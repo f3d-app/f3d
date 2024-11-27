@@ -208,6 +208,21 @@ PYBIND11_MODULE(pyf3d, module)
     .def_static("text_distance", &f3d::utils::textDistance);
 
   // f3d::interactor
+  py::class_<f3d::interaction_bind_t> interaction_bind(module, "InteractionBind");
+
+  py::enum_<f3d::interaction_bind_t::ModifierKeys>(interaction_bind, "ModifierKeys")
+    .value("ANY", f3d::interaction_bind_t::ModifierKeys::ANY)
+    .value("NONE", f3d::interaction_bind_t::ModifierKeys::NONE)
+    .value("CTRL", f3d::interaction_bind_t::ModifierKeys::CTRL)
+    .value("SHIFT", f3d::interaction_bind_t::ModifierKeys::SHIFT)
+    .value("CTRL_SHIFT", f3d::interaction_bind_t::ModifierKeys::CTRL_SHIFT)
+    .export_values();
+
+  interaction_bind.def(py::init<const f3d::interaction_bind_t::ModifierKeys&, const std::string&>())
+    .def_readwrite("mod", &f3d::interaction_bind_t::mod)
+    .def_readwrite("inter", &f3d::interaction_bind_t::inter)
+    .def("format", &f3d::interaction_bind_t::format);
+
   py::class_<f3d::interactor, std::unique_ptr<f3d::interactor, py::nodelete>> interactor(
     module, "Interactor");
   interactor //
@@ -233,25 +248,18 @@ PYBIND11_MODULE(pyf3d, module)
     .def("init_bindings", &f3d::interactor::initBindings,
       "Remove all bindings and add default bindings")
     .def("add_binding",
-      py::overload_cast<const std::string&, f3d::interactor::ModifierKeys, std::string>(
-        &f3d::interactor::addBinding),
+      py::overload_cast<const f3d::interaction_bind_t&, std::string, std::string,
+        std::function<std::pair<std::string, std::string>()>>(&f3d::interactor::addBinding),
       "Add a binding command")
     .def("add_binding",
-      py::overload_cast<const std::string&, f3d::interactor::ModifierKeys,
-        std::vector<std::string>>(&f3d::interactor::addBinding),
+      py::overload_cast<const f3d::interaction_bind_t&, std::vector<std::string>, std::string,
+        std::function<std::pair<std::string, std::string>()>>(&f3d::interactor::addBinding),
       "Add binding commands")
     .def("remove_binding", &f3d::interactor::removeBinding, "Remove interaction commands")
-    .def("get_binding_interactions", &f3d::interactor::getBindingInteractions,
-      "Get all interaction binds")
-    .def_static("get_default_interactions_info", &f3d::interactor::getDefaultInteractionsInfo);
-
-  py::enum_<f3d::interactor::ModifierKeys>(interactor, "ModifierKeys")
-    .value("ANY", f3d::interactor::ModifierKeys::ANY)
-    .value("NONE", f3d::interactor::ModifierKeys::NONE)
-    .value("CTRL", f3d::interactor::ModifierKeys::CTRL)
-    .value("SHIFT", f3d::interactor::ModifierKeys::SHIFT)
-    .value("CTRL_SHIFT", f3d::interactor::ModifierKeys::CTRL_SHIFT)
-    .export_values();
+    .def("get_bind_groups", &f3d::interactor::getBindGroups)
+    .def("get_binds_for_group", &f3d::interactor::getBindsForGroup)
+    .def("get_binds", &f3d::interactor::getBinds)
+    .def("get_binding_documentation", &f3d::interactor::getBindingDocumentation);
 
   // f3d::mesh_t
   py::class_<f3d::mesh_t>(module, "Mesh")

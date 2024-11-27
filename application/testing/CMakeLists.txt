@@ -394,14 +394,16 @@ if(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestInteractionCheatsheetRaytracing DATA cow.vtp INTERACTION) #H
   f3d_test(NAME TestInteractionCheatsheetWhiteBGRaytracing DATA cow.vtp ARGS --bg-color=1,1,1 INTERACTION) #H
   f3d_test(NAME TestInteractionCheatsheetBlackBGRaytracing DATA cow.vtp ARGS --bg-color=0,0,0 INTERACTION) #H
-  f3d_test(NAME TestInteractionCheatsheetScalarsRaytracing DATA dragon.vtu ARGS --scalar-coloring --comp=-2 INTERACTION LONG_TIMEOUT) #HSSS
-  f3d_test(NAME TestInteractionNoFileCheatsheetRaytracing INTERACTION NO_DATA_FORCE_RENDER) #HXZM
+  f3d_test(NAME TestInteractionCheatsheetScalarsRaytracing DATA dragon.vtu ARGS --scalar-coloring --comp=-2 RESOLUTION 800,800 INTERACTION LONG_TIMEOUT) #HSSS
+  f3d_test(NAME TestInteractionCheatsheetNoFileRaytracing INTERACTION NO_DATA_FORCE_RENDER) #HXZM
+  f3d_test(NAME TestInteractionCheatsheetAnimationNameRaytracing DATA InterpolationTest.glb ARGS --animation-index=6 RESOLUTION 800,800 INTERACTION) #HWWW
 else()
   f3d_test(NAME TestInteractionCheatsheet DATA cow.vtp INTERACTION) #H
   f3d_test(NAME TestInteractionCheatsheetWhiteBG DATA cow.vtp ARGS --bg-color=1,1,1 INTERACTION) #H
   f3d_test(NAME TestInteractionCheatsheetBlackBG DATA cow.vtp ARGS --bg-color=0,0,0 INTERACTION) #H
-  f3d_test(NAME TestInteractionCheatsheetScalars DATA dragon.vtu ARGS --scalar-coloring --comp=-2 INTERACTION LONG_TIMEOUT) #HSSS
-  f3d_test(NAME TestInteractionNoFileCheatsheet INTERACTION NO_DATA_FORCE_RENDER) #HXZM
+  f3d_test(NAME TestInteractionCheatsheetScalars DATA dragon.vtu ARGS --scalar-coloring --comp=-2 RESOLUTION 800,800 INTERACTION LONG_TIMEOUT) #HSSS
+  f3d_test(NAME TestInteractionCheatsheetNoFile INTERACTION NO_DATA_FORCE_RENDER) #HXZM
+  f3d_test(NAME TestInteractionCheatsheetAnimationName DATA InterpolationTest.glb ARGS --animation-index=6 RESOLUTION 800,800 INTERACTION) #HWWW
 endif()
 
 f3d_test(NAME TestCameraPersp DATA Cameras.gltf ARGS --camera-index=0)
@@ -518,7 +520,8 @@ if(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestRaytracingNoBackground DATA suzanne.ply ARGS -rd --samples=4 --no-background)
 
 else(F3D_MODULE_RAYTRACING)
-  f3d_test(NAME TestInteractionRaytracingDenoiseNoRaytracing DATA suzanne.ply INTERACTION NO_BASELINE REGEXP "Raytracing options can't be used if F3D has not been built with raytracing") #RD
+  # XXX: This test is disabled until this code can be reached again using `--command-script`
+  # f3d_test(NAME TestInteractionRaytracingDenoiseNoRaytracing DATA suzanne.ply INTERACTION NO_BASELINE REGEXP "Raytracing options can't be used if F3D has not been built with raytracing") #RD
 endif()
 
 if(F3D_MODULE_EXR)
@@ -1019,6 +1022,9 @@ f3d_test(NAME TestInteractionInvalidComponent INTERACTION DATA cow.vtp ARGS --co
 if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME TestReadersListMultiplePlugins ARGS --readers-list --load-plugins=assimp,alembic NO_BASELINE REGEXP_FAIL "Plugin failed to load")
 endif()
+
+# Test bindings-list display
+f3d_test(NAME TestBindingsList ARGS --bindings-list REGEXP "Any.Question Print scene descr to terminal")
 
 # Test rendering backends
 # For some reason the sanitizer detects leaks because of EGL and OSMesa

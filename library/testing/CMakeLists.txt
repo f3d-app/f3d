@@ -11,6 +11,7 @@ list(APPEND libf3dSDKTests_list
      TestSDKEngineExceptions.cxx
      TestSDKImage.cxx
      TestSDKInteractorCallBack.cxx
+     TestSDKInteractorDocumentation.cxx
      TestSDKInteractorDropFullScene.cxx
      TestSDKInteractorCommand.cxx
      TestSDKSceneFromMemory.cxx

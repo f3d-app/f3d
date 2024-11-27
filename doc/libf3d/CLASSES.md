@@ -47,6 +47,7 @@ The commands let you interact with the libf3d in a very flexible manner.
 
 Interactor also lets you add and remove bindings in order to modify how
 the libf3d react to different interactions, eg. when a key is pressed or when a file is dropped.
+This API also lets you control the content of the cheatsheet.
 
 Use `log::setVerboseLevel(log::VerboseLevel::DEBUG)` to print debug information on interaction and command use.
 

@@ -43,12 +43,18 @@ public:
   bool triggerCommand(std::string_view command) override;
 
   interactor& initBindings() override;
-  interactor& addBinding(const std::string& interaction, ModifierKeys modifiers,
-    std::vector<std::string> commands) override;
-  interactor& addBinding(
-    const std::string& interaction, ModifierKeys modifiers, std::string command) override;
-  interactor& removeBinding(std::string interaction, ModifierKeys modifiers) override;
-  std::vector<std::pair<std::string, ModifierKeys>> getBindingInteractions() const override;
+  interactor& addBinding(const interaction_bind_t& bind, std::vector<std::string> commands,
+    std::string group = std::string(),
+    documentation_callback_t documentationCallback = nullptr) override;
+  interactor& addBinding(const interaction_bind_t& bind, std::string command,
+    std::string group = std::string(),
+    documentation_callback_t documentationCallback = nullptr) override;
+  interactor& removeBinding(const interaction_bind_t& bind) override;
+  std::vector<std::string> getBindGroups() const override;
+  std::vector<interaction_bind_t> getBindsForGroup(std::string group) const override;
+  std::vector<interaction_bind_t> getBinds() const override;
+  std::pair<std::string, std::string> getBindingDocumentation(
+    const interaction_bind_t& bind) const override;
 
   unsigned long createTimerCallBack(double time, std::function<void()> callBack) override;
   void removeTimerCallBack(unsigned long id) override;

@@ -1,6 +1,6 @@
 # Interactions
 
-## Mouse Interactions
+## 3D Mouse Interactions
 
 Simple interaction with the displayed data is possible directly within the window. It is as follows:
 
@@ -12,11 +12,10 @@ Simple interaction with the displayed data is possible directly within the windo
 * Hold <kbd>Ctrl</kbd>, then *Move the mouse wheel* to zoom in/out to mouse position.
 * *Click and drag* with the *middle* mouse button to translate the camera.
 * *Click* with the *middle* mouse button to center the camera on the point under the cursor (hold <kbd>Shift</kbd> to allow forward or backward movement).
-* Drag and drop a file, directory or HDRI into the F3D window to load it. F3D relies on the extension (`.hdr` or `.exr`) to detect if the dropped file is an HDRI.
 
 > Note: When playing an animation with a scene camera, camera interactions are locked.
 
-## Hotkeys
+## Bindings
 
 The coloring can be controlled directly by pressing the following hotkeys:
 
@@ -52,7 +51,7 @@ Other options can be toggled directly by pressing the following hotkeys:
 * <kbd>L</kbd>: increase lights intensity.
 * <kbd>Shift</kbd>+<kbd>L</kbd>: decrease lights intensity.
 
-Note that some hotkeys can be available or not depending on the file being loaded and the F3D configuration.
+Note that the raytracing hotkeys are only available if F3D is build with raytracing enabled.
 
 Camera Hotkeys:
 * <kbd>1</kbd>: front view camera.
@@ -64,7 +63,7 @@ Camera Hotkeys:
 * <kbd>9</kbd>: isometric view camera.
 * <kbd>Enter</kbd>: reset the camera to its initial parameters.
 
-Other hotkeys are available:
+Other hotkeys and interactions are available:
 
 * <kbd>H</kbd>: key to toggle the display of a cheat sheet showing all these hotkeys and their statuses.
 * <kbd>?</kbd>: key to print scene description to the terminal.
@@ -76,6 +75,9 @@ Other hotkeys are available:
 * <kbd>&darr;</kbd>: add all current files parent directories to the list of files, reload the currently loaded files and reset the camera.
 * <kbd>F12</kbd>: take a screenshot, ie. render the current view to an image file.
 * <kbd>F11</kbd>: take a "minimal" screenshot, ie. render the current view with no grid and no overlays to an image file with a transparent background.
+* *Drop* a file, directory or HDRI into the F3D window to load it. F3D relies on the extension (`.hdr` or `.exr`) to detect if the dropped file is an HDRI.
+* <kbd>Ctrl</kbd> + *Drop* a file, directory and load it.
+* <kbd>Shift</kbd> + *Drop* a HDRI and use it, no extensions checks performed.
 
 When loading another file or reloading, options that have been changed interactively are kept as is.
 
