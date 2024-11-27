@@ -192,7 +192,7 @@ f3d_test(NAME TestVolumeMag DATA vase_4comp.vti ARGS -vb)
 f3d_test(NAME TestVolumeComp DATA vase_4comp.vti ARGS -vb --comp=3)
 f3d_test(NAME TestVolumeDirect DATA vase_4comp.vti ARGS -vb --comp=-2)
 f3d_test(NAME TestVolumeCells DATA waveletArrays.vti ARGS -vb --cells)
-f3d_test(NAME TestVolumeColoringArray DATA waveletArrays.vti ARGS -vb --coloring-array=Result LONG_TIMEOUT THRESHOLD 0.07)
+f3d_test(NAME TestVolumeColoringArray DATA waveletArrays.vti ARGS -vb --coloring-array=Result LONG_TIMEOUT)
 f3d_test(NAME TestTextureNormal DATA WaterBottle.glb ARGS --texture-normal=${F3D_SOURCE_DIR}/testing/data/normal.png --normal-scale=0.1)
 f3d_test(NAME TestTextureMaterial DATA WaterBottle.glb ARGS --texture-material=${F3D_SOURCE_DIR}/testing/data/red_mod.jpg --roughness=1 --metallic=1)
 f3d_test(NAME TestTextureMaterialWithOptions DATA WaterBottle.glb ARGS --texture-material=${F3D_SOURCE_DIR}/testing/data/red_mod.jpg --roughness=0.5 --metallic=0.5)
@@ -805,7 +805,7 @@ f3d_test(NAME TestInteractionProgressReload DATA cow.vtp ARGS --progress NO_BASE
 
 # For some reasons this animation test goes "too far" when run with sanitizer
 if(F3D_SANITIZER STREQUAL "none")
-  f3d_test(NAME TestInteractionCycleAnimation DATA InterpolationTest.glb INTERACTION THRESHOLD 0.06) #WWWWWWWWWWW;Space;Space;
+  f3d_test(NAME TestInteractionCycleAnimation DATA InterpolationTest.glb INTERACTION) #WWWWWWWWWWW;Space;Space;
 endif()
 f3d_test(NAME TestInteractionCycleAnimationNoAnimation DATA cow.vtp INTERACTION NO_BASELINE) #W
 

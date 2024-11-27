@@ -45,6 +45,8 @@ struct vtkF3DImguiActor::Internals
 
       // Create VBO
       this->VertexBuffer = vtkSmartPointer<vtkOpenGLBufferObject>::New();
+
+      // https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10589
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231016)
       this->VertexBuffer->SetUsage(vtkOpenGLBufferObject::StreamDraw);
 #endif
@@ -52,6 +54,8 @@ struct vtkF3DImguiActor::Internals
 
       // Create IBO
       this->IndexBuffer = vtkSmartPointer<vtkOpenGLBufferObject>::New();
+
+      // https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10589
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231016)
       this->IndexBuffer->SetUsage(vtkOpenGLBufferObject::StreamDraw);
 #endif
