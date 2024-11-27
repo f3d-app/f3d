@@ -1172,7 +1172,7 @@ void vtkF3DRenderer::SetLightIntensity(const double intensityFactor)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetFilenameInfo(const std::string& info)
 {
-  this->UIActor->ReportFileName(info);
+  this->UIActor->SetFileName(info);
 }
 
 //----------------------------------------------------------------------------
