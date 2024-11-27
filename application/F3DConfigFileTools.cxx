@@ -186,7 +186,7 @@ F3DOptionsTools::OptionsEntries F3DConfigFileTools::ReadConfigFiles(const std::s
       {
         match = configBlock.at("match");
       }
-      catch(nlohmann::json::exception&)
+      catch (nlohmann::json::exception&)
       {
         // No match defined, use a catch all regex
         match = ".*";
@@ -198,7 +198,9 @@ F3DOptionsTools::OptionsEntries F3DConfigFileTools::ReadConfigFiles(const std::s
       {
         optionsBlock = configBlock.at("options");
       }
-      catch(nlohmann::json::exception&){}
+      catch (nlohmann::json::exception&)
+      {
+      }
 
       // Add each options config entry into an option dict
       F3DOptionsTools::OptionsDict entry;

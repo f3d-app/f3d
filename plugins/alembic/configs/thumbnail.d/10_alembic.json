@@ -1,7 +1,7 @@
 [
 {
   "match": ".*(abc)",
-  "opions":
+  "options":
   {
     "scalar-coloring": true,
     "load-plugins": "alembic"
