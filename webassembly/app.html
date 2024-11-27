@@ -176,13 +176,21 @@
               Module.engineInstance.getWindow().render();
             });
         };
-
-        mapToggleIdToOption('grid', 'render.grid.enable');
-        mapToggleIdToOption('axis', 'interactor.axis');
-        mapToggleIdToOption('fxaa', 'render.effect.anti_aliasing');
-        mapToggleIdToOption('tone', 'render.effect.tone_mapping');
-        mapToggleIdToOption('ssao', 'render.effect.ambient_occlusion');
-        mapToggleIdToOption('ambient', 'render.hdri.ambient');
+        
+        // Storing dom el ids to f3d option mappings since also useful for url-param parsing
+        const idOptionMappings = [
+          ['grid', 'render.grid.enable'],
+          ['axis', 'interactor.axis'],
+          ['fxaa', 'render.effect.anti_aliasing'],
+          ['tone', 'render.effect.tone_mapping'],
+          ['ssao', 'render.effect.ambient_occlusion'],
+          ['ambient', 'render.hdri.ambient'],
+        ]
+        // This assumes all toggles are on before mapping their state to options
+        // Ok after f3d(settings) where settings = {..., setupOptions} which toggles some options
+        for (let [id, option] of idOptionMappings) {
+          mapToggleIdToOption(id, option);
+        }
 
         switchDark = () => {
           document.documentElement.classList.add('theme-dark');
@@ -248,8 +256,8 @@
           }
           throw new Error(`Could not parse filename/extension from either urlparam extension, response header content-disposition, nor filename present in url`);
         }
+        // Parse search-query model url-param or load default model file
         function load_from_url(){
-          // Parse search-query model url-param or load default model file
           // const params = new URLSearchParams(window.location.search);
           // Replace first hash with question mark to have real search query parsing and avoid leading # in first parsed urlparam
           const params = new URLSearchParams(window.location.hash.replace(/^#/, '?'));
@@ -274,6 +282,37 @@
             // load the file located in the virtual filesystem
             openFile('f3d.vtp');
           }
+
+          // Parse other options like #axis=false&grid=false&fxaa=false&tone=false&ssao=false&ambient=false
+          const options = Module.engineInstance.getOptions()
+          for (let [id, option] of idOptionMappings) {
+            console.log(id, option)
+            // Set f3d option parameter values
+            const parsed_param_value = params.get(id);
+            console.log('  ', parsed_param_value, typeof parsed_param_value)
+            if (parsed_param_value && parsed_param_value.toLowerCase() === 'false') {
+              // we can use toggle, set_string, set_integer, set_color
+              // sad thing is toggle requires knowing the param state beforehand, rather than setting it explicitly
+              options.toggle(option)
+
+              // Sync UI elements with params value
+              document.querySelector('#' + id).checked = false;
+            }
+          }
+          
+          // Parse up vector and update UI, up is either +Z or +Y
+          const parsed_up_value = params.get('up');
+          if (parsed_up_value) {
+            options.set_string('scene.up_direction', parsed_up_value);
+            if (parsed_up_value == '+Y') {
+              document.getElementById('z-up').classList.remove('is-active');
+              document.getElementById('y-up').classList.add('is-active');
+              openFile(document.getElementById('file-name').innerHTML);
+            }
+          }
+
+          // Needs re-render to update F3D options
+          Module.engineInstance.getWindow().render();
         }
         addEventListener("hashchange", (event) => {load_from_url()}); 
         load_from_url(); 
