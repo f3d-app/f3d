@@ -803,7 +803,7 @@ f3d_test(NAME TestProgress DATA cow.vtp ARGS --progress NO_BASELINE)
 f3d_test(NAME TestProgressScene DATA WaterBottle.glb ARGS --progress NO_BASELINE)
 f3d_test(NAME TestInteractionProgressReload DATA cow.vtp ARGS --progress NO_BASELINE INTERACTION) #Up;Up;Up;Up
 
-# This test is not reliable since dependending on the local performance, different frames can be captured
+# This test is not reliable since depending on the local performance, different frames can be captured
 # f3d_test(NAME TestInteractionCycleAnimation DATA InterpolationTest.glb INTERACTION) #WWWWWWWWWWW;Space;Space;
 f3d_test(NAME TestInteractionCycleAnimationNoAnimation DATA cow.vtp INTERACTION NO_BASELINE) #W
 
