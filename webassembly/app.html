@@ -83,6 +83,10 @@
         </div>
       </div>
     </div>
+    <div class="event-log" style="position: absolute; z-index: 10; bottom: 50px; width: 100%; display: none;">
+      <p style="text-align: center;""> Loading 3D object...</p>
+      <progress class="progress is-primary" id="progressEl" value="0" max="100" style="transition: all 2s; width: 500px; margin: auto;"> 30% </progress>
+    </div>
   </section>
   <script type="text/javascript" src="f3d.js"></script>
   <script type="text/javascript">
@@ -139,13 +143,24 @@
         };
 
         // setup file open event
-        document.querySelector('#file-selector')
-          .addEventListener('change', (evt) => {
+        const progressEl = document.querySelector("#progressEl");
+        const fileSelector = document.querySelector('#file-selector');
+        fileSelector.addEventListener('change', (evt) => {
             for (const file of evt.target.files) {
               const reader = new FileReader();
               reader.addEventListener('loadend', (e) => {
+                progressEl.textContent = "100%";
+                progressEl.value = 100;
                 Module.FS.writeFile(file.name, new Uint8Array(reader.result));
                 openFile(file.name);
+                progressEl.parentElement.style.display = "none"
+              });
+              reader.addEventListener('progress', (evt) => {
+                console.log(evt)
+                const progress = Math.floor(100 * evt.loaded / evt.total);
+                progressEl.parentElement.style.display = "block"
+                progressEl.value = progress;
+                progressEl.textContent = `${progress}%`;
               });
               reader.readAsArrayBuffer(file);
             }
