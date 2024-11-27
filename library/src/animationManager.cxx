@@ -3,11 +3,15 @@
 #include "interactor_impl.h"
 #include "log.h"
 #include "options.h"
-#include "window.h"
+#include "window_impl.h"
+
+#include "vtkF3DRenderer.h"
 
 #include <vtkDoubleArray.h>
 #include <vtkImporter.h>
 #include <vtkProgressBarRepresentation.h>
+#include <vtkRenderWindow.h>
+#include <vtkRendererCollection.h>
 #include <vtkVersion.h>
 
 #include <cmath>
@@ -16,7 +20,7 @@
 namespace f3d::detail
 {
 //----------------------------------------------------------------------------
-animationManager::animationManager(const options& options, window& window)
+animationManager::animationManager(const options& options, window_impl& window)
   : Options(options)
   , Window(window)
 {
@@ -308,6 +312,11 @@ void animationManager::CycleAnimation()
 
   this->EnableOnlyCurrentAnimation();
   this->LoadAtTime(this->TimeRange[0]);
+
+  vtkRenderWindow* renWin = this->Window.GetRenderWindow();
+  vtkF3DRenderer* ren =
+    vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+  ren->SetCheatSheetConfigured(false);
 }
 
 // ---------------------------------------------------------------------------------

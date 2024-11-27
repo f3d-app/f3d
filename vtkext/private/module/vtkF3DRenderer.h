@@ -355,13 +355,19 @@ public:
    * out of date since the last ConfigureCheatSheet call,
    * false otherwise.
    */
-  bool CheatSheetInfoNeedsUpdate();
+  bool CheatSheetNeedsUpdate() const;
 
   /**
    * Configure the cheatsheet text from the provided info
    * Should be called before Render() if CheatSheetInfoNeedsUpdate() returns true.
    */
   void ConfigureCheatSheet(const std::string& info);
+
+  /**
+   * Use this method to flag in the renderer that the cheatsheet needs to be updated
+   * This is not required to call when using any of the setter of the renderer
+   */
+  void SetCheatSheetConfigured(bool flag);
 
 private:
   vtkF3DRenderer();
@@ -429,11 +435,6 @@ private:
    * Create a cache directory if a HDRIHash is set
    */
   void CreateCacheDirectory();
-
-  /**
-   * Shorten a provided name with "..."
-   */
-  static std::string ShortName(const std::string& name, int maxChar);
 
   /**
    * Configure coloring for all actors

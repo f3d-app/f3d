@@ -448,7 +448,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->UpdateActors();
 
   // Update the cheatsheet if needed
-  if (this->Internals->Interactor && renderer->CheatSheetInfoNeedsUpdate())
+  if (this->Internals->Interactor && renderer->CheatSheetNeedsUpdate())
   {
     std::stringstream cheatSheetStream;
     cheatSheetStream << "\n";

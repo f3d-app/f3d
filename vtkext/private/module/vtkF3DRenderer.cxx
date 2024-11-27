@@ -1363,6 +1363,7 @@ void vtkF3DRenderer::ConfigureCheatSheet(const std::string& info)
   if (this->CheatSheetVisible)
   {
     this->CheatSheetActor->SetText(vtkCornerAnnotation::LeftEdge, info.c_str());
+    this->CheatSheetActor->RenderOpaqueGeometry(this);
     this->CheatSheetConfigured = true;
   }
 }
@@ -1633,19 +1634,6 @@ void vtkF3DRenderer::CreateCacheDirectory()
 
   // Create the folder if it does not exists
   vtksys::SystemTools::MakeDirectory(currentCachePath);
-}
-
-//----------------------------------------------------------------------------
-std::string vtkF3DRenderer::ShortName(const std::string& name, int maxChar)
-{
-  if (name.size() <= static_cast<size_t>(maxChar) || maxChar <= 3)
-  {
-    return name;
-  }
-  else
-  {
-    return name.substr(0, maxChar - 3) + "...";
-  }
 }
 
 //----------------------------------------------------------------------------
@@ -2644,7 +2632,13 @@ std::string vtkF3DRenderer::ComponentToString(int component)
 }
 
 //----------------------------------------------------------------------------
-bool vtkF3DRenderer::CheatSheetInfoNeedsUpdate()
+bool vtkF3DRenderer::CheatSheetNeedsUpdate() const
 {
   return this->CheatSheetVisible && !this->CheatSheetConfigured;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetCheatSheetConfigured(bool flag)
+{
+  this->CheatSheetConfigured = flag;
 }

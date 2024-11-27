@@ -17,7 +17,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   win.setSize(300, 300);
 
   // Avoid using a hardcoded value so this test does not fail when adding/removing bindings
-  constexpr int expectedBindingsSize = inter.getBindingsDocumentation().size();
+  size_t expectedBindingsSize = inter.getBindingsDocumentation().size();
 
   // Sanity checks coverage
   if (inter.playInteraction(""))
