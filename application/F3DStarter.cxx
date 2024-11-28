@@ -1100,8 +1100,8 @@ int F3DStarter::Start(int argc, char** argv)
       else
       {
         // Create the event loop repeating timer
+        window.render();
         interactor.createTimerCallBack(30, [this]() { this->EventLoop(); });
-        this->RequestRender();
         interactor.start();
       }
 #endif

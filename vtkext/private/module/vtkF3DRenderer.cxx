@@ -30,6 +30,7 @@
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLFXAAPass.h>
 #include <vtkOpenGLRenderer.h>
+#include <vtkOpenGLRenderWindow.h>
 #include <vtkOpenGLTexture.h>
 #include <vtkPBRLUTTexture.h>
 #include <vtkPNGReader.h>
@@ -217,7 +218,6 @@ vtkF3DRenderer::vtkF3DRenderer()
 
   this->CheatSheetActor->SetTextProperty(textProp);
 
-  this->FilenameActor->GetTextProperty()->SetFontFamilyToCourier();
   this->MetaDataActor->GetTextProperty()->SetFontFamilyToCourier();
   this->TimerActor->GetTextProperty()->SetFontFamilyToCourier();
   this->CheatSheetActor->GetTextProperty()->SetFontFamilyToCourier();
@@ -226,7 +226,6 @@ vtkF3DRenderer::vtkF3DRenderer()
   this->SkyboxActor->SetProjection(vtkSkybox::Sphere);
   this->SkyboxActor->GammaCorrectOn();
 
-  this->FilenameActor->VisibilityOff();
   this->MetaDataActor->VisibilityOff();
   this->TimerActor->VisibilityOff();
   this->CheatSheetActor->VisibilityOff();
@@ -248,6 +247,9 @@ void vtkF3DRenderer::ReleaseGraphicsResources(vtkWindow* w)
     glDeleteQueries(1, &this->Timer);
     this->Timer = 0;
   }
+
+  this->UIActor->ReleaseGraphicsResources(w);
+
   this->Superclass::ReleaseGraphicsResources(w);
 }
 
@@ -258,13 +260,13 @@ void vtkF3DRenderer::Initialize()
   this->RemoveAllViewProps();
   this->RemoveAllLights();
 
-  this->AddActor(this->FilenameActor);
   this->AddActor(this->GridActor);
   this->AddActor(this->TimerActor);
   this->AddActor(this->MetaDataActor);
   this->AddActor(this->DropZoneActor);
   this->AddActor(this->CheatSheetActor);
   this->AddActor(this->SkyboxActor);
+  this->AddActor(this->UIActor);
 
   this->GridConfigured = false;
   this->CheatSheetConfigured = false;
@@ -1081,14 +1083,12 @@ void vtkF3DRenderer::ConfigureTextActors()
   {
     textColor[0] = textColor[1] = textColor[2] = 0.2;
   }
-  this->FilenameActor->GetTextProperty()->SetColor(textColor);
   this->MetaDataActor->GetTextProperty()->SetColor(textColor);
   this->TimerActor->GetTextProperty()->SetColor(textColor);
   this->CheatSheetActor->GetTextProperty()->SetColor(0.8, 0.8, 0.8);
   this->DropZoneActor->GetTextProperty()->SetColor(textColor);
 
   // Font
-  this->FilenameActor->GetTextProperty()->SetFontFamilyToCourier();
   this->MetaDataActor->GetTextProperty()->SetFontFamilyToCourier();
   this->TimerActor->GetTextProperty()->SetFontFamilyToCourier();
   this->CheatSheetActor->GetTextProperty()->SetFontFamilyToCourier();
@@ -1098,8 +1098,6 @@ void vtkF3DRenderer::ConfigureTextActors()
     std::string tmpFontFile = vtksys::SystemTools::CollapseFullPath(this->FontFile.value());
     if (vtksys::SystemTools::FileExists(tmpFontFile, true))
     {
-      this->FilenameActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
-      this->FilenameActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
       this->MetaDataActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
       this->MetaDataActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
       this->TimerActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
@@ -1108,6 +1106,7 @@ void vtkF3DRenderer::ConfigureTextActors()
       this->CheatSheetActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
       this->DropZoneActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
       this->DropZoneActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
+      this->UIActor->SetFontFile(tmpFontFile);
     }
     else
     {
@@ -1115,6 +1114,9 @@ void vtkF3DRenderer::ConfigureTextActors()
         F3DLog::Severity::Warning, std::string("Cannot find \"") + tmpFontFile + "\" font file.");
     }
   }
+
+  // create ImGui context if F3D_MODULE_UI is enabled
+  this->UIActor->Initialize(vtkOpenGLRenderWindow::SafeDownCast(this->RenderWindow));
 
   this->TextActorsConfigured = true;
 }
@@ -1170,8 +1172,7 @@ void vtkF3DRenderer::SetLightIntensity(const double intensityFactor)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetFilenameInfo(const std::string& info)
 {
-  this->FilenameActor->SetText(vtkCornerAnnotation::UpperEdge, info.c_str());
-  this->RenderPassesConfigured = false;
+  this->UIActor->SetFileName(info);
 }
 
 //----------------------------------------------------------------------------
@@ -1315,8 +1316,7 @@ void vtkF3DRenderer::ShowFilename(bool show)
   if (this->FilenameVisible != show)
   {
     this->FilenameVisible = show;
-    this->FilenameActor->SetVisibility(show);
-    this->RenderPassesConfigured = false;
+    this->UIActor->SetFileNameVisibility(show);
     this->CheatSheetConfigured = false;
   }
 }

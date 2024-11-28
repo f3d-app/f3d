@@ -1,0 +1,66 @@
+name: 'Install ImGui Dependency'
+description: 'Install ImGui Dependency using cache when possible'
+inputs:
+  cpu:
+    description: 'CPU architecture to build for'
+    required: false
+    default: 'x86_64'
+    
+runs:
+  using: "composite"
+  steps:
+
+    - name: Cache ImGui
+      id: cache-imgui
+      uses: actions/cache@v4
+      with:
+        path: dependencies/imgui_install
+        key: imgui-v1.91.5-${{runner.os}}-${{inputs.cpu}}-4
+
+    - name: Checkout ImGui
+      if: steps.cache-imgui.outputs.cache-hit != 'true'
+      uses: actions/checkout@v4
+      with:
+        repository: ocornut/imgui
+        path: './dependencies/imgui'
+        ref: v1.91.5
+
+    - name: Copy CMake files
+      if: steps.cache-imgui.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/imgui
+      shell: bash
+      run: |
+        cp $GITHUB_ACTION_PATH/CMakeLists.txt ./
+        cp $GITHUB_ACTION_PATH/imgui-config.cmake.in ./
+
+    - name: Setup ImGui
+      if: steps.cache-imgui.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir imgui_build
+        mkdir imgui_install
+
+    - name: Configure ImGui
+      if: steps.cache-imgui.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/imgui_build
+      shell: bash
+      run: >
+        cmake ../imgui
+        -DBUILD_SHARED_LIBS=OFF
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX:PATH=../imgui_install
+        -DCMAKE_PREFIX_PATH:PATH=../install/
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_MACOSX_RPATH=ON' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+
+    - name: Build ImGui
+      if: steps.cache-imgui.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/imgui_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/imgui_install
+      shell: bash
+      run: cp -r ./* ../install/

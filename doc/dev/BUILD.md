@@ -10,6 +10,7 @@ please take a look at our [getting started guide](GETTING_STARTED.md).
 * [VTK](https://vtk.org) >= 9.2.6 (9.3.1 recommended).
 * A C++17 compiler.
 * A CMake-compatible build system (Visual Studio, XCode, Ninja, Make, etc.).
+* Optionally (but recommended), [ImGui](https://github.com/ocornut/imgui/) >= 1.91.5.
 * Optionally, [Assimp](https://www.assimp.org/) >= 5.0.
 * Optionally, Open CASCADE [OCCT](https://dev.opencascade.org/) >= 7.5.2.
 * Optionally, [Alembic](http://www.alembic.io/) >= 1.7.
@@ -42,6 +43,7 @@ Some modules, plugins and language bindings depending on external libraries can 
 
 * `F3D_MODULE_RAYTRACING`: Support for raytracing rendering. Requires that VTK has been built with `OSPRay` and `VTK_MODULE_ENABLE_VTK_RenderingRayTracing` turned on. Disabled by default.
 * `F3D_MODULE_EXR`: Support for OpenEXR images. Requires `OpenEXR`. Disabled by default.
+* `F3D_MODULE_UI`: Support for ImGui widgets. Requires `ImGui`. Enabled by default.
 * `F3D_PLUGIN_BUILD_EXODUS`: Support for ExodusII (.ex2) file format. Requires that VTK has been built with `IOExodus` module (and `hdf5`). Enabled by default.
 * `F3D_PLUGIN_BUILD_OCCT`: Support for STEP, IGES, BREP, and XBF file formats. Requires `OpenCASCADE`. Disabled by default.
 * `F3D_PLUGIN_BUILD_ASSIMP`: Support for FBX, DAE, OFF, DXF, X and 3MF file formats. Requires `Assimp`. Disabled by default.

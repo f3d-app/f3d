@@ -10,6 +10,7 @@
 #include "vtkF3DInteractorEventRecorder.h"
 #include "vtkF3DInteractorStyle.h"
 #include "vtkF3DRenderer.h"
+#include "vtkF3DUIObserver.h"
 
 #include <vtkCallbackCommand.h>
 #include <vtkCellPicker.h>
@@ -71,6 +72,8 @@ public:
     this->VTKInteractor->SetRenderWindow(this->Window.GetRenderWindow());
     this->VTKInteractor->SetInteractorStyle(this->Style);
     this->VTKInteractor->Initialize();
+
+    this->UIObserver->InstallObservers(this->VTKInteractor);
 
     // Disable standard interactor behavior with timer event
     // in order to be able to interact while animating
@@ -446,6 +449,7 @@ public:
   vtkSmartPointer<vtkRenderWindowInteractor> VTKInteractor;
   vtkNew<vtkF3DInteractorStyle> Style;
   vtkSmartPointer<vtkF3DInteractorEventRecorder> Recorder;
+  vtkNew<vtkF3DUIObserver> UIObserver;
   std::map<unsigned long, std::pair<int, std::function<void()>>> TimerCallBacks;
 
   std::map<std::string, std::function<void(const std::vector<std::string>&)>> Commands;

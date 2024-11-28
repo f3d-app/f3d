@@ -3,15 +3,10 @@ list(APPEND libf3dSDKTests_list
      TestSDKCamera.cxx
      TestSDKCompareWithFile.cxx
      TestSDKDropZone.cxx
-     TestSDKDynamicBackgroundColor.cxx
-     TestSDKDynamicFontFile.cxx
      TestSDKDynamicLightIntensity.cxx
-     TestSDKDynamicProperties.cxx
      TestSDKEngine.cxx
      TestSDKEngineExceptions.cxx
      TestSDKImage.cxx
-     TestSDKInteractorCallBack.cxx
-     TestSDKInteractorDocumentation.cxx
      TestSDKInteractorDropFullScene.cxx
      TestSDKInteractorCommand.cxx
      TestSDKSceneFromMemory.cxx
@@ -28,11 +23,22 @@ list(APPEND libf3dSDKTests_list
      TestPseudoUnitTest.cxx
 )
 
-# HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
+# Tests having UI widgets
+if(F3D_MODULE_UI)
   list(APPEND libf3dSDKTests_list
-    TestSDKDynamicHDRI.cxx
+    TestSDKDynamicBackgroundColor.cxx
+    TestSDKDynamicFontFile.cxx
+    TestSDKDynamicProperties.cxx
+    TestSDKInteractorCallBack.cxx
+    TestSDKInteractorDocumentation.cxx
     )
+
+  # HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
+    list(APPEND libf3dSDKTests_list
+      TestSDKDynamicHDRI.cxx
+      )
+  endif()
 endif()
 
 # Invalid scene codepath needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11287
@@ -142,7 +148,7 @@ Test Warning\nTest Error\nTest Error\n\
 Test Print Debug\nTest Print Info\nTest Print Warning\nTest Print Error\n\
 Test Debug Coloring")
 
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
+if(F3D_MODULE_UI AND VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   set_tests_properties(libf3d::TestSDKDynamicHDRI PROPERTIES TIMEOUT 120)
   if(NOT F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS)
     set_tests_properties(libf3d::TestSDKDynamicHDRI PROPERTIES DISABLED ON)

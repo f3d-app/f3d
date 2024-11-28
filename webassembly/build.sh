@@ -4,6 +4,7 @@ set -euo pipefail
 
 cmake -S /src -B /build \
     -DBUILD_SHARED_LIBS=OFF \
+    -DF3D_MODULE_UI=OFF \
     -DF3D_STRICT_BUILD=ON \
     -DF3D_PLUGIN_BUILD_ASSIMP=ON \
     -DF3D_PLUGIN_BUILD_DRACO=ON \

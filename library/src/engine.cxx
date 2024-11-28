@@ -391,6 +391,12 @@ engine::libInformation engine::getLibInfo()
   libInfo.Modules["OpenEXR"] = false;
 #endif
 
+#if F3D_MODULE_UI
+  libInfo.Modules["ImGui"] = true;
+#else
+  libInfo.Modules["ImGui"] = false;
+#endif
+
   std::string vtkVersion = std::string(vtkVersion::GetVTKVersionFull());
   if (!vtkVersion.empty())
   {

@@ -3,7 +3,7 @@
  * @brief   A F3D dedicated renderer
  *
  * This renderers all the generic actors added by F3D which includes
- * axis, grid, edges, timer, filename, metadata and cheatsheet.
+ * UI, axis, grid, edges, timer, metadata and cheatsheet.
  * It also handles the different rendering passes, including
  * raytracing, ssao, fxaa, tonemapping.
  */
@@ -12,6 +12,7 @@
 #define vtkF3DRenderer_h
 
 #include "vtkF3DMetaImporter.h"
+#include "vtkF3DUIActor.h"
 
 #include <vtkLight.h>
 #include <vtkOpenGLRenderer.h>
@@ -470,12 +471,12 @@ private:
 
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
 
-  vtkNew<vtkCornerAnnotation> FilenameActor;
   vtkNew<vtkCornerAnnotation> MetaDataActor;
   vtkNew<vtkCornerAnnotation> CheatSheetActor;
   vtkNew<vtkF3DDropZoneActor> DropZoneActor;
   vtkNew<vtkActor> GridActor;
   vtkNew<vtkSkybox> SkyboxActor;
+  vtkNew<vtkF3DUIActor> UIActor;
 
   // vtkCornerAnnotation building is too slow for the timer
   vtkNew<vtkTextActor> TimerActor;
