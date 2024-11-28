@@ -204,7 +204,7 @@ F3DOptionsTools::OptionsEntries F3DConfigFileTools::ReadConfigFiles(const std::s
         {
         }
 
-        if (optionsBlock.size() == 0)
+        if (optionsBlock.empty())
         {
           // To help users figure out issues with configuration files
           f3d::log::warn("A config block in config file: ", configFilePath.string(),
