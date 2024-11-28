@@ -994,6 +994,9 @@ f3d_test(NAME TestVerboseUnnamedAnimation DATA BoxAnimated.gltf ARGS --verbose R
 f3d_test(NAME TestConfigFileEmpty DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/empty.json REGEXP_FAIL "empty.json" NO_BASELINE)
 
 # Test invalid value in config file
+f3d_test(NAME TestConfigFileInvalidOptions DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/invalid_options.json REGEXP "Error processing config file" NO_BASELINE)
+
+# Test invalid value in config file
 f3d_test(NAME TestConfigFileInvalidValue DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/invalid_value.json REGEXP "must be a string, a boolean or a number" NO_BASELINE)
 
 # Test non-parsable value in config file
