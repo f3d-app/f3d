@@ -208,7 +208,7 @@ F3DOptionsTools::OptionsEntries F3DConfigFileTools::ReadConfigFiles(const std::s
         {
           // To help users figure out issues with configuration files
           f3d::log::warn("A config block in config file: ", configFilePath.string(),
-                         " does not contains options, ignoring block");
+            " does not contains options, ignoring block");
         }
         else
         {
