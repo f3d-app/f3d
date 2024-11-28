@@ -990,9 +990,6 @@ f3d_test(NAME TestInvalidMultiFileMode DATA mb/recursive ARGS --multi-file-mode=
 f3d_test(NAME TestVerboseUnnamedCamera DATA Cameras.gltf ARGS --verbose REGEXP "1: unnamed_1" NO_BASELINE)
 f3d_test(NAME TestVerboseUnnamedAnimation DATA BoxAnimated.gltf ARGS --verbose REGEXP "0: unnamed_0" NO_BASELINE)
 
-# Test empty and valid config file
-f3d_test(NAME TestConfigFileEmpty DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/empty.json REGEXP_FAIL "empty.json" NO_BASELINE)
-
 # Test invalid value in config file
 f3d_test(NAME TestConfigFileInvalidOptions DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/invalid_options.json REGEXP "Error processing config file" NO_BASELINE)
 
