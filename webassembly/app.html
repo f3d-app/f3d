@@ -354,12 +354,19 @@
           }
           
           // Parse up vector and update UI, up is either +Z or +Y
-          const parsed_up_value = params.get('up');
+          // + Plus sign means spaces in urls, so +Z has to be replaced by %2BZ
+          const parsed_up_value = params.get('up'); 
           if (parsed_up_value) {
+            console.log('up', parsed_up_value)
             options.set_string('scene.up_direction', parsed_up_value);
             if (parsed_up_value == '+Y') {
               document.getElementById('z-up').classList.remove('is-active');
               document.getElementById('y-up').classList.add('is-active');
+              openFile(document.getElementById('file-name').innerHTML);
+            }
+            else {
+              document.getElementById('z-up').classList.add('is-active');
+              document.getElementById('y-up').classList.remove('is-active');
               openFile(document.getElementById('file-name').innerHTML);
             }
           }
