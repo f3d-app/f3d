@@ -997,6 +997,9 @@ f3d_test(NAME TestConfigFileEmpty DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/
 f3d_test(NAME TestConfigFileInvalidOptions DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/invalid_options.json REGEXP "Error processing config file" NO_BASELINE)
 
 # Test invalid value in config file
+f3d_test(NAME TestConfigFileNoOptions DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/no_options.json REGEXP "does not contains options" NO_BASELINE)
+
+# Test invalid value in config file
 f3d_test(NAME TestConfigFileInvalidValue DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/invalid_value.json REGEXP "must be a string, a boolean or a number" NO_BASELINE)
 
 # Test non-parsable value in config file

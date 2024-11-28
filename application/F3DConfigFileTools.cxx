@@ -204,28 +204,37 @@ F3DOptionsTools::OptionsEntries F3DConfigFileTools::ReadConfigFiles(const std::s
         {
         }
 
-        // Add each options config entry into an option dict
-        F3DOptionsTools::OptionsDict entry;
-        for (const auto& item : optionsBlock.items())
+        if (optionsBlock.size() == 0)
         {
-          if (item.value().is_number() || item.value().is_boolean())
-          {
-            entry[item.key()] = nlohmann::to_string(item.value());
-          }
-          else if (item.value().is_string())
-          {
-            entry[item.key()] = item.value().get<std::string>();
-          }
-          else
-          {
-            f3d::log::error(item.key(), " from ", configFilePath.string(),
-              " must be a string, a boolean or a number, ignoring entry");
-            continue;
-          }
+          // To help users figure out issues with configuration files
+          f3d::log::warn("A config block in config file: ", configFilePath.string(),
+                         " does not contains options, ignoring block");
         }
+        else
+        {
+          // Add each options config entry into an option dict
+          F3DOptionsTools::OptionsDict entry;
+          for (const auto& item : optionsBlock.items())
+          {
+            if (item.value().is_number() || item.value().is_boolean())
+            {
+              entry[item.key()] = nlohmann::to_string(item.value());
+            }
+            else if (item.value().is_string())
+            {
+              entry[item.key()] = item.value().get<std::string>();
+            }
+            else
+            {
+              f3d::log::error(item.key(), " from ", configFilePath.string(),
+                " must be a string, a boolean or a number, ignoring entry");
+              continue;
+            }
+          }
 
-        // Emplace the option dict for that pattern match into the config entries vector
-        confEntries.emplace_back(entry, configFilePath, match);
+          // Emplace the option dict for that pattern match into the config entries vector
+          confEntries.emplace_back(entry, configFilePath, match);
+        }
       }
     }
     catch (const nlohmann::json::type_error& ex)
