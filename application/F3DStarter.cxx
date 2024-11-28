@@ -1007,7 +1007,7 @@ int F3DStarter::Start(int argc, char** argv)
         std::string command;
         while (std::getline(scriptFile, command))
         {
-          if (!command.empty() && command[0] != '#')
+          if (!command.empty())
           {
             interactor.triggerCommand(command);
           }
