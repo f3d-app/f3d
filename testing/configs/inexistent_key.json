@@ -1,6 +1,8 @@
+[
 {
-    ".*":
-    {
-      "scene.animation.inexistent": 0
-    }
+  "options":
+  {
+    "scene.animation.inexistent": 0
+  }
 }
+]

@@ -1,5 +1,7 @@
+[
 {
-  ".*(step|stp|iges|igs|brep|xbf)":
+  "match": ".*(step|stp|iges|igs|brep|xbf)",
+  "options":
   {
     "scalar-coloring": true,
     "load-plugins": "occt",
@@ -10,3 +12,4 @@
     "camera-direction": "-1,1,-0.5"
   }
 }
+]

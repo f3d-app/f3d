@@ -1,6 +1,8 @@
+[
 {
-    ".*":
-    {
-      "verbose": {"foo": "bar"}
-    }
+  "options":
+  {
+    "verbose": {"foo": "bar"}
+  }
 }
+]

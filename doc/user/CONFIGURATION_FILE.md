@@ -10,37 +10,52 @@ in order to provide different default values for the different filetypes.
 
 Using a command-line option will override similar option set in any config files.
 
-Some options are only taken into account on the first load and not on subsequent loads, 
+Some options are only taken into account on the first load and not on subsequent loads,
 when switching between files.
 
 A typical config file may look like this:
 
 ```javascript
+[
 {
-   ".*": {
-       "bg-color": "0.7,0.7,0.7",
-       "color": "0.5,0.1,0.1",
-       "anti-aliasing": true,
-       "timer": true,
-       "progress": true,
-       "axis": true,
-       "bar": true,
-       "roughness": 0.2,
-       "grid": true,
-       "scalar-coloring": true
-   },
-   ".*vt.": {
-       "edges": true
-   },
-   ".*gl(tf|b)": {
-       "raytracing": true,
-       "denoise": true,
-       "samples": 3
-   },
-   ".*mhd": {
-       "volume": true
-   }
+  "options":
+  {
+     "bg-color": "0.7,0.7,0.7",
+     "color": "0.5,0.1,0.1",
+     "anti-aliasing": true,
+     "timer": true,
+     "progress": true,
+     "axis": true,
+     "bar": true,
+     "roughness": 0.2,
+     "grid": true,
+     "scalar-coloring": true
+  }
+},
+{
+  "match": ".*vt.",
+  "options":
+  {
+    "edges": true
+  }
+},
+{
+  "match": ".*gl(tf|b)",
+  "options":
+  {
+    "raytracing": true,
+    "denoise": true,
+    "samples": 3
+  }
+},
+{
+  "match": ".*mhd",
+  "options":
+  {
+    "volume": true
+  }
 }
+]
 ```
 Here, the first block defines a basic configuration with many desired options for all files.
 The second block specifies that all files ending with vt., eg: vtk, vtp, vtu, ... will be shown with edges visibility turned on.
