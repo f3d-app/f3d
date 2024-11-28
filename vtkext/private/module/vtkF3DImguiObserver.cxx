@@ -11,122 +11,160 @@
 
 #include <imgui.h>
 
+#include <unordered_map>
+
 namespace
 {
   ImGuiKey GetImGuiKeyFromKeySym(std::string_view&& keySym)
   {
-    if (keySym == "Tab") return ImGuiKey_Tab;
-    if (keySym == "Left") return ImGuiKey_LeftArrow;
-    if (keySym == "Right") return ImGuiKey_RightArrow;
-    if (keySym == "Up") return ImGuiKey_UpArrow;
-    if (keySym == "Down") return ImGuiKey_DownArrow;
-    if (keySym == "Prior") return ImGuiKey_PageUp;
-    if (keySym == "Next") return ImGuiKey_PageDown;
-    if (keySym == "Home") return ImGuiKey_Home;
-    if (keySym == "End") return ImGuiKey_End;
-    if (keySym == "Insert") return ImGuiKey_Insert;
-    if (keySym == "Delete") return ImGuiKey_Delete;
-    if (keySym == "Backspace") return ImGuiKey_Backspace;
-    if (keySym == "space") return ImGuiKey_Space;
-    if (keySym == "Return") return ImGuiKey_Enter;
-    if (keySym == "Escape") return ImGuiKey_Escape;
-    if (keySym == "Control_L") return ImGuiKey_LeftCtrl;
-    if (keySym == "Shift_L") return ImGuiKey_LeftShift;
-    if (keySym == "Alt_L") return ImGuiKey_LeftAlt;
-    if (keySym == "Super_L") return ImGuiKey_LeftSuper;
-    if (keySym == "Control_R") return ImGuiKey_RightCtrl;
-    if (keySym == "Shift_R") return ImGuiKey_RightShift;
-    if (keySym == "Alt_R") return ImGuiKey_RightAlt;
-    if (keySym == "Super_R") return ImGuiKey_RightSuper;
-    if (keySym == "Menu") return ImGuiKey_Menu;
-    if (keySym == "0") return ImGuiKey_0;
-    if (keySym == "1") return ImGuiKey_1;
-    if (keySym == "2") return ImGuiKey_2;
-    if (keySym == "3") return ImGuiKey_3;
-    if (keySym == "4") return ImGuiKey_4;
-    if (keySym == "5") return ImGuiKey_5;
-    if (keySym == "6") return ImGuiKey_6;
-    if (keySym == "7") return ImGuiKey_7;
-    if (keySym == "8") return ImGuiKey_8;
-    if (keySym == "9") return ImGuiKey_9;
-    if (keySym == "a" || keySym == "A") return ImGuiKey_A;
-    if (keySym == "b" || keySym == "B") return ImGuiKey_B;
-    if (keySym == "c" || keySym == "C") return ImGuiKey_C;
-    if (keySym == "d" || keySym == "D") return ImGuiKey_D;
-    if (keySym == "e" || keySym == "E") return ImGuiKey_E;
-    if (keySym == "f" || keySym == "F") return ImGuiKey_F;
-    if (keySym == "g" || keySym == "G") return ImGuiKey_G;
-    if (keySym == "h" || keySym == "H") return ImGuiKey_H;
-    if (keySym == "i" || keySym == "I") return ImGuiKey_I;
-    if (keySym == "j" || keySym == "J") return ImGuiKey_J;
-    if (keySym == "k" || keySym == "K") return ImGuiKey_K;
-    if (keySym == "l" || keySym == "L") return ImGuiKey_L;
-    if (keySym == "m" || keySym == "M") return ImGuiKey_M;
-    if (keySym == "n" || keySym == "N") return ImGuiKey_N;
-    if (keySym == "o" || keySym == "O") return ImGuiKey_O;
-    if (keySym == "p" || keySym == "P") return ImGuiKey_P;
-    if (keySym == "q" || keySym == "Q") return ImGuiKey_Q;
-    if (keySym == "r" || keySym == "R") return ImGuiKey_R;
-    if (keySym == "s" || keySym == "S") return ImGuiKey_S;
-    if (keySym == "t" || keySym == "T") return ImGuiKey_T;
-    if (keySym == "u" || keySym == "U") return ImGuiKey_U;
-    if (keySym == "v" || keySym == "V") return ImGuiKey_V;
-    if (keySym == "w" || keySym == "W") return ImGuiKey_W;
-    if (keySym == "x" || keySym == "X") return ImGuiKey_X;
-    if (keySym == "y" || keySym == "Y") return ImGuiKey_Y;
-    if (keySym == "z" || keySym == "Z") return ImGuiKey_Z;
-    if (keySym == "F1") return ImGuiKey_F1;
-    if (keySym == "F2") return ImGuiKey_F2;
-    if (keySym == "F3") return ImGuiKey_F3;
-    if (keySym == "F4") return ImGuiKey_F4;
-    if (keySym == "F5") return ImGuiKey_F5;
-    if (keySym == "F6") return ImGuiKey_F6;
-    if (keySym == "F7") return ImGuiKey_F7;
-    if (keySym == "F8") return ImGuiKey_F8;
-    if (keySym == "F9") return ImGuiKey_F9;
-    if (keySym == "F10") return ImGuiKey_F10;
-    if (keySym == "F11") return ImGuiKey_F11;
-    if (keySym == "F12") return ImGuiKey_F12;
-    if (keySym == "F13") return ImGuiKey_F13;
-    if (keySym == "F14") return ImGuiKey_F14;
-    if (keySym == "F15") return ImGuiKey_F15;
-    if (keySym == "F16") return ImGuiKey_F16;
-    if (keySym == "F17") return ImGuiKey_F17;
-    if (keySym == "F18") return ImGuiKey_F18;
-    if (keySym == "F19") return ImGuiKey_F19;
-    if (keySym == "F20") return ImGuiKey_F20;
-    if (keySym == "F21") return ImGuiKey_F21;
-    if (keySym == "F22") return ImGuiKey_F22;
-    if (keySym == "F23") return ImGuiKey_F23;
-    if (keySym == "F24") return ImGuiKey_F24;
-    if (keySym == "apostrophe") return ImGuiKey_Apostrophe;
-    if (keySym == "comma") return ImGuiKey_Comma;
-    if (keySym == "minus") return ImGuiKey_Minus;
-    if (keySym == "period") return ImGuiKey_Period;
-    if (keySym == "slash") return ImGuiKey_Slash;
-    if (keySym == "semicolon") return ImGuiKey_Semicolon;
-    if (keySym == "equal") return ImGuiKey_Equal;
-    if (keySym == "bracketleft") return ImGuiKey_LeftBracket;
-    if (keySym == "backslash") return ImGuiKey_Backslash;
-    if (keySym == "bracketright") return ImGuiKey_RightBracket;
-    if (keySym == "grave") return ImGuiKey_GraveAccent;
-    if (keySym == "Caps_Lock") return ImGuiKey_CapsLock;
-    if (keySym == "Scroll_Lock") return ImGuiKey_ScrollLock;
-    if (keySym == "Num_Lock") return ImGuiKey_NumLock;
-    if (keySym == "Snapshot") return ImGuiKey_PrintScreen;
-    if (keySym == "Pause") return ImGuiKey_Pause;
-    if (keySym == "KP_0") return ImGuiKey_Keypad0;
-    if (keySym == "KP_1") return ImGuiKey_Keypad1;
-    if (keySym == "KP_2") return ImGuiKey_Keypad2;
-    if (keySym == "KP_3") return ImGuiKey_Keypad3;
-    if (keySym == "KP_4") return ImGuiKey_Keypad4;
-    if (keySym == "KP_5") return ImGuiKey_Keypad5;
-    if (keySym == "KP_6") return ImGuiKey_Keypad6;
-    if (keySym == "KP_7") return ImGuiKey_Keypad7;
-    if (keySym == "KP_8") return ImGuiKey_Keypad8;
-    if (keySym == "KP_9") return ImGuiKey_Keypad9;
+    static const std::unordered_map<std::string_view, ImGuiKey> keySymToImGuiKey =
+    {
+      { "Tab", ImGuiKey_Tab },
+      { "Left", ImGuiKey_LeftArrow },
+      { "Right", ImGuiKey_RightArrow },
+      { "Up", ImGuiKey_UpArrow },
+      { "Down", ImGuiKey_DownArrow },
+      { "Prior", ImGuiKey_PageUp },
+      { "Next", ImGuiKey_PageDown },
+      { "Home", ImGuiKey_Home },
+      { "End", ImGuiKey_End },
+      { "Insert", ImGuiKey_Insert },
+      { "Delete", ImGuiKey_Delete },
+      { "Backspace", ImGuiKey_Backspace },
+      { "space", ImGuiKey_Space },
+      { "Return", ImGuiKey_Enter },
+      { "Escape", ImGuiKey_Escape },
+      { "Control_L", ImGuiKey_LeftCtrl },
+      { "Shift_L", ImGuiKey_LeftShift },
+      { "Alt_L", ImGuiKey_LeftAlt },
+      { "Super_L", ImGuiKey_LeftSuper },
+      { "Control_R", ImGuiKey_RightCtrl },
+      { "Shift_R", ImGuiKey_RightShift },
+      { "Alt_R", ImGuiKey_RightAlt },
+      { "Super_R", ImGuiKey_RightSuper },
+      { "Menu", ImGuiKey_Menu },
+      { "0", ImGuiKey_0 },
+      { "1", ImGuiKey_1 },
+      { "2", ImGuiKey_2 },
+      { "3", ImGuiKey_3 },
+      { "4", ImGuiKey_4 },
+      { "5", ImGuiKey_5 },
+      { "6", ImGuiKey_6 },
+      { "7", ImGuiKey_7 },
+      { "8", ImGuiKey_8 },
+      { "9", ImGuiKey_9 },
+      { "a", ImGuiKey_A },
+      { "b", ImGuiKey_B },
+      { "c", ImGuiKey_C },
+      { "d", ImGuiKey_D },
+      { "e", ImGuiKey_E },
+      { "f", ImGuiKey_F },
+      { "g", ImGuiKey_G },
+      { "h", ImGuiKey_H },
+      { "i", ImGuiKey_I },
+      { "j", ImGuiKey_J },
+      { "k", ImGuiKey_K },
+      { "l", ImGuiKey_L },
+      { "m", ImGuiKey_M },
+      { "n", ImGuiKey_N },
+      { "o", ImGuiKey_O },
+      { "p", ImGuiKey_P },
+      { "q", ImGuiKey_Q },
+      { "r", ImGuiKey_R },
+      { "s", ImGuiKey_S },
+      { "t", ImGuiKey_T },
+      { "u", ImGuiKey_U },
+      { "v", ImGuiKey_V },
+      { "w", ImGuiKey_W },
+      { "x", ImGuiKey_X },
+      { "y", ImGuiKey_Y },
+      { "z", ImGuiKey_Z },
+      { "A", ImGuiKey_A },
+      { "B", ImGuiKey_B },
+      { "C", ImGuiKey_C },
+      { "D", ImGuiKey_D },
+      { "E", ImGuiKey_E },
+      { "F", ImGuiKey_F },
+      { "G", ImGuiKey_G },
+      { "H", ImGuiKey_H },
+      { "I", ImGuiKey_I },
+      { "J", ImGuiKey_J },
+      { "K", ImGuiKey_K },
+      { "L", ImGuiKey_L },
+      { "M", ImGuiKey_M },
+      { "N", ImGuiKey_N },
+      { "O", ImGuiKey_O },
+      { "P", ImGuiKey_P },
+      { "Q", ImGuiKey_Q },
+      { "R", ImGuiKey_R },
+      { "S", ImGuiKey_S },
+      { "T", ImGuiKey_T },
+      { "U", ImGuiKey_U },
+      { "V", ImGuiKey_V },
+      { "W", ImGuiKey_W },
+      { "X", ImGuiKey_X },
+      { "Y", ImGuiKey_Y },
+      { "Z", ImGuiKey_Z },
+      { "F1", ImGuiKey_F1 },
+      { "F2", ImGuiKey_F2 },
+      { "F3", ImGuiKey_F3 },
+      { "F4", ImGuiKey_F4 },
+      { "F5", ImGuiKey_F5 },
+      { "F6", ImGuiKey_F6 },
+      { "F7", ImGuiKey_F7 },
+      { "F8", ImGuiKey_F8 },
+      { "F9", ImGuiKey_F9 },
+      { "F10", ImGuiKey_F10 },
+      { "F11", ImGuiKey_F11 },
+      { "F12", ImGuiKey_F12 },
+      { "F13", ImGuiKey_F13 },
+      { "F14", ImGuiKey_F14 },
+      { "F15", ImGuiKey_F15 },
+      { "F16", ImGuiKey_F16 },
+      { "F17", ImGuiKey_F17 },
+      { "F18", ImGuiKey_F18 },
+      { "F19", ImGuiKey_F19 },
+      { "F20", ImGuiKey_F20 },
+      { "F21", ImGuiKey_F21 },
+      { "F22", ImGuiKey_F22 },
+      { "F23", ImGuiKey_F23 },
+      { "F24", ImGuiKey_F24 },
+      { "apostrophe", ImGuiKey_Apostrophe },
+      { "comma", ImGuiKey_Comma },
+      { "minus", ImGuiKey_Minus },
+      { "period", ImGuiKey_Period },
+      { "slash", ImGuiKey_Slash },
+      { "semicolon", ImGuiKey_Semicolon },
+      { "equal", ImGuiKey_Equal },
+      { "bracketleft", ImGuiKey_LeftBracket },
+      { "backslash", ImGuiKey_Backslash },
+      { "bracketright", ImGuiKey_RightBracket },
+      { "grave", ImGuiKey_GraveAccent },
+      { "Caps_Lock", ImGuiKey_CapsLock },
+      { "Scroll_Lock", ImGuiKey_ScrollLock },
+      { "Num_Lock", ImGuiKey_NumLock },
+      { "Snapshot", ImGuiKey_PrintScreen },
+      { "Pause", ImGuiKey_Pause },
+      { "KP_0", ImGuiKey_Keypad0 },
+      { "KP_1", ImGuiKey_Keypad1 },
+      { "KP_2", ImGuiKey_Keypad2 },
+      { "KP_3", ImGuiKey_Keypad3 },
+      { "KP_4", ImGuiKey_Keypad4 },
+      { "KP_5", ImGuiKey_Keypad5 },
+      { "KP_6", ImGuiKey_Keypad6 },
+      { "KP_7", ImGuiKey_Keypad7 },
+      { "KP_8", ImGuiKey_Keypad8 },
+      { "KP_9", ImGuiKey_Keypad9 }
+    };
 
-    return ImGuiKey::ImGuiKey_None;
+    auto it = keySymToImGuiKey.find(keySym);
+
+    if (it == keySymToImGuiKey.end())
+    {
+      return ImGuiKey::ImGuiKey_None;
+    }
+
+    return it->second;
   }
 }
 

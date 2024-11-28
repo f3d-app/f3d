@@ -1,5 +1,9 @@
 #include "vtkF3DImguiActor.h"
 
+#include "vtkF3DImguiFS.h"
+#include "vtkF3DImguiVS.h"
+#include "F3DFontBuffer.h"
+
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLBufferObject.h>
 #include <vtkOpenGLRenderWindow.h>
@@ -17,10 +21,6 @@
 #else
 #include <vtk_glew.h>
 #endif
-
-#include "vtkF3DImguiFS.h"
-#include "vtkF3DImguiVS.h"
-#include "F3DFontBuffer.h"
 
 #include <imgui.h>
 
@@ -250,6 +250,7 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
   io.BackendPlatformName = io.BackendRendererName = "F3D/VTK";
 }
 
+//----------------------------------------------------------------------------
 void vtkF3DImguiActor::ReleaseGraphicsResources(vtkWindow* w)
 {
   this->Pimpl->Release(vtkOpenGLRenderWindow::SafeDownCast(w));
