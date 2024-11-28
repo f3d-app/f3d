@@ -81,8 +81,14 @@ eg: `add_files_or_set_hdri /path/to/dragon.vtu /path/to/file.hdr`.
 
 ## Command Script (`--command-script`)
 
-F3D provides a feature to load and execute commands from a script file using the `--command-script` CLI option. This allows users to automate a sequence of commands by listing them in a plain text file.
-eg: `--command-script path/to/command_script.txt`.
+F3D provides a feature to execute commands from a script file using the `--command-script` [CLI option[(OPTIONS.md)]]. This allows users to automate a sequence of commands by listing them in a plain text file.
+eg: `f3d --command-script path/to/command_script.txt`.
+Example Command Script:
+`roll_camera 90`
+`toggle ui.scalar_bar`
+`print_scene_info`
+`increase_light_intensity`
+In this example, it is shown that each command is required to be written on a new line.
 
 ## Command syntax
 
