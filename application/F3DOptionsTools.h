@@ -27,6 +27,7 @@ using OptionsEntries = std::vector<OptionsEntry>;
 static inline const OptionsDict DefaultAppOptions = {
   { "input", "" },
   { "output", "" },
+  { "bindings-list", "false" },
   { "no-background", "false" },
   { "config", "" },
   { "dry-run", "false" },
@@ -140,6 +141,12 @@ std::pair<std::string, int> GetClosestOption(const std::string& option, bool che
  */
 F3DOptionsTools::OptionsDict ParseCLIOptions(
   int argc, char** argv, std::vector<std::string>& positionals);
+
+/**
+ * Log provided key and help with nice formatting
+ */
+void PrintHelpPair(
+  std::string_view key, std::string_view help, int keyWidth = 10, int helpWidth = 70);
 };
 
 #endif

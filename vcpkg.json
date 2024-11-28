@@ -4,6 +4,7 @@
         "alembic",
         "assimp",
         "draco",
+        "imgui",
         "opencascade",
         "openexr",
         "openvdb",

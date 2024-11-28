@@ -87,7 +87,7 @@ runs:
         -DF3D_PLUGIN_BUILD_VDB=${{ runner.os == 'macOS' && 'OFF' || 'ON' }};
         -DF3D_MACOS_BUNDLE=OFF;
         -DF3D_MODULE_EXR=ON;
-        -DF3D_MODULE_EXTERNAL_RENDERING=ON;
+        -DF3D_MODULE_UI=ON;
         -DF3D_WINDOWS_GUI=OFF" >> $GITHUB_ENV
 
     - name: Set up Python

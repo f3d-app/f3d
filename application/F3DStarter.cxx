@@ -3,6 +3,7 @@
 #include "F3DColorMapTools.h"
 #include "F3DConfig.h"
 #include "F3DConfigFileTools.h"
+#include "F3DException.h"
 #include "F3DIcon.h"
 #include "F3DNSDelegate.h"
 #include "F3DOptionsTools.h"
@@ -67,6 +68,7 @@ public:
   struct F3DAppOptions
   {
     std::string Output;
+    bool BindingsList;
     bool NoBackground;
     bool NoRender;
     std::string RenderingBackend;
@@ -556,6 +558,7 @@ public:
   {
     // Update typed app options from app options
     this->AppOptions.Output = f3d::options::parse<std::string>(appOptions.at("output"));
+    this->AppOptions.BindingsList = f3d::options::parse<bool>(appOptions.at("bindings-list"));
     this->AppOptions.NoBackground = f3d::options::parse<bool>(appOptions.at("no-background"));
     this->AppOptions.NoRender = f3d::options::parse<bool>(appOptions.at("no-render"));
     this->AppOptions.RenderingBackend =
@@ -766,11 +769,12 @@ int F3DStarter::Start(int argc, char** argv)
   }
   else
   {
-    bool offscreen = !reference.empty() || !output.empty();
+    bool offscreen =
+      !reference.empty() || !output.empty() || this->Internals->AppOptions.BindingsList;
 
     if (this->Internals->AppOptions.RenderingBackend == "egl")
     {
-      this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::createEGL(offscreen));
+      this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::createEGL());
     }
     else if (this->Internals->AppOptions.RenderingBackend == "osmesa")
     {
@@ -799,18 +803,17 @@ int F3DStarter::Start(int argc, char** argv)
 
     f3d::interactor& interactor = this->Internals->Engine->getInteractor();
 
-    interactor.addCommandCallback("load_previous_file_group",
-      [this](const std::vector<std::string>&) { return this->LoadRelativeFileGroup(-1); });
+    interactor.addCommand("load_previous_file_group",
+      [this](const std::vector<std::string>&) { this->LoadRelativeFileGroup(-1); });
 
-    interactor.addCommandCallback("load_next_file_group",
-      [this](const std::vector<std::string>&) { return this->LoadRelativeFileGroup(+1); });
+    interactor.addCommand("load_next_file_group",
+      [this](const std::vector<std::string>&) { this->LoadRelativeFileGroup(+1); });
 
-    interactor.addCommandCallback("reload_current_file_group",
+    interactor.addCommand("reload_current_file_group",
+      [this](const std::vector<std::string>&) { this->LoadRelativeFileGroup(0, true, true); });
+
+    interactor.addCommand("add_current_directories",
       [this](const std::vector<std::string>&)
-      { return this->LoadRelativeFileGroup(0, true, true); });
-
-    interactor.addCommandCallback("add_current_directories",
-      [this](const std::vector<std::string>&) -> bool
       {
         if (this->Internals->LoadedFiles.size() > 0)
         {
@@ -818,69 +821,65 @@ int F3DStarter::Start(int argc, char** argv)
           {
             this->AddFile(parentPath, true);
           }
-          return this->LoadRelativeFileGroup(0);
+          this->LoadRelativeFileGroup(0);
         }
-        return true;
       });
 
-    interactor.addCommandCallback("take_screenshot",
-      [this](const std::vector<std::string>& args) -> bool
+    interactor.addCommand("take_screenshot",
+      [this](const std::vector<std::string>& args)
       {
         // XXX: Add a test for this one this can be reached with a non empty filename
         std::string filename =
           args.empty() ? this->Internals->AppOptions.ScreenshotFilename : args[0];
         this->SaveScreenshot(filename);
-        return true;
       });
 
-    interactor.addCommandCallback("take_minimal_screenshot",
-      [this](const std::vector<std::string>& args) -> bool
+    interactor.addCommand("take_minimal_screenshot",
+      [this](const std::vector<std::string>& args)
       {
         // XXX: Add a test for this one this can be reached with a non empty filename
         std::string filename =
           args.empty() ? this->Internals->AppOptions.ScreenshotFilename : args[0];
         this->SaveScreenshot(filename, true);
-        return true;
       });
 
-    interactor.setKeyPressCallBack(
-      [this](int, const std::string& keySym) -> bool
-      {
-        if (keySym == "Left")
-        {
-          return this->Internals->Engine->getInteractor().triggerCommand(
-            "load_previous_file_group");
-        }
-        if (keySym == "Right")
-        {
-          return this->Internals->Engine->getInteractor().triggerCommand("load_next_file_group");
-        }
-        if (keySym == "Up")
-        {
-          return this->Internals->Engine->getInteractor().triggerCommand(
-            "reload_current_file_group");
-        }
-        if (keySym == "Down")
-        {
-          return this->Internals->Engine->getInteractor().triggerCommand("add_current_directories");
-        }
-
-        if (keySym == "F12")
-        {
-          return this->Internals->Engine->getInteractor().triggerCommand("take_screenshot");
-        }
-        if (keySym == "F11")
-        {
-          return this->Internals->Engine->getInteractor().triggerCommand("take_minimal_screenshot");
-        }
-        return false;
-      });
-
-    interactor.setDropFilesCallBack(
-      [this](const std::vector<std::string>& filesVec) -> bool
+    // This replace an existing command in libf3d
+    interactor.removeCommand("add_files");
+    interactor.addCommand("add_files",
+      [this](const std::vector<std::string>& files)
       {
         int index = -1;
-        for (const std::string& file : filesVec)
+        for (const std::string& file : files)
+        {
+          index = this->AddFile(fs::path(file));
+        }
+        if (index > -1)
+        {
+          this->LoadFileGroup(index);
+        }
+      });
+
+    interactor.addCommand("set_hdri",
+      [this](const std::vector<std::string>& files)
+      {
+        if (!files.empty())
+        {
+          // Set the first file has an HDRI
+          f3d::options& options = this->Internals->Engine->getOptions();
+          options.render.hdri.file = files[0];
+          options.render.hdri.ambient = true;
+          options.render.background.skybox = true;
+
+          // Rendering now is needed for correct lighting
+          this->Render();
+        }
+      });
+
+    interactor.addCommand("add_files_or_set_hdri",
+      [this](const std::vector<std::string>& files)
+      {
+        int index = -1;
+        for (const std::string& file : files)
         {
           if (F3DInternals::HasHDRIExtension(file))
           {
@@ -904,9 +903,34 @@ int F3DStarter::Start(int argc, char** argv)
         {
           this->LoadFileGroup(index);
         }
-        this->RequestRender();
-        return true;
       });
+
+    // "doc"
+    auto docString = [](const std::string& doc) -> std::pair<std::string, std::string>
+    { return std::make_pair(doc, ""); };
+
+    using mod_t = f3d::interaction_bind_t::ModifierKeys;
+    interactor.addBinding({ mod_t::NONE, "Left" }, "load_previous_file_group", "Others",
+      std::bind(docString, "Load previous file group"));
+    interactor.addBinding({ mod_t::NONE, "Right" }, "load_next_file_group", "Others",
+      std::bind(docString, "Load next file group"));
+    interactor.addBinding({ mod_t::NONE, "Up" }, "reload_current_file_group", "Others",
+      std::bind(docString, "Reload current file group"));
+    interactor.addBinding({ mod_t::NONE, "Down" }, "add_current_directories", "Others",
+      std::bind(docString, "Add files from dir of current file"));
+    interactor.addBinding({ mod_t::NONE, "F11" }, "take_minimal_screenshot", "Others",
+      std::bind(docString, "Take a minimal screenshot"));
+    interactor.addBinding({ mod_t::NONE, "F12" }, "take_screenshot", "Others",
+      std::bind(docString, "Take a screenshot"));
+
+    // This replace an existing default interaction command in the libf3d
+    interactor.removeBinding({ mod_t::NONE, "Drop" });
+    interactor.addBinding({ mod_t::NONE, "Drop" }, "add_files_or_set_hdri", "Others",
+      std::bind(docString, "Load dropped files, folder or HDRI"));
+    interactor.addBinding({ mod_t::CTRL, "Drop" }, "add_files", "Others",
+      std::bind(docString, "Load dropped files or folder"));
+    interactor.addBinding(
+      { mod_t::SHIFT, "Drop" }, "set_hdri", "Others", std::bind(docString, "Set HDRI and use it"));
   }
 
   this->Internals->Engine->setOptions(this->Internals->LibOptions);
@@ -925,6 +949,24 @@ int F3DStarter::Start(int argc, char** argv)
   {
     f3d::window& window = this->Internals->Engine->getWindow();
     f3d::interactor& interactor = this->Internals->Engine->getInteractor();
+
+    // Print bindings list and exits if needed
+    if (this->Internals->AppOptions.BindingsList)
+    {
+      f3d::log::info("Bindings:");
+      for (const std::string& group : interactor.getBindGroups())
+      {
+        f3d::log::info(" ", group, ":");
+        for (const f3d::interaction_bind_t& bind : interactor.getBindsForGroup(group))
+        {
+          // XXX: Formatting could be improved here
+          auto [doc, val] = interactor.getBindingDocumentation(bind);
+          F3DOptionsTools::PrintHelpPair(bind.format(), doc, 12);
+        }
+        f3d::log::info("");
+      }
+      throw F3DExNoProcess("bindings list requested");
+    }
 
     // Play recording if any
     const std::string& interactionTestPlayFile =
@@ -1049,10 +1091,19 @@ int F3DStarter::Start(int argc, char** argv)
       f3d::log::error("This is a headless build of F3D, interactive rendering is not supported");
       return EXIT_FAILURE;
 #else
-      // Create the event loop repeating timer
-      interactor.createTimerCallBack(30, [this]() { this->EventLoop(); });
-      this->RequestRender();
-      interactor.start();
+      if (this->Internals->Engine->getWindow().isOffscreen())
+      {
+        f3d::log::warn(
+          "You are using an offscreen configuration, interactive rendering is disabled");
+        return EXIT_SUCCESS;
+      }
+      else
+      {
+        // Create the event loop repeating timer
+        window.render();
+        interactor.createTimerCallBack(30, [this]() { this->EventLoop(); });
+        interactor.start();
+      }
 #endif
     }
   }
@@ -1276,7 +1327,10 @@ void F3DStarter::LoadFileGroup(
 
   if (!this->Internals->AppOptions.NoRender)
   {
-    this->Internals->Engine->getWindow().setWindowName(filenameInfo + " - " + F3D::AppName);
+    if (!filenameInfo.empty())
+    {
+      this->Internals->Engine->getWindow().setWindowName(filenameInfo + " - " + F3D::AppName);
+    }
 
     if (dynamicOptions.scene.camera.index.has_value())
     {

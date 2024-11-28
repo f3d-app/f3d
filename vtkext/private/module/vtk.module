@@ -4,10 +4,8 @@ DESCRIPTION
   A VTK containing class related to rendering
 DEPENDS
   VTK::CommonCore
-  VTK::CommonCore
   VTK::CommonDataModel
   VTK::IOImage
-  VTK::IOImport
   VTK::ImagingCore
   VTK::InteractionStyle
   VTK::RenderingAnnotation
@@ -19,20 +17,14 @@ PRIVATE_DEPENDS
   VTK::CommonExecutionModel
   VTK::FiltersGeneral
   VTK::FiltersGeometry
-  VTK::IOImage
   VTK::IOXML
   VTK::ImagingHybrid
   VTK::InteractionWidgets
-  VTK::RenderingCore
-  VTK::RenderingVolumeOpenGL2
 OPTIONAL_DEPENDS
   VTK::opengl
-  VTK::RenderingExternal
   VTK::RenderingRayTracing
 TEST_DEPENDS
   VTK::IOGeometry
   VTK::IOPLY
   VTK::IOXML
-  VTK::IOXML
-  VTK::InteractionWidgets
   VTK::TestingCore

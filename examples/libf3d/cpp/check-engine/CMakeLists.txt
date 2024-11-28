@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.10)
 
 project(check-engine)
 
@@ -12,9 +12,9 @@ function(check_variable_defined f3d_var)
   message(STATUS "${f3d_var} is set to ${${f3d_var}}")
 endfunction()
 
-check_variable_defined(f3d_MODULE_EXTERNAL_RENDERING)
 check_variable_defined(f3d_MODULE_RAYTRACING)
 check_variable_defined(f3d_MODULE_EXR)
+check_variable_defined(f3d_MODULE_UI)
 check_variable_defined(f3d_BINDINGS_PYTHON)
 check_variable_defined(f3d_BINDINGS_JAVA)
 

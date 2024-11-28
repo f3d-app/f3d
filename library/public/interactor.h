@@ -1,6 +1,7 @@
 #ifndef f3d_interactor_h
 #define f3d_interactor_h
 
+#include "exception.h"
 #include "export.h"
 #include "options.h"
 #include "window.h"
@@ -12,6 +13,57 @@
 
 namespace f3d
 {
+
+struct interaction_bind_t
+{
+  /**
+   * Enumeration of supported modifier combination, in binary.
+   */
+  enum class ModifierKeys : unsigned char
+  {
+    ANY = 0x80,      // 10000000
+    NONE = 0x0,      // 00000000
+    CTRL = 0x1,      // 00000001
+    SHIFT = 0x2,     // 00000010
+    CTRL_SHIFT = 0x3 // 00000011
+  };
+
+  ModifierKeys mod;
+  std::string inter;
+
+  bool operator<(const interaction_bind_t& bind) const
+  {
+    return this->mod < bind.mod || (this->mod == bind.mod && this->inter < bind.inter);
+  }
+
+  bool operator==(const interaction_bind_t& bind) const
+  {
+    return this->mod == bind.mod && this->inter == bind.inter;
+  }
+
+  /**
+   * Format this binding into a string
+   * eg: "A", "Any+Question", "Shift+L".
+   */
+  std::string format() const
+  {
+    switch (this->mod)
+    {
+      case ModifierKeys::CTRL_SHIFT:
+        return "Ctrl+Shift+" + this->inter;
+      case ModifierKeys::CTRL:
+        return "Ctrl+" + this->inter;
+      case ModifierKeys::SHIFT:
+        return "Shift+" + this->inter;
+      case ModifierKeys::ANY:
+        return "Any+" + this->inter;
+      default:
+        // No need to check for NONE
+        return this->inter;
+    }
+  }
+};
+
 /**
  * @class   interactor
  * @brief   Class used to control interaction and animation
@@ -22,47 +74,141 @@ namespace f3d
 class F3D_EXPORT interactor
 {
 public:
-  /**
-   * Use this method to specify your own keypress callback, with the expected API:
-   * \code
-   * bool callBack(int keyCode, std::string keySym)
-   * \endcode
-   * keyCode being the pressed key, eg: `C` and keySym the key symbol for keys which do not have
-   * codes, eg: Left, Right, Up, Down, Space, Enter. Your callBack should return true if the key was
-   * handled, false if you want standard interactor behavior instead.
-   */
-  virtual interactor& setKeyPressCallBack(std::function<bool(int, std::string)> callBack) = 0;
-
-  /**
-   * Use this method to specify your own drop files callback, with the expected API:
-   * \code
-   * bool callBack(std::vector<std::string> files)
-   * \endcode
-   * files being a vector of string containing paths to dropped files.
-   * Your callBack should return true if the event was handled, false if you want standard
-   * interactor behavior instead.
-   */
-  virtual interactor& setDropFilesCallBack(
-    std::function<bool(std::vector<std::string>)> callBack) = 0;
-
   ///@{ @name Command
   /**
-   * Use this method to add a callback into the command map
-   * to be called using triggerCommand.
-   * Adding a commandCallback with an existing action replaces it.
+   * Remove all existing commands and add all default commands,
+   * see COMMANDS.md for details.
    */
-  virtual interactor& addCommandCallback(
-    std::string action, std::function<bool(const std::vector<std::string>&)> callback) = 0;
+  virtual interactor& initCommands() = 0;
 
   /**
-   * Remove a command callback for provided action
+   * Use this method to add a command to be called using triggerCommand.
+   * Adding a command with an already existing action throw a
+   * interactor::already_exists_exception.
+   * Considering namespacing dedicated action to avoid conflicts with default action,
+   * eg: `my_app::action`
    */
-  virtual interactor& removeCommandCallback(const std::string& action) = 0;
+  virtual interactor& addCommand(
+    const std::string& action, std::function<void(const std::vector<std::string>&)> callback) = 0;
 
   /**
-   * Trigger provided command, see COMMAND.md for more information
+   * Remove a command for provided action, does not do anything if it does not exists.
+   */
+  virtual interactor& removeCommand(const std::string& action) = 0;
+
+  /**
+   * Return a string vector containing all currently defined actions of commands
+   */
+  virtual std::vector<std::string> getCommandActions() const = 0;
+
+  /**
+   * Trigger provided command, see COMMANDS.md for details about supported
+   * commands and syntax.
+   *
+   * If the command fails, it prints a debug log explaining why.
+   *
+   * Return true if the command succeeded, false otherwise.
+   * Throw an interactor::command_runtime_exception if the command callback
+   * throw an unrecognized exception. Note that default commands cannot throw such
+   * an exception.
    */
   virtual bool triggerCommand(std::string_view command) = 0;
+  ///@}
+
+  ///@{ @name Bindings
+  using documentation_callback_t = std::function<std::pair<std::string, std::string>()>;
+
+  /**
+   * Remove all existing interaction commands and add all default bindings
+   * see INTERACTIONS.md for details.
+   */
+  virtual interactor& initBindings() = 0;
+
+  /**
+   * Use this method to add binding, in order to trigger commands for a specific bind
+   *
+   * Bind modifiers is a binary flag from the dedicated enum that represent KeyModifiers.
+   * Bind interaction can be a pressed key symbol, eg: "C",
+   * or a dedicated key symbol for special keys:
+   * "Left", "Right", "Up", "Down", "Space", "Enter", "Escape", "Question".
+   *
+   * group is an optional arg to group bindings together for better display of the documentation.
+   * Groups are kept in order of addition when recovered using `getBindGroups`.
+   * Bindings are kept in order of addition when recovered using `getBindsForGroup`.
+   *
+   * documentationCallback is an optional function that returns a pair of string,
+   * the first is the doc itself, the second is the current value as a string, if any.
+   * Use `getBindingDocumentation` to access this doc.
+   *
+   * When the corresponding bind happens, the provided commands will be triggered using
+   * triggerCommand. Considering checking if an interaction exists or removing it before adding it
+   * to avoid potential conflicts.
+   *
+   * ANY modifier interactions will only be triggered if no other interaction bind with modifier
+   * is found.
+   *
+   * Adding commands for an existing bind will throw a interactor::already_exists_exception.
+   */
+  virtual interactor& addBinding(const interaction_bind_t& bind, std::vector<std::string> commands,
+    std::string group = {}, documentation_callback_t documentationCallback = nullptr) = 0;
+
+  /**
+   * See addBinding
+   * Convenience method to add a single command for an interaction,
+   * similar as `addBinding(bind, {command})`
+   *
+   * Adding command for an existing bind will throw a interactor::already_exists_exception.
+   */
+  virtual interactor& addBinding(const interaction_bind_t& bind, std::string command,
+    std::string group = {}, documentation_callback_t documentationCallback = nullptr) = 0;
+
+  /**
+   * Convenience initializer list signature for add binding method
+   */
+  interactor& addBinding(const interaction_bind_t& bind, std::initializer_list<std::string> list,
+    std::string group = {}, documentation_callback_t documentationCallback = nullptr)
+  {
+    return this->addBinding(
+      bind, std::vector<std::string>(list), std::move(group), std::move(documentationCallback));
+  }
+
+  /**
+   * Remove binding corresponding to provided bind.
+   * Does not do anything if the provided bind does not exists.
+   */
+  virtual interactor& removeBinding(const interaction_bind_t& bind) = 0;
+
+  /**
+   * Return a vector of available bind groups, in order of addition
+   */
+  virtual std::vector<std::string> getBindGroups() const = 0;
+
+  /**
+   * Return a vector of bind for the specified group, in order of addition
+   *
+   * Getting binds for a group that does not exists will throw a does_not_exists_exception.
+   */
+  virtual std::vector<interaction_bind_t> getBindsForGroup(std::string group) const = 0;
+
+  /**
+   * Return a vector of all binds, in order of addition
+   */
+  virtual std::vector<interaction_bind_t> getBinds() const = 0;
+
+  /**
+   * Get a pair of string documenting a binding.
+   * The first string is the documentation of the binding,
+   * eg: "Toggle anti aliasing", "Print scene descr to terminal", "Decrease light intensity"
+   * The second string is the current value of the binding,
+   * eg: "OFF", "" if there is no value or "1.12".
+   * If a binding was not documented on addition, the provided strings will be empty.
+   * The possible string can depends on the bindings but boolean value are expected to be
+   * "ON", "OFF", "N/A" (for optional values).
+   *
+   * Getting documentation for a bind that does not exists will throw a does_not_exists_exception.
+   */
+  virtual std::pair<std::string, std::string> getBindingDocumentation(
+    const interaction_bind_t& bind) const = 0;
   ///@}
 
   /**
@@ -106,6 +252,7 @@ public:
 
   /**
    * Start the interactor.
+   * Make sure the window is initialized first, by calling `window.render()`
    */
   virtual void start() = 0;
 
@@ -115,9 +262,31 @@ public:
   virtual void stop() = 0;
 
   /**
-   * Get a structure of strings describing default interactions.
+   * An exception that can be thrown by the interactor
+   * when adding something that already exists internally
    */
-  static const std::vector<std::pair<std::string, std::string>>& getDefaultInteractionsInfo();
+  struct already_exists_exception : public exception
+  {
+    explicit already_exists_exception(const std::string& what = "");
+  };
+
+  /**
+   * An exception that can be thrown by the interactor
+   * when looking for something that does not exists
+   */
+  struct does_not_exists_exception : public exception
+  {
+    explicit does_not_exists_exception(const std::string& what = "");
+  };
+
+  /**
+   * An exception that can be thrown by interactor::triggerCommand
+   * when a command callback throw an exception
+   */
+  struct command_runtime_exception : public exception
+  {
+    explicit command_runtime_exception(const std::string& what = "");
+  };
 
 protected:
   //! @cond

@@ -6,6 +6,8 @@
 #include <vtkBoundingBox.h>
 #include <vtkCameraPass.h>
 #include <vtkDualDepthPeelingPass.h>
+#include <vtkInformation.h>
+#include <vtkInformationIntegerKey.h>
 #include <vtkLightsPass.h>
 #include <vtkObjectFactory.h>
 #include <vtkOpaquePass.h>
@@ -37,6 +39,8 @@
 #include <sstream>
 
 vtkStandardNewMacro(vtkF3DRenderPass);
+
+vtkInformationKeyMacro(vtkF3DRenderPass, RENDER_UI_ONLY, Integer);
 
 // ----------------------------------------------------------------------------
 void vtkF3DRenderPass::PrintSelf(ostream& os, vtkIndent indent)
@@ -219,18 +223,30 @@ void vtkF3DRenderPass::Render(const vtkRenderState* s)
   double bgColor[3];
 
   vtkRenderer* r = s->GetRenderer();
+  vtkInformation* info = r->GetInformation();
+  bool uiOnly = info->Has(vtkF3DRenderPass::RENDER_UI_ONLY());
+
   r->GetBackground(bgColor);
 
   // force background to full black when generating offscreen layers to avoid blending
   // problems when compositing layers in the Blend() function
   r->SetBackground(0.0, 0.0, 0.0);
 
-  vtkRenderState backgroundState(s->GetRenderer());
-  backgroundState.SetPropArrayAndCount(
-    this->BackgroundProps.data(), static_cast<int>(this->BackgroundProps.size()));
-  backgroundState.SetFrameBuffer(s->GetFrameBuffer());
+  if (!uiOnly)
+  {
+    vtkRenderState backgroundState(s->GetRenderer());
+    backgroundState.SetPropArrayAndCount(
+      this->BackgroundProps.data(), static_cast<int>(this->BackgroundProps.size()));
+    backgroundState.SetFrameBuffer(s->GetFrameBuffer());
 
-  this->BackgroundPass->Render(&backgroundState);
+    this->BackgroundPass->Render(&backgroundState);
+
+    vtkRenderState mainState(s->GetRenderer());
+    mainState.SetPropArrayAndCount(this->MainProps.data(), static_cast<int>(this->MainProps.size()));
+    mainState.SetFrameBuffer(s->GetFrameBuffer());
+
+    this->MainPass->Render(&mainState);
+  }
 
   vtkRenderState overlayState(s->GetRenderer());
   overlayState.SetPropArrayAndCount(
@@ -238,12 +254,6 @@ void vtkF3DRenderPass::Render(const vtkRenderState* s)
   overlayState.SetFrameBuffer(s->GetFrameBuffer());
 
   this->OverlayPass->Render(&overlayState);
-
-  vtkRenderState mainState(s->GetRenderer());
-  mainState.SetPropArrayAndCount(this->MainProps.data(), static_cast<int>(this->MainProps.size()));
-  mainState.SetFrameBuffer(s->GetFrameBuffer());
-
-  this->MainPass->Render(&mainState);
 
   // restore background color before compositing the layers
   r->SetBackground(bgColor);

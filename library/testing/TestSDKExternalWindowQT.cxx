@@ -56,6 +56,7 @@ protected:
     };
 
     mEngine = std::make_unique<f3d::engine>(f3d::engine::createExternal(loadFunc));
+    mEngine->getWindow().setSize(width(), height());
     mEngine->getScene().add(mFilePath);
   }
 

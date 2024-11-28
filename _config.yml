@@ -201,7 +201,7 @@ defaults:
 
   -
     scope:
-      path: "doc/libf3d/BINDINGS.md"
+      path: "doc/libf3d/LANGUAGE_BINDINGS.md"
     values:
       parent: libf3d Documentation
       nav_order: 3

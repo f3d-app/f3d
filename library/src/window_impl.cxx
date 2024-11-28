@@ -6,6 +6,7 @@
 #include "options.h"
 
 #include "vtkF3DConfigure.h"
+#include "vtkF3DExternalRenderWindow.h"
 
 #include "vtkF3DGenericImporter.h"
 #include "vtkF3DNoRenderWindow.h"
@@ -16,7 +17,6 @@
 #include <vtkImageExport.h>
 #include <vtkPNGReader.h>
 #include <vtkPointGaussianMapper.h>
-#include <vtkRenderWindow.h>
 #include <vtkRendererCollection.h>
 #include <vtkRenderingOpenGLConfigure.h>
 #include <vtkVersion.h>
@@ -24,11 +24,11 @@
 #include <vtksys/SystemTools.hxx>
 
 #ifdef VTK_USE_X
-#include <vtkXOpenGLRenderWindow.h>
+#include <vtkF3DGLXRenderWindow.h>
 #endif
 
 #ifdef _WIN32
-#include <vtkWin32OpenGLRenderWindow.h>
+#include <vtkF3DWGLRenderWindow.h>
 #endif
 
 #ifdef VTK_OPENGL_HAS_EGL
@@ -39,20 +39,7 @@
 #include <vtkOSOpenGLRenderWindow.h>
 #endif
 
-#if F3D_MODULE_EXTERNAL_RENDERING
-#include <vtkExternalOpenGLRenderWindow.h>
-#endif
-
-#ifdef _WIN32
-#include <Windows.h>
-#include <dwmapi.h>
-
-#ifndef DWMWA_USE_IMMERSIVE_DARK_MODE
-#define DWMWA_USE_IMMERSIVE_DARK_MODE 20
-#endif
-
-constexpr auto IMMERSIVE_DARK_MODE_SUPPORTED_SINCE = 19041;
-#endif
+#include <sstream>
 
 namespace f3d::detail
 {
@@ -72,90 +59,6 @@ public:
     return this->CachePath;
   }
 
-#if _WIN32
-  /**
-   * Helper function to detect if the
-   * Windows Build Number is equal or greater to a number
-   */
-  static bool IsWindowsBuildNumberOrGreater(int buildNumber)
-  {
-    std::string value{};
-    bool result = vtksys::SystemTools::ReadRegistryValue(
-      "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows NT\\CurrentVersion;CurrentBuildNumber",
-      value);
-
-    if (result == true)
-    {
-      try
-      {
-        return std::stoi(value) >= buildNumber;
-      }
-      catch (const std::invalid_argument& e)
-      {
-        f3d::log::debug("Error parsing CurrentBuildNumber", e.what());
-      }
-    }
-    else
-    {
-      f3d::log::debug("Error opening registry key.");
-    }
-
-    return false;
-  }
-
-  /**
-   * Helper function to fetch a DWORD from windows registry.
-   *
-   * @param hKey A handle to an open registry key
-   * @param subKey The path of registry key relative to 'hKey'
-   * @param value The name of the registry value
-   * @param dWord Variable to store the result in
-   */
-  static bool ReadRegistryDWord(
-    HKEY hKey, const std::wstring& subKey, const std::wstring& value, DWORD& dWord)
-  {
-    DWORD dataSize = sizeof(DWORD);
-    LONG result = RegGetValueW(
-      hKey, subKey.c_str(), value.c_str(), RRF_RT_REG_DWORD, nullptr, &dWord, &dataSize);
-
-    return result == ERROR_SUCCESS;
-  }
-
-  /**
-   * Helper function to detect user theme
-   */
-  static bool IsWindowsInDarkMode()
-  {
-    std::wstring subKey(L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize");
-
-    DWORD value{};
-
-    if (ReadRegistryDWord(HKEY_CURRENT_USER, subKey, L"AppsUseLightTheme", value))
-    {
-      return value == 0;
-    }
-
-    if (ReadRegistryDWord(HKEY_CURRENT_USER, subKey, L"SystemUsesLightTheme", value))
-    {
-      return value == 0;
-    }
-
-    return false;
-  }
-#endif
-
-  void UpdateTheme() const
-  {
-#ifdef _WIN32
-    if (this->IsWindowsBuildNumberOrGreater(IMMERSIVE_DARK_MODE_SUPPORTED_SINCE))
-    {
-      HWND hwnd = static_cast<HWND>(this->RenWin->GetGenericWindowId());
-      BOOL useDarkMode = this->IsWindowsInDarkMode();
-      DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &useDarkMode, sizeof(useDarkMode));
-    }
-#endif
-  }
-
   static context::fptr SymbolLoader(void* userptr, const char* name)
   {
     assert(userptr != nullptr);
@@ -164,10 +67,31 @@ public:
     return (*fn)(name);
   }
 
+  static vtkSmartPointer<vtkRenderWindow> AutoBackendWindow()
+  {
+    // Override VTK logic
+#ifdef _WIN32
+    return vtkSmartPointer<vtkF3DWGLRenderWindow>::New();
+#else
+#if defined(VTK_USE_X)
+    // try GLX
+    vtkSmartPointer<vtkRenderWindow> renWin = vtkSmartPointer<vtkF3DGLXRenderWindow>::New();
+    if (renWin)
+    {
+      return renWin;
+    }
+#endif
+    // XXX: At the moment, fallback on VTK logic
+    // It will change in the future when other subclasses are implemented
+    return vtkSmartPointer<vtkRenderWindow>::New();
+#endif
+  }
+
   std::unique_ptr<camera_impl> Camera;
   vtkSmartPointer<vtkRenderWindow> RenWin;
   vtkNew<vtkF3DRenderer> Renderer;
   const options& Options;
+  interactor_impl* Interactor = nullptr;
   std::string CachePath;
   context::function GetProcAddress;
 };
@@ -184,24 +108,12 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   }
   else if (type == Type::EXTERNAL)
   {
-#if F3D_MODULE_EXTERNAL_RENDERING
-    vtkNew<vtkExternalOpenGLRenderWindow> extWin;
-    extWin->AutomaticWindowPositionAndResizeOff();
-    this->Internals->RenWin = extWin;
-#else
-    throw engine::no_window_exception(
-      "Window type is external but F3D_MODULE_EXTERNAL_RENDERING is not enabled");
-#endif
+    this->Internals->RenWin = vtkSmartPointer<vtkF3DExternalRenderWindow>::New();
   }
   else if (type == Type::EGL)
   {
 #if defined(VTK_OPENGL_HAS_EGL) && VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
     this->Internals->RenWin = vtkSmartPointer<vtkEGLRenderWindow>::New();
-#ifdef __ANDROID__
-    // Since F3D_MODULE_EXTERNAL_RENDERING is not supported on Android yet, we need to call
-    // this workaround. It makes vtkEGLRenderWindow external if WindowInfo is not nullptr.
-    this->Internals->RenWin->SetWindowInfo("jni");
-#endif
 #else
     throw engine::no_window_exception("Window type is EGL but VTK EGL support is not enabled");
 #endif
@@ -217,8 +129,8 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   }
   else if (type == Type::GLX)
   {
-#if defined(VTK_USE_X) && VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
-    this->Internals->RenWin = vtkSmartPointer<vtkXOpenGLRenderWindow>::New();
+#if defined(VTK_USE_X)
+    this->Internals->RenWin = vtkSmartPointer<vtkF3DGLXRenderWindow>::New();
 #else
     throw engine::no_window_exception("Window type is GLX but VTK GLX support is not enabled");
 #endif
@@ -226,16 +138,18 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   else if (type == Type::WGL)
   {
 #ifdef _WIN32
-    this->Internals->RenWin = vtkSmartPointer<vtkWin32OpenGLRenderWindow>::New();
+    this->Internals->RenWin = vtkSmartPointer<vtkF3DWGLRenderWindow>::New();
 #endif
   }
   else if (!type.has_value())
   {
-    // rely on VTK logic
-    this->Internals->RenWin = vtkSmartPointer<vtkRenderWindow>::New();
+    this->Internals->RenWin = internals::AutoBackendWindow();
   }
 
-  assert(this->Internals->RenWin != nullptr);
+  if (this->Internals->RenWin == nullptr)
+  {
+    throw engine::no_window_exception("Cannot create a window");
+  }
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
   vtkOpenGLRenderWindow* oglRenWin = vtkOpenGLRenderWindow::SafeDownCast(this->Internals->RenWin);
@@ -245,14 +159,6 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
     {
       oglRenWin->SetOpenGLSymbolLoader(&internals::SymbolLoader, &this->Internals->GetProcAddress);
     }
-#if F3D_MODULE_EXTERNAL_RENDERING
-    if (oglRenWin->IsA("vtkExternalOpenGLRenderWindow"))
-    {
-      // We need to call vtkOpenGLRenderWindow function because vtkGenericOpenGLRenderWindow is
-      // reimplementing it incorrectly
-      oglRenWin->vtkOpenGLRenderWindow::OpenGLInit();
-    }
-#endif
   }
 #endif
 
@@ -267,7 +173,6 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   this->Internals->Camera->SetVTKRenderer(this->Internals->Renderer);
 
   this->Initialize();
-  this->Internals->UpdateTheme();
 
   log::debug("VTK window class type is ", this->Internals->RenWin->GetClassName());
 }
@@ -293,14 +198,14 @@ window_impl::Type window_impl::getType()
   }
 
 #ifdef VTK_USE_X
-  if (this->Internals->RenWin->IsA("vtkXOpenGLRenderWindow"))
+  if (this->Internals->RenWin->IsA("vtkF3DGLXRenderWindow"))
   {
     return Type::GLX;
   }
 #endif
 
 #ifdef _WIN32
-  if (this->Internals->RenWin->IsA("vtkWin32OpenGLRenderWindow"))
+  if (this->Internals->RenWin->IsA("vtkF3DWGLRenderWindow"))
   {
     return Type::WGL;
   }
@@ -356,13 +261,6 @@ int window_impl::getWidth() const
 int window_impl::getHeight() const
 {
   return this->Internals->RenWin->GetSize()[1];
-}
-
-//----------------------------------------------------------------------------
-window& window_impl::setAnimationNameInfo(const std::string& name)
-{
-  this->Internals->Renderer->SetAnimationnameInfo(name);
-  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -547,6 +445,31 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetUseInverseOpacityFunction(opt.model.volume.inverse);
 
   renderer->UpdateActors();
+
+  // Update the cheatsheet if needed
+  if (this->Internals->Interactor && renderer->CheatSheetNeedsUpdate())
+  {
+    std::stringstream cheatSheetStream;
+    cheatSheetStream << "\n";
+    for (const std::string& group : this->Internals->Interactor->getBindGroups())
+    {
+      for (const interaction_bind_t& bind : this->Internals->Interactor->getBindsForGroup(group))
+      {
+        auto [doc, val] = this->Internals->Interactor->getBindingDocumentation(bind);
+        if (!doc.empty())
+        {
+          // XXX: This formatting will be reworked during ImGUI work
+          cheatSheetStream << " " << bind.format() << ": " << doc;
+          if (!val.empty())
+          {
+            cheatSheetStream << " [" << val << "]";
+          }
+          cheatSheetStream << "\n";
+        }
+      }
+    }
+    renderer->ConfigureCheatSheet(cheatSheetStream.str());
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -582,7 +505,7 @@ bool window_impl::render()
 //----------------------------------------------------------------------------
 image window_impl::renderToImage(bool noBackground)
 {
-  this->UpdateDynamicOptions();
+  this->render();
 
   vtkNew<vtkWindowToImageFilter> rtW2if;
   rtW2if->SetInput(this->Internals->RenWin);
@@ -591,7 +514,7 @@ image window_impl::renderToImage(bool noBackground)
   {
     // we need to set the background to black to avoid blending issues with translucent
     // objects when saving to file with no background
-    this->Internals->RenWin->GetRenderers()->GetFirstRenderer()->SetBackground(0, 0, 0);
+    this->Internals->Renderer->SetBackground(0, 0, 0);
     rtW2if->SetInputBufferTypeToRGBA();
   }
 
@@ -618,5 +541,11 @@ void window_impl::SetImporter(vtkF3DMetaImporter* importer)
 void window_impl::SetCachePath(const std::string& cachePath)
 {
   this->Internals->CachePath = cachePath;
+}
+
+//----------------------------------------------------------------------------
+void window_impl::SetInteractor(interactor_impl* interactor)
+{
+  this->Internals->Interactor = interactor;
 }
 };

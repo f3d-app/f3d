@@ -23,6 +23,7 @@
 #include <memory>
 #include <vector>
 
+class vtkInformationIntegerKey;
 class vtkProp;
 
 class vtkF3DRenderPass : public vtkRenderPass
@@ -44,6 +45,8 @@ public:
 
   vtkF3DRenderPass(const vtkF3DRenderPass&) = delete;
   void operator=(const vtkF3DRenderPass&) = delete;
+
+  static vtkInformationIntegerKey* RENDER_UI_ONLY();
 
 protected:
   vtkF3DRenderPass() = default;

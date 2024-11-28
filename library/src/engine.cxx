@@ -98,9 +98,9 @@ engine engine::createWGL(bool offscreen)
 }
 
 //----------------------------------------------------------------------------
-engine engine::createEGL(bool offscreen)
+engine engine::createEGL()
 {
-  return { window::Type::EGL, offscreen, context::egl() };
+  return { window::Type::EGL, true, context::egl() };
 }
 
 //----------------------------------------------------------------------------
@@ -385,16 +385,16 @@ engine::libInformation engine::getLibInfo()
   libInfo.Modules["Raytracing"] = false;
 #endif
 
-#if F3D_MODULE_EXTERNAL_RENDERING
-  libInfo.Modules["ExternalRendering"] = true;
-#else
-  libInfo.Modules["ExternalRendering"] = false;
-#endif
-
 #if F3D_MODULE_EXR
   libInfo.Modules["OpenEXR"] = true;
 #else
   libInfo.Modules["OpenEXR"] = false;
+#endif
+
+#if F3D_MODULE_UI
+  libInfo.Modules["ImGui"] = true;
+#else
+  libInfo.Modules["ImGui"] = false;
 #endif
 
   std::string vtkVersion = std::string(vtkVersion::GetVTKVersionFull());

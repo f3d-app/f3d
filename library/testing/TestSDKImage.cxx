@@ -45,7 +45,7 @@ int TestSDKImage(int argc, char* argv[])
     std::begin(pixels16), std::end(pixels16), [&]() { return randGenerator() % 65536; });
   generated16.setContent(pixels16.data());
 
-  std::uniform_real_distribution<> dist(
+  std::uniform_real_distribution<float> dist(
     std::numeric_limits<float>::min(), std::numeric_limits<float>::max());
   f3d::image generated32(width, height, channels, f3d::image::ChannelType::FLOAT);
   std::vector<float> pixels32(width * height * channels);

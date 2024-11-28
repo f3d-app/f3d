@@ -39,11 +39,12 @@ static bool RenderTest(const f3d::image& img, const std::string& baselinePath,
 
   if (!img.compare(reference, threshold, error))
   {
-    std::cerr << "Current rendering difference with reference image: " << error
+    std::cerr << "Current rendering difference with reference image " << baseline << " : " << error
               << " is higher than the threshold of " << threshold << std::endl;
     std::cerr << "Result resolution: " << img.getWidth() << "x" << img.getHeight() << std::endl;
     std::cerr << "Reference resolution: " << reference.getWidth() << "x" << reference.getHeight()
               << std::endl;
+    std::cerr << "Result image saved to " << output << std::endl;
     img.save(output);
     return false;
   }

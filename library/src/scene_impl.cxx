@@ -145,9 +145,6 @@ public:
       }
     }
 
-    // Set the name for animation
-    this->Window.setAnimationNameInfo(this->AnimationManager.GetAnimationName());
-
     // Display output description
     scene_impl::internals::DisplayImporterDescription(this->MetaImporter);
 

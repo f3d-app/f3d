@@ -3,7 +3,7 @@
  * @brief   A F3D dedicated renderer
  *
  * This renderers all the generic actors added by F3D which includes
- * axis, grid, edges, timer, filename, metadata and cheatsheet.
+ * UI, axis, grid, edges, timer, metadata and cheatsheet.
  * It also handles the different rendering passes, including
  * raytracing, ssao, fxaa, tonemapping.
  */
@@ -12,6 +12,7 @@
 #define vtkF3DRenderer_h
 
 #include "vtkF3DMetaImporter.h"
+#include "vtkF3DUIActor.h"
 
 #include <vtkLight.h>
 #include <vtkOpenGLRenderer.h>
@@ -62,7 +63,6 @@ public:
   void SetBackground(const double* backgroundColor) override;
   void SetLightIntensity(const double intensity);
   void SetFilenameInfo(const std::string& info);
-  void SetAnimationnameInfo(const std::string& info);
   void SetDropZoneInfo(const std::string& info);
   void SetGridAbsolute(bool absolute);
   void SetGridUnitSquare(const std::optional<double>& unitSquare);
@@ -111,7 +111,6 @@ public:
   /**
    * Reimplemented to configure:
    *  - ActorsProperties
-   *  - CheatSheet
    *  - Timer
    * before actual rendering, only when needed
    */
@@ -303,7 +302,7 @@ public:
   void SetUseCellColoring(bool useCell);
   vtkGetMacro(UseCellColoring, bool);
   ///@}
-  
+
   ///@{
   /**
    * Set/Get the name of the array to use for coloring
@@ -311,7 +310,7 @@ public:
   void SetArrayNameForColoring(const std::optional<std::string>& arrayName);
   std::optional<std::string> GetArrayNameForColoring();
   ///@}
-  
+
   ///@{
   /**
    * Set/Get the name of the component to use for coloring
@@ -345,6 +344,31 @@ public:
    */
   void CycleComponentForColoring();
 
+  /**
+   * Convert a component index into a string
+   * If there is a component name defined in the current coloring information, display it.
+   * Otherwise, use component #index as the default value.
+   */
+  std::string ComponentToString(int component);
+
+  /**
+   * Return true if the cheatsheet info is potentially
+   * out of date since the last ConfigureCheatSheet call,
+   * false otherwise.
+   */
+  bool CheatSheetNeedsUpdate() const;
+
+  /**
+   * Configure the cheatsheet text from the provided info
+   * Should be called before Render() if CheatSheetInfoNeedsUpdate() returns true.
+   */
+  void ConfigureCheatSheet(const std::string& info);
+
+  /**
+   * Use this method to flag in the renderer that the cheatsheet needs to be updated
+   * This is not required to call when using any of the setter of the renderer
+   */
+  void SetCheatSheetConfigured(bool flag);
 
 private:
   vtkF3DRenderer();
@@ -392,11 +416,6 @@ private:
   void ConfigureActorsProperties();
 
   /**
-   * Configure the cheatsheet text and hotkeys and mark it for rendering
-   */
-  void ConfigureCheatSheet();
-
-  /**
    * Configure the grid
    */
   void ConfigureGridUsingCurrentActors();
@@ -417,11 +436,6 @@ private:
    * Create a cache directory if a HDRIHash is set
    */
   void CreateCacheDirectory();
-
-  /**
-   * Shorten a provided name with "..."
-   */
-  static std::string ShortName(const std::string& name, int maxChar);
 
   /**
    * Configure coloring for all actors
@@ -455,21 +469,14 @@ private:
    */
   void ConfigureRangeAndCTFForColoring(const F3DColoringInfoHandler::ColoringInfo& info);
 
-  /**
-   * Convert a component index into a string
-   * If there is a component name defined in the current coloring information, display it.
-   * Otherwise, use component #index as the default value.
-   */
-  std::string ComponentToString(int component);
-
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
 
-  vtkNew<vtkCornerAnnotation> FilenameActor;
   vtkNew<vtkCornerAnnotation> MetaDataActor;
   vtkNew<vtkCornerAnnotation> CheatSheetActor;
   vtkNew<vtkF3DDropZoneActor> DropZoneActor;
   vtkNew<vtkActor> GridActor;
   vtkNew<vtkSkybox> SkyboxActor;
+  vtkNew<vtkF3DUIActor> UIActor;
 
   // vtkCornerAnnotation building is too slow for the timer
   vtkNew<vtkTextActor> TimerActor;
@@ -543,7 +550,6 @@ private:
   std::string GridInfo;
 
   std::string CachePath;
-  std::string AnimationNameInfo;
 
   std::optional <std::string> BackfaceType;
   std::optional <std::string> FinalShader;

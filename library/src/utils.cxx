@@ -31,7 +31,11 @@ std::vector<std::string> utils::tokenize(std::string_view str)
     switch (c)
     {
       case '\\':
-        escaped = true;
+        if (escaped)
+        {
+          accumulate(c);
+        }
+        escaped = !escaped;
         break;
       case ' ':
         if (!escaped && !quoted)

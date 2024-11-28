@@ -35,13 +35,26 @@ public:
   interactor_impl(options& options, window_impl& window, scene_impl& scene);
   ~interactor_impl() override;
 
-  interactor& setKeyPressCallBack(std::function<bool(int, std::string)> callBack) override;
-  interactor& setDropFilesCallBack(std::function<bool(std::vector<std::string>)> callBack) override;
-
-  interactor& addCommandCallback(
-    std::string action, std::function<bool(const std::vector<std::string>&)> callback) override;
-  interactor& removeCommandCallback(const std::string& action) override;
+  interactor& initCommands() override;
+  interactor& addCommand(const std::string& action,
+    std::function<void(const std::vector<std::string>&)> callback) override;
+  interactor& removeCommand(const std::string& action) override;
+  std::vector<std::string> getCommandActions() const override;
   bool triggerCommand(std::string_view command) override;
+
+  interactor& initBindings() override;
+  interactor& addBinding(const interaction_bind_t& bind, std::vector<std::string> commands,
+    std::string group = std::string(),
+    documentation_callback_t documentationCallback = nullptr) override;
+  interactor& addBinding(const interaction_bind_t& bind, std::string command,
+    std::string group = std::string(),
+    documentation_callback_t documentationCallback = nullptr) override;
+  interactor& removeBinding(const interaction_bind_t& bind) override;
+  std::vector<std::string> getBindGroups() const override;
+  std::vector<interaction_bind_t> getBindsForGroup(std::string group) const override;
+  std::vector<interaction_bind_t> getBinds() const override;
+  std::pair<std::string, std::string> getBindingDocumentation(
+    const interaction_bind_t& bind) const override;
 
   unsigned long createTimerCallBack(double time, std::function<void()> callBack) override;
   void removeTimerCallBack(unsigned long id) override;
@@ -87,6 +100,16 @@ public:
    * the camera clipping range.
    */
   void UpdateRendererAfterInteraction();
+
+  /**
+   * An exception that can be thrown by certain command callbacks
+   * when the arguments of the callback are incorrect and expected
+   * to be caught by triggerCommand
+   */
+  struct invalid_args_exception : public exception
+  {
+    explicit invalid_args_exception(const std::string& what = "");
+  };
 
 private:
   class internals;
