@@ -256,6 +256,52 @@
           }
           throw new Error(`Could not parse filename/extension from either urlparam extension, response header content-disposition, nor filename present in url`);
         }
+
+        // Have fetch support onProgress event
+        async function fetchWithProgress(url, onProgress) {
+          const response = await fetch(url);
+          if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const contentLength = response.headers.get('Content-Length');
+          if (!contentLength) {
+              console.warn('Content-Length header is missing');
+          }
+          const total = contentLength ? parseInt(contentLength, 10) : 0;
+          let loaded = 0;
+          const reader = response.body.getReader();
+          const stream = new ReadableStream({
+              start(controller) {
+                  function push() {
+                      reader.read().then(({ done, value }) => {
+                          if (done) {
+                              controller.close();
+                              return;
+                          }
+                          loaded += value.length;
+                          if (onProgress) {
+                              onProgress(loaded, total);
+                          }
+                          controller.enqueue(value);
+                          push();
+                      }).catch(err => {
+                          console.error('Stream reading error:', err);
+                          controller.error(err);
+                      });
+                  }
+                  push();
+              }
+          });
+          return new Response(stream);
+        }
+        function onFetchProgress(loaded, total) {
+          const progress = Math.floor(100 * loaded / total);
+          progressEl.parentElement.style.display = "block";
+          progressEl.value = progress;
+          progressEl.textContent = `${progress}%`;
+          console.log(`${progress}%`, loaded, total); 
+        }
+
         // Parse search-query model url-param or load default model file
         function load_from_url(){
           // const params = new URLSearchParams(window.location.search);
@@ -265,7 +311,8 @@
           const extension_parsed = params.get("extension");
           if (model_url_passed) {
             const model_url = decodeURI(model_url_passed);
-            fetch(model_url)
+            fetchWithProgress(model_url, onFetchProgress)
+            // fetch(model_url)
             .then((response) => {
               if (!response.ok) {
                 throw new Error(`HTTP error, status = ${response.status}`);
@@ -276,6 +323,7 @@
               response.arrayBuffer().then((buffer) => {
                 Module.FS.writeFile(filename, new Uint8Array(buffer));
                 openFile(filename);
+                progressEl.parentElement.style.display = "none"
               });
             })
             .catch(function (error) {
