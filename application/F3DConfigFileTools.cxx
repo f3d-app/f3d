@@ -230,7 +230,8 @@ F3DOptionsTools::OptionsEntries F3DConfigFileTools::ReadConfigFiles(const std::s
     }
     catch (const nlohmann::json::type_error& ex)
     {
-      f3d::log::warn("Error processing config file: ", configFilePath.string(), ", configuration may be incorrect");
+      f3d::log::warn("Error processing config file: ", configFilePath.string(),
+        ", configuration may be incorrect");
       f3d::log::error(ex.what());
     }
   }

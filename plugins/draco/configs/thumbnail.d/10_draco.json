@@ -1,6 +1,6 @@
 [
 {
-  "match": ".*(drc)":
+  "match": ".*(drc)",
   "options":
   {
     "scalar-coloring": true,
