@@ -362,9 +362,9 @@ void vtkF3DImguiActor::RenderCheatSheet()
 
   ImGui::Begin("CheatSheet", nullptr, flags);
 
-  for (const auto& [group, content] : this->CheatSheet)
+  auto printGroup = [](const std::string& groupName, const CheatSheetList& content)
   {
-    ImGui::SeparatorText(group.c_str());
+    ImGui::SeparatorText(groupName.c_str());
     for (const auto& [bind, desc, val] : content)
     {
       if (!val.empty())
@@ -375,6 +375,24 @@ void vtkF3DImguiActor::RenderCheatSheet()
       {
         ImGui::Text("%s: %s", bind.c_str(), desc.c_str());
       }
+    }
+  };
+
+  // Make sure default groups are displayed in order first
+  for (const std::string& group : { "Scene", "Camera", "Others" })
+  {
+    if (this->CheatSheet.count(group) > 0)
+    {
+      printGroup(group, this->CheatSheet[group]);
+    }
+  }
+
+  // Display user defined groups
+  for (const auto& [group, content] : this->CheatSheet)
+  {
+    if (group != "Scene" && group != "Camera" && group != "Others")
+    {
+      printGroup(group, this->CheatSheet[group]);
     }
   }
 
