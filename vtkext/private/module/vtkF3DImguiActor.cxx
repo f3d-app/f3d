@@ -24,6 +24,8 @@
 
 #include <imgui.h>
 
+#include <optional>
+
 struct vtkF3DImguiActor::Internals
 {
   void Initialize(vtkOpenGLRenderWindow* renWin)
@@ -205,6 +207,26 @@ struct vtkF3DImguiActor::Internals
   vtkSmartPointer<vtkShaderProgram> Program;
 };
 
+namespace
+{
+void SetupNextWindow(std::optional<ImVec2> position, std::optional<ImVec2> size)
+{
+  if (size.has_value())
+  {
+    // it's super important to set the size of the window manually
+    // otherwise ImGui skip a frame for computing the size resulting in
+    // no UI when doing offscreen rendering
+    ImGui::SetNextWindowSize(size.value());
+  }
+
+  if (position.has_value())
+  {
+    ImGui::SetNextWindowPos(position.value());
+  }
+  
+}
+}
+
 vtkStandardNewMacro(vtkF3DImguiActor);
 
 //----------------------------------------------------------------------------
@@ -269,11 +291,7 @@ void vtkF3DImguiActor::RenderFileName()
   winSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
   winSize.y += 2.f * ImGui::GetStyle().WindowPadding.y;
 
-  // it's super important to set the size of the window manually
-  // otherwise ImGui skip a frame for computing the size resulting in
-  // no UI when doing offscreen rendering
-  ImGui::SetNextWindowSize(winSize);
-  ImGui::SetNextWindowPos(ImVec2(viewport->GetWorkCenter().x - 0.5f * winSize.x, marginTop));
+  ::SetupNextWindow(ImVec2(viewport->GetWorkCenter().x - 0.5f * winSize.x, marginTop), winSize);
   ImGui::SetNextWindowBgAlpha(0.35f);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
@@ -295,12 +313,8 @@ void vtkF3DImguiActor::RenderMetaData()
   winSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
   winSize.y += 2.f * ImGui::GetStyle().WindowPadding.y;
 
-  // it's super important to set the size of the window manually
-  // otherwise ImGui skip a frame for computing the size resulting in
-  // no UI when doing offscreen rendering
-  ImGui::SetNextWindowSize(winSize);
-  ImGui::SetNextWindowPos(ImVec2(viewport->WorkSize.x - winSize.x - marginRight,
-    viewport->GetWorkCenter().y - 0.5f * winSize.y));
+  ::SetupNextWindow(ImVec2(viewport->WorkSize.x - winSize.x - marginRight,
+    viewport->GetWorkCenter().y - 0.5f * winSize.y), winSize);
   ImGui::SetNextWindowBgAlpha(0.35f);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
@@ -322,11 +336,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
   winSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
   winSize.y += 2.f * ImGui::GetStyle().WindowPadding.y;
 
-  // it's super important to set the size of the window manually
-  // otherwise ImGui skip a frame for computing the size resulting in
-  // no UI when doing offscreen rendering
-  ImGui::SetNextWindowSize(winSize);
-  ImGui::SetNextWindowPos(ImVec2(marginLeft, viewport->GetWorkCenter().y - 0.5f * winSize.y));
+  ::SetupNextWindow(ImVec2(marginLeft, viewport->GetWorkCenter().y - 0.5f * winSize.y), winSize);
   ImGui::SetNextWindowBgAlpha(0.35f);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
@@ -352,11 +362,7 @@ void vtkF3DImguiActor::RenderFpsCounter()
   winSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
   winSize.y += 2.f * ImGui::GetStyle().WindowPadding.y;
 
-  // it's super important to set the size of the window manually
-  // otherwise ImGui skip a frame for computing the size resulting in
-  // no UI when doing offscreen rendering
-  ImGui::SetNextWindowSize(winSize);
-  ImGui::SetNextWindowPos(ImVec2(marginLeft, viewport->WorkSize.y - winSize.y - marginBottom));
+  ::SetupNextWindow(ImVec2(marginLeft, viewport->WorkSize.y - winSize.y - marginBottom), winSize);
   ImGui::SetNextWindowBgAlpha(0.35f);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
