@@ -2099,9 +2099,13 @@ void vtkF3DRenderer::SetColormap(const std::vector<double>& colormap)
   }
 }
 
-void vtkF3DRenderer::SetColorDiscretization(const bool discretization) {
+void vtkF3DRenderer::SetColorDiscretization(const std::vector<double>& discretization) {
   auto logMsg = std::string("[Gapry PoC][Add CLI Options] " + std::string(__PRETTY_FUNCTION__));
   F3DLog::Print(F3DLog::Severity::Warning, logMsg);
+  for(auto& e : discretization) {
+    F3DLog::Print(F3DLog::Severity::Warning, std::to_string(e) + std::string(" "));
+  }
+  F3DLog::Print(F3DLog::Severity::Warning, std::string("\n"));
 }
 
 //----------------------------------------------------------------------------

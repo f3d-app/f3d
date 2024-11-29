@@ -284,7 +284,7 @@ public:
    */
   void SetColormap(const std::vector<double>& colormap);
 
-  void SetColorDiscretization(const bool discretization);
+  void SetColorDiscretization(const std::vector<double>& discretization);
 
   /**
    * Set the meta importer to recover coloring information from
