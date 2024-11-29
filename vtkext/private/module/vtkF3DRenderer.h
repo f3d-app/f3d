@@ -285,7 +285,7 @@ public:
    */
   void SetColormap(const std::vector<double>& colormap);
 
-  void SetColorDiscretization(const bool discretization);
+  void SetColorDiscretization(const std::vector<double>& discretization);
 
   /**
    * Set the discretization of the colormap
