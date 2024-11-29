@@ -379,7 +379,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
   };
 
   // Make sure default groups are displayed in order first
-  for (const std::string& group : { "Scene", "Camera", "Others" })
+  for (const char* group : { "Scene", "Camera", "Others" })
   {
     if (this->CheatSheet.count(group) > 0)
     {
