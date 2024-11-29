@@ -210,25 +210,11 @@ vtkF3DRenderer::vtkF3DRenderer()
   textProp->SetBackgroundColor(0, 0, 0);
   textProp->SetBackgroundOpacity(0.8);
 
-  this->MetaDataActor->SetTextProperty(textProp);
-
-  this->TimerActor->GetTextProperty()->SetFontSize(15);
-  this->TimerActor->SetPosition(10, 10);
-  this->TimerActor->SetInput("0 fps");
-
-  this->CheatSheetActor->SetTextProperty(textProp);
-
-  this->MetaDataActor->GetTextProperty()->SetFontFamilyToCourier();
-  this->TimerActor->GetTextProperty()->SetFontFamilyToCourier();
-  this->CheatSheetActor->GetTextProperty()->SetFontFamilyToCourier();
   this->DropZoneActor->GetTextProperty()->SetFontFamilyToCourier();
 
   this->SkyboxActor->SetProjection(vtkSkybox::Sphere);
   this->SkyboxActor->GammaCorrectOn();
 
-  this->MetaDataActor->VisibilityOff();
-  this->TimerActor->VisibilityOff();
-  this->CheatSheetActor->VisibilityOff();
   this->DropZoneActor->VisibilityOff();
   this->SkyboxActor->VisibilityOff();
 
@@ -261,10 +247,7 @@ void vtkF3DRenderer::Initialize()
   this->RemoveAllLights();
 
   this->AddActor(this->GridActor);
-  this->AddActor(this->TimerActor);
-  this->AddActor(this->MetaDataActor);
   this->AddActor(this->DropZoneActor);
-  this->AddActor(this->CheatSheetActor);
   this->AddActor(this->SkyboxActor);
   this->AddActor(this->UIActor);
 
@@ -274,7 +257,6 @@ void vtkF3DRenderer::Initialize()
   this->RenderPassesConfigured = false;
   this->LightIntensitiesConfigured = false;
   this->TextActorsConfigured = false;
-  this->MetaDataConfigured = false;
   this->HDRITextureConfigured = false;
   this->HDRILUTConfigured = false;
   this->HDRISphericalHarmonicsConfigured = false;
@@ -1083,27 +1065,15 @@ void vtkF3DRenderer::ConfigureTextActors()
   {
     textColor[0] = textColor[1] = textColor[2] = 0.2;
   }
-  this->MetaDataActor->GetTextProperty()->SetColor(textColor);
-  this->TimerActor->GetTextProperty()->SetColor(textColor);
-  this->CheatSheetActor->GetTextProperty()->SetColor(0.8, 0.8, 0.8);
   this->DropZoneActor->GetTextProperty()->SetColor(textColor);
 
   // Font
-  this->MetaDataActor->GetTextProperty()->SetFontFamilyToCourier();
-  this->TimerActor->GetTextProperty()->SetFontFamilyToCourier();
-  this->CheatSheetActor->GetTextProperty()->SetFontFamilyToCourier();
   this->DropZoneActor->GetTextProperty()->SetFontFamilyToCourier();
   if (this->FontFile.has_value())
   {
     std::string tmpFontFile = vtksys::SystemTools::CollapseFullPath(this->FontFile.value());
     if (vtksys::SystemTools::FileExists(tmpFontFile, true))
     {
-      this->MetaDataActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
-      this->MetaDataActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
-      this->TimerActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
-      this->TimerActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
-      this->CheatSheetActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
-      this->CheatSheetActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
       this->DropZoneActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
       this->DropZoneActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
       this->UIActor->SetFontFile(tmpFontFile);
@@ -1304,8 +1274,7 @@ void vtkF3DRenderer::ShowTimer(bool show)
   if (this->TimerVisible != show)
   {
     this->TimerVisible = show;
-    this->TimerActor->SetVisibility(show);
-    this->RenderPassesConfigured = false;
+    this->UIActor->SetFpsCounterVisibility(show);
     this->CheatSheetConfigured = false;
   }
 }
@@ -1327,8 +1296,8 @@ void vtkF3DRenderer::ShowMetaData(bool show)
   if (this->MetaDataVisible != show)
   {
     this->MetaDataVisible = show;
+    this->UIActor->SetMetaDataVisibility(show);
     this->MetaDataConfigured = false;
-    this->RenderPassesConfigured = false;
     this->CheatSheetConfigured = false;
   }
 }
@@ -1336,11 +1305,10 @@ void vtkF3DRenderer::ShowMetaData(bool show)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureMetaData()
 {
-  this->MetaDataActor->SetVisibility(this->MetaDataVisible);
+  this->UIActor->SetMetaDataVisibility(this->MetaDataVisible);
   if (this->MetaDataVisible)
   {
-    this->MetaDataActor->SetText(
-      vtkCornerAnnotation::RightEdge, this->GenerateMetaDataDescription().c_str());
+    this->UIActor->SetMetaData(this->GenerateMetaDataDescription());
   }
   this->MetaDataConfigured = true;
 }
@@ -1351,8 +1319,7 @@ void vtkF3DRenderer::ShowCheatSheet(bool show)
   if (this->CheatSheetVisible != show)
   {
     this->CheatSheetVisible = show;
-    this->CheatSheetActor->SetVisibility(show);
-    this->RenderPassesConfigured = false;
+    this->UIActor->SetCheatSheetVisibility(show);
     this->CheatSheetConfigured = false;
   }
 }
@@ -1362,8 +1329,7 @@ void vtkF3DRenderer::ConfigureCheatSheet(const std::string& info)
 {
   if (this->CheatSheetVisible)
   {
-    this->CheatSheetActor->SetText(vtkCornerAnnotation::LeftEdge, info.c_str());
-    this->CheatSheetActor->RenderOpaqueGeometry(this);
+    this->UIActor->SetCheatSheet(info);
     this->CheatSheetConfigured = true;
   }
 }
@@ -1532,8 +1498,6 @@ void vtkF3DRenderer::Render()
   glBeginQuery(GL_TIME_ELAPSED, this->Timer);
 #endif
 
-  this->TimerActor->RenderOpaqueGeometry(this); // update texture
-
   this->Superclass::Render();
 
   auto cpuElapsed = std::chrono::high_resolution_clock::now() - cpuStart;
@@ -1551,9 +1515,7 @@ void vtkF3DRenderer::Render()
   fps = std::min(fps, static_cast<int>(std::round(1.0 / (elapsed * 1e-9))));
 #endif
 
-  std::string str = std::to_string(fps);
-  str += " fps";
-  this->TimerActor->SetInput(str.c_str());
+  this->UIActor->SetFpsValue(fps);
 }
 
 //----------------------------------------------------------------------------

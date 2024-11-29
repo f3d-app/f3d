@@ -13,7 +13,6 @@ list(APPEND libf3dSDKTests_list
      TestSDKScene.cxx
      TestSDKLog.cxx
      TestSDKMultiColoring.cxx
-     TestSDKMultiOptions.cxx
      TestSDKOptions.cxx
      TestSDKOptionsIO.cxx
      TestSDKRenderAndInteract.cxx
@@ -31,6 +30,7 @@ if(F3D_MODULE_UI)
     TestSDKDynamicProperties.cxx
     TestSDKInteractorCallBack.cxx
     TestSDKInteractorDocumentation.cxx
+    TestSDKMultiOptions.cxx
     )
 
   # HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767

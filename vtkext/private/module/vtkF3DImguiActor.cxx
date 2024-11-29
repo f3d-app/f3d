@@ -285,6 +285,89 @@ void vtkF3DImguiActor::RenderFileName()
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DImguiActor::RenderMetaData()
+{
+  ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+  constexpr float marginRight = 5.f;
+
+  ImVec2 winSize = ImGui::CalcTextSize(this->MetaData.c_str());
+  winSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
+  winSize.y += 2.f * ImGui::GetStyle().WindowPadding.y;
+
+  // it's super important to set the size of the window manually
+  // otherwise ImGui skip a frame for computing the size resulting in
+  // no UI when doing offscreen rendering
+  ImGui::SetNextWindowSize(winSize);
+  ImGui::SetNextWindowPos(ImVec2(viewport->WorkSize.x - winSize.x - marginRight,
+    viewport->GetWorkCenter().y - 0.5f * winSize.y));
+  ImGui::SetNextWindowBgAlpha(0.35f);
+
+  ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
+    ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
+
+  ImGui::Begin("MetaData", nullptr, flags);
+  ImGui::TextUnformatted(this->MetaData.c_str());
+  ImGui::End();
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DImguiActor::RenderCheatSheet()
+{
+  ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+  constexpr float marginLeft = 5.f;
+
+  ImVec2 winSize = ImGui::CalcTextSize(this->CheatSheet.c_str());
+  winSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
+  winSize.y += 2.f * ImGui::GetStyle().WindowPadding.y;
+
+  // it's super important to set the size of the window manually
+  // otherwise ImGui skip a frame for computing the size resulting in
+  // no UI when doing offscreen rendering
+  ImGui::SetNextWindowSize(winSize);
+  ImGui::SetNextWindowPos(ImVec2(marginLeft, viewport->GetWorkCenter().y - 0.5f * winSize.y));
+  ImGui::SetNextWindowBgAlpha(0.35f);
+
+  ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
+    ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
+
+  ImGui::Begin("CheatSheet", nullptr, flags);
+  ImGui::TextUnformatted(this->CheatSheet.c_str());
+  ImGui::End();
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DImguiActor::RenderFpsCounter()
+{
+  ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+  constexpr float marginLeft = 3.f;
+  constexpr float marginBottom = 3.f;
+
+  std::string fpsString = std::to_string(this->FpsValue);
+  fpsString += " fps";
+
+  ImVec2 winSize = ImGui::CalcTextSize(fpsString.c_str());
+  winSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
+  winSize.y += 2.f * ImGui::GetStyle().WindowPadding.y;
+
+  // it's super important to set the size of the window manually
+  // otherwise ImGui skip a frame for computing the size resulting in
+  // no UI when doing offscreen rendering
+  ImGui::SetNextWindowSize(winSize);
+  ImGui::SetNextWindowPos(ImVec2(marginLeft, viewport->WorkSize.y - winSize.y - marginBottom));
+  ImGui::SetNextWindowBgAlpha(0.35f);
+
+  ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
+    ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
+
+  ImGui::Begin("FpsCounter", nullptr, flags);
+  ImGui::TextUnformatted(fpsString.c_str());
+  ImGui::End();
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DImguiActor::StartFrame(vtkOpenGLRenderWindow* renWin)
 {
   if (ImGui::GetCurrentContext() == nullptr)

@@ -56,6 +56,21 @@ private:
    */
   void RenderFileName() override;
 
+  /**
+   * Render the metadata UI widget
+   */
+  void RenderMetaData() override;
+
+  /**
+   * Render the cheatsheet UI widget
+   */
+  void RenderCheatSheet() override;
+
+  /**
+   * Render the fps UI widget
+   */
+  void RenderFpsCounter() override;
+
 private:
   vtkF3DImguiActor(const vtkF3DImguiActor&) = delete;
   void operator=(const vtkF3DImguiActor&) = delete;

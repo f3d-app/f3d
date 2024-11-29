@@ -471,16 +471,12 @@ private:
 
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
 
-  vtkNew<vtkCornerAnnotation> MetaDataActor;
-  vtkNew<vtkCornerAnnotation> CheatSheetActor;
   vtkNew<vtkF3DDropZoneActor> DropZoneActor;
   vtkNew<vtkActor> GridActor;
   vtkNew<vtkSkybox> SkyboxActor;
   vtkNew<vtkF3DUIActor> UIActor;
 
-  // vtkCornerAnnotation building is too slow for the timer
-  vtkNew<vtkTextActor> TimerActor;
-  unsigned int Timer = 0;
+  unsigned int Timer = 0; // Timer OpenGL query
 
   bool CheatSheetConfigured = false;
   bool ActorsPropertiesConfigured = false;
