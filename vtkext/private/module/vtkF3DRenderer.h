@@ -359,10 +359,10 @@ public:
   bool CheatSheetNeedsUpdate() const;
 
   /**
-   * Configure the cheatsheet text from the provided info
+   * Configure the cheatsheet data from the provided info
    * Should be called before Render() if CheatSheetInfoNeedsUpdate() returns true.
    */
-  void ConfigureCheatSheet(const std::string& info);
+  void ConfigureCheatSheet(const std::unordered_map<std::string, vtkF3DUIActor::CheatSheetList>& info);
 
   /**
    * Use this method to flag in the renderer that the cheatsheet needs to be updated
@@ -424,13 +424,6 @@ private:
    * Configure the different render passes
    */
   void ConfigureRenderPasses();
-
-  /**
-   * Generate a padded metadata description
-   * using the internal importer.
-   * Returns a multiline string containing the meta data description
-   */
-  std::string GenerateMetaDataDescription();
 
   /**
    * Create a cache directory if a HDRIHash is set

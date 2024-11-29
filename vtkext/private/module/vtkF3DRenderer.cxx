@@ -257,6 +257,7 @@ void vtkF3DRenderer::Initialize()
   this->RenderPassesConfigured = false;
   this->LightIntensitiesConfigured = false;
   this->TextActorsConfigured = false;
+  this->MetaDataConfigured = false;
   this->HDRITextureConfigured = false;
   this->HDRILUTConfigured = false;
   this->HDRISphericalHarmonicsConfigured = false;
@@ -1308,7 +1309,8 @@ void vtkF3DRenderer::ConfigureMetaData()
   this->UIActor->SetMetaDataVisibility(this->MetaDataVisible);
   if (this->MetaDataVisible)
   {
-    this->UIActor->SetMetaData(this->GenerateMetaDataDescription());
+    assert(this->Importer);
+    this->UIActor->SetMetaData(this->Importer->GetMetaDataDescription());
   }
   this->MetaDataConfigured = true;
 }
@@ -1325,7 +1327,7 @@ void vtkF3DRenderer::ShowCheatSheet(bool show)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::ConfigureCheatSheet(const std::string& info)
+void vtkF3DRenderer::ConfigureCheatSheet(const std::unordered_map<std::string, vtkF3DUIActor::CheatSheetList>& info)
 {
   if (this->CheatSheetVisible)
   {
@@ -1596,33 +1598,6 @@ void vtkF3DRenderer::CreateCacheDirectory()
 
   // Create the folder if it does not exists
   vtksys::SystemTools::MakeDirectory(currentCachePath);
-}
-
-//----------------------------------------------------------------------------
-std::string vtkF3DRenderer::GenerateMetaDataDescription()
-{
-  assert(this->Importer);
-
-  // XXX Padding should not be handled by manipulating string
-  // but on the actor directly, but it is not supported by VTK yet.
-
-  // add eol before/after the string
-  std::string description = "\n" + this->Importer->GetMetaDataDescription() + "\n";
-  size_t index = 0;
-  while (true)
-  {
-    index = description.find('\n', index);
-    if (index == std::string::npos)
-    {
-      break;
-    }
-    // Add spaces after/before eol
-    description.insert(index + 1, " ");
-    description.insert(index, " ");
-    index += 3;
-  }
-
-  return description;
 }
 
 //----------------------------------------------------------------------------
