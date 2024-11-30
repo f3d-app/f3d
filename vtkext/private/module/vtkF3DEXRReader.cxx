@@ -11,7 +11,7 @@
 #include <ImfIO.h>
 #include <ImfRgbaFile.h>
 
-#include <cstring>
+#include <algorithm>
 #include <sstream>
 #include <thread>
 
@@ -32,7 +32,7 @@ public:
   {
     if (pos + n <= bufflen)
     {
-      memcpy(c, buffer + pos, n);
+      std::copy_n(buffer + pos, n, c);
       pos += n;
       return true;
     }
