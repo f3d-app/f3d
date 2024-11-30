@@ -564,7 +564,7 @@ private:
 
   vtkNew<vtkDiscretizableColorTransferFunction> DiscretizableColorTransferFunction;
   bool DiscretizableColorTransferFunctionConfigured = false;
-  int Discretization = -1;
+  int Discretization = 256;
 
   vtkNew<vtkScalarBarActor> ScalarBarActor;
   bool ScalarBarActorConfigured = false;
