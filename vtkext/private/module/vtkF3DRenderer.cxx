@@ -2466,6 +2466,7 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
   }
 
   // Set Discretization
+
   this->ColorTransferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
   if (this->Colormap.size() > 0) {
     if (this->Colormap.size() % 4 == 0) {
