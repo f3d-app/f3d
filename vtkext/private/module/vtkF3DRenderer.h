@@ -285,7 +285,10 @@ public:
    */
   void SetColormap(const std::vector<double>& colormap);
 
-  void SetColorDiscretization(const std::vector<double>& discretization);
+  /**
+   * Set the discretization of the colormap
+   */
+  void SetColorDiscretization(const int discretization);
 
   /**
    * Set the discretization of the colormap
@@ -565,6 +568,10 @@ private:
   vtkMTimeType ImporterUpdateTimeStamp = 0;
 
   int Discretization = 256;
+
+  vtkNew<vtkDiscretizableColorTransferFunction> DiscretizableColorTransferFunction;
+  bool DiscretizableColorTransferFunctionConfigured = false;
+  int Discretization = -1;
 
   vtkNew<vtkScalarBarActor> ScalarBarActor;
   bool ScalarBarActorConfigured = false;
