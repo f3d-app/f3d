@@ -283,7 +283,7 @@ void vtkF3DRenderer::Initialize()
 
   this->GridInfo = "";
 
-  this->Discretization = -1;
+  this->Discretization = 256;
   this->DiscretizableColorTransferFunctionConfigured = false;
 
   this->AddActor2D(this->ScalarBarActor);
@@ -2136,14 +2136,14 @@ void vtkF3DRenderer::SetColorDiscretization(const int discretization) {
     std::string("[Gapry PoC][Add CLI Options] ") + 
     "input discretization = " + std::to_string(discretization));
  
-  if(discretization >= 0 && discretization <= 255) {
+  if(discretization >= 0 and discretization <= std::numeric_limits<int>::max()) {
     this->Discretization = discretization;
 
     vtkF3DMetaImporter::ColoringInfo info;
     this->ConfigureRangeAndCTFForColoring(info);
   } else {
     F3DLog::Print(F3DLog::Severity::Error,
-      "The discretization value is between 0 and 255.");
+      "The discretization value need to great than zero");
   }
 }
 
@@ -2495,7 +2495,7 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
   }
 
   // Set Discretization
-  if(this->Discretization >= 0 && !this->DiscretizableColorTransferFunctionConfigured) {
+  if(!this->DiscretizableColorTransferFunctionConfigured) {
     F3DLog::Print(F3DLog::Severity::Warning, 
       std::string("[Gapry PoC][Add CLI Options] " ) + __PRETTY_FUNCTION__ + 
       " discretization = " + std::to_string(this->Discretization));
