@@ -268,6 +268,9 @@ void vtkF3DRenderer::Initialize()
 
   this->GridInfo = "";
 
+  this->Discretization = -1;
+  this->DiscretizableColorTransferFunctionConfigured = false;
+
   this->AddActor2D(this->ScalarBarActor);
   this->ScalarBarActor->VisibilityOff();
 
@@ -2099,13 +2102,23 @@ void vtkF3DRenderer::SetColormap(const std::vector<double>& colormap)
   }
 }
 
-void vtkF3DRenderer::SetColorDiscretization(const std::vector<double>& discretization) {
-  auto logMsg = std::string("[Gapry PoC][Add CLI Options] " + std::string(__PRETTY_FUNCTION__));
-  F3DLog::Print(F3DLog::Severity::Warning, logMsg);
-  for(auto& e : discretization) {
-    F3DLog::Print(F3DLog::Severity::Warning, std::to_string(e) + std::string(" "));
+void vtkF3DRenderer::SetColorDiscretization(const int discretization) {
+  F3DLog::Print(F3DLog::Severity::Warning,
+    std::string("[Gapry PoC][Add CLI Options] ") + __PRETTY_FUNCTION__);
+
+  F3DLog::Print(F3DLog::Severity::Warning, 
+    std::string("[Gapry PoC][Add CLI Options] ") + 
+    "input discretization = " + std::to_string(discretization));
+ 
+  if(discretization >= 0 && discretization <= 255) {
+    this->Discretization = discretization;
+
+    vtkF3DMetaImporter::ColoringInfo info;
+    this->ConfigureRangeAndCTFForColoring(info);
+  } else {
+    F3DLog::Print(F3DLog::Severity::Error,
+      "The discretization value is between 0 and 255.");
   }
-  F3DLog::Print(F3DLog::Severity::Warning, std::string("\n"));
 }
 
 //----------------------------------------------------------------------------
@@ -2456,6 +2469,16 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
     F3DLog::Print(F3DLog::Severity::Warning,
       std::string("Invalid component index: ") + std::to_string(this->ComponentForColoring));
     return;
+  }
+
+  // Set Discretization
+  if(this->Discretization >= 0 && !this->DiscretizableColorTransferFunctionConfigured) {
+    F3DLog::Print(F3DLog::Severity::Warning, 
+      std::string("[Gapry PoC][Add CLI Options] " ) + __PRETTY_FUNCTION__ + 
+      " discretization = " + std::to_string(this->Discretization));
+
+    this->DiscretizableColorTransferFunction->SetNumberOfValues(this->Discretization);
+    this->DiscretizableColorTransferFunctionConfigured = true;
   }
 
   // Set range
