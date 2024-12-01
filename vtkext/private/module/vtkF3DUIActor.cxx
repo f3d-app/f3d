@@ -43,7 +43,7 @@ void vtkF3DUIActor::SetCheatSheetVisibility(bool show)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DUIActor::SetCheatSheet(const std::unordered_map<std::string, CheatSheetList>& cheatsheet)
+void vtkF3DUIActor::SetCheatSheet(const std::vector<CheatSheetGroup>& cheatsheet)
 {
   this->CheatSheet = cheatsheet;
 }

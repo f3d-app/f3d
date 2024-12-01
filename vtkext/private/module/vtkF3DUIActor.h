@@ -10,8 +10,6 @@
 
 #include <vtkProp.h>
 
-#include <unordered_map>
-
 class vtkOpenGLRenderWindow;
 
 class vtkF3DUIActor : public vtkProp
@@ -21,7 +19,7 @@ public:
   vtkTypeMacro(vtkF3DUIActor, vtkProp);
 
   using CheatSheetTuple = std::tuple<std::string, std::string, std::string>;
-  using CheatSheetList = std::vector<CheatSheetTuple>;
+  using CheatSheetGroup = std::pair<std::string, std::vector<CheatSheetTuple>>;
 
   /**
   * Initialize the UI actor resources
@@ -62,7 +60,7 @@ public:
    * Set the cheatsheet string
    * Empty by default
    */
-  void SetCheatSheet(const std::unordered_map<std::string, CheatSheetList>& cheatsheet);
+  void SetCheatSheet(const std::vector<CheatSheetGroup>& cheatsheet);
 
   /**
    * Set the fps counter visibility
@@ -128,7 +126,7 @@ protected:
   std::string MetaData = "";
 
   bool CheatSheetVisible = false;
-  std::unordered_map<std::string, CheatSheetList> CheatSheet;
+  std::vector<CheatSheetGroup> CheatSheet;
 
   bool FpsCounterVisible = false;
   int FpsValue = 0;

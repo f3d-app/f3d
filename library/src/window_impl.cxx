@@ -449,10 +449,10 @@ void window_impl::UpdateDynamicOptions()
   // Update the cheatsheet if needed
   if (this->Internals->Interactor && renderer->CheatSheetNeedsUpdate())
   {
-    std::unordered_map<std::string, vtkF3DUIActor::CheatSheetList> cheatsheet;
+    std::vector<vtkF3DUIActor::CheatSheetGroup> cheatsheet;
     for (const std::string& group : this->Internals->Interactor->getBindGroups())
     {
-      vtkF3DUIActor::CheatSheetList groupList;
+      std::vector<vtkF3DUIActor::CheatSheetTuple> groupList;
       for (const interaction_bind_t& bind : this->Internals->Interactor->getBindsForGroup(group))
       {
         auto [doc, val] = this->Internals->Interactor->getBindingDocumentation(bind);
@@ -461,7 +461,7 @@ void window_impl::UpdateDynamicOptions()
           groupList.emplace_back(std::make_tuple(bind.format(), doc, val));
         }
       }
-      cheatsheet.emplace(group, std::move(groupList));
+      cheatsheet.emplace_back(std::make_pair(group, std::move(groupList)));
     }
     renderer->ConfigureCheatSheet(cheatsheet);
   }

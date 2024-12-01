@@ -362,7 +362,7 @@ public:
    * Configure the cheatsheet data from the provided info
    * Should be called before Render() if CheatSheetInfoNeedsUpdate() returns true.
    */
-  void ConfigureCheatSheet(const std::unordered_map<std::string, vtkF3DUIActor::CheatSheetList>& info);
+  void ConfigureCheatSheet(const std::vector<vtkF3DUIActor::CheatSheetGroup>& info);
 
   /**
    * Use this method to flag in the renderer that the cheatsheet needs to be updated

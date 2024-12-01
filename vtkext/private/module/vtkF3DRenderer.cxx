@@ -1327,7 +1327,7 @@ void vtkF3DRenderer::ShowCheatSheet(bool show)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::ConfigureCheatSheet(const std::unordered_map<std::string, vtkF3DUIActor::CheatSheetList>& info)
+void vtkF3DRenderer::ConfigureCheatSheet(const std::vector<vtkF3DUIActor::CheatSheetGroup>& info)
 {
   if (this->CheatSheetVisible)
   {
