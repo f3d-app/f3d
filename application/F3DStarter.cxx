@@ -31,6 +31,7 @@
 #include "interactor.h"
 #include "log.h"
 #include "options.h"
+#include "utils.h"
 #include "window.h"
 
 #include <algorithm>
@@ -254,7 +255,7 @@ public:
   fs::path applyFilenameTemplate(const std::string& templateString)
   {
     constexpr size_t maxNumberingAttempts = 1000000;
-    const std::regex numberingRe("\\{(n:?([0-9]*))\\}");
+    const std::regex numberingRe("(n:?([0-9]*))");
     const std::regex dateRe("date:?([A-Za-z%]*)");
 
     /* Return a file related string depending on the currently loaded files, or the empty string if
@@ -332,55 +333,14 @@ public:
       throw std::out_of_range(var);
     };
 
-    /* process template as tokens, keeping track of whether they've been
-     * substituted or left untouched */
-    const auto substituteVariables = [&]()
-    {
-      const std::string varName = "[\\w_.%:-]+";
-      const std::string escapedVar = "(\\{(\\{" + varName + "\\})\\})";
-      const std::string substVar = "(\\{(" + varName + ")\\})";
-      const std::regex escapedVarRe(escapedVar);
-      const std::regex substVarRe(substVar);
+    f3d::utils::StringTemplate stringTemplate(templateString);
+    stringTemplate.substitute(variableLookup);
 
-      std::vector<std::pair<std::string, bool>> fragments;
-      const auto callback = [&](const std::string& m)
-      {
-        if (std::regex_match(m, escapedVarRe))
-        {
-          fragments.emplace_back(std::regex_replace(m, escapedVarRe, "$2"), true);
-        }
-        else if (std::regex_match(m, substVarRe))
-        {
-          try
-          {
-            fragments.emplace_back(variableLookup(std::regex_replace(m, substVarRe, "$2")), true);
-          }
-          catch (std::out_of_range&)
-          {
-            fragments.emplace_back(m, false);
-          }
-        }
-        else
-        {
-          fragments.emplace_back(m, false);
-        }
-      };
-
-      const std::regex re(escapedVar + "|" + substVar);
-      std::sregex_token_iterator begin(templateString.begin(), templateString.end(), re, { -1, 0 });
-      std::for_each(begin, std::sregex_token_iterator(), callback);
-
-      return fragments;
-    };
-
-    const auto fragments = substituteVariables();
-
-    /* check the non-substituted fragments for numbering variables */
     const auto hasNumbering = [&]()
     {
-      for (const auto& [fragment, processed] : fragments)
+      for (const auto& variable : stringTemplate.variables())
       {
-        if (!processed && std::regex_search(fragment, numberingRe))
+        if (std::regex_search(variable, numberingRe))
         {
           return true;
         }
@@ -388,49 +348,39 @@ public:
       return false;
     };
 
-    /* just join and return if there's no numbering to be done */
+    /* return if there's no numbering to be done */
     if (!hasNumbering())
     {
-      std::stringstream joined;
-      for (const auto& fragment : fragments)
-      {
-        joined << fragment.first;
-      }
-      return { joined.str() };
+      return { stringTemplate.str() };
     }
 
-    /* apply numbering in the non-substituted fragments and join */
-    const auto applyNumbering = [&](const size_t i)
+    const auto numberingLookup = [&](const size_t i)
     {
-      std::stringstream joined;
-      for (const auto& [fragment, processed] : fragments)
+      return [&numberingRe, i](const std::string var)
       {
-        if (!processed && std::regex_match(fragment, numberingRe))
+        if (std::regex_match(var, numberingRe))
         {
           std::stringstream formattedNumber;
           try
           {
-            const std::string fmt = std::regex_replace(fragment, numberingRe, "$2");
+            const std::string fmt = std::regex_replace(var, numberingRe, "$2");
             formattedNumber << std::setfill('0') << std::setw(std::stoi(fmt)) << i;
           }
           catch (std::invalid_argument&)
           {
             formattedNumber << std::setw(0) << i;
           }
-          joined << std::regex_replace(fragment, numberingRe, formattedNumber.str());
+          return std::regex_replace(var, numberingRe, formattedNumber.str());
         }
-        else
-        {
-          joined << fragment;
-        }
-      }
-      return joined.str();
+        throw std::out_of_range(var);
+      };
     };
 
-    /* apply incrementing numbering until file doesn't exist already */
+    /* try substituting incrementing number until file doesn't exist already */
     for (size_t i = 1; i <= maxNumberingAttempts; ++i)
     {
-      const std::string candidate = applyNumbering(i);
+      const std::string candidate =
+        f3d::utils::StringTemplate(stringTemplate).substitute(numberingLookup(i)).str();
       if (!fs::exists(candidate))
       {
         return { candidate };

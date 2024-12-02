@@ -4,6 +4,8 @@
 #include "exception.h"
 #include "export.h"
 
+#include <functional>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -56,6 +58,28 @@ public:
   struct tokenize_exception : public exception
   {
     explicit tokenize_exception(const std::string& what = "");
+  };
+
+  /** String template allowing substitution of variables enclosed in curly braces.
+    ```
+    StringTemplate("{greeting} {name}!")
+      .substitute({ { "greeting", "hello" }, { "name", "World" } })
+      .str() == "hello World!"
+    ```
+   */
+  class StringTemplate
+  {
+    std::vector<std::pair<std::string, bool>> fragments;
+
+  public:
+    StringTemplate(const std::string& templateString);
+
+    StringTemplate& substitute(const std::function<std::string(const std::string&)>& lookup);
+    StringTemplate& substitute(const std::map<std::string, std::string>& lookup);
+
+    std::string str() const;
+
+    std::vector<std::string> variables() const;
   };
 };
 }
