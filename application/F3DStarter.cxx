@@ -328,7 +328,7 @@ public:
         std::time_t t = std::time(nullptr);
         std::stringstream ss;
         ss << std::put_time(std::localtime(&t), fmt.c_str());
-        const std::string formatted = ss.str();
+        std::string formatted = ss.str();
         if (formatted == fmt)
         {
           f3d::log::warn("invalid date format for \"", var, "\"");
