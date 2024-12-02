@@ -340,7 +340,9 @@ void vtkF3DImguiActor::RenderCheatSheet()
   {
     for (const auto& [bind, desc, val] : content)
     {
-      std::string line = bind + ": " + desc;
+      std::string line = bind;
+      line += ": ";
+      line += desc;
       if (!val.empty())
       {
         line += " [" + val + "]";
