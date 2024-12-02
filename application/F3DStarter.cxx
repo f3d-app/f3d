@@ -87,7 +87,7 @@ public:
     double RefThreshold;
     std::string InteractionTestRecordFile;
     std::string InteractionTestPlayFile;
-    std::string CommandScriptFile; 
+    std::string CommandScriptFile;
   };
 
   void SetupCamera(const CameraConfiguration& camConf)
@@ -596,7 +596,7 @@ public:
       f3d::options::parse<std::string>(appOptions.at("interaction-test-record"));
     this->AppOptions.InteractionTestPlayFile =
       f3d::options::parse<std::string>(appOptions.at("interaction-test-play"));
-    this->AppOptions.CommandScriptFile = 
+    this->AppOptions.CommandScriptFile =
       f3d::options::parse<std::string>(appOptions.at("command-script"));
   }
 
@@ -997,8 +997,7 @@ int F3DStarter::Start(int argc, char** argv)
     }
 
     // Process Command Script file
-    const std::string& commandScriptFile = 
-      this->Internals->AppOptions.CommandScriptFile;
+    const std::string& commandScriptFile = this->Internals->AppOptions.CommandScriptFile;
     if (!commandScriptFile.empty())
     {
       std::ifstream scriptFile(commandScriptFile);

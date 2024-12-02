@@ -83,7 +83,7 @@ eg: `add_files_or_set_hdri /path/to/dragon.vtu /path/to/file.hdr`.
 
 F3D provides a feature to execute commands from a script file using the `--command-script` [CLI option[(OPTIONS.md)]]. This allows users to automate a sequence of commands by listing them in a plain text file.
 eg: `f3d --command-script path/to/command_script.txt`.
-Example Command Script, commands are separated by new lines
+Example Command Script, commands are separated by new lines:
 ```
 roll_camera 90
 toggle ui.scalar_bar
