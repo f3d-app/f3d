@@ -30,7 +30,7 @@ namespace
       { "End", ImGuiKey_End },
       { "Insert", ImGuiKey_Insert },
       { "Delete", ImGuiKey_Delete },
-      { "Backspace", ImGuiKey_Backspace },
+      { "BackSpace", ImGuiKey_Backspace },
       { "space", ImGuiKey_Space },
       { "Return", ImGuiKey_Enter },
       { "Escape", ImGuiKey_Escape },
@@ -278,6 +278,20 @@ bool vtkF3DImguiObserver::MouseWheelBackward(vtkObject* caller, unsigned long, v
 }
 
 //----------------------------------------------------------------------------
+bool vtkF3DImguiObserver::Char(vtkObject* caller, unsigned long, void*)
+{
+  vtkRenderWindowInteractor* that = static_cast<vtkRenderWindowInteractor*>(caller);
+
+  ImGuiIO& io = ImGui::GetIO();
+
+  io.AddInputCharacter(that->GetKeyCode());
+
+  this->RenderUI(that);
+
+  return io.WantCaptureKeyboard;
+}
+
+//----------------------------------------------------------------------------
 bool vtkF3DImguiObserver::KeyPress(vtkObject* caller, unsigned long, void*)
 {
   vtkRenderWindowInteractor* that = static_cast<vtkRenderWindowInteractor*>(caller);
@@ -289,7 +303,6 @@ bool vtkF3DImguiObserver::KeyPress(vtkObject* caller, unsigned long, void*)
   io.AddKeyEvent(ImGuiMod_Alt, that->GetAltKey() == 1);
 
   io.AddKeyEvent(::GetImGuiKeyFromKeySym(that->GetKeySym()), true);
-  io.AddInputCharacter(that->GetKeyCode());
 
   this->RenderUI(that);
 
@@ -326,4 +339,5 @@ void vtkF3DImguiObserver::InstallObservers(vtkRenderWindowInteractor* interactor
   interactor->AddObserver(vtkCommand::MouseWheelBackwardEvent, this, &vtkF3DImguiObserver::MouseWheelBackward, 2.f);
   interactor->AddObserver(vtkCommand::KeyPressEvent, this, &vtkF3DImguiObserver::KeyPress, 2.f);
   interactor->AddObserver(vtkCommand::KeyReleaseEvent, this, &vtkF3DImguiObserver::KeyRelease, 2.f);
+  interactor->AddObserver(vtkCommand::CharEvent, this, &vtkF3DImguiObserver::Char, 2.f);
 }

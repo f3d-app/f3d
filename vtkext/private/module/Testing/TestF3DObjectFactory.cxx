@@ -2,8 +2,8 @@
 #include "vtkF3DObjectFactory.h"
 #include "vtkF3DPolyDataMapper.h"
 
-#if F3D_WINDOWS_GUI
-#include "vtkF3DWin32OutputWindow.h"
+#if F3D_MODULE_UI
+#include "vtkF3DImguiConsole.h"
 #else
 #include "vtkF3DConsoleOutputWindow.h"
 #endif
@@ -60,8 +60,8 @@ int TestF3DObjectFactory(int argc, char* argv[])
 #endif
 
   vtkNew<vtkOutputWindow> window;
-#if F3D_WINDOWS_GUI
-  vtkF3DWin32OutputWindow* windowPtr = vtkF3DWin32OutputWindow::SafeDownCast(window);
+#if F3D_MODULE_UI
+  vtkF3DImguiConsole* windowPtr = vtkF3DImguiConsole::SafeDownCast(window);
 #else
   vtkF3DConsoleOutputWindow* windowPtr = vtkF3DConsoleOutputWindow::SafeDownCast(window);
 #endif

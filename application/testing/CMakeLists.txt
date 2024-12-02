@@ -145,7 +145,7 @@ f3d_test(NAME TestVTU DATA dragon.vtu)
 f3d_test(NAME TestVTP DATA cow.vtp)
 f3d_test(NAME TestVTR DATA RectGrid2.vtr ARGS --scalar-coloring --roughness=1)
 f3d_test(NAME TestVTS DATA bluntfin.vts)
-f3d_test(NAME TestVTM DATA mb.vtm)
+f3d_test(NAME TestVTM DATA mb.vtm UI)
 f3d_test(NAME TestVTK DATA cow.vtk)
 f3d_test(NAME TestNRRD DATA beach.nrrd ARGS -s)
 f3d_test(NAME TestSPLAT DATA small.splat ARGS -osy --up=-Y --point-sprites-size=1)
@@ -226,8 +226,8 @@ f3d_test(NAME TestComponentName DATA from_abq.vtu ARGS --scalar-coloring --bar -
 f3d_test(NAME TestNoRender DATA dragon.vtu NO_RENDER)
 f3d_test(NAME TestNoRenderWithOptions DATA dragon.vtu ARGS --hdri-ambient --axis NO_RENDER) # These options causes issues if not handled correctly
 f3d_test(NAME TestNoFile NO_DATA_FORCE_RENDER)
-f3d_test(NAME TestMultiFile DATA mb/recursive ARGS --multi-file-mode=all)
-f3d_test(NAME TestMultiFileColoring DATA mb/recursive ARGS --multi-file-mode=all -s --coloring-array=Polynomial -b)
+f3d_test(NAME TestMultiFile DATA mb/recursive ARGS --multi-file-mode=all UI)
+f3d_test(NAME TestMultiFileColoring DATA mb/recursive ARGS --multi-file-mode=all -s --coloring-array=Polynomial -b UI)
 f3d_test(NAME TestMultiFileVolume DATA multi ARGS --multi-file-mode=all -vsb --coloring-array=Scalars_)
 f3d_test(NAME TestMultiFileColoringTexture DATA mb/recursive/mb_1_0.vtp mb/recursive/mb_2_0.vtp world.obj ARGS --multi-file-mode=all -sb --coloring-array=Normals --comp=1)
 f3d_test(NAME TestMultiFilePositionals DATA mb/recursive/mb_0_0.vtu mb/recursive/mb_1_0.vtp ARGS --multi-file-mode=all -s --coloring-array=Polynomial -b)
@@ -396,9 +396,6 @@ f3d_test(NAME TestInteractionAnimationFrameRate DATA InterpolationTest.glb ARGS 
 f3d_test(NAME TestVerboseAnimationWrongAnimationTimeHigh DATA BoxAnimated.gltf ARGS --animation-time=10 --verbose REGEXP "Animation time 10 is outside of range \\[0, 3\\.70833\\], using 3\\.70833" NO_BASELINE)
 f3d_test(NAME TestVerboseAnimationWrongAnimationTimeLow DATA BoxAnimated.gltf ARGS --animation-time=-5 --verbose REGEXP "Animation time -5 is outside of range \\[0, 3\\.70833\\], using 0" NO_BASELINE)
 
-# Test exit hotkey
-f3d_test(NAME TestInteractionSimpleExit DATA cow.vtp REGEXP "Interactor has been stopped" INTERACTION NO_BASELINE) #Escape;
-
 # No alternative baseline supports in F3D
 if(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestInteractionCheatsheetRaytracing DATA cow.vtp INTERACTION UI) #H
@@ -466,7 +463,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   f3d_test(NAME TestInvalidHDRI DATA cow.vtp HDRI invalid.png REGEXP "Cannot open HDRI file" NO_BASELINE)
 
   # Use a dummy HDRI for simplicity to test default HDRI
-  f3d_test(NAME TestHDRIDefault DATA suzanne.ply HDRI dummy.png THRESHOLD 0.11) # Threshold is needed for legacy comparison method for VTK 9.3
+  f3d_test(NAME TestHDRIDefault DATA suzanne.ply HDRI dummy.png THRESHOLD 0.11 UI) # Threshold is needed for legacy comparison method for VTK 9.3 
 
   configure_file("${F3D_SOURCE_DIR}/testing/configs/hdri.json.in" "${CMAKE_BINARY_DIR}/hdri.json")
   f3d_test(NAME TestConfigFileHDRI DATA dragon.vtu CONFIG "${CMAKE_BINARY_DIR}/hdri.json" LONG_TIMEOUT)
@@ -770,18 +767,18 @@ f3d_test(NAME TestInteractionVolumeAfterColoring DATA waveletArrays.vti ARGS INT
 f3d_test(NAME TestInteractionVolumeInverse DATA HeadMRVolume.mhd ARGS --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 INTERACTION) #VI
 f3d_test(NAME TestInteractionMultiFileVolume DATA multi ARGS --multi-file-mode=all INTERACTION) #SSVB
 f3d_test(NAME TestInteractionPointCloud DATA pointsCloud.vtp ARGS --point-sprites-size=20 INTERACTION) #O
-f3d_test(NAME TestInteractionDirectory DATA mb INTERACTION ARGS --scalar-coloring) #Right;Right;Right;Left;Up;
+f3d_test(NAME TestInteractionDirectory DATA mb INTERACTION ARGS --scalar-coloring UI) #Right;Right;Right;Left;Up;
 f3d_test(NAME TestInteractionDirectoryLoop DATA mb/recursive INTERACTION ARGS --scalar-coloring --filename UI) #Left;Left;Left;Left;Left;
-f3d_test(NAME TestInteractionDirectoryEmpty DATA mb INTERACTION NO_DATA_FORCE_RENDER) #Right;Right;Right;
+f3d_test(NAME TestInteractionDirectoryEmpty DATA mb INTERACTION NO_DATA_FORCE_RENDER UI) #Right;Right;Right;
 f3d_test(NAME TestInteractionDirectoryEmptyVerbose DATA mb ARGS --verbose NO_BASELINE INTERACTION REGEXP "is not a file of a supported file format") #Right;Right;Right;HMCSY
 f3d_test(NAME TestInteractionAnimationNotStopped DATA InterpolationTest.glb NO_BASELINE INTERACTION)#Space;
 f3d_test(NAME TestInteractionResetCamera DATA dragon.vtu INTERACTION LONG_TIMEOUT)#MouseMovements;Return;
 f3d_test(NAME TestInteractionResetCameraWithCameraIndex DATA CameraAnimated.glb ARGS --camera-index=0 INTERACTION)#MouseMovements;Return;
-f3d_test(NAME TestInteractionTensorsCycleComp DATA tensors.vti ARGS --scalar-coloring --comp=-2  INTERACTION) #SYYYYYYYYYY
+f3d_test(NAME TestInteractionTensorsCycleComp DATA tensors.vti ARGS --scalar-coloring --comp=-2 INTERACTION UI) #SYYYYYYYYYY
 f3d_test(NAME TestInteractionCycleScalarsCompCheck DATA dragon.vtu ARGS -b --scalar-coloring --comp=2 INTERACTION) #S
 f3d_test(NAME TestInteractionConfigFileNoColorBar DATA multi CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION) #Right;Right;Left
 f3d_test(NAME TestInteractionConfigFileBindings DATA dragon.vtu CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json INTERACTION UI) #Ctrl+Shift+O;Ctrl+O;Shift+O;O;3
-f3d_test(NAME TestInteractionConfigFileMulti DATA multi CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION) #SY;Right;XG;Right;N;Right;Right
+f3d_test(NAME TestInteractionConfigFileMulti DATA multi CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI) #SY;Right;XG;Right;N;Right;Right
 f3d_test(NAME TestInteractionConfigFileAndCommand DATA multi ARGS -o CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI) #OX;Right;N;Right;Right;Right
 f3d_test(NAME TestInteractionDumpSceneState DATA dragon.vtu NO_BASELINE INTERACTION REGEXP "Camera position: 2.23745,3.83305,507.598")#?
 f3d_test(NAME TestInteractionCycleVerbose DATA dragon.vtu ARGS --verbose -s NO_BASELINE INTERACTION REGEXP "Not coloring")#SSSSYC
@@ -791,7 +788,7 @@ f3d_test(NAME TestInteractionFocalPointPickingDefault DATA dragon.vtu INTERACTIO
 f3d_test(NAME TestInteractionFocalPointPickingShift DATA dragon.vtu INTERACTION LONG_TIMEOUT)
 f3d_test(NAME TestInteractionFocalPointPickingPoints DATA pointsCloud.vtp INTERACTION)
 f3d_test(NAME TestInteractionLightIntensity DATA dragon.vtu INTERACTION LONG_TIMEOUT)
-f3d_test(NAME TestInteractionMultiFileColoring DATA mb/recursive ARGS --multi-file-mode=all INTERACTION) #SSSB
+f3d_test(NAME TestInteractionMultiFileColoring DATA mb/recursive ARGS --multi-file-mode=all INTERACTION UI) #SSSB
 f3d_test(NAME TestInteractionReload DATA dragon.vtu ARGS -e INTERACTION) #Up;
 f3d_test(NAME TestInteractionLoadParentDirectory DATA multi/dragon.vtu ARGS --filename INTERACTION UI) #Down;
 f3d_test(NAME TestInteractionEmptyLoadParentDirectory INTERACTION NO_BASELINE REGEXP "No files loaded, no rendering performed") #Down;
@@ -805,6 +802,11 @@ f3d_test(NAME TestInteractionRotateCameraMinus90 DATA f3d.glb INTERACTION)
 f3d_test(NAME TestInteractionRotateCamera90 DATA f3d.glb INTERACTION)
 f3d_test(NAME TestInteractionPanWithShift DATA f3d.glb INTERACTION) #Shift;LeftMouse;MouseMovements
 f3d_test(NAME TestInteractionFileOpen INTERACTION NO_BASELINE ENV CTEST_OPEN_DIALOG_FILE=${F3D_SOURCE_DIR}/testing/data/cow.vtp)
+f3d_test(NAME TestInteractionConsoleOpen DATA f3d.glb INTERACTION UI) #Escape
+f3d_test(NAME TestInteractionConsoleToggleGrid DATA f3d.glb INTERACTION UI) #Escape;toggle render.grid.enable;Return;Escape
+f3d_test(NAME TestInteractionConsoleInvalidCommand DATA f3d.glb INTERACTION UI) #Escape;foo;Return
+f3d_test(NAME TestInteractionConsoleInvalidOption DATA f3d.glb INTERACTION UI) #Escape;toggle foo;Return
+f3d_test(NAME TestInteractionConsoleTypingSceneInfo DATA f3d.glb INTERACTION UI) #Escape;e;Escape;printt;BackSpace;_scee;Left;Right;_info;Return
 
 # Progress test
 f3d_test(NAME TestProgress DATA cow.vtp ARGS --progress NO_BASELINE)
@@ -817,7 +819,7 @@ f3d_test(NAME TestInteractionCycleAnimationNoAnimation DATA cow.vtp INTERACTION 
 
 f3d_test(NAME TestInteractionDropFiles ARGS -n INTERACTION_CONFIGURE UI)#X;DropEvent cow.vtp;DropEvent dragon.vtu suzanne.stl;
 f3d_test(NAME TestInteractionMultiFileDrop ARGS --multi-file-mode=all -e INTERACTION_CONFIGURE) #DropEvent mb_1_0.vtp mb_2_0.vtp
-f3d_test(NAME TestInteractionDropSameFiles ARGS -x INTERACTION_CONFIGURE)#DropEvent cow.vtp;#DropEvent dragon.vtu;#DropEvent cow.vtp#DropEvent cow.vtp;
+f3d_test(NAME TestInteractionDropSameFiles ARGS -x INTERACTION_CONFIGURE UI) #DropEvent cow.vtp;#DropEvent dragon.vtu;#DropEvent cow.vtp#DropEvent cow.vtp;
 
 # A proper test for this is not possible because of the double quotes
 f3d_test(NAME TestInteractionDropFileWithQuotes ARGS -n INTERACTION REGEXP "\"'`Quotes\"'`.stl does not exist" NO_BASELINE)#X;DropEvent "'`Quotes"'`.stl"; 

@@ -383,6 +383,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetFilenameInfo(opt.ui.filename_info);
   renderer->ShowMetaData(opt.ui.metadata);
   renderer->ShowCheatSheet(opt.ui.cheatsheet);
+  renderer->ShowConsole(opt.ui.console);
   renderer->ShowDropZone(opt.ui.dropzone);
   renderer->SetDropZoneInfo(opt.ui.dropzone_info);
 

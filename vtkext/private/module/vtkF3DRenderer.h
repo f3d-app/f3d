@@ -46,6 +46,7 @@ public:
   void ShowMetaData(bool show);
   void ShowFilename(bool show);
   void ShowCheatSheet(bool show);
+  void ShowConsole(bool show);
   void ShowDropZone(bool show);
   void ShowHDRISkybox(bool show);
   ///@}
@@ -494,6 +495,7 @@ private:
   bool FilenameVisible = false;
   bool MetaDataVisible = false;
   bool CheatSheetVisible = false;
+  bool ConsoleVisible = false;
   bool DropZoneVisible = false;
   bool HDRISkyboxVisible = false;
   bool UseRaytracing = false;

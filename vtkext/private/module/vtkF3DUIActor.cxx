@@ -43,6 +43,12 @@ void vtkF3DUIActor::SetCheatSheetVisibility(bool show)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DUIActor::SetConsoleVisibility(bool show)
+{
+  this->ConsoleVisible = show;
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DUIActor::SetCheatSheet(const std::vector<CheatSheetGroup>& cheatsheet)
 {
   this->CheatSheet = cheatsheet;
@@ -61,9 +67,13 @@ void vtkF3DUIActor::SetFpsValue(int fps)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DUIActor::SetFontFile(const std::string& font)
+void vtkF3DUIActor::SetFontFile(vtkOpenGLRenderWindow* renWin, const std::string& font)
 {
-  this->FontFile = font;
+  if (this->FontFile != font)
+  {
+    this->FontFile = font;
+    this->Initialize(renWin);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -90,6 +100,15 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
   if (this->FpsCounterVisible)
   {
     this->RenderFpsCounter();
+  }
+
+  if (this->ConsoleVisible)
+  {
+    this->RenderConsole();
+  }
+  else
+  {
+    this->RenderConsoleBadge();
   }
 
   this->EndFrame(renWin);

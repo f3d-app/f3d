@@ -1,5 +1,0 @@
-# StreamVersion 1.1
-ExposeEvent 0 599 0 0 0 0
-RenderEvent 0 599 0 0 0 0
-KeyReleaseEvent -710 286 0 13 1 Return
-KeyPressEvent -710 286 0 27 1 Escape

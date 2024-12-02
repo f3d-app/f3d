@@ -6,13 +6,25 @@
 #ifndef vtkF3DConsoleOutputWindow_h
 #define vtkF3DConsoleOutputWindow_h
 
-#include "vtkOutputWindow.h"
+#include <vtkOutputWindow.h>
+
+#include <vtkCommand.h>
 
 class vtkF3DConsoleOutputWindow : public vtkOutputWindow
 {
 public:
   vtkTypeMacro(vtkF3DConsoleOutputWindow, vtkOutputWindow);
   static vtkF3DConsoleOutputWindow* New();
+
+  /**
+   * Custom events invoked by this class
+   */
+  enum vtkCustomEvents
+  {
+    TriggerEvent = vtkCommand::UserEvent + 200,
+    ShowEvent,
+    HideEvent
+  };
 
   /**
    * Reimplemented to support coloring
@@ -32,7 +44,6 @@ protected:
   vtkF3DConsoleOutputWindow();
   ~vtkF3DConsoleOutputWindow() override = default;
 
-private:
   bool UseColoring = true;
 };
 

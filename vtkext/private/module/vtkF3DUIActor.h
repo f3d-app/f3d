@@ -57,6 +57,12 @@ public:
   void SetCheatSheetVisibility(bool show);
 
   /**
+   * Set the console visibility
+   * False by default
+   */
+  void SetConsoleVisibility(bool show);
+
+  /**
    * Set the cheatsheet string
    * Empty by default
    */
@@ -78,7 +84,7 @@ public:
    * Set the font file path
    * Use Inter font by default if empty
    */
-  void SetFontFile(const std::string& font);
+  void SetFontFile(vtkOpenGLRenderWindow* renWin, const std::string& font);
 
   /**
    * Render the UI actor
@@ -119,6 +125,16 @@ protected:
    */
   virtual void RenderFpsCounter() {}
 
+  /**
+   * Render the console widget
+   */
+  virtual void RenderConsole() {}
+
+  /**
+   * Render the console badge
+   */
+  virtual void RenderConsoleBadge() {}
+
   bool FileNameVisible = false;
   std::string FileName = "";
 
@@ -127,6 +143,8 @@ protected:
 
   bool CheatSheetVisible = false;
   std::vector<CheatSheetGroup> CheatSheet;
+
+  bool ConsoleVisible = false;
 
   bool FpsCounterVisible = false;
   int FpsValue = 0;

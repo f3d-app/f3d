@@ -1377,6 +1377,7 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate, bool minima
   {
     options.ui.scalar_bar = false;
     options.ui.cheatsheet = false;
+    options.ui.console = false;
     options.ui.filename = false;
     options.ui.fps = false;
     options.ui.metadata = false;
