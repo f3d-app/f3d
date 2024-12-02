@@ -72,7 +72,7 @@ public:
     std::vector<std::pair<std::string, bool>> fragments;
 
   public:
-    StringTemplate(const std::string& templateString);
+    explicit StringTemplate(const std::string& templateString);
 
     StringTemplate& substitute(const std::function<std::string(const std::string&)>& lookup);
     StringTemplate& substitute(const std::map<std::string, std::string>& lookup);
