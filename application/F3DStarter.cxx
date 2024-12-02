@@ -255,8 +255,8 @@ public:
   fs::path applyFilenameTemplate(const std::string& templateString)
   {
     constexpr size_t maxNumberingAttempts = 1000000;
-    const std::regex numberingRe("(n:?([0-9]*))");
-    const std::regex dateRe("date:?([A-Za-z%]*)");
+    const std::regex numberingRe("(n:?(.*))");
+    const std::regex dateRe("date:?(.*)");
 
     /* Return a file related string depending on the currently loaded files, or the empty string if
      * a single file is loaded */
@@ -326,9 +326,14 @@ public:
           fmt = "%Y%m%d";
         }
         std::time_t t = std::time(nullptr);
-        std::stringstream joined;
-        joined << std::put_time(std::localtime(&t), fmt.c_str());
-        return joined.str();
+        std::stringstream ss;
+        ss << std::put_time(std::localtime(&t), fmt.c_str());
+        const std::string formatted = ss.str();
+        if (formatted == fmt)
+        {
+          f3d::log::warn("invalid date format for \"", var, "\"");
+        }
+        return formatted;
       }
       throw std::out_of_range(var);
     };
@@ -368,6 +373,10 @@ public:
           }
           catch (std::invalid_argument&)
           {
+            if (i == 1) /* avoid spamming the log */
+            {
+              f3d::log::warn("ignoring invalid number format for \"", var, "\"");
+            }
             formattedNumber << std::setw(0) << i;
           }
           return std::regex_replace(var, numberingRe, formattedNumber.str());
