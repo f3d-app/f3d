@@ -356,7 +356,7 @@ public:
 
     const auto numberingLookup = [&](const size_t i)
     {
-      return [&numberingRe, i](const std::string var)
+      return [&numberingRe, i](const std::string& var)
       {
         if (std::regex_match(var, numberingRe))
         {

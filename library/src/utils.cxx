@@ -131,7 +131,7 @@ utils::StringTemplate& utils::StringTemplate::substitute(
         fragment = lookup(fragment);
         isVariable = false;
       }
-      catch (const std::out_of_range& e)
+      catch (const std::out_of_range&)
       {
         /* leave variable as is */
       }
