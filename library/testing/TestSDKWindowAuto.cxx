@@ -7,7 +7,7 @@
 
 int TestSDKWindowAuto(int argc, char* argv[])
 {
-  f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
+  f3d::log::setVerboseLevel(f3d::log::VerboseLevel::ERROR);
   f3d::engine eng = f3d::engine::create();
   f3d::window& win = eng.getWindow();
   win.setWindowName("Test").setSize(300, 300).setPosition(100, 100);

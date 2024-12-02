@@ -1,6 +1,7 @@
 #include "vtkF3DImguiActor.h"
 
 #include "F3DFontBuffer.h"
+#include "vtkF3DImguiConsole.h"
 #include "vtkF3DImguiFS.h"
 #include "vtkF3DImguiVS.h"
 
@@ -410,6 +411,20 @@ void vtkF3DImguiActor::RenderFpsCounter()
   ImGui::Begin("FpsCounter", nullptr, flags);
   ImGui::TextUnformatted(fpsString.c_str());
   ImGui::End();
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DImguiActor::RenderConsole()
+{
+  vtkF3DImguiConsole* console = vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
+  console->ShowConsole();
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DImguiActor::RenderConsoleBadge()
+{
+  vtkF3DImguiConsole* console = vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
+  console->ShowBadge();
 }
 
 //----------------------------------------------------------------------------

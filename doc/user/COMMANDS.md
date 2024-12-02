@@ -41,7 +41,7 @@ Supports `front`, `top`, `right`, `isometric` arguments. eg: `set_camera top`.
 
 `toggle_volume_rendering`: A specific command to toggle `model.volume.enable` and print coloring information. No argument.
 
-`stop_interactor`: A specific command to stop the interactor hence quitting the application. No argument.
+`exit`: A specific command to stop the interactor hence quitting the application. No argument.
 
 `reset_camera`: A specific command to reset the camera to its original location. No argument.
 
@@ -90,6 +90,10 @@ toggle ui.scalar_bar
 print_scene_info # Another comment
 increase_light_intensity
 ```
+
+## Console
+
+If F3D is built with `F3D_MODULE_UI` support, pressing <kbd>Esc</kbd> will open the console mode. It's possible to type any command in the input field and pressing <kbd>Enter</kbd> will trigger the command instantly.
 
 ## Command syntax
 

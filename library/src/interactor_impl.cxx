@@ -7,17 +7,21 @@
 #include "window_impl.h"
 
 #include "vtkF3DConfigure.h"
+#include "vtkF3DConsoleOutputWindow.h"
 #include "vtkF3DInteractorEventRecorder.h"
 #include "vtkF3DInteractorStyle.h"
+#include "vtkF3DRenderPass.h"
 #include "vtkF3DRenderer.h"
 #include "vtkF3DUIObserver.h"
 
 #include <vtkCallbackCommand.h>
 #include <vtkCellPicker.h>
 #include <vtkGenericRenderWindowInteractor.h>
+#include <vtkInformation.h>
 #include <vtkMath.h>
 #include <vtkMatrix3x3.h>
 #include <vtkNew.h>
+#include <vtkOutputWindow.h>
 #include <vtkPicker.h>
 #include <vtkPointPicker.h>
 #include <vtkRenderWindow.h>
@@ -74,6 +78,17 @@ public:
     this->VTKInteractor->Initialize();
 
     this->UIObserver->InstallObservers(this->VTKInteractor);
+
+    // observe console event to trigger commands
+    vtkNew<vtkCallbackCommand> commandCallback;
+    commandCallback->SetClientData(this);
+    commandCallback->SetCallback(OnConsoleEvent);
+    vtkOutputWindow::GetInstance()->AddObserver(
+      vtkF3DConsoleOutputWindow::TriggerEvent, commandCallback);
+    vtkOutputWindow::GetInstance()->AddObserver(
+      vtkF3DConsoleOutputWindow::ShowEvent, commandCallback);
+    vtkOutputWindow::GetInstance()->AddObserver(
+      vtkF3DConsoleOutputWindow::HideEvent, commandCallback);
 
     // Disable standard interactor behavior with timer event
     // in order to be able to interact while animating
@@ -207,6 +222,25 @@ public:
   }
 
   //----------------------------------------------------------------------------
+  static void OnConsoleEvent(vtkObject*, unsigned long event, void* clientData, void* data)
+  {
+    internals* self = static_cast<internals*>(clientData);
+
+    if (event == vtkF3DConsoleOutputWindow::TriggerEvent)
+    {
+      const char* commandWithArgs = static_cast<const char*>(data);
+      self->Interactor.triggerCommand(commandWithArgs);
+    }
+    else if (event == vtkF3DConsoleOutputWindow::ShowEvent ||
+      event == vtkF3DConsoleOutputWindow::HideEvent)
+    {
+      self->Options.ui.console = event == vtkF3DConsoleOutputWindow::ShowEvent;
+    }
+
+    self->NeedFullRender = true;
+  }
+
+  //----------------------------------------------------------------------------
   static void OnKeyPress(vtkObject*, unsigned long, void* clientData, void*)
   {
     internals* self = static_cast<internals*>(clientData);
@@ -334,6 +368,31 @@ public:
   //----------------------------------------------------------------------------
   void StartInteractor()
   {
+#if F3D_MODULE_UI
+    // create event loop to refresh UI and trigger full render if needed
+    // this may be rework to a generalize event loop, see https://github.com/f3d-app/f3d/issues/1534
+    this->Interactor.createTimerCallBack(30,
+      [&]()
+      {
+        vtkRenderWindow* renWin = this->Window.GetRenderWindow();
+        vtkF3DRenderer* ren =
+          vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+        vtkInformation* info = ren->GetInformation();
+
+        if (this->NeedFullRender)
+        {
+          this->NeedFullRender = false;
+          this->Window.render();
+        }
+        else
+        {
+          info->Set(vtkF3DRenderPass::RENDER_UI_ONLY(), 1);
+          renWin->Render();
+          info->Remove(vtkF3DRenderPass::RENDER_UI_ONLY());
+        }
+      });
+#endif
+
     this->VTKInteractor->Start();
   }
 
@@ -465,6 +524,8 @@ public:
 
   int DragDistanceTol = 3;      /* px */
   int TransitionDuration = 100; /* ms */
+
+  bool NeedFullRender = false;
 };
 
 //----------------------------------------------------------------------------
@@ -587,7 +648,7 @@ interactor& interactor_impl::initCommands()
   this->addCommand("set_camera",
     [&](const std::vector<std::string>& args)
     {
-      check_args(args, 1, "cycle_coloring");
+      check_args(args, 1, "set_camera");
       std::string_view type = args[0];
       if (type == "front")
       {
@@ -621,7 +682,7 @@ interactor& interactor_impl::initCommands()
     });
 
   this->addCommand(
-    "stop_interactor", [&](const std::vector<std::string>&) { this->Internals->StopInteractor(); });
+    "exit", [&](const std::vector<std::string>&) { this->Internals->StopInteractor(); });
 
   this->addCommand("reset_camera",
     [&](const std::vector<std::string>&) { this->Internals->Window.getCamera().resetToDefault(); });
@@ -635,6 +696,7 @@ interactor& interactor_impl::initCommands()
       this->Internals->AnimationManager->StopAnimation();
       this->Internals->Scene.add(files);
     });
+
   return *this;
 }
 
@@ -816,9 +878,11 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "E"}, "toggle render.show_edges","Scene", std::bind(docTglOpt, "Toggle edges display", std::cref(opts.render.show_edges)));
   this->addBinding({mod_t::NONE, "X"}, "toggle interactor.axis","Scene", std::bind(docTgl, "Toggle axes display", std::cref(opts.interactor.axis)));
   this->addBinding({mod_t::NONE, "G"}, "toggle render.grid.enable","Scene", std::bind(docTgl, "Toggle grid display", std::cref(opts.render.grid.enable)));
+#if F3D_MODULE_UI
   this->addBinding({mod_t::NONE, "N"}, "toggle ui.filename","Scene", std::bind(docTgl, "Toggle filename display", std::cref(opts.ui.filename)));
   this->addBinding({mod_t::NONE, "M"}, "toggle ui.metadata","Scene", std::bind(docTgl, "Toggle metadata display", std::cref(opts.ui.metadata)));
   this->addBinding({mod_t::NONE, "Z"}, "toggle ui.fps","Scene", std::bind(docTgl, "Toggle FPS counter display", std::cref(opts.ui.fps)));
+#endif
 #if F3D_MODULE_RAYTRACING
   this->addBinding({mod_t::NONE, "R"}, "toggle render.raytracing.enable","Scene", std::bind(docTgl, "Toggle raytracing rendering", std::cref(opts.render.raytracing.enable)));
   this->addBinding({mod_t::NONE, "D"}, "toggle render.raytracing.denoise","Scene", std::bind(docTgl, "Toggle denoising when raytracing", std::cref(opts.render.raytracing.denoise)));
@@ -839,9 +903,11 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::ANY, "6"}, "roll_camera 90", "Camera", std::bind(docStr, "Rotate camera left"));
   this->addBinding({mod_t::ANY, "7"}, "set_camera top", "Camera", std::bind(docStr, "Top View camera"));
   this->addBinding({mod_t::ANY, "9"}, "set_camera isometric", "Camera", std::bind(docStr, "Isometric View camera"));
+#if F3D_MODULE_UI
   this->addBinding({mod_t::NONE, "H"}, "toggle ui.cheatsheet", "Others", std::bind(docStr, "Toggle cheatsheet display"));
+  this->addBinding({mod_t::NONE, "Escape"}, "toggle ui.console", "Others", std::bind(docStr, "Toggle console display"));
+#endif
   this->addBinding({mod_t::ANY, "Question"}, "print_scene_info", "Others", std::bind(docStr, "Print scene descr to terminal"));
-  this->addBinding({mod_t::NONE, F3D_EXIT_HOTKEY_SYM}, "stop_interactor", "Others", std::bind(docStr, "Quit"));
   this->addBinding({mod_t::NONE, "Return"}, "reset_camera", "Others", std::bind(docStr, "Reset camera to initial parameters"));
   this->addBinding({mod_t::NONE, "Space"}, "toggle_animation", "Others", std::bind(docStr, "Play/Pause animation if any"));
   this->addBinding({mod_t::NONE, "Drop"}, "add_files", "Others", std::bind(docStr, "Add files to the scene"));
@@ -1053,12 +1119,6 @@ bool interactor_impl::playInteraction(const std::string& file)
     this->Internals->Recorder->Play();
   }
 
-  // Recorder can stop the interactor, make sure it is still running
-  if (this->Internals->VTKInteractor->GetDone())
-  {
-    log::error("Interactor has been stopped");
-    return false;
-  }
   return true;
 }
 

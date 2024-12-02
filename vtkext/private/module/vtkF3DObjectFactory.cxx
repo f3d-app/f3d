@@ -19,8 +19,9 @@
 #endif
 
 #if F3D_MODULE_UI
-#include "vtkF3DImguiObserver.h"
 #include "vtkF3DImguiActor.h"
+#include "vtkF3DImguiConsole.h"
+#include "vtkF3DImguiObserver.h"
 #endif
 
 namespace
@@ -47,9 +48,13 @@ vtkF3DObjectFactory::vtkF3DObjectFactory()
     "vtkPointGaussianMapper override for F3D", 1, ::Factory<vtkF3DPointSplatMapper>);
 #endif
 
+
 #ifdef __ANDROID__
   this->RegisterOverride("vtkOutputWindow", "vtkF3DAndroidLogOutputWindow",
     "vtkOutputWindow override for F3D", 1, ::Factory<vtkF3DAndroidLogOutputWindow>);
+#elif F3D_MODULE_UI
+  this->RegisterOverride("vtkOutputWindow", "vtkF3DImguiConsole",
+    "vtkOutputWindow override for F3D", 1, ::Factory<vtkF3DImguiConsole>);
 #elif F3D_WINDOWS_GUI
   this->RegisterOverride("vtkOutputWindow", "vtkF3DWin32OutputWindow",
     "vtkOutputWindow override for F3D", 1, ::Factory<vtkF3DWin32OutputWindow>);

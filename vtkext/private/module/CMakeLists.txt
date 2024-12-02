@@ -71,7 +71,7 @@ set(classes
   )
 
 if (F3D_MODULE_UI)
-  set(classes ${classes} vtkF3DImguiObserver vtkF3DImguiActor)
+  set(classes ${classes} vtkF3DImguiActor vtkF3DImguiConsole vtkF3DImguiObserver)
 endif ()
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10675
@@ -84,7 +84,7 @@ if(NOT VTK_VERSION VERSION_GREATER_EQUAL 9.2.20220907)
 endif()
 
 if(WIN32)
-  list(APPEND classes vtkF3DWin32OutputWindow vtkF3DWGLRenderWindow)
+  list(APPEND classes vtkF3DWGLRenderWindow)
 endif()
 
 # In theory the test should be `if (VTK_USE_X)` but this variable is
