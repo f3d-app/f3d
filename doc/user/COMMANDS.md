@@ -79,6 +79,18 @@ eg: `set_hdri /path/to/file.hdr`.
 `add_files_or_set_hdri [path/to/file1] [path/to/file2]`: A specific command that will process each files and either, `set_hdri` if the provided file uses a recognised HDR extension or `add_files` otherwise. Take one or more files as arguments.
 eg: `add_files_or_set_hdri /path/to/dragon.vtu /path/to/file.hdr`.
 
+## Command Script (`--command-script`)
+
+F3D provides a feature to execute commands from a script file using the `--command-script` [CLI option[(OPTIONS.md)]]. This allows users to automate a sequence of commands by listing them in a plain text file.
+eg: `f3d --command-script path/to/command_script.txt`.
+Example Command Script, commands are separated by new lines:
+```
+roll_camera 90
+toggle ui.scalar_bar
+print_scene_info
+increase_light_intensity
+```
+
 ## Command syntax
 
 Command syntax is similar to bash, as in they will be split by "token" to be processed.
