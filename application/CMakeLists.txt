@@ -27,6 +27,8 @@ endif()
 if(APPLE)
   list(APPEND F3D_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/F3DNSDelegate.mm")
 endif()
+#add source for dialogs
+list(APPEND F3D_SOURCE_FILES "${F3D_SOURCE_DIR}/external/tinyfiledialogs/tinyfiledialogs.cxx")
 
 # Define f3d target
 add_executable(f3d ${F3D_SOURCE_FILES})
@@ -65,6 +67,7 @@ endif ()
 
 target_include_directories(f3d PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
 
+
 if (F3D_USE_EXTERNAL_CXXOPTS)
   target_link_libraries(f3d PRIVATE cxxopts::cxxopts)
 else ()
@@ -82,6 +85,8 @@ if (F3D_USE_EXTERNAL_DMON)
 else ()
   target_include_directories(f3d PUBLIC $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/dmon>)
 endif ()
+
+target_include_directories(f3d PUBLIC $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/tinyfiledialogs>)
 
 set(f3d_compile_options_private "")
 set(f3d_compile_options_public "")

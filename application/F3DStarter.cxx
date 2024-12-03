@@ -9,6 +9,7 @@
 #include "F3DOptionsTools.h"
 #include "F3DPluginsTools.h"
 #include "F3DSystemTools.h"
+#include "scene.h"
 
 #define DMON_IMPL
 #ifdef WIN32
@@ -26,6 +27,8 @@
 #else
 #include "dmon.h"
 #endif
+
+#include "tinyfiledialogs.h"
 
 #include "engine.h"
 #include "interactor.h"
@@ -704,6 +707,7 @@ public:
       interactor.addBinding({ mod_t::NONE, "Drop" }, "add_files_or_set_hdri", "Others", std::bind(docString, "Load dropped files, folder or HDRI"));
       interactor.addBinding({ mod_t::CTRL, "Drop" }, "add_files", "Others", std::bind(docString, "Load dropped files or folder"));
       interactor.addBinding({ mod_t::SHIFT, "Drop" }, "set_hdri", "Others", std::bind(docString, "Set HDRI and use it"));
+      interactor.addBinding( { mod_t::CTRL, "O" }, "open_file", "Others", std::bind(docString, "Open File"));
       // clang-format on
 
       f3d::log::debug("Adding config defined bindings if any: ");
@@ -1636,4 +1640,22 @@ void F3DStarter::AddCommands()
         this->LoadFileGroup(index);
       }
     });
+    interactor.addCommand("open_file", 
+          [this](const std::vector<std::string>& args) {
+          f3d::scene& s = this->Internals->Engine->getScene();
+          //can add filters later
+          char* file = tinyfd_openFileDialog(
+                  "Open File",
+                  ".",
+                  0, 
+                  nullptr,
+                  nullptr,
+                  false);
+          if (file) {
+          s.clear();
+          s.add(file);
+          //probably a better way to do this part.
+          this->Internals->Engine->getOptions().ui.dropzone = false;
+          }
+          });
 }
