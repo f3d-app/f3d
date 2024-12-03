@@ -684,6 +684,11 @@ bool interactor_impl::triggerCommand(std::string_view command)
     return false;
   }
 
+  if (tokens.empty())
+  {
+    return true;
+  }
+
   const std::string& action = tokens[0];
   try
   {

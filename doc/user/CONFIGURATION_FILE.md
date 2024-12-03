@@ -106,7 +106,7 @@ A typical config file with bindings may look like this:
 
 Here, the first block define new bindings for all and any files.
 It even replace an existing default [interaction](INTERACTIONS.md) on the `O` key with its own.
-Each bind is associated to the [command](COMMANDS.mnd) to execute when it is pressed.
+Each bind is associated to the [command](COMMANDS.md) to execute when it is pressed.
 
 In the second block, new bindings are defined for files ending in `.vtu`, and there bindings
 will only be available when loading such a file.
