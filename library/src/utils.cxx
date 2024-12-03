@@ -26,6 +26,7 @@ std::vector<std::string> utils::tokenize(std::string_view str)
   };
   bool escaped = false;
   char quoted = '\0';
+  bool commented = false;
   for (char c : str)
   {
     switch (c)
@@ -66,10 +67,26 @@ std::vector<std::string> utils::tokenize(std::string_view str)
         }
         escaped = false;
         break;
+      case '#':
+        if (!escaped && !quoted)
+        {
+          commented = true;
+        }
+        else
+        {
+          accumulate(c);
+        }
+        escaped = false;
+        break;
       default:
         accumulate(c);
         escaped = false;
         break;
+    }
+
+    if (commented)
+    {
+      break;
     }
   }
   if (quoted || escaped)

@@ -32,20 +32,22 @@ public:
    *  - Split by quoted section and remove the quotes
    *  - Supported quotes are: '"`
    *  - Use escaped \ quotes, spaces and escape to add them verbatim
+   *  - Comments are supported with `#`, any characters after are ignored
+   *  - Use escaped \# to add it verbatim
    *  - Other escaped characters are also added verbatim
    * Throw a tokenize_exception if a quoted section is not closed or if finishing with an escape
    *
    * Examples:
    * `set scene.up.direction +Z` -> `set` `scene.up.direction` `+Z`
-   * `set render.hdri.file "/path/to/file with spaces.png"` -> `set`, `render.hdri.file`,
-   * `/path/to/file with spaces.png` `set render.hdri.file '/path/to/file with spaces.png'` ->
-   * `set`, `render.hdri.file`, `/path/to/file with spaces.png` `set render.hdri.file
-   * "/path/to/file'with'quotes.png"` -> `set`, `render.hdri.file`, `/path/to/file'with'quotes.png`
-   * `set render.hdri.file /path/to/file\ spaces\ \'quotes\".png` -> `set`, `render.hdri.file`,
-   * `/path/to/file spaces 'quotes".png` `set render.hdri.file C:\\path\\to\\windows\\file.png` ->
-   * `set`, `render.hdri.file`, `C:\path\to\windows\file.png` `set scene.up.direction +\Z` -> `set`,
-   * `scene.up.direction`, `+Z` `set scene.up.direction "+Z` -> tokenize_exception `set
-   * scene.up.direction +Z\` -> tokenize_exception
+   * `set render.hdri.file "/path/to/file with spaces.png"` -> `set`, `render.hdri.file`, `/path/to/file with spaces.png`
+   * `set render.hdri.file '/path/to/file with spaces.png'` -> `set`, `render.hdri.file`, `/path/to/file with spaces.png`
+   * `set render.hdri.file "/path/to/file'with'quotes.png"` -> `set`, `render.hdri.file`, `/path/to/file'with'quotes.png`
+   * `set render.hdri.file /path/to/file\ spaces\ \'quotes\".png` -> `set`, `render.hdri.file`, `/path/to/file spaces 'quotes".png`
+   * `set render.hdri.file C:\\path\\to\\windows\\file.png` -> `set`, `render.hdri.file`, `C:\path\to\windows\file.png`
+   * `set scene.up.direction +Z # A comment` -> `set`, `scene.up.direction`, `+Z`
+   * `set scene.up.direction +\Z` -> `set`, `scene.up.direction`, `+Z`
+   * `set scene.up.direction "+Z` -> tokenize_exception
+   * `set scene.up.direction +Z\` -> tokenize_exception
    */
   static std::vector<std::string> tokenize(std::string_view str);
   // clang-format on

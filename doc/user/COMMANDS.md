@@ -79,25 +79,29 @@ eg: `add_files_or_set_hdri /path/to/dragon.vtu /path/to/file.hdr`.
 
 ## Command Script (`--command-script`)
 
-F3D provides a feature to execute commands from a script file using the `--command-script` [CLI option[(OPTIONS.md)]]. This allows users to automate a sequence of commands by listing them in a plain text file.
-eg: `f3d --command-script path/to/command_script.txt`.
-Example Command Script, commands are separated by new lines:
-```
+F3D provides a feature to execute commands from a script file using the `--command-script` [CLI option](OPTIONS.md). This allows users to automate a sequence of commands by listing them in a plain text file, eg: `f3d --command-script path/to/command_script.txt`.
+
+Example Command Script, commands are separated by new lines, comments are supported:
+
+```shell
+# A comment
 roll_camera 90
 toggle ui.scalar_bar
-print_scene_info
+print_scene_info # Another comment
 increase_light_intensity
 ```
 
 ## Command syntax
 
 Command syntax is similar to bash, as in they will be split by "token" to be processed.
-Tokens are spaces separated, eg: `set scene.up.direction +Z`.
-Tokens can also be quoted to support spaces inside, eg:  `set render.hdri.file "/path/to/file with spaces.png"`.
-Supported quotes are `` `'" ``, eg: `set render.hdri.file '/path/to/file with spaces.png'`.
-Quotes inside quotes are supported as well, eg: `set render.hdri.file "/path/to/file'with'quotes.png"`.
-Quotes and spaces can be escaped, eg: `set render.hdri.file /path/to/file\ with\ spaces\ and\ \'quotes\".png`.
-Escapes can be escaped too: eg: `set render.hdri.file C:\\path\\to\\windows\\file.png`.
-Other escaped character will be processed as if the escape was not present, eg: `set scene.up.direction +\Z`
-Unfinished quoted section is invalid, eg: `set scene.up.direction "+Z`
-A escape at the end is also invalid, eg: `set scene.up.direction +Z\`
+
+ - Tokens are spaces separated, eg: `set scene.up.direction +Z`.
+ - Tokens can also be quoted to support spaces inside, eg:  `set render.hdri.file "/path/to/file with spaces.png"`.
+ - Supported quotes are `` `'" ``, eg: `set render.hdri.file '/path/to/file with spaces.png'`.
+ - Quotes inside quotes are supported as well, eg: `set render.hdri.file "/path/to/file'with'quotes.png"`.
+ - Quotes and spaces can be escaped, eg: `set render.hdri.file /path/to/file\ with\ spaces\ and\ \'quotes\".png`.
+ - Comment are supported using `#`, Any character after will be ignored. Use `\#` to add it verbatim.
+ - Escapes can be escaped too: eg: `set render.hdri.file C:\\path\\to\\windows\\file.png`.
+ - Other escaped character will be processed as if the escape was not present, eg: `set scene.up.direction +\Z`
+ - Unfinished quoted section is invalid, eg: `set scene.up.direction "+Z`
+ - A escape at the end is also invalid, eg: `set scene.up.direction +Z\`
