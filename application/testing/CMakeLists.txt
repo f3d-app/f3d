@@ -198,9 +198,9 @@ f3d_test(NAME TestTextureMaterial DATA WaterBottle.glb ARGS --texture-material=$
 f3d_test(NAME TestTextureMaterialWithOptions DATA WaterBottle.glb ARGS --texture-material=${F3D_SOURCE_DIR}/testing/data/red_mod.jpg --roughness=0.5 --metallic=0.5)
 f3d_test(NAME TestTextureEmissive DATA WaterBottle.glb ARGS --texture-emissive=${F3D_SOURCE_DIR}/testing/data/red.jpg --emissive-factor=0.1,0.1,0.1)
 f3d_test(NAME TestTextures DATA WaterBottle.glb ARGS --texture-material=${F3D_SOURCE_DIR}/testing/data/red.jpg --roughness=1 --metallic=1 --texture-base-color=${F3D_SOURCE_DIR}/testing/data/albedo.png --texture-normal=${F3D_SOURCE_DIR}/testing/data/normal.png --texture-emissive=${F3D_SOURCE_DIR}/testing/data/red.jpg --emissive-factor=0.1,0.1,0.1)
-f3d_test(NAME TestMetaDataImporter DATA BoxAnimated.gltf ARGS -m)
-f3d_test(NAME TestMultiblockMetaData DATA mb.vtm ARGS -m)
-f3d_test(NAME TestMultiFileMetaData DATA mb/recursive ARGS -m --multi-file-mode=all)
+f3d_test(NAME TestMetaDataImporter DATA BoxAnimated.gltf ARGS -m UI)
+f3d_test(NAME TestMultiblockMetaData DATA mb.vtm ARGS -m UI)
+f3d_test(NAME TestMultiFileMetaData DATA mb/recursive ARGS -m --multi-file-mode=all UI)
 f3d_test(NAME TestTIFF DATA f3d.tif ARGS -sy --up=-Y)
 f3d_test(NAME TestLightIntensityBrighter DATA cow.vtp ARGS --light-intensity=5.0)
 f3d_test(NAME TestLightIntensityDarker DATA cow.vtp ARGS --light-intensity=0.2)
@@ -363,7 +363,7 @@ endif()
 f3d_test(NAME TestGLTFImporterUnlit DATA UnlitTest.glb)
 f3d_test(NAME TestMaterial DATA suzanne.ply ARGS --color=0.72,0.45,0.2 --metallic=0.7 --roughness=0.2)
 f3d_test(NAME TestMaterialFullScene DATA WaterBottle.glb ARGS --color=0.9,0.1,0.1 --metallic=0.7 --roughness=0.2)
-f3d_test(NAME TestMetaData DATA pdiag.vtu ARGS -m)
+f3d_test(NAME TestMetaData DATA pdiag.vtu ARGS -m UI)
 f3d_test(NAME TestEdges DATA suzanne.ply ARGS -e)
 f3d_test(NAME TestLineWidth DATA cow.vtk ARGS -e --line-width=5)
 f3d_test(NAME TestLineWidthFullScene DATA suzanne.obj ARGS -e --line-width=3 --up=-Y)
@@ -396,19 +396,19 @@ f3d_test(NAME TestInteractionSimpleExit DATA cow.vtp REGEXP "Interactor has been
 
 # No alternative baseline supports in F3D
 if(F3D_MODULE_RAYTRACING)
-  f3d_test(NAME TestInteractionCheatsheetRaytracing DATA cow.vtp INTERACTION) #H
-  f3d_test(NAME TestInteractionCheatsheetWhiteBGRaytracing DATA cow.vtp ARGS --bg-color=1,1,1 INTERACTION) #H
-  f3d_test(NAME TestInteractionCheatsheetBlackBGRaytracing DATA cow.vtp ARGS --bg-color=0,0,0 INTERACTION) #H
-  f3d_test(NAME TestInteractionCheatsheetScalarsRaytracing DATA dragon.vtu ARGS --scalar-coloring --comp=-2 RESOLUTION 800,800 INTERACTION LONG_TIMEOUT) #HSSS
-  f3d_test(NAME TestInteractionCheatsheetNoFileRaytracing INTERACTION NO_DATA_FORCE_RENDER) #HXZM
-  f3d_test(NAME TestInteractionCheatsheetAnimationNameRaytracing DATA InterpolationTest.glb ARGS --animation-index=6 RESOLUTION 800,800 INTERACTION) #HWWW
+  f3d_test(NAME TestInteractionCheatsheetRaytracing DATA cow.vtp INTERACTION UI) #H
+  f3d_test(NAME TestInteractionCheatsheetWhiteBGRaytracing DATA cow.vtp ARGS --bg-color=1,1,1 INTERACTION UI) #H
+  f3d_test(NAME TestInteractionCheatsheetBlackBGRaytracing DATA cow.vtp ARGS --bg-color=0,0,0 INTERACTION UI) #H
+  f3d_test(NAME TestInteractionCheatsheetScalarsRaytracing DATA dragon.vtu ARGS --scalar-coloring --comp=-2 RESOLUTION 800,800 INTERACTION UI LONG_TIMEOUT) #HSSS
+  f3d_test(NAME TestInteractionCheatsheetNoFileRaytracing INTERACTION UI NO_DATA_FORCE_RENDER) #HXM
+  f3d_test(NAME TestInteractionCheatsheetAnimationNameRaytracing DATA InterpolationTest.glb ARGS --animation-index=6 RESOLUTION 800,800 INTERACTION UI) #HWWW
 else()
-  f3d_test(NAME TestInteractionCheatsheet DATA cow.vtp INTERACTION) #H
-  f3d_test(NAME TestInteractionCheatsheetWhiteBG DATA cow.vtp ARGS --bg-color=1,1,1 INTERACTION) #H
-  f3d_test(NAME TestInteractionCheatsheetBlackBG DATA cow.vtp ARGS --bg-color=0,0,0 INTERACTION) #H
-  f3d_test(NAME TestInteractionCheatsheetScalars DATA dragon.vtu ARGS --scalar-coloring --comp=-2 RESOLUTION 800,800 INTERACTION LONG_TIMEOUT) #HSSS
-  f3d_test(NAME TestInteractionCheatsheetNoFile INTERACTION NO_DATA_FORCE_RENDER) #HXZM
-  f3d_test(NAME TestInteractionCheatsheetAnimationName DATA InterpolationTest.glb ARGS --animation-index=6 RESOLUTION 800,800 INTERACTION) #HWWW
+  f3d_test(NAME TestInteractionCheatsheet DATA cow.vtp INTERACTION UI) #H
+  f3d_test(NAME TestInteractionCheatsheetWhiteBG DATA cow.vtp ARGS --bg-color=1,1,1 INTERACTION UI) #H
+  f3d_test(NAME TestInteractionCheatsheetBlackBG DATA cow.vtp ARGS --bg-color=0,0,0 INTERACTION UI) #H
+  f3d_test(NAME TestInteractionCheatsheetScalars DATA dragon.vtu ARGS --scalar-coloring --comp=-2 RESOLUTION 800,800 INTERACTION UI LONG_TIMEOUT) #HSSS
+  f3d_test(NAME TestInteractionCheatsheetNoFile INTERACTION UI NO_DATA_FORCE_RENDER) #HXM
+  f3d_test(NAME TestInteractionCheatsheetAnimationName DATA InterpolationTest.glb ARGS --animation-index=6 RESOLUTION 800,800 INTERACTION UI) #HWWW
 endif()
 
 f3d_test(NAME TestCameraPersp DATA Cameras.gltf ARGS --camera-index=0)
@@ -753,7 +753,7 @@ f3d_test(NAME TestFinalShaderCompilationFailure DATA cow.vtp ARGS --final-shader
 # Test hotkeys
 f3d_test(NAME TestInteractionPostFX DATA cow.vtp INTERACTION TONE_MAPPING LONG_TIMEOUT) #PQAT
 f3d_test(NAME TestInteractionActors DATA cow.vtp INTERACTION UI) #EXGMN
-f3d_test(NAME TestInteractionTimer DATA cow.vtp NO_BASELINE INTERACTION LONG_TIMEOUT) #Z
+f3d_test(NAME TestInteractionTimer DATA cow.vtp NO_BASELINE INTERACTION UI LONG_TIMEOUT) #Z
 f3d_test(NAME TestInteractionMisc DATA cow.vtp NO_BASELINE INTERACTION) #KK
 f3d_test(NAME TestInteractionCycleCell DATA waveletArrays.vti INTERACTION LONG_TIMEOUT) #VCCC
 f3d_test(NAME TestInteractionCycleComp DATA dragon.vtu INTERACTION) #SYYYY
@@ -1031,7 +1031,7 @@ f3d_test(NAME TestVersion ARGS --version REGEXP "Version:")
 f3d_test(NAME TestReadersList ARGS --readers-list REGEXP_FAIL "No registered reader found")
 
 # Test invalid component string coverage
-f3d_test(NAME TestInteractionInvalidComponent INTERACTION DATA cow.vtp ARGS --comp=1 NO_BASELINE) #H
+f3d_test(NAME TestInteractionInvalidComponent INTERACTION UI DATA cow.vtp ARGS --comp=1 NO_BASELINE) #H
 
 # Test multi plugin readers-lists
 if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
