@@ -67,7 +67,7 @@ public:
       .str() == "hello World!"
     ```
    */
-  class StringTemplate
+  class F3D_EXPORT StringTemplate
   {
     std::vector<std::pair<std::string, bool>> fragments;
 
