@@ -6,6 +6,8 @@
 
 #include <functional>
 #include <map>
+#include <regex>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -72,14 +74,80 @@ public:
     std::vector<std::pair<std::string, bool>> fragments;
 
   public:
-    explicit StringTemplate(const std::string& templateString);
+    explicit StringTemplate(const std::string& templateString)
+    {
+      const std::string varName = "[\\w_.%:-]+";
+      const std::string escapedVar = "(\\{(\\{" + varName + "\\})\\})";
+      const std::string substVar = "(\\{(" + varName + ")\\})";
+      const std::regex escapedVarRe(escapedVar);
+      const std::regex substVarRe(substVar);
 
-    StringTemplate& substitute(const std::function<std::string(const std::string&)>& lookup);
-    StringTemplate& substitute(const std::map<std::string, std::string>& lookup);
+      const auto callback = [&](const std::string& m)
+      {
+        if (std::regex_match(m, escapedVarRe))
+        {
+          this->fragments.emplace_back(std::regex_replace(m, escapedVarRe, "$2"), false);
+        }
+        else if (std::regex_match(m, substVarRe))
+        {
+          this->fragments.emplace_back(std::regex_replace(m, substVarRe, "$2"), true);
+        }
+        else
+        {
+          this->fragments.emplace_back(m, false);
+        }
+      };
 
-    std::string str() const;
+      const std::regex re(escapedVar + "|" + substVar);
+      std::sregex_token_iterator begin(templateString.begin(), templateString.end(), re, { -1, 0 });
+      std::for_each(begin, std::sregex_token_iterator(), callback);
+    }
 
-    std::vector<std::string> variables() const;
+    template<typename F>
+    StringTemplate& substitute(F lookup)
+    {
+      for (auto& [fragment, isVariable] : this->fragments)
+      {
+        if (isVariable)
+        {
+          try
+          {
+            fragment = lookup(fragment);
+            isVariable = false;
+          }
+          catch (const std::out_of_range&)
+          {
+            /* leave variable as is */
+          }
+        }
+      }
+      return *this;
+    }
+
+    StringTemplate& substitute(const std::map<std::string, std::string>& lookup)
+    {
+      return this->substitute([&](const std::string& key) { return lookup.at(key); });
+    }
+
+    std::string str() const
+    {
+      std::ostringstream ss;
+      for (auto [fragment, isVariable] : this->fragments)
+        if (isVariable)
+          ss << "{" << fragment << "}";
+        else
+          ss << fragment;
+      return ss.str();
+    }
+
+    std::vector<std::string> variables() const
+    {
+      std::vector<std::string> variables;
+      for (auto [fragment, isVariable] : this->fragments)
+        if (isVariable)
+          variables.emplace_back(fragment);
+      return variables;
+    }
   };
 };
 }
