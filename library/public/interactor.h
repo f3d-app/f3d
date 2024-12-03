@@ -14,8 +14,7 @@
 
 namespace f3d
 {
-
-struct F3D_EXPORT interaction_bind_t
+struct interaction_bind_t
 {
   /**
    * Enumeration of supported modifier combination, in binary.
