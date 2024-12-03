@@ -10,11 +10,16 @@
 
 namespace F3DConfigFileTools
 {
+using BindingsVector = std::vector<std::pair<std::string, std::vector<std::string>>>;
+using BindingsEntry = std::tuple<BindingsVector, std::filesystem::path, std::string>;
+using BindingsEntries = std::vector<BindingsEntry>;
+
 /**
  * Read config files using userConfig if any, return an optionEntries
- * containing ordered optionDict.
+ * containing ordered optionDict and ordered bindingsEntries
  */
-F3DOptionsTools::OptionsEntries ReadConfigFiles(const std::string& userConfig);
+std::pair<F3DOptionsTools::OptionsEntries, BindingsEntries> ReadConfigFiles(
+  const std::string& userConfig);
 }
 
 #endif

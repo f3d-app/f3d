@@ -79,7 +79,8 @@ std::vector<fs::path> GetConfigPaths(const std::string& configSearch)
 }
 
 //----------------------------------------------------------------------------
-F3DOptionsTools::OptionsEntries F3DConfigFileTools::ReadConfigFiles(const std::string& userConfig)
+std::pair<F3DOptionsTools::OptionsEntries, F3DConfigFileTools::BindingsEntries>
+F3DConfigFileTools::ReadConfigFiles(const std::string& userConfig)
 {
   // Default config directory name
   std::string configSearch = "config";
@@ -151,7 +152,8 @@ F3DOptionsTools::OptionsEntries F3DConfigFileTools::ReadConfigFiles(const std::s
   }
 
   // Read config files
-  F3DOptionsTools::OptionsEntries confEntries;
+  F3DOptionsTools::OptionsEntries optionsEntries;
+  F3DConfigFileTools::BindingsEntries bindingEntries;
   for (const auto& configFilePath : actualConfigFilePaths)
   {
     std::ifstream file(configFilePath);
@@ -204,13 +206,7 @@ F3DOptionsTools::OptionsEntries F3DConfigFileTools::ReadConfigFiles(const std::s
         {
         }
 
-        if (optionsBlock.empty())
-        {
-          // To help users figure out issues with configuration files
-          f3d::log::warn("A config block in config file: ", configFilePath.string(),
-            " does not contains options, ignoring block");
-        }
-        else
+        if (!optionsBlock.empty())
         {
           // Add each options config entry into an option dict
           F3DOptionsTools::OptionsDict entry;
@@ -233,7 +229,53 @@ F3DOptionsTools::OptionsEntries F3DConfigFileTools::ReadConfigFiles(const std::s
           }
 
           // Emplace the option dict for that pattern match into the config entries vector
-          confEntries.emplace_back(entry, configFilePath, match);
+          optionsEntries.emplace_back(entry, configFilePath, match);
+        }
+
+        // Recover bindings if any
+        nlohmann::ordered_json bindingsBlock;
+        try
+        {
+          bindingsBlock = configBlock.at("bindings");
+        }
+        catch (nlohmann::json::out_of_range&)
+        {
+        }
+
+        if (!bindingsBlock.empty())
+        {
+          // Add each binding config entry
+          F3DConfigFileTools::BindingsVector bindingEntry;
+          for (const auto& item : bindingsBlock.items())
+          {
+            if (item.value().is_string())
+            {
+              bindingEntry.emplace_back(std::make_pair(
+                item.key(), std::vector<std::string>{ item.value().get<std::string>() }));
+            }
+            else if (item.value().is_array())
+            {
+              // Do not check before we look for simplicity sake
+              bindingEntry.emplace_back(
+                std::make_pair(item.key(), item.value().get<std::vector<std::string>>()));
+            }
+            else
+            {
+              f3d::log::error(item.key(), " from ", configFilePath.string(),
+                " must be a string or an array of string, ignoring binding entry");
+              continue;
+            }
+          }
+
+          // Emplace the config dict for that pattern match into the binding entries vector
+          bindingEntries.emplace_back(bindingEntry, configFilePath, match);
+        }
+
+        if (optionsBlock.empty() && bindingsBlock.empty())
+        {
+          // To help users figure out issues with configuration files
+          f3d::log::warn("A config block in config file: ", configFilePath.string(),
+            " does not contains options nor bindings, ignoring block");
         }
       }
     }
@@ -244,5 +286,5 @@ F3DOptionsTools::OptionsEntries F3DConfigFileTools::ReadConfigFiles(const std::s
       f3d::log::error(ex.what());
     }
   }
-  return confEntries;
+  return { std::move(optionsEntries), std::move(bindingEntries) };
 }
