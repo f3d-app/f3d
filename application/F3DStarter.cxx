@@ -338,7 +338,7 @@ public:
       throw std::out_of_range(var);
     };
 
-    f3d::utils::StringTemplate stringTemplate(templateString);
+    f3d::utils::string_template stringTemplate(templateString);
     stringTemplate.substitute(variableLookup);
 
     const auto hasNumbering = [&]()
@@ -389,7 +389,7 @@ public:
     for (size_t i = 1; i <= maxNumberingAttempts; ++i)
     {
       const std::string candidate =
-        f3d::utils::StringTemplate(stringTemplate).substitute(numberingLookup(i)).str();
+        f3d::utils::string_template(stringTemplate).substitute(numberingLookup(i)).str();
       if (!fs::exists(candidate))
       {
         return { candidate };

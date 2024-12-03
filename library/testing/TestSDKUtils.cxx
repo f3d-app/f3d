@@ -62,32 +62,32 @@ int TestSDKUtils(int argc, char* argv[])
 
   //
 
-  test("StringTemplate: basic substitution",
-    f3d::utils::StringTemplate("{greeting} {name}!")
+  test("string_template: basic substitution",
+    f3d::utils::string_template("{greeting} {name}!")
       .substitute({ { "greeting", "hello" }, { "name", "World" } })
       .str(),
     "hello World!");
 
-  test("StringTemplate: partial substitution",
-    f3d::utils::StringTemplate("{greeting} {name}!").substitute({ { "greeting", "hello" } }).str(),
+  test("string_template: partial substitution",
+    f3d::utils::string_template("{greeting} {name}!").substitute({ { "greeting", "hello" } }).str(),
     "hello {name}!");
 
-  test("StringTemplate: multi-step substitution",
-    f3d::utils::StringTemplate("{greeting} {name}!")
+  test("string_template: multi-step substitution",
+    f3d::utils::string_template("{greeting} {name}!")
       .substitute({ { "greeting", "hello" } })
       .substitute({ { "name", "World" } })
       .str(),
     "hello World!");
 
-  test("StringTemplate: escaped variable substitution",
-    f3d::utils::StringTemplate("{greeting} {{name}}!")
+  test("string_template: escaped variable substitution",
+    f3d::utils::string_template("{greeting} {{name}}!")
       .substitute({ { "greeting", "hello" } })
       .substitute({ { "name", "World" } })
       .str(),
     "hello {name}!");
 
-  test("StringTemplate: non-recursive substitution",
-    f3d::utils::StringTemplate("{greeting} {name}!")
+  test("string_template: non-recursive substitution",
+    f3d::utils::string_template("{greeting} {name}!")
       .substitute({ { "greeting", "hello" }, { "name", "{foo}" } })
       .substitute({ { "foo", "bar" } })
       .str(),

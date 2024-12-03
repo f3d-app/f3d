@@ -69,12 +69,12 @@ public:
       .str() == "hello World!"
     ```
    */
-  class StringTemplate
+  class string_template
   {
     std::vector<std::pair<std::string, bool>> fragments;
 
   public:
-    explicit StringTemplate(const std::string& templateString)
+    explicit string_template(const std::string& templateString)
     {
       const std::string varName = "[\\w_.%:-]+";
       const std::string escapedVar = "(\\{(\\{" + varName + "\\})\\})";
@@ -104,7 +104,7 @@ public:
     }
 
     template<typename F>
-    StringTemplate& substitute(F lookup)
+    string_template& substitute(F lookup)
     {
       for (auto& [fragment, isVariable] : this->fragments)
       {
@@ -124,7 +124,7 @@ public:
       return *this;
     }
 
-    StringTemplate& substitute(const std::map<std::string, std::string>& lookup)
+    string_template& substitute(const std::map<std::string, std::string>& lookup)
     {
       return this->substitute([&](const std::string& key) { return lookup.at(key); });
     }
