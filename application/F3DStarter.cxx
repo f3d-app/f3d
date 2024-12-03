@@ -922,10 +922,10 @@ int F3DStarter::Start(int argc, char** argv)
       std::bind(docString, "Reload current file group"));
     interactor.addBinding({ mod_t::NONE, "Down" }, "add_current_directories", "Others",
       std::bind(docString, "Add files from dir of current file"));
-    interactor.addBinding({ mod_t::NONE, "F11" }, "take_minimal_screenshot", "Others",
-      std::bind(docString, "Take a minimal screenshot"));
     interactor.addBinding({ mod_t::NONE, "F12" }, "take_screenshot", "Others",
       std::bind(docString, "Take a screenshot"));
+    interactor.addBinding({ mod_t::CTRL, "F12" }, "take_minimal_screenshot", "Others",
+      std::bind(docString, "Take a minimal screenshot"));
 
     // This replace an existing default interaction command in the libf3d
     interactor.removeBinding({ mod_t::NONE, "Drop" });
