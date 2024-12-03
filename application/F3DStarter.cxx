@@ -913,6 +913,7 @@ int F3DStarter::Start(int argc, char** argv)
 
   if (!this->Internals->AppOptions.NoRender)
   {
+    this->Internals->ApplyPositionAndResolution();
     f3d::window& window = this->Internals->Engine->getWindow();
     f3d::interactor& interactor = this->Internals->Engine->getInteractor();
 
@@ -1213,7 +1214,6 @@ void F3DStarter::LoadFileGroup(
       this->Internals->UpdateBindings(configPaths);
 
       this->Internals->Engine->setOptions(this->Internals->LibOptions);
-      this->Internals->ApplyPositionAndResolution();
 
       f3d::log::debug("Checking files:");
       for (const fs::path& tmpPath : paths)
