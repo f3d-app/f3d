@@ -1,6 +1,6 @@
 # Commands
 
-F3D will provide access to commands through bindings configuration and command line widget in the future.
+F3D provides access to commands through bindings configuration. They may be more ways to access them in the future.
 Commands let you trigger specific behavior that may not be available otherwise.
 Please note commands are currently experimental and the behaviors, actions may be added or removed without deprecation.
 Action names and arguments may also change without deprecation.

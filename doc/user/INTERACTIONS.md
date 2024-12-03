@@ -102,3 +102,7 @@ The destination filename used to save the screenshots (created by pressing <kbd>
 
 Unless the configured filename template is an absolute path, images will be saved into the user's home directory
 (using the following environment variables, if defined and pointing to an existing directory, in that order: `XDG_PICTURES_DIR`, `HOME`, or `USERPROFILE`).
+
+## Configuring bindings
+
+It is supported to change all bindings above using a specific syntax in the [configuration file](CONFIGURATION_FILE.md) using [commands](COMMANDS.md).
