@@ -64,7 +64,7 @@ public:
 
   /** String template allowing substitution of variables enclosed in curly braces.
     ```
-    StringTemplate("{greeting} {name}!")
+    string_template("{greeting} {name}!")
       .substitute({ { "greeting", "hello" }, { "name", "World" } })
       .str() == "hello World!"
     ```
@@ -74,82 +74,99 @@ public:
     std::vector<std::pair<std::string, bool>> fragments;
 
   public:
-    explicit string_template(const std::string& templateString)
-    {
-      const std::string varName = "[\\w_.%:-]+";
-      const std::string escapedVar = "(\\{(\\{" + varName + "\\})\\})";
-      const std::string substVar = "(\\{(" + varName + ")\\})";
-      const std::regex escapedVarRe(escapedVar);
-      const std::regex substVarRe(substVar);
-
-      const auto callback = [&](const std::string& m)
-      {
-        if (std::regex_match(m, escapedVarRe))
-        {
-          this->fragments.emplace_back(std::regex_replace(m, escapedVarRe, "$2"), false);
-        }
-        else if (std::regex_match(m, substVarRe))
-        {
-          this->fragments.emplace_back(std::regex_replace(m, substVarRe, "$2"), true);
-        }
-        else
-        {
-          this->fragments.emplace_back(m, false);
-        }
-      };
-
-      const std::regex re(escapedVar + "|" + substVar);
-      std::sregex_token_iterator begin(templateString.begin(), templateString.end(), re, { -1, 0 });
-      std::for_each(begin, std::sregex_token_iterator(), callback);
-    }
+    explicit string_template(const std::string& templateString);
 
     template<typename F>
-    string_template& substitute(F lookup)
-    {
-      for (auto& [fragment, isVariable] : this->fragments)
-      {
-        if (isVariable)
-        {
-          try
-          {
-            fragment = lookup(fragment);
-            isVariable = false;
-          }
-          catch (const std::out_of_range&)
-          {
-            /* leave variable as is */
-          }
-        }
-      }
-      return *this;
-    }
+    string_template& substitute(F lookup);
 
-    string_template& substitute(const std::map<std::string, std::string>& lookup)
-    {
-      return this->substitute([&](const std::string& key) { return lookup.at(key); });
-    }
+    string_template& substitute(const std::map<std::string, std::string>& lookup);
 
-    std::string str() const
-    {
-      std::ostringstream ss;
-      for (auto [fragment, isVariable] : this->fragments)
-        if (isVariable)
-          ss << "{" << fragment << "}";
-        else
-          ss << fragment;
-      return ss.str();
-    }
+    std::string str() const;
 
-    std::vector<std::string> variables() const
-    {
-      std::vector<std::string> variables;
-      for (auto [fragment, isVariable] : this->fragments)
-        if (isVariable)
-          variables.emplace_back(fragment);
-      return variables;
-    }
+    std::vector<std::string> variables() const;
   };
 };
+
+//------------------------------------------------------------------------------
+inline utils::string_template::string_template(const std::string& templateString)
+{
+  const std::string varName = "[\\w_.%:-]+";
+  const std::string escapedVar = "(\\{(\\{" + varName + "\\})\\})";
+  const std::string substVar = "(\\{(" + varName + ")\\})";
+  const std::regex escapedVarRe(escapedVar);
+  const std::regex substVarRe(substVar);
+
+  const auto callback = [&](const std::string& m)
+  {
+    if (std::regex_match(m, escapedVarRe))
+    {
+      this->fragments.emplace_back(std::regex_replace(m, escapedVarRe, "$2"), false);
+    }
+    else if (std::regex_match(m, substVarRe))
+    {
+      this->fragments.emplace_back(std::regex_replace(m, substVarRe, "$2"), true);
+    }
+    else
+    {
+      this->fragments.emplace_back(m, false);
+    }
+  };
+
+  const std::regex re(escapedVar + "|" + substVar);
+  std::sregex_token_iterator begin(templateString.begin(), templateString.end(), re, { -1, 0 });
+  std::for_each(begin, std::sregex_token_iterator(), callback);
+}
+
+//------------------------------------------------------------------------------
+template<typename F>
+utils::string_template& utils::string_template::substitute(F lookup)
+{
+  for (auto& [fragment, isVariable] : this->fragments)
+  {
+    if (isVariable)
+    {
+      try
+      {
+        fragment = lookup(fragment);
+        isVariable = false;
+      }
+      catch (const std::out_of_range&)
+      {
+        /* leave variable as is */
+      }
+    }
+  }
+  return *this;
+}
+
+//------------------------------------------------------------------------------
+inline utils::string_template& utils::string_template::substitute(
+  const std::map<std::string, std::string>& lookup)
+{
+  return this->substitute([&](const std::string& key) { return lookup.at(key); });
+}
+
+//------------------------------------------------------------------------------
+inline std::string utils::string_template::str() const
+{
+  std::ostringstream ss;
+  for (auto [fragment, isVariable] : this->fragments)
+    if (isVariable)
+      ss << "{" << fragment << "}";
+    else
+      ss << fragment;
+  return ss.str();
+}
+
+//------------------------------------------------------------------------------
+inline std::vector<std::string> utils::string_template::variables() const
+{
+  std::vector<std::string> variables;
+  for (auto [fragment, isVariable] : this->fragments)
+    if (isVariable)
+      variables.emplace_back(fragment);
+  return variables;
+}
 }
 
 #endif
