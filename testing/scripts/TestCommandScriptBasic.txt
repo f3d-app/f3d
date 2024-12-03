@@ -1,0 +1,4 @@
+roll_camera 90
+toggle ui.scalar_bar
+print_scene_info
+increase_light_intensity
