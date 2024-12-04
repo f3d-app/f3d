@@ -1640,21 +1640,12 @@ void F3DStarter::AddCommands()
       }
     });
     interactor.addCommand("open_file", 
-          [this](const std::vector<std::string>& args) {
-          f3d::scene& s = this->Internals->Engine->getScene();
-          //can add filters later
-          char* file = tinyfd_openFileDialog(
-                  "Open File",
-                  ".",
-                  0, 
-                  nullptr,
-                  nullptr,
-                  false);
-          if (file) {
-          s.clear();
-          s.add(file);
-          //probably a better way to do this part.
-          this->Internals->Engine->getOptions().ui.dropzone = false;
-          }
-          });
+      [this](const std::vector<std::string>& args)
+      {
+         char* file = tinyfd_openFileDialog( "Open File", ".", 0, nullptr, nullptr, false);
+         if (file) {
+           int index = this->AddFile(file);
+           if (index > -1) this->LoadFileGroup(index);
+         }
+    });
 }
