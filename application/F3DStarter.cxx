@@ -8,7 +8,7 @@
 #include "F3DNSDelegate.h"
 #include "F3DOptionsTools.h"
 #include "F3DPluginsTools.h"
-#include "scene.h"
+#include "F3DSystemTools.h"
 
 #define DMON_IMPL
 #ifdef WIN32
@@ -700,13 +700,13 @@ public:
       interactor.addBinding({ mod_t::NONE, "Down" }, "add_current_directories", "Others", std::bind(docString, "Add files from dir of current file"));
       interactor.addBinding({ mod_t::NONE, "F11" }, "take_minimal_screenshot", "Others", std::bind(docString, "Take a minimal screenshot"));
       interactor.addBinding({ mod_t::NONE, "F12" }, "take_screenshot", "Others", std::bind(docString, "Take a screenshot"));
+      interactor.addBinding({ mod_t::CTRL, "O" }, "open_file_dialog", "Others", std::bind(docString, "Open File"));
 
       // This replace an existing default binding command in the libf3d
       interactor.removeBinding({ mod_t::NONE, "Drop" });
       interactor.addBinding({ mod_t::NONE, "Drop" }, "add_files_or_set_hdri", "Others", std::bind(docString, "Load dropped files, folder or HDRI"));
       interactor.addBinding({ mod_t::CTRL, "Drop" }, "add_files", "Others", std::bind(docString, "Load dropped files or folder"));
       interactor.addBinding({ mod_t::SHIFT, "Drop" }, "set_hdri", "Others", std::bind(docString, "Set HDRI and use it"));
-      interactor.addBinding( { mod_t::CTRL, "O" }, "open_file", "Others", std::bind(docString, "Open File"));
       // clang-format on
 
       f3d::log::debug("Adding config defined bindings if any: ");
@@ -1639,13 +1639,17 @@ void F3DStarter::AddCommands()
         this->LoadFileGroup(index);
       }
     });
-    interactor.addCommand("open_file", 
-      [this](const std::vector<std::string>& args)
+    interactor.addCommand("open_file_dialog", 
+      [this](const std::vector<std::string>&)
       {
          char* file = tinyfd_openFileDialog( "Open File", ".", 0, nullptr, nullptr, false);
-         if (file) {
+         if (file) 
+         {
            int index = this->AddFile(file);
-           if (index > -1) this->LoadFileGroup(index);
+           if (index > -1) 
+           {
+             this->LoadFileGroup(index);
+           }
          }
     });
 }

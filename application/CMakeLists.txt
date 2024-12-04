@@ -67,7 +67,6 @@ endif ()
 
 target_include_directories(f3d PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
 
-
 if (F3D_USE_EXTERNAL_CXXOPTS)
   target_link_libraries(f3d PRIVATE cxxopts::cxxopts)
 else ()
