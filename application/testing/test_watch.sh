@@ -21,10 +21,12 @@ pid=$!
 
 function cleanup()
 {
-  if [[ -z "${CTEST_F3D_COVERAGE-}" ]]; then
-    kill $pid
+  if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    wmctrl -c :ACTIVE:
+  elif [[ "$OSTYPE" == "darwin"* ]]; then
+    osascript -e 'quit app "F3D"'
   else
-    xdotool key Escape
+    exit 1 # not supported
   fi
 }
 trap "cleanup" EXIT
