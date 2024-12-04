@@ -4,6 +4,7 @@ list(APPEND libf3dSDKTests_list
      TestSDKCompareWithFile.cxx
      TestSDKDropZone.cxx
      TestSDKDynamicLightIntensity.cxx
+     TestSDKEmptyFilename.cxx
      TestSDKEngine.cxx
      TestSDKEngineExceptions.cxx
      TestSDKImage.cxx

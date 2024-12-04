@@ -285,10 +285,17 @@ vtkF3DImguiActor::~vtkF3DImguiActor() = default;
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderFileName()
 {
+  // Make sure we always display something
+  std::string filename = "N/A";
+  if (!this->FileName.empty())
+  {
+    filename = this->FileName;
+  }
+
   ImGuiViewport* viewport = ImGui::GetMainViewport();
 
   constexpr float marginTop = 5.f;
-  ImVec2 winSize = ImGui::CalcTextSize(this->FileName.c_str());
+  ImVec2 winSize = ImGui::CalcTextSize(filename.c_str());
   winSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
   winSize.y += 2.f * ImGui::GetStyle().WindowPadding.y;
 
@@ -299,7 +306,7 @@ void vtkF3DImguiActor::RenderFileName()
     ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
 
   ImGui::Begin("FileName", nullptr, flags);
-  ImGui::TextUnformatted(this->FileName.c_str());
+  ImGui::TextUnformatted(filename.c_str());
   ImGui::End();
 }
 
