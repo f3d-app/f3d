@@ -15,7 +15,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: dependencies/usd_install
-        key: usd-v24.11-${{runner.os}}-${{inputs.cpu}}-2
+        key: usd-v24.11-${{runner.os}}-${{inputs.cpu}}-3
 
     - name: Checkout USD
       if: steps.cache-usd.outputs.cache-hit != 'true'

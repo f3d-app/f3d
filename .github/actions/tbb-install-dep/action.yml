@@ -15,7 +15,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: dependencies/tbb_install
-        key: tbb-v2021.12.0-${{runner.os}}-${{inputs.cpu}}-1
+        key: tbb-v2021.12.0-${{runner.os}}-${{inputs.cpu}}-2
 
     # Dependents: usd openvdb vtk
     # v2021.13.0 somehow cause memory issue in draco and alembic
