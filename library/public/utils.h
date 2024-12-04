@@ -149,6 +149,8 @@ inline utils::string_template& utils::string_template::substitute(
 inline std::string utils::string_template::str() const
 {
   std::ostringstream ss;
+  // cppcheck-suppress unassignedVariable
+  // (false positive, fixed in cppcheck 2.8)
   for (const auto& [fragment, isVariable] : this->fragments)
     if (isVariable)
       ss << "{" << fragment << "}";
