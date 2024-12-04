@@ -4,7 +4,6 @@
 #include "exception.h"
 #include "export.h"
 
-#include <functional>
 #include <map>
 #include <regex>
 #include <sstream>
@@ -150,7 +149,7 @@ inline utils::string_template& utils::string_template::substitute(
 inline std::string utils::string_template::str() const
 {
   std::ostringstream ss;
-  for (auto [fragment, isVariable] : this->fragments)
+  for (const auto& [fragment, isVariable] : this->fragments)
     if (isVariable)
       ss << "{" << fragment << "}";
     else
@@ -162,7 +161,7 @@ inline std::string utils::string_template::str() const
 inline std::vector<std::string> utils::string_template::variables() const
 {
   std::vector<std::string> variables;
-  for (auto [fragment, isVariable] : this->fragments)
+  for (const auto& [fragment, isVariable] : this->fragments)
     if (isVariable)
       variables.emplace_back(fragment);
   return variables;
