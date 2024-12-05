@@ -2128,14 +2128,7 @@ void vtkF3DRenderer::SetColormap(const std::vector<double>& colormap)
   }
 }
 
-void vtkF3DRenderer::SetColorDiscretization(const int discretization) {
-  F3DLog::Print(F3DLog::Severity::Warning,
-    std::string("[Gapry PoC][Add CLI Options] ") + __PRETTY_FUNCTION__);
-
-  F3DLog::Print(F3DLog::Severity::Warning, 
-    std::string("[Gapry PoC][Add CLI Options] ") + 
-    "input discretization = " + std::to_string(discretization));
- 
+void vtkF3DRenderer::SetColorDiscretization(const int discretization) { 
   if(discretization >= 0 and discretization <= std::numeric_limits<int>::max()) {
     this->Discretization = discretization;
 
@@ -2498,10 +2491,6 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
 
   // Set Discretization
   if(!this->DiscretizableColorTransferFunctionConfigured) {
-    F3DLog::Print(F3DLog::Severity::Warning, 
-      std::string("[Gapry PoC][Add CLI Options] " ) + __PRETTY_FUNCTION__ + 
-      " discretization = " + std::to_string(this->Discretization));
-
     this->DiscretizableColorTransferFunction->SetNumberOfValues(this->Discretization);
     this->DiscretizableColorTransferFunctionConfigured = true;
   }
