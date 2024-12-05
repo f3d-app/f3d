@@ -1,7 +1,7 @@
 # F3D Testing
 function(f3d_test)
 
-	cmake_parse_arguments(F3D_TEST "TONE_MAPPING;LONG_TIMEOUT;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI" "NAME;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;RENDERING_BACKEND" "DATA;DEPENDS;ENV;ARGS" ${ARGN})
+	cmake_parse_arguments(F3D_TEST "TONE_MAPPING;LONG_TIMEOUT;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI" "NAME;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;SCRIPT;RENDERING_BACKEND" "DATA;DEPENDS;ENV;ARGS" ${ARGN})
 
   if(F3D_TEST_CONFIG)
     list(APPEND F3D_TEST_ARGS "--config=${F3D_TEST_CONFIG}")
@@ -27,6 +27,10 @@ function(f3d_test)
   if (F3D_TEST_HDRI)
     list(APPEND F3D_TEST_ARGS "--hdri-file=${F3D_SOURCE_DIR}/testing/data/${F3D_TEST_HDRI}" "--hdri-ambient" "--hdri-skybox")
     set(F3D_TEST_LONG_TIMEOUT ON)
+  endif()
+
+  if (F3D_TEST_SCRIPT)
+    list(APPEND F3D_TEST_ARGS "--command-script=${F3D_SOURCE_DIR}/testing/scripts/${F3D_TEST_SCRIPT}")
   endif()
 
   if(F3D_TEST_NO_RENDER)
@@ -198,9 +202,9 @@ f3d_test(NAME TestTextureMaterial DATA WaterBottle.glb ARGS --texture-material=$
 f3d_test(NAME TestTextureMaterialWithOptions DATA WaterBottle.glb ARGS --texture-material=${F3D_SOURCE_DIR}/testing/data/red_mod.jpg --roughness=0.5 --metallic=0.5)
 f3d_test(NAME TestTextureEmissive DATA WaterBottle.glb ARGS --texture-emissive=${F3D_SOURCE_DIR}/testing/data/red.jpg --emissive-factor=0.1,0.1,0.1)
 f3d_test(NAME TestTextures DATA WaterBottle.glb ARGS --texture-material=${F3D_SOURCE_DIR}/testing/data/red.jpg --roughness=1 --metallic=1 --texture-base-color=${F3D_SOURCE_DIR}/testing/data/albedo.png --texture-normal=${F3D_SOURCE_DIR}/testing/data/normal.png --texture-emissive=${F3D_SOURCE_DIR}/testing/data/red.jpg --emissive-factor=0.1,0.1,0.1)
-f3d_test(NAME TestMetaDataImporter DATA BoxAnimated.gltf ARGS -m)
-f3d_test(NAME TestMultiblockMetaData DATA mb.vtm ARGS -m)
-f3d_test(NAME TestMultiFileMetaData DATA mb/recursive ARGS -m --multi-file-mode=all)
+f3d_test(NAME TestMetaDataImporter DATA BoxAnimated.gltf ARGS -m UI)
+f3d_test(NAME TestMultiblockMetaData DATA mb.vtm ARGS -m UI)
+f3d_test(NAME TestMultiFileMetaData DATA mb/recursive ARGS -m --multi-file-mode=all UI)
 f3d_test(NAME TestTIFF DATA f3d.tif ARGS -sy --up=-Y)
 f3d_test(NAME TestLightIntensityBrighter DATA cow.vtp ARGS --light-intensity=5.0)
 f3d_test(NAME TestLightIntensityDarker DATA cow.vtp ARGS --light-intensity=0.2)
@@ -363,7 +367,7 @@ endif()
 f3d_test(NAME TestGLTFImporterUnlit DATA UnlitTest.glb)
 f3d_test(NAME TestMaterial DATA suzanne.ply ARGS --color=0.72,0.45,0.2 --metallic=0.7 --roughness=0.2)
 f3d_test(NAME TestMaterialFullScene DATA WaterBottle.glb ARGS --color=0.9,0.1,0.1 --metallic=0.7 --roughness=0.2)
-f3d_test(NAME TestMetaData DATA pdiag.vtu ARGS -m)
+f3d_test(NAME TestMetaData DATA pdiag.vtu ARGS -m UI)
 f3d_test(NAME TestEdges DATA suzanne.ply ARGS -e)
 f3d_test(NAME TestLineWidth DATA cow.vtk ARGS -e --line-width=5)
 f3d_test(NAME TestLineWidthFullScene DATA suzanne.obj ARGS -e --line-width=3 --up=-Y)
@@ -396,19 +400,21 @@ f3d_test(NAME TestInteractionSimpleExit DATA cow.vtp REGEXP "Interactor has been
 
 # No alternative baseline supports in F3D
 if(F3D_MODULE_RAYTRACING)
-  f3d_test(NAME TestInteractionCheatsheetRaytracing DATA cow.vtp INTERACTION) #H
-  f3d_test(NAME TestInteractionCheatsheetWhiteBGRaytracing DATA cow.vtp ARGS --bg-color=1,1,1 INTERACTION) #H
-  f3d_test(NAME TestInteractionCheatsheetBlackBGRaytracing DATA cow.vtp ARGS --bg-color=0,0,0 INTERACTION) #H
-  f3d_test(NAME TestInteractionCheatsheetScalarsRaytracing DATA dragon.vtu ARGS --scalar-coloring --comp=-2 RESOLUTION 800,800 INTERACTION LONG_TIMEOUT) #HSSS
-  f3d_test(NAME TestInteractionCheatsheetNoFileRaytracing INTERACTION NO_DATA_FORCE_RENDER) #HXZM
-  f3d_test(NAME TestInteractionCheatsheetAnimationNameRaytracing DATA InterpolationTest.glb ARGS --animation-index=6 RESOLUTION 800,800 INTERACTION) #HWWW
+  f3d_test(NAME TestInteractionCheatsheetRaytracing DATA cow.vtp INTERACTION UI) #H
+  f3d_test(NAME TestInteractionCheatsheetWhiteBGRaytracing DATA cow.vtp ARGS --bg-color=1,1,1 INTERACTION UI) #H
+  f3d_test(NAME TestInteractionCheatsheetBlackBGRaytracing DATA cow.vtp ARGS --bg-color=0,0,0 INTERACTION UI) #H
+  f3d_test(NAME TestInteractionCheatsheetScalarsRaytracing DATA dragon.vtu ARGS --scalar-coloring --comp=-2 RESOLUTION 800,800 INTERACTION UI LONG_TIMEOUT) #HSSS
+  f3d_test(NAME TestInteractionCheatsheetNoFileRaytracing INTERACTION UI NO_DATA_FORCE_RENDER) #HXM
+  f3d_test(NAME TestInteractionCheatsheetAnimationNameRaytracing DATA InterpolationTest.glb ARGS --animation-index=6 RESOLUTION 800,800 INTERACTION UI) #HWWW
+  f3d_test(NAME TestInteractionCheatsheetConfigFileRaytracing DATA dragon.vtu CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json RESOLUTION 600,1300 INTERACTION UI) #H
 else()
-  f3d_test(NAME TestInteractionCheatsheet DATA cow.vtp INTERACTION) #H
-  f3d_test(NAME TestInteractionCheatsheetWhiteBG DATA cow.vtp ARGS --bg-color=1,1,1 INTERACTION) #H
-  f3d_test(NAME TestInteractionCheatsheetBlackBG DATA cow.vtp ARGS --bg-color=0,0,0 INTERACTION) #H
-  f3d_test(NAME TestInteractionCheatsheetScalars DATA dragon.vtu ARGS --scalar-coloring --comp=-2 RESOLUTION 800,800 INTERACTION LONG_TIMEOUT) #HSSS
-  f3d_test(NAME TestInteractionCheatsheetNoFile INTERACTION NO_DATA_FORCE_RENDER) #HXZM
-  f3d_test(NAME TestInteractionCheatsheetAnimationName DATA InterpolationTest.glb ARGS --animation-index=6 RESOLUTION 800,800 INTERACTION) #HWWW
+  f3d_test(NAME TestInteractionCheatsheet DATA cow.vtp INTERACTION UI) #H
+  f3d_test(NAME TestInteractionCheatsheetWhiteBG DATA cow.vtp ARGS --bg-color=1,1,1 INTERACTION UI) #H
+  f3d_test(NAME TestInteractionCheatsheetBlackBG DATA cow.vtp ARGS --bg-color=0,0,0 INTERACTION UI) #H
+  f3d_test(NAME TestInteractionCheatsheetScalars DATA dragon.vtu ARGS --scalar-coloring --comp=-2 RESOLUTION 800,800 INTERACTION UI LONG_TIMEOUT) #HSSS
+  f3d_test(NAME TestInteractionCheatsheetNoFile INTERACTION UI NO_DATA_FORCE_RENDER) #HXM
+  f3d_test(NAME TestInteractionCheatsheetAnimationName DATA InterpolationTest.glb ARGS --animation-index=6 RESOLUTION 800,800 INTERACTION UI) #HWWW
+  f3d_test(NAME TestInteractionCheatsheetConfigFile DATA dragon.vtu CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json RESOLUTION 600,1200 INTERACTION UI) #H
 endif()
 
 f3d_test(NAME TestCameraPersp DATA Cameras.gltf ARGS --camera-index=0)
@@ -525,8 +531,7 @@ if(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestRaytracingNoBackground DATA suzanne.ply ARGS -rd --samples=4 --no-background)
 
 else(F3D_MODULE_RAYTRACING)
-  # XXX: This test is disabled until this code can be reached again using `--command-script`
-  # f3d_test(NAME TestInteractionRaytracingDenoiseNoRaytracing DATA suzanne.ply INTERACTION NO_BASELINE REGEXP "Raytracing options can't be used if F3D has not been built with raytracing") #RD
+  f3d_test(NAME TestCommandScriptRaytracingNoRaytracing DATA suzanne.ply SCRIPT TestCommandScriptRaytracing.txt NO_BASELINE REGEXP "Raytracing options can't be used if F3D has not been built with raytracing")
 endif()
 
 if(F3D_MODULE_EXR)
@@ -753,7 +758,7 @@ f3d_test(NAME TestFinalShaderCompilationFailure DATA cow.vtp ARGS --final-shader
 # Test hotkeys
 f3d_test(NAME TestInteractionPostFX DATA cow.vtp INTERACTION TONE_MAPPING LONG_TIMEOUT) #PQAT
 f3d_test(NAME TestInteractionActors DATA cow.vtp INTERACTION UI) #EXGMN
-f3d_test(NAME TestInteractionTimer DATA cow.vtp NO_BASELINE INTERACTION LONG_TIMEOUT) #Z
+f3d_test(NAME TestInteractionTimer DATA cow.vtp NO_BASELINE INTERACTION UI LONG_TIMEOUT) #Z
 f3d_test(NAME TestInteractionMisc DATA cow.vtp NO_BASELINE INTERACTION) #KK
 f3d_test(NAME TestInteractionCycleCell DATA waveletArrays.vti INTERACTION LONG_TIMEOUT) #VCCC
 f3d_test(NAME TestInteractionCycleComp DATA dragon.vtu INTERACTION) #SYYYY
@@ -774,6 +779,7 @@ f3d_test(NAME TestInteractionResetCameraWithCameraIndex DATA CameraAnimated.glb 
 f3d_test(NAME TestInteractionTensorsCycleComp DATA tensors.vti ARGS --scalar-coloring --comp=-2  INTERACTION) #SYYYYYYYYYY
 f3d_test(NAME TestInteractionCycleScalarsCompCheck DATA dragon.vtu ARGS -b --scalar-coloring --comp=2 INTERACTION) #S
 f3d_test(NAME TestInteractionConfigFileNoColorBar DATA multi CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION) #Right;Right;Left
+f3d_test(NAME TestInteractionConfigFileBindings DATA dragon.vtu CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json INTERACTION UI) #Ctrl+Shift+O;Ctrl+O;Shift+O;O;3
 f3d_test(NAME TestInteractionConfigFileMulti DATA multi CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION) #SY;Right;XG;Right;N;Right;Right
 f3d_test(NAME TestInteractionConfigFileAndCommand DATA multi ARGS -o CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI) #OX;Right;N;Right;Right;Right
 f3d_test(NAME TestInteractionDumpSceneState DATA dragon.vtu NO_BASELINE INTERACTION REGEXP "Camera position: 2.23745,3.83305,507.598")#?
@@ -854,9 +860,9 @@ f3d_test(NAME TestInteractionRecord DATA cow.vtp ARGS --interaction-test-record=
 f3d_test(NAME TestInteractionPlay DATA cow.vtp ARGS --interaction-test-play=${CMAKE_BINARY_DIR}/Testing/Temporary/interaction.log DEPENDS TestInteractionRecord NO_BASELINE)
 
 # Command Script Test
-f3d_test(NAME TestCommandScriptBasic DATA dragon.vtu ARGS --command-script=${F3D_SOURCE_DIR}/testing/data/TestCommandScriptBasic.txt --ref=${F3D_SOURCE_DIR}/testing/baselines/TestCommandScriptBasic.png)
-f3d_test(NAME TestCommandScriptInvalidCommand DATA dragon.vtu ARGS --command-script=${F3D_SOURCE_DIR}/testing/data/TestCommandScriptInvalid.txt REGEXP "Command: \"INVALID_COMMAND_1\" is not recognized, ignoring" NO_BASELINE)
-f3d_test(NAME TestCommandScriptMissingFile DATA dragon.vtu ARGS --command-script=${F3D_SOURCE_DIR}/testing/data/TestCommandScriptMissingFile.txt REGEXP "Unable to open command script file" NO_BASELINE)
+f3d_test(NAME TestCommandScriptBasic DATA dragon.vtu SCRIPT TestCommandScriptBasic.txt --ref=${F3D_SOURCE_DIR}/testing/baselines/TestCommandScriptBasic.png)
+f3d_test(NAME TestCommandScriptInvalidCommand DATA dragon.vtu SCRIPT TestCommandScriptInvalid.txt REGEXP "Command: \"INVALID_COMMAND_1\" is not recognized, ignoring" NO_BASELINE)
+f3d_test(NAME TestCommandScriptMissingFile DATA dragon.vtu SCRIPT TestCommandScriptMissingFile.txt REGEXP "Unable to open command script file" NO_BASELINE)
 
 # Window position test
 f3d_test(NAME TestPosition DATA dragon.vtu ARGS --position=100,100 NO_BASELINE)
@@ -1005,6 +1011,13 @@ f3d_test(NAME TestConfigFileInvalidOptions DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}
 # Test invalid value in config file
 f3d_test(NAME TestConfigFileNoOptions DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/no_options.json REGEXP "does not contains options" NO_BASELINE)
 
+# Test update interaction verbose
+f3d_test(NAME TestConfigFileBindingsVerbose DATA dragon.vtu ARGS --verbose CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json REGEXP "'Shift.O' : '`toggle model.point_sprites.enable` '" NO_BASELINE)
+
+# Test bindings-list display with config file
+f3d_test(NAME TestConfigFileBindingsList ARGS --bindings-list CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json REGEXP "Ctrl.Shift.O `toggle ui.filename`" NO_BASELINE)
+f3d_test(NAME TestConfigFileBindingsListData DATA dragon.vtu ARGS --bindings-list CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json REGEXP "Any.3        `roll_camera 90`" NO_BASELINE)
+
 # Test invalid value in config file
 f3d_test(NAME TestConfigFileInvalidValue DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/invalid_value.json REGEXP "must be a string, a boolean or a number" NO_BASELINE)
 
@@ -1031,7 +1044,7 @@ f3d_test(NAME TestVersion ARGS --version REGEXP "Version:")
 f3d_test(NAME TestReadersList ARGS --readers-list REGEXP_FAIL "No registered reader found")
 
 # Test invalid component string coverage
-f3d_test(NAME TestInteractionInvalidComponent INTERACTION DATA cow.vtp ARGS --comp=1 NO_BASELINE) #H
+f3d_test(NAME TestInteractionInvalidComponent INTERACTION UI DATA cow.vtp ARGS --comp=1 NO_BASELINE) #H
 
 # Test multi plugin readers-lists
 if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
@@ -1124,7 +1137,9 @@ if(NOT F3D_MACOS_BUNDLE)
   endif()
 endif()
 
-if(WIN32 OR APPLE OR F3D_TESTING_ENABLE_GLX_TESTS) # Watch testing require GLX rendering on Linux
+# Watch testing require GLX rendering on Linux
+# SIGTERM is not caught with VTK 9.2.6 for some reason
+if(WIN32 OR APPLE OR (F3D_TESTING_ENABLE_GLX_TESTS AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.0))
   if(UNIX)
     set(_f3d_os_script_ext "sh")
     set(_f3d_os_script_exec "")
@@ -1134,8 +1149,5 @@ if(WIN32 OR APPLE OR F3D_TESTING_ENABLE_GLX_TESTS) # Watch testing require GLX r
   endif()
   # Custom bash/pwsh test for testing watch option
   add_test (NAME f3d::TestWatch COMMAND ${_f3d_os_script_exec} ${CMAKE_CURRENT_SOURCE_DIR}/test_watch.${_f3d_os_script_ext} $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data ${CMAKE_BINARY_DIR}/Testing/Temporary)
-  set_tests_properties(f3d::TestWatch PROPERTIES RUN_SERIAL TRUE)
-  if(F3D_COVERAGE) # When running test for coverage, adapt the script to use xdotool
-    set_tests_properties(f3d::TestWatch PROPERTIES ENVIRONMENT "CTEST_F3D_COVERAGE=1")
-  endif()
+  set_tests_properties(f3d::TestWatch PROPERTIES RUN_SERIAL TRUE TIMEOUT 30)
 endif()
