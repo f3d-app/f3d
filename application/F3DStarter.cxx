@@ -9,6 +9,7 @@
 #include "F3DOptionsTools.h"
 #include "F3DPluginsTools.h"
 #include "F3DSystemTools.h"
+#include <cstdlib>
 
 #define DMON_IMPL
 #ifdef WIN32
@@ -700,7 +701,7 @@ public:
       interactor.addBinding({ mod_t::NONE, "Down" }, "add_current_directories", "Others", std::bind(docString, "Add files from dir of current file"));
       interactor.addBinding({ mod_t::NONE, "F11" }, "take_minimal_screenshot", "Others", std::bind(docString, "Take a minimal screenshot"));
       interactor.addBinding({ mod_t::NONE, "F12" }, "take_screenshot", "Others", std::bind(docString, "Take a screenshot"));
-      interactor.addBinding({ mod_t::CTRL, "O" }, "open_file_dialog", "Others", std::bind(docString, "Open File"));
+      interactor.addBinding({ mod_t::CTRL, "O" }, "open_file_dialog", "Others", std::bind(docString, "Open File Dialog"));
 
       // This replace an existing default binding command in the libf3d
       interactor.removeBinding({ mod_t::NONE, "Drop" });
@@ -1642,7 +1643,13 @@ void F3DStarter::AddCommands()
     interactor.addCommand("open_file_dialog", 
       [this](const std::vector<std::string>&)
       {
-         char* file = tinyfd_openFileDialog( "Open File", ".", 0, nullptr, nullptr, false);
+         const char* file = getenv("CTEST_OPEN_DIALOG_FILE");
+         std::cout << file << std::endl;
+         if (!file)
+         {
+           file = tinyfd_openFileDialog( "Open File", ".", 0, nullptr, nullptr, false);
+         }
+
          if (file) 
          {
            int index = this->AddFile(file);
