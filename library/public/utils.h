@@ -159,10 +159,16 @@ inline std::string utils::string_template::str() const
   // cppcheck-suppress unassignedVariable
   // (false positive, fixed in cppcheck 2.8)
   for (const auto& [fragment, isVariable] : this->fragments)
+  {
     if (isVariable)
+    {
       ss << "{" << fragment << "}";
+    }
     else
+    {
       ss << fragment;
+    }
+  }
   return ss.str();
 }
 
@@ -171,8 +177,12 @@ inline std::vector<std::string> utils::string_template::variables() const
 {
   std::vector<std::string> variables;
   for (const auto& [fragment, isVariable] : this->fragments)
+  {
     if (isVariable)
+    {
       variables.emplace_back(fragment);
+    }
+  }
   return variables;
 }
 }

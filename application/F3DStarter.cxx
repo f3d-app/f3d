@@ -359,9 +359,9 @@ public:
       return { stringTemplate.str() };
     }
 
-    const auto numberingLookup = [&](const size_t i)
+    const auto numberingLookup = [&](const size_t number)
     {
-      return [&numberingRe, i](const std::string& var)
+      return [&numberingRe, number](const std::string& var)
       {
         if (std::regex_match(var, numberingRe))
         {
@@ -369,15 +369,15 @@ public:
           try
           {
             const std::string fmt = std::regex_replace(var, numberingRe, "$2");
-            formattedNumber << std::setfill('0') << std::setw(std::stoi(fmt)) << i;
+            formattedNumber << std::setfill('0') << std::setw(std::stoi(fmt)) << number;
           }
           catch (std::invalid_argument&)
           {
-            if (i == 1) /* avoid spamming the log */
+            if (number == 1) /* avoid spamming the log */
             {
               f3d::log::warn("ignoring invalid number format for \"", var, "\"");
             }
-            formattedNumber << std::setw(0) << i;
+            formattedNumber << std::setw(0) << number;
           }
           return std::regex_replace(var, numberingRe, formattedNumber.str());
         }
