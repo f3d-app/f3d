@@ -21,7 +21,13 @@ pid=$!
 
 function cleanup()
 {
-  kill -SIGTERM $pid
+  if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    wmctrl -c f3d
+  elif [[ "$OSTYPE" == "darwin"* ]]; then
+    osascript -e 'quit app "f3d"'
+  else
+    exit 1 # not supported
+  fi
 }
 trap "cleanup" EXIT
 
