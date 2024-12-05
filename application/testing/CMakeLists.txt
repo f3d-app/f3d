@@ -1137,7 +1137,9 @@ if(NOT F3D_MACOS_BUNDLE)
   endif()
 endif()
 
-if(WIN32 OR APPLE OR F3D_TESTING_ENABLE_GLX_TESTS) # Watch testing require GLX rendering on Linux
+# Watch testing require GLX rendering on Linux
+# SIGTERM is not caught with VTK 9.2.6 for some reason
+if(WIN32 OR APPLE OR (F3D_TESTING_ENABLE_GLX_TESTS AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.0))
   if(UNIX)
     set(_f3d_os_script_ext "sh")
     set(_f3d_os_script_exec "")
@@ -1147,8 +1149,5 @@ if(WIN32 OR APPLE OR F3D_TESTING_ENABLE_GLX_TESTS) # Watch testing require GLX r
   endif()
   # Custom bash/pwsh test for testing watch option
   add_test (NAME f3d::TestWatch COMMAND ${_f3d_os_script_exec} ${CMAKE_CURRENT_SOURCE_DIR}/test_watch.${_f3d_os_script_ext} $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data ${CMAKE_BINARY_DIR}/Testing/Temporary)
-  set_tests_properties(f3d::TestWatch PROPERTIES RUN_SERIAL TRUE)
-  if(F3D_COVERAGE) # When running test for coverage, adapt the script to use xdotool
-    set_tests_properties(f3d::TestWatch PROPERTIES ENVIRONMENT "CTEST_F3D_COVERAGE=1")
-  endif()
+  set_tests_properties(f3d::TestWatch PROPERTIES RUN_SERIAL TRUE TIMEOUT 30)
 endif()
