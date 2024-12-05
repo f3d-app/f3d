@@ -36,6 +36,7 @@
 #include <algorithm>
 #include <atomic>
 #include <cassert>
+#include <csignal>
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
@@ -45,6 +46,9 @@
 #include <set>
 
 namespace fs = std::filesystem;
+
+// This pointer is used to retrieve the interactor in case an OS signal is handled
+f3d::interactor* GlobalInteractor = nullptr;
 
 class F3DStarter::F3DInternals
 {
@@ -759,6 +763,14 @@ public:
     return parents;
   }
 
+  static void SigCallback(int)
+  {
+    if (GlobalInteractor)
+    {
+      GlobalInteractor->stop();
+    }
+  }
+
   F3DAppOptions AppOptions;
   f3d::options LibOptions;
   F3DOptionsTools::OptionsEntries ConfigOptionsEntries;
@@ -1093,6 +1105,11 @@ int F3DStarter::Start(int argc, char** argv)
         // Create the event loop repeating timer
         window.render();
         interactor.createTimerCallBack(30, [this]() { this->EventLoop(); });
+
+        GlobalInteractor = &interactor;
+        std::signal(SIGTERM, F3DInternals::SigCallback);
+        std::signal(SIGINT, F3DInternals::SigCallback);
+
         interactor.start();
       }
 #endif
