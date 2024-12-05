@@ -17,3 +17,6 @@ _version.py
 
 # wasm process related
 node_modules
+
+# vscode related
+.vscode/
