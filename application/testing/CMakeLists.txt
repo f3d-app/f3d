@@ -1137,7 +1137,9 @@ if(NOT F3D_MACOS_BUNDLE)
   endif()
 endif()
 
-if(WIN32 OR APPLE OR F3D_TESTING_ENABLE_GLX_TESTS) # Watch testing require GLX rendering on Linux
+# Watch testing require GLX rendering on Linux
+# SIGTERM is not caught with VTK 9.2.6 for some reason
+if(WIN32 OR APPLE OR (F3D_TESTING_ENABLE_GLX_TESTS AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.0))
   if(UNIX)
     set(_f3d_os_script_ext "sh")
     set(_f3d_os_script_exec "")
