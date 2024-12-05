@@ -803,6 +803,9 @@ f3d_test(NAME TestInteractionRotateCamera90 DATA f3d.glb INTERACTION)
 f3d_test(NAME TestInteractionPanWithShift DATA f3d.glb INTERACTION) #Shift;LeftMouse;MouseMovements
 f3d_test(NAME TestInteractionFileOpen INTERACTION NO_BASELINE ENV CTEST_OPEN_DIALOG_FILE=${F3D_SOURCE_DIR}/testing/data/cow.vtp)
 f3d_test(NAME TestInteractionConsoleOpen DATA f3d.glb INTERACTION UI) #Escape
+f3d_test(NAME TestInteractionConsoleOpenExit DATA f3d.glb INTERACTION UI) #Escape;exit;Return
+f3d_test(NAME TestInteractionConsoleOpenWarningKeyboard DATA f3d.glb ARGS --rendering-backend=invalid INTERACTION UI) #Escape
+f3d_test(NAME TestInteractionConsoleOpenWarningClick DATA f3d.glb ARGS --rendering-backend=invalid INTERACTION UI) #Click badge
 f3d_test(NAME TestInteractionConsoleToggleGrid DATA f3d.glb INTERACTION UI) #Escape;toggle render.grid.enable;Return;Escape
 f3d_test(NAME TestInteractionConsoleInvalidCommand DATA f3d.glb INTERACTION UI) #Escape;foo;Return
 f3d_test(NAME TestInteractionConsoleInvalidOption DATA f3d.glb INTERACTION UI) #Escape;toggle foo;Return

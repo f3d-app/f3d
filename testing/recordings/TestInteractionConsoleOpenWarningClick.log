@@ -1,0 +1,6 @@
+# StreamVersion 1.2
+EnterEvent 297 115 0 0 0 0 0
+
+MouseMoveEvent 281 265 0 0 0 0 0
+LeftButtonPressEvent 281 265 0 0 0 0 0
+LeftButtonReleaseEvent 281 265 0 0 0 0 0
