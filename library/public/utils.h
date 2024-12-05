@@ -75,13 +75,20 @@ public:
   public:
     explicit string_template(const std::string& templateString);
 
+    /** Substitute variables based on a `std::string(const std::string&)` function.
+     * Variables for which the fuction throws an `std::out_of_range` exception are left untouched.
+     */
     template<typename F>
     string_template& substitute(F lookup);
 
+    /** Substitute variables based on a map.
+     * Variables for which the map does not contain a key are left untouched.
+     */
     string_template& substitute(const std::map<std::string, std::string>& lookup);
 
     std::string str() const;
 
+    /** List the remaining un-substituted variables. */
     std::vector<std::string> variables() const;
   };
 };
