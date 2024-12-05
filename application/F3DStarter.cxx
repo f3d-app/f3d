@@ -1643,8 +1643,7 @@ void F3DStarter::AddCommands()
     interactor.addCommand("open_file_dialog", 
       [this](const std::vector<std::string>&)
       {
-         const char* file = getenv("CTEST_OPEN_DIALOG_FILE");
-         std::cout << file << std::endl;
+         const char* file = std::getenv("CTEST_OPEN_DIALOG_FILE");
          if (!file)
          {
            file = tinyfd_openFileDialog( "Open File", ".", 0, nullptr, nullptr, false);
