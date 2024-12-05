@@ -768,6 +768,7 @@ public:
     if (GlobalInteractor)
     {
       GlobalInteractor->stop();
+      GlobalInteractor = nullptr;
     }
   }
 
@@ -1106,6 +1107,7 @@ int F3DStarter::Start(int argc, char** argv)
         window.render();
         interactor.createTimerCallBack(30, [this]() { this->EventLoop(); });
 
+        // gracefully exits if SIGTERM or SIGINT is send to F3D
         GlobalInteractor = &interactor;
         std::signal(SIGTERM, F3DInternals::SigCallback);
         std::signal(SIGINT, F3DInternals::SigCallback);
