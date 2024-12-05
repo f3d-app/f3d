@@ -2113,8 +2113,10 @@ void vtkF3DRenderer::SetColorDiscretization(const int discretization) {
   if(discretization >= 0 and discretization <= std::numeric_limits<int>::max()) {
     this->Discretization = discretization;
 
-    vtkF3DMetaImporter::ColoringInfo info;
-    this->ConfigureRangeAndCTFForColoring(info);
+    bool enableColoring = this->EnableColoring || (!this->UseRaytracing && this->UseVolume);
+    F3DColoringInfoHandler& coloringHandler = this->Importer->GetColoringInfoHandler();
+    auto info = coloringHandler.SetCurrentColoring(enableColoring, this->UseCellColoring, this->ArrayNameForColoring, false);
+    this->ConfigureRangeAndCTFForColoring(info.value());
   } else {
     F3DLog::Print(F3DLog::Severity::Error,
       "The discretization value need to great than zero");
