@@ -1640,22 +1640,22 @@ void F3DStarter::AddCommands()
         this->LoadFileGroup(index);
       }
     });
-    interactor.addCommand("open_file_dialog", 
-      [this](const std::vector<std::string>&)
-      {
-         const char* file = std::getenv("CTEST_OPEN_DIALOG_FILE");
-         if (!file)
-         {
-           file = tinyfd_openFileDialog( "Open File", ".", 0, nullptr, nullptr, false);
-         }
+  interactor.addCommand("open_file_dialog", 
+    [this](const std::vector<std::string>&)
+    {
+       const char* file = std::getenv("CTEST_OPEN_DIALOG_FILE");
+       if (!file)
+       {
+         file = tinyfd_openFileDialog( "Open File", ".", 0, nullptr, nullptr, false);
+       }
 
-         if (file) 
+       if (file) 
+       {
+         int index = this->AddFile(file);
+         if (index > -1) 
          {
-           int index = this->AddFile(file);
-           if (index > -1) 
-           {
-             this->LoadFileGroup(index);
-           }
+           this->LoadFileGroup(index);
          }
+       }
     });
 }
