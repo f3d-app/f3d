@@ -76,7 +76,7 @@ public:
     explicit string_template(const std::string& templateString);
 
     /** Substitute variables based on a `std::string(const std::string&)` function.
-     * Variables for which the fuction throws an `std::out_of_range` exception are left untouched.
+     * Variables for which the function throws an `std::out_of_range` exception are left untouched.
      */
     template<typename F>
     string_template& substitute(F lookup);
