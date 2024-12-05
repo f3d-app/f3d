@@ -27,6 +27,7 @@ endif()
 if(APPLE)
   list(APPEND F3D_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/F3DNSDelegate.mm")
 endif()
+
 #add source for dialogs
 list(APPEND F3D_SOURCE_FILES "${F3D_SOURCE_DIR}/external/tinyfiledialogs/tinyfiledialogs.cxx")
 
