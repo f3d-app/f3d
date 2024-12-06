@@ -3,6 +3,11 @@
  * @brief   An ImGui console window
  *
  * This class is used instead of vtkF3DConsoleOutputWindow if F3D_MODULE_UI is enabled
+ * On top of the regular behavior of printing the log in the console, all the logs are also added
+ * in an imgui window so the user can access it easily by pressing `Escape`.
+ * It is also adding an input widget where commands registered in libf3d can be executed.
+ * Finally, a small icon is displayed on the top right corner when the console is hidden but a new
+ * warning or error is logged.
  */
 
 #ifndef vtkF3DImguiConsole_h
