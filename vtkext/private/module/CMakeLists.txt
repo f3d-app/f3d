@@ -90,7 +90,7 @@ endif()
 # In theory the test should be `if (VTK_USE_X)` but this variable is
 # only exported starting from VTK 9.4
 if(UNIX AND NOT APPLE AND NOT EMSCRIPTEN AND NOT ANDROID)
-  list(APPEND classes vtkF3DGLXRenderWindow)
+  list(APPEND classes vtkF3DGLXRenderWindow vtkF3DEGLRenderWindow)
 endif()
 
 if(ANDROID)

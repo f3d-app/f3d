@@ -234,7 +234,7 @@ public:
     else if (event == vtkF3DConsoleOutputWindow::ShowEvent ||
       event == vtkF3DConsoleOutputWindow::HideEvent)
     {
-      self->Options.ui.console = event == vtkF3DConsoleOutputWindow::ShowEvent;
+      self->Options.ui.console = (event == vtkF3DConsoleOutputWindow::ShowEvent);
     }
 
     self->NeedFullRender = true;
@@ -366,7 +366,7 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  void StartInteractor()
+  void StartEventLoop()
   {
 #if F3D_MODULE_UI
     // create event loop to refresh UI and trigger full render if needed
@@ -392,7 +392,11 @@ public:
         }
       });
 #endif
+  }
 
+  //----------------------------------------------------------------------------
+  void StartInteractor()
+  {
     this->VTKInteractor->Start();
   }
 
@@ -1113,6 +1117,8 @@ bool interactor_impl::playInteraction(const std::string& file)
     this->Internals->Recorder->Off();
     this->Internals->Recorder->Clear();
 
+    this->Internals->StartEventLoop();
+
     std::string cleanFile = vtksys::SystemTools::CollapseFullPath(file);
     this->Internals->Recorder->SetFileName(cleanFile.c_str());
     this->Internals->Window.UpdateDynamicOptions();
@@ -1163,6 +1169,7 @@ bool interactor_impl::recordInteraction(const std::string& file)
 //----------------------------------------------------------------------------
 void interactor_impl::start()
 {
+  this->Internals->StartEventLoop();
   this->Internals->Window.UpdateDynamicOptions();
   this->Internals->StartInteractor();
 }
