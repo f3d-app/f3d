@@ -68,5 +68,38 @@ int TestSDKUtils(int argc, char* argv[])
   test.expect<f3d::utils::tokenize_exception>("tokenize_exception with unfinishied escape",
     [&]() { f3d::utils::tokenize(R"(set render.hdri.file file path back\)"); });
 
+  //
+
+  test("string_template: basic substitution",
+    f3d::utils::string_template("{greeting} {name}!")
+      .substitute({ { "greeting", "hello" }, { "name", "World" } })
+      .str(),
+    "hello World!");
+
+  test("string_template: partial substitution",
+    f3d::utils::string_template("{greeting} {name}!").substitute({ { "greeting", "hello" } }).str(),
+    "hello {name}!");
+
+  test("string_template: multi-step substitution",
+    f3d::utils::string_template("{greeting} {name}!")
+      .substitute({ { "greeting", "hello" } })
+      .substitute({ { "name", "World" } })
+      .str(),
+    "hello World!");
+
+  test("string_template: escaped variable substitution",
+    f3d::utils::string_template("{greeting} {{name}}!")
+      .substitute({ { "greeting", "hello" } })
+      .substitute({ { "name", "World" } })
+      .str(),
+    "hello {name}!");
+
+  test("string_template: non-recursive substitution",
+    f3d::utils::string_template("{greeting} {name}!")
+      .substitute({ { "greeting", "hello" }, { "name", "{foo}" } })
+      .substitute({ { "foo", "bar" } })
+      .str(),
+    "hello {foo}!");
+
   return test.result();
 }
