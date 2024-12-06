@@ -376,13 +376,17 @@ public:
         if (std::regex_match(var, numberingRe))
         {
           std::stringstream formattedNumber;
+          const std::string fmt = std::regex_replace(var, numberingRe, "$2");
           try
           {
-            const std::string fmt = std::regex_replace(var, numberingRe, "$2");
             formattedNumber << std::setfill('0') << std::setw(std::stoi(fmt)) << number;
           }
           catch (std::invalid_argument&)
           {
+            if (!fmt.empty() && number == 1) /* avoid spamming the log */
+            {
+              f3d::log::warn("ignoring invalid number format for \"", var, "\"");
+            }
             formattedNumber << std::setw(0) << number;
           }
           return std::regex_replace(var, numberingRe, formattedNumber.str());
