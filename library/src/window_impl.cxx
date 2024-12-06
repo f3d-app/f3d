@@ -71,7 +71,6 @@ public:
   {
     // Override VTK logic
 #ifdef _WIN32
-    log::info("Rendering backend is WGL.");
     return vtkSmartPointer<vtkF3DWGLRenderWindow>::New();
 #elif __linux__
 #if defined(VTK_USE_X)
@@ -79,7 +78,6 @@ public:
     vtkSmartPointer<vtkRenderWindow> glxRenWin = vtkSmartPointer<vtkF3DGLXRenderWindow>::New();
     if (glxRenWin)
     {
-      log::info("Rendering backend is GLX.");
       return glxRenWin;
     }
 #endif
@@ -88,12 +86,10 @@ public:
     vtkSmartPointer<vtkRenderWindow> eglRenWin = vtkSmartPointer<vtkF3DEGLRenderWindow>::New();
     if (eglRenWin)
     {
-      log::info("Rendering backend is EGL.");
       return eglRenWin;
     }
 #endif
     // OSMesa
-    log::info("Rendering backend is OSMesa.");
     return vtkSmartPointer<vtkOSOpenGLRenderWindow>::New();
 #else
     // fallback on VTK logic for other systems
@@ -126,7 +122,7 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   }
   else if (type == Type::EGL)
   {
-#if defined(VTK_OPENGL_HAS_EGL) && VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
+#if defined(VTK_OPENGL_HAS_EGL)
     this->Internals->RenWin = vtkSmartPointer<vtkF3DEGLRenderWindow>::New();
 #else
     throw engine::no_window_exception("Window type is EGL but VTK EGL support is not enabled");
