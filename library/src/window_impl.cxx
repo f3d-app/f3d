@@ -89,8 +89,11 @@ public:
       return eglRenWin;
     }
 #endif
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
     // OSMesa
     return vtkSmartPointer<vtkOSOpenGLRenderWindow>::New();
+#endif
+    return nullptr;
 #else
     // fallback on VTK logic for other systems
     return vtkSmartPointer<vtkRenderWindow>::New();
