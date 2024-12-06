@@ -383,10 +383,6 @@ public:
           }
           catch (std::invalid_argument&)
           {
-            if (number == 1) /* avoid spamming the log */
-            {
-              f3d::log::warn("ignoring invalid number format for \"", var, "\"");
-            }
             formattedNumber << std::setw(0) << number;
           }
           return std::regex_replace(var, numberingRe, formattedNumber.str());
