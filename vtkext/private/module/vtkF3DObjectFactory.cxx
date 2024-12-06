@@ -48,7 +48,6 @@ vtkF3DObjectFactory::vtkF3DObjectFactory()
     "vtkPointGaussianMapper override for F3D", 1, ::Factory<vtkF3DPointSplatMapper>);
 #endif
 
-
 #ifdef __ANDROID__
   this->RegisterOverride("vtkOutputWindow", "vtkF3DAndroidLogOutputWindow",
     "vtkOutputWindow override for F3D", 1, ::Factory<vtkF3DAndroidLogOutputWindow>);
