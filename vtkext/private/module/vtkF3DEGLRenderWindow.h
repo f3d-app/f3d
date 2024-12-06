@@ -6,13 +6,13 @@
 #ifndef vtkF3DEGLRenderWindow_h
 #define vtkF3DEGLRenderWindow_h
 
-#include <vtkXOpenGLRenderWindow.h>
+#include <vtkEGLRenderWindow.h>
 
-class vtkF3DEGLRenderWindow : public vtkXOpenGLRenderWindow
+class vtkF3DEGLRenderWindow : public vtkEGLRenderWindow
 {
 public:
   static vtkF3DEGLRenderWindow* New();
-  vtkTypeMacro(vtkF3DEGLRenderWindow, vtkXOpenGLRenderWindow);
+  vtkTypeMacro(vtkF3DEGLRenderWindow, vtkEGLRenderWindow);
 
 protected:
   vtkF3DEGLRenderWindow();

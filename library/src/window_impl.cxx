@@ -76,20 +76,20 @@ public:
 #elif __linux__
 #if defined(VTK_USE_X)
     // try GLX
-    vtkSmartPointer<vtkRenderWindow> renWin = vtkSmartPointer<vtkF3DGLXRenderWindow>::New();
-    if (renWin)
+    vtkSmartPointer<vtkRenderWindow> glxRenWin = vtkSmartPointer<vtkF3DGLXRenderWindow>::New();
+    if (glxRenWin)
     {
       log::info("Rendering backend is GLX.");
-      return renWin;
+      return glxRenWin;
     }
 #endif
 #if defined(VTK_OPENGL_HAS_EGL)
     // try EGL
-    vtkSmartPointer<vtkRenderWindow> renWin = vtkSmartPointer<vtkF3DEGLRenderWindow>::New();
-    if (renWin)
+    vtkSmartPointer<vtkRenderWindow> eglRenWin = vtkSmartPointer<vtkF3DEGLRenderWindow>::New();
+    if (eglRenWin)
     {
       log::info("Rendering backend is EGL.");
-      return renWin;
+      return eglRenWin;
     }
 #endif
     // OSMesa
