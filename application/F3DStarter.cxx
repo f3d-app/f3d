@@ -374,14 +374,14 @@ public:
         if (std::regex_match(var, numberingRe))
         {
           std::stringstream formattedNumber;
+          const std::string fmt = std::regex_replace(var, numberingRe, "$2");
           try
           {
-            const std::string fmt = std::regex_replace(var, numberingRe, "$2");
             formattedNumber << std::setfill('0') << std::setw(std::stoi(fmt)) << number;
           }
           catch (std::invalid_argument&)
           {
-            if (number == 1) /* avoid spamming the log */
+            if (!fmt.empty() && number == 1) /* avoid spamming the log */
             {
               f3d::log::warn("ignoring invalid number format for \"", var, "\"");
             }
@@ -1373,6 +1373,7 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate, bool minima
   {
     options.ui.scalar_bar = false;
     options.ui.cheatsheet = false;
+    options.ui.console = false;
     options.ui.filename = false;
     options.ui.fps = false;
     options.ui.metadata = false;

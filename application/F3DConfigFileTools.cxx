@@ -145,10 +145,10 @@ F3DConfigFileTools::ReadConfigFiles(const std::string& userConfig)
     }
   }
 
-  // If we used a configSearch but did not find any, warn the user
+  // If we used a configSearch but did not find any, inform the user
   if (!configSearch.empty() && actualConfigFilePaths.empty())
   {
-    f3d::log::warn("Configuration file for \"", configSearch, "\" could not be found");
+    f3d::log::info("Configuration file for \"", configSearch, "\" could not be found");
   }
 
   // Read config files

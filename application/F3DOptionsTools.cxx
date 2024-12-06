@@ -219,7 +219,6 @@ void PrintHelp(const std::string& execName, const cxxopts::Options& cxxOptions)
   }
   f3d::log::info("\nReport bugs to https://github.com/f3d-app/f3d/issues");
   f3d::log::setUseColoring(true);
-  f3d::log::waitForUser();
 }
 
 //----------------------------------------------------------------------------
@@ -266,7 +265,6 @@ void PrintVersion()
   }
   f3d::log::info("License " + libInfo.License + ".");
   f3d::log::setUseColoring(true);
-  f3d::log::waitForUser();
 }
 
 //----------------------------------------------------------------------------
@@ -338,7 +336,6 @@ void PrintReadersList()
       f3d::log::info(readerLine.str());
     }
   }
-  f3d::log::waitForUser();
 }
 }
 
@@ -530,7 +527,6 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
     }
     if (foundUnknownOption)
     {
-      f3d::log::waitForUser();
       throw F3DExFailure("unknown options");
     }
 

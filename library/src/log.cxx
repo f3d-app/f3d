@@ -105,11 +105,4 @@ void log::setVerboseLevel(log::VerboseLevel level, bool forceStdErr)
   // Display third parties log on Debug level
   vtkObject::SetGlobalWarningDisplay(level == log::VerboseLevel::DEBUG);
 }
-
-//----------------------------------------------------------------------------
-void log::waitForUser()
-{
-  detail::init::initialize();
-  F3DLog::WaitForUser();
-}
 }

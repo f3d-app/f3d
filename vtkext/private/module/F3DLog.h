@@ -55,13 +55,6 @@ void SetUseColoring(bool use);
  * are written to stdout.
  */
 void SetStandardStream(StandardStream mode);
-
-/**
- * If output window is a vtkF3DWin32OutputWindow,
- * this calls WaitForUser on the output window.
- * No effect otherwise.
- */
-void WaitForUser();
 };
 
 #endif

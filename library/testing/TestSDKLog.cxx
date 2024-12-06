@@ -51,6 +51,5 @@ int TestSDKLog(int argc, char* argv[])
   f3d::log::warn("Test Warning Coloring");
   f3d::log::error("Test Error Coloring");
 
-  f3d::log::waitForUser(); // This just returns immediately in testing environment
   return EXIT_SUCCESS;
 }
