@@ -9,7 +9,6 @@
 #include "F3DOptionsTools.h"
 #include "F3DPluginsTools.h"
 #include "F3DSystemTools.h"
-#include <cstdlib>
 
 #define DMON_IMPL
 #ifdef WIN32
