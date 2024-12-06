@@ -187,10 +187,8 @@ bool vtkF3DImguiObserver::MouseMove(vtkObject* caller, unsigned long, void*)
 {
   vtkRenderWindowInteractor* that = static_cast<vtkRenderWindowInteractor*>(caller);
 
-  int sz[2];
-  int p[2];
-  that->GetEventPosition(p);
-  that->GetSize(sz);
+  int* p = that->GetEventPosition();
+  int* sz = that->GetRenderWindow()->GetSize();
   ImGuiIO& io = ImGui::GetIO();
   io.AddMousePosEvent(static_cast<float>(p[0]), static_cast<float>(sz[1] - p[1] - 1));
 
