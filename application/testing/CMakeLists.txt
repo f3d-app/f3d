@@ -463,7 +463,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   f3d_test(NAME TestInvalidHDRI DATA cow.vtp HDRI invalid.png REGEXP "Cannot open HDRI file" NO_BASELINE)
 
   # Use a dummy HDRI for simplicity to test default HDRI
-  f3d_test(NAME TestHDRIDefault DATA suzanne.ply HDRI dummy.png THRESHOLD 0.11 UI) # Threshold is needed for legacy comparison method for VTK 9.3 
+  f3d_test(NAME TestHDRIDefault DATA suzanne.ply HDRI dummy.png THRESHOLD 0.11 UI) # Threshold is needed for legacy comparison method for VTK 9.3
 
   configure_file("${F3D_SOURCE_DIR}/testing/configs/hdri.json.in" "${CMAKE_BINARY_DIR}/hdri.json")
   f3d_test(NAME TestConfigFileHDRI DATA dragon.vtu CONFIG "${CMAKE_BINARY_DIR}/hdri.json" LONG_TIMEOUT)

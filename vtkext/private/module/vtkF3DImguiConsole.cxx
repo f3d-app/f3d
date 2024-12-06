@@ -95,19 +95,26 @@ void vtkF3DImguiConsole::ShowConsole()
     {
       bool hasColor = true;
 
-      switch (severity)
+      if (this->UseColoring)
       {
-        case Internals::LogType::Error:
-          ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
-          break;
-        case Internals::LogType::Warning:
-          ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 0.0f, 1.0f));
-          break;
-        case Internals::LogType::Typed:
-          ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 1.0f, 1.0f, 1.0f));
-          break;
-        default:
-          hasColor = false;
+        switch (severity)
+        {
+          case Internals::LogType::Error:
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+            break;
+          case Internals::LogType::Warning:
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 0.0f, 1.0f));
+            break;
+          case Internals::LogType::Typed:
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 1.0f, 1.0f, 1.0f));
+            break;
+          default:
+            hasColor = false;
+        }
+      }
+      else
+      {
+        hasColor = false;
       }
 
       ImGui::TextUnformatted(msg.c_str());

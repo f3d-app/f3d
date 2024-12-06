@@ -83,6 +83,7 @@ public:
   /**
    * Set the font file path
    * Use Inter font by default if empty
+   * A valid OpenGL context must be specified by providing the render window
    */
   void SetFontFile(vtkOpenGLRenderWindow* renWin, const std::string& font);
 
