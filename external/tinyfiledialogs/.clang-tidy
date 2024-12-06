@@ -1,1 +1,3 @@
-Checks: '-*'
+Checks: '-*,misc-definitions-in-headers'
+CheckOptions:
+  - { key: HeaderFileExtensions, value: "x" }
