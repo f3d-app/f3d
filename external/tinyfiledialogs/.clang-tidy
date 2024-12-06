@@ -1,3 +1,4 @@
-Checks: 'misc-definitions-in-headers,-*'
+InheritParentConfig: false
+Checks: '-*,misc-definitions-in-headers'
 CheckOptions:
   - { key: HeaderFileExtensions, value: "x" }

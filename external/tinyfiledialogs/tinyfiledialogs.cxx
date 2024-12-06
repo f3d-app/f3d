@@ -1,3 +1,4 @@
+// NOLINTBEGIN
 /* SPDX-License-Identifier: Zlib
 Copyright (c) 2014 - 2024 Guillaume Vareille http://ysengrin.com
 	 ________________________________________________________________
@@ -8169,3 +8170,4 @@ tinyfd_messageBox("The selected hexcolor is",
 #pragma warning(default:4100)
 #pragma warning(default:4706)
 #endif
+// NOLINTEND
