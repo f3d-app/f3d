@@ -76,7 +76,8 @@ public:
     explicit string_template(const std::string& templateString);
 
     /** Substitute variables based on a `std::string(const std::string&)` function.
-     * Variables for which the function throws an `std::out_of_range` exception are left untouched.
+     * Variables for which the function throws a `string_template::lookup_error` exception
+     * are left untouched.
      */
     template<typename F>
     string_template& substitute(F lookup);
@@ -90,6 +91,17 @@ public:
 
     /** List the remaining un-substituted variables. */
     std::vector<std::string> variables() const;
+
+    /**
+     * Exception to be thrown by substitution functions to let untouched variables through.
+     */
+    struct lookup_error : public std::out_of_range
+    {
+      explicit lookup_error(const std::string& what = "")
+        : std::out_of_range(what)
+      {
+      }
+    };
   };
 };
 
@@ -136,7 +148,7 @@ utils::string_template& utils::string_template::substitute(F lookup)
         fragment = lookup(fragment);
         isVariable = false;
       }
-      catch (const std::out_of_range&)
+      catch (const lookup_error&)
       {
         /* leave variable as is */
       }
@@ -149,7 +161,18 @@ utils::string_template& utils::string_template::substitute(F lookup)
 inline utils::string_template& utils::string_template::substitute(
   const std::map<std::string, std::string>& lookup)
 {
-  return this->substitute([&](const std::string& key) { return lookup.at(key); });
+  return this->substitute(
+    [&](const std::string& key)
+    {
+      try
+      {
+        return lookup.at(key);
+      }
+      catch (const std::out_of_range&)
+      {
+        throw lookup_error(key);
+      }
+    });
 }
 
 //------------------------------------------------------------------------------

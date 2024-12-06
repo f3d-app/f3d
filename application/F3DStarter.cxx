@@ -335,7 +335,7 @@ public:
         }
         return formatted;
       }
-      throw std::out_of_range(var);
+      throw f3d::utils::string_template::lookup_error(var);
     };
 
     f3d::utils::string_template stringTemplate(templateString);
@@ -381,7 +381,7 @@ public:
           }
           return std::regex_replace(var, numberingRe, formattedNumber.str());
         }
-        throw std::out_of_range(var);
+        throw f3d::utils::string_template::lookup_error(var);
       };
     };
 
