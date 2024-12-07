@@ -47,7 +47,6 @@ void animationManager::Initialize()
   this->CurrentTime = 0;
   this->CurrentTimeSet = false;
 
-  // This can be -1 if animation support is not implemented in the importer
   this->AvailAnimations = this->Importer->GetNumberOfAnimations();
   if (this->AvailAnimations > 0 && this->Interactor)
   {

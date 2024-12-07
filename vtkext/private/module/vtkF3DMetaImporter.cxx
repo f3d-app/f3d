@@ -309,18 +309,29 @@ std::string vtkF3DMetaImporter::GetOutputsDescription()
 //----------------------------------------------------------------------------
 vtkIdType vtkF3DMetaImporter::GetNumberOfAnimations()
 {
+  // Importer->GetNumberOfAnimations() can be -1 if animation support is not implemented in the importer
   return std::accumulate(this->Pimpl->Importers.begin(), this->Pimpl->Importers.end(), 0,
     [](vtkIdType a, const auto& importerPair)
-    { return a + importerPair.Importer->GetNumberOfAnimations(); });
+    {
+      vtkIdType nAnim = importerPair.Importer->GetNumberOfAnimations();
+      a += nAnim >= 0 ? nAnim : 0;
+      return a;
+    });
 }
 
 //----------------------------------------------------------------------------
 std::string vtkF3DMetaImporter::GetAnimationName(vtkIdType animationIndex)
 {
+  // Importer->GetNumberOfAnimations() can be -1 if animation support is not implemented in the importer
   vtkIdType localAnimationIndex = animationIndex;
   for (const auto& importerPair : this->Pimpl->Importers)
   {
     vtkIdType nAnim = importerPair.Importer->GetNumberOfAnimations();
+    if (nAnim < 0)
+    {
+      nAnim = 0;
+    }
+
     if (localAnimationIndex < nAnim)
     {
       std::string name = importerPair.Importer->GetAnimationName(localAnimationIndex);
@@ -345,6 +356,11 @@ void vtkF3DMetaImporter::EnableAnimation(vtkIdType animationIndex)
   for (const auto& importerPair : this->Pimpl->Importers)
   {
     vtkIdType nAnim = importerPair.Importer->GetNumberOfAnimations();
+    if (nAnim < 0)
+    {
+      nAnim = 0;
+    }
+
     if (localAnimationIndex < nAnim)
     {
       importerPair.Importer->EnableAnimation(localAnimationIndex);
@@ -364,6 +380,11 @@ void vtkF3DMetaImporter::DisableAnimation(vtkIdType animationIndex)
   for (const auto& importerPair : this->Pimpl->Importers)
   {
     vtkIdType nAnim = importerPair.Importer->GetNumberOfAnimations();
+    if (nAnim < 0)
+    {
+      nAnim = 0;
+    }
+
     if (localAnimationIndex < nAnim)
     {
       importerPair.Importer->DisableAnimation(localAnimationIndex);
@@ -383,6 +404,11 @@ bool vtkF3DMetaImporter::IsAnimationEnabled(vtkIdType animationIndex)
   for (const auto& importerPair : this->Pimpl->Importers)
   {
     vtkIdType nAnim = importerPair.Importer->GetNumberOfAnimations();
+    if (nAnim < 0)
+    {
+      nAnim = 0;
+    }
+
     if (localAnimationIndex < nAnim)
     {
       return importerPair.Importer->IsAnimationEnabled(localAnimationIndex);
@@ -441,6 +467,11 @@ bool vtkF3DMetaImporter::GetTemporalInformation(vtkIdType animationIndex, double
   for (const auto& importerPair : this->Pimpl->Importers)
   {
     vtkIdType nAnim = importerPair.Importer->GetNumberOfAnimations();
+    if (nAnim < 0)
+    {
+      nAnim = 0;
+    }
+
     if (localAnimationIndex < nAnim)
     {
       return importerPair.Importer->GetTemporalInformation(
