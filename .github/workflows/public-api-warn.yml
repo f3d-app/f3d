@@ -3,6 +3,7 @@ on:
   pull_request_target:
     paths:
       - 'library/public/*.h'
+      - 'library/public/*.h.in'
 
 jobs:
   public-api-warn:

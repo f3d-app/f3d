@@ -1,0 +1,27 @@
+name: Submit Winget Package to Windows Package Manager Community Repository
+on:
+  release:
+    types: [released]
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: "Specific tag name"
+        required: true
+        type: string
+jobs:
+  winget-publish:
+    name: Publish winget package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set winget version env
+        env:
+          TAG_NAME: ${{ inputs.tag_name || github.event.release.tag_name }}
+        run: echo "WINGET_TAG_NAME=$(echo ${TAG_NAME#v})" >> $GITHUB_ENV
+      - name: Submit package to Windows Package Manager Community Repository
+        uses: vedantmgoyal2009/winget-releaser@v2
+        with:
+          identifier: f3d-app.f3d
+          installers-regex: '^F3D-[\d\.]+-Windows-x86_64\.exe$'
+          version: ${{ env.WINGET_TAG_NAME }}
+          release-tag: ${{ inputs.tag_name || github.event.release.tag_name }}
+          token: ${{ secrets.WINGET_ACC_TOKEN }}

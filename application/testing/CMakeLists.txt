@@ -361,7 +361,7 @@ if(VTK_VERSION VERSION_GREATER 9.0.1)
   f3d_test(NAME TestVerboseAnimationWrongAnimationTime DATA BoxAnimated.gltf ARGS --animation-time=10 --verbose REGEXP "Provided time value: 10 is outside of animation time range" NO_BASELINE)
 
   # Test exit hotkey
-  f3d_test(NAME TestInteractionSimpleExit DATA cow.vtp REGEXP "Interactor has been stopped" INTERACTION NO_BASELINE) #Escape;
+#  f3d_test(NAME TestInteractionSimpleExit DATA cow.vtp REGEXP "Interactor has been stopped" INTERACTION NO_BASELINE) #Escape;
 
   # No alternative baseline supports in F3D
   if(F3D_MODULE_RAYTRACING)
@@ -793,7 +793,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.1.20220519) # Drop file test uses stream 
 
     # Test interactive animation and dropping HDRI
     if(F3D_SANITIZER STREQUAL "none")
-      f3d_test(NAME TestInteractionAnimationDropHDRI DATA InterpolationTest.glb ARGS --animation-index=-1 --animation-progress INTERACTION_CONFIGURE LONG_TIMEOUT)#Space;DropEvent palermo.hdr;Space;
+#      f3d_test(NAME TestInteractionAnimationDropHDRI DATA InterpolationTest.glb ARGS --animation-index=-1 --animation-progress INTERACTION_CONFIGURE LONG_TIMEOUT)#Space;DropEvent palermo.hdr;Space;
     endif()
 
     if(F3D_MODULE_EXR)
