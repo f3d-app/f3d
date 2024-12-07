@@ -1,0 +1,6 @@
+NAME
+  f3d::vtkextPDAL
+DESCRIPTION
+  A VTK module for the PDAL plugin
+DEPENDS
+  VTK::IOPDAL
