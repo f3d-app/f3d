@@ -288,6 +288,7 @@ f3d_ss_test(NAME Model TEMPLATE ${_screenshot_dir}/{model}_{model.ext}_{model_ex
 f3d_ss_test(NAME ModelN1 TEMPLATE ${_screenshot_dir}/{model}_{n}_{n:2}.png EXPECTED ${_screenshot_dir}/suzanne_1_01.png)
 f3d_ss_test(NAME ModelN2 TEMPLATE ${_screenshot_dir}/{model}_{n}_{n:2}.png EXPECTED ${_screenshot_dir}/suzanne_2_02.png DEPENDS TestScreenshotModelN1)
 f3d_ss_template_test(NAME Date TEMPLATE ${_screenshot_dir}/{model}_{date}_{date:%Y}.png EXPECTED_REGEX suzanne_[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]_[0-9][0-9][0-9][0-9]\.png)
+f3d_ss_template_test(NAME InvalidFormats TEMPLATE ${_screenshot_dir}/{model}_{date:blah}_{n:blah}_{unknown}.png EXPECTED_REGEX suzanne_blah_1_\{unknown\}\.png)
 f3d_ss_test(NAME Esc TEMPLATE ${_screenshot_dir}/{model}_{{model}}_{}.png EXPECTED ${_screenshot_dir}/suzanne_{model}_{}.png)
 f3d_ss_test(NAME Minimal MINIMAL TEMPLATE ${_screenshot_dir}/minimal.png EXPECTED ${_screenshot_dir}/minimal.png)
 
