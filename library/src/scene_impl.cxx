@@ -129,21 +129,7 @@ public:
     progressWidget->Off();
 
     // Initialize the animation using temporal information from the importer
-    if (this->AnimationManager.Initialize())
-    {
-      if (this->Options.scene.animation.time.has_value())
-      {
-        double animationTime = this->Options.scene.animation.time.value();
-        double timeRange[2];
-        this->AnimationManager.GetTimeRange(timeRange);
-
-        // We assume importers import data at timeRange[0] when not specified
-        if (animationTime != timeRange[0])
-        {
-          this->AnimationManager.LoadAtTime(animationTime);
-        }
-      }
-    }
+    this->AnimationManager.Initialize();
 
     // Display output description
     scene_impl::internals::DisplayImporterDescription(this->MetaImporter);
@@ -324,6 +310,19 @@ scene& scene_impl::clear()
 bool scene_impl::supports(const fs::path& filePath)
 {
   return f3d::factory::instance()->getReader(filePath.string()) != nullptr;
+}
+
+//----------------------------------------------------------------------------
+scene& scene_impl::loadAnimationTime(double timeValue)
+{
+  this->Internals->AnimationManager.LoadAtTime(timeValue);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+std::pair<double, double> scene_impl::animationTimeRange()
+{
+  return this->Internals->AnimationManager.GetTimeRange();
 }
 
 //----------------------------------------------------------------------------

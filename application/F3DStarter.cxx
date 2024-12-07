@@ -83,6 +83,7 @@ public:
     bool NoRender;
     std::string RenderingBackend;
     double MaxSize;
+    std::optional<double> AnimationTime;
     bool Watch;
     std::vector<std::string> Plugins;
     std::string ScreenshotFilename;
@@ -141,9 +142,12 @@ public:
       cam.setPosition(pos);
       reset = true;
     }
-    if (camConf.CameraPosition.size() != 3 && camConf.CameraZoomFactor > 0)
+    if (camConf.CameraPosition.size() != 3)
     {
-      zoomFactor = camConf.CameraZoomFactor;
+      if (camConf.CameraZoomFactor > 0)
+      {
+        zoomFactor = camConf.CameraZoomFactor;
+      }
       reset = true;
     }
     if (reset)
@@ -538,6 +542,10 @@ public:
     this->AppOptions.RenderingBackend =
       f3d::options::parse<std::string>(appOptions.at("rendering-backend"));
     this->AppOptions.MaxSize = f3d::options::parse<double>(appOptions.at("max-size"));
+    if (!appOptions.at("animation-time").empty())
+    {
+      this->AppOptions.AnimationTime = f3d::options::parse<double>(appOptions.at("animation-time"));
+    }
     this->AppOptions.Watch = f3d::options::parse<bool>(appOptions.at("watch"));
     this->AppOptions.Plugins = { f3d::options::parse<std::vector<std::string>>(
       appOptions.at("load-plugins")) };
@@ -1233,6 +1241,11 @@ void F3DStarter::LoadFileGroup(
       {
         // Add files to the scene
         scene.add(localPaths);
+
+        if (this->Internals->AppOptions.AnimationTime.has_value())
+        {
+          scene.loadAnimationTime(this->Internals->AppOptions.AnimationTime.value());
+        }
 
         // Update loaded files
         std::copy(

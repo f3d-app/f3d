@@ -82,6 +82,20 @@ public:
    */
   virtual bool supports(const std::filesystem::path& filePath) = 0;
 
+  /**
+   * Load added files at provided time value if they contain any animation
+   * Providing a timeVale outside of the current animationTimeRange will clamp
+   * to the closest value in the range.
+   * Does not do anything if there is no animations.
+   */
+  virtual scene& loadAnimationTime(double timeValue) = 0;
+
+  /**
+   * Get animation time range of currently added files.
+   * Returns [0, 0] if there is no animations.
+   */
+  virtual std::pair<double, double> animationTimeRange() = 0;
+
 protected:
   //! @cond
   scene() = default;

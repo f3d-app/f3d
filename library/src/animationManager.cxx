@@ -39,7 +39,7 @@ void animationManager::SetInteractor(interactor_impl* interactor)
 }
 
 //----------------------------------------------------------------------------
-bool animationManager::Initialize()
+void animationManager::Initialize()
 {
   assert(this->Importer);
   this->HasAnimation = false;
@@ -82,12 +82,7 @@ bool animationManager::Initialize()
     {
       log::warn("An animation index has been specified but there are no animation available.");
     }
-    if (this->Options.scene.animation.time.has_value())
-    {
-      log::warn("No animation available, cannot load a specific animation time");
-    }
-
-    return false;
+    return;
   }
   else
   {
@@ -137,7 +132,7 @@ bool animationManager::Initialize()
     log::warn("Animation(s) time range delta is invalid: [", this->TimeRange[0], ", ",
       this->TimeRange[1], "]. Disabling animation.");
     this->HasAnimation = false;
-    return false;
+    return;
   }
   else
   {
@@ -150,7 +145,6 @@ bool animationManager::Initialize()
   {
     this->StartAnimation();
   }
-  return true;
 }
 
 //----------------------------------------------------------------------------
@@ -253,6 +247,7 @@ bool animationManager::LoadAtTime(double timeValue)
   assert(this->Importer);
   if (!this->HasAnimation)
   {
+    log::warn("No animation available, cannot load a specific animation time");
     return false;
   }
 
@@ -358,9 +353,8 @@ void animationManager::EnableOnlyCurrentAnimation()
 }
 
 //----------------------------------------------------------------------------
-void animationManager::GetTimeRange(double timeRange[2])
+std::pair<double, double> animationManager::GetTimeRange()
 {
-  timeRange[0] = this->TimeRange[0];
-  timeRange[1] = this->TimeRange[1];
+  return std::make_pair(this->TimeRange[0], this->TimeRange[1]);
 }
 }
