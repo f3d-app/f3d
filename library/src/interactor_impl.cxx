@@ -1049,7 +1049,6 @@ bool interactor_impl::playInteraction(const std::string& file)
 
     std::string cleanFile = vtksys::SystemTools::CollapseFullPath(file);
     this->Internals->Recorder->SetFileName(cleanFile.c_str());
-    this->Internals->Window.UpdateDynamicOptions();
     this->Internals->Recorder->Play();
   }
 

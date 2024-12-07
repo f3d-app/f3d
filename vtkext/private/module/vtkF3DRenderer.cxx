@@ -246,6 +246,9 @@ void vtkF3DRenderer::Initialize()
   this->RemoveAllViewProps();
   this->RemoveAllLights();
 
+  this->ImporterTimeStamp = 0;
+  this->ImporterUpdateTimeStamp = 0;
+
   this->AddActor(this->GridActor);
   this->AddActor(this->DropZoneActor);
   this->AddActor(this->SkyboxActor);
@@ -268,6 +271,8 @@ void vtkF3DRenderer::Initialize()
 
   this->AddActor2D(this->ScalarBarActor);
   this->ScalarBarActor->VisibilityOff();
+
+  this->ExpandingRangeSet = false;
 
   this->ColorTransferFunctionConfigured = false;
   this->ColoringMappersConfigured = false;
@@ -1431,21 +1436,29 @@ void vtkF3DRenderer::UpdateActors()
   // XXX: Importer only modify itself when adding a new importer,
   // not when updating at a time step
   vtkMTimeType importerMTime = this->Importer->GetMTime();
-  bool importerChanged = this->Importer->GetMTime() > this->ImporterTimeStamp;
-  if (importerChanged)
+  if (importerMTime > this->ImporterTimeStamp)
   {
+    this->ActorsPropertiesConfigured = false;
+    this->GridConfigured = false;
+  }
+  this->ImporterTimeStamp = importerMTime;
+
+  // XXX: Handle animation update in importer, which may have an impact on the colormap
+  // We assume animation change do not change the number of actors
+  vtkMTimeType importerUpdateMTime = this->Importer->GetUpdateMTime();
+  if (this->UsingExpandingRange && importerUpdateMTime > this->ImporterTimeStamp)
+  {
+    // XXX: This could be improved further to only configure mappers and actors
+    // when the coloring range actually change
     this->ColorTransferFunctionConfigured = false;
     this->ColoringMappersConfigured = false;
     this->PointSpritesMappersConfigured = false;
     this->VolumePropsAndMappersConfigured = false;
     this->ScalarBarActorConfigured = false;
-    this->ActorsPropertiesConfigured = false;
-    this->GridConfigured = false;
     this->MetaDataConfigured = false;
-    this->ActorsPropertiesConfigured = false;
     this->ColoringConfigured = false;
   }
-  this->ImporterTimeStamp = importerMTime;
+  this->ImporterUpdateTimeStamp = importerUpdateMTime;
 
   if (!this->ActorsPropertiesConfigured)
   {
@@ -2086,6 +2099,7 @@ void vtkF3DRenderer::SetUseCellColoring(bool useCell)
     this->ScalarBarActorConfigured = false;
     this->CheatSheetConfigured = false;
     this->ColoringConfigured = false;
+    this->ExpandingRangeSet = false;
   }
 }
 
@@ -2102,6 +2116,7 @@ void vtkF3DRenderer::SetArrayNameForColoring(const std::optional<std::string>& a
     this->ScalarBarActorConfigured = false;
     this->CheatSheetConfigured = false;
     this->ColoringConfigured = false;
+    this->ExpandingRangeSet = false;
   }
 }
 
@@ -2124,6 +2139,7 @@ void vtkF3DRenderer::SetComponentForColoring(int component)
     this->ScalarBarActorConfigured = false;
     this->CheatSheetConfigured = false;
     this->ColoringConfigured = false;
+    this->ExpandingRangeSet = false;
   }
 }
 
@@ -2410,12 +2426,12 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
   }
 
   // Set range
-  bool autoRange = true;
+  this->UsingExpandingRange = true;
   if (this->UserScalarBarRange.has_value())
   {
     if (this->UserScalarBarRange.value().size() == 2 && this->UserScalarBarRange.value()[0] <= this->UserScalarBarRange.value()[1])
     {
-      autoRange = false;
+      this->UsingExpandingRange = false;
       this->ColorRange[0] = this->UserScalarBarRange.value()[0];
       this->ColorRange[1] = this->UserScalarBarRange.value()[1];
     }
@@ -2426,18 +2442,32 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
     }
   }
 
-  if (autoRange)
+  if (this->UsingExpandingRange)
   {
+    double minRange;
+    double maxRange;
     if (this->ComponentForColoring >= 0)
     {
-      this->ColorRange[0] = info.ComponentRanges[this->ComponentForColoring][0];
-      this->ColorRange[1] = info.ComponentRanges[this->ComponentForColoring][1];
+      minRange = info.ComponentRanges[this->ComponentForColoring][0];
+      maxRange = info.ComponentRanges[this->ComponentForColoring][1];
     }
     else
     {
-      this->ColorRange[0] = info.MagnitudeRange[0];
-      this->ColorRange[1] = info.MagnitudeRange[1];
+      minRange = info.MagnitudeRange[0];
+      maxRange = info.MagnitudeRange[1];
     }
+    if (this->ExpandingRangeSet)
+    {
+      // Only extend the range when already set
+      this->ColorRange[0] = minRange < this->ColorRange[0] ? minRange : this->ColorRange[0];
+      this->ColorRange[1] = maxRange > this->ColorRange[1] ? maxRange : this->ColorRange[1];
+    }
+    else
+    {
+      this->ColorRange[0] = minRange;
+      this->ColorRange[1] = maxRange;
+    }
+    this->ExpandingRangeSet = true;
   }
 
   // Create lookup table
