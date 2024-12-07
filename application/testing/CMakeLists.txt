@@ -638,6 +638,9 @@ if(F3D_PLUGIN_BUILD_EXODUS)
   # Test animation with generic importer and coloring
   f3d_test(NAME TestAnimationGenericImporter DATA small.ex2 ARGS -sb --load-plugins=exodus --animation-time=0.003 --animation-progress)
 
+  # Test animation with generic importer, coloring and a custom scalar range
+  f3d_test(NAME TestAnimationGenericImporterScalarRange DATA small.ex2 ARGS -sb --load-plugins=exodus --animation-time=0.003 --animation-progress --range=0,1e7)
+
   # Test animation with inverted speed factor
   f3d_test(NAME TestInteractionAnimationInvert DATA small.ex2 ARGS -sb --load-plugins=exodus --animation-speed-factor=-0.0000001 --animation-time=0.00429998 --animation-progress INTERACTION)#Space;Space;
 
