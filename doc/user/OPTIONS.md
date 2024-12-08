@@ -47,6 +47,7 @@ Options|Default|Description
 \-\-animation-time=\<factor\>||Set the animation time to load.
 \-\-animation-frame-rate=\<factor\>|60|Set the animation frame rate used when playing animation interactively.
 \-\-font-file=\<font file\>||Use the provided FreeType compatible font file to display text.<br>Can be useful to display non-ASCII filenames.
+\-\-command-script=\<command script\>||Provide a script file containing a list of commands to be executed sequentially.<br>Allows automation of multiple commands or pre-defined tasks.
 
 ## Material options
 

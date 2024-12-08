@@ -1,6 +1,6 @@
 # Commands
 
-F3D will provide access to commands through bindings configuration and command line widget in the future.
+F3D provides access to commands through bindings configuration. They may be more ways to access them in the future.
 Commands let you trigger specific behavior that may not be available otherwise.
 Please note commands are currently experimental and the behaviors, actions may be added or removed without deprecation.
 Action names and arguments may also change without deprecation.
@@ -41,8 +41,6 @@ Supports `front`, `top`, `right`, `isometric` arguments. eg: `set_camera top`.
 
 `toggle_volume_rendering`: A specific command to toggle `model.volume.enable` and print coloring information. No argument.
 
-`toggle_ui_fps`: A specific command to toggle `ui.fps` and update it. No argument.
-
 `stop_interactor`: A specific command to stop the interactor hence quitting the application. No argument.
 
 `reset_camera`: A specific command to reset the camera to its original location. No argument.
@@ -79,15 +77,31 @@ eg: `set_hdri /path/to/file.hdr`.
 `add_files_or_set_hdri [path/to/file1] [path/to/file2]`: A specific command that will process each files and either, `set_hdri` if the provided file uses a recognised HDR extension or `add_files` otherwise. Take one or more files as arguments.
 eg: `add_files_or_set_hdri /path/to/dragon.vtu /path/to/file.hdr`.
 
+## Command Script (`--command-script`)
+
+F3D provides a feature to execute commands from a script file using the `--command-script` [CLI option](OPTIONS.md). This allows users to automate a sequence of commands by listing them in a plain text file, eg: `f3d --command-script path/to/command_script.txt`.
+
+Example Command Script, commands are separated by new lines, comments are supported:
+
+```shell
+# A comment
+roll_camera 90
+toggle ui.scalar_bar
+print_scene_info # Another comment
+increase_light_intensity
+```
+
 ## Command syntax
 
 Command syntax is similar to bash, as in they will be split by "token" to be processed.
-Tokens are spaces separated, eg: `set scene.up.direction +Z`.
-Tokens can also be quoted to support spaces inside, eg:  `set render.hdri.file "/path/to/file with spaces.png"`.
-Supported quotes are `` `'" ``, eg: `set render.hdri.file '/path/to/file with spaces.png'`.
-Quotes inside quotes are supported as well, eg: `set render.hdri.file "/path/to/file'with'quotes.png"`.
-Quotes and spaces can be escaped, eg: `set render.hdri.file /path/to/file\ with\ spaces\ and\ \'quotes\".png`.
-Escapes can be escaped too: eg: `set render.hdri.file C:\\path\\to\\windows\\file.png`.
-Other escaped character will be processed as if the escape was not present, eg: `set scene.up.direction +\Z`
-Unfinished quoted section is invalid, eg: `set scene.up.direction "+Z`
-A escape at the end is also invalid, eg: `set scene.up.direction +Z\`
+
+ - Tokens are spaces separated, eg: `set scene.up.direction +Z`.
+ - Tokens can also be quoted to support spaces inside, eg:  `set render.hdri.file "/path/to/file with spaces.png"`.
+ - Supported quotes are `` `'" ``, eg: `set render.hdri.file '/path/to/file with spaces.png'`.
+ - Quotes inside quotes are supported as well, eg: `set render.hdri.file "/path/to/file'with'quotes.png"`.
+ - Quotes and spaces can be escaped, eg: `set render.hdri.file /path/to/file\ with\ spaces\ and\ \'quotes\".png`.
+ - Comment are supported using `#`, Any character after will be ignored. Use `\#` to add it verbatim.
+ - Escapes can be escaped too: eg: `set render.hdri.file C:\\path\\to\\windows\\file.png`.
+ - Other escaped character will be processed as if the escape was not present, eg: `set scene.up.direction +\Z`
+ - Unfinished quoted section is invalid, eg: `set scene.up.direction "+Z`
+ - A escape at the end is also invalid, eg: `set scene.up.direction +Z\`

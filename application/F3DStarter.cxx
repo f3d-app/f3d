@@ -27,16 +27,21 @@
 #include "dmon.h"
 #endif
 
+#include "tinyfiledialogs.h"
+
 #include "engine.h"
 #include "interactor.h"
 #include "log.h"
 #include "options.h"
+#include "utils.h"
 #include "window.h"
 
 #include <algorithm>
 #include <atomic>
 #include <cassert>
+#include <csignal>
 #include <filesystem>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <mutex>
@@ -45,10 +50,15 @@
 
 namespace fs = std::filesystem;
 
+// This pointer is used to retrieve the interactor in case an OS signal is handled
+f3d::interactor* GlobalInteractor = nullptr;
+
 class F3DStarter::F3DInternals
 {
 public:
   F3DInternals() = default;
+
+  using log_entry_t = std::tuple<std::string, fs::path, std::string, std::string>;
 
   // XXX: The values in the following two structs
   // are left uninitialized as the will all be initialized from
@@ -86,6 +96,7 @@ public:
     double RefThreshold;
     std::string InteractionTestRecordFile;
     std::string InteractionTestPlayFile;
+    std::string CommandScriptFile;
   };
 
   void SetupCamera(const CameraConfiguration& camConf)
@@ -254,8 +265,8 @@ public:
   fs::path applyFilenameTemplate(const std::string& templateString)
   {
     constexpr size_t maxNumberingAttempts = 1000000;
-    const std::regex numberingRe("\\{(n:?([0-9]*))\\}");
-    const std::regex dateRe("date:?([A-Za-z%]*)");
+    const std::regex numberingRe("(n:?(.*))");
+    const std::regex dateRe("date:?(.*)");
 
     /* Return a file related string depending on the currently loaded files, or the empty string if
      * a single file is loaded */
@@ -325,62 +336,26 @@ public:
           fmt = "%Y%m%d";
         }
         std::time_t t = std::time(nullptr);
-        std::stringstream joined;
-        joined << std::put_time(std::localtime(&t), fmt.c_str());
-        return joined.str();
+        std::stringstream ss;
+        ss << std::put_time(std::localtime(&t), fmt.c_str());
+        std::string formatted = ss.str();
+        if (formatted == fmt)
+        {
+          f3d::log::warn("invalid date format for \"", var, "\"");
+        }
+        return formatted;
       }
-      throw std::out_of_range(var);
+      throw f3d::utils::string_template::lookup_error(var);
     };
 
-    /* process template as tokens, keeping track of whether they've been
-     * substituted or left untouched */
-    const auto substituteVariables = [&]()
-    {
-      const std::string varName = "[\\w_.%:-]+";
-      const std::string escapedVar = "(\\{(\\{" + varName + "\\})\\})";
-      const std::string substVar = "(\\{(" + varName + ")\\})";
-      const std::regex escapedVarRe(escapedVar);
-      const std::regex substVarRe(substVar);
+    f3d::utils::string_template stringTemplate(templateString);
+    stringTemplate.substitute(variableLookup);
 
-      std::vector<std::pair<std::string, bool>> fragments;
-      const auto callback = [&](const std::string& m)
-      {
-        if (std::regex_match(m, escapedVarRe))
-        {
-          fragments.emplace_back(std::regex_replace(m, escapedVarRe, "$2"), true);
-        }
-        else if (std::regex_match(m, substVarRe))
-        {
-          try
-          {
-            fragments.emplace_back(variableLookup(std::regex_replace(m, substVarRe, "$2")), true);
-          }
-          catch (std::out_of_range&)
-          {
-            fragments.emplace_back(m, false);
-          }
-        }
-        else
-        {
-          fragments.emplace_back(m, false);
-        }
-      };
-
-      const std::regex re(escapedVar + "|" + substVar);
-      std::sregex_token_iterator begin(templateString.begin(), templateString.end(), re, { -1, 0 });
-      std::for_each(begin, std::sregex_token_iterator(), callback);
-
-      return fragments;
-    };
-
-    const auto fragments = substituteVariables();
-
-    /* check the non-substituted fragments for numbering variables */
     const auto hasNumbering = [&]()
     {
-      for (const auto& [fragment, processed] : fragments)
+      for (const auto& variable : stringTemplate.variables())
       {
-        if (!processed && std::regex_search(fragment, numberingRe))
+        if (std::regex_search(variable, numberingRe))
         {
           return true;
         }
@@ -388,49 +363,43 @@ public:
       return false;
     };
 
-    /* just join and return if there's no numbering to be done */
+    /* return if there's no numbering to be done */
     if (!hasNumbering())
     {
-      std::stringstream joined;
-      for (const auto& fragment : fragments)
-      {
-        joined << fragment.first;
-      }
-      return { joined.str() };
+      return { stringTemplate.str() };
     }
 
-    /* apply numbering in the non-substituted fragments and join */
-    const auto applyNumbering = [&](const size_t i)
+    const auto numberingLookup = [&](const size_t number)
     {
-      std::stringstream joined;
-      for (const auto& [fragment, processed] : fragments)
+      return [&numberingRe, number](const std::string& var)
       {
-        if (!processed && std::regex_match(fragment, numberingRe))
+        if (std::regex_match(var, numberingRe))
         {
           std::stringstream formattedNumber;
           try
           {
-            const std::string fmt = std::regex_replace(fragment, numberingRe, "$2");
-            formattedNumber << std::setfill('0') << std::setw(std::stoi(fmt)) << i;
+            const std::string fmt = std::regex_replace(var, numberingRe, "$2");
+            formattedNumber << std::setfill('0') << std::setw(std::stoi(fmt)) << number;
           }
           catch (std::invalid_argument&)
           {
-            formattedNumber << std::setw(0) << i;
+            if (number == 1) /* avoid spamming the log */
+            {
+              f3d::log::warn("ignoring invalid number format for \"", var, "\"");
+            }
+            formattedNumber << std::setw(0) << number;
           }
-          joined << std::regex_replace(fragment, numberingRe, formattedNumber.str());
+          return std::regex_replace(var, numberingRe, formattedNumber.str());
         }
-        else
-        {
-          joined << fragment;
-        }
-      }
-      return joined.str();
+        throw f3d::utils::string_template::lookup_error(var);
+      };
     };
 
-    /* apply incrementing numbering until file doesn't exist already */
+    /* try substituting incrementing number until file doesn't exist already */
     for (size_t i = 1; i <= maxNumberingAttempts; ++i)
     {
-      const std::string candidate = applyNumbering(i);
+      const std::string candidate =
+        f3d::utils::string_template(stringTemplate).substitute(numberingLookup(i)).str();
       if (!fs::exists(candidate))
       {
         return { candidate };
@@ -438,6 +407,17 @@ public:
     }
     throw std::runtime_error("could not find available unique filename after " +
       std::to_string(maxNumberingAttempts) + " attempts");
+  }
+
+  static void PrintLoggingMap(const std::map<std::string, log_entry_t>& loggingMap, char sep)
+  {
+    for (const auto& [key, tuple] : loggingMap)
+    {
+      const auto& [bindStr, source, pattern, commands] = tuple;
+      std::string origin = source.empty() ? pattern : source.string() + ":`" + pattern + "`";
+      f3d::log::debug(" '", bindStr, "' ", sep, " '", commands, "' from ", origin);
+    }
+    f3d::log::debug("");
   }
 
   void UpdateOptions(const std::vector<F3DOptionsTools::OptionsEntries>& entriesVector,
@@ -455,16 +435,16 @@ public:
 
     // Logging specific map
     bool logOptions = this->AppOptions.VerboseLevel == "debug";
-    std::map<std::string, std::tuple<std::string, fs::path, std::string, std::string>> loggingMap;
+    std::map<std::string, log_entry_t> loggingMap;
 
-    // For each input file, order matter
+    // For each input file, order matters
     for (const auto& tmpPath : paths)
     {
       std::string inputFile = tmpPath.string();
       // For each config entries, ordered by priority
       for (const auto& entries : entriesVector)
       {
-        // For each entry (eg: difference config files)
+        // For each entry (eg: different config files)
         for (auto const& [conf, source, pattern] : entries)
         {
           std::regex re(pattern, std::regex_constants::icase);
@@ -530,13 +510,7 @@ public:
       }
     }
 
-    for (const auto& [key, tuple] : loggingMap)
-    {
-      const auto& [name, source, pattern, value] = tuple;
-      std::string origin = source.empty() ? pattern : source.string() + ":`" + pattern + "`";
-      f3d::log::debug(" '", name, "' = '", value, "' from ", origin);
-    }
-    f3d::log::debug("");
+    F3DInternals::PrintLoggingMap(loggingMap, '=');
 
     // Update typed app options from the string version
     this->UpdateTypedAppOptions(appOptions);
@@ -594,6 +568,8 @@ public:
       f3d::options::parse<std::string>(appOptions.at("interaction-test-record"));
     this->AppOptions.InteractionTestPlayFile =
       f3d::options::parse<std::string>(appOptions.at("interaction-test-play"));
+    this->AppOptions.CommandScriptFile =
+      f3d::options::parse<std::string>(appOptions.at("command-script"));
   }
 
   void UpdateInterdependentOptions()
@@ -651,6 +627,90 @@ public:
     }
   }
 
+  // Update bindings by initializing them and adding the app and config bindings
+  void UpdateBindings(const std::vector<fs::path>& paths)
+  {
+    if (!this->AppOptions.NoRender)
+    {
+      // std::vector<std::string> -> std::string for printing
+      auto vecToString = [](const std::vector<std::string>& vec)
+      {
+        std::string ret;
+        for (const std::string& val : vec)
+        {
+          ret += "`";
+          ret += val;
+          ret += "` ";
+        }
+        return ret;
+      };
+
+      // "doc", ""
+      auto docString = [](const std::string& doc) { return std::make_pair(doc, ""); };
+
+      auto docStringVec = [&](const std::vector<std::string>& docs)
+      { return std::make_pair(vecToString(docs), ""); };
+
+      using mod_t = f3d::interaction_bind_t::ModifierKeys;
+
+      f3d::interactor& interactor = this->Engine->getInteractor();
+      interactor.initBindings();
+
+      // clang-format off
+      interactor.addBinding({ mod_t::NONE, "Left" }, "load_previous_file_group", "Others", std::bind(docString, "Load previous file group"));
+      interactor.addBinding({ mod_t::NONE, "Right" }, "load_next_file_group", "Others", std::bind(docString, "Load next file group"));
+      interactor.addBinding({ mod_t::NONE, "Up" }, "reload_current_file_group", "Others", std::bind(docString, "Reload current file group"));
+      interactor.addBinding({ mod_t::NONE, "Down" }, "add_current_directories", "Others", std::bind(docString, "Add files from dir of current file"));
+      interactor.addBinding({ mod_t::NONE, "F12" }, "take_screenshot", "Others", std::bind(docString, "Take a screenshot"));
+      interactor.addBinding({ mod_t::CTRL, "O" }, "open_file_dialog", "Others", std::bind(docString, "Open File Dialog"));
+      interactor.addBinding({ mod_t::CTRL, "F12" }, "take_minimal_screenshot", "Others", std::bind(docString, "Take a minimal screenshot"));
+
+
+      // This replace an existing default binding command in the libf3d
+      interactor.removeBinding({ mod_t::NONE, "Drop" });
+      interactor.addBinding({ mod_t::NONE, "Drop" }, "add_files_or_set_hdri", "Others", std::bind(docString, "Load dropped files, folder or HDRI"));
+      interactor.addBinding({ mod_t::CTRL, "Drop" }, "add_files", "Others", std::bind(docString, "Load dropped files or folder"));
+      interactor.addBinding({ mod_t::SHIFT, "Drop" }, "set_hdri", "Others", std::bind(docString, "Set HDRI and use it"));
+      // clang-format on
+
+      f3d::log::debug("Adding config defined bindings if any: ");
+      bool logBindings = this->AppOptions.VerboseLevel == "debug";
+      std::map<std::string, log_entry_t> loggingMap;
+
+      // For each input file, order matters
+      for (const auto& tmpPath : paths)
+      {
+        std::string inputFile = tmpPath.string();
+        for (auto const& [bindings, source, pattern] : this->ConfigBindingsEntries)
+        {
+          std::regex re(pattern, std::regex_constants::icase);
+          std::smatch matches;
+
+          // If the source is empty, there is no pattern, all bindings applies
+          // Note: An empty inputFile matches with ".*"
+          if (source.empty() || std::regex_match(inputFile, matches, re))
+          {
+            // For each interaction bindings
+            for (auto const& [bindStr, commands] : bindings)
+            {
+              if (logBindings)
+              {
+                // XXX: Formatting could be improved
+                loggingMap.emplace(
+                  bindStr, std::tuple(bindStr, source, pattern, vecToString(commands)));
+              }
+
+              f3d::interaction_bind_t bind = f3d::interaction_bind_t::parse(bindStr);
+              interactor.removeBinding(bind);
+              interactor.addBinding(bind, commands, "Config", std::bind(docStringVec, commands));
+            }
+          }
+        }
+      }
+      F3DInternals::PrintLoggingMap(loggingMap, ':');
+    }
+  }
+
   // Recover a vector of unique parent paths from a vector of paths
   static std::vector<fs::path> ParentPaths(const std::vector<fs::path>& paths)
   {
@@ -666,11 +726,21 @@ public:
     return parents;
   }
 
+  static void SigCallback(int)
+  {
+    if (GlobalInteractor)
+    {
+      GlobalInteractor->stop();
+      GlobalInteractor = nullptr;
+    }
+  }
+
   F3DAppOptions AppOptions;
   f3d::options LibOptions;
   F3DOptionsTools::OptionsEntries ConfigOptionsEntries;
   F3DOptionsTools::OptionsEntries CLIOptionsEntries;
   F3DOptionsTools::OptionsEntries DynamicOptionsEntries;
+  F3DConfigFileTools::BindingsEntries ConfigBindingsEntries;
   std::unique_ptr<f3d::engine> Engine;
   std::vector<std::vector<fs::path>> FilesGroups;
   std::vector<fs::path> LoadedFiles;
@@ -745,7 +815,8 @@ int F3DStarter::Start(int argc, char** argv)
   // Read config files
   if (!dryRun)
   {
-    this->Internals->ConfigOptionsEntries = F3DConfigFileTools::ReadConfigFiles(config);
+    std::tie(this->Internals->ConfigOptionsEntries, this->Internals->ConfigBindingsEntries) =
+      F3DConfigFileTools::ReadConfigFiles(config);
   }
 
   // Update app and libf3d options based on config entries, with an empty input file
@@ -800,137 +871,8 @@ int F3DStarter::Start(int argc, char** argv)
     f3d::window& window = this->Internals->Engine->getWindow();
     window.setWindowName(F3D::AppTitle).setIcon(F3DIcon, sizeof(F3DIcon));
     this->Internals->ApplyPositionAndResolution();
-
-    f3d::interactor& interactor = this->Internals->Engine->getInteractor();
-
-    interactor.addCommand("load_previous_file_group",
-      [this](const std::vector<std::string>&) { this->LoadRelativeFileGroup(-1); });
-
-    interactor.addCommand("load_next_file_group",
-      [this](const std::vector<std::string>&) { this->LoadRelativeFileGroup(+1); });
-
-    interactor.addCommand("reload_current_file_group",
-      [this](const std::vector<std::string>&) { this->LoadRelativeFileGroup(0, true, true); });
-
-    interactor.addCommand("add_current_directories",
-      [this](const std::vector<std::string>&)
-      {
-        if (this->Internals->LoadedFiles.size() > 0)
-        {
-          for (const auto& parentPath : F3DInternals::ParentPaths(this->Internals->LoadedFiles))
-          {
-            this->AddFile(parentPath, true);
-          }
-          this->LoadRelativeFileGroup(0);
-        }
-      });
-
-    interactor.addCommand("take_screenshot",
-      [this](const std::vector<std::string>& args)
-      {
-        // XXX: Add a test for this one this can be reached with a non empty filename
-        std::string filename =
-          args.empty() ? this->Internals->AppOptions.ScreenshotFilename : args[0];
-        this->SaveScreenshot(filename);
-      });
-
-    interactor.addCommand("take_minimal_screenshot",
-      [this](const std::vector<std::string>& args)
-      {
-        // XXX: Add a test for this one this can be reached with a non empty filename
-        std::string filename =
-          args.empty() ? this->Internals->AppOptions.ScreenshotFilename : args[0];
-        this->SaveScreenshot(filename, true);
-      });
-
-    // This replace an existing command in libf3d
-    interactor.removeCommand("add_files");
-    interactor.addCommand("add_files",
-      [this](const std::vector<std::string>& files)
-      {
-        int index = -1;
-        for (const std::string& file : files)
-        {
-          index = this->AddFile(fs::path(file));
-        }
-        if (index > -1)
-        {
-          this->LoadFileGroup(index);
-        }
-      });
-
-    interactor.addCommand("set_hdri",
-      [this](const std::vector<std::string>& files)
-      {
-        if (!files.empty())
-        {
-          // Set the first file has an HDRI
-          f3d::options& options = this->Internals->Engine->getOptions();
-          options.render.hdri.file = files[0];
-          options.render.hdri.ambient = true;
-          options.render.background.skybox = true;
-
-          // Rendering now is needed for correct lighting
-          this->Render();
-        }
-      });
-
-    interactor.addCommand("add_files_or_set_hdri",
-      [this](const std::vector<std::string>& files)
-      {
-        int index = -1;
-        for (const std::string& file : files)
-        {
-          if (F3DInternals::HasHDRIExtension(file))
-          {
-            // TODO: add a image::canRead
-
-            // Load the file as an HDRI instead of adding it.
-            f3d::options& options = this->Internals->Engine->getOptions();
-            options.render.hdri.file = file;
-            options.render.hdri.ambient = true;
-            options.render.background.skybox = true;
-
-            // Rendering now is needed for correct lighting
-            this->Render();
-          }
-          else
-          {
-            index = this->AddFile(fs::path(file));
-          }
-        }
-        if (index > -1)
-        {
-          this->LoadFileGroup(index);
-        }
-      });
-
-    // "doc"
-    auto docString = [](const std::string& doc) -> std::pair<std::string, std::string>
-    { return std::make_pair(doc, ""); };
-
-    using mod_t = f3d::interaction_bind_t::ModifierKeys;
-    interactor.addBinding({ mod_t::NONE, "Left" }, "load_previous_file_group", "Others",
-      std::bind(docString, "Load previous file group"));
-    interactor.addBinding({ mod_t::NONE, "Right" }, "load_next_file_group", "Others",
-      std::bind(docString, "Load next file group"));
-    interactor.addBinding({ mod_t::NONE, "Up" }, "reload_current_file_group", "Others",
-      std::bind(docString, "Reload current file group"));
-    interactor.addBinding({ mod_t::NONE, "Down" }, "add_current_directories", "Others",
-      std::bind(docString, "Add files from dir of current file"));
-    interactor.addBinding({ mod_t::NONE, "F11" }, "take_minimal_screenshot", "Others",
-      std::bind(docString, "Take a minimal screenshot"));
-    interactor.addBinding({ mod_t::NONE, "F12" }, "take_screenshot", "Others",
-      std::bind(docString, "Take a screenshot"));
-
-    // This replace an existing default interaction command in the libf3d
-    interactor.removeBinding({ mod_t::NONE, "Drop" });
-    interactor.addBinding({ mod_t::NONE, "Drop" }, "add_files_or_set_hdri", "Others",
-      std::bind(docString, "Load dropped files, folder or HDRI"));
-    interactor.addBinding({ mod_t::CTRL, "Drop" }, "add_files", "Others",
-      std::bind(docString, "Load dropped files or folder"));
-    interactor.addBinding(
-      { mod_t::SHIFT, "Drop" }, "set_hdri", "Others", std::bind(docString, "Set HDRI and use it"));
+    this->AddCommands();
+    this->Internals->UpdateBindings({ "" });
   }
 
   this->Internals->Engine->setOptions(this->Internals->LibOptions);
@@ -947,6 +889,7 @@ int F3DStarter::Start(int argc, char** argv)
 
   if (!this->Internals->AppOptions.NoRender)
   {
+    this->Internals->ApplyPositionAndResolution();
     f3d::window& window = this->Internals->Engine->getWindow();
     f3d::interactor& interactor = this->Internals->Engine->getInteractor();
 
@@ -988,6 +931,30 @@ int F3DStarter::Start(int argc, char** argv)
     {
       if (!interactor.recordInteraction(interactionTestRecordFile))
       {
+        return EXIT_FAILURE;
+      }
+    }
+
+    // Process Command Script file
+    const std::string& commandScriptFile = this->Internals->AppOptions.CommandScriptFile;
+    if (!commandScriptFile.empty())
+    {
+      std::ifstream scriptFile(commandScriptFile);
+      if (scriptFile.is_open())
+      {
+        std::string command;
+        while (std::getline(scriptFile, command))
+        {
+          if (!command.empty())
+          {
+            interactor.triggerCommand(command);
+          }
+        }
+        scriptFile.close();
+      }
+      else
+      {
+        f3d::log::error("Unable to open command script file");
         return EXIT_FAILURE;
       }
     }
@@ -1102,6 +1069,12 @@ int F3DStarter::Start(int argc, char** argv)
         // Create the event loop repeating timer
         window.render();
         interactor.createTimerCallBack(30, [this]() { this->EventLoop(); });
+
+        // gracefully exits if SIGTERM or SIGINT is send to F3D
+        GlobalInteractor = &interactor;
+        std::signal(SIGTERM, F3DInternals::SigCallback);
+        std::signal(SIGINT, F3DInternals::SigCallback);
+
         interactor.start();
       }
 #endif
@@ -1220,9 +1193,9 @@ void F3DStarter::LoadFileGroup(
         { this->Internals->ConfigOptionsEntries, this->Internals->CLIOptionsEntries,
           this->Internals->DynamicOptionsEntries },
         configPaths);
+      this->Internals->UpdateBindings(configPaths);
 
       this->Internals->Engine->setOptions(this->Internals->LibOptions);
-      this->Internals->ApplyPositionAndResolution();
 
       f3d::log::debug("Checking files:");
       for (const fs::path& tmpPath : paths)
@@ -1537,4 +1510,130 @@ void F3DStarter::EventLoop()
     this->Render();
     this->Internals->RenderRequested = false;
   }
+}
+
+//----------------------------------------------------------------------------
+void F3DStarter::AddCommands()
+{
+  f3d::interactor& interactor = this->Internals->Engine->getInteractor();
+
+  interactor.addCommand("load_previous_file_group",
+    [this](const std::vector<std::string>&) { this->LoadRelativeFileGroup(-1); });
+
+  interactor.addCommand("load_next_file_group",
+    [this](const std::vector<std::string>&) { this->LoadRelativeFileGroup(+1); });
+
+  interactor.addCommand("reload_current_file_group",
+    [this](const std::vector<std::string>&) { this->LoadRelativeFileGroup(0, true, true); });
+
+  interactor.addCommand("add_current_directories",
+    [this](const std::vector<std::string>&)
+    {
+      if (!this->Internals->LoadedFiles.empty())
+      {
+        for (const auto& parentPath : F3DInternals::ParentPaths(this->Internals->LoadedFiles))
+        {
+          this->AddFile(parentPath, true);
+        }
+        this->LoadRelativeFileGroup(0);
+      }
+    });
+
+  interactor.addCommand("take_screenshot",
+    [this](const std::vector<std::string>& args)
+    {
+      // XXX: Add a test for this one this can be reached with a non empty filename
+      std::string filename =
+        args.empty() ? this->Internals->AppOptions.ScreenshotFilename : args[0];
+      this->SaveScreenshot(filename);
+    });
+
+  interactor.addCommand("take_minimal_screenshot",
+    [this](const std::vector<std::string>& args)
+    {
+      // XXX: Add a test for this one this can be reached with a non empty filename
+      std::string filename =
+        args.empty() ? this->Internals->AppOptions.ScreenshotFilename : args[0];
+      this->SaveScreenshot(filename, true);
+    });
+
+  // This replace an existing command in libf3d
+  interactor.removeCommand("add_files");
+  interactor.addCommand("add_files",
+    [this](const std::vector<std::string>& files)
+    {
+      int index = -1;
+      for (const std::string& file : files)
+      {
+        index = this->AddFile(fs::path(file));
+      }
+      if (index > -1)
+      {
+        this->LoadFileGroup(index);
+      }
+    });
+
+  interactor.addCommand("set_hdri",
+    [this](const std::vector<std::string>& files)
+    {
+      if (!files.empty())
+      {
+        // Set the first file has an HDRI
+        f3d::options& options = this->Internals->Engine->getOptions();
+        options.render.hdri.file = files[0];
+        options.render.hdri.ambient = true;
+        options.render.background.skybox = true;
+
+        // Rendering now is needed for correct lighting
+        this->Render();
+      }
+    });
+
+  interactor.addCommand("add_files_or_set_hdri",
+    [this](const std::vector<std::string>& files)
+    {
+      int index = -1;
+      for (const std::string& file : files)
+      {
+        if (F3DInternals::HasHDRIExtension(file))
+        {
+          // TODO: add a image::canRead
+
+          // Load the file as an HDRI instead of adding it.
+          f3d::options& options = this->Internals->Engine->getOptions();
+          options.render.hdri.file = file;
+          options.render.hdri.ambient = true;
+          options.render.background.skybox = true;
+
+          // Rendering now is needed for correct lighting
+          this->Render();
+        }
+        else
+        {
+          index = this->AddFile(fs::path(file));
+        }
+      }
+      if (index > -1)
+      {
+        this->LoadFileGroup(index);
+      }
+    });
+  interactor.addCommand("open_file_dialog",
+    [this](const std::vector<std::string>&)
+    {
+      const char* file = std::getenv("CTEST_OPEN_DIALOG_FILE");
+      if (!file)
+      {
+        file = tinyfd_openFileDialog("Open File", ".", 0, nullptr, nullptr, false);
+      }
+
+      if (file)
+      {
+        int index = this->AddFile(file);
+        if (index > -1)
+        {
+          this->LoadFileGroup(index);
+        }
+      }
+    });
 }

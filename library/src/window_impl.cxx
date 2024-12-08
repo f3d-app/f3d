@@ -449,26 +449,21 @@ void window_impl::UpdateDynamicOptions()
   // Update the cheatsheet if needed
   if (this->Internals->Interactor && renderer->CheatSheetNeedsUpdate())
   {
-    std::stringstream cheatSheetStream;
-    cheatSheetStream << "\n";
+    std::vector<vtkF3DUIActor::CheatSheetGroup> cheatsheet;
     for (const std::string& group : this->Internals->Interactor->getBindGroups())
     {
+      std::vector<vtkF3DUIActor::CheatSheetTuple> groupList;
       for (const interaction_bind_t& bind : this->Internals->Interactor->getBindsForGroup(group))
       {
         auto [doc, val] = this->Internals->Interactor->getBindingDocumentation(bind);
         if (!doc.empty())
         {
-          // XXX: This formatting will be reworked during ImGUI work
-          cheatSheetStream << " " << bind.format() << ": " << doc;
-          if (!val.empty())
-          {
-            cheatSheetStream << " [" << val << "]";
-          }
-          cheatSheetStream << "\n";
+          groupList.emplace_back(std::make_tuple(bind.format(), doc, val));
         }
       }
+      cheatsheet.emplace_back(std::make_pair(group, std::move(groupList)));
     }
-    renderer->ConfigureCheatSheet(cheatSheetStream.str());
+    renderer->ConfigureCheatSheet(cheatsheet);
   }
 }
 

@@ -25,6 +25,42 @@ void vtkF3DUIActor::SetFileName(const std::string& filename)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DUIActor::SetMetaDataVisibility(bool show)
+{
+  this->MetaDataVisible = show;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DUIActor::SetMetaData(const std::string& metadata)
+{
+  this->MetaData = metadata;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DUIActor::SetCheatSheetVisibility(bool show)
+{
+  this->CheatSheetVisible = show;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DUIActor::SetCheatSheet(const std::vector<CheatSheetGroup>& cheatsheet)
+{
+  this->CheatSheet = cheatsheet;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DUIActor::SetFpsCounterVisibility(bool show)
+{
+  this->FpsCounterVisible = show;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DUIActor::SetFpsValue(int fps)
+{
+  this->FpsValue = fps;
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DUIActor::SetFontFile(const std::string& font)
 {
   this->FontFile = font;
@@ -39,6 +75,21 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
   if (this->FileNameVisible)
   {
     this->RenderFileName();
+  }
+
+  if (this->MetaDataVisible)
+  {
+    this->RenderMetaData();
+  }
+
+  if (this->CheatSheetVisible)
+  {
+    this->RenderCheatSheet();
+  }
+
+  if (this->FpsCounterVisible)
+  {
+    this->RenderFpsCounter();
   }
 
   this->EndFrame(renWin);

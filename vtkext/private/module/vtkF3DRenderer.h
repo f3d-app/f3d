@@ -359,10 +359,10 @@ public:
   bool CheatSheetNeedsUpdate() const;
 
   /**
-   * Configure the cheatsheet text from the provided info
+   * Configure the cheatsheet data from the provided info
    * Should be called before Render() if CheatSheetInfoNeedsUpdate() returns true.
    */
-  void ConfigureCheatSheet(const std::string& info);
+  void ConfigureCheatSheet(const std::vector<vtkF3DUIActor::CheatSheetGroup>& info);
 
   /**
    * Use this method to flag in the renderer that the cheatsheet needs to be updated
@@ -426,13 +426,6 @@ private:
   void ConfigureRenderPasses();
 
   /**
-   * Generate a padded metadata description
-   * using the internal importer.
-   * Returns a multiline string containing the meta data description
-   */
-  std::string GenerateMetaDataDescription();
-
-  /**
    * Create a cache directory if a HDRIHash is set
    */
   void CreateCacheDirectory();
@@ -471,16 +464,12 @@ private:
 
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
 
-  vtkNew<vtkCornerAnnotation> MetaDataActor;
-  vtkNew<vtkCornerAnnotation> CheatSheetActor;
   vtkNew<vtkF3DDropZoneActor> DropZoneActor;
   vtkNew<vtkActor> GridActor;
   vtkNew<vtkSkybox> SkyboxActor;
   vtkNew<vtkF3DUIActor> UIActor;
 
-  // vtkCornerAnnotation building is too slow for the timer
-  vtkNew<vtkTextActor> TimerActor;
-  unsigned int Timer = 0;
+  unsigned int Timer = 0; // Timer OpenGL query
 
   bool CheatSheetConfigured = false;
   bool ActorsPropertiesConfigured = false;

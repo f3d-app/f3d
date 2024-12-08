@@ -13,7 +13,6 @@ list(APPEND libf3dSDKTests_list
      TestSDKScene.cxx
      TestSDKLog.cxx
      TestSDKMultiColoring.cxx
-     TestSDKMultiOptions.cxx
      TestSDKOptions.cxx
      TestSDKOptionsIO.cxx
      TestSDKRenderAndInteract.cxx
@@ -31,6 +30,7 @@ if(F3D_MODULE_UI)
     TestSDKDynamicProperties.cxx
     TestSDKInteractorCallBack.cxx
     TestSDKInteractorDocumentation.cxx
+    TestSDKMultiOptions.cxx
     )
 
   # HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767
@@ -155,7 +155,7 @@ if(F3D_MODULE_UI AND VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   endif()
 endif()
 
-if(NOT F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS)
+if(F3D_MODULE_UI AND NOT F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS)
   set_tests_properties(libf3d::TestSDKInteractorCallBack PROPERTIES DISABLED ON)
 endif()
 

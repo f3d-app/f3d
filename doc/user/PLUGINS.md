@@ -17,11 +17,15 @@ Alternatively, you can add your plugin directly in the
 multiple plugins in a single comma-separated list, like in the example below:
 
 ```
+[
 {
-    ".*(file_extension)": {
-        "load-plugins": "plugin1", "plugin2"
-    }
+  "match": ".*(file_extension)",
+  "options":
+  {
+    "load-plugins": "plugin1", "plugin2"
+  }
 }
+]
 ```
 
 ### Supported plugins

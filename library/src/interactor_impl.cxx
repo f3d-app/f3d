@@ -620,13 +620,6 @@ interactor& interactor_impl::initCommands()
       this->Internals->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
     });
 
-  this->addCommand("toggle_fps",
-    [&](const std::vector<std::string>&)
-    {
-      this->Internals->Options.ui.fps = !this->Internals->Options.ui.fps;
-      this->Internals->Window.render();
-    });
-
   this->addCommand(
     "stop_interactor", [&](const std::vector<std::string>&) { this->Internals->StopInteractor(); });
 
@@ -689,6 +682,11 @@ bool interactor_impl::triggerCommand(std::string_view command)
   {
     log::error("Command: unable to tokenize command:\"", command, "\", ignoring");
     return false;
+  }
+
+  if (tokens.empty())
+  {
+    return true;
   }
 
   const std::string& action = tokens[0];
@@ -820,7 +818,7 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "G"}, "toggle render.grid.enable","Scene", std::bind(docTgl, "Toggle grid display", std::cref(opts.render.grid.enable)));
   this->addBinding({mod_t::NONE, "N"}, "toggle ui.filename","Scene", std::bind(docTgl, "Toggle filename display", std::cref(opts.ui.filename)));
   this->addBinding({mod_t::NONE, "M"}, "toggle ui.metadata","Scene", std::bind(docTgl, "Toggle metadata display", std::cref(opts.ui.metadata)));
-  this->addBinding({mod_t::NONE, "Z"}, "toggle_fps","Scene", std::bind(docTgl, "Toggle FPS counter display", std::cref(opts.ui.fps)));
+  this->addBinding({mod_t::NONE, "Z"}, "toggle ui.fps","Scene", std::bind(docTgl, "Toggle FPS counter display", std::cref(opts.ui.fps)));
 #if F3D_MODULE_RAYTRACING
   this->addBinding({mod_t::NONE, "R"}, "toggle render.raytracing.enable","Scene", std::bind(docTgl, "Toggle raytracing rendering", std::cref(opts.render.raytracing.enable)));
   this->addBinding({mod_t::NONE, "D"}, "toggle render.raytracing.denoise","Scene", std::bind(docTgl, "Toggle denoising when raytracing", std::cref(opts.render.raytracing.denoise)));

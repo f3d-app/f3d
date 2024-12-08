@@ -1,8 +1,8 @@
 #include "vtkF3DImguiActor.h"
 
+#include "F3DFontBuffer.h"
 #include "vtkF3DImguiFS.h"
 #include "vtkF3DImguiVS.h"
-#include "F3DFontBuffer.h"
 
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLBufferObject.h>
@@ -23,6 +23,8 @@
 #endif
 
 #include <imgui.h>
+
+#include <optional>
 
 struct vtkF3DImguiActor::Internals
 {
@@ -63,8 +65,8 @@ struct vtkF3DImguiActor::Internals
 
       // Create shader program
       std::string emptyGeom; // no geometry shader
-      this->Program =
-        renWin->GetShaderCache()->ReadyShaderProgram(vtkF3DImguiVS, vtkF3DImguiFS, emptyGeom.c_str());
+      this->Program = renWin->GetShaderCache()->ReadyShaderProgram(
+        vtkF3DImguiVS, vtkF3DImguiFS, emptyGeom.c_str());
 
       // Create VAO
       this->VertexArray = vtkSmartPointer<vtkOpenGLVertexArrayObject>::New();
@@ -150,7 +152,7 @@ struct vtkF3DImguiActor::Internals
     this->Program->SetUniform2f("Scale", scale);
     this->Program->SetUniform2f("Shift", shift);
     this->Program->SetUniformi("Texture", this->FontTexture->GetTextureUnit());
-    
+
     // Render the UI
     this->VertexArray->Bind();
     this->VertexBuffer->Bind();
@@ -181,8 +183,9 @@ struct vtkF3DImguiActor::Internals
         {
           // Apply scissor/clipping rectangle (Y is inverted in OpenGL)
           float fbHeight = drawData->DisplaySize.y * drawData->FramebufferScale.y;
-          state->vtkglScissor(static_cast<GLint>(clipMin.x), static_cast<GLint>(fbHeight - clipMax.y),
-            static_cast<GLsizei>(clipMax.x - clipMin.x), static_cast<GLsizei>(clipMax.y - clipMin.y));
+          state->vtkglScissor(static_cast<GLint>(clipMin.x),
+            static_cast<GLint>(fbHeight - clipMax.y), static_cast<GLsizei>(clipMax.x - clipMin.x),
+            static_cast<GLsizei>(clipMax.y - clipMin.y));
 
           glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(cmd->ElemCount),
             sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT,
@@ -204,6 +207,25 @@ struct vtkF3DImguiActor::Internals
   vtkSmartPointer<vtkOpenGLBufferObject> IndexBuffer;
   vtkSmartPointer<vtkShaderProgram> Program;
 };
+
+namespace
+{
+void SetupNextWindow(std::optional<ImVec2> position, std::optional<ImVec2> size)
+{
+  if (size.has_value())
+  {
+    // it's super important to set the size of the window manually
+    // otherwise ImGui skip a frame for computing the size resulting in
+    // no UI when doing offscreen rendering
+    ImGui::SetNextWindowSize(size.value());
+  }
+
+  if (position.has_value())
+  {
+    ImGui::SetNextWindowPos(position.value());
+  }
+}
+}
 
 vtkStandardNewMacro(vtkF3DImguiActor);
 
@@ -230,13 +252,14 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
   if (this->FontFile.empty())
   {
     fontConfig.FontDataOwnedByAtlas = false;
-    font = io.Fonts->AddFontFromMemoryTTF((void*)F3DFontBuffer, sizeof(F3DFontBuffer), 18, &fontConfig);
+    font =
+      io.Fonts->AddFontFromMemoryTTF((void*)F3DFontBuffer, sizeof(F3DFontBuffer), 18, &fontConfig);
   }
   else
   {
     font = io.Fonts->AddFontFromFileTTF(this->FontFile.c_str(), 18, &fontConfig);
   }
-  
+
   io.Fonts->Build();
   io.FontDefault = font;
 
@@ -269,11 +292,7 @@ void vtkF3DImguiActor::RenderFileName()
   winSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
   winSize.y += 2.f * ImGui::GetStyle().WindowPadding.y;
 
-  // it's super important to set the size of the window manually
-  // otherwise ImGui skip a frame for computing the size resulting in
-  // no UI when doing offscreen rendering
-  ImGui::SetNextWindowSize(winSize);
-  ImGui::SetNextWindowPos(ImVec2(viewport->GetWorkCenter().x - 0.5f * winSize.x, marginTop));
+  ::SetupNextWindow(ImVec2(viewport->GetWorkCenter().x - 0.5f * winSize.x, marginTop), winSize);
   ImGui::SetNextWindowBgAlpha(0.35f);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
@@ -281,6 +300,115 @@ void vtkF3DImguiActor::RenderFileName()
 
   ImGui::Begin("FileName", nullptr, flags);
   ImGui::TextUnformatted(this->FileName.c_str());
+  ImGui::End();
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DImguiActor::RenderMetaData()
+{
+  ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+  constexpr float marginRight = 5.f;
+
+  ImVec2 winSize = ImGui::CalcTextSize(this->MetaData.c_str());
+  winSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
+  winSize.y += 2.f * ImGui::GetStyle().WindowPadding.y;
+
+  ::SetupNextWindow(ImVec2(viewport->WorkSize.x - winSize.x - marginRight,
+                      viewport->GetWorkCenter().y - 0.5f * winSize.y),
+    winSize);
+  ImGui::SetNextWindowBgAlpha(0.35f);
+
+  ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
+    ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
+
+  ImGui::Begin("MetaData", nullptr, flags);
+  ImGui::TextUnformatted(this->MetaData.c_str());
+  ImGui::End();
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DImguiActor::RenderCheatSheet()
+{
+  ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+  constexpr float marginLeft = 5.f;
+  constexpr float marginTopBottom = 5.f;
+
+  float winWidth = 0.f;
+  for (const auto& [group, content] : this->CheatSheet)
+  {
+    for (const auto& [bind, desc, val] : content)
+    {
+      std::string line = bind;
+      line += ": ";
+      line += desc;
+      if (!val.empty())
+      {
+        line += " [" + val + "]";
+      }
+      ImVec2 currentLine = ImGui::CalcTextSize(line.c_str());
+
+      winWidth = std::max(winWidth, currentLine.x);
+    }
+  }
+  winWidth += 2.f * ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().ScrollbarSize;
+
+  ::SetupNextWindow(ImVec2(marginLeft, marginTopBottom),
+    ImVec2(winWidth, viewport->WorkSize.y - 2.f * marginTopBottom));
+  ImGui::SetNextWindowBgAlpha(0.35f);
+
+  ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+    ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings |
+    ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
+
+  ImGui::Begin("CheatSheet", nullptr, flags);
+
+  for (const auto& [group, list] : this->CheatSheet)
+  {
+    ImGui::SeparatorText(group.c_str());
+    for (const auto& [bind, desc, val] : list)
+    {
+      if (!val.empty())
+      {
+        ImGui::Text("%s: %s [%s]", bind.c_str(), desc.c_str(), val.c_str());
+      }
+      else
+      {
+        ImGui::Text("%s: %s", bind.c_str(), desc.c_str());
+      }
+    }
+  }
+
+  ImGui::End();
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DImguiActor::RenderFpsCounter()
+{
+  ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+  constexpr float marginRight = 3.f;
+  constexpr float marginBottom = 3.f;
+
+  std::string fpsString = std::to_string(this->FpsValue);
+  fpsString += " fps";
+
+  ImVec2 winSize = ImGui::CalcTextSize(fpsString.c_str());
+  winSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
+  winSize.y += 2.f * ImGui::GetStyle().WindowPadding.y;
+
+  ImVec2 position(viewport->WorkSize.x - winSize.x - marginRight,
+    viewport->WorkSize.y - winSize.y - marginBottom);
+
+  ::SetupNextWindow(position, winSize);
+  ImGui::SetNextWindowBgAlpha(0.35f);
+
+  ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
+    ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
+
+  ImGui::Begin("FpsCounter", nullptr, flags);
+  ImGui::TextUnformatted(fpsString.c_str());
   ImGui::End();
 }
 
