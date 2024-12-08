@@ -27,6 +27,8 @@
 #include "dmon.h"
 #endif
 
+#include "tinyfiledialogs.h"
+
 #include "engine.h"
 #include "interactor.h"
 #include "log.h"
@@ -660,7 +662,9 @@ public:
       interactor.addBinding({ mod_t::NONE, "Up" }, "reload_current_file_group", "Others", std::bind(docString, "Reload current file group"));
       interactor.addBinding({ mod_t::NONE, "Down" }, "add_current_directories", "Others", std::bind(docString, "Add files from dir of current file"));
       interactor.addBinding({ mod_t::NONE, "F12" }, "take_screenshot", "Others", std::bind(docString, "Take a screenshot"));
+      interactor.addBinding({ mod_t::CTRL, "O" }, "open_file_dialog", "Others", std::bind(docString, "Open File Dialog"));
       interactor.addBinding({ mod_t::CTRL, "F12" }, "take_minimal_screenshot", "Others", std::bind(docString, "Take a minimal screenshot"));
+
 
       // This replace an existing default binding command in the libf3d
       interactor.removeBinding({ mod_t::NONE, "Drop" });
@@ -1612,6 +1616,24 @@ void F3DStarter::AddCommands()
       if (index > -1)
       {
         this->LoadFileGroup(index);
+      }
+    });
+  interactor.addCommand("open_file_dialog",
+    [this](const std::vector<std::string>&)
+    {
+      const char* file = std::getenv("CTEST_OPEN_DIALOG_FILE");
+      if (!file)
+      {
+        file = tinyfd_openFileDialog("Open File", ".", 0, nullptr, nullptr, false);
+      }
+
+      if (file)
+      {
+        int index = this->AddFile(file);
+        if (index > -1)
+        {
+          this->LoadFileGroup(index);
+        }
       }
     });
 }
