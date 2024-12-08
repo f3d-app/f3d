@@ -244,10 +244,10 @@ public:
   /**
    * Start the interactor event loop.
    * Make sure the window is initialized first, by calling `window.render()`
-   * The event loop will be triggered every loopTime, and userCallBack will be called at the
+   * The event loop will be triggered every loopTime ms, and userCallBack will be called at the
    * start of the event loop
    */
-  virtual void start(double loopTime = 30, std::function<void()> userCallBack = nullptr) = 0;
+  virtual void start(double loopTime = 5, std::function<void()> userCallBack = nullptr) = 0;
 
   /**
    * Stop the interactor.

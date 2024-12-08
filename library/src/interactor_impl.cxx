@@ -1163,7 +1163,7 @@ bool interactor_impl::recordInteraction(const std::string& file)
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::start(double eventLoopTimeStep, std::function<void()> userCallBack)
+void interactor_impl::start(double loopTime, std::function<void()> userCallBack)
 {
   // MEAK
   this->Internals->StartEventLoop();
@@ -1173,7 +1173,8 @@ void interactor_impl::start(double eventLoopTimeStep, std::function<void()> user
     this->Internals->EventLoopUserCallBack = std::move(userCallBack);
   }
 
-  this->Internals->EventLoopTimerId = this->createTimerCallBack(eventLoopTimeStep, [this]() { this->EventLoop(); });
+  this->Internals->AnimationManager->SetInteractorEventLoopTime(loopTime);
+  this->Internals->EventLoopTimerId = this->createTimerCallBack(loopTime, [this]() { this->EventLoop(); });
   this->Internals->VTKInteractor->Start();
 }
 
@@ -1213,6 +1214,12 @@ void interactor_impl::UpdateRendererAfterInteraction()
 void interactor_impl::EventLoop()
 {
   this->Internals->EventLoopUserCallBack();
+
+  if (this->Internals->AnimationManager->IsPlaying())
+  {
+    this->Internals->AnimationManager->Tick();
+  }
+
   if (this->Internals->RenderRequested)
   {
     this->Internals->Window.render();
