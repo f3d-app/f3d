@@ -74,7 +74,7 @@ Other hotkeys and interactions are available:
 * <kbd>&uarr;</kbd>: reload the currently loaded files.
 * <kbd>&darr;</kbd>: add all current files parent directories to the list of files, reload the currently loaded files and reset the camera.
 * <kbd>F12</kbd>: take a screenshot, ie. render the current view to an image file.
-* <kbd>F11</kbd>: take a "minimal" screenshot, ie. render the current view with no grid and no overlays to an image file with a transparent background.
+* <kbd>Ctrl</kbd> + <kbd>F12</kbd>: take a "minimal" screenshot, ie. render the current view with no grid and no overlays to an image file with a transparent background.
 * *Drop* a file, directory or HDRI into the F3D window to load it. F3D relies on the extension (`.hdr` or `.exr`) to detect if the dropped file is an HDRI.
 * <kbd>Ctrl</kbd> + *Drop* a file, directory and load it.
 * <kbd>Shift</kbd> + *Drop* a HDRI and use it, no extensions checks performed.
@@ -98,7 +98,7 @@ as specified above.
 
 ## Taking Screenshots
 
-The destination filename used to save the screenshots (created by pressing <kbd>F12</kbd> or <kbd>F11</kbd>) is configurable (using the `screenshot-filename` option) and can use template variables as described [on the options page](OPTIONS.md#filename-templating).
+The destination filename used to save the screenshots (created by pressing <kbd>F12</kbd> or <kbd>Ctrl</kbd> + <kbd>F12</kbd>) is configurable (using the `screenshot-filename` option) and can use template variables as described [on the options page](OPTIONS.md#filename-templating).
 
 Unless the configured filename template is an absolute path, images will be saved into the user's home directory
 (using the following environment variables, if defined and pointing to an existing directory, in that order: `XDG_PICTURES_DIR`, `HOME`, or `USERPROFILE`).
