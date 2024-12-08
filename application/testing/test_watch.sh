@@ -21,11 +21,7 @@ pid=$!
 
 function cleanup()
 {
-  if [[ -z "${CTEST_F3D_COVERAGE-}" ]]; then
-    kill $pid
-  else
-    xdotool key Escape
-  fi
+  kill -SIGTERM $pid
 }
 trap "cleanup" EXIT
 
