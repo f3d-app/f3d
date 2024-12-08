@@ -99,8 +99,8 @@ find_package(VTK 9.0 REQUIRED
     RenderingVolumeOpenGL2
     TestingCore
     jsoncpp
-    opengl
   OPTIONAL_COMPONENTS
+    opengl
     IOExodus
     IOOpenVDB
     RenderingExternal

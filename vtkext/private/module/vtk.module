@@ -14,7 +14,6 @@ DEPENDS
   VTK::RenderingCore
   VTK::RenderingOpenGL2
   VTK::RenderingVolumeOpenGL2
-  VTK::opengl
 PRIVATE_DEPENDS
   VTK::CommonExecutionModel
   VTK::FiltersGeneral
@@ -27,6 +26,7 @@ PRIVATE_DEPENDS
   VTK::RenderingVolumeOpenGL2
   f3d::vtkext
 OPTIONAL_DEPENDS
+  VTK::opengl
   VTK::RenderingExternal
   VTK::RenderingRayTracing
 TEST_DEPENDS
