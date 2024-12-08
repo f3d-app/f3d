@@ -88,6 +88,17 @@ public:
   }
 
   /**
+   * Set the interactor event loop time and compute the number of event loop needed to trigger an actual tick
+   * TODO rework this API ?
+   */
+  void SetInteractorEventLoopTime(double loopTime);
+
+  /**
+   * Interactor EventLoop call this method every loopTime to advance animation
+   */
+  void Tick();
+
+  /**
    * Load animation at provided time value
    */
   bool LoadAtTime(double timeValue);
@@ -101,11 +112,6 @@ public:
   std::pair<double, double> GetTimeRange();
 
 private:
-  /**
-   * Called by an internal timer to advance one animation tick
-   */
-  void Tick();
-
   const options& Options;
   window_impl& Window;
   vtkImporter* Importer = nullptr;
@@ -122,6 +128,9 @@ private:
   std::chrono::steady_clock::time_point PreviousTick;
 
   vtkSmartPointer<vtkProgressBarWidget> ProgressWidget;
+
+  unsigned int AnimationFrameNLoop = 1;
+  unsigned int AnimationFrameLoopCount = 1;
 };
 }
 }
