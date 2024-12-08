@@ -1,0 +1,7 @@
+cmake_policy(SET CMP0012 NEW)
+
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+include("${CMAKE_CURRENT_LIST_DIR}/imgui-targets.cmake")

@@ -14,11 +14,12 @@ runs:
       run: |
         [[ "${{ inputs.lfs_sha }}" ]] || { echo "lfs_sha input is empty" ; exit 1; }
 
-    - name: Copy LFS Data
-      uses: ./source/.github/actions/lfs-copy
+    - name: Recover LFS Data
+      uses: f3d-app/lfs-data-cache-action@v1
       with:
-        lfs_sha: ${{ inputs.lfs_sha}}
-        workflow_label: 'consumer'
+        type: 'consumer'
+        lfs_sha: ${{inputs.lfs_sha}}
+        cache_postfix: cache-0 
 
     - name: Dependencies Dir
       shell: bash
@@ -86,7 +87,7 @@ runs:
         -DF3D_PLUGIN_BUILD_VDB=${{ runner.os == 'macOS' && 'OFF' || 'ON' }};
         -DF3D_MACOS_BUNDLE=OFF;
         -DF3D_MODULE_EXR=ON;
-        -DF3D_MODULE_EXTERNAL_RENDERING=ON;
+        -DF3D_MODULE_UI=ON;
         -DF3D_WINDOWS_GUI=OFF" >> $GITHUB_ENV
 
     - name: Set up Python

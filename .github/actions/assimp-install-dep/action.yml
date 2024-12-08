@@ -15,7 +15,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: dependencies/assimp_install
-        key: assimp-v5.4.0-${{runner.os}}-${{inputs.cpu}}-2
+        key: assimp-v5.4.2-${{runner.os}}-${{inputs.cpu}}-0
 
     - name: Checkout ASSIMP
       if: steps.cache-assimp.outputs.cache-hit != 'true'
@@ -23,7 +23,7 @@ runs:
       with:
         repository: assimp/assimp
         path: './dependencies/assimp'
-        ref: v5.4.0
+        ref: v5.4.2
 
     # Revert https://github.com/assimp/assimp/pull/5349
     - name: Patch ASSIMP
