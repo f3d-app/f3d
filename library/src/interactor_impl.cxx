@@ -332,19 +332,6 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  void StartInteractor()
-  {
-    this->VTKInteractor->Start();
-  }
-
-  //----------------------------------------------------------------------------
-  void StopInteractor()
-  {
-    this->VTKInteractor->RemoveObservers(vtkCommand::TimerEvent);
-    this->VTKInteractor->ExitCallback();
-  }
-
-  //----------------------------------------------------------------------------
   /**
    * Run a camera transition animation based on a camera state interpolation function.
    * The provided function will be called with an interpolation parameter
@@ -465,6 +452,10 @@ public:
 
   int DragDistanceTol = 3;      /* px */
   int TransitionDuration = 100; /* ms */
+
+  std::function<void()> EventLoopUserCallBack = std::function<void()>();
+  unsigned long EventLoopTimerId = -1;
+  std::atomic<bool> RenderRequested = false;
 };
 
 //----------------------------------------------------------------------------
@@ -621,7 +612,7 @@ interactor& interactor_impl::initCommands()
     });
 
   this->addCommand(
-    "stop_interactor", [&](const std::vector<std::string>&) { this->Internals->StopInteractor(); });
+    "stop_interactor", [&](const std::vector<std::string>&) { this->stop(); });
 
   this->addCommand("reset_camera",
     [&](const std::vector<std::string>&) { this->Internals->Window.getCamera().resetToDefault(); });
@@ -1049,7 +1040,6 @@ bool interactor_impl::playInteraction(const std::string& file)
 
     std::string cleanFile = vtksys::SystemTools::CollapseFullPath(file);
     this->Internals->Recorder->SetFileName(cleanFile.c_str());
-    this->Internals->Window.UpdateDynamicOptions();
     this->Internals->Recorder->Play();
   }
 
@@ -1101,16 +1091,32 @@ bool interactor_impl::recordInteraction(const std::string& file)
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::start()
+void interactor_impl::start(double loopTime, std::function<void()> userCallBack)
 {
   this->Internals->Window.UpdateDynamicOptions();
-  this->Internals->StartInteractor();
+
+  if (userCallBack)
+  {
+    this->Internals->EventLoopUserCallBack = std::move(userCallBack);
+  }
+
+  this->Internals->AnimationManager->SetInteractorEventLoopTime(loopTime);
+  this->Internals->EventLoopTimerId = this->createTimerCallBack(loopTime, [this]() { this->EventLoop(); });
+  this->Internals->VTKInteractor->Start();
 }
 
 //----------------------------------------------------------------------------
 void interactor_impl::stop()
 {
-  this->Internals->StopInteractor();
+  this->removeTimerCallBack(this->Internals->EventLoopTimerId);
+  this->Internals->VTKInteractor->RemoveObservers(vtkCommand::TimerEvent);
+  this->Internals->VTKInteractor->ExitCallback();
+}
+
+//----------------------------------------------------------------------------
+void interactor_impl::requestRender()
+{
+  this->Internals->RenderRequested = true;
 }
 
 //----------------------------------------------------------------------------
@@ -1129,6 +1135,23 @@ void interactor_impl::SetInteractorOn(vtkInteractorObserver* observer)
 void interactor_impl::UpdateRendererAfterInteraction()
 {
   this->Internals->Style->UpdateRendererAfterInteraction();
+}
+
+//----------------------------------------------------------------------------
+void interactor_impl::EventLoop()
+{
+  this->Internals->EventLoopUserCallBack();
+
+  if (this->Internals->AnimationManager->IsPlaying())
+  {
+    this->Internals->AnimationManager->Tick();
+  }
+
+  if (this->Internals->RenderRequested)
+  {
+    this->Internals->Window.render();
+    this->Internals->RenderRequested = false;
+  }
 }
 
 //----------------------------------------------------------------------------

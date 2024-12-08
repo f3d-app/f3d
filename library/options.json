@@ -17,9 +17,6 @@
         "type": "ratio",
         "default_value": "1.0"
       },
-      "time": {
-        "type": "double"
-      },
       "frame_rate": {
         "type": "double",
         "default_value": "60.0"

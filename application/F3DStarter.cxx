@@ -83,6 +83,7 @@ public:
     bool NoRender;
     std::string RenderingBackend;
     double MaxSize;
+    std::optional<double> AnimationTime;
     bool Watch;
     std::vector<std::string> Plugins;
     std::string ScreenshotFilename;
@@ -141,9 +142,12 @@ public:
       cam.setPosition(pos);
       reset = true;
     }
-    if (camConf.CameraPosition.size() != 3 && camConf.CameraZoomFactor > 0)
+    if (camConf.CameraPosition.size() != 3)
     {
-      zoomFactor = camConf.CameraZoomFactor;
+      if (camConf.CameraZoomFactor > 0)
+      {
+        zoomFactor = camConf.CameraZoomFactor;
+      }
       reset = true;
     }
     if (reset)
@@ -538,6 +542,10 @@ public:
     this->AppOptions.RenderingBackend =
       f3d::options::parse<std::string>(appOptions.at("rendering-backend"));
     this->AppOptions.MaxSize = f3d::options::parse<double>(appOptions.at("max-size"));
+    if (!appOptions.at("animation-time").empty())
+    {
+      this->AppOptions.AnimationTime = f3d::options::parse<double>(appOptions.at("animation-time"));
+    }
     this->AppOptions.Watch = f3d::options::parse<bool>(appOptions.at("watch"));
     this->AppOptions.Plugins = { f3d::options::parse<std::vector<std::string>>(
       appOptions.at("load-plugins")) };
@@ -751,7 +759,6 @@ public:
   std::mutex LoadedFilesMutex;
 
   // Event loop atomics
-  std::atomic<bool> RenderRequested = false;
   std::atomic<bool> ReloadFileRequested = false;
 };
 
@@ -1068,14 +1075,13 @@ int F3DStarter::Start(int argc, char** argv)
       {
         // Create the event loop repeating timer
         window.render();
-        interactor.createTimerCallBack(30, [this]() { this->EventLoop(); });
 
         // gracefully exits if SIGTERM or SIGINT is send to F3D
         GlobalInteractor = &interactor;
         std::signal(SIGTERM, F3DInternals::SigCallback);
         std::signal(SIGINT, F3DInternals::SigCallback);
 
-        interactor.start();
+        interactor.start(5, [this]() { this->EventLoop(); });
       }
 #endif
     }
@@ -1231,6 +1237,13 @@ void F3DStarter::LoadFileGroup(
         // Add files to the scene
         scene.add(localPaths);
 
+        if (this->Internals->AppOptions.AnimationTime.has_value())
+        {
+          f3d::log::debug(
+            "Loading animation time: ", this->Internals->AppOptions.AnimationTime.value());
+          scene.loadAnimationTime(this->Internals->AppOptions.AnimationTime.value());
+        }
+
         // Update loaded files
         std::copy(
           localPaths.begin(), localPaths.end(), std::back_inserter(this->Internals->LoadedFiles));
@@ -1322,13 +1335,6 @@ void F3DStarter::LoadFileGroup(
   f3d::options& options = this->Internals->Engine->getOptions();
   options.ui.dropzone = this->Internals->LoadedFiles.empty();
   options.ui.filename_info = filenameInfo;
-}
-
-//----------------------------------------------------------------------------
-void F3DStarter::RequestRender()
-{
-  // Render will be called by the next event loop
-  this->Internals->RenderRequested = true;
 }
 
 //----------------------------------------------------------------------------
@@ -1492,7 +1498,7 @@ bool F3DStarter::LoadRelativeFileGroup(int index, bool restoreCamera, bool force
     this->LoadFileGroup(index, true, forceClear);
   }
 
-  this->RequestRender();
+  this->Internals->Engine->getInteractor().requestRender();
 
   return true;
 }
@@ -1504,11 +1510,6 @@ void F3DStarter::EventLoop()
   {
     this->LoadRelativeFileGroup(0, true, true);
     this->Internals->ReloadFileRequested = false;
-  }
-  if (this->Internals->RenderRequested)
-  {
-    this->Render();
-    this->Internals->RenderRequested = false;
   }
 }
 

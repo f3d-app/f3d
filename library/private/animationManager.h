@@ -47,9 +47,9 @@ public:
    * Can be used to reset animation to the initial state.
    * Importer must be set before use.
    * Interactor should be set before use if any.
-   * Return true if at least one animation is available, false otherwise.
+   * Also start the animation when using autoplay option
    */
-  bool Initialize();
+  void Initialize();
 
   /**
    * Start/Stop playing the animation
@@ -88,6 +88,17 @@ public:
   }
 
   /**
+   * Set the interactor event loop time and compute the number of event loop needed to trigger an actual tick
+   * TODO rework this API ?
+   */
+  void SetInteractorEventLoopTime(double loopTime);
+
+  /**
+   * Interactor EventLoop call this method every loopTime to advance animation
+   */
+  void Tick();
+
+  /**
    * Load animation at provided time value
    */
   bool LoadAtTime(double timeValue);
@@ -96,16 +107,11 @@ public:
   void operator=(animationManager const&) = delete;
 
   /**
-   * Set a time range pointer to the current time range values
+   * Return a pair containing the current time range values
    */
-  void GetTimeRange(double timeRange[2]);
+  std::pair<double, double> GetTimeRange();
 
 private:
-  /**
-   * Called by an internal timer to advance one animation tick
-   */
-  void Tick();
-
   const options& Options;
   window_impl& Window;
   vtkImporter* Importer = nullptr;
@@ -122,6 +128,9 @@ private:
   std::chrono::steady_clock::time_point PreviousTick;
 
   vtkSmartPointer<vtkProgressBarWidget> ProgressWidget;
+
+  unsigned int AnimationFrameNLoop = 1;
+  unsigned int AnimationFrameLoopCount = 1;
 };
 }
 }
