@@ -19,6 +19,8 @@ Start-Sleep -Seconds 3
 Copy-Item $lowres_data -Destination $reloaded_data
 Start-Sleep -Seconds 3
 
+Get-Content $log
+
 $str = Select-String $log -Pattern "Number of points: 634"
 if ($str -ne $null) {
   $ret = 0
