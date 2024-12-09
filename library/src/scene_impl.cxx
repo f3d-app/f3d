@@ -131,6 +131,9 @@ public:
     // Initialize the animation using temporal information from the importer
     this->AnimationManager.Initialize();
 
+    // Display output description
+    scene_impl::internals::DisplayImporterDescription(this->MetaImporter);
+
     // Update all window options and reset camera to bounds if needed
     this->Window.UpdateDynamicOptions();
     if (!this->Options.scene.camera.index.has_value())
@@ -138,7 +141,13 @@ public:
       this->Window.getCamera().resetToBounds();
     }
 
-    scene_impl::internals::DisplayAllInfo(this->MetaImporter, this->Window);
+    // Display coloring information
+    this->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
+    log::debug("");
+
+    // Print scene description
+    this->Window.PrintSceneDescription(log::VerboseLevel::DEBUG);
+
   }
 
   static void DisplayImporterDescription(vtkImporter* importer)
@@ -158,19 +167,6 @@ public:
     }
     log::debug("");
     log::debug(importer->GetOutputsDescription(), "\n");
-  }
-
-  static void DisplayAllInfo(vtkImporter* importer, window_impl& window)
-  {
-    // Display output description
-    scene_impl::internals::DisplayImporterDescription(importer);
-
-    // Display coloring information
-    window.PrintColoringDescription(log::VerboseLevel::DEBUG);
-    log::debug("");
-
-    // Print scene description
-    window.PrintSceneDescription(log::VerboseLevel::DEBUG);
   }
 
   const options& Options;
@@ -321,7 +317,7 @@ bool scene_impl::supports(const fs::path& filePath)
 scene& scene_impl::loadAnimationTime(double timeValue)
 {
   this->Internals->AnimationManager.LoadAtTime(timeValue);
-  scene_impl::internals::DisplayAllInfo(this->Internals->MetaImporter, this->Internals->Window);
+//  scene_impl::internals::DisplayAllInfo(this->Internals->MetaImporter, this->Internals->Window);
   return *this;
 }
 
