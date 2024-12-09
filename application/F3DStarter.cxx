@@ -1640,6 +1640,5 @@ void F3DStarter::AddCommands()
         }
       }
     });
-  interactor.addCommand(
-    "exit", [&](const std::vector<std::string>&) { interactor.stop(); });
+  interactor.addCommand("exit", [&](const std::vector<std::string>&) { interactor.stop(); });
 }
