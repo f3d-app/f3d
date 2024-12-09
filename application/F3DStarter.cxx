@@ -1621,10 +1621,27 @@ void F3DStarter::AddCommands()
   interactor.addCommand("open_file_dialog",
     [this](const std::vector<std::string>&)
     {
+      std::vector<std::string> filters;
+      for (const auto& info : f3d::engine::getReadersInfo())
+      {
+        for (const auto& ext : info.Extensions)
+        {
+          filters.push_back("*." + ext);
+        }
+      }
+
+      std::vector<const char*> cstrings;
+      cstrings.reserve(filters.size());
+      for (const auto& filter : filters)
+      {
+        cstrings.push_back(filter.c_str());
+      }
+
       const char* file = std::getenv("CTEST_OPEN_DIALOG_FILE");
       if (!file)
       {
-        file = tinyfd_openFileDialog("Open File", ".", 0, nullptr, nullptr, false);
+        file = tinyfd_openFileDialog("Open File", nullptr, static_cast<int>(cstrings.size()),
+          cstrings.data(), "Supported Files", false);
       }
 
       if (file)
