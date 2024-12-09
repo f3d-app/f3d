@@ -1624,7 +1624,24 @@ void F3DStarter::AddCommands()
       const char* file = std::getenv("CTEST_OPEN_DIALOG_FILE");
       if (!file)
       {
-        file = tinyfd_openFileDialog("Open File", ".", 0, nullptr, nullptr, false);
+        std::vector<std::string> filters;
+        for (const auto info : f3d::engine::getReadersInfo())
+        {
+          for (const auto ext : info.Extensions)
+          {
+            filters.push_back("*." + ext);
+          }
+        }
+
+        std::vector<const char*> cstrings;
+        cstrings.reserve(filters.size());
+        for (const auto& filter : filters)
+        {
+          cstrings.push_back(filter.c_str());
+        }
+
+        file = tinyfd_openFileDialog(
+          "Open File", "./", cstrings.size(), cstrings.data(), "Supported Files", false);
       }
 
       if (file)
