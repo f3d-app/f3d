@@ -671,6 +671,9 @@ public:
       interactor.addBinding({ mod_t::NONE, "Drop" }, "add_files_or_set_hdri", "Others", std::bind(docString, "Load dropped files, folder or HDRI"));
       interactor.addBinding({ mod_t::CTRL, "Drop" }, "add_files", "Others", std::bind(docString, "Load dropped files or folder"));
       interactor.addBinding({ mod_t::SHIFT, "Drop" }, "set_hdri", "Others", std::bind(docString, "Set HDRI and use it"));
+
+      interactor.removeBinding({mod_t::CTRL, "Q"});
+      interactor.addBinding({mod_t::CTRL, "Q"}, "exit", "Others", std::bind(docString, "Quit"));
       // clang-format on
 
       f3d::log::debug("Adding config defined bindings if any: ");
@@ -1637,4 +1640,6 @@ void F3DStarter::AddCommands()
         }
       }
     });
+  interactor.addCommand(
+    "exit", [&](const std::vector<std::string>&) { interactor.stop(); });
 }

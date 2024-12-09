@@ -686,7 +686,7 @@ interactor& interactor_impl::initCommands()
     });
 
   this->addCommand(
-    "exit", [&](const std::vector<std::string>&) { this->Internals->StopInteractor(); });
+    "stop_interactor", [&](const std::vector<std::string>&) { this->Internals->StopInteractor(); });
 
   this->addCommand("reset_camera",
     [&](const std::vector<std::string>&) { this->Internals->Window.getCamera().resetToDefault(); });

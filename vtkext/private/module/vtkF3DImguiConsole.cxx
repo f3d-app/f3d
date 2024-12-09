@@ -180,7 +180,9 @@ void vtkF3DImguiConsole::ShowBadge()
 
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
 
-    if (this->GetUseColoring())
+    const bool useColoring = this->GetUseColoring();
+
+    if (useColoring)
     {
       ImGui::PushStyleColor(ImGuiCol_Text,
         this->Pimpl->NewError ? ImVec4(1.0f, 0.0f, 0.0f, 1.0f) : ImVec4(1.0f, 1.0f, 0.0f, 1.0f));
@@ -191,7 +193,7 @@ void vtkF3DImguiConsole::ShowBadge()
       this->InvokeEvent(vtkF3DImguiConsole::ShowEvent);
     }
 
-    ImGui::PopStyleColor(this->GetUseColoring() ? 2 : 1);
+    ImGui::PopStyleColor(useColoring ? 2 : 1);
 
     ImGui::End();
   }

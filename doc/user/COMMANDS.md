@@ -41,7 +41,7 @@ Supports `front`, `top`, `right`, `isometric` arguments. eg: `set_camera top`.
 
 `toggle_volume_rendering`: A specific command to toggle `model.volume.enable` and print coloring information. No argument.
 
-`exit`: A specific command to stop the interactor hence quitting the application. No argument.
+`stop_interactor`: A specific command to stop the interactor hence quitting the application. No argument.
 
 `reset_camera`: A specific command to reset the camera to its original location. No argument.
 
@@ -53,6 +53,8 @@ eg: `add_files /path/to/dragon.vtu`.
 ## F3D provided specific commands
 
 The F3D application provides a few more commands.
+
+`exit`: A specific command to quit the application. No argument.
 
 `load_previous_file_group`: A specific command to load the previous file or file group. No argument.
 
