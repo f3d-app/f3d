@@ -1513,6 +1513,7 @@ void F3DStarter::EventLoop()
 {
   if (this->Internals->ReloadFileRequested)
   {
+    std::cout<<"ReloadFileRequested"<<std::endl;
     this->LoadRelativeFileGroup(0, true, true);
     this->Internals->ReloadFileRequested = false;
   }

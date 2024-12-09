@@ -1440,6 +1440,13 @@ void vtkF3DRenderer::UpdateActors()
   {
     this->ActorsPropertiesConfigured = false;
     this->GridConfigured = false;
+    this->ColorTransferFunctionConfigured = false;
+    this->ColoringMappersConfigured = false;
+    this->PointSpritesMappersConfigured = false;
+    this->VolumePropsAndMappersConfigured = false;
+    this->ScalarBarActorConfigured = false;
+    this->MetaDataConfigured = false;
+    this->ColoringConfigured = false;
   }
   this->ImporterTimeStamp = importerMTime;
 
