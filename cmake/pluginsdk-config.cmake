@@ -3,7 +3,7 @@ if (UNIX AND NOT APPLE)
   find_package(X11)
 endif()
 find_package(OpenGL)
-find_package(VTK 9.0 REQUIRED COMPONENTS CommonCore CommonExecutionModel IOImport)
+find_package(VTK 9.2.6 REQUIRED COMPONENTS CommonCore CommonExecutionModel IOImport)
 include("${CMAKE_CURRENT_LIST_DIR}/f3dPlugin.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/../f3d_vtkext/f3d_vtkext-targets.cmake")
 

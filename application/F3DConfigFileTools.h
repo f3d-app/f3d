@@ -1,21 +1,25 @@
-/**
- * @class   F3DConfigFileTools
- * @brief   A namespace to recover path to config file and related directories, cross platform
- *
- */
-
 #ifndef F3DConfigFileTools_h
 #define F3DConfigFileTools_h
+/**
+ * @class   F3DConfigFileTools
+ * @brief   A namespace to parse config files
+ */
+#include "F3DOptionsTools.h"
 
-#include <filesystem>
 #include <string>
-#include <vector>
 
 namespace F3DConfigFileTools
 {
-std::filesystem::path GetUserConfigFileDirectory();
-std::filesystem::path GetBinaryResourceDirectory();
-std::vector<std::filesystem::path> GetConfigPaths(const std::string& configSearch);
+using BindingsVector = std::vector<std::pair<std::string, std::vector<std::string>>>;
+using BindingsEntry = std::tuple<BindingsVector, std::filesystem::path, std::string>;
+using BindingsEntries = std::vector<BindingsEntry>;
+
+/**
+ * Read config files using userConfig if any, return an optionEntries
+ * containing ordered optionDict and ordered bindingsEntries
+ */
+std::pair<F3DOptionsTools::OptionsEntries, BindingsEntries> ReadConfigFiles(
+  const std::string& userConfig);
 }
 
 #endif

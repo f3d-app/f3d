@@ -84,3 +84,65 @@ std::vector<std::string> GetVectorEnvironnementVariable(const std::string& envVa
   return tokens;
 }
 }
+
+//----------------------------------------------------------------------------
+fs::path F3DSystemTools::GetUserConfigFileDirectory()
+{
+  std::string applicationName = "f3d";
+  fs::path dirPath;
+#if defined(_WIN32)
+  const char* appData = std::getenv("APPDATA");
+  if (!appData)
+  {
+    return {};
+  }
+  dirPath = fs::path(appData);
+#else
+  // Implementing XDG specifications
+  const char* xdgConfigHome = std::getenv("XDG_CONFIG_HOME");
+  if (xdgConfigHome && strlen(xdgConfigHome) > 0)
+  {
+    dirPath = fs::path(xdgConfigHome);
+  }
+  else
+  {
+    const char* home = std::getenv("HOME");
+    if (!home || strlen(home) == 0)
+    {
+      return {};
+    }
+    dirPath = fs::path(home);
+    dirPath /= ".config";
+  }
+#endif
+  dirPath /= applicationName;
+  return dirPath;
+}
+
+//----------------------------------------------------------------------------
+fs::path F3DSystemTools::GetBinaryResourceDirectory()
+{
+  fs::path dirPath;
+  try
+  {
+    dirPath = F3DSystemTools::GetApplicationPath();
+
+    // transform path to exe to path to install
+    // /install/bin/f3d -> /install
+    dirPath = fs::canonical(dirPath).parent_path().parent_path();
+
+    // Add binary specific paths
+#if F3D_MACOS_BUNDLE
+    dirPath /= "Resources";
+#else
+    dirPath /= "share/f3d";
+#endif
+  }
+  catch (const fs::filesystem_error&)
+  {
+    f3d::log::debug("Cannot recover binary configuration file directory: ", dirPath.string());
+    return {};
+  }
+
+  return dirPath;
+}

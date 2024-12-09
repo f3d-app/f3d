@@ -1,11 +1,19 @@
-.vscode
+## This file should contain only F3D process related files and folder
+## For any files specific to user process, use either ~/.gitignore or .git/info/exclude instead
+# doc process related
 _site
-.vs
-CMakeUserPresets.json
-build/
+
+# scikit build related
 _skbuild
 dist
 *.egg-info
+
+# python usage related
 __pycache__
 *.pyc
+
+# python wheel process related
 _version.py
+
+# wasm process related
+node_modules

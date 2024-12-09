@@ -76,8 +76,9 @@ defaults:
 
   -
     scope:
-      path: "doc/user/USAGE.md"
+      path: "doc/user/QUICKSTART.md"
     values:
+      title: Quickstart
       parent: User Documentation
       nav_order: 0
 
@@ -90,53 +91,74 @@ defaults:
 
   -
     scope:
-      path: "doc/user/OPTIONS.md"
+      path: "doc/user/SUPPORTED_FORMATS.md"
     values:
-      title: Options
+      title: Supported File Formats
       parent: User Documentation
       nav_order: 2
 
   -
     scope:
-      path: "doc/user/INTERACTIONS.md"
+      path: "doc/user/OPTIONS.md"
     values:
+      title: Options
       parent: User Documentation
       nav_order: 3
-
+  
   -
     scope:
-      path: "doc/user/ANIMATIONS.md"
+      path: "doc/user/INTERACTIONS.md"
     values:
       parent: User Documentation
       nav_order: 4
 
   -
     scope:
-      path: "doc/user/CONFIGURATION_FILE.md"
+      path: "doc/user/ANIMATIONS.md"
     values:
       parent: User Documentation
       nav_order: 5
 
   -
     scope:
-      path: "doc/user/COLOR_MAPS.md"
+      path: "doc/user/CONFIGURATION_FILE.md"
     values:
       parent: User Documentation
       nav_order: 6
-
   -
     scope:
-      path: "doc/user/FINAL_SHADER.md"
+      path: "doc/user/COMMANDS.md"
     values:
       parent: User Documentation
       nav_order: 7
 
   -
     scope:
-      path: "doc/user/DESKTOP_INTEGRATION.md"
+      path: "doc/user/COLOR_MAPS.md"
     values:
       parent: User Documentation
       nav_order: 8
+
+  -
+    scope:
+      path: "doc/user/FINAL_SHADER.md"
+    values:
+      parent: User Documentation
+      nav_order: 9
+
+  -
+    scope:
+      path: "doc/user/DESKTOP_INTEGRATION.md"
+    values:
+      parent: User Documentation
+      nav_order: 10
+
+  -
+    scope:
+      path: "doc/user/PLUGINS.md"
+    values:
+      parent: User Documentation
+      nav_order: 11
 
   -
     scope:
@@ -144,7 +166,7 @@ defaults:
     values:
       title: Limitations and Troubleshooting
       parent: User Documentation
-      nav_order: 9
+      nav_order: 12
 
 # libf3d doc
   -
@@ -179,7 +201,7 @@ defaults:
 
   -
     scope:
-      path: "doc/libf3d/BINDINGS.md"
+      path: "doc/libf3d/LANGUAGE_BINDINGS.md"
     values:
       parent: libf3d Documentation
       nav_order: 3

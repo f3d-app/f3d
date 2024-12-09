@@ -1,6 +1,10 @@
+[
 {
-  ".*(abc)":
+  "match": ".*(abc)",
+  "options":
   {
+    "scalar-coloring": true,
     "load-plugins": "alembic"
   }
 }
+]

@@ -1,6 +1,8 @@
+[
 {
-  "global":
+  "options":
   {
     "verbose": true
   }
 }
+]

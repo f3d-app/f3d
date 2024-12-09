@@ -1,7 +1,7 @@
 // Automatically generated headers
 #include <app_f3d_F3D_Camera.h>
 #include <app_f3d_F3D_Engine.h>
-#include <app_f3d_F3D_Loader.h>
+#include <app_f3d_F3D_Scene.h>
 #include <app_f3d_F3D_Options.h>
 #include <app_f3d_F3D_Window.h>
 
@@ -46,7 +46,7 @@ extern "C"
   JNIEXPORT jlong JAVA_BIND(Engine, construct)(JNIEnv*, jobject)
   {
     f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
-    return reinterpret_cast<jlong>(new f3d::engine());
+    return reinterpret_cast<jlong>(new f3d::engine(f3d::engine::create()));
   }
 
   JNIEXPORT void JAVA_BIND(Engine, destroy)(JNIEnv*, jobject, jlong ptr)
@@ -54,18 +54,16 @@ extern "C"
     delete reinterpret_cast<f3d::engine*>(ptr);
   }
 
-  // Loader
-  JNIEXPORT void JAVA_BIND(Loader, loadScene)(JNIEnv* env, jobject self, jstring path)
+  // Scene
+  JNIEXPORT void JAVA_BIND(Scene, add)(JNIEnv* env, jobject self, jstring path)
   {
     const char* str = env->GetStringUTFChars(path, nullptr);
-    GetEngine(env, self)->getLoader().loadScene(str);
+    GetEngine(env, self)->getScene().add(str);
     env->ReleaseStringUTFChars(path, str);
   }
-  JNIEXPORT void JAVA_BIND(Loader, loadGeometry)(JNIEnv* env, jobject self, jstring path)
+  JNIEXPORT void JAVA_BIND(Scene, clear)(JNIEnv* env, jobject self)
   {
-    const char* str = env->GetStringUTFChars(path, nullptr);
-    GetEngine(env, self)->getLoader().loadGeometry(str);
-    env->ReleaseStringUTFChars(path, str);
+    GetEngine(env, self)->getScene().clear();
   }
 
   // Window

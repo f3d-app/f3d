@@ -5,8 +5,8 @@
 
 #include <vtkBMPWriter.h>
 #include <vtkDataArrayRange.h>
+#include <vtkDoubleArray.h>
 #include <vtkImageData.h>
-#include <vtkImageDifference.h>
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Collection.h>
 #include <vtkImageReader2Factory.h>
@@ -18,7 +18,14 @@
 #include <vtkStringArray.h>
 #include <vtkTIFFWriter.h>
 #include <vtkUnsignedCharArray.h>
+#include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240729)
+#include <vtkImageSSIM.h>
+#else
+#include <vtkImageDifference.h>
+#endif
 
 #include <algorithm>
 #include <cassert>
@@ -31,9 +38,15 @@ namespace f3d
 {
 class image::internals
 {
-  inline static const std::string metadataKeyPrefix = "f3d:";
-
 public:
+  inline static const std::string metadataKeyPrefix = "f3d:";
+  inline static const std::map<SaveFormat, std::string> saveFormatString = {
+    { SaveFormat::PNG, "PNG" },
+    { SaveFormat::BMP, "BMP" },
+    { SaveFormat::JPG, "JPG" },
+    { SaveFormat::TIF, "TIF" },
+  };
+
   vtkSmartPointer<vtkImageData> Image;
   std::unordered_map<std::string, std::string> Metadata;
 
@@ -84,6 +97,51 @@ public:
           }
         }
       }
+    }
+  }
+
+  static void checkSaveFormatCompatibility(const image& self, SaveFormat format)
+  {
+    ChannelType type = self.getChannelType();
+    int count = self.getChannelCount();
+
+    switch (format)
+    {
+      case SaveFormat::PNG:
+        if (type != ChannelType::BYTE && type != ChannelType::SHORT)
+        {
+          throw write_exception("PNG format is only compatible with BYTE or SHORT channel types");
+        }
+        break;
+      case SaveFormat::JPG:
+      case SaveFormat::BMP:
+        if (type != ChannelType::BYTE)
+        {
+          throw write_exception(
+            saveFormatString.at(format) + " format is only compatible with BYTE channel types");
+        }
+        break;
+      default:
+        break;
+    }
+
+    switch (format)
+    {
+      case SaveFormat::JPG:
+        if (count != 1 && count != 3)
+        {
+          throw write_exception("JPG format is only compatible with a channel count of 1 or 3");
+        }
+        break;
+      case SaveFormat::PNG:
+      case SaveFormat::BMP:
+      case SaveFormat::TIF:
+        if (count < 1 || count > 4)
+        {
+          throw write_exception(saveFormatString.at(format) +
+            " format is only compatible with a channel count between 1 to 4");
+        }
+        break;
     }
   }
 };
@@ -231,31 +289,11 @@ unsigned int image::getHeight() const
   return dims[1];
 }
 
-#ifndef F3D_NO_DEPRECATED
-//----------------------------------------------------------------------------
-image& image::setResolution(unsigned int width, unsigned int height)
-{
-  this->Internals->Image->SetDimensions(static_cast<int>(width), static_cast<int>(height), 1);
-  this->Internals->Image->AllocateScalars(
-    VTK_UNSIGNED_CHAR, static_cast<int>(this->getChannelCount()));
-  return *this;
-}
-#endif
-
 //----------------------------------------------------------------------------
 unsigned int image::getChannelCount() const
 {
   return this->Internals->Image->GetNumberOfScalarComponents();
 }
-
-#ifndef F3D_NO_DEPRECATED
-//----------------------------------------------------------------------------
-image& image::setChannelCount(unsigned int dim)
-{
-  this->Internals->Image->AllocateScalars(VTK_UNSIGNED_CHAR, static_cast<int>(dim));
-  return *this;
-}
-#endif
 
 //----------------------------------------------------------------------------
 image::ChannelType image::getChannelType() const
@@ -297,27 +335,76 @@ void* image::getContent() const
   return this->Internals->Image->GetScalarPointer();
 }
 
-#ifndef F3D_NO_DEPRECATED
 //----------------------------------------------------------------------------
-image& image::setData(unsigned char* buffer)
+bool image::compare(const image& reference, double threshold, double& error) const
 {
-  this->setContent(buffer);
-  return *this;
-}
+  // Sanity check for threshold
+  if (threshold < 0 || threshold >= 1)
+  {
+    error = 1;
+    return false;
+  }
 
-//----------------------------------------------------------------------------
-unsigned char* image::getData() const
-{
-  return static_cast<unsigned char*>(this->getContent());
-}
-#endif
+  ChannelType type = this->getChannelType();
+  if (type != reference.getChannelType())
+  {
+    error = 1;
+    return false;
+  }
 
-//----------------------------------------------------------------------------
-bool image::compare(const image& reference, double threshold, image& diff, double& error) const
-{
+  unsigned int count = this->getChannelCount();
+  if (count != reference.getChannelCount())
+  {
+    error = 1;
+    return false;
+  }
+
+  if (this->getWidth() != reference.getWidth() || this->getHeight() != reference.getHeight())
+  {
+    error = 1;
+    return false;
+  }
+
+  if (this->getWidth() == 0 && this->getHeight() == 0)
+  {
+    error = 0;
+    return true;
+  }
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240729)
+  vtkNew<vtkImageSSIM> ssim;
+  std::vector<int> ranges(count);
+  switch (type)
+  {
+    case ChannelType::BYTE:
+      std::fill(ranges.begin(), ranges.end(), 256);
+      ssim->SetInputRange(ranges);
+      break;
+    case ChannelType::SHORT:
+      std::fill(ranges.begin(), ranges.end(), 65535);
+      ssim->SetInputRange(ranges);
+      break;
+    case ChannelType::FLOAT:
+      ssim->SetInputToAuto();
+      break;
+  }
+
+  ssim->SetInputData(this->Internals->Image);
+  ssim->SetInputData(1, reference.Internals->Image);
+  ssim->Update();
+  vtkDoubleArray* scalars = vtkArrayDownCast<vtkDoubleArray>(
+    vtkDataSet::SafeDownCast(ssim->GetOutputDataObject(0))->GetPointData()->GetScalars());
+
+  // Thanks to the checks above, this is always true
+  assert(scalars != nullptr);
+
+  double unused;
+  vtkImageSSIM::ComputeErrorMetrics(scalars, error, unused);
+  return error <= threshold;
+#else
+  threshold *= 1000;
+
   vtkNew<vtkImageDifference> imDiff;
-  // handle threshold outside of vtkImageDifference:
-  // https://gitlab.kitware.com/vtk/vtk/-/issues/18152
   imDiff->SetThreshold(0);
   imDiff->SetInputData(this->Internals->Image);
   imDiff->SetImageData(reference.Internals->Image);
@@ -330,22 +417,20 @@ bool image::compare(const image& reference, double threshold, image& diff, doubl
     error = imDiff->GetThresholdedError();
   }
 
-  if (error > threshold)
-  {
-    imDiff->Update();
-    diff.Internals->Image = imDiff->GetOutput();
-    return false;
-  }
-
-  return true;
+  bool ret = error <= threshold;
+  error /= 1000;
+  return ret;
+#endif
 }
 
 //----------------------------------------------------------------------------
 bool image::operator==(const image& reference) const
 {
-  image diff;
   double error;
-  return this->compare(reference, 0, diff, error);
+  // XXX: We do not use 0 because even with identical images, rounding error, arithmetic imprecision
+  // or architecture issue may cause the value to not be 0. See:
+  // https://develop.openfoam.com/Development/openfoam/-/issues/2958
+  return this->compare(reference, 1e-14, error);
 }
 
 //----------------------------------------------------------------------------
@@ -384,8 +469,9 @@ std::vector<double> image::getNormalizedPixel(const std::pair<int, int>& xy) con
 //----------------------------------------------------------------------------
 void image::save(const std::string& path, SaveFormat format) const
 {
-  vtkSmartPointer<vtkImageWriter> writer;
+  internals::checkSaveFormatCompatibility(*this, format);
 
+  vtkSmartPointer<vtkImageWriter> writer;
   switch (format)
   {
     case SaveFormat::PNG:
@@ -419,6 +505,8 @@ void image::save(const std::string& path, SaveFormat format) const
 //----------------------------------------------------------------------------
 std::vector<unsigned char> image::saveBuffer(SaveFormat format) const
 {
+  internals::checkSaveFormatCompatibility(*this, format);
+
   switch (format)
   {
     case SaveFormat::PNG:
@@ -432,7 +520,8 @@ std::vector<unsigned char> image::saveBuffer(SaveFormat format) const
     case SaveFormat::BMP:
       return this->Internals->SaveBuffer(vtkSmartPointer<vtkBMPWriter>::New());
     default:
-      throw write_exception("Cannot save to buffer in the specified format");
+      throw write_exception(
+        "Cannot save to buffer in the specified format: " + internals::saveFormatString.at(format));
   }
 }
 
@@ -442,7 +531,7 @@ const f3d::image& image::toTerminalText(std::ostream& stream) const
   const int depth = this->getChannelCount();
   if (this->getChannelType() != ChannelType::BYTE || depth < 3 || depth > 4)
   {
-    throw std::invalid_argument("image must be byte RGB or RGBA");
+    throw write_exception("image must be byte RGB or RGBA");
   }
 
   int dims[3];
@@ -598,7 +687,7 @@ std::string image::getMetadata(const std::string& key) const
   {
     return this->Internals->Metadata[key];
   }
-  throw std::out_of_range(key);
+  throw metadata_exception("No such key: " + key);
 }
 
 //----------------------------------------------------------------------------
@@ -618,6 +707,12 @@ image::write_exception::write_exception(const std::string& what)
 
 //----------------------------------------------------------------------------
 image::read_exception::read_exception(const std::string& what)
+  : exception(what)
+{
+}
+
+//----------------------------------------------------------------------------
+image::metadata_exception::metadata_exception(const std::string& what)
   : exception(what)
 {
 }

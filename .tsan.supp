@@ -14,3 +14,6 @@ race:libOpenEXR
 # dmon
 # https://github.com/septag/dmon/issues/33
 race:dmon.h
+
+# OSMesa
+race:libOSMesa

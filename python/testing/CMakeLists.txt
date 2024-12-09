@@ -1,5 +1,6 @@
 list(APPEND pyf3dTests_list
      test_camera.py
+     test_interactor.py
      test_image.py
      test_options.py
      test_utils.py
@@ -7,28 +8,18 @@ list(APPEND pyf3dTests_list
 
 if(NOT F3D_MACOS_BUNDLE)
   list(APPEND pyf3dTests_list
-       test_plugins.py
+       test_engine.py
       )
 endif()
 
-# Test image comparison only with VTK > 9.0.1
-if(VTK_VERSION VERSION_GREATER 9.0.1)
-
-  # A deprecated test use image comparison
-  if(NOT F3D_EXCLUDE_DEPRECATED)
-      list(APPEND pyf3dTests_list
-          test_deprecated.py)
-  endif()
-
-  list(APPEND pyf3dTests_list
-       test_image_compare.py
-       test_loader.py
-      )
-endif()
+list(APPEND pyf3dTests_list
+     test_image_compare.py
+     test_scene.py
+    )
 
 list(APPEND pyf3dTestsNoRender_list
      test_options.py
-     test_plugins.py
+     test_engine.py
      test_utils.py
     )
 

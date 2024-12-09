@@ -15,7 +15,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: dependencies/usd_install
-        key: usd-v23.05-${{runner.os}}-${{inputs.cpu}}-9
+        key: usd-v24.11-${{runner.os}}-${{inputs.cpu}}-2
 
     - name: Checkout USD
       if: steps.cache-usd.outputs.cache-hit != 'true'
@@ -23,17 +23,14 @@ runs:
       with:
         repository: PixarAnimationStudios/USD
         path: './dependencies/usd'
-        ref: v23.05
+        ref: v24.11
 
-    # This patch is coming from https://gist.github.com/Meakk/c1d5e25c0e4d3dfffb5f776b2f93663b
-    # Related issue: https://github.com/PixarAnimationStudios/OpenUSD/issues/1471#issuecomment-1587463831
-    - name: Patch USD oneTBB
+   # Upstream issue: https://github.com/PixarAnimationStudios/OpenUSD/issues/2490
+    - name: Patch USD
       if: steps.cache-usd.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/usd
       shell: bash
-      run: |
-        patch -p1 < $GITHUB_ACTION_PATH/0001-usd-onetbb.patch
-        patch -p1 < $GITHUB_ACTION_PATH/0002-install-bin.patch
+      run: patch -p1 < $GITHUB_ACTION_PATH/usd-install-bin.patch
 
     - name: Setup USD
       if: steps.cache-usd.outputs.cache-hit != 'true'

@@ -53,9 +53,9 @@ option(F3D_EXCLUDE_DEPRECATED "Exclude deprecated functions and options" OFF)
 mark_as_advanced(F3D_EXCLUDE_DEPRECATED)
 
 # Modules
-option(F3D_MODULE_EXTERNAL_RENDERING "External rendering module" OFF)
 option(F3D_MODULE_RAYTRACING "Raytracing module" OFF)
 option(F3D_MODULE_EXR "OpenEXR images module" OFF)
+option(F3D_MODULE_UI "ImGui widgets module" ON)
 
 # Use externals
 option(F3D_USE_EXTERNAL_CXXOPTS "Use external cxxopts dependency" OFF)
@@ -75,7 +75,7 @@ endif ()
 # VTK dependency
 # Optional components should list VTK modules
 # needed by plugins and optional modules
-find_package(VTK 9.0 REQUIRED
+find_package(VTK 9.2.6 REQUIRED
   COMPONENTS
     CommonCore
     CommonDataModel
@@ -103,9 +103,13 @@ find_package(VTK 9.0 REQUIRED
     opengl
     IOExodus
     IOOpenVDB
-    RenderingExternal
     RenderingRayTracing)
 message(STATUS "VTK ${VTK_VERSION} found")
+
+if(VTK_VERSION VERSION_LESS 9.3.20240914)
+  # Not optional before
+  find_package(VTK REQUIRED COMPONENTS opengl)
+endif()
 
 # Shared options between application and library
 include(GNUInstallDirs)
@@ -182,12 +186,22 @@ list(APPEND f3d_link_options_public ${f3d_sanitizer_link_options})
 
 # Testing
 option(BUILD_TESTING "Build the tests" OFF)
-cmake_dependent_option(F3D_TESTING_DISABLE_DEFAULT_LIGHTS_TESTS_COMPARISON "Disable image comparison on tests using the default lights" OFF "BUILD_TESTING" OFF)
 cmake_dependent_option(F3D_TESTING_ENABLE_RENDERING_TESTS "Enable rendering tests" ON "BUILD_TESTING" OFF)
 cmake_dependent_option(F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS "Enable long timeout tests" OFF "BUILD_TESTING" OFF)
+cmake_dependent_option(F3D_TESTING_ENABLE_GLX_TESTS "Enable tests that require a X server running on Linux" ON "F3D_TESTING_ENABLE_RENDERING_TESTS AND UNIX AND NOT APPLE" OFF)
+cmake_dependent_option(F3D_TESTING_ENABLE_EGL_TESTS "Enable tests that require EGL to run" ON "F3D_TESTING_ENABLE_RENDERING_TESTS AND UNIX AND NOT APPLE" OFF)
+cmake_dependent_option(F3D_TESTING_ENABLE_OSMESA_TESTS "Enable tests that require OSMESA to run" ON "F3D_TESTING_ENABLE_RENDERING_TESTS AND UNIX AND NOT APPLE" OFF)
+
 if(BUILD_TESTING)
   enable_testing()
 endif()
+
+# Testing offscreen backend
+if(NOT F3D_TESTING_FORCE_RENDERING_BACKEND)
+  set(F3D_TESTING_FORCE_RENDERING_BACKEND "auto" CACHE STRING "Force testing offscreen backend" FORCE)
+  set_property(CACHE F3D_TESTING_FORCE_RENDERING_BACKEND PROPERTY STRINGS "auto" "egl" "osmesa")
+endif()
+mark_as_advanced(F3D_TESTING_FORCE_RENDERING_BACKEND)
 
 # Figure out F3D configuration directory
 if(UNIX AND NOT APPLE)
@@ -211,7 +225,7 @@ endif()
 # F3D Application
 cmake_dependent_option(F3D_BUILD_APPLICATION "Build the application" ON "NOT ANDROID AND NOT EMSCRIPTEN" OFF)
 
-# Build VTK extension moddules
+# Build VTK extension modules
 add_subdirectory(vtkext)
 
 # plugins
@@ -273,10 +287,10 @@ endif ()
 file(SIZE "${F3D_SOURCE_DIR}/testing/data/dragon.vtu" f3d_lfs_file_size)
 if (f3d_lfs_file_size LESS_EQUAL 500)
   if(BUILD_TESTING)
-    message(FATAL_ERROR "Building tests without LFS data will result in non fonctionning tests, please fetch LFS data or disable BUILD_TESTING. Aborting.")
+    message(FATAL_ERROR "Building tests without git LFS data will result in non functioning tests, please fetch LFS data (git lfs pull) or disable BUILD_TESTING. Aborting.")
   endif()
   if (F3D_BINDINGS_PYTHON)
-    message(WARNING "Building python binding without LFS data is supported but testing using pytest will not be, please fetch LFS data to avoid this.")
+    message(WARNING "Building python binding without git LFS data is supported but testing using pytest will not be, please fetch LFS data (git lfs pull) to avoid this.")
   endif()
 endif()
 
@@ -289,8 +303,8 @@ f3d_report_variable(F3D_BINDINGS_JAVA)
 f3d_report_variable(F3D_BINDINGS_PYTHON)
 f3d_report_variable(F3D_BUILD_APPLICATION)
 f3d_report_variable(F3D_MODULE_EXR)
-f3d_report_variable(F3D_MODULE_EXTERNAL_RENDERING)
 f3d_report_variable(F3D_MODULE_RAYTRACING)
+f3d_report_variable(F3D_MODULE_UI)
 f3d_report_variable(F3D_PLUGIN_BUILD_ALEMBIC)
 f3d_report_variable(F3D_PLUGIN_BUILD_ASSIMP)
 f3d_report_variable(F3D_PLUGIN_BUILD_DRACO)

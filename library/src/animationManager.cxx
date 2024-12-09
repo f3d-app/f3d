@@ -3,11 +3,15 @@
 #include "interactor_impl.h"
 #include "log.h"
 #include "options.h"
-#include "window.h"
+#include "window_impl.h"
+
+#include "vtkF3DRenderer.h"
 
 #include <vtkDoubleArray.h>
 #include <vtkImporter.h>
 #include <vtkProgressBarRepresentation.h>
+#include <vtkRenderWindow.h>
+#include <vtkRendererCollection.h>
 #include <vtkVersion.h>
 
 #include <cmath>
@@ -16,26 +20,39 @@
 namespace f3d::detail
 {
 //----------------------------------------------------------------------------
-bool animationManager::Initialize(
-  const options* options, window* window, interactor_impl* interactor, vtkImporter* importer)
+animationManager::animationManager(const options& options, window_impl& window)
+  : Options(options)
+  , Window(window)
 {
-  assert(importer);
+}
+
+//----------------------------------------------------------------------------
+void animationManager::SetImporter(vtkImporter* importer)
+{
+  this->Importer = importer;
+}
+
+//----------------------------------------------------------------------------
+void animationManager::SetInteractor(interactor_impl* interactor)
+{
+  this->Interactor = interactor;
+}
+
+//----------------------------------------------------------------------------
+bool animationManager::Initialize()
+{
+  assert(this->Importer);
   this->HasAnimation = false;
   this->Playing = false;
   this->CurrentTime = 0;
   this->CurrentTimeSet = false;
-  this->Options = options;
-  this->Interactor = interactor;
-  this->Window = window;
-  this->Importer = importer;
 
   // This can be -1 if animation support is not implemented in the importer
   this->AvailAnimations = this->Importer->GetNumberOfAnimations();
-
-  if (this->AvailAnimations > 0 && interactor)
+  if (this->AvailAnimations > 0 && this->Interactor)
   {
     this->ProgressWidget = vtkSmartPointer<vtkProgressBarWidget>::New();
-    interactor->SetInteractorOn(this->ProgressWidget);
+    this->Interactor->SetInteractorOn(this->ProgressWidget);
 
     vtkProgressBarRepresentation* progressRep =
       vtkProgressBarRepresentation::SafeDownCast(this->ProgressWidget->GetRepresentation());
@@ -48,14 +65,9 @@ bool animationManager::Initialize(
     progressRep->DrawBackgroundOff();
     progressRep->DragableOff();
     progressRep->SetShowBorderToOff();
-// Complete vtkProgressBarRepresentation needs
-// https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7359
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201027)
     progressRep->DrawFrameOff();
     progressRep->SetPadding(0.0, 0.0);
-#endif
-    progressRep->SetVisibility(options->getAsBool("ui.animation-progress"));
-
+    progressRep->SetVisibility(this->Options.ui.animation_progress);
     this->ProgressWidget->On();
   }
   else
@@ -63,17 +75,14 @@ bool animationManager::Initialize(
     this->ProgressWidget = nullptr;
   }
 
-  int animationIndex = options->getAsInt("scene.animation.index");
-  double animationTime = options->getAsDouble("scene.animation.time");
-
   if (this->AvailAnimations <= 0)
   {
-    log::debug("No animation available in this file");
-    if (animationIndex > 0)
+    log::debug("No animation available");
+    if (this->Options.scene.animation.index > 0)
     {
       log::warn("An animation index has been specified but there are no animation available.");
     }
-    if (animationTime != 0)
+    if (this->Options.scene.animation.time.has_value())
     {
       log::warn("No animation available, cannot load a specific animation time");
     }
@@ -82,26 +91,22 @@ bool animationManager::Initialize(
   }
   else
   {
-    log::debug("Animation(s) available in this file are:");
+    log::debug("Animation(s) available are:");
   }
   for (int i = 0; i < this->AvailAnimations; i++)
   {
     log::debug(i, ": ", this->Importer->GetAnimationName(i));
   }
-  log::debug("");
 
-  this->AnimationIndex = options->getAsInt("scene.animation.index");
+  this->AnimationIndex = this->Options.scene.animation.index;
   if (this->AnimationIndex > 0 && this->AnimationIndex >= this->AvailAnimations)
   {
     log::warn(
       "Specified animation index is greater than the highest possible animation index, enabling "
       "the first animation.");
-    this->Importer->EnableAnimation(0);
+    this->AnimationIndex = 0;
   }
-  else
-  {
-    this->EnableOnlyCurrentAnimation();
-  }
+  this->EnableOnlyCurrentAnimation();
 
   // Recover time ranges for all enabled animations
   this->TimeRange[0] = std::numeric_limits<double>::infinity();
@@ -114,17 +119,13 @@ bool animationManager::Initialize(
       int nbTimeSteps;
       vtkNew<vtkDoubleArray> timeSteps;
 
-// Complete GetTemporalInformation needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7246
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201016)
       // Discard timesteps, F3D only cares about real elapsed time using time range
       // Specifying the frame rate in the next call is not needed after VTK 9.2.20230603 :
       // VTK_VERSION_CHECK(9, 2, 20230603)
-      double frameRate = this->Options->getAsDouble("scene.animation.frame-rate");
+      double frameRate = this->Options.scene.animation.frame_rate;
       this->Importer->GetTemporalInformation(
         animIndex, frameRate, nbTimeSteps, timeRange, timeSteps);
-#else
-      this->Importer->GetTemporalInformation(animIndex, nbTimeSteps, timeRange, timeSteps);
-#endif
+
       // Accumulate time ranges
       this->TimeRange[0] = std::min(timeRange[0], this->TimeRange[0]);
       this->TimeRange[1] = std::max(timeRange[1], this->TimeRange[1]);
@@ -142,8 +143,9 @@ bool animationManager::Initialize(
   {
     log::debug("Animation(s) time range is: [", this->TimeRange[0], ", ", this->TimeRange[1], "].");
   }
+  log::debug("");
 
-  bool autoplay = options->getAsBool("scene.animation.autoplay");
+  bool autoplay = this->Options.scene.animation.autoplay;
   if (autoplay)
   {
     this->StartAnimation();
@@ -192,12 +194,12 @@ void animationManager::ToggleAnimation()
       // Always reset previous tick when starting the animation
       this->PreviousTick = std::chrono::steady_clock::now();
 
-      double frameRate = this->Options->getAsDouble("scene.animation.frame-rate");
+      double frameRate = this->Options.scene.animation.frame_rate;
       this->CallBackId =
         this->Interactor->createTimerCallBack(1000.0 / frameRate, [this]() { this->Tick(); });
     }
 
-    if (this->Playing && this->Options->getAsInt("scene.camera.index") >= 0)
+    if (this->Playing && this->Options.scene.camera.index.has_value())
     {
       this->Interactor->disableCameraMovement();
     }
@@ -221,7 +223,7 @@ void animationManager::Tick()
 
   // Convert to a usable time in seconds
   double elapsedTime = static_cast<double>(timeInMS) / 1000.0;
-  double animationSpeedFactor = this->Options->getAsDouble("scene.animation.speed-factor");
+  double animationSpeedFactor = this->Options.scene.animation.speed_factor;
 
   // elapsedTime can be negative
   elapsedTime *= animationSpeedFactor;
@@ -239,8 +241,10 @@ void animationManager::Tick()
       modulo(this->CurrentTime - this->TimeRange[0], this->TimeRange[1] - this->TimeRange[0]);
   }
 
-  this->LoadAtTime(this->CurrentTime);
-  this->Window->render();
+  if (this->LoadAtTime(this->CurrentTime))
+  {
+    this->Window.render();
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -251,15 +255,32 @@ bool animationManager::LoadAtTime(double timeValue)
   {
     return false;
   }
-  if (timeValue < this->TimeRange[0] || timeValue > this->TimeRange[1])
+
+  /* clamp target time to available range */
+  if (timeValue < this->TimeRange[0])
   {
-    log::warn("Provided time value: ", timeValue, " is outside of animation time range: [",
-      this->TimeRange[0], ", ", this->TimeRange[1], "] .");
-    return false;
+    log::warn("Animation time ", timeValue, " is outside of range [", this->TimeRange[0], ", ",
+      this->TimeRange[1], "], using ", this->TimeRange[0], ".");
+    timeValue = this->TimeRange[0];
   }
+  else if (timeValue > this->TimeRange[1])
+  {
+    log::warn("Animation time ", timeValue, " is outside of range [", this->TimeRange[0], ", ",
+      this->TimeRange[1], "], using ", this->TimeRange[1], ".");
+    timeValue = this->TimeRange[1];
+  }
+
   this->CurrentTime = timeValue;
   this->CurrentTimeSet = true;
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
+  if (!this->Importer->UpdateAtTimeValue(this->CurrentTime))
+  {
+    log::error("Could not load time value: ", this->CurrentTime);
+    return false;
+  }
+#else
   this->Importer->UpdateTimeStep(this->CurrentTime);
+#endif
 
   if (this->Interactor && this->ProgressWidget)
   {
@@ -291,6 +312,10 @@ void animationManager::CycleAnimation()
 
   this->EnableOnlyCurrentAnimation();
   this->LoadAtTime(this->TimeRange[0]);
+
+  vtkRenderWindow* renWin = this->Window.GetRenderWindow();
+  vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+  ren->SetCheatSheetConfigured(false);
 }
 
 // ---------------------------------------------------------------------------------
@@ -302,12 +327,13 @@ int animationManager::GetAnimationIndex()
 // ---------------------------------------------------------------------------------
 std::string animationManager::GetAnimationName()
 {
-  if (!this->Importer || this->AvailAnimations <= 0)
+  assert(this->Importer);
+  if (this->AvailAnimations <= 0)
   {
     return "No animation";
   }
 
-  if (this->AnimationIndex == -1)
+  if (this->AnimationIndex < 0)
   {
     return "All Animations";
   }
@@ -324,7 +350,7 @@ void animationManager::EnableOnlyCurrentAnimation()
   }
   for (int i = 0; i < this->AvailAnimations; i++)
   {
-    if (this->AnimationIndex == -1 || i == this->AnimationIndex)
+    if (this->AnimationIndex < 0 || i == this->AnimationIndex)
     {
       this->Importer->EnableAnimation(i);
     }

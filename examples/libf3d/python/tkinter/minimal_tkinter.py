@@ -12,8 +12,8 @@ class Frame(OpenGLFrame):
 
     # Initialize F3D
     def initgl(self):
-        self.engine = f3d.Engine(f3d.Window.Type.EXTERNAL)
-        self.engine.loader.load_geometry(
+        self.engine = f3d.Engine.create_external_glx() # use create_external_egl for Wayland
+        self.engine.scene.add(
             f3d.Mesh(
             points=[0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0],
             face_sides=[3],

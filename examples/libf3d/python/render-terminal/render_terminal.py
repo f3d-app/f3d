@@ -12,11 +12,11 @@ TEST_DATA_DIR = Path(__file__).parent.parent.parent.parent.parent / "testing/dat
 def main():
     model_path = TEST_DATA_DIR / "suzanne.obj"
     options = {
-        "scene.up-direction": "+Y",
-        "render.effect.tone-mapping": True,
-        "render.effect.ambient-occlusion": True,
-        "render.effect.translucency-support": True,
-        "render.effect.anti-aliasing": True,
+        "scene.up_direction": "+Y",
+        "render.effect.tone_mapping": True,
+        "render.effect.ambient_occlusion": True,
+        "render.effect.translucency_support": True,
+        "render.effect.anti_aliasing": True,
     }
     anim_fps = 30
     anim_duration = 4
@@ -28,9 +28,9 @@ def main():
         rows, cols = 40, 20
 
     # setup engine
-    engine = f3d.Engine(f3d.Window.NATIVE_OFFSCREEN)
+    engine = f3d.Engine.create(True)
     engine.options.update(options)
-    engine.loader.load_geometry(str(model_path))
+    engine.scene.add(str(model_path))
     engine.window.size = rows, cols * 2
 
     # fit view to loaded model and grab computed camera position

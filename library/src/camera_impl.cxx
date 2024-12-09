@@ -271,22 +271,14 @@ camera& camera_impl::resetToDefault()
 //----------------------------------------------------------------------------
 camera& camera_impl::resetToBounds([[maybe_unused]] double zoomFactor)
 {
-#if __ANDROID__ || VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 0, 20210331)
+#if __ANDROID__
   this->Internals->VTKRenderer->ResetCamera();
 #else
-  if (this->Internals->VTKRenderer->GetRenderWindow()->IsA("vtkExternalOpenGLRenderWindow"))
-  {
-    // External render window does not support ResetCameraScreenSpace correctly
-    this->Internals->VTKRenderer->ResetCamera();
-  }
-  else
-  {
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20230221)
-    this->Internals->VTKRenderer->ResetCameraScreenSpace(zoomFactor);
+  this->Internals->VTKRenderer->ResetCameraScreenSpace(zoomFactor);
 #else
-    this->Internals->VTKRenderer->ResetCameraScreenSpace();
+  this->Internals->VTKRenderer->ResetCameraScreenSpace();
 #endif
-  }
 #endif
   this->Internals->VTKRenderer->ResetCameraClippingRange();
   return *this;

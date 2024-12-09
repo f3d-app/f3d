@@ -3,8 +3,8 @@
 #include "config.h"
 #include "init.h"
 #include "interactor_impl.h"
-#include "loader_impl.h"
 #include "log.h"
+#include "scene_impl.h"
 #include "window_impl.h"
 
 #include "factory.h"
@@ -28,12 +28,13 @@ class engine::internals
 public:
   std::unique_ptr<options> Options;
   std::unique_ptr<detail::window_impl> Window;
-  std::unique_ptr<detail::loader_impl> Loader;
+  std::unique_ptr<detail::scene_impl> Scene;
   std::unique_ptr<detail::interactor_impl> Interactor;
 };
 
 //----------------------------------------------------------------------------
-engine::engine(window::Type windowType)
+engine::engine(
+  const std::optional<window::Type>& windowType, bool offscreen, const context::function& loader)
   : Internals(new engine::internals)
 {
   // Ensure all lib initialization is done (once)
@@ -58,24 +59,112 @@ engine::engine(window::Type windowType)
   this->Internals->Options = std::make_unique<options>();
 
   this->Internals->Window =
-    std::make_unique<detail::window_impl>(*this->Internals->Options, windowType);
+    std::make_unique<detail::window_impl>(*this->Internals->Options, windowType, offscreen, loader);
   this->Internals->Window->SetCachePath(cachePath);
 
-  this->Internals->Loader =
-    std::make_unique<detail::loader_impl>(*this->Internals->Options, *this->Internals->Window);
+  this->Internals->Scene =
+    std::make_unique<detail::scene_impl>(*this->Internals->Options, *this->Internals->Window);
 
   // Do not create an interactor for NONE or EXTERNAL
   if (windowType != window::Type::NONE && windowType != window::Type::EXTERNAL)
   {
     this->Internals->Interactor = std::make_unique<detail::interactor_impl>(
-      *this->Internals->Options, *this->Internals->Window, *this->Internals->Loader);
+      *this->Internals->Options, *this->Internals->Window, *this->Internals->Scene);
   }
+}
+
+//----------------------------------------------------------------------------
+engine engine::create(bool offscreen)
+{
+  return { std::nullopt, offscreen, nullptr };
+}
+
+//----------------------------------------------------------------------------
+engine engine::createNone()
+{
+  return { window::Type::NONE, true, nullptr };
+}
+
+//----------------------------------------------------------------------------
+engine engine::createGLX(bool offscreen)
+{
+  return { window::Type::GLX, offscreen, context::glx() };
+}
+
+//----------------------------------------------------------------------------
+engine engine::createWGL(bool offscreen)
+{
+  return { window::Type::WGL, offscreen, context::wgl() };
+}
+
+//----------------------------------------------------------------------------
+engine engine::createEGL()
+{
+  return { window::Type::EGL, true, context::egl() };
+}
+
+//----------------------------------------------------------------------------
+engine engine::createOSMesa()
+{
+  return { window::Type::OSMESA, true, context::osmesa() };
+}
+
+//----------------------------------------------------------------------------
+engine engine::createExternal(const context::function& getProcAddress)
+{
+  return { window::Type::EXTERNAL, false, getProcAddress };
+}
+
+//----------------------------------------------------------------------------
+engine engine::createExternalGLX()
+{
+  return { window::Type::EXTERNAL, false, context::glx() };
+}
+
+//----------------------------------------------------------------------------
+engine engine::createExternalWGL()
+{
+  return { window::Type::EXTERNAL, false, context::wgl() };
+}
+
+//----------------------------------------------------------------------------
+engine engine::createExternalCOCOA()
+{
+  return { window::Type::EXTERNAL, false, context::cocoa() };
+}
+
+//----------------------------------------------------------------------------
+engine engine::createExternalEGL()
+{
+  return { window::Type::EXTERNAL, false, context::egl() };
+}
+
+//----------------------------------------------------------------------------
+engine engine::createExternalOSMesa()
+{
+  return { window::Type::EXTERNAL, false, context::osmesa() };
 }
 
 //----------------------------------------------------------------------------
 engine::~engine()
 {
   delete this->Internals;
+}
+
+//----------------------------------------------------------------------------
+engine::engine(engine&& other) noexcept
+{
+  this->Internals = other.Internals;
+  other.Internals = nullptr;
+}
+
+//----------------------------------------------------------------------------
+engine& engine::operator=(engine&& other) noexcept
+{
+  delete this->Internals;
+  this->Internals = other.Internals;
+  other.Internals = nullptr;
+  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -109,9 +198,9 @@ window& engine::getWindow()
 }
 
 //----------------------------------------------------------------------------
-loader& engine::getLoader()
+scene& engine::getScene()
 {
-  return *this->Internals->Loader;
+  return *this->Internals->Scene;
 }
 
 //----------------------------------------------------------------------------
@@ -290,31 +379,24 @@ engine::libInformation engine::getLibInfo()
   libInfo.BuildSystem = detail::LibBuildSystem;
   libInfo.Compiler = detail::LibCompiler;
 
-  std::string tmp;
-
 #if F3D_MODULE_RAYTRACING
-  tmp = "ON";
+  libInfo.Modules["Raytracing"] = true;
 #else
-  tmp = "OFF";
+  libInfo.Modules["Raytracing"] = false;
 #endif
-  libInfo.RaytracingModule = tmp;
-
-#if F3D_MODULE_EXTERNAL_RENDERING
-  tmp = "ON";
-#else
-  tmp = "OFF";
-#endif
-  libInfo.ExternalRenderingModule = tmp;
 
 #if F3D_MODULE_EXR
-  tmp = "ON";
+  libInfo.Modules["OpenEXR"] = true;
 #else
-  tmp = "OFF";
+  libInfo.Modules["OpenEXR"] = false;
 #endif
-  libInfo.OpenEXRModule = tmp;
 
-  // First version of VTK including the version check (and the feature used)
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200527)
+#if F3D_MODULE_UI
+  libInfo.Modules["ImGui"] = true;
+#else
+  libInfo.Modules["ImGui"] = false;
+#endif
+
   std::string vtkVersion = std::string(vtkVersion::GetVTKVersionFull());
   if (!vtkVersion.empty())
   {
@@ -326,15 +408,13 @@ engine::libInformation engine::getLibInfo()
     }
   }
   else
-#endif
   {
     libInfo.VTKVersion = vtkVersion::GetVTKVersion();
   }
 
-  libInfo.PreviousCopyright = "Copyright (C) 2019-2021 Kitware SAS";
-  libInfo.Copyright = "Copyright (C) 2021-2024 Michael Migliore, Mathieu Westphal";
+  libInfo.Copyrights.emplace_back("2019-2021 Kitware SAS");
+  libInfo.Copyrights.emplace_back("2021-2024 Michael Migliore, Mathieu Westphal");
   libInfo.License = "BSD-3-Clause";
-  libInfo.Authors = "Michael Migliore, Mathieu Westphal and Joachim Pouderoux";
 
   return libInfo;
 }

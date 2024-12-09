@@ -1,5 +1,11 @@
 #include "vtkF3DBitonicSort.h"
 
+#include "vtkF3DBitonicSortFunctions.h"
+#include "vtkF3DBitonicSortGlobalDisperseCS.h"
+#include "vtkF3DBitonicSortGlobalFlipCS.h"
+#include "vtkF3DBitonicSortLocalDisperseCS.h"
+#include "vtkF3DBitonicSortLocalSortCS.h"
+
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLBufferObject.h>
 #include <vtkOpenGLRenderWindow.h>
@@ -13,12 +19,6 @@
 #else
 #include <vtk_glew.h>
 #endif
-
-#include "vtkF3DBitonicSortFunctions.h"
-#include "vtkF3DBitonicSortGlobalDisperseCS.h"
-#include "vtkF3DBitonicSortGlobalFlipCS.h"
-#include "vtkF3DBitonicSortLocalDisperseCS.h"
-#include "vtkF3DBitonicSortLocalSortCS.h"
 
 #include <sstream>
 

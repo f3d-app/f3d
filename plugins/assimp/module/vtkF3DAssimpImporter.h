@@ -12,16 +12,17 @@
 #ifndef vtkF3DAssimpImporter_h
 #define vtkF3DAssimpImporter_h
 
-#include <vtkImporter.h>
+#include "vtkF3DImporter.h"
+
 #include <vtkVersion.h>
 
 #include <memory>
 
-class vtkF3DAssimpImporter : public vtkImporter
+class vtkF3DAssimpImporter : public vtkF3DImporter
 {
 public:
   static vtkF3DAssimpImporter* New();
-  vtkTypeMacro(vtkF3DAssimpImporter, vtkImporter);
+  vtkTypeMacro(vtkF3DAssimpImporter, vtkF3DImporter);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   ///@{
@@ -35,7 +36,7 @@ public:
   /**
    * Update actors at the given time value.
    */
-  void UpdateTimeStep(double timeValue) override;
+  bool UpdateAtTimeValue(double timeValue) override;
 
   /**
    * Get the number of available animations.
@@ -51,6 +52,9 @@ public:
   /**
    * Enable/Disable/Get the status of specific animations
    * Only one single animation can be enabled
+   * By default, no animation are enabled
+   * As specified in the vtkImporter API, animationIndex
+   * is expected to be 0 < GetNumberOfAnimations
    */
   void EnableAnimation(vtkIdType animationIndex) override;
   void DisableAnimation(vtkIdType animationIndex) override;
@@ -74,14 +78,9 @@ public:
    * Get temporal information for the currently enabled animation.
    * Only defines timerange and ignore provided frameRate.
    */
-// Complete GetTemporalInformation needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7246
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201016)
   bool GetTemporalInformation(vtkIdType animationIndex, double frameRate, int& nbTimeSteps,
     double timeRange[2], vtkDoubleArray* timeSteps) override;
-#endif
 
-// Importer camera needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7701
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200912)
   /**
    * Get the number of available cameras.
    */
@@ -97,8 +96,6 @@ public:
    * If a negative index is provided, no camera from the importer is used.
    */
   void SetCamera(vtkIdType camIndex) override;
-
-#endif
 
 protected:
   vtkF3DAssimpImporter();

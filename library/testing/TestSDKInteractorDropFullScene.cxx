@@ -1,6 +1,5 @@
 #include <engine.h>
 #include <interactor.h>
-#include <loader.h>
 #include <options.h>
 #include <window.h>
 
@@ -10,19 +9,19 @@
 
 int TestSDKInteractorDropFullScene(int argc, char* argv[])
 {
-  f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
+  f3d::engine eng = f3d::engine::create(true);
   const f3d::options& options = eng.getOptions();
-  const f3d::loader& load = eng.getLoader();
   f3d::window& win = eng.getWindow();
   f3d::interactor& inter = eng.getInteractor();
   win.setSize(300, 300);
+  win.render();
 
   std::string filename = "TestSDKInteractorDropFullScene";
   std::string interactionFilePath = std::string(argv[2]) + "../../" + filename + ".log";
   inter.playInteraction(interactionFilePath); // world.obj; S
 
   return TestSDKHelpers::RenderTest(
-           win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename, 50)
+           win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename)
     ? EXIT_SUCCESS
     : EXIT_FAILURE;
 }

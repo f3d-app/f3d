@@ -1,6 +1,6 @@
 #include <engine.h>
 #include <interactor.h>
-#include <loader.h>
+#include <scene.h>
 #include <window.h>
 
 int TestSDKRenderAndInteract(int argc, char* argv[])
@@ -10,9 +10,9 @@ int TestSDKRenderAndInteract(int argc, char* argv[])
   // an interactor works
   // Using an onscreen window to mimic standard usage
 
-  f3d::engine eng(f3d::window::Type::NATIVE);
-  f3d::loader& load = eng.getLoader();
-  load.loadGeometry(std::string(argv[1]) + "/data/cow.vtp");
+  f3d::engine eng = f3d::engine::create();
+  f3d::scene& sce = eng.getScene();
+  sce.add(std::string(argv[1]) + "/data/cow.vtp");
   f3d::window& win = eng.getWindow();
 
   win.render();

@@ -1,5 +1,8 @@
 #include "vtkF3DPointSplatMapper.h"
 
+#include "vtkF3DBitonicSort.h"
+#include "vtkF3DComputeDepthCS.h"
+
 #include <vtkCamera.h>
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLBufferObject.h>
@@ -21,9 +24,6 @@
 #else
 #include <vtk_glew.h>
 #endif
-
-#include "vtkF3DBitonicSort.h"
-#include "vtkF3DComputeDepthCS.h"
 
 //----------------------------------------------------------------------------
 class vtkF3DSplatMapperHelper : public vtkOpenGLPointGaussianMapperHelper

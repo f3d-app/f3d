@@ -2,18 +2,18 @@
 
 By Michael Migliore and Mathieu Westphal.
 
-libf3d is a BSD-licensed C++ library to open and render 3D meshes. It is of course used by F3D.
+libf3d is a BSD-licensed C++17 library to open and render 3D meshes. It is of course used by F3D.
 libf3d API is simple and easy to learn. Python bindings are provided through pybind11. Java bindings are also available.
 libf3d API is still in alpha version and may change drastically in the future.
 
 ## Getting Started
 
-Rendering a full scene file and starting the interaction is very easy:
+Rendering a file and starting the interaction is very easy:
 
 ```cpp
 #include <f3d/engine.h>
 #include <f3d/interactor.h>
-#include <f3d/loader.h>
+#include <f3d/scene.h>
 
 // Load VTK native readers
 f3d::engine::autoloadPlugins();
@@ -21,19 +21,19 @@ f3d::engine::autoloadPlugins();
 // Create a f3d::engine
 f3d::engine eng();
 
-// Load a scene
-eng.getLoader().loadScene("path/to/file.ext");
+// Add a file into a scene
+eng.getScene().add("path/to/file.ext");
 
 // Start rendering and interacting
 eng.getInteractor().start();
 ```
 
-As well as loading multiple geometries into a default scene:
+As well as loading multiple files:
 
 ```cpp
 #include <f3d/engine.h>
 #include <f3d/interactor.h>
-#include <f3d/loader.h>
+#include <f3d/scene.h>
 
 // Load VTK native readers
 f3d::engine::autoloadPlugins();
@@ -42,7 +42,7 @@ f3d::engine::autoloadPlugins();
 f3d::engine eng();
 
 // Load multiples geometries
-eng.getLoader().loadGeometry("path/to/file.ext").loadGeometry("path/to/file2.ext");
+eng.getScene().add({"path/to/file.ext", "path/to/file2.ext"});
 
 // Start rendering and interacting
 eng.getInteractor().start();
@@ -53,7 +53,7 @@ It's also possible to load a geometry from memory buffers:
 ```cpp
 #include <f3d/engine.h>
 #include <f3d/interactor.h>
-#include <f3d/loader.h>
+#include <f3d/scene.h>
 
 // Create a f3d::engine
 f3d::engine eng();
@@ -63,7 +63,7 @@ f3d::mesh_t mesh = {};
 mesh.points = { 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f };
 mesh.face_sides = { 3 };
 mesh.face_indices = { 0, 1, 2 };
-eng.getLoader().loadGeometry(mesh);
+eng.getScene().add(mesh);
 
 // Start rendering and interacting
 eng.getInteractor().start();
@@ -74,17 +74,17 @@ Manipulating the window directly can be done this way:
 ```cpp
 #include <f3d/engine.h>
 #include <f3d/image.h>
-#include <f3d/loader.h>
+#include <f3d/scene.h>
 #include <f3d/window.h>
 
 // Load VTK native readers
 f3d::engine::autoloadPlugins();
 
-// Create a f3d::engine
-f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
+// Create a f3d::engine with a offscreen window
+f3d::engine eng = f3d::engine::create(true);
 
 // Load a geometry
-eng.getLoader().loadGeometry("path/to/file.ext");
+eng.getScene().add("path/to/file.ext");
 
 // Set the window size and render to an image
 f3d::image img = eng.getWindow().setSize(300, 300).renderToImage();
@@ -99,7 +99,7 @@ Changing some options can be done this way:
 #include <f3d/engine.h>
 #include <f3d/interactor.h>
 #include <f3d/options.h>
-#include <f3d/loader.h>
+#include <f3d/scene.h>
 
 // Load VTK native readers
 f3d::engine::autoloadPlugins();
@@ -108,12 +108,12 @@ f3d::engine::autoloadPlugins();
 f3d::engine eng();
 
 // Recover the options and set the wanted value
-eng.getOptions()
-  .set("render.effect.ambient-occlusion", true)
-  .set("render.effect.anti-aliasing", true);
+options& opt = eng.getOptions();
+opt.render.effect.ambient_occlusion = true;
+opt.render.effect.anti_aliasing = true;
 
 // Standard libf3d usage
-eng.getLoader().loadGeometry("path/to/file.ext");
+eng.getScene().add("path/to/file.ext");
 eng.getInteractor().start();
 ```
 Most options are dynamic, some are only taken into account when loading a file. See the [options](OPTIONS.md) documentation.

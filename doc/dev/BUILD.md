@@ -7,9 +7,10 @@ please take a look at our [getting started guide](GETTING_STARTED.md).
 ## Dependencies
 
 * [CMake](https://cmake.org) >= 3.1.
-* [VTK](https://vtk.org) >= 9.0.0 (9.2.6 recommended).
+* [VTK](https://vtk.org) >= 9.2.6 (9.3.1 recommended).
 * A C++17 compiler.
 * A CMake-compatible build system (Visual Studio, XCode, Ninja, Make, etc.).
+* Optionally (but recommended), [ImGui](https://github.com/ocornut/imgui/) >= 1.91.5.
 * Optionally, [Assimp](https://www.assimp.org/) >= 5.0.
 * Optionally, Open CASCADE [OCCT](https://dev.opencascade.org/) >= 7.5.2.
 * Optionally, [Alembic](http://www.alembic.io/) >= 1.7.
@@ -22,7 +23,7 @@ please take a look at our [getting started guide](GETTING_STARTED.md).
 
 ## VTK compatibility
 
-As stated in the dependencies, F3D is compatible with VTK >= 9.0.0, however, many features are only available in certain conditions. We suggest using VTK 9.2.6 with RenderingRayTracing, RenderingExternal, IOExodus and IOOpenVDB modules enabled in order to get as many features as possible in F3D.
+As stated in the dependencies, F3D is compatible with VTK >= 9.2.6, however, some features may not be available. We suggest using VTK 9.3.1 with RenderingRayTracing, IOExodus and IOOpenVDB modules enabled in order to get as many features as possible in F3D.
 
 ## Configuration and building
 
@@ -38,13 +39,13 @@ Here is some CMake options of interest:
 * `F3D_PLUGINS_STATIC_BUILD`: Build all plugins as static library (embedded into `libf3d`) and automatically loaded by the application. Incompatible with `F3D_MACOS_BUNDLE`.
 * `BUILD_SHARED_LIBS`: Build the libf3d and all plugins as static library (embedded into `f3d` executable). The `library` and `plugin_sdk` component will not be installed.
 
-Some modules, plugins and bindings depending on external libraries can be optionally enabled with the following CMake variables:
+Some modules, plugins and language bindings depending on external libraries can be optionally enabled with the following CMake variables:
 
 * `F3D_MODULE_RAYTRACING`: Support for raytracing rendering. Requires that VTK has been built with `OSPRay` and `VTK_MODULE_ENABLE_VTK_RenderingRayTracing` turned on. Disabled by default.
-* `F3D_MODULE_EXTERNAL_RENDERING`: Support for external render window. Requires that VTK has been built with `VTK_MODULE_ENABLE_VTK_RenderingExternal` turned on. Disabled by default.
 * `F3D_MODULE_EXR`: Support for OpenEXR images. Requires `OpenEXR`. Disabled by default.
+* `F3D_MODULE_UI`: Support for ImGui widgets. Requires `ImGui`. Enabled by default.
 * `F3D_PLUGIN_BUILD_EXODUS`: Support for ExodusII (.ex2) file format. Requires that VTK has been built with `IOExodus` module (and `hdf5`). Enabled by default.
-* `F3D_PLUGIN_BUILD_OCCT`: Support for STEP, IGES and BREP file formats. Requires `OpenCASCADE`. Disabled by default.
+* `F3D_PLUGIN_BUILD_OCCT`: Support for STEP, IGES, BREP, and XBF file formats. Requires `OpenCASCADE`. Disabled by default.
 * `F3D_PLUGIN_BUILD_ASSIMP`: Support for FBX, DAE, OFF, DXF, X and 3MF file formats. Requires `Assimp`. Disabled by default.
 * `F3D_PLUGIN_BUILD_ALEMBIC`: Support for ABC file format. Requires `Alembic`. Disabled by default.
 * `F3D_PLUGIN_BUILD_DRACO`: Support for DRC file format. Requires `Draco`. Disabled by default.

@@ -25,17 +25,6 @@ from .pyf3d import *
 # Automatically load plugins for the user
 Engine.autoload_plugins()
 
-# TODO: Delete this in 3.0, it's there for retrocompatibility with old class naming
-engine = Engine
-options = Options
-loader = Loader
-image = Image
-interactor = Interactor
-window = Window
-camera = Camera
-camera_state_t = CameraState
-utils = Utils
-
 __version__ = "@F3D_VERSION@"
 
 
@@ -79,7 +68,7 @@ def deprecated_decorator(f, reason):
 def add_deprecation_warnings():
     for f3d_class in (
         Camera,
-        Loader,
+        Scene,
         Options,
         Interactor,
         Engine,

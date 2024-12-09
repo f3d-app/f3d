@@ -129,6 +129,10 @@ macro(f3d_plugin_declare_reader)
     set(F3D_READER_HAS_GEOMETRY_READER 0)
   endif()
 
+  if (NOT F3D_READER_HAS_SCENE_READER AND NOT F3D_READER_HAS_GEOMETRY_READER)
+    message(FATAL_ERROR "Please provide either a VTK_IMPORTER or a VTK_READER")
+  endif ()
+
   string(JSON F3D_PLUGIN_JSON
     SET "${F3D_PLUGIN_JSON}" "readers" ${F3D_PLUGIN_CURRENT_READER_INDEX} "${F3D_READER_JSON}")
 
@@ -196,7 +200,7 @@ The `NAME` argument is required. The arguments are as follows:
 macro(f3d_plugin_build)
   cmake_parse_arguments(F3D_PLUGIN "FREEDESKTOP;FORCE_STATIC" "NAME;DESCRIPTION;VERSION" "VTK_MODULES;ADDITIONAL_RPATHS;MIMETYPE_XML_FILES;CONFIGURATION_DIRS" ${ARGN})
 
-  find_package(VTK 9.0 REQUIRED COMPONENTS
+  find_package(VTK 9.2.6 REQUIRED COMPONENTS
                CommonCore CommonExecutionModel IOImport
                ${F3D_PLUGIN_VTK_MODULES})
 
@@ -226,6 +230,10 @@ macro(f3d_plugin_build)
   list(APPEND f3d_plugin_compile_options "${f3d_strict_build_compile_options}")
   list(APPEND f3d_plugin_compile_options "${f3d_coverage_compile_options}")
   list(APPEND f3d_plugin_compile_options "${f3d_sanitizer_compile_options}")
+  if(EMSCRIPTEN)
+    # Exceptions are disabled by default in emscripten but we need them
+    list(APPEND f3d_plugin_compile_options "-fexceptions")
+  endif()
 
   set(f3d_plugin_link_options "")
   list(APPEND f3d_plugin_link_options "${f3d_coverage_link_options}")
