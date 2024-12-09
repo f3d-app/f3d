@@ -1640,8 +1640,8 @@ void F3DStarter::AddCommands()
           cstrings.push_back(filter.c_str());
         }
 
-        file = tinyfd_openFileDialog(
-          "Open File", "./", cstrings.size(), cstrings.data(), "Supported Files", false);
+        file = tinyfd_openFileDialog("Open File", "./", static_cast<int>(cstrings.size()),
+          cstrings.data(), "Supported Files", false);
       }
 
       if (file)
