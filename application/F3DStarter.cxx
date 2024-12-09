@@ -1625,9 +1625,9 @@ void F3DStarter::AddCommands()
       if (!file)
       {
         std::vector<std::string> filters;
-        for (const auto info : f3d::engine::getReadersInfo())
+        for (const auto& info : f3d::engine::getReadersInfo())
         {
-          for (const auto ext : info.Extensions)
+          for (const auto& ext : info.Extensions)
           {
             filters.push_back("*." + ext);
           }
