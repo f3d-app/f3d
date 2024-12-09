@@ -8,6 +8,7 @@
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRendererCollection.h>
+#include <vtkVersion.h>
 
 #include <imgui.h>
 
@@ -17,6 +18,7 @@ namespace
 {
   ImGuiKey GetImGuiKeyFromKeySym(std::string_view&& keySym)
   {
+    // clang-format off
     static const std::unordered_map<std::string_view, ImGuiKey> keySymToImGuiKey =
     {
       { "Tab", ImGuiKey_Tab },
@@ -31,7 +33,10 @@ namespace
       { "Insert", ImGuiKey_Insert },
       { "Delete", ImGuiKey_Delete },
       { "BackSpace", ImGuiKey_Backspace },
+// https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11738
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 4, 20241210)
       { "Backspace", ImGuiKey_Backspace },
+#endif
       { "space", ImGuiKey_Space },
       { "Return", ImGuiKey_Enter },
       { "Escape", ImGuiKey_Escape },
@@ -157,6 +162,7 @@ namespace
       { "KP_8", ImGuiKey_Keypad8 },
       { "KP_9", ImGuiKey_Keypad9 }
     };
+    // clang-format on
 
     auto it = keySymToImGuiKey.find(keySym);
 
