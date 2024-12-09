@@ -1640,7 +1640,7 @@ void F3DStarter::AddCommands()
       const char* file = std::getenv("CTEST_OPEN_DIALOG_FILE");
       if (!file)
       {
-        file = tinyfd_openFileDialog("Open File", "./", static_cast<int>(cstrings.size()),
+        file = tinyfd_openFileDialog("Open File", nullptr, static_cast<int>(cstrings.size()),
           cstrings.data(), "Supported Files", false);
       }
 
