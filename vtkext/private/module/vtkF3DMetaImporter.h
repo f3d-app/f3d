@@ -153,6 +153,11 @@ public:
    */
   bool UpdateAtTimeValue(double timeValue) override;
 
+  /**
+   * Get the update mTime
+   */
+  vtkMTimeType GetUpdateMTime();
+
 protected:
   vtkF3DMetaImporter();
   ~vtkF3DMetaImporter() override;

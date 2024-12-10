@@ -34,10 +34,17 @@ F3D animation behavior can be fully controlled from the command line using the f
 | \-\-animation\-index=-1      |                     | Play all animations at once (.gltf/.glb only). |
 | \-\-animation\-speed\-factor | Time Unit = Seconds | Adjust time unit.                              |
 | \-\-animation\-frame\-rate   | 60 FPS              | Adjust animation frame rate.                   |
+| \-\-animation\-time          |                     | Load a specific time value on start.           |
 
 ## Animation Interactions
 - Press <kbd>W</kbd> to cycle through animations
 - Press <kbd>Space</kbd> to play/pause animation
 
 ## Time Units
-- When F3D plays an animation, it assumes the time unit is in seconds to show accurate speed of animation.
+
+When F3D plays an animation, it assumes the time unit is in seconds to show accurate speed of animation.
+
+## Coloring range
+
+When coloring while loading a time value or playing the animation, the coloring range will be automatically expanded from previously loaded time value,
+this include `--animation-time` that first load the initial time before loading the provided time value.

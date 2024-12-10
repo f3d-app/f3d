@@ -36,7 +36,6 @@ def test_scene():
     sphere1 = f"{testing_dir}/data/mb/recursive/mb_1_0.vtp"
     sphere2 = f"{testing_dir}/data/mb/recursive/mb_2_0.vtp"
     cube = f"{testing_dir}/data/mb/recursive/mb_0_0.vtu"
-    cube = f"{testing_dir}/data/f3d.glb"
     reference = f"{testing_dir}/baselines/TestPythonScene.png"
     output = tempfile.gettempdir() + "/TestPythonScene.png"
 
@@ -46,6 +45,9 @@ def test_scene():
     engine.scene.add([world, logo])
     engine.scene.add(Path(sphere1))
     engine.scene.add([Path(sphere2), Path(cube)])
+
+    assert engine.scene.animation_time_range() == (0.0, 4.0)
+    engine.scene.load_animation_time(2)
 
     img = engine.window.render_to_image()
     img.save(output)
