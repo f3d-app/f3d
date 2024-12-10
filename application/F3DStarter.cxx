@@ -881,6 +881,7 @@ int F3DStarter::Start(int argc, char** argv)
   // Add all input files
   for (auto& file : inputFiles)
   {
+    f3d::log::info("[gapry][issues][1281][", __PRETTY_FUNCTION__, "] ", file);
     this->AddFile(fs::path(file));
   }
 
@@ -1086,6 +1087,8 @@ int F3DStarter::Start(int argc, char** argv)
 //----------------------------------------------------------------------------
 void F3DStarter::LoadFileGroup(int index, bool relativeIndex, bool forceClear)
 {
+  f3d::log::info("[gapry][issues][1281][", __PRETTY_FUNCTION__, "] ", index, relativeIndex, forceClear);
+
   int groupIndex = this->Internals->CurrentFilesGroupIndex;
   if (relativeIndex)
   {
@@ -1131,6 +1134,10 @@ void F3DStarter::LoadFileGroup(int index, bool relativeIndex, bool forceClear)
 void F3DStarter::LoadFileGroup(
   const std::vector<fs::path>& paths, bool clear, const std::string& groupIdx)
 {
+  for(auto& p: paths) {
+    f3d::log::info("[gapry][issues][1281][", __PRETTY_FUNCTION__, "] " , p.string(), clear, groupIdx);
+  }
+
   // Make sure the animation is stopped before trying to load any file
   if (!this->Internals->AppOptions.NoRender)
   {
@@ -1163,7 +1170,7 @@ void F3DStarter::LoadFileGroup(
     dynamicOptionsDict, fs::path(), "dynamic options");
 
   // Recover file information
-  f3d::scene& scene = this->Internals->Engine->getScene();
+  f3d::scene& scene = this->Internals->Engine->getScene(); // [gapry][issues][1281]
   bool unsupported = false;
 
   std::vector<fs::path> localPaths;
@@ -1215,6 +1222,7 @@ void F3DStarter::LoadFileGroup(
             }
             else
             {
+              f3d::log::info("[gapry][issues][1281][", __PRETTY_FUNCTION__, "] ", tmpPath.string());
               localPaths.emplace_back(tmpPath);
             }
           }
@@ -1229,7 +1237,7 @@ void F3DStarter::LoadFileGroup(
       if (!localPaths.empty())
       {
         // Add files to the scene
-        scene.add(localPaths);
+        scene.add(localPaths); // [gapry][issues][1281]
 
         // Update loaded files
         std::copy(
