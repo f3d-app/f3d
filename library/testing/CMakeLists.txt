@@ -25,6 +25,7 @@ list(APPEND libf3dSDKTests_list
 # Tests having UI widgets
 if(F3D_MODULE_UI)
   list(APPEND libf3dSDKTests_list
+    TestSDKConsole.cxx
     TestSDKDynamicBackgroundColor.cxx
     TestSDKDynamicFontFile.cxx
     TestSDKDynamicProperties.cxx
