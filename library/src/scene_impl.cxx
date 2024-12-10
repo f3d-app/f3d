@@ -148,6 +148,7 @@ public:
     // Print scene description
     this->Window.PrintSceneDescription(log::VerboseLevel::DEBUG);
 
+    std::cout<<"After PrintSceneDescription"<<std::endl;
   }
 
   static void DisplayImporterDescription(vtkImporter* importer)
@@ -268,6 +269,7 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
   log::debug("");
 
   this->Internals->Load(importers);
+  std::cout<<"After Load"<<std::endl;
   return *this;
 }
 

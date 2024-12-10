@@ -889,7 +889,9 @@ int F3DStarter::Start(int argc, char** argv)
   }
 
   // Load a file
+  std::cout<<"Before load filegroup"<<std::endl;
   this->LoadFileGroup();
+  std::cout<<"After load filegroup"<<std::endl;
 
   if (!this->Internals->AppOptions.NoRender)
   {
@@ -1071,15 +1073,20 @@ int F3DStarter::Start(int argc, char** argv)
       else
       {
         // Create the event loop repeating timer
+        std::cout<<"Before render"<<std::endl;
         window.render();
+        std::cout<<"After render"<<std::endl;
         interactor.createTimerCallBack(300, [this]() { this->EventLoop(); });
+        std::cout<<"After callback"<<std::endl;
 
         // gracefully exits if SIGTERM or SIGINT is send to F3D
         GlobalInteractor = &interactor;
         std::signal(SIGTERM, F3DInternals::SigCallback);
         std::signal(SIGINT, F3DInternals::SigCallback);
 
+        std::cout<<"Before start"<<std::endl;
         interactor.start();
+        std::cout<<"After start"<<std::endl;
       }
 #endif
     }
@@ -1234,6 +1241,7 @@ void F3DStarter::LoadFileGroup(
       {
         // Add files to the scene
         scene.add(localPaths);
+        std::cout<<"After add"<<std::endl;
 
         if (this->Internals->AppOptions.AnimationTime.has_value())
         {
