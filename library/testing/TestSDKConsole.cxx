@@ -19,8 +19,8 @@ int TestSDKConsole(int argc, char* argv[])
   f3d::window& win = eng.getWindow();
   win.setSize(300, 300);
 
-  return TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/",
-           std::string(argv[2]), "TestSDKConsole")
+  return TestSDKHelpers::RenderTest(
+           win, std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKConsole")
     ? EXIT_SUCCESS
     : EXIT_FAILURE;
 }
