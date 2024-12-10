@@ -1102,7 +1102,7 @@ bool interactor_impl::recordInteraction(const std::string& file)
 //----------------------------------------------------------------------------
 void interactor_impl::start()
 {
-  this->Internals->Window.UpdateDynamicOptions();
+//  this->Internals->Window.UpdateDynamicOptions();
   this->Internals->StartInteractor();
 }
 
