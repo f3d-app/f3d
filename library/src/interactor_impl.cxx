@@ -685,6 +685,12 @@ interactor& interactor_impl::initCommands()
       }
     });
 
+  this->addCommand("print_coloring_info",
+    [&](const std::vector<std::string>&)
+    {
+      this->Internals->Window.PrintColoringDescription(log::VerboseLevel::INFO);
+    });
+
   this->addCommand("set_camera",
     [&](const std::vector<std::string>& args)
     {
