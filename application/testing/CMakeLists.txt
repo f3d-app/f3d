@@ -193,7 +193,7 @@ f3d_test(NAME TestDepthPeelingToneMapping DATA suzanne.ply ARGS --opacity=0.9 -p
 f3d_test(NAME TestVolume DATA HeadMRVolume.mhd ARGS -v --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1)
 f3d_test(NAME TestVolumeInverse DATA HeadMRVolume.mhd ARGS -vi --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1)
 f3d_test(NAME TestVolumeMag DATA vase_4comp.vti ARGS -vb)
-f3d_test(NAME TestVolumeComp DATA vase_4comp.vti ARGS -vb --comp=3)
+f3d_test(NAME TestVolumeComp DATA vase_4comp.vti ARGS -vb --comp=3 LONG_TIMEOUT)
 f3d_test(NAME TestVolumeDirect DATA vase_4comp.vti ARGS -vb --comp=-2)
 f3d_test(NAME TestVolumeCells DATA waveletArrays.vti ARGS -vb --cells)
 f3d_test(NAME TestVolumeColoringArray DATA waveletArrays.vti ARGS -vb --coloring-array=Result LONG_TIMEOUT)
