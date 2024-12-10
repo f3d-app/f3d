@@ -34,7 +34,8 @@ struct vtkF3DMetaImporter::Internals
   std::vector<ImporterPair> Importers;
   std::optional<vtkIdType> CameraIndex;
   vtkBoundingBox GeometryBoundingBox;
-  bool ColoringInfoUpdated = false;
+  vtkTimeStamp ColoringInfoTime;
+  vtkTimeStamp UpdateTime;
 
   F3DColoringInfoHandler ColoringInfoHandler;
 
@@ -134,13 +135,9 @@ bool vtkF3DMetaImporter::Update()
   this->Renderer = this->RenderWindow->GetRenderers()->GetFirstRenderer();
   assert(this->Renderer);
 
-  // XXX: Doing this means that coloring information
-  // is recomputed from scratch when doing incremental loading
-  // This is the simplest way to implement coloring
-  // and should not have too big of an overhead.
-  this->Pimpl->ColoringInfoUpdated = false;
-
   vtkIdType localCameraIndex = -1;
+
+  this->Pimpl->UpdateTime.Modified();
 
   if (this->Pimpl->CameraIndex.has_value())
   {
@@ -312,18 +309,29 @@ std::string vtkF3DMetaImporter::GetOutputsDescription()
 //----------------------------------------------------------------------------
 vtkIdType vtkF3DMetaImporter::GetNumberOfAnimations()
 {
+  // Importer->GetNumberOfAnimations() can be -1 if animation support is not implemented in the importer
   return std::accumulate(this->Pimpl->Importers.begin(), this->Pimpl->Importers.end(), 0,
     [](vtkIdType a, const auto& importerPair)
-    { return a + importerPair.Importer->GetNumberOfAnimations(); });
+    {
+      vtkIdType nAnim = importerPair.Importer->GetNumberOfAnimations();
+      a += nAnim >= 0 ? nAnim : 0;
+      return a;
+    });
 }
 
 //----------------------------------------------------------------------------
 std::string vtkF3DMetaImporter::GetAnimationName(vtkIdType animationIndex)
 {
+  // Importer->GetNumberOfAnimations() can be -1 if animation support is not implemented in the importer
   vtkIdType localAnimationIndex = animationIndex;
   for (const auto& importerPair : this->Pimpl->Importers)
   {
     vtkIdType nAnim = importerPair.Importer->GetNumberOfAnimations();
+    if (nAnim < 0)
+    {
+      nAnim = 0;
+    }
+
     if (localAnimationIndex < nAnim)
     {
       std::string name = importerPair.Importer->GetAnimationName(localAnimationIndex);
@@ -348,6 +356,11 @@ void vtkF3DMetaImporter::EnableAnimation(vtkIdType animationIndex)
   for (const auto& importerPair : this->Pimpl->Importers)
   {
     vtkIdType nAnim = importerPair.Importer->GetNumberOfAnimations();
+    if (nAnim < 0)
+    {
+      nAnim = 0;
+    }
+
     if (localAnimationIndex < nAnim)
     {
       importerPair.Importer->EnableAnimation(localAnimationIndex);
@@ -367,6 +380,11 @@ void vtkF3DMetaImporter::DisableAnimation(vtkIdType animationIndex)
   for (const auto& importerPair : this->Pimpl->Importers)
   {
     vtkIdType nAnim = importerPair.Importer->GetNumberOfAnimations();
+    if (nAnim < 0)
+    {
+      nAnim = 0;
+    }
+
     if (localAnimationIndex < nAnim)
     {
       importerPair.Importer->DisableAnimation(localAnimationIndex);
@@ -386,6 +404,11 @@ bool vtkF3DMetaImporter::IsAnimationEnabled(vtkIdType animationIndex)
   for (const auto& importerPair : this->Pimpl->Importers)
   {
     vtkIdType nAnim = importerPair.Importer->GetNumberOfAnimations();
+    if (nAnim < 0)
+    {
+      nAnim = 0;
+    }
+
     if (localAnimationIndex < nAnim)
     {
       return importerPair.Importer->IsAnimationEnabled(localAnimationIndex);
@@ -444,6 +467,11 @@ bool vtkF3DMetaImporter::GetTemporalInformation(vtkIdType animationIndex, double
   for (const auto& importerPair : this->Pimpl->Importers)
   {
     vtkIdType nAnim = importerPair.Importer->GetNumberOfAnimations();
+    if (nAnim < 0)
+    {
+      nAnim = 0;
+    }
+
     if (localAnimationIndex < nAnim)
     {
       return importerPair.Importer->GetTemporalInformation(
@@ -460,7 +488,6 @@ bool vtkF3DMetaImporter::GetTemporalInformation(vtkIdType animationIndex, double
 //----------------------------------------------------------------------------
 bool vtkF3DMetaImporter::UpdateAtTimeValue(double timeValue)
 {
-  this->Pimpl->ColoringInfoUpdated = false;
   bool ret = true;
   for (const auto& importerPair : this->Pimpl->Importers)
   {
@@ -470,48 +497,52 @@ bool vtkF3DMetaImporter::UpdateAtTimeValue(double timeValue)
     importerPair.Importer->UpdateTimeStep(timeValue);
 #endif
   }
+  this->Pimpl->UpdateTime.Modified();
   return ret;
 }
 
 //----------------------------------------------------------------------------
 void vtkF3DMetaImporter::UpdateInfoForColoring()
 {
-  for (const auto& importerPair : this->Pimpl->Importers)
+  if (this->Pimpl->UpdateTime.GetMTime() > this->Pimpl->ColoringInfoTime.GetMTime())
   {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
-    vtkActorCollection* actorCollection = importerPair.Importer->GetImportedActors();
-#else
-    vtkActorCollection* actorCollection =
-      this->Pimpl->ActorsForImporterMap.at(importerPair.Importer).Get();
-#endif
-    vtkCollectionSimpleIterator ait;
-    actorCollection->InitTraversal(ait);
-    while (auto* actor = actorCollection->GetNextActor(ait))
+    for (const auto& importerPair : this->Pimpl->Importers)
     {
-      vtkPolyDataMapper* pdMapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
-      assert(pdMapper);
-
-      // Update coloring vectors, with a dedicated logic for generic importer
-      vtkDataSet* datasetForColoring = pdMapper->GetInput();
-      vtkF3DGenericImporter* genericImporter = vtkF3DGenericImporter::SafeDownCast(importerPair.Importer);
-      if (genericImporter)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
+      vtkActorCollection* actorCollection = importerPair.Importer->GetImportedActors();
+#else
+      vtkActorCollection* actorCollection =
+        this->Pimpl->ActorsForImporterMap.at(importerPair.Importer).Get();
+#endif
+      vtkCollectionSimpleIterator ait;
+      actorCollection->InitTraversal(ait);
+      while (auto* actor = actorCollection->GetNextActor(ait))
       {
-        // TODO This will be improved with proper composite support
-        // Currently generic importer always has a single actor
-        if (genericImporter->GetImportedImage())
+        vtkPolyDataMapper* pdMapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
+        assert(pdMapper);
+
+        // Update coloring vectors, with a dedicated logic for generic importer
+        vtkDataSet* datasetForColoring = pdMapper->GetInput();
+        vtkF3DGenericImporter* genericImporter = vtkF3DGenericImporter::SafeDownCast(importerPair.Importer);
+        if (genericImporter)
         {
-          datasetForColoring = genericImporter->GetImportedImage();
+          // TODO This will be improved with proper composite support
+          // Currently generic importer always has a single actor
+          if (genericImporter->GetImportedImage())
+          {
+            datasetForColoring = genericImporter->GetImportedImage();
+          }
+          else if (genericImporter->GetImportedPoints())
+          {
+            datasetForColoring = genericImporter->GetImportedPoints();
+          }
         }
-        else if (genericImporter->GetImportedPoints())
-        {
-          datasetForColoring = genericImporter->GetImportedPoints();
-        }
+        this->Pimpl->ColoringInfoHandler.UpdateColoringInfo(datasetForColoring, false);
+        this->Pimpl->ColoringInfoHandler.UpdateColoringInfo(datasetForColoring, true);
       }
-      this->Pimpl->ColoringInfoHandler.UpdateColoringInfo(datasetForColoring, false);
-      this->Pimpl->ColoringInfoHandler.UpdateColoringInfo(datasetForColoring, true);
     }
+    this->Pimpl->ColoringInfoTime.Modified();
   }
-  this->Pimpl->ColoringInfoUpdated = true;
 }
 
 //----------------------------------------------------------------------------
@@ -551,10 +582,12 @@ std::string vtkF3DMetaImporter::GetMetaDataDescription() const
 //----------------------------------------------------------------------------
 F3DColoringInfoHandler& vtkF3DMetaImporter::GetColoringInfoHandler()
 {
-  if (!this->Pimpl->ColoringInfoUpdated)
-  {
-    this->UpdateInfoForColoring();
-  }
-
+  this->UpdateInfoForColoring();
   return this->Pimpl->ColoringInfoHandler;
+}
+
+//----------------------------------------------------------------------------
+vtkMTimeType vtkF3DMetaImporter::GetUpdateMTime()
+{
+  return this->Pimpl->UpdateTime.GetMTime();
 }

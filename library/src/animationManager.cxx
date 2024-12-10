@@ -39,7 +39,19 @@ void animationManager::SetInteractor(interactor_impl* interactor)
 }
 
 //----------------------------------------------------------------------------
-bool animationManager::Initialize()
+void animationManager::SetInteractorEventLoopTime(double loopTime)
+{
+  this->AnimationFrameNLoop = (1000.0/this->Options.scene.animation.frame_rate) / loopTime;
+  if (this->AnimationFrameNLoop == 0)
+  {
+    // TODO warn?
+    this->AnimationFrameNLoop = 1;
+  }
+  this->AnimationFrameLoopCount = this->AnimationFrameNLoop;
+}
+
+//----------------------------------------------------------------------------
+void animationManager::Initialize()
 {
   assert(this->Importer);
   this->HasAnimation = false;
@@ -47,7 +59,6 @@ bool animationManager::Initialize()
   this->CurrentTime = 0;
   this->CurrentTimeSet = false;
 
-  // This can be -1 if animation support is not implemented in the importer
   this->AvailAnimations = this->Importer->GetNumberOfAnimations();
   if (this->AvailAnimations > 0 && this->Interactor)
   {
@@ -82,12 +93,7 @@ bool animationManager::Initialize()
     {
       log::warn("An animation index has been specified but there are no animation available.");
     }
-    if (this->Options.scene.animation.time.has_value())
-    {
-      log::warn("No animation available, cannot load a specific animation time");
-    }
-
-    return false;
+    return;
   }
   else
   {
@@ -137,7 +143,7 @@ bool animationManager::Initialize()
     log::warn("Animation(s) time range delta is invalid: [", this->TimeRange[0], ", ",
       this->TimeRange[1], "]. Disabling animation.");
     this->HasAnimation = false;
-    return false;
+    return;
   }
   else
   {
@@ -150,7 +156,6 @@ bool animationManager::Initialize()
   {
     this->StartAnimation();
   }
-  return true;
 }
 
 //----------------------------------------------------------------------------
@@ -193,10 +198,6 @@ void animationManager::ToggleAnimation()
 
       // Always reset previous tick when starting the animation
       this->PreviousTick = std::chrono::steady_clock::now();
-
-      double frameRate = this->Options.scene.animation.frame_rate;
-      this->CallBackId =
-        this->Interactor->createTimerCallBack(1000.0 / frameRate, [this]() { this->Tick(); });
     }
 
     if (this->Playing && this->Options.scene.camera.index.has_value())
@@ -213,37 +214,43 @@ void animationManager::ToggleAnimation()
 //----------------------------------------------------------------------------
 void animationManager::Tick()
 {
-  assert(this->Interactor);
-
-  // Compute time since previous tick
-  std::chrono::steady_clock::time_point tick = std::chrono::steady_clock::now();
-  auto timeInMS =
-    std::chrono::duration_cast<std::chrono::milliseconds>(tick - this->PreviousTick).count();
-  this->PreviousTick = tick;
-
-  // Convert to a usable time in seconds
-  double elapsedTime = static_cast<double>(timeInMS) / 1000.0;
-  double animationSpeedFactor = this->Options.scene.animation.speed_factor;
-
-  // elapsedTime can be negative
-  elapsedTime *= animationSpeedFactor;
-  this->CurrentTime += elapsedTime;
-
-  // Modulo computation, compute CurrentTime in the time range.
-  if (this->CurrentTime < this->TimeRange[0] || this->CurrentTime > this->TimeRange[1])
+  this->AnimationFrameLoopCount--;
+  if (this->AnimationFrameLoopCount == 0)
   {
-    auto modulo = [](double val, double mod)
+    this->AnimationFrameLoopCount = this->AnimationFrameNLoop;
+
+    assert(this->Interactor);
+
+    // Compute time since previous tick
+    std::chrono::steady_clock::time_point tick = std::chrono::steady_clock::now();
+    auto timeInMS =
+      std::chrono::duration_cast<std::chrono::milliseconds>(tick - this->PreviousTick).count();
+    this->PreviousTick = tick;
+
+    // Convert to a usable time in seconds
+    double elapsedTime = static_cast<double>(timeInMS) / 1000.0;
+    double animationSpeedFactor = this->Options.scene.animation.speed_factor;
+
+    // elapsedTime can be negative
+    elapsedTime *= animationSpeedFactor;
+    this->CurrentTime += elapsedTime;
+
+    // Modulo computation, compute CurrentTime in the time range.
+    if (this->CurrentTime < this->TimeRange[0] || this->CurrentTime > this->TimeRange[1])
     {
-      const double remainder = fmod(val, mod);
-      return remainder < 0 ? remainder + mod : remainder;
-    };
-    this->CurrentTime = this->TimeRange[0] +
-      modulo(this->CurrentTime - this->TimeRange[0], this->TimeRange[1] - this->TimeRange[0]);
-  }
+      auto modulo = [](double val, double mod)
+      {
+        const double remainder = fmod(val, mod);
+        return remainder < 0 ? remainder + mod : remainder;
+      };
+      this->CurrentTime = this->TimeRange[0] +
+        modulo(this->CurrentTime - this->TimeRange[0], this->TimeRange[1] - this->TimeRange[0]);
+    }
 
-  if (this->LoadAtTime(this->CurrentTime))
-  {
-    this->Window.render();
+    if (this->LoadAtTime(this->CurrentTime))
+    {
+      this->Window.render();
+    }
   }
 }
 
@@ -253,6 +260,7 @@ bool animationManager::LoadAtTime(double timeValue)
   assert(this->Importer);
   if (!this->HasAnimation)
   {
+    log::warn("No animation available, cannot load a specific animation time");
     return false;
   }
 
@@ -358,9 +366,8 @@ void animationManager::EnableOnlyCurrentAnimation()
 }
 
 //----------------------------------------------------------------------------
-void animationManager::GetTimeRange(double timeRange[2])
+std::pair<double, double> animationManager::GetTimeRange()
 {
-  timeRange[0] = this->TimeRange[0];
-  timeRange[1] = this->TimeRange[1];
+  return std::make_pair(this->TimeRange[0], this->TimeRange[1]);
 }
 }
