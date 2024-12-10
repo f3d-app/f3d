@@ -52,8 +52,7 @@ void vtkF3DImguiConsole::DisplayText(const char* text)
       this->Pimpl->Logs.emplace_back(std::make_pair(Internals::LogType::Log, text));
   }
 
-  // still print text to std::cout in
-  // order to be able to test verbose outputs
+  // also print text to std::cout
   this->Superclass::DisplayText(text);
 }
 

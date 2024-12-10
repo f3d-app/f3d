@@ -83,9 +83,8 @@ public:
   /**
    * Set the font file path
    * Use Inter font by default if empty
-   * A valid OpenGL context must be specified by providing the render window
    */
-  void SetFontFile(vtkOpenGLRenderWindow* renWin, const std::string& font);
+  void SetFontFile(const std::string& font);
 
   /**
    * Render the UI actor
@@ -155,6 +154,8 @@ protected:
 private:
   vtkF3DUIActor(const vtkF3DUIActor&) = delete;
   void operator=(const vtkF3DUIActor&) = delete;
+
+  bool Initialized = false;
 };
 
 #endif

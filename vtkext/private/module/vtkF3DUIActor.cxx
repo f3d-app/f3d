@@ -67,12 +67,12 @@ void vtkF3DUIActor::SetFpsValue(int fps)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DUIActor::SetFontFile(vtkOpenGLRenderWindow* renWin, const std::string& font)
+void vtkF3DUIActor::SetFontFile(const std::string& font)
 {
   if (this->FontFile != font)
   {
     this->FontFile = font;
-    this->Initialize(renWin);
+    this->Initialized = false;
   }
 }
 
@@ -80,6 +80,13 @@ void vtkF3DUIActor::SetFontFile(vtkOpenGLRenderWindow* renWin, const std::string
 int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
 {
   vtkOpenGLRenderWindow* renWin = vtkOpenGLRenderWindow::SafeDownCast(vp->GetVTKWindow());
+
+  if (!this->Initialized)
+  {
+    this->Initialize(renWin);
+    this->Initialized = true;
+  }
+
   this->StartFrame(renWin);
 
   if (this->FileNameVisible)
