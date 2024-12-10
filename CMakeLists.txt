@@ -113,6 +113,7 @@ endif()
 
 # Shared options between application and library
 include(GNUInstallDirs)
+cmake_dependent_option(F3D_WINDOWS_GUI "Build a non-console Win32 application" ON "WIN32" OFF)
 cmake_dependent_option(F3D_MACOS_BUNDLE "Build a macOS bundle application" ON "APPLE" OFF)
 
 # Force static library when creating a macOS bundle

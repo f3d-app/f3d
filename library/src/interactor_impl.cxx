@@ -1124,6 +1124,13 @@ bool interactor_impl::playInteraction(const std::string& file)
     this->Internals->Recorder->Play();
   }
 
+  // Recorder can stop the interactor, make sure it is still running
+  if (this->Internals->VTKInteractor->GetDone())
+  {
+    log::error("Interactor has been stopped");
+    return false;
+  }
+
   return true;
 }
 

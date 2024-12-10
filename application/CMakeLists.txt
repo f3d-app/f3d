@@ -173,10 +173,10 @@ if(APPLE)
   target_link_libraries(f3d PRIVATE "-framework Cocoa")
 endif()
 
-if(WIN32)
-  # Windows executable without its own console
+if(F3D_WINDOWS_GUI)
+  # Windows executable without console
   set_target_properties(f3d PROPERTIES WIN32_EXECUTABLE TRUE)
-  # force usage of wWinMainCRTStartup in console mode for Unicode support
+  # force usage of wWinMainCRTStartup for Unicode support
   list(APPEND f3d_link_options_public "/ENTRY:wWinMainCRTStartup")
 endif()
 
