@@ -21,7 +21,6 @@
 #include <vtkMath.h>
 #include <vtkMatrix3x3.h>
 #include <vtkNew.h>
-#include <vtkOutputWindow.h>
 #include <vtkPicker.h>
 #include <vtkPointPicker.h>
 #include <vtkRenderWindow.h>

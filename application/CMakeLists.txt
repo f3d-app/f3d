@@ -173,7 +173,6 @@ if(APPLE)
   target_link_libraries(f3d PRIVATE "-framework Cocoa")
 endif()
 
-
 # Windows executable without console
 if(WIN32)
   if(F3D_WINDOWS_GUI)
