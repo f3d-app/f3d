@@ -50,11 +50,6 @@ void vtkF3DInteractorEventRecorder::ProcessEvents(
         break;
 
       default:
-        if (rwi->GetKeySym() && rwi->GetKeySym() == std::string(F3D_EXIT_HOTKEY_SYM))
-        {
-          self->Off();
-        }
-        else
         {
           int mod = 0;
           if (rwi->GetShiftKey())
@@ -71,8 +66,9 @@ void vtkF3DInteractorEventRecorder::ProcessEvents(
           }
           self->WriteEvent(vtkCommand::GetStringFromEventId(event), rwi->GetEventPosition(), mod,
             rwi->GetKeyCode(), rwi->GetRepeatCount(), rwi->GetKeySym(), callData);
+
+          self->OutputStream->flush();
         }
     }
-    self->OutputStream->flush();
   }
 }

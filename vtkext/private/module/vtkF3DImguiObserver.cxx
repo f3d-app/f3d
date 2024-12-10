@@ -8,6 +8,7 @@
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRendererCollection.h>
+#include <vtkVersion.h>
 
 #include <imgui.h>
 
@@ -17,6 +18,7 @@ namespace
 {
   ImGuiKey GetImGuiKeyFromKeySym(std::string_view&& keySym)
   {
+    // clang-format off
     static const std::unordered_map<std::string_view, ImGuiKey> keySymToImGuiKey =
     {
       { "Tab", ImGuiKey_Tab },
@@ -30,7 +32,11 @@ namespace
       { "End", ImGuiKey_End },
       { "Insert", ImGuiKey_Insert },
       { "Delete", ImGuiKey_Delete },
+      { "BackSpace", ImGuiKey_Backspace },
+// https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11738
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 4, 20241210)
       { "Backspace", ImGuiKey_Backspace },
+#endif
       { "space", ImGuiKey_Space },
       { "Return", ImGuiKey_Enter },
       { "Escape", ImGuiKey_Escape },
@@ -156,6 +162,7 @@ namespace
       { "KP_8", ImGuiKey_Keypad8 },
       { "KP_9", ImGuiKey_Keypad9 }
     };
+    // clang-format on
 
     auto it = keySymToImGuiKey.find(keySym);
 
@@ -186,16 +193,12 @@ void vtkF3DImguiObserver::RenderUI(vtkRenderWindowInteractor* interactor)
 bool vtkF3DImguiObserver::MouseMove(vtkObject* caller, unsigned long, void*)
 {
   vtkRenderWindowInteractor* that = static_cast<vtkRenderWindowInteractor*>(caller);
-
-  int sz[2];
-  int p[2];
-  that->GetEventPosition(p);
-  that->GetSize(sz);
+  int* p = that->GetEventPosition();
+  int* sz = that->GetRenderWindow()->GetSize();
   ImGuiIO& io = ImGui::GetIO();
   io.AddMousePosEvent(static_cast<float>(p[0]), static_cast<float>(sz[1] - p[1] - 1));
-
-  this->RenderUI(that);
-
+  // RenderUI is not called here on purpose to avoid too frequent UI draw
+  // The event loop is taking care of it
   return io.WantCaptureMouse;
 }
 
@@ -203,12 +206,9 @@ bool vtkF3DImguiObserver::MouseMove(vtkObject* caller, unsigned long, void*)
 bool vtkF3DImguiObserver::MouseLeftPress(vtkObject* caller, unsigned long, void*)
 {
   vtkRenderWindowInteractor* that = static_cast<vtkRenderWindowInteractor*>(caller);
-
   ImGuiIO& io = ImGui::GetIO();
   io.AddMouseButtonEvent(ImGuiMouseButton_Left, true);
-
   this->RenderUI(that);
-
   return io.WantCaptureMouse;
 }
 
@@ -216,12 +216,9 @@ bool vtkF3DImguiObserver::MouseLeftPress(vtkObject* caller, unsigned long, void*
 bool vtkF3DImguiObserver::MouseLeftRelease(vtkObject* caller, unsigned long, void*)
 {
   vtkRenderWindowInteractor* that = static_cast<vtkRenderWindowInteractor*>(caller);
-
   ImGuiIO& io = ImGui::GetIO();
   io.AddMouseButtonEvent(ImGuiMouseButton_Left, false);
-
   this->RenderUI(that);
-
   return io.WantCaptureMouse;
 }
 
@@ -229,12 +226,9 @@ bool vtkF3DImguiObserver::MouseLeftRelease(vtkObject* caller, unsigned long, voi
 bool vtkF3DImguiObserver::MouseRightPress(vtkObject* caller, unsigned long, void*)
 {
   vtkRenderWindowInteractor* that = static_cast<vtkRenderWindowInteractor*>(caller);
-
   ImGuiIO& io = ImGui::GetIO();
   io.AddMouseButtonEvent(ImGuiMouseButton_Right, true);
-
   this->RenderUI(that);
-
   return io.WantCaptureMouse;
 }
 
@@ -242,12 +236,9 @@ bool vtkF3DImguiObserver::MouseRightPress(vtkObject* caller, unsigned long, void
 bool vtkF3DImguiObserver::MouseRightRelease(vtkObject* caller, unsigned long, void*)
 {
   vtkRenderWindowInteractor* that = static_cast<vtkRenderWindowInteractor*>(caller);
-
   ImGuiIO& io = ImGui::GetIO();
   io.AddMouseButtonEvent(ImGuiMouseButton_Right, false);
-
   this->RenderUI(that);
-
   return io.WantCaptureMouse;
 }
 
@@ -255,12 +246,9 @@ bool vtkF3DImguiObserver::MouseRightRelease(vtkObject* caller, unsigned long, vo
 bool vtkF3DImguiObserver::MouseWheelForward(vtkObject* caller, unsigned long, void*)
 {
   vtkRenderWindowInteractor* that = static_cast<vtkRenderWindowInteractor*>(caller);
-
   ImGuiIO& io = ImGui::GetIO();
   io.AddMouseWheelEvent(0.f, 1.f);
-
   this->RenderUI(that);
-
   return io.WantCaptureMouse;
 }
 
@@ -268,31 +256,32 @@ bool vtkF3DImguiObserver::MouseWheelForward(vtkObject* caller, unsigned long, vo
 bool vtkF3DImguiObserver::MouseWheelBackward(vtkObject* caller, unsigned long, void*)
 {
   vtkRenderWindowInteractor* that = static_cast<vtkRenderWindowInteractor*>(caller);
-
   ImGuiIO& io = ImGui::GetIO();
   io.AddMouseWheelEvent(0.f, -1.f);
-
   this->RenderUI(that);
-
   return io.WantCaptureMouse;
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DImguiObserver::Char(vtkObject* caller, unsigned long, void*)
+{
+  vtkRenderWindowInteractor* that = static_cast<vtkRenderWindowInteractor*>(caller);
+  ImGuiIO& io = ImGui::GetIO();
+  io.AddInputCharacter(that->GetKeyCode());
+  this->RenderUI(that);
+  return io.WantCaptureKeyboard;
 }
 
 //----------------------------------------------------------------------------
 bool vtkF3DImguiObserver::KeyPress(vtkObject* caller, unsigned long, void*)
 {
   vtkRenderWindowInteractor* that = static_cast<vtkRenderWindowInteractor*>(caller);
-
   ImGuiIO& io = ImGui::GetIO();
-
   io.AddKeyEvent(ImGuiMod_Ctrl, that->GetControlKey() == 1);
   io.AddKeyEvent(ImGuiMod_Shift, that->GetShiftKey() == 1);
   io.AddKeyEvent(ImGuiMod_Alt, that->GetAltKey() == 1);
-
   io.AddKeyEvent(::GetImGuiKeyFromKeySym(that->GetKeySym()), true);
-  io.AddInputCharacter(that->GetKeyCode());
-
   this->RenderUI(that);
-
   return io.WantCaptureKeyboard;
 }
 
@@ -300,17 +289,12 @@ bool vtkF3DImguiObserver::KeyPress(vtkObject* caller, unsigned long, void*)
 bool vtkF3DImguiObserver::KeyRelease(vtkObject* caller, unsigned long, void*)
 {
   vtkRenderWindowInteractor* that = static_cast<vtkRenderWindowInteractor*>(caller);
-
   ImGuiIO& io = ImGui::GetIO();
-
   io.AddKeyEvent(ImGuiMod_Ctrl, that->GetControlKey() == 1);
   io.AddKeyEvent(ImGuiMod_Shift, that->GetShiftKey() == 1);
   io.AddKeyEvent(ImGuiMod_Alt, that->GetAltKey() == 1);
-
   io.AddKeyEvent(::GetImGuiKeyFromKeySym(that->GetKeySym()), false);
-
   this->RenderUI(that);
-
   return io.WantCaptureKeyboard;
 }
 
@@ -326,4 +310,5 @@ void vtkF3DImguiObserver::InstallObservers(vtkRenderWindowInteractor* interactor
   interactor->AddObserver(vtkCommand::MouseWheelBackwardEvent, this, &vtkF3DImguiObserver::MouseWheelBackward, 2.f);
   interactor->AddObserver(vtkCommand::KeyPressEvent, this, &vtkF3DImguiObserver::KeyPress, 2.f);
   interactor->AddObserver(vtkCommand::KeyReleaseEvent, this, &vtkF3DImguiObserver::KeyRelease, 2.f);
+  interactor->AddObserver(vtkCommand::CharEvent, this, &vtkF3DImguiObserver::Char, 2.f);
 }

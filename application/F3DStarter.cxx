@@ -376,14 +376,14 @@ public:
         if (std::regex_match(var, numberingRe))
         {
           std::stringstream formattedNumber;
+          const std::string fmt = std::regex_replace(var, numberingRe, "$2");
           try
           {
-            const std::string fmt = std::regex_replace(var, numberingRe, "$2");
             formattedNumber << std::setfill('0') << std::setw(std::stoi(fmt)) << number;
           }
           catch (std::invalid_argument&)
           {
-            if (number == 1) /* avoid spamming the log */
+            if (!fmt.empty() && number == 1) /* avoid spamming the log */
             {
               f3d::log::warn("ignoring invalid number format for \"", var, "\"");
             }
@@ -671,6 +671,9 @@ public:
       interactor.addBinding({ mod_t::NONE, "Drop" }, "add_files_or_set_hdri", "Others", std::bind(docString, "Load dropped files, folder or HDRI"));
       interactor.addBinding({ mod_t::CTRL, "Drop" }, "add_files", "Others", std::bind(docString, "Load dropped files or folder"));
       interactor.addBinding({ mod_t::SHIFT, "Drop" }, "set_hdri", "Others", std::bind(docString, "Set HDRI and use it"));
+
+      interactor.removeBinding({mod_t::CTRL, "Q"});
+      interactor.addBinding({mod_t::CTRL, "Q"}, "exit", "Others", std::bind(docString, "Quit"));
       // clang-format on
 
       f3d::log::debug("Adding config defined bindings if any: ");
@@ -1377,6 +1380,7 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate, bool minima
   {
     options.ui.scalar_bar = false;
     options.ui.cheatsheet = false;
+    options.ui.console = false;
     options.ui.filename = false;
     options.ui.fps = false;
     options.ui.metadata = false;
@@ -1653,4 +1657,5 @@ void F3DStarter::AddCommands()
         }
       }
     });
+  interactor.addCommand("exit", [&](const std::vector<std::string>&) { interactor.stop(); });
 }

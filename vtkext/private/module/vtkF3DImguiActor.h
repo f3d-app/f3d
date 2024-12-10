@@ -71,6 +71,16 @@ private:
    */
   void RenderFpsCounter() override;
 
+  /**
+   * Render the console widget
+   */
+  void RenderConsole() override;
+
+  /**
+   * Render the console badge
+   */
+  void RenderConsoleBadge() override;
+
 private:
   vtkF3DImguiActor(const vtkF3DImguiActor&) = delete;
   void operator=(const vtkF3DImguiActor&) = delete;
