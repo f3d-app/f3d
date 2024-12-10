@@ -1072,7 +1072,7 @@ int F3DStarter::Start(int argc, char** argv)
       {
         // Create the event loop repeating timer
         window.render();
-        interactor.createTimerCallBack(30, [this]() { this->EventLoop(); });
+        interactor.createTimerCallBack(300, [this]() { this->EventLoop(); });
 
         // gracefully exits if SIGTERM or SIGINT is send to F3D
         GlobalInteractor = &interactor;
@@ -1511,6 +1511,7 @@ bool F3DStarter::LoadRelativeFileGroup(int index, bool restoreCamera, bool force
 //----------------------------------------------------------------------------
 void F3DStarter::EventLoop()
 {
+  std::cout<<"EventLoop"<<std::endl;
   if (this->Internals->ReloadFileRequested)
   {
     std::cout<<"ReloadFileRequested"<<std::endl;

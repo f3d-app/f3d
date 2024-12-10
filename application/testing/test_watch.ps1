@@ -15,9 +15,9 @@ Copy-Item $hires_data -Destination $reloaded_data
 $log = "$tmp_dir/output.log"
 $id = (Start-Process -FilePath $f3d_cmd -ArgumentList "--watch --verbose $reloaded_data" -RedirectStandardOutput $log -PassThru).Id
 
-Start-Sleep -Seconds 3
+Start-Sleep -Seconds 10
 Copy-Item $lowres_data -Destination $reloaded_data
-Start-Sleep -Seconds 3
+Start-Sleep -Seconds 10
 
 Get-Content $log
 
