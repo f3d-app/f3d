@@ -545,6 +545,7 @@ private:
 
   vtkF3DMetaImporter* Importer = nullptr;
   vtkMTimeType ImporterTimeStamp = 0;
+  vtkMTimeType ImporterUpdateTimeStamp = 0;
 
   vtkNew<vtkScalarBarActor> ScalarBarActor;
   bool ScalarBarActorConfigured = false;
@@ -567,6 +568,8 @@ private:
   std::optional<std::string> TextureNormal;
 
   vtkSmartPointer<vtkColorTransferFunction> ColorTransferFunction;
+  bool ExpandingRangeSet = false;
+  bool UsingExpandingRange = true;
   double ColorRange[2] = { 0.0, 1.0 };
   bool ColorTransferFunctionConfigured = false;
 
