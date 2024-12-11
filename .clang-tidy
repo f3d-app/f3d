@@ -1,4 +1,4 @@
-Checks: '-*,performance-*,modernize-*,-modernize-use-trailing-return-type,-modernize-use-nodiscard,-modernize-avoid-c-arrays,-modernize-use-auto,-modernize-avoid-bind,-performance-no-int-to-ptr'
+Checks: '-*,performance-*,modernize-*,-modernize-use-trailing-return-type,-modernize-use-nodiscard,-modernize-avoid-c-arrays,-modernize-use-auto,-modernize-avoid-bind'
 WarningsAsErrors: '*'
 UseColor: true
 FormatStyle: none

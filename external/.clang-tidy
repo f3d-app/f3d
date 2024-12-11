@@ -1,1 +1,1 @@
-Checks: '-*'
+Checks: '-*,performance-*,-performance-no-int-to-ptr'
