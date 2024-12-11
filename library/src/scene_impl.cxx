@@ -129,24 +129,7 @@ public:
     progressWidget->Off();
 
     // Initialize the animation using temporal information from the importer
-    if (this->AnimationManager.Initialize())
-    {
-      if (this->Options.scene.animation.time.has_value())
-      {
-        double animationTime = this->Options.scene.animation.time.value();
-        double timeRange[2];
-        this->AnimationManager.GetTimeRange(timeRange);
-
-        // We assume importers import data at timeRange[0] when not specified
-        if (animationTime != timeRange[0])
-        {
-          this->AnimationManager.LoadAtTime(animationTime);
-        }
-      }
-    }
-
-    // Display output description
-    scene_impl::internals::DisplayImporterDescription(this->MetaImporter);
+    this->AnimationManager.Initialize();
 
     // Update all window options and reset camera to bounds if needed
     this->Window.UpdateDynamicOptions();
@@ -155,12 +138,7 @@ public:
       this->Window.getCamera().resetToBounds();
     }
 
-    // Display coloring information
-    this->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
-    log::debug("");
-
-    // Print scene description
-    this->Window.PrintSceneDescription(log::VerboseLevel::DEBUG);
+    scene_impl::internals::DisplayAllInfo(this->MetaImporter, this->Window);
   }
 
   static void DisplayImporterDescription(vtkImporter* importer)
@@ -180,6 +158,19 @@ public:
     }
     log::debug("");
     log::debug(importer->GetOutputsDescription(), "\n");
+  }
+
+  static void DisplayAllInfo(vtkImporter* importer, window_impl& window)
+  {
+    // Display output description
+    scene_impl::internals::DisplayImporterDescription(importer);
+
+    // Display coloring information
+    window.PrintColoringDescription(log::VerboseLevel::DEBUG);
+    log::debug("");
+
+    // Print scene description
+    window.PrintSceneDescription(log::VerboseLevel::DEBUG);
   }
 
   const options& Options;
@@ -324,6 +315,20 @@ scene& scene_impl::clear()
 bool scene_impl::supports(const fs::path& filePath)
 {
   return f3d::factory::instance()->getReader(filePath.string()) != nullptr;
+}
+
+//----------------------------------------------------------------------------
+scene& scene_impl::loadAnimationTime(double timeValue)
+{
+  this->Internals->AnimationManager.LoadAtTime(timeValue);
+  scene_impl::internals::DisplayAllInfo(this->Internals->MetaImporter, this->Internals->Window);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+std::pair<double, double> scene_impl::animationTimeRange()
+{
+  return this->Internals->AnimationManager.GetTimeRange();
 }
 
 //----------------------------------------------------------------------------

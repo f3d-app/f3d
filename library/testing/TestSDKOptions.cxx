@@ -141,18 +141,18 @@ int TestSDKOptions(int argc, char* argv[])
 
   // Test getNames
   std::vector<std::string> names = f3d::options::getAllNames();
-  test("getAllNames find",
-    std::find(names.begin(), names.end(), "scene.animation.time") != names.end());
+  test(
+    "getAllNames find", std::find(names.begin(), names.end(), "render.point_size") != names.end());
 
   std::vector<std::string> setNames = opt.getNames();
   test("getNames count", setNames.size() != 0 && setNames == opt2.getNames());
 
   // Test isSame/copy/hasValue
   test("isSame", opt.isSame(opt2, "render.line_width"));
-  test("isSame unset", opt.isSame(opt2, "scene.animation.time"));
+  test("isSame unset", opt.isSame(opt2, "render.point_size"));
 
   test("hasValue", opt.hasValue("render.line_width"));
-  test("hasValue", !opt.hasValue("scene.animation.time"));
+  test("hasValue", !opt.hasValue("render.point_size"));
 
   opt2.render.line_width = 3.12;
   test("not isSame", !opt.isSame(opt2, "render.line_width"));
@@ -187,7 +187,7 @@ int TestSDKOptions(int argc, char* argv[])
     "inexistent_exception exception on get", [&]() { opt.get("dummy"); });
 
   test.expect<f3d::options::no_value_exception>(
-    "no_value_exception exception on get", [&]() { opt.get("scene.animation.time"); });
+    "no_value_exception exception on get", [&]() { opt.get("render.point_size"); });
 
   // Test setAsString/getAsString error paths
   test.expect<f3d::options::inexistent_exception>(
@@ -196,8 +196,8 @@ int TestSDKOptions(int argc, char* argv[])
   test.expect<f3d::options::inexistent_exception>(
     "inexistent_exception exception on getAsString", [&]() { opt.getAsString("dummy"); });
 
-  test.expect<f3d::options::no_value_exception>("no_value_exception exception on getAsString",
-    [&]() { opt.getAsString("scene.animation.time"); });
+  test.expect<f3d::options::no_value_exception>(
+    "no_value_exception exception on getAsString", [&]() { opt.getAsString("render.point_size"); });
 
   f3d::options opt6{};
 

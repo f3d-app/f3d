@@ -288,7 +288,9 @@ PYBIND11_MODULE(pyf3d, module)
     .def("add", py::overload_cast<const std::vector<std::string>&>(&f3d::scene::add),
       "Add multiple filenames to the scene", py::arg("file_name_vector"))
     .def("add", py::overload_cast<const f3d::mesh_t&>(&f3d::scene::add),
-      "Add a surfacic mesh from memory into the scene", py::arg("mesh"));
+      "Add a surfacic mesh from memory into the scene", py::arg("mesh"))
+    .def("load_animation_time", &f3d::scene::loadAnimationTime)
+    .def("animation_time_range", &f3d::scene::animationTimeRange);
 
   // f3d::camera
   py::class_<f3d::camera, std::unique_ptr<f3d::camera, py::nodelete>> camera(module, "Camera");
