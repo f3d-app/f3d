@@ -116,7 +116,7 @@ Your previous F3D installation is current being used to generate thumbnails, wai
 
 It's a limitation from the Windows "subsystem".
 You can workaround the issue by piping to a file (`f3d.exe --version > file.txt`) and read the file.
-We found that using git bash console works fine though.
+It also seems to be working fine with (git bash console)[https://gitforwindows.org/].
 Another solution is recompiling F3D with the CMake option `F3D_WINDOWS_GUI` disabled.
 
 ## macOS
