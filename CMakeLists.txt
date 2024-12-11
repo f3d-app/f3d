@@ -61,6 +61,7 @@ option(F3D_MODULE_UI "ImGui widgets module" ON)
 option(F3D_USE_EXTERNAL_CXXOPTS "Use external cxxopts dependency" OFF)
 option(F3D_USE_EXTERNAL_NLOHMANN_JSON "Use external nlohmann_json dependency" OFF)
 option(F3D_USE_EXTERNAL_DMON "Use external dmon dependency" OFF)
+option(F3D_USE_EXTERNAL_IMGUI "Use external imgui dependency" OFF)
 
 if (F3D_USE_EXTERNAL_CXXOPTS)
   find_package(cxxopts REQUIRED)
@@ -70,6 +71,9 @@ if (F3D_USE_EXTERNAL_NLOHMANN_JSON)
 endif ()
 if (F3D_USE_EXTERNAL_DMON)
   find_package(dmon REQUIRED)
+endif ()
+if (F3D_MODULE_UI AND F3D_USE_EXTERNAL_IMGUI)
+  find_package(imgui REQUIRED)
 endif ()
 
 # VTK dependency
