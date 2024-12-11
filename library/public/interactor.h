@@ -242,15 +242,23 @@ public:
   virtual bool recordInteraction(const std::string& file) = 0;
 
   /**
-   * Start the interactor.
+   * Start the interactor event loop.
    * Make sure the window is initialized first, by calling `window.render()`
+   * The event loop will be triggered every loopTime, and userCallBack will be called at the
+   * start of the event loop
    */
-  virtual void start() = 0;
+  virtual void start(double loopTime = 30, std::function<void()> userCallBack = nullptr) = 0;
 
   /**
    * Stop the interactor.
    */
   virtual void stop() = 0;
+
+  /**
+   * Request a render to be done on the next event loop
+   * Safe to call in a multithreaded environnement
+   */
+  virtual void requestRender() = 0;
 
   /**
    * An exception that can be thrown by the interactor

@@ -70,8 +70,9 @@ public:
   bool playInteraction(const std::string& file) override;
   bool recordInteraction(const std::string& file) override;
 
-  void start() override;
+  void start(double loopTime, std::function<void()> userCallBack) override;
   void stop() override;
+  void requestRender() override;
   ///@}
 
   /**
@@ -100,6 +101,12 @@ public:
    * the camera clipping range.
    */
   void UpdateRendererAfterInteraction();
+
+  /**
+   * Event loop being called automatically once the interactor is started
+   * First call the EventLoopUserCallBack, then call render if requested.
+   */
+  void EventLoop();
 
   /**
    * An exception that can be thrown by certain command callbacks
