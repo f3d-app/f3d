@@ -1084,7 +1084,7 @@ int F3DStarter::Start(int argc, char** argv)
         std::signal(SIGTERM, F3DInternals::SigCallback);
         std::signal(SIGINT, F3DInternals::SigCallback);
 
-        interactor.start(5, [this]() { this->EventLoop(); });
+        interactor.start(30, [this]() { this->EventLoop(); });
       }
 #endif
     }

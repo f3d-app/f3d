@@ -9,14 +9,12 @@
 #include "vtkF3DConsoleOutputWindow.h"
 #include "vtkF3DInteractorEventRecorder.h"
 #include "vtkF3DInteractorStyle.h"
-#include "vtkF3DRenderPass.h"
 #include "vtkF3DRenderer.h"
 #include "vtkF3DUIObserver.h"
 
 #include <vtkCallbackCommand.h>
 #include <vtkCellPicker.h>
 #include <vtkGenericRenderWindowInteractor.h>
-#include <vtkInformation.h>
 #include <vtkMath.h>
 #include <vtkMatrix3x3.h>
 #include <vtkNew.h>
@@ -235,7 +233,7 @@ public:
       self->Options.ui.console = (event == vtkF3DConsoleOutputWindow::ShowEvent);
     }
 
-    self->NeedFullRender = true;
+    self->RenderRequested = true;
   }
 
   //----------------------------------------------------------------------------
@@ -363,35 +361,6 @@ public:
     self->Style->OnMiddleButtonUp();
   }
 
-  //----------------------------------------------------------------------------
-  void StartEventLoop()
-  {
-#if F3D_MODULE_UI
-    // create event loop to refresh UI and trigger full render if needed
-    // this may be rework to a generalize event loop, see https://github.com/f3d-app/f3d/issues/1534
-    this->Interactor.createTimerCallBack(30,
-      [&]()
-      {
-        vtkRenderWindow* renWin = this->Window.GetRenderWindow();
-        vtkF3DRenderer* ren =
-          vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
-        vtkInformation* info = ren->GetInformation();
-
-        if (this->NeedFullRender)
-        {
-          this->NeedFullRender = false;
-          this->Window.render();
-        }
-        else
-        {
-          info->Set(vtkF3DRenderPass::RENDER_UI_ONLY(), 1);
-          renWin->Render();
-          info->Remove(vtkF3DRenderPass::RENDER_UI_ONLY());
-        }
-      });
-#endif
-  }
-
   /**
    * Run a camera transition animation based on a camera state interpolation function.
    * The provided function will be called with an interpolation parameter
@@ -513,10 +482,6 @@ public:
   int DragDistanceTol = 3;      /* px */
   int TransitionDuration = 100; /* ms */
 
-  // MEAK
-  bool NeedFullRender = false;
-
-  // EVENT
   std::function<void()> EventLoopUserCallBack = std::function<void()>();
   unsigned long EventLoopTimerId = -1;
   std::atomic<bool> RenderRequested = false;
@@ -1107,7 +1072,8 @@ bool interactor_impl::playInteraction(const std::string& file)
     this->Internals->Recorder->Off();
     this->Internals->Recorder->Clear();
 
-    this->Internals->StartEventLoop();
+//    this->Internals->StartEventLoop(); Why was it needed ? TODO
+
 
     std::string cleanFile = vtksys::SystemTools::CollapseFullPath(file);
     this->Internals->Recorder->SetFileName(cleanFile.c_str());
@@ -1165,9 +1131,6 @@ bool interactor_impl::recordInteraction(const std::string& file)
 //----------------------------------------------------------------------------
 void interactor_impl::start(double loopTime, std::function<void()> userCallBack)
 {
-  // MEAK
-  this->Internals->StartEventLoop();
-
   if (userCallBack)
   {
     this->Internals->EventLoopUserCallBack = std::move(userCallBack);
@@ -1224,6 +1187,11 @@ void interactor_impl::EventLoop()
   {
     this->Internals->Window.render();
     this->Internals->RenderRequested = false;
+  }
+  else
+  {
+    // TODO speed blinking ?
+    this->Internals->Window.RenderUIOnly();
   }
 }
 
