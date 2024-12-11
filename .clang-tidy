@@ -2,4 +2,4 @@ Checks: '-*,performance-*,modernize-*,-modernize-use-trailing-return-type,-moder
 WarningsAsErrors: '*'
 UseColor: true
 FormatStyle: none
-
+HeaderFilterRegex: ''
