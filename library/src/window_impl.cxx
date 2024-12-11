@@ -32,7 +32,7 @@
 #endif
 
 #ifdef VTK_OPENGL_HAS_EGL
-#include <vtkEGLRenderWindow.h>
+#include <vtkF3DEGLRenderWindow.h>
 #endif
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
@@ -72,17 +72,30 @@ public:
     // Override VTK logic
 #ifdef _WIN32
     return vtkSmartPointer<vtkF3DWGLRenderWindow>::New();
-#else
+#elif __linux__
 #if defined(VTK_USE_X)
     // try GLX
-    vtkSmartPointer<vtkRenderWindow> renWin = vtkSmartPointer<vtkF3DGLXRenderWindow>::New();
-    if (renWin)
+    vtkSmartPointer<vtkRenderWindow> glxRenWin = vtkSmartPointer<vtkF3DGLXRenderWindow>::New();
+    if (glxRenWin)
     {
-      return renWin;
+      return glxRenWin;
     }
 #endif
-    // XXX: At the moment, fallback on VTK logic
-    // It will change in the future when other subclasses are implemented
+#if defined(VTK_OPENGL_HAS_EGL)
+    // try EGL
+    vtkSmartPointer<vtkRenderWindow> eglRenWin = vtkSmartPointer<vtkF3DEGLRenderWindow>::New();
+    if (eglRenWin)
+    {
+      return eglRenWin;
+    }
+#endif
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
+    // OSMesa
+    return vtkSmartPointer<vtkOSOpenGLRenderWindow>::New();
+#endif
+    return nullptr;
+#else
+    // fallback on VTK logic for other systems
     return vtkSmartPointer<vtkRenderWindow>::New();
 #endif
   }
@@ -112,8 +125,8 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   }
   else if (type == Type::EGL)
   {
-#if defined(VTK_OPENGL_HAS_EGL) && VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
-    this->Internals->RenWin = vtkSmartPointer<vtkEGLRenderWindow>::New();
+#if defined(VTK_OPENGL_HAS_EGL)
+    this->Internals->RenWin = vtkSmartPointer<vtkF3DEGLRenderWindow>::New();
 #else
     throw engine::no_window_exception("Window type is EGL but VTK EGL support is not enabled");
 #endif
@@ -219,7 +232,7 @@ window_impl::Type window_impl::getType()
 #endif
 
 #ifdef VTK_OPENGL_HAS_EGL
-  if (this->Internals->RenWin->IsA("vtkEGLRenderWindow"))
+  if (this->Internals->RenWin->IsA("vtkF3DEGLRenderWindow"))
   {
     return Type::EGL;
   }
@@ -383,6 +396,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetFilenameInfo(opt.ui.filename_info);
   renderer->ShowMetaData(opt.ui.metadata);
   renderer->ShowCheatSheet(opt.ui.cheatsheet);
+  renderer->ShowConsole(opt.ui.console);
   renderer->ShowDropZone(opt.ui.dropzone);
   renderer->SetDropZoneInfo(opt.ui.dropzone_info);
 

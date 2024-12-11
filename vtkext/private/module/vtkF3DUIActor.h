@@ -57,6 +57,12 @@ public:
   void SetCheatSheetVisibility(bool show);
 
   /**
+   * Set the console visibility
+   * False by default
+   */
+  void SetConsoleVisibility(bool show);
+
+  /**
    * Set the cheatsheet string
    * Empty by default
    */
@@ -119,6 +125,16 @@ protected:
    */
   virtual void RenderFpsCounter() {}
 
+  /**
+   * Render the console widget
+   */
+  virtual void RenderConsole() {}
+
+  /**
+   * Render the console badge
+   */
+  virtual void RenderConsoleBadge() {}
+
   bool FileNameVisible = false;
   std::string FileName = "";
 
@@ -128,6 +144,8 @@ protected:
   bool CheatSheetVisible = false;
   std::vector<CheatSheetGroup> CheatSheet;
 
+  bool ConsoleVisible = false;
+
   bool FpsCounterVisible = false;
   int FpsValue = 0;
 
@@ -136,6 +154,8 @@ protected:
 private:
   vtkF3DUIActor(const vtkF3DUIActor&) = delete;
   void operator=(const vtkF3DUIActor&) = delete;
+
+  bool Initialized = false;
 };
 
 #endif

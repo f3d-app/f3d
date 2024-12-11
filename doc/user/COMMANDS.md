@@ -54,6 +54,8 @@ eg: `add_files /path/to/dragon.vtu`.
 
 The F3D application provides a few more commands.
 
+`exit`: A specific command to quit the application. No argument.
+
 `load_previous_file_group`: A specific command to load the previous file or file group. No argument.
 
 `load_next_file_group`: A specific command to load the next file or file group. No argument.
@@ -90,6 +92,10 @@ toggle ui.scalar_bar
 print_scene_info # Another comment
 increase_light_intensity
 ```
+
+## Console
+
+If F3D is built with `F3D_MODULE_UI` support, pressing <kbd>Esc</kbd> will open the console mode. It's possible to type any command in the input field and pressing <kbd>Enter</kbd> will trigger the command instantly.
 
 ## Command syntax
 

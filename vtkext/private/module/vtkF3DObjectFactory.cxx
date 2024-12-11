@@ -12,15 +12,14 @@
 
 #ifdef __ANDROID__
 #include <vtkF3DAndroidLogOutputWindow.h>
-#elif F3D_WINDOWS_GUI
-#include <vtkF3DWin32OutputWindow.h>
 #else
 #include <vtkF3DConsoleOutputWindow.h>
 #endif
 
 #if F3D_MODULE_UI
-#include "vtkF3DImguiObserver.h"
 #include "vtkF3DImguiActor.h"
+#include "vtkF3DImguiConsole.h"
+#include "vtkF3DImguiObserver.h"
 #endif
 
 namespace
@@ -50,9 +49,9 @@ vtkF3DObjectFactory::vtkF3DObjectFactory()
 #ifdef __ANDROID__
   this->RegisterOverride("vtkOutputWindow", "vtkF3DAndroidLogOutputWindow",
     "vtkOutputWindow override for F3D", 1, ::Factory<vtkF3DAndroidLogOutputWindow>);
-#elif F3D_WINDOWS_GUI
-  this->RegisterOverride("vtkOutputWindow", "vtkF3DWin32OutputWindow",
-    "vtkOutputWindow override for F3D", 1, ::Factory<vtkF3DWin32OutputWindow>);
+#elif F3D_MODULE_UI
+  this->RegisterOverride("vtkOutputWindow", "vtkF3DImguiConsole",
+    "vtkOutputWindow override for F3D", 1, ::Factory<vtkF3DImguiConsole>);
 #else
   this->RegisterOverride("vtkOutputWindow", "vtkF3DConsoleOutputWindow",
     "vtkOutputWindow override for F3D", 1, ::Factory<vtkF3DConsoleOutputWindow>);

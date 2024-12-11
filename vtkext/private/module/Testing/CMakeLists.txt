@@ -10,10 +10,6 @@ set(test_sources
   TestF3DRendererWithColoring.cxx
   )
 
-if(WIN32 AND F3D_WINDOWS_GUI)
-  list(APPEND test_sources TestF3DWinGuiObjectFactory.cxx)
-endif()
-
 if(F3D_MODULE_EXR)
   list(APPEND test_sources
        TestF3DEXRReader.cxx

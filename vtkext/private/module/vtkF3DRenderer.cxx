@@ -276,6 +276,9 @@ void vtkF3DRenderer::Initialize()
   this->ScalarBarActorConfigured = false;
   this->CheatSheetConfigured = false;
   this->ColoringConfigured = false;
+
+  // create ImGui context if F3D_MODULE_UI is enabled
+  this->UIActor->Initialize(vtkOpenGLRenderWindow::SafeDownCast(this->RenderWindow));
 }
 
 //----------------------------------------------------------------------------
@@ -1086,9 +1089,6 @@ void vtkF3DRenderer::ConfigureTextActors()
     }
   }
 
-  // create ImGui context if F3D_MODULE_UI is enabled
-  this->UIActor->Initialize(vtkOpenGLRenderWindow::SafeDownCast(this->RenderWindow));
-
   this->TextActorsConfigured = true;
 }
 
@@ -1322,6 +1322,17 @@ void vtkF3DRenderer::ShowCheatSheet(bool show)
   {
     this->CheatSheetVisible = show;
     this->UIActor->SetCheatSheetVisibility(show);
+    this->CheatSheetConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ShowConsole(bool show)
+{
+  if (this->ConsoleVisible != show)
+  {
+    this->ConsoleVisible = show;
+    this->UIActor->SetConsoleVisibility(show);
     this->CheatSheetConfigured = false;
   }
 }

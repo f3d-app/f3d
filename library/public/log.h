@@ -15,7 +15,6 @@ namespace f3d
  * A class to output logs to the standard output.
  * It supports different levels, errors, warnings and info, with associated coloring.
  * A few static methods exists to control the coloring and the verbosity level
- * A waitForUser utility static method exist for windows.
  *
  */
 class F3D_EXPORT log
@@ -105,12 +104,6 @@ public:
    * stdout. If forceStdErr is true, all messages including debug and info are written to stderr.
    */
   static void setVerboseLevel(VerboseLevel level, bool forceStdErr = false);
-
-  /**
-   * Wait for user if applicable (eg: win32 output window).
-   * No effect otherwise.
-   */
-  static void waitForUser();
 
 protected:
   //! @cond

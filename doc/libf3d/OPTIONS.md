@@ -100,6 +100,7 @@ Option|Type<br>Default<br>Trigger|Description|F3D option
 :---:|:---:|:---|:---:
 ui.scalar_bar|bool<br>false<br>render|Show *scalar bar* of the coloring by data array.|\-\-bar
 ui.cheatsheet|bool<br>false<br>render|Show a interactor cheatsheet
+ui.console|bool<br>false<br>render|Show the console
 ui.filename|bool<br>false<br>render|Display the *filename info content* on top of the window.|\-\-filename
 ui.filename_info|string<br>-<br>render|Content of *filename info* to display.
 ui.font_file|string<br>optional<br>render|Use the provided FreeType compatible font file to display text.<br>Can be useful to display non-ASCII filenames.|\-\-font-file

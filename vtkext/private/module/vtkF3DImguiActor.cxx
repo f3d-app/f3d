@@ -1,6 +1,7 @@
 #include "vtkF3DImguiActor.h"
 
 #include "F3DFontBuffer.h"
+#include "vtkF3DImguiConsole.h"
 #include "vtkF3DImguiFS.h"
 #include "vtkF3DImguiVS.h"
 
@@ -238,6 +239,8 @@ vtkF3DImguiActor::vtkF3DImguiActor()
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
 {
+  this->Superclass::Initialize(renWin);
+
   // release existing context
   this->ReleaseGraphicsResources(renWin);
 
@@ -276,6 +279,8 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::ReleaseGraphicsResources(vtkWindow* w)
 {
+  this->Superclass::ReleaseGraphicsResources(w);
+
   this->Pimpl->Release(vtkOpenGLRenderWindow::SafeDownCast(w));
 }
 
@@ -285,6 +290,8 @@ vtkF3DImguiActor::~vtkF3DImguiActor() = default;
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderFileName()
 {
+  this->Superclass::RenderFileName();
+
   ImGuiViewport* viewport = ImGui::GetMainViewport();
 
   constexpr float marginTop = 5.f;
@@ -306,6 +313,8 @@ void vtkF3DImguiActor::RenderFileName()
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderMetaData()
 {
+  this->Superclass::RenderMetaData();
+
   ImGuiViewport* viewport = ImGui::GetMainViewport();
 
   constexpr float marginRight = 5.f;
@@ -330,6 +339,8 @@ void vtkF3DImguiActor::RenderMetaData()
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderCheatSheet()
 {
+  this->Superclass::RenderCheatSheet();
+
   ImGuiViewport* viewport = ImGui::GetMainViewport();
 
   constexpr float marginLeft = 5.f;
@@ -386,6 +397,8 @@ void vtkF3DImguiActor::RenderCheatSheet()
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderFpsCounter()
 {
+  this->Superclass::RenderFpsCounter();
+
   ImGuiViewport* viewport = ImGui::GetMainViewport();
 
   constexpr float marginRight = 3.f;
@@ -413,8 +426,28 @@ void vtkF3DImguiActor::RenderFpsCounter()
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DImguiActor::RenderConsole()
+{
+  this->Superclass::RenderConsole();
+
+  vtkF3DImguiConsole* console = vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
+  console->ShowConsole();
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DImguiActor::RenderConsoleBadge()
+{
+  this->Superclass::RenderConsoleBadge();
+
+  vtkF3DImguiConsole* console = vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
+  console->ShowBadge();
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DImguiActor::StartFrame(vtkOpenGLRenderWindow* renWin)
 {
+  this->Superclass::StartFrame(renWin);
+
   if (ImGui::GetCurrentContext() == nullptr)
   {
     this->Initialize(renWin);
@@ -433,6 +466,8 @@ void vtkF3DImguiActor::StartFrame(vtkOpenGLRenderWindow* renWin)
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::EndFrame(vtkOpenGLRenderWindow* renWin)
 {
+  this->Superclass::EndFrame(renWin);
+
   ImGui::Render();
   this->Pimpl->RenderDrawData(renWin, ImGui::GetDrawData());
 }
