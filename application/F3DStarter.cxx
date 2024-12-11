@@ -1244,6 +1244,8 @@ void F3DStarter::LoadFileGroup(
 
         if (this->Internals->AppOptions.AnimationTime.has_value())
         {
+          f3d::log::debug(
+            "Loading animation time: ", this->Internals->AppOptions.AnimationTime.value());
           scene.loadAnimationTime(this->Internals->AppOptions.AnimationTime.value());
         }
 

@@ -1120,7 +1120,6 @@ bool interactor_impl::playInteraction(const std::string& file)
 
     std::string cleanFile = vtksys::SystemTools::CollapseFullPath(file);
     this->Internals->Recorder->SetFileName(cleanFile.c_str());
-    this->Internals->Window.UpdateDynamicOptions();
     this->Internals->Recorder->Play();
   }
 
@@ -1176,7 +1175,6 @@ bool interactor_impl::recordInteraction(const std::string& file)
 void interactor_impl::start()
 {
   this->Internals->StartEventLoop();
-  this->Internals->Window.UpdateDynamicOptions();
   this->Internals->StartInteractor();
 }
 
