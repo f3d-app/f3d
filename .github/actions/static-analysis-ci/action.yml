@@ -80,7 +80,7 @@ runs:
     - name: Clang-tidy
       shell: bash
       working-directory: ${{github.workspace}}/source
-      run: run-clang-tidy -quiet -p ../build
+      run: run-clang-tidy -quiet -allow-no-checks -p ../build
 
     - name: Cppcheck
       shell: bash
