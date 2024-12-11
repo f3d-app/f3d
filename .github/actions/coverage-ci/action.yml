@@ -109,10 +109,7 @@ runs:
       working-directory: ${{github.workspace}}/source
       run: |
         lcov --base-directory . --directory . -c -o coverage.info --gcov-tool /usr/bin/gcov
-        lcov --remove coverage.info "*/dependencies/*" -o coverage.info
-        lcov --remove coverage.info "*/cxxopts.hpp" -o coverage.info
-        lcov --remove coverage.info "*/json.hpp" -o coverage.info
-        lcov --remove coverage.info "*/dmon.h" -o coverage.info
+        lcov --remove coverage.info "*/external/*" -o coverage.info
         lcov --remove coverage.info "*Test*" -o coverage.info
 
     - name: Upload coverage to Codecov
