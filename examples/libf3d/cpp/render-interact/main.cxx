@@ -27,12 +27,9 @@ int main(int argc, char** argv)
   f3d::window& win = eng.getWindow();
   win.render();
 
-  // Create a timer to stop interaction after one second
+  // Start interaction and stop it after one second
   f3d::interactor& inter = eng.getInteractor();
-  inter.createTimerCallBack(1000, [&inter]() { inter.stop(); });
-
-  // Start interaction
-  inter.start();
+  inter.start(1000, [&inter]() { inter.stop(); });
 
   return EXIT_SUCCESS;
 }
