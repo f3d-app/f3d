@@ -691,6 +691,18 @@ interactor& interactor_impl::initCommands()
       this->Internals->Window.PrintColoringDescription(log::VerboseLevel::INFO);
     });
 
+  this->addCommand("print_mesh_info",
+    [&](const std::vector<std::string>&)
+    {
+      this->Internals->Scene.PrintImporterDescription(log::VerboseLevel::INFO);
+    });
+
+  this->addCommand("print_options_info",
+    [&](const std::vector<std::string>&)
+    {
+      this->Internals->Options.PrintOptionsDescription(log::VerboseLevel::INFO);
+    });
+
   this->addCommand("set_camera",
     [&](const std::vector<std::string>& args)
     {
