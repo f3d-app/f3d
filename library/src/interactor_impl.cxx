@@ -10,8 +10,8 @@
 #include "vtkF3DInteractorEventRecorder.h"
 #include "vtkF3DInteractorStyle.h"
 #include "vtkF3DRenderer.h"
-#include "vtkF3DUIObserver.h"
 #include "vtkF3DUIActor.h"
+#include "vtkF3DUIObserver.h"
 
 #include <vtkCallbackCommand.h>
 #include <vtkCellPicker.h>
@@ -464,8 +464,7 @@ public:
 
     // Configure UI delta time
     vtkRenderWindow* renWin = this->Window.GetRenderWindow();
-    vtkF3DRenderer* ren =
-      vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+    vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
     ren->SetUIDeltaTime(loopTime);
 
     // Configure animation manager
@@ -479,8 +478,8 @@ public:
     timerCallBack->SetCallback(
       [](vtkObject*, unsigned long, void* clientData, void*)
       {
-      std::function<void()>* callBackPtr = static_cast<std::function<void()>*>(clientData);
-      (*callBackPtr)();
+        std::function<void()>* callBackPtr = static_cast<std::function<void()>*>(clientData);
+        (*callBackPtr)();
       });
     this->EventLoopObserverId =
       this->VTKInteractor->AddObserver(vtkCommand::TimerEvent, timerCallBack);
@@ -707,8 +706,7 @@ interactor& interactor_impl::initCommands()
       this->Internals->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
     });
 
-  this->addCommand(
-    "stop_interactor", [&](const std::vector<std::string>&) { this->stop(); });
+  this->addCommand("stop_interactor", [&](const std::vector<std::string>&) { this->stop(); });
 
   this->addCommand("reset_camera",
     [&](const std::vector<std::string>&) { this->Internals->Window.getCamera().resetToDefault(); });
@@ -1096,7 +1094,8 @@ void interactor_impl::disableCameraMovement()
 }
 
 //----------------------------------------------------------------------------
-bool interactor_impl::playInteraction(const std::string& file, double loopTime, std::function<void()> userCallBack)
+bool interactor_impl::playInteraction(
+  const std::string& file, double loopTime, std::function<void()> userCallBack)
 {
   if (!vtksys::SystemTools::FileExists(file))
   {

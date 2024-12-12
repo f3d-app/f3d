@@ -571,6 +571,6 @@ void window_impl::RenderUIOnly()
   info->Set(vtkF3DRenderPass::RENDER_UI_ONLY(), 1);
   renWin->Render();
   info->Remove(vtkF3DRenderPass::RENDER_UI_ONLY());
-#endif    
+#endif
 }
 };

@@ -88,7 +88,8 @@ public:
   }
 
   /**
-   * Set the interactor event loop time and compute the number of event loop needed to trigger an actual tick
+   * Set the interactor event loop time and compute the number of event loop needed to trigger an
+   * actual tick
    * TODO rework this API ?
    */
   void SetInteractorEventLoopTime(double loopTime);

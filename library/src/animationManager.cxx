@@ -41,7 +41,7 @@ void animationManager::SetInteractor(interactor_impl* interactor)
 //----------------------------------------------------------------------------
 void animationManager::SetInteractorEventLoopTime(double loopTime)
 {
-  this->AnimationFrameNLoop = (1000.0/this->Options.scene.animation.frame_rate) / loopTime;
+  this->AnimationFrameNLoop = (1000.0 / this->Options.scene.animation.frame_rate) / loopTime;
   if (this->AnimationFrameNLoop == 0)
   {
     // TODO warn?
