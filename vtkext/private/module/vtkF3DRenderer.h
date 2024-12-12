@@ -371,6 +371,11 @@ public:
    */
   void SetCheatSheetConfigured(bool flag);
 
+  /**
+   * Set the UI delta time (time between frame being rendered) in ms
+   */
+  void SetUIDeltaTime(double time);
+
 private:
   vtkF3DRenderer();
   ~vtkF3DRenderer() override;

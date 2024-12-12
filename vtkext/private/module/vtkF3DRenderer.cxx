@@ -2621,3 +2621,9 @@ void vtkF3DRenderer::SetCheatSheetConfigured(bool flag)
 {
   this->CheatSheetConfigured = flag;
 }
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetUIDeltaTime(double time)
+{
+  this->UIActor->SetDeltaTime(time);
+}

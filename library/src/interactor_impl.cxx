@@ -11,6 +11,7 @@
 #include "vtkF3DInteractorStyle.h"
 #include "vtkF3DRenderer.h"
 #include "vtkF3DUIObserver.h"
+#include "vtkF3DUIActor.h"
 
 #include <vtkCallbackCommand.h>
 #include <vtkCellPicker.h>
@@ -1135,6 +1136,11 @@ void interactor_impl::start(double loopTime, std::function<void()> userCallBack)
   {
     this->Internals->EventLoopUserCallBack = std::move(userCallBack);
   }
+
+  vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
+  vtkF3DRenderer* ren =
+    vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+  ren->SetUIDeltaTime(loopTime);
 
   this->Internals->AnimationManager->SetInteractorEventLoopTime(loopTime);
   this->Internals->EventLoopTimerId = this->createTimerCallBack(loopTime, [this]() { this->EventLoop(); });
