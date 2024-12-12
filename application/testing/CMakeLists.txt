@@ -390,8 +390,8 @@ f3d_test(NAME TestInteractionAnimationFast DATA InterpolationTest.glb ARGS --ani
 f3d_test(NAME TestInteractionAnimationSlow DATA InterpolationTest.glb ARGS --animation-speed-factor=0.01 --animation-index=-1 INTERACTION)#Space;Wait;Space;
 f3d_test(NAME TestInteractionAnimationCameraMovement DATA CameraAnimated.glb ARGS --camera-index=0 --animation-speed-factor=1000 --animation-progress INTERACTION)#Space;MouseMovement;Space;
 
-# Framerate test is a smoke test as event playing seems to break VTK timers
-f3d_test(NAME TestInteractionAnimationFrameRate DATA InterpolationTest.glb ARGS --animation-frame-rate=2 --animation-index=-1 --animation-progress INTERACTION)#Space;Wait;Space;
+# Framerate test with a frame rate so low that we should not see anything but the first frame, even after looping the whole animation once
+f3d_test(NAME TestInteractionAnimationFrameRate DATA f3d.glb ARGS --animation-frame-rate=0.01 --animation-progress INTERACTION)#Space;Wait approx 4s;Space;
 
 # A verbose test that needs animation index support
 f3d_test(NAME TestVerboseAnimationWrongAnimationTimeHigh DATA BoxAnimated.gltf ARGS --animation-time=10 --verbose REGEXP "Animation time 10 is outside of range \\[0, 3\\.70833\\], using 3\\.70833" NO_BASELINE)
