@@ -1,4 +1,3 @@
-#include "vtkF3DConfigure.h"
 #include "vtkF3DObjectFactory.h"
 #include "vtkF3DPolyDataMapper.h"
 

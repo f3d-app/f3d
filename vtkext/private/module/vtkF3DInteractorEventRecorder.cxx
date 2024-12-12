@@ -1,5 +1,4 @@
 #include "vtkF3DInteractorEventRecorder.h"
-#include "vtkF3DConfigure.h"
 
 #include <vtkCallbackCommand.h>
 #include <vtkObjectFactory.h>

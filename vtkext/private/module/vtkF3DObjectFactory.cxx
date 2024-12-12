@@ -2,7 +2,6 @@
 
 #include <vtkVersion.h>
 
-#include "vtkF3DConfigure.h"
 #include "vtkF3DPolyDataMapper.h"
 
 #if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__) &&                                           \

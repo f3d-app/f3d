@@ -1,6 +1,5 @@
 #include "F3DLog.h"
 
-#include "vtkF3DConfigure.h"
 #include "vtkF3DConsoleOutputWindow.h"
 
 F3DLog::Severity F3DLog::VerboseLevel = F3DLog::Severity::Info;

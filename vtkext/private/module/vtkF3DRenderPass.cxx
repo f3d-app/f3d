@@ -1,6 +1,5 @@
 #include "vtkF3DRenderPass.h"
 
-#include "vtkF3DConfigure.h"
 #include "vtkF3DHexagonalBokehBlurPass.h"
 
 #include <vtkBoundingBox.h>
@@ -138,16 +137,16 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
   this->OverlayPass->SetColorFormat(vtkTextureObject::Float32);
 
   // main pass
-  if (F3D_MODULE_RAYTRACING && this->UseRaytracing)
-  {
 #if F3D_MODULE_RAYTRACING
+  if (this->UseRaytracing)
+  {
     vtkNew<vtkOSPRayPass> ospP;
     this->MainPass = vtkSmartPointer<vtkFramebufferPass>::New();
     this->MainPass->SetDelegatePass(ospP);
     this->MainPass->SetColorFormat(vtkTextureObject::Float32);
-#endif
   }
   else
+#endif
   {
     vtkNew<vtkLightsPass> lightsP;
     vtkNew<vtkOpaquePass> opaqueP;

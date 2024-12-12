@@ -5,7 +5,6 @@
 #include "F3DColoringInfoHandler.h"
 #include "vtkF3DCachedLUTTexture.h"
 #include "vtkF3DCachedSpecularTexture.h"
-#include "vtkF3DConfigure.h"
 #include "vtkF3DDropZoneActor.h"
 #include "vtkF3DOpenGLGridMapper.h"
 #include "vtkF3DRenderPass.h"
@@ -343,7 +342,9 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   }
 
   vtkNew<vtkF3DRenderPass> newPass;
-  newPass->SetUseRaytracing(F3D_MODULE_RAYTRACING && this->UseRaytracing);
+#if F3D_MODULE_RAYTRACING  
+  newPass->SetUseRaytracing(this->UseRaytracing);
+#endif  
   newPass->SetUseSSAOPass(this->UseSSAOPass);
   newPass->SetUseDepthPeelingPass(this->UseDepthPeelingPass);
   newPass->SetUseBlurBackground(this->UseBlurBackground);
