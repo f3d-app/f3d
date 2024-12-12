@@ -457,6 +457,70 @@ public:
   }
 
   //----------------------------------------------------------------------------
+  void StartEventLoop(double loopTime, std::function<void()> userCallBack)
+  {
+    // Copy user callback
+    this->EventLoopUserCallBack = std::move(userCallBack);
+
+    // Configure UI delta time
+    vtkRenderWindow* renWin = this->Window.GetRenderWindow();
+    vtkF3DRenderer* ren =
+      vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+    ren->SetUIDeltaTime(loopTime);
+
+    // Configure animation manager
+    this->AnimationManager->SetInteractorEventLoopTime(loopTime);
+
+    // Create the timer
+    this->EventLoopTimerId = this->VTKInteractor->CreateRepeatingTimer(loopTime);
+
+    // Create the callback and add an observer
+    vtkNew<vtkCallbackCommand> timerCallBack;
+    timerCallBack->SetCallback(
+      [](vtkObject*, unsigned long, void* clientData, void*)
+      {
+      std::function<void()>* callBackPtr = static_cast<std::function<void()>*>(clientData);
+      (*callBackPtr)();
+      });
+    this->EventLoopObserverId =
+      this->VTKInteractor->AddObserver(vtkCommand::TimerEvent, timerCallBack);
+    timerCallBack->SetClientData(&this->EventLoopCallBack);
+  }
+
+  //----------------------------------------------------------------------------
+  void StopEventLoop()
+  {
+    this->VTKInteractor->RemoveObserver(this->EventLoopObserverId);
+    this->VTKInteractor->DestroyTimer(this->EventLoopTimerId);
+    this->EventLoopObserverId = -1;
+    this->EventLoopTimerId = -1;
+  }
+
+  //----------------------------------------------------------------------------
+  void EventLoop()
+  {
+    if (this->EventLoopUserCallBack)
+    {
+      this->EventLoopUserCallBack();
+    }
+
+    if (this->AnimationManager->IsPlaying())
+    {
+      this->AnimationManager->Tick();
+    }
+
+    if (this->RenderRequested)
+    {
+      this->Window.render();
+      this->RenderRequested = false;
+    }
+    else
+    {
+      this->Window.RenderUIOnly();
+    }
+  }
+
+  //----------------------------------------------------------------------------
   options& Options;
   window_impl& Window;
   scene_impl& Scene;
@@ -483,8 +547,10 @@ public:
   int DragDistanceTol = 3;      /* px */
   int TransitionDuration = 100; /* ms */
 
-  std::function<void()> EventLoopUserCallBack = std::function<void()>();
+  std::function<void()> EventLoopUserCallBack = nullptr;
   unsigned long EventLoopTimerId = -1;
+  int EventLoopObserverId = -1;
+  std::function<void()> EventLoopCallBack = [this]() { this->EventLoop(); };
   std::atomic<bool> RenderRequested = false;
 };
 
@@ -1060,7 +1126,7 @@ void interactor_impl::disableCameraMovement()
 }
 
 //----------------------------------------------------------------------------
-bool interactor_impl::playInteraction(const std::string& file)
+bool interactor_impl::playInteraction(const std::string& file, double loopTime, std::function<void()> userCallBack)
 {
   if (!vtksys::SystemTools::FileExists(file))
   {
@@ -1073,12 +1139,13 @@ bool interactor_impl::playInteraction(const std::string& file)
     this->Internals->Recorder->Off();
     this->Internals->Recorder->Clear();
 
-//    this->Internals->StartEventLoop(); Why was it needed ? TODO
-
+    this->Internals->StartEventLoop(loopTime, std::move(userCallBack));
 
     std::string cleanFile = vtksys::SystemTools::CollapseFullPath(file);
     this->Internals->Recorder->SetFileName(cleanFile.c_str());
     this->Internals->Recorder->Play();
+
+    this->Internals->StopEventLoop();
   }
 
   // Recorder can stop the interactor, make sure it is still running
@@ -1132,26 +1199,14 @@ bool interactor_impl::recordInteraction(const std::string& file)
 //----------------------------------------------------------------------------
 void interactor_impl::start(double loopTime, std::function<void()> userCallBack)
 {
-  if (userCallBack)
-  {
-    this->Internals->EventLoopUserCallBack = std::move(userCallBack);
-  }
-
-  vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
-  vtkF3DRenderer* ren =
-    vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
-  ren->SetUIDeltaTime(loopTime);
-
-  this->Internals->AnimationManager->SetInteractorEventLoopTime(loopTime);
-  this->Internals->EventLoopTimerId = this->createTimerCallBack(loopTime, [this]() { this->EventLoop(); });
+  this->Internals->StartEventLoop(loopTime, std::move(userCallBack));
   this->Internals->VTKInteractor->Start();
 }
 
 //----------------------------------------------------------------------------
 void interactor_impl::stop()
 {
-  this->removeTimerCallBack(this->Internals->EventLoopTimerId);
-  this->Internals->VTKInteractor->RemoveObservers(vtkCommand::TimerEvent);
+  this->Internals->StopEventLoop();
   this->Internals->VTKInteractor->ExitCallback();
 }
 
@@ -1177,28 +1232,6 @@ void interactor_impl::SetInteractorOn(vtkInteractorObserver* observer)
 void interactor_impl::UpdateRendererAfterInteraction()
 {
   this->Internals->Style->UpdateRendererAfterInteraction();
-}
-
-//----------------------------------------------------------------------------
-void interactor_impl::EventLoop()
-{
-  this->Internals->EventLoopUserCallBack();
-
-  if (this->Internals->AnimationManager->IsPlaying())
-  {
-    this->Internals->AnimationManager->Tick();
-  }
-
-  if (this->Internals->RenderRequested)
-  {
-    this->Internals->Window.render();
-    this->Internals->RenderRequested = false;
-  }
-  else
-  {
-    // TODO speed blinking ?
-    this->Internals->Window.RenderUIOnly();
-  }
 }
 
 //----------------------------------------------------------------------------

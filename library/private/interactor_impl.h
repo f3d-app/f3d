@@ -67,7 +67,7 @@ public:
   void enableCameraMovement() override;
   void disableCameraMovement() override;
 
-  bool playInteraction(const std::string& file) override;
+  bool playInteraction(const std::string& file, double loopTime, std::function<void()> userCallBack) override;
   bool recordInteraction(const std::string& file) override;
 
   void start(double loopTime, std::function<void()> userCallBack) override;

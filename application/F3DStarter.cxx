@@ -53,6 +53,8 @@ namespace fs = std::filesystem;
 // This pointer is used to retrieve the interactor in case an OS signal is handled
 f3d::interactor* GlobalInteractor = nullptr;
 
+static constexpr int EVENT_LOOP_TIME = 30;
+
 class F3DStarter::F3DInternals
 {
 public:
@@ -928,7 +930,7 @@ int F3DStarter::Start(int argc, char** argv)
     {
       // For better testing, render once before the interaction
       window.render();
-      if (!interactor.playInteraction(interactionTestPlayFile))
+      if (!interactor.playInteraction(interactionTestPlayFile, EVENT_LOOP_TIME))
       {
         return EXIT_FAILURE;
       }
@@ -1084,7 +1086,7 @@ int F3DStarter::Start(int argc, char** argv)
         std::signal(SIGTERM, F3DInternals::SigCallback);
         std::signal(SIGINT, F3DInternals::SigCallback);
 
-        interactor.start(30, [this]() { this->EventLoop(); });
+        interactor.start(EVENT_LOOP_TIME, [this]() { this->EventLoop(); });
       }
 #endif
     }

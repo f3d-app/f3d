@@ -234,7 +234,7 @@ public:
   /**
    * Play a VTK interaction file.
    */
-  virtual bool playInteraction(const std::string& file) = 0;
+  virtual bool playInteraction(const std::string& file, double loopTime = 5, std::function<void()> userCallBack = nullptr) = 0;
 
   /**
    * Start interaction and record it all in a VTK interaction file.
