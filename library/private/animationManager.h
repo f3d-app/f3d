@@ -120,7 +120,6 @@ private:
   double TimeRange[2] = { 0.0, 0.0 };
   bool Playing = false;
   bool HasAnimation = false;
-  unsigned long CallBackId = 0;
   double CurrentTime = 0;
   bool CurrentTimeSet = false;
   int AnimationIndex = 0;

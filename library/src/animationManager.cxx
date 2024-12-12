@@ -183,10 +183,6 @@ void animationManager::ToggleAnimation()
   {
     this->Playing = !this->Playing;
 
-    if (this->CallBackId != 0)
-    {
-      this->Interactor->removeTimerCallBack(this->CallBackId);
-    }
     if (this->Playing)
     {
       // Initialize time if not already

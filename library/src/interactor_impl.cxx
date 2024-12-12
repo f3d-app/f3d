@@ -1056,36 +1056,6 @@ std::pair<std::string, std::string> interactor_impl::getBindingDocumentation(
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::removeTimerCallBack(unsigned long id)
-{
-  this->Internals->VTKInteractor->RemoveObserver(id);
-  this->Internals->VTKInteractor->DestroyTimer(this->Internals->TimerCallBacks[id].first);
-}
-
-//----------------------------------------------------------------------------
-unsigned long interactor_impl::createTimerCallBack(double time, std::function<void()> callBack)
-{
-  // Create the timer
-  int timerId = this->Internals->VTKInteractor->CreateRepeatingTimer(time);
-
-  // Create the callback and get the observer id
-  vtkNew<vtkCallbackCommand> timerCallBack;
-  timerCallBack->SetCallback(
-    [](vtkObject*, unsigned long, void* clientData, void*)
-    {
-      std::function<void()>* callBackPtr = static_cast<std::function<void()>*>(clientData);
-      (*callBackPtr)();
-    });
-  unsigned long id =
-    this->Internals->VTKInteractor->AddObserver(vtkCommand::TimerEvent, timerCallBack);
-
-  // Store the user callback and set it as client data
-  this->Internals->TimerCallBacks[id] = std::make_pair(timerId, callBack);
-  timerCallBack->SetClientData(&this->Internals->TimerCallBacks[id].second);
-  return id;
-}
-
-//----------------------------------------------------------------------------
 void interactor_impl::toggleAnimation()
 {
   assert(this->Internals->AnimationManager);

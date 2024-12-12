@@ -202,17 +202,6 @@ public:
     const interaction_bind_t& bind) const = 0;
   ///@}
 
-  /**
-   * Use this method to create your own timer callback. You callback will be called once every time
-   * ms. Return an id to use in removeTimeCallBack.
-   */
-  virtual unsigned long createTimerCallBack(double time, std::function<void()> callBack) = 0;
-
-  /**
-   * Remove a previously created timer callback using the id.
-   */
-  virtual void removeTimerCallBack(unsigned long id) = 0;
-
   ///@{ @name Animation
   /**
    * Control the animation.
