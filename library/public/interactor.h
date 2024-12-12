@@ -245,7 +245,7 @@ public:
 
   /**
    * Request a render to be done on the next event loop
-   * Safe to call in a multithreaded environnement
+   * Safe to call in a multithreaded environment
    */
   virtual void requestRender() = 0;
 
