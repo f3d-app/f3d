@@ -121,6 +121,10 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240729)
   target_compile_definitions(libf3dSDKTests PRIVATE F3D_SSIM_COMPARE)
 endif()
 
+if (F3D_MODULE_EXR)
+  target_compile_definitions(libf3dSDKTests PRIVATE F3D_MODULE_EXR)
+endif ()
+
 # List tests that do not require rendering
 list(APPEND libf3dSDKTestsNoRender_list
      TestSDKEngineExceptions

@@ -9,7 +9,6 @@
 
 #include "factory.h"
 
-#include "vtkF3DConfigure.h"
 #include "vtkF3DNoRenderWindow.h"
 
 #include <vtkVersion.h>

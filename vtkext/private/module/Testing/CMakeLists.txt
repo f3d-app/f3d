@@ -37,3 +37,7 @@ if(F3D_MODULE_EXR)
     PROPERTIES
     FAIL_REGULAR_EXPRESSION "")
 endif()
+
+if (F3D_MODULE_UI)
+  target_compile_definitions(vtkextPrivateTests PRIVATE F3D_MODULE_UI)
+endif ()

@@ -5,7 +5,6 @@
 #include "log.h"
 #include "options.h"
 
-#include "vtkF3DConfigure.h"
 #include "vtkF3DExternalRenderWindow.h"
 
 #include "vtkF3DGenericImporter.h"

@@ -1,8 +1,3 @@
-configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/vtkF3DConfigure.h.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/vtkF3DConfigure.h"
-  @ONLY)
-
 set(F3D_DEFAULT_HDRI "${F3D_SOURCE_DIR}/resources/defaultHDRI.png" CACHE STRING "Default HDRI when no HDRI file is provided")
 mark_as_advanced(F3D_DEFAULT_HDRI)
 include("f3dEmbed")
@@ -132,12 +127,14 @@ if(MSVC)
   vtk_module_definitions(f3d::vtkextPrivate PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS _CRT_SECURE_NO_WARNINGS)
 endif()
 
+# exr
 if(F3D_MODULE_EXR)
   vtk_module_link(f3d::vtkextPrivate PRIVATE OpenEXR::OpenEXR)
 endif()
 
 # imgui
 if (F3D_MODULE_UI)
+  vtk_module_definitions(f3d::vtkextPrivate PRIVATE F3D_MODULE_UI)
   if(F3D_USE_EXTERNAL_IMGUI)
     vtk_module_link(f3d::vtkextPrivate PRIVATE imgui::imgui)
   else()
@@ -145,4 +142,9 @@ if (F3D_MODULE_UI)
       PRIVATE
         "${F3D_SOURCE_DIR}/external/imgui")
   endif ()
+endif ()
+
+# raytracing
+if (F3D_MODULE_RAYTRACING)
+  vtk_module_definitions(f3d::vtkextPrivate PRIVATE F3D_MODULE_RAYTRACING)
 endif ()

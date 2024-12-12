@@ -6,7 +6,6 @@
 #include "utils.h"
 #include "window_impl.h"
 
-#include "vtkF3DConfigure.h"
 #include "vtkF3DConsoleOutputWindow.h"
 #include "vtkF3DInteractorEventRecorder.h"
 #include "vtkF3DInteractorStyle.h"

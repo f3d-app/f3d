@@ -2,7 +2,6 @@
 
 #include "log.h"
 
-#include "vtkF3DConfigure.h"
 #include "vtkF3DObjectFactory.h"
 
 #if F3D_MODULE_EXR
