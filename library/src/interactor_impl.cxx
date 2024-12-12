@@ -492,7 +492,7 @@ public:
     this->VTKInteractor->RemoveObserver(this->EventLoopObserverId);
     this->VTKInteractor->DestroyTimer(this->EventLoopTimerId);
     this->EventLoopObserverId = -1;
-    this->EventLoopTimerId = -1;
+    this->EventLoopTimerId = 0;
   }
 
   //----------------------------------------------------------------------------
@@ -547,7 +547,7 @@ public:
   int TransitionDuration = 100; /* ms */
 
   std::function<void()> EventLoopUserCallBack = nullptr;
-  unsigned long EventLoopTimerId = -1;
+  unsigned long EventLoopTimerId = 0;
   int EventLoopObserverId = -1;
   std::function<void()> EventLoopCallBack = [this]() { this->EventLoop(); };
   std::atomic<bool> RenderRequested = false;
