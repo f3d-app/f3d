@@ -46,6 +46,9 @@ public:
    */
   void SetInteractor(interactor_impl* interactor);
 
+  //Use internal DisplayImporterDescription function
+  void PrintImporterDescription(log::VerboseLevel level);
+
 private:
   class internals;
   std::unique_ptr<internals> Internals;
