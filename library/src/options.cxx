@@ -164,6 +164,16 @@ void options::removeValue(const std::string& name)
   }
 }
 
+void options::PrintOptionsDescription(log::VerboseLevel level)
+{
+  for (auto option : getNames())
+  {
+    std::string val = getAsString(option);
+    std::string descr = option + ": " + val;
+    log::print(level, descr);
+  }
+}
+
 //----------------------------------------------------------------------------
 template<typename T>
 T options::parse(const std::string& str)
