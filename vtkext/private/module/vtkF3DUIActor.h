@@ -94,7 +94,7 @@ public:
   /**
    * Set the delta time (time between UI frames) in ms
    */
-  virtual void SetDeltaTime(double time) {}
+  virtual void SetDeltaTime(double) {}
 
 protected:
   vtkF3DUIActor();
