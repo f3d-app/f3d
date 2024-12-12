@@ -138,6 +138,7 @@ endif()
 
 # imgui
 if (F3D_MODULE_UI)
+  vtk_module_definitions(f3d::vtkextPrivate PRIVATE F3D_MODULE_UI)
   if(F3D_USE_EXTERNAL_IMGUI)
     vtk_module_link(f3d::vtkextPrivate PRIVATE imgui::imgui)
   else()
