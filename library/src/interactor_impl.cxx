@@ -457,7 +457,7 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  void StartEventLoop(double loopTime, std::function<void()> userCallBack)
+  void StartEventLoop(double deltaTime, std::function<void()> userCallBack)
   {
     // Copy user callback
     this->EventLoopUserCallBack = std::move(userCallBack);
@@ -465,13 +465,13 @@ public:
     // Configure UI delta time
     vtkRenderWindow* renWin = this->Window.GetRenderWindow();
     vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
-    ren->SetUIDeltaTime(loopTime);
+    ren->SetUIDeltaTime(deltaTime);
 
-    // Configure animation manager
-    this->AnimationManager->SetInteractorEventLoopTime(loopTime);
+    // Configure animation delta time
+    this->AnimationManager->SetDeltaTime(deltaTime);
 
     // Create the timer
-    this->EventLoopTimerId = this->VTKInteractor->CreateRepeatingTimer(loopTime);
+    this->EventLoopTimerId = this->VTKInteractor->CreateRepeatingTimer(deltaTime*1000);
 
     // Create the callback and add an observer
     vtkNew<vtkCallbackCommand> timerCallBack;
@@ -503,10 +503,7 @@ public:
       this->EventLoopUserCallBack();
     }
 
-    if (this->AnimationManager->IsPlaying())
-    {
-      this->AnimationManager->Tick();
-    }
+    this->AnimationManager->Tick();
 
     if (this->RenderRequested)
     {

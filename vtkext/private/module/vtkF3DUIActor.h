@@ -92,7 +92,7 @@ public:
   int RenderOverlay(vtkViewport* vp) override;
 
   /**
-   * Set the delta time (time between UI frames) in ms
+   * Set the delta time (time between UI frames) in seconds
    */
   virtual void SetDeltaTime(double) {}
 

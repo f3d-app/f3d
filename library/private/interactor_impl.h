@@ -65,10 +65,10 @@ public:
   void disableCameraMovement() override;
 
   bool playInteraction(
-    const std::string& file, double loopTime, std::function<void()> userCallBack) override;
+    const std::string& file, double deltaTime, std::function<void()> userCallBack) override;
   bool recordInteraction(const std::string& file) override;
 
-  void start(double loopTime, std::function<void()> userCallBack) override;
+  void start(double deltaTime, std::function<void()> userCallBack) override;
   void stop() override;
   void requestRender() override;
   ///@}

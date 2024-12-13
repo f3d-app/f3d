@@ -39,15 +39,9 @@ void animationManager::SetInteractor(interactor_impl* interactor)
 }
 
 //----------------------------------------------------------------------------
-void animationManager::SetInteractorEventLoopTime(double loopTime)
+void animationManager::SetDeltaTime(double deltaTime)
 {
-  this->AnimationFrameNLoop = (1000.0 / this->Options.scene.animation.frame_rate) / loopTime;
-  if (this->AnimationFrameNLoop == 0)
-  {
-    // TODO warn?
-    this->AnimationFrameNLoop = 1;
-  }
-  this->AnimationFrameLoopCount = this->AnimationFrameNLoop;
+  this->DeltaTime = deltaTime;
 }
 
 //----------------------------------------------------------------------------
@@ -210,26 +204,9 @@ void animationManager::ToggleAnimation()
 //----------------------------------------------------------------------------
 void animationManager::Tick()
 {
-  this->AnimationFrameLoopCount--;
-  if (this->AnimationFrameLoopCount == 0)
+  if (this->Playing)
   {
-    this->AnimationFrameLoopCount = this->AnimationFrameNLoop;
-
-    assert(this->Interactor);
-
-    // Compute time since previous tick
-    std::chrono::steady_clock::time_point tick = std::chrono::steady_clock::now();
-    auto timeInMS =
-      std::chrono::duration_cast<std::chrono::milliseconds>(tick - this->PreviousTick).count();
-    this->PreviousTick = tick;
-
-    // Convert to a usable time in seconds
-    double elapsedTime = static_cast<double>(timeInMS) / 1000.0;
-    double animationSpeedFactor = this->Options.scene.animation.speed_factor;
-
-    // elapsedTime can be negative
-    elapsedTime *= animationSpeedFactor;
-    this->CurrentTime += elapsedTime;
+    this->CurrentTime += this->DeltaTime * this->Options.scene.animation.speed_factor;
 
     // Modulo computation, compute CurrentTime in the time range.
     if (this->CurrentTime < this->TimeRange[0] || this->CurrentTime > this->TimeRange[1])

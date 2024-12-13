@@ -88,14 +88,13 @@ public:
   }
 
   /**
-   * Set the interactor event loop time and compute the number of event loop needed to trigger an
-   * actual tick
-   * TODO rework this API ?
+   * Set the animation in delta time (in ms)
    */
-  void SetInteractorEventLoopTime(double loopTime);
+  void SetDeltaTime(double deltaTime);
 
   /**
-   * Interactor EventLoop call this method every loopTime to advance animation
+   * Advance animationTime of DeltaTime and call loadAtTime accordingly
+   * Do nothing if IsPlaying is false
    */
   void Tick();
 
@@ -122,15 +121,13 @@ private:
   bool Playing = false;
   bool HasAnimation = false;
   double CurrentTime = 0;
+  double DeltaTime = 0;
   bool CurrentTimeSet = false;
   int AnimationIndex = 0;
   int AvailAnimations = -1;
   std::chrono::steady_clock::time_point PreviousTick;
 
   vtkSmartPointer<vtkProgressBarWidget> ProgressWidget;
-
-  unsigned int AnimationFrameNLoop = 1;
-  unsigned int AnimationFrameLoopCount = 1;
 };
 }
 }

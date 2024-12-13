@@ -372,7 +372,7 @@ public:
   void SetCheatSheetConfigured(bool flag);
 
   /**
-   * Set the UI delta time (time between frame being rendered) in ms
+   * Set the UI delta time (time between frame being rendered) in seconds
    */
   void SetUIDeltaTime(double time);
 
