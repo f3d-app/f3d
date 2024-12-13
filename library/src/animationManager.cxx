@@ -119,12 +119,11 @@ void animationManager::Initialize()
       int nbTimeSteps;
       vtkNew<vtkDoubleArray> timeSteps;
 
-      // Discard timesteps, F3D only cares about real elapsed time using time range
-      // Specifying the frame rate in the next call is not needed after VTK 9.2.20230603 :
+      // Discard timesteps, F3D only cares about elapsed time using time range and deltaTime
+      // Specifying a frame rate (60) in the next call is not needed after VTK 9.2.20230603 :
       // VTK_VERSION_CHECK(9, 2, 20230603)
-      double frameRate = this->Options.scene.animation.frame_rate;
       this->Importer->GetTemporalInformation(
-        animIndex, frameRate, nbTimeSteps, timeRange, timeSteps);
+        animIndex, 60, nbTimeSteps, timeRange, timeSteps);
 
       // Accumulate time ranges
       this->TimeRange[0] = std::min(timeRange[0], this->TimeRange[0]);

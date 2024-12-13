@@ -94,7 +94,6 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "animation-index", "", "Select animation to show", "<index>", "" },
       { "animation-speed-factor", "", "Set animation speed factor", "<factor>", "" },
       { "animation-time", "", "Set animation time to load", "<time>", "" },
-      {"animation-frame-rate", "", "Set animation frame rate when playing animation interactively", "<frame rate>", ""},
       {"font-file", "", "Path to a FreeType compatible font file", "<file_path>", ""}, 
       {"command-script", "", "Path to a script file containing commands to execute", "<file_path>", "" } } }, 
   { "Material",
