@@ -13,6 +13,7 @@
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
 #include <vtkUnsignedCharArray.h>
+#include <vtkCapsuleSource.h>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkF3DSplatReader);
@@ -20,6 +21,7 @@ vtkStandardNewMacro(vtkF3DSplatReader);
 //----------------------------------------------------------------------------
 vtkF3DSplatReader::vtkF3DSplatReader()
 {
+  vtkNew<vtkCapsuleSource> source;
   this->SetNumberOfInputPorts(0);
 }
 

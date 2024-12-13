@@ -4,6 +4,7 @@ DESCRIPTION
   A VTK module for the native plugin
 DEPENDS
   VTK::CommonCore
+  VTK::FiltersSources
   VTK::CommonExecutionModel
 TEST_DEPENDS
   VTK::TestingCore
