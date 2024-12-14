@@ -29,7 +29,7 @@ int main(int argc, char** argv)
 
   // Start interaction and stop it after one second
   f3d::interactor& inter = eng.getInteractor();
-  inter.start(1000, [&inter]() { inter.stop(); });
+  inter.start(1, [&inter]() { inter.stop(); });
 
   return EXIT_SUCCESS;
 }

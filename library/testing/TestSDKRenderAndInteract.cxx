@@ -18,7 +18,7 @@ int TestSDKRenderAndInteract(int argc, char* argv[])
   win.render();
 
   f3d::interactor& inter = eng.getInteractor();
-  inter.start(1000, [&inter]() { inter.stop(); });
+  inter.start(1, [&inter]() { inter.stop(); });
 
   return EXIT_SUCCESS;
 }

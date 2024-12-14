@@ -1172,6 +1172,7 @@ void interactor_impl::start(double loopTime, std::function<void()> userCallBack)
 //----------------------------------------------------------------------------
 void interactor_impl::stop()
 {
+  std::cout<<"stop"<<std::endl;
   this->Internals->StopEventLoop();
   this->Internals->VTKInteractor->ExitCallback();
 }

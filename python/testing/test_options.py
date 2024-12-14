@@ -24,7 +24,7 @@ def test_getitem():
     options = engine.options
 
     assert options["interactor.axis"] is False
-    assert options["render.background.blur_coc"] == 60.0
+    assert options["render.background.blur_coc"] == 20.0
     assert options["scene.animation.speed_factor"] == 1.0
     assert options["render.raytracing.samples"] == 5
     assert options["render.grid.color"] == [0.0, 0.0, 0.0]
