@@ -42,7 +42,7 @@ if(F3D_MODULE_UI)
 endif()
 
 # This test fails with vtk 9.2.6
-if(VTK_VERSION VERSION_GREATER 9.2.6)
+if(VTK_VERSION VERSION_GREATER 9.1.0)
   list(APPEND libf3dSDKTests_list
     TestSDKRenderAndInteract.cxx
     )
