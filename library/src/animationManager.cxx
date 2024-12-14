@@ -122,8 +122,7 @@ void animationManager::Initialize()
       // Discard timesteps, F3D only cares about elapsed time using time range and deltaTime
       // Specifying a frame rate (60) in the next call is not needed after VTK 9.2.20230603 :
       // VTK_VERSION_CHECK(9, 2, 20230603)
-      this->Importer->GetTemporalInformation(
-        animIndex, 60, nbTimeSteps, timeRange, timeSteps);
+      this->Importer->GetTemporalInformation(animIndex, 60, nbTimeSteps, timeRange, timeSteps);
 
       // Accumulate time ranges
       this->TimeRange[0] = std::min(timeRange[0], this->TimeRange[0]);

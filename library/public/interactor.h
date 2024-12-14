@@ -223,8 +223,8 @@ public:
   /**
    * Play a VTK interaction file.
    */
-  virtual bool playInteraction(
-    const std::string& file, double deltaTime = 0.03, std::function<void()> userCallBack = nullptr) = 0;
+  virtual bool playInteraction(const std::string& file, double deltaTime = 0.03,
+    std::function<void()> userCallBack = nullptr) = 0;
 
   /**
    * Start interaction and record it all in a VTK interaction file.
@@ -234,8 +234,8 @@ public:
   /**
    * Start the interactor event loop.
    * Make sure the window is initialized first, by calling `window.render()`
-   * The event loop will be triggered every deltaTime in seconds, and userCallBack will be called at the
-   * start of the event loop
+   * The event loop will be triggered every deltaTime in seconds, and userCallBack will be called at
+   * the start of the event loop
    */
   virtual void start(double deltaTime = 0.03, std::function<void()> userCallBack = nullptr) = 0;
 

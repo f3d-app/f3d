@@ -471,7 +471,7 @@ public:
     this->AnimationManager->SetDeltaTime(deltaTime);
 
     // Create the timer
-    this->EventLoopTimerId = this->VTKInteractor->CreateRepeatingTimer(deltaTime*1000);
+    this->EventLoopTimerId = this->VTKInteractor->CreateRepeatingTimer(deltaTime * 1000);
 
     // Create the callback and add an observer
     vtkNew<vtkCallbackCommand> timerCallBack;
@@ -1172,7 +1172,6 @@ void interactor_impl::start(double loopTime, std::function<void()> userCallBack)
 //----------------------------------------------------------------------------
 void interactor_impl::stop()
 {
-  std::cout<<"stop"<<std::endl;
   this->Internals->StopEventLoop();
   this->Internals->VTKInteractor->ExitCallback();
 }
