@@ -72,6 +72,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "rendering-backend", "", "Backend to use when rendering (auto|glx|wgl|egl|osmesa)", "<string>", "" },
       { "max-size", "", "Maximum size in Mib of a file to load, negative value means unlimited", "<size in Mib>", "" },
       { "watch", "", "Watch current file and automatically reload it whenever it is modified on disk", "<bool>", "1" },
+      { "frame-rate", "", "Frame rate used to refresh animation and other repeated tasks (watch, UI)", "<fps>", "" },
       { "load-plugins", "", "List of plugins to load separated with a comma", "<paths or names>", "" },
       { "scan-plugins", "", "Scan standard directories for plugins and display available plugins (result can be incomplete)", "", "" },
       { "screenshot-filename", "", "Screenshot filename", "<filename>", "" } } },

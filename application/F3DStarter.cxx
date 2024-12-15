@@ -53,8 +53,6 @@ namespace fs = std::filesystem;
 // This pointer is used to retrieve the interactor in case an OS signal is handled
 f3d::interactor* GlobalInteractor = nullptr;
 
-static constexpr double EVENT_LOOP_DELTA_TIME = 0.03;
-
 class F3DStarter::F3DInternals
 {
 public:
@@ -87,6 +85,7 @@ public:
     double MaxSize;
     std::optional<double> AnimationTime;
     bool Watch;
+    int FrameRate;
     std::vector<std::string> Plugins;
     std::string ScreenshotFilename;
     std::string VerboseLevel;
@@ -548,6 +547,7 @@ public:
     {
       this->AppOptions.AnimationTime = f3d::options::parse<double>(appOptions.at("animation-time"));
     }
+    this->AppOptions.FrameRate = f3d::options::parse<int>(appOptions.at("frame-rate"));
     this->AppOptions.Watch = f3d::options::parse<bool>(appOptions.at("watch"));
     this->AppOptions.Plugins = { f3d::options::parse<std::vector<std::string>>(
       appOptions.at("load-plugins")) };
@@ -674,7 +674,6 @@ public:
       interactor.addBinding({ mod_t::NONE, "F12" }, "take_screenshot", "Others", std::bind(docString, "Take a screenshot"));
       interactor.addBinding({ mod_t::CTRL, "O" }, "open_file_dialog", "Others", std::bind(docString, "Open File Dialog"));
       interactor.addBinding({ mod_t::CTRL, "F12" }, "take_minimal_screenshot", "Others", std::bind(docString, "Take a minimal screenshot"));
-
 
       // This replace an existing default binding command in the libf3d
       interactor.removeBinding({ mod_t::NONE, "Drop" });
@@ -843,6 +842,7 @@ int F3DStarter::Start(int argc, char** argv)
 
   f3d::log::debug("========== Configuring engine ==========");
 
+  double deltaTime = 1.0 / this->Internals->AppOptions.FrameRate;
   const std::string& reference = this->Internals->AppOptions.Reference;
   const std::string& output = this->Internals->AppOptions.Output;
 
@@ -930,7 +930,7 @@ int F3DStarter::Start(int argc, char** argv)
     {
       // For better testing, render once before the interaction
       window.render();
-      if (!interactor.playInteraction(interactionTestPlayFile, EVENT_LOOP_DELTA_TIME))
+      if (!interactor.playInteraction(interactionTestPlayFile, deltaTime))
       {
         return EXIT_FAILURE;
       }
@@ -1086,7 +1086,7 @@ int F3DStarter::Start(int argc, char** argv)
         std::signal(SIGTERM, F3DInternals::SigCallback);
         std::signal(SIGINT, F3DInternals::SigCallback);
 
-        interactor.start(EVENT_LOOP_DELTA_TIME, [this]() { this->EventLoop(); });
+        interactor.start(deltaTime, [this]() { this->EventLoop(); });
       }
 #endif
     }

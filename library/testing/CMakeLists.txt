@@ -41,8 +41,8 @@ if(F3D_MODULE_UI)
   endif()
 endif()
 
-# This test fails with vtk 9.2.6
-if(VTK_VERSION VERSION_GREATER 9.1.0)
+# This test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10155
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20230426)
   list(APPEND libf3dSDKTests_list
     TestSDKRenderAndInteract.cxx
     )

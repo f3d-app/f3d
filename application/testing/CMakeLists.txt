@@ -389,6 +389,7 @@ f3d_test(NAME TestVerboseAnimationIndexError DATA InterpolationTest.glb ARGS --a
 f3d_test(NAME TestInteractionAnimation DATA f3d.glb ARGS --animation-progress INTERACTION)#Space;Wait approx 4s;Space;
 f3d_test(NAME TestInteractionAnimationFast DATA f3d.glb ARGS --animation-progress --animation-speed-factor=1.5 INTERACTION)#Space;Wait;Space;
 f3d_test(NAME TestInteractionAnimationSlow DATA f3d.glb ARGS --animation-progress --animation-speed-factor=0.5 INTERACTION)#Space;Wait;Space;
+f3d_test(NAME TestInteractionAnimationFrameRate DATA f3d.glb ARGS --animation-progress --frame-rate=1 INTERACTION)#Space;Wait;Space;
 f3d_test(NAME TestInteractionAnimationCameraMovement DATA CameraAnimated.glb ARGS --camera-index=0 --animation-progress INTERACTION)#Space;MouseMovement;Space;
 
 # A verbose test that needs animation index support

@@ -56,6 +56,7 @@ static inline const OptionsDict DefaultAppOptions = {
   { "interaction-test-record", "" },
   { "interaction-test-play", "" },
   { "command-script", "" },
+  { "frame-rate", "30" },
 };
 
 /**
