@@ -88,7 +88,7 @@ public:
   }
 
   /**
-   * Set the animation in delta time (in ms)
+   * Set the animation in delta time in seconds
    */
   void SetDeltaTime(double deltaTime);
 

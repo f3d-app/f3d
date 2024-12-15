@@ -37,5 +37,8 @@ int main(int argc, char** argv)
   f3d::interactor& inter = eng.getInteractor();
   inter.start(1, [&inter]() { inter.stop(); });
 
+  // Actual call would look like this
+  // inter.start();
+
   return EXIT_SUCCESS;
 }
