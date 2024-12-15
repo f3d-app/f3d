@@ -1193,8 +1193,10 @@ void F3DStarter::LoadFileGroup(
   std::vector<fs::path> localPaths;
   try
   {
+#if F3D_MODULE_DMON
     // In the main thread, we only need to guard writing
     const std::lock_guard<std::mutex> lock(this->Internals->LoadedFilesMutex);
+#endif
 
     if (clear)
     {
