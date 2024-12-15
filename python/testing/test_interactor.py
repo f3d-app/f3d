@@ -1,12 +1,16 @@
+from functools import partial
 import os
-
 import pytest
 
 import f3d
 
 
-def callback_fn(args):
+def print_fn(args):
     print(args)
+
+
+def stop_fn(inter):
+    inter.stop()
 
 
 def doc_fn():
@@ -24,7 +28,7 @@ def test_command(capfd):
     assert len(inter.get_command_actions()) == 0
 
     # Check a command can be triggered
-    inter.add_command("my_cmd", callback_fn)
+    inter.add_command("my_cmd", print_fn)
     inter.trigger_command("my_cmd arg1 arg2")
     inter.remove_command("my_cmd")
     out, err = capfd.readouterr()
@@ -82,3 +86,18 @@ def test_binding():
     assert len(inter.get_binds()) == 5
 
     inter.init_bindings()
+
+
+def test_start_stop():
+    engine = f3d.Engine.create(True)
+    inter = engine.interactor
+    engine.window.render()
+    inter.start(1, partial(stop_fn, inter))
+
+
+def test_request_render(capfd):
+    engine = f3d.Engine.create(True)
+    inter = engine.interactor
+    engine.window.render()
+    inter.request_render()
+    inter.start(1, partial(stop_fn, inter))
