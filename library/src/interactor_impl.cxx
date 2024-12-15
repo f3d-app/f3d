@@ -478,12 +478,12 @@ public:
     timerCallBack->SetCallback(
       [](vtkObject*, unsigned long, void* clientData, void*)
       {
-        std::function<void()>* callBackPtr = static_cast<std::function<void()>*>(clientData);
-        (*callBackPtr)();
+        internals* that = static_cast<internals*>(clientData);
+        that->EventLoop();
       });
     this->EventLoopObserverId =
       this->VTKInteractor->AddObserver(vtkCommand::TimerEvent, timerCallBack);
-    timerCallBack->SetClientData(&this->EventLoopCallBack);
+    timerCallBack->SetClientData(this);
   }
 
   //----------------------------------------------------------------------------
@@ -546,7 +546,6 @@ public:
   std::function<void()> EventLoopUserCallBack = nullptr;
   unsigned long EventLoopTimerId = 0;
   int EventLoopObserverId = -1;
-  std::function<void()> EventLoopCallBack = [this]() { this->EventLoop(); };
   std::atomic<bool> RenderRequested = false;
 };
 
