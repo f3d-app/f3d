@@ -459,6 +459,9 @@ public:
   //----------------------------------------------------------------------------
   void StartEventLoop(double deltaTime, std::function<void()> userCallBack)
   {
+    // Trigger a render to ensure Window is ready to be configured
+    this->Window.render();
+
     // Copy user callback
     this->EventLoopUserCallBack = std::move(userCallBack);
 

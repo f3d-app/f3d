@@ -233,7 +233,6 @@ public:
 
   /**
    * Start the interactor event loop.
-   * Make sure the window is initialized first, by calling `window.render()`
    * The event loop will be triggered every deltaTime in seconds, and userCallBack will be called at
    * the start of the event loop
    */

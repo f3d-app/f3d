@@ -41,10 +41,11 @@ if(F3D_MODULE_UI)
   endif()
 endif()
 
-# This test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10155
+# These tests needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10155
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20230426)
   list(APPEND libf3dSDKTests_list
     TestSDKRenderAndInteract.cxx
+    TestSDKStartInteractor.cxx
     )
 endif()
 

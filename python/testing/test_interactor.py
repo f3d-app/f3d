@@ -1,4 +1,3 @@
-from functools import partial
 import os
 import pytest
 
@@ -7,10 +6,6 @@ import f3d
 
 def print_fn(args):
     print(args)
-
-
-def stop_fn(inter):
-    inter.stop()
 
 
 def doc_fn():
@@ -86,18 +81,3 @@ def test_binding():
     assert len(inter.get_binds()) == 5
 
     inter.init_bindings()
-
-
-def test_start_stop():
-    engine = f3d.Engine.create(True)
-    inter = engine.interactor
-    engine.window.render()
-    inter.start(1, partial(stop_fn, inter))
-
-
-def test_request_render(capfd):
-    engine = f3d.Engine.create(True)
-    inter = engine.interactor
-    engine.window.render()
-    inter.request_render()
-    inter.start(1, partial(stop_fn, inter))
