@@ -453,3 +453,10 @@ void vtkF3DImguiActor::EndFrame(vtkOpenGLRenderWindow* renWin)
   ImGui::Render();
   this->Pimpl->RenderDrawData(renWin, ImGui::GetDrawData());
 }
+
+//----------------------------------------------------------------------------
+void vtkF3DImguiActor::SetDeltaTime(double time)
+{
+  ImGuiIO& io = ImGui::GetIO();
+  io.DeltaTime = time;
+}

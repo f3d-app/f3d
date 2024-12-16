@@ -56,9 +56,6 @@ public:
   std::pair<std::string, std::string> getBindingDocumentation(
     const interaction_bind_t& bind) const override;
 
-  unsigned long createTimerCallBack(double time, std::function<void()> callBack) override;
-  void removeTimerCallBack(unsigned long id) override;
-
   void toggleAnimation() override;
   void startAnimation() override;
   void stopAnimation() override;
@@ -67,11 +64,13 @@ public:
   void enableCameraMovement() override;
   void disableCameraMovement() override;
 
-  bool playInteraction(const std::string& file) override;
+  bool playInteraction(
+    const std::string& file, double deltaTime, std::function<void()> userCallBack) override;
   bool recordInteraction(const std::string& file) override;
 
-  void start() override;
+  void start(double deltaTime, std::function<void()> userCallBack) override;
   void stop() override;
+  void requestRender() override;
   ///@}
 
   /**
@@ -100,6 +99,12 @@ public:
    * the camera clipping range.
    */
   void UpdateRendererAfterInteraction();
+
+  /**
+   * Event loop being called automatically once the interactor is started
+   * First call the EventLoopUserCallBack, then call render if requested.
+   */
+  void EventLoop();
 
   /**
    * An exception that can be thrown by certain command callbacks

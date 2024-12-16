@@ -88,6 +88,17 @@ public:
   }
 
   /**
+   * Set the animation in delta time in seconds
+   */
+  void SetDeltaTime(double deltaTime);
+
+  /**
+   * Advance animationTime of DeltaTime and call loadAtTime accordingly
+   * Do nothing if IsPlaying is false
+   */
+  void Tick();
+
+  /**
    * Load animation at provided time value
    */
   bool LoadAtTime(double timeValue);
@@ -101,11 +112,6 @@ public:
   std::pair<double, double> GetTimeRange();
 
 private:
-  /**
-   * Called by an internal timer to advance one animation tick
-   */
-  void Tick();
-
   const options& Options;
   window_impl& Window;
   vtkImporter* Importer = nullptr;
@@ -114,8 +120,8 @@ private:
   double TimeRange[2] = { 0.0, 0.0 };
   bool Playing = false;
   bool HasAnimation = false;
-  unsigned long CallBackId = 0;
   double CurrentTime = 0;
+  double DeltaTime = 0;
   bool CurrentTimeSet = false;
   int AnimationIndex = 0;
   int AvailAnimations = -1;

@@ -202,17 +202,6 @@ public:
     const interaction_bind_t& bind) const = 0;
   ///@}
 
-  /**
-   * Use this method to create your own timer callback. You callback will be called once every time
-   * ms. Return an id to use in removeTimeCallBack.
-   */
-  virtual unsigned long createTimerCallBack(double time, std::function<void()> callBack) = 0;
-
-  /**
-   * Remove a previously created timer callback using the id.
-   */
-  virtual void removeTimerCallBack(unsigned long id) = 0;
-
   ///@{ @name Animation
   /**
    * Control the animation.
@@ -234,7 +223,8 @@ public:
   /**
    * Play a VTK interaction file.
    */
-  virtual bool playInteraction(const std::string& file) = 0;
+  virtual bool playInteraction(const std::string& file, double deltaTime = 1.0 / 30,
+    std::function<void()> userCallBack = nullptr) = 0;
 
   /**
    * Start interaction and record it all in a VTK interaction file.
@@ -242,15 +232,22 @@ public:
   virtual bool recordInteraction(const std::string& file) = 0;
 
   /**
-   * Start the interactor.
-   * Make sure the window is initialized first, by calling `window.render()`
+   * Start the interactor event loop.
+   * The event loop will be triggered every deltaTime in seconds, and userCallBack will be called at
+   * the start of the event loop
    */
-  virtual void start() = 0;
+  virtual void start(double deltaTime = 1.0 / 30, std::function<void()> userCallBack = nullptr) = 0;
 
   /**
    * Stop the interactor.
    */
   virtual void stop() = 0;
+
+  /**
+   * Request a render to be done on the next event loop
+   * Safe to call in a multithreaded environment
+   */
+  virtual void requestRender() = 0;
 
   /**
    * An exception that can be thrown by the interactor

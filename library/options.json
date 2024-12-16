@@ -16,10 +16,6 @@
       "speed_factor": {
         "type": "ratio",
         "default_value": "1.0"
-      },
-      "frame_rate": {
-        "type": "double",
-        "default_value": "60.0"
       }
     },
     "camera": {

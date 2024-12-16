@@ -12,8 +12,10 @@
 #include "vtkF3DRenderer.h"
 
 #include <vtkCamera.h>
+#include <vtkF3DRenderPass.h>
 #include <vtkImageData.h>
 #include <vtkImageExport.h>
+#include <vtkInformation.h>
 #include <vtkPNGReader.h>
 #include <vtkPointGaussianMapper.h>
 #include <vtkRendererCollection.h>
@@ -555,5 +557,20 @@ void window_impl::SetCachePath(const std::string& cachePath)
 void window_impl::SetInteractor(interactor_impl* interactor)
 {
   this->Internals->Interactor = interactor;
+}
+
+//----------------------------------------------------------------------------
+void window_impl::RenderUIOnly()
+{
+#if F3D_MODULE_UI
+  // Do only a partial render of the UI
+  vtkRenderWindow* renWin = this->Internals->RenWin;
+  vtkRenderer* ren = renWin->GetRenderers()->GetFirstRenderer();
+  vtkInformation* info = ren->GetInformation();
+
+  info->Set(vtkF3DRenderPass::RENDER_UI_ONLY(), 1);
+  renWin->Render();
+  info->Remove(vtkF3DRenderPass::RENDER_UI_ONLY());
+#endif
 }
 };

@@ -19,6 +19,7 @@ Options|Default|Description
 \-\-no-render||Do not render anything and quit just after loading the first file, use with \-\-verbose to recover information about a file.
 \-\-max-size=\<size in MiB\>|-1|Prevent F3D to load a file bigger than the provided size in Mib, negative value means unlimited, useful for thumbnails.
 \-\-watch||Watch current file and automatically reload it whenever it is modified on disk.
+\-\-frame-rate=\<fps\>|30.0|Frame rate used to refresh animation and other repeated tasks (watch, UI). Does not impact rendering frame rate.
 \-\-load-plugins=\<paths or names\>||List of plugins to load separated with a comma. Official plugins are `alembic`, `assimp`, `draco`, `exodus`, `occt`, `usd`, `vdb`. See [plugins](PLUGINS.md) for more info.
 \-\-scan-plugins||Scan standard directories for plugins and display their names, results may be incomplete. See [plugins](PLUGINS.md) for more info.
 \-\-screenshot-filename=\<png file\>|`{app}/{model}_{n}.png`|Filename to save [screenshots](INTERACTIONS.md#taking-screenshots) to. Can use [template variables](#filename-templating).
@@ -45,7 +46,6 @@ Options|Default|Description
 \-\-animation-index=\<idx\>|0|Select the animation to show.<br>Any negative value means all animations (glTF only).<br>The default scene always has at most one animation.
 \-\-animation-speed-factor=\<factor\>|1|Set the animation speed factor to slow, speed up or even invert animation time.
 \-\-animation-time=\<factor\>||Set the animation time to load.
-\-\-animation-frame-rate=\<factor\>|60|Set the animation frame rate used when playing animation interactively.
 \-\-font-file=\<font file\>||Use the provided FreeType compatible font file to display text.<br>Can be useful to display non-ASCII filenames.
 \-\-command-script=\<command script\>||Provide a script file containing a list of commands to be executed sequentially.<br>Allows automation of multiple commands or pre-defined tasks.
 
@@ -78,7 +78,7 @@ Options|Default|Description
 \-\-bg-color=\<R,G,B\>|0.2, 0.2, 0.2|Set the window *background color*.<br>Ignored if *hdri* is set.
 \-\-resolution=\<width,height\>|1000, 600|Set the *window resolution*.
 \-\-position=\<x,y\>||Set the *window position* (top left corner) , in pixels, starting from the top left of your screens.
--z, \-\-fps||Display a *frame per second counter*.
+-z, \-\-fps||Display a rendering *frame per second counter*.
 -n, \-\-filename||Display the *name of the file* on top of the window.
 -m, \-\-metadata||Display the *metadata*.
 \-\-hdri-skybox||Show the HDRI as a skybox. Overrides \-\-bg-color and \-\-no-background.
