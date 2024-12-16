@@ -91,6 +91,11 @@ public:
    */
   int RenderOverlay(vtkViewport* vp) override;
 
+  /**
+   * Set the delta time (time between UI frames) in seconds
+   */
+  virtual void SetDeltaTime(double) {}
+
 protected:
   vtkF3DUIActor();
   ~vtkF3DUIActor() override;

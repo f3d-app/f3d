@@ -9,14 +9,13 @@
 #include "vtkF3DConsoleOutputWindow.h"
 #include "vtkF3DInteractorEventRecorder.h"
 #include "vtkF3DInteractorStyle.h"
-#include "vtkF3DRenderPass.h"
 #include "vtkF3DRenderer.h"
+#include "vtkF3DUIActor.h"
 #include "vtkF3DUIObserver.h"
 
 #include <vtkCallbackCommand.h>
 #include <vtkCellPicker.h>
 #include <vtkGenericRenderWindowInteractor.h>
-#include <vtkInformation.h>
 #include <vtkMath.h>
 #include <vtkMatrix3x3.h>
 #include <vtkNew.h>
@@ -235,7 +234,7 @@ public:
       self->Options.ui.console = (event == vtkF3DConsoleOutputWindow::ShowEvent);
     }
 
-    self->NeedFullRender = true;
+    self->RenderRequested = true;
   }
 
   //----------------------------------------------------------------------------
@@ -363,49 +362,6 @@ public:
     self->Style->OnMiddleButtonUp();
   }
 
-  //----------------------------------------------------------------------------
-  void StartEventLoop()
-  {
-#if F3D_MODULE_UI
-    // create event loop to refresh UI and trigger full render if needed
-    // this may be rework to a generalize event loop, see https://github.com/f3d-app/f3d/issues/1534
-    this->Interactor.createTimerCallBack(30,
-      [&]()
-      {
-        vtkRenderWindow* renWin = this->Window.GetRenderWindow();
-        vtkF3DRenderer* ren =
-          vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
-        vtkInformation* info = ren->GetInformation();
-
-        if (this->NeedFullRender)
-        {
-          this->NeedFullRender = false;
-          this->Window.render();
-        }
-        else
-        {
-          info->Set(vtkF3DRenderPass::RENDER_UI_ONLY(), 1);
-          renWin->Render();
-          info->Remove(vtkF3DRenderPass::RENDER_UI_ONLY());
-        }
-      });
-#endif
-  }
-
-  //----------------------------------------------------------------------------
-  void StartInteractor()
-  {
-    this->VTKInteractor->Start();
-  }
-
-  //----------------------------------------------------------------------------
-  void StopInteractor()
-  {
-    this->VTKInteractor->RemoveObservers(vtkCommand::TimerEvent);
-    this->VTKInteractor->ExitCallback();
-  }
-
-  //----------------------------------------------------------------------------
   /**
    * Run a camera transition animation based on a camera state interpolation function.
    * The provided function will be called with an interpolation parameter
@@ -501,6 +457,69 @@ public:
   }
 
   //----------------------------------------------------------------------------
+  void StartEventLoop(double deltaTime, std::function<void()> userCallBack)
+  {
+    // Trigger a render to ensure Window is ready to be configured
+    this->Window.render();
+
+    // Copy user callback
+    this->EventLoopUserCallBack = std::move(userCallBack);
+
+    // Configure UI delta time
+    vtkRenderWindow* renWin = this->Window.GetRenderWindow();
+    vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+    ren->SetUIDeltaTime(deltaTime);
+
+    // Configure animation delta time
+    this->AnimationManager->SetDeltaTime(deltaTime);
+
+    // Create the timer
+    this->EventLoopTimerId = this->VTKInteractor->CreateRepeatingTimer(deltaTime * 1000);
+
+    // Create the callback and add an observer
+    vtkNew<vtkCallbackCommand> timerCallBack;
+    timerCallBack->SetCallback(
+      [](vtkObject*, unsigned long, void* clientData, void*)
+      {
+        internals* that = static_cast<internals*>(clientData);
+        that->EventLoop();
+      });
+    this->EventLoopObserverId =
+      this->VTKInteractor->AddObserver(vtkCommand::TimerEvent, timerCallBack);
+    timerCallBack->SetClientData(this);
+  }
+
+  //----------------------------------------------------------------------------
+  void StopEventLoop()
+  {
+    this->VTKInteractor->RemoveObserver(this->EventLoopObserverId);
+    this->VTKInteractor->DestroyTimer(this->EventLoopTimerId);
+    this->EventLoopObserverId = -1;
+    this->EventLoopTimerId = 0;
+  }
+
+  //----------------------------------------------------------------------------
+  void EventLoop()
+  {
+    if (this->EventLoopUserCallBack)
+    {
+      this->EventLoopUserCallBack();
+    }
+
+    this->AnimationManager->Tick();
+
+    if (this->RenderRequested)
+    {
+      this->Window.render();
+      this->RenderRequested = false;
+    }
+    else
+    {
+      this->Window.RenderUIOnly();
+    }
+  }
+
+  //----------------------------------------------------------------------------
   options& Options;
   window_impl& Window;
   scene_impl& Scene;
@@ -527,7 +546,10 @@ public:
   int DragDistanceTol = 3;      /* px */
   int TransitionDuration = 100; /* ms */
 
-  bool NeedFullRender = false;
+  std::function<void()> EventLoopUserCallBack = nullptr;
+  unsigned long EventLoopTimerId = 0;
+  int EventLoopObserverId = -1;
+  std::atomic<bool> RenderRequested = false;
 };
 
 //----------------------------------------------------------------------------
@@ -683,8 +705,7 @@ interactor& interactor_impl::initCommands()
       this->Internals->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
     });
 
-  this->addCommand(
-    "stop_interactor", [&](const std::vector<std::string>&) { this->Internals->StopInteractor(); });
+  this->addCommand("stop_interactor", [&](const std::vector<std::string>&) { this->stop(); });
 
   this->addCommand("reset_camera",
     [&](const std::vector<std::string>&) { this->Internals->Window.getCamera().resetToDefault(); });
@@ -1032,36 +1053,6 @@ std::pair<std::string, std::string> interactor_impl::getBindingDocumentation(
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::removeTimerCallBack(unsigned long id)
-{
-  this->Internals->VTKInteractor->RemoveObserver(id);
-  this->Internals->VTKInteractor->DestroyTimer(this->Internals->TimerCallBacks[id].first);
-}
-
-//----------------------------------------------------------------------------
-unsigned long interactor_impl::createTimerCallBack(double time, std::function<void()> callBack)
-{
-  // Create the timer
-  int timerId = this->Internals->VTKInteractor->CreateRepeatingTimer(time);
-
-  // Create the callback and get the observer id
-  vtkNew<vtkCallbackCommand> timerCallBack;
-  timerCallBack->SetCallback(
-    [](vtkObject*, unsigned long, void* clientData, void*)
-    {
-      std::function<void()>* callBackPtr = static_cast<std::function<void()>*>(clientData);
-      (*callBackPtr)();
-    });
-  unsigned long id =
-    this->Internals->VTKInteractor->AddObserver(vtkCommand::TimerEvent, timerCallBack);
-
-  // Store the user callback and set it as client data
-  this->Internals->TimerCallBacks[id] = std::make_pair(timerId, callBack);
-  timerCallBack->SetClientData(&this->Internals->TimerCallBacks[id].second);
-  return id;
-}
-
-//----------------------------------------------------------------------------
 void interactor_impl::toggleAnimation()
 {
   assert(this->Internals->AnimationManager);
@@ -1102,7 +1093,8 @@ void interactor_impl::disableCameraMovement()
 }
 
 //----------------------------------------------------------------------------
-bool interactor_impl::playInteraction(const std::string& file)
+bool interactor_impl::playInteraction(
+  const std::string& file, double loopTime, std::function<void()> userCallBack)
 {
   if (!vtksys::SystemTools::FileExists(file))
   {
@@ -1115,11 +1107,13 @@ bool interactor_impl::playInteraction(const std::string& file)
     this->Internals->Recorder->Off();
     this->Internals->Recorder->Clear();
 
-    this->Internals->StartEventLoop();
+    this->Internals->StartEventLoop(loopTime, std::move(userCallBack));
 
     std::string cleanFile = vtksys::SystemTools::CollapseFullPath(file);
     this->Internals->Recorder->SetFileName(cleanFile.c_str());
     this->Internals->Recorder->Play();
+
+    this->Internals->StopEventLoop();
   }
 
   // Recorder can stop the interactor, make sure it is still running
@@ -1171,16 +1165,23 @@ bool interactor_impl::recordInteraction(const std::string& file)
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::start()
+void interactor_impl::start(double loopTime, std::function<void()> userCallBack)
 {
-  this->Internals->StartEventLoop();
-  this->Internals->StartInteractor();
+  this->Internals->StartEventLoop(loopTime, std::move(userCallBack));
+  this->Internals->VTKInteractor->Start();
 }
 
 //----------------------------------------------------------------------------
 void interactor_impl::stop()
 {
-  this->Internals->StopInteractor();
+  this->Internals->StopEventLoop();
+  this->Internals->VTKInteractor->ExitCallback();
+}
+
+//----------------------------------------------------------------------------
+void interactor_impl::requestRender()
+{
+  this->Internals->RenderRequested = true;
 }
 
 //----------------------------------------------------------------------------

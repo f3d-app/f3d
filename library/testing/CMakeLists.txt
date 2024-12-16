@@ -15,7 +15,6 @@ list(APPEND libf3dSDKTests_list
      TestSDKMultiColoring.cxx
      TestSDKOptions.cxx
      TestSDKOptionsIO.cxx
-     TestSDKRenderAndInteract.cxx
      TestSDKRenderFinalShader.cxx
      TestSDKUtils.cxx
      TestSDKWindowAuto.cxx
@@ -40,6 +39,14 @@ if(F3D_MODULE_UI)
       TestSDKDynamicHDRI.cxx
       )
   endif()
+endif()
+
+# These tests needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10155
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20230426)
+  list(APPEND libf3dSDKTests_list
+    TestSDKRenderAndInteract.cxx
+    TestSDKStartInteractor.cxx
+    )
 endif()
 
 # Invalid scene codepath needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11287

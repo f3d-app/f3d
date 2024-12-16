@@ -31,6 +31,11 @@ public:
    */
   void ReleaseGraphicsResources(vtkWindow* w) override;
 
+  /**
+   * Set imgui::DeltaTime, with time in seconds
+   */
+  void SetDeltaTime(double time) override;
+
 protected:
   vtkF3DImguiActor();
   ~vtkF3DImguiActor() override;

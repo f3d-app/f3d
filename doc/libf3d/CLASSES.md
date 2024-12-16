@@ -54,6 +54,7 @@ This API also lets you control the content of the cheatsheet.
 Use `log::setVerboseLevel(log::VerboseLevel::DEBUG)` to print debug information on interaction and command use.
 
 Of course, you can use `start` and `stop` to control the interactor behavior.
+`start` lets you specify time for the event loop and a `std::function` to execute at each loop.
 
 ## Camera class
 

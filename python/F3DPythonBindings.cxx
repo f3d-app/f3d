@@ -237,8 +237,10 @@ PYBIND11_MODULE(pyf3d, module)
       "Disable the camera interaction")
     .def("play_interaction", &f3d::interactor::playInteraction, "Play an interaction file")
     .def("record_interaction", &f3d::interactor::recordInteraction, "Record an interaction file")
-    .def("start", &f3d::interactor::start, "Start the interactor")
-    .def("stop", &f3d::interactor::start, "Stop the interactor")
+    .def("start", &f3d::interactor::start, "Start the interactor and the event loop")
+    .def("stop", &f3d::interactor::stop, "Stop the interactor and the event loop")
+    .def(
+      "request_render", &f3d::interactor::requestRender, "Request a render on the next event loop")
     .def("init_commands", &f3d::interactor::initCommands,
       "Remove all commands and add all default command callbacks")
     .def("add_command", &f3d::interactor::addCommand, "Add a command")

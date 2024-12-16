@@ -116,6 +116,12 @@ public:
    */
   void SetInteractor(interactor_impl* interactor);
 
+  /**
+   * Trigger a render only of the UI
+   * Does nothing if F3D_MODULE_UI is OFF
+   */
+  void RenderUIOnly();
+
 private:
   class internals;
   std::unique_ptr<internals> Internals;

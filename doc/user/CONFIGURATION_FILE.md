@@ -68,7 +68,7 @@ The following options <b> cannot </b> be set via config file:
 `help`, `version`, `readers-list`, `config`, `dry-run` and `input`.
 
 The following options <b>are only taken on the first load</b>:
-`no-render`, `output`, `position`, `resolution` and all testing options.
+`no-render`, `output`, `position`, `resolution`, `frame-rate` and all testing options.
 
 Boolean options that have been turned on in the configuration file can be turned
 off on the command line if needed, eg: `--point-sprites=false`.

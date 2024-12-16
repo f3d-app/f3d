@@ -74,6 +74,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
 #if F3D_MODULE_DMON
       { "watch", "", "Watch current file and automatically reload it whenever it is modified on disk", "<bool>", "1" },
 #endif
+      { "frame-rate", "", "Frame rate used to refresh animation and other repeated tasks (watch, UI). Does not impact rendering frame rate.", "<fps>", "" },
       { "load-plugins", "", "List of plugins to load separated with a comma", "<paths or names>", "" },
       { "scan-plugins", "", "Scan standard directories for plugins and display available plugins (result can be incomplete)", "", "" },
       { "screenshot-filename", "", "Screenshot filename", "<filename>", "" } } },
@@ -96,7 +97,6 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "animation-index", "", "Select animation to show", "<index>", "" },
       { "animation-speed-factor", "", "Set animation speed factor", "<factor>", "" },
       { "animation-time", "", "Set animation time to load", "<time>", "" },
-      {"animation-frame-rate", "", "Set animation frame rate when playing animation interactively", "<frame rate>", ""},
       {"font-file", "", "Path to a FreeType compatible font file", "<file_path>", ""},
       {"command-script", "", "Path to a script file containing commands to execute", "<file_path>", "" } } },
   { "Material",
@@ -124,7 +124,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
     { {"bg-color", "", "Background color", "<R,G,B>", ""},
       {"resolution", "", "Window resolution", "<width,height>", ""},
       {"position", "", "Window position", "<x,y>", ""},
-      {"fps", "z", "Display frame per second", "<bool>", "1"},
+      {"fps", "z", "Display rendering frame per second", "<bool>", "1"},
       {"filename", "n", "Display filename", "<bool>", "1"},
       {"metadata", "m", "Display file metadata", "<bool>", "1"},
       {"blur-background", "u", "Blur background", "<bool>", "1" },

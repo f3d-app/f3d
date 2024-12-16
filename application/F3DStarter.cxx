@@ -89,6 +89,7 @@ public:
     double MaxSize;
     std::optional<double> AnimationTime;
     bool Watch;
+    double FrameRate;
     std::vector<std::string> Plugins;
     std::string ScreenshotFilename;
     std::string VerboseLevel;
@@ -552,6 +553,7 @@ public:
     {
       this->AppOptions.AnimationTime = f3d::options::parse<double>(appOptions.at("animation-time"));
     }
+    this->AppOptions.FrameRate = f3d::options::parse<double>(appOptions.at("frame-rate"));
     this->AppOptions.Watch = f3d::options::parse<bool>(appOptions.at("watch"));
     this->AppOptions.Plugins = { f3d::options::parse<std::vector<std::string>>(
       appOptions.at("load-plugins")) };
@@ -771,7 +773,6 @@ public:
 #endif
 
   // Event loop atomics
-  std::atomic<bool> RenderRequested = false;
   std::atomic<bool> ReloadFileRequested = false;
 };
 
@@ -855,6 +856,7 @@ int F3DStarter::Start(int argc, char** argv)
 
   f3d::log::debug("========== Configuring engine ==========");
 
+  double deltaTime = 1.0 / this->Internals->AppOptions.FrameRate;
   const std::string& reference = this->Internals->AppOptions.Reference;
   const std::string& output = this->Internals->AppOptions.Output;
 
@@ -942,7 +944,7 @@ int F3DStarter::Start(int argc, char** argv)
     {
       // For better testing, render once before the interaction
       window.render();
-      if (!interactor.playInteraction(interactionTestPlayFile))
+      if (!interactor.playInteraction(interactionTestPlayFile, deltaTime))
       {
         return EXIT_FAILURE;
       }
@@ -1092,14 +1094,13 @@ int F3DStarter::Start(int argc, char** argv)
       {
         // Create the event loop repeating timer
         window.render();
-        interactor.createTimerCallBack(30, [this]() { this->EventLoop(); });
 
         // gracefully exits if SIGTERM or SIGINT is send to F3D
         GlobalInteractor = &interactor;
         std::signal(SIGTERM, F3DInternals::SigCallback);
         std::signal(SIGINT, F3DInternals::SigCallback);
 
-        interactor.start();
+        interactor.start(deltaTime, [this]() { this->EventLoop(); });
       }
 #endif
     }
@@ -1360,13 +1361,6 @@ void F3DStarter::LoadFileGroup(
 }
 
 //----------------------------------------------------------------------------
-void F3DStarter::RequestRender()
-{
-  // Render will be called by the next event loop
-  this->Internals->RenderRequested = true;
-}
-
-//----------------------------------------------------------------------------
 void F3DStarter::Render()
 {
   f3d::log::debug("========== Rendering ==========");
@@ -1528,7 +1522,7 @@ bool F3DStarter::LoadRelativeFileGroup(int index, bool restoreCamera, bool force
     this->LoadFileGroup(index, true, forceClear);
   }
 
-  this->RequestRender();
+  this->Internals->Engine->getInteractor().requestRender();
 
   return true;
 }
@@ -1540,11 +1534,6 @@ void F3DStarter::EventLoop()
   {
     this->LoadRelativeFileGroup(0, true, true);
     this->Internals->ReloadFileRequested = false;
-  }
-  if (this->Internals->RenderRequested)
-  {
-    this->Render();
-    this->Internals->RenderRequested = false;
   }
 }
 
