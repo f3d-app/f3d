@@ -9,8 +9,8 @@
 #ifndef f3d_scene_impl_h
 #define f3d_scene_impl_h
 
-#include "scene.h"
 #include "log.h"
+#include "scene.h"
 
 #include <memory>
 
@@ -47,7 +47,7 @@ public:
    */
   void SetInteractor(interactor_impl* interactor);
 
-  //Display available cameras in the log
+  // Display available cameras in the log
   void PrintImporterDescription(log::VerboseLevel level);
 
 private:
