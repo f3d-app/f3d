@@ -10,6 +10,7 @@
 #include "F3DPluginsTools.h"
 #include "F3DSystemTools.h"
 
+#if F3D_MODULE_DMON
 #define DMON_IMPL
 #ifdef WIN32
 #pragma warning(push)
@@ -26,8 +27,11 @@
 #else
 #include "dmon.h"
 #endif
+#endif
 
+#if F3D_MODULE_TINYFILEDIALOGS
 #include "tinyfiledialogs.h"
+#endif
 
 #include "engine.h"
 #include "interactor.h"
@@ -218,6 +222,7 @@ public:
     }
   }
 
+#if F3D_MODULE_DMON
   static void dmonFolderChanged(
     dmon_watch_id, dmon_action, const char*, const char* filename, const char*, void* userData)
   {
@@ -230,6 +235,7 @@ public:
       self->Internals->ReloadFileRequested = true;
     }
   }
+#endif
 
   void addOutputImageMetadata(f3d::image& image)
   {
@@ -672,7 +678,9 @@ public:
       interactor.addBinding({ mod_t::NONE, "Up" }, "reload_current_file_group", "Others", std::bind(docString, "Reload current file group"));
       interactor.addBinding({ mod_t::NONE, "Down" }, "add_current_directories", "Others", std::bind(docString, "Add files from dir of current file"));
       interactor.addBinding({ mod_t::NONE, "F12" }, "take_screenshot", "Others", std::bind(docString, "Take a screenshot"));
+#if F3D_MODULE_TINYFILEDIALOGS
       interactor.addBinding({ mod_t::CTRL, "O" }, "open_file_dialog", "Others", std::bind(docString, "Open File Dialog"));
+#endif
       interactor.addBinding({ mod_t::CTRL, "F12" }, "take_minimal_screenshot", "Others", std::bind(docString, "Take a minimal screenshot"));
 
       // This replace an existing default binding command in the libf3d
@@ -756,11 +764,13 @@ public:
   std::unique_ptr<f3d::engine> Engine;
   std::vector<std::vector<fs::path>> FilesGroups;
   std::vector<fs::path> LoadedFiles;
-  std::vector<dmon_watch_id> FolderWatchIds;
   int CurrentFilesGroupIndex = -1;
 
-  // dmon used atomic and mutex
+#if F3D_MODULE_DMON
+  // dmon related
   std::mutex LoadedFilesMutex;
+  std::vector<dmon_watch_id> FolderWatchIds;
+#endif
 
   // Event loop atomics
   std::atomic<bool> ReloadFileRequested = false;
@@ -770,15 +780,19 @@ public:
 F3DStarter::F3DStarter()
   : Internals(std::make_unique<F3DStarter::F3DInternals>())
 {
+#if F3D_MODULE_DMON
   // Initialize dmon
   dmon_init();
+#endif
 }
 
 //----------------------------------------------------------------------------
 F3DStarter::~F3DStarter()
 {
+#if F3D_MODULE_DMON
   // deinit dmon
   dmon_deinit();
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -1180,8 +1194,10 @@ void F3DStarter::LoadFileGroup(
   std::vector<fs::path> localPaths;
   try
   {
+#if F3D_MODULE_DMON
     // In the main thread, we only need to guard writing
     const std::lock_guard<std::mutex> lock(this->Internals->LoadedFilesMutex);
+#endif
 
     if (clear)
     {
@@ -1280,6 +1296,7 @@ void F3DStarter::LoadFileGroup(
       filenameInfo += " [+UNSUPPORTED]";
     }
 
+#if F3D_MODULE_DMON
     // Update dmon watch logic
     if (this->Internals->AppOptions.Watch)
     {
@@ -1299,6 +1316,7 @@ void F3DStarter::LoadFileGroup(
           dmon_watch(parentPath.string().c_str(), &F3DInternals::dmonFolderChanged, 0, this));
       }
     }
+#endif
   }
   else
   {
@@ -1625,6 +1643,8 @@ void F3DStarter::AddCommands()
         this->LoadFileGroup(index);
       }
     });
+
+#if F3D_MODULE_TINYFILEDIALOGS
   interactor.addCommand("open_file_dialog",
     [this](const std::vector<std::string>&)
     {
@@ -1660,5 +1680,6 @@ void F3DStarter::AddCommands()
         }
       }
     });
+#endif
   interactor.addCommand("exit", [&](const std::vector<std::string>&) { interactor.stop(); });
 }

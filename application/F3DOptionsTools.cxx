@@ -71,7 +71,9 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "no-render", "", "Do not read the configuration file", "<bool>", "1" },
       { "rendering-backend", "", "Backend to use when rendering (auto|glx|wgl|egl|osmesa)", "<string>", "" },
       { "max-size", "", "Maximum size in Mib of a file to load, negative value means unlimited", "<size in Mib>", "" },
+#if F3D_MODULE_DMON
       { "watch", "", "Watch current file and automatically reload it whenever it is modified on disk", "<bool>", "1" },
+#endif
       { "frame-rate", "", "Frame rate used to refresh animation and other repeated tasks (watch, UI). Does not impact rendering frame rate.", "<fps>", "" },
       { "load-plugins", "", "List of plugins to load separated with a comma", "<paths or names>", "" },
       { "scan-plugins", "", "Scan standard directories for plugins and display available plugins (result can be incomplete)", "", "" },
@@ -95,8 +97,8 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "animation-index", "", "Select animation to show", "<index>", "" },
       { "animation-speed-factor", "", "Set animation speed factor", "<factor>", "" },
       { "animation-time", "", "Set animation time to load", "<time>", "" },
-      {"font-file", "", "Path to a FreeType compatible font file", "<file_path>", ""}, 
-      {"command-script", "", "Path to a script file containing commands to execute", "<file_path>", "" } } }, 
+      {"font-file", "", "Path to a FreeType compatible font file", "<file_path>", ""},
+      {"command-script", "", "Path to a script file containing commands to execute", "<file_path>", "" } } },
   { "Material",
     { {"point-sprites", "o", "Show sphere sprites instead of surfaces", "<bool>", "1" },
       {"point-sprites-type", "", "Point sprites type", "<sphere|gaussian>", ""},
