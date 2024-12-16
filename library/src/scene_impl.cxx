@@ -338,4 +338,24 @@ void scene_impl::SetInteractor(interactor_impl* interactor)
   this->Internals->AnimationManager.SetInteractor(interactor);
   this->Internals->Interactor->SetAnimationManager(&this->Internals->AnimationManager);
 }
+
+//----------------------------------------------------------------------------
+void scene_impl::PrintImporterDescription(log::VerboseLevel level)
+{
+  vtkIdType availCameras = this->Internals->MetaImporter->GetNumberOfCameras();
+  if (availCameras <= 0)
+  {
+    log::print(level, "No camera available");
+  }
+  else
+  {
+    log::print(level, "Camera(s) available are:");
+  }
+  for (int i = 0; i < availCameras; i++)
+  {
+    log::print(level, i, ": ", this->Internals->MetaImporter->GetCameraName(i));
+  }
+  log::print(level, "");
+  log::print(level, this->Internals->MetaImporter->GetOutputsDescription(), "\n");
+}
 }
