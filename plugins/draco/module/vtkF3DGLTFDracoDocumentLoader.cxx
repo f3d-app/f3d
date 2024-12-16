@@ -1,4 +1,4 @@
-#include "vtkF3DGLTFDocumentLoader.h"
+#include "vtkF3DGLTFDracoDocumentLoader.h"
 
 #include <vtkObjectFactory.h>
 
@@ -101,10 +101,10 @@ std::vector<char> DecodeVertexBuffer(vtkGLTFDocumentLoader::ComponentType compTy
 }
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkF3DGLTFDocumentLoader);
+vtkStandardNewMacro(vtkF3DGLTFDracoDocumentLoader);
 
 //----------------------------------------------------------------------------
-std::vector<std::string> vtkF3DGLTFDocumentLoader::GetSupportedExtensions()
+std::vector<std::string> vtkF3DGLTFDracoDocumentLoader::GetSupportedExtensions()
 {
   std::vector<std::string> extensions = this->Superclass::GetSupportedExtensions();
   extensions.emplace_back("KHR_draco_mesh_compression");
@@ -112,7 +112,7 @@ std::vector<std::string> vtkF3DGLTFDocumentLoader::GetSupportedExtensions()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DGLTFDocumentLoader::PrepareData()
+void vtkF3DGLTFDracoDocumentLoader::PrepareData()
 {
   std::shared_ptr<Model> model = this->GetInternalModel();
 
