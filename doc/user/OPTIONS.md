@@ -19,7 +19,7 @@ Options|Default|Description
 \-\-no-render||Do not render anything and quit just after loading the first file, use with \-\-verbose to recover information about a file.
 \-\-max-size=\<size in MiB\>|-1|Prevent F3D to load a file bigger than the provided size in Mib, negative value means unlimited, useful for thumbnails.
 \-\-watch||Watch current file and automatically reload it whenever it is modified on disk.
-\-\-frame-rate=\<fps\>|30|Frame rate used to refresh animation and other repeated tasks (watch, UI). Does not impact rendering frame rate.
+\-\-frame-rate=\<fps\>|30.0|Frame rate used to refresh animation and other repeated tasks (watch, UI). Does not impact rendering frame rate.
 \-\-load-plugins=\<paths or names\>||List of plugins to load separated with a comma. Official plugins are `alembic`, `assimp`, `draco`, `exodus`, `occt`, `usd`, `vdb`. See [plugins](PLUGINS.md) for more info.
 \-\-scan-plugins||Scan standard directories for plugins and display their names, results may be incomplete. See [plugins](PLUGINS.md) for more info.
 \-\-screenshot-filename=\<png file\>|`{app}/{model}_{n}.png`|Filename to save [screenshots](INTERACTIONS.md#taking-screenshots) to. Can use [template variables](#filename-templating).

@@ -85,7 +85,7 @@ public:
     double MaxSize;
     std::optional<double> AnimationTime;
     bool Watch;
-    int FrameRate;
+    double FrameRate;
     std::vector<std::string> Plugins;
     std::string ScreenshotFilename;
     std::string VerboseLevel;
@@ -547,7 +547,7 @@ public:
     {
       this->AppOptions.AnimationTime = f3d::options::parse<double>(appOptions.at("animation-time"));
     }
-    this->AppOptions.FrameRate = f3d::options::parse<int>(appOptions.at("frame-rate"));
+    this->AppOptions.FrameRate = f3d::options::parse<double>(appOptions.at("frame-rate"));
     this->AppOptions.Watch = f3d::options::parse<bool>(appOptions.at("watch"));
     this->AppOptions.Plugins = { f3d::options::parse<std::vector<std::string>>(
       appOptions.at("load-plugins")) };
