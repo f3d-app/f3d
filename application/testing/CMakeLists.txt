@@ -397,6 +397,13 @@ f3d_test(NAME TestInteractionAnimationInvert DATA f3d.glb ARGS --animation-speed
 f3d_test(NAME TestVerboseAnimationWrongAnimationTimeHigh DATA BoxAnimated.gltf ARGS --animation-time=10 --verbose REGEXP "Animation time 10 is outside of range \\[0, 3\\.70833\\], using 3\\.70833" NO_BASELINE)
 f3d_test(NAME TestVerboseAnimationWrongAnimationTimeLow DATA BoxAnimated.gltf ARGS --animation-time=-5 --verbose REGEXP "Animation time -5 is outside of range \\[0, 3\\.70833\\], using 0" NO_BASELINE)
 
+# Armature test
+f3d_test(NAME TestGLTFRigNoArmature DATA RiggedFigure.glb ARGS --animation-time=1)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20241219)
+  f3d_test(NAME TestGLTFRigArmature DATA RiggedFigure.glb ARGS --animation-time=1 --armature)
+  f3d_test(NAME TestGLTFRigArmatureSphereTube DATA RiggedFigure.glb ARGS --animation-time=1 --armature --point-size=20 --line-width=5)
+endif()
+
 # Test exit hotkey
 f3d_test(NAME TestInteractionSimpleExit DATA cow.vtp REGEXP "Interactor has been stopped" INTERACTION NO_BASELINE) #CTRL+Q
 

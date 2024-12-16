@@ -3,6 +3,7 @@ NAME
 DESCRIPTION
   A VTK module for the Draco plugin
 DEPENDS
+  f3d::vtkextPrivate
   VTK::CommonCore
   VTK::CommonExecutionModel
   VTK::IOGeometry

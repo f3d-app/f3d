@@ -400,6 +400,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->ShowConsole(opt.ui.console);
   renderer->ShowDropZone(opt.ui.dropzone);
   renderer->SetDropZoneInfo(opt.ui.dropzone_info);
+  renderer->ShowArmature(opt.render.armature.enable);
 
   renderer->SetUseRaytracing(opt.render.raytracing.enable);
   renderer->SetRaytracingSamples(opt.render.raytracing.samples);

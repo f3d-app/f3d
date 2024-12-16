@@ -47,6 +47,7 @@ set(classes
   vtkF3DConsoleOutputWindow
   vtkF3DDropZoneActor
   vtkF3DExternalRenderWindow
+  vtkF3DGLTFImporter
   vtkF3DGenericImporter
   vtkF3DHexagonalBokehBlurPass
   vtkF3DInteractorEventRecorder
