@@ -2,6 +2,11 @@
 
 ## Ongoing development
 
+## v2.5.1
+
+For F3D packagers:
+- Added compatibility with VTK v9.4.0
+
 ## v2.5.0
 
 For F3D users:
