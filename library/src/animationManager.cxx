@@ -210,7 +210,7 @@ void animationManager::Tick()
     if (this->CurrentTime < this->TimeRange[0] || this->CurrentTime > this->TimeRange[1])
     {
       this->CurrentTime = this->TimeRange[0] +
-        std::remainder(this->CurrentTime - this->TimeRange[0], this->TimeRange[1] - this->TimeRange[0]);
+        std::fmod(this->CurrentTime - this->TimeRange[0], this->TimeRange[1] - this->TimeRange[0]);
     }
 
     if (this->LoadAtTime(this->CurrentTime))
