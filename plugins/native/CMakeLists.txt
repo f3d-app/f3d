@@ -190,7 +190,7 @@ f3d_plugin_declare_reader(
   NAME QuakeMDL
   EXTENSIONS mdl
   MIMETYPES application/vnd.mdl
-  VTK_IMPORTER vtkQuakeMDLImporter
+  VTK_IMPORTER vtkF3DQuakeMDLImporter
   FORMAT_DESCRIPTION "Quake 1 MDL model"
 )
 
