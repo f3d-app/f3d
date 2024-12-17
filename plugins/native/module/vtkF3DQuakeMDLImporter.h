@@ -1,17 +1,18 @@
 /**
- * @class   vtkQuakeMDLImporter
- * @brief   VTK Importer for Quake 1 models in binary .mdl file format
+ * @class   vtkF3DQuakeMDLImporter
+ * @brief   VTK Importer for Quake 1 models in .mdl file format
  */
 
-#ifndef vtkQuakeMDLImporter_h
-#define vtkQuakeMDLImporter_h
+#ifndef vtkF3DQuakeMDLImporter_h
+#define vtkF3DQuakeMDLImporter_h
 #include <vtkImporter.h>
+#include "vtkF3DQuakeMDLImporterConstants.h"
 
-class vtkQuakeMDLImporter : public vtkImporter
+class vtkF3DQuakeMDLImporter : public vtkImporter
 {
 public:
-  static vtkQuakeMDLImporter* New();
-  vtkTypeMacro(vtkQuakeMDLImporter, vtkImporter);
+  static vtkF3DQuakeMDLImporter* New();
+  //vtkTypeMacro(vtkF3DQuakeMDLImporter, vtkImporter);
 
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
@@ -54,13 +55,7 @@ public:
    */
   std::string GetOutputsDescription() override;
 
-  ///@{
-  /**
-   * Set/Get collada fixup flag.
-   */
-  vtkSetMacro(ColladaFixup, bool);
-  vtkGetMacro(ColladaFixup, bool);
-  ///@}
+
 
   /**
    * Get temporal information for the currently enabled animation.
@@ -86,8 +81,8 @@ public:
   void SetCamera(vtkIdType camIndex) override;
 
 protected:
-  vtkQuakeMDLImporter();
-  ~vtkQuakeMDLImporter() override = default;
+  vtkF3DQuakeMDLImporter();
+  ~vtkF3DQuakeMDLImporter() override = default;
 
   int ImportBegin() override;
   void ImportActors(vtkRenderer*) override;
@@ -114,20 +109,17 @@ protected:
     float size;
   };
 
-  ///@{
-  /**
-   * Set/Get the file name.
-   */
-  ///@}
-  std::string FileName;
-  bool ColladaFixup = false;
 
 private:
-  vtkQuakeMDLImporter(const vtkQuakeMDLImporter&) = delete;
-  void operator=(const vtkQuakeMDLImporter&) = delete;
+  vtkF3DQuakeMDLImporter(const vtkF3DQuakeMDLImporter&) = delete;
+  void operator=(const vtkF3DQuakeMDLImporter&) = delete;
 
   class vtkInternals;
+  std::string FileName;
+
   std::unique_ptr<vtkInternals> Internals;
+
 };
+
 
 #endif
