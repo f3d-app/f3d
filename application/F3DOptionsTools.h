@@ -114,6 +114,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "range", "model.scivis.range" },
   { "bar", "ui.scalar_bar" },
   { "colormap", "model.scivis.colormap" },
+  { "colormap-discretization", "model.scivis.discretization" },
   { "volume", "model.volume.enable" },
   { "inverse", "model.volume.inverse" },
   { "camera-orthographic", "scene.camera.orthographic" },
