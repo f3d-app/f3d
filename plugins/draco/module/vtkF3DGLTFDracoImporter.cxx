@@ -1,14 +1,14 @@
-#include "vtkF3DDracoGLTFImporter.h"
+#include "vtkF3DGLTFDracoImporter.h"
 
 #include "vtkF3DGLTFDracoDocumentLoader.h"
 
 #include <vtkObjectFactory.h>
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkF3DDracoGLTFImporter);
+vtkStandardNewMacro(vtkF3DGLTFDracoImporter);
 
 //----------------------------------------------------------------------------
-void vtkF3DDracoGLTFImporter::InitializeLoader()
+void vtkF3DGLTFDracoImporter::InitializeLoader()
 {
   this->Loader = vtkSmartPointer<vtkF3DGLTFDracoDocumentLoader>::New();
 }
