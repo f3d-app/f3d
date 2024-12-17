@@ -34,9 +34,7 @@
 #include <vtkTriangleFilter.h>
 #include <vtkVersion.h>
 
-#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 3, 0)
 #include <vtkCapsuleSource.h>
-#endif
 
 #if defined(__clang__)
 #pragma clang diagnostic push
@@ -1221,6 +1219,7 @@ vtkInformationKeyMacro(vtkF3DUSDImporter, TCOORDS_NAME, String);
 vtkF3DUSDImporter::vtkF3DUSDImporter()
   : Internals(new vtkF3DUSDImporter::vtkInternals(this))
 {
+  vtkNew<vtkCapsuleSource> source;
 }
 
 //----------------------------------------------------------------------------

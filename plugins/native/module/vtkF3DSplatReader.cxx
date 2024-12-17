@@ -21,7 +21,6 @@ vtkStandardNewMacro(vtkF3DSplatReader);
 //----------------------------------------------------------------------------
 vtkF3DSplatReader::vtkF3DSplatReader()
 {
-  vtkNew<vtkCapsuleSource> source;
   this->SetNumberOfInputPorts(0);
 }
 
