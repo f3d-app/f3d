@@ -67,7 +67,7 @@
     "grid": false,
     "anti-aliasing": false,
     "translucency-support": false
-  },
+  }
 },
 {
   "match": ".*(mdl)",
