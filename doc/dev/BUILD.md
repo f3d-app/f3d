@@ -7,7 +7,7 @@ please take a look at our [getting started guide](GETTING_STARTED.md).
 ## Dependencies
 
 * [CMake](https://cmake.org) >= 3.1.
-* [VTK](https://vtk.org) >= 9.2.6 (9.3.1 recommended).
+* [VTK](https://vtk.org) >= 9.2.6 (9.4.0 recommended).
 * A C++17 compiler.
 * A CMake-compatible build system (Visual Studio, XCode, Ninja, Make, etc.).
 * Optionally, [Assimp](https://www.assimp.org/) >= 5.0.
@@ -22,7 +22,7 @@ please take a look at our [getting started guide](GETTING_STARTED.md).
 
 ## VTK compatibility
 
-As stated in the dependencies, F3D is compatible with VTK >= 9.2.6, however, some features may not be available. We suggest using VTK 9.3.1 with RenderingRayTracing, IOExodus and IOOpenVDB modules enabled in order to get as many features as possible in F3D.
+As stated in the dependencies, F3D is compatible with VTK >= 9.2.6, however, some features may not be available. We suggest using VTK 9.4.0 with RenderingRayTracing, IOExodus and IOOpenVDB modules enabled in order to get as many features as possible in F3D.
 
 ## Configuration and building
 
