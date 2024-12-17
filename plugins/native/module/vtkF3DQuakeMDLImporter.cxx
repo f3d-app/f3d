@@ -109,6 +109,27 @@ public:
     return texture;
   }
 
+  // Header definition,
+  struct mdl_header_t
+  {
+    int IDPO;
+    int version;
+    float scale[3];
+    float translation[3];
+    float boundingRadius;
+    float eyePosition[3];
+    int numSkins;
+    int skinWidth;
+    int skinHeight;
+    int numVertices;
+    int numTriangles;
+    int numFrames;
+    int syncType;
+    int stateFlags;
+    float size;
+  };
+
+
   //----------------------------------------------------------------------------
   void CreateMesh(std::vector<unsigned char> buffer, int offset, mdl_header_t* header)
   {
@@ -392,14 +413,10 @@ public:
   //----------------------------------------------------------------------------
   void UpdateTimeStep(double timeValue)
   {
-    float framesToSkip = FrameRate * abs(timeValue - LastRenderTime);
-    if (framesToSkip >= 1.0)
-    {
-      CurrentFrameIndex = (CurrentFrameIndex + 1) % (int)ActiveFrames.size();
-      int currentFrame = ActiveFrames[CurrentFrameIndex];
-      Mapper->SetInputData(Mesh[currentFrame]);
-      LastRenderTime = timeValue;
-    }
+    int frameIndex = (int) floor(FrameRate * abs(timeValue)) % (int)ActiveFrames.size();
+    int currentFrame = ActiveFrames[frameIndex];
+    Mapper->SetInputData(Mesh[currentFrame]);
+    LastRenderTime = timeValue;
   }
 
   //----------------------------------------------------------------------------
@@ -420,7 +437,6 @@ public:
     {
       ActiveFrames.emplace_back(i);
     }
-    CurrentFrameIndex = 0;
     ActiveAnimationId.emplace_back(animationIndex);
   }
 
@@ -441,7 +457,6 @@ public:
     {
       ActiveFrames.erase(std::remove(ActiveFrames.begin(), ActiveFrames.end(), i), ActiveFrames.end());
     }
-    CurrentFrameIndex = 0;
     ActiveAnimationId.erase(
       std::remove(ActiveAnimationId.begin(), ActiveAnimationId.end(), animationIndex), ActiveAnimationId.end());
   }
@@ -467,16 +482,10 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  void GetTimeRange(vtkIdType animationIndex, double timeRange[2])
+  void GetTimeRange(vtkIdType vtkNotUsed(animationIndex), double timeRange[2])
   {
-    int firstFrameIndex = std::distance(GroupAndTimeVal.begin(),
-      std::find_if(GroupAndTimeVal.begin(), GroupAndTimeVal.end(), [animationIndex](const std::pair<int, float> pair) { return pair.first == animationIndex; }));
-    int lastFrameIndex = std::distance(GroupAndTimeVal.begin(),
-      std::find_if(GroupAndTimeVal.begin(), GroupAndTimeVal.end(), [animationIndex](const std::pair<int, float> pair) { return pair.first > animationIndex; }));
-    firstFrameIndex = firstFrameIndex < GroupAndTimeVal.size() ? firstFrameIndex : 0;
-    lastFrameIndex = lastFrameIndex - 1;
-    timeRange[0] = GroupAndTimeVal[firstFrameIndex].second <= 0.0 ? (1.0 / FrameRate) * firstFrameIndex : GroupAndTimeVal[firstFrameIndex].second;
-    timeRange[1] = GroupAndTimeVal[lastFrameIndex].second <= 0.0 ? (1.0 / FrameRate) * (lastFrameIndex + 1) : GroupAndTimeVal[lastFrameIndex].second;
+    timeRange[0] = 0.0;
+    timeRange[1] = (1.0 / FrameRate) * GroupAndTimeVal.size();
   }
 
   vtkF3DQuakeMDLImporter* Parent;
@@ -488,7 +497,6 @@ public:
   std::vector<std::string> AnimationNames;
   std::vector<int> ActiveFrames;
   std::vector<int> ActiveAnimationId;
-  int CurrentFrameIndex = 0;
   int NumberOfAnimations = 0;
   double LastRenderTime = 0.0;
   double FrameRate = 60.0;
@@ -568,17 +576,10 @@ bool vtkF3DQuakeMDLImporter::GetTemporalInformation(vtkIdType animationIndex,
   double frameRate, int& nbTimeSteps, double timeRange[2],
   vtkDoubleArray* vtkNotUsed(timeSteps))
 {
-  if ((int) Internals->ActiveFrames.size() > 1)
-  {
-    Internals->SetFrameRate(frameRate);
-    Internals->GetTimeRange(animationIndex, timeRange);
-    nbTimeSteps = (int)Internals->ActiveFrames.size();
-    return true;
-  }
-  else
-  {
-    return false;
-  }
+  Internals->SetFrameRate(frameRate);
+  Internals->GetTimeRange(animationIndex, timeRange);
+  nbTimeSteps = (int) Internals->ActiveFrames.size();
+  return true;
 }
 
 //----------------------------------------------------------------------------
@@ -611,6 +612,7 @@ void vtkF3DQuakeMDLImporter::ImportLights(vtkRenderer* renderer)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DQuakeMDLImporter::PrintSelf(ostream& vtkNotUsed(os), vtkIndent vtkNotUsed(indent))
+void vtkF3DQuakeMDLImporter::SetFileName(std::string fileName)
 {
+  this->FileName = fileName;
 }
