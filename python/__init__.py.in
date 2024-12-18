@@ -28,10 +28,6 @@ Engine.autoload_plugins()
 __version__ = "@F3D_VERSION@"
 
 
-point3_t = tuple[float, float, float]
-vector3_t = tuple[float, float, float]
-
-
 ################################################################################
 # monkey patch `options.update`
 
