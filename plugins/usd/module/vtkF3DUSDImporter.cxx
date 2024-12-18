@@ -3,6 +3,7 @@
 #include "vtkF3DFaceVaryingPointDispatcher.h"
 
 #include <vtkActor.h>
+#include <vtkCapsuleSource.h>
 #include <vtkConeSource.h>
 #include <vtkCubeSource.h>
 #include <vtkCylinderSource.h>
@@ -32,11 +33,6 @@
 #include <vtkTransform.h>
 #include <vtkTransformFilter.h>
 #include <vtkTriangleFilter.h>
-#include <vtkVersion.h>
-
-#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 3, 0)
-#include <vtkCapsuleSource.h>
-#endif
 
 #if defined(__clang__)
 #pragma clang diagnostic push
