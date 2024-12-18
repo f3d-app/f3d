@@ -677,29 +677,11 @@ interactor& interactor_impl::initCommands()
   this->addCommand("print_options_info",
     [&](const std::vector<std::string>&)
     {
-      for (auto option : this->Internals->Options.getNames())
+      for (const std::string& option : this->Internals->Options.getNames())
       {
-        std::string val = this->Internals->Options.getAsString(option);
-        std::string descr = option + ": " + val;
-        log::print(log::VerboseLevel::INFO, descr);
-      }
-    });
-
-  this->addCommand("print_coloring_info",
-    [&](const std::vector<std::string>&)
-    { this->Internals->Window.PrintSceneDescription(log::VerboseLevel::INFO); });
-
-  this->addCommand("print_mesh_info",
-    [&](const std::vector<std::string>&)
-    { this->Internals->Scene.PrintImporterDescription(log::VerboseLevel::INFO); });
-
-  this->addCommand("print_options_info",
-    [&](const std::vector<std::string>&)
-    {
-      for (auto option : this->Internals->Options.getNames())
-      {
-        std::string val = this->Internals->Options.getAsString(option);
-        std::string descr = option + ": " + val;
+        const std::string val{ this->Internals->Options.getAsString(option) };
+        std::string descr{};
+        descr.append(option).append(": ").append(val);
         log::print(log::VerboseLevel::INFO, descr);
       }
     });
