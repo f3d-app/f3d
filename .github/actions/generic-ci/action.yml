@@ -369,7 +369,7 @@ runs:
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: |
-        ${{ env.F3D_BIN_PATH }} ../source/testing/data/dragon.vtu --output=output/install_output.png --ref=../source/.github/baselines/install_output.png --resolution=300,300 --colormap-file=viridis --comp=0 --verbose --rendering-backend=${{ inputs.rendering_backend }}
+        ${{ env.F3D_BIN_PATH }} ../source/testing/data/dragon.vtu --output=output/install_output.png --ref=../source/.github/baselines/install_output.png --resolution=300,300 --colormap-file=viridis --coloring-component=0 --verbose --rendering-backend=${{ inputs.rendering_backend }}
 
     - name: Check Install plugins
       if: |

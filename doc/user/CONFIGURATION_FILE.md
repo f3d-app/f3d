@@ -22,7 +22,7 @@ A typical config file with options may look like this:
 {
   "options":
   {
-     "bg-color": "0.7,0.7,0.7",
+     "background-color": "0.7,0.7,0.7",
      "color": "0.5,0.1,0.1",
      "anti-aliasing": true,
      "timer": true,
@@ -98,7 +98,7 @@ A typical config file with bindings may look like this:
     "Any+3": "roll_camera 90",
     "Shift+O": "toggle model.point_sprites.enable",
     "Ctrl+O": ["toggle render.grid.enable", "toggle scene.camera.orthographic"],
-    "None+I": "toggle interactor.axis"
+    "None+I": "toggle ui.axis"
   }
 }
 ]

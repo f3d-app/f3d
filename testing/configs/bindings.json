@@ -18,7 +18,7 @@
     "Any+3": "roll_camera 90",
     "Shift+O": "toggle model.point_sprites.enable",
     "Ctrl+O": ["toggle render.grid.enable", "toggle scene.camera.orthographic"],
-    "None+I": "toggle interactor.axis"
+    "None+I": "toggle ui.axis"
   }
 }
 ]

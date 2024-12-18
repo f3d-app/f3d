@@ -115,12 +115,14 @@
         "default_value": "false"
       },
       "blur": {
-        "type": "bool",
-        "default_value": "false"
-      },
-      "blur_coc": {
+        "enable": {
+          "type": "bool",
+          "default_value": "false"
+        },
+        "coc": {
         "type": "double",
         "default_value": "20.0"
+        }
       }
     },
     "light": {
@@ -131,6 +133,10 @@
     }
   },
   "ui": {
+    "axis": {
+      "type": "bool",
+      "default_value": "false"
+    },
     "scalar_bar": {
       "type": "bool",
       "default_value": "false"
@@ -273,10 +279,6 @@
     }
   },
   "interactor": {
-    "axis": {
-      "type": "bool",
-      "default_value": "false"
-    },
     "trackball": {
       "type": "bool",
       "default_value": "false"

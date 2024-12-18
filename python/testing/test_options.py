@@ -11,8 +11,8 @@ def test_closest_option():
 
 def test_setitem():
     options = f3d.Options()
-    options["interactor.axis"] = False
-    options["render.background.blur_coc"] = 33.33
+    options["ui.axis"] = False
+    options["render.background.blur.coc"] = 33.33
     options["scene.animation.speed_factor"] = 3.3
     options["render.raytracing.samples"] = 5
     options["render.grid.color"] = [1.0, 1.0, 1.0]
@@ -23,8 +23,8 @@ def test_getitem():
     engine = f3d.Engine.create_none()
     options = engine.options
 
-    assert options["interactor.axis"] is False
-    assert options["render.background.blur_coc"] == 20.0
+    assert options["ui.axis"] is False
+    assert options["render.background.blur.coc"] == 20.0
     assert options["scene.animation.speed_factor"] == 1.0
     assert options["render.raytracing.samples"] == 5
     assert options["render.grid.color"] == [0.0, 0.0, 0.0]
@@ -46,7 +46,7 @@ def test_set_non_existent_key():
 def test_set_incompatible_key():
     options = f3d.Options()
     with pytest.raises(AttributeError):
-        options["interactor.axis"] = "world"
+        options["ui.axis"] = "world"
 
 
 def test_len():
@@ -67,7 +67,7 @@ def test_contains():
 
 def test_set_options():
     options = f3d.Options()
-    options["interactor.axis"] = True
+    options["ui.axis"] = True
     options["model.material.roughness"] = 0.7
     options["scene.animation.speed_factor"] = 3.7
     options["render.raytracing.samples"] = 2
@@ -76,7 +76,7 @@ def test_set_options():
 
     engine = f3d.Engine.create_none()
     engine.options = options
-    assert engine.options["interactor.axis"] is True
+    assert engine.options["ui.axis"] is True
     assert engine.options["model.material.roughness"] == 0.7
     assert engine.options["scene.animation.speed_factor"] == 3.7
     assert engine.options["render.raytracing.samples"] == 2
@@ -98,7 +98,7 @@ def test_update_from_dict():
     options = f3d.Options()
 
     d = {
-        "interactor.axis": True,
+        "ui.axis": True,
         "model.material.roughness": 0.8,
         "scene.animation.speed_factor": 3.8,
         "render.raytracing.samples": 8,
@@ -114,7 +114,7 @@ def test_update_from_kv_pairs():
     options = f3d.Options()
 
     d = {
-        "interactor.axis": True,
+        "ui.axis": True,
         "model.material.roughness": 0.8,
         "scene.animation.speed_factor": 3.8,
         "render.raytracing.samples": 8,
@@ -129,16 +129,16 @@ def test_update_from_kv_pairs():
 def test_is_same():
     options1 = f3d.Options()
     options2 = f3d.Options()
-    options1["interactor.axis"] = True
-    options2["interactor.axis"] = False
-    assert not options2.is_same(options1, "interactor.axis")
+    options1["ui.axis"] = True
+    options2["ui.axis"] = False
+    assert not options2.is_same(options1, "ui.axis")
 
 
 def test_is_copy():
     options1 = f3d.Options()
     options2 = f3d.Options()
-    options1["interactor.axis"] = True
-    options2["interactor.axis"] = False
-    assert not options2.is_same(options1, "interactor.axis")
-    options2.copy(options1, "interactor.axis")
-    assert options2.is_same(options1, "interactor.axis")
+    options1["ui.axis"] = True
+    options2["ui.axis"] = False
+    assert not options2.is_same(options1, "ui.axis")
+    options2.copy(options1, "ui.axis")
+    assert options2.is_same(options1, "ui.axis")

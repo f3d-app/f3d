@@ -75,13 +75,13 @@ Options|Default|Description
 
 Options|Default|Description
 ------|------|------
-\-\-bg-color=\<R,G,B\>|0.2, 0.2, 0.2|Set the window *background color*.<br>Ignored if *hdri* is set.
+\-\-background-color=\<R,G,B\>|0.2, 0.2, 0.2|Set the window *background color*.<br>Ignored if *hdri* is set.
 \-\-resolution=\<width,height\>|1000, 600|Set the *window resolution*.
 \-\-position=\<x,y\>||Set the *window position* (top left corner) , in pixels, starting from the top left of your screens.
 -z, \-\-fps||Display a rendering *frame per second counter*.
 -n, \-\-filename||Display the *name of the file* on top of the window.
 -m, \-\-metadata||Display the *metadata*.
-\-\-hdri-skybox||Show the HDRI as a skybox. Overrides \-\-bg-color and \-\-no-background.
+\-\-hdri-skybox||Show the HDRI as a skybox. Overrides \-\-background-color and \-\-no-background.
 -u, \-\-blur-background||Blur background.<br>Useful with a HDRI skybox.
 \-\-blur-coc|20|Blur circle of confusion radius.
 \-\-light-intensity|1.0|*Adjust the intensity* of every light in the scene.
