@@ -109,7 +109,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "scalar-coloring", "model.scivis.enable" },
   { "coloring-array", "model.scivis.array_name" },
   { "light-intensity", "render.light.intensity" },
-  { "comp", "model.scivis.component" },
+  { "coloring-component", "model.scivis.component" },
   { "cells", "model.scivis.cells" },
   { "range", "model.scivis.range" },
   { "bar", "ui.scalar_bar" },

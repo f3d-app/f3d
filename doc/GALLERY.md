@@ -21,7 +21,7 @@ Images and videos displayed below use public datasets, you can download them [he
 
 <img src="https://user-images.githubusercontent.com/3129530/194735272-5bcd3e7c-a333-41f5-8066-9b0bec9885e8.png" width="700">
 
-*Direct scalars rendering of a point cloud*: `f3d Carola_PointCloud.ply --point-size=0 --comp=-2 -sofj --coloring-array=RGBA --up=+Z --hdri-file=venice_sunset_8k.hdr`
+*Direct scalars rendering of a point cloud*: `f3d Carola_PointCloud.ply --point-size=0 --coloring-component=-2 -sofj --coloring-array=RGBA --up=+Z --hdri-file=venice_sunset_8k.hdr`
 
 <img src="https://user-images.githubusercontent.com/3129530/194735378-b8be4df2-e030-4d13-b12f-24806cbb385b.png" width="700">
 
@@ -37,7 +37,7 @@ Images and videos displayed below use public datasets, you can download them [he
 
 <img src="https://user-images.githubusercontent.com/3129530/194735416-3f386437-456c-4145-9b5e-6bb6451d7e9a.png" width="700">
 
-*Showcase of interactive widgets*: `f3d dragon.vtu -xtganse --comp=0`
+*Showcase of interactive widgets*: `f3d dragon.vtu -xtganse --coloring-component=0`
 
 <img src="https://user-images.githubusercontent.com/3129530/194735370-4d1f067c-704c-4118-9d94-c1adf4039c39.png" width="700">
 

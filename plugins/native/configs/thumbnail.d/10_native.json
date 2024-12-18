@@ -27,7 +27,7 @@
   "options":
   {
     "scalar-coloring": true,
-    "comp": "-2",
+    "coloring-component": "-2",
     "translucency-support": true
   }
 },
@@ -40,7 +40,7 @@
     "point-sprites-type": "gaussian",
     "scalar-coloring": true,
     "coloring-array": "color",
-    "comp": "-2",
+    "coloring-component": "-2",
     "up": "-Y",
     "camera-position": "0,1,-5.2",
     "camera-focal-point": "0,1,0",
