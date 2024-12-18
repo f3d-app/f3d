@@ -490,13 +490,44 @@ public:
 
               try
               {
-                // Assume this is a libf3d option and set the value
-                libOptions.setAsString(libf3dOptionName, value);
-
-                // Log the option if needed
-                if (logOptions)
+                if (value == "default")
                 {
-                  loggingMap.emplace(libf3dOptionName, std::tuple(key, source, pattern, value));
+                  // Use reset to handle both resetting to default or unsetting
+                  libOptions.reset(libf3dOptionName);
+
+                  if (logOptions)
+                  {
+                    loggingMap.emplace(
+                      libf3dOptionName, std::tuple(key, source, pattern, "default (reset)"));
+                  }
+                }
+                else
+                {
+                  // Assume this is a libf3d option and set the value
+                  libOptions.setAsString(libf3dOptionName, value);
+
+                  // Log the option if needed
+                  if (logOptions)
+                  {
+                    loggingMap.emplace(libf3dOptionName, std::tuple(key, source, pattern, value));
+                  }
+                }
+              }
+              catch (const f3d::options::inexistent_exception&)
+              {
+                std::string origin =
+                  source.empty() ? pattern : source.string() + ":`" + pattern + "`";
+                if (value == "default")
+                {
+                  f3d::log::warn(
+                    "Attempted to reset non-existent option: '", key, "' from ", origin);
+                }
+                else
+                {
+                  auto [closestName, dist] =
+                    F3DOptionsTools::GetClosestOption(libf3dOptionName, true);
+                  f3d::log::warn("'", key, "' option from ", origin,
+                    " does not exists , did you mean '", closestName, "'?");
                 }
               }
               catch (const f3d::options::parsing_exception& ex)
@@ -505,15 +536,6 @@ public:
                   source.empty() ? pattern : source.string() + ":`" + pattern + "`";
                 f3d::log::warn("Could not set '", key, "' to '", value, "' from ", origin,
                   " because: ", ex.what());
-              }
-              catch (const f3d::options::inexistent_exception&)
-              {
-                std::string origin =
-                  source.empty() ? pattern : source.string() + ":`" + pattern + "`";
-                auto [closestName, dist] =
-                  F3DOptionsTools::GetClosestOption(libf3dOptionName, true);
-                f3d::log::warn("'", key, "' option from ", origin,
-                  " does not exists , did you mean '", closestName, "'?");
               }
             }
           }
