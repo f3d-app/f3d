@@ -66,7 +66,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "progress", "ui.loader_progress" },
   { "animation-progress", "ui.animation_progress" },
   { "up", "scene.up_direction" },
-  { "axis", "interactor.axis" },
+  { "axis", "ui.axis" },
   { "grid", "render.grid.enable" },
   { "grid-absolute", "render.grid.absolute" },
   { "grid-unit", "render.grid.unit" },

@@ -34,8 +34,8 @@ scene.camera.orthographic|bool<br>optional<br>load|Set to true to force orthogra
 
 Option|Type<br>Default<br>Trigger|Description|F3D option
 :---:|:---:|:---|:---:
-interactor.axis|bool<br>false<br>render|Show *axes* as a trihedron in the scene.|\-\-axis
 interactor.trackball|bool<br>false<br>render|Enable trackball interaction.|\-\-trackball
+interactor.invert_zoom|bool<br>false<br>render|Invert the zoom direction.|\-\-invert-zoom
 
 ## Model Options
 
@@ -97,6 +97,7 @@ render.light.intensity|double<br>1.0<br>render|Adjust the intensity of every lig
 
 Option|Type<br>Default<br>Trigger|Description|F3D option
 :---:|:---:|:---|:---:
+ui.axis|bool<br>false<br>render|Show *axes* as a trihedron in the scene.|\-\-axis
 ui.scalar_bar|bool<br>false<br>render|Show *scalar bar* of the coloring by data array.|\-\-bar
 ui.cheatsheet|bool<br>false<br>render|Show a interactor cheatsheet
 ui.console|bool<br>false<br>render|Show the console

@@ -961,7 +961,7 @@ f3d_test(NAME TestVerboseNonExistentFont DATA suzanne.ply ARGS -n --font-file=${
 
 # Test scalar rendering without any array
 f3d_test(NAME TestVerboseOptionsCLI ARGS -x --verbose=debug REGEXP "'axis' = '1' from CLI options" NO_BASELINE)
-f3d_test(NAME TestVerboseOptionsConfig ARGS --verbose=debug CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json REGEXP "'interactor.axis' = 'true'" NO_BASELINE)
+f3d_test(NAME TestVerboseOptionsConfig ARGS --verbose=debug CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json REGEXP "'ui.axis' = 'true'" NO_BASELINE)
 
 # Test quiet with a non existent file
 f3d_test(NAME TestQuietNonExistentFile DATA nonExistentFile.vtp ARGS --verbose=quiet --no-render REGEXP_FAIL "File .*nonExistentFile.vtp does not exist")

@@ -1411,7 +1411,7 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate, bool minima
     options.ui.fps = false;
     options.ui.metadata = false;
     options.ui.animation_progress = false;
-    options.interactor.axis = false;
+    options.ui.axis = false;
     options.render.grid.enable = false;
     noBackground = true;
   }

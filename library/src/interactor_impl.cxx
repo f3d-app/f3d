@@ -898,7 +898,7 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "A"}, "toggle render.effect.anti_aliasing","Scene", std::bind(docTgl, "Toggle anti-aliasing", std::cref(opts.render.effect.anti_aliasing)));
   this->addBinding({mod_t::NONE, "T"}, "toggle render.effect.tone_mapping","Scene", std::bind(docTgl, "Toggle tone mapping", std::cref(opts.render.effect.tone_mapping)));
   this->addBinding({mod_t::NONE, "E"}, "toggle render.show_edges","Scene", std::bind(docTglOpt, "Toggle edges display", std::cref(opts.render.show_edges)));
-  this->addBinding({mod_t::NONE, "X"}, "toggle interactor.axis","Scene", std::bind(docTgl, "Toggle axes display", std::cref(opts.interactor.axis)));
+  this->addBinding({mod_t::NONE, "X"}, "toggle ui.axis","Scene", std::bind(docTgl, "Toggle axes display", std::cref(opts.ui.axis)));
   this->addBinding({mod_t::NONE, "G"}, "toggle render.grid.enable","Scene", std::bind(docTgl, "Toggle grid display", std::cref(opts.render.grid.enable)));
 #if F3D_MODULE_UI
   this->addBinding({mod_t::NONE, "N"}, "toggle ui.filename","Scene", std::bind(docTgl, "Toggle filename display", std::cref(opts.ui.filename)));

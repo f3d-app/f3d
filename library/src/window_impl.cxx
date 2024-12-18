@@ -377,7 +377,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->UpdateLights();
 
   const options& opt = this->Internals->Options;
-  renderer->ShowAxis(opt.interactor.axis);
+  renderer->ShowAxis(opt.ui.axis);
   renderer->SetUseTrackball(opt.interactor.trackball);
   renderer->SetInvertZoom(opt.interactor.invert_zoom);
 
