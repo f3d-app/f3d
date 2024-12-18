@@ -5,8 +5,8 @@
 
 #ifndef vtkF3DQuakeMDLImporter_h
 #define vtkF3DQuakeMDLImporter_h
-#include <vtkF3DImporter.h>
 #include "vtkF3DQuakeMDLImporterConstants.h"
+#include <vtkF3DImporter.h>
 
 class vtkF3DQuakeMDLImporter : public vtkF3DImporter
 {
@@ -47,8 +47,6 @@ public:
    */
   std::string GetOutputsDescription() override;
 
-
-
   /**
    * Get temporal information for the currently enabled animation.
    */
@@ -87,8 +85,6 @@ private:
   std::string FileName;
 
   std::unique_ptr<vtkInternals> Internals;
-
 };
-
 
 #endif
