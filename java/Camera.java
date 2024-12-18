@@ -8,9 +8,9 @@ public class Camera {
 
     public native void dolly(double val);
     public native void roll(double angle);
-    public native void azimuth(double angle);
-    public native void yaw(double angle);
-    public native void elevation(double angle);
+    public native void addAzimuth(double angle);
+    public native void addYaw(double angle);
+    public native void addElevation(double angle);
     public native void pitch(double angle);
 
     public native double[] getFocalPoint();
