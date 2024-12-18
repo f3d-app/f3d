@@ -22,7 +22,7 @@ A typical config file with options may look like this:
 {
   "options":
   {
-     "bg-color": "0.7,0.7,0.7",
+     "background-color": "0.7,0.7,0.7",
      "color": "0.5,0.1,0.1",
      "anti-aliasing": true,
      "timer": true,

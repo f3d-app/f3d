@@ -100,7 +100,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "emissive-factor", "model.emissive.factor" },
   { "texture-normal", "model.normal.texture" },
   { "normal-scale", "model.normal.scale" },
-  { "bg-color", "render.background.color" },
+  { "background-color", "render.background.color" },
   { "fps", "ui.fps" },
   { "filename", "ui.filename" },
   { "metadata", "ui.metadata" },

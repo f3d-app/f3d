@@ -121,7 +121,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       {"texture-normal", "", "Path to a texture file that sets the normal map of the object", "<file path>", ""},
       {"normal-scale", "", "Normal scale affects the strength of the normal deviation from the normal texture", "<normalScale>", ""} } },
   {"Window",
-    { {"bg-color", "", "Background color", "<R,G,B>", ""},
+    { {"background-color", "", "Background color", "<R,G,B>", ""},
       {"resolution", "", "Window resolution", "<width,height>", ""},
       {"position", "", "Window position", "<x,y>", ""},
       {"fps", "z", "Display rendering frame per second", "<bool>", "1"},

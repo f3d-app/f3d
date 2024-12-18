@@ -58,7 +58,7 @@
     "scalar-coloring": true,
     "coloring-array": "color",
     "comp": "-2",
-    "bg-color": "0, 0, 0",
+    "background-color": "0, 0, 0",
     "up": "-Y",
     "trackball": true,
     "camera-position": "0,1,-5.2",
