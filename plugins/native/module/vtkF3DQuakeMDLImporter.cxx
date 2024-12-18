@@ -1,5 +1,4 @@
 #include "vtkF3DQuakeMDLImporter.h"
-#include <vtkImporter.h>
 #include <vtkActorCollection.h>
 #include <vtkAnimationScene.h>
 #include <vtkCamera.h>
@@ -73,18 +72,18 @@ public:
     std::vector<mixed_pointer_array> skins = std::vector<mixed_pointer_array>(nbSkins);
     for (int i = 0; i < nbSkins; i++)
     {
-      int* group = (int*) (buffer.data() + offset);
+      int* group = (int*)(buffer.data() + offset);
       if (*group == 0)
       {
         skins[i].group = 0;
-        skins[i].skin = (unsigned char*) (buffer.data() + 4 + offset);
+        skins[i].skin = (unsigned char*)(buffer.data() + 4 + offset);
         offset += 4 + (skinWidth) * (skinHeight);
       }
       else
       {
         skins[i].group = 1;
-        int nb = *(int*) (buffer.data() + offset + 4);
-        skins[i].skin = (unsigned char*) (buffer.data() + 4 + nb * 4 + offset);
+        int nb = *(int*)(buffer.data() + offset + 4);
+        skins[i].skin = (unsigned char*)(buffer.data() + 4 + nb * 4 + offset);
         offset += 4 + nb * 4 + nb * (skinWidth) * (skinHeight);
       }
     }
@@ -98,8 +97,8 @@ public:
     {
       for (int j = 0; j < skinWidth; j++)
       {
-        unsigned char index = *(unsigned char*) (selectedSkin + i * skinWidth + j);
-        unsigned char* ptr = (unsigned char*) (img->GetScalarPointer(j, i, 0));
+        unsigned char index = *(unsigned char*)(selectedSkin + i * skinWidth + j);
+        unsigned char* ptr = (unsigned char*)(img->GetScalarPointer(j, i, 0));
         ptr[0] = F3DMDLDefaultColorMap[index][0]; // R
         ptr[1] = F3DMDLDefaultColorMap[index][1]; // G
         ptr[2] = F3DMDLDefaultColorMap[index][2]; // B
@@ -140,7 +139,7 @@ public:
       int s;
       int t;
     };
-    mdl_texcoord_t* texcoords = (mdl_texcoord_t*) (buffer.data() + offset);
+    mdl_texcoord_t* texcoords = (mdl_texcoord_t*)(buffer.data() + offset);
     offset += 12 * header->numVertices;
     // Read triangles
     struct mdl_triangle_t
@@ -148,7 +147,7 @@ public:
       int facesfront; /* 0 = backface, 1 = frontface */
       int vertex[3];  /* vertex indices */
     };
-    mdl_triangle_t* triangles = (mdl_triangle_t*) (buffer.data() + offset);
+    mdl_triangle_t* triangles = (mdl_triangle_t*)(buffer.data() + offset);
     offset += 16 * header->numTriangles;
     // Read frames
     struct mdl_vertex_t // 4 bytes
@@ -173,24 +172,24 @@ public:
     std::vector<plugin_frame_pointer> framePtr = std::vector<plugin_frame_pointer>(header->numFrames);
     for (int i = 0; i < header->numFrames; i++)
     {
-      int* type = (int*) (buffer.data() + offset);
+      int* type = (int*)(buffer.data() + offset);
       if (*type == 0)
       {
         framePtr[i].type = type;
         framePtr[i].nb = nullptr;
         framePtr[i].time = nullptr;
-        framePtr[i].frames = (mdl_simpleframe_t*) (buffer.data() + 4 + offset);
+        framePtr[i].frames = (mdl_simpleframe_t*)(buffer.data() + 4 + offset);
         offset += 4 + 24 + 4 * (header->numVertices);
       }
       else
       {
         framePtr[i].type = type;
-        framePtr[i].nb = (int*) (buffer.data() + 4 + offset);
+        framePtr[i].nb = (int*)(buffer.data() + 4 + offset);
         // mdl_vertex_t* min = reinterpret_cast<mdl_vertex_t*>(buffer.data() + 8 + offset);
         // mdl_vertex_t* max = reinterpret_cast<mdl_vertex_t*>(buffer.data() + 12 + offset);
         // float* time = framePtr[i].time = reinterpret_cast<float*>(buffer.data() + 16 + offset);
         framePtr[i].frames =
-          (mdl_simpleframe_t*) (buffer.data() + 16 + 4 * (*framePtr[i].nb) + offset);
+          (mdl_simpleframe_t*)(buffer.data() + 16 + 4 * (*framePtr[i].nb) + offset);
         offset += 16 + (*framePtr[i].nb) * 4;
         for (int j = 0; j < *framePtr[i].nb; j++)
         {
@@ -211,14 +210,12 @@ public:
       float t;
       int id;
     };
-    std::vector<plugin_texture_coords> coords = std::vector<plugin_texture_coords>(header->numTriangles * 3);
+    std::vector<plugin_texture_coords> coords =
+      std::vector<plugin_texture_coords>(header->numTriangles * 3);
     for (int i = 0; i < header->numTriangles; i++)
     {
-      vtkIdType vertexNum[3];
       for (int j = 0; j < 3; j++)
       {
-        vertexNum[j] = triangles[i].vertex[j];
-        // int onseam_correct = 1;
         float s = texcoords[triangles[i].vertex[j]].s;
         float t = texcoords[triangles[i].vertex[j]].t;
         if (!triangles[i].facesfront && texcoords[triangles[i].vertex[j]].onseam)
@@ -267,7 +264,8 @@ public:
             vertices->InsertPoint(i * 3 + j, v);
             int normalIndex = selectedFrame.frames->verts[vertexNum[j]].normalIndex;
             normals->SetTuple3(i * 3 + j, F3DMDLNormalVectors[normalIndex][0] / 255.0,
-              F3DMDLNormalVectors[normalIndex][1] / 255.0, F3DMDLNormalVectors[normalIndex][2] / 255.0);
+              F3DMDLNormalVectors[normalIndex][1] / 255.0,
+              F3DMDLNormalVectors[normalIndex][2] / 255.0);
           }
         }
         vtkNew<vtkPolyData> mesh;
@@ -298,7 +296,7 @@ public:
           NumberOfAnimations++;
           AnimationNames.emplace_back(meshName);
         }
-        GroupAndTimeVal.emplace_back(std::make_pair( frameIndex, 0.0 ));
+        GroupAndTimeVal.emplace_back(std::make_pair(frameIndex, 0.0));
       }
       else
       {
@@ -320,7 +318,8 @@ public:
               vertices->InsertPoint(i * 3 + j, v);
               int normalIndex = selectedFrame.frames[groupFrameNum].verts[vertexNum[j]].normalIndex;
               normals->SetTuple3(i * 3 + j, F3DMDLNormalVectors[normalIndex][0] / 255.0,
-                F3DMDLNormalVectors[normalIndex][1] / 255.0, F3DMDLNormalVectors[normalIndex][2] / 255.0);
+                F3DMDLNormalVectors[normalIndex][1] / 255.0,
+                F3DMDLNormalVectors[normalIndex][2] / 255.0);
             }
           }
           vtkNew<vtkPolyData> mesh;
@@ -413,7 +412,7 @@ public:
   //----------------------------------------------------------------------------
   void UpdateTimeStep(double timeValue)
   {
-    int frameIndex = (int) floor(FrameRate * abs(timeValue)) % (int)ActiveFrames.size();
+    int frameIndex = (int)floor(FrameRate * abs(timeValue)) % (int)ActiveFrames.size();
     int currentFrame = ActiveFrames[frameIndex];
     Mapper->SetInputData(Mesh[currentFrame]);
     LastRenderTime = timeValue;
@@ -430,9 +429,9 @@ public:
       std::find_if(GroupAndTimeVal.begin(), GroupAndTimeVal.end(),
       [animationIndex](const std::pair<int, float> pair)
       { return pair.first > animationIndex; }));
-    firstFrameIndex = firstFrameIndex <= GroupAndTimeVal.size() ? firstFrameIndex : 0;
+    firstFrameIndex = firstFrameIndex <= (int)GroupAndTimeVal.size() ? firstFrameIndex : 0;
     lastFrameIndex =
-      lastFrameIndex <= GroupAndTimeVal.size() ? lastFrameIndex - 1 : lastFrameIndex;
+      lastFrameIndex <= (int)GroupAndTimeVal.size() ? lastFrameIndex - 1 : lastFrameIndex;
     for (int i = firstFrameIndex; i <= lastFrameIndex; i++)
     {
       ActiveFrames.emplace_back(i);
@@ -451,14 +450,16 @@ public:
       std::find_if(GroupAndTimeVal.begin(), GroupAndTimeVal.end(),
         [animationIndex](const std::pair<int, float> pair)
         { return pair.first > animationIndex; }));
-    firstFrameIndex = firstFrameIndex <= GroupAndTimeVal.size() ? firstFrameIndex : 0;
-    lastFrameIndex = lastFrameIndex <= GroupAndTimeVal.size() ? lastFrameIndex - 1 : lastFrameIndex;
+    firstFrameIndex = firstFrameIndex <= (int)GroupAndTimeVal.size() ? firstFrameIndex : 0;
+    lastFrameIndex = lastFrameIndex <= (int)GroupAndTimeVal.size() ? lastFrameIndex - 1 : lastFrameIndex;
     for (int i = firstFrameIndex; i <= lastFrameIndex; i++)
     {
-      ActiveFrames.erase(std::remove(ActiveFrames.begin(), ActiveFrames.end(), i), ActiveFrames.end());
+      ActiveFrames.erase(
+        std::remove(ActiveFrames.begin(), ActiveFrames.end(), i), ActiveFrames.end());
     }
     ActiveAnimationId.erase(
-      std::remove(ActiveAnimationId.begin(), ActiveAnimationId.end(), animationIndex), ActiveAnimationId.end());
+      std::remove(ActiveAnimationId.begin(), ActiveAnimationId.end(), animationIndex),
+      ActiveAnimationId.end());
   }
 
   //----------------------------------------------------------------------------
@@ -543,7 +544,7 @@ vtkIdType vtkF3DQuakeMDLImporter::GetNumberOfAnimations()
 //----------------------------------------------------------------------------
 std::string vtkF3DQuakeMDLImporter::GetAnimationName(vtkIdType animationIndex)
 {
-  if (animationIndex < (int) this->Internals->AnimationNames.size())
+  if (animationIndex < (int)this->Internals->AnimationNames.size())
   {
     return this->Internals->AnimationNames[animationIndex];
   }
@@ -568,17 +569,17 @@ void vtkF3DQuakeMDLImporter::DisableAnimation(vtkIdType animationIndex)
 //----------------------------------------------------------------------------
 bool vtkF3DQuakeMDLImporter::IsAnimationEnabled(vtkIdType animationIndex)
 {
-  return std::count(this->Internals->ActiveAnimationId.begin(), this->Internals->ActiveAnimationId.end(), animationIndex) > 0;
+  return std::count(this->Internals->ActiveAnimationId.begin(),
+    this->Internals->ActiveAnimationId.end(), animationIndex) > 0;
 }
 
 //----------------------------------------------------------------------------
-bool vtkF3DQuakeMDLImporter::GetTemporalInformation(vtkIdType animationIndex,
-  double frameRate, int& nbTimeSteps, double timeRange[2],
-  vtkDoubleArray* vtkNotUsed(timeSteps))
+bool vtkF3DQuakeMDLImporter::GetTemporalInformation(vtkIdType animationIndex, double frameRate,
+  int& nbTimeSteps, double timeRange[2], vtkDoubleArray* vtkNotUsed(timeSteps))
 {
   Internals->SetFrameRate(frameRate);
   Internals->GetTimeRange(animationIndex, timeRange);
-  nbTimeSteps = (int) Internals->ActiveFrames.size();
+  nbTimeSteps = (int)Internals->ActiveFrames.size();
   return true;
 }
 
