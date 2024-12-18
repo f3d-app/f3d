@@ -15,7 +15,7 @@ The libf3d provides a few commands, many related to manipulating libf3d (options
 
 `set option.name values`: A command to set a libf3d option, eg: `set scene.up.direction +Z` or `set render.hdri.file "/path/to/file with spaces.png"`
 
-`toggle option.name`: A command to toggle a boolean libf3d option, eg: `toggle ui.scalar_bar`. 
+`toggle option.name`: A command to toggle a boolean libf3d option, eg: `toggle ui.scalar_bar`.
 
 `reset option.name`: A command to reset a libf3d option to its default values, eg: `reset render.background.blur.coc`.
 
@@ -23,11 +23,11 @@ The libf3d provides a few commands, many related to manipulating libf3d (options
 
 `cycle_animation`:  A specific command to cycle `scene.animation.index` option using model information, No argument.
 
-`cycle_coloring field/array/component`:  A specific command to manipulate scivis options using model information. 
+`cycle_coloring field/array/component`:  A specific command to manipulate scivis options using model information.
 Supports `field`, `array` or `component` arguments, see [documentation](INTERACTIONS.md#cycling-coloring).
 eg: `cycle_coloring array`.
 
-`roll_camera value`: A specific command to roll the camera on its side, takes an angle in degrees as an argument. 
+`roll_camera value`: A specific command to roll the camera on its side, takes an angle in degrees as an argument.
 eg: `roll_camera 120`.
 
 `increase_light_intensity`: A specific command to increase light intensity. No argument.
@@ -56,9 +56,9 @@ The F3D application provides a few more commands.
 
 `exit`: A specific command to quit the application. No argument.
 
-`load_previous_file_group`: A specific command to load the previous file or file group. No argument.
+`load_previous_file_group [keep_camera]`: A specific command to load the previous file or file group. Camera state is kept if `keep_camera` is true (default: false).
 
-`load_next_file_group`: A specific command to load the next file or file group. No argument.
+`load_next_file_group [keep_camera]`: A specific command to load the next file or file group. No argument. Camera state is kept if `keep_camera` is true (default: false).
 
 `reload_current_file_group`: A specific command to reload the current file or file group. No argument.
 
