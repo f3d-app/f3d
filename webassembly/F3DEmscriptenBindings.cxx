@@ -112,7 +112,7 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function("resetCamera", &resetCamera, emscripten::return_value_policy::reference());
 
   // f3d::interactor
-  emscripten::class_<f3d::interactor>("Interactor").function("start", &f3d::interactor::start);
+  emscripten::class_<f3d::interactor>("Interactor").function("start", &start, emscripten::return_value_policy::reference());
 
   // f3d::engine
   emscripten::class_<f3d::engine> engine("Engine");
