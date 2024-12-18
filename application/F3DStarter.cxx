@@ -489,6 +489,7 @@ public:
               }
 
               try
+              try
               {
                 if (value == "default")
                 {
