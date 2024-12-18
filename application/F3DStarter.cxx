@@ -487,8 +487,6 @@ public:
               {
                 libf3dOptionName = std::string(libf3dIter->second);
               }
-
-              try
               try
               {
                 if (value == "default")
