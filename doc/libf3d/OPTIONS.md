@@ -89,7 +89,7 @@ render.hdri.file|string<br>optional<br>render|Set the *HDRI* image that can be u
 render.hdri.ambient|bool<br>false<br>render|Light the scene using the *HDRI* image as ambient lighting<br>The environment act as a light source and is reflected on the material.|\-\-hdri-ambient
 render.background.color|vector\<double\><br>0.2,0.2,0.2<br>render|Set the window *background color*.<br>Ignored if a *hdri* skybox is used.|\-\-background-color
 render.background.skybox|bool<br>false<br>render|Show the *HDRI* image as a skybox<br>Overrides the the background color if any|\-\-hdri-skybox
-render.background.blur|bool<br>false<br>render|Blur background, useful with a skybox.|\-\-blur-background
+render.background.blur.enable|bool<br>false<br>render|Blur background, useful with a skybox.|\-\-blur-background
 render.background.blur.coc|double<br>20.0<br>render|Blur background circle of confusion radius.|\-\-blur-coc
 render.light.intensity|double<br>1.0<br>render|Adjust the intensity of every light in the scene.|\-\-light-intensity
 

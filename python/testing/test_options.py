@@ -12,7 +12,7 @@ def test_closest_option():
 def test_setitem():
     options = f3d.Options()
     options["interactor.axis"] = False
-    options["render.background.blur_coc"] = 33.33
+    options["render.background.blur.coc"] = 33.33
     options["scene.animation.speed_factor"] = 3.3
     options["render.raytracing.samples"] = 5
     options["render.grid.color"] = [1.0, 1.0, 1.0]
@@ -24,7 +24,7 @@ def test_getitem():
     options = engine.options
 
     assert options["interactor.axis"] is False
-    assert options["render.background.blur_coc"] == 20.0
+    assert options["render.background.blur.coc"] == 20.0
     assert options["scene.animation.speed_factor"] == 1.0
     assert options["render.raytracing.samples"] == 5
     assert options["render.grid.color"] == [0.0, 0.0, 0.0]

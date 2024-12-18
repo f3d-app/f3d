@@ -413,8 +413,8 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetFinalShader(opt.render.effect.final_shader);
 
   renderer->SetBackground(opt.render.background.color.data());
-  renderer->SetUseBlurBackground(opt.render.background.blur);
-  renderer->SetBlurCircleOfConfusionRadius(opt.render.background.blur_coc);
+  renderer->SetUseBlurBackground(opt.render.background.blur.enable);
+  renderer->SetBlurCircleOfConfusionRadius(opt.render.background.blur.coc);
   renderer->SetLightIntensity(opt.render.light.intensity);
 
   renderer->SetHDRIFile(opt.render.hdri.file);
