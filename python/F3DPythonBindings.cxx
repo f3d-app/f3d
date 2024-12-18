@@ -294,6 +294,15 @@ PYBIND11_MODULE(pyf3d, module)
     .def("load_animation_time", &f3d::scene::loadAnimationTime)
     .def("animation_time_range", &f3d::scene::animationTimeRange);
 
+  py::class_<f3d::camera_state_t>(module, "CameraState")
+    .def(py::init<>())
+    .def(py::init<const f3d::point3_t&, const f3d::point3_t&, const f3d::vector3_t&,
+      const f3d::angle_deg_t&>())
+    .def_readwrite("pos", &f3d::camera_state_t::pos)
+    .def_readwrite("foc", &f3d::camera_state_t::foc)
+    .def_readwrite("up", &f3d::camera_state_t::up)
+    .def_readwrite("angle", &f3d::camera_state_t::angle);
+
   // f3d::camera
   py::class_<f3d::camera, std::unique_ptr<f3d::camera, py::nodelete>> camera(module, "Camera");
   camera //
@@ -319,15 +328,6 @@ PYBIND11_MODULE(pyf3d, module)
     .def("set_current_as_default", &f3d::camera::setCurrentAsDefault)
     .def("reset_to_default", &f3d::camera::resetToDefault)
     .def("reset_to_bounds", &f3d::camera::resetToBounds, py::arg("zoom_factor") = 0.9);
-
-  py::class_<f3d::camera_state_t>(module, "CameraState")
-    .def(py::init<>())
-    .def(py::init<const f3d::point3_t&, const f3d::point3_t&, const f3d::vector3_t&,
-      const f3d::angle_deg_t&>())
-    .def_readwrite("pos", &f3d::camera_state_t::pos)
-    .def_readwrite("foc", &f3d::camera_state_t::foc)
-    .def_readwrite("up", &f3d::camera_state_t::up)
-    .def_readwrite("angle", &f3d::camera_state_t::angle);
 
   // f3d::window
   py::class_<f3d::window, std::unique_ptr<f3d::window, py::nodelete>> window(module, "Window");
@@ -366,6 +366,28 @@ PYBIND11_MODULE(pyf3d, module)
       "Get world coordinate point from display coordinate")
     .def("get_display_from_world", &f3d::window::getDisplayFromWorld,
       "Get display coordinate point from world coordinate");
+
+  // libInformation
+  py::class_<f3d::engine::libInformation>(module, "LibInformation")
+    .def_readonly("version", &f3d::engine::libInformation::Version)
+    .def_readonly("version_full", &f3d::engine::libInformation::VersionFull)
+    .def_readonly("build_date", &f3d::engine::libInformation::BuildDate)
+    .def_readonly("build_system", &f3d::engine::libInformation::BuildSystem)
+    .def_readonly("compiler", &f3d::engine::libInformation::Compiler)
+    .def_readonly("modules", &f3d::engine::libInformation::Modules)
+    .def_readonly("vtk_version", &f3d::engine::libInformation::VTKVersion)
+    .def_readonly("copyrights", &f3d::engine::libInformation::Copyrights)
+    .def_readonly("license", &f3d::engine::libInformation::License);
+
+  // readerInformation
+  py::class_<f3d::engine::readerInformation>(module, "ReaderInformation")
+    .def_readonly("name", &f3d::engine::readerInformation::Name)
+    .def_readonly("description", &f3d::engine::readerInformation::Description)
+    .def_readonly("extensions", &f3d::engine::readerInformation::Extensions)
+    .def_readonly("mime_types", &f3d::engine::readerInformation::MimeTypes)
+    .def_readonly("plugin_name", &f3d::engine::readerInformation::PluginName)
+    .def_readonly("has_scene_reader", &f3d::engine::readerInformation::HasSceneReader)
+    .def_readonly("has_geometry_reader", &f3d::engine::readerInformation::HasGeometryReader);
 
   // f3d::engine
   py::class_<f3d::engine> engine(module, "Engine");
@@ -406,38 +428,8 @@ PYBIND11_MODULE(pyf3d, module)
     .def_static("get_lib_info", &f3d::engine::getLibInfo, py::return_value_policy::reference)
     .def_static("get_readers_info", &f3d::engine::getReadersInfo);
 
-  // libInformation
-  py::class_<f3d::engine::libInformation>(module, "LibInformation")
-    .def_readonly("version", &f3d::engine::libInformation::Version)
-    .def_readonly("version_full", &f3d::engine::libInformation::VersionFull)
-    .def_readonly("build_date", &f3d::engine::libInformation::BuildDate)
-    .def_readonly("build_system", &f3d::engine::libInformation::BuildSystem)
-    .def_readonly("compiler", &f3d::engine::libInformation::Compiler)
-    .def_readonly("modules", &f3d::engine::libInformation::Modules)
-    .def_readonly("vtk_version", &f3d::engine::libInformation::VTKVersion)
-    .def_readonly("copyrights", &f3d::engine::libInformation::Copyrights)
-    .def_readonly("license", &f3d::engine::libInformation::License);
-
-  // readerInformation
-  py::class_<f3d::engine::readerInformation>(module, "ReaderInformation")
-    .def_readonly("name", &f3d::engine::readerInformation::Name)
-    .def_readonly("description", &f3d::engine::readerInformation::Description)
-    .def_readonly("extensions", &f3d::engine::readerInformation::Extensions)
-    .def_readonly("mime_types", &f3d::engine::readerInformation::MimeTypes)
-    .def_readonly("plugin_name", &f3d::engine::readerInformation::PluginName)
-    .def_readonly("has_scene_reader", &f3d::engine::readerInformation::HasSceneReader)
-    .def_readonly("has_geometry_reader", &f3d::engine::readerInformation::HasGeometryReader);
-
   // f3d::log
   py::class_<f3d::log> log(module, "Log");
-
-  log //
-    .def_static("set_verbose_level", &f3d::log::setVerboseLevel, py::arg("level"),
-      py::arg("force_std_err") = false)
-    .def_static("set_use_coloring", &f3d::log::setUseColoring)
-    .def_static("print",
-      [](f3d::log::VerboseLevel& level, const std::string& message)
-      { f3d::log::print(level, message); });
 
   py::enum_<f3d::log::VerboseLevel>(log, "VerboseLevel")
     .value("DEBUG", f3d::log::VerboseLevel::DEBUG)
@@ -446,4 +438,11 @@ PYBIND11_MODULE(pyf3d, module)
     .value("ERROR", f3d::log::VerboseLevel::ERROR)
     .value("QUIET", f3d::log::VerboseLevel::QUIET)
     .export_values();
+
+  log //
+    .def_static("set_verbose_level", &f3d::log::setVerboseLevel, py::arg("level"),
+      py::arg("force_std_err") = false)
+    .def_static("set_use_coloring", &f3d::log::setUseColoring)
+    .def_static("print", [](f3d::log::VerboseLevel& level, const std::string& message)
+      { f3d::log::print(level, message); });
 }
