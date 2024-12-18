@@ -675,6 +675,8 @@ public:
       // clang-format off
       interactor.addBinding({ mod_t::NONE, "Left" }, "load_previous_file_group", "Others", std::bind(docString, "Load previous file group"));
       interactor.addBinding({ mod_t::NONE, "Right" }, "load_next_file_group", "Others", std::bind(docString, "Load next file group"));
+      interactor.addBinding({ mod_t::CTRL, "Left" }, "load_previous_file_group true", "Others", std::bind(docString, "Load previous file group, keeping camera"));
+      interactor.addBinding({ mod_t::CTRL, "Right" }, "load_next_file_group true", "Others", std::bind(docString, "Load next file group, keeping camera"));
       interactor.addBinding({ mod_t::NONE, "Up" }, "reload_current_file_group", "Others", std::bind(docString, "Reload current file group"));
       interactor.addBinding({ mod_t::NONE, "Down" }, "add_current_directories", "Others", std::bind(docString, "Add files from dir of current file"));
       interactor.addBinding({ mod_t::NONE, "F12" }, "take_screenshot", "Others", std::bind(docString, "Take a screenshot"));
@@ -1542,11 +1544,34 @@ void F3DStarter::AddCommands()
 {
   f3d::interactor& interactor = this->Internals->Engine->getInteractor();
 
+  static const auto parse_optional_bool_flag =
+    [](const std::vector<std::string>& args, std::string_view commandName, bool defaultValue)
+  {
+    if (args.empty())
+    {
+      return defaultValue;
+    }
+    if (args.size() != 1)
+    {
+      throw std::invalid_argument{ std::string("Command: ") + std::string(commandName) +
+        " takes at most 1 argument, got " + std::to_string(args.size()) + " arguments instead." };
+    }
+    return f3d::options::parse<bool>(args[0]);
+  };
+
   interactor.addCommand("load_previous_file_group",
-    [this](const std::vector<std::string>&) { this->LoadRelativeFileGroup(-1); });
+    [this](const std::vector<std::string>& args)
+    {
+      this->LoadRelativeFileGroup(
+        -1, parse_optional_bool_flag(args, "load_previous_file_group", false));
+    });
 
   interactor.addCommand("load_next_file_group",
-    [this](const std::vector<std::string>&) { this->LoadRelativeFileGroup(+1); });
+    [this](const std::vector<std::string>& args)
+    {
+      this->LoadRelativeFileGroup(
+        +1, parse_optional_bool_flag(args, "load_next_file_group", false));
+    });
 
   interactor.addCommand("reload_current_file_group",
     [this](const std::vector<std::string>&) { this->LoadRelativeFileGroup(0, true, true); });
