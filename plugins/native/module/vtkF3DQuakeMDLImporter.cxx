@@ -128,7 +128,6 @@ public:
     float size;
   };
 
-
   //----------------------------------------------------------------------------
   void CreateMesh(std::vector<unsigned char> buffer, int offset, mdl_header_t* header)
   {
@@ -169,7 +168,8 @@ public:
       float* time;
       mdl_simpleframe_t* frames;
     };
-    std::vector<plugin_frame_pointer> framePtr = std::vector<plugin_frame_pointer>(header->numFrames);
+    std::vector<plugin_frame_pointer> framePtr =
+      std::vector<plugin_frame_pointer>(header->numFrames);
     for (int i = 0; i < header->numFrames; i++)
     {
       int* type = (int*)(buffer.data() + offset);
@@ -387,7 +387,6 @@ public:
         i++;
       }
     }
-
   }
 
   //----------------------------------------------------------------------------
@@ -427,8 +426,8 @@ public:
         { return pair.first == animationIndex; }));
     int lastFrameIndex = std::distance(GroupAndTimeVal.begin(),
       std::find_if(GroupAndTimeVal.begin(), GroupAndTimeVal.end(),
-      [animationIndex](const std::pair<int, float> pair)
-      { return pair.first > animationIndex; }));
+        [animationIndex](const std::pair<int, float> pair)
+        { return pair.first > animationIndex; }));
     firstFrameIndex = firstFrameIndex <= (int)GroupAndTimeVal.size() ? firstFrameIndex : 0;
     lastFrameIndex =
       lastFrameIndex <= (int)GroupAndTimeVal.size() ? lastFrameIndex - 1 : lastFrameIndex;
@@ -451,7 +450,8 @@ public:
         [animationIndex](const std::pair<int, float> pair)
         { return pair.first > animationIndex; }));
     firstFrameIndex = firstFrameIndex <= (int)GroupAndTimeVal.size() ? firstFrameIndex : 0;
-    lastFrameIndex = lastFrameIndex <= (int)GroupAndTimeVal.size() ? lastFrameIndex - 1 : lastFrameIndex;
+    lastFrameIndex =
+      lastFrameIndex <= (int)GroupAndTimeVal.size() ? lastFrameIndex - 1 : lastFrameIndex;
     for (int i = firstFrameIndex; i <= lastFrameIndex; i++)
     {
       ActiveFrames.erase(
@@ -570,7 +570,7 @@ void vtkF3DQuakeMDLImporter::DisableAnimation(vtkIdType animationIndex)
 bool vtkF3DQuakeMDLImporter::IsAnimationEnabled(vtkIdType animationIndex)
 {
   return std::count(this->Internals->ActiveAnimationId.begin(),
-    this->Internals->ActiveAnimationId.end(), animationIndex) > 0;
+           this->Internals->ActiveAnimationId.end(), animationIndex) > 0;
 }
 
 //----------------------------------------------------------------------------
