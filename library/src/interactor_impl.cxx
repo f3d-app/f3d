@@ -699,13 +699,16 @@ interactor& interactor_impl::initCommands()
 
   this->addCommand("print_options_info",
     [&](const std::vector<std::string>&)
-    {
-      for (auto option : this->Internals->Options.getNames())
-      {
-        std::string val = this->Internals->Options.getAsString(option);
-        std::string descr = option + ": " + val;
-        log::print(log::VerboseLevel::INFO, descr);
-      }
+    { /*void options::PrintOptionsDescription(log::VerboseLevel level)
+        {
+          for (auto option : getNames())
+          {
+            std::string val = getAsString(option);
+            std::string descr = option + ": " + val;
+            log::print(level, descr);
+          }
+        }
+        this->Internals->Options.PrintOptionsDescription(log::VerboseLevel::INFO);*/ 
     });
 
   this->addCommand("set_camera",
