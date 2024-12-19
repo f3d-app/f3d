@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "f3d"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 dynamic = ["version"]
 description = "F3D, a fast and minimalist 3D viewer"
 readme = "README.md"
