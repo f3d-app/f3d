@@ -341,14 +341,11 @@
             // Set f3d option parameter values
             const parsed_param_value = params.get(id);
             if (parsed_param_value) {
-              const new_val = parsed_param_value.toLowerCase() === 'true'; //TODO actual input validation?
-              const ui_switch = document.querySelector('#' + id); 
-              if (ui_switch) {
-                const old_val = ui_switch.checked; // let's hope this is in sync
-                if(new_val != old_val) {
-                  options.toggle(option)
-                }
-                ui_switch.checked = new_val;
+              // Let set_as_string handle value conversion and validation. 
+              options.set_as_string(option, parsed_param_value.toLowerCase())
+              // However, get_as_string returns string rather than typed value
+              const new_val = options.get_as_string(option) == 'true'; 
+              ui_switch = document.querySelector('#' + id)?.checked = new_val;
               }
             }
           }
