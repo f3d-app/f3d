@@ -11,6 +11,7 @@
 
 #include "log.h"
 #include "scene.h"
+#include "log.h"
 
 #include <memory>
 
