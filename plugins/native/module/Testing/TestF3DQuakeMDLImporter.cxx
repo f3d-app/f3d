@@ -19,5 +19,7 @@ int TestF3DQuakeMDLImporter(int vtkNotUsed(argc), char* argv[])
   }
   vtkIdType selectedAnimationIndex = 1;
   importer->EnableAnimation(selectedAnimationIndex);
-  return numAnimations == 2 ? EXIT_SUCCESS : EXIT_FAILURE;
+  std::string animationName = importer->GetAnimationName(2);
+  importer->UpdateTimeStep(0.0);
+  return numAnimations == 2 && animationName == "" ? EXIT_SUCCESS : EXIT_FAILURE;
 }
