@@ -665,30 +665,8 @@ interactor& interactor_impl::initCommands()
   this->addCommand("print_scene_info",
     [&](const std::vector<std::string>&)
     {
-      this->Internals->Window.PrintSceneDescription(log::VerboseLevel::INFO);
-    });
-
-  this->addCommand("print_coloring_info",
-    [&](const std::vector<std::string>&)
-    {
       this->Internals->Window.PrintColoringDescription(log::VerboseLevel::INFO);
-    });
-
-  this->addCommand("print_mesh_info",
-    [&](const std::vector<std::string>&)
-    {
-      this->Internals->Scene.PrintImporterDescription(log::VerboseLevel::INFO);
-    });
-
-  this->addCommand("print_options_info",
-    [&](const std::vector<std::string>&)
-    {
-      for (auto option : this->Internals->Options.getNames())
-      {
-        std::string val = this->Internals->Options.getAsString(option);
-        std::string descr = option + ": " + val;
-        log::print(log::VerboseLevel::INFO, descr);
-      }
+      this->Internals->Window.PrintSceneDescription(log::VerboseLevel::INFO);
     });
 
   this->addCommand("set_camera",
@@ -951,6 +929,7 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "H"}, "toggle ui.cheatsheet", "Others", std::bind(docStr, "Toggle cheatsheet display"));
   this->addBinding({mod_t::NONE, "Escape"}, "toggle ui.console", "Others", std::bind(docStr, "Toggle console display"));
 #endif
+  this->addBinding({mod_t::ANY, "Question"}, "print_scene_info", "Others", std::bind(docStr, "Print scene descr to terminal"));
   this->addBinding({mod_t::CTRL, "Q"}, "stop_interactor", "Others", std::bind(docStr, "Stop the interactor"));
   this->addBinding({mod_t::NONE, "Return"}, "reset_camera", "Others", std::bind(docStr, "Reset camera to initial parameters"));
   this->addBinding({mod_t::NONE, "Space"}, "toggle_animation", "Others", std::bind(docStr, "Play/Pause animation if any"));
