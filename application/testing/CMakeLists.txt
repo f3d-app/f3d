@@ -903,7 +903,7 @@ f3d_test(NAME TestCommandScriptMissingFile DATA dragon.vtu SCRIPT TestCommandScr
 f3d_test(NAME TestCommandScriptPrintScene DATA dragon.vtu SCRIPT TestCommandScriptPrintScene.txt REGEXP "Camera position: 2.23745,3.83305,507.598" NO_BASELINE) # print_scene_info
 f3d_test(NAME TestCommandScriptPrintColoring DATA dragon.vtu SCRIPT TestCommandScriptPrintColoring.txt REGEXP "Not coloring" NO_BASELINE) # print_coloring_info
 f3d_test(NAME TestCommandScriptPrintMesh DATA dragon.vtu SCRIPT TestCommandScriptPrintMesh.txt REGEXP "Number of points: 13268" NO_BASELINE) # print_mesh_info
-f3d_test(NAME TestCommandScriptPrintOptions DATA dragon.vtu SCRIPT TestCommandScriptPrintOptions.txt REGEXP "interactor.axis: false" NO_BASELINE) # print_options_info
+f3d_test(NAME TestCommandScriptPrintOptions DATA dragon.vtu SCRIPT TestCommandScriptPrintOptions.txt REGEXP "interactor.invert_zoom: false" NO_BASELINE) # print_options_info
 f3d_test(NAME TestParseOptionalBoolExtraArg DATA dragon.vtu SCRIPT TestParseOptionalBoolExtraArg.txt REGEXP "Command: load_previous_file_group takes at most 1 argument, got 2 arguments instead." NO_BASELINE)
 
 # Window position test
