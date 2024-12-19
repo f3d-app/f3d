@@ -36,12 +36,6 @@ eg: `roll_camera 120`.
 
 `print_scene_info`: A specific command to print information about the scene, No argument.
 
-`print_coloring_info`: A specific command to print information about the coloring state, No argument.
-
-`print_mesh_info`: A specific command to print information about the mesh from the importer, No argument.
-
-`print_options_info`: A specific command to print information about the current values for configuration options, No argument.
-
 `set_camera front/top/right/isometric`: A specific command to position the camera in the specified location relative to the model.
 Supports `front`, `top`, `right`, `isometric` arguments. eg: `set_camera top`.
 
