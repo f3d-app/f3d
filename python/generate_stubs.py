@@ -2,8 +2,11 @@ import re
 import subprocess
 import sys
 from argparse import ArgumentParser
+from contextlib import contextmanager
+from difflib import unified_diff
 from pathlib import Path
-from tempfile import TemporaryDirectory, gettempdir
+from tempfile import gettempdir
+from typing import Iterable
 
 
 def main():
@@ -11,33 +14,35 @@ def main():
     argparser.add_argument(
         "-o",
         "--into",
-        help="output directory for the post-processed stubs",
-        default=gettempdir(),
+        help="output directory for the post-processed stubs (default: %(default)s)",
+        default=f"{gettempdir()}/stubs",
     )
     args = argparser.parse_args()
 
-    with TemporaryDirectory() as tmp_dir:
-        run_pybind11_stubgen(tmp_dir)
-        postprocess_generated_stubs(tmp_dir, args.into)
+    stubs = run_pybind11_stubgen(Path(args.into))
+    if diff := postprocess_generated_stubs(stubs):
+        print("\n".join(diff))
 
 
-def run_pybind11_stubgen(out_dir: str):
+def run_pybind11_stubgen(out_dir: Path, module: str = "f3d"):
     stubgen_cmd = (
         # use current python interpreter to run stubs generation for the `f3d` module
-        *(sys.executable, "-m", "pybind11_stubgen", "f3d"),
+        *(sys.executable, "-m", "pybind11_stubgen", module),
         # fix enum for default values in `Image.save()` and `Image.save_buffer()`
         *("--enum-class-locations", "SaveFormat:Image"),
         # ignore `f3d.vector3_t` and `f3d.point3_t` as we dont actually map them
         # but let them auto-convert from and to `tuple[float, float, float]`
         # (all occurrences will be postprocessed later)
         *("--ignore-unresolved-names", r"f3d\.(vector3_t|point3_t)"),
-        # output in temporary directory as we're going to post process
+        # output directory so we can retrieve and post process
         *("--output-dir", out_dir),
     )
-    subprocess.check_call(stubgen_cmd)
+    with retrieve_changed_files(out_dir, f"{module}/**/*.pyi") as changed_files:
+        subprocess.check_call(stubgen_cmd)
+    return changed_files
 
 
-def postprocess_generated_stubs(stubs_dir: str, into: str):
+def postprocess_generated_stubs(filenames: Iterable[Path]):
     replacements = [
         (
             # change `point3_t` and `vector3_t` parameter annotations and return types
@@ -46,39 +51,45 @@ def postprocess_generated_stubs(stubs_dir: str, into: str):
             r"\1tuple[float, float, float]",
         ),
         (
-            # remove `point3_t` and `vector3_t` being imported `as tuple`
-            r"from builtins import tuple as (vector3_t|point3_t)[\n\r]+",
-            r"",
-        ),
-        (
-            # add missing template parameter to raw `os.PathLike` (`os.PathLike[str | bytes]`)
+            # add missing template parameter to raw `os.PathLike` (`os.PathLike[str]`)
             r"(PathLike)(?!\[)",
-            r"\1[str | bytes]",
+            r"\1[str]",
         ),
         (
             # remove `_pybind11_conduit_v1_` static methods
-            r"^\s+@staticmethod[\n\r]+\s+def _pybind11_conduit_v1_\(\*args, \*\*kwargs\):[\n\r]+\s+\.\.\.[\n\r]",
+            r"^\s+@staticmethod\s+def _pybind11_conduit_v1_\(\*args, *\*\*kwargs\):\s*\.\.\.[\n\r]",
             "",
         ),
     ]
 
-    tmp_dir = Path(stubs_dir)
-    out_dir = Path(into)
+    diff: list[str] = []
 
-    for tmp_fn in tmp_dir.glob("**/*.pyi"):
-        rel_fn = tmp_fn.relative_to(tmp_dir)
-        out_fn = out_dir / rel_fn
-        out_fn.parent.mkdir(exist_ok=True, parents=True)
-
-        src = tmp_fn.read_text()
+    for filename in filenames:
+        processed = original = filename.read_text()
         for pattern, repl in replacements:
-            src = re.sub(pattern, repl, src, flags=re.MULTILINE)
-        out_fn.write_text(src)
+            processed = re.sub(pattern, repl, processed, flags=re.MULTILINE)
+        filename.write_text(processed)
 
-        try:
-            subprocess.call(["diff", "-u", str(tmp_fn), str(out_fn)])
-        except IOError:
-            pass  # no `diff` executable
+        diff += unified_diff(
+            original.splitlines(),
+            processed.splitlines(),
+            str(filename),
+            str(filename),
+            n=1,
+            lineterm="",
+        )
+
+    return diff
+
+
+@contextmanager
+def retrieve_changed_files(directory: Path, files_glob: str):
+    mtimes = {f: f.stat().st_mtime for f in directory.glob(files_glob)}
+    changed_files: list[Path] = []
+    yield changed_files
+    changed_files += (
+        f for f in directory.glob(files_glob) if f.stat().st_mtime > mtimes.get(f, 0)
+    )
 
 
 if __name__ == "__main__":
