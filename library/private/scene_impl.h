@@ -10,7 +10,6 @@
 #define f3d_scene_impl_h
 
 #include "scene.h"
-#include "log.h"
 
 #include <memory>
 
