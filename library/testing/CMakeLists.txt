@@ -3,35 +3,49 @@ list(APPEND libf3dSDKTests_list
      TestSDKCamera.cxx
      TestSDKCompareWithFile.cxx
      TestSDKDropZone.cxx
-     TestSDKDynamicBackgroundColor.cxx
-     TestSDKDynamicFontFile.cxx
      TestSDKDynamicLightIntensity.cxx
-     TestSDKDynamicProperties.cxx
      TestSDKEngine.cxx
      TestSDKEngineExceptions.cxx
      TestSDKImage.cxx
-     TestSDKInteractorCallBack.cxx
-     TestSDKInteractorDocumentation.cxx
      TestSDKInteractorDropFullScene.cxx
      TestSDKInteractorCommand.cxx
      TestSDKSceneFromMemory.cxx
      TestSDKScene.cxx
      TestSDKLog.cxx
      TestSDKMultiColoring.cxx
-     TestSDKMultiOptions.cxx
      TestSDKOptions.cxx
      TestSDKOptionsIO.cxx
-     TestSDKRenderAndInteract.cxx
      TestSDKRenderFinalShader.cxx
      TestSDKUtils.cxx
      TestSDKWindowAuto.cxx
      TestPseudoUnitTest.cxx
 )
 
-# HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
+# Tests having UI widgets
+if(F3D_MODULE_UI)
   list(APPEND libf3dSDKTests_list
-    TestSDKDynamicHDRI.cxx
+    TestSDKConsole.cxx
+    TestSDKDynamicBackgroundColor.cxx
+    TestSDKDynamicFontFile.cxx
+    TestSDKDynamicProperties.cxx
+    TestSDKInteractorCallBack.cxx
+    TestSDKInteractorDocumentation.cxx
+    TestSDKMultiOptions.cxx
+    )
+
+  # HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
+    list(APPEND libf3dSDKTests_list
+      TestSDKDynamicHDRI.cxx
+      )
+  endif()
+endif()
+
+# These tests needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10155
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20230426)
+  list(APPEND libf3dSDKTests_list
+    TestSDKRenderAndInteract.cxx
+    TestSDKStartInteractor.cxx
     )
 endif()
 
@@ -114,6 +128,10 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240729)
   target_compile_definitions(libf3dSDKTests PRIVATE F3D_SSIM_COMPARE)
 endif()
 
+if (F3D_MODULE_EXR)
+  target_compile_definitions(libf3dSDKTests PRIVATE F3D_MODULE_EXR)
+endif ()
+
 # List tests that do not require rendering
 list(APPEND libf3dSDKTestsNoRender_list
      TestSDKEngineExceptions
@@ -142,14 +160,14 @@ Test Warning\nTest Error\nTest Error\n\
 Test Print Debug\nTest Print Info\nTest Print Warning\nTest Print Error\n\
 Test Debug Coloring")
 
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
+if(F3D_MODULE_UI AND VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   set_tests_properties(libf3d::TestSDKDynamicHDRI PROPERTIES TIMEOUT 120)
   if(NOT F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS)
     set_tests_properties(libf3d::TestSDKDynamicHDRI PROPERTIES DISABLED ON)
   endif()
 endif()
 
-if(NOT F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS)
+if(F3D_MODULE_UI AND NOT F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS)
   set_tests_properties(libf3d::TestSDKInteractorCallBack PROPERTIES DISABLED ON)
 endif()
 

@@ -1,0 +1,2 @@
+# Disabling all checks is not allowed by clang-format 14
+Checks: '-*,performance-*,-performance-no-int-to-ptr'

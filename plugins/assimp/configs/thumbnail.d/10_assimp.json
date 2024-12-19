@@ -1,16 +1,25 @@
+[
 {
-  ".*(fbx|dae|off|dxf|x|3mf)":
+  "match": ".*(fbx|dae|off|dxf|x|3mf)",
+  "options":
   {
     "load-plugins": "assimp"
-  },
-  ".*(off|3mf)":
+  }
+},
+{
+  "match": ".*(off|3mf)",
+  "options":
   {
     "up": "+Z",
     "camera-direction": "-1,1,-0.5"
-  },
-  ".*(dxf)":
+  }
+},
+{
+  "match": ".*(dxf)",
+  "options":
   {
     "up": "-Z",
     "camera-direction": "1,-1,0.5"
   }
 }
+]

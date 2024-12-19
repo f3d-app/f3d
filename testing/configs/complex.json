@@ -1,23 +1,33 @@
+[
 {
-  ".*":
+  "options":
   {
     "scalar-coloring": true,
-    "interactor.axis": true,
+    "ui.axis": true,
     "grid": true
-  },
-  ".*(vt.)":
+  }
+},
+{
+  "match": ".*(vt.)",
+  "options":
   {
     "up": "+Y",
     "bar": true,
     "render.effect.ambient_occlusion": true,
     "filename": true
-  },
-  ".*(vti)":
+  }
+},
+{
+  "match": ".*(vti)",
+  "options":
   {
     "grid": true,
     "volume": true
-  },
-  ".*(stl)":
+  }
+},
+{
+  "match": ".*(stl)",
+  "options":
   {
     "grid": true,
     "up": "+Z",
@@ -25,3 +35,4 @@
     "filename": false
   }
 }
+]

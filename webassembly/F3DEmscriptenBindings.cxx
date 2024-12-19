@@ -33,6 +33,14 @@ f3d::options& toggle(f3d::options& o, const std::string& name)
 {
   return o.toggle(name);
 }
+f3d::options& set_as_string(f3d::options& o, const std::string& name, const std::string& value)
+{
+  return o.setAsString(name, value);
+}
+std::string get_as_string(f3d::options& o, const std::string& name)
+{
+  return o.getAsString(name);
+}
 f3d::options& set_string(f3d::options& o, const std::string& name, const std::string& value)
 {
   return o.set(name, value);
@@ -69,6 +77,12 @@ f3d::window& resetCamera(f3d::window& win)
   return win;
 }
 
+f3d::interactor& start(f3d::interactor& inter)
+{
+  inter.start(1.0/30, nullptr);
+  return inter;
+}
+
 f3d::engine createEngine()
 {
   return f3d::engine::create();
@@ -79,6 +93,8 @@ EMSCRIPTEN_BINDINGS(f3d)
   // f3d::options
   emscripten::class_<f3d::options>("Options")
     .function("toggle", &toggle, emscripten::return_value_policy::reference())
+    .function("set_as_string", &set_as_string, emscripten::return_value_policy::reference())
+    .function("get_as_string", &get_as_string, emscripten::return_value_policy::reference())
     .function("set_string", &set_string, emscripten::return_value_policy::reference())
     .function("set_integer", &set_integer, emscripten::return_value_policy::reference())
     .function("set_color", &set_color, emscripten::return_value_policy::reference());
@@ -96,7 +112,7 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function("resetCamera", &resetCamera, emscripten::return_value_policy::reference());
 
   // f3d::interactor
-  emscripten::class_<f3d::interactor>("Interactor").function("start", &f3d::interactor::start);
+  emscripten::class_<f3d::interactor>("Interactor").function("start", &start, emscripten::return_value_policy::reference());
 
   // f3d::engine
   emscripten::class_<f3d::engine> engine("Engine");

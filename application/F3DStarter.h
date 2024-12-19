@@ -81,6 +81,11 @@ private:
    * - ReloadFile
    */
   void EventLoop();
+
+  /**
+   * Add F3D specific commands
+   */
+  void AddCommands();
 };
 
 #endif

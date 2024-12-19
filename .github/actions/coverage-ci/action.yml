@@ -67,6 +67,7 @@ runs:
         -DF3D_COVERAGE=ON
         -DF3D_MODULE_EXR=ON
         -DF3D_MODULE_RAYTRACING=ON
+        -DF3D_MODULE_UI=ON
         -DF3D_PLUGINS_STATIC_BUILD=OFF
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
         -DF3D_PLUGIN_BUILD_ASSIMP=ON
@@ -108,10 +109,7 @@ runs:
       working-directory: ${{github.workspace}}/source
       run: |
         lcov --base-directory . --directory . -c -o coverage.info --gcov-tool /usr/bin/gcov
-        lcov --remove coverage.info "*/dependencies/*" -o coverage.info
-        lcov --remove coverage.info "*/cxxopts.hpp" -o coverage.info
-        lcov --remove coverage.info "*/json.hpp" -o coverage.info
-        lcov --remove coverage.info "*/dmon.h" -o coverage.info
+        lcov --remove coverage.info "*/external/*" -o coverage.info
         lcov --remove coverage.info "*Test*" -o coverage.info
 
     - name: Upload coverage to Codecov

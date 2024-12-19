@@ -3,6 +3,7 @@
 
 #include "exception.h"
 #include "export.h"
+#include "log.h"
 #include "options.h"
 #include "window.h"
 
@@ -13,7 +14,6 @@
 
 namespace f3d
 {
-
 struct interaction_bind_t
 {
   /**
@@ -28,40 +28,31 @@ struct interaction_bind_t
     CTRL_SHIFT = 0x3 // 00000011
   };
 
-  ModifierKeys mod;
+  ModifierKeys mod = ModifierKeys::NONE;
   std::string inter;
 
-  bool operator<(const interaction_bind_t& bind) const
-  {
-    return this->mod < bind.mod || (this->mod == bind.mod && this->inter < bind.inter);
-  }
+  /**
+   * Operator to be able to store binds in maps and other structs
+   * Compare modifier and interaction
+   */
+  bool operator<(const interaction_bind_t& bind) const;
 
-  bool operator==(const interaction_bind_t& bind) const
-  {
-    return this->mod == bind.mod && this->inter == bind.inter;
-  }
+  /**
+   * Operator to be able to store binds in maps and other structs
+   * Compare modifier and interaction
+   */
+  bool operator==(const interaction_bind_t& bind) const;
 
   /**
    * Format this binding into a string
    * eg: "A", "Any+Question", "Shift+L".
    */
-  std::string format() const
-  {
-    switch (this->mod)
-    {
-      case ModifierKeys::CTRL_SHIFT:
-        return "Ctrl+Shift+" + this->inter;
-      case ModifierKeys::CTRL:
-        return "Ctrl+" + this->inter;
-      case ModifierKeys::SHIFT:
-        return "Shift+" + this->inter;
-      case ModifierKeys::ANY:
-        return "Any+" + this->inter;
-      default:
-        // No need to check for NONE
-        return this->inter;
-    }
-  }
+  std::string format() const;
+
+  /**
+   * Create and return an interaction bind from provided string
+   */
+  static interaction_bind_t parse(const std::string& str);
 };
 
 /**
@@ -211,17 +202,6 @@ public:
     const interaction_bind_t& bind) const = 0;
   ///@}
 
-  /**
-   * Use this method to create your own timer callback. You callback will be called once every time
-   * ms. Return an id to use in removeTimeCallBack.
-   */
-  virtual unsigned long createTimerCallBack(double time, std::function<void()> callBack) = 0;
-
-  /**
-   * Remove a previously created timer callback using the id.
-   */
-  virtual void removeTimerCallBack(unsigned long id) = 0;
-
   ///@{ @name Animation
   /**
    * Control the animation.
@@ -243,7 +223,8 @@ public:
   /**
    * Play a VTK interaction file.
    */
-  virtual bool playInteraction(const std::string& file) = 0;
+  virtual bool playInteraction(const std::string& file, double deltaTime = 1.0 / 30,
+    std::function<void()> userCallBack = nullptr) = 0;
 
   /**
    * Start interaction and record it all in a VTK interaction file.
@@ -251,14 +232,22 @@ public:
   virtual bool recordInteraction(const std::string& file) = 0;
 
   /**
-   * Start the interactor.
+   * Start the interactor event loop.
+   * The event loop will be triggered every deltaTime in seconds, and userCallBack will be called at
+   * the start of the event loop
    */
-  virtual void start() = 0;
+  virtual void start(double deltaTime = 1.0 / 30, std::function<void()> userCallBack = nullptr) = 0;
 
   /**
    * Stop the interactor.
    */
   virtual void stop() = 0;
+
+  /**
+   * Request a render to be done on the next event loop
+   * Safe to call in a multithreaded environment
+   */
+  virtual void requestRender() = 0;
 
   /**
    * An exception that can be thrown by the interactor
@@ -297,6 +286,79 @@ protected:
   interactor& operator=(interactor&& opt) = delete;
   //! @endcond
 };
+
+//----------------------------------------------------------------------------
+inline bool interaction_bind_t::operator<(const interaction_bind_t& bind) const
+{
+  return this->mod < bind.mod || (this->mod == bind.mod && this->inter < bind.inter);
+}
+
+//----------------------------------------------------------------------------
+inline bool interaction_bind_t::operator==(const interaction_bind_t& bind) const
+{
+  return this->mod == bind.mod && this->inter == bind.inter;
+}
+
+//----------------------------------------------------------------------------
+inline std::string interaction_bind_t::format() const
+{
+  switch (this->mod)
+  {
+    case ModifierKeys::CTRL_SHIFT:
+      return "Ctrl+Shift+" + this->inter;
+    case ModifierKeys::CTRL:
+      return "Ctrl+" + this->inter;
+    case ModifierKeys::SHIFT:
+      return "Shift+" + this->inter;
+    case ModifierKeys::ANY:
+      return "Any+" + this->inter;
+    default:
+      // No need to check for NONE
+      return this->inter;
+  }
+}
+
+//----------------------------------------------------------------------------
+inline interaction_bind_t interaction_bind_t::parse(const std::string& str)
+{
+  interaction_bind_t bind;
+  auto plusIt = str.find_last_of('+');
+  if (plusIt == std::string::npos)
+  {
+    bind.inter = str;
+  }
+  else
+  {
+    bind.inter = str.substr(plusIt + 1);
+
+    std::string modStr = str.substr(0, plusIt);
+    if (modStr == "Ctrl+Shift")
+    {
+      bind.mod = ModifierKeys::CTRL_SHIFT;
+    }
+    else if (modStr == "Shift")
+    {
+      bind.mod = ModifierKeys::SHIFT;
+    }
+    else if (modStr == "Ctrl")
+    {
+      bind.mod = ModifierKeys::CTRL;
+    }
+    else if (modStr == "Any")
+    {
+      bind.mod = ModifierKeys::ANY;
+    }
+    else if (modStr == "None")
+    {
+      bind.mod = ModifierKeys::NONE;
+    }
+    else
+    {
+      f3d::log::warn("Invalid modifier: ", modStr, ", ignoring modifier");
+    }
+  }
+  return bind;
+}
 }
 
 #endif

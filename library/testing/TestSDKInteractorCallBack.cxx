@@ -17,6 +17,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   f3d::window& win = eng.getWindow();
   f3d::interactor& inter = eng.getInteractor();
   win.setSize(300, 300);
+  win.render();
 
   // Sanity checks coverage
   if (inter.playInteraction(""))
@@ -66,7 +67,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   inter.removeBinding({ mod_t::NONE, "Z" });
 
   // Check that an binding can be added
-  inter.addBinding({ mod_t::NONE, "S" }, "toggle interactor.axis");
+  inter.addBinding({ mod_t::NONE, "S" }, "toggle ui.axis");
 
   // Check CTRL modifier and that another interaction can be added on the same key with another
   // modifier

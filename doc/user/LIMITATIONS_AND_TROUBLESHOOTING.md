@@ -112,6 +112,13 @@ There are too many entry in your PATH environment variable, remove the ones you 
 
 Your previous F3D installation is current being used to generate thumbnails, wait for a bit or reboot your computer before updating again.
 
+> When running F3D without interactivity (e.g. `f3d.exe --version`) from CLI, nothing is displayed.
+
+It's a limitation from the Windows "subsystem".
+You can workaround the issue by piping to a file (`f3d.exe --version > file.txt`) and read the file.
+It also seems to be working fine with (git bash console)[https://gitforwindows.org/].
+Another solution is recompiling F3D with the CMake option `F3D_WINDOWS_GUI` disabled.
+
 ## macOS
 
 > I'm unable to use the binary release, macOS complains the file is invalid or corrupted

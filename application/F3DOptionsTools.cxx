@@ -65,13 +65,16 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "no-background", "", "No background when render to file", "<bool>", "1" },
       { "help", "h", "Print help", "", "" }, { "version", "", "Print version details", "", "" },
       { "readers-list", "", "Print the list of readers", "", "" },
-      { "bindings-list", "", "Print the list of interaction bindings, ignored with `--no-render`", "", "" },
+      { "bindings-list", "", "Print the list of interaction bindings and exits, ignored with `--no-render`, only considers the first file group.", "", "" },
       { "config", "", "Specify the configuration file to use. absolute/relative path or filename/filestem to search in configuration file locations", "<filePath/filename/fileStem>", "" },
       { "dry-run", "", "Do not read the configuration file", "<bool>", "1" },
       { "no-render", "", "Do not read the configuration file", "<bool>", "1" },
       { "rendering-backend", "", "Backend to use when rendering (auto|glx|wgl|egl|osmesa)", "<string>", "" },
       { "max-size", "", "Maximum size in Mib of a file to load, negative value means unlimited", "<size in Mib>", "" },
+#if F3D_MODULE_DMON
       { "watch", "", "Watch current file and automatically reload it whenever it is modified on disk", "<bool>", "1" },
+#endif
+      { "frame-rate", "", "Frame rate used to refresh animation and other repeated tasks (watch, UI). Does not impact rendering frame rate.", "<fps>", "" },
       { "load-plugins", "", "List of plugins to load separated with a comma", "<paths or names>", "" },
       { "scan-plugins", "", "Scan standard directories for plugins and display available plugins (result can be incomplete)", "", "" },
       { "screenshot-filename", "", "Screenshot filename", "<filename>", "" } } },
@@ -94,8 +97,8 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "animation-index", "", "Select animation to show", "<index>", "" },
       { "animation-speed-factor", "", "Set animation speed factor", "<factor>", "" },
       { "animation-time", "", "Set animation time to load", "<time>", "" },
-      {"animation-frame-rate", "", "Set animation frame rate when playing animation interactively", "<frame rate>", ""},
-      {"font-file", "", "Path to a FreeType compatible font file", "<file_path>", ""} } },
+      {"font-file", "", "Path to a FreeType compatible font file", "<file_path>", ""},
+      {"command-script", "", "Path to a script file containing commands to execute", "<file_path>", "" } } },
   { "Material",
     { {"point-sprites", "o", "Show sphere sprites instead of surfaces", "<bool>", "1" },
       {"point-sprites-type", "", "Point sprites type", "<sphere|gaussian>", ""},
@@ -118,10 +121,10 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       {"texture-normal", "", "Path to a texture file that sets the normal map of the object", "<file path>", ""},
       {"normal-scale", "", "Normal scale affects the strength of the normal deviation from the normal texture", "<normalScale>", ""} } },
   {"Window",
-    { {"bg-color", "", "Background color", "<R,G,B>", ""},
+    { {"background-color", "", "Background color", "<R,G,B>", ""},
       {"resolution", "", "Window resolution", "<width,height>", ""},
       {"position", "", "Window position", "<x,y>", ""},
-      {"fps", "z", "Display frame per second", "<bool>", "1"},
+      {"fps", "z", "Display rendering frame per second", "<bool>", "1"},
       {"filename", "n", "Display filename", "<bool>", "1"},
       {"metadata", "m", "Display file metadata", "<bool>", "1"},
       {"blur-background", "u", "Blur background", "<bool>", "1" },
@@ -130,7 +133,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
   {"Scientific visualization",
     { {"scalar-coloring", "s", "Color by a scalar array", "<bool>", "1" },
       {"coloring-array", "", "Name of the array to color with", "<array_name>", "" },
-      {"comp", "y", "Component from the array to color with. -1 means magnitude, -2 or the short option, -y, means direct scalars", "<comp_index>", "-2"},
+      {"coloring-component", "y", "Component from the array to color with. -1 means magnitude, -2 or the short option, -y, means direct scalars", "<comp_index>", "-2"},
       {"cells", "c", "Use an array from the cells", "<bool>", "1"},
       {"range", "", "Custom range for the coloring by array, automatically computed by default", "<min,max>", ""},
       {"bar", "b", "Show scalar bar", "<bool>", "1" },
@@ -197,7 +200,7 @@ void PrintHelp(const std::string& execName, const cxxopts::Options& cxxOptions)
       "View a unstructured mesh in a typical nice looking sciviz style" },
     { execName + " file.glb -tuqap --hdri-file=file.hdr --hdri-ambient --hdri-skybox",
       "View a gltf file in a realistic environment" },
-    { execName + " file.ply -so --point-size=0 --comp=-2",
+    { execName + " file.ply -so --point-size=0 --coloring-component=-2",
       "View a point cloud file with direct scalars rendering" },
     { execName + " folder", "View all files in folder" },
   }};
@@ -218,7 +221,6 @@ void PrintHelp(const std::string& execName, const cxxopts::Options& cxxOptions)
   }
   f3d::log::info("\nReport bugs to https://github.com/f3d-app/f3d/issues");
   f3d::log::setUseColoring(true);
-  f3d::log::waitForUser();
 }
 
 //----------------------------------------------------------------------------
@@ -265,7 +267,6 @@ void PrintVersion()
   }
   f3d::log::info("License " + libInfo.License + ".");
   f3d::log::setUseColoring(true);
-  f3d::log::waitForUser();
 }
 
 //----------------------------------------------------------------------------
@@ -337,7 +338,6 @@ void PrintReadersList()
       f3d::log::info(readerLine.str());
     }
   }
-  f3d::log::waitForUser();
 }
 }
 
@@ -529,7 +529,6 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
     }
     if (foundUnknownOption)
     {
-      f3d::log::waitForUser();
       throw F3DExFailure("unknown options");
     }
 

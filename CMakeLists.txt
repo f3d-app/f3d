@@ -31,7 +31,7 @@ include(f3dVersion)
 # Handle F3D_VERSION
 set(F3D_MAJOR_VERSION 2)
 set(F3D_MINOR_VERSION 5)
-set(F3D_PATCH_VERSION 0)
+set(F3D_PATCH_VERSION 1)
 set(F3D_VERSION ${F3D_MAJOR_VERSION}.${F3D_MINOR_VERSION}.${F3D_PATCH_VERSION})
 
 set(F3D_PATCH_VERSION_EXTRA "")
@@ -55,11 +55,15 @@ mark_as_advanced(F3D_EXCLUDE_DEPRECATED)
 # Modules
 option(F3D_MODULE_RAYTRACING "Raytracing module" OFF)
 option(F3D_MODULE_EXR "OpenEXR images module" OFF)
+option(F3D_MODULE_UI "ImGui widgets module" ON)
+option(F3D_MODULE_DMON "dmon (watch) module" ON)
+option(F3D_MODULE_TINYFILEDIALOGS "tinyfiledialogs module" ON)
 
 # Use externals
 option(F3D_USE_EXTERNAL_CXXOPTS "Use external cxxopts dependency" OFF)
 option(F3D_USE_EXTERNAL_NLOHMANN_JSON "Use external nlohmann_json dependency" OFF)
-option(F3D_USE_EXTERNAL_DMON "Use external dmon dependency" OFF)
+cmake_dependent_option(F3D_USE_EXTERNAL_DMON "Use external dmon dependency" OFF "F3D_MODULE_DMON" OFF)
+cmake_dependent_option(F3D_USE_EXTERNAL_IMGUI "Use external imgui dependency" OFF "F3D_MODULE_UI" OFF)
 
 if (F3D_USE_EXTERNAL_CXXOPTS)
   find_package(cxxopts REQUIRED)
@@ -69,6 +73,9 @@ if (F3D_USE_EXTERNAL_NLOHMANN_JSON)
 endif ()
 if (F3D_USE_EXTERNAL_DMON)
   find_package(dmon REQUIRED)
+endif ()
+if (F3D_USE_EXTERNAL_IMGUI)
+  find_package(imgui REQUIRED)
 endif ()
 
 # VTK dependency
@@ -303,6 +310,7 @@ f3d_report_variable(F3D_BINDINGS_PYTHON)
 f3d_report_variable(F3D_BUILD_APPLICATION)
 f3d_report_variable(F3D_MODULE_EXR)
 f3d_report_variable(F3D_MODULE_RAYTRACING)
+f3d_report_variable(F3D_MODULE_UI)
 f3d_report_variable(F3D_PLUGIN_BUILD_ALEMBIC)
 f3d_report_variable(F3D_PLUGIN_BUILD_ASSIMP)
 f3d_report_variable(F3D_PLUGIN_BUILD_DRACO)

@@ -5,7 +5,6 @@
 #include "log.h"
 #include "options.h"
 
-#include "vtkF3DConfigure.h"
 #include "vtkF3DExternalRenderWindow.h"
 
 #include "vtkF3DGenericImporter.h"
@@ -13,11 +12,12 @@
 #include "vtkF3DRenderer.h"
 
 #include <vtkCamera.h>
+#include <vtkF3DRenderPass.h>
 #include <vtkImageData.h>
 #include <vtkImageExport.h>
+#include <vtkInformation.h>
 #include <vtkPNGReader.h>
 #include <vtkPointGaussianMapper.h>
-#include <vtkRenderWindow.h>
 #include <vtkRendererCollection.h>
 #include <vtkRenderingOpenGLConfigure.h>
 #include <vtkVersion.h>
@@ -33,7 +33,7 @@
 #endif
 
 #ifdef VTK_OPENGL_HAS_EGL
-#include <vtkEGLRenderWindow.h>
+#include <vtkF3DEGLRenderWindow.h>
 #endif
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
@@ -73,17 +73,30 @@ public:
     // Override VTK logic
 #ifdef _WIN32
     return vtkSmartPointer<vtkF3DWGLRenderWindow>::New();
-#else
+#elif __linux__
 #if defined(VTK_USE_X)
     // try GLX
-    vtkSmartPointer<vtkRenderWindow> renWin = vtkSmartPointer<vtkF3DGLXRenderWindow>::New();
-    if (renWin)
+    vtkSmartPointer<vtkRenderWindow> glxRenWin = vtkSmartPointer<vtkF3DGLXRenderWindow>::New();
+    if (glxRenWin)
     {
-      return renWin;
+      return glxRenWin;
     }
 #endif
-    // XXX: At the moment, fallback on VTK logic
-    // It will change in the future when other subclasses are implemented
+#if defined(VTK_OPENGL_HAS_EGL)
+    // try EGL
+    vtkSmartPointer<vtkRenderWindow> eglRenWin = vtkSmartPointer<vtkF3DEGLRenderWindow>::New();
+    if (eglRenWin)
+    {
+      return eglRenWin;
+    }
+#endif
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
+    // OSMesa
+    return vtkSmartPointer<vtkOSOpenGLRenderWindow>::New();
+#endif
+    return nullptr;
+#else
+    // fallback on VTK logic for other systems
     return vtkSmartPointer<vtkRenderWindow>::New();
 #endif
   }
@@ -113,8 +126,8 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   }
   else if (type == Type::EGL)
   {
-#if defined(VTK_OPENGL_HAS_EGL) && VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
-    this->Internals->RenWin = vtkSmartPointer<vtkEGLRenderWindow>::New();
+#if defined(VTK_OPENGL_HAS_EGL)
+    this->Internals->RenWin = vtkSmartPointer<vtkF3DEGLRenderWindow>::New();
 #else
     throw engine::no_window_exception("Window type is EGL but VTK EGL support is not enabled");
 #endif
@@ -220,7 +233,7 @@ window_impl::Type window_impl::getType()
 #endif
 
 #ifdef VTK_OPENGL_HAS_EGL
-  if (this->Internals->RenWin->IsA("vtkEGLRenderWindow"))
+  if (this->Internals->RenWin->IsA("vtkF3DEGLRenderWindow"))
   {
     return Type::EGL;
   }
@@ -364,7 +377,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->UpdateLights();
 
   const options& opt = this->Internals->Options;
-  renderer->ShowAxis(opt.interactor.axis);
+  renderer->ShowAxis(opt.ui.axis);
   renderer->SetUseTrackball(opt.interactor.trackball);
   renderer->SetInvertZoom(opt.interactor.invert_zoom);
 
@@ -384,6 +397,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetFilenameInfo(opt.ui.filename_info);
   renderer->ShowMetaData(opt.ui.metadata);
   renderer->ShowCheatSheet(opt.ui.cheatsheet);
+  renderer->ShowConsole(opt.ui.console);
   renderer->ShowDropZone(opt.ui.dropzone);
   renderer->SetDropZoneInfo(opt.ui.dropzone_info);
 
@@ -399,8 +413,8 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetFinalShader(opt.render.effect.final_shader);
 
   renderer->SetBackground(opt.render.background.color.data());
-  renderer->SetUseBlurBackground(opt.render.background.blur);
-  renderer->SetBlurCircleOfConfusionRadius(opt.render.background.blur_coc);
+  renderer->SetUseBlurBackground(opt.render.background.blur.enable);
+  renderer->SetBlurCircleOfConfusionRadius(opt.render.background.blur.coc);
   renderer->SetLightIntensity(opt.render.light.intensity);
 
   renderer->SetHDRIFile(opt.render.hdri.file);
@@ -450,26 +464,21 @@ void window_impl::UpdateDynamicOptions()
   // Update the cheatsheet if needed
   if (this->Internals->Interactor && renderer->CheatSheetNeedsUpdate())
   {
-    std::stringstream cheatSheetStream;
-    cheatSheetStream << "\n";
+    std::vector<vtkF3DUIActor::CheatSheetGroup> cheatsheet;
     for (const std::string& group : this->Internals->Interactor->getBindGroups())
     {
+      std::vector<vtkF3DUIActor::CheatSheetTuple> groupList;
       for (const interaction_bind_t& bind : this->Internals->Interactor->getBindsForGroup(group))
       {
         auto [doc, val] = this->Internals->Interactor->getBindingDocumentation(bind);
         if (!doc.empty())
         {
-          // XXX: This formatting will be reworked during ImGUI work
-          cheatSheetStream << " " << bind.format() << ": " << doc;
-          if (!val.empty())
-          {
-            cheatSheetStream << " [" << val << "]";
-          }
-          cheatSheetStream << "\n";
+          groupList.emplace_back(std::make_tuple(bind.format(), doc, val));
         }
       }
+      cheatsheet.emplace_back(std::make_pair(group, std::move(groupList)));
     }
-    renderer->ConfigureCheatSheet(cheatSheetStream.str());
+    renderer->ConfigureCheatSheet(cheatsheet);
   }
 }
 
@@ -506,7 +515,7 @@ bool window_impl::render()
 //----------------------------------------------------------------------------
 image window_impl::renderToImage(bool noBackground)
 {
-  this->UpdateDynamicOptions();
+  this->render();
 
   vtkNew<vtkWindowToImageFilter> rtW2if;
   rtW2if->SetInput(this->Internals->RenWin);
@@ -515,7 +524,7 @@ image window_impl::renderToImage(bool noBackground)
   {
     // we need to set the background to black to avoid blending issues with translucent
     // objects when saving to file with no background
-    this->Internals->RenWin->GetRenderers()->GetFirstRenderer()->SetBackground(0, 0, 0);
+    this->Internals->Renderer->SetBackground(0, 0, 0);
     rtW2if->SetInputBufferTypeToRGBA();
   }
 
@@ -548,5 +557,20 @@ void window_impl::SetCachePath(const std::string& cachePath)
 void window_impl::SetInteractor(interactor_impl* interactor)
 {
   this->Internals->Interactor = interactor;
+}
+
+//----------------------------------------------------------------------------
+void window_impl::RenderUIOnly()
+{
+#if F3D_MODULE_UI
+  // Do only a partial render of the UI
+  vtkRenderWindow* renWin = this->Internals->RenWin;
+  vtkRenderer* ren = renWin->GetRenderers()->GetFirstRenderer();
+  vtkInformation* info = ren->GetInformation();
+
+  info->Set(vtkF3DRenderPass::RENDER_UI_ONLY(), 1);
+  renWin->Render();
+  info->Remove(vtkF3DRenderPass::RENDER_UI_ONLY());
+#endif
 }
 };

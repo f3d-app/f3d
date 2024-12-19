@@ -6,8 +6,6 @@
 #include "log.h"
 #include "utils.h"
 
-#include "vtkF3DConfigure.h"
-
 #include <algorithm>
 #include <limits>
 #include <string>

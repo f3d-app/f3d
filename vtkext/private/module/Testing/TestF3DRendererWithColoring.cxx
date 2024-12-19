@@ -3,7 +3,6 @@
 #include <vtkRenderWindow.h>
 #include <vtkXMLUnstructuredGridReader.h>
 
-#include "vtkF3DConfigure.h"
 #include "vtkF3DGenericImporter.h"
 #include "vtkF3DRenderer.h"
 

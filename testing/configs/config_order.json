@@ -1,8 +1,14 @@
+[
 {
-  ".+": {
-    "bg-color": "1.0, 0.0, 0.0"
-  },
-  ".*": {
-    "bg-color": "0.0, 0.0, 0.25"
+  "match": ".+",
+  "options": {
+    "background-color": "1.0, 0.0, 0.0"
+  }
+},
+{
+  "match": ".*",
+  "options": {
+    "background-color": "0.0, 0.0, 0.25"
   }
 }
+]

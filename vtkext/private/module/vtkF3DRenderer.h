@@ -3,7 +3,7 @@
  * @brief   A F3D dedicated renderer
  *
  * This renderers all the generic actors added by F3D which includes
- * axis, grid, edges, timer, filename, metadata and cheatsheet.
+ * UI, axis, grid, edges, timer, metadata and cheatsheet.
  * It also handles the different rendering passes, including
  * raytracing, ssao, fxaa, tonemapping.
  */
@@ -12,6 +12,7 @@
 #define vtkF3DRenderer_h
 
 #include "vtkF3DMetaImporter.h"
+#include "vtkF3DUIActor.h"
 
 #include <vtkLight.h>
 #include <vtkOpenGLRenderer.h>
@@ -45,6 +46,7 @@ public:
   void ShowMetaData(bool show);
   void ShowFilename(bool show);
   void ShowCheatSheet(bool show);
+  void ShowConsole(bool show);
   void ShowDropZone(bool show);
   void ShowHDRISkybox(bool show);
   ///@}
@@ -358,16 +360,21 @@ public:
   bool CheatSheetNeedsUpdate() const;
 
   /**
-   * Configure the cheatsheet text from the provided info
+   * Configure the cheatsheet data from the provided info
    * Should be called before Render() if CheatSheetInfoNeedsUpdate() returns true.
    */
-  void ConfigureCheatSheet(const std::string& info);
+  void ConfigureCheatSheet(const std::vector<vtkF3DUIActor::CheatSheetGroup>& info);
 
   /**
    * Use this method to flag in the renderer that the cheatsheet needs to be updated
    * This is not required to call when using any of the setter of the renderer
    */
   void SetCheatSheetConfigured(bool flag);
+
+  /**
+   * Set the UI delta time (time between frame being rendered) in seconds
+   */
+  void SetUIDeltaTime(double time);
 
 private:
   vtkF3DRenderer();
@@ -425,13 +432,6 @@ private:
   void ConfigureRenderPasses();
 
   /**
-   * Generate a padded metadata description
-   * using the internal importer.
-   * Returns a multiline string containing the meta data description
-   */
-  std::string GenerateMetaDataDescription();
-
-  /**
    * Create a cache directory if a HDRIHash is set
    */
   void CreateCacheDirectory();
@@ -470,16 +470,12 @@ private:
 
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
 
-  vtkNew<vtkCornerAnnotation> FilenameActor;
-  vtkNew<vtkCornerAnnotation> MetaDataActor;
-  vtkNew<vtkCornerAnnotation> CheatSheetActor;
   vtkNew<vtkF3DDropZoneActor> DropZoneActor;
   vtkNew<vtkActor> GridActor;
   vtkNew<vtkSkybox> SkyboxActor;
+  vtkNew<vtkF3DUIActor> UIActor;
 
-  // vtkCornerAnnotation building is too slow for the timer
-  vtkNew<vtkTextActor> TimerActor;
-  unsigned int Timer = 0;
+  unsigned int Timer = 0; // Timer OpenGL query
 
   bool CheatSheetConfigured = false;
   bool ActorsPropertiesConfigured = false;
@@ -504,6 +500,7 @@ private:
   bool FilenameVisible = false;
   bool MetaDataVisible = false;
   bool CheatSheetVisible = false;
+  bool ConsoleVisible = false;
   bool DropZoneVisible = false;
   bool HDRISkyboxVisible = false;
   bool UseRaytracing = false;
@@ -555,6 +552,7 @@ private:
 
   vtkF3DMetaImporter* Importer = nullptr;
   vtkMTimeType ImporterTimeStamp = 0;
+  vtkMTimeType ImporterUpdateTimeStamp = 0;
 
   vtkNew<vtkScalarBarActor> ScalarBarActor;
   bool ScalarBarActorConfigured = false;
@@ -577,6 +575,8 @@ private:
   std::optional<std::string> TextureNormal;
 
   vtkSmartPointer<vtkColorTransferFunction> ColorTransferFunction;
+  bool ExpandingRangeSet = false;
+  bool UsingExpandingRange = true;
   double ColorRange[2] = { 0.0, 1.0 };
   bool ColorTransferFunctionConfigured = false;
 

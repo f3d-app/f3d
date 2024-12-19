@@ -26,7 +26,6 @@ scene.animation.autoplay|bool<br>false<br>load|Automatically start animation.|\-
 scene.animation.index|int<br>0<br>load|Select the animation to load.<br>Any negative value means all animations (glTF only).<br>The default scene always has at most one animation.|\-\-animation-index
 scene.animation.speed_factor|double<br>1<br>render|Set the animation speed factor to slow, speed up or even invert animation.|\-\-animation-speed-factor
 scene.animation.time|double<br>optional<br>load|Set the animation time to load.|\-\-animation-time
-scene.animation.frame_rate|double<br>60<br>render|Set the animation frame rate used to play the animation interactively.|\-\-animation-frame-rate
 scene.camera.index|int<br>optional<br>load|Select the scene camera to use when available in the file.<br>The default scene always uses automatic camera.|\-\-camera-index
 scene.up_direction|string<br>+Y<br>load|Define the Up direction. It impacts the grid, the axis, the HDRI and the camera.|\-\-up
 scene.camera.orthographic|bool<br>optional<br>load|Set to true to force orthographic projection. Model specified by default, which is false if not specified.|\-\-camera\-orthographic
@@ -35,8 +34,8 @@ scene.camera.orthographic|bool<br>optional<br>load|Set to true to force orthogra
 
 Option|Type<br>Default<br>Trigger|Description|F3D option
 :---:|:---:|:---|:---:
-interactor.axis|bool<br>false<br>render|Show *axes* as a trihedron in the scene.|\-\-axis
 interactor.trackball|bool<br>false<br>render|Enable trackball interaction.|\-\-trackball
+interactor.invert_zoom|bool<br>false<br>render|Invert the zoom direction.|\-\-invert-zoom
 
 ## Model Options
 
@@ -88,9 +87,9 @@ render.raytracing.samples|int<br>5<br>render|The number of *samples per pixel*.|
 render.raytracing.denoise|bool<br>false<br>render|*Denoise* the raytracing rendering.|\-\-denoise
 render.hdri.file|string<br>optional<br>render|Set the *HDRI* image that can be used for ambient lighting and skybox.<br>Valid file format are hdr, exr, png, jpg, pnm, tiff, bmp.<br>If not set, a default is provided.|\-\-hdri-file
 render.hdri.ambient|bool<br>false<br>render|Light the scene using the *HDRI* image as ambient lighting<br>The environment act as a light source and is reflected on the material.|\-\-hdri-ambient
-render.background.color|vector\<double\><br>0.2,0.2,0.2<br>render|Set the window *background color*.<br>Ignored if a *hdri* skybox is used.|\-\-bg-color
+render.background.color|vector\<double\><br>0.2,0.2,0.2<br>render|Set the window *background color*.<br>Ignored if a *hdri* skybox is used.|\-\-background-color
 render.background.skybox|bool<br>false<br>render|Show the *HDRI* image as a skybox<br>Overrides the the background color if any|\-\-hdri-skybox
-render.background.blur|bool<br>false<br>render|Blur background, useful with a skybox.|\-\-blur-background
+render.background.blur.enable|bool<br>false<br>render|Blur background, useful with a skybox.|\-\-blur-background
 render.background.blur.coc|double<br>20.0<br>render|Blur background circle of confusion radius.|\-\-blur-coc
 render.light.intensity|double<br>1.0<br>render|Adjust the intensity of every light in the scene.|\-\-light-intensity
 
@@ -98,8 +97,10 @@ render.light.intensity|double<br>1.0<br>render|Adjust the intensity of every lig
 
 Option|Type<br>Default<br>Trigger|Description|F3D option
 :---:|:---:|:---|:---:
+ui.axis|bool<br>false<br>render|Show *axes* as a trihedron in the scene.|\-\-axis
 ui.scalar_bar|bool<br>false<br>render|Show *scalar bar* of the coloring by data array.|\-\-bar
 ui.cheatsheet|bool<br>false<br>render|Show a interactor cheatsheet
+ui.console|bool<br>false<br>render|Show the console
 ui.filename|bool<br>false<br>render|Display the *filename info content* on top of the window.|\-\-filename
 ui.filename_info|string<br>-<br>render|Content of *filename info* to display.
 ui.font_file|string<br>optional<br>render|Use the provided FreeType compatible font file to display text.<br>Can be useful to display non-ASCII filenames.|\-\-font-file

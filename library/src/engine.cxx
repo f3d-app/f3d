@@ -9,7 +9,6 @@
 
 #include "factory.h"
 
-#include "vtkF3DConfigure.h"
 #include "vtkF3DNoRenderWindow.h"
 
 #include <vtkVersion.h>
@@ -389,6 +388,12 @@ engine::libInformation engine::getLibInfo()
   libInfo.Modules["OpenEXR"] = true;
 #else
   libInfo.Modules["OpenEXR"] = false;
+#endif
+
+#if F3D_MODULE_UI
+  libInfo.Modules["ImGui"] = true;
+#else
+  libInfo.Modules["ImGui"] = false;
 #endif
 
   std::string vtkVersion = std::string(vtkVersion::GetVTKVersionFull());
