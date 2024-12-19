@@ -1,1 +1,0 @@
-print_options_info
