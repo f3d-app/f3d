@@ -57,7 +57,7 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  vtkSmartPointer<vtkTexture> CreateTexture(const std::vector<unsigned char> buffer, int& offset,
+  vtkSmartPointer<vtkTexture> CreateTexture(const std::vector<unsigned char>& buffer, int& offset,
     int skinWidth, int skinHeight, int nbSkins, int selectedSkinIndex)
   {
     vtkNew<vtkTexture> texture;
@@ -129,7 +129,7 @@ public:
   };
 
   //----------------------------------------------------------------------------
-  void CreateMesh(std::vector<unsigned char> buffer, int offset, mdl_header_t* header)
+  void CreateMesh(const std::vector<unsigned char>& buffer, int offset, mdl_header_t* header)
   {
     // Read texture coordinates
     struct mdl_texcoord_t
@@ -170,6 +170,8 @@ public:
     };
     std::vector<plugin_frame_pointer> framePtr =
       std::vector<plugin_frame_pointer>(header->numFrames);
+    std::vector<std::vector<int>> frameOffsets =
+      std::vector<std::vector<int>>();
     for (int i = 0; i < header->numFrames; i++)
     {
       int* type = (int*)(buffer.data() + offset);
@@ -185,16 +187,15 @@ public:
       {
         framePtr[i].type = type;
         framePtr[i].nb = (int*)(buffer.data() + 4 + offset);
-        // mdl_vertex_t* min = reinterpret_cast<mdl_vertex_t*>(buffer.data() + 8 + offset);
-        // mdl_vertex_t* max = reinterpret_cast<mdl_vertex_t*>(buffer.data() + 12 + offset);
-        // float* time = framePtr[i].time = reinterpret_cast<float*>(buffer.data() + 16 + offset);
-        framePtr[i].frames =
-          (mdl_simpleframe_t*)(buffer.data() + 16 + 4 * (*framePtr[i].nb) + offset);
-        offset += 16 + (*framePtr[i].nb) * 4;
+        // float* time = framePtr[i].time = (float*)(buffer.data() + 16 + offset);
+        frameOffsets.emplace_back(std::vector<int>());
         for (int j = 0; j < *framePtr[i].nb; j++)
         {
-          offset += 24 + 4 * header->numVertices;
+          frameOffsets[i].emplace_back(
+            16 + 4 * (*framePtr[i].nb) + j * 4 * (header->numVertices + 6) + offset);
         }
+        offset += 16 + (*framePtr[i].nb) * 4;
+        offset += (24 + 4 * header->numVertices) * (*framePtr[i].nb);
       }
     }
     // Draw cells
@@ -246,23 +247,27 @@ public:
       normals->Allocate(header->numTriangles * 3 * 3);
 
       plugin_frame_pointer selectedFrame = framePtr[frameNum];
-      if (*selectedFrame.type == 0)
+      int numGroupFrames = *selectedFrame.type == 0 ? 1 : *selectedFrame.nb;
+      for (int groupFrameNum = 0; groupFrameNum < numGroupFrames; groupFrameNum++)
       {
+        mdl_simpleframe_t* selectedSimpleFrame = numGroupFrames > 1
+          ? (mdl_simpleframe_t*)(buffer.data() + frameOffsets[frameNum][groupFrameNum])
+          : selectedFrame.frames;
         for (int i = 0; i < header->numTriangles; i++)
         {
           vtkIdType vertexNum[3];
           for (int j = 0; j < 3; j++)
           {
             vertexNum[j] = triangles[i].vertex[j];
-            double v[3] = { double(selectedFrame.frames->verts[vertexNum[j]].v[0]),
-              double(selectedFrame.frames->verts[vertexNum[j]].v[1]),
-              double(selectedFrame.frames->verts[vertexNum[j]].v[2]) };
+            double v[3] = { double(selectedSimpleFrame->verts[vertexNum[j]].v[0]),
+              double(selectedSimpleFrame->verts[vertexNum[j]].v[1]),
+              double(selectedSimpleFrame->verts[vertexNum[j]].v[2]) };
             for (int k = 0; k < 3; k++)
             {
               v[k] = v[k] * header->scale[k] + header->translation[k];
             }
             vertices->InsertPoint(i * 3 + j, v);
-            int normalIndex = selectedFrame.frames->verts[vertexNum[j]].normalIndex;
+            int normalIndex = selectedSimpleFrame->verts[vertexNum[j]].normalIndex;
             normals->SetTuple3(i * 3 + j, F3DMDLNormalVectors[normalIndex][0] / 255.0,
               F3DMDLNormalVectors[normalIndex][1] / 255.0,
               F3DMDLNormalVectors[normalIndex][2] / 255.0);
@@ -272,9 +277,9 @@ public:
         mesh->SetPoints(vertices);
         mesh->SetPolys(cells);
         mesh->GetPointData()->SetTCoords(textureCoordinates);
-        //        mesh->GetPointData()->SetNormals(normals);
+        mesh->GetPointData()->SetNormals(normals);
         Mesh.emplace_back(mesh);
-        std::string meshName = std::string(selectedFrame.frames->name);
+        std::string meshName = std::string(selectedSimpleFrame->name);
         for (std::size_t i = 0; i < meshName.size(); i++)
         {
           if (meshName[i] >= '0' && meshName[i] <= '9')
@@ -283,7 +288,7 @@ public:
             break;
           }
         }
-        if (frameNum == 0)
+        if (frameNum == 0 && groupFrameNum == 0)
         {
           frameName = meshName;
           NumberOfAnimations++;
@@ -297,61 +302,6 @@ public:
           AnimationNames.emplace_back(meshName);
         }
         GroupAndTimeVal.emplace_back(std::make_pair(frameIndex, 0.0));
-      }
-      else
-      {
-        for (int groupFrameNum = 0; groupFrameNum < *selectedFrame.nb; groupFrameNum++)
-        {
-          for (int i = 0; i < header->numTriangles; i++)
-          {
-            vtkIdType vertexNum[3];
-            for (int j = 0; j < 3; j++)
-            {
-              vertexNum[j] = triangles[i].vertex[j];
-              double v[3] = { double(selectedFrame.frames[groupFrameNum].verts[vertexNum[j]].v[0]),
-                double(selectedFrame.frames[groupFrameNum].verts[vertexNum[j]].v[1]),
-                double(selectedFrame.frames[groupFrameNum].verts[vertexNum[j]].v[2]) };
-              for (int k = 0; k < 3; k++)
-              {
-                v[k] = v[k] * header->scale[k] + header->translation[k];
-              }
-              vertices->InsertPoint(i * 3 + j, v);
-              int normalIndex = selectedFrame.frames[groupFrameNum].verts[vertexNum[j]].normalIndex;
-              normals->SetTuple3(i * 3 + j, F3DMDLNormalVectors[normalIndex][0] / 255.0,
-                F3DMDLNormalVectors[normalIndex][1] / 255.0,
-                F3DMDLNormalVectors[normalIndex][2] / 255.0);
-            }
-          }
-          vtkNew<vtkPolyData> mesh;
-          mesh->SetPoints(vertices);
-          mesh->SetPolys(cells);
-          mesh->GetPointData()->SetTCoords(textureCoordinates);
-          mesh->GetPointData()->SetNormals(normals);
-          Mesh.emplace_back(mesh);
-          std::string meshName = std::string(selectedFrame.frames[groupFrameNum].name);
-          for (std::size_t i = 0; i < meshName.size(); i++)
-          {
-            if (meshName[i] >= '0' && meshName[i] <= '9')
-            {
-              meshName = meshName.substr(0, i - 1);
-              break;
-            }
-          }
-          if (frameNum == 0)
-          {
-            frameName = meshName;
-            NumberOfAnimations++;
-            AnimationNames.emplace_back(meshName);
-          }
-          else if (meshName != frameName)
-          {
-            frameIndex++;
-            NumberOfAnimations++;
-            AnimationNames.emplace_back(meshName);
-            frameName = meshName;
-          }
-          GroupAndTimeVal.emplace_back(std::make_pair(frameIndex, 0.0));
-        }
       }
     }
 
@@ -596,11 +546,6 @@ std::string vtkF3DQuakeMDLImporter::GetCameraName(vtkIdType vtkNotUsed(camIndex)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DQuakeMDLImporter::SetCamera(vtkIdType vtkNotUsed(camIndex))
-{
-}
-
-//----------------------------------------------------------------------------
 void vtkF3DQuakeMDLImporter::ImportCameras(vtkRenderer* renderer)
 {
   this->Internals->ImportCameras(renderer);
@@ -610,10 +555,4 @@ void vtkF3DQuakeMDLImporter::ImportCameras(vtkRenderer* renderer)
 void vtkF3DQuakeMDLImporter::ImportLights(vtkRenderer* renderer)
 {
   this->Internals->ImportLights(renderer);
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DQuakeMDLImporter::SetFileName(std::string fileName)
-{
-  this->FileName = fileName;
 }

@@ -16,7 +16,7 @@ public:
   /**
    * Set the file name.
    */
-  void SetFileName(std::string fileName);
+  vtkSetMacro(FileName, std::string);
 
   /**
    * Update actors at the given time value.
@@ -62,11 +62,6 @@ public:
    * Get the name of a camera.
    */
   std::string GetCameraName(vtkIdType camIndex) override;
-
-  /**
-   * Enable a specific camera.
-   */
-  void SetCamera(vtkIdType camIndex) override;
 
 protected:
   vtkF3DQuakeMDLImporter();
