@@ -74,8 +74,7 @@
   "options":
   {
     "up": "+Z",
-    "camera-direction": "-1,0,0",
-    "grid": false
+    "camera-direction": "-1,0,0"
   }
 }
 ]
