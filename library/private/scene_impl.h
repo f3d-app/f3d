@@ -9,6 +9,7 @@
 #ifndef f3d_scene_impl_h
 #define f3d_scene_impl_h
 
+#include "log.h"
 #include "scene.h"
 
 #include <memory>
@@ -45,6 +46,9 @@ public:
    * Set the interactor to use when interacting and set the AnimationManager on the interactor.
    */
   void SetInteractor(interactor_impl* interactor);
+
+  // Display available cameras in the log
+  void PrintImporterDescription(log::VerboseLevel level);
 
 private:
   class internals;
