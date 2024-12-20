@@ -50,6 +50,11 @@ using mod_t = interaction_bind_t::ModifierKeys;
 
 class interactor_impl::internals
 {
+  //-------------------------------------------------------------------
+private:
+  // Map to store aliases
+  std::map<std::string, std::string> aliasMap;
+  //-------------------------------------------------------------------
 public:
   struct BindingCommands
   {
@@ -798,6 +803,18 @@ std::vector<std::string> interactor_impl::getCommandActions() const
 }
 
 //----------------------------------------------------------------------------
+void interactor_impl::alias(const std::string& action, const std::string& value)
+{
+  if (action.empty() || value.empty())
+  {
+    F3DLog::Error(F3DLog::Severity::ERROR, "Alias action or value cannot be empty.");
+    return;
+  }
+  aliasMap[action] = value;
+  F3DLog::Info(F3DLog::Severity::DEBUG, "Alias added: " + action + " -> " + value);
+}
+
+//----------------------------------------------------------------------------
 bool interactor_impl::triggerCommand(std::string_view command)
 {
   log::debug("Command: ", command);
@@ -817,7 +834,16 @@ bool interactor_impl::triggerCommand(std::string_view command)
     return true;
   }
 
-  const std::string& action = tokens[0];
+  std::string action = tokens[0];
+
+  // Check if action is an alias
+  auto aliasIt = aliasMap.find(action);
+  if (aliasIt != aliasMap.end())
+  {
+    action = aliasIt->second;
+    F3DLog::Info(F3DLog::Severity::DEBUG, "Alias resolved: " + action);
+  }
+
   try
   {
     // Find the right command to call
