@@ -807,11 +807,11 @@ void interactor_impl::alias(const std::string& action, const std::string& value)
 {
   if (action.empty() || value.empty())
   {
-    F3DLog::Error(F3DLog::Severity::ERROR, "Alias action or value cannot be empty.");
+    log::error("Alias action or value cannot be empty.");
     return;
   }
   aliasMap[action] = value;
-  F3DLog::Info(F3DLog::Severity::DEBUG, "Alias added: " + action + " -> " + value);
+  log::error("Alias added: " + action + " -> " + value);
 }
 
 //----------------------------------------------------------------------------
@@ -841,7 +841,7 @@ bool interactor_impl::triggerCommand(std::string_view command)
   if (aliasIt != aliasMap.end())
   {
     action = aliasIt->second;
-    F3DLog::Info(F3DLog::Severity::DEBUG, "Alias resolved: " + action);
+    log::error("Alias resolved: " + action);
   }
 
   try
