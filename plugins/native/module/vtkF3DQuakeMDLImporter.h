@@ -1,11 +1,15 @@
 /**
  * @class   vtkF3DQuakeMDLImporter
  * @brief   VTK Importer for Quake 1 models in .mdl file format
+ * 
+ * This reader is based on implementations of Quake 1's MDL, defined in https://book.leveldesignbook.com/appendix/resources/formats/mdl
+ * It reads vertices, normals and texture coordinate data from .mdl files.
+ * Supports animations.
  */
+
 
 #ifndef vtkF3DQuakeMDLImporter_h
 #define vtkF3DQuakeMDLImporter_h
-#include "vtkF3DQuakeMDLImporterConstants.h"
 #include <vtkF3DImporter.h>
 
 class vtkF3DQuakeMDLImporter : public vtkF3DImporter
@@ -55,11 +59,13 @@ public:
 
   /**
    * Get the number of available cameras.
+   * Not implemented, multiple cameras are not specified.
    */
   vtkIdType GetNumberOfCameras() override;
 
   /**
    * Get the name of a camera.
+   * Not implemented, not specified.
    */
   std::string GetCameraName(vtkIdType camIndex) override;
 
