@@ -246,6 +246,8 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
   ImGui::SetCurrentContext(ctx);
 
   ImGuiIO& io = ImGui::GetIO();
+  io.IniFilename = nullptr;
+  io.LogFilename = nullptr;
 
   ImFontConfig fontConfig;
 
