@@ -68,5 +68,13 @@
     "anti-aliasing": false,
     "translucency-support": false
   }
+},
+{
+  "match": ".*(mdl)",
+  "options":
+  {
+    "up": "+Z",
+    "camera-direction": "-1,0,0"
+  }
 }
 ]
