@@ -56,6 +56,7 @@ For **default scene** formats, certain default values are set automatically:
  - normal-scale: 1.0
  - metallic: 0.0
  - roughness: 0.3
+ - camera-orthographic: false
 
 They will be overridden when using corresponding [options](OPTIONS.md).
 
