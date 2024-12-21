@@ -324,10 +324,10 @@ PYBIND11_MODULE(pyf3d, module)
     .def(py::init<>())
     .def(py::init<const f3d::point3_t&, const f3d::point3_t&, const f3d::vector3_t&,
       const f3d::angle_deg_t&>())
-    .def_readwrite("pos", &f3d::camera_state_t::pos)
-    .def_readwrite("foc", &f3d::camera_state_t::foc)
-    .def_readwrite("up", &f3d::camera_state_t::up)
-    .def_readwrite("angle", &f3d::camera_state_t::angle);
+    .def_readwrite("position", &f3d::camera_state_t::position)
+    .def_readwrite("focal_point", &f3d::camera_state_t::focalPoint)
+    .def_readwrite("view_up", &f3d::camera_state_t::viewUp)
+    .def_readwrite("view_angle", &f3d::camera_state_t::viewAngle);
 
   // f3d::window
   py::class_<f3d::window, std::unique_ptr<f3d::window, py::nodelete>> window(module, "Window");

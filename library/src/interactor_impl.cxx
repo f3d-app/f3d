@@ -326,33 +326,32 @@ public:
         const camera_state_t state = self->Window.getCamera().getState();
 
         double focV[3];
-        vtkMath::Subtract(picked, state.foc.data(), focV); /* foc -> picked */
+        vtkMath::Subtract(picked, state.focalPoint.data(), focV); /* foc -> picked */
 
         double posV[3];
-        vtkMath::Subtract(picked, state.foc.data(), posV); /* pos -> pos1, parallel to focV */
+        vtkMath::Subtract(
+          picked, state.focalPoint.data(), posV); /* pos -> pos1, parallel to focV */
         if (!self->Style->GetInteractor()->GetShiftKey())
         {
           double v[3];
-          vtkMath::Subtract(state.foc.data(), state.pos.data(), v); /* pos -> foc */
-          vtkMath::ProjectVector(focV, v, v);                       /* pos2 -> pos1 */
+          vtkMath::Subtract(state.focalPoint.data(), state.position.data(), v); /* pos -> foc */
+          vtkMath::ProjectVector(focV, v, v);                                   /* pos2 -> pos1 */
           vtkMath::Subtract(posV, v, posV); /* pos -> pos2, keeps on camera plane */
         }
 
         const auto interpolateCameraState = [&state, &focV, &posV](double ratio) -> camera_state_t
         {
-          return { //
+          return { {
+                     state.position[0] + posV[0] * ratio,
+                     state.position[1] + posV[1] * ratio,
+                     state.position[2] + posV[2] * ratio,
+                   },
             {
-              state.pos[0] + posV[0] * ratio,
-              state.pos[1] + posV[1] * ratio,
-              state.pos[2] + posV[2] * ratio,
+              state.focalPoint[0] + focV[0] * ratio,
+              state.focalPoint[1] + focV[1] * ratio,
+              state.focalPoint[2] + focV[2] * ratio,
             },
-            {
-              state.foc[0] + focV[0] * ratio,
-              state.foc[1] + focV[1] * ratio,
-              state.foc[2] + focV[2] * ratio,
-            },
-            state.up, state.angle
-          };
+            state.viewUp, state.viewAngle };
         };
 
         self->AnimateCameraTransition(interpolateCameraState);
