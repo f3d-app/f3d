@@ -249,10 +249,10 @@ public:
         return ss.str();
       };
       cameraMetadata << "{\n";
-      cameraMetadata << "  \"pos\": " << vec3toJson(state.position) << ",\n";
-      cameraMetadata << "  \"foc\": " << vec3toJson(state.focalPoint) << ",\n";
-      cameraMetadata << "  \"up\": " << vec3toJson(state.viewUp) << ",\n";
-      cameraMetadata << "  \"angle\": " << state.viewAngle << "\n";
+      cameraMetadata << "  \"position\": " << vec3toJson(state.position) << ",\n";
+      cameraMetadata << "  \"focalPoint\": " << vec3toJson(state.focalPoint) << ",\n";
+      cameraMetadata << "  \"viewUp\": " << vec3toJson(state.viewUp) << ",\n";
+      cameraMetadata << "  \"viewAngle\": " << state.viewAngle << "\n";
       cameraMetadata << "}\n";
     }
 
