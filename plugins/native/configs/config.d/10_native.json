@@ -73,8 +73,7 @@
   "match": ".*(mdl)",
   "options":
   {
-    "up": "+Z",
-    "camera-direction": "-1,0,0"
+    "up": "+Z"
   }
 }
 ]
