@@ -123,8 +123,8 @@ public:
     // Simple frame
     struct mdl_simpleframe_t // 24 + nbVertices bytes
     {
-      mdl_vertex_t bboxmin; // bouding box min
-      mdl_vertex_t bboxmax; // bouding box max
+      mdl_vertex_t bboxmin; // bounding box min
+      mdl_vertex_t bboxmax; // bounding box max
       char name[16];  // frame name
       mdl_vertex_t verts[1024]; // vertex list of the frame, maximum capacity is 1024
     };
@@ -148,12 +148,14 @@ public:
         framePtr[i].nb = nullptr;
         framePtr[i].time = nullptr;
         framePtr[i].frames = reinterpret_cast<const mdl_simpleframe_t*>(buffer.data() + 4 + offset);
-        offset += 4 + 24 + 4 * (header->numVertices);
+        offset += 4 + 24 + 4 * header->numVertices;
       }
       else
       {
         framePtr[i].nb = reinterpret_cast<const int*>(buffer.data() + 4 + offset);
         framePtr[i].time = reinterpret_cast<const float*>(buffer.data() + 16 + offset);
+        framePtr[i].frames = reinterpret_cast<const mdl_simpleframe_t*>(
+          buffer.data() + 16 + 4 * (*framePtr[i].nb) + offset);
         frameOffsets.emplace_back(std::vector<int>());
         for (int j = 0; j < *framePtr[i].nb; j++)
         {
