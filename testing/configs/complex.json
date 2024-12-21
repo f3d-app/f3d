@@ -12,7 +12,7 @@
   "options":
   {
     "up": "+Y",
-    "bar": true,
+    "coloring-scalar-bar": true,
     "render.effect.ambient_occlusion": true,
     "filename": true
   }
