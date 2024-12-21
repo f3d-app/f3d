@@ -4,7 +4,7 @@
   "options":
   {
     "scalar-coloring": true,
-    "bar": true
+    "coloring-scalar-bar": true
   }
 },
 {
