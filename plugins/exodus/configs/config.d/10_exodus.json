@@ -5,7 +5,7 @@
   {
     "scalar-coloring": true,
     "load-plugins": "exodus",
-    "bar": true
+    "coloring-scalar-bar": true
   }
 }
 ]
