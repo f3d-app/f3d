@@ -27,7 +27,8 @@ set(f3d_python_package_name "f3d")
 set(f3d_python_package_suffix "python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/site-packages")
 
 get_property(F3D_MULTI_CONFIG_GENERATOR GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
-set(f3d_module_dir "${CMAKE_BINARY_DIR}$<${F3D_MULTI_CONFIG_GENERATOR}:/$<CONFIG>>/${f3d_python_package_name}")
+set(f3d_binary_dir "${CMAKE_BINARY_DIR}$<${F3D_MULTI_CONFIG_GENERATOR}:/$<CONFIG>>")
+set(f3d_module_dir "${f3d_binary_dir}/${f3d_python_package_name}")
 
 set_target_properties(pyf3d PROPERTIES
   CXX_STANDARD 17
@@ -90,8 +91,8 @@ if (F3D_BINDINGS_PYTHON_GENERATE_STUBS)
   add_custom_command(
     TARGET pyf3d
     POST_BUILD
-    COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/generate_stubs.py --into=${CMAKE_BINARY_DIR}
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+    COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/generate_stubs.py --into=${f3d_binary_dir}
+    WORKING_DIRECTORY ${f3d_binary_dir})
 endif()
 
 # testing
