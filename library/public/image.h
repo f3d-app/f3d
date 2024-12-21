@@ -146,7 +146,7 @@ public:
    * Depending on the VTK version, another comparison algorithm may be used.
    * Threshold should be in range [0, 1[, this returns false otherwise.
    * 1e-14: Pixel perfect comparison.
-   * 0.05: Visually indistinguishable.
+   * 0.04: Visually indistinguishable.
    * 0.1: Small visible difference.
    * 0.5: Comparable images.
    * 1.0: Different type, size or number of components

@@ -52,7 +52,7 @@ static inline const OptionsDict DefaultAppOptions = {
   { "camera-azimuth-angle", "0.0" },
   { "camera-elevation-angle", "0.0" },
   { "ref", "" },
-  { "ref-threshold", "0.05" },
+  { "ref-threshold", "0.04" },
   { "interaction-test-record", "" },
   { "interaction-test-play", "" },
   { "command-script", "" },

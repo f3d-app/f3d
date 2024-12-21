@@ -138,7 +138,7 @@ Options|Description
 Options|Default|Description
 ------|------|------
 \-\-ref=\<png file\>||Render and compare with the provided *reference image*, for testing purposes. Use with output option to generate new baselines and diff images.
-\-\-ref-threshold=\<threshold\>|0.05|Set the *comparison threshold* to trigger a test failure or success. The default (0.05) correspond to almost visually identical images.
+\-\-ref-threshold=\<threshold\>|0.04|Set the *comparison threshold* to trigger a test failure or success. The default (0.04) correspond to almost visually identical images.
 \-\-interaction-test-record=\<log file\>||Path to an interaction log file to *record interaction events* to.
 \-\-interaction-test-play=\<log file\>||Path to an interaction log file to *play interactions events* from when loading a file.
 
