@@ -102,16 +102,18 @@ public:
       int s;
       int t;
     };
-    const mdl_texcoord_t* texcoords = reinterpret_cast<const mdl_texcoord_t*>(buffer.data() + offset);
+    const mdl_texcoord_t* texcoords =
+      reinterpret_cast<const mdl_texcoord_t*>(buffer.data() + offset);
     offset += 12 * header->numVertices;
 
     // Read triangles
-    struct mdl_triangle_t 
+    struct mdl_triangle_t
     {
       int facesfront; // 0 = backface, 1 = frontface
       int vertex[3];  // vertex indices
     };
-    const mdl_triangle_t* triangles = reinterpret_cast<const mdl_triangle_t*>(buffer.data() + offset);
+    const mdl_triangle_t* triangles =
+      reinterpret_cast<const mdl_triangle_t*>(buffer.data() + offset);
     offset += 16 * header->numTriangles;
 
     // Simple vertex and normal
@@ -123,18 +125,18 @@ public:
     // Simple frame
     struct mdl_simpleframe_t // 24 + nbVertices bytes
     {
-      mdl_vertex_t bboxmin; // bounding box min
-      mdl_vertex_t bboxmax; // bounding box max
-      char name[16];  // frame name
-      mdl_vertex_t verts[1024]; // vertex list of the frame, maximum capacity is 1024
+      mdl_vertex_t bboxmin;      // bounding box min
+      mdl_vertex_t bboxmax;      // bounding box max
+      char name[16];             // frame name
+      mdl_vertex_t verts[1024];  // vertex list of the frame, maximum capacity is 1024
     };
     // Struct containing frame type and data
     struct plugin_frame_pointer
     {
-      const int* type; // 0 = simple frame, !0 = group frames
-      const int* nb; // "number", size of *time and *frames arrays
-      const float* time;  // time duration for each frame
-      const mdl_simpleframe_t* frames;  // simple frame list
+      const int* type;                 // 0 = simple frame, !0 = group frames
+      const int* nb;                   // "number", size of *time and *frames arrays
+      const float* time;               // time duration for each frame
+      const mdl_simpleframe_t* frames; // simple frame list
     };
     // Read frames
     std::vector<plugin_frame_pointer> framePtr =
@@ -153,7 +155,8 @@ public:
       else
       {
         framePtr[i].nb = reinterpret_cast<const int*>(buffer.data() + 4 + offset);
-        framePtr[i].time = reinterpret_cast<const float*>(buffer.data() + 16 + offset);
+        framePtr[i].time = reinterpret_cast<const float*>(
+          reinterpret_cast<const void*>(buffer.data() + 16 + offset));
         framePtr[i].frames = reinterpret_cast<const mdl_simpleframe_t*>(
           buffer.data() + 16 + 4 * (*framePtr[i].nb) + offset);
         frameOffsets.emplace_back(std::vector<int>());
@@ -217,7 +220,8 @@ public:
         normals->SetNumberOfComponents(3);
         normals->Allocate(header->numTriangles * 3 * 3);
         const mdl_simpleframe_t* selectedSimpleFrame = numGroupFrames > 1
-          ? reinterpret_cast<const mdl_simpleframe_t*>(buffer.data() + frameOffsets[frameNum][groupFrameNum])
+          ? reinterpret_cast<const mdl_simpleframe_t*>(
+              buffer.data() + frameOffsets[frameNum][groupFrameNum])
           : selectedFrame.frames;
         for (int i = 0; i < header->numTriangles; i++)
         {
@@ -308,7 +312,7 @@ public:
         std::pair<int, float> pair = std::make_pair(this->AnimationIds[i].first,
           (this->AnimationIds[i].second + this->AnimationIds[i + 1].second) / 2);
         // Increments i to avoid infinite loop
-        this->AnimationIds.insert(this->AnimationIds.begin() + i++, pair); 
+        this->AnimationIds.insert(this->AnimationIds.begin() + i++, pair);
       }
     }
   }
@@ -376,8 +380,8 @@ public:
       lastFrameIndex <= (int)this->AnimationIds.size() ? lastFrameIndex - 1 : lastFrameIndex;
     for (int i = firstFrameIndex; i <= lastFrameIndex; i++)
     {
-      this->ActiveFrames.erase(
-        std::remove(this->ActiveFrames.begin(), this->ActiveFrames.end(), i), this->ActiveFrames.end());
+      this->ActiveFrames.erase(std::remove(this->ActiveFrames.begin(), this->ActiveFrames.end(), i),
+        this->ActiveFrames.end());
     }
     this->ActiveAnimationIds.erase(
       std::remove(this->ActiveAnimationIds.begin(), this->ActiveAnimationIds.end(), animationIndex),
