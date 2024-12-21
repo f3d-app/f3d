@@ -350,6 +350,7 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   newPass->SetUseBlurBackground(this->UseBlurBackground);
   newPass->SetCircleOfConfusionRadius(this->CircleOfConfusionRadius);
   newPass->SetForceOpaqueBackground(this->HDRISkyboxVisible);
+  newPass->SetArmatureVisible(this->ArmatureVisible);
 
   double bounds[6];
   this->ComputeVisiblePropBounds(bounds);
@@ -1373,6 +1374,17 @@ void vtkF3DRenderer::ShowHDRISkybox(bool show)
     this->HDRIReaderConfigured = false;
     this->HDRITextureConfigured = false;
     this->HDRISkyboxConfigured = false;
+    this->RenderPassesConfigured = false;
+    this->CheatSheetConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ShowArmature(bool show)
+{
+  if (this->ArmatureVisible != show)
+  {
+    this->ArmatureVisible = show;
     this->RenderPassesConfigured = false;
     this->CheatSheetConfigured = false;
   }

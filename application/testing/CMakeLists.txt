@@ -305,9 +305,11 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20231108)
   if(APPLE) # MacOS does not support OpenGL 4.3
     f3d_test(NAME TestSkinningManyBonesFailure DATA tube_254bones.glb ARGS --verbose REGEXP "which requires OpenGL" NO_BASELINE)
   else()
-    # Strictly speaking, this test can also fail if ran without OpenGL 4.3 support on Windows and Linux
-    # Instead of checking MacOS only, we should try to get OpenGL capabilities from CMake later instead
-    f3d_test(NAME TestSkinningManyBones DATA tube_254bones.glb)
+    if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20241219) # The baseline changed with armature support
+      # Strictly speaking, this test can also fail if ran without OpenGL 4.3 support on Windows and Linux
+      # Instead of checking MacOS only, we should try to get OpenGL capabilities from CMake later instead
+      f3d_test(NAME TestSkinningManyBones DATA tube_254bones.glb)
+    endif()
   endif()
 else()
   f3d_test(NAME TestSkinningManyBonesWarning DATA tube_254bones.glb ARGS --verbose REGEXP "with more than 250 bones \\\(254\\\)" NO_BASELINE)
@@ -396,6 +398,13 @@ f3d_test(NAME TestInteractionAnimationInvert DATA f3d.glb ARGS --animation-speed
 # A verbose test that needs animation index support
 f3d_test(NAME TestVerboseAnimationWrongAnimationTimeHigh DATA BoxAnimated.gltf ARGS --animation-time=10 --verbose REGEXP "Animation time 10 is outside of range \\[0, 3\\.70833\\], using 3\\.70833" NO_BASELINE)
 f3d_test(NAME TestVerboseAnimationWrongAnimationTimeLow DATA BoxAnimated.gltf ARGS --animation-time=-5 --verbose REGEXP "Animation time -5 is outside of range \\[0, 3\\.70833\\], using 0" NO_BASELINE)
+
+# Armature test
+f3d_test(NAME TestGLTFRigNoArmature DATA RiggedFigure.glb ARGS --animation-time=1)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20241219)
+  f3d_test(NAME TestGLTFRigArmature DATA RiggedFigure.glb ARGS --animation-time=1 --armature)
+  f3d_test(NAME TestGLTFRigArmatureSphereTube DATA RiggedFigure.glb ARGS --animation-time=1 --armature --point-size=20 --line-width=5)
+endif()
 
 # Test exit hotkey
 f3d_test(NAME TestInteractionSimpleExit DATA cow.vtp REGEXP "Interactor has been stopped" INTERACTION NO_BASELINE) #CTRL+Q

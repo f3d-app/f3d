@@ -45,6 +45,7 @@
 - Crosterian.ttf: Denis Ignatov : [OFL (SIL Open Font License)](https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL)
 - SimpleMorph.gltf: glTF-Sample-Models: Public Domain
 - SimpleSkin.gltf: glTF-Sample-Models: Public Domain
+- RiggedFigure.glb: glTF-Sample-Models: Public Domain
 - samplePTS.pts: VTK Data: BSD-3-Clause
 - skin.png: Blender: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - small.ex2: VTK Data: BSD-3-Clause

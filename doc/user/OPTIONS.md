@@ -40,6 +40,7 @@ Options|Default|Description
 \-\-grid\-subdivisions=\<count\>||Set the number of subdivisions for the grid.
 \-\-grid\-color=\<color\>|(0,0,0)|Set the color grid lines.
 -e, \-\-edges||Show the *cell edges*.
+\-\-armature||Show armature if present (glTF only).
 \-\-camera-index=\<idx\>||Select the scene camera to use when available in the file. Automatically computed by default.
 -k, \-\-trackball||Enable trackball interaction.
 \-\-animation-autoplay||Automatically start animation.
