@@ -8,6 +8,7 @@
 - [How to use animations in F3D.](ANIMATIONS.md)
 - [How to configure F3D using a configuration file.](CONFIGURATION_FILE.md)
 - [The different commands available in F3D.](COMMANDS.md)
+- [How are options values are parsed in F3D.](PARSING.md)
 - [How to use colormaps in F3D.](COLOR_MAPS.md)
 - [How to a use custom final shader in F3D.](FINAL_SHADER.md)
 - [How to integrate F3D in your desktop.](DESKTOP_INTEGRATION.md)
