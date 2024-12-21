@@ -29,13 +29,5 @@ void vtkF3DGLTFImporter::ApplyArmatureProperties(vtkActor* actor)
   vtkNew<vtkInformation> info;
   info->Set(vtkF3DRenderPass::ACTOR_IS_ARMATURE(), 1);
   actor->SetPropertyKeys(info);
-
-  // armature on top
-  //vtkOpenGLShaderProperty* sp = vtkOpenGLShaderProperty::SafeDownCast(actor->GetShaderProperty());
-  //if (sp)
-  //{
-  //  // compress the depth value to the first thousandth slice in front of the camera to make sure it's displayed on top
-  //  sp->AddFragmentShaderReplacement("//VTK::Depth::Impl", false, "gl_FragDepth = gl_FragDepth * 0.001;\n", false);
-  //}
 }
 #endif
