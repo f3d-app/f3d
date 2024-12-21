@@ -1,10 +1,10 @@
 /**
  * @class   vtkF3DQuakeMDLImporter
  * @brief   VTK Importer for Quake 1 models in .mdl file format
- * 
- * This reader is based on implementations of Quake 1's MDL, defined in https://book.leveldesignbook.com/appendix/resources/formats/mdl
- * It reads vertices, normals and texture coordinate data from .mdl files.
- * Supports animations.
+ *
+ * This reader is based on implementations of Quake 1's MDL, defined in
+ * https://book.leveldesignbook.com/appendix/resources/formats/mdl It reads vertices, normals and
+ * texture coordinate data from .mdl files. Supports animations.
  */
 
 
