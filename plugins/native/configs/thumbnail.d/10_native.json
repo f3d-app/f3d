@@ -44,5 +44,12 @@
       "anti-aliasing": false,
       "translucency-support": false
     }
+  },
+  {
+    "match": ".*(mdl)",
+    "options":
+    {
+      "up": "+Z"
+    }
   }
 ]
