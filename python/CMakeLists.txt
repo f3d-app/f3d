@@ -90,7 +90,7 @@ if (F3D_BINDINGS_PYTHON_GENERATE_STUBS)
   add_custom_command(
     TARGET pyf3d
     POST_BUILD
-    COMMAND /home/michael/.venv/bin/python ${CMAKE_CURRENT_SOURCE_DIR}/generate_stubs.py --into=${CMAKE_BINARY_DIR}
+    COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/generate_stubs.py --into=${CMAKE_BINARY_DIR}
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 endif()
 
