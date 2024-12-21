@@ -7,7 +7,6 @@
  * texture coordinate data from .mdl files. Supports animations.
  */
 
-
 #ifndef vtkF3DQuakeMDLImporter_h
 #define vtkF3DQuakeMDLImporter_h
 #include <vtkF3DImporter.h>
@@ -63,20 +62,12 @@ public:
    */
   vtkIdType GetNumberOfCameras() override;
 
-  /**
-   * Get the name of a camera.
-   * Not implemented, not specified.
-   */
-  std::string GetCameraName(vtkIdType camIndex) override;
-
 protected:
   vtkF3DQuakeMDLImporter();
   ~vtkF3DQuakeMDLImporter() override = default;
 
   int ImportBegin() override;
   void ImportActors(vtkRenderer*) override;
-  void ImportCameras(vtkRenderer*) override;
-  void ImportLights(vtkRenderer*) override;
 
 private:
   vtkF3DQuakeMDLImporter(const vtkF3DQuakeMDLImporter&) = delete;
