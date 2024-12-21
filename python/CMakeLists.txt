@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.21)
 
 project(pyf3d)
 
+option(F3D_BINDINGS_PYTHON_GENERATE_STUBS "Generate Python stubs" OFF)
+
 list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_LIST_DIR}/cmake")
 include(GNUInstallDirs)
 include(f3dPython)
@@ -83,6 +85,15 @@ endif()
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/__init__.py.in"
   "${CMAKE_CURRENT_BINARY_DIR}/__init__.py-install" @ONLY)
 
+# Stubs
+if (F3D_BINDINGS_PYTHON_GENERATE_STUBS)
+  add_custom_command(
+    TARGET pyf3d
+    POST_BUILD
+    COMMAND /home/michael/.venv/bin/python ${CMAKE_CURRENT_SOURCE_DIR}/generate_stubs.py --into=${CMAKE_BINARY_DIR}
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+endif()
+
 # testing
 if(BUILD_TESTING)
   add_subdirectory(testing)
@@ -93,3 +104,7 @@ install(TARGETS pyf3d
   LIBRARY DESTINATION ${f3d_python_install_path} COMPONENT python)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/__init__.py-install" RENAME "__init__.py"
   DESTINATION ${f3d_python_install_path} COMPONENT python)
+if (F3D_BINDINGS_PYTHON_GENERATE_STUBS)
+  install(FILES  "${f3d_module_dir}/__init__.pyi" "${f3d_module_dir}/pyf3d.pyi"
+    DESTINATION ${f3d_python_install_path} COMPONENT python)
+endif()
