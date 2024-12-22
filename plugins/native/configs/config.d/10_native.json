@@ -60,7 +60,7 @@
     "coloring-component": "-2",
     "background-color": "0, 0, 0",
     "up": "-Y",
-    "trackball": true,
+    "interaction-trackball": true,
     "camera-position": "0,1,-5.2",
     "camera-focal-point": "0,1,0",
     "tone-mapping": false,
