@@ -578,8 +578,9 @@ public:
       f3d::options::parse<double>(appOptions.at("camera-azimuth-angle")),
       f3d::options::parse<double>(appOptions.at("camera-elevation-angle")) };
 
-    this->AppOptions.Reference = f3d::options::parse<std::string>(appOptions.at("ref"));
-    this->AppOptions.RefThreshold = f3d::options::parse<double>(appOptions.at("ref-threshold"));
+    this->AppOptions.Reference = f3d::options::parse<std::string>(appOptions.at("reference"));
+    this->AppOptions.RefThreshold =
+      f3d::options::parse<double>(appOptions.at("reference-threshold"));
     this->AppOptions.InteractionTestRecordFile =
       f3d::options::parse<std::string>(appOptions.at("interaction-test-record"));
     this->AppOptions.InteractionTestPlayFile =
