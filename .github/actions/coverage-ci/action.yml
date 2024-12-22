@@ -18,11 +18,12 @@ runs:
       run: |
         [[ "${{ inputs.lfs_sha }}" ]] || { echo "lfs_sha input is empty" ; exit 1; }
 
-    - name: Copy LFS Data
-      uses: ./source/.github/actions/lfs-copy
+    - name: Recover LFS Data
+      uses: f3d-app/lfs-data-cache-action@v1
       with:
-        lfs_sha: ${{ inputs.lfs_sha}}
-        workflow_label: 'consumer'
+        type: 'consumer'
+        lfs_sha: ${{inputs.lfs_sha}}
+        cache_postfix: cache-0 
 
     - name: Dependencies Dir
       shell: bash
@@ -64,9 +65,9 @@ runs:
         -DCMAKE_MODULE_PATH=$(pwd)/../dependencies/install/lib/cmake/OpenVDB/
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_COVERAGE=ON
-        -DF3D_MODULE_EXTERNAL_RENDERING=ON
         -DF3D_MODULE_EXR=ON
         -DF3D_MODULE_RAYTRACING=ON
+        -DF3D_MODULE_UI=ON
         -DF3D_PLUGINS_STATIC_BUILD=OFF
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
         -DF3D_PLUGIN_BUILD_ASSIMP=ON
@@ -75,7 +76,12 @@ runs:
         -DF3D_PLUGIN_BUILD_USD=ON
         -DF3D_PLUGIN_BUILD_VDB=ON
         -DF3D_STRICT_BUILD=ON
+        -DF3D_TESTING_ENABLE_EGL_TESTS=ON
+        -DF3D_TESTING_ENABLE_EXTERNAL_GLFW=ON
+        -DF3D_TESTING_ENABLE_EXTERNAL_QT=ON
+        -DF3D_TESTING_ENABLE_GLX_TESTS=ON
         -DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=ON
+        -DF3D_TESTING_ENABLE_OSMESA_TESTS=ON
 
     - name: Build
       shell: bash
@@ -103,10 +109,7 @@ runs:
       working-directory: ${{github.workspace}}/source
       run: |
         lcov --base-directory . --directory . -c -o coverage.info --gcov-tool /usr/bin/gcov
-        lcov --remove coverage.info "*/dependencies/*" -o coverage.info
-        lcov --remove coverage.info "*/cxxopts.hpp" -o coverage.info
-        lcov --remove coverage.info "*/json.hpp" -o coverage.info
-        lcov --remove coverage.info "*/dmon.h" -o coverage.info
+        lcov --remove coverage.info "*/external/*" -o coverage.info
         lcov --remove coverage.info "*Test*" -o coverage.info
 
     - name: Upload coverage to Codecov

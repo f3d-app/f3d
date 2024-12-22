@@ -1,0 +1,2 @@
+toggle render.raytracing.enable
+toggle render.raytracing.denoise

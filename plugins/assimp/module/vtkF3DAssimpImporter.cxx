@@ -242,8 +242,6 @@ public:
 
     if (aTexture->mHeight == 0)
     {
-// CreateImageReader2FromExtension needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8211
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20210729)
       std::string fileType = aTexture->achFormatHint;
 
       vtkSmartPointer<vtkImageReader2> reader;
@@ -256,10 +254,6 @@ public:
         reader->SetMemoryBufferLength(aTexture->mWidth);
         vTexture->SetInputConnection(reader->GetOutputPort());
       }
-#else
-      vtkWarningWithObjectMacro(
-        this->Parent, "Embedded texture are supported by VTK >= 9.0.20210729");
-#endif
     }
     else
     {
@@ -592,7 +586,7 @@ public:
   /**
    * Read the scene file
    */
-  void ReadScene(const std::string& filePath)
+  bool ReadScene(const std::string& filePath)
   {
     try
     {
@@ -602,7 +596,8 @@ public:
     }
     catch (const DeadlyImportError& e)
     {
-      vtkWarningWithObjectMacro(this->Parent, "Assimp exception: " << e.what());
+      vtkErrorWithObjectMacro(this->Parent, "Assimp exception: " << e.what());
+      return false;
     }
 
     if (this->Scene)
@@ -627,13 +622,15 @@ public:
       {
         this->Properties[i] = this->CreateMaterial(this->Scene->mMaterials[i]);
       }
+      return true;
     }
     else
     {
-      vtkWarningWithObjectMacro(this->Parent, "Assimp failed to load: " << filePath);
+      vtkErrorWithObjectMacro(this->Parent, "Assimp failed to load: " << filePath);
 
       auto errorDescription = this->Importer.GetErrorString();
-      vtkWarningWithObjectMacro(this->Parent, "Assimp error: " << errorDescription);
+      vtkErrorWithObjectMacro(this->Parent, "Assimp error: " << errorDescription);
+      return false;
     }
   }
 
@@ -870,7 +867,7 @@ public:
   std::vector<vtkSmartPointer<vtkPolyData>> Meshes;
   std::vector<vtkSmartPointer<vtkProperty>> Properties;
   std::vector<vtkSmartPointer<vtkTexture>> EmbeddedTextures;
-  vtkIdType ActiveAnimation = 0;
+  vtkIdType ActiveAnimation = -1; // -1 means no animation enabled here
   std::vector<std::pair<std::string, vtkSmartPointer<vtkLight>>> Lights;
   std::vector<
     std::pair<std::string, std::pair<vtkSmartPointer<vtkCamera>, vtkSmartPointer<vtkCamera>>>>
@@ -895,9 +892,7 @@ vtkF3DAssimpImporter::~vtkF3DAssimpImporter() = default;
 //----------------------------------------------------------------------------
 int vtkF3DAssimpImporter::ImportBegin()
 {
-  this->Internals->ReadScene(this->FileName);
-
-  return 1;
+  return this->Internals->ReadScene(this->FileName);
 }
 
 //----------------------------------------------------------------------------
@@ -913,12 +908,12 @@ std::string vtkF3DAssimpImporter::GetOutputsDescription()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DAssimpImporter::UpdateTimeStep(double timeValue)
+bool vtkF3DAssimpImporter::UpdateAtTimeValue(double timeValue)
 {
-  if (this->Internals->ActiveAnimation < 0 ||
-    this->Internals->ActiveAnimation >= this->GetNumberOfAnimations())
+  assert(this->Internals->ActiveAnimation < this->GetNumberOfAnimations());
+  if (this->Internals->ActiveAnimation == -1)
   {
-    return;
+    return true;
   }
 
   // get the animation tick
@@ -1030,6 +1025,7 @@ void vtkF3DAssimpImporter::UpdateTimeStep(double timeValue)
   this->Internals->UpdateBones();
   this->Internals->UpdateCameras();
   this->Internals->UpdateLights();
+  return true;
 }
 
 //----------------------------------------------------------------------------
@@ -1041,34 +1037,41 @@ vtkIdType vtkF3DAssimpImporter::GetNumberOfAnimations()
 //----------------------------------------------------------------------------
 std::string vtkF3DAssimpImporter::GetAnimationName(vtkIdType animationIndex)
 {
+  assert(animationIndex < this->GetNumberOfAnimations());
+  assert(animationIndex >= 0);
   return this->Internals->Scene->mAnimations[animationIndex]->mName.C_Str();
 }
 
 //----------------------------------------------------------------------------
 void vtkF3DAssimpImporter::EnableAnimation(vtkIdType animationIndex)
 {
+  assert(animationIndex < this->GetNumberOfAnimations());
+  assert(animationIndex >= 0);
   this->Internals->ActiveAnimation = animationIndex;
 }
 
 //----------------------------------------------------------------------------
 void vtkF3DAssimpImporter::DisableAnimation(vtkIdType vtkNotUsed(animationIndex))
 {
-  this->Internals->ActiveAnimation = 0;
+  this->Internals->ActiveAnimation = -1;
 }
 
 //----------------------------------------------------------------------------
 bool vtkF3DAssimpImporter::IsAnimationEnabled(vtkIdType animationIndex)
 {
+  assert(animationIndex < this->GetNumberOfAnimations());
+  assert(animationIndex >= 0);
   return this->Internals->ActiveAnimation == animationIndex;
 }
 
-// Complete GetTemporalInformation needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7246
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200912)
 //----------------------------------------------------------------------------
 bool vtkF3DAssimpImporter::GetTemporalInformation(vtkIdType animationIndex,
   double vtkNotUsed(frameRate), int& vtkNotUsed(nbTimeSteps), double timeRange[2],
   vtkDoubleArray* vtkNotUsed(timeSteps))
 {
+  assert(animationIndex < this->GetNumberOfAnimations());
+  assert(animationIndex >= 0);
+
   double duration = this->Internals->Scene->mAnimations[animationIndex]->mDuration;
   double fps = this->Internals->Scene->mAnimations[animationIndex]->mTicksPerSecond;
   if (fps == 0.0)
@@ -1089,10 +1092,7 @@ bool vtkF3DAssimpImporter::GetTemporalInformation(vtkIdType animationIndex,
   timeRange[1] = duration / fps;
   return true;
 }
-#endif
 
-// Importer camera needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7701
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200912)
 //----------------------------------------------------------------------------
 vtkIdType vtkF3DAssimpImporter::GetNumberOfCameras()
 {
@@ -1110,7 +1110,6 @@ void vtkF3DAssimpImporter::SetCamera(vtkIdType camIndex)
 {
   this->Internals->ActiveCameraIndex = camIndex;
 }
-#endif
 
 //----------------------------------------------------------------------------
 void vtkF3DAssimpImporter::ImportCameras(vtkRenderer* renderer)

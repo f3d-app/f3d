@@ -15,7 +15,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: dependencies/occt_install
-        key: occt-V7_8_1-${{runner.os}}-${{inputs.cpu}}-1
+        key: occt-V7_8_1-${{runner.os}}-${{inputs.cpu}}-2
 
     - name: Checkout OCCT
       if: steps.cache-occt.outputs.cache-hit != 'true'
@@ -49,7 +49,7 @@ runs:
       shell: bash
       run: >
         cmake ../occt
-        -DBUILD_ADDITIONAL_TOOLKITS="TKDESTEP;TKDEIGES;TKMesh"
+        -DBUILD_ADDITIONAL_TOOLKITS="TKDESTEP;TKDEIGES;TKMesh;TKBinXCAF"
         -DBUILD_DOC_Overview=OFF
         -DBUILD_LIBRARY_TYPE=Shared
         -DBUILD_MODULE_ApplicationFramework=OFF

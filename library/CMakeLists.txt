@@ -19,25 +19,26 @@ if(F3D_MODULE_RAYTRACING)
   endif()
 endif()
 
-if(F3D_MODULE_EXTERNAL_RENDERING)
-  if(TARGET VTK::RenderingExternal)
-    message(STATUS "VTK::RenderingExternal module found")
-    set(F3D_VTK_MODULES ${F3D_VTK_MODULES} VTK::RenderingExternal)
-  else()
-    message(FATAL_ERROR "F3D_MODULE_EXTERNAL_RENDERING option is enabled but VTK::RenderingExternal is not found")
-  endif()
-endif()
-
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/src/config.cxx.in"
   "${CMAKE_CURRENT_BINARY_DIR}/src/config.cxx"
   @ONLY)
+
+include(f3dOptions)
+f3d_generate_options(
+  INPUT_JSON "${CMAKE_CURRENT_SOURCE_DIR}/options.json"
+  INPUT_PUBLIC_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/public/options.h.in"
+  INPUT_PRIVATE_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/private/options_tools.h.in"
+  DESTINATION "${CMAKE_CURRENT_BINARY_DIR}"
+  OUTPUT_NAME "options"
+  )
 
 # Define libf3d target
 set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/animationManager.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/camera_impl.cxx
   ${CMAKE_CURRENT_BINARY_DIR}/src/config.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/context.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/engine.cxx
   ${CMAKE_CURRENT_BINARY_DIR}/src/factory.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/image.cxx
@@ -45,27 +46,32 @@ set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/interactor.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/interactor_impl.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/levenshtein.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/loader_impl.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/log.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/options.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/scene_impl.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/types.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/utils.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/window_impl.cxx
   )
 
+if(APPLE)
+  list(APPEND F3D_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/context_cocoa.mm)
+endif()
+
 # List of headers that will be installed
 set(F3D_PUBLIC_HEADERS
-  ${CMAKE_CURRENT_SOURCE_DIR}/plugin/reader.h
+  ${CMAKE_CURRENT_BINARY_DIR}/public/export.h
+  ${CMAKE_CURRENT_BINARY_DIR}/public/options.h
   ${CMAKE_CURRENT_SOURCE_DIR}/plugin/plugin.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/plugin/reader.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/camera.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/public/context.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/engine.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/exception.h
-  ${CMAKE_CURRENT_BINARY_DIR}/public/export.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/image.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/interactor.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/public/loader.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/log.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/public/options.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/public/scene.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/types.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/utils.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/window.h
@@ -102,8 +108,8 @@ if (WIN32)
 endif()
 
 set_target_properties(libf3d PROPERTIES
-  CXX_STANDARD 17
   CXX_VISIBILITY_PRESET hidden
+  CXX_STANDARD 17
   POSITION_INDEPENDENT_CODE ON
   OUTPUT_NAME "f3d"
   PDB_NAME "libf3d"
@@ -152,8 +158,7 @@ list(JOIN F3D_STATIC_PLUGIN_MAP "\n  " F3D_STATIC_PLUGIN_MAP)
 
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/src/factory.cxx.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/src/factory.cxx"
-  @ONLY)
+  "${CMAKE_CURRENT_BINARY_DIR}/src/factory.cxx")
 
 # libf3d links with the static plugins.
 list(TRANSFORM F3D_STATIC_PLUGIN_TARGETS PREPEND "f3d-plugin-")
@@ -161,6 +166,21 @@ list(TRANSFORM F3D_STATIC_PLUGIN_TARGETS PREPEND "f3d-plugin-")
 target_link_libraries(libf3d PRIVATE ${F3D_VTK_MODULES} ${F3D_STATIC_PLUGIN_TARGETS})
 target_compile_options(libf3d PUBLIC ${f3d_compile_options_public} PRIVATE ${f3d_compile_options_private})
 target_link_options(libf3d PUBLIC ${f3d_link_options_public})
+
+# exr
+if (F3D_MODULE_EXR)
+  target_compile_definitions(libf3d PRIVATE F3D_MODULE_EXR)
+endif ()
+
+# ui
+if (F3D_MODULE_UI)
+  target_compile_definitions(libf3d PRIVATE F3D_MODULE_UI)
+endif ()
+
+# raytracing
+if (F3D_MODULE_RAYTRACING)
+  target_compile_definitions(libf3d PRIVATE F3D_MODULE_RAYTRACING)
+endif ()
 
 if(F3D_STRICT_BUILD AND MSVC)
   # There are warnings in VTK related to deprecated features in C++17

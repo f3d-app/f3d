@@ -2,7 +2,6 @@
 
 #include "log.h"
 
-#include "vtkF3DConfigure.h"
 #include "vtkF3DObjectFactory.h"
 
 #if F3D_MODULE_EXR
@@ -37,10 +36,7 @@ init::init()
 
   // Disable vtkLogger in case VTK was built with log support
   vtkLogger::SetStderrVerbosity(vtkLogger::VERBOSITY_OFF);
-// SetInternalVerbosityLevel needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7078
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200701)
   vtkLogger::SetInternalVerbosityLevel(vtkLogger::VERBOSITY_OFF);
-#endif
 
   // instantiate our own polydata mapper and output windows
   vtkNew<vtkF3DObjectFactory> factory;

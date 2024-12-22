@@ -1,13 +1,13 @@
 #include "vtkF3DCachedSpecularTexture.h"
 
-#include "vtkImageData.h"
-#include "vtkMultiBlockDataSet.h"
-#include "vtkObjectFactory.h"
-#include "vtkOpenGLRenderWindow.h"
-#include "vtkRenderer.h"
-#include "vtkTextureObject.h"
-#include "vtkXMLMultiBlockDataReader.h"
+#include <vtkImageData.h>
+#include <vtkMultiBlockDataSet.h>
+#include <vtkObjectFactory.h>
+#include <vtkOpenGLRenderWindow.h>
+#include <vtkRenderer.h>
+#include <vtkTextureObject.h>
 #include <vtkVersion.h>
+#include <vtkXMLMultiBlockDataReader.h>
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
 #include <vtk_glad.h>

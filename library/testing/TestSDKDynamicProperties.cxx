@@ -1,32 +1,32 @@
 #include <engine.h>
-#include <loader.h>
 #include <options.h>
+#include <scene.h>
 #include <window.h>
 
 #include "TestSDKHelpers.h"
 
 int TestSDKDynamicProperties(int argc, char* argv[])
 {
-  f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
-  f3d::loader& load = eng.getLoader();
+  f3d::engine eng = f3d::engine::create(true);
+  f3d::scene& sce = eng.getScene();
   f3d::window& win = eng.getWindow();
   f3d::options& opt = eng.getOptions();
   win.setSize(300, 300);
-  opt.set("ui.filename", true);
-  opt.set("ui.filename-info", "(1/1) cow.vtp");
+  opt.ui.filename = true;
+  opt.ui.filename_info = "(1/1) cow.vtp";
 
-  load.loadGeometry(std::string(argv[1]) + "/data/cow.vtp");
+  sce.add(std::string(argv[1]) + "/data/cow.vtp");
 
   win.render();
 
   // Change model properties and make sure it is taken into account
-  opt.set("model.material.roughness", 0.6);
-  opt.set("model.material.metallic", 0.5);
-  opt.set("model.color.rgb", { 0.6, 0.1, 0.2 });
-  opt.set("model.color.opacity", 0.6);
+  opt.model.material.roughness = 0.6;
+  opt.model.material.metallic = 0.5;
+  opt.model.color.rgb = { 0.6, 0.1, 0.2 };
+  opt.model.color.opacity = 0.6;
 
   return TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
-           std::string(argv[2]), "TestSDKDynamicProperties", 50)
+           std::string(argv[2]), "TestSDKDynamicProperties")
     ? EXIT_SUCCESS
     : EXIT_FAILURE;
 }

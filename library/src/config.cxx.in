@@ -1,10 +1,8 @@
 #include "config.h"
 
-#include "vtkF3DConfigure.h"
-
 namespace f3d::detail
 {
-const std::string LibVersion = "@F3D_VERSION@"; // Version is synchronized with F3D
+const std::string LibVersion = "@F3D_VERSION@";          // Version is synchronized with F3D
 const std::string LibVersionFull = "@F3D_VERSION_FULL@"; // Version is synchronized with F3D
 const std::string LibBuildSystem = "@CMAKE_SYSTEM_NAME@ @F3D_SYSTEM_PROCESSOR@";
 const std::string LibBuildDate = "@F3D_BUILD_DATE@";

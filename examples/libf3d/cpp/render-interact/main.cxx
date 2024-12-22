@@ -1,7 +1,6 @@
 #include <f3d/engine.h>
 #include <f3d/image.h>
 #include <f3d/log.h>
-#include <f3d/options.h>
 #include <f3d/window.h>
 
 int main(int argc, char** argv)
@@ -19,21 +18,21 @@ int main(int argc, char** argv)
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
 
   // Create a native window engine
-  f3d::engine eng(f3d::window::Type::NATIVE);
+  f3d::engine eng = f3d::engine::create();
 
-  // Load a model
-  const f3d::loader& load = eng.getLoader().loadGeometry(std::string(argv[1]));
+  // add a model
+  eng.getScene().add(std::string(argv[1]));
 
   // Render
   f3d::window& win = eng.getWindow();
   win.render();
 
-  // Create a timer to stop interaction after one second
+  // Start interaction and stop it after one second
   f3d::interactor& inter = eng.getInteractor();
-  inter.createTimerCallBack(1000, [&inter]() { inter.stop(); });
+  inter.start(1, [&inter]() { inter.stop(); });
 
-  // Start interaction
-  inter.start();
+  // Actual call would look like this
+  // inter.start();
 
   return EXIT_SUCCESS;
 }

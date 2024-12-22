@@ -1,15 +1,15 @@
 # Installation
 
-## Current release packages (2.4.0)
+## Current release packages (2.5.0)
 
 | Platform | Files |
 | -------- | ----- |
-| Windows (installer) | [F3D-2.4.0-Windows.exe](https://github.com/f3d-app/f3d/releases/download/v2.4.0/F3D-2.4.0-Windows-x86_64-raytracing.exe) |
-| Windows (portable) | [F3D-2.4.0-Windows.zip](https://github.com/f3d-app/f3d/releases/download/v2.4.0/F3D-2.4.0-Windows-x86_64-raytracing.zip) |
-| MacOS (Silicon) | [F3D-2.4.0-macOS-arm64.dmg](https://github.com/f3d-app/f3d/releases/download/v2.4.0/F3D-2.4.0-macOS-arm64-raytracing.dmg) |
-| MacOS (Intel) | [F3D-2.4.0-macOS-x86_64.dmg](https://github.com/f3d-app/f3d/releases/download/v2.4.0/F3D-2.4.0-macOS-x86_64-raytracing.dmg) |
-| Linux (Debian package) | [F3D-2.4.0-Linux.deb](https://github.com/f3d-app/f3d/releases/download/v2.4.0/F3D-2.4.0-Linux-x86_64-raytracing.deb) |
-| Linux (portable) | [F3D-2.4.0-Linux.tar.xz](https://github.com/f3d-app/f3d/releases/download/v2.4.0/F3D-2.4.0-Linux-x86_64-raytracing.tar.xz) |
+| Windows (installer) | [F3D-2.5.0-Windows.exe](https://github.com/f3d-app/f3d/releases/download/v2.5.0/F3D-2.5.0-Windows-x86_64-raytracing.exe) |
+| Windows (portable) | [F3D-2.5.0-Windows.zip](https://github.com/f3d-app/f3d/releases/download/v2.5.0/F3D-2.5.0-Windows-x86_64-raytracing.zip) |
+| MacOS (Silicon) | [F3D-2.5.0-macOS-arm64.dmg](https://github.com/f3d-app/f3d/releases/download/v2.5.0/F3D-2.5.0-macOS-arm64-raytracing.dmg) |
+| MacOS (Intel) | [F3D-2.5.0-macOS-x86_64.dmg](https://github.com/f3d-app/f3d/releases/download/v2.5.0/F3D-2.5.0-macOS-x86_64-raytracing.dmg) |
+| Linux (Debian package) | [F3D-2.5.0-Linux.deb](https://github.com/f3d-app/f3d/releases/download/v2.5.0/F3D-2.5.0-Linux-x86_64-raytracing.deb) |
+| Linux (portable) | [F3D-2.5.0-Linux.tar.xz](https://github.com/f3d-app/f3d/releases/download/v2.5.0/F3D-2.5.0-Linux-x86_64-raytracing.tar.xz) |
 
 Note: MacOS package is not signed, see the [troubleshooting](LIMITATIONS_AND_TROUBLESHOOTING.md#macos) section for a workaround if needed.
 

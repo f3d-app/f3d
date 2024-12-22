@@ -5,37 +5,42 @@
 #include "log.h"
 #include "options.h"
 
-#include "vtkF3DConfigure.h"
+#include "vtkF3DExternalRenderWindow.h"
 
 #include "vtkF3DGenericImporter.h"
 #include "vtkF3DNoRenderWindow.h"
-#include "vtkF3DRendererWithColoring.h"
+#include "vtkF3DRenderer.h"
 
 #include <vtkCamera.h>
+#include <vtkF3DRenderPass.h>
 #include <vtkImageData.h>
 #include <vtkImageExport.h>
+#include <vtkInformation.h>
 #include <vtkPNGReader.h>
 #include <vtkPointGaussianMapper.h>
-#include <vtkRenderWindow.h>
 #include <vtkRendererCollection.h>
+#include <vtkRenderingOpenGLConfigure.h>
 #include <vtkVersion.h>
 #include <vtkWindowToImageFilter.h>
 #include <vtksys/SystemTools.hxx>
 
-#if F3D_MODULE_EXTERNAL_RENDERING
-#include <vtkExternalOpenGLRenderWindow.h>
+#ifdef VTK_USE_X
+#include <vtkF3DGLXRenderWindow.h>
 #endif
 
 #ifdef _WIN32
-#include <Windows.h>
-#include <dwmapi.h>
-
-#ifndef DWMWA_USE_IMMERSIVE_DARK_MODE
-#define DWMWA_USE_IMMERSIVE_DARK_MODE 20
+#include <vtkF3DWGLRenderWindow.h>
 #endif
 
-constexpr auto IMMERSIVE_DARK_MODE_SUPPORTED_SINCE = 19041;
+#ifdef VTK_OPENGL_HAS_EGL
+#include <vtkF3DEGLRenderWindow.h>
 #endif
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
+#include <vtkOSOpenGLRenderWindow.h>
+#endif
+
+#include <sstream>
 
 namespace f3d::detail
 {
@@ -55,155 +60,208 @@ public:
     return this->CachePath;
   }
 
-#if _WIN32
-  /**
-   * Helper function to detect if the
-   * Windows Build Number is equal or greater to a number
-   */
-  static bool IsWindowsBuildNumberOrGreater(int buildNumber)
+  static context::fptr SymbolLoader(void* userptr, const char* name)
   {
-    std::string value{};
-    bool result = vtksys::SystemTools::ReadRegistryValue(
-      "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows NT\\CurrentVersion;CurrentBuildNumber",
-      value);
-
-    if (result == true)
-    {
-      try
-      {
-        return std::stoi(value) >= buildNumber;
-      }
-      catch (const std::invalid_argument& e)
-      {
-        f3d::log::debug("Error parsing CurrentBuildNumber", e.what());
-      }
-    }
-    else
-    {
-      f3d::log::debug("Error opening registry key.");
-    }
-
-    return false;
+    assert(userptr != nullptr);
+    auto* fn = static_cast<context::function*>(userptr);
+    assert(fn != nullptr);
+    return (*fn)(name);
   }
 
-  /**
-   * Helper function to fetch a DWORD from windows registry.
-   *
-   * @param hKey A handle to an open registry key
-   * @param subKey The path of registry key relative to 'hKey'
-   * @param value The name of the registry value
-   * @param dWord Variable to store the result in
-   */
-  static bool ReadRegistryDWord(
-    HKEY hKey, const std::wstring& subKey, const std::wstring& value, DWORD& dWord)
+  static vtkSmartPointer<vtkRenderWindow> AutoBackendWindow()
   {
-    DWORD dataSize = sizeof(DWORD);
-    LONG result = RegGetValueW(
-      hKey, subKey.c_str(), value.c_str(), RRF_RT_REG_DWORD, nullptr, &dWord, &dataSize);
-
-    return result == ERROR_SUCCESS;
-  }
-
-  /**
-   * Helper function to detect user theme
-   */
-  static bool IsWindowsInDarkMode()
-  {
-    std::wstring subKey(L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize");
-
-    DWORD value{};
-
-    if (ReadRegistryDWord(HKEY_CURRENT_USER, subKey, L"AppsUseLightTheme", value))
-    {
-      return value == 0;
-    }
-
-    if (ReadRegistryDWord(HKEY_CURRENT_USER, subKey, L"SystemUsesLightTheme", value))
-    {
-      return value == 0;
-    }
-
-    return false;
-  }
-#endif
-
-  void UpdateTheme() const
-  {
+    // Override VTK logic
 #ifdef _WIN32
-    if (this->IsWindowsBuildNumberOrGreater(IMMERSIVE_DARK_MODE_SUPPORTED_SINCE))
+    return vtkSmartPointer<vtkF3DWGLRenderWindow>::New();
+#elif __linux__
+#if defined(VTK_USE_X)
+    // try GLX
+    vtkSmartPointer<vtkRenderWindow> glxRenWin = vtkSmartPointer<vtkF3DGLXRenderWindow>::New();
+    if (glxRenWin)
     {
-      HWND hwnd = static_cast<HWND>(this->RenWin->GetGenericWindowId());
-      BOOL useDarkMode = this->IsWindowsInDarkMode();
-      DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &useDarkMode, sizeof(useDarkMode));
+      return glxRenWin;
     }
+#endif
+#if defined(VTK_OPENGL_HAS_EGL)
+    // try EGL
+    vtkSmartPointer<vtkRenderWindow> eglRenWin = vtkSmartPointer<vtkF3DEGLRenderWindow>::New();
+    if (eglRenWin)
+    {
+      return eglRenWin;
+    }
+#endif
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
+    // OSMesa
+    return vtkSmartPointer<vtkOSOpenGLRenderWindow>::New();
+#endif
+    return nullptr;
+#else
+    // fallback on VTK logic for other systems
+    return vtkSmartPointer<vtkRenderWindow>::New();
 #endif
   }
 
   std::unique_ptr<camera_impl> Camera;
   vtkSmartPointer<vtkRenderWindow> RenWin;
-  vtkNew<vtkF3DRendererWithColoring> Renderer;
-  Type WindowType;
+  vtkNew<vtkF3DRenderer> Renderer;
   const options& Options;
-  bool Initialized = false;
-  bool WithColoring = false;
+  interactor_impl* Interactor = nullptr;
   std::string CachePath;
+  context::function GetProcAddress;
 };
 
 //----------------------------------------------------------------------------
-window_impl::window_impl(const options& options, Type type)
+window_impl::window_impl(const options& options, const std::optional<Type>& type, bool offscreen,
+  const context::function& getProcAddress)
   : Internals(std::make_unique<window_impl::internals>(options))
 {
-  this->Internals->WindowType = type;
+  this->Internals->GetProcAddress = getProcAddress;
   if (type == Type::NONE)
   {
     this->Internals->RenWin = vtkSmartPointer<vtkF3DNoRenderWindow>::New();
   }
   else if (type == Type::EXTERNAL)
   {
-#if F3D_MODULE_EXTERNAL_RENDERING
-    this->Internals->RenWin = vtkSmartPointer<vtkExternalOpenGLRenderWindow>::New();
+    this->Internals->RenWin = vtkSmartPointer<vtkF3DExternalRenderWindow>::New();
+  }
+  else if (type == Type::EGL)
+  {
+#if defined(VTK_OPENGL_HAS_EGL)
+    this->Internals->RenWin = vtkSmartPointer<vtkF3DEGLRenderWindow>::New();
+#else
+    throw engine::no_window_exception("Window type is EGL but VTK EGL support is not enabled");
+#endif
+  }
+  else if (type == Type::OSMESA)
+  {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
+    this->Internals->RenWin = vtkSmartPointer<vtkOSOpenGLRenderWindow>::New();
 #else
     throw engine::no_window_exception(
-      "Window type is external but F3D_MODULE_EXTERNAL_RENDERING is not enabled");
+      "Window type is OSMesa but VTK OSMesa support is not enabled");
 #endif
   }
-  else
+  else if (type == Type::GLX)
   {
-    this->Internals->RenWin = vtkSmartPointer<vtkRenderWindow>::New();
-    this->Internals->RenWin->SetOffScreenRendering(type == Type::NATIVE_OFFSCREEN);
-    this->Internals->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
-
-#ifdef __ANDROID__
-    // Since F3D_MODULE_EXTERNAL_RENDERING is not supported on Android yet, we need to call
-    // this workaround. It makes vtkEGLRenderWindow external if WindowInfo is not nullptr.
-    this->Internals->RenWin->SetWindowInfo("jni");
+#if defined(VTK_USE_X)
+    this->Internals->RenWin = vtkSmartPointer<vtkF3DGLXRenderWindow>::New();
+#else
+    throw engine::no_window_exception("Window type is GLX but VTK GLX support is not enabled");
 #endif
   }
+  else if (type == Type::WGL)
+  {
+#ifdef _WIN32
+    this->Internals->RenWin = vtkSmartPointer<vtkF3DWGLRenderWindow>::New();
+#endif
+  }
+  else if (!type.has_value())
+  {
+    this->Internals->RenWin = internals::AutoBackendWindow();
+  }
+
+  if (this->Internals->RenWin == nullptr)
+  {
+    throw engine::no_window_exception("Cannot create a window");
+  }
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
+  vtkOpenGLRenderWindow* oglRenWin = vtkOpenGLRenderWindow::SafeDownCast(this->Internals->RenWin);
+  if (oglRenWin)
+  {
+    if (this->Internals->GetProcAddress)
+    {
+      oglRenWin->SetOpenGLSymbolLoader(&internals::SymbolLoader, &this->Internals->GetProcAddress);
+    }
+  }
+#endif
+
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240606)
   this->Internals->RenWin->EnableTranslucentSurfaceOn();
 #endif
+  this->Internals->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
+  this->Internals->RenWin->SetOffScreenRendering(offscreen);
   this->Internals->RenWin->SetWindowName("f3d");
   this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
   this->Internals->Camera = std::make_unique<detail::camera_impl>();
   this->Internals->Camera->SetVTKRenderer(this->Internals->Renderer);
+
+  this->Initialize();
+
+  log::debug("VTK window class type is ", this->Internals->RenWin->GetClassName());
+}
+
+//----------------------------------------------------------------------------
+void window_impl::Initialize()
+{
+  this->Internals->Renderer->Initialize();
+}
+
+//----------------------------------------------------------------------------
+void window_impl::InitializeUpVector()
+{
+  this->Internals->Renderer->InitializeUpVector(this->Internals->Options.scene.up_direction);
 }
 
 //----------------------------------------------------------------------------
 window_impl::Type window_impl::getType()
 {
-  return this->Internals->WindowType;
+  if (this->Internals->RenWin->IsA("vtkOSOpenGLRenderWindow"))
+  {
+    return Type::OSMESA;
+  }
+
+#ifdef VTK_USE_X
+  if (this->Internals->RenWin->IsA("vtkF3DGLXRenderWindow"))
+  {
+    return Type::GLX;
+  }
+#endif
+
+#ifdef _WIN32
+  if (this->Internals->RenWin->IsA("vtkF3DWGLRenderWindow"))
+  {
+    return Type::WGL;
+  }
+#endif
+
+#ifdef __APPLE__
+  if (this->Internals->RenWin->IsA("vtkCocoaRenderWindow"))
+  {
+    return Type::COCOA;
+  }
+#endif
+
+#ifdef VTK_OPENGL_HAS_EGL
+  if (this->Internals->RenWin->IsA("vtkF3DEGLRenderWindow"))
+  {
+    return Type::EGL;
+  }
+#endif
+#ifdef __EMSCRIPTEN__
+  if (this->Internals->RenWin->IsA("vtkWebAssemblyOpenGLRenderWindow"))
+  {
+    return Type::WASM;
+  }
+#endif
+
+  if (this->Internals->RenWin->IsA("vtkF3DNoRenderWindow"))
+  {
+    return Type::NONE;
+  }
+
+  return Type::UNKNOWN;
+}
+
+//----------------------------------------------------------------------------
+bool window_impl::isOffscreen()
+{
+  return !this->Internals->RenWin->GetShowWindow();
 }
 
 //----------------------------------------------------------------------------
 camera& window_impl::getCamera()
 {
-  // Make sure the camera (and the whole rendering stack)
-  // is initialized before providing one.
-  if (!this->Internals->Initialized)
-  {
-    this->Initialize(false);
-  }
-
   return *this->Internals->Camera;
 }
 
@@ -217,13 +275,6 @@ int window_impl::getWidth() const
 int window_impl::getHeight() const
 {
   return this->Internals->RenWin->GetSize()[1];
-}
-
-//----------------------------------------------------------------------------
-window& window_impl::setAnimationNameInfo(const std::string& name)
-{
-  this->Internals->Renderer->SetAnimationnameInfo(name);
-  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -254,19 +305,12 @@ window& window_impl::setPosition(int x, int y)
 //----------------------------------------------------------------------------
 window& window_impl::setIcon(const unsigned char* icon, size_t iconSize)
 {
-  // SetIcon needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7004
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200616)
   // XXX This code requires that the interactor has already been set on the render window
   vtkNew<vtkPNGReader> iconReader;
   iconReader->SetMemoryBuffer(icon);
   iconReader->SetMemoryBufferLength(iconSize);
   iconReader->Update();
   this->Internals->RenWin->SetIcon(iconReader->GetOutput());
-#else
-  // Silent noop
-  (void)icon;
-  (void)iconSize;
-#endif
   return *this;
 }
 
@@ -315,173 +359,127 @@ window_impl::~window_impl()
 }
 
 //----------------------------------------------------------------------------
-void window_impl::Initialize(bool withColoring)
-{
-  this->Internals->WithColoring = withColoring;
-  this->Internals->Renderer->Initialize(this->Internals->Options.getAsString("scene.up-direction"));
-  this->Internals->UpdateTheme();
-  this->Internals->Initialized = true;
-}
-
-//----------------------------------------------------------------------------
 void window_impl::UpdateDynamicOptions()
 {
-  if (!this->Internals->Initialized)
-  {
-    // Renderer is missing, create a default one
-    this->Initialize(false);
-  }
+  vtkF3DRenderer* renderer = this->Internals->Renderer;
 
-  if (this->Internals->WindowType == Type::NONE)
+  if (this->Internals->RenWin->IsA("vtkF3DNoRenderWindow"))
   {
     // With a NONE window type, only update the actors to get accurate bounding box information
-    this->Internals->Renderer->UpdateActors();
+    renderer->UpdateActors();
     return;
   }
 
   // Set the cache path if not already
-  this->Internals->Renderer->SetCachePath(this->Internals->GetCachePath());
+  renderer->SetCachePath(this->Internals->GetCachePath());
 
   // Make sure lights are created before we take options into account
-  this->Internals->Renderer->UpdateLights();
+  renderer->UpdateLights();
 
-  this->Internals->Renderer->ShowAxis(this->Internals->Options.getAsBool("interactor.axis"));
-  this->Internals->Renderer->SetUseTrackball(
-    this->Internals->Options.getAsBool("interactor.trackball"));
-  this->Internals->Renderer->SetInvertZoom(
-    this->Internals->Options.getAsBool("interactor.invert-zoom"));
+  const options& opt = this->Internals->Options;
+  renderer->ShowAxis(opt.ui.axis);
+  renderer->SetUseTrackball(opt.interactor.trackball);
+  renderer->SetInvertZoom(opt.interactor.invert_zoom);
 
-  // XXX: model.point-sprites.type only has an effect on geometry scene
+  // XXX: model.point_sprites.type only has an effect on geometry scene
   // but we set it here for practical reasons
-  std::string splatTypeStr = this->Internals->Options.getAsString("model.point-sprites.type");
-  int pointSize = this->Internals->Options.getAsDouble("render.point-size");
-  vtkF3DRendererWithColoring::SplatType splatType = vtkF3DRendererWithColoring::SplatType::SPHERE;
-  if (splatTypeStr == "gaussian")
+  const int pointSpritesSize = opt.model.point_sprites.size;
+  const vtkF3DRenderer::SplatType splatType = opt.model.point_sprites.type == "gaussian"
+    ? vtkF3DRenderer::SplatType::GAUSSIAN
+    : vtkF3DRenderer::SplatType::SPHERE;
+  renderer->SetPointSpritesProperties(splatType, pointSpritesSize);
+
+  renderer->SetLineWidth(opt.render.line_width);
+  renderer->SetPointSize(opt.render.point_size);
+  renderer->ShowEdge(opt.render.show_edges);
+  renderer->ShowTimer(opt.ui.fps);
+  renderer->ShowFilename(opt.ui.filename);
+  renderer->SetFilenameInfo(opt.ui.filename_info);
+  renderer->ShowMetaData(opt.ui.metadata);
+  renderer->ShowCheatSheet(opt.ui.cheatsheet);
+  renderer->ShowConsole(opt.ui.console);
+  renderer->ShowDropZone(opt.ui.dropzone);
+  renderer->SetDropZoneInfo(opt.ui.dropzone_info);
+
+  renderer->SetUseRaytracing(opt.render.raytracing.enable);
+  renderer->SetRaytracingSamples(opt.render.raytracing.samples);
+  renderer->SetUseRaytracingDenoiser(opt.render.raytracing.denoise);
+
+  renderer->SetUseSSAOPass(opt.render.effect.ambient_occlusion);
+  renderer->SetUseFXAAPass(opt.render.effect.anti_aliasing);
+  renderer->SetUseToneMappingPass(opt.render.effect.tone_mapping);
+  renderer->SetUseDepthPeelingPass(opt.render.effect.translucency_support);
+  renderer->SetBackfaceType(opt.render.backface_type);
+  renderer->SetFinalShader(opt.render.effect.final_shader);
+
+  renderer->SetBackground(opt.render.background.color.data());
+  renderer->SetUseBlurBackground(opt.render.background.blur.enable);
+  renderer->SetBlurCircleOfConfusionRadius(opt.render.background.blur.coc);
+  renderer->SetLightIntensity(opt.render.light.intensity);
+
+  renderer->SetHDRIFile(opt.render.hdri.file);
+  renderer->SetUseImageBasedLighting(opt.render.hdri.ambient);
+  renderer->ShowHDRISkybox(opt.render.background.skybox);
+
+  renderer->SetFontFile(opt.ui.font_file);
+
+  renderer->SetGridUnitSquare(opt.render.grid.unit);
+  renderer->SetGridSubdivisions(opt.render.grid.subdivisions);
+  renderer->SetGridAbsolute(opt.render.grid.absolute);
+  renderer->ShowGrid(opt.render.grid.enable);
+  renderer->SetGridColor(opt.render.grid.color);
+
+  if (!opt.scene.camera.index.has_value())
   {
-    splatType = vtkF3DRendererWithColoring::SplatType::GAUSSIAN;
+    renderer->SetUseOrthographicProjection(opt.scene.camera.orthographic);
   }
 
-  this->Internals->Renderer->SetPointProperties(splatType, pointSize);
+  renderer->SetSurfaceColor(opt.model.color.rgb);
+  renderer->SetOpacity(opt.model.color.opacity);
+  renderer->SetTextureBaseColor(opt.model.color.texture);
+  renderer->SetRoughness(opt.model.material.roughness);
+  renderer->SetMetallic(opt.model.material.metallic);
+  renderer->SetTextureMaterial(opt.model.material.texture);
+  renderer->SetTextureEmissive(opt.model.emissive.texture);
+  renderer->SetEmissiveFactor(opt.model.emissive.factor);
+  renderer->SetTextureNormal(opt.model.normal.texture);
+  renderer->SetNormalScale(opt.model.normal.scale);
+  renderer->SetTextureMatCap(opt.model.matcap.texture);
 
-  this->Internals->Renderer->SetLineWidth(
-    this->Internals->Options.getAsDouble("render.line-width"));
-  this->Internals->Renderer->ShowEdge(this->Internals->Options.getAsBool("render.show-edges"));
-  this->Internals->Renderer->ShowTimer(this->Internals->Options.getAsBool("ui.fps"));
-  this->Internals->Renderer->ShowFilename(this->Internals->Options.getAsBool("ui.filename"));
-  this->Internals->Renderer->SetFilenameInfo(
-    this->Internals->Options.getAsString("ui.filename-info"));
-  this->Internals->Renderer->ShowMetaData(this->Internals->Options.getAsBool("ui.metadata"));
-  this->Internals->Renderer->ShowCheatSheet(this->Internals->Options.getAsBool("ui.cheatsheet"));
-  this->Internals->Renderer->ShowDropZone(this->Internals->Options.getAsBool("ui.dropzone"));
-  this->Internals->Renderer->SetDropZoneInfo(
-    this->Internals->Options.getAsString("ui.dropzone-info"));
+  renderer->SetEnableColoring(opt.model.scivis.enable);
+  renderer->SetUseCellColoring(opt.model.scivis.cells);
+  renderer->SetArrayNameForColoring(opt.model.scivis.array_name);
+  renderer->SetComponentForColoring(opt.model.scivis.component);
 
-  this->Internals->Renderer->SetUseRaytracing(
-    this->Internals->Options.getAsBool("render.raytracing.enable"));
-  this->Internals->Renderer->SetRaytracingSamples(
-    this->Internals->Options.getAsInt("render.raytracing.samples"));
-  this->Internals->Renderer->SetUseRaytracingDenoiser(
-    this->Internals->Options.getAsBool("render.raytracing.denoise"));
+  renderer->SetScalarBarRange(opt.model.scivis.range);
+  renderer->SetColormap(opt.model.scivis.colormap);
+  renderer->ShowScalarBar(opt.ui.scalar_bar);
 
-  this->Internals->Renderer->SetUseSSAOPass(
-    this->Internals->Options.getAsBool("render.effect.ambient-occlusion"));
-  this->Internals->Renderer->SetUseFXAAPass(
-    this->Internals->Options.getAsBool("render.effect.anti-aliasing"));
-  this->Internals->Renderer->SetUseToneMappingPass(
-    this->Internals->Options.getAsBool("render.effect.tone-mapping"));
-  this->Internals->Renderer->SetUseDepthPeelingPass(
-    this->Internals->Options.getAsBool("render.effect.translucency-support"));
-  this->Internals->Renderer->SetBackfaceType(
-    this->Internals->Options.getAsString("render.backface-type"));
-  this->Internals->Renderer->SetFinalShader(
-    this->Internals->Options.getAsString("render.effect.final-shader"));
+  renderer->SetUsePointSprites(opt.model.point_sprites.enable);
+  renderer->SetUseVolume(opt.model.volume.enable);
+  renderer->SetUseInverseOpacityFunction(opt.model.volume.inverse);
 
-  this->Internals->Renderer->SetBackground(
-    this->Internals->Options.getAsDoubleVector("render.background.color").data());
-  this->Internals->Renderer->SetUseBlurBackground(
-    this->Internals->Options.getAsBool("render.background.blur"));
-  this->Internals->Renderer->SetBlurCircleOfConfusionRadius(
-    this->Internals->Options.getAsDouble("render.background.blur.coc"));
-  this->Internals->Renderer->SetLightIntensity(
-    this->Internals->Options.getAsDouble("render.light.intensity"));
+  renderer->UpdateActors();
 
-  std::string hdriFile = this->Internals->Options.getAsString("render.hdri.file");
-  bool hdriAmbient = this->Internals->Options.getAsBool("render.hdri.ambient");
-  bool hdriSkybox = this->Internals->Options.getAsBool("render.background.skybox");
-#ifndef F3D_NO_DEPRECATED
-  std::string legacyHDRI = this->Internals->Options.getAsString("render.background.hdri");
-  if (!legacyHDRI.empty())
+  // Update the cheatsheet if needed
+  if (this->Internals->Interactor && renderer->CheatSheetNeedsUpdate())
   {
-    hdriFile = legacyHDRI;
-    hdriAmbient = true;
-    hdriSkybox = true;
+    std::vector<vtkF3DUIActor::CheatSheetGroup> cheatsheet;
+    for (const std::string& group : this->Internals->Interactor->getBindGroups())
+    {
+      std::vector<vtkF3DUIActor::CheatSheetTuple> groupList;
+      for (const interaction_bind_t& bind : this->Internals->Interactor->getBindsForGroup(group))
+      {
+        auto [doc, val] = this->Internals->Interactor->getBindingDocumentation(bind);
+        if (!doc.empty())
+        {
+          groupList.emplace_back(std::make_tuple(bind.format(), doc, val));
+        }
+      }
+      cheatsheet.emplace_back(std::make_pair(group, std::move(groupList)));
+    }
+    renderer->ConfigureCheatSheet(cheatsheet);
   }
-#endif
-  this->Internals->Renderer->SetHDRIFile(hdriFile);
-  this->Internals->Renderer->SetUseImageBasedLighting(hdriAmbient);
-  this->Internals->Renderer->ShowHDRISkybox(hdriSkybox);
-
-  this->Internals->Renderer->SetFontFile(this->Internals->Options.getAsString("ui.font-file"));
-
-  this->Internals->Renderer->SetGridUnitSquare(
-    this->Internals->Options.getAsDouble("render.grid.unit"));
-  this->Internals->Renderer->SetGridSubdivisions(
-    this->Internals->Options.getAsInt("render.grid.subdivisions"));
-  this->Internals->Renderer->SetGridAbsolute(
-    this->Internals->Options.getAsBool("render.grid.absolute"));
-  this->Internals->Renderer->ShowGrid(this->Internals->Options.getAsBool("render.grid.enable"));
-  this->Internals->Renderer->SetGridColor(
-    this->Internals->Options.getAsDoubleVector("render.grid.color"));
-
-  if (this->Internals->Options.getAsInt("scene.camera.index") == -1)
-  {
-    this->Internals->Renderer->SetUseOrthographicProjection(
-      this->Internals->Options.getAsBool("scene.camera.orthographic"));
-  }
-
-  if (this->Internals->WithColoring)
-  {
-    this->Internals->Renderer->SetSurfaceColor(
-      this->Internals->Options.getAsDoubleVector("model.color.rgb").data());
-    this->Internals->Renderer->SetOpacity(
-      this->Internals->Options.getAsDouble("model.color.opacity"));
-    this->Internals->Renderer->SetTextureBaseColor(
-      this->Internals->Options.getAsString("model.color.texture"));
-    this->Internals->Renderer->SetRoughness(
-      this->Internals->Options.getAsDouble("model.material.roughness"));
-    this->Internals->Renderer->SetMetallic(
-      this->Internals->Options.getAsDouble("model.material.metallic"));
-    this->Internals->Renderer->SetTextureMaterial(
-      this->Internals->Options.getAsString("model.material.texture"));
-    this->Internals->Renderer->SetTextureEmissive(
-      this->Internals->Options.getAsString("model.emissive.texture"));
-    this->Internals->Renderer->SetEmissiveFactor(
-      this->Internals->Options.getAsDoubleVector("model.emissive.factor").data());
-    this->Internals->Renderer->SetTextureNormal(
-      this->Internals->Options.getAsString("model.normal.texture"));
-    this->Internals->Renderer->SetNormalScale(
-      this->Internals->Options.getAsDouble("model.normal.scale"));
-    this->Internals->Renderer->SetTextureMatCap(
-      this->Internals->Options.getAsString("model.matcap.texture"));
-
-    this->Internals->Renderer->SetColoring(this->Internals->Options.getAsBool("model.scivis.cells"),
-      this->Internals->Options.getAsString("model.scivis.array-name"),
-      this->Internals->Options.getAsInt("model.scivis.component"));
-    this->Internals->Renderer->SetScalarBarRange(
-      this->Internals->Options.getAsDoubleVector("model.scivis.range"));
-    this->Internals->Renderer->SetColormap(
-      this->Internals->Options.getAsDoubleVector("model.scivis.colormap"));
-    this->Internals->Renderer->ShowScalarBar(this->Internals->Options.getAsBool("ui.bar"));
-
-    this->Internals->Renderer->SetUsePointSprites(
-      this->Internals->Options.getAsBool("model.point-sprites.enable"));
-    this->Internals->Renderer->SetUseVolume(
-      this->Internals->Options.getAsBool("model.volume.enable"));
-    this->Internals->Renderer->SetUseInverseOpacityFunction(
-      this->Internals->Options.getAsBool("model.volume.inverse"));
-  }
-
-  this->Internals->Renderer->UpdateActors();
 }
 
 //----------------------------------------------------------------------------
@@ -493,13 +491,10 @@ void window_impl::PrintSceneDescription(log::VerboseLevel level)
 //----------------------------------------------------------------------------
 void window_impl::PrintColoringDescription(log::VerboseLevel level)
 {
-  if (this->Internals->WithColoring)
+  std::string descr = this->Internals->Renderer->GetColoringDescription();
+  if (!descr.empty())
   {
-    std::string descr = this->Internals->Renderer->GetColoringDescription();
-    if (!descr.empty())
-    {
-      log::print(level, descr);
-    }
+    log::print(level, descr);
   }
 }
 
@@ -520,7 +515,7 @@ bool window_impl::render()
 //----------------------------------------------------------------------------
 image window_impl::renderToImage(bool noBackground)
 {
-  this->UpdateDynamicOptions();
+  this->render();
 
   vtkNew<vtkWindowToImageFilter> rtW2if;
   rtW2if->SetInput(this->Internals->RenWin);
@@ -529,7 +524,7 @@ image window_impl::renderToImage(bool noBackground)
   {
     // we need to set the background to black to avoid blending issues with translucent
     // objects when saving to file with no background
-    this->Internals->RenWin->GetRenderers()->GetFirstRenderer()->SetBackground(0, 0, 0);
+    this->Internals->Renderer->SetBackground(0, 0, 0);
     rtW2if->SetInputBufferTypeToRGBA();
   }
 
@@ -547,17 +542,35 @@ image window_impl::renderToImage(bool noBackground)
 }
 
 //----------------------------------------------------------------------------
-void window_impl::SetImporterForColoring(vtkF3DGenericImporter* importer)
+void window_impl::SetImporter(vtkF3DMetaImporter* importer)
 {
-  if (this->Internals->WithColoring)
-  {
-    this->Internals->Renderer->SetImporter(importer);
-  }
+  this->Internals->Renderer->SetImporter(importer);
 }
 
 //----------------------------------------------------------------------------
 void window_impl::SetCachePath(const std::string& cachePath)
 {
   this->Internals->CachePath = cachePath;
+}
+
+//----------------------------------------------------------------------------
+void window_impl::SetInteractor(interactor_impl* interactor)
+{
+  this->Internals->Interactor = interactor;
+}
+
+//----------------------------------------------------------------------------
+void window_impl::RenderUIOnly()
+{
+#if F3D_MODULE_UI
+  // Do only a partial render of the UI
+  vtkRenderWindow* renWin = this->Internals->RenWin;
+  vtkRenderer* ren = renWin->GetRenderers()->GetFirstRenderer();
+  vtkInformation* info = ren->GetInformation();
+
+  info->Set(vtkF3DRenderPass::RENDER_UI_ONLY(), 1);
+  renWin->Render();
+  info->Remove(vtkF3DRenderPass::RENDER_UI_ONLY());
+#endif
 }
 };

@@ -1,0 +1,15 @@
+[
+{
+  "options":
+  {
+    "resolution": "400,400"
+  }
+},
+{
+  "match": ".*(stl)",
+  "options":
+  {
+    "resolution": "200,200"
+  }
+}
+]

@@ -20,25 +20,36 @@ class vtkRenderWindow;
 namespace f3d
 {
 class options;
-class window;
 
 namespace detail
 {
 class interactor_impl;
+class window_impl;
 
 class animationManager
 {
 public:
-  animationManager() = default;
+  animationManager(const options& options, window_impl& window);
   ~animationManager() = default;
 
   /**
-   * Initialize the animation manager, required before playing the animation.
-   * Provided pointers are expected to be not null except interactor.
-   * Return true if at least one animation is available, false otherwise.
+   * Set the interactor to use in the animation_manager, should be set before initializing if any
    */
-  bool Initialize(
-    const options* options, window* window, interactor_impl* interactor, vtkImporter* importer);
+  void SetInteractor(interactor_impl* interactor);
+
+  /**
+   * Set the importer to use in the animation_manager, must be set before initializing
+   */
+  void SetImporter(vtkImporter* importer);
+
+  /**
+   * Initialize the animation manager, required before playing the animation.
+   * Can be used to reset animation to the initial state.
+   * Importer must be set before use.
+   * Interactor should be set before use if any.
+   * Also start the animation when using autoplay option
+   */
+  void Initialize();
 
   /**
    * Start/Stop playing the animation
@@ -77,6 +88,17 @@ public:
   }
 
   /**
+   * Set the animation in delta time in seconds
+   */
+  void SetDeltaTime(double deltaTime);
+
+  /**
+   * Advance animationTime of DeltaTime and call loadAtTime accordingly
+   * Do nothing if IsPlaying is false
+   */
+  void Tick();
+
+  /**
    * Load animation at provided time value
    */
   bool LoadAtTime(double timeValue);
@@ -85,26 +107,21 @@ public:
   void operator=(animationManager const&) = delete;
 
   /**
-   * Set a time range pointer to the current time range values
+   * Return a pair containing the current time range values
    */
-  void GetTimeRange(double timeRange[2]);
+  std::pair<double, double> GetTimeRange();
 
-protected:
-  /**
-   * Called by an internal timer to advance one animation tick
-   */
-  void Tick();
-
+private:
+  const options& Options;
+  window_impl& Window;
   vtkImporter* Importer = nullptr;
-  window* Window = nullptr;
   interactor_impl* Interactor = nullptr;
-  const options* Options = nullptr;
 
   double TimeRange[2] = { 0.0, 0.0 };
   bool Playing = false;
   bool HasAnimation = false;
-  unsigned long CallBackId = 0;
   double CurrentTime = 0;
+  double DeltaTime = 0;
   bool CurrentTimeSet = false;
   int AnimationIndex = 0;
   int AvailAnimations = -1;

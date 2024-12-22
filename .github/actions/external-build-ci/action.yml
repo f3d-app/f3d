@@ -44,6 +44,7 @@ runs:
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_STRICT_BUILD=ON
+        -DF3D_MODULE_UI=OFF
 
     - name: Build
       shell: bash

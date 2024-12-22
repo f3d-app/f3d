@@ -52,6 +52,7 @@ Release :
 - [ ] Communicate on reddit
 - [ ] Communicate on hackernews
 - [ ] Communicate on linkedin
+- [ ] Communicate on mastodon
 - [ ] Move all issue from current milestone to next milestone, close current roadmap issue and open a next roadmap issue
 - [ ] Update `doc/dev/ROADMAPS_AND_RELEASES.md` for next release
 - [ ] Create an issue for updating dependencies in CI and superbuild
@@ -67,17 +68,19 @@ Linux testing protocol:
 - Check that all supported files in testing/data have a generated thumbnails, especially for new file formats if any
 - Double click on supported file in testing/data, especially for new file formats if any and check it opens in F3D
 - Drag&Drop cow.vtp, Drag&Drop palermo_park.hdr, check render
+- Check that CTRL+O (file dialog) is working
 - `cd examples/libf3d && mkdir build && cd build && cmake ../ && make`
 - `./cpp/check-engine/check-engine`
-- `./cpp/render-interact/render-interact testing/data/cow.vtp`
+- `./cpp/render-interact/render-interact ../../../testing/data/cow.vtp`
 
 macOS testing protocol:
 - Install F3D-X.Y.Z-RCN-macOS-x86_64-raytracing.dmg
-- Double click on cow.vtp, check render and orientation, press R and check raytracing (Intel only)
+- Double click on cow.vtp, check render and orientation, press R and check raytracing
 - Double click on f3d.stp, check render and orientation
 - Double click on any new supported file.format, check render
 - Check all supported file in testing/data directory in finder have the f3d mark, if not, check that "open with" suggest F3D
 - Drag&Drop cow.vtp, Drag&Drop palermo_park.hdr, check render
+- Check that CTRL+O (file dialog) is working
 
 Windows testing protocol:
 - Install F3D-X.Y.Z-RCN-Windows-x86_64-raytracing.exe, add F3D to path for all users
@@ -89,9 +92,10 @@ Windows testing protocol:
 - Double click on cow.vtp, check render and orientation, press R and check raytracing
 - Double click on f3d.stp, check render and orientation
 - Double click on any new supported file format, check render
+- Check that CTRL+O (file dialog) is working
 - `cd examples\libf3d && mkdir build && cd build && cmake ../ && cmake --build . --config Release`
 - `.\cpp\check-engine\Release\check-engine`
-- `.\cpp\render-interact\Release\render-interact testing\data\cow.vtp`
+- `.\cpp\render-interact\Release\render-interact ..\..\..\testing\data\cow.vtp`
 
 Python testing protocol:
 - Use a venv or make sure f3d is not installed in your python environment

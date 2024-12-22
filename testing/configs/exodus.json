@@ -1,6 +1,9 @@
+[
 {
-  ".*(ex2)":
+  "match": ".*(ex2)",
+  "options":
   {
     "load-plugins": "exodus"
   }
 }
+]

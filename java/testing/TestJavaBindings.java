@@ -28,8 +28,8 @@ public class TestJavaBindings {
       assert pos[1] == 1.0 : "Position Y is not valid";
       assert pos[2] == 2.0 : "Position Z is not valid";
 
-      Loader loader = engine.getLoader();
-      loader.loadGeometry(args[0] + "data/cow.vtp");
+      Scene scene = engine.getScene();
+      scene.add(args[0] + "data/cow.vtp");
     }
   }
 }

@@ -1,5 +1,5 @@
 #include <engine.h>
-#include <loader.h>
+#include <scene.h>
 #include <window.h>
 
 #include "TestSDKHelpers.h"
@@ -10,10 +10,6 @@
 
 int TestSDKExternalWindowGLFW(int argc, char* argv[])
 {
-  // create engine and load file
-  f3d::engine eng(f3d::window::Type::EXTERNAL);
-  eng.getLoader().loadGeometry(std::string(argv[1]) + "/data/cow.vtp");
-
   // setup glfw window
   if (!glfwInit())
   {
@@ -21,8 +17,9 @@ int TestSDKExternalWindowGLFW(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  glfwSetErrorCallback([](int error, const char* desc)
-    { std::cerr << "GLFW error " << error << ": " << desc << std::endl; });
+  glfwSetErrorCallback([](int error, const char* desc) {
+    std::cerr << "GLFW error " << error << ": " << desc << std::endl;
+  });
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -36,17 +33,19 @@ int TestSDKExternalWindowGLFW(int argc, char* argv[])
   }
 
   glfwMakeContextCurrent(window);
-  glfwSetWindowUserPointer(window, &eng);
+
+  f3d::engine eng = f3d::engine::createExternal(glfwGetProcAddress);
+  eng.getWindow().setSize(300, 300);
 
   // key callback
-  glfwSetKeyCallback(window,
-    [](GLFWwindow* window, int key, int scancode, int action, int mods)
+  glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
     {
-      if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-      {
-        glfwSetWindowShouldClose(window, 1);
-      }
-    });
+      glfwSetWindowShouldClose(window, 1);
+    }
+  });
+
+  eng.getScene().add(std::string(argv[1]) + "/data/cow.vtp");
 
   while (!glfwWindowShouldClose(window) && glfwGetTime() < 1.0)
   {

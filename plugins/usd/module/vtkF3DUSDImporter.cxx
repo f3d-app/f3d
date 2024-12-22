@@ -3,7 +3,6 @@
 #include "vtkF3DFaceVaryingPointDispatcher.h"
 
 #include <vtkActor.h>
-#include <vtkCapsuleSource.h>
 #include <vtkConeSource.h>
 #include <vtkCubeSource.h>
 #include <vtkCylinderSource.h>
@@ -33,6 +32,11 @@
 #include <vtkTransform.h>
 #include <vtkTransformFilter.h>
 #include <vtkTriangleFilter.h>
+#include <vtkVersion.h>
+
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 3, 0)
+#include <vtkCapsuleSource.h>
+#endif
 
 #if defined(__clang__)
 #pragma clang diagnostic push
@@ -705,12 +709,12 @@ public:
     }
   }
 
-  void ImportRoot(vtkRenderer* renderer)
+  bool ImportRoot(vtkRenderer* renderer)
   {
     if (!this->Stage)
     {
       vtkErrorWithObjectMacro(renderer, << "Stage failed to open");
-      return;
+      return false;
     }
 
     vtkNew<vtkMatrix4x4> rootTransform;
@@ -729,6 +733,7 @@ public:
     }
 
     this->ImportNode(renderer, this->Stage->GetPseudoRoot(), pxr::SdfPath("/"), rootTransform);
+    return true;
   }
 
   vtkSmartPointer<vtkImageData> CombineORMImage(
@@ -867,13 +872,9 @@ public:
       {
         vtkSmartPointer<vtkImageReader2> reader;
 
-// CreateImageReader2FromExtension needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/8211
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20210729)
         const std::string& assetPath = path.GetAssetPath();
         std::string ext = assetPath.substr(assetPath.find_last_of('.'));
         reader.TakeReference(vtkImageReader2Factory::CreateImageReader2FromExtension(ext.c_str()));
-#endif
-
         if (!reader)
         {
           // cannot read the image file
@@ -1236,7 +1237,10 @@ int vtkF3DUSDImporter::ImportBegin()
 //----------------------------------------------------------------------------
 void vtkF3DUSDImporter::ImportActors(vtkRenderer* renderer)
 {
-  this->Internals->ImportRoot(renderer);
+  if (!this->Internals->ImportRoot(renderer))
+  {
+    this->SetFailureStatus();
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -1245,8 +1249,6 @@ vtkIdType vtkF3DUSDImporter::GetNumberOfAnimations()
   return this->Internals->HasTimeCode() ? 1 : 0;
 }
 
-// Complete GetTemporalInformation needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7246
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20200912)
 //----------------------------------------------------------------------------
 bool vtkF3DUSDImporter::GetTemporalInformation(vtkIdType vtkNotUsed(animationIndex),
   double frameRate, int& nbTimeSteps, double timeRange[2], vtkDoubleArray* timeSteps)
@@ -1263,13 +1265,13 @@ bool vtkF3DUSDImporter::GetTemporalInformation(vtkIdType vtkNotUsed(animationInd
 
   return true;
 }
-#endif
 
 //----------------------------------------------------------------------------
-void vtkF3DUSDImporter::UpdateTimeStep(double timeStep)
+bool vtkF3DUSDImporter::UpdateAtTimeValue(double timeValue)
 {
-  this->Internals->SetCurrentTime(timeStep);
+  this->Internals->SetCurrentTime(timeValue);
   this->Update();
+  return this->Superclass::UpdateAtTimeValue(timeValue);
 }
 
 //----------------------------------------------------------------------------

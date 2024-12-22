@@ -10,13 +10,16 @@
 #ifndef f3d_window_impl_h
 #define f3d_window_impl_h
 
+#include "context.h"
+#include "interactor_impl.h"
 #include "log.h"
 #include "window.h"
 
 #include <memory>
+#include <optional>
 
 class vtkRenderWindow;
-class vtkF3DGenericImporter;
+class vtkF3DMetaImporter;
 namespace f3d
 {
 class options;
@@ -30,8 +33,8 @@ public:
    * Create the internal vtkRenderWindow using the offscreen param
    * and store option ref for later usage
    */
-  window_impl(const options& options, Type type);
-
+  window_impl(const options& options, const std::optional<Type>& type, bool offscreen,
+    const context::function& getProcAddress);
   /**
    * Default destructor
    */
@@ -42,12 +45,12 @@ public:
    * Documented public API
    */
   Type getType() override;
+  bool isOffscreen() override;
   camera& getCamera() override;
   bool render() override;
   image renderToImage(bool noBackground = false) override;
   int getWidth() const override;
   int getHeight() const override;
-  window& setAnimationNameInfo(const std::string& name);
   window& setSize(int width, int height) override;
   window& setPosition(int x, int y) override;
   window& setIcon(const unsigned char* icon, size_t iconSize) override;
@@ -58,27 +61,30 @@ public:
 
   /**
    * Implementation only API.
-   * Create and initialize the internal vtkF3DRenderer with the provided parameters
-   * Called by the loader right before reading a file
+   * Initialize the renderer by clearing it of all actors.
    */
-  virtual void Initialize(bool withColoring);
+  void Initialize();
 
   /**
    * Implementation only API.
-   * Set the importer on an already created vtkF3DRendererWithColoring
-   * Called by the loader right after reading a file
+   * Initialize the up vector on the renderer using the Up string option
    */
-  virtual void SetImporterForColoring(vtkF3DGenericImporter* importer);
+  void InitializeUpVector();
+
+  /**
+   * Implementation only API.
+   * Set the importer on the internal renderer
+   */
+  void SetImporter(vtkF3DMetaImporter* importer);
 
   /**
    * Implementation only API.
    * Use all the rendering related options to update the configuration of the window
-   * and the rendering stack below. This also initialize the rendering stack if needed.
-   * This will be called automatically when calling loader::loadFile but can also be called manually
-   * when needed. This must be called, either manually or automatically, before any render call.
-   * Return true on success, false otherwise.
+   * and the rendering stack below.
+   * This is called automatically when calling scene::add and window::render but can also be called
+   * manually when needed. Return true on success, false otherwise.
    */
-  virtual void UpdateDynamicOptions();
+  void UpdateDynamicOptions();
 
   /**
    * Implementation only API.
@@ -103,6 +109,18 @@ public:
    * Set the cache path.
    */
   void SetCachePath(const std::string& cachePath);
+
+  /**
+   * Implementation only API.
+   * Set the interactor to use when recovering bindings documentation.
+   */
+  void SetInteractor(interactor_impl* interactor);
+
+  /**
+   * Trigger a render only of the UI
+   * Does nothing if F3D_MODULE_UI is OFF
+   */
+  void RenderUIOnly();
 
 private:
   class internals;

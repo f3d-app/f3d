@@ -1,7 +1,7 @@
 #include <engine.h>
 #include <interactor.h>
-#include <loader.h>
 #include <log.h>
+#include <scene.h>
 #include <window.h>
 
 #include "TestSDKHelpers.h"
@@ -11,8 +11,8 @@
 int TestSDKMultiColoring(int argc, char* argv[])
 {
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
-  f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
-  f3d::loader& load = eng.getLoader();
+  f3d::engine eng = f3d::engine::create(true);
+  f3d::scene& sce = eng.getScene();
   f3d::options& opt = eng.getOptions();
 
   // Test file logic
@@ -24,12 +24,13 @@ int TestSDKMultiColoring(int argc, char* argv[])
   std::string right = std::string(argv[1]) + "data/" + rightFilename;
 
   // Multiple geometries
-  load.loadGeometry(cube).loadGeometry(left).loadGeometry(right);
+  sce.add(std::vector<std::string>{ cube, left, right });
 
-  opt.set("model.scivis.array-name", "Normals");
+  opt.model.scivis.enable = true;
+  opt.model.scivis.array_name = "Normals";
 
   return TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
-           std::string(argv[2]), "TestSDKMultiColoring", 50)
+           std::string(argv[2]), "TestSDKMultiColoring")
     ? EXIT_SUCCESS
     : EXIT_FAILURE;
 }

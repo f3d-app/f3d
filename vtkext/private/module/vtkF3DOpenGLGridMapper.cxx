@@ -75,7 +75,7 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
     "  float alpha = min(linewidth, 1.0);\n"
     "  float d = dist - lw;\n"
     "  return d < .0 ? alpha\n"
-    "       : d < aa ? (1.0 - d / aa) * alpha\n"
+    "       : d < aa ? pow((1.0 - d / aa) * alpha, 3.0)\n"
     "       : 0.0;\n"
     "}\n"
   );
@@ -91,13 +91,13 @@ void vtkF3DOpenGLGridMapper::ReplaceShaderValues(
     "  float minorAlpha = antialias(min(minorGrid.x, minorGrid.y), gridLineWidth);\n"
     "  float zoomFadeFactor = 1.0 - clamp(fwidth(majorCoord.x / unitSquare * fadeDist), 0.0, 1.0);"
     "  float alpha = max(majorAlpha, minorAlpha * minorOpacity * zoomFadeFactor);\n"
+
     "  vec4 color = vec4(diffuseColorUniform, alpha);\n"
 
     "  float axis1Weight = abs(majorCoord.y) < 0.5 ? antialias(majorGrid.y, axesLineWidth) : 0.0;\n"
     "  float axis2Weight = abs(majorCoord.x) < 0.5 ? antialias(majorGrid.x, axesLineWidth) : 0.0;\n"
     "  color = mix(color, axis2Color, axis2Weight);\n"
     "  color = mix(color, axis1Color, axis1Weight);\n"
-
     "  float sqDist = unitSquare * unitSquare * dot(fromCenter, fromCenter);\n"
     "  float radialFadeFactor = 1.0 - sqDist / (fadeDist * fadeDist);\n"
     "  color.w *= radialFadeFactor;\n"
@@ -235,12 +235,6 @@ void vtkF3DOpenGLGridMapper::RenderPiece(vtkRenderer* ren, vtkActor* actor)
 bool vtkF3DOpenGLGridMapper::GetNeedToRebuildShaders(
   vtkOpenGLHelper& cellBO, vtkRenderer* vtkNotUsed(ren), vtkActor* act)
 {
-// Complete GetRenderPassStageMTime needs in
-// https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7933
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20210506)
   vtkMTimeType renderPassMTime = this->GetRenderPassStageMTime(act, &cellBO);
-#else
-  vtkMTimeType renderPassMTime = this->GetRenderPassStageMTime(act);
-#endif
   return cellBO.Program == nullptr || cellBO.ShaderSourceTime < renderPassMTime;
 }

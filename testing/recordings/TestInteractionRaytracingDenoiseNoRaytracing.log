@@ -1,9 +1,0 @@
-# StreamVersion 1.1
-ExposeEvent 0 599 0 0 0 0
-RenderEvent 0 599 0 0 0 0
-KeyPressEvent 623 198 0 114 1 r
-CharEvent 623 198 0 114 1 r
-KeyReleaseEvent 623 198 0 114 1 r
-KeyPressEvent 623 198 0 100 1 d
-CharEvent 623 198 0 100 1 d
-KeyReleaseEvent 623 198 0 100 1 d

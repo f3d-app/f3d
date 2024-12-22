@@ -4,11 +4,10 @@ Here is a non exhaustive list of F3D limitations:
 
 * No support for specifying manual lighting in the default scene apart from using `--light-intensity` option.
 * Multiblock (.vtm, .gml) support is partial, non-surfacic data will be converted into surfaces.
-* Animation support with full scene data format require VTK >= 9.0.20201016.
-* Full drag and drop support require VTK >= 9.0.20210620
 * Drag and drop interaction cannot be recorded nor played back.
 * Volume rendering and HDRI support requires a decent GPU.
 * The `--camera-zoom-factor` option require VTK >= 9.3.0
+* Information about the failure to load a file is not provided before VTK >= 9.4.0
 
 ## Assimp
 FBX, DAE, OFF, DXF, X and 3MF file formats rely on [Assimp](https://github.com/assimp/assimp) library. It comes with some known limitations:
@@ -40,7 +39,7 @@ VDB file formats rely on [OpenVDB](https://github.com/AcademySoftwareFoundation/
 - The `vdb` plugin is not shipped in the python wheels yet.
 
 ## Gaussian splatting
-Gaussian splatting (option `--point-type=gaussian`) needs depth sorting which is done internally using a compute shader. This requires support for OpenGL 4.3 which is not supported by macOS and old GPUs/drivers.
+Gaussian splatting (option `--point-sprites-type=gaussian`) needs depth sorting which is done internally using a compute shader. This requires support for OpenGL 4.3 which is not supported by macOS and old GPUs/drivers.
 
 # Troubleshooting
 
@@ -70,13 +69,12 @@ The GCC flag `-latomic` is not being added automatically with specific architect
  * If all fails, remove your `.cache` user dir and check that `pcmanfm` thumbnails are working.
   * If they are working, then it is an issue specific to your file manager (see below for a potential work around).
   * If only a few format have working thumbnails, then it is an issue with the mime types database.
-  * If no formats have working thumbnails, then it is an issue with the `f3d-plugin-xxx.thumbnailer` files.
+  * If no formats have working thumbnails, then it is can be an issue with sandboxing or with the `f3d-plugin-xxx.thumbnailer` files.
   * If only big file do not have thumbnails, this is intended, you can modify this behavior in the `thumbnail.d/10_global.json` configuration folder using the `max-size` option.
 
-Some file managers (eg: Nautilus) are using sandboxing for thumbnails, which the F3D standard binary release does not support as it needs
-access to the Xorg server to render anything.
-In that case, you want to use the headless version of F3D that rely on EGL instead of Xorg, available in the [releases page](https://github.com/f3d-app/f3d/releases).
-If you use the portable archive, make sure to extract it somewhere the sandboxing system has access to, eg: Nautilus uses `bwrap` and gives it access to `/usr` but not to `/opt`.
+> `--rendering-backend` CLI option is not working as expected
+
+Dynamically switching rendering backend require VTK 9.4.0, you may need to update VTK or to use our [binary release](INSTALLATION.md).
 
 ## Windows
 
@@ -113,6 +111,13 @@ There are too many entry in your PATH environment variable, remove the ones you 
 > When I try to update F3D, the installer fails with: `Error opening file for writing: F3DShellExtension.dll`
 
 Your previous F3D installation is current being used to generate thumbnails, wait for a bit or reboot your computer before updating again.
+
+> When running F3D without interactivity (e.g. `f3d.exe --version`) from CLI, nothing is displayed.
+
+It's a limitation from the Windows "subsystem".
+You can workaround the issue by piping to a file (`f3d.exe --version > file.txt`) and read the file.
+It also seems to be working fine with (git bash console)[https://gitforwindows.org/].
+Another solution is recompiling F3D with the CMake option `F3D_WINDOWS_GUI` disabled.
 
 ## macOS
 

@@ -11,8 +11,8 @@ endif()
 set(F3D_JAVA_SOURCES
   Camera.java
   Engine.java
-  Loader.java
   Options.java
+  Scene.java
   Window.java)
 
 # Generate JNI headers, and builds a JAR package
@@ -35,7 +35,7 @@ endif()
 
 set_target_properties(javaf3d PROPERTIES
   CXX_VISIBILITY_PRESET hidden
-  CXX_STANDARD 11
+  CXX_STANDARD 17
   OUTPUT_NAME "f3d-java"
   )
 

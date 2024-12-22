@@ -10,10 +10,11 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/F3DConfig.h.in"
     "${CMAKE_CURRENT_BINARY_DIR}/F3DConfig.h")
 
 set(F3D_SOURCE_FILES
+  ${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DColorMapTools.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DConfigFileTools.cxx
-  ${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/F3DOptionsParser.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/F3DOptionsTools.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/F3DPluginsTools.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DStarter.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DSystemTools.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/main.cxx
@@ -26,6 +27,9 @@ endif()
 if(APPLE)
   list(APPEND F3D_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/F3DNSDelegate.mm")
 endif()
+
+# Add source for dialogs
+list(APPEND F3D_SOURCE_FILES "${F3D_SOURCE_DIR}/external/tinyfiledialogs/tinyfiledialogs.cxx")
 
 # Define f3d target
 add_executable(f3d ${F3D_SOURCE_FILES})
@@ -76,19 +80,54 @@ else ()
   target_include_directories(f3d PUBLIC $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/nlohmann_json>)
 endif ()
 
-if (F3D_USE_EXTERNAL_DMON)
-  target_link_libraries(f3d PRIVATE dmon::dmon)
-else ()
-  target_include_directories(f3d PUBLIC $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/dmon>)
+if (F3D_MODULE_DMON)
+  if (F3D_USE_EXTERNAL_DMON)
+    target_link_libraries(f3d PRIVATE dmon::dmon)
+  else ()
+    target_include_directories(f3d PUBLIC $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/dmon>)
+  endif ()
 endif ()
+
+target_include_directories(f3d PUBLIC $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/tinyfiledialogs>)
 
 set(f3d_compile_options_private "")
 set(f3d_compile_options_public "")
 set(f3d_link_options_public "")
 
-# Headless EGL build
-if (VTK_OPENGL_HAS_EGL)
-  target_compile_definitions(f3d PRIVATE F3D_HEADLESS_BUILD)
+# This is required to avoid cxxopts
+# splitting input positional option by commas
+target_compile_definitions(f3d PRIVATE "CXXOPTS_VECTOR_DELIMITER='\\0'")
+
+# macOS bundle
+if (F3D_MACOS_BUNDLE)
+  target_compile_definitions(f3d PRIVATE F3D_MACOS_BUNDLE)
+endif ()
+
+# raytracing
+if (F3D_MODULE_RAYTRACING)
+  target_compile_definitions(f3d PRIVATE F3D_MODULE_RAYTRACING)
+endif ()
+
+# exr
+if (F3D_MODULE_EXR)
+  target_compile_definitions(f3d PRIVATE F3D_MODULE_EXR)
+endif ()
+
+# dmon
+if (F3D_MODULE_DMON)
+  target_compile_definitions(f3d PRIVATE F3D_MODULE_DMON)
+endif ()
+
+# tinyfiledialogs
+if (F3D_MODULE_TINYFILEDIALOGS)
+  target_compile_definitions(f3d PRIVATE F3D_MODULE_TINYFILEDIALOGS)
+endif ()
+
+if(VTK_VERSION VERSION_LESS 9.3.20240914)
+  # Headless EGL build
+  if (VTK_OPENGL_HAS_EGL)
+    target_compile_definitions(f3d PRIVATE F3D_HEADLESS_BUILD)
+  endif ()
 endif ()
 
 # F3D_STRICT_BUILD
@@ -222,6 +261,12 @@ install(
 if(UNIX AND NOT APPLE AND NOT ANDROID)
   install(FILES "${F3D_SOURCE_DIR}/resources/f3d.desktop"
     DESTINATION "share/applications" COMPONENT assets)
+  install(FILES "${F3D_SOURCE_DIR}/resources/logo16.png"
+    DESTINATION "share/icons/hicolor/16x16/apps" COMPONENT assets
+    RENAME "f3d.png")
+  install(FILES "${F3D_SOURCE_DIR}/resources/logo24.png"
+    DESTINATION "share/icons/hicolor/24x24/apps" COMPONENT assets
+    RENAME "f3d.png")
   install(FILES "${F3D_SOURCE_DIR}/resources/logo32.png"
     DESTINATION "share/icons/hicolor/32x32/apps" COMPONENT assets
     RENAME "f3d.png")
@@ -231,8 +276,14 @@ if(UNIX AND NOT APPLE AND NOT ANDROID)
   install(FILES "${F3D_SOURCE_DIR}/resources/logo64.png"
     DESTINATION "share/icons/hicolor/64x64/apps" COMPONENT assets
     RENAME "f3d.png")
+  install(FILES "${F3D_SOURCE_DIR}/resources/logo256.png"
+    DESTINATION "share/icons/hicolor/256x256/apps" COMPONENT assets
+    RENAME "f3d.png")
   install(FILES "${F3D_SOURCE_DIR}/resources/logo.svg"
     DESTINATION "share/icons/hicolor/scalable/apps" COMPONENT assets
+    RENAME "f3d.svg")
+  install(FILES "${F3D_SOURCE_DIR}/resources/logo-mono.svg"
+    DESTINATION "share/icons/HighContrast/scalable/apps" COMPONENT assets
     RENAME "f3d.svg")
   install(FILES "${F3D_SOURCE_DIR}/resources/completion.bash"
     DESTINATION "share/bash-completion/completions" COMPONENT shellext

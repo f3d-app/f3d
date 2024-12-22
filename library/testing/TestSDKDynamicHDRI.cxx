@@ -1,8 +1,8 @@
 #include <engine.h>
 #include <export.h>
-#include <loader.h>
 #include <log.h>
 #include <options.h>
+#include <scene.h>
 #include <window.h>
 
 #include "TestSDKHelpers.h"
@@ -13,16 +13,16 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
 {
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::INFO);
 
-  f3d::engine eng(f3d::window::Type::NATIVE_OFFSCREEN);
+  f3d::engine eng = f3d::engine::create(true);
 
-  f3d::loader& load = eng.getLoader();
+  f3d::scene& sce = eng.getScene();
   f3d::window& win = eng.getWindow();
   f3d::options& opt = eng.getOptions();
   win.setSize(300, 300);
-  opt.set("ui.filename", true);
-  opt.set("ui.filename-info", "(1/1) cow.vtp");
+  opt.ui.filename = true;
+  opt.ui.filename_info = "(1/1) cow.vtp";
 
-  load.loadGeometry(std::string(argv[1]) + "/data/cow.vtp");
+  sce.add(std::string(argv[1]) + "/data/cow.vtp");
 
   bool ret = win.render();
   if (!ret)
@@ -39,10 +39,10 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
   eng.setCachePath(cachePath);
 
   // Enable HDRI ambient and skybox and check the default HDRI
-  opt.set("render.hdri.ambient", true);
-  opt.set("render.background.skybox", true);
+  opt.render.hdri.ambient = true;
+  opt.render.background.skybox = true;
   ret = TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
-    std::string(argv[2]), "TestSDKDynamicHDRIDefault", 120);
+    std::string(argv[2]), "TestSDKDynamicHDRIDefault");
   if (!ret)
   {
     std::cerr << "Render with Default HDRI failed" << std::endl;
@@ -50,9 +50,9 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
   }
 
   // Change the hdri and make sure it is taken into account
-  opt.set("render.hdri.file", std::string(argv[1]) + "data/palermo_park_1k.hdr");
+  opt.render.hdri.file = std::string(argv[1]) + "data/palermo_park_1k.hdr";
   ret = TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
-    std::string(argv[2]), "TestSDKDynamicHDRI", 50);
+    std::string(argv[2]), "TestSDKDynamicHDRI");
   if (!ret)
   {
     std::cerr << "Render with HDRI failed" << std::endl;
@@ -70,7 +70,7 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
   // Force a cache path change to force a LUT reconfiguration and test dynamic cache path
   eng.setCachePath(std::string(argv[2]) + "/cache_" + std::to_string(dist(e1)));
   ret = TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
-    std::string(argv[2]), "TestSDKDynamicHDRI", 50);
+    std::string(argv[2]), "TestSDKDynamicHDRI");
   if (!ret)
   {
     std::cerr << "Render with HDRI with another cache path failed" << std::endl;
@@ -80,7 +80,7 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
   // Use an existing cache
   eng.setCachePath(cachePath);
   ret = TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
-    std::string(argv[2]), "TestSDKDynamicHDRI", 50);
+    std::string(argv[2]), "TestSDKDynamicHDRI");
   if (!ret)
   {
     std::cerr << "Render with HDRI with existing cache path failed" << std::endl;
@@ -89,28 +89,13 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
 
 #if F3D_MODULE_EXR
   // Change the hdri and make sure it is taken into account
-  opt.set("render.hdri.file", std::string(argv[1]) + "/data/kloofendal_43d_clear_1k.exr");
+  opt.render.hdri.file = std::string(argv[1]) + "/data/kloofendal_43d_clear_1k.exr";
   ret = TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
-    std::string(argv[2]), "TestSDKDynamicHDRIExr", 50);
+    std::string(argv[2]), "TestSDKDynamicHDRIExr");
 
   if (!ret)
   {
     std::cerr << "Render with EXR HDRI failed" << std::endl;
-    return EXIT_FAILURE;
-  }
-#endif
-
-#ifndef F3D_NO_DEPRECATED
-  // Check deprecated HDRI options
-  opt.set("render.hdri.ambient", false);
-  opt.set("render.background.skybox", false);
-  opt.set("render.background.hdri", std::string(argv[1]) + "data/palermo_park_1k.hdr");
-
-  ret = TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
-    std::string(argv[2]), "TestSDKDynamicHDRI", 50);
-  if (!ret)
-  {
-    std::cerr << "Render with deprecated HDRI option failed" << std::endl;
     return EXIT_FAILURE;
   }
 #endif

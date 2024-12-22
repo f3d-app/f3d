@@ -19,7 +19,8 @@
 #ifndef vtkF3DUSDImporter_h
 #define vtkF3DUSDImporter_h
 
-#include <vtkImporter.h>
+#include "vtkF3DImporter.h"
+
 #include <vtkNew.h>
 #include <vtkVersion.h>
 
@@ -27,11 +28,11 @@
 
 class vtkInformationStringKey;
 
-class vtkF3DUSDImporter : public vtkImporter
+class vtkF3DUSDImporter : public vtkF3DImporter
 {
 public:
   static vtkF3DUSDImporter* New();
-  vtkTypeMacro(vtkF3DUSDImporter, vtkImporter);
+  vtkTypeMacro(vtkF3DUSDImporter, vtkF3DImporter);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
@@ -74,13 +75,10 @@ protected:
 
   vtkIdType GetNumberOfAnimations() override;
 
-// Complete GetTemporalInformation needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7246
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 0, 20201016)
   bool GetTemporalInformation(vtkIdType animationIndex, double frameRate, int& nbTimeSteps,
     double timeRange[2], vtkDoubleArray* timeSteps) override;
-#endif
 
-  void UpdateTimeStep(double timeStep) override;
+  bool UpdateAtTimeValue(double timeValue) override;
 
   std::string FileName;
   bool AnimationEnabled = false;
