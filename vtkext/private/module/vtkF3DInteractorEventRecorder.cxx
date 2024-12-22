@@ -48,6 +48,11 @@ void vtkF3DInteractorEventRecorder::ProcessEvents(
       case vtkCommand::ModifiedEvent: // don't want these
         break;
 
+      case vtkCommand::ExitEvent: // disable the recorder then exit
+        self->Off();
+        rwi->ExitCallback();
+        break;
+
       default:
         {
           int mod = 0;
