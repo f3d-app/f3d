@@ -16,7 +16,7 @@
 namespace f3d
 {
 //----------------------------------------------------------------------------
-context::function context::getSymbol(const std::string& lib, const std::string& func)
+context::function context::getSymbol(std::string_view lib, std::string_view func)
 {
   std::string libName = vtksys::DynamicLoader::LibPrefix();
   libName += lib;
@@ -26,16 +26,17 @@ context::function context::getSymbol(const std::string& lib, const std::string& 
 
   if (!handle)
   {
-    throw context::loading_exception("Cannot find " + lib + " library");
+    throw context::loading_exception("Cannot find " + std::string(lib) + " library");
   }
 
   using symbol = context::fptr (*)(const char*);
 
-  symbol address = reinterpret_cast<symbol>(vtksys::DynamicLoader::GetSymbolAddress(handle, func));
+  symbol address =
+    reinterpret_cast<symbol>(vtksys::DynamicLoader::GetSymbolAddress(handle, func.data()));
 
   if (!address)
   {
-    throw context::symbol_exception("Cannot find " + func + " symbol");
+    throw context::symbol_exception("Cannot find " + std::string(func) + " symbol");
   }
 
   return address;
