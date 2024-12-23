@@ -10,15 +10,15 @@ runs:
   using: "composite"
   steps:
 
+    # Boost is part of VFX reference platform (CY2025: 1.85)
     - name: Cache Boost
       id: cache-boost
       uses: actions/cache@v4
       with:
         path: dependencies/boost_install
-        key: boost-1.83.0-${{runner.os}}-${{inputs.cpu}}-4
+        key: boost-1.85.0-${{runner.os}}-${{inputs.cpu}}-0
 
-    # Dependents: usd openvdb vtk
-    # Note: usd v23.05 not compatible with boost 1.84.0
+    # Dependents: openvdb vtk
     - name: Checkout Boost
       if: steps.cache-boost.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
@@ -27,7 +27,7 @@ runs:
         submodules: true
         fetch-depth: 0
         path: './dependencies/boost'
-        ref: boost-1.83.0
+        ref: boost-1.85.0
 
     - name: Setup Boost
       if: steps.cache-boost.outputs.cache-hit != 'true'
