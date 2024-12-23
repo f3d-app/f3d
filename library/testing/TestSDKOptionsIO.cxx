@@ -23,7 +23,8 @@ public:
   template<typename T, typename E>
   void parse_expect(const std::string& label, const std::string& input)
   {
-    PseudoUnitTest::expect<E>(label + " `" + input + "`", [&]() { std::ignore = f3d::options::parse<T>(input); });
+    PseudoUnitTest::expect<E>(
+      label + " `" + input + "`", [&]() { std::ignore = f3d::options::parse<T>(input); });
   }
 };
 

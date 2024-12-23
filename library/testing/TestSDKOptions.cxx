@@ -197,11 +197,11 @@ int TestSDKOptions(int argc, char* argv[])
   test.expect<f3d::options::inexistent_exception>(
     "inexistent_exception exception on setAsString", [&]() { opt.setAsString("dummy", "2.13"); });
 
-  test.expect<f3d::options::inexistent_exception>(
-    "inexistent_exception exception on getAsString", [&]() { std::ignore = opt.getAsString("dummy"); });
+  test.expect<f3d::options::inexistent_exception>("inexistent_exception exception on getAsString",
+    [&]() { std::ignore = opt.getAsString("dummy"); });
 
-  test.expect<f3d::options::no_value_exception>(
-    "no_value_exception exception on getAsString", [&]() { std::ignore = opt.getAsString("render.point_size"); });
+  test.expect<f3d::options::no_value_exception>("no_value_exception exception on getAsString",
+    [&]() { std::ignore = opt.getAsString("render.point_size"); });
 
   f3d::options opt6{};
 

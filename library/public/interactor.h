@@ -237,7 +237,8 @@ public:
    * The event loop will be triggered every deltaTime in seconds, and userCallBack will be called at
    * the start of the event loop
    */
-  virtual interactor& start(double deltaTime = 1.0 / 30, std::function<void()> userCallBack = nullptr) = 0;
+  virtual interactor& start(
+    double deltaTime = 1.0 / 30, std::function<void()> userCallBack = nullptr) = 0;
 
   /**
    * Stop the interactor.
