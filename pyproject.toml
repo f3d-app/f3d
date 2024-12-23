@@ -30,6 +30,10 @@ classifiers = [
   "Topic :: Scientific/Engineering :: Visualization",
 ]
 
+dependencies = [
+  "pybind11_stubgen"
+]
+
 [project.urls]
 Homepage = "https://f3d.app"
 Repository = "https://github.com/f3d-app/f3d.git"
