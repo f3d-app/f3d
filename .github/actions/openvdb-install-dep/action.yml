@@ -10,12 +10,13 @@ runs:
   using: "composite"
   steps:
 
+    # OpenVDB is part of VFX reference platform (CY2025: 12.x)
     - name: Cache OpenVDB
       id: cache-openvdb
       uses: actions/cache@v4
       with:
         path: dependencies/openvdb_install
-        key: openvdb-11.0.0-${{runner.os}}-${{inputs.cpu}}-8
+        key: openvdb-12.0.0-${{runner.os}}-${{inputs.cpu}}-0
 
     # Dependents: vtk
     - name: Checkout OpenVDB
@@ -24,14 +25,7 @@ runs:
       with:
         repository: AcademySoftwareFoundation/openvdb
         path: './dependencies/openvdb'
-        ref: v11.0.0
-
-    # https://github.com/AcademySoftwareFoundation/openvdb/pull/1860
-    - name: Patch OpenVDB
-      if: steps.cache-openvdb.outputs.cache-hit != 'true'
-      working-directory: ${{github.workspace}}/dependencies/openvdb
-      shell: bash
-      run: patch -p1 < $GITHUB_ACTION_PATH/openvdb-cmake-CMP0167.patch
+        ref: v12.0.0
 
     - name: Setup OpenVDB
       if: steps.cache-openvdb.outputs.cache-hit != 'true'
@@ -56,11 +50,12 @@ runs:
         -DOPENVDB_BUILD_BINARIES=OFF
         -DOPENVDB_BUILD_VDB_PRINT:BOOL=OFF
         -DOPENVDB_CORE_STATIC=OFF
+        -DOPENVDB_USE_DELAYED_LOADING=OFF
         -DUSE_BLOSC:BOOL=ON
         -DUSE_CCACHE:BOOL=OFF
         -DUSE_EXPLICIT_INSTANTIATION:BOOL=OFF
         -DUSE_ZLIB:BOOL=ON
-        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build OpenVDB

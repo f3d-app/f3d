@@ -90,11 +90,12 @@ runs:
       with:
         cpu: ${{inputs.cpu}}
 
+    # Python is part of VFX reference platform (CY2025: 3.11)
     - name: Set up Python
       if: inputs.optional_deps_label == 'optional-deps'
       uses: actions/setup-python@v5
       with:
-        python-version: '3.x'
+        python-version: '3.11'
 
     - name: Install Python dependencies
       if: inputs.optional_deps_label == 'optional-deps'
@@ -178,7 +179,7 @@ runs:
         -DF3D_TESTING_FORCE_RENDERING_BACKEND=${{ inputs.rendering_backend }}
         -DF3D_WINDOWS_GUI=ON
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
-        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
 
     - name: Build
       shell: bash

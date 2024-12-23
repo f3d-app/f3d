@@ -15,7 +15,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: dependencies/occt_install
-        key: occt-V7_8_1-${{runner.os}}-${{inputs.cpu}}-2
+        key: occt-V7_8_1-${{runner.os}}-${{inputs.cpu}}-3
 
     - name: Checkout OCCT
       if: steps.cache-occt.outputs.cache-hit != 'true'
@@ -65,7 +65,7 @@ runs:
         -DCMAKE_INSTALL_NAME_DIR:PATH=${{github.workspace}}/dependencies/install/lib
         -DINSTALL_DIR_BIN:PATH=bin
         -DUSE_FREETYPE=OFF
-        ${{ runner.os == 'macOS' && '-DCMAKE_BUILD_WITH_INSTALL_RPATH=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_BUILD_WITH_INSTALL_RPATH=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build OCCT
