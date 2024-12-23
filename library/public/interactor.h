@@ -52,7 +52,7 @@ struct interaction_bind_t
   /**
    * Create and return an interaction bind from provided string
    */
-  [[nodiscard]] static interaction_bind_t parse(const std::string& str);
+  [[nodiscard]] static interaction_bind_t parse(std::string_view str);
 };
 
 /**
@@ -80,7 +80,7 @@ public:
    * eg: `my_app::action`
    */
   virtual interactor& addCommand(
-    const std::string& action, std::function<void(const std::vector<std::string>&)> callback) = 0;
+    std::string action, std::function<void(const std::vector<std::string>&)> callback) = 0;
 
   /**
    * Remove a command for provided action, does not do anything if it does not exists.
@@ -223,14 +223,18 @@ public:
 
   /**
    * Play a VTK interaction file.
+   * Provided file path is used as is and file existence will be checked.
+   * The event loop will be triggered every deltaTime in seconds, and userCallBack will be called at
+   * the start of the event loop
    */
-  virtual bool playInteraction(const std::string& file, double deltaTime = 1.0 / 30,
+  virtual bool playInteraction(const std::filesystem::path& file, double deltaTime = 1.0 / 30,
     std::function<void()> userCallBack = nullptr) = 0;
 
   /**
    * Start interaction and record it all in a VTK interaction file.
+   * Provided file path will be used as is and the parent directory of the file will be checked for writability
    */
-  virtual bool recordInteraction(const std::string& file) = 0;
+  virtual bool recordInteraction(const std::filesystem::path& file) = 0;
 
   /**
    * Start the interactor event loop.
@@ -321,7 +325,7 @@ inline std::string interaction_bind_t::format() const
 }
 
 //----------------------------------------------------------------------------
-inline interaction_bind_t interaction_bind_t::parse(const std::string& str)
+inline interaction_bind_t interaction_bind_t::parse(std::string_view str)
 {
   interaction_bind_t bind;
   auto plusIt = str.find_last_of('+');
@@ -333,7 +337,7 @@ inline interaction_bind_t interaction_bind_t::parse(const std::string& str)
   {
     bind.inter = str.substr(plusIt + 1);
 
-    std::string modStr = str.substr(0, plusIt);
+    std::string_view modStr = str.substr(0, plusIt);
     if (modStr == "Ctrl+Shift")
     {
       bind.mod = ModifierKeys::CTRL_SHIFT;
