@@ -36,7 +36,7 @@ public:
   ~interactor_impl() override;
 
   interactor& initCommands() override;
-  interactor& addCommand(const std::string& action,
+  interactor& addCommand(std::string action,
     std::function<void(const std::vector<std::string>&)> callback) override;
   interactor& removeCommand(const std::string& action) override;
   std::vector<std::string> getCommandActions() const override;
@@ -65,8 +65,8 @@ public:
   interactor& disableCameraMovement() override;
 
   bool playInteraction(
-    const std::string& file, double deltaTime, std::function<void()> userCallBack) override;
-  bool recordInteraction(const std::string& file) override;
+    const std::filesystem::path& file, double deltaTime, std::function<void()> userCallBack) override;
+  bool recordInteraction(const std::filesystem::path& file) override;
 
   interactor& start(double deltaTime, std::function<void()> userCallBack) override;
   interactor& stop() override;
