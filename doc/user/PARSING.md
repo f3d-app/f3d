@@ -4,7 +4,7 @@ When setting options from the [CLI Options](OPTIONS.md), the [commands](COMMANDS
 
 The following types are supported:
  - bool: A boolean, true or false.
- - int: An signed integer.
+ - int: A signed integer.
  - double: A floating point number.
  - ratio: A double dividend over a double divisor, stored in a double.
  - string: A string of characters.
