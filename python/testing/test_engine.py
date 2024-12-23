@@ -62,3 +62,9 @@ def test_get_readers_info():
         assert isinstance(reader.plugin_name, str) and reader.plugin_name
         assert isinstance(reader.has_scene_reader, bool)
         assert isinstance(reader.has_geometry_reader, bool)
+
+
+def test_get_rendering_backend_list():
+    backends = f3d.Engine.get_rendering_backend_list()
+
+    assert isinstance(backends, dict) and len(backends) == 5
