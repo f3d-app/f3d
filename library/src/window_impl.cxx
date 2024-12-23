@@ -548,9 +548,9 @@ void window_impl::SetImporter(vtkF3DMetaImporter* importer)
 }
 
 //----------------------------------------------------------------------------
-void window_impl::SetCachePath(const std::string& cachePath)
+void window_impl::SetCachePath(const std::filesystem::path& cachePath)
 {
-  this->Internals->CachePath = cachePath;
+  this->Internals->CachePath = std::filesystem::absolute(cachePath).string();
 }
 
 //----------------------------------------------------------------------------

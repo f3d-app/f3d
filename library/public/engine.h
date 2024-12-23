@@ -153,14 +153,14 @@ public:
   //@}
 
   /**
-   * Set the cache path. Must be an absolute path.
+   * Set the cache path.
    * Currently, it's only used to store HDRI baked textures.
    * By default, the cache path is:
    * - Windows: %LOCALAPPDATA%\f3d
    * - Linux: ~/.cache/f3d
    * - macOS: ~/Library/Caches/f3d
    */
-  engine& setCachePath(const std::string& cachePath);
+  engine& setCachePath(const std::filesystem::path& cachePath);
 
   /**
    * Engine provide a default options that you can use using engine::getOptions().
@@ -212,7 +212,7 @@ public:
    * Throw a plugin_exception if the plugin can't be loaded for some reason.
    */
   static void loadPlugin(
-    const std::string& nameOrPath, const std::vector<std::string>& pluginSearchPaths = {});
+    std::string_view pathOrName, const std::vector<std::filesystem::path>& pluginSearchPaths = {});
 
   /**
    * Automatically load all the static plugins.
@@ -225,7 +225,7 @@ public:
    * Listed plugins can be loaded using engine::loadPlugin function.
    * Note that the listed plugins may fail to load if the library is not found or incompatible.
    */
-  [[nodiscard]] static std::vector<std::string> getPluginsList(const std::string& pluginPath);
+  [[nodiscard]] static std::vector<std::string> getPluginsList(const std::filesystem::path& pluginPath);
 
   /**
    * A structure providing information about the libf3d.
