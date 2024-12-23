@@ -14,6 +14,8 @@
 #include <vtkImporter.h>
 #include <vtkVersion.h>
 
+class vtkInformationIntegerKey;
+
 class VTKEXT_EXPORT vtkF3DImporter : public vtkImporter
 {
 public:
