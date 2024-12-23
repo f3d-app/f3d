@@ -1161,8 +1161,18 @@ if(WIN32)
   f3d_test(NAME TestRenderingBackenListWGL ARGS --rendering-backend-list NO_RENDER NO_BASELINE REGEXP "wgl: available")
 elseif(APPLE)
   f3d_test(NAME TestRenderingBackenListCOCOA ARGS --rendering-backend-list NO_RENDER NO_BASELINE REGEXP "cocoa: available")
-elseif(F3D_TESTING_ENABLE_GLX_TESTS)
+endif()
+
+if(F3D_TESTING_ENABLE_GLX_TESTS)
   f3d_test(NAME TestRenderingBackenListGLX ARGS --rendering-backend-list NO_RENDER NO_BASELINE REGEXP "glx: available")
+endif()
+
+if(F3D_TESTING_ENABLE_EGL_TESTS)
+  f3d_test(NAME TestRenderingBackenListEGL ARGS --rendering-backend-list NO_RENDER NO_BASELINE REGEXP "egl: available")
+endif()
+
+if(F3D_TESTING_ENABLE_OSMESA_TESTS)
+  f3d_test(NAME TestRenderingBackenListOSMesa ARGS --rendering-backend-list NO_RENDER NO_BASELINE REGEXP "osmesa: available")
 endif()
 
 # Test scan plugins
