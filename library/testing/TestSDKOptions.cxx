@@ -73,11 +73,15 @@ int TestSDKOptions(int argc, char* argv[])
   test("set/get string", std::get<std::string>(opt.get("model.color.texture")) == "test");
 
   // Test double vector
-  opt.setAsString("render.background.color", "0.1, 0.2, 0.4");
-  test("setAsString vector<double>", opt.getAsString("render.background.color") == "0.1, 0.2, 0.4");
+  opt.setAsString("render.background.color", "0.1,0.2,0.4");
+  test("setAsString vector<double>", opt.getAsString("render.background.color") == "0.1,0.2,0.4");
+
+  opt.setAsString("render.background.color", "0.1, 0.3, 0.4");
+  test("setAsString spaces vector<double>",
+    opt.getAsString("render.background.color") == "0.1,0.3,0.4");
 
   opt.render.background.color = { 0.1, 0.2, 0.5 };
-  test("getAsString vector<double>", opt.getAsString("render.background.color") == "0.1, 0.2, 0.5");
+  test("getAsString vector<double>", opt.getAsString("render.background.color") == "0.1,0.2,0.5");
 
   opt.set("render.background.color", std::vector<double>{ 0.1, 0.2, 0.3 });
   test("set/get vector<double>",

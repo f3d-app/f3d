@@ -264,7 +264,7 @@ std::string format(const std::vector<double>& var)
   unsigned int i = 0;
   for (auto& elem : var)
   {
-    stream << ((i > 0) ? ", " : "") << options_tools::format(elem);
+    stream << ((i > 0) ? "," : "") << options_tools::format(elem);
     i++;
   }
   return stream.str();
