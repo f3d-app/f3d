@@ -17,6 +17,12 @@
 class VTKEXT_EXPORT vtkF3DImporter : public vtkImporter
 {
 public:
+  /**
+   * Information key used to flag actors.
+   * Actors having this flag will be drawn on top.
+   */
+  static vtkInformationIntegerKey* ACTOR_IS_ARMATURE();
+
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
   /**
    * This method should be reimplemented in importer

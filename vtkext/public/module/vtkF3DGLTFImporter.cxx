@@ -1,6 +1,6 @@
 #include "vtkF3DGLTFImporter.h"
 
-#include "vtkF3DRenderPass.h"
+#include "vtkF3DImporter.h"
 
 #include <vtkActor.h>
 #include <vtkInformation.h>
@@ -27,7 +27,7 @@ void vtkF3DGLTFImporter::ApplyArmatureProperties(vtkActor* actor)
   this->Superclass::ApplyArmatureProperties(actor);
 
   vtkNew<vtkInformation> info;
-  info->Set(vtkF3DRenderPass::ACTOR_IS_ARMATURE(), 1);
+  info->Set(vtkF3DImporter::ACTOR_IS_ARMATURE(), 1);
   actor->SetPropertyKeys(info);
 }
 #endif

@@ -1,6 +1,7 @@
 #include "vtkF3DRenderPass.h"
 
 #include "vtkF3DHexagonalBokehBlurPass.h"
+#include "vtkF3DImporter.h"
 
 #include <vtkBoundingBox.h>
 #include <vtkCameraPass.h>
@@ -40,7 +41,6 @@
 vtkStandardNewMacro(vtkF3DRenderPass);
 
 vtkInformationKeyMacro(vtkF3DRenderPass, RENDER_UI_ONLY, Integer);
-vtkInformationKeyMacro(vtkF3DRenderPass, ACTOR_IS_ARMATURE, Integer);
 
 // ----------------------------------------------------------------------------
 void vtkF3DRenderPass::PrintSelf(ostream& os, vtkIndent indent)
@@ -100,7 +100,7 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     {
       // armature
       vtkInformation* info = prop->GetPropertyKeys();
-      if (this->ArmatureVisible && info && info->Has(vtkF3DRenderPass::ACTOR_IS_ARMATURE()))
+      if (this->ArmatureVisible && info && info->Has(vtkF3DImporter::ACTOR_IS_ARMATURE()))
       {
         this->MainOnTopProps.push_back(prop);
       }

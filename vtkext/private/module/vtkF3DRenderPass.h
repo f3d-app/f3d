@@ -48,7 +48,6 @@ public:
   void operator=(const vtkF3DRenderPass&) = delete;
 
   static vtkInformationIntegerKey* RENDER_UI_ONLY();
-  static vtkInformationIntegerKey* ACTOR_IS_ARMATURE();
 
 protected:
   vtkF3DRenderPass() = default;

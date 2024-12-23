@@ -3,9 +3,9 @@ NAME
 DESCRIPTION
   A VTK module for the native plugin
 DEPENDS
-  f3d::vtkextPrivate
   VTK::CommonCore
   VTK::CommonExecutionModel
+  f3d::vtkext
 TEST_DEPENDS
   VTK::TestingCore
   VTK::CommonDataModel
