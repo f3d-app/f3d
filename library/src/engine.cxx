@@ -442,9 +442,10 @@ std::vector<engine::readerInformation> engine::getReadersInfo()
 }
 
 //----------------------------------------------------------------------------
-void engine::setCachePath(const std::string& cachePath)
+engine& engine::setCachePath(const std::string& cachePath)
 {
   this->Internals->Window->SetCachePath(cachePath);
+  return *this;
 }
 
 //----------------------------------------------------------------------------

@@ -1053,24 +1053,27 @@ std::pair<std::string, std::string> interactor_impl::getBindingDocumentation(
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::toggleAnimation()
+interactor& interactor_impl::toggleAnimation()
 {
   assert(this->Internals->AnimationManager);
   this->Internals->AnimationManager->ToggleAnimation();
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::startAnimation()
+interactor& interactor_impl::startAnimation()
 {
   assert(this->Internals->AnimationManager);
   this->Internals->AnimationManager->StartAnimation();
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::stopAnimation()
+interactor& interactor_impl::stopAnimation()
 {
   assert(this->Internals->AnimationManager);
   this->Internals->AnimationManager->StopAnimation();
+  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -1081,15 +1084,17 @@ bool interactor_impl::isPlayingAnimation()
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::enableCameraMovement()
+interactor& interactor_impl::enableCameraMovement()
 {
   this->Internals->Style->SetCameraMovementDisabled(false);
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::disableCameraMovement()
+interactor& interactor_impl::disableCameraMovement()
 {
   this->Internals->Style->SetCameraMovementDisabled(true);
+  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -1165,23 +1170,26 @@ bool interactor_impl::recordInteraction(const std::string& file)
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::start(double loopTime, std::function<void()> userCallBack)
+interactor& interactor_impl::start(double loopTime, std::function<void()> userCallBack)
 {
   this->Internals->StartEventLoop(loopTime, std::move(userCallBack));
   this->Internals->VTKInteractor->Start();
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::stop()
+interactor& interactor_impl::stop()
 {
   this->Internals->StopEventLoop();
   this->Internals->VTKInteractor->ExitCallback();
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::requestRender()
+interactor& interactor_impl::requestRender()
 {
   this->Internals->RenderRequested = true;
+  return *this;
 }
 
 //----------------------------------------------------------------------------

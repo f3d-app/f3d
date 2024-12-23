@@ -80,7 +80,7 @@ public:
   /**
    * Return true if provided file path is supported, false otherwise.
    */
-  virtual bool supports(const std::filesystem::path& filePath) = 0;
+  [[nodiscard]] virtual bool supports(const std::filesystem::path& filePath) = 0;
 
   /**
    * Load added files at provided time value if they contain any animation
@@ -94,7 +94,7 @@ public:
    * Get animation time range of currently added files.
    * Returns [0, 0] if there is no animations.
    */
-  virtual std::pair<double, double> animationTimeRange() = 0;
+  [[nodiscard]] virtual std::pair<double, double> animationTimeRange() = 0;
 
 protected:
   //! @cond
