@@ -86,7 +86,7 @@ public:
     bool NoBackground;
     bool NoRender;
     std::string RenderingBackend;
-    double MaxSize;
+    std::optional<double> MaxSize;
     std::optional<double> AnimationTime;
     bool Watch;
     double FrameRate;
@@ -548,7 +548,10 @@ public:
     this->AppOptions.NoRender = f3d::options::parse<bool>(appOptions.at("no-render"));
     this->AppOptions.RenderingBackend =
       f3d::options::parse<std::string>(appOptions.at("rendering-backend"));
-    this->AppOptions.MaxSize = f3d::options::parse<double>(appOptions.at("max-size"));
+    if (!appOptions.at("max-size").empty())
+    {
+      this->AppOptions.MaxSize = f3d::options::parse<double>(appOptions.at("max-size"));
+    }
     if (!appOptions.at("animation-time").empty())
     {
       this->AppOptions.AnimationTime = f3d::options::parse<double>(appOptions.at("animation-time"));
@@ -1237,9 +1240,10 @@ void F3DStarter::LoadFileGroup(
           {
             // Check the size of the file before loading it
             static constexpr int BYTES_IN_MIB = 1048576;
-            if (this->Internals->AppOptions.MaxSize >= 0.0 &&
+            if (this->Internals->AppOptions.MaxSize.has_value() &&
               fs::file_size(tmpPath) >
-                static_cast<std::uintmax_t>(this->Internals->AppOptions.MaxSize * BYTES_IN_MIB))
+                static_cast<std::uintmax_t>(
+                  this->Internals->AppOptions.MaxSize.value() * BYTES_IN_MIB))
             {
               f3d::log::info(tmpPath.string(), " skipped, file is bigger than max size");
             }

@@ -70,7 +70,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "dry-run", "", "Do not read the configuration file", "<bool>", "1" },
       { "no-render", "", "Do not read the configuration file", "<bool>", "1" },
       { "rendering-backend", "", "Backend to use when rendering (auto|glx|wgl|egl|osmesa)", "<string>", "" },
-      { "max-size", "", "Maximum size in Mib of a file to load, negative value means unlimited", "<size in Mib>", "" },
+      { "max-size", "", "Maximum size in Mib of a file to load, leave empty for unlimited", "<size in Mib>", "" },
 #if F3D_MODULE_DMON
       { "watch", "", "Watch current file and automatically reload it whenever it is modified on disk", "<bool>", "1" },
 #endif

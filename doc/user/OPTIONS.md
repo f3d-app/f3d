@@ -17,7 +17,7 @@ Options|Default|Description
 \-\-config=\<config file path/name/stem\>|config|Specify the [configuration file](CONFIGURATION_FILE.md) to use. Supports absolute/relative path but also filename/filestem to search for in standard configuration file locations.
 \-\-dry-run||Do not read any configuration file and consider only the command line options.
 \-\-no-render||Do not render anything and quit just after loading the first file, use with \-\-verbose to recover information about a file.
-\-\-max-size=\<size in MiB\>|-1|Prevent F3D to load a file bigger than the provided size in Mib, negative value means unlimited, useful for thumbnails.
+\-\-max-size=\<size in MiB\>||Prevent F3D to load a file bigger than the provided size in Mib, leave empty for unlimited, useful for thumbnails.
 \-\-watch||Watch current file and automatically reload it whenever it is modified on disk.
 \-\-frame-rate=\<fps\>|30.0|Frame rate used to refresh animation and other repeated tasks (watch, UI). Does not impact rendering frame rate.
 \-\-load-plugins=\<paths or names\>||List of plugins to load separated with a comma. Official plugins are `alembic`, `assimp`, `draco`, `exodus`, `occt`, `usd`, `vdb`. See [plugins](PLUGINS.md) for more info.
