@@ -43,9 +43,9 @@ Option|Type<br>Default<br>Trigger|Description|F3D option
 :---:|:---:|:---|:---:
 model.matcap.texture|string<br>optional<br>render|Path to a texture file containing a material capture. All other model options for surfaces are ignored if this is set. Model specified by default.|\-\-texture-matcap
 model.color.opacity|double<br>optional<br>render|Set *opacity* on the geometry. Usually used with Depth Peeling option. Multiplied with the `model.color.texture` when present. Model specified by default.|\-\-opacity
-model.color.rgb|double_vector<br>optional<br>render|Set a *color* on the geometry. Multiplied with the `model.color.texture` when present. Model specified by default.|\-\-color
+model.color.rgb|vector\<double\><br>optional<br>render|Set a *color* on the geometry. Multiplied with the `model.color.texture` when present. Model specified by default.|\-\-color
 model.color.texture|string<br>optional<br>render|Path to a texture file that sets the color of the object. Will be multiplied with rgb and opacity. Model specified by default.|\-\-texture-base-color
-model.emissive.factor|double_vector<br>optional<br>render| Multiply the emissive color when an emissive texture is present. Model specified by default.|\-\-emissive-factor
+model.emissive.factor|vector\<double\><br>optional<br>render| Multiply the emissive color when an emissive texture is present. Model specified by default.|\-\-emissive-factor
 model.emissive.texture|string<br><br>render|Path to a texture file that sets the emitted light of the object. Multiplied with the `model.emissive.factor`. Model specified by default.|\-\-texture-emissive
 model.material.metallic|double<br>optional<br>render|Set the *metallic coefficient* on the geometry (0.0-1.0). Multiplied with the `model.material.texture` when present. Model specified by default.|\-\-metallic
 model.material.roughness|double<br>optional<br>render|Set the *roughness coefficient* on the geometry (0.0-1.0). Multiplied with the `model.material.texture` when present. Model specified by default.|\-\-roughness
@@ -54,10 +54,10 @@ model.normal.scale|double<br>optional<br>render|Normal scale affects the strengt
 model.normal.texture|string<br>optional<br>render|Path to a texture file that sets the normal map of the object. Model specified by default.|\-\-texture-normal
 model.scivis.enable|bool<br>false<br>render|*Color by an array* present in on the data. If `model.scivis.array_name` is not set, the first available array will be used.|\-\-scalar-coloring
 model.scivis.cells|bool<br>false<br>render|Color the data with value found *on the cells* instead of points|\-\-cells
-model.scivis.colormap|double_vector<br>\<inferno\><br>render|Set a *custom colormap for the coloring*.<br>This is a list of colors in the format `val1,red1,green1,blue1,...,valN,redN,greenN,blueN`<br>where all values are in the range (0,1).|\-\-colormap
+model.scivis.colormap|vector\<double\><br>\<inferno\><br>render|Set a *custom colormap for the coloring*.<br>This is a list of colors in the format `val1,red1,green1,blue1,...,valN,redN,greenN,blueN`<br>where all values are in the range (0,1).|\-\-colormap
 model.scivis.component|int<br>-1<br>render|Specify the component to color with. -1 means *magnitude*. -2 means *direct values*.|\-\-comp
 model.scivis.array_name|string<br><br>render|Select the name of the array to color with.|\-\-coloring-array
-model.scivis.range|double_vector<br>optional<br>render|Set the *coloring range*. Automatically computed by default.|\-\-range
+model.scivis.range|vector\<double\><br>optional<br>render|Set the *coloring range*. Automatically computed by default.|\-\-range
 model.point_sprites.enable|bool<br>false<br>render|Show sphere *points sprites* instead of the geometry.|\-\-point-sprites
 model.point_sprites.type|string<br>sphere<br>render|Set the sprites type when showing point sprites (can be `sphere` or `gaussian`).|\-\-point-stripes-type
 model.point_sprites.size|double<br>10.0<br>render|Set the *size* of point sprites.|\-\-point-stripes-size
@@ -87,7 +87,7 @@ render.raytracing.samples|int<br>5<br>render|The number of *samples per pixel*.|
 render.raytracing.denoise|bool<br>false<br>render|*Denoise* the raytracing rendering.|\-\-denoise
 render.hdri.file|string<br>optional<br>render|Set the *HDRI* image that can be used for ambient lighting and skybox.<br>Valid file format are hdr, exr, png, jpg, pnm, tiff, bmp.<br>If not set, a default is provided.|\-\-hdri-file
 render.hdri.ambient|bool<br>false<br>render|Light the scene using the *HDRI* image as ambient lighting<br>The environment act as a light source and is reflected on the material.|\-\-hdri-ambient
-render.background.color|double_vector<br>0.2,0.2,0.2<br>render|Set the window *background color*.<br>Ignored if a *hdri* skybox is used.|\-\-background-color
+render.background.color|vector\<double\><br>0.2,0.2,0.2<br>render|Set the window *background color*.<br>Ignored if a *hdri* skybox is used.|\-\-background-color
 render.background.skybox|bool<br>false<br>render|Show the *HDRI* image as a skybox<br>Overrides the the background color if any|\-\-hdri-skybox
 render.background.blur.enable|bool<br>false<br>render|Blur background, useful with a skybox.|\-\-blur-background
 render.background.blur.coc|double<br>20.0<br>render|Blur background circle of confusion radius.|\-\-blur-coc

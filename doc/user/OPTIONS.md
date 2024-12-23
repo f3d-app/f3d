@@ -38,7 +38,7 @@ Options|Type<br>Default|Description
 -g, \-\-grid|bool<br>false|Show *a grid* aligned with the horizontal (orthogonal to the Up direction) plane.
 \-\-grid\-unit=\<length\>|double<br>-|Set the size of the *unit square* for the grid. If not set (the default) a suitable value will be automatically computed.
 \-\-grid\-subdivisions=\<count\>|int<br>10|Set the number of subdivisions for the grid.
-\-\-grid\-color=\<color\>|double_vector<br>(0,0,0)|Set the color grid lines.
+\-\-grid\-color=\<color\>|vector\<double\><br>(0,0,0)|Set the color grid lines.
 -e, \-\-edges|bool<br>false|Show the *cell edges*.
 \-\-camera-index=\<idx\>|int<br>-|Select the scene camera to use when available in the file. Automatically computed by default.
 -k, \-\-trackball|bool<br>false|Enable trackball interaction.
@@ -59,7 +59,7 @@ Options|Type<br>Default|Description
 \-\-point-size=\<size\>|double<br>-|Set the *size* of points when showing vertices. Model specified by default.
 \-\-line-width=\<size\>|double<br>-|Set the *width* of lines when showing edges. Model specified by default.
 \-\-backface-type=\<visible\|hidden\>|string<br>-|Set the Backface type. Model specified by default.
-\-\-color=\<R,G,B\>|double_vector<br>-| Set a *color* on the geometry. Multiplied with the base color texture when present. <br>Model specified by default.
+\-\-color=\<R,G,B\>|vector\<double\><br>-| Set a *color* on the geometry. Multiplied with the base color texture when present. <br>Model specified by default.
 \-\-opacity=\<opacity\>|double<br>-|Set *opacity* on the geometry. Multiplied with the base color texture when present. <br>Model specified by default. Usually used with Depth Peeling option.
 \-\-roughness=\<roughness\>|double<br>-|Set the *roughness coefficient* on the geometry (0.0-1.0). Multiplied with the material texture when present. <br>Model specified by default.
 \-\-metallic=\<metallic\>|double<br>-|Set the *metallic coefficient* on the geometry (0.0-1.0). Multiplied with the material texture when present. <br>Model specified by default.
@@ -69,15 +69,15 @@ Options|Type<br>Default|Description
 \-\-texture-base-color=\<texture file\>|string<br>-|Set the texture file to control the color of the object. Please note this will be multiplied with the color and opacity options. Must be in sRGB color space. <br>Model specified by default.
 \-\-texture-material=\<texture file\>|string<br>-|Set the texture file to control the occlusion, roughness and metallic values of the object. Please note this will be multiplied with the roughness and metallic options, which have impactful default values. To obtain true results, use \-\-roughness=1 \-\-metallic=1. Must be in linear color space. <br>Model specified by default.
 \-\-texture-emissive=\<texture file\>|string<br>-|Set the texture file to control the emitted light of the object. Please note this will be multiplied with the emissive factor.  Must be in sRGB color space. <br>Model specified by default.
-\-\-emissive-factor=\<R,G,B\>|double_vector<br>-|Set the emissive factor. This value is multiplied with the emissive color when an emissive texture is present. <br>Model specified by default.
+\-\-emissive-factor=\<R,G,B\>|vector\<double\><br>-|Set the emissive factor. This value is multiplied with the emissive color when an emissive texture is present. <br>Model specified by default.
 
 ## Window options
 
 Options|Type<br>Default|Description
 ------|------|------
-\-\-background-color=\<R,G,B\>|double_vector<br>0.2, 0.2, 0.2|Set the window *background color*.<br>Ignored if *hdri* is set.
-\-\-resolution=\<width,height\>|double_vector<br>1000, 600|Set the *window resolution*.
-\-\-position=\<x,y\>|double_vector<br>-|Set the *window position* (top left corner) , in pixels, starting from the top left of your screens.
+\-\-background-color=\<R,G,B\>|vector\<double\><br>0.2, 0.2, 0.2|Set the window *background color*.<br>Ignored if *hdri* is set.
+\-\-resolution=\<width,height\>|vector\<double\><br>1000, 600|Set the *window resolution*.
+\-\-position=\<x,y\>|vector\<double\><br>-|Set the *window position* (top left corner) , in pixels, starting from the top left of your screens.
 -z, \-\-fps|bool<br>false|Display a rendering *frame per second counter*.
 -n, \-\-filename|bool<br>false|Display the *name of the file* on top of the window.
 -m, \-\-metadata|bool<br>false|Display the *metadata*.
@@ -94,7 +94,7 @@ Options|Type<br>Default|Description
 \-\-coloring-array=\<array_name\>|string<br>-|The coloring array name to use when coloring.<br>Use \-\-verbose to recover the usable array names.
 -y, \-\-comp=\<comp_index\>|int<br>-1|Specify the *component from the scalar* array to color with.<br>Use with the scalar option. -1 means *magnitude*. -2 or the short option, -y, means *direct values*.<br>When using *direct values*, components are used as L, LA, RGB, RGBA values depending on the number of components.
 -c, \-\-cells|bool<br>false|Specify that the scalar array is to be found *on the cells* instead of on the points.<br>Use with the scalar option.
-\-\-range=\<min,max\>|double_vector<br>-|Set the *coloring range*. Automatically computed by default.<br>Use with the scalar option.
+\-\-range=\<min,max\>|vector\<double\><br>-|Set the *coloring range*. Automatically computed by default.<br>Use with the scalar option.
 -b, \-\-bar|bool<br>false|Show *scalar bar* of the coloring by array.<br>Use with the scalar option.
 \-\-colormap\-file=\<name\>|string<br>-|Set a *colormap file for the coloring*.<br>See [color maps](COLOR_MAPS.md).<br>Use with the scalar option.
 \-\-colormap=\<color_list\>|string<br>-|Set a *custom colormap for the coloring*.<br>This is a list of colors in the format `val1,red1,green1,blue1,...,valN,redN,greenN,blueN`<br>where all values are in the range (0,1).<br>Ignored if `--colormap-file` option is specified.<br>Use with the scalar option.
@@ -105,11 +105,11 @@ Options|Type<br>Default|Description
 
 Options|Type<br>Default|Description
 ------|------|------
-\-\-camera-position=\<X,Y,Z\>|double_vector<br>-|Set the camera position, overrides --camera-direction and camera-zoom-factor.
-\-\-camera-focal-point=\<X,Y,Z\>|double_vector<br>-|Set the camera focal point.
-\-\-camera-view-up=\<X,Y,Z\>|double_vector<br>-|Set the camera view up vector. Will be orthogonalized.
+\-\-camera-position=\<X,Y,Z\>|vector\<double\><br>-|Set the camera position, overrides --camera-direction and camera-zoom-factor.
+\-\-camera-focal-point=\<X,Y,Z\>|vector\<double\><br>-|Set the camera focal point.
+\-\-camera-view-up=\<X,Y,Z\>|vector\<double\><br>-|Set the camera view up vector. Will be orthogonalized.
 \-\-camera-view-angle=\<angle\>|double<br>-|Set the camera view angle, a strictly positive value in degrees.
-\-\-camera-direction=\<X,Y,Z\>|double_vector<br>-|Set the camera direction, looking at the focal point.
+\-\-camera-direction=\<X,Y,Z\>|vector\<double\><br>-|Set the camera direction, looking at the focal point.
 \-\-camera-zoom-factor=\<factor\>|double<br>-|Set the camera zoom factor relative to the autozoom on data, a strictly positive value.
 \-\-camera-azimuth-angle=\<angle\>|double<br>0.0|Apply an azimuth transformation to the camera, in degrees, added after other camera options.
 \-\-camera-elevation-angle=\<angle\>|double<br>0.0|Apply an elevation transformation to the camera, in degrees, added after other camera options.

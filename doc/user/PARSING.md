@@ -1,15 +1,16 @@
 # Parsing options
 
-When setting options from the [CLI Options](OPTIONS.md), the [commands](COMMANDS.md) or using the [libf3d options string API](../libf3d/OPTIONS.md#string-api), the values are parsed according to their type. If parsing fails, the values is not changed.
+When setting options from the [CLI Options](OPTIONS.md), the [commands](COMMANDS.md) or using the [libf3d options string API](../libf3d/OPTIONS.md#string-api), the values are parsed according to their type. If parsing fails, the value is not changed.
 
 The following types are supported:
- - bool
- - int
- - double
- - ratio
- - string
+ - bool: A boolean, true or false.
+ - int: An signed integer.
+ - double: A floating point number.
+ - ratio: A double dividend over a double divisor, stored in a double.
+ - string: A string of characters.
 
-As well as vectors for each of these types.
+As well as a list for each of these types, noted as
+ - vector\<type\>
 
 ## Bool
 
@@ -39,8 +40,8 @@ with removing the point and precision when the value is exactly an integer.
 ## Ratio
 
 The following formats are supported when parsing a string into a ratio:
- - percent%
- - dividend/divisor
+ - percent% where percent is a double
+ - dividend/divisor where both are doubles
  - double
 
 Percent, dividend, divisor are then parsed as double.
