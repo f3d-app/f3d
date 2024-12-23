@@ -4,6 +4,7 @@
 #include "exception.h"
 #include "export.h"
 
+#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -45,13 +46,13 @@ public:
   };
 
   /**
-   * Create an image from file, the following formats are supported:
+   * Create an image from provided file path, used as is, the following formats are supported:
    * PNG, PNM, TIFF, BMP, HDR, JPEG, GESigna, MetaImage, TGA.
    * EXR files are also supported if the associated module is built.
    * The complete list can be retrieve at runtime by calling `getSupportedFormats()`.
    * Throw an `image::read_exception` in case of failure.
    */
-  explicit image(const std::string& path);
+  explicit image(const std::filesystem::path& filePath);
 
   /**
    * Create an image from a given width, height, and channel count.
@@ -154,7 +155,7 @@ public:
   bool compare(const image& reference, double threshold, double& error) const;
 
   /**
-   * Save an image to a file in the specified format.
+   * Save an image to the provided file path, used as is, in the specified format.
    * Default format is PNG if not specified.
    * PNG: Supports channel type BYTE and SHORT with channel count of 1 to 4
    * JPG: Supports channel type BYTE with channel count of 1 or 3
@@ -163,7 +164,8 @@ public:
    * Throw an `image::write_exception` if the format is incompatible with with image channel type or
    * channel count
    */
-  const image& save(const std::string& path, SaveFormat format = SaveFormat::PNG) const;
+  const image& save(
+    const std::filesystem::path& filePath, SaveFormat format = SaveFormat::PNG) const;
 
   /**
    * Save an image to a memory buffer in the specified format and returns it.
@@ -200,7 +202,7 @@ public:
   /**
    * Set the value for a metadata key. Setting an empty value (`""`) removes the key.
    */
-  f3d::image& setMetadata(const std::string& key, const std::string& value);
+  f3d::image& setMetadata(std::string key, std::string value);
 
   /**
    * Get the value for a metadata key.
