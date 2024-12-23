@@ -228,7 +228,7 @@ int TestSDKOptions(int argc, char* argv[])
   opt7.model.scivis.array_name = "dummy";
   opt7.reset("model.scivis.array_name");
   test.expect<f3d::options::no_value_exception>(
-    "reset non-optional values", [&]() { std::ignore = opt7.get("model.scivis.array_name"); });
+    "reset non-optional values", [&]() { opt7.get("model.scivis.array_name"); });
 
   // Test reset non-existent option
   test.expect<f3d::options::inexistent_exception>(
