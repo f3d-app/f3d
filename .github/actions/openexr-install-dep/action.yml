@@ -10,12 +10,13 @@ runs:
   using: "composite"
   steps:
 
+    # OpenEXR is part of VFX reference platform (CY2025: 3.3.x)
     - name: Cache OpenEXR
       id: cache-openexr
       uses: actions/cache@v4
       with:
         path: dependencies/openexr_install
-        key: openexr-v3.2.4-${{runner.os}}-${{inputs.cpu}}-1
+        key: openexr-v3.3.2-${{runner.os}}-${{inputs.cpu}}-0
 
     # Dependents: usd
     - name: Checkout OpenEXR
@@ -24,7 +25,7 @@ runs:
       with:
         repository: AcademySoftwareFoundation/openexr
         path: './dependencies/openexr'
-        ref: v3.2.4
+        ref: v3.3.2
 
     - name: Setup OpenEXR
       if: steps.cache-openexr.outputs.cache-hit != 'true'
@@ -46,7 +47,7 @@ runs:
         -DCMAKE_PREFIX_PATH:PATH=../install/
         -DOPENEXR_INSTALL_TOOLS=OFF
         -DOPENEXR_INSTALL_EXAMPLES=OFF
-        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_MACOSX_RPATH=ON' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0 -DCMAKE_MACOSX_RPATH=ON' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build OpenEXR
