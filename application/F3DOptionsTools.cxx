@@ -177,7 +177,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
  * True boolean options need to be filtered out in ParseCLIOptions
  * This is the easiest, compile time way to do it
  */
-constexpr std::array CLIBooleans = {"version", "help", "readers-list", "scan-plugins", "renderin-backend-list"};
+constexpr std::array CLIBooleans = {"version", "help", "readers-list", "scan-plugins", "rendering-backend-list"};
 
 //----------------------------------------------------------------------------
 /**
