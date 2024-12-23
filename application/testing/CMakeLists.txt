@@ -1039,9 +1039,9 @@ f3d_test(NAME TestConfigFileNoOptions DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/test
 # Test update interaction verbose
 f3d_test(NAME TestConfigFileBindingsVerbose DATA dragon.vtu ARGS --verbose CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json REGEXP "'Shift.O' : '`toggle model.point_sprites.enable` '" NO_BASELINE)
 
-# Test bindings-list display with config file
-f3d_test(NAME TestConfigFileBindingsList ARGS --bindings-list CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json REGEXP "Ctrl.Shift.O `toggle ui.filename`" NO_BASELINE)
-f3d_test(NAME TestConfigFileBindingsListData DATA dragon.vtu ARGS --bindings-list CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json REGEXP "Any.3        `roll_camera 90`" NO_BASELINE)
+# Test list-bindings display with config file
+f3d_test(NAME TestConfigFileBindingsList ARGS --list-bindings CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json REGEXP "Ctrl.Shift.O `toggle ui.filename`" NO_BASELINE)
+f3d_test(NAME TestConfigFileBindingsListData DATA dragon.vtu ARGS --list-bindings CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json REGEXP "Any.3        `roll_camera 90`" NO_BASELINE)
 
 # Test invalid value in config file
 f3d_test(NAME TestConfigFileInvalidValue DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/invalid_value.json REGEXP "must be a string, a boolean or a number" NO_BASELINE)
@@ -1068,19 +1068,19 @@ f3d_test(NAME TestHelpPositional ARGS --help REGEXP "file1 file2 \.\.\.")
 # Test version display
 f3d_test(NAME TestVersion ARGS --version REGEXP "Version:")
 
-# Test readers-list display
-f3d_test(NAME TestReadersList ARGS --readers-list REGEXP_FAIL "No registered reader found")
+# Test list-readers display
+f3d_test(NAME TestReadersList ARGS --list-readers REGEXP_FAIL "No registered reader found")
 
 # Test invalid component string coverage
 f3d_test(NAME TestInteractionInvalidComponent INTERACTION UI DATA cow.vtp ARGS --coloring-component=1 NO_BASELINE) #H
 
-# Test multi plugin readers-lists
+# Test multi plugin list-readers
 if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
-  f3d_test(NAME TestReadersListMultiplePlugins ARGS --readers-list --load-plugins=assimp,alembic NO_BASELINE REGEXP_FAIL "Plugin failed to load")
+  f3d_test(NAME TestReadersListMultiplePlugins ARGS --list-readers --load-plugins=assimp,alembic NO_BASELINE REGEXP_FAIL "Plugin failed to load")
 endif()
 
-# Test bindings-list display
-f3d_test(NAME TestBindingsList ARGS --bindings-list REGEXP "Any.Question Print scene descr to terminal")
+# Test list-bindings display
+f3d_test(NAME TestBindingsList ARGS --list-bindings REGEXP "Any.Question Print scene descr to terminal")
 
 # Test rendering backends
 # For some reason the sanitizer detects leaks because of EGL and OSMesa
@@ -1158,21 +1158,21 @@ f3d_test(NAME TestVersionPrecedenceWithUnknownOption ARGS --version --unknown RE
 
 # Test rendering backend list
 if(WIN32)
-  f3d_test(NAME TestRenderingBackenListWGL ARGS --rendering-backend-list NO_RENDER NO_BASELINE REGEXP "wgl: available")
+  f3d_test(NAME TestRenderingBackenListWGL ARGS --list-rendering-backends NO_RENDER NO_BASELINE REGEXP "wgl: available")
 elseif(APPLE)
-  f3d_test(NAME TestRenderingBackenListCOCOA ARGS --rendering-backend-list NO_RENDER NO_BASELINE REGEXP "cocoa: available")
+  f3d_test(NAME TestRenderingBackenListCOCOA ARGS --list-rendering-backends NO_RENDER NO_BASELINE REGEXP "cocoa: available")
 endif()
 
-if(F3D_TESTING_ENABLE_GLX_TESTS)
-  f3d_test(NAME TestRenderingBackenListGLX ARGS --rendering-backend-list NO_RENDER NO_BASELINE REGEXP "glx: available")
+if(F3D_TESTING_ENABLE_GLX_TESTS AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240914)
+  f3d_test(NAME TestRenderingBackenListGLX ARGS --list-rendering-backends NO_RENDER NO_BASELINE REGEXP "glx: available")
 endif()
 
-if(F3D_TESTING_ENABLE_EGL_TESTS)
-  f3d_test(NAME TestRenderingBackenListEGL ARGS --rendering-backend-list NO_RENDER NO_BASELINE REGEXP "egl: available")
+if(F3D_TESTING_ENABLE_EGL_TESTS AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240914)
+  f3d_test(NAME TestRenderingBackenListEGL ARGS --list-rendering-backends NO_RENDER NO_BASELINE REGEXP "egl: available")
 endif()
 
 if(F3D_TESTING_ENABLE_OSMESA_TESTS)
-  f3d_test(NAME TestRenderingBackenListOSMesa ARGS --rendering-backend-list NO_RENDER NO_BASELINE REGEXP "osmesa: available")
+  f3d_test(NAME TestRenderingBackenListOSMesa ARGS --list-rendering-backends NO_RENDER NO_BASELINE REGEXP "osmesa: available")
 endif()
 
 # Test scan plugins

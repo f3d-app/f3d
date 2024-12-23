@@ -64,13 +64,13 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
     { { "output", "", "Render to file", "<png file>", "" },
       { "no-background", "", "No background when render to file", "<bool>", "1" },
       { "help", "h", "Print help", "", "" }, { "version", "", "Print version details", "", "" },
-      { "readers-list", "", "Print the list of readers", "", "" },
-      { "bindings-list", "", "Print the list of interaction bindings and exits, ignored with `--no-render`, only considers the first file group.", "", "" },
+      { "list-readers", "", "Print the list of readers", "", "" },
+      { "list-bindings", "", "Print the list of interaction bindings and exits, ignored with `--no-render`, only considers the first file group.", "", "" },
       { "config", "", "Specify the configuration file to use. absolute/relative path or filename/filestem to search in configuration file locations", "<filePath/filename/fileStem>", "" },
       { "no-config", "", "Do not read the configuration file", "<bool>", "1" },
       { "no-render", "", "Do not render anything and quit right after loading the first file, use with --verbose to recover information about a file.", "<bool>", "1" },
       { "rendering-backend", "", "Backend to use when rendering (auto|glx|wgl|egl|osmesa)", "<string>", "" },
-      { "rendering-backend-list", "", "List of rendering backends available on this system", "", "" },
+      { "list-rendering-backends", "", "Print the list of rendering backends available on this system", "", "" },
       { "max-size", "", "Maximum size in Mib of a file to load, leave empty for unlimited", "<size in Mib>", "" },
 #if F3D_MODULE_DMON
       { "watch", "", "Watch current file and automatically reload it whenever it is modified on disk", "<bool>", "1" },
@@ -177,7 +177,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
  * True boolean options need to be filtered out in ParseCLIOptions
  * This is the easiest, compile time way to do it
  */
-constexpr std::array CLIBooleans = {"version", "help", "readers-list", "scan-plugins", "rendering-backend-list"};
+constexpr std::array CLIBooleans = {"version", "help", "list-readers", "scan-plugins", "list-rendering-backends"};
 
 //----------------------------------------------------------------------------
 /**
@@ -499,7 +499,7 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
       ::PrintVersion();
       throw F3DExNoProcess("version requested");
     }
-    if (result.count("rendering-backend-list") > 0)
+    if (result.count("list-rendering-backends") > 0)
     {
       ::PrintRenderingBackendList();
       throw F3DExNoProcess("rendering backend list requested");
@@ -509,9 +509,9 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
       ::PrintPluginsScan();
       throw F3DExNoProcess("scan plugins requested");
     }
-    if (result.count("readers-list") > 0)
+    if (result.count("list-readers") > 0)
     {
-      // `--readers-list` needs plugin to be loaded to be useful
+      // `--list-readers` needs plugin to be loaded to be useful
       // Load them manually
       std::vector<std::string> plugins;
       if (result.count("load-plugins") > 0)
