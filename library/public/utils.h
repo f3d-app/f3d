@@ -89,6 +89,7 @@ public:
      */
     string_template& substitute(const std::map<std::string, std::string>& lookup);
 
+    /** Return a string representation of the string template */
     [[nodiscard]] std::string str() const;
 
     /** List the remaining un-substituted variables. */

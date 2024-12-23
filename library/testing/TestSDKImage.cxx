@@ -222,8 +222,9 @@ int TestSDKImage(int argc, char* argv[])
   {
     test.expect<f3d::image::write_exception>("invalid toTerminalText with BYTE",
       [&]() { std::ignore = f3d::image(3, 3, 1, f3d::image::ChannelType::BYTE).toTerminalText(); });
-    test.expect<f3d::image::write_exception>("invalid toTerminalText with SHORT",
-      [&]() { std::ignore = f3d::image(3, 3, 4, f3d::image::ChannelType::SHORT).toTerminalText(); });
+    test.expect<f3d::image::write_exception>("invalid toTerminalText with SHORT", [&]() {
+      std::ignore = f3d::image(3, 3, 4, f3d::image::ChannelType::SHORT).toTerminalText();
+    });
 
     const auto fileToString = [](const std::string& path) {
       std::ifstream file(path);
@@ -256,8 +257,8 @@ int TestSDKImage(int argc, char* argv[])
       "invalid get metadata", [&]() { std::ignore = img.getMetadata("baz"); });
 
     test.expect<f3d::image::metadata_exception>("remove and get metadata", [&]() {
-      img.setMetadata("foo", ""); // empty value, should remove key
-      std::ignore = img.getMetadata("foo");     // expected to throw
+      img.setMetadata("foo", "");           // empty value, should remove key
+      std::ignore = img.getMetadata("foo"); // expected to throw
     });
 
     test(

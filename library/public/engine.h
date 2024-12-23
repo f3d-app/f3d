@@ -160,7 +160,7 @@ public:
    * - Linux: ~/.cache/f3d
    * - macOS: ~/Library/Caches/f3d
    */
-  void setCachePath(const std::string& cachePath);
+  engine& setCachePath(const std::string& cachePath);
 
   /**
    * Engine provide a default options that you can use using engine::getOptions().

@@ -179,7 +179,8 @@ public:
    *
    * Getting binds for a group that does not exists will throw a does_not_exists_exception.
    */
-  [[nodiscard]] virtual std::vector<interaction_bind_t> getBindsForGroup(std::string group) const = 0;
+  [[nodiscard]] virtual std::vector<interaction_bind_t> getBindsForGroup(
+    std::string group) const = 0;
 
   /**
    * Return a vector of all binds, in order of addition
@@ -206,18 +207,18 @@ public:
   /**
    * Control the animation.
    */
-  virtual void toggleAnimation() = 0;
-  virtual void startAnimation() = 0;
-  virtual void stopAnimation() = 0;
-  virtual bool isPlayingAnimation() = 0;
+  virtual interactor& toggleAnimation() = 0;
+  virtual interactor& startAnimation() = 0;
+  virtual interactor& stopAnimation() = 0;
+  [[nodiscard]] virtual bool isPlayingAnimation() = 0;
   ///@}
 
   ///@{ @name Movement
   /**
    * Control if camera movements are enabled, which they are by default.
    */
-  virtual void enableCameraMovement() = 0;
-  virtual void disableCameraMovement() = 0;
+  virtual interactor& enableCameraMovement() = 0;
+  virtual interactor& disableCameraMovement() = 0;
   ///@}
 
   /**
@@ -236,18 +237,18 @@ public:
    * The event loop will be triggered every deltaTime in seconds, and userCallBack will be called at
    * the start of the event loop
    */
-  virtual void start(double deltaTime = 1.0 / 30, std::function<void()> userCallBack = nullptr) = 0;
+  virtual interactor& start(double deltaTime = 1.0 / 30, std::function<void()> userCallBack = nullptr) = 0;
 
   /**
    * Stop the interactor.
    */
-  virtual void stop() = 0;
+  virtual interactor& stop() = 0;
 
   /**
    * Request a render to be done on the next event loop
    * Safe to call in a multithreaded environment
    */
-  virtual void requestRender() = 0;
+  virtual interactor& requestRender() = 0;
 
   /**
    * An exception that can be thrown by the interactor

@@ -163,7 +163,7 @@ public:
    * Throw an `image::write_exception` if the format is incompatible with with image channel type or
    * channel count
    */
-  void save(const std::string& path, SaveFormat format = SaveFormat::PNG) const;
+  const image& save(const std::string& path, SaveFormat format = SaveFormat::PNG) const;
 
   /**
    * Save an image to a memory buffer in the specified format and returns it.
@@ -188,7 +188,7 @@ public:
    * - 24-bit escape codes (`ESC[38;2;{r};{g};{b}m`, `ESC[48;2;{r};{g};{b}m`)
    * Throw a `image::write_exception` if the type is not byte RGB or RGBA.
    */
-  const f3d::image& toTerminalText(std::ostream& stream) const;
+  const image& toTerminalText(std::ostream& stream) const;
 
   /**
    * Convert to colored text using ANSI escape sequences for printing in a terminal.

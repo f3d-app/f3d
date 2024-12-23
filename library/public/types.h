@@ -80,7 +80,7 @@ struct mesh_t
    * Returns a pair with the first element to true if the mesh is valid.
    * If invalid, an error message is returned in the second element.
    */
-  F3D_EXPORT [[nodiscard]] std::pair<bool, std::string> isValid() const;
+  F3D_EXPORT std::pair<bool, std::string> isValid() const;
 };
 }
 

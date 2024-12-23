@@ -56,21 +56,21 @@ public:
   std::pair<std::string, std::string> getBindingDocumentation(
     const interaction_bind_t& bind) const override;
 
-  void toggleAnimation() override;
-  void startAnimation() override;
-  void stopAnimation() override;
+  interactor& toggleAnimation() override;
+  interactor& startAnimation() override;
+  interactor& stopAnimation() override;
   bool isPlayingAnimation() override;
 
-  void enableCameraMovement() override;
-  void disableCameraMovement() override;
+  interactor& enableCameraMovement() override;
+  interactor& disableCameraMovement() override;
 
   bool playInteraction(
     const std::string& file, double deltaTime, std::function<void()> userCallBack) override;
   bool recordInteraction(const std::string& file) override;
 
-  void start(double deltaTime, std::function<void()> userCallBack) override;
-  void stop() override;
-  void requestRender() override;
+  interactor& start(double deltaTime, std::function<void()> userCallBack) override;
+  interactor& stop() override;
+  interactor& requestRender() override;
   ///@}
 
   /**
