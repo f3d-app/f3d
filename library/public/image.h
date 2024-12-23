@@ -4,6 +4,7 @@
 #include "exception.h"
 #include "export.h"
 
+#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -51,7 +52,7 @@ public:
    * The complete list can be retrieve at runtime by calling `getSupportedFormats()`.
    * Throw an `image::read_exception` in case of failure.
    */
-  explicit image(const std::string& path);
+  explicit image(const std::filesystem::path& filePath);
 
   /**
    * Create an image from a given width, height, and channel count.
@@ -163,7 +164,7 @@ public:
    * Throw an `image::write_exception` if the format is incompatible with with image channel type or
    * channel count
    */
-  const image& save(const std::string& path, SaveFormat format = SaveFormat::PNG) const;
+  const image& save(const std::filesystem::path& filePath, SaveFormat format = SaveFormat::PNG) const;
 
   /**
    * Save an image to a memory buffer in the specified format and returns it.
@@ -200,7 +201,7 @@ public:
   /**
    * Set the value for a metadata key. Setting an empty value (`""`) removes the key.
    */
-  f3d::image& setMetadata(const std::string& key, const std::string& value);
+  f3d::image& setMetadata(std::string key, std::string value);
 
   /**
    * Get the value for a metadata key.
