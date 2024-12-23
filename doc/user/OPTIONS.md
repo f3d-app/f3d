@@ -14,6 +14,8 @@ Options|Type<br>Default|Description
 -h, \-\-help||Print *help* and exit. Ignore `--verbose`.
 \-\-version||Show *version* information and exit. Ignore `--verbose`.
 \-\-list-readers||List available *readers* and exit. Ignore `--verbose`.
+\-\-list-bindings||List available *bindings* and exit. Ignore `--verbose`.
+\-\-list-rendering-backends||List available *rendering backends* and exit. Ignore `--verbose`.
 \-\-config=\<config file path/name/stem\>|string<br>config|Specify the [configuration file](CONFIGURATION_FILE.md) to use. Supports absolute/relative path but also filename/filestem to search for in standard configuration file locations.
 \-\-no-config|bool<br>false|Do not read any configuration file and consider only the command line options.
 \-\-no-render|bool<br>false|Do not render anything and quit just after loading the first file, use with \-\-verbose to recover information about a file.
