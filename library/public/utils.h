@@ -26,7 +26,7 @@ public:
    * Compute the Levenshtein distance between two strings.
    * Can be useful for spell checking and typo detection.
    */
-  static unsigned int textDistance(const std::string& strA, const std::string& strB);
+  [[nodiscard]] static unsigned int textDistance(const std::string& strA, const std::string& strB);
 
   // clang-format off
   /**
@@ -52,7 +52,7 @@ public:
    * `set scene.up.direction "+Z` -> tokenize_exception
    * `set scene.up.direction +Z\` -> tokenize_exception
    */
-  static std::vector<std::string> tokenize(std::string_view str);
+  [[nodiscard]] static std::vector<std::string> tokenize(std::string_view str);
   // clang-format on
 
   /**
@@ -89,10 +89,10 @@ public:
      */
     string_template& substitute(const std::map<std::string, std::string>& lookup);
 
-    std::string str() const;
+    [[nodiscard]] std::string str() const;
 
     /** List the remaining un-substituted variables. */
-    std::vector<std::string> variables() const;
+    [[nodiscard]] std::vector<std::string> variables() const;
 
     /**
      * Exception to be thrown by substitution functions to let untouched variables through.

@@ -35,24 +35,24 @@ struct interaction_bind_t
    * Operator to be able to store binds in maps and other structs
    * Compare modifier and interaction
    */
-  bool operator<(const interaction_bind_t& bind) const;
+  [[nodiscard]] bool operator<(const interaction_bind_t& bind) const;
 
   /**
    * Operator to be able to store binds in maps and other structs
    * Compare modifier and interaction
    */
-  bool operator==(const interaction_bind_t& bind) const;
+  [[nodiscard]] bool operator==(const interaction_bind_t& bind) const;
 
   /**
    * Format this binding into a string
    * eg: "A", "Any+Question", "Shift+L".
    */
-  std::string format() const;
+  [[nodiscard]] std::string format() const;
 
   /**
    * Create and return an interaction bind from provided string
    */
-  static interaction_bind_t parse(const std::string& str);
+  [[nodiscard]] static interaction_bind_t parse(const std::string& str);
 };
 
 /**
@@ -90,7 +90,7 @@ public:
   /**
    * Return a string vector containing all currently defined actions of commands
    */
-  virtual std::vector<std::string> getCommandActions() const = 0;
+  [[nodiscard]] virtual std::vector<std::string> getCommandActions() const = 0;
 
   /**
    * Trigger provided command, see COMMANDS.md for details about supported
@@ -172,19 +172,19 @@ public:
   /**
    * Return a vector of available bind groups, in order of addition
    */
-  virtual std::vector<std::string> getBindGroups() const = 0;
+  [[nodiscard]] virtual std::vector<std::string> getBindGroups() const = 0;
 
   /**
    * Return a vector of bind for the specified group, in order of addition
    *
    * Getting binds for a group that does not exists will throw a does_not_exists_exception.
    */
-  virtual std::vector<interaction_bind_t> getBindsForGroup(std::string group) const = 0;
+  [[nodiscard]] virtual std::vector<interaction_bind_t> getBindsForGroup(std::string group) const = 0;
 
   /**
    * Return a vector of all binds, in order of addition
    */
-  virtual std::vector<interaction_bind_t> getBinds() const = 0;
+  [[nodiscard]] virtual std::vector<interaction_bind_t> getBinds() const = 0;
 
   /**
    * Get a pair of string documenting a binding.
@@ -198,7 +198,7 @@ public:
    *
    * Getting documentation for a bind that does not exists will throw a does_not_exists_exception.
    */
-  virtual std::pair<std::string, std::string> getBindingDocumentation(
+  [[nodiscard]] virtual std::pair<std::string, std::string> getBindingDocumentation(
     const interaction_bind_t& bind) const = 0;
   ///@}
 

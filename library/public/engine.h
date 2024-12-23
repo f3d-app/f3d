@@ -45,12 +45,12 @@ public:
    * Windows: Try Win32, then EGL, then OSMesa
    * macOS: Always use Cocoa
    */
-  static engine create(bool offscreen = false);
+  [[nodiscard]] static engine create(bool offscreen = false);
 
   /**
    * Create an engine with no window.
    */
-  static engine createNone();
+  [[nodiscard]] static engine createNone();
 
   /**
    * Create an engine with a GLX window.
@@ -59,7 +59,7 @@ public:
    * Optionally, the window can be hidden by setting offscreen to true.
    * Throws engine::loading_exception in case of window creation failure.
    */
-  static engine createGLX(bool offscreen = false);
+  [[nodiscard]] static engine createGLX(bool offscreen = false);
 
   /**
    * Create an engine with a WGL window.
@@ -68,7 +68,7 @@ public:
    * Optionally, the window can be hidden by setting offscreen to true.
    * Throws engine::loading_exception in case of window creation failure.
    */
-  static engine createWGL(bool offscreen = false);
+  [[nodiscard]] static engine createWGL(bool offscreen = false);
 
   /**
    * Create an engine with an offscreen EGL window.
@@ -77,14 +77,14 @@ public:
    * `VTK_DEFAULT_EGL_DEVICE_INDEX` allows its selection.
    * Throws engine::loading_exception in case of failure.
    */
-  static engine createEGL();
+  [[nodiscard]] static engine createEGL();
 
   /**
    * Create an engine with an offscreen OSMesa window.
    * VTK >= 9.4 required.
    * Throws engine::loading_exception in case of window creation failure.
    */
-  static engine createOSMesa();
+  [[nodiscard]] static engine createOSMesa();
 
   /**
    * Create an engine with an external window.
@@ -95,7 +95,7 @@ public:
    *  f3d::engine eng = f3d::engine::createExternal(glfwGetProcAddress);
    * \endcode
    */
-  static engine createExternal(const context::function& getProcAddress);
+  [[nodiscard]] static engine createExternal(const context::function& getProcAddress);
 
   /**
    * Create an engine with an external GLX context.
@@ -103,7 +103,7 @@ public:
    * VTK >= 9.4 required.
    * Throws context::loading_exception if GLX library is not found or if not running on Linux.
    */
-  static engine createExternalGLX();
+  [[nodiscard]] static engine createExternalGLX();
 
   /**
    * Create an engine with an external WGL context.
@@ -111,7 +111,7 @@ public:
    * VTK >= 9.4 required.
    * Throws context::loading_exception if WGL library is not found or if not running on Windows.
    */
-  static engine createExternalWGL();
+  [[nodiscard]] static engine createExternalWGL();
 
   /**
    * Create an engine with an external COCOA context.
@@ -119,7 +119,7 @@ public:
    * VTK >= 9.4 required.
    * Throws context::loading_exception if WGL library is not found or if not running on Windows.
    */
-  static engine createExternalCOCOA();
+  [[nodiscard]] static engine createExternalCOCOA();
 
   /**
    * Create an engine with an external EGL context.
@@ -127,7 +127,7 @@ public:
    * VTK >= 9.4 required.
    * Throws context::loading_exception if EGL library is not found.
    */
-  static engine createExternalEGL();
+  [[nodiscard]] static engine createExternalEGL();
 
   /**
    * Create an engine with an external OSMesa context.
@@ -135,7 +135,7 @@ public:
    * VTK >= 9.4 required.
    * Throws context::loading_exception if OSMesa library is not found.
    */
-  static engine createExternalOSMesa();
+  [[nodiscard]] static engine createExternalOSMesa();
 
   /**
    * Engine destructor, delete all object instances as well.
@@ -179,24 +179,24 @@ public:
   /**
    * Get the default options provided by the engine.
    */
-  options& getOptions();
+  [[nodiscard]] options& getOptions();
 
   /**
    * Get the window provided by the engine, if any.
    * If not, will throw a engine::no_window_exception.
    */
-  window& getWindow();
+  [[nodiscard]] window& getWindow();
 
   /**
    * Get the loaded provided by the engine.
    */
-  scene& getScene();
+  [[nodiscard]] scene& getScene();
 
   /**
    * Get the interactor provided by the engine, if any.
    * If not, will throw a engine::no_interactor_exception.
    */
-  interactor& getInteractor();
+  [[nodiscard]] interactor& getInteractor();
 
   /**
    * Load a plugin.
@@ -225,7 +225,7 @@ public:
    * Listed plugins can be loaded using engine::loadPlugin function.
    * Note that the listed plugins may fail to load if the library is not found or incompatible.
    */
-  static std::vector<std::string> getPluginsList(const std::string& pluginPath);
+  [[nodiscard]] static std::vector<std::string> getPluginsList(const std::string& pluginPath);
 
   /**
    * A structure providing information about the libf3d.
@@ -247,7 +247,7 @@ public:
   /**
    * Get a struct containing info about the libf3d.
    */
-  static libInformation getLibInfo();
+  [[nodiscard]] static libInformation getLibInfo();
 
   /**
    * A structure providing information about a reader.
@@ -267,7 +267,7 @@ public:
   /**
    * Get a vector of struct containing info about the supported readers.
    */
-  static std::vector<readerInformation> getReadersInfo();
+  [[nodiscard]] static std::vector<readerInformation> getReadersInfo();
 
   /**
    * An exception that can be thrown by the engine

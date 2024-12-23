@@ -35,19 +35,19 @@ public:
    * Angles are in degrees.
    */
   virtual camera& setPosition(const point3_t& pos) = 0;
-  virtual point3_t getPosition() = 0;
+  [[nodiscard]] virtual point3_t getPosition() = 0;
   virtual void getPosition(point3_t& pos) = 0;
   virtual camera& setFocalPoint(const point3_t& foc) = 0;
-  virtual point3_t getFocalPoint() = 0;
+  [[nodiscard]] virtual point3_t getFocalPoint() = 0;
   virtual void getFocalPoint(point3_t& foc) = 0;
   virtual camera& setViewUp(const vector3_t& up) = 0;
-  virtual vector3_t getViewUp() = 0;
+  [[nodiscard]] virtual vector3_t getViewUp() = 0;
   virtual void getViewUp(vector3_t& up) = 0;
   virtual camera& setViewAngle(const angle_deg_t& angle) = 0;
-  virtual angle_deg_t getViewAngle() = 0;
+  [[nodiscard]] virtual angle_deg_t getViewAngle() = 0;
   virtual void getViewAngle(angle_deg_t& angle) = 0;
   virtual camera& setState(const camera_state_t& state) = 0;
-  virtual camera_state_t getState() = 0;
+  [[nodiscard]] virtual camera_state_t getState() = 0;
   virtual void getState(camera_state_t& state) = 0;
   ///@}
 

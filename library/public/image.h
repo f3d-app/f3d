@@ -76,8 +76,8 @@ public:
   /**
    * Comparison operators, uses image::compare with a threshold of 1e-14.
    */
-  bool operator==(const image& reference) const;
-  bool operator!=(const image& reference) const;
+  [[nodiscard]] bool operator==(const image& reference) const;
+  [[nodiscard]] bool operator!=(const image& reference) const;
   ///@}
 
   /**
@@ -86,12 +86,12 @@ public:
    * \warning Because of the normalization, this function can be slow, prefer getContent when
    * reading several pixels and normalization is not needed.
    */
-  std::vector<double> getNormalizedPixel(const std::pair<int, int>& xy) const;
+  [[nodiscard]] std::vector<double> getNormalizedPixel(const std::pair<int, int>& xy) const;
 
   /**
    * Get the list of supported image format extensions when opening a file.
    */
-  static std::vector<std::string> getSupportedFormats();
+  [[nodiscard]] static std::vector<std::string> getSupportedFormats();
 
   ///@{ @name Resolution
   /**
@@ -99,8 +99,8 @@ public:
    *
    * \deprecated { setResolution is deprecated, use the appropriate constructor }
    */
-  unsigned int getWidth() const;
-  unsigned int getHeight() const;
+  [[nodiscard]] unsigned int getWidth() const;
+  [[nodiscard]] unsigned int getHeight() const;
   ///@}
 
   ///@{ @name Channel Count
@@ -109,19 +109,19 @@ public:
    *
    * \deprecated { setChannelCount is deprecated, use the appropriate constructor }
    */
-  unsigned int getChannelCount() const;
+  [[nodiscard]] unsigned int getChannelCount() const;
   ///@}
 
   /**
    * Get image channel type.
    * throw an `image::read_exception` if the type is unknown.
    */
-  ChannelType getChannelType() const;
+  [[nodiscard]] ChannelType getChannelType() const;
 
   /**
    * Get image channel type size in bytes.
    */
-  unsigned int getChannelTypeSize() const;
+  [[nodiscard]] unsigned int getChannelTypeSize() const;
 
   ///@{ @name Buffer Data
   /**
@@ -131,7 +131,7 @@ public:
    * \deprecated { setData and getData are deprecated, use setContent and getContent instead }
    */
   image& setContent(void* buffer);
-  void* getContent() const;
+  [[nodiscard]] void* getContent() const;
   ///@}
 
   /**
@@ -166,7 +166,7 @@ public:
   void save(const std::string& path, SaveFormat format = SaveFormat::PNG) const;
 
   /**
-   * Save an image to a memory buffer in the specified format.
+   * Save an image to a memory buffer in the specified format and returns it.
    * Default format is PNG if not specified.
    * PNG: Supports channel type BYTE and SHORT with channel count of 1 to 4
    * JPG: Supports channel type BYTE with channel count of 1 or 3
@@ -175,7 +175,7 @@ public:
    * Throw an `image::write_exception` if the type is TIF or
    * if the format is incompatible with with image channel type or channel count.
    */
-  std::vector<unsigned char> saveBuffer(SaveFormat format = SaveFormat::PNG) const;
+  [[nodiscard]] std::vector<unsigned char> saveBuffer(SaveFormat format = SaveFormat::PNG) const;
 
   /**
    * Convert to colored text using ANSI escape sequences for printing in a terminal.
@@ -195,7 +195,7 @@ public:
    * See `toTerminalText(std::ostream& stream)`.
    * Throw a `image::write_exception` if the type is not byte RGB or RGBA.
    */
-  std::string toTerminalText() const;
+  [[nodiscard]] std::string toTerminalText() const;
 
   /**
    * Set the value for a metadata key. Setting an empty value (`""`) removes the key.
@@ -206,12 +206,12 @@ public:
    * Get the value for a metadata key.
    * Throw a `image::read_exception` if key does not exist.
    */
-  std::string getMetadata(const std::string& key) const;
+  [[nodiscard]] std::string getMetadata(const std::string& key) const;
 
   /**
    * List all the metadata keys which have a value set.
    */
-  std::vector<std::string> allMetadata() const;
+  [[nodiscard]] std::vector<std::string> allMetadata() const;
 
   /**
    * An exception that can be thrown by the image when there.

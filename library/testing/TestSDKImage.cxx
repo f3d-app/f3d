@@ -69,7 +69,7 @@ int TestSDKImage(int argc, char* argv[])
   test("generated JPG buffer not empty", bufferJPG.size() != 0);
 
   test.expect<f3d::image::write_exception>("save incompatible buffer to TIF format",
-    [&]() { generated.saveBuffer(f3d::image::SaveFormat::TIF); });
+    [&]() { std::ignore = generated.saveBuffer(f3d::image::SaveFormat::TIF); });
 
   std::vector<unsigned char> bufferBMP = generated.saveBuffer(f3d::image::SaveFormat::BMP);
   test("generated BMP buffer not empty", bufferBMP.size() != 0);
@@ -82,16 +82,16 @@ int TestSDKImage(int argc, char* argv[])
   test.expect<f3d::image::write_exception>(
     "save buffer to incorrect path", [&]() { generated.save("/dummy/folder/img.png"); });
   test.expect<f3d::image::write_exception>("save incompatible buffer to BMP format",
-    [&]() { img16.saveBuffer(f3d::image::SaveFormat::BMP); });
+    [&]() { std::ignore = img16.saveBuffer(f3d::image::SaveFormat::BMP); });
   test.expect<f3d::image::write_exception>("save incompatible buffer to PNG format",
-    [&]() { img32.saveBuffer(f3d::image::SaveFormat::PNG); });
+    [&]() { std::ignore = img32.saveBuffer(f3d::image::SaveFormat::PNG); });
 
   f3d::image img2Ch(4, 4, 2);
   f3d::image img5Ch(4, 4, 5);
   test.expect<f3d::image::write_exception>("save incompatible channel count to BMP format",
-    [&]() { img5Ch.saveBuffer(f3d::image::SaveFormat::BMP); });
+    [&]() { std::ignore = img5Ch.saveBuffer(f3d::image::SaveFormat::BMP); });
   test.expect<f3d::image::write_exception>("save incompatible channel count to JPG format",
-    [&]() { img2Ch.saveBuffer(f3d::image::SaveFormat::JPG); });
+    [&]() { std::ignore = img2Ch.saveBuffer(f3d::image::SaveFormat::JPG); });
 
   test.expect<f3d::image::read_exception>(
     "read image from incorrect path", [&]() { f3d::image img("/dummy/folder/img.png"); });
@@ -221,9 +221,9 @@ int TestSDKImage(int argc, char* argv[])
   // test toTerminalText
   {
     test.expect<f3d::image::write_exception>("invalid toTerminalText with BYTE",
-      [&]() { f3d::image(3, 3, 1, f3d::image::ChannelType::BYTE).toTerminalText(); });
+      [&]() { std::ignore = f3d::image(3, 3, 1, f3d::image::ChannelType::BYTE).toTerminalText(); });
     test.expect<f3d::image::write_exception>("invalid toTerminalText with SHORT",
-      [&]() { f3d::image(3, 3, 4, f3d::image::ChannelType::SHORT).toTerminalText(); });
+      [&]() { std::ignore = f3d::image(3, 3, 4, f3d::image::ChannelType::SHORT).toTerminalText(); });
 
     const auto fileToString = [](const std::string& path) {
       std::ifstream file(path);
@@ -253,11 +253,11 @@ int TestSDKImage(int argc, char* argv[])
       std::set<std::string>(keys.begin(), keys.end()) == std::set<std::string>({ "foo", "hello" }));
 
     test.expect<f3d::image::metadata_exception>(
-      "invalid get metadata", [&]() { img.getMetadata("baz"); });
+      "invalid get metadata", [&]() { std::ignore = img.getMetadata("baz"); });
 
     test.expect<f3d::image::metadata_exception>("remove and get metadata", [&]() {
       img.setMetadata("foo", ""); // empty value, should remove key
-      img.getMetadata("foo");     // expected to throw
+      std::ignore = img.getMetadata("foo");     // expected to throw
     });
 
     test(
