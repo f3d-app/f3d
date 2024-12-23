@@ -64,7 +64,7 @@ public:
    * For example, `getSymbol("EGL", "eglGetProcAddress")` looks for the symbol
    * `eglGetProcAddress` in the library `libEGL.so` on Linux.
    */
-  [[nodiscard]] static function getSymbol(const std::string& lib, const std::string& func);
+  [[nodiscard]] static function getSymbol(std::string_view lib, std::string_view func);
 
   /**
    * An exception that can be thrown when the requested library cannot be loaded.
