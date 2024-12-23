@@ -1156,6 +1156,15 @@ f3d_test(NAME TestHelpPrecedenceWithUnknownOption ARGS --help --unknown REGEXP "
 # Test that --version is displayed even when there is an unknown option
 f3d_test(NAME TestVersionPrecedenceWithUnknownOption ARGS --version --unknown REGEXP "Version:" NO_BASELINE)
 
+# Test rendering backend list
+if(WIN32)
+  f3d_test(NAME TestRenderingBackenListWGL ARGS --rendering-backend-list NO_RENDER NO_BASELINE REGEXP "wgl: available")
+elseif(APPLE)
+  f3d_test(NAME TestRenderingBackenListCOCOA ARGS --rendering-backend-list NO_RENDER NO_BASELINE REGEXP "cocoa: available")
+elseif(F3D_TESTING_ENABLE_GLX_TESTS)
+  f3d_test(NAME TestRenderingBackenListGLX ARGS --rendering-backend-list NO_RENDER NO_BASELINE REGEXP "glx: available")
+endif()
+
 # Test scan plugins
 if(NOT F3D_MACOS_BUNDLE)
   f3d_test(NAME TestScanPluginsCheckNative ARGS --scan-plugins NO_RENDER NO_BASELINE REGEXP " - native")

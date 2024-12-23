@@ -70,6 +70,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "no-config", "", "Do not read the configuration file", "<bool>", "1" },
       { "no-render", "", "Do not render anything and quit right after loading the first file, use with --verbose to recover information about a file.", "<bool>", "1" },
       { "rendering-backend", "", "Backend to use when rendering (auto|glx|wgl|egl|osmesa)", "<string>", "" },
+      { "rendering-backend-list", "", "List of rendering backends available on this system", "", "" },
       { "max-size", "", "Maximum size in Mib of a file to load, leave empty for unlimited", "<size in Mib>", "" },
 #if F3D_MODULE_DMON
       { "watch", "", "Watch current file and automatically reload it whenever it is modified on disk", "<bool>", "1" },
@@ -268,6 +269,19 @@ void PrintVersion()
   }
   f3d::log::info("License " + libInfo.License + ".");
   f3d::log::setUseColoring(true);
+}
+
+//----------------------------------------------------------------------------
+void PrintRenderingBackendList()
+{
+  auto backends = f3d::engine::getRenderingBackendList();
+
+  f3d::log::setUseColoring(false);
+  f3d::log::info("Rendering backends:");
+  for (const auto& [name, available] : backends)
+  {
+    f3d::log::info(name + ": " + (available ? "available" : "unavailable"));
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -484,6 +498,11 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
     {
       ::PrintVersion();
       throw F3DExNoProcess("version requested");
+    }
+    if (result.count("rendering-backend-list") > 0)
+    {
+      ::PrintRenderingBackendList();
+      throw F3DExNoProcess("rendering backend list requested");
     }
     if (result.count("scan-plugins") > 0)
     {
