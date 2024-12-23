@@ -73,6 +73,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "grid-subdivisions", "render.grid.subdivisions" },
   { "grid-color", "render.grid.color" },
   { "edges", "render.show_edges" },
+  { "armature", "render.armature.enable" },
   { "camera-index", "scene.camera.index" },
   { "interaction-trackball", "interactor.trackball" },
   { "invert-zoom", "interactor.invert_zoom" },
