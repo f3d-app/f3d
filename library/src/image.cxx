@@ -34,6 +34,8 @@
 #include <string>
 #include <unordered_map>
 
+namespace fs = std::filesystem;
+
 namespace f3d
 {
 class image::internals
@@ -175,23 +177,22 @@ image::image(unsigned int width, unsigned int height, unsigned int channelCount,
 }
 
 //----------------------------------------------------------------------------
-image::image(const std::string& path)
+image::image(const fs::path& filePath)
   : Internals(new image::internals())
 {
   detail::init::initialize();
 
-  std::string fullPath = vtksys::SystemTools::CollapseFullPath(path);
-  if (!vtksys::SystemTools::FileExists(fullPath))
+  if (!fs::exists(filePath))
   {
-    throw read_exception("Cannot open file " + path);
+    throw read_exception("Cannot open file " + filePath.string());
   }
 
   auto reader = vtkSmartPointer<vtkImageReader2>::Take(
-    vtkImageReader2Factory::CreateImageReader2(fullPath.c_str()));
+    vtkImageReader2Factory::CreateImageReader2(filePath.string().c_str()));
 
   if (reader)
   {
-    reader->SetFileName(fullPath.c_str());
+    reader->SetFileName(filePath.string().c_str());
     reader->Update();
     this->Internals->Image = reader->GetOutput();
 
@@ -204,7 +205,7 @@ image::image(const std::string& path)
 
   if (!this->Internals->Image)
   {
-    throw read_exception("Cannot read image " + path);
+    throw read_exception("Cannot read image " + filePath.string());
   }
 }
 
@@ -467,7 +468,7 @@ std::vector<double> image::getNormalizedPixel(const std::pair<int, int>& xy) con
 }
 
 //----------------------------------------------------------------------------
-void image::save(const std::string& path, SaveFormat format) const
+const image& image::save(const fs::path& filePath, SaveFormat format) const
 {
   internals::checkSaveFormatCompatibility(*this, format);
 
@@ -492,14 +493,15 @@ void image::save(const std::string& path, SaveFormat format) const
       break;
   }
 
-  writer->SetFileName(path.c_str());
+  writer->SetFileName(filePath.string().c_str());
   writer->SetInputData(this->Internals->Image);
   writer->Write();
 
   if (writer->GetErrorCode() != 0)
   {
-    throw write_exception("Cannot write " + path);
+    throw write_exception("Cannot write " + filePath.string());
   }
+  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -526,7 +528,7 @@ std::vector<unsigned char> image::saveBuffer(SaveFormat format) const
 }
 
 //----------------------------------------------------------------------------
-const f3d::image& image::toTerminalText(std::ostream& stream) const
+const image& image::toTerminalText(std::ostream& stream) const
 {
   const int depth = this->getChannelCount();
   if (this->getChannelType() != ChannelType::BYTE || depth < 3 || depth > 4)
@@ -667,15 +669,15 @@ std::string image::toTerminalText() const
 }
 
 //----------------------------------------------------------------------------
-f3d::image& image::setMetadata(const std::string& key, const std::string& value)
+image& image::setMetadata(std::string key, std::string value)
 {
   if (value.empty())
   {
-    this->Internals->Metadata.erase(key);
+    this->Internals->Metadata.erase(std::move(key));
   }
   else
   {
-    this->Internals->Metadata[key] = value;
+    this->Internals->Metadata[std::move(key)] = std::move(value);
   }
   return *this;
 }

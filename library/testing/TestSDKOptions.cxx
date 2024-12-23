@@ -175,7 +175,7 @@ int TestSDKOptions(int argc, char* argv[])
 
   // Test isSame/copy error path
   test.expect<f3d::options::inexistent_exception>(
-    "inexistent_exception exception on isSame", [&]() { opt.isSame(opt2, "dummy"); });
+    "inexistent_exception exception on isSame", [&]() { std::ignore = opt.isSame(opt2, "dummy"); });
 
   test.expect<f3d::options::inexistent_exception>(
     "inexistent_exception exception on copy", [&]() { opt.copy(opt2, "dummy"); });
@@ -188,20 +188,20 @@ int TestSDKOptions(int argc, char* argv[])
     "inexistent_exception exception on set", [&]() { opt.set("dummy", 2.13); });
 
   test.expect<f3d::options::inexistent_exception>(
-    "inexistent_exception exception on get", [&]() { opt.get("dummy"); });
+    "inexistent_exception exception on get", [&]() { std::ignore = opt.get("dummy"); });
 
   test.expect<f3d::options::no_value_exception>(
-    "no_value_exception exception on get", [&]() { opt.get("render.point_size"); });
+    "no_value_exception exception on get", [&]() { std::ignore = opt.get("render.point_size"); });
 
   // Test setAsString/getAsString error paths
   test.expect<f3d::options::inexistent_exception>(
     "inexistent_exception exception on setAsString", [&]() { opt.setAsString("dummy", "2.13"); });
 
-  test.expect<f3d::options::inexistent_exception>(
-    "inexistent_exception exception on getAsString", [&]() { opt.getAsString("dummy"); });
+  test.expect<f3d::options::inexistent_exception>("inexistent_exception exception on getAsString",
+    [&]() { std::ignore = opt.getAsString("dummy"); });
 
-  test.expect<f3d::options::no_value_exception>(
-    "no_value_exception exception on getAsString", [&]() { opt.getAsString("render.point_size"); });
+  test.expect<f3d::options::no_value_exception>("no_value_exception exception on getAsString",
+    [&]() { std::ignore = opt.getAsString("render.point_size"); });
 
   f3d::options opt6{};
 
@@ -215,7 +215,7 @@ int TestSDKOptions(int argc, char* argv[])
 
   // Test isOptional non-existent options
   test.expect<f3d::options::inexistent_exception>(
-    "isOptional with non-existent option", [&]() { opt6.isOptional("dummy"); });
+    "isOptional with non-existent option", [&]() { std::ignore = opt6.isOptional("dummy"); });
 
   f3d::options opt7{};
 
@@ -228,7 +228,7 @@ int TestSDKOptions(int argc, char* argv[])
   opt7.model.scivis.array_name = "dummy";
   opt7.reset("model.scivis.array_name");
   test.expect<f3d::options::no_value_exception>(
-    "reset non-optional values", [&]() { opt7.get("model.scivis.array_name"); });
+    "reset non-optional values", [&]() { std::ignore = opt7.get("model.scivis.array_name"); });
 
   // Test reset non-existent option
   test.expect<f3d::options::inexistent_exception>(
@@ -240,7 +240,7 @@ int TestSDKOptions(int argc, char* argv[])
   opt8.model.scivis.array_name = "dummy";
   opt8.removeValue("model.scivis.array_name");
   test.expect<f3d::options::no_value_exception>(
-    "removeValue optional values", [&]() { opt8.get("model.scivis.array_name"); });
+    "removeValue optional values", [&]() { std::ignore = opt8.get("model.scivis.array_name"); });
 
   // Test removeValue non-optional values
   test.expect<f3d::options::incompatible_exception>(

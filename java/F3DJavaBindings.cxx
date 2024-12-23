@@ -39,7 +39,7 @@ extern "C"
   JNIEXPORT void JAVA_BIND(Engine, setCachePath)(JNIEnv* env, jobject self, jstring path)
   {
     const char* str = env->GetStringUTFChars(path, nullptr);
-    GetEngine(env, self)->setCachePath(str);
+    GetEngine(env, self)->setCachePath(fs::path(str));
     env->ReleaseStringUTFChars(path, str);
   }
 

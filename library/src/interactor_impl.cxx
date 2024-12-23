@@ -37,6 +37,8 @@
 
 #include "camera.h"
 
+namespace fs = std::filesystem;
+
 namespace f3d::detail
 {
 using mod_t = interaction_bind_t::ModifierKeys;
@@ -723,13 +725,13 @@ interactor& interactor_impl::initCommands()
 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::addCommand(
-  const std::string& action, std::function<void(const std::vector<std::string>&)> callback)
+  std::string action, std::function<void(const std::vector<std::string>&)> callback)
 {
-  const auto [it, success] = this->Internals->Commands.insert({ action, callback });
+  const auto [it, success] = this->Internals->Commands.insert({ std::move(action), std::move(callback) });
   if (!success)
   {
     throw interactor::already_exists_exception(
-      "Could not add a command callback for action: " + action + " as it already exists.");
+      "Could not add a command callback for action: " + it->first + " as it already exists.");
   }
   return *this;
 }
@@ -1053,24 +1055,27 @@ std::pair<std::string, std::string> interactor_impl::getBindingDocumentation(
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::toggleAnimation()
+interactor& interactor_impl::toggleAnimation()
 {
   assert(this->Internals->AnimationManager);
   this->Internals->AnimationManager->ToggleAnimation();
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::startAnimation()
+interactor& interactor_impl::startAnimation()
 {
   assert(this->Internals->AnimationManager);
   this->Internals->AnimationManager->StartAnimation();
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::stopAnimation()
+interactor& interactor_impl::stopAnimation()
 {
   assert(this->Internals->AnimationManager);
   this->Internals->AnimationManager->StopAnimation();
+  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -1081,24 +1086,26 @@ bool interactor_impl::isPlayingAnimation()
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::enableCameraMovement()
+interactor& interactor_impl::enableCameraMovement()
 {
   this->Internals->Style->SetCameraMovementDisabled(false);
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::disableCameraMovement()
+interactor& interactor_impl::disableCameraMovement()
 {
   this->Internals->Style->SetCameraMovementDisabled(true);
+  return *this;
 }
 
 //----------------------------------------------------------------------------
 bool interactor_impl::playInteraction(
-  const std::string& file, double loopTime, std::function<void()> userCallBack)
+  const fs::path& file, double loopTime, std::function<void()> userCallBack)
 {
-  if (!vtksys::SystemTools::FileExists(file))
+  if (!fs::exists(file))
   {
-    log::error("Interaction record file to play does not exist ", file);
+    log::error("Interaction record file to play does not exist ", file.string());
     return false;
   }
   else
@@ -1108,9 +1115,7 @@ bool interactor_impl::playInteraction(
     this->Internals->Recorder->Clear();
 
     this->Internals->StartEventLoop(loopTime, std::move(userCallBack));
-
-    std::string cleanFile = vtksys::SystemTools::CollapseFullPath(file);
-    this->Internals->Recorder->SetFileName(cleanFile.c_str());
+    this->Internals->Recorder->SetFileName(fs::canonical(file).string().c_str());
     this->Internals->Recorder->Play();
 
     this->Internals->StopEventLoop();
@@ -1127,7 +1132,7 @@ bool interactor_impl::playInteraction(
 }
 
 //----------------------------------------------------------------------------
-bool interactor_impl::recordInteraction(const std::string& file)
+bool interactor_impl::recordInteraction(const fs::path& file)
 {
   if (file.empty())
   {
@@ -1135,19 +1140,17 @@ bool interactor_impl::recordInteraction(const std::string& file)
     return false;
   }
 
-  std::string cleanFile = vtksys::SystemTools::CollapseFullPath(file);
-
-  std::string parentDirectory = vtksys::SystemTools::GetParentDirectory(cleanFile);
-
   // Check if the parent directory exists
-  if (!vtksys::SystemTools::FileExists(parentDirectory))
+  fs::path parentDirectory = file.parent_path();
+  if (!fs::exists(parentDirectory))
   {
-    log::error("Interaction record directory does not exist ", parentDirectory);
+    log::error("Interaction record directory does not exist ", parentDirectory.string());
     return false;
   }
 
   // Check if we can write to the directory
-  if (!vtksys::SystemTools::TestFileAccess(parentDirectory, vtksys::TEST_FILE_WRITE))
+  // XXX: Implement using std::filesystem
+  if (!vtksys::SystemTools::TestFileAccess(parentDirectory.string(), vtksys::TEST_FILE_WRITE))
   {
     log::error("Don't have write permissions for ", parentDirectory);
     return false;
@@ -1157,7 +1160,7 @@ bool interactor_impl::recordInteraction(const std::string& file)
   this->Internals->Recorder->Off();
   this->Internals->Recorder->Clear();
 
-  this->Internals->Recorder->SetFileName(cleanFile.c_str());
+  this->Internals->Recorder->SetFileName(file.string().c_str());
   this->Internals->Recorder->On();
   this->Internals->Recorder->Record();
 
@@ -1165,23 +1168,26 @@ bool interactor_impl::recordInteraction(const std::string& file)
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::start(double loopTime, std::function<void()> userCallBack)
+interactor& interactor_impl::start(double loopTime, std::function<void()> userCallBack)
 {
   this->Internals->StartEventLoop(loopTime, std::move(userCallBack));
   this->Internals->VTKInteractor->Start();
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::stop()
+interactor& interactor_impl::stop()
 {
   this->Internals->StopEventLoop();
   this->Internals->VTKInteractor->ExitCallback();
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::requestRender()
+interactor& interactor_impl::requestRender()
 {
   this->Internals->RenderRequested = true;
+  return *this;
 }
 
 //----------------------------------------------------------------------------

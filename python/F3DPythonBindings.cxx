@@ -119,7 +119,7 @@ PYBIND11_MODULE(pyf3d, module)
 
   image //
     .def(py::init<>())
-    .def(py::init<const std::string&>())
+    .def(py::init<const std::filesystem::path&>())
     .def(py::init<unsigned int, unsigned int, unsigned int, f3d::image::ChannelType>())
     .def(py::self == py::self)
     .def(py::self != py::self)
@@ -139,11 +139,11 @@ PYBIND11_MODULE(pyf3d, module)
     .def("to_terminal_text", [](const f3d::image& img) { return img.toTerminalText(); })
     .def("set_metadata", &f3d::image::setMetadata)
     .def("get_metadata",
-      [](const f3d::image& img, const std::string& key)
+      [](const f3d::image& img, std::string key)
       {
         try
         {
-          return img.getMetadata(key);
+          return img.getMetadata(std::move(key));
         }
         catch (const f3d::image::metadata_exception&)
         {

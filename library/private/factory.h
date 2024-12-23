@@ -55,7 +55,7 @@ public:
    * Get static plugin initialization function
    * Return nullptr if it does not exists
    */
-  plugin_initializer_t getStaticInitializer(const std::string& pluginName);
+  plugin_initializer_t getStaticInitializer(std::string_view pluginName);
 
 protected:
   factory();

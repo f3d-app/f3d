@@ -29,9 +29,9 @@ const std::vector<plugin*>& factory::getPlugins()
 }
 
 //----------------------------------------------------------------------------
-factory::plugin_initializer_t factory::getStaticInitializer(const std::string& pluginName)
+factory::plugin_initializer_t factory::getStaticInitializer(std::string_view pluginName)
 {
-  auto it = this->StaticPluginInitializers.find(pluginName);
+  auto it = this->StaticPluginInitializers.find(std::string(pluginName));
   if (it != this->StaticPluginInitializers.end())
   {
     return it->second;
