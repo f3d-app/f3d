@@ -13,10 +13,7 @@
 
 #include <vtkVersion.h>
 
-#include <vtksys/Directory.hxx>
 #include <vtksys/DynamicLoader.hxx>
-#include <vtksys/Encoding.hxx>
-#include <vtksys/SystemTools.hxx>
 
 #include <nlohmann/json.hpp>
 
@@ -43,15 +40,15 @@ engine::engine(
 
   // build default cache path
 #if defined(_WIN32)
-  fs::path cachePath(vtksys::SystemTools::GetEnv("LOCALAPPDATA"));
+  fs::path cachePath(std::getenv("LOCALAPPDATA"));
   cachePath /= "f3d";
 #elif defined(__APPLE__)
-  fs::path cachePath(vtksys::SystemTools::GetEnv("HOME"));
+  fs::path cachePath(std::getenv("HOME"));
   cachePath = cachePath / "Library" / "Caches" / "f3d";
 #elif defined(__ANDROID__)
   fs::path cachePath;
 #elif defined(__unix__)
-  fs::path cachePath(vtksys::SystemTools::GetEnv("HOME"));
+  fs::path cachePath(std::getenv("HOME"));
   cachePath = cachePath / ".cache" / "f3d";
 #else
 #error "Unsupported platform"
@@ -332,36 +329,27 @@ void engine::autoloadPlugins()
 //----------------------------------------------------------------------------
 std::vector<std::string> engine::getPluginsList(const fs::path& pluginPath)
 {
-  vtksys::Directory dir;
   constexpr std::string_view ext = ".json";
   std::vector<std::string> pluginNames;
-
-  if (dir.Load(pluginPath.string()))
+  for (auto& entry : fs::directory_iterator(pluginPath))
   {
-    for (unsigned long i = 0; i < dir.GetNumberOfFiles(); i++)
+    fs::path fullPath = entry.path();
+    if (fullPath.extension() == ext)
     {
-      std::string currentFile = dir.GetFile(i);
-      if (std::equal(ext.rbegin(), ext.rend(), currentFile.rbegin()))
+      try
       {
-        std::string fullPath = dir.GetPath();
-        fullPath += "/";
-        fullPath += currentFile;
+        auto root = nlohmann::json::parse(std::ifstream(fullPath));
 
-        try
+        auto name = root.find("name");
+
+        if (name != root.end() && name.value().is_string())
         {
-          auto root = nlohmann::json::parse(std::ifstream(fullPath));
-
-          auto name = root.find("name");
-
-          if (name != root.end() && name.value().is_string())
-          {
-            pluginNames.push_back(name.value().get<std::string>());
-          }
+          pluginNames.push_back(name.value().get<std::string>());
         }
-        catch (const nlohmann::json::parse_error& ex)
-        {
-          log::warn(fullPath, " is not a valid JSON file: ", ex.what());
-        }
+      }
+      catch (const nlohmann::json::parse_error& ex)
+      {
+        log::warn(fullPath, " is not a valid JSON file: ", ex.what());
       }
     }
   }
