@@ -111,3 +111,4 @@ Command syntax is similar to bash, as in they will be split by "token" to be pro
  - Other escaped character will be processed as if the escape was not present, eg: `set scene.up.direction +\Z`
  - Unfinished quoted section is invalid, eg: `set scene.up.direction "+Z`
  - A escape at the end is also invalid, eg: `set scene.up.direction +Z\`
+ - Options values are [parsed](PARSING.md) according to their types.
