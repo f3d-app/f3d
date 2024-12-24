@@ -67,8 +67,8 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "readers-list", "", "Print the list of readers", "", "" },
       { "bindings-list", "", "Print the list of interaction bindings and exits, ignored with `--no-render`, only considers the first file group.", "", "" },
       { "config", "", "Specify the configuration file to use. absolute/relative path or filename/filestem to search in configuration file locations", "<filePath/filename/fileStem>", "" },
-      { "dry-run", "", "Do not read the configuration file", "<bool>", "1" },
-      { "no-render", "", "Do not read the configuration file", "<bool>", "1" },
+      { "no-config", "", "Do not read the configuration file", "<bool>", "1" },
+      { "no-render", "", "Do not render anything and quit right after loading the first file, use with --verbose to recover information about a file.", "<bool>", "1" },
       { "rendering-backend", "", "Backend to use when rendering (auto|glx|wgl|egl|osmesa)", "<string>", "" },
       { "max-size", "", "Maximum size in Mib of a file to load, leave empty for unlimited", "<size in Mib>", "" },
 #if F3D_MODULE_DMON
