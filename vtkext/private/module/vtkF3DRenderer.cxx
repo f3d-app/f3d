@@ -268,6 +268,9 @@ void vtkF3DRenderer::Initialize()
 
   this->GridInfo = "";
 
+  this->Discretization = 256;
+  this->DiscretizableColorTransferFunctionConfigured = false;
+
   this->AddActor2D(this->ScalarBarActor);
   this->ScalarBarActor->VisibilityOff();
 
@@ -2099,6 +2102,20 @@ void vtkF3DRenderer::SetColormap(const std::vector<double>& colormap)
   }
 }
 
+void vtkF3DRenderer::SetColorDiscretization(const int discretization) { 
+  if(discretization >= 0 and discretization <= std::numeric_limits<int>::max()) {
+    this->Discretization = discretization;
+
+    bool enableColoring = this->EnableColoring || (!this->UseRaytracing && this->UseVolume);
+    F3DColoringInfoHandler& coloringHandler = this->Importer->GetColoringInfoHandler();
+    auto info = coloringHandler.SetCurrentColoring(enableColoring, this->UseCellColoring, this->ArrayNameForColoring, false);
+    this->ConfigureRangeAndCTFForColoring(info.value());
+  } else {
+    F3DLog::Print(F3DLog::Severity::Error,
+      "The discretization value need to great than zero");
+  }
+}
+
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetEnableColoring(bool enable)
 {
@@ -2447,6 +2464,12 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
     F3DLog::Print(F3DLog::Severity::Warning,
       std::string("Invalid component index: ") + std::to_string(this->ComponentForColoring));
     return;
+  }
+
+  // Set Discretization
+  if(!this->DiscretizableColorTransferFunctionConfigured) {
+    this->DiscretizableColorTransferFunction->SetNumberOfValues(this->Discretization);
+    this->DiscretizableColorTransferFunctionConfigured = true;
   }
 
   // Set range
