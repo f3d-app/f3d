@@ -106,7 +106,7 @@ public:
   /**
    * Set the window name to be shown by a window manager.
    */
-  virtual window& setWindowName(const std::string& windowName) = 0;
+  virtual window& setWindowName(std::string_view windowName) = 0;
 
   /**
    * Convert a point in display coordinate to world coordinate.
