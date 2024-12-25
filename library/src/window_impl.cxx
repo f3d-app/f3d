@@ -315,9 +315,9 @@ window& window_impl::setIcon(const unsigned char* icon, size_t iconSize)
 }
 
 //----------------------------------------------------------------------------
-window& window_impl::setWindowName(const std::string& windowName)
+window& window_impl::setWindowName(std::string_view windowName)
 {
-  this->Internals->RenWin->SetWindowName(windowName.c_str());
+  this->Internals->RenWin->SetWindowName(windowName.data());
   return *this;
 }
 
