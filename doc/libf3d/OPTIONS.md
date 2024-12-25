@@ -92,6 +92,7 @@ render.background.skybox|bool<br>false<br>render|Show the *HDRI* image as a skyb
 render.background.blur.enable|bool<br>false<br>render|Blur background, useful with a skybox.|\-\-blur-background
 render.background.blur.coc|double<br>20.0<br>render|Blur background circle of confusion radius.|\-\-blur-coc
 render.light.intensity|double<br>1.0<br>render|Adjust the intensity of every light in the scene.|\-\-light-intensity
+render.armature.enable|bool<br>false<br>render|Display armatures if present in the scene (glTF only).|\-\-armature
 
 ## UI Options
 

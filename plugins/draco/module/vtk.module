@@ -7,6 +7,7 @@ DEPENDS
   VTK::CommonExecutionModel
   VTK::IOGeometry
   VTK::IOImport
+  f3d::vtkext
   draco::draco
 TEST_DEPENDS
   VTK::TestingCore

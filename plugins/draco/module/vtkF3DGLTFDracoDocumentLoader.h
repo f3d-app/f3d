@@ -1,20 +1,20 @@
 /**
- * @class   vtkF3DGLTFDocumentLoader
+ * @class   vtkF3DGLTFDracoDocumentLoader
  * @brief   Specialized GLTF document loader with Draco buffer decoding
  *
  * This class subclasses vtkGLTFDocumentLoader to handle Draco metadata
  */
 
-#ifndef vtkF3DGLTFDocumentLoader_h
-#define vtkF3DGLTFDocumentLoader_h
+#ifndef vtkF3DGLTFDracoDocumentLoader_h
+#define vtkF3DGLTFDracoDocumentLoader_h
 
 #include <vtkGLTFDocumentLoader.h>
 
-class vtkF3DGLTFDocumentLoader : public vtkGLTFDocumentLoader
+class vtkF3DGLTFDracoDocumentLoader : public vtkGLTFDocumentLoader
 {
 public:
-  static vtkF3DGLTFDocumentLoader* New();
-  vtkTypeMacro(vtkF3DGLTFDocumentLoader, vtkGLTFDocumentLoader);
+  static vtkF3DGLTFDracoDocumentLoader* New();
+  vtkTypeMacro(vtkF3DGLTFDracoDocumentLoader, vtkGLTFDocumentLoader);
 
   /**
    * Overridden to add KHR_draco_mesh_compression support
@@ -29,12 +29,12 @@ public:
   void PrepareData() override;
 
 protected:
-  vtkF3DGLTFDocumentLoader() = default;
-  ~vtkF3DGLTFDocumentLoader() override = default;
+  vtkF3DGLTFDracoDocumentLoader() = default;
+  ~vtkF3DGLTFDracoDocumentLoader() override = default;
 
 private:
-  vtkF3DGLTFDocumentLoader(const vtkF3DGLTFDocumentLoader&) = delete;
-  void operator=(const vtkF3DGLTFDocumentLoader&) = delete;
+  vtkF3DGLTFDracoDocumentLoader(const vtkF3DGLTFDracoDocumentLoader&) = delete;
+  void operator=(const vtkF3DGLTFDracoDocumentLoader&) = delete;
 };
 
 #endif

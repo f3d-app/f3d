@@ -1,6 +1,7 @@
 #include "vtkF3DRenderPass.h"
 
 #include "vtkF3DHexagonalBokehBlurPass.h"
+#include "vtkF3DImporter.h"
 
 #include <vtkBoundingBox.h>
 #include <vtkCameraPass.h>
@@ -67,6 +68,10 @@ void vtkF3DRenderPass::ReleaseGraphicsResources(vtkWindow* w)
   {
     this->MainPass->ReleaseGraphicsResources(w);
   }
+  if (this->MainOnTopPass)
+  {
+    this->MainOnTopPass->ReleaseGraphicsResources(w);
+  }
   if (this->OverlayPass)
   {
     this->OverlayPass->ReleaseGraphicsResources(w);
@@ -80,6 +85,7 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
   this->BackgroundProps.clear();
   this->OverlayProps.clear();
   this->MainProps.clear();
+  this->MainOnTopProps.clear();
 
   // assign props to the correct pass
   vtkProp** props = s->GetPropArray();
@@ -92,7 +98,16 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     }
     else if (vtkProp3D::SafeDownCast(prop))
     {
-      this->MainProps.push_back(prop);
+      // armature
+      vtkInformation* info = prop->GetPropertyKeys();
+      if (this->ArmatureVisible && info && info->Has(vtkF3DImporter::ACTOR_IS_ARMATURE()))
+      {
+        this->MainOnTopProps.push_back(prop);
+      }
+      else
+      {
+        this->MainProps.push_back(prop);
+      }
     }
     else
     {
@@ -211,6 +226,27 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     this->MainPass->SetDepthFormat(vtkTextureObject::Fixed32);
   }
 
+  {
+    vtkNew<vtkLightsPass> lightsP;
+    vtkNew<vtkOpaquePass> opaqueP;
+
+    vtkNew<vtkRenderPassCollection> collection;
+    collection->AddItem(lightsP);
+    collection->AddItem(opaqueP);
+
+    vtkNew<vtkSequencePass> sequence;
+    sequence->SetPasses(collection);
+
+    vtkNew<vtkCameraPass> camP;
+    camP->SetDelegatePass(sequence);
+
+    this->MainOnTopPass = vtkSmartPointer<vtkFramebufferPass>::New();
+    this->MainOnTopPass->SetDelegatePass(camP);
+
+    // Needed because VTK can pick the wrong format with certain drivers
+    this->MainOnTopPass->SetDepthFormat(vtkTextureObject::Fixed32);
+  }
+
   this->InitializeTime = this->GetMTime();
 }
 
@@ -245,6 +281,13 @@ void vtkF3DRenderPass::Render(const vtkRenderState* s)
     mainState.SetFrameBuffer(s->GetFrameBuffer());
 
     this->MainPass->Render(&mainState);
+
+    vtkRenderState mainOnTopState(s->GetRenderer());
+    mainOnTopState.SetPropArrayAndCount(
+      this->MainOnTopProps.data(), static_cast<int>(this->MainOnTopProps.size()));
+    mainOnTopState.SetFrameBuffer(s->GetFrameBuffer());
+
+    this->MainOnTopPass->Render(&mainOnTopState);
   }
 
   vtkRenderState overlayState(s->GetRenderer());
@@ -288,6 +331,7 @@ void vtkF3DRenderPass::Blend(const vtkRenderState* s)
     ssDecl << "uniform sampler2D texBackground;\n"
               "uniform sampler2D texOverlay;\n"
               "uniform sampler2D texMain;\n"
+              "uniform sampler2D texMainOnTop;\n"
               "vec3 toLinear(vec3 color) { return pow(color.rgb, vec3(2.2)); }\n"
               "vec3 toSRGB(vec3 color) { return pow(color.rgb, vec3(1.0 / 2.2)); }\n"
               "//VTK::FSQ::Decl";
@@ -327,6 +371,14 @@ void vtkF3DRenderPass::Blend(const vtkRenderState* s)
       // the background is fully transparent, skip the blending
       ssImpl << "  vec4 result = mainSample;\n";
     }
+
+    // blend "on top"
+    ssImpl << "  vec4 onTopSample = texture(texMainOnTop, texCoord);\n";
+    ssImpl << "  if (onTopSample.a > 0.0)\n";
+    ssImpl << "    onTopSample.rgb = toLinear(onTopSample.rgb / onTopSample.a);\n";
+    ssImpl << "  onTopSample.rgb *= onTopSample.a;\n";
+    ssImpl << "  result.rgb = (1.0 - onTopSample.a) * result.rgb + onTopSample.rgb;\n";
+    ssImpl << "  result.a = (1.0 - onTopSample.a) * result.a + onTopSample.a;\n";
 
     // the input color is alpha premultiplied, we need to divide it, then
     // convert to linear space, and finally premultiply back by the alpha value
@@ -372,16 +424,20 @@ void vtkF3DRenderPass::Blend(const vtkRenderState* s)
   this->BackgroundPass->GetColorTexture()->Activate();
   this->OverlayPass->GetColorTexture()->Activate();
   this->MainPass->GetColorTexture()->Activate();
+  this->MainOnTopPass->GetColorTexture()->Activate();
   this->BlendQuadHelper->Program->SetUniformi(
     "texBackground", this->BackgroundPass->GetColorTexture()->GetTextureUnit());
   this->BlendQuadHelper->Program->SetUniformi(
     "texOverlay", this->OverlayPass->GetColorTexture()->GetTextureUnit());
   this->BlendQuadHelper->Program->SetUniformi(
     "texMain", this->MainPass->GetColorTexture()->GetTextureUnit());
+  this->BlendQuadHelper->Program->SetUniformi(
+    "texMainOnTop", this->MainOnTopPass->GetColorTexture()->GetTextureUnit());
 
   this->BlendQuadHelper->Render();
 
   this->BackgroundPass->GetColorTexture()->Deactivate();
   this->OverlayPass->GetColorTexture()->Deactivate();
   this->MainPass->GetColorTexture()->Deactivate();
+  this->MainOnTopPass->GetColorTexture()->Deactivate();
 }

@@ -130,6 +130,12 @@
         "type": "double",
         "default_value": "1.0"
       }
+    },
+    "armature": {
+      "enable": {
+        "type": "bool",
+        "default_value": "false"
+      }
     }
   },
   "ui": {

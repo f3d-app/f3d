@@ -49,6 +49,7 @@ public:
   void ShowConsole(bool show);
   void ShowDropZone(bool show);
   void ShowHDRISkybox(bool show);
+  void ShowArmature(bool show);
   ///@}
 
   using vtkOpenGLRenderer::SetBackground;
@@ -503,6 +504,7 @@ private:
   bool ConsoleVisible = false;
   bool DropZoneVisible = false;
   bool HDRISkyboxVisible = false;
+  bool ArmatureVisible = false;
   bool UseRaytracing = false;
   bool UseRaytracingDenoiser = false;
   bool UseDepthPeelingPass = false;
