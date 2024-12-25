@@ -7,6 +7,7 @@
 #include "window_impl.h"
 
 #include "vtkF3DConsoleOutputWindow.h"
+#include "vtkF3DImguiConsole.h"
 #include "vtkF3DInteractorEventRecorder.h"
 #include "vtkF3DInteractorStyle.h"
 #include "vtkF3DRenderer.h"
@@ -603,6 +604,18 @@ interactor& interactor_impl::initCommands()
       check_args(args, 1, "reset");
       this->Internals->Options.reset(args[0]);
     });
+  this->addCommand("clear",
+    [&](const std::vector<std::string>& args)
+    {
+      check_args(args, 0, "clear");
+
+      vtkF3DImguiConsole* console =
+        vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
+      if (console)
+      {
+        console->Clear();
+      }
+    });
   this->addCommand("print",
     [&](const std::vector<std::string>& args)
     {
@@ -981,7 +994,7 @@ interactor& interactor_impl::removeBinding(const interaction_bind_t& bind)
   // Look for the group of the removed bind
   std::string group;
   for (auto it = this->Internals->GroupedBinds.begin(); it != this->Internals->GroupedBinds.end();
-       it++)
+    it++)
   {
     if (it->second == bind)
     {

@@ -462,3 +462,13 @@ void vtkF3DImguiActor::SetDeltaTime(double time)
   ImGuiIO& io = ImGui::GetIO();
   io.DeltaTime = time;
 }
+
+//----------------------------------------------------------------------------
+void vtkF3DImguiActor::Clear()
+{
+  vtkF3DImguiConsole* console = vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
+  if (console)
+  {
+    console->Clear();
+  }
+}

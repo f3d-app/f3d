@@ -43,6 +43,16 @@ public:
    */
   void ShowBadge();
 
+  /**
+   * Clear console
+   */
+  void Clear();
+
+  /**
+   * Get console history size
+   */
+  size_t GetLogsSize();
+
 protected:
   vtkF3DImguiConsole();
   ~vtkF3DImguiConsole() override;

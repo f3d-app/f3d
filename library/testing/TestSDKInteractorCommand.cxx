@@ -3,6 +3,7 @@
 #include <engine.h>
 #include <interactor.h>
 #include <options.h>
+#include <vtkF3DImguiConsole.h>
 
 int TestSDKInteractorCommand(int argc, char* argv[])
 {
@@ -23,6 +24,12 @@ int TestSDKInteractorCommand(int argc, char* argv[])
   test("triggerCommand reset", options.model.scivis.cells == false);
   inter.triggerCommand("reset render.hdri.file");
   test("triggerCommand reset optional", options.render.hdri.file.has_value() == false);
+
+  // Test clear
+  vtkF3DImguiConsole* console = vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
+  const size_t beforeSize = console->GetLogsSize();
+  inter.triggerCommand("clear");
+  test("triggerCommand clear", console->GetLogsSize() == 0 && beforeSize > 0);
 
   // Test toggle
   inter.triggerCommand("toggle model.scivis.cells");

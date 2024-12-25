@@ -197,3 +197,17 @@ void vtkF3DImguiConsole::ShowBadge()
     ImGui::End();
   }
 }
+
+//----------------------------------------------------------------------------
+void vtkF3DImguiConsole::Clear()
+{
+  this->Pimpl->Logs.clear();
+  this->Pimpl->NewError = false;
+  this->Pimpl->NewWarning = false;
+}
+
+//----------------------------------------------------------------------------
+size_t vtkF3DImguiConsole::GetLogsSize()
+{
+  return this->Pimpl->Logs.size();
+}

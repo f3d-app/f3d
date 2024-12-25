@@ -96,6 +96,11 @@ public:
    */
   virtual void SetDeltaTime(double) {}
 
+  /**
+   * Clear console
+   */
+  virtual void Clear() {}
+
 protected:
   vtkF3DUIActor();
   ~vtkF3DUIActor() override;
