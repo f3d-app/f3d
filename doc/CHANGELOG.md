@@ -345,7 +345,7 @@ Issue Fixes:
 - Fixed an issue with point cloud rendering
 - Fixed a crash on exit on Windows
 - Fixed an issue with fullscreen window size on Windows
-- Fixed offscreen rendering (`--output` and `--ref` ) to actually use offscreen rendering
+- Fixed offscreen rendering (`--output` and `--reference ) to actually use offscreen rendering
 - Fixed a memory leak when no rendering is performed (thanks @CharlesGueunet)
 - Fixed a rendering issue with certain GPU drivers
 - Fixed tone mapping with background opacity
