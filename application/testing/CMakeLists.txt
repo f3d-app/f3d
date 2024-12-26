@@ -1058,7 +1058,7 @@ f3d_test(NAME TestConfigFileQuiet DATA nonExistentFile.vtp CONFIG ${F3D_SOURCE_D
 # Test no file with config file
 f3d_test(NAME TestNoFileConfigFile CONFIG ${F3D_SOURCE_DIR}/testing/configs/verbose.json ARGS --verbose REGEXP "No files to load provided" NO_BASELINE)
 
-# Test that --no-config set no-config value to 1
+# Test that --no-config overrides --config
 f3d_test(NAME TestNoConfigWithConfig DATA f3d.glb ARGS --no-config --config ${F3D_SOURCE_DIR}/testing/configs/complex.json)
 
 # Test help display
