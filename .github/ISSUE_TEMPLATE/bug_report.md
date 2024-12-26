@@ -12,7 +12,7 @@ A clear and concise description of what the bug is, a screenshot helps a lot.
 
 **To Reproduce**
 Steps to reproduce the behavior:
- 1. Open the file using `f3d --dry-run example.glb`
+ 1. Open the file using `f3d --no-config example.glb`
  2. step 2
  3. step 3
 

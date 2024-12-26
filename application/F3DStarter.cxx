@@ -812,17 +812,17 @@ int F3DStarter::Start(int argc, char** argv)
   // Store in a option entries for easier processing
   this->Internals->CLIOptionsEntries.emplace_back(cliOptionsDict, fs::path(), "CLI options");
 
-  // Check dry-run, config CLI, output and verbose options first
+  // Check no-config, config CLI, output and verbose options first
   // XXX: the local variable are initialized manually for simplicity
   // but this duplicate the initialization value as it is present in
   // F3DOptionTools::DefaultAppOptions too
-  bool dryRun = false;
-  if (cliOptionsDict.find("no-render") != cliOptionsDict.end())
+  bool noConfig = false;
+  if (cliOptionsDict.find("no-config") != cliOptionsDict.end())
   {
-    dryRun = f3d::options::parse<bool>(cliOptionsDict["no-render"]);
+    noConfig = f3d::options::parse<bool>(cliOptionsDict["no-config"]);
   }
   std::string config;
-  if (cliOptionsDict.find("config") != cliOptionsDict.end())
+  if (!noConfig && cliOptionsDict.find("config") != cliOptionsDict.end())
   {
     config = f3d::options::parse<std::string>(cliOptionsDict["config"]);
   }
@@ -844,7 +844,7 @@ int F3DStarter::Start(int argc, char** argv)
   f3d::log::debug("========== Initializing Options ==========");
 
   // Read config files
-  if (!dryRun)
+  if (!noConfig)
   {
     std::tie(this->Internals->ConfigOptionsEntries, this->Internals->ConfigBindingsEntries) =
       F3DConfigFileTools::ReadConfigFiles(config);
