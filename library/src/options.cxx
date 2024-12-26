@@ -146,13 +146,14 @@ bool options::isOptional(const std::string& option) const
 }
 
 //----------------------------------------------------------------------------
-void options::reset(const std::string& name)
+options& options::reset(const std::string& name)
 {
   options_tools::reset(*this, name);
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void options::removeValue(const std::string& name)
+options& options::removeValue(const std::string& name)
 {
   if (this->isOptional(name))
   {
@@ -162,6 +163,7 @@ void options::removeValue(const std::string& name)
   {
     throw options::incompatible_exception("Option " + name + " is not not optional");
   }
+  return *this;
 }
 
 //----------------------------------------------------------------------------

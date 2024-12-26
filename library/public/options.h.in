@@ -53,7 +53,7 @@ public:
    * Throw an options::inexistent_exception if option does not exist.
    * Throw an options::no_value_exception if option has not been set.
    */
-  option_variant_t get(const std::string& name) const;
+  [[nodiscard]] option_variant_t get(const std::string& name) const;
 
   /**
    * Set an option as a string based on its name
@@ -69,7 +69,7 @@ public:
    * Throw an options::inexistent_exception if option does not exist.
    * Throw an options::no_value_exception if option has not been set.
    */
-  std::string getAsString(const std::string& name) const;
+  [[nodiscard]] std::string getAsString(const std::string& name) const;
 
   /**
    * A boolean option specific method to toggle it.
@@ -84,14 +84,14 @@ public:
    * Return true if they are the same value, false otherwise.
    * Throw an options::inexistent_exception if option does not exist.
    */
-  bool isSame(const options& other, const std::string& name) const;
+  [[nodiscard]] bool isSame(const options& other, const std::string& name) const;
 
   /**
    * Return true if an option has a value, false otherwise
    * Always returns true for non-optional options.
    * Throw an options::inexistent_exception if option does not exist.
    */
-  bool hasValue(const std::string& name) const;
+  [[nodiscard]] bool hasValue(const std::string& name) const;
 
   /**
    * Copy the value of an option from this to the provided other.
@@ -102,35 +102,36 @@ public:
   /**
    * Get all available option names.
    */
-  static std::vector<std::string> getAllNames();
+  [[nodiscard]] static std::vector<std::string> getAllNames();
 
   /**
    * Get all option names that currently have values.
    */
-  std::vector<std::string> getNames() const;
+  [[nodiscard]] std::vector<std::string> getNames() const;
 
   /**
    * Get the closest option name and its Levenshtein distance.
    */
-  std::pair<std::string, unsigned int> getClosestOption(const std::string& option) const;
+  [[nodiscard]] std::pair<std::string, unsigned int> getClosestOption(
+    const std::string& option) const;
 
   /**
    *  Returns true if the option is optional else returns false.
    *  Throws an options::inexistent_exception if option does not exist.
    */
-  bool isOptional(const std::string& option) const;
+  [[nodiscard]] bool isOptional(const std::string& option) const;
 
   /**
    *  Resets the option to default value.
    *  Throws an options::inexistent_exception if option does not exist.
    */
-  void reset(const std::string& name);
+  options& reset(const std::string& name);
 
   /**
    *  Unset the option if it is optional else throws options::incompatible_exception.
    *  Throws an options::inexistent_exception if option does not exist.
    */
-  void removeValue(const std::string& name);
+  options& removeValue(const std::string& name);
 
   /**
    * Templated parsing method used internally to parse strings.
@@ -149,7 +150,7 @@ public:
    * Throw an options::parsing_exception if parsing failed.
    */
   template<typename T>
-  static T parse(const std::string& str);
+  [[nodiscard]] static T parse(const std::string& str);
 
   /**
    * An exception that can be thrown by the options

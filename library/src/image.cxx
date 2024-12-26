@@ -467,7 +467,7 @@ std::vector<double> image::getNormalizedPixel(const std::pair<int, int>& xy) con
 }
 
 //----------------------------------------------------------------------------
-void image::save(const std::string& path, SaveFormat format) const
+const image& image::save(const std::string& path, SaveFormat format) const
 {
   internals::checkSaveFormatCompatibility(*this, format);
 
@@ -500,6 +500,7 @@ void image::save(const std::string& path, SaveFormat format) const
   {
     throw write_exception("Cannot write " + path);
   }
+  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -526,7 +527,7 @@ std::vector<unsigned char> image::saveBuffer(SaveFormat format) const
 }
 
 //----------------------------------------------------------------------------
-const f3d::image& image::toTerminalText(std::ostream& stream) const
+const image& image::toTerminalText(std::ostream& stream) const
 {
   const int depth = this->getChannelCount();
   if (this->getChannelType() != ChannelType::BYTE || depth < 3 || depth > 4)
@@ -667,7 +668,7 @@ std::string image::toTerminalText() const
 }
 
 //----------------------------------------------------------------------------
-f3d::image& image::setMetadata(const std::string& key, const std::string& value)
+image& image::setMetadata(const std::string& key, const std::string& value)
 {
   if (value.empty())
   {
