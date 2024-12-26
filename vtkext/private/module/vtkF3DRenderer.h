@@ -377,6 +377,11 @@ public:
    */
   void SetUIDeltaTime(double time);
 
+  /**
+   * Set console badge enabled status
+   */
+  void SetConsoleBadgeEnabled(bool enabled);
+
 private:
   vtkF3DRenderer();
   ~vtkF3DRenderer() override;

@@ -63,6 +63,12 @@ public:
   void SetConsoleVisibility(bool show);
 
   /**
+   * Set the console badge enabled status
+   * False by default
+   */
+  void SetConsoleBadgeEnabled(bool enabled);
+
+  /**
    * Set the cheatsheet string
    * Empty by default
    */
@@ -150,6 +156,7 @@ protected:
   std::vector<CheatSheetGroup> CheatSheet;
 
   bool ConsoleVisible = false;
+  bool ConsoleBadgeEnabled = false;
 
   bool FpsCounterVisible = false;
   int FpsValue = 0;

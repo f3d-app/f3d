@@ -2639,3 +2639,9 @@ void vtkF3DRenderer::SetUIDeltaTime(double time)
 {
   this->UIActor->SetDeltaTime(time);
 }
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetConsoleBadgeEnabled(bool enabled)
+{
+  this->UIActor->SetConsoleBadgeEnabled(enabled);
+}
