@@ -205,9 +205,3 @@ void vtkF3DImguiConsole::Clear()
   this->Pimpl->NewError = false;
   this->Pimpl->NewWarning = false;
 }
-
-//----------------------------------------------------------------------------
-size_t vtkF3DImguiConsole::GetLogsSize()
-{
-  return this->Pimpl->Logs.size();
-}
