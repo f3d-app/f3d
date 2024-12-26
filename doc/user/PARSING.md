@@ -41,6 +41,7 @@ with removing the point and precision when the value is exactly an integer.
 
 The following formats are supported when parsing a string into a ratio:
  - percent% where percent is a double
+ - dividend:divisor where both are doubles
  - dividend/divisor where both are doubles
  - double
 
