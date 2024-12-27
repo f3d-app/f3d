@@ -863,8 +863,9 @@ int F3DStarter::Start(int argc, char** argv)
   f3d::log::debug("========== Configuring engine ==========");
 
   double deltaTime = 1.0 / this->Internals->AppOptions.FrameRate;
-  const std::string& reference = this->Internals->AppOptions.Reference;
-  const std::string& output = this->Internals->AppOptions.Output;
+
+  fs::path reference(f3d::utils::collapsePath(this->Internals->AppOptions.Reference));
+  fs::path output(f3d::utils::collapsePath(this->Internals->applyFilenameTemplate(this->Internals->AppOptions.Output)));
 
   if (this->Internals->AppOptions.NoRender)
   {
@@ -1002,21 +1003,29 @@ int F3DStarter::Start(int argc, char** argv)
         return EXIT_FAILURE;
       }
 
-      if (!fs::exists(reference))
+      try
       {
-        if (output.empty())
+        if (!fs::exists(reference))
         {
-          f3d::log::error("Reference image ", reference,
-            " does not exist, use the output option to output current rendering into an image "
-            "file.\n");
-        }
-        else
-        {
-          window.renderToImage(this->Internals->AppOptions.NoBackground).save(output);
+          if (output.empty())
+          {
+            f3d::log::error("Reference image ", reference,
+              " does not exist, use the output option to output current rendering into an image "
+              "file.\n");
+          }
+          else
+          {
+            window.renderToImage(this->Internals->AppOptions.NoBackground).save(output);
 
-          f3d::log::error("Reference image " + reference +
-            " does not exist, current rendering has been outputted to " + output + ".\n");
+            f3d::log::error("Reference image ", reference,
+              " does not exist, current rendering has been outputted to ", output, ".\n");
+          }
+          return EXIT_FAILURE;
         }
+      }
+      catch (const std::filesystem::filesystem_error& ex)
+      {
+        f3d::log::error("Error reading reference image: ", ex.what());
         return EXIT_FAILURE;
       }
 
@@ -1072,9 +1081,8 @@ int F3DStarter::Start(int argc, char** argv)
       }
       else
       {
-        fs::path path = this->Internals->applyFilenameTemplate(output);
-        img.save(path.string());
-        f3d::log::debug("Output image saved to ", path);
+        img.save(output);
+        f3d::log::debug("Output image saved to ", output);
       }
 
       if (this->Internals->FilesGroups.size() > 1)
