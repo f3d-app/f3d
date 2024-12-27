@@ -29,34 +29,34 @@ public:
    * Create a GLX context function.
    * Only supported on Linux.
    */
-  static function glx();
+  [[nodiscard]] static function glx();
 
   /**
    * Create a WGL context function.
    * Only supported on Windows.
    */
-  static function wgl();
+  [[nodiscard]] static function wgl();
 
   /**
    * Create a COCOA context function.
    * This is usually required when using a headless context and a GPU device.
    * Only supported on macOS.
    */
-  static function cocoa();
+  [[nodiscard]] static function cocoa();
 
   /**
    * Create a EGL context function.
    * This is usually required when using a headless context and a GPU device.
    * Only supported on Linux and Windows.
    */
-  static function egl();
+  [[nodiscard]] static function egl();
 
   /**
    * Create a OSMesa context function.
    * This is usually required when using a headless context and no GPU device.
    * Only supported on Linux and Windows.
    */
-  static function osmesa();
+  [[nodiscard]] static function osmesa();
 
   /**
    * Create a context function from a library name and a function name.
@@ -64,7 +64,7 @@ public:
    * For example, `getSymbol("EGL", "eglGetProcAddress")` looks for the symbol
    * `eglGetProcAddress` in the library `libEGL.so` on Linux.
    */
-  static function getSymbol(const std::string& lib, const std::string& func);
+  [[nodiscard]] static function getSymbol(std::string_view lib, std::string_view func);
 
   /**
    * An exception that can be thrown when the requested library cannot be loaded.

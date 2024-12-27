@@ -23,7 +23,8 @@ public:
   template<typename T, typename E>
   void parse_expect(const std::string& label, const std::string& input)
   {
-    PseudoUnitTest::expect<E>(label + " `" + input + "`", [&]() { f3d::options::parse<T>(input); });
+    PseudoUnitTest::expect<E>(
+      label + " `" + input + "`", [&]() { std::ignore = f3d::options::parse<T>(input); });
   }
 };
 
@@ -60,6 +61,8 @@ int TestSDKOptionsIO(int argc, char* argv[])
 
   test.parse<f3d::ratio_t>("ratio_t", "0.1234", 0.1234);
   test.parse<f3d::ratio_t>("ratio_t", "12.34%", 0.1234);
+  test.parse<f3d::ratio_t>("ratio_t", "1/2", 0.5);
+  test.parse<f3d::ratio_t>("ratio_t", "1:2", 0.5);
   test.parse_expect<f3d::ratio_t, parsing_exception>("invalid ratio_t", "12.34&");
   test.parse<f3d::ratio_t>("ratio_t", "-2/-3.5", 2.0 / 3.5);
   test.parse_expect<f3d::ratio_t, parsing_exception>("invalid ratio_t", "1/2/3");

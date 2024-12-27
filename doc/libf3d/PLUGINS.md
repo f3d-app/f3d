@@ -69,5 +69,6 @@ F3D provides access to a VTK modules containing utilities that may be useful for
  - `vtkF3DFaceVaryingPointDispatcher`: A VTK filter that manipulates point data so that F3D can display them as face-varying data (used by `usd` plugin)
  - `vtkF3DBitonicSort`: A VTK class that perform Bitonic Sort algorithm on the GPU (used by the `splat` point sprites rendering algorithm
  - `vtkF3DImporter`: An Importer class that abstract away support for different version of VTK after some API changes.
+ - `vtkF3DGLTFImporter`: An custom glTF importer class that support armatures, useful when creating other plugin supporting glTF extensions.
 
 For the complete documentation, please consult the [vtkext doxygen documentation.](https://f3d.app/doc/libf3d/vtkext_doxygen/).
