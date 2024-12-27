@@ -562,8 +562,6 @@ private:
   vtkMTimeType ImporterTimeStamp = 0;
   vtkMTimeType ImporterUpdateTimeStamp = 0;
 
-  vtkNew<vtkDiscretizableColorTransferFunction> DiscretizableColorTransferFunction;
-  bool DiscretizableColorTransferFunctionConfigured = false;
   int Discretization = 256;
 
   vtkNew<vtkScalarBarActor> ScalarBarActor;
