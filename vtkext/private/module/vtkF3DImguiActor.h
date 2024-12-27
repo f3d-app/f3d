@@ -86,11 +86,6 @@ private:
    */
   void RenderConsoleBadge() override;
 
-  /**
-   * Clear console
-   */
-  void Clear() override; 
-
 private:
   vtkF3DImguiActor(const vtkF3DImguiActor&) = delete;
   void operator=(const vtkF3DImguiActor&) = delete;
