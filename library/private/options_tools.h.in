@@ -162,10 +162,10 @@ ratio_t parse(const std::string& str)
       return stodStrict(str.substr(0, str.size() - 1)) / 100;
     }
 
-    const std::size_t i = str.find('/');
-    if (i != std::string::npos)
+    const std::size_t sep = str.find_first_of(":/");
+    if (sep != std::string::npos)
     {
-      return stodStrict(str.substr(0, i)) / stodStrict(str.substr(i + 1, str.size() - i - 1));
+      return stodStrict(str.substr(0, sep)) / stodStrict(str.substr(sep + 1));
     }
 
     return stodStrict(str);
