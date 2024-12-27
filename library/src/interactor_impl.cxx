@@ -615,8 +615,8 @@ interactor& interactor_impl::initCommands()
 #if F3D_MODULE_UI
       vtkF3DImguiConsole* console =
         vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
-        assert(console != nullptr);
-        console->Clear();
+      assert(console != nullptr);
+      console->Clear();
 #endif
     });
   this->addCommand("print",
