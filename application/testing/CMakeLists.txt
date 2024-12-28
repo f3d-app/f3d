@@ -1158,14 +1158,9 @@ if(NOT WIN32)
   set_tests_properties(f3d::TestHOMEReference PROPERTIES ENVIRONMENT "HOME=${CMAKE_BINARY_DIR}")
   set_tests_properties(f3d::TestHOMEReference PROPERTIES FIXTURES_REQUIRED f3d::TestHOMEOutput_FIXTURE)
 
-  f3d_test(NAME TestHOMEInput ARGS --input=~/testing/data/suzanne.stl)
-  set_tests_properties(f3d::TestHOMEInput PROPERTIES ENVIRONMENT "HOME=${F3D_SOURCE_DIR}")
-
-  f3d_test(NAME TestHOMEConfig DATA suzanne.stl CONFIG ~/testing/configs/complex.json)
-  set_tests_properties(f3d::TestHOMEConfig PROPERTIES ENVIRONMENT "HOME=${F3D_SOURCE_DIR}")
-
-  f3d_test(NAME TestHOMEPlugin ARGS --load-plugins=~/testing/data/invalid.so REGEXP "Cannot open the library" NO_BASELINE)
-  set_tests_properties(f3d::TestHOMEPlugin PROPERTIES ENVIRONMENT "HOME=${F3D_SOURCE_DIR}")
+  f3d_test(NAME TestHOMEInput ARGS --input=~/testing/data/suzanne.stl ENV "HOME=${F3D_SOURCE_DIR}")
+  f3d_test(NAME TestHOMEConfig DATA suzanne.stl CONFIG ~/testing/configs/complex.json ENV "HOME=${F3D_SOURCE_DIR}")
+  f3d_test(NAME TestHOMEPlugin ARGS --load-plugins=~/testing/data/invalid.so REGEXP "Cannot open the library" NO_BASELINE ENV "HOME=${F3D_SOURCE_DIR}")
 endif()
 
 # Test failure without a reference, please do not create a TestNoRef.png file
