@@ -16,10 +16,9 @@ int TestSDKEngineRecreation(int argc, char* argv[])
   delete eng;
   for (int i = 0; i < 5; i++)
   {
-      f3d::engine* eng2 = new f3d::engine(f3d::engine::create(false));
-      eng2->getInteractor().playInteraction(interactionFilePath);
+    f3d::engine* eng2 = new f3d::engine(f3d::engine::create(false));
+    eng2->getInteractor().playInteraction(interactionFilePath);
   }
   delete eng2;
-
   return EXIT_SUCCESS;
 }
