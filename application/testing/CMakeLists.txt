@@ -247,6 +247,7 @@ f3d_test(NAME TestOutputStreamInfo DATA suzanne.ply ARGS --verbose=info --output
 # Color map files testing
 f3d_test(NAME TestColorMapFileFullPath DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis8.png --scalar-coloring --coloring-component=1)
 f3d_test(NAME TestColorMapInvalid DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/invalid.png --scalar-coloring REGEXP "Cannot read colormap at" NO_BASELINE)
+f3d_test(NAME TestColorMapTooLong DATA dragon.vtu ARGS --colormap-file=folderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolder/file.ext --scalar-coloring REGEXP "File name too long" NO_BASELINE)
 f3d_test(NAME TestColorMapNonExistent DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/non_existent.png --scalar-coloring REGEXP "Cannot find the colormap" NO_BASELINE)
 f3d_test(NAME TestColorMapGrayscale DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/white_grayscale.png --scalar-coloring REGEXP "The specified color map must have at least 3 channels" NO_BASELINE)
 f3d_test(NAME TestColorMapMore1pxWarning DATA dragon.vtu ARGS --verbose=warning --colormap-file=${F3D_SOURCE_DIR}/testing/data/16bit.png --scalar-coloring REGEXP "The specified color map height is not equal to 1" NO_BASELINE)
@@ -1166,6 +1167,7 @@ if(NOT WIN32)
   f3d_test(NAME TestHOMEPlugin ARGS --load-plugins=~/testing/data/invalid.so REGEXP "Cannot open the library" NO_BASELINE ENV "HOME=${F3D_SOURCE_DIR}")
   f3d_test(NAME TestHOMEInteractionRecord DATA cow.vtp ARGS --interaction-test-record=~/Testing/Temporary/TestHOMEInteractionRecord.log NO_BASELINE ENV "HOME=${CMAKE_BINARY_DIR}")
   f3d_test(NAME TestHOMEInteractionPlay DATA cow.vtp ARGS --interaction-test-play=~/Testing/Temporary/TestHOMEInteractionRecord.log DEPENDS TestHOMEInteractionRecord NO_BASELINE ENV "HOME=${CMAKE_BINARY_DIR}")
+  f3d_test(NAME TestHOMEColorMapFile DATA dragon.vtu ARGS --colormap-file=~/testing/data/viridis8.png --scalar-coloring --coloring-component=1 ENV "HOME=${F3D_SOURCE_DIR}")
 endif()
 
 # Test failure without a reference, please do not create a TestNoRef.png file

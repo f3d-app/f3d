@@ -598,7 +598,7 @@ public:
     const std::string& colorMapFile = this->AppOptions.ColorMapFile;
     if (!colorMapFile.empty())
     {
-      std::string fullPath = F3DColorMapTools::Find(colorMapFile);
+      fs::path fullPath = F3DColorMapTools::Find(colorMapFile);
 
       if (!fullPath.empty())
       {
