@@ -964,7 +964,7 @@ int F3DStarter::Start(int argc, char** argv)
     }
 
     // Process Command Script file
-    const std::string& commandScriptFile = this->Internals->AppOptions.CommandScriptFile;
+    std::string commandScriptFile = f3d::utils::collapsePath(this->Internals->AppOptions.CommandScriptFile);
     if (!commandScriptFile.empty())
     {
       std::ifstream scriptFile(commandScriptFile);
