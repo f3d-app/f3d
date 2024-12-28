@@ -6,7 +6,6 @@ list(APPEND libf3dSDKTests_list
      TestSDKDynamicLightIntensity.cxx
      TestSDKEngine.cxx
      TestSDKEngineExceptions.cxx
-     TestSDKEngineRecreation.cxx
      TestSDKImage.cxx
      TestSDKInteractorDropFullScene.cxx
      TestSDKInteractorCommand.cxx
@@ -29,6 +28,7 @@ if(F3D_MODULE_UI)
     TestSDKDynamicBackgroundColor.cxx
     TestSDKDynamicFontFile.cxx
     TestSDKDynamicProperties.cxx
+    TestSDKEngineRecreation.cxx
     TestSDKInteractorCallBack.cxx
     TestSDKInteractorDocumentation.cxx
     TestSDKMultiOptions.cxx
