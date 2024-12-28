@@ -1157,6 +1157,9 @@ if(NOT WIN32)
   add_test(NAME f3d::TestHOMEReference COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/suzanne.stl --output=${CMAKE_BINARY_DIR}/Testing/Temporary/TestHOMEReference.png --reference=~/Testing/Temporary/TestHOMEOutput.png --resolution=300,300)
   set_tests_properties(f3d::TestHOMEReference PROPERTIES ENVIRONMENT "HOME=${CMAKE_BINARY_DIR}")
   set_tests_properties(f3d::TestHOMEReference PROPERTIES FIXTURES_REQUIRED f3d::TestHOMEOutput_FIXTURE)
+
+  f3d_test(NAME TestHOMEInput ARGS --input=~/testing/data/suzanne.stl)
+  set_tests_properties(f3d::TestHOMEInput PROPERTIES ENVIRONMENT "HOME=${F3D_SOURCE_DIR}")
 endif()
 
 # Test failure without a reference, please do not create a TestNoRef.png file

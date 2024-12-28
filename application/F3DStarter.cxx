@@ -914,7 +914,7 @@ int F3DStarter::Start(int argc, char** argv)
   // Add all input files
   for (auto& file : inputFiles)
   {
-    this->AddFile(fs::path(file));
+    this->AddFile(fs::path(f3d::utils::collapsePath(file)));
   }
 
   // Load a file
