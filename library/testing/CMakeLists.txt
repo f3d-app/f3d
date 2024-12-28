@@ -6,6 +6,7 @@ list(APPEND libf3dSDKTests_list
      TestSDKDynamicLightIntensity.cxx
      TestSDKEngine.cxx
      TestSDKEngineExceptions.cxx
+     TestSDKEngineRecreation.cxx
      TestSDKImage.cxx
      TestSDKInteractorDropFullScene.cxx
      TestSDKInteractorCommand.cxx
