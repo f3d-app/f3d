@@ -990,7 +990,7 @@ int F3DStarter::Start(int argc, char** argv)
     char* noDataForceRender = std::getenv("CTEST_F3D_NO_DATA_FORCE_RENDER");
 
     fs::path reference(f3d::utils::collapsePath(this->Internals->AppOptions.Reference));
-    fs::path output(f3d::utils::collapsePath(this->Internals->applyFilenameTemplate(this->Internals->AppOptions.Output)));
+    fs::path output(this->Internals->applyFilenameTemplate(f3d::utils::collapsePath(this->Internals->AppOptions.Output)));
 
     // Render and compare with file if needed
     if (!reference.empty())
