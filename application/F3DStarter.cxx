@@ -1403,12 +1403,9 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate, bool minima
     return fs::current_path();
   };
 
-  fs::path pathTemplate = fs::path(filenameTemplate).make_preferred();
-  fs::path fullPathTemplate =
-    pathTemplate.is_absolute() ? pathTemplate : getScreenshotDir() / pathTemplate;
-  fs::path path = this->Internals->applyFilenameTemplate(fullPathTemplate.string());
+  fs::path path = this->Internals->applyFilenameTemplate(f3d::utils::collapsePath(filenameTemplate, getScreenshotDir().string()));
 
-  fs::create_directories(fs::path(path).parent_path());
+  fs::create_directories(path.parent_path());
   f3d::log::info("saving screenshot to " + path.string());
 
   f3d::options& options = this->Internals->Engine->getOptions();
@@ -1431,7 +1428,7 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate, bool minima
 
   f3d::image img = this->Internals->Engine->getWindow().renderToImage(noBackground);
   this->Internals->addOutputImageMetadata(img);
-  img.save(path.string(), f3d::image::SaveFormat::PNG);
+  img.save(path, f3d::image::SaveFormat::PNG);
 
   options.render.light.intensity *= 5;
   this->Render();
