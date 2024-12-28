@@ -5,6 +5,7 @@
 #include "nlohmann/json.hpp"
 
 #include "log.h"
+#include "utils.h"
 
 #include <filesystem>
 #include <fstream>
@@ -111,7 +112,8 @@ F3DConfigFileTools::ReadConfigFiles(const std::string& userConfig)
   }
   else
   {
-    configPaths.emplace_back(userConfig);
+    // Collpase full path into an absolute path
+    configPaths.emplace_back(f3d::utils::collapsePath(userConfig));
   }
 
   // Recover actual individual config file paths
