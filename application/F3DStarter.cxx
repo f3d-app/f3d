@@ -864,9 +864,6 @@ int F3DStarter::Start(int argc, char** argv)
 
   double deltaTime = 1.0 / this->Internals->AppOptions.FrameRate;
 
-  fs::path reference(f3d::utils::collapsePath(this->Internals->AppOptions.Reference));
-  fs::path output(f3d::utils::collapsePath(this->Internals->applyFilenameTemplate(this->Internals->AppOptions.Output)));
-
   if (this->Internals->AppOptions.NoRender)
   {
     this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::createNone());
@@ -874,7 +871,7 @@ int F3DStarter::Start(int argc, char** argv)
   else
   {
     bool offscreen =
-      !reference.empty() || !output.empty() || this->Internals->AppOptions.BindingsList;
+      !this->Internals->AppOptions.Reference.empty() || !this->Internals->AppOptions.Output.empty() || this->Internals->AppOptions.BindingsList;
 
     if (this->Internals->AppOptions.RenderingBackend == "egl")
     {
@@ -991,6 +988,9 @@ int F3DStarter::Start(int argc, char** argv)
     }
 
     char* noDataForceRender = std::getenv("CTEST_F3D_NO_DATA_FORCE_RENDER");
+
+    fs::path reference(f3d::utils::collapsePath(this->Internals->AppOptions.Reference));
+    fs::path output(f3d::utils::collapsePath(this->Internals->applyFilenameTemplate(this->Internals->AppOptions.Output)));
 
     // Render and compare with file if needed
     if (!reference.empty())
