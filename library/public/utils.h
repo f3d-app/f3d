@@ -56,6 +56,16 @@ public:
   // clang-format on
 
   /**
+   * Collapse a string filesystem path by:
+   * - Expanding tilda `~` into home dir in a cross-platform way
+   * - Transform relative path into an absolute path based on basedDirectory if provided, or the current directory if not
+   * - Remove any `..` if any
+   * Rely on vtksys::SystemTools::CollapseFullPath but return empty string if the provided
+   * string is empty.
+   */
+  [[nodiscard]] static std::string collapsePath(const std::string& path, const std::string& baseDirectory = std::string());
+
+  /**
    * An exception that can be thrown by tokenize
    */
   struct tokenize_exception : public exception

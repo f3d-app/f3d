@@ -205,7 +205,8 @@ PYBIND11_MODULE(pyf3d, module)
   py::class_<f3d::utils> utils(module, "Utils");
 
   utils //
-    .def_static("text_distance", &f3d::utils::textDistance);
+    .def_static("text_distance", &f3d::utils::textDistance)
+    .def_static("collapse_path", &f3d::utils::collapsePath);
 
   // f3d::interactor
   py::class_<f3d::interaction_bind_t> interaction_bind(module, "InteractionBind");

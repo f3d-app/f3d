@@ -2,6 +2,8 @@
 
 #include "levenshtein.h"
 
+#include <vtksys/SystemTools.hxx>
+
 namespace f3d
 {
 //----------------------------------------------------------------------------
@@ -95,6 +97,14 @@ std::vector<std::string> utils::tokenize(std::string_view str)
   }
   emit();
   return tokens;
+}
+
+//----------------------------------------------------------------------------
+std::string utils::collapsePath(const std::string& path, const std::string& baseDirectory)
+{
+  return path.empty()       ? path
+    : baseDirectory.empty() ? vtksys::SystemTools::CollapseFullPath(path)
+                            : vtksys::SystemTools::CollapseFullPath(path, baseDirectory);
 }
 
 //----------------------------------------------------------------------------
