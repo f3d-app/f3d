@@ -1151,11 +1151,11 @@ set_tests_properties(f3d::TestNoFileFileNameTemplate PROPERTIES PASS_REGULAR_EXP
 set_tests_properties(f3d::TestNoFileFileNameTemplate PROPERTIES ENVIRONMENT "CTEST_F3D_NO_DATA_FORCE_RENDER=1")
 
 if(NOT WIN32)
-  add_test(NAME f3d::TestHOMEOutput COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/suzanne.stl --output=~/Testing/Temporary/TestHOMEOutput.png --resolution=300,300)
+  add_test(NAME f3d::TestHOMEOutput COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/suzanne.stl --output=~/Testing/Temporary/TestHOMEOutput.png --resolution=300,300 --no-config)
   set_tests_properties(f3d::TestHOMEOutput PROPERTIES ENVIRONMENT "HOME=${CMAKE_BINARY_DIR}")
   set_tests_properties(f3d::TestHOMEOutput PROPERTIES FIXTURES_SETUP f3d::TestHOMEOutput_FIXTURE)
 
-  add_test(NAME f3d::TestHOMEReference COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/suzanne.stl --output=${CMAKE_BINARY_DIR}/Testing/Temporary/TestHOMEReference.png --reference=~/Testing/Temporary/TestHOMEOutput.png --resolution=300,300)
+  add_test(NAME f3d::TestHOMEReference COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/suzanne.stl --output=${CMAKE_BINARY_DIR}/Testing/Temporary/TestHOMEReference.png --reference=~/Testing/Temporary/TestHOMEOutput.png --resolution=300,300 --no-config)
   set_tests_properties(f3d::TestHOMEReference PROPERTIES ENVIRONMENT "HOME=${CMAKE_BINARY_DIR}")
   set_tests_properties(f3d::TestHOMEReference PROPERTIES FIXTURES_REQUIRED f3d::TestHOMEOutput_FIXTURE)
 
