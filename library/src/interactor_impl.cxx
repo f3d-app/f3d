@@ -1041,14 +1041,13 @@ std::vector<interaction_bind_t> interactor_impl::getBinds() const
 std::pair<std::string, std::string> interactor_impl::getBindingDocumentation(
   const interaction_bind_t& bind) const
 {
-  std::vector<std::tuple<std::string, std::string, std::string>> doc;
-  auto it = this->Internals->Bindings.find(bind);
+  const auto& it = this->Internals->Bindings.find(bind);
   if (it == this->Internals->Bindings.end())
   {
     throw interactor_impl::does_not_exists_exception(
       std::string("Bind: ") + bind.format() + " does not exists");
   }
-  auto docFunc = it->second.DocumentationCallback;
+  const auto& docFunc = it->second.DocumentationCallback;
   return docFunc ? docFunc() : std::make_pair(std::string(), std::string());
 }
 
