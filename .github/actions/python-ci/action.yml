@@ -102,7 +102,7 @@ runs:
       uses: actions/upload-artifact@v4
       with:
         path: ./source/*.whl
-        name: ${{runner.os}}-wheel
+        name: ${{runner.os}}-${{inputs.python_version}}-wheel
 
     - name: Install wheel
       shell: bash
