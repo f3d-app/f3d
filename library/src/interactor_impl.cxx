@@ -7,6 +7,11 @@
 #include "window_impl.h"
 
 #include "vtkF3DConsoleOutputWindow.h"
+
+#if F3D_MODULE_UI
+#include "vtkF3DImguiConsole.h"
+#endif
+
 #include "vtkF3DInteractorEventRecorder.h"
 #include "vtkF3DInteractorStyle.h"
 #include "vtkF3DRenderer.h"
@@ -602,6 +607,17 @@ interactor& interactor_impl::initCommands()
     {
       check_args(args, 1, "reset");
       this->Internals->Options.reset(args[0]);
+    });
+  this->addCommand("clear",
+    [&](const std::vector<std::string>& args)
+    {
+      check_args(args, 0, "clear");
+#if F3D_MODULE_UI
+      vtkF3DImguiConsole* console =
+        vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
+      assert(console != nullptr);
+      console->Clear();
+#endif
     });
   this->addCommand("print",
     [&](const std::vector<std::string>& args)

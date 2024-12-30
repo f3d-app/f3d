@@ -19,6 +19,8 @@ The libf3d provides a few commands, many related to manipulating libf3d (options
 
 `reset option.name`: A command to reset a libf3d option to its default values, eg: `reset render.background.blur.coc`.
 
+`clear`: A command to clear ImGui console. No argument. 
+
 `print option.name`: A command to print the value of an libf3d option, eg: `print scene.up.direction`.
 
 `cycle_animation`:  A specific command to cycle `scene.animation.index` option using model information, No argument.
