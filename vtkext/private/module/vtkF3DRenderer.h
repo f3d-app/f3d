@@ -527,7 +527,7 @@ private:
   int GridSubdivisions = 10;
   double GridColor[3] = { 0.0, 0.0, 0.0 };
 
-  std::optional<std::string> HDRIFile;
+  std::string HDRIFile;
   vtkSmartPointer<vtkImageReader2> HDRIReader;
   bool HasValidHDRIReader = false;
   bool UseDefaultHDRI = false;
