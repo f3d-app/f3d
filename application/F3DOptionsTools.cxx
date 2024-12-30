@@ -236,7 +236,7 @@ void PrintPluginsScan()
 
   appPath /= "share/f3d/plugins";
 
-  auto plugins = f3d::engine::getPluginsList(appPath.string());
+  auto plugins = f3d::engine::getPluginsList(appPath);
 
   f3d::log::info("Found ", plugins.size(), " plugins:");
 
