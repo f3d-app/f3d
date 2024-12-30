@@ -13,12 +13,12 @@
 
 #include <vtkVersion.h>
 
-#include <vtksys/Directory.hxx>
 #include <vtksys/DynamicLoader.hxx>
-#include <vtksys/Encoding.hxx>
 #include <vtksys/SystemTools.hxx>
 
 #include <nlohmann/json.hpp>
+
+namespace fs = std::filesystem;
 
 namespace f3d
 {
@@ -52,18 +52,29 @@ engine::engine(
   // Ensure all lib initialization is done (once)
   detail::init::initialize();
 
-  // build default cache path
 #if defined(_WIN32)
-  std::string cachePath = vtksys::SystemTools::GetEnv("LOCALAPPDATA");
-  cachePath = cachePath + "/f3d";
+  static constexpr const char* CACHE_ENV_VAR = "LOCALAPPDATA";
+#else
+  static constexpr const char* CACHE_ENV_VAR = "HOME";
+#endif
+
+  char* env = std::getenv(CACHE_ENV_VAR);
+  if (!env)
+  {
+    throw engine::cache_exception(
+      std::string("Could not setup cache, please set ") + CACHE_ENV_VAR + " environment variable");
+  }
+
+  fs::path cachePath(env);
+
+#if defined(_WIN32)
+  cachePath /= "f3d";
 #elif defined(__APPLE__)
-  std::string cachePath = vtksys::SystemTools::GetEnv("HOME");
-  cachePath += "/Library/Caches/f3d";
+  cachePath = cachePath / "Library" / "Caches" / "f3d";
 #elif defined(__ANDROID__)
-  std::string cachePath = ""; // no default
+  // XXX: Android does not have a default cache location for now
 #elif defined(__unix__)
-  std::string cachePath = vtksys::SystemTools::GetEnv("HOME");
-  cachePath += "/.cache/f3d";
+  cachePath = cachePath / ".cache" / "f3d";
 #else
 #error "Unsupported platform"
 #endif
@@ -240,7 +251,7 @@ std::map<std::string, bool> engine::getRenderingBackendList()
 }
 
 //----------------------------------------------------------------------------
-void engine::loadPlugin(const std::string& pathOrName, const std::vector<std::string>& searchPaths)
+void engine::loadPlugin(const std::string& pathOrName, const std::vector<fs::path>& searchPaths)
 {
   if (pathOrName.empty())
   {
@@ -266,72 +277,77 @@ void engine::loadPlugin(const std::string& pathOrName, const std::vector<std::st
   if (init_plugin == nullptr)
   {
     vtksys::DynamicLoader::LibraryHandle handle = nullptr;
-
-    std::string fullPath = vtksys::SystemTools::CollapseFullPath(pathOrName);
-    if (vtksys::SystemTools::FileExists(fullPath))
+    try
     {
-      // plugin provided as full path
-      log::debug("Trying to load plugin from: \"", fullPath, "\"");
-      handle = vtksys::DynamicLoader::OpenLibrary(fullPath);
-
-      if (!handle)
+      fs::path fullPath(vtksys::SystemTools::CollapseFullPath(pathOrName));
+      if (fs::exists(fullPath))
       {
-        throw engine::plugin_exception(
-          "Cannot open the library \"" + fullPath + "\": " + vtksys::DynamicLoader::LastError());
-      }
-      else
-      {
-        pluginOrigin = fullPath;
-      }
-    }
-    else
-    {
-      // construct the library file name from the plugin name
-      std::string libName = vtksys::DynamicLoader::LibPrefix();
-      libName += "f3d-plugin-";
-      libName += pathOrName;
-      libName += vtksys::DynamicLoader::LibExtension();
+        // plugin provided as full path
+        log::debug("Trying to load plugin from: \"", fullPath, "\"");
+        handle = vtksys::DynamicLoader::OpenLibrary(fullPath.string());
 
-      // try search paths
-      for (std::string tryPath : searchPaths)
-      {
-        tryPath += '/';
-        tryPath += libName;
-        tryPath = vtksys::SystemTools::ConvertToOutputPath(tryPath);
-        if (vtksys::SystemTools::FileExists(tryPath))
-        {
-          log::debug("Trying to load \"", pathOrName, "\" plugin from: \"", tryPath, "\"");
-          handle = vtksys::DynamicLoader::OpenLibrary(tryPath);
-
-          if (handle)
-          {
-            // plugin is found and loaded
-            pluginOrigin = tryPath;
-            break;
-          }
-          else
-          {
-            log::debug(
-              "Could not load \"", tryPath, "\" because: ", vtksys::DynamicLoader::LastError());
-          }
-        }
-      }
-
-      if (!handle)
-      {
-        // Rely on internal system (e.g. LD_LIBRARY_PATH on Linux) by giving only the file name
-        log::debug("Trying to load plugin relying on internal system: ", libName);
-        handle = vtksys::DynamicLoader::OpenLibrary(libName);
         if (!handle)
         {
-          throw engine::plugin_exception("Cannot open the library \"" + pathOrName +
+          throw engine::plugin_exception("Cannot open the library \"" + fullPath.string() +
             "\": " + vtksys::DynamicLoader::LastError());
         }
         else
         {
-          pluginOrigin = "system";
+          pluginOrigin = fullPath.string();
         }
       }
+      else
+      {
+        // Not a full path
+        // Construct the library file name from the plugin name
+        std::string libName = vtksys::DynamicLoader::LibPrefix();
+        libName += "f3d-plugin-";
+        libName += pathOrName;
+        libName += vtksys::DynamicLoader::LibExtension();
+
+        // try search paths
+        for (fs::path tryPath : searchPaths)
+        {
+          tryPath /= libName;
+          if (fs::exists(tryPath))
+          {
+            log::debug(
+              "Trying to load \"", pathOrName, "\" plugin from: \"", tryPath.string(), "\"");
+            handle = vtksys::DynamicLoader::OpenLibrary(tryPath.string());
+
+            if (handle)
+            {
+              // plugin is found and loaded
+              pluginOrigin = tryPath.string();
+              break;
+            }
+            else
+            {
+              log::debug("Could not load \"", tryPath.string(),
+                "\" because: ", vtksys::DynamicLoader::LastError());
+            }
+          }
+        }
+        if (!handle)
+        {
+          // Rely on internal system (e.g. LD_LIBRARY_PATH on Linux) by giving only the file name
+          log::debug("Trying to load plugin relying on internal system: ", libName);
+          handle = vtksys::DynamicLoader::OpenLibrary(libName);
+          if (!handle)
+          {
+            throw engine::plugin_exception("Cannot open the library \"" + pathOrName +
+              "\": " + vtksys::DynamicLoader::LastError());
+          }
+          else
+          {
+            pluginOrigin = "system";
+          }
+        }
+      }
+    }
+    catch (const fs::filesystem_error& ex)
+    {
+      throw engine::plugin_exception(std::string("Could not load plugin: ") + ex.what());
     }
 
     init_plugin = reinterpret_cast<factory::plugin_initializer_t>(
@@ -356,23 +372,17 @@ void engine::autoloadPlugins()
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::string> engine::getPluginsList(const std::string& pluginPath)
+std::vector<std::string> engine::getPluginsList(const fs::path& pluginPath)
 {
-  vtksys::Directory dir;
   constexpr std::string_view ext = ".json";
   std::vector<std::string> pluginNames;
-
-  if (dir.Load(pluginPath))
+  try
   {
-    for (unsigned long i = 0; i < dir.GetNumberOfFiles(); i++)
+    for (auto& entry : fs::directory_iterator(pluginPath))
     {
-      std::string currentFile = dir.GetFile(i);
-      if (std::equal(ext.rbegin(), ext.rend(), currentFile.rbegin()))
+      const fs::path& fullPath = entry.path();
+      if (fullPath.extension() == ext)
       {
-        std::string fullPath = dir.GetPath();
-        fullPath += "/";
-        fullPath += currentFile;
-
         try
         {
           auto root = nlohmann::json::parse(std::ifstream(fullPath));
@@ -390,6 +400,9 @@ std::vector<std::string> engine::getPluginsList(const std::string& pluginPath)
         }
       }
     }
+  }
+  catch (const fs::filesystem_error&)
+  {
   }
 
   return pluginNames;
@@ -469,7 +482,7 @@ std::vector<engine::readerInformation> engine::getReadersInfo()
 }
 
 //----------------------------------------------------------------------------
-engine& engine::setCachePath(const std::string& cachePath)
+engine& engine::setCachePath(const fs::path& cachePath)
 {
   this->Internals->Window->SetCachePath(cachePath);
   return *this;
@@ -489,6 +502,12 @@ engine::no_interactor_exception::no_interactor_exception(const std::string& what
 
 //----------------------------------------------------------------------------
 engine::plugin_exception::plugin_exception(const std::string& what)
+  : exception(what)
+{
+}
+
+//----------------------------------------------------------------------------
+engine::cache_exception::cache_exception(const std::string& what)
   : exception(what)
 {
 }
