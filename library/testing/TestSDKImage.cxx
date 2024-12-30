@@ -92,15 +92,14 @@ int TestSDKImage(int argc, char* argv[])
     [&]() { std::ignore = img5Ch.saveBuffer(f3d::image::SaveFormat::BMP); });
   test.expect<f3d::image::write_exception>("save incompatible channel count to JPG format",
     [&]() { std::ignore = img2Ch.saveBuffer(f3d::image::SaveFormat::JPG); });
-  test.expect<f3d::image::write_exception>(
-    "save image to invalid path", [&]() { img2Ch.save("/" + std::string(257, 'x') + "/file.ext"); });
+  test.expect<f3d::image::write_exception>("save image to invalid path",
+    [&]() { img2Ch.save("/" + std::string(257, 'x') + "/file.ext"); });
 
   test.expect<f3d::image::read_exception>(
     "read image from incorrect path", [&]() { f3d::image img("/dummy/folder/img.png"); });
 
-  test.expect<f3d::image::read_exception>(
-    "read image from invalid path", [&]() { f3d::image img("/" + std::string(257, 'x') + "/file.ext"); });
-
+  test.expect<f3d::image::read_exception>("read image from invalid path",
+    [&]() { f3d::image img("/" + std::string(257, 'x') + "/file.ext"); });
 
   // check 16-bits image code paths
   f3d::image shortImg(testingDir + "/data/16bit.png");
