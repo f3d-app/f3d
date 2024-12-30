@@ -129,6 +129,7 @@ function(f3d_test)
 
   set(f3d_test_env_vars ${F3D_TEST_ENV})
   list(APPEND f3d_test_env_vars "CTEST_F3D_PROGRESS_BAR=1")
+  list(APPEND f3d_test_env_vars "CTEST_F3D_CONSOLE_BADGE=1")
   if (F3D_TEST_NO_DATA_FORCE_RENDER)
     list(APPEND f3d_test_env_vars "CTEST_F3D_NO_DATA_FORCE_RENDER=1")
   endif ()

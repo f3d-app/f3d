@@ -186,6 +186,9 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   this->Internals->Camera = std::make_unique<detail::camera_impl>();
   this->Internals->Camera->SetVTKRenderer(this->Internals->Renderer);
 
+  this->Internals->Renderer->SetConsoleBadgeEnabled(
+    !offscreen || std::getenv("CTEST_F3D_CONSOLE_BADGE"));
+
   this->Initialize();
 
   log::debug("VTK window class type is ", this->Internals->RenWin->GetClassName());
