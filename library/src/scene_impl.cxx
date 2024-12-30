@@ -141,29 +141,29 @@ public:
     scene_impl::internals::DisplayAllInfo(this->MetaImporter, this->Window);
   }
 
-  static void DisplayImporterDescription(vtkImporter* importer)
+  static void DisplayImporterDescription(log::VerboseLevel level, vtkImporter* importer)
   {
     vtkIdType availCameras = importer->GetNumberOfCameras();
     if (availCameras <= 0)
     {
-      log::debug("No camera available");
+      log::print(level, "No camera available");
     }
     else
     {
-      log::debug("Camera(s) available are:");
+      log::print(level, "Camera(s) available are:");
     }
     for (int i = 0; i < availCameras; i++)
     {
-      log::debug(i, ": ", importer->GetCameraName(i));
+      log::print(level, i, ": ", importer->GetCameraName(i));
     }
-    log::debug("");
-    log::debug(importer->GetOutputsDescription(), "\n");
+    log::print(level, "");
+    log::print(level, importer->GetOutputsDescription(), "\n");
   }
 
   static void DisplayAllInfo(vtkImporter* importer, window_impl& window)
   {
     // Display output description
-    scene_impl::internals::DisplayImporterDescription(importer);
+    scene_impl::internals::DisplayImporterDescription(log::VerboseLevel::DEBUG, importer);
 
     // Display coloring information
     window.PrintColoringDescription(log::VerboseLevel::DEBUG);
@@ -341,20 +341,6 @@ void scene_impl::SetInteractor(interactor_impl* interactor)
 
 void scene_impl::PrintImporterDescription(log::VerboseLevel level)
 {
-  vtkIdType availCameras = this->Internals->MetaImporter->GetNumberOfCameras();
-  if (availCameras <= 0)
-  {
-    log::print(level, "No camera available");
-  }
-  else
-  {
-    log::print(level, "Camera(s) available are:");
-  }
-  for (int i = 0; i < availCameras; i++)
-  {
-    log::print(level, i, ": ", this->Internals->MetaImporter->GetCameraName(i));
-  }
-  log::print(level, "");
-  log::print(level, this->Internals->MetaImporter->GetOutputsDescription(), "\n");
+  scene_impl::internals::DisplayImporterDescription(level, this->Internals->MetaImporter);
 }
 }

@@ -47,7 +47,9 @@ public:
    */
   void SetInteractor(interactor_impl* interactor);
 
-  // Display available cameras in the log
+  /**
+   * Display available cameras in the log
+   */
   void PrintImporterDescription(log::VerboseLevel level);
 
 private:
