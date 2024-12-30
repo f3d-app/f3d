@@ -40,7 +40,7 @@ sudo yum install make automake gcc gcc-c++ kernel-devel git git-lfs cmake vtk
 
 ```
 sudo pacman -Syu
-sudo pacman -S base-devel git git-lfs cmake vtk nlohmann-json hdf5 netcdf fmt verdict openmpi glew ospray boost libxcursor
+sudo pacman -S base-devel git git-lfs cmake vtk nlohmann-json hdf5 netcdf fmt verdict openmpi glew ospray libxcursor
 ```
 
 ### Compile F3D
