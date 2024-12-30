@@ -543,7 +543,7 @@ public:
   {
     // Update typed app options from app options
     this->AppOptions.Output = f3d::options::parse<std::string>(appOptions.at("output"));
-    this->AppOptions.BindingsList = f3d::options::parse<bool>(appOptions.at("bindings-list"));
+    this->AppOptions.BindingsList = f3d::options::parse<bool>(appOptions.at("list-bindings"));
     this->AppOptions.NoBackground = f3d::options::parse<bool>(appOptions.at("no-background"));
     this->AppOptions.NoRender = f3d::options::parse<bool>(appOptions.at("no-render"));
     this->AppOptions.RenderingBackend =

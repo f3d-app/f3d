@@ -25,6 +25,19 @@ namespace f3d
 class engine::internals
 {
 public:
+  template<typename F>
+  static bool BackendAvailable(F&& func)
+  {
+    try
+    {
+      return func() != nullptr;
+    }
+    catch (const context::loading_exception&)
+    {
+      return false;
+    }
+  }
+
   std::unique_ptr<options> Options;
   std::unique_ptr<detail::window_impl> Window;
   std::unique_ptr<detail::scene_impl> Scene;
@@ -210,6 +223,20 @@ interactor& engine::getInteractor()
     throw engine::no_interactor_exception("No interactor with this engine");
   }
   return *this->Internals->Interactor;
+}
+
+//----------------------------------------------------------------------------
+std::map<std::string, bool> engine::getRenderingBackendList()
+{
+  std::map<std::string, bool> backends;
+
+  backends["glx"] = engine::internals::BackendAvailable(context::glx);
+  backends["wgl"] = engine::internals::BackendAvailable(context::wgl);
+  backends["cocoa"] = engine::internals::BackendAvailable(context::cocoa);
+  backends["egl"] = engine::internals::BackendAvailable(context::egl);
+  backends["osmesa"] = engine::internals::BackendAvailable(context::osmesa);
+
+  return backends;
 }
 
 //----------------------------------------------------------------------------

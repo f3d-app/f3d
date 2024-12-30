@@ -404,7 +404,8 @@ PYBIND11_MODULE(pyf3d, module)
       "autoload_plugins", &f3d::engine::autoloadPlugins, "Automatically load internal plugins")
     .def_static("get_plugins_list", &f3d::engine::getPluginsList)
     .def_static("get_lib_info", &f3d::engine::getLibInfo, py::return_value_policy::reference)
-    .def_static("get_readers_info", &f3d::engine::getReadersInfo);
+    .def_static("get_readers_info", &f3d::engine::getReadersInfo)
+    .def_static("get_rendering_backend_list", &f3d::engine::getRenderingBackendList);
 
   // libInformation
   py::class_<f3d::engine::libInformation>(module, "LibInformation")

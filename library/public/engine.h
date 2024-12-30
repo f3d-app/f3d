@@ -199,6 +199,12 @@ public:
   [[nodiscard]] interactor& getInteractor();
 
   /**
+   * List rendering backends supported by libf3d.
+   * All backends have an associated boolean flag indicating if it can be used.
+   */
+  static std::map<std::string, bool> getRenderingBackendList();
+
+  /**
    * Load a plugin.
    * Supports full path, relative path, and plugin name.
    * First try to load the plugin by name from the static plugins.
