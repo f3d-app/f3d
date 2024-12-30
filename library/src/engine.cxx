@@ -1,13 +1,13 @@
 #include "engine.h"
 
 #include "config.h"
+#include "factory.h"
 #include "init.h"
 #include "interactor_impl.h"
 #include "log.h"
 #include "scene_impl.h"
+#include "utils.h"
 #include "window_impl.h"
-
-#include "factory.h"
 
 #include "vtkF3DNoRenderWindow.h"
 
@@ -279,7 +279,7 @@ void engine::loadPlugin(const std::string& pathOrName, const std::vector<fs::pat
     vtksys::DynamicLoader::LibraryHandle handle = nullptr;
     try
     {
-      fs::path fullPath(vtksys::SystemTools::CollapseFullPath(pathOrName));
+      fs::path fullPath(utils::collapsePath(pathOrName));
       if (fs::exists(fullPath))
       {
         // plugin provided as full path
