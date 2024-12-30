@@ -210,7 +210,7 @@ image::image(const fs::path& filePath)
       throw read_exception("Cannot read image " + filePath.string());
     }
   }
-  catch (const std::filesystem::filesystem_error& ex)
+  catch (const fs::filesystem_error& ex)
   {
     throw read_exception(std::string("Cannot read image: ") + ex.what());
   }
@@ -502,6 +502,9 @@ const image& image::save(const fs::path& filePath, SaveFormat format) const
 
   try
   {
+    // Ensure the directories exists
+    fs::create_directories(filePath.parent_path());
+
     writer->SetFileName(filePath.string().c_str());
     writer->SetInputData(this->Internals->Image);
     writer->Write();
@@ -511,7 +514,7 @@ const image& image::save(const fs::path& filePath, SaveFormat format) const
       throw write_exception("Cannot write " + filePath.string());
     }
   }
-  catch (const std::filesystem::filesystem_error& ex)
+  catch (const fs::filesystem_error& ex)
   {
     throw write_exception(std::string("Cannot write image: ") + ex.what());
   }
