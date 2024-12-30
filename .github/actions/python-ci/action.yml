@@ -4,6 +4,9 @@ inputs:
   lfs_sha:
     description: 'Cache LFS sha'
     required: true
+  python_version:
+    description: 'Python version'
+    required: true
 
 runs:
   using: "composite"
@@ -43,7 +46,7 @@ runs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.13'
+        python-version: ${{ inputs.python_version }}
 
     - name: Install Python dependencies
       shell: bash
@@ -99,7 +102,7 @@ runs:
       uses: actions/upload-artifact@v4
       with:
         path: ./source/*.whl
-        name: ${{runner.os}}-wheel
+        name: ${{runner.os}}-${{inputs.python_version}}-wheel
 
     - name: Install wheel
       shell: bash

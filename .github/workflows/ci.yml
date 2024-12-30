@@ -231,6 +231,18 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-13]
+        python_version: ['3.11']
+        include:
+          - os: ubuntu-latest
+            python_version: '3.9'
+          - os: ubuntu-latest
+            python_version: '3.10'
+          - os: ubuntu-latest
+            python_version: '3.11'
+          - os: ubuntu-latest
+            python_version: '3.12'
+          - os: ubuntu-latest
+            python_version: '3.13'
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-latest' && 'ghcr.io/f3d-app/f3d-ci' || null }}
@@ -251,6 +263,7 @@ jobs:
       uses: ./source/.github/actions/python-ci
       with:
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+        python_version: ${{matrix.python_version}}
 
 #----------------------------------------------------------------------------
 # Coverage: Build and test on linux with last VTK with coverage option
