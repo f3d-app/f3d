@@ -79,8 +79,6 @@ int TestSDKImage(int argc, char* argv[])
   f3d::image img32(width, height, channels, f3d::image::ChannelType::FLOAT);
 
   // test exceptions
-  test.expect<f3d::image::write_exception>(
-    "save buffer to incorrect path", [&]() { generated.save("/dummy/folder/img.png"); });
   test.expect<f3d::image::write_exception>("save incompatible buffer to BMP format",
     [&]() { std::ignore = img16.saveBuffer(f3d::image::SaveFormat::BMP); });
   test.expect<f3d::image::write_exception>("save incompatible buffer to PNG format",
@@ -121,7 +119,7 @@ int TestSDKImage(int argc, char* argv[])
   test.expect<f3d::image::read_exception>(
     "read invalid image", [&]() { f3d::image invalidImg(testingDir + "/data/invalid.png"); });
 
-  // check reading inexistent image
+  // check reading inexistent image, do not create a "/dummy/folder/img.png"
   test.expect<f3d::image::read_exception>(
     "read image from incorrect path", [&]() { f3d::image img("/dummy/folder/img.png"); });
 
@@ -320,5 +318,5 @@ int TestSDKImage(int argc, char* argv[])
   test("compare with negative threshold", !empty.compare(empty, -1, error) && error == 1.);
   test("compare with threshold == 1", !empty.compare(empty, 1, error) && error == 1.);
 
-  return EXIT_SUCCESS;
+  return test.result();
 }
