@@ -1,5 +1,5 @@
 [build-system]
-requires = ["scikit-build-core", "setuptools-scm>=8.0"]
+requires = ["scikit-build-core", "setuptools-scm>=8.0", "pybind11_stubgen"]
 build-backend = "scikit_build_core.build"
 
 [project]
@@ -28,10 +28,6 @@ classifiers = [
   "Topic :: Multimedia :: Graphics :: 3D Rendering",
   "Topic :: Multimedia :: Graphics :: Viewers",
   "Topic :: Scientific/Engineering :: Visualization",
-]
-
-dependencies = [
-  "pybind11_stubgen"
 ]
 
 [project.urls]
