@@ -49,7 +49,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20230426)
     )
 endif()
 
-if (VTK_VERSION VERSION_GREATER_EQUAL 9.2.6)
+if (VTK_VERSION VERSION_GREATER 9.2.6)
     list(APPEND libf3dSDKTests_list
         TestSDKEngineRecreation.cxx
         )
