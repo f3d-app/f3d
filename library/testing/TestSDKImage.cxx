@@ -127,7 +127,6 @@ int TestSDKImage(int argc, char* argv[])
   test.expect<f3d::image::read_exception>("read image from invalid path",
     [&]() { f3d::image img("/" + std::string(257, 'x') + "/file.ext"); });
 
-
   // check generated image with baseline
   test(
     "check generated image size", generated.getWidth() == width && generated.getHeight() == height);

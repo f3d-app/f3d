@@ -46,11 +46,10 @@ public:
   };
 
   /**
-   * Read provided file path (used as is) into a new image instance, the following formats are supported:
-   * PNG, PNM, TIFF, BMP, HDR, JPEG, GESigna, MetaImage, TGA.
-   * EXR files are also supported if the associated module is built.
-   * The complete list can be retrieve at runtime by calling `getSupportedFormats()`.
-   * Throw an `image::read_exception` in case of failure.
+   * Read provided file path (used as is) into a new image instance, the following formats are
+   * supported: PNG, PNM, TIFF, BMP, HDR, JPEG, GESigna, MetaImage, TGA. EXR files are also
+   * supported if the associated module is built. The complete list can be retrieve at runtime by
+   * calling `getSupportedFormats()`. Throw an `image::read_exception` in case of failure.
    */
   explicit image(const std::filesystem::path& filePath);
 
