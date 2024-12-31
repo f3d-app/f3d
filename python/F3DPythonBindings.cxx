@@ -294,6 +294,16 @@ PYBIND11_MODULE(pyf3d, module)
     .def("load_animation_time", &f3d::scene::loadAnimationTime)
     .def("animation_time_range", &f3d::scene::animationTimeRange);
 
+  // f3d::camera_state_t
+  py::class_<f3d::camera_state_t>(module, "CameraState")
+    .def(py::init<>())
+    .def(py::init<const f3d::point3_t&, const f3d::point3_t&, const f3d::vector3_t&,
+      const f3d::angle_deg_t&>())
+    .def_readwrite("position", &f3d::camera_state_t::position)
+    .def_readwrite("focal_point", &f3d::camera_state_t::focalPoint)
+    .def_readwrite("view_up", &f3d::camera_state_t::viewUp)
+    .def_readwrite("view_angle", &f3d::camera_state_t::viewAngle);
+
   // f3d::camera
   py::class_<f3d::camera, std::unique_ptr<f3d::camera, py::nodelete>> camera(module, "Camera");
   camera //
@@ -320,14 +330,6 @@ PYBIND11_MODULE(pyf3d, module)
     .def("reset_to_default", &f3d::camera::resetToDefault)
     .def("reset_to_bounds", &f3d::camera::resetToBounds, py::arg("zoom_factor") = 0.9);
 
-  py::class_<f3d::camera_state_t>(module, "CameraState")
-    .def(py::init<>())
-    .def(py::init<const f3d::point3_t&, const f3d::point3_t&, const f3d::vector3_t&,
-      const f3d::angle_deg_t&>())
-    .def_readwrite("position", &f3d::camera_state_t::position)
-    .def_readwrite("focal_point", &f3d::camera_state_t::focalPoint)
-    .def_readwrite("view_up", &f3d::camera_state_t::viewUp)
-    .def_readwrite("view_angle", &f3d::camera_state_t::viewAngle);
   // f3d::window
   py::class_<f3d::window, std::unique_ptr<f3d::window, py::nodelete>> window(module, "Window");
 
