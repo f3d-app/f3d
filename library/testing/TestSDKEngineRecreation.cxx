@@ -6,7 +6,7 @@
 int TestSDKEngineRecreation(int argc, char* argv[])
 {
   std::string filename = "TestSDKEngineRecreation";
-  std::string interactionFilePath = std::string(argv[1]) + "/recordings/" +filename + ".log";
+  std::string interactionFilePath = std::string(argv[1]) + "/recordings/" + filename + ".log";
   f3d::engine* eng = new f3d::engine(f3d::engine::create(false));
   eng->getInteractor().start(1 / 30, [eng]() { eng->getInteractor().stop(); });
   delete eng;
