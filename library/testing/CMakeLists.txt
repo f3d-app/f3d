@@ -28,7 +28,6 @@ if(F3D_MODULE_UI)
     TestSDKDynamicBackgroundColor.cxx
     TestSDKDynamicFontFile.cxx
     TestSDKDynamicProperties.cxx
-    TestSDKEngineRecreation.cxx
     TestSDKInteractorCallBack.cxx
     TestSDKInteractorDocumentation.cxx
     TestSDKMultiOptions.cxx
@@ -50,6 +49,12 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20230426)
     )
 endif()
 
+if (VTK_VERSION VERSION_GREATER_EQUAL 9.2.6)
+    list(APPEND libf3dSDKTests_list
+        TestSDKEngineRecreation.cxx
+        )
+endif()
+
 # Invalid scene codepath needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11287
 # Merge with TestSDKScene.cxx when VTK 9.4.0 is required.
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
@@ -63,8 +68,6 @@ configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestSDKInteractorCallBack.l
                "${CMAKE_BINARY_DIR}/TestSDKInteractorCallBack.log") # Dragon.vtu; S
 configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestSDKInteractorDropFullScene.log.in"
                "${CMAKE_BINARY_DIR}/TestSDKInteractorDropFullScene.log") # world.obj; S
-configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestSDKEngineRecreation.log.in"
-               "${CMAKE_BINARY_DIR}/TestSDKEngineRecreation.log") # world.obj; S
 
 # External window tests
 option(F3D_TESTING_ENABLE_EXTERNAL_GLFW "Test external GLFW" OFF)
