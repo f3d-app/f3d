@@ -44,11 +44,17 @@ public:
    * Linux: Try GLX, then EGL, then OSMesa
    * Windows: Try Win32, then EGL, then OSMesa
    * macOS: Always use Cocoa
+   * Throws a context::loading_exception if a needed graphic library cannot be loaded
+   * Throws a context::symbol_exception if a needed symbol cannot be found in graphic library
+   * Throws a engine::no_window_exception if the window cannot be created for another reason
+   * Throws a engine::cache_exception if the default cache directory cannot be used
    */
   [[nodiscard]] static engine create(bool offscreen = false);
 
   /**
    * Create an engine with no window.
+   * Throws a engine::no_window_exception if the window cannot be created for another reason
+   * Throws a engine::cache_exception if the default cache directory cannot be used
    */
   [[nodiscard]] static engine createNone();
 
@@ -57,7 +63,10 @@ public:
    * Works on Linux only.
    * VTK >= 9.4 required.
    * Optionally, the window can be hidden by setting offscreen to true.
-   * Throws engine::loading_exception in case of window creation failure.
+   * Throws a context::loading_exception if a needed graphic library cannot be loaded
+   * Throws a context::symbol_exception if a needed symbol cannot be found in graphic library
+   * Throws a engine::no_window_exception if the window cannot be created for another reason
+   * Throws a engine::cache_exception if the default cache directory cannot be used
    */
   [[nodiscard]] static engine createGLX(bool offscreen = false);
 
@@ -66,7 +75,10 @@ public:
    * Works on Windows only.
    * VTK >= 9.4 required.
    * Optionally, the window can be hidden by setting offscreen to true.
-   * Throws engine::loading_exception in case of window creation failure.
+   * Throws a context::loading_exception if a needed graphic library cannot be loaded
+   * Throws a context::symbol_exception if a needed symbol cannot be found in graphic library
+   * Throws a engine::no_window_exception if the window cannot be created for another reason
+   * Throws a engine::cache_exception if the default cache directory cannot be used
    */
   [[nodiscard]] static engine createWGL(bool offscreen = false);
 
@@ -75,14 +87,20 @@ public:
    * VTK >= 9.4 required.
    * If several GPU are available, the environment variable
    * `VTK_DEFAULT_EGL_DEVICE_INDEX` allows its selection.
-   * Throws engine::loading_exception in case of failure.
+   * Throws a context::loading_exception if a needed graphic library cannot be loaded
+   * Throws a context::symbol_exception if a needed symbol cannot be found in graphic library
+   * Throws a engine::no_window_exception if the window cannot be created for another reason
+   * Throws a engine::cache_exception if the default cache directory cannot be used
    */
   [[nodiscard]] static engine createEGL();
 
   /**
    * Create an engine with an offscreen OSMesa window.
    * VTK >= 9.4 required.
-   * Throws engine::loading_exception in case of window creation failure.
+   * Throws a context::loading_exception if a needed graphic library cannot be loaded
+   * Throws a context::symbol_exception if a needed symbol cannot be found in graphic library
+   * Throws a engine::no_window_exception if the window cannot be created for another reason
+   * Throws a engine::cache_exception if the default cache directory cannot be used
    */
   [[nodiscard]] static engine createOSMesa();
 
@@ -94,6 +112,8 @@ public:
    * \code{.cpp}
    *  f3d::engine eng = f3d::engine::createExternal(glfwGetProcAddress);
    * \endcode
+   * Throws a engine::no_window_exception if the window cannot be created for another reason
+   * Throws a engine::cache_exception if the default cache directory cannot be used
    */
   [[nodiscard]] static engine createExternal(const context::function& getProcAddress);
 
@@ -101,7 +121,10 @@ public:
    * Create an engine with an external GLX context.
    * Equivalent to createExternal(f3d::context::glx());
    * VTK >= 9.4 required.
-   * Throws context::loading_exception if GLX library is not found or if not running on Linux.
+   * Throws a context::loading_exception if a needed graphic library cannot be loaded
+   * Throws a context::symbol_exception if a needed symbol cannot be found in graphic library
+   * Throws a engine::no_window_exception if the window cannot be created for another reason
+   * Throws a engine::cache_exception if the default cache directory cannot be used
    */
   [[nodiscard]] static engine createExternalGLX();
 
@@ -109,7 +132,10 @@ public:
    * Create an engine with an external WGL context.
    * Equivalent to createExternal(f3d::context::wgl());
    * VTK >= 9.4 required.
-   * Throws context::loading_exception if WGL library is not found or if not running on Windows.
+   * Throws a context::loading_exception if a needed graphic library cannot be loaded
+   * Throws a context::symbol_exception if a needed symbol cannot be found in graphic library
+   * Throws a engine::no_window_exception if the window cannot be created for another reason
+   * Throws a engine::cache_exception if the default cache directory cannot be used
    */
   [[nodiscard]] static engine createExternalWGL();
 
@@ -117,7 +143,10 @@ public:
    * Create an engine with an external COCOA context.
    * Equivalent to createExternal(f3d::context::cocoa());
    * VTK >= 9.4 required.
-   * Throws context::loading_exception if WGL library is not found or if not running on Windows.
+   * Throws a context::loading_exception if a needed graphic library cannot be loaded
+   * Throws a context::symbol_exception if a needed symbol cannot be found in graphic library
+   * Throws a engine::no_window_exception if the window cannot be created for another reason
+   * Throws a engine::cache_exception if the default cache directory cannot be used
    */
   [[nodiscard]] static engine createExternalCOCOA();
 
@@ -125,7 +154,10 @@ public:
    * Create an engine with an external EGL context.
    * Equivalent to createExternal(f3d::context::egl());
    * VTK >= 9.4 required.
-   * Throws context::loading_exception if EGL library is not found.
+   * Throws a context::loading_exception if a needed graphic library cannot be loaded
+   * Throws a context::symbol_exception if a needed symbol cannot be found in graphic library
+   * Throws a engine::no_window_exception if the window cannot be created for another reason
+   * Throws a engine::cache_exception if the default cache directory cannot be used
    */
   [[nodiscard]] static engine createExternalEGL();
 
@@ -133,7 +165,10 @@ public:
    * Create an engine with an external OSMesa context.
    * Equivalent to createExternal(f3d::context::osmesa());
    * VTK >= 9.4 required.
-   * Throws context::loading_exception if OSMesa library is not found.
+   * Throws a context::loading_exception if a needed graphic library cannot be loaded
+   * Throws a context::symbol_exception if a needed symbol cannot be found in graphic library
+   * Throws a engine::no_window_exception if the window cannot be created for another reason
+   * Throws a engine::cache_exception if the default cache directory cannot be used
    */
   [[nodiscard]] static engine createExternalOSMesa();
 
@@ -153,14 +188,15 @@ public:
   //@}
 
   /**
-   * Set the cache path. Must be an absolute path.
+   * Set the cache path. The provided path is used as is.
    * Currently, it's only used to store HDRI baked textures.
    * By default, the cache path is:
    * - Windows: %LOCALAPPDATA%\f3d
    * - Linux: ~/.cache/f3d
    * - macOS: ~/Library/Caches/f3d
+   * Throw a cache_exception if the provided cachePath cannot be used.
    */
-  engine& setCachePath(const std::string& cachePath);
+  engine& setCachePath(const std::filesystem::path& cachePath);
 
   /**
    * Engine provide a default options that you can use using engine::getOptions().
@@ -199,20 +235,26 @@ public:
   [[nodiscard]] interactor& getInteractor();
 
   /**
+   * List rendering backends supported by libf3d.
+   * All backends have an associated boolean flag indicating if it can be used.
+   */
+  static std::map<std::string, bool> getRenderingBackendList();
+
+  /**
    * Load a plugin.
-   * Supports full path, relative path, and plugin name.
+   * The provided pathOrName can be a full path, relative path, or plugin name.
    * First try to load the plugin by name from the static plugins.
    * Then try to load the path provided as if it is a full path to a plugin.
-   * Then try to load a plugin by its name looking into the provided plugin search paths.
-   * Then try to load a plugin by its name relying on internal system (eg: LD_LIBRARY_PATH).
+   * Then try to load a plugin by its name looking into the provided plugin search paths (used as
+   * is). Then try to load a plugin by its name relying on internal system (eg: LD_LIBRARY_PATH).
    * The plugin "native" is always available and includes native VTK readers.
    * If built and available in your build, F3D is providing 5 additional plugins:
    * "alembic", "assimp", "draco", "exodus", "occt", "usd".
    * Custom plugins can also be available that F3D is not supporting officially.
    * Throw a plugin_exception if the plugin can't be loaded for some reason.
    */
-  static void loadPlugin(
-    const std::string& nameOrPath, const std::vector<std::string>& pluginSearchPaths = {});
+  static void loadPlugin(const std::string& pathOrName,
+    const std::vector<std::filesystem::path>& pluginSearchPaths = {});
 
   /**
    * Automatically load all the static plugins.
@@ -221,11 +263,14 @@ public:
   static void autoloadPlugins();
 
   /**
-   * List plugins based on associated json files located in the given directory.
+   * List plugins based on associated json files located in the given directory, used as is.
    * Listed plugins can be loaded using engine::loadPlugin function.
    * Note that the listed plugins may fail to load if the library is not found or incompatible.
+   * Return available plugins if any, or an empty vector if there are none or the provided path does
+   * not exist.
    */
-  [[nodiscard]] static std::vector<std::string> getPluginsList(const std::string& pluginPath);
+  [[nodiscard]] static std::vector<std::string> getPluginsList(
+    const std::filesystem::path& pluginPath);
 
   /**
    * A structure providing information about the libf3d.
@@ -294,6 +339,15 @@ public:
   struct plugin_exception : public exception
   {
     explicit plugin_exception(const std::string& what = "");
+  };
+
+  /**
+   * An exception that can be thrown by the engine
+   * when the cache cannot be used
+   */
+  struct cache_exception : public exception
+  {
+    explicit cache_exception(const std::string& what = "");
   };
 
 private:

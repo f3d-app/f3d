@@ -129,6 +129,7 @@ function(f3d_test)
 
   set(f3d_test_env_vars ${F3D_TEST_ENV})
   list(APPEND f3d_test_env_vars "CTEST_F3D_PROGRESS_BAR=1")
+  list(APPEND f3d_test_env_vars "CTEST_F3D_CONSOLE_BADGE=1")
   if (F3D_TEST_NO_DATA_FORCE_RENDER)
     list(APPEND f3d_test_env_vars "CTEST_F3D_NO_DATA_FORCE_RENDER=1")
   endif ()
@@ -327,7 +328,19 @@ endif()
 # Test plugin fail code path
 f3d_test(NAME TestPluginVerbose ARGS --verbose REGEXP "Loading plugin \"native\"" NO_BASELINE)
 f3d_test(NAME TestPluginNonExistent ARGS --load-plugins=dummy REGEXP "Plugin failed to load" NO_BASELINE)
-f3d_test(NAME TestPluginInvalid ARGS --load-plugins=${F3D_SOURCE_DIR}/testing/data/invalid.so REGEXP "Cannot open the library" NO_BASELINE)
+if(WIN32)
+  set(_TEST_PLUGIN_INVALID_REGEXP "is not a valid Win32 application")
+elseif(APPLE)
+  set(_TEST_PLUGIN_INVALID_REGEXP "not a mach-o file")
+else()
+  set(_TEST_PLUGIN_INVALID_REGEXP "file too short")
+endif()
+f3d_test(NAME TestPluginInvalid ARGS --load-plugins=${F3D_SOURCE_DIR}/testing/data/invalid.so REGEXP ${_TEST_PLUGIN_INVALID_REGEXP} NO_BASELINE)
+
+if(UNIX AND NOT APPLE)
+  f3d_test(NAME TestPluginInvalidSystem ARGS --verbose --load-plugins=invalid REGEXP "file too short" ENV "LD_LIBRARY_PATH=${F3D_SOURCE_DIR}/testing/data" NO_BASELINE)
+endif()
+
 if(WIN32)
   set(_dirname "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 else()
@@ -793,7 +806,6 @@ f3d_test(NAME TestInteractionConfigFileNoColorBar DATA multi CONFIG ${F3D_SOURCE
 f3d_test(NAME TestInteractionConfigFileBindings DATA dragon.vtu CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json INTERACTION UI) #Ctrl+Shift+O;Ctrl+O;Shift+O;O;3
 f3d_test(NAME TestInteractionConfigFileMulti DATA multi CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI) #SY;Right;XG;Right;N;Right;Right
 f3d_test(NAME TestInteractionConfigFileAndCommand DATA multi ARGS -o CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI) #OX;Right;N;Right;Right;Right
-f3d_test(NAME TestInteractionDumpSceneState DATA dragon.vtu NO_BASELINE INTERACTION REGEXP "Camera position: 2.23745,3.83305,507.598")#?
 f3d_test(NAME TestInteractionCycleVerbose DATA dragon.vtu ARGS --verbose -s NO_BASELINE INTERACTION REGEXP "Not coloring")#SSSSYC
 f3d_test(NAME TestInteractionEmptyDrop INTERACTION REGEXP "Drop event without any provided files.")#DropEvent Empty;
 f3d_test(NAME TestInteractionCameraUpdate DATA dragon.vtu INTERACTION) #MouseWheel;MouseWheel;MouseWheel;S
@@ -821,6 +833,7 @@ f3d_test(NAME TestInteractionConsoleOpenWarningClick DATA f3d.glb ARGS --positio
 f3d_test(NAME TestInteractionConsoleToggleGrid DATA f3d.glb INTERACTION UI) #Escape;toggle render.grid.enable;Return;Escape
 f3d_test(NAME TestInteractionConsoleInvalidCommand DATA f3d.glb INTERACTION UI) #Escape;foo;Return
 f3d_test(NAME TestInteractionConsoleInvalidOption DATA f3d.glb INTERACTION UI) #Escape;toggle foo;Return
+f3d_test(NAME TestInteractionConsoleClear DATA dragon.vtu INTERACTION UI) #Escape;e;Escape;printt;BackSpace;_scee;Left;n;Right;_info;Return;clear;Return
 f3d_test(NAME TestInteractionConsoleTypingSceneInfo DATA f3d.glb INTERACTION UI) #Escape;e;Escape;printt;BackSpace;_scee;Left;Right;_info;Return
 
 if (F3D_MODULE_TINYFILEDIALOGS)
@@ -887,6 +900,10 @@ f3d_test(NAME TestInteractionPlay DATA cow.vtp ARGS --interaction-test-play=${CM
 f3d_test(NAME TestCommandScriptBasic DATA dragon.vtu SCRIPT TestCommandScriptBasic.txt --reference=${F3D_SOURCE_DIR}/testing/baselines/TestCommandScriptBasic.png)
 f3d_test(NAME TestCommandScriptInvalidCommand DATA dragon.vtu SCRIPT TestCommandScriptInvalid.txt REGEXP "Command: \"INVALID_COMMAND_1\" is not recognized, ignoring" NO_BASELINE)
 f3d_test(NAME TestCommandScriptMissingFile DATA dragon.vtu SCRIPT TestCommandScriptMissingFile.txt REGEXP "Unable to open command script file" NO_BASELINE)
+f3d_test(NAME TestCommandScriptPrintScene DATA dragon.vtu SCRIPT TestCommandScriptPrintScene.txt REGEXP "Camera position: 2.23745,3.83305,507.598" NO_BASELINE) # print_scene_info
+f3d_test(NAME TestCommandScriptPrintColoring DATA dragon.vtu SCRIPT TestCommandScriptPrintColoring.txt REGEXP "Not coloring" NO_BASELINE) # print_coloring_info
+f3d_test(NAME TestCommandScriptPrintMesh DATA dragon.vtu SCRIPT TestCommandScriptPrintMesh.txt REGEXP "Number of points: 13268" NO_BASELINE) # print_mesh_info
+f3d_test(NAME TestCommandScriptPrintOptions DATA dragon.vtu SCRIPT TestCommandScriptPrintOptions.txt REGEXP "interactor.invert_zoom: false" NO_BASELINE) # print_options_info
 f3d_test(NAME TestParseOptionalBoolExtraArg DATA dragon.vtu SCRIPT TestParseOptionalBoolExtraArg.txt REGEXP "Command: load_previous_file_group takes at most 1 argument, got 2 arguments instead." NO_BASELINE)
 
 # Window position test
@@ -1039,9 +1056,9 @@ f3d_test(NAME TestConfigFileNoOptions DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/test
 # Test update interaction verbose
 f3d_test(NAME TestConfigFileBindingsVerbose DATA dragon.vtu ARGS --verbose CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json REGEXP "'Shift.O' : '`toggle model.point_sprites.enable` '" NO_BASELINE)
 
-# Test bindings-list display with config file
-f3d_test(NAME TestConfigFileBindingsList ARGS --bindings-list CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json REGEXP "Ctrl.Shift.O `toggle ui.filename`" NO_BASELINE)
-f3d_test(NAME TestConfigFileBindingsListData DATA dragon.vtu ARGS --bindings-list CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json REGEXP "Any.3        `roll_camera 90`" NO_BASELINE)
+# Test list-bindings display with config file
+f3d_test(NAME TestConfigFileBindingsList ARGS --list-bindings CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json REGEXP "Ctrl.Shift.O `toggle ui.filename`" NO_BASELINE)
+f3d_test(NAME TestConfigFileBindingsListData DATA dragon.vtu ARGS --list-bindings CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json REGEXP "Any.3        `roll_camera 90`" NO_BASELINE)
 
 # Test invalid value in config file
 f3d_test(NAME TestConfigFileInvalidValue DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/invalid_value.json REGEXP "must be a string, a boolean or a number" NO_BASELINE)
@@ -1068,19 +1085,19 @@ f3d_test(NAME TestHelpPositional ARGS --help REGEXP "file1 file2 \.\.\.")
 # Test version display
 f3d_test(NAME TestVersion ARGS --version REGEXP "Version:")
 
-# Test readers-list display
-f3d_test(NAME TestReadersList ARGS --readers-list REGEXP_FAIL "No registered reader found")
+# Test list-readers display
+f3d_test(NAME TestReadersList ARGS --list-readers REGEXP_FAIL "No registered reader found")
 
 # Test invalid component string coverage
 f3d_test(NAME TestInteractionInvalidComponent INTERACTION UI DATA cow.vtp ARGS --coloring-component=1 NO_BASELINE) #H
 
-# Test multi plugin readers-lists
+# Test multi plugin list-readers
 if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
-  f3d_test(NAME TestReadersListMultiplePlugins ARGS --readers-list --load-plugins=assimp,alembic NO_BASELINE REGEXP_FAIL "Plugin failed to load")
+  f3d_test(NAME TestReadersListMultiplePlugins ARGS --list-readers --load-plugins=assimp,alembic NO_BASELINE REGEXP_FAIL "Plugin failed to load")
 endif()
 
 # Test bindings-list display
-f3d_test(NAME TestBindingsList ARGS --bindings-list REGEXP "Any.Question Print scene descr to terminal")
+f3d_test(NAME TestBindingsList ARGS --list-bindings REGEXP "Any.5        Toggle Orthographic Projection")
 
 # Test rendering backends
 # For some reason the sanitizer detects leaks because of EGL and OSMesa
@@ -1155,6 +1172,25 @@ f3d_test(NAME TestHelpPrecedenceWithUnknownOption ARGS --help --unknown REGEXP "
 
 # Test that --version is displayed even when there is an unknown option
 f3d_test(NAME TestVersionPrecedenceWithUnknownOption ARGS --version --unknown REGEXP "Version:" NO_BASELINE)
+
+# Test rendering backend list
+if(WIN32)
+  f3d_test(NAME TestRenderingBackenListWGL ARGS --list-rendering-backends NO_RENDER NO_BASELINE REGEXP "wgl: available")
+elseif(APPLE)
+  f3d_test(NAME TestRenderingBackenListCOCOA ARGS --list-rendering-backends NO_RENDER NO_BASELINE REGEXP "cocoa: available")
+endif()
+
+if(F3D_TESTING_ENABLE_GLX_TESTS AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240914)
+  f3d_test(NAME TestRenderingBackenListGLX ARGS --list-rendering-backends NO_RENDER NO_BASELINE REGEXP "glx: available")
+endif()
+
+if(F3D_TESTING_ENABLE_EGL_TESTS AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240914)
+  f3d_test(NAME TestRenderingBackenListEGL ARGS --list-rendering-backends NO_RENDER NO_BASELINE REGEXP "egl: available")
+endif()
+
+if(F3D_TESTING_ENABLE_OSMESA_TESTS)
+  f3d_test(NAME TestRenderingBackenListOSMesa ARGS --list-rendering-backends NO_RENDER NO_BASELINE REGEXP "osmesa: available")
+endif()
 
 # Test scan plugins
 if(NOT F3D_MACOS_BUNDLE)

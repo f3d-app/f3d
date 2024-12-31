@@ -7,6 +7,11 @@
 #include "window_impl.h"
 
 #include "vtkF3DConsoleOutputWindow.h"
+
+#if F3D_MODULE_UI
+#include "vtkF3DImguiConsole.h"
+#endif
+
 #include "vtkF3DInteractorEventRecorder.h"
 #include "vtkF3DInteractorStyle.h"
 #include "vtkF3DRenderer.h"
@@ -608,6 +613,17 @@ interactor& interactor_impl::initCommands()
       check_args(args, 1, "reset");
       this->Internals->Options.reset(args[0]);
     });
+  this->addCommand("clear",
+    [&](const std::vector<std::string>& args)
+    {
+      check_args(args, 0, "clear");
+#if F3D_MODULE_UI
+      vtkF3DImguiConsole* console =
+        vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
+      assert(console != nullptr);
+      console->Clear();
+#endif
+    });
   this->addCommand("print",
     [&](const std::vector<std::string>& args)
     {
@@ -668,9 +684,26 @@ interactor& interactor_impl::initCommands()
 
   this->addCommand("print_scene_info",
     [&](const std::vector<std::string>&)
+    { this->Internals->Window.PrintSceneDescription(log::VerboseLevel::INFO); });
+
+  this->addCommand("print_coloring_info",
+    [&](const std::vector<std::string>&)
+    { this->Internals->Window.PrintColoringDescription(log::VerboseLevel::INFO); });
+
+  this->addCommand("print_mesh_info",
+    [&](const std::vector<std::string>&)
+    { this->Internals->Scene.PrintImporterDescription(log::VerboseLevel::INFO); });
+
+  this->addCommand("print_options_info",
+    [&](const std::vector<std::string>&)
     {
-      this->Internals->Window.PrintColoringDescription(log::VerboseLevel::INFO);
-      this->Internals->Window.PrintSceneDescription(log::VerboseLevel::INFO);
+      for (const std::string& option : this->Internals->Options.getNames())
+      {
+        const std::string val{ this->Internals->Options.getAsString(option) };
+        std::string descr{};
+        descr.append(option).append(": ").append(val);
+        log::print(log::VerboseLevel::INFO, descr);
+      }
     });
 
   this->addCommand("set_camera",
@@ -934,7 +967,6 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "H"}, "toggle ui.cheatsheet", "Others", std::bind(docStr, "Toggle cheatsheet display"));
   this->addBinding({mod_t::NONE, "Escape"}, "toggle ui.console", "Others", std::bind(docStr, "Toggle console display"));
 #endif
-  this->addBinding({mod_t::ANY, "Question"}, "print_scene_info", "Others", std::bind(docStr, "Print scene descr to terminal"));
   this->addBinding({mod_t::CTRL, "Q"}, "stop_interactor", "Others", std::bind(docStr, "Stop the interactor"));
   this->addBinding({mod_t::NONE, "Return"}, "reset_camera", "Others", std::bind(docStr, "Reset camera to initial parameters"));
   this->addBinding({mod_t::NONE, "Space"}, "toggle_animation", "Others", std::bind(docStr, "Play/Pause animation if any"));
@@ -1046,14 +1078,13 @@ std::vector<interaction_bind_t> interactor_impl::getBinds() const
 std::pair<std::string, std::string> interactor_impl::getBindingDocumentation(
   const interaction_bind_t& bind) const
 {
-  std::vector<std::tuple<std::string, std::string, std::string>> doc;
-  auto it = this->Internals->Bindings.find(bind);
+  const auto& it = this->Internals->Bindings.find(bind);
   if (it == this->Internals->Bindings.end())
   {
     throw interactor_impl::does_not_exists_exception(
       std::string("Bind: ") + bind.format() + " does not exists");
   }
-  auto docFunc = it->second.DocumentationCallback;
+  const auto& docFunc = it->second.DocumentationCallback;
   return docFunc ? docFunc() : std::make_pair(std::string(), std::string());
 }
 

@@ -49,6 +49,12 @@ void vtkF3DUIActor::SetConsoleVisibility(bool show)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DUIActor::SetConsoleBadgeEnabled(bool enabled)
+{
+  this->ConsoleBadgeEnabled = enabled;
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DUIActor::SetCheatSheet(const std::vector<CheatSheetGroup>& cheatsheet)
 {
   this->CheatSheet = cheatsheet;
@@ -113,7 +119,7 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
   {
     this->RenderConsole();
   }
-  else
+  else if (this->ConsoleBadgeEnabled)
   {
     this->RenderConsoleBadge();
   }

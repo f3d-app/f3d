@@ -12,7 +12,8 @@ int TestSDKEngine(int argc, char* argv[])
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
 
   // clang-format off
-  // Load all plugins, built or not
+  // Load all plugins, built or not, already loaded or not
+  try { f3d::engine::loadPlugin("native", {argv[3]}); } catch (...) {}
   try { f3d::engine::loadPlugin("alembic", {argv[3]}); } catch (...) {}
   try { f3d::engine::loadPlugin("assimp", {argv[3]}); } catch (...) {}
   try { f3d::engine::loadPlugin("draco", {argv[3]}); } catch (...) {}
@@ -70,6 +71,10 @@ int TestSDKEngine(int argc, char* argv[])
     std::cerr << "Unexpected readersInfo output" << std::endl;
     return EXIT_FAILURE;
   }
+
+  // coverage for getPluginList
+  std::ignore = f3d::engine::getPluginsList(std::string(argv[1]) + "configs");
+  std::ignore = f3d::engine::getPluginsList("inexistent");
 
   return EXIT_SUCCESS;
 }

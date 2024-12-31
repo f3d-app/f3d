@@ -27,7 +27,7 @@ using OptionsEntries = std::vector<OptionsEntry>;
 static inline const OptionsDict DefaultAppOptions = {
   { "input", "" },
   { "output", "" },
-  { "bindings-list", "false" },
+  { "list-bindings", "false" },
   { "no-background", "false" },
   { "config", "" },
   { "no-config", "false" },

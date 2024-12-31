@@ -15,6 +15,7 @@
 #include "log.h"
 #include "window.h"
 
+#include <filesystem>
 #include <memory>
 #include <optional>
 
@@ -108,7 +109,7 @@ public:
    * Implementation only API.
    * Set the cache path.
    */
-  void SetCachePath(const std::string& cachePath);
+  void SetCachePath(const std::filesystem::path& cachePath);
 
   /**
    * Implementation only API.
