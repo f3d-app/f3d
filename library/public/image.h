@@ -46,7 +46,7 @@ public:
   };
 
   /**
-   * Create an image from provided file path, used as is, the following formats are supported:
+   * Read provided file path (used as is) into a new image instance, the following formats are supported:
    * PNG, PNM, TIFF, BMP, HDR, JPEG, GESigna, MetaImage, TGA.
    * EXR files are also supported if the associated module is built.
    * The complete list can be retrieve at runtime by calling `getSupportedFormats()`.
