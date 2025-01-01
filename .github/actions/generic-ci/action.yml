@@ -144,7 +144,7 @@ runs:
         --warn-uninitialized
         -DBUILD_SHARED_LIBS=${{ inputs.static_label == 'static' && 'OFF' || 'ON' }}
         -DBUILD_TESTING=ON
-        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_BUILD_TYPE=Debug
         -DCMAKE_INSTALL_PREFIX:PATH=../install
         -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
         -DCMAKE_POLICY_DEFAULT_CMP0091=NEW

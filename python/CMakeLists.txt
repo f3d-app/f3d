@@ -8,7 +8,7 @@ list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_LIST_DIR}/cmake")
 include(GNUInstallDirs)
 include(f3dPython)
 
-find_package(Python 3.8 COMPONENTS Interpreter Development)
+find_package(Python 3.9 COMPONENTS Interpreter Development)
 find_package(pybind11 2.2 REQUIRED)
 
 pybind11_add_module(pyf3d MODULE F3DPythonBindings.cxx)
