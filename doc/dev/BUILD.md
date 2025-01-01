@@ -20,6 +20,8 @@ please take a look at our [getting started guide](GETTING_STARTED.md).
 * Optionally, [Java](https://www.java.com) >= 18.
 * Optionally, [OpenEXR](https://openexr.com/en/latest/) >= 3.0.
 
+F3D is tested continuously against versions recommended by the [VFX reference platform](https://vfxplatform.com) defined for **CY2025**
+
 ## VTK compatibility
 
 As stated in the dependencies, F3D is compatible with VTK >= 9.2.6, however, some features may not be available. We suggest using VTK 9.4.1 with RenderingRayTracing, IOExodus and IOOpenVDB modules enabled in order to get as many features as possible in F3D.
