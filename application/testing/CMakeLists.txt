@@ -890,8 +890,8 @@ f3d_test(NAME TestUnsupportedInputOutput DATA unsupportedFile.dummy REGEXP "No f
 f3d_test(NAME TestOutputNoBackground DATA cow.vtp ARGS --no-background NO_BASELINE)
 
 # Basic record and play test
-f3d_test(NAME TestInteractionRecord DATA cow.vtp ARGS --interaction-test-record=${CMAKE_BINARY_DIR}/Testing/Temporary/interaction.log NO_BASELINE)
-f3d_test(NAME TestInteractionPlay DATA cow.vtp ARGS --interaction-test-play=${CMAKE_BINARY_DIR}/Testing/Temporary/interaction.log DEPENDS TestInteractionRecord NO_BASELINE)
+f3d_test(NAME TestInteractionRecord DATA cow.vtp ARGS --interaction-test-record=${CMAKE_BINARY_DIR}/Testing/Temporary/TestInteractionRecord.log NO_BASELINE)
+f3d_test(NAME TestInteractionPlay DATA cow.vtp ARGS --interaction-test-play=${CMAKE_BINARY_DIR}/Testing/Temporary/TestInteractionRecord.log DEPENDS TestInteractionRecord NO_BASELINE)
 
 # Command Script Test
 f3d_test(NAME TestCommandScriptBasic DATA dragon.vtu SCRIPT TestCommandScriptBasic.txt --reference=${F3D_SOURCE_DIR}/testing/baselines/TestCommandScriptBasic.png)
@@ -1161,6 +1161,8 @@ if(NOT WIN32)
   f3d_test(NAME TestHOMEInput ARGS --input=~/testing/data/suzanne.stl ENV "HOME=${F3D_SOURCE_DIR}")
   f3d_test(NAME TestHOMEConfig DATA suzanne.stl CONFIG ~/testing/configs/complex.json ENV "HOME=${F3D_SOURCE_DIR}")
   f3d_test(NAME TestHOMEPlugin ARGS --load-plugins=~/testing/data/invalid.so REGEXP "Cannot open the library" NO_BASELINE ENV "HOME=${F3D_SOURCE_DIR}")
+  f3d_test(NAME TestHOMEInteractionRecord DATA cow.vtp ARGS --interaction-test-record=~/Testing/Temporary/TestHOMEInteractionRecord.log NO_BASELINE ENV "HOME=${CMAKE_BINARY_DIR}")
+  f3d_test(NAME TestHOMEInteractionPlay DATA cow.vtp ARGS --interaction-test-play=~/Testing/Temporary/TestHOMEInteractionRecord.log DEPENDS TestHOMEInteractionRecord NO_BASELINE ENV "HOME=${CMAKE_BINARY_DIR}")
 endif()
 
 # Test failure without a reference, please do not create a TestNoRef.png file

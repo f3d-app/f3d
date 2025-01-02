@@ -945,8 +945,7 @@ int F3DStarter::Start(int argc, char** argv)
     }
 
     // Play recording if any
-    const std::string& interactionTestPlayFile =
-      this->Internals->AppOptions.InteractionTestPlayFile;
+    fs::path interactionTestPlayFile(f3d::utils::collapsePath(this->Internals->AppOptions.InteractionTestPlayFile));
     if (!interactionTestPlayFile.empty())
     {
       // For better testing, render once before the interaction
@@ -958,8 +957,7 @@ int F3DStarter::Start(int argc, char** argv)
     }
 
     // Start recording if needed
-    const std::string& interactionTestRecordFile =
-      this->Internals->AppOptions.InteractionTestRecordFile;
+    fs::path interactionTestRecordFile(f3d::utils::collapsePath(this->Internals->AppOptions.InteractionTestRecordFile));
     if (!interactionTestRecordFile.empty())
     {
       if (!interactor.recordInteraction(interactionTestRecordFile))
