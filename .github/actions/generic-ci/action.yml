@@ -200,6 +200,12 @@ runs:
       with:
         path: ${{github.workspace}}\build\bin_Release
 
+    - name: Install Mesa Windows Python
+      if: runner.os == 'Windows'
+      uses: f3d-app/install-mesa-windows-action@v1
+      with:
+        path: ${{github.workspace}}\build\Release\f3d
+
     # A EGL test is crashing in the CI but not locally
     - name: Set CI test exception for Linux EGL
       if:
