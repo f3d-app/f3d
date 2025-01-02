@@ -14,6 +14,7 @@
 #include "vtkF3DMetaImporter.h"
 #include "vtkF3DUIActor.h"
 
+#include <vtkDiscretizableColorTransferFunction.h>
 #include <vtkLight.h>
 #include <vtkOpenGLRenderer.h>
 
@@ -283,6 +284,16 @@ public:
    * Setting an empty vector will use default color map
    */
   void SetColormap(const std::vector<double>& colormap);
+
+  /**
+   * Set the discretization of the colormap
+   */
+  void SetColorDiscretization(const int discretization);
+
+  /**
+   * Set the discretization of the colormap
+   */
+  void SetColorDiscretization(const int discretization);
 
   /**
    * Set the meta importer to recover coloring information from
@@ -560,6 +571,12 @@ private:
   vtkF3DMetaImporter* Importer = nullptr;
   vtkMTimeType ImporterTimeStamp = 0;
   vtkMTimeType ImporterUpdateTimeStamp = 0;
+
+  int Discretization = 256;
+
+  vtkNew<vtkDiscretizableColorTransferFunction> DiscretizableColorTransferFunction;
+  bool DiscretizableColorTransferFunctionConfigured = false;
+  int Discretization = 256;
 
   vtkNew<vtkScalarBarActor> ScalarBarActor;
   bool ScalarBarActorConfigured = false;
