@@ -65,10 +65,10 @@ fs::path Find(const std::string& str)
     f3d::log::error("Unable to look for color map ", str, ": ", ex.what());
   }
 
-  return fs::path();
+  return {};
 }
 
-std::vector<double> Read(const std::string& path)
+std::vector<double> Read(const fs::path& path)
 {
   try
   {

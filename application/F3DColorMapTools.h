@@ -14,7 +14,7 @@
 namespace F3DColorMapTools
 {
 std::filesystem::path Find(const std::string& str);
-std::vector<double> Read(const std::string& path);
+std::vector<double> Read(const std::filesystem::path& path);
 }
 
 #endif
