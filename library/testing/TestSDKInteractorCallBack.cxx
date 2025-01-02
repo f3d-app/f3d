@@ -153,8 +153,24 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
     std::cerr << "Unexcepted error playing interaction" << std::endl;
     return EXIT_FAILURE;
   }
-  return TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
-           filename + "DefaultAgain")
-    ? EXIT_SUCCESS
-    : EXIT_FAILURE;
+  if (!TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
+           filename + "DefaultAgain"))
+  {
+    std::cerr << "Unexcepted rendering playing interaction" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  // Check error handling
+  if (inter.recordInteraction("/" + std::string(257, 'x') + "/record.ext"))
+  {
+    std::cerr << "Unexcepted success recording an invalid path" << std::endl;
+    return EXIT_FAILURE;
+  }
+  if (inter.playInteraction("/" + std::string(257, 'x') + "/play.ext"))
+  {
+    std::cerr << "Unexcepted success playing an invalid path" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  return EXIT_SUCCESS;
 }

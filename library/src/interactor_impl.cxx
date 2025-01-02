@@ -1182,21 +1182,8 @@ bool interactor_impl::recordInteraction(const fs::path& file)
 
   try
   {
-    // Check if the parent directory exists
-    fs::path parentDirectory = file.parent_path();
-    if (!fs::exists(parentDirectory))
-    {
-      log::error("Interaction record directory does not exist ", parentDirectory.string());
-      return false;
-    }
-
-    // Check if we can write to the directory
-    // XXX: Implement using std::filesystem
-    if (!vtksys::SystemTools::TestFileAccess(parentDirectory.string(), vtksys::TEST_FILE_WRITE))
-    {
-      log::error("Don't have write permissions for ", parentDirectory);
-      return false;
-    }
+    // Ensure parent directories exists
+    fs::create_directories(file.parent_path());
 
     // Make sure the recorder is off and streams are cleared
     this->Internals->Recorder->Off();

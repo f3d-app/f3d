@@ -232,7 +232,7 @@ public:
 
   /**
    * Start interaction and record it all in a VTK interaction file.
-   * Provided file path will be used as is and the parent directory of the file will be checked for writability
+   * Provided file path will be used as is and the parent directories of the file will be created
    */
   virtual bool recordInteraction(const std::filesystem::path& file) = 0;
 
