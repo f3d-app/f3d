@@ -1142,18 +1142,16 @@ bool interactor_impl::playInteraction(
       log::error("Interaction record file to play does not exist ", file.string());
       return false;
     }
-    else
-    {
-      // Make sure the recorder is off and streams are cleared
-      this->Internals->Recorder->Off();
-      this->Internals->Recorder->Clear();
 
-      this->Internals->StartEventLoop(loopTime, std::move(userCallBack));
-      this->Internals->Recorder->SetFileName(file.string().c_str());
-      this->Internals->Recorder->Play();
+    // Make sure the recorder is off and streams are cleared
+    this->Internals->Recorder->Off();
+    this->Internals->Recorder->Clear();
 
-      this->Internals->StopEventLoop();
-    }
+    this->Internals->StartEventLoop(loopTime, std::move(userCallBack));
+    this->Internals->Recorder->SetFileName(file.string().c_str());
+    this->Internals->Recorder->Play();
+
+    this->Internals->StopEventLoop();
   }
   catch (const std::filesystem::filesystem_error& ex)
   {
