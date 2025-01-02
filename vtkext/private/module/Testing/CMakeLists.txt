@@ -13,7 +13,8 @@ set(test_sources
 if(F3D_MODULE_EXR)
   list(APPEND test_sources
        TestF3DEXRReader.cxx
-       TestF3DEXRReaderInvalid.cxx)
+       TestF3DEXRReaderInvalid.cxx
+       TestF3DEXRMemReader.cxx)
 endif()
 
 vtk_add_test_cxx(vtkextPrivateTests tests
