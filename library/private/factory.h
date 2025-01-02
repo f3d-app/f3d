@@ -17,6 +17,7 @@
 #include "reader.h"
 
 #include <map>
+#include <optional>
 #include <vector>
 
 namespace f3d
@@ -57,6 +58,16 @@ public:
    */
   plugin_initializer_t getStaticInitializer(const std::string& pluginName);
 
+  /**
+   * Set preferred reader
+   */
+  bool setPreferredReader(const std::string& preferredReader);
+
+  /**
+   * Get preferred reader
+   */
+  std::optional<std::string_view> getPreferredReader();
+
 protected:
   factory();
   virtual ~factory() = default;
@@ -66,6 +77,8 @@ protected:
   std::vector<plugin*> Plugins;
 
   std::map<std::string, plugin_initializer_t> StaticPluginInitializers;
+
+  std::optional<std::string> Reader;
 };
 }
 #endif

@@ -126,6 +126,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "anti-aliasing", "render.effect.anti_aliasing" },
   { "tone-mapping", "render.effect.tone_mapping" },
   { "final-shader", "render.effect.final_shader" },
+  { "reader", "render.reader" },
 };
 
 /**

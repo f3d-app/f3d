@@ -28,6 +28,9 @@
     }
   },
   "render": {
+    "reader": {
+      "type": "string"
+    },
     "show_edges": {
       "type": "bool"
     },

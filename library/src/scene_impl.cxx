@@ -11,6 +11,7 @@
 #include "vtkF3DMemoryMesh.h"
 #include "vtkF3DMetaImporter.h"
 
+#include <optional>
 #include <vtkCallbackCommand.h>
 #include <vtkProgressBarRepresentation.h>
 #include <vtkProgressBarWidget.h>
@@ -231,8 +232,17 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
       throw scene::load_failure_exception(filePath.string() + " does not exists");
     }
 
+    auto* factory = f3d::factory::instance();
+
+    if (const auto& opts = this->Internals->Options;
+      !factory->getPreferredReader().has_value() && opts.render.reader.has_value())
+    {
+      const auto& reader = opts.render.reader;
+      factory->setPreferredReader(*reader);
+    }
+
     // Recover the importer for the provided file path
-    f3d::reader* reader = f3d::factory::instance()->getReader(filePath.string());
+    f3d::reader* reader = factory->getReader(filePath.string());
     if (reader)
     {
       log::debug(
