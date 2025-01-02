@@ -26,6 +26,18 @@ public:
     PseudoUnitTest::expect<E>(
       label + " `" + input + "`", [&]() { std::ignore = f3d::options::parse<T>(input); });
   }
+
+  template<typename T>
+  void format(const std::string& label, const T& input, const std::string& expected)
+  {
+    PseudoUnitTest::operator()(label + " `" + std::to_string(input) + "`", [&]() {
+      const std::string actual = f3d::options::format<T>(input);
+      if (actual != expected)
+      {
+        throw this->comparisonMessage(actual, expected, "!=");
+      }
+    });
+  }
 };
 
 int TestSDKOptionsIO(int argc, char* argv[])
@@ -41,6 +53,9 @@ int TestSDKOptionsIO(int argc, char* argv[])
   test.parse<bool>("bool", "1", true);
   test.parse<bool>("bool", "0", false);
   test.parse_expect<bool, parsing_exception>("invalid bool", "foo");
+
+  test.format<bool>("bool", true, "true");
+  test.format<bool>("bool", false, "false");
 
   test.parse<int>("int", "123", 123);
   test.parse<int>("int", "-123", -123);

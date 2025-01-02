@@ -174,8 +174,16 @@ T options::parse(const std::string& str)
 }
 
 //----------------------------------------------------------------------------
+template<typename T>
+std::string options::format(const T& var)
+{
+  return options_tools::format<T>(var);
+}
+
+//----------------------------------------------------------------------------
 #define F3D_DECL_TYPE_INTERNAL(TYPE)                                                               \
-  template F3D_EXPORT TYPE options::parse<TYPE>(const std::string& str)
+  template F3D_EXPORT TYPE options::parse<TYPE>(const std::string& str);                           \
+  template F3D_EXPORT std::string options::format<TYPE>(const TYPE& val)
 #define F3D_DECL_TYPE(TYPE)                                                                        \
   F3D_DECL_TYPE_INTERNAL(TYPE);                                                                    \
   F3D_DECL_TYPE_INTERNAL(std::vector<TYPE>)
