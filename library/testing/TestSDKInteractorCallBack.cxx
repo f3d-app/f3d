@@ -153,8 +153,8 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
     std::cerr << "Unexcepted error playing interaction" << std::endl;
     return EXIT_FAILURE;
   }
-  if (!TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
-           filename + "DefaultAgain"))
+  if (!TestSDKHelpers::RenderTest(
+        win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename + "DefaultAgain"))
   {
     std::cerr << "Unexcepted rendering playing interaction" << std::endl;
     return EXIT_FAILURE;
