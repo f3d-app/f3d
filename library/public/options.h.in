@@ -135,7 +135,7 @@ public:
 
   /**
    * Templated parsing method used internally to parse strings.
-   * Implemented for the different supported types, 
+   * Implemented for the different supported types,
    * see PARSING.md for more info.
    * Throw an options::parsing_exception if parsing failed.
    */

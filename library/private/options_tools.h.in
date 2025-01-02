@@ -285,7 +285,8 @@ void set(options& opt, std::string_view name, const option_variant_t& value)
   }
   catch (const std::bad_variant_access&)
   {
-    throw options::incompatible_exception("Trying to set " + std::string(name) + " with incompatible type");
+    throw options::incompatible_exception(
+      "Trying to set " + std::string(name) + " with incompatible type");
   }
 }
 
