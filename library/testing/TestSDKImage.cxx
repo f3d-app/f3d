@@ -79,8 +79,6 @@ int TestSDKImage(int argc, char* argv[])
   f3d::image img32(width, height, channels, f3d::image::ChannelType::FLOAT);
 
   // test exceptions
-  test.expect<f3d::image::write_exception>(
-    "save buffer to incorrect path", [&]() { generated.save("/dummy/folder/img.png"); });
   test.expect<f3d::image::write_exception>("save incompatible buffer to BMP format",
     [&]() { std::ignore = img16.saveBuffer(f3d::image::SaveFormat::BMP); });
   test.expect<f3d::image::write_exception>("save incompatible buffer to PNG format",
@@ -92,9 +90,10 @@ int TestSDKImage(int argc, char* argv[])
     [&]() { std::ignore = img5Ch.saveBuffer(f3d::image::SaveFormat::BMP); });
   test.expect<f3d::image::write_exception>("save incompatible channel count to JPG format",
     [&]() { std::ignore = img2Ch.saveBuffer(f3d::image::SaveFormat::JPG); });
-
-  test.expect<f3d::image::read_exception>(
-    "read image from incorrect path", [&]() { f3d::image img("/dummy/folder/img.png"); });
+  test.expect<f3d::image::write_exception>("save image to invalid path",
+    [&]() { img2Ch.save("/" + std::string(257, 'x') + "/file.ext"); });
+  test.expect<f3d::image::write_exception>("save image to invalid filename",
+    [&]() { img2Ch.save(testingDir + std::string(257, 'x') + ".ext"); });
 
   // check 16-bits image code paths
   f3d::image shortImg(testingDir + "/data/16bit.png");
@@ -119,6 +118,14 @@ int TestSDKImage(int argc, char* argv[])
   // check reading invalid image
   test.expect<f3d::image::read_exception>(
     "read invalid image", [&]() { f3d::image invalidImg(testingDir + "/data/invalid.png"); });
+
+  // check reading inexistent image, do not create a "/dummy/folder/img.png"
+  test.expect<f3d::image::read_exception>(
+    "read image from incorrect path", [&]() { f3d::image img("/dummy/folder/img.png"); });
+
+  // check reading image with invalid path
+  test.expect<f3d::image::read_exception>("read image from invalid path",
+    [&]() { f3d::image img("/" + std::string(257, 'x') + "/file.ext"); });
 
   // check generated image with baseline
   test(
@@ -310,5 +317,5 @@ int TestSDKImage(int argc, char* argv[])
   test("compare with negative threshold", !empty.compare(empty, -1, error) && error == 1.);
   test("compare with threshold == 1", !empty.compare(empty, 1, error) && error == 1.);
 
-  return EXIT_SUCCESS;
+  return test.result();
 }

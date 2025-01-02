@@ -5,7 +5,7 @@
 namespace f3d
 {
 //----------------------------------------------------------------------------
-unsigned int utils::textDistance(const std::string& strA, const std::string& strB)
+unsigned int utils::textDistance(std::string_view strA, std::string_view strB)
 {
   return static_cast<unsigned int>(detail::levenshtein(strA, strB));
 }
