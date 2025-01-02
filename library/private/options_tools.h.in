@@ -194,22 +194,10 @@ std::string parse(const std::string& str)
 // TODO Improve string generation
 //----------------------------------------------------------------------------
 /**
- * Generic templated string generation from provided value
- * rely on std::to_string
- */
-template<typename T>
-std::string format(const T& var)
-{
-  return std::to_string(var);
-}
-
-//----------------------------------------------------------------------------
-/**
  * Format provided var into a string from provided boolean
  * using boolalpha formatting, eg: "true" or "false"
  */
-template<>
-std::string format(const bool& var)
+std::string format(bool var)
 {
   std::stringstream stream;
   stream << std::boolalpha << var;
@@ -218,11 +206,19 @@ std::string format(const bool& var)
 
 //----------------------------------------------------------------------------
 /**
+ * Format provided var into a string from provided int
+ */
+std::string format(int var)
+{
+  return std::to_string(var);
+}
+
+//----------------------------------------------------------------------------
+/**
  * Format provided var into a string from provided double
  * using ostringstream with std::noshowpoint
  */
-template<>
-std::string format(const double& var)
+std::string format(double var)
 {
   std::ostringstream stream;
   stream << std::noshowpoint << var;
@@ -234,19 +230,16 @@ std::string format(const double& var)
  * Format provided var into a string from provided ratio_t
  * rely on format(double&)
  */
-template<>
-std::string format(const ratio_t& var)
+std::string format(ratio_t var)
 {
   // TODO generate a proper ratio string
-  double val = var;
-  return options_tools::format(val);
+  return options_tools::format(static_cast<double>(var));
 }
 
 //----------------------------------------------------------------------------
 /**
  * Generate (returns) a string from provided string
  */
-template<>
 std::string format(const std::string& var)
 {
   return var;
@@ -257,12 +250,12 @@ std::string format(const std::string& var)
  * Format provided var into a string from provided double vector
  * rely on format(double&) and add `, ` between the double values
  */
-template<>
-std::string format(const std::vector<double>& var)
+template<typename T>
+std::string format(const std::vector<T>& var)
 {
   std::ostringstream stream;
   unsigned int i = 0;
-  for (auto& elem : var)
+  for (const T& elem : var)
   {
     stream << ((i > 0) ? "," : "") << options_tools::format(elem);
     i++;

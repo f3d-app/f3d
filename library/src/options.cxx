@@ -177,7 +177,7 @@ T options::parse(const std::string& str)
 template<typename T>
 std::string options::format(const T& var)
 {
-  return options_tools::format<T>(var);
+  return options_tools::format(var);
 }
 
 //----------------------------------------------------------------------------
