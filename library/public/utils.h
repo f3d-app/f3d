@@ -26,7 +26,7 @@ public:
    * Compute the Levenshtein distance between two strings.
    * Can be useful for spell checking and typo detection.
    */
-  [[nodiscard]] static unsigned int textDistance(const std::string& strA, const std::string& strB);
+  [[nodiscard]] static unsigned int textDistance(std::string_view strA, std::string_view strB);
 
   // clang-format off
   /**
