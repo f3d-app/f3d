@@ -144,7 +144,7 @@ runs:
         --warn-uninitialized
         -DBUILD_SHARED_LIBS=${{ inputs.static_label == 'static' && 'OFF' || 'ON' }}
         -DBUILD_TESTING=ON
-        -DCMAKE_BUILD_TYPE=Debug
+        -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../install
         -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
         -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
@@ -152,7 +152,7 @@ runs:
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_BINDINGS_JAVA=${{ (runner.os != 'macOS' || inputs.cpu == 'arm64') && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_BINDINGS_PYTHON=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
-        -DF3D_BINDINGS_PYTHON_GENERATE_STUBS=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_BINDINGS_PYTHON_GENERATE_STUBS=OFF
         -DF3D_EXCLUDE_DEPRECATED=${{ inputs.exclude_deprecated_label == 'exclude-deprecated' && 'ON' || 'OFF' }}
         -DF3D_LINUX_GENERATE_MAN=ON
         -DF3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
