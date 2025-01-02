@@ -113,7 +113,7 @@ runs:
         lcov --remove coverage.info "*Test*" -o coverage.info
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
       with:
         working-directory: ${{github.workspace}}/source
         token: ${{inputs.codecov_token}}
