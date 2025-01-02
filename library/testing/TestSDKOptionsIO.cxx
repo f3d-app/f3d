@@ -23,8 +23,8 @@ public:
   template<typename T, typename E>
   void parse_expect(const std::string& label, const std::string& input)
   {
-    PseudoUnitTest::expect<E>(
-      "parse exception: " + label + " `" + input + "`", [&]() { std::ignore = f3d::options::parse<T>(input); });
+    PseudoUnitTest::expect<E>("parse exception: " + label + " `" + input + "`",
+      [&]() { std::ignore = f3d::options::parse<T>(input); });
   }
 
   template<typename T>
@@ -101,7 +101,8 @@ int TestSDKOptionsIO(int argc, char* argv[])
     "std::vector<std::string>", "foo,bar,baz", { "foo", "bar", "baz" });
   test.parse<std::vector<std::string>>(
     "std::vector<std::string>", "  foo, bar ,   baz ", { "foo", "bar", "baz" });
-  test.format<std::vector<std::string>>("std::vector<std::string>", { "foo", "bar", "baz" }, "foo,bar,baz");
+  test.format<std::vector<std::string>>(
+    "std::vector<std::string>", { "foo", "bar", "baz" }, "foo,bar,baz");
 
   return test.result();
 }
