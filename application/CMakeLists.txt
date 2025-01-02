@@ -212,7 +212,7 @@ if(UNIX AND NOT APPLE)
       install(FILES "${CMAKE_BINARY_DIR}/f3d.1.gz"
         DESTINATION "share/man/man1/" COMPONENT documentation)
     else()
-      message(WARNING "help2man or gzip not found, cannot create man entry")
+      message(FATAL_ERROR "help2man or gzip not found, cannot create man entry, please disable F3D_LINUX_GENERATE_MAN or install them")
     endif()
   endif()
 endif()
