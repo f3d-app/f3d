@@ -186,7 +186,7 @@ image::image(const fs::path& filePath)
   {
     if (!fs::exists(filePath))
     {
-      throw read_exception("Cannot open file " + filePath.string());
+      throw read_exception("Cannot open image " + filePath.string());
     }
 
     auto reader = vtkSmartPointer<vtkImageReader2>::Take(
@@ -511,7 +511,7 @@ const image& image::save(const fs::path& filePath, SaveFormat format) const
 
     if (writer->GetErrorCode() != 0)
     {
-      throw write_exception("Cannot write " + filePath.string());
+      throw write_exception("Cannot write image " + filePath.string());
     }
   }
   catch (const fs::filesystem_error& ex)
