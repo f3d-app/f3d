@@ -247,7 +247,6 @@ f3d_test(NAME TestOutputStreamInfo DATA suzanne.ply ARGS --verbose=info --output
 # Color map files testing
 f3d_test(NAME TestColorMapFileFullPath DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis8.png --scalar-coloring --coloring-component=1)
 f3d_test(NAME TestColorMapInvalid DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/invalid.png --scalar-coloring REGEXP "Cannot read colormap at" NO_BASELINE)
-f3d_test(NAME TestColorMapTooLong DATA dragon.vtu ARGS --colormap-file=folderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolder/file.ext --scalar-coloring REGEXP "File name too long" NO_BASELINE)
 f3d_test(NAME TestColorMapNonExistent DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/non_existent.png --scalar-coloring REGEXP "Cannot find the colormap" NO_BASELINE)
 f3d_test(NAME TestColorMapGrayscale DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/white_grayscale.png --scalar-coloring REGEXP "The specified color map must have at least 3 channels" NO_BASELINE)
 f3d_test(NAME TestColorMapMore1pxWarning DATA dragon.vtu ARGS --verbose=warning --colormap-file=${F3D_SOURCE_DIR}/testing/data/16bit.png --scalar-coloring REGEXP "The specified color map height is not equal to 1" NO_BASELINE)
@@ -1170,6 +1169,10 @@ if(NOT WIN32)
   f3d_test(NAME TestHOMEColorMapFile DATA dragon.vtu ARGS --colormap-file=~/testing/data/viridis8.png --scalar-coloring --coloring-component=1 ENV "HOME=${F3D_SOURCE_DIR}")
   f3d_test(NAME TestHOMEScreenshot DATA suzanne.ply ARGS --screenshot-filename=~/Testing/Temporary/TestHOMEScreenshot.png --interaction-test-play=${F3D_SOURCE_DIR}/testing/recordings/TestScreenshot.log REGEXP "saving screenshot to ${CMAKE_BINARY_DIR}/Testing/Temporary/TestHOMEScreenshot.png" NO_BASELINE ENV "HOME=${CMAKE_BINARY_DIR}")
   f3d_test(NAME TestHOMECommandScript DATA suzanne.ply ARGS --command-script=~/testing/scripts/TestHOMECommandScript.txt REGEXP "Camera focal point" NO_BASELINE ENV "HOME=${F3D_SOURCE_DIR}")
+
+  f3d_test(NAME TestColorMapTooLong DATA dragon.vtu ARGS --colormap-file=folderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolder/file.ext --scalar-coloring REGEXP "File name too long" NO_BASELINE)
+  f3d_test(NAME TestScreenshotTooLong DATA suzanne.ply ARGS --screenshot-filename=folderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolder/file.ext --interaction-test-play=${F3D_SOURCE_DIR}/testing/recordings/TestScreenshot.log REGEXP "File name too long" NO_BASELINE)
+  f3d_test(NAME TestInputTooLong ARGS --input=folderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolderfolder/file.ext REGEXP "File name too long" NO_BASELINE)
 endif()
 
 # Test failure without a reference, please do not create a TestNoRef.png file
