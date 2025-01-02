@@ -1021,7 +1021,7 @@ int F3DStarter::Start(int argc, char** argv)
           return EXIT_FAILURE;
         }
       }
-      catch (const std::filesystem::filesystem_error& ex)
+      catch (const fs::filesystem_error& ex)
       {
         f3d::log::error("Error reading reference image: ", ex.what());
         return EXIT_FAILURE;
@@ -1403,10 +1403,19 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate, bool minima
     return fs::current_path();
   };
 
-  fs::path path = this->Internals->applyFilenameTemplate(f3d::utils::collapsePath(filenameTemplate, getScreenshotDir().string()));
+  fs::path path;
+  try
+  {
+    path = this->Internals->applyFilenameTemplate(f3d::utils::collapsePath(filenameTemplate, getScreenshotDir().string()));
 
-  fs::create_directories(path.parent_path());
-  f3d::log::info("saving screenshot to " + path.string());
+    fs::create_directories(path.parent_path());
+    f3d::log::info("saving screenshot to " + path.string());
+  }
+  catch (const fs::filesystem_error& ex)
+  {
+    f3d::log::error("Error recovering screenshot path: ", ex.what());
+    return;
+  }
 
   f3d::options& options = this->Internals->Engine->getOptions();
   f3d::options optionsCopy = this->Internals->Engine->getOptions();
@@ -1440,79 +1449,90 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate, bool minima
 //----------------------------------------------------------------------------
 int F3DStarter::AddFile(const fs::path& path, bool quiet)
 {
-  // Check file exists
-  auto tmpPath = fs::absolute(path);
-  if (!fs::exists(tmpPath))
+  try
   {
-    if (!quiet)
+    // Check file exists
+    auto tmpPath = fs::absolute(path);
+    if (!fs::exists(tmpPath))
     {
-      f3d::log::error("File ", tmpPath.string(), " does not exist");
-    }
-    return -1;
-  }
-  // If file is a folder, add files recursively
-  else if (fs::is_directory(tmpPath))
-  {
-    std::set<fs::path> sortedPaths;
-    for (const auto& entry : fs::directory_iterator(tmpPath))
-    {
-      sortedPaths.insert(entry.path());
-    }
-    for (const auto& entryPath : sortedPaths)
-    {
-      // Recursively add all files
-      this->AddFile(entryPath, quiet);
-    }
-    return static_cast<int>(this->Internals->FilesGroups.size()) - 1;
-  }
-  else
-  {
-    // Check if file has already been added
-    bool found = false;
-    std::vector<std::vector<fs::path>>::iterator it;
-    for (it = this->Internals->FilesGroups.begin(); it != this->Internals->FilesGroups.end(); it++)
-    {
-      auto localIt = std::find(it->begin(), it->end(), tmpPath);
-      found |= localIt != it->end();
-      if (found)
+      if (!quiet)
       {
-        break;
+        f3d::log::error("File ", tmpPath.string(), " does not exist");
       }
+      return -1;
     }
-
-    if (!found)
+    // If file is a folder, add files recursively
+    else if (fs::is_directory(tmpPath))
     {
-      // Add to the right file group
-      // XXX more multi-file mode may be added in the future
-      if (this->Internals->AppOptions.MultiFileMode == "all")
+      std::set<fs::path> sortedPaths;
+      for (const auto& entry : fs::directory_iterator(tmpPath))
       {
-        if (this->Internals->FilesGroups.empty())
-        {
-          this->Internals->FilesGroups.resize(1);
-        }
-        assert(this->Internals->FilesGroups.size() == 1);
-        this->Internals->FilesGroups[0].emplace_back(tmpPath);
+        sortedPaths.insert(entry.path());
       }
-      else
+      for (const auto& entryPath : sortedPaths)
       {
-        if (this->Internals->AppOptions.MultiFileMode != "single")
-        {
-          f3d::log::warn("Unrecognized multi-file-mode: ",
-            this->Internals->AppOptions.MultiFileMode, ". Assuming \"single\" mode.");
-        }
-        this->Internals->FilesGroups.emplace_back(std::vector<fs::path>{ tmpPath });
+        // Recursively add all files
+        this->AddFile(entryPath, quiet);
       }
       return static_cast<int>(this->Internals->FilesGroups.size()) - 1;
     }
     else
     {
-      // If already added, just return the index of the group containing the file
-      if (!quiet)
+      // Check if file has already been added
+      bool found = false;
+      std::vector<std::vector<fs::path>>::iterator it;
+      for (it = this->Internals->FilesGroups.begin(); it != this->Internals->FilesGroups.end(); it++)
       {
-        f3d::log::warn("File ", tmpPath.string(), " has already been added");
+        auto localIt = std::find(it->begin(), it->end(), tmpPath);
+        found |= localIt != it->end();
+        if (found)
+        {
+          break;
+        }
       }
-      return static_cast<int>(std::distance(this->Internals->FilesGroups.begin(), it));
+
+      if (!found)
+      {
+        // Add to the right file group
+        // XXX more multi-file mode may be added in the future
+        if (this->Internals->AppOptions.MultiFileMode == "all")
+        {
+          if (this->Internals->FilesGroups.empty())
+          {
+            this->Internals->FilesGroups.resize(1);
+          }
+          assert(this->Internals->FilesGroups.size() == 1);
+          this->Internals->FilesGroups[0].emplace_back(tmpPath);
+        }
+        else
+        {
+          if (this->Internals->AppOptions.MultiFileMode != "single")
+          {
+            f3d::log::warn("Unrecognized multi-file-mode: ",
+              this->Internals->AppOptions.MultiFileMode, ". Assuming \"single\" mode.");
+          }
+          this->Internals->FilesGroups.emplace_back(std::vector<fs::path>{ tmpPath });
+        }
+        return static_cast<int>(this->Internals->FilesGroups.size()) - 1;
+      }
+      else
+      {
+        // If already added, just return the index of the group containing the file
+        if (!quiet)
+        {
+          f3d::log::warn("File ", tmpPath.string(), " has already been added");
+        }
+        return static_cast<int>(std::distance(this->Internals->FilesGroups.begin(), it));
+      }
     }
+  }
+  catch (const fs::filesystem_error& ex)
+  {
+    if (!quiet)
+    {
+      f3d::log::error("Error adding file: ", ex.what());
+    }
+    return -1;
   }
 }
 
@@ -1623,7 +1643,7 @@ void F3DStarter::AddCommands()
       int index = -1;
       for (const std::string& file : files)
       {
-        index = this->AddFile(fs::path(file));
+        index = this->AddFile(fs::path(f3d::utils::collapsePath(file)));
       }
       if (index > -1)
       {
@@ -1668,7 +1688,7 @@ void F3DStarter::AddCommands()
         }
         else
         {
-          index = this->AddFile(fs::path(file));
+          index = this->AddFile(fs::path(f3d::utils::collapsePath(file)));
         }
       }
       if (index > -1)
