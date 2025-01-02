@@ -1169,7 +1169,7 @@ if(NOT WIN32)
   f3d_test(NAME TestHOMEInteractionPlay DATA cow.vtp ARGS --interaction-test-play=~/Testing/Temporary/TestHOMEInteractionRecord.log DEPENDS TestHOMEInteractionRecord NO_BASELINE ENV "HOME=${CMAKE_BINARY_DIR}")
   f3d_test(NAME TestHOMEColorMapFile DATA dragon.vtu ARGS --colormap-file=~/testing/data/viridis8.png --scalar-coloring --coloring-component=1 ENV "HOME=${F3D_SOURCE_DIR}")
   f3d_test(NAME TestHOMEScreenshot DATA suzanne.ply ARGS --screenshot-filename=~/Testing/Temporary/TestHOMEScreenshot.png --interaction-test-play=${F3D_SOURCE_DIR}/testing/recordings/TestScreenshot.log REGEXP "saving screenshot to ${CMAKE_BINARY_DIR}/Testing/Temporary/TestHOMEScreenshot.png" NO_BASELINE ENV "HOME=${CMAKE_BINARY_DIR}")
-  f3d_test(NAME TestHOMECommandScript DATA suzanne.ply ARGS --command-script=~/testing/scripts/TestHOMECommandScript.txt REGEXP "Not coloring" NO_BASELINE ENV "HOME=${F3D_SOURCE_DIR}")
+  f3d_test(NAME TestHOMECommandScript DATA suzanne.ply ARGS --command-script=~/testing/scripts/TestHOMECommandScript.txt REGEXP "Camera focal point" NO_BASELINE ENV "HOME=${F3D_SOURCE_DIR}")
 endif()
 
 # Test failure without a reference, please do not create a TestNoRef.png file
