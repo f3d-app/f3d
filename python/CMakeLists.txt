@@ -59,7 +59,7 @@ if(WIN32)
   if(PROJECT_IS_TOP_LEVEL)
     f3d_python_windows_dll_fixup(PATHS "$<TARGET_FILE_DIR:f3d::libf3d>" OUTPUT F3D_ABSOLUTE_DLLS_FIXUP)
   else()
-    f3d_python_windows_dll_fixup(PATHS "$<TARGET_FILE_DIR:libf3d>" "$<TARGET_FILE_DIR:VTK::CommonCore>" OUTPUT F3D_ABSOLUTE_DLLS_FIXUP)
+    f3d_python_windows_dll_fixup(PATHS "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" "$<TARGET_FILE_DIR:VTK::CommonCore>" OUTPUT F3D_ABSOLUTE_DLLS_FIXUP)
   endif()
 endif()
 
