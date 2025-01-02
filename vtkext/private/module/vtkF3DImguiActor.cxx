@@ -267,11 +267,25 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
   io.FontDefault = font;
   io.FontGlobalScale = this->FontScale;
 
+  ImVec4 colText = ImVec4(0.941f, 0.906f, 0.855f, 1.f);
+  ImVec4 colBg = ImVec4(0.106f, 0.106f, 0.098f, 1.f);
+  ImVec4 colHighlight = ImVec4(0.471f, 0.541f, 0.996f, 1.f);
+
   ImGuiStyle* style = &ImGui::GetStyle();
   style->GrabRounding = 4.0f;
   style->WindowRounding = 8.f;
   style->WindowBorderSize = 0.f;
   style->WindowPadding = ImVec2(10, 10);
+  style->FrameBorderSize = 1.f;
+  style->Colors[ImGuiCol_Text] = colText;
+  style->Colors[ImGuiCol_WindowBg] = colBg;
+  style->Colors[ImGuiCol_Border] = colHighlight;
+  style->Colors[ImGuiCol_FrameBg] = colBg;
+  style->Colors[ImGuiCol_ScrollbarBg] = colBg;
+  style->Colors[ImGuiCol_ScrollbarGrab] = colText;
+  style->Colors[ImGuiCol_ScrollbarGrabHovered] = colHighlight;
+  style->Colors[ImGuiCol_ScrollbarGrabActive] = colHighlight;
+  style->Colors[ImGuiCol_TextSelectedBg] = colHighlight;
 
   // Setup backend name
   io.BackendPlatformName = io.BackendRendererName = "F3D/VTK";
