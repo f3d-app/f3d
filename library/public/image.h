@@ -158,7 +158,7 @@ public:
    * TIF: Supports channel type BYTE, SHORT and FLOAT with channel count of 1 to 4
    * BMP: Supports channel type BYTE with channel count of 1 to 4
    * Throw an `image::write_exception` if the format is incompatible with with image channel type or
-   * channel count
+   * channel count or if the image cannot be written for any other reason.
    */
   const image& save(
     const std::filesystem::path& filePath, SaveFormat format = SaveFormat::PNG) const;

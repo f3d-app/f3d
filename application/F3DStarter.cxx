@@ -1017,7 +1017,15 @@ int F3DStarter::Start(int argc, char** argv)
           }
           else
           {
-            window.renderToImage(this->Internals->AppOptions.NoBackground).save(output);
+            try
+            {
+              window.renderToImage(this->Internals->AppOptions.NoBackground).save(output);
+            }
+            catch (const f3d::image::write_exception& ex)
+            {
+              f3d::log::error("Could not write output: ", ex.what());
+              return EXIT_FAILURE;
+            }
 
             f3d::log::error("Reference image ", reference,
               " does not exist, current rendering has been outputted to ", output, ".\n");
@@ -1048,7 +1056,15 @@ int F3DStarter::Start(int argc, char** argv)
           f3d::log::error("Current rendering difference with reference image: ", error,
             " is higher than the threshold of ", threshold, ".\n");
 
-          img.save(output);
+          try
+          {
+            img.save(output);
+          }
+          catch (const f3d::image::write_exception& ex)
+          {
+            f3d::log::error("Could not write output: ", ex.what());
+            return EXIT_FAILURE;
+          }
         }
         return EXIT_FAILURE;
       }
@@ -1083,7 +1099,16 @@ int F3DStarter::Start(int argc, char** argv)
       }
       else
       {
-        img.save(output);
+        try
+        {
+          img.save(output);
+        }
+        catch (const f3d::image::write_exception& ex)
+        {
+          f3d::log::error("Could not write output: ", ex.what());
+          return EXIT_FAILURE;
+        }
+
         f3d::log::debug("Output image saved to ", output);
       }
 
