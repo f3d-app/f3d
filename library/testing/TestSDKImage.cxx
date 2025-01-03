@@ -139,10 +139,7 @@ int TestSDKImage(int argc, char* argv[])
   f3d::image baseline(testingDir + "/baselines/TestSDKImage.png");
   if (generated != baseline)
   {
-    double error;
-    generated.compare(baseline, 0, error);
-
-    std::cerr << "Generated image is different from the png baseline: " << error << std::endl;
+    std::cerr << "Generated image is different from the png baseline: " << generated.compare(baseline) << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -151,10 +148,7 @@ int TestSDKImage(int argc, char* argv[])
   f3d::image baselineTIF(testingDir + "/baselines/TestSDKImage.tif");
   if (generated != baselineTIF)
   {
-    double error;
-    generated.compare(baselineTIF, 0, error);
-
-    std::cerr << "Generated image is different from the tif baseline: " << error << std::endl;
+    std::cerr << "Generated image is different from the tif baseline: " << generated.compare(baselineTIF) << std::endl;
     return EXIT_FAILURE;
   }*/
 
@@ -171,10 +165,7 @@ int TestSDKImage(int argc, char* argv[])
   f3d::image baseline16(testingDir + "/baselines/TestSDKImage16.png");
   if (generated16 != baseline16)
   {
-    double error;
-    generated16.compare(baseline16, 0, error);
-
-    std::cerr << "generated short image is different from the baseline: " << error << std::endl;
+    std::cerr << "generated short image is different from the baseline: " << generated16.compare(baseline16) << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -183,10 +174,7 @@ int TestSDKImage(int argc, char* argv[])
   f3d::image baseline16TIF(testingDir + "/baselines/TestSDKImage16.tif");
   if (generated16 != baseline16TIF)
   {
-    double error;
-    generated16.compare(baseline16TIF, 0, error);
-
-    std::cerr << "generated short image is different from the TIF baseline: " << error << std::endl;
+    std::cerr << "generated short image is different from the TIF baseline: " << generated16.compare(baseline16TIF) << std::endl;
     return EXIT_FAILURE;
   }*/
 
@@ -204,10 +192,7 @@ int TestSDKImage(int argc, char* argv[])
 
   if (generated32 != baseline32)
   {
-    double error;
-    generated32.compare(baseline32, 0, error);
-
-    std::cerr << "generated float image is different from the baseline: " << error << std::endl;
+    std::cerr << "generated float image is different from the baseline: " << generated32.compare(baseline32) << std::endl;
     return EXIT_FAILURE;
   }
 #endif // F3D_SSIM_COMPARE
@@ -300,22 +285,18 @@ int TestSDKImage(int argc, char* argv[])
   }
 
   // Test image::compare dedicated code paths
-  double error;
-  test("compare images with different channel types",
-    !generated.compare(generated16, 0, error) && error == 1.);
+  test("compare images with different channel types", generated.compare(generated16) == 1.);
 
   f3d::image generatedCount(width, height, channels + 1);
-  test("compare images with different channel count",
-    !generated.compare(generatedCount, 0, error) && error == 1.);
+  test("compare images with different channel count", generated.compare(generatedCount) == 1.);
 
   f3d::image generatedSize(width + 1, height, channels);
-  test("compare images with different size",
-    !generated.compare(generatedSize, 0, error) && error == 1.);
+  test("compare images with different size", generated.compare(generatedSize) == 1.);
 
   f3d::image empty(0, 0, 0);
-  test("compare empty images", empty.compare(empty, 0, error) && error == 0.);
-  test("compare with negative threshold", !empty.compare(empty, -1, error) && error == 1.);
-  test("compare with threshold == 1", !empty.compare(empty, 1, error) && error == 1.);
+  test("compare empty images", empty.compare(empty) == 0.);
+  test("compare with negative threshold", empty.compare(empty) == 1.);
+  test("compare with threshold == 1", empty.compare(empty) == 1.);
 
   return test.result();
 }

@@ -135,23 +135,20 @@ public:
   ///@}
 
   /**
-   * Compare current image to a reference using the provided threshold.
-   * If the comparison fails, ie. error is higher than the threshold,
-   * this outputs the resulting diff and error and return false,
-   * return true otherwise.
+   * Compare current image to a reference.
    * The error is minimum between Minkownski and Wasserstein distance
    * on a SSIM computation, as specified in VTK.
    * Please note, due to possible arithmetic imprecision in the SSIM computation
-   * using a threshold of zero may return false with identical images.
+   * a non-zero value can be returned with identical images.
    * Depending on the VTK version, another comparison algorithm may be used.
-   * Threshold should be in range [0, 1[, this returns false otherwise.
+   * Error value meaning is described below:
    * 1e-14: Pixel perfect comparison.
    * 0.04: Visually indistinguishable.
    * 0.1: Small visible difference.
    * 0.5: Comparable images.
    * 1.0: Different type, size or number of components
    */
-  bool compare(const image& reference, double threshold, double& error) const;
+  double compare(const image& reference) const;
 
   /**
    * Save an image to the provided file path, used as is, in the specified format.

@@ -26,7 +26,7 @@ def test_scene_memory():
 
     error = 0.0
 
-    assert img.compare(f3d.Image(reference), 0.05, error)
+    assert img.compare(f3d.Image(reference)) < 0.05
 
 
 def test_scene():
@@ -54,4 +54,4 @@ def test_scene():
 
     error = 0.0
 
-    assert img.compare(f3d.Image(reference), 0.05, error)
+    assert img.compare(f3d.Image(reference)) < 0.05

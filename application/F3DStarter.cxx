@@ -1025,7 +1025,7 @@ int F3DStarter::Start(int argc, char** argv)
       f3d::image diff;
       double error;
       const double& threshold = this->Internals->AppOptions.RefThreshold;
-      if (!img.compare(ref, threshold, error))
+      if (img.compare(ref) > threshold)
       {
         if (output.empty())
         {
