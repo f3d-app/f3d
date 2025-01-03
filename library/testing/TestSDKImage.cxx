@@ -139,7 +139,8 @@ int TestSDKImage(int argc, char* argv[])
   f3d::image baseline(testingDir + "/baselines/TestSDKImage.png");
   if (generated != baseline)
   {
-    std::cerr << "Generated image is different from the png baseline: " << generated.compare(baseline) << std::endl;
+    std::cerr << "Generated image is different from the png baseline: "
+              << generated.compare(baseline) << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -148,7 +149,8 @@ int TestSDKImage(int argc, char* argv[])
   f3d::image baselineTIF(testingDir + "/baselines/TestSDKImage.tif");
   if (generated != baselineTIF)
   {
-    std::cerr << "Generated image is different from the tif baseline: " << generated.compare(baselineTIF) << std::endl;
+    std::cerr << "Generated image is different from the tif baseline: "
+              << generated.compare(baselineTIF) << std::endl;
     return EXIT_FAILURE;
   }*/
 
@@ -165,7 +167,8 @@ int TestSDKImage(int argc, char* argv[])
   f3d::image baseline16(testingDir + "/baselines/TestSDKImage16.png");
   if (generated16 != baseline16)
   {
-    std::cerr << "generated short image is different from the baseline: " << generated16.compare(baseline16) << std::endl;
+    std::cerr << "generated short image is different from the baseline: "
+              << generated16.compare(baseline16) << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -174,7 +177,8 @@ int TestSDKImage(int argc, char* argv[])
   f3d::image baseline16TIF(testingDir + "/baselines/TestSDKImage16.tif");
   if (generated16 != baseline16TIF)
   {
-    std::cerr << "generated short image is different from the TIF baseline: " << generated16.compare(baseline16TIF) << std::endl;
+    std::cerr << "generated short image is different from the TIF baseline: "
+              << generated16.compare(baseline16TIF) << std::endl;
     return EXIT_FAILURE;
   }*/
 
@@ -192,7 +196,8 @@ int TestSDKImage(int argc, char* argv[])
 
   if (generated32 != baseline32)
   {
-    std::cerr << "generated float image is different from the baseline: " << generated32.compare(baseline32) << std::endl;
+    std::cerr << "generated float image is different from the baseline: "
+              << generated32.compare(baseline32) << std::endl;
     return EXIT_FAILURE;
   }
 #endif // F3D_SSIM_COMPARE
