@@ -4,6 +4,7 @@
 #include "exception.h"
 #include "export.h"
 
+#include <filesystem>
 #include <map>
 #include <regex>
 #include <sstream>
@@ -64,8 +65,8 @@ public:
    * Rely on vtksys::SystemTools::CollapseFullPath but return empty string if the provided
    * string is empty.
    */
-  [[nodiscard]] static std::string collapsePath(
-    const std::string& path, const std::string& baseDirectory = std::string());
+  [[nodiscard]] static std::filesystem::path collapsePath(
+    const std::filesystem::path& path, const std::filesystem::path& baseDirectory = {});
 
   /**
    * An exception that can be thrown by tokenize
