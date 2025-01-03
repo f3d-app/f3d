@@ -4,6 +4,7 @@
 #include "exception.h"
 #include "export.h"
 
+#include <filesystem>
 #include <map>
 #include <regex>
 #include <sstream>
@@ -54,6 +55,18 @@ public:
    */
   [[nodiscard]] static std::vector<std::string> tokenize(std::string_view str);
   // clang-format on
+
+  /**
+   * Collapse a string filesystem path by:
+   * - Expanding tilda `~` into home dir in a cross-platform way
+   * - Transform relative path into an absolute path based on basedDirectory if provided, or the
+   * current directory if not
+   * - Remove any `..` if any
+   * Rely on vtksys::SystemTools::CollapseFullPath but return empty string if the provided
+   * string is empty.
+   */
+  [[nodiscard]] static std::filesystem::path collapsePath(
+    const std::filesystem::path& path, const std::filesystem::path& baseDirectory = {});
 
   /**
    * An exception that can be thrown by tokenize
