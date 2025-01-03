@@ -273,7 +273,7 @@ public:
    * - `{n:2}`, `{n:3}`, ...: zero-padded auto-incremented number to make filename unique
    *   (up to 1000000)
    */
-  fs::path applyFilenameTemplate(const std::string& templateString)
+  fs::path applyFilenameTemplate(const fs::path& templatePath)
   {
     constexpr size_t maxNumberingAttempts = 1000000;
     const std::regex numberingRe("(n:?(.*))");
@@ -359,7 +359,7 @@ public:
       throw f3d::utils::string_template::lookup_error(var);
     };
 
-    f3d::utils::string_template stringTemplate(templateString);
+    f3d::utils::string_template stringTemplate(templatePath.string());
     stringTemplate.substitute(variableLookup);
 
     const auto hasNumbering = [&]()
@@ -598,7 +598,7 @@ public:
     const std::string& colorMapFile = this->AppOptions.ColorMapFile;
     if (!colorMapFile.empty())
     {
-      std::string fullPath = F3DColorMapTools::Find(colorMapFile);
+      fs::path fullPath = F3DColorMapTools::Find(colorMapFile);
 
       if (!fullPath.empty())
       {
@@ -863,8 +863,6 @@ int F3DStarter::Start(int argc, char** argv)
   f3d::log::debug("========== Configuring engine ==========");
 
   double deltaTime = 1.0 / this->Internals->AppOptions.FrameRate;
-  const std::string& reference = this->Internals->AppOptions.Reference;
-  const std::string& output = this->Internals->AppOptions.Output;
 
   if (this->Internals->AppOptions.NoRender)
   {
@@ -872,8 +870,8 @@ int F3DStarter::Start(int argc, char** argv)
   }
   else
   {
-    bool offscreen =
-      !reference.empty() || !output.empty() || this->Internals->AppOptions.BindingsList;
+    bool offscreen = !this->Internals->AppOptions.Reference.empty() ||
+      !this->Internals->AppOptions.Output.empty() || this->Internals->AppOptions.BindingsList;
 
     if (this->Internals->AppOptions.RenderingBackend == "egl")
     {
@@ -913,7 +911,7 @@ int F3DStarter::Start(int argc, char** argv)
   // Add all input files
   for (auto& file : inputFiles)
   {
-    this->AddFile(fs::path(file));
+    this->AddFile(f3d::utils::collapsePath(file));
   }
 
   // Load a file
@@ -944,8 +942,8 @@ int F3DStarter::Start(int argc, char** argv)
     }
 
     // Play recording if any
-    const std::string& interactionTestPlayFile =
-      this->Internals->AppOptions.InteractionTestPlayFile;
+    fs::path interactionTestPlayFile =
+      f3d::utils::collapsePath(this->Internals->AppOptions.InteractionTestPlayFile);
     if (!interactionTestPlayFile.empty())
     {
       // For better testing, render once before the interaction
@@ -957,8 +955,8 @@ int F3DStarter::Start(int argc, char** argv)
     }
 
     // Start recording if needed
-    const std::string& interactionTestRecordFile =
-      this->Internals->AppOptions.InteractionTestRecordFile;
+    fs::path interactionTestRecordFile =
+      f3d::utils::collapsePath(this->Internals->AppOptions.InteractionTestRecordFile);
     if (!interactionTestRecordFile.empty())
     {
       if (!interactor.recordInteraction(interactionTestRecordFile))
@@ -968,7 +966,8 @@ int F3DStarter::Start(int argc, char** argv)
     }
 
     // Process Command Script file
-    const std::string& commandScriptFile = this->Internals->AppOptions.CommandScriptFile;
+    fs::path commandScriptFile =
+      f3d::utils::collapsePath(this->Internals->AppOptions.CommandScriptFile);
     if (!commandScriptFile.empty())
     {
       std::ifstream scriptFile(commandScriptFile);
@@ -993,6 +992,10 @@ int F3DStarter::Start(int argc, char** argv)
 
     char* noDataForceRender = std::getenv("CTEST_F3D_NO_DATA_FORCE_RENDER");
 
+    fs::path reference = f3d::utils::collapsePath(this->Internals->AppOptions.Reference);
+    fs::path output = this->Internals->applyFilenameTemplate(
+      f3d::utils::collapsePath(this->Internals->AppOptions.Output));
+
     // Render and compare with file if needed
     if (!reference.empty())
     {
@@ -1002,21 +1005,29 @@ int F3DStarter::Start(int argc, char** argv)
         return EXIT_FAILURE;
       }
 
-      if (!fs::exists(reference))
+      try
       {
-        if (output.empty())
+        if (!fs::exists(reference))
         {
-          f3d::log::error("Reference image ", reference,
-            " does not exist, use the output option to output current rendering into an image "
-            "file.\n");
-        }
-        else
-        {
-          window.renderToImage(this->Internals->AppOptions.NoBackground).save(output);
+          if (output.empty())
+          {
+            f3d::log::error("Reference image ", reference,
+              " does not exist, use the output option to output current rendering into an image "
+              "file.\n");
+          }
+          else
+          {
+            window.renderToImage(this->Internals->AppOptions.NoBackground).save(output);
 
-          f3d::log::error("Reference image " + reference +
-            " does not exist, current rendering has been outputted to " + output + ".\n");
+            f3d::log::error("Reference image ", reference,
+              " does not exist, current rendering has been outputted to ", output, ".\n");
+          }
+          return EXIT_FAILURE;
         }
+      }
+      catch (const fs::filesystem_error& ex)
+      {
+        f3d::log::error("Error reading reference image: ", ex.what());
         return EXIT_FAILURE;
       }
 
@@ -1072,9 +1083,8 @@ int F3DStarter::Start(int argc, char** argv)
       }
       else
       {
-        fs::path path = this->Internals->applyFilenameTemplate(output);
-        img.save(path.string());
-        f3d::log::debug("Output image saved to ", path);
+        img.save(output);
+        f3d::log::debug("Output image saved to ", output);
       }
 
       if (this->Internals->FilesGroups.size() > 1)
@@ -1397,13 +1407,20 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate, bool minima
     return fs::current_path();
   };
 
-  fs::path pathTemplate = fs::path(filenameTemplate).make_preferred();
-  fs::path fullPathTemplate =
-    pathTemplate.is_absolute() ? pathTemplate : getScreenshotDir() / pathTemplate;
-  fs::path path = this->Internals->applyFilenameTemplate(fullPathTemplate.string());
+  fs::path path;
+  try
+  {
+    path = this->Internals->applyFilenameTemplate(
+      f3d::utils::collapsePath(filenameTemplate, getScreenshotDir()));
 
-  fs::create_directories(fs::path(path).parent_path());
-  f3d::log::info("saving screenshot to " + path.string());
+    fs::create_directories(path.parent_path());
+    f3d::log::info("saving screenshot to " + path.string());
+  }
+  catch (const fs::filesystem_error& ex)
+  {
+    f3d::log::error("Error recovering screenshot path: ", ex.what());
+    return;
+  }
 
   f3d::options& options = this->Internals->Engine->getOptions();
   f3d::options optionsCopy = this->Internals->Engine->getOptions();
@@ -1425,7 +1442,7 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate, bool minima
 
   f3d::image img = this->Internals->Engine->getWindow().renderToImage(noBackground);
   this->Internals->addOutputImageMetadata(img);
-  img.save(path.string(), f3d::image::SaveFormat::PNG);
+  img.save(path, f3d::image::SaveFormat::PNG);
 
   options.render.light.intensity *= 5;
   this->Render();
@@ -1437,79 +1454,91 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate, bool minima
 //----------------------------------------------------------------------------
 int F3DStarter::AddFile(const fs::path& path, bool quiet)
 {
-  // Check file exists
-  auto tmpPath = fs::absolute(path);
-  if (!fs::exists(tmpPath))
+  try
   {
-    if (!quiet)
+    // Check file exists
+    auto tmpPath = fs::absolute(path);
+    if (!fs::exists(tmpPath))
     {
-      f3d::log::error("File ", tmpPath.string(), " does not exist");
-    }
-    return -1;
-  }
-  // If file is a folder, add files recursively
-  else if (fs::is_directory(tmpPath))
-  {
-    std::set<fs::path> sortedPaths;
-    for (const auto& entry : fs::directory_iterator(tmpPath))
-    {
-      sortedPaths.insert(entry.path());
-    }
-    for (const auto& entryPath : sortedPaths)
-    {
-      // Recursively add all files
-      this->AddFile(entryPath, quiet);
-    }
-    return static_cast<int>(this->Internals->FilesGroups.size()) - 1;
-  }
-  else
-  {
-    // Check if file has already been added
-    bool found = false;
-    std::vector<std::vector<fs::path>>::iterator it;
-    for (it = this->Internals->FilesGroups.begin(); it != this->Internals->FilesGroups.end(); it++)
-    {
-      auto localIt = std::find(it->begin(), it->end(), tmpPath);
-      found |= localIt != it->end();
-      if (found)
+      if (!quiet)
       {
-        break;
+        f3d::log::error("File ", tmpPath.string(), " does not exist");
       }
+      return -1;
     }
-
-    if (!found)
+    // If file is a folder, add files recursively
+    else if (fs::is_directory(tmpPath))
     {
-      // Add to the right file group
-      // XXX more multi-file mode may be added in the future
-      if (this->Internals->AppOptions.MultiFileMode == "all")
+      std::set<fs::path> sortedPaths;
+      for (const auto& entry : fs::directory_iterator(tmpPath))
       {
-        if (this->Internals->FilesGroups.empty())
-        {
-          this->Internals->FilesGroups.resize(1);
-        }
-        assert(this->Internals->FilesGroups.size() == 1);
-        this->Internals->FilesGroups[0].emplace_back(tmpPath);
+        sortedPaths.insert(entry.path());
       }
-      else
+      for (const auto& entryPath : sortedPaths)
       {
-        if (this->Internals->AppOptions.MultiFileMode != "single")
-        {
-          f3d::log::warn("Unrecognized multi-file-mode: ",
-            this->Internals->AppOptions.MultiFileMode, ". Assuming \"single\" mode.");
-        }
-        this->Internals->FilesGroups.emplace_back(std::vector<fs::path>{ tmpPath });
+        // Recursively add all files
+        this->AddFile(entryPath, quiet);
       }
       return static_cast<int>(this->Internals->FilesGroups.size()) - 1;
     }
     else
     {
-      // If already added, just return the index of the group containing the file
-      if (!quiet)
+      // Check if file has already been added
+      bool found = false;
+      std::vector<std::vector<fs::path>>::iterator it;
+      for (it = this->Internals->FilesGroups.begin(); it != this->Internals->FilesGroups.end();
+           it++)
       {
-        f3d::log::warn("File ", tmpPath.string(), " has already been added");
+        auto localIt = std::find(it->begin(), it->end(), tmpPath);
+        found |= localIt != it->end();
+        if (found)
+        {
+          break;
+        }
       }
-      return static_cast<int>(std::distance(this->Internals->FilesGroups.begin(), it));
+
+      if (!found)
+      {
+        // Add to the right file group
+        // XXX more multi-file mode may be added in the future
+        if (this->Internals->AppOptions.MultiFileMode == "all")
+        {
+          if (this->Internals->FilesGroups.empty())
+          {
+            this->Internals->FilesGroups.resize(1);
+          }
+          assert(this->Internals->FilesGroups.size() == 1);
+          this->Internals->FilesGroups[0].emplace_back(tmpPath);
+        }
+        else
+        {
+          if (this->Internals->AppOptions.MultiFileMode != "single")
+          {
+            f3d::log::warn("Unrecognized multi-file-mode: ",
+              this->Internals->AppOptions.MultiFileMode, ". Assuming \"single\" mode.");
+          }
+          this->Internals->FilesGroups.emplace_back(std::vector<fs::path>{ tmpPath });
+        }
+        return static_cast<int>(this->Internals->FilesGroups.size()) - 1;
+      }
+      else
+      {
+        // If already added, just return the index of the group containing the file
+        if (!quiet)
+        {
+          f3d::log::warn("File ", tmpPath.string(), " has already been added");
+        }
+        return static_cast<int>(std::distance(this->Internals->FilesGroups.begin(), it));
+      }
     }
+  }
+  catch (const fs::filesystem_error& ex)
+  {
+    if (!quiet)
+    {
+      f3d::log::error("Error adding file: ", ex.what());
+    }
+    return -1;
   }
 }
 
@@ -1620,7 +1649,7 @@ void F3DStarter::AddCommands()
       int index = -1;
       for (const std::string& file : files)
       {
-        index = this->AddFile(fs::path(file));
+        index = this->AddFile(f3d::utils::collapsePath(file));
       }
       if (index > -1)
       {
@@ -1665,7 +1694,7 @@ void F3DStarter::AddCommands()
         }
         else
         {
-          index = this->AddFile(fs::path(file));
+          index = this->AddFile(f3d::utils::collapsePath(file));
         }
       }
       if (index > -1)

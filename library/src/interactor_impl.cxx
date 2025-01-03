@@ -1158,7 +1158,7 @@ bool interactor_impl::playInteraction(
 
     this->Internals->StopEventLoop();
   }
-  catch (const std::filesystem::filesystem_error& ex)
+  catch (const fs::filesystem_error& ex)
   {
     log::error("Could not play recording: ", ex.what());
     return false;
@@ -1196,7 +1196,7 @@ bool interactor_impl::recordInteraction(const fs::path& file)
     this->Internals->Recorder->On();
     this->Internals->Recorder->Record();
   }
-  catch (const std::filesystem::filesystem_error& ex)
+  catch (const fs::filesystem_error& ex)
   {
     log::error("Could not record: ", ex.what());
     return false;
