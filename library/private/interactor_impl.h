@@ -40,6 +40,8 @@ public:
     std::string action, std::function<void(const std::vector<std::string>&)> callback) override;
   interactor& removeCommand(const std::string& action) override;
   std::vector<std::string> getCommandActions() const override;
+  std::unordered_map<std::string, std::string> aliasMap;
+  void alias(const std::string& action, const std::string& value);
   bool triggerCommand(std::string_view command) override;
 
   interactor& initBindings() override;
