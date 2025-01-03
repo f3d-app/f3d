@@ -112,7 +112,7 @@ std::vector<std::string> options::getNames() const
   const std::vector<std::string> names = options::getAllNames();
   std::vector<std::string> setNames;
   std::copy_if(names.begin(), names.end(), std::back_inserter(setNames),
-    [&](std::string_view name) { return this->hasValue(name); });
+    [&](const std::string& name) { return this->hasValue(name); });
   return setNames;
 }
 
