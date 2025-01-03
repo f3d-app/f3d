@@ -143,6 +143,14 @@ public:
   [[nodiscard]] static T parse(const std::string& str);
 
   /**
+   * Templated parsing method used internally to format var into strings.
+   * Implemented for the different supported types,
+   * see PARSING.md for more info.
+   */
+  template<typename T>
+  [[nodiscard]] static std::string format(const T& var);
+
+  /**
    * An exception that can be thrown by the options
    * when parsing of a string into an option value fails
    */
