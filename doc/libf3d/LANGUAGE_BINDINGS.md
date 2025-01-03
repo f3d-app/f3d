@@ -23,6 +23,11 @@ eng.interactor.start()
 
 You can see more examples using python bindings in the dedicated example folder [here](https://github.com/f3d-app/f3d/tree/master/examples/libf3d/python).
 
+### Stubs
+
+It's also possible to generate Python stubs automatically by enabling the CMake option `F3D_BINDINGS_PYTHON_GENERATE_STUBS`.
+Python stubs are `.pyi` files defining the public interface, allowing IDEs to auto-complete and do static analysis.
+
 ## Java (experimental)
 
 If the Java bindings have been generated using the `F3D_BINDINGS_JAVA` CMake option, the libf3d can be used directly from Java.

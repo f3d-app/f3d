@@ -2,11 +2,13 @@ cmake_minimum_required(VERSION 3.21)
 
 project(pyf3d)
 
+option(F3D_BINDINGS_PYTHON_GENERATE_STUBS "Generate Python stubs" OFF)
+
 list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_LIST_DIR}/cmake")
 include(GNUInstallDirs)
 include(f3dPython)
 
-find_package(Python 3.8 COMPONENTS Interpreter Development)
+find_package(Python 3.9 COMPONENTS Interpreter Development)
 find_package(pybind11 2.2 REQUIRED)
 
 pybind11_add_module(pyf3d MODULE F3DPythonBindings.cxx)
@@ -25,7 +27,8 @@ set(f3d_python_package_name "f3d")
 set(f3d_python_package_suffix "python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/site-packages")
 
 get_property(F3D_MULTI_CONFIG_GENERATOR GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
-set(f3d_module_dir "${CMAKE_BINARY_DIR}$<${F3D_MULTI_CONFIG_GENERATOR}:/$<CONFIG>>/${f3d_python_package_name}")
+set(f3d_binary_dir "${CMAKE_BINARY_DIR}$<${F3D_MULTI_CONFIG_GENERATOR}:/$<CONFIG>>")
+set(f3d_module_dir "${f3d_binary_dir}/${f3d_python_package_name}")
 
 set_target_properties(pyf3d PROPERTIES
   CXX_STANDARD 17
@@ -56,7 +59,11 @@ if(WIN32)
   if(PROJECT_IS_TOP_LEVEL)
     f3d_python_windows_dll_fixup(PATHS "$<TARGET_FILE_DIR:f3d::libf3d>" OUTPUT F3D_ABSOLUTE_DLLS_FIXUP)
   else()
-    f3d_python_windows_dll_fixup(PATHS "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" "$<TARGET_FILE_DIR:VTK::CommonCore>" OUTPUT F3D_ABSOLUTE_DLLS_FIXUP)
+    set(f3d_win_dll_paths "$<TARGET_FILE_DIR:VTK::CommonCore>")
+    if(BUILD_SHARED_LIBS)
+      list(APPEND f3d_win_dll_paths "$<TARGET_FILE_DIR:libf3d>")
+    endif()
+    f3d_python_windows_dll_fixup(PATHS "${f3d_win_dll_paths}" OUTPUT F3D_ABSOLUTE_DLLS_FIXUP)
   endif()
 endif()
 
@@ -83,6 +90,15 @@ endif()
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/__init__.py.in"
   "${CMAKE_CURRENT_BINARY_DIR}/__init__.py-install" @ONLY)
 
+# Stubs
+if (F3D_BINDINGS_PYTHON_GENERATE_STUBS)
+  add_custom_command(
+    TARGET pyf3d
+    POST_BUILD
+    COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/generate_stubs.py --into=${f3d_binary_dir}
+    WORKING_DIRECTORY ${f3d_binary_dir})
+endif()
+
 # testing
 if(BUILD_TESTING)
   add_subdirectory(testing)
@@ -93,3 +109,7 @@ install(TARGETS pyf3d
   LIBRARY DESTINATION ${f3d_python_install_path} COMPONENT python)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/__init__.py-install" RENAME "__init__.py"
   DESTINATION ${f3d_python_install_path} COMPONENT python)
+if (F3D_BINDINGS_PYTHON_GENERATE_STUBS)
+  install(FILES  "${f3d_module_dir}/__init__.pyi" "${f3d_module_dir}/pyf3d.pyi"
+    DESTINATION ${f3d_python_install_path} COMPONENT python)
+endif()
