@@ -22,6 +22,4 @@ def test_compare_with_file():
     img = engine.window.render_to_image()
     img.save(output)
 
-    result, _error = img.compare(f3d.Image(reference), 0.05)
-
-    assert result
+    assert img.compare(f3d.Image(reference)) < 0.05
