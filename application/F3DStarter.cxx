@@ -1065,7 +1065,6 @@ int F3DStarter::Start(int argc, char** argv)
             f3d::log::error("Could not write output: ", ex.what());
             return EXIT_FAILURE;
           }
-
         }
         return EXIT_FAILURE;
       }
