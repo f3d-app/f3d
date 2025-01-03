@@ -234,10 +234,9 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
 
     auto* factory = f3d::factory::instance();
 
-    if (const auto& opts = this->Internals->Options;
-      !factory->getPreferredReader().has_value() && opts.render.reader.has_value())
+    if (auto reader = this->Internals->Options.render.reader; reader.has_value())
     {
-      const auto& reader = opts.render.reader;
+      log::debug("Current value of a reader:" + *reader + "\n");
       factory->setPreferredReader(*reader);
     }
 

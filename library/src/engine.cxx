@@ -482,6 +482,14 @@ std::vector<engine::readerInformation> engine::getReadersInfo()
 }
 
 //----------------------------------------------------------------------------
+std::string_view engine::getReader()
+{
+  static const std::string empty_str = ""; // used to avoid dangling pointer; a bit strange way
+  auto prefReader = factory::instance()->getPreferredReader();
+  return prefReader.has_value() ? *prefReader : empty_str;
+}
+
+//----------------------------------------------------------------------------
 engine& engine::setCachePath(const fs::path& cachePath)
 {
   this->Internals->Window->SetCachePath(cachePath);
