@@ -24,23 +24,22 @@ int TestSDKReaderSelection(int argc, char* argv[])
     test("add with a single path", [&]() { scene.add(fs::path(monkey)); });
   }
 
-  // Test Draco reader
+  // Test Draco reader; GLTF is by-default
   {
     f3d::engine engine = f3d::engine::create(true);
-    engine.getOptions().render.reader = "GLTFDraco";
+    engine.getOptions().scene.force_reader = "GLTFDraco";
     f3d::scene& scene = engine.getScene();
     test("Draco reader works", [&]() { scene.add(fs::path(monkey)); });
-    test("Reader is GLTFDraco", engine.getReader() == "GLTFDraco");
+    test("Reader is GLTFDraco", engine.getOptions().scene.force_reader == "GLTFDraco");
   }
 
-  // Test GLTF reader
+  // Test GLTF reader;
   {
     f3d::engine engine = f3d::engine::create(true);
-    engine.getOptions().render.reader = "GLTF";
+    engine.getOptions().scene.force_reader = "GLTF";
     f3d::scene& scene = engine.getScene();
     test("GLTF reader works", [&]() { scene.add(fs::path(monkey)); });
-    test("Reader is GLTF", engine.getReader() == "GLTF");
+    test("Reader is GLTF", engine.getOptions().scene.force_reader == "GLTF");
   }
-
   return test.result();
 }

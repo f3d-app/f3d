@@ -4,6 +4,7 @@
 #include "interactor_impl.h"
 #include "log.h"
 #include "options.h"
+#include "scene.h"
 #include "window_impl.h"
 
 #include "factory.h"
@@ -232,16 +233,9 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
       throw scene::load_failure_exception(filePath.string() + " does not exists");
     }
 
-    auto* factory = f3d::factory::instance();
-
-    if (auto reader = this->Internals->Options.render.reader; reader.has_value())
-    {
-      log::debug("Current value of a reader:" + *reader + "\n");
-      factory->setPreferredReader(*reader);
-    }
-
     // Recover the importer for the provided file path
-    f3d::reader* reader = factory->getReader(filePath.string());
+    f3d::reader* reader = f3d::factory::instance()->getReader(
+      filePath.string(), this->Internals->Options.scene.force_reader);
     if (reader)
     {
       log::debug(
@@ -323,7 +317,8 @@ scene& scene_impl::clear()
 //----------------------------------------------------------------------------
 bool scene_impl::supports(const fs::path& filePath)
 {
-  return f3d::factory::instance()->getReader(filePath.string()) != nullptr;
+  return f3d::factory::instance()->getReader(
+           filePath.string(), this->Internals->Options.scene.force_reader) != nullptr;
 }
 
 //----------------------------------------------------------------------------

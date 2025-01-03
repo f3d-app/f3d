@@ -40,7 +40,7 @@ factory::plugin_initializer_t factory::getStaticInitializer(const std::string& p
 }
 
 //----------------------------------------------------------------------------
-reader* factory::getReader(const std::string& fileName)
+reader* factory::getReader(const std::string& fileName, std::optional<std::string_view> forceReader)
 {
   int bestScore = -1;
   reader* bestReader = nullptr;
@@ -49,7 +49,7 @@ reader* factory::getReader(const std::string& fileName)
   {
     for (auto r : p->getReaders())
     {
-      if (this->Reader.has_value() && r->getName() == *(this->Reader))
+      if (forceReader.has_value() && r->getName() == *forceReader)
       {
         return r->canRead(fileName) ? r.get() : nullptr;
       }
@@ -102,25 +102,5 @@ bool factory::registerOnce(plugin* plug)
     return true;
   }
   return false;
-}
-
-//----------------------------------------------------------------------------
-bool factory::setPreferredReader(const std::string& preferredReader)
-{
-  if (preferredReader == "")
-  {
-    return false;
-  }
-  else
-  {
-    this->Reader = preferredReader;
-    return true;
-  }
-}
-
-//----------------------------------------------------------------------------
-std::optional<std::string_view> factory::getPreferredReader()
-{
-  return this->Reader;
 }
 }

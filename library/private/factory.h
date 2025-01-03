@@ -18,6 +18,7 @@
 
 #include <map>
 #include <optional>
+#include <string_view>
 #include <vector>
 
 namespace f3d
@@ -45,7 +46,7 @@ public:
   /**
    * Get the reader that can read the given file, nullptr if none
    */
-  reader* getReader(const std::string& fileName);
+  reader* getReader(const std::string& fileName, std::optional<std::string_view> forceReader);
 
   /**
    * Get the list of the registered plugins
@@ -58,16 +59,6 @@ public:
    */
   plugin_initializer_t getStaticInitializer(const std::string& pluginName);
 
-  /**
-   * Set preferred reader
-   */
-  bool setPreferredReader(const std::string& preferredReader);
-
-  /**
-   * Get preferred reader
-   */
-  std::optional<std::string_view> getPreferredReader();
-
 protected:
   factory();
   virtual ~factory() = default;
@@ -77,8 +68,6 @@ protected:
   std::vector<plugin*> Plugins;
 
   std::map<std::string, plugin_initializer_t> StaticPluginInitializers;
-
-  std::optional<std::string> Reader;
 };
 }
 #endif

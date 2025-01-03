@@ -235,11 +235,6 @@ public:
   [[nodiscard]] interactor& getInteractor();
 
   /**
-   * Get the enforced readers name
-   */
-  [[nodiscard]] std::string_view getReader();
-
-  /**
    * List rendering backends supported by libf3d.
    * All backends have an associated boolean flag indicating if it can be used.
    */

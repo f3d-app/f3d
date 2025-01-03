@@ -57,6 +57,7 @@ static inline const OptionsDict DefaultAppOptions = {
   { "interaction-test-play", "" },
   { "command-script", "" },
   { "frame-rate", "30.0" },
+  { "force-reader", "" },
 };
 
 /**
@@ -80,6 +81,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "animation-autoplay", "scene.animation.autoplay" },
   { "animation-index", "scene.animation.index" },
   { "animation-speed-factor", "scene.animation.speed_factor" },
+  { "force-reader", "scene.force_reader" },
   { "font-file", "ui.font_file" },
   { "point-sprites", "model.point_sprites.enable" },
   { "point-sprites-type", "model.point_sprites.type" },
@@ -126,7 +128,6 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "anti-aliasing", "render.effect.anti_aliasing" },
   { "tone-mapping", "render.effect.tone_mapping" },
   { "final-shader", "render.effect.final_shader" },
-  { "reader", "render.reader" },
 };
 
 /**

@@ -25,12 +25,12 @@
       "orthographic": {
         "type": "bool"
       }
+    },
+    "force_reader": {
+      "type": "string" 
     }
   },
   "render": {
-    "reader": {
-      "type": "string"
-    },
     "show_edges": {
       "type": "bool"
     },
