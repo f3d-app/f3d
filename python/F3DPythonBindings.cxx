@@ -130,7 +130,12 @@ PYBIND11_MODULE(pyf3d, module)
     .def_property_readonly("channel_type", &f3d::image::getChannelType)
     .def_property_readonly("channel_type_size", &f3d::image::getChannelTypeSize)
     .def_property("content", getImageBytes, setImageBytes)
-    .def("compare", &f3d::image::compare)
+    .def("compare",
+      [](const f3d::image& self, f3d::image& other, double threshold)
+      {
+        double error = 0;
+        return std::make_pair(self.compare(other, threshold, error), error);
+      })
     .def(
       "save", &f3d::image::save, py::arg("path"), py::arg("format") = f3d::image::SaveFormat::PNG)
     .def("save_buffer", getFileBytes, py::arg("format") = f3d::image::SaveFormat::PNG)

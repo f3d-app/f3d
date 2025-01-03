@@ -23,9 +23,8 @@ def test_scene_memory():
     img = engine.window.render_to_image()
     img.save(output)
 
-    error = 0.0
-
-    assert img.compare(f3d.Image(reference), 0.05, error)
+    result, _error = img.compare(f3d.Image(reference), 0.05)
+    assert result
 
 
 def test_scene():
@@ -51,6 +50,5 @@ def test_scene():
     img = engine.window.render_to_image()
     img.save(output)
 
-    error = 0.0
-
-    assert img.compare(f3d.Image(reference), 0.05, error)
+    result, _error = img.compare(f3d.Image(reference), 0.05)
+    assert result
