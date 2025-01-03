@@ -107,9 +107,10 @@ fs::path utils::collapsePath(const fs::path& path, const fs::path& baseDirectory
 {
   try
   {
-    return path.empty()       ? path
-      : baseDirectory.empty() ? fs::path(vtksys::SystemTools::CollapseFullPath(path.string()))
-                              : fs::path(vtksys::SystemTools::CollapseFullPath(path.string(), baseDirectory.string()));
+    return path.empty() ? path
+      : baseDirectory.empty()
+      ? fs::path(vtksys::SystemTools::CollapseFullPath(path.string()))
+      : fs::path(vtksys::SystemTools::CollapseFullPath(path.string(), baseDirectory.string()));
   }
   catch (const fs::filesystem_error& ex)
   {
