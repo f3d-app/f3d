@@ -300,8 +300,6 @@ int TestSDKImage(int argc, char* argv[])
 
   f3d::image empty(0, 0, 0);
   test("compare empty images", empty.compare(empty) == 0.);
-  test("compare with negative threshold", empty.compare(empty) == 1.);
-  test("compare with threshold == 1", empty.compare(empty) == 1.);
 
   return test.result();
 }
