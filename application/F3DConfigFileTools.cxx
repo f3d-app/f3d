@@ -22,7 +22,7 @@ namespace
  */
 std::vector<fs::path> GetConfigPaths(const std::string& configSearch)
 {
-  std::vector<std::filesystem::path> paths;
+  std::vector<fs::path> paths;
 
   fs::path configPath;
   std::vector<fs::path> dirsToCheck = {
@@ -135,7 +135,7 @@ F3DConfigFileTools::ReadConfigFiles(const std::string& userConfig)
     if (fs::is_directory(configPath))
     {
       f3d::log::debug("Using config directory ", configPath.string());
-      for (auto& entry : std::filesystem::directory_iterator(configPath))
+      for (auto& entry : fs::directory_iterator(configPath))
       {
         actualConfigFilePaths.emplace(entry);
       }

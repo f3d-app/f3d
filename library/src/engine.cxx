@@ -279,7 +279,7 @@ void engine::loadPlugin(const std::string& pathOrName, const std::vector<fs::pat
     vtksys::DynamicLoader::LibraryHandle handle = nullptr;
     try
     {
-      fs::path fullPath(utils::collapsePath(pathOrName));
+      fs::path fullPath = utils::collapsePath(pathOrName);
       if (fs::exists(fullPath))
       {
         // plugin provided as full path

@@ -60,7 +60,7 @@ fs::path Find(const std::string& str)
       }
     }
   }
-  catch (const std::filesystem::filesystem_error& ex)
+  catch (const fs::filesystem_error& ex)
   {
     f3d::log::error("Unable to look for color map ", str, ": ", ex.what());
   }

@@ -273,7 +273,7 @@ public:
    * - `{n:2}`, `{n:3}`, ...: zero-padded auto-incremented number to make filename unique
    *   (up to 1000000)
    */
-  fs::path applyFilenameTemplate(const std::string& templateString)
+  fs::path applyFilenameTemplate(const fs::path& templatePath)
   {
     constexpr size_t maxNumberingAttempts = 1000000;
     const std::regex numberingRe("(n:?(.*))");
@@ -359,7 +359,7 @@ public:
       throw f3d::utils::string_template::lookup_error(var);
     };
 
-    f3d::utils::string_template stringTemplate(templateString);
+    f3d::utils::string_template stringTemplate(templatePath.string());
     stringTemplate.substitute(variableLookup);
 
     const auto hasNumbering = [&]()
@@ -911,7 +911,7 @@ int F3DStarter::Start(int argc, char** argv)
   // Add all input files
   for (auto& file : inputFiles)
   {
-    this->AddFile(fs::path(f3d::utils::collapsePath(file)));
+    this->AddFile(f3d::utils::collapsePath(file));
   }
 
   // Load a file
@@ -942,7 +942,7 @@ int F3DStarter::Start(int argc, char** argv)
     }
 
     // Play recording if any
-    fs::path interactionTestPlayFile(f3d::utils::collapsePath(this->Internals->AppOptions.InteractionTestPlayFile));
+    fs::path interactionTestPlayFile = f3d::utils::collapsePath(this->Internals->AppOptions.InteractionTestPlayFile);
     if (!interactionTestPlayFile.empty())
     {
       // For better testing, render once before the interaction
@@ -954,7 +954,7 @@ int F3DStarter::Start(int argc, char** argv)
     }
 
     // Start recording if needed
-    fs::path interactionTestRecordFile(f3d::utils::collapsePath(this->Internals->AppOptions.InteractionTestRecordFile));
+    fs::path interactionTestRecordFile = f3d::utils::collapsePath(this->Internals->AppOptions.InteractionTestRecordFile);
     if (!interactionTestRecordFile.empty())
     {
       if (!interactor.recordInteraction(interactionTestRecordFile))
@@ -964,7 +964,7 @@ int F3DStarter::Start(int argc, char** argv)
     }
 
     // Process Command Script file
-    std::string commandScriptFile = f3d::utils::collapsePath(this->Internals->AppOptions.CommandScriptFile);
+    fs::path commandScriptFile = f3d::utils::collapsePath(this->Internals->AppOptions.CommandScriptFile);
     if (!commandScriptFile.empty())
     {
       std::ifstream scriptFile(commandScriptFile);
@@ -989,8 +989,8 @@ int F3DStarter::Start(int argc, char** argv)
 
     char* noDataForceRender = std::getenv("CTEST_F3D_NO_DATA_FORCE_RENDER");
 
-    fs::path reference(f3d::utils::collapsePath(this->Internals->AppOptions.Reference));
-    fs::path output(this->Internals->applyFilenameTemplate(f3d::utils::collapsePath(this->Internals->AppOptions.Output)));
+    fs::path reference = f3d::utils::collapsePath(this->Internals->AppOptions.Reference);
+    fs::path output = this->Internals->applyFilenameTemplate(f3d::utils::collapsePath(this->Internals->AppOptions.Output));
 
     // Render and compare with file if needed
     if (!reference.empty())
@@ -1406,7 +1406,7 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate, bool minima
   fs::path path;
   try
   {
-    path = this->Internals->applyFilenameTemplate(f3d::utils::collapsePath(filenameTemplate, getScreenshotDir().string()));
+    path = this->Internals->applyFilenameTemplate(f3d::utils::collapsePath(filenameTemplate, getScreenshotDir()));
 
     fs::create_directories(path.parent_path());
     f3d::log::info("saving screenshot to " + path.string());
@@ -1643,7 +1643,7 @@ void F3DStarter::AddCommands()
       int index = -1;
       for (const std::string& file : files)
       {
-        index = this->AddFile(fs::path(f3d::utils::collapsePath(file)));
+        index = this->AddFile(f3d::utils::collapsePath(file));
       }
       if (index > -1)
       {
@@ -1688,7 +1688,7 @@ void F3DStarter::AddCommands()
         }
         else
         {
-          index = this->AddFile(fs::path(f3d::utils::collapsePath(file)));
+          index = this->AddFile(f3d::utils::collapsePath(file));
         }
       }
       if (index > -1)

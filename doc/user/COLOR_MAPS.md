@@ -3,7 +3,7 @@
 ## Image files
 
 It is possible to specify a color map using the `--colormap-file` option.
-The value of the option can be an absolute path to an image file, a relative path, a filename or a filestem. `~` is not supported.
+The value of the option can be an absolute path to an image file, a relative path, a filename or a filestem.
 If it is not an absolute path, these directories are used to find the file (in this order):
  * Linux: `${XDG_CONFIG_HOME}/f3d/colormaps`, `~/.config/f3d/colormaps`, `/etc/f3d/colormaps`, `/usr/share/f3d/colormaps`, `[install_dir]/share/f3d/colormaps`
  * Windows: `%APPDATA%\f3d\colormaps`, `[install_dir]\share\f3d\configs\colormaps`
