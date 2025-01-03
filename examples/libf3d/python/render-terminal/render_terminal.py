@@ -1,17 +1,17 @@
 import math
 import os
-from pathlib import Path
 import time
+from pathlib import Path
+from typing import Any
 
 import f3d
-
 
 TEST_DATA_DIR = Path(__file__).parent.parent.parent.parent.parent / "testing/data"
 
 
 def main():
     model_path = TEST_DATA_DIR / "suzanne.obj"
-    options = {
+    options: dict[str, Any] = {
         "scene.up_direction": "+Y",
         "render.effect.tone_mapping": True,
         "render.effect.ambient_occlusion": True,
@@ -27,10 +27,10 @@ def main():
     except OSError:
         rows, cols = 40, 20
 
-    # setup engine
-    engine = f3d.Engine.create(True)
+    # setup offscreen engine
+    engine = f3d.Engine.create(offsrceen=True)
     engine.options.update(options)
-    engine.scene.add(str(model_path))
+    engine.scene.add(model_path)
     engine.window.size = rows, cols * 2
 
     # fit view to loaded model and grab computed camera position

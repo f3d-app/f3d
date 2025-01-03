@@ -257,7 +257,8 @@ PYBIND11_MODULE(pyf3d, module)
       "Disable the camera interaction")
     .def("play_interaction", &f3d::interactor::playInteraction, "Play an interaction file")
     .def("record_interaction", &f3d::interactor::recordInteraction, "Record an interaction file")
-    .def("start", &f3d::interactor::start, "Start the interactor and the event loop")
+    .def("start", &f3d::interactor::start, "Start the interactor and the event loop",
+      py::arg("delta_time"), py::arg("user_callback"))
     .def("stop", &f3d::interactor::stop, "Stop the interactor and the event loop")
     .def(
       "request_render", &f3d::interactor::requestRender, "Request a render on the next event loop")
@@ -318,7 +319,8 @@ PYBIND11_MODULE(pyf3d, module)
   py::class_<f3d::camera_state_t>(module, "CameraState")
     .def(py::init<>())
     .def(py::init<const f3d::point3_t&, const f3d::point3_t&, const f3d::vector3_t&,
-      const f3d::angle_deg_t&>())
+           const f3d::angle_deg_t&>(),
+      py::arg("position"), py::arg("focal_point"), py::arg("view_up"), py::arg("view_angle"))
     .def_readwrite("position", &f3d::camera_state_t::position)
     .def_readwrite("focal_point", &f3d::camera_state_t::focalPoint)
     .def_readwrite("view_up", &f3d::camera_state_t::viewUp)
@@ -414,7 +416,8 @@ PYBIND11_MODULE(pyf3d, module)
   py::class_<f3d::engine> engine(module, "Engine");
 
   engine //
-    .def_static("create", &f3d::engine::create, "Create an engine with a automatic window")
+    .def_static("create", &f3d::engine::create, "Create an engine with a automatic window",
+      py::arg("offsrceen") = false)
     .def_static("create_none", &f3d::engine::createNone, "Create an engine with no window")
     .def_static(
       "create_glx", &f3d::engine::createGLX, "Create an engine with an GLX window (Linux only)")
