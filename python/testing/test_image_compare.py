@@ -26,4 +26,4 @@ def test_compare_with_file():
 
     error = 0.0
 
-    assert img.compare(f3d.Image(reference), 0.05, error)
+    assert img.compare(f3d.Image(reference)) <= 0.05

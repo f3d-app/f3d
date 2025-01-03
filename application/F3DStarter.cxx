@@ -1034,9 +1034,9 @@ int F3DStarter::Start(int argc, char** argv)
       f3d::image img = window.renderToImage(this->Internals->AppOptions.NoBackground);
       f3d::image ref(reference);
       f3d::image diff;
-      double error;
+      double error = img.compare(ref);
       const double& threshold = this->Internals->AppOptions.RefThreshold;
-      if (!img.compare(ref, threshold, error))
+      if (error > threshold)
       {
         if (output.empty())
         {

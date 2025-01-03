@@ -11,9 +11,7 @@ if __name__ == "__main__":
     diff = f3d.Image()
     error = 0.0
 
-    result = img_0.compare(img_1, 0.05, diff, error)
-
-    if result:
+    if img_0.compare(img_1) <= 0.05:
         print("Images are identical")
     else:
         print("Images are different")
