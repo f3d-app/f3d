@@ -1,19 +1,19 @@
-import sys
+from argparse import ArgumentParser
+
 import f3d
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        sys.exit(1)
+    argparser = ArgumentParser()
+    argparser.add_argument("image1")
+    argparser.add_argument("image2")
 
-    img_0 = f3d.Image(sys.argv[1])
-    img_1 = f3d.Image(sys.argv[2])
+    args = argparser.parse_args()
 
-    diff = f3d.Image()
-    error = 0.0
+    img1 = f3d.Image(args.image1)
+    img2 = f3d.Image(args.image2)
 
-    if img_0.compare(img_1) <= 0.05:
-        print("Images are identical")
+    error = img1.compare(img2)
+    if error > 0.05:
+        print(f"Images are different ({error=})")
     else:
-        print("Images are different")
-
-    sys.exit(0)
+        print(f"Images are identical ({error=})")
