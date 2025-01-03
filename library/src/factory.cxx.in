@@ -52,7 +52,7 @@ reader* factory::getReader(const std::string& fileName)
       if (this->Reader.has_value() && r->getName() == *(this->Reader))
       {
         return r->canRead(fileName) ? r.get() : nullptr;
-      } 
+      }
       if (r->canRead(fileName) && r->getScore() > bestScore)
       {
         bestScore = r->getScore();
@@ -105,20 +105,22 @@ bool factory::registerOnce(plugin* plug)
 }
 
 //----------------------------------------------------------------------------
-bool factory::setPreferredReader(const std::string& preferredReader) {
-  if (preferredReader == "") 
+bool factory::setPreferredReader(const std::string& preferredReader)
+{
+  if (preferredReader == "")
   {
     return false;
   }
-  else 
-  { 
+  else
+  {
     this->Reader = preferredReader;
     return true;
   }
 }
 
 //----------------------------------------------------------------------------
-std::optional<std::string_view> factory::getPreferredReader() {
+std::optional<std::string_view> factory::getPreferredReader()
+{
   return this->Reader;
 }
 }
