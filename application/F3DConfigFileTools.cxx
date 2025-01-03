@@ -112,7 +112,7 @@ F3DConfigFileTools::ReadConfigFiles(const std::string& userConfig)
   }
   else
   {
-    // Collpase full path into an absolute path
+    // Collapse full path into an absolute path
     configPaths.emplace_back(f3d::utils::collapsePath(userConfig));
   }
 

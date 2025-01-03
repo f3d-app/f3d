@@ -870,8 +870,8 @@ int F3DStarter::Start(int argc, char** argv)
   }
   else
   {
-    bool offscreen =
-      !this->Internals->AppOptions.Reference.empty() || !this->Internals->AppOptions.Output.empty() || this->Internals->AppOptions.BindingsList;
+    bool offscreen = !this->Internals->AppOptions.Reference.empty() ||
+      !this->Internals->AppOptions.Output.empty() || this->Internals->AppOptions.BindingsList;
 
     if (this->Internals->AppOptions.RenderingBackend == "egl")
     {
@@ -942,7 +942,8 @@ int F3DStarter::Start(int argc, char** argv)
     }
 
     // Play recording if any
-    fs::path interactionTestPlayFile = f3d::utils::collapsePath(this->Internals->AppOptions.InteractionTestPlayFile);
+    fs::path interactionTestPlayFile =
+      f3d::utils::collapsePath(this->Internals->AppOptions.InteractionTestPlayFile);
     if (!interactionTestPlayFile.empty())
     {
       // For better testing, render once before the interaction
@@ -954,7 +955,8 @@ int F3DStarter::Start(int argc, char** argv)
     }
 
     // Start recording if needed
-    fs::path interactionTestRecordFile = f3d::utils::collapsePath(this->Internals->AppOptions.InteractionTestRecordFile);
+    fs::path interactionTestRecordFile =
+      f3d::utils::collapsePath(this->Internals->AppOptions.InteractionTestRecordFile);
     if (!interactionTestRecordFile.empty())
     {
       if (!interactor.recordInteraction(interactionTestRecordFile))
@@ -964,7 +966,8 @@ int F3DStarter::Start(int argc, char** argv)
     }
 
     // Process Command Script file
-    fs::path commandScriptFile = f3d::utils::collapsePath(this->Internals->AppOptions.CommandScriptFile);
+    fs::path commandScriptFile =
+      f3d::utils::collapsePath(this->Internals->AppOptions.CommandScriptFile);
     if (!commandScriptFile.empty())
     {
       std::ifstream scriptFile(commandScriptFile);
@@ -990,7 +993,8 @@ int F3DStarter::Start(int argc, char** argv)
     char* noDataForceRender = std::getenv("CTEST_F3D_NO_DATA_FORCE_RENDER");
 
     fs::path reference = f3d::utils::collapsePath(this->Internals->AppOptions.Reference);
-    fs::path output = this->Internals->applyFilenameTemplate(f3d::utils::collapsePath(this->Internals->AppOptions.Output));
+    fs::path output = this->Internals->applyFilenameTemplate(
+      f3d::utils::collapsePath(this->Internals->AppOptions.Output));
 
     // Render and compare with file if needed
     if (!reference.empty())
@@ -1406,7 +1410,8 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate, bool minima
   fs::path path;
   try
   {
-    path = this->Internals->applyFilenameTemplate(f3d::utils::collapsePath(filenameTemplate, getScreenshotDir()));
+    path = this->Internals->applyFilenameTemplate(
+      f3d::utils::collapsePath(filenameTemplate, getScreenshotDir()));
 
     fs::create_directories(path.parent_path());
     f3d::log::info("saving screenshot to " + path.string());
@@ -1481,7 +1486,8 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
       // Check if file has already been added
       bool found = false;
       std::vector<std::vector<fs::path>>::iterator it;
-      for (it = this->Internals->FilesGroups.begin(); it != this->Internals->FilesGroups.end(); it++)
+      for (it = this->Internals->FilesGroups.begin(); it != this->Internals->FilesGroups.end();
+           it++)
       {
         auto localIt = std::find(it->begin(), it->end(), tmpPath);
         found |= localIt != it->end();
