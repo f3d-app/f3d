@@ -171,7 +171,22 @@ PYBIND11_MODULE(pyf3d, module)
         }
         catch (const f3d::options::incompatible_exception&)
         {
-          throw py::attribute_error(key);
+          if (std::holds_alternative<std::string>(value))
+          {
+            try
+            {
+
+              opts.setAsString(key, std::get<std::string>(value));
+            }
+            catch (const f3d::options::parsing_exception&)
+            {
+              throw py::value_error(std::get<std::string>(value));
+            }
+          }
+          else
+          {
+            throw py::attribute_error(key);
+          }
         }
       })
     .def("__getitem__",
