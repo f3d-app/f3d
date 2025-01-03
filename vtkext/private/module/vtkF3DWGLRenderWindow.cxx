@@ -100,4 +100,9 @@ void vtkF3DWGLRenderWindow::WindowInitialize()
     BOOL useDarkMode = ::IsWindowsInDarkMode();
     DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &useDarkMode, sizeof(useDarkMode));
   }
+
+  // set HDPI
+#if WINVER >= 0x0605
+  SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+#endif
 }
