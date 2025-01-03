@@ -130,13 +130,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def_property_readonly("channel_type", &f3d::image::getChannelType)
     .def_property_readonly("channel_type_size", &f3d::image::getChannelTypeSize)
     .def_property("content", getImageBytes, setImageBytes)
-    .def("compare", // TODO remove lambda when C++ API is updated
-      [](const f3d::image& self, f3d::image& other)
-      {
-        double error = 0;
-        self.compare(other, 0, error);
-        return error;
-      })
+    .def("compare", &f3d::image::compare)
     .def(
       "save", &f3d::image::save, py::arg("path"), py::arg("format") = f3d::image::SaveFormat::PNG)
     .def("save_buffer", getFileBytes, py::arg("format") = f3d::image::SaveFormat::PNG)
