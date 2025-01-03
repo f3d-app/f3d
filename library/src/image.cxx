@@ -403,7 +403,7 @@ double image::compare(const image& reference) const
   imDiff->SetThreshold(0);
   imDiff->SetInputData(this->Internals->Image);
   imDiff->SetImageData(reference.Internals->Image);
-  imDiff->UpdateInformation();
+  imDiff->Update();
   double error = imDiff->GetThresholdedError();
   return error / 1000.0;
 #endif
