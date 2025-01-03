@@ -25,8 +25,4 @@ if __name__ == "__main__":
     # Render
     eng.window.render()
 
-    # Start interaction
-    def user_callback():
-        pass
-
-    eng.interactor.start(1 / 30, user_callback)
+    eng.interactor.start()
