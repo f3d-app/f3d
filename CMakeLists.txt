@@ -122,6 +122,11 @@ include(GNUInstallDirs)
 cmake_dependent_option(F3D_WINDOWS_GUI "Build a non-console Win32 application" ON "WIN32" OFF)
 cmake_dependent_option(F3D_MACOS_BUNDLE "Build a macOS bundle application" ON "APPLE" OFF)
 
+if(UNIX AND NOT APPLE)
+  option(F3D_LINUX_LINK_FILESYSTEM "Link with libstdc++fs" ON)
+  mark_as_advanced(F3D_LINUX_LINK_FILESYSTEM)
+endif()
+
 # Force static library when creating a macOS bundle
 cmake_dependent_option(BUILD_SHARED_LIBS "Build f3d with shared libraries" ON "NOT ANDROID" OFF)
 

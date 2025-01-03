@@ -167,6 +167,10 @@ target_link_libraries(libf3d PRIVATE ${F3D_VTK_MODULES} ${F3D_STATIC_PLUGIN_TARG
 target_compile_options(libf3d PUBLIC ${f3d_compile_options_public} PRIVATE ${f3d_compile_options_private})
 target_link_options(libf3d PUBLIC ${f3d_link_options_public})
 
+if(F3D_LINUX_LINK_FILESYSTEM)
+  target_link_libraries(libf3d PRIVATE stdc++fs)
+endif()
+
 # exr
 if (F3D_MODULE_EXR)
   target_compile_definitions(libf3d PRIVATE F3D_MODULE_EXR)

@@ -40,12 +40,8 @@ if(UNIX)
   target_link_libraries(f3d PRIVATE Threads::Threads)
 endif()
 
-if(UNIX AND NOT APPLE)
-  option(F3D_LINUX_APPLICATION_LINK_FILESYSTEM "Link with libstdc++fs" ON)
-  mark_as_advanced(F3D_LINUX_APPLICATION_LINK_FILESYSTEM)
-  if(F3D_LINUX_APPLICATION_LINK_FILESYSTEM)
-    target_link_libraries(f3d PRIVATE stdc++fs)
-  endif()
+if(F3D_LINUX_LINK_FILESYSTEM)
+  target_link_libraries(f3d PRIVATE stdc++fs)
 endif()
 
 set_target_properties(f3d PROPERTIES
