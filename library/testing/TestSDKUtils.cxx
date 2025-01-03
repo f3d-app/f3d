@@ -115,7 +115,7 @@ int TestSDKUtils(int argc, char* argv[])
   test(
     "collapsePath: remove dotdot", f3d::utils::collapsePath("/folder/../file.ext") == "/file.ext");
   test("collapsePath: expand home",
-    fs::path(f3d::utils::collapsePath("~/folder/file.ext")).is_absolute());
+    f3d::utils::collapsePath("~/folder/file.ext").is_absolute());
 
   return test.result();
 }
