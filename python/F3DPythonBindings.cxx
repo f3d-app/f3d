@@ -130,7 +130,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def_property_readonly("channel_type", &f3d::image::getChannelType)
     .def_property_readonly("channel_type_size", &f3d::image::getChannelTypeSize)
     .def_property("content", getImageBytes, setImageBytes)
-    .def("compare",
+    .def("compare", // TODO rework c++ API to match
       [](const f3d::image& self, f3d::image& other, double threshold)
       {
         double error = 0;
@@ -180,7 +180,6 @@ PYBIND11_MODULE(pyf3d, module)
           {
             try
             {
-
               opts.setAsString(key, std::get<std::string>(value));
             }
             catch (const f3d::options::parsing_exception&)
@@ -417,7 +416,7 @@ PYBIND11_MODULE(pyf3d, module)
 
   engine //
     .def_static("create", &f3d::engine::create, "Create an engine with a automatic window",
-      py::arg("offsrceen") = false)
+      py::arg("offscreen") = false)
     .def_static("create_none", &f3d::engine::createNone, "Create an engine with no window")
     .def_static(
       "create_glx", &f3d::engine::createGLX, "Create an engine with an GLX window (Linux only)")
