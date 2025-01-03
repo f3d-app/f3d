@@ -46,14 +46,14 @@ public:
    * Throw an options::inexistent_exception if option does not exist.
    * Throw an options::incompatible_exception if value is not compatible with option.
    */
-  options& set(const std::string& name, const option_variant_t& value);
+  options& set(std::string_view name, const option_variant_t& value);
 
   /**
    * Get an option as a variant based on its name
    * Throw an options::inexistent_exception if option does not exist.
    * Throw an options::no_value_exception if option has not been set.
    */
-  [[nodiscard]] option_variant_t get(const std::string& name) const;
+  [[nodiscard]] option_variant_t get(std::string_view name) const;
 
   /**
    * Set an option as a string based on its name
@@ -62,14 +62,14 @@ public:
    * Throw an options::inexistent_exception if option does not exist.
    * Throw an options::parsing_exception if parsing failed.
    */
-  options& setAsString(const std::string& name, const std::string& str);
+  options& setAsString(std::string_view name, const std::string& str);
 
   /**
    * Get an option as a string based on its name
    * Throw an options::inexistent_exception if option does not exist.
    * Throw an options::no_value_exception if option has not been set.
    */
-  [[nodiscard]] std::string getAsString(const std::string& name) const;
+  [[nodiscard]] std::string getAsString(std::string_view name) const;
 
   /**
    * A boolean option specific method to toggle it.
@@ -77,27 +77,27 @@ public:
    * Throw an options::inexistent_exception if option does not exist.
    * Throw an options::incompatible_exception if option is not boolean.
    */
-  options& toggle(const std::string& name);
+  options& toggle(std::string_view name);
 
   /**
    * Compare an option between this and a provided other.
    * Return true if they are the same value, false otherwise.
    * Throw an options::inexistent_exception if option does not exist.
    */
-  [[nodiscard]] bool isSame(const options& other, const std::string& name) const;
+  [[nodiscard]] bool isSame(const options& other, std::string_view name) const;
 
   /**
    * Return true if an option has a value, false otherwise
    * Always returns true for non-optional options.
    * Throw an options::inexistent_exception if option does not exist.
    */
-  [[nodiscard]] bool hasValue(const std::string& name) const;
+  [[nodiscard]] bool hasValue(std::string_view name) const;
 
   /**
    * Copy the value of an option from this to the provided other.
    * Throw an options::inexistent_exception if option does not exist.
    */
-  options& copy(const options& other, const std::string& name);
+  options& copy(const options& other, std::string_view name);
 
   /**
    * Get all available option names.
@@ -113,40 +113,30 @@ public:
    * Get the closest option name and its Levenshtein distance.
    */
   [[nodiscard]] std::pair<std::string, unsigned int> getClosestOption(
-    const std::string& option) const;
+    std::string_view option) const;
 
   /**
    *  Returns true if the option is optional else returns false.
    *  Throws an options::inexistent_exception if option does not exist.
    */
-  [[nodiscard]] bool isOptional(const std::string& option) const;
+  [[nodiscard]] bool isOptional(std::string_view option) const;
 
   /**
    *  Resets the option to default value.
    *  Throws an options::inexistent_exception if option does not exist.
    */
-  options& reset(const std::string& name);
+  options& reset(std::string_view name);
 
   /**
    *  Unset the option if it is optional else throws options::incompatible_exception.
    *  Throws an options::inexistent_exception if option does not exist.
    */
-  options& removeValue(const std::string& name);
+  options& removeValue(std::string_view name);
 
   /**
    * Templated parsing method used internally to parse strings.
-   * Implemented for:
-   * - `bool` as `"true"`/`"false"`, `"1"`/`"0"`, `"yes"`/`"no"`, `"on"`/`"off"`
-   * (case-insensitive)
-   * - `int`: `"123"`, `"+123"`, `"-456"`
-   * - `double`: `"123.45"`, `"+123.45"`, `"-67.8"`, `"-1e3"`
-   * - `ratio_t`: as
-   *   + a number, same a `double` above
-   *   + a percentage: `"12.3%"` => `0.123`
-   *   + a fraction: `"3/4"` => `0.75`
-   * - `vector<T>` where `T` is one of the above: the input is split on `","` and chunks are trimmed
-   *   before parsing each element.
-   * See parsing documentation for more info. TODO.
+   * Implemented for the different supported types,
+   * see PARSING.md for more info.
    * Throw an options::parsing_exception if parsing failed.
    */
   template<typename T>
