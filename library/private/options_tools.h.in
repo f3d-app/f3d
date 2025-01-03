@@ -194,22 +194,10 @@ std::string parse(const std::string& str)
 // TODO Improve string generation
 //----------------------------------------------------------------------------
 /**
- * Generic templated string generation from provided value
- * rely on std::to_string
- */
-template<typename T>
-std::string format(const T& var)
-{
-  return std::to_string(var);
-}
-
-//----------------------------------------------------------------------------
-/**
  * Format provided var into a string from provided boolean
  * using boolalpha formatting, eg: "true" or "false"
  */
-template<>
-std::string format(const bool& var)
+std::string format(bool var)
 {
   std::stringstream stream;
   stream << std::boolalpha << var;
@@ -218,11 +206,19 @@ std::string format(const bool& var)
 
 //----------------------------------------------------------------------------
 /**
+ * Format provided var into a string from provided int
+ */
+std::string format(int var)
+{
+  return std::to_string(var);
+}
+
+//----------------------------------------------------------------------------
+/**
  * Format provided var into a string from provided double
  * using ostringstream with std::noshowpoint
  */
-template<>
-std::string format(const double& var)
+std::string format(double var)
 {
   std::ostringstream stream;
   stream << std::noshowpoint << var;
@@ -234,19 +230,16 @@ std::string format(const double& var)
  * Format provided var into a string from provided ratio_t
  * rely on format(double&)
  */
-template<>
-std::string format(const ratio_t& var)
+std::string format(ratio_t var)
 {
   // TODO generate a proper ratio string
-  double val = var;
-  return options_tools::format(val);
+  return options_tools::format(static_cast<double>(var));
 }
 
 //----------------------------------------------------------------------------
 /**
  * Generate (returns) a string from provided string
  */
-template<>
 std::string format(const std::string& var)
 {
   return var;
@@ -257,12 +250,12 @@ std::string format(const std::string& var)
  * Format provided var into a string from provided double vector
  * rely on format(double&) and add `, ` between the double values
  */
-template<>
-std::string format(const std::vector<double>& var)
+template<typename T>
+std::string format(const std::vector<T>& var)
 {
   std::ostringstream stream;
   unsigned int i = 0;
-  for (auto& elem : var)
+  for (const T& elem : var)
   {
     stream << ((i > 0) ? "," : "") << options_tools::format(elem);
     i++;
@@ -274,18 +267,19 @@ std::string format(const std::vector<double>& var)
 /**
  * Generated method, see `options::set`
  */
-void set(options& opt, const std::string& name, const option_variant_t& value)
+void set(options& opt, std::string_view name, const option_variant_t& value)
 {
   try
   {
     // clang-format off
     ${_options_setter};
     // clang-format on
-    else throw options::inexistent_exception("Option " + name + " does not exist");
+    else throw options::inexistent_exception("Option " + std::string(name) + " does not exist");
   }
   catch (const std::bad_variant_access&)
   {
-    throw options::incompatible_exception("Trying to set " + name + " with incompatible type");
+    throw options::incompatible_exception(
+      "Trying to set " + std::string(name) + " with incompatible type");
   }
 }
 
@@ -293,18 +287,18 @@ void set(options& opt, const std::string& name, const option_variant_t& value)
 /**
  * Generated method, see `options::get`
  */
-option_variant_t get(const options& opt, const std::string& name)
+option_variant_t get(const options& opt, std::string_view name)
 {
   try
   {
     // clang-format off
     ${_options_getter};
     // clang-format on
-    else throw options::inexistent_exception("Option " + name + " does not exist");
+    else throw options::inexistent_exception("Option " + std::string(name) + " does not exist");
   }
   catch (const std::bad_optional_access&)
   {
-    throw options::no_value_exception("Trying to get " + name + " before it was set");
+    throw options::no_value_exception("Trying to get " + std::string(name) + " before it was set");
   }
 }
 
@@ -323,29 +317,29 @@ std::vector<std::string> getNames()
 /**
  * Generated method, see `options::setAsString`
  */
-void setAsString(options& opt, const std::string& name, const std::string& str)
+void setAsString(options& opt, std::string_view name, const std::string& str)
 {
   // clang-format off
   ${_options_string_setter};
   // clang-format on
-  else throw options::inexistent_exception("Option " + name + " does not exist");
+  else throw options::inexistent_exception("Option " + std::string(name) + " does not exist");
 }
 //----------------------------------------------------------------------------
 /**
  * Generated method, see `options::getAsString`
  */
-std::string getAsString(const options& opt, const std::string& name)
+std::string getAsString(const options& opt, std::string_view name)
 {
   try
   {
     // clang-format off
     ${_options_string_getter};
     // clang-format on
-    else throw options::inexistent_exception("Option " + name + " does not exist");
+    else throw options::inexistent_exception("Option " + std::string(name) + " does not exist");
   }
   catch (const std::bad_optional_access&)
   {
-    throw options::no_value_exception("Trying to get " + name + " before it was set");
+    throw options::no_value_exception("Trying to get " + std::string(name) + " before it was set");
   }
 }
 
@@ -353,24 +347,24 @@ std::string getAsString(const options& opt, const std::string& name)
 /**
  * Generated method, see `options::isOptional`
  */
-bool isOptional(const std::string& name)
+bool isOptional(std::string_view name)
 {
   // clang-format off
   ${_options_is_optional};
   // clang-format on
-  else throw options::inexistent_exception("Option " + name + " does not exist");
+  else throw options::inexistent_exception("Option " + std::string(name) + " does not exist");
 }
 
 //----------------------------------------------------------------------------
 /**
  * Generated method, see `options::reset`
  */
-void reset(options& opt, const std::string& name)
+void reset(options& opt, std::string_view name)
 {
   // clang-format off
   ${_options_reset};
   // clang-format on
-  else throw options::inexistent_exception("Option " + name + " does not exist");
+  else throw options::inexistent_exception("Option " + std::string(name) + " does not exist");
 }
 
 } // option_tools

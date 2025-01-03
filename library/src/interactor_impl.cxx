@@ -572,7 +572,12 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
 }
 
 //----------------------------------------------------------------------------
-interactor_impl::~interactor_impl() = default;
+interactor_impl::~interactor_impl()
+{
+  vtkOutputWindow::GetInstance()->RemoveObservers(vtkF3DConsoleOutputWindow::TriggerEvent);
+  vtkOutputWindow::GetInstance()->RemoveObservers(vtkF3DConsoleOutputWindow::ShowEvent);
+  vtkOutputWindow::GetInstance()->RemoveObservers(vtkF3DConsoleOutputWindow::HideEvent);
+}
 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::initCommands()
@@ -1153,7 +1158,7 @@ bool interactor_impl::playInteraction(
 
     this->Internals->StopEventLoop();
   }
-  catch (const std::filesystem::filesystem_error& ex)
+  catch (const fs::filesystem_error& ex)
   {
     log::error("Could not play recording: ", ex.what());
     return false;
@@ -1191,7 +1196,7 @@ bool interactor_impl::recordInteraction(const fs::path& file)
     this->Internals->Recorder->On();
     this->Internals->Recorder->Record();
   }
-  catch (const std::filesystem::filesystem_error& ex)
+  catch (const fs::filesystem_error& ex)
   {
     log::error("Could not record: ", ex.what());
     return false;

@@ -1,10 +1,10 @@
 [build-system]
-requires = ["scikit-build-core", "setuptools-scm>=8.0"]
+requires = ["scikit-build-core", "setuptools-scm>=8.0", "pybind11_stubgen"]
 build-backend = "scikit_build_core.build"
 
 [project]
 name = "f3d"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 dynamic = ["version"]
 description = "F3D, a fast and minimalist 3D viewer"
 readme = "README.md"
@@ -58,6 +58,7 @@ fallback_version = "2.5.1"
 CMAKE_OSX_DEPLOYMENT_TARGET = "10.15"
 BUILD_SHARED_LIBS = "ON"
 F3D_BINDINGS_PYTHON = "ON"
+F3D_BINDINGS_PYTHON_GENERATE_STUBS = "ON"
 F3D_PLUGINS_STATIC_BUILD = "ON"
 F3D_BUILD_APPLICATION = "OFF"
 F3D_WINDOWS_BUILD_SHELL_THUMBNAILS_EXTENSION = "OFF"

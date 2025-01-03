@@ -2,6 +2,10 @@
 
 #include <utils.h>
 
+#include <filesystem>
+
+namespace fs = std::filesystem;
+
 int TestSDKUtils(int argc, char* argv[])
 {
   PseudoUnitTest test;
@@ -100,6 +104,17 @@ int TestSDKUtils(int argc, char* argv[])
       .substitute({ { "foo", "bar" } })
       .str(),
     "hello {foo}!");
+
+  //
+
+  test("collapsePath: empty", f3d::utils::collapsePath("").empty());
+  test("collapsePath: relative to absolute",
+    f3d::utils::collapsePath("folder/file.ext").is_absolute());
+  test("collapsePath: relative with folder",
+    f3d::utils::collapsePath("folder/file.ext", "/") == "/folder/file.ext");
+  test(
+    "collapsePath: remove dotdot", f3d::utils::collapsePath("/folder/../file.ext") == "/file.ext");
+  test("collapsePath: expand home", f3d::utils::collapsePath("~/folder/file.ext").is_absolute());
 
   return test.result();
 }
