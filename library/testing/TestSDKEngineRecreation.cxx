@@ -1,14 +1,11 @@
 #include <engine.h>
 #include <interactor.h>
 
-#include <iostream>
-
 int TestSDKEngineRecreation(int argc, char* argv[])
 {
   std::string filename = "TestSDKEngineRecreation";
   std::string interactionFilePath = std::string(argv[1]) + "/recordings/" + filename + ".log";
   auto eng = std::make_unique<f3d::engine>(f3d::engine::create(false));
-  eng->getInteractor().start(1 / 30, [eng]() { eng->getInteractor().stop(); });
   eng = nullptr;
   for (int i = 0; i < 5; i++)
   {
