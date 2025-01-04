@@ -246,9 +246,9 @@ public:
           for (int j = 0; j < 3; j++)
           {
             vertexNum[j] = triangles[i].vertex[j];
-            double xyz[3] = { double(selectedSimpleFrame->verts[vertexNum[j]].xyz[0]),
-              double(selectedSimpleFrame->verts[vertexNum[j]].xyz[1]),
-              double(selectedSimpleFrame->verts[vertexNum[j]].xyz[2]) };
+            double xyz[3] = { static_cast<double>(selectedSimpleFrame->verts[vertexNum[j]].xyz[0]),
+              static_cast<double>(selectedSimpleFrame->verts[vertexNum[j]].xyz[1]),
+              static_cast<double>(selectedSimpleFrame->verts[vertexNum[j]].xyz[2]) };
             // Calculate real vertex position
             for (int k = 0; k < 3; k++)
             {
@@ -453,7 +453,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkF3DQuakeMDLImporter::vtkF3DQuakeMDLImporter()
-  : Internals(new vtkF3DQuakeMDLImporter::vtkInternals(this)) {
+  : Internals(new vtkF3DQuakeMDLImporter::vtkInternals(this)){
 
   };
 
