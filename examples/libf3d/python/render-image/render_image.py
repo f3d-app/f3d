@@ -1,20 +1,32 @@
 import sys
+from argparse import ArgumentParser
+from pathlib import Path
+from tempfile import gettempdir
+
 import f3d
 
+TEST_DATA_DIR = Path(__file__).parent.parent.parent.parent.parent / "testing/data"
+
 if __name__ == "__main__":
-    if len(sys.argv) > 4:
-        sys.exit(1)
+    argparser = ArgumentParser()
+    argparser.add_argument("models", nargs="*")
+    argparser.add_argument("--into", default=gettempdir())
+
+    args = argparser.parse_args()
+
+    input_paths = args.models or [TEST_DATA_DIR / "suzanne.obj"]
+    output_path = Path(args.into) / "f3d.png"
 
     try:
-        f3d.Engine.autoload_plugins()
-
         eng = f3d.Engine.create(True)
-        eng.scene.add(sys.argv[1])
-
         eng.window.size = 300, 300
-        img = eng.window.render_to_image()
 
-        img.save(sys.argv[2])
+        eng.scene.add(input_paths)
+
+        img = eng.window.render_to_image()
+        img.save(output_path)
+
+        print(f"rendered to {output_path}")
     except Exception as e:
         print("F3D encountered an unexpected exception:")
         print(e)

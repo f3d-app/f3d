@@ -24,7 +24,7 @@ Option|Type<br>Default<br>Trigger|Description|F3D option
 :---:|:---:|:---|:---:
 scene.animation.autoplay|bool<br>false<br>load|Automatically start animation.|\-\-animation-autoplay
 scene.animation.index|int<br>0<br>load|Select the animation to load.<br>Any negative value means all animations (glTF only).<br>The default scene always has at most one animation.|\-\-animation-index
-scene.animation.speed_factor|double<br>1<br>render|Set the animation speed factor to slow, speed up or even invert animation.|\-\-animation-speed-factor
+scene.animation.speed_factor|ratio<br>1<br>render|Set the animation speed factor to slow, speed up or even invert animation.|\-\-animation-speed-factor
 scene.animation.time|double<br>optional<br>load|Set the animation time to load.|\-\-animation-time
 scene.camera.index|int<br>optional<br>load|Select the scene camera to use when available in the file.<br>The default scene always uses automatic camera.|\-\-camera-index
 scene.up_direction|string<br>+Y<br>load|Define the Up direction. It impacts the grid, the axis, the HDRI and the camera.|\-\-up
@@ -92,6 +92,7 @@ render.background.skybox|bool<br>false<br>render|Show the *HDRI* image as a skyb
 render.background.blur.enable|bool<br>false<br>render|Blur background, useful with a skybox.|\-\-blur-background
 render.background.blur.coc|double<br>20.0<br>render|Blur background circle of confusion radius.|\-\-blur-coc
 render.light.intensity|double<br>1.0<br>render|Adjust the intensity of every light in the scene.|\-\-light-intensity
+render.armature.enable|bool<br>false<br>render|Display armatures if present in the scene (glTF only).|\-\-armature
 
 ## UI Options
 
@@ -148,7 +149,7 @@ It's even more true with the few optional boolean options as std::optional has a
 ## String API
 
 The most generic and flexible API, as it rely on parsing and string generation.
-The documentation about option parsing is upcoming.
+See the [parsing documentation](../user/PARSING.md) for more details.
 
 ```cpp
   f3d::engine eng = f3d::engine::create();

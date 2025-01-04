@@ -7,6 +7,11 @@
 #include "window_impl.h"
 
 #include "vtkF3DConsoleOutputWindow.h"
+
+#if F3D_MODULE_UI
+#include "vtkF3DImguiConsole.h"
+#endif
+
 #include "vtkF3DInteractorEventRecorder.h"
 #include "vtkF3DInteractorStyle.h"
 #include "vtkF3DRenderer.h"
@@ -36,6 +41,8 @@
 #include <vector>
 
 #include "camera.h"
+
+namespace fs = std::filesystem;
 
 namespace f3d::detail
 {
@@ -565,7 +572,12 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
 }
 
 //----------------------------------------------------------------------------
-interactor_impl::~interactor_impl() = default;
+interactor_impl::~interactor_impl()
+{
+  vtkOutputWindow::GetInstance()->RemoveObservers(vtkF3DConsoleOutputWindow::TriggerEvent);
+  vtkOutputWindow::GetInstance()->RemoveObservers(vtkF3DConsoleOutputWindow::ShowEvent);
+  vtkOutputWindow::GetInstance()->RemoveObservers(vtkF3DConsoleOutputWindow::HideEvent);
+}
 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::initCommands()
@@ -602,6 +614,17 @@ interactor& interactor_impl::initCommands()
     {
       check_args(args, 1, "reset");
       this->Internals->Options.reset(args[0]);
+    });
+  this->addCommand("clear",
+    [&](const std::vector<std::string>& args)
+    {
+      check_args(args, 0, "clear");
+#if F3D_MODULE_UI
+      vtkF3DImguiConsole* console =
+        vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
+      assert(console != nullptr);
+      console->Clear();
+#endif
     });
   this->addCommand("print",
     [&](const std::vector<std::string>& args)
@@ -663,9 +686,26 @@ interactor& interactor_impl::initCommands()
 
   this->addCommand("print_scene_info",
     [&](const std::vector<std::string>&)
+    { this->Internals->Window.PrintSceneDescription(log::VerboseLevel::INFO); });
+
+  this->addCommand("print_coloring_info",
+    [&](const std::vector<std::string>&)
+    { this->Internals->Window.PrintColoringDescription(log::VerboseLevel::INFO); });
+
+  this->addCommand("print_mesh_info",
+    [&](const std::vector<std::string>&)
+    { this->Internals->Scene.PrintImporterDescription(log::VerboseLevel::INFO); });
+
+  this->addCommand("print_options_info",
+    [&](const std::vector<std::string>&)
     {
-      this->Internals->Window.PrintColoringDescription(log::VerboseLevel::INFO);
-      this->Internals->Window.PrintSceneDescription(log::VerboseLevel::INFO);
+      for (const std::string& option : this->Internals->Options.getNames())
+      {
+        const std::string val{ this->Internals->Options.getAsString(option) };
+        std::string descr{};
+        descr.append(option).append(": ").append(val);
+        log::print(log::VerboseLevel::INFO, descr);
+      }
     });
 
   this->addCommand("set_camera",
@@ -723,13 +763,14 @@ interactor& interactor_impl::initCommands()
 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::addCommand(
-  const std::string& action, std::function<void(const std::vector<std::string>&)> callback)
+  std::string action, std::function<void(const std::vector<std::string>&)> callback)
 {
-  const auto [it, success] = this->Internals->Commands.insert({ action, callback });
+  const auto [it, success] =
+    this->Internals->Commands.insert({ std::move(action), std::move(callback) });
   if (!success)
   {
     throw interactor::already_exists_exception(
-      "Could not add a command callback for action: " + action + " as it already exists.");
+      "Could not add a command callback for action: " + it->first + " as it already exists.");
   }
   return *this;
 }
@@ -917,6 +958,7 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "J"}, "toggle render.background.skybox","Scene", std::bind(docTgl, "Toggle HDRI skybox", std::cref(opts.render.background.skybox)));
   this->addBinding({mod_t::NONE, "L"}, "increase_light_intensity", "Scene", std::bind(docDbl, "Increase lights intensity", std::cref(opts.render.light.intensity)));
   this->addBinding({mod_t::SHIFT, "L"}, "decrease_light_intensity", "Scene", std::bind(docDbl, "Decrease lights intensity", std::cref(opts.render.light.intensity)));
+  this->addBinding({mod_t::SHIFT, "A"}, "toggle render.armature.enable","Scene", std::bind(docTgl, "Toggle armature", std::cref(opts.render.armature.enable)));
   this->addBinding({mod_t::ANY, "1"}, "set_camera front", "Camera", std::bind(docStr, "Front View camera"));
   this->addBinding({mod_t::ANY, "3"}, "set_camera right", "Camera", std::bind(docStr, "Right View camera"));
   this->addBinding({mod_t::ANY, "4"}, "roll_camera -90", "Camera", std::bind(docStr, "Rotate camera right"));
@@ -928,7 +970,6 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "H"}, "toggle ui.cheatsheet", "Others", std::bind(docStr, "Toggle cheatsheet display"));
   this->addBinding({mod_t::NONE, "Escape"}, "toggle ui.console", "Others", std::bind(docStr, "Toggle console display"));
 #endif
-  this->addBinding({mod_t::ANY, "Question"}, "print_scene_info", "Others", std::bind(docStr, "Print scene descr to terminal"));
   this->addBinding({mod_t::CTRL, "Q"}, "stop_interactor", "Others", std::bind(docStr, "Stop the interactor"));
   this->addBinding({mod_t::NONE, "Return"}, "reset_camera", "Others", std::bind(docStr, "Reset camera to initial parameters"));
   this->addBinding({mod_t::NONE, "Space"}, "toggle_animation", "Others", std::bind(docStr, "Play/Pause animation if any"));
@@ -1040,36 +1081,38 @@ std::vector<interaction_bind_t> interactor_impl::getBinds() const
 std::pair<std::string, std::string> interactor_impl::getBindingDocumentation(
   const interaction_bind_t& bind) const
 {
-  std::vector<std::tuple<std::string, std::string, std::string>> doc;
-  auto it = this->Internals->Bindings.find(bind);
+  const auto& it = this->Internals->Bindings.find(bind);
   if (it == this->Internals->Bindings.end())
   {
     throw interactor_impl::does_not_exists_exception(
       std::string("Bind: ") + bind.format() + " does not exists");
   }
-  auto docFunc = it->second.DocumentationCallback;
+  const auto& docFunc = it->second.DocumentationCallback;
   return docFunc ? docFunc() : std::make_pair(std::string(), std::string());
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::toggleAnimation()
+interactor& interactor_impl::toggleAnimation()
 {
   assert(this->Internals->AnimationManager);
   this->Internals->AnimationManager->ToggleAnimation();
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::startAnimation()
+interactor& interactor_impl::startAnimation()
 {
   assert(this->Internals->AnimationManager);
   this->Internals->AnimationManager->StartAnimation();
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::stopAnimation()
+interactor& interactor_impl::stopAnimation()
 {
   assert(this->Internals->AnimationManager);
   this->Internals->AnimationManager->StopAnimation();
+  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -1080,39 +1123,45 @@ bool interactor_impl::isPlayingAnimation()
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::enableCameraMovement()
+interactor& interactor_impl::enableCameraMovement()
 {
   this->Internals->Style->SetCameraMovementDisabled(false);
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::disableCameraMovement()
+interactor& interactor_impl::disableCameraMovement()
 {
   this->Internals->Style->SetCameraMovementDisabled(true);
+  return *this;
 }
 
 //----------------------------------------------------------------------------
 bool interactor_impl::playInteraction(
-  const std::string& file, double loopTime, std::function<void()> userCallBack)
+  const fs::path& file, double loopTime, std::function<void()> userCallBack)
 {
-  if (!vtksys::SystemTools::FileExists(file))
+  try
   {
-    log::error("Interaction record file to play does not exist ", file);
-    return false;
-  }
-  else
-  {
+    if (!fs::exists(file))
+    {
+      log::error("Interaction record file to play does not exist ", file.string());
+      return false;
+    }
+
     // Make sure the recorder is off and streams are cleared
     this->Internals->Recorder->Off();
     this->Internals->Recorder->Clear();
 
     this->Internals->StartEventLoop(loopTime, std::move(userCallBack));
-
-    std::string cleanFile = vtksys::SystemTools::CollapseFullPath(file);
-    this->Internals->Recorder->SetFileName(cleanFile.c_str());
+    this->Internals->Recorder->SetFileName(file.string().c_str());
     this->Internals->Recorder->Play();
 
     this->Internals->StopEventLoop();
+  }
+  catch (const fs::filesystem_error& ex)
+  {
+    log::error("Could not play recording: ", ex.what());
+    return false;
   }
 
   // Recorder can stop the interactor, make sure it is still running
@@ -1126,7 +1175,7 @@ bool interactor_impl::playInteraction(
 }
 
 //----------------------------------------------------------------------------
-bool interactor_impl::recordInteraction(const std::string& file)
+bool interactor_impl::recordInteraction(const fs::path& file)
 {
   if (file.empty())
   {
@@ -1134,53 +1183,49 @@ bool interactor_impl::recordInteraction(const std::string& file)
     return false;
   }
 
-  std::string cleanFile = vtksys::SystemTools::CollapseFullPath(file);
-
-  std::string parentDirectory = vtksys::SystemTools::GetParentDirectory(cleanFile);
-
-  // Check if the parent directory exists
-  if (!vtksys::SystemTools::FileExists(parentDirectory))
+  try
   {
-    log::error("Interaction record directory does not exist ", parentDirectory);
+    // Ensure parent directories exists
+    fs::create_directories(file.parent_path());
+
+    // Make sure the recorder is off and streams are cleared
+    this->Internals->Recorder->Off();
+    this->Internals->Recorder->Clear();
+
+    this->Internals->Recorder->SetFileName(file.string().c_str());
+    this->Internals->Recorder->On();
+    this->Internals->Recorder->Record();
+  }
+  catch (const fs::filesystem_error& ex)
+  {
+    log::error("Could not record: ", ex.what());
     return false;
   }
-
-  // Check if we can write to the directory
-  if (!vtksys::SystemTools::TestFileAccess(parentDirectory, vtksys::TEST_FILE_WRITE))
-  {
-    log::error("Don't have write permissions for ", parentDirectory);
-    return false;
-  }
-
-  // Make sure the recorder is off and streams are cleared
-  this->Internals->Recorder->Off();
-  this->Internals->Recorder->Clear();
-
-  this->Internals->Recorder->SetFileName(cleanFile.c_str());
-  this->Internals->Recorder->On();
-  this->Internals->Recorder->Record();
 
   return true;
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::start(double loopTime, std::function<void()> userCallBack)
+interactor& interactor_impl::start(double loopTime, std::function<void()> userCallBack)
 {
   this->Internals->StartEventLoop(loopTime, std::move(userCallBack));
   this->Internals->VTKInteractor->Start();
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::stop()
+interactor& interactor_impl::stop()
 {
   this->Internals->StopEventLoop();
   this->Internals->VTKInteractor->ExitCallback();
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::requestRender()
+interactor& interactor_impl::requestRender()
 {
   this->Internals->RenderRequested = true;
+  return *this;
 }
 
 //----------------------------------------------------------------------------

@@ -56,7 +56,7 @@ Your data probably contains some translucent data for some reason, turn on trans
 
 > I have a link error related to `stdc++fs` not found.
 
-With some C++ STD library version, explicit linking to `stdc++fs` is not supported. We provide a CMake option `F3D_LINUX_APPLICATION_LINK_FILESYSTEM` that you can set to `OFF` to workaround this issue.
+With some C++ STD library version, explicit linking to `stdc++fs` is not supported. We provide a CMake option `F3D_LINUX_LINK_FILESYSTEM` that you can set to `OFF` to workaround this issue.
 
 > I have a link error related to undefined reference to symbol of `libatomic`.
 

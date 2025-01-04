@@ -1,18 +1,17 @@
-import os
 import pytest
 
 import f3d
 
 
-def print_fn(args):
+def print_fn(args: list[str]):
     print(args)
 
 
 def doc_fn():
-    return ["dummyDoc", "dummyValue"]
+    return "dummyDoc", "dummyValue"
 
 
-def test_command(capfd):
+def test_command(capfd: pytest.CaptureFixture[str]):
     engine = f3d.Engine.create(True)
     inter = engine.interactor
 
@@ -26,7 +25,7 @@ def test_command(capfd):
     inter.add_command("my_cmd", print_fn)
     inter.trigger_command("my_cmd arg1 arg2")
     inter.remove_command("my_cmd")
-    out, err = capfd.readouterr()
+    out, _err = capfd.readouterr()
     assert out == "['arg1', 'arg2']\n"
 
     # Smoke test

@@ -350,6 +350,7 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   newPass->SetUseBlurBackground(this->UseBlurBackground);
   newPass->SetCircleOfConfusionRadius(this->CircleOfConfusionRadius);
   newPass->SetForceOpaqueBackground(this->HDRISkyboxVisible);
+  newPass->SetArmatureVisible(this->ArmatureVisible);
 
   double bounds[6];
   this->ComputeVisiblePropBounds(bounds);
@@ -636,8 +637,8 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
 void vtkF3DRenderer::SetHDRIFile(const std::optional<std::string>& hdriFile)
 {
   // Check HDRI is different than current one
-  std::optional<std::string> collapsedHdriFile;
-  if (hdriFile.has_value())
+  std::string collapsedHdriFile;
+  if (hdriFile.has_value() && !hdriFile.value().empty())
   {
     collapsedHdriFile = vtksys::SystemTools::CollapseFullPath(hdriFile.value());
   }
@@ -769,25 +770,25 @@ void vtkF3DRenderer::ConfigureHDRIReader()
   {
     this->UseDefaultHDRI = false;
     this->HDRIReader = nullptr;
-    if (this->HDRIFile.has_value())
+    if (!this->HDRIFile.empty())
     {
-      if (!vtksys::SystemTools::FileExists(this->HDRIFile.value(), true))
+      if (!vtksys::SystemTools::FileExists(this->HDRIFile, true))
       {
         F3DLog::Print(
-          F3DLog::Severity::Warning, std::string("HDRI file does not exist ") + this->HDRIFile.value());
+          F3DLog::Severity::Warning, std::string("HDRI file does not exist ") + this->HDRIFile);
       }
       else
       {
         this->HDRIReader = vtkSmartPointer<vtkImageReader2>::Take(
-          vtkImageReader2Factory::CreateImageReader2(this->HDRIFile.value().c_str()));
+          vtkImageReader2Factory::CreateImageReader2(this->HDRIFile.c_str()));
         if (this->HDRIReader)
         {
-          this->HDRIReader->SetFileName(this->HDRIFile.value().c_str());
+          this->HDRIReader->SetFileName(this->HDRIFile.c_str());
         }
         else
         {
           F3DLog::Print(F3DLog::Severity::Warning,
-            std::string("Cannot open HDRI file ") + this->HDRIFile.value() +
+            std::string("Cannot open HDRI file ") + this->HDRIFile +
               std::string(". Using default HDRI"));
         }
       }
@@ -820,8 +821,8 @@ void vtkF3DRenderer::ConfigureHDRIHash()
     }
     else
     {
-      // Compute HDRI MD5, here we know the HDRIFile has a value
-      this->HDRIHash = ::ComputeFileHash(this->HDRIFile.value());
+      // Compute HDRI MD5, here we know the HDRIFile is not empty
+      this->HDRIHash = ::ComputeFileHash(this->HDRIFile);
     }
     this->HasValidHDRIHash = true;
     this->CreateCacheDirectory();
@@ -1079,7 +1080,7 @@ void vtkF3DRenderer::ConfigureTextActors()
 
   // Font
   this->DropZoneActor->GetTextProperty()->SetFontFamilyToCourier();
-  if (this->FontFile.has_value())
+  if (this->FontFile.has_value() && !this->FontFile.value().empty())
   {
     std::string tmpFontFile = vtksys::SystemTools::CollapseFullPath(this->FontFile.value());
     if (vtksys::SystemTools::FileExists(tmpFontFile, true))
@@ -1373,6 +1374,17 @@ void vtkF3DRenderer::ShowHDRISkybox(bool show)
     this->HDRIReaderConfigured = false;
     this->HDRITextureConfigured = false;
     this->HDRISkyboxConfigured = false;
+    this->RenderPassesConfigured = false;
+    this->CheatSheetConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ShowArmature(bool show)
+{
+  if (this->ArmatureVisible != show)
+  {
+    this->ArmatureVisible = show;
     this->RenderPassesConfigured = false;
     this->CheatSheetConfigured = false;
   }
@@ -2626,4 +2638,10 @@ void vtkF3DRenderer::SetCheatSheetConfigured(bool flag)
 void vtkF3DRenderer::SetUIDeltaTime(double time)
 {
   this->UIActor->SetDeltaTime(time);
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetConsoleBadgeEnabled(bool enabled)
+{
+  this->UIActor->SetConsoleBadgeEnabled(enabled);
 }

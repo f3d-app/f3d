@@ -43,6 +43,11 @@ public:
    */
   void ShowBadge();
 
+  /**
+   * Clear console
+   */
+  void Clear();
+
 protected:
   vtkF3DImguiConsole();
   ~vtkF3DImguiConsole() override;

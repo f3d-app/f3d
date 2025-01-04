@@ -119,7 +119,7 @@ PYBIND11_MODULE(pyf3d, module)
 
   image //
     .def(py::init<>())
-    .def(py::init<const std::string&>())
+    .def(py::init<const std::filesystem::path&>())
     .def(py::init<unsigned int, unsigned int, unsigned int, f3d::image::ChannelType>())
     .def(py::self == py::self)
     .def(py::self != py::self)
@@ -139,11 +139,11 @@ PYBIND11_MODULE(pyf3d, module)
     .def("to_terminal_text", [](const f3d::image& img) { return img.toTerminalText(); })
     .def("set_metadata", &f3d::image::setMetadata)
     .def("get_metadata",
-      [](const f3d::image& img, const std::string& key)
+      [](const f3d::image& img, std::string key)
       {
         try
         {
-          return img.getMetadata(key);
+          return img.getMetadata(std::move(key));
         }
         catch (const f3d::image::metadata_exception&)
         {
@@ -171,7 +171,21 @@ PYBIND11_MODULE(pyf3d, module)
         }
         catch (const f3d::options::incompatible_exception&)
         {
-          throw py::attribute_error(key);
+          if (std::holds_alternative<std::string>(value))
+          {
+            try
+            {
+              opts.setAsString(key, std::get<std::string>(value));
+            }
+            catch (const f3d::options::parsing_exception&)
+            {
+              throw py::value_error(std::get<std::string>(value));
+            }
+          }
+          else
+          {
+            throw py::attribute_error(key);
+          }
         }
       })
     .def("__getitem__",
@@ -205,7 +219,8 @@ PYBIND11_MODULE(pyf3d, module)
   py::class_<f3d::utils> utils(module, "Utils");
 
   utils //
-    .def_static("text_distance", &f3d::utils::textDistance);
+    .def_static("text_distance", &f3d::utils::textDistance)
+    .def_static("collapse_path", &f3d::utils::collapsePath);
 
   // f3d::interactor
   py::class_<f3d::interaction_bind_t> interaction_bind(module, "InteractionBind");
@@ -237,7 +252,8 @@ PYBIND11_MODULE(pyf3d, module)
       "Disable the camera interaction")
     .def("play_interaction", &f3d::interactor::playInteraction, "Play an interaction file")
     .def("record_interaction", &f3d::interactor::recordInteraction, "Record an interaction file")
-    .def("start", &f3d::interactor::start, "Start the interactor and the event loop")
+    .def("start", &f3d::interactor::start, "Start the interactor and the event loop",
+      py::arg("delta_time") = 1.0 / 30, py::arg("user_callback") = nullptr)
     .def("stop", &f3d::interactor::stop, "Stop the interactor and the event loop")
     .def(
       "request_render", &f3d::interactor::requestRender, "Request a render on the next event loop")
@@ -294,6 +310,17 @@ PYBIND11_MODULE(pyf3d, module)
     .def("load_animation_time", &f3d::scene::loadAnimationTime)
     .def("animation_time_range", &f3d::scene::animationTimeRange);
 
+  // f3d::camera_state_t
+  py::class_<f3d::camera_state_t>(module, "CameraState")
+    .def(py::init<>())
+    .def(py::init<const f3d::point3_t&, const f3d::point3_t&, const f3d::vector3_t&,
+           const f3d::angle_deg_t&>(),
+      py::arg("position"), py::arg("focal_point"), py::arg("view_up"), py::arg("view_angle"))
+    .def_readwrite("position", &f3d::camera_state_t::position)
+    .def_readwrite("focal_point", &f3d::camera_state_t::focalPoint)
+    .def_readwrite("view_up", &f3d::camera_state_t::viewUp)
+    .def_readwrite("view_angle", &f3d::camera_state_t::viewAngle);
+
   // f3d::camera
   py::class_<f3d::camera, std::unique_ptr<f3d::camera, py::nodelete>> camera(module, "Camera");
   camera //
@@ -319,15 +346,6 @@ PYBIND11_MODULE(pyf3d, module)
     .def("set_current_as_default", &f3d::camera::setCurrentAsDefault)
     .def("reset_to_default", &f3d::camera::resetToDefault)
     .def("reset_to_bounds", &f3d::camera::resetToBounds, py::arg("zoom_factor") = 0.9);
-
-  py::class_<f3d::camera_state_t>(module, "CameraState")
-    .def(py::init<>())
-    .def(py::init<const f3d::point3_t&, const f3d::point3_t&, const f3d::vector3_t&,
-      const f3d::angle_deg_t&>())
-    .def_readwrite("position", &f3d::camera_state_t::position)
-    .def_readwrite("focal_point", &f3d::camera_state_t::focalPoint)
-    .def_readwrite("view_up", &f3d::camera_state_t::viewUp)
-    .def_readwrite("view_angle", &f3d::camera_state_t::viewAngle);
 
   // f3d::window
   py::class_<f3d::window, std::unique_ptr<f3d::window, py::nodelete>> window(module, "Window");
@@ -367,11 +385,34 @@ PYBIND11_MODULE(pyf3d, module)
     .def("get_display_from_world", &f3d::window::getDisplayFromWorld,
       "Get display coordinate point from world coordinate");
 
+  // libInformation
+  py::class_<f3d::engine::libInformation>(module, "LibInformation")
+    .def_readonly("version", &f3d::engine::libInformation::Version)
+    .def_readonly("version_full", &f3d::engine::libInformation::VersionFull)
+    .def_readonly("build_date", &f3d::engine::libInformation::BuildDate)
+    .def_readonly("build_system", &f3d::engine::libInformation::BuildSystem)
+    .def_readonly("compiler", &f3d::engine::libInformation::Compiler)
+    .def_readonly("modules", &f3d::engine::libInformation::Modules)
+    .def_readonly("vtk_version", &f3d::engine::libInformation::VTKVersion)
+    .def_readonly("copyrights", &f3d::engine::libInformation::Copyrights)
+    .def_readonly("license", &f3d::engine::libInformation::License);
+
+  // readerInformation
+  py::class_<f3d::engine::readerInformation>(module, "ReaderInformation")
+    .def_readonly("name", &f3d::engine::readerInformation::Name)
+    .def_readonly("description", &f3d::engine::readerInformation::Description)
+    .def_readonly("extensions", &f3d::engine::readerInformation::Extensions)
+    .def_readonly("mime_types", &f3d::engine::readerInformation::MimeTypes)
+    .def_readonly("plugin_name", &f3d::engine::readerInformation::PluginName)
+    .def_readonly("has_scene_reader", &f3d::engine::readerInformation::HasSceneReader)
+    .def_readonly("has_geometry_reader", &f3d::engine::readerInformation::HasGeometryReader);
+
   // f3d::engine
   py::class_<f3d::engine> engine(module, "Engine");
 
   engine //
-    .def_static("create", &f3d::engine::create, "Create an engine with a automatic window")
+    .def_static("create", &f3d::engine::create, "Create an engine with a automatic window",
+      py::arg("offscreen") = false)
     .def_static("create_none", &f3d::engine::createNone, "Create an engine with no window")
     .def_static(
       "create_glx", &f3d::engine::createGLX, "Create an engine with an GLX window (Linux only)")
@@ -404,40 +445,11 @@ PYBIND11_MODULE(pyf3d, module)
       "autoload_plugins", &f3d::engine::autoloadPlugins, "Automatically load internal plugins")
     .def_static("get_plugins_list", &f3d::engine::getPluginsList)
     .def_static("get_lib_info", &f3d::engine::getLibInfo, py::return_value_policy::reference)
-    .def_static("get_readers_info", &f3d::engine::getReadersInfo);
-
-  // libInformation
-  py::class_<f3d::engine::libInformation>(module, "LibInformation")
-    .def_readonly("version", &f3d::engine::libInformation::Version)
-    .def_readonly("version_full", &f3d::engine::libInformation::VersionFull)
-    .def_readonly("build_date", &f3d::engine::libInformation::BuildDate)
-    .def_readonly("build_system", &f3d::engine::libInformation::BuildSystem)
-    .def_readonly("compiler", &f3d::engine::libInformation::Compiler)
-    .def_readonly("modules", &f3d::engine::libInformation::Modules)
-    .def_readonly("vtk_version", &f3d::engine::libInformation::VTKVersion)
-    .def_readonly("copyrights", &f3d::engine::libInformation::Copyrights)
-    .def_readonly("license", &f3d::engine::libInformation::License);
-
-  // readerInformation
-  py::class_<f3d::engine::readerInformation>(module, "ReaderInformation")
-    .def_readonly("name", &f3d::engine::readerInformation::Name)
-    .def_readonly("description", &f3d::engine::readerInformation::Description)
-    .def_readonly("extensions", &f3d::engine::readerInformation::Extensions)
-    .def_readonly("mime_types", &f3d::engine::readerInformation::MimeTypes)
-    .def_readonly("plugin_name", &f3d::engine::readerInformation::PluginName)
-    .def_readonly("has_scene_reader", &f3d::engine::readerInformation::HasSceneReader)
-    .def_readonly("has_geometry_reader", &f3d::engine::readerInformation::HasGeometryReader);
+    .def_static("get_readers_info", &f3d::engine::getReadersInfo)
+    .def_static("get_rendering_backend_list", &f3d::engine::getRenderingBackendList);
 
   // f3d::log
   py::class_<f3d::log> log(module, "Log");
-
-  log //
-    .def_static("set_verbose_level", &f3d::log::setVerboseLevel, py::arg("level"),
-      py::arg("force_std_err") = false)
-    .def_static("set_use_coloring", &f3d::log::setUseColoring)
-    .def_static("print",
-      [](f3d::log::VerboseLevel& level, const std::string& message)
-      { f3d::log::print(level, message); });
 
   py::enum_<f3d::log::VerboseLevel>(log, "VerboseLevel")
     .value("DEBUG", f3d::log::VerboseLevel::DEBUG)
@@ -446,4 +458,12 @@ PYBIND11_MODULE(pyf3d, module)
     .value("ERROR", f3d::log::VerboseLevel::ERROR)
     .value("QUIET", f3d::log::VerboseLevel::QUIET)
     .export_values();
+
+  log //
+    .def_static("set_verbose_level", &f3d::log::setVerboseLevel, py::arg("level"),
+      py::arg("force_std_err") = false)
+    .def_static("set_use_coloring", &f3d::log::setUseColoring)
+    .def_static("print",
+      [](f3d::log::VerboseLevel& level, const std::string& message)
+      { f3d::log::print(level, message); });
 }

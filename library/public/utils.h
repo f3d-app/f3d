@@ -4,6 +4,7 @@
 #include "exception.h"
 #include "export.h"
 
+#include <filesystem>
 #include <map>
 #include <regex>
 #include <sstream>
@@ -26,7 +27,7 @@ public:
    * Compute the Levenshtein distance between two strings.
    * Can be useful for spell checking and typo detection.
    */
-  static unsigned int textDistance(const std::string& strA, const std::string& strB);
+  [[nodiscard]] static unsigned int textDistance(std::string_view strA, std::string_view strB);
 
   // clang-format off
   /**
@@ -52,8 +53,20 @@ public:
    * `set scene.up.direction "+Z` -> tokenize_exception
    * `set scene.up.direction +Z\` -> tokenize_exception
    */
-  static std::vector<std::string> tokenize(std::string_view str);
+  [[nodiscard]] static std::vector<std::string> tokenize(std::string_view str);
   // clang-format on
+
+  /**
+   * Collapse a string filesystem path by:
+   * - Expanding tilda `~` into home dir in a cross-platform way
+   * - Transform relative path into an absolute path based on basedDirectory if provided, or the
+   * current directory if not
+   * - Remove any `..` if any
+   * Rely on vtksys::SystemTools::CollapseFullPath but return empty string if the provided
+   * string is empty.
+   */
+  [[nodiscard]] static std::filesystem::path collapsePath(
+    const std::filesystem::path& path, const std::filesystem::path& baseDirectory = {});
 
   /**
    * An exception that can be thrown by tokenize
@@ -89,10 +102,11 @@ public:
      */
     string_template& substitute(const std::map<std::string, std::string>& lookup);
 
-    std::string str() const;
+    /** Return a string representation of the string template */
+    [[nodiscard]] std::string str() const;
 
     /** List the remaining un-substituted variables. */
-    std::vector<std::string> variables() const;
+    [[nodiscard]] std::vector<std::string> variables() const;
 
     /**
      * Exception to be thrown by substitution functions to let untouched variables through.

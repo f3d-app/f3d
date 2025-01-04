@@ -8,7 +8,7 @@
     "up": "+Z",
     "ambient-occlusion": true,
     "coloring-component": "-2",
-    "cells": true,
+    "coloring-by-cells": true,
     "camera-direction": "-1,1,-0.5"
   }
 }

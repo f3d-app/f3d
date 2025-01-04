@@ -49,6 +49,7 @@ public:
   void ShowConsole(bool show);
   void ShowDropZone(bool show);
   void ShowHDRISkybox(bool show);
+  void ShowArmature(bool show);
   ///@}
 
   using vtkOpenGLRenderer::SetBackground;
@@ -376,6 +377,11 @@ public:
    */
   void SetUIDeltaTime(double time);
 
+  /**
+   * Set console badge enabled status
+   */
+  void SetConsoleBadgeEnabled(bool enabled);
+
 private:
   vtkF3DRenderer();
   ~vtkF3DRenderer() override;
@@ -503,6 +509,7 @@ private:
   bool ConsoleVisible = false;
   bool DropZoneVisible = false;
   bool HDRISkyboxVisible = false;
+  bool ArmatureVisible = false;
   bool UseRaytracing = false;
   bool UseRaytracingDenoiser = false;
   bool UseDepthPeelingPass = false;
@@ -525,7 +532,7 @@ private:
   int GridSubdivisions = 10;
   double GridColor[3] = { 0.0, 0.0, 0.0 };
 
-  std::optional<std::string> HDRIFile;
+  std::string HDRIFile;
   vtkSmartPointer<vtkImageReader2> HDRIReader;
   bool HasValidHDRIReader = false;
   bool UseDefaultHDRI = false;

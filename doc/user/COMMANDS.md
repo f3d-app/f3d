@@ -19,6 +19,8 @@ The libf3d provides a few commands, many related to manipulating libf3d (options
 
 `reset option.name`: A command to reset a libf3d option to its default values, eg: `reset render.background.blur.coc`.
 
+`clear`: A command to clear ImGui console. No argument. 
+
 `print option.name`: A command to print the value of an libf3d option, eg: `print scene.up.direction`.
 
 `cycle_animation`:  A specific command to cycle `scene.animation.index` option using model information, No argument.
@@ -35,6 +37,12 @@ eg: `roll_camera 120`.
 `decrease_light_intensity`: A specific command to decrease light intensity. No argument.
 
 `print_scene_info`: A specific command to print information about the scene, No argument.
+
+`print_coloring_info`: A specific command to print information about coloring settings, No argument.
+
+`print_mesh_info`: A specific command to print information from the mesh importer, No argument.
+
+`print_options_info`: A specific command to print configuration options that have a value, No argument.
 
 `set_camera front/top/right/isometric`: A specific command to position the camera in the specified location relative to the model.
 Supports `front`, `top`, `right`, `isometric` arguments. eg: `set_camera top`.
@@ -111,3 +119,4 @@ Command syntax is similar to bash, as in they will be split by "token" to be pro
  - Other escaped character will be processed as if the escape was not present, eg: `set scene.up.direction +\Z`
  - Unfinished quoted section is invalid, eg: `set scene.up.direction "+Z`
  - A escape at the end is also invalid, eg: `set scene.up.direction +Z\`
+ - Options values are [parsed](PARSING.md) according to their types.
