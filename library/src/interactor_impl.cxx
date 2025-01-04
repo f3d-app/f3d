@@ -191,6 +191,7 @@ public:
     /* set camera coordinates back */
     cam.setPosition(newPos);
     cam.setViewUp(up);
+    Style->EndTemporaryUp();
     cam.resetToBounds(0.9);
   }
 
@@ -687,6 +688,20 @@ interactor& interactor_impl::initCommands()
     {
       check_args(args, 1, "roll_camera");
       this->Internals->Window.getCamera().roll(options::parse<int>(args[0]));
+
+      // Check if temporary view up is needed, otherwise remove it
+      vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(this->Internals->Style->GetCurrentRenderer());
+      vector3_t viewUp = this->Internals->Window.getCamera().getViewUp();
+      double renUp[3];
+      ren->GetUpVector(renUp);
+      if (viewUp[0] == renUp[0] && viewUp[1] == renUp[1] && viewUp[2] == renUp[2])
+      {
+        this->Internals->Style->EndTemporaryUp();
+      }
+      else
+      {
+        this->Internals->Style->SetTemporaryUp(viewUp._Elems);
+      }
     });
 
   this->addCommand("increase_light_intensity",
@@ -758,7 +773,11 @@ interactor& interactor_impl::initCommands()
   this->addCommand("stop_interactor", [&](const std::vector<std::string>&) { this->stop(); });
 
   this->addCommand("reset_camera",
-    [&](const std::vector<std::string>&) { this->Internals->Window.getCamera().resetToDefault(); });
+    [&](const std::vector<std::string>&) 
+    {
+      this->Internals->Window.getCamera().resetToDefault(); 
+      this->Internals->Style->EndTemporaryUp();
+    });
 
   this->addCommand("toggle_animation",
     [&](const std::vector<std::string>&) { this->Internals->AnimationManager->ToggleAnimation(); });
