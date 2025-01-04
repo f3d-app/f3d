@@ -9,6 +9,7 @@
 
 #ifndef vtkF3DQuakeMDLImporter_h
 #define vtkF3DQuakeMDLImporter_h
+
 #include <vtkF3DImporter.h>
 
 class vtkF3DQuakeMDLImporter : public vtkF3DImporter

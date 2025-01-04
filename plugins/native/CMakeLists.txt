@@ -176,7 +176,6 @@ f3d_plugin_declare_reader(
   FORMAT_DESCRIPTION "VTK XML MultiBlock"
 )
 
-
 f3d_plugin_declare_reader(
   NAME Splat
   SCORE 90
@@ -193,7 +192,6 @@ f3d_plugin_declare_reader(
   VTK_IMPORTER vtkF3DQuakeMDLImporter
   FORMAT_DESCRIPTION "Quake 1 MDL model"
 )
-
 
 f3d_plugin_build(
   NAME native
