@@ -204,11 +204,10 @@ int TestSDKCamera(int argc, char* argv[])
     std::cerr << std::setprecision(12) << "yaw: " << yaw << " != 0.0" << std::endl;
     return EXIT_FAILURE;
   }
-  dotProduct = viewDirProj[0] * viewDirProj[0] + viewDirProj[1] * viewDirProj[1];
   if (dotProduct < epsilon)
   {
-    std::cerr << "Dot product is lesser than epsilon, returning epsilon." << std::endl;
-    return epsilon;
+    std::cerr << "Dot product is lesser than epsilon, returning failure." << std::endl;
+    return EXIT_FAILURE;
   }
 
   // Test elevation
