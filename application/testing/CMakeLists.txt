@@ -451,6 +451,7 @@ f3d_test(NAME TestCameraIndexNegative DATA Cameras.gltf ARGS --camera-index=-1 R
 # Require improved importer support https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11303
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240910)
   f3d_test(NAME TestInvalidFileFileName DATA invalid.vtp ARGS --filename NO_DATA_FORCE_RENDER UI)
+  f3d_test(NAME TestMultiFileInvalid DATA cow.vtp invalid.vtp dragon.vtu ARGS --multi-file-mode=all NO_DATA_FORCE_RENDER UI)
   f3d_test(NAME TestMultiFileInvalidFilesFileName DATA mb/mb_3_0.vtt invalid.vtp ARGS --multi-file-mode=all --filename NO_DATA_FORCE_RENDER UI)
   f3d_test(NAME TestMultiFileCameraIndex DATA Cameras.gltf CameraAnimated.glb ARGS --multi-file-mode=all --camera-index=2 --opacity=0.5 --translucency-support)
 endif()
