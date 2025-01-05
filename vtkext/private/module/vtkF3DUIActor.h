@@ -81,10 +81,10 @@ public:
   void SetFpsCounterVisibility(bool show);
 
   /**
-   * Set the fps value
+   * Updates the fps value
    * 0 by default
    */
-  void SetFpsValue(int fps);
+  void UpdateFpsValue(int fps);
 
   /**
    * Set the font file path
@@ -159,6 +159,11 @@ protected:
   bool ConsoleBadgeEnabled = false;
 
   bool FpsCounterVisible = false;
+
+  static const int FramesToAverage = 5;
+  int FramesAccumulated = 0;
+
+  int AccumulatedFpsValue = 0;
   int FpsValue = 0;
 
   std::string FontFile = "";

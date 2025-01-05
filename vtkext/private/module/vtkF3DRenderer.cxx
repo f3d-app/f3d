@@ -1554,7 +1554,7 @@ void vtkF3DRenderer::Render()
   fps = std::min(fps, static_cast<int>(std::round(1.0 / (elapsed * 1e-9))));
 #endif
 
-  this->UIActor->SetFpsValue(fps);
+  this->UIActor->UpdateFpsValue(fps);
 }
 
 //----------------------------------------------------------------------------

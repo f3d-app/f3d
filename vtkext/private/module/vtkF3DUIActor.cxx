@@ -67,9 +67,18 @@ void vtkF3DUIActor::SetFpsCounterVisibility(bool show)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DUIActor::SetFpsValue(int fps)
+void vtkF3DUIActor::UpdateFpsValue(int fps)
 {
-  this->FpsValue = fps;
+  this->AccumulatedFpsValue += fps;
+  this->FramesAccumulated++;
+
+  if (this->FramesAccumulated == vtkF3DUI::FramesToAverage)
+  {
+	  this->FpsValue = static_cast<int>(this->AccumulatedFpsValue / this->FramesAccumulated);
+
+	  this->AccumulatedFpsValue = 0;
+	  this->FramesAccumulated = 0;
+  }
 }
 
 //----------------------------------------------------------------------------
