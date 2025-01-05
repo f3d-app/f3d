@@ -1541,6 +1541,12 @@ void vtkF3DRenderer::Render()
 
   auto cpuElapsed = std::chrono::high_resolution_clock::now() - cpuStart;
 
+  vtkInformation *info = this->GetInformation();
+
+  bool uiOnly = info->Get(vtkF3DRenderPass::RENDER_UI_ONLY());
+
+  if (! uiOnly)
+  {
   // Get CPU frame per seconds
   int fps = static_cast<int>(std::round(
     1.0 / (std::chrono::duration_cast<std::chrono::microseconds>(cpuElapsed).count() * 1e-6)));
@@ -1555,6 +1561,7 @@ void vtkF3DRenderer::Render()
 #endif
 
   this->UIActor->UpdateFpsValue(fps);
+  }
 }
 
 //----------------------------------------------------------------------------

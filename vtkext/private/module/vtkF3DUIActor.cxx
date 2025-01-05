@@ -72,7 +72,7 @@ void vtkF3DUIActor::UpdateFpsValue(int fps)
   this->AccumulatedFpsValue += fps;
   this->FramesAccumulated++;
 
-  if (this->FramesAccumulated == vtkF3DUI::FramesToAverage)
+  if (this->FramesAccumulated == vtkF3DUIActor::FramesToAverage)
   {
 	  this->FpsValue = static_cast<int>(this->AccumulatedFpsValue / this->FramesAccumulated);
 
