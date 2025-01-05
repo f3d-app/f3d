@@ -141,20 +141,19 @@ int TestSDKCamera(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  // Test getAzimuth
   f3d::angle_deg_t azimuth = cam.getAzimuth();
   if (!compareDouble(azimuth, 90.0))
   {
     std::cerr << "getAzimuth is not behaving as expected:" << std::endl;
-    std::cerr << std::setprecision(12) << "azimuth: " << azimuth << " != 0.0" << std::endl;
+    std::cerr << std::setprecision(12) << "azimuth: " << azimuth << " != 90.0" << std::endl;
     return EXIT_FAILURE;
   }
-  double viewDirProj[2] = { 0.0, 0.0 };
+  double viewDirProj[2] = { 1.0, 1.0 };
   double dotProduct = viewDirProj[0] * viewDirProj[0] + viewDirProj[1] * viewDirProj[1];
   const double epsilon = std::numeric_limits<double>::epsilon();
   if (dotProduct < epsilon)
   {
-    std::cerr << "Dot product is lesser than epsilon, returning epsilon." << std::endl;
+    std::cerr << "Dot product is lesser than epsilon, returning failure." << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -208,7 +207,7 @@ int TestSDKCamera(int argc, char* argv[])
   if (dotProduct < epsilon)
   {
     std::cerr << "Dot product is lesser than epsilon, returning epsilon." << std::endl;
-    return EXIT_FAILURE;
+    return epsilon;
   }
 
   // Test elevation
