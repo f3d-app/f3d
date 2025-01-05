@@ -141,6 +141,7 @@ int TestSDKCamera(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
+  // Test getAzimuth
   f3d::angle_deg_t azimuth = cam.getAzimuth();
   if (!compareDouble(azimuth, 90.0))
   {
