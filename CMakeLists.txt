@@ -123,7 +123,7 @@ cmake_dependent_option(F3D_WINDOWS_GUI "Build a non-console Win32 application" O
 cmake_dependent_option(F3D_MACOS_BUNDLE "Build a macOS bundle application" ON "APPLE" OFF)
 
 if(UNIX AND NOT APPLE)
-  option(F3D_LINUX_LINK_FILESYSTEM "Link with libstdc++fs" ON)
+  option(F3D_LINUX_LINK_FILESYSTEM "Link with libstdc++fs, may be needed for older compilers" OFF)
   mark_as_advanced(F3D_LINUX_LINK_FILESYSTEM)
 endif()
 
