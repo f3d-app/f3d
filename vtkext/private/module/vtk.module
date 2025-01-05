@@ -1,7 +1,7 @@
 NAME
   f3d::vtkextPrivate
 DESCRIPTION
-  A VTK containing class related to rendering
+  A VTK module only used internally by libf3d
 DEPENDS
   VTK::CommonCore
   VTK::CommonDataModel

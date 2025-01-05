@@ -46,8 +46,10 @@ public:
   void ShowMetaData(bool show);
   void ShowFilename(bool show);
   void ShowCheatSheet(bool show);
+  void ShowConsole(bool show);
   void ShowDropZone(bool show);
   void ShowHDRISkybox(bool show);
+  void ShowArmature(bool show);
   ///@}
 
   using vtkOpenGLRenderer::SetBackground;
@@ -370,6 +372,16 @@ public:
    */
   void SetCheatSheetConfigured(bool flag);
 
+  /**
+   * Set the UI delta time (time between frame being rendered) in seconds
+   */
+  void SetUIDeltaTime(double time);
+
+  /**
+   * Set console badge enabled status
+   */
+  void SetConsoleBadgeEnabled(bool enabled);
+
 private:
   vtkF3DRenderer();
   ~vtkF3DRenderer() override;
@@ -494,8 +506,10 @@ private:
   bool FilenameVisible = false;
   bool MetaDataVisible = false;
   bool CheatSheetVisible = false;
+  bool ConsoleVisible = false;
   bool DropZoneVisible = false;
   bool HDRISkyboxVisible = false;
+  bool ArmatureVisible = false;
   bool UseRaytracing = false;
   bool UseRaytracingDenoiser = false;
   bool UseDepthPeelingPass = false;
@@ -518,7 +532,7 @@ private:
   int GridSubdivisions = 10;
   double GridColor[3] = { 0.0, 0.0, 0.0 };
 
-  std::optional<std::string> HDRIFile;
+  std::string HDRIFile;
   vtkSmartPointer<vtkImageReader2> HDRIReader;
   bool HasValidHDRIReader = false;
   bool UseDefaultHDRI = false;
@@ -545,6 +559,7 @@ private:
 
   vtkF3DMetaImporter* Importer = nullptr;
   vtkMTimeType ImporterTimeStamp = 0;
+  vtkMTimeType ImporterUpdateTimeStamp = 0;
 
   vtkNew<vtkScalarBarActor> ScalarBarActor;
   bool ScalarBarActorConfigured = false;
@@ -567,6 +582,8 @@ private:
   std::optional<std::string> TextureNormal;
 
   vtkSmartPointer<vtkColorTransferFunction> ColorTransferFunction;
+  bool ExpandingRangeSet = false;
+  bool UsingExpandingRange = true;
   double ColorRange[2] = { 0.0, 1.0 };
   bool ColorTransferFunctionConfigured = false;
 

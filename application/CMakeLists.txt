@@ -28,7 +28,7 @@ if(APPLE)
   list(APPEND F3D_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/F3DNSDelegate.mm")
 endif()
 
-#add source for dialogs
+# Add source for dialogs
 list(APPEND F3D_SOURCE_FILES "${F3D_SOURCE_DIR}/external/tinyfiledialogs/tinyfiledialogs.cxx")
 
 # Define f3d target
@@ -40,12 +40,8 @@ if(UNIX)
   target_link_libraries(f3d PRIVATE Threads::Threads)
 endif()
 
-if(UNIX AND NOT APPLE)
-  option(F3D_LINUX_APPLICATION_LINK_FILESYSTEM "Link with libstdc++fs" ON)
-  mark_as_advanced(F3D_LINUX_APPLICATION_LINK_FILESYSTEM)
-  if(F3D_LINUX_APPLICATION_LINK_FILESYSTEM)
-    target_link_libraries(f3d PRIVATE stdc++fs)
-  endif()
+if(F3D_LINUX_LINK_FILESYSTEM)
+  target_link_libraries(f3d PRIVATE stdc++fs)
 endif()
 
 set_target_properties(f3d PROPERTIES
@@ -80,10 +76,12 @@ else ()
   target_include_directories(f3d PUBLIC $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/nlohmann_json>)
 endif ()
 
-if (F3D_USE_EXTERNAL_DMON)
-  target_link_libraries(f3d PRIVATE dmon::dmon)
-else ()
-  target_include_directories(f3d PUBLIC $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/dmon>)
+if (F3D_MODULE_DMON)
+  if (F3D_USE_EXTERNAL_DMON)
+    target_link_libraries(f3d PRIVATE dmon::dmon)
+  else ()
+    target_include_directories(f3d PUBLIC $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/dmon>)
+  endif ()
 endif ()
 
 target_include_directories(f3d PUBLIC $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/tinyfiledialogs>)
@@ -111,9 +109,14 @@ if (F3D_MODULE_EXR)
   target_compile_definitions(f3d PRIVATE F3D_MODULE_EXR)
 endif ()
 
-# ui
-if (F3D_MODULE_UI)
-  target_compile_definitions(f3d PRIVATE F3D_MODULE_UI)
+# dmon
+if (F3D_MODULE_DMON)
+  target_compile_definitions(f3d PRIVATE F3D_MODULE_DMON)
+endif ()
+
+# tinyfiledialogs
+if (F3D_MODULE_TINYFILEDIALOGS)
+  target_compile_definitions(f3d PRIVATE F3D_MODULE_TINYFILEDIALOGS)
 endif ()
 
 if(VTK_VERSION VERSION_LESS 9.3.20240914)
@@ -205,7 +208,7 @@ if(UNIX AND NOT APPLE)
       install(FILES "${CMAKE_BINARY_DIR}/f3d.1.gz"
         DESTINATION "share/man/man1/" COMPONENT documentation)
     else()
-      message(WARNING "help2man or gzip not found, cannot create man entry")
+      message(FATAL_ERROR "help2man or gzip not found, cannot create man entry, please disable F3D_LINUX_GENERATE_MAN or install them")
     endif()
   endif()
 endif()

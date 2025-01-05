@@ -57,6 +57,18 @@ public:
   void SetCheatSheetVisibility(bool show);
 
   /**
+   * Set the console visibility
+   * False by default
+   */
+  void SetConsoleVisibility(bool show);
+
+  /**
+   * Set the console badge enabled status
+   * False by default
+   */
+  void SetConsoleBadgeEnabled(bool enabled);
+
+  /**
    * Set the cheatsheet string
    * Empty by default
    */
@@ -84,6 +96,11 @@ public:
    * Render the UI actor
    */
   int RenderOverlay(vtkViewport* vp) override;
+
+  /**
+   * Set the delta time (time between UI frames) in seconds
+   */
+  virtual void SetDeltaTime(double) {}
 
 protected:
   vtkF3DUIActor();
@@ -119,6 +136,16 @@ protected:
    */
   virtual void RenderFpsCounter() {}
 
+  /**
+   * Render the console widget
+   */
+  virtual void RenderConsole() {}
+
+  /**
+   * Render the console badge
+   */
+  virtual void RenderConsoleBadge() {}
+
   bool FileNameVisible = false;
   std::string FileName = "";
 
@@ -128,6 +155,9 @@ protected:
   bool CheatSheetVisible = false;
   std::vector<CheatSheetGroup> CheatSheet;
 
+  bool ConsoleVisible = false;
+  bool ConsoleBadgeEnabled = false;
+
   bool FpsCounterVisible = false;
   int FpsValue = 0;
 
@@ -136,6 +166,8 @@ protected:
 private:
   vtkF3DUIActor(const vtkF3DUIActor&) = delete;
   void operator=(const vtkF3DUIActor&) = delete;
+
+  bool Initialized = false;
 };
 
 #endif

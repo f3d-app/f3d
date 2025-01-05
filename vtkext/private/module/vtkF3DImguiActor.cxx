@@ -1,6 +1,7 @@
 #include "vtkF3DImguiActor.h"
 
 #include "F3DFontBuffer.h"
+#include "vtkF3DImguiConsole.h"
 #include "vtkF3DImguiFS.h"
 #include "vtkF3DImguiVS.h"
 
@@ -245,6 +246,8 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
   ImGui::SetCurrentContext(ctx);
 
   ImGuiIO& io = ImGui::GetIO();
+  io.IniFilename = nullptr;
+  io.LogFilename = nullptr;
 
   ImFontConfig fontConfig;
 
@@ -276,6 +279,8 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::ReleaseGraphicsResources(vtkWindow* w)
 {
+  this->Superclass::ReleaseGraphicsResources(w);
+
   this->Pimpl->Release(vtkOpenGLRenderWindow::SafeDownCast(w));
 }
 
@@ -413,6 +418,20 @@ void vtkF3DImguiActor::RenderFpsCounter()
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DImguiActor::RenderConsole()
+{
+  vtkF3DImguiConsole* console = vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
+  console->ShowConsole();
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DImguiActor::RenderConsoleBadge()
+{
+  vtkF3DImguiConsole* console = vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
+  console->ShowBadge();
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DImguiActor::StartFrame(vtkOpenGLRenderWindow* renWin)
 {
   if (ImGui::GetCurrentContext() == nullptr)
@@ -435,4 +454,11 @@ void vtkF3DImguiActor::EndFrame(vtkOpenGLRenderWindow* renWin)
 {
   ImGui::Render();
   this->Pimpl->RenderDrawData(renWin, ImGui::GetDrawData());
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DImguiActor::SetDeltaTime(double time)
+{
+  ImGuiIO& io = ImGui::GetIO();
+  io.DeltaTime = time;
 }

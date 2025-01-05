@@ -1,11 +1,16 @@
 #include "utils.h"
 
 #include "levenshtein.h"
+#include "log.h"
+
+#include <vtksys/SystemTools.hxx>
+
+namespace fs = std::filesystem;
 
 namespace f3d
 {
 //----------------------------------------------------------------------------
-unsigned int utils::textDistance(const std::string& strA, const std::string& strB)
+unsigned int utils::textDistance(std::string_view strA, std::string_view strB)
 {
   return static_cast<unsigned int>(detail::levenshtein(strA, strB));
 }
@@ -95,6 +100,23 @@ std::vector<std::string> utils::tokenize(std::string_view str)
   }
   emit();
   return tokens;
+}
+
+//----------------------------------------------------------------------------
+fs::path utils::collapsePath(const fs::path& path, const fs::path& baseDirectory)
+{
+  try
+  {
+    return path.empty() ? path
+      : baseDirectory.empty()
+      ? fs::path(vtksys::SystemTools::CollapseFullPath(path.string()))
+      : fs::path(vtksys::SystemTools::CollapseFullPath(path.string(), baseDirectory.string()));
+  }
+  catch (const fs::filesystem_error& ex)
+  {
+    log::error("Could not collapse path: ", ex.what());
+    return {};
+  }
 }
 
 //----------------------------------------------------------------------------

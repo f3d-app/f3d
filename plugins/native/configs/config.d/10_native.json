@@ -4,7 +4,7 @@
   "options":
   {
     "scalar-coloring": true,
-    "bar": true
+    "coloring-scalar-bar": true
   }
 },
 {
@@ -35,7 +35,7 @@
   {
     "scalar-coloring": true,
     "up": "-Y",
-    "comp": "-2",
+    "coloring-component": "-2",
     "camera-direction": "-1,0.5,1"
   }
 },
@@ -44,7 +44,7 @@
   "options":
   {
     "scalar-coloring": true,
-    "comp": "-2",
+    "coloring-component": "-2",
     "translucency-support": true
   }
 },
@@ -57,10 +57,10 @@
     "point-sprites-type": "gaussian",
     "scalar-coloring": true,
     "coloring-array": "color",
-    "comp": "-2",
-    "bg-color": "0, 0, 0",
+    "coloring-component": "-2",
+    "background-color": "0, 0, 0",
     "up": "-Y",
-    "trackball": true,
+    "interaction-trackball": true,
     "camera-position": "0,1,-5.2",
     "camera-focal-point": "0,1,0",
     "tone-mapping": false,

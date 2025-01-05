@@ -53,8 +53,3 @@ runs:
       uses: ./source/.github/actions/usd-install-dep
       with:
         cpu: ${{inputs.cpu}}
-
-    - name: Install ImGui dependency
-      uses: ./source/.github/actions/imgui-install-dep
-      with:
-        cpu: ${{inputs.cpu}}

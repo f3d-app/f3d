@@ -15,7 +15,6 @@
 #include <vtk_glew.h>
 #endif
 
-
 vtkStandardNewMacro(vtkF3DCachedSpecularTexture);
 
 //------------------------------------------------------------------------------

@@ -19,7 +19,7 @@ Rendering a file and starting the interaction is very easy:
 f3d::engine::autoloadPlugins();
 
 // Create a f3d::engine
-f3d::engine eng();
+f3d::engine eng = f3d::engine::create();
 
 // Add a file into a scene
 eng.getScene().add("path/to/file.ext");
@@ -39,7 +39,7 @@ As well as loading multiple files:
 f3d::engine::autoloadPlugins();
 
 // Create a f3d::engine
-f3d::engine eng();
+f3d::engine eng = f3d::engine::create();
 
 // Load multiples geometries
 eng.getScene().add({"path/to/file.ext", "path/to/file2.ext"});
@@ -56,7 +56,7 @@ It's also possible to load a geometry from memory buffers:
 #include <f3d/scene.h>
 
 // Create a f3d::engine
-f3d::engine eng();
+f3d::engine eng = f3d::engine::create();
 
 // Create a single triangle
 f3d::mesh_t mesh = {};
@@ -105,7 +105,7 @@ Changing some options can be done this way:
 f3d::engine::autoloadPlugins();
 
 // Create a f3d::engine
-f3d::engine eng();
+f3d::engine eng = f3d::engine::create();
 
 // Recover the options and set the wanted value
 options& opt = eng.getOptions();

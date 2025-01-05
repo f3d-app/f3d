@@ -15,19 +15,21 @@ The libf3d provides a few commands, many related to manipulating libf3d (options
 
 `set option.name values`: A command to set a libf3d option, eg: `set scene.up.direction +Z` or `set render.hdri.file "/path/to/file with spaces.png"`
 
-`toggle option.name`: A command to toggle a boolean libf3d option, eg: `toggle ui.scalar_bar`. 
+`toggle option.name`: A command to toggle a boolean libf3d option, eg: `toggle ui.scalar_bar`.
 
-`reset option.name`: A command to reset a libf3d option to its default values, eg: `reset render.background.blur_coc`.
+`reset option.name`: A command to reset a libf3d option to its default values, eg: `reset render.background.blur.coc`.
+
+`clear`: A command to clear ImGui console. No argument. 
 
 `print option.name`: A command to print the value of an libf3d option, eg: `print scene.up.direction`.
 
 `cycle_animation`:  A specific command to cycle `scene.animation.index` option using model information, No argument.
 
-`cycle_coloring field/array/component`:  A specific command to manipulate scivis options using model information. 
+`cycle_coloring field/array/component`:  A specific command to manipulate scivis options using model information.
 Supports `field`, `array` or `component` arguments, see [documentation](INTERACTIONS.md#cycling-coloring).
 eg: `cycle_coloring array`.
 
-`roll_camera value`: A specific command to roll the camera on its side, takes an angle in degrees as an argument. 
+`roll_camera value`: A specific command to roll the camera on its side, takes an angle in degrees as an argument.
 eg: `roll_camera 120`.
 
 `increase_light_intensity`: A specific command to increase light intensity. No argument.
@@ -35,6 +37,12 @@ eg: `roll_camera 120`.
 `decrease_light_intensity`: A specific command to decrease light intensity. No argument.
 
 `print_scene_info`: A specific command to print information about the scene, No argument.
+
+`print_coloring_info`: A specific command to print information about coloring settings, No argument.
+
+`print_mesh_info`: A specific command to print information from the mesh importer, No argument.
+
+`print_options_info`: A specific command to print configuration options that have a value, No argument.
 
 `set_camera front/top/right/isometric`: A specific command to position the camera in the specified location relative to the model.
 Supports `front`, `top`, `right`, `isometric` arguments. eg: `set_camera top`.
@@ -54,9 +62,11 @@ eg: `add_files /path/to/dragon.vtu`.
 
 The F3D application provides a few more commands.
 
-`load_previous_file_group`: A specific command to load the previous file or file group. No argument.
+`exit`: A specific command to quit the application. No argument.
 
-`load_next_file_group`: A specific command to load the next file or file group. No argument.
+`load_previous_file_group [keep_camera]`: A specific command to load the previous file or file group. Camera state is kept if `keep_camera` is true (default: false).
+
+`load_next_file_group [keep_camera]`: A specific command to load the next file or file group. No argument. Camera state is kept if `keep_camera` is true (default: false).
 
 `reload_current_file_group`: A specific command to reload the current file or file group. No argument.
 
@@ -91,6 +101,10 @@ print_scene_info # Another comment
 increase_light_intensity
 ```
 
+## Console
+
+If F3D is built with `F3D_MODULE_UI` support, pressing <kbd>Esc</kbd> will open the console mode. It's possible to type any command in the input field and pressing <kbd>Enter</kbd> will trigger the command instantly.
+
 ## Command syntax
 
 Command syntax is similar to bash, as in they will be split by "token" to be processed.
@@ -105,3 +119,4 @@ Command syntax is similar to bash, as in they will be split by "token" to be pro
  - Other escaped character will be processed as if the escape was not present, eg: `set scene.up.direction +\Z`
  - Unfinished quoted section is invalid, eg: `set scene.up.direction "+Z`
  - A escape at the end is also invalid, eg: `set scene.up.direction +Z\`
+ - Options values are [parsed](PARSING.md) according to their types.

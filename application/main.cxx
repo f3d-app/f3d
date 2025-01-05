@@ -26,7 +26,6 @@ int main(int argc, char** argv)
   {
     f3d::log::error("F3D encountered an unexpected exception:");
     f3d::log::error(ex.what());
-    f3d::log::waitForUser();
     exit(EXIT_FAILURE);
   }
 
@@ -50,10 +49,6 @@ int WINAPI wWinMain(HINSTANCE, HINSTANCE, LPWSTR, int)
   setvbuf(stderr, nullptr, _IOFBF, 1000);
 
   std::setlocale(LC_ALL, "en_US.utf8");
-
-#if WINVER >= 0x0605
-  SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
-#endif
 
   int argc;
   wchar_t** wargv = CommandLineToArgvW(GetCommandLineW(), &argc);

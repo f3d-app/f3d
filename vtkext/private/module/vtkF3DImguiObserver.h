@@ -42,6 +42,7 @@ private:
   bool MouseWheelBackward(vtkObject* caller, unsigned long, void*);
   bool KeyPress(vtkObject* caller, unsigned long, void*);
   bool KeyRelease(vtkObject* caller, unsigned long, void*);
+  bool Char(vtkObject* caller, unsigned long, void*);
   //@}
 
   /**

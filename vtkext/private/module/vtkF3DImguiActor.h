@@ -31,6 +31,11 @@ public:
    */
   void ReleaseGraphicsResources(vtkWindow* w) override;
 
+  /**
+   * Set imgui::DeltaTime, with time in seconds
+   */
+  void SetDeltaTime(double time) override;
+
 protected:
   vtkF3DImguiActor();
   ~vtkF3DImguiActor() override;
@@ -70,6 +75,16 @@ private:
    * Render the fps UI widget
    */
   void RenderFpsCounter() override;
+
+  /**
+   * Render the console widget
+   */
+  void RenderConsole() override;
+
+  /**
+   * Render the console badge
+   */
+  void RenderConsoleBadge() override;
 
 private:
   vtkF3DImguiActor(const vtkF3DImguiActor&) = delete;

@@ -15,7 +15,6 @@ list(APPEND libf3dSDKTests_list
      TestSDKMultiColoring.cxx
      TestSDKOptions.cxx
      TestSDKOptionsIO.cxx
-     TestSDKRenderAndInteract.cxx
      TestSDKRenderFinalShader.cxx
      TestSDKUtils.cxx
      TestSDKWindowAuto.cxx
@@ -25,6 +24,7 @@ list(APPEND libf3dSDKTests_list
 # Tests having UI widgets
 if(F3D_MODULE_UI)
   list(APPEND libf3dSDKTests_list
+    TestSDKConsole.cxx
     TestSDKDynamicBackgroundColor.cxx
     TestSDKDynamicFontFile.cxx
     TestSDKDynamicProperties.cxx
@@ -39,6 +39,20 @@ if(F3D_MODULE_UI)
       TestSDKDynamicHDRI.cxx
       )
   endif()
+endif()
+
+# These tests needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10155
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20230426)
+  list(APPEND libf3dSDKTests_list
+    TestSDKRenderAndInteract.cxx
+    TestSDKStartInteractor.cxx
+    )
+endif()
+
+if (VTK_VERSION VERSION_GREATER 9.2.6)
+    list(APPEND libf3dSDKTests_list
+        TestSDKEngineRecreation.cxx
+        )
 endif()
 
 # Invalid scene codepath needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11287
@@ -119,6 +133,10 @@ target_compile_definitions(libf3dSDKTests PRIVATE F3D_MODULE_EXR=$<BOOL:${F3D_MO
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240729)
   target_compile_definitions(libf3dSDKTests PRIVATE F3D_SSIM_COMPARE)
 endif()
+
+if (F3D_MODULE_EXR)
+  target_compile_definitions(libf3dSDKTests PRIVATE F3D_MODULE_EXR)
+endif ()
 
 # List tests that do not require rendering
 list(APPEND libf3dSDKTestsNoRender_list

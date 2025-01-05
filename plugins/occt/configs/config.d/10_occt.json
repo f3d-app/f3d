@@ -7,8 +7,8 @@
     "load-plugins": "occt",
     "up": "+Z",
     "ambient-occlusion": true,
-    "comp": "-2",
-    "cells": true,
+    "coloring-component": "-2",
+    "coloring-by-cells": true,
     "camera-direction": "-1,1,-0.5"
   }
 }

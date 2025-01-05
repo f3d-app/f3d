@@ -56,7 +56,7 @@ Your data probably contains some translucent data for some reason, turn on trans
 
 > I have a link error related to `stdc++fs` not found.
 
-With some C++ STD library version, explicit linking to `stdc++fs` is not supported. We provide a CMake option `F3D_LINUX_APPLICATION_LINK_FILESYSTEM` that you can set to `OFF` to workaround this issue.
+With some C++ STD library version, explicit linking to `stdc++fs` is not supported. We provide a CMake option `F3D_LINUX_LINK_FILESYSTEM` that you can set to `OFF` to workaround this issue.
 
 > I have a link error related to undefined reference to symbol of `libatomic`.
 
@@ -111,6 +111,13 @@ There are too many entry in your PATH environment variable, remove the ones you 
 > When I try to update F3D, the installer fails with: `Error opening file for writing: F3DShellExtension.dll`
 
 Your previous F3D installation is current being used to generate thumbnails, wait for a bit or reboot your computer before updating again.
+
+> When running F3D without interactivity (e.g. `f3d.exe --version`) from CLI, nothing is displayed.
+
+It's a limitation from the Windows "subsystem".
+You can workaround the issue by piping to a file (`f3d.exe --version > file.txt`) and read the file.
+It also seems to be working fine with (git bash console)[https://gitforwindows.org/].
+Another solution is recompiling F3D with the CMake option `F3D_WINDOWS_GUI` disabled.
 
 ## macOS
 

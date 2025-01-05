@@ -5,7 +5,6 @@
 #include "F3DColoringInfoHandler.h"
 #include "vtkF3DCachedLUTTexture.h"
 #include "vtkF3DCachedSpecularTexture.h"
-#include "vtkF3DConfigure.h"
 #include "vtkF3DDropZoneActor.h"
 #include "vtkF3DOpenGLGridMapper.h"
 #include "vtkF3DRenderPass.h"
@@ -246,6 +245,9 @@ void vtkF3DRenderer::Initialize()
   this->RemoveAllViewProps();
   this->RemoveAllLights();
 
+  this->ImporterTimeStamp = 0;
+  this->ImporterUpdateTimeStamp = 0;
+
   this->AddActor(this->GridActor);
   this->AddActor(this->DropZoneActor);
   this->AddActor(this->SkyboxActor);
@@ -269,6 +271,8 @@ void vtkF3DRenderer::Initialize()
   this->AddActor2D(this->ScalarBarActor);
   this->ScalarBarActor->VisibilityOff();
 
+  this->ExpandingRangeSet = false;
+
   this->ColorTransferFunctionConfigured = false;
   this->ColoringMappersConfigured = false;
   this->PointSpritesMappersConfigured = false;
@@ -276,6 +280,9 @@ void vtkF3DRenderer::Initialize()
   this->ScalarBarActorConfigured = false;
   this->CheatSheetConfigured = false;
   this->ColoringConfigured = false;
+
+  // create ImGui context if F3D_MODULE_UI is enabled
+  this->UIActor->Initialize(vtkOpenGLRenderWindow::SafeDownCast(this->RenderWindow));
 }
 
 //----------------------------------------------------------------------------
@@ -335,12 +342,15 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   }
 
   vtkNew<vtkF3DRenderPass> newPass;
-  newPass->SetUseRaytracing(F3D_MODULE_RAYTRACING && this->UseRaytracing);
+#if F3D_MODULE_RAYTRACING  
+  newPass->SetUseRaytracing(this->UseRaytracing);
+#endif  
   newPass->SetUseSSAOPass(this->UseSSAOPass);
   newPass->SetUseDepthPeelingPass(this->UseDepthPeelingPass);
   newPass->SetUseBlurBackground(this->UseBlurBackground);
   newPass->SetCircleOfConfusionRadius(this->CircleOfConfusionRadius);
   newPass->SetForceOpaqueBackground(this->HDRISkyboxVisible);
+  newPass->SetArmatureVisible(this->ArmatureVisible);
 
   double bounds[6];
   this->ComputeVisiblePropBounds(bounds);
@@ -627,8 +637,8 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
 void vtkF3DRenderer::SetHDRIFile(const std::optional<std::string>& hdriFile)
 {
   // Check HDRI is different than current one
-  std::optional<std::string> collapsedHdriFile;
-  if (hdriFile.has_value())
+  std::string collapsedHdriFile;
+  if (hdriFile.has_value() && !hdriFile.value().empty())
   {
     collapsedHdriFile = vtksys::SystemTools::CollapseFullPath(hdriFile.value());
   }
@@ -760,25 +770,25 @@ void vtkF3DRenderer::ConfigureHDRIReader()
   {
     this->UseDefaultHDRI = false;
     this->HDRIReader = nullptr;
-    if (this->HDRIFile.has_value())
+    if (!this->HDRIFile.empty())
     {
-      if (!vtksys::SystemTools::FileExists(this->HDRIFile.value(), true))
+      if (!vtksys::SystemTools::FileExists(this->HDRIFile, true))
       {
         F3DLog::Print(
-          F3DLog::Severity::Warning, std::string("HDRI file does not exist ") + this->HDRIFile.value());
+          F3DLog::Severity::Warning, std::string("HDRI file does not exist ") + this->HDRIFile);
       }
       else
       {
         this->HDRIReader = vtkSmartPointer<vtkImageReader2>::Take(
-          vtkImageReader2Factory::CreateImageReader2(this->HDRIFile.value().c_str()));
+          vtkImageReader2Factory::CreateImageReader2(this->HDRIFile.c_str()));
         if (this->HDRIReader)
         {
-          this->HDRIReader->SetFileName(this->HDRIFile.value().c_str());
+          this->HDRIReader->SetFileName(this->HDRIFile.c_str());
         }
         else
         {
           F3DLog::Print(F3DLog::Severity::Warning,
-            std::string("Cannot open HDRI file ") + this->HDRIFile.value() +
+            std::string("Cannot open HDRI file ") + this->HDRIFile +
               std::string(". Using default HDRI"));
         }
       }
@@ -811,8 +821,8 @@ void vtkF3DRenderer::ConfigureHDRIHash()
     }
     else
     {
-      // Compute HDRI MD5, here we know the HDRIFile has a value
-      this->HDRIHash = ::ComputeFileHash(this->HDRIFile.value());
+      // Compute HDRI MD5, here we know the HDRIFile is not empty
+      this->HDRIHash = ::ComputeFileHash(this->HDRIFile);
     }
     this->HasValidHDRIHash = true;
     this->CreateCacheDirectory();
@@ -1070,7 +1080,7 @@ void vtkF3DRenderer::ConfigureTextActors()
 
   // Font
   this->DropZoneActor->GetTextProperty()->SetFontFamilyToCourier();
-  if (this->FontFile.has_value())
+  if (this->FontFile.has_value() && !this->FontFile.value().empty())
   {
     std::string tmpFontFile = vtksys::SystemTools::CollapseFullPath(this->FontFile.value());
     if (vtksys::SystemTools::FileExists(tmpFontFile, true))
@@ -1085,9 +1095,6 @@ void vtkF3DRenderer::ConfigureTextActors()
         F3DLog::Severity::Warning, std::string("Cannot find \"") + tmpFontFile + "\" font file.");
     }
   }
-
-  // create ImGui context if F3D_MODULE_UI is enabled
-  this->UIActor->Initialize(vtkOpenGLRenderWindow::SafeDownCast(this->RenderWindow));
 
   this->TextActorsConfigured = true;
 }
@@ -1327,6 +1334,17 @@ void vtkF3DRenderer::ShowCheatSheet(bool show)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::ShowConsole(bool show)
+{
+  if (this->ConsoleVisible != show)
+  {
+    this->ConsoleVisible = show;
+    this->UIActor->SetConsoleVisibility(show);
+    this->CheatSheetConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureCheatSheet(const std::vector<vtkF3DUIActor::CheatSheetGroup>& info)
 {
   if (this->CheatSheetVisible)
@@ -1356,6 +1374,17 @@ void vtkF3DRenderer::ShowHDRISkybox(bool show)
     this->HDRIReaderConfigured = false;
     this->HDRITextureConfigured = false;
     this->HDRISkyboxConfigured = false;
+    this->RenderPassesConfigured = false;
+    this->CheatSheetConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ShowArmature(bool show)
+{
+  if (this->ArmatureVisible != show)
+  {
+    this->ArmatureVisible = show;
     this->RenderPassesConfigured = false;
     this->CheatSheetConfigured = false;
   }
@@ -1431,21 +1460,29 @@ void vtkF3DRenderer::UpdateActors()
   // XXX: Importer only modify itself when adding a new importer,
   // not when updating at a time step
   vtkMTimeType importerMTime = this->Importer->GetMTime();
-  bool importerChanged = this->Importer->GetMTime() > this->ImporterTimeStamp;
-  if (importerChanged)
+  if (importerMTime > this->ImporterTimeStamp)
   {
+    this->ActorsPropertiesConfigured = false;
+    this->GridConfigured = false;
+  }
+  this->ImporterTimeStamp = importerMTime;
+
+  // XXX: Handle animation update in importer, which may have an impact on the colormap
+  // We assume animation change do not change the number of actors
+  vtkMTimeType importerUpdateMTime = this->Importer->GetUpdateMTime();
+  if (this->UsingExpandingRange && importerUpdateMTime > this->ImporterTimeStamp)
+  {
+    // XXX: This could be improved further to only configure mappers and actors
+    // when the coloring range actually change
     this->ColorTransferFunctionConfigured = false;
     this->ColoringMappersConfigured = false;
     this->PointSpritesMappersConfigured = false;
     this->VolumePropsAndMappersConfigured = false;
     this->ScalarBarActorConfigured = false;
-    this->ActorsPropertiesConfigured = false;
-    this->GridConfigured = false;
     this->MetaDataConfigured = false;
-    this->ActorsPropertiesConfigured = false;
     this->ColoringConfigured = false;
   }
-  this->ImporterTimeStamp = importerMTime;
+  this->ImporterUpdateTimeStamp = importerUpdateMTime;
 
   if (!this->ActorsPropertiesConfigured)
   {
@@ -2086,6 +2123,7 @@ void vtkF3DRenderer::SetUseCellColoring(bool useCell)
     this->ScalarBarActorConfigured = false;
     this->CheatSheetConfigured = false;
     this->ColoringConfigured = false;
+    this->ExpandingRangeSet = false;
   }
 }
 
@@ -2102,6 +2140,7 @@ void vtkF3DRenderer::SetArrayNameForColoring(const std::optional<std::string>& a
     this->ScalarBarActorConfigured = false;
     this->CheatSheetConfigured = false;
     this->ColoringConfigured = false;
+    this->ExpandingRangeSet = false;
   }
 }
 
@@ -2124,6 +2163,7 @@ void vtkF3DRenderer::SetComponentForColoring(int component)
     this->ScalarBarActorConfigured = false;
     this->CheatSheetConfigured = false;
     this->ColoringConfigured = false;
+    this->ExpandingRangeSet = false;
   }
 }
 
@@ -2410,12 +2450,12 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
   }
 
   // Set range
-  bool autoRange = true;
+  this->UsingExpandingRange = true;
   if (this->UserScalarBarRange.has_value())
   {
     if (this->UserScalarBarRange.value().size() == 2 && this->UserScalarBarRange.value()[0] <= this->UserScalarBarRange.value()[1])
     {
-      autoRange = false;
+      this->UsingExpandingRange = false;
       this->ColorRange[0] = this->UserScalarBarRange.value()[0];
       this->ColorRange[1] = this->UserScalarBarRange.value()[1];
     }
@@ -2426,18 +2466,32 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
     }
   }
 
-  if (autoRange)
+  if (this->UsingExpandingRange)
   {
+    double minRange;
+    double maxRange;
     if (this->ComponentForColoring >= 0)
     {
-      this->ColorRange[0] = info.ComponentRanges[this->ComponentForColoring][0];
-      this->ColorRange[1] = info.ComponentRanges[this->ComponentForColoring][1];
+      minRange = info.ComponentRanges[this->ComponentForColoring][0];
+      maxRange = info.ComponentRanges[this->ComponentForColoring][1];
     }
     else
     {
-      this->ColorRange[0] = info.MagnitudeRange[0];
-      this->ColorRange[1] = info.MagnitudeRange[1];
+      minRange = info.MagnitudeRange[0];
+      maxRange = info.MagnitudeRange[1];
     }
+    if (this->ExpandingRangeSet)
+    {
+      // Only extend the range when already set
+      this->ColorRange[0] = minRange < this->ColorRange[0] ? minRange : this->ColorRange[0];
+      this->ColorRange[1] = maxRange > this->ColorRange[1] ? maxRange : this->ColorRange[1];
+    }
+    else
+    {
+      this->ColorRange[0] = minRange;
+      this->ColorRange[1] = maxRange;
+    }
+    this->ExpandingRangeSet = true;
   }
 
   // Create lookup table
@@ -2578,4 +2632,16 @@ bool vtkF3DRenderer::CheatSheetNeedsUpdate() const
 void vtkF3DRenderer::SetCheatSheetConfigured(bool flag)
 {
   this->CheatSheetConfigured = flag;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetUIDeltaTime(double time)
+{
+  this->UIActor->SetDeltaTime(time);
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetConsoleBadgeEnabled(bool enabled)
+{
+  this->UIActor->SetConsoleBadgeEnabled(enabled);
 }

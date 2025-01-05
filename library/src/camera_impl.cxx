@@ -177,10 +177,10 @@ void camera_impl::getViewAngle(angle_deg_t& angle)
 camera& camera_impl::setState(const camera_state_t& state)
 {
   vtkCamera* cam = this->GetVTKCamera();
-  cam->SetPosition(state.pos.data());
-  cam->SetFocalPoint(state.foc.data());
-  cam->SetViewUp(state.up.data());
-  cam->SetViewAngle(state.angle);
+  cam->SetPosition(state.position.data());
+  cam->SetFocalPoint(state.focalPoint.data());
+  cam->SetViewUp(state.viewUp.data());
+  cam->SetViewAngle(state.viewAngle);
   cam->OrthogonalizeViewUp();
   this->Internals->VTKRenderer->ResetCameraClippingRange();
   return *this;
@@ -198,10 +198,10 @@ camera_state_t camera_impl::getState()
 void camera_impl::getState(camera_state_t& state)
 {
   vtkCamera* cam = this->GetVTKCamera();
-  cam->GetPosition(state.pos.data());
-  cam->GetFocalPoint(state.foc.data());
-  cam->GetViewUp(state.up.data());
-  state.angle = cam->GetViewAngle();
+  cam->GetPosition(state.position.data());
+  cam->GetFocalPoint(state.focalPoint.data());
+  cam->GetViewUp(state.viewUp.data());
+  state.viewAngle = cam->GetViewAngle();
 }
 //----------------------------------------------------------------------------
 camera& camera_impl::dolly(double val)

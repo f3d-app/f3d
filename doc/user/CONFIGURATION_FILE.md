@@ -22,7 +22,7 @@ A typical config file with options may look like this:
 {
   "options":
   {
-     "bg-color": "0.7,0.7,0.7",
+     "background-color": "0.7,0.7,0.7",
      "color": "0.5,0.1,0.1",
      "anti-aliasing": true,
      "timer": true,
@@ -65,10 +65,10 @@ The third block specifies raytracing usage for .gltf and .glb files.
 The last block specifies that volume rendering should be used with .mhd files.
 
 The following options <b> cannot </b> be set via config file:
-`help`, `version`, `readers-list`, `config`, `dry-run` and `input`.
+`help`, `version`, `list-readers`, `list-rendering-backends`, `scan-plugins`, `config`, `no-config` and `input`.
 
 The following options <b>are only taken on the first load</b>:
-`no-render`, `output`, `position`, `resolution` and all testing options.
+`no-render`, `output`, `position`, `resolution`, `frame-rate` and all testing options.
 
 Boolean options that have been turned on in the configuration file can be turned
 off on the command line if needed, eg: `--point-sprites=false`.
@@ -98,7 +98,7 @@ A typical config file with bindings may look like this:
     "Any+3": "roll_camera 90",
     "Shift+O": "toggle model.point_sprites.enable",
     "Ctrl+O": ["toggle render.grid.enable", "toggle scene.camera.orthographic"],
-    "None+I": "toggle interactor.axis"
+    "None+I": "toggle ui.axis"
   }
 }
 ]
@@ -115,7 +115,7 @@ interaction on the `Any+3` bind and even define a bindings that have multiple co
 on the `Ctrl+O` bind.
 
 Please note this configuration feature is only available through config file and not through the command line.
-However, it is possible to check your current binding configuration by using the `--bindings-list` CLI options.
+However, it is possible to check your current binding configuration by using the `--list-bindings` CLI options.
 
 ### Bind
 

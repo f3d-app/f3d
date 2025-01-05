@@ -21,15 +21,15 @@ Images and videos displayed below use public datasets, you can download them [he
 
 <img src="https://user-images.githubusercontent.com/3129530/194735272-5bcd3e7c-a333-41f5-8066-9b0bec9885e8.png" width="700">
 
-*Direct scalars rendering of a point cloud*: `f3d Carola_PointCloud.ply --point-size=0 --comp=-2 -sofj --coloring-array=RGBA --up=+Z --hdri-file=venice_sunset_8k.hdr`
+*Direct scalars rendering of a point cloud*: `f3d Carola_PointCloud.ply --point-size=0 --coloring-component=-2 -sofj --coloring-array=RGBA --up=+Z --hdri-file=venice_sunset_8k.hdr`
 
 <img src="https://user-images.githubusercontent.com/3129530/194735378-b8be4df2-e030-4d13-b12f-24806cbb385b.png" width="700">
 
-*Raytraced CAD assembly*: `f3d 202.vtp -xtgans -rd --samples=10 --range=-2,9`
+*Raytraced CAD assembly*: `f3d 202.vtp -xtgans -rd --raytracing-samples=10 --coloring-range=-2,9`
 
 <img src="https://user-images.githubusercontent.com/3129530/194735377-127fa5d8-ece5-40c7-8176-672279ebdacc.png" width="700">
 
-*Volume rendering of a security bag scan*: `f3d backpack.vti -vmn --range=300,1000 --colormap=0,0,0,0,1,1,1,1`
+*Volume rendering of a security bag scan*: `f3d backpack.vti -vmn --coloring-range=300,1000 --colormap=0,0,0,0,1,1,1,1`
 
 <img src="https://user-images.githubusercontent.com/3129530/194735376-3a476643-00d6-4cfc-9a88-e0dd33658564.png" width="700">
 
@@ -37,7 +37,7 @@ Images and videos displayed below use public datasets, you can download them [he
 
 <img src="https://user-images.githubusercontent.com/3129530/194735416-3f386437-456c-4145-9b5e-6bb6451d7e9a.png" width="700">
 
-*Showcase of interactive widgets*: `f3d dragon.vtu -xtganse --comp=0`
+*Showcase of interactive widgets*: `f3d dragon.vtu -xtganse --coloring-component=0`
 
 <img src="https://user-images.githubusercontent.com/3129530/194735370-4d1f067c-704c-4118-9d94-c1adf4039c39.png" width="700">
 
@@ -53,11 +53,11 @@ Images and videos displayed below use public datasets, you can download them [he
 
 <img src="https://user-images.githubusercontent.com/3129530/194735361-7e827d8e-531a-4938-b608-18825a9574f8.png" width="700">
 
-*Visualization of a CFD velocity field*: `f3d single-pin.vtp -xtbgans --range=-2,8 --colormap=0,0.3,0.7,0,0.7,0,0.1,1,1,0.8,0.8,0`
+*Visualization of a CFD velocity field*: `f3d single-pin.vtp -xtbgans --coloring-range=-2,8 --colormap=0,0.3,0.7,0,0.7,0,0.1,1,1,0.8,0.8,0`
 
 <img src="https://user-images.githubusercontent.com/3129530/194735354-486999dd-3c57-4ab1-a9ad-b8e97bac0da0.png" width="700">
 
-*Volume rendering of a medical skull scan*: `f3d skull.vti -vxbt --range=40,200 --camera-direction=1,0,0`
+*Volume rendering of a medical skull scan*: `f3d skull.vti -vxbt --coloring-range=40,200 --camera-direction=1,0,0`
 
 <img src="https://user-images.githubusercontent.com/3129530/194735348-7dd14922-f546-4f54-8bc2-b6602617c4cc.png" width="700">
 

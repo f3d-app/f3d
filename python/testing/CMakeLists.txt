@@ -23,6 +23,12 @@ list(APPEND pyf3dTestsNoRender_list
      test_utils.py
     )
 
+# These tests needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10155
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20230426)
+list(APPEND pyf3dTests_list
+     test_interactor_start.py)
+endif ()
+
 # Add all the ADD_TEST for each test
 foreach(test ${pyf3dTests_list})
   get_filename_component (TName TestPython_${test} NAME_WE)

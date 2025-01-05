@@ -18,6 +18,7 @@ endforeach()
 
 set(classes
   vtkF3DFaceVaryingPointDispatcher
+  vtkF3DGLTFImporter
   vtkF3DImporter
   )
 

@@ -5,6 +5,7 @@
 #include "nlohmann/json.hpp"
 
 #include "log.h"
+#include "utils.h"
 
 #include <filesystem>
 #include <fstream>
@@ -21,7 +22,7 @@ namespace
  */
 std::vector<fs::path> GetConfigPaths(const std::string& configSearch)
 {
-  std::vector<std::filesystem::path> paths;
+  std::vector<fs::path> paths;
 
   fs::path configPath;
   std::vector<fs::path> dirsToCheck = {
@@ -111,7 +112,8 @@ F3DConfigFileTools::ReadConfigFiles(const std::string& userConfig)
   }
   else
   {
-    configPaths.emplace_back(userConfig);
+    // Collapse full path into an absolute path
+    configPaths.emplace_back(f3d::utils::collapsePath(userConfig));
   }
 
   // Recover actual individual config file paths
@@ -133,7 +135,7 @@ F3DConfigFileTools::ReadConfigFiles(const std::string& userConfig)
     if (fs::is_directory(configPath))
     {
       f3d::log::debug("Using config directory ", configPath.string());
-      for (auto& entry : std::filesystem::directory_iterator(configPath))
+      for (auto& entry : fs::directory_iterator(configPath))
       {
         actualConfigFilePaths.emplace(entry);
       }
@@ -145,10 +147,10 @@ F3DConfigFileTools::ReadConfigFiles(const std::string& userConfig)
     }
   }
 
-  // If we used a configSearch but did not find any, warn the user
+  // If we used a configSearch but did not find any, inform the user
   if (!configSearch.empty() && actualConfigFilePaths.empty())
   {
-    f3d::log::warn("Configuration file for \"", configSearch, "\" could not be found");
+    f3d::log::info("Configuration file for \"", configSearch, "\" could not be found");
   }
 
   // Read config files

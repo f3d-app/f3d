@@ -31,7 +31,7 @@ include(f3dVersion)
 # Handle F3D_VERSION
 set(F3D_MAJOR_VERSION 2)
 set(F3D_MINOR_VERSION 5)
-set(F3D_PATCH_VERSION 0)
+set(F3D_PATCH_VERSION 1)
 set(F3D_VERSION ${F3D_MAJOR_VERSION}.${F3D_MINOR_VERSION}.${F3D_PATCH_VERSION})
 
 set(F3D_PATCH_VERSION_EXTRA "")
@@ -56,11 +56,14 @@ mark_as_advanced(F3D_EXCLUDE_DEPRECATED)
 option(F3D_MODULE_RAYTRACING "Raytracing module" OFF)
 option(F3D_MODULE_EXR "OpenEXR images module" OFF)
 option(F3D_MODULE_UI "ImGui widgets module" ON)
+option(F3D_MODULE_DMON "dmon (watch) module" ON)
+option(F3D_MODULE_TINYFILEDIALOGS "tinyfiledialogs module" ON)
 
 # Use externals
 option(F3D_USE_EXTERNAL_CXXOPTS "Use external cxxopts dependency" OFF)
 option(F3D_USE_EXTERNAL_NLOHMANN_JSON "Use external nlohmann_json dependency" OFF)
-option(F3D_USE_EXTERNAL_DMON "Use external dmon dependency" OFF)
+cmake_dependent_option(F3D_USE_EXTERNAL_DMON "Use external dmon dependency" OFF "F3D_MODULE_DMON" OFF)
+cmake_dependent_option(F3D_USE_EXTERNAL_IMGUI "Use external imgui dependency" OFF "F3D_MODULE_UI" OFF)
 
 if (F3D_USE_EXTERNAL_CXXOPTS)
   find_package(cxxopts REQUIRED)
@@ -70,6 +73,9 @@ if (F3D_USE_EXTERNAL_NLOHMANN_JSON)
 endif ()
 if (F3D_USE_EXTERNAL_DMON)
   find_package(dmon REQUIRED)
+endif ()
+if (F3D_USE_EXTERNAL_IMGUI)
+  find_package(imgui REQUIRED)
 endif ()
 
 # VTK dependency
@@ -115,6 +121,11 @@ endif()
 include(GNUInstallDirs)
 cmake_dependent_option(F3D_WINDOWS_GUI "Build a non-console Win32 application" ON "WIN32" OFF)
 cmake_dependent_option(F3D_MACOS_BUNDLE "Build a macOS bundle application" ON "APPLE" OFF)
+
+if(UNIX AND NOT APPLE)
+  option(F3D_LINUX_LINK_FILESYSTEM "Link with libstdc++fs" ON)
+  mark_as_advanced(F3D_LINUX_LINK_FILESYSTEM)
+endif()
 
 # Force static library when creating a macOS bundle
 cmake_dependent_option(BUILD_SHARED_LIBS "Build f3d with shared libraries" ON "NOT ANDROID" OFF)

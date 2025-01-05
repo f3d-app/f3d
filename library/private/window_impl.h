@@ -15,6 +15,7 @@
 #include "log.h"
 #include "window.h"
 
+#include <filesystem>
 #include <memory>
 #include <optional>
 
@@ -54,7 +55,7 @@ public:
   window& setSize(int width, int height) override;
   window& setPosition(int x, int y) override;
   window& setIcon(const unsigned char* icon, size_t iconSize) override;
-  window& setWindowName(const std::string& windowName) override;
+  window& setWindowName(std::string_view windowName) override;
   point3_t getWorldFromDisplay(const point3_t& displayPoint) const override;
   point3_t getDisplayFromWorld(const point3_t& worldPoint) const override;
   ///@}
@@ -108,13 +109,19 @@ public:
    * Implementation only API.
    * Set the cache path.
    */
-  void SetCachePath(const std::string& cachePath);
+  void SetCachePath(const std::filesystem::path& cachePath);
 
   /**
    * Implementation only API.
    * Set the interactor to use when recovering bindings documentation.
    */
   void SetInteractor(interactor_impl* interactor);
+
+  /**
+   * Trigger a render only of the UI
+   * Does nothing if F3D_MODULE_UI is OFF
+   */
+  void RenderUIOnly();
 
 private:
   class internals;

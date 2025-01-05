@@ -35,6 +35,7 @@ public:
 
   void Render(const vtkRenderState* s) override;
 
+  vtkSetMacro(ArmatureVisible, bool);
   vtkSetMacro(UseRaytracing, bool);
   vtkSetMacro(UseSSAOPass, bool);
   vtkSetMacro(UseDepthPeelingPass, bool);
@@ -58,6 +59,7 @@ protected:
 
   void Blend(const vtkRenderState* s);
 
+  bool ArmatureVisible = false;
   bool UseRaytracing = false;
   bool UseSSAOPass = false;
   bool UseDepthPeelingPass = false;
@@ -69,6 +71,7 @@ protected:
   vtkSmartPointer<vtkFramebufferPass> BackgroundPass;
   vtkSmartPointer<vtkFramebufferPass> OverlayPass;
   vtkSmartPointer<vtkFramebufferPass> MainPass;
+  vtkSmartPointer<vtkFramebufferPass> MainOnTopPass;
 
   double Bounds[6] = {};
 
@@ -77,6 +80,7 @@ protected:
   std::vector<vtkProp*> BackgroundProps;
   std::vector<vtkProp*> OverlayProps;
   std::vector<vtkProp*> MainProps;
+  std::vector<vtkProp*> MainOnTopProps;
 
   std::shared_ptr<vtkOpenGLQuadHelper> BlendQuadHelper;
 };

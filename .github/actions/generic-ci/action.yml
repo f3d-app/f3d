@@ -90,11 +90,12 @@ runs:
       with:
         cpu: ${{inputs.cpu}}
 
+    # Python is part of VFX reference platform (CY2025: 3.11)
     - name: Set up Python
       if: inputs.optional_deps_label == 'optional-deps'
       uses: actions/setup-python@v5
       with:
-        python-version: '3.x'
+        python-version: '3.11'
 
     - name: Install Python dependencies
       if: inputs.optional_deps_label == 'optional-deps'
@@ -102,6 +103,7 @@ runs:
       run: |
         python -m pip install --upgrade pip
         python -m pip install pytest==8.0.0
+        python -m pip install pybind11_stubgen
 
     - name: Setup Directories
       shell: bash
@@ -151,6 +153,7 @@ runs:
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_BINDINGS_JAVA=${{ (runner.os != 'macOS' || inputs.cpu == 'arm64') && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_BINDINGS_PYTHON=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_BINDINGS_PYTHON_GENERATE_STUBS=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_EXCLUDE_DEPRECATED=${{ inputs.exclude_deprecated_label == 'exclude-deprecated' && 'ON' || 'OFF' }}
         -DF3D_LINUX_GENERATE_MAN=ON
         -DF3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
@@ -158,6 +161,8 @@ runs:
         -DF3D_MODULE_EXR=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_MODULE_RAYTRACING=${{ inputs.raytracing_label == 'raytracing' && 'ON' || 'OFF' }}
         -DF3D_MODULE_UI=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_MODULE_DMON=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_MODULE_TINYFILEDIALOGS=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGINS_STATIC_BUILD=${{ inputs.bundle_label == 'bundle' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_ALEMBIC=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_ASSIMP=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
@@ -176,7 +181,7 @@ runs:
         -DF3D_TESTING_FORCE_RENDERING_BACKEND=${{ inputs.rendering_backend }}
         -DF3D_WINDOWS_GUI=ON
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
-        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
 
     - name: Build
       shell: bash
@@ -196,6 +201,12 @@ runs:
       with:
         path: ${{github.workspace}}\build\bin_Release
 
+    - name: Install Mesa Windows Python
+      if: runner.os == 'Windows'
+      uses: f3d-app/install-mesa-windows-action@v1
+      with:
+        path: ${{github.workspace}}\build\Release\f3d
+
     # A EGL test is crashing in the CI but not locally
     - name: Set CI test exception for Linux EGL
       if:
@@ -212,7 +223,7 @@ runs:
         runner.os == 'macOS' &&
         inputs.cpu == 'x86_64'
       shell: bash
-      run: echo "F3D_CTEST_EXCEPTIONS=(TestDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestInteractionAnimationSlow)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionCycleComp)" >> $GITHUB_ENV
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestInteractionAnimationSlow)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionCycleComp)|(TestGLTFRigArmature)" >> $GITHUB_ENV
 
     # Certain tests are failing on macOS arm64 for unknown reasons
     # https://github.com/f3d-app/f3d/issues/1276
@@ -223,7 +234,7 @@ runs:
         runner.os == 'macOS' &&
         inputs.cpu == 'arm64'
       shell: bash
-      run: echo "F3D_CTEST_EXCEPTIONS=(TestDepthPeelingToneMapping)|(TestDepthPeeling)|(TestTextureColor)|(TestDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)|(TestInteractionActors)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionAnimationSlow)|(TestInteractionConfigFileInteractions)" >> $GITHUB_ENV
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestDepthPeelingToneMapping)|(TestDepthPeeling)|(TestTextureColor)|(TestDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)|(TestInteractionActors)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionAnimationSlow)|(TestInteractionConfigFileInteractions)|(TestGLTFRigArmature)" >> $GITHUB_ENV
 
     - name: Test
       shell: bash
@@ -348,7 +359,7 @@ runs:
         inputs.cpu != 'arm64' && inputs.static_label == 'no-static' && inputs.optional_deps_label == 'optional-deps'
       shell: bash
       working-directory: ${{github.workspace}}/install
-      run: F3D_PLUGINS_PATH=$(pwd)/../build_plugins/example-plugin${{ runner.os == 'Windows' && '/Release' || null }} ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --load-plugins=example --output=../install_example_plugin_output.png --ref=../source/.github/baselines/install_example_plugin_output.png --resolution=300,300 --verbose
+      run: F3D_PLUGINS_PATH=$(pwd)/../build_plugins/example-plugin${{ runner.os == 'Windows' && '/Release' || null }} ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --load-plugins=example --output=../install_example_plugin_output.png --reference=../source/.github/baselines/install_example_plugin_output.png --resolution=300,300 --rendering-backend=${{ inputs.rendering_backend }} --verbose
 
     - name: Install plugin examples
       if: inputs.static_label == 'no-static'
@@ -367,7 +378,7 @@ runs:
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: |
-        ${{ env.F3D_BIN_PATH }} ../source/testing/data/dragon.vtu --output=output/install_output.png --ref=../source/.github/baselines/install_output.png --resolution=300,300 --colormap-file=viridis --comp=0 --verbose --rendering-backend=${{ inputs.rendering_backend }}
+        ${{ env.F3D_BIN_PATH }} ../source/testing/data/dragon.vtu --output=output/install_output.png --reference=../source/.github/baselines/install_output.png --resolution=300,300 --colormap-file=viridis --coloring-component=0 --verbose --rendering-backend=${{ inputs.rendering_backend }}
 
     - name: Check Install plugins
       if: |
@@ -377,7 +388,7 @@ runs:
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: |
-        ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --output=../install_example_plugin_output.png --ref=../source/.github/baselines/install_example_plugin_output.png  --resolution=300,300 --verbose --rendering-backend=${{ inputs.rendering_backend }}
+        ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --output=../install_example_plugin_output.png --reference=../source/.github/baselines/install_example_plugin_output.png  --resolution=300,300 --verbose --rendering-backend=${{ inputs.rendering_backend }}
 
     - name: Upload Tests Install Artifact
       if: failure()
