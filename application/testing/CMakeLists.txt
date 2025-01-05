@@ -228,6 +228,7 @@ f3d_test(NAME TestComponentName DATA from_abq.vtu ARGS --scalar-coloring --color
 f3d_test(NAME TestNoRender DATA dragon.vtu NO_RENDER)
 f3d_test(NAME TestNoRenderWithOptions DATA dragon.vtu ARGS --hdri-ambient --axis NO_RENDER) # These options causes issues if not handled correctly
 f3d_test(NAME TestNoFile NO_DATA_FORCE_RENDER)
+f3d_test(NAME TestNoFileEmptyFileName ARGS --filename NO_DATA_FORCE_RENDER)
 f3d_test(NAME TestMultiFile DATA mb/recursive ARGS --multi-file-mode=all UI)
 f3d_test(NAME TestMultiFileColoring DATA mb/recursive ARGS --multi-file-mode=all -s --coloring-array=Polynomial -b UI)
 f3d_test(NAME TestMultiFileVolume DATA multi ARGS --multi-file-mode=all -vsb --coloring-array=Scalars_)
