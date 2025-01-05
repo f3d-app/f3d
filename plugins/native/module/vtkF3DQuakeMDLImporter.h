@@ -26,6 +26,7 @@ public:
    * Update actors at the given time value.
    */
   void UpdateTimeStep(double timeValue) override;
+  bool UpdateAtTimeValue(double timeValue) override;
 
   /**
    * Get the number of available animations.
