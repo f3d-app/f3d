@@ -93,6 +93,11 @@ public:
   void SetFontFile(const std::string& font);
 
   /**
+   * Set the font scale
+   */
+  void SetFontScale(const double fontScale);
+
+  /**
    * Render the UI actor
    */
   int RenderOverlay(vtkViewport* vp) override;
@@ -162,6 +167,7 @@ protected:
   int FpsValue = 0;
 
   std::string FontFile = "";
+  double FontScale = 1.0;
 
 private:
   vtkF3DUIActor(const vtkF3DUIActor&) = delete;

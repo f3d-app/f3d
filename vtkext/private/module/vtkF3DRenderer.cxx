@@ -1096,6 +1096,8 @@ void vtkF3DRenderer::ConfigureTextActors()
     }
   }
 
+  this->UIActor->SetFontScale(this->FontScale);
+
   this->TextActorsConfigured = true;
 }
 
@@ -1129,6 +1131,15 @@ void vtkF3DRenderer::SetFontFile(const std::optional<std::string>& fontFile)
   }
 }
 
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetFontScale(const double fontScale)
+{
+  if (this->FontScale != fontScale)
+  {
+    this->FontScale = fontScale;
+    this->TextActorsConfigured = false;
+  }
+}
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetBackground(const double* color)
 {

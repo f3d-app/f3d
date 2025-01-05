@@ -423,6 +423,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->ShowHDRISkybox(opt.render.background.skybox);
 
   renderer->SetFontFile(opt.ui.font_file);
+  renderer->SetFontScale(opt.ui.scale);
 
   renderer->SetGridUnitSquare(opt.render.grid.unit);
   renderer->SetGridSubdivisions(opt.render.grid.subdivisions);

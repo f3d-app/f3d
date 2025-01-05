@@ -100,6 +100,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "animation-speed-factor", "", "Set animation speed factor", "<factor>", "" },
       { "animation-time", "", "Set animation time to load", "<time>", "" },
       { "font-file", "", "Path to a FreeType compatible font file", "<file_path>", ""},
+      { "font-scale", "", "Scale fonts", "<ratio>", ""},
       { "command-script", "", "Path to a script file containing commands to execute", "<file_path>", "" } } },
   { "Material",
     { {"point-sprites", "o", "Show sphere sprites instead of surfaces", "<bool>", "1" },
