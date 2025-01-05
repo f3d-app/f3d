@@ -688,20 +688,8 @@ interactor& interactor_impl::initCommands()
     {
       check_args(args, 1, "roll_camera");
       this->Internals->Window.getCamera().roll(options::parse<int>(args[0]));
-
-      // Check if temporary view up is needed, otherwise remove it
-      vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(this->Internals->Style->GetCurrentRenderer());
-      vector3_t viewUp = this->Internals->Window.getCamera().getViewUp();
-      double renUp[3];
-      ren->GetUpVector(renUp);
-      if (viewUp[0] == renUp[0] && viewUp[1] == renUp[1] && viewUp[2] == renUp[2])
-      {
-        this->Internals->Style->EndTemporaryUp();
-      }
-      else
-      {
-        this->Internals->Style->SetTemporaryUp(viewUp._Elems);
-      }
+      this->Internals->Style->SetTemporaryUp(
+        this->Internals->Window.getCamera().getViewUp()._Elems);
     });
 
   this->addCommand("increase_light_intensity",
