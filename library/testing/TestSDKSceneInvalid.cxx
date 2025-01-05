@@ -23,8 +23,9 @@ int TestSDKSceneInvalid(int argc, char* argv[])
     "add with invalid default scene file", [&]() { sce.add(invalidDefaultScene); });
   test.expect<f3d::scene::load_failure_exception>(
     "add with invalid full scene file", [&]() { sce.add(invalidFullScene); });
-  test.expect<f3d::scene::load_failure_exception>("add with invalid multiple files",
-    [&]() { sce.add({ validFilename, invalidFullScene, invalidDefaultScene }); });
+  test.expect<f3d::scene::load_failure_exception>("add with invalid multiple files", [&]() {
+    sce.add({ validFilename, invalidFullScene, invalidDefaultScene });
+  });
 
   return test.result();
 }
