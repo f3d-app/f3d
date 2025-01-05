@@ -482,6 +482,14 @@ void vtkF3DQuakeMDLImporter::UpdateTimeStep(double timeValue)
 }
 
 //----------------------------------------------------------------------------
+bool vtkF3DQuakeMDLImporter::UpdateAtTimeValue(double timeValue)
+{
+  this->Internals->UpdateTimeStep(timeValue);
+  return timeValue <= this->Internals->FrameRate * this->Internals->AnimationIds.size();
+}
+
+
+//----------------------------------------------------------------------------
 vtkIdType vtkF3DQuakeMDLImporter::GetNumberOfAnimations()
 {
   return this->Internals->NumberOfAnimations;
