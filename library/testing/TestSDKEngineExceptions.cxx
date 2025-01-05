@@ -22,6 +22,8 @@ int TestSDKEngineExceptions(int argc, char* argv[])
       "get non-existent interactor", [&]() { std::ignore = eng.getInteractor(); });
 
     // Test setCachePath error handling
+    test.expect<f3d::engine::cache_exception>(
+      "set cache path with empty name", [&]() { eng.setCachePath(""); });
     test.expect<f3d::engine::cache_exception>("set cache path with invalid long name",
       [&]() { eng.setCachePath("/" + std::string(257, 'x')); });
 
