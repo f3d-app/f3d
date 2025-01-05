@@ -479,8 +479,12 @@ const image& image::save(const fs::path& filePath, SaveFormat format) const
 
   try
   {
-    // Ensure the directories exists
-    fs::create_directories(filePath.parent_path());
+    // Ensure the directories exists if not empty
+    fs::path parent = filePath.parent_path();
+    if (!parent.empty())
+    {
+      fs::create_directories(parent);
+    }
 
     writer->SetFileName(filePath.string().c_str());
     writer->SetInputData(this->Internals->Image);

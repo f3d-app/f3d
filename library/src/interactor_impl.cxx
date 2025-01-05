@@ -1185,8 +1185,12 @@ bool interactor_impl::recordInteraction(const fs::path& file)
 
   try
   {
-    // Ensure parent directories exists
-    fs::create_directories(file.parent_path());
+    // Ensure parent directories exists if not empty
+    fs::path parent = file.parent_path();
+    if (!parent.empty())
+    {
+      fs::create_directories(parent);
+    }
 
     // Make sure the recorder is off and streams are cleared
     this->Internals->Recorder->Off();
