@@ -689,7 +689,7 @@ interactor& interactor_impl::initCommands()
       check_args(args, 1, "roll_camera");
       this->Internals->Window.getCamera().roll(options::parse<int>(args[0]));
       this->Internals->Style->SetTemporaryUp(
-        this->Internals->Window.getCamera().getViewUp()._Elems);
+        this->Internals->Window.getCamera().getViewUp().data());
     });
 
   this->addCommand("increase_light_intensity",
