@@ -488,7 +488,6 @@ bool vtkF3DQuakeMDLImporter::UpdateAtTimeValue(double timeValue)
   return timeValue <= this->Internals->FrameRate * this->Internals->AnimationIds.size();
 }
 
-
 //----------------------------------------------------------------------------
 vtkIdType vtkF3DQuakeMDLImporter::GetNumberOfAnimations()
 {
