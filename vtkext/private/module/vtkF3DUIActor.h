@@ -9,6 +9,7 @@
 #define vtkF3DUIActor_h
 
 #include <vtkProp.h>
+#include <deque>
 
 class vtkOpenGLRenderWindow;
 
@@ -84,7 +85,7 @@ public:
    * Updates the fps value
    * 0 by default
    */
-  void UpdateFpsValue(int fps);
+  void UpdateFpsValue(const double elapsedMicroSeconds);
 
   /**
    * Set the font file path
@@ -160,10 +161,9 @@ protected:
 
   bool FpsCounterVisible = false;
 
-  static const int FramesToAverage = 5;
-  int FramesAccumulated = 0;
+  // deque instead of queue to allow for iteration
+  std::deque<double> FrameTimes;
 
-  int AccumulatedFpsValue = 0;
   int FpsValue = 0;
 
   std::string FontFile = "";

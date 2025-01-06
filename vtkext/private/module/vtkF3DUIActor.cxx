@@ -4,6 +4,8 @@
 #include <vtkOpenGLRenderWindow.h>
 #include <vtkViewport.h>
 
+#include <numeric>
+
 vtkObjectFactoryNewMacro(vtkF3DUIActor);
 
 //----------------------------------------------------------------------------
@@ -67,18 +69,19 @@ void vtkF3DUIActor::SetFpsCounterVisibility(bool show)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DUIActor::UpdateFpsValue(int fps)
+void vtkF3DUIActor::UpdateFpsValue(const double elapsedMicroSeconds)
 {
-  this->AccumulatedFpsValue += fps;
-  this->FramesAccumulated++;
+	this->FrameTimes.push_back(elapsedMicroSeconds);
 
-  if (this->FramesAccumulated == vtkF3DUIActor::FramesToAverage)
-  {
-	  this->FpsValue = static_cast<int>(this->AccumulatedFpsValue / this->FramesAccumulated);
+	// add window size check here
+	if (this->FrameTimes.size() == 6)
+	{
+		this->FrameTimes.pop_front();
+	}
 
-	  this->AccumulatedFpsValue = 0;
-	  this->FramesAccumulated = 0;
-  }
+	double averageFrameTime = std::accumulate(this->FrameTimes.begin(), this->FrameTimes.end(), 0.0) / this->FrameTimes.size();
+
+	this->FpsValue = static_cast<int>(std::round(1.0 / averageFrameTime));
 }
 
 //----------------------------------------------------------------------------
