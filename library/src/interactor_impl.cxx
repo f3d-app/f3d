@@ -191,7 +191,7 @@ public:
     /* set camera coordinates back */
     cam.setPosition(newPos);
     cam.setViewUp(up);
-    Style->EndTemporaryUp();
+    this->Style->EndTemporaryUp();
     cam.resetToBounds(0.9);
   }
 
