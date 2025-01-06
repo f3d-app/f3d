@@ -69,9 +69,9 @@ void vtkF3DUIActor::SetFpsCounterVisibility(bool show)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DUIActor::UpdateFpsValue(const double elapsedMicroSeconds)
+void vtkF3DUIActor::UpdateFpsValue(const double elapsedFrameTime)
 {
-	this->FrameTimes.push_back(elapsedMicroSeconds);
+	this->FrameTimes.push_back(elapsedFrameTime);
 
 	// add window size check here
 	if (this->FrameTimes.size() == 6)

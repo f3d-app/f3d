@@ -85,7 +85,7 @@ public:
    * Updates the fps value
    * 0 by default
    */
-  void UpdateFpsValue(const double elapsedMicroSeconds);
+  void UpdateFpsValue(const double elapsedFrameTime);
 
   /**
    * Set the font file path
