@@ -763,7 +763,7 @@ interactor& interactor_impl::initCommands()
   this->addCommand("reset_camera",
     [&](const std::vector<std::string>&)
     {
-      this->Internals->Window.getCamera().resetToDefault(); 
+      this->Internals->Window.getCamera().resetToDefault();
       this->Internals->Style->EndTemporaryUp();
     });
 
