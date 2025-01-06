@@ -60,6 +60,7 @@ public:
   void SetLineWidth(const std::optional<double>& lineWidth);
   void SetPointSize(const std::optional<double>& pointSize);
   void SetFontFile(const std::optional<std::string>& fontFile);
+  void SetFontScale(const double fontScale);
   void SetHDRIFile(const std::optional<std::string>& hdriFile);
   void SetUseImageBasedLighting(bool use) override;
   void SetBackground(const double* backgroundColor) override;
@@ -545,6 +546,7 @@ private:
   bool HasValidHDRISpec = false;
 
   std::optional<std::string> FontFile;
+  double FontScale = 1.0;
 
   double LightIntensity = 1.0;
   std::map<vtkLight*, double> OriginalLightIntensities;

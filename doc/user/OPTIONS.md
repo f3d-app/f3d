@@ -50,6 +50,7 @@ Options|Type<br>Default|Description
 \-\-animation-speed-factor=\<factor\>|ratio<br>1|Set the animation speed factor to slow, speed up or even invert animation time.
 \-\-animation-time=\<time\>|double<br>-|Set the animation time to load.
 \-\-font-file=\<font file\>|string<br>-|Use the provided FreeType compatible font file to display text.<br>Can be useful to display non-ASCII filenames.
+\-\-font-scale=\<scale\>|ratio<br>1.0|Scale fonts. 
 \-\-command-script=\<command script\>|script<br>-|Provide a script file containing a list of commands to be executed sequentially.<br>Allows automation of multiple commands or pre-defined tasks.
 
 ## Material options

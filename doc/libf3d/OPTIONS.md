@@ -105,6 +105,7 @@ ui.console|bool<br>false<br>render|Show the console
 ui.filename|bool<br>false<br>render|Display the *filename info content* on top of the window.|\-\-filename
 ui.filename_info|string<br>-<br>render|Content of *filename info* to display.
 ui.font_file|string<br>optional<br>render|Use the provided FreeType compatible font file to display text.<br>Can be useful to display non-ASCII filenames.|\-\-font-file
+ui.scale|ratio<br>1.0<br>render|Scale fonts.|\-\-font-scale
 ui.fps|bool<br>false<br>render|Display a *frame per second counter*.|\-\-fps
 ui.loader_progress|bool<br>false<br>load|Show a *progress bar* when loading the file.|\-\-progress
 ui.animation_progress|bool<br>false<br>load|Show a *progress bar* when playing the animation.|\-\-animation-progress

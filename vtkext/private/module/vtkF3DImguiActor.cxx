@@ -265,6 +265,7 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
 
   io.Fonts->Build();
   io.FontDefault = font;
+  io.FontGlobalScale = this->FontScale;
 
   ImGuiStyle* style = &ImGui::GetStyle();
   style->GrabRounding = 4.0f;

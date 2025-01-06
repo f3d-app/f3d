@@ -83,6 +83,16 @@ void vtkF3DUIActor::SetFontFile(const std::string& font)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DUIActor::SetFontScale(const double fontScale)
+{
+  if (this->FontScale != fontScale)
+  {
+    this->FontScale = fontScale;
+    this->Initialized = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
 {
   vtkOpenGLRenderWindow* renWin = vtkOpenGLRenderWindow::SafeDownCast(vp->GetVTKWindow());
