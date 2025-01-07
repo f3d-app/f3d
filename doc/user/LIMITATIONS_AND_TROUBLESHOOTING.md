@@ -118,6 +118,10 @@ It's a limitation from the Windows "subsystem".
 You can workaround the issue by piping to a file (`f3d.exe --version > file.txt`) and read the file.
 Another solution is recompiling F3D with the CMake option `F3D_WINDOWS_GUI` disabled.
 
+> When playing an animation, the animation appear to move too slowly
+
+This is a limitation of older VTK version before VTK 9.5.0, use our [binaries](INSTALLATION.md) or compile a recent version of VTK.
+
 ## macOS
 
 > I'm unable to use the binary release, macOS complains the file is invalid or corrupted
