@@ -81,6 +81,10 @@ public:
     this->VTKInteractor->SetInteractorStyle(this->Style);
     this->VTKInteractor->Initialize();
 
+    // Some implementation (e.g. macOS) in VTK set the window name during initialization
+    // so we need to set the name right after initialization
+    this->Window.setWindowName("f3d");
+
     this->UIObserver->InstallObservers(this->VTKInteractor);
 
     // observe console event to trigger commands
