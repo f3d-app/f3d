@@ -28,6 +28,14 @@ You can see more examples using python bindings in the dedicated example folder 
 It's also possible to generate Python stubs automatically by enabling the CMake option `F3D_BINDINGS_PYTHON_GENERATE_STUBS`.
 Python stubs are `.pyi` files defining the public interface, allowing IDEs to auto-complete and do static analysis.
 
+## C (incomplete)
+
+If the Java bindings have been generated using the `F3D_BINDINGS_C` CMake option, the libf3d can be used directly from C.
+
+```c
+// todo C example
+```
+
 ## Java (experimental)
 
 If the Java bindings have been generated using the `F3D_BINDINGS_JAVA` CMake option, the libf3d can be used directly from Java.
