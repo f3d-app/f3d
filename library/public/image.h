@@ -96,8 +96,6 @@ public:
   ///@{ @name Resolution
   /**
    * Set/Get image resolution.
-   *
-   * \deprecated { setResolution is deprecated, use the appropriate constructor }
    */
   [[nodiscard]] unsigned int getWidth() const;
   [[nodiscard]] unsigned int getHeight() const;
@@ -106,8 +104,6 @@ public:
   ///@{ @name Channel Count
   /**
    * Set/Get image channel count.
-   *
-   * \deprecated { setChannelCount is deprecated, use the appropriate constructor }
    */
   [[nodiscard]] unsigned int getChannelCount() const;
   ///@}
@@ -127,8 +123,6 @@ public:
   /**
    * Set/Get image buffer data.
    * Its size is expected to be `width * height * channelCount * typeSize`.
-   *
-   * \deprecated { setData and getData are deprecated, use setContent and getContent instead }
    */
   image& setContent(void* buffer);
   [[nodiscard]] void* getContent() const;
