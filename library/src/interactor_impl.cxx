@@ -774,7 +774,7 @@ interactor& interactor_impl::initCommands()
       const std::string& aliasCommand = args[1];
 
       // Add alias to the map
-      aliasMap[aliasName] = aliasCommand;
+      AliasMap[aliasName] = aliasCommand;
       log::info("Alias added: ", aliasName, " → ", aliasCommand);
     });
   return *this;
@@ -835,8 +835,8 @@ bool interactor_impl::triggerCommand(std::string_view command)
   std::string action = tokens[0];
 
   // Resolve Alias
-  auto aliasIt = aliasMap.find(action);
-  if (aliasIt != aliasMap.end())
+  auto aliasIt = AliasMap.find(action);
+  if (aliasIt != AliasMap.end())
   {
     action = aliasIt->second;
     log::info("Alias resolved: ", action);
