@@ -803,18 +803,6 @@ std::vector<std::string> interactor_impl::getCommandActions() const
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::alias(const std::string& action, const std::string& value)
-{
-  if (action.empty() || value.empty())
-  {
-    log::error("Alias action or value cannot be empty.");
-    return;
-  }
-  aliasMap[action] = value;
-  log::error("Alias added: " + action + " -> " + value);
-}
-
-//----------------------------------------------------------------------------
 bool interactor_impl::triggerCommand(std::string_view command)
 {
   log::debug("Command: ", command);
@@ -836,12 +824,27 @@ bool interactor_impl::triggerCommand(std::string_view command)
 
   std::string action = tokens[0];
 
-  // Check if action is an alias
+  // **Handle Alias Command**
+  if (action == "alias")
+  {
+    if (tokens.size() != 3)
+    {
+      log::error("Alias command requires exactly 2 arguments: alias <name> <something>");
+      return false;
+    }
+    const std::string& aliasName = tokens[1];
+    const std::string& aliasCommand = tokens[2];
+    aliasMap[aliasName] = aliasCommand;
+    log::info("Alias added: ", aliasName, " → ", aliasCommand);
+    return true;
+  }
+
+  // **Resolve Alias**
   auto aliasIt = aliasMap.find(action);
   if (aliasIt != aliasMap.end())
   {
     action = aliasIt->second;
-    log::error("Alias resolved: " + action);
+    log::info("Alias resolved: ", action);
   }
 
   try
