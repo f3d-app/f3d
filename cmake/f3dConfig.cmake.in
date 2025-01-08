@@ -2,6 +2,7 @@
 #
 # The following variables will be defined:
 #
+#   f3d_BINDINGS_C                 Will be enabled if F3D was built with c bindings
 #   f3d_BINDINGS_JAVA              Will be enabled if F3D was built with java bindings
 #   f3d_BINDINGS_PYTHON            Will be enabled if F3D was built with python bindings
 #   f3d_BUILD_APPLICATION          Will be enabled if F3D application was built
@@ -49,6 +50,7 @@ set(f3d_BUILD_APPLICATION "@F3D_BUILD_APPLICATION@")
 set(f3d_MODULE_RAYTRACING "@F3D_MODULE_RAYTRACING@")
 set(f3d_MODULE_EXR "@F3D_MODULE_EXR@")
 set(f3d_MODULE_UI "@F3D_MODULE_UI@")
+set(f3d_BINDINGS_C "@F3D_BINDINGS_C@")
 set(f3d_BINDINGS_PYTHON "@F3D_BINDINGS_PYTHON@")
 set(f3d_BINDINGS_JAVA "@F3D_BINDINGS_JAVA@")
 set(f3d_CONFIG_DIR "@f3d_config_dir@")
