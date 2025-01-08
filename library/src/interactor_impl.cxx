@@ -50,11 +50,6 @@ using mod_t = interaction_bind_t::ModifierKeys;
 
 class interactor_impl::internals
 {
-  //-------------------------------------------------------------------
-private:
-  // Map to store aliases
-  std::map<std::string, std::string> aliasMap;
-  //-------------------------------------------------------------------
 public:
   struct BindingCommands
   {
@@ -553,6 +548,8 @@ public:
   std::multimap<std::string, interaction_bind_t> GroupedBinds;
   std::vector<std::string> OrderedBindGroups;
 
+  std::map<std::string, std::string> aliasMap;
+
   vtkNew<vtkCellPicker> CellPicker;
   vtkNew<vtkPointPicker> PointPicker;
 
@@ -824,12 +821,12 @@ bool interactor_impl::triggerCommand(std::string_view command)
 
   std::string action = tokens[0];
 
-  // **Handle Alias Command**
+  // Handle Alias Command
   if (action == "alias")
   {
     if (tokens.size() != 3)
     {
-      log::error("Alias command requires exactly 2 arguments: alias <name> <something>");
+      log::error("Alias command requires exactly 2 arguments: alias <name> <command>");
       return false;
     }
     const std::string& aliasName = tokens[1];
@@ -839,7 +836,7 @@ bool interactor_impl::triggerCommand(std::string_view command)
     return true;
   }
 
-  // **Resolve Alias**
+  // Resolve Alias
   auto aliasIt = aliasMap.find(action);
   if (aliasIt != aliasMap.end())
   {
