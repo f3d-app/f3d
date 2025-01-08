@@ -81,6 +81,10 @@ public:
     this->VTKInteractor->SetInteractorStyle(this->Style);
     this->VTKInteractor->Initialize();
 
+    // Some implementation (e.g. macOS) in VTK set the window name during initialization
+    // so we need to set the name right after initialization
+    this->Window.setWindowName("f3d");
+
     this->UIObserver->InstallObservers(this->VTKInteractor);
 
     // observe console event to trigger commands
@@ -1185,8 +1189,12 @@ bool interactor_impl::recordInteraction(const fs::path& file)
 
   try
   {
-    // Ensure parent directories exists
-    fs::create_directories(file.parent_path());
+    // Ensure parent directories exists if not empty
+    fs::path parent = file.parent_path();
+    if (!parent.empty())
+    {
+      fs::create_directories(parent);
+    }
 
     // Make sure the recorder is off and streams are cleared
     this->Internals->Recorder->Off();
