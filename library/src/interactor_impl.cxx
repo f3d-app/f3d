@@ -767,6 +767,7 @@ interactor& interactor_impl::initCommands()
       this->Internals->AnimationManager->StopAnimation();
       this->Internals->Scene.add(files);
     });
+    
   this->addCommand("alias",
     [&](const std::vector<std::string>& args)
     {
