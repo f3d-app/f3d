@@ -767,7 +767,7 @@ interactor& interactor_impl::initCommands()
       this->Internals->AnimationManager->StopAnimation();
       this->Internals->Scene.add(files);
     });
-    
+
   this->addCommand("alias",
     [&](const std::vector<std::string>& args)
     {
@@ -818,76 +818,76 @@ std::vector<std::string> interactor_impl::getCommandActions() const
 //----------------------------------------------------------------------------
 bool interactor_impl::triggerCommand(std::string_view command)
 {
-    log::debug("Command: ", command);
-    std::vector<std::string> tokens;
-    try
-    {
-        tokens = utils::tokenize(command);
-    }
-    catch (const utils::tokenize_exception&)
-    {
-        log::error("Command: unable to tokenize command:\"", command, "\", ignoring");
-        return false;
-    }
+  log::debug("Command: ", command);
+  std::vector<std::string> tokens;
+  try
+  {
+      tokens = utils::tokenize(command);
+  }
+  catch (const utils::tokenize_exception&)
+  {
+      log::error("Command: unable to tokenize command:\"", command, "\", ignoring");
+      return false;
+  }
 
-    if (tokens.empty())
-    {
-        return true;
-    }
+  if (tokens.empty())
+  {
+      return true;
+  }
 
-    std::string action = tokens[0];
+  std::string action = tokens[0];
 
-    // Resolve Alias
-    auto aliasIt = aliasMap.find(action);
-    if (aliasIt != aliasMap.end())
-    {
-        action = aliasIt->second;
-        log::info("Alias resolved: ", action);
-    }
+  // Resolve Alias
+  auto aliasIt = aliasMap.find(action);
+  if (aliasIt != aliasMap.end())
+  {
+      action = aliasIt->second;
+      log::info("Alias resolved: ", action);
+  }
 
-    try
+  try
+  {
+    // Find the right command to call
+    auto callbackIt = this->Internals->Commands.find(action);
+    if (callbackIt != this->Internals->Commands.end())
     {
-        // Find the right command to call
-        auto callbackIt = this->Internals->Commands.find(action);
-        if (callbackIt != this->Internals->Commands.end())
-        {
-            callbackIt->second({ tokens.begin() + 1, tokens.end() });
-        }
-        else
-        {
-            log::error("Command: \"", action, "\" is not recognized, ignoring");
-            return false;
-        }
+      callbackIt->second({ tokens.begin() + 1, tokens.end() });
     }
-    catch (const f3d::options::incompatible_exception&)
+    else
     {
-        log::error("Command: provided args in command: \"", command,
-            "\" are not compatible with action:\"", action, "\", ignoring");
+      log::error("Command: \"", action, "\" is not recognized, ignoring");
+      return false;
     }
-    catch (const f3d::options::inexistent_exception&)
-    {
-        log::error("Command: provided args in command: \"", command,
-            "\" point to an inexistent option, ignoring");
-    }
-    catch (const f3d::options::no_value_exception&)
-    {
-        log::error("Command: provided args in command: \"", command,
-            "\" point to an option without a value, ignoring");
-    }
-    catch (const f3d::options::parsing_exception&)
-    {
-        log::error("Command: provided args in command: \"", command,
-            "\" cannot be parsed into an option, ignoring");
-    }
-    catch (const invalid_args_exception& ex)
-    {
-        log::error(ex.what(), " Ignoring.");
-    }
-    catch (const std::exception& ex)
-    {
-        throw interactor::command_runtime_exception(ex.what());
-    }
-    return false;
+  }
+  catch (const f3d::options::incompatible_exception&)
+  {
+    log::error("Command: provided args in command: \"", command,
+      "\" are not compatible with action:\"", action, "\", ignoring");
+  }
+  catch (const f3d::options::inexistent_exception&)
+  {
+    log::error("Command: provided args in command: \"", command,
+      "\" point to an inexistent option, ignoring");
+  }
+  catch (const f3d::options::no_value_exception&)
+  {
+    log::error("Command: provided args in command: \"", command,
+      "\" point to an option without a value, ignoring");
+  }
+  catch (const f3d::options::parsing_exception&)
+  {
+    log::error("Command: provided args in command: \"", command,
+      "\" cannot be parsed into an option, ignoring");
+  }
+  catch (const invalid_args_exception& ex)
+  {
+    log::error(ex.what(), " Ignoring.");
+  }
+  catch (const std::exception& ex)
+  {
+    throw interactor::command_runtime_exception(ex.what());
+  }
+  return false;
 }
 
 //----------------------------------------------------------------------------
@@ -1045,7 +1045,176 @@ interactor& interactor_impl::addBinding(const interaction_bind_t& bind, std::str
 }
 
 //----------------------------------------------------------------------------
-interactor& interactor_impl::removeBinding(const interaction_bind_t& bind)
+interactor& interactor_impl::removeBinding(const intebool interactor_impl::triggerCommand(std::string_view command)
+{
+  log::debug("Command: ", command);
+  std::vector<std::string> tokens;
+  try
+  {
+    tokens = utils::tokenize(command);
+  }
+  catch (const utils::tokenize_exception&)
+  {
+    log::error("Command: unable to tokenize command:\"", command, "\", ignoring");
+    return false;
+  }
+
+  if (tokens.empty())
+  {
+    return true;
+  }
+
+  std::string action = tokens[0];
+
+  // Handle Alias Command
+  if (action == "alias")
+  {bool interactor_impl::triggerCommand(std::string_view command)
+{
+  log::debug("Command: ", command);
+  std::vector<std::string> tokens;
+  try
+  {
+    tokens = utils::tokenize(command);
+  }
+  catch (const utils::tokenize_exception&)
+  {
+    log::error("Command: unable to tokenize command:\"", command, "\", ignoring");
+    return false;
+  }
+
+  if (tokens.empty())
+  {
+    return true;
+  }
+
+  std::string action = tokens[0];
+
+  // Handle Alias Command
+  if (action == "alias")
+  {
+    if (tokens.size() != 3)
+    {
+      log::error("Alias command requires exactly 2 arguments: alias <name> <command>");
+      return false;
+    }
+    const std::string& aliasName = tokens[1];
+    const std::string& aliasCommand = tokens[2];
+    aliasMap[aliasName] = aliasCommand;
+    log::info("Alias added: ", aliasName, " → ", aliasCommand);
+    return true;
+  }
+
+  // Resolve Alias
+  auto aliasIt = aliasMap.find(action);
+  if (aliasIt != aliasMap.end())
+  {
+    action = aliasIt->second;
+    log::info("Alias resolved: ", action);
+  }
+
+  try
+  {
+    // Find the right command to call
+    auto callbackIt = this->Internals->Commands.find(action);
+    if (callbackIt != this->Internals->Commands.end())
+    {
+      callbackIt->second({ tokens.begin() + 1, tokens.end() });
+    }
+    else
+    {
+      log::error("Command: \"", action, "\" is not recognized, ignoring");
+      return false;
+    }
+  }
+  catch (const f3d::options::incompatible_exception&)
+  {
+    log::error("Command: provided args in command: \"", command,
+      "\" are not compatible with action:\"", action, "\", ignoring");
+  }
+  catch (const f3d::options::inexistent_exception&)
+  {
+    log::error("Command: provided args in command: \"", command,
+      "\" point to an inexistent option, ignoring");
+  }
+  catch (const f3d::options::no_value_exception&)
+  {
+    log::error("Command: provided args in command: \"", command,
+      "\" point to an option without a value, ignoring");
+  }
+  catch (const f3d::options::parsing_exception&)
+  {
+    log::error("Command: provided args in command: \"", command,
+      "\" cannot be parsed into an option, ignoring");
+  }
+  catch (const invalid_args_exception& ex)
+  {
+    log::error(ex.what(), " Ignoring.");
+  }
+  catch (const std::exception& ex)
+  {
+    throw interactor::command_runtime_exception(ex.what());
+  }
+  return false;
+}
+    const std::string& aliasName = tokens[1];
+    const std::string& aliasCommand = tokens[2];
+    aliasMap[aliasName] = aliasCommand;
+    log::info("Alias added: ", aliasName, " → ", aliasCommand);
+    return true;
+  }
+
+  // Resolve Alias
+  auto aliasIt = aliasMap.find(action);
+  if (aliasIt != aliasMap.end())
+  {
+    action = aliasIt->second;
+    log::info("Alias resolved: ", action);
+  }
+
+  try
+  {
+    // Find the right command to call
+    auto callbackIt = this->Internals->Commands.find(action);
+    if (callbackIt != this->Internals->Commands.end())
+    {
+      callbackIt->second({ tokens.begin() + 1, tokens.end() });
+    }
+    else
+    {
+      log::error("Command: \"", action, "\" is not recognized, ignoring");
+      return false;
+    }
+  }
+  catch (const f3d::options::incompatible_exception&)
+  {
+    log::error("Command: provided args in command: \"", command,
+      "\" are not compatible with action:\"", action, "\", ignoring");
+  }
+  catch (const f3d::options::inexistent_exception&)
+  {
+    log::error("Command: provided args in command: \"", command,
+      "\" point to an inexistent option, ignoring");
+  }
+  catch (const f3d::options::no_value_exception&)
+  {
+    log::error("Command: provided args in command: \"", command,
+      "\" point to an option without a value, ignoring");
+  }
+  catch (const f3d::options::parsing_exception&)
+  {
+    log::error("Command: provided args in command: \"", command,
+      "\" cannot be parsed into an option, ignoring");
+  }
+  catch (const invalid_args_exception& ex)
+  {
+    log::error(ex.what(), " Ignoring.");
+  }
+  catch (const std::exception& ex)
+  {
+    throw interactor::command_runtime_exception(ex.what());
+  }
+  return false;
+}raction_bind_t& bind)
 {
   this->Internals->Bindings.erase(bind);
 
