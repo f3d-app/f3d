@@ -547,11 +547,7 @@ public:
   std::map<interaction_bind_t, BindingCommands> Bindings;
   std::multimap<std::string, interaction_bind_t> GroupedBinds;
   std::vector<std::string> OrderedBindGroups;
-//-------------------------------------------------------------------
-private:
-  // Map to store aliases
   std::map<std::string, std::string> aliasMap;
-//-------------------------------------------------------------------
 
   vtkNew<vtkCellPicker> CellPicker;
   vtkNew<vtkPointPicker> PointPicker;
