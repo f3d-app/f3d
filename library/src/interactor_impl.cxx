@@ -767,7 +767,10 @@ interactor& interactor_impl::initCommands()
       this->Internals->AnimationManager->StopAnimation();
       this->Internals->Scene.add(files);
     });
+<<<<<<< HEAD
 
+=======
+>>>>>>> 864d331a (added using addCommand)
   this->addCommand("alias",
     [&](const std::vector<std::string>& args)
     {
@@ -818,6 +821,7 @@ std::vector<std::string> interactor_impl::getCommandActions() const
 //----------------------------------------------------------------------------
 bool interactor_impl::triggerCommand(std::string_view command)
 {
+<<<<<<< HEAD
   log::debug("Command: ", command);
   std::vector<std::string> tokens;
   try
@@ -888,6 +892,78 @@ bool interactor_impl::triggerCommand(std::string_view command)
     throw interactor::command_runtime_exception(ex.what());
   }
   return false;
+=======
+    log::debug("Command: ", command);
+    std::vector<std::string> tokens;
+    try
+    {
+        tokens = utils::tokenize(command);
+    }
+    catch (const utils::tokenize_exception&)
+    {
+        log::error("Command: unable to tokenize command:\"", command, "\", ignoring");
+        return false;
+    }
+
+    if (tokens.empty())
+    {
+        return true;
+    }
+
+    std::string action = tokens[0];
+
+    // Resolve Alias
+    auto aliasIt = aliasMap.find(action);
+    if (aliasIt != aliasMap.end())
+    {
+        action = aliasIt->second;
+        log::info("Alias resolved: ", action);
+    }
+
+    try
+    {
+        // Find the right command to call
+        auto callbackIt = this->Internals->Commands.find(action);
+        if (callbackIt != this->Internals->Commands.end())
+        {
+            callbackIt->second({ tokens.begin() + 1, tokens.end() });
+        }
+        else
+        {
+            log::error("Command: \"", action, "\" is not recognized, ignoring");
+            return false;
+        }
+    }
+    catch (const f3d::options::incompatible_exception&)
+    {
+        log::error("Command: provided args in command: \"", command,
+            "\" are not compatible with action:\"", action, "\", ignoring");
+    }
+    catch (const f3d::options::inexistent_exception&)
+    {
+        log::error("Command: provided args in command: \"", command,
+            "\" point to an inexistent option, ignoring");
+    }
+    catch (const f3d::options::no_value_exception&)
+    {
+        log::error("Command: provided args in command: \"", command,
+            "\" point to an option without a value, ignoring");
+    }
+    catch (const f3d::options::parsing_exception&)
+    {
+        log::error("Command: provided args in command: \"", command,
+            "\" cannot be parsed into an option, ignoring");
+    }
+    catch (const invalid_args_exception& ex)
+    {
+        log::error(ex.what(), " Ignoring.");
+    }
+    catch (const std::exception& ex)
+    {
+        throw interactor::command_runtime_exception(ex.what());
+    }
+    return false;
+>>>>>>> 864d331a (added using addCommand)
 }
 
 //----------------------------------------------------------------------------
