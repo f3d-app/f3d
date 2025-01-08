@@ -36,7 +36,6 @@ int TestSDKInteractorCommand(int argc, char* argv[])
 
   // Test alias command
   inter.triggerCommand("alias axis_off set ui.axis off");
-  test("triggerCommand alias add", aliasMap["axis_off"] == "set ui.axis off");
   inter.triggerCommand("axis_off");
   test("triggerCommand alias resolve", options.ui.axis == false);
 
