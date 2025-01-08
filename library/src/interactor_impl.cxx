@@ -829,7 +829,7 @@ bool interactor_impl::triggerCommand(std::string_view command)
   {
     if (tokens.size() != 3)
     {
-      log::error("Alias command requires exactly 2 arguments: alias <name> <something>");
+      log::error("Alias command requires exactly 2 arguments: alias <name> <command>");
       return false;
     }
     const std::string& aliasName = tokens[1];
