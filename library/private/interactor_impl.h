@@ -119,6 +119,7 @@ public:
 private:
   class internals;
   std::unique_ptr<internals> Internals;
+  std::unordered_map<std::string, std::string> AliasMap;
 };
 }
 }
