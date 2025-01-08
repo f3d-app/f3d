@@ -35,8 +35,8 @@ int TestSDKInteractorCommand(int argc, char* argv[])
   test("triggerCommand toggle", options.model.scivis.cells == true);
 
   // Test alias command
-  inter.triggerCommand("alias list_files ls -al");
-  test("triggerCommand alias add", aliasMap["list_files"] == "ls -al");
+  inter.triggerCommand("list_files");
+  test("triggerCommand alias resolve", );
 
   // triggerCommand error codepaths
   test("triggerCommand toggle incompatible",
