@@ -34,6 +34,10 @@ int TestSDKInteractorCommand(int argc, char* argv[])
   inter.triggerCommand("toggle model.scivis.cells");
   test("triggerCommand toggle", options.model.scivis.cells == true);
 
+  // Test alias command
+  inter.triggerCommand("alias list_files ls -al");
+  test("triggerCommand alias add", aliasMap["list_files"] == "ls -al");
+
   // triggerCommand error codepaths
   test("triggerCommand toggle incompatible",
     inter.triggerCommand("toggle scene.animation.index") == false);
