@@ -191,7 +191,6 @@ public:
     /* set camera coordinates back */
     cam.setPosition(newPos);
     cam.setViewUp(up);
-    this->Style->EndTemporaryUp();
     cam.resetToBounds(0.9);
   }
 
@@ -730,18 +729,22 @@ interactor& interactor_impl::initCommands()
       if (type == "front")
       {
         this->Internals->SetViewOrbit(internals::ViewType::VT_FRONT);
+        this->Internals->Style->EndTemporaryUp();
       }
       else if (type == "top")
       {
         this->Internals->SetViewOrbit(internals::ViewType::VT_TOP);
+        this->Internals->Style->EndTemporaryUp();
       }
       else if (type == "right")
       {
         this->Internals->SetViewOrbit(internals::ViewType::VT_RIGHT);
+        this->Internals->Style->EndTemporaryUp();
       }
       else if (type == "isometric")
       {
         this->Internals->SetViewOrbit(internals::ViewType::VT_ISOMETRIC);
+        this->Internals->Style->EndTemporaryUp();
       }
       else
       {
