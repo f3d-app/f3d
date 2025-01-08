@@ -764,6 +764,19 @@ interactor& interactor_impl::initCommands()
       this->Internals->AnimationManager->StopAnimation();
       this->Internals->Scene.add(files);
     });
+
+  this->addCommand("alias",
+    [&](const std::vector<std::string>& args)
+    {
+      // Validate the alias arguments
+      check_args(args, 2, "alias");
+      const std::string& aliasName = args[0];
+      const std::string& aliasCommand = args[1];
+
+      // Add alias to the map
+      aliasMap[aliasName] = aliasCommand;
+      log::info("Alias added: ", aliasName, " → ", aliasCommand);
+    });
   return *this;
 }
 
@@ -820,21 +833,6 @@ bool interactor_impl::triggerCommand(std::string_view command)
   }
 
   std::string action = tokens[0];
-
-  // Handle Alias Command
-  if (action == "alias")
-  {
-    if (tokens.size() != 3)
-    {
-      log::error("Alias command requires exactly 2 arguments: alias <name> <command>");
-      return false;
-    }
-    const std::string& aliasName = tokens[1];
-    const std::string& aliasCommand = tokens[2];
-    aliasMap[aliasName] = aliasCommand;
-    log::info("Alias added: ", aliasName, " → ", aliasCommand);
-    return true;
-  }
 
   // Resolve Alias
   auto aliasIt = aliasMap.find(action);
