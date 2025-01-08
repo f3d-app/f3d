@@ -824,7 +824,7 @@ bool interactor_impl::triggerCommand(std::string_view command)
 
   std::string action = tokens[0];
 
-  // **Handle Alias Command**
+  // Handle Alias Command
   if (action == "alias")
   {
     if (tokens.size() != 3)
