@@ -839,7 +839,7 @@ bool interactor_impl::triggerCommand(std::string_view command)
     return true;
   }
 
-  // **Resolve Alias**
+  // Resolve Alias
   auto aliasIt = aliasMap.find(action);
   if (aliasIt != aliasMap.end())
   {
