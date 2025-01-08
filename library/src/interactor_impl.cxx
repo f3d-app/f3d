@@ -548,7 +548,7 @@ public:
   std::multimap<std::string, interaction_bind_t> GroupedBinds;
   std::vector<std::string> OrderedBindGroups;
 
-  std::map<std::string, std::string> aliasMap;
+  std::map<std::string, std::string> AliasMap;
 
   vtkNew<vtkCellPicker> CellPicker;
   vtkNew<vtkPointPicker> PointPicker;

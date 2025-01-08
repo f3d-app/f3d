@@ -39,7 +39,6 @@ int TestSDKInteractorCommand(int argc, char* argv[])
   inter.triggerCommand("axis_off");
   test("triggerCommand alias resolve", options.ui.axis == false);
 
-
   // triggerCommand error codepaths
   test("triggerCommand toggle incompatible",
     inter.triggerCommand("toggle scene.animation.index") == false);
