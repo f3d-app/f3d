@@ -770,7 +770,8 @@ interactor& interactor_impl::initCommands()
     {
       if (args.size() < 2)
       {
-        throw interactor_impl::invalid_args_exception("alias command requires at least 2 arguments");
+        throw interactor_impl::invalid_args_exception(
+          "alias command requires at least 2 arguments");
       }
 
       // Validate the alias arguments
