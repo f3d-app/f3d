@@ -770,8 +770,8 @@ interactor& interactor_impl::initCommands()
     {
       // Validate the alias arguments
       check_args(args, 2, "alias");
-      const std::string& aliasName = args[1];
-      const std::string& aliasCommand = args[2];
+      const std::string& aliasName = args[0];
+      const std::string& aliasCommand = args[1];
 
       // Add alias to the map
       AliasMap[aliasName] = aliasCommand;
@@ -838,8 +838,10 @@ bool interactor_impl::triggerCommand(std::string_view command)
   auto aliasIt = AliasMap.find(action);
   if (aliasIt != AliasMap.end())
   {
-    action = aliasIt->second;
-    log::info("Alias resolved: ", action);
+    std::vector<std::string> aliasTokens = utils::tokenize(aliasIt->second);
+    tokens.insert(tokens.begin(), aliasTokens.begin(), aliasTokens.end());
+    tokens.erase(tokens.begin() + aliasTokens.size());
+    action = tokens[0];
   }
 
   try
