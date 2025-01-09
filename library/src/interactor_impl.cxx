@@ -771,7 +771,13 @@ interactor& interactor_impl::initCommands()
       // Validate the alias arguments
       check_args(args, 2, "alias");
       const std::string& aliasName = args[0];
-      const std::string& aliasCommand = args[1];
+      // combine set of command to aliasCommand
+      std::string aliasCommand;
+      for (size_t i = 1; i < args.size(); ++i) 
+      {
+        if (i > 1) aliasCommand += " ";
+        aliasCommand += args[i];
+      }
 
       // Add alias to the map
       AliasMap[aliasName] = aliasCommand;
