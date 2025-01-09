@@ -770,13 +770,14 @@ interactor& interactor_impl::initCommands()
     {
       if (args.size() < 2)
       {
-        throw interactor_impl::invalid_args_exception("alias command requires at least 2 arguments")
+        throw interactor_impl::invalid_args_exception("alias command requires at least 2 arguments");
       }
 
       // Validate the alias arguments
       const std::string& aliasName = args[0];
       // Combine all remaining arguments into the alias command
       std::string aliasCommand;
+
       for (size_t i = 1; i < args.size(); ++i) 
       {
         if (i > 1)
@@ -789,7 +790,8 @@ interactor& interactor_impl::initCommands()
       // Prevent recursion
       if (aliasName == aliasCommand)
       {
-        throw interactor_impl::invalid_args_exception("Alias cannot reference itself: " + aliasName);
+        throw interactor_impl::invalid_args_exception(
+          "Alias cannot reference itself: " + aliasName);
       }
 
       // Add alias to the map
