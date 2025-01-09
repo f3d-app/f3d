@@ -38,12 +38,11 @@ int TestSDKInteractorCommand(int argc, char* argv[])
   inter.triggerCommand("alias axis_off set ui.axis off");
   inter.triggerCommand("axis_off");
   test("triggerCommand alias resolve", options.ui.axis == false);
-
-  bool result = inter.triggerCommand("alias axis_off");
+  bool alias_result;
+  alias_result = inter.triggerCommand("alias axis_off");
   test("triggerCommand alias invalid args", result == false);
-
   inter.triggerCommand("alias recursive_alias recursive_alias");
-  bool result = inter.triggerCommand("recursive_alias");
+  alias_result = inter.triggerCommand("recursive_alias");
   test("triggerCommand alias recursion handling", result == false);
 
   // triggerCommand error codepaths
