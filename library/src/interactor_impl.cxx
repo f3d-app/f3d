@@ -768,10 +768,14 @@ interactor& interactor_impl::initCommands()
   this->addCommand("alias",
     [&](const std::vector<std::string>& args)
     {
+      if (args.size() < 2)
+      {
+        throw interactor_impl::invalid_args_exception("alias command requires at least 2 arguments")
+      }
+
       // Validate the alias arguments
-      check_args(args, 2, "alias");
       const std::string& aliasName = args[0];
-      // combine set of command to aliasCommand
+      // Combine all remaining arguments into the alias command
       std::string aliasCommand;
       for (size_t i = 1; i < args.size(); ++i) 
       {
@@ -780,6 +784,12 @@ interactor& interactor_impl::initCommands()
           aliasCommand += " ";
         }
         aliasCommand += args[i];
+      }
+
+      // Prevent recursion
+      if (aliasName == aliasCommand)
+      {
+        throw interactor_impl::invalid_args_exception("Alias cannot reference itself: " + aliasName);
       }
 
       // Add alias to the map
@@ -848,8 +858,8 @@ bool interactor_impl::triggerCommand(std::string_view command)
   if (aliasIt != AliasMap.end())
   {
     std::vector<std::string> aliasTokens = utils::tokenize(aliasIt->second);
+    tokens.erase(tokens.begin());
     tokens.insert(tokens.begin(), aliasTokens.begin(), aliasTokens.end());
-    tokens.erase(tokens.begin() + aliasTokens.size());
     action = tokens[0];
   }
 
