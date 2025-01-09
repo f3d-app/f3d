@@ -779,10 +779,10 @@ interactor& interactor_impl::initCommands()
       // Combine all remaining arguments into the alias command
       std::string aliasCommand;
 
-      for (size_t i = 1; i < args.size(); ++i) 
+      for (size_t i = 1; i < args.size(); ++i)
       {
         if (i > 1)
-        { 
+        {
           aliasCommand += " ";
         }
         aliasCommand += args[i];
