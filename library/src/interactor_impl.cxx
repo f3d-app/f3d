@@ -1264,6 +1264,7 @@ void interactor_impl::UpdateRendererAfterInteraction()
 //----------------------------------------------------------------------------
 void interactor_impl::SetCommandBuffer(const char* command)
 {
+  // XXX This replace previous command buffer, it should be improved
   this->Internals->CommandBuffer = command;
 }
 
