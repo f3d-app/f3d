@@ -178,6 +178,7 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
 #endif
   this->Internals->RenWin->SetMultiSamples(0); // Disable hardware antialiasing
   this->Internals->RenWin->SetOffScreenRendering(offscreen);
+  this->Internals->RenWin->SetWindowName("f3d");
   this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
   this->Internals->Camera = std::make_unique<detail::camera_impl>();
   this->Internals->Camera->SetVTKRenderer(this->Internals->Renderer);
