@@ -259,6 +259,10 @@
         "type": "double_vector",
         "default_value": "0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0, 1.0, 1.0, 1.0, 1.0"
       },
+      "discretization" : {
+        "type": "int",
+        "default_value": "256"
+      },
       "range": {
         "type": "double_vector"
       }

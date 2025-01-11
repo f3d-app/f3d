@@ -142,6 +142,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       {"coloring-scalar-bar", "b", "Show scalar bar", "<bool>", "1" },
       {"colormap-file", "", "Specify a colormap image", "<filePath/filename/fileStem>", ""},
       {"colormap", "", "Specify a custom colormap (ignored if \"colormap-file\" is specified)", "<color_list>", ""},
+      {"colormap-discretization", "", "Specify the discretization of the colormap", "<int>", "256"},
       {"volume", "v", "Show volume if the file is compatible", "<bool>", "1"},
       {"volume-inverse", "i", "Inverse opacity function for volume rendering", "<bool>", "1"} } },
   {"Camera",
