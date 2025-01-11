@@ -4,8 +4,6 @@
 #include <vtkOpenGLRenderWindow.h>
 #include <vtkViewport.h>
 
-#include <numeric>
-
 vtkObjectFactoryNewMacro(vtkF3DUIActor);
 
 //----------------------------------------------------------------------------
