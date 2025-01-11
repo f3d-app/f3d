@@ -778,11 +778,8 @@ interactor& interactor_impl::initCommands()
       // Validate the alias arguments
       const std::string& aliasName = args[0];
       // Combine all remaining arguments into the alias command
-      std::string aliasCommand;
-      aliasCommand = std::accumulate(args.begin() + 1, args.end(), std::string(" "));
-
-      // Add alias to the map
-      this->Internals->AliasMap[aliasName] = aliasCommand;
+      // Add alias command to the map
+      this->Internals->AliasMap[aliasName] = std::accumulate(args.begin() + 1, args.end(), std::string(" "));
       log::info("Alias added: ", aliasName, " → ", aliasCommand);
     });
   return *this;
