@@ -796,7 +796,7 @@ interactor& interactor_impl::initCommands()
       }
 
       // Add alias to the map
-      AliasMap[aliasName] = aliasCommand;
+      this->Internals->AliasMap[aliasName] = aliasCommand;
       log::info("Alias added: ", aliasName, " → ", aliasCommand);
     });
   return *this;
