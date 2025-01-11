@@ -823,7 +823,7 @@ bool interactor_impl::triggerCommand(std::string_view command)
   log::debug("Command: ", command);
 
   // Resolve Alias Before Tokenizing
-  auto aliasIt = AliasMap.find(std::string(command));
+  auto aliasIt = this->Internals->AliasMap.find(std::string(command));
   if (aliasIt != AliasMap.end())
   {
     command = aliasIt->second;
