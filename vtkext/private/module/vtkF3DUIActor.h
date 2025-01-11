@@ -164,6 +164,7 @@ protected:
   // deque instead of queue to allow for iteration
   std::deque<double> FrameTimes;
 
+  double TotalFrameTimes = 0.0;
   int FpsValue = 0;
 
   std::string FontFile = "";

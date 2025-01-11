@@ -71,16 +71,17 @@ void vtkF3DUIActor::SetFpsCounterVisibility(bool show)
 //----------------------------------------------------------------------------
 void vtkF3DUIActor::UpdateFpsValue(const double elapsedFrameTime)
 {
+	this->TotalFrameTimes += elapsedFrameTime;
 	this->FrameTimes.push_back(elapsedFrameTime);
 
-	// add window size check here
-	if (this->FrameTimes.size() == 6)
+	while (this->TotalFrameTimes > 1.0)
 	{
+		double t = this->FrameTimes.front();
 		this->FrameTimes.pop_front();
+		this->TotalFrameTimes -= t;
 	}
 
-	double averageFrameTime = std::accumulate(this->FrameTimes.begin(), this->FrameTimes.end(), 0.0) / this->FrameTimes.size();
-
+	double averageFrameTime = this->TotalFrameTimes / this->FrameTimes.size();
 	this->FpsValue = static_cast<int>(std::round(1.0 / averageFrameTime));
 }
 
