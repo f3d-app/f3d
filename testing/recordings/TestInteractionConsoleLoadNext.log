@@ -1,0 +1,98 @@
+# StreamVersion 1.2
+ConfigureEvent 1249 1374 0 0 0 0 0
+ExposeEvent 0 1406 0 0 0 0 0
+RenderEvent 0 1406 0 0 0 0 0
+
+KeyPressEvent -179 393 0 27 1 Escape 0
+CharEvent -179 393 0 27 1 Escape 0
+KeyReleaseEvent -179 393 0 27 1 Escape 0
+
+KeyPressEvent -179 393 0 108 1 l 0
+CharEvent -179 393 0 108 1 l 0
+KeyReleaseEvent -179 393 0 108 1 l 0
+
+KeyPressEvent -179 393 0 111 1 o 0
+CharEvent -179 393 0 111 1 o 0
+KeyReleaseEvent -179 393 0 111 1 o 0
+
+KeyPressEvent -179 393 0 97 1 a 0
+CharEvent -179 393 0 97 1 a 0
+KeyReleaseEvent -179 393 0 97 1 a 0
+
+KeyPressEvent -179 393 0 100 1 d 0
+CharEvent -179 393 0 100 1 d 0
+KeyReleaseEvent -179 393 0 100 1 d 0
+
+KeyPressEvent -179 393 1 95 1 underscore 0
+CharEvent -179 393 1 95 1 underscore 0
+KeyReleaseEvent -179 393 1 95 1 underscore 0
+
+KeyPressEvent -179 393 0 110 1 n 0
+CharEvent -179 393 0 110 1 n 0
+KeyReleaseEvent -179 393 0 110 1 n 0
+
+KeyPressEvent -179 393 0 101 1 e 0
+CharEvent -179 393 0 101 1 e 0
+KeyReleaseEvent -179 393 0 101 1 e 0
+
+KeyPressEvent -179 393 0 120 1 x 0
+CharEvent -179 393 0 120 1 x 0
+KeyReleaseEvent -179 393 0 120 1 x 0
+
+KeyPressEvent -179 393 0 116 1 t 0
+CharEvent -179 393 0 116 1 t 0
+KeyReleaseEvent -179 393 0 116 1 t 0
+
+KeyPressEvent -179 393 1 95 1 underscore 0
+CharEvent -179 393 1 95 1 underscore 0
+KeyReleaseEvent -179 393 1 95 1 underscore 0
+
+KeyPressEvent -179 393 0 102 1 f 0
+CharEvent -179 393 0 102 1 f 0
+KeyReleaseEvent -179 393 0 102 1 f 0
+
+KeyPressEvent -179 393 0 105 1 i 0
+CharEvent -179 393 0 105 1 i 0
+KeyReleaseEvent -179 393 0 105 1 i 0
+
+KeyPressEvent -179 393 0 108 1 l 0
+CharEvent -179 393 0 108 1 l 0
+KeyReleaseEvent -179 393 0 108 1 l 0
+
+KeyPressEvent -179 393 0 101 1 e 0
+CharEvent -179 393 0 101 1 e 0
+KeyReleaseEvent -179 393 0 101 1 e 0
+
+KeyPressEvent -179 393 1 95 1 underscore 0
+CharEvent -179 393 1 95 1 underscore 0
+KeyReleaseEvent -179 393 1 95 1 underscore 0
+
+KeyPressEvent -179 393 0 103 1 g 0
+CharEvent -179 393 0 103 1 g 0
+KeyReleaseEvent -179 393 0 103 1 g 0
+
+KeyPressEvent -179 393 0 114 1 r 0
+CharEvent -179 393 0 114 1 r 0
+KeyReleaseEvent -179 393 0 114 1 r 0
+
+KeyPressEvent -179 393 0 111 1 o 0
+CharEvent -179 393 0 111 1 o 0
+KeyReleaseEvent -179 393 0 111 1 o 0
+
+KeyPressEvent -179 393 0 117 1 u 0
+CharEvent -179 393 0 117 1 u 0
+KeyReleaseEvent -179 393 0 117 1 u 0
+
+KeyPressEvent -179 393 0 112 1 p 0
+CharEvent -179 393 0 112 1 p 0
+KeyReleaseEvent -179 393 0 112 1 p 0
+
+KeyPressEvent -179 393 0 13 1 Return 0
+CharEvent -179 393 0 13 1 Return 0
+KeyReleaseEvent -179 393 0 13 1 Return 0
+
+KeyPressEvent -179 393 0 27 1 Escape 0
+CharEvent -179 393 0 27 1 Escape 0
+KeyReleaseEvent -179 393 0 27 1 Escape 0
+
+TimerEvent 212 76 0 27 1 Escape 0

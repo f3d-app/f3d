@@ -107,6 +107,11 @@ public:
   void EventLoop();
 
   /**
+   * Set a command to be run on the next event loop
+   */
+  void SetCommandBuffer(const char* command);
+
+  /**
    * An exception that can be thrown by certain command callbacks
    * when the arguments of the callback are incorrect and expected
    * to be caught by triggerCommand

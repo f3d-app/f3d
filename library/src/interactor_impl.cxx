@@ -237,7 +237,7 @@ public:
     if (event == vtkF3DConsoleOutputWindow::TriggerEvent)
     {
       const char* commandWithArgs = static_cast<const char*>(data);
-      self->Interactor.triggerCommand(commandWithArgs);
+      self->Interactor.SetCommandBuffer(commandWithArgs);
     }
     else if (event == vtkF3DConsoleOutputWindow::ShowEvent ||
       event == vtkF3DConsoleOutputWindow::HideEvent)
@@ -516,6 +516,12 @@ public:
       this->EventLoopUserCallBack();
     }
 
+    if (this->CommandBuffer.has_value())
+    {
+      this->Interactor.triggerCommand(this->CommandBuffer.value());
+      this->CommandBuffer.reset();
+    }
+
     this->AnimationManager->Tick();
 
     if (this->RenderRequested)
@@ -543,6 +549,7 @@ public:
   std::map<unsigned long, std::pair<int, std::function<void()>>> TimerCallBacks;
 
   std::map<std::string, std::function<void(const std::vector<std::string>&)>> Commands;
+  std::optional<std::string> CommandBuffer;
 
   std::map<interaction_bind_t, BindingCommands> Bindings;
   std::multimap<std::string, interaction_bind_t> GroupedBinds;
@@ -1252,6 +1259,13 @@ void interactor_impl::SetInteractorOn(vtkInteractorObserver* observer)
 void interactor_impl::UpdateRendererAfterInteraction()
 {
   this->Internals->Style->UpdateRendererAfterInteraction();
+}
+
+//----------------------------------------------------------------------------
+void interactor_impl::SetCommandBuffer(const char* command)
+{
+  // XXX This replace previous command buffer, it should be improved
+  this->Internals->CommandBuffer = command;
 }
 
 //----------------------------------------------------------------------------
