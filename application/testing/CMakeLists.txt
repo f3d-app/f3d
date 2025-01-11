@@ -417,9 +417,10 @@ f3d_test(NAME TestVerboseAnimationWrongAnimationTimeHigh DATA BoxAnimated.gltf A
 f3d_test(NAME TestVerboseAnimationWrongAnimationTimeLow DATA BoxAnimated.gltf ARGS --animation-time=-5 --verbose REGEXP "Animation time -5 is outside of range \\[0, 3\\.70833\\], using 0" NO_BASELINE)
 
 # Armature test
-f3d_test(NAME TestGLTFRigNoArmature DATA RiggedFigure.glb ARGS --animation-time=1)
+f3d_test(NAME TestGLTFRigArmatureNoArmature DATA RiggedFigure.glb ARGS --animation-time=1 --opacity=0.5 -p)
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20241219)
   f3d_test(NAME TestGLTFRigArmature DATA RiggedFigure.glb ARGS --animation-time=1 --armature)
+  f3d_test(NAME TestGLTFRigArmatureWithOpacity DATA RiggedFigure.glb ARGS --animation-time=1 --armature --opacity=0.5 -p)
   f3d_test(NAME TestGLTFRigArmatureSphereTube DATA RiggedFigure.glb ARGS --animation-time=1 --armature --point-size=20 --line-width=5)
 endif()
 
