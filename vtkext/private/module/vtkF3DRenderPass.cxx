@@ -100,9 +100,12 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     {
       // armature
       vtkInformation* info = prop->GetPropertyKeys();
-      if (this->ArmatureVisible && info && info->Has(vtkF3DImporter::ACTOR_IS_ARMATURE()))
+      if (info && info->Has(vtkF3DImporter::ACTOR_IS_ARMATURE()))
       {
-        this->MainOnTopProps.push_back(prop);
+        if (this->ArmatureVisible)
+        {
+          this->MainOnTopProps.push_back(prop);
+        }
       }
       else
       {
