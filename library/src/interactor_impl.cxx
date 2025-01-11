@@ -778,22 +778,7 @@ interactor& interactor_impl::initCommands()
       const std::string& aliasName = args[0];
       // Combine all remaining arguments into the alias command
       std::string aliasCommand;
-
-      for (size_t i = 1; i < args.size(); ++i)
-      {
-        if (i > 1)
-        {
-          aliasCommand += " ";
-        }
-        aliasCommand += args[i];
-      }
-
-      // Prevent recursion
-      if (aliasName == aliasCommand)
-      {
-        throw interactor_impl::invalid_args_exception(
-          "Alias cannot reference itself: " + aliasName);
-      }
+      aliasCommand = std::accumulate(args.begin() + 1, args.end(), " ");
 
       // Add alias to the map
       this->Internals->AliasMap[aliasName] = aliasCommand;
@@ -838,6 +823,14 @@ std::vector<std::string> interactor_impl::getCommandActions() const
 bool interactor_impl::triggerCommand(std::string_view command)
 {
   log::debug("Command: ", command);
+
+  // Resolve Alias Before Tokenizing
+  auto aliasIt = AliasMap.find(std::string(command));
+  if (aliasIt != AliasMap.end())
+  {
+    command = aliasIt->second;
+  }
+
   std::vector<std::string> tokens;
   try
   {
@@ -855,16 +848,6 @@ bool interactor_impl::triggerCommand(std::string_view command)
   }
 
   std::string action = tokens[0];
-
-  // Resolve Alias
-  auto aliasIt = AliasMap.find(action);
-  if (aliasIt != AliasMap.end())
-  {
-    std::vector<std::string> aliasTokens = utils::tokenize(aliasIt->second);
-    tokens.erase(tokens.begin());
-    tokens.insert(tokens.begin(), aliasTokens.begin(), aliasTokens.end());
-    action = tokens[0];
-  }
 
   try
   {
