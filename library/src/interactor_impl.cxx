@@ -124,6 +124,8 @@ public:
 
     this->Recorder = vtkSmartPointer<vtkF3DInteractorEventRecorder>::New();
     this->Recorder->SetInteractor(this->VTKInteractor);
+
+    this->Style->ResetTemporaryUp();
   }
 
   //----------------------------------------------------------------------------
@@ -729,22 +731,22 @@ interactor& interactor_impl::initCommands()
       if (type == "front")
       {
         this->Internals->SetViewOrbit(internals::ViewType::VT_FRONT);
-        this->Internals->Style->EndTemporaryUp();
+        this->Internals->Style->ResetTemporaryUp();
       }
       else if (type == "top")
       {
         this->Internals->SetViewOrbit(internals::ViewType::VT_TOP);
-        this->Internals->Style->EndTemporaryUp();
+        this->Internals->Style->ResetTemporaryUp();
       }
       else if (type == "right")
       {
         this->Internals->SetViewOrbit(internals::ViewType::VT_RIGHT);
-        this->Internals->Style->EndTemporaryUp();
+        this->Internals->Style->ResetTemporaryUp();
       }
       else if (type == "isometric")
       {
         this->Internals->SetViewOrbit(internals::ViewType::VT_ISOMETRIC);
-        this->Internals->Style->EndTemporaryUp();
+        this->Internals->Style->ResetTemporaryUp();
       }
       else
       {
@@ -767,7 +769,7 @@ interactor& interactor_impl::initCommands()
     [&](const std::vector<std::string>&)
     {
       this->Internals->Window.getCamera().resetToDefault();
-      this->Internals->Style->EndTemporaryUp();
+      this->Internals->Style->ResetTemporaryUp();
     });
 
   this->addCommand("toggle_animation",
