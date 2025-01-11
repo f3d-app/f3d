@@ -153,7 +153,7 @@ void vtkF3DInteractorStyle::Rotate()
   double dir[3];
   camera->GetDirectionOfProjection(dir);
   double* up = ren->GetUpVector();
-  InterpolateTemporaryUp(0.1, up);
+  this->InterpolateTemporaryUp(0.1, up);
   up = this->TemporaryUp;
 
   double dot = vtkMath::Dot(dir, up);

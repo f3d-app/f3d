@@ -834,7 +834,7 @@ f3d_test(NAME TestInteractionOrthographicProjection DATA cow.vtp INTERACTION) #5
 f3d_test(NAME TestInteractionZoomToggleOrthographicProjection DATA cow.vtp INTERACTION) #MouseWheel;5;Mousewheelx6;5
 f3d_test(NAME TestInteractionRotateCameraMinus90 DATA f3d.glb INTERACTION)
 f3d_test(NAME TestInteractionRotateCamera90 DATA f3d.glb INTERACTION)
-f3d_test(NAME TestInteractionRollCameraRotation DATA f3d.glb INTERACTION) #1;4;LeftMouse;MouseMovements
+f3d_test(NAME TestInteractionRollCameraRotation DATA f3d.glb ARGS -g INTERACTION) #1;4;LeftMouse;MouseMovements
 f3d_test(NAME TestInteractionPanWithShift DATA f3d.glb INTERACTION) #Shift;LeftMouse;MouseMovements
 f3d_test(NAME TestInteractionConsoleOpen DATA f3d.glb INTERACTION UI) #Escape
 f3d_test(NAME TestInteractionConsoleOpenExit DATA f3d.glb REGEXP "Interactor has been stopped" INTERACTION NO_BASELINE UI) #Escape;exit;Return
