@@ -33,6 +33,7 @@
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
 
+#include <numeric>
 #include <algorithm>
 #include <chrono>
 #include <cmath>
