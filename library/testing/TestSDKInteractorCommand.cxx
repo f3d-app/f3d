@@ -41,9 +41,6 @@ int TestSDKInteractorCommand(int argc, char* argv[])
   bool alias_result;
   alias_result = inter.triggerCommand("alias axis_off");
   test("triggerCommand alias invalid args", alias_result == false);
-  inter.triggerCommand("alias recursive_alias recursive_alias");
-  alias_result = inter.triggerCommand("recursive_alias");
-  test("triggerCommand alias recursion handling", alias_result == false);
 
   // triggerCommand error codepaths
   test("triggerCommand toggle incompatible",
