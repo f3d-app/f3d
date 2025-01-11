@@ -33,11 +33,11 @@
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
 
-#include <numeric>
 #include <algorithm>
 #include <chrono>
 #include <cmath>
 #include <map>
+#include <numeric>
 #include <regex>
 #include <vector>
 
@@ -779,7 +779,7 @@ interactor& interactor_impl::initCommands()
       const std::string& aliasName = args[0];
       // Combine all remaining arguments into the alias command
       std::string aliasCommand;
-      aliasCommand = std::accumulate(args.begin() + 1, args.end(), " ");
+      aliasCommand = std::accumulate(args.begin() + 1, args.end(), std::string(" "));
 
       // Add alias to the map
       this->Internals->AliasMap[aliasName] = aliasCommand;
