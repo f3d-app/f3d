@@ -113,7 +113,6 @@ public:
   void SetTemporaryUp(const double *tempUp);
   void InterpolateTemporaryUp(const double factor, const double* input);
 
-
 protected:
   /**
    * Overridden to support being disabled
