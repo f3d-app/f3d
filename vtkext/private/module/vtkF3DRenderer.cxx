@@ -1851,8 +1851,12 @@ void vtkF3DRenderer::ConfigureActorsProperties()
 
     if (this->Opacity.has_value())
     {
-      actor->GetProperty()->SetOpacity(this->Opacity.value());
-      originalActor->GetProperty()->SetOpacity(this->Opacity.value());
+      vtkInformation* info = originalActor->GetPropertyKeys();
+      if (!info || !info->Has(vtkF3DImporter::ACTOR_IS_ARMATURE()))
+      {
+        actor->GetProperty()->SetOpacity(this->Opacity.value());
+        originalActor->GetProperty()->SetOpacity(this->Opacity.value());
+      }
     }
 
     if (this->Roughness.has_value())

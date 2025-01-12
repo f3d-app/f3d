@@ -14,18 +14,26 @@
 // This is a subclass of NSApplicationDelegate.
 @interface F3DNSDelegateInternal : NSObject<NSApplicationDelegate>
 @property F3DStarter* Starter;
+@property BOOL ShouldHandleFileOpening;
 @end
 
 @implementation F3DNSDelegateInternal
 @synthesize Starter;
+@synthesize ShouldHandleFileOpening;
 
 // ----------------------------------------------------------------------------
 - (BOOL)application:(NSApplication*)theApplication openFile:(NSString*)filename
 {
   (void)theApplication;
-  Starter->AddFile([filename UTF8String]);
-  Starter->LoadFileGroup();
-  Starter->Render();
+  if (ShouldHandleFileOpening)
+  {
+    int index = Starter->AddFile([filename UTF8String]);
+    if (index > -1)
+    {    
+      Starter->LoadFileGroup(index);
+    }   
+    Starter->Render();
+  }
   return YES;
 }
 
@@ -105,6 +113,13 @@
                          action:@selector(toggleFullScreen:)
                   keyEquivalent:@"f"]
     setKeyEquivalentModifierMask:NSEventModifierFlagControl | NSEventModifierFlagCommand];
+
+  ShouldHandleFileOpening = false;
+}
+
+- (void)applicationDidFinishLaunching:(NSNotification *)notification
+{
+  ShouldHandleFileOpening = true;
 }
 
 @end
