@@ -37,6 +37,7 @@
 #include <chrono>
 #include <cmath>
 #include <map>
+#include <numeric>
 #include <regex>
 #include <vector>
 
@@ -557,6 +558,8 @@ public:
   std::multimap<std::string, interaction_bind_t> GroupedBinds;
   std::vector<std::string> OrderedBindGroups;
 
+  std::map<std::string, std::string> AliasMap;
+
   vtkNew<vtkCellPicker> CellPicker;
   vtkNew<vtkPointPicker> PointPicker;
 
@@ -781,6 +784,24 @@ interactor& interactor_impl::initCommands()
       this->Internals->AnimationManager->StopAnimation();
       this->Internals->Scene.add(files);
     });
+
+  this->addCommand("alias",
+    [&](const std::vector<std::string>& args)
+    {
+      if (args.size() < 2)
+      {
+        throw interactor_impl::invalid_args_exception(
+          "alias command requires at least 2 arguments");
+      }
+
+      // Validate the alias arguments
+      const std::string& aliasName = args[0];
+      // Combine all remaining arguments into the alias command
+      // Add alias command to the map
+      this->Internals->AliasMap[aliasName] =
+        std::accumulate(args.begin() + 1, args.end(), std::string(" "));
+      log::info("Alias added!!!");
+    });
   return *this;
 }
 
@@ -820,6 +841,14 @@ std::vector<std::string> interactor_impl::getCommandActions() const
 bool interactor_impl::triggerCommand(std::string_view command)
 {
   log::debug("Command: ", command);
+
+  // Resolve Alias Before Tokenizing
+  auto aliasIt = this->Internals->AliasMap.find(std::string(command));
+  if (aliasIt != this->Internals->AliasMap.end())
+  {
+    command = aliasIt->second;
+  }
+
   std::vector<std::string> tokens;
   try
   {
@@ -837,6 +866,7 @@ bool interactor_impl::triggerCommand(std::string_view command)
   }
 
   const std::string& action = tokens[0];
+
   try
   {
     // Find the right command to call
