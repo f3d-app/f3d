@@ -1,0 +1,12 @@
+# StreamVersion 1.2
+RenderEvent 0 0 0 0 0 0 0
+
+KeyPressEvent 0 0 0 27 1 Escape 0
+CharEvent 0 0 0 27 1 Escape 0
+
+MouseMoveEvent 147 80 0 0 0 Escape 0
+LeftButtonPressEvent 147 80 0 0 0 Escape 0
+MouseMoveEvent 148 80 0 0 0 Escape 0
+MouseMoveEvent 247 84 0 0 0 Escape 0
+LeftButtonReleaseEvent 247 84 0 0 0 Escape 0
+MouseMoveEvent 247 84 0 0 0 Escape 0
