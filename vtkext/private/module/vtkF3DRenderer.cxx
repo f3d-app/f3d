@@ -1547,19 +1547,19 @@ void vtkF3DRenderer::Render()
 
   if (!uiOnly)
   {
-	  // Get CPU frame time
-    double elapsedTime = std::chrono::duration_cast<std::chrono::microseconds>(cpuElapsed).count() * 1e-6;
+   // Get CPU frame time
+   double elapsedTime = std::chrono::duration_cast<std::chrono::microseconds>(cpuElapsed).count() * 1e-6;
 
 #if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
-	glEndQuery(GL_TIME_ELAPSED);
-	GLint elapsed;
-	glGetQueryObjectiv(this->Timer, GL_QUERY_RESULT, &elapsed);
+   glEndQuery(GL_TIME_ELAPSED);
+   GLint elapsed;
+   glGetQueryObjectiv(this->Timer, GL_QUERY_RESULT, &elapsed);
 
-	// Get min between CPU frame time and GPU frame time
-	elapsedTime = std::min(elapsedTime, elapsed * 1e-9);
+   // Get min between CPU frame time and GPU frame time
+   elapsedTime = std::min(elapsedTime, elapsed * 1e-9);
 #endif
 
-	this->UIActor->UpdateFpsValue(elapsedTime);
+   this->UIActor->UpdateFpsValue(elapsedTime);
   }
 }
 
