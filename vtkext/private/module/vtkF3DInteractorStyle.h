@@ -110,7 +110,7 @@ public:
    * Temporary up vector to support rolled camera interaction
    */
   void ResetTemporaryUp();
-  void SetTemporaryUp(const double *tempUp);
+  void SetTemporaryUp(const double* tempUp);
   void InterpolateTemporaryUp(const double factor, const double* input);
 
 protected:

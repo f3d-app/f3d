@@ -79,7 +79,7 @@ f3d::window& resetCamera(f3d::window& win)
 
 f3d::interactor& start(f3d::interactor& inter)
 {
-  inter.start(1.0/30, nullptr);
+  inter.start(1.0 / 30, nullptr);
   return inter;
 }
 
@@ -112,16 +112,17 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function("resetCamera", &resetCamera, emscripten::return_value_policy::reference());
 
   // f3d::interactor
-  emscripten::class_<f3d::interactor>("Interactor").function("start", &start, emscripten::return_value_policy::reference());
+  emscripten::class_<f3d::interactor>("Interactor")
+    .function("start", &start, emscripten::return_value_policy::reference());
 
   // f3d::engine
   emscripten::class_<f3d::engine> engine("Engine");
 
-  engine
-    .class_function("create", &createEngine, emscripten::return_value_policy::take_ownership())
+  engine.class_function("create", &createEngine, emscripten::return_value_policy::take_ownership())
     .function("getScene", &f3d::engine::getScene, emscripten::return_value_policy::reference())
     .function("getWindow", &f3d::engine::getWindow, emscripten::return_value_policy::reference())
-    .function("getInteractor", &f3d::engine::getInteractor, emscripten::return_value_policy::reference())
+    .function(
+      "getInteractor", &f3d::engine::getInteractor, emscripten::return_value_policy::reference())
     .function("getOptions", &f3d::engine::getOptions, emscripten::return_value_policy::reference())
     .class_function("autoloadPlugins", &f3d::engine::autoloadPlugins);
 }

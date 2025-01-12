@@ -84,8 +84,7 @@ void vtkF3DImguiConsole::ShowConsole()
   ImGui::Begin("Console", nullptr, winFlags);
 
   // Log window
-  const float reservedHeight =
-    ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
+  const float reservedHeight = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
   if (ImGui::BeginChild(
         "LogRegion", ImVec2(0, -reservedHeight), 0, ImGuiWindowFlags_HorizontalScrollbar))
   {

@@ -10,10 +10,10 @@ jobs:
     - name: C++ Formatting
       uses: DoozyX/clang-format-lint-action@v0.16.1
       with:
-        source: 'library application python plugins examples'
+        source: 'application examples java library plugins python vtkext webassembly'
         extensions: 'h,cxx,in'
         exclude: '**/*.py.in'
-        clangFormatVersion: 14 # Last Ubuntu LTS version (22.04)
+        clangFormatVersion: 18
     - name: Python Formatting
       uses: psf/black@stable
       with:

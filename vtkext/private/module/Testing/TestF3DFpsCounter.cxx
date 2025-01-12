@@ -12,9 +12,18 @@ public:
   static vtkF3DTestUIActor* New();
   vtkTypeMacro(vtkF3DTestUIActor, vtkF3DUIActor);
 
-  size_t GetNumberOfFrameTimes() { return this->FrameTimes.size(); }
-  double GetTotalFrameTimes() { return this->TotalFrameTimes; }
-  int GetFpsValue() { return this->FpsValue; }
+  size_t GetNumberOfFrameTimes()
+  {
+    return this->FrameTimes.size();
+  }
+  double GetTotalFrameTimes()
+  {
+    return this->TotalFrameTimes;
+  }
+  int GetFpsValue()
+  {
+    return this->FpsValue;
+  }
 };
 
 vtkObjectFactoryNewMacro(vtkF3DTestUIActor);
