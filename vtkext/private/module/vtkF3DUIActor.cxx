@@ -77,7 +77,7 @@ void vtkF3DUIActor::UpdateFpsValue(const double elapsedFrameTime)
     double oldestFrameTime = this->FrameTimes.front();
 
     this->FrameTimes.pop_front();
-	this->TotalFrameTimes -= oldestFrameTime;
+    this->TotalFrameTimes -= oldestFrameTime;
   }
 
   double averageFrameTime = this->TotalFrameTimes / this->FrameTimes.size();
