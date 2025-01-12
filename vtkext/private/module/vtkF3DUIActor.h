@@ -9,6 +9,7 @@
 #define vtkF3DUIActor_h
 
 #include <vtkProp.h>
+
 #include <deque>
 
 class vtkOpenGLRenderWindow;
@@ -23,9 +24,11 @@ public:
   using CheatSheetGroup = std::pair<std::string, std::vector<CheatSheetTuple>>;
 
   /**
-  * Initialize the UI actor resources
-  */
-  virtual void Initialize(vtkOpenGLRenderWindow*) {}
+   * Initialize the UI actor resources
+   */
+  virtual void Initialize(vtkOpenGLRenderWindow*)
+  {
+  }
 
   /**
    * Set the filename visibility
@@ -106,7 +109,9 @@ public:
   /**
    * Set the delta time (time between UI frames) in seconds
    */
-  virtual void SetDeltaTime(double) {}
+  virtual void SetDeltaTime(double)
+  {
+  }
 
 protected:
   vtkF3DUIActor();
@@ -115,42 +120,58 @@ protected:
   /**
    * Called at the beginning of the rendering step
    */
-  virtual void StartFrame(vtkOpenGLRenderWindow*) {}
+  virtual void StartFrame(vtkOpenGLRenderWindow*)
+  {
+  }
 
   /**
    * Called at the end of the rendering step
    */
-  virtual void EndFrame(vtkOpenGLRenderWindow*) {}
+  virtual void EndFrame(vtkOpenGLRenderWindow*)
+  {
+  }
 
   /**
    * Render the filename UI widget
    */
-  virtual void RenderFileName() {}
+  virtual void RenderFileName()
+  {
+  }
 
   /**
    * Render the metadata UI widget
    */
-  virtual void RenderMetaData() {}
+  virtual void RenderMetaData()
+  {
+  }
 
   /**
    * Render the cheatsheet UI widget
    */
-  virtual void RenderCheatSheet() {}
+  virtual void RenderCheatSheet()
+  {
+  }
 
   /**
    * Render the fps counter UI widget
    */
-  virtual void RenderFpsCounter() {}
+  virtual void RenderFpsCounter()
+  {
+  }
 
   /**
    * Render the console widget
    */
-  virtual void RenderConsole() {}
+  virtual void RenderConsole()
+  {
+  }
 
   /**
    * Render the console badge
    */
-  virtual void RenderConsoleBadge() {}
+  virtual void RenderConsoleBadge()
+  {
+  }
 
   bool FileNameVisible = false;
   std::string FileName = "";

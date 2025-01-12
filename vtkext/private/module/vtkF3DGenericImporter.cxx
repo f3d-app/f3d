@@ -1,7 +1,7 @@
 #include "vtkF3DGenericImporter.h"
 
-#include "vtkF3DPostProcessFilter.h"
 #include "F3DLog.h"
+#include "vtkF3DPostProcessFilter.h"
 
 #include <vtkActor.h>
 #include <vtkEventForwarderCommand.h>
@@ -136,11 +136,12 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 
   // Cast to dataset types
   this->Pimpl->ImportedPoints = vtkPolyData::SafeDownCast(this->Pimpl->PostPro->GetOutput(1));
-  vtkImageData* image =  vtkImageData::SafeDownCast(this->Pimpl->PostPro->GetOutput(2));
-  this->Pimpl->ImportedImage =  image->GetNumberOfCells() > 0 ? image : nullptr;
+  vtkImageData* image = vtkImageData::SafeDownCast(this->Pimpl->PostPro->GetOutput(2));
+  this->Pimpl->ImportedImage = image->GetNumberOfCells() > 0 ? image : nullptr;
 
   // Recover output description from the reader
-  this->Pimpl->OutputDescription = vtkF3DGenericImporter::GetDataObjectDescription(this->Pimpl->Reader->GetOutputDataObject(0));
+  this->Pimpl->OutputDescription =
+    vtkF3DGenericImporter::GetDataObjectDescription(this->Pimpl->Reader->GetOutputDataObject(0));
 
   // Add filter outputs to mapper inputs
   this->Pimpl->PolyDataMapper->SetInputConnection(this->Pimpl->PostPro->GetOutputPort(0));
@@ -260,7 +261,8 @@ std::string vtkF3DGenericImporter::GetDataObjectDescription(vtkDataObject* objec
 bool vtkF3DGenericImporter::UpdateAtTimeValue(double timeValue)
 {
   assert(this->Pimpl->Reader);
-  if(!this->Pimpl->PostPro->UpdateTimeStep(timeValue) || !this->Pimpl->Reader->GetOutputDataObject(0))
+  if (!this->Pimpl->PostPro->UpdateTimeStep(timeValue) ||
+    !this->Pimpl->Reader->GetOutputDataObject(0))
   {
     F3DLog::Print(F3DLog::Severity::Warning, "A reader failed to update at a timeValue");
     return false;

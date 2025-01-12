@@ -55,7 +55,8 @@ void vtkF3DUserRenderPass::Render(const vtkRenderState* s)
   }
 
   renWin->GetState()->PushFramebufferBindings();
-  this->RenderDelegate(s, size[0], size[1], size[0], size[1], this->FrameBufferObject, this->ColorTexture);
+  this->RenderDelegate(
+    s, size[0], size[1], size[0], size[1], this->FrameBufferObject, this->ColorTexture);
   renWin->GetState()->PopFramebufferBindings();
 
   if (this->QuadHelper && this->QuadHelper->ShaderChangeValue < this->GetMTime())
@@ -77,7 +78,8 @@ void vtkF3DUserRenderPass::Render(const vtkRenderState* s)
     // Apply user shader
     vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Impl", "gl_FragData[0] = pixel(texCoord);");
 
-    this->QuadHelper = std::make_shared<vtkOpenGLQuadHelper>(renWin, nullptr, FSSource.c_str(), nullptr);
+    this->QuadHelper =
+      std::make_shared<vtkOpenGLQuadHelper>(renWin, nullptr, FSSource.c_str(), nullptr);
     this->QuadHelper->ShaderChangeValue = this->GetMTime();
   }
   else

@@ -1,7 +1,7 @@
 #include <vtkMathUtilities.h>
 #include <vtkNew.h>
-#include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
+#include <vtkRenderer.h>
 #include <vtkTestUtilities.h>
 #include <vtkXMLStructuredGridReader.h>
 #include <vtkXMLUnstructuredGridReader.h>

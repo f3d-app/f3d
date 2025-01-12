@@ -54,25 +54,25 @@ void vtkF3DInteractorEventRecorder::ProcessEvents(
         break;
 
       default:
+      {
+        int mod = 0;
+        if (rwi->GetShiftKey())
         {
-          int mod = 0;
-          if (rwi->GetShiftKey())
-          {
-            mod |= ModifierKey::ShiftKey;
-          }
-          if (rwi->GetControlKey())
-          {
-            mod |= ModifierKey::ControlKey;
-          }
-          if (rwi->GetAltKey())
-          {
-            mod |= ModifierKey::AltKey;
-          }
-          self->WriteEvent(vtkCommand::GetStringFromEventId(event), rwi->GetEventPosition(), mod,
-            rwi->GetKeyCode(), rwi->GetRepeatCount(), rwi->GetKeySym(), callData);
-
-          self->OutputStream->flush();
+          mod |= ModifierKey::ShiftKey;
         }
+        if (rwi->GetControlKey())
+        {
+          mod |= ModifierKey::ControlKey;
+        }
+        if (rwi->GetAltKey())
+        {
+          mod |= ModifierKey::AltKey;
+        }
+        self->WriteEvent(vtkCommand::GetStringFromEventId(event), rwi->GetEventPosition(), mod,
+          rwi->GetKeyCode(), rwi->GetRepeatCount(), rwi->GetKeySym(), callData);
+
+        self->OutputStream->flush();
+      }
     }
   }
 }
