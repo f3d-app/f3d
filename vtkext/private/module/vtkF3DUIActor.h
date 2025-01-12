@@ -9,6 +9,7 @@
 #define vtkF3DUIActor_h
 
 #include <vtkProp.h>
+#include <deque>
 
 class vtkOpenGLRenderWindow;
 
@@ -81,10 +82,10 @@ public:
   void SetFpsCounterVisibility(bool show);
 
   /**
-   * Set the fps value
+   * Updates the fps value
    * 0 by default
    */
-  void SetFpsValue(int fps);
+  void UpdateFpsValue(const double elapsedFrameTime);
 
   /**
    * Set the font file path
@@ -164,6 +165,11 @@ protected:
   bool ConsoleBadgeEnabled = false;
 
   bool FpsCounterVisible = false;
+
+  // deque instead of queue to allow for iteration
+  std::deque<double> FrameTimes;
+
+  double TotalFrameTimes = 0.0;
   int FpsValue = 0;
 
   std::string FontFile = "";
