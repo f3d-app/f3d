@@ -140,7 +140,7 @@ public:
   ///@{
   /**
    * Implement vtkImporter camera API by adding cameras for each individual importers one after the
-   * other No input checking on camIndex Please note `void SetCamera(vtkIdType camIndex);` is not
+   * other No input checking on camIndex. Please note `void SetCamera(vtkIdType camIndex);` is not
    * reimplemented nor used.
    */
   vtkIdType GetNumberOfCameras() override;
