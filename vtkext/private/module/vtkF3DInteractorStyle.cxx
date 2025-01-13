@@ -349,7 +349,7 @@ void vtkF3DInteractorStyle::ResetTemporaryUp()
 }
 
 //------------------------------------------------------------------------------
-void vtkF3DInteractorStyle::SetTemporaryUp(const double *tempUp)
+void vtkF3DInteractorStyle::SetTemporaryUp(const double* tempUp)
 {
   for (int i = 0; i < 3; i++)
   {
