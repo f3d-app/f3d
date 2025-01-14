@@ -82,6 +82,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "animation-speed-factor", "scene.animation.speed_factor" },
   { "force-reader", "scene.force_reader" },
   { "font-file", "ui.font_file" },
+  { "font-scale", "ui.scale" },
   { "point-sprites", "model.point_sprites.enable" },
   { "point-sprites-type", "model.point_sprites.type" },
   { "point-sprites-size", "model.point_sprites.size" },

@@ -96,8 +96,6 @@ public:
   ///@{ @name Resolution
   /**
    * Set/Get image resolution.
-   *
-   * \deprecated { setResolution is deprecated, use the appropriate constructor }
    */
   [[nodiscard]] unsigned int getWidth() const;
   [[nodiscard]] unsigned int getHeight() const;
@@ -106,8 +104,6 @@ public:
   ///@{ @name Channel Count
   /**
    * Set/Get image channel count.
-   *
-   * \deprecated { setChannelCount is deprecated, use the appropriate constructor }
    */
   [[nodiscard]] unsigned int getChannelCount() const;
   ///@}
@@ -127,31 +123,26 @@ public:
   /**
    * Set/Get image buffer data.
    * Its size is expected to be `width * height * channelCount * typeSize`.
-   *
-   * \deprecated { setData and getData are deprecated, use setContent and getContent instead }
    */
   image& setContent(void* buffer);
   [[nodiscard]] void* getContent() const;
   ///@}
 
   /**
-   * Compare current image to a reference using the provided threshold.
-   * If the comparison fails, ie. error is higher than the threshold,
-   * this outputs the resulting diff and error and return false,
-   * return true otherwise.
+   * Compare current image to a reference.
    * The error is minimum between Minkownski and Wasserstein distance
    * on a SSIM computation, as specified in VTK.
    * Please note, due to possible arithmetic imprecision in the SSIM computation
-   * using a threshold of zero may return false with identical images.
+   * a non-zero value can be returned with identical images.
    * Depending on the VTK version, another comparison algorithm may be used.
-   * Threshold should be in range [0, 1[, this returns false otherwise.
+   * Error value meaning is described below:
    * 1e-14: Pixel perfect comparison.
    * 0.04: Visually indistinguishable.
    * 0.1: Small visible difference.
    * 0.5: Comparable images.
    * 1.0: Different type, size or number of components
    */
-  bool compare(const image& reference, double threshold, double& error) const;
+  double compare(const image& reference) const;
 
   /**
    * Save an image to the provided file path, used as is, in the specified format.
@@ -161,7 +152,7 @@ public:
    * TIF: Supports channel type BYTE, SHORT and FLOAT with channel count of 1 to 4
    * BMP: Supports channel type BYTE with channel count of 1 to 4
    * Throw an `image::write_exception` if the format is incompatible with with image channel type or
-   * channel count
+   * channel count or if the image cannot be written for any other reason.
    */
   const image& save(
     const std::filesystem::path& filePath, SaveFormat format = SaveFormat::PNG) const;

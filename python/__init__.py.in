@@ -40,14 +40,16 @@ def _f3d_options_update(
         for k, v in arg.items():
             self[k] = v
         return
-    except AttributeError:
+    except AttributeError:  # `arg` doesn't have `.items()`
         pass
 
     try:
         for k, v in arg:
             self[k] = v
         return
-    except AttributeError:
+    except TypeError:  # `arg` isn't iterable
+        pass
+    except ValueError:  # `arg` isn't iterable of pairs
         pass
 
     raise ValueError(f"cannot update {self} from {arg}")

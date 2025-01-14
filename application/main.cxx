@@ -50,10 +50,6 @@ int WINAPI wWinMain(HINSTANCE, HINSTANCE, LPWSTR, int)
 
   std::setlocale(LC_ALL, "en_US.utf8");
 
-#if WINVER >= 0x0605
-  SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
-#endif
-
   int argc;
   wchar_t** wargv = CommandLineToArgvW(GetCommandLineW(), &argc);
 

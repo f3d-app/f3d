@@ -13,6 +13,5 @@ int main(int argc, char** argv)
   f3d::image img1(argv[2]);
 
   // Compare them
-  double error;
-  return img0.compare(img1, 0.05, error) ? EXIT_SUCCESS : EXIT_FAILURE;
+  return img0.compare(img1) <= 0.05 ? EXIT_SUCCESS : EXIT_FAILURE;
 }

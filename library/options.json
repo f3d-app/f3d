@@ -185,6 +185,10 @@
     "font_file": {
       "type": "string"
     },
+    "scale": {
+      "type": "ratio",
+      "default_value": "1.0"
+    },
     "loader_progress": {
       "type": "bool",
       "default_value": "false"

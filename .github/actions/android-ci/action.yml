@@ -68,7 +68,6 @@ runs:
         -DCMAKE_SYSTEM_NAME=Android
         -DCMAKE_SYSTEM_VERSION=${{inputs.api_level}}
         -DF3D_BINDINGS_JAVA=ON
-        -DF3D_LINUX_LINK_FILESYSTEM=OFF
         -DF3D_MODULE_UI=OFF
         -DF3D_PLUGIN_BUILD_EXODUS=OFF
         -DF3D_STRICT_BUILD=ON

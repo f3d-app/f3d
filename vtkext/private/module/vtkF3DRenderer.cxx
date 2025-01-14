@@ -1,8 +1,8 @@
 #include "vtkF3DRenderer.h"
 
+#include "F3DColoringInfoHandler.h"
 #include "F3DDefaultHDRI.h"
 #include "F3DLog.h"
-#include "F3DColoringInfoHandler.h"
 #include "vtkF3DCachedLUTTexture.h"
 #include "vtkF3DCachedSpecularTexture.h"
 #include "vtkF3DDropZoneActor.h"
@@ -28,8 +28,8 @@
 #include <vtkMultiBlockDataSet.h>
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLFXAAPass.h>
-#include <vtkOpenGLRenderer.h>
 #include <vtkOpenGLRenderWindow.h>
+#include <vtkOpenGLRenderer.h>
 #include <vtkOpenGLTexture.h>
 #include <vtkPBRLUTTexture.h>
 #include <vtkPNGReader.h>
@@ -342,9 +342,9 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   }
 
   vtkNew<vtkF3DRenderPass> newPass;
-#if F3D_MODULE_RAYTRACING  
+#if F3D_MODULE_RAYTRACING
   newPass->SetUseRaytracing(this->UseRaytracing);
-#endif  
+#endif
   newPass->SetUseSSAOPass(this->UseSSAOPass);
   newPass->SetUseDepthPeelingPass(this->UseDepthPeelingPass);
   newPass->SetUseBlurBackground(this->UseBlurBackground);
@@ -396,8 +396,8 @@ void vtkF3DRenderer::ConfigureRenderPasses()
     }
     else
     {
-      F3DLog::Print(F3DLog::Severity::Warning,
-        "Final shader must define a function named \"pixel\"");
+      F3DLog::Print(
+        F3DLog::Severity::Warning, "Final shader must define a function named \"pixel\"");
     }
   }
 
@@ -533,7 +533,8 @@ void vtkF3DRenderer::SetGridColor(const std::vector<double>& color)
 {
   assert(color.size() == 3);
 
-  if (this->GridColor[0] != color[0] || this->GridColor[1] != color[1] || this->GridColor[2] != color[2])
+  if (this->GridColor[0] != color[0] || this->GridColor[1] != color[1] ||
+    this->GridColor[2] != color[2])
   {
     this->GridColor[0] = color[0];
     this->GridColor[1] = color[1];
@@ -1096,6 +1097,8 @@ void vtkF3DRenderer::ConfigureTextActors()
     }
   }
 
+  this->UIActor->SetFontScale(this->FontScale);
+
   this->TextActorsConfigured = true;
 }
 
@@ -1129,6 +1132,15 @@ void vtkF3DRenderer::SetFontFile(const std::optional<std::string>& fontFile)
   }
 }
 
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetFontScale(const double fontScale)
+{
+  if (this->FontScale != fontScale)
+  {
+    this->FontScale = fontScale;
+    this->TextActorsConfigured = false;
+  }
+}
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetBackground(const double* color)
 {
@@ -1541,20 +1553,27 @@ void vtkF3DRenderer::Render()
 
   auto cpuElapsed = std::chrono::high_resolution_clock::now() - cpuStart;
 
-  // Get CPU frame per seconds
-  int fps = static_cast<int>(std::round(
-    1.0 / (std::chrono::duration_cast<std::chrono::microseconds>(cpuElapsed).count() * 1e-6)));
+  vtkInformation* info = this->GetInformation();
+
+  bool uiOnly = info->Get(vtkF3DRenderPass::RENDER_UI_ONLY());
+
+  if (!uiOnly)
+  {
+    // Get CPU frame time
+    double elapsedTime =
+      std::chrono::duration_cast<std::chrono::microseconds>(cpuElapsed).count() * 1e-6;
 
 #if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
-  glEndQuery(GL_TIME_ELAPSED);
-  GLint elapsed;
-  glGetQueryObjectiv(this->Timer, GL_QUERY_RESULT, &elapsed);
+    glEndQuery(GL_TIME_ELAPSED);
+    GLint elapsed;
+    glGetQueryObjectiv(this->Timer, GL_QUERY_RESULT, &elapsed);
 
-  // Get min between CPU frame per seconds and GPU frame per seconds
-  fps = std::min(fps, static_cast<int>(std::round(1.0 / (elapsed * 1e-9))));
+    // Get min between CPU frame time and GPU frame time
+    elapsedTime = std::min(elapsedTime, elapsed * 1e-9);
 #endif
 
-  this->UIActor->SetFpsValue(fps);
+    this->UIActor->UpdateFpsValue(elapsedTime);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -1763,8 +1782,8 @@ void vtkF3DRenderer::ConfigureActorsProperties()
   {
     if (this->SurfaceColor.value().size() != 3)
     {
-      F3DLog::Print(F3DLog::Severity::Warning,
-        std::string("Invalid surface color provided, not applying"));
+      F3DLog::Print(
+        F3DLog::Severity::Warning, std::string("Invalid surface color provided, not applying"));
     }
     else
     {
@@ -1777,8 +1796,8 @@ void vtkF3DRenderer::ConfigureActorsProperties()
   {
     if (this->EmissiveFactor.value().size() != 3)
     {
-      F3DLog::Print(F3DLog::Severity::Warning,
-        std::string("Invalid emissive factor provided, not applying"));
+      F3DLog::Print(
+        F3DLog::Severity::Warning, std::string("Invalid emissive factor provided, not applying"));
     }
     else
     {
@@ -1802,11 +1821,13 @@ void vtkF3DRenderer::ConfigureActorsProperties()
     else
     {
       setBackfaceCulling = false;
-      F3DLog::Print(F3DLog::Severity::Warning, this->BackfaceType.value() + " is not a valid backface type, assuming it is not set");
+      F3DLog::Print(F3DLog::Severity::Warning,
+        this->BackfaceType.value() + " is not a valid backface type, assuming it is not set");
     }
   }
 
-  for ([[maybe_unused]] const auto& [actor, mapper, originalActor] : this->Importer->GetColoringActorsAndMappers())
+  for ([[maybe_unused]] const auto& [actor, mapper, originalActor] :
+    this->Importer->GetColoringActorsAndMappers())
   {
     if (this->EdgeVisible.has_value())
     {
@@ -1832,7 +1853,7 @@ void vtkF3DRenderer::ConfigureActorsProperties()
       originalActor->GetProperty()->SetBackfaceCulling(backfaceCulling);
     }
 
-    if(surfaceColor)
+    if (surfaceColor)
     {
       actor->GetProperty()->SetColor(surfaceColor);
       originalActor->GetProperty()->SetColor(surfaceColor);
@@ -1840,8 +1861,12 @@ void vtkF3DRenderer::ConfigureActorsProperties()
 
     if (this->Opacity.has_value())
     {
-      actor->GetProperty()->SetOpacity(this->Opacity.value());
-      originalActor->GetProperty()->SetOpacity(this->Opacity.value());
+      vtkInformation* info = originalActor->GetPropertyKeys();
+      if (!info || !info->Has(vtkF3DImporter::ACTOR_IS_ARMATURE()))
+      {
+        actor->GetProperty()->SetOpacity(this->Opacity.value());
+        originalActor->GetProperty()->SetOpacity(this->Opacity.value());
+      }
     }
 
     if (this->Roughness.has_value())
@@ -1912,9 +1937,10 @@ void vtkF3DRenderer::ConfigureActorsProperties()
     }
   }
 
-  for ([[maybe_unused]] const auto& [actor, mapper] : this->Importer->GetPointSpritesActorsAndMappers())
+  for ([[maybe_unused]] const auto& [actor, mapper] :
+    this->Importer->GetPointSpritesActorsAndMappers())
   {
-    if(surfaceColor)
+    if (surfaceColor)
     {
       actor->GetProperty()->SetColor(surfaceColor);
     }
@@ -2175,7 +2201,8 @@ void vtkF3DRenderer::ConfigureColoring()
   // Recover coloring information and update handler
   bool enableColoring = this->EnableColoring || (!this->UseRaytracing && this->UseVolume);
   F3DColoringInfoHandler& coloringHandler = this->Importer->GetColoringInfoHandler();
-  auto info = coloringHandler.SetCurrentColoring(enableColoring, this->UseCellColoring, this->ArrayNameForColoring, false);
+  auto info = coloringHandler.SetCurrentColoring(
+    enableColoring, this->UseCellColoring, this->ArrayNameForColoring, false);
   bool hasColoring = info.has_value();
   if (hasColoring && !this->ColorTransferFunctionConfigured)
   {
@@ -2192,7 +2219,8 @@ void vtkF3DRenderer::ConfigureColoring()
       bool visible = false;
       if (hasColoring)
       {
-        // Rely on the previous state of scalar visibility to know if we should show the actor by default
+        // Rely on the previous state of scalar visibility to know if we should show the actor by
+        // default
         visible = mapper->GetScalarVisibility();
         if (!this->ColoringMappersConfigured)
         {
@@ -2257,14 +2285,13 @@ void vtkF3DRenderer::ConfigureColoring()
         visible = !std::string(mapper->GetArrayName()).empty();
         if (!this->VolumePropsAndMappersConfigured)
         {
-          visible = vtkF3DRenderer::ConfigureVolumeForColoring(mapper,
-            prop, info.value().Name, this->ComponentForColoring,
-            this->ColorTransferFunction, this->ColorRange, this->UseCellColoring,
-            this->UseInverseOpacityFunction);
+          visible = vtkF3DRenderer::ConfigureVolumeForColoring(mapper, prop, info.value().Name,
+            this->ComponentForColoring, this->ColorTransferFunction, this->ColorRange,
+            this->UseCellColoring, this->UseInverseOpacityFunction);
           if (!visible)
           {
-            F3DLog::Print(
-              F3DLog::Severity::Warning, "Cannot find the array \"" + info.value().Name + "\" to display volume with");
+            F3DLog::Print(F3DLog::Severity::Warning,
+              "Cannot find the array \"" + info.value().Name + "\" to display volume with");
           }
         }
       }
@@ -2275,8 +2302,7 @@ void vtkF3DRenderer::ConfigureColoring()
   {
     if (!this->VolumePropsAndMappersConfigured && volPropsAndMappers.size() == 0)
     {
-      F3DLog::Print(
-        F3DLog::Severity::Error, "Cannot use volume with this data");
+      F3DLog::Print(F3DLog::Severity::Error, "Cannot use volume with this data");
     }
     this->VolumePropsAndMappersConfigured = true;
   }
@@ -2286,8 +2312,8 @@ void vtkF3DRenderer::ConfigureColoring()
   this->ScalarBarActor->SetVisibility(barVisible);
   if (barVisible && !this->ScalarBarActorConfigured)
   {
-    vtkF3DRenderer::ConfigureScalarBarActorForColoring(
-      this->ScalarBarActor, info.value().Name, this->ComponentForColoring, this->ColorTransferFunction);
+    vtkF3DRenderer::ConfigureScalarBarActorForColoring(this->ScalarBarActor, info.value().Name,
+      this->ComponentForColoring, this->ColorTransferFunction);
     this->ScalarBarActorConfigured = true;
   }
 
@@ -2319,9 +2345,9 @@ std::string vtkF3DRenderer::GetColoringDescription()
 bool vtkF3DRenderer::ConfigureMapperForColoring(vtkPolyDataMapper* mapper, const std::string& name,
   int component, vtkColorTransferFunction* ctf, double range[2], bool cellFlag)
 {
-  vtkDataSetAttributes* data = cellFlag ?
-    static_cast<vtkDataSetAttributes*>(mapper->GetInput()->GetCellData()) :
-    static_cast<vtkDataSetAttributes*>(mapper->GetInput()->GetPointData());
+  vtkDataSetAttributes* data = cellFlag
+    ? static_cast<vtkDataSetAttributes*>(mapper->GetInput()->GetCellData())
+    : static_cast<vtkDataSetAttributes*>(mapper->GetInput()->GetPointData());
   vtkDataArray* array = data->GetArray(name.c_str());
   if (!array || component >= array->GetNumberOfComponents())
   {
@@ -2359,13 +2385,13 @@ bool vtkF3DRenderer::ConfigureMapperForColoring(vtkPolyDataMapper* mapper, const
 }
 
 //----------------------------------------------------------------------------
-bool vtkF3DRenderer::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper,
-  vtkVolume* volume, const std::string& name, int component, vtkColorTransferFunction* ctf,
-  double range[2], bool cellFlag, bool inverseOpacityFlag)
+bool vtkF3DRenderer::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vtkVolume* volume,
+  const std::string& name, int component, vtkColorTransferFunction* ctf, double range[2],
+  bool cellFlag, bool inverseOpacityFlag)
 {
-  vtkDataSetAttributes* data = cellFlag ?
-    static_cast<vtkDataSetAttributes*>(mapper->GetInput()->GetCellData()) :
-    static_cast<vtkDataSetAttributes*>(mapper->GetInput()->GetPointData());
+  vtkDataSetAttributes* data = cellFlag
+    ? static_cast<vtkDataSetAttributes*>(mapper->GetInput()->GetCellData())
+    : static_cast<vtkDataSetAttributes*>(mapper->GetInput()->GetPointData());
   vtkDataArray* array = data->GetArray(name.c_str());
   if (!array || component >= array->GetNumberOfComponents())
   {
@@ -2453,7 +2479,8 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
   this->UsingExpandingRange = true;
   if (this->UserScalarBarRange.has_value())
   {
-    if (this->UserScalarBarRange.value().size() == 2 && this->UserScalarBarRange.value()[0] <= this->UserScalarBarRange.value()[1])
+    if (this->UserScalarBarRange.value().size() == 2 &&
+      this->UserScalarBarRange.value()[0] <= this->UserScalarBarRange.value()[1])
     {
       this->UsingExpandingRange = false;
       this->ColorRange[0] = this->UserScalarBarRange.value()[0];
@@ -2535,7 +2562,8 @@ void vtkF3DRenderer::CycleFieldForColoring()
   this->SetUseCellColoring(!this->UseCellColoring);
   bool enableColoring = this->EnableColoring || (!this->UseRaytracing && this->UseVolume);
   F3DColoringInfoHandler& coloringHandler = this->Importer->GetColoringInfoHandler();
-  auto info = coloringHandler.SetCurrentColoring(enableColoring, this->UseCellColoring, this->ArrayNameForColoring, true);
+  auto info = coloringHandler.SetCurrentColoring(
+    enableColoring, this->UseCellColoring, this->ArrayNameForColoring, true);
   if (!info.has_value())
   {
     // Cycle array if the current one is not valid
@@ -2547,7 +2575,8 @@ void vtkF3DRenderer::CycleFieldForColoring()
 void vtkF3DRenderer::CycleArrayForColoring()
 {
   assert(this->Importer);
-  this->Importer->GetColoringInfoHandler().CycleColoringArray(!this->UseVolume); //TODO check this cond
+  this->Importer->GetColoringInfoHandler().CycleColoringArray(
+    !this->UseVolume); // TODO check this cond
   auto info = this->Importer->GetColoringInfoHandler().GetCurrentColoringInfo();
   bool enable = info.has_value();
 

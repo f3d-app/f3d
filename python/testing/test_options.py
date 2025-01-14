@@ -1,3 +1,4 @@
+from typing import Any
 import pytest
 
 import f3d
@@ -43,10 +44,16 @@ def test_set_non_existent_key():
         options["hello"] = "world"
 
 
-def test_set_incompatible_key():
+def test_set_invalid_str_value():
+    options = f3d.Options()
+    with pytest.raises(ValueError):
+        options["ui.axis"] = "world"
+
+
+def test_set_incompatible_value_type():
     options = f3d.Options()
     with pytest.raises(AttributeError):
-        options["ui.axis"] = "world"
+        options["ui.axis"] = 1.12
 
 
 def test_len():
@@ -84,6 +91,18 @@ def test_set_options():
     assert engine.options["scene.up_direction"] == "-Z"
 
 
+def test_set_options_from_string():
+    options = f3d.Options()
+    options["ui.axis"] = False
+    assert not options["ui.axis"]
+
+    options["ui.axis"] = "on"
+    assert options["ui.axis"]
+
+    options["ui.axis"] = "off"
+    assert not options["ui.axis"]
+
+
 def test_to_dict():
     options = f3d.Options()
     options_dict = dict(options)
@@ -97,7 +116,7 @@ def test_to_dict():
 def test_update_from_dict():
     options = f3d.Options()
 
-    d = {
+    d: dict[str, Any] = {
         "ui.axis": True,
         "model.material.roughness": 0.8,
         "scene.animation.speed_factor": 3.8,
@@ -113,7 +132,7 @@ def test_update_from_dict():
 def test_update_from_kv_pairs():
     options = f3d.Options()
 
-    d = {
+    d: dict[str, Any] = {
         "ui.axis": True,
         "model.material.roughness": 0.8,
         "scene.animation.speed_factor": 3.8,
@@ -124,6 +143,18 @@ def test_update_from_kv_pairs():
     options.update(d.items())
     for k, v in d.items():
         assert options[k] == v, f"{k} was not set correctly"
+
+
+def test_update_from_invalid_kv_pairs():
+    options = f3d.Options()
+
+    items = (
+        ("ui.axis", True),
+        ("model.material.roughness", 0.8),
+        ("a", "b", 3),
+    )
+    with pytest.raises(ValueError):
+        options.update(items)  # type: ignore
 
 
 def test_is_same():

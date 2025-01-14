@@ -265,6 +265,7 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
 
   io.Fonts->Build();
   io.FontDefault = font;
+  io.FontGlobalScale = this->FontScale;
 
   ImGuiStyle* style = &ImGui::GetStyle();
   style->GrabRounding = 4.0f;
@@ -290,22 +291,25 @@ vtkF3DImguiActor::~vtkF3DImguiActor() = default;
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderFileName()
 {
-  ImGuiViewport* viewport = ImGui::GetMainViewport();
+  if (!this->FileName.empty())
+  {
+    ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-  constexpr float marginTop = 5.f;
-  ImVec2 winSize = ImGui::CalcTextSize(this->FileName.c_str());
-  winSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
-  winSize.y += 2.f * ImGui::GetStyle().WindowPadding.y;
+    constexpr float marginTop = 5.f;
+    ImVec2 winSize = ImGui::CalcTextSize(this->FileName.c_str());
+    winSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
+    winSize.y += 2.f * ImGui::GetStyle().WindowPadding.y;
 
-  ::SetupNextWindow(ImVec2(viewport->GetWorkCenter().x - 0.5f * winSize.x, marginTop), winSize);
-  ImGui::SetNextWindowBgAlpha(0.35f);
+    ::SetupNextWindow(ImVec2(viewport->GetWorkCenter().x - 0.5f * winSize.x, marginTop), winSize);
+    ImGui::SetNextWindowBgAlpha(0.35f);
 
-  ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
-    ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
+      ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
 
-  ImGui::Begin("FileName", nullptr, flags);
-  ImGui::TextUnformatted(this->FileName.c_str());
-  ImGui::End();
+    ImGui::Begin("FileName", nullptr, flags);
+    ImGui::TextUnformatted(this->FileName.c_str());
+    ImGui::End();
+  }
 }
 
 //----------------------------------------------------------------------------

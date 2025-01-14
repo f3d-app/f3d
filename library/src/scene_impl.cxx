@@ -116,10 +116,12 @@ public:
         &callbackData, this->MetaImporter, this->Interactor);
     }
 
-    // Update the meta importer, the will only update importers that have not been update before
+    // Update the meta importer, the will only update importers that have not been updated before
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
     if (!this->MetaImporter->Update())
     {
+      this->MetaImporter->Clear();
+      this->Window.Initialize();
       throw scene::load_failure_exception("failed to load scene");
     }
 #else

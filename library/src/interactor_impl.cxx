@@ -81,6 +81,10 @@ public:
     this->VTKInteractor->SetInteractorStyle(this->Style);
     this->VTKInteractor->Initialize();
 
+    // Some implementation (e.g. macOS) in VTK set the window name during initialization
+    // so we need to set the name right after initialization
+    this->Window.setWindowName("f3d");
+
     this->UIObserver->InstallObservers(this->VTKInteractor);
 
     // observe console event to trigger commands
@@ -120,6 +124,8 @@ public:
 
     this->Recorder = vtkSmartPointer<vtkF3DInteractorEventRecorder>::New();
     this->Recorder->SetInteractor(this->VTKInteractor);
+
+    this->Style->ResetTemporaryUp();
   }
 
   //----------------------------------------------------------------------------
@@ -233,7 +239,7 @@ public:
     if (event == vtkF3DConsoleOutputWindow::TriggerEvent)
     {
       const char* commandWithArgs = static_cast<const char*>(data);
-      self->Interactor.triggerCommand(commandWithArgs);
+      self->Interactor.SetCommandBuffer(commandWithArgs);
     }
     else if (event == vtkF3DConsoleOutputWindow::ShowEvent ||
       event == vtkF3DConsoleOutputWindow::HideEvent)
@@ -512,6 +518,12 @@ public:
       this->EventLoopUserCallBack();
     }
 
+    if (this->CommandBuffer.has_value())
+    {
+      this->Interactor.triggerCommand(this->CommandBuffer.value());
+      this->CommandBuffer.reset();
+    }
+
     this->AnimationManager->Tick();
 
     if (this->RenderRequested)
@@ -539,6 +551,7 @@ public:
   std::map<unsigned long, std::pair<int, std::function<void()>>> TimerCallBacks;
 
   std::map<std::string, std::function<void(const std::vector<std::string>&)>> Commands;
+  std::optional<std::string> CommandBuffer;
 
   std::map<interaction_bind_t, BindingCommands> Bindings;
   std::multimap<std::string, interaction_bind_t> GroupedBinds;
@@ -676,6 +689,8 @@ interactor& interactor_impl::initCommands()
     {
       check_args(args, 1, "roll_camera");
       this->Internals->Window.getCamera().roll(options::parse<int>(args[0]));
+      this->Internals->Style->SetTemporaryUp(
+        this->Internals->Window.getCamera().getViewUp().data());
     });
 
   this->addCommand("increase_light_intensity",
@@ -684,16 +699,13 @@ interactor& interactor_impl::initCommands()
   this->addCommand("decrease_light_intensity",
     [&](const std::vector<std::string>&) { this->Internals->IncreaseLightIntensity(true); });
 
-  this->addCommand("print_scene_info",
-    [&](const std::vector<std::string>&)
+  this->addCommand("print_scene_info", [&](const std::vector<std::string>&)
     { this->Internals->Window.PrintSceneDescription(log::VerboseLevel::INFO); });
 
-  this->addCommand("print_coloring_info",
-    [&](const std::vector<std::string>&)
+  this->addCommand("print_coloring_info", [&](const std::vector<std::string>&)
     { this->Internals->Window.PrintColoringDescription(log::VerboseLevel::INFO); });
 
-  this->addCommand("print_mesh_info",
-    [&](const std::vector<std::string>&)
+  this->addCommand("print_mesh_info", [&](const std::vector<std::string>&)
     { this->Internals->Scene.PrintImporterDescription(log::VerboseLevel::INFO); });
 
   this->addCommand("print_options_info",
@@ -716,18 +728,22 @@ interactor& interactor_impl::initCommands()
       if (type == "front")
       {
         this->Internals->SetViewOrbit(internals::ViewType::VT_FRONT);
+        this->Internals->Style->ResetTemporaryUp();
       }
       else if (type == "top")
       {
         this->Internals->SetViewOrbit(internals::ViewType::VT_TOP);
+        this->Internals->Style->ResetTemporaryUp();
       }
       else if (type == "right")
       {
         this->Internals->SetViewOrbit(internals::ViewType::VT_RIGHT);
+        this->Internals->Style->ResetTemporaryUp();
       }
       else if (type == "isometric")
       {
         this->Internals->SetViewOrbit(internals::ViewType::VT_ISOMETRIC);
+        this->Internals->Style->ResetTemporaryUp();
       }
       else
       {
@@ -747,7 +763,11 @@ interactor& interactor_impl::initCommands()
   this->addCommand("stop_interactor", [&](const std::vector<std::string>&) { this->stop(); });
 
   this->addCommand("reset_camera",
-    [&](const std::vector<std::string>&) { this->Internals->Window.getCamera().resetToDefault(); });
+    [&](const std::vector<std::string>&)
+    {
+      this->Internals->Window.getCamera().resetToDefault();
+      this->Internals->Style->ResetTemporaryUp();
+    });
 
   this->addCommand("toggle_animation",
     [&](const std::vector<std::string>&) { this->Internals->AnimationManager->ToggleAnimation(); });
@@ -1185,8 +1205,12 @@ bool interactor_impl::recordInteraction(const fs::path& file)
 
   try
   {
-    // Ensure parent directories exists
-    fs::create_directories(file.parent_path());
+    // Ensure parent directories exists if not empty
+    fs::path parent = file.parent_path();
+    if (!parent.empty())
+    {
+      fs::create_directories(parent);
+    }
 
     // Make sure the recorder is off and streams are cleared
     this->Internals->Recorder->Off();
@@ -1244,6 +1268,13 @@ void interactor_impl::SetInteractorOn(vtkInteractorObserver* observer)
 void interactor_impl::UpdateRendererAfterInteraction()
 {
   this->Internals->Style->UpdateRendererAfterInteraction();
+}
+
+//----------------------------------------------------------------------------
+void interactor_impl::SetCommandBuffer(const char* command)
+{
+  // XXX This replace previous command buffer, it should be improved
+  this->Internals->CommandBuffer = command;
 }
 
 //----------------------------------------------------------------------------

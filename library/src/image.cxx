@@ -344,39 +344,28 @@ void* image::getContent() const
 }
 
 //----------------------------------------------------------------------------
-bool image::compare(const image& reference, double threshold, double& error) const
+double image::compare(const image& reference) const
 {
-  // Sanity check for threshold
-  if (threshold < 0 || threshold >= 1)
-  {
-    error = 1;
-    return false;
-  }
-
   ChannelType type = this->getChannelType();
   if (type != reference.getChannelType())
   {
-    error = 1;
-    return false;
+    return 1.0;
   }
 
   unsigned int count = this->getChannelCount();
   if (count != reference.getChannelCount())
   {
-    error = 1;
-    return false;
+    return 1.0;
   }
 
   if (this->getWidth() != reference.getWidth() || this->getHeight() != reference.getHeight())
   {
-    error = 1;
-    return false;
+    return 1.0;
   }
 
   if (this->getWidth() == 0 && this->getHeight() == 0)
   {
-    error = 0;
-    return true;
+    return 0.0;
   }
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240729)
@@ -406,39 +395,27 @@ bool image::compare(const image& reference, double threshold, double& error) con
   // Thanks to the checks above, this is always true
   assert(scalars != nullptr);
 
-  double unused;
+  double error, unused;
   vtkImageSSIM::ComputeErrorMetrics(scalars, error, unused);
-  return error <= threshold;
+  return error;
 #else
-  threshold *= 1000;
-
   vtkNew<vtkImageDifference> imDiff;
   imDiff->SetThreshold(0);
   imDiff->SetInputData(this->Internals->Image);
   imDiff->SetImageData(reference.Internals->Image);
-  imDiff->UpdateInformation();
-  error = imDiff->GetThresholdedError();
-
-  if (error <= threshold)
-  {
-    imDiff->Update();
-    error = imDiff->GetThresholdedError();
-  }
-
-  bool ret = error <= threshold;
-  error /= 1000;
-  return ret;
+  imDiff->Update();
+  double error = imDiff->GetThresholdedError();
+  return error / 1000.0;
 #endif
 }
 
 //----------------------------------------------------------------------------
 bool image::operator==(const image& reference) const
 {
-  double error;
   // XXX: We do not use 0 because even with identical images, rounding error, arithmetic imprecision
   // or architecture issue may cause the value to not be 0. See:
   // https://develop.openfoam.com/Development/openfoam/-/issues/2958
-  return this->compare(reference, 1e-14, error);
+  return this->compare(reference) <= 1e-14;
 }
 
 //----------------------------------------------------------------------------
@@ -502,8 +479,12 @@ const image& image::save(const fs::path& filePath, SaveFormat format) const
 
   try
   {
-    // Ensure the directories exists
-    fs::create_directories(filePath.parent_path());
+    // Ensure the directories exists if not empty
+    fs::path parent = filePath.parent_path();
+    if (!parent.empty())
+    {
+      fs::create_directories(parent);
+    }
 
     writer->SetFileName(filePath.string().c_str());
     writer->SetInputData(this->Internals->Image);

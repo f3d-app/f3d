@@ -423,6 +423,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->ShowHDRISkybox(opt.render.background.skybox);
 
   renderer->SetFontFile(opt.ui.font_file);
+  renderer->SetFontScale(opt.ui.scale);
 
   renderer->SetGridUnitSquare(opt.render.grid.unit);
   renderer->SetGridSubdivisions(opt.render.grid.subdivisions);
@@ -553,6 +554,11 @@ void window_impl::SetCachePath(const fs::path& cachePath)
 {
   try
   {
+    if (cachePath.empty())
+    {
+      throw engine::cache_exception("Provided cache path is empty");
+    }
+
     // create directories if they do not exist
     fs::create_directories(cachePath);
   }
