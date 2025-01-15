@@ -25,7 +25,6 @@ public:
   /**
    * Update actors at the given time value.
    */
-  void UpdateTimeStep(double timeValue) override;
   bool UpdateAtTimeValue(double timeValue) override;
 
   /**
@@ -48,22 +47,11 @@ public:
   ///@}
 
   /**
-   * Return importer description.
-   */
-  std::string GetOutputsDescription() override;
-
-  /**
    * Get temporal information for the currently enabled animation.
    */
   bool GetTemporalInformation(vtkIdType animationIndex, double frameRate, int& nbTimeSteps,
     double timeRange[2], vtkDoubleArray* timeSteps) override;
-
-  /**
-   * Get the number of available cameras.
-   * Not implemented, multiple cameras are not specified.
-   */
-  vtkIdType GetNumberOfCameras() override;
-
+  
 protected:
   vtkF3DQuakeMDLImporter();
   ~vtkF3DQuakeMDLImporter() override = default;

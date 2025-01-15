@@ -299,39 +299,7 @@ public:
     }
 
     // Add interpolated frames
-    // Linear interpolation between frames in the same animation.
-    for (std::size_t i = 0; i < this->Mesh.size() - 1; i++)
-    {
-      if (this->AnimationIds[i + 1].first != this->AnimationIds[i].first)
-      {
-        continue;
-      }
-      else
-      {
-        vtkNew<vtkPoints> vertices;
-        vertices->Allocate(header->numTriangles * 3);
-        for (int j = 0; j < header->numTriangles * 3; j++)
-        {
-          double* vertex0 = this->Mesh[i]->GetPoint(j);
-          double* vertex1 = this->Mesh[i + 1]->GetPoint(j);
-          double interp[3];
-          interp[0] = vertex0[0] + 0.5 * (vertex1[0] - vertex0[0]);
-          interp[1] = vertex0[1] + 0.5 * (vertex1[1] - vertex0[1]);
-          interp[2] = vertex0[2] + 0.5 * (vertex1[2] - vertex0[2]);
-          vertices->InsertPoint(j, interp);
-        }
-        vtkNew<vtkPolyData> mesh;
-        mesh->SetPoints(vertices);
-        mesh->SetPolys(cells);
-        mesh->GetPointData()->SetTCoords(textureCoordinates);
-        // Inserts frame between i and i+1
-        this->Mesh.insert(this->Mesh.begin() + i, mesh);
-        std::pair<int, float> pair = std::make_pair(this->AnimationIds[i].first,
-          (this->AnimationIds[i].second + this->AnimationIds[i + 1].second) / 2);
-        // Increments i to avoid infinite loop
-        this->AnimationIds.insert(this->AnimationIds.begin() + i++, pair);
-      }
-    }
+    this->InterpolateFrames(header, cells, textureCoordinates);
   }
 
   //----------------------------------------------------------------------------
@@ -432,10 +400,61 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  void GetTimeRange(vtkIdType vtkNotUsed(animationIndex), double timeRange[2])
+  void InterpolateFrames(const mdl_header_t* header, const vtkSmartPointer<vtkCellArray>& cells,
+    const vtkSmartPointer<vtkFloatArray>& textureCoordinates)
   {
+    // Linear interpolation between frames in the same animation.
+    std::size_t i = 0;
+    while (i < this->Mesh.size() - 1)
+    {
+      if (this->AnimationIds[i + 1].first != this->AnimationIds[i].first)
+      {
+        i++; // Move to next frame.
+        continue;
+      }
+      else
+      {
+        vtkNew<vtkPoints> vertices;
+        vertices->Allocate(header->numTriangles * 3);
+        for (int j = 0; j < header->numTriangles * 3; j++)
+        {
+          double* vertex0 = this->Mesh[i]->GetPoint(j);
+          double* vertex1 = this->Mesh[i + 1]->GetPoint(j);
+          double interp[3];
+          interp[0] = vertex0[0] + 0.5 * (vertex1[0] - vertex0[0]);
+          interp[1] = vertex0[1] + 0.5 * (vertex1[1] - vertex0[1]);
+          interp[2] = vertex0[2] + 0.5 * (vertex1[2] - vertex0[2]);
+          vertices->InsertPoint(j, interp);
+        }
+        vtkNew<vtkPolyData> mesh;
+        mesh->SetPoints(vertices);
+        mesh->SetPolys(cells);
+        mesh->GetPointData()->SetTCoords(textureCoordinates);
+        // Inserts frame between i and i+1
+        this->Mesh.insert(this->Mesh.begin() + i, mesh);
+        std::pair<int, float> pair = std::make_pair(this->AnimationIds[i].first,
+          (this->AnimationIds[i].second + this->AnimationIds[i + 1].second) / 2);
+        this->AnimationIds.insert(this->AnimationIds.begin() + i, pair);
+        // Because a frame is added at i+1, the next frame is at i+2
+        i += 2;
+      }
+    }
+  }
+
+  //----------------------------------------------------------------------------
+  void GetTimeRange(vtkIdType animationIndex, double timeRange[2])
+  {
+    // Retrieve time range of all previous animations first, then the selected animation index.
     timeRange[0] = 0.0;
-    timeRange[1] = (1.0 / this->FrameRate) * this->AnimationIds.size();
+    timeRange[1] = 0.0;
+    for (int i = 0; i <= animationIndex; i++)
+    {
+      int numFrames = std::count_if(this->AnimationIds.begin(), this->AnimationIds.end(),
+        [i](const std::pair<int, float> pair) { return pair.first == i; });
+      float duration = numFrames / this->FrameRate;
+      timeRange[0] = timeRange[1];
+      timeRange[1] += duration;
+    }
   }
 
   vtkF3DQuakeMDLImporter* Parent;
@@ -453,9 +472,9 @@ public:
 
 //----------------------------------------------------------------------------
 vtkF3DQuakeMDLImporter::vtkF3DQuakeMDLImporter()
-  : Internals(new vtkF3DQuakeMDLImporter::vtkInternals(this)){
-
-  };
+  : Internals(new vtkF3DQuakeMDLImporter::vtkInternals(this))
+{
+}
 
 //----------------------------------------------------------------------------
 int vtkF3DQuakeMDLImporter::ImportBegin()
@@ -467,18 +486,6 @@ int vtkF3DQuakeMDLImporter::ImportBegin()
 void vtkF3DQuakeMDLImporter::ImportActors(vtkRenderer* renderer)
 {
   this->Internals->ImportActors(renderer);
-}
-
-//----------------------------------------------------------------------------
-std::string vtkF3DQuakeMDLImporter::GetOutputsDescription()
-{
-  return this->Internals->Description;
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DQuakeMDLImporter::UpdateTimeStep(double timeValue)
-{
-  return this->Internals->UpdateTimeStep(timeValue);
 }
 
 //----------------------------------------------------------------------------
@@ -497,31 +504,32 @@ vtkIdType vtkF3DQuakeMDLImporter::GetNumberOfAnimations()
 //----------------------------------------------------------------------------
 std::string vtkF3DQuakeMDLImporter::GetAnimationName(vtkIdType animationIndex)
 {
-  if (animationIndex < static_cast<vtkIdType>(this->Internals->AnimationNames.size()))
-  {
-    return this->Internals->AnimationNames[animationIndex];
-  }
-  else
-  {
-    return "";
-  }
+  assert(animationIndex < static_cast<vtkIdType>(this->Internals->AnimationNames.size()));
+  assert(animationIndex >= 0);
+  return this->Internals->AnimationNames[animationIndex];
 }
 
 //----------------------------------------------------------------------------
 void vtkF3DQuakeMDLImporter::EnableAnimation(vtkIdType animationIndex)
 {
+  assert(animationIndex < static_cast<vtkIdType>(this->Internals->AnimationNames.size()));
+  assert(animationIndex >= 0);
   this->Internals->EnableAnimation(animationIndex);
 }
 
 //----------------------------------------------------------------------------
 void vtkF3DQuakeMDLImporter::DisableAnimation(vtkIdType animationIndex)
 {
+  assert(animationIndex < static_cast<vtkIdType>(this->Internals->AnimationNames.size()));
+  assert(animationIndex >= 0);
   this->Internals->DisableAnimation(animationIndex);
 }
 
 //----------------------------------------------------------------------------
 bool vtkF3DQuakeMDLImporter::IsAnimationEnabled(vtkIdType animationIndex)
 {
+  assert(animationIndex < static_cast<vtkIdType>(this->Internals->AnimationNames.size()));
+  assert(animationIndex >= 0);
   return std::count(this->Internals->ActiveAnimationIds.begin(),
            this->Internals->ActiveAnimationIds.end(), animationIndex) > 0;
 }
@@ -534,10 +542,4 @@ bool vtkF3DQuakeMDLImporter::GetTemporalInformation(vtkIdType animationIndex, do
   this->Internals->GetTimeRange(animationIndex, timeRange);
   nbTimeSteps = static_cast<int>(this->Internals->ActiveFrames.size());
   return true;
-}
-
-//----------------------------------------------------------------------------
-vtkIdType vtkF3DQuakeMDLImporter::GetNumberOfCameras()
-{
-  return 0;
 }
