@@ -61,7 +61,8 @@ Some dependencies are provided internally, eg: ImGui, dmon and others. Use `F3D_
 ## VCPKG
 
 It's possible to use VCPKG to automatically build dependencies. A manifest file `vcpkg.json` is available at your convenience. Please read [VCPKG documentation](https://vcpkg.io/en/getting-started.html).  
-Basically, just install VCPKG, and configure F3D using `-DCMAKE_TOOLCHAIN_FILE=[path to vcpkg]/scripts/buildsystems/vcpkg.cmake` option.
+Basically, just install VCPKG, and configure F3D using `-DCMAKE_TOOLCHAIN_FILE=[path to vcpkg]/scripts/buildsystems/vcpkg.cmake` option.  
+Only VTK is added to the manifest file and additional dependencies must be added manually in this file.
 
 ## Installing
 
