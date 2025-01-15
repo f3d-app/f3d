@@ -66,7 +66,8 @@
     "match": ".*(mdl)",
     "options":
     {
-      "up": "+Z"
+      "up": "+Z",
+      "animation-index": "-1"
     }
   }
 ]
