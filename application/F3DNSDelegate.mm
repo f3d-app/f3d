@@ -25,7 +25,10 @@
 - (BOOL)application:(NSApplication*)theApplication openFile:(NSString*)filename
 {
   (void)theApplication;
-  if (ShouldHandleFileOpening)
+
+  NSArray *arguments = [[NSProcessInfo processInfo] arguments];
+
+  if (ShouldHandleFileOpening || arguments.count <= 1)
   {
     int index = Starter->AddFile([filename UTF8String]);
     if (index > -1)
