@@ -135,6 +135,9 @@ function(f3d_test)
   if (F3D_TEST_NO_DATA_FORCE_RENDER)
     list(APPEND f3d_test_env_vars "CTEST_F3D_NO_DATA_FORCE_RENDER=1")
   endif ()
+  if (F3D_TEST_PREVENT_SKIP_FRAME)
+    list(APPEND f3d_test_env_vars "CTEST_F3D_PREVENT_SKIP_FRAME=1")
+  endif ()
 
   set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES ENVIRONMENT
     "F3D_PLUGINS_PATH=${CMAKE_LIBRARY_OUTPUT_DIRECTORY};${f3d_test_env_vars}")

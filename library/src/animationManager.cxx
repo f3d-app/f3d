@@ -205,9 +205,10 @@ void animationManager::Tick()
   if (this->Playing)
   {
     std::chrono::steady_clock::time_point currentTick = std::chrono::steady_clock::now();
-    if (std::chrono::duration_cast<std::chrono::milliseconds>(currentTick - this->PreviousTick).count() > 1000 * this->DeltaTime)
+    if (!vtksys::SystemTools::HasEnv("CTEST_F3D_PREVENT_SKIP_FRAME") && 
+      std::chrono::duration_cast<std::chrono::milliseconds>(currentTick - this->PreviousTick).count() > 1000 * this->DeltaTime)
     {
-      log::info("Unable to process frames fast enough, skipping a frame");
+      log::debug("Unable to process frames fast enough, skipping a frame");
       this->PreviousTick = currentTick;
       return;
     }
