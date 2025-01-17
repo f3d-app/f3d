@@ -24,6 +24,10 @@ animationManager::animationManager(const options& options, window_impl& window)
   : Options(options)
   , Window(window)
 {
+  if (vtksys::SystemTools::HasEnv("CTEST_F3D_PREVENT_SKIP_FRAME"))
+  {
+    this->SkipFrame = false;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -205,7 +209,7 @@ void animationManager::Tick()
   if (this->Playing)
   {
     std::chrono::steady_clock::time_point currentTick = std::chrono::steady_clock::now();
-    if (!vtksys::SystemTools::HasEnv("CTEST_F3D_PREVENT_SKIP_FRAME") &&
+    if (this->SkipFrame &&
       std::chrono::duration_cast<std::chrono::milliseconds>(currentTick - this->PreviousTick)
           .count() > 1000 * this->DeltaTime)
     {
