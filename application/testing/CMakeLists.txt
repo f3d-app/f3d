@@ -609,7 +609,7 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME TestDAE DATA duck.dae ARGS --load-plugins=assimp)
   f3d_test(NAME TestX DATA anim_test.x ARGS --load-plugins=assimp)
 
-  f3d_test(NAME TestInteractionAnimationFBXBone DATA animation_with_skeleton.fbx ARGS --load-plugins=assimp --camera-position=0,0,14000 --camera-focal-point=0,0,0 INTERACTION)#Space;Wait;Space;
+  f3d_test(NAME TestInteractionAnimationFBXBone DATA animation_with_skeleton.fbx ARGS --load-plugins=assimp --camera-position=0,0,14000 --camera-focal-point=0,0,0 INTERACTION PREVENT_SKIP_FRAME)#Space;Wait;Space;
 
   # This test baseline is incorrect because of https://github.com/f3d-app/f3d/issues/603
   # It will need to be changed when fixed
@@ -866,7 +866,7 @@ f3d_test(NAME TestProgress DATA cow.vtp ARGS --loading-progress NO_BASELINE)
 f3d_test(NAME TestProgressScene DATA WaterBottle.glb ARGS --loading-progress NO_BASELINE)
 f3d_test(NAME TestInteractionProgressReload DATA cow.vtp ARGS --loading-progress NO_BASELINE INTERACTION) #Up;Up;Up;Up
 
-f3d_test(NAME TestInteractionAnimationCycleAnimation DATA InterpolationTest.glb INTERACTION) #WWWWWWWWWWW;Space;Space;
+f3d_test(NAME TestInteractionAnimationCycleAnimation DATA InterpolationTest.glb INTERACTION PREVENT_SKIP_FRAME) #WWWWWWWWWWW;Space;Space;
 f3d_test(NAME TestInteractionCycleAnimationNoAnimation DATA cow.vtp INTERACTION NO_BASELINE) #W
 
 f3d_test(NAME TestInteractionDropFiles ARGS -n INTERACTION_CONFIGURE UI)#X;DropEvent cow.vtp;DropEvent dragon.vtu suzanne.stl;
@@ -892,7 +892,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   f3d_test(NAME TestInteractionDropHDRIModifiers INTERACTION_CONFIGURE LONG_TIMEOUT)#CTRL+DropEvent f3d.tif;SHIFT+DropEvent;SHIFT+DropEven palermo.tif;SYYYY
 
   # Test interactive animation and dropping HDRI
-  f3d_test(NAME TestInteractionAnimationDropHDRI DATA InterpolationTest.glb ARGS --animation-index=-1 --animation-progress INTERACTION_CONFIGURE LONG_TIMEOUT)#Space;DropEvent palermo.hdr;Space;
+  f3d_test(NAME TestInteractionAnimationDropHDRI DATA InterpolationTest.glb ARGS --animation-index=-1 --animation-progress INTERACTION_CONFIGURE LONG_TIMEOUT PREVENT_SKIP_FRAME)#Space;DropEvent palermo.hdr;Space;
 
   if(F3D_MODULE_EXR)
     f3d_test(NAME TestInteractionDropHDRIExr INTERACTION_CONFIGURE LONG_TIMEOUT)#X;DropEvent kloofendal.exr;DropEvent dragon.vtu;
