@@ -17,7 +17,7 @@ jobs:
 # Cache LFS: Checkout LFS data and update the cache to limit LFS bandwidth
 #----------------------------------------------------------------------------
   cache_lfs:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     name: Update LFS data cache
     outputs:
       lfs_sha: ${{ steps.lfs_sha_recover.outputs.lfs_sha }}
@@ -124,7 +124,7 @@ jobs:
             rendering_backend: auto
             static_label: static
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
@@ -230,22 +230,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-13]
+        os: [ubuntu-22.04, windows-latest, macos-13]
         python_version: ['3.11']
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-22.04
             python_version: '3.9'
-          - os: ubuntu-latest
+          - os: ubuntu-22.04
             python_version: '3.10'
-          - os: ubuntu-latest
+          - os: ubuntu-22.04
             python_version: '3.11'
-          - os: ubuntu-latest
+          - os: ubuntu-22.04
             python_version: '3.12'
-          - os: ubuntu-latest
+          - os: ubuntu-22.04
             python_version: '3.13'
 
     runs-on: ${{matrix.os}}
-    container: ${{ matrix.os == 'ubuntu-latest' && 'ghcr.io/f3d-app/f3d-ci' || null }}
+    container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
 
     env:
       DISPLAY: :0
@@ -272,7 +272,7 @@ jobs:
     needs: cache_lfs
     if: github.event.pull_request.draft == false
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
 
     # Add dummy F3D_PLUGINS_PATH for coverage
@@ -310,7 +310,7 @@ jobs:
       matrix:
         sanitizer_type: [address, thread, undefined]
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
@@ -344,7 +344,7 @@ jobs:
     strategy:
       fail-fast: false
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
@@ -374,7 +374,7 @@ jobs:
     strategy:
       fail-fast: false
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
 
     steps:
@@ -400,7 +400,7 @@ jobs:
       matrix:
         arch: [armeabi-v7a, arm64-v8a, x86, x86_64]
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
 
     steps:
