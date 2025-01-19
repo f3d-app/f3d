@@ -1,5 +1,5 @@
 ---
-name: Help wanted
+name: Open to contribution
 about: A maintainer specific template
 title: ''
 labels: help-wanted 
