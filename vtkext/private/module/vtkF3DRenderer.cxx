@@ -269,6 +269,9 @@ void vtkF3DRenderer::Initialize()
 
   this->GridInfo = "";
 
+  this->Discretization = 256;
+
+  this->AddActor2D(this->ScalarBarActor);
   this->ScalarBarActor->VisibilityOff();
 
   this->ExpandingRangeSet = false;
@@ -2127,6 +2130,20 @@ void vtkF3DRenderer::SetColormap(const std::vector<double>& colormap)
   }
 }
 
+void vtkF3DRenderer::SetColorDiscretization(const int discretization) { 
+  if(discretization >= 0 and discretization <= std::numeric_limits<int>::max()) {
+    this->Discretization = discretization;
+
+    bool enableColoring = this->EnableColoring || (!this->UseRaytracing && this->UseVolume);
+    F3DColoringInfoHandler& coloringHandler = this->Importer->GetColoringInfoHandler();
+    auto info = coloringHandler.SetCurrentColoring(enableColoring, this->UseCellColoring, this->ArrayNameForColoring, false);
+    this->ConfigureRangeAndCTFForColoring(info.value());
+  } else {
+    F3DLog::Print(F3DLog::Severity::Error,
+      "The discretization value need to great than zero");
+  }
+}
+
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetEnableColoring(bool enable)
 {
@@ -2475,6 +2492,78 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
     F3DLog::Print(F3DLog::Severity::Warning,
       std::string("Invalid component index: ") + std::to_string(this->ComponentForColoring));
     return;
+  }
+
+  // Set Discretization
+  this->ColorTransferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
+  if (this->Colormap.size() > 0) {
+    if (this->Colormap.size() % 4 == 0) {
+      const int stepSize = 256 / this->Discretization;
+
+      for (size_t i = 0; i < this->Colormap.size(); i += 4) {
+        double val = this->Colormap[i];
+        double r   = this->Colormap[i + 1];
+        double g   = this->Colormap[i + 2];
+        double b   = this->Colormap[i + 3];
+
+        val = this->ColorRange[0] + val * (this->ColorRange[1] - this->ColorRange[0]);
+        // Assume r = 0.5, g = 0.7, b = 0.6 and Discretization = 4
+        //
+        // Original range [0, 1]:
+        // |----|----|----|----|----|----|----|----|----|----|
+        // 0   .1   .2   .3   .4   .5   .6   .7   .8   .9   1.0
+        //                         ^     ^    ^
+        //                        0.5   0.6  0.7
+        //
+        // Step 1: Scale to [0, 255]
+        // r * 255.0 = 0.5 * 255.0 = 127.5
+        // g * 255.0 = 0.7 * 255.0 = 178.5
+        // b * 255.0 = 0.6 * 255.0 = 153.0
+        //
+        // Step 2: Cast to int to truncate the decimal part
+        // 127.5 -> 127
+        // 178.5 -> 178
+        // 153.0 -> 153
+        //
+        // |----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|
+        // 0   16   32   48   64   80   96  112  128  144  160  176  192  208  224  240  255
+        //                                        ^      ^          ^
+        //                                     127.5   153.0      178.5
+        //                                     (127)   (153)      (178)
+        //
+        // Step 3: Apply discretization by dividing by stepSize and taking the integer part
+        // 127 / 64 = 1
+        // 178 / 64 = 2
+        // 153 / 64 = 2
+        //
+        // Step 4: Multiply by stepSize to snap to the nearest discrete level
+        // 1 * 64 = 64
+        // 2 * 64 = 128
+        // 2 * 64 = 128
+        //
+        // |----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|
+        // 0   16   32   48   64   80   96  112  128  144  160  176  192  208  224  240  255
+        //                    ^                   ^
+        //                    64                 128
+        //
+        // Step 5: Scale back to [0, 1]
+        // 64  / 255.0 ≈ 0.251
+        // 128 / 255.0 ≈ 0.502
+        // 128 / 255.0 ≈ 0.502
+        //
+        // |----|----|----|----|----|----|----|----|----|----|
+        // 0   .1   .2   .3   .4   .5   .6   .7   .8   .9   1.0
+        //             ^             ^
+        //           0.251         0.502
+        //
+        // In this discretization process, we have reduced 3 distinct colors to 2 colors.
+        r   = (static_cast<int>(r * 255.0) / stepSize) * stepSize / 255.0;
+        g   = (static_cast<int>(g * 255.0) / stepSize) * stepSize / 255.0;
+        b   = (static_cast<int>(b * 255.0) / stepSize) * stepSize / 255.0;
+
+        this->ColorTransferFunction->AddRGBPoint(val, r, g, b);
+      }
+    }
   }
 
   // Set range
