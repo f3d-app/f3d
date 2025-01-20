@@ -11,7 +11,7 @@ jobs:
 #----------------------------------------------------------------------------
   check_nightly:
     if: github.repository == 'f3d-app/f3d'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     name: Check nightly
     outputs:
       should_run: ${{ steps.should_run.outputs.should_run }}
@@ -42,7 +42,7 @@ jobs:
   cache_lfs:
     needs: check_nightly
     if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     name: Update LFS data cache
     outputs:
       lfs_sha: ${{ steps.lfs_sha_recover.outputs.lfs_sha }}
@@ -103,7 +103,7 @@ jobs:
             rendering_backend: egl
           - build_type: osmesa
             rendering_backend: osmesa
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
@@ -193,7 +193,7 @@ jobs:
       matrix:
         sanitizer_type: [address, thread, undefined]
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
@@ -230,7 +230,7 @@ jobs:
       matrix:
         arch: [armeabi-v7a, arm64-v8a, x86, x86_64]
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
 
     steps:
@@ -258,7 +258,7 @@ jobs:
     strategy:
       fail-fast: false
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
 
