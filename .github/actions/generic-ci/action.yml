@@ -57,24 +57,11 @@ runs:
         lfs_sha: ${{inputs.lfs_sha}}
         cache_postfix: cache-0
 
-    - name: Dependencies Dir
-      shell: bash
-      working-directory: ${{github.workspace}}
-      run: |
-        mkdir dependencies
-        cd dependencies
-        mkdir install
-
-    - name: Install VTK dependencies
-      uses: ./source/.github/actions/vtk-dependencies
+    - name: Install all F3D dependencies
+      uses: ./source/.github/actions/generic-dependencies
       with:
         cpu: ${{inputs.cpu}}
-
-    - name: Install Raytracing Dependencies
-      if: inputs.raytracing_label == 'raytracing'
-      uses: ./source/.github/actions/ospray-sb-install-dep
-      with:
-        cpu: ${{inputs.cpu}}
+        raytracing_label: ${{inputs.raytracing_label}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
@@ -82,12 +69,6 @@ runs:
         vtk_version: ${{inputs.vtk_version}}
         vtk_sha_file: ./source/.github/actions/vtk_commit_sha
         raytracing_label: ${{inputs.raytracing_label}}
-        cpu: ${{inputs.cpu}}
-
-    - name: Install F3D dependencies
-      if: inputs.optional_deps_label == 'optional-deps'
-      uses: ./source/.github/actions/f3d-dependencies
-      with:
         cpu: ${{inputs.cpu}}
 
     # Python is part of VFX reference platform (CY2025: 3.11)

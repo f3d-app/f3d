@@ -25,28 +25,16 @@ runs:
         lfs_sha: ${{inputs.lfs_sha}}
         cache_postfix: cache-0 
 
-    - name: Dependencies Dir
-      shell: bash
-      working-directory: ${{github.workspace}}
-      run: |
-        mkdir dependencies
-        cd dependencies
-        mkdir install
-
-    - name: Install VTK dependencies
-      uses: ./source/.github/actions/vtk-dependencies
-
-    - name: Install Raytracing Dependencies
-      uses: ./source/.github/actions/ospray-sb-install-dep
+    - name: Install all F3D dependencies
+      uses: ./source/.github/actions/generic-dependencies
+      with:
+        raytracing_label: raytracing
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
       with:
         vtk_sha_file: ./source/.github/actions/vtk_commit_sha
         raytracing_label: raytracing
-
-    - name: Install F3D dependencies
-      uses: ./source/.github/actions/f3d-dependencies
 
     # coverage build is done in source as it seems to be required for codecov
     # CMAKE_MODULE_PATH is required because of
