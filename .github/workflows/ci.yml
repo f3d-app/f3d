@@ -52,6 +52,7 @@ jobs:
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
+    steps:
 
     - name: Checkout
       uses: actions/checkout@v4
