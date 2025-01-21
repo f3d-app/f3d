@@ -37,10 +37,10 @@ jobs:
         cache_postfix: cache-0
 
 #----------------------------------------------------------------------------
-# Cache Dependencies: Checkout and compile all dependencies but VTK if not cached
+# Cache dependencies: Checkout dependencies data and update the cache to limit dependencies bandwidth
 #----------------------------------------------------------------------------
   cache_dependencies:
-    name: Cache dependencies
+    name: Update dependencies data cache
     strategy:
       fail-fast: false
       matrix:
@@ -52,18 +52,20 @@ jobs:
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
+    steps:
 
     - name: Checkout
       uses: actions/checkout@v4
       with:
         path: 'source'
         fetch-depth: 1
-        lfs: false
+        dependencies: false
 
-    - name: Generic Dependencies
-      uses: ./source/.github/actions/generic-dependencies
+    - name: Cache dependencies Data
+      id: dependencies_sha_recover
+      uses: f3d-app/lfs-data-cache-action@v1
       with:
-        raytracing_label: raytracing
+        cache_postfix: cache-0
 
 #----------------------------------------------------------------------------
 # Windows CI: Build and test, cross-vtk build matrix
