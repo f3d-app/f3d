@@ -32,7 +32,7 @@ int TestSDKEngineExceptions(int argc, char* argv[])
     test("engine assignment operator", eng.getWindow().isOffscreen() == false);
   }
 
-#ifdef __linux__
+#if defined(__linux__) || defined(__FreeBSD__)
   // Test incorrect engine configuration
   test.expect<f3d::context::loading_exception>(
     "create WGL engine on linux", [&]() { std::ignore = f3d::engine::createWGL(); });
@@ -59,7 +59,7 @@ int TestSDKEngineExceptions(int argc, char* argv[])
   test.expect<f3d::engine::plugin_exception>("load plugin with invalid long name",
     [&]() { f3d::engine::loadPlugin("/" + std::string(257, 'x') + "/file.ext"); });
 
-#ifdef __linux__
+#if defined(__linux__) || defined(__FreeBSD__)
   // Test error handling without "HOME" set
   unsetenv("HOME");
   test.expect<f3d::engine::cache_exception>(

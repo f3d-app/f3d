@@ -66,7 +66,7 @@ public:
     // Override VTK logic
 #ifdef _WIN32
     return vtkSmartPointer<vtkF3DWGLRenderWindow>::New();
-#elif __linux__
+#elif defined(__linux__) || defined(__FreeBSD__)
 #if defined(VTK_USE_X)
     // try GLX
     vtkSmartPointer<vtkRenderWindow> glxRenWin = vtkSmartPointer<vtkF3DGLXRenderWindow>::New();
