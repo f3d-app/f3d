@@ -45,8 +45,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-22.04, windows-latest, macos-13, macos-14]
+        cpu: [x86_64]
         include:
-          - cpu: x86_64
           - os: macos-14
             cpu: arm64
 
