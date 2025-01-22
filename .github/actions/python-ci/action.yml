@@ -105,7 +105,7 @@ runs:
 
     - name: Install Mesa Windows
       if: runner.os == 'Windows'
-      uses: f3d-app/install-mesa-windows-action@v1
+      uses: f3d-app/install-mesa-windows-action@v2
       with:
         path: ${{ env.Python_ROOT_DIR }}
 

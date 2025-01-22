@@ -178,13 +178,13 @@ runs:
 
     - name: Install Mesa Windows
       if: runner.os == 'Windows'
-      uses: f3d-app/install-mesa-windows-action@v1
+      uses: f3d-app/install-mesa-windows-action@v2
       with:
         path: ${{github.workspace}}\build\bin_Release
 
     - name: Install Mesa Windows Python
       if: runner.os == 'Windows'
-      uses: f3d-app/install-mesa-windows-action@v1
+      uses: f3d-app/install-mesa-windows-action@v2
       with:
         path: ${{github.workspace}}\build\Release\f3d
 
@@ -270,7 +270,7 @@ runs:
       if: |
         runner.os == 'Windows' &&
         inputs.static_label == 'no-static'
-      uses: f3d-app/install-mesa-windows-action@v1
+      uses: f3d-app/install-mesa-windows-action@v2
       with:
         path: ${{github.workspace}}\build_examples\*\Release
 
@@ -328,7 +328,7 @@ runs:
 
     - name: Install Mesa Windows in install
       if: runner.os == 'Windows'
-      uses: f3d-app/install-mesa-windows-action@v1
+      uses: f3d-app/install-mesa-windows-action@v2
       with:
         path: ${{github.workspace}}\install\bin
 
