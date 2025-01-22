@@ -8,6 +8,9 @@ inputs:
     description: 'Codecov token, needed for non-forked workflows'
     required: false
     default: ''
+  alembic_version:
+    description: 'Version of alembic to build'
+    required: true
 
 runs:
   using: "composite"
@@ -29,6 +32,7 @@ runs:
       uses: ./source/.github/actions/generic-dependencies
       with:
         raytracing_label: raytracing
+        alembic_version: ${{inputs.alembic_version}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep

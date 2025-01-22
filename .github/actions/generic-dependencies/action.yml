@@ -13,10 +13,18 @@ inputs:
     description: 'CPU architecture to build for'
     required: false
     default: 'x86_64'
+  alembic_version:
+    description: 'Version of alembic to build'
+    required: true
 
 runs:
   using: "composite"
   steps:
+
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.alembic_version }}" ]] || { echo "alembic_version input is empty" ; exit 1; }
 
     - name: Dependencies Dir
       shell: bash
@@ -42,3 +50,4 @@ runs:
       uses: ./source/.github/actions/f3d-dependencies
       with:
         cpu: ${{inputs.cpu}}
+        alembic_version: ${{inputs.alembic_version}}

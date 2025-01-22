@@ -11,7 +11,7 @@ else()
   include(f3dPlugin)
 endif()
 
-find_package(Alembic 1.7 REQUIRED)
+find_package(Alembic 1.8.5 REQUIRED)
 
 message(STATUS "Plugin: Alembic ${Alembic_VERSION} found")
 

@@ -4,6 +4,9 @@ inputs:
   lfs_sha:
     description: 'Cache LFS sha'
     required: true
+  alembic_version:
+    description: 'Version of alembic to build'
+    required: true
 
 runs:
   using: "composite"
@@ -24,6 +27,8 @@ runs:
 
     - name: Install all F3D dependencies
       uses: ./source/.github/actions/generic-dependencies
+      with:
+        alembic_version: ${{inputs.alembic_version}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep

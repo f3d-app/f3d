@@ -14,6 +14,25 @@ concurrency:
 jobs:
 
 #----------------------------------------------------------------------------
+# Default versions: Set default version for all dependencies
+#----------------------------------------------------------------------------
+  default_versions:
+    runs-on: ubuntu-22.04
+    name: Set default versions
+    outputs:
+      alembic_version: ${{ steps.set_default_versions.outputs.alembic_version }}
+      alembic_min_version: ${{ steps.set_default_versions.outputs.alembic_min_version }}
+    steps:
+
+    # Alembic is part of VFX reference platform (CY2025: 1.8.x)
+    - name: Set default versions output
+      id: set_default_versions
+      shell: bash
+      run: |
+        echo "alembic_version=1.8.8" >> $GITHUB_OUTPUT
+        echo "alembic_min_version=1.8.5" >> $GITHUB_OUTPUT
+
+#----------------------------------------------------------------------------
 # Cache LFS: Checkout LFS data and update the cache to limit LFS bandwidth
 #----------------------------------------------------------------------------
   cache_lfs:
@@ -41,14 +60,21 @@ jobs:
 #----------------------------------------------------------------------------
   cache_dependencies:
     name: Cache dependencies
+    needs: default_versions
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-22.04, windows-latest, macos-13, macos-14]
+        build_type: [standard]
         include:
           - cpu: x86_64
           - os: macos-14
             cpu: arm64
+          - alembic_version: ${{needs.default_versions.outputs.alembic_version}}
+          - build_type: mindeps
+            os: ubuntu-22.04
+            cpu: x86_64
+            alembic_version: ${{needs.default_versions.outputs.alembic_min_version}}
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
@@ -66,13 +92,14 @@ jobs:
       with:
         raytracing_label: raytracing
         cpu: ${{matrix.cpu}}
+        alembic_version: ${{matrix.alembic_version}}
 
 #----------------------------------------------------------------------------
 # Windows CI: Build and test, cross-vtk build matrix
 #----------------------------------------------------------------------------
   windows:
     if: github.event.pull_request.draft == false
-    needs: [cache_lfs, cache_dependencies]
+    needs: [cache_lfs, cache_dependencies, default_versions]
 
     strategy:
       fail-fast: false
@@ -100,13 +127,14 @@ jobs:
         raytracing_label: raytracing
         static_label: ${{matrix.static_label}}
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+        alembic_version: ${{needs.default_versions.outputs.alembic_version}}
 
 #----------------------------------------------------------------------------
 # Linux CI: Build and test, cross-vtk build matrix
 #----------------------------------------------------------------------------
   linux:
     if: github.event.pull_request.draft == false
-    needs: [cache_lfs, cache_dependencies]
+    needs: [cache_lfs, cache_dependencies, default_versions]
 
     strategy:
       fail-fast: false
@@ -119,6 +147,7 @@ jobs:
           - optional_deps_label: optional-deps
           - rendering_backend: auto
           - static_label: no-static
+          - alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           - build_type: egl
             vtk_version: commit
             raytracing_label: raytracing
@@ -126,6 +155,7 @@ jobs:
             exclude_deprecated_label: no-exclude-deprecated
             rendering_backend: egl
             static_label: no-static
+            alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           - build_type: osmesa
             vtk_version: commit
             raytracing_label: raytracing
@@ -133,6 +163,7 @@ jobs:
             exclude_deprecated_label: no-exclude-deprecated
             rendering_backend: osmesa
             static_label: no-static
+            alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           - build_type: exclude_deprecated
             vtk_version: commit
             raytracing_label: raytracing
@@ -140,6 +171,7 @@ jobs:
             exclude_deprecated_label: exclude-deprecated
             rendering_backend: auto
             static_label: no-static
+            alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           - build_type: no_optional_deps
             vtk_version: commit
             raytracing_label: no-raytracing
@@ -147,6 +179,7 @@ jobs:
             exclude_deprecated_label: no-exclude-deprecated
             rendering_backend: auto
             static_label: no-static
+            alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           - build_type: static_libs
             vtk_version: commit
             raytracing_label: no-raytracing
@@ -154,6 +187,15 @@ jobs:
             exclude_deprecated_label: no-exclude-deprecated
             rendering_backend: auto
             static_label: static
+            alembic_version: ${{needs.default_versions.outputs.alembic_version}}
+          - build_type: mindeps
+            vtk_version: commit
+            raytracing_label: raytracing
+            optional_deps_label: optional-deps
+            exclude_deprecated_label: no-exclude-deprecated
+            rendering_backend: auto
+            static_label: no-static
+            alembic_version: ${{needs.default_versions.outputs.alembic_min_version}}
 
     runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
@@ -180,13 +222,14 @@ jobs:
         exclude_deprecated_label: ${{matrix.exclude_deprecated_label}}
         static_label: ${{matrix.static_label}}
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+        alembic_version: ${{matrix.alembic_version}}
 
 #----------------------------------------------------------------------------
 # MacOS CI: Build and test, cross-vtk build matrix
 #----------------------------------------------------------------------------
   macos:
     if: github.event.pull_request.draft == false
-    needs: [cache_lfs, cache_dependencies]
+    needs: [cache_lfs, cache_dependencies, default_versions]
     strategy:
       fail-fast: false
       matrix:
@@ -209,13 +252,14 @@ jobs:
         raytracing_label: raytracing
         cpu: x86_64
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+        alembic_version: ${{needs.default_versions.outputs.alembic_version}}
 
 #----------------------------------------------------------------------------
 # MacOS ARM CI: Build and test, cross-vtk build matrix with a few optional builds
 #----------------------------------------------------------------------------
   macos_arm:
     if: github.event.pull_request.draft == false
-    needs: [cache_lfs, cache_dependencies]
+    needs: [cache_lfs, cache_dependencies, default_versions]
 
     strategy:
       fail-fast: false
@@ -250,13 +294,14 @@ jobs:
         static_label: ${{matrix.static_label}}
         cpu: arm64
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+        alembic_version: ${{needs.default_versions.outputs.alembic_version}}
 
 #----------------------------------------------------------------------------
 # Python packaging: Build and test the Python wheel
 #----------------------------------------------------------------------------
   python-packaging:
     if: github.event.pull_request.draft == false
-    needs: [cache_lfs, cache_dependencies]
+    needs: [cache_lfs, cache_dependencies, default_versions]
 
     strategy:
       fail-fast: false
@@ -295,12 +340,13 @@ jobs:
       with:
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
         python_version: ${{matrix.python_version}}
+        alembic_version: ${{needs.default_versions.outputs.alembic_version}}
 
 #----------------------------------------------------------------------------
 # Coverage: Build and test on linux with last VTK with coverage option
 #----------------------------------------------------------------------------
   coverage:
-    needs: [cache_lfs, cache_dependencies]
+    needs: [cache_lfs, cache_dependencies, default_versions]
     if: github.event.pull_request.draft == false
 
     runs-on: ubuntu-22.04
@@ -325,6 +371,7 @@ jobs:
       with:
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
         codecov_token: ${{secrets.CODECOV_TOKEN}}
+        alembic_version: ${{needs.default_versions.outputs.alembic_version}}
 
 #----------------------------------------------------------------------------
 # Sanitizer: Build and test on linux with last VTK with sanitizer options
@@ -333,7 +380,7 @@ jobs:
 # "memory" returns false positives in VTK:
 # https://stackoverflow.com/questions/60097307/memory-sanitizer-reports-use-of-uninitialized-value-in-global-object-constructio
   sanitizer:
-    needs: [cache_lfs, cache_dependencies]
+    needs: [cache_lfs, cache_dependencies, default_versions]
     if: github.event.pull_request.draft == false
 
     strategy:
@@ -364,12 +411,13 @@ jobs:
       with:
         sanitizer_type: ${{matrix.sanitizer_type}}
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+        alembic_version: ${{needs.default_versions.outputs.alembic_version}}
 
 #----------------------------------------------------------------------------
 # static-analysis: Run static analysis on linux
 #----------------------------------------------------------------------------
   static-analysis:
-    needs: [cache_lfs, cache_dependencies]
+    needs: [cache_lfs, cache_dependencies, default_versions]
     if: github.event.pull_request.draft == false
 
     strategy:
@@ -395,6 +443,7 @@ jobs:
       uses: ./source/.github/actions/static-analysis-ci
       with:
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+        alembic_version: ${{needs.default_versions.outputs.alembic_version}}
 
 #----------------------------------------------------------------------------
 # external-build: Check build of F3D as sub-project
