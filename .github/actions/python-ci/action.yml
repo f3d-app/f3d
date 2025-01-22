@@ -24,24 +24,13 @@ runs:
         lfs_sha: ${{inputs.lfs_sha}}
         cache_postfix: cache-0 
 
-    - name: Dependencies Dir
-      shell: bash
-      working-directory: ${{github.workspace}}
-      run: |
-        mkdir dependencies
-        cd dependencies
-        mkdir install
-
-    - name: Install VTK dependencies
-      uses: ./source/.github/actions/vtk-dependencies
+    - name: Install all F3D dependencies
+      uses: ./source/.github/actions/generic-dependencies
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
       with:
         vtk_sha_file: ./source/.github/actions/vtk_commit_sha
-
-    - name: Install F3D dependencies
-      uses: ./source/.github/actions/f3d-dependencies
 
     - name: Set up Python
       uses: actions/setup-python@v5

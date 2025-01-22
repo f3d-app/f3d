@@ -1,0 +1,44 @@
+name: 'Install F3D dependencies'
+description: 'Install all F3D Dependencies but VTK'
+inputs:
+  raytracing_label:
+    description: 'Label to control raytracing'
+    required: false
+    default: 'no-raytracing'
+  optional_deps_label:
+    description: 'Label to optional dependencies'
+    required: false
+    default: 'optional-deps'
+  cpu:
+    description: 'CPU architecture to build for'
+    required: false
+    default: 'x86_64'
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Dependencies Dir
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: |
+        mkdir dependencies
+        cd dependencies
+        mkdir install
+
+    - name: Install VTK dependencies
+      uses: ./source/.github/actions/vtk-dependencies
+      with:
+        cpu: ${{inputs.cpu}}
+
+    - name: Install Raytracing Dependencies
+      if: inputs.raytracing_label == 'raytracing'
+      uses: ./source/.github/actions/ospray-sb-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+
+    - name: Install F3D dependencies
+      if: inputs.optional_deps_label == 'optional-deps'
+      uses: ./source/.github/actions/f3d-dependencies
+      with:
+        cpu: ${{inputs.cpu}}
