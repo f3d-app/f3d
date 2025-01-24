@@ -26,17 +26,14 @@ fs::path Find(const std::string& str)
       }
     }
 
-    std::vector<fs::path> dirsToCheck
-    {
-      F3DSystemTools::GetUserConfigFileDirectory() / "colormaps",
+    std::vector<fs::path> dirsToCheck{ F3DSystemTools::GetUserConfigFileDirectory() / "colormaps",
 #ifdef __APPLE__
-        "/usr/local/etc/f3d/colormaps",
+      "/usr/local/etc/f3d/colormaps",
 #endif
 #if defined(__linux__) || defined(__FreeBSD__)
-        "/etc/f3d/colormaps", "/usr/share/f3d/colormaps",
+      "/etc/f3d/colormaps", "/usr/share/f3d/colormaps",
 #endif
-        F3DSystemTools::GetBinaryResourceDirectory() / "colormaps"
-    };
+      F3DSystemTools::GetBinaryResourceDirectory() / "colormaps" };
 
     for (const fs::path& dir : dirsToCheck)
     {
