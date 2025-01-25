@@ -8,6 +8,9 @@ inputs:
   alembic_version:
     description: 'Version of alembic to build'
     required: true
+  assimp_version:
+    description: 'Version of assimp to build'
+    required: true
 
 runs:
   using: "composite"
@@ -28,6 +31,7 @@ runs:
       uses: ./source/.github/actions/assimp-install-dep
       with:
         cpu: ${{inputs.cpu}}
+        version: ${{inputs.assimp_version}}
 
     - name: Install Draco dependency
       uses: ./source/.github/actions/draco-install-dep

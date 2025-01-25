@@ -10,6 +10,9 @@ inputs:
   alembic_version:
     description: 'Version of alembic to build'
     required: true
+  assimp_version:
+    description: 'Version of assimp to build'
+    required: true
 
 runs:
   using: "composite"
@@ -31,6 +34,7 @@ runs:
       uses: ./source/.github/actions/generic-dependencies
       with:
         alembic_version: ${{inputs.alembic_version}}
+        assimp_version: ${{inputs.assimp_version}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
