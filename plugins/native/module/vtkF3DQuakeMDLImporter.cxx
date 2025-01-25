@@ -198,8 +198,6 @@ public:
       float coord_s;
       float coord_t;
     };
-    std::vector<plugin_texture_coords> coords =
-      std::vector<plugin_texture_coords>(header->numTriangles * 3);
     for (int i = 0; i < header->numTriangles; i++)
     {
       for (int j = 0; j < 3; j++)
@@ -213,8 +211,6 @@ public:
         // Scale s and t to range from 0.0 to 1.0
         coord_s = (coord_s + 0.5) / header->skinWidth;
         coord_t = (coord_t + 0.5) / header->skinHeight;
-        coords[3 * i + j].coord_s = coord_s;
-        coords[3 * i + j].coord_t = coord_t;
         float coords_st[2] = { coord_s, coord_t };
         textureCoordinates->InsertNextTuple(coords_st);
       }
