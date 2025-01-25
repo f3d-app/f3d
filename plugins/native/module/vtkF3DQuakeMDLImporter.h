@@ -51,7 +51,7 @@ public:
    */
   bool GetTemporalInformation(vtkIdType animationIndex, double frameRate, int& nbTimeSteps,
     double timeRange[2], vtkDoubleArray* timeSteps) override;
-  
+
 protected:
   vtkF3DQuakeMDLImporter();
   ~vtkF3DQuakeMDLImporter() override = default;
