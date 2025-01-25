@@ -17,6 +17,9 @@ inputs:
   occt_version:
     description: 'Version of occt to build'
     required: true
+  openexr_version:
+    description: 'Version of openexr to build'
+    required: true
 
 runs:
   using: "composite"
@@ -55,6 +58,7 @@ runs:
       uses: ./source/.github/actions/openexr-install-dep
       with:
         cpu: ${{inputs.cpu}}
+        version: ${{inputs.openexr_version}}
 
     - name: Install Alembic dependency
       uses: ./source/.github/actions/alembic-install-dep

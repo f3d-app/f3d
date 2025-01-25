@@ -52,6 +52,9 @@ inputs:
   occt_version:
     description: 'Version of occt to build'
     required: true
+  openexr_version:
+    description: 'Version of openexr to build'
+    required: true
 
 runs:
   using: "composite"
@@ -78,6 +81,7 @@ runs:
         assimp_version: ${{inputs.assimp_version}}
         draco_version: ${{inputs.draco_version}}
         occt_version: ${{inputs.occt_version}}
+        openexr_version: ${{inputs.openexr_version}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep

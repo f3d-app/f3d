@@ -25,6 +25,9 @@ inputs:
   occt_version:
     description: 'Version of occt to build'
     required: true
+  openexr_version:
+    description: 'Version of openexr to build'
+    required: true
 
 runs:
   using: "composite"
@@ -37,6 +40,7 @@ runs:
         [[ "${{ inputs.assimp_version }}" ]] || { echo "assimp_version input is empty" ; exit 1; }
         [[ "${{ inputs.draco_version }}" ]] || { echo "draco_version input is empty" ; exit 1; }
         [[ "${{ inputs.occt_version }}" ]] || { echo "occt_version input is empty" ; exit 1; }
+        [[ "${{ inputs.openexr_version }}" ]] || { echo "openexr_version input is empty" ; exit 1; }
 
     - name: Dependencies Dir
       shell: bash
@@ -66,3 +70,4 @@ runs:
         assimp_version: ${{inputs.assimp_version}}
         draco_version: ${{inputs.draco_version}}
         occt_version: ${{inputs.occt_version}}
+        openexr_version: ${{inputs.openexr_version}}
