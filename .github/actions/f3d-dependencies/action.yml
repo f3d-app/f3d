@@ -11,6 +11,9 @@ inputs:
   assimp_version:
     description: 'Version of assimp to build'
     required: true
+  draco_version:
+    description: 'Version of draco to build'
+    required: true
 
 runs:
   using: "composite"
@@ -37,6 +40,7 @@ runs:
       uses: ./source/.github/actions/draco-install-dep
       with:
         cpu: ${{inputs.cpu}}
+        version: ${{inputs.draco_version}}
 
     - name: Install Imath dependency
       uses: ./source/.github/actions/imath-install-dep

@@ -17,6 +17,9 @@ inputs:
   assimp_version:
     description: 'Version of assimp to build'
     required: true
+  draco_version:
+    description: 'Version of draco to build'
+    required: true
 
 runs:
   using: "composite"
@@ -40,6 +43,7 @@ runs:
       with:
         alembic_version: ${{inputs.alembic_version}}
         assimp_version: ${{inputs.assimp_version}}
+        draco_version: ${{inputs.draco_version}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
