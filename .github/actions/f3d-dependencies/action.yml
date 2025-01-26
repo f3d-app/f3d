@@ -20,6 +20,9 @@ inputs:
   openexr_version:
     description: 'Version of openexr to build'
     required: true
+  pybind11_version:
+    description: 'Version of pybind11 to build'
+    required: true
 
 runs:
   using: "composite"
@@ -68,6 +71,8 @@ runs:
 
     - name: Install pybind11 dependency
       uses: ./source/.github/actions/pybind11-install-dep
+      with:
+        version: ${{inputs.pybind11_version}}
 
     - name: Install USD dependency
       uses: ./source/.github/actions/usd-install-dep

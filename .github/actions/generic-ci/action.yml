@@ -58,6 +58,9 @@ inputs:
   openvdb_version:
     description: 'Version of openvdb to build'
     required: true
+  pybind11_version:
+    description: 'Version of pybind11 to build'
+    required: true
 
 runs:
   using: "composite"
@@ -86,6 +89,7 @@ runs:
         occt_version: ${{inputs.occt_version}}
         openexr_version: ${{inputs.openexr_version}}
         openvdb_version: ${{inputs.openvdb_version}}
+        pybind11_version: ${{inputs.pybind11_version}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep

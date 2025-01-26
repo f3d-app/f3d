@@ -31,6 +31,9 @@ inputs:
   openvdb_version:
     description: 'Version of openvdb to build'
     required: true
+  pybind11_version:
+    description: 'Version of pybind11 to build'
+    required: true
 
 runs:
   using: "composite"
@@ -45,6 +48,7 @@ runs:
         [[ "${{ inputs.occt_version }}" ]] || { echo "occt_version input is empty" ; exit 1; }
         [[ "${{ inputs.openexr_version }}" ]] || { echo "openexr_version input is empty" ; exit 1; }
         [[ "${{ inputs.openvdb_version }}" ]] || { echo "openvdb_version input is empty" ; exit 1; }
+        [[ "${{ inputs.pybind11_version }}" ]] || { echo "pybind11_version input is empty" ; exit 1; }
 
     - name: Dependencies Dir
       shell: bash
@@ -76,3 +80,4 @@ runs:
         draco_version: ${{inputs.draco_version}}
         occt_version: ${{inputs.occt_version}}
         openexr_version: ${{inputs.openexr_version}}
+        pybind11_version: ${{inputs.pybind11_version}}
