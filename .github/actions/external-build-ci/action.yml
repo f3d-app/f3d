@@ -1,5 +1,9 @@
 name: 'External build CI'
 description: 'External build CI'
+inputs:
+  openvdb_version:
+    description: 'Version of openvdb to build'
+    required: true
 
 runs:
   using: "composite"
@@ -22,6 +26,7 @@ runs:
       uses: ./source/f3d/.github/actions/vtk-dependencies
       with:
         source_dir: ./source/f3d
+        openvdb_version: ${{inputs.openvdb_version}}
  
     - name: Install VTK dependency
       uses: ./source/f3d/.github/actions/vtk-install-dep

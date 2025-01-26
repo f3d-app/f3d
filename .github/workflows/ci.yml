@@ -30,10 +30,14 @@ jobs:
       occt_min_version: ${{ steps.set_default_versions.outputs.occt_min_version }}
       openexr_version: ${{ steps.set_default_versions.outputs.openexr_version }}
       openexr_min_version: ${{ steps.set_default_versions.outputs.openexr_min_version }}
+      openvdb_version: ${{ steps.set_default_versions.outputs.openvdb_version }}
+      openvdb_min_version: ${{ steps.set_default_versions.outputs.openvdb_min_version }}
     steps:
 
     # Alembic is part of VFX reference platform (CY2025: 1.8.x)
     # OpenEXR is part of VFX reference platform (CY2025: 3.3.x)
+    # OpenVDB is part of VFX reference platform (CY2025: 12.x)
+    # OpenVDB min version is not enforced by F3D code and missing from VTK code
     - name: Set default versions output
       id: set_default_versions
       shell: bash
@@ -48,6 +52,8 @@ jobs:
         echo "occt_min_version=V7_6_3" >> $GITHUB_OUTPUT
         echo "openexr_version=v3.3.2" >> $GITHUB_OUTPUT
         echo "openexr_min_version=v3.0.1" >> $GITHUB_OUTPUT
+        echo "openvdb_version=v12.0.0" >> $GITHUB_OUTPUT
+        echo "openvdb_min_version=v12.0.0" >> $GITHUB_OUTPUT
 
 #----------------------------------------------------------------------------
 # Cache LFS: Checkout LFS data and update the cache to limit LFS bandwidth
@@ -92,6 +98,7 @@ jobs:
           - draco_version: ${{needs.default_versions.outputs.draco_version}}
           - occt_version: ${{needs.default_versions.outputs.occt_version}}
           - openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+          - openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
           - build_type: mindeps
             os: ubuntu-22.04
             cpu: x86_64
@@ -100,6 +107,7 @@ jobs:
             draco_version: ${{needs.default_versions.outputs.draco_min_version}}
             occt_version: ${{needs.default_versions.outputs.occt_min_version}}
             openexr_version: ${{needs.default_versions.outputs.openexr_min_version}}
+            openvdb_version: ${{needs.default_versions.outputs.openvdb_min_version}}
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
@@ -122,6 +130,7 @@ jobs:
         draco_version: ${{matrix.draco_version}}
         occt_version: ${{matrix.occt_version}}
         openexr_version: ${{matrix.openexr_version}}
+        openvdb_version: ${{matrix.openvdb_version}}
 
 #----------------------------------------------------------------------------
 # Windows CI: Build and test, cross-vtk build matrix
@@ -161,6 +170,7 @@ jobs:
         draco_version: ${{needs.default_versions.outputs.draco_version}}
         occt_version: ${{needs.default_versions.outputs.occt_version}}
         openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
 
 #----------------------------------------------------------------------------
 # Linux CI: Build and test, cross-vtk build matrix
@@ -185,6 +195,7 @@ jobs:
           - draco_version: ${{needs.default_versions.outputs.draco_version}}
           - occt_version: ${{needs.default_versions.outputs.occt_version}}
           - openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+          - openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
           - build_type: egl
             vtk_version: commit
             raytracing_label: raytracing
@@ -197,6 +208,7 @@ jobs:
             draco_version: ${{needs.default_versions.outputs.draco_version}}
             occt_version: ${{needs.default_versions.outputs.occt_version}}
             openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+            openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
           - build_type: osmesa
             vtk_version: commit
             raytracing_label: raytracing
@@ -209,6 +221,7 @@ jobs:
             draco_version: ${{needs.default_versions.outputs.draco_version}}
             occt_version: ${{needs.default_versions.outputs.occt_version}}
             openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+            openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
           - build_type: exclude_deprecated
             vtk_version: commit
             raytracing_label: raytracing
@@ -221,6 +234,7 @@ jobs:
             draco_version: ${{needs.default_versions.outputs.draco_version}}
             occt_version: ${{needs.default_versions.outputs.occt_version}}
             openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+            openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
           - build_type: no_optional_deps
             vtk_version: commit
             raytracing_label: no-raytracing
@@ -233,6 +247,7 @@ jobs:
             draco_version: ${{needs.default_versions.outputs.draco_version}}
             occt_version: ${{needs.default_versions.outputs.occt_version}}
             openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+            openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
           - build_type: static_libs
             vtk_version: commit
             raytracing_label: no-raytracing
@@ -245,6 +260,7 @@ jobs:
             draco_version: ${{needs.default_versions.outputs.draco_version}}
             occt_version: ${{needs.default_versions.outputs.occt_version}}
             openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+            openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
           - build_type: mindeps
             vtk_version: commit
             raytracing_label: raytracing
@@ -257,6 +273,7 @@ jobs:
             draco_version: ${{needs.default_versions.outputs.draco_min_version}}
             occt_version: ${{needs.default_versions.outputs.occt_min_version}}
             openexr_version: ${{needs.default_versions.outputs.openexr_min_version}}
+            openvdb_version: ${{needs.default_versions.outputs.openvdb_min_version}}
 
     runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
@@ -288,6 +305,7 @@ jobs:
         draco_version: ${{matrix.draco_version}}
         occt_version: ${{matrix.occt_version}}
         openexr_version: ${{matrix.openexr_version}}
+        openvdb_version: ${{matrix.openvdb_version}}
 
 #----------------------------------------------------------------------------
 # MacOS CI: Build and test, cross-vtk build matrix
@@ -322,6 +340,7 @@ jobs:
         draco_version: ${{needs.default_versions.outputs.draco_version}}
         occt_version: ${{needs.default_versions.outputs.occt_version}}
         openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
 
 #----------------------------------------------------------------------------
 # MacOS ARM CI: Build and test, cross-vtk build matrix with a few optional builds
@@ -368,6 +387,7 @@ jobs:
         draco_version: ${{needs.default_versions.outputs.draco_version}}
         occt_version: ${{needs.default_versions.outputs.occt_version}}
         openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
 
 #----------------------------------------------------------------------------
 # Python packaging: Build and test the Python wheel
@@ -418,6 +438,7 @@ jobs:
         draco_version: ${{needs.default_versions.outputs.draco_version}}
         occt_version: ${{needs.default_versions.outputs.occt_version}}
         openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
 
 #----------------------------------------------------------------------------
 # Coverage: Build and test on linux with last VTK with coverage option
@@ -453,6 +474,7 @@ jobs:
         draco_version: ${{needs.default_versions.outputs.draco_version}}
         occt_version: ${{needs.default_versions.outputs.occt_version}}
         openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
 
 #----------------------------------------------------------------------------
 # Sanitizer: Build and test on linux with last VTK with sanitizer options
@@ -497,6 +519,7 @@ jobs:
         draco_version: ${{needs.default_versions.outputs.draco_version}}
         occt_version: ${{needs.default_versions.outputs.occt_version}}
         openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
 
 #----------------------------------------------------------------------------
 # static-analysis: Run static analysis on linux
@@ -533,11 +556,13 @@ jobs:
         draco_version: ${{needs.default_versions.outputs.draco_version}}
         occt_version: ${{needs.default_versions.outputs.occt_version}}
         openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
 
 #----------------------------------------------------------------------------
 # external-build: Check build of F3D as sub-project
 #----------------------------------------------------------------------------
   external-build:
+    needs: [cache_dependencies, default_versions]
     if: github.event.pull_request.draft == false
 
     strategy:
@@ -557,6 +582,8 @@ jobs:
 
     - name: External build CI
       uses: ./source/f3d/.github/actions/external-build-ci
+      with:
+        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
 
 #----------------------------------------------------------------------------
 # android: Check build of F3D for android

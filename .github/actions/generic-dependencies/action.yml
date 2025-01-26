@@ -28,6 +28,9 @@ inputs:
   openexr_version:
     description: 'Version of openexr to build'
     required: true
+  openvdb_version:
+    description: 'Version of openvdb to build'
+    required: true
 
 runs:
   using: "composite"
@@ -41,6 +44,7 @@ runs:
         [[ "${{ inputs.draco_version }}" ]] || { echo "draco_version input is empty" ; exit 1; }
         [[ "${{ inputs.occt_version }}" ]] || { echo "occt_version input is empty" ; exit 1; }
         [[ "${{ inputs.openexr_version }}" ]] || { echo "openexr_version input is empty" ; exit 1; }
+        [[ "${{ inputs.openvdb_version }}" ]] || { echo "openvdb_version input is empty" ; exit 1; }
 
     - name: Dependencies Dir
       shell: bash
@@ -54,6 +58,7 @@ runs:
       uses: ./source/.github/actions/vtk-dependencies
       with:
         cpu: ${{inputs.cpu}}
+        openvdb_version: ${{inputs.openvdb_version}}
 
     - name: Install Raytracing Dependencies
       if: inputs.raytracing_label == 'raytracing'
