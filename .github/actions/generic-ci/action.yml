@@ -61,6 +61,9 @@ inputs:
   pybind11_version:
     description: 'Version of pybind11 to build'
     required: true
+  python_version:
+    description: 'Version of python to install'
+    required: true
 
 runs:
   using: "composite"
@@ -70,6 +73,7 @@ runs:
       shell: bash
       run: |
         [[ "${{ inputs.lfs_sha }}" ]] || { echo "lfs_sha input is empty" ; exit 1; }
+        [[ "${{ inputs.python_version }}" ]] || { echo "python_version input is empty" ; exit 1; }
 
     - name: Recover LFS Data
       uses: f3d-app/lfs-data-cache-action@v1
@@ -99,12 +103,11 @@ runs:
         raytracing_label: ${{inputs.raytracing_label}}
         cpu: ${{inputs.cpu}}
 
-    # Python is part of VFX reference platform (CY2025: 3.11)
     - name: Set up Python
       if: inputs.optional_deps_label == 'optional-deps'
       uses: actions/setup-python@v5
       with:
-        python-version: '3.11'
+        python-version: ${{inputs.python_version}}
 
     - name: Install Python dependencies
       if: inputs.optional_deps_label == 'optional-deps'
