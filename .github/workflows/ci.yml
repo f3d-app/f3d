@@ -38,6 +38,8 @@ jobs:
       python_min_version: ${{ steps.set_default_versions.outputs.python_min_version }}
       usd_version: ${{ steps.set_default_versions.outputs.usd_version }}
       usd_min_version: ${{ steps.set_default_versions.outputs.usd_min_version }}
+      java_version: ${{ steps.set_default_versions.outputs.java_version }}
+      java_min_version: ${{ steps.set_default_versions.outputs.java_min_version }}
     steps:
 
     # Alembic is part of VFX reference platform (CY2025: 1.8.x)
@@ -67,6 +69,8 @@ jobs:
         echo "python_min_version=3.9" >> $GITHUB_OUTPUT
         echo "usd_version=v24.11" >> $GITHUB_OUTPUT
         echo "usd_min_version=v24.08" >> $GITHUB_OUTPUT
+        echo "java_version=21" >> $GITHUB_OUTPUT
+        echo "java_min_version=17" >> $GITHUB_OUTPUT
 
 #----------------------------------------------------------------------------
 # Cache LFS: Checkout LFS data and update the cache to limit LFS bandwidth
@@ -193,6 +197,7 @@ jobs:
         pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
         python_version: ${{needs.default_versions.outputs.python_version}}
         usd_version: ${{needs.default_versions.outputs.usd_version}}
+        java_version: ${{needs.default_versions.outputs.java_version}}
 
 #----------------------------------------------------------------------------
 # Linux CI: Build and test, cross-vtk build matrix
@@ -219,8 +224,9 @@ jobs:
           - openexr_version: ${{needs.default_versions.outputs.openexr_version}}
           - openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
           - pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-          - usd_version: ${{needs.default_versions.outputs.usd_version}}
           - python_version: ${{needs.default_versions.outputs.python_version}}
+          - usd_version: ${{needs.default_versions.outputs.usd_version}}
+          - java_version: ${{needs.default_versions.outputs.java_version}}
           - build_type: egl
             vtk_version: commit
             raytracing_label: raytracing
@@ -237,6 +243,7 @@ jobs:
             pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
             python_version: ${{needs.default_versions.outputs.python_version}}
             usd_version: ${{needs.default_versions.outputs.usd_version}}
+            java_version: ${{needs.default_versions.outputs.java_version}}
           - build_type: osmesa
             vtk_version: commit
             raytracing_label: raytracing
@@ -253,6 +260,7 @@ jobs:
             pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
             python_version: ${{needs.default_versions.outputs.python_version}}
             usd_version: ${{needs.default_versions.outputs.usd_version}}
+            java_version: ${{needs.default_versions.outputs.java_version}}
           - build_type: exclude_deprecated
             vtk_version: commit
             raytracing_label: raytracing
@@ -269,6 +277,7 @@ jobs:
             pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
             python_version: ${{needs.default_versions.outputs.python_version}}
             usd_version: ${{needs.default_versions.outputs.usd_version}}
+            java_version: ${{needs.default_versions.outputs.java_version}}
           - build_type: no_optional_deps
             vtk_version: commit
             raytracing_label: no-raytracing
@@ -285,6 +294,7 @@ jobs:
             pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
             python_version: ${{needs.default_versions.outputs.python_version}}
             usd_version: ${{needs.default_versions.outputs.usd_version}}
+            java_version: ${{needs.default_versions.outputs.java_version}}
           - build_type: static_libs
             vtk_version: commit
             raytracing_label: no-raytracing
@@ -301,6 +311,7 @@ jobs:
             pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
             python_version: ${{needs.default_versions.outputs.python_version}}
             usd_version: ${{needs.default_versions.outputs.usd_version}}
+            java_version: ${{needs.default_versions.outputs.java_version}}
           - build_type: mindeps
             vtk_version: commit
             raytracing_label: raytracing
@@ -317,6 +328,7 @@ jobs:
             pybind11_version: ${{needs.default_versions.outputs.pybind11_min_version}}
             python_version: ${{needs.default_versions.outputs.python_min_version}}
             usd_version: ${{needs.default_versions.outputs.usd_min_version}}
+            java_version: ${{needs.default_versions.outputs.java_min_version}}
 
     runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
@@ -352,6 +364,7 @@ jobs:
         pybind11_version: ${{matrix.pybind11_version}}
         python_version: ${{matrix.python_version}}
         usd_version: ${{matrix.usd_version}}
+        java_version: ${{matrix.java_version}}
 
 #----------------------------------------------------------------------------
 # MacOS CI: Build and test, cross-vtk build matrix
@@ -390,6 +403,7 @@ jobs:
         pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
         python_version: ${{needs.default_versions.outputs.python_version}}
         usd_version: ${{needs.default_versions.outputs.usd_version}}
+        java_version: ${{needs.default_versions.outputs.java_version}}
 
 #----------------------------------------------------------------------------
 # MacOS ARM CI: Build and test, cross-vtk build matrix with a few optional builds
@@ -440,6 +454,7 @@ jobs:
         pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
         python_version: ${{needs.default_versions.outputs.python_version}}
         usd_version: ${{needs.default_versions.outputs.usd_version}}
+        java_version: ${{needs.default_versions.outputs.java_version}}
 
 #----------------------------------------------------------------------------
 # Python packaging: Build and test the Python wheel

@@ -31,12 +31,6 @@ runs:
   using: "composite"
   steps:
 
-    - name: Setup JDK
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: '17'
-
     - name: Install OCCT dependency
       uses: ./source/.github/actions/occt-install-dep
       with:
