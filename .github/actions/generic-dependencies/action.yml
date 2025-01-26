@@ -34,6 +34,9 @@ inputs:
   pybind11_version:
     description: 'Version of pybind11 to build'
     required: true
+  usd_version:
+    description: 'Version of usd to build'
+    required: true
 
 runs:
   using: "composite"
@@ -49,6 +52,7 @@ runs:
         [[ "${{ inputs.openexr_version }}" ]] || { echo "openexr_version input is empty" ; exit 1; }
         [[ "${{ inputs.openvdb_version }}" ]] || { echo "openvdb_version input is empty" ; exit 1; }
         [[ "${{ inputs.pybind11_version }}" ]] || { echo "pybind11_version input is empty" ; exit 1; }
+        [[ "${{ inputs.usd_version }}" ]] || { echo "usd_version input is empty" ; exit 1; }
 
     - name: Dependencies Dir
       shell: bash
@@ -81,3 +85,4 @@ runs:
         occt_version: ${{inputs.occt_version}}
         openexr_version: ${{inputs.openexr_version}}
         pybind11_version: ${{inputs.pybind11_version}}
+        usd_version: ${{inputs.usd_version}}

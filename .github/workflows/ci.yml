@@ -36,6 +36,8 @@ jobs:
       pybind11_min_version: ${{ steps.set_default_versions.outputs.pybind11_min_version }}
       python_version: ${{ steps.set_default_versions.outputs.python_version }}
       python_min_version: ${{ steps.set_default_versions.outputs.python_min_version }}
+      usd_version: ${{ steps.set_default_versions.outputs.usd_version }}
+      usd_min_version: ${{ steps.set_default_versions.outputs.usd_min_version }}
     steps:
 
     # Alembic is part of VFX reference platform (CY2025: 1.8.x)
@@ -63,6 +65,8 @@ jobs:
         echo "pybind11_min_version=v2.9.2" >> $GITHUB_OUTPUT
         echo "python_version=3.11" >> $GITHUB_OUTPUT
         echo "python_min_version=3.9" >> $GITHUB_OUTPUT
+        echo "usd_version=v24.11" >> $GITHUB_OUTPUT
+        echo "usd_min_version=v24.08" >> $GITHUB_OUTPUT
 
 #----------------------------------------------------------------------------
 # Cache LFS: Checkout LFS data and update the cache to limit LFS bandwidth
@@ -109,6 +113,7 @@ jobs:
           - openexr_version: ${{needs.default_versions.outputs.openexr_version}}
           - openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
           - pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
+          - usd_version: ${{needs.default_versions.outputs.usd_version}}
           - build_type: mindeps
             os: ubuntu-22.04
             cpu: x86_64
@@ -119,6 +124,7 @@ jobs:
             openexr_version: ${{needs.default_versions.outputs.openexr_min_version}}
             openvdb_version: ${{needs.default_versions.outputs.openvdb_min_version}}
             pybind11_version: ${{needs.default_versions.outputs.pybind11_min_version}}
+            usd_version: ${{needs.default_versions.outputs.usd_min_version}}
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
@@ -143,6 +149,7 @@ jobs:
         openexr_version: ${{matrix.openexr_version}}
         openvdb_version: ${{matrix.openvdb_version}}
         pybind11_version: ${{matrix.pybind11_version}}
+        usd_version: ${{matrix.usd_version}}
 
 #----------------------------------------------------------------------------
 # Windows CI: Build and test, cross-vtk build matrix
@@ -185,6 +192,7 @@ jobs:
         openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
         pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
         python_version: ${{needs.default_versions.outputs.python_version}}
+        usd_version: ${{needs.default_versions.outputs.usd_version}}
 
 #----------------------------------------------------------------------------
 # Linux CI: Build and test, cross-vtk build matrix
@@ -211,6 +219,7 @@ jobs:
           - openexr_version: ${{needs.default_versions.outputs.openexr_version}}
           - openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
           - pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
+          - usd_version: ${{needs.default_versions.outputs.usd_version}}
           - python_version: ${{needs.default_versions.outputs.python_version}}
           - build_type: egl
             vtk_version: commit
@@ -227,6 +236,7 @@ jobs:
             openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
             pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
             python_version: ${{needs.default_versions.outputs.python_version}}
+            usd_version: ${{needs.default_versions.outputs.usd_version}}
           - build_type: osmesa
             vtk_version: commit
             raytracing_label: raytracing
@@ -242,6 +252,7 @@ jobs:
             openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
             pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
             python_version: ${{needs.default_versions.outputs.python_version}}
+            usd_version: ${{needs.default_versions.outputs.usd_version}}
           - build_type: exclude_deprecated
             vtk_version: commit
             raytracing_label: raytracing
@@ -257,6 +268,7 @@ jobs:
             openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
             pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
             python_version: ${{needs.default_versions.outputs.python_version}}
+            usd_version: ${{needs.default_versions.outputs.usd_version}}
           - build_type: no_optional_deps
             vtk_version: commit
             raytracing_label: no-raytracing
@@ -272,6 +284,7 @@ jobs:
             openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
             pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
             python_version: ${{needs.default_versions.outputs.python_version}}
+            usd_version: ${{needs.default_versions.outputs.usd_version}}
           - build_type: static_libs
             vtk_version: commit
             raytracing_label: no-raytracing
@@ -287,6 +300,7 @@ jobs:
             openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
             pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
             python_version: ${{needs.default_versions.outputs.python_version}}
+            usd_version: ${{needs.default_versions.outputs.usd_version}}
           - build_type: mindeps
             vtk_version: commit
             raytracing_label: raytracing
@@ -302,6 +316,7 @@ jobs:
             openvdb_version: ${{needs.default_versions.outputs.openvdb_min_version}}
             pybind11_version: ${{needs.default_versions.outputs.pybind11_min_version}}
             python_version: ${{needs.default_versions.outputs.python_min_version}}
+            usd_version: ${{needs.default_versions.outputs.usd_min_version}}
 
     runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
@@ -336,6 +351,7 @@ jobs:
         openvdb_version: ${{matrix.openvdb_version}}
         pybind11_version: ${{matrix.pybind11_version}}
         python_version: ${{matrix.python_version}}
+        usd_version: ${{matrix.usd_version}}
 
 #----------------------------------------------------------------------------
 # MacOS CI: Build and test, cross-vtk build matrix
@@ -373,6 +389,7 @@ jobs:
         openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
         pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
         python_version: ${{needs.default_versions.outputs.python_version}}
+        usd_version: ${{needs.default_versions.outputs.usd_version}}
 
 #----------------------------------------------------------------------------
 # MacOS ARM CI: Build and test, cross-vtk build matrix with a few optional builds
@@ -422,6 +439,7 @@ jobs:
         openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
         pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
         python_version: ${{needs.default_versions.outputs.python_version}}
+        usd_version: ${{needs.default_versions.outputs.usd_version}}
 
 #----------------------------------------------------------------------------
 # Python packaging: Build and test the Python wheel
@@ -474,6 +492,7 @@ jobs:
         openexr_version: ${{needs.default_versions.outputs.openexr_version}}
         openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
         pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
+        usd_version: ${{needs.default_versions.outputs.usd_version}}
 
 #----------------------------------------------------------------------------
 # Coverage: Build and test on linux with last VTK with coverage option
@@ -511,6 +530,7 @@ jobs:
         openexr_version: ${{needs.default_versions.outputs.openexr_version}}
         openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
         pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
+        usd_version: ${{needs.default_versions.outputs.usd_version}}
 
 #----------------------------------------------------------------------------
 # Sanitizer: Build and test on linux with last VTK with sanitizer options
@@ -557,6 +577,7 @@ jobs:
         openexr_version: ${{needs.default_versions.outputs.openexr_version}}
         openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
         pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
+        usd_version: ${{needs.default_versions.outputs.usd_version}}
 
 #----------------------------------------------------------------------------
 # static-analysis: Run static analysis on linux
@@ -595,6 +616,7 @@ jobs:
         openexr_version: ${{needs.default_versions.outputs.openexr_version}}
         openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
         pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
+        usd_version: ${{needs.default_versions.outputs.usd_version}}
 
 #----------------------------------------------------------------------------
 # external-build: Check build of F3D as sub-project

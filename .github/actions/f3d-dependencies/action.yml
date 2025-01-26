@@ -23,6 +23,9 @@ inputs:
   pybind11_version:
     description: 'Version of pybind11 to build'
     required: true
+  usd_version:
+    description: 'Version of usd to build'
+    required: true
 
 runs:
   using: "composite"
@@ -78,3 +81,4 @@ runs:
       uses: ./source/.github/actions/usd-install-dep
       with:
         cpu: ${{inputs.cpu}}
+        version: ${{inputs.usd_version}}
