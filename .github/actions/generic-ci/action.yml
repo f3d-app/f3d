@@ -110,6 +110,7 @@ runs:
         vtk_sha_file: ./source/.github/actions/vtk_commit_sha
         raytracing_label: ${{inputs.raytracing_label}}
         cpu: ${{inputs.cpu}}
+        openvdb_version: ${{inputs.openvdb_version}}
 
     - name: Set up Python
       if: inputs.optional_deps_label == 'optional-deps'

@@ -67,6 +67,7 @@ runs:
       with:
         vtk_sha_file: ./source/.github/actions/vtk_commit_sha
         raytracing_label: raytracing
+        openvdb_version: ${{inputs.openvdb_version}}
 
     # coverage build is done in source as it seems to be required for codecov
     # CMAKE_MODULE_PATH is required because of

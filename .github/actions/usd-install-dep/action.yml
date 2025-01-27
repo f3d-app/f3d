@@ -8,17 +8,26 @@ inputs:
   version:
     description: 'Version of usd to build'
     required: true
+  openexr_version:
+    description: 'Version of openexr to build against'
+    required: true
 
 runs:
   using: "composite"
   steps:
+
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+        [[ "${{ inputs.openexr_version }}" ]] || { echo "openexr_version input is empty" ; exit 1; }
 
     - name: Cache USD
       id: cache-usd
       uses: actions/cache/restore@v4
       with:
         path: dependencies/usd_install
-        key: usd-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-3
+        key: usd-${{inputs.version}}-${{inputs.openexr_version}}-${{runner.os}}-${{inputs.cpu}}-3
 
     - name: Checkout USD
       if: steps.cache-usd.outputs.cache-hit != 'true'

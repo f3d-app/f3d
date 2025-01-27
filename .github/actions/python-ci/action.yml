@@ -65,6 +65,7 @@ runs:
       uses: ./source/.github/actions/vtk-install-dep
       with:
         vtk_sha_file: ./source/.github/actions/vtk_commit_sha
+        openvdb_version: ${{inputs.openvdb_version}}
 
     - name: Set up Python
       uses: actions/setup-python@v5

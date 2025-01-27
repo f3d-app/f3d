@@ -25,7 +25,7 @@ runs:
         path: dependencies/openexr_install
         key: openexr-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-0
 
-    # Dependents: usd
+    # Dependents (not version): usd
     - name: Checkout OpenEXR
       if: steps.cache-openexr.outputs.cache-hit != 'true'
       uses: actions/checkout@v4

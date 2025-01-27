@@ -76,3 +76,4 @@ runs:
       with:
         cpu: ${{inputs.cpu}}
         version: ${{inputs.usd_version}}
+        openexr_version: ${{inputs.openexr_version}}

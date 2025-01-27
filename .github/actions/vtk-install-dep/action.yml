@@ -17,10 +17,18 @@ inputs:
     description: 'CPU architecture to build for'
     required: false
     default: 'x86_64'
+  openvdb_version:
+    description: 'Version of openvdb to build against'
+    required: true
 
 runs:
   using: "composite"
   steps:
+
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.openvdb_version }}" ]] || { echo "openvdb_version input is empty" ; exit 1; }
 
     - name: Recover VTK Short SHA from file
       if: |
@@ -43,7 +51,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/vtk_install
-        key: vtk-${{env.VTK_SHA_OR_TAG}}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.cpu}}-8
+        key: vtk-${{env.VTK_SHA_OR_TAG}}-openvdb-${{inputs.openvdb_version}}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.cpu}}-8
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
