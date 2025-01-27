@@ -40,7 +40,7 @@ runs:
 
     - name: Cache VTK
       id: cache-vtk
-      uses: actions/cache@v4
+      uses: actions/cache/restore@v4
       with:
         path: dependencies/vtk_install
         key: vtk-${{env.VTK_SHA_OR_TAG}}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.cpu}}-8
@@ -136,3 +136,10 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/vtk_install
       shell: bash
       run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-vtk.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-vtk.outputs.cache-primary-key }}
+        path: dependencies/vtk_install

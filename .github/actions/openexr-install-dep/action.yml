@@ -20,7 +20,7 @@ runs:
 
     - name: Cache OpenEXR
       id: cache-openexr
-      uses: actions/cache@v4
+      uses: actions/cache/restore@v4
       with:
         path: dependencies/openexr_install
         key: openexr-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-0
@@ -67,3 +67,10 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/openexr_install
       shell: bash
       run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-openexr.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-openexr.outputs.cache-primary-key }}
+        path: dependencies/openexr_install

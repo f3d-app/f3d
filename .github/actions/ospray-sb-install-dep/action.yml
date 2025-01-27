@@ -12,7 +12,7 @@ runs:
 
     - name: Cache ospray
       id: cache-ospray
-      uses: actions/cache@v4
+      uses: actions/cache/restore@v4
       with:
         path: dependencies/ospray_install
         key: ospray-sb-v2.7.1-${{runner.os}}-${{inputs.cpu}}-3
@@ -76,3 +76,10 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/ospray_install
       shell: bash
       run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-ospray.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-ospray.outputs.cache-primary-key }}
+        path: dependencies/ospray_install

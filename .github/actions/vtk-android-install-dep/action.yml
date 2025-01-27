@@ -27,24 +27,20 @@ runs:
         [[ "${{ inputs.arch }}" ]] || { echo "arch input is empty" ; exit 1; }
 
     - name: Recover VTK Short SHA from file
-      if: |
-        steps.cache-vtk.outputs.cache-hit != 'true' &&
-        inputs.vtk_version == 'commit'
+      if: inputs.vtk_version == 'commit'
       working-directory: ${{github.workspace}}
       shell: bash
       run: echo "VTK_SHA_OR_TAG=$(<${{ inputs.vtk_sha_file }})" >> $GITHUB_ENV
 
     - name: Copy VTK version to env var
-      if: |
-        steps.cache-vtk.outputs.cache-hit != 'true' &&
-        inputs.vtk_version != 'commit'
+      if: inputs.vtk_version != 'commit'
       working-directory: ${{github.workspace}}
       shell: bash
       run: echo "VTK_SHA_OR_TAG=${{inputs.vtk_version}}" >> $GITHUB_ENV
 
     - name: Cache VTK
       id: cache-vtk
-      uses: actions/cache@v4
+      uses: actions/cache/restore@v4
       with:
         path: dependencies/vtk_build
         key: vtk-android-${{env.VTK_SHA_OR_TAG}}-${{inputs.api_level}}-${{inputs.arch}}-1
@@ -81,3 +77,10 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/vtk_build
       shell: bash
       run: cmake --build . --parallel 2
+
+    - name: Save cache
+      if: steps.cache-vtk.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-vtk.outputs.cache-primary-key }}
+        path: dependencies/vtk_build

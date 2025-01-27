@@ -20,7 +20,7 @@ runs:
 
     - name: Cache OpenVDB
       id: cache-openvdb
-      uses: actions/cache@v4
+      uses: actions/cache/restore@v4
       with:
         path: dependencies/openvdb_install
         key: openvdb-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-0
@@ -84,3 +84,10 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/openvdb_install
       shell: bash
       run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-openvdb.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-openvdb.outputs.cache-primary-key }}
+        path: dependencies/openvdb_install
