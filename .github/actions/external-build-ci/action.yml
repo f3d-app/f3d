@@ -3,7 +3,7 @@ description: 'External build CI'
 inputs:
   openvdb_version:
     description: 'Version of openvdb to build'
-    required: true
+    required: false
 
 runs:
   using: "composite"

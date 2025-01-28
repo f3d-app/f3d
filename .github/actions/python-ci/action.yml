@@ -9,28 +9,28 @@ inputs:
     required: true
   alembic_version:
     description: 'Version of alembic to build'
-    required: true
+    required: false
   assimp_version:
     description: 'Version of assimp to build'
-    required: true
+    required: false
   draco_version:
     description: 'Version of draco to build'
-    required: true
+    required: false
   occt_version:
     description: 'Version of occt to build'
-    required: true
+    required: false
   openexr_version:
     description: 'Version of openexr to build'
-    required: true
+    required: false
   openvdb_version:
     description: 'Version of openvdb to build'
-    required: true
+    required: false
   pybind11_version:
     description: 'Version of pybind11 to build'
-    required: true
+    required: false
   usd_version:
     description: 'Version of usd to build'
-    required: true
+    required: false
 
 runs:
   using: "composite"

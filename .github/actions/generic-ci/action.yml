@@ -42,34 +42,34 @@ inputs:
     required: true
   alembic_version:
     description: 'Version of alembic to build'
-    required: true
+    required: false
   assimp_version:
     description: 'Version of assimp to build'
-    required: true
+    required: false
   draco_version:
     description: 'Version of draco to build'
-    required: true
+    required: false
   occt_version:
     description: 'Version of occt to build'
-    required: true
+    required: false
   openexr_version:
     description: 'Version of openexr to build'
-    required: true
+    required: false
   openvdb_version:
     description: 'Version of openvdb to build'
-    required: true
+    required: false
   pybind11_version:
     description: 'Version of pybind11 to build'
-    required: true
+    required: false
   python_version:
     description: 'Version of python to install'
-    required: true
+    required: false
   usd_version:
     description: 'Version of usd to build'
-    required: true
+    required: false
   java_version:
     description: 'Version of java to install'
-    required: true
+    required: false
 
 runs:
   using: "composite"
@@ -79,8 +79,6 @@ runs:
       shell: bash
       run: |
         [[ "${{ inputs.lfs_sha }}" ]] || { echo "lfs_sha input is empty" ; exit 1; }
-        [[ "${{ inputs.python_version }}" ]] || { echo "python_version input is empty" ; exit 1; }
-        [[ "${{ inputs.java_version }}" ]] || { echo "java_version input is empty" ; exit 1; }
 
     - name: Recover LFS Data
       uses: f3d-app/lfs-data-cache-action@v1
@@ -113,13 +111,17 @@ runs:
         openvdb_version: ${{inputs.openvdb_version}}
 
     - name: Set up Python
-      if: inputs.optional_deps_label == 'optional-deps'
+      if: |
+        inputs.optional_deps_label == 'optional-deps' &&
+        inputs.python_version != ''
       uses: actions/setup-python@v5
       with:
         python-version: ${{inputs.python_version}}
 
     - name: Install Python dependencies
-      if: inputs.optional_deps_label == 'optional-deps'
+      if: |
+        inputs.optional_deps_label == 'optional-deps' &&
+        inputs.python_version != ''
       shell: bash
       run: |
         python -m pip install --upgrade pip
@@ -127,6 +129,9 @@ runs:
         python -m pip install pybind11_stubgen
 
     - name: Setup JDK
+      if: |
+        inputs.optional_deps_label == 'optional-deps' &&
+        inputs.java_version != ''
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
