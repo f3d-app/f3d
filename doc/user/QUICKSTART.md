@@ -58,7 +58,7 @@ For **default scene** formats, certain default values are set automatically:
  - roughness: 0.3
  - camera-orthographic: false
 
-They will be overridden when using corresponding [options](OPTIONS.md).
+They will be overridden when using corresponding [options](OPTIONS.md), either from command line or [configuration file](CONFIGURATION_FILE.md).
 
 ## Interacting with your scene
 

@@ -100,9 +100,12 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     {
       // armature
       vtkInformation* info = prop->GetPropertyKeys();
-      if (this->ArmatureVisible && info && info->Has(vtkF3DImporter::ACTOR_IS_ARMATURE()))
+      if (info && info->Has(vtkF3DImporter::ACTOR_IS_ARMATURE()))
       {
-        this->MainOnTopProps.push_back(prop);
+        if (this->ArmatureVisible)
+        {
+          this->MainOnTopProps.push_back(prop);
+        }
       }
       else
       {
@@ -277,7 +280,8 @@ void vtkF3DRenderPass::Render(const vtkRenderState* s)
     this->BackgroundPass->Render(&backgroundState);
 
     vtkRenderState mainState(s->GetRenderer());
-    mainState.SetPropArrayAndCount(this->MainProps.data(), static_cast<int>(this->MainProps.size()));
+    mainState.SetPropArrayAndCount(
+      this->MainProps.data(), static_cast<int>(this->MainProps.size()));
     mainState.SetFrameBuffer(s->GetFrameBuffer());
 
     this->MainPass->Render(&mainState);
@@ -316,7 +320,8 @@ void vtkF3DRenderPass::Blend(const vtkRenderState* s)
   // Enable blending with default VTK blending function
   // It is required since external window do not set it up
   renWin->GetState()->vtkglEnable(GL_BLEND);
-  renWin->GetState()->vtkglBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+  renWin->GetState()->vtkglBlendFuncSeparate(
+    GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
   if (this->BlendQuadHelper && this->BlendQuadHelper->ShaderChangeValue < this->GetMTime())
   {

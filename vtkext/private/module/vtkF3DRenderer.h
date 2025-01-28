@@ -148,7 +148,8 @@ public:
   void Initialize();
 
   /**
-   * Initialize actors properties related to the up vector using the provided upString, including the camera
+   * Initialize actors properties related to the up vector using the provided upString, including
+   * the camera
    */
   void InitializeUpVector(const std::string& upString);
 
@@ -335,9 +336,9 @@ public:
   void CycleFieldForColoring();
 
   /**
-   * Cycle the current array for coloring, actually setting EnableColoring and ArrayNameForColoring members.
-   * This loops back to not coloring if volume is not enabled.
-   * This can trigger CycleComponentForColoring if current component is not valid.
+   * Cycle the current array for coloring, actually setting EnableColoring and ArrayNameForColoring
+   * members. This loops back to not coloring if volume is not enabled. This can trigger
+   * CycleComponentForColoring if current component is not valid.
    */
   void CycleArrayForColoring();
 
@@ -556,8 +557,8 @@ private:
 
   std::string CachePath;
 
-  std::optional <std::string> BackfaceType;
-  std::optional <std::string> FinalShader;
+  std::optional<std::string> BackfaceType;
+  std::optional<std::string> FinalShader;
 
   vtkF3DMetaImporter* Importer = nullptr;
   vtkMTimeType ImporterTimeStamp = 0;

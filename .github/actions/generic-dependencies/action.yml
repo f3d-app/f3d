@@ -1,0 +1,88 @@
+name: 'Install F3D dependencies'
+description: 'Install all F3D Dependencies but VTK'
+inputs:
+  raytracing_label:
+    description: 'Label to control raytracing'
+    required: false
+    default: 'no-raytracing'
+  optional_deps_label:
+    description: 'Label to optional dependencies'
+    required: false
+    default: 'optional-deps'
+  cpu:
+    description: 'CPU architecture to build for'
+    required: false
+    default: 'x86_64'
+  alembic_version:
+    description: 'Version of alembic to build'
+    required: true
+  assimp_version:
+    description: 'Version of assimp to build'
+    required: true
+  draco_version:
+    description: 'Version of draco to build'
+    required: true
+  occt_version:
+    description: 'Version of occt to build'
+    required: true
+  openexr_version:
+    description: 'Version of openexr to build'
+    required: true
+  openvdb_version:
+    description: 'Version of openvdb to build'
+    required: true
+  pybind11_version:
+    description: 'Version of pybind11 to build'
+    required: true
+  usd_version:
+    description: 'Version of usd to build'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.alembic_version }}" ]] || { echo "alembic_version input is empty" ; exit 1; }
+        [[ "${{ inputs.assimp_version }}" ]] || { echo "assimp_version input is empty" ; exit 1; }
+        [[ "${{ inputs.draco_version }}" ]] || { echo "draco_version input is empty" ; exit 1; }
+        [[ "${{ inputs.occt_version }}" ]] || { echo "occt_version input is empty" ; exit 1; }
+        [[ "${{ inputs.openexr_version }}" ]] || { echo "openexr_version input is empty" ; exit 1; }
+        [[ "${{ inputs.openvdb_version }}" ]] || { echo "openvdb_version input is empty" ; exit 1; }
+        [[ "${{ inputs.pybind11_version }}" ]] || { echo "pybind11_version input is empty" ; exit 1; }
+        [[ "${{ inputs.usd_version }}" ]] || { echo "usd_version input is empty" ; exit 1; }
+
+    - name: Dependencies Dir
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: |
+        mkdir dependencies
+        cd dependencies
+        mkdir install
+
+    - name: Install VTK dependencies
+      uses: ./source/.github/actions/vtk-dependencies
+      with:
+        cpu: ${{inputs.cpu}}
+        openvdb_version: ${{inputs.openvdb_version}}
+
+    - name: Install Raytracing Dependencies
+      if: inputs.raytracing_label == 'raytracing'
+      uses: ./source/.github/actions/ospray-sb-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+
+    - name: Install F3D dependencies
+      if: inputs.optional_deps_label == 'optional-deps'
+      uses: ./source/.github/actions/f3d-dependencies
+      with:
+        cpu: ${{inputs.cpu}}
+        alembic_version: ${{inputs.alembic_version}}
+        assimp_version: ${{inputs.assimp_version}}
+        draco_version: ${{inputs.draco_version}}
+        occt_version: ${{inputs.occt_version}}
+        openexr_version: ${{inputs.openexr_version}}
+        pybind11_version: ${{inputs.pybind11_version}}
+        usd_version: ${{inputs.usd_version}}

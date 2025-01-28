@@ -16,9 +16,9 @@
 
 namespace
 {
-  ImGuiKey GetImGuiKeyFromKeySym(std::string_view&& keySym)
-  {
-    // clang-format off
+ImGuiKey GetImGuiKeyFromKeySym(std::string_view&& keySym)
+{
+  // clang-format off
     static const std::unordered_map<std::string_view, ImGuiKey> keySymToImGuiKey =
     {
       { "Tab", ImGuiKey_Tab },
@@ -162,17 +162,17 @@ namespace
       { "KP_8", ImGuiKey_Keypad8 },
       { "KP_9", ImGuiKey_Keypad9 }
     };
-    // clang-format on
+  // clang-format on
 
-    auto it = keySymToImGuiKey.find(keySym);
+  auto it = keySymToImGuiKey.find(keySym);
 
-    if (it == keySymToImGuiKey.end())
-    {
-      return ImGuiKey::ImGuiKey_None;
-    }
-
-    return it->second;
+  if (it == keySymToImGuiKey.end())
+  {
+    return ImGuiKey::ImGuiKey_None;
   }
+
+  return it->second;
+}
 }
 
 //----------------------------------------------------------------------------
@@ -302,12 +302,18 @@ bool vtkF3DImguiObserver::KeyRelease(vtkObject* caller, unsigned long, void*)
 void vtkF3DImguiObserver::InstallObservers(vtkRenderWindowInteractor* interactor)
 {
   interactor->AddObserver(vtkCommand::MouseMoveEvent, this, &vtkF3DImguiObserver::MouseMove, 2.f);
-  interactor->AddObserver(vtkCommand::LeftButtonPressEvent, this, &vtkF3DImguiObserver::MouseLeftPress, 2.f);
-  interactor->AddObserver(vtkCommand::LeftButtonReleaseEvent, this, &vtkF3DImguiObserver::MouseLeftRelease, 2.f);
-  interactor->AddObserver(vtkCommand::RightButtonPressEvent, this, &vtkF3DImguiObserver::MouseRightPress, 2.f);
-  interactor->AddObserver(vtkCommand::RightButtonReleaseEvent, this, &vtkF3DImguiObserver::MouseRightRelease, 2.f);
-  interactor->AddObserver(vtkCommand::MouseWheelForwardEvent, this, &vtkF3DImguiObserver::MouseWheelForward, 2.f);
-  interactor->AddObserver(vtkCommand::MouseWheelBackwardEvent, this, &vtkF3DImguiObserver::MouseWheelBackward, 2.f);
+  interactor->AddObserver(
+    vtkCommand::LeftButtonPressEvent, this, &vtkF3DImguiObserver::MouseLeftPress, 2.f);
+  interactor->AddObserver(
+    vtkCommand::LeftButtonReleaseEvent, this, &vtkF3DImguiObserver::MouseLeftRelease, 2.f);
+  interactor->AddObserver(
+    vtkCommand::RightButtonPressEvent, this, &vtkF3DImguiObserver::MouseRightPress, 2.f);
+  interactor->AddObserver(
+    vtkCommand::RightButtonReleaseEvent, this, &vtkF3DImguiObserver::MouseRightRelease, 2.f);
+  interactor->AddObserver(
+    vtkCommand::MouseWheelForwardEvent, this, &vtkF3DImguiObserver::MouseWheelForward, 2.f);
+  interactor->AddObserver(
+    vtkCommand::MouseWheelBackwardEvent, this, &vtkF3DImguiObserver::MouseWheelBackward, 2.f);
   interactor->AddObserver(vtkCommand::KeyPressEvent, this, &vtkF3DImguiObserver::KeyPress, 2.f);
   interactor->AddObserver(vtkCommand::KeyReleaseEvent, this, &vtkF3DImguiObserver::KeyRelease, 2.f);
   interactor->AddObserver(vtkCommand::CharEvent, this, &vtkF3DImguiObserver::Char, 2.f);

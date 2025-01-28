@@ -1,15 +1,15 @@
 # Installation
 
-## Current release packages (2.5.0)
+## Current release packages (3.0.0)
 
 | Platform | Files |
 | -------- | ----- |
-| Windows (installer) | [F3D-2.5.0-Windows.exe](https://github.com/f3d-app/f3d/releases/download/v2.5.0/F3D-2.5.0-Windows-x86_64-raytracing.exe) |
-| Windows (portable) | [F3D-2.5.0-Windows.zip](https://github.com/f3d-app/f3d/releases/download/v2.5.0/F3D-2.5.0-Windows-x86_64-raytracing.zip) |
-| MacOS (Silicon) | [F3D-2.5.0-macOS-arm64.dmg](https://github.com/f3d-app/f3d/releases/download/v2.5.0/F3D-2.5.0-macOS-arm64-raytracing.dmg) |
-| MacOS (Intel) | [F3D-2.5.0-macOS-x86_64.dmg](https://github.com/f3d-app/f3d/releases/download/v2.5.0/F3D-2.5.0-macOS-x86_64-raytracing.dmg) |
-| Linux (Debian package) | [F3D-2.5.0-Linux.deb](https://github.com/f3d-app/f3d/releases/download/v2.5.0/F3D-2.5.0-Linux-x86_64-raytracing.deb) |
-| Linux (portable) | [F3D-2.5.0-Linux.tar.xz](https://github.com/f3d-app/f3d/releases/download/v2.5.0/F3D-2.5.0-Linux-x86_64-raytracing.tar.xz) |
+| Windows (installer) | [F3D-3.0.0-Windows.exe](https://github.com/f3d-app/f3d/releases/download/v3.0.0/F3D-3.0.0-Windows-x86_64-raytracing.exe) |
+| Windows (portable) | [F3D-3.0.0-Windows.zip](https://github.com/f3d-app/f3d/releases/download/v3.0.0/F3D-3.0.0-Windows-x86_64-raytracing.zip) |
+| MacOS (Silicon) | [F3D-3.0.0-macOS-arm64.dmg](https://github.com/f3d-app/f3d/releases/download/v3.0.0/F3D-3.0.0-macOS-arm64-raytracing.dmg) |
+| MacOS (Intel) | [F3D-3.0.0-macOS-x86_64.dmg](https://github.com/f3d-app/f3d/releases/download/v3.0.0/F3D-3.0.0-macOS-x86_64-raytracing.dmg) |
+| Linux (Debian package) | [F3D-3.0.0-Linux.deb](https://github.com/f3d-app/f3d/releases/download/v3.0.0/F3D-3.0.0-Linux-x86_64-raytracing.deb) |
+| Linux (portable) | [F3D-3.0.0-Linux.tar.xz](https://github.com/f3d-app/f3d/releases/download/v3.0.0/F3D-3.0.0-Linux-x86_64-raytracing.tar.xz) |
 
 ### Notes
 - MacOS package is not signed, see the [troubleshooting](LIMITATIONS_AND_TROUBLESHOOTING.md#macos) section for a workaround if needed.
@@ -18,7 +18,7 @@
 
 ## Alternatives
 
-You can find other (headless, older, smaller, checksum, RCs) release related packages and files on the [releases page](https://github.com/f3d-app/f3d/releases).
+You can find other (older, smaller, checksum, RCs) release related packages and files on the [releases page](https://github.com/f3d-app/f3d/releases).
 You can also find there the [nightly release](https://github.com/f3d-app/f3d/releases/tag/nightly) to test the development version of F3D.
 See the [desktop integration](DESKTOP_INTEGRATION.md) section in order actually integrate the binary release in your desktop.
 Alternatively, you can build F3D yourself by following the [build](../dev/BUILD.md) guide.
@@ -28,6 +28,7 @@ You can also find packages for the following repositories:
 ### Windows
 
 - [Scoop](https://scoop.sh/#/apps?q=f3d&s=0&d=1&o=true)
+- [Winget](https://winstall.app/apps/f3d-app.f3d)
 
 ### MacOS
 
@@ -41,7 +42,7 @@ You can also find packages for the following repositories:
 - [NixOS](https://search.nixos.org/packages?query=f3d)
 - [openSUSE](https://software.opensuse.org/package/f3d)
 - [OpenMandriva](https://github.com/OpenMandrivaAssociation/f3d)
-- [Mageia](https://madb.mageia.org/package/show/source/1/application/0/release/cauldron/name/f3d)
+- [Mageia](https://madb.mageialinux-online.org/show?distribution=cauldron&architecture=x86_64&rpm=f3d&repo=&group=&page=)
 - Fedora and others through [openSUSE OBS](https://build.opensuse.org/package/show/home:AndnoVember:F3D/f3d)
 - [Guix](https://packages.guix.gnu.org/packages/f3d/)
 - [Flathub](https://flathub.org/apps/details/io.github.f3d_app.f3d)
@@ -51,3 +52,7 @@ You can also find packages for the following repositories:
 - [FreeBSD](https://cgit.freebsd.org/ports/tree/graphics/f3d)
 - [Spack](https://packages.spack.io/package.html?name=f3d)
 - [pypi](https://pypi.org/project/f3d/) (library only)
+
+### libf3d based tools
+
+- [Exhibit](https://flathub.org/apps/io.github.nokse22.Exhibit)

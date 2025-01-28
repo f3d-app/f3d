@@ -1,5 +1,10 @@
 name: 'Install pybind11 Dependency'
 description: 'Install pybind11 Dependency using cache when possible'
+inputs:
+  version:
+    description: 'Version of pybind11 to build'
+    required: true
+
 runs:
   using: "composite"
   steps:
@@ -9,9 +14,8 @@ runs:
       uses: actions/cache@v4
       with:
         path: dependencies/pybind11_install
-        key: pybind11-v2.13.6-${{runner.os}}-0
+        key: pybind11-${{inputs.version}}-${{runner.os}}-0
 
-    # v2.13 doesn't support python36 which is needed in common-superbuild for now
     - name: Checkout pybind11
       if: steps.cache-pybind11.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
@@ -19,7 +23,7 @@ runs:
         repository: pybind/pybind11
         submodules: true
         path: './dependencies/pybind11'
-        ref: v2.13.6
+        ref: ${{inputs.version}}
 
     - name: Setup pybind11
       if: steps.cache-pybind11.outputs.cache-hit != 'true'

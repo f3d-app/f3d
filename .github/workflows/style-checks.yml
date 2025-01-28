@@ -8,12 +8,12 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: C++ Formatting
-      uses: DoozyX/clang-format-lint-action@v0.16.1
+      uses: DoozyX/clang-format-lint-action@v0.16
       with:
-        source: 'library application python plugins examples'
+        source: 'application examples java library plugins python vtkext webassembly'
         extensions: 'h,cxx,in'
         exclude: '**/*.py.in'
-        clangFormatVersion: 14 # Last Ubuntu LTS version (22.04)
+        clangFormatVersion: 18
     - name: Python Formatting
       uses: psf/black@stable
       with:
@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - uses: codespell-project/actions-codespell@v1.0
+    - uses: codespell-project/actions-codespell@v2
       with:
         check_filenames: true
         check_hidden: true

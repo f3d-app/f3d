@@ -48,7 +48,7 @@ void F3DColoringInfoHandler::UpdateColoringInfo(vtkDataSet* dataset, bool useCel
     info.Name = arrayName;
 
     vtkDataArray* array = useCellData ? dataset->GetCellData()->GetArray(arrayName.c_str())
-      : dataset->GetPointData()->GetArray(arrayName.c_str());
+                                      : dataset->GetPointData()->GetArray(arrayName.c_str());
     if (array)
     {
       info.MaximumNumberOfComponents =
@@ -101,7 +101,8 @@ void F3DColoringInfoHandler::UpdateColoringInfo(vtkDataSet* dataset, bool useCel
 }
 
 //----------------------------------------------------------------------------
-std::optional<F3DColoringInfoHandler::ColoringInfo> F3DColoringInfoHandler::SetCurrentColoring(bool enable, bool useCellData, const std::optional<std::string>& arrayName, bool quiet)
+std::optional<F3DColoringInfoHandler::ColoringInfo> F3DColoringInfoHandler::SetCurrentColoring(
+  bool enable, bool useCellData, const std::optional<std::string>& arrayName, bool quiet)
 {
   this->CurrentUsingCellData = useCellData;
   auto& data =
@@ -138,7 +139,8 @@ std::optional<F3DColoringInfoHandler::ColoringInfo> F3DColoringInfoHandler::SetC
       this->CurrentColoringIter.reset();
       if (!quiet)
       {
-        F3DLog::Print(F3DLog::Severity::Warning, "Unknown scalar array: \"" + arrayName.value() + "\"");
+        F3DLog::Print(
+          F3DLog::Severity::Warning, "Unknown scalar array: \"" + arrayName.value() + "\"");
       }
     }
   }
@@ -146,7 +148,8 @@ std::optional<F3DColoringInfoHandler::ColoringInfo> F3DColoringInfoHandler::SetC
 }
 
 //----------------------------------------------------------------------------
-std::optional<F3DColoringInfoHandler::ColoringInfo> F3DColoringInfoHandler::GetCurrentColoringInfo() const
+std::optional<F3DColoringInfoHandler::ColoringInfo> F3DColoringInfoHandler::GetCurrentColoringInfo()
+  const
 {
   if (this->CurrentColoringIter.has_value())
   {
@@ -162,7 +165,7 @@ void F3DColoringInfoHandler::CycleColoringArray(bool cycleToNonColoring)
     this->CurrentUsingCellData ? this->CellDataColoringInfo : this->PointDataColoringInfo;
   if (!this->CurrentColoringIter.has_value())
   {
-    if(!data.empty())
+    if (!data.empty())
     {
       this->CurrentColoringIter = data.begin();
     }

@@ -84,8 +84,7 @@ void vtkF3DImguiConsole::ShowConsole()
   ImGui::Begin("Console", nullptr, winFlags);
 
   // Log window
-  const float reservedHeight =
-    ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
+  const float reservedHeight = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
   if (ImGui::BeginChild(
         "LogRegion", ImVec2(0, -reservedHeight), 0, ImGuiWindowFlags_HorizontalScrollbar))
   {
@@ -143,9 +142,15 @@ void vtkF3DImguiConsole::ShowConsole()
   ImGui::PopItemWidth();
 
   ImGui::SetItemDefaultFocus();
-  ImGui::SetKeyboardFocusHere(-1);
 
-  if (runCommand)
+  // if always forcing the focus, it prevents grabbing the scrollbar
+  if (!ImGui::IsAnyItemActive())
+  {
+    ImGui::SetKeyboardFocusHere(-1);
+  }
+
+  // do not run the command if nothing is in the input text
+  if (runCommand && this->Pimpl->CurrentInput[0] != 0)
   {
     this->Pimpl->Logs.emplace_back(std::make_pair(
       Internals::LogType::Typed, std::string("> ") + this->Pimpl->CurrentInput.data()));

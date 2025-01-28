@@ -9,6 +9,9 @@ inputs:
     description: 'Source directory for actions'
     required: false
     default: './source'
+  openvdb_version:
+    description: 'Version of openvdb to build'
+    required: true
 
 runs:
   using: "composite"
@@ -40,3 +43,4 @@ runs:
       uses: ./.actions/openvdb-install-dep
       with:
         cpu: ${{inputs.cpu}}
+        version: ${{inputs.openvdb_version}}
