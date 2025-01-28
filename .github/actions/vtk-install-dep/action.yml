@@ -19,16 +19,11 @@ inputs:
     default: 'x86_64'
   openvdb_version:
     description: 'Version of openvdb to build against'
-    required: true
+    required: false
 
 runs:
   using: "composite"
   steps:
-
-    - name: Check required inputs
-      shell: bash
-      run: |
-        [[ "${{ inputs.openvdb_version }}" ]] || { echo "openvdb_version input is empty" ; exit 1; }
 
     - name: Recover VTK Short SHA from file
       if: |
@@ -96,7 +91,7 @@ runs:
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../vtk_install
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
-        -DOpenVDB_CMAKE_PATH=$(pwd)/../install/lib/cmake/OpenVDB/
+        -DOpenVDB_CMAKE_PATH=${{ inputs.openvdb_version != '' && '$(pwd)/../install/lib/cmake/OpenVDB/' || '' }}
         -DVTKOSPRAY_ENABLE_DENOISER=ON
         -DVTK_BUILD_TESTING=OFF
         -DVTK_DEBUG_LEAKS=ON
@@ -114,7 +109,7 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_IOGeometry=YES
         -DVTK_MODULE_ENABLE_VTK_IOImage=YES
         -DVTK_MODULE_ENABLE_VTK_IOImport=YES
-        -DVTK_MODULE_ENABLE_VTK_IOOpenVDB=YES
+        -DVTK_MODULE_ENABLE_VTK_IOOpenVDB=${{ inputs.openvdb_version != '' && 'YES' || 'DEFAULT' }}
         -DVTK_MODULE_ENABLE_VTK_IOPLY=YES
         -DVTK_MODULE_ENABLE_VTK_IOParallel=YES
         -DVTK_MODULE_ENABLE_VTK_IOXML=YES

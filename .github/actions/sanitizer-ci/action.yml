@@ -26,9 +26,6 @@ inputs:
   openexr_version:
     description: 'Version of openexr to build'
     required: false
-  openvdb_version:
-    description: 'Version of openvdb to build'
-    required: false
 
 runs:
   using: "composite"
@@ -55,14 +52,12 @@ runs:
         draco_version: ${{inputs.draco_version}}
         occt_version: ${{inputs.occt_version}}
         openexr_version: ${{inputs.openexr_version}}
-        openvdb_version: ${{inputs.openvdb_version}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
       with:
         vtk_version: ${{inputs.vtk_version}}
         vtk_sha_file: ./source/.github/actions/vtk_commit_sha
-        openvdb_version: ${{inputs.openvdb_version}}
 
     - name: Setup Build Directory
       shell: bash

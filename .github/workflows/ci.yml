@@ -206,7 +206,6 @@ jobs:
     if: github.event.pull_request.draft == false
     needs: [cache_lfs, cache_dependencies, default_versions]
 
-    # no-optional-deps still needs OpenVDB for VTK
     strategy:
       fail-fast: false
       matrix:
@@ -286,7 +285,6 @@ jobs:
             exclude_deprecated_label: no-exclude-deprecated
             rendering_backend: auto
             static_label: no-static
-            openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
           - build_type: static_libs
             vtk_version: commit
             raytracing_label: no-raytracing
@@ -579,7 +577,6 @@ jobs:
         draco_version: ${{needs.default_versions.outputs.draco_version}}
         occt_version: ${{needs.default_versions.outputs.occt_version}}
         openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
 
 #----------------------------------------------------------------------------
 # static-analysis: Run static analysis on linux
@@ -623,7 +620,7 @@ jobs:
 # external-build: Check build of F3D as sub-project
 #----------------------------------------------------------------------------
   external-build:
-    needs: [cache_dependencies, default_versions]
+    needs: cache_dependencies
     if: github.event.pull_request.draft == false
 
     strategy:
@@ -643,8 +640,6 @@ jobs:
 
     - name: External build CI
       uses: ./source/f3d/.github/actions/external-build-ci
-      with:
-        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
 
 #----------------------------------------------------------------------------
 # android: Check build of F3D for android
