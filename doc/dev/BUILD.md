@@ -10,15 +10,15 @@ please take a look at our [getting started guide](GETTING_STARTED.md).
 * [VTK](https://vtk.org) >= 9.2.6 (9.4.1 recommended).
 * A C++17 compiler.
 * A CMake-compatible build system (Visual Studio, XCode, Ninja, Make, etc.).
-* Optionally, [Assimp](https://www.assimp.org/) >= 5.0.
-* Optionally, Open CASCADE [OCCT](https://dev.opencascade.org/) >= 7.5.2.
-* Optionally, [Alembic](http://www.alembic.io/) >= 1.7.
+* Optionally, [Assimp](https://www.assimp.org/) >= 5.4.0.
+* Optionally, Open CASCADE [OCCT](https://dev.opencascade.org/) >= 7.6.3.
+* Optionally, [Alembic](http://www.alembic.io/) >= 1.8.5.
 * Optionally, [OpenUSD](https://openusd.org/release/index.html) >= 23.05.
-* Optionally, [OpenVDB](https://www.openvdb.org/download/) >= 10.0.0, enable `IOOpenVDB` VTK module.
-* Optionally, [Draco](https://google.github.io/draco/) >= 1.5.
-* Optionally, [Python](https://www.python.org/) >= 3.6 and [pybind11](https://github.com/pybind/pybind11) >= 2.2.
-* Optionally, [Java](https://www.java.com) >= 18.
-* Optionally, [OpenEXR](https://openexr.com/en/latest/) >= 3.0.
+* Optionally, [OpenVDB](https://www.openvdb.org/download/) >= 12.0.0, enable `IOOpenVDB` module during VTK configuration.
+* Optionally, [Draco](https://google.github.io/draco/) >= 1.5.6.
+* Optionally, [Python](https://www.python.org/) >= 3.9 and [pybind11](https://github.com/pybind/pybind11) >= 2.9.2.
+* Optionally, [Java](https://www.java.com) >= 17.
+* Optionally, [OpenEXR](https://openexr.com/en/latest/) >= 3.0.1.
 
 F3D is tested continuously against versions recommended by the [VFX reference platform](https://vfxplatform.com) defined for **CY2025**
 

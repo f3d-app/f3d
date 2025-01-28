@@ -30,7 +30,7 @@ std::vector<fs::path> GetConfigPaths(const std::string& configSearch)
 #ifdef __APPLE__
     "/usr/local/etc/f3d",
 #endif
-#ifdef __linux__
+#if defined(__linux__) || defined(__FreeBSD__)
     "/etc/f3d",
     "/usr/share/f3d/configs",
 #endif

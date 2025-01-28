@@ -5,31 +5,49 @@ inputs:
     description: 'CPU architecture to build for'
     required: false
     default: 'x86_64'
+  alembic_version:
+    description: 'Version of alembic to build'
+    required: true
+  assimp_version:
+    description: 'Version of assimp to build'
+    required: true
+  draco_version:
+    description: 'Version of draco to build'
+    required: true
+  occt_version:
+    description: 'Version of occt to build'
+    required: true
+  openexr_version:
+    description: 'Version of openexr to build'
+    required: true
+  pybind11_version:
+    description: 'Version of pybind11 to build'
+    required: true
+  usd_version:
+    description: 'Version of usd to build'
+    required: true
 
 runs:
   using: "composite"
   steps:
 
-    - name: Setup JDK
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: '17'
-
     - name: Install OCCT dependency
       uses: ./source/.github/actions/occt-install-dep
       with:
         cpu: ${{inputs.cpu}}
+        version: ${{inputs.occt_version}}
 
     - name: Install Assimp dependency
       uses: ./source/.github/actions/assimp-install-dep
       with:
         cpu: ${{inputs.cpu}}
+        version: ${{inputs.assimp_version}}
 
     - name: Install Draco dependency
       uses: ./source/.github/actions/draco-install-dep
       with:
         cpu: ${{inputs.cpu}}
+        version: ${{inputs.draco_version}}
 
     - name: Install Imath dependency
       uses: ./source/.github/actions/imath-install-dep
@@ -40,16 +58,21 @@ runs:
       uses: ./source/.github/actions/openexr-install-dep
       with:
         cpu: ${{inputs.cpu}}
+        version: ${{inputs.openexr_version}}
 
     - name: Install Alembic dependency
       uses: ./source/.github/actions/alembic-install-dep
       with:
         cpu: ${{inputs.cpu}}
+        version: ${{inputs.alembic_version}}
 
     - name: Install pybind11 dependency
       uses: ./source/.github/actions/pybind11-install-dep
+      with:
+        version: ${{inputs.pybind11_version}}
 
     - name: Install USD dependency
       uses: ./source/.github/actions/usd-install-dep
       with:
         cpu: ${{inputs.cpu}}
+        version: ${{inputs.usd_version}}

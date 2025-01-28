@@ -15,7 +15,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: dependencies/zlib_install
-        key: zlib-1.3.1-${{runner.os}}-${{inputs.cpu}}-4
+        key: zlib-v1.3.1-${{runner.os}}-${{inputs.cpu}}-4
 
     # Dependents: blosc openvdb vtk
     - name: Checkout zlib

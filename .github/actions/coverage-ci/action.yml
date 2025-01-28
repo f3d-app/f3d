@@ -8,6 +8,30 @@ inputs:
     description: 'Codecov token, needed for non-forked workflows'
     required: false
     default: ''
+  alembic_version:
+    description: 'Version of alembic to build'
+    required: true
+  assimp_version:
+    description: 'Version of assimp to build'
+    required: true
+  draco_version:
+    description: 'Version of draco to build'
+    required: true
+  occt_version:
+    description: 'Version of occt to build'
+    required: true
+  openexr_version:
+    description: 'Version of openexr to build'
+    required: true
+  openvdb_version:
+    description: 'Version of openvdb to build'
+    required: true
+  pybind11_version:
+    description: 'Version of pybind11 to build'
+    required: true
+  usd_version:
+    description: 'Version of usd to build'
+    required: true
 
 runs:
   using: "composite"
@@ -29,6 +53,14 @@ runs:
       uses: ./source/.github/actions/generic-dependencies
       with:
         raytracing_label: raytracing
+        alembic_version: ${{inputs.alembic_version}}
+        assimp_version: ${{inputs.assimp_version}}
+        draco_version: ${{inputs.draco_version}}
+        occt_version: ${{inputs.occt_version}}
+        openexr_version: ${{inputs.openexr_version}}
+        openvdb_version: ${{inputs.openvdb_version}}
+        pybind11_version: ${{inputs.pybind11_version}}
+        usd_version: ${{inputs.usd_version}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
@@ -101,7 +133,7 @@ runs:
         lcov --remove coverage.info "*Test*" -o coverage.info
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
       with:
         working-directory: ${{github.workspace}}/source
         token: ${{inputs.codecov_token}}
