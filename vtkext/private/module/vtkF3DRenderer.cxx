@@ -248,6 +248,7 @@ void vtkF3DRenderer::Initialize()
   this->ImporterTimeStamp = 0;
   this->ImporterUpdateTimeStamp = 0;
 
+  this->AddActor2D(this->ScalarBarActor);
   this->AddActor(this->GridActor);
   this->AddActor(this->DropZoneActor);
   this->AddActor(this->SkyboxActor);
@@ -268,7 +269,6 @@ void vtkF3DRenderer::Initialize()
 
   this->GridInfo = "";
 
-  this->AddActor2D(this->ScalarBarActor);
   this->ScalarBarActor->VisibilityOff();
 
   this->ExpandingRangeSet = false;
