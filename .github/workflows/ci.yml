@@ -40,37 +40,19 @@ jobs:
       usd_min_version: ${{ steps.set_default_versions.outputs.usd_min_version }}
       java_version: ${{ steps.set_default_versions.outputs.java_version }}
       java_min_version: ${{ steps.set_default_versions.outputs.java_min_version }}
+
     steps:
 
-    # Alembic is part of VFX reference platform (CY2025: 1.8.x)
-    # OpenEXR is part of VFX reference platform (CY2025: 3.3.x)
-    # OpenVDB is part of VFX reference platform (CY2025: 12.x)
-    # OpenVDB min version is not enforced by F3D code and missing from VTK code
-    # Python is part of VFX reference platform (CY2025: 3.11)
-    - name: Set default versions output
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        path: 'source'
+        fetch-depth: 1
+        lfs: false
+
+    - name: Set default versions
       id: set_default_versions
-      shell: bash
-      run: |
-        echo "alembic_version=1.8.8" >> $GITHUB_OUTPUT
-        echo "alembic_min_version=1.8.5" >> $GITHUB_OUTPUT
-        echo "assimp_version=v5.4.3" >> $GITHUB_OUTPUT
-        echo "assimp_min_version=v5.4.0" >> $GITHUB_OUTPUT
-        echo "draco_version=1.5.7" >> $GITHUB_OUTPUT
-        echo "draco_min_version=1.5.6" >> $GITHUB_OUTPUT
-        echo "occt_version=V7_8_1" >> $GITHUB_OUTPUT
-        echo "occt_min_version=V7_6_3" >> $GITHUB_OUTPUT
-        echo "openexr_version=v3.3.2" >> $GITHUB_OUTPUT
-        echo "openexr_min_version=v3.0.1" >> $GITHUB_OUTPUT
-        echo "openvdb_version=v12.0.0" >> $GITHUB_OUTPUT
-        echo "openvdb_min_version=v12.0.0" >> $GITHUB_OUTPUT
-        echo "pybind11_version=v2.13.6" >> $GITHUB_OUTPUT
-        echo "pybind11_min_version=v2.9.2" >> $GITHUB_OUTPUT
-        echo "python_version=3.11" >> $GITHUB_OUTPUT
-        echo "python_min_version=3.9" >> $GITHUB_OUTPUT
-        echo "usd_version=v24.11" >> $GITHUB_OUTPUT
-        echo "usd_min_version=v24.08" >> $GITHUB_OUTPUT
-        echo "java_version=21" >> $GITHUB_OUTPUT
-        echo "java_min_version=17" >> $GITHUB_OUTPUT
+      uses: ./source/.github/actions/default-versions
 
 #----------------------------------------------------------------------------
 # Cache LFS: Checkout LFS data and update the cache to limit LFS bandwidth
