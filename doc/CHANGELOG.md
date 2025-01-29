@@ -2,6 +2,113 @@
 
 ## Ongoing development
 
+## v3.0.0
+
+For F3D users:
+ - BREAKING CHANGE: [Configuration files](https://f3d.app/doc/user/CONFIGURATION_FILE.html) have changed syntax
+ - BREAKING CHANGE: Removed all deprecated options
+ - BREAKING CHANGE: `--scalars` have been split into `--scalar-coloring` and `--coloring-array` CLI options
+ - BREAKING CHANGE: `=` must be used for CLI Options, `--option value` is not supported anymore
+ - BREAKING CHANGE: Removed `geometry-only` and `group-geometries` and added `multi-file-mode` option for more flexible loading of multiple files
+ - BREAKING CHANGE: There is no headless specific binary release anymore, just use the standard binary with `--rendering-backend=egl`
+ - BREAKING CHANGE: `--dry-run` has been renamed `--no-config`
+ - BREAKING CHANGE: `Esc` to quit the app has been changed to `Ctrl+Q`
+ - BREAKING CHANGE: `--animation-frame-rate` has been replaced by `--frame-rate`
+ - BREAKING CHANGE: Renamed `--bg-color` into `--background-color`
+ - BREAKING CHANGE: Renamed `--comp` into `--coloring-component`
+ - BREAKING CHANGE: Removed the `?` interaction to dump info, use [commands](https://f3d.app/doc/user/COMMANDS.html) instead
+ - BREAKING CHANGE: Renamed `--progress` into `--loading-progress`
+ - BREAKING CHANGE: Renamed `--cells` into `--coloring-by-cells`
+ - BREAKING CHANGE: Renamed `--range` into `--coloring-range`
+ - BREAKING CHANGE: Renamed `--bar` into `--coloring-scalar-bar`
+ - BREAKING CHANGE: Renamed `--inverse` into `--volume-inverse`
+ - BREAKING CHANGE: Renamed `--samples` into `--raytracing-samples`
+ - BREAKING CHANGE: Renamed `--denoise` into `--raytracing-denoise`
+ - BREAKING CHANGE: Renamed `--ref` into `--reference` and `--ref-threshold` into `--reference-threshold`
+ - BREAKING CHANGE: Renamed `--readers-list` into `--list-readers`
+ - BREAKING CHANGE: F3D binary release is now built with GCC9
+ - Changed the logo!
+ - Reworked the UI using ImGui
+ - Added support for specifying interactions in config files, [see doc](https://f3d.app/doc/user/CONFIGURATION_FILE.html#bindings)
+ - Added a `--command-script` CLI option
+ - Added a tiny file dialog, just press `Ctrl+O`
+ - Added support for armature visualization with `--armature` CLI option (glTF only)
+ - Added support for keeping camera position when switching files, just press `Ctrl+Arrow`
+ - Added a ImGui based console to input [commands](https://f3d.app/doc/user/COMMANDS.html) by pressing `Esc`
+ - Added a "Save minimal screenshot" interaction by pressing `Shift+F12`
+ - Added error reporting when loading a file failed for some reason
+ - Added missing config file for .brep files
+ - Added support for .xbf files
+ - Added `--input` CLI option
+ - Added support for libf3d option in configuration files
+ - Added support for parsing option based on their type, see [the doc](https://f3d.app/doc/user/PARSING.html)
+ - Added a `--rendering-backend` option to select the rendering backend, including headless
+ - Added an interaction to rotate camera 90 degrees by pressing 4/6
+ - Added an interaction to drop only HDRI (Shift+Drop) and an interaction to drop only 3D files (Ctrl+Drop)
+ - Added a `--list-bindings` CLI option
+ - Added a `--list-rendering-backends` CLI option
+ - Added compatibility with [VFX CY2025](https://vfxplatform.com/)
+ - Added commands to print info about scene, coloring, mesh and options
+ - Added command to clear the console
+ - Added support for expanding tilda (`~`) into `HOME` when inputting any path
+ - Reworked CLI option parsing to avoid parsing issues
+ - Improved `--list-readers` CLI option output
+ - Improved image comparison algorithm
+ - Improved options suggestion in the command line
+ - Improved many features in F3DWeb as well as adding OCCT and Draco support
+ - Improved the webassembly bindings
+ - Improved the documentation
+ - Improved python bindings
+ - Improved startup performance
+ - Improved scalar range handling with animation
+ - Fixed a crash when opening a glTF file with no textures
+ - Fixed an option priority issue with `--help`
+ - Fixed a crash with invalid `--animation-index` and assimp
+ - Fixed an issue where the window displayed an empty filename
+ - Fixed an issue where the window resolution was reset when changing file
+ - Fixed an issue when resetting the camera and using `--camera-index`
+ - Fixed an issue with `--camera-index` being overridden by other camera options
+ - Fixed an issue when loading a time value outside of the range
+ - Fixed issues with screenshot templating
+ - Fixed an issue with grid rendering on main axes
+ - Fixed an issue where color-bar would show when not needed
+ - Fixed an issue with glTF file using URI
+ - Fixed `--help` invalid output
+ - Fixed a small issue with F3D dialog being incorrectly named on macOS
+ - Fixed an issue where file where open two times on macOS
+
+For libf3d users:
+- BREAKING CHANGE: All deprecated methods have been removed
+- BREAKING CHANGE: `engine::libInformation` members have been changed
+- BREAKING CHANGE: `options` API has been rewritten from scratch, see the doc
+- BREAKING CHANGE: `options` many options are now optional
+- BREAKING CHANGE: `loader` API has been replaced by a new class: `scene`
+- BREAKING CHANGE: `engine` creation API has been rewritten from scratch and a `context` class has been added.
+- BREAKING CHANGE: `interactor`: `setKeyPressCallBack`, `setDropFilesCallBack` and `timerCallback` have been removed
+- BREAKING CHANGE: `camera` API has been reworked
+- BREAKING CHANGE: `image::compare` API has been changed
+- BREAKING CHANGE: libf3d API is now using C++17, `nodiscard`, `std::filesystem` and `std::string_view` are now used whenever it makes sense
+- BREAKING CHANGE: Removed support for python 3.8
+- Added an `interactor::command*` API that lets user control the libf3d behavior more finely
+- Added an `interactor::binding*` API that lets user control how the libf3d respond to interactions
+- Added an `scene::loadAnimationTime` API to select animation time to load
+- Added `interactor::start` arg to control an event loop time and a event loop callback
+- Added python stubs for autocompletion and IDE integration
+- Added support for python 3.13
+- Fixed an issue with instanciang multiple engines
+- Added an `utils::collapsePath`
+- Fixed an issue with HiDPI when using the libf3d on Windows
+
+For F3D packagers:
+ - BREAKING CHANGE: Removed compatibility with older version of VTK. VTK v9.2.6 is now required.
+ - Added a new CMake options to build python stubs: `F3D_BINDINGS_PYTHON_GENERATE_STUBS`
+ - Added a new optional but internally provided dependency: tinyfiledialogs
+ - Modified dmon dependency to be optional
+ - `F3D_LINUX_APPLICATION_LINK_FILESYSTEM` has been renamed `F3D_LINUX_LINK_FILESYSTEM` and is now OFF by default
+
+For F3D plugin developers:
+- Added a vtkF3DImporter and vtkF3DGLTFImporter for easier subclassing
+
 ## v2.5.1
 
 For F3D packagers:
