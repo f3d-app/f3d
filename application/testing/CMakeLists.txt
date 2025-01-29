@@ -1266,4 +1266,4 @@ if(F3D_MODULE_DMON AND (WIN32 OR APPLE OR (F3D_TESTING_ENABLE_GLX_TESTS AND VTK_
 endif()
 
 # Alias Test
-f3d_test(NAME TestAliasCommand COMMAND alias tokyo_drift set roll_camera 120 DATA dragon.vtu)
+f3d_test(NAME TestAliasCommand DATA dragon.vtu UI) #Escape;alias myrotate roll_camera 90;Return;myrotate;Return
