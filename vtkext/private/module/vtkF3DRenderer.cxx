@@ -618,7 +618,9 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
       gridMapper->SetSubdivisions(this->GridSubdivisions);
       gridMapper->SetUpIndex(this->UpIndex);
       if (this->GridAbsolute)
+      {
         gridMapper->SetOriginOffset(-gridPos[0], -gridPos[1], -gridPos[2]);
+      }
 
       this->GridActor->GetProperty()->SetColor(this->GridColor);
       this->GridActor->ForceTranslucentOn();
