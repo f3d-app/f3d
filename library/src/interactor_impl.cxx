@@ -797,7 +797,8 @@ interactor& interactor_impl::initCommands()
       // Add alias command to the map
       this->Internals->AliasMap[aliasName] =
         std::accumulate(args.begin() + 1, args.end(), std::string(" "));
-      log::info("Alias '{}' added with command '{}'", aliasName, this->Internals->AliasMap[aliasName]);
+      log::info(
+        "Alias '{}' added with command '{}'", aliasName, this->Internals->AliasMap[aliasName]);
     });
   return *this;
 }
