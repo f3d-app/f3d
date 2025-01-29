@@ -11,7 +11,7 @@ inputs:
     default: './source'
   openvdb_version:
     description: 'Version of openvdb to build'
-    required: true
+    required: false
 
 runs:
   using: "composite"
@@ -40,6 +40,7 @@ runs:
         cpu: ${{inputs.cpu}}
 
     - name: Install OpenVDB
+      if: inputs.openvdb_version != ''
       uses: ./.actions/openvdb-install-dep
       with:
         cpu: ${{inputs.cpu}}

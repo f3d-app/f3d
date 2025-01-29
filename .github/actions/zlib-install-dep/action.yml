@@ -12,7 +12,7 @@ runs:
 
     - name: Cache zlib
       id: cache-zlib
-      uses: actions/cache@v4
+      uses: actions/cache/restore@v4
       with:
         path: dependencies/zlib_install
         key: zlib-v1.3.1-${{runner.os}}-${{inputs.cpu}}-4
@@ -56,3 +56,10 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/zlib_install
       shell: bash
       run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-zlib.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-zlib.outputs.cache-primary-key }}
+        path: dependencies/zlib_install
