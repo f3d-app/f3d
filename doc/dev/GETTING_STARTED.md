@@ -7,9 +7,9 @@ to such processes, you may be looking for our [build guide](BUILD.md).
 This guide will help you to compile your own version of F3D with required dependencies.
 Optional dependencies or covered in the build guide.
 
- - If you are using [Linux](#linux)
- - If you are using [Windows](#windows)
- - If you are using [macOS](#macos)
+- If you are using [Linux](#linux)
+- If you are using [Windows](#windows)
+- If you are using [macOS](#macos)
 
 ## Linux
 
@@ -76,13 +76,14 @@ ctest
 Note: The following steps were tested with Visual Studio Community 2022 using Windows 10, but should also work for other versions
 
 #### Install Dependencies
- * Download and install [git bash for windows][gitforwindows]
- * Download and install [cmake][cmake-download]
- * Download and install [Visual Studio 2022 Community Edition][visual-studio]
+
+- Download and install [git bash for windows][gitforwindows]
+- Download and install [cmake][cmake-download]
+- Download and install [Visual Studio 2022 Community Edition][visual-studio]
 
 #### Recover F3D sources
 
- * Open git bash
+- Open git bash
 
 ```sh
 cd C:
@@ -96,14 +97,14 @@ mkdir build
 
 #### Install dependencies using vcpkg
 
- * Open git bash
+- Open git bash
 
 ```sh
 cd C:/dev
 git clone https://github.com/Microsoft/vcpkg.git
 ```
 
- * Open cmd
+- Open cmd
 
 ```sh
 cd C:\dev
@@ -115,7 +116,7 @@ Note: Last command will take a while. It downloads, compiles and installs VTK an
 
 #### Build F3D
 
- * Open cmd
+- Open cmd
 
 ```sh
 cd C:\dev\f3d\build
@@ -125,7 +126,7 @@ cmake --build .
 
 #### Run
 
- * Double click on the `C:\dev\f3d\build\bin_Debug\f3d.exe` executable
+- Double click on the `C:\dev\f3d\build\bin_Debug\f3d.exe` executable
 
 ### Running the test suite
 
