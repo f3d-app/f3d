@@ -21,6 +21,9 @@ jobs:
         src: "./python"
     - name: Prettier Formatting
       uses: creyD/prettier_action@v4.3
+      with:
+        dry: True
+        prettier_options: **/*.{js,json,md}
 
 
   codespell-check:
