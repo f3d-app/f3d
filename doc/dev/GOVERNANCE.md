@@ -55,4 +55,5 @@ Information disclosed in connection with any Project activity, including but not
 Amendments to this governance policy may be made by affirmative vote of 2/3 of all Maintainers.
 
 ---
+
 Modified from of MVG-0.1-beta GOVERNANCE.md. Licensed under the [CC-BY 4.0 License](https://creativecommons.org/licenses/by-sa/4.0/).

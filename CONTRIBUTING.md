@@ -21,7 +21,7 @@ If not, you may want to look at our [getting started guide](doc/dev/GETTING_STAR
 Once you are able to build F3D, you may want to take a look at the open [issues](https://github.com/f3d-app/f3d/issues)!
 If you are a beginner, you may want to look at ["good first issues"](https://github.com/f3d-app/f3d/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22).
 If you already have some experience with programming and contribution, definitely look at ["help wanted"](https://github.com/f3d-app/f3d/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22) issues.
-If an issue is interesting to you and is not yet assigned, then you should *comment on the issue* and ask for any help or clarification needed.
+If an issue is interesting to you and is not yet assigned, then you should _comment on the issue_ and ask for any help or clarification needed.
 F3D maintainers will see your comment, assign the issue to you and provide guidance as needed.
 
 To get involved more deeply, please take a look at the [roadmaps](doc/dev/ROADMAPS_AND_RELEASES.md) for the upcoming releases.
@@ -38,6 +38,7 @@ Another way to get started is to improve the documentation, look for typos, or i
 ## F3D Development Workflow
 
 F3D uses [GitLab Flow](https://about.gitlab.com/topics/version-control/what-is-gitlab-flow/). In a few words, here is how to contribute:
+
 - [Fork](https://github.com/f3d-app/f3d/fork) the F3D repository on GitHub.
 - Create and push a feature branch on your fork containing new commits.
 - When it is ready for review or when you want to run the CI, create a pull request against `f3d-app/f3d/master`.
@@ -69,6 +70,7 @@ that impact developers that build F3D. "For F3D packagers" are changes that impa
 ## F3D Architecture
 
 F3D is divided into different components:
+
 - The `f3d` executable, in the `application` folder.
 - The `libf3d` library, in the `library` folder.
 - The extensions to VTK, in the `vtkext` folder.
@@ -76,6 +78,7 @@ F3D is divided into different components:
 - The plugins, providing all the different readers in the plugins directory.
 
 The extensions to VTK are divided into two modules:
+
 - The [private module](vtkext/private) is used exclusively by `libf3d`.
 - The [public module](vtkext/public) is used by `libf3d` and also by plugins. Additional documentation can be found in [PLUGINS.md](doc/libf3d/PLUGINS.md).
 

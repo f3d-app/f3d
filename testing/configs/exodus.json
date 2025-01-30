@@ -1,9 +1,8 @@
 [
-{
-  "match": ".*(ex2)",
-  "options":
   {
-    "load-plugins": "exodus"
+    "match": ".*(ex2)",
+    "options": {
+      "load-plugins": "exodus"
+    }
   }
-}
 ]
