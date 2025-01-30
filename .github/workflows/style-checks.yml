@@ -19,8 +19,6 @@ jobs:
       with:
         options: "--check --verbose --include '(\\.py|\\.py\\.in)'"
         src: "./python"
-   - name: Prettify code
-     uses: creyD/prettier_action@v4.3
 
   codespell-check:
     name: Codespell Check
