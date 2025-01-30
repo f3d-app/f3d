@@ -263,6 +263,12 @@ if(F3D_WINDOWS_BUILD_SHELL_THUMBNAILS_EXTENSION)
 endif()
 
 # Python bindings
+option(F3D_BINDINGS_C "Create C bindings" ON)
+if(F3D_BINDINGS_C)
+  add_subdirectory(c)
+endif()
+
+# Python bindings
 option(F3D_BINDINGS_PYTHON "Create Python bindings" OFF)
 if(F3D_BINDINGS_PYTHON)
   add_subdirectory(python)
@@ -310,6 +316,7 @@ function(f3d_report_variable f3d_var)
   message(STATUS "${f3d_var}: ${${f3d_var}}")
 endfunction()
 
+f3d_report_variable(F3D_BINDINGS_C)
 f3d_report_variable(F3D_BINDINGS_JAVA)
 f3d_report_variable(F3D_BINDINGS_PYTHON)
 f3d_report_variable(F3D_BUILD_APPLICATION)
