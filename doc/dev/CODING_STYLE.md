@@ -5,17 +5,16 @@ F3D use different coding styles in each component, however there are some common
 ## Common rules
 
 Overall syntax:
-
-- CamelCase.
-- Avoid using `using` for namespaces.
-- Initialize variables in header when possible.
-- Local variables starts with a lower case char.
-- Class members starts with a upper case char.
-- Indents are two spaces.
-- One space between instruction and parenthesis.
-- Always add curly brace after instruction.
-- Curly brace one a new line, aligned with instruction.
-- Add `//----------------------------------------------------------------------------` before any method in implementation.
+ - CamelCase.
+ - Avoid using `using` for namespaces.
+ - Initialize variables in header when possible.
+ - Local variables starts with a lower case char.
+ - Class members starts with a upper case char.
+ - Indents are two spaces.
+ - One space between instruction and parenthesis.
+ - Always add curly brace after instruction.
+ - Curly brace one a new line, aligned with instruction.
+ - Add `//----------------------------------------------------------------------------` before any method in implementation.
 
 Example:
 
@@ -31,9 +30,8 @@ void class::method()
 ```
 
 Includes:
-
-- Organized by category: `F3DApplication`, `libf3d`, `VTKExtensions`, `other deps`, `std`, `system`.
-- Sorted inside category.
+ - Organized by category: `F3DApplication`, `libf3d`, `VTKExtensions`, `other deps`, `std`, `system`.
+ - Sorted inside category.
 
 ## F3D Application rules
 

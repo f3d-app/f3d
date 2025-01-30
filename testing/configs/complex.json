@@ -1,34 +1,38 @@
 [
+{
+  "options":
   {
-    "options": {
-      "scalar-coloring": true,
-      "ui.axis": true,
-      "grid": true
-    }
-  },
-  {
-    "match": ".*(vt.)",
-    "options": {
-      "up": "+Y",
-      "coloring-scalar-bar": true,
-      "render.effect.ambient_occlusion": true,
-      "filename": true
-    }
-  },
-  {
-    "match": ".*(vti)",
-    "options": {
-      "grid": true,
-      "volume": true
-    }
-  },
-  {
-    "match": ".*(stl)",
-    "options": {
-      "grid": true,
-      "up": "+Z",
-      "ambient-occlusion": true,
-      "filename": false
-    }
+    "scalar-coloring": true,
+    "ui.axis": true,
+    "grid": true
   }
+},
+{
+  "match": ".*(vt.)",
+  "options":
+  {
+    "up": "+Y",
+    "coloring-scalar-bar": true,
+    "render.effect.ambient_occlusion": true,
+    "filename": true
+  }
+},
+{
+  "match": ".*(vti)",
+  "options":
+  {
+    "grid": true,
+    "volume": true
+  }
+},
+{
+  "match": ".*(stl)",
+  "options":
+  {
+    "grid": true,
+    "up": "+Z",
+    "ambient-occlusion": true,
+    "filename": false
+  }
+}
 ]

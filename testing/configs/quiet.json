@@ -1,8 +1,9 @@
 [
+{
+  "options":
   {
-    "options": {
-      "verbose": "quiet",
-      "no-render": true
-    }
+    "verbose": "quiet",
+    "no-render": true
   }
+}
 ]

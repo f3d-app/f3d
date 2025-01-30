@@ -1,16 +1,17 @@
 [
+{
+  "options":
   {
-    "options": {
-      "axis": true,
-      "tone-mapping": true,
-      "grid": true,
-      "loading-progress": true,
-      "anti-aliasing": true,
-      "filename": true,
-      "camera-direction": "-1,-0.5,-1",
-      "hdri-ambient": true,
-      "translucency-support": true,
-      "animation-progress": true
-    }
+    "axis": true,
+    "tone-mapping": true,
+    "grid": true,
+    "loading-progress": true,
+    "anti-aliasing": true,
+    "filename": true,
+    "camera-direction": "-1,-0.5,-1",
+    "hdri-ambient": true,
+    "translucency-support": true,
+    "animation-progress": true
   }
+}
 ]

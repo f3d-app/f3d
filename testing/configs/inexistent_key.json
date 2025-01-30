@@ -1,7 +1,8 @@
 [
+{
+  "options":
   {
-    "options": {
-      "scene.animation.inexistent": 0
-    }
+    "scene.animation.inexistent": 0
   }
+}
 ]

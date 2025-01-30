@@ -120,8 +120,8 @@
           "default_value": "false"
         },
         "coc": {
-          "type": "double",
-          "default_value": "20.0"
+        "type": "double",
+        "default_value": "20.0"
         }
       }
     },

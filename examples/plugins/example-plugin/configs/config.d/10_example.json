@@ -1,8 +1,9 @@
 [
+{
+  "match": ".*(expl)",
+  "options":
   {
-    "match": ".*(expl)",
-    "options": {
-      "load-plugins": "example"
-    }
+    "load-plugins": "example"
   }
+}
 ]

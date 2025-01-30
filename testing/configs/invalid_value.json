@@ -1,11 +1,13 @@
 [
+{
+  "options":
   {
-    "options": {
-      "verbose": { "foo": "bar" }
-    },
-    "bindings": {
-      "SHIFT+O": "invalid modifier",
-      "O": { "foo": "bar" }
-    }
+    "verbose": {"foo": "bar"}
+  },
+  "bindings":
+  {
+    "SHIFT+O": "invalid modifier",
+    "O": {"foo": "bar"}
   }
+}
 ]

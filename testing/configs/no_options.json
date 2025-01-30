@@ -1,7 +1,8 @@
 [
+{
+  "opsions":
   {
-    "opsions": {
-      "verbose": true
-    }
+    "verbose": true
   }
+}
 ]

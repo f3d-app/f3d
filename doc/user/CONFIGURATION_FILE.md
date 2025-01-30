@@ -19,43 +19,46 @@ A typical config file with options may look like this:
 
 ```javascript
 [
+{
+  "options":
   {
-    options: {
-      "background-color": "0.7,0.7,0.7",
-      color: "0.5,0.1,0.1",
-      "anti-aliasing": true,
-      timer: true,
-      progress: true,
-      axis: true,
-      bar: true,
-      roughness: 0.2,
-      grid: true,
-      "scalar-coloring": true,
-    },
-  },
+     "background-color": "0.7,0.7,0.7",
+     "color": "0.5,0.1,0.1",
+     "anti-aliasing": true,
+     "timer": true,
+     "progress": true,
+     "axis": true,
+     "bar": true,
+     "roughness": 0.2,
+     "grid": true,
+     "scalar-coloring": true
+  }
+},
+{
+  "match": ".*vt.",
+  "options":
   {
-    match: ".*vt.",
-    options: {
-      edges: true,
-    },
-  },
+    "edges": true
+  }
+},
+{
+  "match": ".*gl(tf|b)",
+  "options":
   {
-    match: ".*gl(tf|b)",
-    options: {
-      raytracing: true,
-      denoise: true,
-      samples: 3,
-    },
-  },
+    "raytracing": true,
+    "denoise": true,
+    "samples": 3
+  }
+},
+{
+  "match": ".*mhd",
+  "options":
   {
-    match: ".*mhd",
-    options: {
-      volume: true,
-    },
-  },
-];
+    "volume": true
+  }
+}
+]
 ```
-
 Here, the first block defines a basic configuration with many desired options for all files.
 The second block specifies that all files ending with vt., eg: vtk, vtp, vtu, ... will be shown with edges visibility turned on.
 The third block specifies raytracing usage for .gltf and .glb files.
@@ -80,26 +83,25 @@ A typical config file with bindings may look like this:
 
 ```javascript
 [
+{
+  "bindings":
   {
-    bindings: {
-      "Ctrl+Shift+O": "toggle ui.filename",
-      "Any+3": "roll_camera -90",
-      O: "set_camera isometric",
-    },
-  },
+    "Ctrl+Shift+O": "toggle ui.filename",
+    "Any+3": "roll_camera -90",
+    "O": "set_camera isometric"
+  }
+},
+{
+  "match": ".*vtu",
+  "bindings":
   {
-    match: ".*vtu",
-    bindings: {
-      "Any+3": "roll_camera 90",
-      "Shift+O": "toggle model.point_sprites.enable",
-      "Ctrl+O": [
-        "toggle render.grid.enable",
-        "toggle scene.camera.orthographic",
-      ],
-      "None+I": "toggle ui.axis",
-    },
-  },
-];
+    "Any+3": "roll_camera 90",
+    "Shift+O": "toggle model.point_sprites.enable",
+    "Ctrl+O": ["toggle render.grid.enable", "toggle scene.camera.orthographic"],
+    "None+I": "toggle ui.axis"
+  }
+}
+]
 ```
 
 Here, the first block define new bindings for all and any files.
@@ -130,17 +132,17 @@ if there is no bind with the same interaction.
 
 Supported interactions are legion, eg:
 
-- Keyboard letter keys, eg:
-  - `O`
-  - `P`
-- Keyboard number keys, eg:
-  - `2`
-  - `5`
-- Keyboard special keys, eg:
-  - `Enter`
-  - `Delete`
-- Other interactions, eg:
-  - `Drop` when files or folders are dropped on F3D window
+ * Keyboard letter keys, eg:
+   * `O`
+   * `P`
+ * Keyboard number keys, eg:
+   * `2`
+   * `5`
+ * Keyboard special keys, eg:
+   * `Enter`
+   * `Delete`
+ * Other interactions, eg:
+   * `Drop` when files or folders are dropped on F3D window
 
 To identify the interaction to use, just use `f3d --verbose` and perform the interaction, F3D will log it like this:
 
@@ -165,9 +167,9 @@ You can edit the file contained in these directory or add your own in specific d
 F3D looks for configuration files in different locations depending on your operating system.
 Existing configuration files are read in order and combined with later entries, potentially overriding previously read entry with the same names.
 
-- Linux: `/etc/f3d/config(.json,.d)`, `/usr/share/f3d/configs/config(.json,.d)`, `[install_dir]/share/f3d/configs/config(.json,.d)`, `${XDG_CONFIG_HOME}/f3d/config(.json,.d)`
-- Windows: `[install_dir]\share\f3d\configs\(config.json,.d)`, `%APPDATA%\f3d\(config.json,.d)`
-- macOS: `/usr/local/etc/f3d/config(.json,.d)`, `f3d.app/Contents/Resources/configs/config(.json,.d)`, `${XDG_CONFIG_HOME}/f3d/config(.json,.d)`
+ * Linux: `/etc/f3d/config(.json,.d)`, `/usr/share/f3d/configs/config(.json,.d)`, `[install_dir]/share/f3d/configs/config(.json,.d)`, `${XDG_CONFIG_HOME}/f3d/config(.json,.d)`
+ * Windows: `[install_dir]\share\f3d\configs\(config.json,.d)`, `%APPDATA%\f3d\(config.json,.d)`
+ * macOS: `/usr/local/etc/f3d/config(.json,.d)`, `f3d.app/Contents/Resources/configs/config(.json,.d)`, `${XDG_CONFIG_HOME}/f3d/config(.json,.d)`
 
 Please note `XDG_CONFIG_HOME` rely on environment variables as specified [here](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html).
 
@@ -175,6 +177,6 @@ The binary release will install the default config directory.
 On Linux, they will be installed in `[install_dir]/share/f3d/configs/`, on Windows, they will be installed in `[install_dir]\share\f3d\configs\`, on macOS, it will be installed in the bundle.
 
 Please note there is a command line option to control the configuration file to read. Using it, one can specify an absolute/relative path for the configuration path, but also
-only the filename or filestem (`.json` and `.d` will be added) to look for in the locations listed above, , eg: `f3d --config=custom_config` will look
+only the filename or filestem (`.json` and `.d`  will be added) to look for in the locations listed above, , eg: `f3d --config=custom_config` will look
 for `custom_config.json` and `custom_config.d` in locations listed above.
 When specifying an absolute/relative path for the configuration file, a single file is read. If not, all files from locations listed above, with the overriding logic specified above.

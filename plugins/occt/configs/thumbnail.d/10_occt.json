@@ -1,14 +1,15 @@
 [
+{
+  "match": ".*(step|stp|iges|igs|brep|xbf)",
+  "options":
   {
-    "match": ".*(step|stp|iges|igs|brep|xbf)",
-    "options": {
-      "scalar-coloring": true,
-      "load-plugins": "occt",
-      "up": "+Z",
-      "ambient-occlusion": true,
-      "coloring-component": "-2",
-      "coloring-by-cells": true,
-      "camera-direction": "-1,1,-0.5"
-    }
+    "scalar-coloring": true,
+    "load-plugins": "occt",
+    "up": "+Z",
+    "ambient-occlusion": true,
+    "coloring-component": "-2",
+    "coloring-by-cells": true,
+    "camera-direction": "-1,1,-0.5"
   }
+}
 ]

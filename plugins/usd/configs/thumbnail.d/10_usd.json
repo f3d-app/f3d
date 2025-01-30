@@ -1,8 +1,9 @@
 [
+{
+  "match": ".*(usd)[acz]?",
+  "options":
   {
-    "match": ".*(usd)[acz]?",
-    "options": {
-      "load-plugins": "usd"
-    }
+    "load-plugins": "usd"
   }
+}
 ]

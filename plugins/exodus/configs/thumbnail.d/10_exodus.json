@@ -1,9 +1,10 @@
 [
+{
+  "match": ".*(ex2)",
+  "options":
   {
-    "match": ".*(ex2)",
-    "options": {
-      "scalar-coloring": true,
-      "load-plugins": "exodus"
-    }
+    "scalar-coloring": true,
+    "load-plugins": "exodus"
   }
+}
 ]
