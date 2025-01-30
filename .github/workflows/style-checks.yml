@@ -20,7 +20,7 @@ jobs:
         options: "--check --verbose --include '(\\.py|\\.py\\.in)'"
         src: "./python"
     - name: Prettier Formatting
-      uses: creyD/prettier_action@v4
+      uses: creyD/prettier_action@v4.3
 
 
   codespell-check:
