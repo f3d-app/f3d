@@ -1,10 +1,9 @@
 [
-{
-  "match": ".*(drc)",
-  "options":
   {
-    "scalar-coloring": true,
-    "load-plugins": "draco"
+    "match": ".*(drc)",
+    "options": {
+      "scalar-coloring": true,
+      "load-plugins": "draco"
+    }
   }
-}
 ]

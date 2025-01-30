@@ -1,72 +1,65 @@
 [
-{
-  "match": ".*(dcm|nrrd|nhdr|mhd|mha|vt.)",
-  "options":
   {
-    "scalar-coloring": true,
-    "coloring-scalar-bar": true
-  }
-},
-{
-  "match": ".*(dcm|nrrd|nhdr|mhd|mha|vti)",
-  "options":
+    "match": ".*(dcm|nrrd|nhdr|mhd|mha|vt.)",
+    "options": {
+      "scalar-coloring": true,
+      "coloring-scalar-bar": true
+    }
+  },
   {
-    "volume": true
-  }
-},
-{
-  "match": ".*(3ds|stl)",
-  "options":
+    "match": ".*(dcm|nrrd|nhdr|mhd|mha|vti)",
+    "options": {
+      "volume": true
+    }
+  },
   {
-    "up": "+Z",
-    "camera-direction": "-1,1,-0.5"
-  }
-},
-{
-  "match": ".*(stl|gml|pts)",
-  "options":
+    "match": ".*(3ds|stl)",
+    "options": {
+      "up": "+Z",
+      "camera-direction": "-1,1,-0.5"
+    }
+  },
   {
-    "scalar-coloring": true
-  }
-},
-{
-  "match": ".*(tif|tiff)",
-  "options":
+    "match": ".*(stl|gml|pts)",
+    "options": {
+      "scalar-coloring": true
+    }
+  },
   {
-    "scalar-coloring": true,
-    "up": "-Y",
-    "coloring-component": "-2",
-    "camera-direction": "-1,0.5,1"
-  }
-},
-{
-  "match": ".*(ply)",
-  "options":
+    "match": ".*(tif|tiff)",
+    "options": {
+      "scalar-coloring": true,
+      "up": "-Y",
+      "coloring-component": "-2",
+      "camera-direction": "-1,0.5,1"
+    }
+  },
   {
-    "scalar-coloring": true,
-    "coloring-component": "-2",
-    "translucency-support": true
-  }
-},
-{
-  "match": ".*(splat)",
-  "options":
+    "match": ".*(ply)",
+    "options": {
+      "scalar-coloring": true,
+      "coloring-component": "-2",
+      "translucency-support": true
+    }
+  },
   {
-    "point-sprites": true,
-    "point-sprites-size": 1,
-    "point-sprites-type": "gaussian",
-    "scalar-coloring": true,
-    "coloring-array": "color",
-    "coloring-component": "-2",
-    "background-color": "0, 0, 0",
-    "up": "-Y",
-    "interaction-trackball": true,
-    "camera-position": "0,1,-5.2",
-    "camera-focal-point": "0,1,0",
-    "tone-mapping": false,
-    "grid": false,
-    "anti-aliasing": false,
-    "translucency-support": false
+    "match": ".*(splat)",
+    "options": {
+      "point-sprites": true,
+      "point-sprites-size": 1,
+      "point-sprites-type": "gaussian",
+      "scalar-coloring": true,
+      "coloring-array": "color",
+      "coloring-component": "-2",
+      "background-color": "0, 0, 0",
+      "up": "-Y",
+      "interaction-trackball": true,
+      "camera-position": "0,1,-5.2",
+      "camera-focal-point": "0,1,0",
+      "tone-mapping": false,
+      "grid": false,
+      "anti-aliasing": false,
+      "translucency-support": false
+    }
   }
-}
 ]
