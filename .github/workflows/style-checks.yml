@@ -23,7 +23,7 @@ jobs:
       uses: creyD/prettier_action@v4.3
       with:
         dry: True
-        prettier_options: '-c **/*.{js,json,md}'
+        prettier_options: '-c **/*.{js,json,md,html}'
 
 
   codespell-check:
