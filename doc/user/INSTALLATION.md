@@ -2,16 +2,17 @@
 
 ## Current release packages (3.0.0)
 
-| Platform | Files |
-| -------- | ----- |
-| Windows (installer) | [F3D-3.0.0-Windows.exe](https://github.com/f3d-app/f3d/releases/download/v3.0.0/F3D-3.0.0-Windows-x86_64-raytracing.exe) |
-| Windows (portable) | [F3D-3.0.0-Windows.zip](https://github.com/f3d-app/f3d/releases/download/v3.0.0/F3D-3.0.0-Windows-x86_64-raytracing.zip) |
-| MacOS (Silicon) | [F3D-3.0.0-macOS-arm64.dmg](https://github.com/f3d-app/f3d/releases/download/v3.0.0/F3D-3.0.0-macOS-arm64-raytracing.dmg) |
-| MacOS (Intel) | [F3D-3.0.0-macOS-x86_64.dmg](https://github.com/f3d-app/f3d/releases/download/v3.0.0/F3D-3.0.0-macOS-x86_64-raytracing.dmg) |
-| Linux (Debian package) | [F3D-3.0.0-Linux.deb](https://github.com/f3d-app/f3d/releases/download/v3.0.0/F3D-3.0.0-Linux-x86_64-raytracing.deb) |
-| Linux (portable) | [F3D-3.0.0-Linux.tar.xz](https://github.com/f3d-app/f3d/releases/download/v3.0.0/F3D-3.0.0-Linux-x86_64-raytracing.tar.xz) |
+| Platform               | Files                                                                                                                       |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Windows (installer)    | [F3D-3.0.0-Windows.exe](https://github.com/f3d-app/f3d/releases/download/v3.0.0/F3D-3.0.0-Windows-x86_64-raytracing.exe)    |
+| Windows (portable)     | [F3D-3.0.0-Windows.zip](https://github.com/f3d-app/f3d/releases/download/v3.0.0/F3D-3.0.0-Windows-x86_64-raytracing.zip)    |
+| MacOS (Silicon)        | [F3D-3.0.0-macOS-arm64.dmg](https://github.com/f3d-app/f3d/releases/download/v3.0.0/F3D-3.0.0-macOS-arm64-raytracing.dmg)   |
+| MacOS (Intel)          | [F3D-3.0.0-macOS-x86_64.dmg](https://github.com/f3d-app/f3d/releases/download/v3.0.0/F3D-3.0.0-macOS-x86_64-raytracing.dmg) |
+| Linux (Debian package) | [F3D-3.0.0-Linux.deb](https://github.com/f3d-app/f3d/releases/download/v3.0.0/F3D-3.0.0-Linux-x86_64-raytracing.deb)        |
+| Linux (portable)       | [F3D-3.0.0-Linux.tar.xz](https://github.com/f3d-app/f3d/releases/download/v3.0.0/F3D-3.0.0-Linux-x86_64-raytracing.tar.xz)  |
 
 ### Notes
+
 - MacOS package is not signed, see the [troubleshooting](LIMITATIONS_AND_TROUBLESHOOTING.md#macos) section for a workaround if needed.
 - MacOS packages require macOS >= 12.0
 - Linux packages require GLIBC >= 2.31

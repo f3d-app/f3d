@@ -1,10 +1,9 @@
 ---
 name: New release
 about: An issue to create a new release
-title: ''
+title: ""
 labels: release
-assignees: ''
-
+assignees: ""
 ---
 
 When creating this issue
@@ -35,9 +34,9 @@ Release Candidates :
 - [ ] Locally test the python wheels on macOS (Silicon)
 - [ ] Locally test the python wheels on Windows
 - If it fails,
- - [ ] Fix the issues in `release` branch,
- - [ ] Edit this issuethis paragraph and increment `N`
- - [ ] Merge F3D release into master: https://github.com/f3d-app/f3d/compare/master...release
+  - [ ] Fix the issues in `release` branch,
+  - [ ] Edit this issuethis paragraph and increment `N`
+  - [ ] Merge F3D release into master: https://github.com/f3d-app/f3d/compare/master...release
 - [ ] Else proceed to the next part
 
 Release :
@@ -64,6 +63,7 @@ Release :
 - [ ] Update `.github/ISSUE_TEMPLATE/new_release.md` in https://github.com/f3d-app/f3d if needed
 
 Linux testing protocol:
+
 - Install F3D-X.Y.Z-RCN-Linux-x86_64-raytracing system wide
 - `f3d testing/data/cow.vtp` -> check render, orientation, press R and check raytracing
 - `f3d testing/data/f3d.stp` -> check render, orientation
@@ -81,6 +81,7 @@ Linux testing protocol:
 - `./cpp/render-interact/render-interact ../../../testing/data/cow.vtp`
 
 macOS testing protocol:
+
 - Install F3D-X.Y.Z-RCN-macOS-x86_64-raytracing.dmg
 - Double click on cow.vtp, check render and orientation, press R and check raytracing
 - Double click on f3d.stp, check render and orientation
@@ -92,6 +93,7 @@ macOS testing protocol:
 - Press "Esc" and check the following commands `reload_current_file_group`, `set_camera top`, `toggle_volume_rendering`, `exit`
 
 Windows testing protocol:
+
 - Install F3D-X.Y.Z-RCN-Windows-x86_64-raytracing.exe, add F3D to path for all users
 - Start -> Disk Cleanup -> select thumbnails -> Ok -> Delete Files
 - Open testing/data directory in file manager
@@ -109,9 +111,11 @@ Windows testing protocol:
 - `.\cpp\render-interact\Release\render-interact ..\..\..\testing\data\cow.vtp`
 
 Python testing protocol:
+
 - Use a venv or make sure f3d is not installed in your python environment
 - pip install f3d==X.Y.Z-RCN
 - python
+
 ```
 import f3d
 eng = f3d.Engine.create()
@@ -119,6 +123,7 @@ eng.scene.add("/path/to/cow.vtp")
 eng.window.render() # No effect on Windows
 eng.interactor.start()
 ```
+
 - Check the following
- - The name of the window is `f3d` at all time
- - Python provides suggestions whenever the "Tab" key is pressed
+  - The name of the window is `f3d` at all time
+  - Python provides suggestions whenever the "Tab" key is pressed

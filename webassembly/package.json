@@ -3,7 +3,10 @@
   "version": "2.5.0",
   "description": "Fast and minimalist 3D viewer framework",
   "main": "f3d.js",
-  "files": ["main.js", "dist/f3d.*"],
+  "files": [
+    "main.js",
+    "dist/f3d.*"
+  ],
   "scripts": {
     "_docker": "docker run --rm -e CMAKE_BUILD_PARALLEL_LEVEL -v $(pwd)/..:/src ghcr.io/f3d-app/f3d-wasm:latest",
     "clean": "npm run _docker -- rm -rf /src/webassembly/dist",

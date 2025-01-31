@@ -1,6 +1,7 @@
 # Third Party Copyrights and License within F3D application source
 
 ## cxxopts.hpp:
+
 ```
 Copyright (c) 2014, 2015, 2016, 2017 Jarryd Beck
 
@@ -24,6 +25,7 @@ THE SOFTWARE.
 ```
 
 ## json.hpp:
+
 ```
     __ _____ _____ _____
  __|  |   __|     |   | |  JSON for Modern C++
@@ -54,6 +56,7 @@ SOFTWARE.
 ```
 
 ## dmon.h:
+
 ```
 BSD 2-Clause License
 
@@ -83,6 +86,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ```
 
 ## ImGui
+
 ```
 The MIT License (MIT)
 
@@ -108,6 +112,7 @@ SOFTWARE.
 ```
 
 ## Inter-Regular.ttf
+
 ```
 Copyright (c) 2016 The Inter Project Authors (https://github.com/rsms/inter)
 
@@ -203,9 +208,9 @@ FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
 OTHER DEALINGS IN THE FONT SOFTWARE.
 ```
 
-
 ### tinyfiledialogs
-``` 
+
+```
 SPDX-License-Identifier: Zlib
 Copyright (c) 2014 - 2024 Guillaume Vareille http://ysengrin.com
 	 ________________________________________________________________

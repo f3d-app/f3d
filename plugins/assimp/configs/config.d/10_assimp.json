@@ -1,25 +1,22 @@
 [
-{
-  "match": ".*(fbx|dae|off|dxf|x|3mf)",
-  "options":
   {
-    "load-plugins": "assimp"
-  }
-},
-{
-  "match": ".*(off|3mf)",
-  "options":
+    "match": ".*(fbx|dae|off|dxf|x|3mf)",
+    "options": {
+      "load-plugins": "assimp"
+    }
+  },
   {
-    "up": "+Z",
-    "camera-direction": "-1,1,-0.5"
-  }
-},
-{
-  "match": ".*(dxf)",
-  "options":
+    "match": ".*(off|3mf)",
+    "options": {
+      "up": "+Z",
+      "camera-direction": "-1,1,-0.5"
+    }
+  },
   {
-    "up": "-Z",
-    "camera-direction": "1,-1,0.5"
+    "match": ".*(dxf)",
+    "options": {
+      "up": "-Z",
+      "camera-direction": "1,-1,0.5"
+    }
   }
-}
 ]

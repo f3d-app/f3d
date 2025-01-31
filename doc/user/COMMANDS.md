@@ -19,13 +19,13 @@ The libf3d provides a few commands, many related to manipulating libf3d (options
 
 `reset option.name`: A command to reset a libf3d option to its default values, eg: `reset render.background.blur.coc`.
 
-`clear`: A command to clear ImGui console. No argument. 
+`clear`: A command to clear ImGui console. No argument.
 
 `print option.name`: A command to print the value of an libf3d option, eg: `print scene.up.direction`.
 
-`cycle_animation`:  A specific command to cycle `scene.animation.index` option using model information, No argument.
+`cycle_animation`: A specific command to cycle `scene.animation.index` option using model information, No argument.
 
-`cycle_coloring field/array/component`:  A specific command to manipulate scivis options using model information.
+`cycle_coloring field/array/component`: A specific command to manipulate scivis options using model information.
 Supports `field`, `array` or `component` arguments, see [documentation](INTERACTIONS.md#cycling-coloring).
 eg: `cycle_coloring array`.
 
@@ -109,14 +109,14 @@ If F3D is built with `F3D_MODULE_UI` support, pressing <kbd>Esc</kbd> will open 
 
 Command syntax is similar to bash, as in they will be split by "token" to be processed.
 
- - Tokens are spaces separated, eg: `set scene.up.direction +Z`.
- - Tokens can also be quoted to support spaces inside, eg:  `set render.hdri.file "/path/to/file with spaces.png"`.
- - Supported quotes are `` `'" ``, eg: `set render.hdri.file '/path/to/file with spaces.png'`.
- - Quotes inside quotes are supported as well, eg: `set render.hdri.file "/path/to/file'with'quotes.png"`.
- - Quotes and spaces can be escaped, eg: `set render.hdri.file /path/to/file\ with\ spaces\ and\ \'quotes\".png`.
- - Comment are supported using `#`, Any character after will be ignored. Use `\#` to add it verbatim.
- - Escapes can be escaped too: eg: `set render.hdri.file C:\\path\\to\\windows\\file.png`.
- - Other escaped character will be processed as if the escape was not present, eg: `set scene.up.direction +\Z`
- - Unfinished quoted section is invalid, eg: `set scene.up.direction "+Z`
- - A escape at the end is also invalid, eg: `set scene.up.direction +Z\`
- - Options values are [parsed](PARSING.md) according to their types.
+- Tokens are spaces separated, eg: `set scene.up.direction +Z`.
+- Tokens can also be quoted to support spaces inside, eg: `set render.hdri.file "/path/to/file with spaces.png"`.
+- Supported quotes are `` `'" ``, eg: `set render.hdri.file '/path/to/file with spaces.png'`.
+- Quotes inside quotes are supported as well, eg: `set render.hdri.file "/path/to/file'with'quotes.png"`.
+- Quotes and spaces can be escaped, eg: `set render.hdri.file /path/to/file\ with\ spaces\ and\ \'quotes\".png`.
+- Comment are supported using `#`, Any character after will be ignored. Use `\#` to add it verbatim.
+- Escapes can be escaped too: eg: `set render.hdri.file C:\\path\\to\\windows\\file.png`.
+- Other escaped character will be processed as if the escape was not present, eg: `set scene.up.direction +\Z`
+- Unfinished quoted section is invalid, eg: `set scene.up.direction "+Z`
+- A escape at the end is also invalid, eg: `set scene.up.direction +Z\`
+- Options values are [parsed](PARSING.md) according to their types.
