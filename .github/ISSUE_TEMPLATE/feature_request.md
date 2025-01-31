@@ -20,4 +20,4 @@ Add any other context or screenshots about the feature request here.
 
 **Contribution**
 Please tell us if you are able to contribute (Can you develop this new feature?)
-Don't worry, you can still post a feature request if you cannot contribute!\*
+Don't worry, you can still post a feature request if you cannot contribute!

@@ -34,9 +34,9 @@ Release Candidates :
 - [ ] Locally test the python wheels on macOS (Silicon)
 - [ ] Locally test the python wheels on Windows
 - If it fails,
-- [ ] Fix the issues in `release` branch,
-- [ ] Edit this issuethis paragraph and increment `N`
-- [ ] Merge F3D release into master: https://github.com/f3d-app/f3d/compare/master...release
+  - [ ] Fix the issues in `release` branch,
+  - [ ] Edit this issuethis paragraph and increment `N`
+  - [ ] Merge F3D release into master: https://github.com/f3d-app/f3d/compare/master...release
 - [ ] Else proceed to the next part
 
 Release :
@@ -125,5 +125,5 @@ eng.interactor.start()
 ```
 
 - Check the following
-- The name of the window is `f3d` at all time
-- Python provides suggestions whenever the "Tab" key is pressed
+  - The name of the window is `f3d` at all time
+  - Python provides suggestions whenever the "Tab" key is pressed
