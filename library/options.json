@@ -261,7 +261,7 @@
       },
       "discretization" : {
         "type": "int",
-        "default_value": "1"
+        "default_value": "0"
       },
       "range": {
         "type": "double_vector"
