@@ -3,6 +3,8 @@ name: CI
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
+    paths-ignore:
+      - 'doc/**'
   push:
     branches:
       - master
@@ -267,16 +269,6 @@ jobs:
             exclude_deprecated_label: no-exclude-deprecated
             rendering_backend: auto
             static_label: no-static
-            alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-            assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-            draco_version: ${{needs.default_versions.outputs.draco_version}}
-            occt_version: ${{needs.default_versions.outputs.occt_version}}
-            openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-            openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-            pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-            python_version: ${{needs.default_versions.outputs.python_version}}
-            usd_version: ${{needs.default_versions.outputs.usd_version}}
-            java_version: ${{needs.default_versions.outputs.java_version}}
           - build_type: static_libs
             vtk_version: commit
             raytracing_label: no-raytracing
@@ -385,7 +377,6 @@ jobs:
         pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
         python_version: ${{needs.default_versions.outputs.python_version}}
         usd_version: ${{needs.default_versions.outputs.usd_version}}
-        java_version: ${{needs.default_versions.outputs.java_version}}
 
 #----------------------------------------------------------------------------
 # MacOS ARM CI: Build and test, cross-vtk build matrix with a few optional builds
@@ -436,7 +427,6 @@ jobs:
         pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
         python_version: ${{needs.default_versions.outputs.python_version}}
         usd_version: ${{needs.default_versions.outputs.usd_version}}
-        java_version: ${{needs.default_versions.outputs.java_version}}
 
 #----------------------------------------------------------------------------
 # Python packaging: Build and test the Python wheel
@@ -526,7 +516,6 @@ jobs:
         occt_version: ${{needs.default_versions.outputs.occt_version}}
         openexr_version: ${{needs.default_versions.outputs.openexr_version}}
         openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-        pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
         usd_version: ${{needs.default_versions.outputs.usd_version}}
 
 #----------------------------------------------------------------------------
@@ -572,9 +561,6 @@ jobs:
         draco_version: ${{needs.default_versions.outputs.draco_version}}
         occt_version: ${{needs.default_versions.outputs.occt_version}}
         openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-        pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-        usd_version: ${{needs.default_versions.outputs.usd_version}}
 
 #----------------------------------------------------------------------------
 # static-analysis: Run static analysis on linux
@@ -612,14 +598,13 @@ jobs:
         occt_version: ${{needs.default_versions.outputs.occt_version}}
         openexr_version: ${{needs.default_versions.outputs.openexr_version}}
         openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-        pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
         usd_version: ${{needs.default_versions.outputs.usd_version}}
 
 #----------------------------------------------------------------------------
 # external-build: Check build of F3D as sub-project
 #----------------------------------------------------------------------------
   external-build:
-    needs: [cache_dependencies, default_versions]
+    needs: cache_dependencies
     if: github.event.pull_request.draft == false
 
     strategy:
@@ -639,8 +624,6 @@ jobs:
 
     - name: External build CI
       uses: ./source/f3d/.github/actions/external-build-ci
-      with:
-        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
 
 #----------------------------------------------------------------------------
 # android: Check build of F3D for android

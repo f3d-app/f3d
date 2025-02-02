@@ -2,15 +2,17 @@
 
 Here is a non exhaustive list of F3D limitations:
 
-* No support for specifying manual lighting in the default scene apart from using `--light-intensity` option.
-* Multiblock (.vtm, .gml) support is partial, non-surfacic data will be converted into surfaces.
-* Drag and drop interaction cannot be recorded nor played back.
-* Volume rendering and HDRI support requires a decent GPU.
-* The `--camera-zoom-factor` option require VTK >= 9.3.0
-* Information about the failure to load a file is not provided before VTK >= 9.4.0
+- No support for specifying manual lighting in the default scene apart from using `--light-intensity` option.
+- Multiblock (.vtm, .gml) support is partial, non-surfacic data will be converted into surfaces.
+- Drag and drop interaction cannot be recorded nor played back.
+- Volume rendering and HDRI support requires a decent GPU.
+- The `--camera-zoom-factor` option require VTK >= 9.3.0
+- Information about the failure to load a file is not provided before VTK >= 9.4.0
 
 ## Assimp
+
 FBX, DAE, OFF, DXF, X and 3MF file formats rely on [Assimp](https://github.com/assimp/assimp) library. It comes with some known limitations:
+
 - PBR materials are not supported for FBX file format.
 - Complex animations are not working very well with Assimp 5.1, it's recommended to use Assimp 5.0 for this use case.
 - Only one animation can be shown at a time, showing all animations is not supported yet.
@@ -20,7 +22,9 @@ FBX, DAE, OFF, DXF, X and 3MF file formats rely on [Assimp](https://github.com/a
 - Only support RBGA 8-bits embedded textures
 
 ## Alembic
+
 ABC file formats rely on [Alembic](https://github.com/alembic/alembic) library. It comes with some known limitations:
+
 - Supports only simple polygonal geometry.
 - Does not support ArbGeomParam feature in Alembic.
 - Does not support Subdivision Meshes.
@@ -28,25 +32,31 @@ ABC file formats rely on [Alembic](https://github.com/alembic/alembic) library. 
 - Does not support Animations.
 
 ## USD
+
 USD file formats rely on [OpenUSD](https://github.com/PixarAnimationStudios/OpenUSD) library. It comes with some known limitations:
+
 - Skinning is slow and baked on the CPU.
 - Does not support Face-varying attributes.
 - The `usd` plugin is not shipped in the python wheels yet.
 
 ## VDB
+
 VDB file formats rely on [OpenVDB](https://github.com/AcademySoftwareFoundation/openvdb) and VTK libraries. It currently comes with some known limitations:
+
 - VDB Grid files are opened with a hard-coded 0.1 sampling rate.
 - The `vdb` plugin is not shipped in the python wheels yet.
 
 ## Gaussian splatting
+
 Gaussian splatting (option `--point-sprites-type=gaussian`) needs depth sorting which is done internally using a compute shader. This requires support for OpenGL 4.3 which is not supported by macOS and old GPUs/drivers.
 
 # Troubleshooting
 
 ## General
+
 > I have built F3D with raytracing support but the denoiser is not working.
 
-Make sure that VTK has been built with *OpenImageDenoise* support (`VTKOSPRAY_ENABLE_DENOISER` option).
+Make sure that VTK has been built with _OpenImageDenoise_ support (`VTKOSPRAY_ENABLE_DENOISER` option).
 
 > My model shows up all wrong, with inverted surfaces everywhere.
 
@@ -64,13 +74,13 @@ The GCC flag `-latomic` is not being added automatically with specific architect
 
 > Thumbnails are not working in my file manager.
 
- * Check that your file manager supports the thumbnailer mechanism.
- * Check that you have updated your mime type database.
- * If all fails, remove your `.cache` user dir and check that `pcmanfm` thumbnails are working.
-  * If they are working, then it is an issue specific to your file manager (see below for a potential work around).
-  * If only a few format have working thumbnails, then it is an issue with the mime types database.
-  * If no formats have working thumbnails, then it is can be an issue with sandboxing or with the `f3d-plugin-xxx.thumbnailer` files.
-  * If only big file do not have thumbnails, this is intended, you can modify this behavior in the `thumbnail.d/10_global.json` configuration folder using the `max-size` option.
+- Check that your file manager supports the thumbnailer mechanism.
+- Check that you have updated your mime type database.
+- If all fails, remove your `.cache` user dir and check that `pcmanfm` thumbnails are working.
+- If they are working, then it is an issue specific to your file manager (see below for a potential work around).
+- If only a few format have working thumbnails, then it is an issue with the mime types database.
+- If no formats have working thumbnails, then it is can be an issue with sandboxing or with the `f3d-plugin-xxx.thumbnailer` files.
+- If only big file do not have thumbnails, this is intended, you can modify this behavior in the `thumbnail.d/10_global.json` configuration folder using the `max-size` option.
 
 > `--rendering-backend` CLI option is not working as expected
 
@@ -95,10 +105,11 @@ regsvr32 /u F3DShellExtension.dll
 
 OpenGL applications like F3D can have issues when launched from Windows Server or from a guest Windows because the access to the GPU is restricted.
 You can try to use a software implementation of OpenGL, called [Mesa](https://github.com/pal1000/mesa-dist-win/releases).
- * Download the latest `release-msvc`.
- * copy `x64/opengl32.dll`, `libgallium_wgl.dll` and `x64/libglapi.dll` in the same folder as `f3d.exe`.
- * set the environment variable `MESA_GL_VERSION_OVERRIDE` to 4.5.
- * run `f3d.exe`.
+
+- Download the latest `release-msvc`.
+- copy `x64/opengl32.dll`, `libgallium_wgl.dll` and `x64/libglapi.dll` in the same folder as `f3d.exe`.
+- set the environment variable `MESA_GL_VERSION_OVERRIDE` to 4.5.
+- run `f3d.exe`.
 
 > I run f3d from the command prompt and my Unicode characters are not displayed properly.
 

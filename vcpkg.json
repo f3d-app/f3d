@@ -1,10 +1,10 @@
 {
-    "name": "f3d",
-    "dependencies": [
-        {
-            "name": "vtk",
-            "default-features": false,
-            "features": [ "opengl" ]
-        }
-    ]
+  "name": "f3d",
+  "dependencies": [
+    {
+      "name": "vtk",
+      "default-features": false,
+      "features": ["opengl"]
+    }
+  ]
 }

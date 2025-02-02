@@ -20,7 +20,7 @@ runs:
 
     - name: Cache ASSIMP
       id: cache-assimp
-      uses: actions/cache@v4
+      uses: actions/cache/restore@v4
       with:
         path: dependencies/assimp_install
         key: assimp-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-0
@@ -87,3 +87,10 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/assimp_install
       shell: bash
       run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-assimp.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-assimp.outputs.cache-primary-key }}
+        path: dependencies/assimp_install

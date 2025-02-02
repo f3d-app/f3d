@@ -20,7 +20,7 @@ runs:
 
     - name: Cache OCCT
       id: cache-occt
-      uses: actions/cache@v4
+      uses: actions/cache/restore@v4
       with:
         path: dependencies/occt_install
         key: occt-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-4
@@ -54,7 +54,7 @@ runs:
       if: steps.cache-occt.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies
       shell: bash
-      run:
+      run: |
         mkdir occt_build
         mkdir occt_install
 
@@ -122,3 +122,10 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/occt_install
       shell: bash
       run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-occt.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-occt.outputs.cache-primary-key }}
+        path: dependencies/occt_install

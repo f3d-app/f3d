@@ -117,11 +117,15 @@ void vtkF3DImguiConsole::ShowConsole()
 
       ImGui::TextUnformatted(msg.c_str());
       if (hasColor)
+      {
         ImGui::PopStyleColor();
+      }
     }
 
     if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+    {
       ImGui::SetScrollHereY(1.0f);
+    }
 
     ImGui::PopStyleVar();
   }

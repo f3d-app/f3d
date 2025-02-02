@@ -19,6 +19,12 @@ jobs:
       with:
         options: "--check --verbose --include '(\\.py|\\.py\\.in)'"
         src: "./python"
+    - name: Prettier Formatting
+      uses: creyD/prettier_action@v4.3
+      with:
+        dry: True
+        prettier_options: '-c **/*.{js,json,md,html}'
+
 
   codespell-check:
     name: Codespell Check

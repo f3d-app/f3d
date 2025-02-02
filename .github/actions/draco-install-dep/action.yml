@@ -20,7 +20,7 @@ runs:
 
     - name: Cache Draco
       id: cache-draco
-      uses: actions/cache@v4
+      uses: actions/cache/restore@v4
       with:
         path: dependencies/draco_install
         key: draco-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-3
@@ -66,3 +66,10 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/draco_install
       shell: bash
       run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-draco.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-draco.outputs.cache-primary-key }}
+        path: dependencies/draco_install

@@ -12,7 +12,7 @@ runs:
 
     - name: Cache Imath
       id: cache-imath
-      uses: actions/cache@v4
+      uses: actions/cache/restore@v4
       with:
         path: dependencies/imath_install
         key: imath-v3.1.12-${{runner.os}}-${{inputs.cpu}}-0
@@ -57,3 +57,10 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/imath_install
       shell: bash
       run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-imath.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-imath.outputs.cache-primary-key }}
+        path: dependencies/imath_install
