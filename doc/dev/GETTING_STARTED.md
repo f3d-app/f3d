@@ -107,12 +107,14 @@ mkdir build
 Note: Resulting folder architecture should look like this:
 
 ```
-dev |- vtk |- src
-    |      |- build
-    |      |- install
-    |
-    |- f3d |- src
-           |- build
+dev
+|-- f3d
+|   |-- build
+|   `-- src
+`-- vtk
+    |-- build
+    |-- install
+    `-- src
 ```
 
 #### Build and install VTK in a dedicated folder
