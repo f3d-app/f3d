@@ -81,7 +81,7 @@ Note: The following steps were tested with Visual Studio Community 2022 using Wi
 - Download and install [cmake][cmake-download]
 - Download and install [Visual Studio 2022 Community Edition][visual-studio]
 
-#### Recover VTK and F3D sources
+#### Retrieve VTK and F3D sources
 
 - Open git bash
 
