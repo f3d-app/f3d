@@ -864,7 +864,6 @@ bool interactor_impl::triggerCommand(std::string_view command)
   }
 
   const std::string& action = tokens[0];
-
   try
   {
     // Find the right command to call
