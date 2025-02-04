@@ -584,6 +584,7 @@ jobs:
         openexr_version: ${{ fromJson(needs.config_file.outputs.config).version.openexr }}
         openvdb_version: ${{ fromJson(needs.config_file.outputs.config).version.openvdb }}
         usd_version: ${{ fromJson(needs.config_file.outputs.config).version.usd }}
+        vtk_version: ${{ fromJson(needs.config_file.outputs.config).vtk_commit_sha }}
 
 #----------------------------------------------------------------------------
 # external-build: Check build of F3D as sub-project
