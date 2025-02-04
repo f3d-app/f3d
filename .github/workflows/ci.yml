@@ -34,9 +34,9 @@ jobs:
         fetch-depth: 1
         lfs: false
 
-    - name: Set default versions
+    - name: Read JSON file
       id: get_config
-      run: echo "config=$(jq -c . < ./source/.github/workflow/config.json)" >> $GITHUB_OUTPUT
+      run: echo "config=$(jq -c . < ./source/.github/workflows/config.json)" >> $GITHUB_OUTPUT
 
 #----------------------------------------------------------------------------
 # Cache LFS: Checkout LFS data and update the cache to limit LFS bandwidth
