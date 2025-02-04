@@ -131,7 +131,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [${{ fromJson(needs.config_file.outputs.config).vtk_commit_sha }}, v9.4.1, v9.3.1, v9.2.6]
+        vtk_version: ["${{ fromJson(needs.config_file.outputs.config).vtk_commit_sha }}", v9.4.1, v9.3.1, v9.2.6]
         static_label: [no-static]
         include:
           - vtk_version: ${{ fromJson(needs.config_file.outputs.config).vtk_commit_sha }}
@@ -175,7 +175,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [${{ fromJson(needs.config_file.outputs.config).vtk_commit_sha }}, v9.4.1, v9.3.1, v9.2.6]
+        vtk_version: ["${{ fromJson(needs.config_file.outputs.config).vtk_commit_sha }}", v9.4.1, v9.3.1, v9.2.6]
         build_type: [standard]
         include:
           - raytracing_label: raytracing
@@ -331,7 +331,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [${{ fromJson(needs.config_file.outputs.config).vtk_commit_sha }}, v9.4.1, v9.3.1, v9.2.6]
+        vtk_version: ["${{ fromJson(needs.config_file.outputs.config).vtk_commit_sha }}", v9.4.1, v9.3.1, v9.2.6]
 
     runs-on: macos-13
 
@@ -370,7 +370,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [${{ fromJson(needs.config_file.outputs.config).vtk_commit_sha }}, v9.4.1, v9.3.1] # VTK 9.2.6 not compatible with recent clang version on macOS
+        vtk_version: ["${{ fromJson(needs.config_file.outputs.config).vtk_commit_sha }}", v9.4.1, v9.3.1] # VTK 9.2.6 not compatible with recent clang version on macOS
         bundle_label: [no-bundle]
         static_label: [no-static]
         include:
