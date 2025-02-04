@@ -3,12 +3,7 @@ description: 'Install VTK Dependency using cache when possible'
 inputs:
   vtk_version:
     description: 'VTK version'
-    required: false
-    default: 'commit'
-  vtk_sha_file:
-    description: 'VTK SHA file'
-    required: false
-    default: ''
+    required: true
   raytracing_label:
     description: 'Label to control raytracing'
     required: false
@@ -25,28 +20,17 @@ runs:
   using: "composite"
   steps:
 
-    - name: Recover VTK Short SHA from file
-      if: |
-        steps.cache-vtk.outputs.cache-hit != 'true' &&
-        inputs.vtk_version == 'commit'
-      working-directory: ${{github.workspace}}
+    - name: Check required inputs
       shell: bash
-      run: echo "VTK_SHA_OR_TAG=$(<${{ inputs.vtk_sha_file }})" >> $GITHUB_ENV
-
-    - name: Copy VTK version to env var
-      if: |
-        steps.cache-vtk.outputs.cache-hit != 'true' &&
-        inputs.vtk_version != 'commit'
-      working-directory: ${{github.workspace}}
-      shell: bash
-      run: echo "VTK_SHA_OR_TAG=${{inputs.vtk_version}}" >> $GITHUB_ENV
+      run: |
+        [[ "${{ inputs.vtk_version }}" ]] || { echo "vtk_version input is empty" ; exit 1; }
 
     - name: Cache VTK
       id: cache-vtk
       uses: actions/cache/restore@v4
       with:
         path: dependencies/vtk_install
-        key: vtk-${{env.VTK_SHA_OR_TAG}}-openvdb-${{inputs.openvdb_version}}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.cpu}}-8
+        key: vtk-${{ inputs.vtk_version }}-openvdb-${{inputs.openvdb_version}}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.cpu}}-8
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -65,7 +49,7 @@ runs:
         submodules: true
         fetch-depth: 0
         path: './dependencies/vtk'
-        ref: ${{env.VTK_SHA_OR_TAG}}
+        ref: ${{ inputs.vtk_version }}
 
     # CMake 3.31 introduced a new policy producing a warning when using vtkModule.cmake
     # See https://gitlab.kitware.com/vtk/vtk/-/issues/19526

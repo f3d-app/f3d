@@ -131,10 +131,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [commit, v9.4.1, v9.3.1, v9.2.6]
+        vtk_version: [${{ fromJson(needs.config_file.outputs.config).vtk_commit_sha }}, v9.4.1, v9.3.1, v9.2.6]
         static_label: [no-static]
         include:
-          - vtk_version: commit
+          - vtk_version: ${{ fromJson(needs.config_file.outputs.config).vtk_commit_sha }}
             static_label: static
 
     runs-on: windows-latest
@@ -175,7 +175,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [commit, v9.4.1, v9.3.1, v9.2.6]
+        vtk_version: [${{ fromJson(needs.config_file.outputs.config).vtk_commit_sha }}, v9.4.1, v9.3.1, v9.2.6]
         build_type: [standard]
         include:
           - raytracing_label: raytracing
@@ -194,7 +194,7 @@ jobs:
           - usd_version: ${{ fromJson(needs.config_file.outputs.config).version.usd }}
           - java_version: ${{ fromJson(needs.config_file.outputs.config).version.java }}
           - build_type: egl
-            vtk_version: commit
+            vtk_version: ${{ fromJson(needs.config_file.outputs.config).vtk_commit_sha }}
             raytracing_label: raytracing
             optional_deps_label: optional-deps
             exclude_deprecated_label: no-exclude-deprecated
@@ -211,7 +211,7 @@ jobs:
             usd_version: ${{ fromJson(needs.config_file.outputs.config).version.usd }}
             java_version: ${{ fromJson(needs.config_file.outputs.config).version.java }}
           - build_type: osmesa
-            vtk_version: commit
+            vtk_version: ${{ fromJson(needs.config_file.outputs.config).vtk_commit_sha }}
             raytracing_label: raytracing
             optional_deps_label: optional-deps
             exclude_deprecated_label: no-exclude-deprecated
@@ -228,7 +228,7 @@ jobs:
             usd_version: ${{ fromJson(needs.config_file.outputs.config).version.usd }}
             java_version: ${{ fromJson(needs.config_file.outputs.config).version.java }}
           - build_type: exclude_deprecated
-            vtk_version: commit
+            vtk_version: ${{ fromJson(needs.config_file.outputs.config).vtk_commit_sha }}
             raytracing_label: raytracing
             optional_deps_label: optional-deps
             exclude_deprecated_label: exclude-deprecated
@@ -245,14 +245,14 @@ jobs:
             usd_version: ${{ fromJson(needs.config_file.outputs.config).version.usd }}
             java_version: ${{ fromJson(needs.config_file.outputs.config).version.java }}
           - build_type: no_optional_deps
-            vtk_version: commit
+            vtk_version: ${{ fromJson(needs.config_file.outputs.config).vtk_commit_sha }}
             raytracing_label: no-raytracing
             optional_deps_label: no-optional-deps
             exclude_deprecated_label: no-exclude-deprecated
             rendering_backend: auto
             static_label: no-static
           - build_type: static_libs
-            vtk_version: commit
+            vtk_version: ${{ fromJson(needs.config_file.outputs.config).vtk_commit_sha }}
             raytracing_label: no-raytracing
             optional_deps_label: optional-deps
             exclude_deprecated_label: no-exclude-deprecated
@@ -269,7 +269,7 @@ jobs:
             usd_version: ${{ fromJson(needs.config_file.outputs.config).version.usd }}
             java_version: ${{ fromJson(needs.config_file.outputs.config).version.java }}
           - build_type: mindeps
-            vtk_version: commit
+            vtk_version: ${{ fromJson(needs.config_file.outputs.config).vtk_commit_sha }}
             raytracing_label: raytracing
             optional_deps_label: optional-deps
             exclude_deprecated_label: no-exclude-deprecated
@@ -331,7 +331,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [commit, v9.4.1, v9.3.1, v9.2.6]
+        vtk_version: [${{ fromJson(needs.config_file.outputs.config).vtk_commit_sha }}, v9.4.1, v9.3.1, v9.2.6]
 
     runs-on: macos-13
 
@@ -370,14 +370,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [commit, v9.4.1, v9.3.1] # VTK 9.2.6 not compatible with recent clang version on macOS
+        vtk_version: [${{ fromJson(needs.config_file.outputs.config).vtk_commit_sha }}, v9.4.1, v9.3.1] # VTK 9.2.6 not compatible with recent clang version on macOS
         bundle_label: [no-bundle]
         static_label: [no-static]
         include:
-          - vtk_version: commit
+          - vtk_version: ${{ fromJson(needs.config_file.outputs.config).vtk_commit_sha }}
             bundle_label: bundle
             static_label: no-static
-          - vtk_version: commit
+          - vtk_version: ${{ fromJson(needs.config_file.outputs.config).vtk_commit_sha }}
             bundle_label: no-bundle
             static_label: static
 
