@@ -500,6 +500,7 @@ jobs:
         openexr_version: ${{ fromJson(needs.config_file.outputs.config).version.openexr }}
         openvdb_version: ${{ fromJson(needs.config_file.outputs.config).version.openvdb }}
         usd_version: ${{ fromJson(needs.config_file.outputs.config).version.usd }}
+        vtk_version: ${{ fromJson(needs.config_file.outputs.config).vtk_commit_sha }}
 
 #----------------------------------------------------------------------------
 # Sanitizer: Build and test on linux with last VTK with sanitizer options
@@ -544,6 +545,7 @@ jobs:
         draco_version: ${{ fromJson(needs.config_file.outputs.config).version.draco }}
         occt_version: ${{ fromJson(needs.config_file.outputs.config).version.occt }}
         openexr_version: ${{ fromJson(needs.config_file.outputs.config).version.openexr }}
+        vtk_version: ${{ fromJson(needs.config_file.outputs.config).vtk_commit_sha }}
 
 #----------------------------------------------------------------------------
 # static-analysis: Run static analysis on linux
@@ -607,6 +609,8 @@ jobs:
 
     - name: External build CI
       uses: ./source/f3d/.github/actions/external-build-ci
+      with:
+        vtk_version: ${{ fromJson(needs.config_file.outputs.config).vtk_commit_sha }}
 
 #----------------------------------------------------------------------------
 # android: Check build of F3D for android
