@@ -73,18 +73,34 @@ int TestSDKOptions(int argc, char* argv[])
   test("set/get string", std::get<std::string>(opt.get("model.color.texture")) == "test");
 
   // Test double vector
+  opt.setAsString("model.scivis.range", "0.7,1.4");
+  test("setAsString vector<double>", opt.getAsString("model.scivis.range") == "0.7,1.4");
+
+  opt.setAsString("model.scivis.range", "0.8, 1.5");
+  test("setAsString spaces vector<double>",
+    opt.getAsString("model.scivis.range") == "0.8,1.5");
+
+  opt.model.scivis.range = { 0.9, 1.2 };
+  test("getAsString vector<double>", opt.getAsString("model.scivis.range") == "0.9,1.2");
+
+  opt.set("model.scivis.range", std::vector<double>{ 0.5, 1.5 });
+  test("set/get vector<double>",
+    std::get<std::vector<double>>(opt.get("model.scivis.range")) ==
+      std::vector<double>{ 0.5, 1.5 });
+
+  // Test color_t
   opt.setAsString("render.background.color", "0.1,0.2,0.4");
-  test("setAsString vector<double>", opt.getAsString("render.background.color") == "0.1,0.2,0.4");
+  test("setAsString color", opt.getAsString("render.background.color") == "0.1,0.2,0.4");
 
   opt.setAsString("render.background.color", "0.1, 0.3, 0.4");
-  test("setAsString spaces vector<double>",
+  test("setAsString spaces color",
     opt.getAsString("render.background.color") == "0.1,0.3,0.4");
 
   opt.render.background.color = { 0.1, 0.2, 0.5 };
-  test("getAsString vector<double>", opt.getAsString("render.background.color") == "0.1,0.2,0.5");
+  test("getAsString color", opt.getAsString("render.background.color") == "0.1,0.2,0.5");
 
-  opt.set("render.background.color", std::vector<double>{ 0.1, 0.2, 0.3 });
-  test("set/get vector<double>",
+  opt.set("render.background.color", f3d::color_t{ 0.1, 0.2, 0.3 });
+  test("set/get color",
     std::get<std::vector<double>>(opt.get("render.background.color")) ==
       std::vector<double>{ 0.1, 0.2, 0.3 });
 
@@ -171,7 +187,7 @@ int TestSDKOptions(int argc, char* argv[])
   test("not isSame with vectors", !opt.isSame(opt2, "render.background.color"));
 
   opt2.copy(opt, "render.background.color");
-  test("copy with vectors", opt2.render.background.color == std::vector<double>({ 0.1, 0.2, 0.7 }));
+  test("copy with vectors", opt2.render.background.color == f3d::color_t({ 0.1, 0.2, 0.7 }));
 
   // Test isSame/copy error path
   test.expect<f3d::options::inexistent_exception>(

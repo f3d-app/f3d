@@ -59,6 +59,48 @@ private:
 };
 
 /**
+ * Describe a RGB color.
+ */
+class F3D_EXPORT color_t
+{
+public:
+  color_t() = default;
+  color_t(std::vector<double> rgb)
+    : RGB(rgb)
+  {
+  }
+  color_t(double red, double green, double blue)
+  {
+    RGB.emplace_back(red);
+    RGB.emplace_back(green);
+    RGB.emplace_back(blue);
+  }
+  color_t(std::initializer_list<double> list)
+  {
+    this->RGB = std::vector<double>(list);
+  }
+  operator std::vector<double>() const
+  {
+    return this->RGB;
+  }
+  bool operator==(const color_t& other) const
+  {
+    return this->RGB == other.RGB;
+  }
+  bool operator!=(const color_t& other) const
+  {
+    return this->RGB != other.RGB;
+  }
+  const double* data() const
+  {
+    return this->RGB.data();
+  }
+
+private:
+  std::vector<double> RGB;
+};
+
+/**
  * Describe a 3D surfacic mesh.
  * A valid mesh fulfills these requirements:
  * - points must not be empty and its length must be a multiple of 3 (3 times the number of points)

@@ -183,6 +183,20 @@ ratio_t parse(const std::string& str)
 
 //----------------------------------------------------------------------------
 /**
+ * Parse provided string into a color_t.
+ * Supported formats: "R,G,B"
+ * rely on parse<std::vector<double>>(str)
+ * Can throw options::parsing_exception in case of failure to parse
+ */
+template<>
+color_t parse(const std::string& str)
+{
+  return color_t(options_tools::parse<std::vector<double>>(str));
+}
+
+
+//----------------------------------------------------------------------------
+/**
  * Return provided string stripped of leading and trailing spaces.
  */
 template<>
@@ -261,6 +275,17 @@ std::string format(const std::vector<T>& var)
     i++;
   }
   return stream.str();
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Format provided var into a string from provided color_t
+ * rely on format(std::vector<double>&)
+ */
+std::string format(color_t var)
+{
+  // TODO generate a proper color string
+  return options_tools::format(static_cast<std::vector<double>>(var));
 }
 
 //----------------------------------------------------------------------------
