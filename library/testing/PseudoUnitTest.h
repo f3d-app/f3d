@@ -1,6 +1,8 @@
 #ifndef PseudoUnitTest_h
 #define PseudoUnitTest_h
 
+#include "types.h"
+
 #include <functional>
 #include <iostream>
 #include <sstream>
@@ -106,6 +108,14 @@ private:
   {
     (success ? passCount : failCount)++;
     this->log(success, label, message);
+  }
+
+  std::string toString(const f3d::color_t& color)
+  {
+    const double* value = color.data();
+    std::stringstream ss;
+    ss << value[0] << "," << value[1] << "," << value[2];
+    return ss.str();
   }
 
   template<typename T>

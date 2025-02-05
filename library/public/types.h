@@ -2,13 +2,26 @@
 #define f3d_types_h
 
 #include "export.h"
+#include "exception.h"
 
+#include <algorithm>
 #include <array>
+#include <iostream>
 #include <string>
 #include <vector>
 
 namespace f3d
 {
+/**
+ * An exception that can be thrown by any type if
+ * it fails in the construtor for some reason.
+ */
+struct type_construction_exception : public exception
+{
+  explicit type_construction_exception(const std::string& what = "")
+    : exception(what) {};
+};
+
 /**
  * Describe a 3D point.
  */
@@ -64,24 +77,33 @@ private:
 class F3D_EXPORT color_t
 {
 public:
+
   color_t() = default;
-  color_t(std::vector<double> rgb)
-    : RGB(rgb)
+  color_t(const std::vector<double>& vec)
   {
+    if (vec.size() != 3)
+    {
+      throw f3d::type_construction_exception("Provided vector does not have the right size");
+    }
+    std::copy_n(vec.begin(), 3, this->RGB.begin());
   }
   color_t(double red, double green, double blue)
   {
-    RGB.emplace_back(red);
-    RGB.emplace_back(green);
-    RGB.emplace_back(blue);
+    this->RGB[0] = red;
+    this->RGB[1] = green;
+    this->RGB[2] = blue;
   }
-  color_t(std::initializer_list<double> list)
+  color_t(const std::initializer_list<double>& list)
   {
-    this->RGB = std::vector<double>(list);
+    if (list.size() != 3)
+    {
+      throw f3d::type_construction_exception("Provided list does not have the right size");
+    }
+    std::copy_n(list.begin(), 3, this->RGB.begin());
   }
   operator std::vector<double>() const
   {
-    return this->RGB;
+    return std::vector<double>(this->RGB.begin(), this->RGB.end());
   }
   bool operator==(const color_t& other) const
   {
@@ -97,7 +119,7 @@ public:
   }
 
 private:
-  std::vector<double> RGB;
+  std::array<double, 3> RGB;
 };
 
 /**

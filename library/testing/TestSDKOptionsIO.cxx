@@ -15,7 +15,7 @@ public:
       const T actual = f3d::options::parse<T>(input);
       if (actual != expected)
       {
-//        throw this->comparisonMessage(actual, expected, "!=");
+        throw this->comparisonMessage(actual, expected, "!=");
       }
     });
   }
@@ -34,7 +34,7 @@ public:
       const std::string actual = f3d::options::format<T>(input);
       if (actual != expected)
       {
-//        throw this->comparisonMessage(actual, expected, "!=");
+        throw this->comparisonMessage(actual, expected, "!=");
       }
     });
   }

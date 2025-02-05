@@ -2,6 +2,7 @@
 
 #include <export.h>
 #include <options.h>
+#include <types.h>
 
 #include <algorithm>
 #include <iostream>
@@ -103,6 +104,19 @@ int TestSDKOptions(int argc, char* argv[])
   test("set/get color",
     std::get<std::vector<double>>(opt.get("render.background.color")) ==
       std::vector<double>{ 0.1, 0.2, 0.3 });
+
+  test.expect<f3d::type_construction_exception>(
+    "color_t invalid size list", [&]() { f3d::color_t({ 0.1, 0.2, 0.3, 0.4 }); });
+
+  test.expect<f3d::type_construction_exception>(
+    "color_t invalid size vector", [&]() { f3d::color_t(std::vector<double>{ 0.1, 0.2 }); });
+
+  test.expect<f3d::options::parsing_exception>("setAsString color with incorrect size",
+    [&]() { opt.setAsString("render.background.color", "0.1,0.2,0.3,0.4"); });
+
+  test.expect<f3d::options::incompatible_exception>("set color with incorrect size",
+    [&]() { opt.set("render.background.color", std::vector<double>{0.1,0.2}); });
+
 
   // Test closest option
   auto closest = opt.getClosestOption("modle.sciivs.cell");
