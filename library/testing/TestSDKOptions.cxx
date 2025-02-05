@@ -78,8 +78,7 @@ int TestSDKOptions(int argc, char* argv[])
   test("setAsString vector<double>", opt.getAsString("model.scivis.range") == "0.7,1.4");
 
   opt.setAsString("model.scivis.range", "0.8, 1.5");
-  test("setAsString spaces vector<double>",
-    opt.getAsString("model.scivis.range") == "0.8,1.5");
+  test("setAsString spaces vector<double>", opt.getAsString("model.scivis.range") == "0.8,1.5");
 
   opt.model.scivis.range = { 0.9, 1.2 };
   test("getAsString vector<double>", opt.getAsString("model.scivis.range") == "0.9,1.2");
@@ -94,8 +93,7 @@ int TestSDKOptions(int argc, char* argv[])
   test("setAsString color", opt.getAsString("render.background.color") == "0.1,0.2,0.4");
 
   opt.setAsString("render.background.color", "0.1, 0.3, 0.4");
-  test("setAsString spaces color",
-    opt.getAsString("render.background.color") == "0.1,0.3,0.4");
+  test("setAsString spaces color", opt.getAsString("render.background.color") == "0.1,0.3,0.4");
 
   opt.render.background.color = { 0.1, 0.2, 0.5 };
   test("getAsString color", opt.getAsString("render.background.color") == "0.1,0.2,0.5");
@@ -115,8 +113,7 @@ int TestSDKOptions(int argc, char* argv[])
     [&]() { opt.setAsString("render.background.color", "0.1,0.2,0.3,0.4"); });
 
   test.expect<f3d::options::incompatible_exception>("set color with incorrect size",
-    [&]() { opt.set("render.background.color", std::vector<double>{0.1,0.2}); });
-
+    [&]() { opt.set("render.background.color", std::vector<double>{ 0.1, 0.2 }); });
 
   // Test closest option
   auto closest = opt.getClosestOption("modle.sciivs.cell");

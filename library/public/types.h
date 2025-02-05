@@ -14,7 +14,7 @@ namespace f3d
 {
 /**
  * An exception that can be thrown by any type if
- * it fails in the construtor for some reason.
+ * it fails in the constructor for some reason.
  */
 struct type_construction_exception : public exception
 {

@@ -201,7 +201,6 @@ color_t parse(const std::string& str)
   }
 }
 
-
 //----------------------------------------------------------------------------
 /**
  * Return provided string stripped of leading and trailing spaces.
@@ -315,7 +314,8 @@ void set(options& opt, std::string_view name, const option_variant_t& value)
   }
   catch (const f3d::type_construction_exception& ex)
   {
-    throw options::incompatible_exception("Could not create type for " + std::string(name) + " : " + ex.what());
+    throw options::incompatible_exception(
+      "Could not create type for " + std::string(name) + " : " + ex.what());
   }
 }
 
