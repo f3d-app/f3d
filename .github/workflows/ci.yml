@@ -275,16 +275,16 @@ jobs:
             exclude_deprecated_label: no-exclude-deprecated
             rendering_backend: auto
             static_label: no-static
-            alembic_version: ${{needs.config_file.outputs.alembic_min_version}}
-            assimp_version: ${{needs.config_file.outputs.assimp_min_version}}
-            draco_version: ${{needs.config_file.outputs.draco_min_version}}
-            occt_version: ${{needs.config_file.outputs.occt_min_version}}
-            openexr_version: ${{needs.config_file.outputs.openexr_min_version}}
-            openvdb_version: ${{needs.config_file.outputs.openvdb_min_version}}
-            pybind11_version: ${{needs.config_file.outputs.pybind11_min_version}}
-            python_version: ${{needs.config_file.outputs.python_min_version}}
-            usd_version: ${{needs.config_file.outputs.usd_min_version}}
-            java_version: ${{needs.config_file.outputs.java_min_version}}
+            alembic_version: ${{ fromJson(needs.config_file.outputs.config).min_version.alembic }}
+            assimp_version: ${{ fromJson(needs.config_file.outputs.config).min_version.assimp }}
+            draco_version: ${{ fromJson(needs.config_file.outputs.config).min_version.draco }}
+            occt_version: ${{ fromJson(needs.config_file.outputs.config).min_version.occt }}
+            openexr_version: ${{ fromJson(needs.config_file.outputs.config).min_version.openexr }}
+            openvdb_version: ${{ fromJson(needs.config_file.outputs.config).min_version.openvdb }}
+            pybind11_version: ${{ fromJson(needs.config_file.outputs.config).min_version.pybind11 }}
+            python_version: ${{ fromJson(needs.config_file.outputs.config).min_version.python }}
+            usd_version: ${{ fromJson(needs.config_file.outputs.config).min_version.usd }}
+            java_version: ${{ fromJson(needs.config_file.outputs.config).min_version.java }}
 
     runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
@@ -590,7 +590,7 @@ jobs:
 # external-build: Check build of F3D as sub-project
 #----------------------------------------------------------------------------
   external-build:
-    needs: cache_dependencies
+    needs: [cache_dependencies, config_file]
     if: github.event.pull_request.draft == false
 
     strategy:
