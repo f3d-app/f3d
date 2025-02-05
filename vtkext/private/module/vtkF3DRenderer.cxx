@@ -531,6 +531,7 @@ void vtkF3DRenderer::SetGridSubdivisions(int subdivisions)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetGridColor(const std::vector<double>& color)
 {
+  // TODO
   assert(color.size() == 3);
 
   if (this->GridColor[0] != color[0] || this->GridColor[1] != color[1] ||
@@ -1782,29 +1783,15 @@ void vtkF3DRenderer::ConfigureActorsProperties()
   double* surfaceColor = nullptr;
   if (this->SurfaceColor.has_value())
   {
-    if (this->SurfaceColor.value().size() != 3)
-    {
-      F3DLog::Print(
-        F3DLog::Severity::Warning, std::string("Invalid surface color provided, not applying"));
-    }
-    else
-    {
-      surfaceColor = this->SurfaceColor.value().data();
-    }
+    assert(this->SurfaceColor->size() == 3);
+    surfaceColor = this->SurfaceColor->data();
   }
 
   double* emissiveFactor = nullptr;
   if (this->EmissiveFactor.has_value())
   {
-    if (this->EmissiveFactor.value().size() != 3)
-    {
-      F3DLog::Print(
-        F3DLog::Severity::Warning, std::string("Invalid emissive factor provided, not applying"));
-    }
-    else
-    {
-      emissiveFactor = this->EmissiveFactor.value().data();
-    }
+    assert(this->EmissiveFactor->size() == 3);
+    emissiveFactor = this->EmissiveFactor->data();
   }
 
   bool setBackfaceCulling = false;

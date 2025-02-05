@@ -1034,10 +1034,7 @@ endif ()
 f3d_test(NAME TestInvalidTexture DATA cow.vtp ARGS --texture-material=${F3D_SOURCE_DIR}/testing/data/invalid.png REGEXP "Cannot open texture file" NO_BASELINE)
 
 # Test invalid color
-f3d_test(NAME TestInvalidColor DATA cow.vtp ARGS --color=0,0,0,1 REGEXP "Invalid surface color provided, not applying" NO_BASELINE)
-
-# Test invalid emmisive factor
-f3d_test(NAME TestInvalidEmissiveFactor DATA cow.vtp ARGS --emissive-factor=0,0,0,1 REGEXP "Invalid emissive factor provided, not applying" NO_BASELINE)
+f3d_test(NAME TestInvalidColor DATA cow.vtp ARGS --color=0,0,0,1 REGEXP "Provided vector does not have the right size" NO_BASELINE)
 
 # Test non existent interaction file, do not add a TestNonExistentInteraction
 f3d_test(NAME TestNonExistentInteraction DATA cow.vtp INTERACTION REGEXP "Interaction record file to play does not exist" NO_BASELINE)
