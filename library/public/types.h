@@ -1,8 +1,8 @@
 #ifndef f3d_types_h
 #define f3d_types_h
 
-#include "export.h"
 #include "exception.h"
+#include "export.h"
 
 #include <algorithm>
 #include <array>
@@ -77,7 +77,6 @@ private:
 class F3D_EXPORT color_t
 {
 public:
-
   color_t() = default;
   color_t(const std::vector<double>& vec)
   {
