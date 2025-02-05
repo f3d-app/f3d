@@ -252,6 +252,7 @@ f3d_test(NAME TestTextureMatCapWithTCoords DATA WaterBottle.glb ARGS --texture-m
 f3d_test(NAME TestConfigOrder DATA suzanne.ply ARGS CONFIG ${F3D_SOURCE_DIR}/testing/configs/config_order.json) # `.+` > `.*` alphabetically but overridden by the order
 f3d_test(NAME TestOutputStream DATA suzanne.ply ARGS --verbose=quiet --output=- REGEXP "^.PNG" NO_BASELINE NO_OUTPUT)
 f3d_test(NAME TestOutputStreamInfo DATA suzanne.ply ARGS --verbose=info --output=- REGEXP "redirected to stderr" NO_BASELINE NO_OUTPUT)
+f3d_test(NAME TestAliasCommand DATA dragon.vtu SCRIPT TestAliasCommand.txt --reference=${F3D_SOURCE_DIR}/testing/baseline/TestAliasCommand.png) # Alias command test
 
 # Color map files testing
 f3d_test(NAME TestColorMapFileFullPath DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis8.png --scalar-coloring --coloring-component=1)
@@ -1264,6 +1265,3 @@ if(F3D_MODULE_DMON AND (WIN32 OR APPLE OR (F3D_TESTING_ENABLE_GLX_TESTS AND VTK_
   add_test (NAME f3d::TestWatch COMMAND ${_f3d_os_script_exec} ${CMAKE_CURRENT_SOURCE_DIR}/test_watch.${_f3d_os_script_ext} $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data ${CMAKE_BINARY_DIR}/Testing/Temporary)
   set_tests_properties(f3d::TestWatch PROPERTIES RUN_SERIAL TRUE TIMEOUT 30)
 endif()
-
-# Alias Test
-f3d_test(NAME TestAliasCommand DATA dragon.vtu SCRIPT TestAliasCommand.txt --reference=${F3D_SOURCE_DIR}/testing/baseline/TestAliasCommand.png)
