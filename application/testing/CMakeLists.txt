@@ -1094,7 +1094,10 @@ f3d_test(NAME TestConfigFileQuiet DATA nonExistentFile.vtp CONFIG ${F3D_SOURCE_D
 f3d_test(NAME TestNoFileConfigFile CONFIG ${F3D_SOURCE_DIR}/testing/configs/verbose.json ARGS --verbose REGEXP "No files to load provided" NO_BASELINE)
 
 # Test that --no-config overrides --config
-f3d_test(NAME TestNoConfigWithConfig DATA f3d.glb ARGS --no-config --config ${F3D_SOURCE_DIR}/testing/configs/complex.json)
+f3d_test(NAME TestNoConfigWithConfig DATA f3d.glb ARGS --no-config CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json)
+
+# Test that config file search display logs
+f3d_test(NAME TestConfigFileLocationVerbose ARGS --verbose CONFIG inexistent.json REGEXP "Candidate config file not found: .*inexistent.json" NO_BASELINE)
 
 # Test help display
 f3d_test(NAME TestHelp ARGS --help REGEXP "Usage:")
