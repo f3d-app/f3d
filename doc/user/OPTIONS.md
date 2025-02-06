@@ -40,7 +40,7 @@ F3D behavior can be fully controlled from the command line using the following o
 | -g, \-\-grid                                         | bool<br>false    | Show _a grid_ aligned with the horizontal (orthogonal to the Up direction) plane.                                                                                                    |
 | \-\-grid\-unit=\<length\>                            | double<br>-      | Set the size of the _unit square_ for the grid. If not set (the default) a suitable value will be automatically computed.                                                            |
 | \-\-grid\-subdivisions=\<count\>                     | int<br>10        | Set the number of subdivisions for the grid.                                                                                                                                         |
-| \-\-grid\-color=\<color\>                            | color<br>(0,0,0) | Set the color grid lines.                                                                                                                                                            |
+| \-\-grid\-color=\<color\>                            | color<br>0,0,0   | Set the color grid lines.                                                                                                                                                            |
 | -e, \-\-edges                                        | bool<br>false    | Show the _cell edges_.                                                                                                                                                               |
 | \-\-armature                                         | bool<br>false    | Show armature if present (glTF only).                                                                                                                                                |
 | \-\-camera-index=\<idx\>                             | int<br>-         | Select the scene camera to use when available in the file. Automatically computed by default.                                                                                        |
@@ -77,18 +77,18 @@ F3D behavior can be fully controlled from the command line using the following o
 
 ## Window options
 
-| Options                         | Type<br>Default                                                          | Description                                                                                          |
-| ------------------------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
-| \-\-background-color=\<color\>  | color<br><span style="color:rgb(51, 51, 51)">&#9632;</span>0.2, 0.2, 0.2 | Set the window _background color_.<br>Ignored if _hdri_ is set.                                      |
-| \-\-resolution=\<width,height\> | vector\<double\><br>1000, 600                                            | Set the _window resolution_.                                                                         |
-| \-\-position=\<x,y\>            | vector\<double\><br>-                                                    | Set the _window position_ (top left corner) , in pixels, starting from the top left of your screens. |
-| -z, \-\-fps                     | bool<br>false                                                            | Display a rendering _frame per second counter_.                                                      |
-| -n, \-\-filename                | bool<br>false                                                            | Display the _name of the file_ on top of the window.                                                 |
-| -m, \-\-metadata                | bool<br>false                                                            | Display the _metadata_.                                                                              |
-| \-\-hdri-skybox                 | bool<br>false                                                            | Show the HDRI as a skybox. Overrides \-\-background-color and \-\-no-background.                     |
-| -u, \-\-blur-background         | bool<br>false                                                            | Blur background.<br>Useful with a HDRI skybox.                                                       |
-| \-\-blur-coc                    | double<br>20                                                             | Blur circle of confusion radius.                                                                     |
-| \-\-light-intensity             | double<br>1.0                                                            | _Adjust the intensity_ of every light in the scene.                                                  |
+| Options                         | Type<br>Default               | Description                                                                                          |
+| ------------------------------- | ----------------------------- | ---------------------------------------------------------------------------------------------------- |
+| \-\-background-color=\<color\>  | color<br>0.2, 0.2, 0.2        | Set the window _background color_.<br>Ignored if _hdri_ is set.                                      |
+| \-\-resolution=\<width,height\> | vector\<double\><br>1000, 600 | Set the _window resolution_.                                                                         |
+| \-\-position=\<x,y\>            | vector\<double\><br>-         | Set the _window position_ (top left corner) , in pixels, starting from the top left of your screens. |
+| -z, \-\-fps                     | bool<br>false                 | Display a rendering _frame per second counter_.                                                      |
+| -n, \-\-filename                | bool<br>false                 | Display the _name of the file_ on top of the window.                                                 |
+| -m, \-\-metadata                | bool<br>false                 | Display the _metadata_.                                                                              |
+| \-\-hdri-skybox                 | bool<br>false                 | Show the HDRI as a skybox. Overrides \-\-background-color and \-\-no-background.                     |
+| -u, \-\-blur-background         | bool<br>false                 | Blur background.<br>Useful with a HDRI skybox.                                                       |
+| \-\-blur-coc                    | double<br>20                  | Blur circle of confusion radius.                                                                     |
+| \-\-light-intensity             | double<br>1.0                 | _Adjust the intensity_ of every light in the scene.                                                  |
 
 ## Scientific visualization options
 
