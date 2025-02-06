@@ -73,7 +73,9 @@ ctest
 
 ## Windows
 
-Note: The following steps were tested with Visual Studio Community 2022 using Windows 10, but should also work for other versions
+The following steps were tested with Visual Studio Community 2022 using Windows 10, but should also work for other versions.
+This guide is relying a lot on terminal command in order to provide easy steps to follow.
+Alternatively, it is possible to use Visual Studio directly by opening .sln files and building in Visual Studio.
 
 #### Install Dependencies
 
@@ -91,10 +93,7 @@ mkdir dev
 cd dev
 mkdir vtk
 cd vtk
-git clone https://gitlab.kitware.com/vtk/vtk.git src
-cd src
-git checkout v9.4.1
-cd ..
+git clone --depth 1 --branch v9.4.1 https://gitlab.kitware.com/vtk/vtk.git src
 mkdir build
 mkdir install
 cd ..
