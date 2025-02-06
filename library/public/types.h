@@ -23,6 +23,16 @@ struct type_construction_exception : public exception
 };
 
 /**
+ * An exception that can be thrown by any type if
+ * it fails when accessing data for some reason.
+ */
+struct type_access_exception : public exception
+{
+  explicit type_access_exception(const std::string& what = "")
+    : exception(what) {};
+};
+
+/**
  * Describe a 3D point.
  */
 struct F3D_EXPORT point3_t : std::array<double, 3>
@@ -92,10 +102,9 @@ public:
     this->RGB[1] = green;
     this->RGB[2] = blue;
   }
-  template<std::size_t N>
-  color_t(const double (&list)[N])
+  color_t(const double (&list)[3])
   {
-    static_assert(N == 3, "color_t needs exactly 3 elements to initialize");
+    static_assert(sizeof(list) == 3 * sizeof(double), "color_t needs exactly 3 elements to initialize");
     std::copy_n(list, 3, this->RGB.begin());
   }
   operator std::vector<double>() const
@@ -110,9 +119,37 @@ public:
   {
     return this->RGB != other.RGB;
   }
+  double operator[](size_t i) const
+  {
+    if (i >= 3)
+    {
+      throw f3d::type_access_exception("Incorrect index");
+    }
+    return this->RGB[i];
+  }
+  double& operator[](size_t i)
+  {
+    if (i >= 3)
+    {
+      throw f3d::type_access_exception("Incorrect index");
+    }
+    return this->RGB[i];
+  }
   const double* data() const
   {
     return this->RGB.data();
+  }
+  double r() const
+  {
+    return this->RGB[0];
+  }
+  double g() const
+  {
+    return this->RGB[1];
+  }
+  double b() const
+  {
+    return this->RGB[2];
   }
 
 private:

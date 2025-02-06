@@ -106,6 +106,17 @@ int TestSDKOptions(int argc, char* argv[])
   test.expect<f3d::type_construction_exception>(
     "color_t invalid size vector", [&]() { f3d::color_t(std::vector<double>{ 0.1, 0.2 }); });
 
+  f3d::color_t color({ 0.1, 0.2, 0.3 });
+  color[0] = 0.7;
+  const f3d::color_t* colorPtr = &color;
+  test("color operator[]", color[0] == 0.7);
+  test("color operator[] const", (*colorPtr)[0] == 0.7);
+  test.expect<f3d::type_access_exception>(
+    "color_t invalid access", [&]() { color[3]; });
+  test("color red", color.r() == 0.7);
+  test("color green", color.g() == 0.2);
+  test("color blue", color.b() == 0.3);
+
   test.expect<f3d::options::parsing_exception>("setAsString color with incorrect size",
     [&]() { opt.setAsString("render.background.color", "0.1,0.2,0.3,0.4"); });
 
