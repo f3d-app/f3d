@@ -118,19 +118,6 @@ private:
     return ss.str();
   }
 
-  /*std::string toString(const f3d::color_t& color)
-  {
-    const double* value = color.data();
-    std::stringstream ss;
-    ss << value[0] << "," << value[1] << "," << value[2];
-    return ss.str();
-  }*/
-
-  std::string toString(const f3d::color_t& color)
-  {
-    return toString(static_cast<std::vector<double>>(color));
-  }
-
   template<typename T>
   std::string toString(const std::vector<T>& value)
   {
@@ -142,6 +129,11 @@ private:
     }
     ss << " }";
     return ss.str();
+  }
+
+  std::string toString(const f3d::color_t& color)
+  {
+    return toString(static_cast<std::vector<double>>(color));
   }
 
 protected:
