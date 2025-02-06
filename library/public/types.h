@@ -104,7 +104,8 @@ public:
   }
   color_t(const double (&list)[3])
   {
-    static_assert(sizeof(list) == 3 * sizeof(double), "color_t needs exactly 3 elements to initialize");
+    static_assert(
+      sizeof(list) == 3 * sizeof(double), "color_t needs exactly 3 elements to initialize");
     std::copy_n(list, 3, this->RGB.begin());
   }
   operator std::vector<double>() const

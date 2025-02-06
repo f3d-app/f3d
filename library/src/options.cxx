@@ -181,11 +181,11 @@ std::string options::format(const T& var)
 }
 
 //----------------------------------------------------------------------------
-#define F3D_DECL_TYPE(TYPE)                                                               \
+#define F3D_DECL_TYPE(TYPE)                                                                        \
   template F3D_EXPORT TYPE options::parse<TYPE>(const std::string& str);                           \
   template F3D_EXPORT std::string options::format<TYPE>(const TYPE& val)
-#define F3D_DECL_TYPE_WITH_VEC(TYPE)                                                                        \
-  F3D_DECL_TYPE(TYPE);                                                                    \
+#define F3D_DECL_TYPE_WITH_VEC(TYPE)                                                               \
+  F3D_DECL_TYPE(TYPE);                                                                             \
   F3D_DECL_TYPE(std::vector<TYPE>)
 F3D_DECL_TYPE_WITH_VEC(bool);
 F3D_DECL_TYPE_WITH_VEC(int);
