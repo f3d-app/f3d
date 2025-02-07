@@ -1,8 +1,6 @@
 #ifndef PseudoUnitTest_h
 #define PseudoUnitTest_h
 
-#include "types.h"
-
 #include <functional>
 #include <iostream>
 #include <sstream>
@@ -129,11 +127,6 @@ private:
     }
     ss << " }";
     return ss.str();
-  }
-
-  std::string toString(const f3d::color_t& color)
-  {
-    return toString(static_cast<std::vector<double>>(color));
   }
 
 protected:
