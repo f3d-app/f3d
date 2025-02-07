@@ -122,7 +122,7 @@ public:
   }
   double operator[](size_t i) const
   {
-    if (i < 0 || i >= 3)
+    if (i >= 3)
     {
       throw f3d::type_access_exception("Incorrect index");
     }
@@ -130,7 +130,7 @@ public:
   }
   double& operator[](size_t i)
   {
-    if (i < 0 || i >= 3)
+    if (i >= 3)
     {
       throw f3d::type_access_exception("Incorrect index");
     }
