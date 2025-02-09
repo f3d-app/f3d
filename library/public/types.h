@@ -102,11 +102,13 @@ public:
     this->RGB[1] = green;
     this->RGB[2] = blue;
   }
-  color_t(const double (&list)[3])
+  color_t(const std::initializer_list<double>& list)
   {
-    static_assert(
-      sizeof(list) == 3 * sizeof(double), "color_t needs exactly 3 elements to initialize");
-    std::copy_n(list, 3, this->RGB.begin());
+    if (list.size() != 3)
+    {
+      throw f3d::type_construction_exception("Provided list does not have the right size");
+    }
+    std::copy_n(list.begin(), 3, this->RGB.begin());
   }
   operator std::vector<double>() const
   {

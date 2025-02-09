@@ -105,6 +105,8 @@ int TestSDKOptions(int argc, char* argv[])
 
   test.expect<f3d::type_construction_exception>(
     "color_t invalid size vector", [&]() { f3d::color_t(std::vector<double>{ 0.1, 0.2 }); });
+  test.expect<f3d::type_construction_exception>(
+    "color_t invalid size list", [&]() { f3d::color_t({ 0.1, 0.2, 0.3, 0.4 }); });
 
   f3d::color_t color({ 0.1, 0.2, 0.3 });
   color[0] = 0.7;
