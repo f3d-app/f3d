@@ -219,6 +219,24 @@ public:
     const int newIntensityPct = std::lround(intensity * 100) + (negative ? -offsetPp : +offsetPp);
     this->Options.render.light.intensity = std::max(newIntensityPct, 0) / 100.0;
   }
+  
+  //----------------------------------------------------------------------------
+  // Increase/Decrease opacity
+  void IncreaseOpacity(bool negative)
+  {
+	// current opacity, interpreted as 1 if it does not exist
+	const double currentOpacity = this->Options.model.color.opacity.has_value() ? this->Options.model.color.opacity.value() : 1.0;
+
+	// new opacity, clamped between 0 and 1 if not already set outside that range
+	const double increment = negative ? -0.05 : 0.05;
+	double newOpacity = currentOpacity + increment;
+	if (currentOpacity <= 1.0 && 0.0 <= currentOpacity)
+	{
+	  newOpacity = std::min(1.0, std::max(0.0, newOpacity));
+	}
+	
+	this->Options.model.color.opacity = newOpacity;
+  }
 
   //----------------------------------------------------------------------------
   // Synchronise options from the renderer properties
@@ -699,6 +717,12 @@ interactor& interactor_impl::initCommands()
   this->addCommand("decrease_light_intensity",
     [&](const std::vector<std::string>&) { this->Internals->IncreaseLightIntensity(true); });
 
+  this->addCommand("increase_opacity",
+    [&](const std::vector<std::string>&) { this->Internals->IncreaseOpacity(false); });
+
+  this->addCommand("decrease_opacity",
+    [&](const std::vector<std::string>&) { this->Internals->IncreaseOpacity(true); });
+
   this->addCommand("print_scene_info", [&](const std::vector<std::string>&)
     { this->Internals->Window.PrintSceneDescription(log::VerboseLevel::INFO); });
 
@@ -938,6 +962,16 @@ interactor& interactor_impl::initBindings()
     valStream << val;
     return std::pair(doc, valStream.str());
   };
+  
+  // "doc", "value (default to 1)"
+  auto docDblOpt = [](const std::string& doc, const std::optional<double>& val)
+  {
+	std::stringstream valStream;
+	valStream.precision(2);
+    valStream << std::fixed;
+	val.has_value() ? (valStream << val.value()) : (valStream << 1.0);
+	return std::pair(doc, valStream.str());
+  };
 
   // "doc", "ON/OFF"
   auto docTgl = [](const std::string& doc, const bool& val)
@@ -978,6 +1012,8 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "J"}, "toggle render.background.skybox","Scene", std::bind(docTgl, "Toggle HDRI skybox", std::cref(opts.render.background.skybox)));
   this->addBinding({mod_t::NONE, "L"}, "increase_light_intensity", "Scene", std::bind(docDbl, "Increase lights intensity", std::cref(opts.render.light.intensity)));
   this->addBinding({mod_t::SHIFT, "L"}, "decrease_light_intensity", "Scene", std::bind(docDbl, "Decrease lights intensity", std::cref(opts.render.light.intensity)));
+  this->addBinding({mod_t::CTRL, "T"}, "increase_opacity", "Scene", std::bind(docDblOpt, "Increase opacity", std::cref(opts.model.color.opacity)));
+  this->addBinding({mod_t::SHIFT, "T"}, "decrease_opacity", "Scene", std::bind(docDblOpt, "Decrease opacity", std::cref(opts.model.color.opacity)));
   this->addBinding({mod_t::SHIFT, "A"}, "toggle render.armature.enable","Scene", std::bind(docTgl, "Toggle armature", std::cref(opts.render.armature.enable)));
   this->addBinding({mod_t::ANY, "1"}, "set_camera front", "Camera", std::bind(docStr, "Front View camera"));
   this->addBinding({mod_t::ANY, "3"}, "set_camera right", "Camera", std::bind(docStr, "Right View camera"));
