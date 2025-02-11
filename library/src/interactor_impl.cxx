@@ -224,18 +224,18 @@ public:
   // Increase/Decrease opacity
   void IncreaseOpacity(bool negative)
   {
-	// current opacity, interpreted as 1 if it does not exist
-	const double currentOpacity = this->Options.model.color.opacity.has_value() ? this->Options.model.color.opacity.value() : 1.0;
+    // current opacity, interpreted as 1 if it does not exist
+    const double currentOpacity = this->Options.model.color.opacity.has_value() ? this->Options.model.color.opacity.value() : 1.0;
 
-	// new opacity, clamped between 0 and 1 if not already set outside that range
-	const double increment = negative ? -0.05 : 0.05;
-	double newOpacity = currentOpacity + increment;
-	if (currentOpacity <= 1.0 && 0.0 <= currentOpacity)
-	{
-	  newOpacity = std::min(1.0, std::max(0.0, newOpacity));
-	}
-	
-	this->Options.model.color.opacity = newOpacity;
+    // new opacity, clamped between 0 and 1 if not already set outside that range
+    const double increment = negative ? -0.05 : 0.05;
+    double newOpacity = currentOpacity + increment;
+    if (currentOpacity <= 1.0 && 0.0 <= currentOpacity)
+    {
+      newOpacity = std::min(1.0, std::max(0.0, newOpacity));
+    }
+
+    this->Options.model.color.opacity = newOpacity;
   }
 
   //----------------------------------------------------------------------------
@@ -966,11 +966,11 @@ interactor& interactor_impl::initBindings()
   // "doc", "value (default to 1)"
   auto docDblOpt = [](const std::string& doc, const std::optional<double>& val)
   {
-	std::stringstream valStream;
-	valStream.precision(2);
+    std::stringstream valStream;
+    valStream.precision(2);
     valStream << std::fixed;
-	val.has_value() ? (valStream << val.value()) : (valStream << 1.0);
-	return std::pair(doc, valStream.str());
+    valStream << val.value_or(1.0);
+    return std::pair(doc, valStream.str());
   };
 
   // "doc", "ON/OFF"
@@ -1012,8 +1012,8 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "J"}, "toggle render.background.skybox","Scene", std::bind(docTgl, "Toggle HDRI skybox", std::cref(opts.render.background.skybox)));
   this->addBinding({mod_t::NONE, "L"}, "increase_light_intensity", "Scene", std::bind(docDbl, "Increase lights intensity", std::cref(opts.render.light.intensity)));
   this->addBinding({mod_t::SHIFT, "L"}, "decrease_light_intensity", "Scene", std::bind(docDbl, "Decrease lights intensity", std::cref(opts.render.light.intensity)));
-  this->addBinding({mod_t::CTRL, "T"}, "increase_opacity", "Scene", std::bind(docDblOpt, "Increase opacity", std::cref(opts.model.color.opacity)));
-  this->addBinding({mod_t::SHIFT, "T"}, "decrease_opacity", "Scene", std::bind(docDblOpt, "Decrease opacity", std::cref(opts.model.color.opacity)));
+  this->addBinding({mod_t::CTRL, "P"}, "increase_opacity", "Scene", std::bind(docDblOpt, "Increase opacity", std::cref(opts.model.color.opacity)));
+  this->addBinding({mod_t::SHIFT, "P"}, "decrease_opacity", "Scene", std::bind(docDblOpt, "Decrease opacity", std::cref(opts.model.color.opacity)));
   this->addBinding({mod_t::SHIFT, "A"}, "toggle render.armature.enable","Scene", std::bind(docTgl, "Toggle armature", std::cref(opts.render.armature.enable)));
   this->addBinding({mod_t::ANY, "1"}, "set_camera front", "Camera", std::bind(docStr, "Front View camera"));
   this->addBinding({mod_t::ANY, "3"}, "set_camera right", "Camera", std::bind(docStr, "Right View camera"));
