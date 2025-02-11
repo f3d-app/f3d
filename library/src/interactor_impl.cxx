@@ -225,7 +225,7 @@ public:
   void IncreaseOpacity(bool negative)
   {
     // current opacity, interpreted as 1 if it does not exist
-    const double currentOpacity = this->Options.model.color.opacity.has_value() ? this->Options.model.color.opacity.value() : 1.0;
+    const double currentOpacity = this->Options.model.color.opacity.value_or(1.0);
 
     // new opacity, clamped between 0 and 1 if not already set outside that range
     const double increment = negative ? -0.05 : 0.05;
