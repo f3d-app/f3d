@@ -63,7 +63,7 @@ You can then simply run F3D from the command line:
 ./bin/f3d
 ```
 
-### Running the test suite
+### Running the test suite (optional)
 
 ```
 cmake -DBUILD_TESTING=ON ../src
@@ -73,7 +73,9 @@ ctest
 
 ## Windows
 
-Note: The following steps were tested with Visual Studio Community 2022 using Windows 10, but should also work for other versions
+The following steps were tested with Visual Studio Community 2022 using Windows 10, but should also work for other versions.
+This guide is relying a lot on terminal command in order to provide easy steps to follow.
+Alternatively, it is possible to use Visual Studio directly by opening .sln files and building in Visual Studio.
 
 #### Install Dependencies
 
@@ -81,7 +83,7 @@ Note: The following steps were tested with Visual Studio Community 2022 using Wi
 - Download and install [cmake][cmake-download]
 - Download and install [Visual Studio 2022 Community Edition][visual-studio]
 
-#### Recover F3D sources
+#### Retrieve VTK and F3D sources
 
 - Open git bash
 
@@ -89,51 +91,78 @@ Note: The following steps were tested with Visual Studio Community 2022 using Wi
 cd C:
 mkdir dev
 cd dev
+mkdir vtk
+cd vtk
+git clone --depth 1 --branch v9.4.1 https://gitlab.kitware.com/vtk/vtk.git src
+mkdir build
+mkdir install
+cd ..
 mkdir f3d
 cd f3d
 git clone https://github.com/f3d-app/f3d.git src
 mkdir build
 ```
 
-#### Install dependencies using vcpkg
+Note: Resulting folder architecture should look like this:
 
-- Open git bash
-
-```sh
-cd C:/dev
-git clone https://github.com/Microsoft/vcpkg.git
+```
+dev
+|-- f3d
+|   |-- build
+|   `-- src
+`-- vtk
+    |-- build
+    |-- install
+    `-- src
 ```
 
-- Open cmd
+#### Build and install VTK in a dedicated folder
+
+- Open x64 Native Tools Command Prompt for VS 2022
 
 ```sh
-cd C:\dev
-.\vcpkg\bootstrap-vcpkg.bat
-cmake -B .\f3d\build -S .\f3d\src -DCMAKE_TOOLCHAIN_FILE=C:\dev\vcpkg\scripts\buildsystems\vcpkg.cmake
+cd C:\dev\vtk\build
+cmake -DCMAKE_INSTALL_PREFIX=../install ../src
+cmake --build . -j 16 --config Debug
+cmake --install . --config Debug
 ```
 
-Note: Last command will take a while. It downloads, compiles and installs VTK and its dependencies.
+Note: These commands will take a while.
+
+#### Add VTK libraries to the PATH
+
+- Search for "Environment variables" in Windows menu and open associated control panel
+- Click on "Environment variables.." button
+- Double click on "Path"
+- Click on "New" and write "C:\dev\vtk\install\bin"
+- Press Ok
+- Press Ok
+- Press Ok
 
 #### Build F3D
 
-- Open cmd
+- Open x64 Native Tools Command Prompt for VS 2022
 
 ```sh
 cd C:\dev\f3d\build
-cmake .
-cmake --build .
+cmake -DVTK_DIR=C:/dev/vtk/install/lib/cmake/vtk-9.4 ../src
+cmake --build . --config Debug
 ```
 
 #### Run
 
+- Open a new file manager window
 - Double click on the `C:\dev\f3d\build\bin_Debug\f3d.exe` executable
 
-### Running the test suite
+### Running the test suite (optional)
+
+- Open x64 Native Tools Command Prompt for VS 2022
 
 ```
+cd C:\dev\f3d\build
 cmake -DBUILD_TESTING=ON .
-cmake --build . --config Release
-ctest -C Release
+cmake --build . --config Debug
+ctest -C Debug
 ```
 
 ## macOS
@@ -187,7 +216,7 @@ You can then simply run F3D from the command line:
 ./bin/f3d.app/Contents/MacOS/f3d
 ```
 
-### Running the test suite
+### Running the test suite (optional)
 
 ```
 cmake -DBUILD_TESTING=ON ../src
