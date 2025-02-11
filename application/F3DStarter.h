@@ -33,11 +33,6 @@ public:
   void LoadFileGroup(int index = 0, bool relativeIndex = false, bool forceClear = false);
 
   /**
-   * Remove all file groups
-   */
-  void RemoveFileGroups();
-
-  /**
    * Trigger a render on the next event loop
    */
   void RequestRender();

@@ -1568,22 +1568,6 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
 }
 
 //----------------------------------------------------------------------------
-void F3DStarter::RemoveFileGroups()
-{
-  // checks to see if animation is playing
-  if (!this->Internals->AppOptions.NoRender)
-  {
-    this->Internals->Engine->getInteractor().stopAnumation();
-  }
-  // clears scene currently displaying
-  f3d::scene& scene = this->Internals->Engine->getScene();
-  scene.clear();
-  // removing actual files from the file groups
-  this->Internals->FilesGroups.clear();
-  return;
-}
-
-//----------------------------------------------------------------------------
 bool F3DStarter::LoadRelativeFileGroup(int index, bool restoreCamera, bool forceClear)
 {
 
@@ -1620,7 +1604,7 @@ void F3DStarter::AddCommands()
   f3d::interactor& interactor = this->Internals->Engine->getInteractor();
 
   static const auto parse_optional_bool_flag =
-    [](const std::vector<std::string>& args, std::string_view commandName, bool defaultValue)
+    [](const std::vector<std::string>& args, ::string_view commandName, bool defaultValue)
   {
     if (args.empty())
     {
@@ -1633,6 +1617,18 @@ void F3DStarter::AddCommands()
     }
     return f3d::options::parse<bool>(args[0]);
   };
+
+  interactor.addCommand("remove_file_groups",
+    [this](const std::vector<std::string>&)
+    {
+      if (!this->Internals->AppOptions.NoRender)
+      {
+        this->Internals->Engine->getInteractor().stopAnumation();
+      }
+      f3d::scene& scene = this->Internals->Engine->getScene();
+      scene.clear();
+      this->Internals->FilesGroups.clear();
+    });
 
   interactor.addCommand("load_previous_file_group",
     [this](const std::vector<std::string>& args)
