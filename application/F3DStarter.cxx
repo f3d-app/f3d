@@ -1618,7 +1618,7 @@ void F3DStarter::AddCommands()
     return f3d::options::parse<bool>(args[0]);
   };
 
-  interactor.addCommand("remove-file-groups",
+  interactor.addCommand("remove_file_groups",
     [this](const std::vector<std::string>&)
     {
       if (!this->Internals->AppOptions.NoRender)
