@@ -1627,7 +1627,7 @@ void F3DStarter::AddCommands()
       }
       f3d::scene& scene = this->Internals->Engine->getScene();
       scene.clear();
-      this->Internals->Engine->FilesGroups.clear();
+      this->Internals->FilesGroups.clear();
     });
 
   interactor.addCommand("load_previous_file_group",
