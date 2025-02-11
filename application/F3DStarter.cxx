@@ -1512,7 +1512,7 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
       bool found = false;
       std::vector<std::vector<fs::path>>::iterator it;
       for (it = this->Internals->FilesGroups.begin(); it != this->Internals->FilesGroups.end();
-           it++)
+        it++)
       {
         auto localIt = std::find(it->begin(), it->end(), tmpPath);
         found |= localIt != it->end();
@@ -1565,6 +1565,22 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
     }
     return -1;
   }
+}
+
+//----------------------------------------------------------------------------
+void F3DStarter::RemoveFileGroups()
+{
+  // checks to see if animation is playing
+  if (!this->Internals->AppOptions.NoRender)
+  {
+    this->Internals->Engine->getInteractor().stopAnumation();
+  }
+  // clears scene currently displaying
+  f3d::scene& scene = this->Internals->Engine->getScene();
+  scene.clear();
+  // removing actual files from the file groups
+  this->Internals->FilesGroups.clear();
+  return;
 }
 
 //----------------------------------------------------------------------------
