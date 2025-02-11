@@ -1512,7 +1512,7 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
       bool found = false;
       std::vector<std::vector<fs::path>>::iterator it;
       for (it = this->Internals->FilesGroups.begin(); it != this->Internals->FilesGroups.end();
-           it++)
+        it++)
       {
         auto localIt = std::find(it->begin(), it->end(), tmpPath);
         found |= localIt != it->end();
@@ -1617,6 +1617,18 @@ void F3DStarter::AddCommands()
     }
     return f3d::options::parse<bool>(args[0]);
   };
+
+  interactor.addCommand("remove-file-groups",
+    [this](const std::vector<std::string>&)
+    {
+      if (!this->Internals->AppOptions.NoRender)
+      {
+        this->Internals->Engine->getInteractor().stopAnimation();
+      }
+      f3d::scene& scene = this->Internals->Engine->getScene();
+      scene.clear();
+      this->Internals->Engine->FilesGroups.clear();
+    });
 
   interactor.addCommand("load_previous_file_group",
     [this](const std::vector<std::string>& args)
