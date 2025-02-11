@@ -1623,7 +1623,7 @@ void F3DStarter::AddCommands()
     {
       if (!this->Internals->AppOptions.NoRender)
       {
-        this->Internals->Engine->getInteractor().stopAnumation();
+        this->Internals->Engine->getInteractor().stopAnimation();
       }
       f3d::scene& scene = this->Internals->Engine->getScene();
       scene.clear();
