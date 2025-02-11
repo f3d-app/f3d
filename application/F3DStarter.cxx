@@ -1584,6 +1584,7 @@ void F3DStarter::RemoveFileGroups()
 }
 
 // this is the new branch
+// what about this
 
 //----------------------------------------------------------------------------
 bool F3DStarter::LoadRelativeFileGroup(int index, bool restoreCamera, bool forceClear)
