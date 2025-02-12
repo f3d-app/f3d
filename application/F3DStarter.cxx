@@ -1630,6 +1630,7 @@ void F3DStarter::AddCommands()
       this->Internals->FilesGroups.clear();
       f3d::window& window = this->Internals->Engine->getWindow();
       window.setWindowName(F3D::AppTitle).setIcon(F3DIcon, sizeof(F3DIcon));
+      this->LoadRelativeFileGroup(0, true, true);
     });
 
   interactor.addCommand("load_previous_file_group",
