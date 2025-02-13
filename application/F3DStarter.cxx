@@ -898,8 +898,7 @@ int F3DStarter::Start(int argc, char** argv)
       this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::create(offscreen));
     }
 
-    f3d::window& window = this->Internals->Engine->getWindow();
-    window.setWindowName(F3D::AppTitle).setIcon(F3DIcon, sizeof(F3DIcon));
+    this->ResetWindowName();
     this->Internals->ApplyPositionAndResolution();
     this->AddCommands();
     this->Internals->UpdateBindings({ "" });
