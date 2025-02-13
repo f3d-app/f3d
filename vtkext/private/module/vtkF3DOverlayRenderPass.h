@@ -2,7 +2,10 @@
  * @class   vtkF3DOverlayRenderPass
  * @brief   Implement the overlay render pass.
  *
- * Render the overlay into a fullscreen texture, then blend it with the result of post-proccess.
+ * Render the overlay into a fullscreen texture, then blend it with the current render pass.
+ * 
+ * @sa
+ * vtkRenderPass
  */
 
 #ifndef vtkF3DOverlayRenderPass_h
@@ -40,6 +43,9 @@ public:
 protected:
   void Initialize(const vtkRenderState* s);
 
+  /**
+   * Apply the rendered overlay frame to the current render pass 
+   */
   void CompositeOverlay(const vtkRenderState* s);
 
   vtkSmartPointer<vtkFramebufferPass> OverlayPass;
