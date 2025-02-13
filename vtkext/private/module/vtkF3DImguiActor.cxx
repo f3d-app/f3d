@@ -345,8 +345,11 @@ void vtkF3DImguiActor::RenderCheatSheet()
   constexpr float marginTopBottom = 5.f;
 
   float winWidth = 0.f;
+  uint8_t textLineNumber = 0;
   for (const auto& [group, content] : this->CheatSheet)
   {
+    ImVec2 groupLine = ImGui::CalcTextSize(group.c_str());
+    textLineNumber += 1;
     for (const auto& [bind, desc, val] : content)
     {
       std::string line = bind;
@@ -359,6 +362,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
       ImVec2 currentLine = ImGui::CalcTextSize(line.c_str());
 
       winWidth = std::max(winWidth, currentLine.x);
+      textLineNumber += 1;
     }
   }
   winWidth += 2.f * ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().ScrollbarSize;
@@ -373,6 +377,10 @@ void vtkF3DImguiActor::RenderCheatSheet()
 
   ImGui::Begin("CheatSheet", nullptr, flags);
 
+  float totalTextHeight = ImGui::GetTextLineHeightWithSpacing() * textLineNumber;
+  float startCursorY = std::max(0.0f, (ImGui::GetWindowHeight() - totalTextHeight) * 0.5f);
+  ImGui::SetCursorPosY(startCursorY);
+  
   for (const auto& [group, list] : this->CheatSheet)
   {
     ImGui::SeparatorText(group.c_str());
