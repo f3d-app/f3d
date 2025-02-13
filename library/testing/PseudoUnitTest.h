@@ -1,6 +1,8 @@
 #ifndef PseudoUnitTest_h
 #define PseudoUnitTest_h
 
+#include "options.h"
+
 #include <functional>
 #include <iostream>
 #include <sstream>
@@ -113,19 +115,6 @@ private:
   {
     std::stringstream ss;
     ss << value;
-    return ss.str();
-  }
-
-  template<typename T>
-  std::string toString(const std::vector<T>& value)
-  {
-    std::stringstream ss;
-    size_t i = 0;
-    for (const T& item : value)
-    {
-      ss << (i++ ? ", " : "{ ") << this->toString(item);
-    }
-    ss << " }";
     return ss.str();
   }
 

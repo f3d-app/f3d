@@ -1,17 +1,10 @@
+#include "PseudoUnitTest.h"
+
 #include <export.h>
 #include <options.h>
 #include <types.h>
 
 #include <iostream>
-
-// Required to be declared here as PseudoUnitTest does not know color_t
-std::ostream& operator<<(std::ostream& os, const f3d::color_t& color)
-{
-  os << color[0] << "," << color[1] << "," << color[2];
-  return os;
-}
-
-#include "PseudoUnitTest.h"
 
 class ParsingTest : public PseudoUnitTest
 {

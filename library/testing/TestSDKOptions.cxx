@@ -74,6 +74,10 @@ int TestSDKOptions(int argc, char* argv[])
   test("set/get string", std::get<std::string>(opt.get("model.color.texture")) == "test");
 
   // Test double vector
+  std::stringstream ssDouble;
+  ssDouble << std::vector<double>{ 1.1, 2., 3. };
+  test("vector<double> to string", ssDouble.str() == "1.1,2,3");
+
   opt.setAsString("model.scivis.range", "0.7,1.4");
   test("setAsString vector<double>", opt.getAsString("model.scivis.range") == "0.7,1.4");
 
@@ -119,6 +123,10 @@ int TestSDKOptions(int argc, char* argv[])
   test("color red", color.r() == 0.7);
   test("color green", color.g() == 0.2);
   test("color blue", color.b() == 0.3);
+
+  std::stringstream ss;
+  ss << f3d::color_t(0.1, 0.2, 0.3);
+  test("color to string", ss.str() == "0.1,0.2,0.3");
 
   test.expect<f3d::options::parsing_exception>("setAsString color with incorrect size",
     [&]() { opt.setAsString("render.background.color", "0.1,0.2,0.3,0.4"); });
