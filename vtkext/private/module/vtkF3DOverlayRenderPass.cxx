@@ -6,13 +6,13 @@
 #include <vtkOpenGLError.h>
 #include <vtkOpenGLFramebufferObject.h>
 #include <vtkOpenGLQuadHelper.h>
-#include "vtkOpenGLRenderUtilities.h"
+#include <vtkOpenGLRenderUtilities.h>
 #include <vtkOpenGLRenderWindow.h>
 #include <vtkOpenGLShaderCache.h>
 #include <vtkOpenGLState.h>
 #include <vtkProp.h>
-#include <vtkRenderer.h>
 #include <vtkRenderState.h>
+#include <vtkRenderer.h>
 #include <vtkShaderProgram.h>
 #include <vtkSkybox.h>
 #include <vtkTextureObject.h>
@@ -30,7 +30,6 @@ void vtkF3DOverlayRenderPass::Render(const vtkRenderState* s)
 
   this->OverlayPass->Render(&overlayState);
 
-  //blend with current buffer here
   this->CompositeOverlay(s);
 }
 
@@ -50,7 +49,7 @@ void vtkF3DOverlayRenderPass::Initialize(const vtkRenderState* s)
 {
   this->OverlayProps.clear();
 
-  //assign props to the overlay pass
+  // assign props to the overlay pass
   vtkProp** props = s->GetPropArray();
   for (int i = 0; i < s->GetPropArrayCount(); i++)
   {
@@ -125,24 +124,50 @@ void vtkF3DOverlayRenderPass::CompositeOverlay(const vtkRenderState* s)
     std::string FSSource = vtkOpenGLRenderUtilities::GetFullScreenQuadFragmentShaderTemplate();
 
     vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Decl",
-      "uniform sampler2D source;\n"
-      "uniform ivec2 resolution;\n"
+      "uniform sampler2D buffer;\n"
       "uniform sampler2D texOverlay;\n"
       "vec3 toLinear(vec3 color) { return pow(color.rgb, vec3(2.2)); }\n"
       "vec3 toSRGB(vec3 color) { return pow(color.rgb, vec3(1.0 / 2.2)); }\n"
       "//VTK::FSQ::Decl");
 
-    vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Impl", 
+    // the input color is alpha premultiplied, we need to divide it, then
+    // convert to linear space, and finally premultiply back by the alpha value
+    /**
+    *  NOTE:
+    *       - Linear blend of overlay causes white pixels around text and UI elements
+    *       - Linear blend of current buffer causes white pixels with grid and
+    *       background to lose rgb value (as a = 0)
+    *       - Without linear blend, background and edges look ok, but the panels
+    *       are too transparent and become unreadable on white backgrounds
+    *       - The scalar bar appears dependent on linear blend to render properly
+    */
+    vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Impl",
       "  vec4 ovlSample = texture(texOverlay, texCoord);\n"
       "  if (ovlSample.a > 0.0)\n"
       "    ovlSample.rgb = toLinear(ovlSample.rgb / ovlSample.a);\n"
       "  ovlSample.rgb *= ovlSample.a;\n"
+      "  vec4 result = texture(buffer, texCoord);\n"
+      "  if (result.a > 0.0)\n"
+      "    result.rgb = toLinear(result.rgb / result.a);\n"
+      "  result.rgb *= result.a;\n"
+      "//VTK::FSQ::Impl");
+
+    // blend overlay frame with current frame
+    vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Impl",
+      "  result.rgb = (1.0 - ovlSample.a) * result.rgb + ovlSample.rgb;\n"
+      "  result.a = (1.0 - ovlSample.a) * result.a + ovlSample.a;\n"
+      "//VTK::FSQ::Impl");
+
+    // divide by alpha and convert back to sRGB
+    // we shouldn't premultiply by alpha again here because the OpenGL blending
+    // function is expecting the source fragment not premultiplied
+    vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Impl",
+      "  if (result.a > 0.0)\n"
+      "    result.rgb = result.rgb / result.a;\n"
+      "  result.rgb = toSRGB(result.rgb);\n"
       "//VTK::FSQ::Impl");
 
     vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Impl",
-      "  vec4 result = texture(source, texCoord);\n"
-      "  result.rgb = (1.0 - ovlSample.a) * result.rgb + ovlSample.rgb;\n"
-      "  result.a = (1.0 - ovlSample.a) * result.a + ovlSample.a;\n"
       "  gl_FragData[0] = result;\n"
       "//VTK::FSQ::Impl");
 
@@ -160,8 +185,7 @@ void vtkF3DOverlayRenderPass::CompositeOverlay(const vtkRenderState* s)
 
   this->QuadHelper->Program->SetUniformi(
     "texOverlay", this->OverlayPass->GetColorTexture()->GetTextureUnit());
-  this->QuadHelper->Program->SetUniformi("source", this->ColorTexture->GetTextureUnit());
-  this->QuadHelper->Program->SetUniform2i("resolution", size);
+  this->QuadHelper->Program->SetUniformi("buffer", this->ColorTexture->GetTextureUnit());
   
   ostate->vtkglDisable(GL_BLEND);
   ostate->vtkglDisable(GL_DEPTH_TEST);
