@@ -9,5 +9,4 @@ The current web build parses some parameters provided as url-params, via a hash 
 
 Some passed model urls might be stored on servers which do not set the Cross-Origin request header parameter. In that case, you can still load these with plugins like Allow-Cors that do exist for chrome, firefox etc. 
 
-Example url: https://f3d.app/web#up=+Y&axis=false&ssao=true&model=https://groups.csail.mit.edu/graphics/classes/6.837/F03/models/teapot.obj
-
+Example url which requires CORS Plugin: `https://f3d.app/web#up=+Y&axis=false&ssao=true&model=https://groups.csail.mit.edu/graphics/classes/6.837/F03/models/teapot.obj`. Also see this [url with all params](https://f3d.app/web#model=https://groups.csail.mit.edu/graphics/classes/6.837/F03/models/teapot.obj&up=%2BY&grid=false&fxaa=false&tone=false&ssao=false&ambient=false&axis=false)
