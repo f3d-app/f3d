@@ -100,7 +100,7 @@ jobs:
       id: lfs_sha_recover
       uses: f3d-app/lfs-data-cache-action@save_restore
       with:
-        cache_postfix: cache-0
+        cache_postfix: cache-1
 
 #----------------------------------------------------------------------------
 # Windows CI: Build and test
