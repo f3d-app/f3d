@@ -205,12 +205,4 @@ inline std::ostream& operator<<(std::ostream& os, const f3d::color_t& color)
   return os;
 }
 
-//----------------------------------------------------------------------------
-template<typename T>
-std::ostream& operator<<(std::ostream& os, const std::vector<T>& val)
-{
-  os << f3d::options::format(val);
-  return os;
-}
-
 #endif

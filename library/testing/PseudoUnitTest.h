@@ -118,6 +118,19 @@ private:
     return ss.str();
   }
 
+  template<typename T>
+  std::string toString(const std::vector<T>& value)
+  {
+    std::stringstream ss;
+    size_t i = 0;
+    for (const T& item : value)
+    {
+      ss << (i++ ? ", " : "{ ") << this->toString(item);
+    }
+    ss << " }";
+    return ss.str();
+  }
+
 protected:
   template<typename T1, typename T2>
   std::string comparisonMessage(const T1& actual, const T2& expected, const std::string& comp)
