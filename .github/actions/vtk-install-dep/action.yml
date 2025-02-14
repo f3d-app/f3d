@@ -17,6 +17,9 @@ inputs:
     description: 'CPU architecture to build for'
     required: false
     default: 'x86_64'
+  openvdb_version:
+    description: 'Version of openvdb to build against'
+    required: false
 
 runs:
   using: "composite"
@@ -40,10 +43,10 @@ runs:
 
     - name: Cache VTK
       id: cache-vtk
-      uses: actions/cache@v4
+      uses: actions/cache/restore@v4
       with:
         path: dependencies/vtk_install
-        key: vtk-${{env.VTK_SHA_OR_TAG}}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.cpu}}-5
+        key: vtk-${{env.VTK_SHA_OR_TAG}}-openvdb-${{inputs.openvdb_version}}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.cpu}}-8
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -88,7 +91,7 @@ runs:
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../vtk_install
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
-        -DOpenVDB_CMAKE_PATH=$(pwd)/../install/lib/cmake/OpenVDB/
+        -DOpenVDB_CMAKE_PATH=${{ inputs.openvdb_version != '' && '$(pwd)/../install/lib/cmake/OpenVDB/' || '' }}
         -DVTKOSPRAY_ENABLE_DENOISER=ON
         -DVTK_BUILD_TESTING=OFF
         -DVTK_DEBUG_LEAKS=ON
@@ -106,7 +109,7 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_IOGeometry=YES
         -DVTK_MODULE_ENABLE_VTK_IOImage=YES
         -DVTK_MODULE_ENABLE_VTK_IOImport=YES
-        -DVTK_MODULE_ENABLE_VTK_IOOpenVDB=YES
+        -DVTK_MODULE_ENABLE_VTK_IOOpenVDB=${{ inputs.openvdb_version != '' && 'YES' || 'DEFAULT' }}
         -DVTK_MODULE_ENABLE_VTK_IOPLY=YES
         -DVTK_MODULE_ENABLE_VTK_IOParallel=YES
         -DVTK_MODULE_ENABLE_VTK_IOXML=YES
@@ -123,7 +126,7 @@ runs:
         -DVTK_OPENGL_HAS_EGL=${{ inputs.vtk_version != 'v9.2.6' && inputs.vtk_version != 'v9.3.1' && 'ON' || 'OFF' }}
         -DVTK_SMP_IMPLEMENTATION_TYPE=TBB
         -DVTK_VERSIONED_INSTALL=OFF
-        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build VTK
@@ -136,3 +139,10 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/vtk_install
       shell: bash
       run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-vtk.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-vtk.outputs.cache-primary-key }}
+        path: dependencies/vtk_install

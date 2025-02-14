@@ -22,7 +22,6 @@
 #include <vtkRenderingOpenGLConfigure.h>
 #include <vtkVersion.h>
 #include <vtkWindowToImageFilter.h>
-#include <vtksys/SystemTools.hxx>
 
 #ifdef VTK_USE_X
 #include <vtkF3DGLXRenderWindow.h>
@@ -42,6 +41,8 @@
 
 #include <sstream>
 
+namespace fs = std::filesystem;
+
 namespace f3d::detail
 {
 class window_impl::internals
@@ -50,14 +51,6 @@ public:
   explicit internals(const options& options)
     : Options(options)
   {
-  }
-
-  std::string GetCachePath()
-  {
-    // create directories if they do not exist
-    vtksys::SystemTools::MakeDirectory(this->CachePath);
-
-    return this->CachePath;
   }
 
   static context::fptr SymbolLoader(void* userptr, const char* name)
@@ -73,7 +66,7 @@ public:
     // Override VTK logic
 #ifdef _WIN32
     return vtkSmartPointer<vtkF3DWGLRenderWindow>::New();
-#elif __linux__
+#elif defined(__linux__) || defined(__FreeBSD__)
 #if defined(VTK_USE_X)
     // try GLX
     vtkSmartPointer<vtkRenderWindow> glxRenWin = vtkSmartPointer<vtkF3DGLXRenderWindow>::New();
@@ -106,7 +99,7 @@ public:
   vtkNew<vtkF3DRenderer> Renderer;
   const options& Options;
   interactor_impl* Interactor = nullptr;
-  std::string CachePath;
+  fs::path CachePath;
   context::function GetProcAddress;
 };
 
@@ -129,7 +122,7 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
 #if defined(VTK_OPENGL_HAS_EGL)
     this->Internals->RenWin = vtkSmartPointer<vtkF3DEGLRenderWindow>::New();
 #else
-    throw engine::no_window_exception("Window type is EGL but VTK EGL support is not enabled");
+    assert(false); // Unreachable
 #endif
   }
   else if (type == Type::OSMESA)
@@ -138,7 +131,7 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
     this->Internals->RenWin = vtkSmartPointer<vtkOSOpenGLRenderWindow>::New();
 #else
     throw engine::no_window_exception(
-      "Window type is OSMesa but VTK OSMesa support is not enabled");
+      "Window type is OSMesa but the underlying VTK version is not recent enough to support it");
 #endif
   }
   else if (type == Type::GLX)
@@ -146,13 +139,15 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
 #if defined(VTK_USE_X)
     this->Internals->RenWin = vtkSmartPointer<vtkF3DGLXRenderWindow>::New();
 #else
-    throw engine::no_window_exception("Window type is GLX but VTK GLX support is not enabled");
+    assert(false); // Unreachable
 #endif
   }
   else if (type == Type::WGL)
   {
 #ifdef _WIN32
     this->Internals->RenWin = vtkSmartPointer<vtkF3DWGLRenderWindow>::New();
+#else
+    assert(false); // Unreachable
 #endif
   }
   else if (!type.has_value())
@@ -160,6 +155,8 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
     this->Internals->RenWin = internals::AutoBackendWindow();
   }
 
+  // COCOA and WASM are not handled explicitly
+  // as there is no helper method to create them in engine
   if (this->Internals->RenWin == nullptr)
   {
     throw engine::no_window_exception("Cannot create a window");
@@ -185,6 +182,9 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   this->Internals->RenWin->AddRenderer(this->Internals->Renderer);
   this->Internals->Camera = std::make_unique<detail::camera_impl>();
   this->Internals->Camera->SetVTKRenderer(this->Internals->Renderer);
+
+  this->Internals->Renderer->SetConsoleBadgeEnabled(
+    !offscreen || std::getenv("CTEST_F3D_CONSOLE_BADGE"));
 
   this->Initialize();
 
@@ -315,9 +315,9 @@ window& window_impl::setIcon(const unsigned char* icon, size_t iconSize)
 }
 
 //----------------------------------------------------------------------------
-window& window_impl::setWindowName(const std::string& windowName)
+window& window_impl::setWindowName(std::string_view windowName)
 {
-  this->Internals->RenWin->SetWindowName(windowName.c_str());
+  this->Internals->RenWin->SetWindowName(windowName.data());
   return *this;
 }
 
@@ -371,7 +371,7 @@ void window_impl::UpdateDynamicOptions()
   }
 
   // Set the cache path if not already
-  renderer->SetCachePath(this->Internals->GetCachePath());
+  renderer->SetCachePath(this->Internals->CachePath.string());
 
   // Make sure lights are created before we take options into account
   renderer->UpdateLights();
@@ -400,6 +400,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->ShowConsole(opt.ui.console);
   renderer->ShowDropZone(opt.ui.dropzone);
   renderer->SetDropZoneInfo(opt.ui.dropzone_info);
+  renderer->ShowArmature(opt.render.armature.enable);
 
   renderer->SetUseRaytracing(opt.render.raytracing.enable);
   renderer->SetRaytracingSamples(opt.render.raytracing.samples);
@@ -422,6 +423,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->ShowHDRISkybox(opt.render.background.skybox);
 
   renderer->SetFontFile(opt.ui.font_file);
+  renderer->SetFontScale(opt.ui.scale);
 
   renderer->SetGridUnitSquare(opt.render.grid.unit);
   renderer->SetGridSubdivisions(opt.render.grid.subdivisions);
@@ -548,8 +550,23 @@ void window_impl::SetImporter(vtkF3DMetaImporter* importer)
 }
 
 //----------------------------------------------------------------------------
-void window_impl::SetCachePath(const std::string& cachePath)
+void window_impl::SetCachePath(const fs::path& cachePath)
 {
+  try
+  {
+    if (cachePath.empty())
+    {
+      throw engine::cache_exception("Provided cache path is empty");
+    }
+
+    // create directories if they do not exist
+    fs::create_directories(cachePath);
+  }
+  catch (const fs::filesystem_error& ex)
+  {
+    throw engine::cache_exception(std::string("Could not use cache: ") + ex.what());
+  }
+
   this->Internals->CachePath = cachePath;
 }
 

@@ -8,6 +8,27 @@ inputs:
     description: 'Codecov token, needed for non-forked workflows'
     required: false
     default: ''
+  alembic_version:
+    description: 'Version of alembic to build'
+    required: false
+  assimp_version:
+    description: 'Version of assimp to build'
+    required: false
+  draco_version:
+    description: 'Version of draco to build'
+    required: false
+  occt_version:
+    description: 'Version of occt to build'
+    required: false
+  openexr_version:
+    description: 'Version of openexr to build'
+    required: false
+  openvdb_version:
+    description: 'Version of openvdb to build'
+    required: false
+  usd_version:
+    description: 'Version of usd to build'
+    required: false
 
 runs:
   using: "composite"
@@ -25,28 +46,24 @@ runs:
         lfs_sha: ${{inputs.lfs_sha}}
         cache_postfix: cache-0 
 
-    - name: Dependencies Dir
-      shell: bash
-      working-directory: ${{github.workspace}}
-      run: |
-        mkdir dependencies
-        cd dependencies
-        mkdir install
-
-    - name: Install VTK dependencies
-      uses: ./source/.github/actions/vtk-dependencies
-
-    - name: Install Raytracing Dependencies
-      uses: ./source/.github/actions/ospray-sb-install-dep
+    - name: Install all F3D dependencies
+      uses: ./source/.github/actions/generic-dependencies
+      with:
+        raytracing_label: raytracing
+        alembic_version: ${{inputs.alembic_version}}
+        assimp_version: ${{inputs.assimp_version}}
+        draco_version: ${{inputs.draco_version}}
+        occt_version: ${{inputs.occt_version}}
+        openexr_version: ${{inputs.openexr_version}}
+        openvdb_version: ${{inputs.openvdb_version}}
+        usd_version: ${{inputs.usd_version}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
       with:
         vtk_sha_file: ./source/.github/actions/vtk_commit_sha
         raytracing_label: raytracing
-
-    - name: Install F3D dependencies
-      uses: ./source/.github/actions/f3d-dependencies
+        openvdb_version: ${{inputs.openvdb_version}}
 
     # coverage build is done in source as it seems to be required for codecov
     # CMAKE_MODULE_PATH is required because of
@@ -113,7 +130,7 @@ runs:
         lcov --remove coverage.info "*Test*" -o coverage.info
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
       with:
         working-directory: ${{github.workspace}}/source
         token: ${{inputs.codecov_token}}

@@ -1,6 +1,5 @@
 name: 'External build CI'
 description: 'External build CI'
-
 runs:
   using: "composite"
   steps:

@@ -19,33 +19,33 @@ options::options()
 };
 
 //----------------------------------------------------------------------------
-options& options::set(const std::string& name, const option_variant_t& value)
+options& options::set(std::string_view name, const option_variant_t& value)
 {
   options_tools::set(*this, name, value);
   return *this;
 }
 
 //----------------------------------------------------------------------------
-option_variant_t options::get(const std::string& name) const
+option_variant_t options::get(std::string_view name) const
 {
   return options_tools::get(*this, name);
 }
 
 //----------------------------------------------------------------------------
-options& options::setAsString(const std::string& name, const std::string& str)
+options& options::setAsString(std::string_view name, const std::string& str)
 {
   options_tools::setAsString(*this, name, str);
   return *this;
 }
 
 //----------------------------------------------------------------------------
-std::string options::getAsString(const std::string& name) const
+std::string options::getAsString(std::string_view name) const
 {
   return options_tools::getAsString(*this, name);
 }
 
 //----------------------------------------------------------------------------
-options& options::toggle(const std::string& name)
+options& options::toggle(std::string_view name)
 {
   try
   {
@@ -62,12 +62,12 @@ options& options::toggle(const std::string& name)
   catch (const std::bad_variant_access&)
   {
     throw options::incompatible_exception(
-      "Trying to get toggle " + name + " with incompatible type");
+      "Trying to get toggle " + std::string(name) + " with incompatible type");
   }
 }
 
 //----------------------------------------------------------------------------
-bool options::isSame(const options& other, const std::string& name) const
+bool options::isSame(const options& other, std::string_view name) const
 {
   try
   {
@@ -80,7 +80,7 @@ bool options::isSame(const options& other, const std::string& name) const
 }
 
 //----------------------------------------------------------------------------
-bool options::hasValue(const std::string& name) const
+bool options::hasValue(std::string_view name) const
 {
   try
   {
@@ -94,7 +94,7 @@ bool options::hasValue(const std::string& name) const
 }
 
 //----------------------------------------------------------------------------
-options& options::copy(const options& from, const std::string& name)
+options& options::copy(const options& from, std::string_view name)
 {
   options_tools::set(*this, name, options_tools::get(from, name));
   return *this;
@@ -117,12 +117,12 @@ std::vector<std::string> options::getNames() const
 }
 
 //----------------------------------------------------------------------------
-std::pair<std::string, unsigned int> options::getClosestOption(const std::string& option) const
+std::pair<std::string, unsigned int> options::getClosestOption(std::string_view option) const
 {
   std::vector<std::string> names = options_tools::getNames();
   if (std::find(names.begin(), names.end(), option) != names.end())
   {
-    return { option, 0 };
+    return { std::string(option), 0 };
   }
 
   std::pair<std::string, int> ret = { "", std::numeric_limits<int>::max() };
@@ -140,19 +140,20 @@ std::pair<std::string, unsigned int> options::getClosestOption(const std::string
 }
 
 //----------------------------------------------------------------------------
-bool options::isOptional(const std::string& option) const
+bool options::isOptional(std::string_view option) const
 {
   return options_tools::isOptional(option);
 }
 
 //----------------------------------------------------------------------------
-void options::reset(const std::string& name)
+options& options::reset(std::string_view name)
 {
   options_tools::reset(*this, name);
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void options::removeValue(const std::string& name)
+options& options::removeValue(std::string_view name)
 {
   if (this->isOptional(name))
   {
@@ -160,8 +161,9 @@ void options::removeValue(const std::string& name)
   }
   else
   {
-    throw options::incompatible_exception("Option " + name + " is not not optional");
+    throw options::incompatible_exception("Option " + std::string(name) + " is not not optional");
   }
+  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -172,8 +174,16 @@ T options::parse(const std::string& str)
 }
 
 //----------------------------------------------------------------------------
+template<typename T>
+std::string options::format(const T& var)
+{
+  return options_tools::format(var);
+}
+
+//----------------------------------------------------------------------------
 #define F3D_DECL_TYPE_INTERNAL(TYPE)                                                               \
-  template F3D_EXPORT TYPE options::parse<TYPE>(const std::string& str)
+  template F3D_EXPORT TYPE options::parse<TYPE>(const std::string& str);                           \
+  template F3D_EXPORT std::string options::format<TYPE>(const TYPE& val)
 #define F3D_DECL_TYPE(TYPE)                                                                        \
   F3D_DECL_TYPE_INTERNAL(TYPE);                                                                    \
   F3D_DECL_TYPE_INTERNAL(std::vector<TYPE>)

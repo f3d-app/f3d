@@ -1,17 +1,21 @@
 name: 'Install pybind11 Dependency'
 description: 'Install pybind11 Dependency using cache when possible'
+inputs:
+  version:
+    description: 'Version of pybind11 to build'
+    required: true
+
 runs:
   using: "composite"
   steps:
 
     - name: Cache pybind11
       id: cache-pybind11
-      uses: actions/cache@v4
+      uses: actions/cache/restore@v4
       with:
         path: dependencies/pybind11_install
-        key: pybind11-v2.12.0-${{runner.os}}-0
+        key: pybind11-${{inputs.version}}-${{runner.os}}-0
 
-    # v2.13 doesn't support python36 which is needed in common-superbuild for now
     - name: Checkout pybind11
       if: steps.cache-pybind11.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
@@ -19,7 +23,7 @@ runs:
         repository: pybind/pybind11
         submodules: true
         path: './dependencies/pybind11'
-        ref: v2.12.0
+        ref: ${{inputs.version}}
 
     - name: Setup pybind11
       if: steps.cache-pybind11.outputs.cache-hit != 'true'
@@ -37,7 +41,7 @@ runs:
         cmake ../pybind11
         -DCMAKE_INSTALL_PREFIX:PATH=../pybind11_install
         -DPYBIND11_TEST=OFF
-        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Install pybind11
@@ -50,3 +54,10 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/pybind11_install
       shell: bash
       run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-pybind11.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-pybind11.outputs.cache-primary-key }}
+        path: dependencies/pybind11_install

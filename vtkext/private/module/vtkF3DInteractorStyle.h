@@ -106,6 +106,13 @@ public:
    */
   void FindPokedRenderer(int vtkNotUsed(x), int vtkNotUsed(y));
 
+  /**
+   * Temporary up vector to support rolled camera interaction
+   */
+  void ResetTemporaryUp();
+  void SetTemporaryUp(const double* tempUp);
+  void InterpolateTemporaryUp(const double factor, const double* input);
+
 protected:
   /**
    * Overridden to support being disabled
@@ -113,6 +120,11 @@ protected:
   void Dolly(double factor) override;
 
   bool CameraMovementDisabled = false;
+
+  /**
+   * Temporary up vector to support rolled camera interaction
+   */
+  double TemporaryUp[3] = { 0, 0, 0 };
 };
 
 #endif

@@ -24,6 +24,12 @@ int TestSDKInteractorCommand(int argc, char* argv[])
   inter.triggerCommand("reset render.hdri.file");
   test("triggerCommand reset optional", options.render.hdri.file.has_value() == false);
 
+  // Test clear
+#if F3D_MODULE_UI
+  inter.triggerCommand("print_scene_info");
+  test("triggerCommand clear", (inter.triggerCommand("clear") == true));
+#endif
+
   // Test toggle
   inter.triggerCommand("toggle model.scivis.cells");
   test("triggerCommand toggle", options.model.scivis.cells == true);

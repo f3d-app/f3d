@@ -97,7 +97,7 @@ if(ANDROID)
 endif()
 
 if(F3D_MODULE_EXR)
-  find_package(OpenEXR 3.0 REQUIRED)
+  find_package(OpenEXR 3.0.1 REQUIRED)
   list(APPEND classes vtkF3DEXRReader)
 endif()
 

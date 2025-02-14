@@ -36,8 +36,8 @@ public:
   ~interactor_impl() override;
 
   interactor& initCommands() override;
-  interactor& addCommand(const std::string& action,
-    std::function<void(const std::vector<std::string>&)> callback) override;
+  interactor& addCommand(
+    std::string action, std::function<void(const std::vector<std::string>&)> callback) override;
   interactor& removeCommand(const std::string& action) override;
   std::vector<std::string> getCommandActions() const override;
   bool triggerCommand(std::string_view command) override;
@@ -56,21 +56,21 @@ public:
   std::pair<std::string, std::string> getBindingDocumentation(
     const interaction_bind_t& bind) const override;
 
-  void toggleAnimation() override;
-  void startAnimation() override;
-  void stopAnimation() override;
+  interactor& toggleAnimation() override;
+  interactor& startAnimation() override;
+  interactor& stopAnimation() override;
   bool isPlayingAnimation() override;
 
-  void enableCameraMovement() override;
-  void disableCameraMovement() override;
+  interactor& enableCameraMovement() override;
+  interactor& disableCameraMovement() override;
 
-  bool playInteraction(
-    const std::string& file, double deltaTime, std::function<void()> userCallBack) override;
-  bool recordInteraction(const std::string& file) override;
+  bool playInteraction(const std::filesystem::path& file, double deltaTime,
+    std::function<void()> userCallBack) override;
+  bool recordInteraction(const std::filesystem::path& file) override;
 
-  void start(double deltaTime, std::function<void()> userCallBack) override;
-  void stop() override;
-  void requestRender() override;
+  interactor& start(double deltaTime, std::function<void()> userCallBack) override;
+  interactor& stop() override;
+  interactor& requestRender() override;
   ///@}
 
   /**
@@ -105,6 +105,11 @@ public:
    * First call the EventLoopUserCallBack, then call render if requested.
    */
   void EventLoop();
+
+  /**
+   * Set a command to be run on the next event loop
+   */
+  void SetCommandBuffer(const char* command);
 
   /**
    * An exception that can be thrown by certain command callbacks

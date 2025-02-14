@@ -35,24 +35,24 @@ struct interaction_bind_t
    * Operator to be able to store binds in maps and other structs
    * Compare modifier and interaction
    */
-  bool operator<(const interaction_bind_t& bind) const;
+  [[nodiscard]] bool operator<(const interaction_bind_t& bind) const;
 
   /**
    * Operator to be able to store binds in maps and other structs
    * Compare modifier and interaction
    */
-  bool operator==(const interaction_bind_t& bind) const;
+  [[nodiscard]] bool operator==(const interaction_bind_t& bind) const;
 
   /**
    * Format this binding into a string
    * eg: "A", "Any+Question", "Shift+L".
    */
-  std::string format() const;
+  [[nodiscard]] std::string format() const;
 
   /**
    * Create and return an interaction bind from provided string
    */
-  static interaction_bind_t parse(const std::string& str);
+  [[nodiscard]] static interaction_bind_t parse(std::string_view str);
 };
 
 /**
@@ -80,7 +80,7 @@ public:
    * eg: `my_app::action`
    */
   virtual interactor& addCommand(
-    const std::string& action, std::function<void(const std::vector<std::string>&)> callback) = 0;
+    std::string action, std::function<void(const std::vector<std::string>&)> callback) = 0;
 
   /**
    * Remove a command for provided action, does not do anything if it does not exists.
@@ -90,7 +90,7 @@ public:
   /**
    * Return a string vector containing all currently defined actions of commands
    */
-  virtual std::vector<std::string> getCommandActions() const = 0;
+  [[nodiscard]] virtual std::vector<std::string> getCommandActions() const = 0;
 
   /**
    * Trigger provided command, see COMMANDS.md for details about supported
@@ -172,19 +172,20 @@ public:
   /**
    * Return a vector of available bind groups, in order of addition
    */
-  virtual std::vector<std::string> getBindGroups() const = 0;
+  [[nodiscard]] virtual std::vector<std::string> getBindGroups() const = 0;
 
   /**
    * Return a vector of bind for the specified group, in order of addition
    *
    * Getting binds for a group that does not exists will throw a does_not_exists_exception.
    */
-  virtual std::vector<interaction_bind_t> getBindsForGroup(std::string group) const = 0;
+  [[nodiscard]] virtual std::vector<interaction_bind_t> getBindsForGroup(
+    std::string group) const = 0;
 
   /**
    * Return a vector of all binds, in order of addition
    */
-  virtual std::vector<interaction_bind_t> getBinds() const = 0;
+  [[nodiscard]] virtual std::vector<interaction_bind_t> getBinds() const = 0;
 
   /**
    * Get a pair of string documenting a binding.
@@ -198,7 +199,7 @@ public:
    *
    * Getting documentation for a bind that does not exists will throw a does_not_exists_exception.
    */
-  virtual std::pair<std::string, std::string> getBindingDocumentation(
+  [[nodiscard]] virtual std::pair<std::string, std::string> getBindingDocumentation(
     const interaction_bind_t& bind) const = 0;
   ///@}
 
@@ -206,48 +207,53 @@ public:
   /**
    * Control the animation.
    */
-  virtual void toggleAnimation() = 0;
-  virtual void startAnimation() = 0;
-  virtual void stopAnimation() = 0;
-  virtual bool isPlayingAnimation() = 0;
+  virtual interactor& toggleAnimation() = 0;
+  virtual interactor& startAnimation() = 0;
+  virtual interactor& stopAnimation() = 0;
+  [[nodiscard]] virtual bool isPlayingAnimation() = 0;
   ///@}
 
   ///@{ @name Movement
   /**
    * Control if camera movements are enabled, which they are by default.
    */
-  virtual void enableCameraMovement() = 0;
-  virtual void disableCameraMovement() = 0;
+  virtual interactor& enableCameraMovement() = 0;
+  virtual interactor& disableCameraMovement() = 0;
   ///@}
 
   /**
    * Play a VTK interaction file.
+   * Provided file path is used as is and file existence will be checked.
+   * The event loop will be triggered every deltaTime in seconds, and userCallBack will be called at
+   * the start of the event loop
    */
-  virtual bool playInteraction(const std::string& file, double deltaTime = 1.0 / 30,
+  virtual bool playInteraction(const std::filesystem::path& file, double deltaTime = 1.0 / 30,
     std::function<void()> userCallBack = nullptr) = 0;
 
   /**
    * Start interaction and record it all in a VTK interaction file.
+   * Provided file path will be used as is and the parent directories of the file will be created
    */
-  virtual bool recordInteraction(const std::string& file) = 0;
+  virtual bool recordInteraction(const std::filesystem::path& file) = 0;
 
   /**
    * Start the interactor event loop.
    * The event loop will be triggered every deltaTime in seconds, and userCallBack will be called at
    * the start of the event loop
    */
-  virtual void start(double deltaTime = 1.0 / 30, std::function<void()> userCallBack = nullptr) = 0;
+  virtual interactor& start(
+    double deltaTime = 1.0 / 30, std::function<void()> userCallBack = nullptr) = 0;
 
   /**
    * Stop the interactor.
    */
-  virtual void stop() = 0;
+  virtual interactor& stop() = 0;
 
   /**
    * Request a render to be done on the next event loop
    * Safe to call in a multithreaded environment
    */
-  virtual void requestRender() = 0;
+  virtual interactor& requestRender() = 0;
 
   /**
    * An exception that can be thrown by the interactor
@@ -319,7 +325,7 @@ inline std::string interaction_bind_t::format() const
 }
 
 //----------------------------------------------------------------------------
-inline interaction_bind_t interaction_bind_t::parse(const std::string& str)
+inline interaction_bind_t interaction_bind_t::parse(std::string_view str)
 {
   interaction_bind_t bind;
   auto plusIt = str.find_last_of('+');
@@ -331,7 +337,7 @@ inline interaction_bind_t interaction_bind_t::parse(const std::string& str)
   {
     bind.inter = str.substr(plusIt + 1);
 
-    std::string modStr = str.substr(0, plusIt);
+    std::string_view modStr = str.substr(0, plusIt);
     if (modStr == "Ctrl+Shift")
     {
       bind.mod = ModifierKeys::CTRL_SHIFT;

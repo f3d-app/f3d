@@ -29,9 +29,9 @@ list(INSERT CMAKE_MODULE_PATH 0 "${f3d_cmake_dir}")
 include(f3dVersion)
 
 # Handle F3D_VERSION
-set(F3D_MAJOR_VERSION 2)
-set(F3D_MINOR_VERSION 5)
-set(F3D_PATCH_VERSION 1)
+set(F3D_MAJOR_VERSION 3)
+set(F3D_MINOR_VERSION 0)
+set(F3D_PATCH_VERSION 0)
 set(F3D_VERSION ${F3D_MAJOR_VERSION}.${F3D_MINOR_VERSION}.${F3D_PATCH_VERSION})
 
 set(F3D_PATCH_VERSION_EXTRA "")
@@ -121,6 +121,11 @@ endif()
 include(GNUInstallDirs)
 cmake_dependent_option(F3D_WINDOWS_GUI "Build a non-console Win32 application" ON "WIN32" OFF)
 cmake_dependent_option(F3D_MACOS_BUNDLE "Build a macOS bundle application" ON "APPLE" OFF)
+
+if(UNIX AND NOT APPLE)
+  option(F3D_LINUX_LINK_FILESYSTEM "Link with libstdc++fs, may be needed for older compilers" OFF)
+  mark_as_advanced(F3D_LINUX_LINK_FILESYSTEM)
+endif()
 
 # Force static library when creating a macOS bundle
 cmake_dependent_option(BUILD_SHARED_LIBS "Build f3d with shared libraries" ON "NOT ANDROID" OFF)
