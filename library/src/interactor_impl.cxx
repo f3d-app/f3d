@@ -963,13 +963,20 @@ interactor& interactor_impl::initBindings()
     return std::pair(doc, valStream.str());
   };
   
-  // "doc", "value (default to 1)"
+  // "doc", "value/Unset"
   auto docDblOpt = [](const std::string& doc, const std::optional<double>& val)
   {
     std::stringstream valStream;
     valStream.precision(2);
     valStream << std::fixed;
-    valStream << val.value_or(1.0);
+    if (val.has_value())
+    {
+      valStream << val.value();
+    }
+    else
+    {
+      valStream << "Unset";
+    }
     return std::pair(doc, valStream.str());
   };
 
