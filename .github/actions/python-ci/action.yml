@@ -43,7 +43,7 @@ runs:
         [[ "${{ inputs.python_version }}" ]] || { echo "python input is empty" ; exit 1; }
 
     - name: Recover LFS Data
-      uses: f3d-app/lfs-data-cache-action@v1
+      uses: f3d-app/lfs-data-cache-action@save_restore
       with:
         type: 'consumer'
         lfs_sha: ${{inputs.lfs_sha}}

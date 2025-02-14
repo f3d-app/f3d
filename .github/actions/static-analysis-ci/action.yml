@@ -37,7 +37,7 @@ runs:
 
     # Needed for BUILD_TESTING
     - name: Recover LFS Data
-      uses: f3d-app/lfs-data-cache-action@v1
+      uses: f3d-app/lfs-data-cache-action@save_restore
       with:
         type: 'consumer'
         lfs_sha: ${{inputs.lfs_sha}}
