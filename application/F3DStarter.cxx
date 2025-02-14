@@ -1511,7 +1511,7 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
       bool found = false;
       std::vector<std::vector<fs::path>>::iterator it;
       for (it = this->Internals->FilesGroups.begin(); it != this->Internals->FilesGroups.end();
-        it++)
+           it++)
       {
         auto localIt = std::find(it->begin(), it->end(), tmpPath);
         found |= localIt != it->end();
