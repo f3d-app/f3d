@@ -49,6 +49,7 @@ public:
   void ShowConsole(bool show);
   void ShowDropZone(bool show);
   void ShowHDRISkybox(bool show);
+  void ShowArmature(bool show);
   ///@}
 
   using vtkOpenGLRenderer::SetBackground;
@@ -59,6 +60,7 @@ public:
   void SetLineWidth(const std::optional<double>& lineWidth);
   void SetPointSize(const std::optional<double>& pointSize);
   void SetFontFile(const std::optional<std::string>& fontFile);
+  void SetFontScale(const double fontScale);
   void SetHDRIFile(const std::optional<std::string>& hdriFile);
   void SetUseImageBasedLighting(bool use) override;
   void SetBackground(const double* backgroundColor) override;
@@ -146,7 +148,8 @@ public:
   void Initialize();
 
   /**
-   * Initialize actors properties related to the up vector using the provided upString, including the camera
+   * Initialize actors properties related to the up vector using the provided upString, including
+   * the camera
    */
   void InitializeUpVector(const std::string& upString);
 
@@ -333,9 +336,9 @@ public:
   void CycleFieldForColoring();
 
   /**
-   * Cycle the current array for coloring, actually setting EnableColoring and ArrayNameForColoring members.
-   * This loops back to not coloring if volume is not enabled.
-   * This can trigger CycleComponentForColoring if current component is not valid.
+   * Cycle the current array for coloring, actually setting EnableColoring and ArrayNameForColoring
+   * members. This loops back to not coloring if volume is not enabled. This can trigger
+   * CycleComponentForColoring if current component is not valid.
    */
   void CycleArrayForColoring();
 
@@ -375,6 +378,11 @@ public:
    * Set the UI delta time (time between frame being rendered) in seconds
    */
   void SetUIDeltaTime(double time);
+
+  /**
+   * Set console badge enabled status
+   */
+  void SetConsoleBadgeEnabled(bool enabled);
 
 private:
   vtkF3DRenderer();
@@ -503,6 +511,7 @@ private:
   bool ConsoleVisible = false;
   bool DropZoneVisible = false;
   bool HDRISkyboxVisible = false;
+  bool ArmatureVisible = false;
   bool UseRaytracing = false;
   bool UseRaytracingDenoiser = false;
   bool UseDepthPeelingPass = false;
@@ -525,7 +534,7 @@ private:
   int GridSubdivisions = 10;
   double GridColor[3] = { 0.0, 0.0, 0.0 };
 
-  std::optional<std::string> HDRIFile;
+  std::string HDRIFile;
   vtkSmartPointer<vtkImageReader2> HDRIReader;
   bool HasValidHDRIReader = false;
   bool UseDefaultHDRI = false;
@@ -538,6 +547,7 @@ private:
   bool HasValidHDRISpec = false;
 
   std::optional<std::string> FontFile;
+  double FontScale = 1.0;
 
   double LightIntensity = 1.0;
   std::map<vtkLight*, double> OriginalLightIntensities;
@@ -547,8 +557,8 @@ private:
 
   std::string CachePath;
 
-  std::optional <std::string> BackfaceType;
-  std::optional <std::string> FinalShader;
+  std::optional<std::string> BackfaceType;
+  std::optional<std::string> FinalShader;
 
   vtkF3DMetaImporter* Importer = nullptr;
   vtkMTimeType ImporterTimeStamp = 0;

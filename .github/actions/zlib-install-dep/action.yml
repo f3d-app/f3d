@@ -12,10 +12,10 @@ runs:
 
     - name: Cache zlib
       id: cache-zlib
-      uses: actions/cache@v4
+      uses: actions/cache/restore@v4
       with:
         path: dependencies/zlib_install
-        key: zlib-1.3.1-${{runner.os}}-${{inputs.cpu}}-3
+        key: zlib-v1.3.1-${{runner.os}}-${{inputs.cpu}}-4
 
     # Dependents: blosc openvdb vtk
     - name: Checkout zlib
@@ -43,7 +43,7 @@ runs:
         -DBUILD_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX=../zlib_install
-        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build zlib
@@ -56,3 +56,10 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/zlib_install
       shell: bash
       run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-zlib.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-zlib.outputs.cache-primary-key }}
+        path: dependencies/zlib_install

@@ -40,12 +40,8 @@ if(UNIX)
   target_link_libraries(f3d PRIVATE Threads::Threads)
 endif()
 
-if(UNIX AND NOT APPLE)
-  option(F3D_LINUX_APPLICATION_LINK_FILESYSTEM "Link with libstdc++fs" ON)
-  mark_as_advanced(F3D_LINUX_APPLICATION_LINK_FILESYSTEM)
-  if(F3D_LINUX_APPLICATION_LINK_FILESYSTEM)
-    target_link_libraries(f3d PRIVATE stdc++fs)
-  endif()
+if(F3D_LINUX_LINK_FILESYSTEM)
+  target_link_libraries(f3d PRIVATE stdc++fs)
 endif()
 
 set_target_properties(f3d PROPERTIES
@@ -205,14 +201,14 @@ if(UNIX AND NOT APPLE)
       add_custom_command(
         OUTPUT ${MAN_OUTPUT_FILE}
         COMMAND ${HELP2MAN} $<TARGET_FILE:f3d> -N -n "fast and minimalist 3D viewer" > ${MAN_OUTPUT_FILE}
-        COMMAND ${GZIP} -f ${MAN_OUTPUT_FILE}
+        COMMAND ${GZIP} -fn ${MAN_OUTPUT_FILE}
         DEPENDS f3d)
       add_custom_target(man ALL DEPENDS ${MAN_OUTPUT_FILE})
 
       install(FILES "${CMAKE_BINARY_DIR}/f3d.1.gz"
         DESTINATION "share/man/man1/" COMPONENT documentation)
     else()
-      message(WARNING "help2man or gzip not found, cannot create man entry")
+      message(FATAL_ERROR "help2man or gzip not found, cannot create man entry, please disable F3D_LINUX_GENERATE_MAN or install them")
     endif()
   endif()
 endif()

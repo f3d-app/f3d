@@ -1,15 +1,13 @@
-import os
-
-import pytest
+from pathlib import Path
 
 import f3d
 
 
 def test_plugins_list():
-    base_dir = os.path.dirname(f3d.__file__)
-    plugins = f3d.Engine.get_plugins_list(base_dir + "/share/f3d/plugins")
-    plugins += f3d.Engine.get_plugins_list(base_dir + "/../share/f3d/plugins")
-    plugins += f3d.Engine.get_plugins_list(base_dir + "/../../share/f3d/plugins")
+    base_dir = Path(f3d.__file__).parent
+    plugins = f3d.Engine.get_plugins_list(base_dir / "share/f3d/plugins")
+    plugins += f3d.Engine.get_plugins_list(base_dir / "../share/f3d/plugins")
+    plugins += f3d.Engine.get_plugins_list(base_dir / "../../share/f3d/plugins")
 
     assert len(plugins) > 0
     assert plugins.index("native") >= 0
@@ -62,3 +60,9 @@ def test_get_readers_info():
         assert isinstance(reader.plugin_name, str) and reader.plugin_name
         assert isinstance(reader.has_scene_reader, bool)
         assert isinstance(reader.has_geometry_reader, bool)
+
+
+def test_get_rendering_backend_list():
+    backends = f3d.Engine.get_rendering_backend_list()
+
+    assert isinstance(backends, dict) and len(backends) == 5

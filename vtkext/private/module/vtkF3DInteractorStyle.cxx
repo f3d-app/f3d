@@ -153,6 +153,8 @@ void vtkF3DInteractorStyle::Rotate()
   double dir[3];
   camera->GetDirectionOfProjection(dir);
   double* up = ren->GetUpVector();
+  this->InterpolateTemporaryUp(0.1, up);
+  up = this->TemporaryUp;
 
   double dot = vtkMath::Dot(dir, up);
 
@@ -331,4 +333,36 @@ void vtkF3DInteractorStyle::FindPokedRenderer(int vtkNotUsed(x), int vtkNotUsed(
 {
   // No need for picking, F3D interaction are only with the first renderer
   this->SetCurrentRenderer(this->Interactor->GetRenderWindow()->GetRenderers()->GetFirstRenderer());
+}
+
+//------------------------------------------------------------------------------
+void vtkF3DInteractorStyle::ResetTemporaryUp()
+{
+  // Make sure this->CurrentRenderer is set
+  this->FindPokedRenderer(0, 0);
+
+  if (this->CurrentRenderer)
+  {
+    vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(this->CurrentRenderer);
+    SetTemporaryUp(ren->GetUpVector());
+  }
+}
+
+//------------------------------------------------------------------------------
+void vtkF3DInteractorStyle::SetTemporaryUp(const double* tempUp)
+{
+  for (int i = 0; i < 3; i++)
+  {
+    this->TemporaryUp[i] = tempUp[i];
+  }
+}
+
+//------------------------------------------------------------------------------
+void vtkF3DInteractorStyle::InterpolateTemporaryUp(double factor, const double* input)
+{
+  for (int i = 0; i < 3; i++)
+  {
+    this->TemporaryUp[i] = (1.0 - factor) * this->TemporaryUp[i] + factor * input[i];
+  }
+  vtkMath::Normalize(this->TemporaryUp);
 }

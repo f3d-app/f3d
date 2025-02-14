@@ -11,6 +11,21 @@ inputs:
   lfs_sha:
     description: 'Cache LFS sha'
     required: true
+  alembic_version:
+    description: 'Version of alembic to build'
+    required: false
+  assimp_version:
+    description: 'Version of assimp to build'
+    required: false
+  draco_version:
+    description: 'Version of draco to build'
+    required: false
+  occt_version:
+    description: 'Version of occt to build'
+    required: false
+  openexr_version:
+    description: 'Version of openexr to build'
+    required: false
 
 runs:
   using: "composite"
@@ -29,25 +44,20 @@ runs:
         lfs_sha: ${{inputs.lfs_sha}}
         cache_postfix: cache-0 
 
-    - name: Dependencies Dir
-      shell: bash
-      working-directory: ${{github.workspace}}
-      run: |
-        mkdir dependencies
-        cd dependencies
-        mkdir install
-
-    - name: Install VTK dependencies
-      uses: ./source/.github/actions/vtk-dependencies
+    - name: Install all F3D dependencies
+      uses: ./source/.github/actions/generic-dependencies
+      with:
+        alembic_version: ${{inputs.alembic_version}}
+        assimp_version: ${{inputs.assimp_version}}
+        draco_version: ${{inputs.draco_version}}
+        occt_version: ${{inputs.occt_version}}
+        openexr_version: ${{inputs.openexr_version}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
       with:
         vtk_version: ${{inputs.vtk_version}}
         vtk_sha_file: ./source/.github/actions/vtk_commit_sha
-
-    - name: Install F3D dependencies
-      uses: ./source/.github/actions/f3d-dependencies
 
     - name: Setup Build Directory
       shell: bash

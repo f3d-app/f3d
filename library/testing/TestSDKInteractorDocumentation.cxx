@@ -31,11 +31,10 @@ int TestSDKInteractorDocumentation(int argc, char* argv[])
   {
     // check exceptions for invalid args
     test.expect<f3d::interactor::does_not_exists_exception>(
-      "Initial invalid group", [&]() { inter.getBindsForGroup("Invalid"); });
+      "Initial invalid group", [&]() { std::ignore = inter.getBindsForGroup("Invalid"); });
 
-    test.expect<f3d::interactor::does_not_exists_exception>("Initial invalid bind", [&]() {
-      inter.getBindingDocumentation({ mod_t::ANY, "Invalid" });
-    });
+    test.expect<f3d::interactor::does_not_exists_exception>("Initial invalid bind",
+      [&]() { std::ignore = inter.getBindingDocumentation({ mod_t::ANY, "Invalid" }); });
   }
 
   // Remove all bindings
@@ -53,11 +52,10 @@ int TestSDKInteractorDocumentation(int argc, char* argv[])
     test("Empty binds size", inter.getBinds().size() == 0);
     // check exceptions for invalid args
     test.expect<f3d::interactor::does_not_exists_exception>(
-      "Empty group", [&]() { inter.getBindsForGroup("Camera"); });
+      "Empty group", [&]() { std::ignore = inter.getBindsForGroup("Camera"); });
 
-    test.expect<f3d::interactor::does_not_exists_exception>("Empty bind", [&]() {
-      inter.getBindingDocumentation({ mod_t::ANY, "5" });
-    });
+    test.expect<f3d::interactor::does_not_exists_exception>(
+      "Empty bind", [&]() { std::ignore = inter.getBindingDocumentation({ mod_t::ANY, "5" }); });
   }
 
   // Add a dummy binding

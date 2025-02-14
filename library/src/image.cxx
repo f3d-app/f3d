@@ -34,6 +34,8 @@
 #include <string>
 #include <unordered_map>
 
+namespace fs = std::filesystem;
+
 namespace f3d
 {
 class image::internals
@@ -175,36 +177,42 @@ image::image(unsigned int width, unsigned int height, unsigned int channelCount,
 }
 
 //----------------------------------------------------------------------------
-image::image(const std::string& path)
+image::image(const fs::path& filePath)
   : Internals(new image::internals())
 {
   detail::init::initialize();
 
-  std::string fullPath = vtksys::SystemTools::CollapseFullPath(path);
-  if (!vtksys::SystemTools::FileExists(fullPath))
+  try
   {
-    throw read_exception("Cannot open file " + path);
-  }
-
-  auto reader = vtkSmartPointer<vtkImageReader2>::Take(
-    vtkImageReader2Factory::CreateImageReader2(fullPath.c_str()));
-
-  if (reader)
-  {
-    reader->SetFileName(fullPath.c_str());
-    reader->Update();
-    this->Internals->Image = reader->GetOutput();
-
-    vtkPNGReader* pngReader = vtkPNGReader::SafeDownCast(reader);
-    if (pngReader != nullptr)
+    if (!fs::exists(filePath))
     {
-      this->Internals->ReadPngMetadata(pngReader);
+      throw read_exception("Cannot open image " + filePath.string());
+    }
+
+    auto reader = vtkSmartPointer<vtkImageReader2>::Take(
+      vtkImageReader2Factory::CreateImageReader2(filePath.string().c_str()));
+
+    if (reader)
+    {
+      reader->SetFileName(filePath.string().c_str());
+      reader->Update();
+      this->Internals->Image = reader->GetOutput();
+
+      vtkPNGReader* pngReader = vtkPNGReader::SafeDownCast(reader);
+      if (pngReader != nullptr)
+      {
+        this->Internals->ReadPngMetadata(pngReader);
+      }
+    }
+
+    if (!this->Internals->Image)
+    {
+      throw read_exception("Cannot read image " + filePath.string());
     }
   }
-
-  if (!this->Internals->Image)
+  catch (const fs::filesystem_error& ex)
   {
-    throw read_exception("Cannot read image " + path);
+    throw read_exception(std::string("Cannot read image: ") + ex.what());
   }
 }
 
@@ -336,39 +344,28 @@ void* image::getContent() const
 }
 
 //----------------------------------------------------------------------------
-bool image::compare(const image& reference, double threshold, double& error) const
+double image::compare(const image& reference) const
 {
-  // Sanity check for threshold
-  if (threshold < 0 || threshold >= 1)
-  {
-    error = 1;
-    return false;
-  }
-
   ChannelType type = this->getChannelType();
   if (type != reference.getChannelType())
   {
-    error = 1;
-    return false;
+    return 1.0;
   }
 
   unsigned int count = this->getChannelCount();
   if (count != reference.getChannelCount())
   {
-    error = 1;
-    return false;
+    return 1.0;
   }
 
   if (this->getWidth() != reference.getWidth() || this->getHeight() != reference.getHeight())
   {
-    error = 1;
-    return false;
+    return 1.0;
   }
 
   if (this->getWidth() == 0 && this->getHeight() == 0)
   {
-    error = 0;
-    return true;
+    return 0.0;
   }
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240729)
@@ -398,39 +395,27 @@ bool image::compare(const image& reference, double threshold, double& error) con
   // Thanks to the checks above, this is always true
   assert(scalars != nullptr);
 
-  double unused;
+  double error, unused;
   vtkImageSSIM::ComputeErrorMetrics(scalars, error, unused);
-  return error <= threshold;
+  return error;
 #else
-  threshold *= 1000;
-
   vtkNew<vtkImageDifference> imDiff;
   imDiff->SetThreshold(0);
   imDiff->SetInputData(this->Internals->Image);
   imDiff->SetImageData(reference.Internals->Image);
-  imDiff->UpdateInformation();
-  error = imDiff->GetThresholdedError();
-
-  if (error <= threshold)
-  {
-    imDiff->Update();
-    error = imDiff->GetThresholdedError();
-  }
-
-  bool ret = error <= threshold;
-  error /= 1000;
-  return ret;
+  imDiff->Update();
+  double error = imDiff->GetThresholdedError();
+  return error / 1000.0;
 #endif
 }
 
 //----------------------------------------------------------------------------
 bool image::operator==(const image& reference) const
 {
-  double error;
   // XXX: We do not use 0 because even with identical images, rounding error, arithmetic imprecision
   // or architecture issue may cause the value to not be 0. See:
   // https://develop.openfoam.com/Development/openfoam/-/issues/2958
-  return this->compare(reference, 1e-14, error);
+  return this->compare(reference) <= 1e-14;
 }
 
 //----------------------------------------------------------------------------
@@ -467,7 +452,7 @@ std::vector<double> image::getNormalizedPixel(const std::pair<int, int>& xy) con
 }
 
 //----------------------------------------------------------------------------
-void image::save(const std::string& path, SaveFormat format) const
+const image& image::save(const fs::path& filePath, SaveFormat format) const
 {
   internals::checkSaveFormatCompatibility(*this, format);
 
@@ -492,14 +477,30 @@ void image::save(const std::string& path, SaveFormat format) const
       break;
   }
 
-  writer->SetFileName(path.c_str());
-  writer->SetInputData(this->Internals->Image);
-  writer->Write();
-
-  if (writer->GetErrorCode() != 0)
+  try
   {
-    throw write_exception("Cannot write " + path);
+    // Ensure the directories exists if not empty
+    fs::path parent = filePath.parent_path();
+    if (!parent.empty())
+    {
+      fs::create_directories(parent);
+    }
+
+    writer->SetFileName(filePath.string().c_str());
+    writer->SetInputData(this->Internals->Image);
+    writer->Write();
+
+    if (writer->GetErrorCode() != 0)
+    {
+      throw write_exception("Cannot write image " + filePath.string());
+    }
   }
+  catch (const fs::filesystem_error& ex)
+  {
+    throw write_exception(std::string("Cannot write image: ") + ex.what());
+  }
+
+  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -526,7 +527,7 @@ std::vector<unsigned char> image::saveBuffer(SaveFormat format) const
 }
 
 //----------------------------------------------------------------------------
-const f3d::image& image::toTerminalText(std::ostream& stream) const
+const image& image::toTerminalText(std::ostream& stream) const
 {
   const int depth = this->getChannelCount();
   if (this->getChannelType() != ChannelType::BYTE || depth < 3 || depth > 4)
@@ -667,7 +668,7 @@ std::string image::toTerminalText() const
 }
 
 //----------------------------------------------------------------------------
-f3d::image& image::setMetadata(const std::string& key, const std::string& value)
+image& image::setMetadata(std::string key, std::string value)
 {
   if (value.empty())
   {
@@ -675,7 +676,7 @@ f3d::image& image::setMetadata(const std::string& key, const std::string& value)
   }
   else
   {
-    this->Internals->Metadata[key] = value;
+    this->Internals->Metadata[std::move(key)] = std::move(value);
   }
   return *this;
 }

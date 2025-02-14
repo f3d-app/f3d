@@ -1,8 +1,8 @@
 // Automatically generated headers
 #include <app_f3d_F3D_Camera.h>
 #include <app_f3d_F3D_Engine.h>
-#include <app_f3d_F3D_Scene.h>
 #include <app_f3d_F3D_Options.h>
+#include <app_f3d_F3D_Scene.h>
 #include <app_f3d_F3D_Window.h>
 
 #include <engine.h>
@@ -11,6 +11,8 @@
 #include <cassert>
 
 #define JAVA_BIND(Cls, Func) JNICALL Java_app_f3d_F3D_##Cls##_##Func
+
+namespace fs = std::filesystem;
 
 inline f3d::engine* GetEngine(JNIEnv* env, jobject self)
 {
@@ -39,7 +41,7 @@ extern "C"
   JNIEXPORT void JAVA_BIND(Engine, setCachePath)(JNIEnv* env, jobject self, jstring path)
   {
     const char* str = env->GetStringUTFChars(path, nullptr);
-    GetEngine(env, self)->setCachePath(str);
+    GetEngine(env, self)->setCachePath(fs::path(str));
     env->ReleaseStringUTFChars(path, str);
   }
 

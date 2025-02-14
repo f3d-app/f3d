@@ -49,17 +49,17 @@ public:
   /**
    * Get the type of the window.
    */
-  virtual Type getType() = 0;
+  [[nodiscard]] virtual Type getType() = 0;
 
   /**
    * Is the window offscreen.
    */
-  virtual bool isOffscreen() = 0;
+  [[nodiscard]] virtual bool isOffscreen() = 0;
 
   /**
    * Get the camera provided by the window.
    */
-  virtual camera& getCamera() = 0;
+  [[nodiscard]] virtual camera& getCamera() = 0;
 
   /**
    * Perform a render of the window to the screen.
@@ -74,7 +74,7 @@ public:
    * Set noBackground to true to have a transparent background.
    * Return the resulting f3d::image.
    */
-  virtual image renderToImage(bool noBackground = false) = 0;
+  [[nodiscard]] virtual image renderToImage(bool noBackground = false) = 0;
 
   /**
    * Set the size of the window.
@@ -84,12 +84,12 @@ public:
   /**
    * Get the width of the window.
    */
-  virtual int getWidth() const = 0;
+  [[nodiscard]] virtual int getWidth() const = 0;
 
   /**
    * Get the height of the window.
    */
-  virtual int getHeight() const = 0;
+  [[nodiscard]] virtual int getHeight() const = 0;
 
   /**
    * Set the position of the window.
@@ -106,17 +106,17 @@ public:
   /**
    * Set the window name to be shown by a window manager.
    */
-  virtual window& setWindowName(const std::string& windowName) = 0;
+  virtual window& setWindowName(std::string_view windowName) = 0;
 
   /**
    * Convert a point in display coordinate to world coordinate.
    */
-  virtual point3_t getWorldFromDisplay(const point3_t& displayPoint) const = 0;
+  [[nodiscard]] virtual point3_t getWorldFromDisplay(const point3_t& displayPoint) const = 0;
 
   /**
    * Convert a point in world coordinate to display coordinate.
    */
-  virtual point3_t getDisplayFromWorld(const point3_t& worldPoint) const = 0;
+  [[nodiscard]] virtual point3_t getDisplayFromWorld(const point3_t& worldPoint) const = 0;
 
 protected:
   //! @cond

@@ -1,19 +1,19 @@
 ## Plugins
 
 F3D officially supports plugins for certain file formats. If you installed F3D using the binary
-release, there's no need to manually load these plugins when opening your file. 
-F3D will load them automatically. 
+release, there's no need to manually load these plugins when opening your file.
+F3D will load them automatically.
 
-However, if you installed F3D using a package manager, 
-it's possible that the packager chose to bundle the plugins into different packages or 
+However, if you installed F3D using a package manager,
+it's possible that the packager chose to bundle the plugins into different packages or
 to list plugin dependencies as optional in order to reduce the number of dependencies of the main package.
 
-In order to open a file that requires a plugin, make sure you've installed all necessary 
-dependencies. You can then specify the `--load-plugins=<path or name>` [option](OPTIONS.md) 
-in the command line to load your plugin. 
+In order to open a file that requires a plugin, make sure you've installed all necessary
+dependencies. You can then specify the `--load-plugins=<path or name>` [option](OPTIONS.md)
+in the command line to load your plugin.
 
-Alternatively, you can add your plugin directly in the 
-[configuration file](CONFIGURATION_FILE.md) if it isn't there already. You can specify one or 
+Alternatively, you can add your plugin directly in the
+[configuration file](CONFIGURATION_FILE.md) if it isn't there already. You can specify one or
 multiple plugins in a single comma-separated list, like in the example below:
 
 ```

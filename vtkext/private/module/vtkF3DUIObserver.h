@@ -21,7 +21,9 @@ public:
   /**
    * Install all observers to the provided interactor.
    */
-  virtual void InstallObservers(vtkRenderWindowInteractor*) {}
+  virtual void InstallObservers(vtkRenderWindowInteractor*)
+  {
+  }
 
 protected:
   vtkF3DUIObserver() = default;

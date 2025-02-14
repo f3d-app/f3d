@@ -11,7 +11,7 @@ else()
   include(f3dPlugin)
 endif()
 
-find_package(draco REQUIRED)
+find_package(draco 1.5.6 REQUIRED)
 
 message(STATUS "Plugin: draco ${draco_VERSION} found")
 
@@ -32,7 +32,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240214)
     SCORE 90
     EXTENSIONS gltf glb
     MIMETYPES model/gltf-binary model/gltf+json
-    VTK_IMPORTER vtkF3DGLTFImporter
+    VTK_IMPORTER vtkF3DGLTFDracoImporter
     FORMAT_DESCRIPTION "GL Transmission Format"
   )
 endif()

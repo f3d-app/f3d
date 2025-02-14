@@ -6,13 +6,19 @@
 #include <engine.h>
 #include <log.h>
 
+namespace fs = std::filesystem;
+
 namespace
 {
 //----------------------------------------------------------------------------
-std::vector<std::string> GetPluginSearchPaths()
+std::vector<fs::path> GetPluginSearchPaths()
 {
+  std::vector<fs::path> searchPaths;
+
   // Recover F3D_PLUGINS_PATH first
-  auto searchPaths = F3DSystemTools::GetVectorEnvironnementVariable("F3D_PLUGINS_PATH");
+  std::vector<std::string> stringPaths =
+    F3DSystemTools::GetVectorEnvironnementVariable("F3D_PLUGINS_PATH");
+  std::copy(stringPaths.begin(), stringPaths.end(), std::back_inserter(searchPaths));
 #if F3D_MACOS_BUNDLE
   return searchPaths;
 #else
@@ -20,7 +26,7 @@ std::vector<std::string> GetPluginSearchPaths()
   auto tmpPath = F3DSystemTools::GetApplicationPath();
   tmpPath = tmpPath.parent_path().parent_path();
   tmpPath /= F3D::PluginsInstallDir;
-  searchPaths.push_back(tmpPath.string());
+  searchPaths.emplace_back(tmpPath);
   return searchPaths;
 #endif
 }

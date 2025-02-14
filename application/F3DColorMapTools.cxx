@@ -4,6 +4,7 @@
 
 #include "image.h"
 #include "log.h"
+#include "utils.h"
 
 #include <filesystem>
 
@@ -11,56 +12,63 @@ namespace fs = std::filesystem;
 
 namespace F3DColorMapTools
 {
-std::string Find(const std::string& str)
+fs::path Find(const std::string& str)
 {
-  if (fs::exists(str))
+  try
   {
-    fs::path resolved = fs::canonical(str);
-    if (fs::is_regular_file(resolved))
+    fs::path fullPath(f3d::utils::collapsePath(str));
+    if (fs::exists(fullPath))
     {
-      // already full path
-      return resolved.string();
-    }
-  }
-
-  std::vector<fs::path> dirsToCheck{ F3DSystemTools::GetUserConfigFileDirectory() / "colormaps",
-#ifdef __APPLE__
-    "/usr/local/etc/f3d/colormaps",
-#endif
-#ifdef __linux__
-    "/etc/f3d/colormaps", "/usr/share/f3d/colormaps",
-#endif
-    F3DSystemTools::GetBinaryResourceDirectory() / "colormaps" };
-
-  for (const fs::path& dir : dirsToCheck)
-  {
-    // If the string is a stem, try adding supported extensions
-    if (fs::path(str).stem() == str)
-    {
-      for (const std::string& ext : f3d::image::getSupportedFormats())
+      if (fs::is_regular_file(fullPath))
       {
-        fs::path cmPath = dir / (str + ext);
+        // already full path
+        return fullPath;
+      }
+    }
+
+    std::vector<fs::path> dirsToCheck{ F3DSystemTools::GetUserConfigFileDirectory() / "colormaps",
+#ifdef __APPLE__
+      "/usr/local/etc/f3d/colormaps",
+#endif
+#if defined(__linux__) || defined(__FreeBSD__)
+      "/etc/f3d/colormaps", "/usr/share/f3d/colormaps",
+#endif
+      F3DSystemTools::GetBinaryResourceDirectory() / "colormaps" };
+
+    for (const fs::path& dir : dirsToCheck)
+    {
+      // If the string is a stem, try adding supported extensions
+      if (fs::path(str).stem() == str)
+      {
+        for (const std::string& ext : f3d::image::getSupportedFormats())
+        {
+          fs::path cmPath = dir / (str + ext);
+          if (fs::exists(cmPath))
+          {
+            return cmPath;
+          }
+        }
+      }
+      else
+      {
+        // If not, use directly
+        fs::path cmPath = dir / str;
         if (fs::exists(cmPath))
         {
-          return cmPath.string();
+          return cmPath;
         }
       }
     }
-    else
-    {
-      // If not, use directly
-      fs::path cmPath = dir / str;
-      if (fs::exists(cmPath))
-      {
-        return cmPath.string();
-      }
-    }
+  }
+  catch (const fs::filesystem_error& ex)
+  {
+    f3d::log::error("Unable to look for color map ", str, ": ", ex.what());
   }
 
   return {};
 }
 
-std::vector<double> Read(const std::string& path)
+std::vector<double> Read(const fs::path& path)
 {
   try
   {

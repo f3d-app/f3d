@@ -1,0 +1,17 @@
+# StreamVersion 1.2
+ExposeEvent 0 599 0 0 0 0 0
+RenderEvent 0 599 0 0 0 0 0
+TimerEvent 0 599 0 0 0 0 0
+KeyPressEvent 103 471 0 27 1 Escape 0
+CharEvent 103 471 0 27 1 Escape 0
+TimerEvent 103 471 0 27 1 Escape 0
+KeyReleaseEvent 103 471 0 27 1 Escape 0
+TimerEvent 103 471 0 27 1 Escape 0
+TimerEvent 103 471 0 27 1 Escape 0
+KeyPressEvent 103 471 0 27 1 Escape 0
+CharEvent 103 471 0 27 1 Escape 0
+TimerEvent 103 471 0 27 1 Escape 0
+TimerEvent 103 471 0 27 1 Escape 0
+KeyReleaseEvent 103 471 0 27 1 Escape 0
+TimerEvent 103 471 0 27 1 Escape 0
+TimerEvent 103 471 0 27 1 Escape 0

@@ -11,10 +11,10 @@ namespace f3d
 {
 struct F3D_EXPORT camera_state_t
 {
-  point3_t pos = { 0., 0., 1. };
-  point3_t foc = { 0., 0., 0. };
-  vector3_t up = { 0., 1., 0. };
-  angle_deg_t angle = 30.;
+  point3_t position = { 0., 0., 1. };
+  point3_t focalPoint = { 0., 0., 0. };
+  vector3_t viewUp = { 0., 1., 0. };
+  angle_deg_t viewAngle = 30.;
 };
 
 /**
@@ -35,19 +35,19 @@ public:
    * Angles are in degrees.
    */
   virtual camera& setPosition(const point3_t& pos) = 0;
-  virtual point3_t getPosition() = 0;
+  [[nodiscard]] virtual point3_t getPosition() = 0;
   virtual void getPosition(point3_t& pos) = 0;
   virtual camera& setFocalPoint(const point3_t& foc) = 0;
-  virtual point3_t getFocalPoint() = 0;
+  [[nodiscard]] virtual point3_t getFocalPoint() = 0;
   virtual void getFocalPoint(point3_t& foc) = 0;
   virtual camera& setViewUp(const vector3_t& up) = 0;
-  virtual vector3_t getViewUp() = 0;
+  [[nodiscard]] virtual vector3_t getViewUp() = 0;
   virtual void getViewUp(vector3_t& up) = 0;
   virtual camera& setViewAngle(const angle_deg_t& angle) = 0;
-  virtual angle_deg_t getViewAngle() = 0;
+  [[nodiscard]] virtual angle_deg_t getViewAngle() = 0;
   virtual void getViewAngle(angle_deg_t& angle) = 0;
   virtual camera& setState(const camera_state_t& state) = 0;
-  virtual camera_state_t getState() = 0;
+  [[nodiscard]] virtual camera_state_t getState() = 0;
   virtual void getState(camera_state_t& state) = 0;
   ///@}
 

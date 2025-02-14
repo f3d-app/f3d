@@ -76,7 +76,8 @@ void vtkF3DMetaImporter::Clear()
 //----------------------------------------------------------------------------
 void vtkF3DMetaImporter::AddImporter(const vtkSmartPointer<vtkImporter>& importer)
 {
-  this->Pimpl->Importers.emplace_back(vtkF3DMetaImporter::Internals::ImporterPair {importer, false});
+  this->Pimpl->Importers.emplace_back(
+    vtkF3DMetaImporter::Internals::ImporterPair{ importer, false });
   this->Modified();
 
   // Add a progress event observer
@@ -298,8 +299,10 @@ bool vtkF3DMetaImporter::Update()
 //----------------------------------------------------------------------------
 std::string vtkF3DMetaImporter::GetOutputsDescription()
 {
-  std::string description = "Number of files: " + std::to_string(this->Pimpl->Importers.size()) + "\n";
-  description += "Number of actors: " + std::to_string(this->ActorCollection->GetNumberOfItems()) + "\n";
+  std::string description =
+    "Number of files: " + std::to_string(this->Pimpl->Importers.size()) + "\n";
+  description +=
+    "Number of actors: " + std::to_string(this->ActorCollection->GetNumberOfItems()) + "\n";
   description += std::accumulate(this->Pimpl->Importers.begin(), this->Pimpl->Importers.end(),
     std::string(), [](const std::string& a, const auto& importerPair)
     { return a + "----------\n" + importerPair.Importer->GetOutputsDescription(); });
@@ -309,7 +312,8 @@ std::string vtkF3DMetaImporter::GetOutputsDescription()
 //----------------------------------------------------------------------------
 vtkIdType vtkF3DMetaImporter::GetNumberOfAnimations()
 {
-  // Importer->GetNumberOfAnimations() can be -1 if animation support is not implemented in the importer
+  // Importer->GetNumberOfAnimations() can be -1 if animation support is not implemented in the
+  // importer
   return std::accumulate(this->Pimpl->Importers.begin(), this->Pimpl->Importers.end(), 0,
     [](vtkIdType a, const auto& importerPair)
     {
@@ -322,7 +326,8 @@ vtkIdType vtkF3DMetaImporter::GetNumberOfAnimations()
 //----------------------------------------------------------------------------
 std::string vtkF3DMetaImporter::GetAnimationName(vtkIdType animationIndex)
 {
-  // Importer->GetNumberOfAnimations() can be -1 if animation support is not implemented in the importer
+  // Importer->GetNumberOfAnimations() can be -1 if animation support is not implemented in the
+  // importer
   vtkIdType localAnimationIndex = animationIndex;
   for (const auto& importerPair : this->Pimpl->Importers)
   {
@@ -523,7 +528,8 @@ void vtkF3DMetaImporter::UpdateInfoForColoring()
 
         // Update coloring vectors, with a dedicated logic for generic importer
         vtkDataSet* datasetForColoring = pdMapper->GetInput();
-        vtkF3DGenericImporter* genericImporter = vtkF3DGenericImporter::SafeDownCast(importerPair.Importer);
+        vtkF3DGenericImporter* genericImporter =
+          vtkF3DGenericImporter::SafeDownCast(importerPair.Importer);
         if (genericImporter)
         {
           // TODO This will be improved with proper composite support

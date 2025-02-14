@@ -1,15 +1,13 @@
 [
-{
-  "options":
   {
-    "resolution": "400,400"
-  }
-},
-{
-  "match": ".*(stl)",
-  "options":
+    "options": {
+      "resolution": "400,400"
+    }
+  },
   {
-    "resolution": "200,200"
+    "match": ".*(stl)",
+    "options": {
+      "resolution": "200,200"
+    }
   }
-}
 ]

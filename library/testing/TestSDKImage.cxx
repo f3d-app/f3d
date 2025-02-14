@@ -69,7 +69,7 @@ int TestSDKImage(int argc, char* argv[])
   test("generated JPG buffer not empty", bufferJPG.size() != 0);
 
   test.expect<f3d::image::write_exception>("save incompatible buffer to TIF format",
-    [&]() { generated.saveBuffer(f3d::image::SaveFormat::TIF); });
+    [&]() { std::ignore = generated.saveBuffer(f3d::image::SaveFormat::TIF); });
 
   std::vector<unsigned char> bufferBMP = generated.saveBuffer(f3d::image::SaveFormat::BMP);
   test("generated BMP buffer not empty", bufferBMP.size() != 0);
@@ -79,22 +79,21 @@ int TestSDKImage(int argc, char* argv[])
   f3d::image img32(width, height, channels, f3d::image::ChannelType::FLOAT);
 
   // test exceptions
-  test.expect<f3d::image::write_exception>(
-    "save buffer to incorrect path", [&]() { generated.save("/dummy/folder/img.png"); });
   test.expect<f3d::image::write_exception>("save incompatible buffer to BMP format",
-    [&]() { img16.saveBuffer(f3d::image::SaveFormat::BMP); });
+    [&]() { std::ignore = img16.saveBuffer(f3d::image::SaveFormat::BMP); });
   test.expect<f3d::image::write_exception>("save incompatible buffer to PNG format",
-    [&]() { img32.saveBuffer(f3d::image::SaveFormat::PNG); });
+    [&]() { std::ignore = img32.saveBuffer(f3d::image::SaveFormat::PNG); });
 
   f3d::image img2Ch(4, 4, 2);
   f3d::image img5Ch(4, 4, 5);
   test.expect<f3d::image::write_exception>("save incompatible channel count to BMP format",
-    [&]() { img5Ch.saveBuffer(f3d::image::SaveFormat::BMP); });
+    [&]() { std::ignore = img5Ch.saveBuffer(f3d::image::SaveFormat::BMP); });
   test.expect<f3d::image::write_exception>("save incompatible channel count to JPG format",
-    [&]() { img2Ch.saveBuffer(f3d::image::SaveFormat::JPG); });
-
-  test.expect<f3d::image::read_exception>(
-    "read image from incorrect path", [&]() { f3d::image img("/dummy/folder/img.png"); });
+    [&]() { std::ignore = img2Ch.saveBuffer(f3d::image::SaveFormat::JPG); });
+  test.expect<f3d::image::write_exception>("save image to invalid path",
+    [&]() { img2Ch.save("/" + std::string(257, 'x') + "/file.ext"); });
+  test.expect<f3d::image::write_exception>("save image to invalid filename",
+    [&]() { img2Ch.save(testingDir + std::string(257, 'x') + ".ext"); });
 
   // check 16-bits image code paths
   f3d::image shortImg(testingDir + "/data/16bit.png");
@@ -120,6 +119,14 @@ int TestSDKImage(int argc, char* argv[])
   test.expect<f3d::image::read_exception>(
     "read invalid image", [&]() { f3d::image invalidImg(testingDir + "/data/invalid.png"); });
 
+  // check reading inexistent image, do not create a "/dummy/folder/img.png"
+  test.expect<f3d::image::read_exception>(
+    "read image from incorrect path", [&]() { f3d::image img("/dummy/folder/img.png"); });
+
+  // check reading image with invalid path
+  test.expect<f3d::image::read_exception>("read image from invalid path",
+    [&]() { f3d::image img("/" + std::string(257, 'x') + "/file.ext"); });
+
   // check generated image with baseline
   test(
     "check generated image size", generated.getWidth() == width && generated.getHeight() == height);
@@ -132,10 +139,8 @@ int TestSDKImage(int argc, char* argv[])
   f3d::image baseline(testingDir + "/baselines/TestSDKImage.png");
   if (generated != baseline)
   {
-    double error;
-    generated.compare(baseline, 0, error);
-
-    std::cerr << "Generated image is different from the png baseline: " << error << std::endl;
+    std::cerr << "Generated image is different from the png baseline: "
+              << generated.compare(baseline) << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -144,10 +149,8 @@ int TestSDKImage(int argc, char* argv[])
   f3d::image baselineTIF(testingDir + "/baselines/TestSDKImage.tif");
   if (generated != baselineTIF)
   {
-    double error;
-    generated.compare(baselineTIF, 0, error);
-
-    std::cerr << "Generated image is different from the tif baseline: " << error << std::endl;
+    std::cerr << "Generated image is different from the tif baseline: "
+              << generated.compare(baselineTIF) << std::endl;
     return EXIT_FAILURE;
   }*/
 
@@ -164,10 +167,8 @@ int TestSDKImage(int argc, char* argv[])
   f3d::image baseline16(testingDir + "/baselines/TestSDKImage16.png");
   if (generated16 != baseline16)
   {
-    double error;
-    generated16.compare(baseline16, 0, error);
-
-    std::cerr << "generated short image is different from the baseline: " << error << std::endl;
+    std::cerr << "generated short image is different from the baseline: "
+              << generated16.compare(baseline16) << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -176,10 +177,8 @@ int TestSDKImage(int argc, char* argv[])
   f3d::image baseline16TIF(testingDir + "/baselines/TestSDKImage16.tif");
   if (generated16 != baseline16TIF)
   {
-    double error;
-    generated16.compare(baseline16TIF, 0, error);
-
-    std::cerr << "generated short image is different from the TIF baseline: " << error << std::endl;
+    std::cerr << "generated short image is different from the TIF baseline: "
+              << generated16.compare(baseline16TIF) << std::endl;
     return EXIT_FAILURE;
   }*/
 
@@ -197,10 +196,8 @@ int TestSDKImage(int argc, char* argv[])
 
   if (generated32 != baseline32)
   {
-    double error;
-    generated32.compare(baseline32, 0, error);
-
-    std::cerr << "generated float image is different from the baseline: " << error << std::endl;
+    std::cerr << "generated float image is different from the baseline: "
+              << generated32.compare(baseline32) << std::endl;
     return EXIT_FAILURE;
   }
 #endif // F3D_SSIM_COMPARE
@@ -221,9 +218,10 @@ int TestSDKImage(int argc, char* argv[])
   // test toTerminalText
   {
     test.expect<f3d::image::write_exception>("invalid toTerminalText with BYTE",
-      [&]() { f3d::image(3, 3, 1, f3d::image::ChannelType::BYTE).toTerminalText(); });
-    test.expect<f3d::image::write_exception>("invalid toTerminalText with SHORT",
-      [&]() { f3d::image(3, 3, 4, f3d::image::ChannelType::SHORT).toTerminalText(); });
+      [&]() { std::ignore = f3d::image(3, 3, 1, f3d::image::ChannelType::BYTE).toTerminalText(); });
+    test.expect<f3d::image::write_exception>("invalid toTerminalText with SHORT", [&]() {
+      std::ignore = f3d::image(3, 3, 4, f3d::image::ChannelType::SHORT).toTerminalText();
+    });
 
     const auto fileToString = [](const std::string& path) {
       std::ifstream file(path);
@@ -253,11 +251,11 @@ int TestSDKImage(int argc, char* argv[])
       std::set<std::string>(keys.begin(), keys.end()) == std::set<std::string>({ "foo", "hello" }));
 
     test.expect<f3d::image::metadata_exception>(
-      "invalid get metadata", [&]() { img.getMetadata("baz"); });
+      "invalid get metadata", [&]() { std::ignore = img.getMetadata("baz"); });
 
     test.expect<f3d::image::metadata_exception>("remove and get metadata", [&]() {
-      img.setMetadata("foo", ""); // empty value, should remove key
-      img.getMetadata("foo");     // expected to throw
+      img.setMetadata("foo", "");           // empty value, should remove key
+      std::ignore = img.getMetadata("foo"); // expected to throw
     });
 
     test(
@@ -292,22 +290,16 @@ int TestSDKImage(int argc, char* argv[])
   }
 
   // Test image::compare dedicated code paths
-  double error;
-  test("compare images with different channel types",
-    !generated.compare(generated16, 0, error) && error == 1.);
+  test("compare images with different channel types", generated.compare(generated16) == 1.);
 
   f3d::image generatedCount(width, height, channels + 1);
-  test("compare images with different channel count",
-    !generated.compare(generatedCount, 0, error) && error == 1.);
+  test("compare images with different channel count", generated.compare(generatedCount) == 1.);
 
   f3d::image generatedSize(width + 1, height, channels);
-  test("compare images with different size",
-    !generated.compare(generatedSize, 0, error) && error == 1.);
+  test("compare images with different size", generated.compare(generatedSize) == 1.);
 
   f3d::image empty(0, 0, 0);
-  test("compare empty images", empty.compare(empty, 0, error) && error == 0.);
-  test("compare with negative threshold", !empty.compare(empty, -1, error) && error == 1.);
-  test("compare with threshold == 1", !empty.compare(empty, 1, error) && error == 1.);
+  test("compare empty images", empty.compare(empty) == 0.);
 
-  return EXIT_SUCCESS;
+  return test.result();
 }

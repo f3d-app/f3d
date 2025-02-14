@@ -5,6 +5,7 @@
 #include "nlohmann/json.hpp"
 
 #include "log.h"
+#include "utils.h"
 
 #include <filesystem>
 #include <fstream>
@@ -21,7 +22,7 @@ namespace
  */
 std::vector<fs::path> GetConfigPaths(const std::string& configSearch)
 {
-  std::vector<std::filesystem::path> paths;
+  std::vector<fs::path> paths;
 
   fs::path configPath;
   std::vector<fs::path> dirsToCheck = {
@@ -29,7 +30,7 @@ std::vector<fs::path> GetConfigPaths(const std::string& configSearch)
 #ifdef __APPLE__
     "/usr/local/etc/f3d",
 #endif
-#ifdef __linux__
+#if defined(__linux__) || defined(__FreeBSD__)
     "/etc/f3d",
     "/usr/share/f3d/configs",
 #endif
@@ -46,25 +47,30 @@ std::vector<fs::path> GetConfigPaths(const std::string& configSearch)
         continue;
       }
 
-      // If the config search is a stem, add extensions
+      std::vector<std::string> configNames;
       if (fs::path(configSearch).stem() == configSearch)
       {
-        for (const std::string& ext : { std::string(".json"), std::string(".d") })
-        {
-          configPath = dir / (configSearch + ext);
-          if (fs::exists(configPath))
-          {
-            paths.emplace_back(configPath);
-          }
-        }
+        // If the config search is a stem, add extensions
+        configNames.emplace_back(configSearch + ".json");
+        configNames.emplace_back(configSearch + ".d");
       }
       else
       {
         // If not, use directly
-        configPath = dir / (configSearch);
+        configNames.emplace_back(configSearch);
+      }
+
+      for (const auto& configName : configNames)
+      {
+        configPath = dir / (configName);
         if (fs::exists(configPath))
         {
+          f3d::log::debug("Config file found: ", configPath.string());
           paths.emplace_back(configPath);
+        }
+        else
+        {
+          f3d::log::debug("Candidate config file not found: ", configPath.string());
         }
       }
     }
@@ -111,7 +117,8 @@ F3DConfigFileTools::ReadConfigFiles(const std::string& userConfig)
   }
   else
   {
-    configPaths.emplace_back(userConfig);
+    // Collapse full path into an absolute path
+    configPaths.emplace_back(f3d::utils::collapsePath(userConfig));
   }
 
   // Recover actual individual config file paths
@@ -133,7 +140,7 @@ F3DConfigFileTools::ReadConfigFiles(const std::string& userConfig)
     if (fs::is_directory(configPath))
     {
       f3d::log::debug("Using config directory ", configPath.string());
-      for (auto& entry : std::filesystem::directory_iterator(configPath))
+      for (auto& entry : fs::directory_iterator(configPath))
       {
         actualConfigFilePaths.emplace(entry);
       }

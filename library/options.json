@@ -120,8 +120,8 @@
           "default_value": "false"
         },
         "coc": {
-        "type": "double",
-        "default_value": "20.0"
+          "type": "double",
+          "default_value": "20.0"
         }
       }
     },
@@ -129,6 +129,12 @@
       "intensity": {
         "type": "double",
         "default_value": "1.0"
+      }
+    },
+    "armature": {
+      "enable": {
+        "type": "bool",
+        "default_value": "false"
       }
     }
   },
@@ -175,6 +181,10 @@
     },
     "font_file": {
       "type": "string"
+    },
+    "scale": {
+      "type": "ratio",
+      "default_value": "1.0"
     },
     "loader_progress": {
       "type": "bool",

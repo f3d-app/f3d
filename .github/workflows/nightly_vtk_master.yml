@@ -11,7 +11,7 @@ jobs:
 #----------------------------------------------------------------------------
   check_nightly:
     if: github.repository == 'f3d-app/f3d'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     name: Check nightly
     outputs:
       should_run: ${{ steps.should_run.outputs.should_run }}
@@ -36,13 +36,54 @@ jobs:
       run: echo "vtk_sha=$(git log -n 1 --pretty=format:%H)" >> $GITHUB_OUTPUT
 
 #----------------------------------------------------------------------------
+# Default versions: Set default version for all dependencies
+#----------------------------------------------------------------------------
+  default_versions:
+    runs-on: ubuntu-22.04
+    name: Set default versions
+    outputs:
+      alembic_version: ${{ steps.set_default_versions.outputs.alembic_version }}
+      alembic_min_version: ${{ steps.set_default_versions.outputs.alembic_min_version }}
+      assimp_version: ${{ steps.set_default_versions.outputs.assimp_version }}
+      assimp_min_version: ${{ steps.set_default_versions.outputs.assimp_min_version }}
+      draco_version: ${{ steps.set_default_versions.outputs.draco_version }}
+      draco_min_version: ${{ steps.set_default_versions.outputs.draco_min_version }}
+      occt_version: ${{ steps.set_default_versions.outputs.occt_version }}
+      occt_min_version: ${{ steps.set_default_versions.outputs.occt_min_version }}
+      openexr_version: ${{ steps.set_default_versions.outputs.openexr_version }}
+      openexr_min_version: ${{ steps.set_default_versions.outputs.openexr_min_version }}
+      openvdb_version: ${{ steps.set_default_versions.outputs.openvdb_version }}
+      openvdb_min_version: ${{ steps.set_default_versions.outputs.openvdb_min_version }}
+      pybind11_version: ${{ steps.set_default_versions.outputs.pybind11_version }}
+      pybind11_min_version: ${{ steps.set_default_versions.outputs.pybind11_min_version }}
+      python_version: ${{ steps.set_default_versions.outputs.python_version }}
+      python_min_version: ${{ steps.set_default_versions.outputs.python_min_version }}
+      usd_version: ${{ steps.set_default_versions.outputs.usd_version }}
+      usd_min_version: ${{ steps.set_default_versions.outputs.usd_min_version }}
+      java_version: ${{ steps.set_default_versions.outputs.java_version }}
+      java_min_version: ${{ steps.set_default_versions.outputs.java_min_version }}
+
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        path: 'source'
+        fetch-depth: 1
+        lfs: false
+
+    - name: Set default versions
+      id: set_default_versions
+      uses: ./source/.github/actions/default-versions
+
+#----------------------------------------------------------------------------
 # Cache LFS: Checkout LFS data and update the cache to limit LFS bandwidth
 #----------------------------------------------------------------------------
 
   cache_lfs:
     needs: check_nightly
     if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     name: Update LFS data cache
     outputs:
       lfs_sha: ${{ steps.lfs_sha_recover.outputs.lfs_sha }}
@@ -65,7 +106,7 @@ jobs:
 # Windows CI: Build and test
 #----------------------------------------------------------------------------
   windows:
-    needs: [cache_lfs, check_nightly]
+    needs: [cache_lfs, check_nightly, default_versions]
     if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
     strategy:
       fail-fast: false
@@ -86,12 +127,22 @@ jobs:
         vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
         raytracing_label: raytracing
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+        alembic_version: ${{needs.default_versions.outputs.alembic_version}}
+        assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+        draco_version: ${{needs.default_versions.outputs.draco_version}}
+        occt_version: ${{needs.default_versions.outputs.occt_version}}
+        openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+        pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
+        python_version: ${{needs.default_versions.outputs.python_version}}
+        usd_version: ${{needs.default_versions.outputs.usd_version}}
+        java_version: ${{needs.default_versions.outputs.java_version}}
 
 #----------------------------------------------------------------------------
 # Linux CI: Build and test
 #----------------------------------------------------------------------------
   linux:
-    needs: [cache_lfs, check_nightly]
+    needs: [cache_lfs, check_nightly, default_versions]
     if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
     strategy:
       fail-fast: false
@@ -103,7 +154,7 @@ jobs:
             rendering_backend: egl
           - build_type: osmesa
             rendering_backend: osmesa
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
@@ -125,12 +176,22 @@ jobs:
         raytracing_label: 'raytracing'
         rendering_backend: ${{matrix.rendering_backend}}
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+        alembic_version: ${{needs.default_versions.outputs.alembic_version}}
+        assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+        draco_version: ${{needs.default_versions.outputs.draco_version}}
+        occt_version: ${{needs.default_versions.outputs.occt_version}}
+        openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+        pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
+        python_version: ${{needs.default_versions.outputs.python_version}}
+        usd_version: ${{needs.default_versions.outputs.usd_version}}
+        java_version: ${{needs.default_versions.outputs.java_version}}
 
 #----------------------------------------------------------------------------
 # MacOS CI: Build and test
 #----------------------------------------------------------------------------
   macos:
-    needs: [cache_lfs, check_nightly]
+    needs: [cache_lfs, check_nightly, default_versions]
     if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
     strategy:
       fail-fast: false
@@ -151,12 +212,22 @@ jobs:
         vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
         cpu: x86_64
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+        alembic_version: ${{needs.default_versions.outputs.alembic_version}}
+        assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+        draco_version: ${{needs.default_versions.outputs.draco_version}}
+        occt_version: ${{needs.default_versions.outputs.occt_version}}
+        openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+        pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
+        python_version: ${{needs.default_versions.outputs.python_version}}
+        usd_version: ${{needs.default_versions.outputs.usd_version}}
+        java_version: ${{needs.default_versions.outputs.java_version}}
 
 #----------------------------------------------------------------------------
 # MacOS arm64 CI: Build and test
 #----------------------------------------------------------------------------
   macos_arm:
-    needs: [cache_lfs, check_nightly]
+    needs: [cache_lfs, check_nightly, default_versions]
     if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
     strategy:
       fail-fast: false
@@ -177,6 +248,16 @@ jobs:
         vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
         cpu: arm64
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+        alembic_version: ${{needs.default_versions.outputs.alembic_version}}
+        assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+        draco_version: ${{needs.default_versions.outputs.draco_version}}
+        occt_version: ${{needs.default_versions.outputs.occt_version}}
+        openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+        pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
+        python_version: ${{needs.default_versions.outputs.python_version}}
+        usd_version: ${{needs.default_versions.outputs.usd_version}}
+        java_version: ${{needs.default_versions.outputs.java_version}}
 
 #----------------------------------------------------------------------------
 # Sanitizer: Build and test on linux with last VTK with sanitizer options
@@ -185,7 +266,7 @@ jobs:
 # "memory" returns false positives in VTK:
 # https://stackoverflow.com/questions/60097307/memory-sanitizer-reports-use-of-uninitialized-value-in-global-object-constructio
   sanitizer:
-    needs: [cache_lfs, check_nightly]
+    needs: [cache_lfs, check_nightly, default_versions]
     if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
 
     strategy:
@@ -193,7 +274,7 @@ jobs:
       matrix:
         sanitizer_type: [address, thread, undefined]
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
@@ -217,6 +298,16 @@ jobs:
         vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
         sanitizer_type: ${{matrix.sanitizer_type}}
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+        alembic_version: ${{needs.default_versions.outputs.alembic_version}}
+        assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+        draco_version: ${{needs.default_versions.outputs.draco_version}}
+        occt_version: ${{needs.default_versions.outputs.occt_version}}
+        openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+        pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
+        python_version: ${{needs.default_versions.outputs.python_version}}
+        usd_version: ${{needs.default_versions.outputs.usd_version}}
+        java_version: ${{needs.default_versions.outputs.java_version}}
 
 #----------------------------------------------------------------------------
 # android: Check build of F3D for android
@@ -230,7 +321,7 @@ jobs:
       matrix:
         arch: [armeabi-v7a, arm64-v8a, x86, x86_64]
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
 
     steps:
@@ -258,7 +349,7 @@ jobs:
     strategy:
       fail-fast: false
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
 

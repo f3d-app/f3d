@@ -9,7 +9,7 @@ Here is an example showing how to use libf3d python bindings:
 ```python
 import f3d
 
-eng = f3d.Engine(f3d.Window.NATIVE)
+eng = f3d.Engine.create(False)
 eng.options.update({
   "model.scivis.array-name": "Normals",
   "model.scivis.component": 0,
@@ -22,6 +22,11 @@ eng.interactor.start()
 ```
 
 You can see more examples using python bindings in the dedicated example folder [here](https://github.com/f3d-app/f3d/tree/master/examples/libf3d/python).
+
+### Stubs
+
+It's also possible to generate Python stubs automatically by enabling the CMake option `F3D_BINDINGS_PYTHON_GENERATE_STUBS`.
+Python stubs are `.pyi` files defining the public interface, allowing IDEs to auto-complete and do static analysis.
 
 ## Java (experimental)
 
