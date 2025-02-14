@@ -977,9 +977,9 @@ interactor& interactor_impl::initBindings()
   auto docTgl = [](const std::string& doc, const bool& val)
   { return std::pair(doc, (val ? "ON" : "OFF")); };
 
-  // "doc", "ON/OFF/N/A"
+  // "doc", "ON/OFF/Unset"
   auto docTglOpt = [](const std::string& doc, const std::optional<bool>& val)
-  { return std::pair(doc, (val.has_value() ? (val.value() ? "ON" : "OFF") : "N/A")); };
+  { return std::pair(doc, (val.has_value() ? (val.value() ? "ON" : "OFF") : "Unset")); };
 
   // Available standard keys: None
   this->addBinding({mod_t::NONE, "W"}, "cycle_animation", "Scene", docAnim);
