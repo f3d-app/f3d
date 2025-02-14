@@ -1634,6 +1634,7 @@ void F3DStarter::AddCommands()
       f3d::scene& scene = this->Internals->Engine->getScene();
       scene.clear();
       this->Internals->FilesGroups.clear();
+      this->Internals->LoadedFiles.clear();
       this->ResetWindowName();
       f3d::options& options = this->Internals->Engine->getOptions();
       options.ui.dropzone = true;
