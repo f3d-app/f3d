@@ -44,7 +44,7 @@ runs:
       with:
         type: 'consumer'
         lfs_sha: ${{inputs.lfs_sha}}
-        cace_postfix: cache-1
+        cache_postfix: cache-1
 
     - name: Install all F3D dependencies
       uses: ./source/.github/actions/generic-dependencies
