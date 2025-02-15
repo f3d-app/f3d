@@ -342,14 +342,14 @@ void vtkF3DImguiActor::RenderCheatSheet()
   ImGuiViewport* viewport = ImGui::GetMainViewport();
 
   constexpr float marginLeft = 5.f;
-  constexpr float marginTopBottom = 5.f;
+  float marginTop = 0.f;
 
   float winWidth = 0.f;
-  uint8_t textLineNumber = 0;
+  float textHeight = 0.f;
   for (const auto& [group, content] : this->CheatSheet)
   {
     ImVec2 groupLine = ImGui::CalcTextSize(group.c_str());
-    textLineNumber += 1;
+    textHeight += ImGui::GetTextLineHeightWithSpacing();
     for (const auto& [bind, desc, val] : content)
     {
       std::string line = bind;
@@ -362,13 +362,16 @@ void vtkF3DImguiActor::RenderCheatSheet()
       ImVec2 currentLine = ImGui::CalcTextSize(line.c_str());
 
       winWidth = std::max(winWidth, currentLine.x);
-      textLineNumber += 1;
+      textHeight += ImGui::GetTextLineHeightWithSpacing();
     }
   }
-  winWidth += 2.f * ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().ScrollbarSize;
 
-  ::SetupNextWindow(ImVec2(marginLeft, marginTopBottom),
-    ImVec2(winWidth, viewport->WorkSize.y - 2.f * marginTopBottom));
+  winWidth += 2.f * ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().ScrollbarSize;
+  textHeight += 2.f * ImGui::GetStyle().WindowPadding.y + ImGui::GetStyle().ScrollbarSize;
+  marginTop = std::max(marginTop, (viewport->WorkSize.y - textHeight) * 0.5f);
+  
+  ::SetupNextWindow(ImVec2(marginLeft, marginTop),
+    ImVec2(winWidth, std::min(viewport->WorkSize.y, textHeight)));
   ImGui::SetNextWindowBgAlpha(0.35f);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
@@ -376,10 +379,6 @@ void vtkF3DImguiActor::RenderCheatSheet()
     ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
 
   ImGui::Begin("CheatSheet", nullptr, flags);
-
-  float totalTextHeight = ImGui::GetTextLineHeightWithSpacing() * textLineNumber;
-  float startCursorY = std::max(0.0f, (ImGui::GetWindowHeight() - totalTextHeight) * 0.5f);
-  ImGui::SetCursorPosY(startCursorY);
   
   for (const auto& [group, list] : this->CheatSheet)
   {
