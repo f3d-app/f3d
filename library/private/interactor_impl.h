@@ -29,7 +29,7 @@ class animationManager;
 class interactor_impl : public interactor
 {
 public:
-  std::map<std::string_view, std::string_view>actions;
+  std::map<std::string_view, std::string_view>actions_contri;
   ///@{
   /**
   * Documented public API

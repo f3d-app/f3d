@@ -793,7 +793,7 @@ interactor& interactor_impl::alias(std::string action, std::string value){
       [&](const std::vector<std::string>& args)
       {
         std::string actiontype = args[1];
-        actions["action"] = actiontype;
+        actions_contri["action"] = actiontype;
         this->triggerCommand(actiontype);
       });
   }
@@ -852,8 +852,8 @@ bool interactor_impl::triggerCommand(std::string_view command)
 
   if (command == "action")
   {
-    auto it = actions.find(command);
-    if (it == actions.end())
+    auto it = actions_contri.find(command);
+    if (it == actions_contri.end())
     {
       cout << "Action type doesn't exist";
     }
