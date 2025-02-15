@@ -219,7 +219,7 @@ public:
     const int newIntensityPct = std::lround(intensity * 100) + (negative ? -offsetPp : +offsetPp);
     this->Options.render.light.intensity = std::max(newIntensityPct, 0) / 100.0;
   }
-  
+
   //----------------------------------------------------------------------------
   // Increase/Decrease opacity
   void IncreaseOpacity(bool negative)

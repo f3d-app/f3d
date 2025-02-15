@@ -65,6 +65,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   inter.removeBinding({ mod_t::NONE, "B" });
   inter.removeBinding({ mod_t::NONE, "S" });
   inter.removeBinding({ mod_t::NONE, "Z" });
+  inter.removeBinding({ mod_t::CTRL, "P" });
 
   // Check that an binding can be added
   inter.addBinding({ mod_t::NONE, "S" }, "toggle ui.axis");
