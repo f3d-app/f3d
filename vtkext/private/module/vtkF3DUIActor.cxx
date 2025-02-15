@@ -129,7 +129,7 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
 
   this->StartFrame(renWin);
 
-  if(this->DropZoneVisible)
+  if (this->DropZoneVisible)
   {
     this->RenderDropZone();
   }
