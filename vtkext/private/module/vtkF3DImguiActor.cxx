@@ -370,8 +370,8 @@ void vtkF3DImguiActor::RenderCheatSheet()
   textHeight += 2.f * ImGui::GetStyle().WindowPadding.y + ImGui::GetStyle().ScrollbarSize;
   marginTop = std::max(marginTop, (viewport->WorkSize.y - textHeight) * 0.5f);
   
-  ::SetupNextWindow(ImVec2(marginLeft, marginTop),
-    ImVec2(winWidth, std::min(viewport->WorkSize.y, textHeight)));
+  ::SetupNextWindow(
+    ImVec2(marginLeft, marginTop), ImVec2(winWidth, std::min(viewport->WorkSize.y, textHeight)));
   ImGui::SetNextWindowBgAlpha(0.35f);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
@@ -379,7 +379,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
     ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
 
   ImGui::Begin("CheatSheet", nullptr, flags);
-  
+
   for (const auto& [group, list] : this->CheatSheet)
   {
     ImGui::SeparatorText(group.c_str());
