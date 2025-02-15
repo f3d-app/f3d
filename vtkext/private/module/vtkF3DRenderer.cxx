@@ -5,7 +5,6 @@
 #include "F3DLog.h"
 #include "vtkF3DCachedLUTTexture.h"
 #include "vtkF3DCachedSpecularTexture.h"
-#include "vtkF3DDropZoneActor.h"
 #include "vtkF3DOpenGLGridMapper.h"
 #include "vtkF3DOverlayRenderPass.h"
 #include "vtkF3DRenderPass.h"
@@ -225,19 +224,9 @@ vtkF3DRenderer::vtkF3DRenderer()
   this->EnvMapPrefiltered->HalfPrecisionOff();
 #endif
 
-  // Init actors
-  vtkNew<vtkTextProperty> textProp;
-  textProp->SetFontSize(14);
-  textProp->SetOpacity(1.0);
-  textProp->SetBackgroundColor(0, 0, 0);
-  textProp->SetBackgroundOpacity(0.8);
-
-  this->DropZoneActor->GetTextProperty()->SetFontFamilyToCourier();
-
   this->SkyboxActor->SetProjection(vtkSkybox::Sphere);
   this->SkyboxActor->GammaCorrectOn();
 
-  this->DropZoneActor->VisibilityOff();
   this->SkyboxActor->VisibilityOff();
 
   // Make sure an active camera is available on the renderer
@@ -273,7 +262,6 @@ void vtkF3DRenderer::Initialize()
 
   this->AddActor2D(this->ScalarBarActor);
   this->AddActor(this->GridActor);
-  this->AddActor(this->DropZoneActor);
   this->AddActor(this->SkyboxActor);
   this->AddActor(this->UIActor);
 
@@ -1250,13 +1238,9 @@ void vtkF3DRenderer::ConfigureTextActors()
   {
     textColor[0] = textColor[1] = textColor[2] = 0.2;
   }
-  this->DropZoneActor->GetTextProperty()->SetColor(textColor);
 
   // Font
-  this->DropZoneActor->GetTextProperty()->SetFontFamilyToCourier();
-
-  std::string fontFileStr;
-  if (this->FontFile.has_value())
+  if (this->FontFile.has_value() && !this->FontFile.value().empty())
   {
     fontFileStr = ::DeprecatedCollapsePath(this->FontFile.value());
   }
@@ -1265,9 +1249,7 @@ void vtkF3DRenderer::ConfigureTextActors()
   {
     if (vtksys::SystemTools::FileExists(fontFileStr, true))
     {
-      this->DropZoneActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
-      this->DropZoneActor->GetTextProperty()->SetFontFile(fontFileStr.c_str());
-      this->UIActor->SetFontFile(fontFileStr);
+      this->UIActor->SetFontFile(tmpFontFile);
     }
     else
     {
@@ -1347,7 +1329,7 @@ void vtkF3DRenderer::SetFilenameInfo(const std::string& info)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetDropZoneInfo(const std::string& info)
 {
-  this->DropZoneActor->SetDropText(info);
+  this->UIActor->SetDropText(info);
 }
 
 //----------------------------------------------------------------------------
@@ -1551,7 +1533,7 @@ void vtkF3DRenderer::ShowDropZone(bool show)
   if (this->DropZoneVisible != show)
   {
     this->DropZoneVisible = show;
-    this->DropZoneActor->SetVisibility(show);
+    this->UIActor->SetDropZoneVisibility(show);
   }
 }
 
