@@ -369,7 +369,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
   winWidth += 2.f * ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().ScrollbarSize;
   textHeight += 2.f * ImGui::GetStyle().WindowPadding.y + ImGui::GetStyle().ScrollbarSize;
   marginTop = std::max(marginTop, (viewport->WorkSize.y - textHeight) * 0.5f);
-  
+
   ::SetupNextWindow(
     ImVec2(marginLeft, marginTop), ImVec2(winWidth, std::min(viewport->WorkSize.y, textHeight)));
   ImGui::SetNextWindowBgAlpha(0.35f);
