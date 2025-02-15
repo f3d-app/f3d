@@ -607,13 +607,15 @@ interactor& interactor_impl::initCommands()
     }
   };
 
+
   // Add default callbacks
-  this->addCommand("set",
-    [&](const std::vector<std::string>& args)
+  this->addCommand("set",[&](const std::vector<std::string>& args)
     {
       check_args(args, 2, "set");
       this->Internals->Options.setAsString(args[0], args[1]);
     });
+
+
 
   this->addCommand("toggle",
     [&](const std::vector<std::string>& args)
@@ -781,6 +783,21 @@ interactor& interactor_impl::initCommands()
   return *this;
 }
 
+interactor& interactor_impl::alias(std::string action, std::string value){
+  if(action.empty() || value.empty()){
+    log::error("Cannot be empty. Add action and or Value");
+  }
+  else
+  {
+    this->addCommand("action",
+      [&](const std::vector<std::string>& args)
+      {
+        std::string actiontype = args[1];
+        actions["action"] = actiontype;
+        this->triggerCommand(actiontype);
+      });
+  }
+}
 //----------------------------------------------------------------------------
 interactor& interactor_impl::addCommand(
   std::string action, std::function<void(const std::vector<std::string>&)> callback)
@@ -832,6 +849,19 @@ bool interactor_impl::triggerCommand(std::string_view command)
   {
     return true;
   }
+
+  if (command == "action")
+  {
+    auto it = actions.find(command);
+    if (it == actions.end())
+    {
+      cout << "Action type doesn't exist";
+    }
+    else{
+      return true;
+    }
+  }
+
 
   const std::string& action = tokens[0];
   try
@@ -905,20 +935,20 @@ interactor& interactor_impl::initBindings()
 
   // "Cycle animation" , "animationName"
   auto docAnim = [&](){ return std::pair("Cycle animation", this->Internals->AnimationManager->GetAnimationName()); };
-  
+
   // "Cycle point/cell data coloring" , "POINT/CELL"
   auto docField = [&](){ return std::pair(std::string("Cycle point/cell data coloring"), (opts.model.scivis.cells ? "CELL" : "POINT")); };
 
   // "Cycle array to color with" , "arrayName"
-  auto docArray = [&](){ 
-    return std::pair("Cycle array to color with", 
+  auto docArray = [&](){
+    return std::pair("Cycle array to color with",
       (opts.model.scivis.array_name.has_value()
         ? shortName(opts.model.scivis.array_name.value(), 15) + (opts.model.scivis.enable ? "" : " (forced)")
         : "OFF"));
   };
 
   // "Cycle component to color with" , "component"
-  auto docComp = [&](){ 
+  auto docComp = [&](){
     vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
     vtkF3DRenderer* ren =
       vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
@@ -1041,7 +1071,7 @@ interactor& interactor_impl::removeBinding(const interaction_bind_t& bind)
   // Look for the group of the removed bind
   std::string group;
   for (auto it = this->Internals->GroupedBinds.begin(); it != this->Internals->GroupedBinds.end();
-       it++)
+    it++)
   {
     if (it->second == bind)
     {

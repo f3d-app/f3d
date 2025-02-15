@@ -1,18 +1,19 @@
 /**
- * @class   interactor_impl
- * @brief   A concrete implementation of interactor
- *
- * A concrete implementation of interactor that hides the private API
- * See interactor.h for the class documentation
+* @class   interactor_impl
+* @brief   A concrete implementation of interactor
+*
+* A concrete implementation of interactor that hides the private API
+* See interactor.h for the class documentation
  */
 
 #ifndef f3d_interactor_impl_h
 #define f3d_interactor_impl_h
 
 #include "interactor.h"
+#include <map>
 
 #include <memory>
-
+using namespace std;
 class vtkInteractorObserver;
 class vtkImporter;
 namespace f3d
@@ -28,13 +29,15 @@ class animationManager;
 class interactor_impl : public interactor
 {
 public:
+  std::map<std::string_view, std::string_view>actions;
   ///@{
   /**
-   * Documented public API
+  * Documented public API
    */
   interactor_impl(options& options, window_impl& window, scene_impl& scene);
   ~interactor_impl() override;
 
+  interactor& alias(std::string action, std::string value);
   interactor& initCommands() override;
   interactor& addCommand(
     std::string action, std::function<void(const std::vector<std::string>&)> callback) override;
@@ -74,47 +77,47 @@ public:
   ///@}
 
   /**
-   * Implementation only API.
-   * Set the internal AnimationManager to be used by the interactor
+  * Implementation only API.
+  * Set the internal AnimationManager to be used by the interactor
    */
   void SetAnimationManager(animationManager* manager);
 
   /**
-   * Implementation only API.
-   * An utility method to set internal VTK interactor on a vtkInteractorObserver object.
+  * Implementation only API.
+  * An utility method to set internal VTK interactor on a vtkInteractorObserver object.
    */
   void SetInteractorOn(vtkInteractorObserver* observer);
 
   /**
-   * Implementation only API.
-   * Initialize the animation manager using interactor objects.
-   * This is called by the scene after add a file.
+  * Implementation only API.
+  * Initialize the animation manager using interactor objects.
+  * This is called by the scene after add a file.
    */
   void InitializeAnimation(vtkImporter* importer);
 
   /**
-   * Implementation only API
-   * Forward to vtkF3DInteractorStyle so that
-   * it update the renderer as needed, especially
-   * the camera clipping range.
+  * Implementation only API
+  * Forward to vtkF3DInteractorStyle so that
+  * it update the renderer as needed, especially
+  * the camera clipping range.
    */
   void UpdateRendererAfterInteraction();
 
   /**
-   * Event loop being called automatically once the interactor is started
-   * First call the EventLoopUserCallBack, then call render if requested.
+  * Event loop being called automatically once the interactor is started
+  * First call the EventLoopUserCallBack, then call render if requested.
    */
   void EventLoop();
 
   /**
-   * Set a command to be run on the next event loop
+  * Set a command to be run on the next event loop
    */
   void SetCommandBuffer(const char* command);
 
   /**
-   * An exception that can be thrown by certain command callbacks
-   * when the arguments of the callback are incorrect and expected
-   * to be caught by triggerCommand
+  * An exception that can be thrown by certain command callbacks
+  * when the arguments of the callback are incorrect and expected
+  * to be caught by triggerCommand
    */
   struct invalid_args_exception : public exception
   {
@@ -124,6 +127,7 @@ public:
 private:
   class internals;
   std::unique_ptr<internals> Internals;
+
 };
 }
 }
