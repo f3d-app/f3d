@@ -13,6 +13,18 @@ vtkF3DUIActor::vtkF3DUIActor() = default;
 vtkF3DUIActor::~vtkF3DUIActor() = default;
 
 //----------------------------------------------------------------------------
+void vtkF3DUIActor::SetDropZoneVisibility(bool show)
+{
+  this->DropZoneVisible = show;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DUIActor::SetDropText(const std::string& info)
+{
+  this->DropText = info;
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DUIActor::SetFileNameVisibility(bool show)
 {
   this->FileNameVisible = show;
@@ -116,6 +128,11 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
   }
 
   this->StartFrame(renWin);
+
+  if(this->DropZoneVisible)
+  {
+    this->RenderDropZone();
+  }
 
   if (this->FileNameVisible)
   {
