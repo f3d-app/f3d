@@ -2127,70 +2127,31 @@ void vtkF3DRenderer::SetColormap(const std::vector<double>& colormap)
   }
 }
 
+// ./build/bin/f3d assets/f3d-data/dragon.vtu --colormap=0,1,0,0,1,0,0,1 -xtgansb --coloring-component=0 --colormap-discretization=4
 void vtkF3DRenderer::SetColorDiscretization(const int discretization) 
 {
   std::string LogMsg1 = std::string("discretization value = ") + std::to_string(discretization);
   F3DLog::Print(F3DLog::Severity::Info, LogMsg1);
 
-  if (discretization > 0) 
+  if (discretization > 0)
   {
-    vtkSmartPointer<vtkDiscretizableColorTransferFunction> discretizableCTF = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
-
-    // this->ColorTransferFunction = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();;
-    // vtkDiscretizableColorTransferFunction* const discretizableCTF = vtkDiscretizableColorTransferFunction::SafeDownCast(this->ColorTransferFunction);
-
-    if(discretizableCTF != nullptr) {
-      F3DLog::Print(F3DLog::Severity::Info, "discretizableCTF is not null");
+    this->ColorTransferFunction = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
+    vtkDiscretizableColorTransferFunction* const discretizableCTF = vtkDiscretizableColorTransferFunction::SafeDownCast(this->ColorTransferFunction);
     
-      discretizableCTF->SetNumberOfValues(discretization);
-      discretizableCTF->DiscretizeOn();
+    discretizableCTF->DiscretizeOn();
+    discretizableCTF->SetNumberOfValues(discretization);
 
-      std::vector<double> colormap = this->Colormap;
-      const int numCompents = colormap.size() / 4; 
-
-      std::string LogMsg2 = std::string("numCompents = ") + std::to_string(numCompents);
-      F3DLog::Print(F3DLog::Severity::Info, LogMsg2);
-
-      for (int i = 0; i < numCompents; i++) 
-      {
-        const double v = colormap[i * 4 + 0]; // Scalar
-        const double r = colormap[i * 4 + 1]; // Red
-        const double g = colormap[i * 4 + 2]; // Green
-        const double b = colormap[i * 4 + 3]; // Blue
-
-        std::string LogMsg4 = std::string("v, r, g, b = ") + std::to_string(v) + ", " 
-                                                           + std::to_string(r) + ", " 
-                                                           + std::to_string(g) + ", "
-                                                           + std::to_string(b);
-        F3DLog::Print(F3DLog::Severity::Info, LogMsg4);
-
-        discretizableCTF->AddRGBPoint(v, r, g, b);
-      }
-
-      // const int numCompents = discretizableCTF->GetSize();
-      // std::string LogMsg3 = std::string("numCompents = ") + std::to_string(numCompents);
-      // F3DLog::Print(F3DLog::Severity::Info, LogMsg3);
-
-      // for (int i = 0; i < numCompents; i++)
-      // {
-      //   double val[6]; 
-      //   discretizableCTF->GetNodeValue(i, val);  
-      //   const double v = val[0]; 
-      //   const double r = val[1];      
-      //   const double g = val[2];      
-      //   const double b = val[3];     
-      //   discretizableCTF->AddRGBPoint(v, r, g, b);
-      // }
-      
-      discretizableCTF->Build();
-      this->ColorTransferFunction = discretizableCTF;
-    } else {
-      F3DLog::Print(F3DLog::Severity::Info, "discretizableCTF is null");
-    }
-  } 
-  else 
-  {
-    F3DLog::Print(F3DLog::Severity::Error, "The discretization value must be greater than zero");
+    // const int numCompents = this->Colormap.size() / 4;
+    // for (int i = 0; i < numCompents; i++)
+    // {
+    //   const int j = i * 4;
+    //   const auto v = this->Colormap[j + 0];
+    //   const auto r = this->Colormap[j + 1];
+    //   const auto g = this->Colormap[j + 2];
+    //   const auto b = this->Colormap[j + 3];
+    //   discretizableCTF->AddRGBPoint(v, r, g, b);
+    // }
+    // discretizableCTF->Build();
   }
 }
 
