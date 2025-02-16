@@ -316,24 +316,36 @@ void vtkF3DImguiActor::RenderDropZone()
     ImVec2 p1(dropZoneW, dropZoneH);
     int tickNumberW = static_cast<int>(std::ceil(dropZoneW / (tickLength * 2.0f)));
     int tickNumberH = static_cast<int>(std::ceil(dropZoneH / (tickLength * 2.0f)));
-    double tickSpaceW =
-      static_cast<double>((dropZoneW - tickNumberW * tickLength) / (tickNumberW - 1));
-    double tickSpaceH =
-      static_cast<double>((dropZoneH - tickNumberH * tickLength) / (tickNumberH - 1));
+
+    double tickSpaceW = static_cast<double>((dropZoneW / (tickNumberW - 2)));
+    double tickSpaceH = static_cast<double>((dropZoneH / (tickNumberH - 2)));
+
+    double tickBBSizeW = tickLength + tickSpaceW;
+    double tickBBSizeH = tickLength + tickSpaceH;
 
     // Draw top and bottom line
-    for (float x = p0.x; x < p1.x; x += tickLength + tickSpaceW)
+    for (float x = p0.x - tickThickness * 0.5f; x < p1.x - tickBBSizeW; x += tickBBSizeW)
     {
       draw_list->AddLine(ImVec2(x, p0.y), ImVec2(x + tickLength, p0.y), color, tickThickness);
       draw_list->AddLine(ImVec2(x, p1.y), ImVec2(x + tickLength, p1.y), color, tickThickness);
     }
 
+    draw_list->AddLine(ImVec2(p1.x - tickLength, p0.y), ImVec2(p1.x + tickThickness * 0.5f, p0.y),
+      color, tickThickness);
+    draw_list->AddLine(ImVec2(p1.x - tickLength, p1.y), ImVec2(p1.x + tickThickness * 0.5f, p1.y),
+      color, tickThickness);
+
     // Draw left and right line
-    for (float y = p0.y; y < p1.y; y += tickLength + tickSpaceH)
+    for (float y = p0.y - tickThickness * 0.5f; y < p1.y - tickBBSizeH; y += tickBBSizeH)
     {
       draw_list->AddLine(ImVec2(p0.x, y), ImVec2(p0.x, y + tickLength), color, tickThickness);
       draw_list->AddLine(ImVec2(p1.x, y), ImVec2(p1.x, y + tickLength), color, tickThickness);
     }
+
+    draw_list->AddLine(ImVec2(p0.x, p1.y - tickLength), ImVec2(p0.x, p1.y + tickThickness * 0.5f),
+      color, tickThickness);
+    draw_list->AddLine(ImVec2(p1.x, p1.y - tickLength), ImVec2(p1.x, p1.y + tickThickness * 0.5f),
+      color, tickThickness);
 
     ImGui::End();
 
