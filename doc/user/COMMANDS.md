@@ -36,6 +36,10 @@ eg: `roll_camera 120`.
 
 `decrease_light_intensity`: A specific command to decrease light intensity. No argument.
 
+`increase_opacity`: A specific command to increase opacity. Unset opacity will be treated as if it has a value of 1. No argument.
+
+`decrease_opacity`: A specific command to decrease opacity. Unset opacity will be treated as if it has a value of 1. No argument.
+
 `print_scene_info`: A specific command to print information about the scene, No argument.
 
 `print_coloring_info`: A specific command to print information about coloring settings, No argument.

@@ -1681,6 +1681,7 @@ void vtkF3DRenderer::SetOpacity(const std::optional<double>& opacity)
   {
     this->Opacity = opacity;
     this->ActorsPropertiesConfigured = false;
+    this->CheatSheetConfigured = false;
   }
 }
 
