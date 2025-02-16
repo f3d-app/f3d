@@ -98,13 +98,13 @@ void vtkF3DImguiConsole::ShowConsole()
         switch (severity)
         {
           case Internals::LogType::Error:
-            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.996, 0.349, 0.231, 1.0f));
             break;
           case Internals::LogType::Warning:
-            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 0.0f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.973, 0.698, 0.039, 1.0f));
             break;
           case Internals::LogType::Typed:
-            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 1.0f, 1.0f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.471f, 0.541f, 0.996f, 1.f));
             break;
           default:
             hasColor = false;
@@ -187,21 +187,19 @@ void vtkF3DImguiConsole::ShowBadge()
     ImGui::Begin("ConsoleAlert", nullptr, winFlags);
 
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.471f, 0.541f, 0.996f, 1.f));
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.f);
 
-    const bool useColoring = this->GetUseColoring();
-
-    if (useColoring)
-    {
-      ImGui::PushStyleColor(ImGuiCol_Text,
+    ImGui::PushStyleColor(ImGuiCol_Text,
         this->Pimpl->NewError ? ImVec4(1.0f, 0.0f, 0.0f, 1.0f) : ImVec4(1.0f, 1.0f, 0.0f, 1.0f));
-    }
 
     if (ImGui::Button("!"))
     {
       this->InvokeEvent(vtkF3DImguiConsole::ShowEvent);
     }
 
-    ImGui::PopStyleColor(useColoring ? 2 : 1);
+    ImGui::PopStyleColor(3);
+    ImGui::PopStyleVar();
 
     ImGui::End();
   }
