@@ -898,8 +898,7 @@ int F3DStarter::Start(int argc, char** argv)
       this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::create(offscreen));
     }
 
-    f3d::window& window = this->Internals->Engine->getWindow();
-    window.setWindowName(F3D::AppTitle).setIcon(F3DIcon, sizeof(F3DIcon));
+    this->ResetWindowName();
     this->Internals->ApplyPositionAndResolution();
     this->AddCommands();
     this->Internals->UpdateBindings({ "" });
@@ -1599,6 +1598,13 @@ void F3DStarter::EventLoop()
 }
 
 //----------------------------------------------------------------------------
+void F3DStarter::ResetWindowName()
+{
+  f3d::window& window = this->Internals->Engine->getWindow();
+  window.setWindowName(F3D::AppTitle).setIcon(F3DIcon, sizeof(F3DIcon));
+}
+
+//----------------------------------------------------------------------------
 void F3DStarter::AddCommands()
 {
   f3d::interactor& interactor = this->Internals->Engine->getInteractor();
@@ -1617,6 +1623,23 @@ void F3DStarter::AddCommands()
     }
     return f3d::options::parse<bool>(args[0]);
   };
+
+  interactor.addCommand("remove_file_groups",
+    [this](const std::vector<std::string>&)
+    {
+      if (!this->Internals->AppOptions.NoRender)
+      {
+        this->Internals->Engine->getInteractor().stopAnimation();
+      }
+      f3d::scene& scene = this->Internals->Engine->getScene();
+      scene.clear();
+      this->Internals->FilesGroups.clear();
+      this->Internals->LoadedFiles.clear();
+      this->ResetWindowName();
+      f3d::options& options = this->Internals->Engine->getOptions();
+      options.ui.dropzone = true;
+      options.ui.filename_info = "";
+    });
 
   interactor.addCommand("load_previous_file_group",
     [this](const std::vector<std::string>& args)

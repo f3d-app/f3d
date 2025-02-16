@@ -87,6 +87,8 @@ eg: `set_hdri /path/to/file.hdr`.
 `add_files_or_set_hdri [path/to/file1] [path/to/file2]`: A specific command that will process each files and either, `set_hdri` if the provided file uses a recognised HDR extension or `add_files` otherwise. Take one or more files as arguments.
 eg: `add_files_or_set_hdri /path/to/dragon.vtu /path/to/file.hdr`.
 
+`remove_file_groups`: A specific command to remove all files. No argument.
+
 ## Command Script (`--command-script`)
 
 F3D provides a feature to execute commands from a script file using the `--command-script` [CLI option](OPTIONS.md). This allows users to automate a sequence of commands by listing them in a plain text file, eg: `f3d --command-script path/to/command_script.txt`.
