@@ -441,6 +441,7 @@ if(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestInteractionCheatsheetScalarsRaytracing DATA dragon.vtu ARGS --scalar-coloring --coloring-component=-2 RESOLUTION 800,800 INTERACTION UI LONG_TIMEOUT) #HSSS
   f3d_test(NAME TestInteractionCheatsheetNoFileRaytracing INTERACTION UI NO_DATA_FORCE_RENDER) #HXM
   f3d_test(NAME TestInteractionCheatsheetAnimationNameRaytracing DATA InterpolationTest.glb ARGS --animation-index=6 RESOLUTION 800,800 INTERACTION UI THRESHOLD 0.05)#HWWW #Threshold is needed for legacy comparison method for VTK 9.3
+  f3d_test(NAME TestInteractionCheatsheetOpacityRaytracing DATA cow.vtp INTERACTION UI ARGS --opacity=0.5 RESOLUTION 300,660)
   f3d_test(NAME TestInteractionCheatsheetConfigFileRaytracing DATA dragon.vtu CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json RESOLUTION 600,1300 INTERACTION UI THRESHOLD 0.05) #H #Threshold is needed for legacy comparison method for VTK 9.3
 else()
   f3d_test(NAME TestInteractionCheatsheet DATA cow.vtp INTERACTION UI) #H
