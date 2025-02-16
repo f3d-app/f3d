@@ -183,6 +183,26 @@ ratio_t parse(const std::string& str)
 
 //----------------------------------------------------------------------------
 /**
+ * Parse provided string into a color_t.
+ * Supported formats: "R,G,B"
+ * rely on parse<std::vector<double>>(str)
+ * Can throw options::parsing_exception in case of failure to parse
+ */
+template<>
+color_t parse(const std::string& str)
+{
+  try
+  {
+    return color_t(options_tools::parse<std::vector<double>>(str));
+  }
+  catch (const f3d::type_construction_exception& ex)
+  {
+    throw options::parsing_exception("Cannot parse " + str + " into a color_t: " + ex.what());
+  }
+}
+
+//----------------------------------------------------------------------------
+/**
  * Return provided string stripped of leading and trailing spaces.
  */
 template<>
@@ -265,6 +285,17 @@ std::string format(const std::vector<T>& var)
 
 //----------------------------------------------------------------------------
 /**
+ * Format provided var into a string from provided color_t
+ * rely on format(std::vector<double>&)
+ */
+std::string format(color_t var)
+{
+  // TODO generate a proper color string
+  return options_tools::format(static_cast<std::vector<double>>(var));
+}
+
+//----------------------------------------------------------------------------
+/**
  * Generated method, see `options::set`
  */
 void set(options& opt, std::string_view name, const option_variant_t& value)
@@ -280,6 +311,11 @@ void set(options& opt, std::string_view name, const option_variant_t& value)
   {
     throw options::incompatible_exception(
       "Trying to set " + std::string(name) + " with incompatible type");
+  }
+  catch (const f3d::type_construction_exception& ex)
+  {
+    throw options::incompatible_exception(
+      "Could not create type for " + std::string(name) + " : " + ex.what());
   }
 }
 

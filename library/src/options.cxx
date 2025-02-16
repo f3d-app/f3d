@@ -181,17 +181,18 @@ std::string options::format(const T& var)
 }
 
 //----------------------------------------------------------------------------
-#define F3D_DECL_TYPE_INTERNAL(TYPE)                                                               \
+#define F3D_DECL_TYPE(TYPE)                                                                        \
   template F3D_EXPORT TYPE options::parse<TYPE>(const std::string& str);                           \
   template F3D_EXPORT std::string options::format<TYPE>(const TYPE& val)
-#define F3D_DECL_TYPE(TYPE)                                                                        \
-  F3D_DECL_TYPE_INTERNAL(TYPE);                                                                    \
-  F3D_DECL_TYPE_INTERNAL(std::vector<TYPE>)
-F3D_DECL_TYPE(bool);
-F3D_DECL_TYPE(int);
-F3D_DECL_TYPE(double);
-F3D_DECL_TYPE(f3d::ratio_t);
-F3D_DECL_TYPE(std::string);
+#define F3D_DECL_TYPE_WITH_VEC(TYPE)                                                               \
+  F3D_DECL_TYPE(TYPE);                                                                             \
+  F3D_DECL_TYPE(std::vector<TYPE>)
+F3D_DECL_TYPE_WITH_VEC(bool);
+F3D_DECL_TYPE_WITH_VEC(int);
+F3D_DECL_TYPE_WITH_VEC(double);
+F3D_DECL_TYPE_WITH_VEC(f3d::ratio_t);
+F3D_DECL_TYPE_WITH_VEC(std::string);
+F3D_DECL_TYPE(color_t);
 
 //----------------------------------------------------------------------------
 options::parsing_exception::parsing_exception(const std::string& what)
