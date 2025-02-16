@@ -450,6 +450,7 @@ else()
   f3d_test(NAME TestInteractionCheatsheetNoFile INTERACTION UI NO_DATA_FORCE_RENDER) #HXM
   f3d_test(NAME TestInteractionCheatsheetAnimationName DATA InterpolationTest.glb ARGS --animation-index=6 RESOLUTION 800,800 INTERACTION UI) #HWWW
   f3d_test(NAME TestInteractionCheatsheetConfigFile DATA dragon.vtu CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json RESOLUTION 600,1300 INTERACTION UI) #H
+  f3d_test(NAME TestInteractionCheatsheetOpacity DATA cow.vtp INTERACTION UI ARGS --opacity=0.5 RESOLUTION 300,620)
 endif()
 
 f3d_test(NAME TestCameraPersp DATA Cameras.gltf ARGS --camera-index=0)
