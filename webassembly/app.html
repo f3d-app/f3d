@@ -464,12 +464,12 @@
             if (parsed_up_value) {
               console.log("up", parsed_up_value);
               options.set_string("scene.up_direction", parsed_up_value);
+              for (const el of ['z-up', 'y-up'])
+                document.getElementById(el).classList.remove("is-active");
               if (parsed_up_value == "+Y") {
-                document.getElementById("z-up").classList.remove("is-active");
                 document.getElementById("y-up").classList.add("is-active");
               } else {
                 document.getElementById("z-up").classList.add("is-active");
-                document.getElementById("y-up").classList.remove("is-active");
               }
               openFile(document.getElementById("file-name").innerHTML);
             }
