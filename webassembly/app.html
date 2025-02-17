@@ -467,12 +467,11 @@
               if (parsed_up_value == "+Y") {
                 document.getElementById("z-up").classList.remove("is-active");
                 document.getElementById("y-up").classList.add("is-active");
-                openFile(document.getElementById("file-name").innerHTML);
               } else {
                 document.getElementById("z-up").classList.add("is-active");
                 document.getElementById("y-up").classList.remove("is-active");
-                openFile(document.getElementById("file-name").innerHTML);
               }
+              openFile(document.getElementById("file-name").innerHTML);
             }
 
             // Needs re-render to update F3D options
