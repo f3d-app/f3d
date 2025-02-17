@@ -1624,22 +1624,28 @@ void F3DStarter::AddCommands()
     return f3d::options::parse<bool>(args[0]);
   };
 
+
   interactor.addCommand("remove_file_groups",
-    [this](const std::vector<std::string>&)
-    {
-      if (!this->Internals->AppOptions.NoRender)
-      {
-        this->Internals->Engine->getInteractor().stopAnimation();
-      }
-      f3d::scene& scene = this->Internals->Engine->getScene();
-      scene.clear();
-      this->Internals->FilesGroups.clear();
-      this->Internals->LoadedFiles.clear();
-      this->ResetWindowName();
-      f3d::options& options = this->Internals->Engine->getOptions();
-      options.ui.dropzone = true;
-      options.ui.filename_info = "";
-    });
+     [this](const std::vector<std::string>&) // Register a command named "remove_file_groups"
+     {
+         auto& internals = *this->Internals; // Create a reference to Internals to simplify access
+
+         // Stop any running animations before clearing the scene
+         if (!internals.AppOptions.NoRender)
+         {
+             internals.Engine->getInteractor().stopAnimation(); // Stop animation if rendering is enabled
+         }
+
+         // Clear the scene and reset stored file groups
+         internals.Engine->getScene().clear(); // Remove all displayed elements from the scene
+         internals.FilesGroups.clear(); // Remove all file groups
+         internals.LoadedFiles.clear(); // Remove all loaded files
+
+         // Restore UI state
+         auto& options = internals.Engine->getOptions(); // Create a reference to the options object
+         options.ui.dropzone = true; // Enable the file drop zone UI
+         options.ui.filename_info.clear(); // Clear displayed filename information
+     });
 
   interactor.addCommand("load_previous_file_group",
     [this](const std::vector<std::string>& args)

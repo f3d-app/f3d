@@ -91,7 +91,7 @@ eg: `set_hdri /path/to/file.hdr`.
 `add_files_or_set_hdri [path/to/file1] [path/to/file2]`: A specific command that will process each files and either, `set_hdri` if the provided file uses a recognised HDR extension or `add_files` otherwise. Take one or more files as arguments.
 eg: `add_files_or_set_hdri /path/to/dragon.vtu /path/to/file.hdr`.
 
-`remove_file_groups`: A specific command to remove all files. No argument.
+`remove_file_groups`: A specific command to delete user files. No argument.
 
 ## Command Script (`--command-script`)
 
