@@ -36,6 +36,10 @@ eg: `roll_camera 120`.
 
 `decrease_light_intensity`: A specific command to decrease light intensity. No argument.
 
+`increase_opacity`: A specific command to increase opacity. Unset opacity will be treated as if it has a value of 1. No argument.
+
+`decrease_opacity`: A specific command to decrease opacity. Unset opacity will be treated as if it has a value of 1. No argument.
+
 `print_scene_info`: A specific command to print information about the scene, No argument.
 
 `print_coloring_info`: A specific command to print information about coloring settings, No argument.
@@ -86,6 +90,8 @@ eg: `set_hdri /path/to/file.hdr`.
 
 `add_files_or_set_hdri [path/to/file1] [path/to/file2]`: A specific command that will process each files and either, `set_hdri` if the provided file uses a recognised HDR extension or `add_files` otherwise. Take one or more files as arguments.
 eg: `add_files_or_set_hdri /path/to/dragon.vtu /path/to/file.hdr`.
+
+`remove_file_groups`: A specific command to remove all files. No argument.
 
 ## Command Script (`--command-script`)
 

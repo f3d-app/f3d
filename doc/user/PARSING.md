@@ -9,8 +9,9 @@ The following types are supported:
 - double: A floating point number.
 - ratio: A double dividend over a double divisor, stored in a double.
 - string: A string of characters.
+- color: A RGB color
 
-As well as a list for each of these types, noted as
+As well as a list for bool, int, double, ratio, string, noted as
 
 - vector\<type\>
 
@@ -62,3 +63,7 @@ String are parsed and formatted as is.
 Vector tokens are separated by `,`, tokens are then parsed using their respective types.
 
 When formatting a vector into a string, individual token are formatted according to their type and separated using `,`.
+
+## Color
+
+Color are parsed and formatted as a vector of double.

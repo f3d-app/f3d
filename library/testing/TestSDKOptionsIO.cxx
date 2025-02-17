@@ -1,7 +1,8 @@
+#include "PseudoUnitTest.h"
+
 #include <export.h>
 #include <options.h>
-
-#include "PseudoUnitTest.h"
+#include <types.h>
 
 #include <iostream>
 
@@ -96,6 +97,10 @@ int TestSDKOptionsIO(int argc, char* argv[])
   test.parse<std::vector<double>>("std::vector<double>", "0.1,0.2,0.3", { 0.1, 0.2, 0.3 });
   test.parse<std::vector<double>>("std::vector<double>", "  0.1,  0.2 , 0.3 ", { 0.1, 0.2, 0.3 });
   test.format<std::vector<double>>("std::vector<double>", { 0.1, 0.2, 0.3 }, "0.1,0.2,0.3");
+
+  test.parse<f3d::color_t>("color_t", "0.1,0.2,0.3", { 0.1, 0.2, 0.3 });
+  test.parse<f3d::color_t>("color_t", "  0.1,  0.2 , 0.3 ", { 0.1, 0.2, 0.3 });
+  test.format<f3d::color_t>("color_t", { 0.1, 0.2, 0.3 }, "0.1,0.2,0.3");
 
   test.parse<std::vector<std::string>>(
     "std::vector<std::string>", "foo,bar,baz", { "foo", "bar", "baz" });

@@ -8,7 +8,7 @@ using mod_t = f3d::interaction_bind_t::ModifierKeys;
 constexpr int nGroup = 3;
 constexpr int nBindsCamera = 7;
 constexpr std::string_view initDoc = "Toggle Orthographic Projection";
-constexpr std::string_view initVal = "N/A";
+constexpr std::string_view initVal = "Unset";
 
 int TestSDKInteractorDocumentation(int argc, char* argv[])
 {

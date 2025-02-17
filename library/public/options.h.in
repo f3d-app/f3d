@@ -194,6 +194,15 @@ public:
   ${_options_struct}
   // clang-format on
 };
+
+}
+
+// Certain options types are not trivially streamable
+//----------------------------------------------------------------------------
+inline std::ostream& operator<<(std::ostream& os, const f3d::color_t& color)
+{
+  os << f3d::options::format(color);
+  return os;
 }
 
 #endif
