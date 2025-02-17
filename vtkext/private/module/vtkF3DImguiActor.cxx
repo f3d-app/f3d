@@ -348,7 +348,6 @@ void vtkF3DImguiActor::RenderCheatSheet()
   float textHeight = 0.f;
   for (const auto& [group, content] : this->CheatSheet)
   {
-    ImVec2 groupLine = ImGui::CalcTextSize(group.c_str());
     textHeight += ImGui::GetTextLineHeightWithSpacing();
     for (const auto& [bind, desc, val] : content)
     {
