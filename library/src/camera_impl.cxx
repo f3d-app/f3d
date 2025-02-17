@@ -296,3 +296,27 @@ vtkCamera* camera_impl::GetVTKCamera()
   return this->Internals->VTKRenderer->GetActiveCamera();
 }
 };
+
+//----------------------------------------------------------------------------
+angle_deg_t camera_impl::getYaw() const
+{
+  vtkCamera* cam = this->GetVTKCamera();
+  double* dir = cam->GetDirectionOfProjection();
+  return vtkMath::DegreesFromRadians(std::atan2(dir[2], dir[0]));
+}
+
+//----------------------------------------------------------------------------
+angle_deg_t camera_impl::getAzimuth() const
+{
+  vtkCamera* cam = this->GetVTKCamera();
+  double* dir = cam->GetDirectionOfProjection();
+  return vtkMath::DegreesFromRadians(std::atan2(-dir[0], -dir[2]));
+}
+
+//----------------------------------------------------------------------------
+angle_deg_t camera_impl::getElevation() const
+{
+  vtkCamera* cam = this->GetVTKCamera();
+  double* dir = cam->GetDirectionOfProjection();
+  return vtkMath::DegreesFromRadians(std::asin(dir[1]));
+}

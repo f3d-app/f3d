@@ -63,6 +63,12 @@ public:
   camera& setCurrentAsDefault() override;
   camera& resetToDefault() override;
   camera& resetToBounds(double zoomFactor = 0.9) override;
+
+  // New getters
+  angle_deg_t getYaw() const;
+  angle_deg_t getAzimuth() const;
+  angle_deg_t getElevation() const;
+
   ///@}
 
   /**
