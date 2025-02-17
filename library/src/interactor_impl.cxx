@@ -5,6 +5,8 @@
 #include "scene_impl.h"
 #include "utils.h"
 #include "window_impl.h"
+#include <fstream>
+#include <ctime>
 
 #include "vtkF3DConsoleOutputWindow.h"
 
@@ -194,6 +196,58 @@ public:
     cam.setPosition(newPos);
     cam.setViewUp(up);
     cam.resetToBounds(0.9);
+  }
+
+  /* Add a remove_file_groups command
+   * Executes a command in the F3D interactor
+   * This function takes a string for a command and executes it
+   * Provide an error message for an unknown command
+  */
+  void InteractorImpl::ExecuteCommand(const std::string& command)
+  {
+    // Parse the input command
+    std::istringstream iss(command);
+    std::string cmd;
+    iss >> cmd;
+
+    // Log command execution to file
+    std::ofstream logFile("command_log.txt", std::ios::app);
+    if (logFile.is_open())
+    {
+      std::time_t now = std::time(nullptr);
+      logFile << "[" << std::ctime(&now) << "] Executed command: " << command << std::endl;
+    }
+    logFile.close();
+
+    // Handle the new command "remove_file_groups"
+    if (cmd == "remove_file_groups")
+    {
+      // Make sure Scene exists
+      if (this->Scene)
+      {
+        // Check if Scene is empty
+        if (this->Scene->IsEmpty())
+        {
+          std::cout << "Warning: No file groups to remove." << std::endl;
+        }
+        else
+        {
+          // Remove all the files
+          this->Scene->Clear();
+          std::cout << "File groups removed successfully." << std::endl;
+        }
+      }
+      else
+      {
+        std::cerr << "Error: Scene does not exist." << std::endl;
+      }
+    }
+    else
+    {
+      // Handle incorrect commands
+      std::cerr << "Error: Unknown command '" << cmd << "'." << std::endl;
+      std::cerr << "Commands available: remove_file_groups" << std::endl;
+    }
   }
 
   //----------------------------------------------------------------------------

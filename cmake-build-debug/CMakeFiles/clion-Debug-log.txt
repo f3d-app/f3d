@@ -1,0 +1,31 @@
+/Applications/CLion.app/Contents/bin/cmake/mac/x64/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/Applications/CLion.app/Contents/bin/ninja/mac/x64/ninja -G Ninja -S /Users/marksweeney/OpenSourceContributions/f3d -B /Users/marksweeney/OpenSourceContributions/f3d/cmake-build-debug
+-- The C compiler identification is AppleClang 16.0.0.16000026
+-- The CXX compiler identification is AppleClang 16.0.0.16000026
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /Library/Developer/CommandLineTools/usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /Library/Developer/CommandLineTools/usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Could not use git to determine source version, using version 3.0.0
+CMake Error at CMakeLists.txt:84 (find_package):
+  By not providing "FindVTK.cmake" in CMAKE_MODULE_PATH this project has
+  asked CMake to find a package configuration file provided by "VTK", but
+  CMake did not find one.
+
+  Could not find a package configuration file provided by "VTK" (requested
+  version 9.2.6) with any of the following names:
+
+    VTKConfig.cmake
+    vtk-config.cmake
+
+  Add the installation prefix of "VTK" to CMAKE_PREFIX_PATH or set "VTK_DIR"
+  to a directory containing one of the above files.  If "VTK" provides a
+  separate development package or SDK, be sure it has been installed.
+
+
+-- Configuring incomplete, errors occurred!
