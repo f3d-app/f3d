@@ -195,7 +195,7 @@ void vtkF3DOverlayRenderPass::CompositeOverlay(const vtkRenderState* s)
   this->QuadHelper->Program->SetUniformi(
     "texOverlay", this->OverlayPass->GetColorTexture()->GetTextureUnit());
   this->QuadHelper->Program->SetUniformi("buffer", this->ColorTexture->GetTextureUnit());
-  
+
   ostate->vtkglDisable(GL_BLEND);
   ostate->vtkglDisable(GL_DEPTH_TEST);
   ostate->vtkglClear(GL_DEPTH_BUFFER_BIT);
