@@ -159,7 +159,7 @@ void vtkF3DOverlayRenderPass::CompositeOverlay(const vtkRenderState* s)
       "  result.rgb *= result.a;\n"
       "//VTK::FSQ::Impl");
 
-     // blend overlay frame with current frame
+    // blend overlay frame with current frame
     vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Impl",
       "  result.rgb = (1.0 - ovlSample.a) * result.rgb + ovlSample.rgb;\n"
       "  result.a = (1.0 - ovlSample.a) * result.a + ovlSample.a;\n"
