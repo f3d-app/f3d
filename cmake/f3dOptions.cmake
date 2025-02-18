@@ -12,7 +12,7 @@ and generate the associated CXX code.
 f3d_generate_options(
   INPUT_JSON "path/to/options.json"
   INPUT_PUBLIC_HEADER "path/to/options.h.in"
-  INPUT_PRIVATE_HEADER "path/to/options_tools.h.in"
+  INPUT_PRIVATE_HEADER "path/to/options_generated.h.in"
   DESTINATION "path/to/destination/folder"
   OUTPUT_NAME "options"
 	)
@@ -83,7 +83,7 @@ function (f3d_generate_options)
 
   configure_file(
     "${_f3d_generate_options_INPUT_PRIVATE_HEADER}"
-    "${_f3d_generate_options_DESTINATION}/private/${_f3d_generate_options_OUTPUT_NAME}_tools.h")
+    "${_f3d_generate_options_DESTINATION}/private/${_f3d_generate_options_OUTPUT_NAME}_generated.h")
 
 endfunction()
 
