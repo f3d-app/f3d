@@ -23,12 +23,22 @@ void vtkF3DOverlayRenderPass::Render(const vtkRenderState* s)
 {
   this->Initialize(s);
 
+  double bgColor[3];
+
+  vtkRenderer* r = s->GetRenderer();
+  r->GetBackground(bgColor);
+
+  // force background to full black when generating offscreen layers to avoid blending
+  // problems when compositing layers in the Blend() function
+  r->SetBackground(0.0, 0.0, 0.0);
+
   vtkRenderState overlayState(s->GetRenderer());
   overlayState.SetPropArrayAndCount(
     this->OverlayProps.data(), static_cast<int>(this->OverlayProps.size()));
   overlayState.SetFrameBuffer(s->GetFrameBuffer());
 
   this->OverlayPass->Render(&overlayState);
+  r->SetBackground(bgColor);
 
   this->CompositeOverlay(s);
 }
@@ -130,29 +140,26 @@ void vtkF3DOverlayRenderPass::CompositeOverlay(const vtkRenderState* s)
       "vec3 toSRGB(vec3 color) { return pow(color.rgb, vec3(1.0 / 2.2)); }\n"
       "//VTK::FSQ::Decl");
 
-    // the input color is alpha premultiplied, we need to divide it, then
+    // the overlay is alpha premultiplied, we need to divide it, then
     // convert to linear space, and finally premultiply back by the alpha value
-    /**
-    *  NOTE:
-    *       - Linear blend of overlay causes white pixels around text and UI elements
-    *       - Linear blend of current buffer causes white pixels with grid and
-    *       background to lose rgb value (as a = 0)
-    *       - Without linear blend, background and edges look ok, but the panels
-    *       are too transparent and become unreadable on white backgrounds
-    *       - The scalar bar appears dependent on linear blend to render properly
-    */
     vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Impl",
       "  vec4 ovlSample = texture(texOverlay, texCoord);\n"
       "  if (ovlSample.a > 0.0)\n"
       "    ovlSample.rgb = toLinear(ovlSample.rgb / ovlSample.a);\n"
       "  ovlSample.rgb *= ovlSample.a;\n"
+      "//VTK::FSQ::Impl");
+
+    // the final render is not alpha premultiplied, so it should not be divided
+    // a sample of the rgb value is taken to be added in as a background after blending
+    vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Impl",
       "  vec4 result = texture(buffer, texCoord);\n"
+      "  vec3 bufSample = result.rgb;\n"
       "  if (result.a > 0.0)\n"
-      "    result.rgb = toLinear(result.rgb / result.a);\n"
+      "    result.rgb = toLinear(result.rgb);\n"
       "  result.rgb *= result.a;\n"
       "//VTK::FSQ::Impl");
 
-    // blend overlay frame with current frame
+     // blend overlay frame with current frame
     vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Impl",
       "  result.rgb = (1.0 - ovlSample.a) * result.rgb + ovlSample.rgb;\n"
       "  result.a = (1.0 - ovlSample.a) * result.a + ovlSample.a;\n"
@@ -167,7 +174,9 @@ void vtkF3DOverlayRenderPass::CompositeOverlay(const vtkRenderState* s)
       "  result.rgb = toSRGB(result.rgb);\n"
       "//VTK::FSQ::Impl");
 
+    // mix the sRGB result with the original render to add the background back in
     vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Impl",
+      "  result.rgb = (1.0 - result.a) * bufSample + result.a * result.rgb;\n"
       "  gl_FragData[0] = result;\n"
       "//VTK::FSQ::Impl");
 
