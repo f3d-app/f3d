@@ -822,7 +822,7 @@ interactor& interactor_impl::initCommands()
       this->Internals->AliasMap[aliasName] = std::accumulate(args.begin() + 2, args.end(),
         args[1], // Start with first command argument
         [](std::string a, std::string b) { return a + " " + b; });
-    
+
       log::info(
         "Alias " + aliasName + " added with command " + this->Internals->AliasMap[aliasName]);
     });
