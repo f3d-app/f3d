@@ -57,7 +57,7 @@
         "default_value": "10"
       },
       "color": {
-        "type": "double_vector",
+        "type": "color",
         "default_value": "0.0, 0.0, 0.0"
       }
     },
@@ -107,7 +107,7 @@
     },
     "background": {
       "color": {
-        "type": "double_vector",
+        "type": "color",
         "default_value": "0.2, 0.2, 0.2"
       },
       "skybox": {
@@ -206,7 +206,7 @@
         "type": "double"
       },
       "rgb": {
-        "type": "double_vector"
+        "type": "color"
       },
       "texture": {
         "type": "string"
@@ -214,7 +214,7 @@
     },
     "emissive": {
       "factor": {
-        "type": "double_vector"
+        "type": "color"
       },
       "texture": {
         "type": "string"

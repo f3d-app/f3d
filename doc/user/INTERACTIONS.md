@@ -50,6 +50,9 @@ Other options can be toggled directly by pressing the following hotkeys:
 - <kbd>J</kbd>: the display of the HDRI skybox.
 - <kbd>L</kbd>: increase lights intensity.
 - <kbd>Shift</kbd>+<kbd>L</kbd>: decrease lights intensity.
+- <kbd>Ctrl</kbd>+<kbd>P</kbd>: increase opacity.
+- <kbd>Shift</kbd>+<kbd>P</kbd>: decrease opacity.
+- <kbd>Shift</kbd>+<kbd>A</kbd>: toggle armature.
 
 Note that the raytracing hotkeys are only available if F3D is build with raytracing enabled.
 

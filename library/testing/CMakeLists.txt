@@ -141,9 +141,9 @@ endif ()
 # List tests that do not require rendering
 list(APPEND libf3dSDKTestsNoRender_list
      TestSDKEngineExceptions
+     TestSDKLog
      TestSDKOptions
      TestSDKOptionsIO
-     TestSDKLog
      TestSDKScene)
 
 # Add all the ADD_TEST for each test

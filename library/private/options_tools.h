@@ -183,6 +183,26 @@ ratio_t parse(const std::string& str)
 
 //----------------------------------------------------------------------------
 /**
+ * Parse provided string into a color_t.
+ * Supported formats: "R,G,B"
+ * rely on parse<std::vector<double>>(str)
+ * Can throw options::parsing_exception in case of failure to parse
+ */
+template<>
+color_t parse(const std::string& str)
+{
+  try
+  {
+    return color_t(options_tools::parse<std::vector<double>>(str));
+  }
+  catch (const f3d::type_construction_exception& ex)
+  {
+    throw options::parsing_exception("Cannot parse " + str + " into a color_t: " + ex.what());
+  }
+}
+
+//----------------------------------------------------------------------------
+/**
  * Return provided string stripped of leading and trailing spaces.
  */
 template<>
@@ -265,106 +285,13 @@ std::string format(const std::vector<T>& var)
 
 //----------------------------------------------------------------------------
 /**
- * Generated method, see `options::set`
+ * Format provided var into a string from provided color_t
+ * rely on format(std::vector<double>&)
  */
-void set(options& opt, std::string_view name, const option_variant_t& value)
+std::string format(color_t var)
 {
-  try
-  {
-    // clang-format off
-    ${_options_setter};
-    // clang-format on
-    else throw options::inexistent_exception("Option " + std::string(name) + " does not exist");
-  }
-  catch (const std::bad_variant_access&)
-  {
-    throw options::incompatible_exception(
-      "Trying to set " + std::string(name) + " with incompatible type");
-  }
-}
-
-//----------------------------------------------------------------------------
-/**
- * Generated method, see `options::get`
- */
-option_variant_t get(const options& opt, std::string_view name)
-{
-  try
-  {
-    // clang-format off
-    ${_options_getter};
-    // clang-format on
-    else throw options::inexistent_exception("Option " + std::string(name) + " does not exist");
-  }
-  catch (const std::bad_optional_access&)
-  {
-    throw options::no_value_exception("Trying to get " + std::string(name) + " before it was set");
-  }
-}
-
-//----------------------------------------------------------------------------
-/**
- * Generated method, see `options::getNames`
- */
-std::vector<std::string> getNames()
-{
-  // clang-format off
-  return { ${_options_lister} };
-  // clang-format on
-}
-
-//----------------------------------------------------------------------------
-/**
- * Generated method, see `options::setAsString`
- */
-void setAsString(options& opt, std::string_view name, const std::string& str)
-{
-  // clang-format off
-  ${_options_string_setter};
-  // clang-format on
-  else throw options::inexistent_exception("Option " + std::string(name) + " does not exist");
-}
-//----------------------------------------------------------------------------
-/**
- * Generated method, see `options::getAsString`
- */
-std::string getAsString(const options& opt, std::string_view name)
-{
-  try
-  {
-    // clang-format off
-    ${_options_string_getter};
-    // clang-format on
-    else throw options::inexistent_exception("Option " + std::string(name) + " does not exist");
-  }
-  catch (const std::bad_optional_access&)
-  {
-    throw options::no_value_exception("Trying to get " + std::string(name) + " before it was set");
-  }
-}
-
-//----------------------------------------------------------------------------
-/**
- * Generated method, see `options::isOptional`
- */
-bool isOptional(std::string_view name)
-{
-  // clang-format off
-  ${_options_is_optional};
-  // clang-format on
-  else throw options::inexistent_exception("Option " + std::string(name) + " does not exist");
-}
-
-//----------------------------------------------------------------------------
-/**
- * Generated method, see `options::reset`
- */
-void reset(options& opt, std::string_view name)
-{
-  // clang-format off
-  ${_options_reset};
-  // clang-format on
-  else throw options::inexistent_exception("Option " + std::string(name) + " does not exist");
+  // TODO generate a proper color string
+  return options_tools::format(static_cast<std::vector<double>>(var));
 }
 
 } // option_tools

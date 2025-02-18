@@ -1681,6 +1681,7 @@ void vtkF3DRenderer::SetOpacity(const std::optional<double>& opacity)
   {
     this->Opacity = opacity;
     this->ActorsPropertiesConfigured = false;
+    this->CheatSheetConfigured = false;
   }
 }
 
@@ -1782,29 +1783,15 @@ void vtkF3DRenderer::ConfigureActorsProperties()
   double* surfaceColor = nullptr;
   if (this->SurfaceColor.has_value())
   {
-    if (this->SurfaceColor.value().size() != 3)
-    {
-      F3DLog::Print(
-        F3DLog::Severity::Warning, std::string("Invalid surface color provided, not applying"));
-    }
-    else
-    {
-      surfaceColor = this->SurfaceColor.value().data();
-    }
+    assert(this->SurfaceColor->size() == 3);
+    surfaceColor = this->SurfaceColor->data();
   }
 
   double* emissiveFactor = nullptr;
   if (this->EmissiveFactor.has_value())
   {
-    if (this->EmissiveFactor.value().size() != 3)
-    {
-      F3DLog::Print(
-        F3DLog::Severity::Warning, std::string("Invalid emissive factor provided, not applying"));
-    }
-    else
-    {
-      emissiveFactor = this->EmissiveFactor.value().data();
-    }
+    assert(this->EmissiveFactor->size() == 3);
+    emissiveFactor = this->EmissiveFactor->data();
   }
 
   bool setBackfaceCulling = false;

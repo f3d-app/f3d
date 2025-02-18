@@ -222,6 +222,24 @@ public:
   }
 
   //----------------------------------------------------------------------------
+  // Increase/Decrease opacity
+  void IncreaseOpacity(bool negative)
+  {
+    // current opacity, interpreted as 1 if it does not exist
+    const double currentOpacity = this->Options.model.color.opacity.value_or(1.0);
+
+    // new opacity, clamped between 0 and 1 if not already set outside that range
+    const double increment = negative ? -0.05 : 0.05;
+    double newOpacity = currentOpacity + increment;
+    if (currentOpacity <= 1.0 && 0.0 <= currentOpacity)
+    {
+      newOpacity = std::min(1.0, std::max(0.0, newOpacity));
+    }
+
+    this->Options.model.color.opacity = newOpacity;
+  }
+
+  //----------------------------------------------------------------------------
   // Synchronise options from the renderer properties
   static void SynchronizeScivisOptions(f3d::options& opt, vtkF3DRenderer* ren)
   {
@@ -702,6 +720,12 @@ interactor& interactor_impl::initCommands()
   this->addCommand("decrease_light_intensity",
     [&](const std::vector<std::string>&) { this->Internals->IncreaseLightIntensity(true); });
 
+  this->addCommand("increase_opacity",
+    [&](const std::vector<std::string>&) { this->Internals->IncreaseOpacity(false); });
+
+  this->addCommand("decrease_opacity",
+    [&](const std::vector<std::string>&) { this->Internals->IncreaseOpacity(true); });
+
   this->addCommand("print_scene_info", [&](const std::vector<std::string>&)
     { this->Internals->Window.PrintSceneDescription(log::VerboseLevel::INFO); });
 
@@ -917,7 +941,6 @@ interactor& interactor_impl::initBindings()
   this->Internals->OrderedBindGroups.clear();
   f3d::options& opts = this->Internals->Options;
 
-  // clang-format off
   // Define lambdas used for documentation
 
   // Shorten a long name
@@ -934,30 +957,37 @@ interactor& interactor_impl::initBindings()
   };
 
   // "Cycle animation" , "animationName"
-  auto docAnim = [&](){ return std::pair("Cycle animation", this->Internals->AnimationManager->GetAnimationName()); };
-  
+  auto docAnim = [&]()
+  { return std::pair("Cycle animation", this->Internals->AnimationManager->GetAnimationName()); };
+
   // "Cycle point/cell data coloring" , "POINT/CELL"
-  auto docField = [&](){ return std::pair(std::string("Cycle point/cell data coloring"), (opts.model.scivis.cells ? "CELL" : "POINT")); };
+  auto docField = [&]()
+  {
+    return std::pair(
+      std::string("Cycle point/cell data coloring"), (opts.model.scivis.cells ? "CELL" : "POINT"));
+  };
 
   // "Cycle array to color with" , "arrayName"
-  auto docArray = [&](){ 
-    return std::pair("Cycle array to color with", 
+  auto docArray = [&]()
+  {
+    return std::pair("Cycle array to color with",
       (opts.model.scivis.array_name.has_value()
-        ? shortName(opts.model.scivis.array_name.value(), 15) + (opts.model.scivis.enable ? "" : " (forced)")
-        : "OFF"));
+          ? shortName(opts.model.scivis.array_name.value(), 15) +
+            (opts.model.scivis.enable ? "" : " (forced)")
+          : "OFF"));
   };
 
   // "Cycle component to color with" , "component"
-  auto docComp = [&](){ 
+  auto docComp = [&]()
+  {
     vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
-    vtkF3DRenderer* ren =
-      vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
-    return std::pair("Cycle component to color with", ren->ComponentToString(opts.model.scivis.component));
+    vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+    return std::pair(
+      "Cycle component to color with", ren->ComponentToString(opts.model.scivis.component));
   };
 
   // "doc", ""
-  auto docStr = [](const std::string& doc)
-  { return std::pair(doc, ""); };
+  auto docStr = [](const std::string& doc) { return std::pair(doc, ""); };
 
   // "doc", "value"
   auto docDbl = [](const std::string& doc, const double& val)
@@ -969,6 +999,23 @@ interactor& interactor_impl::initBindings()
     return std::pair(doc, valStream.str());
   };
 
+  // "doc", "value/Unset"
+  auto docDblOpt = [](const std::string& doc, const std::optional<double>& val)
+  {
+    std::stringstream valStream;
+    valStream.precision(2);
+    valStream << std::fixed;
+    if (val.has_value())
+    {
+      valStream << val.value();
+    }
+    else
+    {
+      valStream << "Unset";
+    }
+    return std::pair(doc, valStream.str());
+  };
+
   // "doc", "ON/OFF"
   auto docTgl = [](const std::string& doc, const bool& val)
   { return std::pair(doc, (val ? "ON" : "OFF")); };
@@ -977,7 +1024,7 @@ interactor& interactor_impl::initBindings()
   auto docTglOpt = [](const std::string& doc, const std::optional<bool>& val)
   { return std::pair(doc, (val.has_value() ? (val.value() ? "ON" : "OFF") : "Unset")); };
 
-  // Available standard keys: None
+  // clang-format off
   this->addBinding({mod_t::NONE, "W"}, "cycle_animation", "Scene", docAnim);
   this->addBinding({mod_t::NONE, "C"}, "cycle_coloring field", "Scene", docField);
   this->addBinding({mod_t::NONE, "S"}, "cycle_coloring array", "Scene", docArray);
@@ -1008,6 +1055,8 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "J"}, "toggle render.background.skybox","Scene", std::bind(docTgl, "Toggle HDRI skybox", std::cref(opts.render.background.skybox)));
   this->addBinding({mod_t::NONE, "L"}, "increase_light_intensity", "Scene", std::bind(docDbl, "Increase lights intensity", std::cref(opts.render.light.intensity)));
   this->addBinding({mod_t::SHIFT, "L"}, "decrease_light_intensity", "Scene", std::bind(docDbl, "Decrease lights intensity", std::cref(opts.render.light.intensity)));
+  this->addBinding({mod_t::CTRL, "P"}, "increase_opacity", "Scene", std::bind(docDblOpt, "Increase opacity", std::cref(opts.model.color.opacity)));
+  this->addBinding({mod_t::SHIFT, "P"}, "decrease_opacity", "Scene", std::bind(docDblOpt, "Decrease opacity", std::cref(opts.model.color.opacity)));
   this->addBinding({mod_t::SHIFT, "A"}, "toggle render.armature.enable","Scene", std::bind(docTgl, "Toggle armature", std::cref(opts.render.armature.enable)));
   this->addBinding({mod_t::ANY, "1"}, "set_camera front", "Camera", std::bind(docStr, "Front View camera"));
   this->addBinding({mod_t::ANY, "3"}, "set_camera right", "Camera", std::bind(docStr, "Right View camera"));
