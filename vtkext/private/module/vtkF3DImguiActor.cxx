@@ -343,12 +343,13 @@ void vtkF3DImguiActor::RenderCheatSheet()
 
   constexpr float marginLeft = 5.f;
   float marginTop = 0.f;
-
   float winWidth = 0.f;
   float textHeight = 0.f;
+
   for (const auto& [group, content] : this->CheatSheet)
   {
-    textHeight += ImGui::GetTextLineHeightWithSpacing();
+    textHeight +=
+      ImGui::GetTextLineHeightWithSpacing() + 2 * ImGui::GetStyle().SeparatorTextPadding.y;
     for (const auto& [bind, desc, val] : content)
     {
       std::string line = bind;
@@ -366,7 +367,8 @@ void vtkF3DImguiActor::RenderCheatSheet()
   }
 
   winWidth += 2.f * ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().ScrollbarSize;
-  textHeight += 2.f * ImGui::GetStyle().WindowPadding.y + ImGui::GetStyle().ScrollbarSize;
+  textHeight += 2.f * ImGui::GetStyle().WindowPadding.y;
+
   marginTop = std::max(marginTop, (viewport->WorkSize.y - textHeight) * 0.5f);
 
   ::SetupNextWindow(
