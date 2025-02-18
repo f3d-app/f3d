@@ -911,7 +911,6 @@ interactor& interactor_impl::initBindings()
   this->Internals->OrderedBindGroups.clear();
   f3d::options& opts = this->Internals->Options;
 
-  // clang-format off
   // Define lambdas used for documentation
 
   // Shorten a long name
@@ -928,30 +927,37 @@ interactor& interactor_impl::initBindings()
   };
 
   // "Cycle animation" , "animationName"
-  auto docAnim = [&](){ return std::pair("Cycle animation", this->Internals->AnimationManager->GetAnimationName()); };
-  
+  auto docAnim = [&]()
+  { return std::pair("Cycle animation", this->Internals->AnimationManager->GetAnimationName()); };
+
   // "Cycle point/cell data coloring" , "POINT/CELL"
-  auto docField = [&](){ return std::pair(std::string("Cycle point/cell data coloring"), (opts.model.scivis.cells ? "CELL" : "POINT")); };
+  auto docField = [&]()
+  {
+    return std::pair(
+      std::string("Cycle point/cell data coloring"), (opts.model.scivis.cells ? "CELL" : "POINT"));
+  };
 
   // "Cycle array to color with" , "arrayName"
-  auto docArray = [&](){ 
-    return std::pair("Cycle array to color with", 
+  auto docArray = [&]()
+  {
+    return std::pair("Cycle array to color with",
       (opts.model.scivis.array_name.has_value()
-        ? shortName(opts.model.scivis.array_name.value(), 15) + (opts.model.scivis.enable ? "" : " (forced)")
-        : "OFF"));
+          ? shortName(opts.model.scivis.array_name.value(), 15) +
+            (opts.model.scivis.enable ? "" : " (forced)")
+          : "OFF"));
   };
 
   // "Cycle component to color with" , "component"
-  auto docComp = [&](){ 
+  auto docComp = [&]()
+  {
     vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
-    vtkF3DRenderer* ren =
-      vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
-    return std::pair("Cycle component to color with", ren->ComponentToString(opts.model.scivis.component));
+    vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+    return std::pair(
+      "Cycle component to color with", ren->ComponentToString(opts.model.scivis.component));
   };
 
   // "doc", ""
-  auto docStr = [](const std::string& doc)
-  { return std::pair(doc, ""); };
+  auto docStr = [](const std::string& doc) { return std::pair(doc, ""); };
 
   // "doc", "value"
   auto docDbl = [](const std::string& doc, const double& val)
@@ -962,7 +968,7 @@ interactor& interactor_impl::initBindings()
     valStream << val;
     return std::pair(doc, valStream.str());
   };
-  
+
   // "doc", "value/Unset"
   auto docDblOpt = [](const std::string& doc, const std::optional<double>& val)
   {
@@ -988,7 +994,7 @@ interactor& interactor_impl::initBindings()
   auto docTglOpt = [](const std::string& doc, const std::optional<bool>& val)
   { return std::pair(doc, (val.has_value() ? (val.value() ? "ON" : "OFF") : "Unset")); };
 
-  // Available standard keys: None
+  // clang-format off
   this->addBinding({mod_t::NONE, "W"}, "cycle_animation", "Scene", docAnim);
   this->addBinding({mod_t::NONE, "C"}, "cycle_coloring field", "Scene", docField);
   this->addBinding({mod_t::NONE, "S"}, "cycle_coloring array", "Scene", docArray);
