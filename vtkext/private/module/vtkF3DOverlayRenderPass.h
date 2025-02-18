@@ -3,7 +3,7 @@
  * @brief   Implement the overlay render pass.
  *
  * Render the overlay into a fullscreen texture, then blend it with the current render pass.
- * 
+ *
  * @sa
  * vtkRenderPass
  */
