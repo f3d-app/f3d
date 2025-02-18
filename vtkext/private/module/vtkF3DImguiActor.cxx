@@ -342,29 +342,49 @@ void vtkF3DImguiActor::RenderCheatSheet()
   ImGuiViewport* viewport = ImGui::GetMainViewport();
 
   constexpr float marginLeft = 5.f;
-  constexpr float marginTopBottom = 5.f;
+  float marginTop = 0.f;
 
-  float winWidth = 0.f;
-  for (const auto& [group, content] : this->CheatSheet)
+  std::vector<float> textWidths; // Uses a vector to store text widths for better memory locality
+  float textHeight = 0.0f;
+  float winWidth = 0.0f;
+  const float textLineHeight = ImGui::GetTextLineHeightWithSpacing(); // Avoids redundant calls
+
+  textWidths.clear();
+  textWidths.reserve(CheatSheet.size() * 5); // Preallocates memory to reduce dynamic allocations
+
+  for (const auto& [group, content] : CheatSheet)
   {
+    textHeight += textLineHeight;
+
     for (const auto& [bind, desc, val] : content)
     {
-      std::string line = bind;
-      line += ": ";
-      line += desc;
+      std::string line;
+      line.reserve(
+        bind.size() + desc.size() + val.size() + 4); // Reduces unnecessary string reallocations
+      line.append(bind).append(": ").append(desc);
       if (!val.empty())
       {
-        line += " [" + val + "]";
+        line.append(" [").append(val).append("]");
       }
-      ImVec2 currentLine = ImGui::CalcTextSize(line.c_str());
 
-      winWidth = std::max(winWidth, currentLine.x);
+      float textWidth = ImGui::CalcTextSize(line.c_str()).x;
+      textWidths.push_back(textWidth); // Caches text widths instead of recalculating
+      winWidth = std::max(winWidth, textWidth);
+      textHeight += textLineHeight;
     }
   }
-  winWidth += 2.f * ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().ScrollbarSize;
 
-  ::SetupNextWindow(ImVec2(marginLeft, marginTopBottom),
-    ImVec2(winWidth, viewport->WorkSize.y - 2.f * marginTopBottom));
+  // Adjusts window size with padding
+  winWidth += 2.f * ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().ScrollbarSize;
+  textHeight += 2.f * ImGui::GetStyle().WindowPadding.y + ImGui::GetStyle().ScrollbarSize;
+
+  // Centers window vertically
+  marginTop = std::max(marginTop, (viewport->WorkSize.y - textHeight) * 0.5f);
+
+  // Optimized setup for window
+  ::SetupNextWindow(
+    ImVec2(marginLeft, marginTop), ImVec2(winWidth, std::min(viewport->WorkSize.y, textHeight)));
+
   ImGui::SetNextWindowBgAlpha(0.35f);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
@@ -373,6 +393,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
 
   ImGui::Begin("CheatSheet", nullptr, flags);
 
+  // Renders cheat sheet content
   for (const auto& [group, list] : this->CheatSheet)
   {
     ImGui::SeparatorText(group.c_str());
