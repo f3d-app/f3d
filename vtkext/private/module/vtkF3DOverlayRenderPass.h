@@ -44,7 +44,7 @@ protected:
   void Initialize(const vtkRenderState* s);
 
   /**
-   * Apply the rendered overlay frame to the current render pass 
+   * Apply the rendered overlay frame to the current render pass.
    */
   void CompositeOverlay(const vtkRenderState* s);
 
