@@ -342,7 +342,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
   ImGuiViewport* viewport = ImGui::GetMainViewport();
 
   constexpr float marginLeft = 5.f;
-  float marginTop = 0.f;
+  float marginTop = 5.f;
   float winWidth = 0.f;
   float textHeight = 0.f;
 
@@ -371,8 +371,8 @@ void vtkF3DImguiActor::RenderCheatSheet()
 
   marginTop = std::max(marginTop, (viewport->WorkSize.y - textHeight) * 0.5f);
 
-  ::SetupNextWindow(
-    ImVec2(marginLeft, marginTop), ImVec2(winWidth, std::min(viewport->WorkSize.y, textHeight)));
+  ::SetupNextWindow(ImVec2(marginLeft, marginTop),
+    ImVec2(winWidth, std::min(viewport->WorkSize.y - marginTop, textHeight)));
   ImGui::SetNextWindowBgAlpha(0.35f);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
