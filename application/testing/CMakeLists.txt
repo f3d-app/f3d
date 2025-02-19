@@ -540,6 +540,11 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20230603)
   f3d_test(NAME TestVRMLImporter DATA bot2.wrl)
 endif()
 
+# TGA support for OBJ added in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11922
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250220)
+  f3d_test(NAME TestOBJWithTGATexture DATA world_tga.obj)
+endif()
+
 if(F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestRaytracingGLTF DATA WaterBottle.glb ARGS -rd --raytracing-samples=4)
   f3d_test(NAME TestRaytracingBackground DATA suzanne.ply ARGS -rd --raytracing-samples=4 --background-color=1,0,0 THRESHOLD 0.05) # Threshold needed because of difference in rendering in VTK 9.3
