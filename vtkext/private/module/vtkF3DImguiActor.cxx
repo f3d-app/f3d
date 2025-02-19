@@ -350,8 +350,6 @@ void vtkF3DImguiActor::RenderDropZone()
     ImGui::End();
 
     ImVec2 dropTextSize = ImGui::CalcTextSize(this->DropText.c_str());
-    dropTextSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
-    dropTextSize.y += 2.f * ImGui::GetStyle().WindowPadding.y;
 
     ImGui::Begin("DropZoneText", nullptr, flags);
     ImGui::SetCursorPos(ImVec2(viewport->GetWorkCenter().x - 0.5f * dropTextSize.x,
