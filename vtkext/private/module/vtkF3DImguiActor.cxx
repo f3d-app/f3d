@@ -300,8 +300,8 @@ void vtkF3DImguiActor::RenderDropZone()
     constexpr float tickLength = 10.0f;
 
     int dropzonePad = static_cast<int>(std::min(viewport->WorkSize.x, viewport->WorkSize.y) * 0.1);
-    int dropZoneW = viewport->WorkSize.x - dropzonePad;
-    int dropZoneH = viewport->WorkSize.y - dropzonePad;
+    int dropZoneW = viewport->WorkSize.x - dropzonePad * 2;
+    int dropZoneH = viewport->WorkSize.y - dropzonePad * 2;
 
     ::SetupNextWindow(ImVec2(0, 0), viewport->WorkSize);
     ImGui::SetNextWindowBgAlpha(0.f);
@@ -313,7 +313,7 @@ void vtkF3DImguiActor::RenderDropZone()
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
     ImVec2 p0(dropzonePad, dropzonePad);
-    ImVec2 p1(dropZoneW, dropZoneH);
+    ImVec2 p1(dropZoneW + dropzonePad, dropZoneH + dropzonePad);
     int tickNumberW = static_cast<int>(std::ceil(dropZoneW / (tickLength * 2.0f)));
     int tickNumberH = static_cast<int>(std::ceil(dropZoneH / (tickLength * 2.0f)));
 
