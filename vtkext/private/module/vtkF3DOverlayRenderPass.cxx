@@ -45,6 +45,12 @@ void vtkF3DOverlayRenderPass::Render(const vtkRenderState* s)
 
 void vtkF3DOverlayRenderPass::ReleaseGraphicsResources(vtkWindow* w)
 {
+  this->Superclass::ReleaseGraphicsResources(w);
+
+  if (this->QuadHelper)
+  {
+    this->QuadHelper->ReleaseGraphicsResources(w);
+  }
   if (this->OverlayPass)
   {
     this->OverlayPass->ReleaseGraphicsResources(w);
@@ -52,6 +58,10 @@ void vtkF3DOverlayRenderPass::ReleaseGraphicsResources(vtkWindow* w)
   if (this->FrameBufferObject)
   {
     this->FrameBufferObject->ReleaseGraphicsResources(w);
+  }
+  if (this->ColorTexture)
+  {
+    this->ColorTexture->ReleaseGraphicsResources(w);
   }
 }
 
@@ -70,7 +80,15 @@ void vtkF3DOverlayRenderPass::Initialize(const vtkRenderState* s)
     }
   }
 
-  this->ReleaseGraphicsResources(s->GetRenderer()->GetRenderWindow());
+  // clear the frame buffers instead of releasing all resources
+  if (this->OverlayPass)
+  {
+    this->OverlayPass->ReleaseGraphicsResources(s->GetRenderer()->GetRenderWindow());
+  }
+  if (this->FrameBufferObject)
+  {
+    this->FrameBufferObject->ReleaseGraphicsResources(s->GetRenderer()->GetRenderWindow());
+  }
 
   vtkNew<vtkDefaultPass> overlayP;
   vtkNew<vtkCameraPass> overlayCamP;
