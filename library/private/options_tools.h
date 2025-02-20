@@ -238,7 +238,6 @@ direction_t parse(const std::string& str)
   }
 }
 
-
 //----------------------------------------------------------------------------
 /**
  * Return provided string stripped of leading and trailing spaces.
