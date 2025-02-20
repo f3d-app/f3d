@@ -74,10 +74,6 @@ int TestSDKOptions(int argc, char* argv[])
   test("set/get string", std::get<std::string>(opt.get("model.color.texture")) == "test");
 
   // Test double vector
-  std::stringstream ssDouble;
-  ssDouble << std::vector<double>{ 1.1, 2., 3. };
-  test("vector<double> to string", ssDouble.str() == "1.1,2,3");
-
   opt.setAsString("model.scivis.range", "0.7,1.4");
   test("setAsString vector<double>", opt.getAsString("model.scivis.range") == "0.7,1.4");
 
@@ -133,6 +129,48 @@ int TestSDKOptions(int argc, char* argv[])
 
   test.expect<f3d::options::incompatible_exception>("set color with incorrect size",
     [&]() { opt.set("render.background.color", std::vector<double>{ 0.1, 0.2 }); });
+
+  // Test direction_t
+  opt.setAsString("scene.up_direction", "0.707,0.707,0.0");
+  test("setAsString direction", opt.getAsString("scene.up_direction") == "0.707,0.707,0");
+
+  opt.setAsString("scene.up_direction", "0.0, 0.707, 0.707");
+  test("setAsString spaces direction", opt.getAsString("scene.up_direction") == "0,0.707,0.707");
+
+  opt.scene.up_direction = { 0.707, 0, 0.707 };
+  test("getAsString direction", opt.getAsString("scene.up_direction") == "0.707,0,0.707");
+
+  opt.set("scene.up_direction", f3d::color_t{ 0, 0, 1 });
+  test("set/get direction",
+    std::get<std::vector<double>>(opt.get("scene.up_direction")) ==
+      std::vector<double>{ 0, 0, 1 });
+
+  test.expect<f3d::type_construction_exception>(
+    "direction_t invalid size vector", [&]() { f3d::direction_t(std::vector<double>{ 0.1, 0.2 }); });
+  test.expect<f3d::type_construction_exception>(
+    "direction_t invalid size list", [&]() { f3d::direction_t({ 0.1, 0.2, 0.3, 0.4 }); });
+
+  f3d::direction_t dir({ -0.707, -0.707, 0 });
+  dir[0] = 0.707;
+  const f3d::direction_t* dirPtr = &dir;
+  test("direction operator[]", dir[0] == 0.707);
+  test("direction operator[] const", (*dirPtr)[0] == 0.707);
+  test.expect<f3d::type_access_exception>("direction_t invalid access", [&]() { dir[3]; });
+  test.expect<f3d::type_access_exception>(
+    "direction_t const invalid access", [&]() { (*dirPtr)[3]; });
+  test("direction x", dir.x() == 0.707);
+  test("direction y", dir.y() == -0.707);
+  test("direction z", dir.z() == 0);
+
+  std::stringstream ssDir;
+  ssDir << f3d::direction_t(0, 0, -1.0);
+  test("direction to string", ssDir.str() == "0,0,-1");
+
+  test.expect<f3d::options::parsing_exception>("setAsString direction with incorrect size",
+    [&]() { opt.setAsString("scene.up_direction", "0,0,0,1"); });
+
+  test.expect<f3d::options::incompatible_exception>("set direction with incorrect size",
+    [&]() { opt.set("scene.up_direction", std::vector<double>{ 0.7, 0.9 }); });
 
   // Test closest option
   auto closest = opt.getClosestOption("modle.sciivs.cell");
