@@ -275,9 +275,9 @@ int TestSDKOptions(int argc, char* argv[])
   f3d::options opt7{};
 
   // Test reset non-optional values
-  opt7.scene.up_direction = {0,0,1};
+  opt7.scene.up_direction = { 0, 0, 1 };
   opt7.reset("scene.up_direction");
-  test("reset non-optional values", opt7.scene.up_direction == f3d::direction_t{0,1,0});
+  test("reset non-optional values", opt7.scene.up_direction == f3d::direction_t{ 0, 1, 0 });
 
   // Test reset optional values
   opt7.model.scivis.array_name = "dummy";

@@ -288,14 +288,14 @@ void vtkF3DRenderer::Initialize()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::InitializeUpVector(const std::vector<double>& upVec)
 {
-  assert (upVec.size() == 3);
+  assert(upVec.size() == 3);
 
   // TODO: Remove this when https://github.com/f3d-app/f3d/pull/1536/ is merged
   int upIndex = -1;
   bool error = true;
-  for (int i = 0; i<3; i++)
+  for (int i = 0; i < 3; i++)
   {
-    if (upVec[i] == 1)
+    if (std::abs(upVec[i]) == 1)
     {
       if (upIndex == -1)
       {
