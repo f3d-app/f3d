@@ -139,7 +139,7 @@ public:
   }
 
 protected:
-  std::array<double, N> Array{0};
+  std::array<double, N> Array{ 0 };
 };
 
 /**
@@ -149,8 +149,14 @@ class F3D_EXPORT color_t : public double_array_t<3>
 {
 public:
   color_t() = default;
-  color_t(const std::vector<double>& vec) : double_array_t(vec) {}
-  color_t(const std::initializer_list<double>& list) : double_array_t(list) {}
+  color_t(const std::vector<double>& vec)
+    : double_array_t(vec)
+  {
+  }
+  color_t(const std::initializer_list<double>& list)
+    : double_array_t(list)
+  {
+  }
   color_t(double red, double green, double blue)
   {
     this->Array[0] = red;
@@ -178,8 +184,14 @@ class F3D_EXPORT direction_t : public double_array_t<3>
 {
 public:
   direction_t() = default;
-  direction_t(const std::vector<double>& vec) : double_array_t(vec) {}
-  direction_t(const std::initializer_list<double>& list) : double_array_t(list) {}
+  direction_t(const std::vector<double>& vec)
+    : double_array_t(vec)
+  {
+  }
+  direction_t(const std::initializer_list<double>& list)
+    : double_array_t(list)
+  {
+  }
   direction_t(double x, double y, double z)
   {
     this->Array[0] = x;
@@ -199,7 +211,6 @@ public:
     return this->Array[2];
   }
 };
-
 
 /**
  * Describe a 3D surfacic mesh.
