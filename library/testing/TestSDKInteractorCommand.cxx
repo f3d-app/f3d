@@ -39,7 +39,7 @@ int TestSDKInteractorCommand(int argc, char* argv[])
   inter.triggerCommand("axis_on");
   test("triggerCommand alias resolve", options.ui.axis == true);
   bool alias_result;
-  alias_result = inter.triggerCommand("alias axis_off");
+  alias_result = inter.triggerCommand("alias axis_on");
   test("triggerCommand alias invalid args", alias_result == false);
 
   // triggerCommand error codepaths
