@@ -143,6 +143,9 @@ int TestSDKOptions(int argc, char* argv[])
   ssDir << f3d::direction_t(0, 0, -1.0);
   test("direction to string", ssDir.str() == "0,0,-1");
 
+  test.expect<f3d::options::parsing_exception>("setAsString direction with incorrect size",
+    [&]() { opt.setAsString("scene.up_direction", "0.1,0.2,0.3,0.4"); });
+
   // Test closest option
   auto closest = opt.getClosestOption("modle.sciivs.cell");
   test("closest option", closest.first == "model.scivis.cells" && closest.second == 5);

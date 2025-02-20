@@ -110,6 +110,7 @@ int TestSDKOptionsIO(int argc, char* argv[])
 
   test.parse<f3d::color_t>("color_t", "0.1,0.2,0.3", { 0.1, 0.2, 0.3 });
   test.parse<f3d::color_t>("color_t", "  0.1,  0.2 , 0.3 ", { 0.1, 0.2, 0.3 });
+  test.parse_expect<f3d::color_t, parsing_exception>("incorrect size color_t", "0.1,0.2,0.3,0.4");
   test.format<f3d::color_t>("color_t", { 0.1, 0.2, 0.3 }, "0.1,0.2,0.3");
 
   test.parse<f3d::direction_t>("direction_t", "+X", { 1, 0, 0 });
@@ -118,6 +119,7 @@ int TestSDKOptionsIO(int argc, char* argv[])
   test.parse_expect<f3d::direction_t, parsing_exception>("invalid direction_t", "-K");
   test.parse<f3d::direction_t>("direction_t", "0.1,0.2,0.3", { 0.1, 0.2, 0.3 });
   test.parse<f3d::direction_t>("direction_t", "  0.1,  0.2 , 0.3 ", { 0.1, 0.2, 0.3 });
+  test.parse_expect<f3d::color_t, parsing_exception>("incorrect size direction_t", "0.1,0.2,0.3,0.4");
   test.format<f3d::direction_t>("direction_t", { 0.1, 0.2, 0.3 }, "0.1,0.2,0.3");
 
   test.parse<std::vector<std::string>>(
