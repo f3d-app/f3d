@@ -138,7 +138,7 @@ public:
     return this->Array.data();
   }
 
-protected:
+private:
   std::array<double, N> Array{ 0 };
 };
 
@@ -159,21 +159,21 @@ public:
   }
   color_t(double red, double green, double blue)
   {
-    this->Array[0] = red;
-    this->Array[1] = green;
-    this->Array[2] = blue;
+    (*this)[0] = red;
+    (*this)[1] = green;
+    (*this)[2] = blue;
   }
   double r() const
   {
-    return this->Array[0];
+    return (*this)[0];
   }
   double g() const
   {
-    return this->Array[1];
+    return (*this)[1];
   }
   double b() const
   {
-    return this->Array[2];
+    return (*this)[2];
   }
 };
 
@@ -194,21 +194,21 @@ public:
   }
   direction_t(double x, double y, double z)
   {
-    this->Array[0] = x;
-    this->Array[1] = y;
-    this->Array[2] = z;
+    (*this)[0] = x;
+    (*this)[1] = y;
+    (*this)[2] = z;
   }
   double x() const
   {
-    return this->Array[0];
+    return (*this)[0];
   }
   double y() const
   {
-    return this->Array[1];
+    return (*this)[1];
   }
   double z() const
   {
-    return this->Array[2];
+    return (*this)[2];
   }
 };
 
