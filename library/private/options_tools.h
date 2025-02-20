@@ -234,7 +234,7 @@ direction_t parse(const std::string& str)
   }
   catch (const f3d::type_construction_exception& ex)
   {
-    throw options::parsing_exception("Cannot parse " + str + " into a color_t: " + ex.what());
+    throw options::parsing_exception("Cannot parse " + str + " into a direction_t: " + ex.what());
   }
 }
 
