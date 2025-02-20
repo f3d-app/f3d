@@ -341,7 +341,7 @@ void vtkF3DRenderer::InitializeUpVector(const std::vector<double>& upVec)
   }
   else
   {
-    F3DLog::Print(F3DLog::Severity::Warning, "Provided Up vector is not a valid up direction");
+    F3DLog::Print(F3DLog::Severity::Warning, "Provided up vector is not a valid up direction");
   }
 }
 
