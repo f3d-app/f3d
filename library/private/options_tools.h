@@ -5,6 +5,8 @@
 #include "types.h"
 
 #include <algorithm>
+#include <cassert>
+#include <regex>
 #include <sstream>
 
 namespace f3d
@@ -203,6 +205,42 @@ color_t parse(const std::string& str)
 
 //----------------------------------------------------------------------------
 /**
+ * Parse provided string into a direction_t.
+ * Supported formats: "X,Y,Z", "[+|-][X|Y|Z]"
+ * rely on parse<std::vector<double>>(str)
+ * Can throw options::parsing_exception in case of failure to parse
+ */
+template<>
+direction_t parse(const std::string& str)
+{
+  try
+  {
+    const std::regex re("([-+]?)([XYZ])", std::regex_constants::icase);
+    std::smatch match;
+    if (std::regex_match(str, match, re))
+    {
+      const float sign = match[1].str() == "-" ? -1.0 : +1.0;
+      const int index = std::toupper(match[2].str()[0]) - 'X';
+      assert(index >= 0 && index < 3);
+
+      direction_t dir;
+      dir[index] = sign;
+      return dir;
+    }
+    else
+    {
+      return direction_t(options_tools::parse<std::vector<double>>(str));
+    }
+  }
+  catch (const f3d::type_construction_exception& ex)
+  {
+    throw options::parsing_exception("Cannot parse " + str + " into a color_t: " + ex.what());
+  }
+}
+
+
+//----------------------------------------------------------------------------
+/**
  * Return provided string stripped of leading and trailing spaces.
  */
 template<>
@@ -291,6 +329,17 @@ std::string format(const std::vector<T>& var)
 std::string format(color_t var)
 {
   // TODO generate a proper color string
+  return options_tools::format(static_cast<std::vector<double>>(var));
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Format provided var into a string from provided direction_t
+ * rely on format(std::vector<double>&)
+ */
+std::string format(direction_t var)
+{
+  // TODO generate a proper direction string
   return options_tools::format(static_cast<std::vector<double>>(var));
 }
 

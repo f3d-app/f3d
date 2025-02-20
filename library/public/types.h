@@ -139,7 +139,7 @@ public:
   }
 
 protected:
-  std::array<double, N> Array;
+  std::array<double, N> Array{0};
 };
 
 /**
@@ -170,6 +170,36 @@ public:
     return this->Array[2];
   }
 };
+
+/**
+ * Describe a 3D direction.
+ */
+class F3D_EXPORT direction_t : public double_array_t<3>
+{
+public:
+  direction_t() = default;
+  direction_t(const std::vector<double>& vec) : double_array_t(vec) {}
+  direction_t(const std::initializer_list<double>& list) : double_array_t(list) {}
+  direction_t(double x, double y, double z)
+  {
+    this->Array[0] = x;
+    this->Array[1] = y;
+    this->Array[2] = z;
+  }
+  double x() const
+  {
+    return this->Array[0];
+  }
+  double y() const
+  {
+    return this->Array[1];
+  }
+  double z() const
+  {
+    return this->Array[2];
+  }
+};
+
 
 /**
  * Describe a 3D surfacic mesh.

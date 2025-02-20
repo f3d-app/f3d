@@ -136,6 +136,11 @@ function(_parse_json_option _top_json)
          set(_option_variant_type "std::vector<double>")
          set(_option_default_value_start "{")
          set(_option_default_value_end "}")
+       elseif(_option_type STREQUAL "direction")
+         set(_option_actual_type "f3d::direction_t")
+         set(_option_variant_type "std::vector<double>")
+         set(_option_default_value_start "{")
+         set(_option_default_value_end "}")
        endif()
 
        # Add option to struct and methods
