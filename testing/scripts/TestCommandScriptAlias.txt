@@ -1,2 +1,2 @@
-alias myrotate "roll_camera 90"
+alias myrotate roll_camera 90
 myrotate
