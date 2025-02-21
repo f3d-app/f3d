@@ -8,6 +8,7 @@
 #include <cassert>
 #include <regex>
 #include <sstream>
+#include <regex>
 
 namespace f3d
 {
@@ -193,6 +194,37 @@ ratio_t parse(const std::string& str)
 template<>
 color_t parse(const std::string& str)
 {
+  std::string s = options_tools::trim(str);
+  std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return std::tolower(c); });
+
+  /* Hex format search */
+  const std::regex hexRegex("^#([0-9a-fA-F]{6})$");
+  std::smatch hexMatch;
+  if (std::regex_search(s, hexMatch, hexRegex))
+  {
+    std::vector<double> vec;
+    const std::string hexStr = hexMatch[1];
+    for (size_t i = 0; i < hexStr.length(); i += 2)
+    {
+      unsigned int byte = std::stoul(hexStr.substr(i, 2), nullptr, 16);
+      vec.push_back(byte / 255.0);
+    }
+    return color_t(vec);
+  }
+
+  /* RGB format search */ 
+  const std::regex rgbRegex("^rgb\\((\\s*\\d{1,3})\\s*,\\s*(\\d{1,3})\\s*,\\s*(\\d{1,3})\\s*\\)$", std::regex_constants::syntax_option_type::icase);
+  std::smatch rgbMatch;
+  if (std::regex_search(s, rgbMatch, rgbRegex))
+  {
+    std::vector<double> vec;
+    for (size_t i = 1; i < rgbMatch.size(); i++)
+    {
+      vec.push_back(std::stod(rgbMatch[i]) / 255.0);
+    }
+    return color_t(vec);
+  }
+
   try
   {
     return color_t(options_tools::parse<std::vector<double>>(str));
