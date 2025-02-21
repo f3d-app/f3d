@@ -2,11 +2,11 @@
   "$comments": [
     "Alembic is part of VFX reference platform (CY2025: 1.8.x)",
     "OpenEXR is part of VFX reference platform (CY2025: 3.3.x)",
-    "OpenVDB is part of VFX reference platform (CY2025: 12.x))",
-    "OpenVDB min version is not enforced by F3D code and missing from VTK code)",
-    "Python is part of VFX reference platform (CY2025: 3.11))"
+    "OpenVDB is part of VFX reference platform (CY2025: 12.x)",
+    "OpenVDB min version is not enforced by F3D code and missing from VTK code",
+    "Python is part of VFX reference platform (CY2025: 3.11)"
   ],
-  "version": {
+  "versions": {
     "alembic": "1.8.8",
     "assimp": "v5.4.3",
     "draco": "1.5.7",
@@ -18,7 +18,7 @@
     "usd": "v24.11",
     "java": "21"
   },
-  "min_version": {
+  "min_versions": {
     "alembic": "1.8.5",
     "assimp": "v5.4.0",
     "draco": "1.5.6",
