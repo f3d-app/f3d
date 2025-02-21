@@ -19,6 +19,7 @@
 
 vtkStandardNewMacro(vtkF3DOverlayRenderPass);
 
+// ----------------------------------------------------------------------------
 void vtkF3DOverlayRenderPass::Render(const vtkRenderState* s)
 {
   this->Initialize(s);
@@ -43,6 +44,7 @@ void vtkF3DOverlayRenderPass::Render(const vtkRenderState* s)
   this->CompositeOverlay(s);
 }
 
+// ----------------------------------------------------------------------------
 void vtkF3DOverlayRenderPass::ReleaseGraphicsResources(vtkWindow* w)
 {
   this->Superclass::ReleaseGraphicsResources(w);
@@ -65,6 +67,7 @@ void vtkF3DOverlayRenderPass::ReleaseGraphicsResources(vtkWindow* w)
   }
 }
 
+// ----------------------------------------------------------------------------
 void vtkF3DOverlayRenderPass::Initialize(const vtkRenderState* s)
 {
   this->OverlayProps.clear();
@@ -74,7 +77,7 @@ void vtkF3DOverlayRenderPass::Initialize(const vtkRenderState* s)
   for (int i = 0; i < s->GetPropArrayCount(); i++)
   {
     vtkProp* prop = props[i];
-    if (!vtkSkybox::SafeDownCast(prop) && !vtkProp3D::SafeDownCast(prop))
+    if (!vtkProp3D::SafeDownCast(prop))
     {
       this->OverlayProps.push_back(prop);
     }
@@ -99,6 +102,7 @@ void vtkF3DOverlayRenderPass::Initialize(const vtkRenderState* s)
   this->OverlayPass->SetColorFormat(vtkTextureObject::Float32);
 }
 
+// ----------------------------------------------------------------------------
 void vtkF3DOverlayRenderPass::CompositeOverlay(const vtkRenderState* s)
 {
   vtkOpenGLClearErrorMacro();
