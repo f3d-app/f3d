@@ -31,6 +31,9 @@ inputs:
   usd_version:
     description: 'Version of usd to build'
     required: false
+  vtk_version:
+    description: 'Version of vtk to build'
+    required: false
 
 runs:
   using: "composite"
@@ -64,7 +67,7 @@ runs:
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
       with:
-        vtk_sha_file: ./source/.github/actions/vtk_commit_sha
+        vtk_version: ${{inputs.vtk_version}}
         openvdb_version: ${{inputs.openvdb_version}}
 
     - name: Set up Python

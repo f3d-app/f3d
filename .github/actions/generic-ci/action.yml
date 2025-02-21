@@ -8,7 +8,6 @@ inputs:
   vtk_version:
     description: 'VTK version'
     required: false
-    default: 'commit'
   raytracing_label:
     description: 'Label to control raytracing'
     required: false
@@ -105,7 +104,6 @@ runs:
       uses: ./source/.github/actions/vtk-install-dep
       with:
         vtk_version: ${{inputs.vtk_version}}
-        vtk_sha_file: ./source/.github/actions/vtk_commit_sha
         raytracing_label: ${{inputs.raytracing_label}}
         cpu: ${{inputs.cpu}}
         openvdb_version: ${{inputs.openvdb_version}}

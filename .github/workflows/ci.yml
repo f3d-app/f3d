@@ -16,32 +16,14 @@ concurrency:
 jobs:
 
 #----------------------------------------------------------------------------
-# Default versions: Set default version for all dependencies
+# Retrieve JSON config file
 #----------------------------------------------------------------------------
-  default_versions:
+  versions_file:
     runs-on: ubuntu-22.04
-    name: Set default versions
+    container: ghcr.io/f3d-app/f3d-ci
+    name: Retrieve JSON versions file
     outputs:
-      alembic_version: ${{ steps.set_default_versions.outputs.alembic_version }}
-      alembic_min_version: ${{ steps.set_default_versions.outputs.alembic_min_version }}
-      assimp_version: ${{ steps.set_default_versions.outputs.assimp_version }}
-      assimp_min_version: ${{ steps.set_default_versions.outputs.assimp_min_version }}
-      draco_version: ${{ steps.set_default_versions.outputs.draco_version }}
-      draco_min_version: ${{ steps.set_default_versions.outputs.draco_min_version }}
-      occt_version: ${{ steps.set_default_versions.outputs.occt_version }}
-      occt_min_version: ${{ steps.set_default_versions.outputs.occt_min_version }}
-      openexr_version: ${{ steps.set_default_versions.outputs.openexr_version }}
-      openexr_min_version: ${{ steps.set_default_versions.outputs.openexr_min_version }}
-      openvdb_version: ${{ steps.set_default_versions.outputs.openvdb_version }}
-      openvdb_min_version: ${{ steps.set_default_versions.outputs.openvdb_min_version }}
-      pybind11_version: ${{ steps.set_default_versions.outputs.pybind11_version }}
-      pybind11_min_version: ${{ steps.set_default_versions.outputs.pybind11_min_version }}
-      python_version: ${{ steps.set_default_versions.outputs.python_version }}
-      python_min_version: ${{ steps.set_default_versions.outputs.python_min_version }}
-      usd_version: ${{ steps.set_default_versions.outputs.usd_version }}
-      usd_min_version: ${{ steps.set_default_versions.outputs.usd_min_version }}
-      java_version: ${{ steps.set_default_versions.outputs.java_version }}
-      java_min_version: ${{ steps.set_default_versions.outputs.java_min_version }}
+      json: ${{ steps.parse_file.outputs.json }}
 
     steps:
 
@@ -52,9 +34,10 @@ jobs:
         fetch-depth: 1
         lfs: false
 
-    - name: Set default versions
-      id: set_default_versions
-      uses: ./source/.github/actions/default-versions
+    - name: Read JSON file
+      id: parse_file
+      run: |
+        echo "json=$(jq -c . < ./source/.github/workflows/versions.json)" >> $GITHUB_OUTPUT
 
 #----------------------------------------------------------------------------
 # Cache LFS: Checkout LFS data and update the cache to limit LFS bandwidth
@@ -84,7 +67,7 @@ jobs:
 #----------------------------------------------------------------------------
   cache_dependencies:
     name: Cache dependencies
-    needs: default_versions
+    needs: versions_file
     strategy:
       fail-fast: false
       matrix:
@@ -94,25 +77,25 @@ jobs:
           - cpu: x86_64
           - os: macos-14
             cpu: arm64
-          - alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-          - assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-          - draco_version: ${{needs.default_versions.outputs.draco_version}}
-          - occt_version: ${{needs.default_versions.outputs.occt_version}}
-          - openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-          - openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-          - pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-          - usd_version: ${{needs.default_versions.outputs.usd_version}}
+          - alembic_version: ${{ fromJson(needs.versions_file.outputs.json).versions.alembic }}
+          - assimp_version: ${{ fromJson(needs.versions_file.outputs.json).versions.assimp }}
+          - draco_version: ${{ fromJson(needs.versions_file.outputs.json).versions.draco }}
+          - occt_version: ${{ fromJson(needs.versions_file.outputs.json).versions.occt }}
+          - openexr_version: ${{ fromJson(needs.versions_file.outputs.json).versions.openexr }}
+          - openvdb_version: ${{ fromJson(needs.versions_file.outputs.json).versions.openvdb }}
+          - pybind11_version: ${{ fromJson(needs.versions_file.outputs.json).versions.pybind11 }}
+          - usd_version: ${{ fromJson(needs.versions_file.outputs.json).versions.usd }}
           - build_type: mindeps
             os: ubuntu-22.04
             cpu: x86_64
-            alembic_version: ${{needs.default_versions.outputs.alembic_min_version}}
-            assimp_version: ${{needs.default_versions.outputs.assimp_min_version}}
-            draco_version: ${{needs.default_versions.outputs.draco_min_version}}
-            occt_version: ${{needs.default_versions.outputs.occt_min_version}}
-            openexr_version: ${{needs.default_versions.outputs.openexr_min_version}}
-            openvdb_version: ${{needs.default_versions.outputs.openvdb_min_version}}
-            pybind11_version: ${{needs.default_versions.outputs.pybind11_min_version}}
-            usd_version: ${{needs.default_versions.outputs.usd_min_version}}
+            alembic_version: ${{ fromJson(needs.versions_file.outputs.json).min_versions.alembic }}
+            assimp_version: ${{ fromJson(needs.versions_file.outputs.json).min_versions.assimp }}
+            draco_version: ${{ fromJson(needs.versions_file.outputs.json).min_versions.draco }}
+            occt_version: ${{ fromJson(needs.versions_file.outputs.json).min_versions.occt }}
+            openexr_version: ${{ fromJson(needs.versions_file.outputs.json).min_versions.openexr }}
+            openvdb_version: ${{ fromJson(needs.versions_file.outputs.json).min_versions.openvdb }}
+            pybind11_version: ${{ fromJson(needs.versions_file.outputs.json).min_versions.pybind11 }}
+            usd_version: ${{ fromJson(needs.versions_file.outputs.json).min_versions.usd }}
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
@@ -144,15 +127,15 @@ jobs:
 #----------------------------------------------------------------------------
   windows:
     if: github.event.pull_request.draft == false
-    needs: [cache_lfs, cache_dependencies, default_versions]
+    needs: [cache_lfs, cache_dependencies, versions_file]
 
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [commit, v9.4.1, v9.3.1, v9.2.6]
+        vtk_version: ["${{ fromJson(needs.versions_file.outputs.json).vtk_commit_sha }}", v9.4.1, v9.3.1, v9.2.6]
         static_label: [no-static]
         include:
-          - vtk_version: commit
+          - vtk_version: ${{ fromJson(needs.versions_file.outputs.json).vtk_commit_sha }}
             static_label: static
 
     runs-on: windows-latest
@@ -172,28 +155,28 @@ jobs:
         raytracing_label: raytracing
         static_label: ${{matrix.static_label}}
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-        assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-        draco_version: ${{needs.default_versions.outputs.draco_version}}
-        occt_version: ${{needs.default_versions.outputs.occt_version}}
-        openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-        pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-        python_version: ${{needs.default_versions.outputs.python_version}}
-        usd_version: ${{needs.default_versions.outputs.usd_version}}
-        java_version: ${{needs.default_versions.outputs.java_version}}
+        alembic_version: ${{ fromJson(needs.versions_file.outputs.json).versions.alembic }}
+        assimp_version: ${{ fromJson(needs.versions_file.outputs.json).versions.assimp }}
+        draco_version: ${{ fromJson(needs.versions_file.outputs.json).versions.draco }}
+        occt_version: ${{ fromJson(needs.versions_file.outputs.json).versions.occt }}
+        openexr_version: ${{ fromJson(needs.versions_file.outputs.json).versions.openexr }}
+        openvdb_version: ${{ fromJson(needs.versions_file.outputs.json).versions.openvdb }}
+        pybind11_version: ${{ fromJson(needs.versions_file.outputs.json).versions.pybind11 }}
+        python_version: ${{ fromJson(needs.versions_file.outputs.json).versions.python }}
+        usd_version: ${{ fromJson(needs.versions_file.outputs.json).versions.usd }}
+        java_version: ${{ fromJson(needs.versions_file.outputs.json).versions.java }}
 
 #----------------------------------------------------------------------------
 # Linux CI: Build and test, cross-vtk build matrix
 #----------------------------------------------------------------------------
   linux:
     if: github.event.pull_request.draft == false
-    needs: [cache_lfs, cache_dependencies, default_versions]
+    needs: [cache_lfs, cache_dependencies, versions_file]
 
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [commit, v9.4.1, v9.3.1, v9.2.6]
+        vtk_version: ["${{ fromJson(needs.versions_file.outputs.json).vtk_commit_sha }}", v9.4.1, v9.3.1, v9.2.6]
         build_type: [standard]
         include:
           - raytracing_label: raytracing
@@ -201,108 +184,108 @@ jobs:
           - optional_deps_label: optional-deps
           - rendering_backend: auto
           - static_label: no-static
-          - alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-          - assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-          - draco_version: ${{needs.default_versions.outputs.draco_version}}
-          - occt_version: ${{needs.default_versions.outputs.occt_version}}
-          - openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-          - openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-          - pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-          - python_version: ${{needs.default_versions.outputs.python_version}}
-          - usd_version: ${{needs.default_versions.outputs.usd_version}}
-          - java_version: ${{needs.default_versions.outputs.java_version}}
+          - alembic_version: ${{ fromJson(needs.versions_file.outputs.json).versions.alembic }}
+          - assimp_version: ${{ fromJson(needs.versions_file.outputs.json).versions.assimp }}
+          - draco_version: ${{ fromJson(needs.versions_file.outputs.json).versions.draco }}
+          - occt_version: ${{ fromJson(needs.versions_file.outputs.json).versions.occt }}
+          - openexr_version: ${{ fromJson(needs.versions_file.outputs.json).versions.openexr }}
+          - openvdb_version: ${{ fromJson(needs.versions_file.outputs.json).versions.openvdb }}
+          - pybind11_version: ${{ fromJson(needs.versions_file.outputs.json).versions.pybind11 }}
+          - python_version: ${{ fromJson(needs.versions_file.outputs.json).versions.python }}
+          - usd_version: ${{ fromJson(needs.versions_file.outputs.json).versions.usd }}
+          - java_version: ${{ fromJson(needs.versions_file.outputs.json).versions.java }}
           - build_type: egl
-            vtk_version: commit
+            vtk_version: ${{ fromJson(needs.versions_file.outputs.json).vtk_commit_sha }}
             raytracing_label: raytracing
             optional_deps_label: optional-deps
             exclude_deprecated_label: no-exclude-deprecated
             rendering_backend: egl
             static_label: no-static
-            alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-            assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-            draco_version: ${{needs.default_versions.outputs.draco_version}}
-            occt_version: ${{needs.default_versions.outputs.occt_version}}
-            openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-            openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-            pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-            python_version: ${{needs.default_versions.outputs.python_version}}
-            usd_version: ${{needs.default_versions.outputs.usd_version}}
-            java_version: ${{needs.default_versions.outputs.java_version}}
+            alembic_version: ${{ fromJson(needs.versions_file.outputs.json).versions.alembic }}
+            assimp_version: ${{ fromJson(needs.versions_file.outputs.json).versions.assimp }}
+            draco_version: ${{ fromJson(needs.versions_file.outputs.json).versions.draco }}
+            occt_version: ${{ fromJson(needs.versions_file.outputs.json).versions.occt }}
+            openexr_version: ${{ fromJson(needs.versions_file.outputs.json).versions.openexr }}
+            openvdb_version: ${{ fromJson(needs.versions_file.outputs.json).versions.openvdb }}
+            pybind11_version: ${{ fromJson(needs.versions_file.outputs.json).versions.pybind11 }}
+            python_version: ${{ fromJson(needs.versions_file.outputs.json).versions.python }}
+            usd_version: ${{ fromJson(needs.versions_file.outputs.json).versions.usd }}
+            java_version: ${{ fromJson(needs.versions_file.outputs.json).versions.java }}
           - build_type: osmesa
-            vtk_version: commit
+            vtk_version: ${{ fromJson(needs.versions_file.outputs.json).vtk_commit_sha }}
             raytracing_label: raytracing
             optional_deps_label: optional-deps
             exclude_deprecated_label: no-exclude-deprecated
             rendering_backend: osmesa
             static_label: no-static
-            alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-            assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-            draco_version: ${{needs.default_versions.outputs.draco_version}}
-            occt_version: ${{needs.default_versions.outputs.occt_version}}
-            openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-            openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-            pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-            python_version: ${{needs.default_versions.outputs.python_version}}
-            usd_version: ${{needs.default_versions.outputs.usd_version}}
-            java_version: ${{needs.default_versions.outputs.java_version}}
+            alembic_version: ${{ fromJson(needs.versions_file.outputs.json).versions.alembic }}
+            assimp_version: ${{ fromJson(needs.versions_file.outputs.json).versions.assimp }}
+            draco_version: ${{ fromJson(needs.versions_file.outputs.json).versions.draco }}
+            occt_version: ${{ fromJson(needs.versions_file.outputs.json).versions.occt }}
+            openexr_version: ${{ fromJson(needs.versions_file.outputs.json).versions.openexr }}
+            openvdb_version: ${{ fromJson(needs.versions_file.outputs.json).versions.openvdb }}
+            pybind11_version: ${{ fromJson(needs.versions_file.outputs.json).versions.pybind11 }}
+            python_version: ${{ fromJson(needs.versions_file.outputs.json).versions.python }}
+            usd_version: ${{ fromJson(needs.versions_file.outputs.json).versions.usd }}
+            java_version: ${{ fromJson(needs.versions_file.outputs.json).versions.java }}
           - build_type: exclude_deprecated
-            vtk_version: commit
+            vtk_version: ${{ fromJson(needs.versions_file.outputs.json).vtk_commit_sha }}
             raytracing_label: raytracing
             optional_deps_label: optional-deps
             exclude_deprecated_label: exclude-deprecated
             rendering_backend: auto
             static_label: no-static
-            alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-            assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-            draco_version: ${{needs.default_versions.outputs.draco_version}}
-            occt_version: ${{needs.default_versions.outputs.occt_version}}
-            openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-            openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-            pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-            python_version: ${{needs.default_versions.outputs.python_version}}
-            usd_version: ${{needs.default_versions.outputs.usd_version}}
-            java_version: ${{needs.default_versions.outputs.java_version}}
+            alembic_version: ${{ fromJson(needs.versions_file.outputs.json).versions.alembic }}
+            assimp_version: ${{ fromJson(needs.versions_file.outputs.json).versions.assimp }}
+            draco_version: ${{ fromJson(needs.versions_file.outputs.json).versions.draco }}
+            occt_version: ${{ fromJson(needs.versions_file.outputs.json).versions.occt }}
+            openexr_version: ${{ fromJson(needs.versions_file.outputs.json).versions.openexr }}
+            openvdb_version: ${{ fromJson(needs.versions_file.outputs.json).versions.openvdb }}
+            pybind11_version: ${{ fromJson(needs.versions_file.outputs.json).versions.pybind11 }}
+            python_version: ${{ fromJson(needs.versions_file.outputs.json).versions.python }}
+            usd_version: ${{ fromJson(needs.versions_file.outputs.json).versions.usd }}
+            java_version: ${{ fromJson(needs.versions_file.outputs.json).versions.java }}
           - build_type: no_optional_deps
-            vtk_version: commit
+            vtk_version: ${{ fromJson(needs.versions_file.outputs.json).vtk_commit_sha }}
             raytracing_label: no-raytracing
             optional_deps_label: no-optional-deps
             exclude_deprecated_label: no-exclude-deprecated
             rendering_backend: auto
             static_label: no-static
           - build_type: static_libs
-            vtk_version: commit
+            vtk_version: ${{ fromJson(needs.versions_file.outputs.json).vtk_commit_sha }}
             raytracing_label: no-raytracing
             optional_deps_label: optional-deps
             exclude_deprecated_label: no-exclude-deprecated
             rendering_backend: auto
             static_label: static
-            alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-            assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-            draco_version: ${{needs.default_versions.outputs.draco_version}}
-            occt_version: ${{needs.default_versions.outputs.occt_version}}
-            openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-            openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-            pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-            python_version: ${{needs.default_versions.outputs.python_version}}
-            usd_version: ${{needs.default_versions.outputs.usd_version}}
-            java_version: ${{needs.default_versions.outputs.java_version}}
+            alembic_version: ${{ fromJson(needs.versions_file.outputs.json).versions.alembic }}
+            assimp_version: ${{ fromJson(needs.versions_file.outputs.json).versions.assimp }}
+            draco_version: ${{ fromJson(needs.versions_file.outputs.json).versions.draco }}
+            occt_version: ${{ fromJson(needs.versions_file.outputs.json).versions.occt }}
+            openexr_version: ${{ fromJson(needs.versions_file.outputs.json).versions.openexr }}
+            openvdb_version: ${{ fromJson(needs.versions_file.outputs.json).versions.openvdb }}
+            pybind11_version: ${{ fromJson(needs.versions_file.outputs.json).versions.pybind11 }}
+            python_version: ${{ fromJson(needs.versions_file.outputs.json).versions.python }}
+            usd_version: ${{ fromJson(needs.versions_file.outputs.json).versions.usd }}
+            java_version: ${{ fromJson(needs.versions_file.outputs.json).versions.java }}
           - build_type: mindeps
-            vtk_version: commit
+            vtk_version: ${{ fromJson(needs.versions_file.outputs.json).vtk_commit_sha }}
             raytracing_label: raytracing
             optional_deps_label: optional-deps
             exclude_deprecated_label: no-exclude-deprecated
             rendering_backend: auto
             static_label: no-static
-            alembic_version: ${{needs.default_versions.outputs.alembic_min_version}}
-            assimp_version: ${{needs.default_versions.outputs.assimp_min_version}}
-            draco_version: ${{needs.default_versions.outputs.draco_min_version}}
-            occt_version: ${{needs.default_versions.outputs.occt_min_version}}
-            openexr_version: ${{needs.default_versions.outputs.openexr_min_version}}
-            openvdb_version: ${{needs.default_versions.outputs.openvdb_min_version}}
-            pybind11_version: ${{needs.default_versions.outputs.pybind11_min_version}}
-            python_version: ${{needs.default_versions.outputs.python_min_version}}
-            usd_version: ${{needs.default_versions.outputs.usd_min_version}}
-            java_version: ${{needs.default_versions.outputs.java_min_version}}
+            alembic_version: ${{ fromJson(needs.versions_file.outputs.json).min_versions.alembic }}
+            assimp_version: ${{ fromJson(needs.versions_file.outputs.json).min_versions.assimp }}
+            draco_version: ${{ fromJson(needs.versions_file.outputs.json).min_versions.draco }}
+            occt_version: ${{ fromJson(needs.versions_file.outputs.json).min_versions.occt }}
+            openexr_version: ${{ fromJson(needs.versions_file.outputs.json).min_versions.openexr }}
+            openvdb_version: ${{ fromJson(needs.versions_file.outputs.json).min_versions.openvdb }}
+            pybind11_version: ${{ fromJson(needs.versions_file.outputs.json).min_versions.pybind11 }}
+            python_version: ${{ fromJson(needs.versions_file.outputs.json).min_versions.python }}
+            usd_version: ${{ fromJson(needs.versions_file.outputs.json).min_versions.usd }}
+            java_version: ${{ fromJson(needs.versions_file.outputs.json).min_versions.java }}
 
     runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
@@ -345,11 +328,11 @@ jobs:
 #----------------------------------------------------------------------------
   macos:
     if: github.event.pull_request.draft == false
-    needs: [cache_lfs, cache_dependencies, default_versions]
+    needs: [cache_lfs, cache_dependencies, versions_file]
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [commit, v9.4.1, v9.3.1, v9.2.6]
+        vtk_version: ["${{ fromJson(needs.versions_file.outputs.json).vtk_commit_sha }}", v9.4.1, v9.3.1, v9.2.6]
 
     runs-on: macos-13
 
@@ -368,34 +351,34 @@ jobs:
         raytracing_label: raytracing
         cpu: x86_64
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-        assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-        draco_version: ${{needs.default_versions.outputs.draco_version}}
-        occt_version: ${{needs.default_versions.outputs.occt_version}}
-        openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-        pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-        python_version: ${{needs.default_versions.outputs.python_version}}
-        usd_version: ${{needs.default_versions.outputs.usd_version}}
+        alembic_version: ${{ fromJson(needs.versions_file.outputs.json).versions.alembic }}
+        assimp_version: ${{ fromJson(needs.versions_file.outputs.json).versions.assimp }}
+        draco_version: ${{ fromJson(needs.versions_file.outputs.json).versions.draco }}
+        occt_version: ${{ fromJson(needs.versions_file.outputs.json).versions.occt }}
+        openexr_version: ${{ fromJson(needs.versions_file.outputs.json).versions.openexr }}
+        openvdb_version: ${{ fromJson(needs.versions_file.outputs.json).versions.openvdb }}
+        pybind11_version: ${{ fromJson(needs.versions_file.outputs.json).versions.pybind11 }}
+        python_version: ${{ fromJson(needs.versions_file.outputs.json).versions.python }}
+        usd_version: ${{ fromJson(needs.versions_file.outputs.json).versions.usd }}
 
 #----------------------------------------------------------------------------
 # MacOS ARM CI: Build and test, cross-vtk build matrix with a few optional builds
 #----------------------------------------------------------------------------
   macos_arm:
     if: github.event.pull_request.draft == false
-    needs: [cache_lfs, cache_dependencies, default_versions]
+    needs: [cache_lfs, cache_dependencies, versions_file]
 
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [commit, v9.4.1, v9.3.1] # VTK 9.2.6 not compatible with recent clang version on macOS
+        vtk_version: ["${{ fromJson(needs.versions_file.outputs.json).vtk_commit_sha }}", v9.4.1, v9.3.1] # VTK 9.2.6 not compatible with recent clang version on macOS
         bundle_label: [no-bundle]
         static_label: [no-static]
         include:
-          - vtk_version: commit
+          - vtk_version: ${{ fromJson(needs.versions_file.outputs.json).vtk_commit_sha }}
             bundle_label: bundle
             static_label: no-static
-          - vtk_version: commit
+          - vtk_version: ${{ fromJson(needs.versions_file.outputs.json).vtk_commit_sha }}
             bundle_label: no-bundle
             static_label: static
 
@@ -418,22 +401,22 @@ jobs:
         static_label: ${{matrix.static_label}}
         cpu: arm64
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-        assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-        draco_version: ${{needs.default_versions.outputs.draco_version}}
-        occt_version: ${{needs.default_versions.outputs.occt_version}}
-        openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-        pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-        python_version: ${{needs.default_versions.outputs.python_version}}
-        usd_version: ${{needs.default_versions.outputs.usd_version}}
+        alembic_version: ${{ fromJson(needs.versions_file.outputs.json).versions.alembic }}
+        assimp_version: ${{ fromJson(needs.versions_file.outputs.json).versions.assimp }}
+        draco_version: ${{ fromJson(needs.versions_file.outputs.json).versions.draco }}
+        occt_version: ${{ fromJson(needs.versions_file.outputs.json).versions.occt }}
+        openexr_version: ${{ fromJson(needs.versions_file.outputs.json).versions.openexr }}
+        openvdb_version: ${{ fromJson(needs.versions_file.outputs.json).versions.openvdb }}
+        pybind11_version: ${{ fromJson(needs.versions_file.outputs.json).versions.pybind11 }}
+        python_version: ${{ fromJson(needs.versions_file.outputs.json).versions.python }}
+        usd_version: ${{ fromJson(needs.versions_file.outputs.json).versions.usd }}
 
 #----------------------------------------------------------------------------
 # Python packaging: Build and test the Python wheel
 #----------------------------------------------------------------------------
   python-packaging:
     if: github.event.pull_request.draft == false
-    needs: [cache_lfs, cache_dependencies, default_versions]
+    needs: [cache_lfs, cache_dependencies, versions_file]
 
     strategy:
       fail-fast: false
@@ -472,20 +455,21 @@ jobs:
       with:
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
         python_version: ${{matrix.python_version}}
-        alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-        assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-        draco_version: ${{needs.default_versions.outputs.draco_version}}
-        occt_version: ${{needs.default_versions.outputs.occt_version}}
-        openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-        pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-        usd_version: ${{needs.default_versions.outputs.usd_version}}
+        alembic_version: ${{ fromJson(needs.versions_file.outputs.json).versions.alembic }}
+        assimp_version: ${{ fromJson(needs.versions_file.outputs.json).versions.assimp }}
+        draco_version: ${{ fromJson(needs.versions_file.outputs.json).versions.draco }}
+        occt_version: ${{ fromJson(needs.versions_file.outputs.json).versions.occt }}
+        openexr_version: ${{ fromJson(needs.versions_file.outputs.json).versions.openexr }}
+        openvdb_version: ${{ fromJson(needs.versions_file.outputs.json).versions.openvdb }}
+        pybind11_version: ${{ fromJson(needs.versions_file.outputs.json).versions.pybind11 }}
+        usd_version: ${{ fromJson(needs.versions_file.outputs.json).versions.usd }}
+        vtk_version: ${{ fromJson(needs.versions_file.outputs.json).vtk_commit_sha }}
 
 #----------------------------------------------------------------------------
 # Coverage: Build and test on linux with last VTK with coverage option
 #----------------------------------------------------------------------------
   coverage:
-    needs: [cache_lfs, cache_dependencies, default_versions]
+    needs: [cache_lfs, cache_dependencies, versions_file]
     if: github.event.pull_request.draft == false
 
     runs-on: ubuntu-22.04
@@ -510,13 +494,14 @@ jobs:
       with:
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
         codecov_token: ${{secrets.CODECOV_TOKEN}}
-        alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-        assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-        draco_version: ${{needs.default_versions.outputs.draco_version}}
-        occt_version: ${{needs.default_versions.outputs.occt_version}}
-        openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-        usd_version: ${{needs.default_versions.outputs.usd_version}}
+        alembic_version: ${{ fromJson(needs.versions_file.outputs.json).versions.alembic }}
+        assimp_version: ${{ fromJson(needs.versions_file.outputs.json).versions.assimp }}
+        draco_version: ${{ fromJson(needs.versions_file.outputs.json).versions.draco }}
+        occt_version: ${{ fromJson(needs.versions_file.outputs.json).versions.occt }}
+        openexr_version: ${{ fromJson(needs.versions_file.outputs.json).versions.openexr }}
+        openvdb_version: ${{ fromJson(needs.versions_file.outputs.json).versions.openvdb }}
+        usd_version: ${{ fromJson(needs.versions_file.outputs.json).versions.usd }}
+        vtk_version: ${{ fromJson(needs.versions_file.outputs.json).vtk_commit_sha }}
 
 #----------------------------------------------------------------------------
 # Sanitizer: Build and test on linux with last VTK with sanitizer options
@@ -525,7 +510,7 @@ jobs:
 # "memory" returns false positives in VTK:
 # https://stackoverflow.com/questions/60097307/memory-sanitizer-reports-use-of-uninitialized-value-in-global-object-constructio
   sanitizer:
-    needs: [cache_lfs, cache_dependencies, default_versions]
+    needs: [cache_lfs, cache_dependencies, versions_file]
     if: github.event.pull_request.draft == false
 
     strategy:
@@ -556,17 +541,18 @@ jobs:
       with:
         sanitizer_type: ${{matrix.sanitizer_type}}
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-        assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-        draco_version: ${{needs.default_versions.outputs.draco_version}}
-        occt_version: ${{needs.default_versions.outputs.occt_version}}
-        openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+        alembic_version: ${{ fromJson(needs.versions_file.outputs.json).versions.alembic }}
+        assimp_version: ${{ fromJson(needs.versions_file.outputs.json).versions.assimp }}
+        draco_version: ${{ fromJson(needs.versions_file.outputs.json).versions.draco }}
+        occt_version: ${{ fromJson(needs.versions_file.outputs.json).versions.occt }}
+        openexr_version: ${{ fromJson(needs.versions_file.outputs.json).versions.openexr }}
+        vtk_version: ${{ fromJson(needs.versions_file.outputs.json).vtk_commit_sha }}
 
 #----------------------------------------------------------------------------
 # static-analysis: Run static analysis on linux
 #----------------------------------------------------------------------------
   static-analysis:
-    needs: [cache_lfs, cache_dependencies, default_versions]
+    needs: [cache_lfs, cache_dependencies, versions_file]
     if: github.event.pull_request.draft == false
 
     strategy:
@@ -592,19 +578,20 @@ jobs:
       uses: ./source/.github/actions/static-analysis-ci
       with:
         lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-        assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-        draco_version: ${{needs.default_versions.outputs.draco_version}}
-        occt_version: ${{needs.default_versions.outputs.occt_version}}
-        openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-        usd_version: ${{needs.default_versions.outputs.usd_version}}
+        alembic_version: ${{ fromJson(needs.versions_file.outputs.json).versions.alembic }}
+        assimp_version: ${{ fromJson(needs.versions_file.outputs.json).versions.assimp }}
+        draco_version: ${{ fromJson(needs.versions_file.outputs.json).versions.draco }}
+        occt_version: ${{ fromJson(needs.versions_file.outputs.json).versions.occt }}
+        openexr_version: ${{ fromJson(needs.versions_file.outputs.json).versions.openexr }}
+        openvdb_version: ${{ fromJson(needs.versions_file.outputs.json).versions.openvdb }}
+        usd_version: ${{ fromJson(needs.versions_file.outputs.json).versions.usd }}
+        vtk_version: ${{ fromJson(needs.versions_file.outputs.json).vtk_commit_sha }}
 
 #----------------------------------------------------------------------------
 # external-build: Check build of F3D as sub-project
 #----------------------------------------------------------------------------
   external-build:
-    needs: cache_dependencies
+    needs: [cache_dependencies, versions_file]
     if: github.event.pull_request.draft == false
 
     strategy:
@@ -624,12 +611,15 @@ jobs:
 
     - name: External build CI
       uses: ./source/f3d/.github/actions/external-build-ci
+      with:
+        vtk_version: ${{ fromJson(needs.versions_file.outputs.json).vtk_commit_sha }}
 
 #----------------------------------------------------------------------------
 # android: Check build of F3D for android
 #----------------------------------------------------------------------------
   android:
     if: github.event.pull_request.draft == false
+    needs: versions_file
 
     strategy:
       fail-fast: false
@@ -652,3 +642,4 @@ jobs:
       uses: ./source/.github/actions/android-ci
       with:
         arch: ${{matrix.arch}}
+        vtk_version: ${{ fromJson(needs.versions_file.outputs.json).vtk_commit_sha }}
