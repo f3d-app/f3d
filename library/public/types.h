@@ -82,81 +82,11 @@ private:
 };
 
 /**
- * A base template type for an array of double
- */
-template<unsigned int N>
-class F3D_EXPORT double_array_t
-{
-public:
-  double_array_t() = default;
-  double_array_t(const std::vector<double>& vec)
-  {
-    if (vec.size() != N)
-    {
-      throw f3d::type_construction_exception("Provided vector does not have the right size");
-    }
-    std::copy_n(vec.begin(), N, this->Array.begin());
-  }
-  double_array_t(const std::initializer_list<double>& list)
-  {
-    if (list.size() != N)
-    {
-      throw f3d::type_construction_exception("Provided list does not have the right size");
-    }
-    std::copy_n(list.begin(), N, this->Array.begin());
-  }
-  operator std::vector<double>() const
-  {
-    return std::vector<double>(this->Array.begin(), this->Array.end());
-  }
-  bool operator==(const double_array_t& other) const
-  {
-    return this->Array == other.Array;
-  }
-  bool operator!=(const double_array_t& other) const
-  {
-    return this->Array != other.Array;
-  }
-  double operator[](size_t i) const
-  {
-    if (i >= N)
-    {
-      throw f3d::type_access_exception("Incorrect index");
-    }
-    return this->Array[i];
-  }
-  double& operator[](size_t i)
-  {
-    if (i >= N)
-    {
-      throw f3d::type_access_exception("Incorrect index");
-    }
-    return this->Array[i];
-  }
-  const double* data() const
-  {
-    return this->Array.data();
-  }
-
-private:
-  std::array<double, N> Array{ 0 };
-};
-
-/**
  * Describe a RGB color.
  */
-class F3D_EXPORT color_t : public double_array_t<3>
+class F3D_EXPORT color_t
 {
 public:
-  color_t() = default;
-  color_t(const std::vector<double>& vec)
-    : double_array_t(vec)
-  {
-  }
-  color_t(const std::initializer_list<double>& list)
-    : double_array_t(list)
-  {
-  }
   color_t(double red, double green, double blue)
   {
     (*this)[0] = red;
@@ -175,23 +105,67 @@ public:
   {
     return (*this)[2];
   }
+
+  color_t() = default;
+  color_t(const std::vector<double>& vec)
+  {
+    if (vec.size() != 3)
+    {
+      throw f3d::type_construction_exception("Provided vector does not have the right size");
+    }
+    std::copy_n(vec.begin(), 3, this->Array.begin());
+  }
+  color_t(const std::initializer_list<double>& list)
+  {
+    if (list.size() != 3)
+    {
+      throw f3d::type_construction_exception("Provided list does not have the right size");
+    }
+    std::copy_n(list.begin(), 3, this->Array.begin());
+  }
+  operator std::vector<double>() const
+  {
+    return std::vector<double>(this->Array.begin(), this->Array.end());
+  }
+  bool operator==(const color_t& other) const
+  {
+    return this->Array == other.Array;
+  }
+  bool operator!=(const color_t& other) const
+  {
+    return this->Array != other.Array;
+  }
+  double operator[](size_t i) const
+  {
+    if (i >= 3)
+    {
+      throw f3d::type_access_exception("Incorrect index");
+    }
+    return this->Array[i];
+  }
+  double& operator[](size_t i)
+  {
+    if (i >= 3)
+    {
+      throw f3d::type_access_exception("Incorrect index");
+    }
+    return this->Array[i];
+  }
+  const double* data() const
+  {
+    return this->Array.data();
+  }
+
+private:
+  std::array<double, 3> Array{ 0 };
 };
 
 /**
  * Describe a 3D direction.
  */
-class F3D_EXPORT direction_t : public double_array_t<3>
+class F3D_EXPORT direction_t
 {
 public:
-  direction_t() = default;
-  direction_t(const std::vector<double>& vec)
-    : double_array_t(vec)
-  {
-  }
-  direction_t(const std::initializer_list<double>& list)
-    : double_array_t(list)
-  {
-  }
   direction_t(double x, double y, double z)
   {
     (*this)[0] = x;
@@ -210,6 +184,59 @@ public:
   {
     return (*this)[2];
   }
+
+  direction_t() = default;
+  direction_t(const std::vector<double>& vec)
+  {
+    if (vec.size() != 3)
+    {
+      throw f3d::type_construction_exception("Provided vector does not have the right size");
+    }
+    std::copy_n(vec.begin(), 3, this->Array.begin());
+  }
+  direction_t(const std::initializer_list<double>& list)
+  {
+    if (list.size() != 3)
+    {
+      throw f3d::type_construction_exception("Provided list does not have the right size");
+    }
+    std::copy_n(list.begin(), 3, this->Array.begin());
+  }
+  operator std::vector<double>() const
+  {
+    return std::vector<double>(this->Array.begin(), this->Array.end());
+  }
+  bool operator==(const direction_t& other) const
+  {
+    return this->Array == other.Array;
+  }
+  bool operator!=(const direction_t& other) const
+  {
+    return this->Array != other.Array;
+  }
+  double operator[](size_t i) const
+  {
+    if (i >= 3)
+    {
+      throw f3d::type_access_exception("Incorrect index");
+    }
+    return this->Array[i];
+  }
+  double& operator[](size_t i)
+  {
+    if (i >= 3)
+    {
+      throw f3d::type_access_exception("Incorrect index");
+    }
+    return this->Array[i];
+  }
+  const double* data() const
+  {
+    return this->Array.data();
+  }
+
+private:
+  std::array<double, 3> Array{ 0 };
 };
 
 /**
