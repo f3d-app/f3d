@@ -2114,6 +2114,34 @@ void vtkF3DRenderer::SetColormap(const std::vector<double>& colormap)
   }
 }
 
+// ./build/bin/f3d assets/f3d-data/dragon.vtu --colormap=0,1,0,0,1,0,0,1 -xtgansb --coloring-component=0 --colormap-discretization=4
+void vtkF3DRenderer::SetColorDiscretization(const int discretization) 
+{
+  std::string LogMsg1 = std::string("discretization value = ") + std::to_string(discretization);
+  F3DLog::Print(F3DLog::Severity::Info, LogMsg1);
+
+  if (discretization > 0)
+  {
+    this->ColorTransferFunction = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
+    vtkDiscretizableColorTransferFunction* const discretizableCTF = vtkDiscretizableColorTransferFunction::SafeDownCast(this->ColorTransferFunction);
+    
+    discretizableCTF->DiscretizeOn();
+    discretizableCTF->SetNumberOfValues(discretization);
+
+    // const int numCompents = this->Colormap.size() / 4;
+    // for (int i = 0; i < numCompents; i++)
+    // {
+    //   const int j = i * 4;
+    //   const auto v = this->Colormap[j + 0];
+    //   const auto r = this->Colormap[j + 1];
+    //   const auto g = this->Colormap[j + 2];
+    //   const auto b = this->Colormap[j + 3];
+    //   discretizableCTF->AddRGBPoint(v, r, g, b);
+    // }
+    // discretizableCTF->Build();
+  }
+}
+
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetEnableColoring(bool enable)
 {
@@ -2464,6 +2492,8 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
     return;
   }
 
+  // Set Discretization
+  
   // Set range
   this->UsingExpandingRange = true;
   if (this->UserScalarBarRange.has_value())
