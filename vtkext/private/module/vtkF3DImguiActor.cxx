@@ -342,9 +342,11 @@ void vtkF3DImguiActor::RenderCheatSheet()
   ImGuiViewport* viewport = ImGui::GetMainViewport();
 
   constexpr float marginLeft = 5.f;
-  float marginTop = 5.f;
-  float winWidth = 0.f;
+  constexpr float marginTopBottom = 5.f;
+
   float textHeight = 0.f;
+  float winWidth = 0.f;
+  float winTop = marginTopBottom;
 
   for (const auto& [group, content] : this->CheatSheet)
   {
@@ -363,16 +365,17 @@ void vtkF3DImguiActor::RenderCheatSheet()
 
       winWidth = std::max(winWidth, currentLine.x);
       textHeight += ImGui::GetTextLineHeightWithSpacing();
+      ;
     }
   }
 
   winWidth += 2.f * ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().ScrollbarSize;
   textHeight += 2.f * ImGui::GetStyle().WindowPadding.y;
 
-  marginTop = std::max(marginTop, (viewport->WorkSize.y - textHeight) * 0.5f);
+  winTop = std::max(marginTopBottom, (viewport->WorkSize.y - textHeight) * 0.5f);
 
-  ::SetupNextWindow(ImVec2(marginLeft, marginTop),
-    ImVec2(winWidth, std::min(viewport->WorkSize.y - marginTop, textHeight)));
+  ::SetupNextWindow(ImVec2(marginLeft, winTop),
+    ImVec2(winWidth, std::min(viewport->WorkSize.y - (2 * marginTopBottom), textHeight)));
   ImGui::SetNextWindowBgAlpha(0.35f);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
