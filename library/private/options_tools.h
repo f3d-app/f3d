@@ -219,7 +219,7 @@ direction_t parse(const std::string& str)
     std::smatch match;
     if (std::regex_match(str, match, re))
     {
-      const float sign = match[1].str() == "-" ? -1.0 : +1.0;
+      const double sign = match[1].str() == "-" ? -1.0 : +1.0;
       const int index = std::toupper(match[2].str()[0]) - 'X';
       assert(index >= 0 && index < 3);
 
