@@ -94,7 +94,7 @@ eg: `add_files_or_set_hdri /path/to/dragon.vtu /path/to/file.hdr`.
 `remove_file_groups`: A specific command to remove all files. No argument.
 
 `alias [alias_name] [command]`: A specific command to create an alias for a command. Take an alias name and a command as arguments.
-eg: `alias ll ls -l`.
+eg: `alias myrotate roll_camera 90`.
 
 ## Command Script (`--command-script`)
 
