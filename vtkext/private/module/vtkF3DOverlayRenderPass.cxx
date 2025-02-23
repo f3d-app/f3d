@@ -146,11 +146,6 @@ void vtkF3DOverlayRenderPass::CompositeOverlay(const vtkRenderState* s)
     s, size[0], size[1], size[0], size[1], this->FrameBufferObject, this->ColorTexture);
   renWin->GetState()->PopFramebufferBindings();
 
-  if (this->QuadHelper && this->QuadHelper->ShaderChangeValue < this->GetMTime())
-  {
-    this->QuadHelper = nullptr;
-  }
-
   if (!this->QuadHelper)
   {
     std::string FSSource = vtkOpenGLRenderUtilities::GetFullScreenQuadFragmentShaderTemplate();
