@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
-  <mime-type type="application/vnd.vdb">
-    <comment>VDB file</comment>
-    <glob pattern="*.vdb"/>
+  <mime-type type="application/vnd.pdal">
+    <comment>LAS file</comment>
+    <glob pattern="*.las"/>
   </mime-type>
 </mime-info>
