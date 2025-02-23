@@ -1,8 +1,8 @@
 [
   {
-    "match": ".*(vdb)",
+    "match": ".*(las)",
     "options": {
-      "load-plugins": "vdb",
+      "load-plugins": "pdal",
       "volume": true,
       "volume-inverse": true
     }
