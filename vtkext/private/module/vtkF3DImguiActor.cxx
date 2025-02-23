@@ -346,7 +346,6 @@ void vtkF3DImguiActor::RenderCheatSheet()
 
   float textHeight = 0.f;
   float winWidth = 0.f;
-  float winTop = marginTopBottom;
 
   for (const auto& [group, content] : this->CheatSheet)
   {
@@ -372,7 +371,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
   winWidth += 2.f * ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().ScrollbarSize;
   textHeight += 2.f * ImGui::GetStyle().WindowPadding.y;
 
-  winTop = std::max(marginTopBottom, (viewport->WorkSize.y - textHeight) * 0.5f);
+  const float winTop = std::max(marginTopBottom, (viewport->WorkSize.y - textHeight) * 0.5f);
 
   ::SetupNextWindow(ImVec2(marginLeft, winTop),
     ImVec2(winWidth, std::min(viewport->WorkSize.y - (2 * marginTopBottom), textHeight)));
