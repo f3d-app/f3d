@@ -153,7 +153,8 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       {"camera-zoom-factor", "", "Camera zoom factor (non-zero)", "<factor>", ""},
       {"camera-azimuth-angle", "", "Camera azimuth angle (in degrees), performed after other camera options", "<angle>", ""},
       {"camera-elevation-angle", "", "Camera elevation angle (in degrees), performed after other camera options", "<angle>", ""},
-      {"camera-orthographic", "", "Use an orthographic camera", "<bool>", "1"} } },
+      {"camera-orthographic", "", "Use an orthographic camera", "<bool>", "1"},
+      {"camera-orbit", "", "Specify the time to complete a camera orbit", "<seconds>", ""} } },
 
 #if F3D_MODULE_RAYTRACING
   {"Raytracing",
