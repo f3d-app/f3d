@@ -73,7 +73,7 @@ public:
     std::vector<double> CameraFocalPoint;
     std::vector<double> CameraViewUp;
     double CameraViewAngle;
-    std::vector<double> CameraDirection;
+    std::optional<f3d::direction_t> CameraDirection;
     double CameraZoomFactor;
     double CameraAzimuthAngle;
     double CameraElevationAngle;
@@ -133,10 +133,10 @@ public:
 
     bool reset = false;
     double zoomFactor = 0.9;
-    if (camConf.CameraPosition.size() != 3 && camConf.CameraDirection.size() == 3)
+    if (camConf.CameraPosition.size() != 3 && camConf.CameraDirection.has_value())
     {
       f3d::vector3_t dir;
-      std::copy_n(camConf.CameraDirection.begin(), 3, dir.begin());
+      std::copy_n(camConf.CameraDirection->data(), 3, dir.begin());
       f3d::point3_t foc;
       f3d::point3_t pos;
       cam.getFocalPoint(foc);
@@ -571,12 +571,17 @@ public:
     this->AppOptions.ColorMapFile =
       f3d::options::parse<std::string>(appOptions.at("colormap-file"));
 
+    std::optional<f3d::direction_t> camDir;
+    if (!appOptions.at("camera-direction").empty())
+    {
+      camDir = f3d::options::parse<f3d::direction_t>(appOptions.at("camera-direction"));
+    }
+
     this->AppOptions.CamConf = { f3d::options::parse<std::vector<double>>(
                                    appOptions.at("camera-position")),
       f3d::options::parse<std::vector<double>>(appOptions.at("camera-focal-point")),
       f3d::options::parse<std::vector<double>>(appOptions.at("camera-view-up")),
-      f3d::options::parse<double>(appOptions.at("camera-view-angle")),
-      f3d::options::parse<std::vector<double>>(appOptions.at("camera-direction")),
+      f3d::options::parse<double>(appOptions.at("camera-view-angle")), camDir,
       f3d::options::parse<double>(appOptions.at("camera-zoom-factor")),
       f3d::options::parse<double>(appOptions.at("camera-azimuth-angle")),
       f3d::options::parse<double>(appOptions.at("camera-elevation-angle")) };

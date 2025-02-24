@@ -1,8 +1,8 @@
 {
   "scene": {
     "up_direction": {
-      "type": "string",
-      "default_value": "+Y"
+      "type": "direction",
+      "default_value": "0,1,0"
     },
     "animation": {
       "autoplay": {

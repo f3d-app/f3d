@@ -151,7 +151,7 @@ public:
    * Initialize actors properties related to the up vector using the provided upString, including
    * the camera
    */
-  void InitializeUpVector(const std::string& upString);
+  void InitializeUpVector(const std::vector<double>& upVec);
 
   /**
    * Get the OpenGL skybox
