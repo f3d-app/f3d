@@ -490,8 +490,16 @@ public:
 
               try
               {
-                // Assume this is a libf3d option and set the value
-                libOptions.setAsString(libf3dOptionName, value);
+                // Assume this is a libf3d option
+                if (value == "Default")
+                {
+                  // "Default" is a special value that lets users reset a libf3d option
+                  libOptions.reset(libf3dOptionName);
+                }
+                else
+                {
+                  libOptions.setAsString(libf3dOptionName, value);
+                }
 
                 // Log the option if needed
                 if (logOptions)

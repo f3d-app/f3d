@@ -162,6 +162,8 @@ As documented, only the `--option=value` syntax is supported. The syntax `--opti
 
 All options are parsed according to their type, see the [parsing documentation](PARSING.md) for more details.
 
+It is possible to reset [libf3d options](../libf3d/OPTIONS.md) to their default value using the `--options=Default` syntax.
+
 ## Filename templating
 
 The destination filename used by `--output` or to save screenshots using `--screenshot-filename` can use the following template variables:
