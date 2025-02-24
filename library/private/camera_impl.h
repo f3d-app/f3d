@@ -82,6 +82,7 @@ public:
 private:
   class internals;
   std::unique_ptr<internals> Internals;
+  double orbit_time = 0.0;
 };
 }
 

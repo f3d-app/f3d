@@ -49,6 +49,9 @@ public:
   virtual camera& setState(const camera_state_t& state) = 0;
   [[nodiscard]] virtual camera_state_t getState() = 0;
   virtual void getState(camera_state_t& state) = 0;
+  virtual camera& setOrbitTime(double time) = 0;
+  [[nodiscard]] virtual double getOrbitTime() const = 0;
+  virtual void setOrbitTime(time) = 0;
   ///@}
 
   ///@{ @name Manipulation

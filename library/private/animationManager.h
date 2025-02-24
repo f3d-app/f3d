@@ -9,6 +9,7 @@
 #include <vtkNew.h>
 #include <vtkProgressBarWidget.h>
 #include <vtkSmartPointer.h>
+#include <vtkCamera.h>
 
 #include <chrono>
 #include <set>

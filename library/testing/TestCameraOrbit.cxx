@@ -22,9 +22,10 @@ int TestCameraOrbit(int argc, char* argv[])
   sce.loadAnimationTime(2.5); // Halfway through the orbit
 
   // Check camera position
-  vtkCamera* camera = sce.getWindow().getRenderWindow()->GetRenderers()->GetFirstRenderer()->GetActiveCamera();
+  vtkCamera* camera = 
+    sce.getWindow().getRenderWindow()->GetRenderers()->GetFirstRenderer()->GetActiveCamera();
   double* position = camera->GetPosition();
-  test("camera x position", std::abs(position[0] - 0.0) < 0.1); // Expect near zero x position
+  test("camera x position", std::abs(position[0] - 0.0) < 0.1);  // Expect near zero x position
   test("camera y position", std::abs(position[1] - 10.0) < 0.1); // Expect near radius y position
 
   inter.stopAnimation();
