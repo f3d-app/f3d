@@ -9,6 +9,8 @@
 #include <regex>
 #include <sstream>
 #include <regex>
+#include <vtkNamedColors.h>
+#include <vtkSmartPointer.h>
 
 namespace f3d
 {
@@ -223,6 +225,15 @@ color_t parse(const std::string& str)
       vec.push_back(std::stod(rgbMatch[i]) / 255.0);
     }
     return color_t(vec);
+  }
+
+  /* Named colors search */
+  vtkSmartPointer<vtkNamedColors> color = vtkSmartPointer<vtkNamedColors>::New();
+  if (color->ColorExists(s))
+  {
+    double rgba[4];
+    color->GetColor(s, rgba);
+    return color_t(rgba[0], rgba[1], rgba[2]);
   }
 
   try
