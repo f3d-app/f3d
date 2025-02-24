@@ -436,12 +436,15 @@ f3d_test(NAME TestInteractionSimpleExit DATA cow.vtp REGEXP "Interactor has been
 # Cheatsheet test with minimal resolution to avoid repeated change of baselines
 f3d_test(NAME TestInteractionCheatsheetWhiteBG DATA cow.vtp ARGS --background-color=1,1,1 INTERACTION UI) #H
 f3d_test(NAME TestInteractionCheatsheetBlackBG DATA cow.vtp ARGS --background-color=0,0,0 INTERACTION UI) #H
-f3d_test(NAME TestInteractionCheatsheetCentered DATA cow.vtp ARGS --resolution=500,1500 INTERACTION UI LONG_TIMEOUT) #H
 f3d_test(NAME TestInteractionCheatsheetNoFile INTERACTION UI NO_DATA_FORCE_RENDER) #HXM
 f3d_test(NAME TestInteractionCheatsheetScalars DATA dragon.vtu ARGS --scalar-coloring --coloring-component=-2 INTERACTION UI LONG_TIMEOUT) #HSSS
 f3d_test(NAME TestInteractionCheatsheetOpacity DATA cow.vtp INTERACTION UI ARGS --opacity=0.5 RESOLUTION 300,700) #H;ScrollDown
 f3d_test(NAME TestInteractionCheatsheetAnimationName DATA InterpolationTest.glb ARGS --animation-index=6 INTERACTION UI) #HWWW
 f3d_test(NAME TestInteractionCheatsheetConfigFile DATA dragon.vtu CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json INTERACTION UI) #H;ScrollDown
+
+if(NOT F3D_MODULE_RAYTRACING)
+  f3d_test(NAME TestInteractionCheatsheetCentered DATA cow.vtp ARGS --resolution=500,1500 INTERACTION UI LONG_TIMEOUT) #H
+endif()
 
 f3d_test(NAME TestCameraPersp DATA Cameras.gltf ARGS --camera-index=0)
 f3d_test(NAME TestCameraOrtho DATA Cameras.gltf ARGS --camera-index=1)
