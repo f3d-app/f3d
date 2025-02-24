@@ -50,6 +50,8 @@ public:
   camera& setState(const camera_state_t& state) override;
   camera_state_t getState() override;
   void getState(camera_state_t& state) override;
+  camera& setOrbitTime(double time) override;
+  double getOrbitTime() const override;
 
   camera& dolly(double val) override;
   camera& pan(double right, double up, double forward) override;

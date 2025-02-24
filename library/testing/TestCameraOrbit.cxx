@@ -32,4 +32,4 @@ int TestCameraOrbit(int argc, char* argv[])
   test("isPlaying after stop", !inter.isPlayingAnimation());
 
   return test.result();
-} 
+  } 
