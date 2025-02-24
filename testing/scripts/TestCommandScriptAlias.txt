@@ -1,0 +1,2 @@
+alias myrotate roll_camera 90
+myrotate
