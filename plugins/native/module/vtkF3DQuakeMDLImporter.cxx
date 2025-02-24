@@ -388,7 +388,7 @@ public:
     renderer->SetBackground(0, 0, 0);
     this->Mapper = mapper;
   }
-
+  
   //----------------------------------------------------------------------------
   void SetFrameRate(double frameRate)
   {
