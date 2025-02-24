@@ -1,0 +1,10 @@
+[
+  {
+    "match": ".*(las)",
+    "options": {
+      "load-plugins": "pdal",
+      "volume": true,
+      "volume-inverse": true
+    }
+  }
+]
