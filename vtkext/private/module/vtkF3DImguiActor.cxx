@@ -289,6 +289,77 @@ void vtkF3DImguiActor::ReleaseGraphicsResources(vtkWindow* w)
 vtkF3DImguiActor::~vtkF3DImguiActor() = default;
 
 //----------------------------------------------------------------------------
+void vtkF3DImguiActor::RenderDropZone()
+{
+  if (this->DropZoneVisible)
+  {
+    ImGuiViewport* viewport = ImGui::GetMainViewport();
+    constexpr ImU32 color = IM_COL32(255, 255, 255, 255);
+    constexpr float tickThickness = 3.0f;
+    constexpr float tickHalfThickness = tickThickness * 0.5f;
+    constexpr float tickLength = 10.0f;
+
+    int dropzonePad = static_cast<int>(std::min(viewport->WorkSize.x, viewport->WorkSize.y) * 0.1);
+    int dropZoneW = viewport->WorkSize.x - dropzonePad * 2;
+    int dropZoneH = viewport->WorkSize.y - dropzonePad * 2;
+
+    ::SetupNextWindow(ImVec2(0, 0), viewport->WorkSize);
+    ImGui::SetNextWindowBgAlpha(0.f);
+
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
+      ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
+
+    ImGui::Begin("DropZoneText", nullptr, flags);
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+    ImVec2 p0(dropzonePad, dropzonePad);
+    ImVec2 p1(dropZoneW + dropzonePad, dropZoneH + dropzonePad);
+    int tickNumberW = static_cast<int>(std::ceil(dropZoneW / (tickLength * 2.0f)));
+    int tickNumberH = static_cast<int>(std::ceil(dropZoneH / (tickLength * 2.0f)));
+
+    double tickSpaceW = static_cast<double>((dropZoneW / (tickNumberW - 2)));
+    double tickSpaceH = static_cast<double>((dropZoneH / (tickNumberH - 2)));
+
+    double tickBBSizeW = tickLength + tickSpaceW;
+    double tickBBSizeH = tickLength + tickSpaceH;
+
+    // Draw top and bottom line
+    for (float x = p0.x - tickHalfThickness; x < p1.x - tickBBSizeW; x += tickBBSizeW)
+    {
+      draw_list->AddLine(ImVec2(x, p0.y), ImVec2(x + tickLength, p0.y), color, tickThickness);
+      draw_list->AddLine(ImVec2(x, p1.y), ImVec2(x + tickLength, p1.y), color, tickThickness);
+    }
+
+    draw_list->AddLine(ImVec2(p1.x - tickLength, p0.y), ImVec2(p1.x + tickHalfThickness, p0.y),
+      color, tickThickness);
+    draw_list->AddLine(ImVec2(p1.x - tickLength, p1.y), ImVec2(p1.x + tickHalfThickness, p1.y),
+      color, tickThickness);
+
+    // Draw left and right line
+    for (float y = p0.y - tickHalfThickness; y < p1.y - tickBBSizeH; y += tickBBSizeH)
+    {
+      draw_list->AddLine(ImVec2(p0.x, y), ImVec2(p0.x, y + tickLength), color, tickThickness);
+      draw_list->AddLine(ImVec2(p1.x, y), ImVec2(p1.x, y + tickLength), color, tickThickness);
+    }
+
+    draw_list->AddLine(ImVec2(p0.x, p1.y - tickLength), ImVec2(p0.x, p1.y + tickHalfThickness),
+      color, tickThickness);
+    draw_list->AddLine(ImVec2(p1.x, p1.y - tickLength), ImVec2(p1.x, p1.y + tickHalfThickness),
+      color, tickThickness);
+
+    ImGui::End();
+
+    ImVec2 dropTextSize = ImGui::CalcTextSize(this->DropText.c_str());
+
+    ImGui::Begin("DropZoneText", nullptr, flags);
+    ImGui::SetCursorPos(ImVec2(viewport->GetWorkCenter().x - 0.5f * dropTextSize.x,
+      viewport->GetWorkCenter().y - 0.5f * dropTextSize.y));
+    ImGui::TextUnformatted(this->DropText.c_str());
+    ImGui::End();
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderFileName()
 {
   if (!this->FileName.empty())
