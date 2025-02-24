@@ -239,9 +239,9 @@ void animationManager::Tick()
     }
 
     // Check if camera orbit option is enabled
-    if (this->Options.scene.camera.orbitTime > 0)
+    if (this->Options.scene.camera.getOrbitTime() > 0)
     {
-      double orbitTime = this->Options.scene.camera.orbitTime;
+      double orbitTime = this->Options.scene.camera.getOrbitTime();
       double angle = 360.0 * (this->CurrentTime / orbitTime);
 
       // Calculate new camera position based on orbit
