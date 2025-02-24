@@ -9,8 +9,9 @@
 int TestF3DQuakeMDLImporter(int vtkNotUsed(argc), char* argv[])
 {
   std::string filename =
-    std::string(argv[1]) + "data/glaunch_2.mdl"; // File was modified to add coverage.
+    std::string(argv[1]) + "data/zombie_2.mdl"; // File was modified to add coverage.
   vtkNew<vtkF3DQuakeMDLImporter> importer;
+  std::cout << filename;
   importer->SetFileName(filename);
   importer->Update();
   importer->Print(cout);
@@ -19,8 +20,8 @@ int TestF3DQuakeMDLImporter(int vtkNotUsed(argc), char* argv[])
   {
     importer->DisableAnimation(i);
   }
-  vtkIdType selectedAnimationIndex = 1;
+  vtkIdType selectedAnimationIndex = 0;
   importer->EnableAnimation(selectedAnimationIndex);
   std::string animationName = importer->GetAnimationName(0);
-  return numAnimations == 2 && animationName == "stand" ? EXIT_SUCCESS : EXIT_FAILURE;
+  return numAnimations == 1 && animationName == "frame" ? EXIT_SUCCESS : EXIT_FAILURE;
 }
