@@ -76,4 +76,4 @@ The following formats are supported when parsing a string into a direction:
 - [+/-][X/Y/Z]
 - vector of three doubles
 
-When formating a direction into a string, it is formatted as a vector of doubles.
+When formatting a direction into a string, it is formatted as a vector of doubles.
