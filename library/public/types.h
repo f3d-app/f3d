@@ -85,7 +85,7 @@ private:
  * A base template type for an array of double
  */
 template<unsigned int N>
-class F3D_EXPORT double_array_t
+class double_array_t
 {
 public:
   double_array_t() = default;
@@ -148,30 +148,30 @@ private:
 class F3D_EXPORT color_t : public double_array_t<3>
 {
 public:
-  color_t() = default;
-  color_t(const std::vector<double>& vec)
+  inline color_t() = default;
+  inline color_t(const std::vector<double>& vec)
     : double_array_t(vec)
   {
   }
-  color_t(const std::initializer_list<double>& list)
+  inline color_t(const std::initializer_list<double>& list)
     : double_array_t(list)
   {
   }
-  color_t(double red, double green, double blue)
+  inline color_t(double red, double green, double blue)
   {
     (*this)[0] = red;
     (*this)[1] = green;
     (*this)[2] = blue;
   }
-  double r() const
+  inline double r() const
   {
     return (*this)[0];
   }
-  double g() const
+  inline double g() const
   {
     return (*this)[1];
   }
-  double b() const
+  inline double b() const
   {
     return (*this)[2];
   }
@@ -183,30 +183,30 @@ public:
 class F3D_EXPORT direction_t : public double_array_t<3>
 {
 public:
-  direction_t() = default;
-  direction_t(const std::vector<double>& vec)
+  inline direction_t() = default;
+  inline direction_t(const std::vector<double>& vec)
     : double_array_t(vec)
   {
   }
-  direction_t(const std::initializer_list<double>& list)
+  inline direction_t(const std::initializer_list<double>& list)
     : double_array_t(list)
   {
   }
-  direction_t(double x, double y, double z)
+  inline direction_t(double x, double y, double z)
   {
     (*this)[0] = x;
     (*this)[1] = y;
     (*this)[2] = z;
   }
-  double x() const
+  inline double x() const
   {
     return (*this)[0];
   }
-  double y() const
+  inline double y() const
   {
     return (*this)[1];
   }
-  double z() const
+  inline double z() const
   {
     return (*this)[2];
   }
