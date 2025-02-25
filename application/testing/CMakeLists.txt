@@ -394,7 +394,7 @@ if(NOT F3D_MACOS_BUNDLE)
   f3d_test(NAME TestDefaultConfigFileSTL DATA suzanne.stl CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
   f3d_test(NAME TestDefaultConfigFileTIFF DATA f3d.tif CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI) # Note: This tests config file order as camera_direction is set in different files
   f3d_test(NAME TestDefaultConfigFilePLY DATA suzanneRGBA.ply CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
-  f3d_test(NAME TestDefaultConfigFileQuakeMDL DATA zombie.mdl CONFIG config_build LONG_TIMEOUT UI)
+  f3d_test(NAME TestDefaultConfigFileQuakeMDL DATA zombie.mdl CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
   f3d_test(NAME TestDefaultConfigFileAndCommand DATA suzanne.stl ARGS --up=-Y --camera-direction=-1,0.5,-1 CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
   f3d_test(NAME TestDefaultConfigTranslucent DATA red_translucent_monkey.gltf CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
 
@@ -403,7 +403,7 @@ if(NOT F3D_MACOS_BUNDLE)
   f3d_test(NAME TestThumbnailConfigFileVTI DATA vase_4comp.vti CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
   f3d_test(NAME TestThumbnailConfigFileSTL DATA suzanne.stl CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
   f3d_test(NAME TestThumbnailConfigFilePLY DATA suzanneRGBA.ply CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
-  f3d_test(NAME TestThumbnailConfigFileQuakeMDL DATA zombie.mdl CONFIG thumbnail_build LONG_TIMEOUT)
+  f3d_test(NAME TestThumbnailConfigFileQuakeMDL DATA zombie.mdl CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
 endif()
 
 # color texture with opacity needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9467
