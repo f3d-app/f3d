@@ -193,11 +193,6 @@ public:
     textureCoordinates->SetNumberOfComponents(2);
     textureCoordinates->SetName("TextureCoordinates");
     textureCoordinates->Allocate(header->numTriangles * 3);
-    struct plugin_texture_coords
-    {
-      float coord_s;
-      float coord_t;
-    };
     for (int i = 0; i < header->numTriangles; i++)
     {
       for (int vertex : triangles[i].vertex)

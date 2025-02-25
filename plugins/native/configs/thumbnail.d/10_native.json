@@ -47,8 +47,7 @@
   },
   {
     "match": ".*(mdl)",
-    "options":
-    {
+    "options": {
       "up": "+Z",
       "animation-index": "-1"
     }
