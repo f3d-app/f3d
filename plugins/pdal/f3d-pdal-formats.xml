@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
-  <mime-type type="application/vnd.pdal">
+  <mime-type type="application/vnd.las">
     <comment>LAS file</comment>
     <glob pattern="*.las"/>
   </mime-type>

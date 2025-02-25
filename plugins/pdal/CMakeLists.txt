@@ -19,7 +19,6 @@ f3d_plugin_declare_reader(
   MIMETYPES application/vnd.las
   VTK_READER vtkPDALReader
   FORMAT_DESCRIPTION "LAS"
-  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/pdal.inl"
 )
 
 f3d_plugin_build(
