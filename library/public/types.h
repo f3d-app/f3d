@@ -145,7 +145,7 @@ private:
 /**
  * Describe a RGB color.
  */
-class F3D_EXPORT color_t : public double_array_t<3>
+class color_t : public double_array_t<3>
 {
 public:
   inline color_t() = default;
