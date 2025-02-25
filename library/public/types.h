@@ -105,19 +105,19 @@ public:
     }
     std::copy_n(list.begin(), N, this->Array.begin());
   }
-  operator std::vector<double>() const
+  [[nodiscard]] operator std::vector<double>() const
   {
     return std::vector<double>(this->Array.begin(), this->Array.end());
   }
-  bool operator==(const double_array_t& other) const
+  [[nodiscard]] bool operator==(const double_array_t& other) const
   {
     return this->Array == other.Array;
   }
-  bool operator!=(const double_array_t& other) const
+  [[nodiscard]] bool operator!=(const double_array_t& other) const
   {
     return this->Array != other.Array;
   }
-  double operator[](size_t i) const
+  [[nodiscard]] double operator[](size_t i) const
   {
     if (i >= N)
     {
@@ -125,7 +125,7 @@ public:
     }
     return this->Array[i];
   }
-  double& operator[](size_t i)
+  [[nodiscard]] double& operator[](size_t i)
   {
     if (i >= N)
     {
@@ -133,7 +133,7 @@ public:
     }
     return this->Array[i];
   }
-  const double* data() const
+  [[nodiscard]] const double* data() const
   {
     return this->Array.data();
   }
@@ -163,15 +163,15 @@ public:
     (*this)[1] = green;
     (*this)[2] = blue;
   }
-  inline double r() const
+  [[nodiscard]] inline double r() const
   {
     return (*this)[0];
   }
-  inline double g() const
+  [[nodiscard]] inline double g() const
   {
     return (*this)[1];
   }
-  inline double b() const
+  [[nodiscard]] inline double b() const
   {
     return (*this)[2];
   }
@@ -198,15 +198,15 @@ public:
     (*this)[1] = y;
     (*this)[2] = z;
   }
-  inline double x() const
+  [[nodiscard]] inline double x() const
   {
     return (*this)[0];
   }
-  inline double y() const
+  [[nodiscard]] inline double y() const
   {
     return (*this)[1];
   }
-  inline double z() const
+  [[nodiscard]] inline double z() const
   {
     return (*this)[2];
   }
