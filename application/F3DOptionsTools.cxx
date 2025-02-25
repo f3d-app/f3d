@@ -524,11 +524,31 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
       throw F3DExNoProcess("reader list requested");
     }
 
+    F3DOptionsTools::OptionsDict cliOptionsDict;
+
     // Check for unknown options and log them
     auto unmatched = result.unmatched();
     bool foundUnknownOption = false;
-    for (const std::string& unknownOption : unmatched)
+    for (std::string unknownOption : unmatched)
     {
+      // First check for "reset-" options
+      if (unknownOption.rfind("--reset-", 0) == 0)
+      {
+        std::string optionToReset = unknownOption.substr(8);
+        auto [closestName, dist] = F3DOptionsTools::GetClosestOption(optionToReset);
+        if (dist == 0)
+        {
+          // recognized an option to reset, log it and continue
+          cliOptionsDict.emplace("reset", optionToReset);
+          continue;
+        }
+        else
+        {
+          f3d::log::error("Unknown option to reset '", unknownOption, "'");
+          unknownOption = optionToReset;
+        }
+      }
+
       f3d::log::error("Unknown option '", unknownOption, "'");
       foundUnknownOption = true;
 
@@ -554,7 +574,6 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
     }
 
     // Add each CLI options into a vector of string/string and return it
-    F3DOptionsTools::OptionsDict cliOptionsDict;
     for (const auto& res : result)
     {
       // Discard boolean option like `--version` or `--help`
