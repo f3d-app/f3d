@@ -27,7 +27,7 @@
 - duck.fbx: assimp test models: BSD-3-Clause
 - Duck0.bin: Copyright 2006 Sony Computer Entertainment Inc.: SCEA Shared Source License
 - duck_invalid.gltf: Copyright 2006 Sony Computer Entertainment Inc.: SCEA Shared Source License
-- zombie*.mdl : LibreQuake Project : BSD 3-Clause License
+- zombie*.mdl: LibreQuake Project: BSD-3-Clause
 - HeadMRVolume*: VTK Data: BSD-3-Clause
 - icosahedron.vdb: OpenVDB: [MPL-2.0](http://www.mozilla.org/MPL/2.0/)
 - iflamigm.3ds: VTK Data: BSD-3-Clause
