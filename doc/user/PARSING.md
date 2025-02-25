@@ -10,7 +10,7 @@ The following types are supported:
 - ratio: A double dividend over a double divisor, stored in a double.
 - string: A string of characters.
 - color: A RGB color
-- direction: A 3D vector for a direction
+- direction: A 3D vector representing a direction
 
 As well as a list for bool, int, double, ratio, string, noted as
 
