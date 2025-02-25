@@ -180,7 +180,7 @@ public:
 /**
  * Describe a 3D direction.
  */
-class F3D_EXPORT direction_t : public double_array_t<3>
+class direction_t : public double_array_t<3>
 {
 public:
   inline direction_t() = default;
