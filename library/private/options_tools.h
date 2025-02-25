@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <regex>
 #include <sstream>
+#include <vtkMath.h>
 #include <vtkNamedColors.h>
 #include <vtkSmartPointer.h>
 
@@ -218,6 +219,23 @@ color_t parse(const std::string& str)
       std::stod(rgbMatch[1]) / 255.0,  //
       std::stod(rgbMatch[2]) / 255.0,  //
       std::stod(rgbMatch[3]) / 255.0); //
+  }
+
+  /* HSV format search */
+  const std::regex hsvRegex(
+    "^hsv\\((\\d{1,3}),(\\d{1,3})%,(\\d{1,3})%\\)$", std::regex_constants::icase);
+  std::smatch hsvMatch;
+  if (std::regex_search(s, hsvMatch, hsvRegex))
+  {
+    double rgb[3];
+    vtkMath::HSVToRGB(                //
+      std::stod(hsvMatch[1]) / 360.0, //
+      std::stod(hsvMatch[2]) / 100.0, //
+      std::stod(hsvMatch[3]) / 100.0, //
+      &rgb[0],                        //
+      &rgb[1],                        //
+      &rgb[2]);                       //
+    return color_t(rgb[0], rgb[1], rgb[2]);
   }
 
   /* Named colors search */
