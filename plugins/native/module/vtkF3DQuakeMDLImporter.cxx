@@ -200,11 +200,11 @@ public:
     };
     for (int i = 0; i < header->numTriangles; i++)
     {
-      for (int j = 0; j < 3; j++)
+      for (int vertex : triangles[i].vertex)
       {
-        float coord_s = texcoords[triangles[i].vertex[j]].coord_s;
-        float coord_t = texcoords[triangles[i].vertex[j]].coord_t;
-        if (!triangles[i].facesFront && texcoords[triangles[i].vertex[j]].onseam)
+        float coord_s = texcoords[vertex].coord_s;
+        float coord_t = texcoords[vertex].coord_t;
+        if (!triangles[i].facesFront && texcoords[vertex].onseam)
         {
           coord_s = coord_s + header->skinWidth * 0.5f; // Backface
         }
@@ -388,7 +388,7 @@ public:
     renderer->SetBackground(0, 0, 0);
     this->Mapper = mapper;
   }
-  
+
   //----------------------------------------------------------------------------
   void SetFrameRate(double frameRate)
   {
