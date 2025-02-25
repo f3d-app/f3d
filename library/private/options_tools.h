@@ -8,7 +8,6 @@
 #include <cassert>
 #include <regex>
 #include <sstream>
-#include <regex>
 #include <vtkNamedColors.h>
 #include <vtkSmartPointer.h>
 
@@ -196,35 +195,30 @@ ratio_t parse(const std::string& str)
 template<>
 color_t parse(const std::string& str)
 {
-  std::string s = options_tools::trim(str);
-  std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return std::tolower(c); });
+  const std::string s = std::regex_replace(str, std::regex("\\s"), "");
 
   /* Hex format search */
-  const std::regex hexRegex("^#([0-9a-fA-F]{6})$");
+  const std::regex hexRegex(
+    "^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$", std::regex_constants::icase);
   std::smatch hexMatch;
   if (std::regex_search(s, hexMatch, hexRegex))
   {
-    std::vector<double> vec;
-    const std::string hexStr = hexMatch[1];
-    for (size_t i = 0; i < hexStr.length(); i += 2)
-    {
-      unsigned int byte = std::stoul(hexStr.substr(i, 2), nullptr, 16);
-      vec.push_back(byte / 255.0);
-    }
-    return color_t(vec);
+    return color_t(                                  //
+      std::stoul(hexMatch[1], nullptr, 16) / 255.0,  //
+      std::stoul(hexMatch[2], nullptr, 16) / 255.0,  //
+      std::stoul(hexMatch[3], nullptr, 16) / 255.0); //
   }
 
-  /* RGB format search */ 
-  const std::regex rgbRegex("^rgb\\((\\s*\\d{1,3})\\s*,\\s*(\\d{1,3})\\s*,\\s*(\\d{1,3})\\s*\\)$", std::regex_constants::syntax_option_type::icase);
+  /* RGB format search */
+  const std::regex rgbRegex(
+    "^rgb\\((\\d{1,3}),(\\d{1,3}),(\\d{1,3})\\)$", std::regex_constants::icase);
   std::smatch rgbMatch;
   if (std::regex_search(s, rgbMatch, rgbRegex))
   {
-    std::vector<double> vec;
-    for (size_t i = 1; i < rgbMatch.size(); i++)
-    {
-      vec.push_back(std::stod(rgbMatch[i]) / 255.0);
-    }
-    return color_t(vec);
+    return color_t(                    //
+      std::stod(rgbMatch[1]) / 255.0,  //
+      std::stod(rgbMatch[2]) / 255.0,  //
+      std::stod(rgbMatch[3]) / 255.0); //
   }
 
   /* Named colors search */
