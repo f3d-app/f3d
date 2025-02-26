@@ -27,7 +27,7 @@
 - duck.fbx: assimp test models: BSD-3-Clause
 - Duck0.bin: Copyright 2006 Sony Computer Entertainment Inc.: SCEA Shared Source License
 - duck_invalid.gltf: Copyright 2006 Sony Computer Entertainment Inc.: SCEA Shared Source License
-- HeadMRVolume*: VTK Data: BSD-3-Clause
+- HeadMRVolume\*: VTK Data: BSD-3-Clause
 - icosahedron.vdb: OpenVDB: [MPL-2.0](http://www.mozilla.org/MPL/2.0/)
 - iflamigm.3ds: VTK Data: BSD-3-Clause
 - IM-0001-1983.dcm: VTK Data: BSD-3-Clause
@@ -56,7 +56,7 @@
 - vase_4comp.vti: VTK Data: BSD-3-Clause
 - WaterBottle.glb: glTF-Sample-Models: Public Domain
 - world\*: VTK Data: BSD-3-Clause
-- zombie*.mdl: LibreQuake Project: BSD-3-Clause
+- zombie\*.mdl: LibreQuake Project: BSD-3-Clause
 - 16bits.\*: @bisechen: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - (ノಠ益ಠ )ノ.vtp: VTK Data: BSD-3-Clause
 
