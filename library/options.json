@@ -24,10 +24,6 @@
       },
       "orthographic": {
         "type": "bool"
-      },
-      "orbit_time": {
-        "type": "double",
-        "default": 0.0
       }
     }
   },
