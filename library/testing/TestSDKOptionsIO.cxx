@@ -127,6 +127,7 @@ int TestSDKOptionsIO(int argc, char* argv[])
   test.parse<f3d::color_t>("color_t", " HSV( 240 , 100 % , 100 % )", { 0.0, 0.0, 1.0 });
   test.parse<f3d::color_t>("color_t", "hsl( 240 , 100 % , 50 % )", { 0.0, 0.0, 1.0 });
   test.parse<f3d::color_t>("color_t", "hwb(240,0%,0%)", { 0.0, 0.0, 1.0 });
+  test.parse<f3d::color_t>("color_t", "cmyk(100,100%,0,0)", { 0.0, 0.0, 1.0 });
   test.parse_expect<f3d::color_t, parsing_exception>("incorrect size color_t", "0.1,0.2,0.3,0.4");
   test.format<f3d::color_t>("color_t", { 0.1, 0.2, 0.3 }, "0.1,0.2,0.3");
 

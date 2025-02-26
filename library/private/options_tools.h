@@ -275,6 +275,23 @@ color_t parse(const std::string& str)
     }
   }
 
+  /* CMYK format search */
+  const std::regex cmykRegex(
+    "^cmyk\\((\\d{1,3})%{0,1},(\\d{1,3})%{0,1},(\\d{1,3})%{0,1},(\\d{1,3})%{0,1}\\)$",
+    std::regex_constants::icase);
+  std::smatch cmykMatch;
+  if (std::regex_search(s, cmykMatch, cmykRegex))
+  {
+    double c = std::stod(cmykMatch[1]) / 100.0;
+    double m = std::stod(cmykMatch[2]) / 100.0;
+    double y = std::stod(cmykMatch[3]) / 100.0;
+    double k = std::stod(cmykMatch[4]) / 100.0;
+    return color_t(           //   
+      (1.0 - c) * (1.0 - k),  //
+      (1.0 - m) * (1.0 - k),  //
+      (1.0 - y) * (1.0 - k)); //
+  }
+
   /* Named colors search */
   vtkSmartPointer<vtkNamedColors> color = vtkSmartPointer<vtkNamedColors>::New();
   if (color->ColorExists(s))
