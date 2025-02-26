@@ -7,6 +7,7 @@
 #include "vtkF3DCachedSpecularTexture.h"
 #include "vtkF3DDropZoneActor.h"
 #include "vtkF3DOpenGLGridMapper.h"
+#include "vtkF3DOverlayRenderPass.h"
 #include "vtkF3DRenderPass.h"
 #include "vtkF3DUserRenderPass.h"
 
@@ -400,6 +401,11 @@ void vtkF3DRenderer::ConfigureRenderPasses()
         F3DLog::Severity::Warning, "Final shader must define a function named \"pixel\"");
     }
   }
+
+  vtkNew<vtkF3DOverlayRenderPass> overlayP;
+  overlayP->SetDelegatePass(renderingPass);
+  this->SetPass(overlayP);
+  renderingPass = overlayP;
 
   this->SetPass(renderingPass);
 
