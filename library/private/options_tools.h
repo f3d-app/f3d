@@ -239,6 +239,23 @@ color_t parse(const std::string& str)
     return color_t(rgb[0], rgb[1], rgb[2]);
   }
 
+  /* HSL format search */
+  const std::regex hslRegex(
+    "^hsl\\((\\d{1,3}),(\\d{1,3})%,(\\d{1,3})%\\)$", std::regex_constants::icase);
+  std::smatch hslMatch;
+  if (std::regex_search(s, hslMatch, hslRegex))
+  {
+    double rgb[3];
+    double s = std::stod(hslMatch[2]) / 100.0;
+    double l = std::stod(hslMatch[3]) / 100.0;
+    /* Convert to HSV values */
+    double v = l + s * std::min(l, 1.0 - l);
+    double sv = (v == 0.0) ? 0.0 : (2.0 * (1.0 - l / v));
+
+    vtkMath::HSVToRGB(std::stod(hslMatch[1]) / 360.0, sv, v, &rgb[0], &rgb[1], &rgb[2]);
+    return color_t(rgb[0], rgb[1], rgb[2]);
+  }
+
   /* Named colors search */
   vtkSmartPointer<vtkNamedColors> color = vtkSmartPointer<vtkNamedColors>::New();
   if (color->ColorExists(s))
