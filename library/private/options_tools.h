@@ -189,14 +189,15 @@ ratio_t parse(const std::string& str)
 //----------------------------------------------------------------------------
 /**
  * Parse provided string into a color_t.
- * Supported formats: "R,G,B"
- * rely on parse<std::vector<double>>(str)
+ * Supported formats: "R,G,B", "#RRGGBB", "rgb(R,G,B)", "hsl(H,S%,L%)", "hsv(H,S%,V%)",
+ *                    "hwb(H,W%,B%)", cmyk(C%,M%,Y%,K%), "CSS3 color name"
  * Can throw options::parsing_exception in case of failure to parse
  */
 template<>
 color_t parse(const std::string& str)
 {
   const std::string s = std::regex_replace(str, std::regex("\\s"), "");
+  double rgb[3]{};
 
   /* Hex format search */
   const std::regex hexRegex(
@@ -216,10 +217,14 @@ color_t parse(const std::string& str)
   std::smatch rgbMatch;
   if (std::regex_search(s, rgbMatch, rgbRegex))
   {
-    return color_t(                    //
-      std::stod(rgbMatch[1]) / 255.0,  //
-      std::stod(rgbMatch[2]) / 255.0,  //
-      std::stod(rgbMatch[3]) / 255.0); //
+    rgb[0] = std::stod(rgbMatch[1]) / 255.0;
+    rgb[1] = std::stod(rgbMatch[2]) / 255.0;
+    rgb[2] = std::stod(rgbMatch[3]) / 255.0;
+    if (rgb[0] > 1.0 || rgb[1] > 1.0 || rgb[2] > 1.0)
+    {
+      throw options::parsing_exception("Cannot parse " + str + " into a color_t");
+    }
+    return color_t(rgb[0], rgb[1], rgb[2]);
   }
 
   /* Hue-based format search: hsl, hsv, hwb */
@@ -228,51 +233,38 @@ color_t parse(const std::string& str)
   std::smatch hueMatch;
   if (std::regex_search(s, hueMatch, hueRegex))
   {
-    double rgb[3]{};
+    double h = std::stod(hueMatch[2]) / 360.0;
+    double s = std::stod(hueMatch[3]) / 100.0;
+    double v = std::stod(hueMatch[4]) / 100.0;
+    if (h > 1.0 || s > 1.0 || v > 1.0)
+    {
+      throw options::parsing_exception("Cannot parse " + str + " into a color_t");
+    }
+
     std::string hueFormat = hueMatch[1].str();
     std::transform(hueFormat.begin(), hueFormat.end(), hueFormat.begin(),
       [](unsigned char c) { return std::tolower(c); });
     if (hueFormat == "hsl")
     {
-      double sl = std::stod(hueMatch[3]) / 100.0;
       double l = std::stod(hueMatch[4]) / 100.0;
-      double v = l + sl * std::min(l, 1.0 - l);
-      double s = (v == 0.0) ? 0.0 : (2.0 * (1.0 - l / v));
-      vtkMath::HSVToRGB(                //
-        std::stod(hueMatch[2]) / 360.0, //
-        s,                              //
-        v,                              //
-        &rgb[0],                        //
-        &rgb[1],                        //
-        &rgb[2]);                       //
+      v = l + s * std::min(l, 1.0 - l);
+      s = (v == 0.0) ? 0.0 : (2.0 * (1.0 - l / v));
+      vtkMath::HSVToRGB(h, s, v, &rgb[0], &rgb[1], &rgb[2]);
       return color_t(rgb[0], rgb[1], rgb[2]);
     }
     if (hueFormat == "hsv")
     {
-      vtkMath::HSVToRGB(                //
-        std::stod(hueMatch[2]) / 360.0, //
-        std::stod(hueMatch[3]) / 100.0, //
-        std::stod(hueMatch[4]) / 100.0, //
-        &rgb[0],                        //
-        &rgb[1],                        //
-        &rgb[2]);                       //
+      vtkMath::HSVToRGB(h, s, v, &rgb[0], &rgb[1], &rgb[2]);
       return color_t(rgb[0], rgb[1], rgb[2]);
     }
     if (hueFormat == "hwb")
     {
-      double w = std::stod(hueMatch[3]) / 100.0;
-      double b = std::stod(hueMatch[4]) / 100.0;
-      double v = 1 - b;
-      double s = 1 - (w / v);
-      vtkMath::HSVToRGB(                //
-        std::stod(hueMatch[2]) / 360.0, //
-        s,                              //
-        v,                              //
-        &rgb[0],                        //
-        &rgb[1],                        //
-        &rgb[2]);                       //
+      v = 1 - v;
+      s = 1 - (s / v);
+      vtkMath::HSVToRGB(h, s, v, &rgb[0], &rgb[1], &rgb[2]);
       return color_t(rgb[0], rgb[1], rgb[2]);
     }
+    throw options::parsing_exception("Cannot parse " + str + " into a color_t");
   }
 
   /* CMYK format search */
@@ -286,7 +278,11 @@ color_t parse(const std::string& str)
     double m = std::stod(cmykMatch[2]) / 100.0;
     double y = std::stod(cmykMatch[3]) / 100.0;
     double k = std::stod(cmykMatch[4]) / 100.0;
-    return color_t(           //   
+    if (c > 1.0 || m > 1.0 || y > 1.0 || k > 1.0)
+    {
+      throw options::parsing_exception("Cannot parse " + str + " into a color_t");
+    }
+    return color_t(           //
       (1.0 - c) * (1.0 - k),  //
       (1.0 - m) * (1.0 - k),  //
       (1.0 - y) * (1.0 - k)); //
