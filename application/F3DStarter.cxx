@@ -465,8 +465,11 @@ public:
           if (source.empty() || std::regex_match(inputFile, matches, re))
           {
             // For each option key/value
-            for (auto const& [key, value] : conf)
+            for (auto const& [originalKey, value] : conf)
             {
+              // TODO why needed ?
+              std::string key = originalKey;
+
               // Check in appOptions first
               auto appIter = appOptions.find(key);
               if (appIter != appOptions.end())
@@ -479,10 +482,18 @@ public:
                 continue;
               }
 
-              std::string libf3dOptionName = key;
+              // Check if its a "reset"
+              bool reset = false;
+              if (key == "reset")
+              {
+                // "reset" is a special option name that lets users reset a libf3d option
+                reset = true;
+                key = value;
+              }
 
               // Convert key into a libf3d option name if possible
-              auto libf3dIter = F3DOptionsTools::LibOptionsNames.find(key);
+              std::string libf3dOptionName = key;
+              auto libf3dIter = F3DOptionsTools::LibOptionsNames.find(libf3dOptionName);
               if (libf3dIter != F3DOptionsTools::LibOptionsNames.end())
               {
                 libf3dOptionName = std::string(libf3dIter->second);
@@ -490,13 +501,21 @@ public:
 
               try
               {
-                // Assume this is a libf3d option and set the value
-                libOptions.setAsString(libf3dOptionName, value);
+                if (reset)
+                {
+                  libOptions.reset(libf3dOptionName);
+                }
+                else
+                {
+                  libOptions.setAsString(libf3dOptionName, value);
+                }
 
                 // Log the option if needed
                 if (logOptions)
                 {
-                  loggingMap.emplace(libf3dOptionName, std::tuple(key, source, pattern, value));
+                  if (reset)
+                    std::cout<<"reset logging: "<<libf3dOptionName<<std::endl;
+                  loggingMap.emplace(libf3dOptionName, std::tuple(key, source, pattern, reset ? "reset" : value));
                 }
               }
               catch (const f3d::options::parsing_exception& ex)
@@ -512,7 +531,7 @@ public:
                   source.empty() ? pattern : source.string() + ":`" + pattern + "`";
                 auto [closestName, dist] =
                   F3DOptionsTools::GetClosestOption(libf3dOptionName, true);
-                f3d::log::warn("'", key, "' option from ", origin,
+                f3d::log::warn("'", libf3dOptionName, "' option from ", origin,
                   " does not exists , did you mean '", closestName, "'?");
               }
             }
