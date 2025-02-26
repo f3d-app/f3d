@@ -237,24 +237,6 @@ void animationManager::Tick()
     {
       this->Window.render();
     }
-
-    // Check if camera orbit option is enabled
-    if (this->Options.scene.camera.getOrbitTime() > 0)
-    {
-      double orbitTime = this->Options.scene.camera.getOrbitTime();
-      double angle = 360.0 * (this->CurrentTime / orbitTime);
-
-      // Calculate new camera position based on orbit
-      double radius = 10.0; // Just Example Radius, can be adjusted later
-      double x = radius * cos(vtkMath::RadiansFromDegrees(angle));
-      double y = radius * sin(vtkMath::RadiansFromDegrees(angle));
-
-      // Update camera position
-      vtkCamera* camera =
-        this->Window.GetRenderWindow()->GetRenderers()->GetFirstRenderer()->GetActiveCamera();
-      camera->SetPosition(x, y, camera->GetPosition()[2]);
-      camera->SetFocalPoint(0, 0, 0); // Example focal point, can be adjusted
-    }
   }
 }
 

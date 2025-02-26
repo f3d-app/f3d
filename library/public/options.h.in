@@ -194,14 +194,6 @@ public:
   ${_options_struct}
   // clang-format on
 };
-
-namespace options {
-namespace scene {
-  struct camera {
-    double orbit_time = 0.0;
-  };
-}
-}
 }
 
 // Certain options types are not trivially streamable
