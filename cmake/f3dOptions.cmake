@@ -171,7 +171,7 @@ function(_parse_json_option _top_json)
          list(APPEND _options_reset "if (name == \"${_option_name}\") opt.${_option_name}.reset()")
        endif()
 
-       list(APPEND _options_setter "if (name == \"${_option_name}\") opt.${_option_name} = ${_option_explicit_constr}${_option_default_value_start}std::get<${_option_variant_type}>(value)${_option_default_value_end}")
+       list(APPEND _options_setter "if (name == \"${_option_name}\") opt.${_option_name} = ${_option_explicit_constr}{std::get<${_option_variant_type}>(value)}")
        list(APPEND _options_getter "if (name == \"${_option_name}\") return opt.${_option_name}${_optional_getter}")
        list(APPEND _options_string_setter "if (name == \"${_option_name}\") opt.${_option_name} = options_tools::parse<${_option_actual_type}>(str)")
        list(APPEND _options_string_getter "if (name == \"${_option_name}\") return options_tools::format(opt.${_option_name}${_optional_getter})")
