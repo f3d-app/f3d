@@ -89,7 +89,7 @@ class double_array_t
 {
 public:
   double_array_t() = default;
-  double_array_t(const std::vector<double>& vec)
+  explicit double_array_t(const std::vector<double>& vec)
   {
     if (vec.size() != N)
     {
