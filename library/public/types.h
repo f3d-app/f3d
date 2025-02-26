@@ -64,15 +64,15 @@ using angle_deg_t = double;
 /**
  * Describe a ratio.
  */
-class F3D_EXPORT ratio_t
+class ratio_t
 {
 public:
-  ratio_t() = default;
-  ratio_t(double val)
+  inline ratio_t() = default;
+  inline explicit ratio_t(double val)
     : Value(val)
   {
   }
-  operator double() const
+  inline operator double() const
   {
     return this->Value;
   }
@@ -149,7 +149,7 @@ class color_t : public double_array_t<3>
 {
 public:
   inline color_t() = default;
-  inline color_t(const std::vector<double>& vec)
+  inline explicit color_t(const std::vector<double>& vec)
     : double_array_t(vec)
   {
   }
@@ -184,7 +184,7 @@ class direction_t : public double_array_t<3>
 {
 public:
   inline direction_t() = default;
-  inline direction_t(const std::vector<double>& vec)
+  inline explicit direction_t(const std::vector<double>& vec)
     : double_array_t(vec)
   {
   }

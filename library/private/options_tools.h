@@ -161,16 +161,16 @@ ratio_t parse(const std::string& str)
   {
     if (!str.empty() && str.at(str.size() - 1) == '%')
     {
-      return stodStrict(str.substr(0, str.size() - 1)) / 100;
+      return f3d::ratio_t(stodStrict(str.substr(0, str.size() - 1)) / 100);
     }
 
     const std::size_t sep = str.find_first_of(":/");
     if (sep != std::string::npos)
     {
-      return stodStrict(str.substr(0, sep)) / stodStrict(str.substr(sep + 1));
+      return f3d::ratio_t(stodStrict(str.substr(0, sep)) / stodStrict(str.substr(sep + 1)));
     }
 
-    return stodStrict(str);
+    return f3d::ratio_t(stodStrict(str));
   }
   catch (std::invalid_argument const&)
   {

@@ -56,7 +56,7 @@ int TestSDKOptions(int argc, char* argv[])
   opt.setAsString("scene.animation.speed_factor", "3.17");
   test("setAsString ratio_t", opt.getAsString("scene.animation.speed_factor") == "3.17");
 
-  opt.scene.animation.speed_factor = 3.18;
+  opt.scene.animation.speed_factor = f3d::ratio_t(3.18);
   test("getAsString ratio_t", opt.getAsString("scene.animation.speed_factor") == "3.18");
 
   opt.set("scene.animation.speed_factor", 3.17);
