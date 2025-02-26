@@ -222,55 +222,57 @@ color_t parse(const std::string& str)
       std::stod(rgbMatch[3]) / 255.0); //
   }
 
-  /* HSV format search */
-  const std::regex hsvRegex(
-    "^hsv\\((\\d{1,3}),(\\d{1,3})%,(\\d{1,3})%\\)$", std::regex_constants::icase);
-  std::smatch hsvMatch;
-  if (std::regex_search(s, hsvMatch, hsvRegex))
+  /* Hue-based format search: hsl, hsv, hwb */
+  const std::regex hueRegex(
+    "^([a-z]{3})\\((\\d{1,3}),(\\d{1,3})%{0,1},(\\d{1,3})%{0,1}\\)$", std::regex_constants::icase);
+  std::smatch hueMatch;
+  if (std::regex_search(s, hueMatch, hueRegex))
   {
-    double rgb[3];
-    vtkMath::HSVToRGB(                //
-      std::stod(hsvMatch[1]) / 360.0, //
-      std::stod(hsvMatch[2]) / 100.0, //
-      std::stod(hsvMatch[3]) / 100.0, //
-      &rgb[0],                        //
-      &rgb[1],                        //
-      &rgb[2]);                       //
-    return color_t(rgb[0], rgb[1], rgb[2]);
-  }
-
-  /* HSL format search */
-  const std::regex hslRegex(
-    "^hsl\\((\\d{1,3}),(\\d{1,3})%,(\\d{1,3})%\\)$", std::regex_constants::icase);
-  std::smatch hslMatch;
-  if (std::regex_search(s, hslMatch, hslRegex))
-  {
-    double rgb[3];
-    double s = std::stod(hslMatch[2]) / 100.0;
-    double l = std::stod(hslMatch[3]) / 100.0;
-    /* Convert to HSV values */
-    double v = l + s * std::min(l, 1.0 - l);
-    double sv = (v == 0.0) ? 0.0 : (2.0 * (1.0 - l / v));
-
-    vtkMath::HSVToRGB(std::stod(hslMatch[1]) / 360.0, sv, v, &rgb[0], &rgb[1], &rgb[2]);
-    return color_t(rgb[0], rgb[1], rgb[2]);
-  }
-
-  /* HWB format search */
-  const std::regex hwbRegex(
-    "^hwb\\((\\d{1,3}),(\\d{1,3})%,(\\d{1,3})%\\)$", std::regex_constants::icase);
-  std::smatch hwbMatch;
-  if (std::regex_search(s, hwbMatch, hwbRegex))
-  {
-    double rgb[3];
-    double w = std::stod(hwbMatch[2]) / 100.0;
-    double b = std::stod(hwbMatch[3]) / 100.0;
-    /* Convert to HSV values */
-    double v = 1 - b;
-    double s = 1 - (w / v);
-
-    vtkMath::HSVToRGB(std::stod(hwbMatch[1]) / 360.0, s, v, &rgb[0], &rgb[1], &rgb[2]);
-    return color_t(rgb[0], rgb[1], rgb[2]);
+    double rgb[3]{};
+    std::string hueFormat = hueMatch[1].str();
+    std::transform(hueFormat.begin(), hueFormat.end(), hueFormat.begin(),
+      [](unsigned char c) { return std::tolower(c); });
+    if (hueFormat == "hsl")
+    {
+      double sl = std::stod(hueMatch[3]) / 100.0;
+      double l = std::stod(hueMatch[4]) / 100.0;
+      double v = l + sl * std::min(l, 1.0 - l);
+      double s = (v == 0.0) ? 0.0 : (2.0 * (1.0 - l / v));
+      vtkMath::HSVToRGB(                //
+        std::stod(hueMatch[2]) / 360.0, //
+        s,                              //
+        v,                              //
+        &rgb[0],                        //
+        &rgb[1],                        //
+        &rgb[2]);                       //
+      return color_t(rgb[0], rgb[1], rgb[2]);
+    }
+    if (hueFormat == "hsv")
+    {
+      vtkMath::HSVToRGB(                //
+        std::stod(hueMatch[2]) / 360.0, //
+        std::stod(hueMatch[3]) / 100.0, //
+        std::stod(hueMatch[4]) / 100.0, //
+        &rgb[0],                        //
+        &rgb[1],                        //
+        &rgb[2]);                       //
+      return color_t(rgb[0], rgb[1], rgb[2]);
+    }
+    if (hueFormat == "hwb")
+    {
+      double w = std::stod(hueMatch[3]) / 100.0;
+      double b = std::stod(hueMatch[4]) / 100.0;
+      double v = 1 - b;
+      double s = 1 - (w / v);
+      vtkMath::HSVToRGB(                //
+        std::stod(hueMatch[2]) / 360.0, //
+        s,                              //
+        v,                              //
+        &rgb[0],                        //
+        &rgb[1],                        //
+        &rgb[2]);                       //
+      return color_t(rgb[0], rgb[1], rgb[2]);
+    }
   }
 
   /* Named colors search */
