@@ -196,14 +196,14 @@ ratio_t parse(const std::string& str)
 template<>
 color_t parse(const std::string& str)
 {
-  const std::string s = std::regex_replace(str, std::regex("\\s"), "");
+  const std::string strCompact = std::regex_replace(str, std::regex("\\s"), "");
   double rgb[3]{};
 
   /* Hex format search */
   const std::regex hexRegex(
     "^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$", std::regex_constants::icase);
   std::smatch hexMatch;
-  if (std::regex_search(s, hexMatch, hexRegex))
+  if (std::regex_search(strCompact, hexMatch, hexRegex))
   {
     return color_t(                                  //
       std::stoul(hexMatch[1], nullptr, 16) / 255.0,  //
@@ -215,7 +215,7 @@ color_t parse(const std::string& str)
   const std::regex rgbRegex(
     "^rgb\\((\\d{1,3}),(\\d{1,3}),(\\d{1,3})\\)$", std::regex_constants::icase);
   std::smatch rgbMatch;
-  if (std::regex_search(s, rgbMatch, rgbRegex))
+  if (std::regex_search(strCompact, rgbMatch, rgbRegex))
   {
     rgb[0] = std::stod(rgbMatch[1]) / 255.0;
     rgb[1] = std::stod(rgbMatch[2]) / 255.0;
@@ -231,7 +231,7 @@ color_t parse(const std::string& str)
   const std::regex hueRegex(
     "^([a-z]{3})\\((\\d{1,3}),(\\d{1,3})%{0,1},(\\d{1,3})%{0,1}\\)$", std::regex_constants::icase);
   std::smatch hueMatch;
-  if (std::regex_search(s, hueMatch, hueRegex))
+  if (std::regex_search(strCompact, hueMatch, hueRegex))
   {
     double h = std::stod(hueMatch[2]) / 360.0;
     double s = std::stod(hueMatch[3]) / 100.0;
@@ -272,7 +272,7 @@ color_t parse(const std::string& str)
     "^cmyk\\((\\d{1,3})%{0,1},(\\d{1,3})%{0,1},(\\d{1,3})%{0,1},(\\d{1,3})%{0,1}\\)$",
     std::regex_constants::icase);
   std::smatch cmykMatch;
-  if (std::regex_search(s, cmykMatch, cmykRegex))
+  if (std::regex_search(strCompact, cmykMatch, cmykRegex))
   {
     double c = std::stod(cmykMatch[1]) / 100.0;
     double m = std::stod(cmykMatch[2]) / 100.0;
@@ -290,10 +290,10 @@ color_t parse(const std::string& str)
 
   /* Named colors search */
   vtkSmartPointer<vtkNamedColors> color = vtkSmartPointer<vtkNamedColors>::New();
-  if (color->ColorExists(s))
+  if (color->ColorExists(strCompact))
   {
     double rgba[4];
-    color->GetColor(s, rgba);
+    color->GetColor(strCompact, rgba);
     return color_t(rgba[0], rgba[1], rgba[2]);
   }
 
