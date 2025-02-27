@@ -64,15 +64,15 @@ using angle_deg_t = double;
 /**
  * Describe a ratio.
  */
-class F3D_EXPORT ratio_t
+class ratio_t
 {
 public:
-  ratio_t() = default;
-  ratio_t(double val)
+  inline ratio_t() = default;
+  inline explicit ratio_t(double val)
     : Value(val)
   {
   }
-  operator double() const
+  inline operator double() const
   {
     return this->Value;
   }
@@ -82,81 +82,134 @@ private:
 };
 
 /**
- * Describe a RGB color.
+ * A base template type for an array of double
  */
-class F3D_EXPORT color_t
+template<unsigned int N>
+class double_array_t
 {
 public:
-  color_t() = default;
-  color_t(const std::vector<double>& vec)
+  double_array_t() = default;
+  explicit double_array_t(const std::vector<double>& vec)
   {
-    if (vec.size() != 3)
+    if (vec.size() != N)
     {
       throw f3d::type_construction_exception("Provided vector does not have the right size");
     }
-    std::copy_n(vec.begin(), 3, this->RGB.begin());
+    std::copy_n(vec.begin(), N, this->Array.begin());
   }
-  color_t(double red, double green, double blue)
+  double_array_t(const std::initializer_list<double>& list)
   {
-    this->RGB[0] = red;
-    this->RGB[1] = green;
-    this->RGB[2] = blue;
-  }
-  color_t(const std::initializer_list<double>& list)
-  {
-    if (list.size() != 3)
+    if (list.size() != N)
     {
       throw f3d::type_construction_exception("Provided list does not have the right size");
     }
-    std::copy_n(list.begin(), 3, this->RGB.begin());
+    std::copy_n(list.begin(), N, this->Array.begin());
   }
-  operator std::vector<double>() const
+  [[nodiscard]] operator std::vector<double>() const
   {
-    return std::vector<double>(this->RGB.begin(), this->RGB.end());
+    return std::vector<double>(this->Array.begin(), this->Array.end());
   }
-  bool operator==(const color_t& other) const
+  [[nodiscard]] bool operator==(const double_array_t& other) const
   {
-    return this->RGB == other.RGB;
+    return this->Array == other.Array;
   }
-  bool operator!=(const color_t& other) const
+  [[nodiscard]] bool operator!=(const double_array_t& other) const
   {
-    return this->RGB != other.RGB;
+    return this->Array != other.Array;
   }
-  double operator[](size_t i) const
+  [[nodiscard]] double operator[](size_t i) const
   {
-    if (i >= 3)
+    if (i >= N)
     {
       throw f3d::type_access_exception("Incorrect index");
     }
-    return this->RGB[i];
+    return this->Array[i];
   }
-  double& operator[](size_t i)
+  [[nodiscard]] double& operator[](size_t i)
   {
-    if (i >= 3)
+    if (i >= N)
     {
       throw f3d::type_access_exception("Incorrect index");
     }
-    return this->RGB[i];
+    return this->Array[i];
   }
-  const double* data() const
+  [[nodiscard]] const double* data() const
   {
-    return this->RGB.data();
-  }
-  double r() const
-  {
-    return this->RGB[0];
-  }
-  double g() const
-  {
-    return this->RGB[1];
-  }
-  double b() const
-  {
-    return this->RGB[2];
+    return this->Array.data();
   }
 
 private:
-  std::array<double, 3> RGB;
+  std::array<double, N> Array{ 0 };
+};
+
+/**
+ * Describe a RGB color.
+ */
+class color_t : public double_array_t<3>
+{
+public:
+  inline color_t() = default;
+  inline explicit color_t(const std::vector<double>& vec)
+    : double_array_t(vec)
+  {
+  }
+  inline color_t(const std::initializer_list<double>& list)
+    : double_array_t(list)
+  {
+  }
+  inline color_t(double red, double green, double blue)
+  {
+    (*this)[0] = red;
+    (*this)[1] = green;
+    (*this)[2] = blue;
+  }
+  [[nodiscard]] inline double r() const
+  {
+    return (*this)[0];
+  }
+  [[nodiscard]] inline double g() const
+  {
+    return (*this)[1];
+  }
+  [[nodiscard]] inline double b() const
+  {
+    return (*this)[2];
+  }
+};
+
+/**
+ * Describe a 3D direction.
+ */
+class direction_t : public double_array_t<3>
+{
+public:
+  inline direction_t() = default;
+  inline explicit direction_t(const std::vector<double>& vec)
+    : double_array_t(vec)
+  {
+  }
+  inline direction_t(const std::initializer_list<double>& list)
+    : double_array_t(list)
+  {
+  }
+  inline direction_t(double x, double y, double z)
+  {
+    (*this)[0] = x;
+    (*this)[1] = y;
+    (*this)[2] = z;
+  }
+  [[nodiscard]] inline double x() const
+  {
+    return (*this)[0];
+  }
+  [[nodiscard]] inline double y() const
+  {
+    return (*this)[1];
+  }
+  [[nodiscard]] inline double z() const
+  {
+    return (*this)[2];
+  }
 };
 
 /**

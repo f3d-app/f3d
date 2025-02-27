@@ -80,7 +80,6 @@
 
 #include <cctype>
 #include <chrono>
-#include <regex>
 #include <sstream>
 
 namespace
@@ -287,20 +286,34 @@ void vtkF3DRenderer::Initialize()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::InitializeUpVector(const std::string& upString)
+void vtkF3DRenderer::InitializeUpVector(const std::vector<double>& upVec)
 {
-  const std::regex re("([-+]?)([XYZ])", std::regex_constants::icase);
-  std::smatch match;
-  if (std::regex_match(upString, match, re))
+  assert(upVec.size() == 3);
+
+  // TODO: Remove this when https://github.com/f3d-app/f3d/pull/1536/ is merged
+  int upIndex = -1;
+  bool error = true;
+  for (int i = 0; i < 3; i++)
   {
-    const float sign = match[1].str() == "-" ? -1.0 : +1.0;
-    const int index = std::toupper(match[2].str()[0]) - 'X';
-    assert(index >= 0 && index < 3);
+    if (std::abs(upVec[i]) == 1)
+    {
+      if (upIndex == -1)
+      {
+        upIndex = i;
+        error = false;
+      }
+      else
+      {
+        error = true;
+        break;
+      }
+    }
+  }
 
-    this->UpIndex = index;
-
-    std::fill(this->UpVector, this->UpVector + 3, 0);
-    this->UpVector[this->UpIndex] = sign;
+  if (!error)
+  {
+    this->UpIndex = upIndex;
+    std::copy_n(upVec.begin(), 3, this->UpVector);
 
     std::fill(this->RightVector, this->RightVector + 3, 0);
     this->RightVector[this->UpIndex == 0 ? 1 : 0] = 1.0;
@@ -328,7 +341,7 @@ void vtkF3DRenderer::InitializeUpVector(const std::string& upString)
   }
   else
   {
-    F3DLog::Print(F3DLog::Severity::Warning, upString + " is not a valid up direction");
+    F3DLog::Print(F3DLog::Severity::Warning, "Provided up vector is not a valid up direction");
   }
 }
 

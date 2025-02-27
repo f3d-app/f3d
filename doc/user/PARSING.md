@@ -10,6 +10,7 @@ The following types are supported:
 - ratio: A double dividend over a double divisor, stored in a double.
 - string: A string of characters.
 - color: A RGB color
+- direction: A 3D vector representing a direction
 
 As well as a list for bool, int, double, ratio, string, noted as
 
@@ -67,3 +68,12 @@ When formatting a vector into a string, individual token are formatted according
 ## Color
 
 Color are parsed and formatted as a vector of double.
+
+## Direction
+
+The following formats are supported when parsing a string into a direction:
+
+- [+/-][X/Y/Z]
+- vector of three doubles
+
+When formatting a direction into a string, it is formatted as a vector of doubles.

@@ -35,7 +35,7 @@ F3D behavior can be fully controlled from the command line using the following o
 | \-\-progress                                         | bool<br>false    | Show a _progress bar_ when loading the file.                                                                                                                                         |
 | \-\-animation-progress                               | bool<br>false    | Show a _progress bar_ when playing the animation.                                                                                                                                    |
 | \-\-multi-file-mode=\<single \| all\>                | string<br>single | When opening multiple files, select if they should be grouped (`all`) or alone (`single`). Configuration files for all loaded files will be used in the order they are provided.     |
-| \-\-up=\<[+\|-][X\|Y\|Z]\>                           | string<br>+Y     | Define the Up direction.                                                                                                                                                             |
+| \-\-up=\<[+\|-][X\|Y\|Z]\>                           | direction<br>+Y  | Define the Up direction. Only axis-aligned directions are valid.                                                                                                                     |
 | -x, \-\-axis                                         | bool<br>false    | Show _axes_ as a trihedron in the scene.                                                                                                                                             |
 | -g, \-\-grid                                         | bool<br>false    | Show _a grid_ aligned with the horizontal (orthogonal to the Up direction) plane.                                                                                                    |
 | \-\-grid\-unit=\<length\>                            | double<br>-      | Set the size of the _unit square_ for the grid. If not set (the default) a suitable value will be automatically computed.                                                            |
@@ -113,7 +113,7 @@ F3D behavior can be fully controlled from the command line using the following o
 | \-\-camera-focal-point=\<X,Y,Z\>     | vector\<double\><br>- | Set the camera focal point.                                                                    |
 | \-\-camera-view-up=\<X,Y,Z\>         | vector\<double\><br>- | Set the camera view up vector. Will be orthogonalized.                                         |
 | \-\-camera-view-angle=\<angle\>      | double<br>-           | Set the camera view angle, a strictly positive value in degrees.                               |
-| \-\-camera-direction=\<X,Y,Z\>       | vector\<double\><br>- | Set the camera direction, looking at the focal point.                                          |
+| \-\-camera-direction=\<X,Y,Z\>       | direction<br>-        | Set the camera direction, looking at the focal point.                                          |
 | \-\-camera-zoom-factor=\<factor\>    | double<br>-           | Set the camera zoom factor relative to the autozoom on data, a strictly positive value.        |
 | \-\-camera-azimuth-angle=\<angle\>   | double<br>0.0         | Apply an azimuth transformation to the camera, in degrees, added after other camera options.   |
 | \-\-camera-elevation-angle=\<angle\> | double<br>0.0         | Apply an elevation transformation to the camera, in degrees, added after other camera options. |
