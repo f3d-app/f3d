@@ -55,5 +55,6 @@ runs:
         echo "json=$(jq -c . < ./source/.github/workflows/versions.json)" >> $GITHUB_OUTPUT
 
     - name: Debug
+      shell: bash
       run: |
         echo "${{steps.parse_file.outputs.json}}"
