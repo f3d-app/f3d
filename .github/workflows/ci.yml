@@ -20,6 +20,7 @@ jobs:
 #----------------------------------------------------------------------------
   default_versions:
     runs-on: ubuntu-22.04
+    container: ghcr.io/f3d-app/f3d-ci
     name: Set default versions
     outputs:
       alembic_version: ${{ steps.set_default_versions.outputs.alembic_version }}
@@ -149,10 +150,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [commit, v9.4.1, v9.3.1, v9.2.6]
+        vtk_version: ["${{needs.default_versions.outputs.vtk_commit_sha}}", v9.4.1, v9.3.1, v9.2.6]
         static_label: [no-static]
         include:
-          - vtk_version: commit
+          - vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             static_label: static
 
     runs-on: windows-latest
@@ -193,7 +194,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [commit, v9.4.1, v9.3.1, v9.2.6]
+        vtk_version: ["${{needs.default_versions.outputs.vtk_commit_sha}}", v9.4.1, v9.3.1, v9.2.6]
         build_type: [standard]
         include:
           - raytracing_label: raytracing
@@ -212,7 +213,7 @@ jobs:
           - usd_version: ${{needs.default_versions.outputs.usd_version}}
           - java_version: ${{needs.default_versions.outputs.java_version}}
           - build_type: egl
-            vtk_version: commit
+            vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             raytracing_label: raytracing
             optional_deps_label: optional-deps
             exclude_deprecated_label: no-exclude-deprecated
@@ -229,7 +230,7 @@ jobs:
             usd_version: ${{needs.default_versions.outputs.usd_version}}
             java_version: ${{needs.default_versions.outputs.java_version}}
           - build_type: osmesa
-            vtk_version: commit
+            vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             raytracing_label: raytracing
             optional_deps_label: optional-deps
             exclude_deprecated_label: no-exclude-deprecated
@@ -246,7 +247,7 @@ jobs:
             usd_version: ${{needs.default_versions.outputs.usd_version}}
             java_version: ${{needs.default_versions.outputs.java_version}}
           - build_type: exclude_deprecated
-            vtk_version: commit
+            vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             raytracing_label: raytracing
             optional_deps_label: optional-deps
             exclude_deprecated_label: exclude-deprecated
@@ -263,14 +264,14 @@ jobs:
             usd_version: ${{needs.default_versions.outputs.usd_version}}
             java_version: ${{needs.default_versions.outputs.java_version}}
           - build_type: no_optional_deps
-            vtk_version: commit
+            vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             raytracing_label: no-raytracing
             optional_deps_label: no-optional-deps
             exclude_deprecated_label: no-exclude-deprecated
             rendering_backend: auto
             static_label: no-static
           - build_type: static_libs
-            vtk_version: commit
+            vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             raytracing_label: no-raytracing
             optional_deps_label: optional-deps
             exclude_deprecated_label: no-exclude-deprecated
@@ -287,7 +288,7 @@ jobs:
             usd_version: ${{needs.default_versions.outputs.usd_version}}
             java_version: ${{needs.default_versions.outputs.java_version}}
           - build_type: mindeps
-            vtk_version: commit
+            vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             raytracing_label: raytracing
             optional_deps_label: optional-deps
             exclude_deprecated_label: no-exclude-deprecated
@@ -349,7 +350,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [commit, v9.4.1, v9.3.1, v9.2.6]
+        vtk_version: ["${{needs.default_versions.outputs.vtk_commit_sha}}", v9.4.1, v9.3.1, v9.2.6]
 
     runs-on: macos-13
 
@@ -388,14 +389,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [commit, v9.4.1, v9.3.1] # VTK 9.2.6 not compatible with recent clang version on macOS
+        vtk_version: ["${{needs.default_versions.outputs.vtk_commit_sha}}", v9.4.1, v9.3.1] # VTK 9.2.6 not compatible with recent clang version on macOS
         bundle_label: [no-bundle]
         static_label: [no-static]
         include:
-          - vtk_version: commit
+          - vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             bundle_label: bundle
             static_label: no-static
-          - vtk_version: commit
+          - vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             bundle_label: no-bundle
             static_label: static
 
@@ -480,6 +481,7 @@ jobs:
         openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
         pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
         usd_version: ${{needs.default_versions.outputs.usd_version}}
+        vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
 
 #----------------------------------------------------------------------------
 # Coverage: Build and test on linux with last VTK with coverage option
@@ -517,6 +519,7 @@ jobs:
         openexr_version: ${{needs.default_versions.outputs.openexr_version}}
         openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
         usd_version: ${{needs.default_versions.outputs.usd_version}}
+        vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
 
 #----------------------------------------------------------------------------
 # Sanitizer: Build and test on linux with last VTK with sanitizer options
@@ -561,6 +564,7 @@ jobs:
         draco_version: ${{needs.default_versions.outputs.draco_version}}
         occt_version: ${{needs.default_versions.outputs.occt_version}}
         openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+        vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
 
 #----------------------------------------------------------------------------
 # static-analysis: Run static analysis on linux
@@ -599,12 +603,13 @@ jobs:
         openexr_version: ${{needs.default_versions.outputs.openexr_version}}
         openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
         usd_version: ${{needs.default_versions.outputs.usd_version}}
+        vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
 
 #----------------------------------------------------------------------------
 # external-build: Check build of F3D as sub-project
 #----------------------------------------------------------------------------
   external-build:
-    needs: cache_dependencies
+    needs: [cache_dependencies, default_versions]
     if: github.event.pull_request.draft == false
 
     strategy:
@@ -624,12 +629,15 @@ jobs:
 
     - name: External build CI
       uses: ./source/f3d/.github/actions/external-build-ci
+      with:
+        vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
 
 #----------------------------------------------------------------------------
 # android: Check build of F3D for android
 #----------------------------------------------------------------------------
   android:
     if: github.event.pull_request.draft == false
+    needs: default_versions
 
     strategy:
       fail-fast: false
@@ -652,3 +660,4 @@ jobs:
       uses: ./source/.github/actions/android-ci
       with:
         arch: ${{matrix.arch}}
+        vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}

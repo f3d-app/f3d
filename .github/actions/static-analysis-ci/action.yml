@@ -25,6 +25,9 @@ inputs:
   usd_version:
     description: 'Version of usd to build'
     required: true
+  vtk_version:
+    description: 'Version of vtk to build'
+    required: true
 
 runs:
   using: "composite"
@@ -34,6 +37,7 @@ runs:
       shell: bash
       run: |
         [[ "${{ inputs.lfs_sha }}" ]] || { echo "lfs_sha input is empty" ; exit 1; }
+        [[ "${{ inputs.vtk_version }}" ]] || { echo "vtk_version input is empty" ; exit 1; }
 
     # Needed for BUILD_TESTING
     - name: Recover LFS Data
@@ -57,7 +61,7 @@ runs:
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
       with:
-        vtk_sha_file: ./source/.github/actions/vtk_commit_sha
+        vtk_version: ${{inputs.vtk_version}}
         openvdb_version: ${{inputs.openvdb_version}}
 
     - name: Setup Build Directory
