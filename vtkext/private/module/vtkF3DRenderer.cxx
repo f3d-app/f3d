@@ -291,6 +291,8 @@ void vtkF3DRenderer::Initialize()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::InitializeUpVector(const std::vector<double>& upVec)
 {
+  assert(upVec.size() == 3);
+
   const auto isNullVector = [](const std::array<double, 3>& v)
   {
     constexpr double e = 1e-8;
