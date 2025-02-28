@@ -43,6 +43,7 @@ jobs:
       usd_min_version: ${{ steps.set_default_versions.outputs.usd_min_version }}
       java_version: ${{ steps.set_default_versions.outputs.java_version }}
       java_min_version: ${{ steps.set_default_versions.outputs.java_min_version }}
+      vtk_commit_sha: ${{ steps.set_default_versions.outputs.vtk_commit_sha }}
 
     steps:
 
