@@ -30,7 +30,7 @@ outputs:
   pybind11_min_version:
     value: "${{ fromJson(steps.parse_file.outputs.json).min_versions.pybind11 }}"
   python_version:
-    value: "${{ fromJson(steps.parse_file.outputs.json).ersions.python }}"
+    value: "${{ fromJson(steps.parse_file.outputs.json).versions.python }}"
   python_min_version:
     value: "${{ fromJson(steps.parse_file.outputs.json).min_versions.python }}"
   usd_version:
