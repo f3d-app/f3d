@@ -24,7 +24,7 @@ outputs:
   openvdb_version:
     value: "${{ fromJson(steps.parse_file.outputs.json).versions.openvdb }}"
   openvdb_min_version:
-    value: "${{ fromJson(steps.parse_file.outputs.json).min_versions.openexr }}"
+    value: "${{ fromJson(steps.parse_file.outputs.json).min_versions.openvdb }}"
   pybind11_version:
     value: "${{ fromJson(steps.parse_file.outputs.json).versions.pybind11 }}"
   pybind11_min_version:
