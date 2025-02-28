@@ -304,6 +304,7 @@ void vtkF3DRenderer::InitializeUpVector(const std::vector<double>& upVec)
   if (isNullVector(up))
   {
     up[1] = 1.0;
+    F3DLog::Print(F3DLog::Severity::Warning, "null up vector, using (0,0,1) instead");
   }
   vtkMath::Normalize(up.data());
 
