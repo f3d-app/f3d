@@ -60,7 +60,7 @@ jobs:
 
     - name: Debug
       run: |
-        echo "${{needs.default_versions.outputs.vtk_commit_sha}}"
+        echo "${{steps.set_default_versions.outputs.alembic_version}}"
 
 #----------------------------------------------------------------------------
 # Cache LFS: Checkout LFS data and update the cache to limit LFS bandwidth
