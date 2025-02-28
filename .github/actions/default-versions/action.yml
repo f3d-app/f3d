@@ -57,4 +57,4 @@ runs:
     - name: Debug
       shell: bash
       run: |
-        echo "${{steps.parse_file.outputs.json}}"
+        echo "${{ fromJson(steps.parse_file.outputs.json) }}"
