@@ -1,0 +1,51 @@
+# F3D Architecture
+
+F3D is structured in different parts, interacting with each others and with its dependencies.
+This architecture is reflected by the directories organisation.
+
+ - **application**: the code of the F3D application itself, see below
+ - cmake: cmake macros and functions, used by the CMake build system
+ - doc: this very documentation
+ - examples: examples usage of the libf3d and plugin framework in python and C++
+ - external: dependencies that are included directly in the code
+ - java: [java bindings](../libf3d/LANGUAGE_BINDINGS.md#java-experimental) and associated tests.
+ - **library**: the [libf3d](../libf3d/README.md) itself, see below
+ - **plugins**: all the [plugins](../libf3d/PLUGINS.md) providing different readers, see below
+ - python: [python bindings](../libf3d/LANGUAGE_BINDINGS.md#python) and tests
+ - resources: all non code, non doc, like icon, configs and such
+ - testing: all testing related resources, does not contain the test themselves
+ - **vtkext**: extensions to VTK and related tests, see below
+ - webassembly: [webassembly/javascript bindings](../libf3d/LANGUAGE_BINDINGS.md#javascript-experimental) and [F3DWeb](https://f3d.app/web/) application code
+ - winshellext: shell extension for Windows, provide [thumbnails for Windows](../user/DESKTOP_INTEGRATION.md#windows)
+
+Here is diagram explaining how some of these parts interact together:
+
+<img src="https://private-user-images.githubusercontent.com/3129530/417923068-292a5037-956d-47dc-93dc-67809b63a3bb.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NDA3Mjc0ODAsIm5iZiI6MTc0MDcyNzE4MCwicGF0aCI6Ii8zMTI5NTMwLzQxNzkyMzA2OC0yOTJhNTAzNy05NTZkLTQ3ZGMtOTNkYy02NzgwOWI2M2EzYmIucG5nP1gtQW16LUFsZ29yaXRobT1BV1M0LUhNQUMtU0hBMjU2JlgtQW16LUNyZWRlbnRpYWw9QUtJQVZDT0RZTFNBNTNQUUs0WkElMkYyMDI1MDIyOCUyRnVzLWVhc3QtMSUyRnMzJTJGYXdzNF9yZXF1ZXN0JlgtQW16LURhdGU9MjAyNTAyMjhUMDcxOTQwWiZYLUFtei1FeHBpcmVzPTMwMCZYLUFtei1TaWduYXR1cmU9OWIwNjZmZWQxNjg2OGYwNWJmOTgxZWYyNDlhYzIzYWU5ZmRjMmZhOWU3NTM4ZTMwZTQxMzFkMzE0M2NjN2JiZiZYLUFtei1TaWduZWRIZWFkZXJzPWhvc3QifQ.uZ3U8HN3d3zWYlGkdHJzOPjiuF5ds-nSiAkNv8bDNik" width="700">
+
+## vtkext
+
+`vtkext` contains two [VTK modules](https://docs.vtk.org/en/latest/api/cmake/ModuleSystem.html) that are used extensively in the libf3d and the plugins.
+
+`public` is a VTK module that contains classes and utilities that can be installed and used by plugins, including externals plugins. `vtkF3DImporter` is a class
+that is specifically made for plugin developers to inherit their importers from. The documentation of this module can be found [here](https://f3d.app/doc/libf3d/vtkext_doxygen/).
+
+`private` is a VTK module that contains many classes and utilities used by the libf3d to provide all features of F3D, especially the rendering, interactions and UI.
+A notable class is `vtkF3DRenderer` that is responsible to actually add the different actors in the 3D scene.
+
+Each of these modules also contains [tests](TESTING.md#vtkextensions-layer) in the `Testing` directory.
+
+## plugins
+
+`plugins` contains [libf3d plugins](../libf3d/PLUGINS.md) that are provided by default in the F3D packages. Each of these plugins correspond to a specific dependency and are named accordingly.Each of these plugin will provide access to specific readers for specific formats. Without plugins, F3D and the libf3d would not be able to open any file. These plugins can be loaded statically or dynamically, which makes the dependencies truly optional if needed.
+
+## library
+
+`library` contains the code of the libf3d. It is a C++ library with a very limited API surface and larger, private, implementation.
+Most classes in the libf3d are split in two. A public part that contains mostly the public API, and a private part, suffixed "_impl", that implements that public API
+and also contains hidden methods used to communicate between classes, especially in regards to VTK symbols.
+
+Logically, it is structured in 3 parts, `public` which contains the public API header files and are all installed, `private` which contains the implementation classes headers files and `src` that contains the source files of all the classes, public and private.
+
+There is also a dedicated `testing` directory which contains the [unit and functionnal testing](TESTING.md#library-layer) of the libf3d.
+
+It also contains the `options.json` file, which is the file used to generate all [options](../libf3d/OPTIONS.md) code.
