@@ -1,8 +1,6 @@
 name: 'Read default versions JSON file'
 description: 'Set default versions of F3D dependencies to install'
 outputs:
-  vtk_sha_commit:
-    value: "${{ fromJson(steps.parse_file.outputs.json).vtk_commit_sha }}"
   alembic_version:
     value: "${{ fromJson(steps.parse_file.outputs.json).versions.alembic }}"
   alembic_min_version:
@@ -43,6 +41,8 @@ outputs:
     value: "${{ fromJson(steps.parse_file.outputs.json).versions.java }}"
   java_min_version:
     value: "${{ fromJson(steps.parse_file.outputs.json).min_versions.java }}"
+  vtk_sha_commit:
+    value: "${{ fromJson(steps.parse_file.outputs.json).vtk_commit_sha }}"
 
 runs:
   using: "composite"
@@ -53,3 +53,7 @@ runs:
       shell: bash
       run: |
         echo "json=$(jq -c . < ./source/.github/workflows/versions.json)" >> $GITHUB_OUTPUT
+
+    - name: Debug
+      run: |
+        echo "${{steps.parse_file.outputs.json}}"

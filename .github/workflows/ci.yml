@@ -58,10 +58,6 @@ jobs:
       id: set_default_versions
       uses: ./source/.github/actions/default-versions
 
-    - name: Debug
-      run: |
-        echo "${{steps.set_default_versions.outputs.alembic_version}}"
-
 #----------------------------------------------------------------------------
 # Cache LFS: Checkout LFS data and update the cache to limit LFS bandwidth
 #----------------------------------------------------------------------------
