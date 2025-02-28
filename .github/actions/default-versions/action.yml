@@ -52,4 +52,4 @@ runs:
       id: parse_file
       shell: bash
       run: |
-        echo "json=$(jq -c . < ./source/.github/workflows/versions.json)"
+        echo "json=$(jq -c . < ./source/.github/workflows/versions.json)" >> $GITHUB_OUTPUT

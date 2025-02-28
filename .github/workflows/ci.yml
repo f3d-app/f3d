@@ -58,6 +58,10 @@ jobs:
       id: set_default_versions
       uses: ./source/.github/actions/default-versions
 
+    - name: Debug
+      run: |
+        echo "${{needs.default_versions.outputs.vtk_commit_sha}}"
+
 #----------------------------------------------------------------------------
 # Cache LFS: Checkout LFS data and update the cache to limit LFS bandwidth
 #----------------------------------------------------------------------------
