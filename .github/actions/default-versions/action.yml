@@ -41,7 +41,7 @@ outputs:
     value: "${{ fromJson(steps.parse_file.outputs.json).versions.java }}"
   java_min_version:
     value: "${{ fromJson(steps.parse_file.outputs.json).min_versions.java }}"
-  vtk_sha_commit:
+  vtk_commit_sha:
     value: "${{ fromJson(steps.parse_file.outputs.json).vtk_commit_sha }}"
 
 runs:
@@ -53,8 +53,3 @@ runs:
       shell: bash
       run: |
         echo "json=$(jq -c . < ./source/.github/workflows/versions.json)" >> $GITHUB_OUTPUT
-
-    - name: Debug
-      shell: bash
-      run: |
-        echo "${{ fromJson(steps.parse_file.outputs.json) }}"
