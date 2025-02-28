@@ -2,47 +2,47 @@ name: 'Read default versions JSON file'
 description: 'Set default versions of F3D dependencies to install'
 outputs:
   alembic_version:
-    value: ${{ fromJson(steps.parse_file.outputs.json).versions.alembic }}
+    value: "${{ fromJson(steps.parse_file.outputs.json).versions.alembic }}"
   alembic_min_version:
-    value: ${{ fromJson(steps.parse_file.outputs.json).min_versions.alembic }}
+    value: "${{ fromJson(steps.parse_file.outputs.json).min_versions.alembic }}"
   assimp_version:
-    value: ${{ fromJson(steps.parse_file.outputs.json).versions.assimp }}
+    value: "${{ fromJson(steps.parse_file.outputs.json).versions.assimp }}"
   assimp_min_version:
-    value: ${{ fromJson(steps.parse_file.outputs.json).min_versions.assimp }}
+    value: "${{ fromJson(steps.parse_file.outputs.json).min_versions.assimp }}"
   draco_version:
-    value: ${{ fromJson(steps.parse_file.outputs.json).versions.draco }}
+    value: "${{ fromJson(steps.parse_file.outputs.json).versions.draco }}"
   draco_min_version:
-    value: ${{ fromJson(steps.parse_file.outputs.json).min_versions.draco }}
+    value: "${{ fromJson(steps.parse_file.outputs.json).min_versions.draco }}"
   occt_version:
-    value: ${{ fromJson(steps.parse_file.outputs.json).versions.occt }}
+    value: "${{ fromJson(steps.parse_file.outputs.json).versions.occt }}"
   occt_min_version:
-    value: ${{ fromJson(steps.parse_file.outputs.json).min_versions.occt }}
+    value: "${{ fromJson(steps.parse_file.outputs.json).min_versions.occt }}"
   openexr_version:
-    value: ${{ fromJson(steps.parse_file.outputs.json).versions.openexr }}
+    value: "${{ fromJson(steps.parse_file.outputs.json).versions.openexr }}"
   openexr_min_version:
-    value: ${{ fromJson(steps.parse_file.outputs.json).min_versions.openexr }}
+    value: "${{ fromJson(steps.parse_file.outputs.json).min_versions.openexr }}"
   openvdb_version:
-    value: ${{ fromJson(steps.parse_file.outputs.json).versions.openvdb }}
+    value: "${{ fromJson(steps.parse_file.outputs.json).versions.openvdb }}"
   openvdb_min_version:
-    value: ${{ fromJson(steps.parse_file.outputs.json).min_versions.openexr }}
+    value: "${{ fromJson(steps.parse_file.outputs.json).min_versions.openexr }}"
   pybind11_version:
-    value: ${{ fromJson(steps.parse_file.outputs.json).versions.pybind11 }}
+    value: "${{ fromJson(steps.parse_file.outputs.json).versions.pybind11 }}"
   pybind11_min_version:
-    value: ${{ fromJson(steps.parse_file.outputs.json).min_versions.pybind11 }}
+    value: "${{ fromJson(steps.parse_file.outputs.json).min_versions.pybind11 }}"
   python_version:
-    value: ${{ fromJson(steps.parse_file.outputs.json).ersions.python }}
+    value: "${{ fromJson(steps.parse_file.outputs.json).ersions.python }}"
   python_min_version:
-    value: ${{ fromJson(steps.parse_file.outputs.json).min_versions.python }}
+    value: "${{ fromJson(steps.parse_file.outputs.json).min_versions.python }}"
   usd_version:
-    value: ${{ fromJson(steps.parse_file.outputs.json).versions.usd }}
+    value: "${{ fromJson(steps.parse_file.outputs.json).versions.usd }}"
   usd_min_version:
-    value: ${{ fromJson(steps.parse_file.outputs.json).min_versions.usd }}
+    value: "${{ fromJson(steps.parse_file.outputs.json).min_versions.usd }}"
   java_version:
-    value: ${{ fromJson(steps.parse_file.outputs.json).versions.java }}
+    value: "${{ fromJson(steps.parse_file.outputs.json).versions.java }}"
   java_min_version:
-    value: ${{ fromJson(steps.parse_file.outputs.json).min_versions.java }}
+    value: "${{ fromJson(steps.parse_file.outputs.json).min_versions.java }}"
   vtk_sha_commit:
-    value: ${{ fromJson(steps.parse_file.outputs.json).vtk_commit_sha }}
+    value: "${{ fromJson(steps.parse_file.outputs.json).vtk_commit_sha }}"
 
 runs:
   using: "composite"
