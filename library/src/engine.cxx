@@ -38,6 +38,38 @@ public:
     }
   }
 
+  fs::path GetDefaultCachePath()
+  {
+#if defined(_WIN32)
+    static constexpr const char* CACHE_ENV_VAR = "LOCALAPPDATA";
+#else
+    static constexpr const char* CACHE_ENV_VAR = "HOME";
+#endif
+
+    char* env = std::getenv(CACHE_ENV_VAR);
+    if (!env)
+    {
+      throw engine::cache_exception(
+          std::string("Could not setup cache, please set ") + CACHE_ENV_VAR + " environment variable");
+    }
+
+    fs::path cachePath(env);
+
+#if defined(_WIN32)
+    cachePath /= "f3d";
+#elif defined(__APPLE__)
+    cachePath = cachePath / "Library" / "Caches" / "f3d";
+#elif defined(__ANDROID__)
+    // XXX: Android does not have a default cache location for now
+#elif defined(__unix__)
+    cachePath = cachePath / ".cache" / "f3d";
+#else
+#error "Unsupported platform"
+#endif
+
+    return cachePath;
+  }
+
   std::unique_ptr<options> Options;
   std::unique_ptr<detail::window_impl> Window;
   std::unique_ptr<detail::scene_impl> Scene;
@@ -52,38 +84,14 @@ engine::engine(
   // Ensure all lib initialization is done (once)
   detail::init::initialize();
 
-#if defined(_WIN32)
-  static constexpr const char* CACHE_ENV_VAR = "LOCALAPPDATA";
-#else
-  static constexpr const char* CACHE_ENV_VAR = "HOME";
-#endif
-
-  char* env = std::getenv(CACHE_ENV_VAR);
-  if (!env)
-  {
-    throw engine::cache_exception(
-      std::string("Could not setup cache, please set ") + CACHE_ENV_VAR + " environment variable");
-  }
-
-  fs::path cachePath(env);
-
-#if defined(_WIN32)
-  cachePath /= "f3d";
-#elif defined(__APPLE__)
-  cachePath = cachePath / "Library" / "Caches" / "f3d";
-#elif defined(__ANDROID__)
-  // XXX: Android does not have a default cache location for now
-#elif defined(__unix__)
-  cachePath = cachePath / ".cache" / "f3d";
-#else
-#error "Unsupported platform"
-#endif
-
   this->Internals->Options = std::make_unique<options>();
 
   this->Internals->Window =
     std::make_unique<detail::window_impl>(*this->Internals->Options, windowType, offscreen, loader);
-  this->Internals->Window->SetCachePath(cachePath);
+
+#if !defined(__ANDROID__)
+  this->Internals->Window->SetCachePath(this->Internals->GetDefaultCachePath());
+#endif
 
   this->Internals->Scene =
     std::make_unique<detail::scene_impl>(*this->Internals->Options, *this->Internals->Window);

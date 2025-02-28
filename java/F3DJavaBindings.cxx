@@ -48,7 +48,7 @@ extern "C"
   JNIEXPORT jlong JAVA_BIND(Engine, construct)(JNIEnv*, jobject)
   {
     f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
-    return reinterpret_cast<jlong>(new f3d::engine(f3d::engine::create()));
+    return reinterpret_cast<jlong>(new f3d::engine(f3d::engine::createExternalEGL()));
   }
 
   JNIEXPORT void JAVA_BIND(Engine, destroy)(JNIEnv*, jobject, jlong ptr)
