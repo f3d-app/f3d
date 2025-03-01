@@ -1,0 +1,8 @@
+[
+  {
+    "match": ".*(las)",
+    "options": {
+      "load-plugins": "pdal",
+    }
+  }
+]
