@@ -29,6 +29,9 @@ inputs:
   usd_version:
     description: 'Version of usd to build'
     required: false
+  vtk_version:
+    description: 'Version of vtk to build'
+    required: true
 
 runs:
   using: "composite"
@@ -38,6 +41,7 @@ runs:
       shell: bash
       run: |
         [[ "${{ inputs.lfs_sha }}" ]] || { echo "lfs_sha input is empty" ; exit 1; }
+        [[ "${{ inputs.vtk_version }}" ]] || { echo "vtk_version input is empty" ; exit 1; }
 
     - name: Recover LFS Data
       uses: f3d-app/lfs-data-cache-action@v1
@@ -61,7 +65,7 @@ runs:
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
       with:
-        vtk_sha_file: ./source/.github/actions/vtk_commit_sha
+        vtk_version: ${{inputs.vtk_version}}
         raytracing_label: raytracing
         openvdb_version: ${{inputs.openvdb_version}}
 

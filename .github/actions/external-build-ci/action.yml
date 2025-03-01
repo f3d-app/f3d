@@ -1,8 +1,18 @@
 name: 'External build CI'
 description: 'External build CI'
+inputs:
+  vtk_version:
+    description: 'Version of vtk to build'
+    required: true
+
 runs:
   using: "composite"
   steps:
+
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.vtk_version }}" ]] || { echo "vtk_version input is empty" ; exit 1; }
 
     - name: Create top level CMakeLists.txt
       shell: bash
@@ -25,7 +35,7 @@ runs:
     - name: Install VTK dependency
       uses: ./source/f3d/.github/actions/vtk-install-dep
       with:
-        vtk_sha_file: ./source/f3d/.github/actions/vtk_commit_sha
+        vtk_version: ${{inputs.vtk_version}}
 
     - name: Setup Build Directory
       shell: bash

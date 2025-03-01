@@ -10,12 +10,7 @@ inputs:
     default: '27'
   vtk_version:
     description: 'VTK version'
-    required: false
-    default: 'commit'
-  vtk_sha_file:
-    description: 'VTK SHA file'
-    required: false
-    default: ''
+    required: true
 
 runs:
   using: "composite"
@@ -25,25 +20,14 @@ runs:
       shell: bash
       run: |
         [[ "${{ inputs.arch }}" ]] || { echo "arch input is empty" ; exit 1; }
-
-    - name: Recover VTK Short SHA from file
-      if: inputs.vtk_version == 'commit'
-      working-directory: ${{github.workspace}}
-      shell: bash
-      run: echo "VTK_SHA_OR_TAG=$(<${{ inputs.vtk_sha_file }})" >> $GITHUB_ENV
-
-    - name: Copy VTK version to env var
-      if: inputs.vtk_version != 'commit'
-      working-directory: ${{github.workspace}}
-      shell: bash
-      run: echo "VTK_SHA_OR_TAG=${{inputs.vtk_version}}" >> $GITHUB_ENV
+        [[ "${{ inputs.vtk_version }}" ]] || { echo "vtk_version input is empty" ; exit 1; }
 
     - name: Cache VTK
       id: cache-vtk
       uses: actions/cache/restore@v4
       with:
         path: dependencies/vtk_build
-        key: vtk-android-${{env.VTK_SHA_OR_TAG}}-${{inputs.api_level}}-${{inputs.arch}}-1
+        key: vtk-android-${{ inputs.vtk_version }}-${{inputs.api_level}}-${{inputs.arch}}-1
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
