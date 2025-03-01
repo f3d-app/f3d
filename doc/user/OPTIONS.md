@@ -194,7 +194,7 @@ Model related variables will be replaced by `no_file` if no file is loaded and `
 When using HDRI related options, F3D will create and use a cache directory to store related data in order to speed up rendering.
 These cache files can be safely removed at the cost of recomputing them on next use.
 
-The cache directory location is as follows:
+The cache directory location is as follows, in order, using the first defined environnement variables:
  - Windows: `%LOCALAPPDATA%\f3d`
- - Linux: `${HOME}/.cache/f3d`
- - macOS: `${HOME}/Library/Caches/f3d`
+ - Linux: `${XDG_CACHE_HOME}/f3d`,`${HOME}/.cache/f3d`
+ - macOS: `${XDG_CACHE_HOME}/f3d`,`${HOME}/Library/Caches/f3d`
