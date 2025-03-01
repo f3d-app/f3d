@@ -311,14 +311,10 @@ void vtkF3DRenderer::InitializeUpVector(const std::vector<double>& upVec)
   vtkMath::Normalize(up.data());
 
   /* make sure `right` is not colinear with `up` */
-  for (size_t i = 0; ::abs(vtkMath::Dot(right, up)) > 0.999 && i < 3; ++i)
+  if (::abs(vtkMath::Dot(right, up)) > 0.999)
   {
-    right[0] = 0;
-    right[1] = 0;
-    right[2] = 0;
-    right[i] = 1;
+    right = { 0, 1, 0 };
   }
-  vtkMath::Normalize(right.data());
 
   /* make `front` orthogonal */
   std::array<double, 3> front;
