@@ -15,6 +15,53 @@
 
 vtkStandardNewMacro(vtkF3DEXRReader);
 
+  /**
+   * Class to treat file contents in memory like it were still in a file.
+   */
+  class MemStream : public Imf::IStream
+  {
+  public:
+    MemStream(const char* name, const void* buff, vtkIdType bufferLen)
+      : Imf::IStream(name)
+      , buffer(static_cast<const char*>(buff))
+      , bufflen(static_cast<size_t>(bufferLen))
+      , pos(0)
+    {
+    }
+
+    bool read(char c[], int n) override;
+
+    /**
+     * returns the current reading position, in bytes, from the beginning of the file.
+     * The next read() call will begin reading at the indicated position
+     */
+    uint64_t tellg() override
+    {
+      return pos;
+    }
+
+    /**
+     * sets the current reading position to pos bytes from the beginning of the "file"
+     */
+    void seekg(uint64_t new_pos) override
+    {
+      pos = new_pos;
+    }
+
+    /**
+     * clears any error flags (we dont have to worry about this)
+     */
+    void clear() override
+    {
+    }
+
+  private:
+    const char* buffer;
+    size_t bufflen;
+    uint64_t pos;
+};
+
+
 //------------------------------------------------------------------------------
 vtkF3DEXRReader::vtkF3DEXRReader() = default;
 
@@ -38,31 +85,48 @@ void vtkF3DEXRReader::ExecuteInformation()
   this->ComputeInternalFileName(this->DataExtent[4]);
   if (this->InternalFileName == nullptr || this->InternalFileName[0] == '\0')
   {
-    return;
-  }
-
-  try
-  {
-    Imf::RgbaInputFile file(this->InternalFileName);
-
-    Imath::Box2i dw = file.dataWindow();
-    this->DataExtent[0] = dw.min.x;
-    this->DataExtent[1] = dw.max.x;
-    this->DataExtent[2] = dw.min.y;
-    this->DataExtent[3] = dw.max.y;
-
-    Imf::RgbaChannels channels = file.channels();
-    if (channels != Imf::RgbaChannels::WRITE_RGBA && channels != Imf::RgbaChannels::WRITE_RGB)
-    {
-      throw std::runtime_error("only RGB and RGBA channels are supported");
+    if (!this->GetMemoryBuffer()){
+      return;
     }
   }
-  catch (const std::exception& e)
-  {
-    vtkErrorMacro("Error reading EXR file: " << e.what());
-    return;
-  }
 
+  if (this->GetMemoryBuffer()){
+    try
+    {
+      MemStream memoryStream("EXRmemoryStream", this->MemoryBuffer, this->MemoryBufferLength);
+      Imf::RgbaInputFile file = Imf::RgbaInputFile(memoryStream);
+      execute(file);
+    }
+    catch (const std::exception& e)
+    {
+      vtkErrorMacro("Error reading EXR file (from memory): " << e.what());
+      return;
+    }
+  }
+  else{
+    try
+    {
+      Imf::RgbaInputFile file(this->InternalFileName);
+    
+      Imath::Box2i dw = file.dataWindow();
+      this->DataExtent[0] = dw.min.x;
+      this->DataExtent[1] = dw.max.x;
+      this->DataExtent[2] = dw.min.y;
+      this->DataExtent[3] = dw.max.y;
+    
+      Imf::RgbaChannels channels = file.channels();
+      if (channels != Imf::RgbaChannels::WRITE_RGBA && channels != Imf::RgbaChannels::WRITE_RGB)
+      {
+        throw std::runtime_error("only RGB and RGBA channels are supported");
+      }
+    }
+    catch (const std::exception& e)
+    {
+      vtkErrorMacro("Error reading EXR file: " << e.what());
+      return;
+    }
+  }
+  
   this->SetNumberOfScalarComponents(3);
   this->SetDataScalarTypeToFloat();
 
@@ -112,6 +176,22 @@ void vtkF3DEXRReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInfor
   scalars->SetName("Pixels");
   float* dataPtr = scalars->GetPointer(0);
 
+  if (this->GetMemoryBuffer()){
+    try
+    {
+      assert(this->InternalFileName);
+      Imf::setGlobalThreadCount(std::thread::hardware_concurrency());
+      MemStream memoryStream("EXRmemoryStream", this->MemoryBuffer, this->MemoryBufferLength);
+      Imf::RgbaInputFile file = Imf::RgbaInputFile(memoryStream);
+      execute(file);
+    }
+    catch (const std::exception& e)
+    {
+      vtkErrorMacro("Error reading EXR file (from memory): " << e.what());
+      return;
+    }
+  }
+  
   try
   {
     assert(this->InternalFileName);
@@ -143,6 +223,24 @@ void vtkF3DEXRReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInfor
 }
 
 //------------------------------------------------------------------------------
+void vtkF3DEXRReader::SetMemoryBuffer(const void* buff)
+{
+  if (this->MemoryBuffer != buff)
+  {
+    this->MemoryBuffer = buff;
+  }
+}
+
+//------------------------------------------------------------------------------
+void vtkF3DEXRReader::SetMemoryBufferLength(vtkIdType buflen)
+{
+  if (this->MemoryBufferLength != buflen)
+  {
+    this->MemoryBufferLength = buflen;
+  }
+}
+
+//------------------------------------------------------------------------------
 int vtkF3DEXRReader::GetWidth() const
 {
   return this->DataExtent[1] - this->DataExtent[0] + 1;
@@ -153,3 +251,5 @@ int vtkF3DEXRReader::GetHeight() const
 {
   return this->DataExtent[3] - this->DataExtent[2] + 1;
 }
+
+
