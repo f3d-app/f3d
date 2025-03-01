@@ -729,7 +729,8 @@ vtkBoundingBox vtkF3DRenderer::ComputeVisiblePropOrientedBounds(const vtkMatrix4
   };
 
   /* Use custom logic to extend box.
-   * Should give the tightest bounds even when non-axis-aligned */
+   * Should give the tightest bounds even when non-axis-aligned.
+   * Only implemented for `vtkPolyDataMapper`-based actors. */
   const auto extendBoxArbitrary = [&](vtkProp3D* prop3d, vtkBoundingBox& box)
   {
     vtkActor* actor = vtkActor::SafeDownCast(prop3d);
@@ -738,11 +739,11 @@ vtkBoundingBox vtkF3DRenderer::ComputeVisiblePropOrientedBounds(const vtkMatrix4
       vtkPolyDataMapper* polyMapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
       if (polyMapper)
       {
-        vtkNew<vtkMatrix4x4> tmpMatrix;
-        vtkMatrix4x4::Multiply4x4(matrix, actor->GetMatrix(), tmpMatrix);
         vtkPolyData* polydata = polyMapper->GetInput();
         if (polydata)
         {
+          vtkNew<vtkMatrix4x4> tmpMatrix;
+          vtkMatrix4x4::Multiply4x4(matrix, actor->GetMatrix(), tmpMatrix);
           double p[4] = { 0, 0, 0, 1 };
           double q[4];
           for (vtkIdType i = 0; i < polydata->GetNumberOfPoints(); ++i)
@@ -751,11 +752,11 @@ vtkBoundingBox vtkF3DRenderer::ComputeVisiblePropOrientedBounds(const vtkMatrix4
             tmpMatrix->MultiplyPoint(p, q);
             box.AddPoint(q);
           }
-          return true;
+          return;
         }
       }
     }
-    return false;
+    assert(false); /* custom bounds calculations not implemented for this `vtkProp3D` */
   };
 
   const bool isAxisAligned = isMatrixAxisAligned(matrix);
@@ -780,14 +781,7 @@ vtkBoundingBox vtkF3DRenderer::ComputeVisiblePropOrientedBounds(const vtkMatrix4
           }
           else
           {
-            if (!extendBoxArbitrary(prop3d, box))
-            {
-              const std::string classname = std::string(prop3d->GetClassName());
-              F3DLog::Print(F3DLog::Severity::Warning,
-                "Could not properly account for " + classname +
-                  " in non-axis-aligned bounds computation");
-              extendBoxAxisAligned(prop3d, box);
-            }
+            extendBoxArbitrary(prop3d, box);
           }
         }
       }
