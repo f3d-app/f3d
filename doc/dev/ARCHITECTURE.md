@@ -56,7 +56,7 @@ It also contains the `options.json` file, which is the file used to generate all
 The most important class in the `F3DStarter` which contains most of the top logic on the application. `F3DOptionsTools` is also notable as it handles most of
 the command line options logic.
 
-There is also a dedicated `testing` directory which contains all of the [applicative testing](TESTING.md#application-layer) of the F3D application as well as many functionnal testing of the libf3d.
+There is also a dedicated `testing` directory which contains all of the [applicative testing](TESTING.md#application-layer) of the F3D application as well as many functional testing of the libf3d.
 
 ## Other f3d-app repositories
 
