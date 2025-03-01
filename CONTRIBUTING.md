@@ -28,6 +28,8 @@ To get involved more deeply, please take a look at the [roadmaps](doc/dev/ROADMA
 
 It is also recommended to reach out on [Discord](https://discord.f3d.app) to simplify communication, but it is not required.
 
+You may also want to understand the overall [architecture](doc/dev/ARCHITECTURE.md) of the F3D project.
+
 You can then fix the issue or implement the feature on your side and contribute it to the F3D repository by following the workflow described below.
 
 Of course, if you are already using F3D and want to improve it for your specific needs, because you want a feature or found a bug,
