@@ -29,7 +29,7 @@ You can also find packages for the following repositories:
 ### Windows
 
 - [Scoop](https://scoop.sh/#/apps?q=f3d&s=0&d=1&o=true)
-- [Winget](https://winstall.app/apps/f3d-app.f3d)
+- [winget](https://winstall.app/apps/f3d-app.f3d)
 
 ### MacOS
 
@@ -44,8 +44,9 @@ You can also find packages for the following repositories:
 - [openSUSE](https://software.opensuse.org/package/f3d)
 - [OpenMandriva](https://github.com/OpenMandrivaAssociation/f3d)
 - [Mageia](https://madb.mageialinux-online.org/show?distribution=cauldron&architecture=x86_64&rpm=f3d&repo=&group=&page=)
+- [ALT Linux](https://packages.altlinux.org/en/sisyphus/srpms/f3d/)
 - Fedora and others through [openSUSE OBS](https://build.opensuse.org/package/show/home:AndnoVember:F3D/f3d)
-- [Guix](https://packages.guix.gnu.org/packages/f3d/)
+- [Guix](https://hpc.guix.info/package/f3d)
 - [Flathub](https://flathub.org/apps/details/io.github.f3d_app.f3d)
 
 ### Other
