@@ -55,7 +55,7 @@ engine::engine(
   fs::path cachePath;
 #if defined(_WIN32)
   const char* appData = std::getenv("APPDATA");
-  if (appData  && strlen(appData) > 0)
+  if (appData && strlen(appData) > 0)
   {
     cachePath = fs::path(appData);
   }
@@ -73,7 +73,7 @@ engine::engine(
     {
       cachePath = fs::path(home);
 #if defined(__APPLE__)
-      cachePath = cachePath / "Library" / "Caches" ;
+      cachePath = cachePath / "Library" / "Caches";
 #elif defined(__unix__)
       cachePath /= ".cache";
 #endif
@@ -82,7 +82,8 @@ engine::engine(
 #endif
   if (cachePath.empty())
   {
-    throw engine::cache_exception("Could not setup cache, please set the appropriate environment variable");
+    throw engine::cache_exception(
+      "Could not setup cache, please set the appropriate environment variable");
   }
   cachePath /= "f3d";
 
