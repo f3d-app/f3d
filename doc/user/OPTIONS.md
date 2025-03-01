@@ -188,3 +188,13 @@ For example the screenshot filename is configured as `{app}/{model}_{n}.png` by 
 consecutive screenshots are going to be saved as `F3D/hello_1.png`, `F3D/hello_2.png`, `F3D/hello_3.png`, ...
 
 Model related variables will be replaced by `no_file` if no file is loaded and `multi_file` if multiple files are loaded using the `multi-file-mode` option.
+
+## HDRI Caches
+
+When using HDRI related options, F3D will create and use a cache directory to store related data in order to speed up rendering.
+These cache files can be safely removed at the cost of recomputing them on next use.
+
+The cache directory location is as follows:
+ - Windows: `%LOCALAPPDATA%\f3d`
+ - Linux: `${HOME}/.cache/f3d`
+ - macOS: `${HOME}/Library/Caches/f3d`
