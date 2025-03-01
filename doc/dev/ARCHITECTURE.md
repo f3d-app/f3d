@@ -1,6 +1,6 @@
 # F3D Architecture
 
-F3D is structured in different parts, interacting with each others and with its dependencies.
+F3D is structured in different parts, interacting with each others and with F3D dependencies.
 This architecture is reflected by the directories organisation.
 
  - **application**: the code of the F3D application itself, see below
@@ -36,7 +36,7 @@ Each of these modules also contains [tests](TESTING.md#vtkextensions-layer) in t
 
 ## plugins
 
-`plugins` contains [libf3d plugins](../libf3d/PLUGINS.md) that are provided by default in the F3D packages. Each of these plugins correspond to a specific dependency and are named accordingly.Each of these plugin will provide access to specific readers for specific formats. Without plugins, F3D and the libf3d would not be able to open any file. These plugins can be loaded statically or dynamically, which makes the dependencies truly optional if needed.
+`plugins` contains [libf3d plugins](../libf3d/PLUGINS.md) that are provided by default in the F3D packages. Each of these plugins correspond to a specific dependency and are named accordingly. Each of these plugins provide access to specific readers for specific formats. Without plugins, F3D and the libf3d would not be able to open any file. These plugins can be loaded statically or dynamically, which makes the dependencies truly optional if needed.
 
 ## library
 
@@ -49,3 +49,20 @@ Logically, it is structured in 3 parts, `public` which contains the public API h
 There is also a dedicated `testing` directory which contains the [unit and functionnal testing](TESTING.md#library-layer) of the libf3d.
 
 It also contains the `options.json` file, which is the file used to generate all [options](../libf3d/OPTIONS.md) code.
+
+## application
+
+`application` contains the code of the F3D application itself. It relies of course on the libf3d to implement all the applicative logic.
+The most important class in the `F3DStarter` which contains most of the top logic on the application. `F3DOptionsTools` is also notable as it handles most of
+the command line options logic.
+
+There is also a dedicated `testing` directory which contains all of the [applicative testing](TESTING.md#application-layer) of the F3D application as well as many functionnal testing of the libf3d.
+
+## Other f3d-app repositories
+
+Although almost everything is contained in the [f3d-app/f3d](https://github.com/f3d-app/f3d) repository, other repositories in the [f3d-app](https://github.com/f3d-app) organisation are handling certains specific tasks in the F3D ecosystem.
+
+ - The [f3d-superbuild](https://github.com/f3d-app/f3d-superbuild) handles the packaging and the creation of the binaries provided in the [releases page](https://github.com/f3d-app/f3d/releases).
+ - [f3d-media](https://github.com/f3d-app/f3d-media) backups all images and video used in this documentation
+ - A collection of actions: [sccache-setup](https://github.com/f3d-app/sccache-setup-action), [lfs-data-cache](https://github.com/f3d-app/sccache-setup-action) and [install-mesa-windows](https://github.com/f3d-app/install-mesa-windows-action) used by the CI of F3D
+ - A collection of [docker files](https://github.com/f3d-app/install-mesa-windows-action) used for generating docker images used by the CI of F3D
