@@ -21,9 +21,9 @@ project = "libf3d"
 copyright = "2025, Michael Migliore and Mathieu Westphal"
 author = "Michael Migliore and Mathieu Westphal"
 
-
 # The full version, including alpha/beta/rc tags
 release = "3.0.0"
+
 
 # -- General configuration ---------------------------------------------------
 
