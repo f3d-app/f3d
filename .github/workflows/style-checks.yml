@@ -10,15 +10,14 @@ jobs:
     - name: C++ Formatting
       uses: DoozyX/clang-format-lint-action@v0.16
       with:
-        source: 'application examples java library plugins python vtkext webassembly'
+        source: '.'
         extensions: 'h,cxx,in'
-        exclude: '**/*.py.in'
+        exclude: './cmake **/*.py.in **/*.log.in **/*.json.in **/*.thumbnailer.in **/*.cmake.in **/*.desktop.in'
         clangFormatVersion: 18
     - name: Python Formatting
       uses: psf/black@stable
       with:
         options: "--check --verbose --include '(\\.py|\\.py\\.in)'"
-        src: "./python"
     - name: Prettier Formatting
       uses: creyD/prettier_action@v4.3
       with:
