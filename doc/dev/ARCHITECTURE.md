@@ -46,7 +46,7 @@ and also contains hidden methods used to communicate between classes, especially
 
 Logically, it is structured in 3 parts, `public` which contains the public API header files and are all installed, `private` which contains the implementation classes headers files and `src` that contains the source files of all the classes, public and private.
 
-There is also a dedicated `testing` directory which contains the [unit and functionnal testing](TESTING.md#library-layer) of the libf3d.
+There is also a dedicated `testing` directory which contains the [unit and functional testing](TESTING.md#library-layer) of the libf3d.
 
 It also contains the `options.json` file, which is the file used to generate all [options](../libf3d/OPTIONS.md) code.
 
