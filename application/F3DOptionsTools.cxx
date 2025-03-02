@@ -178,7 +178,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
  * True boolean options need to be filtered out in ParseCLIOptions
  * This is the easiest, compile time way to do it
  */
-constexpr std::array CLIBooleans = {"version", "help", "list-readers", "scan-plugins", "list-rendering-backends"};
+constexpr std::array CLIBooleans = {"version", "help", "list-readers", "scan-plugins", "list-rendering-backends", "define", "reset"};
 
 //----------------------------------------------------------------------------
 /**
@@ -410,6 +410,13 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
   // cxxopts values need to live somewhere until parsing is done
   std::vector<std::shared_ptr<cxxopts::Value>> cxxoptsValues;
   auto cxxoptsInputPositionals = cxxopts::value<std::vector<std::string>>(positionals);
+
+  std::vector<std::string> defines;
+  auto cxxoptsDefines = cxxopts::value<std::vector<std::string>>(defines);
+
+  std::vector<std::string> resets;
+  auto cxxoptsResets = cxxopts::value<std::vector<std::string>>(resets);
+
   try
   {
     cxxopts::Options cxxOptions(execName, F3D::AppTitle);
@@ -423,6 +430,8 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
       if (std::string(optionGroup.GroupName) == "Applicative")
       {
         group("input", "Input files", cxxoptsInputPositionals, "<files>");
+        group("D,define", "Define libf3d options", cxxoptsDefines, "<defines>");
+        group("R,reset", "Reset libf3d options", cxxoptsResets, "<resets>");
       }
 
       // Add each option to cxxopts
@@ -560,9 +569,28 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
       // Discard boolean option like `--version` or `--help`
       if (std::find(::CLIBooleans.begin(), ::CLIBooleans.end(), res.key()) == ::CLIBooleans.end())
       {
-        cliOptionsDict.emplace(res.key(), res.value());
+        cliOptionsDict[res.key()] = res.value();
       }
     }
+
+    // Handle defines and add them as proper options
+    for (const std::string& define : defines)
+    {
+      std::string::size_type sepIdx = define.find_first_of('=');
+      if (sepIdx == std::string::npos)
+      {
+        f3d::log::warn("Could not parse a define '", define, "'");
+        continue;
+      }
+      cliOptionsDict[define.substr(0, sepIdx)] = define.substr(sepIdx + 1);
+    }
+
+    // Handles reset using the dedicated syntax
+    for (const std::string& reset : resets)
+    {
+      cliOptionsDict["reset-" + reset] = "";
+    }
+
     return cliOptionsDict;
   }
   catch (const cxxopts::exceptions::exception& ex)
