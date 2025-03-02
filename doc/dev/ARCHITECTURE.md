@@ -9,7 +9,7 @@ This architecture is reflected by the directories organisation.
 - examples: examples usage of the libf3d and plugin framework in python and C++
 - external: dependencies that are included directly in the code
 - java: [java bindings](../libf3d/LANGUAGE_BINDINGS.md#java-experimental) and associated tests.
-- **library**: the [libf3d](../libf3d/README.md) itself, see below
+- **library**: the [libf3d](../libf3d/README_LIBF3D.md) itself, see below
 - **plugins**: all the [plugins](../libf3d/PLUGINS.md) providing different readers, see below
 - python: [python bindings](../libf3d/LANGUAGE_BINDINGS.md#python) and tests
 - resources: all non code, non doc, like icon, configs and such
@@ -64,5 +64,5 @@ Although almost everything is contained in the [f3d-app/f3d](https://github.com/
 
 - The [f3d-superbuild](https://github.com/f3d-app/f3d-superbuild) handles the packaging and the creation of the binaries provided in the [releases page](https://github.com/f3d-app/f3d/releases).
 - [f3d-media](https://github.com/f3d-app/f3d-media) backups all images and video used in this documentation
-- A collection of actions: [sccache-setup](https://github.com/f3d-app/sccache-setup-action), [lfs-data-cache](https://github.com/f3d-app/sccache-setup-action) and [install-mesa-windows](https://github.com/f3d-app/install-mesa-windows-action) used by the CI of F3D
-- A collection of [docker files](https://github.com/f3d-app/install-mesa-windows-action) used for generating docker images used by the CI of F3D
+- A collection of actions: [sccache-setup](https://github.com/f3d-app/sccache-setup-action), [lfs-data-cache](https://github.com/f3d-app/lfs-data-cache-action) and [install-mesa-windows](https://github.com/f3d-app/install-mesa-windows-action) used by the CI of F3D
+- A collection of [docker files](https://github.com/f3d-app/f3d-docker-images) used for generating docker images used by the CI of F3D
