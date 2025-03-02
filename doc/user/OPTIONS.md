@@ -195,6 +195,7 @@ When using HDRI related options, F3D will create and use a cache directory to st
 These cache files can be safely removed at the cost of recomputing them on next use.
 
 The cache directory location is as follows, in order, using the first defined environment variables:
- - Windows: `%LOCALAPPDATA%\f3d`
- - Linux: `${XDG_CACHE_HOME}/f3d`,`${HOME}/.cache/f3d`
- - macOS: `${XDG_CACHE_HOME}/f3d`,`${HOME}/Library/Caches/f3d`
+
+- Windows: `%LOCALAPPDATA%\f3d`
+- Linux: `${XDG_CACHE_HOME}/f3d`,`${HOME}/.cache/f3d`
+- macOS: `${XDG_CACHE_HOME}/f3d`,`${HOME}/Library/Caches/f3d`
