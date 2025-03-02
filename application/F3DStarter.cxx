@@ -1245,6 +1245,8 @@ void F3DStarter::LoadFileGroup(
 
   // Recover current options from the engine
   f3d::options& dynamicOptions = this->Internals->Engine->getOptions();
+
+  // reset forced options to avoid logging noise
   dynamicOptions.ui.dropzone = false;
   dynamicOptions.ui.filename_info = "";
 
@@ -1264,6 +1266,8 @@ void F3DStarter::LoadFileGroup(
       }
       else
       {
+        // No need for a try/catch block here, this call cannot trigger
+        // an exception with current code path
         dynamicOptionsDict[name] = dynamicOptions.getAsString(name);
       }
     }
