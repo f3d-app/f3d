@@ -1244,21 +1244,28 @@ void F3DStarter::LoadFileGroup(
   f3d::log::debug("========== Loading 3D files ==========");
 
   // Recover current options from the engine
-  const f3d::options& dynamicOptions = this->Internals->Engine->getOptions();
+  f3d::options& dynamicOptions = this->Internals->Engine->getOptions();
+  dynamicOptions.ui.dropzone = false;
+  dynamicOptions.ui.filename_info = "";
 
   // Detect interactively changed options and store them into the dynamic options dict
   // options names are shared between options instance
   F3DOptionsTools::OptionsDict dynamicOptionsDict;
-  std::vector<std::string> optionNames = dynamicOptions.getNames();
+  std::vector<std::string> optionNames = dynamicOptions.getAllNames();
   for (const auto& name : optionNames)
   {
     if (!dynamicOptions.isSame(this->Internals->LibOptions, name))
     {
-      // TODO Currently an assert is enough but it should be a proper try/catch once
-      // we add a mechanism to unset an option
-      // Now possible, TODO
-      assert(dynamicOptions.hasValue(name));
-      dynamicOptionsDict[name] = dynamicOptions.getAsString(name);
+      if (!dynamicOptions.hasValue(name))
+      {
+        // If a dynamic option has been changed and does not have value, it means it was reset using the command line
+        // reset it using the dedicated sytax
+        dynamicOptionsDict["reset-" + name] = "";
+      }
+      else
+      {
+        dynamicOptionsDict[name] = dynamicOptions.getAsString(name);
+      }
     }
   }
 
@@ -1434,8 +1441,9 @@ void F3DStarter::LoadFileGroup(
     }
   }
 
-  // XXX: We can force dropzone and filename_info because they cannot be set
-  // manually by the user for now
+  // XXX: Here we potentially override user set libf3d options
+  // but there is no way to detect if an option has been set
+  // by the user or not.
   f3d::options& options = this->Internals->Engine->getOptions();
   options.ui.dropzone = this->Internals->LoadedFiles.empty();
   options.ui.filename_info = filenameInfo;

@@ -925,16 +925,17 @@ f3d_test(NAME TestInteractionRecord DATA cow.vtp ARGS --interaction-test-record=
 f3d_test(NAME TestInteractionPlay DATA cow.vtp ARGS --interaction-test-play=${CMAKE_BINARY_DIR}/Testing/Temporary/TestInteractionRecord.log DEPENDS TestInteractionRecord NO_BASELINE)
 
 # Command Script Test
-f3d_test(NAME TestCommandScriptBasic DATA dragon.vtu SCRIPT TestCommandScriptBasic.txt --reference=${F3D_SOURCE_DIR}/testing/baselines/TestCommandScriptBasic.png)
-f3d_test(NAME TestCommandScriptInvalidCommand DATA dragon.vtu SCRIPT TestCommandScriptInvalid.txt REGEXP "Command: \"INVALID_COMMAND_1\" is not recognized, ignoring" NO_BASELINE)
+f3d_test(NAME TestCommandScriptBasic DATA dragon.vtu SCRIPT TestCommandScriptBasic.txt) # roll_camera 90;toggle ui.scalar_bar;print_scene_info;increase_light_intensity
+f3d_test(NAME TestCommandScriptInvalidCommand DATA dragon.vtu SCRIPT TestCommandScriptInvalid.txt REGEXP "Command: \"INVALID_COMMAND_1\" is not recognized, ignoring" NO_BASELINE) # INVALID_COMMAND_1
 f3d_test(NAME TestCommandScriptMissingFile DATA dragon.vtu SCRIPT TestCommandScriptMissingFile.txt REGEXP "Unable to open command script file" NO_BASELINE)
 f3d_test(NAME TestCommandScriptPrintScene DATA dragon.vtu SCRIPT TestCommandScriptPrintScene.txt REGEXP "Camera position: 2.23745,3.83305,507.598" NO_BASELINE) # print_scene_info
 f3d_test(NAME TestCommandScriptPrintColoring DATA dragon.vtu SCRIPT TestCommandScriptPrintColoring.txt REGEXP "Not coloring" NO_BASELINE) # print_coloring_info
 f3d_test(NAME TestCommandScriptPrintMesh DATA dragon.vtu SCRIPT TestCommandScriptPrintMesh.txt REGEXP "Number of points: 13268" NO_BASELINE) # print_mesh_info
 f3d_test(NAME TestCommandScriptPrintOptions DATA dragon.vtu SCRIPT TestCommandScriptPrintOptions.txt REGEXP "interactor.invert_zoom: false" NO_BASELINE) # print_options_info
 f3d_test(NAME TestCommandScriptAlias DATA dragon.vtu SCRIPT TestCommandScriptAlias.txt --reference=${F3D_SOURCE_DIR}/testing/baselines/TestCommandScriptAlias.png) # alias myrotate roll_camera 90;myrotate
-f3d_test(NAME TestParseOptionalBoolExtraArg DATA dragon.vtu SCRIPT TestParseOptionalBoolExtraArg.txt REGEXP "Command: load_previous_file_group takes at most 1 argument, got 2 arguments instead." NO_BASELINE)
-f3d_test(NAME TestRemoveFileGroups DATA dragon.vtu SCRIPT TestRemoveFileGroups.txt NO_DATA_FORCE_RENDER)
+f3d_test(NAME TestCommandScriptReset DATA dragon.vtu suzanne.stl ARGS --edges SCRIPT TestCommandScriptReset.txt) # reset render.show_edges; load_next_file_group;
+f3d_test(NAME TestParseOptionalBoolExtraArg DATA dragon.vtu SCRIPT TestParseOptionalBoolExtraArg.txt REGEXP "Command: load_previous_file_group takes at most 1 argument, got 2 arguments instead." NO_BASELINE) # load_previous_file_group true extra
+f3d_test(NAME TestRemoveFileGroups DATA dragon.vtu SCRIPT TestRemoveFileGroups.txt NO_DATA_FORCE_RENDER) # remove_file_groups
 
 # Window position test
 f3d_test(NAME TestPosition DATA dragon.vtu ARGS --position=100,100 NO_BASELINE)
