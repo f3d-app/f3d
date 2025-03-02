@@ -3,20 +3,20 @@
 F3D is structured in different parts, interacting with each others and with F3D dependencies.
 This architecture is reflected by the directories organisation.
 
- - **application**: the code of the F3D application itself, see below
- - cmake: cmake macros and functions, used by the CMake build system
- - doc: this very documentation
- - examples: examples usage of the libf3d and plugin framework in python and C++
- - external: dependencies that are included directly in the code
- - java: [java bindings](../libf3d/LANGUAGE_BINDINGS.md#java-experimental) and associated tests.
- - **library**: the [libf3d](../libf3d/README.md) itself, see below
- - **plugins**: all the [plugins](../libf3d/PLUGINS.md) providing different readers, see below
- - python: [python bindings](../libf3d/LANGUAGE_BINDINGS.md#python) and tests
- - resources: all non code, non doc, like icon, configs and such
- - testing: all testing related resources, does not contain the test themselves
- - **vtkext**: extensions to VTK and related tests, see below
- - webassembly: [webassembly/javascript bindings](../libf3d/LANGUAGE_BINDINGS.md#javascript-experimental) and [F3DWeb](https://f3d.app/web/) application code
- - winshellext: shell extension for Windows, provide [thumbnails for Windows](../user/DESKTOP_INTEGRATION.md#windows)
+- **application**: the code of the F3D application itself, see below
+- cmake: cmake macros and functions, used by the CMake build system
+- doc: this very documentation
+- examples: examples usage of the libf3d and plugin framework in python and C++
+- external: dependencies that are included directly in the code
+- java: [java bindings](../libf3d/LANGUAGE_BINDINGS.md#java-experimental) and associated tests.
+- **library**: the [libf3d](../libf3d/README.md) itself, see below
+- **plugins**: all the [plugins](../libf3d/PLUGINS.md) providing different readers, see below
+- python: [python bindings](../libf3d/LANGUAGE_BINDINGS.md#python) and tests
+- resources: all non code, non doc, like icon, configs and such
+- testing: all testing related resources, does not contain the test themselves
+- **vtkext**: extensions to VTK and related tests, see below
+- webassembly: [webassembly/javascript bindings](../libf3d/LANGUAGE_BINDINGS.md#javascript-experimental) and [F3DWeb](https://f3d.app/web/) application code
+- winshellext: shell extension for Windows, provide [thumbnails for Windows](../user/DESKTOP_INTEGRATION.md#windows)
 
 Here is diagram explaining how some of these parts interact together:
 
@@ -41,7 +41,7 @@ Each of these modules also contains [tests](TESTING.md#vtkextensions-layer) in t
 ## library
 
 `library` contains the code of the libf3d. It is a C++ library with a very limited API surface and larger, private, implementation.
-Most classes in the libf3d are split in two. A public part that contains mostly the public API, and a private part, suffixed "_impl", that implements that public API
+Most classes in the libf3d are split in two. A public part that contains mostly the public API, and a private part, suffixed "\_impl", that implements that public API
 and also contains hidden methods used to communicate between classes, especially in regards to VTK symbols.
 
 Logically, it is structured in 3 parts, `public` which contains the public API header files and are all installed, `private` which contains the implementation classes headers files and `src` that contains the source files of all the classes, public and private.
@@ -62,7 +62,7 @@ There is also a dedicated `testing` directory which contains all of the [applica
 
 Although almost everything is contained in the [f3d-app/f3d](https://github.com/f3d-app/f3d) repository, other repositories in the [f3d-app](https://github.com/f3d-app) organisation are handling certains specific tasks in the F3D ecosystem.
 
- - The [f3d-superbuild](https://github.com/f3d-app/f3d-superbuild) handles the packaging and the creation of the binaries provided in the [releases page](https://github.com/f3d-app/f3d/releases).
- - [f3d-media](https://github.com/f3d-app/f3d-media) backups all images and video used in this documentation
- - A collection of actions: [sccache-setup](https://github.com/f3d-app/sccache-setup-action), [lfs-data-cache](https://github.com/f3d-app/sccache-setup-action) and [install-mesa-windows](https://github.com/f3d-app/install-mesa-windows-action) used by the CI of F3D
- - A collection of [docker files](https://github.com/f3d-app/install-mesa-windows-action) used for generating docker images used by the CI of F3D
+- The [f3d-superbuild](https://github.com/f3d-app/f3d-superbuild) handles the packaging and the creation of the binaries provided in the [releases page](https://github.com/f3d-app/f3d/releases).
+- [f3d-media](https://github.com/f3d-app/f3d-media) backups all images and video used in this documentation
+- A collection of actions: [sccache-setup](https://github.com/f3d-app/sccache-setup-action), [lfs-data-cache](https://github.com/f3d-app/sccache-setup-action) and [install-mesa-windows](https://github.com/f3d-app/install-mesa-windows-action) used by the CI of F3D
+- A collection of [docker files](https://github.com/f3d-app/install-mesa-windows-action) used for generating docker images used by the CI of F3D
