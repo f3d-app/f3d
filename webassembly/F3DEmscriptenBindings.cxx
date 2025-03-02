@@ -43,7 +43,7 @@ std::string get_as_string(f3d::options& o, const std::string& name)
 }
 f3d::options& set_string(f3d::options& o, const std::string& name, const std::string& value)
 {
-  return o.set(name, value);
+  return o.setAsString(name, value);
 }
 f3d::options& set_integer(f3d::options& o, const std::string& name, int value)
 {
