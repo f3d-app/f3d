@@ -265,7 +265,7 @@
           document.querySelector("#z-up").addEventListener("click", (evt) => {
             Module.engineInstance
               .getOptions()
-              .set_string("scene.up_direction", "+Z");
+              .set_as_string("scene.up_direction", "+Z");
             document.getElementById("z-up").classList.add("is-active");
             document.getElementById("y-up").classList.remove("is-active");
             openFile(document.getElementById("file-name").innerHTML);
@@ -274,7 +274,7 @@
           document.querySelector("#y-up").addEventListener("click", (evt) => {
             Module.engineInstance
               .getOptions()
-              .set_string("scene.up_direction", "+Y");
+              .set_as_string("scene.up_direction", "+Y");
             document.getElementById("y-up").classList.add("is-active");
             document.getElementById("z-up").classList.remove("is-active");
             openFile(document.getElementById("file-name").innerHTML);
