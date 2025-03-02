@@ -176,6 +176,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
 
 /**
  * True boolean options need to be filtered out in ParseCLIOptions
+ * Also filter out special options like `define` and `reset`
  * This is the easiest, compile time way to do it
  */
 constexpr std::array CLIBooleans = {"version", "help", "list-readers", "scan-plugins", "list-rendering-backends", "define", "reset"};
@@ -430,8 +431,8 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
       if (std::string(optionGroup.GroupName) == "Applicative")
       {
         group("input", "Input files", cxxoptsInputPositionals, "<files>");
-        group("D,define", "Define libf3d options", cxxoptsDefines, "<defines>");
-        group("R,reset", "Reset libf3d options", cxxoptsResets, "<resets>");
+        group("D,define", "Define libf3d options", cxxoptsDefines, "libf3d.option=value");
+        group("R,reset", "Reset libf3d options", cxxoptsResets, "libf3d.option");
       }
 
       // Add each option to cxxopts
