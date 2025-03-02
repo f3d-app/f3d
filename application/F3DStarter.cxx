@@ -498,7 +498,7 @@ public:
                 libf3dOptionName = libf3dOptionName.substr(6);
                 libf3dOptionValue = "reset";
               }
-             
+
               try
               {
                 // Assume this is a libf3d option and set/reset the value
@@ -514,15 +514,16 @@ public:
                 // Log the option if needed
                 if (logOptions)
                 {
-                  loggingMap[libf3dOptionName] = std::tuple(libf3dOptionName, source, pattern, libf3dOptionValue);
+                  loggingMap[libf3dOptionName] =
+                    std::tuple(libf3dOptionName, source, pattern, libf3dOptionValue);
                 }
               }
               catch (const f3d::options::parsing_exception& ex)
               {
                 std::string origin =
                   source.empty() ? pattern : source.string() + ":`" + pattern + "`";
-                f3d::log::warn("Could not set '", libf3dOptionName, "' to '", libf3dOptionValue, "' from ", origin,
-                  " because: ", ex.what());
+                f3d::log::warn("Could not set '", libf3dOptionName, "' to '", libf3dOptionValue,
+                  "' from ", origin, " because: ", ex.what());
               }
               catch (const f3d::options::inexistent_exception&)
               {
@@ -581,7 +582,8 @@ public:
 
     this->AppOptions.FrameRate = f3d::options::parse<double>(appOptions.at("frame-rate"));
     this->AppOptions.Watch = f3d::options::parse<bool>(appOptions.at("watch"));
-    this->AppOptions.Plugins = { f3d::options::parse<std::vector<std::string>>( appOptions.at("load-plugins")) };
+    this->AppOptions.Plugins = { f3d::options::parse<std::vector<std::string>>(
+      appOptions.at("load-plugins")) };
     this->AppOptions.ScreenshotFilename =
       f3d::options::parse<std::string>(appOptions.at("screenshot-filename"));
     this->AppOptions.VerboseLevel = f3d::options::parse<std::string>(appOptions.at("verbose"));
@@ -600,7 +602,8 @@ public:
       camDir = f3d::options::parse<f3d::direction_t>(camDirStr);
     }
 
-    this->AppOptions.CamConf = { f3d::options::parse<std::vector<double>>( appOptions.at("camera-position")),
+    this->AppOptions.CamConf = { f3d::options::parse<std::vector<double>>(
+                                   appOptions.at("camera-position")),
       f3d::options::parse<std::vector<double>>(appOptions.at("camera-focal-point")),
       f3d::options::parse<std::vector<double>>(appOptions.at("camera-view-up")),
       f3d::options::parse<double>(appOptions.at("camera-view-angle")), camDir,
@@ -873,8 +876,7 @@ int F3DStarter::Start(int argc, char** argv)
   iter = cliOptionsDict.find("verbose");
   if (iter != cliOptionsDict.end())
   {
-    this->Internals->AppOptions.VerboseLevel =
-      f3d::options::parse<std::string>(iter->second);
+    this->Internals->AppOptions.VerboseLevel = f3d::options::parse<std::string>(iter->second);
   }
 
   // Set verbosity level early from command line
@@ -1260,8 +1262,8 @@ void F3DStarter::LoadFileGroup(
     {
       if (!dynamicOptions.hasValue(name))
       {
-        // If a dynamic option has been changed and does not have value, it means it was reset using the command line
-        // reset it using the dedicated sytax
+        // If a dynamic option has been changed and does not have value, it means it was reset using
+        // the command line reset it using the dedicated syntax
         dynamicOptionsDict["reset-" + name] = "";
       }
       else
