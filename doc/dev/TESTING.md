@@ -71,6 +71,20 @@ The test will run and fail but an image output will be generated in the build di
 Visually check that the generated file looks as expected, then add it to the F3D sources in `testing/baselines`.
 Rerun the test, it should now pass.
 
+There is many other keywords in the `f3d_test` macro, here is a non exhaustive list:
+
+- `TONE_MAPPING`: Tests that uses tone mapping so they can be disabled with old VTK version
+- `LONG_TIMEOUT`: Tests that takes a long time to run, so they can be disabled on weaker CI machines
+- `INTERACTION`: Interaction test, see below
+- `INTERACTION_CONFIGURE`: A special kind of interaction tests that require configuring the interaction log using CMake, eg drag and drop tests.
+- `NO_BASELINE`: Test that have no baselines and do not perform a rendering comparison at the end, usually combined with `REGEXP`
+- `NO_RENDER`: Tests that do not require rendering capability at all, usually combined with `REGEXP`
+- `NO_OUTPUT`: Tests that do not have an automatic `--output`, may still use `BASELINE` or define `--output` manually
+- `WILL_FAIL`: Tests that should fail in order to pass
+- `NO_DATA_FORCE_RENDER`: Tests that do not open any data yet require a rendering tests at the end, rely on an environment variable
+- `UI`: Tests that show the ImGui UI, hence require it to be present in order to be enabled
+- `PREVENT_SKIP_FRAME`: Animation tests that require precise timings and force F3D to not skip animation frames
+
 ### Recovering baselines from CI
 
 Occasionally you may need to recover a baseline from the CI. If this is required, create a PR and let the test run and fail on CI. Check the actions run summary on Github and download the appropriate `baseline` archive. Extract the archive and navigate to the `build/Testing/Temporary/TestName.png`. Visually check that the generated file looks as expected, then add it to the F3D sources in `testing/baselines`.
@@ -88,6 +102,8 @@ where
 - `TestName` should be the name of the test case.
 
 While recording the interaction, care should be taken to perform the minimum number of events to simulate the interaction. For example, if you want to simulate the number `5` being pressed, there should be no mouse events or other keypress events during the recording of the interaction. The interaction file is saved when `f3d` is exited.
+
+Another interaction to avoid the one that quit F3D as it will have unexpected behavior when being replayed. Instead, quit the F3D application by using your window manager or Ctrl+C in the terminal.
 
 You can verify that your interaction file is correct by playing back the interaction
 
