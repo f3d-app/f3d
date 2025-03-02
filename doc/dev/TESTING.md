@@ -78,7 +78,7 @@ There is many other keywords in the `f3d_test` macro, here is a non exhaustive l
 - `INTERACTION`: Interaction test, see below
 - `INTERACTION_CONFIGURE`: A special kind of interaction tests that require configuring the interaction log using CMake, eg drag and drop tests.
 - `NO_BASELINE`: Test that have no baselines and do not perform a rendering comparison at the end, usually combined with `REGEXP`
-- `NO_RENDER`: Test that do not require rendering capability at all, usually combined with `REGEXP`
+- `NO_RENDER`: Tests that do not require rendering capability at all, usually combined with `REGEXP`
 - `NO_OUTPUT`: Tests that do not have an automatic `--output`, may still use `BASELINE` or define `--output` manually
 - `WILL_FAIL`: Tests that should fail in order to pass
 - `NO_DATA_FORCE_RENDER`: Tests that do not open any data yet require a rendering tests at the end, rely on an environment variable
