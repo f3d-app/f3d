@@ -26,7 +26,7 @@ Here is diagram explaining how some of these parts interact together:
 
 `vtkext` contains two [VTK modules](https://docs.vtk.org/en/latest/api/cmake/ModuleSystem.html) that are used extensively in the libf3d. The public one is used in the plugins.
 
-`public` is a VTK module that contains classes and utilities that can be installed and used by plugins, including externals plugins. `vtkF3DImporter` is a class
+`public` is a VTK module that contains classes and utilities that can be installed as part of the `plugin_sdk` and used by plugins, including externals plugins. `vtkF3DImporter` is a class
 that is specifically made for plugin developers to inherit their importers from. The documentation of this module can be found [here](https://f3d.app/doc/libf3d/vtkext_doxygen/).
 
 `private` is a VTK module that contains many classes and utilities used by the libf3d to provide all features of F3D, especially the rendering, interactions and UI.
