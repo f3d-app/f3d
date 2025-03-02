@@ -154,6 +154,11 @@ public:
   void InitializeUpVector(const std::vector<double>& upVec);
 
   /**
+   * Compute bounds of visible props as transformed by given matrix.
+   */
+  vtkBoundingBox ComputeVisiblePropOrientedBounds(const vtkMatrix4x4*);
+
+  /**
    * Get the OpenGL skybox
    */
   vtkGetObjectMacro(SkyboxActor, vtkSkybox);
@@ -524,7 +529,6 @@ private:
   bool InvertZoom = false;
 
   int RaytracingSamples = 0;
-  int UpIndex = 1;
   double UpVector[3] = { 0.0, 1.0, 0.0 };
   double RightVector[3] = { 1.0, 0.0, 0.0 };
   double CircleOfConfusionRadius = 20.0;

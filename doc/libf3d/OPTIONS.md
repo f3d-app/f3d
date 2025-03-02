@@ -27,7 +27,7 @@ See the [APIs](#APIs) details below for more info.
 | scene.animation.speed_factor |    ratio<br>1<br>render    | Set the animation speed factor to slow, speed up or even invert animation.                                                                   | \-\-animation-speed-factor |
 |     scene.animation.time     | double<br>optional<br>load | Set the animation time to load.                                                                                                              |     \-\-animation-time     |
 |      scene.camera.index      |  int<br>optional<br>load   | Select the scene camera to use when available in the file.<br>The default scene always uses automatic camera.                                |      \-\-camera-index      |
-|      scene.up_direction      |  direction<br>+Y<br>load   | Define the Up direction. Only axis-aligned directions are valid. It impacts the grid, the axis, the HDRI and the camera.                     |           \-\-up           |
+|      scene.up_direction      |  direction<br>+Y<br>load   | Define the Up direction. It impacts the grid, the axis, the HDRI and the camera.                                                             |           \-\-up           |
 |  scene.camera.orthographic   |  bool<br>optional<br>load  | Set to true to force orthographic projection. Model specified by default, which is false if not specified.                                   |  \-\-camera\-orthographic  |
 
 ## Interactor Options
