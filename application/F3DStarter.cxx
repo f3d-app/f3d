@@ -62,7 +62,7 @@ class F3DStarter::F3DInternals
 public:
   F3DInternals() = default;
 
-  using log_entry_t = std::tuple<std::string, fs::path, std::string, std::string>;
+  using log_entry_t = std::tuple<std::string, std::string, std::string, std::string>;
 
   // XXX: The values in the following two structs
   // are left uninitialized as the will all be initialized from
@@ -425,7 +425,7 @@ public:
     for (const auto& [key, tuple] : loggingMap)
     {
       const auto& [bindStr, source, pattern, commands] = tuple;
-      std::string origin = source.empty() ? pattern : source.string() + ":`" + pattern + "`";
+      std::string origin = source.empty() ? pattern : source + ":`" + pattern + "`";
       f3d::log::debug(" '", bindStr, "' ", sep, " '", commands, "' from ", origin);
     }
     f3d::log::debug("");
@@ -523,14 +523,14 @@ public:
               catch (const f3d::options::parsing_exception& ex)
               {
                 std::string origin =
-                  source.empty() ? pattern : source.string() + ":`" + pattern + "`";
+                  source.empty() ? pattern : std::string(source) + ":`" + pattern + "`";
                 f3d::log::warn("Could not set '", keyForLog, "' to '", libf3dOptionValue, "' from ",
                   origin, " because: ", ex.what());
               }
               catch (const f3d::options::inexistent_exception&)
               {
                 std::string origin =
-                  source.empty() ? pattern : source.string() + ":`" + pattern + "`";
+                  source.empty() ? pattern : std::string(source) + ":`" + pattern + "`";
                 auto [closestName, dist] =
                   F3DOptionsTools::GetClosestOption(libf3dOptionName, true);
                 f3d::log::warn("'", keyForLog, "' option from ", origin,
@@ -798,6 +798,7 @@ public:
   F3DOptionsTools::OptionsEntries ConfigOptionsEntries;
   F3DOptionsTools::OptionsEntries CLIOptionsEntries;
   F3DOptionsTools::OptionsEntries DynamicOptionsEntries;
+  F3DOptionsTools::OptionsEntries ImperativeConfigOptionsEntries;
   F3DConfigFileTools::BindingsEntries ConfigBindingsEntries;
   std::unique_ptr<f3d::engine> Engine;
   std::vector<std::vector<fs::path>> FilesGroups;
@@ -889,14 +890,14 @@ int F3DStarter::Start(int argc, char** argv)
   // Read config files
   if (!noConfig)
   {
-    std::tie(this->Internals->ConfigOptionsEntries, this->Internals->ConfigBindingsEntries) =
+    std::tie(this->Internals->ConfigOptionsEntries, this->Internals->ImperativeConfigOptionsEntries, this->Internals->ConfigBindingsEntries) =
       F3DConfigFileTools::ReadConfigFiles(config);
   }
 
   // Update app and libf3d options based on config entries, with an empty input file
   // config < cli
   this->Internals->UpdateOptions(
-    { this->Internals->ConfigOptionsEntries, this->Internals->CLIOptionsEntries }, { "" });
+    { this->Internals->ConfigOptionsEntries, this->Internals->CLIOptionsEntries, this->Internals->ImperativeConfigOptionsEntries }, { "" });
 
 #if __APPLE__
   // Initialize MacOS delegate
@@ -1313,7 +1314,7 @@ void F3DStarter::LoadFileGroup(
       std::copy(paths.begin(), paths.end(), std::back_inserter(configPaths));
       this->Internals->UpdateOptions(
         { this->Internals->ConfigOptionsEntries, this->Internals->CLIOptionsEntries,
-          this->Internals->DynamicOptionsEntries },
+          this->Internals->DynamicOptionsEntries, this->Internals->ImperativeConfigOptionsEntries},
         configPaths);
       this->Internals->UpdateBindings(configPaths);
 
