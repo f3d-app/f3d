@@ -79,19 +79,19 @@ This is not always a wanted behavior, so to force an option to always be taken i
 [
   {
     "options": {
-      "!axis": false
+      "!axis": true
     }
   },
   {
     "match": ".*(stl)",
     "options": {
-      "!edges": false
+      "!edges": true
     }
   }
 ]
 ```
 
-In the above example, when loading or reloading a file, the axis is always turned off and when loading a .stl file, the edges are always turned off.
+In the above example, when loading or reloading a file, the axis is always turned on and when loading a .stl file, the edges are always turned on.
 
 ## Bindings
 

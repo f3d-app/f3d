@@ -1,13 +1,13 @@
 [
   {
     "options": {
-      "!ui.axis": false
+      "!ui.axis": true
     }
   },
   {
     "match": ".*(stl)",
     "options": {
-      "!edges": false
+      "!edges": true
     }
   }
 ]
