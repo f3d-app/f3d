@@ -49,11 +49,14 @@ reader* factory::getReader(const std::string& fileName, std::optional<std::strin
   {
     for (const auto& reader : plugin->getReaders())
     {
-      if (forceReader.has_value() && reader->getName() == *forceReader)
+      if (forceReader.has_value())
       {
-        return reader.get();
+        if (reader->getName() == *forceReader)
+        {
+          return reader.get();
+        }
       }
-      if (reader->getScore() > bestScore && reader->canRead(fileName))
+      else if (reader->getScore() > bestScore && reader->canRead(fileName))
       {
         bestScore = reader->getScore();
         bestReader = reader.get();

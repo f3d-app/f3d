@@ -1121,6 +1121,16 @@ if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME TestReadersListMultiplePlugins ARGS --list-readers --load-plugins=assimp,alembic NO_BASELINE REGEXP_FAIL "Plugin failed to load")
 endif()
 
+if(F3D_PLUGIN_BUILD_EXODUS) 
+ f3d_test(NAME TestForceReaderExodusFail DATA BoxAnimated.gltf ARGS --force-reader=ExodusII NO_BASELINE REGEXP "failed to load scene")
+ f3d_test(NAME TestForceReaderExodusPass DATA disk_out_ref.ex2 ARGS --force-reader=ExodusII NO_BASELINE REGEXP_FAIL "failed to load scene")
+endif()
+
+if(F3D_PLUGIN_BUILD_DRACO) 
+ f3d_test(NAME TestForceReaderGLTFDraco DATA BoxAnimated.gltf ARGS --force-reader=GLTFDraco NO_BASELINE REGEXP_FAIL "failed to load scene")
+ f3d_test(NAME TestForceReaderGLTF DATA BoxAnimated.gltf ARGS --force-reader=GLTF NO_BASELINE REGEXP_FAIL "failed to load scene")
+endif()
+
 # Test bindings-list display
 f3d_test(NAME TestBindingsList ARGS --list-bindings REGEXP "Any.5        Toggle Orthographic Projection")
 
