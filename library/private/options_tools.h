@@ -243,7 +243,14 @@ direction_t parse(const std::string& str)
     }
     else
     {
-      return direction_t(options_tools::parse<std::vector<double>>(str));
+      try
+      {
+        return direction_t(options_tools::parse<std::vector<double>>(str));
+      }
+      catch (const options::parsing_exception& ex)
+      {
+        throw options::parsing_exception("Cannot parse " + str + " into a direction_t");
+      }
     }
   }
   catch (const f3d::type_construction_exception& ex)
