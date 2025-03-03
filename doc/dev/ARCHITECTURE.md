@@ -29,7 +29,7 @@ Here is diagram explaining how some of these parts interact together:
            │
            │                                   ┌──────────┐
            │                                   │          │
-      depends on                      ┌─warps──│  python  │
+       depends on                     ┌─warps──│  python  │
            │                          │        │          │
            │                          │        └──────────┘
            │         ┌───────────┐    │        ┌──────────┐
@@ -42,10 +42,10 @@ Here is diagram explaining how some of these parts interact together:
 │           │          depends on     └─wraps──│   wasm   │
 │  plugins  │              │                   │          │
 │           │              ▼                   └──────────┘
-└─────┬─────┘     ┌──────────────────┐
+└───────────┘     ┌──────────────────┐
       │           │      vtkext      │
       │           ├────────┬─────────┤
-      └──────────►│ public │ private │
+     depends─on──►│ public │ private │
                   └────────┴─────────┘
 ```
 
