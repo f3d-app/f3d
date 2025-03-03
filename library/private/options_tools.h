@@ -206,7 +206,7 @@ color_t parse(const std::string& str)
 //----------------------------------------------------------------------------
 /**
  * Parse provided string into a direction_t.
- * Supported formats: "X,Y,Z", "[[+|-]X][[+|-]Y][[+|-]Z]"
+ * Supported formats: "X,Y,Z", "[[+|-]X][[+|-]Y][[+|-]Z]" (case insensitive)
  * rely on parse<std::vector<double>>(str)
  * Can throw options::parsing_exception in case of failure to parse
  */
