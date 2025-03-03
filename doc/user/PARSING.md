@@ -73,7 +73,7 @@ Color are parsed and formatted as a vector of double.
 
 The following formats are supported when parsing a string into a direction:
 
-- [+/-][X/Y/Z]
-- vector of three doubles
+- `[[+|-]X][[+|-]Y][[+|-]Z]` (case insensitive), for example `+X` or `X` for `1,0,0`, `-y+z` for `0,-1,1`
+- vector of three doubles, for example `1,2,3.4`
 
 When formatting a direction into a string, it is formatted as a vector of doubles.

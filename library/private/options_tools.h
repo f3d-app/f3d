@@ -206,7 +206,7 @@ color_t parse(const std::string& str)
 //----------------------------------------------------------------------------
 /**
  * Parse provided string into a direction_t.
- * Supported formats: "X,Y,Z", "[+|-][X|Y|Z]"
+ * Supported formats: "X,Y,Z", "[[+|-]X][[+|-]Y][[+|-]Z]" (case insensitive)
  * rely on parse<std::vector<double>>(str)
  * Can throw options::parsing_exception in case of failure to parse
  */
@@ -215,21 +215,42 @@ direction_t parse(const std::string& str)
 {
   try
   {
-    const std::regex re("([-+]?)([XYZ])", std::regex_constants::icase);
+    const std::regex re("([+-]?x)?([+-]?y)?([+-]?z)?", std::regex_constants::icase);
     std::smatch match;
     if (std::regex_match(str, match, re))
     {
-      const double sign = match[1].str() == "-" ? -1.0 : +1.0;
-      const int index = std::toupper(match[2].str()[0]) - 'X';
-      assert(index >= 0 && index < 3);
-
       direction_t dir;
-      dir[index] = sign;
+      int sign = 1;
+      for (size_t i = 0; i < 3; ++i)
+      {
+        const std::string& match_str = match[i + 1].str();
+        if (!match_str.empty())
+        {
+          if (match_str[0] == '-')
+          {
+            sign = -1;
+          }
+          else if (match_str[0] == '+')
+          {
+            sign = +1;
+          }
+          const int index = std::toupper(match_str[match_str.length() - 1]) - 'X';
+          assert(index >= 0 && index < 3);
+          dir[index] = sign;
+        }
+      }
       return dir;
     }
     else
     {
-      return direction_t(options_tools::parse<std::vector<double>>(str));
+      try
+      {
+        return direction_t(options_tools::parse<std::vector<double>>(str));
+      }
+      catch (const options::parsing_exception&)
+      {
+        throw options::parsing_exception("Cannot parse " + str + " into a direction_t");
+      }
     }
   }
   catch (const f3d::type_construction_exception& ex)

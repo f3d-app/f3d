@@ -116,7 +116,14 @@ int TestSDKOptionsIO(int argc, char* argv[])
   test.parse<f3d::direction_t>("direction_t", "+X", { 1, 0, 0 });
   test.parse<f3d::direction_t>("direction_t", "-Y", { 0, -1, 0 });
   test.parse<f3d::direction_t>("direction_t", "+Z", { 0, 0, 1 });
+  test.parse<f3d::direction_t>("direction_t", "+xZ", { 1, 0, 1 });
+  test.parse<f3d::direction_t>("direction_t", "-XZ", { -1, 0, -1 });
+  test.parse<f3d::direction_t>("direction_t", "-X+Z", { -1, 0, 1 });
+  test.parse<f3d::direction_t>("direction_t", "-Xy+Z", { -1, -1, +1 });
+  test.parse<f3d::direction_t>("direction_t", "-x+Y-Z", { -1, +1, -1 });
   test.parse_expect<f3d::direction_t, parsing_exception>("invalid direction_t", "-K");
+  test.parse_expect<f3d::direction_t, parsing_exception>("invalid direction_t", "-y+zx");
+  test.parse_expect<f3d::direction_t, parsing_exception>("invalid direction_t", "-x++yz");
   test.parse<f3d::direction_t>("direction_t", "0.1,0.2,0.3", { 0.1, 0.2, 0.3 });
   test.parse<f3d::direction_t>("direction_t", "  0.1,  0.2 , 0.3 ", { 0.1, 0.2, 0.3 });
   test.parse_expect<f3d::color_t, parsing_exception>(
