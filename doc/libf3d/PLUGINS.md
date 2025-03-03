@@ -10,7 +10,7 @@ You will then be able to call `find_package(f3d REQUIRED COMPONENTS pluginsdk)` 
 
 You can take a look at the example in the [examples/plugin](https://github.com/f3d-app/f3d/tree/master/examples/plugins) directory or at the official [plugins](https://github.com/f3d-app/f3d/tree/master/plugins).
 
-The first thing (and most difficult part) you have to do is creating a VTK reader (or a VTK importer if you want to support a full scene with materials, lights and cameras), and wrap it into a VTK module. You can create several readers in the same VTK module if you need to support several file formats in a single plugin.
+The first thing (and most difficult part) you have to do is creating a VTK reader (or a VTK importer if you want to support a full scene with materials, lights and cameras), and wrap it into a VTK module. You can create several readers/importers in the same VTK module if you need to support several file formats in a single plugin.
 
 Then, declare the reader(s) and the plugin using the CMake macros:
 
@@ -21,9 +21,18 @@ f3d_plugin_declare_reader(
   NAME "ReaderName"
   EXTENSIONS "myext"                # set the extensions the reader can support
   MIMETYPES "application/vnd.myext" # set the mimetypes the reader can support
-  VTK_READER ${vtk_classname}       # set the name of the VTK class you have created
-  DESCRIPTION "Reader description"  # set the description of the reader
+  VTK_READER ${vtk_classname}       # set the name of the VTK reader class you have created
+  FORMAT_DESCRIPTION "description"  # set the proper name of the file format
   EXCLUDE_FROM_THUMBNAILER          # add this flag if you don't want thumbnail generation for this reader
+)
+
+f3d_plugin_declare_reader(
+  NAME "ReaderNameWithScene"
+  EXTENSIONS "myext2"                # set the extensions the reader can support
+  MIMETYPES "application/vnd.myext2" # set the mimetypes the reader can support
+  VTK_IMPORTER ${vtk_classname}      # set the name of the VTK importer class you have created
+  FORMAT_DESCRIPTION "description"   # set the proper name of the file format
+  CUSTOM_CODE "file.inl"             # set this to add a custom code when instancing your class
 )
 
 # More f3d_plugin_declare_reader calls are possible
