@@ -27,7 +27,7 @@
       }
     },
     "force_reader": {
-      "type": "string" 
+      "type": "string"
     }
   },
   "render": {
