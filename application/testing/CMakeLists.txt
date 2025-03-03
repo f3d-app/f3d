@@ -226,6 +226,11 @@ f3d_test(NAME TestFilenameCommasSpaces DATA "tetrahedron, with commas & spaces.s
 f3d_test(NAME TestFont DATA suzanne.ply ARGS -n --font-file=${F3D_SOURCE_DIR}/testing/data/Crosterian.ttf UI)
 f3d_test(NAME TestFontScale2 DATA suzanne.ply ARGS -n --font-scale=2 UI)
 f3d_test(NAME TestFontScale3 DATA suzanne.ply ARGS -n --font-scale=3 UI)
+f3d_test(NAME TestDefines DATA dragon.vtu ARGS -Dscene.up_direction=+Z --define=model.point_sprites.enable=on)
+f3d_test(NAME TestDefinesInvalid DATA dragon.vtu ARGS -Dscene.up_direction+Z REGEXP "Could not parse a define" NO_BASELINE)
+f3d_test(NAME TestDefinesInexistent DATA dragon.vtu ARGS -Dscene.up_director=+Z REGEXP "option from CLI options does not exists" NO_BASELINE)
+f3d_test(NAME TestConfigReset DATA suzanne.stl ARGS -Rrender.grid.enable --reset=ui.axis CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json)
+f3d_test(NAME TestConfigResetInexistent DATA suzanne.stl ARGS -Rrender.glid.enable REGEXP "option from CLI options does not exists" NO_BASELINE)
 f3d_test(NAME TestAnimationIndex DATA InterpolationTest.glb ARGS --animation-index=7 --animation-time=0.5 --animation-progress)
 f3d_test(NAME TestMultiFileAnimationIndex DATA InterpolationTest.glb BoxAnimated.gltf ARGS --animation-index=9 --animation-time=0.85 --animation-progress --multi-file-mode=all)
 f3d_test(NAME TestMultiFileAnimationNoAnimationSupport DATA f3d.glb world.obj ARGS --multi-file-mode=all --animation-time=2 --animation-progress)
@@ -447,7 +452,7 @@ f3d_test(NAME TestInteractionCheatsheetAnimationName DATA InterpolationTest.glb 
 f3d_test(NAME TestInteractionCheatsheetConfigFile DATA dragon.vtu CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json INTERACTION UI) #H;ScrollDown
 
 if(NOT F3D_MODULE_RAYTRACING)
-  f3d_test(NAME TestInteractionCheatsheetCentered DATA cow.vtp ARGS --resolution=500,1500 INTERACTION UI LONG_TIMEOUT) #H
+  f3d_test(NAME TestInteractionCheatsheetCentered DATA cow.vtp RESOLUTION 500,1500 INTERACTION UI LONG_TIMEOUT) #H
 endif()
 
 f3d_test(NAME TestCameraPersp DATA Cameras.gltf ARGS --camera-index=0)
@@ -920,16 +925,17 @@ f3d_test(NAME TestInteractionRecord DATA cow.vtp ARGS --interaction-test-record=
 f3d_test(NAME TestInteractionPlay DATA cow.vtp ARGS --interaction-test-play=${CMAKE_BINARY_DIR}/Testing/Temporary/TestInteractionRecord.log DEPENDS TestInteractionRecord NO_BASELINE)
 
 # Command Script Test
-f3d_test(NAME TestCommandScriptBasic DATA dragon.vtu SCRIPT TestCommandScriptBasic.txt --reference=${F3D_SOURCE_DIR}/testing/baselines/TestCommandScriptBasic.png)
-f3d_test(NAME TestCommandScriptInvalidCommand DATA dragon.vtu SCRIPT TestCommandScriptInvalid.txt REGEXP "Command: \"INVALID_COMMAND_1\" is not recognized, ignoring" NO_BASELINE)
+f3d_test(NAME TestCommandScriptBasic DATA dragon.vtu SCRIPT TestCommandScriptBasic.txt) # roll_camera 90;toggle ui.scalar_bar;print_scene_info;increase_light_intensity
+f3d_test(NAME TestCommandScriptInvalidCommand DATA dragon.vtu SCRIPT TestCommandScriptInvalid.txt REGEXP "Command: \"INVALID_COMMAND_1\" is not recognized, ignoring" NO_BASELINE) # INVALID_COMMAND_1
 f3d_test(NAME TestCommandScriptMissingFile DATA dragon.vtu SCRIPT TestCommandScriptMissingFile.txt REGEXP "Unable to open command script file" NO_BASELINE)
 f3d_test(NAME TestCommandScriptPrintScene DATA dragon.vtu SCRIPT TestCommandScriptPrintScene.txt REGEXP "Camera position: 2.23745,3.83305,507.598" NO_BASELINE) # print_scene_info
 f3d_test(NAME TestCommandScriptPrintColoring DATA dragon.vtu SCRIPT TestCommandScriptPrintColoring.txt REGEXP "Not coloring" NO_BASELINE) # print_coloring_info
 f3d_test(NAME TestCommandScriptPrintMesh DATA dragon.vtu SCRIPT TestCommandScriptPrintMesh.txt REGEXP "Number of points: 13268" NO_BASELINE) # print_mesh_info
 f3d_test(NAME TestCommandScriptPrintOptions DATA dragon.vtu SCRIPT TestCommandScriptPrintOptions.txt REGEXP "interactor.invert_zoom: false" NO_BASELINE) # print_options_info
 f3d_test(NAME TestCommandScriptAlias DATA dragon.vtu SCRIPT TestCommandScriptAlias.txt --reference=${F3D_SOURCE_DIR}/testing/baselines/TestCommandScriptAlias.png) # alias myrotate roll_camera 90;myrotate
-f3d_test(NAME TestParseOptionalBoolExtraArg DATA dragon.vtu SCRIPT TestParseOptionalBoolExtraArg.txt REGEXP "Command: load_previous_file_group takes at most 1 argument, got 2 arguments instead." NO_BASELINE)
-f3d_test(NAME TestRemoveFileGroups DATA dragon.vtu SCRIPT TestRemoveFileGroups.txt NO_DATA_FORCE_RENDER)
+f3d_test(NAME TestCommandScriptReset DATA dragon.vtu suzanne.stl ARGS --edges SCRIPT TestCommandScriptReset.txt) # reset render.show_edges; load_next_file_group;
+f3d_test(NAME TestParseOptionalBoolExtraArg DATA dragon.vtu SCRIPT TestParseOptionalBoolExtraArg.txt REGEXP "Command: load_previous_file_group takes at most 1 argument, got 2 arguments instead." NO_BASELINE) # load_previous_file_group true extra
+f3d_test(NAME TestRemoveFileGroups DATA dragon.vtu SCRIPT TestRemoveFileGroups.txt NO_DATA_FORCE_RENDER) # remove_file_groups
 
 # Window position test
 f3d_test(NAME TestPosition DATA dragon.vtu ARGS --position=100,100 NO_BASELINE)
@@ -1202,10 +1208,10 @@ if(NOT WIN32)
   f3d_test(NAME TestColorMapTooLong DATA dragon.vtu ARGS --colormap-file=${_f3d_test_invalid_folder}/file.ext --scalar-coloring REGEXP "File name too long" NO_BASELINE)
   f3d_test(NAME TestScreenshotTooLong DATA suzanne.ply ARGS --screenshot-filename=${_f3d_test_invalid_folder}/file.ext --interaction-test-play=${F3D_SOURCE_DIR}/testing/recordings/TestScreenshot.log REGEXP "File name too long" NO_BASELINE)
   f3d_test(NAME TestInputTooLong ARGS --input=${_f3d_test_invalid_folder}/file.ext REGEXP "File name too long" NO_BASELINE)
-  f3d_test(NAME TestReferenceTooLong DATA suzanne.ply ARGS --output=file.png --reference=${_f3d_test_invalid_folder}/file.ext REGEXP "File name too long" NO_BASELINE)
-  f3d_test(NAME TestOutputTooLong DATA suzanne.ply ARGS --output=${_f3d_test_invalid_folder}/file.ext REGEXP "File name too long" NO_BASELINE)
-  f3d_test(NAME TestOutputWithReferenceTooLong DATA suzanne.ply ARGS --reference=file.png --output=${_f3d_test_invalid_folder}/file.ext REGEXP "File name too long" NO_BASELINE)
-  f3d_test(NAME TestOutputWithExistingReferenceTooLong DATA suzanne.ply ARGS --reference=${F3D_SOURCE_DIR}/testing/data/world.png --output=${_f3d_test_invalid_folder}/file.ext REGEXP "File name too long" NO_BASELINE)
+  f3d_test(NAME TestReferenceTooLong DATA suzanne.ply ARGS --output=file.png --reference=${_f3d_test_invalid_folder}/file.ext REGEXP "File name too long" NO_BASELINE NO_OUTPUT)
+  f3d_test(NAME TestOutputTooLong DATA suzanne.ply ARGS --output=${_f3d_test_invalid_folder}/file.ext REGEXP "File name too long" NO_BASELINE NO_OUTPUT)
+  f3d_test(NAME TestOutputWithReferenceTooLong DATA suzanne.ply ARGS --reference=file.png --output=${_f3d_test_invalid_folder}/file.ext REGEXP "File name too long" NO_BASELINE NO_OUTPUT)
+  f3d_test(NAME TestOutputWithExistingReferenceTooLong DATA suzanne.ply ARGS --reference=${F3D_SOURCE_DIR}/testing/data/world.png --output=${_f3d_test_invalid_folder}/file.ext REGEXP "File name too long" NO_BASELINE NO_OUTPUT)
 endif()
 
 # Test failure without a reference, please do not create a TestNoRef.png file
