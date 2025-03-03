@@ -70,6 +70,29 @@ The following options <b>are only taken on the first load</b>:
 Boolean options that have been turned on in the configuration file can be turned
 off on the command line if needed, eg: `--point-sprites=false`.
 
+### Imperative Options
+
+Command line options and options that are changed interactively overrides options that are set in configuration files.
+This is not always a wanted behavior, so to force an option to always be taken into account even if set in command line are changed interactively, it is possible to use imperative options, by adding a `!` in front of the option name, eg:
+
+```
+[
+  {
+    "options": {
+      "!axis": false
+    }
+  },
+  {
+    "match": ".*(stl)",
+    "options": {
+      "!edges": false
+    }
+  }
+]
+```
+
+In the above example, when loading or reloading a file, the axis is always turned off and when loading a .stl file, the edges are always turned off.
+
 ## Bindings
 
 All interaction bindings can be configured using configuration files.

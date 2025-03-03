@@ -83,7 +83,7 @@ Other hotkeys and interactions are available:
 - <kbd>Ctrl</kbd> + _Drop_ a file, directory and load it.
 - <kbd>Shift</kbd> + _Drop_ a HDRI and use it, no extensions checks performed.
 
-When loading another file or reloading, options that have been changed interactively are kept as is.
+When loading another file or reloading, options that have been changed interactively are kept as is, except when using [imperative options](CONFIGURATION_FILE.md#imperative-options) in configuration files.
 
 ## Cycling Coloring
 
