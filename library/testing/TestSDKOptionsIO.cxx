@@ -119,20 +119,21 @@ int TestSDKOptionsIO(int argc, char* argv[])
     { static_cast<double>(35.0 / 255.0), static_cast<double>(149.0 / 255.0),
       static_cast<double>(39.0 / 255.0) });
   test.parse<f3d::color_t>("color_t", "light_salmon",
-    { static_cast<double>(255.0 / 255.0), static_cast<double>(160.0 / 255.0),
-      static_cast<double>(122.0 / 255.0) });
+    { 1.0, static_cast<double>(160.0 / 255.0), static_cast<double>(122.0 / 255.0) });
   test.parse<f3d::color_t>("color_t", "LightSalmon",
-    { static_cast<double>(255.0 / 255.0), static_cast<double>(160.0 / 255.0),
-      static_cast<double>(122.0 / 255.0) });
+    { 1.0, static_cast<double>(160.0 / 255.0), static_cast<double>(122.0 / 255.0) });
   test.parse<f3d::color_t>("color_t", "hsv(0,0%,75%)", { 0.75, 0.75, 0.75 });
   test.parse<f3d::color_t>("color_t", " HSV( 240 , 100 % , 100 % )", { 0.0, 0.0, 1.0 });
   test.parse<f3d::color_t>("color_t", "hsl( 240 , 100 % , 50 % )", { 0.0, 0.0, 1.0 });
   test.parse<f3d::color_t>("color_t", "hwb(240,0%,0%)", { 0.0, 0.0, 1.0 });
   test.parse<f3d::color_t>("color_t", "cmyk(100,100%,0,0)", { 0.0, 0.0, 1.0 });
-  test.parse_expect<f3d::color_t, parsing_exception>("invalid rgb() value color_t", "rgb(300,255,255)");
-  test.parse_expect<f3d::color_t, parsing_exception>("invalid hsl() value color_t", "hsl(361,120,255)");
+  test.parse_expect<f3d::color_t, parsing_exception>(
+    "invalid rgb() value color_t", "rgb(300,255,255)");
+  test.parse_expect<f3d::color_t, parsing_exception>(
+    "invalid hsl() value color_t", "hsl(361,120,255)");
   test.parse_expect<f3d::color_t, parsing_exception>("invalid hsv() color_t", "hsv(100,120%,0)");
   test.parse_expect<f3d::color_t, parsing_exception>("invalid format color_t", "hxb(240,0%,0%)");
+  test.parse_expect<f3d::color_t, parsing_exception>("invalid color_t", "cmyk(200%,12%,34%,56%)");
   test.parse_expect<f3d::color_t, parsing_exception>("incorrect size color_t", "0.1,0.2,0.3,0.4");
   test.format<f3d::color_t>("color_t", { 0.1, 0.2, 0.3 }, "0.1,0.2,0.3");
 

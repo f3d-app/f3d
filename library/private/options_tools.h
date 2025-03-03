@@ -229,7 +229,7 @@ color_t parse(const std::string& str)
 
   /* Hue-based format search: hsl, hsv, hwb */
   const std::regex hueRegex(
-    "^([a-z]{3})\\((\\d{1,3}),(\\d{1,3})%{0,1},(\\d{1,3})%{0,1}\\)$", std::regex_constants::icase);
+    "^(hsl|hsv|hwb)\\((\\d{1,3}),(\\d{1,3})%?,(\\d{1,3})%?\\)$", std::regex_constants::icase);
   std::smatch hueMatch;
   if (std::regex_search(strCompact, hueMatch, hueRegex))
   {
@@ -264,13 +264,11 @@ color_t parse(const std::string& str)
       vtkMath::HSVToRGB(h, s, v, &rgb[0], &rgb[1], &rgb[2]);
       return color_t(rgb[0], rgb[1], rgb[2]);
     }
-    throw options::parsing_exception("Cannot parse " + str + " into a color_t");
   }
 
   /* CMYK format search */
   const std::regex cmykRegex(
-    "^cmyk\\((\\d{1,3})%{0,1},(\\d{1,3})%{0,1},(\\d{1,3})%{0,1},(\\d{1,3})%{0,1}\\)$",
-    std::regex_constants::icase);
+    "^cmyk\\((\\d{1,3})%?,(\\d{1,3})%?,(\\d{1,3})%?,(\\d{1,3})%?\\)$", std::regex_constants::icase);
   std::smatch cmykMatch;
   if (std::regex_search(strCompact, cmykMatch, cmykRegex))
   {
