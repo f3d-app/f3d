@@ -247,7 +247,7 @@ direction_t parse(const std::string& str)
       {
         return direction_t(options_tools::parse<std::vector<double>>(str));
       }
-      catch (const options::parsing_exception& ex)
+      catch (const options::parsing_exception&)
       {
         throw options::parsing_exception("Cannot parse " + str + " into a direction_t");
       }
