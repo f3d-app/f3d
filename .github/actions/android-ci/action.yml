@@ -4,17 +4,6 @@ inputs:
   arch:
     description: 'Android arch to build'
     required: true
-  ndk_version:
-    description: 'Version of the Android NDK to download'
-    required: false
-    default: 'r26b'
-  api_level:
-    description: 'Android API level'
-    required: false
-    default: '27'
-  vtk_version:
-    description: 'VTK version'
-    required: true
 
 runs:
   using: "composite"
@@ -24,28 +13,6 @@ runs:
       shell: bash
       run: |
         [[ "${{inputs.arch}}" ]] || { echo "arch input is empty" ; exit 1; }
-        [[ "${{inputs.vtk_version}}" ]] || { echo "vtk_version input is empty" ; exit 1; }
-
-    - name: Dependencies Dir
-      shell: bash
-      working-directory: ${{github.workspace}}
-      run: mkdir dependencies
-
-    - name: Install NDK
-      shell: bash
-      working-directory: ${{github.workspace}}
-      run: |
-        apt-get install unzip
-        wget https://dl.google.com/android/repository/android-ndk-${{inputs.ndk_version}}-linux.zip
-        unzip -qq android-ndk-${{inputs.ndk_version}}-linux.zip
-        mv android-ndk-${{inputs.ndk_version}} android-ndk
-
-    - name: Install VTK dependency
-      uses: ./source/.github/actions/vtk-android-install-dep
-      with:
-        arch: ${{inputs.arch}}
-        api_level: ${{inputs.api_level}}
-        vtk_version: ${{inputs.vtk_version}}
 
     - name: Setup Directories
       shell: bash
@@ -59,16 +26,17 @@ runs:
       working-directory: ${{github.workspace}}/build
       run: >
         cmake ../source
-        -DCMAKE_ANDROID_ARCH_ABI=${{inputs.arch}}
-        -DCMAKE_ANDROID_NDK=$(pwd)/../android-ndk
         -DCMAKE_BUILD_TYPE=Release
-        -DCMAKE_FIND_ROOT_PATH=$(pwd)/../dependencies/vtk_build/CMakeExternals/Install/vtk-android/
         -DCMAKE_INSTALL_PREFIX:PATH=../install
-        -DCMAKE_SYSTEM_NAME=Android
-        -DCMAKE_SYSTEM_VERSION=${{inputs.api_level}}
         -DF3D_BINDINGS_JAVA=ON
+        -DF3D_MODULE_EXR=ON
         -DF3D_MODULE_UI=OFF
+        -DF3D_PLUGINS_STATIC_BUILD=ON
+        -DF3D_PLUGIN_BUILD_ALEMBIC=ON
+        -DF3D_PLUGIN_BUILD_ASSIMP=ON
+        -DF3D_PLUGIN_BUILD_DRACO=ON
         -DF3D_PLUGIN_BUILD_EXODUS=OFF
+        -DF3D_PLUGIN_BUILD_OCCT=ON
         -DF3D_STRICT_BUILD=ON
 
     - name: Build
