@@ -40,19 +40,26 @@ factory::plugin_initializer_t factory::getStaticInitializer(const std::string& p
 }
 
 //----------------------------------------------------------------------------
-reader* factory::getReader(const std::string& fileName)
+reader* factory::getReader(const std::string& fileName, std::optional<std::string_view> forceReader)
 {
   int bestScore = -1;
   reader* bestReader = nullptr;
 
-  for (auto p : this->Plugins)
+  for (const auto* plugin : this->Plugins)
   {
-    for (auto r : p->getReaders())
+    for (const auto& reader : plugin->getReaders())
     {
-      if (r->getScore() > bestScore && r->canRead(fileName))
+      if (forceReader.has_value())
       {
-        bestScore = r->getScore();
-        bestReader = r.get();
+        if (reader->getName() == *forceReader)
+        {
+          return reader.get();
+        }
+      }
+      else if (reader->getScore() > bestScore && reader->canRead(fileName))
+      {
+        bestScore = reader->getScore();
+        bestReader = reader.get();
       }
     }
   }
