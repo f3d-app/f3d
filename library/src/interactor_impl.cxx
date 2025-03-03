@@ -125,8 +125,6 @@ public:
 
     this->Recorder = vtkSmartPointer<vtkF3DInteractorEventRecorder>::New();
     this->Recorder->SetInteractor(this->VTKInteractor);
-
-    this->Style->ResetTemporaryUp();
   }
 
   //----------------------------------------------------------------------------
@@ -1349,6 +1347,12 @@ void interactor_impl::SetInteractorOn(vtkInteractorObserver* observer)
 void interactor_impl::UpdateRendererAfterInteraction()
 {
   this->Internals->Style->UpdateRendererAfterInteraction();
+}
+
+//----------------------------------------------------------------------------
+void interactor_impl::ResetTemporaryUp()
+{
+  this->Internals->Style->ResetTemporaryUp();
 }
 
 //----------------------------------------------------------------------------

@@ -838,6 +838,7 @@ f3d_test(NAME TestInteractionFocalPointPickingPoints DATA pointsCloud.vtp INTERA
 f3d_test(NAME TestInteractionLightIntensity DATA dragon.vtu INTERACTION LONG_TIMEOUT)
 f3d_test(NAME TestInteractionMultiFileColoring DATA mb/recursive ARGS --multi-file-mode=all INTERACTION) #SSSB
 f3d_test(NAME TestInteractionOpacity DATA dragon.vtu INTERACTION)
+f3d_test(NAME TestInteractionInitUpVectorOption DATA dragon.vtu ARGS --up=-Y INTERACTION) #Small drag left, camera should maintain orientation
 f3d_test(NAME TestInteractionReload DATA dragon.vtu ARGS -e INTERACTION) #Up;
 f3d_test(NAME TestInteractionLoadParentDirectory DATA multi/dragon.vtu ARGS --filename INTERACTION UI) #Down;
 f3d_test(NAME TestInteractionEmptyLoadParentDirectory INTERACTION NO_BASELINE REGEXP "No files loaded, no rendering performed") #Down;
