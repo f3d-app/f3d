@@ -481,6 +481,7 @@ public:
 
               // Convert key into a libf3d option name if possible
               std::string libf3dOptionName = key;
+              std::string keyForLog = key;
               auto libf3dIter = F3DOptionsTools::LibOptionsNames.find(libf3dOptionName);
               if (libf3dIter != F3DOptionsTools::LibOptionsNames.end())
               {
@@ -496,6 +497,7 @@ public:
               {
                 reset = true;
                 libf3dOptionName = libf3dOptionName.substr(6);
+                keyForLog = libf3dOptionName;
                 libf3dOptionValue = "reset";
               }
 
@@ -515,14 +517,14 @@ public:
                 if (logOptions)
                 {
                   loggingMap[libf3dOptionName] =
-                    std::tuple(libf3dOptionName, source, pattern, libf3dOptionValue);
+                    std::tuple(keyForLog, source, pattern, libf3dOptionValue);
                 }
               }
               catch (const f3d::options::parsing_exception& ex)
               {
                 std::string origin =
                   source.empty() ? pattern : source.string() + ":`" + pattern + "`";
-                f3d::log::warn("Could not set '", libf3dOptionName, "' to '", libf3dOptionValue,
+                f3d::log::warn("Could not set '", keyForLog, "' to '", libf3dOptionValue,
                   "' from ", origin, " because: ", ex.what());
               }
               catch (const f3d::options::inexistent_exception&)
@@ -531,7 +533,7 @@ public:
                   source.empty() ? pattern : source.string() + ":`" + pattern + "`";
                 auto [closestName, dist] =
                   F3DOptionsTools::GetClosestOption(libf3dOptionName, true);
-                f3d::log::warn("'", libf3dOptionName, "' option from ", origin,
+                f3d::log::warn("'", keyForLog, "' option from ", origin,
                   " does not exists , did you mean '", closestName, "'?");
               }
             }
