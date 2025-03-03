@@ -452,7 +452,7 @@ f3d_test(NAME TestInteractionCheatsheetAnimationName DATA InterpolationTest.glb 
 f3d_test(NAME TestInteractionCheatsheetConfigFile DATA dragon.vtu CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json INTERACTION UI) #H;ScrollDown
 
 if(NOT F3D_MODULE_RAYTRACING)
-  f3d_test(NAME TestInteractionCheatsheetCentered DATA cow.vtp ARGS --resolution=500,1500 INTERACTION UI LONG_TIMEOUT) #H
+  f3d_test(NAME TestInteractionCheatsheetCentered DATA cow.vtp RESOLUTION 500,1500 INTERACTION UI LONG_TIMEOUT) #H
 endif()
 
 f3d_test(NAME TestCameraPersp DATA Cameras.gltf ARGS --camera-index=0)
