@@ -83,6 +83,11 @@ private:
   void EventLoop();
 
   /**
+   * Resets the window name for f3d app
+   */
+  void ResetWindowName();
+
+  /**
    * Add F3D specific commands
    */
   void AddCommands();

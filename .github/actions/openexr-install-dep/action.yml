@@ -5,27 +5,34 @@ inputs:
     description: 'CPU architecture to build for'
     required: false
     default: 'x86_64'
+  version:
+    description: 'Version of openexr to build'
+    required: true
 
 runs:
   using: "composite"
   steps:
 
-    # OpenEXR is part of VFX reference platform (CY2025: 3.3.x)
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+
     - name: Cache OpenEXR
       id: cache-openexr
-      uses: actions/cache@v4
+      uses: actions/cache/restore@v4
       with:
         path: dependencies/openexr_install
-        key: openexr-v3.3.2-${{runner.os}}-${{inputs.cpu}}-0
+        key: openexr-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-0
 
-    # Dependents: usd
+    # Dependents (not version): usd
     - name: Checkout OpenEXR
       if: steps.cache-openexr.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
       with:
         repository: AcademySoftwareFoundation/openexr
         path: './dependencies/openexr'
-        ref: v3.3.2
+        ref: ${{inputs.version}}
 
     - name: Setup OpenEXR
       if: steps.cache-openexr.outputs.cache-hit != 'true'
@@ -60,3 +67,10 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/openexr_install
       shell: bash
       run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-openexr.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-openexr.outputs.cache-primary-key }}
+        path: dependencies/openexr_install

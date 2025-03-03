@@ -452,7 +452,7 @@ engine::libInformation engine::getLibInfo()
   }
 
   libInfo.Copyrights.emplace_back("2019-2021 Kitware SAS");
-  libInfo.Copyrights.emplace_back("2021-2024 Michael Migliore, Mathieu Westphal");
+  libInfo.Copyrights.emplace_back("2021-2025 Michael Migliore, Mathieu Westphal");
   libInfo.License = "BSD-3-Clause";
 
   return libInfo;

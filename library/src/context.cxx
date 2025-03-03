@@ -100,7 +100,7 @@ context::function context::egl()
 //----------------------------------------------------------------------------
 context::function context::osmesa()
 {
-#ifdef __linux__
+#if defined(__linux__) || defined(__FreeBSD__)
   return getSymbol("OSMesa", "OSMesaGetProcAddress");
 #elif _WIN32
   return getSymbol("osmesa", "OSMesaGetProcAddress");

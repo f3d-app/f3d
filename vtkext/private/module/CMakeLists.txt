@@ -56,6 +56,7 @@ set(classes
   vtkF3DNoRenderWindow
   vtkF3DObjectFactory
   vtkF3DOpenGLGridMapper
+  vtkF3DOverlayRenderPass
   vtkF3DPolyDataMapper
   vtkF3DPostProcessFilter
   vtkF3DRenderPass
@@ -97,7 +98,7 @@ if(ANDROID)
 endif()
 
 if(F3D_MODULE_EXR)
-  find_package(OpenEXR 3.0 REQUIRED)
+  find_package(OpenEXR 3.0.1 REQUIRED)
   list(APPEND classes vtkF3DEXRReader)
 endif()
 

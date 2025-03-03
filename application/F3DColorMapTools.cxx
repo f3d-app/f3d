@@ -30,7 +30,7 @@ fs::path Find(const std::string& str)
 #ifdef __APPLE__
       "/usr/local/etc/f3d/colormaps",
 #endif
-#ifdef __linux__
+#if defined(__linux__) || defined(__FreeBSD__)
       "/etc/f3d/colormaps", "/usr/share/f3d/colormaps",
 #endif
       F3DSystemTools::GetBinaryResourceDirectory() / "colormaps" };

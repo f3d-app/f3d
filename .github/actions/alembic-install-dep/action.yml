@@ -5,18 +5,25 @@ inputs:
     description: 'CPU architecture to build for'
     required: false
     default: 'x86_64'
-    
+  version:
+    description: 'Version of alembic to build'
+    required: true
+
 runs:
   using: "composite"
   steps:
 
-    # Alembic is part of VFX reference platform (CY2025: 1.8.x)
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+
     - name: Cache Alembic
       id: cache-alembic
-      uses: actions/cache@v4
+      uses: actions/cache/restore@v4
       with:
         path: dependencies/alembic_install
-        key: alembic-v1.8.8-${{runner.os}}-${{inputs.cpu}}-0
+        key: alembic-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-0
 
     - name: Checkout Alembic
       if: steps.cache-alembic.outputs.cache-hit != 'true'
@@ -24,7 +31,7 @@ runs:
       with:
         repository: alembic/alembic
         path: './dependencies/alembic'
-        ref: 1.8.8
+        ref: ${{inputs.version}}
 
     - name: Setup Alembic
       if: steps.cache-alembic.outputs.cache-hit != 'true'
@@ -60,3 +67,10 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/alembic_install
       shell: bash
       run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-alembic.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-alembic.outputs.cache-primary-key }}
+        path: dependencies/alembic_install

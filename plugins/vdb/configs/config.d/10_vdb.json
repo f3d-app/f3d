@@ -1,11 +1,10 @@
 [
-{
-  "match": ".*(vdb)",
-  "options":
   {
-    "load-plugins": "vdb",
-    "volume": true,
-    "volume-inverse": true
+    "match": ".*(vdb)",
+    "options": {
+      "load-plugins": "vdb",
+      "volume": true,
+      "volume-inverse": true
+    }
   }
-}
 ]

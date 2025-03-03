@@ -73,7 +73,7 @@ public:
     std::vector<double> CameraFocalPoint;
     std::vector<double> CameraViewUp;
     double CameraViewAngle;
-    std::vector<double> CameraDirection;
+    std::optional<f3d::direction_t> CameraDirection;
     double CameraZoomFactor;
     double CameraAzimuthAngle;
     double CameraElevationAngle;
@@ -133,10 +133,10 @@ public:
 
     bool reset = false;
     double zoomFactor = 0.9;
-    if (camConf.CameraPosition.size() != 3 && camConf.CameraDirection.size() == 3)
+    if (camConf.CameraPosition.size() != 3 && camConf.CameraDirection.has_value())
     {
       f3d::vector3_t dir;
-      std::copy_n(camConf.CameraDirection.begin(), 3, dir.begin());
+      std::copy_n(camConf.CameraDirection->data(), 3, dir.begin());
       f3d::point3_t foc;
       f3d::point3_t pos;
       cam.getFocalPoint(foc);
@@ -571,12 +571,17 @@ public:
     this->AppOptions.ColorMapFile =
       f3d::options::parse<std::string>(appOptions.at("colormap-file"));
 
+    std::optional<f3d::direction_t> camDir;
+    if (!appOptions.at("camera-direction").empty())
+    {
+      camDir = f3d::options::parse<f3d::direction_t>(appOptions.at("camera-direction"));
+    }
+
     this->AppOptions.CamConf = { f3d::options::parse<std::vector<double>>(
                                    appOptions.at("camera-position")),
       f3d::options::parse<std::vector<double>>(appOptions.at("camera-focal-point")),
       f3d::options::parse<std::vector<double>>(appOptions.at("camera-view-up")),
-      f3d::options::parse<double>(appOptions.at("camera-view-angle")),
-      f3d::options::parse<std::vector<double>>(appOptions.at("camera-direction")),
+      f3d::options::parse<double>(appOptions.at("camera-view-angle")), camDir,
       f3d::options::parse<double>(appOptions.at("camera-zoom-factor")),
       f3d::options::parse<double>(appOptions.at("camera-azimuth-angle")),
       f3d::options::parse<double>(appOptions.at("camera-elevation-angle")) };
@@ -898,8 +903,7 @@ int F3DStarter::Start(int argc, char** argv)
       this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::create(offscreen));
     }
 
-    f3d::window& window = this->Internals->Engine->getWindow();
-    window.setWindowName(F3D::AppTitle).setIcon(F3DIcon, sizeof(F3DIcon));
+    this->ResetWindowName();
     this->Internals->ApplyPositionAndResolution();
     this->AddCommands();
     this->Internals->UpdateBindings({ "" });
@@ -1599,6 +1603,13 @@ void F3DStarter::EventLoop()
 }
 
 //----------------------------------------------------------------------------
+void F3DStarter::ResetWindowName()
+{
+  f3d::window& window = this->Internals->Engine->getWindow();
+  window.setWindowName(F3D::AppTitle).setIcon(F3DIcon, sizeof(F3DIcon));
+}
+
+//----------------------------------------------------------------------------
 void F3DStarter::AddCommands()
 {
   f3d::interactor& interactor = this->Internals->Engine->getInteractor();
@@ -1617,6 +1628,23 @@ void F3DStarter::AddCommands()
     }
     return f3d::options::parse<bool>(args[0]);
   };
+
+  interactor.addCommand("remove_file_groups",
+    [this](const std::vector<std::string>&)
+    {
+      if (!this->Internals->AppOptions.NoRender)
+      {
+        this->Internals->Engine->getInteractor().stopAnimation();
+      }
+      f3d::scene& scene = this->Internals->Engine->getScene();
+      scene.clear();
+      this->Internals->FilesGroups.clear();
+      this->Internals->LoadedFiles.clear();
+      this->ResetWindowName();
+      f3d::options& options = this->Internals->Engine->getOptions();
+      options.ui.dropzone = true;
+      options.ui.filename_info = "";
+    });
 
   interactor.addCommand("load_previous_file_group",
     [this](const std::vector<std::string>& args)
