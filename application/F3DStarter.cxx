@@ -524,8 +524,8 @@ public:
               {
                 std::string origin =
                   source.empty() ? pattern : source.string() + ":`" + pattern + "`";
-                f3d::log::warn("Could not set '", keyForLog, "' to '", libf3dOptionValue,
-                  "' from ", origin, " because: ", ex.what());
+                f3d::log::warn("Could not set '", keyForLog, "' to '", libf3dOptionValue, "' from ",
+                  origin, " because: ", ex.what());
               }
               catch (const f3d::options::inexistent_exception&)
               {
