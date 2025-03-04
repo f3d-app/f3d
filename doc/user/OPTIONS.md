@@ -198,4 +198,4 @@ The cache directory location is as follows, in order, using the first defined en
 
 - Windows: `%LOCALAPPDATA%\f3d`
 - Linux: `${XDG_CACHE_HOME}/f3d`,`${HOME}/.cache/f3d`
-- macOS: `${XDG_CACHE_HOME}/f3d`,`${HOME}/Library/Caches/f3d`
+- macOS: `${HOME}/Library/Caches/f3d`

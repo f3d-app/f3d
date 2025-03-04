@@ -60,6 +60,8 @@ engine::engine(
     cachePath = fs::path(appData);
   }
 #else
+
+#if defined(__unix__)
   // Implementing XDG specifications
   const char* xdgCacheHome = std::getenv("XDG_CACHE_HOME");
   if (xdgCacheHome && strlen(xdgCacheHome) > 0)
@@ -67,6 +69,7 @@ engine::engine(
     cachePath = fs::path(xdgCacheHome);
   }
   else
+#endif
   {
     const char* home = std::getenv("HOME");
     if (home && strlen(home) > 0)
