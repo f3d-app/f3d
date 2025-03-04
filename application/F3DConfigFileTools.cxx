@@ -85,7 +85,8 @@ std::vector<fs::path> GetConfigPaths(const std::string& configSearch)
 }
 
 //----------------------------------------------------------------------------
-F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(const std::string& userConfig)
+F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
+  const std::string& userConfig)
 {
   // Default config directory name
   std::string configSearch = "config";
@@ -312,5 +313,6 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(const 
       f3d::log::error(ex.what());
     }
   }
-  return F3DConfigFileTools::ParsedConfigFiles { std::move(optionsEntries), std::move(imperativeOptionsEntries), std::move(bindingsEntries) };
+  return F3DConfigFileTools::ParsedConfigFiles{ std::move(optionsEntries),
+    std::move(imperativeOptionsEntries), std::move(bindingsEntries) };
 }

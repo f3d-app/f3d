@@ -890,7 +890,8 @@ int F3DStarter::Start(int argc, char** argv)
   // Read config files
   if (!noConfig)
   {
-    F3DConfigFileTools::ParsedConfigFiles parsedConfigFiles = F3DConfigFileTools::ReadConfigFiles(config);
+    F3DConfigFileTools::ParsedConfigFiles parsedConfigFiles =
+      F3DConfigFileTools::ReadConfigFiles(config);
     this->Internals->ConfigOptionsEntries = parsedConfigFiles.Options;
     this->Internals->ImperativeConfigOptionsEntries = parsedConfigFiles.ImperativeOptions;
     this->Internals->ConfigBindingsEntries = parsedConfigFiles.Bindings;
