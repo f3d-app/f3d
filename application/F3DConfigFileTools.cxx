@@ -255,8 +255,9 @@ F3DConfigFileTools::ReadConfigFiles(const std::string& userConfig)
           if (!imperativeEntry.empty())
           {
             // The path is only used for logging purpose, store the imperative information inside
-            imperativeOptionsEntries.emplace_back(
-              imperativeEntry, configFilePath.string() + " (imperative)", match);
+            std::string pathStr = configFilePath.string() + " (imperative)";
+            imperativeOptionsEntries.emplace_back(std::tie(
+              imperativeEntry, pathStr, match));
           }
         }
 
@@ -296,7 +297,8 @@ F3DConfigFileTools::ReadConfigFiles(const std::string& userConfig)
           }
 
           // Emplace the config dict for that pattern match into the binding entries vector
-          bindingsEntries.emplace_back(bindingEntry, configFilePath.string(), match);
+          std::string pathStr = configFilePath.string();
+          bindingsEntries.emplace_back(std::tie(bindingEntry, pathStr, match));
         }
 
         if (optionsBlock.empty() && bindingsBlock.empty())

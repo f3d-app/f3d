@@ -425,7 +425,7 @@ public:
     for (const auto& [key, tuple] : loggingMap)
     {
       const auto& [bindStr, source, pattern, commands] = tuple;
-      std::string origin = source.empty() ? pattern : source + ":`" + pattern + "`";
+      std::string origin = source.empty() ? pattern : std::string(source) + ":`" + pattern + "`";
       f3d::log::debug(" '", bindStr, "' ", sep, " '", commands, "' from ", origin);
     }
     f3d::log::debug("");
@@ -522,13 +522,13 @@ public:
               }
               catch (const f3d::options::parsing_exception& ex)
               {
-                std::string origin = source.empty() ? pattern : source + ":`" + pattern + "`";
+                std::string origin = source.empty() ? pattern : std::string(source) + ":`" + pattern + "`";
                 f3d::log::warn("Could not set '", keyForLog, "' to '", libf3dOptionValue, "' from ",
                   origin, " because: ", ex.what());
               }
               catch (const f3d::options::inexistent_exception&)
               {
-                std::string origin = source.empty() ? pattern : source + ":`" + pattern + "`";
+                std::string origin = source.empty() ? pattern : std::string(source) + ":`" + pattern + "`";
                 auto [closestName, dist] =
                   F3DOptionsTools::GetClosestOption(libf3dOptionName, true);
                 f3d::log::warn("'", keyForLog, "' option from ", origin,
@@ -841,7 +841,7 @@ int F3DStarter::Start(int argc, char** argv)
     F3DOptionsTools::ParseCLIOptions(argc, argv, inputFiles);
 
   // Store in a option entries for easier processing
-  this->Internals->CLIOptionsEntries.emplace_back(cliOptionsDict, fs::path(), "CLI options");
+  this->Internals->CLIOptionsEntries.emplace_back(std::tie(cliOptionsDict, "", "CLI options"));
 
   // Check no-config, config CLI, output and verbose options first
   // XXX: the local variable are initialized manually for simplicity
@@ -1281,7 +1281,7 @@ void F3DStarter::LoadFileGroup(
   // Add the dynamicOptionsDict into the entries, which grows over time if option keep changing and
   // files keep being loaded
   this->Internals->DynamicOptionsEntries.emplace_back(
-    dynamicOptionsDict, fs::path(), "dynamic options");
+    dynamicOptionsDict, "", "dynamic options");
 
   // Recover file information
   f3d::scene& scene = this->Internals->Engine->getScene();
