@@ -385,7 +385,7 @@ std::string format(direction_t var)
           str += new_sign;
           sign = new_sign;
         }
-        str += 'X' + i;
+        str += static_cast<char>('X' + i);
       }
     }
     if (str.empty())
