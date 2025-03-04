@@ -68,9 +68,10 @@ When formatting a vector into a string, individual token are formatted according
 ## Color
 
 The following formats are supported when parsing a color, case insensitive:
+
 - R,G,B where R, G, B are doubles between 0 and 1
 - #RRGGBB where RR, GG, BB are hexadecimal values
-- hsl(H, S%, L%) where H \<= 360, S and L in percent 
+- hsl(H, S%, L%) where H \<= 360, S and L in percent
 - hsv(H, S%, V%) where H \<= 360, S and V in percent
 - hwb(H, W%, B%) where H \<= 360, W and B in percent
 - cmyk(C%, M%, Y%, K%) where C, M, Y, K in percent
