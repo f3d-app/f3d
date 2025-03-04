@@ -59,7 +59,7 @@ jobs:
       id: set_default_versions
       uses: f3d-app/default-versions-action@main
       with:
-        file: ./source/.github/workflow/versions.json
+        file: ./source/.github/workflows/versions.json
 
 #----------------------------------------------------------------------------
 # Cache LFS: Checkout LFS data and update the cache to limit LFS bandwidth
