@@ -129,6 +129,17 @@ int TestSDKOptionsIO(int argc, char* argv[])
   test.parse_expect<f3d::color_t, parsing_exception>(
     "incorrect size direction_t", "0.1,0.2,0.3,0.4");
   test.format<f3d::direction_t>("direction_t", { 0.1, 0.2, 0.3 }, "0.1,0.2,0.3");
+  test.format<f3d::direction_t>("direction_t", { 0, 0, 0 }, "0,0,0");
+  test.format<f3d::direction_t>("direction_t", { +1, 0, 0 }, "+X");
+  test.format<f3d::direction_t>("direction_t", { 0, +2, 0 }, "+Y");
+  test.format<f3d::direction_t>("direction_t", { 0, 0, +3 }, "+Z");
+  test.format<f3d::direction_t>("direction_t", { -1, 0, 0 }, "-X");
+  test.format<f3d::direction_t>("direction_t", { 0, -2, 0 }, "-Y");
+  test.format<f3d::direction_t>("direction_t", { 0, 0, -3 }, "-Z");
+  test.format<f3d::direction_t>("direction_t", { +1, 0, +1 }, "+XZ");
+  test.format<f3d::direction_t>("direction_t", { 0, +2, -2 }, "+Y-Z");
+  test.format<f3d::direction_t>("direction_t", { -0.1, -0.1, +0.1 }, "-XY+Z");
+  test.format<f3d::direction_t>("direction_t", { +0.1, -0.1, +0.2 }, "0.1,-0.1,0.2");
 
   test.parse<std::vector<std::string>>(
     "std::vector<std::string>", "foo,bar,baz", { "foo", "bar", "baz" });
