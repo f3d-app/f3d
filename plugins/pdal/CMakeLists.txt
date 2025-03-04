@@ -15,10 +15,50 @@ f3d_plugin_init()
 
 f3d_plugin_declare_reader(
   NAME LAS
-  EXTENSIONS las
+  EXTENSIONS las laz
   MIMETYPES application/vnd.las
   VTK_READER vtkPDALReader
-  FORMAT_DESCRIPTION "LAS"
+  FORMAT_DESCRIPTION "Lidar Data Exchange Format"
+)
+
+f3d_plugin_declare_reader(
+  NAME E57
+  EXTENSIONS e57
+  MIMETYPES model/e57
+  VTK_READER vtkPDALReader
+  FORMAT_DESCRIPTION "ASTM E57 3D Data Exchange"
+)
+
+f3d_plugin_declare_reader(
+  NAME PTS
+  EXTENSIONS pts
+  MIMETYPES application/vnd.pts
+  VTK_READER vtkPDALReader
+  FORMAT_DESCRIPTION "Laser scan plain data format"
+)
+
+f3d_plugin_declare_reader(
+  NAME PTX
+  EXTENSIONS ptx
+  MIMETYPES application/vnd.ptx
+  VTK_READER vtkPDALReader
+  FORMAT_DESCRIPTION "ptx plain text data format"
+)
+
+f3d_plugin_declare_reader(
+  NAME PCD
+  EXTENSIONS pcd
+  MIMETYPES application/vnd.pcd
+  VTK_READER vtkPDALReader
+  FORMAT_DESCRIPTION "point cloud data"
+)
+
+f3d_plugin_declare_reader(
+  NAME EPT
+  EXTENSIONS json
+  MIMETYPES application/vnd.ept
+  VTK_READER vtkPDALReader
+  FORMAT_DESCRIPTION "Entwine Point Tile"
 )
 
 f3d_plugin_build(
