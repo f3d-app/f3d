@@ -76,4 +76,4 @@ The following formats are supported when parsing a string into a direction:
 - `[[+|-]X][[+|-]Y][[+|-]Z]` (case insensitive), for example `+X` or `X` for `1,0,0`, `-y+z` for `0,-1,1`
 - vector of three doubles, for example `1,2,3.4`
 
-When formatting a direction into a string, it is formatted as a vector of doubles.
+When formatting a direction into a string, it is formatted in the `±XYZ` form if possible or as a vector of doubles otherwise.
