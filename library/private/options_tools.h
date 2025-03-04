@@ -359,33 +359,33 @@ std::string format(color_t var)
  */
 std::string format(direction_t var)
 {
-  const auto is_zero = [](double a) { return std::abs(a) < 1e-12; };
-  const auto abs_diff = [](double a, double b) { return std::abs(a) - std::abs(b); };
+  const auto isZero = [](double a) { return std::abs(a) < 1e-12; };
+  const auto absDiff = [](double a, double b) { return std::abs(a) - std::abs(b); };
   const auto formatAsXYZ = [&]()
   {
     std::string str = "";
-    double first_nonzero = 0; // not non-zero until first
-    char sign = ' ';          // initially not `+`/`-` to force first sign
-    for (size_t i = 0; i < 3; ++i)
+    double firstNonZero = 0; // not non-zero until first
+    char sign = '\0';        // initially not `+`/`-` to force first sign
+    for (size_t componentIndex = 0; componentIndex < 3; ++componentIndex)
     {
-      const double v = var[i];
-      if (!is_zero(v))
+      const double componentValue = var[componentIndex];
+      if (!isZero(componentValue))
       {
-        if (is_zero(first_nonzero))
+        if (isZero(firstNonZero))
         {
-          first_nonzero = v;
+          firstNonZero = componentValue;
         }
-        else if (!is_zero(abs_diff(v, first_nonzero)))
+        else if (!isZero(absDiff(componentValue, firstNonZero)))
         {
           throw std::invalid_argument("not all same");
         }
-        const char new_sign = v < 0 ? '-' : '+';
-        if (new_sign != sign)
+        const char newSign = componentValue < 0 ? '-' : '+';
+        if (newSign != sign)
         {
-          str += new_sign;
-          sign = new_sign;
+          str += newSign;
+          sign = newSign;
         }
-        str += static_cast<char>('X' + i);
+        str += static_cast<char>('X' + componentIndex);
       }
     }
     if (str.empty())
