@@ -890,14 +890,16 @@ int F3DStarter::Start(int argc, char** argv)
   // Read config files
   if (!noConfig)
   {
-    std::tie(this->Internals->ConfigOptionsEntries, this->Internals->ImperativeConfigOptionsEntries, this->Internals->ConfigBindingsEntries) =
-      F3DConfigFileTools::ReadConfigFiles(config);
+    std::tie(this->Internals->ConfigOptionsEntries, this->Internals->ImperativeConfigOptionsEntries,
+      this->Internals->ConfigBindingsEntries) = F3DConfigFileTools::ReadConfigFiles(config);
   }
 
   // Update app and libf3d options based on config entries, with an empty input file
   // config < cli
   this->Internals->UpdateOptions(
-    { this->Internals->ConfigOptionsEntries, this->Internals->CLIOptionsEntries, this->Internals->ImperativeConfigOptionsEntries }, { "" });
+    { this->Internals->ConfigOptionsEntries, this->Internals->CLIOptionsEntries,
+      this->Internals->ImperativeConfigOptionsEntries },
+    { "" });
 
 #if __APPLE__
   // Initialize MacOS delegate
@@ -1314,7 +1316,7 @@ void F3DStarter::LoadFileGroup(
       std::copy(paths.begin(), paths.end(), std::back_inserter(configPaths));
       this->Internals->UpdateOptions(
         { this->Internals->ConfigOptionsEntries, this->Internals->CLIOptionsEntries,
-          this->Internals->DynamicOptionsEntries, this->Internals->ImperativeConfigOptionsEntries},
+          this->Internals->DynamicOptionsEntries, this->Internals->ImperativeConfigOptionsEntries },
         configPaths);
       this->Internals->UpdateBindings(configPaths);
 

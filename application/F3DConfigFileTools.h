@@ -18,8 +18,8 @@ using BindingsEntries = std::vector<BindingsEntry>;
  * Read config files using userConfig if any, return an optionEntries
  * containing ordered optionDict and ordered bindingsEntries
  */
-std::tuple<F3DOptionsTools::OptionsEntries, F3DOptionsTools::OptionsEntries, BindingsEntries> ReadConfigFiles(
-  const std::string& userConfig);
+std::tuple<F3DOptionsTools::OptionsEntries, F3DOptionsTools::OptionsEntries, BindingsEntries>
+ReadConfigFiles(const std::string& userConfig);
 }
 
 #endif

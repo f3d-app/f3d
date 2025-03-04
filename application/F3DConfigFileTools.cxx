@@ -85,7 +85,8 @@ std::vector<fs::path> GetConfigPaths(const std::string& configSearch)
 }
 
 //----------------------------------------------------------------------------
-std::tuple<F3DOptionsTools::OptionsEntries, F3DOptionsTools::OptionsEntries, F3DConfigFileTools::BindingsEntries>
+std::tuple<F3DOptionsTools::OptionsEntries, F3DOptionsTools::OptionsEntries,
+  F3DConfigFileTools::BindingsEntries>
 F3DConfigFileTools::ReadConfigFiles(const std::string& userConfig)
 {
   // Default config directory name
@@ -254,7 +255,8 @@ F3DConfigFileTools::ReadConfigFiles(const std::string& userConfig)
           if (!imperativeEntry.empty())
           {
             // The path is only used for logging purpose, store the imperative information inside
-            imperativeOptionsEntries.emplace_back(imperativeEntry, configFilePath.string() + " (imperative)", match);
+            imperativeOptionsEntries.emplace_back(
+              imperativeEntry, configFilePath.string() + " (imperative)", match);
           }
         }
 
@@ -312,5 +314,6 @@ F3DConfigFileTools::ReadConfigFiles(const std::string& userConfig)
       f3d::log::error(ex.what());
     }
   }
-  return { std::move(optionsEntries), std::move(imperativeOptionsEntries), std::move(bindingEntries) };
+  return { std::move(optionsEntries), std::move(imperativeOptionsEntries),
+    std::move(bindingEntries) };
 }
