@@ -255,7 +255,8 @@ F3DConfigFileTools::ReadConfigFiles(const std::string& userConfig)
           if (!imperativeEntry.empty())
           {
             // The path is only used for logging purpose, store the imperative information inside
-            imperativeOptionsEntries.emplace_back(imperativeEntry, configFilePath.string() + " (imperative)", match);
+            imperativeOptionsEntries.emplace_back(
+              imperativeEntry, configFilePath.string() + " (imperative)", match);
           }
         }
 

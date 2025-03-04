@@ -522,13 +522,15 @@ public:
               }
               catch (const f3d::options::parsing_exception& ex)
               {
-                std::string origin = source.empty() ? pattern : std::string(source) + ":`" + pattern + "`";
+                std::string origin =
+                  source.empty() ? pattern : std::string(source) + ":`" + pattern + "`";
                 f3d::log::warn("Could not set '", keyForLog, "' to '", libf3dOptionValue, "' from ",
                   origin, " because: ", ex.what());
               }
               catch (const f3d::options::inexistent_exception&)
               {
-                std::string origin = source.empty() ? pattern : std::string(source) + ":`" + pattern + "`";
+                std::string origin =
+                  source.empty() ? pattern : std::string(source) + ":`" + pattern + "`";
                 auto [closestName, dist] =
                   F3DOptionsTools::GetClosestOption(libf3dOptionName, true);
                 f3d::log::warn("'", keyForLog, "' option from ", origin,
@@ -1280,8 +1282,7 @@ void F3DStarter::LoadFileGroup(
 
   // Add the dynamicOptionsDict into the entries, which grows over time if option keep changing and
   // files keep being loaded
-  this->Internals->DynamicOptionsEntries.emplace_back(
-    dynamicOptionsDict, "", "dynamic options");
+  this->Internals->DynamicOptionsEntries.emplace_back(dynamicOptionsDict, "", "dynamic options");
 
   // Recover file information
   f3d::scene& scene = this->Internals->Engine->getScene();
