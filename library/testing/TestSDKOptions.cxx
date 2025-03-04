@@ -133,7 +133,7 @@ int TestSDKOptions(int argc, char* argv[])
 
   // Test direction_t (rely on testing from color_t)
   opt.setAsString("scene.up_direction", "+X");
-  test("setAsString direction", opt.getAsString("scene.up_direction") == "1,0,0");
+  test("setAsString direction", opt.getAsString("scene.up_direction"), "+X");
 
   f3d::direction_t dir({ 0.707, -0.707, 0 });
   test("direction x", dir.x() == 0.707);
@@ -142,7 +142,7 @@ int TestSDKOptions(int argc, char* argv[])
 
   std::stringstream ssDir;
   ssDir << f3d::direction_t(0, 0, -1.0);
-  test("direction to string", ssDir.str() == "0,0,-1");
+  test("direction to string", ssDir.str(), "-Z");
 
   test.expect<f3d::options::parsing_exception>("setAsString direction with incorrect size",
     [&]() { opt.setAsString("scene.up_direction", "0.1,0.2,0.3,0.4"); });

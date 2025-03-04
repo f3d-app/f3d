@@ -354,13 +354,55 @@ std::string format(color_t var)
 
 //----------------------------------------------------------------------------
 /**
- * Format provided var into a string from provided direction_t
- * rely on format(std::vector<double>&)
+ * Format provided var into a string from provided direction_t.
+ * Format as `+X`/`+X-Y`/... if possible, otherwise rely on `format(std::vector<double>&)`
  */
 std::string format(direction_t var)
 {
-  // TODO generate a proper direction string
-  return options_tools::format(static_cast<std::vector<double>>(var));
+  const auto isZero = [](double a) { return std::abs(a) < 1e-12; };
+  const auto absDiff = [](double a, double b) { return std::abs(a) - std::abs(b); };
+  const auto formatAsXYZ = [&]()
+  {
+    std::string str = "";
+    double firstNonZero = 0; // not non-zero until first
+    char sign = '\0';        // initially not `+`/`-` to force first sign
+    for (size_t componentIndex = 0; componentIndex < 3; ++componentIndex)
+    {
+      const double componentValue = var[componentIndex];
+      if (!isZero(componentValue))
+      {
+        if (isZero(firstNonZero))
+        {
+          firstNonZero = componentValue;
+        }
+        else if (!isZero(absDiff(componentValue, firstNonZero)))
+        {
+          throw std::invalid_argument("not all same");
+        }
+        const char newSign = componentValue < 0 ? '-' : '+';
+        if (newSign != sign)
+        {
+          str += newSign;
+          sign = newSign;
+        }
+        str += static_cast<char>('X' + componentIndex);
+      }
+    }
+    if (str.empty())
+    {
+      throw std::invalid_argument("all zeroes");
+    }
+    return str;
+  };
+
+  try
+  {
+    return formatAsXYZ();
+  }
+  catch (const std::invalid_argument&)
+  {
+    return options_tools::format(static_cast<std::vector<double>>(var));
+  }
 }
 
 } // option_tools
