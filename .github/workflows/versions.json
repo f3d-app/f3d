@@ -30,5 +30,6 @@
     "usd": "v24.08",
     "java": "17"
   },
-  "vtk_commit_sha": "3d88a52001e06c8585b267c4aeab9d243309c9c3"
+  "vtk_commit_sha": "3d88a52001e06c8585b267c4aeab9d243309c9c3",
+  "timestamp": "20250304_0"
 }
