@@ -222,20 +222,20 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(const 
           {
             // Individual item can be imperative, store in the right dict
             std::string key = item.key();
-            F3DOptionsTools::OptionsDict* localEntry = &entry;
+            std::reference_wrapper<F3DOptionsTools::OptionsDict> localEntry = std::ref(entry);
             if (!key.empty() && key[0] == '!')
             {
-              localEntry = &imperativeEntry;
+              localEntry = std::ref(imperativeEntry);
               key = key.substr(1);
             }
 
             if (item.value().is_number() || item.value().is_boolean())
             {
-              (*localEntry)[key] = nlohmann::to_string(item.value());
+              localEntry.get()[key] = nlohmann::to_string(item.value());
             }
             else if (item.value().is_string())
             {
-              (*localEntry)[key] = item.value().get<std::string>();
+              localEntry.get()[key] = item.value().get<std::string>();
             }
             else
             {
