@@ -44,6 +44,7 @@ jobs:
       java_version: ${{ steps.set_default_versions.outputs.java_version }}
       java_min_version: ${{ steps.set_default_versions.outputs.java_min_version }}
       vtk_commit_sha: ${{ steps.set_default_versions.outputs.vtk_commit_sha }}
+      timestamp: ${{ steps.set_default_versions.outputs.timestamp }}
 
     steps:
 
@@ -56,7 +57,9 @@ jobs:
 
     - name: Set default versions
       id: set_default_versions
-      uses: ./source/.github/actions/default-versions
+      uses: f3d-app/default-versions-action@main
+      with:
+        file: ./source/.github/workflow/versions.json
 
 #----------------------------------------------------------------------------
 # Cache LFS: Checkout LFS data and update the cache to limit LFS bandwidth
