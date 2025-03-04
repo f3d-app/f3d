@@ -54,7 +54,7 @@ engine::engine(
 
   fs::path cachePath;
 #if defined(_WIN32)
-  const char* appData = std::getenv("APPDATA");
+  const char* appData = std::getenv("LOCALAPPDATA");
   if (appData && strlen(appData) > 0)
   {
     cachePath = fs::path(appData);
