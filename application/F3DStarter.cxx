@@ -890,8 +890,10 @@ int F3DStarter::Start(int argc, char** argv)
   // Read config files
   if (!noConfig)
   {
-    std::tie(this->Internals->ConfigOptionsEntries, this->Internals->ImperativeConfigOptionsEntries,
-      this->Internals->ConfigBindingsEntries) = F3DConfigFileTools::ReadConfigFiles(config);
+    F3DConfigFileTools::ParsedConfigFiles parsedConfigFiles = F3DConfigFileTools::ReadConfigFiles(config);
+    this->Internals->ConfigOptionsEntries = parsedConfigFiles.Options;
+    this->Internals->ImperativeConfigOptionsEntries = parsedConfigFiles.ImperativeOptions;
+    this->Internals->ConfigBindingsEntries = parsedConfigFiles.Bindings;
   }
 
   // Update app and libf3d options based on config entries, with an empty input file
