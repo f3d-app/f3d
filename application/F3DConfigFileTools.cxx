@@ -85,8 +85,8 @@ std::vector<fs::path> GetConfigPaths(const std::string& configSearch)
 }
 
 //----------------------------------------------------------------------------
-std::pair<F3DOptionsTools::OptionsEntries, F3DConfigFileTools::BindingsEntries>
-F3DConfigFileTools::ReadConfigFiles(const std::string& userConfig)
+F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
+  const std::string& userConfig)
 {
   // Default config directory name
   std::string configSearch = "config";
@@ -160,7 +160,8 @@ F3DConfigFileTools::ReadConfigFiles(const std::string& userConfig)
 
   // Read config files
   F3DOptionsTools::OptionsEntries optionsEntries;
-  F3DConfigFileTools::BindingsEntries bindingEntries;
+  F3DOptionsTools::OptionsEntries imperativeOptionsEntries;
+  F3DConfigFileTools::BindingsEntries bindingsEntries;
   for (const auto& configFilePath : actualConfigFilePaths)
   {
     std::ifstream file(configFilePath);
@@ -217,26 +218,45 @@ F3DConfigFileTools::ReadConfigFiles(const std::string& userConfig)
         {
           // Add each options config entry into an option dict
           F3DOptionsTools::OptionsDict entry;
+          F3DOptionsTools::OptionsDict imperativeEntry;
           for (const auto& item : optionsBlock.items())
           {
+            // Individual item can be imperative, store in the right dict
+            std::string key = item.key();
+            std::reference_wrapper<F3DOptionsTools::OptionsDict> localEntry = std::ref(entry);
+            if (!key.empty() && key[0] == '!')
+            {
+              localEntry = std::ref(imperativeEntry);
+              key = key.substr(1);
+            }
+
             if (item.value().is_number() || item.value().is_boolean())
             {
-              entry[item.key()] = nlohmann::to_string(item.value());
+              localEntry.get()[key] = nlohmann::to_string(item.value());
             }
             else if (item.value().is_string())
             {
-              entry[item.key()] = item.value().get<std::string>();
+              localEntry.get()[key] = item.value().get<std::string>();
             }
             else
             {
-              f3d::log::error(item.key(), " from ", configFilePath.string(),
+              f3d::log::error(key, " from ", configFilePath.string(),
                 " must be a string, a boolean or a number, ignoring entry");
               continue;
             }
           }
 
-          // Emplace the option dict for that pattern match into the config entries vector
-          optionsEntries.emplace_back(entry, configFilePath, match);
+          // Emplace the option dicts for that pattern match into the config entries vector
+          if (!entry.empty())
+          {
+            optionsEntries.emplace_back(entry, configFilePath.string(), match);
+          }
+          if (!imperativeEntry.empty())
+          {
+            // The path is only used for logging purpose, store the imperative information inside
+            imperativeOptionsEntries.emplace_back(
+              imperativeEntry, configFilePath.string() + " (imperative)", match);
+          }
         }
 
         // Recover bindings if any
@@ -275,7 +295,7 @@ F3DConfigFileTools::ReadConfigFiles(const std::string& userConfig)
           }
 
           // Emplace the config dict for that pattern match into the binding entries vector
-          bindingEntries.emplace_back(bindingEntry, configFilePath, match);
+          bindingsEntries.emplace_back(bindingEntry, configFilePath.string(), match);
         }
 
         if (optionsBlock.empty() && bindingsBlock.empty())
@@ -293,5 +313,6 @@ F3DConfigFileTools::ReadConfigFiles(const std::string& userConfig)
       f3d::log::error(ex.what());
     }
   }
-  return { std::move(optionsEntries), std::move(bindingEntries) };
+  return F3DConfigFileTools::ParsedConfigFiles{ std::move(optionsEntries),
+    std::move(imperativeOptionsEntries), std::move(bindingsEntries) };
 }

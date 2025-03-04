@@ -14,7 +14,7 @@
 namespace F3DOptionsTools
 {
 using OptionsDict = std::map<std::string, std::string>;
-using OptionsEntry = std::tuple<OptionsDict, std::filesystem::path, std::string>;
+using OptionsEntry = std::tuple<OptionsDict, std::string, std::string>;
 using OptionsEntries = std::vector<OptionsEntry>;
 
 /**
