@@ -841,7 +841,7 @@ int F3DStarter::Start(int argc, char** argv)
     F3DOptionsTools::ParseCLIOptions(argc, argv, inputFiles);
 
   // Store in a option entries for easier processing
-  this->Internals->CLIOptionsEntries.emplace_back(std::tie(cliOptionsDict, "", "CLI options"));
+  this->Internals->CLIOptionsEntries.emplace_back(cliOptionsDict, "", "CLI options");
 
   // Check no-config, config CLI, output and verbose options first
   // XXX: the local variable are initialized manually for simplicity
