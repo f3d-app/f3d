@@ -162,7 +162,7 @@ F3DConfigFileTools::ReadConfigFiles(const std::string& userConfig)
   // Read config files
   F3DOptionsTools::OptionsEntries optionsEntries;
   F3DOptionsTools::OptionsEntries imperativeOptionsEntries;
-  F3DConfigFileTools::BindingsEntries bindingEntries;
+  F3DConfigFileTools::BindingsEntries bindingsEntries;
   for (const auto& configFilePath : actualConfigFilePaths)
   {
     std::ifstream file(configFilePath);
@@ -296,7 +296,7 @@ F3DConfigFileTools::ReadConfigFiles(const std::string& userConfig)
           }
 
           // Emplace the config dict for that pattern match into the binding entries vector
-          bindingEntries.emplace_back(bindingEntry, configFilePath, match);
+          bindingsEntries.emplace_back(bindingEntry, configFilePath.string(), match);
         }
 
         if (optionsBlock.empty() && bindingsBlock.empty())
@@ -315,5 +315,5 @@ F3DConfigFileTools::ReadConfigFiles(const std::string& userConfig)
     }
   }
   return { std::move(optionsEntries), std::move(imperativeOptionsEntries),
-    std::move(bindingEntries) };
+    std::move(bindingsEntries) };
 }

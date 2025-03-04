@@ -523,14 +523,14 @@ public:
               catch (const f3d::options::parsing_exception& ex)
               {
                 std::string origin =
-                  source.empty() ? pattern : std::string(source) + ":`" + pattern + "`";
+                  source.empty() ? pattern : source + ":`" + pattern + "`";
                 f3d::log::warn("Could not set '", keyForLog, "' to '", libf3dOptionValue, "' from ",
                   origin, " because: ", ex.what());
               }
               catch (const f3d::options::inexistent_exception&)
               {
                 std::string origin =
-                  source.empty() ? pattern : std::string(source) + ":`" + pattern + "`";
+                  source.empty() ? pattern : source + ":`" + pattern + "`";
                 auto [closestName, dist] =
                   F3DOptionsTools::GetClosestOption(libf3dOptionName, true);
                 f3d::log::warn("'", keyForLog, "' option from ", origin,
