@@ -191,6 +191,7 @@ std::string options::format(const T& var)
 F3D_DECL_TYPE_WITH_VEC(bool);
 F3D_DECL_TYPE_WITH_VEC(int);
 F3D_DECL_TYPE_WITH_VEC(double);
+F3D_DECL_TYPE_WITH_VEC(std::filesystem::path);
 F3D_DECL_TYPE_WITH_VEC(f3d::ratio_t);
 F3D_DECL_TYPE_WITH_VEC(std::string);
 F3D_DECL_TYPE(color_t);

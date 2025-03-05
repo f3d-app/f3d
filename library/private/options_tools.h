@@ -185,6 +185,18 @@ ratio_t parse(const std::string& str)
 
 //----------------------------------------------------------------------------
 /**
+ * Parse provided string into a ratio_t.
+ * Supported formats: number (same as `<double>` version), percentage, fraction
+ * Can throw options::parsing_exception in case of failure to parse
+ */
+template<>
+std::filesystem::path parse(const std::string& str)
+{
+  return std::filesystem::path(str);
+}
+
+//----------------------------------------------------------------------------
+/**
  * Parse provided string into a color_t.
  * Supported formats: "R,G,B"
  * rely on parse<std::vector<double>>(str)
@@ -321,6 +333,15 @@ std::string format(ratio_t var)
 std::string format(const std::string& var)
 {
   return var;
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Generate (returns) a string from provided path
+ */
+std::string format(const std::filesystem::path& var)
+{
+  return var.string();
 }
 
 //----------------------------------------------------------------------------
