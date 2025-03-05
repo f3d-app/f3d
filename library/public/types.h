@@ -128,7 +128,7 @@ public:
     return this->Array.data();
   }
 
-private:
+protected:
   std::array<double, N> Array{ 0 };
 };
 
@@ -203,7 +203,7 @@ public:
   [[nodiscard]] operator f3d::vector3_t() const
   {
     // XXX: No better way to do this ?
-    return f3d::vector3_t{ this->x(), this->y(), this->z() };
+    return f3d::vector3_t{ this->Array };
   }
 };
 
