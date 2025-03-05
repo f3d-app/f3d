@@ -45,10 +45,19 @@ public:
   /*
    * Get the mimetypes supported by this reader
    */
-  virtual const std::vector<std::string> getMimeTypes() const override
+  const std::vector<std::string> getMimeTypes() const override
   {
     static const std::vector<std::string> types = { @F3D_READER_MIMETYPES@ };
     return types;
+  }
+
+  void initPluginOptions() override
+  {
+    std::vector<std::string> names = { @F3D_READER_OPTIONS@ };
+    for (const auto& name : names)
+    {
+      this->PluginOptions->emplace(name, "");
+    }
   }
 
 #if @F3D_READER_HAS_SCORE@
