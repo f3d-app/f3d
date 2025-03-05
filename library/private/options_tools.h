@@ -185,6 +185,16 @@ ratio_t parse(const std::string& str)
 
 //----------------------------------------------------------------------------
 /**
+ * Parse provided string into a path_t.
+ */
+template<>
+path_t parse(const std::string& str)
+{
+  return f3d::path_t(str);
+}
+
+//----------------------------------------------------------------------------
+/**
  * Parse provided string into a color_t.
  * Supported formats: "R,G,B"
  * rely on parse<std::vector<double>>(str)
@@ -321,6 +331,17 @@ std::string format(ratio_t var)
 std::string format(const std::string& var)
 {
   return var;
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Format provided var into a string from provided path_t
+ * rely on format(std::string&)
+ */
+std::string format(path_t var)
+{
+  // TODO generate a proper path string
+  return options_tools::format(static_cast<std::string>(var));
 }
 
 //----------------------------------------------------------------------------
