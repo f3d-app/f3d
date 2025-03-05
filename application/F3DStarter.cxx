@@ -122,7 +122,8 @@ public:
     }
     if (camConf.CameraViewUp.has_value())
     {
-      cam.setViewUp(camConf.CameraViewUp.value());
+      f3d::vector3_t up = camConf.CameraViewUp.value();
+      cam.setViewUp(up);
     }
     if (camConf.CameraViewAngle > 0)
     {
