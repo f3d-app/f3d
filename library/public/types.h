@@ -35,26 +35,12 @@ struct type_access_exception : public exception
 /**
  * Describe a 3D point.
  */
-struct F3D_EXPORT point3_t : std::array<double, 3>
-{
-  template<typename... Args>
-  point3_t(Args&&... args)
-    : array({ double(std::forward<Args>(args))... })
-  {
-  }
-};
+struct F3D_EXPORT point3_t : std::array<double, 3>{};
 
 /**
  * Describe a 3D vector.
  */
-struct F3D_EXPORT vector3_t : std::array<double, 3>
-{
-  template<typename... Args>
-  vector3_t(Args&&... args)
-    : array({ double(std::forward<Args>(args))... })
-  {
-  }
-};
+struct F3D_EXPORT vector3_t : std::array<double, 3>{};
 
 /**
  * Describe an angle in degrees.
@@ -213,7 +199,7 @@ public:
   [[nodiscard]] operator f3d::vector3_t() const
   {
     // XXX: No better way to do this ?
-    return f3d::vector3_t(this->x(), this->y(), this->z());
+    return f3d::vector3_t{this->x(), this->y(), this->z()};
   }
 };
 
