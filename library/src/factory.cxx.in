@@ -28,6 +28,13 @@ const std::vector<plugin*>& factory::getPlugins()
   return this->Plugins;
 }
 
+
+//----------------------------------------------------------------------------
+std::map<std::string, std::string>& factory::getPluginOptions()
+{
+  return this->PluginOptions;
+}
+
 //----------------------------------------------------------------------------
 factory::plugin_initializer_t factory::getStaticInitializer(const std::string& pluginName)
 {
@@ -83,6 +90,7 @@ bool factory::registerOnce(plugin* plug)
 {
   if (std::find(this->Plugins.begin(), this->Plugins.end(), plug) == this->Plugins.end())
   {
+    plug->setPluginOptions(this->PluginOptions);
     this->Plugins.push_back(plug);
 
     log::debug("Loading plugin \"" + plug->getName() + "\"");

@@ -17,6 +17,7 @@ f3d_plugin_declare_reader(
   NAME VDB
   EXTENSIONS vdb
   MIMETYPES application/vnd.vdb
+  OPTIONS vdb.downsampling_factor
   VTK_READER vtkOpenVDBReader
   FORMAT_DESCRIPTION "VDB"
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/vdb.inl"

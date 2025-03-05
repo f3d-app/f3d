@@ -420,6 +420,35 @@ std::vector<std::string> engine::getPluginsList(const fs::path& pluginPath)
 }
 
 //----------------------------------------------------------------------------
+void engine::setPluginOption(const std::string& name, std::string value)
+{
+  std::map<std::string, std::string>& pluginOptions = factory::instance()->getPluginOptions();
+  std::cout<<pluginOptions.size()<<std::endl;
+  if (pluginOptions.size() != 0)
+    std::cout<<pluginOptions.begin()->first<<std::endl;
+  const auto iter = factory::instance()->getPluginOptions().find(name);
+  if (iter == pluginOptions.end())
+  {
+    std::cout<<"inexistent_exception engine"<<std::endl;
+    throw options::inexistent_exception("Plugin option " + std::string(name) + " does not exist");
+  }
+  iter->second = std::move(value);
+}
+
+//----------------------------------------------------------------------------
+std::string engine::getPluginOption(const std::string& name)
+{
+  std::map<std::string, std::string>& pluginOptions = factory::instance()->getPluginOptions();
+  const auto iter = factory::instance()->getPluginOptions().find(name);
+  if (iter == pluginOptions.end())
+  {
+    throw options::inexistent_exception("Plugin option " + std::string(name) + " does not exist");
+  }
+  return iter->second;
+}
+
+
+//----------------------------------------------------------------------------
 engine::libInformation engine::getLibInfo()
 {
   libInformation libInfo;

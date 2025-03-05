@@ -52,6 +52,10 @@ public:
   const std::vector<plugin*>& getPlugins();
 
   /**
+   */
+  std::map<std::string, std::string>& getPluginOptions();
+
+  /**
    * Get static plugin initialization function
    * Return nullptr if it does not exists
    */
@@ -66,6 +70,8 @@ protected:
   std::vector<plugin*> Plugins;
 
   std::map<std::string, plugin_initializer_t> StaticPluginInitializers;
+
+  std::map<std::string, std::string> PluginOptions;
 };
 }
 #endif

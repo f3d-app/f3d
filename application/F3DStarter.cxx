@@ -504,6 +504,18 @@ public:
 
               try
               {
+                // try to set it as a plugin option
+                this->Engine->setPluginOption(libf3dOptionName, libf3dOptionValue);
+                continue;
+              }
+              catch (const f3d::options::inexistent_exception&)
+              {
+                std::cout<<"inexistent_exception:" << libf3dOptionName<<std::endl;
+                // XXX: implement a look before API ?
+              }
+
+              try
+              {
                 // Assume this is a libf3d option and set/reset the value
                 if (reset)
                 {
@@ -968,6 +980,7 @@ int F3DStarter::Start(int argc, char** argv)
   }
 
   this->Internals->Engine->setOptions(this->Internals->LibOptions);
+//  this->Internals->Engine->setPluginOption("vdb.downsampling_factor", "1");
   f3d::log::debug("Engine configured");
 
   // Add all input files
