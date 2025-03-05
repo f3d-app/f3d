@@ -98,7 +98,7 @@
     },
     "hdri": {
       "file": {
-        "type": "string"
+        "type": "path"
       },
       "ambient": {
         "type": "bool",

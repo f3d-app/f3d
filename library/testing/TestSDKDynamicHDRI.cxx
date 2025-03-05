@@ -50,7 +50,7 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
   }
 
   // Change the hdri and make sure it is taken into account
-  opt.render.hdri.file = std::string(argv[1]) + "data/palermo_park_1k.hdr";
+  opt.render.hdri.file = f3d::path_t(std::string(argv[1]) + "data/palermo_park_1k.hdr");
   ret = TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
     std::string(argv[2]), "TestSDKDynamicHDRI");
   if (!ret)
@@ -89,7 +89,7 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
 
 #if F3D_MODULE_EXR
   // Change the hdri and make sure it is taken into account
-  opt.render.hdri.file = std::string(argv[1]) + "/data/kloofendal_43d_clear_1k.exr";
+  opt.render.hdri.file = f3d::path_t(std::string(argv[1]) + "/data/kloofendal_43d_clear_1k.exr");
   ret = TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
     std::string(argv[2]), "TestSDKDynamicHDRIExr");
 

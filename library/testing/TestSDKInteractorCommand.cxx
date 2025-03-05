@@ -16,7 +16,7 @@ int TestSDKInteractorCommand(int argc, char* argv[])
   inter.triggerCommand("set model.scivis.cells true");
   test("triggerCommand set", options.model.scivis.cells == true);
   inter.triggerCommand("set render.hdri.file filepath");
-  test("triggerCommand set double quotes", options.render.hdri.file.value() == "filepath");
+  test("triggerCommand set double quotes", options.render.hdri.file.value() == f3d::path_t("filepath"));
 
   // Test reset
   inter.triggerCommand("reset model.scivis.cells");

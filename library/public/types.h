@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <array>
+#include <filesystem>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -79,6 +80,33 @@ public:
 
 private:
   double Value;
+};
+
+/**
+ * Describe a path.
+ */
+class path_t
+{
+public:
+  inline path_t() = default;
+  inline explicit path_t(std::string_view val)
+    : Value(val)
+  {
+  }
+  inline operator std::string() const
+  {
+    return this->Value.string();
+  }
+  [[nodiscard]] bool operator==(const path_t& other) const
+  {
+    return this->Value == other.Value;
+  }
+  [[nodiscard]] bool operator!=(const path_t& other) const
+  {
+    return this->Value != other.Value;
+  }
+private:
+  std::filesystem::path Value;
 };
 
 /**
