@@ -37,7 +37,7 @@ F3D behavior can be fully controlled from the command line using the following o
 | \-\-progress                                         | bool<br>false    | Show a _progress bar_ when loading the file.                                                                                                                                         |
 | \-\-animation-progress                               | bool<br>false    | Show a _progress bar_ when playing the animation.                                                                                                                                    |
 | \-\-multi-file-mode=\<single \| all\>                | string<br>single | When opening multiple files, select if they should be grouped (`all`) or alone (`single`). Configuration files for all loaded files will be used in the order they are provided.     |
-| \-\-up=\<[+\|-][X\|Y\|Z]\>                           | direction<br>+Y  | Define the Up direction.                                                                                                                                                             |
+| \-\-up=\<direction\>                                 | direction<br>+Y  | Define the Up direction.                                                                                                                                                             |
 | -x, \-\-axis                                         | bool<br>false    | Show _axes_ as a trihedron in the scene.                                                                                                                                             |
 | -g, \-\-grid                                         | bool<br>false    | Show _a grid_ aligned with the horizontal (orthogonal to the Up direction) plane.                                                                                                    |
 | \-\-grid\-unit=\<length\>                            | double<br>-      | Set the size of the _unit square_ for the grid. If not set (the default) a suitable value will be automatically computed.                                                            |
@@ -49,10 +49,10 @@ F3D behavior can be fully controlled from the command line using the following o
 | -k, \-\-trackball                                    | bool<br>false    | Enable trackball interaction.                                                                                                                                                        |
 | \-\-animation-autoplay                               | bool<br>false    | Automatically start animation.                                                                                                                                                       |
 | \-\-animation-index=\<idx\>                          | int<br>0         | Select the animation to show.<br>Any negative value means all animations (glTF only).<br>The default scene always has at most one animation.                                         |
-| \-\-animation-speed-factor=\<factor\>                | ratio<br>1       | Set the animation speed factor to slow, speed up or even invert animation time.                                                                                                      |
+| \-\-animation-speed-factor=\<ratio\>                 | ratio<br>1       | Set the animation speed factor to slow, speed up or even invert animation time.                                                                                                      |
 | \-\-animation-time=\<time\>                          | double<br>-      | Set the animation time to load.                                                                                                                                                      |
 | \-\-font-file=\<font file\>                          | string<br>-      | Use the provided FreeType compatible font file to display text.<br>Can be useful to display non-ASCII filenames.                                                                     |
-| \-\-font-scale=\<scale\>                             | ratio<br>1.0     | Scale fonts.                                                                                                                                                                         |
+| \-\-font-scale=\<ratio\>                             | ratio<br>1.0     | Scale fonts.                                                                                                                                                                         |
 | \-\-command-script=\<command script\>                | script<br>-      | Provide a script file containing a list of commands to be executed sequentially.<br>Allows automation of multiple commands or pre-defined tasks.                                     |
 
 ## Material options
@@ -113,9 +113,9 @@ F3D behavior can be fully controlled from the command line using the following o
 | ------------------------------------ | --------------------- | ---------------------------------------------------------------------------------------------- |
 | \-\-camera-position=\<X,Y,Z\>        | vector\<double\><br>- | Set the camera position, overrides --camera-direction and camera-zoom-factor.                  |
 | \-\-camera-focal-point=\<X,Y,Z\>     | vector\<double\><br>- | Set the camera focal point.                                                                    |
-| \-\-camera-view-up=\<X,Y,Z\>         | vector\<double\><br>- | Set the camera view up vector. Will be orthogonalized.                                         |
+| \-\-camera-view-up=\<direction\>     | direction<br>-        | Set the camera view up vector. Will be orthogonalized.                                         |
 | \-\-camera-view-angle=\<angle\>      | double<br>-           | Set the camera view angle, a strictly positive value in degrees.                               |
-| \-\-camera-direction=\<X,Y,Z\>       | direction<br>-        | Set the camera direction, looking at the focal point.                                          |
+| \-\-camera-direction=\<direction\>   | direction<br>-        | Set the camera direction, looking at the focal point.                                          |
 | \-\-camera-zoom-factor=\<factor\>    | double<br>-           | Set the camera zoom factor relative to the autozoom on data, a strictly positive value.        |
 | \-\-camera-azimuth-angle=\<angle\>   | double<br>0.0         | Apply an azimuth transformation to the camera, in degrees, added after other camera options.   |
 | \-\-camera-elevation-angle=\<angle\> | double<br>0.0         | Apply an elevation transformation to the camera, in degrees, added after other camera options. |
