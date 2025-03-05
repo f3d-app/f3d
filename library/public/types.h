@@ -89,7 +89,7 @@ class path_t
 {
 public:
   inline path_t() = default;
-  inline explicit path_t(std::string_view val)
+  inline explicit path_t(const std::string& val)
     : Value(val)
   {
   }
@@ -105,6 +105,7 @@ public:
   {
     return this->Value != other.Value;
   }
+
 private:
   std::filesystem::path Value;
 };
