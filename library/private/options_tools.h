@@ -233,7 +233,7 @@ color_t parse(const std::string& str)
   std::smatch hueMatch;
   if (std::regex_search(strCompact, hueMatch, hueRegex))
   {
-    double h = std::stod(hueMatch[2]) / 360.0;
+    const double h = std::stod(hueMatch[2]) / 360.0;
     double s = std::stod(hueMatch[3]) / 100.0;
     double v = std::stod(hueMatch[4]) / 100.0;
     if (h > 1.0 || s > 1.0 || v > 1.0)
@@ -246,7 +246,7 @@ color_t parse(const std::string& str)
       [](unsigned char c) { return std::tolower(c); });
     if (hueFormat == "hsl")
     {
-      double l = std::stod(hueMatch[4]) / 100.0;
+      const double l = v;
       v = l + s * std::min(l, 1.0 - l);
       s = (v == 0.0) ? 0.0 : (2.0 * (1.0 - l / v));
       vtkMath::HSVToRGB(h, s, v, &rgb[0], &rgb[1], &rgb[2]);
@@ -272,10 +272,10 @@ color_t parse(const std::string& str)
   std::smatch cmykMatch;
   if (std::regex_search(strCompact, cmykMatch, cmykRegex))
   {
-    double c = std::stod(cmykMatch[1]) / 100.0;
-    double m = std::stod(cmykMatch[2]) / 100.0;
-    double y = std::stod(cmykMatch[3]) / 100.0;
-    double k = std::stod(cmykMatch[4]) / 100.0;
+    const double c = std::stod(cmykMatch[1]) / 100.0;
+    const double m = std::stod(cmykMatch[2]) / 100.0;
+    const double y = std::stod(cmykMatch[3]) / 100.0;
+    const double k = std::stod(cmykMatch[4]) / 100.0;
     if (c > 1.0 || m > 1.0 || y > 1.0 || k > 1.0)
     {
       throw options::parsing_exception("Cannot parse " + str + " into a color_t");
