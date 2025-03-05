@@ -210,6 +210,11 @@ public:
   {
     return (*this)[2];
   }
+  [[nodiscard]] operator f3d::vector3_t() const
+  {
+    // XXX: No better way to do this ?
+    return f3d::vector3_t(this->x(), this->y(), this->z());
+  }
 };
 
 /**

@@ -147,7 +147,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
   {"Camera",
     { {"camera-position", "", "Camera position (overrides camera direction and camera zoom factor if any)", "<X,Y,Z>", ""},
       {"camera-focal-point", "", "Camera focal point", "<X,Y,Z>", ""},
-      {"camera-view-up", "", "Camera view up", "<X,Y,Z>", ""},
+      {"camera-view-up", "", "Camera view up", "<direction>", ""},
       {"camera-view-angle", "", "Camera view angle (non-zero, in degrees)", "<angle>", ""},
       {"camera-direction", "", "Camera direction", "<direction>", ""},
       {"camera-zoom-factor", "", "Camera zoom factor (non-zero)", "<factor>", ""},
