@@ -52,32 +52,43 @@ engine::engine(
   // Ensure all lib initialization is done (once)
   detail::init::initialize();
 
+  fs::path cachePath;
 #if defined(_WIN32)
-  static constexpr const char* CACHE_ENV_VAR = "LOCALAPPDATA";
+  const char* appData = std::getenv("LOCALAPPDATA");
+  if (appData && strlen(appData) > 0)
+  {
+    cachePath = fs::path(appData);
+  }
 #else
-  static constexpr const char* CACHE_ENV_VAR = "HOME";
-#endif
 
-  char* env = std::getenv(CACHE_ENV_VAR);
-  if (!env)
+#if defined(__unix__)
+  // Implementing XDG specifications
+  const char* xdgCacheHome = std::getenv("XDG_CACHE_HOME");
+  if (xdgCacheHome && strlen(xdgCacheHome) > 0)
+  {
+    cachePath = fs::path(xdgCacheHome);
+  }
+  else
+#endif
+  {
+    const char* home = std::getenv("HOME");
+    if (home && strlen(home) > 0)
+    {
+      cachePath = fs::path(home);
+#if defined(__APPLE__)
+      cachePath = cachePath / "Library" / "Caches";
+#elif defined(__unix__)
+      cachePath /= ".cache";
+#endif
+    }
+  }
+#endif
+  if (cachePath.empty())
   {
     throw engine::cache_exception(
-      std::string("Could not setup cache, please set ") + CACHE_ENV_VAR + " environment variable");
+      "Could not setup cache, please set the appropriate environment variable");
   }
-
-  fs::path cachePath(env);
-
-#if defined(_WIN32)
   cachePath /= "f3d";
-#elif defined(__APPLE__)
-  cachePath = cachePath / "Library" / "Caches" / "f3d";
-#elif defined(__ANDROID__)
-  // XXX: Android does not have a default cache location for now
-#elif defined(__unix__)
-  cachePath = cachePath / ".cache" / "f3d";
-#else
-#error "Unsupported platform"
-#endif
 
   this->Internals->Options = std::make_unique<options>();
 
