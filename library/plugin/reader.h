@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -132,6 +133,19 @@ public:
   virtual void applyCustomImporter(vtkImporter*, const std::string&) const
   {
   }
+
+  void setPluginOptions(std::map<std::string, std::string>& pluginOptions)
+  {
+    // XXX: Nothing better than a ptr here ?
+    this->PluginOptions = &pluginOptions;
+    this->initPluginOptions();
+  }
+
+
+  virtual void initPluginOptions(){};
+
+protected:
+  std::map<std::string, std::string>* PluginOptions = nullptr;
 };
 }
 
