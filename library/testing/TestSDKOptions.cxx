@@ -73,6 +73,17 @@ int TestSDKOptions(int argc, char* argv[])
   opt.set("model.color.texture", inputString);
   test("set/get string", std::get<std::string>(opt.get("model.color.texture")) == "test");
 
+  // Test path
+  opt.setAsString("render.hdri.file", "/path/to/test/string");
+  test("setAsString path", opt.getAsString("render.hdri.file") == "/path/to/test/string");
+
+  opt.render.hdri.file = "/path/to/test/struct";
+  test("getAsString path", opt.getAsString("render.hdri.file") == "/path/to/test/struct");
+
+  std::string inputPath = "/path/to/test/variant";
+  opt.set("render.hdri.file", inputPath);
+  test("set/get path", std::get<std::string>(opt.get("render.hdri.file")) == "/path/to/test/variant");
+
   // Test double vector
   opt.setAsString("model.scivis.range", "0.7,1.4");
   test("setAsString vector<double>", opt.getAsString("model.scivis.range") == "0.7,1.4");
