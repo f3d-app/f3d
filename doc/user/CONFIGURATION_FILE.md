@@ -190,9 +190,9 @@ Existing configuration files are read in order and combined with later entries, 
 
 - Linux: `/etc/f3d/config(.json,.d)`, `/usr/share/f3d/configs/config(.json,.d)`, `[install_dir]/share/f3d/configs/config(.json,.d)`, `${XDG_CONFIG_HOME}/f3d/config(.json,.d)`
 - Windows: `[install_dir]\share\f3d\configs\(config.json,.d)`, `%APPDATA%\f3d\(config.json,.d)`
-- macOS: `/usr/local/etc/f3d/config(.json,.d)`, `f3d.app/Contents/Resources/configs/config(.json,.d)`, `${XDG_CONFIG_HOME}/f3d/config(.json,.d)`
+- macOS: `/usr/local/etc/f3d/config(.json,.d)`, `f3d.app/Contents/Resources/configs/config(.json,.d)`, `${HOME}/Library/Application Support/f3d/config(.json,.d)`
 
-Please note `XDG_CONFIG_HOME` rely on environment variables as specified [here](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html).
+Please note that, on Linux, `XDG_CONFIG_HOME` implementation can fallback on `HOME` environment variables as specified [here](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html).
 
 The binary release will install the default config directory.
 On Linux, they will be installed in `[install_dir]/share/f3d/configs/`, on Windows, they will be installed in `[install_dir]\share\f3d\configs\`, on macOS, it will be installed in the bundle.
