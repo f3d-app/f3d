@@ -296,13 +296,24 @@ void vtkF3DImguiActor::RenderDropZone()
   {
     ImGuiViewport* viewport = ImGui::GetMainViewport();
     constexpr ImU32 color = IM_COL32(255, 255, 255, 255);
+
+    const int dropzonePad =
+      static_cast<int>(std::min(viewport->WorkSize.x, viewport->WorkSize.y) * 0.1);
+    const int dropZoneW = viewport->WorkSize.x - dropzonePad * 2;
+    const int dropZoneH = viewport->WorkSize.y - dropzonePad * 2;
+
     constexpr float tickThickness = 3.0f;
-    constexpr float tickHalfThickness = tickThickness * 0.5f;
+    constexpr float tickHalfThickness = tickThickness / 2.0f;
     constexpr float tickLength = 10.0f;
 
-    int dropzonePad = static_cast<int>(std::min(viewport->WorkSize.x, viewport->WorkSize.y) * 0.1);
-    int dropZoneW = viewport->WorkSize.x - dropzonePad * 2;
-    int dropZoneH = viewport->WorkSize.y - dropzonePad * 2;
+    const int tickNumberW = static_cast<int>(std::ceil(dropZoneW / (tickLength * 2.0f)));
+    const int tickNumberH = static_cast<int>(std::ceil(dropZoneH / (tickLength * 2.0f)));
+
+    const double tickSpaceW = static_cast<double>(dropZoneW / (tickNumberW - 1));
+    const double tickSpaceH = static_cast<double>(dropZoneH / (tickNumberH - 1));
+
+    const double tickBBSizeW = tickLength + tickSpaceW;
+    const double tickBBSizeH = tickLength + tickSpaceH;
 
     ::SetupNextWindow(ImVec2(0, 0), viewport->WorkSize);
     ImGui::SetNextWindowBgAlpha(0.f);
@@ -313,40 +324,41 @@ void vtkF3DImguiActor::RenderDropZone()
     ImGui::Begin("DropZoneText", nullptr, flags);
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
-    ImVec2 p0(dropzonePad, dropzonePad);
-    ImVec2 p1(dropZoneW + dropzonePad, dropZoneH + dropzonePad);
-    int tickNumberW = static_cast<int>(std::ceil(dropZoneW / (tickLength * 2.0f)));
-    int tickNumberH = static_cast<int>(std::ceil(dropZoneH / (tickLength * 2.0f)));
-
-    double tickSpaceW = static_cast<double>((dropZoneW / (tickNumberW - 2)));
-    double tickSpaceH = static_cast<double>((dropZoneH / (tickNumberH - 2)));
-
-    double tickBBSizeW = tickLength + tickSpaceW;
-    double tickBBSizeH = tickLength + tickSpaceH;
+    ImVec2 dropTopLeft(dropzonePad, dropzonePad);
+    ImVec2 dropBottomRight(dropZoneW + dropzonePad, dropZoneH + dropzonePad);
 
     // Draw top and bottom line
-    for (float x = p0.x - tickHalfThickness; x < p1.x - tickBBSizeW; x += tickBBSizeW)
+    for (float x = dropTopLeft.x - tickHalfThickness; x < dropBottomRight.x - tickBBSizeW;
+      x += tickBBSizeW)
     {
-      draw_list->AddLine(ImVec2(x, p0.y), ImVec2(x + tickLength, p0.y), color, tickThickness);
-      draw_list->AddLine(ImVec2(x, p1.y), ImVec2(x + tickLength, p1.y), color, tickThickness);
+      draw_list->AddLine(
+        ImVec2(x, dropTopLeft.y), ImVec2(x + tickLength, dropTopLeft.y), color, tickThickness);
+      draw_list->AddLine(ImVec2(x, dropBottomRight.y), ImVec2(x + tickLength, dropBottomRight.y),
+        color, tickThickness);
     }
-
-    draw_list->AddLine(ImVec2(p1.x - tickLength, p0.y), ImVec2(p1.x + tickHalfThickness, p0.y),
-      color, tickThickness);
-    draw_list->AddLine(ImVec2(p1.x - tickLength, p1.y), ImVec2(p1.x + tickHalfThickness, p1.y),
-      color, tickThickness);
 
     // Draw left and right line
-    for (float y = p0.y - tickHalfThickness; y < p1.y - tickBBSizeH; y += tickBBSizeH)
+    for (float y = dropTopLeft.y - tickHalfThickness; y < dropBottomRight.y - tickBBSizeH;
+      y += tickBBSizeH)
     {
-      draw_list->AddLine(ImVec2(p0.x, y), ImVec2(p0.x, y + tickLength), color, tickThickness);
-      draw_list->AddLine(ImVec2(p1.x, y), ImVec2(p1.x, y + tickLength), color, tickThickness);
+      draw_list->AddLine(
+        ImVec2(dropTopLeft.x, y), ImVec2(dropTopLeft.x, y + tickLength), color, tickThickness);
+      draw_list->AddLine(ImVec2(dropBottomRight.x, y), ImVec2(dropBottomRight.x, y + tickLength),
+        color, tickThickness);
     }
 
-    draw_list->AddLine(ImVec2(p0.x, p1.y - tickLength), ImVec2(p0.x, p1.y + tickHalfThickness),
-      color, tickThickness);
-    draw_list->AddLine(ImVec2(p1.x, p1.y - tickLength), ImVec2(p1.x, p1.y + tickHalfThickness),
-      color, tickThickness);
+    ImVec2 lastTick(dropBottomRight.x + tickHalfThickness, dropBottomRight.y + tickHalfThickness);
+    // Force draw top and bottom last tick to minimise tick glitch on windows resize
+    draw_list->AddLine(ImVec2(dropBottomRight.x - tickLength, dropTopLeft.y),
+      ImVec2(lastTick.x, dropTopLeft.y), color, tickThickness);
+    draw_list->AddLine(ImVec2(dropBottomRight.x - tickLength, dropBottomRight.y),
+      ImVec2(lastTick.x, dropBottomRight.y), color, tickThickness);
+
+    // Force draw left and right last tick to minimise tick glitch on windows resize
+    draw_list->AddLine(ImVec2(dropTopLeft.x, dropBottomRight.y - tickLength),
+      ImVec2(dropTopLeft.x, lastTick.y), color, tickThickness);
+    draw_list->AddLine(ImVec2(dropBottomRight.x, dropBottomRight.y - tickLength),
+      ImVec2(dropBottomRight.x, lastTick.y), color, tickThickness);
 
     ImGui::End();
 
