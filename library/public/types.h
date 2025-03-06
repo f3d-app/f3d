@@ -202,7 +202,6 @@ public:
   }
   [[nodiscard]] operator f3d::vector3_t() const
   {
-    // XXX: No better way to do this ?
     return f3d::vector3_t{ this->Array };
   }
 };
