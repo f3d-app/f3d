@@ -273,7 +273,6 @@ public:
     const std::filesystem::path& pluginPath);
 
   static void setPluginOption(const std::string& name, std::string value);
-  static std::string getPluginOption(const std::string& name);
   static std::vector<std::string> getAllPluginOptionNames();
 
   /**
