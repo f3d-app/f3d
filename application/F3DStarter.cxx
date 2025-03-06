@@ -510,8 +510,8 @@ public:
               }
               catch (const f3d::options::inexistent_exception&)
               {
-                std::cout<<"inexistent_exception:" << libf3dOptionName<<std::endl;
-                // XXX: implement a look before API ?
+                // XXX: it would be possible to implement using getAllPluginOptionNames
+                // but that would be less efficient
               }
 
               try
@@ -561,10 +561,7 @@ public:
       }
     }
 
-    if (log)
-    {
-      F3DInternals::PrintLoggingMap(loggingMap, '=');
-    }
+    F3DInternals::PrintLoggingMap(loggingMap, '=');
 
     // Update typed app options from the string version
     this->UpdateTypedAppOptions(appOptions);
