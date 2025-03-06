@@ -134,6 +134,9 @@ public:
   {
   }
 
+  /**
+   * Set the plugin option pointer to the provided ref and initialize plugin options
+   */
   void setPluginOptions(std::map<std::string, std::string>& pluginOptions)
   {
     // XXX: Nothing better than a ptr here ?
@@ -141,8 +144,13 @@ public:
     this->initPluginOptions();
   }
 
-
-  virtual void initPluginOptions(){};
+  /*
+   * Reimplement to emplace empty strings into all this plugin specific options in the plugin options
+   * Does nothing in this implementation.
+   */
+  virtual void initPluginOptions()
+  {
+  }
 
 protected:
   std::map<std::string, std::string>* PluginOptions = nullptr;

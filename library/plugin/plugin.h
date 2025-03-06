@@ -81,6 +81,9 @@ public:
   }
   ///@}
 
+  /**
+   * Call setPluginOptions on each reader of this plugin
+   */
   void setPluginOptions(std::map<std::string, std::string>& options)
   {
     for (const auto& reader : this->Readers)

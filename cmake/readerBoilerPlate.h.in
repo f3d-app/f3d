@@ -51,6 +51,9 @@ public:
     return types;
   }
 
+  /*
+   * Emplace empty strings into all this plugin specific options in the plugin options
+   */
   void initPluginOptions() override
   {
     std::vector<std::string> names = { @F3D_READER_OPTIONS@ };

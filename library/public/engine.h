@@ -194,7 +194,7 @@ public:
    * - Windows: %LOCALAPPDATA%\f3d
    * - Linux: ~/.cache/f3d
    * - macOS: ~/Library/Caches/f3d
-   * Throw a cache_exception if the provided cachePath cannot be used.
+   * Throws a cache_exception if the provided cachePath cannot be used.
    */
   engine& setCachePath(const std::filesystem::path& cachePath);
 
@@ -251,7 +251,7 @@ public:
    * If built and available in your build, F3D is providing 5 additional plugins:
    * "alembic", "assimp", "draco", "exodus", "occt", "usd".
    * Custom plugins can also be available that F3D is not supporting officially.
-   * Throw a plugin_exception if the plugin can't be loaded for some reason.
+   * Throws a engine::plugin_exception if the plugin can't be loaded for some reason.
    */
   static void loadPlugin(const std::string& pathOrName,
     const std::vector<std::filesystem::path>& pluginSearchPaths = {});
@@ -272,8 +272,17 @@ public:
   [[nodiscard]] static std::vector<std::string> getPluginsList(
     const std::filesystem::path& pluginPath);
 
+  /**
+   * Get all plugin option names that can be set using `setPluginOption`
+   * This vector can be expanded when loading plugin using `loadPlugin`
+   */
+  [[nodiscard]] static std::vector<std::string> getAllPluginOptionNames();
+
+  /**
+   * Set a specific plugin option to provided value if it exists.
+   * Throws a options::inexistent_exception if the option does not exists.
+   */
   static void setPluginOption(const std::string& name, std::string value);
-  static std::vector<std::string> getAllPluginOptionNames();
 
   /**
    * A structure providing information about the libf3d.
