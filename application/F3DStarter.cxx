@@ -505,7 +505,7 @@ public:
               try
               {
                 // try to set it as a plugin option
-                this->Engine->setPluginOption(libf3dOptionName, libf3dOptionValue);
+                f3d::engine::setPluginOption(libf3dOptionName, libf3dOptionValue);
                 continue;
               }
               catch (const f3d::options::inexistent_exception&)
@@ -561,7 +561,10 @@ public:
       }
     }
 
-    F3DInternals::PrintLoggingMap(loggingMap, '=');
+    if (log)
+    {
+      F3DInternals::PrintLoggingMap(loggingMap, '=');
+    }
 
     // Update typed app options from the string version
     this->UpdateTypedAppOptions(appOptions);
@@ -980,7 +983,6 @@ int F3DStarter::Start(int argc, char** argv)
   }
 
   this->Internals->Engine->setOptions(this->Internals->LibOptions);
-//  this->Internals->Engine->setPluginOption("vdb.downsampling_factor", "1");
   f3d::log::debug("Engine configured");
 
   // Add all input files

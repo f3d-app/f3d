@@ -272,8 +272,9 @@ public:
   [[nodiscard]] static std::vector<std::string> getPluginsList(
     const std::filesystem::path& pluginPath);
 
-  void setPluginOption(const std::string& name, std::string value);
-  std::string getPluginOption(const std::string& name);
+  static void setPluginOption(const std::string& name, std::string value);
+  static std::string getPluginOption(const std::string& name);
+  static std::vector<std::string> getAllPluginOptionNames();
 
   /**
    * A structure providing information about the libf3d.
