@@ -432,11 +432,15 @@ public:
   }
 
   void UpdateOptions(const std::vector<F3DOptionsTools::OptionsEntries>& entriesVector,
-    const std::vector<fs::path>& paths)
+    const std::vector<fs::path>& paths, bool quiet)
   {
     assert(!paths.empty());
 
-    f3d::log::debug("Updating Options:");
+    if (!quiet)
+    {
+      f3d::log::debug("Updating Options:");
+    }
+
     // Initialize libf3dOptions
     f3d::options libOptions;
     libOptions.ui.dropzone_info = "Drop a file or HDRI to load it\nPress H to show cheatsheet";
@@ -445,7 +449,7 @@ public:
     F3DOptionsTools::OptionsDict appOptions = F3DOptionsTools::DefaultAppOptions;
 
     // Logging specific map
-    bool logOptions = this->AppOptions.VerboseLevel == "debug";
+    bool logOptions = this->AppOptions.VerboseLevel == "debug" && !quiet;
     std::map<std::string, log_entry_t> loggingMap;
 
     // For each input file, order matters
@@ -522,19 +526,25 @@ public:
               }
               catch (const f3d::options::parsing_exception& ex)
               {
-                std::string origin =
-                  source.empty() ? pattern : std::string(source) + ":`" + pattern + "`";
-                f3d::log::warn("Could not set '", keyForLog, "' to '", libf3dOptionValue, "' from ",
-                  origin, " because: ", ex.what());
+                if (!quiet)
+                {
+                  std::string origin =
+                    source.empty() ? pattern : std::string(source) + ":`" + pattern + "`";
+                  f3d::log::warn("Could not set '", keyForLog, "' to '", libf3dOptionValue,
+                    "' from ", origin, " because: ", ex.what());
+                }
               }
               catch (const f3d::options::inexistent_exception&)
               {
-                std::string origin =
-                  source.empty() ? pattern : std::string(source) + ":`" + pattern + "`";
-                auto [closestName, dist] =
-                  F3DOptionsTools::GetClosestOption(libf3dOptionName, true);
-                f3d::log::warn("'", keyForLog, "' option from ", origin,
-                  " does not exists , did you mean '", closestName, "'?");
+                if (!quiet)
+                {
+                  std::string origin =
+                    source.empty() ? pattern : std::string(source) + ":`" + pattern + "`";
+                  auto [closestName, dist] =
+                    F3DOptionsTools::GetClosestOption(libf3dOptionName, true);
+                  f3d::log::warn("'", keyForLog, "' option from ", origin,
+                    " does not exists , did you mean '", closestName, "'?");
+                }
               }
             }
           }
@@ -898,11 +908,12 @@ int F3DStarter::Start(int argc, char** argv)
   }
 
   // Update app and libf3d options based on config entries, with an empty input file
-  // config < cli
+  // config < cli.
+  // Force it to be quiet has another options update happens later.
   this->Internals->UpdateOptions(
     { this->Internals->ConfigOptionsEntries, this->Internals->CLIOptionsEntries,
       this->Internals->ImperativeConfigOptionsEntries },
-    { "" });
+    { "" }, true);
 
 #if __APPLE__
   // Initialize MacOS delegate
@@ -1307,6 +1318,13 @@ void F3DStarter::LoadFileGroup(
 
     if (paths.empty())
     {
+      // Update options even when there is no file
+      // as imperative options should override dynamic option even in that case
+      this->Internals->UpdateOptions(
+        { this->Internals->ConfigOptionsEntries, this->Internals->CLIOptionsEntries,
+          this->Internals->DynamicOptionsEntries, this->Internals->ImperativeConfigOptionsEntries },
+        { "" }, false);
+      this->Internals->Engine->setOptions(this->Internals->LibOptions);
       f3d::log::debug("No files to load provided");
     }
     else
@@ -1319,7 +1337,7 @@ void F3DStarter::LoadFileGroup(
       this->Internals->UpdateOptions(
         { this->Internals->ConfigOptionsEntries, this->Internals->CLIOptionsEntries,
           this->Internals->DynamicOptionsEntries, this->Internals->ImperativeConfigOptionsEntries },
-        configPaths);
+        configPaths, false);
       this->Internals->UpdateBindings(configPaths);
 
       this->Internals->Engine->setOptions(this->Internals->LibOptions);
@@ -1692,14 +1710,9 @@ void F3DStarter::AddCommands()
       {
         this->Internals->Engine->getInteractor().stopAnimation();
       }
-      f3d::scene& scene = this->Internals->Engine->getScene();
-      scene.clear();
       this->Internals->FilesGroups.clear();
-      this->Internals->LoadedFiles.clear();
+      this->LoadFileGroup(0, false, true);
       this->ResetWindowName();
-      f3d::options& options = this->Internals->Engine->getOptions();
-      options.ui.dropzone = true;
-      options.ui.filename_info = "";
     });
 
   interactor.addCommand("load_previous_file_group",
