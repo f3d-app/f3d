@@ -359,7 +359,7 @@ void PrintReadersList()
 }
 
 //----------------------------------------------------------------------------
-std::pair<std::string, int> F3DOptionsTools::GetClosestOption(const std::string& option, bool checkLib)
+std::pair<std::string, int> F3DOptionsTools::GetClosestOption(const std::string& option, bool checkLibAndPlugins)
 {
   std::pair<std::string, int> ret = { "", std::numeric_limits<int>::max() };
   auto checkDistance = [](const std::string& key, const std::string& name, std::pair<std::string, int>& ref) {
@@ -391,8 +391,8 @@ std::pair<std::string, int> F3DOptionsTools::GetClosestOption(const std::string&
     checkDistance(std::string(key), option, ret);
   }
 
-  // Check libf3d option names
-  if (checkLib)
+  // Check libf3d and  plugin option names
+  if (checkLibAndPlugins)
   {
     for (const std::string& key : f3d::options::getAllNames())
     {

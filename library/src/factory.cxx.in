@@ -90,7 +90,9 @@ bool factory::registerOnce(plugin* plug)
 {
   if (std::find(this->Plugins.begin(), this->Plugins.end(), plug) == this->Plugins.end())
   {
+    // Set plugio options and initialize them
     plug->setPluginOptions(this->PluginOptions);
+
     this->Plugins.push_back(plug);
 
     log::debug("Loading plugin \"" + plug->getName() + "\"");

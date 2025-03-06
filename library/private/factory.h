@@ -52,6 +52,7 @@ public:
   const std::vector<plugin*>& getPlugins();
 
   /**
+   * Get the plugin options to provide to the plugins
    */
   std::map<std::string, std::string>& getPluginOptions();
 

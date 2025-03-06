@@ -420,18 +420,6 @@ std::vector<std::string> engine::getPluginsList(const fs::path& pluginPath)
 }
 
 //----------------------------------------------------------------------------
-void engine::setPluginOption(const std::string& name, std::string value)
-{
-  std::map<std::string, std::string>& pluginOptions = factory::instance()->getPluginOptions();
-  const auto iter = factory::instance()->getPluginOptions().find(name);
-  if (iter == pluginOptions.end())
-  {
-    throw options::inexistent_exception("Plugin option " + std::string(name) + " does not exist");
-  }
-  iter->second = std::move(value);
-}
-
-//----------------------------------------------------------------------------
 std::vector<std::string> engine::getAllPluginOptionNames()
 {
   std::map<std::string, std::string>& pluginOptions = factory::instance()->getPluginOptions();
@@ -442,6 +430,18 @@ std::vector<std::string> engine::getAllPluginOptionNames()
     keys.push_back(key);
   }
   return keys;
+}
+
+//----------------------------------------------------------------------------
+void engine::setPluginOption(const std::string& name, std::string value)
+{
+  std::map<std::string, std::string>& pluginOptions = factory::instance()->getPluginOptions();
+  const auto iter = factory::instance()->getPluginOptions().find(name);
+  if (iter == pluginOptions.end())
+  {
+    throw options::inexistent_exception("Plugin option " + std::string(name) + " does not exist");
+  }
+  iter->second = std::move(value);
 }
 
 //----------------------------------------------------------------------------
