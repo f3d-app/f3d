@@ -398,6 +398,11 @@ std::pair<std::string, int> F3DOptionsTools::GetClosestOption(const std::string&
     {
       checkDistance(key, option, ret);
     }
+
+    for (const std::string& key : f3d::engine::getAllPluginOptionNames())
+    {
+      checkDistance(key, option, ret);
+    }
   }
   return ret;
 }

@@ -447,6 +447,18 @@ std::string engine::getPluginOption(const std::string& name)
   return iter->second;
 }
 
+//----------------------------------------------------------------------------
+std::vector<std::string> engine::getAllPluginOptionNames()
+{
+  std::map<std::string, std::string>& pluginOptions = factory::instance()->getPluginOptions();
+  std::vector<std::string> keys;
+  keys.reserve(pluginOptions.size());
+  for(const auto& [key, value] : pluginOptions) 
+  {
+    keys.push_back(key);
+  }
+  return keys;
+}
 
 //----------------------------------------------------------------------------
 engine::libInformation engine::getLibInfo()
