@@ -17,8 +17,11 @@
 #include <vtkLight.h>
 #include <vtkOpenGLRenderer.h>
 
+#include <filesystem>
 #include <map>
 #include <optional>
+
+namespace fs = std::filesystem;
 
 class vtkColorTransferFunction;
 class vtkCornerAnnotation;
