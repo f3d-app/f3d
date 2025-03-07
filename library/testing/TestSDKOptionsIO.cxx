@@ -135,6 +135,8 @@ int TestSDKOptionsIO(int argc, char* argv[])
   test.parse_expect<f3d::color_t, parsing_exception>("invalid format color_t", "hxb(240,0%,0%)");
   test.parse_expect<f3d::color_t, parsing_exception>("invalid color_t", "cmyk(200%,12%,34%,56%)");
   test.parse_expect<f3d::color_t, parsing_exception>("incorrect size color_t", "0.1,0.2,0.3,0.4");
+  test.parse_expect<f3d::color_t, parsing_exception>(
+    "out of range color_t", std::string(outOfRangeDoubleStr + ",0.2,0.3"));
   test.format<f3d::color_t>("color_t", { 0.1, 0.2, 0.3 }, "0.1,0.2,0.3");
 
   test.parse<f3d::direction_t>("direction_t", "+X", { 1, 0, 0 });

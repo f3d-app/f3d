@@ -71,11 +71,14 @@ The following formats are supported when parsing a color, case insensitive:
 
 - R,G,B where R, G, B are doubles between 0 and 1
 - #RRGGBB where RR, GG, BB are hexadecimal values
+- rgb(R, G, B) where R, G and B \<= 255
 - hsl(H, S%, L%) where H \<= 360, S and L in percent
 - hsv(H, S%, V%) where H \<= 360, S and V in percent
 - hwb(H, W%, B%) where H \<= 360, W and B in percent
 - cmyk(C%, M%, Y%, K%) where C, M, Y, K in percent
-- color name, see [HTML color names](https://en.wikipedia.org/wiki/Web_colors#HTML_color_names)
+- [color name](https://htmlpreview.github.io/?https://github.com/Kitware/vtk-examples/blob/gh-pages/VTKNamedColorPatches.html)
+
+See [W3C](https://www.w3.org/TR/css-color-3/#rgb-color) doc for more details on these formats.
 
 When formatting a color into a string, it is formatted as `R,G,B` where R, G, B are doubles between 0 and 1.
 
