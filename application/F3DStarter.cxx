@@ -71,7 +71,7 @@ public:
   {
     std::vector<double> CameraPosition;
     std::vector<double> CameraFocalPoint;
-    std::vector<double> CameraViewUp;
+    std::optional<f3d::direction_t> CameraViewUp;
     double CameraViewAngle;
     std::optional<f3d::direction_t> CameraDirection;
     double CameraZoomFactor;
@@ -120,11 +120,9 @@ public:
       std::copy_n(camConf.CameraFocalPoint.begin(), 3, foc.begin());
       cam.setFocalPoint(foc);
     }
-    if (camConf.CameraViewUp.size() == 3)
+    if (camConf.CameraViewUp.has_value())
     {
-      f3d::vector3_t up;
-      std::copy_n(camConf.CameraViewUp.begin(), 3, up.begin());
-      cam.setViewUp(up);
+      cam.setViewUp(camConf.CameraViewUp.value());
     }
     if (camConf.CameraViewAngle > 0)
     {
@@ -135,8 +133,7 @@ public:
     double zoomFactor = 0.9;
     if (camConf.CameraPosition.size() != 3 && camConf.CameraDirection.has_value())
     {
-      f3d::vector3_t dir;
-      std::copy_n(camConf.CameraDirection->data(), 3, dir.begin());
+      f3d::vector3_t dir = camConf.CameraDirection.value();
       f3d::point3_t foc;
       f3d::point3_t pos;
       cam.getFocalPoint(foc);
@@ -614,10 +611,16 @@ public:
       camDir = f3d::options::parse<f3d::direction_t>(camDirStr);
     }
 
+    std::optional<f3d::direction_t> camUp;
+    std::string camUpStr = appOptions.at("camera-view-up");
+    if (!camUpStr.empty())
+    {
+      camUp = f3d::options::parse<f3d::direction_t>(camUpStr);
+    }
+
     this->AppOptions.CamConf = { f3d::options::parse<std::vector<double>>(
                                    appOptions.at("camera-position")),
-      f3d::options::parse<std::vector<double>>(appOptions.at("camera-focal-point")),
-      f3d::options::parse<std::vector<double>>(appOptions.at("camera-view-up")),
+      f3d::options::parse<std::vector<double>>(appOptions.at("camera-focal-point")), camUp,
       f3d::options::parse<double>(appOptions.at("camera-view-angle")), camDir,
       f3d::options::parse<double>(appOptions.at("camera-zoom-factor")),
       f3d::options::parse<double>(appOptions.at("camera-azimuth-angle")),

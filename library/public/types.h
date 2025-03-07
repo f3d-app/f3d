@@ -37,11 +37,6 @@ struct type_access_exception : public exception
  */
 struct F3D_EXPORT point3_t : std::array<double, 3>
 {
-  template<typename... Args>
-  point3_t(Args&&... args)
-    : array({ double(std::forward<Args>(args))... })
-  {
-  }
 };
 
 /**
@@ -49,11 +44,6 @@ struct F3D_EXPORT point3_t : std::array<double, 3>
  */
 struct F3D_EXPORT vector3_t : std::array<double, 3>
 {
-  template<typename... Args>
-  vector3_t(Args&&... args)
-    : array({ double(std::forward<Args>(args))... })
-  {
-  }
 };
 
 /**
@@ -138,7 +128,7 @@ public:
     return this->Array.data();
   }
 
-private:
+protected:
   std::array<double, N> Array{ 0 };
 };
 
@@ -209,6 +199,10 @@ public:
   [[nodiscard]] inline double z() const
   {
     return (*this)[2];
+  }
+  [[nodiscard]] operator f3d::vector3_t() const
+  {
+    return f3d::vector3_t{ this->Array };
   }
 };
 
