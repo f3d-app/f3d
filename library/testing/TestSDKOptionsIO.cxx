@@ -5,6 +5,9 @@
 #include <types.h>
 
 #include <iostream>
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 class ParsingTest : public PseudoUnitTest
 {
@@ -89,6 +92,10 @@ int TestSDKOptionsIO(int argc, char* argv[])
   test.parse<std::string>("std::string", "  foobar   ", "foobar");
   test.format<std::string>("std::string", "foobar", "foobar");
   test.format<std::string>("std::string", "  foobar  ", "  foobar  ");
+
+  test.parse<fs::path>("fs::path", "/path/to/file.ext", "/path/to/file.ext");
+  test.parse<fs::path>("fs::path", "/path/not/valid/../../to/file.ext", "/path/to/file.ext");
+  test.format<fs::path>("fs::path", "/path/to/file.ext", "/path/to/file.ext");
 
   test.parse<f3d::ratio_t>("ratio_t", "0.1234", f3d::ratio_t(0.1234));
   test.parse<f3d::ratio_t>("ratio_t", "12.34%", f3d::ratio_t(0.1234));

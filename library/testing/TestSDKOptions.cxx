@@ -77,6 +77,9 @@ int TestSDKOptions(int argc, char* argv[])
   opt.setAsString("render.hdri.file", "/path/to/test/string");
   test("setAsString path", opt.getAsString("render.hdri.file") == "/path/to/test/string");
 
+  opt.setAsString("render.hdri.file", "/path/not/valid/../../to/test/string");
+  test("setAsString collapse path", opt.getAsString("render.hdri.file") == "/path/to/test/string");
+
   opt.render.hdri.file = "/path/to/test/struct";
   test("getAsString path", opt.getAsString("render.hdri.file") == "/path/to/test/struct");
 
