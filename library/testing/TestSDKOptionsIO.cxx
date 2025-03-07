@@ -138,6 +138,10 @@ int TestSDKOptionsIO(int argc, char* argv[])
   test.parse_expect<f3d::color_t, parsing_exception>(
     "out of range color_t", std::string(outOfRangeDoubleStr + ",0.2,0.3"));
   test.format<f3d::color_t>("color_t", { 0.1, 0.2, 0.3 }, "0.1,0.2,0.3");
+  test.format<f3d::color_t>("color_t",
+    { static_cast<double>(171. / 255.), static_cast<double>(205. / 255.),
+      static_cast<double>(239. / 255.) },
+    "#abcdef");
 
   test.parse<f3d::direction_t>("direction_t", "+X", { 1, 0, 0 });
   test.parse<f3d::direction_t>("direction_t", "-Y", { 0, -1, 0 });

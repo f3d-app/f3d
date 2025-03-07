@@ -437,8 +437,21 @@ std::string format(const std::vector<T>& var)
  */
 std::string format(color_t var)
 {
-  // TODO generate a proper color string
-  return options_tools::format(static_cast<std::vector<double>>(var));
+  if (std::fmod(var.r() * 255., 1) == 0. && //
+    std::fmod(var.g() * 255., 1) == 0. &&   //
+    std::fmod(var.b() * 255., 1) == 0.)     //
+  {
+    std::ostringstream stream;
+    stream << "#" << std::hex                   //
+           << static_cast<int>(var.r() * 255.)  //
+           << static_cast<int>(var.g() * 255.)  //
+           << static_cast<int>(var.b() * 255.); //
+    return stream.str();
+  }
+  else
+  {
+    return options_tools::format(static_cast<std::vector<double>>(var));
+  }
 }
 
 //----------------------------------------------------------------------------
