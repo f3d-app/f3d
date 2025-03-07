@@ -1,0 +1,8 @@
+[
+  {
+    "match": ".*(e57|las|laz|pts|ptx|pcd|json)",
+    "options": {
+      "load-plugins": "pdal",
+    }
+  }
+]
