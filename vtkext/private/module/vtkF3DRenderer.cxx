@@ -803,8 +803,9 @@ void vtkF3DRenderer::SetHDRIFile(const std::optional<fs::path>& hdriFile)
       if (localHdriFile != collapsedHdriFile)
       {
         localHdriFile = collapsedHdriFile;
-        F3DLog::Print(
-          F3DLog::Severity::Warning, std::string("Collapsing path inside the libf3d is now deprecated, use utils::collapsePath manually."));
+        F3DLog::Print(F3DLog::Severity::Warning,
+          std::string("Collapsing path inside the libf3d is now deprecated, use "
+                      "utils::collapsePath manually."));
       }
     }
   }

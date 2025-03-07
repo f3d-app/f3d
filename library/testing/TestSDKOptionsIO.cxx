@@ -4,8 +4,8 @@
 #include <options.h>
 #include <types.h>
 
-#include <iostream>
 #include <filesystem>
+#include <iostream>
 
 namespace fs = std::filesystem;
 
