@@ -788,13 +788,14 @@ vtkBoundingBox vtkF3DRenderer::ComputeVisiblePropOrientedBounds(const vtkMatrix4
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetHDRIFile(const std::optional<std::string>& hdriFile)
+void vtkF3DRenderer::SetHDRIFile(const std::optional<fs::path>& hdriFile)
 {
   // Check HDRI is different than current one
   std::string collapsedHdriFile;
   if (hdriFile.has_value() && !hdriFile.value().empty())
   {
-    collapsedHdriFile = vtksys::SystemTools::CollapseFullPath(hdriFile.value());
+    // TODO remove
+    collapsedHdriFile = vtksys::SystemTools::CollapseFullPath(hdriFile.value().string());
   }
 
   if (this->HDRIFile != collapsedHdriFile)

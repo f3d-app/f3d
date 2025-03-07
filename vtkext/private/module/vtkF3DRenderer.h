@@ -61,7 +61,7 @@ public:
   void SetPointSize(const std::optional<double>& pointSize);
   void SetFontFile(const std::optional<std::string>& fontFile);
   void SetFontScale(const double fontScale);
-  void SetHDRIFile(const std::optional<std::string>& hdriFile);
+  void SetHDRIFile(const std::optional<fs::path>& hdriFile);
   void SetUseImageBasedLighting(bool use) override;
   void SetBackground(const double* backgroundColor) override;
   void SetLightIntensity(const double intensity);

@@ -82,7 +82,8 @@ int TestSDKOptions(int argc, char* argv[])
 
   std::string inputPath = "/path/to/test/variant";
   opt.set("render.hdri.file", inputPath);
-  test("set/get path", std::get<std::string>(opt.get("render.hdri.file")) == "/path/to/test/variant");
+  test(
+    "set/get path", std::get<std::string>(opt.get("render.hdri.file")) == "/path/to/test/variant");
 
   // Test double vector
   opt.setAsString("model.scivis.range", "0.7,1.4");
