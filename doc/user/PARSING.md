@@ -9,8 +9,9 @@ The following types are supported:
 - double: A floating point number.
 - ratio: A double dividend over a double divisor, stored in a double.
 - string: A string of characters.
-- color: A RGB color
-- direction: A 3D vector representing a direction
+- path: A path to a local file.
+- color: A RGB color.
+- direction: A 3D vector representing a direction.
 
 As well as a list for bool, int, double, ratio, string, noted as
 
@@ -57,7 +58,15 @@ When formatting a ratio into a string, it is formatted as a double.
 
 ## String
 
-String are parsed and formatted as is.
+String are trimmed of leading and trailing space when parsed.
+String are formatted as is.
+
+## String
+
+Path are formatted by creating a [std::filesystem::path](https://en.cppreference.com/w/cpp/filesystem/path/path) 
+and then collapsed using [f3d::utils::collapsePath](https://f3d.app/doc/libf3d/doxygen/api/classf3d_1_1utils.html#_CPPv4N3f3d5utils12collapsePathERKNSt10filesystem4pathERKNSt10filesystem4pathE).
+
+Path are formatted using [std::filesystem::path::string](https://en.cppreference.com/w/cpp/filesystem/path/string).
 
 ## Vectors
 

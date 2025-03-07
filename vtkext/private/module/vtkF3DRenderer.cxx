@@ -790,17 +790,29 @@ vtkBoundingBox vtkF3DRenderer::ComputeVisiblePropOrientedBounds(const vtkMatrix4
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetHDRIFile(const std::optional<fs::path>& hdriFile)
 {
-  // Check HDRI is different than current one
-  std::string collapsedHdriFile;
-  if (hdriFile.has_value() && !hdriFile.value().empty())
+  std::string localHdriFile;
+  if (hdriFile.has_value())
   {
-    // TODO remove
-    collapsedHdriFile = vtksys::SystemTools::CollapseFullPath(hdriFile.value().string());
+    localHdriFile = hdriFile->string();
+
+    // Handle retro-compatibility but warn for deprecation
+    // Foe easier removal when removing deprecation: F3D_DEPRECATED
+    if (!localHdriFile.empty())
+    {
+      std::string collapsedHdriFile = vtksys::SystemTools::CollapseFullPath(localHdriFile);
+      if (localHdriFile != collapsedHdriFile)
+      {
+        localHdriFile = collapsedHdriFile;
+        F3DLog::Print(
+          F3DLog::Severity::Warning, std::string("Collapsing path inside the libf3d is now deprecated, use utils::collapsePath manually."));
+      }
+    }
   }
 
-  if (this->HDRIFile != collapsedHdriFile)
+  // Check HDRI is different than current one
+  if (this->HDRIFile != localHdriFile)
   {
-    this->HDRIFile = collapsedHdriFile;
+    this->HDRIFile = localHdriFile;
 
     this->TextActorsConfigured = false;
     this->RenderPassesConfigured = false;
