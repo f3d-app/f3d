@@ -28,7 +28,6 @@ const std::vector<plugin*>& factory::getPlugins()
   return this->Plugins;
 }
 
-
 //----------------------------------------------------------------------------
 std::map<std::string, std::string>& factory::getPluginOptions()
 {

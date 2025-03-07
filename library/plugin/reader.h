@@ -145,8 +145,8 @@ public:
   }
 
   /*
-   * Reimplement to emplace empty strings into all this plugin specific options in the plugin options
-   * Does nothing in this implementation.
+   * Reimplement to emplace empty strings into all this plugin specific options in the plugin
+   * options Does nothing in this implementation.
    */
   virtual void initPluginOptions()
   {

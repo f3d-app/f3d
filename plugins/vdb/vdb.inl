@@ -7,7 +7,7 @@ void applyCustomReader(vtkAlgorithm* algo, const std::string&) const override
   // exceptions and stuff
   double dsFactor = 0.1;
 
-  // No check neeed, we know the option exists
+  // No check needed, we know the option exists
   std::string dsOptStr = this->PluginOptions->at("vdb.downsampling_factor");
   if (!dsOptStr.empty())
   {
