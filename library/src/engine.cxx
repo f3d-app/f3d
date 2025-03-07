@@ -425,7 +425,7 @@ std::vector<std::string> engine::getAllPluginOptionNames()
   std::map<std::string, std::string>& pluginOptions = factory::instance()->getPluginOptions();
   std::vector<std::string> keys;
   keys.reserve(pluginOptions.size());
-  for(const auto& [key, value] : pluginOptions) 
+  for (const auto& [key, value] : pluginOptions)
   {
     keys.push_back(key);
   }

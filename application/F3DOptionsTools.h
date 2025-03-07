@@ -135,7 +135,8 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
  * If checkLibAndPlugins is true, even check in the libf3d and plugin option names
  * Return a pair containing the closest option name and the associated distance
  */
-std::pair<std::string, int> GetClosestOption(const std::string& option, bool checkLibAndPlugins = false);
+std::pair<std::string, int> GetClosestOption(
+  const std::string& option, bool checkLibAndPlugins = false);
 
 /**
  * Parse CLI options from provided argc/argv and returns them as a OptionsDict.
