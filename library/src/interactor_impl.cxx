@@ -668,11 +668,11 @@ interactor& interactor_impl::initCommands()
       log::info(this->Internals->Options.getAsString(args[0]));
     });
 
-  this->addCommand("set_plugin_option",
+  this->addCommand("set_reader_option",
     [&](const std::vector<std::string>& args)
     {
-      check_args(args, 2, "set_plugin_option");
-      f3d::engine::setPluginOption(args[0], args[1]);
+      check_args(args, 2, "set_reader_option");
+      f3d::engine::setReaderOption(args[0], args[1]);
     });
 
   this->addCommand("cycle_animation",

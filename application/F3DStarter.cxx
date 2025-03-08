@@ -502,16 +502,12 @@ public:
                 libf3dOptionValue = "reset";
               }
 
-              try
+              // Handle reader options
+              std::vector<std::string> readerOptionNames = f3d::engine::getAllReaderOptionNames();
+              if (std::find(readerOptionNames.begin(), readerOptionNames.end(), libf3dOptionName) != readerOptionNames.end())
               {
-                // try to set it as a plugin option
-                f3d::engine::setPluginOption(libf3dOptionName, libf3dOptionValue);
+                f3d::engine::setReaderOption(libf3dOptionName, libf3dOptionValue);
                 continue;
-              }
-              catch (const f3d::options::inexistent_exception&)
-              {
-                // XXX: it would be possible to implement using getAllPluginOptionNames
-                // but that would be less efficient
               }
 
               try

@@ -420,28 +420,18 @@ std::vector<std::string> engine::getPluginsList(const fs::path& pluginPath)
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::string> engine::getAllPluginOptionNames()
+std::vector<std::string> engine::getAllReaderOptionNames()
 {
-  std::map<std::string, std::string>& pluginOptions = factory::instance()->getPluginOptions();
-  std::vector<std::string> keys;
-  keys.reserve(pluginOptions.size());
-  for (const auto& [key, value] : pluginOptions)
-  {
-    keys.push_back(key);
-  }
-  return keys;
+  return factory::instance()->getAllReaderOptionNames();
 }
 
 //----------------------------------------------------------------------------
-void engine::setPluginOption(const std::string& name, std::string value)
+void engine::setReaderOption(const std::string& name, std::string value)
 {
-  std::map<std::string, std::string>& pluginOptions = factory::instance()->getPluginOptions();
-  const auto iter = factory::instance()->getPluginOptions().find(name);
-  if (iter == pluginOptions.end())
+  if(!factory::instance()->setReaderOption(name, value))
   {
-    throw options::inexistent_exception("Plugin option " + std::string(name) + " does not exist");
+    throw options::inexistent_exception("Reader option " + std::string(name) + " does not exist");
   }
-  iter->second = std::move(value);
 }
 
 //----------------------------------------------------------------------------
