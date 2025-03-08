@@ -295,6 +295,7 @@ macro(f3d_plugin_build)
   set_target_properties(f3d-plugin-${F3D_PLUGIN_NAME} PROPERTIES
     POSITION_INDEPENDENT_CODE ON
     CXX_VISIBILITY_PRESET hidden
+    CXX_STANDARD 17
     )
 
   if(DEFINED f3d_INCLUDE_DIR)
