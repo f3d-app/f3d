@@ -52,6 +52,17 @@ public:
   const std::vector<plugin*>& getPlugins();
 
   /**
+   * Set an option on the first reader of the first plugin that contains it.
+   * Returns true if the option was found (and set), false otherwise.
+   */
+  bool setReaderOption(const std::string& name, const std::string& value);
+
+  /**
+   * Return the list of all reader option names, from all readers of all plugins
+   */
+  std::vector<std::string> getAllReaderOptionNames();
+
+  /**
    * Get static plugin initialization function
    * Return nullptr if it does not exists
    */
