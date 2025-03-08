@@ -2,7 +2,6 @@
 missingInclude
 unusedFunction
 unknownMacro
-knownEmptyContainer
 
 // external libraries
 *:external/nlohmann_json/nlohmann/json.hpp
