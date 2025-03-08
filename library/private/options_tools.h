@@ -203,9 +203,9 @@ color_t parse(const std::string& str)
   {
     /* Hex format search */
     const std::regex hexRegex(
-      "^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$", std::regex_constants::icase);
+      "#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})", std::regex_constants::icase);
     std::smatch hexMatch;
-    if (std::regex_search(strCompact, hexMatch, hexRegex))
+    if (std::regex_match(strCompact, hexMatch, hexRegex))
     {
       return color_t(                                  //
         std::stoul(hexMatch[1], nullptr, 16) / 255.0,  //
@@ -215,9 +215,9 @@ color_t parse(const std::string& str)
 
     /* RGB format search */
     const std::regex rgbRegex(
-      "^rgb\\((\\d{1,3}),(\\d{1,3}),(\\d{1,3})\\)$", std::regex_constants::icase);
+      "rgb\\((\\d{1,3}),(\\d{1,3}),(\\d{1,3})\\)", std::regex_constants::icase);
     std::smatch rgbMatch;
-    if (std::regex_search(strCompact, rgbMatch, rgbRegex))
+    if (std::regex_match(strCompact, rgbMatch, rgbRegex))
     {
       rgb[0] = std::stod(rgbMatch[1]) / 255.0;
       rgb[1] = std::stod(rgbMatch[2]) / 255.0;
@@ -231,9 +231,9 @@ color_t parse(const std::string& str)
 
     /* Hue-based format search: hsl, hsv, hwb */
     const std::regex hueRegex(
-      "^(hsl|hsv|hwb)\\((\\d{1,3}),(\\d{1,3})%?,(\\d{1,3})%?\\)$", std::regex_constants::icase);
+      "(hsl|hsv|hwb)\\((\\d{1,3}),(\\d{1,3})%?,(\\d{1,3})%?\\)", std::regex_constants::icase);
     std::smatch hueMatch;
-    if (std::regex_search(strCompact, hueMatch, hueRegex))
+    if (std::regex_match(strCompact, hueMatch, hueRegex))
     {
       const double h = std::stod(hueMatch[2]) / 360.0;
       double s = std::stod(hueMatch[3]) / 100.0;
@@ -269,10 +269,10 @@ color_t parse(const std::string& str)
     }
 
     /* CMYK format search */
-    const std::regex cmykRegex("^cmyk\\((\\d{1,3})%?,(\\d{1,3})%?,(\\d{1,3})%?,(\\d{1,3})%?\\)$",
-      std::regex_constants::icase);
+    const std::regex cmykRegex(
+      "cmyk\\((\\d{1,3})%?,(\\d{1,3})%?,(\\d{1,3})%?,(\\d{1,3})%?\\)", std::regex_constants::icase);
     std::smatch cmykMatch;
-    if (std::regex_search(strCompact, cmykMatch, cmykRegex))
+    if (std::regex_match(strCompact, cmykMatch, cmykRegex))
     {
       const double c = std::stod(cmykMatch[1]) / 100.0;
       const double m = std::stod(cmykMatch[2]) / 100.0;
@@ -296,20 +296,19 @@ color_t parse(const std::string& str)
       color->GetColor(strCompact, rgba);
       return color_t(rgba[0], rgba[1], rgba[2]);
     }
-    return color_t(options_tools::parse<std::vector<double>>(str));
+
+    /* Vector double format */
+    std::vector<double> vecColor = options_tools::parse<std::vector<double>>(str);
+    if (std::any_of(vecColor.begin(), vecColor.end(), [](double value) { return !(value >= 0.0); }))
+    {
+      throw options::parsing_exception("Cannot parse " + str + " into a color_t");
+    }
+    return color_t(vecColor);
   }
+  /* We do not catch std::invalid_argument exception from stod as it is covered by the regex */
   catch (const f3d::type_construction_exception& ex)
   {
     throw options::parsing_exception("Cannot parse " + str + " into a color_t: " + ex.what());
-  }
-  catch (std::invalid_argument const&)
-  {
-    throw options::parsing_exception("Cannot parse " + str + " into a color_t");
-  }
-  catch (std::out_of_range const&)
-  {
-    throw options::parsing_exception(
-      "Cannot parse " + str + " into a color_t as it would go out of range");
   }
 }
 
@@ -433,19 +432,20 @@ std::string format(const std::vector<T>& var)
 //----------------------------------------------------------------------------
 /**
  * Format provided var into a string from provided color_t
- * rely on format(std::vector<double>&)
+ * Formats in hex color string "#RRGGBB" if values are multiple of 1/255.
+ * Otherwise rely on format(std::vector<double>&)
  */
 std::string format(color_t var)
 {
-  if (std::fmod(var.r() * 255., 1) == 0. && //
-    std::fmod(var.g() * 255., 1) == 0. &&   //
-    std::fmod(var.b() * 255., 1) == 0.)     //
+  const std::vector<double> colors = { var.r(), var.g(), var.b() };
+  if (std::all_of(colors.begin(), colors.end(),
+        [](double val) { return (val >= 0 && val <= 1 && std::fmod(val * 255., 1) < 1e-9); }))
   {
     std::ostringstream stream;
-    stream << "#" << std::hex                   //
-           << static_cast<int>(var.r() * 255.)  //
-           << static_cast<int>(var.g() * 255.)  //
-           << static_cast<int>(var.b() * 255.); //
+    stream << "#" << std::hex                     //
+           << static_cast<int>(colors[0] * 255.)  //
+           << static_cast<int>(colors[1] * 255.)  //
+           << static_cast<int>(colors[2] * 255.); //
     return stream.str();
   }
   else
