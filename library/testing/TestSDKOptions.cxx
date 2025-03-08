@@ -63,15 +63,15 @@ int TestSDKOptions(int argc, char* argv[])
   test("set/get ratio_t", std::get<double>(opt.get("scene.animation.speed_factor")) == 3.17);
 
   // Test string
-  opt.setAsString("model.color.texture", "testAsString");
-  test("setAsString string", opt.getAsString("model.color.texture") == "testAsString");
+  opt.setAsString("render.effect.final_shader", "testAsString");
+  test("setAsString string", opt.getAsString("render.effect.final_shader") == "testAsString");
 
-  opt.model.color.texture = "testInStruct";
-  test("getAsString string", opt.getAsString("model.color.texture") == "testInStruct");
+  opt.render.effect.final_shader = "testInStruct";
+  test("getAsString string", opt.getAsString("render.effect.final_shader") == "testInStruct");
 
   std::string inputString = "test";
-  opt.set("model.color.texture", inputString);
-  test("set/get string", std::get<std::string>(opt.get("model.color.texture")) == "test");
+  opt.set("render.effect.final_shader", inputString);
+  test("set/get string", std::get<std::string>(opt.get("render.effect.final_shader")) == "test");
 
   // Test path
   opt.setAsString("render.hdri.file", "/path/to/test/string");
