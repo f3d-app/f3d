@@ -15,6 +15,7 @@ list(APPEND libf3dSDKTests_list
      TestSDKMultiColoring.cxx
      TestSDKOptions.cxx
      TestSDKOptionsIO.cxx
+     TestSDKReaderSelection.cxx
      TestSDKRenderFinalShader.cxx
      TestSDKUtils.cxx
      TestSDKWindowAuto.cxx
