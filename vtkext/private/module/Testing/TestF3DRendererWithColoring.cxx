@@ -64,5 +64,9 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
+  // Smoke test for deprecated HDRI collapse codepath
+  // F3D_DEPRECATED
+  renderer->SetHDRIFile("path/not/valid/../../to/file.ext");
+
   return EXIT_SUCCESS;
 }

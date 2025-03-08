@@ -3,11 +3,15 @@
 
 #include "options.h"
 #include "types.h"
+#include "utils.h"
 
 #include <algorithm>
 #include <cassert>
+#include <filesystem>
 #include <regex>
 #include <sstream>
+
+namespace fs = std::filesystem;
 
 namespace f3d
 {
@@ -185,6 +189,16 @@ ratio_t parse(const std::string& str)
 
 //----------------------------------------------------------------------------
 /**
+ * Parse provided string into a fs::path using `utils::collapsePath`
+ */
+template<>
+fs::path parse(const std::string& str)
+{
+  return utils::collapsePath(str);
+}
+
+//----------------------------------------------------------------------------
+/**
  * Parse provided string into a color_t.
  * Supported formats: "R,G,B"
  * rely on parse<std::vector<double>>(str)
@@ -321,6 +335,15 @@ std::string format(ratio_t var)
 std::string format(const std::string& var)
 {
   return var;
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Generate (returns) a string from provided path
+ */
+std::string format(const fs::path& var)
+{
+  return var.string();
 }
 
 //----------------------------------------------------------------------------
