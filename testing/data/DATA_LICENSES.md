@@ -58,6 +58,7 @@
 - world\*: VTK Data: BSD-3-Clause
 - 16bits.\*: @bisechen: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - (ノಠ益ಠ )ノ.vtp: VTK Data: BSD-3-Clause
+- Wolf_test_animation_.fbx: "Wolf" by OLEKSO: [CC-NC 4.0] (http://creativecommons.org/licenses/by-nc/4.0/).
 
 All other datasets are licensed under the BSD-3-Clause F3D license.
 
