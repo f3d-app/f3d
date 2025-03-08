@@ -603,7 +603,7 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME Test3MF DATA cube_gears.3mf ARGS --load-plugins=assimp)
   f3d_test(NAME TestFBX DATA phong_cube.fbx ARGS --load-plugins=assimp)
   f3d_test(NAME TestFBX16bits DATA 16bit.fbx ARGS --load-plugins=assimp)
-  f3d_test(NAME TestAssimpValidation DATA Wolf_test_animation_.fbx ARGS --load-plugins=assimp REGEXP "no rendering performed" NO_BASELINE)
+  f3d_test(NAME TestAssimpValidation DATA Wolf_test_animation_.fbx ARGS --load-plugins=assimp REGEXP "Some of these files could not be loaded" NO_BASELINE)
   f3d_test(NAME TestVerboseCameraAssimp DATA duck.dae ARGS --verbose --load-plugins=assimp NO_BASELINE REGEXP "camera1")
 
   if(NOT APPLE OR VTK_VERSION VERSION_GREATER_EQUAL 9.3.0)
