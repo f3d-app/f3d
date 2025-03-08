@@ -164,12 +164,12 @@ vtkSmartPointer<vtkImageData> SaveTextureToImage(
 
 //----------------------------------------------------------------------------
 // TODO : add this function in a utils file for rendering in VTK directly
-vtkSmartPointer<vtkTexture> GetTexture(const std::string& filePath, bool isSRGB = false)
+vtkSmartPointer<vtkTexture> GetTexture(const fs::path& filePath, bool isSRGB = false)
 {
   vtkSmartPointer<vtkTexture> texture;
-  if (!filePath.empty())
+  std::string fullPath = ::DeprecatedCollapsePath(filePath);
+  if (!fullPath.empty())
   {
-    std::string fullPath = vtksys::SystemTools::CollapseFullPath(filePath);
     if (!vtksys::SystemTools::FileExists(fullPath))
     {
       F3DLog::Print(F3DLog::Severity::Warning, "Texture file does not exist " + fullPath);
@@ -1903,7 +1903,7 @@ void vtkF3DRenderer::SetEmissiveFactor(const std::optional<std::vector<double>>&
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetTextureMatCap(const std::optional<std::string>& tex)
+void vtkF3DRenderer::SetTextureMatCap(const std::optional<fs::path>& tex)
 {
   if (this->TextureMatCap != tex)
   {
@@ -1913,7 +1913,7 @@ void vtkF3DRenderer::SetTextureMatCap(const std::optional<std::string>& tex)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetTextureBaseColor(const std::optional<std::string>& tex)
+void vtkF3DRenderer::SetTextureBaseColor(const std::optional<fs::path>& tex)
 {
   if (this->TextureBaseColor != tex)
   {
@@ -1923,7 +1923,7 @@ void vtkF3DRenderer::SetTextureBaseColor(const std::optional<std::string>& tex)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetTextureMaterial(const std::optional<std::string>& tex)
+void vtkF3DRenderer::SetTextureMaterial(const std::optional<fs::path>& tex)
 {
   if (this->TextureMaterial != tex)
   {
@@ -1933,7 +1933,7 @@ void vtkF3DRenderer::SetTextureMaterial(const std::optional<std::string>& tex)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetTextureEmissive(const std::optional<std::string>& tex)
+void vtkF3DRenderer::SetTextureEmissive(const std::optional<fs::path>& tex)
 {
   if (this->TextureEmissive != tex)
   {
@@ -1943,7 +1943,7 @@ void vtkF3DRenderer::SetTextureEmissive(const std::optional<std::string>& tex)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetTextureNormal(const std::optional<std::string>& tex)
+void vtkF3DRenderer::SetTextureNormal(const std::optional<fs::path>& tex)
 {
   if (this->TextureNormal != tex)
   {

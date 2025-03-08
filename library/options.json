@@ -198,7 +198,7 @@
   "model": {
     "matcap": {
       "texture": {
-        "type": "string"
+        "type": "path"
       }
     },
     "color": {
@@ -209,7 +209,7 @@
         "type": "color"
       },
       "texture": {
-        "type": "string"
+        "type": "path"
       }
     },
     "emissive": {
@@ -217,7 +217,7 @@
         "type": "color"
       },
       "texture": {
-        "type": "string"
+        "type": "path"
       }
     },
     "normal": {
@@ -225,7 +225,7 @@
         "type": "double"
       },
       "texture": {
-        "type": "string"
+        "type": "path"
       }
     },
     "material": {
@@ -236,7 +236,7 @@
         "type": "double"
       },
       "texture": {
-        "type": "string"
+        "type": "path"
       }
     },
     "scivis": {
