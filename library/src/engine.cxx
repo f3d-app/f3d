@@ -428,7 +428,7 @@ std::vector<std::string> engine::getAllReaderOptionNames()
 //----------------------------------------------------------------------------
 void engine::setReaderOption(const std::string& name, std::string value)
 {
-  if(!factory::instance()->setReaderOption(name, value))
+  if (!factory::instance()->setReaderOption(name, value))
   {
     throw options::inexistent_exception("Reader option " + std::string(name) + " does not exist");
   }

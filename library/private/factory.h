@@ -77,7 +77,6 @@ protected:
   std::vector<plugin*> Plugins;
 
   std::map<std::string, plugin_initializer_t> StaticPluginInitializers;
-
 };
 }
 #endif
