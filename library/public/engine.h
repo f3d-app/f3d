@@ -194,7 +194,7 @@ public:
    * - Windows: %LOCALAPPDATA%\f3d
    * - Linux: ~/.cache/f3d
    * - macOS: ~/Library/Caches/f3d
-   * Throws a cache_exception if the provided cachePath cannot be used.
+   * Throws a engine::cache_exception if the provided cachePath cannot be used.
    */
   engine& setCachePath(const std::filesystem::path& cachePath);
 
@@ -280,7 +280,8 @@ public:
 
   /**
    * Set a specific reader option from a plugin to provided value if it exists.
-   * Throws a options::inexistent_exception if the option does not exists in any reader of any plugin.
+   * Throws a options::inexistent_exception if the option does not exists in any reader of any
+   * plugin.
    */
   static void setReaderOption(const std::string& name, std::string value);
 

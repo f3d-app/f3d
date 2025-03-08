@@ -504,7 +504,8 @@ public:
 
               // Handle reader options
               std::vector<std::string> readerOptionNames = f3d::engine::getAllReaderOptionNames();
-              if (std::find(readerOptionNames.begin(), readerOptionNames.end(), libf3dOptionName) != readerOptionNames.end())
+              if (std::find(readerOptionNames.begin(), readerOptionNames.end(), libf3dOptionName) !=
+                readerOptionNames.end())
               {
                 f3d::engine::setReaderOption(libf3dOptionName, libf3dOptionValue);
                 continue;
