@@ -87,6 +87,26 @@
 
 namespace
 {
+std::string DeprecatedCollapsePath(const fs::path& path)
+{
+  std::string collapsed;
+  std::string origin = path.string();
+
+  // Handle retro-compatibility but warn for deprecation
+  // Foe easier removal when removing deprecation: F3D_DEPRECATED
+  if (!origin.empty())
+  {
+    collapsed = vtksys::SystemTools::CollapseFullPath(origin);
+    if (collapsed != origin)
+    {
+      F3DLog::Print(F3DLog::Severity::Warning,
+        std::string("Collapsing path inside the libf3d is now deprecated, use "
+                    "utils::collapsePath manually."));
+    }
+  }
+  return collapsed;
+}
+
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
 //----------------------------------------------------------------------------
 // Compute the MD5 hash of an existing file on disk
@@ -790,30 +810,16 @@ vtkBoundingBox vtkF3DRenderer::ComputeVisiblePropOrientedBounds(const vtkMatrix4
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetHDRIFile(const std::optional<fs::path>& hdriFile)
 {
-  std::string localHdriFile;
+  std::string hdriFileStr;
   if (hdriFile.has_value())
   {
-    localHdriFile = hdriFile->string();
-
-    // Handle retro-compatibility but warn for deprecation
-    // Foe easier removal when removing deprecation: F3D_DEPRECATED
-    if (!localHdriFile.empty())
-    {
-      std::string collapsedHdriFile = vtksys::SystemTools::CollapseFullPath(localHdriFile);
-      if (localHdriFile != collapsedHdriFile)
-      {
-        localHdriFile = collapsedHdriFile;
-        F3DLog::Print(F3DLog::Severity::Warning,
-          std::string("Collapsing path inside the libf3d is now deprecated, use "
-                      "utils::collapsePath manually."));
-      }
-    }
+    hdriFileStr = ::DeprecatedCollapsePath(hdriFile.value());
   }
 
   // Check HDRI is different than current one
-  if (this->HDRIFile != localHdriFile)
+  if (this->HDRIFile != hdriFileStr)
   {
-    this->HDRIFile = localHdriFile;
+    this->HDRIFile = hdriFileStr;
 
     this->TextActorsConfigured = false;
     this->RenderPassesConfigured = false;
@@ -1248,19 +1254,25 @@ void vtkF3DRenderer::ConfigureTextActors()
 
   // Font
   this->DropZoneActor->GetTextProperty()->SetFontFamilyToCourier();
-  if (this->FontFile.has_value() && !this->FontFile.value().empty())
+
+  std::string fontFileStr;
+  if (this->FontFile.has_value())
   {
-    std::string tmpFontFile = vtksys::SystemTools::CollapseFullPath(this->FontFile.value());
-    if (vtksys::SystemTools::FileExists(tmpFontFile, true))
+    fontFileStr = ::DeprecatedCollapsePath(this->FontFile.value());
+  }
+
+  if (!fontFileStr.empty())
+  {
+    if (vtksys::SystemTools::FileExists(fontFileStr, true))
     {
       this->DropZoneActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
-      this->DropZoneActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
-      this->UIActor->SetFontFile(tmpFontFile);
+      this->DropZoneActor->GetTextProperty()->SetFontFile(fontFileStr.c_str());
+      this->UIActor->SetFontFile(fontFileStr);
     }
     else
     {
       F3DLog::Print(
-        F3DLog::Severity::Warning, std::string("Cannot find \"") + tmpFontFile + "\" font file.");
+        F3DLog::Severity::Warning, std::string("Cannot find \"") + fontFileStr + "\" font file.");
     }
   }
 
@@ -1290,7 +1302,7 @@ void vtkF3DRenderer::SetPointSize(const std::optional<double>& pointSize)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetFontFile(const std::optional<std::string>& fontFile)
+void vtkF3DRenderer::SetFontFile(const std::optional<fs::path>& fontFile)
 {
   if (this->FontFile != fontFile)
   {

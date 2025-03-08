@@ -180,7 +180,7 @@
       "default_value": "false"
     },
     "font_file": {
-      "type": "string"
+      "type": "path"
     },
     "scale": {
       "type": "ratio",

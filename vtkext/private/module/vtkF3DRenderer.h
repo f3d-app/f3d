@@ -62,7 +62,7 @@ public:
    */
   void SetLineWidth(const std::optional<double>& lineWidth);
   void SetPointSize(const std::optional<double>& pointSize);
-  void SetFontFile(const std::optional<std::string>& fontFile);
+  void SetFontFile(const std::optional<fs::path>& fontFile);
   void SetFontScale(const double fontScale);
   void SetHDRIFile(const std::optional<fs::path>& hdriFile);
   void SetUseImageBasedLighting(bool use) override;
@@ -553,7 +553,7 @@ private:
   bool HasValidHDRISH = false;
   bool HasValidHDRISpec = false;
 
-  std::optional<std::string> FontFile;
+  std::optional<fs::path> FontFile;
   double FontScale = 1.0;
 
   double LightIntensity = 1.0;
