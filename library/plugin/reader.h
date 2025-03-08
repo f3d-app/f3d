@@ -135,25 +135,36 @@ public:
   }
 
   /**
-   * Set the plugin option pointer to the provided ref and initialize plugin options
+   * Set a reader option
+   * Return true if the option was found (and set), false otherwise
    */
-  void setPluginOptions(std::map<std::string, std::string>& pluginOptions)
+  bool setReaderOption(const std::string& name, const std::string& value)
   {
-    // XXX: Nothing better than a ptr here ?
-    this->PluginOptions = &pluginOptions;
-    this->initPluginOptions();
+    auto iter = this->ReaderOptions.find(name);
+    if (iter == this->ReaderOptions.end())
+    {
+      return false;
+    }
+    iter->second = value;
+    return true;
   }
 
-  /*
-   * Reimplement to emplace empty strings into all this plugin specific options in the plugin
-   * options Does nothing in this implementation.
+  /**
+   * Return the list of all reader option names
    */
-  virtual void initPluginOptions()
+  std::vector<std::string> getAllReaderOptionNames()
   {
+    std::vector<std::string> keys;
+    keys.reserve(this->ReaderOptions.size());
+    for (const auto& [key, value] : this->ReaderOptions)
+    {
+      keys.push_back(key);
+    }
+    return keys;
   }
 
 protected:
-  std::map<std::string, std::string>* PluginOptions = nullptr;
+  std::map<std::string, std::string> ReaderOptions;
 };
 }
 

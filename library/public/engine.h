@@ -273,16 +273,16 @@ public:
     const std::filesystem::path& pluginPath);
 
   /**
-   * Get all plugin option names that can be set using `setPluginOption`
+   * Get all plugin option names that can be set using `setReaderOption`
    * This vector can be expanded when loading plugin using `loadPlugin`
    */
-  [[nodiscard]] static std::vector<std::string> getAllPluginOptionNames();
+  [[nodiscard]] static std::vector<std::string> getAllReaderOptionNames();
 
   /**
-   * Set a specific plugin option to provided value if it exists.
-   * Throws a options::inexistent_exception if the option does not exists.
+   * Set a specific reader option from a plugin to provided value if it exists.
+   * Throws a options::inexistent_exception if the option does not exists in any reader of any plugin.
    */
-  static void setPluginOption(const std::string& name, std::string value);
+  static void setReaderOption(const std::string& name, std::string value);
 
   /**
    * A structure providing information about the libf3d.

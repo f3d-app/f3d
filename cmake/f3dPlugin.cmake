@@ -113,8 +113,8 @@ macro(f3d_plugin_declare_reader)
       SET "${F3D_READER_JSON}" "exclude_thumbnailer" "false")
   endif()
 
-  list(TRANSFORM F3D_READER_OPTIONS PREPEND "\"")
-  list(TRANSFORM F3D_READER_OPTIONS APPEND "\"")
+  list(TRANSFORM F3D_READER_OPTIONS PREPEND "{ \"${F3D_READER_NAME}.")
+  list(TRANSFORM F3D_READER_OPTIONS APPEND "\", \"\" }")
   list(JOIN F3D_READER_OPTIONS ", " F3D_READER_OPTIONS)
 
   if(F3D_READER_VTK_IMPORTER)

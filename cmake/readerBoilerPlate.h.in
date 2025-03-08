@@ -21,7 +21,10 @@
 class reader_@F3D_READER_NAME@ : public f3d::reader
 {
 public:
-  reader_@F3D_READER_NAME@() = default;
+  reader_@F3D_READER_NAME@()
+  {
+    this->ReaderOptions = { @F3D_READER_OPTIONS@ };
+  }
 
   /*
    * Get the name of this reader
@@ -54,14 +57,14 @@ public:
   /*
    * Emplace empty strings into all this plugin specific options in the plugin options
    */
-  void initPluginOptions() override
+/*  void initReaderOptions() override
   {
     std::vector<std::string> names = { @F3D_READER_OPTIONS@ };
     for (const auto& name : names)
     {
-      this->PluginOptions->emplace(name, "");
+      this->ReaderOptions.emplace(name, "");
     }
-  }
+  }*/
 
 #if @F3D_READER_HAS_SCORE@
   /*

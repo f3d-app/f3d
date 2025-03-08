@@ -52,9 +52,15 @@ public:
   const std::vector<plugin*>& getPlugins();
 
   /**
-   * Get the plugin options to provide to the plugins
+   * Set an option on the first reader of the first plugin that contains it.
+   * Returns true if the option was found (and set), false otherwise.
    */
-  std::map<std::string, std::string>& getPluginOptions();
+  bool setReaderOption(const std::string& name, const std::string& value);
+
+  /**
+   * Return the list of all reader option names, from all readers of all plugins
+   */
+  std::vector<std::string> getAllReaderOptionNames();
 
   /**
    * Get static plugin initialization function
@@ -72,7 +78,6 @@ protected:
 
   std::map<std::string, plugin_initializer_t> StaticPluginInitializers;
 
-  std::map<std::string, std::string> PluginOptions;
 };
 }
 #endif
