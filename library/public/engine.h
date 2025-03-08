@@ -283,7 +283,7 @@ public:
    * Throws a options::inexistent_exception if the option does not exists in any reader of any
    * plugin.
    */
-  static void setReaderOption(const std::string& name, std::string value);
+  static void setReaderOption(const std::string& name, const std::string& value);
 
   /**
    * A structure providing information about the libf3d.
