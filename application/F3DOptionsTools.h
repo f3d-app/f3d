@@ -14,7 +14,7 @@
 namespace F3DOptionsTools
 {
 using OptionsDict = std::map<std::string, std::string>;
-using OptionsEntry = std::tuple<OptionsDict, std::filesystem::path, std::string>;
+using OptionsEntry = std::tuple<OptionsDict, std::string, std::string>;
 using OptionsEntries = std::vector<OptionsEntry>;
 
 /**
@@ -81,6 +81,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "animation-index", "scene.animation.index" },
   { "animation-speed-factor", "scene.animation.speed_factor" },
   { "font-file", "ui.font_file" },
+  { "font-scale", "ui.scale" },
   { "point-sprites", "model.point_sprites.enable" },
   { "point-sprites-type", "model.point_sprites.type" },
   { "point-sprites-size", "model.point_sprites.size" },

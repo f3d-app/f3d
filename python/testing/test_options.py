@@ -17,7 +17,7 @@ def test_setitem():
     options["scene.animation.speed_factor"] = 3.3
     options["render.raytracing.samples"] = 5
     options["render.grid.color"] = [1.0, 1.0, 1.0]
-    options["scene.up_direction"] = "+Y"
+    options["model.point_sprites.type"] = "sphere"
 
 
 def test_getitem():
@@ -29,7 +29,7 @@ def test_getitem():
     assert options["scene.animation.speed_factor"] == 1.0
     assert options["render.raytracing.samples"] == 5
     assert options["render.grid.color"] == [0.0, 0.0, 0.0]
-    assert options["scene.up_direction"] == "+Y"
+    assert options["model.point_sprites.type"] == "sphere"
 
 
 def test_get_non_existent_key():
@@ -79,7 +79,7 @@ def test_set_options():
     options["scene.animation.speed_factor"] = 3.7
     options["render.raytracing.samples"] = 2
     options["model.color.rgb"] = [0.0, 1.0, 1.0]
-    options["scene.up_direction"] = "-Z"
+    options["model.point_sprites.type"] = "other"
 
     engine = f3d.Engine.create_none()
     engine.options = options
@@ -88,7 +88,7 @@ def test_set_options():
     assert engine.options["scene.animation.speed_factor"] == 3.7
     assert engine.options["render.raytracing.samples"] == 2
     assert engine.options["model.color.rgb"] == [0.0, 1.0, 1.0]
-    assert engine.options["scene.up_direction"] == "-Z"
+    assert engine.options["model.point_sprites.type"] == "other"
 
 
 def test_set_options_from_string():
@@ -122,7 +122,7 @@ def test_update_from_dict():
         "scene.animation.speed_factor": 3.8,
         "render.raytracing.samples": 8,
         "model.color.rgb": [0.1, 0.2, 1.3],
-        "scene.up_direction": "-X",
+        "model.point_sprites.type": "-X",
     }
     options.update(d)
     for k, v in d.items():
@@ -138,7 +138,7 @@ def test_update_from_kv_pairs():
         "scene.animation.speed_factor": 3.8,
         "render.raytracing.samples": 8,
         "model.color.rgb": [0.1, 0.2, 1.3],
-        "scene.up_direction": "-X",
+        "model.point_sprites.type": "-X",
     }
     options.update(d.items())
     for k, v in d.items():

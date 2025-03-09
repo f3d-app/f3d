@@ -12,7 +12,7 @@ runs:
 
     - name: Cache TBB
       id: cache-tbb
-      uses: actions/cache@v4
+      uses: actions/cache/restore@v4
       with:
         path: dependencies/tbb_install
         key: tbb-v2021.12.0-${{runner.os}}-${{inputs.cpu}}-2
@@ -60,3 +60,10 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/tbb_install
       shell: bash
       run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-tbb.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-tbb.outputs.cache-primary-key }}
+        path: dependencies/tbb_install

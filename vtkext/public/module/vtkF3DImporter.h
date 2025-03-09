@@ -32,7 +32,7 @@ public:
    * then call this method and return what it returns.
    */
   bool UpdateAtTimeValue(double timeValue) override;
-#else  
+#else
   virtual bool UpdateAtTimeValue(double timeValue);
   void UpdateTimeStep(double timeValue) override;
 #endif

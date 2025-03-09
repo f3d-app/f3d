@@ -60,6 +60,7 @@ public:
   void SetLineWidth(const std::optional<double>& lineWidth);
   void SetPointSize(const std::optional<double>& pointSize);
   void SetFontFile(const std::optional<std::string>& fontFile);
+  void SetFontScale(const double fontScale);
   void SetHDRIFile(const std::optional<std::string>& hdriFile);
   void SetUseImageBasedLighting(bool use) override;
   void SetBackground(const double* backgroundColor) override;
@@ -147,9 +148,15 @@ public:
   void Initialize();
 
   /**
-   * Initialize actors properties related to the up vector using the provided upString, including the camera
+   * Initialize actors properties related to the up vector using the provided upString, including
+   * the camera
    */
-  void InitializeUpVector(const std::string& upString);
+  void InitializeUpVector(const std::vector<double>& upVec);
+
+  /**
+   * Compute bounds of visible props as transformed by given matrix.
+   */
+  vtkBoundingBox ComputeVisiblePropOrientedBounds(const vtkMatrix4x4*);
 
   /**
    * Get the OpenGL skybox
@@ -334,9 +341,9 @@ public:
   void CycleFieldForColoring();
 
   /**
-   * Cycle the current array for coloring, actually setting EnableColoring and ArrayNameForColoring members.
-   * This loops back to not coloring if volume is not enabled.
-   * This can trigger CycleComponentForColoring if current component is not valid.
+   * Cycle the current array for coloring, actually setting EnableColoring and ArrayNameForColoring
+   * members. This loops back to not coloring if volume is not enabled. This can trigger
+   * CycleComponentForColoring if current component is not valid.
    */
   void CycleArrayForColoring();
 
@@ -522,7 +529,6 @@ private:
   bool InvertZoom = false;
 
   int RaytracingSamples = 0;
-  int UpIndex = 1;
   double UpVector[3] = { 0.0, 1.0, 0.0 };
   double RightVector[3] = { 1.0, 0.0, 0.0 };
   double CircleOfConfusionRadius = 20.0;
@@ -545,6 +551,7 @@ private:
   bool HasValidHDRISpec = false;
 
   std::optional<std::string> FontFile;
+  double FontScale = 1.0;
 
   double LightIntensity = 1.0;
   std::map<vtkLight*, double> OriginalLightIntensities;
@@ -554,8 +561,8 @@ private:
 
   std::string CachePath;
 
-  std::optional <std::string> BackfaceType;
-  std::optional <std::string> FinalShader;
+  std::optional<std::string> BackfaceType;
+  std::optional<std::string> FinalShader;
 
   vtkF3DMetaImporter* Importer = nullptr;
   vtkMTimeType ImporterTimeStamp = 0;

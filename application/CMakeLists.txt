@@ -201,7 +201,7 @@ if(UNIX AND NOT APPLE)
       add_custom_command(
         OUTPUT ${MAN_OUTPUT_FILE}
         COMMAND ${HELP2MAN} $<TARGET_FILE:f3d> -N -n "fast and minimalist 3D viewer" > ${MAN_OUTPUT_FILE}
-        COMMAND ${GZIP} -f ${MAN_OUTPUT_FILE}
+        COMMAND ${GZIP} -fn ${MAN_OUTPUT_FILE}
         DEPENDS f3d)
       add_custom_target(man ALL DEPENDS ${MAN_OUTPUT_FILE})
 

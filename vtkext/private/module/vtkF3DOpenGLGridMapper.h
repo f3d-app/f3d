@@ -38,9 +38,14 @@ public:
   vtkSetMacro(Subdivisions, int);
 
   /**
-   * Set the up vector index (X, Y, Z axis respectively).
+   * Set the color (RGBA) of the first axis
    */
-  vtkSetClampMacro(UpIndex, int, 0, 2);
+  vtkSetVector4Macro(Axis1Color, float);
+
+  /**
+   * Set the color (RGBA) of the second axis
+   */
+  vtkSetVector4Macro(Axis2Color, float);
 
   using vtkOpenGLPolyDataMapper::GetBounds;
   double* GetBounds() override;
@@ -68,7 +73,8 @@ protected:
   double FadeDistance = 10.0;
   double UnitSquare = 1.0;
   int Subdivisions = 10;
-  int UpIndex = 1;
+  float Axis1Color[4] = { 0.0, 0.0, 0.0, 1.0 };
+  float Axis2Color[4] = { 0.0, 0.0, 0.0, 1.0 };
 };
 
 #endif

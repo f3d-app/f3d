@@ -3,22 +3,27 @@
 When setting options from the [CLI Options](OPTIONS.md), the [commands](COMMANDS.md) or using the [libf3d options string API](../libf3d/OPTIONS.md#string-api), the values are parsed according to their type. If parsing fails, the value is not changed.
 
 The following types are supported:
- - bool: A boolean, true or false.
- - int: A signed integer.
- - double: A floating point number.
- - ratio: A double dividend over a double divisor, stored in a double.
- - string: A string of characters.
 
-As well as a list for each of these types, noted as
- - vector\<type\>
+- bool: A boolean, true or false.
+- int: A signed integer.
+- double: A floating point number.
+- ratio: A double dividend over a double divisor, stored in a double.
+- string: A string of characters.
+- color: A RGB color
+- direction: A 3D vector representing a direction
+
+As well as a list for bool, int, double, ratio, string, noted as
+
+- vector\<type\>
 
 ## Bool
 
 The following formats are supported when parsing a bool, case insensitive:
- - true/false
- - yes/no
- - on/off
- - 1/0
+
+- true/false
+- yes/no
+- on/off
+- 1/0
 
 When formatting a bool into a string, true/false is used.
 
@@ -40,10 +45,11 @@ with removing the point and precision when the value is exactly an integer.
 ## Ratio
 
 The following formats are supported when parsing a string into a ratio:
- - percent% where percent is a double
- - dividend:divisor where both are doubles
- - dividend/divisor where both are doubles
- - double
+
+- percent% where percent is a double
+- dividend:divisor where both are doubles
+- dividend/divisor where both are doubles
+- double
 
 Percent, dividend, divisor are then parsed as double.
 
@@ -58,3 +64,16 @@ String are parsed and formatted as is.
 Vector tokens are separated by `,`, tokens are then parsed using their respective types.
 
 When formatting a vector into a string, individual token are formatted according to their type and separated using `,`.
+
+## Color
+
+Color are parsed and formatted as a vector of double.
+
+## Direction
+
+The following formats are supported when parsing a string into a direction:
+
+- `[[+|-]X][[+|-]Y][[+|-]Z]` (case insensitive), for example `+X` or `X` for `1,0,0`, `-y+z` for `0,-1,1`
+- vector of three doubles, for example `1,2,3.4`
+
+When formatting a direction into a string, it is formatted in the `±XYZ` form if possible or as a vector of doubles otherwise.

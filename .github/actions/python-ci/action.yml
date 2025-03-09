@@ -7,6 +7,33 @@ inputs:
   python_version:
     description: 'Python version'
     required: true
+  alembic_version:
+    description: 'Version of alembic to build'
+    required: false
+  assimp_version:
+    description: 'Version of assimp to build'
+    required: false
+  draco_version:
+    description: 'Version of draco to build'
+    required: false
+  occt_version:
+    description: 'Version of occt to build'
+    required: false
+  openexr_version:
+    description: 'Version of openexr to build'
+    required: false
+  openvdb_version:
+    description: 'Version of openvdb to build'
+    required: false
+  pybind11_version:
+    description: 'Version of pybind11 to build'
+    required: false
+  usd_version:
+    description: 'Version of usd to build'
+    required: false
+  vtk_version:
+    description: 'Version of vtk to build'
+    required: true
 
 runs:
   using: "composite"
@@ -16,6 +43,8 @@ runs:
       shell: bash
       run: |
         [[ "${{ inputs.lfs_sha }}" ]] || { echo "lfs_sha input is empty" ; exit 1; }
+        [[ "${{ inputs.python_version }}" ]] || { echo "python input is empty" ; exit 1; }
+        [[ "${{ inputs.vtk_version }}" ]] || { echo "vtk_version input is empty" ; exit 1; }
 
     - name: Recover LFS Data
       uses: f3d-app/lfs-data-cache-action@v1
@@ -24,24 +53,23 @@ runs:
         lfs_sha: ${{inputs.lfs_sha}}
         cache_postfix: cache-0 
 
-    - name: Dependencies Dir
-      shell: bash
-      working-directory: ${{github.workspace}}
-      run: |
-        mkdir dependencies
-        cd dependencies
-        mkdir install
-
-    - name: Install VTK dependencies
-      uses: ./source/.github/actions/vtk-dependencies
+    - name: Install all F3D dependencies
+      uses: ./source/.github/actions/generic-dependencies
+      with:
+        alembic_version: ${{inputs.alembic_version}}
+        assimp_version: ${{inputs.assimp_version}}
+        draco_version: ${{inputs.draco_version}}
+        occt_version: ${{inputs.occt_version}}
+        openexr_version: ${{inputs.openexr_version}}
+        openvdb_version: ${{inputs.openvdb_version}}
+        pybind11_version: ${{inputs.pybind11_version}}
+        usd_version: ${{inputs.usd_version}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
       with:
-        vtk_sha_file: ./source/.github/actions/vtk_commit_sha
-
-    - name: Install F3D dependencies
-      uses: ./source/.github/actions/f3d-dependencies
+        vtk_version: ${{inputs.vtk_version}}
+        openvdb_version: ${{inputs.openvdb_version}}
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -116,7 +144,7 @@ runs:
 
     - name: Install Mesa Windows
       if: runner.os == 'Windows'
-      uses: f3d-app/install-mesa-windows-action@v1
+      uses: f3d-app/install-mesa-windows-action@v2
       with:
         path: ${{ env.Python_ROOT_DIR }}
 

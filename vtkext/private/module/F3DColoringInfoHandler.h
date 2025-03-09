@@ -45,10 +45,12 @@ public:
    * @param enable: If coloring should be enabled or not
    * @param useCellData: If cell data or point data should be used
    * @param arrayName: An optional arrayName to color with
-   * @param quiet: If true, no log will be done by this method, even when failing to find an array to color with
+   * @param quiet: If true, no log will be done by this method, even when failing to find an array
+   * to color with
    * @return: current coloring info if any, unset optional otherwise
    */
-  std::optional<ColoringInfo> SetCurrentColoring(bool enable, bool useCellData, const std::optional<std::string>& arrayName, bool quiet);
+  std::optional<ColoringInfo> SetCurrentColoring(
+    bool enable, bool useCellData, const std::optional<std::string>& arrayName, bool quiet);
 
   /**
    * Get the current coloring state
@@ -60,7 +62,8 @@ public:
    * Cycle the current coloring
    * If not coloring, this will try to find an array to color with
    * This does not change the cell/point data status
-   * @param cycleToNonColoring: Control whether to cycle to non coloring after reaching the last array or not
+   * @param cycleToNonColoring: Control whether to cycle to non coloring after reaching the last
+   * array or not
    */
   void CycleColoringArray(bool cycleToNonColoring);
 

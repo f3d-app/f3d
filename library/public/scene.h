@@ -40,13 +40,15 @@ public:
   struct load_failure_exception : public exception
   {
     explicit load_failure_exception(const std::string& what = "")
-      : exception(what){};
+      : exception(what) {};
   };
 
   ///@{
   /**
    * Add and load provided files into the scene
    * Already added file will NOT be reloaded
+   * If it fails to loads a file, it clears the scene and
+   * throw a load_failure_exception.
    */
   virtual scene& add(const std::filesystem::path& filePath) = 0;
   virtual scene& add(const std::vector<std::filesystem::path>& filePath) = 0;

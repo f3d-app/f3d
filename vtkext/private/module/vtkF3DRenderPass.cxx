@@ -72,10 +72,6 @@ void vtkF3DRenderPass::ReleaseGraphicsResources(vtkWindow* w)
   {
     this->MainOnTopPass->ReleaseGraphicsResources(w);
   }
-  if (this->OverlayPass)
-  {
-    this->OverlayPass->ReleaseGraphicsResources(w);
-  }
 }
 
 // ----------------------------------------------------------------------------
@@ -83,7 +79,6 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
 {
   // Always updates props from the renderstate
   this->BackgroundProps.clear();
-  this->OverlayProps.clear();
   this->MainProps.clear();
   this->MainOnTopProps.clear();
 
@@ -100,18 +95,17 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     {
       // armature
       vtkInformation* info = prop->GetPropertyKeys();
-      if (this->ArmatureVisible && info && info->Has(vtkF3DImporter::ACTOR_IS_ARMATURE()))
+      if (info && info->Has(vtkF3DImporter::ACTOR_IS_ARMATURE()))
       {
-        this->MainOnTopProps.push_back(prop);
+        if (this->ArmatureVisible)
+        {
+          this->MainOnTopProps.push_back(prop);
+        }
       }
       else
       {
         this->MainProps.push_back(prop);
       }
-    }
-    else
-    {
-      this->OverlayProps.push_back(prop);
     }
   }
 
@@ -141,15 +135,6 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
   {
     this->BackgroundPass->SetDelegatePass(bgCamP);
   }
-
-  // overlay pass
-  vtkNew<vtkDefaultPass> overlayP;
-  vtkNew<vtkCameraPass> overlayCamP;
-  overlayCamP->SetDelegatePass(overlayP);
-
-  this->OverlayPass = vtkSmartPointer<vtkFramebufferPass>::New();
-  this->OverlayPass->SetDelegatePass(overlayCamP);
-  this->OverlayPass->SetColorFormat(vtkTextureObject::Float32);
 
   // main pass
 #if F3D_MODULE_RAYTRACING
@@ -277,7 +262,8 @@ void vtkF3DRenderPass::Render(const vtkRenderState* s)
     this->BackgroundPass->Render(&backgroundState);
 
     vtkRenderState mainState(s->GetRenderer());
-    mainState.SetPropArrayAndCount(this->MainProps.data(), static_cast<int>(this->MainProps.size()));
+    mainState.SetPropArrayAndCount(
+      this->MainProps.data(), static_cast<int>(this->MainProps.size()));
     mainState.SetFrameBuffer(s->GetFrameBuffer());
 
     this->MainPass->Render(&mainState);
@@ -289,13 +275,6 @@ void vtkF3DRenderPass::Render(const vtkRenderState* s)
 
     this->MainOnTopPass->Render(&mainOnTopState);
   }
-
-  vtkRenderState overlayState(s->GetRenderer());
-  overlayState.SetPropArrayAndCount(
-    this->OverlayProps.data(), static_cast<int>(this->OverlayProps.size()));
-  overlayState.SetFrameBuffer(s->GetFrameBuffer());
-
-  this->OverlayPass->Render(&overlayState);
 
   // restore background color before compositing the layers
   r->SetBackground(bgColor);
@@ -316,7 +295,8 @@ void vtkF3DRenderPass::Blend(const vtkRenderState* s)
   // Enable blending with default VTK blending function
   // It is required since external window do not set it up
   renWin->GetState()->vtkglEnable(GL_BLEND);
-  renWin->GetState()->vtkglBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+  renWin->GetState()->vtkglBlendFuncSeparate(
+    GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
   if (this->BlendQuadHelper && this->BlendQuadHelper->ShaderChangeValue < this->GetMTime())
   {
@@ -329,7 +309,6 @@ void vtkF3DRenderPass::Blend(const vtkRenderState* s)
 
     std::stringstream ssDecl;
     ssDecl << "uniform sampler2D texBackground;\n"
-              "uniform sampler2D texOverlay;\n"
               "uniform sampler2D texMain;\n"
               "uniform sampler2D texMainOnTop;\n"
               "vec3 toLinear(vec3 color) { return pow(color.rgb, vec3(2.2)); }\n"
@@ -380,17 +359,6 @@ void vtkF3DRenderPass::Blend(const vtkRenderState* s)
     ssImpl << "  result.rgb = (1.0 - onTopSample.a) * result.rgb + onTopSample.rgb;\n";
     ssImpl << "  result.a = (1.0 - onTopSample.a) * result.a + onTopSample.a;\n";
 
-    // the input color is alpha premultiplied, we need to divide it, then
-    // convert to linear space, and finally premultiply back by the alpha value
-    ssImpl << "  vec4 ovlSample = texture(texOverlay, texCoord);\n";
-    ssImpl << "  if (ovlSample.a > 0.0)\n";
-    ssImpl << "    ovlSample.rgb = toLinear(ovlSample.rgb / ovlSample.a);\n";
-    ssImpl << "  ovlSample.rgb *= ovlSample.a;\n";
-
-    // premultiplied alpha blending (overlay)
-    ssImpl << "  result.rgb = (1.0 - ovlSample.a) * result.rgb + ovlSample.rgb;\n";
-    ssImpl << "  result.a = (1.0 - ovlSample.a) * result.a + ovlSample.a;\n";
-
     // divide by alpha and convert back to sRGB
     // we shouldn't premultiply by alpha again here because the OpenGL blending
     // function is expecting the source fragment not premultiplied
@@ -422,13 +390,10 @@ void vtkF3DRenderPass::Blend(const vtkRenderState* s)
   this->BackgroundPass->GetColorTexture()->SetWrapT(vtkTextureObject::ClampToEdge);
 
   this->BackgroundPass->GetColorTexture()->Activate();
-  this->OverlayPass->GetColorTexture()->Activate();
   this->MainPass->GetColorTexture()->Activate();
   this->MainOnTopPass->GetColorTexture()->Activate();
   this->BlendQuadHelper->Program->SetUniformi(
     "texBackground", this->BackgroundPass->GetColorTexture()->GetTextureUnit());
-  this->BlendQuadHelper->Program->SetUniformi(
-    "texOverlay", this->OverlayPass->GetColorTexture()->GetTextureUnit());
   this->BlendQuadHelper->Program->SetUniformi(
     "texMain", this->MainPass->GetColorTexture()->GetTextureUnit());
   this->BlendQuadHelper->Program->SetUniformi(
@@ -437,7 +402,6 @@ void vtkF3DRenderPass::Blend(const vtkRenderState* s)
   this->BlendQuadHelper->Render();
 
   this->BackgroundPass->GetColorTexture()->Deactivate();
-  this->OverlayPass->GetColorTexture()->Deactivate();
   this->MainPass->GetColorTexture()->Deactivate();
   this->MainOnTopPass->GetColorTexture()->Deactivate();
 }

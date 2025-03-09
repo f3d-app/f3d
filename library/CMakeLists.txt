@@ -28,7 +28,7 @@ include(f3dOptions)
 f3d_generate_options(
   INPUT_JSON "${CMAKE_CURRENT_SOURCE_DIR}/options.json"
   INPUT_PUBLIC_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/public/options.h.in"
-  INPUT_PRIVATE_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/private/options_tools.h.in"
+  INPUT_PRIVATE_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/private/options_generated.h.in"
   DESTINATION "${CMAKE_CURRENT_BINARY_DIR}"
   OUTPUT_NAME "options"
   )

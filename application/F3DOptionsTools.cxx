@@ -65,7 +65,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "no-background", "", "No background when render to file", "<bool>", "1" },
       { "help", "h", "Print help", "", "" }, { "version", "", "Print version details", "", "" },
       { "list-readers", "", "Print the list of readers", "", "" },
-      { "list-bindings", "", "Print the list of interaction bindings and exits, ignored with `--no-render`, only considers the first file group.", "", "" },
+      { "list-bindings", "", "Print the list of interaction bindings and exits, ignored with `--no-render`, only considers the first file group.", "<bool>", "1" },
       { "config", "", "Specify the configuration file to use. absolute/relative path or filename/filestem to search in configuration file locations", "<filePath/filename/fileStem>", "" },
       { "no-config", "", "Do not read the configuration file", "<bool>", "1" },
       { "no-render", "", "Do not render anything and quit right after loading the first file, use with --verbose to recover information about a file.", "<bool>", "1" },
@@ -84,7 +84,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "loading-progress", "", "Show loading progress bar", "<bool>", "1" },
       { "animation-progress", "", "Show animation progress bar", "<bool>", "1" },
       { "multi-file-mode", "", R"(Choose the behavior when opening multiple files. "single" will show one file at a time, "all" will show all files in a single scene.)", "<single|all>", "" },
-      { "up", "", "Up direction", "{-X, +X, -Y, +Y, -Z, +Z}", "" },
+      { "up", "", "Up direction", "<direction>", "" },
       { "axis", "x", "Show axes", "<bool>", "1" }, { "grid", "g", "Show grid", "<bool>", "1" },
       { "grid-absolute", "", "Position grid at the absolute origin instead of below the model", "<bool>", "1" },
       { "grid-unit", "", "Size of grid unit square, automatically computed by default", "<value>", "" },
@@ -97,9 +97,10 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "invert-zoom", "", "Invert zoom direction with right mouse click", "<bool>", "1" },
       { "animation-autoplay", "", "Automatically start animation", "<bool>", "1" },
       { "animation-index", "", "Select animation to show", "<index>", "" },
-      { "animation-speed-factor", "", "Set animation speed factor", "<factor>", "" },
+      { "animation-speed-factor", "", "Set animation speed factor", "<ratio>", "" },
       { "animation-time", "", "Set animation time to load", "<time>", "" },
       { "font-file", "", "Path to a FreeType compatible font file", "<file_path>", ""},
+      { "font-scale", "", "Scale fonts", "<ratio>", ""},
       { "command-script", "", "Path to a script file containing commands to execute", "<file_path>", "" } } },
   { "Material",
     { {"point-sprites", "o", "Show sphere sprites instead of surfaces", "<bool>", "1" },
@@ -146,9 +147,9 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
   {"Camera",
     { {"camera-position", "", "Camera position (overrides camera direction and camera zoom factor if any)", "<X,Y,Z>", ""},
       {"camera-focal-point", "", "Camera focal point", "<X,Y,Z>", ""},
-      {"camera-view-up", "", "Camera view up", "<X,Y,Z>", ""},
+      {"camera-view-up", "", "Camera view up", "<direction>", ""},
       {"camera-view-angle", "", "Camera view angle (non-zero, in degrees)", "<angle>", ""},
-      {"camera-direction", "", "Camera direction", "<X,Y,Z>", ""},
+      {"camera-direction", "", "Camera direction", "<direction>", ""},
       {"camera-zoom-factor", "", "Camera zoom factor (non-zero)", "<factor>", ""},
       {"camera-azimuth-angle", "", "Camera azimuth angle (in degrees), performed after other camera options", "<angle>", ""},
       {"camera-elevation-angle", "", "Camera elevation angle (in degrees), performed after other camera options", "<angle>", ""},
@@ -175,9 +176,10 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
 
 /**
  * True boolean options need to be filtered out in ParseCLIOptions
+ * Also filter out special options like `define` and `reset`
  * This is the easiest, compile time way to do it
  */
-constexpr std::array CLIBooleans = {"version", "help", "list-readers", "scan-plugins", "list-rendering-backends"};
+constexpr std::array CLIBooleans = {"version", "help", "list-readers", "scan-plugins", "list-rendering-backends", "define", "reset"};
 
 //----------------------------------------------------------------------------
 /**
@@ -409,6 +411,13 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
   // cxxopts values need to live somewhere until parsing is done
   std::vector<std::shared_ptr<cxxopts::Value>> cxxoptsValues;
   auto cxxoptsInputPositionals = cxxopts::value<std::vector<std::string>>(positionals);
+
+  std::vector<std::string> defines;
+  auto cxxoptsDefines = cxxopts::value<std::vector<std::string>>(defines);
+
+  std::vector<std::string> resets;
+  auto cxxoptsResets = cxxopts::value<std::vector<std::string>>(resets);
+
   try
   {
     cxxopts::Options cxxOptions(execName, F3D::AppTitle);
@@ -422,6 +431,8 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
       if (std::string(optionGroup.GroupName) == "Applicative")
       {
         group("input", "Input files", cxxoptsInputPositionals, "<files>");
+        group("D,define", "Define libf3d options", cxxoptsDefines, "libf3d.option=value");
+        group("R,reset", "Reset libf3d options", cxxoptsResets, "libf3d.option");
       }
 
       // Add each option to cxxopts
@@ -559,9 +570,28 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
       // Discard boolean option like `--version` or `--help`
       if (std::find(::CLIBooleans.begin(), ::CLIBooleans.end(), res.key()) == ::CLIBooleans.end())
       {
-        cliOptionsDict.emplace(res.key(), res.value());
+        cliOptionsDict[res.key()] = res.value();
       }
     }
+
+    // Handle defines and add them as proper options
+    for (const std::string& define : defines)
+    {
+      std::string::size_type sepIdx = define.find_first_of('=');
+      if (sepIdx == std::string::npos)
+      {
+        f3d::log::warn("Could not parse a define '", define, "'");
+        continue;
+      }
+      cliOptionsDict[define.substr(0, sepIdx)] = define.substr(sepIdx + 1);
+    }
+
+    // Handles reset using the dedicated syntax
+    for (const std::string& reset : resets)
+    {
+      cliOptionsDict["reset-" + reset] = "";
+    }
+
     return cliOptionsDict;
   }
   catch (const cxxopts::exceptions::exception& ex)

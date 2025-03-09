@@ -13,7 +13,11 @@ endif()
 
 find_package(pxr REQUIRED)
 
-message(STATUS "Plugin: USD found")
+if("${PXR_VERSION}" VERSION_LESS "2408")
+  message(FATAL_ERROR "Plugin: USD: ${PXR_VERSION} is not supported by F3D, please update your USD installation.")
+endif()
+
+message(STATUS "Plugin: USD ${PXR_VERSION} found")
 
 f3d_plugin_init()
 

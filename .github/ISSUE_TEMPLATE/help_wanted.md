@@ -1,10 +1,9 @@
 ---
-name: Help wanted
+name: Open to contribution
 about: A maintainer specific template
-title: ''
-labels: help-wanted 
-assignees: ''
-
+title: ""
+labels: help-wanted
+assignees: ""
 ---
 
 **Context**

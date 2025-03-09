@@ -5,17 +5,25 @@ inputs:
     description: 'CPU architecture to build for'
     required: false
     default: 'x86_64'
+  version:
+    description: 'Version of assimp to build'
+    required: true
 
 runs:
   using: "composite"
   steps:
 
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+
     - name: Cache ASSIMP
       id: cache-assimp
-      uses: actions/cache@v4
+      uses: actions/cache/restore@v4
       with:
         path: dependencies/assimp_install
-        key: assimp-v5.4.3-${{runner.os}}-${{inputs.cpu}}-0
+        key: assimp-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-0
 
     - name: Checkout ASSIMP
       if: steps.cache-assimp.outputs.cache-hit != 'true'
@@ -23,11 +31,16 @@ runs:
       with:
         repository: assimp/assimp
         path: './dependencies/assimp'
-        ref: v5.4.3
+        ref: ${{inputs.version}}
 
-    # Revert https://github.com/assimp/assimp/pull/5349
+    # Revert: https://github.com/assimp/assimp/pull/5349
+    # Issue: https://github.com/assimp/assimp/issues/5449
+    # Fix: https://github.com/assimp/assimp/pull/5751
+    # This impact 5.4.3 and should be fixed in next release (5.5 or 5.4.4)
     - name: Patch ASSIMP
-      if: steps.cache-assimp.outputs.cache-hit != 'true'
+      if: |
+        steps.cache-assimp.outputs.cache-hit != 'true' &&
+        inputs.version == 'v5.4.3'
       working-directory: ${{github.workspace}}/dependencies/assimp
       shell: bash
       run: patch -p1 < $GITHUB_ACTION_PATH/assimp-revert-fbx-bone-anim.patch
@@ -74,3 +87,10 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/assimp_install
       shell: bash
       run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-assimp.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-assimp.outputs.cache-primary-key }}
+        path: dependencies/assimp_install

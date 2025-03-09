@@ -2,6 +2,7 @@
 
 #include <export.h>
 #include <options.h>
+#include <types.h>
 
 #include <algorithm>
 #include <iostream>
@@ -55,7 +56,7 @@ int TestSDKOptions(int argc, char* argv[])
   opt.setAsString("scene.animation.speed_factor", "3.17");
   test("setAsString ratio_t", opt.getAsString("scene.animation.speed_factor") == "3.17");
 
-  opt.scene.animation.speed_factor = 3.18;
+  opt.scene.animation.speed_factor = f3d::ratio_t(3.18);
   test("getAsString ratio_t", opt.getAsString("scene.animation.speed_factor") == "3.18");
 
   opt.set("scene.animation.speed_factor", 3.17);
@@ -73,20 +74,78 @@ int TestSDKOptions(int argc, char* argv[])
   test("set/get string", std::get<std::string>(opt.get("model.color.texture")) == "test");
 
   // Test double vector
+  opt.setAsString("model.scivis.range", "0.7,1.4");
+  test("setAsString vector<double>", opt.getAsString("model.scivis.range") == "0.7,1.4");
+
+  opt.setAsString("model.scivis.range", "0.8, 1.5");
+  test("setAsString spaces vector<double>", opt.getAsString("model.scivis.range") == "0.8,1.5");
+
+  opt.model.scivis.range = { 0.9, 1.2 };
+  test("getAsString vector<double>", opt.getAsString("model.scivis.range") == "0.9,1.2");
+
+  opt.set("model.scivis.range", std::vector<double>{ 0.5, 1.5 });
+  test("set/get vector<double>",
+    std::get<std::vector<double>>(opt.get("model.scivis.range")) ==
+      std::vector<double>{ 0.5, 1.5 });
+
+  // Test color_t
   opt.setAsString("render.background.color", "0.1,0.2,0.4");
-  test("setAsString vector<double>", opt.getAsString("render.background.color") == "0.1,0.2,0.4");
+  test("setAsString color", opt.getAsString("render.background.color") == "0.1,0.2,0.4");
 
   opt.setAsString("render.background.color", "0.1, 0.3, 0.4");
-  test("setAsString spaces vector<double>",
-    opt.getAsString("render.background.color") == "0.1,0.3,0.4");
+  test("setAsString spaces color", opt.getAsString("render.background.color") == "0.1,0.3,0.4");
 
   opt.render.background.color = { 0.1, 0.2, 0.5 };
-  test("getAsString vector<double>", opt.getAsString("render.background.color") == "0.1,0.2,0.5");
+  test("getAsString color", opt.getAsString("render.background.color") == "0.1,0.2,0.5");
 
-  opt.set("render.background.color", std::vector<double>{ 0.1, 0.2, 0.3 });
-  test("set/get vector<double>",
+  opt.set("render.background.color", f3d::color_t{ 0.1, 0.2, 0.3 });
+  test("set/get color",
     std::get<std::vector<double>>(opt.get("render.background.color")) ==
       std::vector<double>{ 0.1, 0.2, 0.3 });
+
+  test.expect<f3d::type_construction_exception>(
+    "color_t invalid size vector", [&]() { f3d::color_t(std::vector<double>{ 0.1, 0.2 }); });
+  test.expect<f3d::type_construction_exception>(
+    "color_t invalid size list", [&]() { f3d::color_t({ 0.1, 0.2, 0.3, 0.4 }); });
+
+  f3d::color_t color({ 0.1, 0.2, 0.3 });
+  color[0] = 0.7;
+  const f3d::color_t* colorPtr = &color;
+  test("color operator[]", color[0] == 0.7);
+  test("color operator[] const", (*colorPtr)[0] == 0.7);
+  test.expect<f3d::type_access_exception>(
+    "color_t invalid access", [&]() { double val = color[3]; });
+  test.expect<f3d::type_access_exception>(
+    "color_t const invalid access", [&]() { double val = (*colorPtr)[3]; });
+  test("color red", color.r() == 0.7);
+  test("color green", color.g() == 0.2);
+  test("color blue", color.b() == 0.3);
+
+  std::stringstream ss;
+  ss << f3d::color_t(0.1, 0.2, 0.3);
+  test("color to string", ss.str() == "0.1,0.2,0.3");
+
+  test.expect<f3d::options::parsing_exception>("setAsString color with incorrect size",
+    [&]() { opt.setAsString("render.background.color", "0.1,0.2,0.3,0.4"); });
+
+  test.expect<f3d::options::incompatible_exception>("set color with incorrect size",
+    [&]() { opt.set("render.background.color", std::vector<double>{ 0.1, 0.2 }); });
+
+  // Test direction_t (rely on testing from color_t)
+  opt.setAsString("scene.up_direction", "+X");
+  test("setAsString direction", opt.getAsString("scene.up_direction"), "+X");
+
+  f3d::direction_t dir({ 0.707, -0.707, 0 });
+  test("direction x", dir.x() == 0.707);
+  test("direction y", dir.y() == -0.707);
+  test("direction z", dir.z() == 0);
+
+  std::stringstream ssDir;
+  ssDir << f3d::direction_t(0, 0, -1.0);
+  test("direction to string", ssDir.str(), "-Z");
+
+  test.expect<f3d::options::parsing_exception>("setAsString direction with incorrect size",
+    [&]() { opt.setAsString("scene.up_direction", "0.1,0.2,0.3,0.4"); });
 
   // Test closest option
   auto closest = opt.getClosestOption("modle.sciivs.cell");
@@ -171,7 +230,7 @@ int TestSDKOptions(int argc, char* argv[])
   test("not isSame with vectors", !opt.isSame(opt2, "render.background.color"));
 
   opt2.copy(opt, "render.background.color");
-  test("copy with vectors", opt2.render.background.color == std::vector<double>({ 0.1, 0.2, 0.7 }));
+  test("copy with vectors", opt2.render.background.color == f3d::color_t({ 0.1, 0.2, 0.7 }));
 
   // Test isSame/copy error path
   test.expect<f3d::options::inexistent_exception>(
@@ -220,9 +279,9 @@ int TestSDKOptions(int argc, char* argv[])
   f3d::options opt7{};
 
   // Test reset non-optional values
-  opt7.scene.up_direction = "+Z";
+  opt7.scene.up_direction = { 0, 0, 1 };
   opt7.reset("scene.up_direction");
-  test("reset non-optional values", opt7.scene.up_direction == "+Y");
+  test("reset non-optional values", opt7.scene.up_direction == f3d::direction_t{ 0, 1, 0 });
 
   // Test reset optional values
   opt7.model.scivis.array_name = "dummy";

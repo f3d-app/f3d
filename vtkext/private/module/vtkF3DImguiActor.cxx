@@ -265,6 +265,7 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
 
   io.Fonts->Build();
   io.FontDefault = font;
+  io.FontGlobalScale = this->FontScale;
 
   ImGuiStyle* style = &ImGui::GetStyle();
   style->GrabRounding = 4.0f;
@@ -290,22 +291,25 @@ vtkF3DImguiActor::~vtkF3DImguiActor() = default;
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderFileName()
 {
-  ImGuiViewport* viewport = ImGui::GetMainViewport();
+  if (!this->FileName.empty())
+  {
+    ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-  constexpr float marginTop = 5.f;
-  ImVec2 winSize = ImGui::CalcTextSize(this->FileName.c_str());
-  winSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
-  winSize.y += 2.f * ImGui::GetStyle().WindowPadding.y;
+    constexpr float marginTop = 5.f;
+    ImVec2 winSize = ImGui::CalcTextSize(this->FileName.c_str());
+    winSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
+    winSize.y += 2.f * ImGui::GetStyle().WindowPadding.y;
 
-  ::SetupNextWindow(ImVec2(viewport->GetWorkCenter().x - 0.5f * winSize.x, marginTop), winSize);
-  ImGui::SetNextWindowBgAlpha(0.35f);
+    ::SetupNextWindow(ImVec2(viewport->GetWorkCenter().x - 0.5f * winSize.x, marginTop), winSize);
+    ImGui::SetNextWindowBgAlpha(0.35f);
 
-  ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
-    ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
+      ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
 
-  ImGui::Begin("FileName", nullptr, flags);
-  ImGui::TextUnformatted(this->FileName.c_str());
-  ImGui::End();
+    ImGui::Begin("FileName", nullptr, flags);
+    ImGui::TextUnformatted(this->FileName.c_str());
+    ImGui::End();
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -340,9 +344,13 @@ void vtkF3DImguiActor::RenderCheatSheet()
   constexpr float marginLeft = 5.f;
   constexpr float marginTopBottom = 5.f;
 
+  float textHeight = 0.f;
   float winWidth = 0.f;
+
   for (const auto& [group, content] : this->CheatSheet)
   {
+    textHeight +=
+      ImGui::GetTextLineHeightWithSpacing() + 2 * ImGui::GetStyle().SeparatorTextPadding.y;
     for (const auto& [bind, desc, val] : content)
     {
       std::string line = bind;
@@ -355,12 +363,17 @@ void vtkF3DImguiActor::RenderCheatSheet()
       ImVec2 currentLine = ImGui::CalcTextSize(line.c_str());
 
       winWidth = std::max(winWidth, currentLine.x);
+      textHeight += ImGui::GetTextLineHeightWithSpacing();
     }
   }
-  winWidth += 2.f * ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().ScrollbarSize;
 
-  ::SetupNextWindow(ImVec2(marginLeft, marginTopBottom),
-    ImVec2(winWidth, viewport->WorkSize.y - 2.f * marginTopBottom));
+  winWidth += 2.f * ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().ScrollbarSize;
+  textHeight += 2.f * ImGui::GetStyle().WindowPadding.y;
+
+  const float winTop = std::max(marginTopBottom, (viewport->WorkSize.y - textHeight) * 0.5f);
+
+  ::SetupNextWindow(ImVec2(marginLeft, winTop),
+    ImVec2(winWidth, std::min(viewport->WorkSize.y - (2 * marginTopBottom), textHeight)));
   ImGui::SetNextWindowBgAlpha(0.35f);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |

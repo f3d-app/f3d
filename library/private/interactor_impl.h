@@ -101,10 +101,22 @@ public:
   void UpdateRendererAfterInteraction();
 
   /**
+   * Implementation only API.
+   * Expose the method to reset transformed up vector.
+   * This is called by the scene after initializing the up vector.
+   */
+  void ResetTemporaryUp();
+
+  /**
    * Event loop being called automatically once the interactor is started
    * First call the EventLoopUserCallBack, then call render if requested.
    */
   void EventLoop();
+
+  /**
+   * Set a command to be run on the next event loop
+   */
+  void SetCommandBuffer(const char* command);
 
   /**
    * An exception that can be thrown by certain command callbacks

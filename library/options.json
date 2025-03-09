@@ -1,8 +1,8 @@
 {
   "scene": {
     "up_direction": {
-      "type": "string",
-      "default_value": "+Y"
+      "type": "direction",
+      "default_value": "0,1,0"
     },
     "animation": {
       "autoplay": {
@@ -57,7 +57,7 @@
         "default_value": "10"
       },
       "color": {
-        "type": "double_vector",
+        "type": "color",
         "default_value": "0.0, 0.0, 0.0"
       }
     },
@@ -107,7 +107,7 @@
     },
     "background": {
       "color": {
-        "type": "double_vector",
+        "type": "color",
         "default_value": "0.2, 0.2, 0.2"
       },
       "skybox": {
@@ -120,8 +120,8 @@
           "default_value": "false"
         },
         "coc": {
-        "type": "double",
-        "default_value": "20.0"
+          "type": "double",
+          "default_value": "20.0"
         }
       }
     },
@@ -182,6 +182,10 @@
     "font_file": {
       "type": "string"
     },
+    "scale": {
+      "type": "ratio",
+      "default_value": "1.0"
+    },
     "loader_progress": {
       "type": "bool",
       "default_value": "false"
@@ -202,7 +206,7 @@
         "type": "double"
       },
       "rgb": {
-        "type": "double_vector"
+        "type": "color"
       },
       "texture": {
         "type": "string"
@@ -210,7 +214,7 @@
     },
     "emissive": {
       "factor": {
-        "type": "double_vector"
+        "type": "color"
       },
       "texture": {
         "type": "string"
