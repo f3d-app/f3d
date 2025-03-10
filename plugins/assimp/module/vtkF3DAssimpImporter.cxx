@@ -594,7 +594,7 @@ public:
       this->Importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
       this->Scene = this->Importer.ReadFile(
         filePath, aiProcess_LimitBoneWeights | aiProcess_ValidateDataStructure);
-      if(this->Scene == nullptr)
+      if (this->Scene == nullptr)
       {
         throw DeadlyImportError(this->Importer.GetErrorString());
       }
