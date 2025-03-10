@@ -93,7 +93,7 @@ std::string DeprecatedCollapsePath(const fs::path& path)
   std::string origin = path.string();
 
   // Handle retro-compatibility but warn for deprecation
-  // Foe easier removal when removing deprecation: F3D_DEPRECATED
+  // For easier removal when removing deprecation: F3D_DEPRECATED
   if (!origin.empty())
   {
     collapsed = vtksys::SystemTools::CollapseFullPath(origin);
