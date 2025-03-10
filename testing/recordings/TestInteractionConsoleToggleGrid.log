@@ -1,0 +1,117 @@
+# StreamVersion 1.2
+RenderEvent 0 0 0 0 0 0 0
+EnterEvent 261 0 0 0 0 0 0
+
+KeyPressEvent 212 76 0 27 1 Escape 0
+CharEvent 212 76 0 27 1 Escape 0
+KeyReleaseEvent 212 76 0 27 1 Escape 0
+
+KeyPressEvent 212 76 0 116 1 t 0
+CharEvent 212 76 0 116 1 t 0
+KeyReleaseEvent 212 76 0 116 1 t 0
+
+KeyPressEvent 212 76 0 111 1 o 0
+CharEvent 212 76 0 111 1 o 0
+KeyReleaseEvent 212 76 0 111 1 o 0
+
+KeyPressEvent 212 76 0 103 1 g 0
+CharEvent 212 76 0 103 1 g 0
+KeyReleaseEvent 212 76 0 103 1 g 0
+
+KeyPressEvent 212 76 0 103 1 g 0
+CharEvent 212 76 0 103 1 g 0
+KeyReleaseEvent 212 76 0 103 1 g 0
+
+KeyPressEvent 212 76 0 108 1 l 0
+CharEvent 212 76 0 108 1 l 0
+KeyReleaseEvent 212 76 0 108 1 l 0
+
+KeyPressEvent 212 76 0 101 1 e 0
+CharEvent 212 76 0 101 1 e 0
+KeyReleaseEvent 212 76 0 101 1 e 0
+
+KeyPressEvent 212 76 0 32 1 space 0
+CharEvent 212 76 0 32 1 space 0
+KeyReleaseEvent 212 76 0 32 1 space 0
+
+KeyPressEvent 212 76 0 114 1 r 0
+CharEvent 212 76 0 114 1 r 0
+KeyReleaseEvent 212 76 0 114 1 r 0
+
+KeyPressEvent 212 76 0 101 1 e 0
+CharEvent 212 76 0 101 1 e 0
+KeyReleaseEvent 212 76 0 101 1 e 0
+
+KeyPressEvent 212 76 0 110 1 n 0
+CharEvent 212 76 0 110 1 n 0
+KeyReleaseEvent 212 76 0 110 1 n 0
+
+KeyPressEvent 212 76 0 100 1 d 0
+CharEvent 212 76 0 100 1 d 0
+KeyReleaseEvent 212 76 0 100 1 d 0
+
+KeyPressEvent 212 76 0 101 1 e 0
+CharEvent 212 76 0 101 1 e 0
+KeyReleaseEvent 212 76 0 101 1 e 0
+
+KeyPressEvent 212 76 0 114 1 r 0
+CharEvent 212 76 0 114 1 r 0
+KeyReleaseEvent 212 76 0 114 1 r 0
+
+KeyPressEvent 212 76 0 46 1 period 0
+CharEvent 212 76 0 46 1 period 0
+KeyReleaseEvent 212 76 0 46 1 period 0
+
+KeyPressEvent 212 76 0 103 1 g 0
+CharEvent 212 76 0 103 1 g 0
+KeyReleaseEvent 212 76 0 103 1 g 0
+
+KeyPressEvent 212 76 0 114 1 r 0
+CharEvent 212 76 0 114 1 r 0
+KeyReleaseEvent 212 76 0 114 1 r 0
+
+KeyPressEvent 212 76 0 105 1 i 0
+CharEvent 212 76 0 105 1 i 0
+KeyReleaseEvent 212 76 0 105 1 i 0
+
+KeyPressEvent 212 76 0 100 1 d 0
+CharEvent 212 76 0 100 1 d 0
+KeyReleaseEvent 212 76 0 100 1 d 0
+
+KeyPressEvent 212 76 0 46 1 period 0
+CharEvent 212 76 0 46 1 period 0
+KeyReleaseEvent 212 76 0 46 1 period 0
+
+KeyPressEvent 212 76 0 101 1 e 0
+CharEvent 212 76 0 101 1 e 0
+KeyReleaseEvent 212 76 0 101 1 e 0
+
+KeyPressEvent 212 76 0 110 1 n 0
+CharEvent 212 76 0 110 1 n 0
+KeyReleaseEvent 212 76 0 110 1 n 0
+
+KeyPressEvent 212 76 0 97 1 a 0
+CharEvent 212 76 0 97 1 a 0
+KeyReleaseEvent 212 76 0 97 1 a 0
+
+KeyPressEvent 212 76 0 98 1 b 0
+CharEvent 212 76 0 98 1 b 0
+KeyReleaseEvent 212 76 0 98 1 b 0
+
+KeyPressEvent 212 76 0 108 1 l 0
+CharEvent 212 76 0 108 1 l 0
+KeyReleaseEvent 212 76 0 108 1 l 0
+
+KeyPressEvent 212 76 0 101 1 e 0
+CharEvent 212 76 0 101 1 e 0
+KeyReleaseEvent 212 76 0 101 1 e 0
+
+KeyPressEvent 212 76 0 13 1 Return 0
+CharEvent 212 76 0 13 1 Return 0
+KeyReleaseEvent 212 76 0 13 1 Return 0
+
+KeyPressEvent 212 76 0 27 1 Escape 0
+CharEvent 212 76 0 27 1 Escape 0
+KeyReleaseEvent 212 76 0 27 1 Escape 0
+
+TimerEvent 212 76 0 27 1 Escape 0

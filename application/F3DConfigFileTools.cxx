@@ -5,6 +5,7 @@
 #include "nlohmann/json.hpp"
 
 #include "log.h"
+#include "utils.h"
 
 #include <filesystem>
 #include <fstream>
@@ -21,7 +22,7 @@ namespace
  */
 std::vector<fs::path> GetConfigPaths(const std::string& configSearch)
 {
-  std::vector<std::filesystem::path> paths;
+  std::vector<fs::path> paths;
 
   fs::path configPath;
   std::vector<fs::path> dirsToCheck = {
@@ -29,7 +30,7 @@ std::vector<fs::path> GetConfigPaths(const std::string& configSearch)
 #ifdef __APPLE__
     "/usr/local/etc/f3d",
 #endif
-#ifdef __linux__
+#if defined(__linux__) || defined(__FreeBSD__)
     "/etc/f3d",
     "/usr/share/f3d/configs",
 #endif
@@ -46,25 +47,30 @@ std::vector<fs::path> GetConfigPaths(const std::string& configSearch)
         continue;
       }
 
-      // If the config search is a stem, add extensions
+      std::vector<std::string> configNames;
       if (fs::path(configSearch).stem() == configSearch)
       {
-        for (const std::string& ext : { std::string(".json"), std::string(".d") })
-        {
-          configPath = dir / (configSearch + ext);
-          if (fs::exists(configPath))
-          {
-            paths.emplace_back(configPath);
-          }
-        }
+        // If the config search is a stem, add extensions
+        configNames.emplace_back(configSearch + ".json");
+        configNames.emplace_back(configSearch + ".d");
       }
       else
       {
         // If not, use directly
-        configPath = dir / (configSearch);
+        configNames.emplace_back(configSearch);
+      }
+
+      for (const auto& configName : configNames)
+      {
+        configPath = dir / (configName);
         if (fs::exists(configPath))
         {
+          f3d::log::debug("Config file found: ", configPath.string());
           paths.emplace_back(configPath);
+        }
+        else
+        {
+          f3d::log::debug("Candidate config file not found: ", configPath.string());
         }
       }
     }
@@ -79,7 +85,8 @@ std::vector<fs::path> GetConfigPaths(const std::string& configSearch)
 }
 
 //----------------------------------------------------------------------------
-F3DOptionsTools::OptionsEntries F3DConfigFileTools::ReadConfigFiles(const std::string& userConfig)
+F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
+  const std::string& userConfig)
 {
   // Default config directory name
   std::string configSearch = "config";
@@ -110,7 +117,8 @@ F3DOptionsTools::OptionsEntries F3DConfigFileTools::ReadConfigFiles(const std::s
   }
   else
   {
-    configPaths.emplace_back(userConfig);
+    // Collapse full path into an absolute path
+    configPaths.emplace_back(f3d::utils::collapsePath(userConfig));
   }
 
   // Recover actual individual config file paths
@@ -132,7 +140,7 @@ F3DOptionsTools::OptionsEntries F3DConfigFileTools::ReadConfigFiles(const std::s
     if (fs::is_directory(configPath))
     {
       f3d::log::debug("Using config directory ", configPath.string());
-      for (auto& entry : std::filesystem::directory_iterator(configPath))
+      for (auto& entry : fs::directory_iterator(configPath))
       {
         actualConfigFilePaths.emplace(entry);
       }
@@ -144,14 +152,16 @@ F3DOptionsTools::OptionsEntries F3DConfigFileTools::ReadConfigFiles(const std::s
     }
   }
 
-  // If we used a configSearch but did not find any, warn the user
+  // If we used a configSearch but did not find any, inform the user
   if (!configSearch.empty() && actualConfigFilePaths.empty())
   {
-    f3d::log::warn("Configuration file for \"", configSearch, "\" could not be found");
+    f3d::log::info("Configuration file for \"", configSearch, "\" could not be found");
   }
 
   // Read config files
-  F3DOptionsTools::OptionsEntries confEntries;
+  F3DOptionsTools::OptionsEntries optionsEntries;
+  F3DOptionsTools::OptionsEntries imperativeOptionsEntries;
+  F3DConfigFileTools::BindingsEntries bindingsEntries;
   for (const auto& configFilePath : actualConfigFilePaths)
   {
     std::ifstream file(configFilePath);
@@ -169,7 +179,7 @@ F3DOptionsTools::OptionsEntries F3DConfigFileTools::ReadConfigFiles(const std::s
     {
       file >> json;
     }
-    catch (const std::exception& ex)
+    catch (const nlohmann::json::parse_error& ex)
     {
       f3d::log::error(
         "Unable to parse the configuration file ", configFilePath.string(), " , ignoring it");
@@ -177,32 +187,132 @@ F3DOptionsTools::OptionsEntries F3DConfigFileTools::ReadConfigFiles(const std::s
       continue;
     }
 
-    // For each config "pattern"
-    for (const auto& configBlock : json.items())
+    try
     {
-      // Add each config entry into an option dict
-      F3DOptionsTools::OptionsDict entry;
-      for (const auto& item : configBlock.value().items())
+      // For each config block in the main array
+      for (const auto& configBlock : json)
       {
-        if (item.value().is_number() || item.value().is_boolean())
+        // Recover match if any
+        std::string match;
+        try
         {
-          entry[item.key()] = nlohmann::to_string(item.value());
+          match = configBlock.at("match");
         }
-        else if (item.value().is_string())
+        catch (nlohmann::json::out_of_range&)
         {
-          entry[item.key()] = item.value().get<std::string>();
+          // No match defined, use a catch all regex
+          match = ".*";
         }
-        else
+
+        // Recover options if any
+        nlohmann::ordered_json optionsBlock;
+        try
         {
-          f3d::log::error(item.key(), " from ", configFilePath.string(),
-            " must be a string, a boolean or a number, ignoring entry");
-          continue;
+          optionsBlock = configBlock.at("options");
+        }
+        catch (nlohmann::json::out_of_range&)
+        {
+        }
+
+        if (!optionsBlock.empty())
+        {
+          // Add each options config entry into an option dict
+          F3DOptionsTools::OptionsDict entry;
+          F3DOptionsTools::OptionsDict imperativeEntry;
+          for (const auto& item : optionsBlock.items())
+          {
+            // Individual item can be imperative, store in the right dict
+            std::string key = item.key();
+            std::reference_wrapper<F3DOptionsTools::OptionsDict> localEntry = std::ref(entry);
+            if (!key.empty() && key[0] == '!')
+            {
+              localEntry = std::ref(imperativeEntry);
+              key = key.substr(1);
+            }
+
+            if (item.value().is_number() || item.value().is_boolean())
+            {
+              localEntry.get()[key] = nlohmann::to_string(item.value());
+            }
+            else if (item.value().is_string())
+            {
+              localEntry.get()[key] = item.value().get<std::string>();
+            }
+            else
+            {
+              f3d::log::error(key, " from ", configFilePath.string(),
+                " must be a string, a boolean or a number, ignoring entry");
+              continue;
+            }
+          }
+
+          // Emplace the option dicts for that pattern match into the config entries vector
+          if (!entry.empty())
+          {
+            optionsEntries.emplace_back(entry, configFilePath.string(), match);
+          }
+          if (!imperativeEntry.empty())
+          {
+            // The path is only used for logging purpose, store the imperative information inside
+            imperativeOptionsEntries.emplace_back(
+              imperativeEntry, configFilePath.string() + " (imperative)", match);
+          }
+        }
+
+        // Recover bindings if any
+        nlohmann::ordered_json bindingsBlock;
+        try
+        {
+          bindingsBlock = configBlock.at("bindings");
+        }
+        catch (nlohmann::json::out_of_range&)
+        {
+        }
+
+        if (!bindingsBlock.empty())
+        {
+          // Add each binding config entry
+          F3DConfigFileTools::BindingsVector bindingEntry;
+          for (const auto& item : bindingsBlock.items())
+          {
+            if (item.value().is_string())
+            {
+              bindingEntry.emplace_back(std::make_pair(
+                item.key(), std::vector<std::string>{ item.value().get<std::string>() }));
+            }
+            else if (item.value().is_array())
+            {
+              // Do not check before we look for simplicity sake
+              bindingEntry.emplace_back(
+                std::make_pair(item.key(), item.value().get<std::vector<std::string>>()));
+            }
+            else
+            {
+              f3d::log::error(item.key(), " from ", configFilePath.string(),
+                " must be a string or an array of string, ignoring binding entry");
+              continue;
+            }
+          }
+
+          // Emplace the config dict for that pattern match into the binding entries vector
+          bindingsEntries.emplace_back(bindingEntry, configFilePath.string(), match);
+        }
+
+        if (optionsBlock.empty() && bindingsBlock.empty())
+        {
+          // To help users figure out issues with configuration files
+          f3d::log::warn("A config block in config file: ", configFilePath.string(),
+            " does not contains options nor bindings, ignoring block");
         }
       }
-
-      // Emplace the option dict for that pattern into the config entries vector
-      confEntries.emplace_back(entry, configFilePath, configBlock.key());
+    }
+    catch (const nlohmann::json::type_error& ex)
+    {
+      f3d::log::warn("Error processing config file: ", configFilePath.string(),
+        ", configuration may be incorrect");
+      f3d::log::error(ex.what());
     }
   }
-  return confEntries;
+  return F3DConfigFileTools::ParsedConfigFiles{ std::move(optionsEntries),
+    std::move(imperativeOptionsEntries), std::move(bindingsEntries) };
 }

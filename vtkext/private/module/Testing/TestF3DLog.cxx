@@ -42,6 +42,5 @@ int TestF3DLog(int argc, char* argv[])
   F3DLog::Print(F3DLog::Severity::Warning, "Test Warning Coloring ");
   F3DLog::Print(F3DLog::Severity::Error, "Test Error Coloring\n");
 
-  F3DLog::WaitForUser(); // Without the object factory created, this is expected to have no effect
   return EXIT_SUCCESS;
 }

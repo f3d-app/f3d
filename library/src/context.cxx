@@ -7,10 +7,6 @@
 #include <vtkRenderingOpenGLConfigure.h>
 #include <vtkVersion.h>
 
-#if defined(VTK_USE_X) && VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
-#include <vtkglad/include/glad/glx.h>
-#endif
-
 #if defined(VTK_OPENGL_HAS_EGL) && VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
 #include <vtkglad/include/glad/egl.h>
 #endif
@@ -20,7 +16,7 @@
 namespace f3d
 {
 //----------------------------------------------------------------------------
-context::function context::getSymbol(const std::string& lib, const std::string& func)
+context::function context::getSymbol(std::string_view lib, std::string_view func)
 {
   std::string libName = vtksys::DynamicLoader::LibPrefix();
   libName += lib;
@@ -30,16 +26,17 @@ context::function context::getSymbol(const std::string& lib, const std::string& 
 
   if (!handle)
   {
-    throw context::loading_exception("Cannot find " + lib + " library");
+    throw context::loading_exception("Cannot find " + std::string(lib) + " library");
   }
 
   using symbol = context::fptr (*)(const char*);
 
-  symbol address = reinterpret_cast<symbol>(vtksys::DynamicLoader::GetSymbolAddress(handle, func));
+  symbol address =
+    reinterpret_cast<symbol>(vtksys::DynamicLoader::GetSymbolAddress(handle, func.data()));
 
   if (!address)
   {
-    throw context::symbol_exception("Cannot find " + func + " symbol");
+    throw context::symbol_exception("Cannot find " + std::string(func) + " symbol");
   }
 
   return address;
@@ -49,7 +46,6 @@ context::function context::getSymbol(const std::string& lib, const std::string& 
 context::function context::glx()
 {
 #if defined(VTK_USE_X) && VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
-  gladLoaderLoadGLX(nullptr, 0); // Load core glx functions.
   return getSymbol("GLX", "glXGetProcAddress");
 #else
   throw loading_exception("Cannot use a GLX context on this platform");
@@ -104,7 +100,7 @@ context::function context::egl()
 //----------------------------------------------------------------------------
 context::function context::osmesa()
 {
-#ifdef __linux__
+#if defined(__linux__) || defined(__FreeBSD__)
   return getSymbol("OSMesa", "OSMesaGetProcAddress");
 #elif _WIN32
   return getSymbol("osmesa", "OSMesaGetProcAddress");

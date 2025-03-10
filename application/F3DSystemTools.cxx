@@ -98,6 +98,7 @@ fs::path F3DSystemTools::GetUserConfigFileDirectory()
   }
   dirPath = fs::path(appData);
 #else
+#if defined(__unix__)
   // Implementing XDG specifications
   const char* xdgConfigHome = std::getenv("XDG_CONFIG_HOME");
   if (xdgConfigHome && strlen(xdgConfigHome) > 0)
@@ -105,6 +106,7 @@ fs::path F3DSystemTools::GetUserConfigFileDirectory()
     dirPath = fs::path(xdgConfigHome);
   }
   else
+#endif
   {
     const char* home = std::getenv("HOME");
     if (!home || strlen(home) == 0)
@@ -112,7 +114,11 @@ fs::path F3DSystemTools::GetUserConfigFileDirectory()
       return {};
     }
     dirPath = fs::path(home);
+#if defined(__APPLE__)
+    dirPath = dirPath / "Library" / "Application Support";
+#elif defined(__unix__)
     dirPath /= ".config";
+#endif
   }
 #endif
   dirPath /= applicationName;

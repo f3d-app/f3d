@@ -14,7 +14,7 @@
 namespace F3DOptionsTools
 {
 using OptionsDict = std::map<std::string, std::string>;
-using OptionsEntry = std::tuple<OptionsDict, std::filesystem::path, std::string>;
+using OptionsEntry = std::tuple<OptionsDict, std::string, std::string>;
 using OptionsEntries = std::vector<OptionsEntry>;
 
 /**
@@ -27,12 +27,14 @@ using OptionsEntries = std::vector<OptionsEntry>;
 static inline const OptionsDict DefaultAppOptions = {
   { "input", "" },
   { "output", "" },
+  { "list-bindings", "false" },
   { "no-background", "false" },
   { "config", "" },
-  { "dry-run", "false" },
+  { "no-config", "false" },
   { "no-render", "false" },
   { "rendering-backend", "auto" },
-  { "max-size", "-1.0" },
+  { "max-size", "" },
+  { "animation-time", "" },
   { "watch", "false" },
   { "load-plugins", "" },
   { "screenshot-filename", "{app}/{model}_{n}.png" },
@@ -49,35 +51,37 @@ static inline const OptionsDict DefaultAppOptions = {
   { "camera-zoom-factor", "0.0" },
   { "camera-azimuth-angle", "0.0" },
   { "camera-elevation-angle", "0.0" },
-  { "ref", "" },
-  { "ref-threshold", "0.05" },
+  { "reference", "" },
+  { "reference-threshold", "0.04" },
   { "interaction-test-record", "" },
   { "interaction-test-play", "" },
+  { "command-script", "" },
+  { "frame-rate", "30.0" },
 };
 
 /**
  * Mapping of CLI option name to their libf3d options name counterpart
  */
 static inline const std::map<std::string_view, std::string_view> LibOptionsNames = {
-  { "progress", "ui.loader_progress" },
+  { "loading-progress", "ui.loader_progress" },
   { "animation-progress", "ui.animation_progress" },
   { "up", "scene.up_direction" },
-  { "axis", "interactor.axis" },
+  { "axis", "ui.axis" },
   { "grid", "render.grid.enable" },
   { "grid-absolute", "render.grid.absolute" },
   { "grid-unit", "render.grid.unit" },
   { "grid-subdivisions", "render.grid.subdivisions" },
   { "grid-color", "render.grid.color" },
   { "edges", "render.show_edges" },
+  { "armature", "render.armature.enable" },
   { "camera-index", "scene.camera.index" },
-  { "trackball", "interactor.trackball" },
+  { "interaction-trackball", "interactor.trackball" },
   { "invert-zoom", "interactor.invert_zoom" },
   { "animation-autoplay", "scene.animation.autoplay" },
   { "animation-index", "scene.animation.index" },
   { "animation-speed-factor", "scene.animation.speed_factor" },
-  { "animation-time", "scene.animation.time" },
-  { "animation-frame-rate", "scene.animation.frame_rate" },
   { "font-file", "ui.font_file" },
+  { "font-scale", "ui.scale" },
   { "point-sprites", "model.point_sprites.enable" },
   { "point-sprites-type", "model.point_sprites.type" },
   { "point-sprites-size", "model.point_sprites.size" },
@@ -98,26 +102,26 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "emissive-factor", "model.emissive.factor" },
   { "texture-normal", "model.normal.texture" },
   { "normal-scale", "model.normal.scale" },
-  { "bg-color", "render.background.color" },
+  { "background-color", "render.background.color" },
   { "fps", "ui.fps" },
   { "filename", "ui.filename" },
   { "metadata", "ui.metadata" },
-  { "blur-background", "render.background.blur" },
-  { "blur-coc", "render.background.blur_coc" },
+  { "blur-background", "render.background.blur.enable" },
+  { "blur-coc", "render.background.blur.coc" },
   { "scalar-coloring", "model.scivis.enable" },
   { "coloring-array", "model.scivis.array_name" },
   { "light-intensity", "render.light.intensity" },
-  { "comp", "model.scivis.component" },
-  { "cells", "model.scivis.cells" },
-  { "range", "model.scivis.range" },
-  { "bar", "ui.scalar_bar" },
+  { "coloring-component", "model.scivis.component" },
+  { "coloring-by-cells", "model.scivis.cells" },
+  { "coloring-range", "model.scivis.range" },
+  { "coloring-scalar-bar", "ui.scalar_bar" },
   { "colormap", "model.scivis.colormap" },
   { "volume", "model.volume.enable" },
-  { "inverse", "model.volume.inverse" },
+  { "volume-inverse", "model.volume.inverse" },
   { "camera-orthographic", "scene.camera.orthographic" },
   { "raytracing", "render.raytracing.enable" },
-  { "samples", "render.raytracing.samples" },
-  { "denoise", "render.raytracing.denoise" },
+  { "raytracing-samples", "render.raytracing.samples" },
+  { "raytracing-denoise", "render.raytracing.denoise" },
   { "translucency-support", "render.effect.translucency_support" },
   { "ambient-occlusion", "render.effect.ambient_occlusion" },
   { "anti-aliasing", "render.effect.anti_aliasing" },
@@ -140,6 +144,12 @@ std::pair<std::string, int> GetClosestOption(const std::string& option, bool che
  */
 F3DOptionsTools::OptionsDict ParseCLIOptions(
   int argc, char** argv, std::vector<std::string>& positionals);
+
+/**
+ * Log provided key and help with nice formatting
+ */
+void PrintHelpPair(
+  std::string_view key, std::string_view help, int keyWidth = 10, int helpWidth = 70);
 };
 
 #endif

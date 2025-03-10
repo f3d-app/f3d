@@ -34,4 +34,5 @@ RenderEvent 301 313 1 0 0 Shift_L
 RenderEvent 301 313 1 0 0 Shift_L
 InteractionEvent 301 313 1 0 0 Shift_L
 MouseMoveEvent 283 313 1 0 0 Shift_L
+RightButtonReleaseEvent 283 313 1 0 0 Shift_L
 KeyReleaseEvent -2 309 1 0 1 Shift_L

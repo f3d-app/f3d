@@ -28,7 +28,7 @@ include(f3dOptions)
 f3d_generate_options(
   INPUT_JSON "${CMAKE_CURRENT_SOURCE_DIR}/options.json"
   INPUT_PUBLIC_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/public/options.h.in"
-  INPUT_PRIVATE_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/private/options_tools.h.in"
+  INPUT_PRIVATE_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/private/options_generated.h.in"
   DESTINATION "${CMAKE_CURRENT_BINARY_DIR}"
   OUTPUT_NAME "options"
   )
@@ -167,9 +167,29 @@ target_link_libraries(libf3d PRIVATE ${F3D_VTK_MODULES} ${F3D_STATIC_PLUGIN_TARG
 target_compile_options(libf3d PUBLIC ${f3d_compile_options_public} PRIVATE ${f3d_compile_options_private})
 target_link_options(libf3d PUBLIC ${f3d_link_options_public})
 
+if(F3D_LINUX_LINK_FILESYSTEM)
+  target_link_libraries(libf3d PRIVATE stdc++fs)
+endif()
+
+# exr
+if (F3D_MODULE_EXR)
+  target_compile_definitions(libf3d PRIVATE F3D_MODULE_EXR)
+endif ()
+
+# ui
+if (F3D_MODULE_UI)
+  target_compile_definitions(libf3d PRIVATE F3D_MODULE_UI)
+endif ()
+
+# raytracing
+if (F3D_MODULE_RAYTRACING)
+  target_compile_definitions(libf3d PRIVATE F3D_MODULE_RAYTRACING)
+endif ()
+
 if(F3D_STRICT_BUILD AND MSVC)
   # There are warnings in VTK related to deprecated features in C++17
-  target_compile_definitions(libf3d PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
+  # Using std::getenv is also considered unsecured on Windows
+  target_compile_definitions(libf3d PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS _CRT_SECURE_NO_WARNINGS)
 endif()
 
 if(APPLE)

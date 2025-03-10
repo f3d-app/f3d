@@ -23,6 +23,7 @@
 #include <memory>
 #include <vector>
 
+class vtkInformationIntegerKey;
 class vtkProp;
 
 class vtkF3DRenderPass : public vtkRenderPass
@@ -34,6 +35,7 @@ public:
 
   void Render(const vtkRenderState* s) override;
 
+  vtkSetMacro(ArmatureVisible, bool);
   vtkSetMacro(UseRaytracing, bool);
   vtkSetMacro(UseSSAOPass, bool);
   vtkSetMacro(UseDepthPeelingPass, bool);
@@ -45,6 +47,8 @@ public:
   vtkF3DRenderPass(const vtkF3DRenderPass&) = delete;
   void operator=(const vtkF3DRenderPass&) = delete;
 
+  static vtkInformationIntegerKey* RENDER_UI_ONLY();
+
 protected:
   vtkF3DRenderPass() = default;
   ~vtkF3DRenderPass() override = default;
@@ -55,6 +59,7 @@ protected:
 
   void Blend(const vtkRenderState* s);
 
+  bool ArmatureVisible = false;
   bool UseRaytracing = false;
   bool UseSSAOPass = false;
   bool UseDepthPeelingPass = false;
@@ -64,16 +69,16 @@ protected:
   double CircleOfConfusionRadius = 20.0;
 
   vtkSmartPointer<vtkFramebufferPass> BackgroundPass;
-  vtkSmartPointer<vtkFramebufferPass> OverlayPass;
   vtkSmartPointer<vtkFramebufferPass> MainPass;
+  vtkSmartPointer<vtkFramebufferPass> MainOnTopPass;
 
   double Bounds[6] = {};
 
   vtkMTimeType InitializeTime = 0;
 
   std::vector<vtkProp*> BackgroundProps;
-  std::vector<vtkProp*> OverlayProps;
   std::vector<vtkProp*> MainProps;
+  std::vector<vtkProp*> MainOnTopProps;
 
   std::shared_ptr<vtkOpenGLQuadHelper> BlendQuadHelper;
 };

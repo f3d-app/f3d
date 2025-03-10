@@ -27,6 +27,7 @@ On completion, a folder `webassembly/dist` is created containing the artifacts.
 # Testing it locally
 
 Five different files should be located in `webassembly/dist` folder:
+
 - `f3d.js`: javascript library
 - `f3d.wasm`: webassembly binaries
 - `f3d.data`: virtual filesystem containing the file specified in `F3D_WASM_DATA_FILE`

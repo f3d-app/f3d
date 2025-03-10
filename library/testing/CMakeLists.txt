@@ -3,35 +3,56 @@ list(APPEND libf3dSDKTests_list
      TestSDKCamera.cxx
      TestSDKCompareWithFile.cxx
      TestSDKDropZone.cxx
-     TestSDKDynamicBackgroundColor.cxx
-     TestSDKDynamicFontFile.cxx
      TestSDKDynamicLightIntensity.cxx
-     TestSDKDynamicProperties.cxx
      TestSDKEngine.cxx
      TestSDKEngineExceptions.cxx
      TestSDKImage.cxx
-     TestSDKInteractorCallBack.cxx
      TestSDKInteractorDropFullScene.cxx
      TestSDKInteractorCommand.cxx
      TestSDKSceneFromMemory.cxx
      TestSDKScene.cxx
      TestSDKLog.cxx
      TestSDKMultiColoring.cxx
-     TestSDKMultiOptions.cxx
      TestSDKOptions.cxx
      TestSDKOptionsIO.cxx
-     TestSDKRenderAndInteract.cxx
      TestSDKRenderFinalShader.cxx
      TestSDKUtils.cxx
      TestSDKWindowAuto.cxx
      TestPseudoUnitTest.cxx
 )
 
-# HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
+# Tests having UI widgets
+if(F3D_MODULE_UI)
   list(APPEND libf3dSDKTests_list
-    TestSDKDynamicHDRI.cxx
+    TestSDKConsole.cxx
+    TestSDKDynamicBackgroundColor.cxx
+    TestSDKDynamicFontFile.cxx
+    TestSDKDynamicProperties.cxx
+    TestSDKInteractorCallBack.cxx
+    TestSDKInteractorDocumentation.cxx
+    TestSDKMultiOptions.cxx
     )
+
+  # HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
+    list(APPEND libf3dSDKTests_list
+      TestSDKDynamicHDRI.cxx
+      )
+  endif()
+endif()
+
+# These tests needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10155
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20230426)
+  list(APPEND libf3dSDKTests_list
+    TestSDKRenderAndInteract.cxx
+    TestSDKStartInteractor.cxx
+    )
+endif()
+
+if (VTK_VERSION VERSION_GREATER 9.2.6)
+    list(APPEND libf3dSDKTests_list
+        TestSDKEngineRecreation.cxx
+        )
 endif()
 
 # Invalid scene codepath needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11287
@@ -51,8 +72,6 @@ configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestSDKInteractorDropFullSc
 # External window tests
 option(F3D_TESTING_ENABLE_EXTERNAL_GLFW "Test external GLFW" OFF)
 option(F3D_TESTING_ENABLE_EXTERNAL_QT "Test external QT" OFF)
-option(F3D_TESTING_ENABLE_EXTERNAL_OSMESA "Test external OSMesa" OFF)
-option(F3D_TESTING_ENABLE_EXTERNAL_EGL "Test external GLX" OFF)
 
 set(libf3dSDKTests_link_libs "")
 
@@ -66,7 +85,7 @@ if(F3D_TESTING_ENABLE_EXTERNAL_QT)
   list(APPEND libf3dSDKTests_list TestSDKExternalWindowQT.cxx)
   list(APPEND libf3dSDKTests_link_libs Qt5::OpenGL)
 endif()
-if(F3D_TESTING_ENABLE_EXTERNAL_OSMESA AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240914)
+if(F3D_TESTING_ENABLE_OSMESA_TESTS AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240914)
   find_library(OSMesa_LIB OSMesa REQUIRED)
   list(APPEND libf3dSDKTests_list TestSDKExternalWindowOSMesa.cxx)
   list(APPEND libf3dSDKTests_link_libs "${OSMesa_LIB}")
@@ -77,7 +96,7 @@ if(F3D_TESTING_ENABLE_GLX_TESTS AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.202409
   list(APPEND libf3dSDKTests_list TestSDKExternalWindowGLX.cxx)
   list(APPEND libf3dSDKTests_link_libs OpenGL::GLX "${X11_LIB}")
 endif()
-if(F3D_TESTING_ENABLE_EXTERNAL_EGL AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240914)
+if(F3D_TESTING_ENABLE_EGL_TESTS AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240914)
   find_package(OpenGL COMPONENTS EGL REQUIRED)
   list(APPEND libf3dSDKTests_list TestSDKExternalWindowEGL.cxx)
   list(APPEND libf3dSDKTests_link_libs OpenGL::EGL)
@@ -115,12 +134,16 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240729)
   target_compile_definitions(libf3dSDKTests PRIVATE F3D_SSIM_COMPARE)
 endif()
 
+if (F3D_MODULE_EXR)
+  target_compile_definitions(libf3dSDKTests PRIVATE F3D_MODULE_EXR)
+endif ()
+
 # List tests that do not require rendering
 list(APPEND libf3dSDKTestsNoRender_list
      TestSDKEngineExceptions
+     TestSDKLog
      TestSDKOptions
      TestSDKOptionsIO
-     TestSDKLog
      TestSDKScene)
 
 # Add all the ADD_TEST for each test
@@ -143,14 +166,14 @@ Test Warning\nTest Error\nTest Error\n\
 Test Print Debug\nTest Print Info\nTest Print Warning\nTest Print Error\n\
 Test Debug Coloring")
 
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
-  set_tests_properties(libf3d::TestSDKDynamicHDRI PROPERTIES TIMEOUT 90)
+if(F3D_MODULE_UI AND VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
+  set_tests_properties(libf3d::TestSDKDynamicHDRI PROPERTIES TIMEOUT 120)
   if(NOT F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS)
     set_tests_properties(libf3d::TestSDKDynamicHDRI PROPERTIES DISABLED ON)
   endif()
 endif()
 
-if(NOT F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS)
+if(F3D_MODULE_UI AND NOT F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS)
   set_tests_properties(libf3d::TestSDKInteractorCallBack PROPERTIES DISABLED ON)
 endif()
 

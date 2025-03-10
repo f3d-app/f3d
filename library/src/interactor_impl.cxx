@@ -6,10 +6,17 @@
 #include "utils.h"
 #include "window_impl.h"
 
-#include "vtkF3DConfigure.h"
+#include "vtkF3DConsoleOutputWindow.h"
+
+#if F3D_MODULE_UI
+#include "vtkF3DImguiConsole.h"
+#endif
+
 #include "vtkF3DInteractorEventRecorder.h"
 #include "vtkF3DInteractorStyle.h"
 #include "vtkF3DRenderer.h"
+#include "vtkF3DUIActor.h"
+#include "vtkF3DUIObserver.h"
 
 #include <vtkCallbackCommand.h>
 #include <vtkCellPicker.h>
@@ -30,43 +37,25 @@
 #include <chrono>
 #include <cmath>
 #include <map>
+#include <numeric>
+#include <regex>
 #include <vector>
 
 #include "camera.h"
 
+namespace fs = std::filesystem;
+
 namespace f3d::detail
 {
+using mod_t = interaction_bind_t::ModifierKeys;
+
 class interactor_impl::internals
 {
 public:
-  struct Bind
+  struct BindingCommands
   {
-    std::string Interaction;
-    ModifierKeys Modifiers = f3d::interactor::ModifierKeys::ANY;
-
-    bool operator<(const Bind& bind) const
-    {
-      return this->Interaction < bind.Interaction ||
-        (this->Interaction == bind.Interaction && this->Modifiers < bind.Modifiers);
-    }
-
-    std::string Format() const
-    {
-      switch (this->Modifiers)
-      {
-        case f3d::interactor::ModifierKeys::CTRL_SHIFT:
-          return "CTRL+SHIFT+" + this->Interaction;
-        case f3d::interactor::ModifierKeys::CTRL:
-          return "CTRL+" + this->Interaction;
-        case f3d::interactor::ModifierKeys::SHIFT:
-          return "SHIFT+" + this->Interaction;
-        case f3d::interactor::ModifierKeys::ANY:
-          return "ANY+" + this->Interaction;
-        default:
-          // No need to check for NONE (no log needed)
-          return this->Interaction;
-      }
-    }
+    std::vector<std::string> CommandVector;
+    documentation_callback_t DocumentationCallback;
   };
 
   internals(options& options, window_impl& window, scene_impl& scene, interactor_impl& inter)
@@ -92,6 +81,23 @@ public:
     this->VTKInteractor->SetRenderWindow(this->Window.GetRenderWindow());
     this->VTKInteractor->SetInteractorStyle(this->Style);
     this->VTKInteractor->Initialize();
+
+    // Some implementation (e.g. macOS) in VTK set the window name during initialization
+    // so we need to set the name right after initialization
+    this->Window.setWindowName("f3d");
+
+    this->UIObserver->InstallObservers(this->VTKInteractor);
+
+    // observe console event to trigger commands
+    vtkNew<vtkCallbackCommand> commandCallback;
+    commandCallback->SetClientData(this);
+    commandCallback->SetCallback(OnConsoleEvent);
+    vtkOutputWindow::GetInstance()->AddObserver(
+      vtkF3DConsoleOutputWindow::TriggerEvent, commandCallback);
+    vtkOutputWindow::GetInstance()->AddObserver(
+      vtkF3DConsoleOutputWindow::ShowEvent, commandCallback);
+    vtkOutputWindow::GetInstance()->AddObserver(
+      vtkF3DConsoleOutputWindow::HideEvent, commandCallback);
 
     // Disable standard interactor behavior with timer event
     // in order to be able to interact while animating
@@ -214,6 +220,24 @@ public:
   }
 
   //----------------------------------------------------------------------------
+  // Increase/Decrease opacity
+  void IncreaseOpacity(bool negative)
+  {
+    // current opacity, interpreted as 1 if it does not exist
+    const double currentOpacity = this->Options.model.color.opacity.value_or(1.0);
+
+    // new opacity, clamped between 0 and 1 if not already set outside that range
+    const double increment = negative ? -0.05 : 0.05;
+    double newOpacity = currentOpacity + increment;
+    if (currentOpacity <= 1.0 && 0.0 <= currentOpacity)
+    {
+      newOpacity = std::min(1.0, std::max(0.0, newOpacity));
+    }
+
+    this->Options.model.color.opacity = newOpacity;
+  }
+
+  //----------------------------------------------------------------------------
   // Synchronise options from the renderer properties
   static void SynchronizeScivisOptions(f3d::options& opt, vtkF3DRenderer* ren)
   {
@@ -222,6 +246,25 @@ public:
     opt.model.scivis.cells = ren->GetUseCellColoring();
     opt.model.scivis.array_name = ren->GetArrayNameForColoring();
     opt.model.scivis.component = ren->GetComponentForColoring();
+  }
+
+  //----------------------------------------------------------------------------
+  static void OnConsoleEvent(vtkObject*, unsigned long event, void* clientData, void* data)
+  {
+    internals* self = static_cast<internals*>(clientData);
+
+    if (event == vtkF3DConsoleOutputWindow::TriggerEvent)
+    {
+      const char* commandWithArgs = static_cast<const char*>(data);
+      self->Interactor.SetCommandBuffer(commandWithArgs);
+    }
+    else if (event == vtkF3DConsoleOutputWindow::ShowEvent ||
+      event == vtkF3DConsoleOutputWindow::HideEvent)
+    {
+      self->Options.ui.console = (event == vtkF3DConsoleOutputWindow::ShowEvent);
+    }
+
+    self->RenderRequested = true;
   }
 
   //----------------------------------------------------------------------------
@@ -244,10 +287,19 @@ public:
   {
     internals* self = static_cast<internals*>(clientData);
     vtkStringArray* filesArr = static_cast<vtkStringArray*>(callData);
+    const std::regex charsToEscape(R"((["\\]))");
     std::string filesString;
     for (int i = 0; i < filesArr->GetNumberOfTuples(); i++)
     {
-      filesString.append(" \"" + filesArr->GetValue(i) + "\" ");
+      const vtkStdString& filename = filesArr->GetValue(i);
+      const std::string escapedFilename = std::regex_replace(filename, charsToEscape, "\\$1");
+      if (i > 0)
+      {
+        filesString.push_back(' ');
+      }
+      filesString.push_back('"');
+      filesString.append(escapedFilename);
+      filesString.push_back('"');
     }
 
     self->TriggerBinding("Drop", filesString);
@@ -304,33 +356,32 @@ public:
         const camera_state_t state = self->Window.getCamera().getState();
 
         double focV[3];
-        vtkMath::Subtract(picked, state.foc.data(), focV); /* foc -> picked */
+        vtkMath::Subtract(picked, state.focalPoint.data(), focV); /* foc -> picked */
 
         double posV[3];
-        vtkMath::Subtract(picked, state.foc.data(), posV); /* pos -> pos1, parallel to focV */
+        vtkMath::Subtract(
+          picked, state.focalPoint.data(), posV); /* pos -> pos1, parallel to focV */
         if (!self->Style->GetInteractor()->GetShiftKey())
         {
           double v[3];
-          vtkMath::Subtract(state.foc.data(), state.pos.data(), v); /* pos -> foc */
-          vtkMath::ProjectVector(focV, v, v);                       /* pos2 -> pos1 */
+          vtkMath::Subtract(state.focalPoint.data(), state.position.data(), v); /* pos -> foc */
+          vtkMath::ProjectVector(focV, v, v);                                   /* pos2 -> pos1 */
           vtkMath::Subtract(posV, v, posV); /* pos -> pos2, keeps on camera plane */
         }
 
         const auto interpolateCameraState = [&state, &focV, &posV](double ratio) -> camera_state_t
         {
-          return { //
+          return { {
+                     state.position[0] + posV[0] * ratio,
+                     state.position[1] + posV[1] * ratio,
+                     state.position[2] + posV[2] * ratio,
+                   },
             {
-              state.pos[0] + posV[0] * ratio,
-              state.pos[1] + posV[1] * ratio,
-              state.pos[2] + posV[2] * ratio,
+              state.focalPoint[0] + focV[0] * ratio,
+              state.focalPoint[1] + focV[1] * ratio,
+              state.focalPoint[2] + focV[2] * ratio,
             },
-            {
-              state.foc[0] + focV[0] * ratio,
-              state.foc[1] + focV[1] * ratio,
-              state.foc[2] + focV[2] * ratio,
-            },
-            state.up, state.angle
-          };
+            state.viewUp, state.viewAngle };
         };
 
         self->AnimateCameraTransition(interpolateCameraState);
@@ -340,20 +391,6 @@ public:
     self->Style->OnMiddleButtonUp();
   }
 
-  //----------------------------------------------------------------------------
-  void StartInteractor()
-  {
-    this->VTKInteractor->Start();
-  }
-
-  //----------------------------------------------------------------------------
-  void StopInteractor()
-  {
-    this->VTKInteractor->RemoveObservers(vtkCommand::TimerEvent);
-    this->VTKInteractor->ExitCallback();
-  }
-
-  //----------------------------------------------------------------------------
   /**
    * Run a camera transition animation based on a camera state interpolation function.
    * The provided function will be called with an interpolation parameter
@@ -392,48 +429,54 @@ public:
   //----------------------------------------------------------------------------
   void TriggerBinding(const std::string& interaction, const std::string& argsString)
   {
-    ModifierKeys mod = ModifierKeys::NONE;
+    mod_t mod = mod_t::NONE;
     vtkRenderWindowInteractor* rwi = this->Style->GetInteractor();
     const bool shift = rwi->GetShiftKey() == 1;
     const bool ctrl = rwi->GetControlKey() == 1;
     if (shift && ctrl)
     {
-      mod = ModifierKeys::CTRL_SHIFT;
+      mod = mod_t::CTRL_SHIFT;
     }
     else if (ctrl)
     {
-      mod = ModifierKeys::CTRL;
+      mod = mod_t::CTRL;
     }
     else if (shift)
     {
-      mod = ModifierKeys::SHIFT;
+      mod = mod_t::SHIFT;
     }
 
     // Check for an interaction command with modifiers
-    const Bind bind = { interaction, mod };
-    log::debug("Interaction: KeyPress ", bind.Format());
+    const interaction_bind_t bind = { mod, interaction };
+    log::debug("Interaction: KeyPress ", bind.format());
 
     auto commandsIt = this->Bindings.find(bind);
     if (commandsIt == this->Bindings.end())
     {
       // Modifiers version not found, try ANY instead
-      commandsIt = this->Bindings.find({ interaction, ModifierKeys::ANY });
+      commandsIt = this->Bindings.find({ mod_t::ANY, interaction });
     }
 
     if (commandsIt != this->Bindings.end())
     {
-      for (const std::string& command : commandsIt->second)
+      for (const std::string& command : commandsIt->second.CommandVector)
       {
+        std::string commandWithArgs = command;
+        if (!argsString.empty())
+        {
+          commandWithArgs.push_back(' ');
+          commandWithArgs.append(argsString);
+        };
         try
         {
           // XXX: Ignore the boolean return of triggerCommand,
           //  error is already logged by triggerCommand
-          this->Interactor.triggerCommand(command + argsString);
+          this->Interactor.triggerCommand(commandWithArgs);
         }
         catch (const f3d::interactor::command_runtime_exception& ex)
         {
-          log::error("Interaction: error running command:\"", command + argsString, "\":");
-          log::error(ex.what());
+          log::error(
+            "Interaction: error running command: \"" + commandWithArgs + "\": " + ex.what());
         }
       }
     }
@@ -443,7 +486,75 @@ public:
   }
 
   //----------------------------------------------------------------------------
+  void StartEventLoop(double deltaTime, std::function<void()> userCallBack)
+  {
+    // Trigger a render to ensure Window is ready to be configured
+    this->Window.render();
 
+    // Copy user callback
+    this->EventLoopUserCallBack = std::move(userCallBack);
+
+    // Configure UI delta time
+    vtkRenderWindow* renWin = this->Window.GetRenderWindow();
+    vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+    ren->SetUIDeltaTime(deltaTime);
+
+    // Configure animation delta time
+    this->AnimationManager->SetDeltaTime(deltaTime);
+
+    // Create the timer
+    this->EventLoopTimerId = this->VTKInteractor->CreateRepeatingTimer(deltaTime * 1000);
+
+    // Create the callback and add an observer
+    vtkNew<vtkCallbackCommand> timerCallBack;
+    timerCallBack->SetCallback(
+      [](vtkObject*, unsigned long, void* clientData, void*)
+      {
+        internals* that = static_cast<internals*>(clientData);
+        that->EventLoop();
+      });
+    this->EventLoopObserverId =
+      this->VTKInteractor->AddObserver(vtkCommand::TimerEvent, timerCallBack);
+    timerCallBack->SetClientData(this);
+  }
+
+  //----------------------------------------------------------------------------
+  void StopEventLoop()
+  {
+    this->VTKInteractor->RemoveObserver(this->EventLoopObserverId);
+    this->VTKInteractor->DestroyTimer(this->EventLoopTimerId);
+    this->EventLoopObserverId = -1;
+    this->EventLoopTimerId = 0;
+  }
+
+  //----------------------------------------------------------------------------
+  void EventLoop()
+  {
+    if (this->EventLoopUserCallBack)
+    {
+      this->EventLoopUserCallBack();
+    }
+
+    if (this->CommandBuffer.has_value())
+    {
+      this->Interactor.triggerCommand(this->CommandBuffer.value());
+      this->CommandBuffer.reset();
+    }
+
+    this->AnimationManager->Tick();
+
+    if (this->RenderRequested)
+    {
+      this->Window.render();
+      this->RenderRequested = false;
+    }
+    else
+    {
+      this->Window.RenderUIOnly();
+    }
+  }
+
+  //----------------------------------------------------------------------------
   options& Options;
   window_impl& Window;
   scene_impl& Scene;
@@ -453,11 +564,17 @@ public:
   vtkSmartPointer<vtkRenderWindowInteractor> VTKInteractor;
   vtkNew<vtkF3DInteractorStyle> Style;
   vtkSmartPointer<vtkF3DInteractorEventRecorder> Recorder;
+  vtkNew<vtkF3DUIObserver> UIObserver;
   std::map<unsigned long, std::pair<int, std::function<void()>>> TimerCallBacks;
 
   std::map<std::string, std::function<void(const std::vector<std::string>&)>> Commands;
+  std::optional<std::string> CommandBuffer;
 
-  std::map<Bind, std::vector<std::string>> Bindings;
+  std::map<interaction_bind_t, BindingCommands> Bindings;
+  std::multimap<std::string, interaction_bind_t> GroupedBinds;
+  std::vector<std::string> OrderedBindGroups;
+
+  std::map<std::string, std::string> AliasMap;
 
   vtkNew<vtkCellPicker> CellPicker;
   vtkNew<vtkPointPicker> PointPicker;
@@ -466,6 +583,11 @@ public:
 
   int DragDistanceTol = 3;      /* px */
   int TransitionDuration = 100; /* ms */
+
+  std::function<void()> EventLoopUserCallBack = nullptr;
+  unsigned long EventLoopTimerId = 0;
+  int EventLoopObserverId = -1;
+  std::atomic<bool> RenderRequested = false;
 };
 
 //----------------------------------------------------------------------------
@@ -474,6 +596,7 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
 {
   // scene need the interactor, scene will set the AnimationManager on the interactor
   this->Internals->Scene.SetInteractor(this);
+  this->Internals->Window.SetInteractor(this);
   assert(this->Internals->AnimationManager);
 
   this->initCommands();
@@ -481,7 +604,12 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
 }
 
 //----------------------------------------------------------------------------
-interactor_impl::~interactor_impl() = default;
+interactor_impl::~interactor_impl()
+{
+  vtkOutputWindow::GetInstance()->RemoveObservers(vtkF3DConsoleOutputWindow::TriggerEvent);
+  vtkOutputWindow::GetInstance()->RemoveObservers(vtkF3DConsoleOutputWindow::ShowEvent);
+  vtkOutputWindow::GetInstance()->RemoveObservers(vtkF3DConsoleOutputWindow::HideEvent);
+}
 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::initCommands()
@@ -519,6 +647,17 @@ interactor& interactor_impl::initCommands()
       check_args(args, 1, "reset");
       this->Internals->Options.reset(args[0]);
     });
+  this->addCommand("clear",
+    [&](const std::vector<std::string>& args)
+    {
+      check_args(args, 0, "clear");
+#if F3D_MODULE_UI
+      vtkF3DImguiConsole* console =
+        vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
+      assert(console != nullptr);
+      console->Clear();
+#endif
+    });
   this->addCommand("print",
     [&](const std::vector<std::string>& args)
     {
@@ -529,13 +668,9 @@ interactor& interactor_impl::initCommands()
   this->addCommand("cycle_animation",
     [&](const std::vector<std::string>&)
     {
-      vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
-      vtkF3DRenderer* ren =
-        vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
       this->Internals->AnimationManager->CycleAnimation();
       this->Internals->Options.scene.animation.index =
         this->Internals->AnimationManager->GetAnimationIndex();
-      ren->SetAnimationnameInfo(this->Internals->AnimationManager->GetAnimationName());
     });
 
   this->addCommand("cycle_coloring",
@@ -573,6 +708,8 @@ interactor& interactor_impl::initCommands()
     {
       check_args(args, 1, "roll_camera");
       this->Internals->Window.getCamera().roll(options::parse<int>(args[0]));
+      this->Internals->Style->SetTemporaryUp(
+        this->Internals->Window.getCamera().getViewUp().data());
     });
 
   this->addCommand("increase_light_intensity",
@@ -581,33 +718,57 @@ interactor& interactor_impl::initCommands()
   this->addCommand("decrease_light_intensity",
     [&](const std::vector<std::string>&) { this->Internals->IncreaseLightIntensity(true); });
 
-  this->addCommand("print_scene_info",
+  this->addCommand("increase_opacity",
+    [&](const std::vector<std::string>&) { this->Internals->IncreaseOpacity(false); });
+
+  this->addCommand("decrease_opacity",
+    [&](const std::vector<std::string>&) { this->Internals->IncreaseOpacity(true); });
+
+  this->addCommand("print_scene_info", [&](const std::vector<std::string>&)
+    { this->Internals->Window.PrintSceneDescription(log::VerboseLevel::INFO); });
+
+  this->addCommand("print_coloring_info", [&](const std::vector<std::string>&)
+    { this->Internals->Window.PrintColoringDescription(log::VerboseLevel::INFO); });
+
+  this->addCommand("print_mesh_info", [&](const std::vector<std::string>&)
+    { this->Internals->Scene.PrintImporterDescription(log::VerboseLevel::INFO); });
+
+  this->addCommand("print_options_info",
     [&](const std::vector<std::string>&)
     {
-      this->Internals->Window.PrintColoringDescription(log::VerboseLevel::INFO);
-      this->Internals->Window.PrintSceneDescription(log::VerboseLevel::INFO);
+      for (const std::string& option : this->Internals->Options.getNames())
+      {
+        const std::string val{ this->Internals->Options.getAsString(option) };
+        std::string descr{};
+        descr.append(option).append(": ").append(val);
+        log::print(log::VerboseLevel::INFO, descr);
+      }
     });
 
   this->addCommand("set_camera",
     [&](const std::vector<std::string>& args)
     {
-      check_args(args, 1, "cycle_coloring");
+      check_args(args, 1, "set_camera");
       std::string_view type = args[0];
       if (type == "front")
       {
         this->Internals->SetViewOrbit(internals::ViewType::VT_FRONT);
+        this->Internals->Style->ResetTemporaryUp();
       }
       else if (type == "top")
       {
         this->Internals->SetViewOrbit(internals::ViewType::VT_TOP);
+        this->Internals->Style->ResetTemporaryUp();
       }
       else if (type == "right")
       {
         this->Internals->SetViewOrbit(internals::ViewType::VT_RIGHT);
+        this->Internals->Style->ResetTemporaryUp();
       }
       else if (type == "isometric")
       {
         this->Internals->SetViewOrbit(internals::ViewType::VT_ISOMETRIC);
+        this->Internals->Style->ResetTemporaryUp();
       }
       else
       {
@@ -624,18 +785,14 @@ interactor& interactor_impl::initCommands()
       this->Internals->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
     });
 
-  this->addCommand("toggle_fps",
-    [&](const std::vector<std::string>&)
-    {
-      this->Internals->Options.ui.fps = !this->Internals->Options.ui.fps;
-      this->Internals->Window.render();
-    });
-
-  this->addCommand(
-    "stop_interactor", [&](const std::vector<std::string>&) { this->Internals->StopInteractor(); });
+  this->addCommand("stop_interactor", [&](const std::vector<std::string>&) { this->stop(); });
 
   this->addCommand("reset_camera",
-    [&](const std::vector<std::string>&) { this->Internals->Window.getCamera().resetToDefault(); });
+    [&](const std::vector<std::string>&)
+    {
+      this->Internals->Window.getCamera().resetToDefault();
+      this->Internals->Style->ResetTemporaryUp();
+    });
 
   this->addCommand("toggle_animation",
     [&](const std::vector<std::string>&) { this->Internals->AnimationManager->ToggleAnimation(); });
@@ -646,18 +803,40 @@ interactor& interactor_impl::initCommands()
       this->Internals->AnimationManager->StopAnimation();
       this->Internals->Scene.add(files);
     });
+
+  this->addCommand("alias",
+    [&](const std::vector<std::string>& args)
+    {
+      if (args.size() < 2)
+      {
+        throw interactor_impl::invalid_args_exception(
+          "alias command requires at least 2 arguments");
+      }
+
+      // Validate the alias arguments
+      const std::string& aliasName = args[0];
+      // Combine all remaining arguments into the alias command
+      // Add alias command to the map
+      this->Internals->AliasMap[aliasName] = std::accumulate(args.begin() + 2, args.end(),
+        args[1], // Start with first command argument
+        [](const std::string& a, const std::string& b) { return a + " " + b; });
+
+      log::info(
+        "Alias " + aliasName + " added with command " + this->Internals->AliasMap[aliasName]);
+    });
   return *this;
 }
 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::addCommand(
-  const std::string& action, std::function<void(const std::vector<std::string>&)> callback)
+  std::string action, std::function<void(const std::vector<std::string>&)> callback)
 {
-  const auto [it, success] = this->Internals->Commands.insert({ action, callback });
+  const auto [it, success] =
+    this->Internals->Commands.insert({ std::move(action), std::move(callback) });
   if (!success)
   {
     throw interactor::already_exists_exception(
-      "Could not add a command callback for action: " + action + " as it already exists.");
+      "Could not add a command callback for action: " + it->first + " as it already exists.");
   }
   return *this;
 }
@@ -684,6 +863,14 @@ std::vector<std::string> interactor_impl::getCommandActions() const
 bool interactor_impl::triggerCommand(std::string_view command)
 {
   log::debug("Command: ", command);
+
+  // Resolve Alias Before Tokenizing
+  auto aliasIt = this->Internals->AliasMap.find(std::string(command));
+  if (aliasIt != this->Internals->AliasMap.end())
+  {
+    command = aliasIt->second;
+  }
+
   std::vector<std::string> tokens;
   try
   {
@@ -693,6 +880,11 @@ bool interactor_impl::triggerCommand(std::string_view command)
   {
     log::error("Command: unable to tokenize command:\"", command, "\", ignoring");
     return false;
+  }
+
+  if (tokens.empty())
+  {
+    return true;
   }
 
   const std::string& action = tokens[0];
@@ -745,140 +937,281 @@ bool interactor_impl::triggerCommand(std::string_view command)
 interactor& interactor_impl::initBindings()
 {
   this->Internals->Bindings.clear();
+  this->Internals->GroupedBinds.clear();
+  this->Internals->OrderedBindGroups.clear();
+  f3d::options& opts = this->Internals->Options;
 
-  // Available standard keys: None
-  this->addBinding("W", ModifierKeys::NONE, "cycle_animation");
-  this->addBinding("C", ModifierKeys::NONE, "cycle_coloring field");
-  this->addBinding("S", ModifierKeys::NONE, "cycle_coloring array");
-  this->addBinding("Y", ModifierKeys::NONE, "cycle_coloring component");
-  this->addBinding("B", ModifierKeys::NONE, "toggle ui.scalar_bar");
-  this->addBinding("P", ModifierKeys::NONE, "toggle render.effect.translucency_support");
-  this->addBinding("Q", ModifierKeys::NONE, "toggle render.effect.ambient_occlusion");
-  this->addBinding("A", ModifierKeys::NONE, "toggle render.effect.anti_aliasing");
-  this->addBinding("T", ModifierKeys::NONE, "toggle render.effect.tone_mapping");
-  this->addBinding("E", ModifierKeys::NONE, "toggle render.show_edges");
-  this->addBinding("X", ModifierKeys::NONE, "toggle interactor.axis");
-  this->addBinding("G", ModifierKeys::NONE, "toggle render.grid.enable");
-  this->addBinding("N", ModifierKeys::NONE, "toggle ui.filename");
-  this->addBinding("M", ModifierKeys::NONE, "toggle ui.metadata");
-  this->addBinding("Z", ModifierKeys::NONE, "toggle_fps");
-  this->addBinding("R", ModifierKeys::NONE, "toggle render.raytracing.enable");
-  this->addBinding("D", ModifierKeys::NONE, "toggle render.raytracing.denoise");
-  this->addBinding("V", ModifierKeys::NONE, "toggle_volume_rendering");
-  this->addBinding("I", ModifierKeys::NONE, "toggle model.volume.inverse");
-  this->addBinding("O", ModifierKeys::NONE, "toggle model.point_sprites.enable");
-  this->addBinding("U", ModifierKeys::NONE, "toggle render.background.blur");
-  this->addBinding("K", ModifierKeys::NONE, "toggle interactor.trackball");
-  this->addBinding("F", ModifierKeys::NONE, "toggle render.hdri.ambient");
-  this->addBinding("J", ModifierKeys::NONE, "toggle render.background.skybox");
-  this->addBinding("L", ModifierKeys::NONE, "increase_light_intensity");
-  this->addBinding("L", ModifierKeys::SHIFT, "decrease_light_intensity");
-  this->addBinding("H", ModifierKeys::NONE, "toggle ui.cheatsheet");
-  this->addBinding("Question", ModifierKeys::ANY, "print_scene_info");
-  this->addBinding("1", ModifierKeys::ANY, "set_camera front");
-  this->addBinding("3", ModifierKeys::ANY, "set_camera right");
-  this->addBinding("4", ModifierKeys::ANY, "roll_camera -90");
-  this->addBinding("5", ModifierKeys::ANY, "toggle scene.camera.orthographic");
-  this->addBinding("6", ModifierKeys::ANY, "roll_camera 90");
-  this->addBinding("7", ModifierKeys::ANY, "set_camera top");
-  this->addBinding("9", ModifierKeys::ANY, "set_camera isometric");
-  this->addBinding(F3D_EXIT_HOTKEY_SYM, ModifierKeys::NONE, "stop_interactor");
-  this->addBinding("Return", ModifierKeys::NONE, "reset_camera");
-  this->addBinding("Space", ModifierKeys::NONE, "toggle_animation");
-  this->addBinding("Drop", ModifierKeys::NONE, "add_files");
+  // Define lambdas used for documentation
+
+  // Shorten a long name
+  auto shortName = [](const std::string& name, int maxChar)
+  {
+    if (name.size() <= static_cast<size_t>(maxChar) || maxChar <= 3)
+    {
+      return name;
+    }
+    else
+    {
+      return name.substr(0, maxChar - 3) + "...";
+    }
+  };
+
+  // "Cycle animation" , "animationName"
+  auto docAnim = [&]()
+  { return std::pair("Cycle animation", this->Internals->AnimationManager->GetAnimationName()); };
+
+  // "Cycle point/cell data coloring" , "POINT/CELL"
+  auto docField = [&]()
+  {
+    return std::pair(
+      std::string("Cycle point/cell data coloring"), (opts.model.scivis.cells ? "CELL" : "POINT"));
+  };
+
+  // "Cycle array to color with" , "arrayName"
+  auto docArray = [&]()
+  {
+    return std::pair("Cycle array to color with",
+      (opts.model.scivis.array_name.has_value()
+          ? shortName(opts.model.scivis.array_name.value(), 15) +
+            (opts.model.scivis.enable ? "" : " (forced)")
+          : "OFF"));
+  };
+
+  // "Cycle component to color with" , "component"
+  auto docComp = [&]()
+  {
+    vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
+    vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+    return std::pair(
+      "Cycle component to color with", ren->ComponentToString(opts.model.scivis.component));
+  };
+
+  // "doc", ""
+  auto docStr = [](const std::string& doc) { return std::pair(doc, ""); };
+
+  // "doc", "value"
+  auto docDbl = [](const std::string& doc, const double& val)
+  {
+    std::stringstream valStream;
+    valStream.precision(2);
+    valStream << std::fixed;
+    valStream << val;
+    return std::pair(doc, valStream.str());
+  };
+
+  // "doc", "value/Unset"
+  auto docDblOpt = [](const std::string& doc, const std::optional<double>& val)
+  {
+    std::stringstream valStream;
+    valStream.precision(2);
+    valStream << std::fixed;
+    if (val.has_value())
+    {
+      valStream << val.value();
+    }
+    else
+    {
+      valStream << "Unset";
+    }
+    return std::pair(doc, valStream.str());
+  };
+
+  // "doc", "ON/OFF"
+  auto docTgl = [](const std::string& doc, const bool& val)
+  { return std::pair(doc, (val ? "ON" : "OFF")); };
+
+  // "doc", "ON/OFF/Unset"
+  auto docTglOpt = [](const std::string& doc, const std::optional<bool>& val)
+  { return std::pair(doc, (val.has_value() ? (val.value() ? "ON" : "OFF") : "Unset")); };
+
+  // clang-format off
+  this->addBinding({mod_t::NONE, "W"}, "cycle_animation", "Scene", docAnim);
+  this->addBinding({mod_t::NONE, "C"}, "cycle_coloring field", "Scene", docField);
+  this->addBinding({mod_t::NONE, "S"}, "cycle_coloring array", "Scene", docArray);
+  this->addBinding({mod_t::NONE, "Y"}, "cycle_coloring component", "Scene", docComp);
+  this->addBinding({mod_t::NONE, "B"}, "toggle ui.scalar_bar", "Scene", std::bind(docTgl, "Toggle the scalar bar display", std::cref(opts.ui.scalar_bar)));
+  this->addBinding({mod_t::NONE, "P"}, "toggle render.effect.translucency_support", "Scene", std::bind(docTgl, "Toggle Translucency", std::cref(opts.render.effect.translucency_support)));
+  this->addBinding({mod_t::NONE, "Q"}, "toggle render.effect.ambient_occlusion","Scene", std::bind(docTgl, "Toggle ambient occlusion", std::cref(opts.render.effect.ambient_occlusion)));
+  this->addBinding({mod_t::NONE, "A"}, "toggle render.effect.anti_aliasing","Scene", std::bind(docTgl, "Toggle anti-aliasing", std::cref(opts.render.effect.anti_aliasing)));
+  this->addBinding({mod_t::NONE, "T"}, "toggle render.effect.tone_mapping","Scene", std::bind(docTgl, "Toggle tone mapping", std::cref(opts.render.effect.tone_mapping)));
+  this->addBinding({mod_t::NONE, "E"}, "toggle render.show_edges","Scene", std::bind(docTglOpt, "Toggle edges display", std::cref(opts.render.show_edges)));
+  this->addBinding({mod_t::NONE, "X"}, "toggle ui.axis","Scene", std::bind(docTgl, "Toggle axes display", std::cref(opts.ui.axis)));
+  this->addBinding({mod_t::NONE, "G"}, "toggle render.grid.enable","Scene", std::bind(docTgl, "Toggle grid display", std::cref(opts.render.grid.enable)));
+#if F3D_MODULE_UI
+  this->addBinding({mod_t::NONE, "N"}, "toggle ui.filename","Scene", std::bind(docTgl, "Toggle filename display", std::cref(opts.ui.filename)));
+  this->addBinding({mod_t::NONE, "M"}, "toggle ui.metadata","Scene", std::bind(docTgl, "Toggle metadata display", std::cref(opts.ui.metadata)));
+  this->addBinding({mod_t::NONE, "Z"}, "toggle ui.fps","Scene", std::bind(docTgl, "Toggle FPS counter display", std::cref(opts.ui.fps)));
+#endif
+#if F3D_MODULE_RAYTRACING
+  this->addBinding({mod_t::NONE, "R"}, "toggle render.raytracing.enable","Scene", std::bind(docTgl, "Toggle raytracing rendering", std::cref(opts.render.raytracing.enable)));
+  this->addBinding({mod_t::NONE, "D"}, "toggle render.raytracing.denoise","Scene", std::bind(docTgl, "Toggle denoising when raytracing", std::cref(opts.render.raytracing.denoise)));
+#endif
+  this->addBinding({mod_t::NONE, "V"}, "toggle_volume_rendering","Scene", std::bind(docTgl, "Toggle volume rendering", std::cref(opts.model.volume.enable)));
+  this->addBinding({mod_t::NONE, "I"}, "toggle model.volume.inverse","Scene", std::bind(docTgl, "Toggle inverse volume opacity", std::cref(opts.model.volume.inverse)));
+  this->addBinding({mod_t::NONE, "O"}, "toggle model.point_sprites.enable","Scene", std::bind(docTgl, "Toggle point sprites rendering", std::cref(opts.model.point_sprites.enable)));
+  this->addBinding({mod_t::NONE, "U"}, "toggle render.background.blur.enable","Scene", std::bind(docTgl, "Toggle blur background", std::cref(opts.render.background.blur.enable)));
+  this->addBinding({mod_t::NONE, "K"}, "toggle interactor.trackball","Scene", std::bind(docTgl, "Toggle trackball interaction", std::cref(opts.interactor.trackball)));
+  this->addBinding({mod_t::NONE, "F"}, "toggle render.hdri.ambient","Scene", std::bind(docTgl, "Toggle HDRI ambient lighting", std::cref(opts.render.hdri.ambient)));
+  this->addBinding({mod_t::NONE, "J"}, "toggle render.background.skybox","Scene", std::bind(docTgl, "Toggle HDRI skybox", std::cref(opts.render.background.skybox)));
+  this->addBinding({mod_t::NONE, "L"}, "increase_light_intensity", "Scene", std::bind(docDbl, "Increase lights intensity", std::cref(opts.render.light.intensity)));
+  this->addBinding({mod_t::SHIFT, "L"}, "decrease_light_intensity", "Scene", std::bind(docDbl, "Decrease lights intensity", std::cref(opts.render.light.intensity)));
+  this->addBinding({mod_t::CTRL, "P"}, "increase_opacity", "Scene", std::bind(docDblOpt, "Increase opacity", std::cref(opts.model.color.opacity)));
+  this->addBinding({mod_t::SHIFT, "P"}, "decrease_opacity", "Scene", std::bind(docDblOpt, "Decrease opacity", std::cref(opts.model.color.opacity)));
+  this->addBinding({mod_t::SHIFT, "A"}, "toggle render.armature.enable","Scene", std::bind(docTgl, "Toggle armature", std::cref(opts.render.armature.enable)));
+  this->addBinding({mod_t::ANY, "1"}, "set_camera front", "Camera", std::bind(docStr, "Front View camera"));
+  this->addBinding({mod_t::ANY, "3"}, "set_camera right", "Camera", std::bind(docStr, "Right View camera"));
+  this->addBinding({mod_t::ANY, "4"}, "roll_camera -90", "Camera", std::bind(docStr, "Rotate camera right"));
+  this->addBinding({mod_t::ANY, "5"}, "toggle scene.camera.orthographic", "Camera", std::bind(docTglOpt, "Toggle Orthographic Projection", std::cref(opts.scene.camera.orthographic)));
+  this->addBinding({mod_t::ANY, "6"}, "roll_camera 90", "Camera", std::bind(docStr, "Rotate camera left"));
+  this->addBinding({mod_t::ANY, "7"}, "set_camera top", "Camera", std::bind(docStr, "Top View camera"));
+  this->addBinding({mod_t::ANY, "9"}, "set_camera isometric", "Camera", std::bind(docStr, "Isometric View camera"));
+#if F3D_MODULE_UI
+  this->addBinding({mod_t::NONE, "H"}, "toggle ui.cheatsheet", "Others", std::bind(docStr, "Toggle cheatsheet display"));
+  this->addBinding({mod_t::NONE, "Escape"}, "toggle ui.console", "Others", std::bind(docStr, "Toggle console display"));
+#endif
+  this->addBinding({mod_t::CTRL, "Q"}, "stop_interactor", "Others", std::bind(docStr, "Stop the interactor"));
+  this->addBinding({mod_t::NONE, "Return"}, "reset_camera", "Others", std::bind(docStr, "Reset camera to initial parameters"));
+  this->addBinding({mod_t::NONE, "Space"}, "toggle_animation", "Others", std::bind(docStr, "Play/Pause animation if any"));
+  this->addBinding({mod_t::NONE, "Drop"}, "add_files", "Others", std::bind(docStr, "Add files to the scene"));
+  // clang-format on
+
   return *this;
 }
 
 //----------------------------------------------------------------------------
-interactor& interactor_impl::addBinding(
-  const std::string& interaction, ModifierKeys modifiers, std::vector<std::string> commands)
+interactor& interactor_impl::addBinding(const interaction_bind_t& bind,
+  std::vector<std::string> commands, std::string group,
+  documentation_callback_t documentationCallback)
 {
-  const internals::Bind bind{ interaction, modifiers };
-  const auto [it, success] = this->Internals->Bindings.insert({ bind, std::move(commands) });
+  const auto [it, success] = this->Internals->Bindings.insert(
+    { bind, { std::move(commands), std::move(documentationCallback) } });
   if (!success)
   {
     throw interactor::already_exists_exception(
-      "Could not add interaction commands for interaction: " + bind.Format() +
+      "Could not add interaction commands for interaction: " + bind.format() +
       " as it already exists.");
   }
+  else
+  {
+    // Add the bind to the group
+    auto groupIt = this->Internals->GroupedBinds.emplace(std::move(group), bind);
+    if (this->Internals->GroupedBinds.count(groupIt->first) == 1)
+    {
+      // Add the group in order if first addition
+      this->Internals->OrderedBindGroups.emplace_back(groupIt->first);
+    }
+  }
   return *this;
 }
 
 //----------------------------------------------------------------------------
-interactor& interactor_impl::addBinding(
-  const std::string& interaction, ModifierKeys modifiers, std::string command)
+interactor& interactor_impl::addBinding(const interaction_bind_t& bind, std::string command,
+  std::string group, documentation_callback_t documentationCallback)
 {
-  return this->addBinding(interaction, modifiers, std::vector<std::string>{ std::move(command) });
+  return this->addBinding(bind, std::vector<std::string>{ std::move(command) }, std::move(group),
+    std::move(documentationCallback));
 }
 
 //----------------------------------------------------------------------------
-interactor& interactor_impl::removeBinding(std::string interaction, ModifierKeys modifiers)
+interactor& interactor_impl::removeBinding(const interaction_bind_t& bind)
 {
-  this->Internals->Bindings.erase({ std::move(interaction), modifiers });
+  this->Internals->Bindings.erase(bind);
+
+  // Look for the group of the removed bind
+  std::string group;
+  for (auto it = this->Internals->GroupedBinds.begin(); it != this->Internals->GroupedBinds.end();
+       it++)
+  {
+    if (it->second == bind)
+    {
+      // Binds are unique
+      // Erase the bind entry in the group
+      group = it->first;
+      this->Internals->GroupedBinds.erase(it);
+      if (this->Internals->GroupedBinds.count(group) == 0)
+      {
+        // If it was the last one, remove it from the ordered group
+        // We know the group is present and unique in the vector, so only erase once
+        auto vecIt = std::find(this->Internals->OrderedBindGroups.begin(),
+          this->Internals->OrderedBindGroups.end(), group);
+        assert(vecIt != this->Internals->OrderedBindGroups.end());
+        this->Internals->OrderedBindGroups.erase(vecIt);
+      }
+      break;
+    }
+  }
   return *this;
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::pair<std::string, f3d::interactor::ModifierKeys>>
-interactor_impl::getBindingInteractions() const
+std::vector<std::string> interactor_impl::getBindGroups() const
 {
-  std::vector<std::pair<std::string, ModifierKeys>> binds;
+  return this->Internals->OrderedBindGroups;
+}
+
+//----------------------------------------------------------------------------
+std::vector<interaction_bind_t> interactor_impl::getBindsForGroup(std::string group) const
+{
+  std::vector<interaction_bind_t> output;
+  for (auto [it, rangeEnd] = this->Internals->GroupedBinds.equal_range(group); it != rangeEnd; ++it)
+  {
+    output.emplace_back(it->second);
+  }
+  if (output.size() == 0)
+  {
+    throw interactor_impl::does_not_exists_exception(
+      std::string("Bind: There is no binds for ") + group + " group");
+  }
+  return output;
+}
+
+//----------------------------------------------------------------------------
+std::vector<interaction_bind_t> interactor_impl::getBinds() const
+{
+  std::vector<interaction_bind_t> output;
   for (const auto& [bind, command] : this->Internals->Bindings)
   {
-    binds.emplace_back(std::make_pair(bind.Interaction, bind.Modifiers));
+    output.emplace_back(bind);
   }
-  return binds;
+  return output;
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::removeTimerCallBack(unsigned long id)
+std::pair<std::string, std::string> interactor_impl::getBindingDocumentation(
+  const interaction_bind_t& bind) const
 {
-  this->Internals->VTKInteractor->RemoveObserver(id);
-  this->Internals->VTKInteractor->DestroyTimer(this->Internals->TimerCallBacks[id].first);
+  const auto& it = this->Internals->Bindings.find(bind);
+  if (it == this->Internals->Bindings.end())
+  {
+    throw interactor_impl::does_not_exists_exception(
+      std::string("Bind: ") + bind.format() + " does not exists");
+  }
+  const auto& docFunc = it->second.DocumentationCallback;
+  return docFunc ? docFunc() : std::make_pair(std::string(), std::string());
 }
 
 //----------------------------------------------------------------------------
-unsigned long interactor_impl::createTimerCallBack(double time, std::function<void()> callBack)
-{
-  // Create the timer
-  int timerId = this->Internals->VTKInteractor->CreateRepeatingTimer(time);
-
-  // Create the callback and get the observer id
-  vtkNew<vtkCallbackCommand> timerCallBack;
-  timerCallBack->SetCallback(
-    [](vtkObject*, unsigned long, void* clientData, void*)
-    {
-      std::function<void()>* callBackPtr = static_cast<std::function<void()>*>(clientData);
-      (*callBackPtr)();
-    });
-  unsigned long id =
-    this->Internals->VTKInteractor->AddObserver(vtkCommand::TimerEvent, timerCallBack);
-
-  // Store the user callback and set it as client data
-  this->Internals->TimerCallBacks[id] = std::make_pair(timerId, callBack);
-  timerCallBack->SetClientData(&this->Internals->TimerCallBacks[id].second);
-  return id;
-}
-
-//----------------------------------------------------------------------------
-void interactor_impl::toggleAnimation()
+interactor& interactor_impl::toggleAnimation()
 {
   assert(this->Internals->AnimationManager);
   this->Internals->AnimationManager->ToggleAnimation();
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::startAnimation()
+interactor& interactor_impl::startAnimation()
 {
   assert(this->Internals->AnimationManager);
   this->Internals->AnimationManager->StartAnimation();
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::stopAnimation()
+interactor& interactor_impl::stopAnimation()
 {
   assert(this->Internals->AnimationManager);
   this->Internals->AnimationManager->StopAnimation();
+  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -889,35 +1222,45 @@ bool interactor_impl::isPlayingAnimation()
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::enableCameraMovement()
+interactor& interactor_impl::enableCameraMovement()
 {
   this->Internals->Style->SetCameraMovementDisabled(false);
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::disableCameraMovement()
+interactor& interactor_impl::disableCameraMovement()
 {
   this->Internals->Style->SetCameraMovementDisabled(true);
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-bool interactor_impl::playInteraction(const std::string& file)
+bool interactor_impl::playInteraction(
+  const fs::path& file, double loopTime, std::function<void()> userCallBack)
 {
-  if (!vtksys::SystemTools::FileExists(file))
+  try
   {
-    log::error("Interaction record file to play does not exist ", file);
-    return false;
-  }
-  else
-  {
+    if (!fs::exists(file))
+    {
+      log::error("Interaction record file to play does not exist ", file.string());
+      return false;
+    }
+
     // Make sure the recorder is off and streams are cleared
     this->Internals->Recorder->Off();
     this->Internals->Recorder->Clear();
 
-    std::string cleanFile = vtksys::SystemTools::CollapseFullPath(file);
-    this->Internals->Recorder->SetFileName(cleanFile.c_str());
-    this->Internals->Window.UpdateDynamicOptions();
+    this->Internals->StartEventLoop(loopTime, std::move(userCallBack));
+    this->Internals->Recorder->SetFileName(file.string().c_str());
     this->Internals->Recorder->Play();
+
+    this->Internals->StopEventLoop();
+  }
+  catch (const fs::filesystem_error& ex)
+  {
+    log::error("Could not play recording: ", ex.what());
+    return false;
   }
 
   // Recorder can stop the interactor, make sure it is still running
@@ -926,11 +1269,12 @@ bool interactor_impl::playInteraction(const std::string& file)
     log::error("Interactor has been stopped");
     return false;
   }
+
   return true;
 }
 
 //----------------------------------------------------------------------------
-bool interactor_impl::recordInteraction(const std::string& file)
+bool interactor_impl::recordInteraction(const fs::path& file)
 {
   if (file.empty())
   {
@@ -938,46 +1282,53 @@ bool interactor_impl::recordInteraction(const std::string& file)
     return false;
   }
 
-  std::string cleanFile = vtksys::SystemTools::CollapseFullPath(file);
-
-  std::string parentDirectory = vtksys::SystemTools::GetParentDirectory(cleanFile);
-
-  // Check if the parent directory exists
-  if (!vtksys::SystemTools::FileExists(parentDirectory))
+  try
   {
-    log::error("Interaction record directory does not exist ", parentDirectory);
+    // Ensure parent directories exists if not empty
+    fs::path parent = file.parent_path();
+    if (!parent.empty())
+    {
+      fs::create_directories(parent);
+    }
+
+    // Make sure the recorder is off and streams are cleared
+    this->Internals->Recorder->Off();
+    this->Internals->Recorder->Clear();
+
+    this->Internals->Recorder->SetFileName(file.string().c_str());
+    this->Internals->Recorder->On();
+    this->Internals->Recorder->Record();
+  }
+  catch (const fs::filesystem_error& ex)
+  {
+    log::error("Could not record: ", ex.what());
     return false;
   }
-
-  // Check if we can write to the directory
-  if (!vtksys::SystemTools::TestFileAccess(parentDirectory, vtksys::TEST_FILE_WRITE))
-  {
-    log::error("Don't have write permissions for ", parentDirectory);
-    return false;
-  }
-
-  // Make sure the recorder is off and streams are cleared
-  this->Internals->Recorder->Off();
-  this->Internals->Recorder->Clear();
-
-  this->Internals->Recorder->SetFileName(cleanFile.c_str());
-  this->Internals->Recorder->On();
-  this->Internals->Recorder->Record();
 
   return true;
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::start()
+interactor& interactor_impl::start(double loopTime, std::function<void()> userCallBack)
 {
-  this->Internals->Window.UpdateDynamicOptions();
-  this->Internals->StartInteractor();
+  this->Internals->StartEventLoop(loopTime, std::move(userCallBack));
+  this->Internals->VTKInteractor->Start();
+  return *this;
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::stop()
+interactor& interactor_impl::stop()
 {
-  this->Internals->StopInteractor();
+  this->Internals->StopEventLoop();
+  this->Internals->VTKInteractor->ExitCallback();
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::requestRender()
+{
+  this->Internals->RenderRequested = true;
+  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -996,6 +1347,19 @@ void interactor_impl::SetInteractorOn(vtkInteractorObserver* observer)
 void interactor_impl::UpdateRendererAfterInteraction()
 {
   this->Internals->Style->UpdateRendererAfterInteraction();
+}
+
+//----------------------------------------------------------------------------
+void interactor_impl::ResetTemporaryUp()
+{
+  this->Internals->Style->ResetTemporaryUp();
+}
+
+//----------------------------------------------------------------------------
+void interactor_impl::SetCommandBuffer(const char* command)
+{
+  // XXX This replace previous command buffer, it should be improved
+  this->Internals->CommandBuffer = command;
 }
 
 //----------------------------------------------------------------------------

@@ -36,36 +36,41 @@ public:
   ~interactor_impl() override;
 
   interactor& initCommands() override;
-  interactor& addCommand(const std::string& action,
-    std::function<void(const std::vector<std::string>&)> callback) override;
+  interactor& addCommand(
+    std::string action, std::function<void(const std::vector<std::string>&)> callback) override;
   interactor& removeCommand(const std::string& action) override;
   std::vector<std::string> getCommandActions() const override;
   bool triggerCommand(std::string_view command) override;
 
   interactor& initBindings() override;
-  interactor& addBinding(const std::string& interaction, ModifierKeys modifiers,
-    std::vector<std::string> commands) override;
-  interactor& addBinding(
-    const std::string& interaction, ModifierKeys modifiers, std::string command) override;
-  interactor& removeBinding(std::string interaction, ModifierKeys modifiers) override;
-  std::vector<std::pair<std::string, ModifierKeys>> getBindingInteractions() const override;
+  interactor& addBinding(const interaction_bind_t& bind, std::vector<std::string> commands,
+    std::string group = std::string(),
+    documentation_callback_t documentationCallback = nullptr) override;
+  interactor& addBinding(const interaction_bind_t& bind, std::string command,
+    std::string group = std::string(),
+    documentation_callback_t documentationCallback = nullptr) override;
+  interactor& removeBinding(const interaction_bind_t& bind) override;
+  std::vector<std::string> getBindGroups() const override;
+  std::vector<interaction_bind_t> getBindsForGroup(std::string group) const override;
+  std::vector<interaction_bind_t> getBinds() const override;
+  std::pair<std::string, std::string> getBindingDocumentation(
+    const interaction_bind_t& bind) const override;
 
-  unsigned long createTimerCallBack(double time, std::function<void()> callBack) override;
-  void removeTimerCallBack(unsigned long id) override;
-
-  void toggleAnimation() override;
-  void startAnimation() override;
-  void stopAnimation() override;
+  interactor& toggleAnimation() override;
+  interactor& startAnimation() override;
+  interactor& stopAnimation() override;
   bool isPlayingAnimation() override;
 
-  void enableCameraMovement() override;
-  void disableCameraMovement() override;
+  interactor& enableCameraMovement() override;
+  interactor& disableCameraMovement() override;
 
-  bool playInteraction(const std::string& file) override;
-  bool recordInteraction(const std::string& file) override;
+  bool playInteraction(const std::filesystem::path& file, double deltaTime,
+    std::function<void()> userCallBack) override;
+  bool recordInteraction(const std::filesystem::path& file) override;
 
-  void start() override;
-  void stop() override;
+  interactor& start(double deltaTime, std::function<void()> userCallBack) override;
+  interactor& stop() override;
+  interactor& requestRender() override;
   ///@}
 
   /**
@@ -94,6 +99,24 @@ public:
    * the camera clipping range.
    */
   void UpdateRendererAfterInteraction();
+
+  /**
+   * Implementation only API.
+   * Expose the method to reset transformed up vector.
+   * This is called by the scene after initializing the up vector.
+   */
+  void ResetTemporaryUp();
+
+  /**
+   * Event loop being called automatically once the interactor is started
+   * First call the EventLoopUserCallBack, then call render if requested.
+   */
+  void EventLoop();
+
+  /**
+   * Set a command to be run on the next event loop
+   */
+  void SetCommandBuffer(const char* command);
 
   /**
    * An exception that can be thrown by certain command callbacks

@@ -97,6 +97,12 @@ public:
     // Initialize the UpVector on load
     this->Window.InitializeUpVector();
 
+    // Reset temporary up to apply any config values
+    if (this->Interactor)
+    {
+      this->Interactor->ResetTemporaryUp();
+    }
+
     if (this->Options.scene.camera.index.has_value())
     {
       this->MetaImporter->SetCameraIndex(this->Options.scene.camera.index.value());
@@ -114,10 +120,12 @@ public:
         &callbackData, this->MetaImporter, this->Interactor);
     }
 
-    // Update the meta importer, the will only update importers that have not been update before
+    // Update the meta importer, the will only update importers that have not been updated before
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
     if (!this->MetaImporter->Update())
     {
+      this->MetaImporter->Clear();
+      this->Window.Initialize();
       throw scene::load_failure_exception("failed to load scene");
     }
 #else
@@ -129,27 +137,7 @@ public:
     progressWidget->Off();
 
     // Initialize the animation using temporal information from the importer
-    if (this->AnimationManager.Initialize())
-    {
-      if (this->Options.scene.animation.time.has_value())
-      {
-        double animationTime = this->Options.scene.animation.time.value();
-        double timeRange[2];
-        this->AnimationManager.GetTimeRange(timeRange);
-
-        // We assume importers import data at timeRange[0] when not specified
-        if (animationTime != timeRange[0])
-        {
-          this->AnimationManager.LoadAtTime(animationTime);
-        }
-      }
-    }
-
-    // Set the name for animation
-    this->Window.setAnimationNameInfo(this->AnimationManager.GetAnimationName());
-
-    // Display output description
-    scene_impl::internals::DisplayImporterDescription(this->MetaImporter);
+    this->AnimationManager.Initialize();
 
     // Update all window options and reset camera to bounds if needed
     this->Window.UpdateDynamicOptions();
@@ -158,31 +146,39 @@ public:
       this->Window.getCamera().resetToBounds();
     }
 
-    // Display coloring information
-    this->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
-    log::debug("");
-
-    // Print scene description
-    this->Window.PrintSceneDescription(log::VerboseLevel::DEBUG);
+    scene_impl::internals::DisplayAllInfo(this->MetaImporter, this->Window);
   }
 
-  static void DisplayImporterDescription(vtkImporter* importer)
+  static void DisplayImporterDescription(log::VerboseLevel level, vtkImporter* importer)
   {
     vtkIdType availCameras = importer->GetNumberOfCameras();
     if (availCameras <= 0)
     {
-      log::debug("No camera available");
+      log::print(level, "No camera available");
     }
     else
     {
-      log::debug("Camera(s) available are:");
+      log::print(level, "Camera(s) available are:");
     }
     for (int i = 0; i < availCameras; i++)
     {
-      log::debug(i, ": ", importer->GetCameraName(i));
+      log::print(level, i, ": ", importer->GetCameraName(i));
     }
+    log::print(level, "");
+    log::print(level, importer->GetOutputsDescription(), "\n");
+  }
+
+  static void DisplayAllInfo(vtkImporter* importer, window_impl& window)
+  {
+    // Display output description
+    scene_impl::internals::DisplayImporterDescription(log::VerboseLevel::DEBUG, importer);
+
+    // Display coloring information
+    window.PrintColoringDescription(log::VerboseLevel::DEBUG);
     log::debug("");
-    log::debug(importer->GetOutputsDescription(), "\n");
+
+    // Print scene description
+    window.PrintSceneDescription(log::VerboseLevel::DEBUG);
   }
 
   const options& Options;
@@ -330,10 +326,29 @@ bool scene_impl::supports(const fs::path& filePath)
 }
 
 //----------------------------------------------------------------------------
+scene& scene_impl::loadAnimationTime(double timeValue)
+{
+  this->Internals->AnimationManager.LoadAtTime(timeValue);
+  scene_impl::internals::DisplayAllInfo(this->Internals->MetaImporter, this->Internals->Window);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+std::pair<double, double> scene_impl::animationTimeRange()
+{
+  return this->Internals->AnimationManager.GetTimeRange();
+}
+
+//----------------------------------------------------------------------------
 void scene_impl::SetInteractor(interactor_impl* interactor)
 {
   this->Internals->Interactor = interactor;
   this->Internals->AnimationManager.SetInteractor(interactor);
   this->Internals->Interactor->SetAnimationManager(&this->Internals->AnimationManager);
+}
+
+void scene_impl::PrintImporterDescription(log::VerboseLevel level)
+{
+  scene_impl::internals::DisplayImporterDescription(level, this->Internals->MetaImporter);
 }
 }

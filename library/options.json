@@ -1,8 +1,8 @@
 {
   "scene": {
     "up_direction": {
-      "type": "string",
-      "default_value": "+Y"
+      "type": "direction",
+      "default_value": "0,1,0"
     },
     "animation": {
       "autoplay": {
@@ -16,13 +16,6 @@
       "speed_factor": {
         "type": "ratio",
         "default_value": "1.0"
-      },
-      "time": {
-        "type": "double"
-      },
-      "frame_rate": {
-        "type": "double",
-        "default_value": "60.0"
       }
     },
     "camera": {
@@ -64,7 +57,7 @@
         "default_value": "10"
       },
       "color": {
-        "type": "double_vector",
+        "type": "color",
         "default_value": "0.0, 0.0, 0.0"
       }
     },
@@ -114,7 +107,7 @@
     },
     "background": {
       "color": {
-        "type": "double_vector",
+        "type": "color",
         "default_value": "0.2, 0.2, 0.2"
       },
       "skybox": {
@@ -122,12 +115,14 @@
         "default_value": "false"
       },
       "blur": {
-        "type": "bool",
-        "default_value": "false"
-      },
-      "blur_coc": {
-        "type": "double",
-        "default_value": "20.0"
+        "enable": {
+          "type": "bool",
+          "default_value": "false"
+        },
+        "coc": {
+          "type": "double",
+          "default_value": "20.0"
+        }
       }
     },
     "light": {
@@ -135,9 +130,19 @@
         "type": "double",
         "default_value": "1.0"
       }
+    },
+    "armature": {
+      "enable": {
+        "type": "bool",
+        "default_value": "false"
+      }
     }
   },
   "ui": {
+    "axis": {
+      "type": "bool",
+      "default_value": "false"
+    },
     "scalar_bar": {
       "type": "bool",
       "default_value": "false"
@@ -158,6 +163,10 @@
       "type": "bool",
       "default_value": "false"
     },
+    "console": {
+      "type": "bool",
+      "default_value": "false"
+    },
     "dropzone": {
       "type": "bool",
       "default_value": "false"
@@ -172,6 +181,10 @@
     },
     "font_file": {
       "type": "string"
+    },
+    "scale": {
+      "type": "ratio",
+      "default_value": "1.0"
     },
     "loader_progress": {
       "type": "bool",
@@ -193,7 +206,7 @@
         "type": "double"
       },
       "rgb": {
-        "type": "double_vector"
+        "type": "color"
       },
       "texture": {
         "type": "string"
@@ -201,7 +214,7 @@
     },
     "emissive": {
       "factor": {
-        "type": "double_vector"
+        "type": "color"
       },
       "texture": {
         "type": "string"
@@ -276,10 +289,6 @@
     }
   },
   "interactor": {
-    "axis": {
-      "type": "bool",
-      "default_value": "false"
-    },
     "trackball": {
       "type": "bool",
       "default_value": "false"

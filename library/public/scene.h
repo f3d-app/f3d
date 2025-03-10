@@ -40,13 +40,15 @@ public:
   struct load_failure_exception : public exception
   {
     explicit load_failure_exception(const std::string& what = "")
-      : exception(what){};
+      : exception(what) {};
   };
 
   ///@{
   /**
    * Add and load provided files into the scene
    * Already added file will NOT be reloaded
+   * If it fails to loads a file, it clears the scene and
+   * throw a load_failure_exception.
    */
   virtual scene& add(const std::filesystem::path& filePath) = 0;
   virtual scene& add(const std::vector<std::filesystem::path>& filePath) = 0;
@@ -80,7 +82,21 @@ public:
   /**
    * Return true if provided file path is supported, false otherwise.
    */
-  virtual bool supports(const std::filesystem::path& filePath) = 0;
+  [[nodiscard]] virtual bool supports(const std::filesystem::path& filePath) = 0;
+
+  /**
+   * Load added files at provided time value if they contain any animation
+   * Providing a timeVale outside of the current animationTimeRange will clamp
+   * to the closest value in the range.
+   * Does not do anything if there is no animations.
+   */
+  virtual scene& loadAnimationTime(double timeValue) = 0;
+
+  /**
+   * Get animation time range of currently added files.
+   * Returns [0, 0] if there is no animations.
+   */
+  [[nodiscard]] virtual std::pair<double, double> animationTimeRange() = 0;
 
 protected:
   //! @cond

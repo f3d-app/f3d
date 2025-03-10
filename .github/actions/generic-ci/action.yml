@@ -7,8 +7,7 @@ inputs:
     default: 'standard'
   vtk_version:
     description: 'VTK version'
-    required: false
-    default: 'commit'
+    required: true
   raytracing_label:
     description: 'Label to control raytracing'
     required: false
@@ -40,6 +39,36 @@ inputs:
   lfs_sha:
     description: 'Cache LFS sha'
     required: true
+  alembic_version:
+    description: 'Version of alembic to build'
+    required: false
+  assimp_version:
+    description: 'Version of assimp to build'
+    required: false
+  draco_version:
+    description: 'Version of draco to build'
+    required: false
+  occt_version:
+    description: 'Version of occt to build'
+    required: false
+  openexr_version:
+    description: 'Version of openexr to build'
+    required: false
+  openvdb_version:
+    description: 'Version of openvdb to build'
+    required: false
+  pybind11_version:
+    description: 'Version of pybind11 to build'
+    required: false
+  python_version:
+    description: 'Version of python to install'
+    required: false
+  usd_version:
+    description: 'Version of usd to build'
+    required: false
+  java_version:
+    description: 'Version of java to install'
+    required: false
 
 runs:
   using: "composite"
@@ -49,59 +78,63 @@ runs:
       shell: bash
       run: |
         [[ "${{ inputs.lfs_sha }}" ]] || { echo "lfs_sha input is empty" ; exit 1; }
+        [[ "${{ inputs.vtk_version }}" ]] || { echo "vtk_version input is empty" ; exit 1; }
 
     - name: Recover LFS Data
       uses: f3d-app/lfs-data-cache-action@v1
       with:
         type: 'consumer'
         lfs_sha: ${{inputs.lfs_sha}}
-        cache_postfix: cache-0 
+        cache_postfix: cache-0
 
-    - name: Dependencies Dir
-      shell: bash
-      working-directory: ${{github.workspace}}
-      run: |
-        mkdir dependencies
-        cd dependencies
-        mkdir install
-
-    - name: Install VTK dependencies
-      uses: ./source/.github/actions/vtk-dependencies
+    - name: Install all F3D dependencies
+      uses: ./source/.github/actions/generic-dependencies
       with:
         cpu: ${{inputs.cpu}}
-
-    - name: Install Raytracing Dependencies
-      if: inputs.raytracing_label == 'raytracing'
-      uses: ./source/.github/actions/ospray-sb-install-dep
-      with:
-        cpu: ${{inputs.cpu}}
+        raytracing_label: ${{inputs.raytracing_label}}
+        alembic_version: ${{inputs.alembic_version}}
+        assimp_version: ${{inputs.assimp_version}}
+        draco_version: ${{inputs.draco_version}}
+        occt_version: ${{inputs.occt_version}}
+        openexr_version: ${{inputs.openexr_version}}
+        openvdb_version: ${{inputs.openvdb_version}}
+        pybind11_version: ${{inputs.pybind11_version}}
+        usd_version: ${{inputs.usd_version}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
       with:
         vtk_version: ${{inputs.vtk_version}}
-        vtk_sha_file: ./source/.github/actions/vtk_commit_sha
         raytracing_label: ${{inputs.raytracing_label}}
         cpu: ${{inputs.cpu}}
-
-    - name: Install F3D dependencies
-      if: inputs.optional_deps_label == 'optional-deps'
-      uses: ./source/.github/actions/f3d-dependencies
-      with:
-        cpu: ${{inputs.cpu}}
+        openvdb_version: ${{inputs.openvdb_version}}
 
     - name: Set up Python
-      if: inputs.optional_deps_label == 'optional-deps'
+      if: |
+        inputs.optional_deps_label == 'optional-deps' &&
+        inputs.python_version != ''
       uses: actions/setup-python@v5
       with:
-        python-version: '3.x'
+        python-version: ${{inputs.python_version}}
 
     - name: Install Python dependencies
-      if: inputs.optional_deps_label == 'optional-deps'
+      if: |
+        inputs.optional_deps_label == 'optional-deps' &&
+        inputs.python_version != ''
       shell: bash
       run: |
         python -m pip install --upgrade pip
         python -m pip install pytest==8.0.0
+        python -m pip install pybind11_stubgen
+
+    - name: Setup JDK
+      if: |
+        inputs.optional_deps_label == 'optional-deps' &&
+        inputs.java_version != ''
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: ${{inputs.java_version}}
 
     - name: Setup Directories
       shell: bash
@@ -130,8 +163,7 @@ runs:
       # https://github.com/f3d-app/f3d/issues/1322
       # MacOS x86_64 occasionally segfault with Java
       # https://github.com/f3d-app/f3d/issues/1410
-      # F3D_TESTING_ENABLE_EXTERNAL_(EGL|QT|GLFW) are disabled if no X server is running
-      # EGL is crashing in the CI but not locally
+      # F3D_TESTING_ENABLE_EXTERNAL_(QT|GLFW) are disabled if no X server is running
       # QT/GLFW external tests should be adapted to run offscreen
       # https://github.com/f3d-app/f3d/issues/1670
     - name: Configure
@@ -152,12 +184,16 @@ runs:
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_BINDINGS_JAVA=${{ (runner.os != 'macOS' || inputs.cpu == 'arm64') && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_BINDINGS_PYTHON=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_BINDINGS_PYTHON_GENERATE_STUBS=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_EXCLUDE_DEPRECATED=${{ inputs.exclude_deprecated_label == 'exclude-deprecated' && 'ON' || 'OFF' }}
         -DF3D_LINUX_GENERATE_MAN=ON
         -DF3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
         -DF3D_MACOS_BUNDLE=${{ inputs.bundle_label == 'bundle' && 'ON' || 'OFF' }}
         -DF3D_MODULE_EXR=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_MODULE_RAYTRACING=${{ inputs.raytracing_label == 'raytracing' && 'ON' || 'OFF' }}
+        -DF3D_MODULE_UI=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_MODULE_DMON=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_MODULE_TINYFILEDIALOGS=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGINS_STATIC_BUILD=${{ inputs.bundle_label == 'bundle' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_ALEMBIC=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_ASSIMP=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
@@ -167,16 +203,16 @@ runs:
         -DF3D_PLUGIN_BUILD_USD=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_VDB=${{ matrix.vtk_version != 'v9.2.6' && (runner.os != 'Windows' || matrix.vtk_version != 'v9.3.1') && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_STRICT_BUILD=ON
-        -DF3D_TESTING_ENABLE_EXTERNAL_EGL=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
+        -DF3D_TESTING_ENABLE_EGL_TESTS=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_EXTERNAL_GLFW=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
-        -DF3D_TESTING_ENABLE_EXTERNAL_OSMESA=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_EXTERNAL_QT=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
-        -DF3D_TESTING_ENABLE_GLX_TESTS=${{ inputs.rendering_backend == 'auto' && 'ON' || 'OFF' }}
+        -DF3D_TESTING_ENABLE_GLX_TESTS=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
+        -DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=${{ (runner.os == 'Linux' || runner.os == 'Windows') && 'ON' || 'OFF' }}
+        -DF3D_TESTING_ENABLE_OSMESA_TESTS=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
         -DF3D_TESTING_FORCE_RENDERING_BACKEND=${{ inputs.rendering_backend }}
         -DF3D_WINDOWS_GUI=ON
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
-        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
-        ${{ runner.os == 'Linux' && '-DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=ON' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
 
     - name: Build
       shell: bash
@@ -192,28 +228,44 @@ runs:
 
     - name: Install Mesa Windows
       if: runner.os == 'Windows'
-      uses: f3d-app/install-mesa-windows-action@v1
+      uses: f3d-app/install-mesa-windows-action@v2
       with:
         path: ${{github.workspace}}\build\bin_Release
 
+    - name: Install Mesa Windows Python
+      if: runner.os == 'Windows'
+      uses: f3d-app/install-mesa-windows-action@v2
+      with:
+        path: ${{github.workspace}}\build\Release\f3d
+
+    # A EGL test is crashing in the CI but not locally
+    - name: Set CI test exception for Linux EGL
+      if:
+        runner.os == 'Linux' &&
+        inputs.rendering_backend != 'auto'
+      shell: bash
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestSDKExternalWindowEGL)" >> $GITHUB_ENV
+
     # Certain tests are failing on macOS with GPU pass through
     # https://github.com/f3d-app/f3d/issues/792
+    # https://github.com/f3d-app/f3d/issues/1534
     - name: Set CI test exception for macOS x86_64
       if: |
         runner.os == 'macOS' &&
         inputs.cpu == 'x86_64'
       shell: bash
-      run: echo "F3D_CTEST_EXCEPTIONS=(TestDXF)|(TestScalarsCell)|(TestXCAFColors)" >> $GITHUB_ENV
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestInteractionAnimationSlow)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionCycleComp)|(TestGLTFRigArmature)" >> $GITHUB_ENV
 
     # Certain tests are failing on macOS arm64 for unknown reasons
     # https://github.com/f3d-app/f3d/issues/1276
     # https://github.com/f3d-app/f3d/issues/792
+    # https://github.com/f3d-app/f3d/issues/1534
     - name: Set CI test exception for macOS arm64
       if: |
         runner.os == 'macOS' &&
         inputs.cpu == 'arm64'
       shell: bash
-      run: echo "F3D_CTEST_EXCEPTIONS=(TestDepthPeelingToneMapping)|(TestDepthPeeling)|(TestTextureColor)|(TestDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)|(TestSDKInteractorCallBack)" >> $GITHUB_ENV
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestDepthPeelingToneMapping)|(TestDepthPeeling)|(TestTextureColor)|(TestDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)|(TestInteractionActors)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionAnimationSlow)|(TestInteractionConfigFileInteractions)|(TestGLTFRigArmature)|(TestInteractionRollCameraRotation)" >> $GITHUB_ENV
 
     - name: Test
       shell: bash
@@ -268,7 +320,7 @@ runs:
       if: |
         runner.os == 'Windows' &&
         inputs.static_label == 'no-static'
-      uses: f3d-app/install-mesa-windows-action@v1
+      uses: f3d-app/install-mesa-windows-action@v2
       with:
         path: ${{github.workspace}}\build_examples\*\Release
 
@@ -326,7 +378,7 @@ runs:
 
     - name: Install Mesa Windows in install
       if: runner.os == 'Windows'
-      uses: f3d-app/install-mesa-windows-action@v1
+      uses: f3d-app/install-mesa-windows-action@v2
       with:
         path: ${{github.workspace}}\install\bin
 
@@ -335,10 +387,10 @@ runs:
     - name: Check F3D_PLUGINS_PATH using plugin example
       if: |
         inputs.vtk_version != 'v9.2.6' && inputs.vtk_version != 'v9.3.1' &&
-        inputs.cpu != 'arm64' && inputs.static_label == 'no-static'
+        inputs.cpu != 'arm64' && inputs.static_label == 'no-static' && inputs.optional_deps_label == 'optional-deps'
       shell: bash
       working-directory: ${{github.workspace}}/install
-      run: F3D_PLUGINS_PATH=$(pwd)/../build_plugins/example-plugin${{ runner.os == 'Windows' && '/Release' || null }} ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --load-plugins=example --output=../install_example_plugin_output.png --ref=../source/.github/baselines/install_example_plugin_output.png --resolution=300,300 --verbose
+      run: F3D_PLUGINS_PATH=$(pwd)/../build_plugins/example-plugin${{ runner.os == 'Windows' && '/Release' || null }} ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --load-plugins=example --output=../install_example_plugin_output.png --reference=../source/.github/baselines/install_example_plugin_output.png --resolution=300,300 --rendering-backend=${{ inputs.rendering_backend }} --verbose
 
     - name: Install plugin examples
       if: inputs.static_label == 'no-static'
@@ -352,22 +404,22 @@ runs:
     # https://github.com/f3d-app/f3d/issues/1276
     - name: Check Install
       if: |
-        inputs.vtk_version != 'v9.2.6' &&
-        inputs.vtk_version != 'v9.3.1' && inputs.cpu != 'arm64'
+        inputs.vtk_version != 'v9.2.6' && inputs.vtk_version != 'v9.3.1'
+        && inputs.cpu != 'arm64' && inputs.optional_deps_label == 'optional-deps'
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: |
-        ${{ env.F3D_BIN_PATH }} ../source/testing/data/dragon.vtu --output=output/install_output.png --ref=../source/.github/baselines/install_output.png --resolution=300,300 --colormap-file=viridis --comp=0 --verbose
+        ${{ env.F3D_BIN_PATH }} ../source/testing/data/dragon.vtu --output=output/install_output.png --reference=../source/.github/baselines/install_output.png --resolution=300,300 --colormap-file=viridis --coloring-component=0 --verbose --rendering-backend=${{ inputs.rendering_backend }}
 
     - name: Check Install plugins
       if: |
         inputs.vtk_version != 'v9.2.6'
         && inputs.vtk_version != 'v9.3.1' && inputs.cpu != 'arm64'
-        && inputs.static_label == 'no-static'
+        && inputs.static_label == 'no-static' && inputs.optional_deps_label == 'optional-deps'
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: |
-        ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --output=../install_example_plugin_output.png --ref=../source/.github/baselines/install_example_plugin_output.png  --resolution=300,300 --verbose
+        ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --output=../install_example_plugin_output.png --reference=../source/.github/baselines/install_example_plugin_output.png  --resolution=300,300 --verbose --rendering-backend=${{ inputs.rendering_backend }}
 
     - name: Upload Tests Install Artifact
       if: failure()

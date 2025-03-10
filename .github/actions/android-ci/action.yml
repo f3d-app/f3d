@@ -14,8 +14,7 @@ inputs:
     default: '27'
   vtk_version:
     description: 'VTK version'
-    required: false
-    default: 'commit'
+    required: true
 
 runs:
   using: "composite"
@@ -25,6 +24,7 @@ runs:
       shell: bash
       run: |
         [[ "${{inputs.arch}}" ]] || { echo "arch input is empty" ; exit 1; }
+        [[ "${{inputs.vtk_version}}" ]] || { echo "vtk_version input is empty" ; exit 1; }
 
     - name: Dependencies Dir
       shell: bash
@@ -46,7 +46,6 @@ runs:
         arch: ${{inputs.arch}}
         api_level: ${{inputs.api_level}}
         vtk_version: ${{inputs.vtk_version}}
-        vtk_sha_file: ./source/.github/actions/vtk_commit_sha
 
     - name: Setup Directories
       shell: bash
@@ -68,6 +67,7 @@ runs:
         -DCMAKE_SYSTEM_NAME=Android
         -DCMAKE_SYSTEM_VERSION=${{inputs.api_level}}
         -DF3D_BINDINGS_JAVA=ON
+        -DF3D_MODULE_UI=OFF
         -DF3D_PLUGIN_BUILD_EXODUS=OFF
         -DF3D_STRICT_BUILD=ON
 

@@ -1,0 +1,11 @@
+# StreamVersion 1.2
+KeyPressEvent -546 836 0 0 1 Control_L 0
+CharEvent -546 836 0 0 1 Control_L 0
+TimerEvent -546 836 0 0 1 Control_L 0
+TimerEvent -546 836 0 0 1 Control_L 0
+TimerEvent -546 836 0 0 1 Control_L 0
+TimerEvent -546 836 0 0 1 Control_L 0
+TimerEvent -546 836 0 0 1 Control_L 0
+KeyPressEvent -546 836 2 111 1 o 0
+CharEvent -546 836 2 111 1 o 0
+KeyReleaseEvent -546 836 2 111 1 o 0

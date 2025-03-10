@@ -2,10 +2,11 @@
 # Refer to python/__init__.py.in source file
 
 import os
-import sys
 import re
+import sys
 import warnings
 from pathlib import Path
+from typing import Any, Iterable, Mapping, Union
 
 F3D_ABSOLUTE_DLLS = [
     # @F3D_ABSOLUTE_DLLS_FIXUP@
@@ -32,32 +33,36 @@ __version__ = "@F3D_VERSION@"
 # monkey patch `options.update`
 
 
-def f3d_options_update(self, arg):
+def _f3d_options_update(
+    self, arg: Union[Mapping[str, Any], Iterable[tuple[str, Any]]]
+) -> None:
     try:
         for k, v in arg.items():
             self[k] = v
         return
-    except AttributeError:
+    except AttributeError:  # `arg` doesn't have `.items()`
         pass
 
     try:
         for k, v in arg:
             self[k] = v
         return
-    except AttributeError:
+    except TypeError:  # `arg` isn't iterable
+        pass
+    except ValueError:  # `arg` isn't iterable of pairs
         pass
 
-    raise ValueError(f"cannot update {self} from {args}")
+    raise ValueError(f"cannot update {self} from {arg}")
 
 
-Options.update = f3d_options_update
+Options.update = _f3d_options_update
 
 
 ################################################################################
 # add deprecated warnings
 
 
-def deprecated_decorator(f, reason):
+def _deprecated_decorator(f, reason):
     def g(*args, **kwargs):
         warnings.warn(reason, DeprecationWarning, 2)
         return f(*args, **kwargs)
@@ -65,7 +70,7 @@ def deprecated_decorator(f, reason):
     return g
 
 
-def add_deprecation_warnings():
+def _add_deprecation_warnings():
     for f3d_class in (
         Camera,
         Scene,
@@ -73,6 +78,7 @@ def add_deprecation_warnings():
         Interactor,
         Engine,
         Window,
+        Image,
     ):
         for name, member in f3d_class.__dict__.items():
             if callable(member) and member.__doc__:
@@ -80,7 +86,7 @@ def add_deprecation_warnings():
                 if m:
                     reason = m.group(1) or ""
                     msg = f"{f3d_class.__qualname__}.{name} is deprecated{reason}"
-                    setattr(f3d_class, name, deprecated_decorator(member, msg))
+                    setattr(f3d_class, name, _deprecated_decorator(member, msg))
 
 
-add_deprecation_warnings()
+_add_deprecation_warnings()

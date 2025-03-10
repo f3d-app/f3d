@@ -1,31 +1,43 @@
 #include "engine.h"
 
 #include "config.h"
+#include "factory.h"
 #include "init.h"
 #include "interactor_impl.h"
 #include "log.h"
 #include "scene_impl.h"
+#include "utils.h"
 #include "window_impl.h"
 
-#include "factory.h"
-
-#include "vtkF3DConfigure.h"
 #include "vtkF3DNoRenderWindow.h"
 
 #include <vtkVersion.h>
 
-#include <vtksys/Directory.hxx>
 #include <vtksys/DynamicLoader.hxx>
-#include <vtksys/Encoding.hxx>
 #include <vtksys/SystemTools.hxx>
 
 #include <nlohmann/json.hpp>
+
+namespace fs = std::filesystem;
 
 namespace f3d
 {
 class engine::internals
 {
 public:
+  template<typename F>
+  static bool BackendAvailable(F&& func)
+  {
+    try
+    {
+      return func() != nullptr;
+    }
+    catch (const context::loading_exception&)
+    {
+      return false;
+    }
+  }
+
   std::unique_ptr<options> Options;
   std::unique_ptr<detail::window_impl> Window;
   std::unique_ptr<detail::scene_impl> Scene;
@@ -40,21 +52,43 @@ engine::engine(
   // Ensure all lib initialization is done (once)
   detail::init::initialize();
 
-  // build default cache path
+  fs::path cachePath;
 #if defined(_WIN32)
-  std::string cachePath = vtksys::SystemTools::GetEnv("LOCALAPPDATA");
-  cachePath = cachePath + "/f3d";
-#elif defined(__APPLE__)
-  std::string cachePath = vtksys::SystemTools::GetEnv("HOME");
-  cachePath += "/Library/Caches/f3d";
-#elif defined(__ANDROID__)
-  std::string cachePath = ""; // no default
-#elif defined(__unix__)
-  std::string cachePath = vtksys::SystemTools::GetEnv("HOME");
-  cachePath += "/.cache/f3d";
+  const char* appData = std::getenv("LOCALAPPDATA");
+  if (appData && strlen(appData) > 0)
+  {
+    cachePath = fs::path(appData);
+  }
 #else
-#error "Unsupported platform"
+
+#if defined(__unix__)
+  // Implementing XDG specifications
+  const char* xdgCacheHome = std::getenv("XDG_CACHE_HOME");
+  if (xdgCacheHome && strlen(xdgCacheHome) > 0)
+  {
+    cachePath = fs::path(xdgCacheHome);
+  }
+  else
 #endif
+  {
+    const char* home = std::getenv("HOME");
+    if (home && strlen(home) > 0)
+    {
+      cachePath = fs::path(home);
+#if defined(__APPLE__)
+      cachePath = cachePath / "Library" / "Caches";
+#elif defined(__unix__)
+      cachePath /= ".cache";
+#endif
+    }
+  }
+#endif
+  if (cachePath.empty())
+  {
+    throw engine::cache_exception(
+      "Could not setup cache, please set the appropriate environment variable");
+  }
+  cachePath /= "f3d";
 
   this->Internals->Options = std::make_unique<options>();
 
@@ -98,9 +132,9 @@ engine engine::createWGL(bool offscreen)
 }
 
 //----------------------------------------------------------------------------
-engine engine::createEGL(bool offscreen)
+engine engine::createEGL()
 {
-  return { window::Type::EGL, offscreen, context::egl() };
+  return { window::Type::EGL, true, context::egl() };
 }
 
 //----------------------------------------------------------------------------
@@ -214,7 +248,21 @@ interactor& engine::getInteractor()
 }
 
 //----------------------------------------------------------------------------
-void engine::loadPlugin(const std::string& pathOrName, const std::vector<std::string>& searchPaths)
+std::map<std::string, bool> engine::getRenderingBackendList()
+{
+  std::map<std::string, bool> backends;
+
+  backends["glx"] = engine::internals::BackendAvailable(context::glx);
+  backends["wgl"] = engine::internals::BackendAvailable(context::wgl);
+  backends["cocoa"] = engine::internals::BackendAvailable(context::cocoa);
+  backends["egl"] = engine::internals::BackendAvailable(context::egl);
+  backends["osmesa"] = engine::internals::BackendAvailable(context::osmesa);
+
+  return backends;
+}
+
+//----------------------------------------------------------------------------
+void engine::loadPlugin(const std::string& pathOrName, const std::vector<fs::path>& searchPaths)
 {
   if (pathOrName.empty())
   {
@@ -240,72 +288,77 @@ void engine::loadPlugin(const std::string& pathOrName, const std::vector<std::st
   if (init_plugin == nullptr)
   {
     vtksys::DynamicLoader::LibraryHandle handle = nullptr;
-
-    std::string fullPath = vtksys::SystemTools::CollapseFullPath(pathOrName);
-    if (vtksys::SystemTools::FileExists(fullPath))
+    try
     {
-      // plugin provided as full path
-      log::debug("Trying to load plugin from: \"", fullPath, "\"");
-      handle = vtksys::DynamicLoader::OpenLibrary(fullPath);
-
-      if (!handle)
+      fs::path fullPath = utils::collapsePath(pathOrName);
+      if (fs::exists(fullPath))
       {
-        throw engine::plugin_exception(
-          "Cannot open the library \"" + fullPath + "\": " + vtksys::DynamicLoader::LastError());
-      }
-      else
-      {
-        pluginOrigin = fullPath;
-      }
-    }
-    else
-    {
-      // construct the library file name from the plugin name
-      std::string libName = vtksys::DynamicLoader::LibPrefix();
-      libName += "f3d-plugin-";
-      libName += pathOrName;
-      libName += vtksys::DynamicLoader::LibExtension();
+        // plugin provided as full path
+        log::debug("Trying to load plugin from: \"", fullPath, "\"");
+        handle = vtksys::DynamicLoader::OpenLibrary(fullPath.string());
 
-      // try search paths
-      for (std::string tryPath : searchPaths)
-      {
-        tryPath += '/';
-        tryPath += libName;
-        tryPath = vtksys::SystemTools::ConvertToOutputPath(tryPath);
-        if (vtksys::SystemTools::FileExists(tryPath))
-        {
-          log::debug("Trying to load \"", pathOrName, "\" plugin from: \"", tryPath, "\"");
-          handle = vtksys::DynamicLoader::OpenLibrary(tryPath);
-
-          if (handle)
-          {
-            // plugin is found and loaded
-            pluginOrigin = tryPath;
-            break;
-          }
-          else
-          {
-            log::debug(
-              "Could not load \"", tryPath, "\" because: ", vtksys::DynamicLoader::LastError());
-          }
-        }
-      }
-
-      if (!handle)
-      {
-        // Rely on internal system (e.g. LD_LIBRARY_PATH on Linux) by giving only the file name
-        log::debug("Trying to load plugin relying on internal system: ", libName);
-        handle = vtksys::DynamicLoader::OpenLibrary(libName);
         if (!handle)
         {
-          throw engine::plugin_exception("Cannot open the library \"" + pathOrName +
+          throw engine::plugin_exception("Cannot open the library \"" + fullPath.string() +
             "\": " + vtksys::DynamicLoader::LastError());
         }
         else
         {
-          pluginOrigin = "system";
+          pluginOrigin = fullPath.string();
         }
       }
+      else
+      {
+        // Not a full path
+        // Construct the library file name from the plugin name
+        std::string libName = vtksys::DynamicLoader::LibPrefix();
+        libName += "f3d-plugin-";
+        libName += pathOrName;
+        libName += vtksys::DynamicLoader::LibExtension();
+
+        // try search paths
+        for (fs::path tryPath : searchPaths)
+        {
+          tryPath /= libName;
+          if (fs::exists(tryPath))
+          {
+            log::debug(
+              "Trying to load \"", pathOrName, "\" plugin from: \"", tryPath.string(), "\"");
+            handle = vtksys::DynamicLoader::OpenLibrary(tryPath.string());
+
+            if (handle)
+            {
+              // plugin is found and loaded
+              pluginOrigin = tryPath.string();
+              break;
+            }
+            else
+            {
+              log::debug("Could not load \"", tryPath.string(),
+                "\" because: ", vtksys::DynamicLoader::LastError());
+            }
+          }
+        }
+        if (!handle)
+        {
+          // Rely on internal system (e.g. LD_LIBRARY_PATH on Linux) by giving only the file name
+          log::debug("Trying to load plugin relying on internal system: ", libName);
+          handle = vtksys::DynamicLoader::OpenLibrary(libName);
+          if (!handle)
+          {
+            throw engine::plugin_exception("Cannot open the library \"" + pathOrName +
+              "\": " + vtksys::DynamicLoader::LastError());
+          }
+          else
+          {
+            pluginOrigin = "system";
+          }
+        }
+      }
+    }
+    catch (const fs::filesystem_error& ex)
+    {
+      throw engine::plugin_exception(std::string("Could not load plugin: ") + ex.what());
     }
 
     init_plugin = reinterpret_cast<factory::plugin_initializer_t>(
@@ -330,23 +383,17 @@ void engine::autoloadPlugins()
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::string> engine::getPluginsList(const std::string& pluginPath)
+std::vector<std::string> engine::getPluginsList(const fs::path& pluginPath)
 {
-  vtksys::Directory dir;
   constexpr std::string_view ext = ".json";
   std::vector<std::string> pluginNames;
-
-  if (dir.Load(pluginPath))
+  try
   {
-    for (unsigned long i = 0; i < dir.GetNumberOfFiles(); i++)
+    for (auto& entry : fs::directory_iterator(pluginPath))
     {
-      std::string currentFile = dir.GetFile(i);
-      if (std::equal(ext.rbegin(), ext.rend(), currentFile.rbegin()))
+      const fs::path& fullPath = entry.path();
+      if (fullPath.extension() == ext)
       {
-        std::string fullPath = dir.GetPath();
-        fullPath += "/";
-        fullPath += currentFile;
-
         try
         {
           auto root = nlohmann::json::parse(std::ifstream(fullPath));
@@ -364,6 +411,9 @@ std::vector<std::string> engine::getPluginsList(const std::string& pluginPath)
         }
       }
     }
+  }
+  catch (const fs::filesystem_error&)
+  {
   }
 
   return pluginNames;
@@ -391,6 +441,12 @@ engine::libInformation engine::getLibInfo()
   libInfo.Modules["OpenEXR"] = false;
 #endif
 
+#if F3D_MODULE_UI
+  libInfo.Modules["ImGui"] = true;
+#else
+  libInfo.Modules["ImGui"] = false;
+#endif
+
   std::string vtkVersion = std::string(vtkVersion::GetVTKVersionFull());
   if (!vtkVersion.empty())
   {
@@ -407,7 +463,7 @@ engine::libInformation engine::getLibInfo()
   }
 
   libInfo.Copyrights.emplace_back("2019-2021 Kitware SAS");
-  libInfo.Copyrights.emplace_back("2021-2024 Michael Migliore, Mathieu Westphal");
+  libInfo.Copyrights.emplace_back("2021-2025 Michael Migliore, Mathieu Westphal");
   libInfo.License = "BSD-3-Clause";
 
   return libInfo;
@@ -437,9 +493,10 @@ std::vector<engine::readerInformation> engine::getReadersInfo()
 }
 
 //----------------------------------------------------------------------------
-void engine::setCachePath(const std::string& cachePath)
+engine& engine::setCachePath(const fs::path& cachePath)
 {
   this->Internals->Window->SetCachePath(cachePath);
+  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -456,6 +513,12 @@ engine::no_interactor_exception::no_interactor_exception(const std::string& what
 
 //----------------------------------------------------------------------------
 engine::plugin_exception::plugin_exception(const std::string& what)
+  : exception(what)
+{
+}
+
+//----------------------------------------------------------------------------
+engine::cache_exception::cache_exception(const std::string& what)
   : exception(what)
 {
 }

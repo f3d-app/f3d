@@ -8,11 +8,8 @@ set(test_sources
   TestF3DOpenGLGridMapper.cxx
   TestF3DRenderPass.cxx
   TestF3DRendererWithColoring.cxx
+  TestF3DFpsCounter.cxx
   )
-
-if(WIN32 AND F3D_WINDOWS_GUI)
-  list(APPEND test_sources TestF3DWinGuiObjectFactory.cxx)
-endif()
 
 if(F3D_MODULE_EXR)
   list(APPEND test_sources
@@ -41,3 +38,7 @@ if(F3D_MODULE_EXR)
     PROPERTIES
     FAIL_REGULAR_EXPRESSION "")
 endif()
+
+if (F3D_MODULE_UI)
+  target_compile_definitions(vtkextPrivateTests PRIVATE F3D_MODULE_UI)
+endif ()

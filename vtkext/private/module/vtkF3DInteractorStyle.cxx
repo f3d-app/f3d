@@ -14,6 +14,102 @@
 
 vtkStandardNewMacro(vtkF3DInteractorStyle);
 
+//------------------------------------------------------------------------------
+void vtkF3DInteractorStyle::OnLeftButtonDown()
+{
+  this->FindPokedRenderer(
+    this->Interactor->GetEventPosition()[0], this->Interactor->GetEventPosition()[1]);
+  assert(this->CurrentRenderer != nullptr);
+
+  if (this->Interactor->GetShiftKey())
+  {
+    this->StartPan();
+  }
+  else
+  {
+    if (this->Interactor->GetControlKey())
+    {
+      this->StartSpin();
+    }
+    else
+    {
+      this->StartRotate();
+    }
+  }
+}
+
+//------------------------------------------------------------------------------
+void vtkF3DInteractorStyle::OnLeftButtonUp()
+{
+  switch (this->State)
+  {
+    case VTKIS_PAN:
+      this->EndPan();
+      break;
+
+    case VTKIS_SPIN:
+      this->EndSpin();
+      break;
+
+    case VTKIS_ROTATE:
+      this->EndRotate();
+      break;
+  }
+}
+
+//------------------------------------------------------------------------------
+void vtkF3DInteractorStyle::OnMiddleButtonDown()
+{
+  this->FindPokedRenderer(
+    this->Interactor->GetEventPosition()[0], this->Interactor->GetEventPosition()[1]);
+  assert(this->CurrentRenderer != nullptr);
+
+  this->StartPan();
+}
+
+//------------------------------------------------------------------------------
+void vtkF3DInteractorStyle::OnMiddleButtonUp()
+{
+  switch (this->State)
+  {
+    case VTKIS_PAN:
+      this->EndPan();
+      break;
+  }
+}
+
+//------------------------------------------------------------------------------
+void vtkF3DInteractorStyle::OnRightButtonDown()
+{
+  this->FindPokedRenderer(
+    this->Interactor->GetEventPosition()[0], this->Interactor->GetEventPosition()[1]);
+  assert(this->CurrentRenderer != nullptr);
+
+  if (this->Interactor->GetShiftKey())
+  {
+    this->StartEnvRotate();
+  }
+  else
+  {
+    this->StartDolly();
+  }
+}
+
+//------------------------------------------------------------------------------
+void vtkF3DInteractorStyle::OnRightButtonUp()
+{
+  switch (this->State)
+  {
+    case VTKIS_ENV_ROTATE:
+      this->EndEnvRotate();
+      break;
+
+    case VTKIS_DOLLY:
+      this->EndDolly();
+      break;
+  }
+}
+
 //----------------------------------------------------------------------------
 void vtkF3DInteractorStyle::OnDropFiles(vtkStringArray* files)
 {
@@ -57,6 +153,8 @@ void vtkF3DInteractorStyle::Rotate()
   double dir[3];
   camera->GetDirectionOfProjection(dir);
   double* up = ren->GetUpVector();
+  this->InterpolateTemporaryUp(0.1, up);
+  up = this->TemporaryUp;
 
   double dot = vtkMath::Dot(dir, up);
 
@@ -235,4 +333,36 @@ void vtkF3DInteractorStyle::FindPokedRenderer(int vtkNotUsed(x), int vtkNotUsed(
 {
   // No need for picking, F3D interaction are only with the first renderer
   this->SetCurrentRenderer(this->Interactor->GetRenderWindow()->GetRenderers()->GetFirstRenderer());
+}
+
+//------------------------------------------------------------------------------
+void vtkF3DInteractorStyle::ResetTemporaryUp()
+{
+  // Make sure this->CurrentRenderer is set
+  this->FindPokedRenderer(0, 0);
+
+  if (this->CurrentRenderer)
+  {
+    vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(this->CurrentRenderer);
+    SetTemporaryUp(ren->GetUpVector());
+  }
+}
+
+//------------------------------------------------------------------------------
+void vtkF3DInteractorStyle::SetTemporaryUp(const double* tempUp)
+{
+  for (int i = 0; i < 3; i++)
+  {
+    this->TemporaryUp[i] = tempUp[i];
+  }
+}
+
+//------------------------------------------------------------------------------
+void vtkF3DInteractorStyle::InterpolateTemporaryUp(double factor, const double* input)
+{
+  for (int i = 0; i < 3; i++)
+  {
+    this->TemporaryUp[i] = (1.0 - factor) * this->TemporaryUp[i] + factor * input[i];
+  }
+  vtkMath::Normalize(this->TemporaryUp);
 }

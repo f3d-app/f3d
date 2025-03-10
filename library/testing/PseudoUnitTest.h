@@ -1,6 +1,8 @@
 #ifndef PseudoUnitTest_h
 #define PseudoUnitTest_h
 
+#include "options.h"
+
 #include <functional>
 #include <iostream>
 #include <sstream>

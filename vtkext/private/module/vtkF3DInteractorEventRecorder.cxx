@@ -1,5 +1,4 @@
 #include "vtkF3DInteractorEventRecorder.h"
-#include "vtkF3DConfigure.h"
 
 #include <vtkCallbackCommand.h>
 #include <vtkObjectFactory.h>
@@ -49,30 +48,31 @@ void vtkF3DInteractorEventRecorder::ProcessEvents(
       case vtkCommand::ModifiedEvent: // don't want these
         break;
 
+      case vtkCommand::ExitEvent: // disable the recorder then exit
+        self->Off();
+        rwi->ExitCallback();
+        break;
+
       default:
-        if (rwi->GetKeySym() && rwi->GetKeySym() == std::string(F3D_EXIT_HOTKEY_SYM))
+      {
+        int mod = 0;
+        if (rwi->GetShiftKey())
         {
-          self->Off();
+          mod |= ModifierKey::ShiftKey;
         }
-        else
+        if (rwi->GetControlKey())
         {
-          int mod = 0;
-          if (rwi->GetShiftKey())
-          {
-            mod |= ModifierKey::ShiftKey;
-          }
-          if (rwi->GetControlKey())
-          {
-            mod |= ModifierKey::ControlKey;
-          }
-          if (rwi->GetAltKey())
-          {
-            mod |= ModifierKey::AltKey;
-          }
-          self->WriteEvent(vtkCommand::GetStringFromEventId(event), rwi->GetEventPosition(), mod,
-            rwi->GetKeyCode(), rwi->GetRepeatCount(), rwi->GetKeySym(), callData);
+          mod |= ModifierKey::ControlKey;
         }
+        if (rwi->GetAltKey())
+        {
+          mod |= ModifierKey::AltKey;
+        }
+        self->WriteEvent(vtkCommand::GetStringFromEventId(event), rwi->GetEventPosition(), mod,
+          rwi->GetKeyCode(), rwi->GetRepeatCount(), rwi->GetKeySym(), callData);
+
+        self->OutputStream->flush();
+      }
     }
-    self->OutputStream->flush();
   }
 }

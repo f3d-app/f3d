@@ -1,51 +1,65 @@
-{
-  ".*(dcm|nrrd|nhdr|mhd|mha|vt.)":
+[
   {
-    "scalar-coloring": true,
-    "bar": true
+    "match": ".*(dcm|nrrd|nhdr|mhd|mha|vt.)",
+    "options": {
+      "scalar-coloring": true,
+      "coloring-scalar-bar": true
+    }
   },
-  ".*(dcm|nrrd|nhdr|mhd|mha|vti)":
   {
-    "volume": true
+    "match": ".*(dcm|nrrd|nhdr|mhd|mha|vti)",
+    "options": {
+      "volume": true
+    }
   },
-  ".*(3ds|stl)":
   {
-    "up": "+Z",
-    "camera-direction": "-1,1,-0.5"
+    "match": ".*(3ds|stl)",
+    "options": {
+      "up": "+Z",
+      "camera-direction": "-1,1,-0.5"
+    }
   },
-  ".*(stl|gml|pts)":
   {
-    "scalar-coloring": true
+    "match": ".*(stl|gml|pts)",
+    "options": {
+      "scalar-coloring": true
+    }
   },
-  ".*(tif|tiff)":
   {
-    "scalar-coloring": true,
-    "up": "-Y",
-    "comp": "-2",
-    "camera-direction": "-1,0.5,1"
+    "match": ".*(tif|tiff)",
+    "options": {
+      "scalar-coloring": true,
+      "up": "-Y",
+      "coloring-component": "-2",
+      "camera-direction": "-1,0.5,1"
+    }
   },
-  ".*(ply)":
   {
-    "scalar-coloring": true,
-    "comp": "-2",
-    "translucency-support": true
+    "match": ".*(ply)",
+    "options": {
+      "scalar-coloring": true,
+      "coloring-component": "-2",
+      "translucency-support": true
+    }
   },
-  ".*(splat)":
   {
-    "point-sprites": true,
-    "point-sprites-size": 1,
-    "point-sprites-type": "gaussian",
-    "scalar-coloring": true,
-    "coloring-array": "color",
-    "comp": "-2",
-    "bg-color": "0, 0, 0",
-    "up": "-Y",
-    "trackball": true,
-    "camera-position": "0,1,-5.2",
-    "camera-focal-point": "0,1,0",
-    "tone-mapping": false,
-    "grid": false,
-    "anti-aliasing": false,
-    "translucency-support": false
+    "match": ".*(splat)",
+    "options": {
+      "point-sprites": true,
+      "point-sprites-size": 1,
+      "point-sprites-type": "gaussian",
+      "scalar-coloring": true,
+      "coloring-array": "color",
+      "coloring-component": "-2",
+      "background-color": "0, 0, 0",
+      "up": "-Y",
+      "interaction-trackball": true,
+      "camera-position": "0,1,-5.2",
+      "camera-focal-point": "0,1,0",
+      "tone-mapping": false,
+      "grid": false,
+      "anti-aliasing": false,
+      "translucency-support": false
+    }
   }
-}
+]

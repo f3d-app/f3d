@@ -5,17 +5,25 @@ inputs:
     description: 'CPU architecture to build for'
     required: false
     default: 'x86_64'
-    
+  version:
+    description: 'Version of alembic to build'
+    required: true
+
 runs:
   using: "composite"
   steps:
 
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+
     - name: Cache Alembic
       id: cache-alembic
-      uses: actions/cache@v4
+      uses: actions/cache/restore@v4
       with:
         path: dependencies/alembic_install
-        key: alembic-v1.8.5-${{runner.os}}-${{inputs.cpu}}-4
+        key: alembic-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-0
 
     - name: Checkout Alembic
       if: steps.cache-alembic.outputs.cache-hit != 'true'
@@ -23,7 +31,7 @@ runs:
       with:
         repository: alembic/alembic
         path: './dependencies/alembic'
-        ref: 1.8.5
+        ref: ${{inputs.version}}
 
     - name: Setup Alembic
       if: steps.cache-alembic.outputs.cache-hit != 'true'
@@ -46,7 +54,7 @@ runs:
         -DCMAKE_PREFIX_PATH:PATH=../install/
         -DUSE_BINARIES=OFF
         -DUSE_TESTS=OFF
-        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 -DCMAKE_MACOSX_RPATH=ON' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0 -DCMAKE_MACOSX_RPATH=ON' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build Alembic
@@ -59,3 +67,10 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/alembic_install
       shell: bash
       run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-alembic.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-alembic.outputs.cache-primary-key }}
+        path: dependencies/alembic_install

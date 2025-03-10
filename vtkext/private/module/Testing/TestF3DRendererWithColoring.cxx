@@ -1,9 +1,8 @@
 #include <vtkNew.h>
-#include <vtkTestUtilities.h>
 #include <vtkRenderWindow.h>
+#include <vtkTestUtilities.h>
 #include <vtkXMLUnstructuredGridReader.h>
 
-#include "vtkF3DConfigure.h"
 #include "vtkF3DGenericImporter.h"
 #include "vtkF3DRenderer.h"
 

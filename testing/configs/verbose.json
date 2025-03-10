@@ -1,6 +1,7 @@
-{
-  ".*":
+[
   {
-    "verbose": true
+    "options": {
+      "verbose": true
+    }
   }
-}
+]

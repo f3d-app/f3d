@@ -8,6 +8,8 @@
 
 #include "TestSDKHelpers.h"
 
+using mod_t = f3d::interaction_bind_t::ModifierKeys;
+
 int TestSDKInteractorCallBack(int argc, char* argv[])
 {
   f3d::engine eng = f3d::engine::create(true);
@@ -15,6 +17,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   f3d::window& win = eng.getWindow();
   f3d::interactor& inter = eng.getInteractor();
   win.setSize(300, 300);
+  win.render();
 
   // Sanity checks coverage
   if (inter.playInteraction(""))
@@ -47,7 +50,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   // Check that adding an existing interaction command trigger an exception
   try
   {
-    inter.addBinding("7", f3d::interactor::ModifierKeys::ANY, "exception");
+    inter.addBinding({ mod_t::ANY, "7" }, "exception");
     std::cerr << "An exception has not been thrown when adding a existing interaction command"
               << std::endl;
     return EXIT_FAILURE;
@@ -57,32 +60,32 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   }
 
   // Remove bindings that will be triggered later and should not have any effect
-  inter.removeBinding("7", f3d::interactor::ModifierKeys::ANY);
-  inter.removeBinding("Y", f3d::interactor::ModifierKeys::NONE);
-  inter.removeBinding("B", f3d::interactor::ModifierKeys::NONE);
-  inter.removeBinding("S", f3d::interactor::ModifierKeys::NONE);
-  inter.removeBinding("Z", f3d::interactor::ModifierKeys::NONE);
+  inter.removeBinding({ mod_t::ANY, "7" });
+  inter.removeBinding({ mod_t::NONE, "Y" });
+  inter.removeBinding({ mod_t::NONE, "B" });
+  inter.removeBinding({ mod_t::NONE, "S" });
+  inter.removeBinding({ mod_t::NONE, "Z" });
+  inter.removeBinding({ mod_t::CTRL, "P" });
 
   // Check that an binding can be added
-  inter.addBinding("S", f3d::interactor::ModifierKeys::NONE, "toggle interactor.axis");
+  inter.addBinding({ mod_t::NONE, "S" }, "toggle ui.axis");
 
   // Check CTRL modifier and that another interaction can be added on the same key with another
   // modifier
-  inter.addBinding("S", f3d::interactor::ModifierKeys::CTRL, "toggle render.grid.enable");
+  inter.addBinding({ mod_t::CTRL, "S" }, "toggle render.grid.enable");
 
   // Check invalid command for coverage
-  inter.addBinding("P", f3d::interactor::ModifierKeys::CTRL, "invalid command");
+  inter.addBinding({ mod_t::CTRL, "P" }, "invalid command");
 
   // Check SHIFT modifier
-  inter.addBinding(
-    "Y", f3d::interactor::ModifierKeys::SHIFT, R"(set ui.filename_info "My Own Filename")");
+  inter.addBinding({ mod_t::SHIFT, "Y" }, R"(set ui.filename_info "My Own Filename")");
 
   // Check CTRL_SHIFT modifier
-  inter.addBinding("B", f3d::interactor::ModifierKeys::CTRL_SHIFT,
-    { "set ui.filename true", "set render.show_edges true" });
+  inter.addBinding(
+    { mod_t::CTRL_SHIFT, "B" }, { "set ui.filename true", "set render.show_edges true" });
 
   // Check ANY modifier
-  inter.addBinding("A", f3d::interactor::ModifierKeys::ANY, "toggle render.background.skybox");
+  inter.addBinding({ mod_t::ANY, "A" }, "toggle render.background.skybox");
 
   // Replace the add_files command
   inter.removeCommand("add_files");
@@ -97,7 +100,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   inter.addCommand("exception", [&](const std::vector<std::string>&) {
     throw std::runtime_error("testing runtime exception");
   });
-  inter.addBinding("Z", f3d::interactor::ModifierKeys::NONE, "exception");
+  inter.addBinding({ mod_t::NONE, "Z" }, "exception");
 
   // This time the interaction should result in a different rendering
   // Dragon.vtu; SZZYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
@@ -115,13 +118,17 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   }
 
   // Remove a non-existing interaction command
-  inter.removeBinding("Invalid", f3d::interactor::ModifierKeys::ANY);
+  inter.removeBinding({ mod_t::ANY, "Invalid" });
 
   // Remove all bindings
-  for (const auto& [interaction, modifier] : inter.getBindingInteractions())
+  for (const std::string& group : inter.getBindGroups())
   {
-    inter.removeBinding(interaction, modifier);
+    for (const f3d::interaction_bind_t& bind : inter.getBindsForGroup(group))
+    {
+      inter.removeBinding(bind);
+    }
   }
+
   // Play interaction again, which should not have any effect
   // Dragon.vtu; SZZYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
   if (!inter.playInteraction(interactionFilePath))
@@ -140,14 +147,31 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   // initialize default bindings again, two times, and check rendering
   inter.initBindings();
   inter.initBindings();
+
   // Dragon.vtu; SZZYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
   if (!inter.playInteraction(interactionFilePath))
   {
     std::cerr << "Unexcepted error playing interaction" << std::endl;
     return EXIT_FAILURE;
   }
-  return TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
-           filename + "DefaultAgain")
-    ? EXIT_SUCCESS
-    : EXIT_FAILURE;
+  if (!TestSDKHelpers::RenderTest(
+        win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename + "DefaultAgain"))
+  {
+    std::cerr << "Unexcepted rendering playing interaction" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  // Check error handling
+  if (inter.recordInteraction("/" + std::string(257, 'x') + "/record.ext"))
+  {
+    std::cerr << "Unexcepted success recording an invalid path" << std::endl;
+    return EXIT_FAILURE;
+  }
+  if (inter.playInteraction("/" + std::string(257, 'x') + "/play.ext"))
+  {
+    std::cerr << "Unexcepted success playing an invalid path" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  return EXIT_SUCCESS;
 }

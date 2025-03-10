@@ -13,7 +13,7 @@ endif()
 
 find_package(OpenCASCADE REQUIRED)
 
-if("${OpenCASCADE_VERSION}" VERSION_LESS "7.5.0")
+if("${OpenCASCADE_VERSION}" VERSION_LESS "7.6.3")
   message(FATAL_ERROR "Plugin: OpenCASCADE: ${OpenCASCADE_VERSION} is not supported by F3D, please update your OpenCASCADE installation.")
 endif()
 

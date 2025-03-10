@@ -5,33 +5,34 @@ inputs:
     description: 'CPU architecture to build for'
     required: false
     default: 'x86_64'
+  version:
+    description: 'Version of openvdb to build'
+    required: true
 
 runs:
   using: "composite"
   steps:
 
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+
     - name: Cache OpenVDB
       id: cache-openvdb
-      uses: actions/cache@v4
+      uses: actions/cache/restore@v4
       with:
         path: dependencies/openvdb_install
-        key: openvdb-11.0.0-${{runner.os}}-${{inputs.cpu}}-8
+        key: openvdb-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-0
 
-    # Dependents: vtk
+    # Dependents (not version): vtk
     - name: Checkout OpenVDB
       if: steps.cache-openvdb.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
       with:
         repository: AcademySoftwareFoundation/openvdb
         path: './dependencies/openvdb'
-        ref: v11.0.0
-
-    # https://github.com/AcademySoftwareFoundation/openvdb/pull/1860
-    - name: Patch OpenVDB
-      if: steps.cache-openvdb.outputs.cache-hit != 'true'
-      working-directory: ${{github.workspace}}/dependencies/openvdb
-      shell: bash
-      run: patch -p1 < $GITHUB_ACTION_PATH/openvdb-cmake-CMP0167.patch
+        ref: ${{inputs.version}}
 
     - name: Setup OpenVDB
       if: steps.cache-openvdb.outputs.cache-hit != 'true'
@@ -56,11 +57,12 @@ runs:
         -DOPENVDB_BUILD_BINARIES=OFF
         -DOPENVDB_BUILD_VDB_PRINT:BOOL=OFF
         -DOPENVDB_CORE_STATIC=OFF
+        -DOPENVDB_USE_DELAYED_LOADING=OFF
         -DUSE_BLOSC:BOOL=ON
         -DUSE_CCACHE:BOOL=OFF
         -DUSE_EXPLICIT_INSTANTIATION:BOOL=OFF
         -DUSE_ZLIB:BOOL=ON
-        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build OpenVDB
@@ -82,3 +84,10 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/openvdb_install
       shell: bash
       run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-openvdb.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-openvdb.outputs.cache-primary-key }}
+        path: dependencies/openvdb_install

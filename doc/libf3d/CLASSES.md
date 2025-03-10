@@ -10,13 +10,14 @@ The engine class is the main class that needs to be instantiated. All other clas
 The engine factory lets you choose between the different types of OpenGL rendering backend.
 The generic `create()` is recommended in most cases and will use the best context possible available on your system.
 However, it's possible to force the rendering backend in some specific use cases:
-* `createGLX()`: force usage of GLX backend, works on Linux only and requires a X11 server to run.
-* `createWGL()`: force usage of WGL native backend on Windows.
-* `createEGL()`: force usage of EGL backend, recommended when doing offscreen rendering with a GPU available. Requires EGL library available. No interactor provided.
-* `createOSMesa()`: force usage of OSMesa backend (software rendering), recommended when doing offscreen rendering without any GPU. Requires OSMesa library available. No interactor provided.
-* `createNone()`: do not use any rendering. Useful to retrieve metadata only.
-* `createExternal()`: the user is responsible of the rendering stack. It lets the user integrate libf3d in other frameworks like Qt or GLFW. No interactor provided. See [Context](#context-class) documentation for more info.
-An additional boolean argument is available to specify if offscreen rendering is requested when relevant on the selected rendering backend.
+
+- `createGLX()`: force usage of GLX backend, works on Linux only and requires a X11 server to run.
+- `createWGL()`: force usage of WGL native backend on Windows.
+- `createEGL()`: force usage of EGL backend, recommended when doing offscreen rendering with a GPU available. Requires EGL library available. No interactor provided.
+- `createOSMesa()`: force usage of OSMesa backend (software rendering), recommended when doing offscreen rendering without any GPU. Requires OSMesa library available. No interactor provided.
+- `createNone()`: do not use any rendering. Useful to retrieve metadata only.
+- `createExternal()`: the user is responsible of the rendering stack. It lets the user integrate libf3d in other frameworks like Qt or GLFW. No interactor provided. See [Context](#context-class) documentation for more info.
+  An additional boolean argument is available to specify if offscreen rendering is requested when relevant on the selected rendering backend.
 
 A static function `loadPlugin` can also be called to load reader plugins. It must be called before loading any file. An internal plugin containing VTK native readers can be loaded by calling `f3d::engine::loadPlugin("native");`. Other plugins maintained by F3D team are available if their build is enabled: `alembic`, `assimp`, `draco`, `exodus`, `occt` and `usd`.
 If CMake option `F3D_PLUGINS_STATIC_BUILD` is enabled, the plugins listed above are also static just like `native` plugin.
@@ -47,10 +48,14 @@ The commands let you interact with the libf3d in a very flexible manner.
 
 Interactor also lets you add and remove bindings in order to modify how
 the libf3d react to different interactions, eg. when a key is pressed or when a file is dropped.
+The libf3d has [default bindings](../user/INTERACTIONS.md) but this API lets you defined your own
+by specifying [binds](../user/CONFIGURATION_FILE.md#Bind) and commands.
+This API also lets you control the content of the cheatsheet.
 
 Use `log::setVerboseLevel(log::VerboseLevel::DEBUG)` to print debug information on interaction and command use.
 
 Of course, you can use `start` and `stop` to control the interactor behavior.
+`start` lets you specify time for the event loop and a `std::function` to execute at each loop.
 
 ## Camera class
 

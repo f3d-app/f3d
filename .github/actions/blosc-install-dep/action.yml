@@ -12,10 +12,10 @@ runs:
 
     - name: Cache blosc
       id: cache-blosc
-      uses: actions/cache@v4
+      uses: actions/cache/restore@v4
       with:
         path: dependencies/blosc_install
-        key: blosc-1.21.5-${{runner.os}}-${{inputs.cpu}}-5
+        key: blosc-v1.21.6-${{runner.os}}-${{inputs.cpu}}-0
 
     # Dependents: openvdb vtk
     - name: Checkout blosc
@@ -24,7 +24,7 @@ runs:
       with:
         repository: Blosc/c-blosc
         path: './dependencies/blosc'
-        ref: v1.21.5
+        ref: v1.21.6
 
     - name: Setup blosc
       if: steps.cache-blosc.outputs.cache-hit != 'true'
@@ -49,7 +49,7 @@ runs:
         -DCMAKE_INSTALL_PREFIX=../blosc_install
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
         -DPREFER_EXTERNAL_ZLIB=ON
-        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build blosc
@@ -62,3 +62,10 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/blosc_install
       shell: bash
       run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-blosc.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-blosc.outputs.cache-primary-key }}
+        path: dependencies/blosc_install
