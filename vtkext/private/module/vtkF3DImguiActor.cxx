@@ -303,8 +303,8 @@ void vtkF3DImguiActor::RenderDropZone()
     const int dropZoneH = viewport->WorkSize.y - dropzonePad * 2;
 
     constexpr float tickThickness = 3.0f;
-    constexpr float tickHalfThickness = tickThickness / 2.0f;
     constexpr float tickLength = 10.0f;
+    constexpr float tickHalfThickness = tickThickness / 2.f;
 
     const int tickNumberW = static_cast<int>(std::ceil(dropZoneW / (tickLength * 2.0f)));
     const int tickNumberH = static_cast<int>(std::ceil(dropZoneH / (tickLength * 2.0f)));
