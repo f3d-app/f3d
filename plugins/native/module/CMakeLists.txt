@@ -1,5 +1,6 @@
 set(classes
   vtkF3DSplatReader
+  vtkF3DQuakeMDLImporter
   )
 
 set(_no_install "")
