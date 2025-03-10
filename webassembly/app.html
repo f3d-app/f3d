@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html class="theme-dark">
   <head>
     <meta charset="utf-8" />
@@ -13,7 +13,7 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bulma-switch@2.0.4/dist/css/bulma-switch.min.css"
     />
-    <link rel="manifest" href="manifest.json"/>
+    <link rel="manifest" href="manifest.json" />
     <style>
       #main {
         min-height: 70vh;
@@ -152,7 +152,7 @@
           $delete.addEventListener("click", () => {
             $notification.parentNode.removeChild($notification);
           });
-        },
+        }
       );
 
       const settings = {
@@ -296,7 +296,7 @@
           function filename_for_model_url(
             model_url,
             extension_parsed,
-            contentDisposition,
+            contentDisposition
           ) {
             // Build filename given extension urlparam or response header content-disposition
             if (extension_parsed) {
@@ -308,7 +308,7 @@
               return model_url.split("/").pop();
             }
             throw new Error(
-              `Could not parse filename/extension from either urlparam extension, response header content-disposition, nor filename present in url`,
+              `Could not parse filename/extension from either urlparam extension, response header content-disposition, nor filename present in url`
             );
           }
           function load_from_url() {
@@ -316,7 +316,7 @@
             // const params = new URLSearchParams(window.location.search);
             // Replace first hash with question mark to have real search query parsing and avoid leading # in first parsed urlparam
             const params = new URLSearchParams(
-              window.location.hash.replace(/^#/, "?"),
+              window.location.hash.replace(/^#/, "?")
             );
             const model_url_passed = params.get("model");
             const extension_parsed = params.get("extension");
@@ -327,12 +327,12 @@
                   throw new Error(`HTTP error, status = ${response.status}`);
                 }
                 const contentDisposition = response.headers.get(
-                  "content-disposition",
+                  "content-disposition"
                 );
                 const filename = filename_for_model_url(
                   model_url,
                   extension_parsed,
-                  contentDisposition,
+                  contentDisposition
                 );
                 // Convert buffer to Uint8Array and openFile
                 response.arrayBuffer().then((buffer) => {
