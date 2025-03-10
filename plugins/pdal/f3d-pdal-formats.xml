@@ -8,10 +8,6 @@
     <comment>Compressed LAS file</comment>
     <glob pattern="*.laz"/>
   </mime-type>
-  <mime-type type="model/e57">
-    <comment>ASTM E57 3D Data Exchange</comment>
-    <glob pattern="*.e57"/>
-  </mime-type>
   <mime-type type="application/vnd.pts">
     <comment>Laser scan plain data format</comment>
     <glob pattern="*.pts"/>
@@ -23,9 +19,5 @@
   <mime-type type="application/vnd.pcd">
     <comment>point cloud data</comment>
     <glob pattern="*.pcd"/>
-  </mime-type>
-  <mime-type type="application/vnd.ept">
-    <comment>Entwine Point Tile</comment>
-    <glob pattern="*.json"/>
   </mime-type>
 </mime-info>

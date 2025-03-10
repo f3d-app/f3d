@@ -22,14 +22,6 @@ f3d_plugin_declare_reader(
 )
 
 f3d_plugin_declare_reader(
-  NAME E57
-  EXTENSIONS e57
-  MIMETYPES model/e57
-  VTK_READER vtkPDALReader
-  FORMAT_DESCRIPTION "ASTM E57 3D Data Exchange"
-)
-
-f3d_plugin_declare_reader(
   NAME PTS
   EXTENSIONS pts
   MIMETYPES application/vnd.pts
@@ -51,14 +43,6 @@ f3d_plugin_declare_reader(
   MIMETYPES application/vnd.pcd
   VTK_READER vtkPDALReader
   FORMAT_DESCRIPTION "point cloud data"
-)
-
-f3d_plugin_declare_reader(
-  NAME EPT
-  EXTENSIONS json
-  MIMETYPES application/vnd.ept
-  VTK_READER vtkPDALReader
-  FORMAT_DESCRIPTION "Entwine Point Tile"
 )
 
 f3d_plugin_build(
