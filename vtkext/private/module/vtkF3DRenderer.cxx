@@ -87,6 +87,26 @@
 
 namespace
 {
+std::string DeprecatedCollapsePath(const fs::path& path)
+{
+  std::string collapsed;
+  std::string origin = path.string();
+
+  // Handle retro-compatibility but warn for deprecation
+  // For easier removal when removing deprecation: F3D_DEPRECATED
+  if (!origin.empty())
+  {
+    collapsed = vtksys::SystemTools::CollapseFullPath(origin);
+    if (collapsed != origin)
+    {
+      F3DLog::Print(F3DLog::Severity::Warning,
+        std::string("Collapsing path inside the libf3d is now deprecated, use "
+                    "utils::collapsePath manually."));
+    }
+  }
+  return collapsed;
+}
+
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
 //----------------------------------------------------------------------------
 // Compute the MD5 hash of an existing file on disk
@@ -144,12 +164,12 @@ vtkSmartPointer<vtkImageData> SaveTextureToImage(
 
 //----------------------------------------------------------------------------
 // TODO : add this function in a utils file for rendering in VTK directly
-vtkSmartPointer<vtkTexture> GetTexture(const std::string& filePath, bool isSRGB = false)
+vtkSmartPointer<vtkTexture> GetTexture(const fs::path& filePath, bool isSRGB = false)
 {
   vtkSmartPointer<vtkTexture> texture;
-  if (!filePath.empty())
+  std::string fullPath = ::DeprecatedCollapsePath(filePath);
+  if (!fullPath.empty())
   {
-    std::string fullPath = vtksys::SystemTools::CollapseFullPath(filePath);
     if (!vtksys::SystemTools::FileExists(fullPath))
     {
       F3DLog::Print(F3DLog::Severity::Warning, "Texture file does not exist " + fullPath);
@@ -788,18 +808,18 @@ vtkBoundingBox vtkF3DRenderer::ComputeVisiblePropOrientedBounds(const vtkMatrix4
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetHDRIFile(const std::optional<std::string>& hdriFile)
+void vtkF3DRenderer::SetHDRIFile(const std::optional<fs::path>& hdriFile)
 {
-  // Check HDRI is different than current one
-  std::string collapsedHdriFile;
-  if (hdriFile.has_value() && !hdriFile.value().empty())
+  std::string hdriFileStr;
+  if (hdriFile.has_value())
   {
-    collapsedHdriFile = vtksys::SystemTools::CollapseFullPath(hdriFile.value());
+    hdriFileStr = ::DeprecatedCollapsePath(hdriFile.value());
   }
 
-  if (this->HDRIFile != collapsedHdriFile)
+  // Check HDRI is different than current one
+  if (this->HDRIFile != hdriFileStr)
   {
-    this->HDRIFile = collapsedHdriFile;
+    this->HDRIFile = hdriFileStr;
 
     this->TextActorsConfigured = false;
     this->RenderPassesConfigured = false;
@@ -1234,19 +1254,25 @@ void vtkF3DRenderer::ConfigureTextActors()
 
   // Font
   this->DropZoneActor->GetTextProperty()->SetFontFamilyToCourier();
-  if (this->FontFile.has_value() && !this->FontFile.value().empty())
+
+  std::string fontFileStr;
+  if (this->FontFile.has_value())
   {
-    std::string tmpFontFile = vtksys::SystemTools::CollapseFullPath(this->FontFile.value());
-    if (vtksys::SystemTools::FileExists(tmpFontFile, true))
+    fontFileStr = ::DeprecatedCollapsePath(this->FontFile.value());
+  }
+
+  if (!fontFileStr.empty())
+  {
+    if (vtksys::SystemTools::FileExists(fontFileStr, true))
     {
       this->DropZoneActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
-      this->DropZoneActor->GetTextProperty()->SetFontFile(tmpFontFile.c_str());
-      this->UIActor->SetFontFile(tmpFontFile);
+      this->DropZoneActor->GetTextProperty()->SetFontFile(fontFileStr.c_str());
+      this->UIActor->SetFontFile(fontFileStr);
     }
     else
     {
       F3DLog::Print(
-        F3DLog::Severity::Warning, std::string("Cannot find \"") + tmpFontFile + "\" font file.");
+        F3DLog::Severity::Warning, std::string("Cannot find \"") + fontFileStr + "\" font file.");
     }
   }
 
@@ -1276,7 +1302,7 @@ void vtkF3DRenderer::SetPointSize(const std::optional<double>& pointSize)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetFontFile(const std::optional<std::string>& fontFile)
+void vtkF3DRenderer::SetFontFile(const std::optional<fs::path>& fontFile)
 {
   if (this->FontFile != fontFile)
   {
@@ -1877,7 +1903,7 @@ void vtkF3DRenderer::SetEmissiveFactor(const std::optional<std::vector<double>>&
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetTextureMatCap(const std::optional<std::string>& tex)
+void vtkF3DRenderer::SetTextureMatCap(const std::optional<fs::path>& tex)
 {
   if (this->TextureMatCap != tex)
   {
@@ -1887,7 +1913,7 @@ void vtkF3DRenderer::SetTextureMatCap(const std::optional<std::string>& tex)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetTextureBaseColor(const std::optional<std::string>& tex)
+void vtkF3DRenderer::SetTextureBaseColor(const std::optional<fs::path>& tex)
 {
   if (this->TextureBaseColor != tex)
   {
@@ -1897,7 +1923,7 @@ void vtkF3DRenderer::SetTextureBaseColor(const std::optional<std::string>& tex)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetTextureMaterial(const std::optional<std::string>& tex)
+void vtkF3DRenderer::SetTextureMaterial(const std::optional<fs::path>& tex)
 {
   if (this->TextureMaterial != tex)
   {
@@ -1907,7 +1933,7 @@ void vtkF3DRenderer::SetTextureMaterial(const std::optional<std::string>& tex)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetTextureEmissive(const std::optional<std::string>& tex)
+void vtkF3DRenderer::SetTextureEmissive(const std::optional<fs::path>& tex)
 {
   if (this->TextureEmissive != tex)
   {
@@ -1917,7 +1943,7 @@ void vtkF3DRenderer::SetTextureEmissive(const std::optional<std::string>& tex)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetTextureNormal(const std::optional<std::string>& tex)
+void vtkF3DRenderer::SetTextureNormal(const std::optional<fs::path>& tex)
 {
   if (this->TextureNormal != tex)
   {
