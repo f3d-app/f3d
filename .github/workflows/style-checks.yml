@@ -27,7 +27,7 @@ jobs:
         prettier_options: '-w **/*.{js,json,md,html}'
     - name: Diff output
       shell: bash
-      run: git diff --color=always
+      run: git diff --color=always --exit-code
 
   codespell-check:
     name: Codespell Check
