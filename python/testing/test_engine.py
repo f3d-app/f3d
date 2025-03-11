@@ -1,8 +1,11 @@
 from pathlib import Path
 
+import pytest
+
 import f3d
 
 
+@pytest.fixture
 def test_plugins_list():
     base_dir = Path(f3d.__file__).parent
     plugins = f3d.Engine.get_plugins_list(base_dir / "share/f3d/plugins")
@@ -66,3 +69,12 @@ def test_get_rendering_backend_list():
     backends = f3d.Engine.get_rendering_backend_list()
 
     assert isinstance(backends, dict) and len(backends) == 5
+
+
+def test_reader_options():
+    reader_option_names = f3d.Engine.get_all_reader_option_names()
+
+    assert isinstance(reader_option_names, list) and reader_option_names
+
+    with pytest.raises(KeyError):
+        f3d.Engine.set_reader_option("inexistent", "value")
