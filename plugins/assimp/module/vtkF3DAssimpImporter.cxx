@@ -899,6 +899,16 @@ int vtkF3DAssimpImporter::ImportBegin()
 void vtkF3DAssimpImporter::ImportActors(vtkRenderer* renderer)
 {
   this->Internals->ImportRoot(renderer);
+  // Record all actors imported from internals to importer itself
+  for (auto& pair : this->Internals->NodeActors)
+  {
+    vtkCollectionSimpleIterator ait;
+    pair.second->InitTraversal(ait);
+    while (auto* actor = pair.second->GetNextActor(ait))
+    {
+      this->ActorCollection->AddItem(actor);
+    }
+  }
 }
 
 //----------------------------------------------------------------------------
