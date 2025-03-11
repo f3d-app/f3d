@@ -23,7 +23,18 @@ jobs:
       with:
         dry: True
         prettier_options: '-c **/*.{js,json,md,html}'
-
+    - name: Python Formatting in place
+      uses: psf/black@stable
+      with:
+        options: "--include '(\\.py|\\.py\\.in)'"
+    - name: Prettier Formatting in place
+      uses: creyD/prettier_action@v4.3
+      with:
+        dry: True
+        prettier_options: '-w **/*.{js,json,md,html}'
+    - name: Diff output
+      shell: bash
+      run: git diff
 
   codespell-check:
     name: Codespell Check
