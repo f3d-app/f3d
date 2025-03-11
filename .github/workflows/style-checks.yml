@@ -37,7 +37,7 @@ jobs:
     - name: Diff output
       if: failure()
       shell: bash
-      run: git diff
+      run: git diff --color=always
 
   codespell-check:
     name: Codespell Check
