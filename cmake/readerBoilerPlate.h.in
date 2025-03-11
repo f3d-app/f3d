@@ -54,18 +54,6 @@ public:
     return types;
   }
 
-  /*
-   * Emplace empty strings into all this plugin specific options in the plugin options
-   */
-/*  void initReaderOptions() override
-  {
-    std::vector<std::string> names = { @F3D_READER_OPTIONS@ };
-    for (const auto& name : names)
-    {
-      this->ReaderOptions.emplace(name, "");
-    }
-  }*/
-
 #if @F3D_READER_HAS_SCORE@
   /*
    * Get the score of this reader.
