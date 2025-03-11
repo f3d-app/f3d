@@ -16,11 +16,11 @@ void applyCustomReader(vtkAlgorithm* algo, const std::string&) const override
     }
     catch (const std::invalid_argument&)
     {
-      vtkWarningWithObjectMacro(vdbReader, "Could not parse vdb.downsampling_factor: " << dsOptStr << ". Ignoring.");
+      vtkWarningWithObjectMacro(vdbReader, "Could not parse VDB.downsampling_factor: " << dsOptStr << ". Ignoring.");
     }
     catch (const std::out_of_range&)
     {
-      vtkWarningWithObjectMacro(vdbReader, "vdb.downsampling_factor out of range: " << dsOptStr << ". Ignoring.");
+      vtkWarningWithObjectMacro(vdbReader, "VDB.downsampling_factor out of range: " << dsOptStr << ". Ignoring.");
     }
   }
 
