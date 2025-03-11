@@ -14,28 +14,18 @@ jobs:
         extensions: 'h,cxx,in'
         exclude: './cmake **/*.py.in **/*.log.in **/*.json.in **/*.thumbnailer.in **/*.cmake.in **/*.desktop.in'
         clangFormatVersion: 18
+        inplace: True
     - name: Python Formatting
       uses: psf/black@stable
       with:
-        options: "--check --verbose --include '(\\.py|\\.py\\.in)'"
-    - name: Prettier Formatting
-      uses: creyD/prettier_action@v4.3
-      with:
-        dry: True
-        prettier_options: '-c **/*.{js,json,md,html}'
-    - name: Python Formatting in place
-      if: failure()
-      uses: psf/black@stable
-      with:
         options: "--include '(\\.py|\\.py\\.in)'"
-    - name: Prettier Formatting in place
-      if: failure()
+    - name: Prettier Formatting
+      continue-on-error: true
       uses: creyD/prettier_action@v4.3
       with:
         dry: True
         prettier_options: '-w **/*.{js,json,md,html}'
     - name: Diff output
-      if: failure()
       shell: bash
       run: git diff --color=always
 
