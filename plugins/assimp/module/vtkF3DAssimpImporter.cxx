@@ -899,6 +899,7 @@ int vtkF3DAssimpImporter::ImportBegin()
 void vtkF3DAssimpImporter::ImportActors(vtkRenderer* renderer)
 {
   this->Internals->ImportRoot(renderer);
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
   // Record all actors imported from internals to importer itself
   for (auto& pair : this->Internals->NodeActors)
   {
@@ -909,6 +910,7 @@ void vtkF3DAssimpImporter::ImportActors(vtkRenderer* renderer)
       this->ActorCollection->AddItem(actor);
     }
   }
+#endif
 }
 
 //----------------------------------------------------------------------------
