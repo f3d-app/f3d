@@ -53,3 +53,10 @@ Here is how the plugins are searched (in preceding order):
 You can also try plugins maintained by the community. If you have created a plugin and would like it to be listed here, please submit a pull request.
 
 - **Abaqus**: ODB support by @YangShen398 ([repository](https://github.com/YangShen398/F3D-ODB-Reader-Plugin))
+
+### Reader options
+
+Plugins can provide option that can be set using the `-D/--define` [command line option](OPTIONS.md).
+eg: `-DVDB.downsampling_factor=0.5`.
+
+- `vdb` - `VDB.downsampling_factor` : Control the level of downsampling when reading a volume, default is 0.1.
