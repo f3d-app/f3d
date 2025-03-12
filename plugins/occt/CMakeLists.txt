@@ -51,6 +51,7 @@ f3d_plugin_declare_reader(
   VTK_READER vtkF3DOCCTReader
   FORMAT_DESCRIPTION "STEP ISO 10303"
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/step.inl"
+  OPTIONS linear_deflection angular_deflection
 )
 
 f3d_plugin_declare_reader(
@@ -60,6 +61,7 @@ f3d_plugin_declare_reader(
   VTK_READER vtkF3DOCCTReader
   FORMAT_DESCRIPTION "Initial Graphics Exchange Specification"
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/iges.inl"
+  OPTIONS linear_deflection angular_deflection
 )
 
 f3d_plugin_declare_reader(
@@ -69,6 +71,7 @@ f3d_plugin_declare_reader(
   VTK_READER vtkF3DOCCTReader
   FORMAT_DESCRIPTION "Open CASCADE BRep"
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/brep.inl"
+  OPTIONS linear_deflection angular_deflection
 )
 
 if (F3D_PLUGIN_OCCT_COLORING_SUPPORT)
@@ -79,6 +82,7 @@ if (F3D_PLUGIN_OCCT_COLORING_SUPPORT)
     VTK_READER vtkF3DOCCTReader
     FORMAT_DESCRIPTION "Open CASCADE XBF"
     CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/xbf.inl"
+    OPTIONS linear_deflection angular_deflection
   )
 endif()
 
