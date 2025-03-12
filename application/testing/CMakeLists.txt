@@ -794,6 +794,7 @@ if(F3D_PLUGIN_BUILD_VDB)
   f3d_test(NAME TestVDBDefinesInexistent DATA icosahedron.vdb ARGS --load-plugins=vdb -Dvdb.downsampling_factor=0.2 REGEXP "did you mean 'VDB.downsampling_factor'" NO_BASELINE)
   f3d_test(NAME TestVDBDefinesDownsamplingFactorParseError DATA icosahedron.vdb ARGS --load-plugins=vdb -DVDB.downsampling_factor=abcde --verbose REGEXP "Could not parse VDB.downsampling_factor" NO_BASELINE)
   f3d_test(NAME TestVDBDefinesDownsamplingFactorOutOfRangeError DATA icosahedron.vdb ARGS --load-plugins=vdb -DVDB.downsampling_factor=${_outOfRangeDoubleStr} --verbose REGEXP "VDB.downsampling_factor out of range" NO_BASELINE)
+  f3d_test(NAME TestVDBCommandScriptReaderOptions DATA icosahedron.vdb ARGS --load-plugins=vdb --volume --volume-inverse SCRIPT TestVDBCommandScriptReaderOptions.txt) # set_reader_option VDB.downsampling_factor 0.2; reload_current_file_group
 
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${F3D_SOURCE_DIR}/plugins/vdb/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
