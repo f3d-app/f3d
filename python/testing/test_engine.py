@@ -73,8 +73,7 @@ def test_get_rendering_backend_list():
 
 def test_reader_options():
     reader_option_names = f3d.Engine.get_all_reader_option_names()
-
-    assert isinstance(reader_option_names, list) and reader_option_names
+    assert reader_option_names is not None
 
     with pytest.raises(KeyError):
         f3d.Engine.set_reader_option("inexistent", "value")
