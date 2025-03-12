@@ -649,6 +649,10 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
     f3d_test(NAME TestThumbnailConfigFileAssimpDAE DATA duck.dae CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
   endif()
 
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
+    f3d_test(NAME TestAssimpMetaData DATA 16bit.fbx ARGS --verbose --load-plugins=assimp REGEXP "Number of actors: 1" NO_BASELINE)
+  endif()
+
 endif()
 
 if(F3D_PLUGIN_BUILD_DRACO)
