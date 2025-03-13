@@ -148,6 +148,11 @@ int TestSDKOptionsIO(int argc, char* argv[])
   test.format<f3d::direction_t>("direction_t", { -0.1, -0.1, +0.1 }, "-XY+Z");
   test.format<f3d::direction_t>("direction_t", { +0.1, -0.1, +0.2 }, "0.1,-0.1,0.2");
 
+  test.parse<f3d::colormap_t>("colormap_t", "0,0,0,0,1,1,1,1", { 0,0,0,0,1,1,1,1 });
+  test.parse<f3d::colormap_t>("colormap_t", "  -0.0,   0,   0   , 0.0,1,1.0  ,1,  1.0 ", { 0,0,0,0,1,1,1,1 });
+  test.parse_expect<f3d::colormap_t, parsing_exception>("invalid parsing colormap_t", "zero,0,0,0,one,1,1,1");
+  test.format<f3d::colormap_t>("colormap_t", { 0,0,0,0,1,1,1,1 }, "0,0,0,0,1,1,1,1");
+
   test.parse<std::vector<std::string>>(
     "std::vector<std::string>", "foo,bar,baz", { "foo", "bar", "baz" });
   test.parse<std::vector<std::string>>(

@@ -68,7 +68,7 @@ fs::path Find(const std::string& str)
   return {};
 }
 
-std::vector<double> Read(const fs::path& path)
+f3d::colormap_t Read(const fs::path& path)
 {
   try
   {
@@ -77,7 +77,7 @@ std::vector<double> Read(const fs::path& path)
     if (img.getChannelCount() < 3)
     {
       f3d::log::error("The specified color map must have at least 3 channels");
-      return {};
+      return f3d::colormap_t();
     }
 
     if (img.getHeight() != 1)
@@ -99,12 +99,12 @@ std::vector<double> Read(const fs::path& path)
       cm[4 * i + 3] = pixel[2];
     }
 
-    return cm;
+    return f3d::colormap_t(cm);
   }
   catch (const f3d::image::read_exception&)
   {
     f3d::log::error("Cannot read colormap at ", path);
-    return {};
+    return f3d::colormap_t();
   }
 }
 }

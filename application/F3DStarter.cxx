@@ -661,7 +661,7 @@ public:
       else
       {
         f3d::log::error("Cannot find the colormap ", colorMapFile);
-        this->LibOptions.model.scivis.colormap = std::vector<double>{};
+        this->LibOptions.model.scivis.colormap = f3d::colormap_t();
       }
     }
   }

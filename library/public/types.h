@@ -207,6 +207,44 @@ public:
 };
 
 /**
+ * Describe a colormap, which is a vector of repeated:
+ * val,r,g,b
+ */
+class colormap_t
+{
+public:
+  colormap_t() = default;
+  explicit colormap_t(const std::vector<double>& vec)
+    : Vector(vec)
+  {
+  }
+  colormap_t(const std::initializer_list<double>& list)
+    : Vector(list)
+  {
+  }
+  [[nodiscard]] operator std::vector<double>() const
+  {
+    return this->Vector;
+  }
+  [[nodiscard]] bool operator==(const colormap_t& other) const
+  {
+    return this->Vector == other.Vector;
+  }
+  [[nodiscard]] bool operator!=(const colormap_t& other) const
+  {
+    return this->Vector != other.Vector;
+  }
+  [[nodiscard]] const double* data() const
+  {
+    return this->Vector.data();
+  }
+
+protected:
+  std::vector<double> Vector;
+};
+
+
+/**
  * Describe a 3D surfacic mesh.
  * A valid mesh fulfills these requirements:
  * - points must not be empty and its length must be a multiple of 3 (3 times the number of points)

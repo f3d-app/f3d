@@ -283,6 +283,26 @@ std::string parse(const std::string& str)
   return options_tools::trim(str);
 }
 
+//----------------------------------------------------------------------------
+/**
+ * Parse provided string into a colormap_t.
+ * Supported formats: vector of doubles
+ * Can throw options::parsing_exception in case of failure to parse
+ * TODO add proper parsing
+ */
+template<>
+colormap_t parse(const std::string& str)
+{
+  try
+  {
+    return colormap_t(options_tools::parse<std::vector<double>>(str));
+  }
+  catch (const options::parsing_exception&)
+  {
+    throw options::parsing_exception("Cannot parse " + str + " into a colormap_t");
+  }
+}
+
 // TODO Improve string generation
 //----------------------------------------------------------------------------
 /**
@@ -426,6 +446,17 @@ std::string format(direction_t var)
   {
     return options_tools::format(static_cast<std::vector<double>>(var));
   }
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Format provided var into a string from provided colormap_t.
+ * Rely on `format(std::vector<double>&)`
+ * TODO add proper formating
+ */
+std::string format(colormap_t var)
+{
+  return options_tools::format(static_cast<std::vector<double>>(var));
 }
 
 } // option_tools
