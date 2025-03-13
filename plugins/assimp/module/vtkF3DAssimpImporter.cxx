@@ -673,6 +673,9 @@ public:
 
     vtkNew<vtkActorCollection> actors;
 
+    vtkIdType nPoints = 0;
+    vtkIdType nCells = 0;
+
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
     {
       vtkNew<vtkActor> actor;
@@ -684,6 +687,10 @@ public:
       actor->SetUserMatrix(mat);
       actor->SetProperty(this->Properties[this->Scene->mMeshes[node->mMeshes[i]]->mMaterialIndex]);
 
+      vtkPolyData* surface = vtkPolyDataMapper::SafeDownCast(actor->GetMapper())->GetInput();
+      nPoints += surface->GetNumberOfPoints();
+      nCells += surface->GetNumberOfCells();
+
       renderer->AddActor(actor);
       actors->AddItem(actor);
     }
@@ -694,6 +701,16 @@ public:
     }
     this->Description += node->mName.C_Str();
     this->Description += "\n";
+
+    if ((nPoints > 0) || (nCells > 0))
+    {
+      this->Description += "Number of points: ";
+      this->Description += std::to_string(nPoints);
+      this->Description += "\n";
+      this->Description += "Number of cells: ";
+      this->Description += std::to_string(nCells);
+      this->Description += "\n";
+    }
 
     this->NodeActors.insert({ node->mName.data, actors });
     this->NodeLocalMatrix.insert({ node->mName.data, localMat });

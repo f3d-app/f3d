@@ -650,7 +650,7 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
   endif()
 
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
-    f3d_test(NAME TestAssimpMetaData DATA 16bit.fbx ARGS --verbose --load-plugins=assimp REGEXP "Number of actors: 1" NO_BASELINE)
+    f3d_test(NAME TestAssimpMetaData DATA duck.fbx ARGS --verbose --load-plugins=assimp REGEXP "Number of points: 12636" NO_BASELINE)
   endif()
 
 endif()
