@@ -502,6 +502,15 @@ public:
                 libf3dOptionValue = "reset";
               }
 
+              // Handle reader options
+              std::vector<std::string> readerOptionNames = f3d::engine::getAllReaderOptionNames();
+              if (std::find(readerOptionNames.begin(), readerOptionNames.end(), libf3dOptionName) !=
+                readerOptionNames.end())
+              {
+                f3d::engine::setReaderOption(libf3dOptionName, libf3dOptionValue);
+                continue;
+              }
+
               try
               {
                 // Assume this is a libf3d option and set/reset the value

@@ -420,6 +420,21 @@ std::vector<std::string> engine::getPluginsList(const fs::path& pluginPath)
 }
 
 //----------------------------------------------------------------------------
+std::vector<std::string> engine::getAllReaderOptionNames()
+{
+  return factory::instance()->getAllReaderOptionNames();
+}
+
+//----------------------------------------------------------------------------
+void engine::setReaderOption(const std::string& name, const std::string& value)
+{
+  if (!factory::instance()->setReaderOption(name, value))
+  {
+    throw options::inexistent_exception("Reader option " + name + " does not exist");
+  }
+}
+
+//----------------------------------------------------------------------------
 engine::libInformation engine::getLibInfo()
 {
   libInformation libInfo;
