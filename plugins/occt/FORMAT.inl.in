@@ -22,5 +22,8 @@ void applyCustomReader(vtkAlgorithm* algo, const std::string& vtkNotUsed(fileNam
   occtReader->SetAngularDeflection(angularDeflect);
   occtReader->SetRelativeDeflection(relativeDeflect);
   occtReader->SetReadWire(readWire);
+
+  // clang-format off
   occtReader->SetFileFormat(vtkF3DOCCTReader::FILE_FORMAT::@_occt_format@);
+  // clang-format on
 }
