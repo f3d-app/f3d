@@ -12,7 +12,7 @@
 
 #include <string>
 
-namespace VTKEXT_EXPORT F3DUtils
+namespace F3DUtils
 {
 VTKEXT_EXPORT double ParseToDouble(const std::string& str, double def, const std::string& nameError);
 };
