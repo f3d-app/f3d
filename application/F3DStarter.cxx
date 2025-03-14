@@ -936,29 +936,52 @@ int F3DStarter::Start(int argc, char** argv)
     bool offscreen = !this->Internals->AppOptions.Reference.empty() ||
       !this->Internals->AppOptions.Output.empty() || this->Internals->AppOptions.BindingsList;
 
-    if (this->Internals->AppOptions.RenderingBackend == "egl")
+    try
     {
-      this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::createEGL());
-    }
-    else if (this->Internals->AppOptions.RenderingBackend == "osmesa")
-    {
-      this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::createOSMesa());
-    }
-    else if (this->Internals->AppOptions.RenderingBackend == "glx")
-    {
-      this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::createGLX(offscreen));
-    }
-    else if (this->Internals->AppOptions.RenderingBackend == "wgl")
-    {
-      this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::createWGL(offscreen));
-    }
-    else
-    {
-      if (this->Internals->AppOptions.RenderingBackend != "auto")
+      if (this->Internals->AppOptions.RenderingBackend == "egl")
       {
-        f3d::log::warn("--rendering-backend value is invalid, falling back to \"auto\"");
+        this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::createEGL());
       }
-      this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::create(offscreen));
+      else if (this->Internals->AppOptions.RenderingBackend == "osmesa")
+      {
+        this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::createOSMesa());
+      }
+      else if (this->Internals->AppOptions.RenderingBackend == "glx")
+      {
+        this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::createGLX(offscreen));
+      }
+      else if (this->Internals->AppOptions.RenderingBackend == "wgl")
+      {
+        this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::createWGL(offscreen));
+      }
+      else
+      {
+        if (this->Internals->AppOptions.RenderingBackend != "auto")
+        {
+          f3d::log::warn("--rendering-backend value is invalid, falling back to \"auto\"");
+        }
+        this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::create(offscreen));
+      }
+    }
+    catch (const f3d::context::loading_exception& ex)
+    {
+      f3d::log::error("Could not load graphic library: ", ex.what());
+      return EXIT_FAILURE;
+    }
+    catch (const f3d::context::symbol_exception& ex)
+    {
+      f3d::log::error("Could not find needed symbol in graphic library: ", ex.what());
+      return EXIT_FAILURE;
+    }
+    catch (const f3d::engine::no_window_exception& ex)
+    {
+      f3d::log::error("Could not create the window: ", ex.what());
+      return EXIT_FAILURE;
+    }
+    catch (const f3d::engine::cache_exception& ex)
+    {
+      f3d::log::error("Could not use default cache directory: ", ex.what());
+      return EXIT_FAILURE;
     }
 
     this->ResetWindowName();
