@@ -14,7 +14,8 @@
 
 class VTKEXT_EXPORT F3DUtils
 {
-static double ParseToDouble(const std::string& str, double def, const std::string& nameError);
+public:
+  static double ParseToDouble(const std::string& str, double def, const std::string& nameError);
 };
 
 #endif
