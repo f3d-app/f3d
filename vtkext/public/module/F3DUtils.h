@@ -14,11 +14,11 @@
 
 namespace F3DUtils
 {
-  /*
-   * Convert provided std into a double and returns it.
-   * Catch conversion error, log them if any and returns the provided def value.
-   * Use nameError in the log for easier debugging.
-   */
+/*
+ * Convert provided std into a double and returns it.
+ * Catch conversion error, log them if any and returns the provided def value.
+ * Use nameError in the log for easier debugging.
+ */
 VTKEXT_EXPORT double ParseToDouble(
   const std::string& str, double def, const std::string& nameError);
 };
