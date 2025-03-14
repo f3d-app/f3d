@@ -12,9 +12,9 @@
 
 #include <string>
 
-namespace VTKEXT_EXPORT F3DUtils
+class VTKEXT_EXPORT F3DUtils
 {
-double ParseToDouble(const std::string& str, double def, const std::string& nameError);
+static double ParseToDouble(const std::string& str, double def, const std::string& nameError);
 };
 
 #endif
