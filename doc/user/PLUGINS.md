@@ -60,3 +60,11 @@ Plugins can provide option that can be set using the `-D/--define` [command line
 eg: `-DVDB.downsampling_factor=0.5`.
 
 - `vdb` - `VDB.downsampling_factor` : Control the level of downsampling when reading a volume, default is 0.1.
+- `occt` - `STEP.linear_deflection` : Control the distance between a curve and the resulting tessellation.
+- `occt` - `STEP.angular_deflection` : Control the angle between two subsequent segments.
+- `occt` - `IGES.linear_deflection` : Control the distance between a curve and the resulting tessellation.
+- `occt` - `IGES.angular_deflection` : Control the angle between two subsequent segments.
+- `occt` - `BREP.linear_deflection` : Control the distance between a curve and the resulting tessellation.
+- `occt` - `BREP.angular_deflection` : Control the angle between two subsequent segments.
+- `occt` - `XBF.linear_deflection` : Control the distance between a curve and the resulting tessellation.
+- `occt` - `XBF.angular_deflection` : Control the angle between two subsequent segments.
