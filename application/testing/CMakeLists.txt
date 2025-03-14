@@ -1135,6 +1135,7 @@ f3d_test(NAME TestBindingsList ARGS --list-bindings REGEXP "Any.5        Toggle 
 
 # Test rendering backends
 # For some reason the sanitizer detects leaks because of EGL and OSMesa
+f3d_test(NAME TestInvalidCache ENV "HOME=" REGEXP "Could not use default cache directory" NO_BASELINE)
 f3d_test(NAME TestRenderingBackendAuto DATA cow.vtp RENDERING_BACKEND auto)
 if(UNIX AND NOT APPLE AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240914 AND F3D_SANITIZER STREQUAL "none")
   if(F3D_TESTING_ENABLE_EGL_TESTS)
