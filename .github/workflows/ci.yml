@@ -649,7 +649,7 @@ jobs:
         arch: [armeabi-v7a, arm64-v8a, x86, x86_64]
 
     runs-on: ubuntu-22.04
-    container: ghcr.io/f3d-app/f3d-android-${{ matrix.arch }}:${{needs.default_versions.outputs.vtk_commit_sha}}
+    container: ghcr.io/f3d-app/f3d-android-${{ matrix.arch }}:${{needs.default_versions.outputs.timestamp}}
 
     steps:
 
@@ -676,7 +676,7 @@ jobs:
       fail-fast: false
 
     runs-on: ubuntu-22.04
-    container: ghcr.io/f3d-app/f3d-wasm:${{needs.default_versions.outputs.vtk_commit_sha}}
+    container: ghcr.io/f3d-app/f3d-wasm:${{needs.default_versions.outputs.timestamp}}
 
     steps:
 
