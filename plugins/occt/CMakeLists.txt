@@ -42,6 +42,18 @@ else()
   set(F3D_PLUGIN_OCCT_COLORING_SUPPORT ON CACHE INTERNAL "")
 endif()
 
+set(_occt_formats "STEP;IGES;BREP")
+if(F3D_PLUGIN_OCCT_COLORING_SUPPORT)
+  list(APPEND _occt_formats "XBF")
+endif()
+
+foreach(_occt_format IN LISTS _occt_formats)
+  configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/FORMAT.inl.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/${_occt_format}.inl"
+    @ONLY)
+endforeach()
+
 f3d_plugin_init()
 
 f3d_plugin_declare_reader(
@@ -50,8 +62,8 @@ f3d_plugin_declare_reader(
   MIMETYPES application/vnd.step
   VTK_READER vtkF3DOCCTReader
   FORMAT_DESCRIPTION "STEP ISO 10303"
-  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/step.inl"
-  OPTIONS linear_deflection angular_deflection
+  CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/STEP.inl"
+  OPTIONS linear_deflection angular_deflection read_wire relative_deflection
 )
 
 f3d_plugin_declare_reader(
@@ -60,8 +72,8 @@ f3d_plugin_declare_reader(
   MIMETYPES model/iges
   VTK_READER vtkF3DOCCTReader
   FORMAT_DESCRIPTION "Initial Graphics Exchange Specification"
-  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/iges.inl"
-  OPTIONS linear_deflection angular_deflection
+  CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/IGES.inl"
+  OPTIONS linear_deflection angular_deflection read_wire relative_deflection
 )
 
 f3d_plugin_declare_reader(
@@ -70,8 +82,8 @@ f3d_plugin_declare_reader(
   MIMETYPES application/vnd.brep
   VTK_READER vtkF3DOCCTReader
   FORMAT_DESCRIPTION "Open CASCADE BRep"
-  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/brep.inl"
-  OPTIONS linear_deflection angular_deflection
+  CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/BREP.inl"
+  OPTIONS linear_deflection angular_deflection read_wire relative_deflection
 )
 
 if (F3D_PLUGIN_OCCT_COLORING_SUPPORT)
@@ -81,8 +93,8 @@ if (F3D_PLUGIN_OCCT_COLORING_SUPPORT)
     MIMETYPES application/vnd.xbf
     VTK_READER vtkF3DOCCTReader
     FORMAT_DESCRIPTION "Open CASCADE XBF"
-    CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/xbf.inl"
-    OPTIONS linear_deflection angular_deflection
+    CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/XBF.inl"
+    OPTIONS linear_deflection angular_deflection read_wire relative_deflection
   )
 endif()
 
