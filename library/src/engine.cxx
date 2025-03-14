@@ -47,7 +47,7 @@ public:
 //----------------------------------------------------------------------------
 engine::engine(
   const std::optional<window::Type>& windowType, bool offscreen, const context::function& loader)
-  : Internals(std::make_unique<engine::internals>())
+  : Internals(new engine::internals)
 {
   // Ensure all lib initialization is done (once)
   detail::init::initialize();
@@ -85,6 +85,7 @@ engine::engine(
 #endif
   if (cachePath.empty())
   {
+    delete Internals;
     throw engine::cache_exception(
       "Could not setup cache, please set the appropriate environment variable");
   }
@@ -182,18 +183,22 @@ engine engine::createExternalOSMesa()
 //----------------------------------------------------------------------------
 engine::~engine()
 {
+  delete this->Internals;
 }
 
 //----------------------------------------------------------------------------
 engine::engine(engine&& other) noexcept
 {
-  this->Internals = std::move(other.Internals);
+  this->Internals = other.Internals;
+  other.Internals = nullptr;
 }
 
 //----------------------------------------------------------------------------
 engine& engine::operator=(engine&& other) noexcept
 {
-  this->Internals = std::move(other.Internals);
+  delete this->Internals;
+  this->Internals = other.Internals;
+  other.Internals = nullptr;
   return *this;
 }
 
