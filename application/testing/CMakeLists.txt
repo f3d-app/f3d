@@ -649,7 +649,11 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
     f3d_test(NAME TestThumbnailConfigFileAssimpDAE DATA duck.dae CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
   endif()
 
-f3d_test(NAME TestAssimpVerbose DATA duck.fbx ARGS --verbose --load-plugins=assimp REGEXP "Number of points: 12636" NO_BASELINE)
+  f3d_test(NAME TestAssimpVerbose DATA duck.fbx ARGS --verbose --load-plugins=assimp REGEXP "Number of points: 12636" NO_BASELINE)
+
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
+    f3d_test(NAME TestAssimpMetaDataImporter DATA duck.fbx ARGS -m UI)
+  endif()
 
 endif()
 
