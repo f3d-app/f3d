@@ -352,7 +352,7 @@ public:
 
 private:
   class internals;
-  internals* Internals;
+  std::unique_ptr<internals> Internals;
 
   /**
    * Engine constructor. This is a private method.

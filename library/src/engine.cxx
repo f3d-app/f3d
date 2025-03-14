@@ -47,7 +47,7 @@ public:
 //----------------------------------------------------------------------------
 engine::engine(
   const std::optional<window::Type>& windowType, bool offscreen, const context::function& loader)
-  : Internals(new engine::internals)
+  : Internals(std::make_unique<engine::internals>())
 {
   // Ensure all lib initialization is done (once)
   detail::init::initialize();
@@ -182,22 +182,18 @@ engine engine::createExternalOSMesa()
 //----------------------------------------------------------------------------
 engine::~engine()
 {
-  delete this->Internals;
 }
 
 //----------------------------------------------------------------------------
 engine::engine(engine&& other) noexcept
 {
-  this->Internals = other.Internals;
-  other.Internals = nullptr;
+  this->Internals = std::move(other.Internals);
 }
 
 //----------------------------------------------------------------------------
 engine& engine::operator=(engine&& other) noexcept
 {
-  delete this->Internals;
-  this->Internals = other.Internals;
-  other.Internals = nullptr;
+  this->Internals = std::move(other.Internals);
   return *this;
 }
 
