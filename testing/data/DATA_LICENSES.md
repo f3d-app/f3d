@@ -60,7 +60,7 @@
 - (ノಠ益ಠ )ノ.vtp: VTK Data: BSD-3-Clause
 - Wolf.fbx: OLEKSO: [CC-NC 4.0](http://creativecommons.org/licenses/by-nc/4.0/)
 
-All other datasets are licensed under the BSD-3-Clause F3D license.`
+All other datasets are licensed under the BSD-3-Clause F3D license.
 
 # VTK Data: BSD-3-Clause license
 
