@@ -12,7 +12,7 @@
 
 namespace F3DUtils
 {
-  double ParseToDouble(const std::string& str, double def, const std::string& nameError);
+double ParseToDouble(const std::string& str, double def, const std::string& nameError);
 };
 
 #endif
