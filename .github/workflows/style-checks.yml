@@ -1,8 +1,8 @@
 on:
   pull_request_target:
-    types: [opened, synchronize]
+    types: [assigned, opened, synchronize, reopened]
     branches:
-      - main
+      - master
 name: Style Checks
 jobs:
 
