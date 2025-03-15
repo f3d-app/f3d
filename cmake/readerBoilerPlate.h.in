@@ -7,6 +7,8 @@
 
 #include "reader.h"
 
+#include "F3DUtils.h"
+
 #if @F3D_READER_HAS_GEOMETRY_READER@
 #include <@F3D_READER_VTK_READER@.h>
 #endif
