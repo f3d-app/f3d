@@ -85,6 +85,7 @@ engine::engine(
 #endif
   if (cachePath.empty())
   {
+    delete Internals;
     throw engine::cache_exception(
       "Could not setup cache, please set the appropriate environment variable");
   }
