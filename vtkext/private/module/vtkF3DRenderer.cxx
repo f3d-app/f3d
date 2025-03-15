@@ -1240,7 +1240,8 @@ void vtkF3DRenderer::ConfigureTextActors()
   }
 
   // Font
-  if (this->FontFile.has_value() && !this->FontFile.value().empty())
+  std::string fontFileStr;
+  if (this->FontFile.has_value())
   {
     fontFileStr = ::DeprecatedCollapsePath(this->FontFile.value());
   }
@@ -1249,7 +1250,7 @@ void vtkF3DRenderer::ConfigureTextActors()
   {
     if (vtksys::SystemTools::FileExists(fontFileStr, true))
     {
-      this->UIActor->SetFontFile(tmpFontFile);
+      this->UIActor->SetFontFile(fontFileStr);
     }
     else
     {
