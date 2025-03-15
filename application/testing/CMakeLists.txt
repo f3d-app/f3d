@@ -817,14 +817,31 @@ if(F3D_PLUGIN_BUILD_VDB)
 endif ()
 
 if(F3D_PLUGIN_BUILD_VDB)
-  f3d_test(NAME TestPDALReadLAS DATA thin-2.las ARGS --load-plugins=pdal)
+  # .las files
+  f3d_test(NAME TestPDALReadLAS1 DATA thin-2.las ARGS --load-plugins=pdal)
+  f3d_test(NAME TestPDALReadLAS2 DATA 0450.las ARGS --load-plugins=pdal LONG_TIMEOUT)
+  f3d_test(NAME TestPDALReadLAS3 DATA tile135.las ARGS --load-plugins=pdal LONG_TIMEOUT)
+  f3d_test(NAME TestPDALReadLASVolume DATA thin-2.las ARGS --load-plugins=vdb --volume --volume-inverse)
+  f3d_test(NAME TestPDALReadLASPoints DATA thin-2.las ARGS --load-plugins=vdb -o)
+  f3d_test(NAME TestPDALReadLASVerbose DATA thin-2.las  ARGS --load-plugins=vdb REGEXP "PartitionedDataSet" NO_RENDER)
+
+  # .laz files
   f3d_test(NAME TestPDALReadLAZ1 DATA autzen_trim.laz ARGS --load-plugins=pdal)
   f3d_test(NAME TestPDALReadLAZ2 DATA laszip-generated.laz ARGS --load-plugins=pdal)
+
+  # .pcd files
   f3d_test(NAME TestPDALReadPCD1 DATA autzen-utm.pcd ARGS --load-plugins=pdal)
   f3d_test(NAME TestPDALReadPCD2 DATA utm17_space.pcd ARGS --load-plugins=pdal)
-  f3d_test(NAME TestPDALReadPTX DATA 1.2-with-color.ptx ARGS --load-plugins=pdal)
+  f3d_test(NAME TestPDALReadPCD3 DATA image_0002.pcd ARGS --load-plugins=pdal)
+
+  # .ptx files
+  f3d_test(NAME TestPDALReadPTX1 DATA 1.2-with-color.ptx ARGS --load-plugins=pdal)
+  f3d_test(NAME TestPDALReadPTX2 DATA pump.ptx ARGS --load-plugins=pdal LONG_TIMEOUT)
+
+  # .pts files
   f3d_test(NAME TestPDALReadPTS1 DATA autzen.pts ARGS --load-plugins=pdal)
   f3d_test(NAME TestPDALReadPTS2 DATA bunny_8.pts ARGS --load-plugins=pdal)
+  f3d_test(NAME TestPDALReadPTS3 DATA bunnyData.pts ARGS --load-plugins=pdal)
 endif ()
 
 if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
