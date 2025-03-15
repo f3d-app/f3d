@@ -1136,9 +1136,6 @@ f3d_test(NAME TestBindingsList ARGS --list-bindings REGEXP "Any.5        Toggle 
 # Test rendering backends
 # For some reason the sanitizer detects leaks because of EGL and OSMesa
 f3d_test(NAME TestRenderingBackendAuto DATA cow.vtp RENDERING_BACKEND auto)
-if(NOT WIN32)
-  f3d_test(NAME TestInvalidCache ENV "HOME=" REGEXP "Could not use default cache directory" NO_BASELINE)
-endif()
 if(UNIX AND NOT APPLE AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240914 AND F3D_SANITIZER STREQUAL "none")
   if(F3D_TESTING_ENABLE_EGL_TESTS)
     f3d_test(NAME TestRenderingBackendEGL DATA cow.vtp RENDERING_BACKEND egl)
@@ -1190,6 +1187,7 @@ set_tests_properties(f3d::TestNoFileFileNameTemplate PROPERTIES PASS_REGULAR_EXP
 set_tests_properties(f3d::TestNoFileFileNameTemplate PROPERTIES ENVIRONMENT "CTEST_F3D_NO_DATA_FORCE_RENDER=1")
 
 if(NOT WIN32)
+  f3d_test(NAME TestInvalidCache ENV "HOME=" REGEXP "Could not use default cache directory" NO_BASELINE)
   add_test(NAME f3d::TestHOMEOutput COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/suzanne.stl --output=~/Testing/Temporary/TestHOMEOutput.png --resolution=300,300 --no-config)
   set_tests_properties(f3d::TestHOMEOutput PROPERTIES ENVIRONMENT "HOME=${CMAKE_BINARY_DIR}")
   set_tests_properties(f3d::TestHOMEOutput PROPERTIES FIXTURES_SETUP f3d::TestHOMEOutput_FIXTURE)

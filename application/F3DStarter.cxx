@@ -968,6 +968,11 @@ int F3DStarter::Start(int argc, char** argv)
       f3d::log::error("Could not load graphic library: ", ex.what());
       return EXIT_FAILURE;
     }
+    catch (const f3d::context::symbol_exception& ex)
+    {
+      f3d::log::error("Could not find needed symbol in graphic library: ", ex.what());
+      return EXIT_FAILURE;
+    }
     catch (const f3d::engine::no_window_exception& ex)
     {
       f3d::log::error("Could not create the window: ", ex.what());
