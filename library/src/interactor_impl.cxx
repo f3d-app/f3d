@@ -913,6 +913,7 @@ bool interactor_impl::triggerCommand(std::string_view command)
     if (callbackIt != this->Internals->Commands.end())
     {
       callbackIt->second({ tokens.begin() + 1, tokens.end() });
+      return true;
     }
     else
     {
