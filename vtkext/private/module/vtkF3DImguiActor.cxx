@@ -327,9 +327,9 @@ void vtkF3DImguiActor::RenderDropZone()
     // Draw top and bottom line
     for (float x = p0.x; x < p1.x; x += tickLength + tickSpaceW)
     {
-      const float y0 = p0.y + tickThickness / 2.f;
+//      const float y0 = p0.y + tickThickness / 2.f;
       const float x1 = std::min(p1.x, x + tickLength);
-      draw_list->AddLine(ImVec2(x, y0), ImVec2(x1, y0), color, tickThickness);
+//      draw_list->AddLine(ImVec2(x, y0), ImVec2(x1, y0), color, tickThickness);
       draw_list->AddLine(ImVec2(x, p1.y), ImVec2(x1, p1.y), color, tickThickness);
     }
 
@@ -338,7 +338,7 @@ void vtkF3DImguiActor::RenderDropZone()
     {
       const float x1 = p1.x - tickThickness / 2.f;
       const float y1 = std::min(p1.y, y + tickLength);
-      draw_list->AddLine(ImVec2(p0.x, y), ImVec2(p0.x, y1), color, tickThickness);
+//      draw_list->AddLine(ImVec2(p0.x, y), ImVec2(p0.x, y1), color, tickThickness);
       draw_list->AddLine(ImVec2(x1, y), ImVec2(x1, y1), color, tickThickness);
     }
 
