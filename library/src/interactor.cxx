@@ -19,10 +19,4 @@ interactor::command_runtime_exception::command_runtime_exception(const std::stri
   : exception(what)
 {
 }
-
-//----------------------------------------------------------------------------
-interactor::invalid_args_exception::invalid_args_exception(const std::string& what)
-  : exception(what)
-{
-}
 }

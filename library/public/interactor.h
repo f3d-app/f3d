@@ -290,7 +290,10 @@ public:
    */
   struct invalid_args_exception : public exception
   {
-    explicit invalid_args_exception(const std::string& what = "");
+    explicit invalid_args_exception(const std::string& what = "")
+      : exception(what)
+    {
+    }
   };
 
 protected:
