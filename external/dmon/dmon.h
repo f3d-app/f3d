@@ -83,6 +83,7 @@
 //      1.3.3       Fixed thread sanitizer issues with Linux backend
 //      1.3.4       Fixed thread sanitizer issues with MacOS backend
 //      1.3.5       Got rid of volatile for quit variable
+//      patch       https://github.com/septag/dmon/pull/36
 //      
 
 #include <stdbool.h>
@@ -1173,7 +1174,7 @@ DMON_API_IMPL void dmon_init(void)
 DMON_API_IMPL void dmon_deinit(void)
 {
     DMON_ASSERT(_dmon_init);
-    __sync_lock_test_and_set(&_dmon.quit, true);
+    _DMON_UNUSED(__sync_lock_test_and_set(&_dmon.quit, true));
     pthread_join(_dmon.thread_handle, NULL);
 
     {
@@ -1561,7 +1562,7 @@ DMON_API_IMPL void dmon_init(void)
 DMON_API_IMPL void dmon_deinit(void)
 {
     DMON_ASSERT(_dmon_init);
-    __sync_lock_test_and_set(&_dmon.quit, true);
+    _DMON_UNUSED(__sync_lock_test_and_set(&_dmon.quit, true));
     pthread_join(_dmon.thread_handle, NULL);
 
     dispatch_release(_dmon.thread_sem);
