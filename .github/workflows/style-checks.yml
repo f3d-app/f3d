@@ -1,12 +1,19 @@
 name: Style Checks
 on: [push, pull_request]
+
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
 
   formatting-check:
     name: Formatting Check
     runs-on: ubuntu-latest
     steps:
+
     - uses: actions/checkout@v4
+
     - name: C++ Formatting
       uses: DoozyX/clang-format-lint-action@v0.16
       with:
@@ -15,16 +22,24 @@ jobs:
         exclude: './cmake **/*.py.in **/*.log.in **/*.json.in **/*.thumbnailer.in **/*.cmake.in **/*.desktop.in'
         clangFormatVersion: 18
         inplace: True
+
     - name: Python Formatting
       uses: psf/black@stable
       with:
         options: "--include '(\\.py|\\.py\\.in)'"
+
     - name: Prettier Formatting
       continue-on-error: true
       uses: creyD/prettier_action@v4.3
       with:
         dry: True
         prettier_options: '-w **/*.{js,json,md,html}'
+
+   - uses: parkerbxyz/suggest-changes@v2
+     with:
+       comment: 'Please commit the suggested changes from style checkers.'
+       event: 'REQUEST_CHANGES'
+
     - name: Diff output
       shell: bash
       run: git diff --color=always --exit-code
