@@ -1,5 +1,9 @@
+on:
+  pull_request_target:
+    types: [opened, synchronize]
+    branches:
+      - main
 name: Style Checks
-on: [push, pull_request]
 jobs:
 
   formatting-check:
@@ -25,6 +29,11 @@ jobs:
       with:
         dry: True
         prettier_options: '-w **/*.{js,json,md,html}'
+    - uses: googleapis/code-suggester@v5
+      with:
+        command: review
+        pull_number: ${{ github.event.pull_request.number }}
+        git_dir: '.'
     - name: Diff output
       shell: bash
       run: git diff --color=always --exit-code
