@@ -13,6 +13,9 @@ jobs:
       ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
     - uses: actions/checkout@v4
+      with:
+        ref: ${{github.event.pull_request.head.ref}}
+        repository: ${{github.event.pull_request.head.repo.full_name}}
     - name: C++ Formatting
       uses: DoozyX/clang-format-lint-action@v0.16
       with:
