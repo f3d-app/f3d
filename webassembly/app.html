@@ -141,6 +141,27 @@
           </div>
         </div>
       </div>
+      <div
+        class="event-log"
+        style="
+          position: absolute;
+          z-index: 10;
+          bottom: 50px;
+          width: 100%;
+          display: none;
+        "
+      >
+        <p style="text-align: center">Loading 3D object...</p>
+        <progress
+          class="progress is-primary"
+          id="progressEl"
+          value="0"
+          max="100"
+          style="transition: all 2s; width: 500px; margin: auto"
+        >
+          30%
+        </progress>
+      </div>
     </section>
     <script type="text/javascript" src="f3d.js"></script>
     <script type="text/javascript">
@@ -204,20 +225,40 @@
           };
 
           // setup file open event
-          document
-            .querySelector("#file-selector")
-            .addEventListener("change", (evt) => {
-              for (const file of evt.target.files) {
-                const reader = new FileReader();
-                reader.addEventListener("loadend", (e) => {
-                  Module.FS.writeFile(file.name, new Uint8Array(reader.result));
-                  openFile(file.name);
-                });
-                reader.readAsArrayBuffer(file);
-              }
-            });
+          const progressEl = document.querySelector("#progressEl");
+          const fileSelector = document.querySelector("#file-selector");
+          fileSelector.addEventListener("change", (evt) => {
+            for (const file of evt.target.files) {
+              const reader = new FileReader();
+              reader.addEventListener("loadend", (e) => {
+                progressEl.textContent = "100%";
+                progressEl.value = 100;
+                Module.FS.writeFile(file.name, new Uint8Array(reader.result));
+                openFile(file.name);
+                progressEl.parentElement.style.display = "none";
+              });
+              reader.addEventListener("progress", (evt) => {
+                console.log(evt);
+                const progress = Math.floor((100 * evt.loaded) / evt.total);
+                progressEl.parentElement.style.display = "block";
+                progressEl.value = progress;
+                progressEl.textContent = `${progress}%`;
+              });
+              reader.readAsArrayBuffer(file);
+            }
+          });
 
           Module.setupOptions(Module.engineInstance.getOptions());
+
+          // Storing dom el ids to f3d option mappings since also useful for url-param parsing
+          const idOptionMappings = [
+            ["grid", "render.grid.enable"],
+            ["axis", "ui.axis"],
+            ["fxaa", "render.effect.anti_aliasing"],
+            ["tone", "render.effect.tone_mapping"],
+            ["ssao", "render.effect.ambient_occlusion"],
+            ["ambient", "render.hdri.ambient"],
+          ];
 
           // toggle callback
           const mapToggleIdToOption = (id, option) => {
@@ -229,12 +270,11 @@
               });
           };
 
-          mapToggleIdToOption("grid", "render.grid.enable");
-          mapToggleIdToOption("axis", "ui.axis");
-          mapToggleIdToOption("fxaa", "render.effect.anti_aliasing");
-          mapToggleIdToOption("tone", "render.effect.tone_mapping");
-          mapToggleIdToOption("ssao", "render.effect.ambient_occlusion");
-          mapToggleIdToOption("ambient", "render.hdri.ambient");
+          // This assumes all toggles are 'on' before mapping their state to options
+          // Ok after f3d(settings) where settings = {..., setupOptions} which toggles some options
+          for (let [id, option] of idOptionMappings) {
+            mapToggleIdToOption(id, option);
+          }
 
           switchDark = () => {
             document.documentElement.classList.add("theme-dark");
@@ -311,8 +351,57 @@
               `Could not parse filename/extension from either urlparam extension, response header content-disposition, nor filename present in url`,
             );
           }
+
+          // Have fetch support onProgress event
+          async function fetchWithProgress(url, onProgress) {
+            const response = await fetch(url);
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const contentLength = response.headers.get("Content-Length");
+            if (!contentLength) {
+              console.warn("Content-Length header is missing");
+            }
+            const total = contentLength ? parseInt(contentLength, 10) : 0;
+            let loaded = 0;
+            const reader = response.body.getReader();
+            const stream = new ReadableStream({
+              start(controller) {
+                function push() {
+                  reader
+                    .read()
+                    .then(({ done, value }) => {
+                      if (done) {
+                        controller.close();
+                        return;
+                      }
+                      loaded += value.length;
+                      if (onProgress) {
+                        onProgress(loaded, total);
+                      }
+                      controller.enqueue(value);
+                      push();
+                    })
+                    .catch((err) => {
+                      console.error("Stream reading error:", err);
+                      controller.error(err);
+                    });
+                }
+                push();
+              },
+            });
+            return new Response(stream);
+          }
+          function onFetchProgress(loaded, total) {
+            const progress = Math.floor((100 * loaded) / total);
+            progressEl.parentElement.style.display = "block";
+            progressEl.value = progress;
+            progressEl.textContent = `${progress}%`;
+            console.log(`${progress}%`, loaded, total);
+          }
+
+          // Parse search-query model url-param or load default model file
           function load_from_url() {
-            // Parse search-query model url-param or load default model file
             // const params = new URLSearchParams(window.location.search);
             // Replace first hash with question mark to have real search query parsing and avoid leading # in first parsed urlparam
             const params = new URLSearchParams(
@@ -322,28 +411,72 @@
             const extension_parsed = params.get("extension");
             if (model_url_passed) {
               const model_url = decodeURI(model_url_passed);
-              fetch(model_url).then((response) => {
-                if (!response.ok) {
-                  throw new Error(`HTTP error, status = ${response.status}`);
-                }
-                const contentDisposition = response.headers.get(
-                  "content-disposition",
-                );
-                const filename = filename_for_model_url(
-                  model_url,
-                  extension_parsed,
-                  contentDisposition,
-                );
-                // Convert buffer to Uint8Array and openFile
-                response.arrayBuffer().then((buffer) => {
-                  Module.FS.writeFile(filename, new Uint8Array(buffer));
-                  openFile(filename);
+              fetchWithProgress(model_url, onFetchProgress)
+                // fetch(model_url)
+                .then((response) => {
+                  if (!response.ok) {
+                    throw new Error(`HTTP error, status = ${response.status}`);
+                  }
+                  const contentDisposition = response.headers.get(
+                    "content-disposition",
+                  );
+                  const filename = filename_for_model_url(
+                    model_url,
+                    extension_parsed,
+                    contentDisposition,
+                  );
+                  // Convert buffer to Uint8Array and openFile
+                  response.arrayBuffer().then((buffer) => {
+                    Module.FS.writeFile(filename, new Uint8Array(buffer));
+                    openFile(filename);
+                    progressEl.parentElement.style.display = "none";
+                  });
+                })
+                .catch(function (error) {
+                  console.log("error caught during fetch", error);
+                  alert(
+                    "Error occurred while fetching the model at provided url (passed as url-param). \n\nThis might be a CORS issue (you can avoid it by using a Allow-CORS plugin) because server does not allow cross-origin requests, or the url to the file is wrong. \n\nComplete error message: " +
+                      error.message,
+                  );
                 });
-              });
             } else {
               // load the file located in the virtual filesystem
               openFile("f3d.vtp");
             }
+
+            // Parse other options like #axis=false&grid=false&fxaa=false&tone=false&ssao=false&ambient=false
+            const options = Module.engineInstance.getOptions();
+            for (let [id, option] of idOptionMappings) {
+              // Set f3d option parameter values
+              const parsed_param_value = params.get(id);
+              if (parsed_param_value) {
+                // Let set_as_string handle value conversion and validation.
+                options.set_as_string(option, parsed_param_value.toLowerCase());
+                // However, get_as_string returns string rather than typed value
+                const new_val = options.get_as_string(option) == "true";
+                ui_switch = document.querySelector("#" + id);
+                if (ui_switch) ui_switch.checked = new_val;
+              }
+            }
+
+            // Parse up vector and update UI, up is either +Z or +Y
+            // + Plus sign means spaces in urls, so +Z has to be replaced by %2BZ
+            const parsed_up_value = params.get("up");
+            if (parsed_up_value) {
+              console.log("up", parsed_up_value);
+              options.set_string("scene.up_direction", parsed_up_value);
+              for (const el of ["z-up", "y-up"])
+                document.getElementById(el).classList.remove("is-active");
+              if (parsed_up_value == "+Y") {
+                document.getElementById("y-up").classList.add("is-active");
+              } else {
+                document.getElementById("z-up").classList.add("is-active");
+              }
+              openFile(document.getElementById("file-name").innerHTML);
+            }
+
+            // Needs re-render to update F3D options
+            Module.engineInstance.getWindow().render();
           }
           addEventListener("hashchange", (event) => {
             load_from_url();
