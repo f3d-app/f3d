@@ -283,6 +283,91 @@ std::string parse(const std::string& str)
   return options_tools::trim(str);
 }
 
+//----------------------------------------------------------------------------
+/**
+ * Parse provided string into a colormap_t.
+ * Supported formats:
+ * - "val, color, val, color, ..."
+ * - "val, red, green, blue, val, red, green, blue, ..."
+ * Where val is in [0, 1].
+ * Can throw options::parsing_exception in case of failure to parse
+ */
+template<>
+colormap_t parse(const std::string& str)
+{
+  // Split by separator
+  std::vector<double> colormapVec;
+  std::istringstream split(str);
+  std::string each;
+  while (std::getline(split, each, ','))
+  {
+    // Parse val into a double
+    double val;
+    try
+    {
+      val = options_tools::parse<double>(each);
+    }
+    catch (const options::parsing_exception&)
+    {
+      throw options::parsing_exception("Cannot parse value from colormap: " + each + ". Check provided colormap string is correct: " + str);
+    }
+
+    // Check it is between 0 and 1
+    if (val < 0 || val > 1)
+    {
+      throw options::parsing_exception("Parsed value from colormap: " + each + " is not in expected [0, 1] range. Check provided colormap string is correct: " + str);
+    }
+
+    // Add value to colormap vector;
+    colormapVec.emplace_back(val);
+
+    // recover next string
+    if (!std::getline(split, each, ','))
+    {
+      throw options::parsing_exception("Incorrect number of tokens in provided colormap: " + str);
+    }
+
+    // Try to parse it directly as a color
+    f3d::color_t color;
+    try
+    {
+      color = options_tools::parse<f3d::color_t>(each);
+
+      // Add color to colormap vector
+      colormapVec.emplace_back(color.r());
+      colormapVec.emplace_back(color.g());
+      colormapVec.emplace_back(color.b());
+      continue;
+    }
+    catch (const options::parsing_exception&)
+    {
+      // Quiet catch
+    }
+
+    // Not a color, recover next two token, reconstruct r,g,b string and try to parse it as a color again
+    std::string green;
+    std::string blue;
+    if (!std::getline(split, green, ',') || !std::getline(split, blue, ','))
+    {
+      throw options::parsing_exception("Incorrect number of tokens in provided colormap or a color could not be parsed as expected: " + str);
+    }
+
+    try
+    {
+      color = options_tools::parse<f3d::color_t>(each + "," + green + "," + blue);
+      colormapVec.emplace_back(color.r());
+      colormapVec.emplace_back(color.g());
+      colormapVec.emplace_back(color.b());
+      continue;
+    }
+    catch (const options::parsing_exception&)
+    {
+      throw options::parsing_exception("Cannot parse color from colormap: " + each + "," + green + "," + blue + ". Check provided colormap string is correct: " + str);
+    }
+  }
+  return colormap_t(colormapVec);
+}
+
 // TODO Improve string generation
 //----------------------------------------------------------------------------
 /**
@@ -426,6 +511,17 @@ std::string format(direction_t var)
   {
     return options_tools::format(static_cast<std::vector<double>>(var));
   }
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Format provided var into a string from provided colormap_t.
+ * Rely on `format(std::vector<double>&)`
+ * TODO add proper formatting
+ */
+std::string format(colormap_t var)
+{
+  return options_tools::format(static_cast<std::vector<double>>(var));
 }
 
 } // option_tools
