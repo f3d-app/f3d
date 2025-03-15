@@ -100,8 +100,9 @@ public:
    *
    * Return true if the command succeeded, false otherwise.
    * Throw an interactor::command_runtime_exception if the command callback
-   * throw an unrecognized exception. Note that default commands cannot throw such
-   * an exception.
+   * throw an unrecognized exception.
+   * Note that default commands will never throw this exception, but adding commands
+   * without exception catching may trigger this behavior.
    */
   virtual bool triggerCommand(std::string_view command) = 0;
   ///@}
@@ -280,6 +281,19 @@ public:
   struct command_runtime_exception : public exception
   {
     explicit command_runtime_exception(const std::string& what = "");
+  };
+
+  /**
+   * An exception that can be thrown by command callbacks
+   * when the arguments of the callback are incorrect.
+   * This exception is caught by triggerCommand and logged.
+   */
+  struct invalid_args_exception : public exception
+  {
+    explicit invalid_args_exception(const std::string& what = "")
+      : exception(what)
+    {
+    }
   };
 
 protected:

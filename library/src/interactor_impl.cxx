@@ -471,7 +471,7 @@ public:
         try
         {
           // XXX: Ignore the boolean return of triggerCommand,
-          //  error is already logged by triggerCommand
+          // error is already logged by triggerCommand
           this->Interactor.triggerCommand(commandWithArgs);
         }
         catch (const f3d::interactor::command_runtime_exception& ex)
@@ -538,7 +538,17 @@ public:
 
     if (this->CommandBuffer.has_value())
     {
-      this->Interactor.triggerCommand(this->CommandBuffer.value());
+      try
+      {
+        // XXX: Ignore the boolean return of triggerCommand,
+        // error is already logged by triggerCommand
+        this->Interactor.triggerCommand(this->CommandBuffer.value());
+      }
+      catch (const f3d::interactor::command_runtime_exception& ex)
+      {
+        log::error("Interaction: error running command: \"" + this->CommandBuffer.value() +
+          "\": " + ex.what());
+      }
       this->CommandBuffer.reset();
     }
 
@@ -622,8 +632,8 @@ interactor& interactor_impl::initCommands()
   {
     if (args.size() != expectedSize)
     {
-      throw interactor_impl::invalid_args_exception(std::string("Command: ") +
-        std::string(actionName) + " is expecting " + std::to_string(expectedSize) + " arguments");
+      throw interactor::invalid_args_exception(std::string("Command: ") + std::string(actionName) +
+        " is expecting " + std::to_string(expectedSize) + " arguments");
     }
   };
 
@@ -705,9 +715,8 @@ interactor& interactor_impl::initCommands()
       }
       else
       {
-        throw interactor_impl::invalid_args_exception(
-          std::string("Command: cycle_coloring arg:\"") + std::string(type) +
-          "\" is not recognized.");
+        throw interactor::invalid_args_exception(std::string("Command: cycle_coloring arg:\"") +
+          std::string(type) + "\" is not recognized.");
       }
       this->Internals->SynchronizeScivisOptions(this->Internals->Options, ren);
       this->Internals->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
@@ -782,7 +791,7 @@ interactor& interactor_impl::initCommands()
       }
       else
       {
-        throw interactor_impl::invalid_args_exception(
+        throw interactor::invalid_args_exception(
           std::string("Command: set_camera arg:\"") + std::string(type) + "\" is not recognized.");
       }
     });
@@ -819,8 +828,7 @@ interactor& interactor_impl::initCommands()
     {
       if (args.size() < 2)
       {
-        throw interactor_impl::invalid_args_exception(
-          "alias command requires at least 2 arguments");
+        throw interactor::invalid_args_exception("alias command requires at least 2 arguments");
       }
 
       // Validate the alias arguments
@@ -905,6 +913,7 @@ bool interactor_impl::triggerCommand(std::string_view command)
     if (callbackIt != this->Internals->Commands.end())
     {
       callbackIt->second({ tokens.begin() + 1, tokens.end() });
+      return true;
     }
     else
     {
@@ -932,7 +941,7 @@ bool interactor_impl::triggerCommand(std::string_view command)
     log::error("Command: provided args in command: \"", command,
       "\" cannot be parsed into an option, ignoring");
   }
-  catch (const invalid_args_exception& ex)
+  catch (const interactor::invalid_args_exception& ex)
   {
     log::error(ex.what(), " Ignoring.");
   }
@@ -1370,11 +1379,5 @@ void interactor_impl::SetCommandBuffer(const char* command)
 {
   // XXX This replace previous command buffer, it should be improved
   this->Internals->CommandBuffer = command;
-}
-
-//----------------------------------------------------------------------------
-interactor_impl::invalid_args_exception::invalid_args_exception(const std::string& what)
-  : exception(what)
-{
 }
 }
