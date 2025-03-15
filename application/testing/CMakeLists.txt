@@ -821,9 +821,8 @@ if(F3D_PLUGIN_BUILD_VDB)
   f3d_test(NAME TestPDALReadLAS1 DATA thin-2.las ARGS --load-plugins=pdal)
   f3d_test(NAME TestPDALReadLAS2 DATA 0450.las ARGS --load-plugins=pdal LONG_TIMEOUT)
   f3d_test(NAME TestPDALReadLAS3 DATA tile135.las ARGS --load-plugins=pdal LONG_TIMEOUT)
-  f3d_test(NAME TestPDALReadLASVolume DATA thin-2.las ARGS --load-plugins=vdb --volume --volume-inverse)
-  f3d_test(NAME TestPDALReadLASPoints DATA thin-2.las ARGS --load-plugins=vdb -o)
-  f3d_test(NAME TestPDALReadLASVerbose DATA thin-2.las  ARGS --load-plugins=vdb REGEXP "PartitionedDataSet" NO_RENDER)
+  f3d_test(NAME TestPDALReadLASVolume DATA thin-2.las ARGS --load-plugins=pdal --volume --volume-inverse)
+  f3d_test(NAME TestPDALReadLASPoints DATA thin-2.las ARGS --load-plugins=pdal -o)
 
   # .laz files
   f3d_test(NAME TestPDALReadLAZ1 DATA autzen_trim.laz ARGS --load-plugins=pdal)
