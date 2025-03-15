@@ -1,6 +1,7 @@
 #include "interactor_impl.h"
 
 #include "animationManager.h"
+#include "engine.h"
 #include "log.h"
 #include "scene_impl.h"
 #include "utils.h"
@@ -647,6 +648,7 @@ interactor& interactor_impl::initCommands()
       check_args(args, 1, "reset");
       this->Internals->Options.reset(args[0]);
     });
+
   this->addCommand("clear",
     [&](const std::vector<std::string>& args)
     {
@@ -658,11 +660,19 @@ interactor& interactor_impl::initCommands()
       console->Clear();
 #endif
     });
+
   this->addCommand("print",
     [&](const std::vector<std::string>& args)
     {
       check_args(args, 1, "print");
       log::info(this->Internals->Options.getAsString(args[0]));
+    });
+
+  this->addCommand("set_reader_option",
+    [&](const std::vector<std::string>& args)
+    {
+      check_args(args, 2, "set_reader_option");
+      f3d::engine::setReaderOption(args[0], args[1]);
     });
 
   this->addCommand("cycle_animation",

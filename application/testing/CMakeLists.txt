@@ -144,6 +144,15 @@ function(f3d_test)
 
 endfunction()
 
+set (_outOfRangeDoubleStr "\
+12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012\
+34567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234\
+56789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456\
+78901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678\
+90123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890\
+1234567890123456789012345678901234567890\
+")
+
 f3d_test(NAME TestPLY DATA suzanne.ply)
 f3d_test(NAME TestOBJ DATA world.obj)
 f3d_test(NAME TestSTL DATA suzanne.stl)
@@ -649,6 +658,12 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
     f3d_test(NAME TestThumbnailConfigFileAssimpDAE DATA duck.dae CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
   endif()
 
+  f3d_test(NAME TestAssimpVerbose DATA duck.fbx ARGS --verbose --load-plugins=assimp REGEXP "Number of points: 12636" NO_BASELINE)
+
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
+    f3d_test(NAME TestAssimpMetaDataImporter DATA duck.fbx ARGS --load-plugins=assimp -m UI)
+  endif()
+
 endif()
 
 if(F3D_PLUGIN_BUILD_DRACO)
@@ -728,12 +743,17 @@ if(F3D_PLUGIN_BUILD_OCCT)
   f3d_test(NAME TestIGES DATA f3d.igs ARGS --load-plugins=occt --up=+Z)
   f3d_test(NAME TestBREP DATA f3d.brep ARGS --load-plugins=occt --up=+Z)
   f3d_test(NAME TestBinaryBREP DATA f3d.bin.brep ARGS --load-plugins=occt --up=+Z)
+  f3d_test(NAME TestSTEPDefines DATA cheese.stp ARGS --load-plugins=occt -DSTEP.linear_deflection=0.5 -DSTEP.angular_deflection=0.9 -DSTEP.relative_deflection=1)
+  f3d_test(NAME TestIGESDefines DATA cheese.igs ARGS --load-plugins=occt -DIGES.read_wire=0 --line-width=5 --up=+Z)
+  f3d_test(NAME TestBREPDefines DATA cheese.brep ARGS --load-plugins=occt -DBREP.linear_deflection=100 --up=+Z)
 
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
     f3d_test(NAME TestInvalidBREP DATA invalid.brep ARGS --verbose --load-plugins=occt REGEXP "failed to load scene" NO_BASELINE)
   endif()
 
   if(F3D_PLUGIN_OCCT_COLORING_SUPPORT)
+    f3d_test(NAME TestXBF DATA f3d.xbf ARGS --load-plugins=occt --up=+Z)
+    f3d_test(NAME TestXBFDefines DATA cheese.xbf ARGS --load-plugins=occt -DXBF.angular_deflection=1 -DXBF.relative_deflection=1 --up=+Z)
     f3d_test(NAME TestXCAFColors DATA xcaf-colors.stp ARGS --load-plugins=occt -csy --up=+Z --line-width=3 --camera-direction=-1,-1,-1)
     f3d_test(NAME TestXCAFColorsXBF DATA xcaf-colors.xbf ARGS --load-plugins=occt -csy --up=+Z --line-width=3 --camera-direction=-1,-1,-1)
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
@@ -781,6 +801,11 @@ if(F3D_PLUGIN_BUILD_VDB)
   f3d_test(NAME TestVDBVolume DATA icosahedron.vdb ARGS --load-plugins=vdb --volume --volume-inverse)
   f3d_test(NAME TestVDBPoints DATA sphere_points.vdb ARGS --load-plugins=vdb -o)
   f3d_test(NAME TestVDBVerbose DATA icosahedron.vdb ARGS --load-plugins=vdb REGEXP "PartitionedDataSet" NO_RENDER)
+  f3d_test(NAME TestVDBDefinesDownsamplingFactor DATA icosahedron.vdb ARGS --load-plugins=vdb -DVDB.downsampling_factor=0.2 --volume --volume-inverse)
+  f3d_test(NAME TestVDBDefinesInexistent DATA icosahedron.vdb ARGS --load-plugins=vdb -Dvdb.downsampling_factor=0.2 REGEXP "did you mean 'VDB.downsampling_factor'" NO_BASELINE)
+  f3d_test(NAME TestVDBDefinesDownsamplingFactorParseError DATA icosahedron.vdb ARGS --load-plugins=vdb -DVDB.downsampling_factor=abcde --verbose REGEXP "Could not parse VDB.downsampling_factor" NO_BASELINE)
+  f3d_test(NAME TestVDBDefinesDownsamplingFactorOutOfRangeError DATA icosahedron.vdb ARGS --load-plugins=vdb -DVDB.downsampling_factor=${_outOfRangeDoubleStr} --verbose REGEXP "VDB.downsampling_factor out of range" NO_BASELINE)
+  f3d_test(NAME TestVDBCommandScriptReaderOptions DATA icosahedron.vdb ARGS --load-plugins=vdb --volume --volume-inverse SCRIPT TestVDBCommandScriptReaderOptions.txt) # set_reader_option VDB.downsampling_factor 0.2; reload_current_file_group
 
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${F3D_SOURCE_DIR}/plugins/vdb/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
@@ -939,6 +964,7 @@ f3d_test(NAME TestCommandScriptAlias DATA dragon.vtu SCRIPT TestCommandScriptAli
 f3d_test(NAME TestCommandScriptReset DATA dragon.vtu suzanne.stl ARGS --edges SCRIPT TestCommandScriptReset.txt) # reset render.show_edges; load_next_file_group;
 f3d_test(NAME TestParseOptionalBoolExtraArg DATA dragon.vtu SCRIPT TestParseOptionalBoolExtraArg.txt REGEXP "Command: load_previous_file_group takes at most 1 argument, got 2 arguments instead." NO_BASELINE) # load_previous_file_group true extra
 f3d_test(NAME TestRemoveFileGroups DATA dragon.vtu SCRIPT TestRemoveFileGroups.txt NO_DATA_FORCE_RENDER) # remove_file_groups
+f3d_test(NAME TestCommandScriptInvalidReaderOptions DATA dragon.vtu SCRIPT TestCommandScriptInvalidReaderOptions.txt REGEXP "point to an inexistent option, ignoring" NO_BASELINE) # set_reader_option invalid value
 
 # Window position test
 f3d_test(NAME TestPosition DATA dragon.vtu ARGS --position=100,100 NO_BASELINE)
@@ -1206,6 +1232,12 @@ if(NOT WIN32)
   f3d_test(NAME TestHOMEColorMapFile DATA dragon.vtu ARGS --colormap-file=~/testing/data/viridis8.png --scalar-coloring --coloring-component=1 ENV "HOME=${F3D_SOURCE_DIR}")
   f3d_test(NAME TestHOMEScreenshot DATA suzanne.ply ARGS --screenshot-filename=~/Testing/Temporary/TestHOMEScreenshot.png --interaction-test-play=${F3D_SOURCE_DIR}/testing/recordings/TestScreenshot.log REGEXP "saving screenshot to ${CMAKE_BINARY_DIR}/Testing/Temporary/TestHOMEScreenshot.png" NO_BASELINE ENV "HOME=${CMAKE_BINARY_DIR}")
   f3d_test(NAME TestHOMECommandScript DATA suzanne.ply ARGS --command-script=~/testing/scripts/TestHOMECommandScript.txt REGEXP "Camera focal point" NO_BASELINE ENV "HOME=${F3D_SOURCE_DIR}")
+  f3d_test(NAME TestHOMEFontFile DATA suzanne.stl ARGS -n --font-file=~/testing/data/Crosterian.ttf ENV "HOME=${F3D_SOURCE_DIR}" UI)
+  f3d_test(NAME TestHOMETexture DATA suzanne.ply ARGS --texture-matcap=~/testing/data/skin.png ENV "HOME=${F3D_SOURCE_DIR}")
+
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
+    f3d_test(NAME TestHOMEHDRI DATA suzanne.stl ARGS --hdri-file=~/testing/data/palermo_park_1k.hdr --hdri-ambient --hdri-skybox ENV "HOME=${F3D_SOURCE_DIR}" LONG_TIMEOUT)
+  endif()
 
   STRING(RANDOM LENGTH 257 ALPHABET "x" _f3d_test_invalid_folder)
   f3d_test(NAME TestColorMapTooLong DATA dragon.vtu ARGS --colormap-file=${_f3d_test_invalid_folder}/file.ext --scalar-coloring REGEXP "File name too long" NO_BASELINE)

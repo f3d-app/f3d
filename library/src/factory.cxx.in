@@ -45,19 +45,50 @@ reader* factory::getReader(const std::string& fileName)
   int bestScore = -1;
   reader* bestReader = nullptr;
 
-  for (auto p : this->Plugins)
+  for (const auto& plugin : this->Plugins)
   {
-    for (auto r : p->getReaders())
+    for (const auto& reader : plugin->getReaders())
     {
-      if (r->getScore() > bestScore && r->canRead(fileName))
+      if (reader->getScore() > bestScore && reader->canRead(fileName))
       {
-        bestScore = r->getScore();
-        bestReader = r.get();
+        bestScore = reader->getScore();
+        bestReader = reader.get();
       }
     }
   }
 
   return bestReader;
+}
+
+//----------------------------------------------------------------------------
+bool factory::setReaderOption(const std::string& name, const std::string& value)
+{
+  for (auto& plugin : this->Plugins)
+  {
+    for (auto& reader : plugin->getReaders())
+    {
+      if (reader->setReaderOption(name, value))
+      {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+//----------------------------------------------------------------------------
+std::vector<std::string> factory::getAllReaderOptionNames()
+{
+  std::vector<std::string> names;
+  for (const auto& plugin : this->Plugins)
+  {
+    for (const auto& reader : plugin->getReaders())
+    {
+      auto readerNames = reader->getAllReaderOptionNames();
+      names.insert(names.end(), readerNames.begin(), readerNames.end());
+    }
+  }
+  return names;
 }
 
 //----------------------------------------------------------------------------

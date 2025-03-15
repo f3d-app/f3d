@@ -24,6 +24,7 @@ f3d_plugin_declare_reader(
   VTK_READER ${vtk_classname}       # set the name of the VTK reader class you have created
   FORMAT_DESCRIPTION "description"  # set the proper name of the file format
   EXCLUDE_FROM_THUMBNAILER          # add this flag if you don't want thumbnail generation for this reader
+  OPTIONS "option1" "option2"       # use this to define reader specific option that can be defined by the user
 )
 
 f3d_plugin_declare_reader(
@@ -32,7 +33,7 @@ f3d_plugin_declare_reader(
   MIMETYPES "application/vnd.myext2" # set the mimetypes the reader can support
   VTK_IMPORTER ${vtk_classname}      # set the name of the VTK importer class you have created
   FORMAT_DESCRIPTION "description"   # set the proper name of the file format
-  CUSTOM_CODE "file.inl"             # set this to add a custom code when instancing your class
+  CUSTOM_CODE "file.inl"             # set this to add a custom code when instancing your class, this is where reader options should be processed
 )
 
 # More f3d_plugin_declare_reader calls are possible

@@ -5,6 +5,8 @@
 Simple interaction with the displayed data is possible directly within the window. It is as follows:
 
 - _Click and drag_ with the _left_ mouse button to rotate around the focal point of the camera.
+- Hold <kbd>Shift</kbd> then _Click and drag_ with the _left_ mouse button to translate the camera.
+- Hold <kbd>Ctrl</kbd> then _Click and drag_ with the _left_ mouse button to rotate around the axis of the camera.
 - Hold <kbd>Shift</kbd> then _Click and drag_ horizontally with the _right_ mouse button to rotate the HDRI.
 - _Click and drag_ vertically with the _right_ mouse button to zoom in/out.
 - _Move the mouse wheel_ to zoom in/out.
