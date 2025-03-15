@@ -162,6 +162,22 @@ int TestSDKOptions(int argc, char* argv[])
   test.expect<f3d::options::parsing_exception>("setAsString direction with incorrect size",
     [&]() { opt.setAsString("scene.up_direction", "0.1,0.2,0.3,0.4"); });
 
+  // Test colormap_t
+  opt.setAsString("model.scivis.colormap", "0,0,0,0,1,1,1,1");
+  test("setAsString colormap", opt.getAsString("model.scivis.colormap"), "0,0,0,0,1,1,1,1");
+
+  opt.setAsString("model.scivis.colormap", "0,0,  0,0,  1,0,  1,1");
+  test(
+    "setAsString spaces colormap", opt.getAsString("model.scivis.colormap") == "0,0,0,0,1,0,1,1");
+
+  opt.model.scivis.colormap = { 0, 0, 0, 0, 1, 1, 0, 1 };
+  test("getAsString colormap", opt.getAsString("model.scivis.colormap") == "0,0,0,0,1,1,0,1");
+
+  opt.set("model.scivis.colormap", std::vector<double>{ 0, 0, 0, 0, 1, 1, 1, 0 });
+  test("set/get colormap",
+    std::get<std::vector<double>>(opt.get("model.scivis.colormap")) ==
+      std::vector<double>{ 0, 0, 0, 0, 1, 1, 1, 0 });
+
   // Test closest option
   auto closest = opt.getClosestOption("modle.sciivs.cell");
   test("closest option", closest.first == "model.scivis.cells" && closest.second == 5);
