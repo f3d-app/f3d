@@ -452,7 +452,7 @@ std::string format(direction_t var)
 /**
  * Format provided var into a string from provided colormap_t.
  * Rely on `format(std::vector<double>&)`
- * TODO add proper formating
+ * TODO add proper formatting
  */
 std::string format(colormap_t var)
 {

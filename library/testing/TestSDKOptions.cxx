@@ -167,15 +167,16 @@ int TestSDKOptions(int argc, char* argv[])
   test("setAsString colormap", opt.getAsString("model.scivis.colormap"), "0,0,0,0,1,1,1,1");
 
   opt.setAsString("model.scivis.colormap", "0,0,  0,0,  1,0,  1,1");
-  test("setAsString spaces colormap", opt.getAsString("model.scivis.colormap") == "0,0,0,0,1,0,1,1");
+  test(
+    "setAsString spaces colormap", opt.getAsString("model.scivis.colormap") == "0,0,0,0,1,0,1,1");
 
-  opt.model.scivis.colormap = { 0,0,0,0,1,1,0,1 };
+  opt.model.scivis.colormap = { 0, 0, 0, 0, 1, 1, 0, 1 };
   test("getAsString colormap", opt.getAsString("model.scivis.colormap") == "0,0,0,0,1,1,0,1");
 
-  opt.set("model.scivis.colormap", std::vector<double>{ 0,0,0,0,1,1,1,0 });
+  opt.set("model.scivis.colormap", std::vector<double>{ 0, 0, 0, 0, 1, 1, 1, 0 });
   test("set/get colormap",
     std::get<std::vector<double>>(opt.get("model.scivis.colormap")) ==
-      std::vector<double>{ 0,0,0,0,1,1,1,0 });
+      std::vector<double>{ 0, 0, 0, 0, 1, 1, 1, 0 });
 
   // Test closest option
   auto closest = opt.getClosestOption("modle.sciivs.cell");

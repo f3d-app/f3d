@@ -243,7 +243,6 @@ protected:
   std::vector<double> Vector;
 };
 
-
 /**
  * Describe a 3D surfacic mesh.
  * A valid mesh fulfills these requirements:

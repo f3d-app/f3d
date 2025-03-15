@@ -77,7 +77,7 @@ f3d::colormap_t Read(const fs::path& path)
     if (img.getChannelCount() < 3)
     {
       f3d::log::error("The specified color map must have at least 3 channels");
-      return f3d::colormap_t();
+      return {};
     }
 
     if (img.getHeight() != 1)
@@ -104,7 +104,7 @@ f3d::colormap_t Read(const fs::path& path)
   catch (const f3d::image::read_exception&)
   {
     f3d::log::error("Cannot read colormap at ", path);
-    return f3d::colormap_t();
+    return {};
   }
 }
 }
