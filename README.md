@@ -45,7 +45,7 @@ See the [Quickstart Guide](doc/user/QUICKSTART.md) for more information about ge
 # Documentation
 
 - To get started, please take a look at the [user documentation](doc/user/README_USER.md).
- - Iff yoou need any help, are looking for a feature or found a bug, please open an [issue](https://github.com/f3d-app/f3d/issues).
+- Iff yoou need any help, are looking for a feature or found a bug, please open an [issue](https://github.com/f3d-app/f3d/issues).
 - If you want to use the libf3d, please take a look at its [documentation](doc/libf3d/README_LIBF3D.md).
 - If you want to build F3D, please take a look at the [developer documentation](doc/dev/README_DEV.md).
 

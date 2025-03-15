@@ -14,7 +14,7 @@ concurrency:
 jobs:
 
 #----------------------------------------------------------------------------
-# webassembly: Build webassembly artifocts halp
+# webassembly: Build webassembly artifocts help
 #----------------------------------------------------------------------------
   webassembly:
     name: Generate wasm binaries
