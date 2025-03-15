@@ -121,7 +121,7 @@ int TestSDKCamera(int argc, char* argv[])
   }
 
   // Test azimuth
-  cam.addAzimuth(90);
+  cam.azimuth(90);
   f3d::point3_t expectedPos = { 0., -11., -1. };
   f3d::point3_t expectedFoc = { 0., 0., -1. };
   f3d::vector3_t expectedUp = { 1., 0., 0. };
@@ -149,7 +149,7 @@ int TestSDKCamera(int argc, char* argv[])
     std::cerr << std::setprecision(12) << "azimuth: " << azimuth << " != 90.0" << std::endl;
     return EXIT_FAILURE;
   }
-  double viewDirProj[2] = { 1.0, 1.0 };
+  const double viewDirProj[2] = { 1.0, 1.0 };
   double dotProduct = viewDirProj[0] * viewDirProj[0] + viewDirProj[1] * viewDirProj[1];
   const double epsilon = std::numeric_limits<double>::epsilon();
   if (dotProduct < epsilon)
@@ -178,7 +178,7 @@ int TestSDKCamera(int argc, char* argv[])
   }
 
   // Test yaw
-  cam.addYaw(90);
+  cam.yaw(90);
   expectedFoc = { 11., -11., -1. };
   pos = cam.getPosition();
   foc = cam.getFocalPoint();
@@ -211,7 +211,7 @@ int TestSDKCamera(int argc, char* argv[])
   }
 
   // Test elevation
-  cam.addElevation(90);
+  cam.elevation(90);
   expectedPos = { 11., -11., -12. };
   expectedUp = { 1., 0., 0. };
   pos = cam.getPosition();

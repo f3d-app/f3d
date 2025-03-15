@@ -157,8 +157,8 @@ public:
       cam.resetToBounds(zoomFactor);
     }
 
-    cam.addAzimuth(camConf.CameraAzimuthAngle)
-      .addElevation(camConf.CameraElevationAngle)
+    cam.azimuth(camConf.CameraAzimuthAngle)
+      .elevation(camConf.CameraElevationAngle)
       .setCurrentAsDefault();
   }
 

@@ -264,7 +264,7 @@ camera& camera_impl::roll(angle_deg_t angle)
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::addAzimuth(angle_deg_t angle)
+camera& camera_impl::azimuth(angle_deg_t angle)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->Azimuth(angle);
@@ -274,7 +274,7 @@ camera& camera_impl::addAzimuth(angle_deg_t angle)
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::addYaw(angle_deg_t angle)
+camera& camera_impl::yaw(angle_deg_t angle)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->Yaw(angle);
@@ -284,7 +284,7 @@ camera& camera_impl::addYaw(angle_deg_t angle)
 }
 
 //----------------------------------------------------------------------------
-camera& camera_impl::addElevation(angle_deg_t angle)
+camera& camera_impl::elevation(angle_deg_t angle)
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->Elevation(angle);
