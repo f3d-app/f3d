@@ -44,7 +44,7 @@ jobs:
     - name: Codespell in place
       shell: bash
       run: |
-        apt install -y codespell
+        pip install codespell
         codespell -fHw .
 
     - uses: googleapis/code-suggester@v5
