@@ -143,20 +143,16 @@ int TestSDKCamera(int argc, char* argv[])
   }
 
   // Test getAzimuth
+  f3d::point3_t tempPos = { 0.0, 0.0, 0.0 };
+  f3d::point3_t tempFoc = { 0.0, 0.0, 1.0 };
+  cam.setPosition(tempPos);
+  cam.setFocalPoint(tempFoc);
   f3d::angle_deg_t azimuth = cam.getAzimuth();
-  if (!compareDouble(azimuth, 90.0))
+  if (!compareDouble(azimuth, 0.0))
   {
     std::cerr << "getAzimuth is not behaving as expected:" << std::endl;
-    std::cerr << std::setprecision(12) << "azimuth: " << azimuth << " != 90.0" << std::endl;
+    std::cerr << std::setprecision(12) << "azimuth: " << azimuth << " != 0.0" << std::endl;
     return EXIT_FAILURE;
-  }
-  const double viewDirProj[2] = { 1.0, 1.0 };
-  double dotProduct = vtkMath::Dot(viewDirProj, viewDirProj);
-  const double epsilon = std::numeric_limits<double>::epsilon();
-  if (dotProduct < epsilon)
-  {
-    std::cerr << "Dot product is lesser than epsilon, returning failure." << std::endl;
-    return 0.0;
   }
 
   // Test roll
@@ -198,17 +194,16 @@ int TestSDKCamera(int argc, char* argv[])
   }
 
   // Test getYaw
+  // f3d::point3_t testPos = { 0.0, 0.0, 0.0 };
+  f3d::point3_t termFoc = { 0.0, 0.0, 1.0 };
+  // cam.setPosition(testPos);
+  cam.setFocalPoint(termFoc);
   f3d::angle_deg_t yaw = cam.getYaw();
-  if (!compareDouble(yaw, 90.0))
+  if (!compareDouble(yaw, 0.0))
   {
     std::cerr << "getYaw is not behaving as expected:" << std::endl;
     std::cerr << std::setprecision(12) << "yaw: " << yaw << " != 0.0" << std::endl;
     return EXIT_FAILURE;
-  }
-  if (dotProduct < epsilon)
-  {
-    std::cerr << "Dot product is lesser than epsilon, returning failure." << std::endl;
-    return 0.0;
   }
 
   // Test elevation
