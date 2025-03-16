@@ -981,6 +981,7 @@ int F3DStarter::Start(int argc, char** argv)
     }
     catch (const f3d::engine::cache_exception& ex)
     {
+      assert(false);
       f3d::log::error("Could not use default cache directory: ", ex.what());
       return EXIT_FAILURE;
     }
