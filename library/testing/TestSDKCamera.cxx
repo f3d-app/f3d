@@ -8,6 +8,7 @@
 #include <iostream>
 #include <limits>
 #include <sstream>
+#include <vtkMath.h>
 
 // TODO these methods should be put in types.h at some point.
 // https://github.com/f3d-app/f3d/issues/361
@@ -150,7 +151,7 @@ int TestSDKCamera(int argc, char* argv[])
     return EXIT_FAILURE;
   }
   const double viewDirProj[2] = { 1.0, 1.0 };
-  double dotProduct = viewDirProj[0] * viewDirProj[0] + viewDirProj[1] * viewDirProj[1];
+  double dotProduct = vtkMath::Dot(viewDirProj, viewDirProj);
   const double epsilon = std::numeric_limits<double>::epsilon();
   if (dotProduct < epsilon)
   {

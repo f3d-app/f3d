@@ -75,6 +75,7 @@ option(F3D_TESTING_ENABLE_EXTERNAL_QT "Test external QT" OFF)
 
 set(libf3dSDKTests_link_libs "")
 
+find_package(VTK REQUIRED COMPONENTS CommonCore)
 if(F3D_TESTING_ENABLE_EXTERNAL_GLFW)
   find_package(glfw3 REQUIRED)
   list(APPEND libf3dSDKTests_list TestSDKExternalWindowGLFW.cxx)
@@ -177,7 +178,7 @@ if(F3D_MODULE_UI AND NOT F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS)
   set_tests_properties(libf3d::TestSDKInteractorCallBack PROPERTIES DISABLED ON)
 endif()
 
-target_link_libraries(libf3dSDKTests libf3d ${libf3dSDKTests_link_libs})
+target_link_libraries(libf3dSDKTests libf3d ${libf3dSDKTests_link_libs} VTK::CommonCore)
 
 # make sure the libf3d API is compatible with the right C++ standard
 set_target_properties(libf3dSDKTests PROPERTIES CXX_STANDARD 17)
