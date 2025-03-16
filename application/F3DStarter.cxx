@@ -970,6 +970,7 @@ int F3DStarter::Start(int argc, char** argv)
     }
     catch (const f3d::context::symbol_exception& ex)
     {
+      assert(false);
       f3d::log::error("Could not find needed symbol in graphic library: ", ex.what());
       return EXIT_FAILURE;
     }

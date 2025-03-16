@@ -81,7 +81,7 @@ runs:
         -Werror=deprecated
         --warn-uninitialized
         -DBUILD_TESTING=ON
-        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_BUILD_TYPE=Debug
         -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
         -DCMAKE_MODULE_PATH=$(pwd)/../dependencies/install/lib/cmake/OpenVDB/
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
