@@ -270,18 +270,22 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
   ImVec4 colText = ImVec4(0.941f, 0.906f, 0.855f, 1.f);
   ImVec4 colBg = ImVec4(0.106f, 0.106f, 0.098f, 1.f);
   ImVec4 colHighlight = ImVec4(0.471f, 0.541f, 0.996f, 1.f);
+  ImVec4 colTransparent = ImVec4(0.f, 0.f, 0.f, 0.f);
 
   ImGuiStyle* style = &ImGui::GetStyle();
-  style->GrabRounding = 4.0f;
+  style->GrabRounding = 4.f;
   style->WindowRounding = 8.f;
-  style->WindowBorderSize = 0.f;
-  style->WindowPadding = ImVec2(10, 10);
-  style->FrameBorderSize = 1.f;
+  style->WindowBorderSize = 1.f;
+  style->WindowPadding = ImVec2(12, 8);
+  style->FrameBorderSize = 0.f;
+  style->FramePadding = ImVec2(4, 2);
+  style->FrameRounding = 2.f;
   style->Colors[ImGuiCol_Text] = colText;
   style->Colors[ImGuiCol_WindowBg] = colBg;
-  style->Colors[ImGuiCol_Border] = colHighlight;
-  style->Colors[ImGuiCol_FrameBg] = colBg;
-  style->Colors[ImGuiCol_ScrollbarBg] = colBg;
+  style->Colors[ImGuiCol_Border] = colText;
+  style->Colors[ImGuiCol_FrameBg] = colTransparent;
+  style->Colors[ImGuiCol_FrameBgActive] = colTransparent;
+  style->Colors[ImGuiCol_ScrollbarBg] = colTransparent;
   style->Colors[ImGuiCol_ScrollbarGrab] = colText;
   style->Colors[ImGuiCol_ScrollbarGrabHovered] = colHighlight;
   style->Colors[ImGuiCol_ScrollbarGrabActive] = colHighlight;
@@ -315,7 +319,7 @@ void vtkF3DImguiActor::RenderFileName()
     winSize.y += 2.f * ImGui::GetStyle().WindowPadding.y;
 
     ::SetupNextWindow(ImVec2(viewport->GetWorkCenter().x - 0.5f * winSize.x, marginTop), winSize);
-    ImGui::SetNextWindowBgAlpha(0.35f);
+    ImGui::SetNextWindowBgAlpha(0.9f);
 
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
       ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
@@ -340,7 +344,7 @@ void vtkF3DImguiActor::RenderMetaData()
   ::SetupNextWindow(ImVec2(viewport->WorkSize.x - winSize.x - marginRight,
                       viewport->GetWorkCenter().y - 0.5f * winSize.y),
     winSize);
-  ImGui::SetNextWindowBgAlpha(0.35f);
+  ImGui::SetNextWindowBgAlpha(0.9f);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
     ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
@@ -388,7 +392,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
 
   ::SetupNextWindow(ImVec2(marginLeft, winTop),
     ImVec2(winWidth, std::min(viewport->WorkSize.y - (2 * marginTopBottom), textHeight)));
-  ImGui::SetNextWindowBgAlpha(0.35f);
+  ImGui::SetNextWindowBgAlpha(0.9f);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
     ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings |
@@ -434,7 +438,7 @@ void vtkF3DImguiActor::RenderFpsCounter()
     viewport->WorkSize.y - winSize.y - marginBottom);
 
   ::SetupNextWindow(position, winSize);
-  ImGui::SetNextWindowBgAlpha(0.35f);
+  ImGui::SetNextWindowBgAlpha(0.9f);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
     ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;

@@ -141,11 +141,11 @@ void vtkF3DImguiConsole::ShowConsole()
   ImGuiInputTextFlags inputFlags =
     ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_EscapeClearsAll;
 
-  ImGui::Text("> ");
+  ImGui::Text(">");
   ImGui::SameLine();
 
   ImGui::PushItemWidth(-1);
-  bool runCommand = ImGui::InputText("##ConsoleInput", this->Pimpl->CurrentInput.data(),
+  bool runCommand = ImGui::InputTextWithHint("##ConsoleInput", "Type a command...", this->Pimpl->CurrentInput.data(),
     sizeof(this->Pimpl->CurrentInput), inputFlags, nullptr, this->Pimpl.get());
   ImGui::PopItemWidth();
 
