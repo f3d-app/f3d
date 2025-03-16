@@ -107,3 +107,4 @@ def test_resets():
     camera.set_current_as_default()
     camera.reset_to_bounds()
     camera.reset_to_default()
+    

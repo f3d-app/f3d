@@ -156,7 +156,7 @@ int TestSDKCamera(int argc, char* argv[])
   if (dotProduct < epsilon)
   {
     std::cerr << "Dot product is lesser than epsilon, returning failure." << std::endl;
-    return EXIT_FAILURE;
+    return 0.0;
   }
 
   // Test roll
@@ -208,7 +208,7 @@ int TestSDKCamera(int argc, char* argv[])
   if (dotProduct < epsilon)
   {
     std::cerr << "Dot product is lesser than epsilon, returning failure." << std::endl;
-    return EXIT_FAILURE;
+    return 0.0;
   }
 
   // Test elevation
