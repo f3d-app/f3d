@@ -17,9 +17,18 @@ struct vtkF3DImguiConsole::Internals
     Typed
   };
 
-  static constexpr ImVec4 GetErrorColor() { return { 0.996f, 0.349f, 0.231f, 1.f }; }
-  static constexpr ImVec4 GetWarningColor() { return { 0.973f, 0.698f, 0.039f, 1.f }; }
-  static constexpr ImVec4 GetHighlightColor() { return { 0.471f, 0.541f, 0.996f, 1.f }; }
+  static constexpr ImVec4 GetErrorColor()
+  {
+    return { 0.996f, 0.349f, 0.231f, 1.f };
+  }
+  static constexpr ImVec4 GetWarningColor()
+  {
+    return { 0.973f, 0.698f, 0.039f, 1.f };
+  }
+  static constexpr ImVec4 GetHighlightColor()
+  {
+    return { 0.471f, 0.541f, 0.996f, 1.f };
+  }
 
   std::vector<std::pair<LogType, std::string>> Logs;
   std::array<char, 256> CurrentInput = {};
