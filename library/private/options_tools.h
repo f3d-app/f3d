@@ -454,7 +454,7 @@ std::string format(direction_t var)
  * Rely on `format(std::vector<double>&)`
  * TODO add proper formatting
  */
-std::string format(colormap_t var)
+std::string format(const colormap_t& var)
 {
   return options_tools::format(static_cast<std::vector<double>>(var));
 }
