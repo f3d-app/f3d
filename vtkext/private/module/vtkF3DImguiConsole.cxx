@@ -184,6 +184,7 @@ void vtkF3DImguiConsole::ShowBadge()
     ImGui::SetNextWindowPos(
       ImVec2(viewport->WorkSize.x - winSize.x - marginTopRight, marginTopRight));
     ImGui::SetNextWindowSize(winSize);
+    ImGui::SetNextWindowBgAlpha(0.9f);
 
     ImGuiWindowFlags winFlags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
       ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
@@ -192,7 +193,6 @@ void vtkF3DImguiConsole::ShowBadge()
 
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, Internals::GetHighlightColor());
-    ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 0.f);
 
     ImGui::PushStyleColor(ImGuiCol_Text,
         this->Pimpl->NewError ? Internals::GetErrorColor() : Internals::GetWarningColor());
@@ -203,7 +203,6 @@ void vtkF3DImguiConsole::ShowBadge()
     }
 
     ImGui::PopStyleColor(3);
-    ImGui::PopStyleVar();
 
     ImGui::End();
   }
