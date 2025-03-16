@@ -17,6 +17,19 @@ struct vtkF3DImguiConsole::Internals
     Typed
   };
 
+  static constexpr ImVec4 GetErrorColor()
+  {
+    return { 0.996f, 0.349f, 0.231f, 1.f };
+  }
+  static constexpr ImVec4 GetWarningColor()
+  {
+    return { 0.973f, 0.698f, 0.039f, 1.f };
+  }
+  static constexpr ImVec4 GetHighlightColor()
+  {
+    return { 0.471f, 0.541f, 0.996f, 1.f };
+  }
+
   std::vector<std::pair<LogType, std::string>> Logs;
   std::array<char, 256> CurrentInput = {};
   bool NewError = false;
@@ -98,13 +111,13 @@ void vtkF3DImguiConsole::ShowConsole()
         switch (severity)
         {
           case Internals::LogType::Error:
-            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_Text, Internals::GetErrorColor());
             break;
           case Internals::LogType::Warning:
-            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 0.0f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_Text, Internals::GetWarningColor());
             break;
           case Internals::LogType::Typed:
-            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 1.0f, 1.0f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_Text, Internals::GetHighlightColor());
             break;
           default:
             hasColor = false;
@@ -137,11 +150,11 @@ void vtkF3DImguiConsole::ShowConsole()
   ImGuiInputTextFlags inputFlags =
     ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_EscapeClearsAll;
 
-  ImGui::Text("> ");
+  ImGui::Text(">");
   ImGui::SameLine();
 
   ImGui::PushItemWidth(-1);
-  bool runCommand = ImGui::InputText("##ConsoleInput", this->Pimpl->CurrentInput.data(),
+  bool runCommand = ImGui::InputTextWithHint("##ConsoleInput", "Type a command...", this->Pimpl->CurrentInput.data(),
     sizeof(this->Pimpl->CurrentInput), inputFlags, nullptr, this->Pimpl.get());
   ImGui::PopItemWidth();
 
@@ -180,6 +193,7 @@ void vtkF3DImguiConsole::ShowBadge()
     ImGui::SetNextWindowPos(
       ImVec2(viewport->WorkSize.x - winSize.x - marginTopRight, marginTopRight));
     ImGui::SetNextWindowSize(winSize);
+    ImGui::SetNextWindowBgAlpha(0.9f);
 
     ImGuiWindowFlags winFlags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
       ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
@@ -187,21 +201,17 @@ void vtkF3DImguiConsole::ShowBadge()
     ImGui::Begin("ConsoleAlert", nullptr, winFlags);
 
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, Internals::GetHighlightColor());
 
-    const bool useColoring = this->GetUseColoring();
-
-    if (useColoring)
-    {
-      ImGui::PushStyleColor(ImGuiCol_Text,
-        this->Pimpl->NewError ? ImVec4(1.0f, 0.0f, 0.0f, 1.0f) : ImVec4(1.0f, 1.0f, 0.0f, 1.0f));
-    }
+    ImGui::PushStyleColor(ImGuiCol_Text,
+        this->Pimpl->NewError ? Internals::GetErrorColor() : Internals::GetWarningColor());
 
     if (ImGui::Button("!"))
     {
       this->InvokeEvent(vtkF3DImguiConsole::ShowEvent);
     }
 
-    ImGui::PopStyleColor(useColoring ? 2 : 1);
+    ImGui::PopStyleColor(3);
 
     ImGui::End();
   }
