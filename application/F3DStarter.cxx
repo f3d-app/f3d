@@ -661,7 +661,7 @@ public:
       else
       {
         f3d::log::error("Cannot find the colormap ", colorMapFile);
-        this->LibOptions.model.scivis.colormap = std::vector<double>{};
+        this->LibOptions.model.scivis.colormap = f3d::colormap_t();
       }
     }
   }
@@ -1072,7 +1072,13 @@ int F3DStarter::Start(int argc, char** argv)
         {
           if (!command.empty())
           {
-            interactor.triggerCommand(command);
+            // XXX: No need to catch interactor::command_runtime_exception
+            // as neither libf3d nor F3D has command that can trigger it
+            if (!interactor.triggerCommand(command))
+            {
+              f3d::log::error("Error in command script, stopping script execution");
+              break;
+            }
           }
         }
         scriptFile.close();
@@ -1732,8 +1738,9 @@ void F3DStarter::AddCommands()
     }
     if (args.size() != 1)
     {
-      throw std::invalid_argument{ std::string("Command: ") + std::string(commandName) +
-        " takes at most 1 argument, got " + std::to_string(args.size()) + " arguments instead." };
+      throw f3d::interactor::invalid_args_exception(std::string("Command: ") +
+        std::string(commandName) + " takes at most 1 argument, got " + std::to_string(args.size()) +
+        " arguments instead.");
     }
     return f3d::options::parse<bool>(args[0]);
   };

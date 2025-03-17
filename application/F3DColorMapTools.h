@@ -7,6 +7,8 @@
 #ifndef F3DColorMapReader_h
 #define F3DColorMapReader_h
 
+#include "types.h"
+
 #include <filesystem>
 #include <string>
 #include <vector>
@@ -14,7 +16,7 @@
 namespace F3DColorMapTools
 {
 std::filesystem::path Find(const std::string& str);
-std::vector<double> Read(const std::filesystem::path& path);
+f3d::colormap_t Read(const std::filesystem::path& path);
 }
 
 #endif

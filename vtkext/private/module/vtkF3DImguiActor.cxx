@@ -268,10 +268,11 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
   io.FontGlobalScale = this->FontScale;
 
   ImGuiStyle* style = &ImGui::GetStyle();
+  style->AntiAliasedLines = false;
   style->GrabRounding = 4.0f;
-  style->WindowRounding = 8.f;
   style->WindowBorderSize = 0.f;
   style->WindowPadding = ImVec2(10, 10);
+  style->WindowRounding = 8.f;
 
   // Setup backend name
   io.BackendPlatformName = io.BackendRendererName = "F3D/VTK";
