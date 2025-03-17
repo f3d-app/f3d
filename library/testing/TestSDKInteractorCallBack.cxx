@@ -173,5 +173,15 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
+  // Check console error handling
+  // Esc;"exception";Enter;Esc
+  if (!inter.playInteraction(
+        std::string(argv[1]) + "recordings/TestSDKInteractorCallBackConsoleException.log"))
+  {
+    std::cerr << "Unexcepted failure playing a console command triggering an exception"
+              << std::endl;
+    return EXIT_FAILURE;
+  }
+
   return EXIT_SUCCESS;
 }
