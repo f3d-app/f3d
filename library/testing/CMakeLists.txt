@@ -2,7 +2,6 @@ list(APPEND libf3dSDKTests_list
      TestSDKAnimation.cxx
      TestSDKCamera.cxx
      TestSDKCompareWithFile.cxx
-     TestSDKDropZone.cxx
      TestSDKDynamicLightIntensity.cxx
      TestSDKEngine.cxx
      TestSDKEngineExceptions.cxx
@@ -25,6 +24,7 @@ list(APPEND libf3dSDKTests_list
 if(F3D_MODULE_UI)
   list(APPEND libf3dSDKTests_list
     TestSDKConsole.cxx
+    TestSDKDropZone.cxx
     TestSDKDynamicBackgroundColor.cxx
     TestSDKDynamicFontFile.cxx
     TestSDKDynamicProperties.cxx
