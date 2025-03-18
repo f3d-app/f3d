@@ -209,6 +209,7 @@ runs:
         -DF3D_TESTING_ENABLE_GLX_TESTS=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=${{ (runner.os == 'Linux' || runner.os == 'Windows') && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_OSMESA_TESTS=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
+        -DF3D_TESTING_DISABLE_CATCH_ALL=ON
         -DF3D_TESTING_FORCE_RENDERING_BACKEND=${{ inputs.rendering_backend }}
         -DF3D_WINDOWS_GUI=ON
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
