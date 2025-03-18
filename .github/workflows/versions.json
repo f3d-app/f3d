@@ -4,7 +4,8 @@
     "OpenEXR is part of VFX reference platform (CY2025: 3.3.x)",
     "OpenVDB is part of VFX reference platform (CY2025: 12.x)",
     "OpenVDB min version is not enforced by F3D code and missing from VTK code",
-    "Python is part of VFX reference platform (CY2025: 3.11)"
+    "Python is part of VFX reference platform (CY2025: 3.11)",
+    "PDAL is now used in VTK and should be included as a dependency."
   ],
   "versions": {
     "alembic": "1.8.8",
@@ -13,6 +14,7 @@
     "occt": "V7_8_1",
     "openexr": "v3.3.2",
     "openvdb": "v12.0.0",
+    "pdal": "2.8.4",
     "pybind11": "v2.13.6",
     "python": "3.11",
     "usd": "v24.11",
@@ -25,6 +27,7 @@
     "occt": "V7_6_3",
     "openexr": "v3.0.1",
     "openvdb": "v12.0.0",
+    "pdal": "2.6.0",
     "pybind11": "v2.9.2",
     "python": "3.9",
     "usd": "v24.08",
