@@ -26,8 +26,8 @@ public:
   vtkSmartPointer<vtkTexture> CreateTexture(const std::vector<unsigned char>& buffer, int& offset,
     int skinWidth, int skinHeight, int nbSkins, int selectedSkinIndex)
   {
-    constexpr int char_size = 1;
-    constexpr int int_size = 4;
+    constexpr int char_size = sizeof(int8_t);
+    constexpr int int_size = sizeof(int32_t);
     vtkNew<vtkTexture> texture;
     texture->InterpolateOn();
 
@@ -65,9 +65,7 @@ public:
       {
         unsigned char index = *(selectedSkin + i * skinWidth + j);
         unsigned char* ptr = static_cast<unsigned char*>(img->GetScalarPointer(j, i, 0));
-        ptr[0] = F3DMDLDefaultColorMap[index][0]; // R
-        ptr[1] = F3DMDLDefaultColorMap[index][1]; // G
-        ptr[2] = F3DMDLDefaultColorMap[index][2]; // B
+        std::copy(F3DMDLDefaultColorMap[index], F3DMDLDefaultColorMap[index] + 3, ptr);
       }
     }
     texture->SetInputData(img);
@@ -97,9 +95,9 @@ public:
   //----------------------------------------------------------------------------
   void CreateMesh(const std::vector<unsigned char>& buffer, int offset, const mdl_header_t* header)
   {
-    constexpr char char_size = 1; // Size of char in file
-    constexpr int int_size = 4;   // Size of int in file
-    constexpr int float_size = 4; // Size of float in file
+    constexpr char char_size = sizeof(int8_t); // Size of char in file
+    constexpr int int_size = sizeof(int32_t);  // Size of int in file
+    constexpr int float_size = sizeof(float);  // Size of float in file, 4 bytes
     // Read texture coordinates
     struct mdl_texcoord_t
     {
@@ -316,10 +314,10 @@ public:
   //----------------------------------------------------------------------------
   void UpdateTimeStep(double timeValue)
   {
-    int frameIndex = static_cast<int>(floor(FrameRate * abs(timeValue))) %
-      static_cast<int>(this->ActiveFrames.size());
-    int currentFrame = this->ActiveFrames[frameIndex];
-    this->Mapper->SetInputData(this->Mesh[currentFrame]);
+    int frameIndex = std::distance(this->AnimationIds.begin(),
+      std::find_if(this->AnimationIds.begin(), this->AnimationIds.end(),
+        [timeValue](const std::pair<int, float> pair) { return pair.second >= timeValue; }));
+    this->Mapper->SetInputData(this->Mesh[frameIndex]);
   }
 
   //----------------------------------------------------------------------------
@@ -435,17 +433,16 @@ public:
   //----------------------------------------------------------------------------
   void GetTimeRange(vtkIdType animationIndex, double timeRange[2])
   {
-    // Retrieve time range of all previous animations first, then the selected animation index.
-    timeRange[0] = 0.0;
-    timeRange[1] = 0.0;
-    for (int i = 0; i <= animationIndex; i++)
-    {
-      int numFrames = std::count_if(this->AnimationIds.begin(), this->AnimationIds.end(),
-        [i](const std::pair<int, float> pair) { return pair.first == i; });
-      float duration = numFrames / this->FrameRate;
-      timeRange[0] = timeRange[1];
-      timeRange[1] += duration;
-    }
+    int firstFrameIndex = std::distance(this->AnimationIds.begin(),
+      std::find_if(this->AnimationIds.begin(), this->AnimationIds.end(),
+        [animationIndex](const std::pair<int, float> pair)
+        { return pair.first == animationIndex; }));
+    int lastFrameIndex = std::distance(this->AnimationIds.begin(),
+      std::find_if(this->AnimationIds.begin(), this->AnimationIds.end(),
+        [animationIndex](const std::pair<int, float> pair)
+        { return pair.first > animationIndex; }));
+    timeRange[0] = this->AnimationIds[firstFrameIndex].second;
+    timeRange[1] = this->AnimationIds[lastFrameIndex - 1].second;
   }
 
   vtkF3DQuakeMDLImporter* Parent;
