@@ -304,14 +304,15 @@ void vtkF3DImguiActor::RenderDropZone()
 
     constexpr float tickThickness = 3.0f;
     constexpr float tickLength = 10.0f;
+    const int halfTickThickness = static_cast<int>(std::ceil(tickThickness / 2.f));
 
     const int tickNumberW = static_cast<int>(std::ceil(dropZoneW / (tickLength * 2.0f)));
     const int tickNumberH = static_cast<int>(std::ceil(dropZoneH / (tickLength * 2.0f)));
 
     const double tickSpaceW =
-      static_cast<double>(dropZoneW - tickNumberW * tickLength) / (tickNumberW - 1);
+      static_cast<double>(std::ceil(dropZoneW - tickNumberW * tickLength) / (tickNumberW - 1));
     const double tickSpaceH =
-      static_cast<double>(dropZoneH - tickNumberH * tickLength) / (tickNumberH - 1);
+      static_cast<double>(std::ceil(dropZoneH - tickNumberH * tickLength) / (tickNumberH - 1));
 
     ::SetupNextWindow(ImVec2(0, 0), viewport->WorkSize);
     ImGui::SetNextWindowBgAlpha(0.f);
@@ -328,7 +329,7 @@ void vtkF3DImguiActor::RenderDropZone()
     // Draw top and bottom line
     for (float x = p0.x; x < p1.x; x += tickLength + tickSpaceW)
     {
-      const float y0 = p0.y + tickThickness / 2.f;
+      const float y0 = p0.y + halfTickThickness;
       const float x1 = std::min(p1.x, x + tickLength);
       draw_list->AddLine(ImVec2(x, y0), ImVec2(x1, y0), color, tickThickness);
       draw_list->AddLine(ImVec2(x, p1.y), ImVec2(x1, p1.y), color, tickThickness);
@@ -337,7 +338,7 @@ void vtkF3DImguiActor::RenderDropZone()
     // Draw left and right line
     for (float y = p0.y; y < p1.y; y += tickLength + tickSpaceH)
     {
-      const float x1 = p1.x - tickThickness / 2.f;
+      const float x1 = p1.x - halfTickThickness;
       const float y1 = std::min(p1.y, y + tickLength);
       draw_list->AddLine(ImVec2(p0.x, y), ImVec2(p0.x, y1), color, tickThickness);
       draw_list->AddLine(ImVec2(x1, y), ImVec2(x1, y1), color, tickThickness);
