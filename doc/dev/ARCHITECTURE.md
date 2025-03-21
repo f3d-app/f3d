@@ -29,7 +29,7 @@ Here is diagram explaining how some of these parts interact together:
            │
            │                                   ┌──────────┐
            │                                   │          │
-       depends on                     ┌─warps──│  python  │
+       depends on                     ┌─wraps──│  python  │
            │                          │        │          │
            │                          │        └──────────┘
            │         ┌───────────┐    │        ┌──────────┐
