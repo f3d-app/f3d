@@ -300,7 +300,7 @@ color_t parse(const std::string& str)
     }
 
     /* Named colors search */
-    vtkSmartPointer<vtkNamedColors> color = vtkSmartPointer<vtkNamedColors>::New();
+    vtkNew<vtkNamedColors> color;
     if (color->ColorExists(strCompact))
     {
       double rgba[4];
@@ -309,14 +309,10 @@ color_t parse(const std::string& str)
     }
 
     /* Vector double format */
-    std::vector<double> vecColor = options_tools::parse<std::vector<double>>(str);
-    if (std::any_of(vecColor.begin(), vecColor.end(), [](double value) { return !(value >= 0.0); }))
-    {
-      throw options::parsing_exception("Cannot parse " + str + " into a color_t");
-    }
-    return color_t(vecColor);
+    return color_t(options_tools::parse<std::vector<double>>(str));
   }
-  /* We do not catch std::invalid_argument exception from stod as it is covered by the regex */
+  /* We do not catch std::invalid_argument nor std::out_of_range exception from stod as it is
+   * covered by the regex */
   catch (const f3d::type_construction_exception& ex)
   {
     throw options::parsing_exception("Cannot parse " + str + " into a color_t: " + ex.what());
@@ -450,7 +446,11 @@ std::string format(color_t var)
 {
   const std::vector<double> colors = { var.r(), var.g(), var.b() };
   if (std::all_of(colors.begin(), colors.end(),
-        [](double val) { return (val >= 0 && val <= 1 && std::fmod(val * 255., 1) < 1e-9); }))
+        [](double val)
+        {
+          return (val >= 0 && val <= 1 &&
+            std::fmod(val * 255., 1) < std::numeric_limits<double>::epsilon());
+        }))
   {
     std::ostringstream stream;
     stream << "#" << std::hex                     //

@@ -69,7 +69,7 @@ When formatting a vector into a string, individual token are formatted according
 
 The following formats are supported when parsing a color, case insensitive:
 
-- R,G,B where R, G, B are doubles [0, 1]
+- R,G,B where R, G, B are doubles >= 0
 - #RRGGBB where RR, GG, BB are hexadecimal values
 - rgb(R, G, B) where R, G and B are integer [0, 255]
 - hsl(H, S%, L%) where H is integer [0, 360], S and L are integer [0, 100]
@@ -80,7 +80,7 @@ The following formats are supported when parsing a color, case insensitive:
 
 See [W3C](https://www.w3.org/TR/css-color-3/#rgb-color) doc for more details on these formats.
 
-When formatting a color into a string, it is formatted as `#RRGGBB` if values are multiple of 255. Otherwise, it is formatted as `R,G,B` where R, G, B are doubles between 0 and 1.
+When formatting a color into a string, it is formatted as `#RRGGBB` if values are multiple of 255. Otherwise, it is formatted as vector of doubles.
 
 ## Direction
 
