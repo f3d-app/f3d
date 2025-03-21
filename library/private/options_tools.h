@@ -213,6 +213,17 @@ color_t parse(const std::string& str)
         std::stoul(hexMatch[3], nullptr, 16) / 255.0); //
     }
 
+    /* Short hex format search */
+    const std::regex shortHexRegex("#([0-9a-f])([0-9a-f])([0-9a-f])", std::regex_constants::icase);
+    std::smatch shortHexMatch;
+    if (std::regex_match(strCompact, shortHexMatch, shortHexRegex))
+    {
+      return color_t(
+        std::stoul(shortHexMatch[1].str() + shortHexMatch[1].str(), nullptr, 16) / 255.0,
+        std::stoul(shortHexMatch[2].str() + shortHexMatch[2].str(), nullptr, 16) / 255.0,
+        std::stoul(shortHexMatch[3].str() + shortHexMatch[3].str(), nullptr, 16) / 255.0);
+    }
+
     /* RGB format search */
     const std::regex rgbRegex(
       "rgb\\((\\d{1,3}),(\\d{1,3}),(\\d{1,3})\\)", std::regex_constants::icase);

@@ -114,6 +114,9 @@ int TestSDKOptionsIO(int argc, char* argv[])
   test.parse<f3d::color_t>("color_t", "  #1a2B3c ",
     { static_cast<double>(26.0 / 255.0), static_cast<double>(43.0 / 255.0),
       static_cast<double>(60.0 / 255.0) });
+  test.parse<f3d::color_t>("color_t", "#123",
+    { static_cast<double>(17.0 / 255.0), static_cast<double>(34.0 / 255.0),
+      static_cast<double>(51.0 / 255.0) });
   test.parse<f3d::color_t>("color_t", "  RGB( 255 ,  255 ,255 )  ", { 1.0, 1.0, 1.0 });
   test.parse<f3d::color_t>("color_t", "rgb(35,149,39)",
     { static_cast<double>(35.0 / 255.0), static_cast<double>(149.0 / 255.0),
