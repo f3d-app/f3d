@@ -117,8 +117,39 @@ int TestSDKOptionsIO(int argc, char* argv[])
 
   test.parse<f3d::color_t>("color_t", "0.1,0.2,0.3", { 0.1, 0.2, 0.3 });
   test.parse<f3d::color_t>("color_t", "  0.1,  0.2 , 0.3 ", { 0.1, 0.2, 0.3 });
+  test.parse<f3d::color_t>("color_t", "#FFFFFF", { 1.0, 1.0, 1.0 });
+  test.parse<f3d::color_t>("color_t", "  #1a2B3c ",
+    { static_cast<double>(26.0 / 255.0), static_cast<double>(43.0 / 255.0),
+      static_cast<double>(60.0 / 255.0) });
+  test.parse<f3d::color_t>("color_t", "#123",
+    { static_cast<double>(17.0 / 255.0), static_cast<double>(34.0 / 255.0),
+      static_cast<double>(51.0 / 255.0) });
+  test.parse<f3d::color_t>("color_t", "  RGB( 255 ,  255 ,255 )  ", { 1.0, 1.0, 1.0 });
+  test.parse<f3d::color_t>("color_t", "rgb(35,149,39)",
+    { static_cast<double>(35.0 / 255.0), static_cast<double>(149.0 / 255.0),
+      static_cast<double>(39.0 / 255.0) });
+  test.parse<f3d::color_t>("color_t", "light_salmon",
+    { 1.0, static_cast<double>(160.0 / 255.0), static_cast<double>(122.0 / 255.0) });
+  test.parse<f3d::color_t>("color_t", "LightSalmon",
+    { 1.0, static_cast<double>(160.0 / 255.0), static_cast<double>(122.0 / 255.0) });
+  test.parse<f3d::color_t>("color_t", "hsv(0,0%,75%)", { 0.75, 0.75, 0.75 });
+  test.parse<f3d::color_t>("color_t", " HSV( 240 , 100 % , 100 % )", { 0.0, 0.0, 1.0 });
+  test.parse<f3d::color_t>("color_t", "hsl( 240 , 100 % , 50 % )", { 0.0, 0.0, 1.0 });
+  test.parse<f3d::color_t>("color_t", "hwb(240,0%,0%)", { 0.0, 0.0, 1.0 });
+  test.parse<f3d::color_t>("color_t", "cmyk(100,100%,0,0)", { 0.0, 0.0, 1.0 });
+  test.parse_expect<f3d::color_t, parsing_exception>(
+    "invalid rgb() value color_t", "rgb(300,255,255)");
+  test.parse_expect<f3d::color_t, parsing_exception>(
+    "invalid hsl() value color_t", "hsl(361,120,255)");
+  test.parse_expect<f3d::color_t, parsing_exception>("invalid hsv() color_t", "hsv(100,120%,0)");
+  test.parse_expect<f3d::color_t, parsing_exception>("invalid format color_t", "hxb(240,0%,0%)");
+  test.parse_expect<f3d::color_t, parsing_exception>("invalid color_t", "cmyk(200%,12%,34%,56%)");
   test.parse_expect<f3d::color_t, parsing_exception>("incorrect size color_t", "0.1,0.2,0.3,0.4");
   test.format<f3d::color_t>("color_t", { 0.1, 0.2, 0.3 }, "0.1,0.2,0.3");
+  test.format<f3d::color_t>("color_t",
+    { static_cast<double>(171. / 255.), static_cast<double>(205. / 255.),
+      static_cast<double>(239. / 255.) },
+    "#abcdef");
 
   test.parse<f3d::direction_t>("direction_t", "+X", { 1, 0, 0 });
   test.parse<f3d::direction_t>("direction_t", "-Y", { 0, -1, 0 });
