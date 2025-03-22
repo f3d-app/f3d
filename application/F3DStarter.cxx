@@ -496,7 +496,7 @@ public:
               // XXX: Use starts_with once C++20 is supported
               if (libf3dOptionName.rfind("reset-", 0) == 0)
               {
-                if (libf3dOptionName.size() > 6) 
+                if (libf3dOptionName.size() > 6)
                 {
                   reset = true;
                   libf3dOptionName = libf3dOptionName.substr(6);
