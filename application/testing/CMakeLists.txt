@@ -1097,6 +1097,10 @@ f3d_test(NAME TestNonExistentConfigFileStem DATA cow.vtp CONFIG "dummy" REGEXP "
 # Test invalid config file
 f3d_test(NAME TestInvalidConfigFile DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/invalid.json REGEXP "Unable to parse the configuration file" NO_BASELINE)
 
+# Test invalid reset key in config file
+f3d_test(NAME TestInvalidResetKey DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/invalid_reset.json REGEXP "Invalid option: 'reset-' must be followed by a valid option name, ignoring entry" NO_BASELINE)
+
+
 # Test invalid multifile mode
 f3d_test(NAME TestInvalidMultiFileMode DATA mb/recursive ARGS --multi-file-mode=add REGEXP "Unrecognized multi-file-mode: add. Assuming \"single\" mode." NO_BASELINE)
 
