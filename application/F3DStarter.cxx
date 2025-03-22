@@ -508,8 +508,8 @@ public:
                   static bool alreaedyWarned = false;
                   if (!alreaedyWarned)
                   {
-                    f3d::log::warn(
-                        "Invalid option: 'reset-' must be followed by a valid option name, ignoring entry");
+                    f3d::log::warn("Invalid option: 'reset-' must be followed by a valid option "
+                                   "name, ignoring entry");
                     alreaedyWarned = true;
                   }
                   continue;
