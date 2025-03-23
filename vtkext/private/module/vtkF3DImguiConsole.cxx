@@ -6,8 +6,8 @@
 #include <imgui.h>
 
 #include <array>
-#include <vtkNew.h>
 #include <vtkCallbackCommand.h>
+#include <vtkNew.h>
 
 struct vtkF3DImguiConsole::Internals
 {
