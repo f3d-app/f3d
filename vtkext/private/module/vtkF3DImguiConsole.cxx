@@ -24,7 +24,8 @@ struct vtkF3DImguiConsole::Internals
   bool NewError = false;
   bool NewWarning = false;
   std::vector<std::string> Commands; // List of supported commands
-  std::pair<size_t, size_t> Completions{ 0, 0 }; // Index for start and length of completions in Logs
+  std::pair<size_t, size_t> Completions{ 0,
+    0 }; // Index for start and length of completions in Logs
   /**
    * Clear completions from the logs
    */
