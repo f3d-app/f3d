@@ -6,6 +6,8 @@
 #include <imgui.h>
 
 #include <array>
+#include <vtkNew.h>
+#include <vtkCallbackCommand.h>
 
 struct vtkF3DImguiConsole::Internals
 {
@@ -21,14 +23,137 @@ struct vtkF3DImguiConsole::Internals
   std::array<char, 256> CurrentInput = {};
   bool NewError = false;
   bool NewWarning = false;
+  std::vector<std::string> Commands; // List of supported commands
+  std::pair<size_t, size_t> Completions{ 0, 0 }; // Index for start and length of completions in Logs
+  /**
+   * Clear completions from the logs
+   */
+  void ClearCompletions()
+  {
+    if (Completions.second > 0)
+    {
+      Logs.erase(Logs.begin() + Completions.first, Logs.begin() + Completions.second);
+      Completions.second = 0;
+    }
+  }
+  /**
+   * Callback to process text editing events in console
+   */
+  int TextEditCallback(ImGuiInputTextCallbackData* data)
+  {
+    ClearCompletions();
+    /* Determine if string starts with a given prefix without need of C++20 */
+    auto starts_with = [](const std::string& str, const std::string& prefix)
+    {
+      if (prefix.size() > str.size())
+      {
+        return false;
+      }
+      for (size_t i = 0; i < prefix.size(); ++i)
+      {
+        if (std::tolower(str[i]) != std::tolower(prefix[i]))
+        {
+          return false;
+        }
+      }
+      return true;
+    };
+    switch (data->EventFlag)
+    {
+      case ImGuiInputTextFlags_CallbackCompletion:
+      {
+        std::string pattern{ data->Buf };
+
+        // Build a list of candidates
+        std::vector<std::string> candidates;
+        for (int i = 0; i < Commands.size(); i++)
+        {
+          if (starts_with(Commands[i], pattern))
+          {
+            candidates.push_back(Commands[i]);
+          }
+        }
+
+        if (candidates.size() == 1)
+        {
+          // Single match. Delete the beginning of the word and replace it entirely so we've got
+          // nice casing.
+          data->DeleteChars(0, pattern.size());
+          data->InsertChars(data->CursorPos, candidates[0].c_str());
+          data->InsertChars(data->CursorPos, " ");
+        }
+        else if (candidates.size() > 1)
+        {
+          // Multiple matches. Complete as much as we can.
+          // So inputting "C"+Tab will complete to "CL" then display "CLEAR" and "CLASSIFY" as
+          // matches.
+          int match_len = pattern.size();
+          bool all_candidates_matches = true;
+          // Find the common prefix to all candidates
+          while (all_candidates_matches)
+          {
+            for (auto& candidate : candidates)
+            {
+              if (candidate.size() <= match_len ||
+                std::tolower(candidate[match_len]) != std::tolower(pattern[match_len]))
+              {
+                all_candidates_matches = false;
+                break;
+              }
+            }
+            if (all_candidates_matches)
+            {
+              match_len++;
+            }
+          }
+
+          if (match_len > 0)
+          {
+            data->DeleteChars(0, pattern.size());
+            data->InsertChars(
+              data->CursorPos, candidates[0].c_str(), candidates[0].c_str() + match_len);
+          }
+
+          Completions.first = Logs.size();
+          Completions.second = Logs.size() + candidates.size() + 1;
+          // List matches
+          this->Logs.emplace_back(std::make_pair(Internals::LogType::Log, "Possible matches:"));
+          for (int i = 0; i < candidates.size(); i++)
+          {
+            this->Logs.emplace_back(std::make_pair(Internals::LogType::Log, candidates[i]));
+          }
+        }
+
+        break;
+      }
+    }
+    return 0;
+  }
 };
 
 vtkStandardNewMacro(vtkF3DImguiConsole);
+
+/**
+ * Callback to receive list of commands from the interactor
+ */
+static void OnCommandsSent(vtkObject*, unsigned long, void* clientData, void* data)
+{
+  std::vector<std::string>* commands = static_cast<std::vector<std::string>*>(data);
+  vtkF3DImguiConsole* console = static_cast<vtkF3DImguiConsole*>(clientData);
+  for (const auto& command : *commands)
+  {
+    console->AddCommand(command);
+  }
+}
 
 //----------------------------------------------------------------------------
 vtkF3DImguiConsole::vtkF3DImguiConsole()
   : Pimpl(new Internals())
 {
+  vtkNew<vtkCallbackCommand> keyCommandsCallback;
+  keyCommandsCallback->SetClientData(this);
+  keyCommandsCallback->SetCallback(OnCommandsSent);
+  this->AddObserver(vtkF3DImguiConsole::CommandListEvent, keyCommandsCallback);
 }
 
 //----------------------------------------------------------------------------
@@ -134,15 +259,22 @@ void vtkF3DImguiConsole::ShowConsole()
   ImGui::Separator();
 
   // input
-  ImGuiInputTextFlags inputFlags =
-    ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_EscapeClearsAll;
+  ImGuiInputTextFlags inputFlags = ImGuiInputTextFlags_EnterReturnsTrue |
+    ImGuiInputTextFlags_EscapeClearsAll | ImGuiInputTextFlags_CallbackCompletion;
 
   ImGui::Text("> ");
   ImGui::SameLine();
 
   ImGui::PushItemWidth(-1);
+
+  auto TextEditCallbackStub = [](ImGuiInputTextCallbackData* data) -> int
+  {
+    vtkF3DImguiConsole::Internals* internals = (vtkF3DImguiConsole::Internals*)data->UserData;
+    return internals->TextEditCallback(data);
+  };
+
   bool runCommand = ImGui::InputText("##ConsoleInput", this->Pimpl->CurrentInput.data(),
-    sizeof(this->Pimpl->CurrentInput), inputFlags, nullptr, this->Pimpl.get());
+    sizeof(this->Pimpl->CurrentInput), inputFlags, TextEditCallbackStub, this->Pimpl.get());
   ImGui::PopItemWidth();
 
   ImGui::SetItemDefaultFocus();
@@ -160,6 +292,12 @@ void vtkF3DImguiConsole::ShowConsole()
       Internals::LogType::Typed, std::string("> ") + this->Pimpl->CurrentInput.data()));
     this->InvokeEvent(vtkF3DImguiConsole::TriggerEvent, this->Pimpl->CurrentInput.data());
     this->Pimpl->CurrentInput = {};
+  }
+
+  if (runCommand)
+  {
+    // No need to show completions after command is run
+    this->Pimpl->ClearCompletions();
   }
 
   ImGui::End();
@@ -214,3 +352,9 @@ void vtkF3DImguiConsole::Clear()
   this->Pimpl->NewError = false;
   this->Pimpl->NewWarning = false;
 }
+
+//----------------------------------------------------------------------------
+void vtkF3DImguiConsole::AddCommand(const std::string& command)
+{
+  this->Pimpl->Commands.push_back(command);
+};

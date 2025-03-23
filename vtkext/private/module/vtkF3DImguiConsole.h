@@ -48,6 +48,11 @@ public:
    */
   void Clear();
 
+  /**
+   * Add a command to the console
+   */
+  void AddCommand(const std::string& command);
+
 protected:
   vtkF3DImguiConsole();
   ~vtkF3DImguiConsole() override;

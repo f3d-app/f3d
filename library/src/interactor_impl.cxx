@@ -842,6 +842,13 @@ interactor& interactor_impl::initCommands()
       log::info(
         "Alias " + aliasName + " added with command " + this->Internals->AliasMap[aliasName]);
     });
+  // Send list of commands to ImGui console
+  std::vector<std::string> commands;
+  for (auto const& [action, callback] : this->Internals->Commands)
+  {
+    commands.emplace_back(action);
+  }
+  vtkOutputWindow::GetInstance()->InvokeEvent(vtkF3DImguiConsole::CommandListEvent, &commands);
   return *this;
 }
 
