@@ -5,8 +5,8 @@
 
 #include <imgui.h>
 
-#include <array>
 #include <algorithm>
+#include <array>
 #include <vtkCallbackCommand.h>
 #include <vtkNew.h>
 
