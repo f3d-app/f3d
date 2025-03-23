@@ -167,6 +167,10 @@
       "type": "bool",
       "default_value": "false"
     },
+    "minimal": {
+      "type": "bool",
+      "default_value": "false"
+    },
     "dropzone": {
       "type": "bool",
       "default_value": "false"
