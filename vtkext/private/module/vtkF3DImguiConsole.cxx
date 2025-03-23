@@ -104,7 +104,7 @@ struct vtkF3DImguiConsole::Internals
           // Add all candidates to the logs
           this->Logs.emplace_back(std::make_pair(Internals::LogType::Log, "Possible matches:"));
           std::transform(candidates.begin(), candidates.end(), std::back_inserter(this->Logs),
-            [](std::string candidate)
+            [](const std::string &candidate)
             { return std::make_pair(Internals::LogType::Log, candidate); });
         }
 
