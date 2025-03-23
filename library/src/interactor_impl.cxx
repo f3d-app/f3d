@@ -880,6 +880,14 @@ std::vector<std::string> interactor_impl::getCommandActions() const
 //----------------------------------------------------------------------------
 bool interactor_impl::triggerCommand(std::string_view command)
 {
+  if (this->Internals->Options.ui.minimal_console)
+  {
+#if F3D_MODULE_UI
+    vtkF3DImguiConsole* console = vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
+    assert(console != nullptr);
+    console->MinimalClear();
+#endif
+  }
   log::debug("Command: ", command);
 
   // Resolve Alias Before Tokenizing
@@ -1087,7 +1095,7 @@ interactor& interactor_impl::initBindings()
 #if F3D_MODULE_UI
   this->addBinding({mod_t::NONE, "H"}, "toggle ui.cheatsheet", "Others", std::bind(docStr, "Toggle cheatsheet display"));
   this->addBinding({mod_t::NONE, "Escape"}, "toggle ui.console", "Others", std::bind(docStr, "Toggle console display"));
-  this->addBinding({mod_t::CTRL, "M"}, "toggle ui.minimal", "Others", std::bind(docStr, "Toggle minimal console mode"));
+  this->addBinding({mod_t::SHIFT, "M"}, "toggle ui.minimal_console", "Others", std::bind(docTgl, "Toggle minimal console mode", std::cref(opts.ui.minimal_console)));
 #endif
   this->addBinding({mod_t::CTRL, "Q"}, "stop_interactor", "Others", std::bind(docStr, "Stop the interactor"));
   this->addBinding({mod_t::NONE, "Return"}, "reset_camera", "Others", std::bind(docStr, "Reset camera to initial parameters"));

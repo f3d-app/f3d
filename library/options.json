@@ -167,7 +167,7 @@
       "type": "bool",
       "default_value": "false"
     },
-    "minimal": {
+    "minimal_console": {
       "type": "bool",
       "default_value": "false"
     },
