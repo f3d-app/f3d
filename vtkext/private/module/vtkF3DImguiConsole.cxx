@@ -6,6 +6,7 @@
 #include <imgui.h>
 
 #include <array>
+#include <algorithm>
 #include <vtkCallbackCommand.h>
 #include <vtkNew.h>
 
@@ -43,22 +44,6 @@ struct vtkF3DImguiConsole::Internals
   int TextEditCallback(ImGuiInputTextCallbackData* data)
   {
     ClearCompletions();
-    /* Determine if string starts with a given prefix without need of C++20 */
-    auto starts_with = [](const std::string& str, const std::string& prefix)
-    {
-      if (prefix.size() > str.size())
-      {
-        return false;
-      }
-      for (size_t i = 0; i < prefix.size(); ++i)
-      {
-        if (std::tolower(str[i]) != std::tolower(prefix[i]))
-        {
-          return false;
-        }
-      }
-      return true;
-    };
     switch (data->EventFlag)
     {
       case ImGuiInputTextFlags_CallbackCompletion:
@@ -67,13 +52,12 @@ struct vtkF3DImguiConsole::Internals
 
         // Build a list of candidates
         std::vector<std::string> candidates;
-        for (int i = 0; i < Commands.size(); i++)
-        {
-          if (starts_with(Commands[i], pattern))
+        // Copy all commands that start with the pattern
+        std::copy_if(Commands.begin(), Commands.end(), std::back_inserter(candidates),
+          [&pattern](const std::string& s)
           {
-            candidates.push_back(Commands[i]);
-          }
-        }
+            return s.rfind(pattern, 0) == 0; // To avoid dependency for C++20 starts_with
+          });
 
         if (candidates.size() == 1)
         {
@@ -117,12 +101,11 @@ struct vtkF3DImguiConsole::Internals
 
           Completions.first = Logs.size();
           Completions.second = Logs.size() + candidates.size() + 1;
-          // List matches
+          // Add all candidates to the logs
           this->Logs.emplace_back(std::make_pair(Internals::LogType::Log, "Possible matches:"));
-          for (int i = 0; i < candidates.size(); i++)
-          {
-            this->Logs.emplace_back(std::make_pair(Internals::LogType::Log, candidates[i]));
-          }
+          std::transform(candidates.begin(), candidates.end(), std::back_inserter(this->Logs),
+            [](std::string candidate)
+            { return std::make_pair(Internals::LogType::Log, candidate); });
         }
 
         break;
