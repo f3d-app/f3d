@@ -18,21 +18,9 @@ KeyPressEvent 199 142 0 111 1 o 0
 CharEvent 199 142 0 111 1 o 0
 KeyReleaseEvent 199 142 0 111 1 o 0
 
-KeyPressEvent 199 142 0 103 1 g 0
-CharEvent 199 142 0 103 1 g 0
-KeyReleaseEvent 199 142 0 103 1 g 0
-
-KeyPressEvent 199 142 0 103 1 g 0
-CharEvent 199 142 0 103 1 g 0
-KeyReleaseEvent 199 142 0 103 1 g 0
-
-KeyPressEvent 199 142 0 108 1 l 0
-CharEvent 199 142 0 108 1 l 0
-KeyReleaseEvent 199 142 0 108 1 l 0
-
-KeyPressEvent 199 142 0 101 1 e 0
-CharEvent 199 142 0 101 1 e 0
-KeyReleaseEvent 199 142 0 101 1 e 0
+KeyPressEvent 199 142 0 9 1 Tab 0
+CharEvent 199 142 0 9 1 Tab 0
+KeyReleaseEvent 199 142 0 9 1 Tab 0
 
 KeyPressEvent 199 142 0 95 1 _ 0
 CharEvent 199 142 0 95 1 _ 0

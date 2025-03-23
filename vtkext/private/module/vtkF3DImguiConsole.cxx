@@ -77,14 +77,19 @@ struct vtkF3DImguiConsole::Internals
           // Find the common prefix to all candidates
           while (all_candidates_matches)
           {
-            for (auto& candidate : candidates)
+            const std::string& first = candidates[0];
+            if (first.size() <= match_len)
             {
-              if (candidate.size() <= match_len ||
-                std::tolower(candidate[match_len]) != std::tolower(pattern[match_len]))
-              {
-                all_candidates_matches = false;
-                break;
-              }
+              // The first candidate is shorter than the current match length
+              all_candidates_matches = false;
+            }
+            else
+            {
+              // Check if all candidates match the current character
+              const char target = first[match_len];
+              all_candidates_matches = std::all_of(candidates.begin(), candidates.end(),
+                [match_len, target](const std::string& s)
+                { return s.size() > match_len && s[match_len] == target; });
             }
             if (all_candidates_matches)
             {
