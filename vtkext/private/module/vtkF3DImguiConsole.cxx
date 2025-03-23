@@ -79,7 +79,7 @@ struct vtkF3DImguiConsole::Internals
         {
           // Single match. Delete the beginning of the word and replace it entirely so we've got
           // nice casing.
-          data->DeleteChars(0, pattern.size());
+          data->DeleteChars(0, static_cast<int>(pattern.size()));
           data->InsertChars(data->CursorPos, candidates[0].c_str());
           data->InsertChars(data->CursorPos, " ");
         }
@@ -88,7 +88,7 @@ struct vtkF3DImguiConsole::Internals
           // Multiple matches. Complete as much as we can.
           // So inputting "C"+Tab will complete to "CL" then display "CLEAR" and "CLASSIFY" as
           // matches.
-          int match_len = pattern.size();
+          size_t match_len = pattern.size();
           bool all_candidates_matches = true;
           // Find the common prefix to all candidates
           while (all_candidates_matches)
@@ -110,7 +110,7 @@ struct vtkF3DImguiConsole::Internals
 
           if (match_len > 0)
           {
-            data->DeleteChars(0, pattern.size());
+            data->DeleteChars(0, static_cast<int>(pattern.size()));
             data->InsertChars(
               data->CursorPos, candidates[0].c_str(), candidates[0].c_str() + match_len);
           }
