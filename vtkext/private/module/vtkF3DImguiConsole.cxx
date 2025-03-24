@@ -325,5 +325,5 @@ void vtkF3DImguiConsole::Clear()
 void vtkF3DImguiConsole::SetCommandsMatchCallback(
   std::function<std::vector<std::string>(const std::string& pattern)> callback)
 {
-  this->Pimpl->GetCommandsMatchCallback = callback;
+  this->Pimpl->GetCommandsMatchCallback = std::move(callback);
 }
