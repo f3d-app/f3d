@@ -70,7 +70,7 @@ When formatting a vector into a string, individual token are formatted according
 The following formats are supported when parsing a color, case insensitive:
 
 - R,G,B where R, G, B are doubles >= 0
-- #RRGGBB where RR, GG, BB are hexadecimal values
+- #RRGGBB where RR, GG, BB are hexadecimal values. Shortened format #RGB is also valid.
 - rgb(R, G, B) where R, G and B are integer [0, 255]
 - hsl(H, S%, L%) where H is integer [0, 360], S and L are integer [0, 100]
 - hsv(H, S%, V%) where H is integer [0, 360], S and V are integer [0, 100]

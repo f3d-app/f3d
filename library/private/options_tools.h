@@ -4,13 +4,14 @@
 #include "options.h"
 #include "types.h"
 
+#include <vtkMath.h>
+#include <vtkNamedColors.h>
+#include <vtkSmartPointer.h>
+
 #include <algorithm>
 #include <cassert>
 #include <regex>
 #include <sstream>
-#include <vtkMath.h>
-#include <vtkNamedColors.h>
-#include <vtkSmartPointer.h>
 
 namespace f3d
 {
@@ -189,7 +190,7 @@ ratio_t parse(const std::string& str)
 //----------------------------------------------------------------------------
 /**
  * Parse provided string into a color_t.
- * Supported formats: "R,G,B", "#RRGGBB", "rgb(R,G,B)", "hsl(H,S%,L%)", "hsv(H,S%,V%)",
+ * Supported formats: "R,G,B", "#RRGGBB", "#RGB", rgb(R,G,B)", "hsl(H,S%,L%)", "hsv(H,S%,V%)",
  *                    "hwb(H,W%,B%)", cmyk(C%,M%,Y%,K%), "CSS3 color name"
  * Can throw options::parsing_exception in case of failure to parse
  */
@@ -201,6 +202,17 @@ color_t parse(const std::string& str)
 
   try
   {
+    /* Short hex format search */
+    const std::regex shortHexRegex("#([0-9a-f])([0-9a-f])([0-9a-f])", std::regex_constants::icase);
+    std::smatch shortHexMatch;
+    if (std::regex_match(strCompact, shortHexMatch, shortHexRegex))
+    {
+      return color_t(
+        std::stoul(shortHexMatch[1].str() + shortHexMatch[1].str(), nullptr, 16) / 255.0,
+        std::stoul(shortHexMatch[2].str() + shortHexMatch[2].str(), nullptr, 16) / 255.0,
+        std::stoul(shortHexMatch[3].str() + shortHexMatch[3].str(), nullptr, 16) / 255.0);
+    }
+
     /* Hex format search */
     const std::regex hexRegex(
       "#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})", std::regex_constants::icase);
@@ -211,17 +223,6 @@ color_t parse(const std::string& str)
         std::stoul(hexMatch[1], nullptr, 16) / 255.0,  //
         std::stoul(hexMatch[2], nullptr, 16) / 255.0,  //
         std::stoul(hexMatch[3], nullptr, 16) / 255.0); //
-    }
-
-    /* Short hex format search */
-    const std::regex shortHexRegex("#([0-9a-f])([0-9a-f])([0-9a-f])", std::regex_constants::icase);
-    std::smatch shortHexMatch;
-    if (std::regex_match(strCompact, shortHexMatch, shortHexRegex))
-    {
-      return color_t(
-        std::stoul(shortHexMatch[1].str() + shortHexMatch[1].str(), nullptr, 16) / 255.0,
-        std::stoul(shortHexMatch[2].str() + shortHexMatch[2].str(), nullptr, 16) / 255.0,
-        std::stoul(shortHexMatch[3].str() + shortHexMatch[3].str(), nullptr, 16) / 255.0);
     }
 
     /* RGB format search */
