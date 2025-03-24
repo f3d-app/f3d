@@ -53,7 +53,8 @@ public:
   /**
    * Set the callback to get the list of commands matching patter
    */
-  void SetCommandsMatchCallback(std::function<std::vector<std::string>(const std::string& pattern)> callback);
+  void SetCommandsMatchCallback(
+    std::function<std::vector<std::string>(const std::string& pattern)> callback);
 
 protected:
   vtkF3DImguiConsole();

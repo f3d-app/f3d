@@ -322,7 +322,8 @@ void vtkF3DImguiConsole::Clear()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DImguiConsole::SetCommandsMatchCallback(std::function<std::vector<std::string>(const std::string& pattern)> callback)
+void vtkF3DImguiConsole::SetCommandsMatchCallback(
+  std::function<std::vector<std::string>(const std::string& pattern)> callback)
 {
   this->Pimpl->GetCommandsMatchCallback = callback;
 }
