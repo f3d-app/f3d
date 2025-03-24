@@ -24,9 +24,10 @@ struct vtkF3DImguiConsole::Internals
   std::array<char, 256> CurrentInput = {};
   bool NewError = false;
   bool NewWarning = false;
-  std::vector<std::string> Commands; // List of supported commands
   std::pair<size_t, size_t> Completions{ 0,
     0 }; // Index for start and length of completions in Logs
+  std::function<std::vector<std::string>(const std::string& pattern)>
+    GetCommandsMatchCallback; // Callback to get the list of commands matching pattern
   /**
    * Clear completions from the logs
    */
@@ -48,73 +49,68 @@ struct vtkF3DImguiConsole::Internals
     {
       case ImGuiInputTextFlags_CallbackCompletion:
       {
-        std::string pattern{ data->Buf };
-
-        // Build a list of candidates
-        std::vector<std::string> candidates;
-        // Copy all commands that start with the pattern
-        std::copy_if(Commands.begin(), Commands.end(), std::back_inserter(candidates),
-          [&pattern](const std::string& s)
-          {
-            return s.rfind(pattern, 0) == 0; // To avoid dependency for C++20 starts_with
-          });
-
-        if (candidates.size() == 1)
+        if (GetCommandsMatchCallback)
         {
-          // Single match. Delete the beginning of the word and replace it entirely so we've got
-          // nice casing.
-          data->DeleteChars(0, static_cast<int>(pattern.size()));
-          data->InsertChars(data->CursorPos, candidates[0].c_str());
-          data->InsertChars(data->CursorPos, " ");
-        }
-        else if (candidates.size() > 1)
-        {
-          // Multiple matches. Complete as much as we can.
-          // So inputting "C"+Tab will complete to "CL" then display "CLEAR" and "CLASSIFY" as
-          // matches.
-          size_t match_len = pattern.size();
-          bool all_candidates_matches = true;
-          // Find the common prefix to all candidates
-          while (all_candidates_matches)
-          {
-            const std::string& first = candidates[0];
-            if (first.size() <= match_len)
-            {
-              // The first candidate is shorter than the current match length
-              all_candidates_matches = false;
-            }
-            else
-            {
-              // Check if all candidates match the current character
-              const char target = first[match_len];
-              all_candidates_matches = std::all_of(candidates.begin(), candidates.end(),
-                [match_len, target](const std::string& s)
-                { return s.size() > match_len && s[match_len] == target; });
-            }
-            if (all_candidates_matches)
-            {
-              match_len++;
-            }
-          }
+          std::string pattern{ data->Buf };
+          std::vector<std::string> candidates =
+            GetCommandsMatchCallback(pattern); // List of supported commands
 
-          if (match_len > 0)
+          if (candidates.size() == 1)
           {
+            // Single match. Delete the beginning of the word and replace it entirely so we've got
+            // nice casing.
             data->DeleteChars(0, static_cast<int>(pattern.size()));
-            data->InsertChars(
-              data->CursorPos, candidates[0].c_str(), candidates[0].c_str() + match_len);
+            data->InsertChars(data->CursorPos, candidates[0].c_str());
+            data->InsertChars(data->CursorPos, " ");
           }
+          else if (candidates.size() > 1)
+          {
+            // Multiple matches. Complete as much as we can.
+            // So inputting "C"+Tab will complete to "CL" then display "CLEAR" and "CLASSIFY" as
+            // matches.
+            size_t match_len = pattern.size();
+            bool all_candidates_matches = true;
+            // Find the common prefix to all candidates
+            while (all_candidates_matches)
+            {
+              const std::string& first = candidates[0];
+              if (first.size() <= match_len)
+              {
+                // The first candidate is shorter than the current match length
+                all_candidates_matches = false;
+              }
+              else
+              {
+                // Check if all candidates match the current character
+                const char target = first[match_len];
+                all_candidates_matches = std::all_of(candidates.begin(), candidates.end(),
+                  [match_len, target](const std::string& s)
+                  { return s.size() > match_len && s[match_len] == target; });
+              }
+              if (all_candidates_matches)
+              {
+                match_len++;
+              }
+            }
 
-          Completions.first = Logs.size();
-          Completions.second = Logs.size() + candidates.size() + 1;
-          // Add all candidates to the logs
-          this->Logs.emplace_back(std::make_pair(Internals::LogType::Log, "Possible matches:"));
-          std::transform(candidates.begin(), candidates.end(), std::back_inserter(this->Logs),
-            [](const std::string& candidate)
-            { return std::make_pair(Internals::LogType::Log, candidate); });
+            if (match_len > 0)
+            {
+              data->DeleteChars(0, static_cast<int>(pattern.size()));
+              data->InsertChars(
+                data->CursorPos, candidates[0].c_str(), candidates[0].c_str() + match_len);
+            }
+
+            Completions.first = Logs.size();
+            Completions.second = Logs.size() + candidates.size() + 1;
+            // Add all candidates to the logs
+            this->Logs.emplace_back(std::make_pair(Internals::LogType::Log, "Possible matches:"));
+            std::transform(candidates.begin(), candidates.end(), std::back_inserter(this->Logs),
+              [](const std::string& candidate)
+              { return std::make_pair(Internals::LogType::Log, candidate); });
+          }
         }
-
-        break;
       }
+      break;
     }
     return 0;
   }
@@ -122,27 +118,10 @@ struct vtkF3DImguiConsole::Internals
 
 vtkStandardNewMacro(vtkF3DImguiConsole);
 
-/**
- * Callback to receive list of commands from the interactor
- */
-static void OnCommandsSent(vtkObject*, unsigned long, void* clientData, void* data)
-{
-  std::vector<std::string>* commands = static_cast<std::vector<std::string>*>(data);
-  vtkF3DImguiConsole* console = static_cast<vtkF3DImguiConsole*>(clientData);
-  for (const auto& command : *commands)
-  {
-    console->AddCommand(command);
-  }
-}
-
 //----------------------------------------------------------------------------
 vtkF3DImguiConsole::vtkF3DImguiConsole()
   : Pimpl(new Internals())
 {
-  vtkNew<vtkCallbackCommand> keyCommandsCallback;
-  keyCommandsCallback->SetClientData(this);
-  keyCommandsCallback->SetCallback(OnCommandsSent);
-  this->AddObserver(vtkF3DImguiConsole::CommandListEvent, keyCommandsCallback);
 }
 
 //----------------------------------------------------------------------------
@@ -343,7 +322,7 @@ void vtkF3DImguiConsole::Clear()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DImguiConsole::AddCommand(const std::string& command)
+void vtkF3DImguiConsole::SetCommandsMatchCallback(std::function<std::vector<std::string>(const std::string& pattern)> callback)
 {
-  this->Pimpl->Commands.push_back(command);
-};
+  this->Pimpl->GetCommandsMatchCallback = callback;
+}

@@ -612,6 +612,38 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
 
   this->initCommands();
   this->initBindings();
+#if F3D_MODULE_UI
+  vtkF3DImguiConsole* console = vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
+  assert(console != nullptr);
+  // Set the callback to get the list of commands
+  console->SetCommandsMatchCallback(
+    [internals = this->Internals.get()](const std::string& pattern)
+    {
+      // Build a list of candidates
+      std::vector<std::string> candidates;
+      // Copy all commands that start with the pattern
+      auto start_with = [&pattern](const std::string& s)
+      {
+        return s.rfind(pattern, 0) == 0; // To avoid dependency for C++20 starts_with
+      };
+      for (auto const& [action, _] : internals->Commands)
+      {
+        if (start_with(action))
+        {
+          candidates.push_back(action);
+        }
+        else
+        {
+          // List is sorted so we can break early
+          if (!candidates.empty())
+          {
+            break;
+          }
+        }
+      }
+      return candidates;
+    });
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -842,15 +874,6 @@ interactor& interactor_impl::initCommands()
       log::info(
         "Alias " + aliasName + " added with command " + this->Internals->AliasMap[aliasName]);
     });
-#if F3D_MODULE_UI
-  // Send list of commands to ImGui console
-  std::vector<std::string> commands;
-  for (auto const& [action, callback] : this->Internals->Commands)
-  {
-    commands.emplace_back(action);
-  }
-  vtkOutputWindow::GetInstance()->InvokeEvent(vtkF3DImguiConsole::CommandListEvent, &commands);
-#endif
   return *this;
 }
 

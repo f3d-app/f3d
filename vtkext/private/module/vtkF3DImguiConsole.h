@@ -15,6 +15,8 @@
 
 #include "vtkF3DConsoleOutputWindow.h"
 
+#include <functional>
+
 #include <vtkCommand.h>
 
 #include <memory>
@@ -49,9 +51,9 @@ public:
   void Clear();
 
   /**
-   * Add a command to the console
+   * Set the callback to get the list of commands matching patter
    */
-  void AddCommand(const std::string& command);
+  void SetCommandsMatchCallback(std::function<std::vector<std::string>(const std::string& pattern)> callback);
 
 protected:
   vtkF3DImguiConsole();
