@@ -505,7 +505,8 @@ public:
                 }
                 else
                 {
-                  f3d::log::warn("Invalid option: 'reset-' must be followed by a valid option name, ignoring entry");
+                  f3d::log::warn("Invalid option: 'reset-' must be followed by a valid option "
+                                 "name, ignoring entry");
                   continue;
                 }
               }
