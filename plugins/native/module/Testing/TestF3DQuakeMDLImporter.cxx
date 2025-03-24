@@ -9,8 +9,8 @@
 int TestF3DQuakeMDLImporter(int vtkNotUsed(argc), char* argv[])
 {
   std::string filename =
-    std::string(argv[1]) + "data/zombie_2.mdl"; // MDL can load two types of frames and two types of textures,
-                                                // another file was added for coverage.  
+    std::string(argv[1]) + "data/zombie_2.mdl"; // MDL can load two types of frames and two types of
+                                                // textures, another file was added for coverage.
   vtkNew<vtkF3DQuakeMDLImporter> importer;
   importer->SetFileName(filename);
   importer->Update();
