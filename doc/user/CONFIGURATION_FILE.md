@@ -20,40 +20,40 @@ A typical config file with options may look like this:
 ```javascript
 [
   {
-    options: {
+    "options": {
       "background-color": "0.7,0.7,0.7",
-      color: "0.5,0.1,0.1",
+      "color": "0.5,0.1,0.1",
       "anti-aliasing": true,
-      timer: true,
-      progress: true,
-      axis: true,
-      bar: true,
-      roughness: 0.2,
-      grid: true,
-      "scalar-coloring": true,
-    },
+      "timer": true,
+      "progress": true,
+      "axis": true,
+      "bar": true,
+      "roughness": 0.2,
+      "grid": true,
+      "scalar-coloring": true
+    }
   },
   {
-    match: ".*vt.",
-    options: {
-      edges: true,
-    },
+    "match": ".*vt.",
+    "options": {
+      "edges": true
+    }
   },
   {
-    match: ".*gl(tf|b)",
-    options: {
-      raytracing: true,
-      denoise: true,
-      samples: 3,
-    },
+    "match": ".*gl(tf|b)",
+    "options": {
+      "raytracing": true,
+      "denoise": true,
+      "samples": 3
+    }
   },
   {
-    match: ".*mhd",
-    options: {
-      volume: true,
-    },
-  },
-];
+    "match": ".*mhd",
+    "options": {
+      "volume": true
+    }
+  }
+]
 ```
 
 Here, the first block defines a basic configuration with many desired options for all files.
@@ -104,25 +104,25 @@ A typical config file with bindings may look like this:
 ```javascript
 [
   {
-    bindings: {
+    "bindings": {
       "Ctrl+Shift+O": "toggle ui.filename",
       "Any+3": "roll_camera -90",
-      O: "set_camera isometric",
-    },
+      "O": "set_camera isometric"
+    }
   },
   {
-    match: ".*vtu",
-    bindings: {
+    "match": ".*vtu",
+    "bindings": {
       "Any+3": "roll_camera 90",
       "Shift+O": "toggle model.point_sprites.enable",
       "Ctrl+O": [
         "toggle render.grid.enable",
-        "toggle scene.camera.orthographic",
+        "toggle scene.camera.orthographic"
       ],
-      "None+I": "toggle ui.axis",
-    },
-  },
-];
+      "None+I": "toggle ui.axis"
+    }
+  }
+]
 ```
 
 Here, the first block define new bindings for all and any files.
