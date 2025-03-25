@@ -146,6 +146,8 @@ int TestSDKOptionsIO(int argc, char* argv[])
   test.parse_expect<f3d::color_t, parsing_exception>("invalid color_t", "cmyk(200%,12%,34%,56%)");
   test.parse_expect<f3d::color_t, parsing_exception>("incorrect size color_t", "0.1,0.2,0.3,0.4");
   test.format<f3d::color_t>("color_t", { 0.1, 0.2, 0.3 }, "0.1,0.2,0.3");
+  test.format<f3d::color_t>("color_t", { 0, 0, 0 }, "#000000");
+  test.format<f3d::color_t>("color_t", { 1, 0, 1 }, "#ff00ff");
   test.format<f3d::color_t>("color_t",
     { static_cast<double>(171. / 255.), static_cast<double>(205. / 255.),
       static_cast<double>(239. / 255.) },
