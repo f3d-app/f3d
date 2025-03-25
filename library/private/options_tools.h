@@ -518,10 +518,10 @@ std::string format(color_t var)
         }))
   {
     std::ostringstream stream;
-    stream << "#" << std::hex                     //
-           << static_cast<int>(colors[0] * 255.)  //
-           << static_cast<int>(colors[1] * 255.)  //
-           << static_cast<int>(colors[2] * 255.); //
+    stream << "#" << std::hex << std::setfill('0') << std::setw(2)
+           << static_cast<int>(colors[0] * 255.) << std::setw(2)
+           << static_cast<int>(colors[1] * 255.) << std::setw(2)
+           << static_cast<int>(colors[2] * 255.);
     return stream.str();
   }
   else
