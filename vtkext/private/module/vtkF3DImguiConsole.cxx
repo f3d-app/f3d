@@ -122,7 +122,7 @@ struct vtkF3DImguiConsole::Internals
           if (CommandHistoryIndex == -1)
           {
             /* Start history navigation */
-            CommandHistoryIndex = CommandHistory.size() - 1;
+            CommandHistoryIndex = static_cast<int>(CommandHistory.size()) - 1;
           }
           else if (CommandHistoryIndex > 0)
           {
