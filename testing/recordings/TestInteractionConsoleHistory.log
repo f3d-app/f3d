@@ -1,0 +1,145 @@
+# StreamVersion 1.2
+EnterEvent 293 98 0 0 0 0 0
+RenderEvent 199 142 0 0 0 0 0
+
+KeyPressEvent 987 619 0 27 1 Escape 0
+CharEvent 987 619 0 27 1 Escape 0
+KeyReleaseEvent 987 619 0 27 1 Escape 0
+
+KeyPressEvent 987 619 0 0 1 Up 0
+CharEvent 987 619 0 0 1 Up 0
+KeyReleaseEvent 987 619 0 0 1 Up 0
+
+KeyPressEvent 987 619 0 116 1 t 0
+CharEvent 987 619 0 116 1 t 0
+KeyReleaseEvent 987 619 0 116 1 t 0
+
+KeyPressEvent 987 619 0 111 1 o 0
+CharEvent 987 619 0 111 1 o 0
+KeyReleaseEvent 987 619 0 111 1 o 0
+
+KeyPressEvent 987 619 0 103 1 g 0
+CharEvent 987 619 0 103 1 g 0
+KeyReleaseEvent 987 619 0 103 1 g 0
+
+KeyPressEvent 987 619 0 103 1 g 0
+CharEvent 987 619 0 103 1 g 0
+KeyReleaseEvent 987 619 0 103 1 g 0
+
+KeyPressEvent 987 619 0 108 1 l 0
+CharEvent 987 619 0 108 1 l 0
+KeyReleaseEvent 987 619 0 108 1 l 0
+
+KeyPressEvent 987 619 0 101 1 e 0
+CharEvent 987 619 0 101 1 e 0
+KeyReleaseEvent 987 619 0 101 1 e 0
+
+KeyPressEvent 987 619 1 95 1 underscore 0
+CharEvent 987 619 1 95 1 underscore 0
+KeyReleaseEvent 987 619 1 95 1 underscore 0
+
+KeyPressEvent 987 619 0 97 1 a 0
+CharEvent 987 619 0 97 1 a 0
+KeyReleaseEvent 987 619 0 97 1 a 0
+
+KeyPressEvent 987 619 0 9 1 Tab 0
+CharEvent 987 619 0 9 1 Tab 0
+KeyReleaseEvent 987 619 0 9 1 Tab 0
+
+KeyPressEvent 987 619 0 13 1 Return 0
+CharEvent 987 619 0 13 1 Return 0
+KeyReleaseEvent 987 619 0 13 1 Return 0
+
+KeyPressEvent 987 619 0 99 1 c 0
+CharEvent 987 619 0 99 1 c 0
+KeyReleaseEvent 987 619 0 99 1 c 0
+
+KeyPressEvent 987 619 0 108 1 l 0
+CharEvent 987 619 0 108 1 l 0
+KeyReleaseEvent 987 619 0 108 1 l 0
+
+KeyPressEvent 987 619 0 101 1 e 0
+CharEvent 987 619 0 101 1 e 0
+KeyReleaseEvent 987 619 0 101 1 e 0
+
+KeyPressEvent 987 619 0 97 1 a 0
+CharEvent 987 619 0 97 1 a 0
+KeyReleaseEvent 987 619 0 97 1 a 0
+
+KeyPressEvent 987 619 0 114 1 r 0
+CharEvent 987 619 0 114 1 r 0
+KeyReleaseEvent 987 619 0 114 1 r 0
+
+KeyPressEvent 987 619 0 13 1 Return 0
+CharEvent 987 619 0 13 1 Return 0
+KeyReleaseEvent 987 619 0 13 1 Return 0
+
+KeyPressEvent 987 619 0 99 1 c 0
+CharEvent 987 619 0 99 1 c 0
+KeyReleaseEvent 987 619 0 99 1 c 0
+
+KeyPressEvent 987 619 0 108 1 l 0
+CharEvent 987 619 0 108 1 l 0
+KeyReleaseEvent 987 619 0 108 1 l 0
+
+KeyPressEvent 987 619 0 101 1 e 0
+CharEvent 987 619 0 101 1 e 0
+KeyReleaseEvent 987 619 0 101 1 e 0
+
+KeyPressEvent 987 619 0 97 1 a 0
+CharEvent 987 619 0 97 1 a 0
+KeyReleaseEvent 987 619 0 97 1 a 0
+
+KeyPressEvent 987 619 0 114 1 r 0
+CharEvent 987 619 0 114 1 r 0
+KeyReleaseEvent 987 619 0 114 1 r 0
+
+KeyPressEvent 987 619 0 13 1 Return 0
+CharEvent 987 619 0 13 1 Return 0
+KeyReleaseEvent 987 619 0 13 1 Return 0
+
+KeyPressEvent 987 619 0 0 1 Up 0
+CharEvent 987 619 0 0 1 Up 0
+KeyReleaseEvent 987 619 0 0 1 Up 0
+
+KeyPressEvent 987 619 0 0 1 Up 0
+CharEvent 987 619 0 0 1 Up 0
+KeyReleaseEvent 987 619 0 0 1 Up 0
+
+KeyPressEvent 987 619 0 0 1 Up 0
+CharEvent 987 619 0 0 1 Up 0
+KeyReleaseEvent 987 619 0 0 1 Up 0
+
+KeyPressEvent 987 619 0 0 1 Up 0
+CharEvent 987 619 0 0 1 Up 0
+KeyReleaseEvent 987 619 0 0 1 Up 0
+
+KeyPressEvent 987 619 0 0 1 Up 0
+CharEvent 987 619 0 0 1 Up 0
+KeyReleaseEvent 987 619 0 0 1 Up 0
+
+KeyPressEvent 987 619 0 0 1 Up 0
+CharEvent 987 619 0 0 1 Up 0
+KeyReleaseEvent 987 619 0 0 1 Up 0
+
+KeyPressEvent 987 619 0 0 1 Down 0
+CharEvent 987 619 0 0 1 Down 0
+KeyReleaseEvent 987 619 0 0 1 Down 0
+
+KeyPressEvent 987 619 0 0 1 Down 0
+CharEvent 987 619 0 0 1 Down 0
+KeyReleaseEvent 987 619 0 0 1 Down 0
+
+KeyPressEvent 987 619 0 0 1 Down 0
+CharEvent 987 619 0 0 1 Down 0
+KeyReleaseEvent 987 619 0 0 1 Down 0
+
+KeyPressEvent 987 619 0 0 1 Down 0
+CharEvent 987 619 0 0 1 Down 0
+KeyReleaseEvent 987 619 0 0 1 Down 0
+
+KeyPressEvent 987 619 0 0 1 Up 0
+CharEvent 987 619 0 0 1 Up 0
+KeyReleaseEvent 987 619 0 0 1 Up 0
+
+TimerEvent 351 169 0 0 0 0 0

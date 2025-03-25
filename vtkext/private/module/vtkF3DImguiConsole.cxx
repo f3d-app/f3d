@@ -28,6 +28,9 @@ struct vtkF3DImguiConsole::Internals
     0 }; // Index for start and length of completions in Logs
   std::function<std::vector<std::string>(const std::string& pattern)>
     GetCommandsMatchCallback; // Callback to get the list of commands matching pattern
+  std::vector<std::string> CommandHistory;
+  std::pair<std::string,int> LastInput; // Last input before navigating history
+  int CommandHistoryIndex = -1; // Current index in command history navigation
   /**
    * Clear completions from the logs
    */
@@ -109,8 +112,60 @@ struct vtkF3DImguiConsole::Internals
               { return std::make_pair(Internals::LogType::Log, candidate); });
           }
         }
+        break;
       }
-      break;
+      case ImGuiInputTextFlags_CallbackHistory:
+      {
+        const int prevHistoryPos = CommandHistoryIndex;
+        if (data->EventKey == ImGuiKey_UpArrow)
+        {
+          if (CommandHistoryIndex == -1)
+          {
+            /* Start history navigation */
+            CommandHistoryIndex = CommandHistory.size() - 1;
+          }
+          else if (CommandHistoryIndex > 0)
+          {
+            /* Zero is the least recent command in history */
+            CommandHistoryIndex--;
+          }
+        }
+        else if (data->EventKey == ImGuiKey_DownArrow)
+        {
+          if (CommandHistoryIndex != -1)
+          {
+            if (static_cast<size_t>(++CommandHistoryIndex) >= CommandHistory.size())
+            {
+              CommandHistoryIndex = -1;
+            }
+          }
+        }
+
+        if (prevHistoryPos != CommandHistoryIndex)
+        {
+          if (prevHistoryPos == -1)
+          {
+            /* Saving the last input before history navigation */
+            LastInput = { CurrentInput.data(), data->CursorPos };
+          }
+          if (CommandHistoryIndex == -1)
+          {
+            /* Restoring the last input before history navigation */
+            data->DeleteChars(0, data->BufTextLen);
+            data->InsertChars(0, LastInput.first.c_str());
+            data->CursorPos = LastInput.second;
+          }
+          else
+          {
+            /* We should not be able to have negative index here */
+            /* Retrieve the another command from history */
+            std::string historyStr = CommandHistory[CommandHistoryIndex];
+            data->DeleteChars(0, data->BufTextLen);
+            data->InsertChars(0, historyStr.c_str());
+            data->CursorPos = static_cast<int>(historyStr.size());
+          }
+        }
+      }
     }
     return 0;
   }
@@ -228,7 +283,8 @@ void vtkF3DImguiConsole::ShowConsole()
 
   // input
   ImGuiInputTextFlags inputFlags = ImGuiInputTextFlags_EnterReturnsTrue |
-    ImGuiInputTextFlags_EscapeClearsAll | ImGuiInputTextFlags_CallbackCompletion;
+    ImGuiInputTextFlags_EscapeClearsAll | ImGuiInputTextFlags_CallbackCompletion |
+    ImGuiInputTextFlags_CallbackHistory;
 
   ImGui::Text("> ");
   ImGui::SameLine();
@@ -259,6 +315,7 @@ void vtkF3DImguiConsole::ShowConsole()
     this->Pimpl->Logs.emplace_back(std::make_pair(
       Internals::LogType::Typed, std::string("> ") + this->Pimpl->CurrentInput.data()));
     this->InvokeEvent(vtkF3DImguiConsole::TriggerEvent, this->Pimpl->CurrentInput.data());
+    this->Pimpl->CommandHistory.push_back(this->Pimpl->CurrentInput.data());
     this->Pimpl->CurrentInput = {};
   }
 
