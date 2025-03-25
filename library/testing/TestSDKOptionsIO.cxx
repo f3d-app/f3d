@@ -185,7 +185,9 @@ int TestSDKOptionsIO(int argc, char* argv[])
   test.parse<f3d::colormap_t>("colormap_t", "0,0,0,0,1,1,1,1", { 0, 0, 0, 0, 1, 1, 1, 1 });
   test.parse<f3d::colormap_t>(
     "colormap_t", "  -0.0,   0,   0   , 0.0,1,1.0  ,1,  1.0 ", { 0, 0, 0, 0, 1, 1, 1, 1 });
-  test.parse<f3d::colormap_t>("colormap_t", "0,#ff00ff,.2,#abcdef,0.8,#0000ff", { 0, 1, 0, 1, 0.2, static_cast<double>(171. / 255.), static_cast<double>(205. / 255.), static_cast<double>(239. / 255.), 0.8, 0, 0, 1 });
+  test.parse<f3d::colormap_t>("colormap_t", "0,#ff00ff,.2,#abcdef,0.8,#0000ff",
+    { 0, 1, 0, 1, 0.2, static_cast<double>(171. / 255.), static_cast<double>(205. / 255.),
+      static_cast<double>(239. / 255.), 0.8, 0, 0, 1 });
   test.parse_expect<f3d::colormap_t, parsing_exception>(
     "invalid parsing colormap_t", "zero,0,0,0,one,1,1,1");
   test.parse_expect<f3d::colormap_t, parsing_exception>(
@@ -194,12 +196,12 @@ int TestSDKOptionsIO(int argc, char* argv[])
     "invalid parsing colormap_t [0,1] < val range", "0,0,0,0,2,1,1,1");
   test.parse_expect<f3d::colormap_t, parsing_exception>(
     "incorrect number of tokens", "0,0,0,0,1,1,1");
-  test.parse_expect<f3d::colormap_t, parsing_exception>(
-    "invalid color", "0,0,0,0,1,1,1,invalid");
+  test.parse_expect<f3d::colormap_t, parsing_exception>("invalid color", "0,0,0,0,1,1,1,invalid");
 
-
-  test.format<f3d::colormap_t>("colormap_t", { 0, 0, 0, 0, 0.5, 0, 1, 1 , 0.9, 1, 1, 0}, "0,#000000,0.5,#00ffff,0.9,#ffff00");
-  test.format<f3d::colormap_t>("colormap_t", { 0, 0.1, 0.2, 0.3, 1, 0.3, 0.2, 0.1 }, "0,0.1,0.2,0.3,1,0.3,0.2,0.1");
+  test.format<f3d::colormap_t>(
+    "colormap_t", { 0, 0, 0, 0, 0.5, 0, 1, 1, 0.9, 1, 1, 0 }, "0,#000000,0.5,#00ffff,0.9,#ffff00");
+  test.format<f3d::colormap_t>(
+    "colormap_t", { 0, 0.1, 0.2, 0.3, 1, 0.3, 0.2, 0.1 }, "0,0.1,0.2,0.3,1,0.3,0.2,0.1");
 
   test.parse<std::vector<std::string>>(
     "std::vector<std::string>", "foo,bar,baz", { "foo", "bar", "baz" });

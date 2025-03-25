@@ -167,8 +167,8 @@ int TestSDKOptions(int argc, char* argv[])
   test("setAsString colormap", opt.getAsString("model.scivis.colormap"), "0,#000000,1,#ffffff");
 
   opt.setAsString("model.scivis.colormap", "0,0,  0,0,  1,0,  1,1");
-  test(
-    "setAsString spaces colormap", opt.getAsString("model.scivis.colormap") == "0,#000000,1,#00ffff");
+  test("setAsString spaces colormap",
+    opt.getAsString("model.scivis.colormap") == "0,#000000,1,#00ffff");
 
   opt.model.scivis.colormap = { 0, 0, 0, 0, 1, 1, 0, 1 };
   test("getAsString colormap", opt.getAsString("model.scivis.colormap") == "0,#000000,1,#ff00ff");
