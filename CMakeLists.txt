@@ -202,6 +202,7 @@ cmake_dependent_option(F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS "Enable long timeou
 cmake_dependent_option(F3D_TESTING_ENABLE_GLX_TESTS "Enable tests that require a X server running on Linux" ON "F3D_TESTING_ENABLE_RENDERING_TESTS AND UNIX AND NOT APPLE" OFF)
 cmake_dependent_option(F3D_TESTING_ENABLE_EGL_TESTS "Enable tests that require EGL to run" ON "F3D_TESTING_ENABLE_RENDERING_TESTS AND UNIX AND NOT APPLE" OFF)
 cmake_dependent_option(F3D_TESTING_ENABLE_OSMESA_TESTS "Enable tests that require OSMESA to run" ON "F3D_TESTING_ENABLE_RENDERING_TESTS AND UNIX AND NOT APPLE" OFF)
+cmake_dependent_option(F3D_TESTING_DISABLE_CATCH_ALL "Disable the catch all exception code in main for improved testing" OFF "BUILD_TESTING" OFF)
 
 if(BUILD_TESTING)
   enable_testing()

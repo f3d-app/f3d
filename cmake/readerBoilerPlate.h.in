@@ -7,6 +7,8 @@
 
 #include "reader.h"
 
+#include "F3DUtils.h"
+
 #if @F3D_READER_HAS_GEOMETRY_READER@
 #include <@F3D_READER_VTK_READER@.h>
 #endif
@@ -21,7 +23,10 @@
 class reader_@F3D_READER_NAME@ : public f3d::reader
 {
 public:
-  reader_@F3D_READER_NAME@() = default;
+  reader_@F3D_READER_NAME@()
+  {
+    this->ReaderOptions = { @F3D_READER_OPTIONS@ };
+  }
 
   /*
    * Get the name of this reader
@@ -45,7 +50,7 @@ public:
   /*
    * Get the mimetypes supported by this reader
    */
-  virtual const std::vector<std::string> getMimeTypes() const override
+  const std::vector<std::string> getMimeTypes() const override
   {
     static const std::vector<std::string> types = { @F3D_READER_MIMETYPES@ };
     return types;

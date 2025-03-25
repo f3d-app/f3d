@@ -20,7 +20,34 @@ This architecture is reflected by the directories organisation.
 
 Here is diagram explaining how some of these parts interact together:
 
-<img src="https://media.githubusercontent.com/media/f3d-app/f3d-media/c43c1367a2aac4c9a3bdd478bdac3ffefe82750e/media/archi.png" width="700">
+```
+   ┌────────────────┐              ┌───────────────┐
+   │                │              │               │
+   │  application   │◄────uses─────│  winshellext  │
+   │                │              │               │
+   └────────────────┘              └───────────────┘
+           │
+           │                                   ┌──────────┐
+           │                                   │          │
+       depends on                     ┌─wraps──│  python  │
+           │                          │        │          │
+           │                          │        └──────────┘
+           │         ┌───────────┐    │        ┌──────────┐
+           └────────►│           │◄───┘        │          │
+                     │  library  │◄─────wraps──│   java   │
+      ┌───loads──────│           │◄───┐        │          │
+      │              └───────────┘    │        └──────────┘
+      ▼                    │          │        ┌──────────┐
+┌───────────┐              │          │        │          │
+│           │          depends on     └─wraps──│   wasm   │
+│  plugins  │              │                   │          │
+│           │              ▼                   └──────────┘
+└───────────┘     ┌──────────────────┐
+      │           │      vtkext      │
+      │           ├────────┬─────────┤
+     depends─on──►│ public │ private │
+                  └────────┴─────────┘
+```
 
 ## vtkext
 

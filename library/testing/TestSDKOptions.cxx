@@ -63,15 +63,30 @@ int TestSDKOptions(int argc, char* argv[])
   test("set/get ratio_t", std::get<double>(opt.get("scene.animation.speed_factor")) == 3.17);
 
   // Test string
-  opt.setAsString("model.color.texture", "testAsString");
-  test("setAsString string", opt.getAsString("model.color.texture") == "testAsString");
+  opt.setAsString("render.effect.final_shader", "testAsString");
+  test("setAsString string", opt.getAsString("render.effect.final_shader") == "testAsString");
 
-  opt.model.color.texture = "testInStruct";
-  test("getAsString string", opt.getAsString("model.color.texture") == "testInStruct");
+  opt.render.effect.final_shader = "testInStruct";
+  test("getAsString string", opt.getAsString("render.effect.final_shader") == "testInStruct");
 
   std::string inputString = "test";
-  opt.set("model.color.texture", inputString);
-  test("set/get string", std::get<std::string>(opt.get("model.color.texture")) == "test");
+  opt.set("render.effect.final_shader", inputString);
+  test("set/get string", std::get<std::string>(opt.get("render.effect.final_shader")) == "test");
+
+  // Test path
+  opt.setAsString("render.hdri.file", "/path/to/test/string");
+  test("setAsString path", opt.getAsString("render.hdri.file") == "/path/to/test/string");
+
+  opt.setAsString("render.hdri.file", "/path/not/valid/../../to/test/string");
+  test("setAsString collapse path", opt.getAsString("render.hdri.file") == "/path/to/test/string");
+
+  opt.render.hdri.file = "/path/to/test/struct";
+  test("getAsString path", opt.getAsString("render.hdri.file") == "/path/to/test/struct");
+
+  std::string inputPath = "/path/to/test/variant";
+  opt.set("render.hdri.file", inputPath);
+  test(
+    "set/get path", std::get<std::string>(opt.get("render.hdri.file")) == "/path/to/test/variant");
 
   // Test double vector
   opt.setAsString("model.scivis.range", "0.7,1.4");
@@ -133,7 +148,7 @@ int TestSDKOptions(int argc, char* argv[])
 
   // Test direction_t (rely on testing from color_t)
   opt.setAsString("scene.up_direction", "+X");
-  test("setAsString direction", opt.getAsString("scene.up_direction") == "1,0,0");
+  test("setAsString direction", opt.getAsString("scene.up_direction"), "+X");
 
   f3d::direction_t dir({ 0.707, -0.707, 0 });
   test("direction x", dir.x() == 0.707);
@@ -142,10 +157,26 @@ int TestSDKOptions(int argc, char* argv[])
 
   std::stringstream ssDir;
   ssDir << f3d::direction_t(0, 0, -1.0);
-  test("direction to string", ssDir.str() == "0,0,-1");
+  test("direction to string", ssDir.str(), "-Z");
 
   test.expect<f3d::options::parsing_exception>("setAsString direction with incorrect size",
     [&]() { opt.setAsString("scene.up_direction", "0.1,0.2,0.3,0.4"); });
+
+  // Test colormap_t
+  opt.setAsString("model.scivis.colormap", "0,0,0,0,1,1,1,1");
+  test("setAsString colormap", opt.getAsString("model.scivis.colormap"), "0,0,0,0,1,1,1,1");
+
+  opt.setAsString("model.scivis.colormap", "0,0,  0,0,  1,0,  1,1");
+  test(
+    "setAsString spaces colormap", opt.getAsString("model.scivis.colormap") == "0,0,0,0,1,0,1,1");
+
+  opt.model.scivis.colormap = { 0, 0, 0, 0, 1, 1, 0, 1 };
+  test("getAsString colormap", opt.getAsString("model.scivis.colormap") == "0,0,0,0,1,1,0,1");
+
+  opt.set("model.scivis.colormap", std::vector<double>{ 0, 0, 0, 0, 1, 1, 1, 0 });
+  test("set/get colormap",
+    std::get<std::vector<double>>(opt.get("model.scivis.colormap")) ==
+      std::vector<double>{ 0, 0, 0, 0, 1, 1, 1, 0 });
 
   // Test closest option
   auto closest = opt.getClosestOption("modle.sciivs.cell");

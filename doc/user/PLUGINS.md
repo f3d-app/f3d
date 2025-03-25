@@ -53,3 +53,28 @@ Here is how the plugins are searched (in preceding order):
 You can also try plugins maintained by the community. If you have created a plugin and would like it to be listed here, please submit a pull request.
 
 - **Abaqus**: ODB support by @YangShen398 ([repository](https://github.com/YangShen398/F3D-ODB-Reader-Plugin))
+
+### Reader options
+
+Plugins can provide option that can be set using the `-D/--define` [command line option](OPTIONS.md).
+eg: `-DVDB.downsampling_factor=0.5`.
+
+Values are parsed as doubles. For booleans, 0 means false, not 0 means true.
+
+- `vdb` - `VDB.downsampling_factor` : Control the level of downsampling when reading a volume, default is 0.1.
+- `occt` - `STEP.linear_deflection` : Control the distance between a curve and the resulting tessellation, default is 0.1.
+- `occt` - `STEP.angular_deflection` : Control the angle between two subsequent segments, default is 0.5.
+- `occt` - `STEP.relative_deflection` : Control if the deflection values are relative to object size, default is false.
+- `occt` - `STEP.read_wire` : Control if lines should be read, default is true.
+- `occt` - `IGES.linear_deflection` : Control the distance between a curve and the resulting tessellation, default is 0.1.
+- `occt` - `IGES.angular_deflection` : Control the angle between two subsequent segments, default is 0.5.
+- `occt` - `IGES.relative_deflection` : Control if the deflection values are relative to object size, default is false.
+- `occt` - `IGES.read_wire` : Control if lines should be read, default is true.
+- `occt` - `BREP.linear_deflection` : Control the distance between a curve and the resulting tessellation, default is 0.1.
+- `occt` - `BREP.angular_deflection` : Control the angle between two subsequent segments, default is 0.5.
+- `occt` - `BREP.relative_deflection` : Control if the deflection values are relative to object size, default is false.
+- `occt` - `BREP.read_wire` : Control if lines should be read, default is true.
+- `occt` - `XBF.linear_deflection` : Control the distance between a curve and the resulting tessellation, default is 0.1.
+- `occt` - `XBF.angular_deflection` : Control the angle between two subsequent segments, default is 0.5.
+- `occt` - `XBF.relative_deflection` : Control if the deflection values are relative to object size, default is false.
+- `occt` - `XBF.read_wire` : Control if lines should be read, default is true.

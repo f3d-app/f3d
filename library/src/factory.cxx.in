@@ -68,6 +68,37 @@ reader* factory::getReader(const std::string& fileName, std::optional<std::strin
 }
 
 //----------------------------------------------------------------------------
+bool factory::setReaderOption(const std::string& name, const std::string& value)
+{
+  for (auto& plugin : this->Plugins)
+  {
+    for (auto& reader : plugin->getReaders())
+    {
+      if (reader->setReaderOption(name, value))
+      {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+//----------------------------------------------------------------------------
+std::vector<std::string> factory::getAllReaderOptionNames()
+{
+  std::vector<std::string> names;
+  for (const auto& plugin : this->Plugins)
+  {
+    for (const auto& reader : plugin->getReaders())
+    {
+      auto readerNames = reader->getAllReaderOptionNames();
+      names.insert(names.end(), readerNames.begin(), readerNames.end());
+    }
+  }
+  return names;
+}
+
+//----------------------------------------------------------------------------
 void factory::load(plugin* plug)
 {
   if (!this->registerOnce(plug))

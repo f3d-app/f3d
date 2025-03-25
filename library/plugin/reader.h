@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -132,6 +133,38 @@ public:
   virtual void applyCustomImporter(vtkImporter*, const std::string&) const
   {
   }
+
+  /**
+   * Set a reader option
+   * Return true if the option was found (and set), false otherwise
+   */
+  bool setReaderOption(const std::string& name, const std::string& value)
+  {
+    auto iter = this->ReaderOptions.find(name);
+    if (iter == this->ReaderOptions.end())
+    {
+      return false;
+    }
+    iter->second = value;
+    return true;
+  }
+
+  /**
+   * Return the list of all reader option names
+   */
+  std::vector<std::string> getAllReaderOptionNames()
+  {
+    std::vector<std::string> keys;
+    keys.reserve(this->ReaderOptions.size());
+    for (const auto& [key, value] : this->ReaderOptions)
+    {
+      keys.push_back(key);
+    }
+    return keys;
+  }
+
+protected:
+  std::map<std::string, std::string> ReaderOptions;
 };
 }
 

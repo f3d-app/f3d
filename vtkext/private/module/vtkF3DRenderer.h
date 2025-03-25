@@ -17,12 +17,14 @@
 #include <vtkLight.h>
 #include <vtkOpenGLRenderer.h>
 
+#include <filesystem>
 #include <map>
 #include <optional>
 
+namespace fs = std::filesystem;
+
 class vtkColorTransferFunction;
 class vtkCornerAnnotation;
-class vtkF3DDropZoneActor;
 class vtkImageReader2;
 class vtkOrientationMarkerWidget;
 class vtkScalarBarActor;
@@ -59,9 +61,9 @@ public:
    */
   void SetLineWidth(const std::optional<double>& lineWidth);
   void SetPointSize(const std::optional<double>& pointSize);
-  void SetFontFile(const std::optional<std::string>& fontFile);
+  void SetFontFile(const std::optional<fs::path>& fontFile);
   void SetFontScale(const double fontScale);
-  void SetHDRIFile(const std::optional<std::string>& hdriFile);
+  void SetHDRIFile(const std::optional<fs::path>& hdriFile);
   void SetUseImageBasedLighting(bool use) override;
   void SetBackground(const double* backgroundColor) override;
   void SetLightIntensity(const double intensity);
@@ -220,27 +222,27 @@ public:
    * This texture includes baked lighting effect,
    * so all other material textures are ignored.
    */
-  void SetTextureMatCap(const std::optional<std::string>& tex);
+  void SetTextureMatCap(const std::optional<fs::path>& tex);
 
   /**
    * Set the base color texture on all actors
    */
-  void SetTextureBaseColor(const std::optional<std::string>& tex);
+  void SetTextureBaseColor(const std::optional<fs::path>& tex);
 
   /**
    * Set the material texture on all actors
    */
-  void SetTextureMaterial(const std::optional<std::string>& tex);
+  void SetTextureMaterial(const std::optional<fs::path>& tex);
 
   /**
    * Set the emissive texture on all actors
    */
-  void SetTextureEmissive(const std::optional<std::string>& tex);
+  void SetTextureEmissive(const std::optional<fs::path>& tex);
 
   /**
    * Set the normal texture on all actors
    */
-  void SetTextureNormal(const std::optional<std::string>& tex);
+  void SetTextureNormal(const std::optional<fs::path>& tex);
 
   enum class SplatType
   {
@@ -483,7 +485,6 @@ private:
 
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
 
-  vtkNew<vtkF3DDropZoneActor> DropZoneActor;
   vtkNew<vtkActor> GridActor;
   vtkNew<vtkSkybox> SkyboxActor;
   vtkNew<vtkF3DUIActor> UIActor;
@@ -550,7 +551,7 @@ private:
   bool HasValidHDRISH = false;
   bool HasValidHDRISpec = false;
 
-  std::optional<std::string> FontFile;
+  std::optional<fs::path> FontFile;
   double FontScale = 1.0;
 
   double LightIntensity = 1.0;
@@ -582,11 +583,11 @@ private:
   std::optional<double> NormalScale;
   std::optional<std::vector<double>> SurfaceColor;
   std::optional<std::vector<double>> EmissiveFactor;
-  std::optional<std::string> TextureMatCap;
-  std::optional<std::string> TextureBaseColor;
-  std::optional<std::string> TextureMaterial;
-  std::optional<std::string> TextureEmissive;
-  std::optional<std::string> TextureNormal;
+  std::optional<fs::path> TextureMatCap;
+  std::optional<fs::path> TextureBaseColor;
+  std::optional<fs::path> TextureMaterial;
+  std::optional<fs::path> TextureEmissive;
+  std::optional<fs::path> TextureNormal;
 
   vtkSmartPointer<vtkColorTransferFunction> ColorTransferFunction;
   bool ExpandingRangeSet = false;

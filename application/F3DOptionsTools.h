@@ -14,7 +14,7 @@
 namespace F3DOptionsTools
 {
 using OptionsDict = std::map<std::string, std::string>;
-using OptionsEntry = std::tuple<OptionsDict, std::filesystem::path, std::string>;
+using OptionsEntry = std::tuple<OptionsDict, std::string, std::string>;
 using OptionsEntries = std::vector<OptionsEntry>;
 
 /**
@@ -133,10 +133,11 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
 /**
  * Browse through all possible option names to find one that have the smallest distance to the
  * provided option.
- * If checkLib is true, even check in the libf3d option names
+ * If checkLibAndReaders is true, even check in the libf3d and reader option names from plugins
  * Return a pair containing the closest option name and the associated distance
  */
-std::pair<std::string, int> GetClosestOption(const std::string& option, bool checkLib = false);
+std::pair<std::string, int> GetClosestOption(
+  const std::string& option, bool checkLibAndReaders = false);
 
 /**
  * Parse CLI options from provided argc/argv and returns them as a OptionsDict.

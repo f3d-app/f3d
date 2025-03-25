@@ -27,6 +27,8 @@ F3D behavior can be fully controlled from the command line using the following o
 | \-\-scan-plugins                                      |                                   | Scan standard directories for plugins and display their names, results may be incomplete. See [plugins](PLUGINS.md) for more info.                                                                                                                                                     |
 | \-\-screenshot-filename=\<png file\>                  | string<br>`{app}/{model}_{n}.png` | Filename to save [screenshots](INTERACTIONS.md#taking-screenshots) to. Can use [template variables](#filename-templating). Supports relative paths [as described](INTERACTIONS.md#taking-screenshots).                                                                                 |
 | \-\-rendering-backend=\<auto\|egl\|osmesa\|glx\|wgl\> | string<br>auto                    | Rendering backend to load, `auto` means to let F3D pick the correct one for you depending on your system capabilities. Use `egl` or `osmesa` on linux to force headless rendering.                                                                                                     |
+| -D, \-\-define=\<libf3d.option=value\>                | special<br>-                      | A repeatable option to set [libf3d](../libf3d/OPTIONS.md) and [reader](PLUGINS.md#reader-options) option manually. May trigger unexpected behavior.                                                                                                                                    |
+| -R, \-\-reset=\<libf3d.option\>                       | special<br>-                      | A repeatable option to reset [libf3d options](../libf3d/OPTIONS.md) manually. Useful when overidding option set in [configuration files](CONFIGURATION_FILE.md).                                                                                                                       |
 
 ## General Options
 
@@ -36,7 +38,7 @@ F3D behavior can be fully controlled from the command line using the following o
 | \-\-progress                                         | bool<br>false    | Show a _progress bar_ when loading the file.                                                                                                                                         |
 | \-\-animation-progress                               | bool<br>false    | Show a _progress bar_ when playing the animation.                                                                                                                                    |
 | \-\-multi-file-mode=\<single \| all\>                | string<br>single | When opening multiple files, select if they should be grouped (`all`) or alone (`single`). Configuration files for all loaded files will be used in the order they are provided.     |
-| \-\-up=\<[+\|-][X\|Y\|Z]\>                           | direction<br>+Y  | Define the Up direction.                                                                                                                                                             |
+| \-\-up=\<direction\>                                 | direction<br>+Y  | Define the Up direction.                                                                                                                                                             |
 | -x, \-\-axis                                         | bool<br>false    | Show _axes_ as a trihedron in the scene.                                                                                                                                             |
 | -g, \-\-grid                                         | bool<br>false    | Show _a grid_ aligned with the horizontal (orthogonal to the Up direction) plane.                                                                                                    |
 | \-\-grid\-unit=\<length\>                            | double<br>-      | Set the size of the _unit square_ for the grid. If not set (the default) a suitable value will be automatically computed.                                                            |
@@ -48,10 +50,10 @@ F3D behavior can be fully controlled from the command line using the following o
 | -k, \-\-trackball                                    | bool<br>false    | Enable trackball interaction.                                                                                                                                                        |
 | \-\-animation-autoplay                               | bool<br>false    | Automatically start animation.                                                                                                                                                       |
 | \-\-animation-index=\<idx\>                          | int<br>0         | Select the animation to show.<br>Any negative value means all animations (glTF only).<br>The default scene always has at most one animation.                                         |
-| \-\-animation-speed-factor=\<factor\>                | ratio<br>1       | Set the animation speed factor to slow, speed up or even invert animation time.                                                                                                      |
+| \-\-animation-speed-factor=\<ratio\>                 | ratio<br>1       | Set the animation speed factor to slow, speed up or even invert animation time.                                                                                                      |
 | \-\-animation-time=\<time\>                          | double<br>-      | Set the animation time to load.                                                                                                                                                      |
-| \-\-font-file=\<font file\>                          | string<br>-      | Use the provided FreeType compatible font file to display text.<br>Can be useful to display non-ASCII filenames.                                                                     |
-| \-\-font-scale=\<scale\>                             | ratio<br>1.0     | Scale fonts.                                                                                                                                                                         |
+| \-\-font-file=\<font file\>                          | path<br>-        | Use the provided FreeType compatible font file to display text.<br>Can be useful to display non-ASCII filenames.                                                                     |
+| \-\-font-scale=\<ratio\>                             | ratio<br>1.0     | Scale fonts.                                                                                                                                                                         |
 | \-\-command-script=\<command script\>                | script<br>-      | Provide a script file containing a list of commands to be executed sequentially.<br>Allows automation of multiple commands or pre-defined tasks.                                     |
 
 ## Material options
@@ -68,13 +70,15 @@ F3D behavior can be fully controlled from the command line using the following o
 | \-\-opacity=\<opacity\>                     | double<br>-      | Set _opacity_ on the geometry. Multiplied with the base color texture when present. <br>Model specified by default. Usually used with Depth Peeling option.                                                                                                                                                                              |
 | \-\-roughness=\<roughness\>                 | double<br>-      | Set the _roughness coefficient_ on the geometry (0.0-1.0). Multiplied with the material texture when present. <br>Model specified by default.                                                                                                                                                                                            |
 | \-\-metallic=\<metallic\>                   | double<br>-      | Set the _metallic coefficient_ on the geometry (0.0-1.0). Multiplied with the material texture when present. <br>Model specified by default.                                                                                                                                                                                             |
-| \-\-hdri-file=\<HDRI file\>                 | string<br>-      | Set the _HDRI_ image that can be used as ambient lighting and skybox.<br>Valid file format are hdr, exr, png, jpg, pnm, tiff, bmp. <br> If not set, a default is provided.                                                                                                                                                               |
+| \-\-hdri-file=\<HDRI file\>                 | path<br>-        | Set the _HDRI_ image that can be used as ambient lighting and skybox.<br>Valid file format are hdr, exr, png, jpg, pnm, tiff, bmp. <br> If not set, a default is provided.                                                                                                                                                               |
 | \-\-hdri-ambient                            | string<br>-      | Light the scene using the _HDRI_ image as ambient lighting.<br>The environment act as a light source and is reflected on the material.                                                                                                                                                                                                   |
-| \-\-texture-matcap=\<texture file\>         | string<br>-      | Set the texture file to control the material capture of the object. All other model options for surfaces are ignored if this is set. Must be in linear color space. <br>Model specified by default.                                                                                                                                      |
-| \-\-texture-base-color=\<texture file\>     | string<br>-      | Set the texture file to control the color of the object. Please note this will be multiplied with the color and opacity options. Must be in sRGB color space. <br>Model specified by default.                                                                                                                                            |
-| \-\-texture-material=\<texture file\>       | string<br>-      | Set the texture file to control the occlusion, roughness and metallic values of the object. Please note this will be multiplied with the roughness and metallic options, which have impactful default values. To obtain true results, use \-\-roughness=1 \-\-metallic=1. Must be in linear color space. <br>Model specified by default. |
-| \-\-texture-emissive=\<texture file\>       | string<br>-      | Set the texture file to control the emitted light of the object. Please note this will be multiplied with the emissive factor. Must be in sRGB color space. <br>Model specified by default.                                                                                                                                              |
+| \-\-texture-matcap=\<texture file\>         | path<br>-        | Set the texture file to control the material capture of the object. All other model options for surfaces are ignored if this is set. Must be in linear color space. <br>Model specified by default.                                                                                                                                      |
+| \-\-texture-base-color=\<texture file\>     | path<br>-        | Set the texture file to control the color of the object. Please note this will be multiplied with the color and opacity options. Must be in sRGB color space. <br>Model specified by default.                                                                                                                                            |
+| \-\-texture-material=\<texture file\>       | path<br>-        | Set the texture file to control the occlusion, roughness and metallic values of the object. Please note this will be multiplied with the roughness and metallic options, which have impactful default values. To obtain true results, use \-\-roughness=1 \-\-metallic=1. Must be in linear color space. <br>Model specified by default. |
+| \-\-texture-emissive=\<texture file\>       | path<br>-        | Set the texture file to control the emitted light of the object. Please note this will be multiplied with the emissive factor. Must be in sRGB color space. <br>Model specified by default.                                                                                                                                              |
 | \-\-emissive-factor=\<color\>               | color<br>-       | Set the emissive factor. This value is multiplied with the emissive color when an emissive texture is present. <br>Model specified by default.                                                                                                                                                                                           |
+| \-\-texture-normal=\<texture file\>         | path<br>-        | Set the texture file to control the normal map of the object. Must be in sRGB color space. <br>Model specified by default.                                                                                                                                                                                                               |
+| \-\-normal-scale=\<color\>                  | double<br>-      | Set the normal scale. This value affects the strength of the normal deviation from the normal texture. <br>Model specified by default.                                                                                                                                                                                                   |
 
 ## Window options
 
@@ -112,9 +116,9 @@ F3D behavior can be fully controlled from the command line using the following o
 | ------------------------------------ | --------------------- | ---------------------------------------------------------------------------------------------- |
 | \-\-camera-position=\<X,Y,Z\>        | vector\<double\><br>- | Set the camera position, overrides --camera-direction and camera-zoom-factor.                  |
 | \-\-camera-focal-point=\<X,Y,Z\>     | vector\<double\><br>- | Set the camera focal point.                                                                    |
-| \-\-camera-view-up=\<X,Y,Z\>         | vector\<double\><br>- | Set the camera view up vector. Will be orthogonalized.                                         |
+| \-\-camera-view-up=\<direction\>     | direction<br>-        | Set the camera view up vector. Will be orthogonalized.                                         |
 | \-\-camera-view-angle=\<angle\>      | double<br>-           | Set the camera view angle, a strictly positive value in degrees.                               |
-| \-\-camera-direction=\<X,Y,Z\>       | direction<br>-        | Set the camera direction, looking at the focal point.                                          |
+| \-\-camera-direction=\<direction\>   | direction<br>-        | Set the camera direction, looking at the focal point.                                          |
 | \-\-camera-zoom-factor=\<factor\>    | double<br>-           | Set the camera zoom factor relative to the autozoom on data, a strictly positive value.        |
 | \-\-camera-azimuth-angle=\<angle\>   | double<br>0.0         | Apply an azimuth transformation to the camera, in degrees, added after other camera options.   |
 | \-\-camera-elevation-angle=\<angle\> | double<br>0.0         | Apply an elevation transformation to the camera, in degrees, added after other camera options. |
@@ -159,7 +163,11 @@ Some rendering options are not compatible between them, here is the precedence o
 
 To turn on/off boolean options, it is possible to write `--option=true` and `--option=false`, eg `--points-sprites=false`.
 
-As documented, only the `--option=value` syntax is supported. The syntax `--option value` is not supported.
+As documented, the `--option=value` syntax should be preferred. The syntax `--option value` can have unintended effect with positional arguments.
+
+To set pass an arguments to a short option, use the following syntax: `-Rlibf3d.option`.
+
+The `--define` option has a special syntax: `--define=libf3d.option=value`.
 
 All options are parsed according to their type, see the [parsing documentation](PARSING.md) for more details.
 
@@ -183,3 +191,14 @@ For example the screenshot filename is configured as `{app}/{model}_{n}.png` by 
 consecutive screenshots are going to be saved as `F3D/hello_1.png`, `F3D/hello_2.png`, `F3D/hello_3.png`, ...
 
 Model related variables will be replaced by `no_file` if no file is loaded and `multi_file` if multiple files are loaded using the `multi-file-mode` option.
+
+## HDRI Caches
+
+When using HDRI related options, F3D will create and use a cache directory to store related data in order to speed up rendering.
+These cache files can be safely removed at the cost of recomputing them on next use.
+
+The cache directory location is as follows, in order, using the first defined environment variables:
+
+- Windows: `%LOCALAPPDATA%\f3d`
+- Linux: `${XDG_CACHE_HOME}/f3d`,`${HOME}/.cache/f3d`
+- macOS: `${HOME}/Library/Caches/f3d`

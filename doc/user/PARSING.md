@@ -9,8 +9,9 @@ The following types are supported:
 - double: A floating point number.
 - ratio: A double dividend over a double divisor, stored in a double.
 - string: A string of characters.
-- color: A RGB color
-- direction: A 3D vector representing a direction
+- path: A path to a local file.
+- color: A RGB color.
+- direction: A 3D vector representing a direction.
 
 As well as a list for bool, int, double, ratio, string, noted as
 
@@ -57,7 +58,15 @@ When formatting a ratio into a string, it is formatted as a double.
 
 ## String
 
-String are parsed and formatted as is.
+String are trimmed of leading and trailing space when parsed.
+String are formatted as is.
+
+## String
+
+Path are formatted by creating a [std::filesystem::path](https://en.cppreference.com/w/cpp/filesystem/path/path)
+and then collapsed using [f3d::utils::collapsePath](https://f3d.app/doc/libf3d/doxygen/api/classf3d_1_1utils.html#_CPPv4N3f3d5utils12collapsePathERKNSt10filesystem4pathERKNSt10filesystem4pathE).
+
+Path are formatted using [std::filesystem::path::string](https://en.cppreference.com/w/cpp/filesystem/path/string).
 
 ## Vectors
 
@@ -67,13 +76,26 @@ When formatting a vector into a string, individual token are formatted according
 
 ## Color
 
-Color are parsed and formatted as a vector of double.
+The following formats are supported when parsing a color, case insensitive:
+
+- R,G,B where R, G, B are doubles >= 0
+- #RRGGBB where RR, GG, BB are hexadecimal values. Shortened format #RGB is also valid.
+- rgb(R, G, B) where R, G and B are integer [0, 255]
+- hsl(H, S%, L%) where H is integer [0, 360], S and L are integer [0, 100]
+- hsv(H, S%, V%) where H is integer [0, 360], S and V are integer [0, 100]
+- hwb(H, W%, B%) where H is integer [0, 360], W and B are integer [0, 100]
+- cmyk(C%, M%, Y%, K%) where C, M, Y, K are integer [0, 100]
+- [color name](https://htmlpreview.github.io/?https://github.com/Kitware/vtk-examples/blob/gh-pages/VTKNamedColorPatches.html)
+
+See [W3C](https://www.w3.org/TR/css-color-3/#rgb-color) doc for more details on these formats.
+
+When formatting a color into a string, it is formatted as `#RRGGBB` if values are multiple of 255. Otherwise, it is formatted as vector of doubles.
 
 ## Direction
 
 The following formats are supported when parsing a string into a direction:
 
-- [+/-][X/Y/Z]
-- vector of three doubles
+- `[[+|-]X][[+|-]Y][[+|-]Z]` (case insensitive), for example `+X` or `X` for `1,0,0`, `-y+z` for `0,-1,1`
+- vector of three doubles, for example `1,2,3.4`
 
-When formatting a direction into a string, it is formatted as a vector of doubles.
+When formatting a direction into a string, it is formatted in the `±XYZ` form if possible or as a vector of doubles otherwise.

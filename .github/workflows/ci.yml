@@ -44,6 +44,7 @@ jobs:
       java_version: ${{ steps.set_default_versions.outputs.java_version }}
       java_min_version: ${{ steps.set_default_versions.outputs.java_min_version }}
       vtk_commit_sha: ${{ steps.set_default_versions.outputs.vtk_commit_sha }}
+      timestamp: ${{ steps.set_default_versions.outputs.timestamp }}
 
     steps:
 
@@ -56,7 +57,9 @@ jobs:
 
     - name: Set default versions
       id: set_default_versions
-      uses: ./source/.github/actions/default-versions
+      uses: f3d-app/default-versions-action@main
+      with:
+        file: ./source/.github/workflows/versions.json
 
 #----------------------------------------------------------------------------
 # Cache LFS: Checkout LFS data and update the cache to limit LFS bandwidth
@@ -646,7 +649,7 @@ jobs:
         arch: [armeabi-v7a, arm64-v8a, x86, x86_64]
 
     runs-on: ubuntu-22.04
-    container: ghcr.io/f3d-app/f3d-ci
+    container: ghcr.io/f3d-app/f3d-android-${{ matrix.arch }}:${{needs.default_versions.outputs.timestamp}}
 
     steps:
 
@@ -661,4 +664,70 @@ jobs:
       uses: ./source/.github/actions/android-ci
       with:
         arch: ${{matrix.arch}}
-        vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
+
+#----------------------------------------------------------------------------
+# webassembly: Build webassembly artifacts
+#----------------------------------------------------------------------------
+  webassembly:
+    if: github.event.pull_request.draft == false
+    needs: default_versions
+
+    strategy:
+      fail-fast: false
+
+    runs-on: ubuntu-22.04
+    container: ghcr.io/f3d-app/f3d-wasm:${{needs.default_versions.outputs.timestamp}}
+
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        path: 'source'
+        fetch-depth: 0
+        lfs: 'true'
+
+    - name: WebAssembly CI
+      uses: ./source/.github/actions/wasm-ci
+
+#----------------------------------------------------------------------------
+# generate website
+#----------------------------------------------------------------------------
+  generate-website:
+    needs: webassembly
+    name: Generate Website
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Build Jekyll
+      uses: actions/jekyll-build-pages@v1
+
+    - name: Install doxygen and build doxygen doc
+      working-directory: ${{github.workspace}}
+      run: |
+        pip install "sphinx==5.3.0" "pydata-sphinx-theme==0.13.1" sphinx-book-theme exhale
+        sudo apt install doxygen
+        sphinx-build -M html ./library/doxygen ./library/doxygen/build/
+        sudo mv library/doxygen/build/html _site/doc/libf3d/doxygen
+        sphinx-build -M html ./vtkext/public/doxygen ./vtkext/public/doxygen/build/
+        sudo mv vtkext/public/doxygen/build/html _site/doc/libf3d/vtkext_doxygen
+
+    - name: Retrieve web assembly binaries
+      uses: actions/download-artifact@v4
+      with:
+        name: f3d-wasm
+        path: ./web
+
+    - name: Copy web assembly binaries
+      run: sudo mv web _site/
+
+    - name: Deploy
+      if: github.ref == 'refs/heads/master'
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        folder: _site
+        token: ${{ secrets.GITHUB_TOKEN }}
+        clean: true

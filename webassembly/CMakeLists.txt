@@ -50,4 +50,12 @@ if(F3D_WASM_COPY_APP)
     "${F3D_SOURCE_DIR}/resources/logo.ico"
     "${CMAKE_BINARY_DIR}/bin/favicon.ico"
     COPYONLY)
+  configure_file(
+    "${F3D_SOURCE_DIR}/resources/logo256.png"
+    "${CMAKE_BINARY_DIR}/bin/icon256.png"
+    COPYONLY)
+  configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/manifest.json"
+    "${CMAKE_BINARY_DIR}/bin/manifest.json"
+    COPYONLY)
 endif()

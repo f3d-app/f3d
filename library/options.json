@@ -101,7 +101,7 @@
     },
     "hdri": {
       "file": {
-        "type": "string"
+        "type": "path"
       },
       "ambient": {
         "type": "bool",
@@ -183,7 +183,7 @@
       "default_value": "false"
     },
     "font_file": {
-      "type": "string"
+      "type": "path"
     },
     "scale": {
       "type": "ratio",
@@ -201,7 +201,7 @@
   "model": {
     "matcap": {
       "texture": {
-        "type": "string"
+        "type": "path"
       }
     },
     "color": {
@@ -212,7 +212,7 @@
         "type": "color"
       },
       "texture": {
-        "type": "string"
+        "type": "path"
       }
     },
     "emissive": {
@@ -220,7 +220,7 @@
         "type": "color"
       },
       "texture": {
-        "type": "string"
+        "type": "path"
       }
     },
     "normal": {
@@ -228,7 +228,7 @@
         "type": "double"
       },
       "texture": {
-        "type": "string"
+        "type": "path"
       }
     },
     "material": {
@@ -239,7 +239,7 @@
         "type": "double"
       },
       "texture": {
-        "type": "string"
+        "type": "path"
       }
     },
     "scivis": {
@@ -259,7 +259,7 @@
         "default_value": "-1"
       },
       "colormap": {
-        "type": "double_vector",
+        "type": "colormap",
         "default_value": "0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0, 1.0, 1.0, 1.0, 1.0"
       },
       "range": {

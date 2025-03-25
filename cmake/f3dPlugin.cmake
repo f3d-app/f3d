@@ -59,7 +59,7 @@ The `NAME` argument is required. The arguments are as follows:
 #]==]
 
 macro(f3d_plugin_declare_reader)
-  cmake_parse_arguments(F3D_READER "EXCLUDE_FROM_THUMBNAILER" "NAME;VTK_IMPORTER;VTK_READER;FORMAT_DESCRIPTION;SCORE;CUSTOM_CODE" "EXTENSIONS;MIMETYPES" ${ARGN})
+  cmake_parse_arguments(F3D_READER "EXCLUDE_FROM_THUMBNAILER" "NAME;VTK_IMPORTER;VTK_READER;FORMAT_DESCRIPTION;SCORE;CUSTOM_CODE" "EXTENSIONS;MIMETYPES;OPTIONS" ${ARGN})
 
   if(F3D_READER_CUSTOM_CODE)
     set(F3D_READER_HAS_CUSTOM_CODE 1)
@@ -112,6 +112,10 @@ macro(f3d_plugin_declare_reader)
     string(JSON F3D_READER_JSON
       SET "${F3D_READER_JSON}" "exclude_thumbnailer" "false")
   endif()
+
+  list(TRANSFORM F3D_READER_OPTIONS PREPEND "{ \"${F3D_READER_NAME}.")
+  list(TRANSFORM F3D_READER_OPTIONS APPEND "\", \"\" }")
+  list(JOIN F3D_READER_OPTIONS ", " F3D_READER_OPTIONS)
 
   if(F3D_READER_VTK_IMPORTER)
     set(F3D_READER_HAS_SCENE_READER 1)
@@ -291,6 +295,7 @@ macro(f3d_plugin_build)
   set_target_properties(f3d-plugin-${F3D_PLUGIN_NAME} PROPERTIES
     POSITION_INDEPENDENT_CODE ON
     CXX_VISIBILITY_PRESET hidden
+    CXX_STANDARD 17
     )
 
   if(DEFINED f3d_INCLUDE_DIR)
