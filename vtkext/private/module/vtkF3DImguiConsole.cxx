@@ -29,8 +29,8 @@ struct vtkF3DImguiConsole::Internals
   std::function<std::vector<std::string>(const std::string& pattern)>
     GetCommandsMatchCallback; // Callback to get the list of commands matching pattern
   std::vector<std::string> CommandHistory;
-  std::pair<std::string,int> LastInput; // Last input before navigating history
-  int CommandHistoryIndex = -1; // Current index in command history navigation
+  std::pair<std::string, int> LastInput; // Last input before navigating history
+  int CommandHistoryIndex = -1;          // Current index in command history navigation
   /**
    * Clear completions from the logs
    */
