@@ -65,7 +65,7 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
   }
 
   // Check invalid colormap code path
-  renderer->SetColormap({0,0,0});
+  renderer->SetColormap({ 0, 0, 0 });
   renderer->UpdateActors();
 
   // Smoke test for deprecated HDRI collapse codepath
