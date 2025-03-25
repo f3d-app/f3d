@@ -440,7 +440,7 @@ colormap_t parse(const std::string& str)
     // Add value to colormap vector;
     colormapVec.emplace_back(val);
 
-    // recover next string
+    // recover next string token
     if (!std::getline(split, each, ','))
     {
       throw options::parsing_exception("Incorrect number of tokens in provided colormap: " + str);
@@ -617,7 +617,7 @@ std::string format(direction_t var)
     char sign = '\0';        // initially not `+`/`-` to force first sign
     for (size_t componentIndex = 0; componentIndex < 3; ++componentIndex)
     {
-      const double componentValue = var[componentIndex];
+     const double componentValue = var[componentIndex];
       if (!isZero(componentValue))
       {
         if (isZero(firstNonZero))
@@ -657,12 +657,18 @@ std::string format(direction_t var)
 //----------------------------------------------------------------------------
 /**
  * Format provided var into a string from provided colormap_t.
- * Rely on `format(std::vector<double>&)`
- * TODO add proper formatting
+ * Rely on `format(double)` and `format(color_t)`
  */
 std::string format(const colormap_t& var)
 {
-  return options_tools::format(static_cast<std::vector<double>>(var));
+  std::ostringstream stream;
+  std::vector<double> vec(var);
+  size_t size = vec.size()/4;
+  for (unsigned int i = 0; i < size; i++)
+  {
+    stream << ((i > 0) ? "," : "") << options_tools::format(vec[i * 4]) << "," << options_tools::format(color_t(vec[i * 4 + 1], vec[i * 4 + 2], vec[i * 4 + 3]));
+  }
+  return stream.str();
 }
 
 } // option_tools
