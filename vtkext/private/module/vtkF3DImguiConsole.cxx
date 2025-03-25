@@ -68,36 +68,36 @@ struct vtkF3DImguiConsole::Internals
             // Multiple matches. Complete as much as we can.
             // So inputting "C"+Tab will complete to "CL" then display "CLEAR" and "CLASSIFY" as
             // matches.
-            size_t match_len = pattern.size();
-            bool all_candidates_matches = true;
+            size_t matchLen = pattern.size();
+            bool allCandidatesMatches = true;
             // Find the common prefix to all candidates
-            while (all_candidates_matches)
+            while (allCandidatesMatches)
             {
               const std::string& first = candidates[0];
-              if (first.size() <= match_len)
+              if (first.size() <= matchLen)
               {
                 // The first candidate is shorter than the current match length
-                all_candidates_matches = false;
+                allCandidatesMatches = false;
               }
               else
               {
                 // Check if all candidates match the current character
-                const char target = first[match_len];
-                all_candidates_matches = std::all_of(candidates.begin(), candidates.end(),
-                  [match_len, target](const std::string& s)
-                  { return s.size() > match_len && s[match_len] == target; });
+                const char target = first[matchLen];
+                allCandidatesMatches = std::all_of(candidates.begin(), candidates.end(),
+                  [matchLen, target](const std::string& s)
+                  { return s.size() > matchLen && s[matchLen] == target; });
               }
-              if (all_candidates_matches)
+              if (allCandidatesMatches)
               {
-                match_len++;
+                matchLen++;
               }
             }
 
-            if (match_len > 0)
+            if (matchLen > 0)
             {
               data->DeleteChars(0, static_cast<int>(pattern.size()));
               data->InsertChars(
-                data->CursorPos, candidates[0].c_str(), candidates[0].c_str() + match_len);
+                data->CursorPos, candidates[0].c_str(), candidates[0].c_str() + matchLen);
             }
 
             Completions.first = Logs.size();

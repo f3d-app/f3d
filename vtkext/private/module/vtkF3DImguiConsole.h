@@ -15,10 +15,9 @@
 
 #include "vtkF3DConsoleOutputWindow.h"
 
-#include <functional>
-
 #include <vtkCommand.h>
 
+#include <functional>
 #include <memory>
 
 class vtkOpenGLRenderWindow;

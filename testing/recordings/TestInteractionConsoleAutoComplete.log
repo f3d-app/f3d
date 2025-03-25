@@ -22,9 +22,13 @@ KeyPressEvent 199 142 0 9 1 Tab 0
 CharEvent 199 142 0 9 1 Tab 0
 KeyReleaseEvent 199 142 0 9 1 Tab 0
 
-KeyPressEvent 199 142 0 95 1 _ 0
-CharEvent 199 142 0 95 1 _ 0
-KeyReleaseEvent 199 142 0 95 1 _ 0
+KeyPressEvent 199 142 0 9 1 Tab 0
+CharEvent 199 142 0 9 1 Tab 0
+KeyReleaseEvent 199 142 0 9 1 Tab 0
+
+KeyPressEvent 199 142 0 95 1 underscore 0
+CharEvent 199 142 0 95 1 underscore 0
+KeyReleaseEvent 199 142 0 95 1 underscore 0
 
 KeyPressEvent 199 142 0 97 1 a 0
 CharEvent 199 142 0 97 1 a 0

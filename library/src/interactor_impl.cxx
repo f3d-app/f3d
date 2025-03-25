@@ -622,13 +622,13 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
       // Build a list of candidates
       std::vector<std::string> candidates;
       // Copy all commands that start with the pattern
-      auto start_with = [&pattern](const std::string& s)
+      auto startWith = [&pattern](const std::string& s)
       {
         return s.rfind(pattern, 0) == 0; // To avoid dependency for C++20 starts_with
       };
       for (auto const& [action, _] : internals->Commands)
       {
-        if (start_with(action))
+        if (startWith(action))
         {
           candidates.push_back(action);
         }
