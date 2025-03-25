@@ -2691,22 +2691,15 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
   this->ColorTransferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
   if (this->Colormap.size() > 0)
   {
-    if (this->Colormap.size() % 4 == 0)
+    assert(this->Colormap.size() % 4 ==0);
+    for (size_t i = 0; i < this->Colormap.size(); i += 4)
     {
-      for (size_t i = 0; i < this->Colormap.size(); i += 4)
-      {
-        double val = this->Colormap[i];
-        double r = this->Colormap[i + 1];
-        double g = this->Colormap[i + 2];
-        double b = this->Colormap[i + 3];
-        this->ColorTransferFunction->AddRGBPoint(
-          this->ColorRange[0] + val * (this->ColorRange[1] - this->ColorRange[0]), r, g, b);
-      }
-    }
-    else
-    {
-      F3DLog::Print(F3DLog::Severity::Warning,
-        "Specified color map list count is not a multiple of 4, ignoring it.");
+      double val = this->Colormap[i];
+      double r = this->Colormap[i + 1];
+      double g = this->Colormap[i + 2];
+      double b = this->Colormap[i + 3];
+      this->ColorTransferFunction->AddRGBPoint(
+        this->ColorRange[0] + val * (this->ColorRange[1] - this->ColorRange[0]), r, g, b);
     }
   }
 
