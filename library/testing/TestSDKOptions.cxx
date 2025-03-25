@@ -164,14 +164,14 @@ int TestSDKOptions(int argc, char* argv[])
 
   // Test colormap_t
   opt.setAsString("model.scivis.colormap", "0,0,0,0,1,1,1,1");
-  test("setAsString colormap", opt.getAsString("model.scivis.colormap"), "0,0,0,0,1,1,1,1");
+  test("setAsString colormap", opt.getAsString("model.scivis.colormap"), "0,#000000,1,#ffffff");
 
   opt.setAsString("model.scivis.colormap", "0,0,  0,0,  1,0,  1,1");
   test(
-    "setAsString spaces colormap", opt.getAsString("model.scivis.colormap") == "0,0,0,0,1,0,1,1");
+    "setAsString spaces colormap", opt.getAsString("model.scivis.colormap") == "0,#000000,1,#00ffff");
 
   opt.model.scivis.colormap = { 0, 0, 0, 0, 1, 1, 0, 1 };
-  test("getAsString colormap", opt.getAsString("model.scivis.colormap") == "0,0,0,0,1,1,0,1");
+  test("getAsString colormap", opt.getAsString("model.scivis.colormap") == "0,#000000,1,#ff00ff");
 
   opt.set("model.scivis.colormap", std::vector<double>{ 0, 0, 0, 0, 1, 1, 1, 0 });
   test("set/get colormap",

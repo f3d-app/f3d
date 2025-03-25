@@ -617,7 +617,7 @@ std::string format(direction_t var)
     char sign = '\0';        // initially not `+`/`-` to force first sign
     for (size_t componentIndex = 0; componentIndex < 3; ++componentIndex)
     {
-     const double componentValue = var[componentIndex];
+      const double componentValue = var[componentIndex];
       if (!isZero(componentValue))
       {
         if (isZero(firstNonZero))
@@ -663,10 +663,11 @@ std::string format(const colormap_t& var)
 {
   std::ostringstream stream;
   std::vector<double> vec(var);
-  size_t size = vec.size()/4;
+  size_t size = vec.size() / 4;
   for (unsigned int i = 0; i < size; i++)
   {
-    stream << ((i > 0) ? "," : "") << options_tools::format(vec[i * 4]) << "," << options_tools::format(color_t(vec[i * 4 + 1], vec[i * 4 + 2], vec[i * 4 + 3]));
+    stream << ((i > 0) ? "," : "") << options_tools::format(vec[i * 4]) << ","
+           << options_tools::format(color_t(vec[i * 4 + 1], vec[i * 4 + 2], vec[i * 4 + 3]));
   }
   return stream.str();
 }
