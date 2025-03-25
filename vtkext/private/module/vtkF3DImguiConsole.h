@@ -48,6 +48,11 @@ public:
    */
   void Clear();
 
+  /**
+   * Clear console except for latest command
+   */
+  void MinimalClear();
+
 protected:
   vtkF3DImguiConsole();
   ~vtkF3DImguiConsole() override;

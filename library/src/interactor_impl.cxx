@@ -610,6 +610,9 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
   this->Internals->Window.SetInteractor(this);
   assert(this->Internals->AnimationManager);
 
+  // TODO
+  log::info("Minimal console: disabled");
+
   this->initCommands();
   this->initBindings();
 }
@@ -662,13 +665,21 @@ interactor& interactor_impl::initCommands()
   this->addCommand("clear",
     [&](const std::vector<std::string>& args)
     {
+      // TODO
       check_args(args, 0, "clear");
 #if F3D_MODULE_UI
-      vtkF3DImguiConsole* console =
-        vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
+      vtkF3DImguiConsole* console = vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
       assert(console != nullptr);
       console->Clear();
 #endif
+      if (this->Internals->Options.ui.minimal_console)
+      {
+        log::info("Minimal console: enabled");
+      }
+      else
+      {
+        log::info("Minimal console: disabled");
+      }
     });
 
   this->addCommand("print",
@@ -802,6 +813,25 @@ interactor& interactor_impl::initCommands()
       this->Internals->Options.model.volume.enable = !this->Internals->Options.model.volume.enable;
       this->Internals->Window.render();
       this->Internals->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
+    });
+
+    this->addCommand("toggle_minimal_console",
+    [&](const std::vector<std::string>&)
+    {
+      // TODO
+      vtkF3DImguiConsole* console = vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
+      assert(console != nullptr);
+      console->Clear();
+
+      this->Internals->Options.ui.minimal_console = !this->Internals->Options.ui.minimal_console;
+      if (this->Internals->Options.ui.minimal_console)
+      {
+        log::info("Minimal console: enabled");
+      }
+      else
+      {
+        log::info("Minimal console: disabled");
+      }
     });
 
   this->addCommand("stop_interactor", [&](const std::vector<std::string>&) { this->stop(); });
@@ -1095,7 +1125,7 @@ interactor& interactor_impl::initBindings()
 #if F3D_MODULE_UI
   this->addBinding({mod_t::NONE, "H"}, "toggle ui.cheatsheet", "Others", std::bind(docStr, "Toggle cheatsheet display"));
   this->addBinding({mod_t::NONE, "Escape"}, "toggle ui.console", "Others", std::bind(docStr, "Toggle console display"));
-  this->addBinding({mod_t::SHIFT, "M"}, "toggle ui.minimal_console", "Others", std::bind(docTgl, "Toggle minimal console mode", std::cref(opts.ui.minimal_console)));
+  this->addBinding({mod_t::SHIFT, "M"}, "toggle_minimal_console", "Others", std::bind(docStr, "Toggle minimal console mode"));
 #endif
   this->addBinding({mod_t::CTRL, "Q"}, "stop_interactor", "Others", std::bind(docStr, "Stop the interactor"));
   this->addBinding({mod_t::NONE, "Return"}, "reset_camera", "Others", std::bind(docStr, "Reset camera to initial parameters"));

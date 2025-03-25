@@ -214,3 +214,15 @@ void vtkF3DImguiConsole::Clear()
   this->Pimpl->NewError = false;
   this->Pimpl->NewWarning = false;
 }
+
+//----------------------------------------------------------------------------
+void vtkF3DImguiConsole::MinimalClear()
+{
+  //TODO
+  if (this->Pimpl->Logs.size() > 3)
+  {
+    this->Pimpl->Logs.erase(this->Pimpl->Logs.begin()+1, this->Pimpl->Logs.end() - 1);
+  }
+  this->Pimpl->NewError = false;
+  this->Pimpl->NewWarning = false;
+}
