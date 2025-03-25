@@ -17,7 +17,7 @@ when switching between files.
 
 A typical config file with options may look like this:
 
-```javascript
+```json
 [
   {
     "options": {
@@ -75,7 +75,7 @@ off on the command line if needed, eg: `--point-sprites=false`.
 Command line options and options that are changed interactively overrides options that are set in configuration files.
 This is not always a desired behavior, so in order to force an option to always be taken into account even if set in command line or changed interactively, it is possible to use imperative options, by adding a `!` in front of the option name, eg:
 
-```
+```json
 [
   {
     "options": {
@@ -101,7 +101,7 @@ A `bindings` block can be added to specify associations between binds (eg : `Ctr
 
 A typical config file with bindings may look like this:
 
-```javascript
+```json
 [
   {
     "bindings": {
