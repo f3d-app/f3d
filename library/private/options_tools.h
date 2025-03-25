@@ -78,7 +78,6 @@ T parse(const std::string& str)
 {
   static_assert(is_vector<T>::value, "non-vector types parsing must be specialized");
 
-  // TODO implement more parsing possibilities, eg different types of tokens
   T vec;
   std::istringstream split(str);
   for (std::string each; std::getline(split, each, ',');)
@@ -491,7 +490,6 @@ colormap_t parse(const std::string& str)
   return colormap_t(colormapVec);
 }
 
-// TODO Improve string generation
 //----------------------------------------------------------------------------
 /**
  * Format provided var into a string from provided boolean
@@ -532,7 +530,6 @@ std::string format(double var)
  */
 std::string format(ratio_t var)
 {
-  // TODO generate a proper ratio string
   return options_tools::format(static_cast<double>(var));
 }
 
