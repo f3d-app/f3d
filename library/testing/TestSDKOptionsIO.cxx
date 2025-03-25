@@ -195,7 +195,9 @@ int TestSDKOptionsIO(int argc, char* argv[])
   test.parse_expect<f3d::colormap_t, parsing_exception>(
     "invalid parsing colormap_t [0,1] < val range", "0,0,0,0,2,1,1,1");
   test.parse_expect<f3d::colormap_t, parsing_exception>(
-    "incorrect number of tokens", "0,0,0,0,1,1,1");
+    "incorrect number of tokens color", "0,0,0,0,1,1,1");
+  test.parse_expect<f3d::colormap_t, parsing_exception>(
+    "incorrect number of tokens value", "0,0,0,0,1");
   test.parse_expect<f3d::colormap_t, parsing_exception>("invalid color", "0,0,0,0,1,1,1,invalid");
 
   test.format<f3d::colormap_t>(
