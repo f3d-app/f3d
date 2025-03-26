@@ -166,7 +166,7 @@ function(_parse_json_option _top_json)
 
        set(_option_deprecated_string "")
        if(_deprecated_error STREQUAL "NOTFOUND" AND _option_deprecated)
-         set(_option_deprecated_string "F3D_DEPRECATED ")
+         set(_option_deprecated_string "[[deprecated(\"${_option_deprecated}\")]] ")
        endif()
 
        if(_default_value_error STREQUAL "NOTFOUND")

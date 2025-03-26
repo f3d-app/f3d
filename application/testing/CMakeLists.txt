@@ -548,6 +548,11 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   endif()
 endif()
 
+# SSAA with HDR framebuffer support in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/xxx
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20250324)
+  f3d_test(NAME TestHDRIToneMappingSSAA DATA suzanne.ply HDRI palermo_park_1k.hdr TONE_MAPPING ARGS -t -a --anti-aliasing-mode=ssaa)
+endif()
+
 # Zoom factor was introduced in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9958
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20230221)
   f3d_test(NAME TestCameraZoomFactor DATA suzanne.obj ARGS --camera-direction=-1,-1,1 --camera-zoom-factor=1.5)

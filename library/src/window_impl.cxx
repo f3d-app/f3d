@@ -406,8 +406,31 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetRaytracingSamples(opt.render.raytracing.samples);
   renderer->SetUseRaytracingDenoiser(opt.render.raytracing.denoise);
 
+  vtkF3DRenderer::AntiAliasingMode aa = vtkF3DRenderer::AntiAliasingMode::NONE;
+
+  if (opt.render.effect.anti_aliasing)
+  {
+    aa = vtkF3DRenderer::AntiAliasingMode::FXAA;
+  }
+
+  if (opt.render.effect.antialiasing.enable)
+  {
+    if (opt.render.effect.antialiasing.mode == "fxaa")
+    {
+      aa = vtkF3DRenderer::AntiAliasingMode::FXAA;
+    }
+    else if (opt.render.effect.antialiasing.mode == "ssaa")
+    {
+      aa = vtkF3DRenderer::AntiAliasingMode::SSAA;
+    }
+    else
+    {
+      // todo: invalid mode
+    }
+  }
+
   renderer->SetUseSSAOPass(opt.render.effect.ambient_occlusion);
-  renderer->SetUseFXAAPass(opt.render.effect.anti_aliasing);
+  renderer->SetAntiAliasingMode(aa);
   renderer->SetUseToneMappingPass(opt.render.effect.tone_mapping);
   renderer->SetUseDepthPeelingPass(opt.render.effect.translucency_support);
   renderer->SetBackfaceType(opt.render.backface_type);

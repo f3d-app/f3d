@@ -108,9 +108,9 @@ f3d::engine::autoloadPlugins();
 f3d::engine eng = f3d::engine::create();
 
 // Recover the options and set the wanted value
-options& opt = eng.getOptions();
+f3d::options& opt = eng.getOptions();
 opt.render.effect.ambient_occlusion = true;
-opt.render.effect.anti_aliasing = true;
+opt.render.effect.antialiasing.enable = true;
 
 // Standard libf3d usage
 eng.getScene().add("path/to/file.ext");
