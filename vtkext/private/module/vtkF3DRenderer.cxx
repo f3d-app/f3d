@@ -260,7 +260,7 @@ void vtkF3DRenderer::Initialize()
   this->ImporterTimeStamp = 0;
   this->ImporterUpdateTimeStamp = 0;
 
-  this->AddActor2D(this->ScalarBarActor);
+  this->AddViewProp(this->ScalarBarActor);
   this->AddActor(this->GridActor);
   this->AddActor(this->SkyboxActor);
   this->AddActor(this->UIActor);
