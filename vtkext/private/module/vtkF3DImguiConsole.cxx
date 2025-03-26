@@ -36,10 +36,10 @@ struct vtkF3DImguiConsole::Internals
    */
   void ClearCompletions()
   {
-    if (Completions.second > 0)
+    if (this->Completions.second > 0)
     {
-      Logs.erase(Logs.begin() + Completions.first, Logs.begin() + Completions.second);
-      Completions.second = 0;
+      this->Logs.erase(this->Logs.begin() + this->Completions.first, this->Logs.begin() + this->Completions.second);
+      this->Completions.second = 0;
     }
   }
   /**
