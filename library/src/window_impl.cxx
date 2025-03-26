@@ -408,10 +408,29 @@ void window_impl::UpdateDynamicOptions()
 
   vtkF3DRenderer::AntiAliasingMode aa = vtkF3DRenderer::AntiAliasingMode::NONE;
 
+#if defined(_MSC_VER)
+#pragma warning( push )
+#pragma warning( disable : 4996)
+#elif defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
   if (opt.render.effect.anti_aliasing)
   {
     aa = vtkF3DRenderer::AntiAliasingMode::FXAA;
   }
+
+#if defined(_MSC_VER)
+#pragma warning( pop )
+#elif defined(__clang__)
+#pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
 
   if (opt.render.effect.antialiasing.enable)
   {

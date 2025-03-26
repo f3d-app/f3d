@@ -391,7 +391,7 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   if (this->AntiAliasingModeEnabled == vtkF3DRenderer::AntiAliasingMode::SSAA)
   {
     vtkNew<vtkSSAAPass> ssaaP;
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250324) // TODO: fix number
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250327) // TODO: fix version when merged
     ssaaP->SetColorFormat(vtkTextureObject::Float16);
 #endif
     ssaaP->SetDelegatePass(renderingPass);
