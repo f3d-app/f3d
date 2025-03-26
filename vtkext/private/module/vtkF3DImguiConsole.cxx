@@ -10,7 +10,6 @@
 #include <algorithm>
 #include <array>
 
-
 struct vtkF3DImguiConsole::Internals
 {
   enum class LogType
