@@ -1,14 +1,15 @@
 #include "vtkF3DImguiConsole.h"
 
+#include <vtkCallbackCommand.h>
 #include <vtkCommand.h>
+#include <vtkNew.h>
 #include <vtkObjectFactory.h>
 
 #include <imgui.h>
 
 #include <algorithm>
 #include <array>
-#include <vtkCallbackCommand.h>
-#include <vtkNew.h>
+
 
 struct vtkF3DImguiConsole::Internals
 {
@@ -151,7 +152,7 @@ struct vtkF3DImguiConsole::Internals
           }
           if (CommandHistoryIndex == -1)
           {
-            /* Restoring the last input before history navigation */
+            /* Restoring the last input when navigated back to it */
             data->DeleteChars(0, data->BufTextLen);
             data->InsertChars(0, LastInput.first.c_str());
             data->CursorPos = LastInput.second;
@@ -317,6 +318,7 @@ void vtkF3DImguiConsole::ShowConsole()
       Internals::LogType::Typed, std::string("> ") + this->Pimpl->CurrentInput.data()));
     this->InvokeEvent(vtkF3DImguiConsole::TriggerEvent, this->Pimpl->CurrentInput.data());
     this->Pimpl->CommandHistory.push_back(this->Pimpl->CurrentInput.data());
+    this->Pimpl->CommandHistoryIndex = -1; // Reset history navigation, looks natural
     this->Pimpl->CurrentInput = {};
   }
 

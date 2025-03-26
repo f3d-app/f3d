@@ -617,7 +617,7 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
   assert(console != nullptr);
   // Set the callback to get the list of commands
   console->SetCommandsMatchCallback(
-    [internals = this->Internals.get()](const std::string& pattern)
+    [this](const std::string& pattern)
     {
       // Build a list of candidates
       std::vector<std::string> candidates;
@@ -626,7 +626,7 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
       {
         return s.rfind(pattern, 0) == 0; // To avoid dependency for C++20 starts_with
       };
-      for (auto const& [action, _] : internals->Commands)
+      for (auto const& [action, _] : this->Internals->Commands)
       {
         if (startWith(action))
         {
