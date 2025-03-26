@@ -191,7 +191,8 @@ void vtkF3DOverlayRenderPass::CompositeOverlay(const vtkRenderState* s)
 
     // mix the sRGB result with the original render to add the background back in
     vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Impl",
-      "  sceneSample.rgb = (1.0 - sceneSample.a) * initialSceneColor + sceneSample.a * sceneSample.rgb;\n"
+      "  sceneSample.rgb = (1.0 - sceneSample.a) * initialSceneColor + sceneSample.a * "
+      "sceneSample.rgb;\n"
       "  gl_FragData[0] = sceneSample;\n"
       "//VTK::FSQ::Impl");
 

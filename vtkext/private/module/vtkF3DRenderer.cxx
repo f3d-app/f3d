@@ -13,12 +13,12 @@
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
 #include <vtkCamera.h>
-#include <vtkF3DSolidBackgroundPass.h>
 #include <vtkCellData.h>
 #include <vtkColorTransferFunction.h>
 #include <vtkCornerAnnotation.h>
 #include <vtkCullerCollection.h>
 #include <vtkF3DPolyDataMapper.h>
+#include <vtkF3DSolidBackgroundPass.h>
 #include <vtkFloatArray.h>
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
@@ -31,7 +31,6 @@
 #include <vtkMultiBlockDataSet.h>
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLFXAAPass.h>
-#include <vtkSSAAPass.h>
 #include <vtkOpenGLRenderWindow.h>
 #include <vtkOpenGLRenderer.h>
 #include <vtkOpenGLTexture.h>
@@ -43,6 +42,7 @@
 #include <vtkPolyData.h>
 #include <vtkProperty.h>
 #include <vtkRenderWindow.h>
+#include <vtkSSAAPass.h>
 #include <vtkScalarBarActor.h>
 #include <vtkSkybox.h>
 #include <vtkTable.h>

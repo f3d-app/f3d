@@ -60,7 +60,7 @@ option_variant_t get(const options& opt, std::string_view name)
 std::vector<std::string> getNames()
 {
   // clang-format off
-  return { ${_options_lister} }
+  return { ${_options_lister} };
   // clang-format on
 }
 

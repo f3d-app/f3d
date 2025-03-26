@@ -184,7 +184,7 @@ function(_parse_json_option _top_json)
        if(_default_value_error STREQUAL "NOTFOUND")
          # Use default_value
          set(_optional_default_value_initialize "${_option_explicit_constr}${_option_default_value_start}${_option_default_value}${_option_default_value_end}")
-         string(APPEND _options_struct "${_option_indent}  ${_option_deprecated_string}${_option_actual_type} ${_member_name} = ${_optional_default_value_initialize}\;\n")
+         string(APPEND _options_struct "${_option_indent}  ${_option_deprecated_string}${_option_actual_type} ${_member_name} = ${_optional_default_value_initialize};\n")
          set(_optional_getter "")
          list(APPEND _options_is_optional "if (name == \"${_option_name}\") { return false\; }")
          list(APPEND _options_reset "if (name == \"${_option_name}\") { ${_option_deprecated_guard_begin}opt.${_option_name} = ${_optional_default_value_initialize}\; ${_option_deprecated_guard_end} }")
@@ -192,7 +192,7 @@ function(_parse_json_option _top_json)
          # No default_value, it is an std::optional
          string(APPEND _options_struct "${_option_indent}  ${_option_deprecated_string}std::optional<${_option_actual_type}> ${_member_name};\n")
          set(_optional_getter ".value()")
-         list(APPEND _options_is_optional "if (name == \"${_option_name}\") { return true; }")
+         list(APPEND _options_is_optional "if (name == \"${_option_name}\") { return true\; }")
          list(APPEND _options_reset "if (name == \"${_option_name}\") { ${_option_deprecated_guard_begin}opt.${_option_name}.reset()\; ${_option_deprecated_guard_end} }")
        endif()
 

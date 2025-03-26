@@ -767,16 +767,13 @@ interactor& interactor_impl::initCommands()
   this->addCommand("decrease_opacity",
     [&](const std::vector<std::string>&) { this->Internals->IncreaseOpacity(true); });
 
-  this->addCommand("print_scene_info",
-    [&](const std::vector<std::string>&)
+  this->addCommand("print_scene_info", [&](const std::vector<std::string>&)
     { this->Internals->Window.PrintSceneDescription(log::VerboseLevel::INFO); });
 
-  this->addCommand("print_coloring_info",
-    [&](const std::vector<std::string>&)
+  this->addCommand("print_coloring_info", [&](const std::vector<std::string>&)
     { this->Internals->Window.PrintColoringDescription(log::VerboseLevel::INFO); });
 
-  this->addCommand("print_mesh_info",
-    [&](const std::vector<std::string>&)
+  this->addCommand("print_mesh_info", [&](const std::vector<std::string>&)
     { this->Internals->Scene.PrintImporterDescription(log::VerboseLevel::INFO); });
 
   this->addCommand("print_options_info",
@@ -1181,7 +1178,7 @@ interactor& interactor_impl::removeBinding(const interaction_bind_t& bind)
   // Look for the group of the removed bind
   std::string group;
   for (auto it = this->Internals->GroupedBinds.begin(); it != this->Internals->GroupedBinds.end();
-       it++)
+    it++)
   {
     if (it->second == bind)
     {

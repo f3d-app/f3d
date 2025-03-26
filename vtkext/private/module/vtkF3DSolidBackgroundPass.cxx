@@ -73,7 +73,8 @@ void vtkF3DSolidBackgroundPass::Render(const vtkRenderState* s)
       "uniform sampler2D source;\n"
       "//VTK::FSQ::Decl");
 
-    vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Impl", "gl_FragData[0] = texture(source, texCoord);");
+    vtkShaderProgram::Substitute(
+      FSSource, "//VTK::FSQ::Impl", "gl_FragData[0] = texture(source, texCoord);");
 
     this->QuadHelper =
       std::make_shared<vtkOpenGLQuadHelper>(renWin, nullptr, FSSource.c_str(), nullptr);

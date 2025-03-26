@@ -409,8 +409,8 @@ void window_impl::UpdateDynamicOptions()
   vtkF3DRenderer::AntiAliasingMode aa = vtkF3DRenderer::AntiAliasingMode::NONE;
 
 #if defined(_MSC_VER)
-#pragma warning( push )
-#pragma warning( disable : 4996)
+#pragma warning(push)
+#pragma warning(disable : 4996)
 #elif defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
@@ -425,7 +425,7 @@ void window_impl::UpdateDynamicOptions()
   }
 
 #if defined(_MSC_VER)
-#pragma warning( pop )
+#pragma warning(pop)
 #elif defined(__clang__)
 #pragma clang diagnostic pop
 #elif defined(__GNUC__)
