@@ -18,7 +18,7 @@ void set(options& opt, std::string_view name, const option_variant_t& value)
   try
   {
     // clang-format off
-    ${_options_setter};
+    ${_options_setter}
     // clang-format on
     else throw options::inexistent_exception("Option " + std::string(name) + " does not exist");
   }
@@ -43,7 +43,7 @@ option_variant_t get(const options& opt, std::string_view name)
   try
   {
     // clang-format off
-    ${_options_getter};
+    ${_options_getter}
     // clang-format on
     else throw options::inexistent_exception("Option " + std::string(name) + " does not exist");
   }
@@ -60,7 +60,7 @@ option_variant_t get(const options& opt, std::string_view name)
 std::vector<std::string> getNames()
 {
   // clang-format off
-  return { ${_options_lister} };
+  return { ${_options_lister} }
   // clang-format on
 }
 
@@ -71,7 +71,7 @@ std::vector<std::string> getNames()
 void setAsString(options& opt, std::string_view name, const std::string& str)
 {
   // clang-format off
-  ${_options_string_setter};
+  ${_options_string_setter}
   // clang-format on
   else throw options::inexistent_exception("Option " + std::string(name) + " does not exist");
 }
@@ -84,7 +84,7 @@ std::string getAsString(const options& opt, std::string_view name)
   try
   {
     // clang-format off
-    ${_options_string_getter};
+    ${_options_string_getter}
     // clang-format on
     else throw options::inexistent_exception("Option " + std::string(name) + " does not exist");
   }
@@ -101,7 +101,7 @@ std::string getAsString(const options& opt, std::string_view name)
 bool isOptional(std::string_view name)
 {
   // clang-format off
-  ${_options_is_optional};
+  ${_options_is_optional}
   // clang-format on
   else throw options::inexistent_exception("Option " + std::string(name) + " does not exist");
 }
@@ -113,7 +113,7 @@ bool isOptional(std::string_view name)
 void reset(options& opt, std::string_view name)
 {
   // clang-format off
-  ${_options_reset};
+  ${_options_reset}
   // clang-format on
   else throw options::inexistent_exception("Option " + std::string(name) + " does not exist");
 }
