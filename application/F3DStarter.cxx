@@ -1167,7 +1167,7 @@ int F3DStarter::Start(int argc, char** argv)
 
           try
           {
-            img.save(reference);
+            img.save(output);
           }
           catch (const f3d::image::write_exception& ex)
           {
@@ -1180,7 +1180,6 @@ int F3DStarter::Start(int argc, char** argv)
       else
       {
         f3d::log::info("Image comparison success with an error difference of: ", error);
-        img.save(reference);
       }
 
       if (this->Internals->FilesGroups.size() > 1)
