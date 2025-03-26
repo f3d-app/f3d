@@ -38,6 +38,21 @@ options::options()
 }
 
 //----------------------------------------------------------------------------
+options::~options() = default;
+
+//----------------------------------------------------------------------------
+options::options(const options& opt) = default;
+
+//----------------------------------------------------------------------------
+options& options::operator=(const options& opt) = default;
+
+//----------------------------------------------------------------------------
+options::options(options&& other) noexcept = default;
+
+//----------------------------------------------------------------------------
+options& options::operator=(options&& other) noexcept = default;
+
+//----------------------------------------------------------------------------
 options& options::set(std::string_view name, const option_variant_t& value)
 {
   options_generated::set(*this, name, value);

@@ -33,11 +33,11 @@ public:
    * Default/Copy/move constructors/operators.
    */
   options();
-  ~options() = default;
-  options(const options& opt) = default;
-  options& operator=(const options& opt) = default;
-  options(options&& other) noexcept = default;
-  options& operator=(options&& other) noexcept = default;
+  ~options();
+  options(const options& opt);
+  options& operator=(const options& opt);
+  options(options&& other) noexcept;
+  options& operator=(options&& other) noexcept;
   ///@}
 
   /**
