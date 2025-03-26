@@ -317,7 +317,7 @@ void vtkF3DImguiConsole::ShowConsole()
     this->Pimpl->Logs.emplace_back(std::make_pair(
       Internals::LogType::Typed, std::string("> ") + this->Pimpl->CurrentInput.data()));
     this->InvokeEvent(vtkF3DImguiConsole::TriggerEvent, this->Pimpl->CurrentInput.data());
-    this->Pimpl->CommandHistory.push_back(this->Pimpl->CurrentInput.data());
+    this->Pimpl->CommandHistory.emplace_back(this->Pimpl->CurrentInput.data());
     this->Pimpl->CommandHistoryIndex = -1; // Reset history navigation, looks natural
     this->Pimpl->CurrentInput = {};
   }
