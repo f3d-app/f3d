@@ -38,7 +38,8 @@ struct vtkF3DImguiConsole::Internals
   {
     if (this->Completions.second > 0)
     {
-      this->Logs.erase(this->Logs.begin() + this->Completions.first, this->Logs.begin() + this->Completions.second);
+      this->Logs.erase(this->Logs.begin() + this->Completions.first,
+        this->Logs.begin() + this->Completions.second);
       this->Completions.second = 0;
     }
   }
