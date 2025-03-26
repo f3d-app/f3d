@@ -1178,7 +1178,7 @@ interactor& interactor_impl::removeBinding(const interaction_bind_t& bind)
   // Look for the group of the removed bind
   std::string group;
   for (auto it = this->Internals->GroupedBinds.begin(); it != this->Internals->GroupedBinds.end();
-    it++)
+       it++)
   {
     if (it->second == bind)
     {
