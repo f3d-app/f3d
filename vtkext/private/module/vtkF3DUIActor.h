@@ -31,6 +31,18 @@ public:
   }
 
   /**
+   * Set the dropzone visibility
+   * False by default
+   */
+  void SetDropZoneVisibility(bool show);
+
+  /**
+   * Set the dropzone string
+   * Empty by default
+   */
+  void SetDropText(const std::string& info);
+
+  /**
    * Set the filename visibility
    * False by default
    */
@@ -138,6 +150,13 @@ protected:
   }
 
   /**
+   * Render the dropzone UI widget
+   */
+  virtual void RenderDropZone()
+  {
+  }
+
+  /**
    * Render the filename UI widget
    */
   virtual void RenderFileName()
@@ -185,6 +204,9 @@ protected:
   virtual void RenderConsoleBadge()
   {
   }
+
+  bool DropZoneVisible = false;
+  std::string DropText = "";
 
   bool FileNameVisible = false;
   std::string FileName = "";
