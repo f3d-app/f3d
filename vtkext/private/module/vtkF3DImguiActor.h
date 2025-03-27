@@ -82,6 +82,11 @@ private:
   void RenderConsole() override;
 
   /**
+   * Render the minimal console widget
+   */
+  void RenderMinimalConsole() override;
+
+  /**
    * Render the console badge
    */
   void RenderConsoleBadge() override;

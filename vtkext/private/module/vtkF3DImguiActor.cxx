@@ -439,6 +439,13 @@ void vtkF3DImguiActor::RenderConsole()
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DImguiActor::RenderMinimalConsole()
+{
+  vtkF3DImguiConsole* console = vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
+  console->ShowMinimalConsole();
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderConsoleBadge()
 {
   vtkF3DImguiConsole* console = vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());

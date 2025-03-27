@@ -39,19 +39,19 @@ public:
   void ShowConsole();
 
   /**
+   * Show minimal console window
+   */ 
+  void ShowMinimalConsole();
+
+  /**
    * Show console badge
    */
   void ShowBadge();
-
+  
   /**
    * Clear console
    */
   void Clear();
-
-  /**
-   * Clear console except for latest command
-   */
-  void MinimalClear();
 
 protected:
   vtkF3DImguiConsole();

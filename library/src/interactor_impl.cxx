@@ -274,6 +274,10 @@ public:
     internals* self = static_cast<internals*>(clientData);
     vtkRenderWindowInteractor* rwi = self->Style->GetInteractor();
     std::string interaction = rwi->GetKeySym();
+    if (interaction == "semicolon" && rwi->GetShiftKey() == 1)
+    {
+      interaction = "colon";
+    }
     if (!interaction.empty())
     {
       // Make sure key symbols starts with an upper char (e.g. "space" -> "Space")
@@ -442,7 +446,7 @@ public:
     {
       mod = mod_t::CTRL;
     }
-    else if (shift)
+    else if (shift && interaction != "Colon")
     {
       mod = mod_t::SHIFT;
     }
@@ -610,9 +614,6 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
   this->Internals->Window.SetInteractor(this);
   assert(this->Internals->AnimationManager);
 
-  // TODO
-  log::info("Minimal console: disabled");
-
   this->initCommands();
   this->initBindings();
 }
@@ -665,20 +666,22 @@ interactor& interactor_impl::initCommands()
   this->addCommand("clear",
     [&](const std::vector<std::string>& args)
     {
-      // TODO
       check_args(args, 0, "clear");
 #if F3D_MODULE_UI
-      vtkF3DImguiConsole* console = vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
+      vtkF3DImguiConsole* console =
+        vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
       assert(console != nullptr);
       console->Clear();
 #endif
+    });
+
+  this->addCommand(":q",
+    [&](const std::vector<std::string>& args)
+    {
+      check_args(args, 0, ":q");
       if (this->Internals->Options.ui.minimal_console)
       {
-        log::info("Minimal console: enabled");
-      }
-      else
-      {
-        log::info("Minimal console: disabled");
+          this->Internals->Options.ui.minimal_console = false;
       }
     });
 
@@ -815,25 +818,6 @@ interactor& interactor_impl::initCommands()
       this->Internals->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
     });
 
-    this->addCommand("toggle_minimal_console",
-    [&](const std::vector<std::string>&)
-    {
-      // TODO
-      vtkF3DImguiConsole* console = vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
-      assert(console != nullptr);
-      console->Clear();
-
-      this->Internals->Options.ui.minimal_console = !this->Internals->Options.ui.minimal_console;
-      if (this->Internals->Options.ui.minimal_console)
-      {
-        log::info("Minimal console: enabled");
-      }
-      else
-      {
-        log::info("Minimal console: disabled");
-      }
-    });
-
   this->addCommand("stop_interactor", [&](const std::vector<std::string>&) { this->stop(); });
 
   this->addCommand("reset_camera",
@@ -910,14 +894,6 @@ std::vector<std::string> interactor_impl::getCommandActions() const
 //----------------------------------------------------------------------------
 bool interactor_impl::triggerCommand(std::string_view command)
 {
-  if (this->Internals->Options.ui.minimal_console)
-  {
-#if F3D_MODULE_UI
-    vtkF3DImguiConsole* console = vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
-    assert(console != nullptr);
-    console->MinimalClear();
-#endif
-  }
   log::debug("Command: ", command);
 
   // Resolve Alias Before Tokenizing
@@ -1125,7 +1101,7 @@ interactor& interactor_impl::initBindings()
 #if F3D_MODULE_UI
   this->addBinding({mod_t::NONE, "H"}, "toggle ui.cheatsheet", "Others", std::bind(docStr, "Toggle cheatsheet display"));
   this->addBinding({mod_t::NONE, "Escape"}, "toggle ui.console", "Others", std::bind(docStr, "Toggle console display"));
-  this->addBinding({mod_t::SHIFT, "M"}, "toggle_minimal_console", "Others", std::bind(docStr, "Toggle minimal console mode"));
+  this->addBinding({mod_t::NONE, "Colon"}, "toggle ui.minimal_console", "Others", std::bind(docStr, "Toggle minimal console display"));
 #endif
   this->addBinding({mod_t::CTRL, "Q"}, "stop_interactor", "Others", std::bind(docStr, "Stop the interactor"));
   this->addBinding({mod_t::NONE, "Return"}, "reset_camera", "Others", std::bind(docStr, "Reset camera to initial parameters"));
@@ -1255,7 +1231,7 @@ interactor& interactor_impl::toggleAnimation()
   this->Internals->AnimationManager->ToggleAnimation();
   return *this;
 }
-
+ 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::startAnimation()
 {
