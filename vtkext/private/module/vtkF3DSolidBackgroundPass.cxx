@@ -60,11 +60,6 @@ void vtkF3DSolidBackgroundPass::Render(const vtkRenderState* s)
     s, size[0], size[1], size[0], size[1], this->FrameBufferObject, this->ColorTexture);
   renWin->GetState()->PopFramebufferBindings();
 
-  if (this->QuadHelper && this->QuadHelper->ShaderChangeValue < this->GetMTime())
-  {
-    this->QuadHelper = nullptr;
-  }
-
   if (!this->QuadHelper)
   {
     std::string FSSource = vtkOpenGLRenderUtilities::GetFullScreenQuadFragmentShaderTemplate();
@@ -85,11 +80,7 @@ void vtkF3DSolidBackgroundPass::Render(const vtkRenderState* s)
     renWin->GetShaderCache()->ReadyShaderProgram(this->QuadHelper->Program);
   }
 
-  if (!this->QuadHelper->Program || !this->QuadHelper->Program->GetCompiled())
-  {
-    vtkErrorMacro("Couldn't build the shader program.");
-    return;
-  }
+  assert(this->QuadHelper->Program && this->QuadHelper->Program->GetCompiled());
 
   this->ColorTexture->Activate();
   this->QuadHelper->Program->SetUniformi("source", this->ColorTexture->GetTextureUnit());
