@@ -548,8 +548,8 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   endif()
 endif()
 
-# SSAA with HDR framebuffer support in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/xxx
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250327)
+# SSAA with HDR framebuffer support in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12026
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250329)
   f3d_test(NAME TestHDRIToneMappingSSAA DATA suzanne.ply HDRI palermo_park_1k.hdr TONE_MAPPING ARGS -t -a --anti-aliasing-mode=ssaa)
 endif()
 
