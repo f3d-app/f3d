@@ -5,6 +5,10 @@
 #include "types.h"
 #include "utils.h"
 
+#include <vtkMath.h>
+#include <vtkNamedColors.h>
+#include <vtkSmartPointer.h>
+
 #include <algorithm>
 #include <cassert>
 #include <filesystem>
@@ -74,7 +78,6 @@ T parse(const std::string& str)
 {
   static_assert(is_vector<T>::value, "non-vector types parsing must be specialized");
 
-  // TODO implement more parsing possibilities, eg different types of tokens
   T vec;
   std::istringstream split(str);
   for (std::string each; std::getline(split, each, ',');)
@@ -200,17 +203,130 @@ fs::path parse(const std::string& str)
 //----------------------------------------------------------------------------
 /**
  * Parse provided string into a color_t.
- * Supported formats: "R,G,B"
- * rely on parse<std::vector<double>>(str)
+ * Supported formats: "R,G,B", "#RRGGBB", "#RGB", rgb(R,G,B)", "hsl(H,S%,L%)", "hsv(H,S%,V%)",
+ *                    "hwb(H,W%,B%)", cmyk(C%,M%,Y%,K%), "CSS3 color name"
  * Can throw options::parsing_exception in case of failure to parse
  */
 template<>
 color_t parse(const std::string& str)
 {
+  const std::string strCompact = std::regex_replace(str, std::regex("\\s"), "");
+  double rgb[3]{};
+
   try
   {
+    /* Short hex format search */
+    const std::regex shortHexRegex("#([0-9a-f])([0-9a-f])([0-9a-f])", std::regex_constants::icase);
+    std::smatch shortHexMatch;
+    if (std::regex_match(strCompact, shortHexMatch, shortHexRegex))
+    {
+      return color_t(
+        std::stoul(shortHexMatch[1].str() + shortHexMatch[1].str(), nullptr, 16) / 255.0,
+        std::stoul(shortHexMatch[2].str() + shortHexMatch[2].str(), nullptr, 16) / 255.0,
+        std::stoul(shortHexMatch[3].str() + shortHexMatch[3].str(), nullptr, 16) / 255.0);
+    }
+
+    /* Hex format search */
+    const std::regex hexRegex(
+      "#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})", std::regex_constants::icase);
+    std::smatch hexMatch;
+    if (std::regex_match(strCompact, hexMatch, hexRegex))
+    {
+      return color_t(                                  //
+        std::stoul(hexMatch[1], nullptr, 16) / 255.0,  //
+        std::stoul(hexMatch[2], nullptr, 16) / 255.0,  //
+        std::stoul(hexMatch[3], nullptr, 16) / 255.0); //
+    }
+
+    /* RGB format search */
+    const std::regex rgbRegex(
+      "rgb\\((\\d{1,3}),(\\d{1,3}),(\\d{1,3})\\)", std::regex_constants::icase);
+    std::smatch rgbMatch;
+    if (std::regex_match(strCompact, rgbMatch, rgbRegex))
+    {
+      rgb[0] = std::stod(rgbMatch[1]) / 255.0;
+      rgb[1] = std::stod(rgbMatch[2]) / 255.0;
+      rgb[2] = std::stod(rgbMatch[3]) / 255.0;
+      if (rgb[0] > 1.0 || rgb[1] > 1.0 || rgb[2] > 1.0)
+      {
+        throw options::parsing_exception("Cannot parse " + str + " into a color_t");
+      }
+      return color_t(rgb[0], rgb[1], rgb[2]);
+    }
+
+    /* Hue-based format search: hsl, hsv, hwb */
+    const std::regex hueRegex(
+      "(hsl|hsv|hwb)\\((\\d{1,3}),(\\d{1,3})%?,(\\d{1,3})%?\\)", std::regex_constants::icase);
+    std::smatch hueMatch;
+    if (std::regex_match(strCompact, hueMatch, hueRegex))
+    {
+      const double h = std::stod(hueMatch[2]) / 360.0;
+      double s = std::stod(hueMatch[3]) / 100.0;
+      double v = std::stod(hueMatch[4]) / 100.0;
+      if (h > 1.0 || s > 1.0 || v > 1.0)
+      {
+        throw options::parsing_exception("Cannot parse " + str + " into a color_t");
+      }
+
+      std::string hueFormat = hueMatch[1].str();
+      std::transform(hueFormat.begin(), hueFormat.end(), hueFormat.begin(),
+        [](unsigned char c) { return std::tolower(c); });
+      if (hueFormat == "hsl")
+      {
+        const double l = v;
+        v = l + s * std::min(l, 1.0 - l);
+        s = (v == 0.0) ? 0.0 : (2.0 * (1.0 - l / v));
+        vtkMath::HSVToRGB(h, s, v, &rgb[0], &rgb[1], &rgb[2]);
+        return color_t(rgb[0], rgb[1], rgb[2]);
+      }
+      if (hueFormat == "hsv")
+      {
+        vtkMath::HSVToRGB(h, s, v, &rgb[0], &rgb[1], &rgb[2]);
+        return color_t(rgb[0], rgb[1], rgb[2]);
+      }
+      if (hueFormat == "hwb")
+      {
+        v = 1 - v;
+        s = 1 - (s / v);
+        vtkMath::HSVToRGB(h, s, v, &rgb[0], &rgb[1], &rgb[2]);
+        return color_t(rgb[0], rgb[1], rgb[2]);
+      }
+    }
+
+    /* CMYK format search */
+    const std::regex cmykRegex(
+      "cmyk\\((\\d{1,3})%?,(\\d{1,3})%?,(\\d{1,3})%?,(\\d{1,3})%?\\)", std::regex_constants::icase);
+    std::smatch cmykMatch;
+    if (std::regex_match(strCompact, cmykMatch, cmykRegex))
+    {
+      const double c = std::stod(cmykMatch[1]) / 100.0;
+      const double m = std::stod(cmykMatch[2]) / 100.0;
+      const double y = std::stod(cmykMatch[3]) / 100.0;
+      const double k = std::stod(cmykMatch[4]) / 100.0;
+      if (c > 1.0 || m > 1.0 || y > 1.0 || k > 1.0)
+      {
+        throw options::parsing_exception("Cannot parse " + str + " into a color_t");
+      }
+      return color_t(           //
+        (1.0 - c) * (1.0 - k),  //
+        (1.0 - m) * (1.0 - k),  //
+        (1.0 - y) * (1.0 - k)); //
+    }
+
+    /* Named colors search */
+    vtkNew<vtkNamedColors> color;
+    if (color->ColorExists(strCompact))
+    {
+      double rgba[4];
+      color->GetColor(strCompact, rgba);
+      return color_t(rgba[0], rgba[1], rgba[2]);
+    }
+
+    /* Vector double format */
     return color_t(options_tools::parse<std::vector<double>>(str));
   }
+  /* We do not catch std::invalid_argument nor std::out_of_range exception from stod as it is
+   * covered by the regex */
   catch (const f3d::type_construction_exception& ex)
   {
     throw options::parsing_exception("Cannot parse " + str + " into a color_t: " + ex.what());
@@ -286,24 +402,94 @@ std::string parse(const std::string& str)
 //----------------------------------------------------------------------------
 /**
  * Parse provided string into a colormap_t.
- * Supported formats: vector of doubles
+ * Supported formats:
+ * - "val, color, val, color, ..."
+ * - "val, red, green, blue, val, red, green, blue, ..."
+ * Where val is in [0, 1].
  * Can throw options::parsing_exception in case of failure to parse
- * TODO add proper parsing
  */
 template<>
 colormap_t parse(const std::string& str)
 {
-  try
+  // Split by separator
+  std::vector<double> colormapVec;
+  std::istringstream split(str);
+  std::string each;
+  while (std::getline(split, each, ','))
   {
-    return colormap_t(options_tools::parse<std::vector<double>>(str));
+    // Parse val into a double
+    double val;
+    try
+    {
+      val = options_tools::parse<double>(each);
+    }
+    catch (const options::parsing_exception&)
+    {
+      throw options::parsing_exception("Cannot parse value from colormap: " + each +
+        ". Check provided colormap string is correct: " + str);
+    }
+
+    // Check it is between 0 and 1
+    if (val < 0 || val > 1)
+    {
+      throw options::parsing_exception("Parsed value from colormap: " + each +
+        " is not in expected [0, 1] range. Check provided colormap string is correct: " + str);
+    }
+
+    // Add value to colormap vector;
+    colormapVec.emplace_back(val);
+
+    // recover next string token
+    if (!std::getline(split, each, ','))
+    {
+      throw options::parsing_exception("Incorrect number of tokens in provided colormap: " + str);
+    }
+
+    // Try to parse it directly as a color
+    f3d::color_t color;
+    try
+    {
+      color = options_tools::parse<f3d::color_t>(each);
+
+      // Add color to colormap vector
+      colormapVec.emplace_back(color.r());
+      colormapVec.emplace_back(color.g());
+      colormapVec.emplace_back(color.b());
+      continue;
+    }
+    catch (const options::parsing_exception&)
+    {
+      // Quiet catch
+    }
+
+    // Not a color, recover next two token, reconstruct r,g,b string and try to parse it as a color
+    // again
+    std::string green;
+    std::string blue;
+    if (!std::getline(split, green, ',') || !std::getline(split, blue, ','))
+    {
+      throw options::parsing_exception("Incorrect number of tokens in provided colormap or a color "
+                                       "could not be parsed as expected: " +
+        str);
+    }
+
+    try
+    {
+      color = options_tools::parse<f3d::color_t>(each + "," + green + "," + blue);
+      colormapVec.emplace_back(color.r());
+      colormapVec.emplace_back(color.g());
+      colormapVec.emplace_back(color.b());
+      continue;
+    }
+    catch (const options::parsing_exception&)
+    {
+      throw options::parsing_exception("Cannot parse color from colormap: " + each + "," + green +
+        "," + blue + ". Check provided colormap string is correct: " + str);
+    }
   }
-  catch (const options::parsing_exception&)
-  {
-    throw options::parsing_exception("Cannot parse " + str + " into a colormap_t");
-  }
+  return colormap_t(colormapVec);
 }
 
-// TODO Improve string generation
 //----------------------------------------------------------------------------
 /**
  * Format provided var into a string from provided boolean
@@ -344,7 +530,6 @@ std::string format(double var)
  */
 std::string format(ratio_t var)
 {
-  // TODO generate a proper ratio string
   return options_tools::format(static_cast<double>(var));
 }
 
@@ -387,12 +572,30 @@ std::string format(const std::vector<T>& var)
 //----------------------------------------------------------------------------
 /**
  * Format provided var into a string from provided color_t
- * rely on format(std::vector<double>&)
+ * Formats in hex color string "#RRGGBB" if values are multiple of 1/255.
+ * Otherwise rely on format(std::vector<double>&)
  */
 std::string format(color_t var)
 {
-  // TODO generate a proper color string
-  return options_tools::format(static_cast<std::vector<double>>(var));
+  const std::vector<double> colors = { var.r(), var.g(), var.b() };
+  if (std::all_of(colors.begin(), colors.end(),
+        [](double val)
+        {
+          return (val >= 0 && val <= 1 &&
+            std::fmod(val * 255., 1) < std::numeric_limits<double>::epsilon());
+        }))
+  {
+    std::ostringstream stream;
+    stream << "#" << std::hex << std::setfill('0') << std::setw(2)
+           << static_cast<int>(colors[0] * 255.) << std::setw(2)
+           << static_cast<int>(colors[1] * 255.) << std::setw(2)
+           << static_cast<int>(colors[2] * 255.);
+    return stream.str();
+  }
+  else
+  {
+    return options_tools::format(static_cast<std::vector<double>>(var));
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -451,12 +654,19 @@ std::string format(direction_t var)
 //----------------------------------------------------------------------------
 /**
  * Format provided var into a string from provided colormap_t.
- * Rely on `format(std::vector<double>&)`
- * TODO add proper formatting
+ * Rely on `format(double)` and `format(color_t)`
  */
 std::string format(const colormap_t& var)
 {
-  return options_tools::format(static_cast<std::vector<double>>(var));
+  std::ostringstream stream;
+  std::vector<double> vec(var);
+  size_t size = vec.size() / 4;
+  for (unsigned int i = 0; i < size; i++)
+  {
+    stream << ((i > 0) ? "," : "") << options_tools::format(vec[i * 4]) << ","
+           << options_tools::format(color_t(vec[i * 4 + 1], vec[i * 4 + 2], vec[i * 4 + 3]));
+  }
+  return stream.str();
 }
 
 } // option_tools

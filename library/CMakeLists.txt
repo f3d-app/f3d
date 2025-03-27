@@ -3,6 +3,7 @@
 # should be listed here as reader instantiation is header only
 set(F3D_VTK_MODULES
   VTK::CommonSystem
+  VTK::CommonColor
   VTK::IOImage
   VTK::InteractionWidgets
   f3d::vtkext

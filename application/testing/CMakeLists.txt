@@ -253,8 +253,8 @@ f3d_test(NAME TestUnsupportedFile DATA unsupportedFile.dummy ARGS --filename WIL
 f3d_test(NAME TestComponentName DATA from_abq.vtu ARGS --scalar-coloring --coloring-scalar-bar --coloring-component=2)
 f3d_test(NAME TestNoRender DATA dragon.vtu NO_RENDER)
 f3d_test(NAME TestNoRenderWithOptions DATA dragon.vtu ARGS --hdri-ambient --axis NO_RENDER) # These options causes issues if not handled correctly
-f3d_test(NAME TestNoFile NO_DATA_FORCE_RENDER)
-f3d_test(NAME TestNoFileEmptyFileName ARGS --filename NO_DATA_FORCE_RENDER)
+f3d_test(NAME TestNoFile NO_DATA_FORCE_RENDER UI)
+f3d_test(NAME TestNoFileEmptyFileName ARGS --filename NO_DATA_FORCE_RENDER UI)
 f3d_test(NAME TestMultiFile DATA mb/recursive ARGS --multi-file-mode=all)
 f3d_test(NAME TestMultiFileColoring DATA mb/recursive ARGS --multi-file-mode=all -s --coloring-array=Polynomial -b)
 f3d_test(NAME TestMultiFileVolume DATA multi ARGS --multi-file-mode=all -vsb --coloring-array=Scalars_)
@@ -473,7 +473,7 @@ f3d_test(NAME TestCameraIndexNegative DATA Cameras.gltf ARGS --camera-index=-1 R
 # Require improved importer support https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11303
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240910)
   f3d_test(NAME TestInvalidFileFileName DATA invalid.vtp ARGS --filename NO_DATA_FORCE_RENDER UI)
-  f3d_test(NAME TestMultiFileInvalid DATA cow.vtp invalid.vtp dragon.vtu ARGS --multi-file-mode=all NO_DATA_FORCE_RENDER)
+  f3d_test(NAME TestMultiFileInvalid DATA cow.vtp invalid.vtp dragon.vtu ARGS --multi-file-mode=all NO_DATA_FORCE_RENDER UI)
   f3d_test(NAME TestMultiFileInvalidFilesFileName DATA mb/mb_3_0.vtt invalid.vtp ARGS --multi-file-mode=all --filename NO_DATA_FORCE_RENDER UI)
   f3d_test(NAME TestMultiFileCameraIndex DATA Cameras.gltf CameraAnimated.glb ARGS --multi-file-mode=all --camera-index=2 --opacity=0.5 --translucency-support)
   f3d_test(NAME TestConsoleBadgeError DATA invalid.vtp NO_DATA_FORCE_RENDER UI)
@@ -843,7 +843,7 @@ f3d_test(NAME TestInteractionMultiFileVolume DATA multi ARGS --multi-file-mode=a
 f3d_test(NAME TestInteractionPointCloud DATA pointsCloud.vtp ARGS --point-sprites-size=20 INTERACTION) #O
 f3d_test(NAME TestInteractionDirectory DATA mb INTERACTION ARGS --scalar-coloring) #Right;Right;Right;Left;Up;
 f3d_test(NAME TestInteractionDirectoryLoop DATA mb/recursive INTERACTION ARGS --scalar-coloring --filename UI) #Left;Left;Left;Left;Left;
-f3d_test(NAME TestInteractionDirectoryEmpty DATA mb INTERACTION NO_DATA_FORCE_RENDER) #Right;Right;Right;
+f3d_test(NAME TestInteractionDirectoryEmpty DATA mb INTERACTION NO_DATA_FORCE_RENDER UI) #Right;Right;Right;
 f3d_test(NAME TestInteractionDirectoryEmptyVerbose DATA mb ARGS --verbose NO_BASELINE INTERACTION REGEXP "is not a file of a supported file format") #Right;Right;Right;HMCSY
 f3d_test(NAME TestInteractionAnimationNotStopped DATA InterpolationTest.glb NO_BASELINE INTERACTION)#Space;
 f3d_test(NAME TestInteractionResetCamera DATA dragon.vtu INTERACTION LONG_TIMEOUT)#MouseMovements;Return;
@@ -855,7 +855,7 @@ f3d_test(NAME TestInteractionConfigFileBindings DATA dragon.vtu CONFIG ${F3D_SOU
 f3d_test(NAME TestInteractionConfigFileMulti DATA multi CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI) #SY;Right;XG;Right;N;Right;Right
 f3d_test(NAME TestInteractionConfigFileAndCommand DATA multi ARGS -o CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI) #OX;Right;N;Right;Right;Right
 f3d_test(NAME TestInteractionConfigFileImperative DATA dragon.vtu suzanne.stl ARGS --edges CONFIG ${F3D_SOURCE_DIR}/testing/configs/imperative.json INTERACTION) #E;Right
-f3d_test(NAME TestInteractionConfigFileImperativeNoData CONFIG ${F3D_SOURCE_DIR}/testing/configs/imperative.json INTERACTION NO_DATA_FORCE_RENDER) #X;Up
+f3d_test(NAME TestInteractionConfigFileImperativeNoData CONFIG ${F3D_SOURCE_DIR}/testing/configs/imperative.json INTERACTION NO_DATA_FORCE_RENDER UI) #X;Up
 f3d_test(NAME TestInteractionCycleVerbose DATA dragon.vtu ARGS --verbose -s NO_BASELINE INTERACTION REGEXP "Not coloring")#SSSSYC
 f3d_test(NAME TestInteractionEmptyDrop INTERACTION REGEXP "Drop event without any provided files.")#DropEvent Empty;
 f3d_test(NAME TestInteractionCameraUpdate DATA dragon.vtu INTERACTION) #MouseWheel;MouseWheel;MouseWheel;S
@@ -963,7 +963,7 @@ f3d_test(NAME TestCommandScriptPrintOptions DATA dragon.vtu SCRIPT TestCommandSc
 f3d_test(NAME TestCommandScriptAlias DATA dragon.vtu SCRIPT TestCommandScriptAlias.txt --reference=${F3D_SOURCE_DIR}/testing/baselines/TestCommandScriptAlias.png) # alias myrotate roll_camera 90;myrotate
 f3d_test(NAME TestCommandScriptReset DATA dragon.vtu suzanne.stl ARGS --edges SCRIPT TestCommandScriptReset.txt) # reset render.show_edges; load_next_file_group;
 f3d_test(NAME TestParseOptionalBoolExtraArg DATA dragon.vtu SCRIPT TestParseOptionalBoolExtraArg.txt REGEXP "Command: load_previous_file_group takes at most 1 argument, got 2 arguments instead." NO_BASELINE) # load_previous_file_group true extra
-f3d_test(NAME TestRemoveFileGroups DATA dragon.vtu SCRIPT TestRemoveFileGroups.txt NO_DATA_FORCE_RENDER) # remove_file_groups
+f3d_test(NAME TestRemoveFileGroups DATA dragon.vtu SCRIPT TestRemoveFileGroups.txt NO_DATA_FORCE_RENDER UI) # remove_file_groups
 f3d_test(NAME TestCommandScriptInvalidReaderOptions DATA dragon.vtu SCRIPT TestCommandScriptInvalidReaderOptions.txt REGEXP "point to an inexistent option, ignoring" NO_BASELINE) # set_reader_option invalid value
 
 # Window position test
@@ -1005,7 +1005,7 @@ f3d_test(NAME TestIncorrectComponent DATA dragon.vtu ARGS -s --coloring-componen
 f3d_test(NAME TestIncorrectMultiFileVolume DATA multi ARGS -sv --coloring-array=Normals --multi-file-mode=all REGEXP "Cannot find the array \"Normals\" to display volume with" NO_BASELINE)
 
 # Incorrect color map
-f3d_test(NAME TestIncorrectColormap DATA IM-0001-1983.dcm ARGS --scalar-coloring --roughness=1 --colormap=0,1,0,0,1,0,1 REGEXP "Specified color map list count is not a multiple of 4, ignoring it." NO_BASELINE)
+f3d_test(NAME TestIncorrectColormap DATA IM-0001-1983.dcm ARGS --scalar-coloring --roughness=1 --colormap=0,1,0,0,1,0,1 REGEXP "Incorrect number of tokens in provided colormap" NO_BASELINE)
 
 # Test opening a directory
 f3d_test(NAME TestVerboseDirectory DATA mb REGEXP "mb_0_0.vtu" NO_RENDER)
@@ -1096,6 +1096,9 @@ f3d_test(NAME TestNonExistentConfigFileStem DATA cow.vtp CONFIG "dummy" REGEXP "
 
 # Test invalid config file
 f3d_test(NAME TestInvalidConfigFile DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/invalid.json REGEXP "Unable to parse the configuration file" NO_BASELINE)
+
+# Test invalid reset key in config file
+f3d_test(NAME TestInvalidResetOptions DATA cow.vtp ARGS --reset= REGEXP "Invalid option: 'reset' must be followed by a valid option name, ignoring entry" NO_BASELINE)
 
 # Test invalid multifile mode
 f3d_test(NAME TestInvalidMultiFileMode DATA mb/recursive ARGS --multi-file-mode=add REGEXP "Unrecognized multi-file-mode: add. Assuming \"single\" mode." NO_BASELINE)

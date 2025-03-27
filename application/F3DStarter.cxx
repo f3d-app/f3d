@@ -496,10 +496,19 @@ public:
               // XXX: Use starts_with once C++20 is supported
               if (libf3dOptionName.rfind("reset-", 0) == 0)
               {
-                reset = true;
-                libf3dOptionName = libf3dOptionName.substr(6);
-                keyForLog = libf3dOptionName;
-                libf3dOptionValue = "reset";
+                if (libf3dOptionName.size() > 6)
+                {
+                  reset = true;
+                  libf3dOptionName = libf3dOptionName.substr(6);
+                  keyForLog = libf3dOptionName;
+                  libf3dOptionValue = "reset";
+                }
+                else
+                {
+                  f3d::log::warn("Invalid option: 'reset' must be followed by a valid option "
+                                 "name, ignoring entry");
+                  continue;
+                }
               }
 
               // Handle reader options
