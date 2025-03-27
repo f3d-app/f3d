@@ -2,7 +2,7 @@
   {
     "match": ".*(las|laz|pts|ptx|pcd)",
     "options": {
-      "load-plugins": "pdal",
+      "load-plugins": "pdal"
     }
   }
 ]
