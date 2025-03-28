@@ -1837,7 +1837,7 @@ void F3DStarter::AddCommands()
       {
         // Set the first file has an HDRI
         f3d::options& options = this->Internals->Engine->getOptions();
-        options.render.hdri.file = files[0];
+        options.render.hdri.file = f3d::utils::collapsePath(files[0]);
         options.render.hdri.ambient = true;
         options.render.background.skybox = true;
 
@@ -1858,7 +1858,7 @@ void F3DStarter::AddCommands()
 
           // Load the file as an HDRI instead of adding it.
           f3d::options& options = this->Internals->Engine->getOptions();
-          options.render.hdri.file = file;
+          options.render.hdri.file = f3d::utils::collapsePath(file);
           options.render.hdri.ambient = true;
           options.render.background.skybox = true;
 

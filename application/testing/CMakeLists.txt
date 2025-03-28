@@ -925,13 +925,13 @@ endif()
 
 # HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
-  f3d_test(NAME TestInteractionDropHDRI INTERACTION_CONFIGURE LONG_TIMEOUT)#X;DropEvent dragon.vtu;DropEven palermo.hdr;
+  f3d_test(NAME TestInteractionDropHDRI INTERACTION_CONFIGURE LONG_TIMEOUT)#X;DropEvent dragon.vtu;DropEvent palermo.hdr;
   f3d_test(NAME TestInteractionDropHDRIInvert INTERACTION_CONFIGURE LONG_TIMEOUT)#X;DropEvent palermo.hdr;DropEvent dragon.vtu;
   f3d_test(NAME TestInteractionDropHDRIMulti INTERACTION_CONFIGURE LONG_TIMEOUT)#X;DropEvent dragon.vtu palermo.hdr;
 
   # Test modified drops, this test rendering is impacted by https://github.com/f3d-app/f3d/issues/1558
   # Empty drop is for coverage
-  f3d_test(NAME TestInteractionDropHDRIModifiers INTERACTION_CONFIGURE LONG_TIMEOUT)#CTRL+DropEvent f3d.tif;SHIFT+DropEvent;SHIFT+DropEven palermo.tif;SYYYY
+  f3d_test(NAME TestInteractionDropHDRIModifiers INTERACTION_CONFIGURE LONG_TIMEOUT)#CTRL+DropEvent f3d.tif;SHIFT+DropEvent;SHIFT+DropEvent palermo.tif;SYYYY
 
   # Test interactive animation and dropping HDRI
   f3d_test(NAME TestInteractionAnimationDropHDRI DATA InterpolationTest.glb ARGS --animation-index=-1 --animation-progress INTERACTION_CONFIGURE LONG_TIMEOUT PREVENT_SKIP_FRAME)#Space;DropEvent palermo.hdr;Space;
@@ -1242,6 +1242,7 @@ if(NOT WIN32)
 
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
     f3d_test(NAME TestHOMEHDRI DATA suzanne.stl ARGS --hdri-file=~/testing/data/palermo_park_1k.hdr --hdri-ambient --hdri-skybox ENV "HOME=${F3D_SOURCE_DIR}" LONG_TIMEOUT)
+    f3d_test(NAME TestHOMEInteractionDropHDRICollapse INTERACTION_CONFIGURE ENV "HOME=${F3D_SOURCE_DIR}" LONG_TIMEOUT)#X;DropEvent dragon.vtu;DropEvent palermo.hdr;
   endif()
 
   STRING(RANDOM LENGTH 257 ALPHABET "x" _f3d_test_invalid_folder)
