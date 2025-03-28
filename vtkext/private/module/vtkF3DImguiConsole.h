@@ -42,7 +42,6 @@ public:
    * Show console badge
    */
   void ShowBadge();
-  
   /**
    * Clear console
    */
