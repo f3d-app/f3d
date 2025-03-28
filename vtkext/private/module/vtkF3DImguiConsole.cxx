@@ -198,6 +198,7 @@ void vtkF3DImguiConsole::ShowMinimalConsole()
   if (ImGui::BeginChild(
         "LogRegion", ImVec2(0, -reservedHeight), 0, ImGuiWindowFlags_HorizontalScrollbar) &&
     !this->Pimpl->Logs.empty())
+    !this->Pimpl->Logs.empty())
   {
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1)); // Tighten spacing
 
