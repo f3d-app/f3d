@@ -626,7 +626,7 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
       {
         return s.rfind(pattern, 0) == 0; // To avoid dependency for C++20 starts_with
       };
-      for (auto const& [action, _] : this->Internals->Commands)
+      for (auto const& [action, callback] : this->Internals->Commands)
       {
         if (startWith(action))
         {
