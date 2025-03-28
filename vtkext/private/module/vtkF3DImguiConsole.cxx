@@ -48,15 +48,15 @@ struct vtkF3DImguiConsole::Internals
    */
   int TextEditCallback(ImGuiInputTextCallbackData* data)
   {
-    ClearCompletions();
+    this->ClearCompletions();
     switch (data->EventFlag)
     {
       case ImGuiInputTextFlags_CallbackCompletion:
       {
-        assert(GetCommandsMatchCallback);
+        assert(this->GetCommandsMatchCallback);
         std::string pattern{ data->Buf };
         std::vector<std::string> candidates =
-          GetCommandsMatchCallback(pattern); // List of supported commands
+          this->GetCommandsMatchCallback(pattern); // List of supported commands
 
         if (candidates.size() == 1)
         {
@@ -105,8 +105,8 @@ struct vtkF3DImguiConsole::Internals
               data->CursorPos, candidates[0].c_str(), candidates[0].c_str() + matchLen);
           }
 
-          Completions.first = Logs.size();
-          Completions.second = Logs.size() + candidates.size() + 1;
+          this->Completions.first = this->Logs.size();
+          this->Completions.second = this->Logs.size() + candidates.size() + 1;
           // Add all candidates to the logs
           this->Logs.emplace_back(std::make_pair(Internals::LogType::Log, "Possible matches:"));
           std::transform(candidates.begin(), candidates.end(), std::back_inserter(this->Logs),
@@ -117,50 +117,50 @@ struct vtkF3DImguiConsole::Internals
       }
       case ImGuiInputTextFlags_CallbackHistory:
       {
-        const int prevHistoryPos = CommandHistoryIndex;
+        const int prevHistoryPos = this->CommandHistoryIndex;
         if (data->EventKey == ImGuiKey_UpArrow)
         {
-          if (CommandHistoryIndex == -1)
+          if (this->CommandHistoryIndex == -1)
           {
             /* Start history navigation */
-            CommandHistoryIndex = static_cast<int>(CommandHistory.size()) - 1;
+            this->CommandHistoryIndex = static_cast<int>(this->CommandHistory.size()) - 1;
           }
-          else if (CommandHistoryIndex > 0)
+          else if (this->CommandHistoryIndex > 0)
           {
             /* Zero is the least recent command in history */
-            CommandHistoryIndex--;
+            this->CommandHistoryIndex--;
           }
         }
         else if (data->EventKey == ImGuiKey_DownArrow)
         {
-          if (CommandHistoryIndex != -1)
+          if (this->CommandHistoryIndex != -1)
           {
-            if (static_cast<size_t>(++CommandHistoryIndex) >= CommandHistory.size())
+            if (static_cast<size_t>(++this->CommandHistoryIndex) >= this->CommandHistory.size())
             {
-              CommandHistoryIndex = -1;
+              this->CommandHistoryIndex = -1;
             }
           }
         }
 
-        if (prevHistoryPos != CommandHistoryIndex)
+        if (prevHistoryPos != this->CommandHistoryIndex)
         {
           if (prevHistoryPos == -1)
           {
             /* Saving the last input before history navigation */
-            LastInput = { CurrentInput.data(), data->CursorPos };
+            this->LastInput = { this->CurrentInput.data(), data->CursorPos };
           }
-          if (CommandHistoryIndex == -1)
+          if (this->CommandHistoryIndex == -1)
           {
             /* Restoring the last input when navigated back to it */
             data->DeleteChars(0, data->BufTextLen);
-            data->InsertChars(0, LastInput.first.c_str());
-            data->CursorPos = LastInput.second;
+            data->InsertChars(0, this->LastInput.first.c_str());
+            data->CursorPos = this->LastInput.second;
           }
           else
           {
             /* We should not be able to have negative index here */
             /* Retrieve the another command from history */
-            std::string historyStr = CommandHistory[CommandHistoryIndex];
+            std::string historyStr = this->CommandHistory[this->CommandHistoryIndex];
             data->DeleteChars(0, data->BufTextLen);
             data->InsertChars(0, historyStr.c_str());
             data->CursorPos = static_cast<int>(historyStr.size());
