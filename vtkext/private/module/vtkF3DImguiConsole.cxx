@@ -53,66 +53,64 @@ struct vtkF3DImguiConsole::Internals
     {
       case ImGuiInputTextFlags_CallbackCompletion:
       {
-        if (GetCommandsMatchCallback)
+        assert(GetCommandsMatchCallback);
+        std::string pattern{ data->Buf };
+        std::transform(pattern.begin(), pattern.end(), pattern.begin(), ::tolower);
+        std::vector<std::string> candidates =
+          GetCommandsMatchCallback(pattern); // List of supported commands
+
+        if (candidates.size() == 1)
         {
-          std::string pattern{ data->Buf };
-          std::transform(pattern.begin(), pattern.end(), pattern.begin(), ::tolower);
-          std::vector<std::string> candidates =
-            GetCommandsMatchCallback(pattern); // List of supported commands
-
-          if (candidates.size() == 1)
+          // Single match. Delete the beginning of the word and replace it entirely so we've got
+          // nice casing.
+          data->DeleteChars(0, static_cast<int>(pattern.size()));
+          data->InsertChars(data->CursorPos, candidates[0].c_str());
+          data->InsertChars(data->CursorPos, " ");
+        }
+        else if (candidates.size() > 1)
+        {
+          // Multiple matches. Complete as much as we can.
+          // So inputting "C"+Tab will complete to "CL" then display "CLEAR" and "CLASSIFY" as
+          // matches.
+          size_t matchLen = pattern.size();
+          bool allCandidatesMatches = true;
+          // Find the common prefix to all candidates
+          while (allCandidatesMatches)
           {
-            // Single match. Delete the beginning of the word and replace it entirely so we've got
-            // nice casing.
+            const std::string& first = candidates[0];
+            if (first.size() <= matchLen)
+            {
+              // The first candidate is shorter than the current match length
+              allCandidatesMatches = false;
+            }
+            else
+            {
+              // Check if all candidates match the current character
+              const char target = first[matchLen];
+              allCandidatesMatches = std::all_of(candidates.begin(), candidates.end(),
+                [matchLen, target](const std::string& s)
+                { return s.size() > matchLen && s[matchLen] == target; });
+            }
+            if (allCandidatesMatches)
+            {
+              matchLen++;
+            }
+          }
+
+          if (matchLen > 0)
+          {
             data->DeleteChars(0, static_cast<int>(pattern.size()));
-            data->InsertChars(data->CursorPos, candidates[0].c_str());
-            data->InsertChars(data->CursorPos, " ");
+            data->InsertChars(
+              data->CursorPos, candidates[0].c_str(), candidates[0].c_str() + matchLen);
           }
-          else if (candidates.size() > 1)
-          {
-            // Multiple matches. Complete as much as we can.
-            // So inputting "C"+Tab will complete to "CL" then display "CLEAR" and "CLASSIFY" as
-            // matches.
-            size_t matchLen = pattern.size();
-            bool allCandidatesMatches = true;
-            // Find the common prefix to all candidates
-            while (allCandidatesMatches)
-            {
-              const std::string& first = candidates[0];
-              if (first.size() <= matchLen)
-              {
-                // The first candidate is shorter than the current match length
-                allCandidatesMatches = false;
-              }
-              else
-              {
-                // Check if all candidates match the current character
-                const char target = first[matchLen];
-                allCandidatesMatches = std::all_of(candidates.begin(), candidates.end(),
-                  [matchLen, target](const std::string& s)
-                  { return s.size() > matchLen && s[matchLen] == target; });
-              }
-              if (allCandidatesMatches)
-              {
-                matchLen++;
-              }
-            }
 
-            if (matchLen > 0)
-            {
-              data->DeleteChars(0, static_cast<int>(pattern.size()));
-              data->InsertChars(
-                data->CursorPos, candidates[0].c_str(), candidates[0].c_str() + matchLen);
-            }
-
-            Completions.first = Logs.size();
-            Completions.second = Logs.size() + candidates.size() + 1;
-            // Add all candidates to the logs
-            this->Logs.emplace_back(std::make_pair(Internals::LogType::Log, "Possible matches:"));
-            std::transform(candidates.begin(), candidates.end(), std::back_inserter(this->Logs),
-              [](const std::string& candidate)
-              { return std::make_pair(Internals::LogType::Log, candidate); });
-          }
+          Completions.first = Logs.size();
+          Completions.second = Logs.size() + candidates.size() + 1;
+          // Add all candidates to the logs
+          this->Logs.emplace_back(std::make_pair(Internals::LogType::Log, "Possible matches:"));
+          std::transform(candidates.begin(), candidates.end(), std::back_inserter(this->Logs),
+            [](const std::string& candidate)
+            { return std::make_pair(Internals::LogType::Log, candidate); });
         }
         break;
       }
