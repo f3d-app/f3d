@@ -681,7 +681,7 @@ interactor& interactor_impl::initCommands()
       check_args(args, 0, ":q");
       if (this->Internals->Options.ui.minimal_console)
       {
-          this->Internals->Options.ui.minimal_console = false;
+        this->Internals->Options.ui.minimal_console = false;
       }
     });
 
