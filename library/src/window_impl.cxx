@@ -409,13 +409,13 @@ void window_impl::UpdateDynamicOptions()
 
   vtkF3DRenderer::AntiAliasingMode aaMode = vtkF3DRenderer::AntiAliasingMode::NONE;
 
-F3D_SILENT_WARNING_PUSH()
-F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
+  F3D_SILENT_WARNING_PUSH()
+  F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
   if (opt.render.effect.anti_aliasing)
   {
     aaMode = vtkF3DRenderer::AntiAliasingMode::FXAA;
   }
-F3D_SILENT_WARNING_POP()
+  F3D_SILENT_WARNING_POP()
 
   if (opt.render.effect.antialiasing.enable)
   {
@@ -429,7 +429,8 @@ F3D_SILENT_WARNING_POP()
     }
     else
     {
-      log::warn(opt.render.effect.antialiasing.mode, R"( is an invalid antialiasing mode. Valid modes are: "fxaa", "ssaa")");
+      log::warn(opt.render.effect.antialiasing.mode,
+        R"( is an invalid antialiasing mode. Valid modes are: "fxaa", "ssaa")");
     }
   }
 
