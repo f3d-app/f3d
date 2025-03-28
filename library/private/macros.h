@@ -20,13 +20,13 @@
 #define F3D_SILENT_WARNING_PUSH() _Pragma("clang diagnostic push")
 #define F3D_INTERNAL_DO_PRAGMA(x) _Pragma(#x)
 #define F3D_SILENT_WARNING_DECL(MSVC_CODE, GNU_STRING)                                             \
-  F3D_INTERNAL_DO_PRAGMA("clang diagnostic ignored \"-W" GNU_STRING "\"")
+  F3D_INTERNAL_DO_PRAGMA("clang diagnostic ignored \"-W" #GNU_STRING "\"")
 #define F3D_SILENT_WARNING_POP() _Pragma("clang diagnostic pop")
 #elif defined(__GNUC__)
 #define F3D_SILENT_WARNING_PUSH() _Pragma("GCC diagnostic push")
 #define F3D_INTERNAL_DO_PRAGMA(x) _Pragma(#x)
 #define F3D_SILENT_WARNING_DECL(MSVC_CODE, GNU_STRING)                                             \
-  F3D_INTERNAL_DO_PRAGMA("GCC diagnostic ignored \"-W" GNU_STRING "\"")
+  F3D_INTERNAL_DO_PRAGMA("GCC diagnostic ignored \"-W" #GNU_STRING "\"")
 #define F3D_SILENT_WARNING_POP() _Pragma("GCC diagnostic pop")
 #else
 #define F3D_SILENT_WARNING_PUSH()
