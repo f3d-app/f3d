@@ -23,6 +23,8 @@ The libf3d provides a few commands, many related to manipulating libf3d (options
 
 `print option.name`: A command to print the value of an libf3d option, eg: `print scene.up.direction`.
 
+`cycle_anti_aliasing`: A command to cycle between the anti-aliasing method (`none`,`fxaa`,`ssaa`).
+
 `cycle_animation`: A specific command to cycle `scene.animation.index` option using model information, No argument.
 
 `cycle_coloring field/array/component`: A specific command to manipulate scivis options using model information.

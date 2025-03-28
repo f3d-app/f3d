@@ -2,7 +2,10 @@
  * @class   vtkF3DSolidBackgroundPass
  * @brief   Implement a post-processing blending the result of the delegate pass.
  *
- * Early passes in F3D...
+ * Early passes in F3D skip the background color for proper alpha blending.
+ * This pass is rendered before the post-process passes in order to add the specified
+ * background color. It just clears the framebuffer to the specified color and
+ * renders the previous pass result with alpha blending enabled.
  *
  * @sa
  * vtkRenderPass
@@ -30,12 +33,12 @@ public:
   /**
    * Perform rendering according to a render state.
    */
-  void Render(const vtkRenderState* s) override;
+  void Render(const vtkRenderState* state) override;
 
   /**
    * Release graphics resources and ask components to release their own resources.
    */
-  void ReleaseGraphicsResources(vtkWindow* w) override;
+  void ReleaseGraphicsResources(vtkWindow* win) override;
 
   /**
    * Forbidden copies.

@@ -16,17 +16,17 @@
 vtkStandardNewMacro(vtkF3DSolidBackgroundPass);
 
 //------------------------------------------------------------------------------
-void vtkF3DSolidBackgroundPass::Render(const vtkRenderState* s)
+void vtkF3DSolidBackgroundPass::Render(const vtkRenderState* state)
 {
   vtkOpenGLClearErrorMacro();
 
   this->NumberOfRenderedProps = 0;
 
-  vtkRenderer* r = s->GetRenderer();
-  vtkOpenGLRenderWindow* renWin = static_cast<vtkOpenGLRenderWindow*>(r->GetRenderWindow());
+  vtkRenderer* ren = state->GetRenderer();
+  vtkOpenGLRenderWindow* renWin = static_cast<vtkOpenGLRenderWindow*>(ren->GetRenderWindow());
   vtkOpenGLState* ostate = renWin->GetState();
 
-  r->Clear();
+  ren->Clear();
 
   vtkOpenGLState::ScopedglEnableDisable bsaver(ostate, GL_BLEND);
 
@@ -35,7 +35,7 @@ void vtkF3DSolidBackgroundPass::Render(const vtkRenderState* s)
   // create FBO and texture
   int pos[2];
   int size[2];
-  r->GetTiledSizeAndOrigin(&size[0], &size[1], &pos[0], &pos[1]);
+  ren->GetTiledSizeAndOrigin(&size[0], &size[1], &pos[0], &pos[1]);
 
   if (this->ColorTexture == nullptr)
   {
@@ -57,7 +57,7 @@ void vtkF3DSolidBackgroundPass::Render(const vtkRenderState* s)
 
   renWin->GetState()->PushFramebufferBindings();
   this->RenderDelegate(
-    s, size[0], size[1], size[0], size[1], this->FrameBufferObject, this->ColorTexture);
+    state, size[0], size[1], size[0], size[1], this->FrameBufferObject, this->ColorTexture);
   renWin->GetState()->PopFramebufferBindings();
 
   if (!this->QuadHelper)
@@ -103,16 +103,16 @@ void vtkF3DSolidBackgroundPass::Render(const vtkRenderState* s)
 }
 
 //------------------------------------------------------------------------------
-void vtkF3DSolidBackgroundPass::ReleaseGraphicsResources(vtkWindow* w)
+void vtkF3DSolidBackgroundPass::ReleaseGraphicsResources(vtkWindow* win)
 {
-  this->Superclass::ReleaseGraphicsResources(w);
+  this->Superclass::ReleaseGraphicsResources(win);
 
   if (this->FrameBufferObject)
   {
-    this->FrameBufferObject->ReleaseGraphicsResources(w);
+    this->FrameBufferObject->ReleaseGraphicsResources(win);
   }
   if (this->ColorTexture)
   {
-    this->ColorTexture->ReleaseGraphicsResources(w);
+    this->ColorTexture->ReleaseGraphicsResources(win);
   }
 }

@@ -1,21 +1,4 @@
-#if defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable : 4996)
-#elif defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-#elif defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
 #include "options.h"
-#if defined(_MSC_VER)
-#pragma warning(pop)
-#elif defined(__clang__)
-#pragma clang diagnostic pop
-#elif defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
 
 #include "options_generated.h"
 #include "options_tools.h"
@@ -23,11 +6,15 @@
 #include "export.h"
 #include "init.h"
 #include "log.h"
+#include "macros.h"
 #include "utils.h"
 
 #include <algorithm>
 #include <limits>
 #include <string>
+
+F3D_SILENT_WARNING_PUSH()
+F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
 
 namespace f3d
 {
@@ -255,3 +242,5 @@ options::no_value_exception::no_value_exception(const std::string& what)
 {
 }
 }
+
+F3D_SILENT_WARNING_POP()

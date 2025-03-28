@@ -3,6 +3,7 @@
 #include "camera_impl.h"
 #include "engine.h"
 #include "log.h"
+#include "macros.h"
 #include "options.h"
 
 #include "vtkF3DExternalRenderWindow.h"
@@ -406,50 +407,34 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetRaytracingSamples(opt.render.raytracing.samples);
   renderer->SetUseRaytracingDenoiser(opt.render.raytracing.denoise);
 
-  vtkF3DRenderer::AntiAliasingMode aa = vtkF3DRenderer::AntiAliasingMode::NONE;
+  vtkF3DRenderer::AntiAliasingMode aaMode = vtkF3DRenderer::AntiAliasingMode::NONE;
 
-#if defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable : 4996)
-#elif defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-#elif defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-
+F3D_SILENT_WARNING_PUSH()
+F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
   if (opt.render.effect.anti_aliasing)
   {
-    aa = vtkF3DRenderer::AntiAliasingMode::FXAA;
+    aaMode = vtkF3DRenderer::AntiAliasingMode::FXAA;
   }
-
-#if defined(_MSC_VER)
-#pragma warning(pop)
-#elif defined(__clang__)
-#pragma clang diagnostic pop
-#elif defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
+F3D_SILENT_WARNING_POP()
 
   if (opt.render.effect.antialiasing.enable)
   {
     if (opt.render.effect.antialiasing.mode == "fxaa")
     {
-      aa = vtkF3DRenderer::AntiAliasingMode::FXAA;
+      aaMode = vtkF3DRenderer::AntiAliasingMode::FXAA;
     }
     else if (opt.render.effect.antialiasing.mode == "ssaa")
     {
-      aa = vtkF3DRenderer::AntiAliasingMode::SSAA;
+      aaMode = vtkF3DRenderer::AntiAliasingMode::SSAA;
     }
     else
     {
-      // todo: invalid mode
+      log::warn(opt.render.effect.antialiasing.mode, R"( is an invalid antialiasing mode. Valid modes are: "fxaa", "ssaa")");
     }
   }
 
   renderer->SetUseSSAOPass(opt.render.effect.ambient_occlusion);
-  renderer->SetAntiAliasingMode(aa);
+  renderer->SetAntiAliasingMode(aaMode);
   renderer->SetUseToneMappingPass(opt.render.effect.tone_mapping);
   renderer->SetUseDepthPeelingPass(opt.render.effect.translucency_support);
   renderer->SetBackfaceType(opt.render.backface_type);
