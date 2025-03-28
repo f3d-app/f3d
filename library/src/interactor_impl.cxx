@@ -1231,7 +1231,6 @@ interactor& interactor_impl::toggleAnimation()
   this->Internals->AnimationManager->ToggleAnimation();
   return *this;
 }
- 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::startAnimation()
 {
