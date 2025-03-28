@@ -1,4 +1,9 @@
+#include "macros.h"
+
+F3D_SILENT_WARNING_PUSH()
+F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
 #include "options.h"
+F3D_SILENT_WARNING_POP()
 
 #include "options_generated.h"
 #include "options_tools.h"
@@ -6,15 +11,11 @@
 #include "export.h"
 #include "init.h"
 #include "log.h"
-#include "macros.h"
 #include "utils.h"
 
 #include <algorithm>
 #include <limits>
 #include <string>
-
-F3D_SILENT_WARNING_PUSH()
-F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
 
 namespace f3d
 {
@@ -242,5 +243,3 @@ options::no_value_exception::no_value_exception(const std::string& what)
 {
 }
 }
-
-F3D_SILENT_WARNING_POP()
