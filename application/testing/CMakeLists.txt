@@ -896,7 +896,6 @@ f3d_test(NAME TestInteractionConsoleScrollbar DATA f3d.glb INTERACTION UI) #Esca
 f3d_test(NAME TestInteractionConsoleEmptyCommand DATA f3d.glb INTERACTION UI) #Escape;Enter
 f3d_test(NAME TestInteractionConsoleAutoComplete DATA BoxAnimated.gltf INTERACTION UI) #Escape;Tab;to;Tab;Tab;_a;Tab;Enter
 f3d_test(NAME TestInteractionConsoleAutoCompleteNoMatch DATA BoxAnimated.gltf INTERACTION UI) #Escape;zz;Tab
-f3d_test(NAME TestInteractionConsoleAutoCompleteCaps DATA BoxAnimated.gltf INTERACTION UI) #Escape;rOlLTab;45;Enter
 f3d_test(NAME TestInteractionConsoleHistory DATA BoxAnimated.gltf INTERACTION UI)
 f3d_test(NAME TestInteractionConsoleHistoryEmpty DATA BoxAnimated.gltf INTERACTION UI)#Escape;Up;Down
 

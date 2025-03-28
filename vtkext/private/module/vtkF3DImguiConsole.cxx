@@ -55,7 +55,6 @@ struct vtkF3DImguiConsole::Internals
       {
         assert(GetCommandsMatchCallback);
         std::string pattern{ data->Buf };
-        std::transform(pattern.begin(), pattern.end(), pattern.begin(), ::tolower);
         std::vector<std::string> candidates =
           GetCommandsMatchCallback(pattern); // List of supported commands
 
