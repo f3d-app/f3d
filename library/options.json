@@ -61,6 +61,12 @@
         "default_value": "0.0, 0.0, 0.0"
       }
     },
+	"cubeAxis": {
+	  "enable": {
+		"type": "bool",
+		"default_value": "false"
+	  }
+	},
     "raytracing": {
       "enable": {
         "type": "bool",

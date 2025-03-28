@@ -25,6 +25,7 @@ namespace fs = std::filesystem;
 
 class vtkColorTransferFunction;
 class vtkCornerAnnotation;
+class vtkCubeAxesActor;
 class vtkF3DDropZoneActor;
 class vtkImageReader2;
 class vtkOrientationMarkerWidget;
@@ -44,6 +45,7 @@ public:
    */
   void ShowAxis(bool show);
   void ShowGrid(bool show);
+  void ShowCubeAxis(bool show);
   void ShowEdge(const std::optional<bool>& show);
   void ShowTimer(bool show);
   void ShowMetaData(bool show);
@@ -443,6 +445,11 @@ private:
   void ConfigureGridUsingCurrentActors();
 
   /**
+   * Configure the cube Axis actor
+   */
+  void ConfigureCubeAxisUsingCurrentActors();
+
+  /**
    * Configure the different render passes
    */
   void ConfigureRenderPasses();
@@ -488,6 +495,7 @@ private:
 
   vtkNew<vtkF3DDropZoneActor> DropZoneActor;
   vtkNew<vtkActor> GridActor;
+  vtkNew<vtkCubeAxesActor> CubeAxesActor;
   vtkNew<vtkSkybox> SkyboxActor;
   vtkNew<vtkF3DUIActor> UIActor;
 
@@ -496,6 +504,7 @@ private:
   bool CheatSheetConfigured = false;
   bool ActorsPropertiesConfigured = false;
   bool GridConfigured = false;
+  bool CubeAxesConfigured = false;
   bool RenderPassesConfigured = false;
   bool LightIntensitiesConfigured = false;
   bool TextActorsConfigured = false;
@@ -511,6 +520,7 @@ private:
   bool GridVisible = false;
   bool GridAbsolute = false;
   bool AxisVisible = false;
+  bool CubeAxisVisible = false;
   std::optional<bool> EdgeVisible;
   bool TimerVisible = false;
   bool FilenameVisible = false;
