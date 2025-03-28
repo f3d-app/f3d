@@ -999,7 +999,7 @@ interactor& interactor_impl::initBindings()
     }
   };
 
-  // "Cycle anti-aliasing" , "NONE/FXAA/SSAA"
+  // "Cycle anti-aliasing" , "none/fxaa/ssaa"
   auto docAA = [&]()
   {
     std::string desc;

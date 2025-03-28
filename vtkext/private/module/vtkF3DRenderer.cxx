@@ -7,7 +7,9 @@
 #include "vtkF3DCachedSpecularTexture.h"
 #include "vtkF3DOpenGLGridMapper.h"
 #include "vtkF3DOverlayRenderPass.h"
+#include "vtkF3DPolyDataMapper.h"
 #include "vtkF3DRenderPass.h"
+#include "vtkF3DSolidBackgroundPass.h"
 #include "vtkF3DUserRenderPass.h"
 
 #include <vtkAxesActor.h>
@@ -17,8 +19,6 @@
 #include <vtkColorTransferFunction.h>
 #include <vtkCornerAnnotation.h>
 #include <vtkCullerCollection.h>
-#include <vtkF3DPolyDataMapper.h>
-#include <vtkF3DSolidBackgroundPass.h>
 #include <vtkFloatArray.h>
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
