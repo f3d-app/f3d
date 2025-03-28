@@ -39,11 +39,6 @@ public:
   void ShowConsole();
 
   /**
-   * Show minimal console window
-   */
-  void ShowMinimalConsole();
-
-  /**
    * Show console badge
    */
   void ShowBadge();
@@ -52,6 +47,11 @@ public:
    * Clear console
    */
   void Clear();
+
+  /**
+   * Show minimal console window
+   */
+  void ShowMinimalConsole();
 
 protected:
   vtkF3DImguiConsole();
