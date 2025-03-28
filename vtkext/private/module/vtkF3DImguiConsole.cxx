@@ -184,8 +184,8 @@ void vtkF3DImguiConsole::ShowMinimalConsole()
   else
   {
     const auto& [severity, msg] = this->Pimpl->Logs.back();
-    ImGui::SetNextWindowSize(
-      ImVec2(viewport->WorkSize.x - 2.f * margin, ImGui::CalcTextSize(msg.c_str()).y + reservedHeight + margin));
+    ImGui::SetNextWindowSize(ImVec2(viewport->WorkSize.x - 2.f * margin,
+      ImGui::CalcTextSize(msg.c_str()).y + reservedHeight + margin));
   }
   ImGui::SetNextWindowBgAlpha(0.9f);
 
