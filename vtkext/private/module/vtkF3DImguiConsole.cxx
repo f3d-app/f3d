@@ -17,7 +17,8 @@ struct vtkF3DImguiConsole::Internals
     Log,
     Warning,
     Error,
-    Typed
+    Typed,
+    Completion
   };
 
   std::vector<std::pair<LogType, std::string>> Logs;
@@ -108,10 +109,10 @@ struct vtkF3DImguiConsole::Internals
           this->Completions.first = this->Logs.size();
           this->Completions.second = this->Logs.size() + candidates.size() + 1;
           // Add all candidates to the logs
-          this->Logs.emplace_back(std::make_pair(Internals::LogType::Log, "Possible matches:"));
+          this->Logs.emplace_back(std::make_pair(Internals::LogType::Completion, "Possible matches:"));
           std::transform(candidates.begin(), candidates.end(), std::back_inserter(this->Logs),
             [](const std::string& candidate)
-            { return std::make_pair(Internals::LogType::Log, candidate); });
+            { return std::make_pair(Internals::LogType::Completion, candidate); });
         }
         break;
       }
@@ -254,6 +255,9 @@ void vtkF3DImguiConsole::ShowConsole()
             break;
           case Internals::LogType::Typed:
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 1.0f, 1.0f, 1.0f));
+            break;
+          case Internals::LogType::Completion:
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.6f, 1.0f, 0.6f, 1.0f));
             break;
           default:
             hasColor = false;
