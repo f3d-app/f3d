@@ -125,8 +125,6 @@ private:
   bool CurrentTimeSet = false;
   int AnimationIndex = 0;
   int AvailAnimations = -1;
-  bool SkipFrame = true;
-  std::chrono::steady_clock::time_point PreviousTick;
 
   vtkSmartPointer<vtkProgressBarWidget> ProgressWidget;
 };
