@@ -176,8 +176,7 @@ void vtkF3DImguiConsole::ShowMinimalConsole()
   this->Pimpl->NewWarning = false;
 
   ImGui::SetNextWindowPos(ImVec2(margin, margin));
-  ImGui::SetNextWindowSize(
-    ImVec2(viewport->WorkSize.x - 2.f * margin, 0));
+  ImGui::SetNextWindowSize(ImVec2(viewport->WorkSize.x - 2.f * margin, 0));
   ImGui::SetNextWindowBgAlpha(0.9f);
 
   ImGuiWindowFlags winFlags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
