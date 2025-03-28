@@ -98,6 +98,8 @@ struct vtkF3DImguiConsole::Internals
 
           if (matchLen > 0)
           {
+            // Fill the best we can by now - use the longest common prefix from available candidates
+            // (possibly just pattern itself in the worst case)
             data->DeleteChars(0, static_cast<int>(pattern.size()));
             data->InsertChars(
               data->CursorPos, candidates[0].c_str(), candidates[0].c_str() + matchLen);
