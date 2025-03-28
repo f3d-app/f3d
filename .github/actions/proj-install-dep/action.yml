@@ -21,13 +21,15 @@ runs:
       if: steps.cache-proj.outputs.cache-hit != 'true'
       shell: bash
       run: |
-        if [[ "$RUNNER_OS" == "Linux" ]]; then
+        if [[ "${{runner.os}}" == "Linux" ]]; then
           sudo apt-get update
           sudo apt-get install -y sqlite3 libsqlite3-dev
-        elif [[ "$RUNNER_OS" == "macOS" ]]; then
+        elif [[ "${{runner.os}}" == "macOS" ]]; then
           brew install sqlite
-        elif [[ "$RUNNER_OS" == "Windows" ]]; then
+        elif [[ "${{runner.os}}" == "Windows" ]]; then
           choco install sqlite
+        fi
+
     # Dependents: gdal
     - name: Checkout PROJ
       if: steps.cache-proj.outputs.cache-hit != 'true'
@@ -56,8 +58,8 @@ runs:
         -DCMAKE_INSTALL_PREFIX=../proj_install
         -DCMAKE_PREFIX_PATH=$(pwd)/../install
         -DBUILD_TESTING=OFF
-        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
-        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || '' }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || '' }}
 
     - name: Build PROJ
       if: steps.cache-proj.outputs.cache-hit != 'true'
