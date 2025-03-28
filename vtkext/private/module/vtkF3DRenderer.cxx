@@ -712,11 +712,11 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::ShowCubeAxis(bool show)
+void vtkF3DRenderer::ShowAxesGrid(bool show)
 {
-  if (this->CubeAxisVisible != show)
+  if (this->AxesGridVisible != show)
   {
-    this->CubeAxisVisible = show;
+    this->AxesGridVisible = show;
     this->RenderPassesConfigured = false;
     this->CubeAxesConfigured = false;
     this->CheatSheetConfigured = false;
@@ -726,7 +726,7 @@ void vtkF3DRenderer::ShowCubeAxis(bool show)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureCubeAxisUsingCurrentActors()
 {
-  bool show = this->CubeAxisVisible;
+  bool show = this->AxesGridVisible;
   if (show)
   {
     double* up = this->GetEnvironmentUp();
@@ -768,13 +768,16 @@ void vtkF3DRenderer::ConfigureCubeAxisUsingCurrentActors()
       bbox.GetBounds(a, b, c, x, y, z);
       double bounds[6] = { a, b, c, x, y, z };
       this->CubeAxesActor->SetBounds(bounds);
+
       this->CubeAxesActor->XAxisLabelVisibilityOn();
       this->CubeAxesActor->YAxisLabelVisibilityOn();
       this->CubeAxesActor->ZAxisLabelVisibilityOn();
       this->CubeAxesActor->SetCamera(GetActiveCamera());
-      this->CubeAxesActor->DrawXGridlinesOn();
-      this->CubeAxesActor->DrawYGridlinesOn();
-      this->CubeAxesActor->DrawZGridlinesOn();
+
+      this->CubeAxesActor->SetFlyModeToStaticEdges();
+      this->CubeAxesActor->SetXAxisMinorTickVisibility(false);
+      this->CubeAxesActor->SetYAxisMinorTickVisibility(false);
+      this->CubeAxesActor->SetZAxisMinorTickVisibility(false);
 
       this->CubeAxesActor->GetLabelTextProperty(0)->SetColor(right);
       this->CubeAxesActor->GetTitleTextProperty(0)->SetColor(right);

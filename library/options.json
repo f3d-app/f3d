@@ -69,7 +69,7 @@
         "default_value": "0.0, 0.0, 0.0"
       }
     },
-	"cubeAxis": {
+	"axes_grid": {
 	  "enable": {
 		"type": "bool",
 		"default_value": "false"

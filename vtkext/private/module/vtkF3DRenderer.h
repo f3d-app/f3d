@@ -55,7 +55,7 @@ public:
    */
   void ShowAxis(bool show);
   void ShowGrid(bool show);
-  void ShowCubeAxis(bool show);
+  void ShowAxesGrid(bool show);
   void ShowEdge(const std::optional<bool>& show);
   void ShowTimer(bool show);
   void ShowMetaData(bool show);
@@ -551,7 +551,7 @@ private:
   bool GridVisible = false;
   bool GridAbsolute = false;
   bool AxisVisible = false;
-  bool CubeAxisVisible = false;
+  bool AxesGridVisible = false;
   std::optional<bool> EdgeVisible;
   bool TimerVisible = false;
   bool FilenameVisible = false;

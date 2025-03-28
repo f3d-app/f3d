@@ -91,7 +91,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "grid-unit", "", "Size of grid unit square, automatically computed by default", "<value>", "" },
       { "grid-subdivisions", "", "Number of grid subdivisions", "<value>", "" },
       { "grid-color", "", "Color of main grid lines", "<color>", "" },
-      { "axesGrid", "", "Enable grid axis", "<bool>", "1" },
+      { "axes-grid", "", "Enable grid axis", "<bool>", "1" },
       { "edges", "e", "Show cell edges", "<bool>", "1" },
       { "armature", "", "Enable armature visualization", "<bool>", "1" },
       { "camera-index", "", "Select the camera to use", "<index>", "" },
