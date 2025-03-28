@@ -1,0 +1,19 @@
+# StreamVersion 1.2
+ExposeEvent 0 599 0 0 0 0 0
+RenderEvent 0 599 0 0 0 0 0
+KeyPressEvent 351 169 0 120 1 x 0
+CharEvent 351 169 0 120 1 x 0
+TimerEvent 351 169 0 120 1 x 0
+TimerEvent 351 169 0 120 1 x 0
+TimerEvent 351 169 0 120 1 x 0
+KeyReleaseEvent 351 169 0 120 1 x 0
+KeyPressEvent 677 699 0 0 1 Super_L 0
+CharEvent 677 699 0 0 1 Super_L 0
+UpdateDropLocationEvent 677 699 0 0 1 Super_L 0
+EnterEvent 781 494 0 0 0 Super_L 0
+DropFilesEvent 781 494 0 0 0 Super_L 1 1 ~/testing/data/../data/dragon.vtu
+RenderEvent 781 494 0 0 0 Super_L 0
+UpdateDropLocationEvent 677 699 0 0 1 Super_L 0
+EnterEvent 781 494 0 0 0 Super_L 0
+DropFilesEvent 781 494 0 0 0 Super_L 1 1 ~/testing/data/../data/palermo_park_1k.hdr
+RenderEvent 781 494 0 0 0 Super_L 0
