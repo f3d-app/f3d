@@ -40,8 +40,8 @@ public:
 
   /**
    * Show minimal console window
-   */ 
-  void ShowMinimalConsole();
+   */
+
 
   /**
    * Show console badge
