@@ -64,6 +64,10 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
+  // Check invalid colormap code path
+  renderer->SetColormap({ 0, 0, 0 });
+  renderer->UpdateActors();
+
   // Smoke test for deprecated HDRI collapse codepath
   // F3D_DEPRECATED
   renderer->SetHDRIFile("path/not/valid/../../to/file.ext");

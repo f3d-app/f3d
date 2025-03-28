@@ -493,7 +493,6 @@ private:
 
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
 
-  vtkNew<vtkF3DDropZoneActor> DropZoneActor;
   vtkNew<vtkActor> GridActor;
   vtkNew<vtkCubeAxesActor> CubeAxesActor;
   vtkNew<vtkSkybox> SkyboxActor;

@@ -29,7 +29,7 @@ _Raytraced CAD assembly_: `f3d 202.vtp -xtgans -rd --raytracing-samples=10 --col
 
 <img src="https://user-images.githubusercontent.com/3129530/194735377-127fa5d8-ece5-40c7-8176-672279ebdacc.png" width="700">
 
-_Volume rendering of a security bag scan_: `f3d backpack.vti -vmn --coloring-range=300,1000 --colormap=0,0,0,0,1,1,1,1`
+_Volume rendering of a security bag scan_: `f3d backpack.vti -vmn --coloring-range=300,1000 --colormap=0,#000000,1,#ffffff`
 
 <img src="https://user-images.githubusercontent.com/3129530/194735376-3a476643-00d6-4cfc-9a88-e0dd33658564.png" width="700">
 
