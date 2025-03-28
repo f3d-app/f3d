@@ -457,7 +457,7 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   vtkOSPRayRendererNode::SetSamplesPerPixel(this->RaytracingSamples, this);
   vtkOSPRayRendererNode::SetEnableDenoiser(this->UseRaytracingDenoiser, this);
   vtkOSPRayRendererNode::SetDenoiserThreshold(0, this);
-  vtkOSPRayRendererNode::SetCompositeOnGL(0);
+  vtkOSPRayRendererNode::SetCompositeOnGL(0, this);
 
   vtkOSPRayRendererNode::BackgroundMode mode = vtkOSPRayRendererNode::Backplate;
   if (this->GetUseImageBasedLighting())
