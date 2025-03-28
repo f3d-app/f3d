@@ -109,7 +109,8 @@ struct vtkF3DImguiConsole::Internals
           this->Completions.first = this->Logs.size();
           this->Completions.second = this->Logs.size() + candidates.size() + 1;
           // Add all candidates to the logs
-          this->Logs.emplace_back(std::make_pair(Internals::LogType::Completion, "Possible matches:"));
+          this->Logs.emplace_back(
+            std::make_pair(Internals::LogType::Completion, "Possible matches:"));
           std::transform(candidates.begin(), candidates.end(), std::back_inserter(this->Logs),
             [](const std::string& candidate)
             { return std::make_pair(Internals::LogType::Completion, candidate); });
