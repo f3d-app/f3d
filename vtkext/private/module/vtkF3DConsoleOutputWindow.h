@@ -23,7 +23,8 @@ public:
   {
     TriggerEvent = vtkCommand::UserEvent + 200,
     ShowEvent,
-    HideEvent,
+    HideConsoleEvent,
+    HideMinimalConsoleEvent,
   };
 
   /**

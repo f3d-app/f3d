@@ -102,7 +102,7 @@ See the [APIs](#APIs) details below for more info.
 |     ui.scalar_bar     |  bool<br>false<br>render   | Show _scalar bar_ of the coloring by data array.                                                                 |        \-\-bar         |
 |     ui.cheatsheet     |  bool<br>false<br>render   | Show a interactor cheatsheet                                                                                     |           -            |
 |      ui.console       |  bool<br>false<br>render   | Show the console                                                                                                 |           -            |
-|  ui.minimal_console   |  bool<br>false<br>render   | Enable minimal console mode. Display only latest log.                                                            |           -            |
+|  ui.minimal_console   |  bool<br>false<br>render   | Enable minimal console mode. Useful to execute a quick command.                                                  |           -            |
 |      ui.filename      |  bool<br>false<br>render   | Display the _filename info content_ on top of the window.                                                        |      \-\-filename      |
 |   ui.filename_info    |   string<br>-<br>render    | Content of _filename info_ to display.                                                                           |           -            |
 |     ui.font_file      | path<br>optional<br>render | Use the provided FreeType compatible font file to display text.<br>Can be useful to display non-ASCII filenames. |     \-\-font-file      |

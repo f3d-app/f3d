@@ -78,7 +78,7 @@ void vtkF3DImguiConsole::ShowConsole()
   // So let's handle the console visibility here
   if (ImGui::IsKeyPressed(ImGuiKey_Escape, false) && this->Pimpl->CurrentInput[0] == '\0')
   {
-    this->InvokeEvent(vtkF3DImguiConsole::HideEvent);
+    this->InvokeEvent(vtkF3DImguiConsole::HideConsoleEvent);
   }
 
   ImGui::Begin("Console", nullptr, winFlags);
@@ -171,77 +171,26 @@ void vtkF3DImguiConsole::ShowMinimalConsole()
   ImGuiViewport* viewport = ImGui::GetMainViewport();
 
   constexpr float margin = 30.f;
-  const float reservedHeight = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
 
   this->Pimpl->NewError = false;
   this->Pimpl->NewWarning = false;
 
   ImGui::SetNextWindowPos(ImVec2(margin, margin));
-  if (this->Pimpl->Logs.empty())
-  {
-    ImGui::SetNextWindowSize(ImVec2(viewport->WorkSize.x - 2.f * margin, reservedHeight + margin));
-  }
-  else
-  {
-    const auto& [severity, msg] = this->Pimpl->Logs.back();
-    ImGui::SetNextWindowSize(ImVec2(viewport->WorkSize.x - 2.f * margin,
-      ImGui::CalcTextSize(msg.c_str()).y + reservedHeight + margin));
-  }
+  ImGui::SetNextWindowSize(
+    ImVec2(viewport->WorkSize.x - 2.f * margin, 0));
   ImGui::SetNextWindowBgAlpha(0.9f);
 
   ImGuiWindowFlags winFlags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
     ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
 
-  ImGui::Begin("Console", nullptr, winFlags);
-
-  // Log window
-  if (ImGui::BeginChild(
-        "LogRegion", ImVec2(0, -reservedHeight), 0, ImGuiWindowFlags_HorizontalScrollbar) &&
-    !this->Pimpl->Logs.empty())
+  // Since imgui has focus, it won't propagate the "Escape" key event to VTK
+  // So let's handle the console visibility here
+  if (ImGui::IsKeyPressed(ImGuiKey_Escape, false) && this->Pimpl->CurrentInput[0] == '\0')
   {
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1)); // Tighten spacing
-
-    const auto& [severity, msg] = this->Pimpl->Logs.back();
-    bool hasColor = true;
-
-    if (this->GetUseColoring())
-    {
-      switch (severity)
-      {
-        case Internals::LogType::Error:
-          ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
-          break;
-        case Internals::LogType::Warning:
-          ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 0.0f, 1.0f));
-          break;
-        case Internals::LogType::Typed:
-          ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 1.0f, 1.0f, 1.0f));
-          break;
-        default:
-          hasColor = false;
-      }
-    }
-    else
-    {
-      hasColor = false;
-    }
-
-    ImGui::TextUnformatted(msg.c_str());
-    if (hasColor)
-    {
-      ImGui::PopStyleColor();
-    }
-
-    if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
-    {
-      ImGui::SetScrollHereY(1.0f);
-    }
-
-    ImGui::PopStyleVar();
+    this->InvokeEvent(vtkF3DImguiConsole::HideMinimalConsoleEvent);
   }
-  ImGui::EndChild();
 
-  ImGui::Separator();
+  ImGui::Begin("Minimal Console", nullptr, winFlags);
 
   // input
   ImGuiInputTextFlags inputFlags =
@@ -251,17 +200,12 @@ void vtkF3DImguiConsole::ShowMinimalConsole()
   ImGui::SameLine();
 
   ImGui::PushItemWidth(-1);
-  bool runCommand = ImGui::InputText("##ConsoleInput", this->Pimpl->CurrentInput.data(),
+  bool runCommand = ImGui::InputText("##MinimalConsoleInput", this->Pimpl->CurrentInput.data(),
     sizeof(this->Pimpl->CurrentInput), inputFlags, nullptr, this->Pimpl.get());
   ImGui::PopItemWidth();
 
   ImGui::SetItemDefaultFocus();
-
-  // if always forcing the focus, it prevents grabbing the scrollbar
-  if (!ImGui::IsAnyItemActive())
-  {
-    ImGui::SetKeyboardFocusHere(-1);
-  }
+  ImGui::SetKeyboardFocusHere(-1);
 
   // do not run the command if nothing is in the input text
   if (runCommand && this->Pimpl->CurrentInput[0] != 0)
@@ -270,6 +214,7 @@ void vtkF3DImguiConsole::ShowMinimalConsole()
       Internals::LogType::Typed, std::string("> ") + this->Pimpl->CurrentInput.data()));
     this->InvokeEvent(vtkF3DImguiConsole::TriggerEvent, this->Pimpl->CurrentInput.data());
     this->Pimpl->CurrentInput = {};
+    this->InvokeEvent(vtkF3DImguiConsole::HideMinimalConsoleEvent);
   }
 
   ImGui::End();

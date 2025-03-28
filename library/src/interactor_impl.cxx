@@ -98,7 +98,9 @@ public:
     vtkOutputWindow::GetInstance()->AddObserver(
       vtkF3DConsoleOutputWindow::ShowEvent, commandCallback);
     vtkOutputWindow::GetInstance()->AddObserver(
-      vtkF3DConsoleOutputWindow::HideEvent, commandCallback);
+      vtkF3DConsoleOutputWindow::HideConsoleEvent, commandCallback);
+    vtkOutputWindow::GetInstance()->AddObserver(
+      vtkF3DConsoleOutputWindow::HideMinimalConsoleEvent, commandCallback);
 
     // Disable standard interactor behavior with timer event
     // in order to be able to interact while animating
@@ -260,9 +262,13 @@ public:
       self->Interactor.SetCommandBuffer(commandWithArgs);
     }
     else if (event == vtkF3DConsoleOutputWindow::ShowEvent ||
-      event == vtkF3DConsoleOutputWindow::HideEvent)
+      event == vtkF3DConsoleOutputWindow::HideConsoleEvent)
     {
       self->Options.ui.console = (event == vtkF3DConsoleOutputWindow::ShowEvent);
+    }
+    else if (event == vtkF3DConsoleOutputWindow::HideMinimalConsoleEvent)
+    {
+      self->Options.ui.minimal_console = false;
     }
 
     self->RenderRequested = true;
@@ -623,7 +629,7 @@ interactor_impl::~interactor_impl()
 {
   vtkOutputWindow::GetInstance()->RemoveObservers(vtkF3DConsoleOutputWindow::TriggerEvent);
   vtkOutputWindow::GetInstance()->RemoveObservers(vtkF3DConsoleOutputWindow::ShowEvent);
-  vtkOutputWindow::GetInstance()->RemoveObservers(vtkF3DConsoleOutputWindow::HideEvent);
+  vtkOutputWindow::GetInstance()->RemoveObservers(vtkF3DConsoleOutputWindow::HideConsoleEvent);
 }
 
 //----------------------------------------------------------------------------
@@ -673,16 +679,6 @@ interactor& interactor_impl::initCommands()
       assert(console != nullptr);
       console->Clear();
 #endif
-    });
-
-  this->addCommand(":q",
-    [&](const std::vector<std::string>& args)
-    {
-      check_args(args, 0, ":q");
-      if (this->Internals->Options.ui.minimal_console)
-      {
-        this->Internals->Options.ui.minimal_console = false;
-      }
     });
 
   this->addCommand("print",
