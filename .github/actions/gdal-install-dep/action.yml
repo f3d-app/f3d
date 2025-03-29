@@ -1,6 +1,5 @@
 name: 'Install GDAL Dependency'
 description: 'Install GDAL Dependency using cache when possible'
-
 inputs:
   cpu:
     description: 'CPU architecture to build for'
@@ -23,14 +22,13 @@ runs:
       if: steps.cache-gdal.outputs.cache-hit != 'true'
       shell: bash
       run: |
-        if [[ "${{runner.os}}" == "Linux" ]]; then
+        if [[ "$RUNNER_OS" == "Linux" ]]; then
           sudo apt-get update
           sudo apt-get install -y sqlite3 libsqlite3-dev
-        elif [[ "${{runner.os}}" == "macOS" ]]; then
+        elif [[ "$RUNNER_OS" == "macOS" ]]; then
           brew install sqlite
-        elif [[ "${{runner.os}}" == "Windows" ]]; then
+        elif [[ "$RUNNER_OS" == "Windows" ]]; then
           choco install sqlite
-        fi
 
     - name: Install PROJ Dependency
       if: steps.cache-gdal.outputs.cache-hit != 'true'
@@ -78,8 +76,8 @@ runs:
         -DGDAL_USE_LZMA=ON
         -DGDAL_USE_ZSTD=ON
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
-        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || '' }}
-        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || '' }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
     - name: Build GDAL
       if: steps.cache-gdal.outputs.cache-hit != 'true'
