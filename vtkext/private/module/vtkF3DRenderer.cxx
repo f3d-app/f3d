@@ -5,6 +5,7 @@
 #include "F3DLog.h"
 #include "vtkF3DCachedLUTTexture.h"
 #include "vtkF3DCachedSpecularTexture.h"
+#include "vtkF3DDropZoneActor.h"
 #include "vtkF3DOpenGLGridMapper.h"
 #include "vtkF3DOverlayRenderPass.h"
 #include "vtkF3DRenderPass.h"
@@ -16,6 +17,7 @@
 #include <vtkCellData.h>
 #include <vtkColorTransferFunction.h>
 #include <vtkCornerAnnotation.h>
+#include <vtkCubeAxesActor.h>
 #include <vtkCullerCollection.h>
 #include <vtkF3DPolyDataMapper.h>
 #include <vtkFloatArray.h>
@@ -224,9 +226,19 @@ vtkF3DRenderer::vtkF3DRenderer()
   this->EnvMapPrefiltered->HalfPrecisionOff();
 #endif
 
+  // Init actors
+  vtkNew<vtkTextProperty> textProp;
+  textProp->SetFontSize(14);
+  textProp->SetOpacity(1.0);
+  textProp->SetBackgroundColor(0, 0, 0);
+  textProp->SetBackgroundOpacity(0.8);
+
+  this->DropZoneActor->GetTextProperty()->SetFontFamilyToCourier();
+
   this->SkyboxActor->SetProjection(vtkSkybox::Sphere);
   this->SkyboxActor->GammaCorrectOn();
 
+  this->DropZoneActor->VisibilityOff();
   this->SkyboxActor->VisibilityOff();
 
   // Make sure an active camera is available on the renderer
@@ -260,8 +272,10 @@ void vtkF3DRenderer::Initialize()
   this->ImporterTimeStamp = 0;
   this->ImporterUpdateTimeStamp = 0;
 
-  this->AddViewProp(this->ScalarBarActor);
+  this->AddActor2D(this->ScalarBarActor);
   this->AddActor(this->GridActor);
+  this->AddActor(this->CubeAxesActor);
+  this->AddActor(this->DropZoneActor);
   this->AddActor(this->SkyboxActor);
   this->AddActor(this->UIActor);
 
@@ -689,6 +703,87 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
 
   this->GridActor->SetVisibility(show);
   this->ResetCameraClippingRange();
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ShowAxesGrid(bool show)
+{
+  if (this->AxesGridVisible != show)
+  {
+    this->AxesGridVisible = show;
+    this->RenderPassesConfigured = false;
+    this->CubeAxesConfigured = false;
+    this->CheatSheetConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ConfigureCubeAxisUsingCurrentActors()
+{
+  bool show = this->AxesGridVisible;
+  if (show)
+  {
+    double* up = this->GetEnvironmentUp();
+    double* right = this->GetEnvironmentRight();
+    double front[3];
+    vtkMath::Cross(right, up, front);
+
+    vtkNew<vtkMatrix4x4> upMatrix;
+    const double m[16] = {
+      right[0], right[1], right[2], 0, //
+      up[0], up[1], up[2], 0,          //
+      front[0], front[1], front[2], 0, //
+      0, 0, 0, 1,                      //
+    };
+    upMatrix->DeepCopy(m);
+    vtkNew<vtkMatrix4x4> upMatrixInv;
+    upMatrixInv->DeepCopy(upMatrix);
+    upMatrixInv->Transpose();
+
+    double orientation[3];
+    vtkTransform::GetOrientation(orientation, upMatrixInv);
+    const vtkBoundingBox bbox = this->ComputeVisiblePropOrientedBounds(upMatrix);
+
+    if (!bbox.IsValid())
+    {
+      show = false;
+    }
+    else
+    {
+      this->CubeAxesActor->SetOrientation(orientation);
+      this->CubeAxesActor->SetVisibility(true);
+
+      double center[4] = { 0, 0, 0, 1 };
+      bbox.GetCenter(center);
+
+      this->CubeAxesActor->SetPosition(center);
+
+      double a, b, c, x, y, z;
+      bbox.GetBounds(a, b, c, x, y, z);
+      double bounds[6] = { a, b, c, x, y, z };
+      this->CubeAxesActor->SetBounds(bounds);
+
+      this->CubeAxesActor->XAxisLabelVisibilityOn();
+      this->CubeAxesActor->YAxisLabelVisibilityOn();
+      this->CubeAxesActor->ZAxisLabelVisibilityOn();
+      this->CubeAxesActor->SetCamera(GetActiveCamera());
+
+      this->CubeAxesActor->SetFlyModeToStaticEdges();
+      this->CubeAxesActor->SetXAxisMinorTickVisibility(false);
+      this->CubeAxesActor->SetYAxisMinorTickVisibility(false);
+      this->CubeAxesActor->SetZAxisMinorTickVisibility(false);
+
+      this->CubeAxesActor->GetLabelTextProperty(0)->SetColor(right);
+      this->CubeAxesActor->GetTitleTextProperty(0)->SetColor(right);
+      this->CubeAxesActor->GetLabelTextProperty(1)->SetColor(up);
+      this->CubeAxesActor->GetTitleTextProperty(1)->SetColor(up);
+      this->CubeAxesActor->GetLabelTextProperty(2)->SetColor(front);
+      this->CubeAxesActor->GetTitleTextProperty(2)->SetColor(front);
+
+      this->CubeAxesConfigured = true;
+    }
+  }
+  this->CubeAxesActor->SetVisibility(show);
 }
 
 //----------------------------------------------------------------------------
@@ -1238,8 +1333,11 @@ void vtkF3DRenderer::ConfigureTextActors()
   {
     textColor[0] = textColor[1] = textColor[2] = 0.2;
   }
+  this->DropZoneActor->GetTextProperty()->SetColor(textColor);
 
   // Font
+  this->DropZoneActor->GetTextProperty()->SetFontFamilyToCourier();
+
   std::string fontFileStr;
   if (this->FontFile.has_value())
   {
@@ -1250,6 +1348,8 @@ void vtkF3DRenderer::ConfigureTextActors()
   {
     if (vtksys::SystemTools::FileExists(fontFileStr, true))
     {
+      this->DropZoneActor->GetTextProperty()->SetFontFamily(VTK_FONT_FILE);
+      this->DropZoneActor->GetTextProperty()->SetFontFile(fontFileStr.c_str());
       this->UIActor->SetFontFile(fontFileStr);
     }
     else
@@ -1330,7 +1430,7 @@ void vtkF3DRenderer::SetFilenameInfo(const std::string& info)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetDropZoneInfo(const std::string& info)
 {
-  this->UIActor->SetDropText(info);
+  this->DropZoneActor->SetDropText(info);
 }
 
 //----------------------------------------------------------------------------
@@ -1534,7 +1634,7 @@ void vtkF3DRenderer::ShowDropZone(bool show)
   if (this->DropZoneVisible != show)
   {
     this->DropZoneVisible = show;
-    this->UIActor->SetDropZoneVisibility(show);
+    this->DropZoneActor->SetVisibility(show);
   }
 }
 
@@ -1689,6 +1789,11 @@ void vtkF3DRenderer::UpdateActors()
   if (!this->GridConfigured)
   {
     this->ConfigureGridUsingCurrentActors();
+  }
+
+  if (!this->CubeAxesConfigured)
+  {
+    this->ConfigureCubeAxisUsingCurrentActors();
   }
 }
 

@@ -57,11 +57,6 @@ private:
   void EndFrame(vtkOpenGLRenderWindow* renWin) override;
 
   /**
-   * Render the dropzone UI widget
-   */
-  void RenderDropZone() override;
-
-  /**
    * Render the filename UI widget
    */
   void RenderFileName() override;

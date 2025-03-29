@@ -99,12 +99,3 @@ The following formats are supported when parsing a string into a direction:
 - vector of three doubles, for example `1,2,3.4`
 
 When formatting a direction into a string, it is formatted in the `±XYZ` form if possible or as a vector of doubles otherwise.
-
-## Colormap
-
-The following formats are supported when parsing a string into a colormap:
-
-- `val, red, green, blue, ...`
-- `val, color, ...`
-
-When formatting a colormap into a string, it is formatted as `val, color, ...`.
