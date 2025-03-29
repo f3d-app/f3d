@@ -31,7 +31,7 @@ struct vtkF3DImguiConsole::Internals
     GetCommandsMatchCallback; // Callback to get the list of commands matching pattern
   std::vector<std::string> CommandHistory;
   std::pair<std::string, int> LastInput; // Last input before navigating history
-  int CommandHistoryIndex = -1;          // Current index in command history navigation
+  int CommandHistoryIndexInv = -1;       // Current inverted index in command history navigation
   /**
    * Clear completions from the logs
    */
@@ -119,39 +119,30 @@ struct vtkF3DImguiConsole::Internals
       }
       case ImGuiInputTextFlags_CallbackHistory:
       {
-        const int prevHistoryPos = this->CommandHistoryIndex;
+        const int prevHistoryPos = this->CommandHistoryIndexInv;
         if (data->EventKey == ImGuiKey_UpArrow)
         {
-          if (this->CommandHistoryIndex == -1)
+          if (this->CommandHistoryIndexInv < (static_cast<int>(this->CommandHistory.size() - 1)))
           {
-            /* Start history navigation */
-            this->CommandHistoryIndex = static_cast<int>(this->CommandHistory.size()) - 1;
-          }
-          else if (this->CommandHistoryIndex > 0)
-          {
-            /* Zero is the least recent command in history */
-            this->CommandHistoryIndex--;
+            this->CommandHistoryIndexInv++;
           }
         }
         else if (data->EventKey == ImGuiKey_DownArrow)
         {
-          if (this->CommandHistoryIndex != -1)
+          if (this->CommandHistoryIndexInv > -1)
           {
-            if (static_cast<size_t>(++this->CommandHistoryIndex) >= this->CommandHistory.size())
-            {
-              this->CommandHistoryIndex = -1;
-            }
+            this->CommandHistoryIndexInv--;
           }
         }
 
-        if (prevHistoryPos != this->CommandHistoryIndex)
+        if (prevHistoryPos != this->CommandHistoryIndexInv)
         {
           if (prevHistoryPos == -1)
           {
             /* Saving the last input before history navigation */
             this->LastInput = { this->CurrentInput.data(), data->CursorPos };
           }
-          if (this->CommandHistoryIndex == -1)
+          if (this->CommandHistoryIndexInv == -1)
           {
             /* Restoring the last input when navigated back to it */
             data->DeleteChars(0, data->BufTextLen);
@@ -162,7 +153,8 @@ struct vtkF3DImguiConsole::Internals
           {
             /* We should not be able to have negative index here */
             /* Retrieve the another command from history */
-            std::string historyStr = this->CommandHistory[this->CommandHistoryIndex];
+            std::string historyStr =
+              this->CommandHistory[this->CommandHistory.size() - this->CommandHistoryIndexInv - 1];
             data->DeleteChars(0, data->BufTextLen);
             data->InsertChars(0, historyStr.c_str());
             data->CursorPos = static_cast<int>(historyStr.size());
@@ -322,7 +314,7 @@ void vtkF3DImguiConsole::ShowConsole()
       Internals::LogType::Typed, std::string("> ") + this->Pimpl->CurrentInput.data()));
     this->InvokeEvent(vtkF3DImguiConsole::TriggerEvent, this->Pimpl->CurrentInput.data());
     this->Pimpl->CommandHistory.emplace_back(this->Pimpl->CurrentInput.data());
-    this->Pimpl->CommandHistoryIndex = -1; // Reset history navigation, looks natural
+    this->Pimpl->CommandHistoryIndexInv = -1; // Reset history navigation, looks natural
     this->Pimpl->CurrentInput = {};
   }
 
