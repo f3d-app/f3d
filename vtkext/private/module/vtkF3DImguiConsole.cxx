@@ -119,29 +119,28 @@ struct vtkF3DImguiConsole::Internals
       }
       case ImGuiInputTextFlags_CallbackHistory:
       {
+        /* CommandHistoryIndexInv is a reversed index for command history:
+        - `-1` represents the current user input (not yet stored in history).
+        - `0` corresponds to the most recent command (CommandHistory.size() - 1).
+        - `CommandHistory.size() - 1` maps to the oldest command (0 in CommandHistory). */
         const int prevHistoryPos = this->CommandHistoryIndexInv;
-        if (data->EventKey == ImGuiKey_UpArrow)
+        if (prevHistoryPos == -1)
         {
-          if (this->CommandHistoryIndexInv < (static_cast<int>(this->CommandHistory.size() - 1)))
-          {
-            this->CommandHistoryIndexInv++;
-          }
+          /* Saving the last input before history navigation */
+          this->LastInput = { this->CurrentInput.data(), data->CursorPos };
         }
-        else if (data->EventKey == ImGuiKey_DownArrow)
+        const int histSize = static_cast<int>(this->CommandHistory.size());
+        if ((data->EventKey == ImGuiKey_UpArrow) && (this->CommandHistoryIndexInv < (histSize - 1)))
         {
-          if (this->CommandHistoryIndexInv >= 0)
-          {
-            this->CommandHistoryIndexInv--;
-          }
+          this->CommandHistoryIndexInv++;
+        }
+        else if ((data->EventKey == ImGuiKey_DownArrow) && (this->CommandHistoryIndexInv >= 0))
+        {
+          this->CommandHistoryIndexInv--;
         }
 
         if (prevHistoryPos != this->CommandHistoryIndexInv)
         {
-          if (prevHistoryPos == -1)
-          {
-            /* Saving the last input before history navigation */
-            this->LastInput = { this->CurrentInput.data(), data->CursorPos };
-          }
           if (this->CommandHistoryIndexInv == -1)
           {
             /* Restoring the last input when navigated back to it */
@@ -154,7 +153,7 @@ struct vtkF3DImguiConsole::Internals
             /* We should not be able to have negative index here */
             /* Retrieve the command from history */
             std::string historyStr =
-              this->CommandHistory[this->CommandHistory.size() - this->CommandHistoryIndexInv - 1];
+              this->CommandHistory[histSize - this->CommandHistoryIndexInv - 1];
             data->DeleteChars(0, data->BufTextLen);
             data->InsertChars(0, historyStr.c_str());
             data->CursorPos = static_cast<int>(historyStr.size());
