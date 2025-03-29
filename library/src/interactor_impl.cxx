@@ -98,7 +98,9 @@ public:
     vtkOutputWindow::GetInstance()->AddObserver(
       vtkF3DConsoleOutputWindow::ShowEvent, commandCallback);
     vtkOutputWindow::GetInstance()->AddObserver(
-      vtkF3DConsoleOutputWindow::HideEvent, commandCallback);
+      vtkF3DConsoleOutputWindow::HideConsoleEvent, commandCallback);
+    vtkOutputWindow::GetInstance()->AddObserver(
+      vtkF3DConsoleOutputWindow::HideMinimalConsoleEvent, commandCallback);
 
     // Disable standard interactor behavior with timer event
     // in order to be able to interact while animating
@@ -260,9 +262,13 @@ public:
       self->Interactor.SetCommandBuffer(commandWithArgs);
     }
     else if (event == vtkF3DConsoleOutputWindow::ShowEvent ||
-      event == vtkF3DConsoleOutputWindow::HideEvent)
+      event == vtkF3DConsoleOutputWindow::HideConsoleEvent)
     {
       self->Options.ui.console = (event == vtkF3DConsoleOutputWindow::ShowEvent);
+    }
+    else if (event == vtkF3DConsoleOutputWindow::HideMinimalConsoleEvent)
+    {
+      self->Options.ui.minimal_console = false;
     }
 
     self->RenderRequested = true;
@@ -274,6 +280,10 @@ public:
     internals* self = static_cast<internals*>(clientData);
     vtkRenderWindowInteractor* rwi = self->Style->GetInteractor();
     std::string interaction = rwi->GetKeySym();
+    if (interaction == "semicolon" && rwi->GetShiftKey() == 1)
+    {
+      interaction = "colon";
+    }
     if (!interaction.empty())
     {
       // Make sure key symbols starts with an upper char (e.g. "space" -> "Space")
@@ -442,7 +452,7 @@ public:
     {
       mod = mod_t::CTRL;
     }
-    else if (shift)
+    else if (shift && interaction != "Colon")
     {
       mod = mod_t::SHIFT;
     }
@@ -619,7 +629,7 @@ interactor_impl::~interactor_impl()
 {
   vtkOutputWindow::GetInstance()->RemoveObservers(vtkF3DConsoleOutputWindow::TriggerEvent);
   vtkOutputWindow::GetInstance()->RemoveObservers(vtkF3DConsoleOutputWindow::ShowEvent);
-  vtkOutputWindow::GetInstance()->RemoveObservers(vtkF3DConsoleOutputWindow::HideEvent);
+  vtkOutputWindow::GetInstance()->RemoveObservers(vtkF3DConsoleOutputWindow::HideConsoleEvent);
 }
 
 //----------------------------------------------------------------------------
@@ -1087,6 +1097,7 @@ interactor& interactor_impl::initBindings()
 #if F3D_MODULE_UI
   this->addBinding({mod_t::NONE, "H"}, "toggle ui.cheatsheet", "Others", std::bind(docStr, "Toggle cheatsheet display"));
   this->addBinding({mod_t::NONE, "Escape"}, "toggle ui.console", "Others", std::bind(docStr, "Toggle console display"));
+  this->addBinding({mod_t::NONE, "Colon"}, "toggle ui.minimal_console", "Others", std::bind(docStr, "Toggle minimal console display"));
 #endif
   this->addBinding({mod_t::CTRL, "Q"}, "stop_interactor", "Others", std::bind(docStr, "Stop the interactor"));
   this->addBinding({mod_t::NONE, "Return"}, "reset_camera", "Others", std::bind(docStr, "Reset camera to initial parameters"));
@@ -1216,7 +1227,6 @@ interactor& interactor_impl::toggleAnimation()
   this->Internals->AnimationManager->ToggleAnimation();
   return *this;
 }
-
 //----------------------------------------------------------------------------
 interactor& interactor_impl::startAnimation()
 {

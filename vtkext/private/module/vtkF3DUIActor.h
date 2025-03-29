@@ -79,6 +79,12 @@ public:
   void SetConsoleVisibility(bool show);
 
   /**
+   * Set the minimal console visibility
+   * False by default
+   */
+  void SetMinimalConsoleVisibility(bool show);
+
+  /**
    * Set the console badge enabled status
    * False by default
    */
@@ -186,6 +192,13 @@ protected:
   }
 
   /**
+   * Render the minimal console widget
+   */
+  virtual void RenderMinimalConsole()
+  {
+  }
+
+  /**
    * Render the console badge
    */
   virtual void RenderConsoleBadge()
@@ -205,6 +218,7 @@ protected:
   std::vector<CheatSheetGroup> CheatSheet;
 
   bool ConsoleVisible = false;
+  bool MinimalConsoleVisible = false;
   bool ConsoleBadgeEnabled = false;
 
   bool FpsCounterVisible = false;

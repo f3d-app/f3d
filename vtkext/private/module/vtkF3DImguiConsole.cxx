@@ -78,7 +78,7 @@ void vtkF3DImguiConsole::ShowConsole()
   // So let's handle the console visibility here
   if (ImGui::IsKeyPressed(ImGuiKey_Escape, false) && this->Pimpl->CurrentInput[0] == '\0')
   {
-    this->InvokeEvent(vtkF3DImguiConsole::HideEvent);
+    this->InvokeEvent(vtkF3DImguiConsole::HideConsoleEvent);
   }
 
   ImGui::Begin("Console", nullptr, winFlags);
@@ -160,6 +160,60 @@ void vtkF3DImguiConsole::ShowConsole()
       Internals::LogType::Typed, std::string("> ") + this->Pimpl->CurrentInput.data()));
     this->InvokeEvent(vtkF3DImguiConsole::TriggerEvent, this->Pimpl->CurrentInput.data());
     this->Pimpl->CurrentInput = {};
+  }
+
+  ImGui::End();
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DImguiConsole::ShowMinimalConsole()
+{
+  ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+  constexpr float margin = 30.f;
+
+  this->Pimpl->NewError = false;
+  this->Pimpl->NewWarning = false;
+
+  ImGui::SetNextWindowPos(ImVec2(margin, margin));
+  ImGui::SetNextWindowSize(ImVec2(viewport->WorkSize.x - 2.f * margin, 0));
+  ImGui::SetNextWindowBgAlpha(0.9f);
+
+  ImGuiWindowFlags winFlags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
+    ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
+
+  // Since imgui has focus, it won't propagate the "Escape" key event to VTK
+  // So let's handle the console visibility here
+  if (ImGui::IsKeyPressed(ImGuiKey_Escape, false) && this->Pimpl->CurrentInput[0] == '\0')
+  {
+    this->InvokeEvent(vtkF3DImguiConsole::HideMinimalConsoleEvent);
+  }
+
+  ImGui::Begin("Minimal Console", nullptr, winFlags);
+
+  // input
+  ImGuiInputTextFlags inputFlags =
+    ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_EscapeClearsAll;
+
+  ImGui::Text("> ");
+  ImGui::SameLine();
+
+  ImGui::PushItemWidth(-1);
+  bool runCommand = ImGui::InputText("##MinimalConsoleInput", this->Pimpl->CurrentInput.data(),
+    sizeof(this->Pimpl->CurrentInput), inputFlags, nullptr, this->Pimpl.get());
+  ImGui::PopItemWidth();
+
+  ImGui::SetItemDefaultFocus();
+  ImGui::SetKeyboardFocusHere(-1);
+
+  // do not run the command if nothing is in the input text
+  if (runCommand && this->Pimpl->CurrentInput[0] != 0)
+  {
+    this->Pimpl->Logs.emplace_back(std::make_pair(
+      Internals::LogType::Typed, std::string("> ") + this->Pimpl->CurrentInput.data()));
+    this->InvokeEvent(vtkF3DImguiConsole::TriggerEvent, this->Pimpl->CurrentInput.data());
+    this->Pimpl->CurrentInput = {};
+    this->InvokeEvent(vtkF3DImguiConsole::HideMinimalConsoleEvent);
   }
 
   ImGui::End();
