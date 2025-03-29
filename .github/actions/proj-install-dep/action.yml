@@ -17,17 +17,6 @@ runs:
         path: dependencies/proj_install
         key: proj-9.4.0-${{runner.os}}-${{inputs.cpu}}-1
 
-    - name: Install SQLite3 dependencies
-      if: steps.cache-proj.outputs.cache-hit != 'true'
-      shell: bash
-      run: |
-        if [[ "$RUNNER_OS" == "Linux" ]]; then
-          sudo apt-get update
-          sudo apt-get install -y sqlite3 libsqlite3-dev
-        elif [[ "$RUNNER_OS" == "macOS" ]]; then
-          brew install sqlite
-        elif [[ "$RUNNER_OS" == "Windows" ]]; then
-          choco install sqlite
     # Dependents: gdal
     - name: Checkout PROJ
       if: steps.cache-proj.outputs.cache-hit != 'true'
