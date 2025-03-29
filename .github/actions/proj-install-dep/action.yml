@@ -1,0 +1,65 @@
+name: 'Install zlib Dependency'
+description: 'Install zlib Dependency using cache when possible'
+inputs:
+  cpu:
+    description: 'CPU architecture to build for'
+    required: false
+    default: 'x86_64'
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Cache zlib
+      id: cache-zlib
+      uses: actions/cache/restore@v4
+      with:
+        path: dependencies/zlib_install
+        key: zlib-v1.3.1-${{runner.os}}-${{inputs.cpu}}-4
+
+    # Dependents: blosc openvdb pdal vtk
+    - name: Checkout zlib
+      if: steps.cache-zlib.outputs.cache-hit != 'true'
+      uses: actions/checkout@v4
+      with:
+        repository: madler/zlib
+        path: './dependencies/zlib'
+        ref: v1.3.1
+
+    - name: Setup zlib
+      if: steps.cache-zlib.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir zlib_build
+        mkdir zlib_install
+
+    - name: Configure zlib
+      if: steps.cache-zlib.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/zlib_build
+      shell: bash
+      run: >
+        cmake ../zlib
+        -DBUILD_SHARED_LIBS=ON
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX=../zlib_install
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+
+    - name: Build zlib
+      if: steps.cache-zlib.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/zlib_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/zlib_install
+      shell: bash
+      run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-zlib.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-zlib.outputs.cache-primary-key }}
+        path: dependencies/zlib_install
