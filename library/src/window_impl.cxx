@@ -409,6 +409,8 @@ void window_impl::UpdateDynamicOptions()
 
   vtkF3DRenderer::AntiAliasingMode aaMode = vtkF3DRenderer::AntiAliasingMode::NONE;
 
+  // F3D_DEPRECATED
+  // Remove this in the next major release
   F3D_SILENT_WARNING_PUSH()
   F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
   if (opt.render.effect.anti_aliasing)
