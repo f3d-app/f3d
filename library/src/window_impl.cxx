@@ -386,7 +386,7 @@ void window_impl::UpdateDynamicOptions()
   const int pointSpritesSize = opt.model.point_sprites.size;
   const vtkF3DRenderer::SplatType splatType = opt.model.point_sprites.type == "gaussian"
     ? vtkF3DRenderer::SplatType::GAUSSIAN
-    : vtkF3DRenderer::SplatType::SPHERE;
+    : vtkF3DRenderer::SplatType::SPHERE; 
   renderer->SetPointSpritesProperties(splatType, pointSpritesSize);
 
   renderer->SetLineWidth(opt.render.line_width);

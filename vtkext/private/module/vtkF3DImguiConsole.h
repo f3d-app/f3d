@@ -36,21 +36,17 @@ public:
   /**
    * Show console window
    */
-  void ShowConsole();
+  void ShowConsole(bool);
 
   /**
    * Show console badge
    */
   void ShowBadge();
+
   /**
    * Clear console
    */
   void Clear();
-
-  /**
-   * Show minimal console window
-   */
-  void ShowMinimalConsole();
 
 protected:
   vtkF3DImguiConsole();

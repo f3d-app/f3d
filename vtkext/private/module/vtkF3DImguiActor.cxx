@@ -502,14 +502,14 @@ void vtkF3DImguiActor::RenderFpsCounter()
 void vtkF3DImguiActor::RenderConsole()
 {
   vtkF3DImguiConsole* console = vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
-  console->ShowConsole();
+  console->ShowConsole(false);
 }
 
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderMinimalConsole()
 {
   vtkF3DImguiConsole* console = vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
-  console->ShowMinimalConsole();
+  console->ShowConsole(true);
 }
 
 //----------------------------------------------------------------------------
