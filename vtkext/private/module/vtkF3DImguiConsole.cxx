@@ -221,6 +221,8 @@ void vtkF3DImguiConsole::ShowConsole()
   // So let's handle the console visibility here
   if (ImGui::IsKeyPressed(ImGuiKey_Escape, false) && this->Pimpl->CurrentInput[0] == '\0')
   {
+    this->Pimpl->CommandHistoryIndexInv = -1; // Reset history navigation on hiding
+    this->Pimpl->ClearCompletions();          // Clear completion on hiding
     this->InvokeEvent(vtkF3DImguiConsole::HideEvent);
   }
 
