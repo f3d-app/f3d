@@ -13,7 +13,10 @@ inputs:
     required: false
     default: 'x86_64'
   openvdb_version:
-    description: 'Version of openvdb to build against'
+    description: 'Version of OpenVDB to build against'
+    required: false
+  pdal_version:
+    description: 'Version of PDAL to build against'
     required: false
 
 runs:
@@ -30,7 +33,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/vtk_install
-        key: vtk-${{ inputs.vtk_version }}-openvdb-${{inputs.openvdb_version}}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.cpu}}-8
+        key: vtk-${{ inputs.vtk_version }}-openvdb-${{inputs.openvdb_version}}-pdal-${{inputs.pdal_version}}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.cpu}}-9
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -76,6 +79,7 @@ runs:
         -DCMAKE_INSTALL_PREFIX:PATH=../vtk_install
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
         -DOpenVDB_CMAKE_PATH=${{ inputs.openvdb_version != '' && '$(pwd)/../install/lib/cmake/OpenVDB/' || '' }}
+        -DPDAL_CMAKE_PATH=${{ inputs.pdal_version != '' && '$(pwd)/../install/lib/cmake/PDAL/' || '' }}
         -DVTKOSPRAY_ENABLE_DENOISER=ON
         -DVTK_BUILD_TESTING=OFF
         -DVTK_DEBUG_LEAKS=ON
@@ -94,6 +98,7 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_IOImage=YES
         -DVTK_MODULE_ENABLE_VTK_IOImport=YES
         -DVTK_MODULE_ENABLE_VTK_IOOpenVDB=${{ inputs.openvdb_version != '' && 'YES' || 'DEFAULT' }}
+        -DVTK_MODULE_ENABLE_VTK_IOPDAL=${{ inputs.pdal_version != '' && 'YES' || 'DEFAULT' }}
         -DVTK_MODULE_ENABLE_VTK_IOPLY=YES
         -DVTK_MODULE_ENABLE_VTK_IOParallel=YES
         -DVTK_MODULE_ENABLE_VTK_IOXML=YES
