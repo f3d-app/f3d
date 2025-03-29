@@ -1,0 +1,21 @@
+# StreamVersion 1.2
+EnterEvent 293 98 0 0 0 0 0
+RenderEvent 199 142 0 0 0 0 0
+
+KeyPressEvent -37 88 0 27 1 Escape 0
+CharEvent -37 88 0 27 1 Escape 0
+KeyReleaseEvent -37 88 0 27 1 Escape 0
+
+KeyPressEvent -37 88 0 116 1 t 0
+CharEvent -37 88 0 116 1 t 0
+KeyReleaseEvent -37 88 0 116 1 t 0
+
+KeyPressEvent -37 88 0 111 1 o 0
+CharEvent -37 88 0 111 1 o 0
+KeyReleaseEvent -37 88 0 111 1 o 0
+
+KeyPressEvent -37 88 0 9 1 Tab 0
+CharEvent -37 88 0 9 1 Tab 0
+KeyReleaseEvent -37 88 0 9 1 Tab 0
+
+TimerEvent 351 169 0 0 0 0 0

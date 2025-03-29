@@ -612,6 +612,38 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
 
   this->initCommands();
   this->initBindings();
+#if F3D_MODULE_UI
+  vtkF3DImguiConsole* console = vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
+  assert(console != nullptr);
+  // Set the callback to get the list of commands
+  console->SetCommandsMatchCallback(
+    [this](const std::string& pattern)
+    {
+      // Build a list of candidates
+      std::vector<std::string> candidates;
+      // Copy all commands that start with the pattern
+      auto startWith = [&pattern](const std::string& s)
+      {
+        return s.rfind(pattern, 0) == 0; // To avoid dependency for C++20 starts_with
+      };
+      for (auto const& [action, callback] : this->Internals->Commands)
+      {
+        if (startWith(action))
+        {
+          candidates.push_back(action);
+        }
+        else
+        {
+          // List is sorted so we can break early
+          if (!candidates.empty())
+          {
+            break;
+          }
+        }
+      }
+      return candidates;
+    });
+#endif
 }
 
 //----------------------------------------------------------------------------
