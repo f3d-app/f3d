@@ -32,6 +32,7 @@ struct vtkF3DImguiConsole::Internals
   std::vector<std::string> CommandHistory;
   std::pair<std::string, int> LastInput; // Last input before navigating history
   int CommandHistoryIndexInv = -1;       // Current inverted index in command history navigation
+
   /**
    * Clear completions from the logs
    */
