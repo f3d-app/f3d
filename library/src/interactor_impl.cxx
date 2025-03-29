@@ -885,7 +885,7 @@ bool interactor_impl::triggerCommand(std::string_view command)
 
   // Console has priority over minimal console
   if (command == "toggle ui.minimal_console" && this->Internals->Options.ui.console)
-  { 
+  {
     return true;
   }
 
