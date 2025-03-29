@@ -152,7 +152,7 @@ struct vtkF3DImguiConsole::Internals
           else
           {
             /* We should not be able to have negative index here */
-            /* Retrieve the another command from history */
+            /* Retrieve the command from history */
             std::string historyStr =
               this->CommandHistory[this->CommandHistory.size() - this->CommandHistoryIndexInv - 1];
             data->DeleteChars(0, data->BufTextLen);
