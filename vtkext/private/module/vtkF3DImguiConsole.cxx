@@ -135,7 +135,7 @@ struct vtkF3DImguiConsole::Internals
         {
           this->CommandHistoryIndexInv++;
         }
-        else if ((data->EventKey == ImGuiKey_DownArrow) && (this->CommandHistoryIndexInv >= 0))
+        else if (data->EventKey == ImGuiKey_DownArrow && this->CommandHistoryIndexInv >= 0)
         {
           this->CommandHistoryIndexInv--;
         }
