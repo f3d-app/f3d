@@ -18,12 +18,6 @@ runs:
         key: gdal-v3.8.0-${{runner.os}}-${{inputs.cpu}}-0
 
     # Dependents: pdal, proj
-    - name: Install PROJ Dependency
-      if: steps.cache-gdal.outputs.cache-hit != 'true'
-      uses: ./source/.github/actions/proj-install-dep
-      with:
-        cpu: ${{ inputs.cpu }}
-
     - name: Checkout GDAL
       if: steps.cache-gdal.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
