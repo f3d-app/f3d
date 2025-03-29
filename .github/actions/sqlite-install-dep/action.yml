@@ -1,5 +1,5 @@
-name: 'Install zlib Dependency'
-description: 'Install zlib Dependency using cache when possible'
+name: 'Install SQLite Dependency'
+description: 'Install SQLite Dependency using cache when possible'
 inputs:
   cpu:
     description: 'CPU architecture to build for'
@@ -10,56 +10,67 @@ runs:
   using: "composite"
   steps:
 
-    - name: Cache zlib
-      id: cache-zlib
+    - name: Cache SQLite
+      id: cache-sqlite
       uses: actions/cache/restore@v4
       with:
-        path: dependencies/zlib_install
-        key: zlib-v1.3.1-${{runner.os}}-${{inputs.cpu}}-4
+        path: dependencies/sqlite_install
+        key: sqlite-v3.39.2-${{runner.os}}-${{inputs.cpu}}-1
 
-    # Dependents: blosc openvdb pdal vtk
-    - name: Checkout zlib
-      if: steps.cache-zlib.outputs.cache-hit != 'true'
+    - name: Checkout SQLite
+      if: steps.cache-sqlite.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
       with:
-        repository: madler/zlib
-        path: './dependencies/zlib'
-        ref: v1.3.1
+        repository: sqlite/sqlite
+        path: './dependencies/sqlite'
+        ref: version-3.39.2
 
-    - name: Setup zlib
-      if: steps.cache-zlib.outputs.cache-hit != 'true'
+    - name: Setup SQLite
+      if: steps.cache-sqlite.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies
       shell: bash
       run: |
-        mkdir zlib_build
-        mkdir zlib_install
+        mkdir sqlite_install
 
-    - name: Configure zlib
-      if: steps.cache-zlib.outputs.cache-hit != 'true'
-      working-directory: ${{github.workspace}}/dependencies/zlib_build
+    - name: Configure SQLite on Unix
+      if: steps.cache-sqlite.outputs.cache-hit != 'true' && runner.os != 'Windows'
+      working-directory: ${{github.workspace}}/dependencies/sqlite
       shell: bash
-      run: >
-        cmake ../zlib
-        -DBUILD_SHARED_LIBS=ON
-        -DCMAKE_BUILD_TYPE=Release
-        -DCMAKE_INSTALL_PREFIX=../zlib_install
-        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
-        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+      run: |
+        ./configure --prefix=${{github.workspace}}/dependencies/sqlite_install
 
-    - name: Build zlib
-      if: steps.cache-zlib.outputs.cache-hit != 'true'
-      working-directory: ${{github.workspace}}/dependencies/zlib_build
+    - name: Build and Install SQLite on Unix
+      if: steps.cache-sqlite.outputs.cache-hit != 'true' && runner.os != 'Windows'
+      working-directory: ${{github.workspace}}/dependencies/sqlite
       shell: bash
-      run: cmake --build . --parallel 2 --target install --config Release
+      run: |
+        make
+        make install
+
+    - name: Configure SQLite on Windows
+      if: steps.cache-sqlite.outputs.cache-hit != 'true' && runner.os == 'Windows'
+      working-directory: ${{github.workspace}}/dependencies/sqlite
+      shell: bash
+      run: |
+        mkdir -p sqlite_install
+        cd sqlite_install
+        cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_INSTALL_PREFIX=../sqlite_install ..
+
+    - name: Build and Install SQLite on Windows
+      if: steps.cache-sqlite.outputs.cache-hit != 'true' && runner.os == 'Windows'
+      working-directory: ${{github.workspace}}/dependencies/sqlite/sqlite_install
+      shell: bash
+      run: |
+        cmake --build . --config Release --target INSTALL
 
     - name: Copy to install
-      working-directory: ${{github.workspace}}/dependencies/zlib_install
+      working-directory: ${{github.workspace}}/dependencies/sqlite_install
       shell: bash
       run: cp -r ./* ../install/
 
     - name: Save cache
-      if: steps.cache-zlib.outputs.cache-hit != 'true'
+      if: steps.cache-sqlite.outputs.cache-hit != 'true'
       uses: actions/cache/save@v4
       with:
-        key: ${{ steps.cache-zlib.outputs.cache-primary-key }}
-        path: dependencies/zlib_install
+        key: ${{ steps.cache-sqlite.outputs.cache-primary-key }}
+        path: dependencies/sqlite_install

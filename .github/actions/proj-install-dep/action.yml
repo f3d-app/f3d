@@ -26,6 +26,13 @@ runs:
         path: './dependencies/proj'
         ref: 9.4.0
 
+    # Install SQLite first (only if PROJ is not cached)
+    - name: Install SQLite Dependency
+      if: steps.cache-proj.outputs.cache-hit != 'true'
+      uses: ./source/.github/actions/sqlite-install-dep
+      with:
+        cpu: ${{ inputs.cpu }}
+
     - name: Setup PROJ
       if: steps.cache-proj.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies
