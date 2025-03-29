@@ -1,6 +1,5 @@
 name: 'Install GDAL Dependency'
 description: 'Install GDAL Dependency using cache when possible'
-
 inputs:
   cpu:
     description: 'CPU architecture to build for'
@@ -16,9 +15,9 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/gdal_install
-        key: gdal-v3.8.0-noproj-${{runner.os}}-${{inputs.cpu}}-0
+        key: gdal-v3.8.0-${{runner.os}}-${{inputs.cpu}}-0
 
-    # Dependents: pdal
+    # Dependents: pdal, proj
     - name: Checkout GDAL
       if: steps.cache-gdal.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
@@ -35,7 +34,7 @@ runs:
         mkdir gdal_build
         mkdir gdal_install
 
-    - name: Configure GDAL (without PROJ)
+    - name: Configure GDAL
       if: steps.cache-gdal.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/gdal_build
       shell: bash
@@ -45,7 +44,7 @@ runs:
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX=../gdal_install
         -DGDAL_USE_EXTERNAL_LIBS=ON
-        -DGDAL_USE_PROJ=OFF
+        -DGDAL_ENABLE_DRIVER_GPKG=ON
         -DGDAL_ENABLE_DRIVER_TIFF=ON
         -DGDAL_ENABLE_DRIVER_NETCDF=OFF
         -DGDAL_ENABLE_DRIVER_POSTGIS=OFF
