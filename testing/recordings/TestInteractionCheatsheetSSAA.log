@@ -11,5 +11,3 @@ KeyReleaseEvent 738 539 0 104 1 a
 KeyPressEvent 738 539 0 104 1 a
 CharEvent 738 539 0 104 1 a
 KeyReleaseEvent 738 539 0 104 1 a
-MouseWheelBackwardEvent 91 350 0 0 0 h 0
-MouseWheelBackwardEvent 91 350 0 0 1 h 0
