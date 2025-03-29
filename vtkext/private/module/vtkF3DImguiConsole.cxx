@@ -131,7 +131,7 @@ struct vtkF3DImguiConsole::Internals
           this->LastInput = { this->CurrentInput.data(), data->CursorPos };
         }
         const int histSize = static_cast<int>(this->CommandHistory.size());
-        if ((data->EventKey == ImGuiKey_UpArrow) && (this->CommandHistoryIndexInv < (histSize - 1)))
+        if (data->EventKey == ImGuiKey_UpArrow && this->CommandHistoryIndexInv < (histSize - 1))
         {
           this->CommandHistoryIndexInv++;
         }
