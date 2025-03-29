@@ -2,6 +2,7 @@
   {
     "options": {
       "anti-aliasing": true,
+      "anti-aliasing-mode": "ssaa",
       "camera-direction": "-1,-0.5,-1",
       "hdri-ambient": true,
       "max-size": 100,

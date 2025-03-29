@@ -131,7 +131,7 @@ void vtkF3DOverlayRenderPass::CompositeOverlay(const vtkRenderState* s)
     this->ColorTexture->SetMagnificationFilter(vtkTextureObject::Linear);
     this->ColorTexture->SetWrapS(vtkTextureObject::ClampToEdge);
     this->ColorTexture->SetWrapT(vtkTextureObject::ClampToEdge);
-    this->ColorTexture->Allocate2D(size[0], size[1], 4, VTK_FLOAT);
+    this->ColorTexture->Allocate2D(size[0], size[1], 4, VTK_UNSIGNED_CHAR);
   }
   this->ColorTexture->Resize(size[0], size[1]);
 
@@ -151,7 +151,7 @@ void vtkF3DOverlayRenderPass::CompositeOverlay(const vtkRenderState* s)
     std::string FSSource = vtkOpenGLRenderUtilities::GetFullScreenQuadFragmentShaderTemplate();
 
     vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Decl",
-      "uniform sampler2D buffer;\n"
+      "uniform sampler2D texScene;\n"
       "uniform sampler2D texOverlay;\n"
       "vec3 toLinear(vec3 color) { return pow(color.rgb, vec3(2.2)); }\n"
       "vec3 toSRGB(vec3 color) { return pow(color.rgb, vec3(1.0 / 2.2)); }\n"
@@ -166,35 +166,34 @@ void vtkF3DOverlayRenderPass::CompositeOverlay(const vtkRenderState* s)
       "  ovlSample.rgb *= ovlSample.a;\n"
       "//VTK::FSQ::Impl");
 
-    // the final render is not alpha premultiplied, so it should not be divided
-    // a sample of the rgb value is taken to be added in as a background after blending
+    // the scene texture is not alpha premultiplied, so it should not be divided
     vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Impl",
-      "  vec4 result = texture(buffer, texCoord);\n"
-      "  vec3 bufSample = result.rgb;\n"
-      "  if (result.a > 0.0)\n"
-      "    result.rgb = toLinear(result.rgb);\n"
-      "  result.rgb *= result.a;\n"
+      "  vec4 sceneSample = texture(texScene, texCoord);\n"
+      "  vec3 initialSceneColor = sceneSample.rgb;\n"
+      "  sceneSample.rgb = toLinear(sceneSample.rgb);\n"
+      "  sceneSample.rgb *= sceneSample.a;\n"
       "//VTK::FSQ::Impl");
 
     // blend overlay frame with current frame
     vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Impl",
-      "  result.rgb = (1.0 - ovlSample.a) * result.rgb + ovlSample.rgb;\n"
-      "  result.a = (1.0 - ovlSample.a) * result.a + ovlSample.a;\n"
+      "  sceneSample.rgb = (1.0 - ovlSample.a) * sceneSample.rgb + ovlSample.rgb;\n"
+      "  sceneSample.a = (1.0 - ovlSample.a) * sceneSample.a + ovlSample.a;\n"
       "//VTK::FSQ::Impl");
 
     // divide by alpha and convert back to sRGB
     // we shouldn't premultiply by alpha again here because the OpenGL blending
     // function is expecting the source fragment not premultiplied
     vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Impl",
-      "  if (result.a > 0.0)\n"
-      "    result.rgb = result.rgb / result.a;\n"
-      "  result.rgb = toSRGB(result.rgb);\n"
+      "  if (sceneSample.a > 0.0)\n"
+      "    sceneSample.rgb = sceneSample.rgb / sceneSample.a;\n"
+      "  sceneSample.rgb = toSRGB(sceneSample.rgb);\n"
       "//VTK::FSQ::Impl");
 
     // mix the sRGB result with the original render to add the background back in
     vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Impl",
-      "  result.rgb = (1.0 - result.a) * bufSample + result.a * result.rgb;\n"
-      "  gl_FragData[0] = result;\n"
+      "  sceneSample.rgb = (1.0 - sceneSample.a) * initialSceneColor + sceneSample.a * "
+      "sceneSample.rgb;\n"
+      "  gl_FragData[0] = sceneSample;\n"
       "//VTK::FSQ::Impl");
 
     this->QuadHelper =
@@ -211,11 +210,10 @@ void vtkF3DOverlayRenderPass::CompositeOverlay(const vtkRenderState* s)
 
   this->QuadHelper->Program->SetUniformi(
     "texOverlay", this->OverlayPass->GetColorTexture()->GetTextureUnit());
-  this->QuadHelper->Program->SetUniformi("buffer", this->ColorTexture->GetTextureUnit());
+  this->QuadHelper->Program->SetUniformi("texScene", this->ColorTexture->GetTextureUnit());
 
   ostate->vtkglDisable(GL_BLEND);
   ostate->vtkglDisable(GL_DEPTH_TEST);
-  ostate->vtkglClear(GL_DEPTH_BUFFER_BIT);
   ostate->vtkglViewport(pos[0], pos[1], size[0], size[1]);
   ostate->vtkglScissor(pos[0], pos[1], size[0], size[1]);
 

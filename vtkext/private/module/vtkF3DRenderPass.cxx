@@ -11,7 +11,6 @@
 #include <vtkLightsPass.h>
 #include <vtkObjectFactory.h>
 #include <vtkOpaquePass.h>
-#include <vtkOpenGLFXAAPass.h>
 #include <vtkOpenGLRenderUtilities.h>
 #include <vtkOpenGLRenderWindow.h>
 #include <vtkOpenGLShaderCache.h>
@@ -289,14 +288,10 @@ void vtkF3DRenderPass::Blend(const vtkRenderState* s)
 {
   vtkRenderer* r = s->GetRenderer();
   vtkOpenGLRenderWindow* renWin = static_cast<vtkOpenGLRenderWindow*>(r->GetRenderWindow());
+  vtkOpenGLState* ostate = renWin->GetState();
 
-  r->Clear();
-
-  // Enable blending with default VTK blending function
-  // It is required since external window do not set it up
-  renWin->GetState()->vtkglEnable(GL_BLEND);
-  renWin->GetState()->vtkglBlendFuncSeparate(
-    GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+  vtkOpenGLState::ScopedglEnableDisable bsaver(ostate, GL_BLEND);
+  vtkOpenGLState::ScopedglEnableDisable dsaver(ostate, GL_DEPTH_TEST);
 
   if (this->BlendQuadHelper && this->BlendQuadHelper->ShaderChangeValue < this->GetMTime())
   {
@@ -359,9 +354,7 @@ void vtkF3DRenderPass::Blend(const vtkRenderState* s)
     ssImpl << "  result.rgb = (1.0 - onTopSample.a) * result.rgb + onTopSample.rgb;\n";
     ssImpl << "  result.a = (1.0 - onTopSample.a) * result.a + onTopSample.a;\n";
 
-    // divide by alpha and convert back to sRGB
-    // we shouldn't premultiply by alpha again here because the OpenGL blending
-    // function is expecting the source fragment not premultiplied
+    // divide by alpha and convert back to sRGB, premultiply again
     ssImpl << "  if (result.a > 0.0)\n";
     ssImpl << "    result.rgb = result.rgb / result.a;\n";
     ssImpl << "  result.rgb = toSRGB(result.rgb);\n";
@@ -398,6 +391,9 @@ void vtkF3DRenderPass::Blend(const vtkRenderState* s)
     "texMain", this->MainPass->GetColorTexture()->GetTextureUnit());
   this->BlendQuadHelper->Program->SetUniformi(
     "texMainOnTop", this->MainOnTopPass->GetColorTexture()->GetTextureUnit());
+
+  ostate->vtkglDisable(GL_BLEND);
+  ostate->vtkglDisable(GL_DEPTH_TEST);
 
   this->BlendQuadHelper->Render();
 

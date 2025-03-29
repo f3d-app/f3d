@@ -5,7 +5,7 @@
  * This renderers all the generic actors added by F3D which includes
  * UI, axis, grid, edges, timer, metadata and cheatsheet.
  * It also handles the different rendering passes, including
- * raytracing, ssao, fxaa, tonemapping.
+ * raytracing, ssao, anti-aliasing, tonemapping.
  */
 
 #ifndef vtkF3DRenderer_h
@@ -36,6 +36,16 @@ class vtkF3DRenderer : public vtkOpenGLRenderer
 public:
   static vtkF3DRenderer* New();
   vtkTypeMacro(vtkF3DRenderer, vtkOpenGLRenderer);
+
+  /**
+   * Enum listing possible anti aliasing modes.
+   */
+  enum class AntiAliasingMode : unsigned char
+  {
+    NONE,
+    FXAA,
+    SSAA
+  };
 
   ///@{
   /**
@@ -83,7 +93,7 @@ public:
   void SetUseRaytracingDenoiser(bool use);
   void SetUseDepthPeelingPass(bool use);
   void SetUseSSAOPass(bool use);
-  void SetUseFXAAPass(bool use);
+  void SetAntiAliasingMode(AntiAliasingMode mode);
   void SetUseToneMappingPass(bool use);
   void SetUseBlurBackground(bool use);
   void SetBlurCircleOfConfusionRadius(double radius);
@@ -521,7 +531,7 @@ private:
   bool UseRaytracing = false;
   bool UseRaytracingDenoiser = false;
   bool UseDepthPeelingPass = false;
-  bool UseFXAAPass = false;
+  AntiAliasingMode AntiAliasingModeEnabled = AntiAliasingMode::NONE;
   bool UseSSAOPass = false;
   bool UseToneMappingPass = false;
   bool UseBlurBackground = false;

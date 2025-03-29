@@ -7,7 +7,9 @@
 #include "vtkF3DCachedSpecularTexture.h"
 #include "vtkF3DOpenGLGridMapper.h"
 #include "vtkF3DOverlayRenderPass.h"
+#include "vtkF3DPolyDataMapper.h"
 #include "vtkF3DRenderPass.h"
+#include "vtkF3DSolidBackgroundPass.h"
 #include "vtkF3DUserRenderPass.h"
 
 #include <vtkAxesActor.h>
@@ -17,7 +19,6 @@
 #include <vtkColorTransferFunction.h>
 #include <vtkCornerAnnotation.h>
 #include <vtkCullerCollection.h>
-#include <vtkF3DPolyDataMapper.h>
 #include <vtkFloatArray.h>
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
@@ -41,6 +42,7 @@
 #include <vtkPolyData.h>
 #include <vtkProperty.h>
 #include <vtkRenderWindow.h>
+#include <vtkSSAAPass.h>
 #include <vtkScalarBarActor.h>
 #include <vtkSkybox.h>
 #include <vtkTable.h>
@@ -386,6 +388,16 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   // Image post processing passes
   vtkSmartPointer<vtkRenderPass> renderingPass = newPass;
 
+  if (this->AntiAliasingModeEnabled == vtkF3DRenderer::AntiAliasingMode::SSAA)
+  {
+    vtkNew<vtkSSAAPass> ssaaP;
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250329)
+    ssaaP->SetColorFormat(vtkTextureObject::Float16);
+#endif
+    ssaaP->SetDelegatePass(renderingPass);
+    renderingPass = ssaaP;
+  }
+
   if (this->UseToneMappingPass)
   {
     vtkNew<vtkToneMappingPass> toneP;
@@ -400,7 +412,16 @@ void vtkF3DRenderer::ConfigureRenderPasses()
     renderingPass = toneP;
   }
 
-  if (this->UseFXAAPass)
+  if (!this->HDRISkyboxVisible)
+  {
+    // if the background is transparent, we need to blend the result to the RGB background
+    // before it goes through the next passes
+    vtkNew<vtkF3DSolidBackgroundPass> bgPass;
+    bgPass->SetDelegatePass(renderingPass);
+    renderingPass = bgPass;
+  }
+
+  if (this->AntiAliasingModeEnabled == vtkF3DRenderer::AntiAliasingMode::FXAA)
   {
     vtkNew<vtkOpenGLFXAAPass> fxaaP;
     fxaaP->SetDelegatePass(renderingPass);
@@ -417,8 +438,6 @@ void vtkF3DRenderer::ConfigureRenderPasses()
       vtkNew<vtkF3DUserRenderPass> userP;
       userP->SetUserShader(this->FinalShader.value().c_str());
       userP->SetDelegatePass(renderingPass);
-
-      this->SetPass(userP);
       renderingPass = userP;
     }
     else
@@ -430,16 +449,15 @@ void vtkF3DRenderer::ConfigureRenderPasses()
 
   vtkNew<vtkF3DOverlayRenderPass> overlayP;
   overlayP->SetDelegatePass(renderingPass);
-  this->SetPass(overlayP);
-  renderingPass = overlayP;
 
-  this->SetPass(renderingPass);
+  this->SetPass(overlayP);
 
 #if F3D_MODULE_RAYTRACING
   vtkOSPRayRendererNode::SetRendererType("pathtracer", this);
   vtkOSPRayRendererNode::SetSamplesPerPixel(this->RaytracingSamples, this);
   vtkOSPRayRendererNode::SetEnableDenoiser(this->UseRaytracingDenoiser, this);
   vtkOSPRayRendererNode::SetDenoiserThreshold(0, this);
+  vtkOSPRayRendererNode::SetCompositeOnGL(0, this);
 
   vtkOSPRayRendererNode::BackgroundMode mode = vtkOSPRayRendererNode::Backplate;
   if (this->GetUseImageBasedLighting())
@@ -1397,11 +1415,11 @@ void vtkF3DRenderer::SetFinalShader(const std::optional<std::string>& finalShade
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetUseFXAAPass(bool use)
+void vtkF3DRenderer::SetAntiAliasingMode(AntiAliasingMode mode)
 {
-  if (this->UseFXAAPass != use)
+  if (this->AntiAliasingModeEnabled != mode)
   {
-    this->UseFXAAPass = use;
+    this->AntiAliasingModeEnabled = mode;
     this->RenderPassesConfigured = false;
     this->CheatSheetConfigured = false;
   }

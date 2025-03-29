@@ -138,6 +138,7 @@ F3D behavior can be fully controlled from the command line using the following o
 | -p, \-\-translucency-support | bool<br>false   | Enable _translucency support_. This is a technique used to correctly render translucent objects.                |
 | -q, \-\-ambient-occlusion    | bool<br>false   | Enable _ambient occlusion_. This is a technique used to improve the depth perception of the object.             |
 | -a, \-\-anti-aliasing        | bool<br>false   | Enable _anti-aliasing_. This technique is used to reduce aliasing.                                              |
+| \-\-anti-aliasing-mode       | string<br>fxaa  | Anti-aliasing method (`fxaa`: fast, `ssaa`: quality)                                                            |
 | -t, \-\-tone-mapping         | bool<br>false   | Enable generic filmic _Tone Mapping Pass_. This technique is used to map colors properly to the monitor colors. |
 | \-\-final-shader             | string<br>-     | Add a final shader to the output image. See the [dedicated documentation](FINAL_SHADER.md) for more details.    |
 

@@ -1,4 +1,4 @@
-#include "vtkF3DUserRenderPass.h"
+#include "vtkF3DSolidBackgroundPass.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkOpenGLError.h"
@@ -13,28 +13,29 @@
 #include "vtkShaderProgram.h"
 #include "vtkTextureObject.h"
 
-vtkStandardNewMacro(vtkF3DUserRenderPass);
+vtkStandardNewMacro(vtkF3DSolidBackgroundPass);
 
 //------------------------------------------------------------------------------
-void vtkF3DUserRenderPass::Render(const vtkRenderState* s)
+void vtkF3DSolidBackgroundPass::Render(const vtkRenderState* state)
 {
   vtkOpenGLClearErrorMacro();
 
   this->NumberOfRenderedProps = 0;
 
-  vtkRenderer* r = s->GetRenderer();
-  vtkOpenGLRenderWindow* renWin = static_cast<vtkOpenGLRenderWindow*>(r->GetRenderWindow());
+  vtkRenderer* ren = state->GetRenderer();
+  vtkOpenGLRenderWindow* renWin = static_cast<vtkOpenGLRenderWindow*>(ren->GetRenderWindow());
   vtkOpenGLState* ostate = renWin->GetState();
 
+  ren->Clear();
+
   vtkOpenGLState::ScopedglEnableDisable bsaver(ostate, GL_BLEND);
-  vtkOpenGLState::ScopedglEnableDisable dsaver(ostate, GL_DEPTH_TEST);
 
   assert(this->DelegatePass != nullptr);
 
   // create FBO and texture
   int pos[2];
   int size[2];
-  r->GetTiledSizeAndOrigin(&size[0], &size[1], &pos[0], &pos[1]);
+  ren->GetTiledSizeAndOrigin(&size[0], &size[1], &pos[0], &pos[1]);
 
   if (this->ColorTexture == nullptr)
   {
@@ -56,13 +57,8 @@ void vtkF3DUserRenderPass::Render(const vtkRenderState* s)
 
   renWin->GetState()->PushFramebufferBindings();
   this->RenderDelegate(
-    s, size[0], size[1], size[0], size[1], this->FrameBufferObject, this->ColorTexture);
+    state, size[0], size[1], size[0], size[1], this->FrameBufferObject, this->ColorTexture);
   renWin->GetState()->PopFramebufferBindings();
-
-  if (this->QuadHelper && this->QuadHelper->ShaderChangeValue < this->GetMTime())
-  {
-    this->QuadHelper = nullptr;
-  }
 
   if (!this->QuadHelper)
   {
@@ -70,13 +66,10 @@ void vtkF3DUserRenderPass::Render(const vtkRenderState* s)
 
     vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Decl",
       "uniform sampler2D source;\n"
-      "uniform ivec2 resolution;\n"
       "//VTK::FSQ::Decl");
 
-    vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Decl", this->UserShader);
-
-    // Apply user shader
-    vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Impl", "gl_FragData[0] = pixel(texCoord);");
+    vtkShaderProgram::Substitute(
+      FSSource, "//VTK::FSQ::Impl", "gl_FragData[0] = texture(source, texCoord);");
 
     this->QuadHelper =
       std::make_shared<vtkOpenGLQuadHelper>(renWin, nullptr, FSSource.c_str(), nullptr);
@@ -87,19 +80,18 @@ void vtkF3DUserRenderPass::Render(const vtkRenderState* s)
     renWin->GetShaderCache()->ReadyShaderProgram(this->QuadHelper->Program);
   }
 
-  if (!this->QuadHelper->Program || !this->QuadHelper->Program->GetCompiled())
-  {
-    vtkErrorMacro("Couldn't build the shader program.");
-    return;
-  }
+  assert(this->QuadHelper->Program && this->QuadHelper->Program->GetCompiled());
 
   this->ColorTexture->Activate();
   this->QuadHelper->Program->SetUniformi("source", this->ColorTexture->GetTextureUnit());
-  this->QuadHelper->Program->SetUniform2i("resolution", size);
 
-  ostate->vtkglDisable(GL_BLEND);
+  // Enable blending with default VTK blending function
+  // It is required since external window do not set it up
+  ostate->vtkglEnable(GL_BLEND);
+  ostate->vtkglBlendFuncSeparate(
+    GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
   ostate->vtkglDisable(GL_DEPTH_TEST);
-  ostate->vtkglClear(GL_DEPTH_BUFFER_BIT);
   ostate->vtkglViewport(pos[0], pos[1], size[0], size[1]);
   ostate->vtkglScissor(pos[0], pos[1], size[0], size[1]);
 
@@ -111,16 +103,16 @@ void vtkF3DUserRenderPass::Render(const vtkRenderState* s)
 }
 
 //------------------------------------------------------------------------------
-void vtkF3DUserRenderPass::ReleaseGraphicsResources(vtkWindow* w)
+void vtkF3DSolidBackgroundPass::ReleaseGraphicsResources(vtkWindow* win)
 {
-  this->Superclass::ReleaseGraphicsResources(w);
+  this->Superclass::ReleaseGraphicsResources(win);
 
   if (this->FrameBufferObject)
   {
-    this->FrameBufferObject->ReleaseGraphicsResources(w);
+    this->FrameBufferObject->ReleaseGraphicsResources(win);
   }
   if (this->ColorTexture)
   {
-    this->ColorTexture->ReleaseGraphicsResources(w);
+    this->ColorTexture->ReleaseGraphicsResources(win);
   }
 }

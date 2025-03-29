@@ -267,6 +267,7 @@ f3d_test(NAME TestTextureMatCapWithTCoords DATA WaterBottle.glb ARGS --texture-m
 f3d_test(NAME TestConfigOrder DATA suzanne.ply ARGS CONFIG ${F3D_SOURCE_DIR}/testing/configs/config_order.json) # `.+` > `.*` alphabetically but overridden by the order
 f3d_test(NAME TestOutputStream DATA suzanne.ply ARGS --verbose=quiet --output=- REGEXP "^.PNG" NO_BASELINE NO_OUTPUT)
 f3d_test(NAME TestOutputStreamInfo DATA suzanne.ply ARGS --verbose=info --output=- REGEXP "redirected to stderr" NO_BASELINE NO_OUTPUT)
+f3d_test(NAME TestInvalidAntiAliasingMode DATA suzanne.ply ARGS -a --anti-aliasing-mode=foo REGEXP "foo is an invalid antialiasing mode" NO_BASELINE)
 
 # Color map files testing
 f3d_test(NAME TestColorMapFileFullPath DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis8.png --scalar-coloring --coloring-component=1)
@@ -455,6 +456,7 @@ f3d_test(NAME TestInteractionCheatsheetScalars DATA dragon.vtu ARGS --scalar-col
 f3d_test(NAME TestInteractionCheatsheetOpacity DATA cow.vtp INTERACTION UI ARGS --opacity=0.5 RESOLUTION 300,700) #H;ScrollDown
 f3d_test(NAME TestInteractionCheatsheetAnimationName DATA InterpolationTest.glb ARGS --animation-index=6 INTERACTION UI) #HWWW
 f3d_test(NAME TestInteractionCheatsheetConfigFile DATA dragon.vtu CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json INTERACTION UI) #H;ScrollDown
+f3d_test(NAME TestInteractionCheatsheetSSAA DATA cow.vtp INTERACTION UI) #H;A;A
 
 if(NOT F3D_MODULE_RAYTRACING)
   f3d_test(NAME TestInteractionCheatsheetCentered DATA cow.vtp RESOLUTION 500,1500 INTERACTION UI LONG_TIMEOUT) #H
@@ -546,6 +548,11 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
     f3d_test(NAME TestInteractionHDRIRaytracingFullFromNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr -rd --raytracing-samples=4 INTERACTION LONG_TIMEOUT)
 
   endif()
+endif()
+
+# SSAA with HDR framebuffer support in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12026
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250329)
+  f3d_test(NAME TestHDRIToneMappingSSAA DATA suzanne.ply HDRI palermo_park_1k.hdr TONE_MAPPING ARGS -t -a --anti-aliasing-mode=ssaa)
 endif()
 
 # Zoom factor was introduced in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9958
@@ -826,7 +833,7 @@ f3d_test(NAME TestFinalShaderCompilationFailure DATA cow.vtp ARGS --final-shader
 
 ## Interaction Tests
 # Test hotkeys
-f3d_test(NAME TestInteractionPostFX DATA cow.vtp INTERACTION TONE_MAPPING LONG_TIMEOUT) #PQAT
+f3d_test(NAME TestInteractionPostFX DATA cow.vtp INTERACTION TONE_MAPPING LONG_TIMEOUT) #PQAAAAT
 f3d_test(NAME TestInteractionActors DATA cow.vtp INTERACTION UI) #EXGMN
 f3d_test(NAME TestInteractionTimer DATA cow.vtp NO_BASELINE INTERACTION UI LONG_TIMEOUT) #Z
 f3d_test(NAME TestInteractionTrackball DATA cow.vtp ARGS --interaction-trackball INTERACTION) #Mouse movements;
