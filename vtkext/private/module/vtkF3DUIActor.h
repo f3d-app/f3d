@@ -187,7 +187,7 @@ protected:
   /**
    * Render the console widget
    */
-  virtual void RenderConsole()
+  virtual void RenderConsole(bool)
   {
   }
 

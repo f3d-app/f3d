@@ -499,17 +499,10 @@ void vtkF3DImguiActor::RenderFpsCounter()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DImguiActor::RenderConsole()
+void vtkF3DImguiActor::RenderConsole(bool minimal)
 {
   vtkF3DImguiConsole* console = vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
-  console->ShowConsole(false);
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DImguiActor::RenderMinimalConsole()
-{
-  vtkF3DImguiConsole* console = vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
-  console->ShowConsole(true);
+  console->ShowConsole(minimal);
 }
 
 //----------------------------------------------------------------------------

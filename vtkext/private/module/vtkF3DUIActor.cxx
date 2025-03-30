@@ -162,11 +162,11 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
 
   if (this->ConsoleVisible)
   {
-    this->RenderConsole();
+    this->RenderConsole(false);
   }
   else if (this->MinimalConsoleVisible)
   {
-    this->RenderMinimalConsole();
+    this->RenderConsole(true);
   }
   else if (this->ConsoleBadgeEnabled)
   {

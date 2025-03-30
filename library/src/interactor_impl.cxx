@@ -259,11 +259,14 @@ public:
       const char* commandWithArgs = static_cast<const char*>(data);
       self->Interactor.SetCommandBuffer(commandWithArgs);
     }
-    else if (event == vtkF3DConsoleOutputWindow::ShowEvent ||
-      event == vtkF3DConsoleOutputWindow::HideEvent)
+    else if (event == vtkF3DConsoleOutputWindow::ShowEvent)
     {
-      self->Options.ui.console = (event == vtkF3DConsoleOutputWindow::ShowEvent);
-      self->Options.ui.minimal_console = (event == vtkF3DConsoleOutputWindow::ShowEvent);
+      self->Options.ui.console = true;
+    }
+    else if (event == vtkF3DConsoleOutputWindow::HideEvent)
+    {
+      self->Options.ui.console = false;
+      self->Options.ui.minimal_console = false;
     }
 
     self->RenderRequested = true;
@@ -939,12 +942,6 @@ bool interactor_impl::triggerCommand(std::string_view command)
 {
   log::debug("Command: ", command);
 
-  // Console has priority over minimal console
-  if (command == "toggle ui.minimal_console" && this->Internals->Options.ui.console)
-  {
-    return true;
-  }
-
   // Resolve Alias Before Tokenizing
   auto aliasIt = this->Internals->AliasMap.find(std::string(command));
   if (aliasIt != this->Internals->AliasMap.end())
@@ -1165,7 +1162,7 @@ interactor& interactor_impl::initBindings()
 #if F3D_MODULE_UI
   this->addBinding({mod_t::NONE, "H"}, "toggle ui.cheatsheet", "Others", std::bind(docStr, "Toggle cheatsheet display"));
   this->addBinding({mod_t::NONE, "Escape"}, "toggle ui.console", "Others", std::bind(docStr, "Toggle console display"));
-  this->addBinding({mod_t::ANY, "Semicolon"}, "toggle ui.minimal_console", "Others", std::bind(docStr, "Toggle minimal console display"));
+  this->addBinding({mod_t::ANY, "Colon"}, "toggle ui.minimal_console", "Others", std::bind(docStr, "Toggle minimal console display"));
 #endif
   this->addBinding({mod_t::CTRL, "Q"}, "stop_interactor", "Others", std::bind(docStr, "Stop the interactor"));
   this->addBinding({mod_t::NONE, "Return"}, "reset_camera", "Others", std::bind(docStr, "Reset camera to initial parameters"));
@@ -1295,6 +1292,7 @@ interactor& interactor_impl::toggleAnimation()
   this->Internals->AnimationManager->ToggleAnimation();
   return *this;
 }
+
 //----------------------------------------------------------------------------
 interactor& interactor_impl::startAnimation()
 {

@@ -261,6 +261,9 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
             case Internals::LogType::Typed:
               ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 1.0f, 1.0f, 1.0f));
               break;
+            case Internals::LogType::Completion:
+              ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.6f, 1.0f, 0.6f, 1.0f));
+              break;
             default:
               hasColor = false;
           }
@@ -326,17 +329,18 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
     this->Pimpl->CommandHistory.emplace_back(this->Pimpl->CurrentInput.data());
     this->Pimpl->CommandHistoryIndexInv = -1; // Reset history navigation, looks natural
     this->Pimpl->CurrentInput = {};
-    // exit console immediately after running command if in minimal mode
-    if (minimal)
-    {
-      this->InvokeEvent(vtkF3DImguiConsole::HideEvent);
-    }
   }
 
   if (runCommand)
   {
     // No need to show completions after command is run
     this->Pimpl->ClearCompletions();
+
+    // exit console immediately after running command if in minimal mode
+    if (minimal)
+    {
+      this->InvokeEvent(vtkF3DImguiConsole::HideEvent);
+    }
   }
 
   ImGui::End();
