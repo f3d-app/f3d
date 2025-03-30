@@ -83,7 +83,6 @@ There is many other keywords in the `f3d_test` macro, here is a non exhaustive l
 - `WILL_FAIL`: Tests that should fail in order to pass
 - `NO_DATA_FORCE_RENDER`: Tests that do not open any data yet require a rendering tests at the end, rely on an environment variable
 - `UI`: Tests that show the ImGui UI, hence require it to be present in order to be enabled
-- `PREVENT_SKIP_FRAME`: Animation tests that require precise timings and force F3D to not skip animation frames
 
 ### Recovering baselines from CI
 

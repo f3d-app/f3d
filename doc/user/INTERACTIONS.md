@@ -21,6 +21,7 @@ Simple interaction with the displayed data is possible directly within the windo
 
 The coloring can be controlled directly by pressing the following hotkeys:
 
+- <kbd>A</kbd>: cycle between anti-aliasing modes.
 - <kbd>C</kbd>: cycle between coloring with array from point data and from cell data.
 - <kbd>S</kbd>: cycle the array to color with.
 - <kbd>Y</kbd>: cycle the component of the array to color with.
@@ -36,7 +37,6 @@ Other options can be toggled directly by pressing the following hotkeys:
 - <kbd>O</kbd>: point sprites rendering.
 - <kbd>P</kbd>: translucency support.
 - <kbd>Q</kbd>: ambient occlusion.
-- <kbd>A</kbd>: anti-aliasing.
 - <kbd>T</kbd>: tone mapping.
 - <kbd>E</kbd>: the display of cell edges.
 - <kbd>X</kbd>: the trihedral axes display.

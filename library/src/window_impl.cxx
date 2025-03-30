@@ -3,6 +3,7 @@
 #include "camera_impl.h"
 #include "engine.h"
 #include "log.h"
+#include "macros.h"
 #include "options.h"
 
 #include "vtkF3DExternalRenderWindow.h"
@@ -407,8 +408,37 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetRaytracingSamples(opt.render.raytracing.samples);
   renderer->SetUseRaytracingDenoiser(opt.render.raytracing.denoise);
 
+  vtkF3DRenderer::AntiAliasingMode aaMode = vtkF3DRenderer::AntiAliasingMode::NONE;
+
+  // F3D_DEPRECATED
+  // Remove this in the next major release
+  F3D_SILENT_WARNING_PUSH()
+  F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
+  if (opt.render.effect.anti_aliasing)
+  {
+    aaMode = vtkF3DRenderer::AntiAliasingMode::FXAA;
+  }
+  F3D_SILENT_WARNING_POP()
+
+  if (opt.render.effect.antialiasing.enable)
+  {
+    if (opt.render.effect.antialiasing.mode == "fxaa")
+    {
+      aaMode = vtkF3DRenderer::AntiAliasingMode::FXAA;
+    }
+    else if (opt.render.effect.antialiasing.mode == "ssaa")
+    {
+      aaMode = vtkF3DRenderer::AntiAliasingMode::SSAA;
+    }
+    else
+    {
+      log::warn(opt.render.effect.antialiasing.mode,
+        R"( is an invalid antialiasing mode. Valid modes are: "fxaa", "ssaa")");
+    }
+  }
+
   renderer->SetUseSSAOPass(opt.render.effect.ambient_occlusion);
-  renderer->SetUseFXAAPass(opt.render.effect.anti_aliasing);
+  renderer->SetAntiAliasingMode(aaMode);
   renderer->SetUseToneMappingPass(opt.render.effect.tone_mapping);
   renderer->SetUseDepthPeelingPass(opt.render.effect.translucency_support);
   renderer->SetBackfaceType(opt.render.backface_type);

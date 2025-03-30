@@ -1,6 +1,6 @@
 # Commands
 
-F3D provides access to commands through bindings configuration. They may be more ways to access them in the future.
+F3D provides access to commands through [interactive console](#interactive-console), [command script](#command-script---command-script) and [bindings configuration](CONFIGURATION_FILE.md#bindings).
 Commands let you trigger specific behavior that may not be available otherwise.
 Please note commands are currently experimental and the behaviors, actions may be added or removed without deprecation.
 Action names and arguments may also change without deprecation.
@@ -19,9 +19,11 @@ The libf3d provides a few commands, many related to manipulating libf3d (options
 
 `reset option.name`: A command to reset a libf3d option to its default values, eg: `reset render.background.blur.coc`.
 
-`clear`: A command to clear ImGui console. No argument.
+`clear`: A command to clear console. No argument.
 
 `print option.name`: A command to print the value of an libf3d option, eg: `print scene.up.direction`.
+
+`cycle_anti_aliasing`: A command to cycle between the anti-aliasing method (`none`,`fxaa`,`ssaa`).
 
 `cycle_animation`: A specific command to cycle `scene.animation.index` option using model information, No argument.
 
@@ -110,9 +112,13 @@ print_scene_info # Another comment
 increase_light_intensity
 ```
 
-## Console
+## Interactive Console
 
 If F3D is built with `F3D_MODULE_UI` support, pressing <kbd>Esc</kbd> will open the console mode. It's possible to type any command in the input field and pressing <kbd>Enter</kbd> will trigger the command instantly.
+
+Press <kbd>Tab</kbd> to autocomplete the command action and display command action suggestions.
+
+Press <kbd>&uarr;</kbd> and <kbd>&darr;</kbd> to navigate through the command history.
 
 ## Command syntax
 

@@ -1,9 +1,14 @@
 #ifndef f3d_options_generated_h
 #define f3d_options_generated_h
 
+#include "macros.h"
 #include "options.h"
 #include "options_tools.h"
 #include "types.h"
+
+// Some options could be marked as deprecated so we need to silent the warnings
+F3D_SILENT_WARNING_PUSH()
+F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
 
 namespace f3d
 {
@@ -120,4 +125,7 @@ void reset(options& opt, std::string_view name)
 
 } // options_generated
 } // f3d
+
+F3D_SILENT_WARNING_POP()
+
 #endif // f3d_options_generated_h

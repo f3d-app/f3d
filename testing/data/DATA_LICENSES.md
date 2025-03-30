@@ -49,6 +49,7 @@
 - samplePTS.pts: VTK Data: BSD-3-Clause
 - skin.png: Blender: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - small.ex2: VTK Data: BSD-3-Clause
+- soldier.mdl: LibreQuake Project: BSD-3-Clause
 - sphere_points.vdb: OpenVDB: [MPL-2.0](http://www.mozilla.org/MPL/2.0/)
 - teapot.off: Utah Teapot: Public Domain
 - tensors.vti: VTK Data: BSD-3-Clause
@@ -56,8 +57,10 @@
 - vase_4comp.vti: VTK Data: BSD-3-Clause
 - WaterBottle.glb: glTF-Sample-Models: Public Domain
 - world\*: VTK Data: BSD-3-Clause
+- zombie\*.mdl: LibreQuake Project: BSD-3-Clause
 - 16bits.\*: @bisechen: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - (ノಠ益ಠ )ノ.vtp: VTK Data: BSD-3-Clause
+- Wolf.fbx: OLEKSO: [CC-NC 4.0](http://creativecommons.org/licenses/by-nc/4.0/)
 
 All other datasets are licensed under the BSD-3-Clause F3D license.
 

@@ -60,6 +60,7 @@ set(classes
   vtkF3DPostProcessFilter
   vtkF3DRenderPass
   vtkF3DRenderer
+  vtkF3DSolidBackgroundPass
   vtkF3DUIObserver
   vtkF3DUIActor
   vtkF3DUserRenderPass
