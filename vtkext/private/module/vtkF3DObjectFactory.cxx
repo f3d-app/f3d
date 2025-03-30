@@ -57,8 +57,8 @@ vtkF3DObjectFactory::vtkF3DObjectFactory()
 #endif
 
 #if F3D_MODULE_UI
-  this->RegisterOverride("vtkF3DUIActor", "vtkF3DImguiActor",
-    "vtkF3DUIActor override for F3D", 1, ::Factory<vtkF3DImguiActor>);
+  this->RegisterOverride("vtkF3DUIActor", "vtkF3DImguiActor", "vtkF3DUIActor override for F3D", 1,
+    ::Factory<vtkF3DImguiActor>);
   this->RegisterOverride("vtkF3DUIObserver", "vtkF3DImguiObserver",
     "vtkF3DUIObserver override for F3D", 1, ::Factory<vtkF3DImguiObserver>);
 #endif

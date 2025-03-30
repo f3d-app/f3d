@@ -1,8 +1,8 @@
 {
   "scene": {
     "up_direction": {
-      "type": "string",
-      "default_value": "+Y"
+      "type": "direction",
+      "default_value": "0,1,0"
     },
     "animation": {
       "autoplay": {
@@ -57,7 +57,7 @@
         "default_value": "10"
       },
       "color": {
-        "type": "double_vector",
+        "type": "color",
         "default_value": "0.0, 0.0, 0.0"
       }
     },
@@ -82,7 +82,18 @@
       },
       "anti_aliasing": {
         "type": "bool",
-        "default_value": "false"
+        "default_value": "false",
+        "deprecated": "use render.effect.antialiasing.enable instead"
+      },
+      "antialiasing": {
+        "enable": {
+          "type": "bool",
+          "default_value": "false"
+        },
+        "mode": {
+          "type": "string",
+          "default_value": "fxaa"
+        }
       },
       "ambient_occlusion": {
         "type": "bool",
@@ -98,7 +109,7 @@
     },
     "hdri": {
       "file": {
-        "type": "string"
+        "type": "path"
       },
       "ambient": {
         "type": "bool",
@@ -107,7 +118,7 @@
     },
     "background": {
       "color": {
-        "type": "double_vector",
+        "type": "color",
         "default_value": "0.2, 0.2, 0.2"
       },
       "skybox": {
@@ -120,8 +131,8 @@
           "default_value": "false"
         },
         "coc": {
-        "type": "double",
-        "default_value": "20.0"
+          "type": "double",
+          "default_value": "20.0"
         }
       }
     },
@@ -180,7 +191,11 @@
       "default_value": "false"
     },
     "font_file": {
-      "type": "string"
+      "type": "path"
+    },
+    "scale": {
+      "type": "ratio",
+      "default_value": "1.0"
     },
     "loader_progress": {
       "type": "bool",
@@ -194,7 +209,7 @@
   "model": {
     "matcap": {
       "texture": {
-        "type": "string"
+        "type": "path"
       }
     },
     "color": {
@@ -202,18 +217,18 @@
         "type": "double"
       },
       "rgb": {
-        "type": "double_vector"
+        "type": "color"
       },
       "texture": {
-        "type": "string"
+        "type": "path"
       }
     },
     "emissive": {
       "factor": {
-        "type": "double_vector"
+        "type": "color"
       },
       "texture": {
-        "type": "string"
+        "type": "path"
       }
     },
     "normal": {
@@ -221,7 +236,7 @@
         "type": "double"
       },
       "texture": {
-        "type": "string"
+        "type": "path"
       }
     },
     "material": {
@@ -232,7 +247,7 @@
         "type": "double"
       },
       "texture": {
-        "type": "string"
+        "type": "path"
       }
     },
     "scivis": {
@@ -252,7 +267,7 @@
         "default_value": "-1"
       },
       "colormap": {
-        "type": "double_vector",
+        "type": "colormap",
         "default_value": "0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0, 1.0, 1.0, 1.0, 1.0"
       },
       "range": {

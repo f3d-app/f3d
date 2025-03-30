@@ -25,12 +25,12 @@ F3D supports rendering in environments with limited graphical contexts, includin
 In most cases, the default behavior will automatically detect which capabilities are available and use the right rendering backend,
 it is possible to specify it using the `--rendering-backend` CLI option.
 
- - If `libEGL.so` is available, you can use: `--rendering-backend=egl`.
- - If `libOSMesa.so` is available, you can use: `--rendering-backend=osmesa`.
- - When using `--rendering-backend=auto`, F3D will try to load the following libraries in order and use the first one it was able to load and use:
-   - `libGLX.so`
-   - `libEGL.so`
-   - `libOSMesa.so`
+- If `libEGL.so` is available, you can use: `--rendering-backend=egl`.
+- If `libOSMesa.so` is available, you can use: `--rendering-backend=osmesa`.
+- When using `--rendering-backend=auto`, F3D will try to load the following libraries in order and use the first one it was able to load and use:
+  - `libGLX.so`
+  - `libEGL.so`
+  - `libOSMesa.so`
 
 You can use that feature for thumbnail generation whenever needed (e.g., Nautilus or other sandboxing file browser),
 by modifying the [thumbnail config file](CONFIGURATION_FILE.md), eg:`~/.config/f3d/thumbnail.json`:

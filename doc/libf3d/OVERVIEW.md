@@ -108,14 +108,15 @@ f3d::engine::autoloadPlugins();
 f3d::engine eng = f3d::engine::create();
 
 // Recover the options and set the wanted value
-options& opt = eng.getOptions();
+f3d::options& opt = eng.getOptions();
 opt.render.effect.ambient_occlusion = true;
-opt.render.effect.anti_aliasing = true;
+opt.render.effect.antialiasing.enable = true;
 
 // Standard libf3d usage
 eng.getScene().add("path/to/file.ext");
 eng.getInteractor().start();
 ```
+
 Most options are dynamic, some are only taken into account when loading a file. See the [options](OPTIONS.md) documentation.
 
 Find more examples in the [examples directory](https://github.com/f3d-app/f3d/tree/master/examples),
@@ -137,9 +138,10 @@ target_link_libraries(target f3d::libf3d)
 ## find_package COMPONENTS
 
 When using `find_package(f3d)` and `sdk` CMake component have been installed, you can require specific components:
- - `application`: access to f3d::f3d target
- - `library`: access to f3d::libf3d target and include dir
- - `plugin_sdk`: access to CMake macros to create plugins, the f3d::vtkext target and include dir
+
+- `application`: access to f3d::f3d target
+- `library`: access to f3d::libf3d target and include dir
+- `plugin_sdk`: access to CMake macros to create plugins, the f3d::vtkext target and include dir
 
 see the installed `f3dConfig.cmake` file for more info.
 

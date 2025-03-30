@@ -2,7 +2,7 @@ list(APPEND libf3dSDKTests_list
      TestSDKAnimation.cxx
      TestSDKCamera.cxx
      TestSDKCompareWithFile.cxx
-     TestSDKDropZone.cxx
+     TestSDKDeprecatedOptions.cxx
      TestSDKDynamicLightIntensity.cxx
      TestSDKEngine.cxx
      TestSDKEngineExceptions.cxx
@@ -25,6 +25,7 @@ list(APPEND libf3dSDKTests_list
 if(F3D_MODULE_UI)
   list(APPEND libf3dSDKTests_list
     TestSDKConsole.cxx
+    TestSDKDropZone.cxx
     TestSDKDynamicBackgroundColor.cxx
     TestSDKDynamicFontFile.cxx
     TestSDKDynamicProperties.cxx
@@ -141,9 +142,9 @@ endif ()
 # List tests that do not require rendering
 list(APPEND libf3dSDKTestsNoRender_list
      TestSDKEngineExceptions
+     TestSDKLog
      TestSDKOptions
      TestSDKOptionsIO
-     TestSDKLog
      TestSDKScene)
 
 # Add all the ADD_TEST for each test

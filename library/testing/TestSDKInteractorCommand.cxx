@@ -15,8 +15,9 @@ int TestSDKInteractorCommand(int argc, char* argv[])
   // Test `set`
   inter.triggerCommand("set model.scivis.cells true");
   test("triggerCommand set", options.model.scivis.cells == true);
-  inter.triggerCommand("set render.hdri.file filepath");
-  test("triggerCommand set double quotes", options.render.hdri.file.value() == "filepath");
+  inter.triggerCommand("set render.hdri.file \"/path/to/file with spaces.ext\"");
+  test("triggerCommand set double quotes",
+    options.render.hdri.file.value() == "/path/to/file with spaces.ext");
 
   // Test reset
   inter.triggerCommand("reset model.scivis.cells");
@@ -33,6 +34,14 @@ int TestSDKInteractorCommand(int argc, char* argv[])
   // Test toggle
   inter.triggerCommand("toggle model.scivis.cells");
   test("triggerCommand toggle", options.model.scivis.cells == true);
+
+  // Test alias command
+  inter.triggerCommand("alias axis_on set ui.axis on");
+  inter.triggerCommand("axis_on");
+  test("triggerCommand alias resolve", options.ui.axis == true);
+  bool alias_result;
+  alias_result = inter.triggerCommand("alias axis_on");
+  test("triggerCommand alias invalid args", alias_result == false);
 
   // triggerCommand error codepaths
   test("triggerCommand toggle incompatible",

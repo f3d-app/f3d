@@ -1,24 +1,24 @@
 [
-{
-  "options":
   {
-    "up": "+Z"
+    "options": {
+      "up": "+Z"
+    },
+    "bindings": {
+      "Ctrl+Shift+O": "toggle ui.filename",
+      "Any+3": "roll_camera -90",
+      "O": "set_camera isometric"
+    }
   },
-  "bindings":
   {
-    "Ctrl+Shift+O": "toggle ui.filename",
-    "Any+3": "roll_camera -90",
-    "O": "set_camera isometric"
+    "match": ".*vtu",
+    "bindings": {
+      "Any+3": "roll_camera 90",
+      "Shift+O": "toggle model.point_sprites.enable",
+      "Ctrl+O": [
+        "toggle render.grid.enable",
+        "toggle scene.camera.orthographic"
+      ],
+      "None+I": "toggle ui.axis"
+    }
   }
-},
-{
-  "match": ".*vtu",
-  "bindings":
-  {
-    "Any+3": "roll_camera 90",
-    "Shift+O": "toggle model.point_sprites.enable",
-    "Ctrl+O": ["toggle render.grid.enable", "toggle scene.camera.orthographic"],
-    "None+I": "toggle ui.axis"
-  }
-}
 ]

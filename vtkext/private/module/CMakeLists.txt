@@ -45,7 +45,6 @@ set(classes
   vtkF3DCachedLUTTexture
   vtkF3DCachedSpecularTexture
   vtkF3DConsoleOutputWindow
-  vtkF3DDropZoneActor
   vtkF3DExternalRenderWindow
   vtkF3DGenericImporter
   vtkF3DHexagonalBokehBlurPass
@@ -56,10 +55,12 @@ set(classes
   vtkF3DNoRenderWindow
   vtkF3DObjectFactory
   vtkF3DOpenGLGridMapper
+  vtkF3DOverlayRenderPass
   vtkF3DPolyDataMapper
   vtkF3DPostProcessFilter
   vtkF3DRenderPass
   vtkF3DRenderer
+  vtkF3DSolidBackgroundPass
   vtkF3DUIObserver
   vtkF3DUIActor
   vtkF3DUserRenderPass
@@ -97,7 +98,7 @@ if(ANDROID)
 endif()
 
 if(F3D_MODULE_EXR)
-  find_package(OpenEXR 3.0 REQUIRED)
+  find_package(OpenEXR 3.0.1 REQUIRED)
   list(APPEND classes vtkF3DEXRReader)
 endif()
 

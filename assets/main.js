@@ -17,7 +17,7 @@ function enhance_install_page() {
     button.classList = "btn btn-primary";
     button.innerHTML = "Ok";
     button.addEventListener("click", function () {
-        popup.remove();
+      popup.remove();
     });
     popup.append(button);
 
@@ -79,7 +79,8 @@ function enhance_install_page() {
     link.setAttribute("href", url);
     link.setAttribute("class", i++ ? "btn" : "btn btn-primary");
     link.innerHTML = `<div>Get <b>F3D</b> for ${bolded_platform}</div><small>${filename}</small>`;
-    if (current_os === "MacOS") link.addEventListener("click", open_mac_warning_popup);
+    if (current_os === "MacOS")
+      link.addEventListener("click", open_mac_warning_popup);
     div.append(link);
   }
   const note = document.createElement("div");

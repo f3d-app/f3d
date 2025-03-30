@@ -592,7 +592,8 @@ public:
     {
       // Work around for https://github.com/assimp/assimp/issues/4620
       this->Importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
-      this->Scene = this->Importer.ReadFile(filePath, aiProcess_LimitBoneWeights);
+      this->Scene = this->Importer.ReadFile(
+        filePath, aiProcess_LimitBoneWeights | aiProcess_ValidateDataStructure);
     }
     catch (const DeadlyImportError& e)
     {
@@ -673,6 +674,9 @@ public:
 
     vtkNew<vtkActorCollection> actors;
 
+    vtkIdType nPoints = 0;
+    vtkIdType nCells = 0;
+
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
     {
       vtkNew<vtkActor> actor;
@@ -684,6 +688,10 @@ public:
       actor->SetUserMatrix(mat);
       actor->SetProperty(this->Properties[this->Scene->mMeshes[node->mMeshes[i]]->mMaterialIndex]);
 
+      vtkPolyData* surface = vtkPolyDataMapper::SafeDownCast(actor->GetMapper())->GetInput();
+      nPoints += surface->GetNumberOfPoints();
+      nCells += surface->GetNumberOfCells();
+
       renderer->AddActor(actor);
       actors->AddItem(actor);
     }
@@ -694,6 +702,16 @@ public:
     }
     this->Description += node->mName.C_Str();
     this->Description += "\n";
+
+    if ((nPoints > 0) || (nCells > 0))
+    {
+      this->Description += "Number of points: ";
+      this->Description += std::to_string(nPoints);
+      this->Description += "\n";
+      this->Description += "Number of cells: ";
+      this->Description += std::to_string(nCells);
+      this->Description += "\n";
+    }
 
     this->NodeActors.insert({ node->mName.data, actors });
     this->NodeLocalMatrix.insert({ node->mName.data, localMat });
@@ -899,6 +917,18 @@ int vtkF3DAssimpImporter::ImportBegin()
 void vtkF3DAssimpImporter::ImportActors(vtkRenderer* renderer)
 {
   this->Internals->ImportRoot(renderer);
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
+  // Record all actors imported from internals to importer itself
+  for (auto& pair : this->Internals->NodeActors)
+  {
+    vtkCollectionSimpleIterator ait;
+    pair.second->InitTraversal(ait);
+    while (auto* actor = pair.second->GetNextActor(ait))
+    {
+      this->ActorCollection->AddItem(actor);
+    }
+  }
+#endif
 }
 
 //----------------------------------------------------------------------------

@@ -52,32 +52,44 @@ engine::engine(
   // Ensure all lib initialization is done (once)
   detail::init::initialize();
 
+  fs::path cachePath;
 #if defined(_WIN32)
-  static constexpr const char* CACHE_ENV_VAR = "LOCALAPPDATA";
-#else
-  static constexpr const char* CACHE_ENV_VAR = "HOME";
-#endif
-
-  char* env = std::getenv(CACHE_ENV_VAR);
-  if (!env)
+  const char* appData = std::getenv("LOCALAPPDATA");
+  if (appData && strlen(appData) > 0)
   {
-    throw engine::cache_exception(
-      std::string("Could not setup cache, please set ") + CACHE_ENV_VAR + " environment variable");
+    cachePath = fs::path(appData);
   }
-
-  fs::path cachePath(env);
-
-#if defined(_WIN32)
-  cachePath /= "f3d";
-#elif defined(__APPLE__)
-  cachePath = cachePath / "Library" / "Caches" / "f3d";
-#elif defined(__ANDROID__)
-  // XXX: Android does not have a default cache location for now
-#elif defined(__unix__)
-  cachePath = cachePath / ".cache" / "f3d";
 #else
-#error "Unsupported platform"
+
+#if defined(__unix__)
+  // Implementing XDG specifications
+  const char* xdgCacheHome = std::getenv("XDG_CACHE_HOME");
+  if (xdgCacheHome && strlen(xdgCacheHome) > 0)
+  {
+    cachePath = fs::path(xdgCacheHome);
+  }
+  else
 #endif
+  {
+    const char* home = std::getenv("HOME");
+    if (home && strlen(home) > 0)
+    {
+      cachePath = fs::path(home);
+#if defined(__APPLE__)
+      cachePath = cachePath / "Library" / "Caches";
+#elif defined(__unix__)
+      cachePath /= ".cache";
+#endif
+    }
+  }
+#endif
+  if (cachePath.empty())
+  {
+    delete Internals;
+    throw engine::cache_exception(
+      "Could not setup cache, please set the appropriate environment variable");
+  }
+  cachePath /= "f3d";
 
   this->Internals->Options = std::make_unique<options>();
 
@@ -409,6 +421,21 @@ std::vector<std::string> engine::getPluginsList(const fs::path& pluginPath)
 }
 
 //----------------------------------------------------------------------------
+std::vector<std::string> engine::getAllReaderOptionNames()
+{
+  return factory::instance()->getAllReaderOptionNames();
+}
+
+//----------------------------------------------------------------------------
+void engine::setReaderOption(const std::string& name, const std::string& value)
+{
+  if (!factory::instance()->setReaderOption(name, value))
+  {
+    throw options::inexistent_exception("Reader option " + name + " does not exist");
+  }
+}
+
+//----------------------------------------------------------------------------
 engine::libInformation engine::getLibInfo()
 {
   libInformation libInfo;
@@ -452,7 +479,7 @@ engine::libInformation engine::getLibInfo()
   }
 
   libInfo.Copyrights.emplace_back("2019-2021 Kitware SAS");
-  libInfo.Copyrights.emplace_back("2021-2024 Michael Migliore, Mathieu Westphal");
+  libInfo.Copyrights.emplace_back("2021-2025 Michael Migliore, Mathieu Westphal");
   libInfo.License = "BSD-3-Clause";
 
   return libInfo;

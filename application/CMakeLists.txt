@@ -136,6 +136,11 @@ if(F3D_STRICT_BUILD)
   endif()
 endif()
 
+# F3D_TESTING_DISABLE_CATCH_ALL
+if (F3D_TESTING_DISABLE_CATCH_ALL)
+  target_compile_definitions(f3d PRIVATE F3D_TESTING_DISABLE_CATCH_ALL)
+endif ()
+
 # Coverage
 list(APPEND f3d_compile_options_public ${f3d_coverage_compile_options})
 list(APPEND f3d_link_options_public ${f3d_coverage_link_options})
@@ -201,7 +206,7 @@ if(UNIX AND NOT APPLE)
       add_custom_command(
         OUTPUT ${MAN_OUTPUT_FILE}
         COMMAND ${HELP2MAN} $<TARGET_FILE:f3d> -N -n "fast and minimalist 3D viewer" > ${MAN_OUTPUT_FILE}
-        COMMAND ${GZIP} -f ${MAN_OUTPUT_FILE}
+        COMMAND ${GZIP} -fn ${MAN_OUTPUT_FILE}
         DEPENDS f3d)
       add_custom_target(man ALL DEPENDS ${MAN_OUTPUT_FILE})
 

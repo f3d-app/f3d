@@ -22,7 +22,10 @@ public:
   /**
    * An external context is always considered current.
    */
-  bool IsCurrent() override { return true; }
+  bool IsCurrent() override
+  {
+    return true;
+  }
 
   /**
    * Trigger rendering. Reimplemented to ensure OpenGL is initialized.

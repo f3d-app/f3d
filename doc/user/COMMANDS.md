@@ -1,6 +1,6 @@
 # Commands
 
-F3D provides access to commands through bindings configuration. They may be more ways to access them in the future.
+F3D provides access to commands through [interactive console](#interactive-console), [command script](#command-script---command-script) and [bindings configuration](CONFIGURATION_FILE.md#bindings).
 Commands let you trigger specific behavior that may not be available otherwise.
 Please note commands are currently experimental and the behaviors, actions may be added or removed without deprecation.
 Action names and arguments may also change without deprecation.
@@ -19,13 +19,15 @@ The libf3d provides a few commands, many related to manipulating libf3d (options
 
 `reset option.name`: A command to reset a libf3d option to its default values, eg: `reset render.background.blur.coc`.
 
-`clear`: A command to clear ImGui console. No argument. 
+`clear`: A command to clear console. No argument.
 
 `print option.name`: A command to print the value of an libf3d option, eg: `print scene.up.direction`.
 
-`cycle_animation`:  A specific command to cycle `scene.animation.index` option using model information, No argument.
+`cycle_anti_aliasing`: A command to cycle between the anti-aliasing method (`none`,`fxaa`,`ssaa`).
 
-`cycle_coloring field/array/component`:  A specific command to manipulate scivis options using model information.
+`cycle_animation`: A specific command to cycle `scene.animation.index` option using model information, No argument.
+
+`cycle_coloring field/array/component`: A specific command to manipulate scivis options using model information.
 Supports `field`, `array` or `component` arguments, see [documentation](INTERACTIONS.md#cycling-coloring).
 eg: `cycle_coloring array`.
 
@@ -35,6 +37,10 @@ eg: `roll_camera 120`.
 `increase_light_intensity`: A specific command to increase light intensity. No argument.
 
 `decrease_light_intensity`: A specific command to decrease light intensity. No argument.
+
+`increase_opacity`: A specific command to increase opacity. Unset opacity will be treated as if it has a value of 1. No argument.
+
+`decrease_opacity`: A specific command to decrease opacity. Unset opacity will be treated as if it has a value of 1. No argument.
 
 `print_scene_info`: A specific command to print information about the scene, No argument.
 
@@ -87,6 +93,11 @@ eg: `set_hdri /path/to/file.hdr`.
 `add_files_or_set_hdri [path/to/file1] [path/to/file2]`: A specific command that will process each files and either, `set_hdri` if the provided file uses a recognised HDR extension or `add_files` otherwise. Take one or more files as arguments.
 eg: `add_files_or_set_hdri /path/to/dragon.vtu /path/to/file.hdr`.
 
+`remove_file_groups`: A specific command to remove all files. No argument.
+
+`alias [alias_name] [command]`: A specific command to create an alias for a command. Take an alias name and a command as arguments.
+eg: `alias myrotate roll_camera 90`.
+
 ## Command Script (`--command-script`)
 
 F3D provides a feature to execute commands from a script file using the `--command-script` [CLI option](OPTIONS.md). This allows users to automate a sequence of commands by listing them in a plain text file, eg: `f3d --command-script path/to/command_script.txt`.
@@ -101,22 +112,26 @@ print_scene_info # Another comment
 increase_light_intensity
 ```
 
-## Console
+## Interactive Console
 
 If F3D is built with `F3D_MODULE_UI` support, pressing <kbd>Esc</kbd> will open the console mode. It's possible to type any command in the input field and pressing <kbd>Enter</kbd> will trigger the command instantly.
+
+Press <kbd>Tab</kbd> to autocomplete the command action and display command action suggestions.
+
+Press <kbd>&uarr;</kbd> and <kbd>&darr;</kbd> to navigate through the command history.
 
 ## Command syntax
 
 Command syntax is similar to bash, as in they will be split by "token" to be processed.
 
- - Tokens are spaces separated, eg: `set scene.up.direction +Z`.
- - Tokens can also be quoted to support spaces inside, eg:  `set render.hdri.file "/path/to/file with spaces.png"`.
- - Supported quotes are `` `'" ``, eg: `set render.hdri.file '/path/to/file with spaces.png'`.
- - Quotes inside quotes are supported as well, eg: `set render.hdri.file "/path/to/file'with'quotes.png"`.
- - Quotes and spaces can be escaped, eg: `set render.hdri.file /path/to/file\ with\ spaces\ and\ \'quotes\".png`.
- - Comment are supported using `#`, Any character after will be ignored. Use `\#` to add it verbatim.
- - Escapes can be escaped too: eg: `set render.hdri.file C:\\path\\to\\windows\\file.png`.
- - Other escaped character will be processed as if the escape was not present, eg: `set scene.up.direction +\Z`
- - Unfinished quoted section is invalid, eg: `set scene.up.direction "+Z`
- - A escape at the end is also invalid, eg: `set scene.up.direction +Z\`
- - Options values are [parsed](PARSING.md) according to their types.
+- Tokens are spaces separated, eg: `set scene.up.direction +Z`.
+- Tokens can also be quoted to support spaces inside, eg: `set render.hdri.file "/path/to/file with spaces.png"`.
+- Supported quotes are `` `'" ``, eg: `set render.hdri.file '/path/to/file with spaces.png'`.
+- Quotes inside quotes are supported as well, eg: `set render.hdri.file "/path/to/file'with'quotes.png"`.
+- Quotes and spaces can be escaped, eg: `set render.hdri.file /path/to/file\ with\ spaces\ and\ \'quotes\".png`.
+- Comment are supported using `#`, Any character after will be ignored. Use `\#` to add it verbatim.
+- Escapes can be escaped too: eg: `set render.hdri.file C:\\path\\to\\windows\\file.png`.
+- Other escaped character will be processed as if the escape was not present, eg: `set scene.up.direction +\Z`
+- Unfinished quoted section is invalid, eg: `set scene.up.direction "+Z`
+- A escape at the end is also invalid, eg: `set scene.up.direction +Z\`
+- Options values are [parsed](PARSING.md) according to their types.

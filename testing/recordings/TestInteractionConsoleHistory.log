@@ -1,0 +1,118 @@
+# StreamVersion 1.2
+EnterEvent 293 98 0 0 0 0 0
+RenderEvent 199 142 0 0 0 0 0
+
+KeyPressEvent 1281 35 0 27 1 Escape 0
+CharEvent 1281 35 0 27 1 Escape 0
+KeyReleaseEvent 1281 35 0 27 1 Escape 0
+
+KeyPressEvent 1281 35 0 114 1 r 0
+CharEvent 1281 35 0 114 1 r 0
+KeyReleaseEvent 1281 35 0 114 1 r 0
+
+KeyPressEvent 1281 35 0 111 1 o 0
+CharEvent 1281 35 0 111 1 o 0
+KeyReleaseEvent 1281 35 0 111 1 o 0
+
+KeyPressEvent 1281 35 0 9 1 Tab 0
+CharEvent 1281 35 0 9 1 Tab 0
+KeyReleaseEvent 1281 35 0 9 1 Tab 0
+
+KeyPressEvent 986 613 0 52 1 4 0
+CharEvent 986 613 0 52 1 4 0
+KeyReleaseEvent 986 613 0 52 1 4 0
+
+KeyPressEvent 986 613 0 53 1 5 0
+CharEvent 986 613 0 53 1 5 0
+KeyReleaseEvent 986 613 0 53 1 5 0
+
+KeyPressEvent 1281 35 0 13 1 Return 0
+CharEvent 1281 35 0 13 1 Return 0
+KeyReleaseEvent 1281 35 0 13 1 Return 0
+
+KeyPressEvent 1281 35 0 115 1 s 0
+CharEvent 1281 35 0 115 1 s 0
+KeyReleaseEvent 1281 35 0 115 1 s 0
+
+KeyPressEvent 1281 35 0 101 1 e 0
+CharEvent 1281 35 0 101 1 e 0
+KeyReleaseEvent 1281 35 0 101 1 e 0
+
+KeyPressEvent 1281 35 0 116 1 t 0
+CharEvent 1281 35 0 116 1 t 0
+KeyReleaseEvent 1281 35 0 116 1 t 0
+
+
+KeyPressEvent 1281 35 1 95 1 underscore 0
+CharEvent 1281 35 1 95 1 underscore 0
+KeyReleaseEvent 1281 35 1 95 1 underscore 0
+
+KeyPressEvent 1281 35 0 99 1 c 0
+CharEvent 1281 35 0 99 1 c 0
+KeyReleaseEvent 1281 35 0 99 1 c 0
+
+KeyPressEvent 1281 35 0 9 1 Tab 0
+CharEvent 1281 35 0 9 1 Tab 0
+KeyReleaseEvent 1281 35 0 9 1 Tab 0
+
+KeyPressEvent 1281 35 0 116 1 t 0
+CharEvent 1281 35 0 116 1 t 0
+KeyReleaseEvent 1281 35 0 116 1 t 0
+
+KeyPressEvent 1281 35 0 111 1 o 0
+CharEvent 1281 35 0 111 1 o 0
+KeyReleaseEvent 1281 35 0 111 1 o 0
+
+KeyPressEvent 1281 35 0 112 1 p 0
+CharEvent 1281 35 0 112 1 p 0
+KeyReleaseEvent 1281 35 0 112 1 p 0
+
+KeyPressEvent 1281 35 0 13 1 Return 0
+CharEvent 1281 35 0 13 1 Return 0
+KeyReleaseEvent 1281 35 0 13 1 Return 0
+
+KeyPressEvent 1281 35 0 0 1 Up 0
+CharEvent 1281 35 0 0 1 Up 0
+KeyReleaseEvent 1281 35 0 0 1 Up 0
+
+KeyPressEvent 1281 35 0 0 1 Up 0
+CharEvent 1281 35 0 0 1 Up 0
+KeyReleaseEvent 1281 35 0 0 1 Up 0
+
+KeyPressEvent 1281 35 0 13 1 Return 0
+CharEvent 1281 35 0 13 1 Return 0
+KeyReleaseEvent 1281 35 0 13 1 Return 0
+
+KeyPressEvent 1281 35 0 0 1 Up 0
+CharEvent 1281 35 0 0 1 Up 0
+KeyReleaseEvent 1281 35 0 0 1 Up 0
+
+KeyPressEvent 1281 35 0 0 1 Up 0
+CharEvent 1281 35 0 0 1 Up 0
+KeyReleaseEvent 1281 35 0 0 1 Up 0
+
+KeyPressEvent 1281 35 0 0 1 Up 0
+CharEvent 1281 35 0 0 1 Up 0
+KeyReleaseEvent 1281 35 0 0 1 Up 0
+
+KeyPressEvent 1281 35 0 0 1 Up 0
+CharEvent 1281 35 0 0 1 Up 0
+KeyReleaseEvent 1281 35 0 0 1 Up 0
+
+KeyPressEvent 1281 35 0 0 1 Down 0
+CharEvent 1281 35 0 0 1 Down 0
+KeyReleaseEvent 1281 35 0 0 1 Down 0
+
+KeyPressEvent 1281 35 0 0 1 Down 0
+CharEvent 1281 35 0 0 1 Down 0
+KeyReleaseEvent 1281 35 0 0 1 Down 0
+
+KeyPressEvent 1281 35 0 0 1 Down 0
+CharEvent 1281 35 0 0 1 Down 0
+KeyReleaseEvent 1281 35 0 0 1 Down 0
+
+KeyPressEvent 1281 35 0 0 1 Down 0
+CharEvent 1281 35 0 0 1 Down 0
+KeyReleaseEvent 1281 35 0 0 1 Down 0
+
+TimerEvent 351 169 0 0 0 0 0

@@ -1,31 +1,58 @@
+on:
+  pull_request_target:
+    types: [assigned, opened, synchronize, reopened]
+    branches:
+      - master
 name: Style Checks
-on: [push, pull_request]
 jobs:
 
-  formatting-check:
+  style-checks:
     name: Formatting Check
     runs-on: ubuntu-latest
+
+    env:
+      ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     steps:
+
     - uses: actions/checkout@v4
-    - name: C++ Formatting
-      uses: DoozyX/clang-format-lint-action@v0.16.1
       with:
-        source: 'library application python plugins examples'
+        ref: ${{github.event.pull_request.head.ref}}
+        repository: ${{github.event.pull_request.head.repo.full_name}}
+
+    - name: C++ Formatting
+      uses: DoozyX/clang-format-lint-action@v0.16
+      with:
+        source: '.'
         extensions: 'h,cxx,in'
-        exclude: '**/*.py.in'
-        clangFormatVersion: 14 # Last Ubuntu LTS version (22.04)
+        exclude: './cmake **/*.py.in **/*.log.in **/*.json.in **/*.thumbnailer.in **/*.cmake.in **/*.desktop.in'
+        clangFormatVersion: 18
+        inplace: True
+
     - name: Python Formatting
       uses: psf/black@stable
       with:
-        options: "--check --verbose --include '(\\.py|\\.py\\.in)'"
-        src: "./python"
+        options: "--include '(\\.py|\\.py\\.in)'"
 
-  codespell-check:
-    name: Codespell Check
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: codespell-project/actions-codespell@v1.0
+    - name: Prettier Formatting
+      continue-on-error: true
+      uses: creyD/prettier_action@v4.3
       with:
-        check_filenames: true
-        check_hidden: true
+        dry: True
+        prettier_options: '-w **/*.{js,json,md,html}'
+
+    - name: Codespell in place
+      shell: bash
+      run: |
+        pip install codespell
+        codespell -fHw .
+
+    - uses: googleapis/code-suggester@v5
+      with:
+        command: review
+        pull_number: ${{ github.event.pull_request.number }}
+        git_dir: '.'
+
+    - name: Diff output
+      shell: bash
+      run: git diff --color=always --exit-code

@@ -11,7 +11,7 @@ else()
   include(f3dPlugin)
 endif()
 
-find_package(draco REQUIRED)
+find_package(draco 1.5.6 REQUIRED)
 
 message(STATUS "Plugin: draco ${draco_VERSION} found")
 

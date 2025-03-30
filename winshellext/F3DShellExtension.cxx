@@ -127,8 +127,7 @@ STDAPI DllRegisterServer()
   }
   // Register the thumbnail handler. The thumbnail handler is associated
   // with the f3d file class.
-  RunOnJSONExtensions(szModuleName,
-    [&](const std::wstring& ext)
+  RunOnJSONExtensions(szModuleName, [&](const std::wstring& ext)
     { hr |= RegisterShellExtThumbnailHandler(ext.c_str(), CLSID_F3DThumbnailProvider); });
 
   if (SUCCEEDED(hr))

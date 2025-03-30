@@ -65,7 +65,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "no-background", "", "No background when render to file", "<bool>", "1" },
       { "help", "h", "Print help", "", "" }, { "version", "", "Print version details", "", "" },
       { "list-readers", "", "Print the list of readers", "", "" },
-      { "list-bindings", "", "Print the list of interaction bindings and exits, ignored with `--no-render`, only considers the first file group.", "", "" },
+      { "list-bindings", "", "Print the list of interaction bindings and exits, ignored with `--no-render`, only considers the first file group.", "<bool>", "1" },
       { "config", "", "Specify the configuration file to use. absolute/relative path or filename/filestem to search in configuration file locations", "<filePath/filename/fileStem>", "" },
       { "no-config", "", "Do not read the configuration file", "<bool>", "1" },
       { "no-render", "", "Do not render anything and quit right after loading the first file, use with --verbose to recover information about a file.", "<bool>", "1" },
@@ -84,12 +84,12 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "loading-progress", "", "Show loading progress bar", "<bool>", "1" },
       { "animation-progress", "", "Show animation progress bar", "<bool>", "1" },
       { "multi-file-mode", "", R"(Choose the behavior when opening multiple files. "single" will show one file at a time, "all" will show all files in a single scene.)", "<single|all>", "" },
-      { "up", "", "Up direction", "{-X, +X, -Y, +Y, -Z, +Z}", "" },
+      { "up", "", "Up direction", "<direction>", "" },
       { "axis", "x", "Show axes", "<bool>", "1" }, { "grid", "g", "Show grid", "<bool>", "1" },
       { "grid-absolute", "", "Position grid at the absolute origin instead of below the model", "<bool>", "1" },
       { "grid-unit", "", "Size of grid unit square, automatically computed by default", "<value>", "" },
       { "grid-subdivisions", "", "Number of grid subdivisions", "<value>", "" },
-      { "grid-color", "", "Color of main grid lines", "<R,G,B>", "" },
+      { "grid-color", "", "Color of main grid lines", "<color>", "" },
       { "edges", "e", "Show cell edges", "<bool>", "1" },
       { "armature", "", "Enable armature visualization", "<bool>", "1" },
       { "camera-index", "", "Select the camera to use", "<index>", "" },
@@ -97,9 +97,10 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "invert-zoom", "", "Invert zoom direction with right mouse click", "<bool>", "1" },
       { "animation-autoplay", "", "Automatically start animation", "<bool>", "1" },
       { "animation-index", "", "Select animation to show", "<index>", "" },
-      { "animation-speed-factor", "", "Set animation speed factor", "<factor>", "" },
+      { "animation-speed-factor", "", "Set animation speed factor", "<ratio>", "" },
       { "animation-time", "", "Set animation time to load", "<time>", "" },
       { "font-file", "", "Path to a FreeType compatible font file", "<file_path>", ""},
+      { "font-scale", "", "Scale fonts", "<ratio>", ""},
       { "command-script", "", "Path to a script file containing commands to execute", "<file_path>", "" } } },
   { "Material",
     { {"point-sprites", "o", "Show sphere sprites instead of surfaces", "<bool>", "1" },
@@ -108,7 +109,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       {"point-size", "", "Point size when showing vertices, model specified by default", "<size>", ""},
       {"line-width", "", "Line width when showing edges, model specified by default", "<width>", ""},
       {"backface-type", "", "Backface type, can be visible or hidden, model specified by default", "<visible|hidden>", ""},
-      {"color", "", "Solid color", "<R,G,B>", ""},
+      {"color", "", "Solid color", "<color>", ""},
       {"opacity", "", "Opacity", "<opacity>", ""},
       {"roughness", "", "Roughness coefficient (0.0-1.0)", "<roughness>", ""},
       {"metallic", "", "Metallic coefficient (0.0-1.0)", "<metallic>", ""},
@@ -119,11 +120,11 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       {"texture-base-color", "", "Path to a texture file that sets the color of the object", "<file path>", ""},
       {"texture-material", "", "Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object", "<file path>", ""},
       {"texture-emissive", "", "Path to a texture file that sets the emitted light of the object", "<file path>", ""},
-      {"emissive-factor", "", "Emissive factor. This value is multiplied with the emissive color when an emissive texture is present", "<R,G,B>", ""},
+      {"emissive-factor", "", "Emissive factor. This value is multiplied with the emissive color when an emissive texture is present", "<color>", ""},
       {"texture-normal", "", "Path to a texture file that sets the normal map of the object", "<file path>", ""},
       {"normal-scale", "", "Normal scale affects the strength of the normal deviation from the normal texture", "<normalScale>", ""} } },
   {"Window",
-    { {"background-color", "", "Background color", "<R,G,B>", ""},
+    { {"background-color", "", "Background color", "<color>", ""},
       {"resolution", "", "Window resolution", "<width,height>", ""},
       {"position", "", "Window position", "<x,y>", ""},
       {"fps", "z", "Display rendering frame per second", "<bool>", "1"},
@@ -146,9 +147,9 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
   {"Camera",
     { {"camera-position", "", "Camera position (overrides camera direction and camera zoom factor if any)", "<X,Y,Z>", ""},
       {"camera-focal-point", "", "Camera focal point", "<X,Y,Z>", ""},
-      {"camera-view-up", "", "Camera view up", "<X,Y,Z>", ""},
+      {"camera-view-up", "", "Camera view up", "<direction>", ""},
       {"camera-view-angle", "", "Camera view angle (non-zero, in degrees)", "<angle>", ""},
-      {"camera-direction", "", "Camera direction", "<X,Y,Z>", ""},
+      {"camera-direction", "", "Camera direction", "<direction>", ""},
       {"camera-zoom-factor", "", "Camera zoom factor (non-zero)", "<factor>", ""},
       {"camera-azimuth-angle", "", "Camera azimuth angle (in degrees), performed after other camera options", "<angle>", ""},
       {"camera-elevation-angle", "", "Camera elevation angle (in degrees), performed after other camera options", "<angle>", ""},
@@ -163,7 +164,8 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
   {"PostFX (OpenGL)",
     { {"translucency-support", "p", "Enable translucency support, implemented using depth peeling", "<bool>", "1"},
       {"ambient-occlusion", "q", "Enable ambient occlusion providing approximate shadows for better depth perception, implemented using SSAO", "<bool>", "1"},
-      {"anti-aliasing", "a", "Enable anti-aliasing, implemented using FXAA", "<bool>", "1"},
+      {"anti-aliasing", "a", "Enable anti-aliasing", "<bool>", "1"},
+      {"anti-aliasing-mode", "", R"(Select anti-aliasing method ("fxaa" or "ssaa"))", "<string>", "fxaa"},
       {"tone-mapping", "t", "Enable Tone Mapping, providing balanced coloring", "<bool>", "1"},
       {"final-shader", "", "Execute the final shader at the end of the rendering pipeline", "<GLSL code>", ""} } },
   {"Testing",
@@ -175,9 +177,10 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
 
 /**
  * True boolean options need to be filtered out in ParseCLIOptions
+ * Also filter out special options like `define` and `reset`
  * This is the easiest, compile time way to do it
  */
-constexpr std::array CLIBooleans = {"version", "help", "list-readers", "scan-plugins", "list-rendering-backends"};
+constexpr std::array CLIBooleans = {"version", "help", "list-readers", "scan-plugins", "list-rendering-backends", "define", "reset"};
 
 //----------------------------------------------------------------------------
 /**
@@ -357,7 +360,7 @@ void PrintReadersList()
 }
 
 //----------------------------------------------------------------------------
-std::pair<std::string, int> F3DOptionsTools::GetClosestOption(const std::string& option, bool checkLib)
+std::pair<std::string, int> F3DOptionsTools::GetClosestOption(const std::string& option, bool checkLibAndReaders)
 {
   std::pair<std::string, int> ret = { "", std::numeric_limits<int>::max() };
   auto checkDistance = [](const std::string& key, const std::string& name, std::pair<std::string, int>& ref) {
@@ -389,10 +392,15 @@ std::pair<std::string, int> F3DOptionsTools::GetClosestOption(const std::string&
     checkDistance(std::string(key), option, ret);
   }
 
-  // Check libf3d option names
-  if (checkLib)
+  // Check libf3d and reader option names
+  if (checkLibAndReaders)
   {
     for (const std::string& key : f3d::options::getAllNames())
+    {
+      checkDistance(key, option, ret);
+    }
+
+    for (const std::string& key : f3d::engine::getAllReaderOptionNames())
     {
       checkDistance(key, option, ret);
     }
@@ -409,6 +417,13 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
   // cxxopts values need to live somewhere until parsing is done
   std::vector<std::shared_ptr<cxxopts::Value>> cxxoptsValues;
   auto cxxoptsInputPositionals = cxxopts::value<std::vector<std::string>>(positionals);
+
+  std::vector<std::string> defines;
+  auto cxxoptsDefines = cxxopts::value<std::vector<std::string>>(defines);
+
+  std::vector<std::string> resets;
+  auto cxxoptsResets = cxxopts::value<std::vector<std::string>>(resets);
+
   try
   {
     cxxopts::Options cxxOptions(execName, F3D::AppTitle);
@@ -422,6 +437,8 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
       if (std::string(optionGroup.GroupName) == "Applicative")
       {
         group("input", "Input files", cxxoptsInputPositionals, "<files>");
+        group("D,define", "Define libf3d options", cxxoptsDefines, "libf3d.option=value");
+        group("R,reset", "Reset libf3d options", cxxoptsResets, "libf3d.option");
       }
 
       // Add each option to cxxopts
@@ -559,9 +576,28 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
       // Discard boolean option like `--version` or `--help`
       if (std::find(::CLIBooleans.begin(), ::CLIBooleans.end(), res.key()) == ::CLIBooleans.end())
       {
-        cliOptionsDict.emplace(res.key(), res.value());
+        cliOptionsDict[res.key()] = res.value();
       }
     }
+
+    // Handle defines and add them as proper options
+    for (const std::string& define : defines)
+    {
+      std::string::size_type sepIdx = define.find_first_of('=');
+      if (sepIdx == std::string::npos)
+      {
+        f3d::log::warn("Could not parse a define '", define, "'");
+        continue;
+      }
+      cliOptionsDict[define.substr(0, sepIdx)] = define.substr(sepIdx + 1);
+    }
+
+    // Handles reset using the dedicated syntax
+    for (const std::string& reset : resets)
+    {
+      cliOptionsDict["reset-" + reset] = "";
+    }
+
     return cliOptionsDict;
   }
   catch (const cxxopts::exceptions::exception& ex)

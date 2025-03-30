@@ -5,17 +5,29 @@ inputs:
     description: 'CPU architecture to build for'
     required: false
     default: 'x86_64'
+  version:
+    description: 'Version of usd to build'
+    required: true
+  openexr_version:
+    description: 'Version of openexr to build against'
+    required: true
 
 runs:
   using: "composite"
   steps:
 
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+        [[ "${{ inputs.openexr_version }}" ]] || { echo "openexr_version input is empty" ; exit 1; }
+
     - name: Cache USD
       id: cache-usd
-      uses: actions/cache@v4
+      uses: actions/cache/restore@v4
       with:
         path: dependencies/usd_install
-        key: usd-v24.11-${{runner.os}}-${{inputs.cpu}}-2
+        key: usd-${{inputs.version}}-${{inputs.openexr_version}}-${{runner.os}}-${{inputs.cpu}}-0
 
     - name: Checkout USD
       if: steps.cache-usd.outputs.cache-hit != 'true'
@@ -23,7 +35,7 @@ runs:
       with:
         repository: PixarAnimationStudios/USD
         path: './dependencies/usd'
-        ref: v24.11
+        ref: ${{inputs.version}}
 
    # Upstream issue: https://github.com/PixarAnimationStudios/OpenUSD/issues/2490
     - name: Patch USD
@@ -71,3 +83,10 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/usd_install
       shell: bash
       run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-usd.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-usd.outputs.cache-primary-key }}
+        path: dependencies/usd_install

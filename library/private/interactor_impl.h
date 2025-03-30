@@ -101,6 +101,13 @@ public:
   void UpdateRendererAfterInteraction();
 
   /**
+   * Implementation only API.
+   * Expose the method to reset transformed up vector.
+   * This is called by the scene after initializing the up vector.
+   */
+  void ResetTemporaryUp();
+
+  /**
    * Event loop being called automatically once the interactor is started
    * First call the EventLoopUserCallBack, then call render if requested.
    */
@@ -110,16 +117,6 @@ public:
    * Set a command to be run on the next event loop
    */
   void SetCommandBuffer(const char* command);
-
-  /**
-   * An exception that can be thrown by certain command callbacks
-   * when the arguments of the callback are incorrect and expected
-   * to be caught by triggerCommand
-   */
-  struct invalid_args_exception : public exception
-  {
-    explicit invalid_args_exception(const std::string& what = "");
-  };
 
 private:
   class internals;

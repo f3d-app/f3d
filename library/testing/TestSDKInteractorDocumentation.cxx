@@ -8,7 +8,7 @@ using mod_t = f3d::interaction_bind_t::ModifierKeys;
 constexpr int nGroup = 3;
 constexpr int nBindsCamera = 7;
 constexpr std::string_view initDoc = "Toggle Orthographic Projection";
-constexpr std::string_view initVal = "N/A";
+constexpr std::string_view initVal = "Unset";
 
 int TestSDKInteractorDocumentation(int argc, char* argv[])
 {
@@ -33,9 +33,8 @@ int TestSDKInteractorDocumentation(int argc, char* argv[])
     test.expect<f3d::interactor::does_not_exists_exception>(
       "Initial invalid group", [&]() { std::ignore = inter.getBindsForGroup("Invalid"); });
 
-    test.expect<f3d::interactor::does_not_exists_exception>("Initial invalid bind", [&]() {
-      std::ignore = inter.getBindingDocumentation({ mod_t::ANY, "Invalid" });
-    });
+    test.expect<f3d::interactor::does_not_exists_exception>("Initial invalid bind",
+      [&]() { std::ignore = inter.getBindingDocumentation({ mod_t::ANY, "Invalid" }); });
   }
 
   // Remove all bindings
@@ -55,9 +54,8 @@ int TestSDKInteractorDocumentation(int argc, char* argv[])
     test.expect<f3d::interactor::does_not_exists_exception>(
       "Empty group", [&]() { std::ignore = inter.getBindsForGroup("Camera"); });
 
-    test.expect<f3d::interactor::does_not_exists_exception>("Empty bind", [&]() {
-      std::ignore = inter.getBindingDocumentation({ mod_t::ANY, "5" });
-    });
+    test.expect<f3d::interactor::does_not_exists_exception>(
+      "Empty bind", [&]() { std::ignore = inter.getBindingDocumentation({ mod_t::ANY, "5" }); });
   }
 
   // Add a dummy binding

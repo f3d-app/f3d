@@ -1,0 +1,13 @@
+[
+  {
+    "options": {
+      "!ui.axis": true
+    }
+  },
+  {
+    "match": ".*(stl)",
+    "options": {
+      "!edges": true
+    }
+  }
+]

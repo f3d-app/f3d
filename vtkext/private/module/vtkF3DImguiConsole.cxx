@@ -1,10 +1,13 @@
 #include "vtkF3DImguiConsole.h"
 
+#include <vtkCallbackCommand.h>
 #include <vtkCommand.h>
+#include <vtkNew.h>
 #include <vtkObjectFactory.h>
 
 #include <imgui.h>
 
+#include <algorithm>
 #include <array>
 
 struct vtkF3DImguiConsole::Internals
@@ -14,13 +17,153 @@ struct vtkF3DImguiConsole::Internals
     Log,
     Warning,
     Error,
-    Typed
+    Typed,
+    Completion
   };
 
   std::vector<std::pair<LogType, std::string>> Logs;
   std::array<char, 256> CurrentInput = {};
   bool NewError = false;
   bool NewWarning = false;
+  std::pair<size_t, size_t> Completions{ 0,
+    0 }; // Index for start and length of completions in Logs
+  std::function<std::vector<std::string>(const std::string& pattern)>
+    GetCommandsMatchCallback; // Callback to get the list of commands matching pattern
+  std::vector<std::string> CommandHistory;
+  std::pair<std::string, int> LastInput; // Last input before navigating history
+  int CommandHistoryIndexInv = -1;       // Current inverted index in command history navigation
+
+  /**
+   * Clear completions from the logs
+   */
+  void ClearCompletions()
+  {
+    if (this->Completions.second > 0)
+    {
+      this->Logs.erase(this->Logs.begin() + this->Completions.first,
+        this->Logs.begin() + this->Completions.second);
+      this->Completions.second = 0;
+    }
+  }
+  /**
+   * Callback to process text editing events in console
+   */
+  int TextEditCallback(ImGuiInputTextCallbackData* data)
+  {
+    this->ClearCompletions();
+    switch (data->EventFlag)
+    {
+      case ImGuiInputTextFlags_CallbackCompletion:
+      {
+        assert(this->GetCommandsMatchCallback);
+        std::string pattern{ data->Buf };
+        std::vector<std::string> candidates =
+          this->GetCommandsMatchCallback(pattern); // List of supported commands
+
+        if (candidates.size() == 1)
+        {
+          // Single match. Delete the beginning of the word and replace it entirely so we've got
+          // nice casing.
+          data->DeleteChars(0, static_cast<int>(pattern.size()));
+          data->InsertChars(data->CursorPos, candidates[0].c_str());
+          data->InsertChars(data->CursorPos, " ");
+        }
+        else if (candidates.size() > 1)
+        {
+          // Multiple matches. Complete as much as we can.
+          // So inputting "C"+Tab will complete to "CL" then display "CLEAR" and "CLASSIFY" as
+          // matches.
+          size_t matchLen = pattern.size();
+          bool allCandidatesMatches = true;
+          // Find the common prefix to all candidates
+          while (allCandidatesMatches)
+          {
+            const std::string& first = candidates[0];
+            if (first.size() <= matchLen)
+            {
+              // The first candidate is shorter than the current match length
+              allCandidatesMatches = false;
+            }
+            else
+            {
+              // Check if all candidates match the current character
+              const char target = first[matchLen];
+              allCandidatesMatches = std::all_of(candidates.begin(), candidates.end(),
+                [matchLen, target](const std::string& s)
+                { return s.size() > matchLen && s[matchLen] == target; });
+            }
+            if (allCandidatesMatches)
+            {
+              matchLen++;
+            }
+          }
+
+          if (matchLen > 0)
+          {
+            // Fill the best we can by now - use the longest common prefix from available candidates
+            // (possibly just pattern itself in the worst case)
+            data->DeleteChars(0, static_cast<int>(pattern.size()));
+            data->InsertChars(
+              data->CursorPos, candidates[0].c_str(), candidates[0].c_str() + matchLen);
+          }
+
+          this->Completions.first = this->Logs.size();
+          this->Completions.second = this->Logs.size() + candidates.size() + 1;
+          // Add all candidates to the logs
+          this->Logs.emplace_back(
+            std::make_pair(Internals::LogType::Completion, "Possible matches:"));
+          std::transform(candidates.begin(), candidates.end(), std::back_inserter(this->Logs),
+            [](const std::string& candidate)
+            { return std::make_pair(Internals::LogType::Completion, candidate); });
+        }
+        break;
+      }
+      case ImGuiInputTextFlags_CallbackHistory:
+      {
+        /* CommandHistoryIndexInv is a reversed index for command history:
+        - `-1` represents the current user input (not yet stored in history).
+        - `0` corresponds to the most recent command (CommandHistory.size() - 1).
+        - `CommandHistory.size() - 1` maps to the oldest command (0 in CommandHistory). */
+        const int prevHistoryPos = this->CommandHistoryIndexInv;
+        if (prevHistoryPos == -1)
+        {
+          /* Saving the last input before history navigation */
+          this->LastInput = { this->CurrentInput.data(), data->CursorPos };
+        }
+        const int histSize = static_cast<int>(this->CommandHistory.size());
+        if (data->EventKey == ImGuiKey_UpArrow && this->CommandHistoryIndexInv < (histSize - 1))
+        {
+          this->CommandHistoryIndexInv++;
+        }
+        else if (data->EventKey == ImGuiKey_DownArrow && this->CommandHistoryIndexInv >= 0)
+        {
+          this->CommandHistoryIndexInv--;
+        }
+
+        if (prevHistoryPos != this->CommandHistoryIndexInv)
+        {
+          if (this->CommandHistoryIndexInv == -1)
+          {
+            /* Restoring the last input when navigated back to it */
+            data->DeleteChars(0, data->BufTextLen);
+            data->InsertChars(0, this->LastInput.first.c_str());
+            data->CursorPos = this->LastInput.second;
+          }
+          else
+          {
+            /* We should not be able to have negative index here */
+            /* Retrieve the command from history */
+            std::string historyStr =
+              this->CommandHistory[histSize - this->CommandHistoryIndexInv - 1];
+            data->DeleteChars(0, data->BufTextLen);
+            data->InsertChars(0, historyStr.c_str());
+            data->CursorPos = static_cast<int>(historyStr.size());
+          }
+        }
+      }
+    }
+    return 0;
+  }
 };
 
 vtkStandardNewMacro(vtkF3DImguiConsole);
@@ -78,14 +221,15 @@ void vtkF3DImguiConsole::ShowConsole()
   // So let's handle the console visibility here
   if (ImGui::IsKeyPressed(ImGuiKey_Escape, false) && this->Pimpl->CurrentInput[0] == '\0')
   {
+    this->Pimpl->CommandHistoryIndexInv = -1; // Reset history navigation on hiding
+    this->Pimpl->ClearCompletions();          // Clear completion on hiding
     this->InvokeEvent(vtkF3DImguiConsole::HideEvent);
   }
 
   ImGui::Begin("Console", nullptr, winFlags);
 
   // Log window
-  const float reservedHeight =
-    ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
+  const float reservedHeight = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
   if (ImGui::BeginChild(
         "LogRegion", ImVec2(0, -reservedHeight), 0, ImGuiWindowFlags_HorizontalScrollbar))
   {
@@ -107,6 +251,9 @@ void vtkF3DImguiConsole::ShowConsole()
           case Internals::LogType::Typed:
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 1.0f, 1.0f, 1.0f));
             break;
+          case Internals::LogType::Completion:
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.6f, 1.0f, 0.6f, 1.0f));
+            break;
           default:
             hasColor = false;
         }
@@ -118,11 +265,15 @@ void vtkF3DImguiConsole::ShowConsole()
 
       ImGui::TextUnformatted(msg.c_str());
       if (hasColor)
+      {
         ImGui::PopStyleColor();
+      }
     }
 
     if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+    {
       ImGui::SetScrollHereY(1.0f);
+    }
 
     ImGui::PopStyleVar();
   }
@@ -131,15 +282,23 @@ void vtkF3DImguiConsole::ShowConsole()
   ImGui::Separator();
 
   // input
-  ImGuiInputTextFlags inputFlags =
-    ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_EscapeClearsAll;
+  ImGuiInputTextFlags inputFlags = ImGuiInputTextFlags_EnterReturnsTrue |
+    ImGuiInputTextFlags_EscapeClearsAll | ImGuiInputTextFlags_CallbackCompletion |
+    ImGuiInputTextFlags_CallbackHistory;
 
   ImGui::Text("> ");
   ImGui::SameLine();
 
   ImGui::PushItemWidth(-1);
+
+  auto TextEditCallbackStub = [](ImGuiInputTextCallbackData* data) -> int
+  {
+    vtkF3DImguiConsole::Internals* internals = (vtkF3DImguiConsole::Internals*)data->UserData;
+    return internals->TextEditCallback(data);
+  };
+
   bool runCommand = ImGui::InputText("##ConsoleInput", this->Pimpl->CurrentInput.data(),
-    sizeof(this->Pimpl->CurrentInput), inputFlags, nullptr, this->Pimpl.get());
+    sizeof(this->Pimpl->CurrentInput), inputFlags, TextEditCallbackStub, this->Pimpl.get());
   ImGui::PopItemWidth();
 
   ImGui::SetItemDefaultFocus();
@@ -156,7 +315,15 @@ void vtkF3DImguiConsole::ShowConsole()
     this->Pimpl->Logs.emplace_back(std::make_pair(
       Internals::LogType::Typed, std::string("> ") + this->Pimpl->CurrentInput.data()));
     this->InvokeEvent(vtkF3DImguiConsole::TriggerEvent, this->Pimpl->CurrentInput.data());
+    this->Pimpl->CommandHistory.emplace_back(this->Pimpl->CurrentInput.data());
+    this->Pimpl->CommandHistoryIndexInv = -1; // Reset history navigation, looks natural
     this->Pimpl->CurrentInput = {};
+  }
+
+  if (runCommand)
+  {
+    // No need to show completions after command is run
+    this->Pimpl->ClearCompletions();
   }
 
   ImGui::End();
@@ -210,4 +377,11 @@ void vtkF3DImguiConsole::Clear()
   this->Pimpl->Logs.clear();
   this->Pimpl->NewError = false;
   this->Pimpl->NewWarning = false;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DImguiConsole::SetCommandsMatchCallback(
+  std::function<std::vector<std::string>(const std::string& pattern)> callback)
+{
+  this->Pimpl->GetCommandsMatchCallback = std::move(callback);
 }

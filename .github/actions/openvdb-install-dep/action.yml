@@ -5,27 +5,34 @@ inputs:
     description: 'CPU architecture to build for'
     required: false
     default: 'x86_64'
+  version:
+    description: 'Version of openvdb to build'
+    required: true
 
 runs:
   using: "composite"
   steps:
 
-    # OpenVDB is part of VFX reference platform (CY2025: 12.x)
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+
     - name: Cache OpenVDB
       id: cache-openvdb
-      uses: actions/cache@v4
+      uses: actions/cache/restore@v4
       with:
         path: dependencies/openvdb_install
-        key: openvdb-12.0.0-${{runner.os}}-${{inputs.cpu}}-0
+        key: openvdb-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-0
 
-    # Dependents: vtk
+    # Dependents (not version): vtk
     - name: Checkout OpenVDB
       if: steps.cache-openvdb.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
       with:
         repository: AcademySoftwareFoundation/openvdb
         path: './dependencies/openvdb'
-        ref: v12.0.0
+        ref: ${{inputs.version}}
 
     - name: Setup OpenVDB
       if: steps.cache-openvdb.outputs.cache-hit != 'true'
@@ -77,3 +84,10 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/openvdb_install
       shell: bash
       run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-openvdb.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-openvdb.outputs.cache-primary-key }}
+        path: dependencies/openvdb_install

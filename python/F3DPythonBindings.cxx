@@ -446,7 +446,20 @@ PYBIND11_MODULE(pyf3d, module)
     .def_static("get_plugins_list", &f3d::engine::getPluginsList)
     .def_static("get_lib_info", &f3d::engine::getLibInfo, py::return_value_policy::reference)
     .def_static("get_readers_info", &f3d::engine::getReadersInfo)
-    .def_static("get_rendering_backend_list", &f3d::engine::getRenderingBackendList);
+    .def_static("get_rendering_backend_list", &f3d::engine::getRenderingBackendList)
+    .def_static("set_reader_option",
+      [](const std::string& name, const std::string& value)
+      {
+        try
+        {
+          f3d::engine::setReaderOption(name, value);
+        }
+        catch (const f3d::options::inexistent_exception&)
+        {
+          throw py::key_error(name);
+        }
+      })
+    .def_static("get_all_reader_option_names", &f3d::engine::getAllReaderOptionNames);
 
   // f3d::log
   py::class_<f3d::log> log(module, "Log");
@@ -463,7 +476,6 @@ PYBIND11_MODULE(pyf3d, module)
     .def_static("set_verbose_level", &f3d::log::setVerboseLevel, py::arg("level"),
       py::arg("force_std_err") = false)
     .def_static("set_use_coloring", &f3d::log::setUseColoring)
-    .def_static("print",
-      [](f3d::log::VerboseLevel& level, const std::string& message)
+    .def_static("print", [](f3d::log::VerboseLevel& level, const std::string& message)
       { f3d::log::print(level, message); });
 }

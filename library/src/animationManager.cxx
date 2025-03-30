@@ -24,10 +24,6 @@ animationManager::animationManager(const options& options, window_impl& window)
   : Options(options)
   , Window(window)
 {
-  if (vtksys::SystemTools::HasEnv("CTEST_F3D_PREVENT_SKIP_FRAME"))
-  {
-    this->SkipFrame = false;
-  }
 }
 
 //----------------------------------------------------------------------------
@@ -187,9 +183,6 @@ void animationManager::ToggleAnimation()
         this->CurrentTime = this->TimeRange[0];
         this->CurrentTimeSet = true;
       }
-
-      // Always reset previous tick when starting the animation
-      this->PreviousTick = std::chrono::steady_clock::now();
     }
 
     if (this->Playing && this->Options.scene.camera.index.has_value())
@@ -208,17 +201,6 @@ void animationManager::Tick()
 {
   if (this->Playing)
   {
-    std::chrono::steady_clock::time_point currentTick = std::chrono::steady_clock::now();
-    if (this->SkipFrame &&
-      std::chrono::duration_cast<std::chrono::milliseconds>(currentTick - this->PreviousTick)
-          .count() > 1000 * this->DeltaTime)
-    {
-      log::debug("Unable to process frames fast enough, skipping a frame");
-      this->PreviousTick = currentTick;
-      return;
-    }
-    this->PreviousTick = currentTick;
-
     this->CurrentTime += this->DeltaTime * this->Options.scene.animation.speed_factor;
 
     // Modulo computation, compute CurrentTime in the time range.

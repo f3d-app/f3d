@@ -65,6 +65,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   inter.removeBinding({ mod_t::NONE, "B" });
   inter.removeBinding({ mod_t::NONE, "S" });
   inter.removeBinding({ mod_t::NONE, "Z" });
+  inter.removeBinding({ mod_t::CTRL, "P" });
 
   // Check that an binding can be added
   inter.addBinding({ mod_t::NONE, "S" }, "toggle ui.axis");
@@ -169,6 +170,16 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   if (inter.playInteraction("/" + std::string(257, 'x') + "/play.ext"))
   {
     std::cerr << "Unexcepted success playing an invalid path" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  // Check console error handling
+  // Esc;"exception";Enter;Esc
+  if (!inter.playInteraction(
+        std::string(argv[1]) + "recordings/TestSDKInteractorCallBackConsoleException.log"))
+  {
+    std::cerr << "Unexcepted failure playing a console command triggering an exception"
+              << std::endl;
     return EXIT_FAILURE;
   }
 

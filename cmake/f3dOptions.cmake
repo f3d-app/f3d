@@ -12,7 +12,7 @@ and generate the associated CXX code.
 f3d_generate_options(
   INPUT_JSON "path/to/options.json"
   INPUT_PUBLIC_HEADER "path/to/options.h.in"
-  INPUT_PRIVATE_HEADER "path/to/options_tools.h.in"
+  INPUT_PRIVATE_HEADER "path/to/options_generated.h.in"
   DESTINATION "path/to/destination/folder"
   OUTPUT_NAME "options"
 	)
@@ -70,9 +70,9 @@ function (f3d_generate_options)
   _parse_json_option(${_options_json})
 
   list(JOIN _options_setter ";\n    else " _options_setter)
-  list(JOIN _options_getter ";\n  else " _options_getter)
+  list(JOIN _options_getter ";\n    else " _options_getter)
   list(JOIN _options_string_setter ";\n  else " _options_string_setter)
-  list(JOIN _options_string_getter ";\n  else " _options_string_getter)
+  list(JOIN _options_string_getter ";\n    else " _options_string_getter)
   list(JOIN _options_lister ",\n  " _options_lister)
   list(JOIN _options_is_optional ";\n  else " _options_is_optional)
   list(JOIN _options_reset ";\n  else " _options_reset)
@@ -83,7 +83,7 @@ function (f3d_generate_options)
 
   configure_file(
     "${_f3d_generate_options_INPUT_PRIVATE_HEADER}"
-    "${_f3d_generate_options_DESTINATION}/private/${_f3d_generate_options_OUTPUT_NAME}_tools.h")
+    "${_f3d_generate_options_DESTINATION}/private/${_f3d_generate_options_OUTPUT_NAME}_generated.h")
 
 endfunction()
 
@@ -91,7 +91,6 @@ endfunction()
 @brief internal recursive method use to parse json structure and generate variables
 #]==]
 function(_parse_json_option _top_json)
-  # TODO Add a deprecation mechanism
   string(JSON _options_length LENGTH ${_top_json})
   MATH(EXPR _options_length "${_options_length} - 1")
   foreach(_json_idx RANGE ${_options_length})
@@ -108,11 +107,16 @@ function(_parse_json_option _top_json)
        # Recover default_value if any
        string(JSON _option_default_value ERROR_VARIABLE _default_value_error GET ${_cur_json} "default_value")
 
+       # Recover deprecated if any
+       string(JSON _option_deprecated ERROR_VARIABLE _deprecated_error GET ${_cur_json} "deprecated")
+
        set(_option_name "${_option_basename}${_member_name}")
 
        # Identify types
        set(_option_actual_type ${_option_type})
        set(_option_variant_type ${_option_type})
+       set(_option_variant_convert "")
+       set(_option_explicit_constr "")
        set(_option_default_value_start "")
        set(_option_default_value_end "")
 
@@ -126,30 +130,62 @@ function(_parse_json_option _top_json)
          set(_option_variant_type "std::string")
          set(_option_default_value_start "\"")
          set(_option_default_value_end "\"")
+       elseif(_option_type STREQUAL "path")
+         set(_option_actual_type "std::filesystem::path")
+         set(_option_variant_type "std::string")
+         set(_option_variant_convert ".string()")
+         set(_option_default_value_start "\"")
+         set(_option_default_value_end "\"")
        elseif(_option_type STREQUAL "ratio")
          set(_option_actual_type "f3d::ratio_t")
+         set(_option_explicit_constr "f3d::ratio_t")
          set(_option_variant_type "double")
+         set(_option_default_value_start "{")
+         set(_option_default_value_end "}")
+       elseif(_option_type STREQUAL "color")
+         set(_option_actual_type "f3d::color_t")
+         set(_option_explicit_constr "f3d::color_t")
+         set(_option_variant_type "std::vector<double>")
+         set(_option_default_value_start "{")
+         set(_option_default_value_end "}")
+       elseif(_option_type STREQUAL "direction")
+         set(_option_actual_type "f3d::direction_t")
+         set(_option_explicit_constr "f3d::direction_t")
+         set(_option_variant_type "std::vector<double>")
+         set(_option_default_value_start "{")
+         set(_option_default_value_end "}")
+       elseif(_option_type STREQUAL "colormap")
+         set(_option_actual_type "f3d::colormap_t")
+         set(_option_explicit_constr "f3d::colormap_t")
+         set(_option_variant_type "std::vector<double>")
+         set(_option_default_value_start "{")
+         set(_option_default_value_end "}")
        endif()
 
        # Add option to struct and methods
 
+       set(_option_deprecated_string "")
+       if(_deprecated_error STREQUAL "NOTFOUND" AND _option_deprecated)
+         set(_option_deprecated_string "[[deprecated(\"${_option_deprecated}\")]] ")
+       endif()
+
        if(_default_value_error STREQUAL "NOTFOUND")
          # Use default_value
-         set(_optional_default_value_initialize "${_option_default_value_start}${_option_default_value}${_option_default_value_end}")
-         string(APPEND _options_struct "${_option_indent}  ${_option_actual_type} ${_member_name} = ${_optional_default_value_initialize};\n")
+         set(_optional_default_value_initialize "${_option_explicit_constr}${_option_default_value_start}${_option_default_value}${_option_default_value_end}")
+         string(APPEND _options_struct "${_option_indent}  ${_option_deprecated_string}${_option_actual_type} ${_member_name} = ${_optional_default_value_initialize};\n")
          set(_optional_getter "")
          list(APPEND _options_is_optional "if (name == \"${_option_name}\") return false")
          list(APPEND _options_reset "if (name == \"${_option_name}\") opt.${_option_name} = ${_optional_default_value_initialize}")
        else()
          # No default_value, it is an std::optional
-         string(APPEND _options_struct "${_option_indent}  std::optional<${_option_actual_type}> ${_member_name};\n")
+         string(APPEND _options_struct "${_option_indent}  ${_option_deprecated_string}std::optional<${_option_actual_type}> ${_member_name};\n")
          set(_optional_getter ".value()")
          list(APPEND _options_is_optional "if (name == \"${_option_name}\") return true")
          list(APPEND _options_reset "if (name == \"${_option_name}\") opt.${_option_name}.reset()")
        endif()
 
-       list(APPEND _options_setter "if (name == \"${_option_name}\") opt.${_option_name} = std::get<${_option_variant_type}>(value)")
-       list(APPEND _options_getter "if (name == \"${_option_name}\") return opt.${_option_name}${_optional_getter}")
+       list(APPEND _options_setter "if (name == \"${_option_name}\") opt.${_option_name} = ${_option_explicit_constr}{std::get<${_option_variant_type}>(value)}")
+       list(APPEND _options_getter "if (name == \"${_option_name}\") return opt.${_option_name}${_optional_getter}${_option_variant_convert}")
        list(APPEND _options_string_setter "if (name == \"${_option_name}\") opt.${_option_name} = options_tools::parse<${_option_actual_type}>(str)")
        list(APPEND _options_string_getter "if (name == \"${_option_name}\") return options_tools::format(opt.${_option_name}${_optional_getter})")
        list(APPEND _options_lister "\"${_option_name}\"")

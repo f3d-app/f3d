@@ -1,6 +1,6 @@
 #include <vtkNew.h>
-#include <vtkTestUtilities.h>
 #include <vtkRenderWindow.h>
+#include <vtkTestUtilities.h>
 #include <vtkXMLUnstructuredGridReader.h>
 
 #include "vtkF3DGenericImporter.h"
@@ -63,6 +63,14 @@ int TestF3DRendererWithColoring(int argc, char* argv[])
     std::cerr << "Unexpected coloring information after cycling component" << std::endl;
     return EXIT_FAILURE;
   }
+
+  // Check invalid colormap code path
+  renderer->SetColormap({ 0, 0, 0 });
+  renderer->UpdateActors();
+
+  // Smoke test for deprecated HDRI collapse codepath
+  // F3D_DEPRECATED
+  renderer->SetHDRIFile("path/not/valid/../../to/file.ext");
 
   return EXIT_SUCCESS;
 }
