@@ -4,6 +4,7 @@
 #include "interactor_impl.h"
 #include "log.h"
 #include "options.h"
+#include "scene.h"
 #include "window_impl.h"
 
 #include "factory.h"
@@ -11,6 +12,7 @@
 #include "vtkF3DMemoryMesh.h"
 #include "vtkF3DMetaImporter.h"
 
+#include <optional>
 #include <vtkCallbackCommand.h>
 #include <vtkProgressBarRepresentation.h>
 #include <vtkProgressBarWidget.h>
@@ -240,7 +242,8 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
     }
 
     // Recover the importer for the provided file path
-    f3d::reader* reader = f3d::factory::instance()->getReader(filePath.string());
+    f3d::reader* reader = f3d::factory::instance()->getReader(
+      filePath.string(), this->Internals->Options.scene.force_reader);
     if (reader)
     {
       log::debug(
@@ -322,7 +325,8 @@ scene& scene_impl::clear()
 //----------------------------------------------------------------------------
 bool scene_impl::supports(const fs::path& filePath)
 {
-  return f3d::factory::instance()->getReader(filePath.string()) != nullptr;
+  return f3d::factory::instance()->getReader(
+           filePath.string(), this->Internals->Options.scene.force_reader) != nullptr;
 }
 
 //----------------------------------------------------------------------------

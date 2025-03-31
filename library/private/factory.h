@@ -17,6 +17,8 @@
 #include "reader.h"
 
 #include <map>
+#include <optional>
+#include <string_view>
 #include <vector>
 
 namespace f3d
@@ -44,7 +46,7 @@ public:
   /**
    * Get the reader that can read the given file, nullptr if none
    */
-  reader* getReader(const std::string& fileName);
+  reader* getReader(const std::string& fileName, std::optional<std::string> forceReader);
 
   /**
    * Get the list of the registered plugins
