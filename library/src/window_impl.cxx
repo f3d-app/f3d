@@ -415,6 +415,7 @@ void window_impl::UpdateDynamicOptions()
   F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
   if (opt.render.effect.anti_aliasing)
   {
+    log::warn("render.effect.anti_aliasing is deprecated, please use render.effect.antialiasing.enable instead");
     aaMode = vtkF3DRenderer::AntiAliasingMode::FXAA;
   }
   F3D_SILENT_WARNING_POP()
