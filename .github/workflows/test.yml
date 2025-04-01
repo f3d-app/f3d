@@ -1,0 +1,17 @@
+name: Test
+on: push
+
+jobs:
+  hello:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Start echo
+        run: echo "Start!!"
+
+      - name: Install zlib
+        uses: ./source/.github/actions/zlib-install-dep
+        with:
+          cpu: ${{inputs.cpu}}
+
+      - name: End echo
+        run: echo "End!!"
