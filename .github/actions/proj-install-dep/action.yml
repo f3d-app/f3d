@@ -17,6 +17,27 @@ runs:
         path: dependencies/proj_install
         key: proj-9.4.0-${{runner.os}}-${{inputs.cpu}}-1
 
+    - name: Install SQLite3 dependencies
+      if: steps.cache-proj.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        if [[ "${{runner.os}}" == "Linux" ]]; then
+          echo "==> Starting installation of SQLite3 and related dependencies on Linux"
+          sudo apt-get update
+          sudo apt-get install -y ccache cmake g++ sqlite3 libsqlite3-dev libtiff-dev libcurl4-openssl-dev
+          echo "==> Finished installing SQLite3 dependencies on Linux"
+        elif [[ "${{runner.os}}" == "macOS" ]]; then
+          echo "==> Starting installation of SQLite3 and related dependencies on macOS"
+          brew update
+          brew install cmake ccache sqlite3 libtiff libcurl
+          echo "==> Finished installing SQLite3 dependencies on macOS"
+        elif [[ "${{runner.os}}" == "Windows" ]]; then
+          echo "==> Starting installation of SQLite3 and related dependencies on Windows"
+          vcpkg install sqlite3[core,tool] tiff curl --triplet=${{ env.ARCH }}-windows
+          echo "==> Finished installing SQLite3 dependencies on Windows"
+        fi
+
+
     # Dependents: gdal
     - name: Checkout PROJ
       if: steps.cache-proj.outputs.cache-hit != 'true'
@@ -25,13 +46,6 @@ runs:
         repository: OSGeo/PROJ
         path: './dependencies/proj'
         ref: 9.4.0
-
-    # Install SQLite first (only if PROJ is not cached)
-    - name: Install SQLite Dependency
-      if: steps.cache-proj.outputs.cache-hit != 'true'
-      uses: ./source/.github/actions/sqlite-install-dep
-      with:
-        cpu: ${{ inputs.cpu }}
 
     - name: Setup PROJ
       if: steps.cache-proj.outputs.cache-hit != 'true'
@@ -52,8 +66,8 @@ runs:
         -DCMAKE_INSTALL_PREFIX=../proj_install
         -DCMAKE_PREFIX_PATH=$(pwd)/../install
         -DBUILD_TESTING=OFF
-        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
-        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || '' }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || '' }}
 
     - name: Build PROJ
       if: steps.cache-proj.outputs.cache-hit != 'true'
