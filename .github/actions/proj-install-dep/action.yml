@@ -1,0 +1,88 @@
+name: 'Install PROJ Dependency'
+description: 'Install PROJ Dependency using cache when possible'
+inputs:
+  cpu:
+    description: 'CPU architecture to build for'
+    required: false
+    default: 'x86_64'
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Cache PROJ
+      id: cache-proj
+      uses: actions/cache/restore@v4
+      with:
+        path: dependencies/proj_install
+        key: proj-9.4.0-${{runner.os}}-${{inputs.cpu}}-1
+
+    - name: Install SQLite3 dependencies
+      if: steps.cache-proj.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        if [[ "${{runner.os}}" == "Linux" ]]; then
+          echo "==> Starting installation of SQLite3 and related dependencies on Linux"
+          sudo apt-get update
+          sudo apt-get install -y ccache cmake g++ sqlite3 libsqlite3-dev libtiff-dev libcurl4-openssl-dev
+          echo "==> Finished installing SQLite3 dependencies on Linux"
+        elif [[ "${{runner.os}}" == "macOS" ]]; then
+          echo "==> Starting installation of SQLite3 and related dependencies on macOS"
+          brew update
+          brew install cmake ccache sqlite3 libtiff libcurl
+          echo "==> Finished installing SQLite3 dependencies on macOS"
+        elif [[ "${{runner.os}}" == "Windows" ]]; then
+          echo "==> Starting installation of SQLite3 and related dependencies on Windows"
+          vcpkg install sqlite3[core,tool] tiff curl --triplet=${{ env.ARCH }}-windows
+          echo "==> Finished installing SQLite3 dependencies on Windows"
+        fi
+
+
+    # Dependents: gdal
+    - name: Checkout PROJ
+      if: steps.cache-proj.outputs.cache-hit != 'true'
+      uses: actions/checkout@v4
+      with:
+        repository: OSGeo/PROJ
+        path: './dependencies/proj'
+        ref: 9.4.0
+
+    - name: Setup PROJ
+      if: steps.cache-proj.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir proj_build
+        mkdir proj_install
+
+    - name: Configure PROJ
+      if: steps.cache-proj.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/proj_build
+      shell: bash
+      run: >
+        cmake ../proj
+        -DBUILD_SHARED_LIBS=ON
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX=../proj_install
+        -DCMAKE_PREFIX_PATH=$(pwd)/../install
+        -DBUILD_TESTING=OFF
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || '' }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || '' }}
+
+    - name: Build PROJ
+      if: steps.cache-proj.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/proj_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/proj_install
+      shell: bash
+      run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-proj.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-proj.outputs.cache-primary-key }}
+        path: dependencies/proj_install

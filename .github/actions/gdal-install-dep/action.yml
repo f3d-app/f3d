@@ -1,0 +1,86 @@
+name: 'Install GDAL Dependency'
+description: 'Install GDAL Dependency using cache when possible'
+inputs:
+  cpu:
+    description: 'CPU architecture to build for'
+    required: false
+    default: 'x86_64'
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Cache GDAL
+      id: cache-gdal
+      uses: actions/cache/restore@v4
+      with:
+        path: dependencies/gdal_install
+        key: gdal-v3.8.0-${{runner.os}}-${{inputs.cpu}}-0
+
+    # Dependents: pdal, proj
+    - name: Install PROJ Dependency
+      if: steps.cache-gdal.outputs.cache-hit != 'true'
+      uses: ./source/.github/actions/proj-install-dep
+      with:
+        cpu: ${{ inputs.cpu }}
+
+    - name: Checkout GDAL
+      if: steps.cache-gdal.outputs.cache-hit != 'true'
+      uses: actions/checkout@v4
+      with:
+        repository: OSGeo/gdal
+        path: './dependencies/gdal'
+        ref: v3.8.0
+
+    - name: Setup GDAL
+      if: steps.cache-gdal.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir gdal_build
+        mkdir gdal_install
+
+    - name: Configure GDAL
+      if: steps.cache-gdal.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/gdal_build
+      shell: bash
+      run: >
+        cmake ../gdal
+        -DBUILD_SHARED_LIBS=ON
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX=../gdal_install
+        -DGDAL_USE_EXTERNAL_LIBS=ON
+        -DGDAL_ENABLE_DRIVER_GPKG=ON
+        -DGDAL_ENABLE_DRIVER_TIFF=ON
+        -DGDAL_ENABLE_DRIVER_NETCDF=OFF
+        -DGDAL_ENABLE_DRIVER_POSTGIS=OFF
+        -DGDAL_ENABLE_DRIVER_SHP=ON
+        -DGDAL_ENABLE_DRIVER_VRT=ON
+        -DGDAL_ENABLE_DRIVER_PDF=OFF
+        -DGDAL_ENABLE_DRIVER_OPENJPEG=OFF
+        -DGDAL_ENABLE_DRIVER_JPEG=ON
+        -DGDAL_ENABLE_DRIVER_PNG=ON
+        -DGDAL_USE_ZLIB=ON
+        -DGDAL_USE_LZMA=ON
+        -DGDAL_USE_ZSTD=ON
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+
+    - name: Build GDAL
+      if: steps.cache-gdal.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/gdal_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/gdal_install
+      shell: bash
+      run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-gdal.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-gdal.outputs.cache-primary-key }}
+        path: dependencies/gdal_install

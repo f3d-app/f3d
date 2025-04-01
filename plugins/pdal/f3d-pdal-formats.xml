@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/vnd.las">
+    <comment>LAS file</comment>
+    <glob pattern="*.las"/>
+  </mime-type>
+  <mime-type type="application/vnd.laz">
+    <comment>Compressed LAS file</comment>
+    <glob pattern="*.laz"/>
+  </mime-type>
+  <mime-type type="application/vnd.pts">
+    <comment>Laser scan plain data format</comment>
+    <glob pattern="*.pts"/>
+  </mime-type>
+  <mime-type type="application/vnd.ptx">
+    <comment>ptx plain text data format</comment>
+    <glob pattern="*.ptx"/>
+  </mime-type>
+  <mime-type type="application/vnd.pcd">
+    <comment>point cloud data</comment>
+    <glob pattern="*.pcd"/>
+  </mime-type>
+</mime-info>

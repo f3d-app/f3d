@@ -26,6 +26,9 @@ inputs:
   openvdb_version:
     description: 'Version of openvdb to build'
     required: false
+  pdal_version:
+    description: 'Version of PDAL to build'
+    required: false
   usd_version:
     description: 'Version of usd to build'
     required: false
@@ -60,6 +63,7 @@ runs:
         occt_version: ${{inputs.occt_version}}
         openexr_version: ${{inputs.openexr_version}}
         openvdb_version: ${{inputs.openvdb_version}}
+        pdal_version: ${{inputs.pdal_version}}
         usd_version: ${{inputs.usd_version}}
 
     - name: Install VTK dependency
@@ -68,6 +72,7 @@ runs:
         vtk_version: ${{inputs.vtk_version}}
         raytracing_label: raytracing
         openvdb_version: ${{inputs.openvdb_version}}
+        pdal_version: ${{inputs.pdal_version}}
 
     # coverage build is done in source as it seems to be required for codecov
     # CMAKE_MODULE_PATH is required because of
@@ -83,7 +88,7 @@ runs:
         -DBUILD_TESTING=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
-        -DCMAKE_MODULE_PATH=$(pwd)/../dependencies/install/lib/cmake/OpenVDB/
+        -DCMAKE_MODULE_PATH=$(pwd)/../dependencies/install/lib/cmake/OpenVDB/:$(pwd)/../dependencies/install/lib/cmake/PDAL/
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_COVERAGE=ON
         -DF3D_MODULE_EXR=ON
@@ -96,6 +101,7 @@ runs:
         -DF3D_PLUGIN_BUILD_OCCT=ON
         -DF3D_PLUGIN_BUILD_USD=ON
         -DF3D_PLUGIN_BUILD_VDB=ON
+        -DF3D_PLUGIN_BUILD_PDAL=ON
         -DF3D_STRICT_BUILD=ON
         -DF3D_TESTING_ENABLE_EGL_TESTS=ON
         -DF3D_TESTING_ENABLE_EXTERNAL_GLFW=ON

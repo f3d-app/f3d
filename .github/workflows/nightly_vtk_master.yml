@@ -54,6 +54,8 @@ jobs:
       openexr_min_version: ${{ steps.set_default_versions.outputs.openexr_min_version }}
       openvdb_version: ${{ steps.set_default_versions.outputs.openvdb_version }}
       openvdb_min_version: ${{ steps.set_default_versions.outputs.openvdb_min_version }}
+      pdal_version: ${{ steps.set_default_versions.outputs.pdal_version }}
+      pdal_min_version: ${{ steps.set_default_versions.outputs.pdal_min_version }}
       pybind11_version: ${{ steps.set_default_versions.outputs.pybind11_version }}
       pybind11_min_version: ${{ steps.set_default_versions.outputs.pybind11_min_version }}
       python_version: ${{ steps.set_default_versions.outputs.python_version }}
@@ -136,6 +138,7 @@ jobs:
         occt_version: ${{needs.default_versions.outputs.occt_version}}
         openexr_version: ${{needs.default_versions.outputs.openexr_version}}
         openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+        pdal_version: ${{needs.default_versions.outputs.pdal_version}}
         pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
         python_version: ${{needs.default_versions.outputs.python_version}}
         usd_version: ${{needs.default_versions.outputs.usd_version}}
@@ -185,6 +188,7 @@ jobs:
         occt_version: ${{needs.default_versions.outputs.occt_version}}
         openexr_version: ${{needs.default_versions.outputs.openexr_version}}
         openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+        pdal_version: ${{needs.default_versions.outputs.pdal_version}}
         pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
         python_version: ${{needs.default_versions.outputs.python_version}}
         usd_version: ${{needs.default_versions.outputs.usd_version}}
@@ -221,6 +225,7 @@ jobs:
         occt_version: ${{needs.default_versions.outputs.occt_version}}
         openexr_version: ${{needs.default_versions.outputs.openexr_version}}
         openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+        pdal_version: ${{needs.default_versions.outputs.pdal_version}}
         pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
         python_version: ${{needs.default_versions.outputs.python_version}}
         usd_version: ${{needs.default_versions.outputs.usd_version}}
@@ -257,6 +262,7 @@ jobs:
         occt_version: ${{needs.default_versions.outputs.occt_version}}
         openexr_version: ${{needs.default_versions.outputs.openexr_version}}
         openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+        pdal_version: ${{needs.default_versions.outputs.pdal_version}}
         pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
         python_version: ${{needs.default_versions.outputs.python_version}}
         usd_version: ${{needs.default_versions.outputs.usd_version}}
@@ -307,6 +313,7 @@ jobs:
         occt_version: ${{needs.default_versions.outputs.occt_version}}
         openexr_version: ${{needs.default_versions.outputs.openexr_version}}
         openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+        pdal_version: ${{needs.default_versions.outputs.pdal_version}}
         pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
         python_version: ${{needs.default_versions.outputs.python_version}}
         usd_version: ${{needs.default_versions.outputs.usd_version}}
