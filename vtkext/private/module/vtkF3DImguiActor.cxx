@@ -446,7 +446,8 @@ void vtkF3DImguiActor::RenderCheatSheet()
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
     ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings |
-    ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
+    ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove |
+    ImGuiWindowFlags_NoBringToFrontOnFocus;
 
   ImGui::Begin("CheatSheet", nullptr, flags);
 
