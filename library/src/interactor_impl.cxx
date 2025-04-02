@@ -906,8 +906,7 @@ interactor& interactor_impl::initCommands()
 //----------------------------------------------------------------------------
 interactor& interactor_impl::addCommand(InteractiveCommand command)
 {
-  const auto [it, success] =
-    this->Internals->Commands.insert({ command.Name, std::move(command) });
+  const auto [it, success] = this->Internals->Commands.insert({ command.Name, std::move(command) });
   if (!success)
   {
     throw interactor::already_exists_exception(
