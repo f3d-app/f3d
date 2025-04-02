@@ -89,8 +89,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
 
   // Replace the add_files command
   inter.removeCommand("add_files");
-  constexpr InteractiveCommandDoc<0> F3D_CMD_ADD_FILES = { "add_files",
-    "Add files." };
+  constexpr InteractiveCommandDoc<0> F3D_CMD_ADD_FILES = { "add_files", "Add files." };
   inter.addCommand(makeCommand(F3D_CMD_ADD_FILES, [&](const std::vector<std::string>& filesVec) {
     const std::string& path = filesVec[0];
     size_t found = path.find_last_of("/\\");
