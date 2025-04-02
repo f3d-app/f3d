@@ -94,9 +94,8 @@ int TestSDKInteractorCommand(int argc, char* argv[])
   test.expect<f3d::interactor::already_exists_exception>("add already existing command", [&]() {
     constexpr InteractiveCommandDoc<0> F3D_CMD_TEST_TOGGLE = { "open_file_dialog",
       "Testing toggle." };
-    inter.addCommand(
-      makeCommand(F3D_CMD_TEST_TOGGLE, [&](const std::vector<std::string>&) {
-      options.toggle("model.scivis.cells"); }));
+    inter.addCommand(makeCommand(F3D_CMD_TEST_TOGGLE,
+      [&](const std::vector<std::string>&) { options.toggle("model.scivis.cells"); }));
   });
 
   // Args check

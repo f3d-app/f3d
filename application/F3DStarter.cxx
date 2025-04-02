@@ -1914,6 +1914,6 @@ void F3DStarter::AddCommands()
     }));
 #endif
 
-  interactor.addCommand(makeCommand(
-    F3D_CMD_EXIT, [&](const std::vector<std::string>&) { interactor.stop(); }));
+  interactor.addCommand(
+    makeCommand(F3D_CMD_EXIT, [&](const std::vector<std::string>&) { interactor.stop(); }));
 }
