@@ -578,7 +578,7 @@ public:
   vtkNew<vtkF3DUIObserver> UIObserver;
   std::map<unsigned long, std::pair<int, std::function<void()>>> TimerCallBacks;
 
-  std::map<std::string, std::function<void(const std::vector<std::string>&)>> Commands;
+  std::map<std::string, InteractiveCommand> Commands;
   std::optional<std::string> CommandBuffer;
 
   std::map<interaction_bind_t, BindingCommands> Bindings;
@@ -670,28 +670,28 @@ interactor& interactor_impl::initCommands()
   };
 
   // Add default callbacks
-  this->addCommand("set",
+  this->addCommand(makeCommand(F3D_CMD_SET,
     [&](const std::vector<std::string>& args)
     {
       check_args(args, 2, "set");
       this->Internals->Options.setAsString(args[0], args[1]);
-    });
+    }));
 
-  this->addCommand("toggle",
+  this->addCommand(makeCommand(F3D_CMD_TOGGLE,
     [&](const std::vector<std::string>& args)
     {
       check_args(args, 1, "toggle");
       this->Internals->Options.toggle(args[0]);
-    });
+    }));
 
-  this->addCommand("reset",
+  this->addCommand(makeCommand(F3D_CMD_RESET,
     [&](const std::vector<std::string>& args)
     {
       check_args(args, 1, "reset");
       this->Internals->Options.reset(args[0]);
-    });
+    }));
 
-  this->addCommand("clear",
+  this->addCommand(makeCommand(F3D_CMD_CLEAR,
     [&](const std::vector<std::string>& args)
     {
       check_args(args, 0, "clear");
@@ -701,31 +701,31 @@ interactor& interactor_impl::initCommands()
       assert(console != nullptr);
       console->Clear();
 #endif
-    });
+    }));
 
-  this->addCommand("print",
+  this->addCommand(makeCommand(F3D_CMD_PRINT,
     [&](const std::vector<std::string>& args)
     {
       check_args(args, 1, "print");
       log::info(this->Internals->Options.getAsString(args[0]));
-    });
+    }));
 
-  this->addCommand("set_reader_option",
+  this->addCommand(makeCommand(F3D_CMD_SET_READER_OPTION,
     [&](const std::vector<std::string>& args)
     {
       check_args(args, 2, "set_reader_option");
       f3d::engine::setReaderOption(args[0], args[1]);
-    });
+    }));
 
-  this->addCommand("cycle_animation",
+  this->addCommand(makeCommand(F3D_CMD_CYCLE_ANIMATION,
     [&](const std::vector<std::string>&)
     {
       this->Internals->AnimationManager->CycleAnimation();
       this->Internals->Options.scene.animation.index =
         this->Internals->AnimationManager->GetAnimationIndex();
-    });
+    }));
 
-  this->addCommand("cycle_anti_aliasing",
+  this->addCommand(makeCommand(F3D_CMD_CYCLE_ANTI_ALIASING,
     [&](const std::vector<std::string>&)
     {
       bool& enabled = this->Internals->Options.render.effect.antialiasing.enable;
@@ -747,9 +747,9 @@ interactor& interactor_impl::initCommands()
         }
       }
       this->Internals->Window.render();
-    });
+    }));
 
-  this->addCommand("cycle_coloring",
+  this->addCommand(makeCommand(F3D_CMD_CYCLE_COLORING,
     [&](const std::vector<std::string>& args)
     {
       check_args(args, 1, "cycle_coloring");
@@ -776,39 +776,42 @@ interactor& interactor_impl::initCommands()
       }
       this->Internals->SynchronizeScivisOptions(this->Internals->Options, ren);
       this->Internals->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
-    });
+    }));
 
-  this->addCommand("roll_camera",
+  this->addCommand(makeCommand(F3D_CMD_ROLL_CAMERA,
     [&](const std::vector<std::string>& args)
     {
       check_args(args, 1, "roll_camera");
       this->Internals->Window.getCamera().roll(options::parse<int>(args[0]));
       this->Internals->Style->SetTemporaryUp(
         this->Internals->Window.getCamera().getViewUp().data());
-    });
+    }));
 
-  this->addCommand("increase_light_intensity",
-    [&](const std::vector<std::string>&) { this->Internals->IncreaseLightIntensity(false); });
+  this->addCommand(makeCommand(F3D_CMD_INCREASE_LIGHT_INTENSITY,
+    [&](const std::vector<std::string>&) { this->Internals->IncreaseLightIntensity(false); }));
 
-  this->addCommand("decrease_light_intensity",
-    [&](const std::vector<std::string>&) { this->Internals->IncreaseLightIntensity(true); });
+  this->addCommand(makeCommand(F3D_CMD_DECREASE_LIGHT_INTENSITY,
+    [&](const std::vector<std::string>&) { this->Internals->IncreaseLightIntensity(true); }));
 
-  this->addCommand("increase_opacity",
-    [&](const std::vector<std::string>&) { this->Internals->IncreaseOpacity(false); });
+  this->addCommand(makeCommand(F3D_CMD_INCREASE_OPACITY,
+    [&](const std::vector<std::string>&) { this->Internals->IncreaseOpacity(false); }));
 
-  this->addCommand("decrease_opacity",
-    [&](const std::vector<std::string>&) { this->Internals->IncreaseOpacity(true); });
+  this->addCommand(makeCommand(F3D_CMD_DECREASE_OPACITY,
+    [&](const std::vector<std::string>&) { this->Internals->IncreaseOpacity(true); }));
 
-  this->addCommand("print_scene_info", [&](const std::vector<std::string>&)
-    { this->Internals->Window.PrintSceneDescription(log::VerboseLevel::INFO); });
+  this->addCommand(
+    makeCommand(F3D_CMD_PRINT_SCENE_INFO, [&](const std::vector<std::string>&)
+      { this->Internals->Window.PrintSceneDescription(log::VerboseLevel::INFO); }));
 
-  this->addCommand("print_coloring_info", [&](const std::vector<std::string>&)
-    { this->Internals->Window.PrintColoringDescription(log::VerboseLevel::INFO); });
+  this->addCommand(
+    makeCommand(F3D_CMD_PRINT_COLORING_INFO, [&](const std::vector<std::string>&)
+      { this->Internals->Window.PrintColoringDescription(log::VerboseLevel::INFO); }));
 
-  this->addCommand("print_mesh_info", [&](const std::vector<std::string>&)
-    { this->Internals->Scene.PrintImporterDescription(log::VerboseLevel::INFO); });
+  this->addCommand(
+    makeCommand(F3D_CMD_PRINT_MESH_INFO, [&](const std::vector<std::string>&)
+      { this->Internals->Scene.PrintImporterDescription(log::VerboseLevel::INFO); }));
 
-  this->addCommand("print_options_info",
+  this->addCommand(makeCommand(F3D_CMD_PRINT_OPTIONS_INFO,
     [&](const std::vector<std::string>&)
     {
       for (const std::string& option : this->Internals->Options.getNames())
@@ -818,9 +821,9 @@ interactor& interactor_impl::initCommands()
         descr.append(option).append(": ").append(val);
         log::print(log::VerboseLevel::INFO, descr);
       }
-    });
+    }));
 
-  this->addCommand("set_camera",
+  this->addCommand(makeCommand(F3D_CMD_SET_CAMERA,
     [&](const std::vector<std::string>& args)
     {
       check_args(args, 1, "set_camera");
@@ -828,58 +831,57 @@ interactor& interactor_impl::initCommands()
       if (type == "front")
       {
         this->Internals->SetViewOrbit(internals::ViewType::VT_FRONT);
-        this->Internals->Style->ResetTemporaryUp();
       }
       else if (type == "top")
       {
         this->Internals->SetViewOrbit(internals::ViewType::VT_TOP);
-        this->Internals->Style->ResetTemporaryUp();
       }
       else if (type == "right")
       {
         this->Internals->SetViewOrbit(internals::ViewType::VT_RIGHT);
-        this->Internals->Style->ResetTemporaryUp();
       }
       else if (type == "isometric")
       {
         this->Internals->SetViewOrbit(internals::ViewType::VT_ISOMETRIC);
-        this->Internals->Style->ResetTemporaryUp();
       }
       else
       {
         throw interactor::invalid_args_exception(
           std::string("Command: set_camera arg:\"") + std::string(type) + "\" is not recognized.");
       }
-    });
+      this->Internals->Style->ResetTemporaryUp();
+    }));
 
-  this->addCommand("toggle_volume_rendering",
+  this->addCommand(makeCommand(F3D_CMD_TOGGLE_VOLUME_RENDERING,
     [&](const std::vector<std::string>&)
     {
       this->Internals->Options.model.volume.enable = !this->Internals->Options.model.volume.enable;
       this->Internals->Window.render();
       this->Internals->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
-    });
+    }));
 
-  this->addCommand("stop_interactor", [&](const std::vector<std::string>&) { this->stop(); });
+  this->addCommand(makeCommand(
+    F3D_CMD_STOP_INTERACTOR, [&](const std::vector<std::string>&) { this->stop(); }));
 
-  this->addCommand("reset_camera",
+  this->addCommand(makeCommand(F3D_CMD_RESET_CAMERA,
     [&](const std::vector<std::string>&)
     {
       this->Internals->Window.getCamera().resetToDefault();
       this->Internals->Style->ResetTemporaryUp();
-    });
+    }));
 
-  this->addCommand("toggle_animation",
-    [&](const std::vector<std::string>&) { this->Internals->AnimationManager->ToggleAnimation(); });
+  this->addCommand(
+    makeCommand(F3D_CMD_TOGGLE_ANIMATION, [&](const std::vector<std::string>&)
+      { this->Internals->AnimationManager->ToggleAnimation(); }));
 
-  this->addCommand("add_files",
+  this->addCommand(makeCommand(F3D_CMD_ADD_FILES,
     [&](const std::vector<std::string>& files)
     {
       this->Internals->AnimationManager->StopAnimation();
       this->Internals->Scene.add(files);
-    });
+    }));
 
-  this->addCommand("alias",
+  this->addCommand(makeCommand(F3D_CMD_ALIAS,
     [&](const std::vector<std::string>& args)
     {
       if (args.size() < 2)
@@ -897,16 +899,16 @@ interactor& interactor_impl::initCommands()
 
       log::info(
         "Alias " + aliasName + " added with command " + this->Internals->AliasMap[aliasName]);
-    });
+    }));
+
   return *this;
 }
 
 //----------------------------------------------------------------------------
-interactor& interactor_impl::addCommand(
-  std::string action, std::function<void(const std::vector<std::string>&)> callback)
+interactor& interactor_impl::addCommand(InteractiveCommand command)
 {
   const auto [it, success] =
-    this->Internals->Commands.insert({ std::move(action), std::move(callback) });
+    this->Internals->Commands.insert({ command.Name, std::move(command) });
   if (!success)
   {
     throw interactor::already_exists_exception(
@@ -965,10 +967,10 @@ bool interactor_impl::triggerCommand(std::string_view command)
   try
   {
     // Find the right command to call
-    auto callbackIt = this->Internals->Commands.find(action);
-    if (callbackIt != this->Internals->Commands.end())
+    auto commandIt = this->Internals->Commands.find(action);
+    if (commandIt != this->Internals->Commands.end())
     {
-      callbackIt->second({ tokens.begin() + 1, tokens.end() });
+      commandIt->second.Handler({ tokens.begin() + 1, tokens.end() });
       return true;
     }
     else

@@ -1754,7 +1754,7 @@ void F3DStarter::AddCommands()
     return f3d::options::parse<bool>(args[0]);
   };
 
-  interactor.addCommand("remove_file_groups",
+  interactor.addCommand(makeCommand(F3D_CMD_REMOVE_FILE_GROUPS,
     [this](const std::vector<std::string>&)
     {
       if (!this->Internals->AppOptions.NoRender)
@@ -1764,26 +1764,26 @@ void F3DStarter::AddCommands()
       this->Internals->FilesGroups.clear();
       this->LoadFileGroup(0, false, true);
       this->ResetWindowName();
-    });
+    }));
 
-  interactor.addCommand("load_previous_file_group",
+  interactor.addCommand(makeCommand(F3D_CMD_LOAD_PREVIOUS_FILE_GROUP,
     [this](const std::vector<std::string>& args)
     {
       this->LoadRelativeFileGroup(
         -1, parse_optional_bool_flag(args, "load_previous_file_group", false));
-    });
+    }));
 
-  interactor.addCommand("load_next_file_group",
+  interactor.addCommand(makeCommand(F3D_CMD_LOAD_NEXT_FILE_GROUP,
     [this](const std::vector<std::string>& args)
     {
       this->LoadRelativeFileGroup(
         +1, parse_optional_bool_flag(args, "load_next_file_group", false));
-    });
+    }));
 
-  interactor.addCommand("reload_current_file_group",
-    [this](const std::vector<std::string>&) { this->LoadRelativeFileGroup(0, true, true); });
+  interactor.addCommand(makeCommand(F3D_CMD_RELOAD_CURRENT_FILE_GROUP,
+    [this](const std::vector<std::string>&) { this->LoadRelativeFileGroup(0, true, true); }));
 
-  interactor.addCommand("add_current_directories",
+  interactor.addCommand(makeCommand(F3D_CMD_ADD_CURRENT_DIRECTORIES,
     [this](const std::vector<std::string>&)
     {
       if (!this->Internals->LoadedFiles.empty())
@@ -1794,29 +1794,29 @@ void F3DStarter::AddCommands()
         }
         this->LoadRelativeFileGroup(0);
       }
-    });
+    }));
 
-  interactor.addCommand("take_screenshot",
+  interactor.addCommand(makeCommand(F3D_CMD_TAKE_SCREENSHOT,
     [this](const std::vector<std::string>& args)
     {
       // XXX: Add a test for this one this can be reached with a non empty filename
       std::string filename =
         args.empty() ? this->Internals->AppOptions.ScreenshotFilename : args[0];
       this->SaveScreenshot(filename);
-    });
+    }));
 
-  interactor.addCommand("take_minimal_screenshot",
+  interactor.addCommand(makeCommand(F3D_CMD_TAKE_MINIMAL_SCREENSHOT,
     [this](const std::vector<std::string>& args)
     {
       // XXX: Add a test for this one this can be reached with a non empty filename
       std::string filename =
         args.empty() ? this->Internals->AppOptions.ScreenshotFilename : args[0];
       this->SaveScreenshot(filename, true);
-    });
+    }));
 
   // This replace an existing command in libf3d
   interactor.removeCommand("add_files");
-  interactor.addCommand("add_files",
+  interactor.addCommand(makeCommand(F3D_CMD_ADD_FILES,
     [this](const std::vector<std::string>& files)
     {
       int index = -1;
@@ -1828,9 +1828,9 @@ void F3DStarter::AddCommands()
       {
         this->LoadFileGroup(index);
       }
-    });
+    }));
 
-  interactor.addCommand("set_hdri",
+  interactor.addCommand(makeCommand(F3D_CMD_SET_HDRI,
     [this](const std::vector<std::string>& files)
     {
       if (!files.empty())
@@ -1844,9 +1844,9 @@ void F3DStarter::AddCommands()
         // Rendering now is needed for correct lighting
         this->Render();
       }
-    });
+    }));
 
-  interactor.addCommand("add_files_or_set_hdri",
+  interactor.addCommand(makeCommand(F3D_CMD_ADD_FILES_OR_SET_HDRI,
     [this](const std::vector<std::string>& files)
     {
       int index = -1;
@@ -1874,10 +1874,10 @@ void F3DStarter::AddCommands()
       {
         this->LoadFileGroup(index);
       }
-    });
+    }));
 
 #if F3D_MODULE_TINYFILEDIALOGS
-  interactor.addCommand("open_file_dialog",
+  interactor.addCommand(makeCommand(F3D_CMD_OPEN_FILE_DIALOG,
     [this](const std::vector<std::string>&)
     {
       std::vector<std::string> filters;
@@ -1911,7 +1911,9 @@ void F3DStarter::AddCommands()
           this->LoadFileGroup(index);
         }
       }
-    });
+    }));
 #endif
-  interactor.addCommand("exit", [&](const std::vector<std::string>&) { interactor.stop(); });
+
+  interactor.addCommand(makeCommand(
+    F3D_CMD_EXIT, [&](const std::vector<std::string>&) { interactor.stop(); }));
 }

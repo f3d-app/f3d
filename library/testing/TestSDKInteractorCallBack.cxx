@@ -89,17 +89,21 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
 
   // Replace the add_files command
   inter.removeCommand("add_files");
-  inter.addCommand("add_files", [&](const std::vector<std::string>& filesVec) {
+  constexpr InteractiveCommandDoc<0> F3D_CMD_ADD_FILES = { "add_files",
+    "Add files." };
+  inter.addCommand(makeCommand(F3D_CMD_ADD_FILES, [&](const std::vector<std::string>& filesVec) {
     const std::string& path = filesVec[0];
     size_t found = path.find_last_of("/\\");
     sce.clear();
     sce.add(path.substr(0, found + 1) + "suzanne.ply");
-  });
+  }));
 
   // Add a command and binding that throws an exception
-  inter.addCommand("exception", [&](const std::vector<std::string>&) {
+  constexpr InteractiveCommandDoc<0> F3D_CMD_EXCEPTION = { "exception",
+    "Testing runtime exception." };
+  inter.addCommand(makeCommand(F3D_CMD_EXCEPTION, [&](const std::vector<std::string>&) {
     throw std::runtime_error("testing runtime exception");
-  });
+  }));
   inter.addBinding({ mod_t::NONE, "Z" }, "exception");
 
   // This time the interaction should result in a different rendering

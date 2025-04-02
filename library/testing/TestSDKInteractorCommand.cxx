@@ -52,8 +52,10 @@ int TestSDKInteractorCommand(int argc, char* argv[])
     inter.triggerCommand("set scene.animation.index invalid") == false);
 
   // Add/Remove command
-  inter.addCommand(
-    "test_toggle", [&](const std::vector<std::string>&) { options.toggle("model.scivis.cells"); });
+  constexpr InteractiveCommandDoc<0> F3D_CMD_TEST_TOGGLE = { "open_file_dialog",
+    "Testing toggle." };
+  inter.addCommand(makeCommand(F3D_CMD_TEST_TOGGLE,
+    [&](const std::vector<std::string>&) { options.toggle("model.scivis.cells"); }));
   inter.triggerCommand("test_toggle");
   test("addCommand", options.model.scivis.cells == false);
 
@@ -90,8 +92,11 @@ int TestSDKInteractorCommand(int argc, char* argv[])
 
   // check exception
   test.expect<f3d::interactor::already_exists_exception>("add already existing command", [&]() {
+    constexpr InteractiveCommandDoc<0> F3D_CMD_TEST_TOGGLE = { "open_file_dialog",
+      "Testing toggle." };
     inter.addCommand(
-      "toggle", [&](const std::vector<std::string>&) { options.toggle("model.scivis.cells"); });
+      makeCommand(F3D_CMD_TEST_TOGGLE, [&](const std::vector<std::string>&) {
+      options.toggle("model.scivis.cells"); }));
   });
 
   // Args check
@@ -109,9 +114,11 @@ int TestSDKInteractorCommand(int argc, char* argv[])
 
   // check runtime exception
   test.expect<f3d::interactor::command_runtime_exception>("trigger a runtime exception", [&]() {
-    inter.addCommand("exception", [&](const std::vector<std::string>&) {
+    constexpr InteractiveCommandDoc<0> F3D_CMD_EXCEPTION = { "exception",
+      "Testing runtime exception." };
+    inter.addCommand(makeCommand(F3D_CMD_EXCEPTION, [&](const std::vector<std::string>&) {
       throw std::runtime_error("testing runtime exception");
-    });
+    }));
     inter.triggerCommand("exception");
   });
 
