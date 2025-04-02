@@ -310,9 +310,9 @@ void vtkF3DImguiActor::RenderDropZone()
     const int tickNumberH = static_cast<int>(std::ceil(dropZoneH / (tickLength * 2.0f)));
 
     const double tickSpaceW =
-      static_cast<double>(std::ceil(dropZoneW - tickNumberW * tickLength) / (tickNumberW - 3));
+      static_cast<double>(dropZoneW - tickNumberW * tickLength + 1) / (tickNumberW - 1);
     const double tickSpaceH =
-      static_cast<double>(std::ceil(dropZoneH - tickNumberH * tickLength) / (tickNumberH - 3));
+      static_cast<double>(dropZoneH - tickNumberH * tickLength + 1) / (tickNumberH - 1);
 
     ::SetupNextWindow(ImVec2(0, 0), viewport->WorkSize);
     ImGui::SetNextWindowBgAlpha(0.f);
