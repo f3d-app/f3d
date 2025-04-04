@@ -207,14 +207,14 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
   constexpr float margin = 30.f;
   constexpr float marginTopRight = 5.f;
   const float padding = ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().FramePadding.x;
-  
+
   // explicitly calculate size of minimal console to avoid extra flashing frame
   if (minimal)
   {
     if (this->Pimpl->NewError || this->Pimpl->NewWarning)
     {
       // prevent overlap with console badge in minimal console
-      ImGui::SetNextWindowSize(ImVec2(viewport->WorkSize.x - 2.f * margin - 
+      ImGui::SetNextWindowSize(ImVec2(viewport->WorkSize.x - 2.f * margin -
           (ImGui::CalcTextSize("!").y + 2.f * padding) - marginTopRight,
         ImGui::CalcTextSize(">").y + 2.f * padding));
     }
