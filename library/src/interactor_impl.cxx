@@ -266,7 +266,8 @@ public:
     }
     else if (event == vtkF3DConsoleOutputWindow::HideEvent)
     {
-      // Invoked when esc key is pressed while in minimal console or console display, or when something is submitted to minimal console
+      // Invoked when esc key is pressed while in minimal console or console display, or when 
+      // something is submitted to minimal console
       self->Options.ui.console = false;
       self->Options.ui.minimal_console = false;
     }

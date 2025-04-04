@@ -214,15 +214,14 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
     if (this->Pimpl->NewError || this->Pimpl->NewWarning)
     {
       // prevent overlap with console badge in minimal console
-      ImGui::SetNextWindowSize(ImVec2(
-        viewport->WorkSize.x - 2.f * margin - (ImGui::CalcTextSize("!").y + 2.f * padding) - marginTopRight,
+      ImGui::SetNextWindowSize(ImVec2( viewport->WorkSize.x - 2.f * margin - 
+        (ImGui::CalcTextSize("!").y + 2.f * padding) - marginTopRight,
         ImGui::CalcTextSize(">").y + 2.f * padding));
     }
     else
     {
-      ImGui::SetNextWindowSize(ImVec2(
-        viewport->WorkSize.x - 2.f * margin,
-        ImGui::CalcTextSize(">").y + 2.f * padding));
+      ImGui::SetNextWindowSize(
+        ImVec2(viewport->WorkSize.x - 2.f * margin, ImGui::CalcTextSize(">").y + 2.f * padding));
     }
   }
   else
@@ -231,8 +230,8 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
     this->Pimpl->NewError = false;
     this->Pimpl->NewWarning = false;
 
-    ImGui::SetNextWindowSize(ImVec2(
-      viewport->WorkSize.x - 2.f * margin, viewport->WorkSize.y - 2.f * margin));
+    ImGui::SetNextWindowSize(
+      ImVec2(viewport->WorkSize.x - 2.f * margin, viewport->WorkSize.y - 2.f * margin));
   }
 
   ImGui::SetNextWindowPos(ImVec2(margin, margin));
