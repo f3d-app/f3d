@@ -239,6 +239,13 @@ runs:
       with:
         path: ${{github.workspace}}\build\Release\f3d
 
+    # A bug in Windows 2025 prevent loading invalid DLLs
+    # https://github.com/actions/runner-images/issues/11944
+    - name: Set CI test exception for Windows
+      if: runner.os == 'Windows'
+      shell: bash
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestSDKEngineExceptions)|(TestPluginInvalid)" >> $GITHUB_ENV
+
     # A EGL test is crashing in the CI but not locally
     - name: Set CI test exception for Linux EGL
       if:
