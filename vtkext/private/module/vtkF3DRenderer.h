@@ -59,6 +59,7 @@ public:
   void ShowFilename(bool show);
   void ShowCheatSheet(bool show);
   void ShowConsole(bool show);
+  void ShowMinimalConsole(bool show);
   void ShowDropZone(bool show);
   void ShowHDRISkybox(bool show);
   void ShowArmature(bool show);
@@ -525,6 +526,7 @@ private:
   bool MetaDataVisible = false;
   bool CheatSheetVisible = false;
   bool ConsoleVisible = false;
+  bool MinimalConsoleVisible = false;
   bool DropZoneVisible = false;
   bool HDRISkyboxVisible = false;
   bool ArmatureVisible = false;

@@ -1537,6 +1537,17 @@ void vtkF3DRenderer::ShowConsole(bool show)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::ShowMinimalConsole(bool show)
+{
+  if (this->MinimalConsoleVisible != show)
+  {
+    this->MinimalConsoleVisible = show;
+    this->UIActor->SetMinimalConsoleVisibility(show);
+    this->CheatSheetConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureCheatSheet(const std::vector<vtkF3DUIActor::CheatSheetGroup>& info)
 {
   if (this->CheatSheetVisible)
