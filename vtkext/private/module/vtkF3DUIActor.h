@@ -193,13 +193,6 @@ protected:
   }
 
   /**
-   * Render the minimal console widget
-   */
-  virtual void RenderMinimalConsole()
-  {
-  }
-
-  /**
    * Render the console badge
    */
   virtual void RenderConsoleBadge()
