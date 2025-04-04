@@ -80,6 +80,7 @@ public:
 
   /**
    * Set the minimal console visibility
+   * Console visibility has priority over minimal console visibility
    * False by default
    */
   void SetMinimalConsoleVisibility(bool show);

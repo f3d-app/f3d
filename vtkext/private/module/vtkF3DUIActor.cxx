@@ -160,6 +160,7 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
     this->RenderFpsCounter();
   }
 
+  // Only one console can be visible at a time, console has priority over minimal console
   if (this->ConsoleVisible)
   {
     this->RenderConsole(false);
@@ -168,7 +169,8 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
   {
     this->RenderConsole(true);
   }
-  else if (this->ConsoleBadgeEnabled)
+
+  if (this->ConsoleBadgeEnabled)
   {
     this->RenderConsoleBadge();
   }
