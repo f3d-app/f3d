@@ -185,12 +185,10 @@ void vtkF3DImguiConsole::DisplayText(const char* text)
     case vtkOutputWindow::MESSAGE_TYPE_ERROR:
       this->Pimpl->Logs.emplace_back(std::make_pair(Internals::LogType::Error, text));
       this->Pimpl->NewError = true;
-      this->Pimpl->NewWarning = false;
       break;
     case vtkOutputWindow::MESSAGE_TYPE_WARNING:
     case vtkOutputWindow::MESSAGE_TYPE_GENERIC_WARNING:
       this->Pimpl->Logs.emplace_back(std::make_pair(Internals::LogType::Warning, text));
-      this->Pimpl->NewError = false;
       this->Pimpl->NewWarning = true;
       break;
     default:
@@ -383,7 +381,7 @@ void vtkF3DImguiConsole::ShowBadge()
     ImGui::SetNextWindowSize(winSize);
 
     ImGuiWindowFlags winFlags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
-      ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
+      ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
 
     ImGui::Begin("ConsoleAlert", nullptr, winFlags);
 
