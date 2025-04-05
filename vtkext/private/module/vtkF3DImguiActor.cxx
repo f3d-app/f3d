@@ -322,6 +322,7 @@ void vtkF3DImguiActor::RenderDropZone()
       ImGuiWindowFlags_NoBringToFrontOnFocus;
 
     ImGui::Begin("DropZoneText", nullptr, flags);
+    /* Use background draw list to prevent "ignoring" NoBringToFrontOnFocus */
     ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
 
     const ImVec2 p0(dropzonePad, dropzonePad);
