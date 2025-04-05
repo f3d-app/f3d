@@ -318,7 +318,8 @@ void vtkF3DImguiActor::RenderDropZone()
     ImGui::SetNextWindowBgAlpha(0.f);
 
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
-      ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
+      ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove |
+      ImGuiWindowFlags_NoBringToFrontOnFocus;
 
     ImGui::Begin("DropZoneText", nullptr, flags);
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
