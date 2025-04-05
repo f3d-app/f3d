@@ -322,7 +322,7 @@ void vtkF3DImguiActor::RenderDropZone()
       ImGuiWindowFlags_NoBringToFrontOnFocus;
 
     ImGui::Begin("DropZoneText", nullptr, flags);
-    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+    ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
 
     const ImVec2 p0(dropzonePad, dropzonePad);
     const ImVec2 p1(dropzonePad + dropZoneW, dropzonePad + dropZoneH);
