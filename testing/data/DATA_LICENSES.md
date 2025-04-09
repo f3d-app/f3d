@@ -27,6 +27,7 @@
 - duck.fbx: assimp test models: BSD-3-Clause
 - Duck0.bin: Copyright 2006 Sony Computer Entertainment Inc.: SCEA Shared Source License
 - duck_invalid.gltf: Copyright 2006 Sony Computer Entertainment Inc.: SCEA Shared Source License
+- flame2.mdl: LibreQuake Project: BSD-3-Clause
 - HeadMRVolume\*: VTK Data: BSD-3-Clause
 - icosahedron.vdb: OpenVDB: [MPL-2.0](http://www.mozilla.org/MPL/2.0/)
 - iflamigm.3ds: VTK Data: BSD-3-Clause
@@ -49,7 +50,6 @@
 - samplePTS.pts: VTK Data: BSD-3-Clause
 - skin.png: Blender: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - small.ex2: VTK Data: BSD-3-Clause
-- soldier.mdl: LibreQuake Project: BSD-3-Clause
 - sphere_points.vdb: OpenVDB: [MPL-2.0](http://www.mozilla.org/MPL/2.0/)
 - teapot.off: Utah Teapot: Public Domain
 - tensors.vti: VTK Data: BSD-3-Clause
