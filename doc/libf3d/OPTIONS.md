@@ -111,7 +111,7 @@ See the [APIs](#APIs) details below for more info.
 |  ui.loader_progress   |   bool<br>false<br>load    | Show a _progress bar_ when loading the file.                                                                     |      \-\-progress      |
 | ui.animation_progress |   bool<br>false<br>load    | Show a _progress bar_ when playing the animation.                                                                | \-\-animation-progress |
 |      ui.metadata      |  bool<br>false<br>render   | Display the _metadata_.                                                                                          |      \-\-metadata      |
-|      ui.dropzone      |  bool<br>false<br>render   | Show a drop zone.                                                                                                |           -            |
+|      ui.dropzone      |  bool<br>false<br>render   | Show a drop zone. Rendering is disabled when the viewport is smaller than 10×10 pixels.                          |           -            |
 |   ui.dropzone_info    |   string<br>-<br>render    | Content of the drop zone text to display.                                                                        |           -            |
 
 # APIs

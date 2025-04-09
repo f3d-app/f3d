@@ -295,6 +295,12 @@ void vtkF3DImguiActor::RenderDropZone()
   if (this->DropZoneVisible)
   {
     ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+    if (viewport->WorkSize.x < 10 || viewport->WorkSize.y < 10)
+    {
+      return;
+    }
+
     constexpr ImU32 color = IM_COL32(255, 255, 255, 255);
 
     const int dropzonePad =
@@ -310,9 +316,9 @@ void vtkF3DImguiActor::RenderDropZone()
     const int tickNumberH = static_cast<int>(std::ceil(dropZoneH / (tickLength * 2.0f)));
 
     const double tickSpaceW =
-      static_cast<double>(std::ceil(dropZoneW - tickNumberW * tickLength) / (tickNumberW - 1));
+      static_cast<double>(dropZoneW - tickNumberW * tickLength + 1) / (tickNumberW - 1);
     const double tickSpaceH =
-      static_cast<double>(std::ceil(dropZoneH - tickNumberH * tickLength) / (tickNumberH - 1));
+      static_cast<double>(dropZoneH - tickNumberH * tickLength + 1) / (tickNumberH - 1);
 
     ::SetupNextWindow(ImVec2(0, 0), viewport->WorkSize);
     ImGui::SetNextWindowBgAlpha(0.f);
@@ -327,7 +333,7 @@ void vtkF3DImguiActor::RenderDropZone()
     const ImVec2 p1(dropzonePad + dropZoneW, dropzonePad + dropZoneH);
 
     // Draw top and bottom line
-    for (float x = p0.x; x < p1.x; x += tickLength + tickSpaceW)
+    for (float x = p0.x - 1; x < p1.x; x += tickLength + tickSpaceW)
     {
       const float y0 = p0.y + halfTickThickness;
       const float x1 = std::min(p1.x, x + tickLength);
