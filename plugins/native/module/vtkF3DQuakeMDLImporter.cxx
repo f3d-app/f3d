@@ -280,22 +280,69 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       cells->InsertNextCell(3, triangle);
     }
 
+    // A lambda to check frame name for standard naming scheme
+    // and recover animation name
+    auto extract_animation_name = [](const std::string& frameName) 
+    {
+      std::string::size_type sz;
+      sz = frameName.find_first_of("0123456789");
+      std::cout<<frameName<<" "<<sz<<" "<<frameName.substr(0, sz)<<std::endl;
+      if (sz == std::string::npos)
+      {
+        return std::tuple<bool, std::string>(false, "");
+      }
+      return std::tuple<bool, std::string>(true, frameName.substr(0, sz));
+    };
+
+    // A lambda to add an empty named animation, return the index to it
+    auto emplace_empty_animation = [&](const std::string& animName) 
+    {
+      this->AnimationNames.emplace_back(animName);
+      this->AnimationTimes.emplace_back(std::vector<double>());
+      this->AnimationFrames.emplace_back(std::vector<vtkSmartPointer<vtkPolyData>>());
+      return this->AnimationNames.size() - 1;
+    };
+
     // Create frames
     if (frameType == 0)
     {
-      // Only simple frames, create a single animation
-      this->AnimationNames.emplace_back("Animation");
-      this->AnimationTimes.emplace_back(std::vector<double>());
-      this->AnimationFrames.emplace_back(std::vector<vtkSmartPointer<vtkPolyData>>());
-    }
-
-    for (int frameNum = 0; frameNum < header->numFrames; frameNum++)
-    {
-      plugin_frame_pointer selectedFrame = framePtr[frameNum];
-      if (frameType == 0)
+      bool standardNamingScheme = true;
+      for (int frameNum = 0; frameNum < header->numFrames; frameNum++)
       {
+        // Recover pointer to the single frame
+        const mdl_simpleframe_t* frame = framePtr[frameNum].frames;
+
+        // Extract animation name from frame name and recover animation index accordingly
+        size_t animationIdx;
+        if (standardNamingScheme)
+        {
+          // Check if frame name respect standard naming scheme for simple frames
+          // eg: stand1, stand2, stand3, run1, run2, run3
+          // XXX: This code assume frames are provided in order and does not check the numbering
+          auto [standard, animationName] = extract_animation_name(frame->name);
+          if (!standard)
+          {
+            // If one frame is misnamed, give up and put every remaining frame in the same animation
+            standardNamingScheme = false;
+            animationIdx = emplace_empty_animation("Animation");
+            vtkWarningWithObjectMacro(this->Parent, "Frame name doesnt respect standard naming scheme: " + std::string(frame->name) + ", animation may be incorrect");
+          }
+          else
+          {
+            auto it = std::find(this->AnimationNames.begin(), this->AnimationNames.end(), animationName);
+            if (it != this->AnimationNames.end())
+            {
+              animationIdx = std::distance(this->AnimationNames.begin(), it); 
+            }
+            else
+            {
+              animationIdx = emplace_empty_animation(animationName);
+            }
+          }
+        }
+
         // Handle animation times
-        std::vector<double>& times = this->AnimationTimes[0];
+        std::vector<double>& times = this->AnimationTimes[animationIdx];
         if (times.empty())
         {
           times.emplace_back(0.0);
@@ -304,33 +351,53 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         {
           // Simple frames are 10 fps
           times.emplace_back(times.back() + 0.1);
+          std::cout<<times.back()<<std::endl;
         }
 
-        // Recover pointer to the single frame
-        const mdl_simpleframe_t* frame = selectedFrame.frames;
+        // Create the animation frame
         vtkSmartPointer<vtkPolyData> mesh = this->CreateMeshForSimpleFrame(frame, header, triangles, cells, textureCoordinates);
-        this->AnimationFrames[0].emplace_back(mesh);
+        this->AnimationFrames[animationIdx].emplace_back(mesh);
       }
-      else
+    }
+    else
+    {
+      for (int frameNum = 0; frameNum < header->numFrames; frameNum++)
       {
-        // TODO proper animation names
-        this->AnimationNames.emplace_back("Animation");
+        plugin_frame_pointer frameGroup = framePtr[frameNum];
 
+        std::string animationName;
         std::vector<double> times;
         std::vector<vtkSmartPointer<vtkPolyData>> meshes;
 
         // Iterate over each frame in the group
-        for (int groupFrameNum = 0; groupFrameNum < *selectedFrame.nb; groupFrameNum++)
+        for (int groupFrameNum = 0; groupFrameNum < *frameGroup.nb; groupFrameNum++)
         {
           // Recover the frame using the offsets because the struct doesnt store this pointer
           const mdl_simpleframe_t* frame = reinterpret_cast<const mdl_simpleframe_t*>(buffer.data() + frameOffsets[frameNum][groupFrameNum]);
 
+          // Assume all frames are named the with standard naming scheme
+          if (animationName.empty())
+          {
+            auto [standard, localAnimationName] = extract_animation_name(frame->name);
+            if (standard)
+            {
+              animationName = localAnimationName;
+            }
+            else
+            {
+              vtkWarningWithObjectMacro(this->Parent, "Frame name doesnt respect standard naming scheme: " + std::string(frame->name) + ", animation may be misnamed");
+              animationName = frame->name;
+            }
+          }
+
           // Recover time for this frame from the dedicated table
-          times.emplace_back(selectedFrame.time[groupFrameNum]);
+          times.emplace_back(frameGroup.time[groupFrameNum]);
 
           // Recover mesh for this frame
           meshes.emplace_back(this->CreateMeshForSimpleFrame(frame, header, triangles, cells, textureCoordinates));
         }
+        this->AnimationNames.emplace_back(animationName);
+        std::cout<<animationName<<std::endl;
         this->AnimationTimes.emplace_back(times);
         this->AnimationFrames.emplace_back(meshes);
       }
