@@ -108,41 +108,6 @@ void animationManager::Initialize()
   }
   this->EnableOnlyCurrentAnimation();
 
-  // Recover time ranges for all enabled animations
-  this->TimeRange[0] = std::numeric_limits<double>::infinity();
-  this->TimeRange[1] = -std::numeric_limits<double>::infinity();
-  for (vtkIdType animIndex = 0; animIndex < this->AvailAnimations; animIndex++)
-  {
-    if (this->Importer->IsAnimationEnabled(animIndex))
-    {
-      double timeRange[2];
-      int nbTimeSteps;
-      vtkNew<vtkDoubleArray> timeSteps;
-
-      // Discard timesteps, F3D only cares about elapsed time using time range and deltaTime
-      // Specifying a frame rate (60) in the next call is not needed after VTK 9.2.20230603 :
-      // VTK_VERSION_CHECK(9, 2, 20230603)
-      this->Importer->GetTemporalInformation(animIndex, 60, nbTimeSteps, timeRange, timeSteps);
-
-      // Accumulate time ranges
-      this->TimeRange[0] = std::min(timeRange[0], this->TimeRange[0]);
-      this->TimeRange[1] = std::max(timeRange[1], this->TimeRange[1]);
-      this->HasAnimation = true;
-    }
-  }
-  if (this->TimeRange[0] >= this->TimeRange[1])
-  {
-    log::warn("Animation(s) time range delta is invalid: [", this->TimeRange[0], ", ",
-      this->TimeRange[1], "]. Disabling animation.");
-    this->HasAnimation = false;
-    return;
-  }
-  else
-  {
-    log::debug("Animation(s) time range is: [", this->TimeRange[0], ", ", this->TimeRange[1], "].");
-  }
-  log::debug("");
-
   bool autoplay = this->Options.scene.animation.autoplay;
   if (autoplay)
   {
@@ -331,6 +296,41 @@ void animationManager::EnableOnlyCurrentAnimation()
       this->Importer->EnableAnimation(i);
     }
   }
+
+  // Recover time ranges for all enabled animations
+  this->TimeRange[0] = std::numeric_limits<double>::infinity();
+  this->TimeRange[1] = -std::numeric_limits<double>::infinity();
+  for (vtkIdType animIndex = 0; animIndex < this->AvailAnimations; animIndex++)
+  {
+    if (this->Importer->IsAnimationEnabled(animIndex))
+    {
+      double timeRange[2];
+      int nbTimeSteps;
+      vtkNew<vtkDoubleArray> timeSteps;
+
+      // Discard timesteps, F3D only cares about elapsed time using time range and deltaTime
+      // Specifying a frame rate (60) in the next call is not needed after VTK 9.2.20230603 :
+      // VTK_VERSION_CHECK(9, 2, 20230603)
+      this->Importer->GetTemporalInformation(animIndex, 60, nbTimeSteps, timeRange, timeSteps);
+
+      // Accumulate time ranges
+      this->TimeRange[0] = std::min(timeRange[0], this->TimeRange[0]);
+      this->TimeRange[1] = std::max(timeRange[1], this->TimeRange[1]);
+      this->HasAnimation = true;
+    }
+  }
+  if (this->TimeRange[0] >= this->TimeRange[1])
+  {
+    log::warn("Animation(s) time range delta is invalid: [", this->TimeRange[0], ", ",
+      this->TimeRange[1], "]. Disabling animation.");
+    this->HasAnimation = false;
+    return;
+  }
+  else
+  {
+    log::debug("Animation(s) time range is: [", this->TimeRange[0], ", ", this->TimeRange[1], "].");
+  }
+  log::debug("");
 }
 
 //----------------------------------------------------------------------------
