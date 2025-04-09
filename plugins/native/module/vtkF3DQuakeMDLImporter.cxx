@@ -60,6 +60,13 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     int coord_t;
   };
 
+  // Texture
+  struct mixed_pointer_array
+  {
+    int group;
+    const unsigned char* skin;
+  };
+
   // Simple frame
   struct mdl_simpleframe_t // 24 + nbVertices bytes
   {
@@ -97,11 +104,6 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     texture->InterpolateOn();
 
     // Read textures.
-    struct mixed_pointer_array
-    {
-      int group;
-      const unsigned char* skin;
-    };
     std::vector<mixed_pointer_array> skins = std::vector<mixed_pointer_array>(nbSkins);
     for (int i = 0; i < nbSkins; i++)
     {
@@ -415,7 +417,7 @@ bool vtkF3DQuakeMDLImporter::UpdateAtTimeValue(double timeValue)
   const std::vector<double>& times = this->Internals->AnimationTimes[this->Internals->ActiveAnimation];
 
   // TODO find_if ?
-  size_t frameIndex;
+  size_t frameIndex = 0;
   if (timeValue <= times.front())
   {
     frameIndex = 0;
