@@ -29,7 +29,7 @@ class window_impl;
 class animationManager
 {
 public:
-  animationManager(const options& options, window_impl& window);
+  animationManager(options& options, window_impl& window);
   ~animationManager() = default;
 
   /**
@@ -60,13 +60,9 @@ public:
 
   /**
    * Cycle onto and play the next available animation
+   * This modifies the scene.animation.index option
    */
   void CycleAnimation();
-
-  /**
-   * Enable only the current animation
-   */
-  void EnableOnlyCurrentAnimation();
 
   /**
    * Get the current animation index
@@ -103,16 +99,21 @@ public:
    */
   bool LoadAtTime(double timeValue);
 
-  animationManager(animationManager const&) = delete;
-  void operator=(animationManager const&) = delete;
-
   /**
    * Return a pair containing the current time range values
    */
   std::pair<double, double> GetTimeRange();
 
 private:
-  const options& Options;
+  animationManager(animationManager const&) = delete;
+  void operator=(animationManager const&) = delete;
+
+  /**
+   * Update members for animation index from options
+   */
+  void UpdateForAnimationIndex();
+
+  options& Options;
   window_impl& Window;
   vtkImporter* Importer = nullptr;
   interactor_impl* Interactor = nullptr;
@@ -123,7 +124,7 @@ private:
   double CurrentTime = 0;
   double DeltaTime = 0;
   bool CurrentTimeSet = false;
-  int AnimationIndex = 0;
+  int AnimationIndex = -2;
   int AvailAnimations = -1;
 
   vtkSmartPointer<vtkProgressBarWidget> ProgressWidget;

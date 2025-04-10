@@ -20,7 +20,7 @@
 namespace f3d::detail
 {
 //----------------------------------------------------------------------------
-animationManager::animationManager(const options& options, window_impl& window)
+animationManager::animationManager(options& options, window_impl& window)
   : Options(options)
   , Window(window)
 {
@@ -98,15 +98,9 @@ void animationManager::Initialize()
     log::debug(i, ": ", this->Importer->GetAnimationName(i));
   }
 
-  this->AnimationIndex = this->Options.scene.animation.index;
-  if (this->AnimationIndex > 0 && this->AnimationIndex >= this->AvailAnimations)
-  {
-    log::warn(
-      "Specified animation index is greater than the highest possible animation index, enabling "
-      "the first animation.");
-    this->AnimationIndex = 0;
-  }
-  this->EnableOnlyCurrentAnimation();
+  // Reset animation index to an invalid value before updating
+  this->AnimationIndex = -2;
+  this->UpdateForAnimationIndex();
 
   bool autoplay = this->Options.scene.animation.autoplay;
   if (autoplay)
@@ -244,14 +238,14 @@ void animationManager::CycleAnimation()
   {
     return;
   }
-  this->AnimationIndex += 1;
 
-  if (this->AnimationIndex == this->AvailAnimations)
+  this->Options.scene.animation.index++;
+  if (this->Options.scene.animation.index == this->AvailAnimations)
   {
-    this->AnimationIndex = -1;
+    this->Options.scene.animation.index = -1;
   }
 
-  this->EnableOnlyCurrentAnimation();
+  this->UpdateForAnimationIndex();
   this->LoadAtTime(this->TimeRange[0]);
 
   vtkRenderWindow* renWin = this->Window.GetRenderWindow();
@@ -282,9 +276,25 @@ std::string animationManager::GetAnimationName()
 }
 
 //----------------------------------------------------------------------------
-void animationManager::EnableOnlyCurrentAnimation()
+void animationManager::UpdateForAnimationIndex()
 {
   assert(this->Importer);
+
+  if (this->AnimationIndex == this->Options.scene.animation.index || this->AvailAnimations <= 0)
+  {
+    // Already updated or no animation available
+    return;
+  }
+
+  this->AnimationIndex = this->Options.scene.animation.index;
+  if (this->AnimationIndex > 0 && this->AnimationIndex >= this->AvailAnimations)
+  {
+    log::warn(
+      "Specified animation index is greater than the highest possible animation index, enabling "
+      "the first animation.");
+    this->AnimationIndex = 0;
+  }
+
   for (int i = 0; i < this->AvailAnimations; i++)
   {
     this->Importer->DisableAnimation(i);
@@ -296,6 +306,9 @@ void animationManager::EnableOnlyCurrentAnimation()
       this->Importer->EnableAnimation(i);
     }
   }
+
+  // Display currently selected animation
+  log::debug("Current animation is: ", this->GetAnimationName());
 
   // Recover time ranges for all enabled animations
   this->TimeRange[0] = std::numeric_limits<double>::infinity();
@@ -328,7 +341,7 @@ void animationManager::EnableOnlyCurrentAnimation()
   }
   else
   {
-    log::debug("Animation(s) time range is: [", this->TimeRange[0], ", ", this->TimeRange[1], "].");
+    log::debug("Current animation time range is: [", this->TimeRange[0], ", ", this->TimeRange[1], "].");
   }
   log::debug("");
 }
@@ -336,6 +349,10 @@ void animationManager::EnableOnlyCurrentAnimation()
 //----------------------------------------------------------------------------
 std::pair<double, double> animationManager::GetTimeRange()
 {
+  // Make sure TimeRange is updated
+  this->UpdateForAnimationIndex();
+
+  // Return updated data
   return std::make_pair(this->TimeRange[0], this->TimeRange[1]);
 }
 }
