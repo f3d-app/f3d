@@ -120,7 +120,6 @@ private:
 
   double TimeRange[2] = { 0.0, 0.0 };
   bool Playing = false;
-  bool HasAnimation = false;
   double CurrentTime = 0;
   double DeltaTime = 0;
   bool CurrentTimeSet = false;
