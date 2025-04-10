@@ -337,7 +337,8 @@ void animationManager::UpdateForAnimationIndex()
       this->TimeRange[1], "]. Swapping range.");
     std::swap(this->TimeRange[0], this->TimeRange[1]);
   }
-  log::debug("Current animation time range is: [", this->TimeRange[0], ", ", this->TimeRange[1], "].");
+  log::debug(
+    "Current animation time range is: [", this->TimeRange[0], ", ", this->TimeRange[1], "].");
   log::debug("");
 }
 
