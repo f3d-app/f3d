@@ -280,7 +280,7 @@ void animationManager::UpdateForAnimationIndex()
 {
   assert(this->Importer);
 
-  if (this->AnimationIndex == this->Options.scene.animation.index || this->AvailAnimations <= 0)
+  if (this->Options.scene.animation.index <= -2 || this->AnimationIndex == this->Options.scene.animation.index || this->AvailAnimations <= 0)
   {
     // Already updated or no animation available
     return;
