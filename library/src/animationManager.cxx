@@ -48,7 +48,6 @@ void animationManager::SetDeltaTime(double deltaTime)
 void animationManager::Initialize()
 {
   assert(this->Importer);
-  this->HasAnimation = false;
   this->Playing = false;
   this->CurrentTime = 0;
   this->CurrentTimeSet = false;
@@ -99,6 +98,7 @@ void animationManager::Initialize()
   }
 
   // Reset animation index to an invalid value before updating
+  // TODO: Rework animation index to be a vector of int
   this->AnimationIndex = -2;
   this->UpdateForAnimationIndex();
 
@@ -130,7 +130,7 @@ void animationManager::StopAnimation()
 //----------------------------------------------------------------------------
 void animationManager::ToggleAnimation()
 {
-  if (this->HasAnimation && this->Interactor)
+  if (this->AnimationIndex > -2 && this->Interactor)
   {
     this->Playing = !this->Playing;
 
@@ -185,7 +185,7 @@ void animationManager::Tick()
 bool animationManager::LoadAtTime(double timeValue)
 {
   assert(this->Importer);
-  if (!this->HasAnimation)
+  if (this->AnimationIndex == -2)
   {
     log::warn("No animation available, cannot load a specific animation time");
     return false;
@@ -263,12 +263,12 @@ int animationManager::GetAnimationIndex()
 std::string animationManager::GetAnimationName()
 {
   assert(this->Importer);
-  if (this->AvailAnimations <= 0)
+  if (this->AvailAnimations <= 0 || this->AnimationIndex == -2)
   {
     return "No animation";
   }
 
-  if (this->AnimationIndex < 0)
+  if (this->AnimationIndex == -1)
   {
     return "All Animations";
   }
@@ -301,7 +301,7 @@ void animationManager::UpdateForAnimationIndex()
   }
   for (int i = 0; i < this->AvailAnimations; i++)
   {
-    if (this->AnimationIndex < 0 || i == this->AnimationIndex)
+    if (this->AnimationIndex == -1 || i == this->AnimationIndex)
     {
       this->Importer->EnableAnimation(i);
     }
@@ -329,20 +329,15 @@ void animationManager::UpdateForAnimationIndex()
       // Accumulate time ranges
       this->TimeRange[0] = std::min(timeRange[0], this->TimeRange[0]);
       this->TimeRange[1] = std::max(timeRange[1], this->TimeRange[1]);
-      this->HasAnimation = true;
     }
   }
-  if (this->TimeRange[0] >= this->TimeRange[1])
+  if (this->TimeRange[0] > this->TimeRange[1])
   {
     log::warn("Animation(s) time range delta is invalid: [", this->TimeRange[0], ", ",
-      this->TimeRange[1], "]. Disabling animation.");
-    this->HasAnimation = false;
-    return;
+      this->TimeRange[1], "]. Swapping range.");
+    std::swap(this->TimeRange[0], this->TimeRange[1]);
   }
-  else
-  {
-    log::debug("Current animation time range is: [", this->TimeRange[0], ", ", this->TimeRange[1], "].");
-  }
+  log::debug("Current animation time range is: [", this->TimeRange[0], ", ", this->TimeRange[1], "].");
   log::debug("");
 }
 

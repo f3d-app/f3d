@@ -713,8 +713,8 @@ if(F3D_PLUGIN_BUILD_EXODUS)
   # Test animation with generic importer, coloring and a custom scalar range
   f3d_test(NAME TestAnimationGenericImporterScalarRange DATA small.ex2 ARGS -sb --load-plugins=exodus --animation-time=0.003 --animation-progress --coloring-range=0,1e7)
 
-  # Test Generic Importer Verbose invalid animation.
-  f3d_test(NAME TestVerboseAnimationSingleTimestep DATA single_timestep.e ARGS --load-plugins=exodus --verbose NO_BASELINE REGEXP "time range delta is invalid")
+  # Test Generic Importer Verbose animation with a single frame.
+  f3d_test(NAME TestVerboseAnimationSingleTimestep DATA single_timestep.e ARGS --load-plugins=exodus --verbose NO_BASELINE REGEXP "0, 0")
 
   # Test no render animation time. Regex contains a part of the range of the ACCL field.
   f3d_test(NAME TestNoRenderAnimation DATA small.ex2 ARGS  --load-plugins=exodus --animation-time=0.003 REGEXP "-521950, 6.57485" NO_RENDER)
