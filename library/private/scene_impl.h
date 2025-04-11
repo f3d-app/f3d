@@ -29,7 +29,7 @@ public:
   /**
    * Documented public API
    */
-  scene_impl(const options& options, window_impl& window);
+  scene_impl(options& options, window_impl& window);
   ~scene_impl();
   scene& add(const std::filesystem::path& filePath) override;
   scene& add(const std::vector<std::filesystem::path>& filePath) override;
