@@ -470,26 +470,14 @@ bool vtkF3DQuakeMDLImporter::UpdateAtTimeValue(double timeValue)
 {
   const std::vector<double>& times = this->Internals->AnimationTimes[this->Internals->ActiveAnimation];
 
-  // TODO find_if ?
-  size_t frameIndex = 0;
-  if (timeValue <= times.front())
-  {
-    frameIndex = 0;
-  }
-  else if (timeValue >= times.back())
-  {
-    frameIndex = times.size() - 1;
-  }
-  else
-  {
-    for (;times.size() - 1; frameIndex++)
-    {
-      if (times[frameIndex] <= timeValue && timeValue < times[frameIndex + 1])
-      {
-        break;
-      }
-    }
-  }
+  // Find frameIndex for the provided timeValue so that t0 <= timeValue < t1
+
+  // First time >= value
+  const auto found = std::lower_bound(times.begin(), times.end(), timeValue);
+  // If none, select last, if found, select distance
+  const size_t i = found == times.end() ? times.size() - 1 : std::distance(times.begin(), found);
+  // If found time > timeValue, the the previous one
+  const size_t frameIndex = *found > timeValue && i > 0 ? i - 1 : i;
 
   this->Internals->Mapper->SetInputData(this->Internals->AnimationFrames[this->Internals->ActiveAnimation][frameIndex]);
   return true;
