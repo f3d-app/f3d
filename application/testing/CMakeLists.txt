@@ -164,6 +164,7 @@ f3d_test(NAME TestSPLAT DATA small.splat ARGS -osy --up=-Y --point-sprites-size=
 f3d_test(NAME TestQuakeMDL DATA zombie.mdl)
 f3d_test(NAME TestQuakeMDLGroupSkin DATA zombie_2.mdl)
 f3d_test(NAME TestQuakeMDLAnimationSimpleFrame DATA zombie.mdl ARGS --animation-time=0.5)
+f3d_test(NAME TestQuakeMDLAnimationBetween DATA zombie.mdl ARGS --animation-time=1.42)
 f3d_test(NAME TestQuakeMDLAnimationGroupFrame DATA flame2.mdl ARGS --animation-index=1 --animation-time=0.5)
 f3d_test(NAME TestGridX DATA suzanne.ply ARGS -g --up=+X)
 f3d_test(NAME TestGridY DATA suzanne.ply ARGS -g --up=+Y)
