@@ -447,7 +447,7 @@ f3d_test(NAME TestVerboseAnimationWrongAnimationTimeLow DATA BoxAnimated.gltf AR
 # Verbose test for animation
 f3d_test(NAME TestVerboseAnimationTimeRange DATA InterpolationTest.glb ARGS --verbose REGEXP "0, 1.66667" NO_BASELINE)
 f3d_test(NAME TestCommandScriptVerboseMultiAnimationTimeRange SCRIPT TestCommandScriptVerboseMultiAnimationTimeRange.txt DATA InterpolationTest.glb ARGS --verbose REGEXP "0, 1.70833" NO_BASELINE)# cycle_animation x3
-f3d_test(NAME TestVerboseQuakeMDLAnimationWrongNamingScheme ARGS --verbose DATA v_rock2.mdl REGEXP "Frame name doesnt respect standard naming scheme" NO_BASELINE)
+f3d_test(NAME TestVerboseQuakeMDLAnimationWrongNamingScheme ARGS --verbose DATA v_rock2.mdl REGEXP "Frame name does not respect standard naming scheme" NO_BASELINE)
 
 # Armature test
 f3d_test(NAME TestGLTFRigArmatureNoArmature DATA RiggedFigure.glb ARGS --animation-time=1 --opacity=0.5 -p)

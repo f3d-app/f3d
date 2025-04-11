@@ -317,7 +317,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
             // If one frame is misnamed, give up and put every remaining frame in the same animation
             standardNamingScheme = false;
             animationIdx = emplace_empty_animation("Animation");
-            vtkWarningWithObjectMacro(this->Parent, "Frame name doesnt respect standard naming scheme: " + std::string(frame->name) + ", animation may be incorrect");
+            vtkWarningWithObjectMacro(this->Parent, "Frame name does not respect standard naming scheme: " + std::string(frame->name) + ", animation may be incorrect");
           }
           else
           {
@@ -363,7 +363,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         // Iterate over each frame in the group
         for (int groupFrameNum = 0; groupFrameNum < *frameGroup.nb; groupFrameNum++)
         {
-          // Recover the frame using the offsets because the struct doesnt store this pointer
+          // Recover the frame using the offsets because the struct does not store this pointer
           const mdl_simpleframe_t* frame = reinterpret_cast<const mdl_simpleframe_t*>(buffer.data() + frameOffsets[frameNum][groupFrameNum]);
 
           // Assume all frames are named the with standard naming scheme
@@ -376,7 +376,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
             }
             else
             {
-              vtkWarningWithObjectMacro(this->Parent, "Frame name doesnt respect standard naming scheme: " + std::string(frame->name) + ", animation may be misnamed");
+              vtkWarningWithObjectMacro(this->Parent, "Frame name does not respect standard naming scheme: " + std::string(frame->name) + ", animation may be misnamed");
               animationName = frame->name;
             }
           }
