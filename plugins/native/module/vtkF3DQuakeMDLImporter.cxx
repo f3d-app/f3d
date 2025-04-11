@@ -82,8 +82,8 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   {
     const int* type; // 0 = simple frame, !0 = group frames
     const int* nb;   // "number", size of *time and *frames arrays, optional
-                     // const mdl_vertex_t* min;         // min pos in all simple frames, optional
-                     // const mdl_vertex_t* max;         // max pos in all simple frames, optional
+                     // const mdl_vertex_t* min;         // min pos in all simple frames, unused
+                     // const mdl_vertex_t* max;         // max pos in all simple frames, unused
     const float* time;               // time duration for each frame, optional
     const mdl_simpleframe_t* frames; // simple frame list
   };
@@ -98,8 +98,6 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   vtkSmartPointer<vtkTexture> CreateTexture(const std::vector<unsigned char>& buffer, int& offset,
     int skinWidth, int skinHeight, int nbSkins, int selectedSkinIndex)
   {
-    constexpr int char_size = sizeof(int8_t);
-    constexpr int int_size = sizeof(int32_t);
     vtkNew<vtkTexture> texture;
     texture->InterpolateOn();
 
@@ -110,14 +108,14 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       skins[i].group = *reinterpret_cast<const int*>(buffer.data() + offset);
       if (skins[i].group == 0)
       {
-        skins[i].skin = buffer.data() + int_size + offset;
-        offset += int_size + skinWidth * skinHeight * char_size;
+        skins[i].skin = buffer.data() + sizeof(int32_t) + offset;
+        offset += sizeof(int32_t) + skinWidth * skinHeight * sizeof(int8_t);
       }
       else
       {
         int nb = *reinterpret_cast<const int*>(buffer.data() + offset + 4);
         skins[i].skin = buffer.data() + 4 + nb * 4 + offset;
-        offset += int_size + nb * int_size + nb * skinWidth * skinHeight * char_size;
+        offset += sizeof(int32_t) + nb * sizeof(int32_t) + nb * skinWidth * skinHeight * sizeof(int8_t);
       }
     }
 
@@ -185,28 +183,21 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   //----------------------------------------------------------------------------
   bool CreateMesh(const std::vector<unsigned char>& buffer, int offset, const mdl_header_t* header)
   {
-    // TODO replace this by actual size_of ?
-    constexpr char char_size = sizeof(int8_t); // Size of char in file
-    constexpr int int_size = sizeof(int32_t);  // Size of int in file
-    constexpr int float_size = sizeof(float);  // Size of float in file, 4 bytes
-    constexpr int mdl_texcoord_t_size = 3 * int_size; // Size of struct
-    constexpr int mdl_triangle_t_size = 4 * int_size; // Size of struct
-    constexpr int mdl_vertex_t_size = 4;
     constexpr int mdl_simpleframe_t_fixed_size =
-      2 * mdl_vertex_t_size + 16 * char_size; // Size of bboxmin, bboxmax and name.
+      2 * sizeof(mdl_vertex_t) + 16 * sizeof(int8_t); // Size of bboxmin, bboxmax and name.
 
     // Read Texture Coordinates
     const mdl_texcoord_t* texcoords =
       reinterpret_cast<const mdl_texcoord_t*>(buffer.data() + offset);
-    offset += mdl_texcoord_t_size * header->numVertices; // Size of mdl_texcoord_t array
+    offset += sizeof(mdl_texcoord_t) * header->numVertices;
 
     // Read Triangles
     const mdl_triangle_t* triangles =
       reinterpret_cast<const mdl_triangle_t*>(buffer.data() + offset);
-    offset += mdl_triangle_t_size * header->numTriangles; // Size of mdl_triangle_t array
+    offset += sizeof(mdl_triangle_t) * header->numTriangles;
 
     // Read frames
-    int frameType = -1; // To check for mixed types
+    int frameType = -1; // To check for mixed frame types
     std::vector<plugin_frame_pointer> framePtr =
       std::vector<plugin_frame_pointer>(header->numFrames);
     std::vector<std::vector<int>> frameOffsets = std::vector<std::vector<int>>();
@@ -226,28 +217,28 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       {
         framePtr[i].nb = nullptr;
         framePtr[i].time = nullptr;
-        framePtr[i].frames = reinterpret_cast<const mdl_simpleframe_t*>(buffer.data() + 4 + offset);
+        framePtr[i].frames = reinterpret_cast<const mdl_simpleframe_t*>(buffer.data() + sizeof(int32_t) + offset);
 
-        // Size of a frame is 24 + 4 * numVertices, + 4 bytes for the int
-        offset += int_size + mdl_simpleframe_t_fixed_size + mdl_vertex_t_size * header->numVertices;
+        // Size of a frame is mdl_simpleframe_t_fixed_size + mdl_vertex_t * numVertices, + sizeof(int)
+        offset += sizeof(int32_t) + mdl_simpleframe_t_fixed_size + sizeof(mdl_vertex_t) * header->numVertices;
       }
       else
       {
-        framePtr[i].nb = reinterpret_cast<const int*>(buffer.data() + int_size + offset);
+        framePtr[i].nb = reinterpret_cast<const int*>(buffer.data() + sizeof(int32_t) + offset);
         // Skips parameters min and max.
         framePtr[i].time = reinterpret_cast<const float*>(reinterpret_cast<const void*>(
-          buffer.data() + 2 * int_size + 2 * mdl_vertex_t_size + offset));
+          buffer.data() + 2 * sizeof(int32_t) + 2 * sizeof(mdl_vertex_t) + offset));
         // Points to the first frame, 4 * nbFrames for the float array
         framePtr[i].frames = reinterpret_cast<const mdl_simpleframe_t*>(buffer.data() +
-          2 * int_size + 2 * mdl_vertex_t_size + (*framePtr[i].nb) * float_size + offset);
-        offset += 2 * int_size + 2 * mdl_vertex_t_size + (*framePtr[i].nb) * float_size;
+          2 * sizeof(int32_t) + 2 * sizeof(mdl_vertex_t) + (*framePtr[i].nb) * sizeof(float) + offset);
+        offset += 2 * sizeof(int32_t) + 2 * sizeof(mdl_vertex_t) + (*framePtr[i].nb) * sizeof(float);
         frameOffsets.emplace_back(std::vector<int>());
 
         for (int j = 0; j < *framePtr[i].nb; j++)
         {
           // Offset for each frame
           frameOffsets[i].emplace_back(offset);
-          offset += mdl_simpleframe_t_fixed_size + mdl_vertex_t_size * header->numVertices;
+          offset += mdl_simpleframe_t_fixed_size + sizeof(mdl_vertex_t) * header->numVertices;
         }
       }
     }
@@ -407,16 +398,13 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   //----------------------------------------------------------------------------
   bool ReadScene(const std::string& filePath)
   {
-    // TODO use size_of ?
-    constexpr int mdl_header_t_size = 84; // Size of the header struct in the file.
-
     std::ifstream inputStream(filePath, std::ios::binary);
     std::vector<unsigned char> buffer(std::istreambuf_iterator<char>(inputStream), {});
 
     // Read header
     int offset = 0;
     const mdl_header_t* header = reinterpret_cast<const mdl_header_t*>(buffer.data());
-    offset += mdl_header_t_size;
+    offset += sizeof(mdl_header_t);
 
     // Create textures
     this->Texture = this->CreateTexture(
