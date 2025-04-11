@@ -311,7 +311,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         const mdl_simpleframe_t* frame = framePtr[frameNum].frames;
 
         // Extract animation name from frame name and recover animation index accordingly
-        size_t animationIdx;
+        size_t animationIdx = this->AnimationNames.size() - 1;
         if (standardNamingScheme)
         {
           // Check if frame name respect standard naming scheme for simple frames
