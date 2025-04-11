@@ -287,7 +287,8 @@ void animationManager::UpdateForAnimationIndex()
   }
 
   // Valid animation index : ]-2, AvailAnimations[
-  if (this->Options.scene.animation.index <= -2 || this->Options.scene.animation.index >= this->AvailAnimations)
+  if (this->Options.scene.animation.index <= -2 ||
+    this->Options.scene.animation.index >= this->AvailAnimations)
   {
     log::warn(
       "Specified animation index is greater than the highest possible animation index, enabling "
