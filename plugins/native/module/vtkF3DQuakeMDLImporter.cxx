@@ -512,7 +512,7 @@ vtkIdType vtkF3DQuakeMDLImporter::GetNumberOfAnimations()
 //----------------------------------------------------------------------------
 std::string vtkF3DQuakeMDLImporter::GetAnimationName(vtkIdType animationIndex)
 {
-  assert(animationIndex < static_cast<vtkIdType>(this->Internals->AnimationNames.size()));
+  assert(animationIndex < this->Internals->AnimationNames.size());
   assert(animationIndex >= 0);
   return this->Internals->AnimationNames[animationIndex];
 }
@@ -520,7 +520,7 @@ std::string vtkF3DQuakeMDLImporter::GetAnimationName(vtkIdType animationIndex)
 //----------------------------------------------------------------------------
 void vtkF3DQuakeMDLImporter::EnableAnimation(vtkIdType animationIndex)
 {
-  assert(animationIndex < static_cast<vtkIdType>(this->Internals->AnimationNames.size()));
+  assert(animationIndex < this->Internals->AnimationNames.size());
   assert(animationIndex >= 0);
   this->Internals->ActiveAnimation = animationIndex;
 }
@@ -534,7 +534,7 @@ void vtkF3DQuakeMDLImporter::DisableAnimation(vtkIdType vtkNotUsed(animationInde
 //----------------------------------------------------------------------------
 bool vtkF3DQuakeMDLImporter::IsAnimationEnabled(vtkIdType animationIndex)
 {
-  assert(animationIndex < this->GetNumberOfAnimations());
+  assert(animationIndex < this->Internals->AnimationNames.size());
   assert(animationIndex >= 0);
   return this->Internals->ActiveAnimation == animationIndex;
 }
@@ -544,7 +544,7 @@ bool vtkF3DQuakeMDLImporter::GetTemporalInformation(vtkIdType animationIndex,
   double vtkNotUsed(frameRate), int& vtkNotUsed(nbTimeSteps), double timeRange[2],
   vtkDoubleArray* vtkNotUsed(timeSteps))
 {
-  assert(animationIndex < this->GetNumberOfAnimations());
+  assert(animationIndex < this->Internals->AnimationNames.size());
   assert(animationIndex >= 0);
 
   const std::vector<double>& times = this->Internals->AnimationTimes[animationIndex];
