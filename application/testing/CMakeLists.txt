@@ -440,6 +440,10 @@ f3d_test(NAME TestInteractionAnimationInvert DATA f3d.glb ARGS --animation-speed
 f3d_test(NAME TestVerboseAnimationWrongAnimationTimeHigh DATA BoxAnimated.gltf ARGS --animation-time=10 --verbose REGEXP "Animation time 10 is outside of range \\[0, 3\\.70833\\], using 3\\.70833" NO_BASELINE)
 f3d_test(NAME TestVerboseAnimationWrongAnimationTimeLow DATA BoxAnimated.gltf ARGS --animation-time=-5 --verbose REGEXP "Animation time -5 is outside of range \\[0, 3\\.70833\\], using 0" NO_BASELINE)
 
+# Verbose test for animation time range
+f3d_test(NAME TestVerboseAnimationTimeRange DATA InterpolationTest.glb ARGS --verbose REGEXP "0, 1.66667" NO_BASELINE)
+f3d_test(NAME TestCommandScriptVerboseMultiAnimationTimeRange SCRIPT TestCommandScriptVerboseMultiAnimationTimeRange.txt DATA InterpolationTest.glb ARGS --verbose REGEXP "0, 1.70833" NO_BASELINE)# cycle_animation x3
+
 # Armature test
 f3d_test(NAME TestGLTFRigArmatureNoArmature DATA RiggedFigure.glb ARGS --animation-time=1 --opacity=0.5 -p)
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20241219)
@@ -709,8 +713,8 @@ if(F3D_PLUGIN_BUILD_EXODUS)
   # Test animation with generic importer, coloring and a custom scalar range
   f3d_test(NAME TestAnimationGenericImporterScalarRange DATA small.ex2 ARGS -sb --load-plugins=exodus --animation-time=0.003 --animation-progress --coloring-range=0,1e7)
 
-  # Test Generic Importer Verbose animation. Regex contains the time range.
-  f3d_test(NAME TestVerboseAnimationSingleTimestep DATA single_timestep.e ARGS --load-plugins=exodus --verbose NO_BASELINE REGEXP "time range delta is invalid")
+  # Test Generic Importer Verbose animation with a single frame.
+  f3d_test(NAME TestVerboseAnimationSingleTimestep DATA single_timestep.e ARGS --load-plugins=exodus --verbose NO_BASELINE REGEXP "0, 0")
 
   # Test no render animation time. Regex contains a part of the range of the ACCL field.
   f3d_test(NAME TestNoRenderAnimation DATA small.ex2 ARGS  --load-plugins=exodus --animation-time=0.003 REGEXP "-521950, 6.57485" NO_RENDER)
