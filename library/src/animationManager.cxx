@@ -280,20 +280,23 @@ void animationManager::UpdateForAnimationIndex()
 {
   assert(this->Importer);
 
-  if (this->Options.scene.animation.index <= -2 ||
-    this->AnimationIndex == this->Options.scene.animation.index || this->AvailAnimations <= 0)
+  if (this->AnimationIndex == this->Options.scene.animation.index || this->AvailAnimations <= 0)
   {
     // Already updated or no animation available
     return;
   }
 
-  this->AnimationIndex = this->Options.scene.animation.index;
-  if (this->AnimationIndex > 0 && this->AnimationIndex >= this->AvailAnimations)
+  // Valid animation index : ]-2, AvailAnimations[
+  if (this->Options.scene.animation.index <= -2 || this->Options.scene.animation.index >= this->AvailAnimations)
   {
     log::warn(
       "Specified animation index is greater than the highest possible animation index, enabling "
       "the first animation.");
     this->AnimationIndex = 0;
+  }
+  else
+  {
+    this->AnimationIndex = this->Options.scene.animation.index;
   }
 
   for (int i = 0; i < this->AvailAnimations; i++)
