@@ -286,7 +286,6 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     {
       std::string::size_type sz;
       sz = frameName.find_first_of("0123456789");
-      std::cout<<frameName<<" "<<sz<<" "<<frameName.substr(0, sz)<<std::endl;
       if (sz == std::string::npos)
       {
         return std::tuple<bool, std::string>(false, "");
@@ -318,6 +317,8 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         {
           // Check if frame name respect standard naming scheme for simple frames
           // eg: stand1, stand2, stand3, run1, run2, run3
+          // XXX: Multi animation files with standard naming scheme are not tested, here is (a non free) one for manual testing if needed:
+          // https://tomeofpreach.wordpress.com/2012/12/24/shambler-dance/
           // XXX: This code assume frames are provided in order and does not check the numbering
           auto [standard, animationName] = extract_animation_name(frame->name);
           if (!standard)
@@ -351,7 +352,6 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         {
           // Simple frames are 10 fps
           times.emplace_back(times.back() + 0.1);
-          std::cout<<times.back()<<std::endl;
         }
 
         // Create the animation frame
@@ -397,7 +397,6 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
           meshes.emplace_back(this->CreateMeshForSimpleFrame(frame, header, triangles, cells, textureCoordinates));
         }
         this->AnimationNames.emplace_back(animationName);
-        std::cout<<animationName<<std::endl;
         this->AnimationTimes.emplace_back(times);
         this->AnimationFrames.emplace_back(meshes);
       }

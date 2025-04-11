@@ -2,25 +2,24 @@
 
 # Copyrights and Licenses
 
+- (ノಠ益ಠ )ノ.vtp: VTK Data: BSD-3-Clause
+- 16bits.\*: @bisechen: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - albedo.png: glTF-Sample-Models: Public Domain
+- anim_test.x: assimp test models: BSD-3-Clause
 - AnimatedCube.usdz: [USD Working Group](https://github.com/usd-wg/assets): Apache 2.0
-- McUSD.usdz: [USD Working Group](https://github.com/usd-wg/assets): CC-NC-BY-SA, textures by [jasonjgardner](https://github.com/jasonjgardner)
-- Teapot.usd: [USD Working Group](https://github.com/usd-wg/assets): Public Domain - CC0
-- RiggedSimple.usdz: [USD Working Group](https://github.com/usd-wg/assets): [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - animatedWorld.fbx: VTK Data: BSD-3-Clause
 - animation_with_skeleton.fbx: assimp test models: BSD-3-Clause
-- anim_test.x: assimp test models: BSD-3-Clause
-- cube_gears.3mf: 3MF consortium samples: BSD-2-Clause
-- punch.fbx: batrisya1501: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - beach.nrrd: VTK Data: BSD-3-Clause
 - bluntfin.vts: VTK Data: BSD-3-Clause
 - bot2.wrl: VTK Data: BSD-3-Clause
-- BoxAnimated\*: glTF-Sample-Models/Cesium: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - Box_draco\*: glTF-Sample-Models/Cesium: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+- BoxAnimated\*: glTF-Sample-Models/Cesium: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - Cameras.gltf: glTF-Sample-Models: Public Domain
 - cow.vtk: VTK Data: BSD-3-Clause
 - cow.vtp: VTK Data: BSD-3-Clause
 - cowlow.vtp: VTK Data: BSD-3-Clause
+- Crosterian.ttf: Denis Ignatov : [OFL (SIL Open Font License)](https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL)
+- cube_gears.3mf: 3MF consortium samples: BSD-2-Clause
 - disk_out_ref.ex2: VTK Data: BSD-3-Clause
 - dragon.vtu: Stanford: Public Domain
 - duck.dae: assimp test models: BSD-3-Clause
@@ -35,32 +34,34 @@
 - InterpolationTest.glb: glTF-Sample-Models: Public Domain
 - kloofendal_43d_clear_1k.exr: Polyhaven: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - Lantern: glTF-Sample-Models: Public Domain
+- McUSD.usdz: [USD Working Group](https://github.com/usd-wg/assets): CC-NC-BY-SA, textures by [jasonjgardner](https://github.com/jasonjgardner)
 - normal.png: glTF-Sample-Models: Public Domain
 - normalMapping.fbx: assimp test models: BSD-3-Clause; rubberduck: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - palermo_park_1k.hdr: Polyhaven: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - Part-4-Buildings-V4-one.gml: VTK Data: BSD-3-Clause
 - phong_cube.fbx: assimp test models: BSD-3-Clause
 - PinkEggFromLW.dxf: assimp test models: BSD-3-Clause
+- punch.fbx: batrisya1501: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - RectGrid2.vtr: VTK Data: BSD-3-Clause
 - red.jpg: glTF-Sample-Models: Public Domain
-- Crosterian.ttf: Denis Ignatov : [OFL (SIL Open Font License)](https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL)
+- RiggedFigure.glb: glTF-Sample-Models: Public Domain
+- RiggedSimple.usdz: [USD Working Group](https://github.com/usd-wg/assets): [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+- samplePTS.pts: VTK Data: BSD-3-Clause
 - SimpleMorph.gltf: glTF-Sample-Models: Public Domain
 - SimpleSkin.gltf: glTF-Sample-Models: Public Domain
-- RiggedFigure.glb: glTF-Sample-Models: Public Domain
-- samplePTS.pts: VTK Data: BSD-3-Clause
 - skin.png: Blender: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - small.ex2: VTK Data: BSD-3-Clause
 - sphere_points.vdb: OpenVDB: [MPL-2.0](http://www.mozilla.org/MPL/2.0/)
 - teapot.off: Utah Teapot: Public Domain
+- Teapot.usd: [USD Working Group](https://github.com/usd-wg/assets): Public Domain - CC0
 - tensors.vti: VTK Data: BSD-3-Clause
 - UnlitTest.glb: glTF-Sample-Models/Analytical Graphics, Inc.: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+- v_rock2.mdl: LibreQuake Project: BSD-3-Clause
 - vase_4comp.vti: VTK Data: BSD-3-Clause
 - WaterBottle.glb: glTF-Sample-Models: Public Domain
+- Wolf.fbx: OLEKSO: [CC-NC 4.0](http://creativecommons.org/licenses/by-nc/4.0/)
 - world\*: VTK Data: BSD-3-Clause
 - zombie\*.mdl: LibreQuake Project: BSD-3-Clause
-- 16bits.\*: @bisechen: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
-- (ノಠ益ಠ )ノ.vtp: VTK Data: BSD-3-Clause
-- Wolf.fbx: OLEKSO: [CC-NC 4.0](http://creativecommons.org/licenses/by-nc/4.0/)
 
 All other datasets are licensed under the BSD-3-Clause F3D license.
 
