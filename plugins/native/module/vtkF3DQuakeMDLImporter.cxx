@@ -80,11 +80,11 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   // Used to read mdl_frame_t and mdl_groupframe_t
   struct plugin_frame_pointer
   {
-    const int* type; // 0 = simple frame, !0 = group frames
-    const int* nb;   // "number", size of *time and *frames arrays, optional
-                     // const mdl_vertex_t* min;         // min pos in all simple frames, unused
-                     // const mdl_vertex_t* max;         // max pos in all simple frames, unused
-    const float* time;               // time duration for each frame, optional
+    const int* type;   // 0 = simple frame, !0 = group frames
+    const int* nb;     // "number", size of *time and *frames arrays, optional
+                       // const mdl_vertex_t* min;         // min pos in all simple frames, unused
+                       // const mdl_vertex_t* max;         // max pos in all simple frames, unused
+    const float* time; // time duration for each frame, optional
     const mdl_simpleframe_t* frames; // simple frame list
   };
 
@@ -115,7 +115,8 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       {
         int nb = *reinterpret_cast<const int*>(buffer.data() + offset + 4);
         skins[i].skin = buffer.data() + 4 + nb * 4 + offset;
-        offset += sizeof(int32_t) + nb * sizeof(int32_t) + nb * skinWidth * skinHeight * sizeof(int8_t);
+        offset +=
+          sizeof(int32_t) + nb * sizeof(int32_t) + nb * skinWidth * skinHeight * sizeof(int8_t);
       }
     }
 
@@ -138,7 +139,9 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   }
 
   //----------------------------------------------------------------------------
-  vtkSmartPointer<vtkPolyData> CreateMeshForSimpleFrame(const mdl_simpleframe_t* frame, const mdl_header_t* header, const mdl_triangle_t* triangles, vtkCellArray* cells, vtkFloatArray* textureCoordinates)
+  vtkSmartPointer<vtkPolyData> CreateMeshForSimpleFrame(const mdl_simpleframe_t* frame,
+    const mdl_header_t* header, const mdl_triangle_t* triangles, vtkCellArray* cells,
+    vtkFloatArray* textureCoordinates)
   {
     vtkNew<vtkPoints> vertices;
     vertices->Allocate(header->numTriangles * 3);
@@ -168,8 +171,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         // Normal vector
         int normalIndex = frame->verts[vertexNum[j]].normalIndex;
         normals->SetTuple3(i * 3 + j, F3DMDLNormalVectors[normalIndex][0] / 255.0,
-                           F3DMDLNormalVectors[normalIndex][1] / 255.0,
-                           F3DMDLNormalVectors[normalIndex][2] / 255.0);
+          F3DMDLNormalVectors[normalIndex][1] / 255.0, F3DMDLNormalVectors[normalIndex][2] / 255.0);
       }
     }
     vtkNew<vtkPolyData> mesh;
@@ -210,17 +212,21 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       }
       if (frameType != *framePtr[i].type)
       {
-        vtkErrorWithObjectMacro(this->Parent, "Combined simple frame and group frame are not supported, aborting.");
+        vtkErrorWithObjectMacro(
+          this->Parent, "Combined simple frame and group frame are not supported, aborting.");
         return false;
       }
       if (*framePtr[i].type == 0)
       {
         framePtr[i].nb = nullptr;
         framePtr[i].time = nullptr;
-        framePtr[i].frames = reinterpret_cast<const mdl_simpleframe_t*>(buffer.data() + sizeof(int32_t) + offset);
+        framePtr[i].frames =
+          reinterpret_cast<const mdl_simpleframe_t*>(buffer.data() + sizeof(int32_t) + offset);
 
-        // Size of a frame is mdl_simpleframe_t_fixed_size + mdl_vertex_t * numVertices, + sizeof(int)
-        offset += sizeof(int32_t) + mdl_simpleframe_t_fixed_size + sizeof(mdl_vertex_t) * header->numVertices;
+        // Size of a frame is mdl_simpleframe_t_fixed_size + mdl_vertex_t * numVertices, +
+        // sizeof(int)
+        offset += sizeof(int32_t) + mdl_simpleframe_t_fixed_size +
+          sizeof(mdl_vertex_t) * header->numVertices;
       }
       else
       {
@@ -229,9 +235,11 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         framePtr[i].time = reinterpret_cast<const float*>(reinterpret_cast<const void*>(
           buffer.data() + 2 * sizeof(int32_t) + 2 * sizeof(mdl_vertex_t) + offset));
         // Points to the first frame, 4 * nbFrames for the float array
-        framePtr[i].frames = reinterpret_cast<const mdl_simpleframe_t*>(buffer.data() +
-          2 * sizeof(int32_t) + 2 * sizeof(mdl_vertex_t) + (*framePtr[i].nb) * sizeof(float) + offset);
-        offset += 2 * sizeof(int32_t) + 2 * sizeof(mdl_vertex_t) + (*framePtr[i].nb) * sizeof(float);
+        framePtr[i].frames =
+          reinterpret_cast<const mdl_simpleframe_t*>(buffer.data() + 2 * sizeof(int32_t) +
+            2 * sizeof(mdl_vertex_t) + (*framePtr[i].nb) * sizeof(float) + offset);
+        offset +=
+          2 * sizeof(int32_t) + 2 * sizeof(mdl_vertex_t) + (*framePtr[i].nb) * sizeof(float);
         frameOffsets.emplace_back(std::vector<int>());
 
         for (int j = 0; j < *framePtr[i].nb; j++)
@@ -273,7 +281,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
 
     // A lambda to check frame name for standard naming scheme
     // and recover animation name
-    auto extract_animation_name = [](const std::string& frameName) 
+    auto extract_animation_name = [](const std::string& frameName)
     {
       std::string::size_type sz;
       sz = frameName.find_first_of("0123456789");
@@ -285,7 +293,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     };
 
     // A lambda to add an empty named animation, return the index to it
-    auto emplace_empty_animation = [&](const std::string& animName) 
+    auto emplace_empty_animation = [&](const std::string& animName)
     {
       this->AnimationNames.emplace_back(animName);
       this->AnimationTimes.emplace_back(std::vector<double>());
@@ -308,7 +316,8 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         {
           // Check if frame name respect standard naming scheme for simple frames
           // eg: stand1, stand2, stand3, run1, run2, run3
-          // XXX: Multi animation files with standard naming scheme are not tested, here is (a non free) one for manual testing if needed:
+          // XXX: Multi animation files with standard naming scheme are not tested, here is (a non
+          // free) one for manual testing if needed:
           // https://tomeofpreach.wordpress.com/2012/12/24/shambler-dance/
           // XXX: This code assume frames are provided in order and does not check the numbering
           auto [standard, animationName] = extract_animation_name(frame->name);
@@ -317,14 +326,17 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
             // If one frame is misnamed, give up and put every remaining frame in the same animation
             standardNamingScheme = false;
             animationIdx = emplace_empty_animation("Animation");
-            vtkWarningWithObjectMacro(this->Parent, "Frame name does not respect standard naming scheme: " + std::string(frame->name) + ", animation may be incorrect");
+            vtkWarningWithObjectMacro(this->Parent,
+              "Frame name does not respect standard naming scheme: " + std::string(frame->name) +
+                ", animation may be incorrect");
           }
           else
           {
-            auto it = std::find(this->AnimationNames.begin(), this->AnimationNames.end(), animationName);
+            auto it =
+              std::find(this->AnimationNames.begin(), this->AnimationNames.end(), animationName);
             if (it != this->AnimationNames.end())
             {
-              animationIdx = std::distance(this->AnimationNames.begin(), it); 
+              animationIdx = std::distance(this->AnimationNames.begin(), it);
             }
             else
             {
@@ -346,7 +358,8 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         }
 
         // Create the animation frame
-        vtkSmartPointer<vtkPolyData> mesh = this->CreateMeshForSimpleFrame(frame, header, triangles, cells, textureCoordinates);
+        vtkSmartPointer<vtkPolyData> mesh =
+          this->CreateMeshForSimpleFrame(frame, header, triangles, cells, textureCoordinates);
         this->AnimationFrames[animationIdx].emplace_back(mesh);
       }
     }
@@ -364,7 +377,8 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         for (int groupFrameNum = 0; groupFrameNum < *frameGroup.nb; groupFrameNum++)
         {
           // Recover the frame using the offsets because the struct does not store this pointer
-          const mdl_simpleframe_t* frame = reinterpret_cast<const mdl_simpleframe_t*>(buffer.data() + frameOffsets[frameNum][groupFrameNum]);
+          const mdl_simpleframe_t* frame = reinterpret_cast<const mdl_simpleframe_t*>(
+            buffer.data() + frameOffsets[frameNum][groupFrameNum]);
 
           // Assume all frames are named the with standard naming scheme
           if (animationName.empty())
@@ -376,7 +390,9 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
             }
             else
             {
-              vtkWarningWithObjectMacro(this->Parent, "Frame name does not respect standard naming scheme: " + std::string(frame->name) + ", animation may be misnamed");
+              vtkWarningWithObjectMacro(this->Parent,
+                "Frame name does not respect standard naming scheme: " + std::string(frame->name) +
+                  ", animation may be misnamed");
               animationName = frame->name;
             }
           }
@@ -385,7 +401,8 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
           times.emplace_back(frameGroup.time[groupFrameNum]);
 
           // Recover mesh for this frame
-          meshes.emplace_back(this->CreateMeshForSimpleFrame(frame, header, triangles, cells, textureCoordinates));
+          meshes.emplace_back(
+            this->CreateMeshForSimpleFrame(frame, header, triangles, cells, textureCoordinates));
         }
         this->AnimationNames.emplace_back(animationName);
         this->AnimationTimes.emplace_back(times);
@@ -414,7 +431,8 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     bool ret = this->CreateMesh(buffer, offset, header);
     if (this->AnimationFrames.empty() || this->AnimationFrames.front().empty())
     {
-      vtkErrorWithObjectMacro(this->Parent, "No frame read, there is nothing to display in this file.");
+      vtkErrorWithObjectMacro(
+        this->Parent, "No frame read, there is nothing to display in this file.");
       ret = false;
     }
 
@@ -468,7 +486,8 @@ void vtkF3DQuakeMDLImporter::ImportActors(vtkRenderer* renderer)
 //----------------------------------------------------------------------------
 bool vtkF3DQuakeMDLImporter::UpdateAtTimeValue(double timeValue)
 {
-  const std::vector<double>& times = this->Internals->AnimationTimes[this->Internals->ActiveAnimation];
+  const std::vector<double>& times =
+    this->Internals->AnimationTimes[this->Internals->ActiveAnimation];
 
   // Find frameIndex for the provided timeValue so that t0 <= timeValue < t1
 
@@ -479,7 +498,8 @@ bool vtkF3DQuakeMDLImporter::UpdateAtTimeValue(double timeValue)
   // If found time > timeValue, the the previous one
   const size_t frameIndex = *found > timeValue && i > 0 ? i - 1 : i;
 
-  this->Internals->Mapper->SetInputData(this->Internals->AnimationFrames[this->Internals->ActiveAnimation][frameIndex]);
+  this->Internals->Mapper->SetInputData(
+    this->Internals->AnimationFrames[this->Internals->ActiveAnimation][frameIndex]);
   return true;
 }
 
