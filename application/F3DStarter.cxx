@@ -926,7 +926,7 @@ int F3DStarter::Start(int argc, char** argv)
   if (iter != cliOptionsDict.end())
   {
     // XXX: Discarding bool return because this cannot return false with a string
-    this->Internals->Parse(iter->second, this->Internals->AppOptions.VerboseLevel)
+    this->Internals->Parse(iter->second, this->Internals->AppOptions.VerboseLevel);
   }
 
   // Set verbosity level early from command line
