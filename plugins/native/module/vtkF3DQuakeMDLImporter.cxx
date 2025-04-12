@@ -102,7 +102,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
 
   //----------------------------------------------------------------------------
   vtkSmartPointer<vtkTexture> CreateTexture(const std::vector<unsigned char>& buffer, int& offset,
-    int skinWidth, int skinHeight, int nbSkins, int selectedSkinIndex)
+    int skinWidth, int skinHeight, int nbSkins)
   {
     vtkNew<vtkTexture> texture;
     texture->InterpolateOn();
@@ -119,7 +119,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       }
       else
       {
-        // groupskin not supported yet
+        // XXX: groupskin not supported yet
         vtkErrorWithObjectMacro(
           this->Parent, "Groupskin are not supported, aborting.");
         return nullptr;
@@ -130,7 +130,9 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     vtkNew<vtkImageData> img;
     img->SetDimensions(skinWidth, skinHeight, 1);
     img->AllocateScalars(VTK_UNSIGNED_CHAR, 3);
-    const unsigned char* selectedSkin = skins[selectedSkinIndex].skin;
+
+    // XXX: Skin index selection not supported yet
+    const unsigned char* selectedSkin = skins[0].skin;
     for (int i = 0; i < skinHeight; i++)
     {
       for (int j = 0; j < skinWidth; j++)
@@ -384,18 +386,22 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     std::vector<unsigned char> buffer(std::istreambuf_iterator<char>(inputStream), {});
 
     // Read header
+    // XXX: This is completely unsafe, should be rewritten using modern API
     int offset = 0;
     const mdl_header_t* header = reinterpret_cast<const mdl_header_t*>(buffer.data());
     offset += sizeof(mdl_header_t);
 
     // Create textures
-    this->Texture = this->CreateTexture(
-      buffer, offset, header->skinWidth, header->skinHeight, header->numSkins, 0);
-    if (!this->Texture)
+    if (header->numSkins > 0 && header->skinWidth > 0 && header->skinHeight > 0)
     {
-      vtkErrorWithObjectMacro(
-        this->Parent, "Unable to read a texture, aborting.");
-      return false;
+      this->Texture = this->CreateTexture(
+        buffer, offset, header->skinWidth, header->skinHeight, header->numSkins);
+      if (!this->Texture)
+      {
+        vtkErrorWithObjectMacro(
+          this->Parent, "Unable to read a texture, aborting.");
+        return false;
+      }
     }
 
     // Create animation frames

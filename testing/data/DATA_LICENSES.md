@@ -59,6 +59,7 @@
 - UnlitTest.glb: glTF-Sample-Models/Analytical Graphics, Inc.: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - v_rock2.mdl: LibreQuake Project: BSD-3-Clause
 - vase_4comp.vti: VTK Data: BSD-3-Clause
+- w_medkit_hl.mdl: Nomadnetic: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - WaterBottle.glb: glTF-Sample-Models: Public Domain
 - Wolf.fbx: OLEKSO: [CC-NC 4.0](http://creativecommons.org/licenses/by-nc/4.0/)
 - world\*: VTK Data: BSD-3-Clause
