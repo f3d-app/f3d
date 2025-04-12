@@ -917,7 +917,8 @@ int F3DStarter::Start(int argc, char** argv)
   {
     std::string localOutput;
     // XXX: Discarding bool return because this cannot return false with a string
-    this->Internals->Parse(iter->second, localOutput) renderToStdout = localOutput == "-";
+    this->Internals->Parse(iter->second, localOutput);
+    renderToStdout = localOutput == "-";
   }
 
   this->Internals->AppOptions.VerboseLevel = "info";
