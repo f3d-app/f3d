@@ -313,7 +313,6 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
 
       if (*(pluginFramePtr.type) == SINGLE_FRAME)
       {
-        std::cout<<"Single frame"<<std::endl;
         // Recover pointer to the single frame
         const mdl_simpleframe_t* frame = pluginFramePtr.frames;
 
@@ -344,7 +343,6 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       }
       else
       {
-        std::cout<<"Frame group"<<std::endl;
         // Group frame are expected to be a single animation
         std::string animationName;
         std::vector<double> times;
