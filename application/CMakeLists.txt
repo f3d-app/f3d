@@ -236,6 +236,13 @@ install(TARGETS f3d
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT application
   BUNDLE DESTINATION "." COMPONENT application)
 
+if(WIN32 AND F3D_WINDOWS_BUILD_CONSOLE_APPLICATION)
+  install(TARGETS f3d-console
+    EXPORT f3dTargets
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT application
+    BUNDLE DESTINATION "." COMPONENT application)
+endif()
+
 # The targets and config file are only installed with the sdk
 install(EXPORT f3dTargets
   NAMESPACE f3d::
