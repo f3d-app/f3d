@@ -51,6 +51,7 @@
 - SimpleSkin.gltf: glTF-Sample-Models: Public Domain
 - skin.png: Blender: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - small.ex2: VTK Data: BSD-3-Clause
+- soldier_animations.mdl: LibreQuake Project: BSD-3-Clause
 - sphere_points.vdb: OpenVDB: [MPL-2.0](http://www.mozilla.org/MPL/2.0/)
 - teapot.off: Utah Teapot: Public Domain
 - Teapot.usd: [USD Working Group](https://github.com/usd-wg/assets): Public Domain - CC0
