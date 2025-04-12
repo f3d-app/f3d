@@ -613,7 +613,7 @@ public:
   void ParseOption(const F3DOptionsTools::OptionsDict& appOptions, const std::string& name,
     std::optional<T>& option)
   {
-    std::string optStr = appOptions.at(name);
+    const std::string& optStr = appOptions.at(name);
     if (!optStr.empty())
     {
       T localOption;
