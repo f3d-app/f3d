@@ -162,7 +162,6 @@ f3d_test(NAME TestVTK DATA cow.vtk)
 f3d_test(NAME TestNRRD DATA beach.nrrd ARGS -s)
 f3d_test(NAME TestSPLAT DATA small.splat ARGS -osy --up=-Y --point-sprites-size=1)
 f3d_test(NAME TestQuakeMDL DATA zombie.mdl)
-f3d_test(NAME TestQuakeMDLGroupSkin DATA zombie_2.mdl)
 f3d_test(NAME TestQuakeMDLAnimationSimpleFrame DATA zombie.mdl ARGS --animation-time=0.5)
 f3d_test(NAME TestQuakeMDLAnimationBetween DATA zombie.mdl ARGS --animation-time=1.42)
 f3d_test(NAME TestQuakeMDLAnimationMulti DATA soldier_animations.mdl ARGS --animation-index=2 --animation-time=0.5)
@@ -448,7 +447,8 @@ f3d_test(NAME TestVerboseAnimationWrongAnimationTimeLow DATA BoxAnimated.gltf AR
 # Verbose test for animation
 f3d_test(NAME TestVerboseAnimationTimeRange DATA InterpolationTest.glb ARGS --verbose REGEXP "0, 1.66667" NO_BASELINE)
 f3d_test(NAME TestCommandScriptVerboseMultiAnimationTimeRange SCRIPT TestCommandScriptVerboseMultiAnimationTimeRange.txt DATA InterpolationTest.glb ARGS --verbose REGEXP "0, 1.70833" NO_BASELINE)# cycle_animation x3
-f3d_test(NAME TestVerboseQuakeMDLAnimationWrongNamingScheme ARGS --verbose DATA v_rock2.mdl REGEXP "Frame name does not respect standard naming scheme" NO_BASELINE)
+f3d_test(NAME TestVerboseQuakeMDLAnimationNoNamingScheme ARGS --verbose DATA v_rock2.mdl REGEXP "0: flame" NO_BASELINE)
+f3d_test(NAME TestVerboseQuakeMDLGroupSkinUnsupported ARGS --verbose DATA groupskin.mdl REGEXP "Groupskin are not supported" NO_BASELINE)
 
 # Armature test
 f3d_test(NAME TestGLTFRigArmatureNoArmature DATA RiggedFigure.glb ARGS --animation-time=1 --opacity=0.5 -p)

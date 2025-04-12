@@ -119,11 +119,10 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       }
       else
       {
-        // TODO proper groupskin implementation
-        int nb = *reinterpret_cast<const int*>(buffer.data() + offset + 4);
-        skins[i].skin = buffer.data() + 4 + nb * 4 + offset;
-        offset +=
-          sizeof(int32_t) + nb * sizeof(int32_t) + nb * skinWidth * skinHeight * sizeof(int8_t);
+        // groupskin not supported yet
+        vtkErrorWithObjectMacro(
+          this->Parent, "Groupskin are not supported, aborting.");
+        return nullptr;
       }
     }
 
@@ -282,15 +281,13 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     // Check if frame name respect standard naming scheme for single frames
     // eg: stand1, stand2, stand3, run1, run2, run3
     // XXX: This code assume frames are provided in order and does not check the numbering
+    // If not, just return the frame name
     auto extract_animation_name = [&](const std::string& frameName)
     {
       std::string::size_type sz;
       sz = frameName.find_first_of("0123456789");
       if (sz == std::string::npos)
       {
-        vtkWarningWithObjectMacro(this->Parent,
-          "Frame name does not respect standard naming scheme: " + frameName +
-            ", animations may be misnamed or wrongly organised");
         return frameName;
       }
       return frameName.substr(0, sz);
@@ -314,6 +311,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
 
       if (*(pluginFramePtr.type) == SINGLE_FRAME)
       {
+        std::cout<<"Single frame"<<std::endl;
         // Recover pointer to the single frame
         const mdl_simpleframe_t* frame = pluginFramePtr.frames;
 
@@ -344,6 +342,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       }
       else
       {
+        std::cout<<"Frame group"<<std::endl;
         // Group frame are expected to be a single animation
         std::string animationName;
         std::vector<double> times;
@@ -392,6 +391,12 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     // Create textures
     this->Texture = this->CreateTexture(
       buffer, offset, header->skinWidth, header->skinHeight, header->numSkins, 0);
+    if (!this->Texture)
+    {
+      vtkErrorWithObjectMacro(
+        this->Parent, "Unable to read a texture, aborting.");
+      return false;
+    }
 
     // Create animation frames
     bool ret = this->CreateMesh(buffer, offset, header);
@@ -399,9 +404,8 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     {
       vtkErrorWithObjectMacro(
         this->Parent, "No frame read, there is nothing to display in this file.");
-      ret = false;
+      return false;
     }
-
     return ret;
   }
 
