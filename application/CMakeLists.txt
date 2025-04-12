@@ -149,9 +149,12 @@ function(f3d_create_exec target_name)
     target_link_libraries(${target_name} PRIVATE "-framework Cocoa")
   endif()
 
-  # Windows executable without console
   if(WIN32)
+    # Windows executable without console
     set_target_properties(${target_name} PROPERTIES WIN32_EXECUTABLE TRUE)
+
+    # In case console mode is used later
+    list(APPEND f3d_link_options_public "/ENTRY:wWinMainCRTStartup")
   endif()
 
   target_compile_options(${target_name} PUBLIC ${f3d_compile_options_public} PRIVATE ${f3d_compile_options_private})
