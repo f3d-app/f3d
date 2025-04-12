@@ -120,8 +120,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       else
       {
         // XXX: groupskin not supported yet
-        vtkErrorWithObjectMacro(
-          this->Parent, "Groupskin are not supported, aborting.");
+        vtkErrorWithObjectMacro(this->Parent, "Groupskin are not supported, aborting.");
         return nullptr;
       }
     }
@@ -396,8 +395,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         buffer, offset, header->skinWidth, header->skinHeight, header->numSkins);
       if (!this->Texture)
       {
-        vtkErrorWithObjectMacro(
-          this->Parent, "Unable to read a texture, aborting.");
+        vtkErrorWithObjectMacro(this->Parent, "Unable to read a texture, aborting.");
         return false;
       }
     }
