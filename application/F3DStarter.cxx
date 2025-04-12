@@ -593,7 +593,7 @@ public:
       option = f3d::options::parse<T>(optionString);
       return true;
     }
-    catch (const f3d::options::parsing_exception& ex)
+    catch (const f3d::options::parsing_exception&)
     {
       return false;
     }
@@ -906,11 +906,8 @@ int F3DStarter::Start(int argc, char** argv)
     iter = cliOptionsDict.find("config");
     if (iter != cliOptionsDict.end())
     {
-      if (!this->Internals->Parse(iter->second, config))
-      {
-        f3d::log::warn(
-          "Could not parse '" + iter->second + "' into 'config' option, assuming empty");
-      }
+      // XXX: Discarding bool return because this cannot return false with a string
+      this->Internals->Parse(iter->second, config);
     }
   }
 
@@ -919,10 +916,8 @@ int F3DStarter::Start(int argc, char** argv)
   if (iter != cliOptionsDict.end())
   {
     std::string localOutput;
-    if (!this->Internals->Parse(iter->second, localOutput))
-    {
-      f3d::log::warn("Could not parse '" + iter->second + "' as an output, assuming empty");
-    }
+    // XXX: Discarding bool return because this cannot return false with a string
+    this->Internals->Parse(iter->second, localOutput)
     renderToStdout = localOutput == "-";
   }
 
@@ -930,11 +925,8 @@ int F3DStarter::Start(int argc, char** argv)
   iter = cliOptionsDict.find("verbose");
   if (iter != cliOptionsDict.end())
   {
-    if (!this->Internals->Parse(iter->second, this->Internals->AppOptions.VerboseLevel))
-    {
-      f3d::log::warn(
-        "Could not parse '" + iter->second + "' into `verbose` option, assuming empty");
-    }
+    // XXX: Discarding bool return because this cannot return false with a string
+    this->Internals->Parse(iter->second, this->Internals->AppOptions.VerboseLevel)
   }
 
   // Set verbosity level early from command line
