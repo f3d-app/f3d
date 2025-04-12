@@ -104,10 +104,10 @@ public:
    */
   std::pair<double, double> GetTimeRange();
 
-private:
   animationManager(animationManager const&) = delete;
   void operator=(animationManager const&) = delete;
 
+private:
   /**
    * Update members for animation index from options
    */
