@@ -585,74 +585,81 @@ public:
     this->UpdateInterdependentOptions();
   }
 
+  template<typename T>
+  bool Parse(const std::string& optionString, T& option)
+  {
+    try
+    {
+      option = f3d::options::parse<T>(optionString);
+      return true;
+    }
+    catch (const f3d::options::parsing_exception& ex)
+    {
+      return false;
+    }
+  }
+
+  template<typename T>
+  void ParseOption(
+    const F3DOptionsTools::OptionsDict& appOptions, const std::string& name, T& option)
+  {
+    if (!this->Parse(appOptions.at(name), option))
+    {
+      f3d::log::warn("Could not parse '" + appOptions.at(name) + "' into '" + name + "' option");
+    }
+  }
+
+  template<typename T>
+  void ParseOption(const F3DOptionsTools::OptionsDict& appOptions, const std::string& name,
+    std::optional<T>& option)
+  {
+    std::string optStr = appOptions.at(name);
+    if (!optStr.empty())
+    {
+      T localOption;
+      this->ParseOption(appOptions, name, localOption);
+      option = localOption;
+    }
+  }
+
   void UpdateTypedAppOptions(const F3DOptionsTools::OptionsDict& appOptions)
   {
     // Update typed app options from app options
-    this->AppOptions.Output = f3d::options::parse<std::string>(appOptions.at("output"));
-    this->AppOptions.BindingsList = f3d::options::parse<bool>(appOptions.at("list-bindings"));
-    this->AppOptions.NoBackground = f3d::options::parse<bool>(appOptions.at("no-background"));
-    this->AppOptions.NoRender = f3d::options::parse<bool>(appOptions.at("no-render"));
-    this->AppOptions.RenderingBackend =
-      f3d::options::parse<std::string>(appOptions.at("rendering-backend"));
+    this->ParseOption(appOptions, "output", this->AppOptions.Output);
+    this->ParseOption(appOptions, "list-bindings", this->AppOptions.BindingsList);
+    this->ParseOption(appOptions, "no-background", this->AppOptions.NoBackground);
+    this->ParseOption(appOptions, "no-render", this->AppOptions.NoRender);
+    this->ParseOption(appOptions, "rendering-backend", this->AppOptions.RenderingBackend);
+    this->ParseOption(appOptions, "max-size", this->AppOptions.MaxSize);
+    this->ParseOption(appOptions, "animation-time", this->AppOptions.AnimationTime);
+    this->ParseOption(appOptions, "frame-rate", this->AppOptions.FrameRate);
+    this->ParseOption(appOptions, "watch", this->AppOptions.Watch);
+    this->ParseOption(appOptions, "load-plugins", this->AppOptions.Plugins);
+    this->ParseOption(appOptions, "screenshot-filename", this->AppOptions.ScreenshotFilename);
+    this->ParseOption(appOptions, "verbose", this->AppOptions.VerboseLevel);
+    this->ParseOption(appOptions, "multi-file-mode", this->AppOptions.MultiFileMode);
+    this->ParseOption(appOptions, "resolution", this->AppOptions.Resolution);
+    this->ParseOption(appOptions, "position", this->AppOptions.Position);
+    this->ParseOption(appOptions, "colormap-file", this->AppOptions.ColorMapFile);
 
-    std::string maxSize = appOptions.at("max-size");
-    if (!maxSize.empty())
-    {
-      this->AppOptions.MaxSize = f3d::options::parse<double>(maxSize);
-    }
+    this->ParseOption(appOptions, "camera-position", this->AppOptions.CamConf.CameraPosition);
+    this->ParseOption(appOptions, "camera-focal-point", this->AppOptions.CamConf.CameraFocalPoint);
+    this->ParseOption(appOptions, "camera-view-up", this->AppOptions.CamConf.CameraViewUp);
+    this->ParseOption(appOptions, "camera-view-angle", this->AppOptions.CamConf.CameraViewAngle);
+    this->ParseOption(appOptions, "camera-direction", this->AppOptions.CamConf.CameraDirection);
+    this->ParseOption(appOptions, "camera-zoom-factor", this->AppOptions.CamConf.CameraZoomFactor);
+    this->ParseOption(
+      appOptions, "camera-azimuth-angle", this->AppOptions.CamConf.CameraAzimuthAngle);
+    this->ParseOption(
+      appOptions, "camera-elevation-angle", this->AppOptions.CamConf.CameraElevationAngle);
 
-    std::string animationTime = appOptions.at("animation-time");
-    if (!animationTime.empty())
-    {
-      this->AppOptions.AnimationTime = f3d::options::parse<double>(animationTime);
-    }
-
-    this->AppOptions.FrameRate = f3d::options::parse<double>(appOptions.at("frame-rate"));
-    this->AppOptions.Watch = f3d::options::parse<bool>(appOptions.at("watch"));
-    this->AppOptions.Plugins = { f3d::options::parse<std::vector<std::string>>(
-      appOptions.at("load-plugins")) };
-    this->AppOptions.ScreenshotFilename =
-      f3d::options::parse<std::string>(appOptions.at("screenshot-filename"));
-    this->AppOptions.VerboseLevel = f3d::options::parse<std::string>(appOptions.at("verbose"));
-    this->AppOptions.MultiFileMode =
-      f3d::options::parse<std::string>(appOptions.at("multi-file-mode"));
-    this->AppOptions.Resolution =
-      f3d::options::parse<std::vector<int>>(appOptions.at("resolution"));
-    this->AppOptions.Position = f3d::options::parse<std::vector<int>>(appOptions.at("position"));
-    this->AppOptions.ColorMapFile =
-      f3d::options::parse<std::string>(appOptions.at("colormap-file"));
-
-    std::optional<f3d::direction_t> camDir;
-    std::string camDirStr = appOptions.at("camera-direction");
-    if (!camDirStr.empty())
-    {
-      camDir = f3d::options::parse<f3d::direction_t>(camDirStr);
-    }
-
-    std::optional<f3d::direction_t> camUp;
-    std::string camUpStr = appOptions.at("camera-view-up");
-    if (!camUpStr.empty())
-    {
-      camUp = f3d::options::parse<f3d::direction_t>(camUpStr);
-    }
-
-    this->AppOptions.CamConf = { f3d::options::parse<std::vector<double>>(
-                                   appOptions.at("camera-position")),
-      f3d::options::parse<std::vector<double>>(appOptions.at("camera-focal-point")), camUp,
-      f3d::options::parse<double>(appOptions.at("camera-view-angle")), camDir,
-      f3d::options::parse<double>(appOptions.at("camera-zoom-factor")),
-      f3d::options::parse<double>(appOptions.at("camera-azimuth-angle")),
-      f3d::options::parse<double>(appOptions.at("camera-elevation-angle")) };
-
-    this->AppOptions.Reference = f3d::options::parse<std::string>(appOptions.at("reference"));
-    this->AppOptions.RefThreshold =
-      f3d::options::parse<double>(appOptions.at("reference-threshold"));
-    this->AppOptions.InteractionTestRecordFile =
-      f3d::options::parse<std::string>(appOptions.at("interaction-test-record"));
-    this->AppOptions.InteractionTestPlayFile =
-      f3d::options::parse<std::string>(appOptions.at("interaction-test-play"));
-    this->AppOptions.CommandScriptFile =
-      f3d::options::parse<std::string>(appOptions.at("command-script"));
+    this->ParseOption(appOptions, "reference", this->AppOptions.Reference);
+    this->ParseOption(appOptions, "reference-threshold", this->AppOptions.RefThreshold);
+    this->ParseOption(
+      appOptions, "interaction-test-record", this->AppOptions.InteractionTestRecordFile);
+    this->ParseOption(
+      appOptions, "interaction-test-play", this->AppOptions.InteractionTestPlayFile);
+    this->ParseOption(appOptions, "command-script", this->AppOptions.CommandScriptFile);
   }
 
   void UpdateInterdependentOptions()
@@ -886,7 +893,11 @@ int F3DStarter::Start(int argc, char** argv)
   iter = cliOptionsDict.find("no-config");
   if (iter != cliOptionsDict.end())
   {
-    noConfig = f3d::options::parse<bool>(iter->second);
+    if (!this->Internals->Parse(iter->second, noConfig))
+    {
+      f3d::log::warn(
+        "Could not parse '" + iter->second + "' into 'no-config' option, assuming false");
+    }
   }
 
   std::string config;
@@ -895,7 +906,11 @@ int F3DStarter::Start(int argc, char** argv)
     iter = cliOptionsDict.find("config");
     if (iter != cliOptionsDict.end())
     {
-      config = f3d::options::parse<std::string>(iter->second);
+      if (!this->Internals->Parse(iter->second, config))
+      {
+        f3d::log::warn(
+          "Could not parse '" + iter->second + "' into 'config' option, assuming empty");
+      }
     }
   }
 
@@ -903,14 +918,23 @@ int F3DStarter::Start(int argc, char** argv)
   iter = cliOptionsDict.find("output");
   if (iter != cliOptionsDict.end())
   {
-    renderToStdout = f3d::options::parse<std::string>(iter->second) == "-";
+    std::string localOutput;
+    if (!this->Internals->Parse(iter->second, localOutput))
+    {
+      f3d::log::warn("Could not parse '" + iter->second + "' as an output, assuming empty");
+    }
+    renderToStdout = localOutput == "-";
   }
 
   this->Internals->AppOptions.VerboseLevel = "info";
   iter = cliOptionsDict.find("verbose");
   if (iter != cliOptionsDict.end())
   {
-    this->Internals->AppOptions.VerboseLevel = f3d::options::parse<std::string>(iter->second);
+    if (!this->Internals->Parse(iter->second, this->Internals->AppOptions.VerboseLevel))
+    {
+      f3d::log::warn(
+        "Could not parse '" + iter->second + "' into `verbose` option, assuming empty");
+    }
   }
 
   // Set verbosity level early from command line
@@ -1751,6 +1775,7 @@ void F3DStarter::AddCommands()
         std::string(commandName) + " takes at most 1 argument, got " + std::to_string(args.size()) +
         " arguments instead.");
     }
+    // parsing_exception is caught within interactor implementation
     return f3d::options::parse<bool>(args[0]);
   };
 
