@@ -917,8 +917,7 @@ int F3DStarter::Start(int argc, char** argv)
   {
     std::string localOutput;
     // XXX: Discarding bool return because this cannot return false with a string
-    this->Internals->Parse(iter->second, localOutput)
-    renderToStdout = localOutput == "-";
+    this->Internals->Parse(iter->second, localOutput) renderToStdout = localOutput == "-";
   }
 
   this->Internals->AppOptions.VerboseLevel = "info";
@@ -1656,7 +1655,7 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
       bool found = false;
       std::vector<std::vector<fs::path>>::iterator it;
       for (it = this->Internals->FilesGroups.begin(); it != this->Internals->FilesGroups.end();
-           it++)
+        it++)
       {
         auto localIt = std::find(it->begin(), it->end(), tmpPath);
         found |= localIt != it->end();
