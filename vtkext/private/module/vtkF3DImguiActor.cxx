@@ -295,6 +295,12 @@ void vtkF3DImguiActor::RenderDropZone()
   if (this->DropZoneVisible)
   {
     ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+    if (viewport->WorkSize.x < 10 || viewport->WorkSize.y < 10)
+    {
+      return;
+    }
+
     constexpr ImU32 color = IM_COL32(255, 255, 255, 255);
 
     const int dropzonePad =
