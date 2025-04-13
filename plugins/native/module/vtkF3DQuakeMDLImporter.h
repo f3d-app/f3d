@@ -63,7 +63,7 @@ private:
   vtkF3DQuakeMDLImporter(const vtkF3DQuakeMDLImporter&) = delete;
   void operator=(const vtkF3DQuakeMDLImporter&) = delete;
 
-  class vtkInternals;
+  struct vtkInternals;
   std::string FileName;
 
   std::unique_ptr<vtkInternals> Internals;
