@@ -62,6 +62,7 @@ Values are parsed as doubles. For booleans, 0 means false, not 0 means true.
 
 ### QuakeMDL
 
-- Selecting `skin` is not supported
-- Loading `groupskin` is not supported
+- Models texture are loaded with a simple PBR lighting with a BaseIOR set to 1.0.
+- Selecting `skin` is not supported.
+- Loading `groupskin` is not supported.
 - Animation frames are split based on their names, eg: `stand1`, `stand2`, `stand3`, `run1`, `run2`, `run3`.

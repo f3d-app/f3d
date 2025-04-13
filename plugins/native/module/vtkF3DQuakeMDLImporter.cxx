@@ -7,6 +7,7 @@
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
+#include <vtkProperty.h>
 #include <vtkRenderer.h>
 
 //----------------------------------------------------------------------------
@@ -106,6 +107,9 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   {
     vtkNew<vtkTexture> texture;
     texture->InterpolateOn();
+    texture->MipmapOn();
+    texture->SetColorModeToDirectScalars();
+    texture->UseSRGBColorSpaceOn();
 
     // Read textures.
     std::vector<mixed_pointer_array> skins = std::vector<mixed_pointer_array>(nbSkins);
@@ -418,9 +422,10 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     vtkNew<vtkPolyDataMapper> mapper;
     mapper->SetInputData(this->AnimationFrames[0][0]);
     actor->SetMapper(mapper);
-    actor->SetTexture(this->Texture);
+    actor->GetProperty()->SetInterpolationToPBR();
+    actor->GetProperty()->SetBaseColorTexture(Texture);
+    actor->GetProperty()->SetBaseIOR(1.0);
     renderer->AddActor(actor);
-    renderer->SetBackground(0, 0, 0);
     this->Mapper = mapper;
   }
 
