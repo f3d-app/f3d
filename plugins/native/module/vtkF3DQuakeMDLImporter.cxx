@@ -106,8 +106,6 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     int skinWidth, int skinHeight, int nbSkins)
   {
     vtkNew<vtkTexture> texture;
-    texture->InterpolateOn();
-    texture->MipmapOn();
     texture->SetColorModeToDirectScalars();
     texture->UseSRGBColorSpaceOn();
 
