@@ -7,6 +7,8 @@
 #include "options.h"
 #include "window.h"
 
+#include "commands_doc.h"
+
 #include <functional>
 #include <string>
 #include <utility>
@@ -79,8 +81,7 @@ public:
    * Considering namespacing dedicated action to avoid conflicts with default action,
    * eg: `my_app::action`
    */
-  virtual interactor& addCommand(
-    std::string action, std::function<void(const std::vector<std::string>&)> callback) = 0;
+  virtual interactor& addCommand(InteractiveCommand command) = 0;
 
   /**
    * Remove a command for provided action, does not do anything if it does not exists.
