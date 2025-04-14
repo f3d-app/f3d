@@ -414,20 +414,6 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   }
 
   //----------------------------------------------------------------------------
-  void ImportActors(vtkRenderer* renderer)
-  {
-    vtkNew<vtkActor> actor;
-    vtkNew<vtkPolyDataMapper> mapper;
-    mapper->SetInputData(this->AnimationFrames[0][0]);
-    actor->SetMapper(mapper);
-    actor->GetProperty()->SetInterpolationToPBR();
-    actor->GetProperty()->SetBaseColorTexture(Texture);
-    actor->GetProperty()->SetBaseIOR(1.0);
-    renderer->AddActor(actor);
-    this->Mapper = mapper;
-  }
-
-  //----------------------------------------------------------------------------
   vtkF3DQuakeMDLImporter* Parent;
   std::string Description;
   vtkSmartPointer<vtkPolyDataMapper> Mapper;
@@ -455,7 +441,17 @@ int vtkF3DQuakeMDLImporter::ImportBegin()
 //----------------------------------------------------------------------------
 void vtkF3DQuakeMDLImporter::ImportActors(vtkRenderer* renderer)
 {
-  this->Internals->ImportActors(renderer);
+  vtkNew<vtkActor> actor;
+  vtkNew<vtkPolyDataMapper> mapper;
+  mapper->SetInputData(this->Internals->AnimationFrames[0][0]);
+  actor->SetMapper(mapper);
+  actor->GetProperty()->SetInterpolationToPBR();
+  actor->GetProperty()->SetBaseColorTexture(this->Internals->Texture);
+  actor->GetProperty()->SetBaseIOR(1.0);
+  renderer->AddActor(actor);
+  this->Internals->Mapper = mapper;
+
+  this->ActorCollection->AddItem(actor);
 }
 
 //----------------------------------------------------------------------------
