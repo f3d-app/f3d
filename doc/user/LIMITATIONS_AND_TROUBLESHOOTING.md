@@ -86,6 +86,10 @@ The GCC flag `-latomic` is not being added automatically with specific architect
 
 Dynamically switching rendering backend require VTK 9.4.0, you may need to update VTK or to use our [binary release](INSTALLATION.md).
 
+> I'm unable to link C++ examples against my local F3D install directory, it complains about missing VTK symbols
+
+Make sure to have VTK installed in your system or to add VTK install lib directory to `LD_LIBRARY_PATH`.
+
 ## Windows
 
 > Using the portable binary release, I'm unable to run F3D because Windows warns about a security risk
