@@ -451,7 +451,9 @@ void vtkF3DQuakeMDLImporter::ImportActors(vtkRenderer* renderer)
   renderer->AddActor(actor);
   this->Internals->Mapper = mapper;
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
   this->ActorCollection->AddItem(actor);
+#endif
 }
 
 //----------------------------------------------------------------------------
