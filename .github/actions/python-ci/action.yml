@@ -119,7 +119,7 @@ runs:
         -DF3D_MACOS_BUNDLE=OFF;
         -DF3D_MODULE_EXR=ON;
         -DF3D_MODULE_UI=ON;
-        -DF3D_WINDOWS_GUI=OFF" >> $GITHUB_ENV
+        -DF3D_BUILD_APPLICATION=OFF" >> $GITHUB_ENV
 
     - name: Build wheel
       shell: bash

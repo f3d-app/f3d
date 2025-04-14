@@ -20,7 +20,7 @@
 namespace f3d::detail
 {
 //----------------------------------------------------------------------------
-animationManager::animationManager(const options& options, window_impl& window)
+animationManager::animationManager(options& options, window_impl& window)
   : Options(options)
   , Window(window)
 {
@@ -48,7 +48,6 @@ void animationManager::SetDeltaTime(double deltaTime)
 void animationManager::Initialize()
 {
   assert(this->Importer);
-  this->HasAnimation = false;
   this->Playing = false;
   this->CurrentTime = 0;
   this->CurrentTimeSet = false;
@@ -98,50 +97,10 @@ void animationManager::Initialize()
     log::debug(i, ": ", this->Importer->GetAnimationName(i));
   }
 
-  this->AnimationIndex = this->Options.scene.animation.index;
-  if (this->AnimationIndex > 0 && this->AnimationIndex >= this->AvailAnimations)
-  {
-    log::warn(
-      "Specified animation index is greater than the highest possible animation index, enabling "
-      "the first animation.");
-    this->AnimationIndex = 0;
-  }
-  this->EnableOnlyCurrentAnimation();
-
-  // Recover time ranges for all enabled animations
-  this->TimeRange[0] = std::numeric_limits<double>::infinity();
-  this->TimeRange[1] = -std::numeric_limits<double>::infinity();
-  for (vtkIdType animIndex = 0; animIndex < this->AvailAnimations; animIndex++)
-  {
-    if (this->Importer->IsAnimationEnabled(animIndex))
-    {
-      double timeRange[2];
-      int nbTimeSteps;
-      vtkNew<vtkDoubleArray> timeSteps;
-
-      // Discard timesteps, F3D only cares about elapsed time using time range and deltaTime
-      // Specifying a frame rate (60) in the next call is not needed after VTK 9.2.20230603 :
-      // VTK_VERSION_CHECK(9, 2, 20230603)
-      this->Importer->GetTemporalInformation(animIndex, 60, nbTimeSteps, timeRange, timeSteps);
-
-      // Accumulate time ranges
-      this->TimeRange[0] = std::min(timeRange[0], this->TimeRange[0]);
-      this->TimeRange[1] = std::max(timeRange[1], this->TimeRange[1]);
-      this->HasAnimation = true;
-    }
-  }
-  if (this->TimeRange[0] >= this->TimeRange[1])
-  {
-    log::warn("Animation(s) time range delta is invalid: [", this->TimeRange[0], ", ",
-      this->TimeRange[1], "]. Disabling animation.");
-    this->HasAnimation = false;
-    return;
-  }
-  else
-  {
-    log::debug("Animation(s) time range is: [", this->TimeRange[0], ", ", this->TimeRange[1], "].");
-  }
-  log::debug("");
+  // Reset animation index to an invalid value before updating
+  // TODO: Rework animation index to be a vector of int
+  this->AnimationIndex = -2;
+  this->UpdateForAnimationIndex();
 
   bool autoplay = this->Options.scene.animation.autoplay;
   if (autoplay)
@@ -171,7 +130,7 @@ void animationManager::StopAnimation()
 //----------------------------------------------------------------------------
 void animationManager::ToggleAnimation()
 {
-  if (this->HasAnimation && this->Interactor)
+  if (this->AnimationIndex > -2 && this->Interactor)
   {
     this->Playing = !this->Playing;
 
@@ -226,7 +185,7 @@ void animationManager::Tick()
 bool animationManager::LoadAtTime(double timeValue)
 {
   assert(this->Importer);
-  if (!this->HasAnimation)
+  if (this->AnimationIndex == -2)
   {
     log::warn("No animation available, cannot load a specific animation time");
     return false;
@@ -279,14 +238,14 @@ void animationManager::CycleAnimation()
   {
     return;
   }
-  this->AnimationIndex += 1;
 
-  if (this->AnimationIndex == this->AvailAnimations)
+  this->Options.scene.animation.index++;
+  if (this->Options.scene.animation.index == this->AvailAnimations)
   {
-    this->AnimationIndex = -1;
+    this->Options.scene.animation.index = -1;
   }
 
-  this->EnableOnlyCurrentAnimation();
+  this->UpdateForAnimationIndex();
   this->LoadAtTime(this->TimeRange[0]);
 
   vtkRenderWindow* renWin = this->Window.GetRenderWindow();
@@ -304,12 +263,12 @@ int animationManager::GetAnimationIndex()
 std::string animationManager::GetAnimationName()
 {
   assert(this->Importer);
-  if (this->AvailAnimations <= 0)
+  if (this->AvailAnimations <= 0 || this->AnimationIndex == -2)
   {
     return "No animation";
   }
 
-  if (this->AnimationIndex < 0)
+  if (this->AnimationIndex == -1)
   {
     return "All Animations";
   }
@@ -317,25 +276,84 @@ std::string animationManager::GetAnimationName()
 }
 
 //----------------------------------------------------------------------------
-void animationManager::EnableOnlyCurrentAnimation()
+void animationManager::UpdateForAnimationIndex()
 {
   assert(this->Importer);
+
+  if (this->AnimationIndex == this->Options.scene.animation.index || this->AvailAnimations <= 0)
+  {
+    // Already updated or no animation available
+    return;
+  }
+
+  // Valid animation index : ]-2, AvailAnimations[
+  if (this->Options.scene.animation.index <= -2 ||
+    this->Options.scene.animation.index >= this->AvailAnimations)
+  {
+    log::warn(
+      "Specified animation index is greater than the highest possible animation index, enabling "
+      "the first animation.");
+    this->AnimationIndex = 0;
+  }
+  else
+  {
+    this->AnimationIndex = this->Options.scene.animation.index;
+  }
+
   for (int i = 0; i < this->AvailAnimations; i++)
   {
     this->Importer->DisableAnimation(i);
   }
   for (int i = 0; i < this->AvailAnimations; i++)
   {
-    if (this->AnimationIndex < 0 || i == this->AnimationIndex)
+    if (this->AnimationIndex == -1 || i == this->AnimationIndex)
     {
       this->Importer->EnableAnimation(i);
     }
   }
+
+  // Display currently selected animation
+  log::debug("Current animation is: ", this->GetAnimationName());
+
+  // Recover time ranges for all enabled animations
+  this->TimeRange[0] = std::numeric_limits<double>::infinity();
+  this->TimeRange[1] = -std::numeric_limits<double>::infinity();
+  for (vtkIdType animIndex = 0; animIndex < this->AvailAnimations; animIndex++)
+  {
+    if (this->Importer->IsAnimationEnabled(animIndex))
+    {
+      double timeRange[2];
+      int nbTimeSteps;
+      vtkNew<vtkDoubleArray> timeSteps;
+
+      // Discard timesteps, F3D only cares about elapsed time using time range and deltaTime
+      // Specifying a frame rate (60) in the next call is not needed after VTK 9.2.20230603 :
+      // VTK_VERSION_CHECK(9, 2, 20230603)
+      this->Importer->GetTemporalInformation(animIndex, 60, nbTimeSteps, timeRange, timeSteps);
+
+      // Accumulate time ranges
+      this->TimeRange[0] = std::min(timeRange[0], this->TimeRange[0]);
+      this->TimeRange[1] = std::max(timeRange[1], this->TimeRange[1]);
+    }
+  }
+  if (this->TimeRange[0] > this->TimeRange[1])
+  {
+    log::warn("Animation(s) time range delta is invalid: [", this->TimeRange[0], ", ",
+      this->TimeRange[1], "]. Swapping range.");
+    std::swap(this->TimeRange[0], this->TimeRange[1]);
+  }
+  log::debug(
+    "Current animation time range is: [", this->TimeRange[0], ", ", this->TimeRange[1], "].");
+  log::debug("");
 }
 
 //----------------------------------------------------------------------------
 std::pair<double, double> animationManager::GetTimeRange()
 {
+  // Make sure TimeRange is updated
+  this->UpdateForAnimationIndex();
+
+  // Return updated data
   return std::make_pair(this->TimeRange[0], this->TimeRange[1]);
 }
 }

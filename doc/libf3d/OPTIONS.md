@@ -99,9 +99,9 @@ See the [APIs](#APIs) details below for more info.
 
 |        Option         | Type<br>Default<br>Trigger | Description                                                                                                      |       F3D option       |
 | :-------------------: | :------------------------: | :--------------------------------------------------------------------------------------------------------------- | :--------------------: |
-|        ui.axis        |  bool<br>false<br>render   | Show _axes_ as a trihedron in the scene.                                                                         |        \-\-axis        |
+|        ui.axis        |  bool<br>false<br>render   | Show _axes_ as a trihedron in the scene. Requires an interactor.                                                 |        \-\-axis        |
 |     ui.scalar_bar     |  bool<br>false<br>render   | Show _scalar bar_ of the coloring by data array.                                                                 |        \-\-bar         |
-|     ui.cheatsheet     |  bool<br>false<br>render   | Show a interactor cheatsheet                                                                                     |           -            |
+|     ui.cheatsheet     |  bool<br>false<br>render   | Show a interaction cheatsheet                                                                                    |           -            |
 |      ui.console       |  bool<br>false<br>render   | Show the console                                                                                                 |           -            |
 |      ui.filename      |  bool<br>false<br>render   | Display the _filename info content_ on top of the window.                                                        |      \-\-filename      |
 |   ui.filename_info    |   string<br>-<br>render    | Content of _filename info_ to display.                                                                           |           -            |
