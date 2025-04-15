@@ -414,20 +414,6 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   }
 
   //----------------------------------------------------------------------------
-  void ImportActors(vtkRenderer* renderer)
-  {
-    vtkNew<vtkActor> actor;
-    vtkNew<vtkPolyDataMapper> mapper;
-    mapper->SetInputData(this->AnimationFrames[0][0]);
-    actor->SetMapper(mapper);
-    actor->GetProperty()->SetInterpolationToPBR();
-    actor->GetProperty()->SetBaseColorTexture(Texture);
-    actor->GetProperty()->SetBaseIOR(1.0);
-    renderer->AddActor(actor);
-    this->Mapper = mapper;
-  }
-
-  //----------------------------------------------------------------------------
   vtkF3DQuakeMDLImporter* Parent;
   std::string Description;
   vtkSmartPointer<vtkPolyDataMapper> Mapper;
@@ -437,7 +423,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   std::vector<std::vector<double>> AnimationTimes;
   std::vector<std::vector<vtkSmartPointer<vtkPolyData>>> AnimationFrames;
 
-  vtkIdType ActiveAnimation = 0;
+  vtkIdType ActiveAnimation = -1;
 };
 
 //----------------------------------------------------------------------------
@@ -455,26 +441,41 @@ int vtkF3DQuakeMDLImporter::ImportBegin()
 //----------------------------------------------------------------------------
 void vtkF3DQuakeMDLImporter::ImportActors(vtkRenderer* renderer)
 {
-  this->Internals->ImportActors(renderer);
+  vtkNew<vtkActor> actor;
+  vtkNew<vtkPolyDataMapper> mapper;
+  mapper->SetInputData(this->Internals->AnimationFrames[0][0]);
+  actor->SetMapper(mapper);
+  actor->GetProperty()->SetInterpolationToPBR();
+  actor->GetProperty()->SetBaseColorTexture(this->Internals->Texture);
+  actor->GetProperty()->SetBaseIOR(1.0);
+  renderer->AddActor(actor);
+  this->Internals->Mapper = mapper;
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
+  this->ActorCollection->AddItem(actor);
+#endif
 }
 
 //----------------------------------------------------------------------------
 bool vtkF3DQuakeMDLImporter::UpdateAtTimeValue(double timeValue)
 {
-  const std::vector<double>& times =
-    this->Internals->AnimationTimes[this->Internals->ActiveAnimation];
+  if (this->Internals->ActiveAnimation != -1)
+  {
+    const std::vector<double>& times =
+      this->Internals->AnimationTimes[this->Internals->ActiveAnimation];
 
-  // Find frameIndex for the provided timeValue so that t0 <= timeValue < t1
+    // Find frameIndex for the provided timeValue so that t0 <= timeValue < t1
 
-  // First time >= value
-  const auto found = std::lower_bound(times.begin(), times.end(), timeValue);
-  // If none, select last, if found, select distance
-  const size_t i = found == times.end() ? times.size() - 1 : std::distance(times.begin(), found);
-  // If found time > timeValue, the the previous one
-  const size_t frameIndex = *found > timeValue && i > 0 ? i - 1 : i;
+    // First time >= value
+    const auto found = std::lower_bound(times.begin(), times.end(), timeValue);
+    // If none, select last, if found, select distance
+    const size_t i = found == times.end() ? times.size() - 1 : std::distance(times.begin(), found);
+    // If found time > timeValue, the the previous one
+    const size_t frameIndex = *found > timeValue && i > 0 ? i - 1 : i;
 
-  this->Internals->Mapper->SetInputData(
-    this->Internals->AnimationFrames[this->Internals->ActiveAnimation][frameIndex]);
+    this->Internals->Mapper->SetInputData(
+      this->Internals->AnimationFrames[this->Internals->ActiveAnimation][frameIndex]);
+  }
   return true;
 }
 
