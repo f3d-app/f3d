@@ -68,6 +68,7 @@ public:
       this->Actor->GetProperty()->SetRoughness(0.3);
       this->Actor->GetProperty()->SetInterpolationToPBR();
       this->Actor->SetMapper(this->Mapper);
+      this->Actor->SetUserMatrix(originalActor->GetUserMatrix());
       this->Mapper->InterpolateScalarsBeforeMappingOn();
     }
     vtkNew<vtkActor> Actor;
