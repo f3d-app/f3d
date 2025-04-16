@@ -31,6 +31,9 @@ inputs:
   openvdb_version:
     description: 'Version of openvdb to build'
     required: false
+  pdal_version:
+    description: 'Version of PDAL to build'
+    required: false
   pybind11_version:
     description: 'Version of pybind11 to build'
     required: false
@@ -55,6 +58,7 @@ runs:
       with:
         cpu: ${{inputs.cpu}}
         openvdb_version: ${{inputs.openvdb_version}}
+        pdal_version: ${{inputs.pdal_version}}
 
     - name: Install Raytracing Dependencies
       if: inputs.raytracing_label == 'raytracing'

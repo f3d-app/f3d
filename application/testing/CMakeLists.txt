@@ -841,6 +841,33 @@ if(F3D_PLUGIN_BUILD_VDB)
   endif()
 endif ()
 
+if(F3D_PLUGIN_BUILD_VDB)
+  # .las files
+  f3d_test(NAME TestPDALReadLAS1 DATA thin-2.las ARGS --load-plugins=pdal)
+  f3d_test(NAME TestPDALReadLAS2 DATA 0450.las ARGS --load-plugins=pdal LONG_TIMEOUT)
+  f3d_test(NAME TestPDALReadLAS3 DATA tile135.las ARGS --load-plugins=pdal LONG_TIMEOUT)
+  f3d_test(NAME TestPDALReadLASVolume DATA thin-2.las ARGS --load-plugins=pdal --volume --volume-inverse)
+  f3d_test(NAME TestPDALReadLASPoints DATA thin-2.las ARGS --load-plugins=pdal -o)
+
+  # .laz files
+  f3d_test(NAME TestPDALReadLAZ1 DATA autzen_trim.laz ARGS --load-plugins=pdal)
+  f3d_test(NAME TestPDALReadLAZ2 DATA laszip-generated.laz ARGS --load-plugins=pdal)
+
+  # .pcd files
+  f3d_test(NAME TestPDALReadPCD1 DATA autzen-utm.pcd ARGS --load-plugins=pdal)
+  f3d_test(NAME TestPDALReadPCD2 DATA utm17_space.pcd ARGS --load-plugins=pdal)
+  f3d_test(NAME TestPDALReadPCD3 DATA image_0002.pcd ARGS --load-plugins=pdal)
+
+  # .ptx files
+  f3d_test(NAME TestPDALReadPTX1 DATA 1.2-with-color.ptx ARGS --load-plugins=pdal)
+  f3d_test(NAME TestPDALReadPTX2 DATA pump.ptx ARGS --load-plugins=pdal LONG_TIMEOUT)
+
+  # .pts files
+  f3d_test(NAME TestPDALReadPTS1 DATA autzen.pts ARGS --load-plugins=pdal)
+  f3d_test(NAME TestPDALReadPTS2 DATA bunny_8.pts ARGS --load-plugins=pdal)
+  f3d_test(NAME TestPDALReadPTS3 DATA bunnyData.pts ARGS --load-plugins=pdal)
+endif ()
+
 if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME TestMultiplePluginsLoad DATA cow.vtp ARGS --load-plugins=assimp,alembic NO_BASELINE REGEXP_FAIL "Plugin failed to load")
 endif()

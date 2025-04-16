@@ -22,6 +22,9 @@ inputs:
   openvdb_version:
     description: 'Version of openvdb to build'
     required: true
+  pdal_version:
+    description: 'Version of PDAL to build'
+    required: true
   usd_version:
     description: 'Version of usd to build'
     required: true
@@ -56,6 +59,7 @@ runs:
         occt_version: ${{inputs.occt_version}}
         openexr_version: ${{inputs.openexr_version}}
         openvdb_version: ${{inputs.openvdb_version}}
+        pdal_version: ${{inputs.pdal_version}}
         usd_version: ${{inputs.usd_version}}
 
     - name: Install VTK dependency
@@ -63,6 +67,7 @@ runs:
       with:
         vtk_version: ${{inputs.vtk_version}}
         openvdb_version: ${{inputs.openvdb_version}}
+        pdal_version: ${{inputs.pdal_version}}
 
     - name: Setup Build Directory
       shell: bash
@@ -91,6 +96,7 @@ runs:
         -DF3D_PLUGIN_BUILD_OCCT=ON
         -DF3D_PLUGIN_BUILD_USD=ON
         -DF3D_PLUGIN_BUILD_VDB=ON
+        -DF3D_PLUGIN_BUILD_PDAL=ON
         -DF3D_STRICT_BUILD=ON
         -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 

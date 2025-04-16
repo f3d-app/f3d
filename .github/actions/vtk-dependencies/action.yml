@@ -12,6 +12,9 @@ inputs:
   openvdb_version:
     description: 'Version of openvdb to build'
     required: false
+  pdal_version:
+    description: 'Version of PDAL to build'
+    required: false
 
 runs:
   using: "composite"
@@ -39,9 +42,21 @@ runs:
       with:
         cpu: ${{inputs.cpu}}
 
+    - name: Install GDAL
+      uses: ./.actions/gdal-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+
     - name: Install OpenVDB
       if: inputs.openvdb_version != ''
       uses: ./.actions/openvdb-install-dep
       with:
         cpu: ${{inputs.cpu}}
         version: ${{inputs.openvdb_version}}
+
+    - name: Install PDAL
+      if: inputs.pdal_version != ''
+      uses: ./.actions/pdal-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        version: ${{inputs.pdal_version}}
