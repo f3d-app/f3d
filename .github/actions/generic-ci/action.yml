@@ -211,7 +211,7 @@ runs:
         -DF3D_TESTING_ENABLE_OSMESA_TESTS=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
         -DF3D_TESTING_DISABLE_CATCH_ALL=ON
         -DF3D_TESTING_FORCE_RENDERING_BACKEND=${{ inputs.rendering_backend }}
-        -DF3D_WINDOWS_GUI=ON
+        -DF3D_WINDOWS_BUILD_CONSOLE_APPLICATION=ON
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
 
@@ -238,6 +238,13 @@ runs:
       uses: f3d-app/install-mesa-windows-action@v2
       with:
         path: ${{github.workspace}}\build\Release\f3d
+
+    # A bug in Windows 2025 prevent loading invalid DLLs
+    # https://github.com/actions/runner-images/issues/11944
+    - name: Set CI test exception for Windows
+      if: runner.os == 'Windows'
+      shell: bash
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestSDKEngineExceptions)|(TestPluginInvalid)" >> $GITHUB_ENV
 
     # A EGL test is crashing in the CI but not locally
     - name: Set CI test exception for Linux EGL
@@ -361,7 +368,9 @@ runs:
     - name: Set F3D binary path Windows
       if: runner.os == 'Windows'
       shell: bash
-      run: echo "F3D_BIN_PATH=./bin/f3d.exe" >> $GITHUB_ENV
+      run: |
+        echo "F3D_BIN_PATH=./bin/f3d.exe" >> $GITHUB_ENV
+        echo "F3D_CONSOLE_BIN_PATH=./bin/f3d-console.exe" >> $GITHUB_ENV
 
     - name: Set F3D binary path MacOS bundle
       if: |
@@ -421,6 +430,15 @@ runs:
       working-directory: ${{github.workspace}}/install
       run: |
         ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --output=output/install_example_plugin_output.png --reference=../source/.github/baselines/install_example_plugin_output.png  --resolution=300,300 --verbose --rendering-backend=${{ inputs.rendering_backend }}
+
+    - name: Check Install Windows Console Executable
+      if: |
+        inputs.vtk_version != 'v9.2.6' && inputs.vtk_version != 'v9.3.1'
+        && runner.os == 'Windows'
+      shell: bash
+      working-directory: ${{github.workspace}}/install
+      run: |
+        ${{ env.F3D_CONSOLE_BIN_PATH }} ../source/testing/data/dragon.vtu --output=output/install_output.png --reference=../source/.github/baselines/install_output.png --resolution=300,300 --colormap-file=viridis --coloring-component=0 --verbose --rendering-backend=${{ inputs.rendering_backend }}
 
     - name: Upload Tests Install Artifact
       if: failure()

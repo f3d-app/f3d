@@ -25,7 +25,7 @@ A clear and concise description of what you expected to happen.
 - GPU and GPU driver:
 
 **F3D Information**
-Paste the content of `f3d --version`:
+Paste the content of `f3d --version` or `f3d-console.exe --version` on Windows:
 
 **Additional context**
 Add any other context about the problem here.

@@ -86,6 +86,10 @@ The GCC flag `-latomic` is not being added automatically with specific architect
 
 Dynamically switching rendering backend require VTK 9.4.0, you may need to update VTK or to use our [binary release](INSTALLATION.md).
 
+> I'm unable to link C++ examples against my local F3D install directory, it complains about missing VTK symbols
+
+Make sure to have VTK installed in your system or to add VTK install lib directory to `LD_LIBRARY_PATH`.
+
 ## Windows
 
 > Using the portable binary release, I'm unable to run F3D because Windows warns about a security risk
@@ -125,9 +129,7 @@ Your previous F3D installation is current being used to generate thumbnails, wai
 
 > When running F3D without interactivity (e.g. `f3d.exe --version`) from CLI, nothing is displayed.
 
-It's a limitation from the Windows "subsystem".
-You can workaround the issue by piping to a file (`f3d.exe --version > file.txt`) and read the file.
-Another solution is recompiling F3D with the CMake option `F3D_WINDOWS_GUI` disabled.
+It's a limitation from the Windows "subsystem". Use `f3d-console.exe` instead.
 
 > When playing an animation, the animation appear to move too slowly
 

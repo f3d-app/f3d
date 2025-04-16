@@ -354,9 +354,12 @@ point3_t window_impl::getDisplayFromWorld(const point3_t& worldPoint) const
 //----------------------------------------------------------------------------
 window_impl::~window_impl()
 {
-  // The axis widget should be disabled before calling the renderer destructor
-  // As there is a register loop if not
-  this->Internals->Renderer->ShowAxis(false);
+  if (this->Internals->Interactor)
+  {
+    // The axis widget should be disabled before calling the renderer destructor
+    // As there is a register loop if not
+    this->Internals->Renderer->ShowAxis(false);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -378,9 +381,13 @@ void window_impl::UpdateDynamicOptions()
   renderer->UpdateLights();
 
   const options& opt = this->Internals->Options;
-  renderer->ShowAxis(opt.ui.axis);
-  renderer->SetUseTrackball(opt.interactor.trackball);
-  renderer->SetInvertZoom(opt.interactor.invert_zoom);
+
+  if (this->Internals->Interactor)
+  {
+    renderer->ShowAxis(opt.ui.axis);
+    renderer->SetUseTrackball(opt.interactor.trackball);
+    renderer->SetInvertZoom(opt.interactor.invert_zoom);
+  }
 
   // XXX: model.point_sprites.type only has an effect on geometry scene
   // but we set it here for practical reasons
@@ -416,6 +423,8 @@ void window_impl::UpdateDynamicOptions()
   F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
   if (opt.render.effect.anti_aliasing)
   {
+    log::warn("render.effect.anti_aliasing is deprecated, please use "
+              "render.effect.antialiasing.enable instead");
     aaMode = vtkF3DRenderer::AntiAliasingMode::FXAA;
   }
   F3D_SILENT_WARNING_POP()

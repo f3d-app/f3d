@@ -725,12 +725,7 @@ interactor& interactor_impl::initCommands()
     });
 
   this->addCommand("cycle_animation",
-    [&](const std::vector<std::string>&)
-    {
-      this->Internals->AnimationManager->CycleAnimation();
-      this->Internals->Options.scene.animation.index =
-        this->Internals->AnimationManager->GetAnimationIndex();
-    });
+    [&](const std::vector<std::string>&) { this->Internals->AnimationManager->CycleAnimation(); });
 
   this->addCommand("cycle_anti_aliasing",
     [&](const std::vector<std::string>&)
