@@ -220,8 +220,8 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
     }
     else
     {
-      ImGui::SetNextWindowSize(
-        ImVec2(viewport->WorkSize.x - 2.f * marginConsole, ImGui::CalcTextSize(">").y + 2.f * padding));
+      ImGui::SetNextWindowSize(ImVec2(
+        viewport->WorkSize.x - 2.f * marginConsole, ImGui::CalcTextSize(">").y + 2.f * padding));
     }
   }
   else
