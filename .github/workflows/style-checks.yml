@@ -3,6 +3,7 @@ on:
     types: [assigned, opened, synchronize, reopened]
     branches:
       - master
+      - release
 name: Style Checks
 jobs:
 

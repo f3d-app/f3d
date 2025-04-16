@@ -12,6 +12,7 @@ F3D supports the following file formats:
 | NRRD ("nearly raw raster data")           | `.nrrd`, `.nhrd`                               | No         | No                   | `native`  |
 | MetaHeader MetaIO                         | `.mhd`, `.mha`                                 | No         | No                   | `native`  |
 | Tag Image File Format 2D/3D               | `.tif`, `.tiff`                                | No         | No                   | `native`  |
+| QuakeMDL                                  | `.mdl`,                                        | Yes        | Yes                  | `native`  |
 | EXODUS II                                 | `.e`, `.ex2`, `.exo`, `.g`                     | No         | Yes                  | `exodus`  |
 | CityGML                                   | `.gml`                                         | No         | No                   | `native`  |
 | Point Cloud                               | `.pts`                                         | No         | No                   | `native`  |
@@ -32,4 +33,36 @@ F3D supports the following file formats:
 | Universal Scene Description               | `.usd`, `.usda`, `.usdc`, `.usdz`              | Yes        | Yes                  | `usd`     |
 | VDB                                       | `.vdb`                                         | No         | No                   | `vdb`     |
 
-\***Note:** As of version 2.5.0, F3D support for VDB is still experimental.
+## Reader options
+
+Readers can provide option that can be set using the `-D/--define` [command line option](OPTIONS.md).
+eg: `-DVDB.downsampling_factor=0.5`.
+
+Values are parsed as doubles. For booleans, 0 means false, not 0 means true.
+
+- `vdb` - `VDB.downsampling_factor` : Control the level of downsampling when reading a volume, default is 0.1.
+- `occt` - `STEP.linear_deflection` : Control the distance between a curve and the resulting tessellation, default is 0.1.
+- `occt` - `STEP.angular_deflection` : Control the angle between two subsequent segments, default is 0.5.
+- `occt` - `STEP.relative_deflection` : Control if the deflection values are relative to object size, default is false.
+- `occt` - `STEP.read_wire` : Control if lines should be read, default is true.
+- `occt` - `IGES.linear_deflection` : Control the distance between a curve and the resulting tessellation, default is 0.1.
+- `occt` - `IGES.angular_deflection` : Control the angle between two subsequent segments, default is 0.5.
+- `occt` - `IGES.relative_deflection` : Control if the deflection values are relative to object size, default is false.
+- `occt` - `IGES.read_wire` : Control if lines should be read, default is true.
+- `occt` - `BREP.linear_deflection` : Control the distance between a curve and the resulting tessellation, default is 0.1.
+- `occt` - `BREP.angular_deflection` : Control the angle between two subsequent segments, default is 0.5.
+- `occt` - `BREP.relative_deflection` : Control if the deflection values are relative to object size, default is false.
+- `occt` - `BREP.read_wire` : Control if lines should be read, default is true.
+- `occt` - `XBF.linear_deflection` : Control the distance between a curve and the resulting tessellation, default is 0.1.
+- `occt` - `XBF.angular_deflection` : Control the angle between two subsequent segments, default is 0.5.
+- `occt` - `XBF.relative_deflection` : Control if the deflection values are relative to object size, default is false.
+- `occt` - `XBF.read_wire` : Control if lines should be read, default is true.
+
+## Format details
+
+### QuakeMDL
+
+- Models texture are loaded with a simple PBR lighting (diffuse color only, no specular, index of refraction set to 1.0).
+- Selecting `skin` is not supported.
+- Loading `groupskin` is not supported.
+- Animation frames are split based on their names, eg: `stand1`, `stand2`, `stand3`, `run1`, `run2`, `run3`.
