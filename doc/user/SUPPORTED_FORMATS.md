@@ -12,7 +12,7 @@ F3D supports the following file formats:
 | NRRD ("nearly raw raster data")           | `.nrrd`, `.nhrd`                               | No         | No                   | `native`  |
 | MetaHeader MetaIO                         | `.mhd`, `.mha`                                 | No         | No                   | `native`  |
 | Tag Image File Format 2D/3D               | `.tif`, `.tiff`                                | No         | No                   | `native`  |
-| QuakeMDL                                  | `.mdl`,                                        | Yes        | Yes                  | `native`  |
+| QuakeMDL                                  | `.mdl`                                         | Yes        | Yes                  | `native`  |
 | EXODUS II                                 | `.e`, `.ex2`, `.exo`, `.g`                     | No         | Yes                  | `exodus`  |
 | CityGML                                   | `.gml`                                         | No         | No                   | `native`  |
 | Point Cloud                               | `.pts`                                         | No         | No                   | `native`  |
