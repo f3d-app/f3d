@@ -129,5 +129,6 @@ eng.interactor.start()
   - Python provides suggestions whenever the "Tab" key is pressed
 
 Once a release cycle:
- - Check that completions are still working with `fish` and `zsh` when tab is pressed
- - Check that F3D is added for extensions on a fresh Windows installation
+
+- Check that completions are still working with `fish` and `zsh` when tab is pressed
+- Check that F3D is added for extensions on a fresh Windows installation
