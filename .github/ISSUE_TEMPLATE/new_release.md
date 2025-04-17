@@ -55,8 +55,7 @@ Release :
 - [ ] Communicate on hackernews
 - [ ] Communicate on linkedin
 - [ ] Communicate on mastodon
-
-- [ ] Merge F3D release into master: https://github.com/f3d-app/f3d/compare/master...release- [ ] Communicate on bluesky
+- [ ] Communicate on bluesky
 - [ ] Move all issue from current milestone to next milestone, close current roadmap issue and open a next roadmap issue
 - [ ] Update `doc/dev/ROADMAPS_AND_RELEASES.md` for next release
 - [ ] Create an issue for updating dependencies in CI and superbuild
@@ -105,6 +104,7 @@ Windows testing protocol:
 - Double click on f3d.glb, press "Space", check animation is going smoothly and takes 4 seconds
 - Double click on any new supported file format, check render
 - Check that CTRL+O (file dialog) is working
+- run `f3d-console --version` in a Windows command line and check it output the version
 - Press "Esc" and check the following commands `reload_current_file_group`, `set_camera top`, `toggle_volume_rendering`, `exit`
 - `cd examples\libf3d && mkdir build && cd build && cmake ../ && cmake --build . --config Release`
 - `.\cpp\check-engine\Release\check-engine`
@@ -127,3 +127,7 @@ eng.interactor.start()
 - Check the following
   - The name of the window is `f3d` at all time
   - Python provides suggestions whenever the "Tab" key is pressed
+
+Once a release cycle:
+ - Check that completions are still working with `fish` and `zsh` when tab is pressed
+ - Check that F3D is added for extensions on a fresh Windows installation
