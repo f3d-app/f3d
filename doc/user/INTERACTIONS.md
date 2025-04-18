@@ -73,7 +73,8 @@ Other hotkeys and interactions are available:
 
 - <kbd>H</kbd>: key to toggle the display of a cheat sheet showing all these hotkeys and their statuses.
 - <kbd>CTRL</kbd> + <kbd>Q</kbd>: close the window and quit F3D.
-- <kbd>Esc</kbd>: display/hide the console.
+- <kbd>Esc</kbd>: display the console or hide console/minimal console.
+- <kbd>:</kbd>: display the minimal console
 - <kbd>Space</kbd>: play the animation if any.
 - <kbd>&larr;</kbd>: load the previous file if any and reset the camera.
 - <kbd>&rarr;</kbd>: load the next file if any and reset the camera.
