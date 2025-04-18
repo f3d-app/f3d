@@ -324,10 +324,12 @@ void vtkF3DImguiActor::RenderDropZone()
     ImGui::SetNextWindowBgAlpha(0.f);
 
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
-      ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
+      ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove |
+      ImGuiWindowFlags_NoBringToFrontOnFocus;
 
     ImGui::Begin("DropZoneText", nullptr, flags);
-    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+    /* Use background draw list to prevent "ignoring" NoBringToFrontOnFocus */
+    ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
 
     const ImVec2 p0(dropzonePad, dropzonePad);
     const ImVec2 p1(dropzonePad + dropZoneW, dropzonePad + dropZoneH);
@@ -452,7 +454,8 @@ void vtkF3DImguiActor::RenderCheatSheet()
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
     ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings |
-    ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
+    ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove |
+    ImGuiWindowFlags_NoBringToFrontOnFocus;
 
   ImGui::Begin("CheatSheet", nullptr, flags);
 
