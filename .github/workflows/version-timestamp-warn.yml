@@ -1,0 +1,16 @@
+name: Versions timestamp Warning
+on:
+  pull_request_target:
+    paths:
+      - '.github/workflows/versions.json'
+
+jobs:
+  versions-timestamp-warn:
+    name: Version Timestamp Warning
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          message: You are modifying versions.json, please update the timestamp as well.
