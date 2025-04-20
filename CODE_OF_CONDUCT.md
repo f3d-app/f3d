@@ -43,7 +43,7 @@ acceptable behavior and will take appropriate and fair corrective action in
 response to any behavior that they deem inappropriate, threatening, offensive,
 or harmful.
 
-Maintainers and moderators have the responsability to investigate any potential
+Maintainers and moderators have the responsibility to investigate any potential
 code of conduct violation, reported or not, in order to avoid harm to the community.
 
 Maintainers have the right and responsibility to remove, edit, or reject
