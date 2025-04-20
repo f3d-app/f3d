@@ -157,7 +157,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
 
     vtkNew<vtkFloatArray> normals;
     normals->SetNumberOfComponents(3);
-    normals->Allocate(header->numTriangles * 3 * 3);
+    normals->SetNumberOfTuples(header->numTriangles * 3);
 
     for (int i = 0; i < header->numTriangles; i++)
     {
