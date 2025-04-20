@@ -48,6 +48,9 @@ comments, commits, code, wiki edits, issues, and other contributions that are
 not aligned to this Code of Conduct, and will communicate reasons for moderation
 decisions when appropriate.
 
+In case of any issues please reach out, either to any moderators on discord or
+at <contact@f3d.app>.
+
 ## Scope
 
 This Code of Conduct applies within all community spaces, and also applies when
