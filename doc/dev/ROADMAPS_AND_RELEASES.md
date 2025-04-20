@@ -6,8 +6,7 @@ as planned and releases can be delayed.
 
 Roadmaps are available on their dedicated issue with their associated project board and milestone.
 The first draft of the roadmap of each release will be discussed on [discord](https://discord.f3d.app), then they are bound to evolve over time
-while the develpment happens.
-
+while the development happens.
 If you want to get involved, please feel free to join the [discord](https://discord.f3d.app), comment on the issues and contribute to the issues that matters to you!
 
 ## 3.2.0
