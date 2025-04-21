@@ -49,13 +49,16 @@ public:
 
   struct PointSpritesStruct
   {
-    PointSpritesStruct()
+    explicit PointSpritesStruct(vtkActor* originalActor)
+      : OriginalActor(originalActor)
     {
+      this->Actor->vtkProp3D::ShallowCopy(originalActor);
       this->Actor->SetMapper(this->Mapper);
     }
 
     vtkNew<vtkActor> Actor;
     vtkNew<vtkPointGaussianMapper> Mapper;
+    vtkActor* OriginalActor;
   };
 
   struct ColoringStruct
@@ -67,6 +70,7 @@ public:
       this->Actor->GetProperty()->SetLineWidth(1.0);
       this->Actor->GetProperty()->SetRoughness(0.3);
       this->Actor->GetProperty()->SetInterpolationToPBR();
+      this->Actor->vtkProp3D::ShallowCopy(originalActor);
       this->Actor->SetMapper(this->Mapper);
       this->Mapper->InterpolateScalarsBeforeMappingOn();
     }

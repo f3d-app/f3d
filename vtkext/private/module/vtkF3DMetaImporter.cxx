@@ -250,7 +250,7 @@ bool vtkF3DMetaImporter::Update()
 
       // Create and configure point sprites actors
       this->Pimpl->PointSpritesActorsAndMappers.emplace_back(
-        vtkF3DMetaImporter::PointSpritesStruct());
+        vtkF3DMetaImporter::PointSpritesStruct(actor));
       vtkF3DMetaImporter::PointSpritesStruct& pss =
         this->Pimpl->PointSpritesActorsAndMappers.back();
 
@@ -501,6 +501,17 @@ bool vtkF3DMetaImporter::UpdateAtTimeValue(double timeValue)
 #else
     importerPair.Importer->UpdateTimeStep(timeValue);
 #endif
+
+    // Update coloring and point sprites actors
+    for (auto& cs : this->Pimpl->ColoringActorsAndMappers)
+    {
+      cs.Actor->vtkProp3D::ShallowCopy(cs.OriginalActor);
+    }
+    for (auto& pss : this->Pimpl->PointSpritesActorsAndMappers)
+    {
+      pss.Actor->vtkProp3D::ShallowCopy(pss.OriginalActor);
+    }
+
   }
   this->Pimpl->UpdateTime.Modified();
   return ret;
