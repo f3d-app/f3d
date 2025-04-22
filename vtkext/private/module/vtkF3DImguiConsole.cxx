@@ -211,18 +211,9 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
   // explicitly calculate size of minimal console to avoid extra flashing frame
   if (minimal)
   {
-    if (this->Pimpl->NewError || this->Pimpl->NewWarning)
-    {
-      // prevent overlap with console badge in minimal console
-      ImGui::SetNextWindowSize(ImVec2(viewport->WorkSize.x - 2.f * marginConsole -
-          (ImGui::CalcTextSize("!").y + 2.f * padding) - marginTopRight,
-        ImGui::CalcTextSize(">").y + 2.f * padding));
-    }
-    else
-    {
-      ImGui::SetNextWindowSize(ImVec2(
-        viewport->WorkSize.x - 2.f * marginConsole, ImGui::CalcTextSize(">").y + 2.f * padding));
-    }
+    ImGui::SetNextWindowPos(ImVec2(marginTopRight, marginTopRight));
+    ImGui::SetNextWindowSize(ImVec2(
+      viewport->WorkSize.x - 2.f * marginConsole, ImGui::CalcTextSize(">").y + 2.f * padding));
   }
   else
   {
@@ -230,11 +221,11 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
     this->Pimpl->NewError = false;
     this->Pimpl->NewWarning = false;
 
+    ImGui::SetNextWindowPos(ImVec2(marginConsole, marginConsole));
     ImGui::SetNextWindowSize(ImVec2(
       viewport->WorkSize.x - 2.f * marginConsole, viewport->WorkSize.y - 2.f * marginConsole));
   }
 
-  ImGui::SetNextWindowPos(ImVec2(marginConsole, marginConsole));
   ImGui::SetNextWindowBgAlpha(0.9f);
 
   ImGuiWindowFlags winFlags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
@@ -369,7 +360,6 @@ void vtkF3DImguiConsole::ShowBadge()
 
   if (this->Pimpl->NewError || this->Pimpl->NewWarning)
   {
-    constexpr float marginConsole = 30.f;
     constexpr float marginTopRight = 5.f;
     const float padding = ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().FramePadding.x;
     ImVec2 winSize = ImGui::CalcTextSize("!");
@@ -377,7 +367,7 @@ void vtkF3DImguiConsole::ShowBadge()
     winSize.y += 2.f * padding;
 
     ImGui::SetNextWindowPos(
-      ImVec2(viewport->WorkSize.x - winSize.x - marginTopRight, marginConsole));
+      ImVec2(viewport->WorkSize.x - winSize.x - marginTopRight, marginTopRight));
     ImGui::SetNextWindowSize(winSize);
 
     ImGuiWindowFlags winFlags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
