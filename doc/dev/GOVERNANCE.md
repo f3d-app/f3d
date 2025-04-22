@@ -28,6 +28,8 @@ To become a Returning Contributor, one need to have merged at least two pull req
 
 Usually Maintainers will reach out to potential Returning Contributors but in case it was missed, one should reach out to Maintainers for consideration.
 
+Maintainers may decide to list a returning contributor as inactive after a year without contributions, in that case they will be removed from the f3d-app github organization until active again.
+
 ### 1.3. Contributors
 
 Contributors are those who have made or want to make contributions to the Project.
