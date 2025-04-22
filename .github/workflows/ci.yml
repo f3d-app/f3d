@@ -46,8 +46,8 @@ jobs:
     runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
     name: Set default versions
-    needs: [detect]
-    if: needs.detect.outputs.should_run_ci
+    needs: detect
+    if: ${{ needs.detect.outputs.should_run_ci }}
     outputs:
       alembic_version: ${{ steps.set_default_versions.outputs.alembic_version }}
       alembic_min_version: ${{ steps.set_default_versions.outputs.alembic_min_version }}
@@ -93,11 +93,13 @@ jobs:
   cache_lfs:
     runs-on: ubuntu-22.04
     name: Update LFS data cache
-    needs: [detect]
-    if: needs.detect.outputs.should_run_ci
+    needs: detect
     outputs:
       lfs_sha: ${{ steps.lfs_sha_recover.outputs.lfs_sha }}
     steps:
+
+    - name: Should Run
+      run: echo "shouldRun=${{ needs.detect.outputs.should_run_ci }}"
 
     - name: Checkout
       uses: actions/checkout@v4
