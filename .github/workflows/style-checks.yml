@@ -7,9 +7,32 @@ on:
 name: Style Checks
 jobs:
 
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      checked: ${{ steps.detect.outputs.checked }}
+      unchecked: ${{ steps.detect.outputs.unchecked }}
+
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Checkbox Trigger
+        id: detect
+        uses: a7med3bdulbaset/checklist
+        with:
+          token: ${{ github.token }}
+            
+      - name: list changes
+        run: |
+          echo "checked=${{ steps.detect.outputs.checked }}"
+          echo "unchecked=${{ steps.detect.outputs.unchecked }}
+
   style-checks:
     name: Formatting Check
     runs-on: ubuntu-latest
+    needs: [detect]
+    if: ${{ contains(needs.detect.outputs.checked, 'format') }}
 
     env:
       ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}

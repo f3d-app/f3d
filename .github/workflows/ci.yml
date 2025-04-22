@@ -16,12 +16,38 @@ concurrency:
 jobs:
 
 #----------------------------------------------------------------------------
+# Detect checkboxes are checked
+#----------------------------------------------------------------------------
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      checked: ${{ steps.detect.outputs.checked }}
+      unchecked: ${{ steps.detect.outputs.unchecked }}
+
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Checkbox Trigger
+        id: detect
+        uses: a7med3bdulbaset/checklist
+        with:
+          token: ${{ github.token }}
+            
+      - name: list changes
+        run: |
+          echo "checked=${{ steps.detect.outputs.checked }}"
+          echo "unchecked=${{ steps.detect.outputs.unchecked }}
+
+#----------------------------------------------------------------------------
 # Default versions: Set default version for all dependencies
 #----------------------------------------------------------------------------
   default_versions:
     runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
     name: Set default versions
+    needs: [detect]
+    if: ${{ contains(needs.detect.outputs.checked, 'CI') }}
     outputs:
       alembic_version: ${{ steps.set_default_versions.outputs.alembic_version }}
       alembic_min_version: ${{ steps.set_default_versions.outputs.alembic_min_version }}
@@ -67,6 +93,8 @@ jobs:
   cache_lfs:
     runs-on: ubuntu-22.04
     name: Update LFS data cache
+    needs: [detect]
+    if: ${{ contains(needs.detect.outputs.checked, 'CI') }}
     outputs:
       lfs_sha: ${{ steps.lfs_sha_recover.outputs.lfs_sha }}
     steps:
