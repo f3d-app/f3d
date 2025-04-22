@@ -37,7 +37,7 @@ jobs:
       - name: list changes
         run: |
           echo "checked=${{ steps.detect.outputs.checked }}"
-          echo "unchecked=${{ steps.detect.outputs.unchecked }}
+          echo "unchecked=${{ steps.detect.outputs.unchecked }}"
 
 #----------------------------------------------------------------------------
 # Default versions: Set default version for all dependencies
