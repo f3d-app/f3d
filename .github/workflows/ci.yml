@@ -21,23 +21,23 @@ jobs:
   detect:
     runs-on: ubuntu-latest
     outputs:
-      shoud_run_ci: ${{ steps.check-pr.outputs.shouldRun }}
+      checked: ${{ steps.detect.outputs.checked }}
+      unchecked: ${{ steps.detect.outputs.unchecked }}
 
     permissions:
       pull-requests: write
 
     steps:
-      - name: Check the PR
-        # https://github.com/bahmutov/should-run-github-action
-        uses: bahmutov/should-run-github-action@v1
-        id: check-pr
+      - name: Checkbox Trigger
+        id: detect
+        uses: a7med3bdulbaset/checklist@2
         with:
-          checkbox_text: 're-run the tests'
-        env:
-          GITHUB_EVENT: ${{ toJson(github.event) }}
+          token: ${{ github.token }}
 
-      - name: Should Run
-        run: echo "shouldRun=${{ steps.check-pr.outputs.shouldRun }}"
+      - name: list changes
+        run: |
+          echo "checked=${{ steps.detect.outputs.checked }}"
+          echo "unchecked=${{ steps.detect.outputs.unchecked }}
 
 #----------------------------------------------------------------------------
 # Default versions: Set default version for all dependencies
@@ -47,7 +47,7 @@ jobs:
     container: ghcr.io/f3d-app/f3d-ci
     name: Set default versions
     needs: detect
-    if: ${{ needs.detect.outputs.should_run_ci }}
+    if: ${{ contains(needs.detect.outputs.checked, 'run CI') }}
     outputs:
       alembic_version: ${{ steps.set_default_versions.outputs.alembic_version }}
       alembic_min_version: ${{ steps.set_default_versions.outputs.alembic_min_version }}
@@ -99,7 +99,7 @@ jobs:
     steps:
 
     - name: Should Run
-      run: echo "shouldRun=${{ needs.detect.outputs.should_run_ci }}"
+      run: echo "shouldRun="${{ needs.detect.outputs.checked }}"
 
     - name: Checkout
       uses: actions/checkout@v4
