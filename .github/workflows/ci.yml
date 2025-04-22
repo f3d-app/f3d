@@ -30,7 +30,7 @@ jobs:
     steps:
       - name: Checkbox Trigger
         id: detect
-        uses: a7med3bdulbaset/checklist@2
+        uses: a7med3bdulbaset/checklist@latest
         with:
           token: ${{ github.token }}
 
