@@ -1,4 +1,4 @@
 ## CI
 - [ ] format
-- [ ] CI
+- [ ] run CI
 
