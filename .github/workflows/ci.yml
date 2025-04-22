@@ -2,7 +2,7 @@ name: CI
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
+    types: [opened, synchronize, reopened, ready_for_review, edited]
     paths-ignore:
       - 'doc/**'
   push:
@@ -32,9 +32,12 @@ jobs:
         uses: bahmutov/should-run-github-action@v1
         id: check-pr
         with:
-          checkbox_text: 'run CI'
+          checkbox_text: 're-run the tests'
         env:
           GITHUB_EVENT: ${{ toJson(github.event) }}
+
+      - name: Should Run
+        run: echo "shouldRun=${{ steps.check-pr.outputs.shouldRun }}"
 
 #----------------------------------------------------------------------------
 # Default versions: Set default version for all dependencies
@@ -44,7 +47,7 @@ jobs:
     container: ghcr.io/f3d-app/f3d-ci
     name: Set default versions
     needs: [detect]
-    if: needs.detect.should_run_ci
+    if: needs.detect.outputs.should_run_ci
     outputs:
       alembic_version: ${{ steps.set_default_versions.outputs.alembic_version }}
       alembic_min_version: ${{ steps.set_default_versions.outputs.alembic_min_version }}
@@ -91,7 +94,7 @@ jobs:
     runs-on: ubuntu-22.04
     name: Update LFS data cache
     needs: [detect]
-    if: needs.detect.should_run_ci
+    if: needs.detect.outputs.should_run_ci
     outputs:
       lfs_sha: ${{ steps.lfs_sha_recover.outputs.lfs_sha }}
     steps:
