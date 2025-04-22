@@ -44,8 +44,10 @@ F3D uses [GitLab Flow](https://about.gitlab.com/topics/version-control/what-is-g
 - [Fork](https://github.com/f3d-app/f3d/fork) the F3D repository on GitHub.
 - Create and push a feature branch on your fork containing new commits.
 - When it is ready for review or when you want to run the CI, create a pull request against `f3d-app/f3d/master`.
-- Once the PR is approved and CI comes back clean, a F3D maintainer will merge your pull request in the master branch.
-- The master now contains your changes and will be present in the next release!
+- Your PR will be reviewed by maintainers and returning contributors, please take their feedback into account and resolve discussions when adresssed.
+- Maintainers and returning contributors will run the continuous integration and help you figure out how to fix CI issues.
+- Once the PR is approved and CI comes back clean, a maintainer will merge your pull request in the master branch.
+- The master now contains your changes and will be present in the next minor/major release!
 
 ## Continuous Integration
 
@@ -57,11 +59,16 @@ Make sure to check the results for yourself and ask for help if needed.
 F3D continuous integration will also check the coverage as it is a good way to evaluate if new features are being tested or not.
 When adding code to F3D, always try to cover it by adding/modifying [tests](doc/dev/TESTING.md).
 
-F3D continuous integration also checks formatting using clang-format and will inform you if changes needs to be made.
+F3D continuous integration also checks formatting using clang-format and other tools and will inform you if changes needs to be made.
 Some [formatting rules](doc/dev/CODING_STYLE.md) are not enforced by clang-format and will be checked during the review process.
 
 When making changes to the `libf3d` public API, continuous integration will warn about making related changes to the bindings.
 This is required in order to merge the pull request.
+
+This continuous integration, except the style checks, requires a maintainer or a returning contributor to add
+the `ci:full_run` label to the pull request, it will then start running and run on each new push to that branch.
+
+The continuous integration is just code, as the rest of F3D is. If you want to fix or improve it, you are very welcome to!
 
 ## Changelog
 
