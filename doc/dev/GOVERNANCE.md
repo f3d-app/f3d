@@ -30,7 +30,7 @@ Usually Maintainers will reach out to potential Returning Contributors but in ca
 
 ### 1.3. Contributors
 
-Contributors are those who have made or wants to make contributions to the Project.
+Contributors are those who have made or want to make contributions to the Project.
 
 ### 1.4. Mentees
 
