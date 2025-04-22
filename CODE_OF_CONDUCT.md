@@ -69,7 +69,7 @@ First they will immediately reply to the report to confirm receipt.
 This reply must be sent within 24 hours, and they should strive to respond much quicker than that.
 Then they will recover more data if the report does not contain enough information.
 
-Thy will then review the incident and determine, to the best of their ability:
+They will then review the incident and determine, to the best of their ability:
 
 - what happened
 - whether this event constitutes a code of conduct violation
