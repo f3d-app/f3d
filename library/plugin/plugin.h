@@ -37,7 +37,7 @@ public:
   /**
    * Get the name of this plugin
    */
-  const std::string& getName()
+  const std::string& getName() const
   {
     return this->Name;
   }
@@ -45,7 +45,7 @@ public:
   /**
    * Get the description of this plugin
    */
-  const std::string& getDescription()
+  const std::string& getDescription() const
   {
     return this->Description;
   }
@@ -53,7 +53,7 @@ public:
   /**
    * Get the version of this plugin
    */
-  const std::string& getVersion()
+  const std::string& getVersion() const
   {
     return this->Version;
   }
@@ -71,7 +71,7 @@ public:
    * Set/Get the origin of this plugin, usually static, system or an actual path
    * Set by the engine.
    */
-  const std::string& getOrigin()
+  const std::string& getOrigin() const
   {
     return this->Origin;
   }

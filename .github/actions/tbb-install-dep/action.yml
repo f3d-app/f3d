@@ -19,6 +19,7 @@ runs:
 
     # Dependents: usd openvdb vtk
     # v2021.13.0 somehow cause memory issue in draco and alembic
+    # v2022.1.0 is not supported by usd until their next release > 25.02a
     - name: Checkout TBB
       if: steps.cache-tbb.outputs.cache-hit != 'true'
       uses: actions/checkout@v4

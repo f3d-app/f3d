@@ -12,6 +12,8 @@
 
 #include <vtkF3DImporter.h>
 
+#include <memory>
+
 class vtkF3DQuakeMDLImporter : public vtkF3DImporter
 {
 public:

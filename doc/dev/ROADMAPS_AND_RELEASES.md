@@ -9,13 +9,13 @@ They are bound to evolve over time.
 
 If you want to get involved, please feel free to comment on the issues and contribute to the issues that matters to you!
 
-## 3.1.0
+## 3.2.0
 
-Out next minor release is planned for April 2025
+Out next minor release is planned for July 2025
 
-- [Issue](https://github.com/f3d-app/f3d/issues/1929)
-- [Milestone](https://github.com/f3d-app/f3d/milestone/11)
-- [Board](https://github.com/f3d-app/f3d/issues/1929)
+- [Issue](https://github.com/f3d-app/f3d/issues/2157)
+- [Milestone](https://github.com/f3d-app/f3d/milestone/12)
+- [Board](https://github.com/orgs/f3d-app/projects/2)
 
 ## Release cycle
 

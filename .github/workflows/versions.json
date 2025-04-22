@@ -10,12 +10,12 @@
     "alembic": "1.8.8",
     "assimp": "v5.4.3",
     "draco": "1.5.7",
-    "occt": "V7_8_1",
-    "openexr": "v3.3.2",
-    "openvdb": "v12.0.0",
+    "occt": "V7_9_0",
+    "openexr": "v3.3.3",
+    "openvdb": "v12.0.1",
     "pybind11": "v2.13.6",
-    "python": "3.11",
-    "usd": "v24.11",
+    "python": "3.13",
+    "usd": "v25.02a",
     "java": "21"
   },
   "min_versions": {
@@ -31,5 +31,5 @@
     "java": "17"
   },
   "vtk_commit_sha": "691f4a3c114cbfecfda86e811d8da73909bc8d78",
-  "timestamp": "20250329_0"
+  "timestamp": "20250419_0"
 }

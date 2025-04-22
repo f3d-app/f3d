@@ -274,13 +274,12 @@ void engine::loadPlugin(const std::string& pathOrName, const std::vector<fs::pat
   factory* factory = factory::instance();
 
   // check if the plugin is already loaded
-  for (auto* plug : factory->getPlugins())
+  auto plugs = factory->getPlugins();
+  if (std::any_of(plugs.cbegin(), plugs.cend(), [pathOrName](const plugin* plug)
+        { return (plug->getName() == pathOrName || plug->getOrigin() == pathOrName); }))
   {
-    if (plug->getName() == pathOrName || plug->getOrigin() == pathOrName)
-    {
-      log::debug("Plugin \"", pathOrName, "\" already loaded");
-      return;
-    }
+    log::debug("Plugin \"", pathOrName, "\" already loaded");
+    return;
   }
 
   // check if the plugin is a known static plugin
