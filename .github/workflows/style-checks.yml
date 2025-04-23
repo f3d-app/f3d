@@ -30,6 +30,7 @@ jobs:
         run: |
           echo "checked=${{ steps.detect.outputs.checked }}"
           echo "unchecked=${{ steps.detect.outputs.unchecked }}"
+          echo "${{ github.ref }}"
 
 #----------------------------------------------------------------------------
 # Style checks
