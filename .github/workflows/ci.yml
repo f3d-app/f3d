@@ -20,6 +20,7 @@ jobs:
 #----------------------------------------------------------------------------
   detect_checkboxes:
     runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
     outputs:
       checked: ${{ steps.detect.outputs.checked }}
       unchecked: ${{ steps.detect.outputs.unchecked }}
@@ -40,7 +41,6 @@ jobs:
           echo "unchecked=${{ steps.detect.outputs.unchecked }}"
           echo "${{ github.ref }}"
 
-
 #----------------------------------------------------------------------------
 # Default versions: Set default version for all dependencies
 #----------------------------------------------------------------------------
@@ -49,7 +49,7 @@ jobs:
     container: ghcr.io/f3d-app/f3d-ci
     name: Set default versions
     needs: detect_checkboxes
-    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Full CI')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'CI')) || (github.ref == 'refs/heads/master') }}
     outputs:
       alembic_version: ${{ steps.set_default_versions.outputs.alembic_version }}
       alembic_min_version: ${{ steps.set_default_versions.outputs.alembic_min_version }}
@@ -96,7 +96,7 @@ jobs:
     runs-on: ubuntu-22.04
     name: Update LFS data cache
     needs: detect_checkboxes
-    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Full CI')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'CI')) || (github.ref == 'refs/heads/master') }}
     outputs:
       lfs_sha: ${{ steps.lfs_sha_recover.outputs.lfs_sha }}
     steps:
@@ -178,9 +178,8 @@ jobs:
 # Windows CI: Build and test, cross-vtk build matrix
 #----------------------------------------------------------------------------
   windows:
-    if: github.event.pull_request.draft == false
-    needs: [cache_lfs, cache_dependencies, default_versions]
-
+    needs: [cache_lfs, cache_dependencies, default_versions, detect_checkboxes]
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Full CI')) || (github.ref == 'refs/heads/master') }}
     strategy:
       fail-fast: false
       matrix:
@@ -219,11 +218,44 @@ jobs:
         java_version: ${{needs.default_versions.outputs.java_version}}
 
 #----------------------------------------------------------------------------
+# Linux fast CI: Build and test a single fast CI
+#----------------------------------------------------------------------------
+  linux_fast:
+    needs: [cache_lfs, cache_dependencies, default_versions, detect_checkboxes]
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Fast CI')) || (github.ref == 'refs/heads/master') }}
+
+    runs-on: ubuntu-22.04
+    container: ghcr.io/f3d-app/f3d-ci
+
+    env:
+      DISPLAY: :0
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        path: 'source'
+        fetch-depth: 0
+        lfs: false
+
+    - name: Generic CI
+      uses: ./source/.github/actions/generic-ci
+      with:
+        build_type: fast
+        vtk_version: v9.4.2
+        raytracing_label: no-raytracing
+        rendering_backend: auto
+        optional_deps_label: no-optional-deps
+        exclude_deprecated_label: exclude-deprecated
+        static_label: no-static
+        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+
+#----------------------------------------------------------------------------
 # Linux CI: Build and test, cross-vtk build matrix
 #----------------------------------------------------------------------------
   linux:
-    if: github.event.pull_request.draft == false
-    needs: [cache_lfs, cache_dependencies, default_versions]
+    needs: [cache_lfs, cache_dependencies, default_versions, detect_checkboxes]
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Full CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
       fail-fast: false
@@ -379,8 +411,9 @@ jobs:
 # MacOS CI: Build and test, cross-vtk build matrix
 #----------------------------------------------------------------------------
   macos:
-    if: github.event.pull_request.draft == false
-    needs: [cache_lfs, cache_dependencies, default_versions]
+    needs: [cache_lfs, cache_dependencies, default_versions, detect_checkboxes]
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Full CI')) || (github.ref == 'refs/heads/master') }}
+
     strategy:
       fail-fast: false
       matrix:
@@ -417,8 +450,8 @@ jobs:
 # MacOS ARM CI: Build and test, cross-vtk build matrix with a few optional builds
 #----------------------------------------------------------------------------
   macos_arm:
-    if: github.event.pull_request.draft == false
-    needs: [cache_lfs, cache_dependencies, default_versions]
+    needs: [cache_lfs, cache_dependencies, default_versions, detect_checkboxes]
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Full CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
       fail-fast: false
@@ -467,8 +500,8 @@ jobs:
 # Python packaging: Build and test the Python wheel
 #----------------------------------------------------------------------------
   python-packaging:
-    if: github.event.pull_request.draft == false
-    needs: [cache_lfs, cache_dependencies, default_versions]
+    needs: [cache_lfs, cache_dependencies, default_versions, detect_checkboxes]
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Full CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
       fail-fast: false
@@ -521,8 +554,8 @@ jobs:
 # Coverage: Build and test on linux with last VTK with coverage option
 #----------------------------------------------------------------------------
   coverage:
-    needs: [cache_lfs, cache_dependencies, default_versions]
-    if: github.event.pull_request.draft == false
+    needs: [cache_lfs, cache_dependencies, default_versions, detect_checkboxes]
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Full CI')) || (github.ref == 'refs/heads/master') }}
 
     runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
@@ -562,8 +595,8 @@ jobs:
 # "memory" returns false positives in VTK:
 # https://stackoverflow.com/questions/60097307/memory-sanitizer-reports-use-of-uninitialized-value-in-global-object-constructio
   sanitizer:
-    needs: [cache_lfs, cache_dependencies, default_versions]
-    if: github.event.pull_request.draft == false
+    needs: [cache_lfs, cache_dependencies, default_versions, detect_checkboxes]
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Full CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
       fail-fast: false
@@ -604,8 +637,8 @@ jobs:
 # static-analysis: Run static analysis on linux
 #----------------------------------------------------------------------------
   static-analysis:
-    needs: [cache_lfs, cache_dependencies, default_versions]
-    if: github.event.pull_request.draft == false
+    needs: [cache_lfs, cache_dependencies, default_versions, detect_checkboxes]
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Full CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
       fail-fast: false
@@ -643,8 +676,8 @@ jobs:
 # external-build: Check build of F3D as sub-project
 #----------------------------------------------------------------------------
   external-build:
-    needs: [cache_dependencies, default_versions]
-    if: github.event.pull_request.draft == false
+    needs: [cache_dependencies, default_versions, detect_checkboxes]
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Full CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
       fail-fast: false
@@ -670,8 +703,8 @@ jobs:
 # android: Check build of F3D for android
 #----------------------------------------------------------------------------
   android:
-    if: github.event.pull_request.draft == false
-    needs: default_versions
+    needs: [default_versions, detect_checkboxes]
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Full CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
       fail-fast: false
@@ -699,8 +732,8 @@ jobs:
 # webassembly: Build webassembly artifacts
 #----------------------------------------------------------------------------
   webassembly:
-    if: github.event.pull_request.draft == false
-    needs: default_versions
+    needs: [default_versions, detect_checkboxes]
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Full CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
       fail-fast: false
