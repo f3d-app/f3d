@@ -74,7 +74,7 @@ They will then review the incident and determine, to the best of their ability:
 - what happened
 - whether this event constitutes a code of conduct violation
 - who, if anyone, has acted against the code of conduct
-- whether this is an ongoing situation, and there is a threat to anyone's physical safety
+- whether this is an ongoing situation, and there is a threat to anyone's physical or moral safety
 
 This information will be collected in writing, and whenever possible the committee's deliberations will be recorded and retained
 (i.e. chat transcripts, email discussions, recorded voice conversations, etc).
