@@ -30,7 +30,6 @@ jobs:
         run: |
           echo "checked=${{ steps.detect.outputs.checked }}"
           echo "unchecked=${{ steps.detect.outputs.unchecked }}"
-          echo "${{ github.ref }}"
 
 #----------------------------------------------------------------------------
 # Style checks
@@ -39,7 +38,7 @@ jobs:
     name: Formatting Check
     runs-on: ubuntu-latest
     needs: detect_checkboxes
-    if: ${{ contains(needs.detect_checkboxes.outputs.checked, 'Style checks') }} || ${{ github.ref == 'refs/heads/master' }}
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Full CI')) }}
     env:
       ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

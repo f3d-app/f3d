@@ -49,7 +49,7 @@ jobs:
     container: ghcr.io/f3d-app/f3d-ci
     name: Set default versions
     needs: detect_checkboxes
-    if: ${{ contains(needs.detect_checkboxes.outputs.checked, 'Full CI') }} || ${{ github.ref == 'refs/heads/master' }}
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Full CI')) || (github.ref == 'refs/heads/master') }}
     outputs:
       alembic_version: ${{ steps.set_default_versions.outputs.alembic_version }}
       alembic_min_version: ${{ steps.set_default_versions.outputs.alembic_min_version }}
@@ -96,7 +96,7 @@ jobs:
     runs-on: ubuntu-22.04
     name: Update LFS data cache
     needs: detect_checkboxes
-    if: ${{ contains(needs.detect_checkboxes.outputs.checked, 'Full CI') }} || ${{ github.ref == 'refs/heads/master' }}
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Full CI')) || (github.ref == 'refs/heads/master') }}
     outputs:
       lfs_sha: ${{ steps.lfs_sha_recover.outputs.lfs_sha }}
     steps:
