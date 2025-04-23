@@ -63,7 +63,7 @@ It also means that adding a new feature or behavior means adding an associated t
 Make sure to check the results for yourself and ask for help if needed.
 
 To run the CI, just check the CI related checkboxes in your pull request and push anything to your branch.
-After this, the CI will always be run everytime you push to your branch.
+After this, the CI will always be run every time you push to your branch.
 
 F3D continuous integration will also check the coverage as it is a good way to evaluate if new features are being tested or not.
 When adding code to F3D, always try to cover it by adding/modifying [tests](doc/dev/TESTING.md).
