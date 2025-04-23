@@ -14,7 +14,7 @@ Also, do not hesitate to join our [Discord](https://discord.f3d.app)!
 
 ## How to contribute to the documentation
 
-Another way to get contribute is to improve the documentation, look for typos, or improve the examples and the gallery.
+Another way to get contribute is to improve the documentation, look for typos, improve phrasing, the examples and the gallery.
 This does not require to build F3D or to learn C++ and is a very important work!
 
 You can follow the workflow described below.
