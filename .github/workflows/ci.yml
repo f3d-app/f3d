@@ -38,6 +38,8 @@ jobs:
         run: |
           echo "checked=${{ steps.detect.outputs.checked }}"
           echo "unchecked=${{ steps.detect.outputs.unchecked }}"
+          echo "${{ github.ref }}"
+
 
 #----------------------------------------------------------------------------
 # Default versions: Set default version for all dependencies
