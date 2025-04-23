@@ -211,9 +211,19 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
   // explicitly calculate size of minimal console to avoid extra flashing frame
   if (minimal)
   {
-    ImGui::SetNextWindowPos(ImVec2(marginTopRight, marginTopRight));
-    ImGui::SetNextWindowSize(ImVec2(
-      viewport->WorkSize.x - 2.f * marginConsole, ImGui::CalcTextSize(">").y + 2.f * padding));
+    if (this->Pimpl->NewError || this->Pimpl->NewWarning)
+    {
+      // prevent overlap with console badge in minimal console
+      ImGui::SetNextWindowPos(ImVec2(marginTopRight, marginTopRight));
+      ImGui::SetNextWindowSize(ImVec2(
+        viewport->WorkSize.x - 2.f * marginConsole, ImGui::CalcTextSize(">").y + 2.f * padding));
+    }
+    else
+    {
+      ImGui::SetNextWindowPos(ImVec2(marginTopRight, marginTopRight));
+      ImGui::SetNextWindowSize(ImVec2(
+        viewport->WorkSize.x - 2.f * marginTopRight, ImGui::CalcTextSize(">").y + 2.f * padding));
+    }
   }
   else
   {
