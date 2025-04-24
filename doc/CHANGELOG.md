@@ -20,7 +20,7 @@ For F3D users:
 - Added a `remove_file_groups` command
 - Added `increase_opacity` and `decrease_opacity` commands
 - Added `alias` command to create aliases of other commands
-- Added support for seting and reseting libf3d options from CLI using `--define` and `--reset`
+- Added support for setting and resetting libf3d options from CLI using `--define` and `--reset`
 - Added many reader specific options that can be controlled using `--define`
 - Added PWA support to F3DWeb
 - Added support for url-params in F3DWeb
