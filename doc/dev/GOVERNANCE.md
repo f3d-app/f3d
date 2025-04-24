@@ -1,6 +1,6 @@
 # Governance Policy
 
-This document provides the governance policy for F3D (the "Project"). [Every person](./MAINTAINERS.md) responsible for its maintenance (the "Maintainers") agrees to this policy and to abide by all Project policies, including the [code of conduct](../../CODE-OF-CONDUCT.md) by adding their name to the [MAINTAINERS.md file](./MAINTAINERS.md).
+This document provides the governance policy for F3D (the "Project"). [Every person](./MAINTAINERS_AND_CONTRIBUTORS.md) responsible for its maintenance (the "Maintainers") agrees to this policy and to abide by all Project policies, including the [code of conduct](../../CODE-OF-CONDUCT.md) by adding their name to the [MAINTAINERS_AND_CONTRIBUTORS.md file](./MAINTAINERS.md).
 
 ## 1. Roles
 
@@ -8,11 +8,44 @@ This Project includes the following roles.
 
 ### 1.1. Maintainers
 
-Maintainers are responsible for organizing activities around developing, maintaining, and updating the Project. Maintainers are also responsible for determining consensus. The Project may add or remove Maintainers by affirmative vote of 2/3 of all Maintainers.
+Maintainers are responsible for organizing activities around developing, maintaining, and updating the Project. Maintainers are responsible of upholding the [Code of Conduct](../../CODE_OF_CONDUCT.md). Maintainers are also responsible for determining consensus for technical or community matters. The Project may add or remove Maintainers by affirmative vote of 2/3 of all Maintainers. Maintainers are de-facto moderators. Maintainers are part of the f3d-app github organization with a "owner" role and listed in the [MAINTAINERS_AND_CONTRIBUTORS.md file](./MAINTAINERS_AND_CONTRIBUTORS.md).
 
-### 1.2. Contributors
+Maintainers is an important role and as such, will be evaluated by the community yearly and exit interview may be conducted in case of a Maintainer leaving the role.
 
-Contributors are those who have made contributions to the Project.
+Any Returning Contributor interested to become a Maintainer should just reach out to existing Maintainers for consideration.
+
+### 1.1. Moderators
+
+Moderators are responsible of upholding the [Code of Conduct](../../CODE_OF_CONDUCT.md). Moderators are responsible for determining consensus for community matters. The Project may add or remove Maintainers by affirmative vote of 2/3 of all Maintainers.
+
+Anyone interested to become a moderators should just reach out to existing Maintainers for consideration.
+
+### 1.2. Returning Contributors
+
+Contributors are those who have made multiple contributions to the Project and want to be acknowledged as such. Returning Contributors are also very much welcome to share their ideas and feedbacks about the development and maintenance of F3D. Returning contributors may be asked by others about their contributions, provide reviews on code they are familiar with, provide technical insight during discussions and take part in any related activities they wish to.
+
+To become a Returning Contributor, one need to have merged at least two pull requests into the F3D repositories. Returning Contributors are part of the f3d-app github organization with a "member" role and are listed in the [MAINTAINERS_AND_CONTRIBUTORS.md file](./MAINTAINERS_AND_CONTRIBUTORS.md).
+
+Usually Maintainers will reach out to potential Returning Contributors but in case it was missed, one should reach out to Maintainers for consideration.
+
+Maintainers may decide to list a returning contributor as inactive after a year without contributions, in that case they will be removed from the f3d-app github organization until active again.
+
+### 1.3. Contributors
+
+Contributors are those who have made or want to make contributions to the Project.
+
+### 1.4. Mentees
+
+Mentees are contributors that are enrolled in the mentoring program of F3D. It is open to anyone willing to learn more about open source contribution to F3D
+and be helped by Maintainers and Contributors on [discord](https://discord.f3d.app).
+
+### 1.5. Sponsor
+
+Sponsor are users that are currently sponsoring the project. They are acknowledged as such in each release and on [discord](https://discord.f3d.app). Sponsoring can be done either one-time or monthly. One-time sponsor will only be considered sponsor until the next release. See the detail on our [sponsor page](https://github.com/sponsors/f3d-app).
+
+### 1.6 Industrial sponsor
+
+Industrial sponsor are company that are currently sponsoring the project. They are acknowledged as such in each release and in the [README.md](../../README.md) of the project with an appropriate logo. Potential industrial sponsor should reach out to maintainers.
 
 ## 2. Decisions
 

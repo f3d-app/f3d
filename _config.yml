@@ -301,9 +301,9 @@ defaults:
 
   -
     scope:
-      path: "doc/dev/MAINTAINERS.md"
+      path: "doc/dev/MAINTAINERS_AND_CONTRIBUTORS.md"
     values:
-      title: Maintainers
+      title: Maintainers and Contributors
       parent: Developer Documentation
       nav_order: 9
 

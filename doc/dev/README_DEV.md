@@ -9,5 +9,5 @@
 - [Coding Style.](CODING_STYLE.md)
 - [Roadmaps and release cycle.](ROADMAPS_AND_RELEASES.md)
 - [Governance.](GOVERNANCE.md)
-- [Maintainers.](MAINTAINERS.md)
+- [Maintainers and Contributors.](MAINTAINERS_AND_CONTRIBUTORS.md)
 - [Code of conduct.](../../CODE_OF_CONDUCT.md)
