@@ -56,8 +56,7 @@ For F3D packagers:
 - Fixed compatibility with FreeBSD
 - Fixed reproducible build for man generation
 
-For F3D plugin developpers:
-
+For F3D plugin developers:
 - Added support for reader specific options
 
 ## v3.0.0
