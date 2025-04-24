@@ -12,7 +12,7 @@ For F3D users:
 - Added support for parsing direction options with syntax: `+X`, `-z+y` and more
 - Added support for parsing path options with syntax: `~/path/to/../to/relative/file.ext`
 - Added support for parsing colormap options with syntax: `val, color, val, color,....`
-- Added bind to increase opacity  (`Ctrl+P`) and decrease opacity (`Shift+P`)
+- Added bind to increase opacity (`Ctrl+P`) and decrease opacity (`Shift+P`)
 - Added report of config file locations being checked
 - Added support for imperative (force) option in configuration files
 - Added XDG support for cache location
