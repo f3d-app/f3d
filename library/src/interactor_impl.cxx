@@ -259,10 +259,17 @@ public:
       const char* commandWithArgs = static_cast<const char*>(data);
       self->Interactor.SetCommandBuffer(commandWithArgs);
     }
-    else if (event == vtkF3DConsoleOutputWindow::ShowEvent ||
-      event == vtkF3DConsoleOutputWindow::HideEvent)
+    else if (event == vtkF3DConsoleOutputWindow::ShowEvent)
     {
-      self->Options.ui.console = (event == vtkF3DConsoleOutputWindow::ShowEvent);
+      // Invoked when console badge is clicked
+      self->Options.ui.console = true;
+    }
+    else if (event == vtkF3DConsoleOutputWindow::HideEvent)
+    {
+      // Invoked when esc key is pressed while in minimal console or console display, or when
+      // something is submitted to minimal console
+      self->Options.ui.console = false;
+      self->Options.ui.minimal_console = false;
     }
 
     self->RenderRequested = true;
@@ -1153,6 +1160,7 @@ interactor& interactor_impl::initBindings()
 #if F3D_MODULE_UI
   this->addBinding({mod_t::NONE, "H"}, "toggle ui.cheatsheet", "Others", std::bind(docStr, "Toggle cheatsheet display"));
   this->addBinding({mod_t::NONE, "Escape"}, "toggle ui.console", "Others", std::bind(docStr, "Toggle console display"));
+  this->addBinding({mod_t::ANY, "Colon"}, "toggle ui.minimal_console", "Others", std::bind(docStr, "Toggle minimal console display"));
 #endif
   this->addBinding({mod_t::CTRL, "Q"}, "stop_interactor", "Others", std::bind(docStr, "Stop the interactor"));
   this->addBinding({mod_t::NONE, "Return"}, "reset_camera", "Others", std::bind(docStr, "Reset camera to initial parameters"));

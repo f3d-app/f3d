@@ -508,10 +508,10 @@ void vtkF3DImguiActor::RenderFpsCounter()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DImguiActor::RenderConsole()
+void vtkF3DImguiActor::RenderConsole(bool minimal)
 {
   vtkF3DImguiConsole* console = vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
-  console->ShowConsole();
+  console->ShowConsole(minimal);
 }
 
 //----------------------------------------------------------------------------
