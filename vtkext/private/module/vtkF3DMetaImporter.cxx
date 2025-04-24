@@ -511,7 +511,6 @@ bool vtkF3DMetaImporter::UpdateAtTimeValue(double timeValue)
     {
       pss.Actor->vtkProp3D::ShallowCopy(pss.OriginalActor);
     }
-
   }
   this->Pimpl->UpdateTime.Modified();
   return ret;
