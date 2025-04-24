@@ -57,6 +57,7 @@ For F3D packagers:
 - Fixed reproducible build for man generation
 
 For F3D plugin developers:
+
 - Added support for reader specific options
 
 ## v3.0.0
