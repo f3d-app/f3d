@@ -178,6 +178,10 @@
       "type": "bool",
       "default_value": "false"
     },
+    "minimal_console": {
+      "type": "bool",
+      "default_value": "false"
+    },
     "dropzone": {
       "type": "bool",
       "default_value": "false"

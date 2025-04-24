@@ -1,6 +1,64 @@
 # Changelog
 
-## Ongoing development
+## v3.1.0
+
+For F3D users:
+
+- Added support for reading Quake MDL files
+- Added support supersampling anti aliasing and enable it for thumbnails
+- Added support for displaying metadata with assimp formats (FBX and more)
+- Added support for `--up` vector to be any direction
+- Added support for parsing color options with syntax: `#ff00ff`, `hsv(240 , 100% , 100%)` and more
+- Added support for parsing direction options with syntax: `+X`, `-z+y` and more
+- Added support for parsing path options with syntax: `~/path/to/../to/relative/file.ext`
+- Added support for parsing colormap options with syntax: `val, color, val, color,....`
+- Added bind to increase opacity (`Ctrl+P`) and decrease opacity (`Shift+P`)
+- Added report of config file locations being checked
+- Added support for imperative (force) option in configuration files
+- Added XDG support for cache location
+- Added support for history and command action in console
+- Added a `remove_file_groups` command
+- Added `increase_opacity` and `decrease_opacity` commands
+- Added `alias` command to create aliases of other commands
+- Added support for setting and resetting libf3d options from CLI using `--define` and `--reset`
+- Added many reader specific options that can be controlled using `--define`
+- Added PWA support to F3DWeb
+- Added support for url-params in F3DWeb
+- Improved documentation
+- Changed report of Unset value to `Unset` instead of `N/A` in cheatsheet
+- Changed dropzone to be implemented using ImGui
+- Fixed an issue where scalar bar and axis displayed on top of console
+- Fixed zsh completion
+- Fixed multiple OBJ related loading issues
+- Fixed multiple assimp related loading issues
+- Fixed crashes when opening PLY files
+- Fixed a crash when opening multiple USD files
+- Fixed cheatsheet location
+- Fixed final-shader to only be applied on VTK rendering
+- Fixed an issue when using camera shortcut and then interacting
+- Fixed config file location on macOS
+- Fixed multiple issues where exceptions would result in errors
+- Removed skip frame logic with animations after fixes in VTK
+
+For libf3d users:
+
+- Added parsing/formatting for `color_t`
+- Added parsing/formatting for `direction_t`
+- Added parsing/formatting for `std::filesystem::path`
+- Added parsing/formatting for `colormap_t`
+- Changed color options to use actual type `color_t`
+- Changed direction options to use actual type `direction_t`
+- Changed path options to use actual type `std::filesystem::path`. Note that path should now be collapsed.
+- Changed colormap_t options to use actual type `colormap_t`
+
+For F3D packagers:
+
+- Fixed compatibility with FreeBSD
+- Fixed reproducible build for man generation
+
+For F3D plugin developers:
+
+- Added support for reader specific options
 
 ## v3.0.0
 

@@ -14,7 +14,7 @@ When creating this issue
 Before release:
 
 - [ ] Force fetch origin remote tag with `git fetch origin --tags --force`
-- [ ] Write and format release notes from the ongoing changelog, including contributors and packagers
+- [ ] Write and format release notes from the pull requests since last release, including contributors and packagers
 
 Release Split :
 
@@ -49,7 +49,7 @@ Release :
 - [ ] Trigger a release build using https://github.com/f3d-app/f3d-superbuild actions with `vX.Y.Z` F3D version, `vX.Y.Z` sb version and prerelease publish true
 - [ ] Finalize release note and add them to the release
 - [ ] Release
-- [ ] Update download links and update changelog in https://github.com/f3d-app/f3d `doc`
+- [ ] Update **download links** and **changelog** in https://github.com/f3d-app/f3d `doc`
 - [ ] Communicate on discord
 - [ ] Communicate on reddit
 - [ ] Communicate on hackernews

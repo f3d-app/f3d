@@ -84,7 +84,7 @@ private:
   /**
    * Render the console widget
    */
-  void RenderConsole() override;
+  void RenderConsole(bool) override;
 
   /**
    * Render the console badge

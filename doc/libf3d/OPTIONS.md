@@ -103,6 +103,7 @@ See the [APIs](#APIs) details below for more info.
 |     ui.scalar_bar     |  bool<br>false<br>render   | Show _scalar bar_ of the coloring by data array.                                                                 |        \-\-bar         |
 |     ui.cheatsheet     |  bool<br>false<br>render   | Show a interaction cheatsheet                                                                                    |           -            |
 |      ui.console       |  bool<br>false<br>render   | Show the console                                                                                                 |           -            |
+|  ui.minimal_console   |  bool<br>false<br>render   | Show the minimal console. Useful to execute a quick command and exit.                                            |           -            |
 |      ui.filename      |  bool<br>false<br>render   | Display the _filename info content_ on top of the window.                                                        |      \-\-filename      |
 |   ui.filename_info    |   string<br>-<br>render    | Content of _filename info_ to display.                                                                           |           -            |
 |     ui.font_file      | path<br>optional<br>render | Use the provided FreeType compatible font file to display text.<br>Can be useful to display non-ASCII filenames. |     \-\-font-file      |

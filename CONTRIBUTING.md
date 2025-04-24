@@ -79,12 +79,6 @@ This is required in order to merge the pull request.
 
 The continuous integration is just code, as the rest of F3D is. If you want to fix or improve it, you are very welcome to!
 
-## Changelog
-
-Whenever you make significant changes, either bugfixes or features, please update the [changelog](doc/CHANGELOG.md) "Ongoing development" section.
-There are three subsections. "For F3D Users" are changes that impact actual F3D users and are related to F3D behaviors changing. "For developers" are changes
-that impact developers that build F3D. "For F3D packagers" are changes that impact anyone packaging F3D, eg: new CMake options.
-
 ## F3D Architecture
 
 F3D is divided into different components:
