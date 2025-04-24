@@ -2,12 +2,16 @@
 
 ## Issue ticket number and link if any
 
-## Checklist before requesting a review
-- [ ] I have performed a self-review of my code
+## Checklist for finalizing the PR
+
+- [ ] I have performed a [self-review](https://f3d.app/doc/dev/CODING_STYLE.html) of my code
+- [ ] I have added [tests](https://f3d.app/doc/dev/TESTING.html) for new features and bugfixes
+- [ ] I have added [documentation](https://f3d.app/doc/dev/TESTING.html) for new features
 - [ ] If it is a modifying the libf3d API, I have updated bindings
-- [ ] If it is a modifying the versions, I have updated timestamp
+- [ ] If it is a modifying the default versions, I have updated timestamp
 
 ## Continuous integration
+
 Please check the checkbox of the CI you want to run, then push again on your branch.
 
 - [ ] Style checks

@@ -49,7 +49,7 @@ jobs:
     container: ghcr.io/f3d-app/f3d-ci
     name: Set default versions
     needs: detect_checkboxes
-    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'CI')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Full CI')) || (github.ref == 'refs/heads/master') }}
     outputs:
       alembic_version: ${{ steps.set_default_versions.outputs.alembic_version }}
       alembic_min_version: ${{ steps.set_default_versions.outputs.alembic_min_version }}
@@ -119,7 +119,8 @@ jobs:
 #----------------------------------------------------------------------------
   cache_dependencies:
     name: Cache dependencies
-    needs: default_versions
+    needs: [default_versions, detect_checkboxes]
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Full CI')) || (github.ref == 'refs/heads/master') }}
     strategy:
       fail-fast: false
       matrix:
@@ -221,7 +222,7 @@ jobs:
 # Linux fast CI: Build and test a single fast CI
 #----------------------------------------------------------------------------
   linux_fast:
-    needs: [cache_lfs, cache_dependencies, default_versions, detect_checkboxes]
+    needs: [cache_lfs, detect_checkboxes]
     if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Fast CI')) || (github.ref == 'refs/heads/master') }}
 
     runs-on: ubuntu-22.04
