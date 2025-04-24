@@ -10,7 +10,7 @@
 - [ ] If it is a modifying the libf3d API, I have updated bindings
 - [ ] If it is a modifying the default versions, I have updated timestamp
 
-### Continuous integration
+ ### Continuous integration
 
 Please check the checkbox of the CI you want to run, then push again on your branch.
 
