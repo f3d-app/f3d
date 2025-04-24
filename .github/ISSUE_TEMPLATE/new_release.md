@@ -2,7 +2,7 @@
 name: New release
 about: An issue to create a new release
 title: ""
-labels: release
+type: Release
 assignees: ""
 ---
 
