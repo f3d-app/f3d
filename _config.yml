@@ -13,6 +13,7 @@ include:
   - LICENSE.md
   - _licenses.md
   - CONTRIBUTING.md
+  - CODE_OF_CONDUCT.md
 exclude:
   - CMakeLists.txt
   - codecov.yml
