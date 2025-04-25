@@ -11,6 +11,7 @@ jobs:
 # Detect checkboxes are checked
 #----------------------------------------------------------------------------
   detect_checkboxes:
+    name: Detect Checkboxes
     runs-on: ubuntu-latest
     outputs:
       checked: ${{ steps.detect.outputs.checked }}
