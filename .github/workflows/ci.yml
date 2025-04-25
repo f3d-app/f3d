@@ -49,6 +49,8 @@ jobs:
     runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
     name: Set default versions
+    needs: detect_checkboxes
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'CI')) || (github.ref == 'refs/heads/master') }}
     outputs:
       alembic_version: ${{ steps.set_default_versions.outputs.alembic_version }}
       alembic_min_version: ${{ steps.set_default_versions.outputs.alembic_min_version }}
@@ -179,7 +181,7 @@ jobs:
 #----------------------------------------------------------------------------
   windows:
     needs: [cache_lfs, cache_dependencies, default_versions, detect_checkboxes]
-    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Windows CI')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Windows cached CI')) || (github.ref == 'refs/heads/master') }}
     strategy:
       fail-fast: false
       matrix:
@@ -255,7 +257,7 @@ jobs:
 #----------------------------------------------------------------------------
   linux:
     needs: [cache_lfs, cache_dependencies, default_versions, detect_checkboxes]
-    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Linux CI')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Linux cached CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
       fail-fast: false
@@ -412,7 +414,7 @@ jobs:
 #----------------------------------------------------------------------------
   macos:
     needs: [cache_lfs, cache_dependencies, default_versions, detect_checkboxes]
-    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'MacOS CI')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'MacOS cached CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
       fail-fast: false
@@ -451,7 +453,7 @@ jobs:
 #----------------------------------------------------------------------------
   macos_arm:
     needs: [cache_lfs, cache_dependencies, default_versions, detect_checkboxes]
-    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'MacOS ARM CI')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'MacOS ARM cached CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
       fail-fast: false
@@ -501,7 +503,7 @@ jobs:
 #----------------------------------------------------------------------------
   python-packaging:
     needs: [cache_lfs, cache_dependencies, default_versions, detect_checkboxes]
-    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Other CI')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Other cached CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
       fail-fast: false
@@ -555,7 +557,7 @@ jobs:
 #----------------------------------------------------------------------------
   coverage:
     needs: [cache_lfs, cache_dependencies, default_versions, detect_checkboxes]
-    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Coverage CI')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Coverage cached CI')) || (github.ref == 'refs/heads/master') }}
 
     runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
@@ -596,7 +598,7 @@ jobs:
 # https://stackoverflow.com/questions/60097307/memory-sanitizer-reports-use-of-uninitialized-value-in-global-object-constructio
   sanitizer:
     needs: [cache_lfs, cache_dependencies, default_versions, detect_checkboxes]
-    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Other CI')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Other cached CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
       fail-fast: false
@@ -638,7 +640,7 @@ jobs:
 #----------------------------------------------------------------------------
   static-analysis:
     needs: [cache_lfs, cache_dependencies, default_versions, detect_checkboxes]
-    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Analysis CI')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Analysis cached CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
       fail-fast: false
@@ -677,7 +679,7 @@ jobs:
 #----------------------------------------------------------------------------
   external-build:
     needs: [cache_dependencies, default_versions, detect_checkboxes]
-    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Other CI')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Other cached CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
       fail-fast: false
