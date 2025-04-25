@@ -9,9 +9,6 @@ on:
     branches:
       - master
 
-permissions:
-  pull-requests: write
-
 concurrency:
   group: '${{ github.workflow }}-${{ github.ref_name }}'
   cancel-in-progress: true
@@ -34,7 +31,7 @@ jobs:
     steps:
       - name: Checkbox Trigger
         id: detect
-        uses: a7med3bdulbaset/checklist@main
+        uses: a7med3bdulbaset/checklist@3
         with:
           token: ${{ github.token }}
 
