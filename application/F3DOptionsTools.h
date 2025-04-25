@@ -92,6 +92,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "opacity", "model.color.opacity" },
   { "roughness", "model.material.roughness" },
   { "metallic", "model.material.metallic" },
+  { "base-ior", "model.material.base_ior" },
   { "hdri-file", "render.hdri.file" },
   { "hdri-ambient", "render.hdri.ambient" },
   { "hdri-skybox", "render.background.skybox" },

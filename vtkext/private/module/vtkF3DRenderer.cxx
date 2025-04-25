@@ -1864,6 +1864,16 @@ void vtkF3DRenderer::SetRoughness(const std::optional<double>& roughness)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetBaseIOR(const std::optional<double>& baseIOR)
+{
+  if (this->BaseIOR != baseIOR)
+  {
+    this->BaseIOR = baseIOR;
+    this->ActorsPropertiesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetOpacity(const std::optional<double>& opacity)
 {
   if (this->Opacity != opacity)
@@ -2057,6 +2067,12 @@ void vtkF3DRenderer::ConfigureActorsProperties()
     {
       actor->GetProperty()->SetMetallic(this->Metallic.value());
       originalActor->GetProperty()->SetMetallic(this->Metallic.value());
+    }
+
+    if (this->BaseIOR.has_value())
+    {
+      actor->GetProperty()->SetBaseIOR(this->BaseIOR.value());
+      originalActor->GetProperty()->SetBaseIOR(this->BaseIOR.value());
     }
 
     // Textures

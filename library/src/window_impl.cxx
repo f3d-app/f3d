@@ -481,6 +481,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetTextureBaseColor(opt.model.color.texture);
   renderer->SetRoughness(opt.model.material.roughness);
   renderer->SetMetallic(opt.model.material.metallic);
+  renderer->SetBaseIOR(opt.model.material.base_ior);
   renderer->SetTextureMaterial(opt.model.material.texture);
   renderer->SetTextureEmissive(opt.model.emissive.texture);
   renderer->SetEmissiveFactor(opt.model.emissive.factor);
