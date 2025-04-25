@@ -2104,7 +2104,7 @@ void vtkF3DRenderer::ConfigureActorsProperties()
     }
   }
 
-  for ([[maybe_unused]] const auto& [actor, mapper, originalActor] :
+  for ([[maybe_unused]] const auto& [actor, mapper, originalActor, importer] :
     this->Importer->GetPointSpritesActorsAndMappers())
   {
     if (surfaceColor)
@@ -2146,7 +2146,7 @@ void vtkF3DRenderer::SetPointSpritesProperties(SplatType type, double pointSprit
     scaleFactor = pointSpritesSize * bbox.GetDiagonalLength() * 0.001;
   }
 
-  for (const auto& [actor, mapper, originalActor] :
+  for (const auto& [actor, mapper, originalActor, importer] :
     this->Importer->GetPointSpritesActorsAndMappers())
   {
 
@@ -2413,7 +2413,7 @@ void vtkF3DRenderer::ConfigureColoring()
 
   // Handle point sprites
   bool pointSpritesVisible = !this->UseRaytracing && !this->UseVolume && this->UsePointSprites;
-  for (const auto& [actor, mapper, originalActor] :
+  for (const auto& [actor, mapper, originalActor, importer] :
     this->Importer->GetPointSpritesActorsAndMappers())
   {
     actor->SetVisibility(pointSpritesVisible);

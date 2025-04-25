@@ -19,6 +19,7 @@
 #include <numeric>
 #include <vector>
 
+//----------------------------------------------------------------------------
 struct vtkF3DMetaImporter::Internals
 {
   // Actors related vectors
@@ -44,6 +45,25 @@ struct vtkF3DMetaImporter::Internals
 #endif
 };
 
+//----------------------------------------------------------------------------
+namespace
+{
+  vtkPolyData* GetPointSpritesPoints(vtkPolyData* surface, vtkF3DGenericImporter* genericImporter)
+  {
+    if (genericImporter)
+    {
+      // For generic importer, use the single imported points
+      // TODO when supporting composite, handle with an actor based index
+      return genericImporter->GetImportedPoints();
+    }
+    else
+    {
+      return surface;
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkF3DMetaImporter);
 
 //----------------------------------------------------------------------------
@@ -250,17 +270,11 @@ bool vtkF3DMetaImporter::Update()
 
       // Create and configure point sprites actors
       this->Pimpl->PointSpritesActorsAndMappers.emplace_back(
-        vtkF3DMetaImporter::PointSpritesStruct(actor));
+        vtkF3DMetaImporter::PointSpritesStruct(actor, importer));
       vtkF3DMetaImporter::PointSpritesStruct& pss =
         this->Pimpl->PointSpritesActorsAndMappers.back();
 
-      vtkPolyData* points = surface;
-      if (genericImporter)
-      {
-        // For generic importer, use the single imported points
-        // TODO when supporting composite, handle with an actor based index
-        points = genericImporter->GetImportedPoints();
-      }
+      vtkPolyData* points = ::GetPointSpritesPoints(surface, genericImporter);
       pss.Mapper->SetInputData(points);
       this->Renderer->AddActor(pss.Actor);
       pss.Actor->VisibilityOff();
@@ -501,17 +515,24 @@ bool vtkF3DMetaImporter::UpdateAtTimeValue(double timeValue)
 #else
     importerPair.Importer->UpdateTimeStep(timeValue);
 #endif
+  }
 
-    // Update coloring and point sprites actors
-    for (auto& cs : this->Pimpl->ColoringActorsAndMappers)
+  // Update coloring and point sprites
+  for (auto& cs : this->Pimpl->ColoringActorsAndMappers)
+  {
+    cs.Actor->vtkProp3D::ShallowCopy(cs.OriginalActor);
+    cs.Mapper->SetInputData(vtkPolyDataMapper::SafeDownCast(cs.OriginalActor->GetMapper())->GetInput());
+  }
+  for (auto& pss : this->Pimpl->PointSpritesActorsAndMappers)
+  {
+    pss.Actor->vtkProp3D::ShallowCopy(pss.OriginalActor);
+
+    if (!vtkF3DGenericImporter::SafeDownCast(pss.Importer))
     {
-      cs.Actor->vtkProp3D::ShallowCopy(cs.OriginalActor);
-    }
-    for (auto& pss : this->Pimpl->PointSpritesActorsAndMappers)
-    {
-      pss.Actor->vtkProp3D::ShallowCopy(pss.OriginalActor);
+      pss.Mapper->SetInputData(vtkPolyDataMapper::SafeDownCast(pss.OriginalActor->GetMapper())->GetInput());
     }
   }
+
   this->Pimpl->UpdateTime.Modified();
   return ret;
 }

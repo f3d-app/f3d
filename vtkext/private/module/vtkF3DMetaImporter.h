@@ -49,8 +49,9 @@ public:
 
   struct PointSpritesStruct
   {
-    explicit PointSpritesStruct(vtkActor* originalActor)
+    explicit PointSpritesStruct(vtkActor* originalActor, vtkImporter* importer)
       : OriginalActor(originalActor)
+      , Importer(importer)
     {
       this->Actor->vtkProp3D::ShallowCopy(originalActor);
       this->Actor->SetMapper(this->Mapper);
@@ -59,6 +60,7 @@ public:
     vtkNew<vtkActor> Actor;
     vtkNew<vtkPointGaussianMapper> Mapper;
     vtkActor* OriginalActor;
+    vtkImporter* Importer;
   };
 
   struct ColoringStruct
