@@ -1,0 +1,12 @@
+NAME
+  f3d::vtkextSPZ
+DESCRIPTION
+  A VTK module for the SPZ plugin
+DEPENDS
+  VTK::CommonCore
+  VTK::IOImport
+  VTK::IOImage
+  spz::spz
+  ZLIB::ZLIB
+TEST_DEPENDS
+  VTK::TestingCore

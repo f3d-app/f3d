@@ -1,0 +1,22 @@
+[
+  {
+    "match": ".*(spz)",
+    "options": {
+      "point-sprites": true,
+      "point-sprites-size": 1,
+      "point-sprites-type": "gaussian",
+      "scalar-coloring": true,
+      "coloring-array": "color",
+      "coloring-component": "-2",
+      "background-color": "0, 0, 0",
+      "up": "-Y",
+      "interaction-trackball": true,
+      "camera-position": "0,1,-5.2",
+      "camera-focal-point": "0,1,0",
+      "tone-mapping": false,
+      "grid": false,
+      "anti-aliasing": false,
+      "translucency-support": false
+    }
+  }
+]
