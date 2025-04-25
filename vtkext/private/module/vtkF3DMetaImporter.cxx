@@ -520,16 +520,20 @@ bool vtkF3DMetaImporter::UpdateAtTimeValue(double timeValue)
   // Update coloring and point sprites
   for (auto& cs : this->Pimpl->ColoringActorsAndMappers)
   {
-    cs.Actor->vtkProp3D::ShallowCopy(cs.OriginalActor);
     cs.Mapper->SetInputData(vtkPolyDataMapper::SafeDownCast(cs.OriginalActor->GetMapper())->GetInput());
+
+    bool visi = cs.Actor->GetVisibility();
+    cs.Actor->vtkProp3D::ShallowCopy(cs.OriginalActor);
+    cs.Actor->SetVisibility(visi);
   }
   for (auto& pss : this->Pimpl->PointSpritesActorsAndMappers)
   {
-    pss.Actor->vtkProp3D::ShallowCopy(pss.OriginalActor);
-
     if (!vtkF3DGenericImporter::SafeDownCast(pss.Importer))
     {
       pss.Mapper->SetInputData(vtkPolyDataMapper::SafeDownCast(pss.OriginalActor->GetMapper())->GetInput());
+      bool visi = pss.Actor->GetVisibility();
+      pss.Actor->vtkProp3D::ShallowCopy(pss.OriginalActor);
+      pss.Actor->SetVisibility(visi);
     }
   }
 
