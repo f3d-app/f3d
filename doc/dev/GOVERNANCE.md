@@ -1,6 +1,6 @@
 # Governance Policy
 
-This document provides the governance policy for F3D (the "Project"). [Every person](./MAINTAINERS_AND_CONTRIBUTORS.md) responsible for its maintenance (the "Maintainers") agrees to this policy and to abide by all Project policies, including the [code of conduct](../../CODE-OF-CONDUCT.md) by adding their name to the [MAINTAINERS_AND_CONTRIBUTORS.md file](./MAINTAINERS.md).
+This document provides the governance policy for F3D (the "Project"). [Every person](./MAINTAINERS_AND_CONTRIBUTORS.md) responsible for its maintenance (the "Maintainers") agrees to this policy and to abide by all Project policies, including the [code of conduct](../../CODE_OF_CONDUCT.md) by adding their name to the [MAINTAINERS_AND_CONTRIBUTORS.md](./MAINTAINERS.md) file.
 
 ## 1. Roles
 
@@ -8,7 +8,7 @@ This Project includes the following roles.
 
 ### 1.1. Maintainers
 
-Maintainers are responsible for organizing activities around developing, maintaining, and updating the Project. Maintainers are responsible of upholding the [Code of Conduct](../../CODE_OF_CONDUCT.md). Maintainers are also responsible for determining consensus for technical or community matters. The Project may add or remove Maintainers by affirmative vote of 2/3 of all Maintainers. Maintainers are de-facto moderators. Maintainers are part of the f3d-app github organization with a "owner" role and listed in the [MAINTAINERS_AND_CONTRIBUTORS.md file](./MAINTAINERS_AND_CONTRIBUTORS.md).
+Maintainers are responsible for organizing activities around developing, maintaining, and updating the Project. Maintainers are responsible of upholding the [Code of Conduct](../../CODE_OF_CONDUCT.md). Maintainers are also responsible for determining consensus for technical or community matters. The Project may add or remove Maintainers by affirmative vote of 2/3 of all Maintainers. Maintainers are de-facto moderators. Maintainers are part of the f3d-app github organization with a "owner" role and listed in the [dedicated](./MAINTAINERS_AND_CONTRIBUTORS.md) file.
 
 Maintainers is an important role and as such, will be evaluated by the community yearly and exit interview may be conducted in case of a Maintainer leaving the role.
 
@@ -24,7 +24,7 @@ Anyone interested to become a moderators should just reach out to existing Maint
 
 Contributors are those who have made multiple contributions to the Project and want to be acknowledged as such. Returning Contributors are also very much welcome to share their ideas and feedbacks about the development and maintenance of F3D. Returning contributors may be asked by others about their contributions, provide reviews on code they are familiar with, provide technical insight during discussions and take part in any related activities they wish to.
 
-To become a Returning Contributor, one need to have merged at least two pull requests into the F3D repositories. Returning Contributors are part of the f3d-app github organization with a "member" role and are listed in the [MAINTAINERS_AND_CONTRIBUTORS.md file](./MAINTAINERS_AND_CONTRIBUTORS.md).
+To become a Returning Contributor, one need to have merged at least two pull requests into the F3D repositories. Returning Contributors are part of the f3d-app github organization with a "member" role and are listed in the [dedicated](./MAINTAINERS_AND_CONTRIBUTORS.md) file.
 
 Usually Maintainers will reach out to potential Returning Contributors but in case it was missed, one should reach out to Maintainers for consideration.
 

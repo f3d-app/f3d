@@ -13,12 +13,13 @@ Maintainers may add themselves once approved by the existing Maintainers as desc
 
 ## Returning Contributors
 
-Returning Contributors should add themselves once requirements have been checked be existing Maintainers.
+Returning Contributors should add themselves once [requirements](./GOVERNANCE.md#12-returning-contributors) have been checked be existing Maintainers.
 Maintainers may decide to list a returning contributor as inactive after a year without contributions.
-Contributors with a single contribution or may not want to are not listed here but can be found in the git history.
+Contributors with a single contribution or that may not want to are not listed here but can be found in the git history.
 
 | **Name/Alias** | **Handle** | **Active** |
 | -------------- | ---------- | ---------- |
+| Alias          | Handle     | Yes        |
 
 ---
 
