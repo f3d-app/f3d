@@ -1993,128 +1993,126 @@ void vtkF3DRenderer::ConfigureActorsProperties()
     }
   }
 
-  for ([[maybe_unused]] const auto& [actor, mapper, originalActor] :
-    this->Importer->GetColoringActorsAndMappers())
+  for (const auto& coloring : this->Importer->GetColoringActorsAndMappers())
   {
     if (this->EdgeVisible.has_value())
     {
-      actor->GetProperty()->SetEdgeVisibility(this->EdgeVisible.value());
-      originalActor->GetProperty()->SetEdgeVisibility(this->EdgeVisible.value());
+      coloring.Actor->GetProperty()->SetEdgeVisibility(this->EdgeVisible.value());
+      coloring.OriginalActor->GetProperty()->SetEdgeVisibility(this->EdgeVisible.value());
     }
 
     if (this->LineWidth.has_value())
     {
-      actor->GetProperty()->SetLineWidth(this->LineWidth.value());
-      originalActor->GetProperty()->SetLineWidth(this->LineWidth.value());
+      coloring.Actor->GetProperty()->SetLineWidth(this->LineWidth.value());
+      coloring.OriginalActor->GetProperty()->SetLineWidth(this->LineWidth.value());
     }
 
     if (this->PointSize.has_value())
     {
-      actor->GetProperty()->SetPointSize(this->PointSize.value());
-      originalActor->GetProperty()->SetPointSize(this->PointSize.value());
+      coloring.Actor->GetProperty()->SetPointSize(this->PointSize.value());
+      coloring.OriginalActor->GetProperty()->SetPointSize(this->PointSize.value());
     }
 
     if (setBackfaceCulling)
     {
-      actor->GetProperty()->SetBackfaceCulling(backfaceCulling);
-      originalActor->GetProperty()->SetBackfaceCulling(backfaceCulling);
+      coloring.Actor->GetProperty()->SetBackfaceCulling(backfaceCulling);
+      coloring.OriginalActor->GetProperty()->SetBackfaceCulling(backfaceCulling);
     }
 
     if (surfaceColor)
     {
-      actor->GetProperty()->SetColor(surfaceColor);
-      originalActor->GetProperty()->SetColor(surfaceColor);
+      coloring.Actor->GetProperty()->SetColor(surfaceColor);
+      coloring.OriginalActor->GetProperty()->SetColor(surfaceColor);
     }
 
     if (this->Opacity.has_value())
     {
-      vtkInformation* info = originalActor->GetPropertyKeys();
+      vtkInformation* info = coloring.OriginalActor->GetPropertyKeys();
       if (!info || !info->Has(vtkF3DImporter::ACTOR_IS_ARMATURE()))
       {
-        actor->GetProperty()->SetOpacity(this->Opacity.value());
-        originalActor->GetProperty()->SetOpacity(this->Opacity.value());
+        coloring.Actor->GetProperty()->SetOpacity(this->Opacity.value());
+        coloring.OriginalActor->GetProperty()->SetOpacity(this->Opacity.value());
       }
     }
 
     if (this->Roughness.has_value())
     {
-      actor->GetProperty()->SetRoughness(this->Roughness.value());
-      originalActor->GetProperty()->SetRoughness(this->Roughness.value());
+      coloring.Actor->GetProperty()->SetRoughness(this->Roughness.value());
+      coloring.OriginalActor->GetProperty()->SetRoughness(this->Roughness.value());
     }
 
     if (this->Metallic.has_value())
     {
-      actor->GetProperty()->SetMetallic(this->Metallic.value());
-      originalActor->GetProperty()->SetMetallic(this->Metallic.value());
+      coloring.Actor->GetProperty()->SetMetallic(this->Metallic.value());
+      coloring.OriginalActor->GetProperty()->SetMetallic(this->Metallic.value());
     }
 
     // Textures
     if (this->TextureBaseColor.has_value())
     {
       auto colorTex = ::GetTexture(this->TextureBaseColor.value(), true);
-      actor->GetProperty()->SetBaseColorTexture(colorTex);
-      originalActor->GetProperty()->SetBaseColorTexture(colorTex);
+      coloring.Actor->GetProperty()->SetBaseColorTexture(colorTex);
+      coloring.OriginalActor->GetProperty()->SetBaseColorTexture(colorTex);
 
-      // If the input texture is RGBA, flag the actor as translucent
+      // If the input texture is RGBA, flag the coloring.Actor as translucent
       if (colorTex && colorTex->GetImageDataInput(0)->GetNumberOfScalarComponents() == 4)
       {
-        actor->ForceTranslucentOn();
-        originalActor->ForceTranslucentOn();
+        coloring.Actor->ForceTranslucentOn();
+        coloring.OriginalActor->ForceTranslucentOn();
       }
     }
 
     if (this->TextureMaterial.has_value())
     {
       auto matTex = ::GetTexture(this->TextureMaterial.value());
-      actor->GetProperty()->SetORMTexture(matTex);
-      originalActor->GetProperty()->SetORMTexture(matTex);
+      coloring.Actor->GetProperty()->SetORMTexture(matTex);
+      coloring.OriginalActor->GetProperty()->SetORMTexture(matTex);
     }
 
     if (this->TextureEmissive.has_value())
     {
       auto emissTex = ::GetTexture(this->TextureEmissive.value(), true);
-      actor->GetProperty()->SetEmissiveTexture(emissTex);
-      originalActor->GetProperty()->SetEmissiveTexture(emissTex);
+      coloring.Actor->GetProperty()->SetEmissiveTexture(emissTex);
+      coloring.OriginalActor->GetProperty()->SetEmissiveTexture(emissTex);
     }
 
     if (emissiveFactor)
     {
-      actor->GetProperty()->SetEmissiveFactor(emissiveFactor);
-      originalActor->GetProperty()->SetEmissiveFactor(emissiveFactor);
+      coloring.Actor->GetProperty()->SetEmissiveFactor(emissiveFactor);
+      coloring.OriginalActor->GetProperty()->SetEmissiveFactor(emissiveFactor);
     }
 
     if (this->TextureNormal.has_value())
     {
       auto normTex = ::GetTexture(this->TextureNormal.value());
-      actor->GetProperty()->SetNormalTexture(normTex);
-      originalActor->GetProperty()->SetNormalTexture(normTex);
+      coloring.Actor->GetProperty()->SetNormalTexture(normTex);
+      coloring.OriginalActor->GetProperty()->SetNormalTexture(normTex);
     }
 
     if (this->NormalScale.has_value())
     {
-      actor->GetProperty()->SetNormalScale(this->NormalScale.value());
-      originalActor->GetProperty()->SetNormalScale(this->NormalScale.value());
+      coloring.Actor->GetProperty()->SetNormalScale(this->NormalScale.value());
+      coloring.OriginalActor->GetProperty()->SetNormalScale(this->NormalScale.value());
     }
 
     if (this->TextureMatCap.has_value())
     {
       auto matCapTex = ::GetTexture(this->TextureMatCap.value());
-      actor->GetProperty()->SetTexture("matcap", matCapTex);
-      originalActor->GetProperty()->SetTexture("matcap", matCapTex);
+      coloring.Actor->GetProperty()->SetTexture("matcap", matCapTex);
+      coloring.OriginalActor->GetProperty()->SetTexture("matcap", matCapTex);
     }
   }
 
-  for ([[maybe_unused]] const auto& [actor, mapper, originalActor, importer] :
-    this->Importer->GetPointSpritesActorsAndMappers())
+  for (const auto& sprites : this->Importer->GetPointSpritesActorsAndMappers())
   {
     if (surfaceColor)
     {
-      actor->GetProperty()->SetColor(surfaceColor);
+      sprites.Actor->GetProperty()->SetColor(surfaceColor);
     }
 
     if (this->Opacity.has_value())
     {
-      actor->GetProperty()->SetOpacity(this->Opacity.value());
+      sprites.Actor->GetProperty()->SetOpacity(this->Opacity.value());
     }
   }
 
@@ -2146,54 +2144,53 @@ void vtkF3DRenderer::SetPointSpritesProperties(SplatType type, double pointSprit
     scaleFactor = pointSpritesSize * bbox.GetDiagonalLength() * 0.001;
   }
 
-  for (const auto& [actor, mapper, originalActor, importer] :
-    this->Importer->GetPointSpritesActorsAndMappers())
+  for (const auto& sprites : this->Importer->GetPointSpritesActorsAndMappers())
   {
-
-    mapper->EmissiveOff();
+    sprites.Mapper->EmissiveOff();
     if (type == SplatType::GAUSSIAN)
     {
-      mapper->SetScaleFactor(1.0);
-      mapper->SetSplatShaderCode(nullptr); // gaussian is the default VTK shader
-      mapper->SetScaleArray("scale");
+      sprites.Mapper->SetScaleFactor(1.0);
+      sprites.Mapper->SetSplatShaderCode(nullptr); // gaussian is the default VTK shader
+      sprites.Mapper->SetScaleArray("scale");
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
-      mapper->AnisotropicOn();
-      mapper->SetBoundScale(3.0);
-      mapper->SetRotationArray("rotation");
+      sprites.Mapper->AnisotropicOn();
+      sprites.Mapper->SetBoundScale(3.0);
+      sprites.Mapper->SetRotationArray("rotation");
 
       int* viewport = this->GetSize();
 
       float lowPass[3] = { 0.3f / (viewport[0] * viewport[0]), 0.f,
         0.3f / (viewport[1] * viewport[1]) };
-      mapper->SetLowpassMatrix(lowPass);
+      sprites.Mapper->SetLowpassMatrix(lowPass);
 #else
       F3DLog::Print(F3DLog::Severity::Warning,
         "Gaussian splatting selected but VTK <= 9.3 only supports isotropic gaussians");
 #endif
 
-      actor->ForceTranslucentOn();
+      sprites.Actor->ForceTranslucentOn();
     }
     else
     {
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
-      mapper->AnisotropicOff();
-      mapper->SetLowpassMatrix(0., 0., 0.);
+      sprites.Mapper->AnisotropicOff();
+      sprites.Mapper->SetLowpassMatrix(0., 0., 0.);
 #endif
 
-      mapper->SetScaleFactor(scaleFactor);
+      sprites.Mapper->SetScaleFactor(scaleFactor);
 
-      mapper->SetSplatShaderCode("//VTK::Color::Impl\n"
-                                 "float dist = dot(offsetVCVSOutput.xy, offsetVCVSOutput.xy);\n"
-                                 "if (dist > 1.0) {\n"
-                                 "  discard;\n"
-                                 "} else {\n"
-                                 "  float scale = (1.0 - dist);\n"
-                                 "  ambientColor *= scale;\n"
-                                 "  diffuseColor *= scale;\n"
-                                 "}\n");
+      sprites.Mapper->SetSplatShaderCode(
+        "//VTK::Color::Impl\n"
+        "float dist = dot(offsetVCVSOutput.xy, offsetVCVSOutput.xy);\n"
+        "if (dist > 1.0) {\n"
+        "  discard;\n"
+        "} else {\n"
+        "  float scale = (1.0 - dist);\n"
+        "  ambientColor *= scale;\n"
+        "  diffuseColor *= scale;\n"
+        "}\n");
 
-      actor->ForceTranslucentOff();
+      sprites.Actor->ForceTranslucentOff();
     }
   }
 }
@@ -2239,11 +2236,11 @@ void vtkF3DRenderer::SetUseInverseOpacityFunction(bool use)
   if (this->UseInverseOpacityFunction != use)
   {
     this->UseInverseOpacityFunction = use;
-    for ([[maybe_unused]] const auto& [prop, mapper] : this->Importer->GetVolumePropsAndMappers())
+    for (const auto& volume : this->Importer->GetVolumePropsAndMappers())
     {
-      if (prop)
+      if (volume.Prop)
       {
-        vtkPiecewiseFunction* pwf = prop->GetProperty()->GetScalarOpacity();
+        vtkPiecewiseFunction* pwf = volume.Prop->GetProperty()->GetScalarOpacity();
         if (pwf->GetSize() == 2)
         {
           double range[2];
@@ -2380,30 +2377,30 @@ void vtkF3DRenderer::ConfigureColoring()
 
   // Handle surface geometry
   bool geometriesVisible = this->UseRaytracing || (!this->UseVolume && !this->UsePointSprites);
-  for (const auto& [actor, mapper, originalActor] : this->Importer->GetColoringActorsAndMappers())
+  for (const auto& coloring : this->Importer->GetColoringActorsAndMappers())
   {
     if (geometriesVisible)
     {
       bool visible = false;
       if (hasColoring)
       {
-        // Rely on the previous state of scalar visibility to know if we should show the actor by
-        // default
-        visible = mapper->GetScalarVisibility();
+        // Rely on the previous state of scalar visibility to know if we should show the
+        // coloring.Actor by default
+        visible = coloring.Mapper->GetScalarVisibility();
         if (!this->ColoringMappersConfigured)
         {
-          visible = vtkF3DRenderer::ConfigureMapperForColoring(mapper, info.value().Name,
+          visible = vtkF3DRenderer::ConfigureMapperForColoring(coloring.Mapper, info.value().Name,
             this->ComponentForColoring, this->ColorTransferFunction, this->ColorRange,
             this->UseCellColoring);
         }
       }
-      actor->SetVisibility(visible);
-      originalActor->SetVisibility(!visible);
+      coloring.Actor->SetVisibility(visible);
+      coloring.OriginalActor->SetVisibility(!visible);
     }
     else
     {
-      actor->SetVisibility(false);
-      originalActor->SetVisibility(false);
+      coloring.Actor->SetVisibility(false);
+      coloring.OriginalActor->SetVisibility(false);
     }
   }
   if (geometriesVisible)
@@ -2413,22 +2410,21 @@ void vtkF3DRenderer::ConfigureColoring()
 
   // Handle point sprites
   bool pointSpritesVisible = !this->UseRaytracing && !this->UseVolume && this->UsePointSprites;
-  for (const auto& [actor, mapper, originalActor, importer] :
-    this->Importer->GetPointSpritesActorsAndMappers())
+  for (const auto& sprites : this->Importer->GetPointSpritesActorsAndMappers())
   {
-    actor->SetVisibility(pointSpritesVisible);
+    sprites.Actor->SetVisibility(pointSpritesVisible);
     if (pointSpritesVisible)
     {
       if (hasColoring)
       {
         if (!this->PointSpritesMappersConfigured)
         {
-          vtkF3DRenderer::ConfigureMapperForColoring(mapper, info.value().Name,
+          vtkF3DRenderer::ConfigureMapperForColoring(sprites.Mapper, info.value().Name,
             this->ComponentForColoring, this->ColorTransferFunction, this->ColorRange,
             this->UseCellColoring);
         }
       }
-      mapper->SetScalarVisibility(hasColoring);
+      sprites.Mapper->SetScalarVisibility(hasColoring);
     }
   }
   if (pointSpritesVisible)
@@ -2439,11 +2435,11 @@ void vtkF3DRenderer::ConfigureColoring()
   // Handle Volume prop
   bool volumeVisible = !this->UseRaytracing && this->UseVolume;
   const auto& volPropsAndMappers = this->Importer->GetVolumePropsAndMappers();
-  for (const auto& [prop, mapper] : volPropsAndMappers)
+  for (const auto& volume : volPropsAndMappers)
   {
     if (!volumeVisible)
     {
-      prop->VisibilityOff();
+      volume.Prop->VisibilityOff();
     }
     else
     {
@@ -2451,12 +2447,12 @@ void vtkF3DRenderer::ConfigureColoring()
       if (hasColoring)
       {
         // Initialize the visibility based on the mapper configuration
-        visible = !std::string(mapper->GetArrayName()).empty();
+        visible = !std::string(volume.Mapper->GetArrayName()).empty();
         if (!this->VolumePropsAndMappersConfigured)
         {
-          visible = vtkF3DRenderer::ConfigureVolumeForColoring(mapper, prop, info.value().Name,
-            this->ComponentForColoring, this->ColorTransferFunction, this->ColorRange,
-            this->UseCellColoring, this->UseInverseOpacityFunction);
+          visible = vtkF3DRenderer::ConfigureVolumeForColoring(volume.Mapper, volume.Prop,
+            info.value().Name, this->ComponentForColoring, this->ColorTransferFunction,
+            this->ColorRange, this->UseCellColoring, this->UseInverseOpacityFunction);
           if (!visible)
           {
             F3DLog::Print(F3DLog::Severity::Warning,
@@ -2464,7 +2460,7 @@ void vtkF3DRenderer::ConfigureColoring()
           }
         }
       }
-      prop->SetVisibility(visible);
+      volume.Prop->SetVisibility(visible);
     }
   }
   if (volumeVisible)
