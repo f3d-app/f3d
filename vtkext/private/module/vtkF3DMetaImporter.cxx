@@ -261,7 +261,7 @@ bool vtkF3DMetaImporter::Update()
       {
         // For generic importer, use the single imported points
         // TODO when supporting composite, handle with an actor based index
-        surface = genericImporter->GetImportedPoints();
+        points = genericImporter->GetImportedPoints();
       }
       pss.Mapper->SetInputData(points);
       this->Renderer->AddActor(pss.Actor);
