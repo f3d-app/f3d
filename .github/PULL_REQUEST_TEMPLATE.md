@@ -16,4 +16,12 @@ Please check the checkbox of the CI you want to run, then push again on your bra
 
 - [ ] Style checks
 - [ ] Fast CI
-- [ ] Full CI
+- [ ] Coverage cached CI
+- [ ] Analysis cached CI
+- [ ] WASM CI
+- [ ] Android CI
+- [ ] MacOS cached CI
+- [ ] MacOS ARM cached CI
+- [ ] Windows cached CI
+- [ ] Linux cached CI
+- [ ] Other cached CI
