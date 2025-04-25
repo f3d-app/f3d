@@ -46,24 +46,6 @@ struct vtkF3DMetaImporter::Internals
 };
 
 //----------------------------------------------------------------------------
-namespace
-{
-  vtkPolyData* GetPointSpritesPoints(vtkPolyData* surface, vtkF3DGenericImporter* genericImporter)
-  {
-    if (genericImporter)
-    {
-      // For generic importer, use the single imported points
-      // TODO when supporting composite, handle with an actor based index
-      return genericImporter->GetImportedPoints();
-    }
-    else
-    {
-      return surface;
-    }
-  }
-}
-
-//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkF3DMetaImporter);
 
 //----------------------------------------------------------------------------
@@ -274,7 +256,13 @@ bool vtkF3DMetaImporter::Update()
       vtkF3DMetaImporter::PointSpritesStruct& pss =
         this->Pimpl->PointSpritesActorsAndMappers.back();
 
-      vtkPolyData* points = ::GetPointSpritesPoints(surface, genericImporter);
+      vtkPolyData* points = surface;
+      if (genericImporter)
+      {
+        // For generic importer, use the single imported points
+        // TODO when supporting composite, handle with an actor based index
+        surface = genericImporter->GetImportedPoints();
+      }
       pss.Mapper->SetInputData(points);
       this->Renderer->AddActor(pss.Actor);
       pss.Actor->VisibilityOff();
@@ -520,7 +508,8 @@ bool vtkF3DMetaImporter::UpdateAtTimeValue(double timeValue)
   // Update coloring and point sprites
   for (auto& cs : this->Pimpl->ColoringActorsAndMappers)
   {
-    cs.Mapper->SetInputData(vtkPolyDataMapper::SafeDownCast(cs.OriginalActor->GetMapper())->GetInput());
+    cs.Mapper->SetInputData(
+      vtkPolyDataMapper::SafeDownCast(cs.OriginalActor->GetMapper())->GetInput());
 
     bool visi = cs.Actor->GetVisibility();
     cs.Actor->vtkProp3D::ShallowCopy(cs.OriginalActor);
@@ -530,7 +519,8 @@ bool vtkF3DMetaImporter::UpdateAtTimeValue(double timeValue)
   {
     if (!vtkF3DGenericImporter::SafeDownCast(pss.Importer))
     {
-      pss.Mapper->SetInputData(vtkPolyDataMapper::SafeDownCast(pss.OriginalActor->GetMapper())->GetInput());
+      pss.Mapper->SetInputData(
+        vtkPolyDataMapper::SafeDownCast(pss.OriginalActor->GetMapper())->GetInput());
       bool visi = pss.Actor->GetVisibility();
       pss.Actor->vtkProp3D::ShallowCopy(pss.OriginalActor);
       pss.Actor->SetVisibility(visi);
