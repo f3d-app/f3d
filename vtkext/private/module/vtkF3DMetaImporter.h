@@ -66,6 +66,7 @@ public:
       this->Actor->GetProperty()->SetPointSize(10.0);
       this->Actor->GetProperty()->SetLineWidth(1.0);
       this->Actor->GetProperty()->SetRoughness(0.3);
+      this->Actor->GetProperty()->SetBaseIOR(1.5);
       this->Actor->GetProperty()->SetInterpolationToPBR();
       this->Actor->SetMapper(this->Mapper);
       this->Mapper->InterpolateScalarsBeforeMappingOn();
