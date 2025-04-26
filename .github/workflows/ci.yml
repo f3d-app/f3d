@@ -32,7 +32,7 @@ jobs:
     steps:
       - name: Checkbox Trigger
         id: detect
-        uses: a7med3bdulbaset/checklist@3
+        uses: AhmedBaset/checklist@3
         with:
           token: ${{ github.token }}
 
@@ -414,7 +414,7 @@ jobs:
 #----------------------------------------------------------------------------
   macos:
     needs: [cache_lfs, cache_dependencies, default_versions, detect_checkboxes]
-    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'MacOS cached CI')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'macOS Intel cached CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
       fail-fast: false
@@ -453,7 +453,7 @@ jobs:
 #----------------------------------------------------------------------------
   macos_arm:
     needs: [cache_lfs, cache_dependencies, default_versions, detect_checkboxes]
-    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'MacOS ARM cached CI')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'macOS ARM cached CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
       fail-fast: false
