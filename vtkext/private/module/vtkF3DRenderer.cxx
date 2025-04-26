@@ -2070,8 +2070,8 @@ void vtkF3DRenderer::ConfigureActorsProperties()
 
     if (this->BaseIOR.has_value())
     {
-      actor->GetProperty()->SetBaseIOR(this->BaseIOR.value());
-      originalActor->GetProperty()->SetBaseIOR(this->BaseIOR.value());
+      coloring.Actor->GetProperty()->SetBaseIOR(this->BaseIOR.value());
+      coloring.OriginalActor->GetProperty()->SetBaseIOR(this->BaseIOR.value());
     }
 
     // Textures
