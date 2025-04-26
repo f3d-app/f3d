@@ -1,6 +1,6 @@
 # Governance Policy
 
-This document provides the governance policy for F3D (the "Project"). [Every person](./MAINTAINERS_AND_CONTRIBUTORS.md) responsible for its maintenance (the "Maintainers") agrees to this policy and to abide by all Project policies, including the [code of conduct](../../CODE_OF_CONDUCT.md) by adding their name to the [MAINTAINERS_AND_CONTRIBUTORS.md](./MAINTAINERS.md) file.
+This document provides the governance policy for F3D (the "Project"). [Every person](./MAINTAINERS_AND_CONTRIBUTORS.md) responsible for its maintenance (the "Maintainers") agrees to this policy and to abide by all Project policies, including the [code of conduct](../../CODE_OF_CONDUCT.md) by adding their name to the [MAINTAINERS_AND_CONTRIBUTORS.md](./MAINTAINERS_AND_CONTRIBUTORS.md) file.
 
 ## 1. Roles
 
