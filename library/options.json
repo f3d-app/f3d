@@ -250,6 +250,9 @@
       "roughness": {
         "type": "double"
       },
+      "base_ior": {
+        "type": "double"
+      },
       "texture": {
         "type": "path"
       }

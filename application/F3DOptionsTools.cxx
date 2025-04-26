@@ -113,6 +113,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       {"opacity", "", "Opacity", "<opacity>", ""},
       {"roughness", "", "Roughness coefficient (0.0-1.0)", "<roughness>", ""},
       {"metallic", "", "Metallic coefficient (0.0-1.0)", "<metallic>", ""},
+      {"base-ior", "", "Index Of Refraction of the base layer (1.0-2.5)", "<base-ior>", ""},
       {"hdri-file", "", "Path to an image file that can be used as a light source and skybox", "<file path>", ""},
       {"hdri-ambient", "f", "Enable HDRI ambient lighting", "<bool>", "1"},
       {"hdri-skybox", "j", "Enable HDRI skybox background", "<bool>", "1"},

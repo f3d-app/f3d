@@ -204,6 +204,11 @@ public:
   void SetRoughness(const std::optional<double>& roughness);
 
   /**
+   * Set the index of refraction of the base layer on all actors
+   */
+  void SetBaseIOR(const std::optional<double>& baseIOR);
+
+  /**
    * Set the surface color on all actors
    */
   void SetSurfaceColor(const std::optional<std::vector<double>>& color);
@@ -592,6 +597,7 @@ private:
   std::optional<double> Opacity;
   std::optional<double> Roughness;
   std::optional<double> Metallic;
+  std::optional<double> BaseIOR;
   std::optional<double> NormalScale;
   std::optional<std::vector<double>> SurfaceColor;
   std::optional<std::vector<double>> EmissiveFactor;
