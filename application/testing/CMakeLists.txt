@@ -776,6 +776,18 @@ if(F3D_PLUGIN_BUILD_EXODUS)
 
 endif()
 
+if (F3D_PLUGIN_BUILD_HDF)
+  f3d_test(NAME TestVTKHDF DATA blob.vtkhdf ARGS -s)
+
+  if(NOT F3D_MACOS_BUNDLE)
+    file(COPY "${F3D_SOURCE_DIR}/plugins/hdf/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
+    f3d_test(NAME TestDefaultConfigFileVTKHDF DATA blob.vtkhdf CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
+
+    file(COPY "${F3D_SOURCE_DIR}/plugins/hdf/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
+  f3d_test(NAME TestThumbnailConfigFileVTKHDF DATA blob.vtkhdf CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
+endif()
+endif()
+
 if(F3D_PLUGIN_BUILD_OCCT)
   f3d_test(NAME TestSTEP DATA f3d.stp ARGS --load-plugins=occt --up=+Z)
   f3d_test(NAME TestIGES DATA f3d.igs ARGS --load-plugins=occt --up=+Z)
