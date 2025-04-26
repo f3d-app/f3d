@@ -1,6 +1,6 @@
 [
   {
-    "match": ".*(vtkhdf)",
+    "match": ".*(ex2|vtkhdf)",
     "options": {
       "scalar-coloring": true,
       "load-plugins": "hdf",

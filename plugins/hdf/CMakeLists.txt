@@ -22,11 +22,20 @@ f3d_plugin_declare_reader(
   FORMAT_DESCRIPTION "VTKHDF"
 )
 
+f3d_plugin_declare_reader(
+  NAME ExodusII
+  EXTENSIONS exo ex2 e
+  MIMETYPES application/vnd.exodus
+  VTK_READER vtkExodusIIReader
+  FORMAT_DESCRIPTION "Exodus II"
+  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/exodus.inl"
+)
+
 f3d_plugin_build(
   NAME hdf
   VERSION 1.0
   DESCRIPTION "VTK HDF formats support"
-  VTK_MODULES IOHDF
+  VTK_MODULES IOHDF IOExodus
   MIMETYPE_XML_FILES "${CMAKE_CURRENT_SOURCE_DIR}/f3d-hdf-formats.xml"
   CONFIGURATION_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/configs/config.d" "${CMAKE_CURRENT_SOURCE_DIR}/configs/thumbnail.d"
   FREEDESKTOP
