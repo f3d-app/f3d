@@ -30,7 +30,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/vtk_install
-        key: vtk-${{ inputs.vtk_version }}-openvdb-${{inputs.openvdb_version}}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.cpu}}-8
+        key: vtk-${{ inputs.vtk_version }}-openvdb-${{inputs.openvdb_version}}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.cpu}}-9
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -91,6 +91,7 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_IOCityGML=YES
         -DVTK_MODULE_ENABLE_VTK_IOExodus=YES
         -DVTK_MODULE_ENABLE_VTK_IOGeometry=YES
+        -DVTK_MODULE_ENABLE_VTK_IOHDF=YES
         -DVTK_MODULE_ENABLE_VTK_IOImage=YES
         -DVTK_MODULE_ENABLE_VTK_IOImport=YES
         -DVTK_MODULE_ENABLE_VTK_IOOpenVDB=${{ inputs.openvdb_version != '' && 'YES' || 'DEFAULT' }}
