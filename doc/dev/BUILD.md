@@ -24,7 +24,7 @@ F3D is tested continuously against versions recommended by the [VFX reference pl
 
 ## VTK compatibility
 
-As stated in the dependencies, F3D is compatible with VTK >= 9.2.6, however, some features may not be available. We suggest using VTK 9.4.1 with RenderingRayTracing, IOExodus and IOOpenVDB modules enabled in order to get as many features as possible in F3D.
+As stated in the dependencies, F3D is compatible with VTK >= 9.2.6, however, some features may not be available. We suggest using VTK 9.4.1 with RenderingRayTracing, IOExodus, IOHDF and IOOpenVDB modules enabled in order to get as many features as possible in F3D.
 
 ## Configuration and building
 
@@ -47,6 +47,7 @@ Some modules, plugins and language bindings depending on external libraries can 
 - `F3D_MODULE_EXR`: Support for OpenEXR images. Requires `OpenEXR`. Disabled by default.
 - `F3D_MODULE_UI`: Support for ImGui widgets. Uses provided ImGui. Enabled by default.
 - `F3D_PLUGIN_BUILD_EXODUS`: Support for ExodusII (.ex2) file format. Requires that VTK has been built with `IOExodus` module (and `hdf5`). Enabled by default.
+- `F3D_PLUGIN_BUILD_HDF`: Support for VTKHDF (.vtkhdf) file format. Requires that VTK has been built with `IOHDF` module (and `hdf5`). Enabled by default.
 - `F3D_PLUGIN_BUILD_OCCT`: Support for STEP, IGES, BREP, and XBF file formats. Requires `OpenCASCADE`. Disabled by default.
 - `F3D_PLUGIN_BUILD_ASSIMP`: Support for FBX, DAE, OFF, DXF, X and 3MF file formats. Requires `Assimp`. Disabled by default.
 - `F3D_PLUGIN_BUILD_ALEMBIC`: Support for ABC file format. Requires `Alembic`. Disabled by default.

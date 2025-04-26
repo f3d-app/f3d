@@ -6,6 +6,7 @@ F3D supports the following file formats:
 | ----------------------------------------- | ---------------------------------------------- | ---------- | -------------------- | --------- |
 | Legacy VTK                                | `.vtk`                                         | No         | No                   | `native`  |
 | VTK XML                                   | `.vtp`, `.vtu`, `.vtr`, `.vti`, `.vts`, `.vtm` | No         | No                   | `native`  |
+| VTKHDF                                    | `.vtkhdf`                                      | No         | No                   | `hdf`     |
 | Polygon File Format                       | `.ply`                                         | No         | No                   | `native`  |
 | Standard Triangle Language                | `.stl`                                         | No         | No                   | `native`  |
 | DICOM                                     | `.dcm`                                         | No         | No                   | `native`  |

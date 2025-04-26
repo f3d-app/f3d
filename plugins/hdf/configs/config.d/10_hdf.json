@@ -1,0 +1,10 @@
+[
+  {
+    "match": ".*(vtkhdf)",
+    "options": {
+      "scalar-coloring": true,
+      "load-plugins": "hdf",
+      "coloring-scalar-bar": true
+    }
+  }
+]

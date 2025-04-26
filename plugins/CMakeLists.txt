@@ -2,6 +2,7 @@ option(F3D_PLUGIN_BUILD_ALEMBIC "Alembic plugin (ABC files)" OFF)
 option(F3D_PLUGIN_BUILD_ASSIMP "Assimp plugin (FBX, OFF, DAE, DXF, X and 3MF files)" OFF)
 option(F3D_PLUGIN_BUILD_DRACO "Draco plugin (DRC files)" OFF)
 option(F3D_PLUGIN_BUILD_EXODUS "ExodusII plugin (EX2 files)" ON)
+option(F3D_PLUGIN_BUILD_HDF "VTKHDF plugin (VTKHDF files)" ON)
 option(F3D_PLUGIN_BUILD_OCCT "OpenCASCADE plugin (STEP and IGES files)" OFF)
 option(F3D_PLUGIN_BUILD_USD "Universal Scene Description plugin (USD files)" OFF)
 option(F3D_PLUGIN_BUILD_VDB "VDB plugin, using OpenVDB (VDB files)" OFF)
@@ -22,6 +23,10 @@ endif()
 
 if (F3D_PLUGIN_BUILD_EXODUS)
   add_subdirectory(exodus)
+endif()
+
+if (F3D_PLUGIN_BUILD_HDF)
+  add_subdirectory(hdf)
 endif()
 
 if (F3D_PLUGIN_BUILD_OCCT)
