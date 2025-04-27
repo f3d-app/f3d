@@ -43,9 +43,9 @@ and be helped by Maintainers and Contributors on [discord](https://discord.f3d.a
 
 Sponsor are users that are currently sponsoring the project. They are acknowledged as such in each release and on [discord](https://discord.f3d.app). Sponsoring can be done either one-time or monthly. One-time sponsor will only be considered sponsor until the next release. See the detail on our [sponsor page](https://github.com/sponsors/f3d-app).
 
-### 1.6 Industrial sponsor
+### 1.6 Industry sponsor
 
-Industrial sponsor are company that are currently sponsoring the project. They are acknowledged as such in each release and in the [README.md](../../README.md) of the project with an appropriate logo. Potential industrial sponsor should reach out to maintainers.
+Industry sponsor are company that are currently sponsoring the project. They are acknowledged as such in each release and in the [README.md](../../README.md) of the project with an appropriate logo. Potential industry sponsor should reach out to maintainers.
 
 ## 2. Decisions
 
