@@ -19,7 +19,7 @@ Contributors with a single contribution or that may not want to are not listed h
 
 | **Name/Alias** | **Handle** | **Active** |
 | -------------- | ---------- | ---------- |
-| Alias          | Handle     | Yes        |
+| jrushlow       | 19jrushlow | Yes        |
 
 ---
 
