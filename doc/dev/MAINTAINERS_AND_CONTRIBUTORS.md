@@ -20,7 +20,7 @@ Contributors with a single contribution or that may not want to are not listed h
 | **Name/Alias** | **Handle** | **Active** |
 | -------------- | ---------- | ---------- |
 | jrushlow       | 19jrushlow | Yes        |
-| samoncrief     | samoncrief | Yes        |
+| ssmncrf        | samoncrief | Yes        |
 
 ---
 
