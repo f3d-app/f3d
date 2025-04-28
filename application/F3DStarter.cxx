@@ -1685,13 +1685,13 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
           {
             paths.emplace_back(tmpPath);
           }
-          return groupIndex;
+          return static_cast<int>(groupIndex);
         }
         ++groupIndex;
       }
       // Create new group if we haven't found one and returned already
       this->Internals->FilesGroups.emplace_back(groupKey, std::vector<fs::path>({ tmpPath }));
-      return this->Internals->FilesGroups.size() - 1;
+      return static_cast<int>(this->Internals->FilesGroups.size()) - 1;
     }
   }
   catch (const fs::filesystem_error& ex)
