@@ -1660,7 +1660,7 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
     else
     {
       // Compute a key to identify the group the file should go in
-      const auto pathToGroupKey = [&](const fs::path& path)
+      const auto pathToGroupKey = [&]()
       {
         // XXX more multi-file mode may be added in the future
         if (this->Internals->AppOptions.MultiFileMode == "all")
@@ -1669,12 +1669,12 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
         }
         if (this->Internals->AppOptions.MultiFileMode == "dir")
         {
-          return std::string(path.parent_path());
+          return std::string(tmpPath.parent_path());
         }
-        return std::string(path);
+        return std::string(tmpPath);
       };
 
-      const std::string groupKey = pathToGroupKey(tmpPath);
+      const std::string groupKey = pathToGroupKey();
       size_t groupIndex = 0;
       for (auto& [key, paths] : this->Internals->FilesGroups)
       {
