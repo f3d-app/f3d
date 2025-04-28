@@ -732,7 +732,7 @@ jobs:
         github_token: ${{ secrets.GITHUB_PERSONAL_ACCESS_TOKEN }}
         workflow_file_name: build_docker_image.yml 
         wait_interval: 10
-        client_payload: '{"versions_file_url": "https://raw.githubusercontent.com/${{GITHUB_REPOSITORY}}/${{GITHUB_REF}}/.github/workflows/versions.json"}'
+        client_payload: '{"versions_file_url": "https://raw.githubusercontent.com/$GITHUB_REPOSITORY/$GITHUB_REF/.github/workflows/versions.json"}'
         propagate_failure: true
         trigger_workflow: true
         wait_workflow: true
