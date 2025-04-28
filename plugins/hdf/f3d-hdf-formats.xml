@@ -6,4 +6,8 @@
     <glob pattern="*.exo"/>
     <glob pattern="*.e"/>
   </mime-type>
+  <mime-type type="application/vnd.vtkhdf">
+    <comment>VTKHDF file</comment>
+    <glob pattern="*.vtkhdf"/>
+  </mime-type>
 </mime-info>

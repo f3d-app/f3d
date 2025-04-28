@@ -31,7 +31,7 @@ multiple plugins in a single comma-separated list, like in the example below:
 ### Supported plugins
 
 F3D supports loading plugins and contains the following plugins:
-`native`, `alembic`, `assimp`, `draco`, `exodus`, `occt`, `usd`, `vdb`.
+`native`, `alembic`, `assimp`, `draco`, `hdf`, `occt`, `usd`, `vdb`.
 
 see [SUPPORTED_FORMATS.md] for more details.
 

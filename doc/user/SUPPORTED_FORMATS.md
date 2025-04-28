@@ -6,6 +6,8 @@ F3D supports the following file formats:
 | ----------------------------------------- | ---------------------------------------------- | ---------- | -------------------- | --------- |
 | Legacy VTK                                | `.vtk`                                         | No         | No                   | `native`  |
 | VTK XML                                   | `.vtp`, `.vtu`, `.vtr`, `.vti`, `.vts`, `.vtm` | No         | No                   | `native`  |
+| VTKHDF                                    | `.vtkhdf`                                      | No         | Yes                  | `hdf`     |
+| EXODUS II                                 | `.e`, `.ex2`, `.exo`, `.g`                     | No         | Yes                  | `hdf`     |
 | Polygon File Format                       | `.ply`                                         | No         | No                   | `native`  |
 | Standard Triangle Language                | `.stl`                                         | No         | No                   | `native`  |
 | DICOM                                     | `.dcm`                                         | No         | No                   | `native`  |
@@ -13,7 +15,6 @@ F3D supports the following file formats:
 | MetaHeader MetaIO                         | `.mhd`, `.mha`                                 | No         | No                   | `native`  |
 | Tag Image File Format 2D/3D               | `.tif`, `.tiff`                                | No         | No                   | `native`  |
 | QuakeMDL                                  | `.mdl`                                         | Yes        | Yes                  | `native`  |
-| EXODUS II                                 | `.e`, `.ex2`, `.exo`, `.g`                     | No         | Yes                  | `exodus`  |
 | CityGML                                   | `.gml`                                         | No         | No                   | `native`  |
 | Point Cloud                               | `.pts`                                         | No         | No                   | `native`  |
 | Standard for the Exchange of Product Data | `.step`, `.stp`                                | No         | No                   | `occt`    |

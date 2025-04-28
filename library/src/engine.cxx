@@ -270,6 +270,13 @@ void engine::loadPlugin(const std::string& pathOrName, const std::vector<fs::pat
     return;
   }
 
+  // For easier removal when removing deprecation: F3D_DEPRECATED
+  if (pathOrName == "exodus")
+  {
+    f3d::log::warn("The 'exodus' plugin is deprecated, load 'hdf' instead");
+    return f3d::engine::loadPlugin("hdf", searchPaths);
+  }
+
   std::string pluginOrigin = "static";
   factory* factory = factory::instance();
 

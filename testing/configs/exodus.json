@@ -2,7 +2,7 @@
   {
     "match": ".*(ex2)",
     "options": {
-      "load-plugins": "exodus"
+      "load-plugins": "hdf"
     }
   }
 ]

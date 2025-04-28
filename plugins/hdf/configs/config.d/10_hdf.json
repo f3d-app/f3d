@@ -1,9 +1,9 @@
 [
   {
-    "match": ".*(ex2)",
+    "match": ".*(ex2|vtkhdf)",
     "options": {
       "scalar-coloring": true,
-      "load-plugins": "exodus",
+      "load-plugins": "hdf",
       "coloring-scalar-bar": true
     }
   }

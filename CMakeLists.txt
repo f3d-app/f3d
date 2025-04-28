@@ -108,6 +108,7 @@ find_package(VTK 9.2.6 REQUIRED
   OPTIONAL_COMPONENTS
     opengl
     IOExodus
+    IOHDF
     IOOpenVDB
     RenderingRayTracing)
 message(STATUS "VTK ${VTK_VERSION} found")
@@ -320,7 +321,7 @@ f3d_report_variable(F3D_MODULE_UI)
 f3d_report_variable(F3D_PLUGIN_BUILD_ALEMBIC)
 f3d_report_variable(F3D_PLUGIN_BUILD_ASSIMP)
 f3d_report_variable(F3D_PLUGIN_BUILD_DRACO)
-f3d_report_variable(F3D_PLUGIN_BUILD_EXODUS)
+f3d_report_variable(F3D_PLUGIN_BUILD_HDF)
 f3d_report_variable(F3D_PLUGIN_BUILD_OCCT)
 f3d_report_variable(F3D_PLUGIN_BUILD_USD)
 f3d_report_variable(F3D_PLUGIN_BUILD_VDB)
