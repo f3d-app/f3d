@@ -1669,9 +1669,9 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
         }
         if (this->Internals->AppOptions.MultiFileMode == "dir")
         {
-          return std::string(tmpPath.parent_path());
+          return tmpPath.parent_path().string();
         }
-        return std::string(tmpPath);
+        return tmpPath.string();
       };
 
       const std::string groupKey = pathToGroupKey();
