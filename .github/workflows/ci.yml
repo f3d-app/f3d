@@ -702,10 +702,32 @@ jobs:
         vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
 
 #----------------------------------------------------------------------------
+# Check android/wasm docker images
+#----------------------------------------------------------------------------
+  check_docker_images:
+    needs: default_versions
+
+    runs-on: ubuntu-22.04
+
+    steps:
+
+    - uses: convictional/trigger-workflow-and-wait@v1.6.5
+      with:
+        owner: f3d-app
+        repo: f3d-docker-images
+        github_token: ${{ secrets.GITHUB_PERSONAL_ACCESS_TOKEN }}
+        workflow_file_name: build_docker_image.yml 
+        wait_interval: 10
+        client_payload: '{"versions_file_url": "https://raw.githubusercontent.com/$GITHUB_REPOSITORY/$GITHUB_REF/.github/workflows/versions.json"}'
+        propagate_failure: true
+        trigger_workflow: true
+        wait_workflow: true
+
+#----------------------------------------------------------------------------
 # android: Check build of F3D for android
 #----------------------------------------------------------------------------
   android:
-    needs: [default_versions, detect_checkboxes]
+    needs: [default_versions, detect_checkboxes, check_docker_images]
     if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Android CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
@@ -725,18 +747,6 @@ jobs:
         fetch-depth: 0
         lfs: false
 
-    - uses: convictional/trigger-workflow-and-wait@v1.6.5
-      with:
-        owner: f3d-app
-        repo: f3d-docker-images
-        github_token: ${{ secrets.GITHUB_PERSONAL_ACCESS_TOKEN }}
-        workflow_file_name: build_docker_image.yml 
-        wait_interval: 10
-        client_payload: '{"versions_file_url": "https://raw.githubusercontent.com/$GITHUB_REPOSITORY/$GITHUB_REF/.github/workflows/versions.json"}'
-        propagate_failure: true
-        trigger_workflow: true
-        wait_workflow: true
-
     - name: Android CI
       uses: ./source/.github/actions/android-ci
       with:
@@ -746,7 +756,7 @@ jobs:
 # webassembly: Build webassembly artifacts
 #----------------------------------------------------------------------------
   webassembly:
-    needs: [default_versions, detect_checkboxes]
+    needs: [default_versions, detect_checkboxes, check_docker_images]
     if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'WASM CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
