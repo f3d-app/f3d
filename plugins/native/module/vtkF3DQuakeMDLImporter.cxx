@@ -275,6 +275,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         float coords_st[2] = { coord_s, coord_t };
         textureCoordinates->InsertNextTuple(coords_st);
       }
+      // triangle winding order is inverted in Quake MDL
       vtkIdType triangle[3] = { i * 3, i * 3 + 2, i * 3 + 1 };
       cells->InsertNextCell(3, triangle);
     }
