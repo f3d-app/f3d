@@ -29,10 +29,6 @@ if (F3D_PLUGIN_BUILD_OCCT)
   add_subdirectory(occt)
 endif()
 
-if (F3D_PLUGIN_BUILD_SPZ)
-  add_subdirectory(spz)
-endif()
-
 if (F3D_PLUGIN_BUILD_USD)
   add_subdirectory(usd)
 endif()
