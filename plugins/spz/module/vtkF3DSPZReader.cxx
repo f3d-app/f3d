@@ -68,15 +68,15 @@ int vtkF3DSPZReader::RequestData(
     for (int c = 0; c < 3; c++)
     {
       constexpr float SH_C0 = 0.28209479177387814;
-      unsigned char col = static_cast<unsigned char>((gaussians.colors[3 * i + c] * SH_C0 + 0.5) * 255.0);
+      unsigned char col = static_cast<unsigned char>(std::clamp(gaussians.colors[3 * i + c] * SH_C0 + 0.5, 0.0, 1.0) * 255.0);
       colorArray->SetTypedComponent(i, c, col);
 
       scaleArray->SetTypedComponent(i, c, std::exp(gaussians.scales[3 * i + c]));
 
-      rotationArray->SetTypedComponent(i, c, gaussians.rotations[4 * i + 1 + c]);
+      rotationArray->SetTypedComponent(i, c + 1, gaussians.rotations[4 * i + c]);
     }
     colorArray->SetTypedComponent(i, 3, static_cast<unsigned char>(sigmoid(gaussians.alphas[i]) * 255.0));
-    rotationArray->SetTypedComponent(i, 3, gaussians.rotations[4 * i]);
+    rotationArray->SetTypedComponent(i, 0, gaussians.rotations[4 * i + 3]);
   }
 
   vtkNew<vtkPoints> points;
