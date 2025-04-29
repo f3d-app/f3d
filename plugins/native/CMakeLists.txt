@@ -194,7 +194,7 @@ f3d_plugin_declare_reader(
 )
 
 f3d_plugin_declare_reader(
-  NAME SP
+  NAME SPZ
   EXTENSIONS spz
   MIMETYPES application/vnd.spz
   VTK_READER vtkF3DSPZReader

@@ -12,61 +12,55 @@
 
 #include <algorithm>
 
-class vtkF3DSPZReader::vtkInternals
+namespace
 {
-public:
-  static bool UncompressGzip(
-    const std::vector<unsigned char>& compressed, std::vector<unsigned char>& uncompressed)
+bool UncompressGzip(
+  const std::vector<unsigned char>& compressed, std::vector<unsigned char>& uncompressed)
+{
+  std::vector<uint8_t> buffer(8192);
+  z_stream stream = {};
+  stream.next_in = const_cast<Bytef*>(compressed.data());
+  stream.avail_in = compressed.size();
+  if (inflateInit2(&stream, 16 | MAX_WBITS) != Z_OK)
   {
-    std::vector<uint8_t> buffer(8192);
-    z_stream stream = {};
-    stream.next_in = const_cast<Bytef*>(compressed.data());
-    stream.avail_in = compressed.size();
-    if (inflateInit2(&stream, 16 | MAX_WBITS) != Z_OK)
-    {
-      return false;
-    }
-    bool success = false;
-    while (true)
-    {
-      stream.next_out = buffer.data();
-      stream.avail_out = buffer.size();
-      int32_t res = inflate(&stream, Z_NO_FLUSH);
-      if (res != Z_OK && res != Z_STREAM_END)
-      {
-        break;
-      }
-      uncompressed.insert(
-        uncompressed.end(), buffer.data(), buffer.data() + buffer.size() - stream.avail_out);
-      if (res == Z_STREAM_END)
-      {
-        success = true;
-        break;
-      }
-    }
-    inflateEnd(&stream);
-    return success;
+    return false;
   }
-};
+  bool success = false;
+  while (true)
+  {
+    stream.next_out = buffer.data();
+    stream.avail_out = buffer.size();
+    int32_t res = inflate(&stream, Z_NO_FLUSH);
+    if (res != Z_OK && res != Z_STREAM_END)
+    {
+      break;
+    }
+    uncompressed.insert(
+      uncompressed.end(), buffer.data(), buffer.data() + buffer.size() - stream.avail_out);
+    if (res == Z_STREAM_END)
+    {
+      success = true;
+      break;
+    }
+  }
+  inflateEnd(&stream);
+  return success;
+}
+}
 
 vtkStandardNewMacro(vtkF3DSPZReader);
 
 //----------------------------------------------------------------------------
 vtkF3DSPZReader::vtkF3DSPZReader()
-  : Internals(new vtkF3DSPZReader::vtkInternals())
 {
   this->SetNumberOfInputPorts(0);
 }
-
-//----------------------------------------------------------------------------
-vtkF3DSPZReader::~vtkF3DSPZReader() = default;
 
 //----------------------------------------------------------------------------
 int vtkF3DSPZReader::RequestData(
   vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector)
 {
   vtkPolyData* output = vtkPolyData::GetData(outputVector);
-  vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
   std::ifstream file(this->FileName, std::ios::binary);
   if (!file)
@@ -95,7 +89,7 @@ int vtkF3DSPZReader::RequestData(
   std::vector<unsigned char> uncompressed;
   uncompressed.reserve(uncompressedLength);
 
-  if (!vtkInternals::UncompressGzip(compressed, uncompressed))
+  if (!::UncompressGzip(compressed, uncompressed))
   {
     vtkErrorMacro("Uncompress failed");
     return 0;
@@ -229,11 +223,4 @@ int vtkF3DSPZReader::RequestData(
   output->GetPointData()->AddArray(rotationArray);
 
   return 1;
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DSPZReader::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os, indent);
-  os << indent << "FileName: " << this->FileName << "\n";
 }
