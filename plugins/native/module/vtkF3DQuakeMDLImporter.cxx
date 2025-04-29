@@ -157,7 +157,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
 
     vtkNew<vtkFloatArray> normals;
     normals->SetNumberOfComponents(3);
-    normals->Allocate(header->numTriangles * 3 * 3);
+    normals->SetNumberOfTuples(header->numTriangles * 3);
 
     for (int i = 0; i < header->numTriangles; i++)
     {
@@ -179,8 +179,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
 
         // Normal vector
         int normalIndex = frame->verts[vertexNum[j]].normalIndex;
-        normals->SetTuple3(i * 3 + j, F3DMDLNormalVectors[normalIndex][0] / 255.0,
-          F3DMDLNormalVectors[normalIndex][1] / 255.0, F3DMDLNormalVectors[normalIndex][2] / 255.0);
+        normals->SetTypedTuple(i * 3 + j, F3DMDLNormalVectors[normalIndex]);
       }
     }
     vtkNew<vtkPolyData> mesh;
@@ -276,7 +275,8 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         float coords_st[2] = { coord_s, coord_t };
         textureCoordinates->InsertNextTuple(coords_st);
       }
-      vtkIdType triangle[3] = { i * 3, i * 3 + 1, i * 3 + 2 };
+      // triangle winding order is inverted in Quake MDL
+      vtkIdType triangle[3] = { i * 3, i * 3 + 2, i * 3 + 1 };
       cells->InsertNextCell(3, triangle);
     }
 
@@ -488,7 +488,7 @@ vtkIdType vtkF3DQuakeMDLImporter::GetNumberOfAnimations()
 //----------------------------------------------------------------------------
 std::string vtkF3DQuakeMDLImporter::GetAnimationName(vtkIdType animationIndex)
 {
-  assert(animationIndex < this->Internals->AnimationNames.size());
+  assert(animationIndex < static_cast<vtkIdType>(this->Internals->AnimationNames.size()));
   assert(animationIndex >= 0);
   return this->Internals->AnimationNames[animationIndex];
 }
@@ -496,7 +496,7 @@ std::string vtkF3DQuakeMDLImporter::GetAnimationName(vtkIdType animationIndex)
 //----------------------------------------------------------------------------
 void vtkF3DQuakeMDLImporter::EnableAnimation(vtkIdType animationIndex)
 {
-  assert(animationIndex < this->Internals->AnimationNames.size());
+  assert(animationIndex < static_cast<vtkIdType>(this->Internals->AnimationNames.size()));
   assert(animationIndex >= 0);
   this->Internals->ActiveAnimation = animationIndex;
 }
@@ -510,7 +510,7 @@ void vtkF3DQuakeMDLImporter::DisableAnimation(vtkIdType vtkNotUsed(animationInde
 //----------------------------------------------------------------------------
 bool vtkF3DQuakeMDLImporter::IsAnimationEnabled(vtkIdType animationIndex)
 {
-  assert(animationIndex < this->Internals->AnimationNames.size());
+  assert(animationIndex < static_cast<vtkIdType>(this->Internals->AnimationNames.size()));
   assert(animationIndex >= 0);
   return this->Internals->ActiveAnimation == animationIndex;
 }
@@ -520,11 +520,11 @@ bool vtkF3DQuakeMDLImporter::GetTemporalInformation(vtkIdType animationIndex,
   double vtkNotUsed(frameRate), int& vtkNotUsed(nbTimeSteps), double timeRange[2],
   vtkDoubleArray* vtkNotUsed(timeSteps))
 {
-  assert(animationIndex < this->Internals->AnimationNames.size());
+  assert(animationIndex < static_cast<vtkIdType>(this->Internals->AnimationNames.size()));
   assert(animationIndex >= 0);
 
   const std::vector<double>& times = this->Internals->AnimationTimes[animationIndex];
-  // F3D do not care about timesteps, only set time range
+  // F3D does not care about timesteps, only set time range
   timeRange[0] = times.front();
   timeRange[1] = times.back();
   return true;
