@@ -28,17 +28,10 @@ using option_variant_t = std::variant<bool, int, double, std::string, std::vecto
 class F3D_EXPORT options
 {
 public:
-  ///@{ @name Constructors
   /**
-   * Default/Copy/move constructors/operators.
+   * Ensure the libf3d is correctly initialized
    */
   options();
-  ~options();
-  options(const options& opt);
-  options& operator=(const options& opt);
-  options(options&& other) noexcept;
-  options& operator=(options&& other) noexcept;
-  ///@}
 
   /**
    * Set an option as a variant based on its name
