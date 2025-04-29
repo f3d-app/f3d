@@ -21,7 +21,7 @@ Contributors with a single contribution or that may not want to are not listed h
 | -------------- | ---------- | ---------- |
 | jrushlow       | 19jrushlow | Yes        |
 | ssmncrf        | samoncrief | Yes        |
-| Evgenii Startcev        | exbluesbreaker | Yes        |
+| Evgenii Startcev (PhilHellmuth)        | exbluesbreaker | Yes        |
 
 ---
 
