@@ -839,7 +839,7 @@ public:
   F3DOptionsTools::OptionsEntries ImperativeConfigOptionsEntries;
   F3DConfigFileTools::BindingsEntries ConfigBindingsEntries;
   std::unique_ptr<f3d::engine> Engine;
-  std::vector<std::vector<fs::path>> FilesGroups;
+  std::vector<std::pair<std::string, std::vector<fs::path>>> FilesGroups;
   std::vector<fs::path> LoadedFiles;
   int CurrentFilesGroupIndex = -1;
 
@@ -951,6 +951,13 @@ int F3DStarter::Start(int argc, char** argv)
     { this->Internals->ConfigOptionsEntries, this->Internals->CLIOptionsEntries,
       this->Internals->ImperativeConfigOptionsEntries },
     { "" }, true);
+
+  const auto& mode = this->Internals->AppOptions.MultiFileMode;
+  if (mode != "single" && mode != "all" && mode != "dir")
+  {
+    f3d::log::warn("Unrecognized multi-file-mode: ", mode, ". Assuming \"single\" mode.");
+    this->Internals->AppOptions.MultiFileMode = "single";
+  }
 
 #if __APPLE__
   // Initialize MacOS delegate
@@ -1309,7 +1316,7 @@ void F3DStarter::LoadFileGroup(int index, bool relativeIndex, bool forceClear)
     // XXX: Each group contains at least one path
     std::string groupIdx = "(" + std::to_string(groupIndex + 1) + "/" +
       std::to_string(this->Internals->FilesGroups.size()) + ")";
-    this->LoadFileGroup(this->Internals->FilesGroups[groupIndex], clear, groupIdx);
+    this->LoadFileGroup(this->Internals->FilesGroups[groupIndex].second, clear, groupIdx);
   }
   else
   {
@@ -1652,53 +1659,39 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
     }
     else
     {
-      // Check if file has already been added
-      bool found = false;
-      std::vector<std::vector<fs::path>>::iterator it;
-      for (it = this->Internals->FilesGroups.begin(); it != this->Internals->FilesGroups.end();
-           it++)
+      // Compute a key to identify the group the file should go in
+      const auto pathToGroupKey = [&]()
       {
-        auto localIt = std::find(it->begin(), it->end(), tmpPath);
-        found |= localIt != it->end();
-        if (found)
-        {
-          break;
-        }
-      }
-
-      if (!found)
-      {
-        // Add to the right file group
         // XXX more multi-file mode may be added in the future
         if (this->Internals->AppOptions.MultiFileMode == "all")
         {
-          if (this->Internals->FilesGroups.empty())
-          {
-            this->Internals->FilesGroups.resize(1);
-          }
-          assert(this->Internals->FilesGroups.size() == 1);
-          this->Internals->FilesGroups[0].emplace_back(tmpPath);
+          return std::string("");
         }
-        else
+        if (this->Internals->AppOptions.MultiFileMode == "dir")
         {
-          if (this->Internals->AppOptions.MultiFileMode != "single")
-          {
-            f3d::log::warn("Unrecognized multi-file-mode: ",
-              this->Internals->AppOptions.MultiFileMode, ". Assuming \"single\" mode.");
-          }
-          this->Internals->FilesGroups.emplace_back(std::vector<fs::path>{ tmpPath });
+          return tmpPath.parent_path().string();
         }
-        return static_cast<int>(this->Internals->FilesGroups.size()) - 1;
-      }
-      else
+        return tmpPath.string();
+      };
+
+      const std::string groupKey = pathToGroupKey();
+      size_t groupIndex = 0;
+      for (auto& [key, paths] : this->Internals->FilesGroups)
       {
-        // If already added, just return the index of the group containing the file
-        if (!quiet)
+        if (key == groupKey)
         {
-          f3d::log::warn("File ", tmpPath.string(), " has already been added");
+          // Check if file has already been added
+          if (std::find(paths.begin(), paths.end(), tmpPath) == paths.end())
+          {
+            paths.emplace_back(tmpPath);
+          }
+          return static_cast<int>(groupIndex);
         }
-        return static_cast<int>(std::distance(this->Internals->FilesGroups.begin(), it));
+        ++groupIndex;
       }
+      // Create new group if we haven't found one and returned already
+      this->Internals->FilesGroups.emplace_back(groupKey, std::vector<fs::path>({ tmpPath }));
+      return static_cast<int>(this->Internals->FilesGroups.size()) - 1;
     }
   }
   catch (const fs::filesystem_error& ex)
