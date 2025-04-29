@@ -35,7 +35,7 @@ _Volume rendering of a security bag scan_: `f3d backpack.vti -vmn --coloring-ran
 
 _Realistic rendering #1_: `f3d DamagedHelmet.glb --hdri-file=lebombo_4k.hdr -fjtuqap`
 
-<img src="https://user-images.githubusercontent.com/3129530/194735416-3f386437-456c-4145-9b5e-6bb6451d7e9a.png" width="700">
+<img src="https://media.githubusercontent.com/media/f3d-app/f3d-media/95b76c22d927bb24759bbe0246b6260121f2933b/media/typical.png" width="700">
 
 _Showcase of interactive widgets_: `f3d dragon.vtu -xtganse --coloring-component=0`
 
