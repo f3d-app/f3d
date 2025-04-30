@@ -1,5 +1,6 @@
 #include "vtkF3DSPZReader.h"
 
+#include <vtkFileResourceStream.h>
 #include <vtkFloatArray.h>
 #include <vtkInformation.h>
 #include <vtkInformationVector.h>
@@ -7,7 +8,6 @@
 #include <vtkPointData.h>
 #include <vtkPoints.h>
 #include <vtkStreamingDemandDrivenPipeline.h>
-
 #include <vtk_zlib.h>
 
 #include <algorithm>
@@ -51,34 +51,53 @@ bool UncompressGzip(
 vtkStandardNewMacro(vtkF3DSPZReader);
 
 //----------------------------------------------------------------------------
-vtkF3DSPZReader::vtkF3DSPZReader()
-{
-  this->SetNumberOfInputPorts(0);
-}
-
-//----------------------------------------------------------------------------
 int vtkF3DSPZReader::RequestData(
   vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector)
 {
   vtkPolyData* output = vtkPolyData::GetData(outputVector);
 
-  std::ifstream file(this->FileName, std::ios::binary);
-  if (!file)
+  vtkSmartPointer<vtkResourceStream> stream;
+
+  if (this->Stream)
   {
-    vtkErrorMacro("Failed to open file: " + this->FileName);
-    return 0;
+    stream = this->Stream;
+    if (this->Stream->SupportSeek())
+    {
+      this->Stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+    }
+  }
+  else
+  {
+    vtkNew<vtkFileResourceStream> fileStream;
+    if (!this->FileName || !fileStream->Open(this->FileName))
+    {
+      vtkErrorMacro(<< "Failed to open file: "
+                    << (this->FileName ? this->FileName : "No file name set"));
+      return 0;
+    }
+
+    stream = fileStream;
   }
 
-  // Read the file into a vector
-  std::vector<unsigned char> compressed(std::istreambuf_iterator<char>(file), {});
+  size_t compressedLength = 0;
 
-  size_t compressedLength = compressed.size();
-
-  if (compressedLength < 4)
+  if (stream->SupportSeek())
   {
-    vtkErrorMacro("Invalid file content");
-    return 0;
+    stream->Seek(0, vtkResourceStream::SeekDirection::End);
+    compressedLength = stream->Tell();
+
+    if (compressedLength < 4)
+    {
+      vtkErrorMacro("Invalid stream content");
+      return 0;
+    }
+
+    stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
   }
+
+  std::vector<unsigned char> compressed(compressedLength);
+
+  stream->Read(compressed.data(), compressedLength);
 
   // get the buffer size in order to pre-allocate
   uint32_t uncompressedLength = static_cast<uint32_t>(compressed[compressedLength - 4]) |
