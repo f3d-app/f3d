@@ -198,7 +198,7 @@ f3d_plugin_declare_reader(
   EXTENSIONS spz
   MIMETYPES application/vnd.spz
   VTK_READER vtkF3DSPZReader
-  FORMAT_DESCRIPTION "Niantic's 3D Gaussians"
+  FORMAT_DESCRIPTION "Compressed 3D gaussian splats"
 )
 
 f3d_plugin_build(
