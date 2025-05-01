@@ -714,10 +714,9 @@ jobs:
     - name: Wait for other checks to succeed
       uses: lewagon/wait-on-check-action@v1.3.4
       with:
-        ref: ${{ github.ref }}
+        ref: ${{ github.event.pull_request.head.ref }}
         running-workflow-name: 'Build docker images'
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        wait-interval: 10
+        wait-interval: 60
 
 #----------------------------------------------------------------------------
 # android: Check build of F3D for android
