@@ -731,7 +731,7 @@ jobs:
     # This require a F3D_DOCKER_CI_DISPATCH secret contain a PAT with read and write admin access
     - name: Trigger docker images build
       env:
-          secret: ${{ secrets.F3D_DOCKER_CI_DISPATCH_ }}
+          secret: ${{ secrets.F3D_DOCKER_CI_DISPATCH }}
       if: ${{env.F3D_DOCKER_IMAGE_AVAILABLE == '1' && env.secret != '' }}
       uses: convictional/trigger-workflow-and-wait@v1.6.5
       with:
@@ -747,12 +747,12 @@ jobs:
 
     - name: Error out when unable to build docker images
       env:
-          secret: ${{ secrets.F3D_DOCKER_CI_DISPATCH_ }}
+          secret: ${{ secrets.F3D_DOCKER_CI_DISPATCH }}
       if: ${{env.F3D_DOCKER_IMAGE_AVAILABLE == '1' && env.secret == '' }}
       uses: actions/github-script@v3
       with:
         script: |
-            core.setFailed('Could not generate missing docker images')
+            core.setFailed('Could not generate missing docker images, reach out to a maintainer')
 
 #----------------------------------------------------------------------------
 # android: Check build of F3D for android
