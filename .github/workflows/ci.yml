@@ -711,6 +711,7 @@ jobs:
 
     steps:
 
+    # {0} is needed to avoid exit on fail
     - name: Check docker images exists
       shell: bash {0}
       working-directory: ${{github.workspace}}
