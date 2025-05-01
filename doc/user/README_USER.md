@@ -14,3 +14,4 @@
 - [How to integrate F3D in your desktop.](DESKTOP_INTEGRATION.md)
 - [How to configure plugins in F3D.](PLUGINS.md)
 - [Limitations and troubleshooting of F3D.](LIMITATIONS_AND_TROUBLESHOOTING.md)
+- [How to sponsor F3D.](SPONSORING.md)

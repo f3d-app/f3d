@@ -176,6 +176,14 @@ defaults:
       parent: User Documentation
       nav_order: 13
 
+  -
+    scope:
+      path: "doc/user/SPONSORING.md"
+    values:
+      title: Sponsoring
+      parent: User Documentation
+      nav_order: 14
+
 # libf3d doc
   -
     scope:
