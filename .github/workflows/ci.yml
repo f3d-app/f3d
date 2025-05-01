@@ -711,69 +711,26 @@ jobs:
 
     steps:
 
-    - name: Check wasm image
-      id: image_exists_wasm
-      continue-on-error: true
-      uses: cloudposse/github-action-docker-image-exists@main
-      with:
-        registry: ghcr.io
-        organization: "f3d-app"
-        repository: "f3d-wasm"
-        tag: ${{needs.default_versions.outputs.timestamp}}
-
-    - name: Check android armeabi-v7a image
-      id: image_exists_android_armeabi-v7a
-      continue-on-error: true
-      uses: cloudposse/github-action-docker-image-exists@main
-      with:
-        registry: ghcr.io
-        organization: "f3d-app"
-        repository: "f3d-android-armeabi-v7a"
-        tag: ${{needs.default_versions.outputs.timestamp}}
-
-    - name: Check android arm64-v8a image
-      id: image_exists_android_arm64-v8a
-      continue-on-error: true
-      uses: cloudposse/github-action-docker-image-exists@main
-      with:
-        registry: ghcr.io
-        organization: "f3d-app"
-        repository: "f3d-android-arm64-v8a"
-        tag: ${{needs.default_versions.outputs.timestamp}}
-
-    - name: Check android x86 image
-      id: image_exists_android_x86
-      continue-on-error: true
-      uses: cloudposse/github-action-docker-image-exists@main
-      with:
-        registry: ghcr.io
-        organization: "f3d-app"
-        repository: "f3d-android-x86"
-        tag: ${{needs.default_versions.outputs.timestamp}}
-
-    - name: Check android x86_64 image
-      id: image_exists_android_x86_64
-      continue-on-error: true
-      uses: cloudposse/github-action-docker-image-exists@main
-      with:
-        registry: ghcr.io
-        organization: "f3d-app"
-        repository: "f3d-android-x86_64"
-        tag: ${{needs.default_versions.outputs.timestamp}}
-
     - name: Echo
       shell: bash
       working-directory: ${{github.workspace}}
       run: |
-         echo  ${{ steps.image_exists_wasm.conclusion }}
-         echo  ${{ steps.image_exists_armeabi-v7a.conclusion }}
-         echo  ${{ steps.image_exists_arm64-v8a.conclusion }}
-         echo  ${{ steps.image_exists_x86.conclusion }}
-         echo  ${{ steps.image_exists_x86_64.conclusion }}
+         docker manifest inspect ghcr.io/f3d-app/f3d-wasm:20250429_0
+         res=$?
+         docker manifest inspect ghcr.io/f3d-app/f3d-android-armeabi-v7a:20250429_0
+         [ $? -eq 0 ] && [ $res -eq 0 ] || res=$?
+         docker manifest inspect ghcr.io/f3d-app/f3d-android-arm64-v8a:20250429_0
+         [ $? -eq 0 ] && [ $res -eq 0 ] || res=$?
+         docker manifest inspect ghcr.io/f3d-app/f3d-android-x86:20250429_0
+         [ $? -eq 0 ] && [ $res -eq 0 ] || res=$?
+         docker manifest inspect ghcr.io/f3d-app/f3d-android-x86_64:20250429_0
+         [ $? -eq 0 ] && [ $res -eq 0 ] || res=$?
+         echo $res
+         echo "F3D_DOCKER_IMAGE_AVAILABLE=$res" >> $GITHUB_ENV
 
     # This require a F3D_DOCKER_CI_DISPATCH secret contain a PAT with read and write admin access
     - name: Trigger docker images build
-      if: ${{ steps.image_exists_wasm.conclusion != 'success' }}
+      if: ${{env.F3D_DOCKER_IMAGE_AVAILABLE == '0'}}
       uses: convictional/trigger-workflow-and-wait@v1.6.5
       with:
         owner: f3d-app
@@ -787,7 +744,7 @@ jobs:
         wait_workflow: true
 
     - name: Error out when unable to build docker images
-      if: ${{ steps.image_exists_wasm.conclusion != 'success' }}
+      if: ${{env.F3D_DOCKER_IMAGE_AVAILABLE == '0'}}
       uses: actions/github-script@v3
       with:
         script: |
