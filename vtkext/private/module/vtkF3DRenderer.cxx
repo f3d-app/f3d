@@ -2185,6 +2185,15 @@ void vtkF3DRenderer::SetPointSpritesProperties(SplatType type, double pointSprit
       sprites.Mapper->SetBoundScale(3.0);
       sprites.Mapper->SetRotationArray("rotation");
 
+      // TODO: adjust version number
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250501)
+      sprites.Mapper->SetSphericalHarmonicsDegree1Array("sh1");
+      sprites.Mapper->SetSphericalHarmonicsDegree2Array("sh2");
+      sprites.Mapper->SetSphericalHarmonicsDegree3Array("sh3");
+#else
+      // TODO: warn about lack of SH support
+#endif
+
       int* viewport = this->GetSize();
 
       float lowPass[3] = { 0.3f / (viewport[0] * viewport[0]), 0.f,

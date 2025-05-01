@@ -119,8 +119,121 @@ struct PackedRotation
     return { w, xyz[0], xyz[1], xyz[2] };
   }
 };
+
+//----------------------------------------------------------------------------
+template<int Degree>
+struct PackedSH
+{
+  uint8_t packed[3 * Degree * (Degree + 2)];
+
+  template<int SH>
+  auto decode() const;
+
+  template<>
+  auto decode<1>() const
+  {
+    static_assert(Degree >= 1);
+    constexpr float SH_C1[3] = { -0.48860251, 0.48860251, -0.48860251 };
+    std::array<float, 9> sh;
+    for (int i = 0; i < 9; i++)
+    {
+      sh[i] = SH_C1[i / 3] * unquantize(packed[i]);
+    }
+    return sh;
+  }
+
+  template<>
+  auto decode<2>() const
+  {
+    static_assert(Degree >= 2);
+    constexpr float SH_C2[5] = { 1.092548430, -1.09254843, 0.315391565, -1.09254843, 0.546274215 };
+    std::array<float, 15> sh;
+    for (int i = 0; i < 15; i++)
+    {
+      sh[i] = SH_C2[i / 3] * unquantize(packed[9 + i]);
+    }
+    return sh;
+  }
+
+  template<>
+  auto decode<3>() const
+  {
+    static_assert(Degree >= 3);
+    constexpr float SH_C3[7] = { -0.59004358, 2.890611442, -0.45704579, 0.373176332, -0.45704579,
+      1.445305721, -0.59004358 };
+    std::array<float, 21> sh;
+    for (int i = 0; i < 21; i++)
+    {
+      sh[i] = SH_C3[i / 3] * unquantize(packed[24 + i]);
+    }
+    return sh;
+  }
+
+private:
+  static float unquantize(unsigned char c)
+  {
+    return c * (2.f / 255.f) - 1.f;
+  }
+};
+
+//----------------------------------------------------------------------------
+template<int Degree>
+void AddSphericalHarmonics(int nbSplats, unsigned char* buffer, vtkPointData* pointData)
+{
+  PackedSH<Degree>* begin =
+    reinterpret_cast<PackedSH<Degree>*>(buffer + 16 + (9 + 4 + 3 + 3) * nbSplats);
+
+  vtkNew<vtkFloatArray> sh1Array;
+  sh1Array->SetNumberOfComponents(9);
+  sh1Array->SetNumberOfTuples(nbSplats);
+  sh1Array->SetName("sh1");
+
+  PackedSH<Degree>* sh = begin;
+
+  for (size_t splatIndex = 0; splatIndex < nbSplats; splatIndex++)
+  {
+    sh1Array->SetTypedTuple(splatIndex, (sh++)->decode<1>().data());
+  }
+
+  pointData->AddArray(sh1Array);
+
+  if constexpr (Degree >= 2)
+  {
+    vtkNew<vtkFloatArray> sh2Array;
+    sh2Array->SetNumberOfComponents(15);
+    sh2Array->SetNumberOfTuples(nbSplats);
+    sh2Array->SetName("sh2");
+
+    sh = begin;
+
+    for (size_t splatIndex = 0; splatIndex < nbSplats; splatIndex++)
+    {
+      sh2Array->SetTypedTuple(splatIndex, (sh++)->decode<2>().data());
+    }
+
+    pointData->AddArray(sh2Array);
+  }
+
+  if constexpr (Degree >= 3)
+  {
+    vtkNew<vtkFloatArray> sh3Array;
+    sh3Array->SetNumberOfComponents(21);
+    sh3Array->SetNumberOfTuples(nbSplats);
+    sh3Array->SetName("sh3");
+
+    sh = begin;
+
+    for (size_t splatIndex = 0; splatIndex < nbSplats; splatIndex++)
+    {
+      sh3Array->SetTypedTuple(splatIndex, (sh++)->decode<3>().data());
+    }
+
+    pointData->AddArray(sh3Array);
+  }
+}
 }
 
+//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkF3DSPZReader);
 
 //----------------------------------------------------------------------------
@@ -129,16 +242,17 @@ int vtkF3DSPZReader::RequestData(
 {
   vtkPolyData* output = vtkPolyData::GetData(outputVector);
 
+  vtkNew<vtkPoints> points;
+  points->SetDataTypeToFloat();
+  output->SetPoints(points);
+
   vtkSmartPointer<vtkResourceStream> stream;
 
 #if VTK_VERSION_NUMBER > VTK_VERSION_CHECK(9, 4, 20250501)
   if (this->Stream)
   {
     stream = this->Stream;
-    if (this->Stream->SupportSeek())
-    {
-      this->Stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
-    }
+    assert(this->Stream->SupportSeek());
   }
   else
 #endif
@@ -153,8 +267,6 @@ int vtkF3DSPZReader::RequestData(
 
     stream = fileStream;
   }
-
-  assert(stream->SupportSeek());
 
   stream->Seek(0, vtkResourceStream::SeekDirection::End);
   size_t compressedLength = stream->Tell();
@@ -220,6 +332,8 @@ int vtkF3DSPZReader::RequestData(
     }
   }
 
+  points->SetData(positionArray);
+
   vtkNew<vtkUnsignedCharArray> colorArray;
   colorArray->SetNumberOfComponents(4);
   colorArray->SetNumberOfTuples(nbSplats);
@@ -227,11 +341,6 @@ int vtkF3DSPZReader::RequestData(
 
   // alpha is stored just after the 16-bytes header and the positions
   unsigned char* alpha = uncompressed.data() + 16 + 9 * nbSplats;
-
-  for (size_t splatIndex = 0; splatIndex < nbSplats; splatIndex++)
-  {
-    colorArray->SetTypedComponent(splatIndex, 3, *alpha++);
-  }
 
   // color is stored just after the 16-bytes header and alphas
   ColorChannel* color =
@@ -243,7 +352,11 @@ int vtkF3DSPZReader::RequestData(
     {
       colorArray->SetTypedComponent(splatIndex, c, (color++)->decode());
     }
+
+    colorArray->SetTypedComponent(splatIndex, 3, *alpha++);
   }
+
+  output->GetPointData()->SetScalars(colorArray);
 
   vtkNew<vtkFloatArray> scaleArray;
   scaleArray->SetNumberOfComponents(3);
@@ -261,6 +374,8 @@ int vtkF3DSPZReader::RequestData(
     }
   }
 
+  output->GetPointData()->AddArray(scaleArray);
+
   // rotation is stored just after the 16-bytes header, positions, colors, alphas and scales
   PackedRotation* rotation =
     reinterpret_cast<PackedRotation*>(uncompressed.data() + 16 + (9 + 4 + 3) * nbSplats);
@@ -275,14 +390,27 @@ int vtkF3DSPZReader::RequestData(
     rotationArray->SetTypedTuple(splatIndex, (rotation++)->decode().data());
   }
 
-  vtkNew<vtkPoints> points;
-  points->SetDataTypeToFloat();
-  points->SetData(positionArray);
-  output->SetPoints(points);
-
-  output->GetPointData()->SetScalars(colorArray);
-  output->GetPointData()->AddArray(scaleArray);
   output->GetPointData()->AddArray(rotationArray);
+
+  AddSphericalHarmonics<1>(nbSplats, uncompressed.data(), output->GetPointData());
+
+  switch (header->shDegree)
+  {
+    case 0: // nothing to add
+      break;
+    case 1:
+      AddSphericalHarmonics<1>(nbSplats, uncompressed.data(), output->GetPointData());
+      break;
+    case 2:
+      AddSphericalHarmonics<2>(nbSplats, uncompressed.data(), output->GetPointData());
+      break;
+    case 3:
+      AddSphericalHarmonics<3>(nbSplats, uncompressed.data(), output->GetPointData());
+      break;
+    default:
+      vtkWarningMacro("Invalid spherical harmonics degree, ignoring");
+      break;
+  }
 
   return 1;
 }
