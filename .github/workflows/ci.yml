@@ -711,12 +711,11 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-    - name: Wait for other checks to succeed
-      uses: lewagon/wait-on-check-action@v1.3.4
+    - name: Wait on Workflow
+      uses: ArcticLampyrid/action-wait-for-workflow@v1.2.0
       with:
-        ref: ${{ github.event.pull_request.head.ref }}
-        running-workflow-name: 'Build docker images'
-        wait-interval: 60
+        workflow: build-docker-images.yml
+        allowed-conclusions: success
 
 #----------------------------------------------------------------------------
 # android: Check build of F3D for android
