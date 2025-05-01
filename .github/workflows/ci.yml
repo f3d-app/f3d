@@ -711,48 +711,11 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-
-    # {0} is needed to avoid exit on fail
-    - name: Check docker images exists
-      shell: bash {0}
-      working-directory: ${{github.workspace}}
-      run: |
-         docker manifest inspect ghcr.io/f3d-app/f3d-wasm:${{needs.default_versions.outputs.timestamp}}
-         res=$?
-         docker manifest inspect ghcr.io/f3d-app/f3d-android-armeabi-v7a:${{needs.default_versions.outputs.timestamp}}
-         [ $? -eq 0 ] && [ $res -eq 0 ] || res=$?
-         docker manifest inspect ghcr.io/f3d-app/f3d-android-arm64-v8a:${{needs.default_versions.outputs.timestamp}}
-         [ $? -eq 0 ] && [ $res -eq 0 ] || res=$?
-         docker manifest inspect ghcr.io/f3d-app/f3d-android-x86:${{needs.default_versions.outputs.timestamp}}
-         [ $? -eq 0 ] && [ $res -eq 0 ] || res=$?
-         docker manifest inspect ghcr.io/f3d-app/f3d-android-x86_64:${{needs.default_versions.outputs.timestamp}}
-         [ $? -eq 0 ] && [ $res -eq 0 ] || res=$?
-         echo "F3D_DOCKER_IMAGE_AVAILABLE=$res" >> $GITHUB_ENV
-
-    # This require a F3D_DOCKER_CI_DISPATCH secret contain a PAT with read and write admin access
-    - name: Trigger docker images build
-      env:
-          secret: ${{ secrets.F3D_DOCKER_CI_DISPATCH }}
-      if: ${{env.F3D_DOCKER_IMAGE_AVAILABLE == '1' && env.secret != '' }}
-      uses: convictional/trigger-workflow-and-wait@v1.6.5
+    - name: Wait on build-docker-images workflow
+      uses: ArcticLampyrid/action-wait-for-workflow@v1.2.0
       with:
-        owner: f3d-app
-        repo: f3d-docker-images
-        github_token: ${{ secrets.F3D_DOCKER_CI_DISPATCH }}
-        workflow_file_name: build_docker_image.yml
-        wait_interval: 60
-        client_payload: '{"versions_file_url": "https://raw.githubusercontent.com/${{github.repository}}/${{github.ref}}/.github/workflows/versions.json"}'
-        propagate_failure: true
-        trigger_workflow: true
-        wait_workflow: true
-
-    - name: Error out when unable to build docker images
-      env:
-          secret: ${{ secrets.F3D_DOCKER_CI_DISPATCH }}
-      if: ${{env.F3D_DOCKER_IMAGE_AVAILABLE == '1' && env.secret == '' }}
-      uses: actions/github-script@v3
-      with:
-        script: core.setFailed('Could not generate missing docker images, reach out to a maintainer')
+        workflow: build-docker-images.yml
+        allowed-conclusions: success
 
 #----------------------------------------------------------------------------
 # android: Check build of F3D for android
