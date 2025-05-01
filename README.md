@@ -54,9 +54,11 @@ See the [Quickstart Guide](doc/user/QUICKSTART.md) for more information about ge
 F3D needs your help!
 
 If you can, please consider sponsoring F3D. Even a small donation would help us offset the recurring maintenance costs.
-With enough sponsors we would be able to make F3D grow faster and stronger! Read me about it [here](doc/user/SPONSORING.md).
+With enough sponsors we would be able to make F3D grow faster and stronger! Read more about it [here](doc/user/SPONSORING.md).
 
-If not, please use F3D, star it on github and share the word about it!
+If you are an industry user of F3D and want to make sure it can keep growing and being maintained, [please reach out](doc/user/SPONSORING.md#industry-sponsors)!
+
+In any case, please star it on github and share the word about it!
 
 # Vision
 
