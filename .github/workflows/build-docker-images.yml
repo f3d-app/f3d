@@ -40,7 +40,7 @@ jobs:
     container: ghcr.io/f3d-app/f3d-ci
     name: Set default versions
     needs: detect_checkboxes
-    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'CI')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'CI')) }}
     outputs:
       timestamp: ${{ steps.set_default_versions.outputs.timestamp }}
 
@@ -70,9 +70,8 @@ jobs:
 
     steps:
 
-    # {0} is needed to avoid exit on fail
     - name: Check docker images exists
-      shell: bash {0}
+      shell: bash
       working-directory: ${{github.workspace}}
       run: |
          res=0
@@ -85,6 +84,7 @@ jobs:
 
     # This require a F3D_DOCKER_CI_DISPATCH secret contain a PAT with read and write admin access
     - name: Trigger docker images build
+      if: ${{env.F3D_DOCKER_IMAGE_AVAILABLE == '1'}}
       uses: convictional/trigger-workflow-and-wait@v1.6.5
       with:
         owner: f3d-app
