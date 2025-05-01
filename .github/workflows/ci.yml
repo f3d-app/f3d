@@ -712,7 +712,7 @@ jobs:
     steps:
 
     - name: Echo
-      shell: bash
+      shell: bash {0}
       working-directory: ${{github.workspace}}
       run: |
          docker manifest inspect ghcr.io/f3d-app/f3d-wasm:20250429_0
