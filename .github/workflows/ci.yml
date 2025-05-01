@@ -713,6 +713,7 @@ jobs:
 
     - name: Check wasm image
       id: image_exists_wasm
+      continue-on-error: true
       uses: cloudposse/github-action-docker-image-exists@main
       with:
         registry: ghcr.io
@@ -722,6 +723,7 @@ jobs:
 
     - name: Check android armeabi-v7a image
       id: image_exists_android_armeabi-v7a
+      continue-on-error: true
       uses: cloudposse/github-action-docker-image-exists@main
       with:
         registry: ghcr.io
@@ -731,6 +733,7 @@ jobs:
 
     - name: Check android arm64-v8a image
       id: image_exists_android_arm64-v8a
+      continue-on-error: true
       uses: cloudposse/github-action-docker-image-exists@main
       with:
         registry: ghcr.io
@@ -740,6 +743,7 @@ jobs:
 
     - name: Check android x86 image
       id: image_exists_android_x86
+      continue-on-error: true
       uses: cloudposse/github-action-docker-image-exists@main
       with:
         registry: ghcr.io
@@ -749,6 +753,7 @@ jobs:
 
     - name: Check android x86_64 image
       id: image_exists_android_x86_64
+      continue-on-error: true
       uses: cloudposse/github-action-docker-image-exists@main
       with:
         registry: ghcr.io
