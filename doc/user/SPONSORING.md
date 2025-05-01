@@ -40,6 +40,7 @@ We provide different ways to sponsor, choose your preferred one!
 - Direct Transfer:
   - IBAN: FR7616958000018496562230572
   - BIC/SWIFT: QNTOFRP1XXX
+
 ## Industry Sponsors
 
 If you or your company are using F3D in any capacity and you want to ensure F3D keeps growing and being maintained, we would love to hear from you!
