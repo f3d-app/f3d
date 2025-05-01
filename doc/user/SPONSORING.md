@@ -38,8 +38,8 @@ We provide different ways to sponsor, choose your preferred one!
 - [buy me a coffee](https://buymeacoffee.com/f3d.app)
 - [donorbox](https://donorbox.org/support-f3d)
 - Direct Transfer:
-  - IBAN: FR7616958000018496562230572
-  - BIC/SWIFT: QNTOFRP1XXX
+  - IBAN: `FR7616958000018496562230572`
+  - BIC/SWIFT: `QNTOFRP1XXX`
 
 ## Industry Sponsors
 
