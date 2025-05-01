@@ -761,6 +761,16 @@ jobs:
         repository: "f3d-android-x86_64"
         tag: ${{needs.default_versions.outputs.timestamp}}
 
+    - name: Echo
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run:
+         echo  ${{ steps.image_exists_wasm.conclusion }}
+         echo  ${{ steps.image_exists_armeabi-v7a.conclusion }}
+         echo  ${{ steps.image_exists_arm64-v8a.conclusion }}
+         echo  ${{ steps.image_exists_x86.conclusion }}
+         echo  ${{ steps.image_exists_x86_64.conclusion }}
+
     # This require a F3D_DOCKER_CI_DISPATCH secret contain a PAT with read and write admin access
     - name: Trigger docker images build
       if: ${{ !steps.image_exists_wasm.conclusion || !steps.image_exists_android_armeabi-v7a.conclusion || !steps.image_exists_android_arm64-v8a.conclusion || !steps.image_exists_android_x86.conclusion || !steps.image_exists_android_x86_64.conclusion }}
