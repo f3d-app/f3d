@@ -4,6 +4,10 @@ on:
     branches:
       - master
       - release
+    paths-ignore:
+      - 'doc/**'
+      - '_config.yml'
+
 name: Build docker images
 jobs:
 
@@ -40,7 +44,7 @@ jobs:
     container: ghcr.io/f3d-app/f3d-ci
     name: Set default versions
     needs: detect_checkboxes
-    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'CI')) }}
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'docker CI')) }}
     outputs:
       timestamp: ${{ steps.set_default_versions.outputs.timestamp }}
 
@@ -65,9 +69,8 @@ jobs:
 #----------------------------------------------------------------------------
   build_docker_images:
     needs: default_versions
-
-    runs-on: ubuntu-22.04
-
+    name: Build docker images
+    runs-on: ubuntu-latest
     steps:
 
     - name: Check docker images exists
