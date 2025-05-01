@@ -132,3 +132,4 @@ jobs:
       if: ${{env.F3D_DOCKER_IMAGE_AVAILABLE == '1' && env.secret == '' }}
       uses: actions/github-script@v3
       with:
+        script: core.setFailed('Could not generate missing docker images, reach out to a maintainer')
