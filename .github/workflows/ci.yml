@@ -5,6 +5,7 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
     paths-ignore:
       - 'doc/**'
+      - '_config.yml'
   push:
     branches:
       - master
