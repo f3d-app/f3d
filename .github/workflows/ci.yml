@@ -730,7 +730,7 @@ jobs:
 
     # This require a F3D_DOCKER_CI_DISPATCH secret contain a PAT with read and write admin access
     - name: Trigger docker images build
-      if: ${{env.F3D_DOCKER_IMAGE_AVAILABLE == '1' && !secrets.F3D_DOCKER_CI_DISPATCH_ == '' }}
+      if: ${{env.F3D_DOCKER_IMAGE_AVAILABLE == '1' && secrets.F3D_DOCKER_CI_DISPATCH_ != '' }}
       uses: convictional/trigger-workflow-and-wait@v1.6.5
       with:
         owner: f3d-app
@@ -744,7 +744,7 @@ jobs:
         wait_workflow: true
 
     - name: Error out when unable to build docker images
-      if: ${{env.F3D_DOCKER_IMAGE_AVAILABLE == '1' && !secrets.F3D_DOCKER_CI_DISPATCH_ == '' }}
+      if: ${{env.F3D_DOCKER_IMAGE_AVAILABLE == '1' && secrets.F3D_DOCKER_CI_DISPATCH_ == '' }}
       uses: actions/github-script@v3
       with:
         script: |
