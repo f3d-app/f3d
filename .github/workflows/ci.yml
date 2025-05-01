@@ -764,7 +764,7 @@ jobs:
     - name: Echo
       shell: bash
       working-directory: ${{github.workspace}}
-      run:
+      run: |
          echo  ${{ steps.image_exists_wasm.conclusion }}
          echo  ${{ steps.image_exists_armeabi-v7a.conclusion }}
          echo  ${{ steps.image_exists_arm64-v8a.conclusion }}
@@ -773,7 +773,7 @@ jobs:
 
     # This require a F3D_DOCKER_CI_DISPATCH secret contain a PAT with read and write admin access
     - name: Trigger docker images build
-      if: ${{ !steps.image_exists_wasm.conclusion || !steps.image_exists_android_armeabi-v7a.conclusion || !steps.image_exists_android_arm64-v8a.conclusion || !steps.image_exists_android_x86.conclusion || !steps.image_exists_android_x86_64.conclusion }}
+      if: ${{ steps.image_exists_wasm.conclusion != 'success' }}
       uses: convictional/trigger-workflow-and-wait@v1.6.5
       with:
         owner: f3d-app
@@ -787,7 +787,7 @@ jobs:
         wait_workflow: true
 
     - name: Error out when unable to build docker images
-      if: ${{ !steps.image_exists_wasm.conclusion || !steps.image_exists_android_armeabi-v7a.conclusion || !steps.image_exists_android_arm64-v8a.conclusion || !steps.image_exists_android_x86.conclusion || !steps.image_exists_android_x86_64.conclusion }}
+      if: ${{ steps.image_exists_wasm.conclusion != 'success' }}
       uses: actions/github-script@v3
       with:
         script: |
