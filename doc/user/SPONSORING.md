@@ -30,17 +30,16 @@ Please note everything you sponsor gets through the F3D-APP foundation, a non-pr
 
 We provide different ways to sponsor, choose your preferred one!
 
- - [Github sponsors](https://github.com/sponsors/f3d-app)
- - [Patreon](https://patreon.com/f3d_app_foundation)
- - [ko-fi](https://ko-fi.com/f3d_app)
- - [liberapay](https://liberapay.com/f3d-app/)
- - [Tipee](https://fr.tipeee.com/f3d-app/)
- - [buy me a coffee](https://buymeacoffee.com/f3d.app)
- - [donorbox](https://donorbox.org/support-f3d)
- - Direct Transfer:
-   - IBAN: FR7616958000018496562230572
-   - BIC/SWIFT: QNTOFRP1XXX
-
+- [Github sponsors](https://github.com/sponsors/f3d-app)
+- [Patreon](https://patreon.com/f3d_app_foundation)
+- [ko-fi](https://ko-fi.com/f3d_app)
+- [liberapay](https://liberapay.com/f3d-app/)
+- [Tipee](https://fr.tipeee.com/f3d-app/)
+- [buy me a coffee](https://buymeacoffee.com/f3d.app)
+- [donorbox](https://donorbox.org/support-f3d)
+- Direct Transfer:
+  - IBAN: FR7616958000018496562230572
+  - BIC/SWIFT: QNTOFRP1XXX
 ## Industry Sponsors
 
 If you or your company are using F3D in any capacity and you want to ensure F3D keeps growing and being maintained, we would love to hear from you!
