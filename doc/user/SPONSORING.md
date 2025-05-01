@@ -2,7 +2,7 @@
 
 ## Sponsors
 
-F3D, a fast and minimalist 3D viewer is at heart a passion project. We (Michael and myself, Mathieu) created it in order to create the best 3D viewer that we ourselves *want* to use.
+F3D, a fast and minimalist 3D viewer is at heart a passion project. We (Michael and myself, Mathieu) created it in order to create the best 3D viewer that we ourselves _want_ to use.
 
 I'm very active in the open source world. I'm employed at Kitware (creator of CMake, VTK and ParaView) and work on VTK and ParaView everyday, while also working on F3D when I have any free time! I love software design and the software process.
 
