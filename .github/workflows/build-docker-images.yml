@@ -3,6 +3,7 @@ on:
     types: [assigned, opened, synchronize, reopened]
     branches:
       - master
+      - master_second
       - release
     paths-ignore:
       - 'doc/**'
