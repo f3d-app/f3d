@@ -18,8 +18,8 @@ Please check the checkbox of the CI you want to run, then push again on your bra
 - [ ] Fast CI
 - [ ] Coverage cached CI
 - [ ] Analysis cached CI
-- [ ] WASM CI
-- [ ] Android CI
+- [ ] WASM docker CI
+- [ ] Android docker CI
 - [ ] macOS Intel cached CI
 - [ ] macOS ARM cached CI
 - [ ] Windows cached CI
