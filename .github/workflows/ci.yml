@@ -710,8 +710,10 @@ jobs:
 
     runs-on: ubuntu-22.04
 
+    # Pull request can require a rebuild of docker image, wait for it to be done
     steps:
     - name: Wait on build-docker-images workflow
+      if: ${{ github.event_name == 'pull_request' }}
       uses: ArcticLampyrid/action-wait-for-workflow@v1.2.0
       with:
         workflow: build-docker-images.yml
