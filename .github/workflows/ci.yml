@@ -768,7 +768,7 @@ jobs:
       with:
         path: 'source'
         fetch-depth: 0
-        lfs: 'true'
+        lfs: false
 
     - name: WebAssembly CI
       uses: ./source/.github/actions/wasm-ci
