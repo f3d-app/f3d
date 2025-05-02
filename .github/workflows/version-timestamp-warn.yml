@@ -13,4 +13,4 @@ jobs:
     steps:
       - uses: marocchino/sticky-pull-request-comment@v2
         with:
-          message: You are modifying versions.json, please update the timestamp as well.
+          message: You are modifying versions.json, please update the timestamp as well, this will generate new docker images and caches needed for CI.
