@@ -170,7 +170,7 @@ void vtkF3DInteractorStyle::Rotate()
     Transform->TransformPoint(camera->GetPosition(), camera->GetPosition());
 
     camera->SetViewUp(up);
-    double dot = vtkMath::Dot(dir, up);
+    const double dot = vtkMath::Dot(dir, up);
     if (std::abs(dot) < 0.99 || !std::signbit(dot * ryf))
     {
       camera->Elevation(ryf);
