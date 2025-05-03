@@ -48,7 +48,6 @@ jobs:
 #----------------------------------------------------------------------------
   default_versions:
     runs-on: ubuntu-22.04
-    container: ghcr.io/f3d-app/f3d-ci
     name: Set default versions
     needs: detect_checkboxes
     if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'CI')) || (github.ref == 'refs/heads/master') }}
@@ -84,6 +83,10 @@ jobs:
         path: 'source'
         fetch-depth: 1
         lfs: false
+
+    # Needed by default-versions-action, faster than pulling a docker image
+    - name: Install jq
+      run: sudo apt install -y jq
 
     - name: Set default versions
       id: set_default_versions
