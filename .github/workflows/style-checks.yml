@@ -71,7 +71,7 @@ jobs:
       uses: creyD/prettier_action@v4.3
       with:
         dry: True
-        prettier_options: '-w **/*.{js,json,md,html}'
+        prettier_options: '-w **/*.{js,json,md,html,yml}'
 
     - name: Codespell in place
       shell: bash

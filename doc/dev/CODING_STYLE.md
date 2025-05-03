@@ -84,4 +84,4 @@ The continuous integration checks the formatting of all these files using `prett
 You can fix them locally by running:
 
 - single file: `prettier -w /path/to/file.ext`
-- all files: `shopt -s globstar; prettier -w **/*.{js,json,md,html}`
+- all files: `shopt -s dotglob;shopt -s globstar; prettier -w **/*.{js,json,md,html,yml}`
