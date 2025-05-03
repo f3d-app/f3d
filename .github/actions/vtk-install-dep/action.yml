@@ -30,7 +30,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/vtk_install
-        key: vtk-${{ inputs.vtk_version }}${{ inputs.openvdb_version != '' && '-openvdb-${{inputs.openvdb_version}}' || '' }}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.cpu}}-9
+        key: vtk-${{ inputs.vtk_version }}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.cpu}}-9
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
