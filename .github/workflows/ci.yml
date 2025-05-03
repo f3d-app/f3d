@@ -234,6 +234,26 @@ jobs:
         fetch-depth: 1
         lfs: false
 
+    - name: Dependencies Dir
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: |
+        mkdir dependencies
+        cd dependencies
+        mkdir install
+
+    - name: Install VTK dependencies
+      uses: ./source/.github/actions/vtk-dependencies
+      with:
+        cpu: ${{matrix.cpu}}
+        openvdb_version: ${{matrix.openvdb_version}}
+
+    - name: Install Raytracing Dependencies
+      if: inputs.raytracing_label == 'raytracing'
+      uses: ./source/.github/actions/ospray-sb-install-dep
+      with:
+        cpu: ${{matrix.cpu}}
+
     - name: VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
       with:
