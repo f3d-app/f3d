@@ -1,25 +1,24 @@
-name: 'Install VTK Dependency'
-description: 'Install VTK Dependency using cache when possible'
+name: "Install VTK Dependency"
+description: "Install VTK Dependency using cache when possible"
 inputs:
   vtk_version:
-    description: 'VTK version'
+    description: "VTK version"
     required: true
   raytracing_label:
-    description: 'Label to control raytracing'
+    description: "Label to control raytracing"
     required: false
-    default: 'no-raytracing'
+    default: "no-raytracing"
   cpu:
-    description: 'CPU architecture to build for'
+    description: "CPU architecture to build for"
     required: false
-    default: 'x86_64'
+    default: "x86_64"
   openvdb_version:
-    description: 'Version of openvdb to build against'
+    description: "Version of openvdb to build against"
     required: false
 
 runs:
   using: "composite"
   steps:
-
     - name: Check required inputs
       shell: bash
       run: |
@@ -48,7 +47,7 @@ runs:
         repository: Kitware/VTK
         submodules: true
         fetch-depth: 0
-        path: './dependencies/vtk'
+        path: "./dependencies/vtk"
         ref: ${{ inputs.vtk_version }}
 
     # CMake 3.31 introduced a new policy producing a warning when using vtkModule.cmake

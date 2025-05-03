@@ -2,13 +2,12 @@ name: Nightly VTK master
 
 on:
   schedule:
-    - cron:  '0 0 * * *'
+    - cron: "0 0 * * *"
 
 jobs:
-
-#----------------------------------------------------------------------------
-# Check nightly: Checkout VTK and check if the last merged commit is less than 24 hours old
-#----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # Check nightly: Checkout VTK and check if the last merged commit is less than 24 hours old
+  #----------------------------------------------------------------------------
   check_nightly:
     if: github.repository == 'f3d-app/f3d'
     runs-on: ubuntu-22.04
@@ -17,27 +16,26 @@ jobs:
       should_run: ${{ steps.should_run.outputs.should_run }}
       vtk_sha: ${{ steps.vtk_sha_recover.outputs.vtk_sha }}
     steps:
+      - name: Checkout VTK
+        uses: actions/checkout@v4
+        with:
+          repository: Kitware/VTK
+          submodules: false
+          fetch-depth: 0
+          ref: master
 
-    - name: Checkout VTK
-      uses: actions/checkout@v4
-      with:
-        repository: Kitware/VTK
-        submodules: false
-        fetch-depth: 0
-        ref: master
+      - name: Check latest commit age is less than 24 hours
+        id: should_run
+        run: test -n "$(git rev-list --no-merges HEAD --not $(git rev-list -n1 --before=24hours --first-parent HEAD))" && echo "should_run=true" >> $GITHUB_OUTPUT || echo "should_run=false" >> $GITHUB_OUTPUT
 
-    - name: Check latest commit age is less than 24 hours
-      id: should_run
-      run: test -n "$(git rev-list --no-merges HEAD --not $(git rev-list -n1 --before=24hours --first-parent HEAD))" && echo "should_run=true" >> $GITHUB_OUTPUT || echo "should_run=false" >> $GITHUB_OUTPUT
+      - name: Set VTK sha env var
+        id: vtk_sha_recover
+        shell: bash
+        run: echo "vtk_sha=$(git log -n 1 --pretty=format:%H)" >> $GITHUB_OUTPUT
 
-    - name: Set VTK sha env var
-      id: vtk_sha_recover
-      shell: bash
-      run: echo "vtk_sha=$(git log -n 1 --pretty=format:%H)" >> $GITHUB_OUTPUT
-
-#----------------------------------------------------------------------------
-# Default versions: Set default version for all dependencies
-#----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # Default versions: Set default version for all dependencies
+  #----------------------------------------------------------------------------
   default_versions:
     runs-on: ubuntu-22.04
     name: Set default versions
@@ -65,23 +63,22 @@ jobs:
       timestamp: ${{ steps.set_default_versions.outputs.timestamp }}
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 1
+          lfs: false
 
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        path: 'source'
-        fetch-depth: 1
-        lfs: false
+      - name: Set default versions
+        id: set_default_versions
+        uses: f3d-app/default-versions-action@main
+        with:
+          file: ./source/.github/workflows/versions.json
 
-    - name: Set default versions
-      id: set_default_versions
-      uses: f3d-app/default-versions-action@main
-      with:
-        file: ./source/.github/workflows/versions.json
-
-#----------------------------------------------------------------------------
-# Cache LFS: Checkout LFS data and update the cache to limit LFS bandwidth
-#----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # Cache LFS: Checkout LFS data and update the cache to limit LFS bandwidth
+  #----------------------------------------------------------------------------
 
   cache_lfs:
     needs: check_nightly
@@ -91,23 +88,22 @@ jobs:
     outputs:
       lfs_sha: ${{ steps.lfs_sha_recover.outputs.lfs_sha }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 1
+          lfs: false
 
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        path: 'source'
-        fetch-depth: 1
-        lfs: false
+      - name: Cache LFS Data
+        id: lfs_sha_recover
+        uses: f3d-app/lfs-data-cache-action@v1
+        with:
+          cache_postfix: cache-0
 
-    - name: Cache LFS Data
-      id: lfs_sha_recover
-      uses: f3d-app/lfs-data-cache-action@v1
-      with:
-        cache_postfix: cache-0
-
-#----------------------------------------------------------------------------
-# Windows CI: Build and test
-#----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # Windows CI: Build and test
+  #----------------------------------------------------------------------------
   windows:
     needs: [cache_lfs, check_nightly, default_versions]
     if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
@@ -116,34 +112,33 @@ jobs:
     runs-on: windows-latest
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 0
+          lfs: false
 
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        path: 'source'
-        fetch-depth: 0
-        lfs: false
+      - name: Generic CI
+        uses: ./source/.github/actions/generic-ci
+        with:
+          vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
+          raytracing_label: raytracing
+          lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+          alembic_version: ${{needs.default_versions.outputs.alembic_version}}
+          assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          draco_version: ${{needs.default_versions.outputs.draco_version}}
+          occt_version: ${{needs.default_versions.outputs.occt_version}}
+          openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+          openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+          pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
+          python_version: ${{needs.default_versions.outputs.python_version}}
+          usd_version: ${{needs.default_versions.outputs.usd_version}}
+          java_version: ${{needs.default_versions.outputs.java_version}}
 
-    - name: Generic CI
-      uses: ./source/.github/actions/generic-ci
-      with:
-        vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
-        raytracing_label: raytracing
-        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-        assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-        draco_version: ${{needs.default_versions.outputs.draco_version}}
-        occt_version: ${{needs.default_versions.outputs.occt_version}}
-        openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-        pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-        python_version: ${{needs.default_versions.outputs.python_version}}
-        usd_version: ${{needs.default_versions.outputs.usd_version}}
-        java_version: ${{needs.default_versions.outputs.java_version}}
-
-#----------------------------------------------------------------------------
-# Linux CI: Build and test
-#----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # Linux CI: Build and test
+  #----------------------------------------------------------------------------
   linux:
     needs: [cache_lfs, check_nightly, default_versions]
     if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
@@ -164,35 +159,35 @@ jobs:
       DISPLAY: :0
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        path: 'source'
-        fetch-depth: 0
-        lfs: false
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 0
+          lfs: false
 
-    - name: Generic CI
-      uses: ./source/.github/actions/generic-ci
-      with:
-        build_type: ${{matrix.build_type}}
-        vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
-        raytracing_label: 'raytracing'
-        rendering_backend: ${{matrix.rendering_backend}}
-        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-        assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-        draco_version: ${{needs.default_versions.outputs.draco_version}}
-        occt_version: ${{needs.default_versions.outputs.occt_version}}
-        openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-        pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-        python_version: ${{needs.default_versions.outputs.python_version}}
-        usd_version: ${{needs.default_versions.outputs.usd_version}}
-        java_version: ${{needs.default_versions.outputs.java_version}}
+      - name: Generic CI
+        uses: ./source/.github/actions/generic-ci
+        with:
+          build_type: ${{matrix.build_type}}
+          vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
+          raytracing_label: "raytracing"
+          rendering_backend: ${{matrix.rendering_backend}}
+          lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+          alembic_version: ${{needs.default_versions.outputs.alembic_version}}
+          assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          draco_version: ${{needs.default_versions.outputs.draco_version}}
+          occt_version: ${{needs.default_versions.outputs.occt_version}}
+          openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+          openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+          pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
+          python_version: ${{needs.default_versions.outputs.python_version}}
+          usd_version: ${{needs.default_versions.outputs.usd_version}}
+          java_version: ${{needs.default_versions.outputs.java_version}}
 
-#----------------------------------------------------------------------------
-# MacOS CI: Build and test
-#----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # MacOS CI: Build and test
+  #----------------------------------------------------------------------------
   macos:
     needs: [cache_lfs, check_nightly, default_versions]
     if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
@@ -202,33 +197,33 @@ jobs:
     runs-on: macos-13
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        path: 'source'
-        fetch-depth: 0
-        lfs: false
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 0
+          lfs: false
 
-    - name: Generic CI
-      uses: ./source/.github/actions/generic-ci
-      with:
-        vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
-        cpu: x86_64
-        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-        assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-        draco_version: ${{needs.default_versions.outputs.draco_version}}
-        occt_version: ${{needs.default_versions.outputs.occt_version}}
-        openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-        pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-        python_version: ${{needs.default_versions.outputs.python_version}}
-        usd_version: ${{needs.default_versions.outputs.usd_version}}
-        java_version: ${{needs.default_versions.outputs.java_version}}
+      - name: Generic CI
+        uses: ./source/.github/actions/generic-ci
+        with:
+          vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
+          cpu: x86_64
+          lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+          alembic_version: ${{needs.default_versions.outputs.alembic_version}}
+          assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          draco_version: ${{needs.default_versions.outputs.draco_version}}
+          occt_version: ${{needs.default_versions.outputs.occt_version}}
+          openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+          openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+          pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
+          python_version: ${{needs.default_versions.outputs.python_version}}
+          usd_version: ${{needs.default_versions.outputs.usd_version}}
+          java_version: ${{needs.default_versions.outputs.java_version}}
 
-#----------------------------------------------------------------------------
-# MacOS arm64 CI: Build and test
-#----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # MacOS arm64 CI: Build and test
+  #----------------------------------------------------------------------------
   macos_arm:
     needs: [cache_lfs, check_nightly, default_versions]
     if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
@@ -238,36 +233,36 @@ jobs:
     runs-on: macos-14
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        path: 'source'
-        fetch-depth: 0
-        lfs: false
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 0
+          lfs: false
 
-    - name: Generic CI
-      uses: ./source/.github/actions/generic-ci
-      with:
-        vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
-        cpu: arm64
-        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-        assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-        draco_version: ${{needs.default_versions.outputs.draco_version}}
-        occt_version: ${{needs.default_versions.outputs.occt_version}}
-        openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-        pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-        python_version: ${{needs.default_versions.outputs.python_version}}
-        usd_version: ${{needs.default_versions.outputs.usd_version}}
-        java_version: ${{needs.default_versions.outputs.java_version}}
+      - name: Generic CI
+        uses: ./source/.github/actions/generic-ci
+        with:
+          vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
+          cpu: arm64
+          lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+          alembic_version: ${{needs.default_versions.outputs.alembic_version}}
+          assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          draco_version: ${{needs.default_versions.outputs.draco_version}}
+          occt_version: ${{needs.default_versions.outputs.occt_version}}
+          openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+          openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+          pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
+          python_version: ${{needs.default_versions.outputs.python_version}}
+          usd_version: ${{needs.default_versions.outputs.usd_version}}
+          java_version: ${{needs.default_versions.outputs.java_version}}
 
-#----------------------------------------------------------------------------
-# Sanitizer: Build and test on linux with last VTK with sanitizer options
-#----------------------------------------------------------------------------
-# "leak" is run by default with "address" so we do not need to run it in CI
-# "memory" returns false positives in VTK:
-# https://stackoverflow.com/questions/60097307/memory-sanitizer-reports-use-of-uninitialized-value-in-global-object-constructio
+  #----------------------------------------------------------------------------
+  # Sanitizer: Build and test on linux with last VTK with sanitizer options
+  #----------------------------------------------------------------------------
+  # "leak" is run by default with "address" so we do not need to run it in CI
+  # "memory" returns false positives in VTK:
+  # https://stackoverflow.com/questions/60097307/memory-sanitizer-reports-use-of-uninitialized-value-in-global-object-constructio
   sanitizer:
     needs: [cache_lfs, check_nightly, default_versions]
     if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
@@ -287,57 +282,55 @@ jobs:
       VTK_SMP_BACKEND_IN_USE: Sequential
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 0
+          lfs: false
 
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        path: 'source'
-        fetch-depth: 0
-        lfs: false
+      - name: Sanitizer CI
+        uses: ./source/.github/actions/sanitizer-ci
+        with:
+          vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
+          sanitizer_type: ${{matrix.sanitizer_type}}
+          lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+          alembic_version: ${{needs.default_versions.outputs.alembic_version}}
+          assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          draco_version: ${{needs.default_versions.outputs.draco_version}}
+          occt_version: ${{needs.default_versions.outputs.occt_version}}
+          openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+          openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+          pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
+          python_version: ${{needs.default_versions.outputs.python_version}}
+          usd_version: ${{needs.default_versions.outputs.usd_version}}
+          java_version: ${{needs.default_versions.outputs.java_version}}
 
-    - name: Sanitizer CI
-      uses: ./source/.github/actions/sanitizer-ci
-      with:
-        vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
-        sanitizer_type: ${{matrix.sanitizer_type}}
-        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-        assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-        draco_version: ${{needs.default_versions.outputs.draco_version}}
-        occt_version: ${{needs.default_versions.outputs.occt_version}}
-        openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-        pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-        python_version: ${{needs.default_versions.outputs.python_version}}
-        usd_version: ${{needs.default_versions.outputs.usd_version}}
-        java_version: ${{needs.default_versions.outputs.java_version}}
-
-#----------------------------------------------------------------------------
-# Build android/wasm docker images
-#----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # Build android/wasm docker images
+  #----------------------------------------------------------------------------
   build_docker_images:
     needs: check_nightly
     name: Build docker images
     runs-on: ubuntu-latest
     steps:
+      # This require a F3D_DOCKER_CI_DISPATCH secret contain a PAT with read and write admin access
+      - name: Trigger docker images build
+        uses: convictional/trigger-workflow-and-wait@v1.6.5
+        with:
+          owner: f3d-app
+          repo: f3d-docker-images
+          github_token: ${{ secrets.F3D_DOCKER_CI_DISPATCH }}
+          workflow_file_name: build_docker_image.yml
+          wait_interval: 60
+          client_payload: '{"vtk_version_override": "${{needs.check_nightly.outputs.vtk_sha}}"}'
+          propagate_failure: true
+          trigger_workflow: true
+          wait_workflow: true
 
-    # This require a F3D_DOCKER_CI_DISPATCH secret contain a PAT with read and write admin access
-    - name: Trigger docker images build
-      uses: convictional/trigger-workflow-and-wait@v1.6.5
-      with:
-        owner: f3d-app
-        repo: f3d-docker-images
-        github_token: ${{ secrets.F3D_DOCKER_CI_DISPATCH }}
-        workflow_file_name: build_docker_image.yml
-        wait_interval: 60
-        client_payload: '{"vtk_version_override": "${{needs.check_nightly.outputs.vtk_sha}}"}'
-        propagate_failure: true
-        trigger_workflow: true
-        wait_workflow: true
-
-#----------------------------------------------------------------------------
-# android: Check build of F3D for android
-#----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # android: Check build of F3D for android
+  #----------------------------------------------------------------------------
   android:
     needs: [check_nightly, default_versions, build_docker_images]
     strategy:
@@ -349,22 +342,21 @@ jobs:
     container: ghcr.io/f3d-app/f3d-android-${{ matrix.arch }}:${{needs.default_versions.outputs.timestamp}}_${{needs.check_nightly.outputs.vtk_sha}}
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 0
+          lfs: false
 
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        path: 'source'
-        fetch-depth: 0
-        lfs: false
+      - name: Android CI
+        uses: ./source/.github/actions/android-ci
+        with:
+          arch: ${{matrix.arch}}
 
-    - name: Android CI
-      uses: ./source/.github/actions/android-ci
-      with:
-        arch: ${{matrix.arch}}
-
-#----------------------------------------------------------------------------
-# webassembly: Build webassembly artifacts
-#----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # webassembly: Build webassembly artifacts
+  #----------------------------------------------------------------------------
   webassembly:
     needs: [check_nightly, default_versions, build_docker_images]
     strategy:
@@ -374,13 +366,12 @@ jobs:
     container: ghcr.io/f3d-app/f3d-wasm:${{needs.default_versions.outputs.timestamp}}_${{needs.check_nightly.outputs.vtk_sha}}
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 0
+          lfs: false
 
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        path: 'source'
-        fetch-depth: 0
-        lfs: false
-
-    - name: WebAssembly CI
-      uses: ./source/.github/actions/wasm-ci
+      - name: WebAssembly CI
+        uses: ./source/.github/actions/wasm-ci

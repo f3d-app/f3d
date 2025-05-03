@@ -1,15 +1,14 @@
-name: 'Install zlib Dependency'
-description: 'Install zlib Dependency using cache when possible'
+name: "Install zlib Dependency"
+description: "Install zlib Dependency using cache when possible"
 inputs:
   cpu:
-    description: 'CPU architecture to build for'
+    description: "CPU architecture to build for"
     required: false
-    default: 'x86_64'
+    default: "x86_64"
 
 runs:
   using: "composite"
   steps:
-
     - name: Cache zlib
       id: cache-zlib
       uses: actions/cache/restore@v4
@@ -23,7 +22,7 @@ runs:
       uses: actions/checkout@v4
       with:
         repository: madler/zlib
-        path: './dependencies/zlib'
+        path: "./dependencies/zlib"
         ref: v1.3.1
 
     - name: Setup zlib
