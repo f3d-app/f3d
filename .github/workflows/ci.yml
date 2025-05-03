@@ -178,10 +178,75 @@ jobs:
         usd_version: ${{matrix.usd_version}}
 
 #----------------------------------------------------------------------------
+# Cache VTK Dependency: Checkout and compile VTK if not cached
+#----------------------------------------------------------------------------
+  cache_vtk_dependency:
+    name: Cache VTK dependency
+    needs: [default_versions, detect_checkboxes, cache_dependencies]
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'cached CI')) || (github.ref == 'refs/heads/master') }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, windows-latest, macos-13, macos-14]
+        vtk_version: ["${{needs.default_versions.outputs.vtk_commit_sha}}", v9.4.2, v9.3.1, v9.2.6]
+        build_type: [standard]
+        exclude:
+          - os: macos-13
+            vtk_version: v9.3.1
+          - os: macos-13
+            vtk_version: v9.2.6
+          - os: macos-14
+            vtk_version: v9.3.1
+          - os: macos-14
+            vtk_version: v9.2.6
+        include:
+          - cpu: x86_64
+          - raytracing_label: raytracing
+          - openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+          - os: macos-14
+            cpu: arm64
+          - build_type: mindeps
+            os: ubuntu-22.04
+            vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
+            cpu: x86_64
+            raytracing_label: raytracing
+            openvdb_version: ${{needs.default_versions.outputs.openvdb_min_version}}
+          - build_type: no_optional_deps
+            os: ubuntu-22.04
+            vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
+            cpu: x86_64
+            raytracing_label: no-raytracing
+          - build_type: no_raytracing
+            os: ubuntu-22.04
+            vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
+            cpu: x86_64
+            raytracing_label: no-raytracing
+            openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+
+    runs-on: ${{matrix.os}}
+    container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        path: 'source'
+        fetch-depth: 1
+        lfs: false
+
+    - name: VTK dependency
+      uses: ./source/.github/actions/vtk-install-dep
+      with:
+        vtk_version: ${{matrix.vtk_version}}
+        raytracing_label: ${{matrix.raytracing_label}}
+        cpu: ${{matrix.cpu}}
+        openvdb_version: ${{matrix.openvdb_version}}
+
+#----------------------------------------------------------------------------
 # Windows CI: Build and test, cross-vtk build matrix
 #----------------------------------------------------------------------------
   windows:
-    needs: [cache_lfs, cache_dependencies, default_versions, detect_checkboxes]
+    needs: [cache_lfs, cache_vtk_dependency, default_versions, detect_checkboxes]
     if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Windows cached CI')) || (github.ref == 'refs/heads/master') }}
     strategy:
       fail-fast: false
@@ -257,7 +322,7 @@ jobs:
 # Linux CI: Build and test, cross-vtk build matrix
 #----------------------------------------------------------------------------
   linux:
-    needs: [cache_lfs, cache_dependencies, default_versions, detect_checkboxes]
+    needs: [cache_lfs, cache_vtk_dependency, default_versions, detect_checkboxes]
     if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Linux cached CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
@@ -414,7 +479,7 @@ jobs:
 # MacOS CI: Build and test, cross-vtk build matrix
 #----------------------------------------------------------------------------
   macos:
-    needs: [cache_lfs, cache_dependencies, default_versions, detect_checkboxes]
+    needs: [cache_lfs, cache_vtk_dependency, default_versions, detect_checkboxes]
     if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'macOS Intel cached CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
@@ -453,7 +518,7 @@ jobs:
 # MacOS ARM CI: Build and test, cross-vtk build matrix with a few optional builds
 #----------------------------------------------------------------------------
   macos_arm:
-    needs: [cache_lfs, cache_dependencies, default_versions, detect_checkboxes]
+    needs: [cache_lfs, cache_vtk_dependency, default_versions, detect_checkboxes]
     if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'macOS ARM cached CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
@@ -503,7 +568,7 @@ jobs:
 # Python packaging: Build and test the Python wheel
 #----------------------------------------------------------------------------
   python-packaging:
-    needs: [cache_lfs, cache_dependencies, default_versions, detect_checkboxes]
+    needs: [cache_lfs, cache_vtk_dependency, default_versions, detect_checkboxes]
     if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Other cached CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
@@ -557,7 +622,7 @@ jobs:
 # Coverage: Build and test on linux with last VTK with coverage option
 #----------------------------------------------------------------------------
   coverage:
-    needs: [cache_lfs, cache_dependencies, default_versions, detect_checkboxes]
+    needs: [cache_lfs, cache_vtk_dependency, default_versions, detect_checkboxes]
     if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Coverage cached CI')) || (github.ref == 'refs/heads/master') }}
 
     runs-on: ubuntu-22.04
@@ -598,7 +663,7 @@ jobs:
 # "memory" returns false positives in VTK:
 # https://stackoverflow.com/questions/60097307/memory-sanitizer-reports-use-of-uninitialized-value-in-global-object-constructio
   sanitizer:
-    needs: [cache_lfs, cache_dependencies, default_versions, detect_checkboxes]
+    needs: [cache_lfs, cache_vtk_dependency, default_versions, detect_checkboxes]
     if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Other cached CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
@@ -640,7 +705,7 @@ jobs:
 # static-analysis: Run static analysis on linux
 #----------------------------------------------------------------------------
   static-analysis:
-    needs: [cache_lfs, cache_dependencies, default_versions, detect_checkboxes]
+    needs: [cache_lfs, cache_vtk_dependency, default_versions, detect_checkboxes]
     if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Analysis cached CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
@@ -679,7 +744,7 @@ jobs:
 # external-build: Check build of F3D as sub-project
 #----------------------------------------------------------------------------
   external-build:
-    needs: [cache_dependencies, default_versions, detect_checkboxes]
+    needs: [cache_vtk_dependency, default_versions, detect_checkboxes]
     if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Other cached CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
