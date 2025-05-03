@@ -1,10 +1,9 @@
-name: 'WebAssembly CI'
-description: 'WebAssembly CI'
+name: "WebAssembly CI"
+description: "WebAssembly CI"
 
 runs:
   using: "composite"
   steps:
-
     - name: Configure
       shell: bash
       working-directory: ${{github.workspace}}

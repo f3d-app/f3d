@@ -1,14 +1,13 @@
-name: 'Android CI'
-description: 'Android CI'
+name: "Android CI"
+description: "Android CI"
 inputs:
   arch:
-    description: 'Android arch to build'
+    description: "Android arch to build"
     required: true
 
 runs:
   using: "composite"
   steps:
-
     - name: Check required inputs
       shell: bash
       run: |
@@ -18,8 +17,8 @@ runs:
       shell: bash
       working-directory: ${{github.workspace}}
       run: |
-         mkdir build
-         mkdir install
+        mkdir build
+        mkdir install
 
     - name: Configure
       shell: bash
