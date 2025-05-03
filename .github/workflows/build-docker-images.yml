@@ -100,5 +100,6 @@ jobs:
         wait_workflow: true
 
     - uses: marocchino/sticky-pull-request-comment@v2
+      if: ${{env.F3D_DOCKER_IMAGE_AVAILABLE == '1'}}
       with:
         message: New docker images have been generated
