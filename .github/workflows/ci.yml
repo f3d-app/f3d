@@ -249,7 +249,7 @@ jobs:
         openvdb_version: ${{matrix.openvdb_version}}
 
     - name: Install Raytracing Dependencies
-      if: inputs.raytracing_label == 'raytracing'
+      if: matrix.raytracing_label == 'raytracing'
       uses: ./source/.github/actions/ospray-sb-install-dep
       with:
         cpu: ${{matrix.cpu}}
