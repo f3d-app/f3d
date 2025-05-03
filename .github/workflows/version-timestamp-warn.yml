@@ -2,7 +2,7 @@ name: Versions timestamp Warning
 on:
   pull_request_target:
     paths:
-      - '.github/workflows/versions.json'
+      - ".github/workflows/versions.json"
 
 jobs:
   versions-timestamp-warn:

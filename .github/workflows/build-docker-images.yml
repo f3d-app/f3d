@@ -5,15 +5,14 @@ on:
       - master
       - release
     paths-ignore:
-      - 'doc/**'
-      - '_config.yml'
+      - "doc/**"
+      - "_config.yml"
 
 name: Build docker images
 jobs:
-
-#----------------------------------------------------------------------------
-# Detect checkboxes are checked
-#----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # Detect checkboxes are checked
+  #----------------------------------------------------------------------------
   detect_checkboxes:
     name: Detect Checkboxes
     runs-on: ubuntu-latest
@@ -36,9 +35,9 @@ jobs:
           echo "checked=${{ steps.detect.outputs.checked }}"
           echo "unchecked=${{ steps.detect.outputs.unchecked }}"
 
-#----------------------------------------------------------------------------
-# Default versions: Set default version for all dependencies
-#----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # Default versions: Set default version for all dependencies
+  #----------------------------------------------------------------------------
   default_versions:
     runs-on: ubuntu-22.04
     name: Set default versions
@@ -48,58 +47,56 @@ jobs:
       timestamp: ${{ steps.set_default_versions.outputs.timestamp }}
 
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{github.event.pull_request.head.ref}}
+          repository: ${{github.event.pull_request.head.repo.full_name}}
+          path: "source"
+          fetch-depth: 1
+          lfs: false
 
-    - uses: actions/checkout@v4
-      with:
-        ref: ${{github.event.pull_request.head.ref}}
-        repository: ${{github.event.pull_request.head.repo.full_name}}
-        path: 'source'
-        fetch-depth: 1
-        lfs: false
+      - name: Set default versions
+        id: set_default_versions
+        uses: f3d-app/default-versions-action@main
+        with:
+          file: ./source/.github/workflows/versions.json
 
-    - name: Set default versions
-      id: set_default_versions
-      uses: f3d-app/default-versions-action@main
-      with:
-        file: ./source/.github/workflows/versions.json
-
-#----------------------------------------------------------------------------
-# Build android/wasm docker images if needed
-#----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # Build android/wasm docker images if needed
+  #----------------------------------------------------------------------------
   build_docker_images:
     needs: default_versions
     name: Build docker images
     runs-on: ubuntu-latest
     steps:
+      - name: Check docker images exists
+        shell: bash
+        working-directory: ${{github.workspace}}
+        run: |
+          res=0
+          docker manifest inspect ghcr.io/f3d-app/f3d-wasm:${{needs.default_versions.outputs.timestamp}} || res=$?
+          docker manifest inspect ghcr.io/f3d-app/f3d-android-armeabi-v7a:${{needs.default_versions.outputs.timestamp}} || res=$?
+          docker manifest inspect ghcr.io/f3d-app/f3d-android-arm64-v8a:${{needs.default_versions.outputs.timestamp}} || res=$?
+          docker manifest inspect ghcr.io/f3d-app/f3d-android-x86:${{needs.default_versions.outputs.timestamp}} || res=$?
+          docker manifest inspect ghcr.io/f3d-app/f3d-android-x86_64:${{needs.default_versions.outputs.timestamp}} || res=$?
+          echo "F3D_DOCKER_IMAGE_AVAILABLE=$res" >> $GITHUB_ENV
 
-    - name: Check docker images exists
-      shell: bash
-      working-directory: ${{github.workspace}}
-      run: |
-         res=0
-         docker manifest inspect ghcr.io/f3d-app/f3d-wasm:${{needs.default_versions.outputs.timestamp}} || res=$?
-         docker manifest inspect ghcr.io/f3d-app/f3d-android-armeabi-v7a:${{needs.default_versions.outputs.timestamp}} || res=$?
-         docker manifest inspect ghcr.io/f3d-app/f3d-android-arm64-v8a:${{needs.default_versions.outputs.timestamp}} || res=$?
-         docker manifest inspect ghcr.io/f3d-app/f3d-android-x86:${{needs.default_versions.outputs.timestamp}} || res=$?
-         docker manifest inspect ghcr.io/f3d-app/f3d-android-x86_64:${{needs.default_versions.outputs.timestamp}} || res=$?
-         echo "F3D_DOCKER_IMAGE_AVAILABLE=$res" >> $GITHUB_ENV
+      # This require a F3D_DOCKER_CI_DISPATCH secret contain a PAT with read and write admin access
+      - name: Trigger docker images build
+        if: ${{env.F3D_DOCKER_IMAGE_AVAILABLE == '1'}}
+        uses: convictional/trigger-workflow-and-wait@v1.6.5
+        with:
+          owner: f3d-app
+          repo: f3d-docker-images
+          github_token: ${{ secrets.F3D_DOCKER_CI_DISPATCH }}
+          workflow_file_name: build_docker_image.yml
+          wait_interval: 60
+          client_payload: '{"versions_file_url": "https://raw.githubusercontent.com/${{github.event.pull_request.head.repo.full_name}}/${{github.event.pull_request.head.ref}}/.github/workflows/versions.json"}'
+          propagate_failure: true
+          trigger_workflow: true
+          wait_workflow: true
 
-    # This require a F3D_DOCKER_CI_DISPATCH secret contain a PAT with read and write admin access
-    - name: Trigger docker images build
-      if: ${{env.F3D_DOCKER_IMAGE_AVAILABLE == '1'}}
-      uses: convictional/trigger-workflow-and-wait@v1.6.5
-      with:
-        owner: f3d-app
-        repo: f3d-docker-images
-        github_token: ${{ secrets.F3D_DOCKER_CI_DISPATCH }}
-        workflow_file_name: build_docker_image.yml
-        wait_interval: 60
-        client_payload: '{"versions_file_url": "https://raw.githubusercontent.com/${{github.event.pull_request.head.repo.full_name}}/${{github.event.pull_request.head.ref}}/.github/workflows/versions.json"}'
-        propagate_failure: true
-        trigger_workflow: true
-        wait_workflow: true
-
-    - uses: marocchino/sticky-pull-request-comment@v2
-      if: ${{env.F3D_DOCKER_IMAGE_AVAILABLE == '1'}}
-      with:
-        message: New docker images have been generated
+      - uses: marocchino/sticky-pull-request-comment@v2
+        if: ${{env.F3D_DOCKER_IMAGE_AVAILABLE == '1'}}
+        with:
+          message: New docker images have been generated

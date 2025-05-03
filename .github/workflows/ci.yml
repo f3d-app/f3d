@@ -4,21 +4,20 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     paths-ignore:
-      - 'doc/**'
-      - '_config.yml'
+      - "doc/**"
+      - "_config.yml"
   push:
     branches:
       - master
 
 concurrency:
-  group: '${{ github.workflow }}-${{ github.ref_name }}'
+  group: "${{ github.workflow }}-${{ github.ref_name }}"
   cancel-in-progress: true
 
 jobs:
-
-#----------------------------------------------------------------------------
-# Detect checkboxes are checked
-#----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # Detect checkboxes are checked
+  #----------------------------------------------------------------------------
   detect_checkboxes:
     name: Detect Checkboxes
     runs-on: ubuntu-latest
@@ -43,9 +42,9 @@ jobs:
           echo "unchecked=${{ steps.detect.outputs.unchecked }}"
           echo "${{ github.ref }}"
 
-#----------------------------------------------------------------------------
-# Default versions: Set default version for all dependencies
-#----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # Default versions: Set default version for all dependencies
+  #----------------------------------------------------------------------------
   default_versions:
     runs-on: ubuntu-22.04
     name: Set default versions
@@ -76,23 +75,22 @@ jobs:
       timestamp: ${{ steps.set_default_versions.outputs.timestamp }}
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 1
+          lfs: false
 
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        path: 'source'
-        fetch-depth: 1
-        lfs: false
+      - name: Set default versions
+        id: set_default_versions
+        uses: f3d-app/default-versions-action@main
+        with:
+          file: ./source/.github/workflows/versions.json
 
-    - name: Set default versions
-      id: set_default_versions
-      uses: f3d-app/default-versions-action@main
-      with:
-        file: ./source/.github/workflows/versions.json
-
-#----------------------------------------------------------------------------
-# Cache LFS: Checkout LFS data and update the cache to limit LFS bandwidth
-#----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # Cache LFS: Checkout LFS data and update the cache to limit LFS bandwidth
+  #----------------------------------------------------------------------------
   cache_lfs:
     runs-on: ubuntu-22.04
     name: Update LFS data cache
@@ -101,23 +99,22 @@ jobs:
     outputs:
       lfs_sha: ${{ steps.lfs_sha_recover.outputs.lfs_sha }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 1
+          lfs: false
 
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        path: 'source'
-        fetch-depth: 1
-        lfs: false
+      - name: Cache LFS Data
+        id: lfs_sha_recover
+        uses: f3d-app/lfs-data-cache-action@v1
+        with:
+          cache_postfix: cache-0
 
-    - name: Cache LFS Data
-      id: lfs_sha_recover
-      uses: f3d-app/lfs-data-cache-action@v1
-      with:
-        cache_postfix: cache-0
-
-#----------------------------------------------------------------------------
-# Cache Dependencies: Checkout and compile all dependencies but VTK if not cached
-#----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # Cache Dependencies: Checkout and compile all dependencies but VTK if not cached
+  #----------------------------------------------------------------------------
   cache_dependencies:
     name: Cache dependencies
     needs: [default_versions, detect_checkboxes]
@@ -154,31 +151,30 @@ jobs:
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 1
+          lfs: false
 
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        path: 'source'
-        fetch-depth: 1
-        lfs: false
+      - name: Generic Dependencies
+        uses: ./source/.github/actions/generic-dependencies
+        with:
+          raytracing_label: raytracing
+          cpu: ${{matrix.cpu}}
+          alembic_version: ${{matrix.alembic_version}}
+          assimp_version: ${{matrix.assimp_version}}
+          draco_version: ${{matrix.draco_version}}
+          occt_version: ${{matrix.occt_version}}
+          openexr_version: ${{matrix.openexr_version}}
+          openvdb_version: ${{matrix.openvdb_version}}
+          pybind11_version: ${{matrix.pybind11_version}}
+          usd_version: ${{matrix.usd_version}}
 
-    - name: Generic Dependencies
-      uses: ./source/.github/actions/generic-dependencies
-      with:
-        raytracing_label: raytracing
-        cpu: ${{matrix.cpu}}
-        alembic_version: ${{matrix.alembic_version}}
-        assimp_version: ${{matrix.assimp_version}}
-        draco_version: ${{matrix.draco_version}}
-        occt_version: ${{matrix.occt_version}}
-        openexr_version: ${{matrix.openexr_version}}
-        openvdb_version: ${{matrix.openvdb_version}}
-        pybind11_version: ${{matrix.pybind11_version}}
-        usd_version: ${{matrix.usd_version}}
-
-#----------------------------------------------------------------------------
-# Cache VTK Dependency: Checkout and compile VTK if not cached
-#----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # Cache VTK Dependency: Checkout and compile VTK if not cached
+  #----------------------------------------------------------------------------
   cache_vtk_dependency:
     name: Cache VTK dependency
     needs: [default_versions, detect_checkboxes, cache_dependencies]
@@ -187,7 +183,13 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-22.04, windows-latest, macos-13, macos-14]
-        vtk_version: ["${{needs.default_versions.outputs.vtk_commit_sha}}", v9.4.2, v9.3.1, v9.2.6]
+        vtk_version:
+          [
+            "${{needs.default_versions.outputs.vtk_commit_sha}}",
+            v9.4.2,
+            v9.3.1,
+            v9.2.6,
+          ]
         build_type: [standard]
         exclude:
           - os: macos-13
@@ -225,52 +227,58 @@ jobs:
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 1
+          lfs: false
 
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        path: 'source'
-        fetch-depth: 1
-        lfs: false
+      - name: Dependencies Dir
+        shell: bash
+        working-directory: ${{github.workspace}}
+        run: |
+          mkdir dependencies
+          cd dependencies
+          mkdir install
 
-    - name: Dependencies Dir
-      shell: bash
-      working-directory: ${{github.workspace}}
-      run: |
-        mkdir dependencies
-        cd dependencies
-        mkdir install
+      - name: Install VTK dependencies
+        uses: ./source/.github/actions/vtk-dependencies
+        with:
+          cpu: ${{matrix.cpu}}
+          openvdb_version: ${{matrix.openvdb_version}}
 
-    - name: Install VTK dependencies
-      uses: ./source/.github/actions/vtk-dependencies
-      with:
-        cpu: ${{matrix.cpu}}
-        openvdb_version: ${{matrix.openvdb_version}}
+      - name: Install Raytracing Dependencies
+        if: matrix.raytracing_label == 'raytracing'
+        uses: ./source/.github/actions/ospray-sb-install-dep
+        with:
+          cpu: ${{matrix.cpu}}
 
-    - name: Install Raytracing Dependencies
-      if: matrix.raytracing_label == 'raytracing'
-      uses: ./source/.github/actions/ospray-sb-install-dep
-      with:
-        cpu: ${{matrix.cpu}}
+      - name: VTK dependency
+        uses: ./source/.github/actions/vtk-install-dep
+        with:
+          vtk_version: ${{matrix.vtk_version}}
+          raytracing_label: ${{matrix.raytracing_label}}
+          cpu: ${{matrix.cpu}}
+          openvdb_version: ${{matrix.openvdb_version}}
 
-    - name: VTK dependency
-      uses: ./source/.github/actions/vtk-install-dep
-      with:
-        vtk_version: ${{matrix.vtk_version}}
-        raytracing_label: ${{matrix.raytracing_label}}
-        cpu: ${{matrix.cpu}}
-        openvdb_version: ${{matrix.openvdb_version}}
-
-#----------------------------------------------------------------------------
-# Windows CI: Build and test, cross-vtk build matrix
-#----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # Windows CI: Build and test, cross-vtk build matrix
+  #----------------------------------------------------------------------------
   windows:
-    needs: [cache_lfs, cache_vtk_dependency, default_versions, detect_checkboxes]
+    needs:
+      [cache_lfs, cache_vtk_dependency, default_versions, detect_checkboxes]
     if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Windows cached CI')) || (github.ref == 'refs/heads/master') }}
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: ["${{needs.default_versions.outputs.vtk_commit_sha}}", v9.4.2, v9.3.1, v9.2.6]
+        vtk_version:
+          [
+            "${{needs.default_versions.outputs.vtk_commit_sha}}",
+            v9.4.2,
+            v9.3.1,
+            v9.2.6,
+          ]
         static_label: [no-static]
         include:
           - vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
@@ -279,34 +287,34 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        path: 'source'
-        fetch-depth: 0
-        lfs: false
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 0
+          lfs: false
 
-    - name: Generic CI
-      uses: ./source/.github/actions/generic-ci
-      with:
-        vtk_version: ${{matrix.vtk_version}}
-        raytracing_label: raytracing
-        static_label: ${{matrix.static_label}}
-        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-        assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-        draco_version: ${{needs.default_versions.outputs.draco_version}}
-        occt_version: ${{needs.default_versions.outputs.occt_version}}
-        openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-        pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-        python_version: ${{needs.default_versions.outputs.python_version}}
-        usd_version: ${{needs.default_versions.outputs.usd_version}}
-        java_version: ${{needs.default_versions.outputs.java_version}}
+      - name: Generic CI
+        uses: ./source/.github/actions/generic-ci
+        with:
+          vtk_version: ${{matrix.vtk_version}}
+          raytracing_label: raytracing
+          static_label: ${{matrix.static_label}}
+          lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+          alembic_version: ${{needs.default_versions.outputs.alembic_version}}
+          assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          draco_version: ${{needs.default_versions.outputs.draco_version}}
+          occt_version: ${{needs.default_versions.outputs.occt_version}}
+          openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+          openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+          pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
+          python_version: ${{needs.default_versions.outputs.python_version}}
+          usd_version: ${{needs.default_versions.outputs.usd_version}}
+          java_version: ${{needs.default_versions.outputs.java_version}}
 
-#----------------------------------------------------------------------------
-# Linux fast CI: Build and test a single fast CI
-#----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # Linux fast CI: Build and test a single fast CI
+  #----------------------------------------------------------------------------
   linux_fast:
     needs: [cache_lfs, detect_checkboxes]
     if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Fast CI')) || (github.ref == 'refs/heads/master') }}
@@ -318,36 +326,43 @@ jobs:
       DISPLAY: :0
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        path: 'source'
-        fetch-depth: 0
-        lfs: false
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 0
+          lfs: false
 
-    - name: Generic CI
-      uses: ./source/.github/actions/generic-ci
-      with:
-        build_type: fast
-        vtk_version: v9.4.2
-        raytracing_label: no-raytracing
-        rendering_backend: auto
-        optional_deps_label: no-optional-deps
-        exclude_deprecated_label: exclude-deprecated
-        static_label: no-static
-        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+      - name: Generic CI
+        uses: ./source/.github/actions/generic-ci
+        with:
+          build_type: fast
+          vtk_version: v9.4.2
+          raytracing_label: no-raytracing
+          rendering_backend: auto
+          optional_deps_label: no-optional-deps
+          exclude_deprecated_label: exclude-deprecated
+          static_label: no-static
+          lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
-#----------------------------------------------------------------------------
-# Linux CI: Build and test, cross-vtk build matrix
-#----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # Linux CI: Build and test, cross-vtk build matrix
+  #----------------------------------------------------------------------------
   linux:
-    needs: [cache_lfs, cache_vtk_dependency, default_versions, detect_checkboxes]
+    needs:
+      [cache_lfs, cache_vtk_dependency, default_versions, detect_checkboxes]
     if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Linux cached CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: ["${{needs.default_versions.outputs.vtk_commit_sha}}", v9.4.2, v9.3.1, v9.2.6]
+        vtk_version:
+          [
+            "${{needs.default_versions.outputs.vtk_commit_sha}}",
+            v9.4.2,
+            v9.3.1,
+            v9.2.6,
+          ]
         build_type: [standard]
         include:
           - raytracing_label: raytracing
@@ -465,85 +480,97 @@ jobs:
       DISPLAY: :0
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        path: 'source'
-        fetch-depth: 0
-        lfs: false
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 0
+          lfs: false
 
-    - name: Generic CI
-      uses: ./source/.github/actions/generic-ci
-      with:
-        build_type: ${{matrix.build_type}}
-        vtk_version: ${{matrix.vtk_version}}
-        raytracing_label: ${{matrix.raytracing_label}}
-        rendering_backend: ${{matrix.rendering_backend}}
-        optional_deps_label: ${{matrix.optional_deps_label}}
-        exclude_deprecated_label: ${{matrix.exclude_deprecated_label}}
-        static_label: ${{matrix.static_label}}
-        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        alembic_version: ${{matrix.alembic_version}}
-        assimp_version: ${{matrix.assimp_version}}
-        draco_version: ${{matrix.draco_version}}
-        occt_version: ${{matrix.occt_version}}
-        openexr_version: ${{matrix.openexr_version}}
-        openvdb_version: ${{matrix.openvdb_version}}
-        pybind11_version: ${{matrix.pybind11_version}}
-        python_version: ${{matrix.python_version}}
-        usd_version: ${{matrix.usd_version}}
-        java_version: ${{matrix.java_version}}
+      - name: Generic CI
+        uses: ./source/.github/actions/generic-ci
+        with:
+          build_type: ${{matrix.build_type}}
+          vtk_version: ${{matrix.vtk_version}}
+          raytracing_label: ${{matrix.raytracing_label}}
+          rendering_backend: ${{matrix.rendering_backend}}
+          optional_deps_label: ${{matrix.optional_deps_label}}
+          exclude_deprecated_label: ${{matrix.exclude_deprecated_label}}
+          static_label: ${{matrix.static_label}}
+          lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+          alembic_version: ${{matrix.alembic_version}}
+          assimp_version: ${{matrix.assimp_version}}
+          draco_version: ${{matrix.draco_version}}
+          occt_version: ${{matrix.occt_version}}
+          openexr_version: ${{matrix.openexr_version}}
+          openvdb_version: ${{matrix.openvdb_version}}
+          pybind11_version: ${{matrix.pybind11_version}}
+          python_version: ${{matrix.python_version}}
+          usd_version: ${{matrix.usd_version}}
+          java_version: ${{matrix.java_version}}
 
-#----------------------------------------------------------------------------
-# MacOS CI: Build and test, cross-vtk build matrix
-#----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # MacOS CI: Build and test, cross-vtk build matrix
+  #----------------------------------------------------------------------------
   macos:
-    needs: [cache_lfs, cache_vtk_dependency, default_versions, detect_checkboxes]
+    needs:
+      [cache_lfs, cache_vtk_dependency, default_versions, detect_checkboxes]
     if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'macOS Intel cached CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: ["${{needs.default_versions.outputs.vtk_commit_sha}}", v9.4.2, v9.3.1, v9.2.6]
+        vtk_version:
+          [
+            "${{needs.default_versions.outputs.vtk_commit_sha}}",
+            v9.4.2,
+            v9.3.1,
+            v9.2.6,
+          ]
 
     runs-on: macos-13
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        path: 'source'
-        fetch-depth: 0
-        lfs: false
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 0
+          lfs: false
 
-    - name: Generic CI
-      uses: ./source/.github/actions/generic-ci
-      with:
-        vtk_version: ${{matrix.vtk_version}}
-        raytracing_label: raytracing
-        cpu: x86_64
-        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-        assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-        draco_version: ${{needs.default_versions.outputs.draco_version}}
-        occt_version: ${{needs.default_versions.outputs.occt_version}}
-        openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-        pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-        python_version: ${{needs.default_versions.outputs.python_version}}
-        usd_version: ${{needs.default_versions.outputs.usd_version}}
+      - name: Generic CI
+        uses: ./source/.github/actions/generic-ci
+        with:
+          vtk_version: ${{matrix.vtk_version}}
+          raytracing_label: raytracing
+          cpu: x86_64
+          lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+          alembic_version: ${{needs.default_versions.outputs.alembic_version}}
+          assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          draco_version: ${{needs.default_versions.outputs.draco_version}}
+          occt_version: ${{needs.default_versions.outputs.occt_version}}
+          openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+          openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+          pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
+          python_version: ${{needs.default_versions.outputs.python_version}}
+          usd_version: ${{needs.default_versions.outputs.usd_version}}
 
-#----------------------------------------------------------------------------
-# MacOS ARM CI: Build and test, cross-vtk build matrix with a few optional builds
-#----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # MacOS ARM CI: Build and test, cross-vtk build matrix with a few optional builds
+  #----------------------------------------------------------------------------
   macos_arm:
-    needs: [cache_lfs, cache_vtk_dependency, default_versions, detect_checkboxes]
+    needs:
+      [cache_lfs, cache_vtk_dependency, default_versions, detect_checkboxes]
     if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'macOS ARM cached CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: ["${{needs.default_versions.outputs.vtk_commit_sha}}", v9.4.2, v9.3.1] # VTK 9.2.6 not compatible with recent clang version on macOS
+        vtk_version: [
+            "${{needs.default_versions.outputs.vtk_commit_sha}}",
+            v9.4.2,
+            v9.3.1,
+          ] # VTK 9.2.6 not compatible with recent clang version on macOS
         bundle_label: [no-bundle]
         static_label: [no-static]
         include:
@@ -557,55 +584,56 @@ jobs:
     runs-on: macos-14
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        path: 'source'
-        fetch-depth: 0
-        lfs: false
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 0
+          lfs: false
 
-    - name: Generic CI
-      uses: ./source/.github/actions/generic-ci
-      with:
-        vtk_version: ${{matrix.vtk_version}}
-        raytracing_label: raytracing
-        bundle_label: ${{matrix.bundle_label}}
-        static_label: ${{matrix.static_label}}
-        cpu: arm64
-        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-        assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-        draco_version: ${{needs.default_versions.outputs.draco_version}}
-        occt_version: ${{needs.default_versions.outputs.occt_version}}
-        openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-        pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-        python_version: ${{needs.default_versions.outputs.python_version}}
-        usd_version: ${{needs.default_versions.outputs.usd_version}}
+      - name: Generic CI
+        uses: ./source/.github/actions/generic-ci
+        with:
+          vtk_version: ${{matrix.vtk_version}}
+          raytracing_label: raytracing
+          bundle_label: ${{matrix.bundle_label}}
+          static_label: ${{matrix.static_label}}
+          cpu: arm64
+          lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+          alembic_version: ${{needs.default_versions.outputs.alembic_version}}
+          assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          draco_version: ${{needs.default_versions.outputs.draco_version}}
+          occt_version: ${{needs.default_versions.outputs.occt_version}}
+          openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+          openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+          pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
+          python_version: ${{needs.default_versions.outputs.python_version}}
+          usd_version: ${{needs.default_versions.outputs.usd_version}}
 
-#----------------------------------------------------------------------------
-# Python packaging: Build and test the Python wheel
-#----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # Python packaging: Build and test the Python wheel
+  #----------------------------------------------------------------------------
   python-packaging:
-    needs: [cache_lfs, cache_vtk_dependency, default_versions, detect_checkboxes]
+    needs:
+      [cache_lfs, cache_vtk_dependency, default_versions, detect_checkboxes]
     if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Other cached CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-22.04, windows-latest, macos-13]
-        python_version: ['3.11']
+        python_version: ["3.11"]
         include:
           - os: ubuntu-22.04
-            python_version: '3.9'
+            python_version: "3.9"
           - os: ubuntu-22.04
-            python_version: '3.10'
+            python_version: "3.10"
           - os: ubuntu-22.04
-            python_version: '3.11'
+            python_version: "3.11"
           - os: ubuntu-22.04
-            python_version: '3.12'
+            python_version: "3.12"
           - os: ubuntu-22.04
-            python_version: '3.13'
+            python_version: "3.13"
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
@@ -614,34 +642,34 @@ jobs:
       DISPLAY: :0
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 0
+          lfs: false
 
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        path: 'source'
-        fetch-depth: 0
-        lfs: false
+      - name: Python CI
+        uses: ./source/.github/actions/python-ci
+        with:
+          lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+          python_version: ${{matrix.python_version}}
+          alembic_version: ${{needs.default_versions.outputs.alembic_version}}
+          assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          draco_version: ${{needs.default_versions.outputs.draco_version}}
+          occt_version: ${{needs.default_versions.outputs.occt_version}}
+          openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+          openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+          pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
+          usd_version: ${{needs.default_versions.outputs.usd_version}}
+          vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
 
-    - name: Python CI
-      uses: ./source/.github/actions/python-ci
-      with:
-        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        python_version: ${{matrix.python_version}}
-        alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-        assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-        draco_version: ${{needs.default_versions.outputs.draco_version}}
-        occt_version: ${{needs.default_versions.outputs.occt_version}}
-        openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-        pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
-        usd_version: ${{needs.default_versions.outputs.usd_version}}
-        vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
-
-#----------------------------------------------------------------------------
-# Coverage: Build and test on linux with last VTK with coverage option
-#----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # Coverage: Build and test on linux with last VTK with coverage option
+  #----------------------------------------------------------------------------
   coverage:
-    needs: [cache_lfs, cache_vtk_dependency, default_versions, detect_checkboxes]
+    needs:
+      [cache_lfs, cache_vtk_dependency, default_versions, detect_checkboxes]
     if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Coverage cached CI')) || (github.ref == 'refs/heads/master') }}
 
     runs-on: ubuntu-22.04
@@ -653,36 +681,36 @@ jobs:
       F3D_PLUGINS_PATH: /dummy1:/dummy2
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 0
+          lfs: false
 
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        path: 'source'
-        fetch-depth: 0
-        lfs: false
+      - name: Coverage CI
+        uses: ./source/.github/actions/coverage-ci
+        with:
+          lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+          codecov_token: ${{secrets.CODECOV_TOKEN}}
+          alembic_version: ${{needs.default_versions.outputs.alembic_version}}
+          assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          draco_version: ${{needs.default_versions.outputs.draco_version}}
+          occt_version: ${{needs.default_versions.outputs.occt_version}}
+          openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+          openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+          usd_version: ${{needs.default_versions.outputs.usd_version}}
+          vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
 
-    - name: Coverage CI
-      uses: ./source/.github/actions/coverage-ci
-      with:
-        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        codecov_token: ${{secrets.CODECOV_TOKEN}}
-        alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-        assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-        draco_version: ${{needs.default_versions.outputs.draco_version}}
-        occt_version: ${{needs.default_versions.outputs.occt_version}}
-        openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-        usd_version: ${{needs.default_versions.outputs.usd_version}}
-        vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
-
-#----------------------------------------------------------------------------
-# Sanitizer: Build and test on linux with last VTK with sanitizer options
-#----------------------------------------------------------------------------
-# "leak" is run by default with "address" so we do not need to run it in CI
-# "memory" returns false positives in VTK:
-# https://stackoverflow.com/questions/60097307/memory-sanitizer-reports-use-of-uninitialized-value-in-global-object-constructio
+  #----------------------------------------------------------------------------
+  # Sanitizer: Build and test on linux with last VTK with sanitizer options
+  #----------------------------------------------------------------------------
+  # "leak" is run by default with "address" so we do not need to run it in CI
+  # "memory" returns false positives in VTK:
+  # https://stackoverflow.com/questions/60097307/memory-sanitizer-reports-use-of-uninitialized-value-in-global-object-constructio
   sanitizer:
-    needs: [cache_lfs, cache_vtk_dependency, default_versions, detect_checkboxes]
+    needs:
+      [cache_lfs, cache_vtk_dependency, default_versions, detect_checkboxes]
     if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Other cached CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
@@ -700,31 +728,31 @@ jobs:
       VTK_SMP_BACKEND_IN_USE: Sequential
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 0
+          lfs: false
 
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        path: 'source'
-        fetch-depth: 0
-        lfs: false
+      - name: Sanitizer CI
+        uses: ./source/.github/actions/sanitizer-ci
+        with:
+          sanitizer_type: ${{matrix.sanitizer_type}}
+          lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+          alembic_version: ${{needs.default_versions.outputs.alembic_version}}
+          assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          draco_version: ${{needs.default_versions.outputs.draco_version}}
+          occt_version: ${{needs.default_versions.outputs.occt_version}}
+          openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+          vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
 
-    - name: Sanitizer CI
-      uses: ./source/.github/actions/sanitizer-ci
-      with:
-        sanitizer_type: ${{matrix.sanitizer_type}}
-        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-        assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-        draco_version: ${{needs.default_versions.outputs.draco_version}}
-        occt_version: ${{needs.default_versions.outputs.occt_version}}
-        openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-        vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
-
-#----------------------------------------------------------------------------
-# static-analysis: Run static analysis on linux
-#----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # static-analysis: Run static analysis on linux
+  #----------------------------------------------------------------------------
   static-analysis:
-    needs: [cache_lfs, cache_vtk_dependency, default_versions, detect_checkboxes]
+    needs:
+      [cache_lfs, cache_vtk_dependency, default_versions, detect_checkboxes]
     if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Analysis cached CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
@@ -738,30 +766,29 @@ jobs:
       CXX: clang++
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 0
+          lfs: false
 
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        path: 'source'
-        fetch-depth: 0
-        lfs: false
+      - name: Static analysis CI
+        uses: ./source/.github/actions/static-analysis-ci
+        with:
+          lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+          alembic_version: ${{needs.default_versions.outputs.alembic_version}}
+          assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          draco_version: ${{needs.default_versions.outputs.draco_version}}
+          occt_version: ${{needs.default_versions.outputs.occt_version}}
+          openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+          openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+          usd_version: ${{needs.default_versions.outputs.usd_version}}
+          vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
 
-    - name: Static analysis CI
-      uses: ./source/.github/actions/static-analysis-ci
-      with:
-        lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-        alembic_version: ${{needs.default_versions.outputs.alembic_version}}
-        assimp_version: ${{needs.default_versions.outputs.assimp_version}}
-        draco_version: ${{needs.default_versions.outputs.draco_version}}
-        occt_version: ${{needs.default_versions.outputs.occt_version}}
-        openexr_version: ${{needs.default_versions.outputs.openexr_version}}
-        openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
-        usd_version: ${{needs.default_versions.outputs.usd_version}}
-        vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
-
-#----------------------------------------------------------------------------
-# external-build: Check build of F3D as sub-project
-#----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # external-build: Check build of F3D as sub-project
+  #----------------------------------------------------------------------------
   external-build:
     needs: [cache_vtk_dependency, default_versions, detect_checkboxes]
     if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Other cached CI')) || (github.ref == 'refs/heads/master') }}
@@ -773,22 +800,21 @@ jobs:
     container: ghcr.io/f3d-app/f3d-ci
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source/f3d"
+          fetch-depth: 0
+          lfs: false
 
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        path: 'source/f3d'
-        fetch-depth: 0
-        lfs: false
+      - name: External build CI
+        uses: ./source/f3d/.github/actions/external-build-ci
+        with:
+          vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
 
-    - name: External build CI
-      uses: ./source/f3d/.github/actions/external-build-ci
-      with:
-        vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
-
-#----------------------------------------------------------------------------
-# Check android/wasm docker images
-#----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # Check android/wasm docker images
+  #----------------------------------------------------------------------------
   check_docker_images:
     needs: default_versions
 
@@ -796,16 +822,16 @@ jobs:
 
     # Pull request can require a rebuild of docker image, wait for it to be done
     steps:
-    - name: Wait on build-docker-images workflow
-      if: ${{ github.event_name == 'pull_request' }}
-      uses: ArcticLampyrid/action-wait-for-workflow@v1.2.0
-      with:
-        workflow: build-docker-images.yml
-        allowed-conclusions: success
+      - name: Wait on build-docker-images workflow
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: ArcticLampyrid/action-wait-for-workflow@v1.2.0
+        with:
+          workflow: build-docker-images.yml
+          allowed-conclusions: success
 
-#----------------------------------------------------------------------------
-# android: Check build of F3D for android
-#----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # android: Check build of F3D for android
+  #----------------------------------------------------------------------------
   android:
     needs: [default_versions, detect_checkboxes, check_docker_images]
     if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Android docker CI')) || (github.ref == 'refs/heads/master') }}
@@ -819,22 +845,21 @@ jobs:
     container: ghcr.io/f3d-app/f3d-android-${{ matrix.arch }}:${{needs.default_versions.outputs.timestamp}}
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 0
+          lfs: false
 
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        path: 'source'
-        fetch-depth: 0
-        lfs: false
+      - name: Android CI
+        uses: ./source/.github/actions/android-ci
+        with:
+          arch: ${{matrix.arch}}
 
-    - name: Android CI
-      uses: ./source/.github/actions/android-ci
-      with:
-        arch: ${{matrix.arch}}
-
-#----------------------------------------------------------------------------
-# webassembly: Build webassembly artifacts
-#----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # webassembly: Build webassembly artifacts
+  #----------------------------------------------------------------------------
   webassembly:
     needs: [default_versions, detect_checkboxes, check_docker_images]
     if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'WASM docker CI')) || (github.ref == 'refs/heads/master') }}
@@ -846,55 +871,53 @@ jobs:
     container: ghcr.io/f3d-app/f3d-wasm:${{needs.default_versions.outputs.timestamp}}
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 0
+          lfs: false
 
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        path: 'source'
-        fetch-depth: 0
-        lfs: false
+      - name: WebAssembly CI
+        uses: ./source/.github/actions/wasm-ci
 
-    - name: WebAssembly CI
-      uses: ./source/.github/actions/wasm-ci
-
-#----------------------------------------------------------------------------
-# generate website
-#----------------------------------------------------------------------------
+  #----------------------------------------------------------------------------
+  # generate website
+  #----------------------------------------------------------------------------
   generate-website:
     needs: webassembly
     name: Generate Website
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Checkout
-      uses: actions/checkout@v4
+      - name: Build Jekyll
+        uses: actions/jekyll-build-pages@v1
 
-    - name: Build Jekyll
-      uses: actions/jekyll-build-pages@v1
+      - name: Install doxygen and build doxygen doc
+        working-directory: ${{github.workspace}}
+        run: |
+          pip install "sphinx==5.3.0" "pydata-sphinx-theme==0.13.1" sphinx-book-theme exhale
+          sudo apt install doxygen
+          sphinx-build -M html ./library/doxygen ./library/doxygen/build/
+          sudo mv library/doxygen/build/html _site/doc/libf3d/doxygen
+          sphinx-build -M html ./vtkext/public/doxygen ./vtkext/public/doxygen/build/
+          sudo mv vtkext/public/doxygen/build/html _site/doc/libf3d/vtkext_doxygen
 
-    - name: Install doxygen and build doxygen doc
-      working-directory: ${{github.workspace}}
-      run: |
-        pip install "sphinx==5.3.0" "pydata-sphinx-theme==0.13.1" sphinx-book-theme exhale
-        sudo apt install doxygen
-        sphinx-build -M html ./library/doxygen ./library/doxygen/build/
-        sudo mv library/doxygen/build/html _site/doc/libf3d/doxygen
-        sphinx-build -M html ./vtkext/public/doxygen ./vtkext/public/doxygen/build/
-        sudo mv vtkext/public/doxygen/build/html _site/doc/libf3d/vtkext_doxygen
+      - name: Retrieve web assembly binaries
+        uses: actions/download-artifact@v4
+        with:
+          name: f3d-wasm
+          path: ./web
 
-    - name: Retrieve web assembly binaries
-      uses: actions/download-artifact@v4
-      with:
-        name: f3d-wasm
-        path: ./web
+      - name: Copy web assembly binaries
+        run: sudo mv web _site/
 
-    - name: Copy web assembly binaries
-      run: sudo mv web _site/
-
-    - name: Deploy
-      if: github.ref == 'refs/heads/master'
-      uses: JamesIves/github-pages-deploy-action@v4
-      with:
-        folder: _site
-        token: ${{ secrets.GITHUB_TOKEN }}
-        clean: true
+      - name: Deploy
+        if: github.ref == 'refs/heads/master'
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: _site
+          token: ${{ secrets.GITHUB_TOKEN }}
+          clean: true

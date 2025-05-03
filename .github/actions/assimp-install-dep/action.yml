@@ -1,18 +1,17 @@
-name: 'Install Assimp Dependency'
-description: 'Install Assimp Dependency using cache when possible'
+name: "Install Assimp Dependency"
+description: "Install Assimp Dependency using cache when possible"
 inputs:
   cpu:
-    description: 'CPU architecture to build for'
+    description: "CPU architecture to build for"
     required: false
-    default: 'x86_64'
+    default: "x86_64"
   version:
-    description: 'Version of assimp to build'
+    description: "Version of assimp to build"
     required: true
 
 runs:
   using: "composite"
   steps:
-
     - name: Check required inputs
       shell: bash
       run: |
@@ -30,7 +29,7 @@ runs:
       uses: actions/checkout@v4
       with:
         repository: assimp/assimp
-        path: './dependencies/assimp'
+        path: "./dependencies/assimp"
         ref: ${{inputs.version}}
 
     # Revert: https://github.com/assimp/assimp/pull/5349
