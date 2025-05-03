@@ -808,7 +808,7 @@ jobs:
 #----------------------------------------------------------------------------
   android:
     needs: [default_versions, detect_checkboxes, check_docker_images]
-    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Android CI')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Android docker CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
       fail-fast: false
@@ -837,7 +837,7 @@ jobs:
 #----------------------------------------------------------------------------
   webassembly:
     needs: [default_versions, detect_checkboxes, check_docker_images]
-    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'WASM CI')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'WASM docker CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
       fail-fast: false
