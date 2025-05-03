@@ -41,7 +41,6 @@ jobs:
 #----------------------------------------------------------------------------
   default_versions:
     runs-on: ubuntu-22.04
-    container: ghcr.io/f3d-app/f3d-ci
     name: Set default versions
     needs: detect_checkboxes
     if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'docker CI')) }}
