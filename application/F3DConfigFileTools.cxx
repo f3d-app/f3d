@@ -88,6 +88,7 @@ std::vector<fs::path> GetConfigPaths(const std::string& configSearch)
 F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
   const std::string& userConfig)
 {
+  std::cout<<"Default config directory name"<<std::endl;
   // Default config directory name
   std::string configSearch = "config";
   if (!userConfig.empty())
@@ -107,6 +108,7 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
   }
 
   // Recover config paths to search for config files
+  std::cout<<"Recover config paths to search for config files"<<std::endl;
   std::vector<fs::path> configPaths;
   if (!configSearch.empty())
   {
@@ -119,6 +121,7 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
   }
 
   // Recover actual individual config file paths
+  std::cout<<"Recover actual individual config file paths"<<std::endl;
   std::set<fs::path> actualConfigFilePaths;
   for (auto configPath : configPaths)
   {
@@ -150,12 +153,14 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
   }
 
   // If we used a configSearch but did not find any, inform the user
+  std::cout<<"If we used a configSearch but did not find any, inform the user"<<std::endl;
   if (!configSearch.empty() && actualConfigFilePaths.empty())
   {
     f3d::log::info("Configuration file for \"", configSearch, "\" could not be found");
   }
 
   // Read config files
+  std::cout<<"Read config files"<<std::endl;
   F3DOptionsTools::OptionsEntries optionsEntries;
   F3DOptionsTools::OptionsEntries imperativeOptionsEntries;
   F3DConfigFileTools::BindingsEntries bindingsEntries;
@@ -310,6 +315,7 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
       f3d::log::error(ex.what());
     }
   }
+  std::cout<<"return"<<std::endl;
   return F3DConfigFileTools::ParsedConfigFiles{ std::move(optionsEntries),
     std::move(imperativeOptionsEntries), std::move(bindingsEntries) };
 }

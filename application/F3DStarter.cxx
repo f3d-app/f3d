@@ -947,11 +947,13 @@ int F3DStarter::Start(int argc, char** argv)
   // Update app and libf3d options based on config entries, with an empty input file
   // config < cli.
   // Force it to be quiet has another options update happens later.
+  std::cout<<"UpdateOptions"<<std::endl;
   this->Internals->UpdateOptions(
     { this->Internals->ConfigOptionsEntries, this->Internals->CLIOptionsEntries,
       this->Internals->ImperativeConfigOptionsEntries },
     { "" }, true);
 
+  std::cout<<"MultiFileMode"<<std::endl;
   const auto& mode = this->Internals->AppOptions.MultiFileMode;
   if (mode != "single" && mode != "all" && mode != "dir")
   {
@@ -970,6 +972,7 @@ int F3DStarter::Start(int argc, char** argv)
 
   if (this->Internals->AppOptions.NoRender)
   {
+
     this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::createNone());
   }
   else
@@ -977,6 +980,7 @@ int F3DStarter::Start(int argc, char** argv)
     bool offscreen = !this->Internals->AppOptions.Reference.empty() ||
       !this->Internals->AppOptions.Output.empty() || this->Internals->AppOptions.BindingsList;
 
+    std::cout<<"CreateEngine"<<std::endl;
     try
     {
       if (this->Internals->AppOptions.RenderingBackend == "egl")
@@ -1025,6 +1029,7 @@ int F3DStarter::Start(int argc, char** argv)
       return EXIT_FAILURE;
     }
 
+    std::cout<<"EngineCreated"<<std::endl;
     this->ResetWindowName();
     this->Internals->ApplyPositionAndResolution();
     this->AddCommands();

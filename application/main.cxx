@@ -23,12 +23,12 @@ int main(int argc, char** argv)
     exit(EXIT_FAILURE);
   }
 #ifndef F3D_TESTING_DISABLE_CATCH_ALL
-  catch (const std::exception& ex)
+/*  catch (const std::exception& ex)
   {
     f3d::log::error("F3D encountered an unexpected exception:");
     f3d::log::error(ex.what());
     exit(EXIT_FAILURE);
-  }
+  }*/
 #endif
 
   return res;
