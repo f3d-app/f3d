@@ -5,12 +5,14 @@
 
 #include <vtkCamera.h>
 #include <vtkMath.h>
+#include <vtkNew.h>
 #include <vtkObjectFactory.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRendererCollection.h>
 #include <vtkSkybox.h>
 #include <vtkStringArray.h>
+#include <vtkTransform.h>
 
 vtkStandardNewMacro(vtkF3DInteractorStyle);
 
@@ -156,27 +158,29 @@ void vtkF3DInteractorStyle::Rotate()
   this->InterpolateTemporaryUp(0.1, up);
   up = this->TemporaryUp;
 
-  double dot = vtkMath::Dot(dir, up);
-
-  bool canElevate = ren->GetUseTrackball() || std::abs(dot) < 0.99 || !std::signbit(dot * ryf);
-
-  camera->Azimuth(rxf);
-
-  if (canElevate)
-  {
-    camera->Elevation(ryf);
-  }
-
   if (!ren->GetUseTrackball())
   {
-    // orthogonalize up vector based on focal direction
-    vtkMath::MultiplyScalar(dir, dot);
-    vtkMath::Subtract(up, dir, dir);
-    vtkMath::Normalize(dir);
-    camera->SetViewUp(dir);
+    // Rotate camera around the focal point about the environment's up vector
+    vtkNew<vtkTransform> Transform;
+    Transform->Identity();
+    const double* fp = camera->GetFocalPoint();
+    Transform->Translate(+fp[0], +fp[1], +fp[2]);
+    Transform->RotateWXYZ(rxf, ren->GetUpVector());
+    Transform->Translate(-fp[0], -fp[1], -fp[2]);
+    Transform->TransformPoint(camera->GetPosition(), camera->GetPosition());
+
+    camera->SetViewUp(up);
+    const double dot = vtkMath::Dot(dir, up);
+    if (std::abs(dot) < 0.99 || !std::signbit(dot * ryf))
+    {
+      camera->Elevation(ryf);
+    }
+    camera->OrthogonalizeViewUp();
   }
   else
   {
+    camera->Azimuth(rxf);
+    camera->Elevation(ryf);
     camera->OrthogonalizeViewUp();
   }
 
