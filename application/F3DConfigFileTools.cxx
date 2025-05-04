@@ -113,10 +113,12 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
   std::vector<fs::path> configPaths;
   if (!configSearch.empty())
   {
+    std::cout<<"::GetConfigPaths(configSearch)"<<std::endl;
     configPaths = ::GetConfigPaths(configSearch);
   }
   else
   {
+    std::cout<<"Collapse full path into an absolute path"<<std::endl;
     // Collapse full path into an absolute path
     configPaths.emplace_back(f3d::utils::collapsePath(userConfig));
   }

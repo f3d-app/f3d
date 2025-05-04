@@ -105,7 +105,8 @@ std::vector<std::string> utils::tokenize(std::string_view str)
 //----------------------------------------------------------------------------
 fs::path utils::collapsePath(const fs::path& path, const fs::path& baseDirectory)
 {
-  try
+  return path.string();
+/*  try
   {
     return path.empty() ? path
       : baseDirectory.empty()
@@ -116,7 +117,7 @@ fs::path utils::collapsePath(const fs::path& path, const fs::path& baseDirectory
   {
     log::error("Could not collapse path: ", ex.what());
     return {};
-  }
+  }*/
 }
 
 //----------------------------------------------------------------------------
