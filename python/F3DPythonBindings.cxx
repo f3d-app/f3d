@@ -315,7 +315,9 @@ PYBIND11_MODULE(pyf3d, module)
     .def(py::init<>())
     .def(py::init<const f3d::point3_t&, const f3d::point3_t&, const f3d::vector3_t&,
            const f3d::angle_deg_t&>(),
-      py::arg("position"), py::arg("focal_point"), py::arg("view_up"), py::arg("view_angle"))
+      py::arg("position") = f3d::point3_t({ 0., 0., 1. }),
+      py::arg("focal_point") = f3d::point3_t({ 0., 0., 0. }),
+      py::arg("view_up") = f3d::vector3_t({ 0, 1, 0 }), py::arg("view_angle") = 30.)
     .def_readwrite("position", &f3d::camera_state_t::position)
     .def_readwrite("focal_point", &f3d::camera_state_t::focalPoint)
     .def_readwrite("view_up", &f3d::camera_state_t::viewUp)

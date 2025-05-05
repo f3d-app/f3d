@@ -63,6 +63,34 @@ def test_default_state():
     assert new_state.view_angle == 30
 
 
+def test_state_init():
+    default_state = f3d.CameraState()
+
+    s1 = f3d.CameraState((1, 2, 3))
+    assert s1.position == (1, 2, 3)
+    assert s1.focal_point == default_state.focal_point
+    assert s1.view_up == default_state.view_up
+    assert s1.view_angle == default_state.view_angle
+
+    s2 = f3d.CameraState(focal_point=(1, 2, 3))
+    assert s2.position == default_state.position
+    assert s2.focal_point == (1, 2, 3)
+    assert s2.view_up == default_state.view_up
+    assert s2.view_angle == default_state.view_angle
+
+    s3 = f3d.CameraState(view_up=(1, 2, 3))
+    assert s3.position == default_state.position
+    assert s3.focal_point == default_state.focal_point
+    assert s3.view_up == (1, 2, 3)
+    assert s3.view_angle == default_state.view_angle
+
+    s4 = f3d.CameraState(view_angle=12.3)
+    assert s4.position == default_state.position
+    assert s4.focal_point == default_state.focal_point
+    assert s4.view_up == default_state.view_up
+    assert s4.view_angle == 12.3
+
+
 @pytest.mark.xfail(reason="CameraState equality not implemented")
 def test_state_compare():
     state1 = f3d.CameraState((1, 2, 3), (1, 22, 3), (0, 0, 1), 32)
