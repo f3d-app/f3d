@@ -29,7 +29,7 @@ sudo apt upgrade
 sudo apt install build-essential git git-lfs cmake libvtk9-dev
 ```
 
-Note: Ubuntu 24.04 provides VTK version 9.1 but f3d requires VTK 9.2.6 at minimum, so building and installing vtk from source is suggested. Windows build instructions make those steps clearer.
+Note: Ubuntu 24.04 / Debian 12 provides VTK version 9.1 but f3d requires VTK 9.2.6 at minimum, so building and installing vtk from source is suggested. Look at Windows build instruction for inspiration if needed.
 
 #### Fedora/Centos/RedHat
 
