@@ -180,19 +180,23 @@ vtkF3DImguiConsole::~vtkF3DImguiConsole() = default;
 //----------------------------------------------------------------------------
 void vtkF3DImguiConsole::DisplayText(const char* text)
 {
-  switch (this->GetCurrentMessageType())
+  MessageTypes type = this->GetCurrentMessageType();
+  if (this->GetDisplayStream(type) != StreamType::Null)
   {
-    case vtkOutputWindow::MESSAGE_TYPE_ERROR:
-      this->Pimpl->Logs.emplace_back(std::make_pair(Internals::LogType::Error, text));
-      this->Pimpl->NewError = true;
-      break;
-    case vtkOutputWindow::MESSAGE_TYPE_WARNING:
-    case vtkOutputWindow::MESSAGE_TYPE_GENERIC_WARNING:
-      this->Pimpl->Logs.emplace_back(std::make_pair(Internals::LogType::Warning, text));
-      this->Pimpl->NewWarning = true;
-      break;
-    default:
-      this->Pimpl->Logs.emplace_back(std::make_pair(Internals::LogType::Log, text));
+    switch (type)
+    {
+      case vtkOutputWindow::MESSAGE_TYPE_ERROR:
+        this->Pimpl->Logs.emplace_back(std::make_pair(Internals::LogType::Error, text));
+        this->Pimpl->NewError = true;
+        break;
+      case vtkOutputWindow::MESSAGE_TYPE_WARNING:
+      case vtkOutputWindow::MESSAGE_TYPE_GENERIC_WARNING:
+        this->Pimpl->Logs.emplace_back(std::make_pair(Internals::LogType::Warning, text));
+        this->Pimpl->NewWarning = true;
+        break;
+      default:
+        this->Pimpl->Logs.emplace_back(std::make_pair(Internals::LogType::Log, text));
+    }
   }
 
   // also print text to std::cout
