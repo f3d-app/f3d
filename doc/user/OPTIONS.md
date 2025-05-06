@@ -166,7 +166,7 @@ To turn on/off boolean options, it is possible to write `--option=true` and `--o
 
 As documented, the `--option=value` syntax should be preferred. The syntax `--option value` can have unintended effect with positional arguments.
 
-To pass an argument to a short option, use the following syntax: `-Rlibf3d.option`.
+The `-R` short option has a special syntax: `-Rlibf3d.option` but can also be used with `--reset=libf3d.option`
 
 The `-D/--define` option has a special syntax: `-Dlibf3d.option=value` or `--define=libf3d.option=value`.
 
