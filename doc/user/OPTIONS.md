@@ -168,7 +168,7 @@ As documented, the `--option=value` syntax should be preferred. The syntax `--op
 
 To pass an argument to a short option, use the following syntax: `-Rlibf3d.option`.
 
-The `--define` option has a special syntax: `--define=libf3d.option=value`.
+The `-D/--define` option has a special syntax: `-Dlibf3d.option=value` or `--define=libf3d.option=value`.
 
 All options are parsed according to their type, see the [parsing documentation](PARSING.md) for more details.
 
