@@ -122,49 +122,22 @@ struct PackedRotation
 
 //----------------------------------------------------------------------------
 template<int Degree>
-struct PackedSH
+struct SphericalHarmonics
 {
   uint8_t packed[3 * Degree * (Degree + 2)];
 
-  template<int SH>
-  auto decode() const;
-
-  template<>
-  auto decode<1>() const
+  template<int M, int L>
+  std::array<float, 3> decode() const
   {
-    static_assert(Degree >= 1);
-    constexpr float SH_C1[3] = { -0.48860251, 0.48860251, -0.48860251 };
-    std::array<float, 9> sh;
-    for (int i = 0; i < 9; i++)
-    {
-      sh[i] = SH_C1[i / 3] * unquantize(packed[i]);
-    }
-    return sh;
-  }
+    static_assert(L > 0 && L <= Degree);
+    static_assert(M <= L && M >= -L);
 
-  template<>
-  auto decode<2>() const
-  {
-    static_assert(Degree >= 2);
-    constexpr float SH_C2[5] = { 1.092548430, -1.09254843, 0.315391565, -1.09254843, 0.546274215 };
-    std::array<float, 15> sh;
-    for (int i = 0; i < 15; i++)
-    {
-      sh[i] = SH_C2[i / 3] * unquantize(packed[9 + i]);
-    }
-    return sh;
-  }
+    constexpr int offset = 3 * ((M + L) + L * L - 1);
 
-  template<>
-  auto decode<3>() const
-  {
-    static_assert(Degree >= 3);
-    constexpr float SH_C3[7] = { -0.59004358, 2.890611442, -0.45704579, 0.373176332, -0.45704579,
-      1.445305721, -0.59004358 };
-    std::array<float, 21> sh;
-    for (int i = 0; i < 21; i++)
+    std::array<float, 3> sh;
+    for (int i = 0; i < 3; i++)
     {
-      sh[i] = SH_C3[i / 3] * unquantize(packed[24 + i]);
+      sh[i] = constant<M,L>() * unquantize(packed[offset + i]);
     }
     return sh;
   }
@@ -174,46 +147,95 @@ private:
   {
     return c * (2.f / 255.f) - 1.f;
   }
+
+  template<int M, int L>
+  static constexpr float constant()
+  {
+    constexpr float SH_C1[3] = { -0.48860251, 0.48860251, -0.48860251 };
+    constexpr float SH_C2[5] = { 1.092548430, -1.09254843, 0.315391565, -1.09254843, 0.546274215 };
+    constexpr float SH_C3[7] = { -0.59004358, 2.890611442, -0.45704579, 0.373176332, -0.45704579,
+      1.445305721, -0.59004358 };
+
+    if constexpr (L == 1)
+    {
+      return SH_C1[M + 1];
+    }
+    if constexpr (L == 2)
+    {
+      return SH_C2[M + 2];
+    }
+    if constexpr (L == 3)
+    {
+      return SH_C3[M + 3];
+    }
+    return 0.f;
+  }
 };
 
 //----------------------------------------------------------------------------
 template<int Degree>
 void AddSphericalHarmonics(int nbSplats, unsigned char* buffer, vtkPointData* pointData)
 {
-  PackedSH<Degree>* begin =
-    reinterpret_cast<PackedSH<Degree>*>(buffer + 16 + (9 + 4 + 3 + 3) * nbSplats);
+  SphericalHarmonics<Degree>* begin =
+    reinterpret_cast<SphericalHarmonics<Degree>*>(buffer + 16 + (9 + 4 + 3 + 3) * nbSplats);
 
-  vtkNew<vtkFloatArray> sh1Array;
-  sh1Array->SetNumberOfComponents(9);
-  sh1Array->SetNumberOfTuples(nbSplats);
-  sh1Array->SetName("sh1");
-
-  PackedSH<Degree>* sh = begin;
-
-  for (size_t splatIndex = 0; splatIndex < nbSplats; splatIndex++)
+  auto getSuffix = [](int m) -> std::string
   {
-    sh1Array->SetTypedTuple(splatIndex, (sh++)->decode<1>().data());
+    if (m == 0)
+    {
+      return "0";
+    }
+    if (m > 0)
+    {
+      return std::string("p") + std::to_string(m);
+    }
+    return std::string("m") + std::to_string(-m);
+  };
+
+  vtkNew<vtkFloatArray> sh1Array[3];
+
+  for (int i = 0; i < 3; i++)
+  {
+    sh1Array[i]->SetNumberOfComponents(3);
+    sh1Array[i]->SetNumberOfTuples(nbSplats);
+    sh1Array[i]->SetName((std::string("sh1") + getSuffix(i - 1)).data());
+    pointData->AddArray(sh1Array[i]);
   }
 
-  pointData->AddArray(sh1Array);
+  SphericalHarmonics<Degree>* sh = begin;
+
+  for (size_t splatIndex = 0; splatIndex < nbSplats; splatIndex++, sh++)
+  {
+    sh1Array[0]->SetTypedTuple(splatIndex, sh->template decode<-1, 1>().data());
+    sh1Array[1]->SetTypedTuple(splatIndex, sh->template decode<0, 1>().data());
+    sh1Array[2]->SetTypedTuple(splatIndex, sh->template decode<1, 1>().data());
+  }
 
   if constexpr (Degree >= 2)
   {
-    vtkNew<vtkFloatArray> sh2Array;
-    sh2Array->SetNumberOfComponents(15);
-    sh2Array->SetNumberOfTuples(nbSplats);
-    sh2Array->SetName("sh2");
+    vtkNew<vtkFloatArray> sh2Array[5];
+
+    for (int i = 0; i < 5; i++)
+    {
+      sh2Array[i]->SetNumberOfComponents(3);
+      sh2Array[i]->SetNumberOfTuples(nbSplats);
+      sh2Array[i]->SetName((std::string("sh2") + getSuffix(i - 2)).data());
+      pointData->AddArray(sh2Array[i]);
+    }
 
     sh = begin;
 
-    for (size_t splatIndex = 0; splatIndex < nbSplats; splatIndex++)
+    for (size_t splatIndex = 0; splatIndex < nbSplats; splatIndex++, sh++)
     {
-      sh2Array->SetTypedTuple(splatIndex, (sh++)->decode<2>().data());
+      sh2Array[0]->SetTypedTuple(splatIndex, sh->template decode<-2, 2>().data());
+      sh2Array[1]->SetTypedTuple(splatIndex, sh->template decode<-1, 2>().data());
+      sh2Array[2]->SetTypedTuple(splatIndex, sh->template decode<0, 2>().data());
+      sh2Array[3]->SetTypedTuple(splatIndex, sh->template decode<1, 2>().data());
+      sh2Array[4]->SetTypedTuple(splatIndex, sh->template decode<2, 2>().data());
     }
-
-    pointData->AddArray(sh2Array);
   }
 
+  /*
   if constexpr (Degree >= 3)
   {
     vtkNew<vtkFloatArray> sh3Array;
@@ -223,13 +245,14 @@ void AddSphericalHarmonics(int nbSplats, unsigned char* buffer, vtkPointData* po
 
     sh = begin;
 
-    for (size_t splatIndex = 0; splatIndex < nbSplats; splatIndex++)
+    for (size_t splatIndex = 0; splatIndex < nbSplats; splatIndex++, sh++)
     {
-      sh3Array->SetTypedTuple(splatIndex, (sh++)->decode<3>().data());
+      sh3Array->SetTypedTuple(splatIndex, (sh++)->template decode<3>().data());
     }
 
-    pointData->AddArray(sh3Array);
+    // pointData->AddArray(sh3Array);
   }
+    */
 }
 }
 

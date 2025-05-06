@@ -2,6 +2,7 @@
 
 #include "vtkF3DBitonicSort.h"
 #include "vtkF3DComputeDepthCS.h"
+#include "vtkF3DUtilities.h"
 
 #include <vtkCamera.h>
 #include <vtkObjectFactory.h>
@@ -43,6 +44,10 @@ protected:
 
   // overridden to sort splats
   void RenderPieceDraw(vtkRenderer* ren, vtkActor* act) override;
+
+  // add random utility
+  void ReplaceShaderColor(
+    std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor) override;
 
 private:
   void SortSplats(vtkRenderer* ren);
@@ -148,6 +153,18 @@ void vtkF3DSplatMapperHelper::RenderPieceDraw(vtkRenderer* ren, vtkActor* actor)
   }
 
   vtkOpenGLPointGaussianMapperHelper::RenderPieceDraw(ren, actor);
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DSplatMapperHelper::ReplaceShaderColor(
+  std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor)
+{
+  std::string FSSource = shaders[vtkShader::Fragment]->GetSource();
+
+  vtkShaderProgram::Substitute(FSSource, "//VTK::Color::Dec", vtkF3DUtilities, false);
+  shaders[vtkShader::Fragment]->SetSource(FSSource);
+
+  this->Superclass::ReplaceShaderColor(shaders, ren, actor);
 }
 
 //----------------------------------------------------------------------------
