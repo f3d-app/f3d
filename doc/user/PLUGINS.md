@@ -33,7 +33,7 @@ multiple plugins in a single comma-separated list, like in the example below:
 F3D supports loading plugins and contains the following plugins:
 `native`, `alembic`, `assimp`, `draco`, `hdf`, `occt`, `usd`, `vdb`.
 
-see [SUPPORTED_FORMATS.md] for more details.
+see [the format list](SUPPORTED_FORMATS.md) for more details.
 
 > Note: Native plugin is always loaded automatically.
 > Note: If you downloaded the binaries from the release page, it's not necessary to specify manually the plugins above. F3D loads them automatically.

@@ -26,7 +26,7 @@ F3D behavior can be fully controlled from the command line using the following o
 | \-\-scan-plugins                                      |                                   | Scan standard directories for plugins and display their names, results may be incomplete. See [plugins](PLUGINS.md) for more info.                                                                                                                                                     |
 | \-\-screenshot-filename=\<png file\>                  | string<br>`{app}/{model}_{n}.png` | Filename to save [screenshots](INTERACTIONS.md#taking-screenshots) to. Can use [template variables](#filename-templating). Supports relative paths [as described](INTERACTIONS.md#taking-screenshots).                                                                                 |
 | \-\-rendering-backend=\<auto\|egl\|osmesa\|glx\|wgl\> | string<br>auto                    | Rendering backend to load, `auto` means to let F3D pick the correct one for you depending on your system capabilities. Use `egl` or `osmesa` on linux to force headless rendering.                                                                                                     |
-| -D, \-\-define=\<libf3d.option=value\>                | special<br>-                      | A repeatable option to set [libf3d](../libf3d/OPTIONS.md) and [reader](PLUGINS.md#reader-options) option manually. May trigger unexpected behavior.                                                                                                                                    |
+| -D, \-\-define=\<libf3d.option=value\>                | special<br>-                      | A repeatable option to set [libf3d](../libf3d/OPTIONS.md) and [reader](SUPPORTED_FORMATS.md#reader-options) option manually. May trigger unexpected behavior.                                                                                                                          |
 | -R, \-\-reset=\<libf3d.option\>                       | special<br>-                      | A repeatable option to reset [libf3d options](../libf3d/OPTIONS.md) manually. Useful when overidding option set in [configuration files](CONFIGURATION_FILE.md).                                                                                                                       |
 
 ## General Options
@@ -166,9 +166,9 @@ To turn on/off boolean options, it is possible to write `--option=true` and `--o
 
 As documented, the `--option=value` syntax should be preferred. The syntax `--option value` can have unintended effect with positional arguments.
 
-To set pass an arguments to a short option, use the following syntax: `-Rlibf3d.option`.
+The `-R` short option has a special syntax: `-Rlibf3d.option` but can also be used with `--reset=libf3d.option`
 
-The `--define` option has a special syntax: `--define=libf3d.option=value`.
+The `-D/--define` option has a special syntax: `-Dlibf3d.option=value` or `--define=libf3d.option=value`.
 
 All options are parsed according to their type, see the [parsing documentation](PARSING.md) for more details.
 
