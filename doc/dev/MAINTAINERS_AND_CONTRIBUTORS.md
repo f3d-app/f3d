@@ -24,6 +24,7 @@ Contributors with a single contribution or that may not want to are not listed h
 | Evgenii Startcev (PhilHellmuth) | exbluesbreaker | Yes        |
 | Louis Gombert                   | lgt2x          | Yes        |
 | Artem                           | 0xfedcafe      | Yes        |
+| Nig3l                           | Ni-g-3l        | Yes        |
 
 ---
 
