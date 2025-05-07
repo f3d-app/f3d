@@ -49,9 +49,11 @@ engine::engine(
   const std::optional<window::Type>& windowType, bool offscreen, const context::function& loader)
   : Internals(new engine::internals)
 {
+  std::cout<<"engineA"<<std::endl;
   // Ensure all lib initialization is done (once)
   detail::init::initialize();
 
+  std::cout<<"engineB"<<std::endl;
   fs::path cachePath;
 #if defined(_WIN32)
   const char* appData = std::getenv("LOCALAPPDATA");
@@ -61,6 +63,7 @@ engine::engine(
   }
 #else
 
+  std::cout<<"engineC"<<std::endl;
 #if defined(__unix__)
   // Implementing XDG specifications
   const char* xdgCacheHome = std::getenv("XDG_CACHE_HOME");
@@ -83,6 +86,8 @@ engine::engine(
     }
   }
 #endif
+
+  std::cout<<"engineD"<<std::endl;
   if (cachePath.empty())
   {
     delete Internals;
@@ -91,15 +96,19 @@ engine::engine(
   }
   cachePath /= "f3d";
 
+  std::cout<<"engineE"<<std::endl;
   this->Internals->Options = std::make_unique<options>();
 
+  std::cout<<"engineF"<<std::endl;
   this->Internals->Window =
     std::make_unique<detail::window_impl>(*this->Internals->Options, windowType, offscreen, loader);
   this->Internals->Window->SetCachePath(cachePath);
 
+  std::cout<<"engineG"<<std::endl;
   this->Internals->Scene =
     std::make_unique<detail::scene_impl>(*this->Internals->Options, *this->Internals->Window);
 
+  std::cout<<"engineH"<<std::endl;
   // Do not create an interactor for NONE or EXTERNAL
   if (windowType != window::Type::NONE && windowType != window::Type::EXTERNAL)
   {

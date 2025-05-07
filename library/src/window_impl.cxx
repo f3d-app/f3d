@@ -109,6 +109,7 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   const context::function& getProcAddress)
   : Internals(std::make_unique<window_impl::internals>(options))
 {
+  std::cout<<"windowA"<<std::endl;
   this->Internals->GetProcAddress = getProcAddress;
   if (type == Type::NONE)
   {
@@ -156,6 +157,7 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
     this->Internals->RenWin = internals::AutoBackendWindow();
   }
 
+  std::cout<<"windowB"<<std::endl;
   // COCOA and WASM are not handled explicitly
   // as there is no helper method to create them in engine
   if (this->Internals->RenWin == nullptr)
@@ -163,6 +165,7 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
     throw engine::no_window_exception("Cannot create a window");
   }
 
+  std::cout<<"windowC"<<std::endl;
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
   vtkOpenGLRenderWindow* oglRenWin = vtkOpenGLRenderWindow::SafeDownCast(this->Internals->RenWin);
   if (oglRenWin)
@@ -174,6 +177,7 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   }
 #endif
 
+  std::cout<<"windowD"<<std::endl;
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240606)
   this->Internals->RenWin->EnableTranslucentSurfaceOn();
 #endif
@@ -184,9 +188,11 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   this->Internals->Camera = std::make_unique<detail::camera_impl>();
   this->Internals->Camera->SetVTKRenderer(this->Internals->Renderer);
 
+  std::cout<<"windowE"<<std::endl;
   this->Internals->Renderer->SetConsoleBadgeEnabled(
     !offscreen || std::getenv("CTEST_F3D_CONSOLE_BADGE"));
 
+  std::cout<<"windowF"<<std::endl;
   this->Initialize();
 
   log::debug("VTK window class type is ", this->Internals->RenWin->GetClassName());
