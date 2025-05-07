@@ -985,18 +985,22 @@ int F3DStarter::Start(int argc, char** argv)
     {
       if (this->Internals->AppOptions.RenderingBackend == "egl")
       {
+        std::cout<<"CreateEngineEGL"<<std::endl;
         this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::createEGL());
       }
       else if (this->Internals->AppOptions.RenderingBackend == "osmesa")
       {
+        std::cout<<"CreateEngineOSMesa"<<std::endl;
         this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::createOSMesa());
       }
       else if (this->Internals->AppOptions.RenderingBackend == "glx")
       {
+        std::cout<<"CreateEngineGLX"<<std::endl;
         this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::createGLX(offscreen));
       }
       else if (this->Internals->AppOptions.RenderingBackend == "wgl")
       {
+        std::cout<<"CreateEngineWGL"<<std::endl;
         this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::createWGL(offscreen));
       }
       else
@@ -1005,6 +1009,7 @@ int F3DStarter::Start(int argc, char** argv)
         {
           f3d::log::warn("--rendering-backend value is invalid, falling back to \"auto\"");
         }
+        std::cout<<"CreateEngineAuto"<<std::endl;
         this->Internals->Engine = std::make_unique<f3d::engine>(f3d::engine::create(offscreen));
       }
     }

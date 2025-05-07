@@ -18,10 +18,12 @@ namespace f3d
 //----------------------------------------------------------------------------
 context::function context::getSymbol(std::string_view lib, std::string_view func)
 {
+  std::cout<<"getSymbolA"<<std::endl;
   std::string libName = vtksys::DynamicLoader::LibPrefix();
   libName += lib;
   libName += vtksys::DynamicLoader::LibExtension();
 
+  std::cout<<"getSymbolB"<<std::endl;
   vtksys::DynamicLoader::LibraryHandle handle = vtksys::DynamicLoader::OpenLibrary(libName);
 
   if (!handle)
@@ -29,22 +31,26 @@ context::function context::getSymbol(std::string_view lib, std::string_view func
     throw context::loading_exception("Cannot find " + std::string(lib) + " library");
   }
 
+  std::cout<<"getSymbolC"<<std::endl;
   using symbol = context::fptr (*)(const char*);
 
   symbol address =
     reinterpret_cast<symbol>(vtksys::DynamicLoader::GetSymbolAddress(handle, func.data()));
 
+  std::cout<<"getSymbolD"<<std::endl;
   if (!address)
   {
     throw context::symbol_exception("Cannot find " + std::string(func) + " symbol");
   }
 
+  std::cout<<"getSymbolE"<<std::endl;
   return address;
 }
 
 //----------------------------------------------------------------------------
 context::function context::glx()
 {
+  std::cout<<"glx"<<std::endl;
 #if defined(VTK_USE_X) && VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
   return getSymbol("GLX", "glXGetProcAddress");
 #else
@@ -55,6 +61,7 @@ context::function context::glx()
 //----------------------------------------------------------------------------
 context::function context::wgl()
 {
+  std::cout<<"wgl"<<std::endl;
 #ifdef _WIN32
   return [](const char* name)
   {
@@ -89,6 +96,7 @@ context::function context::cocoa()
 //----------------------------------------------------------------------------
 context::function context::egl()
 {
+  std::cout<<"egl"<<std::endl;
 #if defined(VTK_OPENGL_HAS_EGL) && VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
   gladLoaderLoadEGL(EGL_NO_DISPLAY);
   return getSymbol("EGL", "eglGetProcAddress");
@@ -100,6 +108,7 @@ context::function context::egl()
 //----------------------------------------------------------------------------
 context::function context::osmesa()
 {
+  std::cout<<"osmesa"<<std::endl;
 #if defined(__linux__) || defined(__FreeBSD__)
   return getSymbol("OSMesa", "OSMesaGetProcAddress");
 #elif _WIN32
