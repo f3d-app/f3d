@@ -170,11 +170,14 @@ void vtkF3DInteractorStyle::Rotate()
     Transform->TransformPoint(camera->GetPosition(), camera->GetPosition());
 
     camera->SetViewUp(up);
-    const double dot = vtkMath::Dot(dir, up);
-    if (std::abs(dot) < 0.99 || !std::signbit(dot * ryf))
-    {
-      camera->Elevation(ryf);
-    }
+
+    // Clamp parameter to `camera->Elevation()` to maintain -90 < elevation < +90
+    constexpr double maxAbsElevation = 90 - 1e-12;
+    const double elevation = vtkMath::DegreesFromRadians(
+      vtkMath::AngleBetweenVectors(ren->GetUpVector(), camera->GetDirectionOfProjection()) -
+      vtkMath::Pi() / 2);
+    camera->Elevation(std::clamp(ryf, -maxAbsElevation - elevation, +maxAbsElevation - elevation));
+
     camera->OrthogonalizeViewUp();
   }
   else
