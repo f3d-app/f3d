@@ -61,7 +61,7 @@ public:
   /**
    * Get the list of readers created by this plugin
    */
-  const std::vector<std::shared_ptr<reader>>& getReaders()
+  const std::vector<std::shared_ptr<reader>>& getReaders() const
   {
     return this->Readers;
   }

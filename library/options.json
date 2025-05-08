@@ -25,6 +25,9 @@
       "orthographic": {
         "type": "bool"
       }
+    },
+    "force_reader": {
+      "type": "string"
     }
   },
   "render": {
