@@ -2183,8 +2183,9 @@ void vtkF3DRenderer::SetPointSpritesProperties(SplatType type, double pointSprit
                                  "  float dist2 = dot(offsetVCVSOutput.xy,offsetVCVSOutput.xy);\n"
                                  "  float gaussian = exp(-0.5*dist2);\n"
                                  "  opacity = opacity*gaussian;\n"
-                                 "  if (random(gl_FragCoord.xyz) >= opacity) discard;\n"
-                                 "  opacity = 1.0;\n");
+                                 //"  if (random(gl_FragCoord.xyz) >= opacity) discard;\n"
+                                 //"  opacity = 1.0;\n"
+                                 );
 
       sprites.Mapper->SetScaleArray("scale");
 
@@ -2212,7 +2213,7 @@ void vtkF3DRenderer::SetPointSpritesProperties(SplatType type, double pointSprit
         "Gaussian splatting selected but VTK <= 9.3 only supports isotropic gaussians");
 #endif
 
-      sprites.Actor->ForceOpaqueOn();
+      sprites.Actor->ForceTranslucentOn();
     }
     else
     {

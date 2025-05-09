@@ -167,9 +167,6 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   vtkOpenGLRenderWindow* oglRenWin = vtkOpenGLRenderWindow::SafeDownCast(this->Internals->RenWin);
   if (oglRenWin)
   {
-    vtkOpenGLShaderCache* shaderCache = oglRenWin->GetShaderCache();
-    shaderCache->SyncGLSLShaderVersionOn();
-
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
     if (this->Internals->GetProcAddress)
     {
