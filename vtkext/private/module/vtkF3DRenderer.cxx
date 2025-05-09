@@ -2177,13 +2177,31 @@ void vtkF3DRenderer::SetPointSpritesProperties(SplatType type, double pointSprit
     if (type == SplatType::GAUSSIAN)
     {
       sprites.Mapper->SetScaleFactor(1.0);
-      sprites.Mapper->SetSplatShaderCode(nullptr); // gaussian is the default VTK shader
+
+      // stochastic gaussian splatting
+      sprites.Mapper->SetSplatShaderCode("//VTK::Color::Impl\n"
+                                 "  float dist2 = dot(offsetVCVSOutput.xy,offsetVCVSOutput.xy);\n"
+                                 "  float gaussian = exp(-0.5*dist2);\n"
+                                 "  opacity = opacity*gaussian;\n"
+                                 //"  if (random(gl_FragCoord.xyz) >= opacity) discard;\n"
+                                 //"  opacity = 1.0;\n"
+                                 );
+
       sprites.Mapper->SetScaleArray("scale");
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
       sprites.Mapper->AnisotropicOn();
       sprites.Mapper->SetBoundScale(3.0);
       sprites.Mapper->SetRotationArray("rotation");
+
+      // TODO: adjust version number
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250501)
+      //sprites.Mapper->SetSphericalHarmonicsDegree1Array("sh1");
+      //sprites.Mapper->SetSphericalHarmonicsDegree2Array("sh2");
+      //sprites.Mapper->SetSphericalHarmonicsDegree3Array("sh3");
+#else
+      // TODO: warn about lack of SH support
+#endif
 
       int* viewport = this->GetSize();
 

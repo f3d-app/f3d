@@ -17,6 +17,7 @@
 #include <vtkImageData.h>
 #include <vtkImageExport.h>
 #include <vtkInformation.h>
+#include <vtkOpenGLShaderCache.h>
 #include <vtkPNGReader.h>
 #include <vtkPointGaussianMapper.h>
 #include <vtkRendererCollection.h>
@@ -163,16 +164,16 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
     throw engine::no_window_exception("Cannot create a window");
   }
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
   vtkOpenGLRenderWindow* oglRenWin = vtkOpenGLRenderWindow::SafeDownCast(this->Internals->RenWin);
   if (oglRenWin)
   {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
     if (this->Internals->GetProcAddress)
     {
       oglRenWin->SetOpenGLSymbolLoader(&internals::SymbolLoader, &this->Internals->GetProcAddress);
     }
-  }
 #endif
+  }
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240606)
   this->Internals->RenWin->EnableTranslucentSurfaceOn();
