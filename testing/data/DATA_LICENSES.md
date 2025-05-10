@@ -28,7 +28,7 @@
 - duck_invalid.gltf: Copyright 2006 Sony Computer Entertainment Inc.: SCEA Shared Source License
 - flame_mixed.mdl: LibreQuake Project: BSD-3-Clause
 - HeadMRVolume\*: VTK Data: BSD-3-Clause
-- hornedlizard_small_d\*.spz: Modified from SPZ samples: MIT
+- hornedlizard_small_d\*.spz: Modified from [Niantic's SPZ samples](https://github.com/nianticlabs/spz): MIT
 - icosahedron.vdb: OpenVDB: [MPL-2.0](http://www.mozilla.org/MPL/2.0/)
 - iflamigm.3ds: VTK Data: BSD-3-Clause
 - IM-0001-1983.dcm: VTK Data: BSD-3-Clause

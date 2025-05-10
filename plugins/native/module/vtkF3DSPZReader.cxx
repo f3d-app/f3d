@@ -16,7 +16,7 @@
 namespace
 {
 //----------------------------------------------------------------------------
-bool UncompressGzip(
+void UncompressGzip(
   const std::vector<unsigned char>& compressed, std::vector<unsigned char>& uncompressed)
 {
   std::vector<uint8_t> buffer(8192);
@@ -25,27 +25,22 @@ bool UncompressGzip(
   stream.next_in = const_cast<Bytef*>(compressed.data());
   stream.avail_in = static_cast<unsigned int>(compressed.size());
 
-  if (inflateInit2(&stream, 16 | MAX_WBITS) == Z_OK)
+  inflateInit2(&stream, 16 | MAX_WBITS);
+
+  int32_t res = Z_OK;
+
+  while (res != Z_STREAM_END)
   {
-    int32_t res = Z_OK;
+    stream.next_out = buffer.data();
+    stream.avail_out = static_cast<unsigned int>(buffer.size());
 
-    while (res != Z_STREAM_END)
-    {
-      stream.next_out = buffer.data();
-      stream.avail_out = static_cast<unsigned int>(buffer.size());
+    res = inflate(&stream, Z_NO_FLUSH);
+    assert(res == Z_OK || res == Z_STREAM_END);
 
-      res = inflate(&stream, Z_NO_FLUSH);
-      assert(res == Z_OK || res == Z_STREAM_END);
-
-      uncompressed.insert(
-        uncompressed.end(), buffer.data(), buffer.data() + buffer.size() - stream.avail_out);
-    }
-    inflateEnd(&stream);
-
-    return true;
+    uncompressed.insert(
+      uncompressed.end(), buffer.data(), buffer.data() + buffer.size() - stream.avail_out);
   }
-
-  return false;
+  inflateEnd(&stream);
 }
 
 //----------------------------------------------------------------------------
