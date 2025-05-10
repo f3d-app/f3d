@@ -2,6 +2,7 @@
 
 #include "vtkF3DHexagonalBokehBlurPass.h"
 #include "vtkF3DImporter.h"
+#include "vtkF3DStochasticTransparentPass.h"
 
 #include <vtkBoundingBox.h>
 #include <vtkCameraPass.h>
@@ -185,10 +186,10 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     // translucent and volumic passes
     if (this->UseDepthPeelingPass)
     {
-      vtkNew<vtkDualDepthPeelingPass> ddpP;
-      ddpP->SetTranslucentPass(translucentP);
-      ddpP->SetVolumetricPass(volumeP);
-      collection->AddItem(ddpP);
+      vtkNew<vtkF3DStochasticTransparentPass> stochasticP;
+      stochasticP->SetTranslucentPass(translucentP);
+      stochasticP->SetVolumetricPass(volumeP);
+      collection->AddItem(stochasticP);
     }
     else
     {
