@@ -33,6 +33,8 @@ F3D supports the following file formats:
 | 3D Manufacturing Format                   | `.3mf`                                         | Yes        | No                   | `assimp`  |
 | Universal Scene Description               | `.usd`, `.usda`, `.usdc`, `.usdz`              | Yes        | Yes                  | `usd`     |
 | VDB                                       | `.vdb`                                         | No         | No                   | `vdb`     |
+| 3D Gaussian splatting                     | `.splat`                                       | No         | No                   | `native`  |
+| Compressed 3D Gaussian splatting          | `.spz`                                         | No         | No                   | `native`  |
 
 ## Reader options
 

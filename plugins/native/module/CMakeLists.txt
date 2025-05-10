@@ -3,6 +3,11 @@ set(classes
   vtkF3DQuakeMDLImporter
   )
 
+# Needs vtkResourceStream (https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9663)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221216)
+  set(classes "${classes}" vtkF3DSPZReader)
+endif()
+
 set(_no_install "")
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20220928)
   set(_no_install "NO_INSTALL")
