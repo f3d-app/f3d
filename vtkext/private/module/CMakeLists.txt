@@ -61,6 +61,7 @@ set(classes
   vtkF3DRenderPass
   vtkF3DRenderer
   vtkF3DSolidBackgroundPass
+  vtkF3DStochasticTransparentPass
   vtkF3DUIObserver
   vtkF3DUIActor
   vtkF3DUserRenderPass
