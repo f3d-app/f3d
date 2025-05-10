@@ -107,13 +107,21 @@ public:
   void FindPokedRenderer(int vtkNotUsed(x), int vtkNotUsed(y));
 
   /**
-   * Temporary up vector to support rolled camera interaction
+   * Reset temporary up vector to renderer's up direction to support rolled camera interaction.
    */
   void ResetTemporaryUp();
+  /**
+   * Set temporary up vector to support rolled camera interaction.
+   */
   void SetTemporaryUp(const double* tempUp);
-  void InterpolateTemporaryUp(const double factor, const double* input);
 
 protected:
+  /**
+   * Decrement `TemporaryUpFactor` by `factorDelta`
+   * and use it to interpolate `output` between `TemporaryUp` and `target`.
+   */
+  void InterpolateTemporaryUp(const double factorDelta, const double* target, double* output);
+
   /**
    * Overridden to support being disabled
    */
@@ -125,6 +133,10 @@ protected:
    * Temporary up vector to support rolled camera interaction
    */
   double TemporaryUp[3] = { 0, 0, 0 };
+  /**
+   * Interpolation state for `TemporaryUp`
+   */
+  double TemporaryUpFactor = 1;
 };
 
 #endif
