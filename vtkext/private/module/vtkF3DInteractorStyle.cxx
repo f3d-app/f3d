@@ -367,7 +367,7 @@ void vtkF3DInteractorStyle::SetTemporaryUp(const double* tempUp)
 void vtkF3DInteractorStyle::InterpolateTemporaryUp(
   const double factorDelta, const double* target, double* output)
 {
-  this->TemporaryUpFactor = std::max(TemporaryUpFactor - factorDelta, 0.0);
+  this->TemporaryUpFactor = std::max(this->TemporaryUpFactor - factorDelta, 0.0);
   if (this->TemporaryUpFactor >= 0)
   {
     const double factor = (1 - std::cos(vtkMath::Pi() * this->TemporaryUpFactor)) / 2;
