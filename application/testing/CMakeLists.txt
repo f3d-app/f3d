@@ -726,6 +726,7 @@ endif()
 if(F3D_PLUGIN_BUILD_HDF)
   if (VTK_VERSION VERSION_GREATER_EQUAL 9.3.0)
     f3d_test(NAME TestVTKHDF DATA blob.vtkhdf ARGS --load-plugins=hdf -s)
+    f3d_test(NAME TestAMRDataSet DATA amr.vtkhdf ARGS --load-plugins=hdf -s)
   endif()
 
   f3d_test(NAME TestExodus DATA disk_out_ref.ex2 ARGS --load-plugins=hdf -s --camera-position=-11,-2,-49)
