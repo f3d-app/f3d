@@ -110,18 +110,13 @@ public:
    * Reset temporary up vector to renderer's up direction to support rolled camera interaction.
    */
   void ResetTemporaryUp();
+
   /**
    * Set temporary up vector to support rolled camera interaction.
    */
   void SetTemporaryUp(const double* tempUp);
 
 protected:
-  /**
-   * Decrement `TemporaryUpFactor` by `factorDelta`
-   * and use it to interpolate `output` between `TemporaryUp` and `target`.
-   */
-  void InterpolateTemporaryUp(const double factorDelta, const double* target, double* output);
-
   /**
    * Overridden to support being disabled
    */
@@ -130,9 +125,16 @@ protected:
   bool CameraMovementDisabled = false;
 
   /**
+   * Decrement `TemporaryUpFactor` by `factorDelta`
+   * and use it to interpolate `output` between `TemporaryUp` and `target`.
+   */
+  void InterpolateTemporaryUp(const double factorDelta, const double* target, double* output);
+
+  /**
    * Temporary up vector to support rolled camera interaction
    */
   double TemporaryUp[3] = { 0, 0, 0 };
+
   /**
    * Interpolation state for `TemporaryUp`
    */
