@@ -136,7 +136,7 @@ protected:
   /**
    * Interpolation state for `TemporaryUp`
    */
-  double TemporaryUpFactor = 1;
+  double TemporaryUpFactor = 1.0;
 };
 
 #endif

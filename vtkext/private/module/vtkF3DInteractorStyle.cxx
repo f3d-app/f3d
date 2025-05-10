@@ -360,7 +360,7 @@ void vtkF3DInteractorStyle::SetTemporaryUp(const double* tempUp)
   {
     this->TemporaryUp[i] = tempUp[i];
   }
-  this->TemporaryUpFactor = 1;
+  this->TemporaryUpFactor = 1.0;
 }
 
 //------------------------------------------------------------------------------
@@ -370,7 +370,7 @@ void vtkF3DInteractorStyle::InterpolateTemporaryUp(
   this->TemporaryUpFactor = std::max(this->TemporaryUpFactor - factorDelta, 0.0);
   if (this->TemporaryUpFactor >= 0)
   {
-    const double factor = (1 - std::cos(vtkMath::Pi() * this->TemporaryUpFactor)) / 2;
+    const double factor = (1.0 - std::cos(vtkMath::Pi() * this->TemporaryUpFactor)) * 0.5;
     for (int i = 0; i < 3; i++)
     {
       output[i] = factor * this->TemporaryUp[i] + (1.0 - factor) * target[i];
