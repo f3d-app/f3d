@@ -1,6 +1,6 @@
+#include <vtkFileResourceStream.h>
 #include <vtkNew.h>
 #include <vtkTestUtilities.h>
-#include <vtkFileResourceStream.h>
 
 #include "vtkF3DSPZReader.h"
 
