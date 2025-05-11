@@ -54,6 +54,11 @@ public:
   bool GetTemporalInformation(vtkIdType animationIndex, double frameRate, int& nbTimeSteps,
     double timeRange[2], vtkDoubleArray* timeSteps) override;
 
+  /**
+   * Set the skin index.
+   */
+  void setSkinIndex(unsigned int _skinIndex);
+
 protected:
   vtkF3DQuakeMDLImporter();
   ~vtkF3DQuakeMDLImporter() override = default;

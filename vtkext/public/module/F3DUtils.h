@@ -21,6 +21,13 @@ namespace F3DUtils
  */
 VTKEXT_EXPORT double ParseToDouble(
   const std::string& str, double def, const std::string& nameError);
+
+/*
+ * Convert provided std into an unsigned int and returns it.
+ * Similar to ParseToDouble()
+ */
+VTKEXT_EXPORT unsigned int ParseToUInt(
+  const std::string& str, unsigned int def, const std::string& nameError);
 };
 
 #endif
