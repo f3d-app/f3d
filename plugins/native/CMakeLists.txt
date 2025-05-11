@@ -193,6 +193,17 @@ f3d_plugin_declare_reader(
   FORMAT_DESCRIPTION "Quake 1 MDL model"
 )
 
+# Needs vtkResourceStream (https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9663)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221216)
+  f3d_plugin_declare_reader(
+    NAME SPZ
+    EXTENSIONS spz
+    MIMETYPES application/vnd.spz
+    VTK_READER vtkF3DSPZReader
+    FORMAT_DESCRIPTION "Compressed 3D gaussian splats"
+  )
+endif()
+
 f3d_plugin_build(
   NAME native
   VERSION 1.0

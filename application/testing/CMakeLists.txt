@@ -367,6 +367,13 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240203)
     f3d_test(NAME Test3DGaussiansSplatting DATA small.splat ARGS -osy --up=-Y --point-sprites-size=1 --point-sprites-type=gaussian --camera-position=-3.6,0.5,-4.2)
     f3d_test(NAME TestDefaultConfigFileSPLAT DATA small.splat CONFIG config_build LONG_TIMEOUT UI)
     f3d_test(NAME TestThumbnailConfigFileSPLAT DATA small.splat CONFIG thumbnail_build LONG_TIMEOUT)
+
+    f3d_test(NAME TestSPZDegree0 DATA hornedlizard_small_d0.spz ARGS -osy --point-sprites-size=1 --point-sprites-type=gaussian --camera-position=-3.6,0.5,4.2)
+    f3d_test(NAME TestSPZDegree1 DATA hornedlizard_small_d1.spz ARGS -osy --point-sprites-size=1 --point-sprites-type=gaussian --camera-position=-3.6,0.5,4.2)
+    f3d_test(NAME TestSPZDegree2 DATA hornedlizard_small_d2.spz ARGS -osy --point-sprites-size=1 --point-sprites-type=gaussian --camera-position=-3.6,0.5,4.2)
+    f3d_test(NAME TestSPZDegree3 DATA hornedlizard_small_d3.spz ARGS -osy --point-sprites-size=1 --point-sprites-type=gaussian --camera-position=-3.6,0.5,4.2)
+    f3d_test(NAME TestDefaultConfigFileSPZ DATA hornedlizard_small_d3.spz CONFIG config_build LONG_TIMEOUT UI)
+    f3d_test(NAME TestThumbnailConfigFileSPZ DATA hornedlizard_small_d3.spz CONFIG thumbnail_build LONG_TIMEOUT)
   endif()
 endif()
 
