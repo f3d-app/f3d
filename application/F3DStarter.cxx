@@ -49,6 +49,7 @@
 #include <iomanip>
 #include <iostream>
 #include <mutex>
+#include <numeric>
 #include <regex>
 #include <set>
 
@@ -103,6 +104,7 @@ public:
     std::string InteractionTestRecordFile;
     std::string InteractionTestPlayFile;
     std::string CommandScriptFile;
+    std::string AnimationIndicesString;
   };
 
   void SetupCamera(const CameraConfiguration& camConf)
@@ -737,6 +739,7 @@ public:
     this->ParseOption(
       appOptions, "interaction-test-play", this->AppOptions.InteractionTestPlayFile);
     this->ParseOption(appOptions, "command-script", this->AppOptions.CommandScriptFile);
+    this->ParseOption(appOptions, "animation-indices", this->AppOptions.AnimationIndicesString);
   }
 
   void UpdateInterdependentOptions()
@@ -755,6 +758,25 @@ public:
       {
         f3d::log::error("Cannot find the colormap ", colorMapFile);
         this->LibOptions.model.scivis.colormap = f3d::colormap_t();
+      }
+    }
+  }
+
+  void UpdateAnimationIndices()
+  {
+    // animation-indices supports a special syntax "*"
+    if (this->AppOptions.AnimationIndicesString == "*")
+    {
+      int availAnimations = this->Engine->getScene().availableAnimations(); 
+      this->LibOptions.scene.animation.indices.resize(availAnimations);
+      std::iota(this->LibOptions.scene.animation.indices.begin(), this->LibOptions.scene.animation.indices.end(), availAnimations);
+    }
+    else
+    {
+      std::cout<<"this->AppOptions.AnimationIndicesString:"<<this->AppOptions.AnimationIndicesString<<std::endl;
+      if (!this->Parse(this->AppOptions.AnimationIndicesString, this->LibOptions.scene.animation.indices))
+      {
+        f3d::log::warn("Could not parse '", this->AppOptions.AnimationIndicesString, "' into 'scene.animation.indices' option");
       }
     }
   }
@@ -1116,6 +1138,9 @@ int F3DStarter::Start(int argc, char** argv)
 
   // Load a file
   this->LoadFileGroup();
+
+  // Update animation indices libf3d option
+  this->Internals->UpdateAnimationIndices();
 
   if (!this->Internals->AppOptions.NoRender)
   {

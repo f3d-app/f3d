@@ -99,6 +99,11 @@ public:
    */
   std::pair<double, double> GetTimeRange();
 
+  /**
+   * Get the number of available animations
+   */
+  int GetNumberOfAvailableAnimations();
+
   animationManager(animationManager const&) = delete;
   void operator=(animationManager const&) = delete;
 

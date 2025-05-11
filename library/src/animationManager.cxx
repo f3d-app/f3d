@@ -84,16 +84,18 @@ void animationManager::Initialize()
   if (this->AvailAnimations <= 0)
   {
     log::debug("No animation available");
-    if (this->Options.scene.animation.index > 0)
+    // TODO
+/*    if (this->Options.scene.animation.index > 0)
     {
       log::warn("An animation index has been specified but there are no animation available.");
-    }
+    }*/
     return;
   }
   else
   {
     log::debug("Animation(s) available are:");
   }
+
   for (int i = 0; i < this->AvailAnimations; i++)
   {
     log::debug(i, ": ", this->Importer->GetAnimationName(i));
@@ -304,6 +306,9 @@ void animationManager::PrepareForAnimationIndices()
 {
   assert(this->Importer);
 
+  std::cout<<"PrepareForAnimationIndices"<<std::endl;
+  std::cout<<this->Options.scene.animation.indices.size()<<std::endl;
+  std::cout<<this->PreparedAnimationIndices.size()<<std::endl;
   if (this->PreparedAnimationIndices == this->Options.scene.animation.indices || this->AvailAnimations <= 0)
   {
     // Already updated or no animation available
@@ -382,5 +387,15 @@ std::pair<double, double> animationManager::GetTimeRange()
 
   // Return updated data
   return std::make_pair(this->TimeRange[0], this->TimeRange[1]);
+}
+
+//----------------------------------------------------------------------------
+int animationManager::GetNumberOfAvailableAnimations()
+{
+  // Make sure TimeRange is updated
+  this->PrepareForAnimationIndices();
+
+  // Return updated data
+  return this->AvailAnimations;
 }
 }
