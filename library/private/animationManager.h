@@ -65,11 +65,6 @@ public:
   void CycleAnimation();
 
   /**
-   * Get the current animation index
-   */
-  int GetAnimationIndex();
-
-  /**
    * Return the current animation name if any
    * Can be called before initialization safely
    */
@@ -109,22 +104,24 @@ public:
 
 private:
   /**
-   * Update members for animation index from options
+   * Prepare time range and internal members for animation indices from options
+   * Return early if already prepared for the current subset of animation in the options
    */
-  void UpdateForAnimationIndex();
+  void PrepareForAnimationIndices();
 
   options& Options;
   window_impl& Window;
   vtkImporter* Importer = nullptr;
   interactor_impl* Interactor = nullptr;
 
+  int AvailAnimations = -1;
+
+  std::vector<int> PreparedAnimationIndices;
   double TimeRange[2] = { 0.0, 0.0 };
   bool Playing = false;
   double CurrentTime = 0;
   double DeltaTime = 0;
   bool CurrentTimeSet = false;
-  int AnimationIndex = -2;
-  int AvailAnimations = -1;
 
   vtkSmartPointer<vtkProgressBarWidget> ProgressWidget;
 };

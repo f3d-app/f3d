@@ -14,8 +14,10 @@
 #include <vtkRendererCollection.h>
 #include <vtkVersion.h>
 
+#include <algorithm>
 #include <cmath>
 #include <functional>
+#include <numeric>
 
 namespace f3d::detail
 {
@@ -97,10 +99,9 @@ void animationManager::Initialize()
     log::debug(i, ": ", this->Importer->GetAnimationName(i));
   }
 
-  // Reset animation index to an invalid value before updating
-  // TODO: Rework animation index to be a vector of int
-  this->AnimationIndex = -2;
-  this->UpdateForAnimationIndex();
+  // Reset animation indices before updating
+  this->PreparedAnimationIndices.clear();
+  this->PrepareForAnimationIndices();
 
   bool autoplay = this->Options.scene.animation.autoplay;
   if (autoplay)
@@ -130,7 +131,8 @@ void animationManager::StopAnimation()
 //----------------------------------------------------------------------------
 void animationManager::ToggleAnimation()
 {
-  if (this->AnimationIndex > -2 && this->Interactor)
+  this->PrepareForAnimationIndices();
+  if (!this->PreparedAnimationIndices.empty() && this->Interactor)
   {
     this->Playing = !this->Playing;
 
@@ -185,7 +187,9 @@ void animationManager::Tick()
 bool animationManager::LoadAtTime(double timeValue)
 {
   assert(this->Importer);
-  if (this->AnimationIndex == -2)
+
+  this->PrepareForAnimationIndices();
+  if (this->PreparedAnimationIndices.empty())
   {
     log::warn("No animation available, cannot load a specific animation time");
     return false;
@@ -246,13 +250,27 @@ void animationManager::CycleAnimation()
     return;
   }
 
-  this->Options.scene.animation.index++;
-  if (this->Options.scene.animation.index == this->AvailAnimations)
+  // If we started with multi animation or all animations
+  if (this->Options.scene.animation.indices.size() > 1)
   {
-    this->Options.scene.animation.index = -1;
+    // Then disable animation
+    this->Options.scene.animation.indices = {0};
+  }
+  else
+  {
+    // If there was, then increment animation index
+    this->Options.scene.animation.indices[0]++;
+
+    // If we reach/exceeded the last animation
+    if (this->Options.scene.animation.indices[0] >= this->AvailAnimations)
+    {
+      // Then select all
+      this->Options.scene.animation.indices.resize(this->AvailAnimations);
+      std::iota(this->Options.scene.animation.indices.begin(), this->Options.scene.animation.indices.end(), 0);
+    }
   }
 
-  this->UpdateForAnimationIndex();
+  this->PrepareForAnimationIndices();
   this->LoadAtTime(this->TimeRange[0]);
 
   vtkRenderWindow* renWin = this->Window.GetRenderWindow();
@@ -261,68 +279,61 @@ void animationManager::CycleAnimation()
 }
 
 // ---------------------------------------------------------------------------------
-int animationManager::GetAnimationIndex()
-{
-  return this->AnimationIndex;
-}
-
-// ---------------------------------------------------------------------------------
 std::string animationManager::GetAnimationName()
 {
   assert(this->Importer);
-  if (this->AvailAnimations <= 0 || this->AnimationIndex == -2)
+  if (this->AvailAnimations <= 0 || this->PreparedAnimationIndices.empty())
   {
     return "No animation";
   }
-
-  if (this->AnimationIndex == -1)
+  if (this->PreparedAnimationIndices.size() > 1)
   {
-    return "All Animations";
+    std::vector<bool> animCheck(this->AvailAnimations, false);
+    for (int idx : this->PreparedAnimationIndices)
+    {
+      animCheck[idx] = true;
+    }
+    return std::none_of(animCheck.begin(), animCheck.end(), std::logical_not<bool>()) ? "All animations" : "Multi animations";
   }
-  return this->Importer->GetAnimationName(this->AnimationIndex);
+
+  return this->Importer->GetAnimationName(this->PreparedAnimationIndices[0]);
 }
 
 //----------------------------------------------------------------------------
-void animationManager::UpdateForAnimationIndex()
+void animationManager::PrepareForAnimationIndices()
 {
   assert(this->Importer);
 
-  if (this->AnimationIndex == this->Options.scene.animation.index || this->AvailAnimations <= 0)
+  if (this->PreparedAnimationIndices == this->Options.scene.animation.indices || this->AvailAnimations <= 0)
   {
     // Already updated or no animation available
     return;
   }
 
-  // Valid animation index : ]-2, AvailAnimations[
-  if (this->Options.scene.animation.index <= -2 ||
-    this->Options.scene.animation.index >= this->AvailAnimations)
+  this->PreparedAnimationIndices = this->Options.scene.animation.indices;
+
+  // Disable all animations
+  for (int idx = 0; idx < this->AvailAnimations; idx++)
   {
-    log::warn(
-      "Specified animation index is greater than the highest possible animation index, enabling "
-      "the first animation.");
-    this->AnimationIndex = 0;
-  }
-  else
-  {
-    this->AnimationIndex = this->Options.scene.animation.index;
+    this->Importer->DisableAnimation(idx);
   }
 
-  for (int i = 0; i < this->AvailAnimations; i++)
+  // Enable the selected ones
+  for (int idx : this->PreparedAnimationIndices)
   {
-    this->Importer->DisableAnimation(i);
-  }
-  for (int i = 0; i < this->AvailAnimations; i++)
-  {
-    if (this->AnimationIndex == -1 || i == this->AnimationIndex)
+    if (idx < 0 || idx >= this->AvailAnimations)
     {
-      this->Importer->EnableAnimation(i);
+      log::warn(
+        "Specified animation index: ", idx , " is not in range [0, ", this->AvailAnimations, "], ignoring");
     }
+    this->Importer->EnableAnimation(idx);
   }
 
   // Display currently selected animation
   log::debug("Current animation is: ", this->GetAnimationName());
 
   // Recover time ranges for all enabled animations
+  bool foundAnimation = false;
   this->TimeRange[0] = std::numeric_limits<double>::infinity();
   this->TimeRange[1] = -std::numeric_limits<double>::infinity();
   for (vtkIdType animIndex = 0; animIndex < this->AvailAnimations; animIndex++)
@@ -341,8 +352,17 @@ void animationManager::UpdateForAnimationIndex()
       // Accumulate time ranges
       this->TimeRange[0] = std::min(timeRange[0], this->TimeRange[0]);
       this->TimeRange[1] = std::max(timeRange[1], this->TimeRange[1]);
+      foundAnimation = true;
     }
   }
+
+  // No animation, set a [0, 0] time range
+  if (!foundAnimation)
+  {
+    this->TimeRange[0] = this->TimeRange[1] = 0;
+  }
+
+  // Check time range is valid
   if (this->TimeRange[0] > this->TimeRange[1])
   {
     log::warn("Animation(s) time range delta is invalid: [", this->TimeRange[0], ", ",
@@ -358,7 +378,7 @@ void animationManager::UpdateForAnimationIndex()
 std::pair<double, double> animationManager::GetTimeRange()
 {
   // Make sure TimeRange is updated
-  this->UpdateForAnimationIndex();
+  this->PrepareForAnimationIndices();
 
   // Return updated data
   return std::make_pair(this->TimeRange[0], this->TimeRange[1]);

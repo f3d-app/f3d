@@ -13,6 +13,10 @@
         "type": "int",
         "default_value": "0"
       },
+      "indices": {
+        "type": "int_vector",
+        "default_value": "0"
+      },
       "speed_factor": {
         "type": "ratio",
         "default_value": "1.0"
