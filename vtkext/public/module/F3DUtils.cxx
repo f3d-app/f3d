@@ -42,9 +42,9 @@ unsigned int F3DUtils::ParseToUInt(const std::string& str, unsigned int def, con
       vtkWarningWithObjectMacro(
         nullptr, "Provided " << nameError << " out of range: " << str << ". Ignoring.");
     } else if (result.ec != std::errc()) {
-		vtkWarningWithObjectMacro(
+      vtkWarningWithObjectMacro(
         nullptr, "Could not parse " << nameError << ": " << str << ". Ignoring.");
-	}
+    }
   }
   return value;
 }

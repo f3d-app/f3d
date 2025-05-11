@@ -18,6 +18,7 @@ class vtkF3DQuakeMDLImporter : public vtkF3DImporter
 {
 public:
   static vtkF3DQuakeMDLImporter* New();
+  vtkTypeMacro(vtkF3DQuakeMDLImporter, vtkF3DImporter);
 
   /**
    * Set the file name.
