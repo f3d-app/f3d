@@ -1,7 +1,7 @@
 set(vtkextNativeTests_list "")
 
-# Needs vtkResourceStream (https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9663)
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221216)
+# Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12087
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
   list(APPEND vtkextNativeTests_list
     TestF3DSPZReader.cxx
   )
