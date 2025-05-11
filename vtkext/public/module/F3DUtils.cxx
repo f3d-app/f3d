@@ -38,12 +38,16 @@ unsigned int F3DUtils::ParseToUInt(const std::string& str, unsigned int def, con
   {
     auto result = std::from_chars(str.data(), str.data() + str.size(), value);
 
-    if (result.ec == std::errc::result_out_of_range) {
+    if (result.ec == std::errc::result_out_of_range) 
+    {
       vtkWarningWithObjectMacro(
         nullptr, "Provided " << nameError << " out of range: " << str << ". Ignoring.");
-    } else if (result.ec != std::errc()) {
+    }
+    else if (result.ec != std::errc() || *(result.ptr) != '\0') 
+    {
       vtkWarningWithObjectMacro(
         nullptr, "Could not parse " << nameError << ": " << str << ". Ignoring.");
+      return def;
     }
   }
   return value;
