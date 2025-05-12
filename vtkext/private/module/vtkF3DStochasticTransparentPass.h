@@ -31,6 +31,8 @@ public:
   void SetTranslucentPass(vtkRenderPass* translucentPass);
   void SetVolumetricPass(vtkRenderPass* volumetricPass);
 
+  bool PreReplaceShaderValues(std::string& vertexShader, std::string& geometryShader, std::string& fragmentShader, vtkAbstractMapper* mapper, vtkProp* prop) override;
+
 private:
   vtkF3DStochasticTransparentPass();
   ~vtkF3DStochasticTransparentPass() override;
