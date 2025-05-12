@@ -1,4 +1,5 @@
 #include <vtkObjectFactory.h>
+#include <vtkOpenGLShaderCache.h>
 
 #include "vtkF3DWGLRenderWindow.h"
 
@@ -105,4 +106,7 @@ void vtkF3DWGLRenderWindow::WindowInitialize()
 #if WINVER >= 0x0605
   SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 #endif
+
+  vtkOpenGLShaderCache* shaderCache = this->GetShaderCache();
+  shaderCache->SyncGLSLShaderVersionOn();
 }
