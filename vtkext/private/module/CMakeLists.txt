@@ -33,7 +33,7 @@ if(F3D_MODULE_UI)
   list(APPEND private_headers ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultLogo.h)
 endif()
 
-set(shader_files glsl/vtkF3DComputeDepthCS.glsl)
+set(shader_files glsl/vtkF3DComputeDepthCS.glsl glsl/vtkF3DRandomFS.glsl)
 
 if(F3D_MODULE_UI)
   list(APPEND shader_files glsl/vtkF3DImguiFS.glsl glsl/vtkF3DImguiVS.glsl)
