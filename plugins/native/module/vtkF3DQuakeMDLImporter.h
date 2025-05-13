@@ -18,6 +18,7 @@ class vtkF3DQuakeMDLImporter : public vtkF3DImporter
 {
 public:
   static vtkF3DQuakeMDLImporter* New();
+  vtkTypeMacro(vtkF3DQuakeMDLImporter, vtkF3DImporter);
 
   /**
    * Set the file name.
@@ -53,6 +54,11 @@ public:
    */
   bool GetTemporalInformation(vtkIdType animationIndex, double frameRate, int& nbTimeSteps,
     double timeRange[2], vtkDoubleArray* timeSteps) override;
+
+  /**
+   * Set the skin index.
+   */
+  void setSkinIndex(unsigned int _skinIndex);
 
 protected:
   vtkF3DQuakeMDLImporter();

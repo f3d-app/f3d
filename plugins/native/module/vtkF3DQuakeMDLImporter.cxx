@@ -10,6 +10,7 @@
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
 
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkF3DQuakeMDLImporter);
 
@@ -132,8 +133,12 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     img->SetDimensions(skinWidth, skinHeight, 1);
     img->AllocateScalars(VTK_UNSIGNED_CHAR, 3);
 
-    // XXX: Skin index selection not supported yet
-    const unsigned char* selectedSkin = skins[0].skin;
+    if (this->skinIndex >= nbSkins)
+    {
+      this->skinIndex = 0;
+      vtkWarningWithObjectMacro(this->Parent, "QuakeMDL.skin_index is out of bounds. Defauling to 0.");
+    }
+    const unsigned char* selectedSkin = skins[this->skinIndex].skin;
     for (int i = 0; i < skinHeight; i++)
     {
       for (int j = 0; j < skinWidth; j++)
@@ -424,6 +429,8 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   std::vector<std::vector<vtkSmartPointer<vtkPolyData>>> AnimationFrames;
 
   vtkIdType ActiveAnimation = -1;
+
+  unsigned int skinIndex = 0;
 };
 
 //----------------------------------------------------------------------------
@@ -528,4 +535,10 @@ bool vtkF3DQuakeMDLImporter::GetTemporalInformation(vtkIdType animationIndex,
   timeRange[0] = times.front();
   timeRange[1] = times.back();
   return true;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DQuakeMDLImporter::setSkinIndex(unsigned int _skinIndex)
+{
+  this->Internals->skinIndex = _skinIndex;
 }
