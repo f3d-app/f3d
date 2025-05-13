@@ -121,6 +121,24 @@ void vtkF3DSplatMapperHelper::BuildBufferObjects(vtkRenderer* ren, vtkActor* act
     return;
   }
 
+  auto arrayValid = [&](vtkUnsignedCharArray* array)
+  {
+    if (!array)
+    {
+      return false;
+    }
+
+    bool isValid = array->GetNumberOfComponents() == 3 && array->GetNumberOfTuples() == splatCount;
+
+    if (!isValid)
+    {
+      vtkWarningMacro("Spherical harmonics array is not valid");
+      return false;
+    }
+
+    return true;
+  };
+
   vtkUnsignedCharArray* sh1m1 =
     vtkUnsignedCharArray::SafeDownCast(poly->GetPointData()->GetArray("sh1m1"));
   vtkUnsignedCharArray* sh10 =
@@ -128,10 +146,10 @@ void vtkF3DSplatMapperHelper::BuildBufferObjects(vtkRenderer* ren, vtkActor* act
   vtkUnsignedCharArray* sh1p1 =
     vtkUnsignedCharArray::SafeDownCast(poly->GetPointData()->GetArray("sh1p1"));
 
-  if (sh1m1 && sh10 && sh1p1)
+  if (arrayValid(sh1m1) && arrayValid(sh10) && arrayValid(sh1p1))
   {
-  // Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12112
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250512)
+    // Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12112
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
     int width = this->MaxTextureSize;
     int height = 1 + (splatCount / this->MaxTextureSize);
 
@@ -157,7 +175,8 @@ void vtkF3DSplatMapperHelper::BuildBufferObjects(vtkRenderer* ren, vtkActor* act
     vtkUnsignedCharArray* sh2p2 =
       vtkUnsignedCharArray::SafeDownCast(this->GetInput()->GetPointData()->GetArray("sh2p2"));
 
-    if (sh2m2 && sh2m1 && sh20 && sh2p1 && sh2p2)
+    if (arrayValid(sh2m2) && arrayValid(sh2m1) && arrayValid(sh20) && arrayValid(sh2p1) &&
+      arrayValid(sh2p2))
     {
       std::copy_n(
         sh2m2->GetPointer(0), sh2m2->GetNumberOfValues(), packedData.data() + 3 * sliceSize);
@@ -188,7 +207,8 @@ void vtkF3DSplatMapperHelper::BuildBufferObjects(vtkRenderer* ren, vtkActor* act
       vtkUnsignedCharArray* sh3p3 =
         vtkUnsignedCharArray::SafeDownCast(this->GetInput()->GetPointData()->GetArray("sh3p3"));
 
-      if (sh3m3 && sh3m2 && sh3m1 && sh30 && sh3p1 && sh3p2 && sh3p3)
+      if (arrayValid(sh3m3) && arrayValid(sh3m2) && arrayValid(sh3m1) && arrayValid(sh30) &&
+        arrayValid(sh3p1) && arrayValid(sh3p2) && arrayValid(sh3p3))
       {
         std::copy_n(
           sh3m3->GetPointer(0), sh3m3->GetNumberOfValues(), packedData.data() + 8 * sliceSize);
