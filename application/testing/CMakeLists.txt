@@ -369,14 +369,15 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240203)
     f3d_test(NAME TestThumbnailConfigFileSPLAT DATA small.splat CONFIG thumbnail_build LONG_TIMEOUT)
 
     f3d_test(NAME TestSPZDegree0 DATA hornedlizard_small_d0.spz ARGS -osy --point-sprites-size=1 --point-sprites-type=gaussian --camera-position=-3.6,0.5,4.2)
-    f3d_test(NAME TestDefaultConfigFileSPZ DATA hornedlizard_small_d3.spz CONFIG config_build LONG_TIMEOUT UI)
-    f3d_test(NAME TestThumbnailConfigFileSPZ DATA hornedlizard_small_d3.spz CONFIG thumbnail_build LONG_TIMEOUT)
 
     # Needs texture array support: https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12112
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250513)
       f3d_test(NAME TestSPZDegree1 DATA hornedlizard_small_d1.spz ARGS -osy --point-sprites-size=1 --point-sprites-type=gaussian --camera-position=-3.6,0.5,4.2)
       f3d_test(NAME TestSPZDegree2 DATA hornedlizard_small_d2.spz ARGS -osy --point-sprites-size=1 --point-sprites-type=gaussian --camera-position=-3.6,0.5,4.2)
       f3d_test(NAME TestSPZDegree3 DATA hornedlizard_small_d3.spz ARGS -osy --point-sprites-size=1 --point-sprites-type=gaussian --camera-position=-3.6,0.5,4.2)
+
+      f3d_test(NAME TestDefaultConfigFileSPZ DATA hornedlizard_small_d3.spz CONFIG config_build LONG_TIMEOUT UI)
+      f3d_test(NAME TestThumbnailConfigFileSPZ DATA hornedlizard_small_d3.spz CONFIG thumbnail_build LONG_TIMEOUT)
     endif()
   endif()
 endif()
