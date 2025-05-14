@@ -110,17 +110,6 @@ void vtkF3DSplatMapperHelper::BuildBufferObjects(vtkRenderer* ren, vtkActor* act
 
   this->SphericalHarmonicsDegree = 0;
 
-  // we store each spherical harmonics packed in a RGB 8-bits texture.
-  // we use the GPU maximum texture size to set the width of the texture.
-  // the height will depends on the number of gaussians.
-  glGetIntegerv(GL_MAX_TEXTURE_SIZE, &this->MaxTextureSize);
-
-  if (splatCount > this->MaxTextureSize * this->MaxTextureSize)
-  {
-    vtkWarningMacro("Gaussians count is too high to support spherical harmonics on this GPU");
-    return;
-  }
-
   auto arrayValid = [&](vtkUnsignedCharArray* array)
   {
     if (!array)
@@ -150,6 +139,18 @@ void vtkF3DSplatMapperHelper::BuildBufferObjects(vtkRenderer* ren, vtkActor* act
   {
     // Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12112
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
+
+    // we store each spherical harmonics packed in a RGB 8-bits texture.
+    // we use the GPU maximum texture size to set the width of the texture.
+    // the height will depends on the number of gaussians.
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &this->MaxTextureSize);
+
+    if (splatCount > this->MaxTextureSize * this->MaxTextureSize)
+    {
+      vtkWarningMacro("Gaussians count is too high to support spherical harmonics on this GPU");
+      return;
+    }
+
     int width = this->MaxTextureSize;
     int height = 1 + (splatCount / this->MaxTextureSize);
 
