@@ -1925,6 +1925,16 @@ void vtkF3DRenderer::SetEmissiveFactor(const std::optional<std::vector<double>>&
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetTexturesTransform(const std::optional<std::vector<double>>& transform)
+{
+  if (this->TexturesTransform != transform)
+  {
+    this->TexturesTransform = transform;
+    this->ActorsPropertiesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetTextureMatCap(const std::optional<fs::path>& tex)
 {
   if (this->TextureMatCap != tex)
