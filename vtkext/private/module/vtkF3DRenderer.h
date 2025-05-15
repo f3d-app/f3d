@@ -220,6 +220,11 @@ public:
   void SetEmissiveFactor(const std::optional<std::vector<double>>& factors);
 
   /**
+   * Set the texture transform on all actors
+   */
+  void SetTexturesTransform(const std::optional<std::vector<double>>& transform);
+
+  /**
    * Set the opacity on all actors
    */
   void SetOpacity(const std::optional<double>& opacity);
@@ -608,6 +613,7 @@ private:
   std::optional<double> NormalScale;
   std::optional<std::vector<double>> SurfaceColor;
   std::optional<std::vector<double>> EmissiveFactor;
+  std::optional<std::vector<double>> TexturesTransform;
   std::optional<fs::path> TextureMatCap;
   std::optional<fs::path> TextureBaseColor;
   std::optional<fs::path> TextureMaterial;

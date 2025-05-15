@@ -492,6 +492,26 @@ colormap_t parse(const std::string& str)
 
 //----------------------------------------------------------------------------
 /**
+ *  Parse provided string into a transform2d_t
+ *  Supported format: double, double, double, ... as a sequence of 9 values
+ */
+template<>
+transform2d_t parse(const std::string& str)
+{
+  std::vector<double> input;
+  try
+  {
+    input = parse<std::vector<double>>(str);
+  }
+  catch (const options::parsing_exception&)
+  {
+    // Quiet catch
+  }
+  return transform2d_t(input);
+}
+
+//----------------------------------------------------------------------------
+/**
  * Format provided var into a string from provided boolean
  * using boolalpha formatting, eg: "true" or "false"
  */
@@ -665,6 +685,23 @@ std::string format(const colormap_t& var)
   {
     stream << ((i > 0) ? "," : "") << options_tools::format(vec[i * 4]) << ","
            << options_tools::format(color_t(vec[i * 4 + 1], vec[i * 4 + 2], vec[i * 4 + 3]));
+  }
+  return stream.str();
+}
+
+//----------------------------------------------------------------------------
+/**
+ * Format provided var into a string from provided transform2d_t.
+ * Rely on `format(double)` for each item in value array`
+ */
+std::string format(const transform2d_t& var)
+{
+  std::ostringstream stream;
+  std::vector<double> vec(var);
+  size_t size = vec.size();
+  for (unsigned int i = 0; i < size; i++)
+  {
+    stream << ((i > 0) ? "," : "") << options_tools::format(vec[i]);
   }
   return stream.str();
 }

@@ -260,6 +260,10 @@
         "type": "path"
       }
     },
+    "textures_transform": {
+      "type": "transform2d",
+      "default_value": "1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0"
+    },
     "scivis": {
       "enable": {
         "type": "bool",
