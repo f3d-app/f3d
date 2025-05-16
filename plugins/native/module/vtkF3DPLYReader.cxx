@@ -201,8 +201,8 @@ int vtkF3DPLYReader::RequestData(
 
   // open a PLY file for reading
   PlyFile* ply;
-  int nelems, numElems, nprops;
-  char **elist, *elemName;
+  int nelems;
+  char** elist;
 
   if (this->ReadFromInputStream)
   {
@@ -233,7 +233,8 @@ int vtkF3DPLYReader::RequestData(
 
   int numPts;
   int numProps;
-  vtkPLY::ply_get_element_description(ply, "vertex", &numPts, &numProps);
+  std::string elemName = "vertex";
+  vtkPLY::ply_get_element_description(ply, elemName.data(), &numPts, &numProps);
 
   for (PlyProperty& prop : vertProps)
   {
