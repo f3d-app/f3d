@@ -4,7 +4,7 @@ set(classes
 
 # Needs vtkResourceStream (https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9663)
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221216)
-  set(classes "${classes}" vtkF3DSPZReader vtkF3DSplatReader)
+  set(classes "${classes}" vtkF3DSPZReader vtkF3DSplatReader vtkF3DPLYReader)
 endif()
 
 set(_no_install "")
