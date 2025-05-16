@@ -2,8 +2,9 @@
  * @class   vtkF3DPLYReader
  * @brief   VTK Reader for 3D Gaussians in binary .ply file format
  *
- * Reader for "classic" INRIA .ply files as defined in https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/
- * Supports 3rd degree spherical harmonics.
+ * Reader for "classic" INRIA .ply files as defined in
+ * https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/ Supports 3rd degree spherical
+ * harmonics.
  */
 
 #ifndef vtkF3DPLYReader_h
