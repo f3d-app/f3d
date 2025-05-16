@@ -236,7 +236,7 @@ void vtkF3DSplatMapperHelper::BuildBufferObjects(vtkRenderer* ren, vtkActor* act
     this->SphericalHarmonicsTexture->Create2DArrayFromRaw(
       width, height, 3, VTK_UNSIGNED_CHAR, layers, packedData.data());
 #else
-    vtkWarningMacro("VTK <= 9.4 does not support gaussian spherical harmonics");
+    vtkWarningMacro("VTK < 9.5.0 does not support gaussian spherical harmonics");
 #endif
   }
 }
