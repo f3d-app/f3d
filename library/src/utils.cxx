@@ -120,7 +120,189 @@ fs::path utils::collapsePath(const fs::path& path, const fs::path& baseDirectory
 }
 
 //----------------------------------------------------------------------------
+std::string utils::globToRegex(std::string_view glob, bool fullMatch, bool supportGlobStars)
+{
+  std::string result;
+
+  std::vector<size_t> alternations;
+  bool escaped = false;
+  bool inCharClass = false;
+
+  if (fullMatch)
+  {
+    result += '^';
+  }
+
+  for (size_t i = 0; i < glob.size(); i++)
+  {
+    char c = glob[i];
+
+    switch (c)
+    {
+      case '*':
+        if (escaped || inCharClass)
+        {
+          result += c;
+        }
+        else
+        {
+          char prevChar = i > 0 ? glob[i - 1] : '\0';
+          unsigned starCount = 1;
+          while (i + 1 < glob.size() && glob[i + 1] == '*')
+          {
+            starCount++;
+            i++;
+          }
+          char nextChar = i + 1 < glob.size() ? glob[i + 1] : '\0';
+          if (supportGlobStars)
+          {
+            if (starCount > 1 && (prevChar == '/' || prevChar == '\0') &&
+              (nextChar == '/' || !nextChar))
+            {
+              result += "(?:[^/]*(?:/|$))*";
+              i++; // Eat nextChar
+            }
+            else
+            {
+              result += "[^/]*";
+            }
+          }
+          else
+          {
+            result += ".*";
+          }
+        }
+        escaped = false;
+        break;
+      case '?':
+        if (escaped || inCharClass)
+        {
+          result += '?';
+        }
+        else if (supportGlobStars)
+        {
+          result += "[^/]";
+        }
+        else
+        {
+          result += '.';
+        }
+        escaped = false;
+        break;
+      case '[':
+        result += '[';
+        if (!escaped && !inCharClass)
+        {
+          inCharClass = true;
+          if (i + 1 < glob.size() && (glob[i + 1] == '!' || glob[i + 1] == '^'))
+          {
+            result += '^';
+            i++; // Eat the '!' or '^'
+          }
+        }
+        escaped = false;
+        break;
+      case ']':
+        result += ']';
+        if (!escaped)
+        {
+          inCharClass = false;
+        }
+        escaped = false;
+        break;
+      case '{':
+        if (!escaped && !inCharClass)
+        {
+          alternations.push_back(i);
+          result += "(?:";
+        }
+        else
+        {
+          result += '{';
+        }
+        escaped = false;
+        break;
+      case '}':
+        if (!escaped && !inCharClass && !alternations.empty())
+        {
+          result += ')';
+          alternations.pop_back();
+        }
+        else
+        {
+          result += '}';
+        }
+        escaped = false;
+        break;
+      case ',':
+        if (!escaped && !inCharClass && !alternations.empty())
+        {
+          result += '|';
+        }
+        else
+        {
+          result += ',';
+        }
+        escaped = false;
+        break;
+      case '\\':
+        result += c;
+        if (escaped)
+        {
+          escaped = false;
+        }
+        else
+        {
+          escaped = true;
+        }
+        break;
+      case '.':
+      case '(':
+      case ')':
+      case '+':
+      case '|':
+      case '^':
+      case '$':
+        if (!inCharClass)
+        {
+          result += '\\';
+        }
+        result += c;
+        escaped = false;
+        break;
+      default:
+        result += c;
+        escaped = false;
+        break;
+    }
+  }
+
+  if (escaped)
+  {
+    throw glob_exception("Escape at end of glob expression");
+  }
+  if (inCharClass || !alternations.empty())
+  {
+    throw glob_exception(
+      "Unmatched '" + std::string(inCharClass ? "]" : "}") + "' in glob expression");
+  }
+
+  if (fullMatch)
+  {
+    result += '$';
+  }
+
+  return result;
+}
+
+//----------------------------------------------------------------------------
 utils::tokenize_exception::tokenize_exception(const std::string& what)
+  : exception(what)
+{
+}
+
+//----------------------------------------------------------------------------
+utils::glob_exception::glob_exception(const std::string& what)
   : exception(what)
 {
 }

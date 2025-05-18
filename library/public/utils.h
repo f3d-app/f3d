@@ -69,11 +69,33 @@ public:
     const std::filesystem::path& path, const std::filesystem::path& baseDirectory = {});
 
   /**
+   * Converts a glob expression to a regular expression
+   *
+   * It handles the following glob features:
+   * - '*': Matches any number of chracters (except path separators)
+   * - '?': Matches exactly one character (except path separators)
+   * - '[...]': Character classes
+   * - '[!...] or '[^...]': Negated character classes
+   * - '**': Matches any number of characters including path separators if enabled
+   * - '{a,b,c}': Alternation (matches any of the comma-separated patterns)
+   */
+  [[nodiscard]] static std::string globToRegex(
+    std::string_view glob, bool fullMatch = true, bool supportGlobStars = true);
+
+  /**
    * An exception that can be thrown by tokenize
    */
   struct tokenize_exception : public exception
   {
     explicit tokenize_exception(const std::string& what = "");
+  };
+
+  /**
+   * An exception that can be thown by globToRegex
+   */
+  struct glob_exception : public exception
+  {
+    explicit glob_exception(const std::string& what = "");
   };
 
   /** String template allowing substitution of variables enclosed in curly braces.
