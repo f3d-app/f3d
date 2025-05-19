@@ -5,6 +5,12 @@ void applyCustomImporter(vtkImporter* importer, const std::string& fileName) con
   std::string optName = "QuakeMDL.skin_index";
   std::string dsOptStr = this->ReaderOptions.at(optName);
 
-  unsigned int skinIndex = F3DUtils::ParseToInt(dsOptStr, 0, optName);
-  mdlImporter->setSkinIndex(skinIndex);
+  int skinIndex = F3DUtils::ParseToInt(dsOptStr, 0, optName);
+  if (skinIndex < 0)
+  {
+    skinIndex = 0;
+    vtkWarningWithObjectMacro(
+      nullptr, "skinIndex must be positive. Defaulting to 0.");
+  }
+  mdlImporter->SetSkinIndex(skinIndex);
 }

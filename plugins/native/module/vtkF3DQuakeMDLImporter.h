@@ -56,9 +56,10 @@ public:
     double timeRange[2], vtkDoubleArray* timeSteps) override;
 
   /**
-   * Set the skin index.
+   * Set/Get the skin index.
    */
-  void setSkinIndex(unsigned int _skinIndex);
+  vtkSetMacro(SkinIndex, unsigned int);
+  vtkGetMacro(SkinIndex, unsigned int);
 
 protected:
   vtkF3DQuakeMDLImporter();
@@ -73,6 +74,7 @@ private:
 
   struct vtkInternals;
   std::string FileName;
+  unsigned int SkinIndex = 0;
 
   std::unique_ptr<vtkInternals> Internals;
 };
