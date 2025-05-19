@@ -31,9 +31,9 @@ double F3DUtils::ParseToDouble(const std::string& str, double def, const std::st
 }
 
 //----------------------------------------------------------------------------
-unsigned int F3DUtils::ParseToUInt(const std::string& str, unsigned int def, const std::string& nameError)
+int F3DUtils::ParseToInt(const std::string& str, int def, const std::string& nameError)
 {
-  unsigned int value = def;
+  int value = def;
   if (!str.empty())
   {
     auto result = std::from_chars(str.data(), str.data() + str.size(), value);
