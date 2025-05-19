@@ -23,17 +23,17 @@ class MemStream : public Imf::IStream
 public:
   MemStream(const char* name, const void* buff, vtkIdType bufferLen)
     : Imf::IStream(name)
-    , buffer(static_cast<const char*>(buff))
-    , bufflen(static_cast<size_t>(bufferLen))
+    , Buffer(static_cast<const char*>(buff))
+    , BuffLen(static_cast<size_t>(bufferLen))
   {
   }
 
-  bool read(char c[], int n) override
+  bool read(char content[], int size) override
   {
-    if (pos + n <= bufflen)
+    if (this->Pos + size <= this->BuffLen)
     {
-      std::copy_n(buffer + pos, n, c);
-      pos += n;
+      std::copy_n(this->Buffer + this->Pos, size, content);
+      this->Pos += size;
       return true;
     }
     return false;
@@ -45,21 +45,21 @@ public:
    */
   uint64_t tellg() override
   {
-    return pos;
+    return this->Pos;
   }
 
   /**
    * sets the current reading position to pos bytes from the beginning of the "file"
    */
-  void seekg(uint64_t new_pos) override
+  void seekg(uint64_t newPos) override
   {
-    pos = new_pos;
+    this->Pos = newPos;
   }
 
 private:
-  const char* buffer;
-  size_t bufflen;
-  uint64_t pos = 0;
+  const char* Buffer;
+  size_t BuffLen;
+  uint64_t Pos = 0;
 };
 
 vtkStandardNewMacro(vtkF3DEXRReader);
@@ -91,7 +91,7 @@ void vtkF3DEXRReader::ExecuteInformation()
     return;
   }
 
-  auto execute = [&](Imf::RgbaInputFile& file)
+  auto checkChannels = [&](Imf::RgbaInputFile& file)
   {
     Imath::Box2i dw = file.dataWindow();
     this->DataExtent[0] = dw.min.x;
@@ -112,12 +112,12 @@ void vtkF3DEXRReader::ExecuteInformation()
     {
       MemStream memoryStream("EXRmemoryStream", this->MemoryBuffer, this->MemoryBufferLength);
       Imf::RgbaInputFile file = Imf::RgbaInputFile(memoryStream);
-      execute(file);
+      checkChannels(file);
     }
     else
     {
       Imf::RgbaInputFile file(this->InternalFileName);
-      execute(file);
+      checkChannels(file);
     }
   }
   catch (const std::exception& e)
@@ -175,7 +175,7 @@ void vtkF3DEXRReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInfor
   scalars->SetName("Pixels");
   float* dataPtr = scalars->GetPointer(0);
 
-  auto execute = [&](Imf::RgbaInputFile& file)
+  auto readContent = [&](Imf::RgbaInputFile& file)
   {
     Imf::Array2D<Imf::Rgba> pixels(this->GetHeight(), this->GetWidth());
 
@@ -203,12 +203,12 @@ void vtkF3DEXRReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInfor
     {
       MemStream memoryStream("EXRmemoryStream", this->MemoryBuffer, this->MemoryBufferLength);
       Imf::RgbaInputFile file = Imf::RgbaInputFile(memoryStream);
-      execute(file);
+      readContent(file);
     }
     else
     {
       Imf::RgbaInputFile file(this->InternalFileName);
-      execute(file);
+      readContent(file);
     }
   }
   catch (const std::exception& e)
