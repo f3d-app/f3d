@@ -44,6 +44,7 @@
 - PinkEggFromLW.dxf: assimp test models: BSD-3-Clause
 - punch.fbx: batrisya1501: [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - RectGrid2.vtr: VTK Data: BSD-3-Clause
+- Rec709.exr: [Copyright 2006 Industrial Light & Magic](https://github.com/AcademySoftwareFoundation/openexr/blob/370db2835843ac75f85e1386c05455f26a6ff58c/website/test_images/Chromaticities/Rec709.rst): BSD-3-Clause
 - red.jpg: glTF-Sample-Models: Public Domain
 - RiggedFigure.glb: glTF-Sample-Models: Public Domain
 - RiggedSimple.usdz: [USD Working Group](https://github.com/usd-wg/assets): [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
@@ -52,6 +53,7 @@
 - SimpleSkin.gltf: glTF-Sample-Models: Public Domain
 - skin.png: Blender: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
 - small.ex2: VTK Data: BSD-3-Clause
+- small.usdz: [Copyright USD contributors](https://github.com/usd-wg/assets/tree/main/full_assets/StandardShaderBall): [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - soldier_animations.mdl: LibreQuake Project: BSD-3-Clause
 - sphere_points.vdb: OpenVDB: [MPL-2.0](http://www.mozilla.org/MPL/2.0/)
 - teapot.off: Utah Teapot: Public Domain
