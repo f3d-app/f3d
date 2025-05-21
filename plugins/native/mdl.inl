@@ -10,7 +10,7 @@ void applyCustomImporter(vtkImporter* importer, const std::string& fileName) con
   {
     skinIndex = 0;
     vtkWarningWithObjectMacro(
-      nullptr, "skinIndex must be positive. Defaulting to 0.");
+      nullptr, "QuakeMDL.skin_index must be positive. Defaulting to 0.");
   }
   mdlImporter->SetSkinIndex(skinIndex);
 }

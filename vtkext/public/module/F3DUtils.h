@@ -23,7 +23,7 @@ VTKEXT_EXPORT double ParseToDouble(
   const std::string& str, double def, const std::string& nameError);
 
 /*
- * Convert provided std into an unsigned int and returns it.
+ * Convert provided std into an int and returns it.
  * Similar to ParseToDouble()
  */
 VTKEXT_EXPORT int ParseToInt(
