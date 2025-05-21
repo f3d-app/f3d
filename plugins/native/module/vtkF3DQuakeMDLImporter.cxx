@@ -132,7 +132,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     img->SetDimensions(skinWidth, skinHeight, 1);
     img->AllocateScalars(VTK_UNSIGNED_CHAR, 3);
 
-    if (skinIndex >= nbSkins)
+    if (skinIndex >= (unsigned int)nbSkins)
     {
       skinIndex = 0;
       vtkWarningWithObjectMacro(this->Parent, "QuakeMDL.skin_index is out of bounds. Defauling to 0.");
