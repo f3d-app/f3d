@@ -167,6 +167,7 @@ f3d_test(NAME TestQuakeMDLAnimationBetween DATA zombie.mdl ARGS --animation-time
 f3d_test(NAME TestQuakeMDLAnimationMulti DATA soldier_animations.mdl ARGS --animation-index=2 --animation-time=0.5)
 f3d_test(NAME TestQuakeMDLAnimationGroupFrame DATA flame_mixed.mdl ARGS --animation-index=1 --animation-time=0.5)
 f3d_test(NAME TestQuakeMDLDisableAnimation DATA zombie.mdl soldier_animations.mdl ARGS --multi-file-mode=all --animation-time=0.5)
+f3d_test(NAME TestQuakeMDLSkinIndex DATA armor.mdl ARGS -DQuakeMDL.skin_index=2)
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
   f3d_test(NAME TestQuakeMDLActorCollection DATA zombie.mdl ARGS --scalar-coloring)
 endif()
