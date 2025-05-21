@@ -79,23 +79,3 @@ When making changes to the `default_versions.json` file, continuous integration 
 This is required in order to merge the pull request.
 
 The continuous integration is just code, as the rest of F3D is. If you want to fix or improve it, you are very welcome to!
-
-## F3D Architecture
-
-F3D is divided into different components:
-
-- The `f3d` executable, in the `application` folder.
-- The `libf3d` library, in the `library` folder.
-- The extensions to VTK, in the `vtkext` folder.
-- The bindings for Python, Java, and WebAssembly, in their respective folders.
-- The plugins, providing all the different readers in the plugins directory.
-
-The extensions to VTK are divided into two modules:
-
-- The [private module](vtkext/private) is used exclusively by `libf3d`.
-- The [public module](vtkext/public) is used by `libf3d` and also by plugins. Additional documentation can be found in [PLUGINS.md](doc/libf3d/PLUGINS.md).
-
-The `libf3d` library implements the whole logic of instancing and manipulating the different VTK classes, it is fully documented in the [libf3d README](doc/libf3d/README_LIBF3D.md).
-
-The `f3d` executable itself uses `libf3d` and adds an application layer on top of it, especially the handling of [command line options](doc/user/OPTIONS.md)
-and a [configuration file](doc/user/CONFIGURATION_FILE.md).
