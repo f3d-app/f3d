@@ -691,15 +691,21 @@ public:
     if (this->AppOptions.AnimationIndicesString == "*")
     {
       int availAnimations = this->Engine->getScene().availableAnimations(); 
-      this->LibOptions.scene.animation.indices.resize(availAnimations);
-      std::iota(this->LibOptions.scene.animation.indices.begin(), this->LibOptions.scene.animation.indices.end(), availAnimations);
+      std::vector<int> indices(availAnimations);
+      std::iota(indices.begin(), indices.end(), availAnimations);
+      this->Engine->getScene().enableAnimations(indices);
     }
     else
     {
       std::cout<<"this->AppOptions.AnimationIndicesString:"<<this->AppOptions.AnimationIndicesString<<std::endl;
-      if (!this->Parse(this->AppOptions.AnimationIndicesString, this->LibOptions.scene.animation.indices))
+      std::vector<int> indices;
+      if (!this->Parse(this->AppOptions.AnimationIndicesString, indices))
       {
-        f3d::log::warn("Could not parse '", this->AppOptions.AnimationIndicesString, "' into 'scene.animation.indices' option");
+        f3d::log::warn("Could not parse '", this->AppOptions.AnimationIndicesString, "' into proper indices");
+      }
+      else
+      {
+        this->Engine->getScene().enableAnimations(indices);
       }
     }
   }

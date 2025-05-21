@@ -103,6 +103,7 @@ public:
    * Get the number of available animations
    */
   int GetNumberOfAvailableAnimations();
+  void EnableAnimations(const std::vector<int>& indices);
 
   animationManager(animationManager const&) = delete;
   void operator=(animationManager const&) = delete;

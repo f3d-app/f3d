@@ -103,6 +103,10 @@ public:
    */
   [[nodiscard]] virtual int availableAnimations() = 0;
 
+  /**
+   */
+  virtual void enableAnimations(const std::vector<int> indices) = 0;
+
 protected:
   //! @cond
   scene() = default;

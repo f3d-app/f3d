@@ -102,8 +102,8 @@ void animationManager::Initialize()
   }
 
   // Reset animation indices before updating
-  this->PreparedAnimationIndices.clear();
-  this->PrepareForAnimationIndices();
+//  this->PreparedAnimationIndices.clear();
+//  this->PrepareForAnimationIndices();
 
   bool autoplay = this->Options.scene.animation.autoplay;
   if (autoplay)
@@ -133,7 +133,7 @@ void animationManager::StopAnimation()
 //----------------------------------------------------------------------------
 void animationManager::ToggleAnimation()
 {
-  this->PrepareForAnimationIndices();
+//  this->PrepareForAnimationIndices();
   if (!this->PreparedAnimationIndices.empty() && this->Interactor)
   {
     this->Playing = !this->Playing;
@@ -190,7 +190,7 @@ bool animationManager::LoadAtTime(double timeValue)
 {
   assert(this->Importer);
 
-  this->PrepareForAnimationIndices();
+//  this->PrepareForAnimationIndices();
   if (this->PreparedAnimationIndices.empty())
   {
     log::warn("No animation available, cannot load a specific animation time");
@@ -252,27 +252,28 @@ void animationManager::CycleAnimation()
     return;
   }
 
+  std::vector<int> indices = this->PreparedAnimationIndices;
   // If we started with multi animation or all animations
-  if (this->Options.scene.animation.indices.size() > 1)
+  if (indices.size() > 1)
   {
     // Then disable animation
-    this->Options.scene.animation.indices = {0};
+    indices = {0};
   }
   else
   {
     // If there was, then increment animation index
-    this->Options.scene.animation.indices[0]++;
+    indices[0]++;
 
     // If we reach/exceeded the last animation
-    if (this->Options.scene.animation.indices[0] >= this->AvailAnimations)
+    if (indices[0] >= this->AvailAnimations)
     {
       // Then select all
-      this->Options.scene.animation.indices.resize(this->AvailAnimations);
-      std::iota(this->Options.scene.animation.indices.begin(), this->Options.scene.animation.indices.end(), 0);
+      indices.resize(this->AvailAnimations);
+      std::iota(indices.begin(), indices.end(), 0);
     }
   }
 
-  this->PrepareForAnimationIndices();
+  this->EnableAnimations(indices);
   this->LoadAtTime(this->TimeRange[0]);
 
   vtkRenderWindow* renWin = this->Window.GetRenderWindow();
@@ -302,20 +303,20 @@ std::string animationManager::GetAnimationName()
 }
 
 //----------------------------------------------------------------------------
-void animationManager::PrepareForAnimationIndices()
+void animationManager::EnableAnimations(const std::vector<int>& indices)
 {
   assert(this->Importer);
 
-  std::cout<<"PrepareForAnimationIndices"<<std::endl;
+/*  std::cout<<"PrepareForAnimationIndices"<<std::endl;
   std::cout<<this->Options.scene.animation.indices.size()<<std::endl;
-  std::cout<<this->PreparedAnimationIndices.size()<<std::endl;
-  if (this->PreparedAnimationIndices == this->Options.scene.animation.indices || this->AvailAnimations <= 0)
+  std::cout<<this->PreparedAnimationIndices.size()<<std::endl;*/
+  if (this->PreparedAnimationIndices == indices || this->AvailAnimations <= 0)
   {
     // Already updated or no animation available
     return;
   }
 
-  this->PreparedAnimationIndices = this->Options.scene.animation.indices;
+  this->PreparedAnimationIndices = indices;
 
   // Disable all animations
   for (int idx = 0; idx < this->AvailAnimations; idx++)
@@ -383,7 +384,7 @@ void animationManager::PrepareForAnimationIndices()
 std::pair<double, double> animationManager::GetTimeRange()
 {
   // Make sure TimeRange is updated
-  this->PrepareForAnimationIndices();
+//  this->PrepareForAnimationIndices();
 
   // Return updated data
   return std::make_pair(this->TimeRange[0], this->TimeRange[1]);
@@ -393,7 +394,7 @@ std::pair<double, double> animationManager::GetTimeRange()
 int animationManager::GetNumberOfAvailableAnimations()
 {
   // Make sure TimeRange is updated
-  this->PrepareForAnimationIndices();
+//  this->PrepareForAnimationIndices();
 
   // Return updated data
   return this->AvailAnimations;

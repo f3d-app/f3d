@@ -346,6 +346,12 @@ int scene_impl::availableAnimations()
 }
 
 //----------------------------------------------------------------------------
+void scene_impl::enableAnimations(const std::vector<int> indices)
+{
+  this->Internals->AnimationManager.EnableAnimations(indices);
+}
+
+//----------------------------------------------------------------------------
 void scene_impl::SetInteractor(interactor_impl* interactor)
 {
   this->Internals->Interactor = interactor;
