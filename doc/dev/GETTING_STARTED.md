@@ -35,7 +35,7 @@ Note: Ubuntu 24.04 / Debian 12 provides VTK version 9.1 but f3d requires VTK 9.2
 
 ```
 sudo yum update
-sudo dnf install make automake gcc gcc-c++ kernel-devel git git-lfs cmake vtk vtk-devell
+sudo dnf install make automake gcc gcc-c++ kernel-devel git git-lfs cmake vtk vtk-devel
 ```
 
 #### Arch Linux
