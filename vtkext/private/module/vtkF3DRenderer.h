@@ -16,6 +16,7 @@
 
 #include <vtkLight.h>
 #include <vtkOpenGLRenderer.h>
+#include <vtkDiscretizableColorTransferFunction.h>
 
 #include <filesystem>
 #include <map>
@@ -308,6 +309,12 @@ public:
    * Setting an empty vector will use default color map
    */
   void SetColormap(const std::vector<double>& colormap);
+
+  /**
+   * Set Colormap Discretization
+   * Defaults to false.
+   */
+  void SetColorDiscretization(bool use);
 
   /**
    * Set the meta importer to recover coloring information from
@@ -607,7 +614,8 @@ private:
   std::optional<fs::path> TextureEmissive;
   std::optional<fs::path> TextureNormal;
 
-  vtkSmartPointer<vtkColorTransferFunction> ColorTransferFunction;
+  vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorTransferFunction;
+  bool ColorMapDiscretized = false;
   bool ExpandingRangeSet = false;
   bool UsingExpandingRange = true;
   double ColorRange[2] = { 0.0, 1.0 };

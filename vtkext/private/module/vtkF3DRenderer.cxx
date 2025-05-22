@@ -17,6 +17,7 @@
 #include <vtkCamera.h>
 #include <vtkCellData.h>
 #include <vtkColorTransferFunction.h>
+#include <vtkDiscretizableColorTransferFunction.h>
 #include <vtkCornerAnnotation.h>
 #include <vtkCullerCollection.h>
 #include <vtkFloatArray.h>
@@ -45,6 +46,7 @@
 #include <vtkSSAAPass.h>
 #include <vtkScalarBarActor.h>
 #include <vtkSkybox.h>
+#include <vtkSmartPointer.h>
 #include <vtkTable.h>
 #include <vtkTextActor.h>
 #include <vtkTextProperty.h>
@@ -2318,6 +2320,12 @@ void vtkF3DRenderer::SetColormap(const std::vector<double>& colormap)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetColorDiscretization(bool use)
+{
+  this->ColorMapDiscretized = use;
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetEnableColoring(bool enable)
 {
   if (enable != this->EnableColoring)
@@ -2714,7 +2722,9 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
   }
 
   // Create lookup table
-  this->ColorTransferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
+  //this->ColorTransferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
+  this->ColorTransferFunction = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
+
   if (this->Colormap.size() > 0)
   {
     if (this->Colormap.size() % 4 == 0)
@@ -2727,6 +2737,11 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
         double b = this->Colormap[i + 3];
         this->ColorTransferFunction->AddRGBPoint(
           this->ColorRange[0] + val * (this->ColorRange[1] - this->ColorRange[0]), r, g, b);
+      }
+      if (this->ColorMapDiscretized)
+      {
+        this->ColorTransferFunction->DiscretizeOn();
+        this->ColorTransferFunction->SetNumberOfValues(this->Colormap.size()/4);
       }
     }
     else

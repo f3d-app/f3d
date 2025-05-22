@@ -97,6 +97,7 @@ public:
     std::vector<int> Resolution;
     std::vector<int> Position;
     std::string ColorMapFile;
+    std::optional<int> ColorMapSteps;
     CameraConfiguration CamConf;
     std::string Reference;
     double RefThreshold;
@@ -641,6 +642,7 @@ public:
     this->ParseOption(appOptions, "resolution", this->AppOptions.Resolution);
     this->ParseOption(appOptions, "position", this->AppOptions.Position);
     this->ParseOption(appOptions, "colormap-file", this->AppOptions.ColorMapFile);
+    this->ParseOption(appOptions, "colormap-steps", this->AppOptions.ColorMapSteps);
 
     this->ParseOption(appOptions, "camera-position", this->AppOptions.CamConf.CameraPosition);
     this->ParseOption(appOptions, "camera-focal-point", this->AppOptions.CamConf.CameraFocalPoint);
@@ -665,21 +667,31 @@ public:
   void UpdateInterdependentOptions()
   {
     // colormap-file and colormap are interdependent
+    // Colormap discretization is also dependent
     const std::string& colorMapFile = this->AppOptions.ColorMapFile;
+    int steps = -1;
+    if (this->AppOptions.ColorMapSteps.has_value()) steps = this->AppOptions.ColorMapSteps.value(); 
+
     if (!colorMapFile.empty())
     {
       fs::path fullPath = F3DColorMapTools::Find(colorMapFile);
 
       if (!fullPath.empty())
       {
-        this->LibOptions.model.scivis.colormap = F3DColorMapTools::Read(fullPath);
+        this->LibOptions.model.scivis.colormap = F3DColorMapTools::Read(fullPath, steps);
       }
       else
       {
         f3d::log::error("Cannot find the colormap ", colorMapFile);
         this->LibOptions.model.scivis.colormap = f3d::colormap_t();
       }
+
+      if (steps > 0)
+      {
+        this->LibOptions.model.scivis.discretize = true;
+      }
     }
+
   }
 
   void ApplyPositionAndResolution()

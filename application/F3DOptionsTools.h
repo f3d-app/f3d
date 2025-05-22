@@ -43,6 +43,7 @@ static inline const OptionsDict DefaultAppOptions = {
   { "resolution", "1000, 600" },
   { "position", "" },
   { "colormap-file", "" },
+  { "colormap-steps", "" },
   { "camera-position", "" },
   { "camera-focal-point", "" },
   { "camera-view-up", "" },
