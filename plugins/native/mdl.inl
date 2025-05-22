@@ -1,4 +1,4 @@
-void applyCustomImporter(vtkImporter* importer, const std::string& fileName) const override
+void applyCustomImporter(vtkImporter* importer, const std::string& vtkNotUsed(fileName)) const override
 {
   vtkF3DQuakeMDLImporter* mdlImporter = vtkF3DQuakeMDLImporter::SafeDownCast(importer);
 

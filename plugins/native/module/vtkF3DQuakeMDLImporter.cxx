@@ -103,7 +103,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
 
   //----------------------------------------------------------------------------
   vtkSmartPointer<vtkTexture> CreateTexture(const std::vector<unsigned char>& buffer, int& offset,
-    int skinWidth, int skinHeight, int nbSkins, unsigned int skinIndex)
+    int skinWidth, int skinHeight, unsigned int nbSkins, unsigned int skinIndex)
   {
     vtkNew<vtkTexture> texture;
     texture->SetColorModeToDirectScalars();
@@ -132,10 +132,10 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     img->SetDimensions(skinWidth, skinHeight, 1);
     img->AllocateScalars(VTK_UNSIGNED_CHAR, 3);
 
-    if (skinIndex >= (unsigned int)nbSkins)
+    if (skinIndex >= nbSkins)
     {
       skinIndex = 0;
-      vtkWarningWithObjectMacro(this->Parent, "QuakeMDL.skin_index is out of bounds. Defauling to 0.");
+      vtkWarningWithObjectMacro(this->Parent, "QuakeMDL.skin_index is out of bounds. Defaulting to 0.");
     }
     const unsigned char* selectedSkin = skins[skinIndex].skin;
     for (int i = 0; i < skinHeight; i++)
@@ -398,7 +398,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     if (header->numSkins > 0 && header->skinWidth > 0 && header->skinHeight > 0)
     {
       this->Texture = this->CreateTexture(
-        buffer, offset, header->skinWidth, header->skinHeight, header->numSkins, this->Parent->GetSkinIndex());
+        buffer, offset, header->skinWidth, header->skinHeight, (unsigned int)header->numSkins, this->Parent->GetSkinIndex());
       if (!this->Texture)
       {
         vtkErrorWithObjectMacro(this->Parent, "Unable to read a texture, aborting.");
