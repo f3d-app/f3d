@@ -694,7 +694,6 @@ public:
         this->LibOptions.model.scivis.discretize = steps;
       }
     }
-
   }
 
   void ApplyPositionAndResolution()
