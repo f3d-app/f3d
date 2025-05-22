@@ -672,7 +672,7 @@ public:
     int steps = -1;
     if (this->AppOptions.ColorMapSteps.has_value())
     {
-      steps = this->AppOptions.ColorMapSteps.value(); 
+      steps = this->AppOptions.ColorMapSteps.value();
     }
 
     if (!colorMapFile.empty())

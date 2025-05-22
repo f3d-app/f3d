@@ -2746,7 +2746,6 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
         this->ColorTransferFunction->DiscretizeOn();
         this->ColorTransferFunction->SetNumberOfValues(this->ColorMapDiscretized);
       }
-
     }
     else
     {
