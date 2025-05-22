@@ -68,7 +68,7 @@ fs::path Find(const std::string& str)
   return {};
 }
 
-f3d::colormap_t Read(const fs::path& path, int steps)
+f3d::colormap_t Read(const fs::path& path)
 {
   try
   {
@@ -87,21 +87,13 @@ f3d::colormap_t Read(const fs::path& path, int steps)
     }
 
     int w = img.getWidth();
-    int step = 1;
-    int size = w;
-    if (steps > 0)
+
+    std::vector<double> cm(4 * w);
+
+    for (int i = 0; i < w; i++)
     {
-      step = w/steps;
-      size = steps;
-    }
-
-
-    std::vector<double> cm(4 * size);
-
-    for (int i = 0; i < size; i++)
-    {
-      std::vector<double> pixel = img.getNormalizedPixel({ i * step, 0 });
-      cm[4 * i + 0] = static_cast<double>(i) / (size - 1);
+      std::vector<double> pixel = img.getNormalizedPixel({ i, 0 });
+      cm[4 * i + 0] = static_cast<double>(i) / (w - 1);
       cm[4 * i + 1] = pixel[0];
       cm[4 * i + 2] = pixel[1];
       cm[4 * i + 3] = pixel[2];

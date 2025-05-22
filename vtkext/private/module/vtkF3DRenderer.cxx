@@ -2320,7 +2320,7 @@ void vtkF3DRenderer::SetColormap(const std::vector<double>& colormap)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetColorDiscretization(bool use)
+void vtkF3DRenderer::SetColorDiscretization(int use)
 {
   this->ColorMapDiscretized = use;
 }
@@ -2653,9 +2653,9 @@ void vtkF3DRenderer::ConfigureScalarBarActorForColoring(
   scalarBar->SetLookupTable(ctf);
   scalarBar->SetTitle(arrayName.c_str());
   scalarBar->SetNumberOfLabels(4);
-  if (this->Colormap.size() < 6 * 4)
+  if (this->ColorMapDiscretized < 6)
   {
-    scalarBar->SetNumberOfLabels((this->Colormap.size()/4) + 1);
+    scalarBar->SetNumberOfLabels(this->ColorMapDiscretized + 1);
   }
   scalarBar->SetOrientationToHorizontal();
   scalarBar->SetWidth(0.8);
@@ -2742,10 +2742,10 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
         this->ColorTransferFunction->AddRGBPoint(
           this->ColorRange[0] + val * (this->ColorRange[1] - this->ColorRange[0]), r, g, b);
       }
-      if (this->ColorMapDiscretized)
+      if (this->ColorMapDiscretized > 0)
       {
         this->ColorTransferFunction->DiscretizeOn();
-        this->ColorTransferFunction->SetNumberOfValues(this->Colormap.size()/4);
+        this->ColorTransferFunction->SetNumberOfValues(this->ColorMapDiscretized);
       }
 
     }

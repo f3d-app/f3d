@@ -267,8 +267,8 @@
         "default_value": "false"
       },
       "discretize": {
-        "type": "bool",
-        "default_value": "false"
+        "type": "int",
+        "default_value": "-1"
       },
       "array_name": {
         "type": "string"

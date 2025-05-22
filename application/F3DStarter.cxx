@@ -678,7 +678,7 @@ public:
 
       if (!fullPath.empty())
       {
-        this->LibOptions.model.scivis.colormap = F3DColorMapTools::Read(fullPath, steps);
+        this->LibOptions.model.scivis.colormap = F3DColorMapTools::Read(fullPath);
       }
       else
       {
@@ -688,7 +688,7 @@ public:
 
       if (steps > 0)
       {
-        this->LibOptions.model.scivis.discretize = true;
+        this->LibOptions.model.scivis.discretize = steps;
       }
     }
 
