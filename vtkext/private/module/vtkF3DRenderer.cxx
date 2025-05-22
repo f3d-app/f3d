@@ -2653,6 +2653,10 @@ void vtkF3DRenderer::ConfigureScalarBarActorForColoring(
   scalarBar->SetLookupTable(ctf);
   scalarBar->SetTitle(arrayName.c_str());
   scalarBar->SetNumberOfLabels(4);
+  if (this->Colormap.size() < 6 * 4)
+  {
+    scalarBar->SetNumberOfLabels((this->Colormap.size()/4) + 1);
+  }
   scalarBar->SetOrientationToHorizontal();
   scalarBar->SetWidth(0.8);
   scalarBar->SetHeight(0.07);
@@ -2744,9 +2748,6 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
         this->ColorTransferFunction->SetNumberOfValues(this->Colormap.size()/4);
       }
 
-      if (this->Colormap.size() < 5) {
-          this->ScalarBarActor->SetNumberOfLabels(this->Colormap.size() + 1);
-      }
     }
     else
     {
