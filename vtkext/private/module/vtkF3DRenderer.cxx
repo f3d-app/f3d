@@ -2743,6 +2743,10 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
         this->ColorTransferFunction->DiscretizeOn();
         this->ColorTransferFunction->SetNumberOfValues(this->Colormap.size()/4);
       }
+
+      if (this->Colormap.size() < 5) {
+          this->ScalarBarActor->SetNumberOfLabels(this->Colormap.size() + 1);
+      }
     }
     else
     {

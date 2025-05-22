@@ -266,6 +266,10 @@
         "type": "bool",
         "default_value": "false"
       },
+      "discretize": {
+        "type": "bool",
+        "default_value": "false"
+      },
       "array_name": {
         "type": "string"
       },
