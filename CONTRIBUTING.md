@@ -47,7 +47,7 @@ that is definitely possible. Feel free to reach out for guidance by opening an i
 F3D uses [GitLab Flow](https://about.gitlab.com/topics/version-control/what-is-gitlab-flow/). In a few words, here is how to contribute:
 
 - [Fork](https://github.com/f3d-app/f3d/fork) the F3D repository on GitHub.
-- Comment on a chosen issue,if any, so it can be assigned to you by a maintainer.
+- Comment on a chosen issue, if any, so it can be assigned to you by a maintainer.
 - Create and push a feature branch on your fork containing new commits.
 - When it is ready for review or when you want to run the CI, create a pull request against `f3d-app/f3d/master`.
 - Once the PR has been created, you can run the different parts of the CI by checking checkboxes in your PR description.
