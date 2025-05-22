@@ -47,13 +47,14 @@ that is definitely possible. Feel free to reach out for guidance by opening an i
 F3D uses [GitLab Flow](https://about.gitlab.com/topics/version-control/what-is-gitlab-flow/). In a few words, here is how to contribute:
 
 - [Fork](https://github.com/f3d-app/f3d/fork) the F3D repository on GitHub.
+- Comment on a chosen issue, if any, so it can be assigned to you by a maintainer.
 - Create and push a feature branch on your fork containing new commits.
 - When it is ready for review or when you want to run the CI, create a pull request against `f3d-app/f3d/master`.
 - Once the PR has been created, you can run the different parts of the CI by checking checkboxes in your PR description.
 - Maintainers and returning contributors will provide help to interpret the CI and fix issues that may arise.
 - Your PR will be reviewed by maintainers and returning contributors, please take their feedback into account and resolve discussions when adresssed.
 - Once the PR is approved and CI comes back clean, a maintainer will merge your pull request in the master branch.
-- The master now contains your changes and will be present in the next minor/major release, any documentation related changes are visible in [https://f3d.app]!
+- The master now contains your changes and will be present in the next minor/major release, any documentation related changes are visible in <https://f3d.app>!
 
 ## Continuous Integration
 
@@ -78,23 +79,3 @@ When making changes to the `default_versions.json` file, continuous integration 
 This is required in order to merge the pull request.
 
 The continuous integration is just code, as the rest of F3D is. If you want to fix or improve it, you are very welcome to!
-
-## F3D Architecture
-
-F3D is divided into different components:
-
-- The `f3d` executable, in the `application` folder.
-- The `libf3d` library, in the `library` folder.
-- The extensions to VTK, in the `vtkext` folder.
-- The bindings for Python, Java, and WebAssembly, in their respective folders.
-- The plugins, providing all the different readers in the plugins directory.
-
-The extensions to VTK are divided into two modules:
-
-- The [private module](vtkext/private) is used exclusively by `libf3d`.
-- The [public module](vtkext/public) is used by `libf3d` and also by plugins. Additional documentation can be found in [PLUGINS.md](doc/libf3d/PLUGINS.md).
-
-The `libf3d` library implements the whole logic of instancing and manipulating the different VTK classes, it is fully documented in the [libf3d README](doc/libf3d/README_LIBF3D.md).
-
-The `f3d` executable itself uses `libf3d` and adds an application layer on top of it, especially the handling of [command line options](doc/user/OPTIONS.md)
-and a [configuration file](doc/user/CONFIGURATION_FILE.md).
