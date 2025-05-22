@@ -617,7 +617,7 @@ public:
     const std::string& optStr = appOptions.at(name);
     if (!optStr.empty())
     {
-      T localOption = {0};
+      T localOption = {};
       this->ParseOption(appOptions, name, localOption);
       option = localOption;
     }
@@ -670,7 +670,10 @@ public:
     // Colormap discretization is also dependent
     const std::string& colorMapFile = this->AppOptions.ColorMapFile;
     int steps = -1;
-    if (this->AppOptions.ColorMapSteps.has_value()) steps = this->AppOptions.ColorMapSteps.value(); 
+    if (this->AppOptions.ColorMapSteps.has_value())
+    {
+      steps = this->AppOptions.ColorMapSteps.value(); 
+    }
 
     if (!colorMapFile.empty())
     {

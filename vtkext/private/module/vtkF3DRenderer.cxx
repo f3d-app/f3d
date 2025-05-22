@@ -17,9 +17,9 @@
 #include <vtkCamera.h>
 #include <vtkCellData.h>
 #include <vtkColorTransferFunction.h>
-#include <vtkDiscretizableColorTransferFunction.h>
 #include <vtkCornerAnnotation.h>
 #include <vtkCullerCollection.h>
+#include <vtkDiscretizableColorTransferFunction.h>
 #include <vtkFloatArray.h>
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
@@ -2726,7 +2726,6 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
   }
 
   // Create lookup table
-  //this->ColorTransferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
   this->ColorTransferFunction = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
 
   if (this->Colormap.size() > 0)

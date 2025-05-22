@@ -14,9 +14,9 @@
 #include "vtkF3DMetaImporter.h"
 #include "vtkF3DUIActor.h"
 
+#include <vtkDiscretizableColorTransferFunction.h>
 #include <vtkLight.h>
 #include <vtkOpenGLRenderer.h>
-#include <vtkDiscretizableColorTransferFunction.h>
 
 #include <filesystem>
 #include <map>
