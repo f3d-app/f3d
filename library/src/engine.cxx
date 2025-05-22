@@ -103,8 +103,7 @@ engine::engine(
   // Do not create an interactor for NONE or EXTERNAL
   if (windowType != window::Type::NONE && windowType != window::Type::EXTERNAL)
   {
-    this->Internals->Interactor = std::make_unique<detail::interactor_impl>(
-      *this->Internals->Options, *this->Internals->Window, *this->Internals->Scene);
+    this->Internals->Interactor = std::make_unique<detail::interactor_impl>(*this->Internals->Options, *this->Internals->Window, *this->Internals->Scene);
   }
 }
 
