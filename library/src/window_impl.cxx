@@ -496,7 +496,7 @@ void window_impl::UpdateDynamicOptions()
 
   renderer->SetScalarBarRange(opt.model.scivis.range);
   renderer->SetColormap(opt.model.scivis.colormap);
-  if (opt.model.scivis.discretize)
+  if (opt.model.scivis.discretize > 0)
   {
     renderer->SetColorMapDiscretization(opt.model.scivis.discretize);
   }
