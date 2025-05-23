@@ -95,7 +95,7 @@ mkdir dev
 cd dev
 mkdir vtk
 cd vtk
-git clone --depth 1 --branch v9.4.1 https://gitlab.kitware.com/vtk/vtk.git src
+git clone --depth 1 --branch v9.4.2 https://gitlab.kitware.com/vtk/vtk.git src
 mkdir build
 mkdir install
 cd ..

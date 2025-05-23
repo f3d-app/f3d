@@ -7,13 +7,13 @@ please take a look at our [getting started guide](GETTING_STARTED.md).
 ## Dependencies
 
 - [CMake](https://cmake.org) >= 3.1.
-- [VTK](https://vtk.org) >= 9.2.6 (9.4.1 recommended).
+- [VTK](https://vtk.org) >= 9.2.6 (9.4.2 recommended).
 - A C++17 compiler.
 - A CMake-compatible build system (Visual Studio, XCode, Ninja, Make, etc.).
 - Optionally, [Assimp](https://www.assimp.org/) >= 5.4.0.
 - Optionally, Open CASCADE [OCCT](https://dev.opencascade.org/) >= 7.6.3.
 - Optionally, [Alembic](http://www.alembic.io/) >= 1.8.5.
-- Optionally, [OpenUSD](https://openusd.org/release/index.html) >= 23.05.
+- Optionally, [OpenUSD](https://openusd.org/release/index.html) >= 24.08.
 - Optionally, [OpenVDB](https://www.openvdb.org/download/) >= 12.0.0, enable `IOOpenVDB` module during VTK configuration.
 - Optionally, [Draco](https://google.github.io/draco/) >= 1.5.6.
 - Optionally, [Python](https://www.python.org/) >= 3.9 and [pybind11](https://github.com/pybind/pybind11) >= 2.9.2.
@@ -24,7 +24,7 @@ F3D is tested continuously against versions recommended by the [VFX reference pl
 
 ## VTK compatibility
 
-As stated in the dependencies, F3D is compatible with VTK >= 9.2.6, however, some features may not be available. We suggest using VTK 9.4.1 with RenderingRayTracing, IOExodus, IOHDF and IOOpenVDB modules enabled in order to get as many features as possible in F3D.
+As stated in the dependencies, F3D is compatible with VTK >= 9.2.6, however, some features may not be available. We suggest using VTK 9.4.2 with RenderingRayTracing, IOExodus, IOHDF and IOOpenVDB modules enabled in order to get as many features as possible in F3D.
 
 ## Configuration and building
 
