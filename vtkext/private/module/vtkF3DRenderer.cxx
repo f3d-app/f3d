@@ -45,7 +45,6 @@
 #include <vtkSSAAPass.h>
 #include <vtkScalarBarActor.h>
 #include <vtkSkybox.h>
-#include <vtkSmartPointer.h>
 #include <vtkTable.h>
 #include <vtkTextActor.h>
 #include <vtkTextProperty.h>

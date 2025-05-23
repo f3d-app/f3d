@@ -616,7 +616,7 @@ public:
     const std::string& optStr = appOptions.at(name);
     if (!optStr.empty())
     {
-      T localOption;
+      T localOption = {};
       this->ParseOption(appOptions, name, localOption);
       option = localOption;
     }
