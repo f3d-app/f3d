@@ -871,12 +871,13 @@ jobs:
     container: ghcr.io/f3d-app/f3d-wasm:${{needs.default_versions.outputs.timestamp}}
 
     steps:
+      # Note that LFS is needed in order to include the default model
       - name: Checkout
         uses: actions/checkout@v4
         with:
           path: "source"
           fetch-depth: 0
-          lfs: false
+          lfs: true
 
       - name: WebAssembly CI
         uses: ./source/.github/actions/wasm-ci
