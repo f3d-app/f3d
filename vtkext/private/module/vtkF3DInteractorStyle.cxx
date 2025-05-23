@@ -152,14 +152,12 @@ void vtkF3DInteractorStyle::Rotate()
   double ryf = dy * delta_elevation * this->MotionFactor;
 
   vtkCamera* camera = ren->GetActiveCamera();
-  double dir[3];
-  camera->GetDirectionOfProjection(dir);
-  double* up = ren->GetUpVector();
-  this->InterpolateTemporaryUp(0.1, up);
-  up = this->TemporaryUp;
 
   if (!ren->GetUseTrackball())
   {
+    double up[3];
+    this->InterpolateTemporaryUp(0.1, ren->GetUpVector(), up);
+
     // Rotate camera around the focal point about the environment's up vector
     vtkNew<vtkTransform> Transform;
     Transform->Identity();
@@ -170,11 +168,14 @@ void vtkF3DInteractorStyle::Rotate()
     Transform->TransformPoint(camera->GetPosition(), camera->GetPosition());
 
     camera->SetViewUp(up);
-    const double dot = vtkMath::Dot(dir, up);
-    if (std::abs(dot) < 0.99 || !std::signbit(dot * ryf))
-    {
-      camera->Elevation(ryf);
-    }
+
+    // Clamp parameter to `camera->Elevation()` to maintain -90 < elevation < +90
+    constexpr double maxAbsElevation = 90 - 1e-12;
+    const double elevation = vtkMath::DegreesFromRadians(
+      vtkMath::AngleBetweenVectors(ren->GetUpVector(), camera->GetDirectionOfProjection()) -
+      vtkMath::Pi() / 2);
+    camera->Elevation(std::clamp(ryf, -maxAbsElevation - elevation, +maxAbsElevation - elevation));
+
     camera->OrthogonalizeViewUp();
   }
   else
@@ -359,14 +360,21 @@ void vtkF3DInteractorStyle::SetTemporaryUp(const double* tempUp)
   {
     this->TemporaryUp[i] = tempUp[i];
   }
+  this->TemporaryUpFactor = 1.0;
 }
 
 //------------------------------------------------------------------------------
-void vtkF3DInteractorStyle::InterpolateTemporaryUp(double factor, const double* input)
+void vtkF3DInteractorStyle::InterpolateTemporaryUp(
+  const double factorDelta, const double* target, double* output)
 {
-  for (int i = 0; i < 3; i++)
+  this->TemporaryUpFactor = std::max(this->TemporaryUpFactor - factorDelta, 0.0);
+  if (this->TemporaryUpFactor >= 0)
   {
-    this->TemporaryUp[i] = (1.0 - factor) * this->TemporaryUp[i] + factor * input[i];
+    const double factor = (1.0 - std::cos(vtkMath::Pi() * this->TemporaryUpFactor)) * 0.5;
+    for (int i = 0; i < 3; i++)
+    {
+      output[i] = factor * this->TemporaryUp[i] + (1.0 - factor) * target[i];
+    }
+    vtkMath::Normalize(output);
   }
-  vtkMath::Normalize(this->TemporaryUp);
 }
