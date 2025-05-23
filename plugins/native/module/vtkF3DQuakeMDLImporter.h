@@ -55,11 +55,13 @@ public:
   bool GetTemporalInformation(vtkIdType animationIndex, double frameRate, int& nbTimeSteps,
     double timeRange[2], vtkDoubleArray* timeSteps) override;
 
+  ///@{
   /**
    * Set/Get the skin index.
    */
   vtkSetMacro(SkinIndex, unsigned int);
   vtkGetMacro(SkinIndex, unsigned int);
+  ///@}
 
 protected:
   vtkF3DQuakeMDLImporter();

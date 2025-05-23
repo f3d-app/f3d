@@ -399,7 +399,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     if (header->numSkins > 0 && header->skinWidth > 0 && header->skinHeight > 0)
     {
       this->Texture = this->CreateTexture(buffer, offset, header->skinWidth, header->skinHeight,
-        (unsigned int)header->numSkins, this->Parent->GetSkinIndex());
+        static_cast<unsigned int>(header->numSkins), this->Parent->GetSkinIndex());
       if (!this->Texture)
       {
         vtkErrorWithObjectMacro(this->Parent, "Unable to read a texture, aborting.");
