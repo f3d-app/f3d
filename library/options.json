@@ -268,7 +268,7 @@
       },
       "discretize": {
         "type": "int",
-        "default_value": "-1"
+        "default_value": "0"
       },
       "array_name": {
         "type": "string"

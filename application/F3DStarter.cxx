@@ -97,7 +97,6 @@ public:
     std::vector<int> Resolution;
     std::vector<int> Position;
     std::string ColorMapFile;
-    std::optional<int> ColorMapSteps;
     CameraConfiguration CamConf;
     std::string Reference;
     double RefThreshold;
@@ -642,7 +641,6 @@ public:
     this->ParseOption(appOptions, "resolution", this->AppOptions.Resolution);
     this->ParseOption(appOptions, "position", this->AppOptions.Position);
     this->ParseOption(appOptions, "colormap-file", this->AppOptions.ColorMapFile);
-    this->ParseOption(appOptions, "colormap-steps", this->AppOptions.ColorMapSteps);
 
     this->ParseOption(appOptions, "camera-position", this->AppOptions.CamConf.CameraPosition);
     this->ParseOption(appOptions, "camera-focal-point", this->AppOptions.CamConf.CameraFocalPoint);
@@ -669,11 +667,6 @@ public:
     // colormap-file and colormap are interdependent
     // Colormap discretization is also dependent
     const std::string& colorMapFile = this->AppOptions.ColorMapFile;
-    int steps = -1;
-    if (this->AppOptions.ColorMapSteps.has_value())
-    {
-      steps = this->AppOptions.ColorMapSteps.value();
-    }
 
     if (!colorMapFile.empty())
     {
@@ -689,10 +682,6 @@ public:
         this->LibOptions.model.scivis.colormap = f3d::colormap_t();
       }
 
-      if (steps > 0)
-      {
-        this->LibOptions.model.scivis.discretize = steps;
-      }
     }
   }
 
