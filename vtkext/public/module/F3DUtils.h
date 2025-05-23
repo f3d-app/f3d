@@ -27,8 +27,7 @@ VTKEXT_EXPORT double ParseToDouble(
  * Catch conversion error, log them if any and returns the provided def value.
  * Use nameError in the log for easier debugging.
  */
-VTKEXT_EXPORT int ParseToInt(
-  const std::string& str, int def, const std::string& nameError);
+VTKEXT_EXPORT int ParseToInt(const std::string& str, int def, const std::string& nameError);
 };
 
 #endif

@@ -38,8 +38,8 @@ int F3DUtils::ParseToInt(const std::string& str, int def, const std::string& nam
   {
     auto result = std::from_chars(str.data(), str.data() + str.size(), value);
 
-    if (result.ec == std::errc::result_out_of_range) 
-    {
+    if (result.ec == std::errc::result_out_of_range)
+    else if (result.ec != std::errc() || *(result.ptr) != '\0')
       vtkWarningWithObjectMacro(
         nullptr, "Provided " << nameError << " out of range: " << str << ". Ignoring.");
     }
