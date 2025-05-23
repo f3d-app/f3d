@@ -111,7 +111,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
 
     // Read textures.
     std::vector<mixed_pointer_array> skins = std::vector<mixed_pointer_array>(nbSkins);
-    for (int i = 0; i < nbSkins; i++)
+    for (unsigned int i = 0; i < nbSkins; i++)
     {
       skins[i].group = *reinterpret_cast<const int*>(buffer.data() + offset);
       if (skins[i].group == 0)
