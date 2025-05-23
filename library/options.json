@@ -266,7 +266,7 @@
         "type": "bool",
         "default_value": "false"
       },
-      "discretize": {
+      "discretization": {
         "type": "int"
       },
       "array_name": {

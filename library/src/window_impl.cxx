@@ -496,7 +496,7 @@ void window_impl::UpdateDynamicOptions()
 
   renderer->SetScalarBarRange(opt.model.scivis.range);
   renderer->SetColormap(opt.model.scivis.colormap);
-  renderer->SetColorMapDiscretization(opt.model.scivis.discretize);
+  renderer->SetColorMapDiscretization(opt.model.scivis.discretization);
   renderer->ShowScalarBar(opt.ui.scalar_bar);
 
   renderer->SetUsePointSprites(opt.model.point_sprites.enable);
