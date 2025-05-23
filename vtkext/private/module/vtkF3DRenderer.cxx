@@ -2318,13 +2318,6 @@ void vtkF3DRenderer::SetColormap(const std::vector<double>& colormap)
     this->ColoringConfigured = false;
   }
 }
-
-//----------------------------------------------------------------------------
-void vtkF3DRenderer::SetColorDiscretization(int use)
-{
-  this->ColorMapDiscretized = use;
-}
-
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetEnableColoring(bool enable)
 {
@@ -2737,10 +2730,14 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
         this->ColorTransferFunction->AddRGBPoint(
           this->ColorRange[0] + val * (this->ColorRange[1] - this->ColorRange[0]), r, g, b);
       }
-      if (this->ColorMapDiscretized > 0)
+      if (this->ColorMapDiscretization > 0)
       {
         this->ColorTransferFunction->DiscretizeOn();
-        this->ColorTransferFunction->SetNumberOfValues(this->ColorMapDiscretized);
+        this->ColorTransferFunction->SetNumberOfValues(this->ColorMapDiscretization);
+      }
+      else
+      {
+        this->ColorTransferFunction->DiscretizeOff();
       }
     }
     else

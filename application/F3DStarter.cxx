@@ -664,7 +664,6 @@ public:
   {
     // colormap-file and colormap are interdependent
     const std::string& colorMapFile = this->AppOptions.ColorMapFile;
-
     if (!colorMapFile.empty())
     {
       fs::path fullPath = F3DColorMapTools::Find(colorMapFile);
