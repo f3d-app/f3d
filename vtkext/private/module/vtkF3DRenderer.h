@@ -24,7 +24,7 @@
 
 namespace fs = std::filesystem;
 
-class vtkColorTransferFunction;
+class vtkDiscretizableColorTransferFunction;
 class vtkCornerAnnotation;
 class vtkImageReader2;
 class vtkOrientationMarkerWidget;
@@ -312,7 +312,7 @@ public:
 
   /**
    * Set Colormap Discretization
-   * Defaults to -1 which is no discretization.
+   * Defaults to 0 which is no discretization.
    */
   vtkSetMacro(ColorMapDiscretization, int);
 
@@ -615,7 +615,7 @@ private:
   std::optional<fs::path> TextureNormal;
 
   vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorTransferFunction;
-  int ColorMapDiscretization = -1;
+  int ColorMapDiscretization = 0;
   bool ExpandingRangeSet = false;
   bool UsingExpandingRange = true;
   double ColorRange[2] = { 0.0, 1.0 };

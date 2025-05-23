@@ -16,7 +16,6 @@
 #include <vtkBoundingBox.h>
 #include <vtkCamera.h>
 #include <vtkCellData.h>
-#include <vtkColorTransferFunction.h>
 #include <vtkCornerAnnotation.h>
 #include <vtkCullerCollection.h>
 #include <vtkDiscretizableColorTransferFunction.h>
@@ -2318,6 +2317,7 @@ void vtkF3DRenderer::SetColormap(const std::vector<double>& colormap)
     this->ColoringConfigured = false;
   }
 }
+
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetEnableColoring(bool enable)
 {
