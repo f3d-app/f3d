@@ -665,7 +665,6 @@ public:
   void UpdateInterdependentOptions()
   {
     // colormap-file and colormap are interdependent
-    // Colormap discretization is also dependent
     const std::string& colorMapFile = this->AppOptions.ColorMapFile;
 
     if (!colorMapFile.empty())
@@ -681,7 +680,6 @@ public:
         f3d::log::error("Cannot find the colormap ", colorMapFile);
         this->LibOptions.model.scivis.colormap = f3d::colormap_t();
       }
-
     }
   }
 
