@@ -275,7 +275,7 @@
       },
       "component": {
         "type": "int",
-        "default_value": "-1"
+        "default_value": "0"
       },
       "colormap": {
         "type": "colormap",

@@ -2730,10 +2730,10 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
         this->ColorTransferFunction->AddRGBPoint(
           this->ColorRange[0] + val * (this->ColorRange[1] - this->ColorRange[0]), r, g, b);
       }
-      if (this->ColorMapDiscretization > 0)
+      if (this->ColorMapDiscretization.has_value())
       {
         this->ColorTransferFunction->DiscretizeOn();
-        this->ColorTransferFunction->SetNumberOfValues(this->ColorMapDiscretization);
+        this->ColorTransferFunction->SetNumberOfValues(this->ColorMapDiscretization.value());
       }
       else
       {
