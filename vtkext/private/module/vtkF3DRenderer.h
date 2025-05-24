@@ -23,6 +23,7 @@
 
 namespace fs = std::filesystem;
 
+class vtkDiscretizableColorTransferFunction;
 class vtkColorTransferFunction;
 class vtkCornerAnnotation;
 class vtkImageReader2;
@@ -308,6 +309,12 @@ public:
    * Setting an empty vector will use default color map
    */
   void SetColormap(const std::vector<double>& colormap);
+
+  /**
+   * Set Colormap Discretization
+   * Defaults to std::nullopt which is no discretization.
+   */
+  vtkSetMacro(ColorMapDiscretization, std::optional<int>);
 
   /**
    * Set the meta importer to recover coloring information from
@@ -607,7 +614,8 @@ private:
   std::optional<fs::path> TextureEmissive;
   std::optional<fs::path> TextureNormal;
 
-  vtkSmartPointer<vtkColorTransferFunction> ColorTransferFunction;
+  vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorTransferFunction;
+  std::optional<int> ColorMapDiscretization;
   bool ExpandingRangeSet = false;
   bool UsingExpandingRange = true;
   double ColorRange[2] = { 0.0, 1.0 };

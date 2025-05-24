@@ -16,9 +16,9 @@
 #include <vtkBoundingBox.h>
 #include <vtkCamera.h>
 #include <vtkCellData.h>
-#include <vtkColorTransferFunction.h>
 #include <vtkCornerAnnotation.h>
 #include <vtkCullerCollection.h>
+#include <vtkDiscretizableColorTransferFunction.h>
 #include <vtkFloatArray.h>
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
@@ -2714,7 +2714,8 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
   }
 
   // Create lookup table
-  this->ColorTransferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
+  this->ColorTransferFunction = vtkSmartPointer<vtkDiscretizableColorTransferFunction>::New();
+
   if (this->Colormap.size() > 0)
   {
     if (this->Colormap.size() % 4 == 0)
@@ -2727,6 +2728,15 @@ void vtkF3DRenderer::ConfigureRangeAndCTFForColoring(
         double b = this->Colormap[i + 3];
         this->ColorTransferFunction->AddRGBPoint(
           this->ColorRange[0] + val * (this->ColorRange[1] - this->ColorRange[0]), r, g, b);
+      }
+      if (this->ColorMapDiscretization.has_value() && this->ColorMapDiscretization.value() > 0)
+      {
+        this->ColorTransferFunction->DiscretizeOn();
+        this->ColorTransferFunction->SetNumberOfValues(this->ColorMapDiscretization.value());
+      }
+      else
+      {
+        this->ColorTransferFunction->DiscretizeOff();
       }
     }
     else
