@@ -42,7 +42,7 @@ int F3DUtils::ParseToInt(const std::string& str, int def, const std::string& nam
     {
       vtkWarningWithObjectMacro(
         nullptr, "Provided " << nameError << " out of range: " << str << ". Ignoring.");
-        return def;
+      return def;
     }
     else if (result.ec != std::errc() || *(result.ptr) != '\0')
     {
