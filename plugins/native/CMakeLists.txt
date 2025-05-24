@@ -189,8 +189,10 @@ f3d_plugin_declare_reader(
   NAME QuakeMDL
   EXTENSIONS mdl
   MIMETYPES application/vnd.mdl
+  OPTIONS skin_index
   VTK_IMPORTER vtkF3DQuakeMDLImporter
   FORMAT_DESCRIPTION "Quake 1 MDL model"
+  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/mdl.inl"
 )
 
 # Needs vtkResourceStream (https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9663)

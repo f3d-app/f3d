@@ -41,25 +41,28 @@ F3D supports the following file formats:
 Readers can provide option that can be set using the `-D/--define` [command line option](OPTIONS.md).
 eg: `-DVDB.downsampling_factor=0.5`.
 
-Values are parsed as doubles. For booleans, 0 means false, not 0 means true.
+For booleans, 0 means false, not 0 means true. Unsigned int will interpret anything that is not a non-negative integer as the default value.
 
-- `vdb` - `VDB.downsampling_factor` : Control the level of downsampling when reading a volume, default is 0.1.
-- `occt` - `STEP.linear_deflection` : Control the distance between a curve and the resulting tessellation, default is 0.1.
-- `occt` - `STEP.angular_deflection` : Control the angle between two subsequent segments, default is 0.5.
-- `occt` - `STEP.relative_deflection` : Control if the deflection values are relative to object size, default is false.
-- `occt` - `STEP.read_wire` : Control if lines should be read, default is true.
-- `occt` - `IGES.linear_deflection` : Control the distance between a curve and the resulting tessellation, default is 0.1.
-- `occt` - `IGES.angular_deflection` : Control the angle between two subsequent segments, default is 0.5.
-- `occt` - `IGES.relative_deflection` : Control if the deflection values are relative to object size, default is false.
-- `occt` - `IGES.read_wire` : Control if lines should be read, default is true.
-- `occt` - `BREP.linear_deflection` : Control the distance between a curve and the resulting tessellation, default is 0.1.
-- `occt` - `BREP.angular_deflection` : Control the angle between two subsequent segments, default is 0.5.
-- `occt` - `BREP.relative_deflection` : Control if the deflection values are relative to object size, default is false.
-- `occt` - `BREP.read_wire` : Control if lines should be read, default is true.
-- `occt` - `XBF.linear_deflection` : Control the distance between a curve and the resulting tessellation, default is 0.1.
-- `occt` - `XBF.angular_deflection` : Control the angle between two subsequent segments, default is 0.5.
-- `occt` - `XBF.relative_deflection` : Control if the deflection values are relative to object size, default is false.
-- `occt` - `XBF.read_wire` : Control if lines should be read, default is true.
+| File extension | Option Name                | Argument Type  | Description                                                                          |
+| -------------- | -------------------------- | -------------- | ------------------------------------------------------------------------------------ |
+| `vdb`          | `VDB.downsampling_factor`  | `double`       | Control the level of downsampling when reading a volume, default is 0.1.             |
+| `occt`         | `STEP.linear_deflection`   | `double`       | Control the distance between a curve and the resulting tessellation, default is 0.1. |
+| `occt`         | `STEP.angular_deflection`  | `double`       | Control the angle between two subsequent segments, default is 0.5.                   |
+| `occt`         | `STEP.relative_deflection` | `bool`         | Control if the deflection values are relative to object size, default is false.      |
+| `occt`         | `STEP.read_wire`           | `bool`         | Control if lines should be read, default is true.                                    |
+| `occt`         | `IGES.linear_deflection`   | `double`       | Control the distance between a curve and the resulting tessellation, default is 0.1. |
+| `occt`         | `IGES.angular_deflection`  | `double`       | Control the angle between two subsequent segments, default is 0.5.                   |
+| `occt`         | `IGES.relative_deflection` | `bool`         | Control if the deflection values are relative to object size, default is false.      |
+| `occt`         | `IGES.read_wire`           | `bool`         | Control if lines should be read, default is true.                                    |
+| `occt`         | `BREP.linear_deflection`   | `double`       | Control the distance between a curve and the resulting tessellation, default is 0.1. |
+| `occt`         | `BREP.angular_deflection`  | `double`       | Control the angle between two subsequent segments, default is 0.5.                   |
+| `occt`         | `BREP.relative_deflection` | `bool`         | Control if the deflection values are relative to object size, default is false.      |
+| `occt`         | `BREP.read_wire`           | `bool`         | Control if lines should be read, default is true.                                    |
+| `occt`         | `XBF.linear_deflection`    | `double`       | Control the distance between a curve and the resulting tessellation, default is 0.1. |
+| `occt`         | `XBF.angular_deflection`   | `double`       | Control the angle between two subsequent segments, default is 0.5.                   |
+| `occt`         | `XBF.relative_deflection`  | `bool`         | Control if the deflection values are relative to object size, default is false.      |
+| `occt`         | `XBF.read_wire`            | `bool`         | Control if lines should be read, default is true.                                    |
+| `mdl`          | `QuakeMDL.skin_index`      | `unsigned int` | Select a particular skin from a `mdl` file. Uses 0-indexing, default is 0.           |
 
 ## Format details
 
