@@ -22,7 +22,7 @@ Anyone interested to become a moderators should just reach out to existing Maint
 
 ### 1.2. Returning Contributors
 
-Contributors are those who have made multiple contributions to the Project and want to be acknowledged as such. Returning Contributors are also very much welcome to share their ideas and feedbacks about the development and maintenance of F3D. Returning contributors may be asked by others about their contributions, provide reviews on code they are familiar with, provide technical insight during discussions and take part in any related activities they wish to.
+Returning Contributors are those who have made multiple contributions to the Project and want to be acknowledged as such. Returning Contributors are also very much welcome to share their ideas and feedbacks about the development and maintenance of F3D. Returning contributors may be asked by others about their contributions, provide reviews on code they are familiar with, provide technical insight during discussions and take part in any related activities they wish to.
 
 To become a Returning Contributor, one need to have merged at least two pull requests into the F3D repositories. Returning Contributors are part of the f3d-app github organization with a "member" role and are listed in the [dedicated](./MAINTAINERS_AND_CONTRIBUTORS.md) file.
 
