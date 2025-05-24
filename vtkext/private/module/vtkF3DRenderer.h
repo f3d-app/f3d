@@ -24,6 +24,7 @@
 namespace fs = std::filesystem;
 
 class vtkDiscretizableColorTransferFunction;
+class vtkColorTransferFunction;
 class vtkCornerAnnotation;
 class vtkImageReader2;
 class vtkOrientationMarkerWidget;
