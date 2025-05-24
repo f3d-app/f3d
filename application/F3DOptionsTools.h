@@ -80,6 +80,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "animation-autoplay", "scene.animation.autoplay" },
   { "animation-index", "scene.animation.index" },
   { "animation-speed-factor", "scene.animation.speed_factor" },
+  { "force-reader", "scene.force_reader" },
   { "font-file", "ui.font_file" },
   { "font-scale", "ui.scale" },
   { "point-sprites", "model.point_sprites.enable" },
