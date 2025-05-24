@@ -39,7 +39,7 @@ defaults:
       path: ""
     values:
       image: # Set a opengraph image from the gallery for all pages
-        path: https://user-images.githubusercontent.com/3129530/201317344-092db03d-8616-45b9-b606-30d22cda2eff.png
+        path: https://media.githubusercontent.com/media/f3d-app/f3d-media/refs/heads/typical_graph/media/typical_opengraph.png
         height: 1200
         width: 630
       description: "F3D - Fast and minimalist 3D viewer"
