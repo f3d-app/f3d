@@ -142,7 +142,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       {"coloring-range", "", "Custom range for the coloring by array, automatically computed by default", "<min,max>", ""},
       {"coloring-scalar-bar", "b", "Show scalar bar", "<bool>", "1" },
       {"colormap-file", "", "Specify a colormap image", "<filePath/filename/fileStem>", ""},
-      {"colormap-discretization", "", "Specify number of step in colormap", "<int>", ""},
+      {"colormap-discretization", "", "Specify number of colors in colormap", "<int>", ""},
       {"colormap", "", "Specify a custom colormap (ignored if \"colormap-file\" is specified)", "<color_list>", ""},
       {"volume", "v", "Show volume if the file is compatible", "<bool>", "1"},
       {"volume-inverse", "i", "Inverse opacity function for volume rendering", "<bool>", "1"} } },
