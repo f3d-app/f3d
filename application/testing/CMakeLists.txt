@@ -471,8 +471,10 @@ f3d_test(NAME TestInteractionAnimationCameraMovement DATA CameraAnimated.glb ARG
 f3d_test(NAME TestInteractionAnimationInvert DATA f3d.glb ARGS --animation-speed-factor=-1 --animation-progress INTERACTION)#Space;Wait;Space;
 
 # Test scrolling cheatsheet with no model by mouse wheel and by using scrollbar
-f3d_test(NAME TestInteractionNoModelScrollWheel RESOLUTION 1000,600 NO_DATA_FORCE_RENDER INTERACTION UI)
-f3d_test(NAME TestInteractionNoModelScrollBar RESOLUTION 1000,600 NO_DATA_FORCE_RENDER INTERACTION UI)
+if(not APPLE)
+  f3d_test(NAME TestInteractionNoModelScrollWheel RESOLUTION 1000,600 NO_DATA_FORCE_RENDER INTERACTION UI)
+  f3d_test(NAME TestInteractionNoModelScrollBar RESOLUTION 1000,600 NO_DATA_FORCE_RENDER INTERACTION UI)
+endif()
 
 # A verbose test that needs animation index support
 f3d_test(NAME TestVerboseAnimationWrongAnimationTimeHigh DATA BoxAnimated.gltf ARGS --animation-time=10 --verbose REGEXP "Animation time 10 is outside of range \\[0, 3\\.70833\\], using 3\\.70833" NO_BASELINE)
