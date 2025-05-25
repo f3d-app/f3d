@@ -471,7 +471,7 @@ f3d_test(NAME TestInteractionAnimationCameraMovement DATA CameraAnimated.glb ARG
 f3d_test(NAME TestInteractionAnimationInvert DATA f3d.glb ARGS --animation-speed-factor=-1 --animation-progress INTERACTION)#Space;Wait;Space;
 
 # Test scrolling cheatsheet with no model by mouse wheel and by using scrollbar
-if(not APPLE)
+if(NOT APPLE)
   f3d_test(NAME TestInteractionNoModelScrollWheel RESOLUTION 1000,600 NO_DATA_FORCE_RENDER INTERACTION UI)
   f3d_test(NAME TestInteractionNoModelScrollBar RESOLUTION 1000,600 NO_DATA_FORCE_RENDER INTERACTION UI)
 endif()
