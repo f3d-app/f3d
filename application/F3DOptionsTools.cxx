@@ -65,7 +65,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "no-background", "", "No background when render to file", "<bool>", "1" },
       { "help", "h", "Print help", "", "" }, { "version", "", "Print version details", "", "" },
       { "list-readers", "", "Print the list of readers", "", "" },
-      { "force-reader", "", "Force a specific reader to be used, disrigarding the file extension", "<reader>", "1"},
+      { "force-reader", "", "Force a specific reader to be used, disregarding the file extension", "<reader>", "1"},
       { "list-bindings", "", "Print the list of interaction bindings and exits, ignored with `--no-render`, only considers the first file group.", "<bool>", "1" },
       { "config", "", "Specify the configuration file to use. absolute/relative path or filename/filestem to search in configuration file locations", "<filePath/filename/fileStem>", "" },
       { "no-config", "", "Do not read the configuration file", "<bool>", "1" },

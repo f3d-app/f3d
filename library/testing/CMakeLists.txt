@@ -62,6 +62,7 @@ endif()
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
   list(APPEND libf3dSDKTests_list
     TestSDKSceneInvalid.cxx
+    TestSDKInvalidForceReader.cxx
     )
 endif()
 

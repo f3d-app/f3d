@@ -1439,10 +1439,10 @@ void F3DStarter::LoadFileGroup(
           }
           else
           {
-            auto force_reader = this->Internals->LibOptions.scene.force_reader;
-            if (force_reader.has_value())
+            auto forceReader = this->Internals->LibOptions.scene.force_reader;
+            if (forceReader.has_value())
             {
-              f3d::log::warn("Force reader ", *force_reader, " doesn't exist");
+              f3d::log::warn("Forced reader ", *forceReader, " doesn't exist");
             }
             else
             {

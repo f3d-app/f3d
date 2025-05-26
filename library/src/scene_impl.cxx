@@ -238,19 +238,19 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
     {
       throw scene::load_failure_exception(filePath.string() + " does not exists");
     }
-    auto force_reader = this->Internals->Options.scene.force_reader;
+    auto forceReader = this->Internals->Options.scene.force_reader;
     // Recover the importer for the provided file path
-    f3d::reader* reader = f3d::factory::instance()->getReader(filePath.string(), force_reader);
+    f3d::reader* reader = f3d::factory::instance()->getReader(filePath.string(), forceReader);
     if (reader)
     {
-      if (force_reader.has_value())
+      if (forceReader.has_value())
       {
-        if (!reader->canRead(filePath))
+        if (!reader->canRead(filePath.string()))
         {
           throw scene::load_failure_exception(
-            filePath.string() + " is not supported by the given force reader " + (*force_reader));
+            filePath.string() + " is not supported by the given forced reader " + (*forceReader));
         }
-        log::debug("Forcing reader ", (*force_reader), " for ", filePath.string());
+        log::debug("Forcing reader ", (*forceReader), " for ", filePath.string());
       }
       else
       {
@@ -259,9 +259,9 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
     }
     else
     {
-      if (force_reader.has_value())
+      if (forceReader.has_value())
       {
-        throw scene::load_failure_exception(*force_reader + " is not a valid force reader");
+        throw scene::load_failure_exception(*forceReader + " is not a valid force reader");
       }
       throw scene::load_failure_exception(
         filePath.string() + " is not a file of a supported 3D scene file format");
