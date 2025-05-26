@@ -50,6 +50,13 @@ jobs:
           fetch-depth: 1
           lfs: false
 
+      # Run codespell first to avoid issues with style check on same location
+      - name: Codespell in place
+        shell: bash
+        run: |
+          pip install codespell
+          codespell -fHw .
+
       - name: C++ Formatting
         uses: DoozyX/clang-format-lint-action@v0.16
         with:
@@ -70,12 +77,6 @@ jobs:
         with:
           dry: True
           prettier_options: "-w **/*.{js,json,md,html,yml}"
-
-      - name: Codespell in place
-        shell: bash
-        run: |
-          pip install codespell
-          codespell -fHw .
 
       - uses: googleapis/code-suggester@v5
         with:
