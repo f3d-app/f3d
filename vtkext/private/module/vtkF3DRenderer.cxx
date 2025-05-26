@@ -2085,6 +2085,38 @@ void vtkF3DRenderer::ConfigureActorsProperties()
     }
 
     // Textures
+    if (this->TexturesTransform.has_value())
+    {
+      const std::vector<double> tex_transform = this->TexturesTransform.value();
+      double mat[] = {
+        tex_transform[0],   tex_transform[1],   tex_transform[2],   0,
+        tex_transform[3],   tex_transform[4],   tex_transform[5],   0,
+        tex_transform[6],   tex_transform[7],   tex_transform[8],   0,
+        0,                  0,                  0,                  1
+      };
+
+      vtkInformation* info = coloring.OriginalActor->GetPropertyKeys();
+      if (info)
+      {
+        /**
+         * The actor already has a property key dictionary
+         * Check that GeneralTextureTransform does not exist and append,
+         * Otherwise combine matricies and reapply to transform
+         */
+        //TODO
+      }
+      else
+      {
+        /**
+         * No dictionary found, add new dictionary with transform
+         */
+        vtkNew<vtkInformation> properties;
+        properties->Set(vtkProp::GeneralTextureTransform(), mat, 16);
+        coloring.Actor->SetPropertyKeys(properties);
+        coloring.OriginalActor->SetPropertyKeys(properties);
+      }
+    }
+
     if (this->TextureBaseColor.has_value())
     {
       auto colorTex = ::GetTexture(this->TextureBaseColor.value(), true);
