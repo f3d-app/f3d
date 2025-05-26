@@ -1262,7 +1262,6 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
     f3d_test(NAME TestForceReaderGLTF DATA BoxAnimated.gltf ARGS --load-plugins=draco --force-reader=GLTF NO_BASELINE REGEXP_FAIL "failed to load scene")
     f3d_test(NAME TestForceReaderGLTFDracoIntoGLTF DATA Box_draco.gltf ARGS --load-plugins=draco --force-reader=GLTF NO_BASELINE REGEXP "failed to load scene")
   endif()
-
 endif()
 
 # Test bindings-list display
