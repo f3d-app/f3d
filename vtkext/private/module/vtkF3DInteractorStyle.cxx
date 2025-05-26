@@ -5,12 +5,14 @@
 
 #include <vtkCamera.h>
 #include <vtkMath.h>
+#include <vtkNew.h>
 #include <vtkObjectFactory.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRendererCollection.h>
 #include <vtkSkybox.h>
 #include <vtkStringArray.h>
+#include <vtkTransform.h>
 
 vtkStandardNewMacro(vtkF3DInteractorStyle);
 
@@ -150,33 +152,36 @@ void vtkF3DInteractorStyle::Rotate()
   double ryf = dy * delta_elevation * this->MotionFactor;
 
   vtkCamera* camera = ren->GetActiveCamera();
-  double dir[3];
-  camera->GetDirectionOfProjection(dir);
-  double* up = ren->GetUpVector();
-  this->InterpolateTemporaryUp(0.1, up);
-  up = this->TemporaryUp;
-
-  double dot = vtkMath::Dot(dir, up);
-
-  bool canElevate = ren->GetUseTrackball() || std::abs(dot) < 0.99 || !std::signbit(dot * ryf);
-
-  camera->Azimuth(rxf);
-
-  if (canElevate)
-  {
-    camera->Elevation(ryf);
-  }
 
   if (!ren->GetUseTrackball())
   {
-    // orthogonalize up vector based on focal direction
-    vtkMath::MultiplyScalar(dir, dot);
-    vtkMath::Subtract(up, dir, dir);
-    vtkMath::Normalize(dir);
-    camera->SetViewUp(dir);
+    double up[3];
+    this->InterpolateTemporaryUp(0.1, ren->GetUpVector(), up);
+
+    // Rotate camera around the focal point about the environment's up vector
+    vtkNew<vtkTransform> Transform;
+    Transform->Identity();
+    const double* fp = camera->GetFocalPoint();
+    Transform->Translate(+fp[0], +fp[1], +fp[2]);
+    Transform->RotateWXYZ(rxf, ren->GetUpVector());
+    Transform->Translate(-fp[0], -fp[1], -fp[2]);
+    Transform->TransformPoint(camera->GetPosition(), camera->GetPosition());
+
+    camera->SetViewUp(up);
+
+    // Clamp parameter to `camera->Elevation()` to maintain -90 < elevation < +90
+    constexpr double maxAbsElevation = 90 - 1e-12;
+    const double elevation = vtkMath::DegreesFromRadians(
+      vtkMath::AngleBetweenVectors(ren->GetUpVector(), camera->GetDirectionOfProjection()) -
+      vtkMath::Pi() / 2);
+    camera->Elevation(std::clamp(ryf, -maxAbsElevation - elevation, +maxAbsElevation - elevation));
+
+    camera->OrthogonalizeViewUp();
   }
   else
   {
+    camera->Azimuth(rxf);
+    camera->Elevation(ryf);
     camera->OrthogonalizeViewUp();
   }
 
@@ -355,14 +360,21 @@ void vtkF3DInteractorStyle::SetTemporaryUp(const double* tempUp)
   {
     this->TemporaryUp[i] = tempUp[i];
   }
+  this->TemporaryUpFactor = 1.0;
 }
 
 //------------------------------------------------------------------------------
-void vtkF3DInteractorStyle::InterpolateTemporaryUp(double factor, const double* input)
+void vtkF3DInteractorStyle::InterpolateTemporaryUp(
+  const double factorDelta, const double* target, double* output)
 {
-  for (int i = 0; i < 3; i++)
+  this->TemporaryUpFactor = std::max(this->TemporaryUpFactor - factorDelta, 0.0);
+  if (this->TemporaryUpFactor >= 0)
   {
-    this->TemporaryUp[i] = (1.0 - factor) * this->TemporaryUp[i] + factor * input[i];
+    const double factor = (1.0 - std::cos(vtkMath::Pi() * this->TemporaryUpFactor)) * 0.5;
+    for (int i = 0; i < 3; i++)
+    {
+      output[i] = factor * this->TemporaryUp[i] + (1.0 - factor) * target[i];
+    }
+    vtkMath::Normalize(output);
   }
-  vtkMath::Normalize(this->TemporaryUp);
 }

@@ -1,0 +1,26 @@
+# StreamVersion 1.2
+RenderEvent 0 0 0 0 0 0 0
+
+KeyPressEvent 0 0 1 0 1 Shift_L 0
+KeyPressEvent 0 0 1 58 1 colon 0
+CharEvent 0 0 1 58 1 colon 0
+KeyReleaseEvent 0 0 0 0 1 Shift_L 0
+KeyReleaseEvent 0 0 0 59 1 semicolon 0
+
+KeyPressEvent 0 0 0 102 1 f 0
+CharEvent 0 0 0 102 1 f 0
+KeyReleaseEvent 0 0 0 102 1 f 0
+
+KeyPressEvent 0 0 0 111 1 o 0
+CharEvent 0 0 0 111 1 o 0
+KeyReleaseEvent 0 0 0 111 1 o 0
+
+KeyPressEvent 0 0 0 111 1 o 0
+CharEvent 0 0 0 111 1 o 0
+KeyReleaseEvent 0 0 0 111 1 o 0
+
+KeyPressEvent 0 0 0 13 1 Return 0
+CharEvent 0 0 0 13 1 Return 0
+KeyReleaseEvent 0 0 0 13 1 Return 0
+
+TimerEvent 351 169 0 0 0 0 0

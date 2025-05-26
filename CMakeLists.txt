@@ -30,7 +30,7 @@ include(f3dVersion)
 
 # Handle F3D_VERSION
 set(F3D_MAJOR_VERSION 3)
-set(F3D_MINOR_VERSION 0)
+set(F3D_MINOR_VERSION 1)
 set(F3D_PATCH_VERSION 0)
 set(F3D_VERSION ${F3D_MAJOR_VERSION}.${F3D_MINOR_VERSION}.${F3D_PATCH_VERSION})
 
@@ -108,6 +108,7 @@ find_package(VTK 9.2.6 REQUIRED
   OPTIONAL_COMPONENTS
     opengl
     IOExodus
+    IOHDF
     IOOpenVDB
     RenderingRayTracing)
 message(STATUS "VTK ${VTK_VERSION} found")
@@ -119,7 +120,7 @@ endif()
 
 # Shared options between application and library
 include(GNUInstallDirs)
-cmake_dependent_option(F3D_WINDOWS_GUI "Build a non-console Win32 application" ON "WIN32" OFF)
+cmake_dependent_option(F3D_WINDOWS_BUILD_CONSOLE_APPLICATION "Build a supplemental f3d-console application" OFF "WIN32" OFF)
 cmake_dependent_option(F3D_MACOS_BUNDLE "Build a macOS bundle application" ON "APPLE" OFF)
 
 if(UNIX AND NOT APPLE)
@@ -320,7 +321,7 @@ f3d_report_variable(F3D_MODULE_UI)
 f3d_report_variable(F3D_PLUGIN_BUILD_ALEMBIC)
 f3d_report_variable(F3D_PLUGIN_BUILD_ASSIMP)
 f3d_report_variable(F3D_PLUGIN_BUILD_DRACO)
-f3d_report_variable(F3D_PLUGIN_BUILD_EXODUS)
+f3d_report_variable(F3D_PLUGIN_BUILD_HDF)
 f3d_report_variable(F3D_PLUGIN_BUILD_OCCT)
 f3d_report_variable(F3D_PLUGIN_BUILD_USD)
 f3d_report_variable(F3D_PLUGIN_BUILD_VDB)

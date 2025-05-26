@@ -259,10 +259,17 @@ public:
       const char* commandWithArgs = static_cast<const char*>(data);
       self->Interactor.SetCommandBuffer(commandWithArgs);
     }
-    else if (event == vtkF3DConsoleOutputWindow::ShowEvent ||
-      event == vtkF3DConsoleOutputWindow::HideEvent)
+    else if (event == vtkF3DConsoleOutputWindow::ShowEvent)
     {
-      self->Options.ui.console = (event == vtkF3DConsoleOutputWindow::ShowEvent);
+      // Invoked when console badge is clicked
+      self->Options.ui.console = true;
+    }
+    else if (event == vtkF3DConsoleOutputWindow::HideEvent)
+    {
+      // Invoked when esc key is pressed while in minimal console or console display, or when
+      // something is submitted to minimal console
+      self->Options.ui.console = false;
+      self->Options.ui.minimal_console = false;
     }
 
     self->RenderRequested = true;
@@ -612,6 +619,38 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
 
   this->initCommands();
   this->initBindings();
+#if F3D_MODULE_UI
+  vtkF3DImguiConsole* console = vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
+  assert(console != nullptr);
+  // Set the callback to get the list of commands
+  console->SetCommandsMatchCallback(
+    [this](const std::string& pattern)
+    {
+      // Build a list of candidates
+      std::vector<std::string> candidates;
+      // Copy all commands that start with the pattern
+      auto startWith = [&pattern](const std::string& s)
+      {
+        return s.rfind(pattern, 0) == 0; // To avoid dependency for C++20 starts_with
+      };
+      for (auto const& [action, callback] : this->Internals->Commands)
+      {
+        if (startWith(action))
+        {
+          candidates.push_back(action);
+        }
+        else
+        {
+          // List is sorted so we can break early
+          if (!candidates.empty())
+          {
+            break;
+          }
+        }
+      }
+      return candidates;
+    });
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -686,11 +725,30 @@ interactor& interactor_impl::initCommands()
     });
 
   this->addCommand("cycle_animation",
+    [&](const std::vector<std::string>&) { this->Internals->AnimationManager->CycleAnimation(); });
+
+  this->addCommand("cycle_anti_aliasing",
     [&](const std::vector<std::string>&)
     {
-      this->Internals->AnimationManager->CycleAnimation();
-      this->Internals->Options.scene.animation.index =
-        this->Internals->AnimationManager->GetAnimationIndex();
+      bool& enabled = this->Internals->Options.render.effect.antialiasing.enable;
+      std::string& mode = this->Internals->Options.render.effect.antialiasing.mode;
+      if (!enabled)
+      {
+        enabled = true;
+        mode = "fxaa";
+      }
+      else
+      {
+        if (mode == "fxaa")
+        {
+          mode = "ssaa";
+        }
+        else
+        {
+          enabled = false;
+        }
+      }
+      this->Internals->Window.render();
     });
 
   this->addCommand("cycle_coloring",
@@ -975,6 +1033,21 @@ interactor& interactor_impl::initBindings()
     }
   };
 
+  // "Cycle anti-aliasing" , "none/fxaa/ssaa"
+  auto docAA = [&]()
+  {
+    std::string desc;
+    if (!this->Internals->Options.render.effect.antialiasing.enable)
+    {
+      desc = "none";
+    }
+    else
+    {
+      desc = this->Internals->Options.render.effect.antialiasing.mode;
+    }
+    return std::pair("Cycle anti-aliasing", std::move(desc));
+  };
+
   // "Cycle animation" , "animationName"
   auto docAnim = [&]()
   { return std::pair("Cycle animation", this->Internals->AnimationManager->GetAnimationName()); };
@@ -1051,7 +1124,7 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "B"}, "toggle ui.scalar_bar", "Scene", std::bind(docTgl, "Toggle the scalar bar display", std::cref(opts.ui.scalar_bar)));
   this->addBinding({mod_t::NONE, "P"}, "toggle render.effect.translucency_support", "Scene", std::bind(docTgl, "Toggle Translucency", std::cref(opts.render.effect.translucency_support)));
   this->addBinding({mod_t::NONE, "Q"}, "toggle render.effect.ambient_occlusion","Scene", std::bind(docTgl, "Toggle ambient occlusion", std::cref(opts.render.effect.ambient_occlusion)));
-  this->addBinding({mod_t::NONE, "A"}, "toggle render.effect.anti_aliasing","Scene", std::bind(docTgl, "Toggle anti-aliasing", std::cref(opts.render.effect.anti_aliasing)));
+  this->addBinding({mod_t::NONE, "A"}, "cycle_anti_aliasing","Scene", docAA);
   this->addBinding({mod_t::NONE, "T"}, "toggle render.effect.tone_mapping","Scene", std::bind(docTgl, "Toggle tone mapping", std::cref(opts.render.effect.tone_mapping)));
   this->addBinding({mod_t::NONE, "E"}, "toggle render.show_edges","Scene", std::bind(docTglOpt, "Toggle edges display", std::cref(opts.render.show_edges)));
   this->addBinding({mod_t::NONE, "X"}, "toggle ui.axis","Scene", std::bind(docTgl, "Toggle axes display", std::cref(opts.ui.axis)));
@@ -1087,6 +1160,7 @@ interactor& interactor_impl::initBindings()
 #if F3D_MODULE_UI
   this->addBinding({mod_t::NONE, "H"}, "toggle ui.cheatsheet", "Others", std::bind(docStr, "Toggle cheatsheet display"));
   this->addBinding({mod_t::NONE, "Escape"}, "toggle ui.console", "Others", std::bind(docStr, "Toggle console display"));
+  this->addBinding({mod_t::ANY, "Colon"}, "toggle ui.minimal_console", "Others", std::bind(docStr, "Toggle minimal console display"));
 #endif
   this->addBinding({mod_t::CTRL, "Q"}, "stop_interactor", "Others", std::bind(docStr, "Stop the interactor"));
   this->addBinding({mod_t::NONE, "Return"}, "reset_camera", "Others", std::bind(docStr, "Reset camera to initial parameters"));

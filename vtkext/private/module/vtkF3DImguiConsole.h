@@ -17,6 +17,7 @@
 
 #include <vtkCommand.h>
 
+#include <functional>
 #include <memory>
 
 class vtkOpenGLRenderWindow;
@@ -36,7 +37,7 @@ public:
   /**
    * Show console window
    */
-  void ShowConsole();
+  void ShowConsole(bool);
 
   /**
    * Show console badge
@@ -47,6 +48,12 @@ public:
    * Clear console
    */
   void Clear();
+
+  /**
+   * Set the callback to get the list of commands matching pattern
+   */
+  void SetCommandsMatchCallback(
+    std::function<std::vector<std::string>(const std::string& pattern)> callback);
 
 protected:
   vtkF3DImguiConsole();

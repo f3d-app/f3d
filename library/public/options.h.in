@@ -33,11 +33,11 @@ public:
    * Default/Copy/move constructors/operators.
    */
   options();
-  ~options() = default;
-  options(const options& opt) = default;
-  options& operator=(const options& opt) = default;
-  options(options&& other) noexcept = default;
-  options& operator=(options&& other) noexcept = default;
+  ~options();
+  options(const options& opt);
+  options& operator=(const options& opt);
+  options(options&& other) noexcept;
+  options& operator=(options&& other) noexcept;
   ///@}
 
   /**
@@ -58,8 +58,7 @@ public:
 
   /**
    * Set an option as a string based on its name
-   * Use dedicated parsing code, see the related doc
-   * TODO add parsing documentation
+   * Use dedicated parsing code, see the related doc in PARSING.md.
    * Throw an options::inexistent_exception if option does not exist.
    * Throw an options::parsing_exception if parsing failed.
    */

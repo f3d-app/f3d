@@ -1,4 +1,10 @@
+#include "macros.h"
+
+F3D_SILENT_WARNING_PUSH()
+F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
 #include "options.h"
+F3D_SILENT_WARNING_POP()
+
 #include "options_generated.h"
 #include "options_tools.h"
 
@@ -17,7 +23,22 @@ namespace f3d
 options::options()
 {
   detail::init::initialize();
-};
+}
+
+//----------------------------------------------------------------------------
+options::~options() = default;
+
+//----------------------------------------------------------------------------
+options::options(const options& opt) = default;
+
+//----------------------------------------------------------------------------
+options& options::operator=(const options& opt) = default;
+
+//----------------------------------------------------------------------------
+options::options(options&& other) noexcept = default;
+
+//----------------------------------------------------------------------------
+options& options::operator=(options&& other) noexcept = default;
 
 //----------------------------------------------------------------------------
 options& options::set(std::string_view name, const option_variant_t& value)

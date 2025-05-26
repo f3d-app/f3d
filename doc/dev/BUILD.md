@@ -7,13 +7,13 @@ please take a look at our [getting started guide](GETTING_STARTED.md).
 ## Dependencies
 
 - [CMake](https://cmake.org) >= 3.1.
-- [VTK](https://vtk.org) >= 9.2.6 (9.4.1 recommended).
+- [VTK](https://vtk.org) >= 9.2.6 (9.4.2 recommended).
 - A C++17 compiler.
 - A CMake-compatible build system (Visual Studio, XCode, Ninja, Make, etc.).
 - Optionally, [Assimp](https://www.assimp.org/) >= 5.4.0.
 - Optionally, Open CASCADE [OCCT](https://dev.opencascade.org/) >= 7.6.3.
 - Optionally, [Alembic](http://www.alembic.io/) >= 1.8.5.
-- Optionally, [OpenUSD](https://openusd.org/release/index.html) >= 23.05.
+- Optionally, [OpenUSD](https://openusd.org/release/index.html) >= 24.08.
 - Optionally, [OpenVDB](https://www.openvdb.org/download/) >= 12.0.0, enable `IOOpenVDB` module during VTK configuration.
 - Optionally, [Draco](https://google.github.io/draco/) >= 1.5.6.
 - Optionally, [Python](https://www.python.org/) >= 3.9 and [pybind11](https://github.com/pybind/pybind11) >= 2.9.2.
@@ -24,7 +24,7 @@ F3D is tested continuously against versions recommended by the [VFX reference pl
 
 ## VTK compatibility
 
-As stated in the dependencies, F3D is compatible with VTK >= 9.2.6, however, some features may not be available. We suggest using VTK 9.4.1 with RenderingRayTracing, IOExodus and IOOpenVDB modules enabled in order to get as many features as possible in F3D.
+As stated in the dependencies, F3D is compatible with VTK >= 9.2.6, however, some features may not be available. We suggest using VTK 9.4.2 with RenderingRayTracing, IOExodus, IOHDF and IOOpenVDB modules enabled in order to get as many features as possible in F3D.
 
 ## Configuration and building
 
@@ -36,8 +36,8 @@ Here is some CMake options of interest:
 - `F3D_BUILD_APPLICATION`: Build the F3D executable.
 - `BUILD_TESTING`: Enable the [tests](TESTING.md).
 - `F3D_MACOS_BUNDLE`: On macOS, build a `.app` bundle.
-- `F3D_WINDOWS_GUI`: On Windows, build a Win32 application (without console).
 - `F3D_WINDOWS_BUILD_SHELL_THUMBNAILS_EXTENSION`: On Windows, build the shell thumbnails extension.
+- `F3D_WINDOWS_BUILD_CONSOLE_APPLICATION`: On Windows, build a supplemental Win32 console application.
 - `F3D_PLUGINS_STATIC_BUILD`: Build all plugins as static library (embedded into `libf3d`) and automatically loaded by the application. Incompatible with `F3D_MACOS_BUNDLE`.
 - `BUILD_SHARED_LIBS`: Build the libf3d and all plugins as static library (embedded into `f3d` executable). The `library` and `plugin_sdk` component will not be installed.
 
@@ -46,7 +46,7 @@ Some modules, plugins and language bindings depending on external libraries can 
 - `F3D_MODULE_RAYTRACING`: Support for raytracing rendering. Requires that VTK has been built with `OSPRay` and `VTK_MODULE_ENABLE_VTK_RenderingRayTracing` turned on. Disabled by default.
 - `F3D_MODULE_EXR`: Support for OpenEXR images. Requires `OpenEXR`. Disabled by default.
 - `F3D_MODULE_UI`: Support for ImGui widgets. Uses provided ImGui. Enabled by default.
-- `F3D_PLUGIN_BUILD_EXODUS`: Support for ExodusII (.ex2) file format. Requires that VTK has been built with `IOExodus` module (and `hdf5`). Enabled by default.
+- `F3D_PLUGIN_BUILD_HDF`: Support for VTKHDF (.vtkhdf) and ExodusII (.ex2) file formats. Requires that VTK has been built with `IOHDF` and `IOExodus` modules (and `hdf5`). Enabled by default.
 - `F3D_PLUGIN_BUILD_OCCT`: Support for STEP, IGES, BREP, and XBF file formats. Requires `OpenCASCADE`. Disabled by default.
 - `F3D_PLUGIN_BUILD_ASSIMP`: Support for FBX, DAE, OFF, DXF, X and 3MF file formats. Requires `Assimp`. Disabled by default.
 - `F3D_PLUGIN_BUILD_ALEMBIC`: Support for ABC file format. Requires `Alembic`. Disabled by default.

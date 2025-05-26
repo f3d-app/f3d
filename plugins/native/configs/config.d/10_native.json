@@ -43,7 +43,7 @@
     }
   },
   {
-    "match": ".*(splat)",
+    "match": ".*(splat|spz)",
     "options": {
       "point-sprites": true,
       "point-sprites-size": 1,
@@ -52,14 +52,32 @@
       "coloring-array": "color",
       "coloring-component": "-2",
       "background-color": "0, 0, 0",
-      "up": "-Y",
       "interaction-trackball": true,
-      "camera-position": "0,1,-5.2",
-      "camera-focal-point": "0,1,0",
       "tone-mapping": false,
       "grid": false,
       "anti-aliasing": false,
       "translucency-support": false
+    }
+  },
+  {
+    "match": ".*(splat)",
+    "options": {
+      "up": "-Y",
+      "camera-position": "0,1,-5.2",
+      "camera-focal-point": "0,1,0"
+    }
+  },
+  {
+    "match": ".*(spz)",
+    "options": {
+      "camera-position": "0,1,4",
+      "camera-focal-point": "0,0,0"
+    }
+  },
+  {
+    "match": ".*(mdl)",
+    "options": {
+      "up": "+Z"
     }
   }
 ]

@@ -110,10 +110,7 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
   std::vector<fs::path> configPaths;
   if (!configSearch.empty())
   {
-    for (const auto& path : ::GetConfigPaths(configSearch))
-    {
-      configPaths.emplace_back(path);
-    }
+    configPaths = ::GetConfigPaths(configSearch);
   }
   else
   {

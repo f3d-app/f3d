@@ -85,7 +85,18 @@
       },
       "anti_aliasing": {
         "type": "bool",
-        "default_value": "false"
+        "default_value": "false",
+        "deprecated": "use render.effect.antialiasing.enable instead"
+      },
+      "antialiasing": {
+        "enable": {
+          "type": "bool",
+          "default_value": "false"
+        },
+        "mode": {
+          "type": "string",
+          "default_value": "fxaa"
+        }
       },
       "ambient_occlusion": {
         "type": "bool",
@@ -170,6 +181,10 @@
       "type": "bool",
       "default_value": "false"
     },
+    "minimal_console": {
+      "type": "bool",
+      "default_value": "false"
+    },
     "dropzone": {
       "type": "bool",
       "default_value": "false"
@@ -238,6 +253,9 @@
       "roughness": {
         "type": "double"
       },
+      "base_ior": {
+        "type": "double"
+      },
       "texture": {
         "type": "path"
       }
@@ -250,6 +268,9 @@
       "cells": {
         "type": "bool",
         "default_value": "false"
+      },
+      "discretization": {
+        "type": "int"
       },
       "array_name": {
         "type": "string"

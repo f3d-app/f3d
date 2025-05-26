@@ -152,6 +152,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   this->Pimpl->GeometryActor->GetProperty()->SetPointSize(10.0);
   this->Pimpl->GeometryActor->GetProperty()->SetLineWidth(1.0);
   this->Pimpl->GeometryActor->GetProperty()->SetRoughness(0.3);
+  this->Pimpl->GeometryActor->GetProperty()->SetBaseIOR(1.5);
   this->Pimpl->GeometryActor->GetProperty()->SetInterpolationToPBR();
 
   // add mappers

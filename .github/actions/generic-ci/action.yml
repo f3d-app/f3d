@@ -1,79 +1,78 @@
-name: 'Generic F3D CI'
-description: 'Generic F3D CI'
+name: "Generic F3D CI"
+description: "Generic F3D CI"
 inputs:
   build_type:
-    description: 'Name of the build'
+    description: "Name of the build"
     required: false
-    default: 'standard'
+    default: "standard"
   vtk_version:
-    description: 'VTK version'
+    description: "VTK version"
     required: true
   raytracing_label:
-    description: 'Label to control raytracing'
+    description: "Label to control raytracing"
     required: false
-    default: 'no-raytracing'
+    default: "no-raytracing"
   optional_deps_label:
-    description: 'Label to optional dependencies'
+    description: "Label to optional dependencies"
     required: false
-    default: 'optional-deps'
+    default: "optional-deps"
   exclude_deprecated_label:
-    description: 'Label to control deprecated exclusion'
+    description: "Label to control deprecated exclusion"
     required: false
-    default: 'no-exclude-deprecated'
+    default: "no-exclude-deprecated"
   bundle_label:
-    description: 'Label to control bundle'
+    description: "Label to control bundle"
     required: false
-    default: 'no-bundle'
+    default: "no-bundle"
   rendering_backend:
-    description: 'Label to control the rendering backend'
+    description: "Label to control the rendering backend"
     required: false
-    default: 'auto'
+    default: "auto"
   static_label:
-    description: 'Label to control static build'
+    description: "Label to control static build"
     required: false
-    default: 'no-static'
+    default: "no-static"
   cpu:
-    description: 'CPU architecture to build for'
+    description: "CPU architecture to build for"
     required: false
-    default: 'x86_64'
+    default: "x86_64"
   lfs_sha:
-    description: 'Cache LFS sha'
+    description: "Cache LFS sha"
     required: true
   alembic_version:
-    description: 'Version of alembic to build'
+    description: "Version of alembic to build"
     required: false
   assimp_version:
-    description: 'Version of assimp to build'
+    description: "Version of assimp to build"
     required: false
   draco_version:
-    description: 'Version of draco to build'
+    description: "Version of draco to build"
     required: false
   occt_version:
-    description: 'Version of occt to build'
+    description: "Version of occt to build"
     required: false
   openexr_version:
-    description: 'Version of openexr to build'
+    description: "Version of openexr to build"
     required: false
   openvdb_version:
-    description: 'Version of openvdb to build'
+    description: "Version of openvdb to build"
     required: false
   pybind11_version:
-    description: 'Version of pybind11 to build'
+    description: "Version of pybind11 to build"
     required: false
   python_version:
-    description: 'Version of python to install'
+    description: "Version of python to install"
     required: false
   usd_version:
-    description: 'Version of usd to build'
+    description: "Version of usd to build"
     required: false
   java_version:
-    description: 'Version of java to install'
+    description: "Version of java to install"
     required: false
 
 runs:
   using: "composite"
   steps:
-
     - name: Check required inputs
       shell: bash
       run: |
@@ -83,7 +82,7 @@ runs:
     - name: Recover LFS Data
       uses: f3d-app/lfs-data-cache-action@v1
       with:
-        type: 'consumer'
+        type: "consumer"
         lfs_sha: ${{inputs.lfs_sha}}
         cache_postfix: cache-0
 
@@ -133,16 +132,16 @@ runs:
         inputs.java_version != ''
       uses: actions/setup-java@v4
       with:
-        distribution: 'temurin'
+        distribution: "temurin"
         java-version: ${{inputs.java_version}}
 
     - name: Setup Directories
       shell: bash
       working-directory: ${{github.workspace}}
       run: |
-         mkdir build
-         mkdir install
-         mkdir install/output
+        mkdir build
+        mkdir install
+        mkdir install/output
 
     - name: Set PATH windows
       if: runner.os == 'Windows'
@@ -198,7 +197,7 @@ runs:
         -DF3D_PLUGIN_BUILD_ALEMBIC=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_ASSIMP=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_DRACO=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
-        -DF3D_PLUGIN_BUILD_EXODUS=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_HDF=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_OCCT=${{ inputs.optional_deps_label == 'optional-deps' && inputs.static_label == 'no-static' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_USD=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_VDB=${{ matrix.vtk_version != 'v9.2.6' && (runner.os != 'Windows' || matrix.vtk_version != 'v9.3.1') && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
@@ -211,7 +210,7 @@ runs:
         -DF3D_TESTING_ENABLE_OSMESA_TESTS=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
         -DF3D_TESTING_DISABLE_CATCH_ALL=ON
         -DF3D_TESTING_FORCE_RENDERING_BACKEND=${{ inputs.rendering_backend }}
-        -DF3D_WINDOWS_GUI=ON
+        -DF3D_WINDOWS_BUILD_CONSOLE_APPLICATION=ON
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
 
@@ -241,8 +240,7 @@ runs:
 
     # A EGL test is crashing in the CI but not locally
     - name: Set CI test exception for Linux EGL
-      if:
-        runner.os == 'Linux' &&
+      if: runner.os == 'Linux' &&
         inputs.rendering_backend != 'auto'
       shell: bash
       run: echo "F3D_CTEST_EXCEPTIONS=(TestSDKExternalWindowEGL)" >> $GITHUB_ENV
@@ -266,7 +264,7 @@ runs:
         runner.os == 'macOS' &&
         inputs.cpu == 'arm64'
       shell: bash
-      run: echo "F3D_CTEST_EXCEPTIONS=(TestDepthPeelingToneMapping)|(TestDepthPeeling)|(TestTextureColor)|(TestDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)|(TestInteractionActors)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionAnimationSlow)|(TestInteractionConfigFileInteractions)|(TestGLTFRigArmature)|(TestInteractionRollCameraRotation)" >> $GITHUB_ENV
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestDepthPeelingToneMapping)|(TestDepthPeeling)|(TestTextureColor)|(TestDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)|(TestInteractionActors)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionAnimationSlow)|(TestInteractionConfigFileInteractions)|(TestGLTFRigArmature)|(TestInteractionRollCameraRotation)|(TestInteractionDragRotateVertical)" >> $GITHUB_ENV
 
     - name: Test
       shell: bash
@@ -361,7 +359,9 @@ runs:
     - name: Set F3D binary path Windows
       if: runner.os == 'Windows'
       shell: bash
-      run: echo "F3D_BIN_PATH=./bin/f3d.exe" >> $GITHUB_ENV
+      run: |
+        echo "F3D_BIN_PATH=./bin/f3d.exe" >> $GITHUB_ENV
+        echo "F3D_CONSOLE_BIN_PATH=./bin/f3d-console.exe" >> $GITHUB_ENV
 
     - name: Set F3D binary path MacOS bundle
       if: |
@@ -391,7 +391,7 @@ runs:
         inputs.cpu != 'arm64' && inputs.static_label == 'no-static' && inputs.optional_deps_label == 'optional-deps'
       shell: bash
       working-directory: ${{github.workspace}}/install
-      run: F3D_PLUGINS_PATH=$(pwd)/../build_plugins/example-plugin${{ runner.os == 'Windows' && '/Release' || null }} ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --load-plugins=example --output=../install_example_plugin_output.png --reference=../source/.github/baselines/install_example_plugin_output.png --resolution=300,300 --rendering-backend=${{ inputs.rendering_backend }} --verbose
+      run: F3D_PLUGINS_PATH=$(pwd)/../build_plugins/example-plugin${{ runner.os == 'Windows' && '/Release' || null }} ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --load-plugins=example --output=output/install_example_plugin_output.png --reference=../source/.github/baselines/install_example_plugin_output.png --resolution=300,300 --rendering-backend=${{ inputs.rendering_backend }} --verbose
 
     - name: Install plugin examples
       if: inputs.static_label == 'no-static'
@@ -420,7 +420,16 @@ runs:
       shell: bash
       working-directory: ${{github.workspace}}/install
       run: |
-        ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --output=../install_example_plugin_output.png --reference=../source/.github/baselines/install_example_plugin_output.png  --resolution=300,300 --verbose --rendering-backend=${{ inputs.rendering_backend }}
+        ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --output=output/install_example_plugin_output.png --reference=../source/.github/baselines/install_example_plugin_output.png  --resolution=300,300 --verbose --rendering-backend=${{ inputs.rendering_backend }}
+
+    - name: Check Install Windows Console Executable
+      if: |
+        inputs.vtk_version != 'v9.2.6' && inputs.vtk_version != 'v9.3.1'
+        && runner.os == 'Windows'
+      shell: bash
+      working-directory: ${{github.workspace}}/install
+      run: |
+        ${{ env.F3D_CONSOLE_BIN_PATH }} ../source/testing/data/dragon.vtu --output=output/install_output.png --reference=../source/.github/baselines/install_output.png --resolution=300,300 --colormap-file=viridis --coloring-component=0 --verbose --rendering-backend=${{ inputs.rendering_backend }}
 
     - name: Upload Tests Install Artifact
       if: failure()

@@ -78,7 +78,6 @@ T parse(const std::string& str)
 {
   static_assert(is_vector<T>::value, "non-vector types parsing must be specialized");
 
-  // TODO implement more parsing possibilities, eg different types of tokens
   T vec;
   std::istringstream split(str);
   for (std::string each; std::getline(split, each, ',');)
@@ -403,24 +402,94 @@ std::string parse(const std::string& str)
 //----------------------------------------------------------------------------
 /**
  * Parse provided string into a colormap_t.
- * Supported formats: vector of doubles
+ * Supported formats:
+ * - "val, color, val, color, ..."
+ * - "val, red, green, blue, val, red, green, blue, ..."
+ * Where val is in [0, 1].
  * Can throw options::parsing_exception in case of failure to parse
- * TODO add proper parsing
  */
 template<>
 colormap_t parse(const std::string& str)
 {
-  try
+  // Split by separator
+  std::vector<double> colormapVec;
+  std::istringstream split(str);
+  std::string each;
+  while (std::getline(split, each, ','))
   {
-    return colormap_t(options_tools::parse<std::vector<double>>(str));
+    // Parse val into a double
+    double val;
+    try
+    {
+      val = options_tools::parse<double>(each);
+    }
+    catch (const options::parsing_exception&)
+    {
+      throw options::parsing_exception("Cannot parse value from colormap: " + each +
+        ". Check provided colormap string is correct: " + str);
+    }
+
+    // Check it is between 0 and 1
+    if (val < 0 || val > 1)
+    {
+      throw options::parsing_exception("Parsed value from colormap: " + each +
+        " is not in expected [0, 1] range. Check provided colormap string is correct: " + str);
+    }
+
+    // Add value to colormap vector;
+    colormapVec.emplace_back(val);
+
+    // recover next string token
+    if (!std::getline(split, each, ','))
+    {
+      throw options::parsing_exception("Incorrect number of tokens in provided colormap: " + str);
+    }
+
+    // Try to parse it directly as a color
+    f3d::color_t color;
+    try
+    {
+      color = options_tools::parse<f3d::color_t>(each);
+
+      // Add color to colormap vector
+      colormapVec.emplace_back(color.r());
+      colormapVec.emplace_back(color.g());
+      colormapVec.emplace_back(color.b());
+      continue;
+    }
+    catch (const options::parsing_exception&)
+    {
+      // Quiet catch
+    }
+
+    // Not a color, recover next two token, reconstruct r,g,b string and try to parse it as a color
+    // again
+    std::string green;
+    std::string blue;
+    if (!std::getline(split, green, ',') || !std::getline(split, blue, ','))
+    {
+      throw options::parsing_exception("Incorrect number of tokens in provided colormap or a color "
+                                       "could not be parsed as expected: " +
+        str);
+    }
+
+    try
+    {
+      color = options_tools::parse<f3d::color_t>(each + "," + green + "," + blue);
+      colormapVec.emplace_back(color.r());
+      colormapVec.emplace_back(color.g());
+      colormapVec.emplace_back(color.b());
+      continue;
+    }
+    catch (const options::parsing_exception&)
+    {
+      throw options::parsing_exception("Cannot parse color from colormap: " + each + "," + green +
+        "," + blue + ". Check provided colormap string is correct: " + str);
+    }
   }
-  catch (const options::parsing_exception&)
-  {
-    throw options::parsing_exception("Cannot parse " + str + " into a colormap_t");
-  }
+  return colormap_t(colormapVec);
 }
 
-// TODO Improve string generation
 //----------------------------------------------------------------------------
 /**
  * Format provided var into a string from provided boolean
@@ -461,7 +530,6 @@ std::string format(double var)
  */
 std::string format(ratio_t var)
 {
-  // TODO generate a proper ratio string
   return options_tools::format(static_cast<double>(var));
 }
 
@@ -586,12 +654,19 @@ std::string format(direction_t var)
 //----------------------------------------------------------------------------
 /**
  * Format provided var into a string from provided colormap_t.
- * Rely on `format(std::vector<double>&)`
- * TODO add proper formatting
+ * Rely on `format(double)` and `format(color_t)`
  */
 std::string format(const colormap_t& var)
 {
-  return options_tools::format(static_cast<std::vector<double>>(var));
+  std::ostringstream stream;
+  std::vector<double> vec(var);
+  size_t size = vec.size() / 4;
+  for (unsigned int i = 0; i < size; i++)
+  {
+    stream << ((i > 0) ? "," : "") << options_tools::format(vec[i * 4]) << ","
+           << options_tools::format(color_t(vec[i * 4 + 1], vec[i * 4 + 2], vec[i * 4 + 3]));
+  }
+  return stream.str();
 }
 
 } // option_tools

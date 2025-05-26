@@ -29,11 +29,13 @@ sudo apt upgrade
 sudo apt install build-essential git git-lfs cmake libvtk9-dev
 ```
 
+Note: Ubuntu 24.04 / Debian 12 provides VTK version 9.1 but f3d requires VTK 9.2.6 at minimum, so building and installing vtk from source is suggested. Look at Windows build instruction for inspiration if needed.
+
 #### Fedora/Centos/RedHat
 
 ```
 sudo yum update
-sudo yum install make automake gcc gcc-c++ kernel-devel git git-lfs cmake vtk
+sudo dnf install make automake gcc gcc-c++ kernel-devel git git-lfs cmake vtk-devel
 ```
 
 #### Arch Linux
@@ -93,7 +95,7 @@ mkdir dev
 cd dev
 mkdir vtk
 cd vtk
-git clone --depth 1 --branch v9.4.1 https://gitlab.kitware.com/vtk/vtk.git src
+git clone --depth 1 --branch v9.4.2 https://gitlab.kitware.com/vtk/vtk.git src
 mkdir build
 mkdir install
 cd ..

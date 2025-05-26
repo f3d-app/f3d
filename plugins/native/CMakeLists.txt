@@ -176,7 +176,6 @@ f3d_plugin_declare_reader(
   FORMAT_DESCRIPTION "VTK XML MultiBlock"
 )
 
-
 f3d_plugin_declare_reader(
   NAME Splat
   SCORE 90
@@ -185,6 +184,27 @@ f3d_plugin_declare_reader(
   VTK_READER vtkF3DSplatReader
   FORMAT_DESCRIPTION "3D Gaussian splats"
 )
+
+f3d_plugin_declare_reader(
+  NAME QuakeMDL
+  EXTENSIONS mdl
+  MIMETYPES application/vnd.mdl
+  OPTIONS skin_index
+  VTK_IMPORTER vtkF3DQuakeMDLImporter
+  FORMAT_DESCRIPTION "Quake 1 MDL model"
+  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/mdl.inl"
+)
+
+# Needs vtkResourceStream (https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9663)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221216)
+  f3d_plugin_declare_reader(
+    NAME SPZ
+    EXTENSIONS spz
+    MIMETYPES application/vnd.spz
+    VTK_READER vtkF3DSPZReader
+    FORMAT_DESCRIPTION "Compressed 3D gaussian splats"
+  )
+endif()
 
 f3d_plugin_build(
   NAME native

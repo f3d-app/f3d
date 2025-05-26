@@ -31,7 +31,7 @@ namespace f3d::detail
 class scene_impl::internals
 {
 public:
-  internals(const options& options, window_impl& window)
+  internals(options& options, window_impl& window)
     : Options(options)
     , Window(window)
     , AnimationManager(options, window)
@@ -192,7 +192,7 @@ public:
 };
 
 //----------------------------------------------------------------------------
-scene_impl::scene_impl(const options& options, window_impl& window)
+scene_impl::scene_impl(options& options, window_impl& window)
   : Internals(std::make_unique<scene_impl::internals>(options, window))
 {
 }

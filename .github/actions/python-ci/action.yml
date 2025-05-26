@@ -1,44 +1,43 @@
-name: 'Python specific CI'
-description: 'Python specific CI'
+name: "Python specific CI"
+description: "Python specific CI"
 inputs:
   lfs_sha:
-    description: 'Cache LFS sha'
+    description: "Cache LFS sha"
     required: true
   python_version:
-    description: 'Python version'
+    description: "Python version"
     required: true
   alembic_version:
-    description: 'Version of alembic to build'
+    description: "Version of alembic to build"
     required: false
   assimp_version:
-    description: 'Version of assimp to build'
+    description: "Version of assimp to build"
     required: false
   draco_version:
-    description: 'Version of draco to build'
+    description: "Version of draco to build"
     required: false
   occt_version:
-    description: 'Version of occt to build'
+    description: "Version of occt to build"
     required: false
   openexr_version:
-    description: 'Version of openexr to build'
+    description: "Version of openexr to build"
     required: false
   openvdb_version:
-    description: 'Version of openvdb to build'
+    description: "Version of openvdb to build"
     required: false
   pybind11_version:
-    description: 'Version of pybind11 to build'
+    description: "Version of pybind11 to build"
     required: false
   usd_version:
-    description: 'Version of usd to build'
+    description: "Version of usd to build"
     required: false
   vtk_version:
-    description: 'Version of vtk to build'
+    description: "Version of vtk to build"
     required: true
 
 runs:
   using: "composite"
   steps:
-
     - name: Check required inputs
       shell: bash
       run: |
@@ -49,9 +48,9 @@ runs:
     - name: Recover LFS Data
       uses: f3d-app/lfs-data-cache-action@v1
       with:
-        type: 'consumer'
+        type: "consumer"
         lfs_sha: ${{inputs.lfs_sha}}
-        cache_postfix: cache-0 
+        cache_postfix: cache-0
 
     - name: Install all F3D dependencies
       uses: ./source/.github/actions/generic-dependencies
@@ -119,7 +118,7 @@ runs:
         -DF3D_MACOS_BUNDLE=OFF;
         -DF3D_MODULE_EXR=ON;
         -DF3D_MODULE_UI=ON;
-        -DF3D_WINDOWS_GUI=OFF" >> $GITHUB_ENV
+        -DF3D_BUILD_APPLICATION=OFF" >> $GITHUB_ENV
 
     - name: Build wheel
       shell: bash

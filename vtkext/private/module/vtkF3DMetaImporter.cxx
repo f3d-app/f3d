@@ -19,6 +19,7 @@
 #include <numeric>
 #include <vector>
 
+//----------------------------------------------------------------------------
 struct vtkF3DMetaImporter::Internals
 {
   // Actors related vectors
@@ -44,6 +45,7 @@ struct vtkF3DMetaImporter::Internals
 #endif
 };
 
+//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkF3DMetaImporter);
 
 //----------------------------------------------------------------------------
@@ -250,7 +252,7 @@ bool vtkF3DMetaImporter::Update()
 
       // Create and configure point sprites actors
       this->Pimpl->PointSpritesActorsAndMappers.emplace_back(
-        vtkF3DMetaImporter::PointSpritesStruct());
+        vtkF3DMetaImporter::PointSpritesStruct(actor, importer));
       vtkF3DMetaImporter::PointSpritesStruct& pss =
         this->Pimpl->PointSpritesActorsAndMappers.back();
 
@@ -502,6 +504,29 @@ bool vtkF3DMetaImporter::UpdateAtTimeValue(double timeValue)
     importerPair.Importer->UpdateTimeStep(timeValue);
 #endif
   }
+
+  // Update coloring and point sprites
+  for (auto& cs : this->Pimpl->ColoringActorsAndMappers)
+  {
+    cs.Mapper->SetInputData(
+      vtkPolyDataMapper::SafeDownCast(cs.OriginalActor->GetMapper())->GetInput());
+
+    bool visi = cs.Actor->GetVisibility();
+    cs.Actor->vtkProp3D::ShallowCopy(cs.OriginalActor);
+    cs.Actor->SetVisibility(visi);
+  }
+  for (auto& pss : this->Pimpl->PointSpritesActorsAndMappers)
+  {
+    if (!vtkF3DGenericImporter::SafeDownCast(pss.Importer))
+    {
+      pss.Mapper->SetInputData(
+        vtkPolyDataMapper::SafeDownCast(pss.OriginalActor->GetMapper())->GetInput());
+      bool visi = pss.Actor->GetVisibility();
+      pss.Actor->vtkProp3D::ShallowCopy(pss.OriginalActor);
+      pss.Actor->SetVisibility(visi);
+    }
+  }
+
   this->Pimpl->UpdateTime.Modified();
   return ret;
 }

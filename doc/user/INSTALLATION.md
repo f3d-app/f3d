@@ -1,15 +1,15 @@
 # Installation
 
-## Current release packages (3.0.0)
+## Current release packages (3.1.0)
 
 | Platform               | Files                                                                                                                       |
 | ---------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| Windows (installer)    | [F3D-3.0.0-Windows.exe](https://github.com/f3d-app/f3d/releases/download/v3.0.0/F3D-3.0.0-Windows-x86_64-raytracing.exe)    |
-| Windows (portable)     | [F3D-3.0.0-Windows.zip](https://github.com/f3d-app/f3d/releases/download/v3.0.0/F3D-3.0.0-Windows-x86_64-raytracing.zip)    |
-| MacOS (Silicon)        | [F3D-3.0.0-macOS-arm64.dmg](https://github.com/f3d-app/f3d/releases/download/v3.0.0/F3D-3.0.0-macOS-arm64-raytracing.dmg)   |
-| MacOS (Intel)          | [F3D-3.0.0-macOS-x86_64.dmg](https://github.com/f3d-app/f3d/releases/download/v3.0.0/F3D-3.0.0-macOS-x86_64-raytracing.dmg) |
-| Linux (Debian package) | [F3D-3.0.0-Linux.deb](https://github.com/f3d-app/f3d/releases/download/v3.0.0/F3D-3.0.0-Linux-x86_64-raytracing.deb)        |
-| Linux (portable)       | [F3D-3.0.0-Linux.tar.xz](https://github.com/f3d-app/f3d/releases/download/v3.0.0/F3D-3.0.0-Linux-x86_64-raytracing.tar.xz)  |
+| Windows (installer)    | [F3D-3.1.0-Windows.exe](https://github.com/f3d-app/f3d/releases/download/v3.1.0/F3D-3.1.0-Windows-x86_64-raytracing.exe)    |
+| Windows (portable)     | [F3D-3.1.0-Windows.zip](https://github.com/f3d-app/f3d/releases/download/v3.1.0/F3D-3.1.0-Windows-x86_64-raytracing.zip)    |
+| MacOS (Silicon)        | [F3D-3.1.0-macOS-arm64.dmg](https://github.com/f3d-app/f3d/releases/download/v3.1.0/F3D-3.1.0-macOS-arm64-raytracing.dmg)   |
+| MacOS (Intel)          | [F3D-3.1.0-macOS-x86_64.dmg](https://github.com/f3d-app/f3d/releases/download/v3.1.0/F3D-3.1.0-macOS-x86_64-raytracing.dmg) |
+| Linux (Debian package) | [F3D-3.1.0-Linux.deb](https://github.com/f3d-app/f3d/releases/download/v3.1.0/F3D-3.1.0-Linux-x86_64-raytracing.deb)        |
+| Linux (portable)       | [F3D-3.1.0-Linux.tar.xz](https://github.com/f3d-app/f3d/releases/download/v3.1.0/F3D-3.1.0-Linux-x86_64-raytracing.tar.xz)  |
 
 ### Notes
 
@@ -48,6 +48,7 @@ You can also find packages for the following repositories:
 - Fedora and others through [openSUSE OBS](https://build.opensuse.org/package/show/home:AndnoVember:F3D/f3d)
 - [Guix](https://hpc.guix.info/package/f3d)
 - [Flathub](https://flathub.org/apps/details/io.github.f3d_app.f3d)
+- [ALT linux](https://packages.altlinux.org/en/sisyphus/srpms/f3d/)
 
 ### Other
 
@@ -58,3 +59,4 @@ You can also find packages for the following repositories:
 ### libf3d based tools
 
 - [Exhibit](https://flathub.org/apps/io.github.nokse22.Exhibit)
+- [f3dviewer](https://github.com/ccseer/f3dviewer)

@@ -5,7 +5,7 @@
  * This renderers all the generic actors added by F3D which includes
  * UI, axis, grid, edges, timer, metadata and cheatsheet.
  * It also handles the different rendering passes, including
- * raytracing, ssao, fxaa, tonemapping.
+ * raytracing, ssao, anti-aliasing, tonemapping.
  */
 
 #ifndef vtkF3DRenderer_h
@@ -23,6 +23,7 @@
 
 namespace fs = std::filesystem;
 
+class vtkDiscretizableColorTransferFunction;
 class vtkColorTransferFunction;
 class vtkCornerAnnotation;
 class vtkImageReader2;
@@ -37,6 +38,16 @@ public:
   static vtkF3DRenderer* New();
   vtkTypeMacro(vtkF3DRenderer, vtkOpenGLRenderer);
 
+  /**
+   * Enum listing possible anti aliasing modes.
+   */
+  enum class AntiAliasingMode : unsigned char
+  {
+    NONE,
+    FXAA,
+    SSAA
+  };
+
   ///@{
   /**
    * Set visibility of different actors
@@ -49,6 +60,7 @@ public:
   void ShowFilename(bool show);
   void ShowCheatSheet(bool show);
   void ShowConsole(bool show);
+  void ShowMinimalConsole(bool show);
   void ShowDropZone(bool show);
   void ShowHDRISkybox(bool show);
   void ShowArmature(bool show);
@@ -83,7 +95,7 @@ public:
   void SetUseRaytracingDenoiser(bool use);
   void SetUseDepthPeelingPass(bool use);
   void SetUseSSAOPass(bool use);
-  void SetUseFXAAPass(bool use);
+  void SetAntiAliasingMode(AntiAliasingMode mode);
   void SetUseToneMappingPass(bool use);
   void SetUseBlurBackground(bool use);
   void SetBlurCircleOfConfusionRadius(double radius);
@@ -193,6 +205,11 @@ public:
   void SetRoughness(const std::optional<double>& roughness);
 
   /**
+   * Set the index of refraction of the base layer on all actors
+   */
+  void SetBaseIOR(const std::optional<double>& baseIOR);
+
+  /**
    * Set the surface color on all actors
    */
   void SetSurfaceColor(const std::optional<std::vector<double>>& color);
@@ -292,6 +309,12 @@ public:
    * Setting an empty vector will use default color map
    */
   void SetColormap(const std::vector<double>& colormap);
+
+  /**
+   * Set Colormap Discretization
+   * Defaults to std::nullopt which is no discretization.
+   */
+  vtkSetMacro(ColorMapDiscretization, std::optional<int>);
 
   /**
    * Set the meta importer to recover coloring information from
@@ -515,13 +538,14 @@ private:
   bool MetaDataVisible = false;
   bool CheatSheetVisible = false;
   bool ConsoleVisible = false;
+  bool MinimalConsoleVisible = false;
   bool DropZoneVisible = false;
   bool HDRISkyboxVisible = false;
   bool ArmatureVisible = false;
   bool UseRaytracing = false;
   bool UseRaytracingDenoiser = false;
   bool UseDepthPeelingPass = false;
-  bool UseFXAAPass = false;
+  AntiAliasingMode AntiAliasingModeEnabled = AntiAliasingMode::NONE;
   bool UseSSAOPass = false;
   bool UseToneMappingPass = false;
   bool UseBlurBackground = false;
@@ -580,6 +604,7 @@ private:
   std::optional<double> Opacity;
   std::optional<double> Roughness;
   std::optional<double> Metallic;
+  std::optional<double> BaseIOR;
   std::optional<double> NormalScale;
   std::optional<std::vector<double>> SurfaceColor;
   std::optional<std::vector<double>> EmissiveFactor;
@@ -589,7 +614,8 @@ private:
   std::optional<fs::path> TextureEmissive;
   std::optional<fs::path> TextureNormal;
 
-  vtkSmartPointer<vtkColorTransferFunction> ColorTransferFunction;
+  vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorTransferFunction;
+  std::optional<int> ColorMapDiscretization;
   bool ExpandingRangeSet = false;
   bool UsingExpandingRange = true;
   double ColorRange[2] = { 0.0, 1.0 };

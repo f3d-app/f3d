@@ -3,6 +3,7 @@
 #include "camera_impl.h"
 #include "engine.h"
 #include "log.h"
+#include "macros.h"
 #include "options.h"
 
 #include "vtkF3DExternalRenderWindow.h"
@@ -353,9 +354,12 @@ point3_t window_impl::getDisplayFromWorld(const point3_t& worldPoint) const
 //----------------------------------------------------------------------------
 window_impl::~window_impl()
 {
-  // The axis widget should be disabled before calling the renderer destructor
-  // As there is a register loop if not
-  this->Internals->Renderer->ShowAxis(false);
+  if (this->Internals->Interactor)
+  {
+    // The axis widget should be disabled before calling the renderer destructor
+    // As there is a register loop if not
+    this->Internals->Renderer->ShowAxis(false);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -377,9 +381,13 @@ void window_impl::UpdateDynamicOptions()
   renderer->UpdateLights();
 
   const options& opt = this->Internals->Options;
-  renderer->ShowAxis(opt.ui.axis);
-  renderer->SetUseTrackball(opt.interactor.trackball);
-  renderer->SetInvertZoom(opt.interactor.invert_zoom);
+
+  if (this->Internals->Interactor)
+  {
+    renderer->ShowAxis(opt.ui.axis);
+    renderer->SetUseTrackball(opt.interactor.trackball);
+    renderer->SetInvertZoom(opt.interactor.invert_zoom);
+  }
 
   // XXX: model.point_sprites.type only has an effect on geometry scene
   // but we set it here for practical reasons
@@ -398,6 +406,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->ShowMetaData(opt.ui.metadata);
   renderer->ShowCheatSheet(opt.ui.cheatsheet);
   renderer->ShowConsole(opt.ui.console);
+  renderer->ShowMinimalConsole(opt.ui.minimal_console);
   renderer->ShowDropZone(opt.ui.dropzone);
   renderer->SetDropZoneInfo(opt.ui.dropzone_info);
   renderer->ShowArmature(opt.render.armature.enable);
@@ -406,8 +415,39 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetRaytracingSamples(opt.render.raytracing.samples);
   renderer->SetUseRaytracingDenoiser(opt.render.raytracing.denoise);
 
+  vtkF3DRenderer::AntiAliasingMode aaMode = vtkF3DRenderer::AntiAliasingMode::NONE;
+
+  // F3D_DEPRECATED
+  // Remove this in the next major release
+  F3D_SILENT_WARNING_PUSH()
+  F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
+  if (opt.render.effect.anti_aliasing)
+  {
+    log::warn("render.effect.anti_aliasing is deprecated, please use "
+              "render.effect.antialiasing.enable instead");
+    aaMode = vtkF3DRenderer::AntiAliasingMode::FXAA;
+  }
+  F3D_SILENT_WARNING_POP()
+
+  if (opt.render.effect.antialiasing.enable)
+  {
+    if (opt.render.effect.antialiasing.mode == "fxaa")
+    {
+      aaMode = vtkF3DRenderer::AntiAliasingMode::FXAA;
+    }
+    else if (opt.render.effect.antialiasing.mode == "ssaa")
+    {
+      aaMode = vtkF3DRenderer::AntiAliasingMode::SSAA;
+    }
+    else
+    {
+      log::warn(opt.render.effect.antialiasing.mode,
+        R"( is an invalid antialiasing mode. Valid modes are: "fxaa", "ssaa")");
+    }
+  }
+
   renderer->SetUseSSAOPass(opt.render.effect.ambient_occlusion);
-  renderer->SetUseFXAAPass(opt.render.effect.anti_aliasing);
+  renderer->SetAntiAliasingMode(aaMode);
   renderer->SetUseToneMappingPass(opt.render.effect.tone_mapping);
   renderer->SetUseDepthPeelingPass(opt.render.effect.translucency_support);
   renderer->SetBackfaceType(opt.render.backface_type);
@@ -441,6 +481,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetTextureBaseColor(opt.model.color.texture);
   renderer->SetRoughness(opt.model.material.roughness);
   renderer->SetMetallic(opt.model.material.metallic);
+  renderer->SetBaseIOR(opt.model.material.base_ior);
   renderer->SetTextureMaterial(opt.model.material.texture);
   renderer->SetTextureEmissive(opt.model.emissive.texture);
   renderer->SetEmissiveFactor(opt.model.emissive.factor);
@@ -455,6 +496,7 @@ void window_impl::UpdateDynamicOptions()
 
   renderer->SetScalarBarRange(opt.model.scivis.range);
   renderer->SetColormap(opt.model.scivis.colormap);
+  renderer->SetColorMapDiscretization(opt.model.scivis.discretization);
   renderer->ShowScalarBar(opt.ui.scalar_bar);
 
   renderer->SetUsePointSprites(opt.model.point_sprites.enable);
