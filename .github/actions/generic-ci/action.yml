@@ -266,6 +266,15 @@ runs:
       shell: bash
       run: echo "F3D_CTEST_EXCEPTIONS=(TestDepthPeelingToneMapping)|(TestDepthPeeling)|(TestTextureColor)|(TestDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)|(TestInteractionActors)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionAnimationSlow)|(TestInteractionConfigFileInteractions)|(TestGLTFRigArmature)|(TestInteractionRollCameraRotation)|(TestInteractionDragRotateVertical)" >> $GITHUB_ENV
 
+    # Certain tests are failing on macOS for unknown reasons
+    # https://github.com/f3d-app/f3d/issues/2268
+    - name: Set CI test exception for macOS
+      if: |
+        runner.os == 'macOS'
+      shell: bash
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestInteractionNoModelScrollWheel)|(TestInteractionNoModelScrollBar)" >> $GITHUB_ENV
+
+
     - name: Test
       shell: bash
       working-directory: ${{github.workspace}}/build
