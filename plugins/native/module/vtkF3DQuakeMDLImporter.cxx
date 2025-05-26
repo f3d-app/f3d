@@ -136,7 +136,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     {
       skinIndex = 0;
       vtkWarningWithObjectMacro(
-        this->Parent, "QuakeMDL.skin_index is out of bounds. Defaulting to 0.");
+        this->Parent, "QuakeMDL.skin_index is out of bounds. Defauling to 0.");
     }
     const unsigned char* selectedSkin = skins[skinIndex].skin;
     for (int i = 0; i < skinHeight; i++)
