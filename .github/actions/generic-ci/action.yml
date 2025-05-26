@@ -274,7 +274,6 @@ runs:
       shell: bash
       run: echo "F3D_CTEST_EXCEPTIONS=(TestInteractionNoModelScrollWheel)|(TestInteractionNoModelScrollBar)" >> $GITHUB_ENV
 
-
     - name: Test
       shell: bash
       working-directory: ${{github.workspace}}/build
