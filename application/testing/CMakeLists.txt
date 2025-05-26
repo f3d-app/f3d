@@ -1252,14 +1252,17 @@ if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME TestReadersListMultiplePlugins ARGS --list-readers --load-plugins=assimp,alembic NO_BASELINE REGEXP_FAIL "Plugin failed to load")
 endif()
 
-if(F3D_PLUGIN_BUILD_EXODUS) 
- f3d_test(NAME TestForceReaderExodusFail DATA BoxAnimated.gltf ARGS --load-plugins=exodus --force-reader=ExodusII NO_BASELINE REGEXP "is not a file of a supported file format|failed to load scene")
- f3d_test(NAME TestForceReaderExodusPass DATA disk_out_ref.ex2 ARGS --load-plugins=exodus --force-reader=ExodusII NO_BASELINE REGEXP_FAIL "is not a file of a supported file format|failed to load scene")
-endif()
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
+  f3d_test(NAME TestForceReaderFail DATA suzanne.stl ARGS --force-reader=OBJ NO_BASELINE REGEXP "is not supported by the given force reader")
+  f3d_test(NAME TestForceReaderPass DATA suzanne.stl ARGS --force-reader=STL NO_BASELINE REGEXP_FAIL "failed to load scene")
+  f3d_test(NAME TestForceReaderInvalid DATA suzanne.stl ARGS --force-reader=INVALID NO_BASELINE REGEXP "Force reader .* doesn't exist")
 
-if(F3D_PLUGIN_BUILD_DRACO) 
- f3d_test(NAME TestForceReaderGLTFDraco DATA BoxAnimated.gltf ARGS --load-plugins=draco --force-reader=GLTFDraco NO_BASELINE REGEXP_FAIL "is not a file of a supported file format|failed to load scene")
- f3d_test(NAME TestForceReaderGLTF DATA BoxAnimated.gltf ARGS --load-plugins=draco --force-reader=GLTF NO_BASELINE REGEXP_FAIL "is not a file of a supported file format|failed to load scene")
+  if(F3D_PLUGIN_BUILD_DRACO)
+    f3d_test(NAME TestForceReaderGLTFDraco DATA BoxAnimated.gltf ARGS --load-plugins=draco --force-reader=GLTFDraco NO_BASELINE REGEXP_FAIL "failed to load scene")
+    f3d_test(NAME TestForceReaderGLTF DATA BoxAnimated.gltf ARGS --load-plugins=draco --force-reader=GLTF NO_BASELINE REGEXP_FAIL "failed to load scene")
+    f3d_test(NAME TestForceReaderGLTFDracoIntoGLTF DATA Box_draco.gltf ARGS --load-plugins=draco --force-reader=GLTF NO_BASELINE REGEXP "failed to load scene")
+  endif()
+
 endif()
 
 # Test bindings-list display

@@ -18,7 +18,6 @@
 
 #include <map>
 #include <optional>
-#include <string_view>
 #include <vector>
 
 namespace f3d

@@ -20,8 +20,6 @@
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
 
-#include <algorithm>
-#include <numeric>
 #include <vector>
 
 namespace fs = std::filesystem;
@@ -240,20 +238,35 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
     {
       throw scene::load_failure_exception(filePath.string() + " does not exists");
     }
-
+    auto force_reader = this->Internals->Options.scene.force_reader;
     // Recover the importer for the provided file path
-    f3d::reader* reader = f3d::factory::instance()->getReader(
-      filePath.string(), this->Internals->Options.scene.force_reader);
+    f3d::reader* reader = f3d::factory::instance()->getReader(filePath.string(), force_reader);
     if (reader)
     {
-      log::debug(
-        "Found a reader for \"" + filePath.string() + "\" : \"" + reader->getName() + "\"");
+      if (force_reader.has_value())
+      {
+        if (!reader->canRead(filePath))
+        {
+          throw scene::load_failure_exception(
+            filePath.string() + " is not supported by the given force reader " + (*force_reader));
+        }
+        log::debug("Forcing reader ", (*force_reader), " for ", filePath.string());
+      }
+      else
+      {
+        log::debug("Found a reader for \"", filePath.string(), "\" : \"", reader->getName(), "\"");
+      }
     }
     else
     {
+      if (force_reader.has_value())
+      {
+        throw scene::load_failure_exception(*force_reader + " is not a valid force reader");
+      }
       throw scene::load_failure_exception(
         filePath.string() + " is not a file of a supported 3D scene file format");
     }
+
     vtkSmartPointer<vtkImporter> importer = reader->createSceneReader(filePath.string());
     if (!importer)
     {

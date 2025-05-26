@@ -1439,7 +1439,15 @@ void F3DStarter::LoadFileGroup(
           }
           else
           {
-            f3d::log::warn(tmpPath.string(), " is not a file of a supported file format");
+            auto force_reader = this->Internals->LibOptions.scene.force_reader;
+            if (force_reader.has_value())
+            {
+              f3d::log::warn("Force reader ", *force_reader, " doesn't exist");
+            }
+            else
+            {
+              f3d::log::warn(tmpPath.string(), " is not a file of a supported file format");
+            }
             unsupported = true;
           }
         }
