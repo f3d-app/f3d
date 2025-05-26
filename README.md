@@ -38,7 +38,7 @@ Open a file directly in F3D or from the command line by running:
 f3d /path/to/file.ext
 ```
 
-Optionally, append `--output=/path/to/img.png` to save the rendering into an image file.
+Optionaly, append `--output=/path/to/img.png` to save the rendering into an image file.
 
 See the [Quickstart Guide](doc/user/QUICKSTART.md) for more information about getting started with F3D.
 
