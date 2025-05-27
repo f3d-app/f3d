@@ -15,8 +15,12 @@
 
 #include <vtksys/DynamicLoader.hxx>
 #include <vtksys/SystemTools.hxx>
+#include <vtksys/Encoding.hxx>
 
 #include <nlohmann/json.hpp>
+
+#include <Knownfolders.h>
+#include <shlobj_core.h>
 
 namespace fs = std::filesystem;
 
@@ -52,12 +56,39 @@ engine::engine(
   // Ensure all lib initialization is done (once)
   detail::init::initialize();
 
+#if defined(_WIN32)
+  LPWSTR lpwstr;
+  if (FAILED(SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &lpwstr))) {
+//    TODO	  
+//    return cm::nullopt;
+  }
+  std::wstring wstr = std::wstring(lpwstr);
+  CoTaskMemFree(lpwstr);
+  std::string config = vtksys::Encoding::ToNarrow(wstr);
+  vtksys::SystemTools::ConvertToUnixSlashes(config);
+  std::cout<<config<<std::endl;
+#else
+  auto config = cmSystemTools::GetEnvVar("XDG_CONFIG_HOME");
+  if (!config.has_value()) {
+    config = cmSystemTools::GetEnvVar("HOME");
+    if (config.has_value()) {
+#  if defined(__APPLE__)
+      config = cmStrCat(config.value(), "/Library/Application Support");
+#  else
+      config = cmStrCat(config.value(), "/.config");
+#  endif
+    }
+  }
+  return config;
+#endif
+
+
   fs::path cachePath;
 #if defined(_WIN32)
-  const char* appData = std::getenv("LOCALAPPDATA");
-  if (appData && strlen(appData) > 0)
+//  const char* appData = std::getenv("LOCALAPPDATA");
+//  if (appData && strlen(appData) > 0)
   {
-    cachePath = fs::path(appData);
+    cachePath = fs::path(config);
   }
 #else
 
