@@ -29,7 +29,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/vtk_install
-        key: vtk-${{ inputs.vtk_version }}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.cpu}}-9
+        key: vtk-${{ inputs.vtk_version }}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.cpu}}-0
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -107,7 +107,7 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_RenderingRayTracing=${{ inputs.raytracing_label == 'raytracing' && 'YES' || 'DEFAULT' }}
         -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2=YES
         -DVTK_MODULE_ENABLE_VTK_TestingCore=YES
-        -DVTK_OPENGL_HAS_EGL=${{ inputs.vtk_version != 'v9.2.6' && inputs.vtk_version != 'v9.3.1' && 'ON' || 'OFF' }}
+        -DVTK_OPENGL_HAS_EGL=${{ runner.os != 'macOS' && inputs.vtk_version != 'v9.2.6' && inputs.vtk_version != 'v9.3.1' && 'ON' || 'OFF' }}
         -DVTK_SMP_IMPLEMENTATION_TYPE=TBB
         -DVTK_VERSIONED_INSTALL=OFF
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
