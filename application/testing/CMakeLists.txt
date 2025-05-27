@@ -1238,6 +1238,16 @@ f3d_test(NAME TestNoConfigWithConfig DATA f3d.glb ARGS --no-config CONFIG ${F3D_
 # Test that config file search display logs
 f3d_test(NAME TestConfigFileLocationVerbose ARGS --verbose CONFIG inexistent.json REGEXP "Candidate config file not found: .*inexistent.json" NO_BASELINE)
 
+# Test invalid match type in config file
+f3d_test(NAME TestConfigInvalidMatchType DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/invalid_match_type.json REGEXP "A config block in config file .*invalid_match_type.json has an unknown match-type.*" NO_BASELINE)
+
+# Test invalid glob expression in config file
+f3d_test(NAME TestConfigInvalidGlobExp DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/invalid_glob_exp.json REGEXP "A config block in config file .*invalid_glob_exp.json contains an invalid glob.*" NO_BASELINE)
+
+# Test glob matching
+f3d_test(NAME TestMatchFirstConfigGlobOptionBlock DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/glob.json)
+f3d_test(NAME TestMatchSecondConfigGlobOptionBlock DATA suzanne.stl CONFIG ${F3D_SOURCE_DIR}/testing/configs/glob.json)
+
 # Test help display
 f3d_test(NAME TestHelp ARGS --help REGEXP "Usage:")
 f3d_test(NAME TestHelpPositional ARGS --help REGEXP "file1 file2 \.\.\.")

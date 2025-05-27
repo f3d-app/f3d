@@ -189,11 +189,43 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
       // For each config block in the main array
       for (const auto& configBlock : json)
       {
+        // Recover match_type if any
+        std::string matchType;
+        try
+        {
+          matchType = configBlock.at("match-type");
+        }
+        catch (nlohmann::json::out_of_range&)
+        {
+          // Not match_type defined, use regex
+          matchType = "regex";
+        }
+
         // Recover match if any
         std::string match;
         try
         {
           match = configBlock.at("match");
+          if (matchType == "glob")
+          {
+            try
+            {
+              match = f3d::utils::globToRegex(
+                match, false /*don't full match*/, false /*don't support globstar*/);
+            }
+            catch (f3d::utils::glob_exception)
+            {
+              f3d::log::error("A config block in config file ", configFilePath.string(),
+                " contains an invalid glob (", match, "), ignoring block");
+              continue;
+            }
+          }
+          else if (matchType != "regex")
+          {
+            f3d::log::warn("A config block in config file ", configFilePath.string(),
+              " has an unknown match-type (", matchType,
+              R"(). Valid match-types are "glob" and "regex". Defaulting to regex matching.)");
+          }
         }
         catch (nlohmann::json::out_of_range&)
         {

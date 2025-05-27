@@ -48,7 +48,8 @@ A typical config file with options may look like this:
     }
   },
   {
-    "match": ".*mhd",
+    "match-type": "glob",
+    "match": "*mhd",
     "options": {
       "volume": true
     }
