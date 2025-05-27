@@ -314,7 +314,7 @@ public:
    * Set Colormap Discretization
    * Defaults to std::nullopt which is no discretization.
    */
-  vtkSetMacro(ColorMapDiscretization, std::optional<int>);
+  void SetColormapDiscretization(std::optional<int> discretization);
 
   /**
    * Set the meta importer to recover coloring information from
@@ -615,7 +615,6 @@ private:
   std::optional<fs::path> TextureNormal;
 
   vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorTransferFunction;
-  std::optional<int> ColorMapDiscretization;
   bool ExpandingRangeSet = false;
   bool UsingExpandingRange = true;
   double ColorRange[2] = { 0.0, 1.0 };
@@ -633,6 +632,7 @@ private:
 
   std::optional<std::vector<double>> UserScalarBarRange;
   std::vector<double> Colormap;
+  std::optional<int> ColormapDiscretization;
 };
 
 #endif
