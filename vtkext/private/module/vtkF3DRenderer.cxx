@@ -2087,34 +2087,16 @@ void vtkF3DRenderer::ConfigureActorsProperties()
     // Textures
     if (this->TexturesTransform.has_value())
     {
-      const std::vector<double> tex_transform = this->TexturesTransform.value();
-      double mat[] = {
-        tex_transform[0],   tex_transform[1],   tex_transform[2],   0,
-        tex_transform[3],   tex_transform[4],   tex_transform[5],   0,
-        tex_transform[6],   tex_transform[7],   tex_transform[8],   0,
+      const std::vector<double> texTransform = this->TexturesTransform.value();
+      double transform[] = { 
+        texTransform[0],    texTransform[1],    texTransform[2],    0, 
+        texTransform[3],    texTransform[4],    texTransform[5],    0, 
+        texTransform[6],    texTransform[7],    texTransform[8],    0,
         0,                  0,                  0,                  1
       };
 
-      vtkInformation* info = coloring.OriginalActor->GetPropertyKeys();
-      if (info)
-      {
-        /**
-         * The actor already has a property key dictionary
-         * Check that GeneralTextureTransform does not exist and append,
-         * Otherwise combine matricies and reapply to transform
-         */
-        //TODO
-      }
-      else
-      {
-        /**
-         * No dictionary found, add new dictionary with transform
-         */
-        vtkNew<vtkInformation> properties;
-        properties->Set(vtkProp::GeneralTextureTransform(), mat, 16);
-        coloring.Actor->SetPropertyKeys(properties);
-        coloring.OriginalActor->SetPropertyKeys(properties);
-      }
+      this->ConfigureActorTextureTransform(coloring.OriginalActor, transform);
+      this->ConfigureActorTextureTransform(coloring.Actor, transform);
     }
 
     if (this->TextureBaseColor.has_value())
@@ -2829,6 +2811,43 @@ void vtkF3DRenderer::CycleFieldForColoring()
   {
     // Cycle array if the current one is not valid
     this->CycleArrayForColoring();
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ConfigureActorTextureTransform(vtkActor* actorBase, const double* matrix)
+{
+  vtkInformation* info = actorBase->GetPropertyKeys();
+  if (info)
+  {
+    /**
+     * The actor already has a property key dictionary
+     * Check that GeneralTextureTransform exists and combine,
+     * Otherwise set the property to our texture transform
+     */
+
+    double finalTransform[16] = {};
+    for (int i = 0; i < 16; i++)
+    {
+      finalTransform[i] = matrix[i];
+    }
+
+    if (auto transformPtr = info->Get(vtkProp::GeneralTextureTransform()))
+    {
+      // We need to create 4x4 vtk matrixes from the arrays
+      vtkNew<vtkMatrix4x4> matTransform;
+      matTransform->Multiply4x4(transformPtr, matrix, finalTransform);
+    }
+    info->Set(vtkProp::GeneralTextureTransform(), finalTransform, 16);
+  }
+  else
+  {
+    /**
+     * No dictionary found, add new dictionary with transform
+     */
+    vtkNew<vtkInformation> properties;
+    properties->Set(vtkProp::GeneralTextureTransform(), matrix, 16);
+    actorBase->SetPropertyKeys(properties);
   }
 }
 

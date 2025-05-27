@@ -511,6 +511,11 @@ private:
    */
   void ConfigureRangeAndCTFForColoring(const F3DColoringInfoHandler::ColoringInfo& info);
 
+  /**
+   * Convenience method to set texture transform in ConfigureActorsProperties()
+   */
+  void ConfigureActorTextureTransform(vtkActor* actorBase, const double* matrix);
+
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
 
   vtkNew<vtkActor> GridActor;
