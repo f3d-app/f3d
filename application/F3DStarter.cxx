@@ -1122,7 +1122,7 @@ int F3DStarter::Start(int argc, char** argv)
       }
     }
 
-    char* noDataForceRender = std::getenv("CTEST_F3D_NO_DATA_FORCE_RENDER");
+    std::optional<std::string> noDataForceRender = f3d::utils::getEnv("CTEST_F3D_NO_DATA_FORCE_RENDER");
 
     fs::path reference = f3d::utils::collapsePath(this->Internals->AppOptions.Reference);
     fs::path output = this->Internals->applyFilenameTemplate(
@@ -1569,10 +1569,10 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate, bool minima
   {
     for (const char* const& candidate : { "XDG_PICTURES_DIR", "HOME", "USERPROFILE" })
     {
-      char* val = std::getenv(candidate);
-      if (val != nullptr)
+      std::optional<std::string> val = f3d::utils::getEnv(candidate);
+      if (val && !val->empty())
       {
-        fs::path path(val);
+        fs::path path(*val);
         if (fs::is_directory(path))
         {
           return path;
@@ -1906,7 +1906,7 @@ void F3DStarter::AddCommands()
         cstrings.push_back(filter.c_str());
       }
 
-      const char* file = std::getenv("CTEST_OPEN_DIALOG_FILE");
+      std::optional<std::string> file = f3d::utils::getEnv("CTEST_OPEN_DIALOG_FILE");
       if (!file)
       {
         file = tinyfd_openFileDialog("Open File", nullptr, static_cast<int>(cstrings.size()),
@@ -1915,7 +1915,7 @@ void F3DStarter::AddCommands()
 
       if (file)
       {
-        int index = this->AddFile(file);
+        int index = this->AddFile(*file);
         if (index > -1)
         {
           this->LoadFileGroup(index);

@@ -6,6 +6,7 @@
 
 #include <filesystem>
 #include <map>
+#include <optional>
 #include <regex>
 #include <sstream>
 #include <string>
@@ -67,6 +68,11 @@ public:
    */
   [[nodiscard]] static std::filesystem::path collapsePath(
     const std::filesystem::path& path, const std::filesystem::path& baseDirectory = {});
+
+  /**
+   * Get an environnement variable value, returns std::nullopt if not set
+   */
+  [[nodiscard]] static std::optional<std::string> getEnv(const std::string& env);
 
   /**
    * An exception that can be thrown by tokenize

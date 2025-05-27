@@ -19,8 +19,10 @@
 
 #include <nlohmann/json.hpp>
 
+/*
 #include <Knownfolders.h>
-#include <shlobj_core.h>
+#include <shlobj_core.h>\
+*/
 
 namespace fs = std::filesystem;
 
@@ -56,6 +58,7 @@ engine::engine(
   // Ensure all lib initialization is done (once)
   detail::init::initialize();
 
+/*
 #if defined(_WIN32)
   LPWSTR lpwstr;
   if (FAILED(SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &lpwstr))) {
@@ -81,12 +84,14 @@ engine::engine(
   }
   return config;
 #endif
+*/
 
 
   fs::path cachePath;
 #if defined(_WIN32)
-//  const char* appData = std::getenv("LOCALAPPDATA");
-//  if (appData && strlen(appData) > 0)
+  // TODO
+  const char* appData = std::getenv("LOCALAPPDATA");
+  if (appData && strlen(appData) > 0)
   {
     cachePath = fs::path(config);
   }
@@ -94,18 +99,18 @@ engine::engine(
 
 #if defined(__unix__)
   // Implementing XDG specifications
-  const char* xdgCacheHome = std::getenv("XDG_CACHE_HOME");
-  if (xdgCacheHome && strlen(xdgCacheHome) > 0)
+  std::optional<std::string> xdgCacheHome = utils::getEnv("XDG_CACHE_HOME");
+  if (xdgCacheHome && !xdgCacheHome->empty())
   {
-    cachePath = fs::path(xdgCacheHome);
+    cachePath = fs::path(*xdgCacheHome);
   }
   else
 #endif
   {
-    const char* home = std::getenv("HOME");
-    if (home && strlen(home) > 0)
+    std::optional<std::string> home = utils::getEnv("HOME");
+    if (home && !home->empty())
     {
-      cachePath = fs::path(home);
+      cachePath = fs::path(*home);
 #if defined(__APPLE__)
       cachePath = cachePath / "Library" / "Caches";
 #elif defined(__unix__)

@@ -120,6 +120,20 @@ fs::path utils::collapsePath(const fs::path& path, const fs::path& baseDirectory
 }
 
 //----------------------------------------------------------------------------
+std::optional<std::string> utils::getEnv(const std::string& env)
+{
+  std::string val;
+  if (vtksys::SystemTools::GetEnv(env, val))
+  {
+    return val;
+  }
+  else
+  {
+    return std::nullopt;
+  }
+}
+
+//----------------------------------------------------------------------------
 utils::tokenize_exception::tokenize_exception(const std::string& what)
   : exception(what)
 {
