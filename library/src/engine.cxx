@@ -89,9 +89,9 @@ engine::engine(
 
   fs::path cachePath;
 #if defined(_WIN32)
-  // TODO
-  const char* appData = std::getenv("LOCALAPPDATA");
-  if (appData && strlen(appData) > 0)
+  // TODO KnownFolder
+  std::optional<std::string> appData = utils:getenv("LOCALAPPDATA");
+  if (appData && !appData->empty())
   {
     cachePath = fs::path(config);
   }
