@@ -15,8 +15,14 @@
 
 #include <vtksys/DynamicLoader.hxx>
 #include <vtksys/SystemTools.hxx>
+#include <vtksys/Encoding.hxx>
 
 #include <nlohmann/json.hpp>
+
+/*
+#include <Knownfolders.h>
+#include <shlobj_core.h>\
+*/
 
 namespace fs = std::filesystem;
 
@@ -52,29 +58,30 @@ engine::engine(
   // Ensure all lib initialization is done (once)
   detail::init::initialize();
 
+  // Recover cache directory
   fs::path cachePath;
 #if defined(_WIN32)
-  const char* appData = std::getenv("LOCALAPPDATA");
-  if (appData && strlen(appData) > 0)
+  std::optional<std::string> appData = utils::getKnownFolder(KnownFolder::LOCALAPPDATA);
+  if (appData && !appData->empty())
   {
-    cachePath = fs::path(appData);
+    cachePath = fs::path(*appData);
   }
 #else
 
 #if defined(__unix__)
   // Implementing XDG specifications
-  const char* xdgCacheHome = std::getenv("XDG_CACHE_HOME");
-  if (xdgCacheHome && strlen(xdgCacheHome) > 0)
+  std::optional<std::string> xdgCacheHome = utils::getEnv("XDG_CACHE_HOME");
+  if (xdgCacheHome && !xdgCacheHome->empty())
   {
-    cachePath = fs::path(xdgCacheHome);
+    cachePath = fs::path(*xdgCacheHome);
   }
   else
 #endif
   {
-    const char* home = std::getenv("HOME");
-    if (home && strlen(home) > 0)
+    std::optional<std::string> home = utils::getEnv("HOME");
+    if (home && !home->empty())
     {
-      cachePath = fs::path(home);
+      cachePath = fs::path(*home);
 #if defined(__APPLE__)
       cachePath = cachePath / "Library" / "Caches";
 #elif defined(__unix__)

@@ -5,6 +5,11 @@
 
 #include <vtksys/SystemTools.hxx>
 
+#if defined(_WIN32)
+#include <Knownfolders.h>
+#include <shlobj_core.h>
+#endif
+
 namespace fs = std::filesystem;
 
 namespace f3d
@@ -117,6 +122,55 @@ fs::path utils::collapsePath(const fs::path& path, const fs::path& baseDirectory
     log::error("Could not collapse path: ", ex.what());
     return {};
   }
+}
+
+//----------------------------------------------------------------------------
+std::optional<std::string> utils::getEnv(const std::string& env)
+{
+  std::string val;
+  if (vtksys::SystemTools::GetEnv(env, val))
+  {
+    return val;
+  }
+  else
+  {
+    return std::nullopt;
+  }
+}
+
+//----------------------------------------------------------------------------
+std::optional<std::string> utils::getKnownFolder(KnownFolder knownFolder)
+{
+#if defined(_WIN32)
+  REFKNOWNFOLDERID winKnowFolder;
+  switch(knownFolder)
+  {
+    case KnownFolder::APPDATA:
+      winKnowFolder = FOLDERID_AppData;
+      break;
+    case: KnownFolder::LOCALAPPDATA
+      winKnowFolder = FOLDERID_LocalAppData;
+      break;
+    default:
+      // Unreachable
+      return std::nullopt;
+      break;
+  }
+
+  LPWSTR lpwstr;
+  if (FAILED(SHGetKnownFolderPath(winKnowFolder, 0, NULL, &lpwstr)))
+  {
+    return std::nullopt;
+  }
+
+  std::wstring wstr = std::wstring(lpwstr);
+  CoTaskMemFree(lpwstr);
+  std::string folderVal = vtksys::Encoding::ToNarrow(wstr);
+  vtksys::SystemTools::ConvertToUnixSlashes(folderVal);
+  return folderVal;
+#else
+  return std::nullopt;
+#endif
 }
 
 //----------------------------------------------------------------------------

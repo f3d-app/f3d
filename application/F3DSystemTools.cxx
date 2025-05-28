@@ -1,10 +1,12 @@
 #include "F3DSystemTools.h"
 
 #include "log.h"
+#include "utils.h"
 
 #include <array>
 #include <cstring>
 #include <filesystem>
+#include <optional>
 #include <vector>
 
 #if defined(_WIN32)
@@ -59,15 +61,15 @@ fs::path GetApplicationPath()
 
 std::vector<std::string> GetVectorEnvironnementVariable(const std::string& envVar)
 {
-  const char* envPtr = std::getenv(envVar.c_str());
-  if (!envPtr)
+  std::optional<std::string> envVal = f3d::utils::getEnv(envVar);
+  if (!envVal || envVal->empty() )
   {
     return {};
   }
 
   std::vector<std::string> tokens;
   std::string token;
-  std::istringstream tokenStream(envPtr);
+  std::istringstream tokenStream(*envVal);
 
   // split path with OS separator (':' on Linux/macOS and ';' on Windows)
 #ifdef _WIN32
@@ -91,29 +93,29 @@ fs::path F3DSystemTools::GetUserConfigFileDirectory()
   std::string applicationName = "f3d";
   fs::path dirPath;
 #if defined(_WIN32)
-  const char* appData = std::getenv("APPDATA");
-  if (!appData)
+  std::optional<std::string> appData = f3d::utils::getKnownFolder(KnownFolder::APPDATA);
+  if (!appData || appData->empty())
   {
     return {};
   }
-  dirPath = fs::path(appData);
+  dirPath = fs::path(*appData);
 #else
 #if defined(__unix__)
   // Implementing XDG specifications
-  const char* xdgConfigHome = std::getenv("XDG_CONFIG_HOME");
-  if (xdgConfigHome && strlen(xdgConfigHome) > 0)
+  std::optional<std::string> xdgConfigHome = f3d::utils::getEnv("XDG_CONFIG_HOME");
+  if (xdgConfigHome && !xdgConfigHome->empty())
   {
-    dirPath = fs::path(xdgConfigHome);
+    dirPath = fs::path(*xdgConfigHome);
   }
   else
 #endif
   {
-    const char* home = std::getenv("HOME");
-    if (!home || strlen(home) == 0)
+    std::optional<std::string> home = f3d::utils::getEnv("HOME");
+    if (!home || home->empty())
     {
       return {};
     }
-    dirPath = fs::path(home);
+    dirPath = fs::path(*home);
 #if defined(__APPLE__)
     dirPath = dirPath / "Library" / "Application Support";
 #elif defined(__unix__)
