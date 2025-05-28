@@ -58,42 +58,13 @@ engine::engine(
   // Ensure all lib initialization is done (once)
   detail::init::initialize();
 
-/*
-#if defined(_WIN32)
-  LPWSTR lpwstr;
-  if (FAILED(SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &lpwstr))) {
-//    TODO	  
-//    return cm::nullopt;
-  }
-  std::wstring wstr = std::wstring(lpwstr);
-  CoTaskMemFree(lpwstr);
-  std::string config = vtksys::Encoding::ToNarrow(wstr);
-  vtksys::SystemTools::ConvertToUnixSlashes(config);
-  std::cout<<config<<std::endl;
-#else
-  auto config = cmSystemTools::GetEnvVar("XDG_CONFIG_HOME");
-  if (!config.has_value()) {
-    config = cmSystemTools::GetEnvVar("HOME");
-    if (config.has_value()) {
-#  if defined(__APPLE__)
-      config = cmStrCat(config.value(), "/Library/Application Support");
-#  else
-      config = cmStrCat(config.value(), "/.config");
-#  endif
-    }
-  }
-  return config;
-#endif
-*/
-
-
+  // Recover cache directory
   fs::path cachePath;
 #if defined(_WIN32)
-  // TODO KnownFolder
-  std::optional<std::string> appData = utils:getenv("LOCALAPPDATA");
+  std::optional<std::string> appData = utils::getKnownFolder(KnownFolder::LOCALAPPDATA);
   if (appData && !appData->empty())
   {
-    cachePath = fs::path(config);
+    cachePath = fs::path(*appData);
   }
 #else
 

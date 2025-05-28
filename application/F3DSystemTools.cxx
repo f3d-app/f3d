@@ -93,13 +93,12 @@ fs::path F3DSystemTools::GetUserConfigFileDirectory()
   std::string applicationName = "f3d";
   fs::path dirPath;
 #if defined(_WIN32)
-  // TODO KnownFolders FOLDERID_RoamingAppData
-  std::optional<std::string> appData = f3d::utils::getEnv("APPDATA");
+  std::optional<std::string> appData = f3d::utils::getKnownFolder(KnownFolder::APPDATA);
   if (!appData || appData->empty())
   {
     return {};
   }
-  dirPath = fs::path(appData);
+  dirPath = fs::path(*appData);
 #else
 #if defined(__unix__)
   // Implementing XDG specifications

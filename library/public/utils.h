@@ -75,6 +75,21 @@ public:
   [[nodiscard]] static std::optional<std::string> getEnv(const std::string& env);
 
   /**
+   * Enumeration of supported Windows known folders
+   */
+  enum class KnownFolder : unsigned char
+  {
+    APPDATA,
+    LOCALAPPDATA
+  };
+
+  /**
+   * Get an Windows known folder, returns std::nullopt in case of error.
+   * Return std::nullopt on non-Windows platforms.
+   */
+  [[nodiscard]] static std::optional<std::string> getKnownFolder(KnownFolder knownFolder);
+
+  /**
    * An exception that can be thrown by tokenize
    */
   struct tokenize_exception : public exception
