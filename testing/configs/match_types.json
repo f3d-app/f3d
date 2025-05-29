@@ -12,5 +12,13 @@
     "options": {
       "edges": true
     }
+  },
+  {
+    "match-type": "exact",
+    "match": "/dummy/path/f3d.glb",
+    "options": {
+      "grid": true,
+      "edges": true
+    }
   }
 ]

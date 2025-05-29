@@ -194,6 +194,12 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
         try
         {
           matchType = configBlock.at("match-type");
+          if (matchType != "regex" && matchType != "glob" && matchType != "exact")
+          {
+            f3d::log::warn("A config block in config file ", configFilePath.string(),
+              " has an unknown match-type (", matchType, "), defaulting to regex");
+            matchType = "regex";
+          }
         }
         catch (nlohmann::json::out_of_range&)
         {
@@ -206,30 +212,16 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
         try
         {
           match = configBlock.at("match");
-          if (matchType == "glob")
-          {
-            try
-            {
-              match = f3d::utils::globToRegex(
-                match, false /*don't full match*/, false /*don't support globstar*/);
-            }
-            catch (f3d::utils::glob_exception)
-            {
-              f3d::log::error("A config block in config file ", configFilePath.string(),
-                " contains an invalid glob (", match, "), ignoring block");
-              continue;
-            }
-          }
-          else if (matchType != "regex")
-          {
-            f3d::log::warn("A config block in config file ", configFilePath.string(),
-              " has an unknown match-type (", matchType,
-              R"(). Valid match-types are "glob" and "regex". Defaulting to regex matching.)");
-          }
         }
         catch (nlohmann::json::out_of_range&)
         {
           // No match defined, use a catch all regex
+          if (matchType != "regex")
+          {
+            f3d::log::warn("A config block in config file ", configFilePath.string(),
+              " has match-type ", matchType, " but no match expression, using a catch-all regex");
+            matchType = "regex";
+          }
           match = ".*";
         }
 
@@ -278,13 +270,13 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
           // Emplace the option dicts for that pattern match into the config entries vector
           if (!entry.empty())
           {
-            optionsEntries.emplace_back(entry, configFilePath.string(), match);
+            optionsEntries.emplace_back(entry, configFilePath.string(), matchType, match);
           }
           if (!imperativeEntry.empty())
           {
             // The path is only used for logging purpose, store the imperative information inside
             imperativeOptionsEntries.emplace_back(
-              imperativeEntry, configFilePath.string() + " (imperative)", match);
+              imperativeEntry, configFilePath.string() + " (imperative)", matchType, match);
           }
         }
 
@@ -324,7 +316,7 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
           }
 
           // Emplace the config dict for that pattern match into the binding entries vector
-          bindingsEntries.emplace_back(bindingEntry, configFilePath.string(), match);
+          bindingsEntries.emplace_back(bindingEntry, configFilePath.string(), matchType, match);
         }
 
         if (optionsBlock.empty() && bindingsBlock.empty())

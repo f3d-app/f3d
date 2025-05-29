@@ -1242,11 +1242,11 @@ f3d_test(NAME TestConfigFileLocationVerbose ARGS --verbose CONFIG inexistent.jso
 f3d_test(NAME TestConfigInvalidMatchType DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/invalid_match_type.json REGEXP "A config block in config file .*invalid_match_type.json has an unknown match-type.*" NO_BASELINE)
 
 # Test invalid glob expression in config file
-f3d_test(NAME TestConfigInvalidGlobExp DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/invalid_glob_exp.json REGEXP "A config block in config file .*invalid_glob_exp.json contains an invalid glob.*" NO_BASELINE)
+f3d_test(NAME TestConfigInvalidGlobExp DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/invalid_glob_exp.json REGEXP "Unmatched '.' in glob expression" NO_BASELINE)
 
 # Test glob matching
-f3d_test(NAME TestMatchFirstConfigGlobOptionBlock DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/glob.json)
-f3d_test(NAME TestMatchSecondConfigGlobOptionBlock DATA suzanne.stl CONFIG ${F3D_SOURCE_DIR}/testing/configs/glob.json)
+f3d_test(NAME TestMatchFirstConfigGlobOptionBlock DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/match_types.json)
+f3d_test(NAME TestMatchSecondConfigGlobOptionBlock DATA suzanne.stl CONFIG ${F3D_SOURCE_DIR}/testing/configs/match_types.json)
 
 # Test help display
 f3d_test(NAME TestHelp ARGS --help REGEXP "Usage:")
