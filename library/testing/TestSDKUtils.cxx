@@ -118,10 +118,9 @@ int TestSDKUtils(int argc, char* argv[])
   test("collapsePath: expand home", f3d::utils::collapsePath("~/folder/file.ext").is_absolute());
 
   //
-  
+
   auto globMatchesText = [](std::string_view glob, const std::string& text,
-                            bool supportDoubleStar = true)
-  {
+                           bool supportDoubleStar = true) {
     const bool fullMatch = false;
     std::string regexPattern = f3d::utils::globToRegex(glob, fullMatch, supportDoubleStar);
     std::regex regex(regexPattern);
@@ -133,7 +132,8 @@ int TestSDKUtils(int argc, char* argv[])
   test("globToRegex: simple question mark", globMatchesText("file?.txt", "file1.txt"));
   test("globToRegex: simple question mark - no match", !globMatchesText("file?.txt", "file12.txt"));
   test("globToRegex: character class - match digit", globMatchesText("file[0-9].txt", "file5.txt"));
-  test("globToRegex: character class - match letter", globMatchesText("file[a-z].txt", "filex.txt"));
+  test(
+    "globToRegex: character class - match letter", globMatchesText("file[a-z].txt", "filex.txt"));
   test("globToRegex: character class - no match", !globMatchesText("file[a-z].txt", "file5.txt"));
   test("globToRegex: negated character class", globMatchesText("file[!0-9].txt", "filex.txt"));
   test("globToRegex: negated character class - no match",
@@ -142,27 +142,24 @@ int TestSDKUtils(int argc, char* argv[])
     globMatchesText("file[*?].txt", "file*.txt"));
   test("globToRegex: character class with character class opening brace",
     globMatchesText("file[[].txt", "file[.txt"));
-  test("globToRegex: simple alternation",
-    globMatchesText("file.{txt,md,cpp}", "file.txt"));
+  test("globToRegex: simple alternation", globMatchesText("file.{txt,md,cpp}", "file.txt"));
   test("globToRegex: simple alternation - second option",
     globMatchesText("file.{txt,md,cpp}", "file.md"));
-  test("globToRegex: simple alternation - no match",
-    !globMatchesText("file.{txt,md,cpp}", "file.py"));
-  test("globToRegex: nested alternation",
-    globMatchesText("{a,b{c,d}}.txt", "a.txt"));
-  test("globToRegex: nested alternation - inner match",
-    globMatchesText("{a,b{c,d}}.txt", "bc.txt"));
+  test(
+    "globToRegex: simple alternation - no match", !globMatchesText("file.{txt,md,cpp}", "file.py"));
+  test("globToRegex: nested alternation", globMatchesText("{a,b{c,d}}.txt", "a.txt"));
+  test(
+    "globToRegex: nested alternation - inner match", globMatchesText("{a,b{c,d}}.txt", "bc.txt"));
   test("globToRegex: false alternation in character class",
     globMatchesText("file[{1,2,3}].txt", "file1.txt"));
-  test("globToRegex: escape period",
-    globMatchesText("file\\.txt", "file\\.txt"));
-  test("globToRegex: escape period - no match",
-    !globMatchesText("file\\.txt", "file.txt"));
+  test("globToRegex: escape period", globMatchesText("file\\.txt", "file\\.txt"));
+  test("globToRegex: escape period - no match", !globMatchesText("file\\.txt", "file.txt"));
   test("globToRegex: special regex chars", globMatchesText("file+.txt", "file+.txt"));
   test("globToRegex: special regex chars", globMatchesText("file(test).txt", "file(test).txt"));
   test("globToRegex: complex pattern 1",
     globMatchesText("*[0-9]_[a-z]*.{jpg,png}", "image5_photo.jpg"));
-  test("globToRegex: complex pattern 2", !globMatchesText("*[0-9]_[a-z]*.{jpg,png}", "pic_photo.jpg"));
+  test(
+    "globToRegex: complex pattern 2", !globMatchesText("*[0-9]_[a-z]*.{jpg,png}", "pic_photo.jpg"));
   test("globToRegex: complex pattern 3",
     globMatchesText("log_[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].txt", "log_2025-05-18.txt"));
   test("globToRegex: complex pattern 4",
@@ -170,9 +167,9 @@ int TestSDKUtils(int argc, char* argv[])
   test("globToRegex: globstar simple", globMatchesText("**/file.txt", "dir/file.txt"));
   test("globToRegex: globstar deep", globMatchesText("**/file.txt", "dir1/dir2/dir3/file.txt"));
   test("globToRegex: glob disabled", globMatchesText("**/file.txt", "dir/file.txt", false));
-  test("globToRegex: glob disabled - deep", 
+  test("globToRegex: glob disabled - deep",
     globMatchesText("**/file.txt", "dir1/dir2/file.txt", false));
-  test("globToRegex: glob disabled - no match", 
+  test("globToRegex: glob disabled - no match",
     !globMatchesText("**/file.txt", "dir1/dir2/file1.txt", false));
   test("globToRegex: globstar prefix", globMatchesText("src/**/*.cpp", "src/module/file.cpp"));
   test("globToRegex: globstar middle",
@@ -182,10 +179,13 @@ int TestSDKUtils(int argc, char* argv[])
   test("globToRegex: only special chars", globMatchesText("***??[a-z][0-9]", "abc5"));
   test("globToRegex: star shouldn't cross directories", !globMatchesText("*.txt", "dir/file.txt"));
   test("globToRegex: question mark shouldn't cross directories",
-       !globMatchesText("file?a.txt", "file/a.txt"));
-  test.expect<f3d::utils::glob_exception>("globToRegex: unclosed character class", [&]() { return f3d::utils::globToRegex("file[0-9.txt"); });
-  test.expect<f3d::utils::glob_exception>("globToRegex: unclosed alternation", [&]() { return f3d::utils::globToRegex("file.{txt,md"); });
-  test.expect<f3d::utils::glob_exception>("globToRegex: trailing escape", [&]() { return f3d::utils::globToRegex("file1.txt\\"); });
+    !globMatchesText("file?a.txt", "file/a.txt"));
+  test.expect<f3d::utils::glob_exception>("globToRegex: unclosed character class",
+    [&]() { return f3d::utils::globToRegex("file[0-9.txt"); });
+  test.expect<f3d::utils::glob_exception>(
+    "globToRegex: unclosed alternation", [&]() { return f3d::utils::globToRegex("file.{txt,md"); });
+  test.expect<f3d::utils::glob_exception>(
+    "globToRegex: trailing escape", [&]() { return f3d::utils::globToRegex("file1.txt\\"); });
 
   return test.result();
 }
