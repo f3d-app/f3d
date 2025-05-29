@@ -48,8 +48,7 @@ A typical config file with options may look like this:
     }
   },
   {
-    "match-type": "glob",
-    "match": "*mhd",
+    "match": ".*mhd",
     "options": {
       "volume": true
     }
@@ -176,6 +175,54 @@ Please note that the interaction itself can be modified by the modifiers, hence 
 keyboard layout, eg. on a `QWERTY` layout, the bind `Exclam` is unreachable while `Shift+Exclam` is reachable.
 We tried to make the default bindings of F3D to be a keyboard layout independent as possible, but feel free to redefined them
 for your needs.
+
+## Glob and Exact Matching
+
+While regex is the default match type, glob and exact match types are also supported. Below is an example using glob and exact matching.
+
+```json
+[
+  {
+    "options": {
+      "background-color": "0.7,0.7,0.7",
+      "color": "0.5,0.1,0.1",
+      "anti-aliasing": true,
+      "timer": true,
+      "progress": true,
+      "axis": true,
+      "bar": true,
+      "roughness": 0.2,
+      "grid": true,
+      "scalar-coloring": true
+    }
+  },
+  {
+    "match-type": "glob",
+    "match": "*vt?",
+    "options": {
+      "edges": true
+    }
+  },
+  {
+    "match-type": "glob",
+    "match": "*gl{tf,b}",
+    "options": {
+      "raytracing": true,
+      "denoise": true,
+      "samples": 3
+    }
+  },
+  {
+    "match-type": "exact",
+    "match": "/path/to/file.mhd",
+    "options": {
+      "volume": true
+    }
+  }
+]
+```
+
+Glob and exact matching can be used for bindings as well.
 
 ## Locations
 
