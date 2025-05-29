@@ -120,17 +120,19 @@ fs::path utils::collapsePath(const fs::path& path, const fs::path& baseDirectory
 }
 
 //----------------------------------------------------------------------------
-std::string utils::globToRegex(std::string_view glob, bool fullMatch, bool supportGlobStars)
+std::string utils::globToRegex(
+  std::string_view glob, bool supportGlobStars, bool useGenericSeparator)
 {
   std::string result;
 
-  std::vector<size_t> alternations;
   bool escaped = false;
   bool inCharClass = false;
+  std::vector<size_t> alternations;
 
-  if (fullMatch)
+  std::string regexSeparator = "/";
+  if (!useGenericSeparator && fs::path::preferred_separator == '\\')
   {
-    result += '^';
+    regexSeparator = "\\\\";
   }
 
   for (size_t i = 0; i < glob.size(); i++)
@@ -146,25 +148,36 @@ std::string utils::globToRegex(std::string_view glob, bool fullMatch, bool suppo
         }
         else
         {
-          char prevChar = i > 0 ? glob[i - 1] : '\0';
+          bool prevTokenSepOrBeg = i == 0 ||
+            (i >= regexSeparator.size()
+                ? glob.substr(i - regexSeparator.size(), regexSeparator.size()) == regexSeparator
+                : false);
           unsigned starCount = 1;
           while (i + 1 < glob.size() && glob[i + 1] == '*')
           {
             starCount++;
             i++;
           }
-          char nextChar = i + 1 < glob.size() ? glob[i + 1] : '\0';
+          bool nextTokenSepOrEnd = i + 1 >= glob.size() ||
+            (i + 1 < glob.size()
+                ? glob.substr(i + 1, regexSeparator.size()) == regexSeparator
+                : false);
           if (supportGlobStars)
           {
-            if (starCount > 1 && (prevChar == '/' || prevChar == '\0') &&
-              (nextChar == '/' || !nextChar))
+            if (starCount > 1 && prevTokenSepOrBeg && nextTokenSepOrEnd)
             {
-              result += "(?:[^/]*(?:/|$))*";
-              i++; // Eat nextChar
+              result += "(?:[^";
+              result += regexSeparator;
+              result += "]*(?:";
+              result += regexSeparator;
+              result += "|$))*";
+              i += regexSeparator.size(); // Eat separator if next
             }
             else
             {
-              result += "[^/]*";
+              result += "[^";
+              result += regexSeparator;
+              result += "]*";
             }
           }
           else
@@ -181,7 +194,9 @@ std::string utils::globToRegex(std::string_view glob, bool fullMatch, bool suppo
         }
         else if (supportGlobStars)
         {
-          result += "[^/]";
+          result += "[^";
+          result += regexSeparator;
+          result += "]";
         }
         else
         {
@@ -285,11 +300,6 @@ std::string utils::globToRegex(std::string_view glob, bool fullMatch, bool suppo
   {
     throw glob_exception(
       "Unmatched '" + std::string(inCharClass ? "]" : "}") + "' in glob expression");
-  }
-
-  if (fullMatch)
-  {
-    result += '$';
   }
 
   return result;

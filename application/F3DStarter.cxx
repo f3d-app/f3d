@@ -417,20 +417,41 @@ public:
       std::to_string(maxNumberingAttempts) + " attempts");
   }
 
-  static bool PatternMatched(
-    const std::string& patternType, const std::string& pattern, const std::string& text)
+  static bool PatternMatched(const std::string& source, const std::string& patternType,
+    const std::string& pattern, const std::string& inputFile)
   {
+    static std::set<std::string> erroredPatterns;
     if (patternType == "exact")
     {
-      return pattern == text;
+      return pattern == inputFile;
     }
     else
     {
-      std::regex re(
-        patternType == "glob" ? f3d::utils::globToRegex(pattern, false, false) : pattern,
-        std::regex_constants::icase);
-      std::smatch matches;
-      return std::regex_match(text, matches, re);
+      try
+      {
+        std::regex re(patternType == "glob" ? f3d::utils::globToRegex(pattern, false) : pattern,
+          std::regex_constants::icase);
+        std::smatch matches;
+        return std::regex_match(inputFile, matches, re);
+      }
+      catch (const f3d::utils::glob_exception& ex)
+      {
+        if (auto [it, inserted] = erroredPatterns.emplace(pattern); inserted)
+        {
+          f3d::log::error("There was an error in the config ", source, " for glob pattern `",
+            pattern, "`: ", ex.what());
+        }
+        return false;
+      }
+      catch (const std::regex_error& ex)
+      {
+        if (auto [it, inserted] = erroredPatterns.emplace(pattern); inserted)
+        {
+          f3d::log::error("There was an error in the config ", source, " for ", patternType,
+            " pattern `", pattern, "`: ", ex.what());
+        }
+        return false;
+      }
     }
   }
 
@@ -491,7 +512,7 @@ public:
         {
           // If the source is empty, there is no pattern, all options applies
           // Note: An empty inputFile matches with ".*"
-          if (source.empty() || PatternMatched(patternType, pattern, inputFile))
+          if (source.empty() || PatternMatched(source, patternType, pattern, inputFile))
           {
             // For each option key/value
             for (auto const& [key, value] : conf)
@@ -809,7 +830,7 @@ public:
         {
           // If the source is empty, there is no pattern, all bindings applies
           // Note: An empty inputFile matches with ".*"
-          if (source.empty() || PatternMatched(patternType, pattern, inputFile))
+          if (source.empty() || PatternMatched(source, patternType, pattern, inputFile))
           {
             // For each interaction bindings
             for (auto const& [bindStr, commands] : bindings)

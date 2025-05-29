@@ -72,15 +72,15 @@ public:
    * Converts a glob expression to a regular expression
    *
    * It handles the following glob features:
-   * - '*': Matches any number of chracters (except path separators)
-   * - '?': Matches exactly one character (except path separators)
-   * - '[...]': Character classes
-   * - '[!...] or '[^...]': Negated character classes
-   * - '**': Matches any number of characters including path separators if enabled
-   * - '{a,b,c}': Alternation (matches any of the comma-separated patterns)
+   * - `*`: Matches any number of characters (except path separators)
+   * - `?`: Matches exactly one character (except path separators)
+   * - `[...]`: Character classes
+   * - `[!...]` or `[^...]`: Negated character classes
+   * - `**`: Matches any number of characters including path separators if enabled
+   * - `{a,b,c}`: Alternation (matches any of the comma-separated patterns)
    */
   [[nodiscard]] static std::string globToRegex(
-    std::string_view glob, bool fullMatch = true, bool supportGlobStars = true);
+    std::string_view glob, bool supportGlobStars = true, bool useGenericSeparator = false);
 
   /**
    * An exception that can be thrown by tokenize
@@ -91,7 +91,7 @@ public:
   };
 
   /**
-   * An exception that can be thown by globToRegex
+   * An exception that can be thrown by globToRegex
    */
   struct glob_exception : public exception
   {

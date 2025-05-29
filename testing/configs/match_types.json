@@ -3,7 +3,7 @@
     "match-type": "glob",
     "match": "*vt?",
     "options": {
-      "grid": true
+      "background-color": "0.7,0.7,0.7"
     }
   },
   {

@@ -120,12 +120,34 @@ int TestSDKUtils(int argc, char* argv[])
   //
 
   auto globMatchesText = [](std::string_view glob, const std::string& text,
-                           bool supportDoubleStar = true) {
-    const bool fullMatch = false;
-    std::string regexPattern = f3d::utils::globToRegex(glob, fullMatch, supportDoubleStar);
+                           bool supportGlobStars = true) {
+    std::string regexPattern = f3d::utils::globToRegex(glob, supportGlobStars);
     std::regex regex(regexPattern);
     return std::regex_match(text, regex);
   };
+
+  auto usePreferredSep = [](fs::path path) { return path.make_preferred().string(); };
+
+  auto usePreferredGlobSep = [](const std::string& glob) {
+    if constexpr (fs::path::preferred_separator == '\\')
+    {
+      std::string newGlob;
+      for (char c : glob)
+      {
+        if (c == '/')
+        {
+          newGlob.append("\\\\");
+        }
+        else
+        {
+          newGlob.push_back(c);
+        }
+      }
+      return newGlob;
+    }
+    return glob;
+  };
+
   test("globToRegex: exact match", globMatchesText("file.txt", "file.txt"));
   test("globToRegex: simple star", globMatchesText("*.txt", "file.txt"));
   test("globToRegex: simple star - no match", !globMatchesText("*.txt", "file.txt.bak"));
@@ -154,6 +176,7 @@ int TestSDKUtils(int argc, char* argv[])
     globMatchesText("file[{1,2,3}].txt", "file1.txt"));
   test("globToRegex: escape period", globMatchesText("file\\.txt", "file\\.txt"));
   test("globToRegex: escape period - no match", !globMatchesText("file\\.txt", "file.txt"));
+  test("globToRegex: escaped escape", globMatchesText("dir\\\\file.txt", "dir\\file.txt"));
   test("globToRegex: special regex chars", globMatchesText("file+.txt", "file+.txt"));
   test("globToRegex: special regex chars", globMatchesText("file(test).txt", "file(test).txt"));
   test("globToRegex: complex pattern 1",
@@ -164,22 +187,31 @@ int TestSDKUtils(int argc, char* argv[])
     globMatchesText("log_[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].txt", "log_2025-05-18.txt"));
   test("globToRegex: complex pattern 4",
     globMatchesText("data_?{_v[0-9],}.{csv,dat}", "data_1_v2.csv"));
-  test("globToRegex: globstar simple", globMatchesText("**/file.txt", "dir/file.txt"));
-  test("globToRegex: globstar deep", globMatchesText("**/file.txt", "dir1/dir2/dir3/file.txt"));
-  test("globToRegex: glob disabled", globMatchesText("**/file.txt", "dir/file.txt", false));
+  test("globToRegex: globstar simple",
+    globMatchesText(usePreferredGlobSep("**/file.txt"), usePreferredSep("dir/file.txt")));
+  test("globToRegex: globstar deep",
+    globMatchesText(
+      usePreferredGlobSep("**/file.txt"), usePreferredSep("dir1/dir2/dir3/file.txt")));
+  test("globToRegex: glob disabled",
+    globMatchesText(usePreferredGlobSep("**/file.txt"), usePreferredSep("dir/file.txt"), false));
   test("globToRegex: glob disabled - deep",
-    globMatchesText("**/file.txt", "dir1/dir2/file.txt", false));
+    globMatchesText(
+      usePreferredGlobSep("**/file.txt"), usePreferredSep("dir1/dir2/file.txt"), false));
   test("globToRegex: glob disabled - no match",
-    !globMatchesText("**/file.txt", "dir1/dir2/file1.txt", false));
-  test("globToRegex: globstar prefix", globMatchesText("src/**/*.cpp", "src/module/file.cpp"));
+    !globMatchesText(
+      usePreferredGlobSep("**/file.txt"), usePreferredSep("dir1/dir2/file1.txt"), false));
+  test("globToRegex: globstar prefix",
+    globMatchesText(usePreferredGlobSep("src/**/*.cpp"), usePreferredSep("src/module/file.cpp")));
   test("globToRegex: globstar middle",
-    globMatchesText("src/**/include/*.h", "src/module/submodule/include/file.h"));
+    globMatchesText(usePreferredGlobSep("src/**/include/*.h"),
+      usePreferredSep("src/module/submodule/include/file.h")));
   test("globToRegex: empty glob", globMatchesText("", ""));
   test("globToRegex: single star", globMatchesText("*", "anything"));
   test("globToRegex: only special chars", globMatchesText("***??[a-z][0-9]", "abc5"));
-  test("globToRegex: star shouldn't cross directories", !globMatchesText("*.txt", "dir/file.txt"));
+  test("globToRegex: star shouldn't cross directories",
+    !globMatchesText("*.txt", usePreferredSep("dir/file.txt")));
   test("globToRegex: question mark shouldn't cross directories",
-    !globMatchesText("file?a.txt", "file/a.txt"));
+    !globMatchesText("file?a.txt", usePreferredSep("file/a.txt")));
   test.expect<f3d::utils::glob_exception>("globToRegex: unclosed character class",
     [&]() { return f3d::utils::globToRegex("file[0-9.txt"); });
   test.expect<f3d::utils::glob_exception>(

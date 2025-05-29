@@ -1239,10 +1239,13 @@ f3d_test(NAME TestNoConfigWithConfig DATA f3d.glb ARGS --no-config CONFIG ${F3D_
 f3d_test(NAME TestConfigFileLocationVerbose ARGS --verbose CONFIG inexistent.json REGEXP "Candidate config file not found: .*inexistent.json" NO_BASELINE)
 
 # Test invalid match type in config file
-f3d_test(NAME TestConfigInvalidMatchType DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/invalid_match_type.json REGEXP "A config block in config file .*invalid_match_type.json has an unknown match-type.*" NO_BASELINE)
+f3d_test(NAME TestConfigInvalidMatchType DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/invalid_match_type.json REGEXP "There was an error in the config .*invalid_match_type.json for regex pattern.*" NO_BASELINE)
+
+# Test glob match type but no match expression in config file
+f3d_test(NAME TestConfigMatchTypeNoMatch DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/match_type_no_match.json REGEXP "A config block in config file .*match_type_no_match.json has match-type glob but no match expression, using a catch-all regex" NO_BASELINE)
 
 # Test invalid glob expression in config file
-f3d_test(NAME TestConfigInvalidGlobExp DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/invalid_glob_exp.json REGEXP "Unmatched '.' in glob expression" NO_BASELINE)
+f3d_test(NAME TestConfigInvalidGlobExp DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/invalid_glob_exp.json REGEXP "There was an error in the config .*invalid_glob_exp.json for glob pattern.*" NO_BASELINE)
 
 # Test glob matching
 f3d_test(NAME TestMatchFirstConfigGlobOptionBlock DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/match_types.json)
