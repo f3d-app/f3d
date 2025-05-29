@@ -51,6 +51,15 @@ public:
   virtual void getState(camera_state_t& state) = 0;
   ///@}
 
+  ///@{ @name Orientation
+  /** Get the azimuth angle of the camera. */
+  virtual angle_deg_t getAzimuth() = 0;
+  /** Get the yaw angle of the camera. */
+  virtual angle_deg_t getYaw() = 0;
+  /** Get the elevation angle of the camera. */
+  virtual angle_deg_t getElevation() = 0;
+  ///@}
+
   ///@{ @name Manipulation
   /// Standard camera manipulation methods. Angles are in degrees.
 

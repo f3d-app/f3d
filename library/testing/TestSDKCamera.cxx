@@ -8,6 +8,7 @@
 #include <iostream>
 #include <limits>
 #include <sstream>
+#include <vtkMath.h>
 
 // TODO these methods should be put in types.h at some point.
 // https://github.com/f3d-app/f3d/issues/361
@@ -141,6 +142,19 @@ int TestSDKCamera(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
+  // Test getAzimuth
+  f3d::point3_t tempPos = { 0.0, 0.0, 0.0 };
+  f3d::point3_t tempFoc = { 0.0, 0.0, 1.0 };
+  cam.setPosition(tempPos);
+  cam.setFocalPoint(tempFoc);
+  f3d::angle_deg_t azimuth = cam.getAzimuth();
+  if (!compareDouble(azimuth, 0.0))
+  {
+    std::cerr << "getAzimuth is not behaving as expected:" << std::endl;
+    std::cerr << std::setprecision(12) << "azimuth: " << azimuth << " != 0.0" << std::endl;
+    return EXIT_FAILURE;
+  }
+
   // Test roll
   cam.roll(90);
   expectedUp = { 0., 0., -1. };
@@ -179,6 +193,19 @@ int TestSDKCamera(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
+  // Test getYaw
+  // f3d::point3_t testPos = { 0.0, 0.0, 0.0 };
+  f3d::point3_t termFoc = { 0.0, 0.0, 1.0 };
+  // cam.setPosition(testPos);
+  cam.setFocalPoint(termFoc);
+  f3d::angle_deg_t yaw = cam.getYaw();
+  if (!compareDouble(yaw, 0.0))
+  {
+    std::cerr << "getYaw is not behaving as expected:" << std::endl;
+    std::cerr << std::setprecision(12) << "yaw: " << yaw << " != 0.0" << std::endl;
+    return EXIT_FAILURE;
+  }
+
   // Test elevation
   cam.elevation(90);
   expectedPos = { 11., -11., -12. };
@@ -198,6 +225,10 @@ int TestSDKCamera(int argc, char* argv[])
               << std::endl;
     return EXIT_FAILURE;
   }
+
+  // Test getElevation
+  double elevation = cam.getElevation();
+  checkDouble(elevation, 90.0, "getElevation");
 
   // Test pitch
   cam.pitch(90);
