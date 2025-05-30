@@ -62,7 +62,7 @@ class F3DStarter::F3DInternals
 public:
   F3DInternals() = default;
 
-  using log_entry_t = std::tuple<std::string, std::string, std::string, std::string>;
+  using log_entry_t = std::tuple<std::string, std::string, std::string, std::string, std::string>;
 
   // XXX: The values in the following two structs
   // are left uninitialized as the will all be initialized from
@@ -417,12 +417,65 @@ public:
       std::to_string(maxNumberingAttempts) + " attempts");
   }
 
+  static bool PatternMatched(const std::string& source, const std::string& patternType,
+    const std::string& pattern, const std::string& inputFile)
+  {
+    static std::set<std::string> erroredPatterns;
+    if (patternType == "exact")
+    {
+      return pattern == inputFile;
+    }
+    else
+    {
+      try
+      {
+        std::regex re(patternType == "glob"
+            ? f3d::utils::globToRegex(pattern, false, fs::path::preferred_separator)
+            : pattern,
+          std::regex_constants::icase);
+        std::smatch matches;
+        return std::regex_match(inputFile, matches, re);
+      }
+      catch (const f3d::utils::glob_exception& ex)
+      {
+        if (auto [it, inserted] = erroredPatterns.emplace(pattern); inserted)
+        {
+          f3d::log::error("There was an error in the config ", source, " for glob pattern `",
+            pattern, "`: ", ex.what());
+        }
+        return false;
+      }
+      catch (const std::regex_error& ex)
+      {
+        if (auto [it, inserted] = erroredPatterns.emplace(pattern); inserted)
+        {
+          f3d::log::error("There was an error in the config ", source, " for ", patternType,
+            " pattern `", pattern, "`: ", ex.what());
+        }
+        return false;
+      }
+    }
+  }
+
   static void PrintLoggingMap(const std::map<std::string, log_entry_t>& loggingMap, char sep)
   {
     for (const auto& [key, tuple] : loggingMap)
     {
-      const auto& [bindStr, source, pattern, commands] = tuple;
-      std::string origin = source.empty() ? pattern : std::string(source) + ":`" + pattern + "`";
+      const auto& [bindStr, source, patternType, pattern, commands] = tuple;
+      std::string origin;
+      if (source.empty())
+      {
+        origin = pattern;
+      }
+      else
+      {
+        origin = source;
+        origin += ":`";
+        origin += pattern;
+        origin += "` (";
+        origin += patternType;
+        origin += ")";
+      }
       f3d::log::debug(" '", bindStr, "' ", sep, " '", commands, "' from ", origin);
     }
     f3d::log::debug("");
@@ -457,13 +510,11 @@ public:
       for (const auto& entries : entriesVector)
       {
         // For each entry (eg: different config files)
-        for (auto const& [conf, source, pattern] : entries)
+        for (auto const& [conf, source, patternType, pattern] : entries)
         {
-          std::regex re(pattern, std::regex_constants::icase);
-          std::smatch matches;
           // If the source is empty, there is no pattern, all options applies
           // Note: An empty inputFile matches with ".*"
-          if (source.empty() || std::regex_match(inputFile, matches, re))
+          if (source.empty() || PatternMatched(source, patternType, pattern, inputFile))
           {
             // For each option key/value
             for (auto const& [key, value] : conf)
@@ -475,7 +526,7 @@ public:
                 appOptions[key] = value;
                 if (logOptions)
                 {
-                  loggingMap[key] = std::tuple(key, source, pattern, value);
+                  loggingMap[key] = std::tuple(key, source, patternType, pattern, value);
                 }
                 continue;
               }
@@ -536,7 +587,7 @@ public:
                 if (logOptions)
                 {
                   loggingMap[libf3dOptionName] =
-                    std::tuple(keyForLog, source, pattern, libf3dOptionValue);
+                    std::tuple(keyForLog, source, patternType, pattern, libf3dOptionValue);
                 }
               }
               catch (const f3d::options::parsing_exception& ex)
@@ -777,14 +828,11 @@ public:
       for (const auto& tmpPath : paths)
       {
         std::string inputFile = tmpPath.string();
-        for (auto const& [bindings, source, pattern] : this->ConfigBindingsEntries)
+        for (auto const& [bindings, source, patternType, pattern] : this->ConfigBindingsEntries)
         {
-          std::regex re(pattern, std::regex_constants::icase);
-          std::smatch matches;
-
           // If the source is empty, there is no pattern, all bindings applies
           // Note: An empty inputFile matches with ".*"
-          if (source.empty() || std::regex_match(inputFile, matches, re))
+          if (source.empty() || PatternMatched(source, patternType, pattern, inputFile))
           {
             // For each interaction bindings
             for (auto const& [bindStr, commands] : bindings)
@@ -792,8 +840,8 @@ public:
               if (logBindings)
               {
                 // XXX: Formatting could be improved
-                loggingMap.emplace(
-                  bindStr, std::tuple(bindStr, source, pattern, vecToString(commands)));
+                loggingMap.emplace(bindStr,
+                  std::tuple(bindStr, source, patternType, pattern, vecToString(commands)));
               }
 
               f3d::interaction_bind_t bind = f3d::interaction_bind_t::parse(bindStr);
@@ -881,7 +929,7 @@ int F3DStarter::Start(int argc, char** argv)
     F3DOptionsTools::ParseCLIOptions(argc, argv, inputFiles);
 
   // Store in a option entries for easier processing
-  this->Internals->CLIOptionsEntries.emplace_back(cliOptionsDict, "", "CLI options");
+  this->Internals->CLIOptionsEntries.emplace_back(cliOptionsDict, "", "", "CLI options");
 
   // Check no-config, config CLI, output and verbose options first
   // XXX: the local variable are initialized manually for simplicity
@@ -1369,7 +1417,8 @@ void F3DStarter::LoadFileGroup(
 
   // Add the dynamicOptionsDict into the entries, which grows over time if option keep changing and
   // files keep being loaded
-  this->Internals->DynamicOptionsEntries.emplace_back(dynamicOptionsDict, "", "dynamic options");
+  this->Internals->DynamicOptionsEntries.emplace_back(
+    dynamicOptionsDict, "", "", "dynamic options");
 
   // Recover file information
   f3d::scene& scene = this->Internals->Engine->getScene();

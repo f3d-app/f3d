@@ -1,0 +1,24 @@
+[
+  {
+    "match-type": "glob",
+    "match": "*vt?",
+    "options": {
+      "ui.axis": true
+    }
+  },
+  {
+    "match-type": "glob",
+    "match": "*stl",
+    "options": {
+      "edges": true
+    }
+  },
+  {
+    "match-type": "exact",
+    "match": "/dummy/path/f3d.glb",
+    "options": {
+      "grid": true,
+      "edges": true
+    }
+  }
+]
