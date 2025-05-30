@@ -429,7 +429,9 @@ public:
     {
       try
       {
-        std::regex re(patternType == "glob" ? f3d::utils::globToRegex(pattern, false) : pattern,
+        std::regex re(patternType == "glob"
+            ? f3d::utils::globToRegex(pattern, false, fs::path::preferred_separator)
+            : pattern,
           std::regex_constants::icase);
         std::smatch matches;
         return std::regex_match(inputFile, matches, re);

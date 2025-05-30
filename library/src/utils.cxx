@@ -120,8 +120,7 @@ fs::path utils::collapsePath(const fs::path& path, const fs::path& baseDirectory
 }
 
 //----------------------------------------------------------------------------
-std::string utils::globToRegex(
-  std::string_view glob, bool supportGlobStars, bool useGenericSeparator)
+std::string utils::globToRegex(std::string_view glob, bool supportGlobStars, char pathSeparator)
 {
   std::string result;
 
@@ -129,11 +128,7 @@ std::string utils::globToRegex(
   bool inCharClass = false;
   std::vector<size_t> alternations;
 
-  std::string regexSeparator = "/";
-  if (!useGenericSeparator && fs::path::preferred_separator == '\\')
-  {
-    regexSeparator = "\\\\";
-  }
+  const std::string globSeparator = pathSeparator == '\\' ? "\\\\" : "/";
 
   for (size_t i = 0; i < glob.size(); i++)
   {
@@ -149,8 +144,8 @@ std::string utils::globToRegex(
         else
         {
           bool prevTokenSepOrBeg = i == 0 ||
-            (i >= regexSeparator.size()
-                ? glob.substr(i - regexSeparator.size(), regexSeparator.size()) == regexSeparator
+            (i >= globSeparator.size()
+                ? glob.substr(i - globSeparator.size(), globSeparator.size()) == globSeparator
                 : false);
           unsigned starCount = 1;
           while (i + 1 < glob.size() && glob[i + 1] == '*')
@@ -159,23 +154,23 @@ std::string utils::globToRegex(
             i++;
           }
           bool nextTokenSepOrEnd = i + 1 >= glob.size() ||
-            (i + 1 < glob.size() ? glob.substr(i + 1, regexSeparator.size()) == regexSeparator
+            (i + 1 < glob.size() ? glob.substr(i + 1, globSeparator.size()) == globSeparator
                                  : false);
           if (supportGlobStars)
           {
             if (starCount > 1 && prevTokenSepOrBeg && nextTokenSepOrEnd)
             {
               result += "(?:[^";
-              result += regexSeparator;
+              result += globSeparator;
               result += "]*(?:";
-              result += regexSeparator;
+              result += globSeparator;
               result += "|$))*";
-              i += regexSeparator.size(); // Eat separator if next
+              i += globSeparator.size(); // Eat separator if next
             }
             else
             {
               result += "[^";
-              result += regexSeparator;
+              result += globSeparator;
               result += "]*";
             }
           }
@@ -194,7 +189,7 @@ std::string utils::globToRegex(
         else if (supportGlobStars)
         {
           result += "[^";
-          result += regexSeparator;
+          result += globSeparator;
           result += "]";
         }
         else

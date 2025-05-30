@@ -80,7 +80,7 @@ public:
    * - `{a,b,c}`: Alternation (matches any of the comma-separated patterns)
    */
   [[nodiscard]] static std::string globToRegex(
-    std::string_view glob, bool supportGlobStars = true, bool useGenericSeparator = false);
+    std::string_view glob, bool supportGlobStars = true, char pathSeparator = '/');
 
   /**
    * An exception that can be thrown by tokenize
