@@ -17,9 +17,7 @@ def test_glob_to_regex():
     assert f3d.Utils.glob_to_regex("*vt?", False, False) == ".*vt."
     regex_sep = "/" if os.sep == "/" else "\\\\"
     assert f3d.Utils.glob_to_regex("*vt?") == f"[^{regex_sep}]*vt[^{regex_sep}]"
-    assert (
-        f3d.Utils.glob_to_regex("*vt?", use_generic_separator=True) == "[^/]*vt[^/]"
-    )
+    assert f3d.Utils.glob_to_regex("*vt?", use_generic_separator=True) == "[^/]*vt[^/]"
     assert (
         f3d.Utils.glob_to_regex(
             glob="*gl{tf,b}", support_glob_stars=False, use_generic_separator=True
