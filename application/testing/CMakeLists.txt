@@ -1248,7 +1248,7 @@ f3d_test(NAME TestConfigMatchTypeNoMatch DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/t
 f3d_test(NAME TestConfigInvalidGlobExp DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/invalid_glob_exp.json REGEXP "There was an error in the config .*invalid_glob_exp.json for glob pattern.*" NO_BASELINE)
 
 # Test glob matching
-f3d_test(NAME TestMatchFirstConfigGlobOptionBlock DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/match_types.json)
+f3d_test(NAME TestMatchFirstConfigGlobOptionBlock DATA dragon.vtu CONFIG ${F3D_SOURCE_DIR}/testing/configs/match_types.json)
 f3d_test(NAME TestMatchSecondConfigGlobOptionBlock DATA suzanne.stl CONFIG ${F3D_SOURCE_DIR}/testing/configs/match_types.json)
 
 # Test help display
