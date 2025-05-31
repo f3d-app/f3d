@@ -225,7 +225,7 @@ public:
   }
 
   /**
-   *  The variables of this function are based on the mathematical notation for matricies,
+   *  The variables of this function are based on the mathematical notation for matrices,
    *  where the coordinates coorespond to the following:
    * 
    *        [M1_1, M1_2, M1_3]
