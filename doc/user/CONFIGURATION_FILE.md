@@ -7,8 +7,9 @@ Configuration files uses the "long" version of the command-line options in a JSO
 formatted file to provide values for these options. It is also possible to use
 the [libf3d options](../libf3d/OPTIONS.md) syntax.
 
-These options can be organized by block using a regular expression for each block
-in order to provide different default values for the different filetypes.
+These options can be organized by block using a regular expression, glob, or exact match
+for each block in order to provide different default values for the different filetypes. For
+more on glob and exact matching see the [Glob and Exact Matching section](#glob-and-exact-matching).
 
 Using a command-line option will override similar option set in any config files.
 
@@ -205,7 +206,7 @@ While regex is the default match type, glob and exact match types are also suppo
   },
   {
     "match-type": "glob",
-    "match": "*gl{tf,b}",
+    "match": "**/*gl{tf,b}",
     "options": {
       "raytracing": true,
       "denoise": true,
@@ -221,6 +222,8 @@ While regex is the default match type, glob and exact match types are also suppo
   }
 ]
 ```
+
+Globstar support will only be enabled when using the glob match type and the pattern contains a globstar (`**`). By default, globstar support is disabled. When globstar support is enabled `*` and `?` will not match file path separators.
 
 Glob and exact matching can be used for bindings as well.
 

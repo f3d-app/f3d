@@ -417,40 +417,40 @@ public:
       std::to_string(maxNumberingAttempts) + " attempts");
   }
 
-  static bool PatternMatched(const std::string& source, const std::string& patternType,
-    const std::string& pattern, const std::string& inputFile)
+  static bool PatternMatched(const std::string& source, const std::string& matchType,
+    const std::string& match, const std::string& inputFile)
   {
     static std::set<std::string> erroredPatterns;
-    if (patternType == "exact")
+    if (matchType == "exact")
     {
-      return pattern == inputFile;
+      return match == inputFile;
     }
     else
     {
       try
       {
-        std::regex re(patternType == "glob"
-            ? f3d::utils::globToRegex(pattern, false, fs::path::preferred_separator)
-            : pattern,
+        std::regex re(matchType == "glob"
+            ? f3d::utils::globToRegex(
+                match, f3d::utils::globContainsGlobstar(match), fs::path::preferred_separator)
+            : match,
           std::regex_constants::icase);
-        std::smatch matches;
-        return std::regex_match(inputFile, matches, re);
+        return std::regex_match(inputFile, re);
       }
       catch (const f3d::utils::glob_exception& ex)
       {
-        if (auto [it, inserted] = erroredPatterns.emplace(pattern); inserted)
+        if (auto [it, inserted] = erroredPatterns.emplace(match); inserted)
         {
-          f3d::log::error("There was an error in the config ", source, " for glob pattern `",
-            pattern, "`: ", ex.what());
+          f3d::log::error("There was an error in the config ", source, " for glob pattern `", match,
+            "`: ", ex.what());
         }
         return false;
       }
       catch (const std::regex_error& ex)
       {
-        if (auto [it, inserted] = erroredPatterns.emplace(pattern); inserted)
+        if (auto [it, inserted] = erroredPatterns.emplace(match); inserted)
         {
-          f3d::log::error("There was an error in the config ", source, " for ", patternType,
-            " pattern `", pattern, "`: ", ex.what());
+          f3d::log::error("There was an error in the config ", source, " for ", matchType,
+            " pattern `", match, "`: ", ex.what());
         }
         return false;
       }
@@ -461,19 +461,19 @@ public:
   {
     for (const auto& [key, tuple] : loggingMap)
     {
-      const auto& [bindStr, source, patternType, pattern, commands] = tuple;
+      const auto& [bindStr, source, matchType, match, commands] = tuple;
       std::string origin;
       if (source.empty())
       {
-        origin = pattern;
+        origin = match;
       }
       else
       {
         origin = source;
         origin += ":`";
-        origin += pattern;
+        origin += match;
         origin += "` (";
-        origin += patternType;
+        origin += matchType;
         origin += ")";
       }
       f3d::log::debug(" '", bindStr, "' ", sep, " '", commands, "' from ", origin);
@@ -510,11 +510,11 @@ public:
       for (const auto& entries : entriesVector)
       {
         // For each entry (eg: different config files)
-        for (auto const& [conf, source, patternType, pattern] : entries)
+        for (auto const& [conf, source, matchType, match] : entries)
         {
           // If the source is empty, there is no pattern, all options applies
           // Note: An empty inputFile matches with ".*"
-          if (source.empty() || PatternMatched(source, patternType, pattern, inputFile))
+          if (source.empty() || PatternMatched(source, matchType, match, inputFile))
           {
             // For each option key/value
             for (auto const& [key, value] : conf)
@@ -526,7 +526,7 @@ public:
                 appOptions[key] = value;
                 if (logOptions)
                 {
-                  loggingMap[key] = std::tuple(key, source, patternType, pattern, value);
+                  loggingMap[key] = std::tuple(key, source, matchType, match, value);
                 }
                 continue;
               }
@@ -587,15 +587,27 @@ public:
                 if (logOptions)
                 {
                   loggingMap[libf3dOptionName] =
-                    std::tuple(keyForLog, source, patternType, pattern, libf3dOptionValue);
+                    std::tuple(keyForLog, source, matchType, match, libf3dOptionValue);
                 }
               }
               catch (const f3d::options::parsing_exception& ex)
               {
                 if (!quiet)
                 {
-                  std::string origin =
-                    source.empty() ? pattern : std::string(source) + ":`" + pattern + "`";
+                  std::string origin;
+                  if (source.empty())
+                  {
+                    origin = match;
+                  }
+                  else
+                  {
+                    origin = source;
+                    origin += ":`";
+                    origin += match;
+                    origin += "` (";
+                    origin += matchType;
+                    origin += ")";
+                  }
                   f3d::log::warn("Could not set '", keyForLog, "' to '", libf3dOptionValue,
                     "' from ", origin, " because: ", ex.what());
                 }
@@ -604,8 +616,20 @@ public:
               {
                 if (!quiet)
                 {
-                  std::string origin =
-                    source.empty() ? pattern : std::string(source) + ":`" + pattern + "`";
+                  std::string origin;
+                  if (source.empty())
+                  {
+                    origin = match;
+                  }
+                  else
+                  {
+                    origin = source;
+                    origin += ":`";
+                    origin += match;
+                    origin += "` (";
+                    origin += matchType;
+                    origin += ")";
+                  }
                   auto [closestName, dist] =
                     F3DOptionsTools::GetClosestOption(libf3dOptionName, true);
                   f3d::log::warn("'", keyForLog, "' option from ", origin,
@@ -828,11 +852,11 @@ public:
       for (const auto& tmpPath : paths)
       {
         std::string inputFile = tmpPath.string();
-        for (auto const& [bindings, source, patternType, pattern] : this->ConfigBindingsEntries)
+        for (auto const& [bindings, source, matchType, match] : this->ConfigBindingsEntries)
         {
           // If the source is empty, there is no pattern, all bindings applies
           // Note: An empty inputFile matches with ".*"
-          if (source.empty() || PatternMatched(source, patternType, pattern, inputFile))
+          if (source.empty() || PatternMatched(source, matchType, match, inputFile))
           {
             // For each interaction bindings
             for (auto const& [bindStr, commands] : bindings)
@@ -840,8 +864,8 @@ public:
               if (logBindings)
               {
                 // XXX: Formatting could be improved
-                loggingMap.emplace(bindStr,
-                  std::tuple(bindStr, source, patternType, pattern, vecToString(commands)));
+                loggingMap.emplace(
+                  bindStr, std::tuple(bindStr, source, matchType, match, vecToString(commands)));
               }
 
               f3d::interaction_bind_t bind = f3d::interaction_bind_t::parse(bindStr);

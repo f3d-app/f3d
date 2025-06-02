@@ -120,6 +120,52 @@ fs::path utils::collapsePath(const fs::path& path, const fs::path& baseDirectory
 }
 
 //----------------------------------------------------------------------------
+bool utils::globContainsGlobstar(std::string_view glob)
+{
+  if (glob.size() < 2)
+  {
+    return false;
+  }
+
+  bool escaped = false;
+  int starCount = 0;
+  for (char c : glob)
+  {
+    if (c == '\\')
+    {
+      if (escaped)
+      {
+        escaped = false;
+      }
+      else
+      {
+        escaped = true;
+      }
+      starCount = 0;
+      continue;
+    }
+
+    if (!escaped && c == '*')
+    {
+      starCount++;
+    }
+    else
+    {
+      starCount = 0;
+    }
+
+    if (starCount == 2)
+    {
+      return true;
+    }
+
+    escaped = false;
+  }
+
+  return false;
+}
+
+//----------------------------------------------------------------------------
 std::string utils::globToRegex(std::string_view glob, bool supportGlobStars, char pathSeparator)
 {
   std::string result;

@@ -1248,8 +1248,26 @@ f3d_test(NAME TestConfigMatchTypeNoMatch DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/t
 f3d_test(NAME TestConfigInvalidGlobExp DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/invalid_glob_exp.json REGEXP "There was an error in the config .*invalid_glob_exp.json for glob pattern.*" NO_BASELINE)
 
 # Test glob matching
-f3d_test(NAME TestMatchFirstConfigGlobOptionBlock DATA dragon.vtu CONFIG ${F3D_SOURCE_DIR}/testing/configs/match_types.json)
-f3d_test(NAME TestMatchSecondConfigGlobOptionBlock DATA suzanne.stl CONFIG ${F3D_SOURCE_DIR}/testing/configs/match_types.json)
+if(WIN32)
+  set(GLOBSTAR_EXPR [=[**\\\\*stl]=])
+else()
+  set(GLOBSTAR_EXPR "**/*stl")
+endif()
+configure_file("${F3D_SOURCE_DIR}/testing/configs/glob.json.in" "${CMAKE_BINARY_DIR}/glob.json")
+f3d_test(NAME TestMatchFirstConfigGlobOptionBlock DATA dragon.vtu CONFIG ${CMAKE_BINARY_DIR}/glob.json)
+f3d_test(NAME TestMatchSecondConfigGlobOptionBlock DATA suzanne.stl CONFIG ${CMAKE_BINARY_DIR}/glob.json)
+
+# Test exact matching
+cmake_path(APPEND FIRST_EXACT_PATH "${F3D_SOURCE_DIR}" "testing" "data" "suzanne.obj")
+cmake_path(NATIVE_PATH FIRST_EXACT_PATH NATIVE_FIRST_EXACT_PATH)
+cmake_path(APPEND SECOND_EXACT_PATH "${F3D_SOURCE_DIR}" "testing" "data" "suzanne.ply")
+cmake_path(NATIVE_PATH SECOND_EXACT_PATH NATIVE_SECOND_EXACT_PATH)
+if(WIN32)
+  string(REPLACE "\\" "\\\\" NATIVE_FIRST_EXACT_PATH "${NATIVE_FIRST_EXACT_PATH}")
+  string(REPLACE "\\" "\\\\" NATIVE_SECOND_EXACT_PATH "${NATIVE_SECOND_EXACT_PATH}")
+endif()
+configure_file("${F3D_SOURCE_DIR}/testing/configs/exact.json.in" "${CMAKE_BINARY_DIR}/exact.json")
+f3d_test(NAME TestExactMatch DATA suzanne.obj CONFIG ${CMAKE_BINARY_DIR}/exact.json)
 
 # Test help display
 f3d_test(NAME TestHelp ARGS --help REGEXP "Usage:")

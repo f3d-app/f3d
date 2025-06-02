@@ -119,6 +119,37 @@ int TestSDKUtils(int argc, char* argv[])
 
   //
 
+  test("globContainsGlobstar: globstar only", f3d::utils::globContainsGlobstar("**"));
+  test("globContainsGlobstar: globstar suffix", f3d::utils::globContainsGlobstar("dir/**"));
+  test("globContainsGlobstar: globstar prefix", f3d::utils::globContainsGlobstar("**/file.txt"));
+  test("globContainsGlobstar: globstar in middle",
+    f3d::utils::globContainsGlobstar("dir/**/file.txt"));
+  test("globContainsGlobstar: globstar and star", f3d::utils::globContainsGlobstar("**/*.txt"));
+  test("globContainsGlobstar: directory with globstar and star",
+    f3d::utils::globContainsGlobstar("dir/**/*.cxx"));
+  test("globContainsGlobstar: star", !f3d::utils::globContainsGlobstar("*"));
+  test("globContainsGlobstar: directory star", !f3d::utils::globContainsGlobstar("dir/*"));
+  test("globContainsGlobstar: star and extension", !f3d::utils::globContainsGlobstar("*.vtu"));
+  test("globContainsGlobstar: star and extension alternation",
+    !f3d::utils::globContainsGlobstar("*gl{tf,b}"));
+  test("globContainsGlobstar: both astericks escaped", !f3d::utils::globContainsGlobstar("\\*\\*"));
+  test("globContainsGlobstar: first asterick escaped", !f3d::utils::globContainsGlobstar("\\**"));
+  test("globContainsGlobstar: second asterick escaped", !f3d::utils::globContainsGlobstar("\\**"));
+  test("globContainsGlobstar: escaped escape", f3d::utils::globContainsGlobstar("\\\\**"));
+  test(
+    "globContainsGlobstar: Windows path", f3d::utils::globContainsGlobstar(R"(dir\\**\\file.txt)"));
+  test("globContainsGlobstar: three stars", f3d::utils::globContainsGlobstar("***"));
+  test("globContainsGlobstar: three stars suffix", f3d::utils::globContainsGlobstar("dir/***"));
+  test("globContainsGlobstar: front star escaped",
+    f3d::utils::globContainsGlobstar("dir/\\***/utils.cxx"));
+  test("globContainsGlobstar: middle star escaped",
+    !f3d::utils::globContainsGlobstar("dir/*\\**/utils.cxx"));
+  test("globContainsGlobstar: last star escaped",
+    f3d::utils::globContainsGlobstar("dir/**\\*/utils.cxx"));
+  test("globContainsGlobstar: empty glob expression", !f3d::utils::globContainsGlobstar(""));
+
+  //
+
   auto globMatchesText = [](std::string_view glob, const std::string& text,
                            bool supportGlobStars = true, char pathSeparator = '/') {
     std::string regexPattern = f3d::utils::globToRegex(glob, supportGlobStars, pathSeparator);

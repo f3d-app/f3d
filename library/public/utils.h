@@ -69,15 +69,25 @@ public:
     const std::filesystem::path& path, const std::filesystem::path& baseDirectory = {});
 
   /**
-   * Converts a glob expression to a regular expression
+   * Returns true if the glob contains a globstar (`**`).
+   */
+  [[nodiscard]] static bool globContainsGlobstar(std::string_view glob);
+
+  /**
+   * Converts a glob expression to a regular expression, supporting globstars (`**`) when
+   * `supportGlobStars` is true (true by default). When a glob contains globstars, the
+   * `pathSeparator` (`/` by default) is used to help generate the regular expression.
    *
    * It handles the following glob features:
-   * - `*`: Matches any number of characters (except path separators)
-   * - `?`: Matches exactly one character (except path separators)
+   * - `*`: Matches any number of characters (except path separators when using globstars)
+   * - `?`: Matches exactly one character (except path separators when using globstars)
    * - `[...]`: Character classes
    * - `[!...]` or `[^...]`: Negated character classes
-   * - `**`: Matches any number of characters including path separators if enabled
+   * - `**`: Matches any number of characters including path separators when using globstars
    * - `{a,b,c}`: Alternation (matches any of the comma-separated patterns)
+   *
+   * Throws a `utils::glob_exception` if a character class or alternation is not closed or
+   * the expression ends with an escape.
    */
   [[nodiscard]] static std::string globToRegex(
     std::string_view glob, bool supportGlobStars = true, char pathSeparator = '/');
