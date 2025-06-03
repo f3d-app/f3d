@@ -1258,9 +1258,9 @@ f3d_test(NAME TestMatchFirstConfigGlobOptionBlock DATA dragon.vtu CONFIG ${CMAKE
 f3d_test(NAME TestMatchSecondConfigGlobOptionBlock DATA suzanne.stl CONFIG ${CMAKE_BINARY_DIR}/glob.json)
 
 # Test exact matching
-cmake_path(APPEND FIRST_EXACT_PATH "${F3D_SOURCE_DIR}" "testing" "data" "suzanne.obj")
+cmake_path(SET FIRST_EXACT_PATH "${F3D_SOURCE_DIR}/testing/data/suzanne.obj")
 cmake_path(NATIVE_PATH FIRST_EXACT_PATH NATIVE_FIRST_EXACT_PATH)
-cmake_path(APPEND SECOND_EXACT_PATH "${F3D_SOURCE_DIR}" "testing" "data" "suzanne.ply")
+cmake_path(SET SECOND_EXACT_PATH "${F3D_SOURCE_DIR}/testing/data/suzanne.ply")
 cmake_path(NATIVE_PATH SECOND_EXACT_PATH NATIVE_SECOND_EXACT_PATH)
 if(WIN32)
   string(REPLACE "\\" "\\\\" NATIVE_FIRST_EXACT_PATH "${NATIVE_FIRST_EXACT_PATH}")

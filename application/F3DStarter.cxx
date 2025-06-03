@@ -514,7 +514,7 @@ public:
         {
           // If the source is empty, there is no pattern, all options applies
           // Note: An empty inputFile matches with ".*"
-          if (source.empty() || PatternMatched(source, matchType, match, inputFile))
+          if (source.empty() || F3DInternals::PatternMatched(source, matchType, match, inputFile))
           {
             // For each option key/value
             for (auto const& [key, value] : conf)
@@ -856,7 +856,7 @@ public:
         {
           // If the source is empty, there is no pattern, all bindings applies
           // Note: An empty inputFile matches with ".*"
-          if (source.empty() || PatternMatched(source, matchType, match, inputFile))
+          if (source.empty() || F3DInternals::PatternMatched(source, matchType, match, inputFile))
           {
             // For each interaction bindings
             for (auto const& [bindStr, commands] : bindings)

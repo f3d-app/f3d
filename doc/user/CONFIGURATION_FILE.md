@@ -223,7 +223,7 @@ While regex is the default match type, glob and exact match types are also suppo
 ]
 ```
 
-Globstar support will only be enabled when using the glob match type and the pattern contains a globstar (`**`). By default, globstar support is disabled. When globstar support is enabled `*` and `?` will not match file path separators.
+For glob patterns, globstar (`**`) is supported.
 
 Glob and exact matching can be used for bindings as well.
 
