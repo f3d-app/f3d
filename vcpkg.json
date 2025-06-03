@@ -4,7 +4,11 @@
     {
       "name": "vtk",
       "default-features": false,
-      "features": ["opengl"]
+      "features": [
+        "opengl",
+        "seacas"
+      ]
     }
-  ]
+  ],
+  "builtin-baseline": "7e7032a82d7c0674a6e7e399a0bad928c44af473"
 }
