@@ -69,14 +69,8 @@ public:
     const std::filesystem::path& path, const std::filesystem::path& baseDirectory = {});
 
   /**
-   * Returns true if the glob contains a globstar (`**`).
-   */
-  [[nodiscard]] static bool globContainsGlobstar(std::string_view glob);
-
-  /**
-   * Converts a glob expression to a regular expression, supporting globstars (`**`) when
-   * `supportGlobStars` is true (true by default). When a glob contains globstars, the
-   * `pathSeparator` (`/` by default) is used to help generate the regular expression.
+   * Converts a glob expression to a regular expression. When a glob contains globstars,
+   * the `pathSeparator` (`/` by default) is used to help generate the regular expression.
    *
    * It handles the following glob features:
    * - `*`: Matches any number of characters (except path separators when using globstars)
@@ -89,8 +83,7 @@ public:
    * Throws a `utils::glob_exception` if a character class or alternation is not closed or
    * the expression ends with an escape.
    */
-  [[nodiscard]] static std::string globToRegex(
-    std::string_view glob, bool supportGlobStars = true, char pathSeparator = '/');
+  [[nodiscard]] static std::string globToRegex(std::string_view glob, char pathSeparator = '/');
 
   /**
    * An exception that can be thrown by tokenize

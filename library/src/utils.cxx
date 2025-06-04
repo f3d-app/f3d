@@ -120,61 +120,60 @@ fs::path utils::collapsePath(const fs::path& path, const fs::path& baseDirectory
 }
 
 //----------------------------------------------------------------------------
-bool utils::globContainsGlobstar(std::string_view glob)
+std::string utils::globToRegex(std::string_view glob, char pathSeparator)
 {
-  if (glob.size() < 2)
+  bool supportGlobStars = [glob]()
   {
-    return false;
-  }
-
-  bool escaped = false;
-  int starCount = 0;
-  for (char c : glob)
-  {
-    if (c == '\\')
+    // find if the glob expression contains a globstar (**)
+    if (glob.size() < 2)
     {
-      if (escaped)
+      return false;
+    }
+
+    bool escaped = false;
+    int starCount = 0;
+    for (char c : glob)
+    {
+      if (c == '\\')
       {
-        escaped = false;
+        if (escaped)
+        {
+          escaped = false;
+        }
+        else
+        {
+          escaped = true;
+        }
+        starCount = 0;
+        continue;
+      }
+
+      if (!escaped && c == '*')
+      {
+        starCount++;
       }
       else
       {
-        escaped = true;
+        starCount = 0;
       }
-      starCount = 0;
-      continue;
+
+      if (starCount == 2)
+      {
+        return true;
+      }
+
+      escaped = false;
     }
 
-    if (!escaped && c == '*')
-    {
-      starCount++;
-    }
-    else
-    {
-      starCount = 0;
-    }
+    return false;
+  }();
+  const std::string globSeparator = pathSeparator == '\\' ? "\\\\" : "/";
 
-    if (starCount == 2)
-    {
-      return true;
-    }
-
-    escaped = false;
-  }
-
-  return false;
-}
-
-//----------------------------------------------------------------------------
-std::string utils::globToRegex(std::string_view glob, bool supportGlobStars, char pathSeparator)
-{
   std::string result;
 
   bool escaped = false;
   bool inCharClass = false;
   std::vector<size_t> alternations;
-
-  const std::string globSeparator = pathSeparator == '\\' ? "\\\\" : "/";
 
   for (size_t i = 0; i < glob.size(); i++)
   {

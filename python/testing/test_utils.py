@@ -11,18 +11,10 @@ def test_collapse_path():
     assert f3d.Utils.collapse_path("/folder/../file.ext", ".") == Path("/file.ext")
 
 
-def test_glob_contains_globstar():
-    assert f3d.Utils.glob_contains_globstar("*vt?") == False
-    assert f3d.Utils.glob_contains_globstar(glob="**/*gl{tf,b}") == True
-
-
 def test_glob_to_regex():
-    assert f3d.Utils.glob_to_regex("*vt?") == "[^/]*vt[^/]"
-    assert f3d.Utils.glob_to_regex("*vt?", False, "/") == ".*vt."
-    assert f3d.Utils.glob_to_regex("*vt?", path_separator="\\") == "[^\\\\]*vt[^\\\\]"
+    assert f3d.Utils.glob_to_regex("*vt?") == ".*vt."
+    assert f3d.Utils.glob_to_regex("**/*vt?") == "(?:[^/]*(?:/|$))*[^/]*vt[^/]"
     assert (
-        f3d.Utils.glob_to_regex(
-            glob="*gl{tf,b}", support_glob_stars=False, path_separator="/"
-        )
-        == ".*gl(?:tf|b)"
+        f3d.Utils.glob_to_regex(glob="**\\\\*vt?", path_separator="\\")
+        == "(?:[^\\\\]*(?:\\\\|$))*[^\\\\]*vt[^\\\\]"
     )

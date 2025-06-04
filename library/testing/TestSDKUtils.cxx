@@ -119,40 +119,9 @@ int TestSDKUtils(int argc, char* argv[])
 
   //
 
-  test("globContainsGlobstar: globstar only", f3d::utils::globContainsGlobstar("**"));
-  test("globContainsGlobstar: globstar suffix", f3d::utils::globContainsGlobstar("dir/**"));
-  test("globContainsGlobstar: globstar prefix", f3d::utils::globContainsGlobstar("**/file.txt"));
-  test("globContainsGlobstar: globstar in middle",
-    f3d::utils::globContainsGlobstar("dir/**/file.txt"));
-  test("globContainsGlobstar: globstar and star", f3d::utils::globContainsGlobstar("**/*.txt"));
-  test("globContainsGlobstar: directory with globstar and star",
-    f3d::utils::globContainsGlobstar("dir/**/*.cxx"));
-  test("globContainsGlobstar: star", !f3d::utils::globContainsGlobstar("*"));
-  test("globContainsGlobstar: directory star", !f3d::utils::globContainsGlobstar("dir/*"));
-  test("globContainsGlobstar: star and extension", !f3d::utils::globContainsGlobstar("*.vtu"));
-  test("globContainsGlobstar: star and extension alternation",
-    !f3d::utils::globContainsGlobstar("*gl{tf,b}"));
-  test("globContainsGlobstar: both astericks escaped", !f3d::utils::globContainsGlobstar("\\*\\*"));
-  test("globContainsGlobstar: first asterick escaped", !f3d::utils::globContainsGlobstar("\\**"));
-  test("globContainsGlobstar: second asterick escaped", !f3d::utils::globContainsGlobstar("\\**"));
-  test("globContainsGlobstar: escaped escape", f3d::utils::globContainsGlobstar("\\\\**"));
-  test(
-    "globContainsGlobstar: Windows path", f3d::utils::globContainsGlobstar(R"(dir\\**\\file.txt)"));
-  test("globContainsGlobstar: three stars", f3d::utils::globContainsGlobstar("***"));
-  test("globContainsGlobstar: three stars suffix", f3d::utils::globContainsGlobstar("dir/***"));
-  test("globContainsGlobstar: front star escaped",
-    f3d::utils::globContainsGlobstar("dir/\\***/utils.cxx"));
-  test("globContainsGlobstar: middle star escaped",
-    !f3d::utils::globContainsGlobstar("dir/*\\**/utils.cxx"));
-  test("globContainsGlobstar: last star escaped",
-    f3d::utils::globContainsGlobstar("dir/**\\*/utils.cxx"));
-  test("globContainsGlobstar: empty glob expression", !f3d::utils::globContainsGlobstar(""));
-
-  //
-
   auto globMatchesText = [](std::string_view glob, const std::string& text,
-                           bool supportGlobStars = true, char pathSeparator = '/') {
-    std::string regexPattern = f3d::utils::globToRegex(glob, supportGlobStars, pathSeparator);
+                           char pathSeparator = '/') {
+    std::string regexPattern = f3d::utils::globToRegex(glob, pathSeparator);
     std::regex regex(regexPattern);
     return std::regex_match(text, regex);
   };
@@ -195,41 +164,61 @@ int TestSDKUtils(int argc, char* argv[])
     globMatchesText("log_[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].txt", "log_2025-05-18.txt"));
   test("globToRegex: complex pattern 4",
     globMatchesText("data_?{_v[0-9],}.{csv,dat}", "data_1_v2.csv"));
+  test("globToRegex: only special chars", globMatchesText("***??[a-z][0-9]", "abc5"));
+  test("globToRegex: empty glob", globMatchesText("", ""));
   test("globToRegex: globstar simple", globMatchesText("**/file.txt", "dir/file.txt"));
   test("globToRegex: globstar simple - Windows separator",
-    globMatchesText("**\\\\file.txt", "dir\\file.txt", true, '\\'));
+    globMatchesText("**\\\\file.txt", "dir\\file.txt", '\\'));
   test("globToRegex: globstar deep", globMatchesText("**/file.txt", "dir1/dir2/dir3/file.txt"));
   test("globToRegex: globstar deep - Windows separator",
-    globMatchesText("**\\\\file.txt", R"(dir1\dir2\dir3\file.txt)", true, '\\'));
-  test("globToRegex: globstar disabled", globMatchesText("**/file.txt", "dir/file.txt", false));
-  test("globToRegex: globstar disabled - Windows separator",
-    globMatchesText("**\\\\file.txt", "dir\\file.txt", false, '\\'));
-  test("globToRegex: globstar disabled - deep",
-    globMatchesText("**/file.txt", "dir1/dir2/file.txt", false));
-  test("globToRegex: globstar disabled - deep - Windows separator",
-    globMatchesText("**\\\\file.txt", "dir1\\dir2\\file.txt", false, '\\'));
-  test("globToRegex: globstar disabled - no match",
-    !globMatchesText("**/file.txt", "dir1/dir2/file1.txt", false));
-  test("globToRegex: globstar disabled - no match - Windows separator",
-    !globMatchesText("**\\\\file.txt", "dir1\\dir2\\file1.txt", false, '\\'));
-  test("globToRegex: globstar prefix", globMatchesText("src/**/*.cxx", "src/library/src/file.cxx"));
-  test("globToRegex: globstar prefix - Windows separator",
-    globMatchesText(R"(src\\**\\*.cxx)", R"(src\library\src\file.cxx)", true, '\\'));
-  test("globToRegex: globstar middle",
+    globMatchesText("**\\\\file.txt", R"(dir1\dir2\dir3\file.txt)", '\\'));
+  test(
+    "globToRegex: globstar middle 1", globMatchesText("src/**/*.cxx", "src/library/src/file.cxx"));
+  test("globToRegex: globstar middle 1 - Windows separator",
+    globMatchesText(R"(src\\**\\*.cxx)", R"(src\library\src\file.cxx)", '\\'));
+  test("globToRegex: globstar middle 2",
     globMatchesText("src/**/include/*.h", "src/external/submodule/include/file.h"));
-  test("globToRegex: globstar middle - Windows separator",
-    globMatchesText(
-      R"(src\\**\\include\\*.h)", R"(src\external\submodule\include\file.h)", true, '\\'));
-  test("globToRegex: empty glob", globMatchesText("", ""));
-  test("globToRegex: single star", globMatchesText("*", "anything"));
-  test("globToRegex: only special chars", globMatchesText("***??[a-z][0-9]", "abc5"));
-  test("globToRegex: star shouldn't cross directories", !globMatchesText("*.txt", "dir/file.txt"));
+  test("globToRegex: globstar middle 2 - Windows separator",
+    globMatchesText(R"(src\\**\\include\\*.h)", R"(src\external\submodule\include\file.h)", '\\'));
+  test("globToRegex: single star", globMatchesText("*", "/anything/"));
+  test("globToRegex: two stars", globMatchesText("**", "/anything/"));
+  test("globToRegex: three stars", globMatchesText("***", "/anything/"));
+  test("globToRegex: no stars escaped",
+    globMatchesText("dir1/***/utils.cxx", "dir1/dir2/dir3/utils.cxx"));
+  test("globToRegex: no stars escaped - Windows separator",
+    globMatchesText(R"(dir1\\***\\utils.cxx)", R"(dir1\dir2\dir3\utils.cxx)", '\\'));
+  test("globToRegex: front star escaped",
+    globMatchesText("dir1/\\***/utils.cxx", "dir1/*dir2/utils.cxx"));
+  test("globToRegex: front star escaped - Windows separator",
+    globMatchesText(R"(dir1\\\***\\utils.cxx)", R"(dir1\*dir2\utils.cxx)", '\\'));
+  test("globToRegex: front star escaped - no match",
+    !globMatchesText("dir1/\\***/utils.cxx", "dir1/*dir2/dir3/utils.cxx"));
+  test("globToRegex: front star escaped - no match - Windows separator",
+    !globMatchesText(R"(dir1\\\***\\utils.cxx)", R"(dir1\*dir2\dir3\utils.cxx)", '\\'));
+  test("globToRegex: middle star escaped",
+    globMatchesText("dir1/*\\**/utils.cxx", "dir1/anything*anything/utils.cxx"));
+  test("globToRegex: middle star escaped - Windows separator",
+    globMatchesText(R"(dir1\\*\**\\utils.cxx)", R"(dir1\anything*anything\utils.cxx)", '\\'));
+  test("globToRegex: middle star escaped - no match",
+    !globMatchesText("dir1/*\\**/utils.cxx", "dir1/dir2/utils.cxx"));
+  test("globToRegex: middle star escaped - no match - Windows separator",
+    !globMatchesText(R"(dir1\\*\**\\utils.cxx)", R"(dir1\dir2\utils.cxx)", '\\'));
+  test("globToRegex: last star escaped",
+    globMatchesText("dir1/**\\*/utils.cxx", "dir1/dir2*/utils.cxx"));
+  test("globToRegex: last star escaped - Windows separator",
+    globMatchesText(R"(dir1\\**\*\\utils.cxx)", R"(dir1\dir2*\utils.cxx)", '\\'));
+  test("globToRegex: last star escaped - no match",
+    !globMatchesText("dir1/**\\*/utils.cxx", "dir1/dir2/dir3*/utils.cxx"));
+  test("globToRegex: last star escaped - no match - Windows separator",
+    !globMatchesText(R"(dir1\\**\*\\utils.cxx)", "dir1/dir2/dir3*/utils.cxx", '\\'));
+  test("globToRegex: star shouldn't cross directories",
+    !globMatchesText("**/dir2*a.txt", "dir1/dir2/a.txt"));
   test("globToRegex: star shouldn't cross directories - Windows separator",
-    !globMatchesText("*.txt", "dir\\file.txt", true, '\\'));
+    !globMatchesText("**\\\\dir2*a.txt", "dir1\\dir2\\a.txt", '\\'));
   test("globToRegex: question mark shouldn't cross directories",
-    !globMatchesText("file?a.txt", "file/a.txt"));
+    !globMatchesText("**/dir2?a.txt", "dir1/dir2/a.txt"));
   test("globToRegex: question mark shouldn't cross directories - Windows separator",
-    !globMatchesText("file?a.txt", "file\\a.txt", true, '\\'));
+    !globMatchesText("**\\\\dir2?a.txt", "dir1\\dir2\\a.txt", '\\'));
   test.expect<f3d::utils::glob_exception>("globToRegex: unclosed character class",
     [&]() { return f3d::utils::globToRegex("file[0-9.txt"); });
   test.expect<f3d::utils::glob_exception>(

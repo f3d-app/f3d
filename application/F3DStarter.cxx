@@ -430,8 +430,7 @@ public:
       try
       {
         std::regex re(matchType == "glob"
-            ? f3d::utils::globToRegex(
-                match, f3d::utils::globContainsGlobstar(match), fs::path::preferred_separator)
+            ? f3d::utils::globToRegex(match, fs::path::preferred_separator)
             : match,
           std::regex_constants::icase);
         return std::regex_match(inputFile, re);
@@ -469,6 +468,7 @@ public:
       }
       else
       {
+        // TODO: Use std::format once C++20 is supported
         origin = source;
         origin += ":`";
         origin += match;
@@ -601,6 +601,7 @@ public:
                   }
                   else
                   {
+                    // TODO: Use std::format once C++20 is supported
                     origin = source;
                     origin += ":`";
                     origin += match;
@@ -623,6 +624,7 @@ public:
                   }
                   else
                   {
+                    // TODO: Use std::format once C++20 is supported
                     origin = source;
                     origin += ":`";
                     origin += match;
