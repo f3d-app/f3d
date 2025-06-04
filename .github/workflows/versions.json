@@ -8,7 +8,7 @@
   ],
   "versions": {
     "alembic": "1.8.8",
-    "assimp": "v5.4.3",
+    "assimp": "v6.0.1",
     "draco": "1.5.7",
     "occt": "V7_9_0",
     "openexr": "v3.3.3",
@@ -31,5 +31,5 @@
     "java": "17"
   },
   "vtk_commit_sha": "26ed83ed4a877ebf50a3a22d0f532015214263ca",
-  "timestamp": "20250513_0"
+  "timestamp": "20250604_0"
 }

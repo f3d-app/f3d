@@ -11,6 +11,8 @@ else()
   include(f3dPlugin)
 endif()
 
+# We cannot use the CMake version check directly because of an assimp issue
+# https://github.com/assimp/assimp/issues/6204#issuecomment-2931440948
 find_package(assimp REQUIRED)
 
 if("${assimp_VERSION}" VERSION_LESS "5.4")

@@ -32,18 +32,6 @@ runs:
         path: "./dependencies/assimp"
         ref: ${{inputs.version}}
 
-    # Revert: https://github.com/assimp/assimp/pull/5349
-    # Issue: https://github.com/assimp/assimp/issues/5449
-    # Fix: https://github.com/assimp/assimp/pull/5751
-    # This impact 5.4.3 and should be fixed in next release (5.5 or 5.4.4)
-    - name: Patch ASSIMP
-      if: |
-        steps.cache-assimp.outputs.cache-hit != 'true' &&
-        inputs.version == 'v5.4.3'
-      working-directory: ${{github.workspace}}/dependencies/assimp
-      shell: bash
-      run: patch -p1 < $GITHUB_ACTION_PATH/assimp-revert-fbx-bone-anim.patch
-
     - name: Setup ASSIMP
       if: steps.cache-assimp.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies
