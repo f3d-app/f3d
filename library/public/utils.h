@@ -69,16 +69,16 @@ public:
     const std::filesystem::path& path, const std::filesystem::path& baseDirectory = {});
 
   /**
-   * Converts a glob expression to a regular expression. When a glob contains globstars,
+   * Converts a glob expression to a regular expression. When a glob contains `**`,
    * the `pathSeparator` (`/` by default) is used to help generate the regular expression.
    *
    * It handles the following glob features:
-   * - `*`: Matches any number of characters (except path separators when using globstars)
-   * - `?`: Matches exactly one character (except path separators when using globstars)
-   * - `[...]`: Character classes
-   * - `[!...]` or `[^...]`: Negated character classes
-   * - `**`: Matches any number of characters including path separators when using globstars
-   * - `{a,b,c}`: Alternation (matches any of the comma-separated patterns)
+   * - `*`: Matches zero or more characters (except path separators when also using `**`)
+   * - `?`: Matches exactly one character (except path separators when also using `**`)
+   * - `[...]`: Character class, matches any of the given characters
+   * - `[!...]` or `[^...]`: Negated character class, matches none of the given characters
+   * - `{a,b,c}`: Alternation, matches any of the given comma-separated patterns
+   * - `**`: Matches any number of characters including path separators
    *
    * Throws a `utils::glob_exception` if a character class or alternation is not closed or
    * the expression ends with an escape.

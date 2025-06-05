@@ -136,28 +136,14 @@ std::string utils::globToRegex(std::string_view glob, char pathSeparator)
     {
       if (c == '\\')
       {
-        if (escaped)
-        {
-          escaped = false;
-        }
-        else
-        {
-          escaped = true;
-        }
+        escaped = !escaped;
         starCount = 0;
         continue;
       }
 
-      if (!escaped && c == '*')
-      {
-        starCount++;
-      }
-      else
-      {
-        starCount = 0;
-      }
+      starCount = !escaped && c == '*' ? starCount + 1 : 0;
 
-      if (starCount == 2)
+      if (starCount >= 2)
       {
         return true;
       }
@@ -301,14 +287,7 @@ std::string utils::globToRegex(std::string_view glob, char pathSeparator)
         break;
       case '\\':
         result += c;
-        if (escaped)
-        {
-          escaped = false;
-        }
-        else
-        {
-          escaped = true;
-        }
+        escaped = !escaped;
         break;
       case '.':
       case '(':
