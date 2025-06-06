@@ -42,6 +42,28 @@ You can then fix the issue or implement the feature on your side and contribute 
 Of course, if you are already using F3D and want to improve it for your specific needs, because you want a feature or found a bug,
 that is definitely possible. Feel free to reach out for guidance by opening an issue or asking on [Discord](https://discord.f3d.app).
 
+## Bounties
+
+F3D has been funded by an [NLnet NGI0 grant](https://nlnet.nl/project/F3D/), so some issues may be linked to a donation to individuals.
+Such issues have been identified with the ["bounty"]() label. The amount of money for these issues is fairly small (up to a few hundred euros).
+
+In order to be elligible for the bounty you need to:
+ - Be a [returning contributor]()
+ - Be able to provide an IBAN from a UE country where the money will be donated to
+
+If you are not elligible or are not interested by the donation, this is perfectly fine, you can still work on the issue, but there will be no donation.
+If you are elligible and interested, please comment on the issue and Maintainers will reach out to you privately to discuss the details and share the exact amount of the bounty
+for this particulat issue as well as decide together an targeted deadline for completing the work.
+ 
+Maintainers will then vote to decide if you are a good fit for a specific issue and share the result of the vote with you.
+
+When working on a "bounty" issue, some form of communication is expected once a week.
+You should then work on this issue as you would any other issue.
+
+When the maintainer close the issue, the donation will take place. This can sometimes requires multiple pull requests being merged.
+
+Please note the [F3D-APP fundation](https://annuaire-entreprises.data.gouv.fr/entreprise/f3d-app-foundation-941551624) is handling the donations.
+
 ## F3D Development Workflow
 
 F3D uses [GitLab Flow](https://about.gitlab.com/topics/version-control/what-is-gitlab-flow/). In a few words, here is how to contribute:
