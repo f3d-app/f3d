@@ -226,5 +226,24 @@ int TestSDKUtils(int argc, char* argv[])
   test.expect<f3d::utils::glob_exception>(
     "globToRegex: trailing escape", [&]() { return f3d::utils::globToRegex("file1.txt\\"); });
 
+  // 
+  
+  test("getEnv: standard", f3d::utils::getEnv("F3D_TEST_ENV_STANDARD") == "TestEnv");
+  test("getEnv: empty", f3d::utils::getEnv("F3D_TEST_ENV_EMPTY") == std::nullopt);
+  test("getEnv: extended", f3d::utils::getEnv("F3D_TEST_ENV_EXTENDED") == "Test\xC3\x8Bnv");
+  test("getEnv: utf8", f3d::utils::getEnv("F3D_TEST_ENV_UTF8") == "\xF0\x9F\xA4\x94");
+
+#if defined(_WIN32)
+  test("getKnownFolder: windows roaming not empty",
+    f3d::utils::getKnownFolder(f3d::utils::KnownFolder::ROAMINGAPPDATA) != std::nullopt);
+  test("getKnownFolder: windows local not empty",
+    f3d::utils::getKnownFolder(f3d::utils::KnownFolder::LOCALAPPDATA) != std::nullopt);
+  test("getKnownFolder: windows pictures not empty",
+    f3d::utils::getKnownFolder(f3d::utils::KnownFolder::PICTURES) != std::nullopt);
+#else
+  test("getKnownFolder: non-windows empty",
+    f3d::utils::getKnownFolder(f3d::utils::KnownFolder::ROAMINGAPPDATA) == std::nullopt);
+#endif
+
   return test.result();
 }

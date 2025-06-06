@@ -107,8 +107,17 @@ as specified above.
 
 The destination filename used to save the screenshots (created by pressing <kbd>F12</kbd> or <kbd>Ctrl</kbd> + <kbd>F12</kbd>) is configurable (using the `screenshot-filename` option) and can use template variables as described [on the options page](OPTIONS.md#filename-templating).
 
-Unless the configured filename template is an absolute path, images will be saved into the user's home directory
-(using the following environment variables, if defined and pointing to an existing directory, in that order: `XDG_PICTURES_DIR`, `HOME`, or `USERPROFILE`).
+Unless the configured filename template is an absolute path, images will be saved in dedicated directories:
+
+- Windows: `%USERPROFILE%\Pictures`
+- Linux: `${XDG_PICTURES_DIR}`,`${HOME}`
+- macOS: `${HOME}`
+
+So with default options, which are using [templates](OPTIONS.md#filename-templating), the screenshots will be saved as:
+
+- Windows: `%USERPROFILE%\Pictures\F3D\{model}_{n}.png`
+- Linux: `${XDG_PICTURES_DIR}/F3D/{model}_{n}.png`,`${HOME}/F3D/{model}_{n}.png`
+- macOS: `${HOME}/F3D/{model}_{n}.png`
 
 ## Configuring bindings
 

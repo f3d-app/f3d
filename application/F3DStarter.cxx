@@ -1196,7 +1196,8 @@ int F3DStarter::Start(int argc, char** argv)
       }
     }
 
-    char* noDataForceRender = std::getenv("CTEST_F3D_NO_DATA_FORCE_RENDER");
+    std::optional<std::string> noDataForceRender =
+      f3d::utils::getEnv("CTEST_F3D_NO_DATA_FORCE_RENDER");
 
     fs::path reference = f3d::utils::collapsePath(this->Internals->AppOptions.Reference);
     fs::path output = this->Internals->applyFilenameTemplate(
@@ -1205,7 +1206,7 @@ int F3DStarter::Start(int argc, char** argv)
     // Render and compare with file if needed
     if (!reference.empty())
     {
-      if (this->Internals->LoadedFiles.empty() && !noDataForceRender)
+      if (this->Internals->LoadedFiles.empty() && !noDataForceRender.has_value())
       {
         f3d::log::error("No file loaded, no rendering performed");
         return EXIT_FAILURE;
@@ -1288,7 +1289,7 @@ int F3DStarter::Start(int argc, char** argv)
     // Render to file if needed
     else if (!output.empty())
     {
-      if (this->Internals->LoadedFiles.empty() && !noDataForceRender)
+      if (this->Internals->LoadedFiles.empty() && !noDataForceRender.has_value())
       {
         f3d::log::error("No files loaded, no rendering performed");
         return EXIT_FAILURE;
@@ -1639,30 +1640,11 @@ void F3DStarter::Render()
 //----------------------------------------------------------------------------
 void F3DStarter::SaveScreenshot(const std::string& filenameTemplate, bool minimal)
 {
-
-  const auto getScreenshotDir = []()
-  {
-    for (const char* const& candidate : { "XDG_PICTURES_DIR", "HOME", "USERPROFILE" })
-    {
-      char* val = std::getenv(candidate);
-      if (val != nullptr)
-      {
-        fs::path path(val);
-        if (fs::is_directory(path))
-        {
-          return path;
-        }
-      }
-    }
-
-    return fs::current_path();
-  };
-
   fs::path path;
   try
   {
-    path = this->Internals->applyFilenameTemplate(
-      f3d::utils::collapsePath(filenameTemplate, getScreenshotDir()));
+    fs::path dir = F3DSystemTools::GetUserScreenshotDirectory();
+    path = this->Internals->applyFilenameTemplate(f3d::utils::collapsePath(filenameTemplate, dir));
 
     fs::create_directories(path.parent_path());
     f3d::log::info("saving screenshot to " + path.string());
@@ -1981,16 +1963,15 @@ void F3DStarter::AddCommands()
         cstrings.push_back(filter.c_str());
       }
 
-      const char* file = std::getenv("CTEST_OPEN_DIALOG_FILE");
-      if (!file)
+      std::optional<std::string> file = f3d::utils::getEnv("CTEST_OPEN_DIALOG_FILE");
+      if (!file.has_value())
       {
         file = tinyfd_openFileDialog("Open File", nullptr, static_cast<int>(cstrings.size()),
           cstrings.data(), "Supported Files", false);
       }
-
-      if (file)
+      else
       {
-        int index = this->AddFile(file);
+        int index = this->AddFile(file.value());
         if (index > -1)
         {
           this->LoadFileGroup(index);

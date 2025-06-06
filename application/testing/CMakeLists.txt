@@ -332,9 +332,18 @@ cmake_path(SET _screenshot_path ${CMAKE_BINARY_DIR}/Testing/Temporary/ss)
 cmake_path(SET _screenshot_user_path ${_screenshot_path}/user)
 cmake_path(NATIVE_PATH _screenshot_path _screenshot_dir)
 cmake_path(NATIVE_PATH _screenshot_user_path _screenshot_user_dir)
-add_test(NAME f3d::TestClearScreenshots COMMAND ${CMAKE_COMMAND} -E remove_directory ${_screenshot_dir})
-add_test(NAME f3d::TestSetupScreenshots COMMAND ${CMAKE_COMMAND} -E make_directory ${_screenshot_user_dir})
+
+add_test(NAME f3d::TestClearScreenshots COMMAND ${CMAKE_COMMAND} -E remove_directory "${_screenshot_dir}")
 set_tests_properties(f3d::TestClearScreenshots PROPERTIES FIXTURES_SETUP f3d::TestClearScreenshots_FIXTURE)
+
+if(WIN32)
+  cmake_path(SET _screenshot_windows_pictures_dir "${_screenshot_user_dir}/Pictures")
+  cmake_path(NATIVE_PATH _screenshot_windows_pictures_dir _screenshot_windows_pictures_dir)
+  # AppData/Local is required because on Windows changing USERPROFILE also impacts the cache location
+  add_test(NAME f3d::TestSetupScreenshots COMMAND ${CMAKE_COMMAND} -E make_directory "${_screenshot_windows_pictures_dir}" -E make_directory "${_screenshot_user_dir}/AppData/Local")
+else()
+  add_test(NAME f3d::TestSetupScreenshots COMMAND ${CMAKE_COMMAND} -E make_directory "${_screenshot_user_dir}")
+endif()
 set_tests_properties(f3d::TestSetupScreenshots PROPERTIES FIXTURES_REQUIRED f3d::TestClearScreenshots_FIXTURE)
 
 f3d_ss_test(NAME Version TEMPLATE ${_screenshot_dir}/{app}_{version}_{version_full}.png EXPECTED ${_screenshot_dir}/${PROJECT_NAME}_${F3D_VERSION}_${F3D_VERSION_FULL}.png)
@@ -346,7 +355,11 @@ f3d_ss_template_test(NAME InvalidFormats TEMPLATE ${_screenshot_dir}/{model}_{da
 f3d_ss_test(NAME Esc TEMPLATE ${_screenshot_dir}/{model}_{{model}}_{}.png EXPECTED ${_screenshot_dir}/suzanne_{model}_{}.png)
 f3d_ss_test(NAME Minimal MINIMAL TEMPLATE ${_screenshot_dir}/minimal.png EXPECTED ${_screenshot_dir}/minimal.png)
 
+if(WIN32)
+f3d_ss_test(NAME UserModelN TEMPLATE {model}_{n}.png EXPECTED ${_screenshot_windows_pictures_dir}/suzanne_1.png)
+else()
 f3d_ss_test(NAME UserModelN TEMPLATE {model}_{n}.png EXPECTED ${_screenshot_user_dir}/suzanne_1.png)
+endif()
 set_tests_properties(f3d::TestScreenshotUserModelN PROPERTIES ENVIRONMENT "XDG_PICTURES_DIR=${_screenshot_user_dir};HOME=${_screenshot_user_dir};USERPROFILE=${_screenshot_user_dir}")
 
 if(NOT APPLE OR VTK_VERSION VERSION_GREATER_EQUAL 9.3.0)
@@ -686,7 +699,6 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME TestTGATextureFBX DATA duck.fbx ARGS --load-plugins=assimp)
   f3d_test(NAME TestDAE DATA duck.dae ARGS --load-plugins=assimp)
   f3d_test(NAME TestX DATA anim_test.x ARGS --load-plugins=assimp)
-
 
   # This test baseline is incorrect because of https://github.com/f3d-app/f3d/issues/603
   # It will need to be changed when fixed
@@ -1327,6 +1339,10 @@ f3d_test(NAME TestRenderingBackendInvalid DATA cow.vtp RENDERING_BACKEND invalid
 add_test(NAME f3d::TestNoNoConfig COMMAND $<TARGET_FILE:f3d> --no-render)
 set_tests_properties(f3d::TestNoNoConfig PROPERTIES TIMEOUT 4)
 
+# Test that we can try loading a plugin without F3D_PLUGINS_PATH being defined
+add_test(NAME f3d::TestNoEnvInvalidPlugin COMMAND $<TARGET_FILE:f3d> --load-plugins=invalid --no-render)
+set_tests_properties(f3d::TestNoEnvInvalidPlugin PROPERTIES PASS_REGULAR_EXPRESSION "Cannot open the library")
+
 # Test invalid CLI args
 add_test(NAME f3d::TestInvalidCLIArgs COMMAND $<TARGET_FILE:f3d> --up)
 set_tests_properties(f3d::TestInvalidCLIArgs PROPERTIES PASS_REGULAR_EXPRESSION "Error parsing command line arguments")
@@ -1381,6 +1397,21 @@ if(NOT WIN32)
   f3d_test(NAME TestOutputTooLong DATA suzanne.ply ARGS --output=${_f3d_test_invalid_folder}/file.ext REGEXP "File name too long" NO_BASELINE NO_OUTPUT)
   f3d_test(NAME TestOutputWithReferenceTooLong DATA suzanne.ply ARGS --reference=file.png --output=${_f3d_test_invalid_folder}/file.ext REGEXP "File name too long" NO_BASELINE NO_OUTPUT)
   f3d_test(NAME TestOutputWithExistingReferenceTooLong DATA suzanne.ply ARGS --reference=${F3D_SOURCE_DIR}/testing/data/world.png --output=${_f3d_test_invalid_folder}/file.ext REGEXP "File name too long" NO_BASELINE NO_OUTPUT)
+
+  if(NOT APPLE)
+    f3d_test(NAME TestXDG_CONFIG_HOME DATA suzanne.ply CONFIG config_build REGEXP "Using config directory ${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d" NO_RENDER NO_BASELINE ENV "XDG_CONFIG_HOME=${CMAKE_BINARY_DIR}/share")
+    f3d_test(NAME TestXDG_CACHE_HOMECoverage DATA suzanne.ply NO_RENDER NO_BASELINE ENV "XDG_CACHE_HOME=${CMAKE_BINARY_DIR}")
+
+    # Setting XDG_CACHE_HOME is needed for cache to work when HOME is not set
+    f3d_test(NAME TestNoHOMEScreenshot DATA suzanne.ply ARGS --screenshot-filename=TestNoHOMEScreenshot.png --interaction-test-play=${F3D_SOURCE_DIR}/testing/recordings/TestScreenshot.log  REGEXP "saving screenshot to ${CMAKE_BINARY_DIR}/application/testing/TestNoHOMEScreenshot.png" NO_BASELINE ENV "XDG_CACHE_HOME=${CMAKE_BINARY_DIR};HOME=")
+    f3d_test(NAME TestNoHOMEConfig DATA suzanne.ply CONFIG config_build REGEXP "Using config directory ${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d" NO_RENDER NO_BASELINE ENV "XDG_CACHE_HOME=${CMAKE_BINARY_DIR};HOME=")
+  endif()
+
+else()
+  cmake_path(SET _user_profile_path ${CMAKE_BINARY_DIR}/Testing/Temporary/ùser/🥷)
+  cmake_path(NATIVE_PATH _user_profile_path _user_profile_path)
+  add_test(NAME f3d::TestSetupWinUserProfile COMMAND ${CMAKE_COMMAND} -E make_directory "${_user_profile_path}/AppData/Local")
+  f3d_test(NAME TestWinUserProfileNonStandard DATA dragon.vtu ENV "USERPROFILE=${_user_profile_path}" DEPENDS TestSetupWinUserProfile)
 endif()
 
 # Test failure without a reference, please do not create a TestNoRef.png file
