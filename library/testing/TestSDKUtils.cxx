@@ -226,8 +226,8 @@ int TestSDKUtils(int argc, char* argv[])
   test.expect<f3d::utils::glob_exception>(
     "globToRegex: trailing escape", [&]() { return f3d::utils::globToRegex("file1.txt\\"); });
 
-  // 
-  
+  //
+
   test("getEnv: standard", f3d::utils::getEnv("F3D_TEST_ENV_STANDARD") == "TestEnv");
   test("getEnv: empty", f3d::utils::getEnv("F3D_TEST_ENV_EMPTY") == std::nullopt);
   test("getEnv: extended", f3d::utils::getEnv("F3D_TEST_ENV_EXTENDED") == "Test\xC3\x8Bnv");
