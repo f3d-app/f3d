@@ -218,11 +218,19 @@ PYBIND11_MODULE(pyf3d, module)
   // f3d::utils
   py::class_<f3d::utils> utils(module, "Utils");
 
+  py::enum_<f3d::utils::KnownFolder>(utils, "KnownFolder")
+    .value("ROAMINGAPPDATA", f3d::utils::KnownFolder::ROAMINGAPPDATA)
+    .value("LOCALAPPDATA", f3d::utils::KnownFolder::LOCALAPPDATA)
+    .value("PICTURES", f3d::utils::KnownFolder::PICTURES)
+    .export_values();
+
   utils //
     .def_static("text_distance", &f3d::utils::textDistance)
     .def_static("collapse_path", &f3d::utils::collapsePath)
     .def_static(
-      "glob_to_regex", &f3d::utils::globToRegex, py::arg("glob"), py::arg("path_separator") = '/');
+      "glob_to_regex", &f3d::utils::globToRegex, py::arg("glob"), py::arg("path_separator") = '/')
+    .def_static("get_env", &f3d::utils::getEnv)
+    .def_static("get_known_folder", &f3d::utils::getKnownFolder);
 
   // f3d::interactor
   py::class_<f3d::interaction_bind_t> interaction_bind(module, "InteractionBind");

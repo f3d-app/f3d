@@ -3,7 +3,16 @@
 #include "levenshtein.h"
 #include "log.h"
 
+#include <vtksys/Encoding.hxx>
 #include <vtksys/SystemTools.hxx>
+
+#if defined(_WIN32)
+// clang-format off
+#include <Windows.h>
+#include <Knownfolders.h>
+#include <shlobj_core.h>
+// clang-format on
+#endif
 
 namespace fs = std::filesystem;
 
@@ -321,6 +330,55 @@ std::string utils::globToRegex(std::string_view glob, char pathSeparator)
   }
 
   return result;
+}
+
+//----------------------------------------------------------------------------
+std::optional<std::string> utils::getEnv(const std::string& env)
+{
+  std::string val;
+  if (vtksys::SystemTools::GetEnv(env, val))
+  {
+    return val;
+  }
+  return std::nullopt;
+}
+
+//----------------------------------------------------------------------------
+std::optional<std::string> utils::getKnownFolder(KnownFolder knownFolder)
+{
+#if defined(_WIN32)
+  KNOWNFOLDERID winKnowFolder;
+  switch (knownFolder)
+  {
+    case KnownFolder::ROAMINGAPPDATA:
+      winKnowFolder = FOLDERID_RoamingAppData;
+      break;
+    case KnownFolder::LOCALAPPDATA:
+      winKnowFolder = FOLDERID_LocalAppData;
+      break;
+    case KnownFolder::PICTURES:
+      winKnowFolder = FOLDERID_Pictures;
+      break;
+    default:
+      // Unreachable
+      return std::nullopt;
+      break;
+  }
+
+  LPWSTR lpwstr;
+  if (FAILED(SHGetKnownFolderPath(winKnowFolder, 0, NULL, &lpwstr)))
+  {
+    return std::nullopt;
+  }
+
+  std::wstring wstr = std::wstring(lpwstr);
+  CoTaskMemFree(lpwstr);
+  std::string folderVal = vtksys::Encoding::ToNarrow(wstr);
+  vtksys::SystemTools::ConvertToUnixSlashes(folderVal);
+  return folderVal;
+#else
+  return std::nullopt;
+#endif
 }
 
 //----------------------------------------------------------------------------
