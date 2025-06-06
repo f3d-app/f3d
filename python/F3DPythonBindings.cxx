@@ -220,7 +220,9 @@ PYBIND11_MODULE(pyf3d, module)
 
   utils //
     .def_static("text_distance", &f3d::utils::textDistance)
-    .def_static("collapse_path", &f3d::utils::collapsePath);
+    .def_static("collapse_path", &f3d::utils::collapsePath)
+    .def_static(
+      "glob_to_regex", &f3d::utils::globToRegex, py::arg("glob"), py::arg("path_separator") = '/');
 
   // f3d::interactor
   py::class_<f3d::interaction_bind_t> interaction_bind(module, "InteractionBind");
