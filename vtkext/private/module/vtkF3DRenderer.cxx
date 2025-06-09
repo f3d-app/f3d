@@ -2661,11 +2661,21 @@ void vtkF3DRenderer::ConfigureScalarBarActorForColoring(
 
   scalarBar->SetLookupTable(ctf);
   scalarBar->SetTitle(arrayName.c_str());
-  scalarBar->SetNumberOfLabels(4);
   scalarBar->SetOrientationToHorizontal();
   scalarBar->SetWidth(0.8);
   scalarBar->SetHeight(0.07);
   scalarBar->SetPosition(0.1, 0.01);
+  scalarBar->SetMaximumNumberOfColors(512);
+
+  if (this->ColormapDiscretization.has_value() && this->ColormapDiscretization.value() > 0 &&
+    this->ColormapDiscretization.value() <= 12)
+  {
+    scalarBar->SetNumberOfLabels(this->ColormapDiscretization.value() + 1);
+  }
+  else
+  {
+    scalarBar->SetNumberOfLabels(4);
+  }
 }
 
 //----------------------------------------------------------------------------
