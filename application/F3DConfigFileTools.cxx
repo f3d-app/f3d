@@ -119,7 +119,7 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
   }
 
   // Recover actual individual config file paths
-  std::set<fs::path> actualConfigFilePaths;
+  std::vector<fs::path> actualConfigFilePaths;
   for (auto configPath : configPaths)
   {
     // Recover an absolute canonical path to config file
@@ -136,16 +136,22 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
     // Recover all config files if needed in directories
     if (fs::is_directory(configPath))
     {
+      // directory_iterator is not ordered, enforce alphabetical ordering.
+      std::set<fs::path> orderedLocalConfigFilePaths;
       f3d::log::debug("Using config directory ", configPath.string());
       for (auto& entry : fs::directory_iterator(configPath))
       {
-        actualConfigFilePaths.emplace(entry);
+        orderedLocalConfigFilePaths.emplace(entry);
+      }
+      for (auto localConfigPath : orderedLocalConfigFilePaths)
+      {
+        actualConfigFilePaths.emplace_back(localConfigPath);
       }
     }
     else
     {
       f3d::log::debug("Using config file ", configPath.string());
-      actualConfigFilePaths.emplace(configPath);
+      actualConfigFilePaths.emplace_back(configPath);
     }
   }
 
