@@ -65,6 +65,27 @@ function(f3d_test)
     endif()
   endif()
 
+  # make tests w/ scalar-coloring sensitive to increase in max colors
+  set(_has_scalar_coloring FALSE)  
+  if(F3D_TEST_CONFIG) # checks for tests w/ complex config (sets scalar coloring)
+    if("${F3D_TEST_CONFIG}" MATCHES "complex")
+      set(_has_scalar_coloring TRUE) 
+    endif()
+  endif()
+  if(F3D_TEST_ARGS)   # checks for tests w/ scalar-coloring in args
+    foreach(_arg ${F3D_TEST_ARGS})
+      if(_arg STREQUAL "-s" OR _arg STREQUAL "--scalar-coloring")
+        set(_has_scalar_coloring TRUE)
+      elseif(_arg MATCHES "--reference-threshold=") # if threshold is set for whatever reason, don't override
+        set(_has_scalar_coloring FALSE)
+        break()
+      endif()
+    endforeach()
+  endif()
+  if(_has_scalar_coloring)
+    list(APPEND F3D_TEST_ARGS "--reference-threshold=0.0")
+  endif()
+
   add_test(NAME "f3d::${F3D_TEST_NAME}" COMMAND $<TARGET_FILE:f3d> ${F3D_TEST_ARGS} COMMAND_EXPAND_LISTS)
 
   set(_timeout "30")
