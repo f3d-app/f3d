@@ -49,7 +49,7 @@ reader* factory::getReader(const std::string& fileName, std::optional<std::strin
   {
     for (const auto& reader : plugin->getReaders())
     {
-      if (forceReader.has_value())
+      if (forceReader)
       {
         if (reader->getName() == *forceReader)
         {
