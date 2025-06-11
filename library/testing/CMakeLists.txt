@@ -180,6 +180,8 @@ if(F3D_MODULE_UI AND NOT F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS)
   set_tests_properties(libf3d::TestSDKInteractorCallBack PROPERTIES DISABLED ON)
 endif()
 
+set_tests_properties(libf3d::TestSDKUtils PROPERTIES ENVIRONMENT "F3D_TEST_ENV_STANDARD=TestEnv;F3D_TEST_ENV_EXTENDED=TestËnv;F3D_TEST_ENV_UTF8=🤔;")
+
 target_link_libraries(libf3dSDKTests libf3d ${libf3dSDKTests_link_libs})
 
 # make sure the libf3d API is compatible with the right C++ standard
