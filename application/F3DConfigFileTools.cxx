@@ -143,7 +143,7 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
       {
         orderedLocalConfigFilePaths.emplace(entry);
       }
-      for (auto localConfigPath : orderedLocalConfigFilePaths)
+      for (auto& localConfigPath : orderedLocalConfigFilePaths)
       {
         actualConfigFilePaths.emplace_back(localConfigPath);
       }
