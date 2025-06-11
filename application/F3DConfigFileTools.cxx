@@ -143,7 +143,8 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
       {
         orderedLocalConfigFilePaths.emplace(entry);
       }
-      std::copy(orderedLocalConfigFilePaths.begin(), orderedLocalConfigFilePaths.end(), std::back_inserter(actualConfigFilePaths));
+      std::copy(orderedLocalConfigFilePaths.begin(), orderedLocalConfigFilePaths.end(),
+        std::back_inserter(actualConfigFilePaths));
     }
     else
     {
