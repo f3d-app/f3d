@@ -1406,7 +1406,7 @@ if(NOT WIN32)
 
     # This tests the XDG_CONFIG_HOME is taken into account AND that config order between locations is respected
     file(COPY "${F3D_SOURCE_DIR}/testing/configs/02_home.json" DESTINATION "${CMAKE_BINARY_DIR}/share/a_home_config/f3d/config_build.d")
-    f3d_test(NAME TestXDG_CONFIG_HOME DATA suzanne.ply ARGS --verbose CONFIG config_build ENV "XDG_CONFIG_HOME=${CMAKE_BINARY_DIR}/share/a_home_config")
+    f3d_test(NAME TestXDG_CONFIG_HOME DATA suzanne.ply CONFIG config_build ENV "XDG_CONFIG_HOME=${CMAKE_BINARY_DIR}/share/a_home_config" UI)
 
     f3d_test(NAME TestXDG_CACHE_HOMECoverage DATA suzanne.ply NO_RENDER NO_BASELINE ENV "XDG_CACHE_HOME=${CMAKE_BINARY_DIR}")
 
