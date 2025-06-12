@@ -15,6 +15,7 @@ struct F3D_EXPORT camera_state_t
   point3_t focalPoint = { 0., 0., 0. };
   vector3_t viewUp = { 0., 1., 0. };
   angle_deg_t viewAngle = 30.;
+  angle_deg_t elevationAngle = 0.;
 };
 
 /**
@@ -46,6 +47,8 @@ public:
   virtual camera& setViewAngle(const angle_deg_t& angle) = 0;
   [[nodiscard]] virtual angle_deg_t getViewAngle() = 0;
   virtual void getViewAngle(angle_deg_t& angle) = 0;
+  virtual void setElevationAngle(camera_state_t& state, angle_deg_t& angle) = 0; // --- DiegoValdivia
+  [[nodiscard]] virtual angle_deg_t getElevationAngle(const camera_state_t& state) = 0; // --- DiegoValdivia
   virtual camera& setState(const camera_state_t& state) = 0;
   [[nodiscard]] virtual camera_state_t getState() = 0;
   virtual void getState(camera_state_t& state) = 0;

@@ -47,6 +47,8 @@ public:
   camera& setViewAngle(const angle_deg_t& angle) override;
   angle_deg_t getViewAngle() override;
   void getViewAngle(angle_deg_t& angle) override;
+  void setElevationAngle(camera_state_t& state, angle_deg_t& angle) override;
+  angle_deg_t getElevationAngle(const camera_state_t& state) override;
   camera& setState(const camera_state_t& state) override;
   camera_state_t getState() override;
   void getState(camera_state_t& state) override;
