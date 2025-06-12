@@ -136,15 +136,14 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
     // Recover all config files if needed in directories
     if (fs::is_directory(configPath))
     {
-      // directory_iterator is not ordered, enforce alphabetical ordering.
-      std::set<fs::path> orderedLocalConfigFilePaths;
       f3d::log::debug("Using config directory ", configPath.string());
+      const size_t oldSize = actualConfigFilePaths.size();
       for (auto& entry : fs::directory_iterator(configPath))
       {
-        orderedLocalConfigFilePaths.emplace(entry);
+        actualConfigFilePaths.emplace_back(entry);
       }
-      std::copy(orderedLocalConfigFilePaths.begin(), orderedLocalConfigFilePaths.end(),
-        std::back_inserter(actualConfigFilePaths));
+      // directory_iterator is not ordered, enforce alphabetical ordering for the added files.
+      std::sort(actualConfigFilePaths.begin() + oldSize, actualConfigFilePaths.end());
     }
     else
     {
