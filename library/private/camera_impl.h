@@ -79,6 +79,13 @@ public:
    */
   vtkCamera* GetVTKCamera();
 
+  /**
+   * Implementation only api.
+   * Orthogonalize view up even when the position->focal point vector and
+   * up vector have a cross product of 0.
+   */
+  void OrthogonalizeViewUp();
+
 private:
   class internals;
   std::unique_ptr<internals> Internals;
