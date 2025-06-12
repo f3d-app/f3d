@@ -24,7 +24,7 @@ f3d_plugin_declare_reader(
 
 f3d_plugin_declare_reader(
   NAME ExodusII
-  EXTENSIONS exo ex2 e
+  EXTENSIONS exo ex2 e g
   MIMETYPES application/vnd.exodus
   VTK_READER vtkExodusIIReader
   FORMAT_DESCRIPTION "Exodus II"

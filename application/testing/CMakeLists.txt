@@ -770,6 +770,9 @@ if(F3D_PLUGIN_BUILD_HDF)
   endif()
 
   f3d_test(NAME TestExodus DATA disk_out_ref.ex2 ARGS --load-plugins=hdf -s --camera-position=-11,-2,-49)
+  f3d_test(NAME TestExodusExo DATA box.exo ARGS --load-plugins=hdf NO_RENDER NO_BASELINE REGEXP "Number of points: 24")
+  f3d_test(NAME TestExodusG DATA box.g ARGS --load-plugins=hdf NO_RENDER NO_BASELINE REGEXP "Number of points: 24")
+  f3d_test(NAME TestExodusE DATA single_timestep.e ARGS --load-plugins=hdf NO_RENDER NO_BASELINE REGEXP "Number of points: 1331")
 
   f3d_test(NAME TestExodusConfig DATA disk_out_ref.ex2 CONFIG ${F3D_SOURCE_DIR}/testing/configs/exodus.json ARGS -s --camera-position=-11,-2,-49)
 
