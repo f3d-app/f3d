@@ -304,7 +304,7 @@ void camera_impl::OrthogonalizeViewUp()
   cam->OrthogonalizeViewUp();
   auto orthogonalizedUp = getViewUp();
   static constexpr double EPSILON = 128 * std::numeric_limits<double>::epsilon();
-  for (int i = 0; vtkMath::Norm(orthogonalizedUp.data()) < EPSILON && i < up.size(); i++)
+  for (size_t i = 0; vtkMath::Norm(orthogonalizedUp.data()) < EPSILON && i < up.size(); i++)
   {
     // find closest up vector that cam->OrthogonalizeViewUp() does not transform into a zero vector
     up[i] += EPSILON;
