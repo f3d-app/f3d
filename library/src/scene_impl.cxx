@@ -245,11 +245,6 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
     {
       if (forceReader)
       {
-        if (!reader->canRead(filePath.string()))
-        {
-          throw scene::load_failure_exception(
-            filePath.string() + " is not supported by the given forced reader " + (*forceReader));
-        }
         log::debug("Forcing reader ", (*forceReader), " for ", filePath.string());
       }
       else
