@@ -16,14 +16,16 @@
     }
   },
   {
-    "match": ".*(vti)",
+    "match-type": "glob",
+    "match": "*.vti",
     "options": {
       "grid": true,
       "volume": true
     }
   },
   {
-    "match": ".*(stl)",
+    "match-type": "glob",
+    "match": "*.stl",
     "options": {
       "grid": true,
       "up": "+Z",
