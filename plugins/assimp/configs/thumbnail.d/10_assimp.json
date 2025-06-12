@@ -1,7 +1,7 @@
 [
   {
     "match-type": "glob",
-    "match": ".*{fbx,dae,off,dxf,x,3mf}",
+    "match": "*.{fbx,dae,off,dxf,x,3mf}",
     "options": {
       "load-plugins": "assimp"
     }
