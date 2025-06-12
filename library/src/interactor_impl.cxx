@@ -175,9 +175,7 @@ public:
         axis = { +1, 0, 0 };
         break;
       case ViewType::VT_TOP:
-        // The model is prone to disappear when clicked and dragged to change perspective if axis =
-        // { 0, 0, +1 }
-        axis = { 0, +0.000001, +0.999999 };
+        axis = { 0, 0, +1 };
         up = { 0, -1, 0 };
         break;
       case ViewType::VT_ISOMETRIC:
@@ -195,7 +193,6 @@ public:
     /* set camera coordinates back */
     cam.setPosition(newPos);
     cam.setViewUp(up);
-
     cam.resetToBounds(0.9);
   }
 
@@ -1216,7 +1213,7 @@ interactor& interactor_impl::removeBinding(const interaction_bind_t& bind)
   // Look for the group of the removed bind
   std::string group;
   for (auto it = this->Internals->GroupedBinds.begin(); it != this->Internals->GroupedBinds.end();
-    it++)
+       it++)
   {
     if (it->second == bind)
     {
