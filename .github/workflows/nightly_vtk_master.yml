@@ -363,7 +363,10 @@ jobs:
       fail-fast: false
 
     runs-on: ubuntu-22.04
-    container: ghcr.io/f3d-app/f3d-wasm:${{needs.default_versions.outputs.timestamp}}_${{needs.check_nightly.outputs.vtk_sha}}
+    container: ghcr.io/f3d-app/f3d-wasm:${{needs.default_versions.outputs.timestamp}}_26ed83ed4a877ebf50a3a22d0f532015214263ca
+    # Will be fixed once VTK fixes wasm
+    # https://github.com/f3d-app/f3d/issues/2289
+    # container: ghcr.io/f3d-app/f3d-wasm:${{needs.default_versions.outputs.timestamp}}_${{needs.check_nightly.outputs.vtk_sha}}
 
     steps:
       - name: Checkout
