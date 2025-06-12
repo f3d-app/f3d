@@ -139,7 +139,8 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
       f3d::log::debug("Using config directory ", configPath.string());
       const size_t oldSize = actualConfigFilePaths.size();
       auto dirIter = fs::directory_iterator(configPath);
-      std::copy(std::filesystem::begin(dirIter), std::filesystem::end(dirIter), std::back_inserter(actualConfigFilePaths));
+      std::copy(std::filesystem::begin(dirIter), std::filesystem::end(dirIter),
+        std::back_inserter(actualConfigFilePaths));
       // directory_iterator is not ordered, enforce alphabetical ordering for the added files.
       std::sort(actualConfigFilePaths.begin() + oldSize, actualConfigFilePaths.end());
     }
