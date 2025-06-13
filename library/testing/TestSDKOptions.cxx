@@ -100,8 +100,7 @@ int TestSDKOptions(int argc, char* argv[])
 
   opt.set("scene.animation.indices", std::vector<int>{ 7, 3, 1 });
   test("set/get vector<int>",
-    std::get<std::vector<int>>(opt.get("scene.animation.indices")) ==
-      std::vector<int>{ 7, 3, 1 });
+    std::get<std::vector<int>>(opt.get("scene.animation.indices")) == std::vector<int>{ 7, 3, 1 });
 
   // Test double vector
   opt.setAsString("model.scivis.range", "0.7,1.4");
