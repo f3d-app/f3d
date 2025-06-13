@@ -220,6 +220,11 @@ public:
   void SetEmissiveFactor(const std::optional<std::vector<double>>& factors);
 
   /**
+   * Set the texture transform on all actors
+   */
+  void SetTexturesTransform(const std::optional<std::vector<double>>& transform);
+
+  /**
    * Set the opacity on all actors
    */
   void SetOpacity(const std::optional<double>& opacity);
@@ -506,6 +511,11 @@ private:
    */
   void ConfigureRangeAndCTFForColoring(const F3DColoringInfoHandler::ColoringInfo& info);
 
+  /**
+   * Convenience method to set texture transform in ConfigureActorsProperties()
+   */
+  void ConfigureActorTextureTransform(vtkActor* actorBase, const double* matrix);
+
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
 
   vtkNew<vtkActor> GridActor;
@@ -608,6 +618,7 @@ private:
   std::optional<double> NormalScale;
   std::optional<std::vector<double>> SurfaceColor;
   std::optional<std::vector<double>> EmissiveFactor;
+  std::optional<std::vector<double>> TexturesTransform;
   std::optional<fs::path> TextureMatCap;
   std::optional<fs::path> TextureBaseColor;
   std::optional<fs::path> TextureMaterial;

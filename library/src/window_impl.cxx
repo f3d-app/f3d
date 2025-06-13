@@ -480,6 +480,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetSurfaceColor(opt.model.color.rgb);
   renderer->SetOpacity(opt.model.color.opacity);
   renderer->SetTextureBaseColor(opt.model.color.texture);
+  renderer->SetTexturesTransform(opt.model.textures_transform);
   renderer->SetRoughness(opt.model.material.roughness);
   renderer->SetMetallic(opt.model.material.metallic);
   renderer->SetBaseIOR(opt.model.material.base_ior);
