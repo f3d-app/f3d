@@ -82,13 +82,13 @@ void animationManager::Initialize()
     this->ProgressWidget = nullptr;
   }
 
+  // Reset animation indices before updating
+  this->PreparedAnimationIndices.clear();
+  this->PrepareForAnimationIndices();
+
   if (this->AvailAnimations <= 0)
   {
     log::debug("No animation available");
-    if (this->Options.scene.animation.indices != std::vector<int>{ 0 })
-    {
-      log::warn("Animation indices have been specified but there are no animation available.");
-    }
     return;
   }
   else
@@ -100,10 +100,6 @@ void animationManager::Initialize()
   {
     log::debug(i, ": ", this->Importer->GetAnimationName(i));
   }
-
-  // Reset animation indices before updating
-  this->PreparedAnimationIndices.clear();
-  this->PrepareForAnimationIndices();
 
   bool autoplay = this->Options.scene.animation.autoplay;
   if (autoplay)
@@ -345,11 +341,49 @@ void animationManager::PrepareForAnimationIndices()
     std::iota(animIndices.begin(), animIndices.end(), 0);
   }
 
-  if (this->PreparedAnimationIndices == animIndices || this->AvailAnimations <= 0)
+  if (this->PreparedAnimationIndices == animIndices)
   {
-    // Already updated or no animation available
+    // Already updated
     return;
   }
+
+  // Do not warn at all if default or empty
+  if (!animIndices.empty() && animIndices != std::vector<int>{ 0 })
+  {
+    switch(this->Importer->GetAnimationSupportLevel())
+    {
+      case vtkImporter::AnimationSupportLevel::NONE:
+        log::warn("Animation indices have been specified but currently loaded file does not support animations.");
+        break;
+      case vtkImporter::AnimationSupportLevel::UNIQUE:
+        if (this->Options.scene.animation.indices[0] != 0 || this->Options.scene.animation.indices.size() > 0)
+        {
+          log::warn("Non-zero animation indices have been specified but currently loaded file does not support it. Enabling animation 0");
+          animIndices = {0};
+        }
+        break;
+      case vtkImporter::AnimationSupportLevel::SINGLE:
+        if (this->Options.scene.animation.indices.size() > 0)
+        {
+          log::warn("Multiple animation indices have been specified but currently loaded file does not support enabling multiple animations. Enabling animation: ", this->Options.scene.animation.indices[0]);
+          animIndices = {animIndices[0]};
+        }
+        break;
+    }
+  }
+
+  if (this->AvailAnimations <= 0)
+  {
+    if (animIndices != std::vector<int>{ 0 })
+    {
+      log::warn("Animation indices have been specified but there are no animation available.");
+    }
+ 
+    // No animation available
+    return;
+  }
+
+
 
   this->PreparedAnimationIndices = animIndices;
 
@@ -362,7 +396,7 @@ void animationManager::PrepareForAnimationIndices()
   // Enable the selected ones
   for (int idx : this->PreparedAnimationIndices)
   {
-    if (idx < 0 || idx >= this->AvailAnimations)
+    if (idx >= this->AvailAnimations)
     {
       log::warn("Specified animation index: ", idx, " is not in range [0, ", this->AvailAnimations,
         "], ignoring");
