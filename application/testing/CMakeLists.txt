@@ -253,7 +253,9 @@ f3d_test(NAME TestDefinesInexistent DATA dragon.vtu ARGS -Dscene.up_director=+Z 
 f3d_test(NAME TestConfigReset DATA suzanne.stl ARGS -Rrender.grid.enable --reset=ui.axis CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json)
 f3d_test(NAME TestConfigResetInexistent DATA suzanne.stl ARGS -Rrender.glid.enable REGEXP "option from CLI options does not exists" NO_BASELINE)
 f3d_test(NAME TestConfigImperative DATA dragon.vtu ARGS --axis=false CONFIG ${F3D_SOURCE_DIR}/testing/configs/imperative.json)
-f3d_test(NAME TestAnimationIndex DATA InterpolationTest.glb ARGS --animation-indices=7 --animation-time=0.5 --animation-progress)
+f3d_test(NAME TestAnimationIndicesSingle DATA InterpolationTest.glb ARGS --animation-indices=7 --animation-time=0.5 --animation-progress)
+f3d_test(NAME TestAnimationIndicesMulti DATA InterpolationTest.glb ARGS --animation-indices=7,6 --animation-time=0.5 --animation-progress)
+f3d_test(NAME TestAnimationIndexDeprecated DATA InterpolationTest.glb ARGS --animation-index=7 --animation-time=0.5 --animation-progress)
 f3d_test(NAME TestMultiFileAnimationIndex DATA InterpolationTest.glb BoxAnimated.gltf ARGS --animation-indices=9 --animation-time=0.85 --animation-progress --multi-file-mode=all)
 f3d_test(NAME TestMultiFileAnimationNoAnimationSupport DATA f3d.glb world.obj ARGS --multi-file-mode=all --animation-time=2 --animation-progress)
 f3d_test(NAME TestAnimationAutoplay DATA InterpolationTest.glb ARGS --animation-autoplay)
@@ -481,7 +483,7 @@ f3d_test(NAME TestAnimationAllAnimations DATA InterpolationTest.glb ARGS --anima
 f3d_test(NAME TestVerboseAnimation DATA InterpolationTest.glb ARGS --verbose NO_BASELINE REGEXP "7: CubicSpline Translation")
 
 # Test Animation index out of domain error
-f3d_test(NAME TestVerboseAnimationIndexError DATA InterpolationTest.glb ARGS --animation-indices=48 NO_BASELINE REGEXP "Specified animation index is greater than the highest possible animation index, enabling the first animation.")
+f3d_test(NAME TestVerboseAnimationIndexError DATA InterpolationTest.glb ARGS --animation-indices=48 NO_BASELINE REGEXP "Specified animation index: 48 is not in range")
 
 # Test interactive animation and speed factor
 f3d_test(NAME TestInteractionAnimation DATA f3d.glb ARGS --animation-progress INTERACTION)#Space;Wait;Space;
@@ -1128,7 +1130,7 @@ f3d_test(NAME TestVerboseMultiFileRender DATA mb REGEXP "An output image was sav
 f3d_test(NAME TestVerboseMultiFileCompare DATA mb REGEXP "Image comparison was performed using a single 3D file, other provided 3D files were ignored.")
 
 # Test Animation invalid code paths
-f3d_test(NAME TestVerboseAnimationIndexError2 DATA cow.vtp ARGS --animation-indices=1 --verbose REGEXP "An animation index has been specified but there are no animation available." NO_BASELINE)
+f3d_test(NAME TestVerboseAnimationIndexError2 DATA cow.vtp ARGS --animation-indices=1 --verbose REGEXP "Animation indices have been specified but there are no animation available." NO_BASELINE)
 f3d_test(NAME TestVerboseAnimationNoAnimationTime DATA cow.vtp ARGS --animation-time=2 --verbose REGEXP "No animation available, cannot load a specific animation time" NO_BASELINE)
 
 # Test Grid verbose output

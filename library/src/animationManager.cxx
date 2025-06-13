@@ -2,6 +2,7 @@
 
 #include "interactor_impl.h"
 #include "log.h"
+#include "macros.h"
 #include "options.h"
 #include "window_impl.h"
 
@@ -251,6 +252,18 @@ void animationManager::CycleAnimation()
     return;
   }
 
+  // F3D_DEPRECATED
+  // Remove this in the next major release
+  F3D_SILENT_WARNING_PUSH()
+  F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
+  if (this->Options.scene.animation.indices == std::vector<int>{0} && this->Options.scene.animation.index != 0)
+  {
+    log::warn("scene.animation.index is deprecated, please use "
+              "scene.animation.indices instead");
+    this->Options.scene.animation.indices = {this->Options.scene.animation.index};
+  }
+  F3D_SILENT_WARNING_POP()
+
   // If we started with multi animation, all animations or no animations
   // -1 means all animations
   if (this->Options.scene.animation.indices.size() != 1 || this->Options.scene.animation.indices[0] < 0)
@@ -306,14 +319,22 @@ void animationManager::PrepareForAnimationIndices()
 {
   assert(this->Importer);
 
-  std::cout<<"PrepareForAnimationIndices"<<std::endl;
-  std::cout<<this->Options.scene.animation.indices.size()<<std::endl;
-  std::cout<<this->PreparedAnimationIndices.size()<<std::endl;
-
   std::vector<int> animIndices = this->Options.scene.animation.indices;
 
+  // F3D_DEPRECATED
+  // Remove this in the next major release
+  F3D_SILENT_WARNING_PUSH()
+  F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
+  if (animIndices == std::vector<int>{0} && this->Options.scene.animation.index != 0)
+  {
+    log::warn("scene.animation.index is deprecated, please use "
+              "scene.animation.indices instead");
+    animIndices = {this->Options.scene.animation.index};
+  }
+  F3D_SILENT_WARNING_POP()
+
   // If it contains a negative value, all animations should be selected
-  if (std::any_of(this->Options.scene.animation.indices.begin(), this->Options.scene.animation.indices.end(), [](int idx) { return idx < 0; }))
+  if (std::any_of(animIndices.begin(), animIndices.end(), [](int idx) { return idx < 0; }))
   {
     animIndices.resize(this->AvailAnimations);
     std::iota(animIndices.begin(), animIndices.end(), 0);
