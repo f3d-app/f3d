@@ -48,11 +48,14 @@ public:
    */
   bool UpdateAtTimeValue(double timeValue) override;
 
-  /** 
+  /**
    * Get the level of animation support in this importer, which is always
    * AnimationSupportLevel::UNIQUE
    */
-  AnimationSupportLevel GetAnimationSupportLevel() override { return AnimationSupportLevel::UNIQUE; }
+  AnimationSupportLevel GetAnimationSupportLevel() override
+  {
+    return AnimationSupportLevel::UNIQUE;
+  }
 
   /**
    * Get the number of available animations.
