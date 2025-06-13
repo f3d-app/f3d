@@ -130,7 +130,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "anti-aliasing", "render.effect.antialiasing.enable" },
   { "anti-aliasing-mode", "render.effect.antialiasing.mode" },
   { "tone-mapping", "render.effect.tone_mapping" },
-  { "final-shader", "render.effect.final_shader" }, 
+  { "final-shader", "render.effect.final_shader" },
   { "textures-transform", "model.textures_transform" },
 };
 
