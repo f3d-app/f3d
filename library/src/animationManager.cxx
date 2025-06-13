@@ -84,11 +84,10 @@ void animationManager::Initialize()
   if (this->AvailAnimations <= 0)
   {
     log::debug("No animation available");
-    // TODO
-/*    if (this->Options.scene.animation.index > 0)
+    if (this->Options.scene.animation.indices != std::vector<int>{0})
     {
-      log::warn("An animation index has been specified but there are no animation available.");
-    }*/
+      log::warn("Animation indices have been specified but there are no animation available.");
+    }
     return;
   }
   else
@@ -252,15 +251,16 @@ void animationManager::CycleAnimation()
     return;
   }
 
-  // If we started with multi animation or all animations
-  if (this->Options.scene.animation.indices.size() > 1)
+  // If we started with multi animation, all animations or no animations
+  // -1 means all animations
+  if (this->Options.scene.animation.indices.size() != 1 || this->Options.scene.animation.indices[0] < 0)
   {
-    // Then disable animation
+    // Then select first animation
     this->Options.scene.animation.indices = {0};
   }
   else
   {
-    // If there was, then increment animation index
+    // If there was only one select, then increment animation index
     this->Options.scene.animation.indices[0]++;
 
     // If we reach/exceeded the last animation
@@ -309,13 +309,23 @@ void animationManager::PrepareForAnimationIndices()
   std::cout<<"PrepareForAnimationIndices"<<std::endl;
   std::cout<<this->Options.scene.animation.indices.size()<<std::endl;
   std::cout<<this->PreparedAnimationIndices.size()<<std::endl;
-  if (this->PreparedAnimationIndices == this->Options.scene.animation.indices || this->AvailAnimations <= 0)
+
+  std::vector<int> animIndices = this->Options.scene.animation.indices;
+
+  // If it contains a negative value, all animations should be selected
+  if (std::any_of(this->Options.scene.animation.indices.begin(), this->Options.scene.animation.indices.end(), [](int idx) { return idx < 0; }))
+  {
+    animIndices.resize(this->AvailAnimations);
+    std::iota(animIndices.begin(), animIndices.end(), 0);
+  }
+
+  if (this->PreparedAnimationIndices == animIndices || this->AvailAnimations <= 0)
   {
     // Already updated or no animation available
     return;
   }
 
-  this->PreparedAnimationIndices = this->Options.scene.animation.indices;
+  this->PreparedAnimationIndices = animIndices;
 
   // Disable all animations
   for (int idx = 0; idx < this->AvailAnimations; idx++)
