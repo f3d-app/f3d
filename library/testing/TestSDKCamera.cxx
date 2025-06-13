@@ -265,6 +265,46 @@ int TestSDKCamera(int argc, char* argv[])
     checkVec3(cam.getFocalPoint(), { 1, 2, 13 }, "foc after zoom");
     checkVec3(cam.getViewUp(), { 0, 1, 0 }, "up after zoom");
     checkDouble(cam.getViewAngle(), 25 / 1.5, "angle after zoom");
+
+    cam.setPosition({ 1, 0, 0 });
+    cam.setFocalPoint({ 0, 0, 0 });
+    cam.setViewUp({ 1, 0, 0 });
+    checkVec3(
+      cam.getPosition(), { 1, 0, 0 }, "pos when cross product of pos->foc and up is 0 - test 1");
+    checkVec3(
+      cam.getFocalPoint(), { 0, 0, 0 }, "foc when cross product of pos->foc and up is 0 - test 1");
+    checkVec3(
+      cam.getViewUp(), { 0, 1, 0 }, "up when cross product of pos->foc and up is 0 - test 1");
+
+    cam.setPosition({ 0, 1, 0 });
+    cam.setFocalPoint({ 0, 0, 0 });
+    cam.setViewUp({ 0, 1, 0 });
+    checkVec3(
+      cam.getPosition(), { 0, 1, 0 }, "pos when cross product of pos->foc and up is 0 - test 2");
+    checkVec3(
+      cam.getFocalPoint(), { 0, 0, 0 }, "foc when cross product of pos->foc and up is 0 - test 2");
+    checkVec3(
+      cam.getViewUp(), { 1, 0, 0 }, "up when cross product of pos->foc and up is 0 - test 2");
+
+    cam.setPosition({ 0, 0, 1 });
+    cam.setFocalPoint({ 0, 0, 0 });
+    cam.setViewUp({ 0, 0, 1 });
+    checkVec3(
+      cam.getPosition(), { 0, 0, 1 }, "pos when cross product of pos->foc and up is 0 - test 3");
+    checkVec3(
+      cam.getFocalPoint(), { 0, 0, 0 }, "foc when cross product of pos->foc and up is 0 - test 3");
+    checkVec3(
+      cam.getViewUp(), { 1, 0, 0 }, "up when cross product of pos->foc and up is 0 - test 3");
+
+    cam.setPosition({ 5, 0, 0 });
+    cam.setFocalPoint({ 1, 0, 0 });
+    cam.setViewUp({ 1, 0, 0 });
+    checkVec3(
+      cam.getPosition(), { 5, 0, 0 }, "pos when cross product of pos->foc and up is 0 - test 4");
+    checkVec3(
+      cam.getFocalPoint(), { 1, 0, 0 }, "foc when cross product of pos->foc and up is 0 - test 4");
+    checkVec3(
+      cam.getViewUp(), { 0, 1, 0 }, "up when cross product of pos->foc and up is 0 - test 4");
   }
   catch (testFailure& e)
   {
