@@ -85,7 +85,7 @@ void animationManager::Initialize()
   if (this->AvailAnimations <= 0)
   {
     log::debug("No animation available");
-    if (this->Options.scene.animation.indices != std::vector<int>{0})
+    if (this->Options.scene.animation.indices != std::vector<int>{ 0 })
     {
       log::warn("Animation indices have been specified but there are no animation available.");
     }
@@ -256,20 +256,22 @@ void animationManager::CycleAnimation()
   // Remove this in the next major release
   F3D_SILENT_WARNING_PUSH()
   F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
-  if (this->Options.scene.animation.indices == std::vector<int>{0} && this->Options.scene.animation.index != 0)
+  if (this->Options.scene.animation.indices == std::vector<int>{ 0 } &&
+    this->Options.scene.animation.index != 0)
   {
     log::warn("scene.animation.index is deprecated, please use "
               "scene.animation.indices instead");
-    this->Options.scene.animation.indices = {this->Options.scene.animation.index};
+    this->Options.scene.animation.indices = { this->Options.scene.animation.index };
   }
   F3D_SILENT_WARNING_POP()
 
   // If we started with multi animation, all animations or no animations
   // -1 means all animations
-  if (this->Options.scene.animation.indices.size() != 1 || this->Options.scene.animation.indices[0] < 0)
+  if (this->Options.scene.animation.indices.size() != 1 ||
+    this->Options.scene.animation.indices[0] < 0)
   {
     // Then select first animation
-    this->Options.scene.animation.indices = {0};
+    this->Options.scene.animation.indices = { 0 };
   }
   else
   {
@@ -281,7 +283,8 @@ void animationManager::CycleAnimation()
     {
       // Then select all
       this->Options.scene.animation.indices.resize(this->AvailAnimations);
-      std::iota(this->Options.scene.animation.indices.begin(), this->Options.scene.animation.indices.end(), 0);
+      std::iota(this->Options.scene.animation.indices.begin(),
+        this->Options.scene.animation.indices.end(), 0);
     }
   }
 
@@ -308,7 +311,9 @@ std::string animationManager::GetAnimationName()
     {
       animCheck[idx] = true;
     }
-    return std::none_of(animCheck.begin(), animCheck.end(), std::logical_not<bool>()) ? "All animations" : "Multi animations";
+    return std::none_of(animCheck.begin(), animCheck.end(), std::logical_not<bool>())
+      ? "All animations"
+      : "Multi animations";
   }
 
   return this->Importer->GetAnimationName(this->PreparedAnimationIndices[0]);
@@ -325,11 +330,11 @@ void animationManager::PrepareForAnimationIndices()
   // Remove this in the next major release
   F3D_SILENT_WARNING_PUSH()
   F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
-  if (animIndices == std::vector<int>{0} && this->Options.scene.animation.index != 0)
+  if (animIndices == std::vector<int>{ 0 } && this->Options.scene.animation.index != 0)
   {
     log::warn("scene.animation.index is deprecated, please use "
               "scene.animation.indices instead");
-    animIndices = {this->Options.scene.animation.index};
+    animIndices = { this->Options.scene.animation.index };
   }
   F3D_SILENT_WARNING_POP()
 
@@ -359,8 +364,8 @@ void animationManager::PrepareForAnimationIndices()
   {
     if (idx < 0 || idx >= this->AvailAnimations)
     {
-      log::warn(
-        "Specified animation index: ", idx , " is not in range [0, ", this->AvailAnimations, "], ignoring");
+      log::warn("Specified animation index: ", idx, " is not in range [0, ", this->AvailAnimations,
+        "], ignoring");
     }
     this->Importer->EnableAnimation(idx);
   }
