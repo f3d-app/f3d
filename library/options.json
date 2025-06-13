@@ -11,7 +11,8 @@
       },
       "index": {
         "type": "int",
-        "default_value": "0"
+        "default_value": "0",
+        "deprecated": "use scene.animation.indices instead"
       },
       "indices": {
         "type": "int_vector",
