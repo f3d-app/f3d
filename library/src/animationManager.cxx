@@ -423,10 +423,6 @@ std::pair<double, double> animationManager::GetTimeRange()
 //----------------------------------------------------------------------------
 int animationManager::GetNumberOfAvailableAnimations()
 {
-  // Make sure TimeRange is updated
-  this->PrepareForAnimationIndices();
-
-  // Return updated data
   return this->AvailAnimations;
 }
 }

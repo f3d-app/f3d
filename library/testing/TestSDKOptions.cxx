@@ -88,6 +88,21 @@ int TestSDKOptions(int argc, char* argv[])
   test(
     "set/get path", std::get<std::string>(opt.get("render.hdri.file")) == "/path/to/test/variant");
 
+  // Test int vector
+  opt.setAsString("scene.animation.indices", "1,2");
+  test("setAsString vector<int>", opt.getAsString("scene.animation.indices") == "1,2");
+
+  opt.setAsString("scene.animation.indices", "3, 7");
+  test("setAsString spaces vector<int>", opt.getAsString("scene.animation.indices") == "3,7");
+
+  opt.model.scivis.range = { 4, 12 };
+  test("getAsString vector<int>", opt.getAsString("scene.animation.indices") == "4,12");
+
+  opt.set("scene.animation.indices", std::vector<int>{ 7, 3, 1 });
+  test("set/get vector<int>",
+    std::get<std::vector<int>>(opt.get("scene.animation.indices")) ==
+      std::vector<int>{ 7, 3, 1 });
+
   // Test double vector
   opt.setAsString("model.scivis.range", "0.7,1.4");
   test("setAsString vector<double>", opt.getAsString("model.scivis.range") == "0.7,1.4");
