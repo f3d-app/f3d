@@ -312,6 +312,21 @@ std::string vtkF3DMetaImporter::GetOutputsDescription()
 }
 
 //----------------------------------------------------------------------------
+vtkImporter::AnimationSupportLevel vtkF3DMetaImporter::GetAnimationSupportLevel()
+{
+/*  return std::accumulate(this->Pimpl->Importers.begin(), this->Pimpl->Importers.end(), 0,
+    [](AnimationSupportLevel a, const auto& importerPair)
+    {
+      AnimationSupportLevel level = importerPair.Importer->GetAnimationSupportLevel();
+      a = a == AnimationSupportLevel::NONE ? level : AnimationSupportLevel::MULTI;
+      return a;
+    });*/
+    // TODO
+    return vtkImporter::AnimationSupportLevel::MULTI;
+}
+
+
+//----------------------------------------------------------------------------
 vtkIdType vtkF3DMetaImporter::GetNumberOfAnimations()
 {
   // Importer->GetNumberOfAnimations() can be -1 if animation support is not implemented in the
