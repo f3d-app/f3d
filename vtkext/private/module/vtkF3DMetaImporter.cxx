@@ -314,15 +314,105 @@ std::string vtkF3DMetaImporter::GetOutputsDescription()
 //----------------------------------------------------------------------------
 vtkImporter::AnimationSupportLevel vtkF3DMetaImporter::GetAnimationSupportLevel()
 {
-  /*  return std::accumulate(this->Pimpl->Importers.begin(), this->Pimpl->Importers.end(), 0,
-      [](AnimationSupportLevel a, const auto& importerPair)
-      {
-        AnimationSupportLevel level = importerPair.Importer->GetAnimationSupportLevel();
-        a = a == AnimationSupportLevel::NONE ? level : AnimationSupportLevel::MULTI;
-        return a;
-      });*/
-  // TODO
-  return vtkImporter::AnimationSupportLevel::MULTI;
+  vtkImporter::AnimationSupportLevel levelAccum = vtkImporter::AnimationSupportLevel::NONE;
+  for (const auto& importerPair : this->Pimpl->Importers)
+  {
+    AnimationSupportLevel level = importerPair.Importer->GetAnimationSupportLevel();
+    switch(level)
+    {
+      case vtkImporter::AnimationSupportLevel::NONE:
+        /*
+        switch(levelAccum)
+        {
+          case vtkImporter::AnimationSupportLevel::NONE:
+            levelAccum = vtkImporter::AnimationSupportLevel::NONE;
+            break;
+          case vtkImporter::AnimationSupportLevel::UNIQUE:
+            levelAccum = vtkImporter::AnimationSupportLevel::UNIQUE;
+            break;
+          case vtkImporter::AnimationSupportLevel::SINGLE:
+            levelAccum = vtkImporter::AnimationSupportLevel::SINGLE;
+            break;
+          case vtkImporter::AnimationSupportLevel::MULTI:
+            levelAccum = vtkImporter::AnimationSupportLevel::MULTI;
+            break;
+        }
+        */ // Nothing to do
+        break;
+      case vtkImporter::AnimationSupportLevel::UNIQUE:
+        /*
+        switch(levelAccum)
+        {
+          case vtkImporter::AnimationSupportLevel::NONE:
+            levelAccum = vtkImporter::AnimationSupportLevel::UNIQUE;
+            break;
+          case vtkImporter::AnimationSupportLevel::UNIQUE:
+            levelAccum = vtkImporter::AnimationSupportLevel::MULTI;
+            break;
+          case vtkImporter::AnimationSupportLevel::SINGLE:
+            levelAccum = vtkImporter::AnimationSupportLevel::SINGLE;
+            break;
+          case vtkImporter::AnimationSupportLevel::MULTI:
+            levelAccum = vtkImporter::AnimationSupportLevel::MULTI;
+            break;
+        }
+        */
+
+        switch(levelAccum)
+        {
+          case vtkImporter::AnimationSupportLevel::NONE:
+            levelAccum = vtkImporter::AnimationSupportLevel::UNIQUE;
+            break;
+          case vtkImporter::AnimationSupportLevel::UNIQUE:
+            levelAccum = vtkImporter::AnimationSupportLevel::MULTI;
+            break;
+          default:
+            break;
+        }
+        break;
+      case vtkImporter::AnimationSupportLevel::SINGLE:
+/*
+        switch(levelAccum)
+        {
+          case vtkImporter::AnimationSupportLevel::NONE:
+            levelAccum = vtkImporter::AnimationSupportLevel::SINGLE;
+            break;
+          case vtkImporter::AnimationSupportLevel::UNIQUE:
+            levelAccum = vtkImporter::AnimationSupportLevel::SINGLE;
+            break;
+          case vtkImporter::AnimationSupportLevel::SINGLE:
+            levelAccum = vtkImporter::AnimationSupportLevel::SINGLE;
+            break;
+          case vtkImporter::AnimationSupportLevel::MULTI:
+            levelAccum = vtkImporter::AnimationSupportLevel::SINGLE;
+            break;
+        }*/
+
+        levelAccum = vtkImporter::AnimationSupportLevel::SINGLE;
+        break;
+      case vtkImporter::AnimationSupportLevel::MULTI:
+        /*
+        switch(levelAccum)
+        {
+          case vtkImporter::AnimationSupportLevel::NONE:
+            levelAccum = vtkImporter::AnimationSupportLevel::MULTI;
+            break;
+          case vtkImporter::AnimationSupportLevel::UNIQUE:
+            levelAccum = vtkImporter::AnimationSupportLevel::MULTI;
+            break;
+          case vtkImporter::AnimationSupportLevel::SINGLE:
+            levelAccum = vtkImporter::AnimationSupportLevel::SINGLE;
+            break;
+          case vtkImporter::AnimationSupportLevel::MULTI:
+            levelAccum = vtkImporter::AnimationSupportLevel::MULTI;
+            break;
+        }
+        */
+        levelAccum = levelAccum == vtkImporter::AnimationSupportLevel::SINGLE ? vtkImporter::AnimationSupportLevel::SINGLE : vtkImporter::AnimationSupportLevel::MULTI;
+        break;
+    }
+  }
+  return levelAccum;
 }
 
 //----------------------------------------------------------------------------
