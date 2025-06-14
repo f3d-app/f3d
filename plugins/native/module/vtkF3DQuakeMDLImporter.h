@@ -34,9 +34,9 @@ public:
    * Get the level of animation support in this importer, which is always
    * AnimationSupportLevel::SINGLE
    */
-  AnimationSupportLevel GetAnimationSupportLevel() override
+  vtkImporter::AnimationSupportLevel GetAnimationSupportLevel() override
   {
-    return AnimationSupportLevel::SINGLE;
+    return vtkImporter::AnimationSupportLevel::SINGLE;
   }
 
   /**
