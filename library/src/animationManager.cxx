@@ -189,7 +189,10 @@ bool animationManager::LoadAtTime(double timeValue)
   this->PrepareForAnimationIndices();
   if (this->PreparedAnimationIndices.empty())
   {
-    log::warn("No animation available, cannot load a specific animation time");
+    if (this->AvailAnimations == 0)
+    {
+      log::warn("No animation available, cannot load a specific animation time");
+    }
     return false;
   }
 
@@ -261,26 +264,40 @@ void animationManager::CycleAnimation()
   }
   F3D_SILENT_WARNING_POP()
 
-  // If we started with multi animation, all animations or no animations
-  // -1 means all animations
-  if (this->Options.scene.animation.indices.size() != 1 ||
-    this->Options.scene.animation.indices[0] < 0)
+  // If we started with multi animation or all animations (any negative value means all animations)
+  bool negative = std::any_of(this->Options.scene.animation.indices.begin(), this->Options.scene.animation.indices.end(), [](int idx) { return idx < 0; });
+  if (this->Options.scene.animation.indices.size() > 1 || negative)
   {
-    // Then select first animation
+    // Then select no animation
+    this->Options.scene.animation.indices.clear();
+  }
+  // If no animation selected
+  else if (this->Options.scene.animation.indices.empty())
+  {
+    // Select the first one
     this->Options.scene.animation.indices = { 0 };
   }
   else
   {
-    // If there was only one select, then increment animation index
+    // If there was only one animation selected, then increment animation index
     this->Options.scene.animation.indices[0]++;
 
     // If we reach/exceeded the last animation
     if (this->Options.scene.animation.indices[0] >= this->AvailAnimations)
     {
-      // Then select all
-      this->Options.scene.animation.indices.resize(this->AvailAnimations);
-      std::iota(this->Options.scene.animation.indices.begin(),
-        this->Options.scene.animation.indices.end(), 0);
+      // If importer support multi animations
+      if (this->Importer->GetAnimationSupportLevel() == vtkImporter::AnimationSupportLevel::MULTI)
+      {
+        // Then select all
+        this->Options.scene.animation.indices.resize(this->AvailAnimations);
+        std::iota(this->Options.scene.animation.indices.begin(),
+                  this->Options.scene.animation.indices.end(), 0);
+      }
+      else
+      {
+        // If not, select none
+        this->Options.scene.animation.indices.clear();
+      }
     }
   }
 
@@ -305,7 +322,10 @@ std::string animationManager::GetAnimationName()
     std::vector<bool> animCheck(this->AvailAnimations, false);
     for (int idx : this->PreparedAnimationIndices)
     {
-      animCheck[idx] = true;
+      if (idx < this->AvailAnimations)
+      {
+        animCheck[idx] = true;
+      }
     }
     return std::none_of(animCheck.begin(), animCheck.end(), std::logical_not<bool>())
       ? "All animations"
@@ -337,6 +357,11 @@ void animationManager::PrepareForAnimationIndices()
   // If it contains a negative value, all animations should be selected
   if (std::any_of(animIndices.begin(), animIndices.end(), [](int idx) { return idx < 0; }))
   {
+    if (animIndices.size() > 1)
+    {
+      log::warn("Multiple animation indices have been specified include a negative one, all animations will be selected");
+    }
+
     animIndices.resize(this->AvailAnimations);
     std::iota(animIndices.begin(), animIndices.end(), 0);
   }
@@ -358,21 +383,20 @@ void animationManager::PrepareForAnimationIndices()
         break;
       case vtkImporter::AnimationSupportLevel::UNIQUE:
         if (this->Options.scene.animation.indices[0] != 0 ||
-          this->Options.scene.animation.indices.size() > 0)
+          this->Options.scene.animation.indices.size() > 1)
         {
-          log::warn("Non-zero animation indices have been specified but currently loaded file does "
-                    "not support it. Enabling animation 0");
-          animIndices = { 0 };
+          log::warn("Non-zero animation indices have been specified but currently loaded file does not support it.");
         }
         break;
       case vtkImporter::AnimationSupportLevel::SINGLE:
-        if (this->Options.scene.animation.indices.size() > 0)
+        if (this->Options.scene.animation.indices.size() > 1)
         {
           log::warn("Multiple animation indices have been specified but currently loaded file does "
                     "not support enabling multiple animations. Enabling animation: ",
-            this->Options.scene.animation.indices[0]);
-          animIndices = { animIndices[0] };
+            animIndices[animIndices.size() - 1]);
         }
+        break;
+      default:
         break;
     }
   }
@@ -401,7 +425,7 @@ void animationManager::PrepareForAnimationIndices()
   {
     if (idx >= this->AvailAnimations)
     {
-      log::warn("Specified animation index: ", idx, " is not in range [0, ", this->AvailAnimations,
+      log::warn("Specified animation index: ", idx, " is not in range [0, ", this->AvailAnimations - 1,
         "], ignoring");
     }
     this->Importer->EnableAnimation(idx);
