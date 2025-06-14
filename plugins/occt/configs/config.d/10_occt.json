@@ -1,6 +1,7 @@
 [
   {
-    "match": ".*(step|stp|iges|igs|brep|xbf)",
+    "match-type": "glob",
+    "match": "*.{step,stp,iges,igs,brep,xbf}",
     "options": {
       "scalar-coloring": true,
       "load-plugins": "occt",

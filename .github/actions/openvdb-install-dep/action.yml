@@ -1,18 +1,17 @@
-name: 'Install OpenVDB Dependency'
-description: 'Install OpenVDB Dependency using cache when possible'
+name: "Install OpenVDB Dependency"
+description: "Install OpenVDB Dependency using cache when possible"
 inputs:
   cpu:
-    description: 'CPU architecture to build for'
+    description: "CPU architecture to build for"
     required: false
-    default: 'x86_64'
+    default: "x86_64"
   version:
-    description: 'Version of openvdb to build'
+    description: "Version of openvdb to build"
     required: true
 
 runs:
   using: "composite"
   steps:
-
     - name: Check required inputs
       shell: bash
       run: |
@@ -31,7 +30,7 @@ runs:
       uses: actions/checkout@v4
       with:
         repository: AcademySoftwareFoundation/openvdb
-        path: './dependencies/openvdb'
+        path: "./dependencies/openvdb"
         ref: ${{inputs.version}}
 
     - name: Setup OpenVDB

@@ -161,7 +161,20 @@ f3d_test(NAME TestVTM DATA mb.vtm)
 f3d_test(NAME TestVTK DATA cow.vtk)
 f3d_test(NAME TestNRRD DATA beach.nrrd ARGS -s)
 f3d_test(NAME TestSPLAT DATA small.splat ARGS -osy --up=-Y --point-sprites-size=1)
-f3d_test(NAME TestQuakeMDL DATA soldier.mdl ARGS --animation-index=2 --animation-time=0.1)
+f3d_test(NAME TestQuakeMDL DATA zombie.mdl)
+f3d_test(NAME TestQuakeMDLAnimationSimpleFrame DATA zombie.mdl ARGS --animation-time=0.5)
+f3d_test(NAME TestQuakeMDLAnimationBetween DATA zombie.mdl ARGS --animation-time=1.42)
+f3d_test(NAME TestQuakeMDLAnimationMulti DATA soldier_animations.mdl ARGS --animation-index=2 --animation-time=0.5)
+f3d_test(NAME TestQuakeMDLAnimationGroupFrame DATA flame_mixed.mdl ARGS --animation-index=1 --animation-time=0.5)
+f3d_test(NAME TestQuakeMDLDisableAnimation DATA zombie.mdl soldier_animations.mdl ARGS --multi-file-mode=all --animation-time=0.5)
+f3d_test(NAME TestQuakeMDLSkinIndex DATA armor.mdl ARGS -DQuakeMDL.skin_index=2)
+f3d_test(NAME TestQuakeMDLSkinIndexNegative DATA armor.mdl ARGS -DQuakeMDL.skin_index=-1)
+f3d_test(NAME TestQuakeMDLSkinIndexNonInteger DATA armor.mdl ARGS -DQuakeMDL.skin_index=1.5)
+f3d_test(NAME TestQuakeMDLSkinIndexOutOfBounds DATA armor.mdl ARGS -DQuakeMDL.skin_index=4)
+f3d_test(NAME TestQuakeMDLSkinIndexOverflow DATA armor.mdl ARGS -DQuakeMDL.skin_index=9223372036854775808)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
+  f3d_test(NAME TestQuakeMDLActorCollection DATA zombie.mdl ARGS --scalar-coloring)
+endif()
 f3d_test(NAME TestGridX DATA suzanne.ply ARGS -g --up=+X)
 f3d_test(NAME TestGridY DATA suzanne.ply ARGS -g --up=+Y)
 f3d_test(NAME TestGridZ DATA suzanne.ply ARGS -g --up=+Z)
@@ -199,6 +212,7 @@ f3d_test(NAME TestGridWithDepthPeeling DATA suzanne.ply ARGS -gp --opacity=0.2)
 f3d_test(NAME TestFilename DATA suzanne.ply ARGS -n UI)
 f3d_test(NAME TestFilenameWhiteBg DATA suzanne.ply ARGS -n --background-color=1,1,1 UI)
 f3d_test(NAME TestConsoleBadgeWarning DATA suzanne.ply ARGS --position=0 UI)
+f3d_test(NAME TestConsoleBadgeQuiet DATA suzanne.ply ARGS --position=0 --verbose=quiet UI)
 f3d_test(NAME TestCityGML DATA Part-4-Buildings-V4-one.gml)
 f3d_test(NAME TestPTS DATA samplePTS.pts)
 f3d_test(NAME TestColormap DATA IM-0001-1983.dcm ARGS --scalar-coloring --roughness=1 --colormap=0,1,0,0,1,0,1,0)
@@ -223,6 +237,7 @@ f3d_test(NAME TestTextures DATA WaterBottle.glb ARGS --texture-material=${F3D_SO
 f3d_test(NAME TestMetaDataImporter DATA BoxAnimated.gltf ARGS -m UI)
 f3d_test(NAME TestMultiblockMetaData DATA mb.vtm ARGS -m UI)
 f3d_test(NAME TestMultiFileMetaData DATA mb/recursive ARGS -m --multi-file-mode=all UI)
+f3d_test(NAME TestMultiFileModeDir DATA mb ARGS -n --multi-file-mode=dir UI)
 f3d_test(NAME TestTIFF DATA f3d.tif ARGS -sy --up=-Y)
 f3d_test(NAME TestLightIntensityBrighter DATA cow.vtp ARGS --light-intensity=5.0)
 f3d_test(NAME TestLightIntensityDarker DATA cow.vtp ARGS --light-intensity=0.2)
@@ -270,6 +285,15 @@ f3d_test(NAME TestConfigOrder DATA suzanne.ply ARGS CONFIG ${F3D_SOURCE_DIR}/tes
 f3d_test(NAME TestOutputStream DATA suzanne.ply ARGS --verbose=quiet --output=- REGEXP "^.PNG" NO_BASELINE NO_OUTPUT)
 f3d_test(NAME TestOutputStreamInfo DATA suzanne.ply ARGS --verbose=info --output=- REGEXP "redirected to stderr" NO_BASELINE NO_OUTPUT)
 f3d_test(NAME TestInvalidAntiAliasingMode DATA suzanne.ply ARGS -a --anti-aliasing-mode=foo REGEXP "foo is an invalid antialiasing mode" NO_BASELINE)
+f3d_test(NAME TestUserMatrixColoring DATA InterpolationTest.glb ARGS --scalar-coloring --coloring-array=TEXCOORD_0)
+f3d_test(NAME TestSkinColoring DATA SimpleSkin.gltf ARGS --scalar-coloring --coloring-array=WEIGHTS_0)
+f3d_test(NAME TestMorphColoring DATA SimpleMorph.gltf ARGS --scalar-coloring)
+f3d_test(NAME TestAnimationUserMatrixColoring DATA InterpolationTest.glb ARGS --scalar-coloring --coloring-array=TEXCOORD_0 --animation-time=0.5)
+f3d_test(NAME TestAnimationSkinColoring DATA SimpleSkin.gltf ARGS --scalar-coloring --coloring-array=WEIGHTS_0 --animation-time=2)
+f3d_test(NAME TestAnimationMorphColoring DATA SimpleMorph.gltf ARGS --scalar-coloring --animation-time=0.5)
+f3d_test(NAME TestAnimationInputChangeColoring DATA v_rock2.mdl ARGS --scalar-coloring --animation-time=0.01 --animation-index=1)
+f3d_test(NAME TestAnimationUserMatrixPointSprites DATA BoxAnimated.gltf ARGS --point-sprites --point-sprites-size=50 --animation-time=2)
+f3d_test(NAME TestAnimationInputChangePointSprites DATA v_rock2.mdl ARGS --point-sprites --point-sprites-size=50 --animation-time=0.01 --animation-index=1)
 
 # Color map files testing
 f3d_test(NAME TestColorMapFileFullPath DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis8.png --scalar-coloring --coloring-component=1)
@@ -279,6 +303,8 @@ f3d_test(NAME TestColorMapGrayscale DATA dragon.vtu ARGS --colormap-file=${F3D_S
 f3d_test(NAME TestColorMapMore1pxWarning DATA dragon.vtu ARGS --verbose=warning --colormap-file=${F3D_SOURCE_DIR}/testing/data/16bit.png --scalar-coloring REGEXP "The specified color map height is not equal to 1" NO_BASELINE)
 f3d_test(NAME TestColorMap16bits DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis16.png --scalar-coloring --coloring-component=1)
 f3d_test(NAME TestColorMap32bits DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis32.hdr --scalar-coloring --coloring-component=1)
+f3d_test(NAME TestColorDiscretization DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis32.hdr --scalar-coloring --coloring-component=1 --colormap-discretization=4)
+
 if(NOT F3D_MACOS_BUNDLE)
   file(COPY "${F3D_SOURCE_DIR}/resources/colormaps/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/colormaps")
   f3d_test(NAME TestColorMapStem DATA dragon.vtu ARGS --colormap-file=magma --scalar-coloring --coloring-component=1)
@@ -307,9 +333,18 @@ cmake_path(SET _screenshot_path ${CMAKE_BINARY_DIR}/Testing/Temporary/ss)
 cmake_path(SET _screenshot_user_path ${_screenshot_path}/user)
 cmake_path(NATIVE_PATH _screenshot_path _screenshot_dir)
 cmake_path(NATIVE_PATH _screenshot_user_path _screenshot_user_dir)
-add_test(NAME f3d::TestClearScreenshots COMMAND ${CMAKE_COMMAND} -E remove_directory ${_screenshot_dir})
-add_test(NAME f3d::TestSetupScreenshots COMMAND ${CMAKE_COMMAND} -E make_directory ${_screenshot_user_dir})
+
+add_test(NAME f3d::TestClearScreenshots COMMAND ${CMAKE_COMMAND} -E remove_directory "${_screenshot_dir}")
 set_tests_properties(f3d::TestClearScreenshots PROPERTIES FIXTURES_SETUP f3d::TestClearScreenshots_FIXTURE)
+
+if(WIN32)
+  cmake_path(SET _screenshot_windows_pictures_dir "${_screenshot_user_dir}/Pictures")
+  cmake_path(NATIVE_PATH _screenshot_windows_pictures_dir _screenshot_windows_pictures_dir)
+  # AppData/Local is required because on Windows changing USERPROFILE also impacts the cache location
+  add_test(NAME f3d::TestSetupScreenshots COMMAND ${CMAKE_COMMAND} -E make_directory "${_screenshot_windows_pictures_dir}" -E make_directory "${_screenshot_user_dir}/AppData/Local")
+else()
+  add_test(NAME f3d::TestSetupScreenshots COMMAND ${CMAKE_COMMAND} -E make_directory "${_screenshot_user_dir}")
+endif()
 set_tests_properties(f3d::TestSetupScreenshots PROPERTIES FIXTURES_REQUIRED f3d::TestClearScreenshots_FIXTURE)
 
 f3d_ss_test(NAME Version TEMPLATE ${_screenshot_dir}/{app}_{version}_{version_full}.png EXPECTED ${_screenshot_dir}/${PROJECT_NAME}_${F3D_VERSION}_${F3D_VERSION_FULL}.png)
@@ -321,7 +356,11 @@ f3d_ss_template_test(NAME InvalidFormats TEMPLATE ${_screenshot_dir}/{model}_{da
 f3d_ss_test(NAME Esc TEMPLATE ${_screenshot_dir}/{model}_{{model}}_{}.png EXPECTED ${_screenshot_dir}/suzanne_{model}_{}.png)
 f3d_ss_test(NAME Minimal MINIMAL TEMPLATE ${_screenshot_dir}/minimal.png EXPECTED ${_screenshot_dir}/minimal.png)
 
+if(WIN32)
+f3d_ss_test(NAME UserModelN TEMPLATE {model}_{n}.png EXPECTED ${_screenshot_windows_pictures_dir}/suzanne_1.png)
+else()
 f3d_ss_test(NAME UserModelN TEMPLATE {model}_{n}.png EXPECTED ${_screenshot_user_dir}/suzanne_1.png)
+endif()
 set_tests_properties(f3d::TestScreenshotUserModelN PROPERTIES ENVIRONMENT "XDG_PICTURES_DIR=${_screenshot_user_dir};HOME=${_screenshot_user_dir};USERPROFILE=${_screenshot_user_dir}")
 
 if(NOT APPLE OR VTK_VERSION VERSION_GREATER_EQUAL 9.3.0)
@@ -349,6 +388,19 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240203)
     f3d_test(NAME Test3DGaussiansSplatting DATA small.splat ARGS -osy --up=-Y --point-sprites-size=1 --point-sprites-type=gaussian --camera-position=-3.6,0.5,-4.2)
     f3d_test(NAME TestDefaultConfigFileSPLAT DATA small.splat CONFIG config_build LONG_TIMEOUT UI)
     f3d_test(NAME TestThumbnailConfigFileSPLAT DATA small.splat CONFIG thumbnail_build LONG_TIMEOUT)
+
+    f3d_test(NAME TestSPZDegree0 DATA hornedlizard_small_d0.spz ARGS -osy --point-sprites-size=1 --point-sprites-type=gaussian --camera-position=-3.6,0.5,4.2)
+    f3d_test(NAME TestInvalidSH DATA invalidSH.vtp ARGS -osy --verbose REGEXP "Spherical harmonics array is not valid" NO_BASELINE)
+
+    # Needs texture array support: https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12112
+    if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250513)
+      f3d_test(NAME TestSPZDegree1 DATA hornedlizard_small_d1.spz ARGS -osy --point-sprites-size=1 --point-sprites-type=gaussian --camera-position=-3.6,0.5,4.2)
+      f3d_test(NAME TestSPZDegree2 DATA hornedlizard_small_d2.spz ARGS -osy --point-sprites-size=1 --point-sprites-type=gaussian --camera-position=-3.6,0.5,4.2)
+      f3d_test(NAME TestSPZDegree3 DATA hornedlizard_small_d3.spz ARGS -osy --point-sprites-size=1 --point-sprites-type=gaussian --camera-position=-3.6,0.5,4.2)
+
+      f3d_test(NAME TestDefaultConfigFileSPZ DATA hornedlizard_small_d3.spz CONFIG config_build LONG_TIMEOUT UI)
+      f3d_test(NAME TestThumbnailConfigFileSPZ DATA hornedlizard_small_d3.spz CONFIG thumbnail_build LONG_TIMEOUT)
+    endif()
   endif()
 endif()
 
@@ -413,6 +465,8 @@ endif()
 f3d_test(NAME TestGLTFImporterUnlit DATA UnlitTest.glb)
 f3d_test(NAME TestMaterial DATA suzanne.ply ARGS --color=0.72,0.45,0.2 --metallic=0.7 --roughness=0.2)
 f3d_test(NAME TestMaterialFullScene DATA WaterBottle.glb ARGS --color=0.9,0.1,0.1 --metallic=0.7 --roughness=0.2)
+f3d_test(NAME TestMinBaseIOR DATA suzanne.ply ARGS --base-ior=1.0)
+f3d_test(NAME TestMaxBaseIOR DATA suzanne.ply ARGS --base-ior=2.5)
 f3d_test(NAME TestMetaData DATA pdiag.vtu ARGS -m UI)
 f3d_test(NAME TestEdges DATA suzanne.ply ARGS -e)
 f3d_test(NAME TestLineWidth DATA cow.vtk ARGS -e --line-width=5)
@@ -437,9 +491,20 @@ f3d_test(NAME TestInteractionAnimationFrameRate DATA f3d.glb ARGS --animation-pr
 f3d_test(NAME TestInteractionAnimationCameraMovement DATA CameraAnimated.glb ARGS --camera-index=0 --animation-progress INTERACTION)#Space;MouseMovement;Space;
 f3d_test(NAME TestInteractionAnimationInvert DATA f3d.glb ARGS --animation-speed-factor=-1 --animation-progress INTERACTION)#Space;Wait;Space;
 
+# Test scrolling cheatsheet with no model by mouse wheel and by using scrollbar
+f3d_test(NAME TestInteractionNoModelScrollWheel RESOLUTION 1000,600 NO_DATA_FORCE_RENDER INTERACTION UI)
+f3d_test(NAME TestInteractionNoModelScrollBar RESOLUTION 1000,600 NO_DATA_FORCE_RENDER INTERACTION UI)
+
 # A verbose test that needs animation index support
 f3d_test(NAME TestVerboseAnimationWrongAnimationTimeHigh DATA BoxAnimated.gltf ARGS --animation-time=10 --verbose REGEXP "Animation time 10 is outside of range \\[0, 3\\.70833\\], using 3\\.70833" NO_BASELINE)
 f3d_test(NAME TestVerboseAnimationWrongAnimationTimeLow DATA BoxAnimated.gltf ARGS --animation-time=-5 --verbose REGEXP "Animation time -5 is outside of range \\[0, 3\\.70833\\], using 0" NO_BASELINE)
+
+# Verbose test for animation
+f3d_test(NAME TestVerboseAnimationTimeRange DATA InterpolationTest.glb ARGS --verbose REGEXP "0, 1.66667" NO_BASELINE)
+f3d_test(NAME TestCommandScriptVerboseMultiAnimationTimeRange SCRIPT TestCommandScriptVerboseMultiAnimationTimeRange.txt DATA InterpolationTest.glb ARGS --verbose REGEXP "0, 1.70833" NO_BASELINE)# cycle_animation x3
+f3d_test(NAME TestVerboseQuakeMDLAnimationNoNamingScheme ARGS --verbose DATA v_rock2.mdl REGEXP "0: flame" NO_BASELINE)
+f3d_test(NAME TestVerboseQuakeMDLGroupSkinUnsupported ARGS --verbose DATA groupskin.mdl REGEXP "Groupskin are not supported" NO_BASELINE)
+f3d_test(NAME TestVerboseQuakeMDLInvalid ARGS --verbose DATA w_medkit_hl.mdl REGEXP "No frame read" NO_BASELINE)
 
 # Armature test
 f3d_test(NAME TestGLTFRigArmatureNoArmature DATA RiggedFigure.glb ARGS --animation-time=1 --opacity=0.5 -p)
@@ -628,14 +693,12 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
     f3d_test(NAME TestDXF DATA PinkEggFromLW.dxf ARGS --background-color=1,1,1 -p --load-plugins=assimp)
   endif()
 
-  f3d_test(NAME TestFBXSkinningAnimation DATA punch.fbx ARGS --load-plugins=assimp --animation-time=1 --animation-progress)
   f3d_test(NAME TestVerboseAssimp DATA duck.fbx ARGS --verbose --load-plugins=assimp NO_BASELINE REGEXP "LOD3sp")
   f3d_test(NAME TestVerboseAssimpAnimationIndexError DATA animatedLights.fbx ARGS --load-plugins=assimp --animation-index=48 NO_BASELINE REGEXP "Specified animation index is greater than the highest possible animation index, enabling the first animation.")
   f3d_test(NAME TestAssimpAnimationNegativeIndex DATA animatedLights.fbx ARGS --load-plugins=assimp --animation-index=-113 --animation-time=2 --animation-progress)
   f3d_test(NAME TestTGATextureFBX DATA duck.fbx ARGS --load-plugins=assimp)
   f3d_test(NAME TestDAE DATA duck.dae ARGS --load-plugins=assimp)
   f3d_test(NAME TestX DATA anim_test.x ARGS --load-plugins=assimp)
-
 
   # This test baseline is incorrect because of https://github.com/f3d-app/f3d/issues/603
   # It will need to be changed when fixed
@@ -652,6 +715,11 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
     f3d_test(NAME TestFBXBone DATA animation_with_skeleton.fbx ARGS --load-plugins=assimp --camera-position=1.90735e-06,0,11007.8 --camera-focal-point=1.90735e-06,0,-8.9407e-08)
     f3d_test(NAME TestFBXBoneAnimation DATA animation_with_skeleton.fbx ARGS --load-plugins=assimp --camera-position=1.90735e-06,0,11007.8 --camera-focal-point=1.90735e-06,0,-8.9407e-08 --animation-time=0.5 --animation-progress)
     f3d_test(NAME TestInteractionAnimationFBXBone DATA animation_with_skeleton.fbx ARGS --load-plugins=assimp --camera-position=0,0,14000 --camera-focal-point=0,0,0 INTERACTION)#Space;Wait;Space;
+  endif()
+
+  # The visible boxes are not located at the same position in Assimp 6.0 for some reason
+  if("${F3D_ASSIMP_VERSION}" VERSION_GREATER_EQUAL "6.0.1")
+    f3d_test(NAME TestFBXSkinningAnimation DATA punch.fbx ARGS --load-plugins=assimp --animation-time=1 --animation-progress)
   endif()
 
   if(NOT F3D_MACOS_BUNDLE)
@@ -696,54 +764,72 @@ if(F3D_PLUGIN_BUILD_DRACO)
 
 endif()
 
-if(F3D_PLUGIN_BUILD_EXODUS)
-  f3d_test(NAME TestExodus DATA disk_out_ref.ex2 ARGS --load-plugins=exodus -s --camera-position=-11,-2,-49)
+if(F3D_PLUGIN_BUILD_HDF)
+  if (VTK_VERSION VERSION_GREATER_EQUAL 9.3.0)
+    f3d_test(NAME TestVTKHDF DATA blob.vtkhdf ARGS --load-plugins=hdf -s)
+    f3d_test(NAME TestAMRDataSet DATA amr.vtkhdf ARGS --load-plugins=hdf -s)
+  endif()
+
+  f3d_test(NAME TestExodus DATA disk_out_ref.ex2 ARGS --load-plugins=hdf -s --camera-position=-11,-2,-49)
+  f3d_test(NAME TestExodusExo DATA box.exo ARGS --load-plugins=hdf NO_RENDER NO_BASELINE REGEXP "Number of points: 24")
+  f3d_test(NAME TestExodusG DATA box.g ARGS --load-plugins=hdf NO_RENDER NO_BASELINE REGEXP "Number of points: 24")
+  f3d_test(NAME TestExodusE DATA single_timestep.e ARGS --load-plugins=hdf NO_RENDER NO_BASELINE REGEXP "Number of points: 1331")
 
   f3d_test(NAME TestExodusConfig DATA disk_out_ref.ex2 CONFIG ${F3D_SOURCE_DIR}/testing/configs/exodus.json ARGS -s --camera-position=-11,-2,-49)
 
   # Test Generic Importer Verbose animation. Regex contains the time range.
-  f3d_test(NAME TestVerboseGenericImporterAnimation DATA small.ex2 ARGS --load-plugins=exodus --verbose NO_BASELINE REGEXP "0, 0.00429999")
+  f3d_test(NAME TestVerboseGenericImporterAnimation DATA small.ex2 ARGS --load-plugins=hdf --verbose NO_BASELINE REGEXP "0, 0.00429999")
 
   # Test animation with generic importer and coloring
-  f3d_test(NAME TestAnimationGenericImporter DATA small.ex2 ARGS -sb --load-plugins=exodus --animation-time=0.003 --animation-progress)
+  f3d_test(NAME TestAnimationGenericImporter DATA small.ex2 ARGS -sb --load-plugins=hdf --animation-time=0.003 --animation-progress)
+
+  # Test animation with generic importer, coloring and point sprites
+  f3d_test(NAME TestAnimationGenericImporterPointSprites DATA small.ex2 ARGS -sbo --load-plugins=hdf --animation-time=0.003 --animation-progress)
 
   # Test animation with generic importer, coloring and a custom scalar range
-  f3d_test(NAME TestAnimationGenericImporterScalarRange DATA small.ex2 ARGS -sb --load-plugins=exodus --animation-time=0.003 --animation-progress --coloring-range=0,1e7)
+  f3d_test(NAME TestAnimationGenericImporterScalarRange DATA small.ex2 ARGS -sb --load-plugins=hdf --animation-time=0.003 --animation-progress --coloring-range=0,1e7)
 
-  # Test Generic Importer Verbose animation. Regex contains the time range.
-  f3d_test(NAME TestVerboseAnimationSingleTimestep DATA single_timestep.e ARGS --load-plugins=exodus --verbose NO_BASELINE REGEXP "time range delta is invalid")
+  # Test Generic Importer Verbose animation with a single frame.
+  f3d_test(NAME TestVerboseAnimationSingleTimestep DATA single_timestep.e ARGS --load-plugins=hdf --verbose NO_BASELINE REGEXP "0, 0")
 
-  # Test no render animation time. Regex contains a part of the range of the ACCL field.
-  f3d_test(NAME TestNoRenderAnimation DATA small.ex2 ARGS  --load-plugins=exodus --animation-time=0.003 REGEXP "-521950, 6.57485" NO_RENDER)
+  # Test no render animation time. Regex contains a part of the range of the VEL_ field.
+  f3d_test(NAME TestNoRenderAnimation DATA small.ex2 ARGS  --load-plugins=hdf --animation-time=0.003 REGEXP "-994.473, 33.9259" NO_RENDER)
 
   # Test animation time clamping
-  f3d_test(NAME TestAnimationTimeLimitsHigh DATA small.ex2 ARGS ARGS --load-plugins=exodus --animation-time=10)
-  f3d_test(NAME TestAnimationTimeLimitsLow DATA small.ex2 ARGS ARGS --load-plugins=exodus --animation-time=-5)
+  f3d_test(NAME TestAnimationTimeLimitsHigh DATA small.ex2 ARGS ARGS --load-plugins=hdf --animation-time=10)
+  f3d_test(NAME TestAnimationTimeLimitsLow DATA small.ex2 ARGS ARGS --load-plugins=hdf --animation-time=-5)
+  f3d_test(NAME TestAnimationTimeLimitsHighNoWarning DATA small.ex2 ARGS ARGS --load-plugins=hdf --animation-time=0.0043001 REGEXP_FAIL "outside of range" NO_RENDER)
+  f3d_test(NAME TestAnimationTimeLimitsLowNoWarning DATA small.ex2 ARGS ARGS --load-plugins=hdf --animation-time=-0.000001 REGEXP_FAIL "outside of range" NO_RENDER)
 
   # Test if negative range is respected when loading a file without specifying the animation time
-  f3d_test(NAME TestTimeRangeLessThanZeroNoAnimationTime DATA negative_range_animated.e ARGS -s --load-plugins=exodus)
+  f3d_test(NAME TestTimeRangeLessThanZeroNoAnimationTime DATA negative_range_animated.e ARGS -s --load-plugins=hdf)
 
   # Test if the animation-time works when set to zero and time range[0] is less than zero
-  f3d_test(NAME TestTimeRangeLessThanZeroWithAnimationTime DATA negative_range_animated.e ARGS -s --load-plugins=exodus --animation-time=0)
+  f3d_test(NAME TestTimeRangeLessThanZeroWithAnimationTime DATA negative_range_animated.e ARGS -s --load-plugins=hdf --animation-time=0)
 
   # Test if a negative animation-time works when time range[0] is less than zero
-  f3d_test(NAME TestTimeRangeLessThanZeroNegativeAnimationTime DATA negative_range_animated.e ARGS -s --load-plugins=exodus --animation-time=-3)
+  f3d_test(NAME TestTimeRangeLessThanZeroNegativeAnimationTime DATA negative_range_animated.e ARGS -s --load-plugins=hdf --animation-time=-3)
 
   if(NOT F3D_MACOS_BUNDLE)
-    file(COPY "${F3D_SOURCE_DIR}/plugins/exodus/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
+    file(COPY "${F3D_SOURCE_DIR}/plugins/hdf/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     f3d_test(NAME TestDefaultConfigFileExodus DATA disk_out_ref.ex2 CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
 
-    file(COPY "${F3D_SOURCE_DIR}/plugins/exodus/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
+    file(COPY "${F3D_SOURCE_DIR}/plugins/hdf/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
     f3d_test(NAME TestThumbnailConfigFileExodus DATA disk_out_ref.ex2 CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
+
+    if (VTK_VERSION VERSION_GREATER_EQUAL 9.3.0)
+      f3d_test(NAME TestDefaultConfigFileVTKHDF DATA blob.vtkhdf CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
+      f3d_test(NAME TestThumbnailConfigFileVTKHDF DATA blob.vtkhdf CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
+    endif()
   endif()
 
   if (NOT F3D_PLUGINS_STATIC_BUILD AND BUILD_SHARED_LIBS)
 
     # Test --load-plugins with the name of a dynamic plugin
-    f3d_test(NAME TestPluginName DATA disk_out_ref.ex2 ARGS --load-plugins=exodus --verbose NO_BASELINE REGEXP "Loaded plugin exodus from")
+    f3d_test(NAME TestPluginName DATA disk_out_ref.ex2 ARGS --load-plugins=hdf --verbose NO_BASELINE REGEXP "Loaded plugin hdf from")
 
     # Test --load-plugins with a full path plugin
-    f3d_test(NAME TestPluginFullPath DATA disk_out_ref.ex2 ARGS --verbose --load-plugins "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_SHARED_MODULE_PREFIX}f3d-plugin-exodus${CMAKE_SHARED_MODULE_SUFFIX}" NO_BASELINE REGEXP "Loaded plugin exodus from")
+    f3d_test(NAME TestPluginFullPath DATA disk_out_ref.ex2 ARGS --verbose --load-plugins "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_SHARED_MODULE_PREFIX}f3d-plugin-hdf${CMAKE_SHARED_MODULE_SUFFIX}" NO_BASELINE REGEXP "Loaded plugin hdf from")
   endif()
 
 endif()
@@ -797,6 +883,8 @@ if(F3D_PLUGIN_BUILD_USD)
   f3d_test(NAME TestUSDZAnimated DATA AnimatedCube.usdz ARGS --load-plugins=usd --animation-time=0.3 --animation-progress)
   f3d_test(NAME TestUSDZRigged DATA RiggedSimple.usdz ARGS --load-plugins=usd --animation-time=0.3)
   f3d_test(NAME TestUSDZMaterials DATA McUsd.usdz ARGS --load-plugins=usd --camera-position=1055,912,-247 --camera-focal-point=69,173,63 THRESHOLD 0.3) # High threshold because of legacy comparison methods in VTK 9.3
+  f3d_test(NAME TestUSDZMaterialsInterationReload DATA McUsd.usdz ARGS --load-plugins=usd INTERACTION NO_BASELINE) # Up
+  f3d_test(NAME TestUSDZMemEXR DATA small.usdz ARGS --load-plugins=usd)
 
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${F3D_SOURCE_DIR}/plugins/usd/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
@@ -876,6 +964,7 @@ f3d_test(NAME TestInteractionLightIntensity DATA dragon.vtu INTERACTION LONG_TIM
 f3d_test(NAME TestInteractionMultiFileColoring DATA mb/recursive ARGS --multi-file-mode=all INTERACTION) #SSSB
 f3d_test(NAME TestInteractionOpacity DATA dragon.vtu INTERACTION)
 f3d_test(NAME TestInteractionInitUpVectorOption DATA dragon.vtu ARGS --up=-Y INTERACTION) #Small drag left, camera should maintain orientation
+f3d_test(NAME TestInteractionDragRotateVertical DATA offset-flat-box.glb ARGS -g -x --up=y INTERACTION) # Drag down, should look straight down and avoid gimbal lock
 f3d_test(NAME TestInteractionReload DATA dragon.vtu ARGS -e INTERACTION) #Up;
 f3d_test(NAME TestInteractionLoadParentDirectory DATA multi/dragon.vtu ARGS --filename INTERACTION UI) #Down;
 f3d_test(NAME TestInteractionEmptyLoadParentDirectory INTERACTION NO_BASELINE REGEXP "No files loaded, no rendering performed") #Down;
@@ -911,6 +1000,13 @@ f3d_test(NAME TestInteractionConsoleAutoCompleteHide DATA BoxAnimated.gltf INTER
 f3d_test(NAME TestInteractionConsoleHistory DATA BoxAnimated.gltf INTERACTION UI) #Escape;ro;Tab;45;Enter;set_c;Tab;top;Enter;Up;Up;Enter;Up;Up;Up;Up;Down;Down;Down;Down
 f3d_test(NAME TestInteractionConsoleHistoryEmpty DATA BoxAnimated.gltf INTERACTION UI)#Escape;Up;Down
 f3d_test(NAME TestInteractionConsoleHistoryHide DATA BoxAnimated.gltf INTERACTION UI)#Escape;a;Enter;b;Enter;Up;Escape;Escape;Escape;Up
+f3d_test(NAME TestInteractionMinimalConsoleOpen DATA f3d.glb INTERACTION UI) #Colon
+f3d_test(NAME TestInteractionMinimalConsoleEscape DATA f3d.glb INTERACTION UI) #Colon;Escape
+f3d_test(NAME TestInteractionMinimalConsoleReturn DATA f3d.glb INTERACTION UI) #Colon;Return
+f3d_test(NAME TestInteractionMinimalConsoleValidCommand DATA f3d.glb INTERACTION UI) #Colon;set_camera top;Return
+f3d_test(NAME TestInteractionMinimalConsoleInvalidCommand DATA f3d.glb INTERACTION UI) #Colon;foo;Return
+f3d_test(NAME TestInteractionMinimalConsoleResize DATA f3d.glb INTERACTION UI) #Colon;foo;Return;Colon
+f3d_test(NAME TestInteractionMinimalConsoleBadgeRemains DATA f3d.glb INTERACTION UI) #Colon;foo;Return;Colon;Escape
 
 if (F3D_MODULE_TINYFILEDIALOGS)
 f3d_test(NAME TestInteractionFileOpen INTERACTION NO_BASELINE ENV CTEST_OPEN_DIALOG_FILE=${F3D_SOURCE_DIR}/testing/data/cow.vtp)
@@ -1105,6 +1201,10 @@ f3d_test(NAME TestUnknownAppOptionVerbose ARGS --revolution=17,32 REGEXP "Did yo
 f3d_test(NAME TestUnknownBooleanOptionVerbose ARGS --helpo REGEXP "Did you mean '--help'?")
 f3d_test(NAME TestUnknownInputOptionVerbose ARGS --inprut=file REGEXP "Did you mean '--input=file'?")
 
+# Test app option error code path
+f3d_test(NAME TestAppOptionError ARGS --animation-time=invalid REGEXP "Could not parse 'invalid' into 'animation-time' option")
+f3d_test(NAME TestAppOptionNoConfigError ARGS --no-config=invalid CONFIG invalid REGEXP "Could not parse 'invalid' into 'no-config' option, assuming false")
+
 # Test non-existent config filepath, do not add a dummy.json
 f3d_test(NAME TestNonExistentConfigFilePath DATA cow.vtp CONFIG "${F3D_SOURCE_DIR}/testing/configs/dummy.json" REGEXP "Configuration file does not exist" NO_BASELINE)
 
@@ -1158,6 +1258,37 @@ f3d_test(NAME TestNoConfigWithConfig DATA f3d.glb ARGS --no-config CONFIG ${F3D_
 # Test that config file search display logs
 f3d_test(NAME TestConfigFileLocationVerbose ARGS --verbose CONFIG inexistent.json REGEXP "Candidate config file not found: .*inexistent.json" NO_BASELINE)
 
+# Test invalid match type in config file
+f3d_test(NAME TestConfigInvalidMatchType DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/invalid_match_type.json REGEXP "There was an error in the config .*invalid_match_type.json for regex pattern.*" NO_BASELINE)
+
+# Test glob match type but no match expression in config file
+f3d_test(NAME TestConfigMatchTypeNoMatch DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/match_type_no_match.json REGEXP "A config block in config file .*match_type_no_match.json has match-type glob but no match expression, using a catch-all regex" NO_BASELINE)
+
+# Test invalid glob expression in config file
+f3d_test(NAME TestConfigInvalidGlobExp DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/invalid_glob_exp.json REGEXP "There was an error in the config .*invalid_glob_exp.json for glob pattern.*" NO_BASELINE)
+
+# Test glob matching
+if(WIN32)
+  set(GLOBSTAR_EXPR [=[**\\\\*stl]=])
+else()
+  set(GLOBSTAR_EXPR "**/*stl")
+endif()
+configure_file("${F3D_SOURCE_DIR}/testing/configs/glob.json.in" "${CMAKE_BINARY_DIR}/glob.json")
+f3d_test(NAME TestMatchFirstConfigGlobOptionBlock DATA dragon.vtu CONFIG ${CMAKE_BINARY_DIR}/glob.json)
+f3d_test(NAME TestMatchSecondConfigGlobOptionBlock DATA suzanne.stl CONFIG ${CMAKE_BINARY_DIR}/glob.json)
+
+# Test exact matching
+cmake_path(SET FIRST_EXACT_PATH "${F3D_SOURCE_DIR}/testing/data/suzanne.obj")
+cmake_path(NATIVE_PATH FIRST_EXACT_PATH NATIVE_FIRST_EXACT_PATH)
+cmake_path(SET SECOND_EXACT_PATH "${F3D_SOURCE_DIR}/testing/data/suzanne.ply")
+cmake_path(NATIVE_PATH SECOND_EXACT_PATH NATIVE_SECOND_EXACT_PATH)
+if(WIN32)
+  string(REPLACE "\\" "\\\\" NATIVE_FIRST_EXACT_PATH "${NATIVE_FIRST_EXACT_PATH}")
+  string(REPLACE "\\" "\\\\" NATIVE_SECOND_EXACT_PATH "${NATIVE_SECOND_EXACT_PATH}")
+endif()
+configure_file("${F3D_SOURCE_DIR}/testing/configs/exact.json.in" "${CMAKE_BINARY_DIR}/exact.json")
+f3d_test(NAME TestExactMatch DATA suzanne.obj CONFIG ${CMAKE_BINARY_DIR}/exact.json)
+
 # Test help display
 f3d_test(NAME TestHelp ARGS --help REGEXP "Usage:")
 f3d_test(NAME TestHelpPositional ARGS --help REGEXP "file1 file2 \.\.\.")
@@ -1174,6 +1305,17 @@ f3d_test(NAME TestInteractionInvalidComponent INTERACTION UI DATA cow.vtp ARGS -
 # Test multi plugin list-readers
 if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME TestReadersListMultiplePlugins ARGS --list-readers --load-plugins=assimp,alembic NO_BASELINE REGEXP_FAIL "Plugin failed to load")
+endif()
+
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
+  f3d_test(NAME TestForceReaderFail DATA suzanne.stl ARGS --force-reader=GLTF NO_BASELINE REGEXP "Some of these files could not be loaded: failed to load scene")
+  f3d_test(NAME TestForceReaderPass DATA suzanne.not_supported ARGS --force-reader=STL)
+  f3d_test(NAME TestForceReaderInvalid DATA suzanne.stl ARGS --force-reader=INVALID NO_BASELINE REGEXP "Forced reader .* doesn't exist")
+
+  if(F3D_PLUGIN_BUILD_DRACO)
+    f3d_test(NAME TestForceReaderGLTFDraco DATA BoxAnimated.gltf ARGS --load-plugins=draco --force-reader=GLTFDraco)
+    f3d_test(NAME TestForceReaderGLTFDracoIntoGLTF DATA Box_draco.gltf ARGS --load-plugins=draco --force-reader=GLTF NO_BASELINE REGEXP "failed to load scene")
+  endif()
 endif()
 
 # Test bindings-list display
@@ -1215,6 +1357,10 @@ f3d_test(NAME TestRenderingBackendInvalid DATA cow.vtp RENDERING_BACKEND invalid
 # Test that f3d can try to read a system config file
 add_test(NAME f3d::TestNoNoConfig COMMAND $<TARGET_FILE:f3d> --no-render)
 set_tests_properties(f3d::TestNoNoConfig PROPERTIES TIMEOUT 4)
+
+# Test that we can try loading a plugin without F3D_PLUGINS_PATH being defined
+add_test(NAME f3d::TestNoEnvInvalidPlugin COMMAND $<TARGET_FILE:f3d> --load-plugins=invalid --no-render)
+set_tests_properties(f3d::TestNoEnvInvalidPlugin PROPERTIES PASS_REGULAR_EXPRESSION "Cannot open the library")
 
 # Test invalid CLI args
 add_test(NAME f3d::TestInvalidCLIArgs COMMAND $<TARGET_FILE:f3d> --up)
@@ -1270,6 +1416,25 @@ if(NOT WIN32)
   f3d_test(NAME TestOutputTooLong DATA suzanne.ply ARGS --output=${_f3d_test_invalid_folder}/file.ext REGEXP "File name too long" NO_BASELINE NO_OUTPUT)
   f3d_test(NAME TestOutputWithReferenceTooLong DATA suzanne.ply ARGS --reference=file.png --output=${_f3d_test_invalid_folder}/file.ext REGEXP "File name too long" NO_BASELINE NO_OUTPUT)
   f3d_test(NAME TestOutputWithExistingReferenceTooLong DATA suzanne.ply ARGS --reference=${F3D_SOURCE_DIR}/testing/data/world.png --output=${_f3d_test_invalid_folder}/file.ext REGEXP "File name too long" NO_BASELINE NO_OUTPUT)
+
+  if(NOT APPLE)
+
+    # This tests the XDG_CONFIG_HOME is taken into account AND that config order between locations is respected
+    file(COPY "${F3D_SOURCE_DIR}/testing/configs/02_home.json" DESTINATION "${CMAKE_BINARY_DIR}/share/a_home_config/f3d/config_build.d")
+    f3d_test(NAME TestXDG_CONFIG_HOME DATA suzanne.ply CONFIG config_build ENV "XDG_CONFIG_HOME=${CMAKE_BINARY_DIR}/share/a_home_config" UI TONE_MAPPING)
+
+    f3d_test(NAME TestXDG_CACHE_HOMECoverage DATA suzanne.ply NO_RENDER NO_BASELINE ENV "XDG_CACHE_HOME=${CMAKE_BINARY_DIR}")
+
+    # Setting XDG_CACHE_HOME is needed for cache to work when HOME is not set
+    f3d_test(NAME TestNoHOMEScreenshot DATA suzanne.ply ARGS --screenshot-filename=TestNoHOMEScreenshot.png --interaction-test-play=${F3D_SOURCE_DIR}/testing/recordings/TestScreenshot.log  REGEXP "saving screenshot to ${CMAKE_BINARY_DIR}/application/testing/TestNoHOMEScreenshot.png" NO_BASELINE ENV "XDG_CACHE_HOME=${CMAKE_BINARY_DIR};HOME=")
+    f3d_test(NAME TestNoHOMEConfig DATA suzanne.ply CONFIG config_build REGEXP "Using config directory ${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d" NO_RENDER NO_BASELINE ENV "XDG_CACHE_HOME=${CMAKE_BINARY_DIR};HOME=")
+  endif()
+
+else()
+  cmake_path(SET _user_profile_path ${CMAKE_BINARY_DIR}/Testing/Temporary/ùser/🥷)
+  cmake_path(NATIVE_PATH _user_profile_path _user_profile_path)
+  add_test(NAME f3d::TestSetupWinUserProfile COMMAND ${CMAKE_COMMAND} -E make_directory "${_user_profile_path}/AppData/Local")
+  f3d_test(NAME TestWinUserProfileNonStandard DATA dragon.vtu ENV "USERPROFILE=${_user_profile_path}" DEPENDS TestSetupWinUserProfile)
 endif()
 
 # Test failure without a reference, please do not create a TestNoRef.png file
@@ -1316,8 +1481,8 @@ endif()
 if(NOT F3D_MACOS_BUNDLE)
   f3d_test(NAME TestScanPluginsCheckNative ARGS --scan-plugins NO_RENDER NO_BASELINE REGEXP " - native")
 
-  if(F3D_PLUGIN_BUILD_EXODUS)
-    f3d_test(NAME TestScanPluginsCheckExodus ARGS --scan-plugins NO_RENDER NO_BASELINE REGEXP " - exodus")
+  if(F3D_PLUGIN_BUILD_HDF)
+    f3d_test(NAME TestScanPluginsCheckHDF ARGS --scan-plugins NO_RENDER NO_BASELINE REGEXP " - hdf")
   endif()
 endif()
 

@@ -58,6 +58,13 @@ protected:
     mEngine = std::make_unique<f3d::engine>(f3d::engine::createExternal(loadFunc));
     mEngine->getWindow().setSize(width(), height());
     mEngine->getScene().add(mFilePath);
+    auto& opt = mEngine->getOptions();
+
+    // Test setting an option works
+    opt.render.grid.enable = true;
+
+    // XXX: This has no effect as external window does not create an interactor
+    opt.ui.axis = true;
   }
 
   void paintGL() override

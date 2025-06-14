@@ -1,0 +1,5 @@
+# StreamVersion 1.2
+
+KeyPressEvent 100 100 0 0 1 Up 0
+CharEvent 100 100 0 0 1 Up 0
+KeyReleaseEvent 100 100 0 0 1 Up 0

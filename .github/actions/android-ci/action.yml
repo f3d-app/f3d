@@ -1,14 +1,13 @@
-name: 'Android CI'
-description: 'Android CI'
+name: "Android CI"
+description: "Android CI"
 inputs:
   arch:
-    description: 'Android arch to build'
+    description: "Android arch to build"
     required: true
 
 runs:
   using: "composite"
   steps:
-
     - name: Check required inputs
       shell: bash
       run: |
@@ -18,8 +17,8 @@ runs:
       shell: bash
       working-directory: ${{github.workspace}}
       run: |
-         mkdir build
-         mkdir install
+        mkdir build
+        mkdir install
 
     - name: Configure
       shell: bash
@@ -35,7 +34,7 @@ runs:
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
         -DF3D_PLUGIN_BUILD_ASSIMP=ON
         -DF3D_PLUGIN_BUILD_DRACO=ON
-        -DF3D_PLUGIN_BUILD_EXODUS=OFF
+        -DF3D_PLUGIN_BUILD_HDF=OFF
         -DF3D_PLUGIN_BUILD_OCCT=ON
         -DF3D_STRICT_BUILD=ON
 

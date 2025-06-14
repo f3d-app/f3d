@@ -1,3 +1,166 @@
+function(f3d_create_exec target_name)
+  # Define f3d target
+  add_executable(${target_name} ${F3D_SOURCE_FILES})
+  target_link_libraries(${target_name} PUBLIC libf3d)
+
+  if(UNIX)
+    find_package(Threads REQUIRED)
+    target_link_libraries(${target_name} PRIVATE Threads::Threads)
+  endif()
+
+  if(F3D_LINUX_LINK_FILESYSTEM)
+    target_link_libraries(${target_name} PRIVATE stdc++fs)
+  endif()
+
+  set_target_properties(${target_name} PROPERTIES
+    CXX_VISIBILITY_PRESET hidden
+    CXX_STANDARD 17
+    )
+
+  if (APPLE)
+    if (F3D_MACOS_BUNDLE)
+      set_target_properties(${target_name} PROPERTIES INSTALL_RPATH @loader_path/../../../${CMAKE_INSTALL_LIBDIR})
+    else ()
+      set_target_properties(${target_name} PROPERTIES INSTALL_RPATH @loader_path/../${CMAKE_INSTALL_LIBDIR})
+    endif ()
+  elseif (UNIX)
+    set_target_properties(${target_name} PROPERTIES INSTALL_RPATH $ORIGIN/../${CMAKE_INSTALL_LIBDIR})
+  elseif (MSVC)
+    set_property(DIRECTORY ${F3D_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${target_name}) # Set ${target_name} as startup project in visual studio
+    set_target_properties(${target_name} PROPERTIES VS_DEBUGGER_ENVIRONMENT "PATH=$<TARGET_FILE_DIR:VTK::CommonCore>") # Add VTK in MSVC PATH environment variable
+  endif ()
+
+  target_include_directories(${target_name} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
+
+  if (F3D_USE_EXTERNAL_CXXOPTS)
+    target_link_libraries(${target_name} PRIVATE cxxopts::cxxopts)
+  else ()
+    target_include_directories(${target_name} PUBLIC $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/cxxopts>)
+  endif ()
+
+  if (F3D_USE_EXTERNAL_NLOHMANN_JSON)
+    target_link_libraries(${target_name} PRIVATE nlohmann_json::nlohmann_json)
+  else ()
+    target_include_directories(${target_name} PUBLIC $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/nlohmann_json>)
+  endif ()
+
+  if (F3D_MODULE_DMON)
+    if (F3D_USE_EXTERNAL_DMON)
+      target_link_libraries(${target_name} PRIVATE dmon::dmon)
+    else ()
+      target_include_directories(${target_name} PUBLIC $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/dmon>)
+    endif ()
+  endif ()
+
+  target_include_directories(${target_name} PUBLIC $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/tinyfiledialogs>)
+
+  set(f3d_compile_options_private "")
+  set(f3d_compile_options_public "")
+  set(f3d_link_options_public "")
+
+  # This is required to avoid cxxopts
+  # splitting input positional option by commas
+  target_compile_definitions(${target_name} PRIVATE "CXXOPTS_VECTOR_DELIMITER='\\0'")
+
+  # macOS bundle
+  if (F3D_MACOS_BUNDLE)
+    target_compile_definitions(${target_name} PRIVATE F3D_MACOS_BUNDLE)
+  endif ()
+
+  # raytracing
+  if (F3D_MODULE_RAYTRACING)
+    target_compile_definitions(${target_name} PRIVATE F3D_MODULE_RAYTRACING)
+  endif ()
+
+  # exr
+  if (F3D_MODULE_EXR)
+    target_compile_definitions(${target_name} PRIVATE F3D_MODULE_EXR)
+  endif ()
+
+  # dmon
+  if (F3D_MODULE_DMON)
+    target_compile_definitions(${target_name} PRIVATE F3D_MODULE_DMON)
+  endif ()
+
+  # tinyfiledialogs
+  if (F3D_MODULE_TINYFILEDIALOGS)
+    target_compile_definitions(${target_name} PRIVATE F3D_MODULE_TINYFILEDIALOGS)
+  endif ()
+
+  if(VTK_VERSION VERSION_LESS 9.3.20240914)
+    # Headless EGL build
+    if (VTK_OPENGL_HAS_EGL)
+      target_compile_definitions(${target_name} PRIVATE F3D_HEADLESS_BUILD)
+    endif ()
+  endif ()
+
+  # F3D_STRICT_BUILD
+  list(APPEND f3d_compile_options_private ${f3d_strict_build_compile_options})
+  if(F3D_STRICT_BUILD)
+    if(MSVC)
+      target_compile_definitions(${target_name} PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS _CRT_SECURE_NO_WARNINGS)
+    elseif(APPLE)
+      target_compile_definitions(${target_name} PRIVATE GL_SILENCE_DEPRECATION)
+    endif()
+  endif()
+
+  # F3D_TESTING_DISABLE_CATCH_ALL
+  if (F3D_TESTING_DISABLE_CATCH_ALL)
+    target_compile_definitions(${target_name} PRIVATE F3D_TESTING_DISABLE_CATCH_ALL)
+  endif ()
+
+  # Coverage
+  list(APPEND f3d_compile_options_public ${f3d_coverage_compile_options})
+  list(APPEND f3d_link_options_public ${f3d_coverage_link_options})
+
+  # Sanitizer
+  list(APPEND f3d_compile_options_public ${f3d_sanitizer_compile_options})
+  list(APPEND f3d_link_options_public ${f3d_sanitizer_link_options})
+
+  # MacOS Bundle app
+  if(F3D_MACOS_BUNDLE)
+    set_target_properties(${target_name} PROPERTIES MACOSX_BUNDLE TRUE)
+
+    # Add logo icon
+    set(MACOSX_BUNDLE_ICON_FILE logo.icns)
+    set(f3d_ICON ${F3D_SOURCE_DIR}/resources/logo.icns)
+    set_source_files_properties(${f3d_ICON} PROPERTIES
+      MACOSX_PACKAGE_LOCATION "Resources")
+    target_sources(${target_name} PRIVATE ${f3d_ICON})
+
+    # Set other MacOS vars
+    set(MACOSX_BUNDLE_EXECUTABLE_NAME ${PROJECT_NAME})
+    set(MACOSX_BUNDLE_INFO_STRING ${PROJECT_DESCRIPTION})
+    set(MACOSX_BUNDLE_GUI_IDENTIFIER "app.f3d.F3D")
+    set(MACOSX_BUNDLE_LONG_VERSION_STRING ${F3D_VERSION})
+    set(MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME})
+    set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${F3D_VERSION})
+    set(MACOSX_BUNDLE_BUNDLE_VERSION ${F3D_VERSION})
+    set(MACOSX_BUNDLE_COPYRIGHT "Michael Migliore, Mathieu Westphal")
+
+    # Generate MacOS bundle using CMake variable generated by plugins
+    get_property(F3D_MACOS_BUNDLE_XML GLOBAL PROPERTY F3D_MACOS_BUNDLE_XML)
+    configure_file("${F3D_SOURCE_DIR}/resources/BundleInfo.plist.in"
+      "${CMAKE_CURRENT_BINARY_DIR}/BundleInfo.plist")
+    set_target_properties(${target_name} PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_BINARY_DIR}/BundleInfo.plist")
+  endif()
+
+  if(APPLE)
+    target_link_libraries(${target_name} PRIVATE "-framework Cocoa")
+  endif()
+
+  if(WIN32)
+    # Windows executable without console
+    set_target_properties(${target_name} PROPERTIES WIN32_EXECUTABLE TRUE)
+
+    # In case console mode is used later
+    list(APPEND f3d_link_options_public "/ENTRY:wWinMainCRTStartup")
+  endif()
+
+  target_compile_options(${target_name} PUBLIC ${f3d_compile_options_public} PRIVATE ${f3d_compile_options_private})
+  target_link_options(${target_name} PUBLIC ${f3d_link_options_public})
+endfunction()
+
 # Generate F3DIcon buffer
 include("f3dEmbed")
 
@@ -31,168 +194,15 @@ endif()
 # Add source for dialogs
 list(APPEND F3D_SOURCE_FILES "${F3D_SOURCE_DIR}/external/tinyfiledialogs/tinyfiledialogs.cxx")
 
-# Define f3d target
-add_executable(f3d ${F3D_SOURCE_FILES})
-target_link_libraries(f3d PUBLIC libf3d)
+# Create the f3d application
+f3d_create_exec(f3d)
 
-if(UNIX)
-  find_package(Threads REQUIRED)
-  target_link_libraries(f3d PRIVATE Threads::Threads)
+# Create f3d-console on Windows
+if(WIN32 AND F3D_WINDOWS_BUILD_CONSOLE_APPLICATION)
+  f3d_create_exec(f3d-console)
+  # Overwrite console property
+  set_target_properties(f3d-console PROPERTIES WIN32_EXECUTABLE FALSE)
 endif()
-
-if(F3D_LINUX_LINK_FILESYSTEM)
-  target_link_libraries(f3d PRIVATE stdc++fs)
-endif()
-
-set_target_properties(f3d PROPERTIES
-  CXX_VISIBILITY_PRESET hidden
-  CXX_STANDARD 17
-  )
-
-if (APPLE)
-  if (F3D_MACOS_BUNDLE)
-    set_target_properties(f3d PROPERTIES INSTALL_RPATH @loader_path/../../../${CMAKE_INSTALL_LIBDIR})
-  else ()
-    set_target_properties(f3d PROPERTIES INSTALL_RPATH @loader_path/../${CMAKE_INSTALL_LIBDIR})
-  endif ()
-elseif (UNIX)
-  set_target_properties(f3d PROPERTIES INSTALL_RPATH $ORIGIN/../${CMAKE_INSTALL_LIBDIR})
-elseif (MSVC)
-  set_property(DIRECTORY ${F3D_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT f3d) # Set f3d as startup project in visual studio
-  set_target_properties(f3d PROPERTIES VS_DEBUGGER_ENVIRONMENT "PATH=$<TARGET_FILE_DIR:VTK::CommonCore>") # Add VTK in MSVC PATH environment variable
-endif ()
-
-target_include_directories(f3d PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
-
-if (F3D_USE_EXTERNAL_CXXOPTS)
-  target_link_libraries(f3d PRIVATE cxxopts::cxxopts)
-else ()
-  target_include_directories(f3d PUBLIC $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/cxxopts>)
-endif ()
-
-if (F3D_USE_EXTERNAL_NLOHMANN_JSON)
-  target_link_libraries(f3d PRIVATE nlohmann_json::nlohmann_json)
-else ()
-  target_include_directories(f3d PUBLIC $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/nlohmann_json>)
-endif ()
-
-if (F3D_MODULE_DMON)
-  if (F3D_USE_EXTERNAL_DMON)
-    target_link_libraries(f3d PRIVATE dmon::dmon)
-  else ()
-    target_include_directories(f3d PUBLIC $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/dmon>)
-  endif ()
-endif ()
-
-target_include_directories(f3d PUBLIC $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/tinyfiledialogs>)
-
-set(f3d_compile_options_private "")
-set(f3d_compile_options_public "")
-set(f3d_link_options_public "")
-
-# This is required to avoid cxxopts
-# splitting input positional option by commas
-target_compile_definitions(f3d PRIVATE "CXXOPTS_VECTOR_DELIMITER='\\0'")
-
-# macOS bundle
-if (F3D_MACOS_BUNDLE)
-  target_compile_definitions(f3d PRIVATE F3D_MACOS_BUNDLE)
-endif ()
-
-# raytracing
-if (F3D_MODULE_RAYTRACING)
-  target_compile_definitions(f3d PRIVATE F3D_MODULE_RAYTRACING)
-endif ()
-
-# exr
-if (F3D_MODULE_EXR)
-  target_compile_definitions(f3d PRIVATE F3D_MODULE_EXR)
-endif ()
-
-# dmon
-if (F3D_MODULE_DMON)
-  target_compile_definitions(f3d PRIVATE F3D_MODULE_DMON)
-endif ()
-
-# tinyfiledialogs
-if (F3D_MODULE_TINYFILEDIALOGS)
-  target_compile_definitions(f3d PRIVATE F3D_MODULE_TINYFILEDIALOGS)
-endif ()
-
-if(VTK_VERSION VERSION_LESS 9.3.20240914)
-  # Headless EGL build
-  if (VTK_OPENGL_HAS_EGL)
-    target_compile_definitions(f3d PRIVATE F3D_HEADLESS_BUILD)
-  endif ()
-endif ()
-
-# F3D_STRICT_BUILD
-list(APPEND f3d_compile_options_private ${f3d_strict_build_compile_options})
-if(F3D_STRICT_BUILD)
-  if(MSVC)
-    target_compile_definitions(f3d PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS _CRT_SECURE_NO_WARNINGS)
-  elseif(APPLE)
-    target_compile_definitions(f3d PRIVATE GL_SILENCE_DEPRECATION)
-  endif()
-endif()
-
-# F3D_TESTING_DISABLE_CATCH_ALL
-if (F3D_TESTING_DISABLE_CATCH_ALL)
-  target_compile_definitions(f3d PRIVATE F3D_TESTING_DISABLE_CATCH_ALL)
-endif ()
-
-# Coverage
-list(APPEND f3d_compile_options_public ${f3d_coverage_compile_options})
-list(APPEND f3d_link_options_public ${f3d_coverage_link_options})
-
-# Sanitizer
-list(APPEND f3d_compile_options_public ${f3d_sanitizer_compile_options})
-list(APPEND f3d_link_options_public ${f3d_sanitizer_link_options})
-
-# MacOS Bundle app
-if(F3D_MACOS_BUNDLE)
-  set_target_properties(f3d PROPERTIES MACOSX_BUNDLE TRUE)
-
-  # Add logo icon
-  set(MACOSX_BUNDLE_ICON_FILE logo.icns)
-  set(f3d_ICON ${F3D_SOURCE_DIR}/resources/logo.icns)
-  set_source_files_properties(${f3d_ICON} PROPERTIES
-    MACOSX_PACKAGE_LOCATION "Resources")
-  target_sources(f3d PRIVATE ${f3d_ICON})
-
-  # Set other MacOS vars
-  set(MACOSX_BUNDLE_EXECUTABLE_NAME ${PROJECT_NAME})
-  set(MACOSX_BUNDLE_INFO_STRING ${PROJECT_DESCRIPTION})
-  set(MACOSX_BUNDLE_GUI_IDENTIFIER "app.f3d.F3D")
-  set(MACOSX_BUNDLE_LONG_VERSION_STRING ${F3D_VERSION})
-  set(MACOSX_BUNDLE_BUNDLE_NAME ${PROJECT_NAME})
-  set(MACOSX_BUNDLE_SHORT_VERSION_STRING ${F3D_VERSION})
-  set(MACOSX_BUNDLE_BUNDLE_VERSION ${F3D_VERSION})
-  set(MACOSX_BUNDLE_COPYRIGHT "Michael Migliore, Mathieu Westphal")
-
-  # Generate MacOS bundle using CMake variable generated by plugins
-  get_property(F3D_MACOS_BUNDLE_XML GLOBAL PROPERTY F3D_MACOS_BUNDLE_XML)
-  configure_file("${F3D_SOURCE_DIR}/resources/BundleInfo.plist.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/BundleInfo.plist")
-  set_target_properties(f3d PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_BINARY_DIR}/BundleInfo.plist")
-endif()
-
-if(APPLE)
-  target_link_libraries(f3d PRIVATE "-framework Cocoa")
-endif()
-
-# Windows executable without console
-if(WIN32)
-  if(F3D_WINDOWS_GUI)
-    set_target_properties(f3d PROPERTIES WIN32_EXECUTABLE TRUE)
-  else()
-    # force usage of wWinMainCRTStartup in console mode for Unicode support
-    list(APPEND f3d_link_options_public "/ENTRY:wWinMainCRTStartup")
-  endif()
-endif()
-
-target_compile_options(f3d PUBLIC ${f3d_compile_options_public} PRIVATE ${f3d_compile_options_private})
-target_link_options(f3d PUBLIC ${f3d_link_options_public})
 
 # Create man
 if(UNIX AND NOT APPLE)
@@ -228,6 +238,13 @@ install(TARGETS f3d
   EXPORT f3dTargets
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT application
   BUNDLE DESTINATION "." COMPONENT application)
+
+if(WIN32 AND F3D_WINDOWS_BUILD_CONSOLE_APPLICATION)
+  install(TARGETS f3d-console
+    EXPORT f3dTargets
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT application
+    BUNDLE DESTINATION "." COMPONENT application)
+endif()
 
 # The targets and config file are only installed with the sdk
 install(EXPORT f3dTargets

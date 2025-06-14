@@ -1,22 +1,21 @@
-name: 'Install VTK Dependencies'
-description: 'Install multiple VTK Dependencies'
+name: "Install VTK Dependencies"
+description: "Install multiple VTK Dependencies"
 inputs:
   cpu:
-    description: 'CPU architecture to build for'
+    description: "CPU architecture to build for"
     required: false
-    default: 'x86_64'
+    default: "x86_64"
   source_dir:
-    description: 'Source directory for actions'
+    description: "Source directory for actions"
     required: false
-    default: './source'
+    default: "./source"
   openvdb_version:
-    description: 'Version of openvdb to build'
+    description: "Version of openvdb to build"
     required: false
 
 runs:
   using: "composite"
   steps:
-
     - name: Copy actions to a common directory TODO move to another step ?
       shell: bash
       working-directory: ${{github.workspace}}

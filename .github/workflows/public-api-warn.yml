@@ -2,8 +2,8 @@ name: Public API Warning
 on:
   pull_request_target:
     paths:
-      - 'library/public/*.h'
-      - 'library/public/*.h.in'
+      - "library/public/*.h"
+      - "library/public/*.h.in"
 
 jobs:
   public-api-warn:

@@ -21,6 +21,13 @@ namespace F3DUtils
  */
 VTKEXT_EXPORT double ParseToDouble(
   const std::string& str, double def, const std::string& nameError);
+
+/*
+ * Convert provided std into an int and returns it.
+ * Catch conversion error, log them if any and returns the provided def value.
+ * Use nameError in the log for easier debugging.
+ */
+VTKEXT_EXPORT int ParseToInt(const std::string& str, int def, const std::string& nameError);
 };
 
 #endif

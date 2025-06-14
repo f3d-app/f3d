@@ -4,6 +4,7 @@
 #include "interactor_impl.h"
 #include "log.h"
 #include "options.h"
+#include "scene.h"
 #include "window_impl.h"
 
 #include "factory.h"
@@ -11,6 +12,7 @@
 #include "vtkF3DMemoryMesh.h"
 #include "vtkF3DMetaImporter.h"
 
+#include <optional>
 #include <vtkCallbackCommand.h>
 #include <vtkProgressBarRepresentation.h>
 #include <vtkProgressBarWidget.h>
@@ -18,8 +20,6 @@
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
 
-#include <algorithm>
-#include <numeric>
 #include <vector>
 
 namespace fs = std::filesystem;
@@ -29,7 +29,7 @@ namespace f3d::detail
 class scene_impl::internals
 {
 public:
-  internals(const options& options, window_impl& window)
+  internals(options& options, window_impl& window)
     : Options(options)
     , Window(window)
     , AnimationManager(options, window)
@@ -190,7 +190,7 @@ public:
 };
 
 //----------------------------------------------------------------------------
-scene_impl::scene_impl(const options& options, window_impl& window)
+scene_impl::scene_impl(options& options, window_impl& window)
   : Internals(std::make_unique<scene_impl::internals>(options, window))
 {
 }
@@ -238,19 +238,30 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
     {
       throw scene::load_failure_exception(filePath.string() + " does not exists");
     }
-
+    std::optional<std::string> forceReader = this->Internals->Options.scene.force_reader;
     // Recover the importer for the provided file path
-    f3d::reader* reader = f3d::factory::instance()->getReader(filePath.string());
+    f3d::reader* reader = f3d::factory::instance()->getReader(filePath.string(), forceReader);
     if (reader)
     {
-      log::debug(
-        "Found a reader for \"" + filePath.string() + "\" : \"" + reader->getName() + "\"");
+      if (forceReader)
+      {
+        log::debug("Forcing reader ", (*forceReader), " for ", filePath.string());
+      }
+      else
+      {
+        log::debug("Found a reader for \"", filePath.string(), "\" : \"", reader->getName(), "\"");
+      }
     }
     else
     {
+      if (forceReader)
+      {
+        throw scene::load_failure_exception(*forceReader + " is not a valid force reader");
+      }
       throw scene::load_failure_exception(
         filePath.string() + " is not a file of a supported 3D scene file format");
     }
+
     vtkSmartPointer<vtkImporter> importer = reader->createSceneReader(filePath.string());
     if (!importer)
     {
@@ -322,7 +333,8 @@ scene& scene_impl::clear()
 //----------------------------------------------------------------------------
 bool scene_impl::supports(const fs::path& filePath)
 {
-  return f3d::factory::instance()->getReader(filePath.string()) != nullptr;
+  return f3d::factory::instance()->getReader(
+           filePath.string(), this->Internals->Options.scene.force_reader) != nullptr;
 }
 
 //----------------------------------------------------------------------------

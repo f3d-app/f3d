@@ -189,8 +189,7 @@ endif ()
 
 if(F3D_STRICT_BUILD AND MSVC)
   # There are warnings in VTK related to deprecated features in C++17
-  # Using std::getenv is also considered unsecured on Windows
-  target_compile_definitions(libf3d PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS _CRT_SECURE_NO_WARNINGS)
+  target_compile_definitions(libf3d PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
 endif()
 
 if(APPLE)

@@ -1,0 +1,18 @@
+[
+  {
+    "match-type": "exact",
+    "match": "${NATIVE_FIRST_EXACT_PATH}",
+    "options": 
+    {
+      "camera-direction": "-xy+z"
+    }
+  },
+  {
+    "match-type": "exact",
+    "match": "${NATIVE_SECOND_EXACT_PATH}",
+    "options": 
+    {
+      "edges": true
+    }
+  }
+]

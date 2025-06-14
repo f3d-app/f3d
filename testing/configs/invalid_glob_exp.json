@@ -1,0 +1,16 @@
+[
+  {
+    "match-type": "glob",
+    "match": "*vt[",
+    "options": {
+      "grid": true
+    }
+  },
+  {
+    "match-type": "glob",
+    "match": "*stl",
+    "options": {
+      "edges": true
+    }
+  }
+]

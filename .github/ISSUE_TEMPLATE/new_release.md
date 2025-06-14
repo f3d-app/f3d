@@ -2,7 +2,7 @@
 name: New release
 about: An issue to create a new release
 title: ""
-labels: release
+type: Release
 assignees: ""
 ---
 
@@ -14,7 +14,7 @@ When creating this issue
 Before release:
 
 - [ ] Force fetch origin remote tag with `git fetch origin --tags --force`
-- [ ] Write and format release notes from the ongoing changelog, including contributors and packagers
+- [ ] Write and format release notes from the pull requests since last release, including contributors and packagers
 
 Release Split :
 
@@ -49,14 +49,13 @@ Release :
 - [ ] Trigger a release build using https://github.com/f3d-app/f3d-superbuild actions with `vX.Y.Z` F3D version, `vX.Y.Z` sb version and prerelease publish true
 - [ ] Finalize release note and add them to the release
 - [ ] Release
-- [ ] Update download links and update changelog in https://github.com/f3d-app/f3d `doc`
+- [ ] Update **download links** and **changelog** in https://github.com/f3d-app/f3d `doc`
 - [ ] Communicate on discord
 - [ ] Communicate on reddit
 - [ ] Communicate on hackernews
 - [ ] Communicate on linkedin
 - [ ] Communicate on mastodon
-
-- [ ] Merge F3D release into master: https://github.com/f3d-app/f3d/compare/master...release- [ ] Communicate on bluesky
+- [ ] Communicate on bluesky
 - [ ] Move all issue from current milestone to next milestone, close current roadmap issue and open a next roadmap issue
 - [ ] Update `doc/dev/ROADMAPS_AND_RELEASES.md` for next release
 - [ ] Create an issue for updating dependencies in CI and superbuild
@@ -105,6 +104,7 @@ Windows testing protocol:
 - Double click on f3d.glb, press "Space", check animation is going smoothly and takes 4 seconds
 - Double click on any new supported file format, check render
 - Check that CTRL+O (file dialog) is working
+- run `f3d-console --version` in a Windows command line and check it output the version
 - Press "Esc" and check the following commands `reload_current_file_group`, `set_camera top`, `toggle_volume_rendering`, `exit`
 - `cd examples\libf3d && mkdir build && cd build && cmake ../ && cmake --build . --config Release`
 - `.\cpp\check-engine\Release\check-engine`
@@ -127,3 +127,8 @@ eng.interactor.start()
 - Check the following
   - The name of the window is `f3d` at all time
   - Python provides suggestions whenever the "Tab" key is pressed
+
+Once a release cycle:
+
+- Check that completions are still working with `fish` and `zsh` when tab is pressed
+- Check that F3D is added for extensions on a fresh Windows installation

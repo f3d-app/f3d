@@ -60,17 +60,17 @@ vec4 pixel(vec2 uv)
 
     vec3 sum = vec3(0);
 
-	for (int i = -samples; i <= samples; i++)
+    for (int i = -samples; i <= samples; i++)
     {
-		for (int j = -samples; j <= samples; j++)
+        for (int j = -samples; j <= samples; j++)
         {
-			sum += texture(source, uv + vec2(i, j) * step).rgb;
-		}
+            sum += texture(source, uv + vec2(i, j) * step).rgb;
+        }
     }
 
     float d = 1.0 + 2.0 * float(samples);
     sum /= d * d;
 
-	return vec4(sum, 1.0);
+    return vec4(sum, 1.0);
 }
 ```

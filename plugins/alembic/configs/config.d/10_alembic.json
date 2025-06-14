@@ -1,6 +1,7 @@
 [
   {
-    "match": ".*(abc)",
+    "match-type": "glob",
+    "match": "*.abc",
     "options": {
       "scalar-coloring": true,
       "load-plugins": "alembic"

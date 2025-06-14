@@ -1,21 +1,20 @@
-name: 'Install USD Dependency'
-description: 'Install USD Dependency using cache when possible'
+name: "Install USD Dependency"
+description: "Install USD Dependency using cache when possible"
 inputs:
   cpu:
-    description: 'CPU architecture to build for'
+    description: "CPU architecture to build for"
     required: false
-    default: 'x86_64'
+    default: "x86_64"
   version:
-    description: 'Version of usd to build'
+    description: "Version of usd to build"
     required: true
   openexr_version:
-    description: 'Version of openexr to build against'
+    description: "Version of openexr to build against"
     required: true
 
 runs:
   using: "composite"
   steps:
-
     - name: Check required inputs
       shell: bash
       run: |
@@ -34,10 +33,10 @@ runs:
       uses: actions/checkout@v4
       with:
         repository: PixarAnimationStudios/USD
-        path: './dependencies/usd'
+        path: "./dependencies/usd"
         ref: ${{inputs.version}}
 
-   # Upstream issue: https://github.com/PixarAnimationStudios/OpenUSD/issues/2490
+    # Upstream issue: https://github.com/PixarAnimationStudios/OpenUSD/issues/2490
     - name: Patch USD
       if: steps.cache-usd.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/usd

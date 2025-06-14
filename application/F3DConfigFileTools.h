@@ -11,7 +11,7 @@
 namespace F3DConfigFileTools
 {
 using BindingsVector = std::vector<std::pair<std::string, std::vector<std::string>>>;
-using BindingsEntry = std::tuple<BindingsVector, std::string, std::string>;
+using BindingsEntry = std::tuple<BindingsVector, std::string, std::string, std::string>;
 using BindingsEntries = std::vector<BindingsEntry>;
 
 struct ParsedConfigFiles

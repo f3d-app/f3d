@@ -89,6 +89,14 @@ public:
     pxr::TfDiagnosticMgr::GetInstance().AddDelegate(&this->Delegate);
   }
 
+  ~vtkInternals()
+  {
+    pxr::TfDiagnosticMgr::GetInstance().RemoveDelegate(&this->Delegate);
+  }
+
+  vtkInternals(const vtkInternals&) = delete;
+  vtkInternals& operator=(const vtkInternals&) = delete;
+
   void ReadScene(const std::string& filePath)
   {
     // in case of failure, you may want to set PXR_PLUGINPATH_NAME to the lib/usd path

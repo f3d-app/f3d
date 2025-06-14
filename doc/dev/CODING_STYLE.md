@@ -78,10 +78,10 @@ You can fix it locally by running:
 
 ## Markdown and others
 
-Markdown, JavaScript, JSON and HTML files are formatted using [Prettier](https://prettier.io/docs/).
+Markdown, JavaScript, JSON, HTML and YAML files are formatted using [Prettier](https://prettier.io/docs/).
 
 The continuous integration checks the formatting of all these files using `prettier`.
 You can fix them locally by running:
 
 - single file: `prettier -w /path/to/file.ext`
-- all files: `shopt -s globstar; prettier -w **/*.{js,json,md,html}`
+- all files: `shopt -s dotglob;shopt -s globstar; prettier -w **/*.{js,json,md,html,yml}`

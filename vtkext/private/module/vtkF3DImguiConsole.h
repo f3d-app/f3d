@@ -37,7 +37,7 @@ public:
   /**
    * Show console window
    */
-  void ShowConsole();
+  void ShowConsole(bool);
 
   /**
    * Show console badge

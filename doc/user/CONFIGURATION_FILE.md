@@ -7,8 +7,9 @@ Configuration files uses the "long" version of the command-line options in a JSO
 formatted file to provide values for these options. It is also possible to use
 the [libf3d options](../libf3d/OPTIONS.md) syntax.
 
-These options can be organized by block using a regular expression for each block
-in order to provide different default values for the different filetypes.
+These options can be organized by block using a regular expression, glob, or exact match
+for each block in order to provide different default values for the different filetypes. For
+more on glob and exact matching see the [Glob and Exact Matching section](#glob-and-exact-matching).
 
 Using a command-line option will override similar option set in any config files.
 
@@ -175,6 +176,56 @@ Please note that the interaction itself can be modified by the modifiers, hence 
 keyboard layout, eg. on a `QWERTY` layout, the bind `Exclam` is unreachable while `Shift+Exclam` is reachable.
 We tried to make the default bindings of F3D to be a keyboard layout independent as possible, but feel free to redefined them
 for your needs.
+
+## Glob and Exact Matching
+
+While regex is the default match type, glob and exact match types are also supported. Below is an example using glob and exact matching.
+
+```json
+[
+  {
+    "options": {
+      "background-color": "0.7,0.7,0.7",
+      "color": "0.5,0.1,0.1",
+      "anti-aliasing": true,
+      "timer": true,
+      "progress": true,
+      "axis": true,
+      "bar": true,
+      "roughness": 0.2,
+      "grid": true,
+      "scalar-coloring": true
+    }
+  },
+  {
+    "match-type": "glob",
+    "match": "*vt?",
+    "options": {
+      "edges": true
+    }
+  },
+  {
+    "match-type": "glob",
+    "match": "**/*gl{tf,b}",
+    "options": {
+      "raytracing": true,
+      "denoise": true,
+      "samples": 3
+    }
+  },
+  {
+    "match-type": "exact",
+    "match": "/path/to/file.mhd",
+    "options": {
+      "volume": true
+    }
+  }
+]
+```
+
+For glob patterns, globstar (`**`) is supported.
+
+Glob and exact matching can be used for bindings as well.
 
 ## Locations
 

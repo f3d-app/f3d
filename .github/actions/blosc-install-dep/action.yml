@@ -1,15 +1,14 @@
-name: 'Install blosc Dependency'
-description: 'Install blosc Dependency using cache when possible'
+name: "Install blosc Dependency"
+description: "Install blosc Dependency using cache when possible"
 inputs:
   cpu:
-    description: 'CPU architecture to build for'
+    description: "CPU architecture to build for"
     required: false
-    default: 'x86_64'
+    default: "x86_64"
 
 runs:
   using: "composite"
   steps:
-
     - name: Cache blosc
       id: cache-blosc
       uses: actions/cache/restore@v4
@@ -23,7 +22,7 @@ runs:
       uses: actions/checkout@v4
       with:
         repository: Blosc/c-blosc
-        path: './dependencies/blosc'
+        path: "./dependencies/blosc"
         ref: v1.21.6
 
     - name: Setup blosc

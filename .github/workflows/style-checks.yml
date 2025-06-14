@@ -3,56 +3,87 @@ on:
     types: [assigned, opened, synchronize, reopened]
     branches:
       - master
+      - release
 name: Style Checks
 jobs:
+  #----------------------------------------------------------------------------
+  # Detect checkboxes are checked
+  #----------------------------------------------------------------------------
+  detect_checkboxes:
+    name: Detect Checkboxes
+    runs-on: ubuntu-latest
+    outputs:
+      checked: ${{ steps.detect.outputs.checked }}
+      unchecked: ${{ steps.detect.outputs.unchecked }}
 
-  style-checks:
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Checkbox Trigger
+        id: detect
+        uses: AhmedBaset/checklist@3
+        with:
+          token: ${{ github.token }}
+
+      - name: list changes
+        run: |
+          echo "checked=${{ steps.detect.outputs.checked }}"
+          echo "unchecked=${{ steps.detect.outputs.unchecked }}"
+
+  #----------------------------------------------------------------------------
+  # Style checks
+  #----------------------------------------------------------------------------
+  style_checks:
     name: Formatting Check
     runs-on: ubuntu-latest
-
+    needs: detect_checkboxes
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Style checks')) }}
     env:
       ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{github.event.pull_request.head.ref}}
+          repository: ${{github.event.pull_request.head.repo.full_name}}
+          fetch-depth: 1
+          lfs: false
 
-    - uses: actions/checkout@v4
-      with:
-        ref: ${{github.event.pull_request.head.ref}}
-        repository: ${{github.event.pull_request.head.repo.full_name}}
+      # Run codespell first to avoid issues with style check on same location
+      - name: Codespell in place
+        shell: bash
+        run: |
+          pip install codespell
+          codespell -fHw .
 
-    - name: C++ Formatting
-      uses: DoozyX/clang-format-lint-action@v0.16
-      with:
-        source: '.'
-        extensions: 'h,cxx,in'
-        exclude: './cmake **/*.py.in **/*.log.in **/*.json.in **/*.thumbnailer.in **/*.cmake.in **/*.desktop.in'
-        clangFormatVersion: 18
-        inplace: True
+      - name: C++ Formatting
+        uses: DoozyX/clang-format-lint-action@v0.16
+        with:
+          source: "."
+          extensions: "h,cxx,in"
+          exclude: "./cmake **/*.py.in **/*.log.in **/*.json.in **/*.thumbnailer.in **/*.cmake.in **/*.desktop.in"
+          clangFormatVersion: 18
+          inplace: True
 
-    - name: Python Formatting
-      uses: psf/black@stable
-      with:
-        options: "--include '(\\.py|\\.py\\.in)'"
+      - name: Python Formatting
+        uses: psf/black@stable
+        with:
+          options: "--include '(\\.py|\\.py\\.in)'"
 
-    - name: Prettier Formatting
-      continue-on-error: true
-      uses: creyD/prettier_action@v4.3
-      with:
-        dry: True
-        prettier_options: '-w **/*.{js,json,md,html}'
+      - name: Prettier Formatting
+        continue-on-error: true
+        uses: creyD/prettier_action@v4.3
+        with:
+          dry: True
+          prettier_options: "-w **/*.{js,json,md,html,yml}"
 
-    - name: Codespell in place
-      shell: bash
-      run: |
-        pip install codespell
-        codespell -fHw .
+      - uses: googleapis/code-suggester@v5
+        with:
+          command: review
+          pull_number: ${{ github.event.pull_request.number }}
+          git_dir: "."
 
-    - uses: googleapis/code-suggester@v5
-      with:
-        command: review
-        pull_number: ${{ github.event.pull_request.number }}
-        git_dir: '.'
-
-    - name: Diff output
-      shell: bash
-      run: git diff --color=always --exit-code
+      - name: Diff output
+        shell: bash
+        run: git diff --color=always --exit-code
