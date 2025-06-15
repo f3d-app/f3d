@@ -20,6 +20,7 @@
 #include <vtkCullerCollection.h>
 #include <vtkDiscretizableColorTransferFunction.h>
 #include <vtkFloatArray.h>
+#include <vtkGridAxesActor3D.h>
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Factory.h>
@@ -264,6 +265,7 @@ void vtkF3DRenderer::Initialize()
 
   this->AddViewProp(this->ScalarBarActor);
   this->AddActor(this->GridActor);
+  this->AddActor(this->GridAxesActor);
   this->AddActor(this->SkyboxActor);
   this->AddActor(this->UIActor);
 
@@ -707,6 +709,88 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
 
   this->GridActor->SetVisibility(show);
   this->ResetCameraClippingRange();
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ShowAxesGrid(bool show)
+{
+  if (this->AxesGridVisible != show)
+  {
+    this->AxesGridVisible = show;
+    this->RenderPassesConfigured = false;
+    this->GridAxesConfigured = false;
+    this->CheatSheetConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ConfigureCubeAxisUsingCurrentActors()
+{
+  bool show = this->AxesGridVisible;
+  if (show)
+  {
+    double* up = this->GetEnvironmentUp();
+    double* right = this->GetEnvironmentRight();
+    double front[3];
+    vtkMath::Cross(right, up, front);
+
+    vtkNew<vtkMatrix4x4> upMatrix;
+    const double m[16] = {
+      right[0], right[1], right[2], 0, //
+      up[0], up[1], up[2], 0,          //
+      front[0], front[1], front[2], 0, //
+      0, 0, 0, 1,                      //
+    };
+    upMatrix->DeepCopy(m);
+    vtkNew<vtkMatrix4x4> upMatrixInv;
+    upMatrixInv->DeepCopy(upMatrix);
+    upMatrixInv->Transpose();
+
+    double orientation[3];
+    vtkTransform::GetOrientation(orientation, upMatrixInv);
+    const vtkBoundingBox bbox = this->ComputeVisiblePropOrientedBounds(upMatrix);
+
+    if (!bbox.IsValid())
+    {
+      show = false;
+    }
+    else
+    {
+      this->GridAxesActor->SetOrientation(orientation);
+      this->GridAxesActor->SetVisibility(true);
+
+      double center[4] = { 0, 0, 0, 1 };
+      bbox.GetCenter(center);
+
+      this->GridAxesActor->SetPosition(center);
+
+      double a, b, c, x, y, z;
+      bbox.GetBounds(a, b, c, x, y, z);
+      double bounds[6] = { a, b, c, x, y, z };
+      GridAxesActor->SetGridBounds(a, b, c, x, y, z);
+      //this->GridAxesActor->SetBounds(bounds);
+
+      //this->GridAxesActor->XAxisLabelVisibilityOn();
+      /*this->CubeAxesActor->YAxisLabelVisibilityOn();
+      this->CubeAxesActor->ZAxisLabelVisibilityOn();
+      this->GridAxesActor->SetCamera(GetActiveCamera());
+
+      this->CubeAxesActor->SetFlyModeToStaticEdges();
+      this->CubeAxesActor->SetXAxisMinorTickVisibility(false);
+      this->CubeAxesActor->SetYAxisMinorTickVisibility(false);
+      this->CubeAxesActor->SetZAxisMinorTickVisibility(false);
+
+      this->CubeAxesActor->GetLabelTextProperty(0)->SetColor(right);
+      this->CubeAxesActor->GetTitleTextProperty(0)->SetColor(right);
+      this->CubeAxesActor->GetLabelTextProperty(1)->SetColor(up);
+      this->CubeAxesActor->GetTitleTextProperty(1)->SetColor(up);
+      this->CubeAxesActor->GetLabelTextProperty(2)->SetColor(front);
+      this->CubeAxesActor->GetTitleTextProperty(2)->SetColor(front);*/
+
+      this->GridAxesConfigured = true;
+    }
+  }
+  this->GridAxesActor->SetVisibility(show);
 }
 
 //----------------------------------------------------------------------------
@@ -1718,6 +1802,11 @@ void vtkF3DRenderer::UpdateActors()
   if (!this->GridConfigured)
   {
     this->ConfigureGridUsingCurrentActors();
+  }
+
+  if (!this->GridAxesConfigured)
+  {
+    this->ConfigureCubeAxisUsingCurrentActors();
   }
 }
 
