@@ -26,7 +26,7 @@ namespace fs = std::filesystem;
 class vtkDiscretizableColorTransferFunction;
 class vtkColorTransferFunction;
 class vtkCornerAnnotation;
-class vtkCubeAxesActor;
+class vtkGridAxesActor3D;
 class vtkImageReader2;
 class vtkOrientationMarkerWidget;
 class vtkScalarBarActor;
@@ -526,7 +526,7 @@ private:
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
 
   vtkNew<vtkActor> GridActor;
-  vtkNew<vtkCubeAxesActor> CubeAxesActor;
+  vtkNew<vtkGridAxesActor3D> GridAxesActor;
   vtkNew<vtkSkybox> SkyboxActor;
   vtkNew<vtkF3DUIActor> UIActor;
 
@@ -535,7 +535,7 @@ private:
   bool CheatSheetConfigured = false;
   bool ActorsPropertiesConfigured = false;
   bool GridConfigured = false;
-  bool CubeAxesConfigured = false;
+  bool GridAxesConfigured = false;
   bool RenderPassesConfigured = false;
   bool LightIntensitiesConfigured = false;
   bool TextActorsConfigured = false;
