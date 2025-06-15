@@ -481,9 +481,6 @@ f3d_test(NAME TestAnimationAllAnimations DATA InterpolationTest.glb ARGS --anima
 # Test Verbose animation, no baseline needed
 f3d_test(NAME TestVerboseAnimation DATA InterpolationTest.glb ARGS --verbose NO_BASELINE REGEXP "7: CubicSpline Translation")
 
-# Test Animation index out of domain error
-f3d_test(NAME TestVerboseAnimationIndexError DATA InterpolationTest.glb ARGS --animation-indices=48 NO_BASELINE REGEXP "Specified animation index: 48 is not in range")
-
 # Test interactive animation and speed factor
 f3d_test(NAME TestInteractionAnimation DATA f3d.glb ARGS --animation-progress INTERACTION)#Space;Wait;Space;
 f3d_test(NAME TestInteractionAnimationFast DATA f3d.glb ARGS --animation-progress --animation-speed-factor=1.5 INTERACTION)#Space;Wait;Space;
@@ -1129,7 +1126,9 @@ f3d_test(NAME TestVerboseMultiFileRender DATA mb REGEXP "An output image was sav
 f3d_test(NAME TestVerboseMultiFileCompare DATA mb REGEXP "Image comparison was performed using a single 3D file, other provided 3D files were ignored.")
 
 # Test Animation invalid code paths
-f3d_test(NAME TestVerboseAnimationIndexError2 DATA cow.vtp ARGS --animation-indices=1 --verbose REGEXP "Animation indices have been specified but there are no animation available." NO_BASELINE)
+f3d_test(NAME TestVerboseAnimationIndexErrorRange DATA InterpolationTest.glb ARGS --animation-indices=48 NO_BASELINE REGEXP "Specified animation index: 48 is not in range")
+f3d_test(NAME TestVerboseAnimationIndexErrorNone DATA cow.vtp ARGS --animation-indices=1 --verbose REGEXP "Animation indices have been specified but there are no animation available" NO_BASELINE)
+f3d_test(NAME TestVerboseAnimationIndexErrorSingle DATA soldier_animations.mdl ARGS --animation-indices=1,2 --verbose REGEXP "Multiple animation indices have been specified but currently loaded file does not support enabling multiple animations" NO_BASELINE)
 f3d_test(NAME TestVerboseAnimationNoAnimationTime DATA cow.vtp ARGS --animation-time=2 --verbose REGEXP "No animation available, cannot load a specific animation time" NO_BASELINE)
 
 # Test Grid verbose output
