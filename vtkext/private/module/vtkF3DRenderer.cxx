@@ -17,10 +17,10 @@
 #include <vtkCamera.h>
 #include <vtkCellData.h>
 #include <vtkCornerAnnotation.h>
-#include <vtkCubeAxesActor.h>
 #include <vtkCullerCollection.h>
 #include <vtkDiscretizableColorTransferFunction.h>
 #include <vtkFloatArray.h>
+#include <vtkGridAxesActor3D.h>
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Factory.h>
@@ -265,7 +265,7 @@ void vtkF3DRenderer::Initialize()
 
   this->AddViewProp(this->ScalarBarActor);
   this->AddActor(this->GridActor);
-  this->AddActor(this->CubeAxesActor);
+  this->AddActor(this->GridAxesActor);
   this->AddActor(this->SkyboxActor);
   this->AddActor(this->UIActor);
 
@@ -718,7 +718,7 @@ void vtkF3DRenderer::ShowAxesGrid(bool show)
   {
     this->AxesGridVisible = show;
     this->RenderPassesConfigured = false;
-    this->CubeAxesConfigured = false;
+    this->GridAxesConfigured = false;
     this->CheatSheetConfigured = false;
   }
 }
@@ -756,23 +756,24 @@ void vtkF3DRenderer::ConfigureCubeAxisUsingCurrentActors()
     }
     else
     {
-      this->CubeAxesActor->SetOrientation(orientation);
-      this->CubeAxesActor->SetVisibility(true);
+      this->GridAxesActor->SetOrientation(orientation);
+      this->GridAxesActor->SetVisibility(true);
 
       double center[4] = { 0, 0, 0, 1 };
       bbox.GetCenter(center);
 
-      this->CubeAxesActor->SetPosition(center);
+      this->GridAxesActor->SetPosition(center);
 
       double a, b, c, x, y, z;
       bbox.GetBounds(a, b, c, x, y, z);
       double bounds[6] = { a, b, c, x, y, z };
-      this->CubeAxesActor->SetBounds(bounds);
+      GridAxesActor->SetGridBounds(a, b, c, x, y, z);
+      //this->GridAxesActor->SetBounds(bounds);
 
-      this->CubeAxesActor->XAxisLabelVisibilityOn();
-      this->CubeAxesActor->YAxisLabelVisibilityOn();
+      //this->GridAxesActor->XAxisLabelVisibilityOn();
+      /*this->CubeAxesActor->YAxisLabelVisibilityOn();
       this->CubeAxesActor->ZAxisLabelVisibilityOn();
-      this->CubeAxesActor->SetCamera(GetActiveCamera());
+      this->GridAxesActor->SetCamera(GetActiveCamera());
 
       this->CubeAxesActor->SetFlyModeToStaticEdges();
       this->CubeAxesActor->SetXAxisMinorTickVisibility(false);
@@ -784,12 +785,12 @@ void vtkF3DRenderer::ConfigureCubeAxisUsingCurrentActors()
       this->CubeAxesActor->GetLabelTextProperty(1)->SetColor(up);
       this->CubeAxesActor->GetTitleTextProperty(1)->SetColor(up);
       this->CubeAxesActor->GetLabelTextProperty(2)->SetColor(front);
-      this->CubeAxesActor->GetTitleTextProperty(2)->SetColor(front);
+      this->CubeAxesActor->GetTitleTextProperty(2)->SetColor(front);*/
 
-      this->CubeAxesConfigured = true;
+      this->GridAxesConfigured = true;
     }
   }
-  this->CubeAxesActor->SetVisibility(show);
+  this->GridAxesActor->SetVisibility(show);
 }
 
 //----------------------------------------------------------------------------
@@ -1803,7 +1804,7 @@ void vtkF3DRenderer::UpdateActors()
     this->ConfigureGridUsingCurrentActors();
   }
 
-  if (!this->CubeAxesConfigured)
+  if (!this->GridAxesConfigured)
   {
     this->ConfigureCubeAxisUsingCurrentActors();
   }
