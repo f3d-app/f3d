@@ -696,7 +696,7 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
   endif()
 
   f3d_test(NAME TestVerboseAssimp DATA duck.fbx ARGS --verbose --load-plugins=assimp NO_BASELINE REGEXP "LOD3sp")
-  f3d_test(NAME TestVerboseAssimpAnimationIndexError DATA animatedLights.fbx ARGS --load-plugins=assimp --animation-indices=48 NO_BASELINE REGEXP "Specified animation index is greater than the highest possible animation index, enabling the first animation.")
+  f3d_test(NAME TestVerboseAssimpAnimationIndexError DATA animatedLights.fbx ARGS --load-plugins=assimp --animation-indices=48 NO_BASELINE REGEXP "Specified animation index: 48 is not in range")
   f3d_test(NAME TestAssimpAnimationNegativeIndex DATA animatedLights.fbx ARGS --load-plugins=assimp --animation-indices=-113 --animation-time=2 --animation-progress)
   f3d_test(NAME TestTGATextureFBX DATA duck.fbx ARGS --load-plugins=assimp)
   f3d_test(NAME TestDAE DATA duck.dae ARGS --load-plugins=assimp)
@@ -1023,7 +1023,7 @@ f3d_test(NAME TestProgress DATA cow.vtp ARGS --loading-progress NO_BASELINE)
 f3d_test(NAME TestProgressScene DATA WaterBottle.glb ARGS --loading-progress NO_BASELINE)
 f3d_test(NAME TestInteractionProgressReload DATA cow.vtp ARGS --loading-progress NO_BASELINE INTERACTION) #Up;Up;Up;Up
 
-f3d_test(NAME TestInteractionAnimationCycleAnimation DATA InterpolationTest.glb INTERACTION) #WWWWWWWWWWW;Space;Space;
+f3d_test(NAME TestInteractionAnimationCycleAnimation DATA InterpolationTest.glb INTERACTION) #WWWWWWWWWWWW;Space;Space;
 f3d_test(NAME TestInteractionCycleAnimationNoAnimation DATA cow.vtp INTERACTION NO_BASELINE) #W
 
 f3d_test(NAME TestInteractionDropFiles ARGS -n INTERACTION_CONFIGURE UI)#X;DropEvent cow.vtp;DropEvent dragon.vtu suzanne.stl;
@@ -1246,7 +1246,7 @@ f3d_test(NAME TestConfigFileInvalidValue DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/t
 f3d_test(NAME TestConfigFileNonParsableValue DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/nonparsable_value.json REGEXP "Cannot parse nonparsable into an int" NO_BASELINE)
 
 # Test inexistent key in config file
-f3d_test(NAME TestConfigFileInexistentKey DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/inexistent_key.json REGEXP "does not exists , did you mean 'scene.animation.index" NO_BASELINE)
+f3d_test(NAME TestConfigFileInexistentKey DATA cow.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/inexistent_key.json REGEXP "does not exists , did you mean 'scene.animation.indices" NO_BASELINE)
 
 # Test quiet in config file
 f3d_test(NAME TestConfigFileQuiet DATA nonExistentFile.vtp CONFIG ${F3D_SOURCE_DIR}/testing/configs/quiet.json REGEXP_FAIL "File .*/testing/data/nonExistentFile.vtp does not exist" NO_BASELINE)

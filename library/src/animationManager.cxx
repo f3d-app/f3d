@@ -375,44 +375,45 @@ void animationManager::PrepareForAnimationIndices()
   // Do not warn at all if default or empty
   if (!animIndices.empty() && animIndices != std::vector<int>{ 0 })
   {
-    switch (this->Importer->GetAnimationSupportLevel())
+    if (this->AvailAnimations <= 0)
     {
-      case vtkImporter::AnimationSupportLevel::NONE:
-        log::warn("Animation indices have been specified but currently loaded file does not "
-                  "support animations.");
-        break;
-      case vtkImporter::AnimationSupportLevel::UNIQUE:
-        if (this->Options.scene.animation.indices[0] != 0 ||
-          this->Options.scene.animation.indices.size() > 1)
-        {
-          log::warn("Non-zero animation indices have been specified but currently loaded file does not support it.");
-        }
-        break;
-      case vtkImporter::AnimationSupportLevel::SINGLE:
-        if (this->Options.scene.animation.indices.size() > 1)
-        {
-          log::warn("Multiple animation indices have been specified but currently loaded file does "
-                    "not support enabling multiple animations. Enabling animation: ",
-            animIndices[animIndices.size() - 1]);
-        }
-        break;
-      default:
-        break;
+      log::warn("Animation indices have been specified but there are no animation available in this file.");
     }
-  }
-
-  if (this->AvailAnimations <= 0)
-  {
-    if (animIndices != std::vector<int>{ 0 })
+    else
     {
-      log::warn("Animation indices have been specified but there are no animation available.");
+      switch (this->Importer->GetAnimationSupportLevel())
+      {
+        case vtkImporter::AnimationSupportLevel::NONE:
+          log::warn("Animation indices have been specified but currently loaded file does not "
+                    "support animations.");
+          break;
+        case vtkImporter::AnimationSupportLevel::UNIQUE:
+          if (this->Options.scene.animation.indices[0] != 0 ||
+              this->Options.scene.animation.indices.size() > 1)
+          {
+            log::warn("Non-zero animation indices have been specified but currently loaded file does not support it.");
+          }
+          break;
+        case vtkImporter::AnimationSupportLevel::SINGLE:
+          if (this->Options.scene.animation.indices.size() > 1)
+          {
+            log::warn("Multiple animation indices have been specified but currently loaded file does "
+              "not support enabling multiple animations. Enabling animation: ",
+              animIndices[animIndices.size() - 1]);
+          }
+          break;
+        default:
+          break;
+      }
     }
-
-    // No animation available
-    return;
   }
 
   this->PreparedAnimationIndices = animIndices;
+
+  if (this->AvailAnimations <= 0)
+  {
+    return;
+  }
 
   // Disable all animations
   for (int idx = 0; idx < this->AvailAnimations; idx++)

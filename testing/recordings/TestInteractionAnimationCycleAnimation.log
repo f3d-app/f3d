@@ -58,6 +58,11 @@ CharEvent 1195 379 0 119 1 w 0
 KeyReleaseEvent 1195 379 0 119 1 w 0
 RenderEvent 0 1409 0 0 0 0 0
 
+KeyPressEvent 1195 379 0 119 1 w 0
+CharEvent 1195 379 0 119 1 w 0
+KeyReleaseEvent 1195 379 0 119 1 w 0
+RenderEvent 0 1409 0 0 0 0 0
+
 KeyPressEvent 1698 319 0 32 1 space 0
 CharEvent 1698 319 0 32 1 space 0
 KeyReleaseEvent 1698 319 0 32 1 space 0
