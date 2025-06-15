@@ -12,6 +12,11 @@
 int TestF3DGenericImporter(int argc, char* argv[])
 {
   vtkNew<vtkF3DGenericImporter> importer;
+  if (importer->GetAnimationSupportLevel() != vtkImporter::AnimationSupportLevel::UNIQUE)
+  {
+    std::cerr << "Unexpected animation support level" << std::endl;
+    return EXIT_FAILURE;
+  }
   if (importer->GetNumberOfAnimations() != 0)
   {
     std::cerr << "Unexpected number of animations" << std::endl;

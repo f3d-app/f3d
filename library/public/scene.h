@@ -98,6 +98,12 @@ public:
    */
   [[nodiscard]] virtual std::pair<double, double> animationTimeRange() = 0;
 
+  /**
+   * Get the number of animations available in the currently loaded files
+   * Returns -1 if no animation or no loaded files.
+   */
+  [[nodiscard]] virtual int availableAnimations() = 0;
+
 protected:
   //! @cond
   scene() = default;

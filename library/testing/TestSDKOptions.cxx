@@ -33,14 +33,14 @@ int TestSDKOptions(int argc, char* argv[])
   test("toggle optional", opt.getAsString("render.show_edges") == "true");
 
   // Test int
-  opt.setAsString("scene.animation.index", "2");
-  test("setAsString int", opt.getAsString("scene.animation.index") == "2");
+  opt.setAsString("model.scivis.component", "2");
+  test("setAsString int", opt.getAsString("model.scivis.component") == "2");
 
-  opt.scene.animation.index = 3;
-  test("getAsString int", opt.getAsString("scene.animation.index") == "3");
+  opt.model.scivis.component = 3;
+  test("getAsString int", opt.getAsString("model.scivis.component") == "3");
 
-  opt.set("scene.animation.index", 1);
-  test("set/get int", std::get<int>(opt.get("scene.animation.index")) == 1);
+  opt.set("model.scivis.component", 1);
+  test("set/get int", std::get<int>(opt.get("model.scivis.component")) == 1);
 
   // Test double
   opt.setAsString("render.line_width", "2.14");
@@ -87,6 +87,20 @@ int TestSDKOptions(int argc, char* argv[])
   opt.set("render.hdri.file", inputPath);
   test(
     "set/get path", std::get<std::string>(opt.get("render.hdri.file")) == "/path/to/test/variant");
+
+  // Test int vector
+  opt.setAsString("scene.animation.indices", "1,2");
+  test("setAsString vector<int>", opt.getAsString("scene.animation.indices") == "1,2");
+
+  opt.setAsString("scene.animation.indices", "3, 7");
+  test("setAsString spaces vector<int>", opt.getAsString("scene.animation.indices") == "3,7");
+
+  opt.scene.animation.indices = { 4, 12 };
+  test("getAsString vector<int>", opt.getAsString("scene.animation.indices") == "4,12");
+
+  opt.set("scene.animation.indices", std::vector<int>{ 7, 3, 1 });
+  test("set/get vector<int>",
+    std::get<std::vector<int>>(opt.get("scene.animation.indices")) == std::vector<int>{ 7, 3, 1 });
 
   // Test double vector
   opt.setAsString("model.scivis.range", "0.7,1.4");
@@ -198,10 +212,10 @@ int TestSDKOptions(int argc, char* argv[])
 
   // Test parsing error path
   test.expect<f3d::options::parsing_exception>(
-    "set invalid int string", [&]() { opt.setAsString("scene.animation.index", "invalid"); });
+    "set invalid int string", [&]() { opt.setAsString("model.scivis.component", "invalid"); });
 
   test.expect<f3d::options::parsing_exception>("set out-of-range int string",
-    [&]() { opt.setAsString("scene.animation.index", "2147483648"); });
+    [&]() { opt.setAsString("model.scivis.component", "2147483648"); });
 
   test.expect<f3d::options::parsing_exception>(
     "set invalid double string", [&]() { opt.setAsString("render.line_width", "invalid"); });
