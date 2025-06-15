@@ -95,7 +95,7 @@ int TestSDKOptions(int argc, char* argv[])
   opt.setAsString("scene.animation.indices", "3, 7");
   test("setAsString spaces vector<int>", opt.getAsString("scene.animation.indices") == "3,7");
 
-  opt.model.scivis.range = { 4, 12 };
+  opt.scene.animation.indices = { 4, 12 };
   test("getAsString vector<int>", opt.getAsString("scene.animation.indices") == "4,12");
 
   opt.set("scene.animation.indices", std::vector<int>{ 7, 3, 1 });
