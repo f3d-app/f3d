@@ -20,7 +20,3 @@ node_modules
 
 # testing related
 .cache
-
-# visual studio related
-.vs
-build
