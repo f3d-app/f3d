@@ -387,7 +387,7 @@ void animationManager::PrepareForAnimationIndices()
           if (this->Options.scene.animation.indices[0] != 0 ||
               this->Options.scene.animation.indices.size() > 1)
           {
-            log::warn("Non-zero animation indices have been specified but currently loaded file does not support it.");
+            log::warn("Non-zero or multiple animation indices have been specified but currently loaded file does not support it.");
           }
           break;
         case vtkImporter::AnimationSupportLevel::SINGLE:
@@ -399,7 +399,8 @@ void animationManager::PrepareForAnimationIndices()
           }
           break;
         default:
-          // NONE is unreable and MULTI there is nothing to warn
+          // NONE is unreachable
+          // MULTI there is nothing to warn about
           break;
       }
     }
