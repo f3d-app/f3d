@@ -224,6 +224,7 @@ public:
   {
   }
 
+  // clang-format off
   /**
    *  The variables of this function are based on the mathematical notation for matrices,
    *  where the coordinates correspond to the following:
@@ -232,6 +233,7 @@ public:
    *  M =   [M2_1, M2_2, M2_3]
    *        [M3_1, M3_2, M3_3]
    */
+  // clang-format on
 
   inline transform2d_t(double M1_1, double M1_2, double M1_3, double M2_1, double M2_2, double M2_3, double M3_1, double M3_2, double M3_3)
   {
