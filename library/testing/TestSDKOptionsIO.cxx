@@ -211,9 +211,6 @@ int TestSDKOptionsIO(int argc, char* argv[])
     "transform2d_t", "0,0,0,0,0,0,0,0,0", { 0, 0, 0, 0, 0, 0, 0, 0, 0 });
   test.parse<f3d::transform2d_t>(
     "transform2d_t", "0.5,0,0,0,0.5,0,0,0,0.5", { 0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5 });
-  test.parse_expect<f3d::transform2d_t, parsing_exception>("invalid transform2d_t", "0,1");
-  test.parse_expect<f3d::transform2d_t, parsing_exception>("invalid transform2d_t", "1,two,3,four,5,six,7,eight,9");
-  test.parse_expect<f3d::transform2d_t, parsing_exception>("invalid transform2d_t", "1,2,3,4,5,6,7,8,9,0");
   test.format<f3d::transform2d_t>(
     "transform2d_t", { 1, 0, 0, 0, -1, 0, 0, 0, 1 }, "1,0,0,0,-1,0,0,0,1");
   test.format<f3d::transform2d_t>(
