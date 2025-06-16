@@ -31,9 +31,11 @@ _existing_symbols = set(globals().keys())
 from .pyf3d import *
 
 # Automatically populate __all__ with symbols imported from pyf3d
-__all__ = [name for name in globals().keys()
-           if not name.startswith('_')
-           and name not in _existing_symbols]
+__all__ = [
+    name
+    for name in globals().keys()
+    if not name.startswith("_") and name not in _existing_symbols
+]
 
 # Clean up the temporary variable
 del _existing_symbols
