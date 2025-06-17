@@ -499,16 +499,7 @@ template<>
 transform2d_t parse(const std::string& str)
 {
   std::vector<double> input;
-
-  try
-  {
-    input = parse<std::vector<double>>(str);
-  }
-  catch (const options::parsing_exception&)
-  {
-    // Quiet catch
-  }
-
+  input = parse<std::vector<double>>(str);
   return transform2d_t(input);
 }
 
