@@ -257,6 +257,8 @@ f3d_test(NAME TestAnimationIndicesSingle DATA InterpolationTest.glb ARGS --anima
 f3d_test(NAME TestAnimationIndicesMulti DATA InterpolationTest.glb ARGS --animation-indices=7,6 --animation-time=0.5 --animation-progress)
 f3d_test(NAME TestAnimationIndexDeprecated DATA InterpolationTest.glb ARGS --animation-index=7 --animation-time=0.5 --animation-progress)
 f3d_test(NAME TestMultiFileAnimationIndex DATA InterpolationTest.glb BoxAnimated.gltf ARGS --animation-indices=9 --animation-time=0.85 --animation-progress --multi-file-mode=all)
+f3d_test(NAME TestMultiFileAnimationNoneMulti DATA bot2.wrl InterpolationTest.glb ARGS --animation-indices=6 --animation-time=0.85 --multi-file-mode=all)
+f3d_test(NAME TestMultiFileAnimationAnySingle DATA soldier_animations.mdl InterpolationTest.glb ARGS --animation-indices=13 --animation-time=0.85 --multi-file-mode=all --opacity=0.5)
 f3d_test(NAME TestMultiFileAnimationNoAnimationSupport DATA f3d.glb world.obj ARGS --multi-file-mode=all --animation-time=2 --animation-progress)
 f3d_test(NAME TestAnimationAutoplay DATA InterpolationTest.glb ARGS --animation-autoplay)
 f3d_test(NAME TestMaxSizeBelow DATA suzanne.stl ARGS --max-size=1)
@@ -808,6 +810,8 @@ if(F3D_PLUGIN_BUILD_HDF)
 
   # Test if a negative animation-time works when time range[0] is less than zero
   f3d_test(NAME TestTimeRangeLessThanZeroNegativeAnimationTime DATA negative_range_animated.e ARGS -s --load-plugins=hdf --animation-time=-3)
+
+  f3d_test(NAME TestMultiFileAnimationUniqueUnique DATA blob.vtkhdf small.ex2 ARGS --animation-time=0.85 --multi-file-mode=all --opacity=0.5)
 
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${F3D_SOURCE_DIR}/plugins/hdf/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")

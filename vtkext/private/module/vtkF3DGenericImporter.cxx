@@ -261,6 +261,13 @@ std::string vtkF3DGenericImporter::GetDataObjectDescription(vtkDataObject* objec
 //----------------------------------------------------------------------------
 bool vtkF3DGenericImporter::UpdateAtTimeValue(double timeValue)
 {
+
+  if (!this->Pimpl->AnimationEnabled)
+  {
+    // Animation is not enabled, nothing to do
+    return true;
+  }
+
   assert(this->Pimpl->Reader);
   if (!this->Pimpl->PostPro->UpdateTimeStep(timeValue) ||
     !this->Pimpl->Reader->GetOutputDataObject(0))

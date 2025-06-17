@@ -313,10 +313,6 @@ void animationManager::CycleAnimation()
 std::string animationManager::GetAnimationName()
 {
   assert(this->Importer);
-  if (this->AvailAnimations <= 0 || this->PreparedAnimationIndices.empty())
-  {
-    return "No animation";
-  }
   if (this->PreparedAnimationIndices.size() > 1)
   {
     std::vector<bool> animCheck(this->AvailAnimations, false);
@@ -330,6 +326,11 @@ std::string animationManager::GetAnimationName()
     return std::none_of(animCheck.begin(), animCheck.end(), std::logical_not<bool>())
       ? "All animations"
       : "Multi animations";
+  }
+
+  if (this->AvailAnimations <= 0 || this->PreparedAnimationIndices.empty() || this->PreparedAnimationIndices[0] >= this->AvailAnimations)
+  {
+    return "No animation";
   }
 
   return this->Importer->GetAnimationName(this->PreparedAnimationIndices[0]);
@@ -393,9 +394,8 @@ void animationManager::PrepareForAnimationIndices()
         case vtkImporter::AnimationSupportLevel::SINGLE:
           if (this->Options.scene.animation.indices.size() > 1)
           {
-            log::warn("Multiple animation indices have been specified but currently loaded file does "
-              "not support enabling multiple animations. Enabling animation: ",
-              animIndices[animIndices.size() - 1]);
+            log::warn("Multiple animation indices have been specified but currently loaded files may "
+              "not support enabling multiple animations");
           }
           break;
         default:
