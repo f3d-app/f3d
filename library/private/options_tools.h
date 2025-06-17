@@ -494,6 +494,7 @@ colormap_t parse(const std::string& str)
 /**
  *  Parse provided string into a transform2d_t
  *  Supported format: double, double, double, ... as a sequence of 9 values
+ *  Can throw options::parsing_exception in case of failure to parse
  */
 template<>
 transform2d_t parse(const std::string& str)
