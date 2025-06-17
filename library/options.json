@@ -260,6 +260,9 @@
         "type": "path"
       }
     },
+    "textures_transform": {
+      "type": "transform2d"
+    },
     "scivis": {
       "enable": {
         "type": "bool",

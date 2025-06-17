@@ -66,6 +66,7 @@ See the [APIs](#APIs) details below for more info.
 |  model.point_sprites.size   |        double<br>10.0<br>render        | Set the _size_ of point sprites.                                                                                                                                                                                                                     |   \-\-point-stripes-size    |
 |     model.volume.enable     |        bool<br>false<br>render         | Enable _volume rendering_. It is only available for 3D image data (vti, dcm, nrrd, mhd files) and will display nothing with other formats. It forces coloring.                                                                                       |         \-\-volume          |
 |    model.volume.inverse     |        bool<br>false<br>render         | Inverse the linear opacity function.                                                                                                                                                                                                                 |         \-\-inverse         |
+|  model.textures_transform   |   transform2d<br>optional<br>render    | Transform applied to textures on the model. If a default transform is set by the importer, the default value will be multiplied by this transform.                                                                                                   |   \-\-textures-transform    |
 
 ## Render Options
 
