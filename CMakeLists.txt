@@ -227,6 +227,7 @@ if (F3D_MACOS_BUNDLE)
   set(f3d_resources_dir "f3d.app/Contents/Resources")
 endif()
 
+
 ## Will be stored in f3dConfig.cmake
 set(f3d_config_dir "${f3d_resources_dir}/configs")
 if (UNIX AND NOT APPLE)
