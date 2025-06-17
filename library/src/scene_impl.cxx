@@ -97,12 +97,6 @@ public:
     // Initialize the UpVector on load
     this->Window.InitializeUpVector();
 
-    // Reset temporary up to apply any config values
-    if (this->Interactor)
-    {
-      this->Interactor->ResetTemporaryUp();
-    }
-
     if (this->Options.scene.camera.index.has_value())
     {
       this->MetaImporter->SetCameraIndex(this->Options.scene.camera.index.value());

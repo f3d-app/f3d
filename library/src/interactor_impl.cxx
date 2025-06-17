@@ -785,8 +785,6 @@ interactor& interactor_impl::initCommands()
     {
       check_args(args, 1, "roll_camera");
       this->Internals->Window.getCamera().roll(options::parse<int>(args[0]));
-      this->Internals->Style->SetTemporaryUp(
-        this->Internals->Window.getCamera().getViewUp().data());
     });
 
   this->addCommand("increase_light_intensity",
@@ -830,22 +828,18 @@ interactor& interactor_impl::initCommands()
       if (type == "front")
       {
         this->Internals->SetViewOrbit(internals::ViewType::VT_FRONT);
-        this->Internals->Style->ResetTemporaryUp();
       }
       else if (type == "top")
       {
         this->Internals->SetViewOrbit(internals::ViewType::VT_TOP);
-        this->Internals->Style->ResetTemporaryUp();
       }
       else if (type == "right")
       {
         this->Internals->SetViewOrbit(internals::ViewType::VT_RIGHT);
-        this->Internals->Style->ResetTemporaryUp();
       }
       else if (type == "isometric")
       {
         this->Internals->SetViewOrbit(internals::ViewType::VT_ISOMETRIC);
-        this->Internals->Style->ResetTemporaryUp();
       }
       else
       {
@@ -865,11 +859,7 @@ interactor& interactor_impl::initCommands()
   this->addCommand("stop_interactor", [&](const std::vector<std::string>&) { this->stop(); });
 
   this->addCommand("reset_camera",
-    [&](const std::vector<std::string>&)
-    {
-      this->Internals->Window.getCamera().resetToDefault();
-      this->Internals->Style->ResetTemporaryUp();
-    });
+    [&](const std::vector<std::string>&) { this->Internals->Window.getCamera().resetToDefault(); });
 
   this->addCommand("toggle_animation",
     [&](const std::vector<std::string>&) { this->Internals->AnimationManager->ToggleAnimation(); });
@@ -1440,12 +1430,6 @@ void interactor_impl::SetInteractorOn(vtkInteractorObserver* observer)
 void interactor_impl::UpdateRendererAfterInteraction()
 {
   this->Internals->Style->UpdateRendererAfterInteraction();
-}
-
-//----------------------------------------------------------------------------
-void interactor_impl::ResetTemporaryUp()
-{
-  this->Internals->Style->ResetTemporaryUp();
 }
 
 //----------------------------------------------------------------------------

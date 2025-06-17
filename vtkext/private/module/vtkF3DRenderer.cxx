@@ -316,11 +316,11 @@ void vtkF3DRenderer::InitializeUpVector(const std::vector<double>& upVec)
   if (isNullVector(up))
   {
     up[1] = 1.0;
-    F3DLog::Print(F3DLog::Severity::Warning, "null up vector, using (0,0,1) instead");
+    F3DLog::Print(F3DLog::Severity::Warning, "null up vector, using (0,1,0) instead");
   }
   vtkMath::Normalize(up.data());
 
-  /* make sure `right` is not colinear with `up` */
+  /* make sure `right` is not collinear with `up` */
   if (::abs(vtkMath::Dot(right, up)) > 0.999)
   {
     right = { 0, 1, 0 };
