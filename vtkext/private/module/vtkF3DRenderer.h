@@ -185,6 +185,16 @@ public:
   std::string GetSceneDescription();
 
   /**
+   * Get up vector
+   */
+  vtkGetVector3Macro(UpVector, double);
+
+  /**
+   * Set/Get right vector
+   */
+  vtkGetVector3Macro(RightVector, double);
+
+  /**
    * Set cache path, only used by the HDRI logic
    */
   void SetCachePath(const std::string& cachePath);

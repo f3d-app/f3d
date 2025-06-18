@@ -156,21 +156,24 @@ void vtkF3DInteractorStyle::Rotate()
   if (!ren->GetUseTrackball())
   {
     double up[3];
-    camera->GetViewUp(up);
+    this->InterpolateTemporaryUp(0.1, ren->GetUpVector(), up);
 
-    // Rotate camera around the focal point about the camera's up vector
+    // Rotate camera around the focal point about the environment's up vector
     vtkNew<vtkTransform> Transform;
     Transform->Identity();
     const double* fp = camera->GetFocalPoint();
     Transform->Translate(+fp[0], +fp[1], +fp[2]);
-    Transform->RotateWXYZ(rxf, up);
+    Transform->RotateWXYZ(rxf, ren->GetUpVector());
     Transform->Translate(-fp[0], -fp[1], -fp[2]);
     Transform->TransformPoint(camera->GetPosition(), camera->GetPosition());
+
+    camera->SetViewUp(up);
 
     // Clamp parameter to `camera->Elevation()` to maintain -90 < elevation < +90
     constexpr double maxAbsElevation = 90 - 1e-12;
     const double elevation = vtkMath::DegreesFromRadians(
-      vtkMath::AngleBetweenVectors(up, camera->GetDirectionOfProjection()) - vtkMath::Pi() / 2);
+      vtkMath::AngleBetweenVectors(ren->GetUpVector(), camera->GetDirectionOfProjection()) -
+      vtkMath::Pi() / 2);
     camera->Elevation(std::clamp(ryf, -maxAbsElevation - elevation, +maxAbsElevation - elevation));
 
     camera->OrthogonalizeViewUp();
@@ -335,4 +338,43 @@ void vtkF3DInteractorStyle::FindPokedRenderer(int vtkNotUsed(x), int vtkNotUsed(
 {
   // No need for picking, F3D interaction are only with the first renderer
   this->SetCurrentRenderer(this->Interactor->GetRenderWindow()->GetRenderers()->GetFirstRenderer());
+}
+
+//------------------------------------------------------------------------------
+void vtkF3DInteractorStyle::ResetTemporaryUp()
+{
+  // Make sure this->CurrentRenderer is set
+  this->FindPokedRenderer(0, 0);
+
+  if (this->CurrentRenderer)
+  {
+    vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(this->CurrentRenderer);
+    SetTemporaryUp(ren->GetUpVector());
+  }
+}
+
+//------------------------------------------------------------------------------
+void vtkF3DInteractorStyle::SetTemporaryUp(const double* tempUp)
+{
+  for (int i = 0; i < 3; i++)
+  {
+    this->TemporaryUp[i] = tempUp[i];
+  }
+  this->TemporaryUpFactor = 1.0;
+}
+
+//------------------------------------------------------------------------------
+void vtkF3DInteractorStyle::InterpolateTemporaryUp(
+  const double factorDelta, const double* target, double* output)
+{
+  this->TemporaryUpFactor = std::max(this->TemporaryUpFactor - factorDelta, 0.0);
+  if (this->TemporaryUpFactor >= 0)
+  {
+    const double factor = (1.0 - std::cos(vtkMath::Pi() * this->TemporaryUpFactor)) * 0.5;
+    for (int i = 0; i < 3; i++)
+    {
+      output[i] = factor * this->TemporaryUp[i] + (1.0 - factor) * target[i];
+    }
+    vtkMath::Normalize(output);
+  }
 }

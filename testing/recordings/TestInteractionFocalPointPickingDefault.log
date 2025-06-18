@@ -1,549 +1,266 @@
-# StreamVersion 1.2
-TimerEvent 0 0 0 0 0 0 0
-TimerEvent 0 0 0 0 0 0 0
-TimerEvent 0 0 0 0 0 0 0
-TimerEvent 0 0 0 0 0 0 0
-TimerEvent 0 0 0 0 0 0 0
-TimerEvent 0 0 0 0 0 0 0
-TimerEvent 0 0 0 0 0 0 0
-TimerEvent 0 0 0 0 0 0 0
-TimerEvent 0 0 0 0 0 0 0
-TimerEvent 0 0 0 0 0 0 0
-TimerEvent 0 0 0 0 0 0 0
-TimerEvent 0 0 0 0 0 0 0
-TimerEvent 0 0 0 0 0 0 0
-TimerEvent 0 0 0 0 0 0 0
-TimerEvent 0 0 0 0 0 0 0
-TimerEvent 0 0 0 0 0 0 0
-TimerEvent 0 0 0 0 0 0 0
-TimerEvent 0 0 0 0 0 0 0
-TimerEvent 0 0 0 0 0 0 0
-MouseMoveEvent 299 206 0 0 0 0 0
-EnterEvent 299 206 0 0 0 0 0
-MouseMoveEvent 289 200 0 0 0 0 0
-MouseMoveEvent 289 200 0 0 0 0 0
-TimerEvent 289 200 0 0 0 0 0
-MouseMoveEvent 280 195 0 0 0 0 0
-MouseMoveEvent 280 195 0 0 0 0 0
-MouseMoveEvent 272 192 0 0 0 0 0
-MouseMoveEvent 272 192 0 0 0 0 0
-MouseMoveEvent 264 188 0 0 0 0 0
-MouseMoveEvent 264 188 0 0 0 0 0
-MouseMoveEvent 256 184 0 0 0 0 0
-MouseMoveEvent 256 184 0 0 0 0 0
-TimerEvent 256 184 0 0 0 0 0
-MouseMoveEvent 248 180 0 0 0 0 0
-MouseMoveEvent 248 180 0 0 0 0 0
-KeyPressEvent 239 177 0 51 1 3 0
-CharEvent 239 177 0 51 1 3 0
-MouseMoveEvent 228 172 0 0 0 3 0
-MouseMoveEvent 228 172 0 0 0 3 0
-TimerEvent 228 172 0 0 0 3 0
-MouseMoveEvent 222 169 0 0 0 3 0
-MouseMoveEvent 222 169 0 0 0 3 0
-MouseMoveEvent 215 166 0 0 0 3 0
-MouseMoveEvent 215 166 0 0 0 3 0
-MouseMoveEvent 211 164 0 0 0 3 0
-MouseMoveEvent 211 164 0 0 0 3 0
-MouseMoveEvent 207 161 0 0 0 3 0
-MouseMoveEvent 207 161 0 0 0 3 0
-TimerEvent 207 161 0 0 0 3 0
-MouseMoveEvent 202 159 0 0 0 3 0
-MouseMoveEvent 202 159 0 0 0 3 0
-MouseMoveEvent 201 158 0 0 0 3 0
-MouseMoveEvent 201 158 0 0 0 3 0
-MouseMoveEvent 199 157 0 0 0 3 0
-MouseMoveEvent 199 157 0 0 0 3 0
-KeyReleaseEvent 199 157 0 51 1 3 0
-MouseMoveEvent 198 156 0 0 0 3 0
-MouseMoveEvent 198 156 0 0 0 3 0
-TimerEvent 198 156 0 0 0 3 0
-MouseMoveEvent 197 156 0 0 0 3 0
-MouseMoveEvent 197 156 0 0 0 3 0
-MouseMoveEvent 196 155 0 0 0 3 0
-MouseMoveEvent 196 155 0 0 0 3 0
-MouseMoveEvent 195 155 0 0 0 3 0
-MouseMoveEvent 195 155 0 0 0 3 0
-MouseMoveEvent 194 154 0 0 0 3 0
-MouseMoveEvent 194 154 0 0 0 3 0
-TimerEvent 194 154 0 0 0 3 0
-MouseMoveEvent 193 154 0 0 0 3 0
-MouseMoveEvent 193 154 0 0 0 3 0
-MouseMoveEvent 192 153 0 0 0 3 0
-MouseMoveEvent 192 153 0 0 0 3 0
-MouseMoveEvent 192 153 0 0 0 3 0
-MouseMoveEvent 192 153 0 0 0 3 0
-MouseMoveEvent 191 153 0 0 0 3 0
-MouseMoveEvent 191 153 0 0 0 3 0
-TimerEvent 191 153 0 0 0 3 0
-MouseMoveEvent 191 152 0 0 0 3 0
-MouseMoveEvent 191 152 0 0 0 3 0
-MouseMoveEvent 191 152 0 0 0 3 0
-MouseMoveEvent 191 152 0 0 0 3 0
-MouseMoveEvent 191 152 0 0 0 3 0
-MouseMoveEvent 191 152 0 0 0 3 0
-TimerEvent 191 152 0 0 0 3 0
-MouseMoveEvent 190 152 0 0 0 3 0
-MouseMoveEvent 190 152 0 0 0 3 0
-TimerEvent 190 152 0 0 0 3 0
-MouseMoveEvent 190 152 0 0 0 3 0
-MouseMoveEvent 190 152 0 0 0 3 0
-MouseMoveEvent 189 152 0 0 0 3 0
-MouseMoveEvent 189 152 0 0 0 3 0
-MouseMoveEvent 189 152 0 0 0 3 0
-MouseMoveEvent 189 152 0 0 0 3 0
-TimerEvent 189 152 0 0 0 3 0
-MouseMoveEvent 188 152 0 0 0 3 0
-MouseMoveEvent 188 152 0 0 0 3 0
-MouseMoveEvent 187 152 0 0 0 3 0
-MouseMoveEvent 187 152 0 0 0 3 0
-MouseMoveEvent 186 152 0 0 0 3 0
-MouseMoveEvent 186 152 0 0 0 3 0
-MouseMoveEvent 185 152 0 0 0 3 0
-MouseMoveEvent 185 152 0 0 0 3 0
-TimerEvent 185 152 0 0 0 3 0
-MouseMoveEvent 184 152 0 0 0 3 0
-MouseMoveEvent 184 152 0 0 0 3 0
-MouseMoveEvent 182 151 0 0 0 3 0
-MouseMoveEvent 182 151 0 0 0 3 0
-MouseMoveEvent 181 151 0 0 0 3 0
-MouseMoveEvent 181 151 0 0 0 3 0
-MouseMoveEvent 180 151 0 0 0 3 0
-MouseMoveEvent 180 151 0 0 0 3 0
-TimerEvent 180 151 0 0 0 3 0
-MouseMoveEvent 178 150 0 0 0 3 0
-MouseMoveEvent 178 150 0 0 0 3 0
-MouseMoveEvent 175 149 0 0 0 3 0
-MouseMoveEvent 175 149 0 0 0 3 0
-MouseMoveEvent 172 149 0 0 0 3 0
-MouseMoveEvent 172 149 0 0 0 3 0
-MouseMoveEvent 170 148 0 0 0 3 0
-MouseMoveEvent 170 148 0 0 0 3 0
-TimerEvent 170 148 0 0 0 3 0
-MouseMoveEvent 169 148 0 0 0 3 0
-MouseMoveEvent 169 148 0 0 0 3 0
-MouseMoveEvent 167 147 0 0 0 3 0
-MouseMoveEvent 167 147 0 0 0 3 0
-MouseMoveEvent 167 147 0 0 0 3 0
-MouseMoveEvent 167 147 0 0 0 3 0
-MouseMoveEvent 166 147 0 0 0 3 0
-MouseMoveEvent 166 147 0 0 0 3 0
-TimerEvent 166 147 0 0 0 3 0
-MouseMoveEvent 166 147 0 0 0 3 0
-MouseMoveEvent 166 147 0 0 0 3 0
-TimerEvent 166 147 0 0 0 3 0
-TimerEvent 166 147 0 0 0 3 0
-MouseMoveEvent 165 147 0 0 0 3 0
-MouseMoveEvent 165 147 0 0 0 3 0
-MouseMoveEvent 164 147 0 0 0 3 0
-MouseMoveEvent 164 147 0 0 0 3 0
-MouseMoveEvent 163 147 0 0 0 3 0
-MouseMoveEvent 163 147 0 0 0 3 0
-MouseMoveEvent 162 147 0 0 0 3 0
-MouseMoveEvent 162 147 0 0 0 3 0
-MouseMoveEvent 161 147 0 0 0 3 0
-MouseMoveEvent 161 147 0 0 0 3 0
-TimerEvent 161 147 0 0 0 3 0
-MouseMoveEvent 160 147 0 0 0 3 0
-MouseMoveEvent 160 147 0 0 0 3 0
-MouseMoveEvent 159 147 0 0 0 3 0
-MouseMoveEvent 159 147 0 0 0 3 0
-MouseMoveEvent 157 147 0 0 0 3 0
-MouseMoveEvent 157 147 0 0 0 3 0
-TimerEvent 157 147 0 0 0 3 0
-MouseMoveEvent 155 147 0 0 0 3 0
-MouseMoveEvent 155 147 0 0 0 3 0
-MouseMoveEvent 154 147 0 0 0 3 0
-MouseMoveEvent 154 147 0 0 0 3 0
-MouseMoveEvent 152 147 0 0 0 3 0
-MouseMoveEvent 152 147 0 0 0 3 0
-MouseMoveEvent 149 147 0 0 0 3 0
-MouseMoveEvent 149 147 0 0 0 3 0
-MouseMoveEvent 148 147 0 0 0 3 0
-MouseMoveEvent 148 147 0 0 0 3 0
-TimerEvent 148 147 0 0 0 3 0
-MouseMoveEvent 147 147 0 0 0 3 0
-MouseMoveEvent 147 147 0 0 0 3 0
-MouseMoveEvent 146 147 0 0 0 3 0
-MouseMoveEvent 146 147 0 0 0 3 0
-MouseMoveEvent 145 147 0 0 0 3 0
-MouseMoveEvent 145 147 0 0 0 3 0
-TimerEvent 145 147 0 0 0 3 0
-TimerEvent 145 147 0 0 0 3 0
-TimerEvent 145 147 0 0 0 3 0
-TimerEvent 145 147 0 0 0 3 0
-TimerEvent 145 147 0 0 0 3 0
-TimerEvent 145 147 0 0 0 3 0
-TimerEvent 145 147 0 0 0 3 0
-TimerEvent 145 147 0 0 0 3 0
-TimerEvent 145 147 0 0 0 3 0
-TimerEvent 145 147 0 0 0 3 0
-TimerEvent 145 147 0 0 0 3 0
-TimerEvent 145 147 0 0 0 3 0
-TimerEvent 145 147 0 0 0 3 0
-TimerEvent 145 147 0 0 0 3 0
-MiddleButtonPressEvent 144 148 0 0 0 3 0
-StartInteractionEvent 144 148 0 0 0 3 0
-TimerEvent 144 148 0 0 0 3 0
-TimerEvent 144 148 0 0 0 3 0
-TimerEvent 144 148 0 0 0 3 0
-TimerEvent 144 148 0 0 0 3 0
-TimerEvent 144 148 0 0 0 3 0
-TimerEvent 144 148 0 0 0 3 0
-MouseMoveEvent 146 148 0 0 0 3 0
-RenderEvent 146 148 0 0 0 3 0
-InteractionEvent 146 148 0 0 0 3 0
-MouseMoveEvent 147 149 0 0 0 3 0
-RenderEvent 147 149 0 0 0 3 0
-InteractionEvent 147 149 0 0 0 3 0
-MouseMoveEvent 150 150 0 0 0 3 0
-RenderEvent 150 150 0 0 0 3 0
-InteractionEvent 150 150 0 0 0 3 0
-MouseMoveEvent 151 151 0 0 0 3 0
-RenderEvent 151 151 0 0 0 3 0
-InteractionEvent 151 151 0 0 0 3 0
-MouseMoveEvent 153 152 0 0 0 3 0
-RenderEvent 153 152 0 0 0 3 0
-InteractionEvent 153 152 0 0 0 3 0
-TimerEvent 153 152 0 0 0 3 0
-MouseMoveEvent 156 154 0 0 0 3 0
-RenderEvent 156 154 0 0 0 3 0
-InteractionEvent 156 154 0 0 0 3 0
-MouseMoveEvent 163 159 0 0 0 3 0
-RenderEvent 163 159 0 0 0 3 0
-InteractionEvent 163 159 0 0 0 3 0
-MouseMoveEvent 168 161 0 0 0 3 0
-RenderEvent 168 161 0 0 0 3 0
-InteractionEvent 168 161 0 0 0 3 0
-TimerEvent 168 161 0 0 0 3 0
-MouseMoveEvent 169 163 0 0 0 3 0
-RenderEvent 169 163 0 0 0 3 0
-InteractionEvent 169 163 0 0 0 3 0
-MouseMoveEvent 180 169 0 0 0 3 0
-RenderEvent 180 169 0 0 0 3 0
-InteractionEvent 180 169 0 0 0 3 0
-TimerEvent 180 169 0 0 0 3 0
-MouseMoveEvent 183 170 0 0 0 3 0
-RenderEvent 183 170 0 0 0 3 0
-InteractionEvent 183 170 0 0 0 3 0
-MouseMoveEvent 188 173 0 0 0 3 0
-RenderEvent 188 173 0 0 0 3 0
-InteractionEvent 188 173 0 0 0 3 0
-MouseMoveEvent 190 174 0 0 0 3 0
-RenderEvent 190 174 0 0 0 3 0
-InteractionEvent 190 174 0 0 0 3 0
-TimerEvent 190 174 0 0 0 3 0
-MouseMoveEvent 195 177 0 0 0 3 0
-RenderEvent 195 177 0 0 0 3 0
-InteractionEvent 195 177 0 0 0 3 0
-MouseMoveEvent 198 179 0 0 0 3 0
-RenderEvent 198 179 0 0 0 3 0
-InteractionEvent 198 179 0 0 0 3 0
-TimerEvent 198 179 0 0 0 3 0
-MouseMoveEvent 202 181 0 0 0 3 0
-RenderEvent 202 181 0 0 0 3 0
-InteractionEvent 202 181 0 0 0 3 0
-MouseMoveEvent 202 182 0 0 0 3 0
-RenderEvent 202 182 0 0 0 3 0
-InteractionEvent 202 182 0 0 0 3 0
-MouseMoveEvent 206 184 0 0 0 3 0
-RenderEvent 206 184 0 0 0 3 0
-InteractionEvent 206 184 0 0 0 3 0
-MouseMoveEvent 209 185 0 0 0 3 0
-RenderEvent 209 185 0 0 0 3 0
-InteractionEvent 209 185 0 0 0 3 0
-TimerEvent 209 185 0 0 0 3 0
-MouseMoveEvent 211 186 0 0 0 3 0
-RenderEvent 211 186 0 0 0 3 0
-InteractionEvent 211 186 0 0 0 3 0
-MouseMoveEvent 216 190 0 0 0 3 0
-RenderEvent 216 190 0 0 0 3 0
-InteractionEvent 216 190 0 0 0 3 0
-MouseMoveEvent 217 191 0 0 0 3 0
-RenderEvent 217 191 0 0 0 3 0
-InteractionEvent 217 191 0 0 0 3 0
-TimerEvent 217 191 0 0 0 3 0
-MouseMoveEvent 221 194 0 0 0 3 0
-RenderEvent 221 194 0 0 0 3 0
-InteractionEvent 221 194 0 0 0 3 0
-MouseMoveEvent 222 195 0 0 0 3 0
-RenderEvent 222 195 0 0 0 3 0
-InteractionEvent 222 195 0 0 0 3 0
-TimerEvent 222 195 0 0 0 3 0
-MouseMoveEvent 224 196 0 0 0 3 0
-RenderEvent 224 196 0 0 0 3 0
-InteractionEvent 224 196 0 0 0 3 0
-MouseMoveEvent 225 197 0 0 0 3 0
-RenderEvent 225 197 0 0 0 3 0
-InteractionEvent 225 197 0 0 0 3 0
-MouseMoveEvent 225 198 0 0 0 3 0
-RenderEvent 225 198 0 0 0 3 0
-InteractionEvent 225 198 0 0 0 3 0
-MouseMoveEvent 225 198 0 0 0 3 0
-RenderEvent 225 198 0 0 0 3 0
-InteractionEvent 225 198 0 0 0 3 0
-TimerEvent 225 198 0 0 0 3 0
-MouseMoveEvent 226 198 0 0 0 3 0
-RenderEvent 226 198 0 0 0 3 0
-InteractionEvent 226 198 0 0 0 3 0
-MouseMoveEvent 226 199 0 0 0 3 0
-RenderEvent 226 199 0 0 0 3 0
-InteractionEvent 226 199 0 0 0 3 0
-TimerEvent 226 199 0 0 0 3 0
-TimerEvent 226 199 0 0 0 3 0
-TimerEvent 226 199 0 0 0 3 0
-MouseMoveEvent 226 199 0 0 0 3 0
-RenderEvent 226 199 0 0 0 3 0
-InteractionEvent 226 199 0 0 0 3 0
-MouseMoveEvent 226 200 0 0 0 3 0
-RenderEvent 226 200 0 0 0 3 0
-InteractionEvent 226 200 0 0 0 3 0
-MouseMoveEvent 226 200 0 0 0 3 0
-RenderEvent 226 200 0 0 0 3 0
-InteractionEvent 226 200 0 0 0 3 0
-TimerEvent 226 200 0 0 0 3 0
-MouseMoveEvent 227 200 0 0 0 3 0
-RenderEvent 227 200 0 0 0 3 0
-InteractionEvent 227 200 0 0 0 3 0
-MouseMoveEvent 227 201 0 0 0 3 0
-RenderEvent 227 201 0 0 0 3 0
-InteractionEvent 227 201 0 0 0 3 0
-TimerEvent 227 201 0 0 0 3 0
-TimerEvent 227 201 0 0 0 3 0
-TimerEvent 227 201 0 0 0 3 0
-TimerEvent 227 201 0 0 0 3 0
-TimerEvent 227 201 0 0 0 3 0
-TimerEvent 227 201 0 0 0 3 0
-TimerEvent 227 201 0 0 0 3 0
-TimerEvent 227 201 0 0 0 3 0
-TimerEvent 227 201 0 0 0 3 0
-TimerEvent 227 201 0 0 0 3 0
-TimerEvent 227 201 0 0 0 3 0
-MiddleButtonReleaseEvent 226 202 0 0 0 3 0
-EndInteractionEvent 226 202 0 0 0 3 0
-RenderEvent 226 202 0 0 0 3 0
-TimerEvent 226 202 0 0 0 3 0
-MouseMoveEvent 226 201 0 0 0 3 0
-MouseMoveEvent 226 201 0 0 0 3 0
-MouseMoveEvent 223 202 0 0 0 3 0
-MouseMoveEvent 223 202 0 0 0 3 0
-TimerEvent 223 202 0 0 0 3 0
-MouseMoveEvent 221 203 0 0 0 3 0
-MouseMoveEvent 221 203 0 0 0 3 0
-MouseMoveEvent 219 204 0 0 0 3 0
-MouseMoveEvent 219 204 0 0 0 3 0
-MouseMoveEvent 214 206 0 0 0 3 0
-MouseMoveEvent 214 206 0 0 0 3 0
-MouseMoveEvent 211 207 0 0 0 3 0
-MouseMoveEvent 211 207 0 0 0 3 0
-TimerEvent 211 207 0 0 0 3 0
-MouseMoveEvent 208 208 0 0 0 3 0
-MouseMoveEvent 208 208 0 0 0 3 0
-MouseMoveEvent 203 210 0 0 0 3 0
-MouseMoveEvent 203 210 0 0 0 3 0
-MouseMoveEvent 197 212 0 0 0 3 0
-MouseMoveEvent 197 212 0 0 0 3 0
-MouseMoveEvent 191 215 0 0 0 3 0
-MouseMoveEvent 191 215 0 0 0 3 0
-TimerEvent 191 215 0 0 0 3 0
-MouseMoveEvent 181 219 0 0 0 3 0
-MouseMoveEvent 181 219 0 0 0 3 0
-MouseMoveEvent 170 224 0 0 0 3 0
-MouseMoveEvent 170 224 0 0 0 3 0
-MouseMoveEvent 160 227 0 0 0 3 0
-MouseMoveEvent 160 227 0 0 0 3 0
-MouseMoveEvent 147 232 0 0 0 3 0
-MouseMoveEvent 147 232 0 0 0 3 0
-TimerEvent 147 232 0 0 0 3 0
-MouseMoveEvent 138 236 0 0 0 3 0
-MouseMoveEvent 138 236 0 0 0 3 0
-MouseMoveEvent 129 241 0 0 0 3 0
-MouseMoveEvent 129 241 0 0 0 3 0
-MouseMoveEvent 118 244 0 0 0 3 0
-MouseMoveEvent 118 244 0 0 0 3 0
-MouseMoveEvent 110 247 0 0 0 3 0
-MouseMoveEvent 110 247 0 0 0 3 0
-TimerEvent 110 247 0 0 0 3 0
-MouseMoveEvent 101 251 0 0 0 3 0
-MouseMoveEvent 101 251 0 0 0 3 0
-MouseMoveEvent 92 256 0 0 0 3 0
-MouseMoveEvent 92 256 0 0 0 3 0
-MouseMoveEvent 86 258 0 0 0 3 0
-MouseMoveEvent 86 258 0 0 0 3 0
-MouseMoveEvent 81 260 0 0 0 3 0
-MouseMoveEvent 81 260 0 0 0 3 0
-TimerEvent 81 260 0 0 0 3 0
-MouseMoveEvent 78 263 0 0 0 3 0
-MouseMoveEvent 78 263 0 0 0 3 0
-MouseMoveEvent 77 263 0 0 0 3 0
-MouseMoveEvent 77 263 0 0 0 3 0
-MouseMoveEvent 75 264 0 0 0 3 0
-MouseMoveEvent 75 264 0 0 0 3 0
-MouseMoveEvent 74 265 0 0 0 3 0
-MouseMoveEvent 74 265 0 0 0 3 0
-TimerEvent 74 265 0 0 0 3 0
-MouseMoveEvent 73 265 0 0 0 3 0
-MouseMoveEvent 73 265 0 0 0 3 0
-MouseMoveEvent 73 266 0 0 0 3 0
-MouseMoveEvent 73 266 0 0 0 3 0
-MouseMoveEvent 72 266 0 0 0 3 0
-MouseMoveEvent 72 266 0 0 0 3 0
-MouseMoveEvent 72 266 0 0 0 3 0
-MouseMoveEvent 72 266 0 0 0 3 0
-MouseMoveEvent 71 267 0 0 0 3 0
-MouseMoveEvent 71 267 0 0 0 3 0
-TimerEvent 71 267 0 0 0 3 0
-MouseMoveEvent 71 268 0 0 0 3 0
-MouseMoveEvent 71 268 0 0 0 3 0
-MouseMoveEvent 70 268 0 0 0 3 0
-MouseMoveEvent 70 268 0 0 0 3 0
-MouseMoveEvent 69 270 0 0 0 3 0
-MouseMoveEvent 69 270 0 0 0 3 0
-MouseMoveEvent 67 271 0 0 0 3 0
-MouseMoveEvent 67 271 0 0 0 3 0
-TimerEvent 67 271 0 0 0 3 0
-MouseMoveEvent 65 272 0 0 0 3 0
-MouseMoveEvent 65 272 0 0 0 3 0
-MouseMoveEvent 63 274 0 0 0 3 0
-MouseMoveEvent 63 274 0 0 0 3 0
-MouseMoveEvent 62 275 0 0 0 3 0
-MouseMoveEvent 62 275 0 0 0 3 0
-MouseMoveEvent 61 276 0 0 0 3 0
-MouseMoveEvent 61 276 0 0 0 3 0
-TimerEvent 61 276 0 0 0 3 0
-MouseMoveEvent 60 277 0 0 0 3 0
-MouseMoveEvent 60 277 0 0 0 3 0
-MouseMoveEvent 59 278 0 0 0 3 0
-MouseMoveEvent 59 278 0 0 0 3 0
-MouseMoveEvent 59 279 0 0 0 3 0
-MouseMoveEvent 59 279 0 0 0 3 0
-MouseMoveEvent 58 280 0 0 0 3 0
-MouseMoveEvent 58 280 0 0 0 3 0
-TimerEvent 58 280 0 0 0 3 0
-MouseMoveEvent 58 281 0 0 0 3 0
-MouseMoveEvent 58 281 0 0 0 3 0
-MouseMoveEvent 58 282 0 0 0 3 0
-MouseMoveEvent 58 282 0 0 0 3 0
-MouseMoveEvent 58 283 0 0 0 3 0
-MouseMoveEvent 58 283 0 0 0 3 0
-MouseMoveEvent 58 284 0 0 0 3 0
-MouseMoveEvent 58 284 0 0 0 3 0
-TimerEvent 58 284 0 0 0 3 0
-MouseMoveEvent 58 285 0 0 0 3 0
-MouseMoveEvent 58 285 0 0 0 3 0
-MouseMoveEvent 58 286 0 0 0 3 0
-MouseMoveEvent 58 286 0 0 0 3 0
-MouseMoveEvent 57 287 0 0 0 3 0
-MouseMoveEvent 57 287 0 0 0 3 0
-MouseMoveEvent 57 289 0 0 0 3 0
-MouseMoveEvent 57 289 0 0 0 3 0
-TimerEvent 57 289 0 0 0 3 0
-MouseMoveEvent 57 290 0 0 0 3 0
-MouseMoveEvent 57 290 0 0 0 3 0
-MouseMoveEvent 56 291 0 0 0 3 0
-MouseMoveEvent 56 291 0 0 0 3 0
-MouseMoveEvent 56 293 0 0 0 3 0
-MouseMoveEvent 56 293 0 0 0 3 0
-MouseMoveEvent 56 294 0 0 0 3 0
-MouseMoveEvent 56 294 0 0 0 3 0
-TimerEvent 56 294 0 0 0 3 0
-MouseMoveEvent 55 296 0 0 0 3 0
-MouseMoveEvent 55 296 0 0 0 3 0
-MouseMoveEvent 54 298 0 0 0 3 0
-MouseMoveEvent 54 298 0 0 0 3 0
-MouseMoveEvent 54 299 0 0 0 3 0
-MouseMoveEvent 54 299 0 0 0 3 0
-MouseMoveEvent 54 300 0 0 0 3 0
-MouseMoveEvent 54 300 0 0 0 3 0
-TimerEvent 54 300 0 0 0 3 0
-MouseMoveEvent 54 302 0 0 0 3 0
-MouseMoveEvent 54 302 0 0 0 3 0
-MouseMoveEvent 53 303 0 0 0 3 0
-MouseMoveEvent 53 303 0 0 0 3 0
-MouseMoveEvent 53 303 0 0 0 3 0
-MouseMoveEvent 53 303 0 0 0 3 0
-MouseMoveEvent 53 304 0 0 0 3 0
-MouseMoveEvent 53 304 0 0 0 3 0
-MouseMoveEvent 53 306 0 0 0 3 0
-MouseMoveEvent 53 306 0 0 0 3 0
-TimerEvent 53 306 0 0 0 3 0
-MouseMoveEvent 52 307 0 0 0 3 0
-MouseMoveEvent 52 307 0 0 0 3 0
-MouseMoveEvent 52 307 0 0 0 3 0
-MouseMoveEvent 52 307 0 0 0 3 0
-MouseMoveEvent 51 308 0 0 0 3 0
-MouseMoveEvent 51 308 0 0 0 3 0
-MouseMoveEvent 51 309 0 0 0 3 0
-MouseMoveEvent 51 309 0 0 0 3 0
-TimerEvent 51 309 0 0 0 3 0
-MouseMoveEvent 51 310 0 0 0 3 0
-MouseMoveEvent 51 310 0 0 0 3 0
-MouseMoveEvent 50 310 0 0 0 3 0
-MouseMoveEvent 50 310 0 0 0 3 0
-MouseMoveEvent 50 311 0 0 0 3 0
-MouseMoveEvent 50 311 0 0 0 3 0
-MouseMoveEvent 50 311 0 0 0 3 0
-MouseMoveEvent 50 311 0 0 0 3 0
-TimerEvent 50 311 0 0 0 3 0
-MouseMoveEvent 50 312 0 0 0 3 0
-MouseMoveEvent 50 312 0 0 0 3 0
-TimerEvent 50 312 0 0 0 3 0
-MouseMoveEvent 49 312 0 0 0 3 0
-MouseMoveEvent 49 312 0 0 0 3 0
-MouseMoveEvent 48 313 0 0 0 3 0
-MouseMoveEvent 48 313 0 0 0 3 0
-MouseMoveEvent 47 313 0 0 0 3 0
-MouseMoveEvent 47 313 0 0 0 3 0
-TimerEvent 47 313 0 0 0 3 0
-MouseMoveEvent 46 314 0 0 0 3 0
-MouseMoveEvent 46 314 0 0 0 3 0
-MouseMoveEvent 45 314 0 0 0 3 0
-MouseMoveEvent 45 314 0 0 0 3 0
-MouseMoveEvent 44 315 0 0 0 3 0
-MouseMoveEvent 44 315 0 0 0 3 0
-MouseMoveEvent 43 315 0 0 0 3 0
-MouseMoveEvent 43 315 0 0 0 3 0
-TimerEvent 43 315 0 0 0 3 0
-MouseMoveEvent 42 316 0 0 0 3 0
-MouseMoveEvent 42 316 0 0 0 3 0
-MouseMoveEvent 42 316 0 0 0 3 0
-MouseMoveEvent 42 316 0 0 0 3 0
-MouseMoveEvent 42 317 0 0 0 3 0
-MouseMoveEvent 42 317 0 0 0 3 0
-MouseMoveEvent 42 317 0 0 0 3 0
-MouseMoveEvent 42 317 0 0 0 3 0
-TimerEvent 42 317 0 0 0 3 0
-MouseMoveEvent 41 317 0 0 0 3 0
-MouseMoveEvent 41 317 0 0 0 3 0
-MouseMoveEvent 41 318 0 0 0 3 0
-MouseMoveEvent 41 318 0 0 0 3 0
-MouseMoveEvent 40 318 0 0 0 3 0
-MouseMoveEvent 40 318 0 0 0 3 0
-TimerEvent 40 318 0 0 0 3 0
-MouseMoveEvent 40 319 0 0 0 3 0
-MouseMoveEvent 40 319 0 0 0 3 0
-MouseMoveEvent 39 319 0 0 0 3 0
-MouseMoveEvent 39 319 0 0 0 3 0
-MouseMoveEvent 38 320 0 0 0 3 0
-MouseMoveEvent 38 320 0 0 0 3 0
-MouseMoveEvent 37 320 0 0 0 3 0
-MouseMoveEvent 37 320 0 0 0 3 0
-TimerEvent 37 320 0 0 0 3 0
-MouseMoveEvent 37 320 0 0 0 3 0
-MouseMoveEvent 37 320 0 0 0 3 0
-MouseMoveEvent 36 321 0 0 0 3 0
-MouseMoveEvent 36 321 0 0 0 3 0
-MouseMoveEvent 36 321 0 0 0 3 0
-MouseMoveEvent 36 321 0 0 0 3 0
-MouseMoveEvent 36 321 0 0 0 3 0
-MouseMoveEvent 36 321 0 0 0 3 0
-MouseMoveEvent 35 322 0 0 0 3 0
-MouseMoveEvent 35 322 0 0 0 3 0
-TimerEvent 35 322 0 0 0 3 0
-TimerEvent 35 322 0 0 0 3 0
-TimerEvent 35 322 0 0 0 3 0
-TimerEvent 35 322 0 0 0 3 0
-MouseMoveEvent 35 322 0 0 0 3 0
-MouseMoveEvent 35 322 0 0 0 3 0
-TimerEvent 35 322 0 0 0 3 0
-TimerEvent 35 322 0 0 0 3 0
+# StreamVersion 1.1
+ExposeEvent 0 299 0 0 0 0
+RenderEvent 0 299 0 0 0 0
+EnterEvent 290 108 0 0 0 0
+MouseMoveEvent 290 108 0 0 0 0
+MouseMoveEvent 55 189 0 0 0 0
+MiddleButtonPressEvent 55 189 0 0 0 0
+StartInteractionEvent 55 189 0 0 0 0
+MiddleButtonReleaseEvent 55 189 0 0 0 0
+EndInteractionEvent 55 189 0 0 0 0
+RenderEvent 55 189 0 0 0 0
+MouseMoveEvent 55 189 0 0 0 0
+MouseWheelForwardEvent 55 189 0 0 0 0
+StartInteractionEvent 55 189 0 0 0 0
+RenderEvent 55 189 0 0 0 0
+EndInteractionEvent 55 189 0 0 0 0
+RenderEvent 55 189 0 0 0 0
+MouseWheelForwardEvent 55 189 0 0 1 0
+StartInteractionEvent 55 189 0 0 1 0
+RenderEvent 55 189 0 0 1 0
+EndInteractionEvent 55 189 0 0 1 0
+RenderEvent 55 189 0 0 1 0
+MouseWheelForwardEvent 55 189 0 0 0 0
+StartInteractionEvent 55 189 0 0 0 0
+RenderEvent 55 189 0 0 0 0
+EndInteractionEvent 55 189 0 0 0 0
+RenderEvent 55 189 0 0 0 0
+MouseWheelForwardEvent 55 189 0 0 1 0
+StartInteractionEvent 55 189 0 0 1 0
+RenderEvent 55 189 0 0 1 0
+EndInteractionEvent 55 189 0 0 1 0
+RenderEvent 55 189 0 0 1 0
+MouseMoveEvent 55 189 0 0 0 0
+MouseMoveEvent 69 142 0 0 0 0
+LeftButtonPressEvent 69 142 0 0 0 0
+StartInteractionEvent 69 142 0 0 0 0
+MouseMoveEvent 69 142 0 0 0 0
+RenderEvent 69 142 0 0 0 0
+InteractionEvent 69 142 0 0 0 0
+MouseMoveEvent 69 141 0 0 0 0
+RenderEvent 69 141 0 0 0 0
+InteractionEvent 69 141 0 0 0 0
+MouseMoveEvent 70 141 0 0 0 0
+RenderEvent 70 141 0 0 0 0
+InteractionEvent 70 141 0 0 0 0
+MouseMoveEvent 73 141 0 0 0 0
+RenderEvent 73 141 0 0 0 0
+InteractionEvent 73 141 0 0 0 0
+MouseMoveEvent 80 141 0 0 0 0
+RenderEvent 80 141 0 0 0 0
+InteractionEvent 80 141 0 0 0 0
+MouseMoveEvent 92 140 0 0 0 0
+RenderEvent 92 140 0 0 0 0
+InteractionEvent 92 140 0 0 0 0
+MouseMoveEvent 97 138 0 0 0 0
+RenderEvent 97 138 0 0 0 0
+InteractionEvent 97 138 0 0 0 0
+MouseMoveEvent 101 137 0 0 0 0
+RenderEvent 101 137 0 0 0 0
+InteractionEvent 101 137 0 0 0 0
+MouseMoveEvent 106 135 0 0 0 0
+RenderEvent 106 135 0 0 0 0
+InteractionEvent 106 135 0 0 0 0
+MouseMoveEvent 111 134 0 0 0 0
+RenderEvent 111 134 0 0 0 0
+InteractionEvent 111 134 0 0 0 0
+MouseMoveEvent 116 133 0 0 0 0
+RenderEvent 116 133 0 0 0 0
+InteractionEvent 116 133 0 0 0 0
+MouseMoveEvent 122 132 0 0 0 0
+RenderEvent 122 132 0 0 0 0
+InteractionEvent 122 132 0 0 0 0
+MouseMoveEvent 133 132 0 0 0 0
+RenderEvent 133 132 0 0 0 0
+InteractionEvent 133 132 0 0 0 0
+MouseMoveEvent 142 132 0 0 0 0
+RenderEvent 142 132 0 0 0 0
+InteractionEvent 142 132 0 0 0 0
+MouseMoveEvent 145 132 0 0 0 0
+RenderEvent 145 132 0 0 0 0
+InteractionEvent 145 132 0 0 0 0
+MouseMoveEvent 146 131 0 0 0 0
+RenderEvent 146 131 0 0 0 0
+InteractionEvent 146 131 0 0 0 0
+MouseMoveEvent 148 131 0 0 0 0
+RenderEvent 148 131 0 0 0 0
+InteractionEvent 148 131 0 0 0 0
+MouseMoveEvent 155 131 0 0 0 0
+RenderEvent 155 131 0 0 0 0
+InteractionEvent 155 131 0 0 0 0
+MouseMoveEvent 160 130 0 0 0 0
+RenderEvent 160 130 0 0 0 0
+InteractionEvent 160 130 0 0 0 0
+MouseMoveEvent 165 129 0 0 0 0
+RenderEvent 165 129 0 0 0 0
+InteractionEvent 165 129 0 0 0 0
+MouseMoveEvent 173 129 0 0 0 0
+RenderEvent 173 129 0 0 0 0
+InteractionEvent 173 129 0 0 0 0
+MouseMoveEvent 179 128 0 0 0 0
+RenderEvent 179 128 0 0 0 0
+InteractionEvent 179 128 0 0 0 0
+MouseMoveEvent 182 128 0 0 0 0
+RenderEvent 182 128 0 0 0 0
+InteractionEvent 182 128 0 0 0 0
+MouseMoveEvent 183 128 0 0 0 0
+RenderEvent 183 128 0 0 0 0
+InteractionEvent 183 128 0 0 0 0
+MouseMoveEvent 184 128 0 0 0 0
+RenderEvent 184 128 0 0 0 0
+InteractionEvent 184 128 0 0 0 0
+MouseMoveEvent 185 128 0 0 0 0
+RenderEvent 185 128 0 0 0 0
+InteractionEvent 185 128 0 0 0 0
+MouseMoveEvent 186 128 0 0 0 0
+RenderEvent 186 128 0 0 0 0
+InteractionEvent 186 128 0 0 0 0
+MouseMoveEvent 190 128 0 0 0 0
+RenderEvent 190 128 0 0 0 0
+InteractionEvent 190 128 0 0 0 0
+MouseMoveEvent 197 129 0 0 0 0
+RenderEvent 197 129 0 0 0 0
+InteractionEvent 197 129 0 0 0 0
+MouseMoveEvent 208 132 0 0 0 0
+RenderEvent 208 132 0 0 0 0
+InteractionEvent 208 132 0 0 0 0
+MouseMoveEvent 213 133 0 0 0 0
+RenderEvent 213 133 0 0 0 0
+InteractionEvent 213 133 0 0 0 0
+MouseMoveEvent 218 133 0 0 0 0
+RenderEvent 218 133 0 0 0 0
+InteractionEvent 218 133 0 0 0 0
+MouseMoveEvent 222 134 0 0 0 0
+RenderEvent 222 134 0 0 0 0
+InteractionEvent 222 134 0 0 0 0
+MouseMoveEvent 223 134 0 0 0 0
+RenderEvent 223 134 0 0 0 0
+InteractionEvent 223 134 0 0 0 0
+MouseMoveEvent 224 134 0 0 0 0
+RenderEvent 224 134 0 0 0 0
+InteractionEvent 224 134 0 0 0 0
+MouseMoveEvent 225 134 0 0 0 0
+RenderEvent 225 134 0 0 0 0
+InteractionEvent 225 134 0 0 0 0
+MouseMoveEvent 226 134 0 0 0 0
+RenderEvent 226 134 0 0 0 0
+InteractionEvent 226 134 0 0 0 0
+MouseMoveEvent 227 134 0 0 0 0
+RenderEvent 227 134 0 0 0 0
+InteractionEvent 227 134 0 0 0 0
+MouseMoveEvent 228 134 0 0 0 0
+RenderEvent 228 134 0 0 0 0
+InteractionEvent 228 134 0 0 0 0
+MouseMoveEvent 229 134 0 0 0 0
+RenderEvent 229 134 0 0 0 0
+InteractionEvent 229 134 0 0 0 0
+MouseMoveEvent 229 135 0 0 0 0
+RenderEvent 229 135 0 0 0 0
+InteractionEvent 229 135 0 0 0 0
+MouseMoveEvent 231 135 0 0 0 0
+RenderEvent 231 135 0 0 0 0
+InteractionEvent 231 135 0 0 0 0
+MouseMoveEvent 232 135 0 0 0 0
+RenderEvent 232 135 0 0 0 0
+InteractionEvent 232 135 0 0 0 0
+MouseMoveEvent 232 136 0 0 0 0
+RenderEvent 232 136 0 0 0 0
+InteractionEvent 232 136 0 0 0 0
+LeftButtonReleaseEvent 232 136 0 0 0 0
+EndInteractionEvent 232 136 0 0 0 0
+RenderEvent 232 136 0 0 0 0
+MouseMoveEvent 232 136 0 0 0 0
+MouseMoveEvent 104 150 0 0 0 0
+MiddleButtonPressEvent 104 150 0 0 0
+StartInteractionEvent 104 150 0 0 0
+MiddleButtonReleaseEvent 104 150 0 0 0
+EndInteractionEvent 104 150 0 0 0
+LeftButtonPressEvent 104 150 0 0 0
+StartInteractionEvent 104 150 0 0 0
+MouseMoveEvent 104 150 0 0 0
+RenderEvent 104 150 0 0 0
+InteractionEvent 104 150 0 0 0
+MouseMoveEvent 105 150 0 0 0
+RenderEvent 105 150 0 0 0
+InteractionEvent 105 150 0 0 0
+MouseMoveEvent 108 150 0 0 0
+RenderEvent 108 150 0 0 0
+InteractionEvent 108 150 0 0 0
+MouseMoveEvent 110 150 0 0 0
+RenderEvent 110 150 0 0 0
+InteractionEvent 110 150 0 0 0
+MouseMoveEvent 115 150 0 0 0
+RenderEvent 115 150 0 0 0
+InteractionEvent 115 150 0 0 0
+MouseMoveEvent 120 150 0 0 0
+RenderEvent 120 150 0 0 0
+InteractionEvent 120 150 0 0 0
+MouseMoveEvent 126 150 0 0 0
+RenderEvent 126 150 0 0 0
+InteractionEvent 126 150 0 0 0
+MouseMoveEvent 132 150 0 0 0
+RenderEvent 132 150 0 0 0
+InteractionEvent 132 150 0 0 0
+MouseMoveEvent 137 149 0 0 0
+RenderEvent 137 149 0 0 0
+InteractionEvent 137 149 0 0 0
+MouseMoveEvent 141 148 0 0 0
+RenderEvent 141 148 0 0 0
+InteractionEvent 141 148 0 0 0
+MouseMoveEvent 144 148 0 0 0
+RenderEvent 144 148 0 0 0
+InteractionEvent 144 148 0 0 0
+MouseMoveEvent 147 148 0 0 0
+RenderEvent 147 148 0 0 0
+InteractionEvent 147 148 0 0 0
+MouseMoveEvent 151 148 0 0 0
+RenderEvent 151 148 0 0 0
+InteractionEvent 151 148 0 0 0
+MouseMoveEvent 157 148 0 0 0
+RenderEvent 157 148 0 0 0
+InteractionEvent 157 148 0 0 0
+MouseMoveEvent 161 148 0 0 0
+RenderEvent 161 148 0 0 0
+InteractionEvent 161 148 0 0 0
+MouseMoveEvent 166 148 0 0 0
+RenderEvent 166 148 0 0 0
+InteractionEvent 166 148 0 0 0
+MouseMoveEvent 168 148 0 0 0
+RenderEvent 168 148 0 0 0
+InteractionEvent 168 148 0 0 0
+MouseMoveEvent 170 148 0 0 0
+RenderEvent 170 148 0 0 0
+InteractionEvent 170 148 0 0 0
+MouseMoveEvent 172 148 0 0 0
+RenderEvent 172 148 0 0 0
+InteractionEvent 172 148 0 0 0
+MouseMoveEvent 175 148 0 0 0
+RenderEvent 175 148 0 0 0
+InteractionEvent 175 148 0 0 0
+MouseMoveEvent 180 148 0 0 0
+RenderEvent 180 148 0 0 0
+InteractionEvent 180 148 0 0 0
+MouseMoveEvent 185 148 0 0 0
+RenderEvent 185 148 0 0 0
+InteractionEvent 185 148 0 0 0
+MouseMoveEvent 190 148 0 0 0
+RenderEvent 190 148 0 0 0
+InteractionEvent 190 148 0 0 0
+MouseMoveEvent 192 148 0 0 0
+RenderEvent 192 148 0 0 0
+InteractionEvent 192 148 0 0 0
+MouseMoveEvent 192 147 0 0 0
+RenderEvent 192 147 0 0 0
+InteractionEvent 192 147 0 0 0
+MouseMoveEvent 193 147 0 0 0
+RenderEvent 193 147 0 0 0
+InteractionEvent 193 147 0 0 0
+MouseMoveEvent 194 147 0 0 0
+RenderEvent 194 147 0 0 0
+InteractionEvent 194 147 0 0 0
+MouseMoveEvent 196 147 0 0 0
+RenderEvent 196 147 0 0 0
+InteractionEvent 196 147 0 0 0
+LeftButtonReleaseEvent 196 147 0 0 0
+EndInteractionEvent 196 147 0 0 0
+RenderEvent 196 147 0 0 0
