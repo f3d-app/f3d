@@ -291,6 +291,18 @@ void camera_impl::SetVTKRenderer(vtkRenderer* renderer)
 }
 
 //----------------------------------------------------------------------------
+camera& camera_impl::setOrbitTime(double time)
+{
+  this->orbit_time = time;
+  return *this;
+}
+
+double camera_impl::getOrbitTime() const
+{
+  return this->orbit_time;
+}
+
+//----------------------------------------------------------------------------
 vtkCamera* camera_impl::GetVTKCamera()
 {
   return this->Internals->VTKRenderer->GetActiveCamera();

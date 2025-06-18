@@ -6,6 +6,7 @@
 #ifndef f3d_animationManager_h
 #define f3d_animationManager_h
 
+#include <vtkCamera.h>
 #include <vtkNew.h>
 #include <vtkProgressBarWidget.h>
 #include <vtkSmartPointer.h>
