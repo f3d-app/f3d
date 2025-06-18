@@ -1,6 +1,7 @@
 [
   {
-    "match": ".*(ex2|vtkhdf)",
+    "match-type": "glob",
+    "match": "*.{exo,ex2,e,g,vtkhdf}",
     "options": {
       "scalar-coloring": true,
       "load-plugins": "hdf",

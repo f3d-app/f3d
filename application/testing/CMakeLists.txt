@@ -280,7 +280,8 @@ f3d_test(NAME TestMultiInputMultiArgs ARGS --input ${F3D_SOURCE_DIR}/testing/dat
 f3d_test(NAME TestInvalidUpDirection DATA suzanne.ply ARGS -g --up=W REGEXP "Could not set 'up'" NO_BASELINE)
 f3d_test(NAME TestUpDirectionNoSign DATA suzanne.ply ARGS --up=X)
 f3d_test(NAME TestTextureMatCap DATA suzanne.ply ARGS --texture-matcap=${F3D_SOURCE_DIR}/testing/data/skin.png)
-f3d_test(NAME TestTextureMatCapWithTCoords DATA WaterBottle.glb ARGS --texture-matcap=${F3D_SOURCE_DIR}/testing/data/skin.png)
+f3d_test(NAME TestTexturesTransform DATA world.obj ARGS --textures-transform=1,0,0,0,-1,0,0,0,1)
+f3d_test(NAME TestTexturesTransformGL DATA WaterBottle.glb ARGS --textures-transform=1,0,0,0,-1,0,0,0,1 --camera-direction=-1,0,0)
 f3d_test(NAME TestConfigOrder DATA suzanne.ply ARGS CONFIG ${F3D_SOURCE_DIR}/testing/configs/config_order.json) # `.+` > `.*` alphabetically but overridden by the order
 f3d_test(NAME TestOutputStream DATA suzanne.ply ARGS --verbose=quiet --output=- REGEXP "^.PNG" NO_BASELINE NO_OUTPUT)
 f3d_test(NAME TestOutputStreamInfo DATA suzanne.ply ARGS --verbose=info --output=- REGEXP "redirected to stderr" NO_BASELINE NO_OUTPUT)
@@ -772,6 +773,9 @@ if(F3D_PLUGIN_BUILD_HDF)
   endif()
 
   f3d_test(NAME TestExodus DATA disk_out_ref.ex2 ARGS --load-plugins=hdf -s --camera-position=-11,-2,-49)
+  f3d_test(NAME TestExodusExo DATA box.exo ARGS --load-plugins=hdf NO_RENDER NO_BASELINE REGEXP "Number of points: 24")
+  f3d_test(NAME TestExodusG DATA box.g ARGS --load-plugins=hdf NO_RENDER NO_BASELINE REGEXP "Number of points: 24")
+  f3d_test(NAME TestExodusE DATA single_timestep.e ARGS --load-plugins=hdf NO_RENDER NO_BASELINE REGEXP "Number of points: 1331")
 
   f3d_test(NAME TestExodusConfig DATA disk_out_ref.ex2 CONFIG ${F3D_SOURCE_DIR}/testing/configs/exodus.json ARGS -s --camera-position=-11,-2,-49)
 
@@ -1305,6 +1309,17 @@ if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME TestReadersListMultiplePlugins ARGS --list-readers --load-plugins=assimp,alembic NO_BASELINE REGEXP_FAIL "Plugin failed to load")
 endif()
 
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
+  f3d_test(NAME TestForceReaderFail DATA suzanne.stl ARGS --force-reader=GLTF NO_BASELINE REGEXP "Some of these files could not be loaded: failed to load scene")
+  f3d_test(NAME TestForceReaderPass DATA suzanne.not_supported ARGS --force-reader=STL)
+  f3d_test(NAME TestForceReaderInvalid DATA suzanne.stl ARGS --force-reader=INVALID NO_BASELINE REGEXP "Forced reader .* doesn't exist")
+
+  if(F3D_PLUGIN_BUILD_DRACO)
+    f3d_test(NAME TestForceReaderGLTFDraco DATA BoxAnimated.gltf ARGS --load-plugins=draco --force-reader=GLTFDraco)
+    f3d_test(NAME TestForceReaderGLTFDracoIntoGLTF DATA Box_draco.gltf ARGS --load-plugins=draco --force-reader=GLTF NO_BASELINE REGEXP "failed to load scene")
+  endif()
+endif()
+
 # Test bindings-list display
 f3d_test(NAME TestBindingsList ARGS --list-bindings REGEXP "Any.5        Toggle Orthographic Projection")
 
@@ -1405,7 +1420,11 @@ if(NOT WIN32)
   f3d_test(NAME TestOutputWithExistingReferenceTooLong DATA suzanne.ply ARGS --reference=${F3D_SOURCE_DIR}/testing/data/world.png --output=${_f3d_test_invalid_folder}/file.ext REGEXP "File name too long" NO_BASELINE NO_OUTPUT)
 
   if(NOT APPLE)
-    f3d_test(NAME TestXDG_CONFIG_HOME DATA suzanne.ply CONFIG config_build REGEXP "Using config directory ${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d" NO_RENDER NO_BASELINE ENV "XDG_CONFIG_HOME=${CMAKE_BINARY_DIR}/share")
+
+    # This tests the XDG_CONFIG_HOME is taken into account AND that config order between locations is respected
+    file(COPY "${F3D_SOURCE_DIR}/testing/configs/02_home.json" DESTINATION "${CMAKE_BINARY_DIR}/share/a_home_config/f3d/config_build.d")
+    f3d_test(NAME TestXDG_CONFIG_HOME DATA suzanne.ply CONFIG config_build ENV "XDG_CONFIG_HOME=${CMAKE_BINARY_DIR}/share/a_home_config" UI TONE_MAPPING)
+
     f3d_test(NAME TestXDG_CACHE_HOMECoverage DATA suzanne.ply NO_RENDER NO_BASELINE ENV "XDG_CACHE_HOME=${CMAKE_BINARY_DIR}")
 
     # Setting XDG_CACHE_HOME is needed for cache to work when HOME is not set

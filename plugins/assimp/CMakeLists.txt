@@ -33,11 +33,11 @@ f3d_plugin_declare_reader(
 )
 
 f3d_plugin_declare_reader(
-  NAME Collada
+  NAME COLLADA
   EXTENSIONS dae
   MIMETYPES application/vnd.dae
   VTK_IMPORTER vtkF3DAssimpImporter
-  FORMAT_DESCRIPTION "Collada"
+  FORMAT_DESCRIPTION "COLLADA"
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/collada.inl"
 )
 
