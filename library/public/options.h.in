@@ -214,4 +214,9 @@ inline std::ostream& operator<<(std::ostream& os, const f3d::colormap_t& cm)
   os << f3d::options::format(cm);
   return os;
 }
+inline std::ostream& operator<<(std::ostream& os, const f3d::transform2d_t& transform)
+{
+  os << f3d::options::format(transform);
+  return os;
+}
 #endif

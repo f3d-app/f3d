@@ -28,6 +28,7 @@ See the [APIs](#APIs) details below for more info.
 |     scene.animation.time     | double<br>optional<br>load | Set the animation time to load.                                                                                                              |     \-\-animation-time     |
 |      scene.camera.index      |  int<br>optional<br>load   | Select the scene camera to use when available in the file.<br>The default scene always uses automatic camera.                                |      \-\-camera-index      |
 |      scene.up_direction      |  direction<br>+Y<br>load   | Define the Up direction. It impacts the grid, the axis, the HDRI and the camera.                                                             |           \-\-up           |
+|      scene.force_reader      | string<br>optional<br>load | Force a specific reader to be used, disregarding the file extension. See [user documentation](../user/SUPPORTED_FORMATS.md)                  |      \-\-force-reader      |
 |  scene.camera.orthographic   |  bool<br>optional<br>load  | Set to true to force orthographic projection. Model specified by default, which is false if not specified.                                   |  \-\-camera\-orthographic  |
 
 ## Interactor Options
@@ -65,6 +66,7 @@ See the [APIs](#APIs) details below for more info.
 |  model.point_sprites.size   |        double<br>10.0<br>render        | Set the _size_ of point sprites.                                                                                                                                                                                                                     |   \-\-point-stripes-size    |
 |     model.volume.enable     |        bool<br>false<br>render         | Enable _volume rendering_. It is only available for 3D image data (vti, dcm, nrrd, mhd files) and will display nothing with other formats. It forces coloring.                                                                                       |         \-\-volume          |
 |    model.volume.inverse     |        bool<br>false<br>render         | Inverse the linear opacity function.                                                                                                                                                                                                                 |         \-\-inverse         |
+|  model.textures_transform   |   transform2d<br>optional<br>render    | Transform applied to textures on the model. If a default transform is set by the importer, the default value will be multiplied by this transform.                                                                                                   |   \-\-textures-transform    |
 
 ## Render Options
 

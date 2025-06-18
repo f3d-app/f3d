@@ -25,6 +25,9 @@
       "orthographic": {
         "type": "bool"
       }
+    },
+    "force_reader": {
+      "type": "string"
     }
   },
   "render": {
@@ -256,6 +259,9 @@
       "texture": {
         "type": "path"
       }
+    },
+    "textures_transform": {
+      "type": "transform2d"
     },
     "scivis": {
       "enable": {

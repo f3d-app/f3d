@@ -205,6 +205,17 @@ int TestSDKOptionsIO(int argc, char* argv[])
   test.format<f3d::colormap_t>(
     "colormap_t", { 0, 0.1, 0.2, 0.3, 1, 0.3, 0.2, 0.1 }, "0,0.1,0.2,0.3,1,0.3,0.2,0.1");
 
+  test.parse<f3d::transform2d_t>(
+    "transform2d_t", "1,0,0,0,-1,0,0,0,1", { 1, 0, 0, 0, -1, 0, 0, 0, 1 });
+  test.parse<f3d::transform2d_t>(
+    "transform2d_t", "0,0,0,0,0,0,0,0,0", { 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+  test.parse<f3d::transform2d_t>(
+    "transform2d_t", "0.5,0,0,0,0.5,0,0,0,0.5", { 0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5 });
+  test.format<f3d::transform2d_t>(
+    "transform2d_t", { 1, 0, 0, 0, -1, 0, 0, 0, 1 }, "1,0,0,0,-1,0,0,0,1");
+  test.format<f3d::transform2d_t>(
+    "transform2d_t", { 0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5 }, "0.5,0,0,0,0.5,0,0,0,0.5");
+
   test.parse<std::vector<std::string>>(
     "std::vector<std::string>", "foo,bar,baz", { "foo", "bar", "baz" });
   test.parse<std::vector<std::string>>(
