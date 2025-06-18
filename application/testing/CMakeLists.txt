@@ -65,27 +65,6 @@ function(f3d_test)
     endif()
   endif()
 
-  # make tests w/ scalar-coloring sensitive to increase in max colors
-  set(_has_scalar_coloring FALSE)  
-  if(F3D_TEST_CONFIG) # checks for tests w/ complex config (sets scalar coloring)
-    if("${F3D_TEST_CONFIG}" MATCHES "complex")
-      set(_has_scalar_coloring TRUE) 
-    endif()
-  endif()
-  if(F3D_TEST_ARGS)   # checks for tests w/ scalar-coloring in args
-    foreach(_arg ${F3D_TEST_ARGS})
-      if(_arg STREQUAL "-s" OR _arg STREQUAL "--scalar-coloring")
-        set(_has_scalar_coloring TRUE)
-      elseif(_arg MATCHES "--reference-threshold=") # if threshold is set for whatever reason, don't override
-        set(_has_scalar_coloring FALSE)
-        break()
-      endif()
-    endforeach()
-  endif()
-  if(_has_scalar_coloring)
-    list(APPEND F3D_TEST_ARGS "--reference-threshold=0.0")
-  endif()
-
   add_test(NAME "f3d::${F3D_TEST_NAME}" COMMAND $<TARGET_FILE:f3d> ${F3D_TEST_ARGS} COMMAND_EXPAND_LISTS)
 
   set(_timeout "30")
@@ -219,6 +198,7 @@ f3d_test(NAME TestScalars DATA suzanne.ply ARGS -s --coloring-array=Normals --co
 f3d_test(NAME TestScalarsCell DATA f3d.vtp ARGS --scalar-coloring --coloring-by-cells --coloring-component=-2 --up=+Z)
 f3d_test(NAME TestScalarsRange DATA suzanne.ply ARGS -s --coloring-array=Normals --coloring-component=1 --coloring-range=0,1)
 f3d_test(NAME TestScalarsWithBar DATA suzanne.ply ARGS -b -s --coloring-array=Normals --coloring-component=0)
+f3d_test(NAME TestScalarsWithBarContinuity DATA suzanne.ply ARGS -b -s --coloring-array=Normals --coloring-component=0 THRESHOLD 0.001)
 f3d_test(NAME TestGLTFImporter DATA f3d.glb)
 f3d_test(NAME TestGLTFImporterWithAnimation DATA BoxAnimated.gltf ARGS --animation-time=2 --animation-progress)
 f3d_test(NAME TestGLTFSkin DATA SimpleSkin.gltf)
@@ -324,6 +304,7 @@ f3d_test(NAME TestColorMapMore1pxWarning DATA dragon.vtu ARGS --verbose=warning 
 f3d_test(NAME TestColorMap16bits DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis16.png --scalar-coloring --coloring-component=1)
 f3d_test(NAME TestColorMap32bits DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis32.hdr --scalar-coloring --coloring-component=1)
 f3d_test(NAME TestColorDiscretization DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis32.hdr --scalar-coloring --coloring-component=1 --colormap-discretization=4)
+f3d_test(NAME TestColorDiscretizationBarLabels DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis32.hdr --scalar-coloring -b --coloring-component=1 --colormap-discretization=4)
 
 if(NOT F3D_MACOS_BUNDLE)
   file(COPY "${F3D_SOURCE_DIR}/resources/colormaps/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/colormaps")

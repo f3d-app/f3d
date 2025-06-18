@@ -2665,12 +2665,12 @@ void vtkF3DRenderer::ConfigureScalarBarActorForColoring(
   scalarBar->SetWidth(0.8);
   scalarBar->SetHeight(0.07);
   scalarBar->SetPosition(0.1, 0.01);
-  scalarBar->SetMaximumNumberOfColors(512);
+  scalarBar->SetMaximumNumberOfColors(512);  
 
   if (this->ColormapDiscretization.has_value() && this->ColormapDiscretization.value() > 0 &&
-    this->ColormapDiscretization.value() <= 12)
+    this->ColormapDiscretization.value() <= 10)
   {
-    scalarBar->SetNumberOfLabels(this->ColormapDiscretization.value() + 1);
+    scalarBar->SetNumberOfLabels(this->ColormapDiscretization.value() + 1); // Aligns labels for low values
   }
   else
   {
