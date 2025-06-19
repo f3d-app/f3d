@@ -811,7 +811,7 @@ if(F3D_PLUGIN_BUILD_HDF)
   # Test if a negative animation-time works when time range[0] is less than zero
   f3d_test(NAME TestTimeRangeLessThanZeroNegativeAnimationTime DATA negative_range_animated.e ARGS -s --load-plugins=hdf --animation-time=-3)
 
-  f3d_test(NAME TestMultiFileAnimationUniqueUnique DATA blob.vtkhdf small.ex2 ARGS --animation-time=0.85 --multi-file-mode=all --opacity=0.5)
+  f3d_test(NAME TestMultiFileAnimationUniqueUnique DATA negative_range_animated.e small.ex2 ARGS --animation-time=0.0043001 --animation-indices=0,1 --multi-file-mode=all)
 
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${F3D_SOURCE_DIR}/plugins/hdf/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
