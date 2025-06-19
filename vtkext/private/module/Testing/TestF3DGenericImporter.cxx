@@ -72,9 +72,9 @@ int TestF3DGenericImporter(int argc, char* argv[])
 
   importer->SetInternalReader(reader);
   importer->Update();
-  if (importer->UpdateAtTimeValue(0.1))
+  if (!importer->UpdateAtTimeValue(0.1))
   {
-    std::cerr << "Unexpected UpdateAtTimeValue success" << std::endl;
+    std::cerr << "Unexpected UpdateAtTimeValue failure" << std::endl;
     return EXIT_FAILURE;
   }
 #endif

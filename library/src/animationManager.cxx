@@ -186,13 +186,15 @@ bool animationManager::LoadAtTime(double timeValue)
 {
   assert(this->Importer);
 
+  if (this->AvailAnimations == 0)
+  {
+    log::warn("No animation available, cannot load a specific animation time");
+    return false;
+  }
+
   this->PrepareForAnimationIndices();
   if (this->PreparedAnimationIndices.empty())
   {
-    if (this->AvailAnimations == 0)
-    {
-      log::warn("No animation available, cannot load a specific animation time");
-    }
     return false;
   }
 

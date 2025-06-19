@@ -811,7 +811,7 @@ if(F3D_PLUGIN_BUILD_HDF)
   # Test if a negative animation-time works when time range[0] is less than zero
   f3d_test(NAME TestTimeRangeLessThanZeroNegativeAnimationTime DATA negative_range_animated.e ARGS -s --load-plugins=hdf --animation-time=-3)
 
-  f3d_test(NAME TestMultiFileAnimationUniqueUnique DATA negative_range_animated.e small.ex2 ARGS --animation-time=0.0043001 --animation-indices=0,1 --multi-file-mode=all)
+  f3d_test(NAME TestMultiFileAnimationUniqueUnique DATA negative_range_animated.e small.ex2 ARGS --animation-time=0.0043001 --animation-indices=0,1 --multi-file-mode=all --load-plugins=hdf )
 
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${F3D_SOURCE_DIR}/plugins/hdf/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
@@ -1134,12 +1134,12 @@ f3d_test(NAME TestVerboseMultiFileCompare DATA mb REGEXP "Image comparison was p
 # Test Animation invalid code paths
 f3d_test(NAME TestAnimationIndicesWarningRange DATA InterpolationTest.glb ARGS --animation-indices=48 NO_BASELINE REGEXP "Specified animation index: 48 is not in range")
 f3d_test(NAME TestAnimationIndicesWarningNone DATA cow.vtp ARGS --animation-indices=1 REGEXP "Animation indices have been specified but there are no animation available" NO_BASELINE)
-f3d_test(NAME TestAnimationIndicesWarningSingle DATA soldier_animations.mdl ARGS --animation-indices=1,2 REGEXP "Multiple animation indices have been specified but currently loaded file does not support enabling multiple animations" NO_BASELINE)
+f3d_test(NAME TestAnimationIndicesWarningSingle DATA soldier_animations.mdl ARGS --animation-indices=1,2 REGEXP "Multiple animation indices have been specified but currently loaded files may not support enabling multiple animations" NO_BASELINE)
 f3d_test(NAME TestVerboseAnimationNoAnimationTime DATA cow.vtp ARGS --animation-time=2 --verbose REGEXP "No animation available, cannot load a specific animation time" NO_BASELINE)
 
 f3d_test(NAME TestAnimationIndicesWarningAllAnimations DATA InterpolationTest.glb ARGS --animation-indices=-1,2,3 REGEXP "Multiple animation indices have been specified include a negative one, all animations will be selected" NO_BASELINE)
 if(F3D_PLUGIN_BUILD_HDF)
-  f3d_test(NAME TestAnimationIndicesWarningUnique DATA blob.vtkhdf ARGS --animation-indices=1,2 REGEXP "Non-zero or multiple animation indices have been specified but currently loaded file does not support it." NO_BASELINE)
+  f3d_test(NAME TestAnimationIndicesWarningUnique DATA blob.vtkhdf ARGS --animation-indices=1,2 --load-plugins=hdf REGEXP "Non-zero or multiple animation indices have been specified but currently loaded file does not support it." NO_BASELINE)
 endif()
 
 # Test Grid verbose output
