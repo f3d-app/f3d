@@ -1981,7 +1981,8 @@ void F3DStarter::AddCommands()
           file = ptr;
         }
       }
-      else
+
+      if (file.has_value())
       {
         int index = this->AddFile(file.value());
         if (index > -1)
