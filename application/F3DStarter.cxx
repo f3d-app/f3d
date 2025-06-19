@@ -1974,8 +1974,12 @@ void F3DStarter::AddCommands()
       std::optional<std::string> file = f3d::utils::getEnv("CTEST_OPEN_DIALOG_FILE");
       if (!file.has_value())
       {
-        file = tinyfd_openFileDialog("Open File", nullptr, static_cast<int>(cstrings.size()),
+        char* ptr = tinyfd_openFileDialog("Open File", nullptr, static_cast<int>(cstrings.size()),
           cstrings.data(), "Supported Files", false);
+        if (ptr)
+        {
+          file = ptr;
+        }
       }
       else
       {
