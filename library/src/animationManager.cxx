@@ -287,8 +287,12 @@ void animationManager::CycleAnimation()
     // If we reach/exceeded the last animation
     if (this->Options.scene.animation.indices[0] >= this->AvailAnimations)
     {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250507)
       // If importer support multi animations
       if (this->Importer->GetAnimationSupportLevel() == vtkImporter::AnimationSupportLevel::MULTI)
+#else
+      if (true)
+#endif
       {
         // Then select all
         this->Options.scene.animation.indices.resize(this->AvailAnimations);
@@ -384,6 +388,7 @@ void animationManager::PrepareForAnimationIndices()
     }
     else
     {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250507)
       switch (this->Importer->GetAnimationSupportLevel())
       {
         case vtkImporter::AnimationSupportLevel::UNIQUE:
@@ -405,6 +410,7 @@ void animationManager::PrepareForAnimationIndices()
           // MULTI there is nothing to warn about
           break;
       }
+#endif
     }
   }
 
