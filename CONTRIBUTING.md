@@ -47,12 +47,12 @@ that is definitely possible. Feel free to reach out for guidance by opening an i
 The [F3D-APP Foundation](https://annuaire-entreprises.data.gouv.fr/entreprise/f3d-app-foundation-941551624), as a non-profit institution, would like to redistribute some donations to the contributors, for specific issues identified by maintainers as important for the project.
 Such issues have been identified with the ["bounty"](https://github.com/f3d-app/f3d/issues?q=is%3Aissue%20state%3Aopen%20label%3Abounty) label. The amount of money of there bounties is fairly small (up to a few hundred euros).
 
-In order to be elligible for the bounty you need to:
+In order to be eligible for the bounty you need to:
  - Be a [returning contributor](doc/dev/GOVERNANCE.md#12-returning-contributors)
- - Be able to provide an IBAN from a UE country where the money will be donated to
+ - Be able to provide an IBAN from a country located in the European Union where the money will be donated to
 
-If you are not elligible or are not interested by the donation, this is perfectly fine, you can still work on the issue, but there will be no donation.
-If you are elligible and interested, please comment on the issue and Maintainers will reach out to you privately to discuss the details and share the exact amount of the bounty
+If you are not eligible or are not interested by the donation, this is perfectly fine, you can still work on the issue, but there will be no donation.
+If you are eligible and interested, please comment on the issue and Maintainers will reach out to you privately to discuss the details and share the exact amount of the bounty
 for this particulat issue as well as decide together an targeted deadline for completing the work.
  
 Maintainers will then vote to decide if you are a good fit for a specific issue and share the result of the vote with you.
