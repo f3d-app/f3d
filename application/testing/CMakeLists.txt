@@ -1025,8 +1025,10 @@ f3d_test(NAME TestProgressScene DATA WaterBottle.glb ARGS --loading-progress NO_
 f3d_test(NAME TestInteractionProgressReload DATA cow.vtp ARGS --loading-progress NO_BASELINE INTERACTION) #Up;Up;Up;Up
 
 f3d_test(NAME TestInteractionAnimationCycleAnimation DATA InterpolationTest.glb INTERACTION) #WWWWWWWWWWWW;Space;Space;
-f3d_test(NAME TestInteractionAnimationCycleAnimationSingle DATA soldier_animations.mdl INTERACTION) #WWWWWWWWWWWW;Space;Space;
 f3d_test(NAME TestInteractionCycleAnimationNoAnimation DATA cow.vtp INTERACTION NO_BASELINE) #W
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250507)
+  f3d_test(NAME TestInteractionAnimationCycleAnimationSingle DATA soldier_animations.mdl INTERACTION) #WWWWWWWWWWWW;Space;Space;
+endif()
 
 f3d_test(NAME TestInteractionDropFiles ARGS -n INTERACTION_CONFIGURE UI)#X;DropEvent cow.vtp;DropEvent dragon.vtu suzanne.stl;
 f3d_test(NAME TestInteractionMultiFileDrop ARGS --multi-file-mode=all -e INTERACTION_CONFIGURE) #DropEvent mb_1_0.vtp mb_2_0.vtp
@@ -1134,12 +1136,14 @@ f3d_test(NAME TestVerboseMultiFileCompare DATA mb REGEXP "Image comparison was p
 # Test Animation invalid code paths
 f3d_test(NAME TestAnimationIndicesWarningRange DATA InterpolationTest.glb ARGS --animation-indices=48 NO_BASELINE REGEXP "Specified animation index: 48 is not in range")
 f3d_test(NAME TestAnimationIndicesWarningNone DATA cow.vtp ARGS --animation-indices=1 REGEXP "Animation indices have been specified but there are no animation available" NO_BASELINE)
-f3d_test(NAME TestAnimationIndicesWarningSingle DATA soldier_animations.mdl ARGS --animation-indices=1,2 REGEXP "Multiple animation indices have been specified but currently loaded files may not support enabling multiple animations" NO_BASELINE)
+f3d_test(NAME TestAnimationIndicesWarningAllAnimations DATA InterpolationTest.glb ARGS --animation-indices=-1,2,3 REGEXP "Multiple animation indices have been specified include a negative one, all animations will be selected" NO_BASELINE)
 f3d_test(NAME TestVerboseAnimationNoAnimationTime DATA cow.vtp ARGS --animation-time=2 --verbose REGEXP "No animation available, cannot load a specific animation time" NO_BASELINE)
 
-f3d_test(NAME TestAnimationIndicesWarningAllAnimations DATA InterpolationTest.glb ARGS --animation-indices=-1,2,3 REGEXP "Multiple animation indices have been specified include a negative one, all animations will be selected" NO_BASELINE)
-if(F3D_PLUGIN_BUILD_HDF)
-  f3d_test(NAME TestAnimationIndicesWarningUnique DATA blob.vtkhdf ARGS --animation-indices=1,2 --load-plugins=hdf REGEXP "Non-zero or multiple animation indices have been specified but currently loaded file does not support it." NO_BASELINE)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250507)
+  f3d_test(NAME TestAnimationIndicesWarningSingle DATA soldier_animations.mdl ARGS --animation-indices=1,2 REGEXP "Multiple animation indices have been specified but currently loaded files may not support enabling multiple animations" NO_BASELINE)
+  if(F3D_PLUGIN_BUILD_HDF)
+    f3d_test(NAME TestAnimationIndicesWarningUnique DATA blob.vtkhdf ARGS --animation-indices=1,2 --load-plugins=hdf REGEXP "Non-zero or multiple animation indices have been specified but currently loaded file does not support it." NO_BASELINE)
+  endif()
 endif()
 
 # Test Grid verbose output
