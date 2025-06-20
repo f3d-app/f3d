@@ -41,6 +41,15 @@ public:
   vtkSetMacro(FileName, std::string);
 
   /**
+   * Get the level of animation support in this importer, which is always
+   * AnimationSupportLevel::UNIQUE
+   */
+  AnimationSupportLevel GetAnimationSupportLevel() override
+  {
+    return AnimationSupportLevel::UNIQUE;
+  }
+
+  /**
    * Enable the animation.
    */
   void EnableAnimation(vtkIdType vtkNotUsed(animationIndex)) override

@@ -12,6 +12,11 @@
 int TestF3DGenericImporter(int argc, char* argv[])
 {
   vtkNew<vtkF3DGenericImporter> importer;
+  if (importer->GetAnimationSupportLevel() != vtkF3DImporter::AnimationSupportLevel::UNIQUE)
+  {
+    std::cerr << "Unexpected animation support level" << std::endl;
+    return EXIT_FAILURE;
+  }
   if (importer->GetNumberOfAnimations() != 0)
   {
     std::cerr << "Unexpected number of animations" << std::endl;
@@ -67,9 +72,9 @@ int TestF3DGenericImporter(int argc, char* argv[])
 
   importer->SetInternalReader(reader);
   importer->Update();
-  if (importer->UpdateAtTimeValue(0.1))
+  if (!importer->UpdateAtTimeValue(0.1))
   {
-    std::cerr << "Unexpected UpdateAtTimeValue success" << std::endl;
+    std::cerr << "Unexpected UpdateAtTimeValue failure" << std::endl;
     return EXIT_FAILURE;
   }
 #endif

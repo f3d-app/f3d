@@ -49,6 +49,7 @@
 #include <iomanip>
 #include <iostream>
 #include <mutex>
+#include <numeric>
 #include <regex>
 #include <set>
 
@@ -529,6 +530,12 @@ public:
                   loggingMap[key] = std::tuple(key, source, matchType, match, value);
                 }
                 continue;
+              }
+
+              // Handle CLI options deprecation
+              if (key == "animation-index")
+              {
+                f3d::log::warn("animation-index is deprecated, please use animation-indices");
               }
 
               // Convert key into a libf3d option name if possible
