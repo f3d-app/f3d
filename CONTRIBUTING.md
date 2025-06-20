@@ -55,7 +55,6 @@ In order to be eligible for the bounty you need to:
 If you are not eligible or are not interested by the donation, this is perfectly fine, you can still work on the issue, but there will be no donation.
 If you are eligible and interested, please comment on the issue and Maintainers will reach out to you privately to discuss the details and share the exact amount of the bounty
 for this particulat issue as well as decide together an targeted deadline for completing the work.
- 
 Maintainers will then vote to decide if you are a good fit for a specific issue and share the result of the vote with you.
 
 When working on a bounty, some form of communication is expected once a week, failure to do so may result on the issue being unassigned by maintainers opening it up to other contributors.
