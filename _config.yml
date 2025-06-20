@@ -332,6 +332,8 @@ nav_external_links:
     url: https://github.com/f3d-app/f3d
   - title: Web viewer
     url: https://f3d.app/web
+  - title: F3D libf3d doxygen
+    url: https://f3d.app/doc/libf3d/doxygen/
 
 # Google Analytics Tracking
 ga_tracking: G-ZCWEYB9KVG
