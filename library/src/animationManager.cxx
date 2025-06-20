@@ -329,7 +329,7 @@ std::string animationManager::GetAnimationName()
         animCheck[idx] = true;
       }
     }
-    return std::none_of(animCheck.begin(), animCheck.end(), std::logical_not<bool>())
+    return std::none_of(animCheck.begin(), animCheck.end(), std::logical_not<>())
       ? "All animations"
       : "Multi animations";
   }
