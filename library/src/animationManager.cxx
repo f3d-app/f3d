@@ -299,11 +299,13 @@ void animationManager::CycleAnimation()
         std::iota(this->Options.scene.animation.indices.begin(),
                   this->Options.scene.animation.indices.end(), 0);
       }
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250507)
       else
       {
         // If not, select none
         this->Options.scene.animation.indices.clear();
       }
+#endif
     }
   }
 
