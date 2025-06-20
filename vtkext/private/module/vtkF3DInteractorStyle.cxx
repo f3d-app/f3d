@@ -158,6 +158,17 @@ void vtkF3DInteractorStyle::Rotate()
     double up[3];
     this->InterpolateTemporaryUp(0.1, ren->GetUpVector(), up);
 
+    double envUpCamDirCross[3];
+    vtkMath::Cross(up, camera->GetDirectionOfProjection(), envUpCamDirCross);
+    constexpr double EPSILON = 128 * std::numeric_limits<double>::epsilon();
+    if (vtkMath::Norm(envUpCamDirCross) < EPSILON)
+    {
+      // Keep setting the temporary up to the camera's up vector until the interpolated up vector
+      // and the camera direction vector are not collinear
+      this->SetTemporaryUp(camera->GetViewUp());
+      this->InterpolateTemporaryUp(0.1, ren->GetUpVector(), up);
+    }
+
     // Rotate camera around the focal point about the environment's up vector
     vtkNew<vtkTransform> Transform;
     Transform->Identity();
@@ -170,7 +181,7 @@ void vtkF3DInteractorStyle::Rotate()
     camera->SetViewUp(up);
 
     // Clamp parameter to `camera->Elevation()` to maintain -90 < elevation < +90
-    constexpr double maxAbsElevation = 90 - 1e-12;
+    constexpr double maxAbsElevation = 90 - 1e-10;
     const double elevation = vtkMath::DegreesFromRadians(
       vtkMath::AngleBetweenVectors(ren->GetUpVector(), camera->GetDirectionOfProjection()) -
       vtkMath::Pi() / 2);
