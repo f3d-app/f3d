@@ -48,8 +48,9 @@ The [F3D-APP Foundation](https://annuaire-entreprises.data.gouv.fr/entreprise/f3
 Such issues have been identified with the ["bounty"](https://github.com/f3d-app/f3d/issues?q=is%3Aissue%20state%3Aopen%20label%3Abounty) label. The amount of money of there bounties is fairly small (up to a few hundred euros).
 
 In order to be eligible for the bounty you need to:
- - Be a [returning contributor](doc/dev/GOVERNANCE.md#12-returning-contributors)
- - Be able to provide an IBAN from a country located in the European Union where the money will be donated to
+
+- Be a [returning contributor](doc/dev/GOVERNANCE.md#12-returning-contributors)
+- Be able to provide an IBAN from a country located in the European Union where the money will be donated to
 
 If you are not eligible or are not interested by the donation, this is perfectly fine, you can still work on the issue, but there will be no donation.
 If you are eligible and interested, please comment on the issue and Maintainers will reach out to you privately to discuss the details and share the exact amount of the bounty
