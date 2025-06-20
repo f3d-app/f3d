@@ -198,6 +198,7 @@ f3d_test(NAME TestScalars DATA suzanne.ply ARGS -s --coloring-array=Normals --co
 f3d_test(NAME TestScalarsCell DATA f3d.vtp ARGS --scalar-coloring --coloring-by-cells --coloring-component=-2 --up=+Z)
 f3d_test(NAME TestScalarsRange DATA suzanne.ply ARGS -s --coloring-array=Normals --coloring-component=1 --coloring-range=0,1)
 f3d_test(NAME TestScalarsWithBar DATA suzanne.ply ARGS -b -s --coloring-array=Normals --coloring-component=0)
+f3d_test(NAME TestScalarsWithBarContinuity DATA suzanne.ply ARGS -b -s --coloring-array=Normals --coloring-component=0 THRESHOLD 0.001)
 f3d_test(NAME TestGLTFImporter DATA f3d.glb)
 f3d_test(NAME TestGLTFImporterWithAnimation DATA BoxAnimated.gltf ARGS --animation-time=2 --animation-progress)
 f3d_test(NAME TestGLTFSkin DATA SimpleSkin.gltf)
