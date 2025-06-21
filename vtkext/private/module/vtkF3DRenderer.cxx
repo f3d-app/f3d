@@ -724,7 +724,7 @@ void vtkF3DRenderer::ShowAxesGrid(bool show)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::ConfigureCubeAxisUsingCurrentActors()
+void vtkF3DRenderer::ConfigureGridAxesUsingCurrentActors()
 {
   bool show = this->AxesGridVisible;
   if (show)
@@ -768,24 +768,10 @@ void vtkF3DRenderer::ConfigureCubeAxisUsingCurrentActors()
       bbox.GetBounds(a, b, c, x, y, z);
       double bounds[6] = { a, b, c, x, y, z };
       GridAxesActor->SetGridBounds(a, b, c, x, y, z);
-      //this->GridAxesActor->SetBounds(bounds);
 
-      //this->GridAxesActor->XAxisLabelVisibilityOn();
-      /*this->CubeAxesActor->YAxisLabelVisibilityOn();
-      this->CubeAxesActor->ZAxisLabelVisibilityOn();
-      this->GridAxesActor->SetCamera(GetActiveCamera());
-
-      this->CubeAxesActor->SetFlyModeToStaticEdges();
-      this->CubeAxesActor->SetXAxisMinorTickVisibility(false);
-      this->CubeAxesActor->SetYAxisMinorTickVisibility(false);
-      this->CubeAxesActor->SetZAxisMinorTickVisibility(false);
-
-      this->CubeAxesActor->GetLabelTextProperty(0)->SetColor(right);
-      this->CubeAxesActor->GetTitleTextProperty(0)->SetColor(right);
-      this->CubeAxesActor->GetLabelTextProperty(1)->SetColor(up);
-      this->CubeAxesActor->GetTitleTextProperty(1)->SetColor(up);
-      this->CubeAxesActor->GetLabelTextProperty(2)->SetColor(front);
-      this->CubeAxesActor->GetTitleTextProperty(2)->SetColor(front);*/
+      GridAxesActor->SetXTitle("X Axis");
+      GridAxesActor->SetYTitle("Y Axis");
+      GridAxesActor->SetZTitle("Z Axis");
 
       this->GridAxesConfigured = true;
     }
@@ -1806,7 +1792,7 @@ void vtkF3DRenderer::UpdateActors()
 
   if (!this->GridAxesConfigured)
   {
-    this->ConfigureCubeAxisUsingCurrentActors();
+    this->ConfigureGridAxesUsingCurrentActors();
   }
 }
 

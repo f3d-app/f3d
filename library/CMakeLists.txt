@@ -6,6 +6,7 @@ set(F3D_VTK_MODULES
   VTK::CommonColor
   VTK::IOImage
   VTK::InteractionWidgets
+  VTK::RenderingGridAxes
   f3d::vtkext
   f3d::vtkextPrivate
 )
