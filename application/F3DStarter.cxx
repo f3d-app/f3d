@@ -917,6 +917,11 @@ public:
   std::vector<fs::path> LoadedFiles;
   int CurrentFilesGroupIndex = -1;
 
+  double getElevationAngle() const
+  {
+    return this->AppOptions.CamConf.CameraElevationAngle;
+  }
+
 #if F3D_MODULE_DMON
   // dmon related
   std::mutex LoadedFilesMutex;
