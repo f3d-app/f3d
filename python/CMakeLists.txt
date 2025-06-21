@@ -115,6 +115,6 @@ install(TARGETS pyf3d
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/__init__.py-install" RENAME "__init__.py"
   DESTINATION ${f3d_python_install_path} COMPONENT python)
 if (F3D_BINDINGS_PYTHON_GENERATE_STUBS)
-  install(FILES  "${f3d_module_dir}/__init__.pyi" "${f3d_module_dir}/pyf3d.pyi"
+  install(FILES "${f3d_module_dir}/__init__.pyi" "${f3d_module_dir}/pyf3d.pyi" "${CMAKE_CURRENT_SOURCE_DIR}/py.typed"
     DESTINATION ${f3d_python_install_path} COMPONENT python)
 endif()
