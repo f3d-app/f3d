@@ -467,9 +467,9 @@ private:
   void ConfigureGridUsingCurrentActors();
 
   /**
-   * Configure the cube Axis actor
+   * Configure the Grid Axes actor
    */
-  void ConfigureCubeAxisUsingCurrentActors();
+  void ConfigureGridAxesUsingCurrentActors();
 
   /**
    * Configure the different render passes
