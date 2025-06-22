@@ -951,7 +951,8 @@ interactor& interactor_impl::initCommands()
 
       log::setVerboseLevel(levels[currentIdx]);
 
-      this->Internals->CurrentVerboseLevel = this->Internals->VerboseLevelToString(levels[currentIdx]);
+      this->Internals->CurrentVerboseLevel =
+        this->Internals->VerboseLevelToString(levels[currentIdx]);
 
       vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
       vtkF3DRenderer* ren =
