@@ -8,6 +8,9 @@
 
 namespace f3d
 {
+// Track if we're in QUIET mode since F3DLog doesn't have a QUIET severity
+static bool IsQuietMode = false;
+
 //----------------------------------------------------------------------------
 void log::printInternal(log::VerboseLevel level, const std::string& str)
 {
@@ -75,10 +78,12 @@ void log::setVerboseLevel(log::VerboseLevel level, bool forceStdErr)
 
   if (level == log::VerboseLevel::QUIET)
   {
+    IsQuietMode = true;
     F3DLog::SetStandardStream(F3DLog::StandardStream::None);
   }
   else
   {
+    IsQuietMode = false;
     F3DLog::SetStandardStream(
       forceStdErr ? F3DLog::StandardStream::AlwaysStdErr : F3DLog::StandardStream::Default);
   }
@@ -104,5 +109,30 @@ void log::setVerboseLevel(log::VerboseLevel level, bool forceStdErr)
 
   // Display third parties log on Debug level
   vtkObject::SetGlobalWarningDisplay(level == log::VerboseLevel::DEBUG);
+}
+
+//----------------------------------------------------------------------------
+log::VerboseLevel log::getVerboseLevel()
+{
+  detail::init::initialize();
+
+  if (IsQuietMode)
+  {
+    return log::VerboseLevel::QUIET;
+  }
+
+  switch (F3DLog::VerboseLevel)
+  {
+    case (F3DLog::Severity::Debug):
+      return log::VerboseLevel::DEBUG;
+    case (F3DLog::Severity::Info):
+      return log::VerboseLevel::INFO;
+    case (F3DLog::Severity::Warning):
+      return log::VerboseLevel::WARN;
+    case (F3DLog::Severity::Error):
+      return log::VerboseLevel::ERROR;
+    default:
+      return log::VerboseLevel::INFO;
+  }
 }
 }

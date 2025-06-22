@@ -126,6 +126,32 @@ public:
 
     this->Recorder = vtkSmartPointer<vtkF3DInteractorEventRecorder>::New();
     this->Recorder->SetInteractor(this->VTKInteractor);
+
+    this->InitializeCurrentVerboseLevel();
+  }
+
+  std::string VerboseLevelToString(log::VerboseLevel level)
+  {
+    switch (level)
+    {
+      case log::VerboseLevel::DEBUG:
+        return "Debug";
+      case log::VerboseLevel::INFO:
+        return "Info";
+      case log::VerboseLevel::WARN:
+        return "Warning";
+      case log::VerboseLevel::ERROR:
+        return "Error";
+      case log::VerboseLevel::QUIET:
+        return "Quiet";
+      default:
+        return "Info";
+    }
+  }
+
+  void InitializeCurrentVerboseLevel()
+  {
+    this->CurrentVerboseLevel = this->VerboseLevelToString(log::getVerboseLevel());
   }
 
   //----------------------------------------------------------------------------
@@ -594,6 +620,8 @@ public:
 
   std::map<std::string, std::string> AliasMap;
 
+  std::string CurrentVerboseLevel;
+
   vtkNew<vtkCellPicker> CellPicker;
   vtkNew<vtkPointPicker> PointPicker;
 
@@ -900,6 +928,41 @@ interactor& interactor_impl::initCommands()
       log::info(
         "Alias " + aliasName + " added with command " + this->Internals->AliasMap[aliasName]);
     });
+
+  this->addCommand("cycle_verbose_level",
+    [&](const std::vector<std::string>&)
+    {
+      const std::vector<log::VerboseLevel> levels = { log::VerboseLevel::DEBUG,
+        log::VerboseLevel::INFO, log::VerboseLevel::WARN, log::VerboseLevel::ERROR,
+        log::VerboseLevel::QUIET };
+
+      log::VerboseLevel currentLevel = log::getVerboseLevel();
+      size_t currentIdx = 0;
+      for (size_t i = 0; i < levels.size(); ++i)
+      {
+        if (levels[i] == currentLevel)
+        {
+          currentIdx = i;
+          break;
+        }
+      }
+
+      currentIdx = (currentIdx + 1) % levels.size();
+
+      log::setVerboseLevel(levels[currentIdx]);
+
+      this->Internals->CurrentVerboseLevel = this->Internals->VerboseLevelToString(levels[currentIdx]);
+
+      vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
+      vtkF3DRenderer* ren =
+        vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+      if (ren)
+      {
+        ren->SetCheatSheetConfigured(false);
+      }
+
+      log::info("Verbose level changed to: ", this->Internals->CurrentVerboseLevel);
+    });
   return *this;
 }
 
@@ -1116,6 +1179,10 @@ interactor& interactor_impl::initBindings()
   auto docTglOpt = [](const std::string& doc, const std::optional<bool>& val)
   { return std::pair(doc, (val.has_value() ? (val.value() ? "ON" : "OFF") : "Unset")); };
 
+  // "Cycle verbose level", "current_level"
+  auto docVerbose = [&]()
+  { return std::pair("Cycle verbose level", this->Internals->CurrentVerboseLevel); };
+
   // clang-format off
   this->addBinding({mod_t::NONE, "W"}, "cycle_animation", "Scene", docAnim);
   this->addBinding({mod_t::NONE, "C"}, "cycle_coloring field", "Scene", docField);
@@ -1166,6 +1233,7 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "Return"}, "reset_camera", "Others", std::bind(docStr, "Reset camera to initial parameters"));
   this->addBinding({mod_t::NONE, "Space"}, "toggle_animation", "Others", std::bind(docStr, "Play/Pause animation if any"));
   this->addBinding({mod_t::NONE, "Drop"}, "add_files", "Others", std::bind(docStr, "Add files to the scene"));
+  this->addBinding({mod_t::CTRL, "V"}, "cycle_verbose_level", "Others", docVerbose);
   // clang-format on
 
   return *this;
