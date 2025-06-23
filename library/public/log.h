@@ -105,7 +105,6 @@ public:
    */
   static void setVerboseLevel(VerboseLevel level, bool forceStdErr = false);
 
-
 protected:
   //! @cond
   static void appendArg(std::stringstream&)

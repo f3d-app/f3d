@@ -7,8 +7,8 @@
 #include "utils.h"
 #include "window_impl.h"
 
-#include "vtkF3DConsoleOutputWindow.h"
 #include "F3DLog.h"
+#include "vtkF3DConsoleOutputWindow.h"
 
 #if F3D_MODULE_UI
 #include "vtkF3DImguiConsole.h"
