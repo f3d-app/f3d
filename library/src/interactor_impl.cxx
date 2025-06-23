@@ -8,6 +8,7 @@
 #include "window_impl.h"
 
 #include "vtkF3DConsoleOutputWindow.h"
+#include "F3DLog.h"
 
 #if F3D_MODULE_UI
 #include "vtkF3DImguiConsole.h"
@@ -130,28 +131,47 @@ public:
     this->InitializeCurrentVerboseLevel();
   }
 
-  std::string VerboseLevelToString(log::VerboseLevel level)
+  std::string SeverityLevelToString(F3DLog::Severity severity)
   {
-    switch (level)
+    switch (severity)
     {
-      case log::VerboseLevel::DEBUG:
+      case F3DLog::Severity::Debug:
         return "Debug";
-      case log::VerboseLevel::INFO:
+      case F3DLog::Severity::Info:
         return "Info";
-      case log::VerboseLevel::WARN:
+      case F3DLog::Severity::Warning:
         return "Warning";
-      case log::VerboseLevel::ERROR:
+      case F3DLog::Severity::Error:
         return "Error";
-      case log::VerboseLevel::QUIET:
+      case F3DLog::Severity::Quiet:
         return "Quiet";
       default:
         return "Info";
     }
   }
 
+  log::VerboseLevel SeverityToVerboseLevel(F3DLog::Severity severity)
+  {
+    switch (severity)
+    {
+      case F3DLog::Severity::Debug:
+        return log::VerboseLevel::DEBUG;
+      case F3DLog::Severity::Info:
+        return log::VerboseLevel::INFO;
+      case F3DLog::Severity::Warning:
+        return log::VerboseLevel::WARN;
+      case F3DLog::Severity::Error:
+        return log::VerboseLevel::ERROR;
+      case F3DLog::Severity::Quiet:
+        return log::VerboseLevel::QUIET;
+      default:
+        return log::VerboseLevel::INFO;
+    }
+  }
+
   void InitializeCurrentVerboseLevel()
   {
-    this->CurrentVerboseLevel = this->VerboseLevelToString(log::getVerboseLevel());
+    this->CurrentVerboseLevel = this->SeverityLevelToString(F3DLog::GetVerboseLevel());
   }
 
   //----------------------------------------------------------------------------
@@ -932,11 +952,11 @@ interactor& interactor_impl::initCommands()
   this->addCommand("cycle_verbose_level",
     [&](const std::vector<std::string>&)
     {
-      const std::vector<log::VerboseLevel> levels = { log::VerboseLevel::DEBUG,
-        log::VerboseLevel::INFO, log::VerboseLevel::WARN, log::VerboseLevel::ERROR,
-        log::VerboseLevel::QUIET };
+      constexpr std::array<F3DLog::Severity, 5> levels = { F3DLog::Severity::Debug,
+        F3DLog::Severity::Info, F3DLog::Severity::Warning, F3DLog::Severity::Error,
+        F3DLog::Severity::Quiet };
 
-      log::VerboseLevel currentLevel = log::getVerboseLevel();
+      F3DLog::Severity currentLevel = F3DLog::GetVerboseLevel();
       size_t currentIdx = 0;
       for (size_t i = 0; i < levels.size(); ++i)
       {
@@ -948,11 +968,11 @@ interactor& interactor_impl::initCommands()
       }
 
       currentIdx = (currentIdx + 1) % levels.size();
+      F3DLog::Severity newLevel = levels[currentIdx];
 
-      log::setVerboseLevel(levels[currentIdx]);
+      log::setVerboseLevel(this->Internals->SeverityToVerboseLevel(newLevel));
 
-      this->Internals->CurrentVerboseLevel =
-        this->Internals->VerboseLevelToString(levels[currentIdx]);
+      this->Internals->CurrentVerboseLevel = this->Internals->SeverityLevelToString(newLevel);
 
       vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
       vtkF3DRenderer* ren =

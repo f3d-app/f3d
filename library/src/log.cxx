@@ -8,8 +8,6 @@
 
 namespace f3d
 {
-// Track the current verbose level directly
-static log::VerboseLevel CurrentVerboseLevel = log::VerboseLevel::INFO;
 
 //----------------------------------------------------------------------------
 void log::printInternal(log::VerboseLevel level, const std::string& str)
@@ -76,10 +74,9 @@ void log::setVerboseLevel(log::VerboseLevel level, bool forceStdErr)
 {
   detail::init::initialize();
 
-  CurrentVerboseLevel = level;
-
   if (level == log::VerboseLevel::QUIET)
   {
+    F3DLog::VerboseLevel = F3DLog::Severity::Quiet;
     F3DLog::SetStandardStream(F3DLog::StandardStream::None);
   }
   else
@@ -103,6 +100,8 @@ void log::setVerboseLevel(log::VerboseLevel level, bool forceStdErr)
       F3DLog::VerboseLevel = F3DLog::Severity::Error;
       break;
     case (log::VerboseLevel::QUIET):
+      F3DLog::VerboseLevel = F3DLog::Severity::Quiet;
+      break;
     default:
       break;
   }
@@ -111,10 +110,4 @@ void log::setVerboseLevel(log::VerboseLevel level, bool forceStdErr)
   vtkObject::SetGlobalWarningDisplay(level == log::VerboseLevel::DEBUG);
 }
 
-//----------------------------------------------------------------------------
-log::VerboseLevel log::getVerboseLevel()
-{
-  detail::init::initialize();
-  return CurrentVerboseLevel;
-}
 }

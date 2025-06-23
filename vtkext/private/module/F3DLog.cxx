@@ -68,3 +68,9 @@ void F3DLog::SetStandardStream(StandardStream mode)
       break;
   }
 }
+
+//----------------------------------------------------------------------------
+F3DLog::Severity F3DLog::GetVerboseLevel()
+{
+  return F3DLog::VerboseLevel;
+}

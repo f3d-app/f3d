@@ -20,7 +20,8 @@ enum class Severity : unsigned char
   Debug = 0,
   Info,
   Warning,
-  Error
+  Error,
+  Quiet
 };
 
 enum class StandardStream : unsigned char
@@ -55,6 +56,11 @@ void SetUseColoring(bool use);
  * are written to stdout.
  */
 void SetStandardStream(StandardStream mode);
+
+/**
+ * Get the current verbose level
+ */
+Severity GetVerboseLevel();
 };
 
 #endif

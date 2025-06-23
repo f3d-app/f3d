@@ -105,10 +105,6 @@ public:
    */
   static void setVerboseLevel(VerboseLevel level, bool forceStdErr = false);
 
-  /**
-   * Get the current verbose level.
-   */
-  static VerboseLevel getVerboseLevel();
 
 protected:
   //! @cond
