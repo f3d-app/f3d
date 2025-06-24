@@ -107,4 +107,26 @@ void log::setVerboseLevel(log::VerboseLevel level, bool forceStdErr)
   // Display third parties log on Debug level
   vtkObject::SetGlobalWarningDisplay(level == log::VerboseLevel::DEBUG);
 }
+
+//----------------------------------------------------------------------------
+log::VerboseLevel log::getVerboseLevel()
+{
+  detail::init::initialize();
+
+  switch (F3DLog::VerboseLevel)
+  {
+    case F3DLog::Severity::Debug:
+      return log::VerboseLevel::DEBUG;
+    case F3DLog::Severity::Info:
+      return log::VerboseLevel::INFO;
+    case F3DLog::Severity::Warning:
+      return log::VerboseLevel::WARN;
+    case F3DLog::Severity::Error:
+      return log::VerboseLevel::ERROR;
+    case F3DLog::Severity::Quiet:
+      return log::VerboseLevel::QUIET;
+    default:
+      return log::VerboseLevel::INFO;
+  }
+}
 }

@@ -128,51 +128,27 @@ public:
     this->Recorder = vtkSmartPointer<vtkF3DInteractorEventRecorder>::New();
     this->Recorder->SetInteractor(this->VTKInteractor);
 
-    this->InitializeCurrentVerboseLevel();
   }
 
-  std::string SeverityLevelToString(F3DLog::Severity severity)
+  std::string VerboseLevelToString(log::VerboseLevel level)
   {
-    switch (severity)
+    switch (level)
     {
-      case F3DLog::Severity::Debug:
+      case log::VerboseLevel::DEBUG:
         return "Debug";
-      case F3DLog::Severity::Info:
+      case log::VerboseLevel::INFO:
         return "Info";
-      case F3DLog::Severity::Warning:
+      case log::VerboseLevel::WARN:
         return "Warning";
-      case F3DLog::Severity::Error:
+      case log::VerboseLevel::ERROR:
         return "Error";
-      case F3DLog::Severity::Quiet:
+      case log::VerboseLevel::QUIET:
         return "Quiet";
       default:
         return "Info";
     }
   }
 
-  log::VerboseLevel SeverityToVerboseLevel(F3DLog::Severity severity)
-  {
-    switch (severity)
-    {
-      case F3DLog::Severity::Debug:
-        return log::VerboseLevel::DEBUG;
-      case F3DLog::Severity::Info:
-        return log::VerboseLevel::INFO;
-      case F3DLog::Severity::Warning:
-        return log::VerboseLevel::WARN;
-      case F3DLog::Severity::Error:
-        return log::VerboseLevel::ERROR;
-      case F3DLog::Severity::Quiet:
-        return log::VerboseLevel::QUIET;
-      default:
-        return log::VerboseLevel::INFO;
-    }
-  }
-
-  void InitializeCurrentVerboseLevel()
-  {
-    this->CurrentVerboseLevel = this->SeverityLevelToString(F3DLog::VerboseLevel);
-  }
 
   //----------------------------------------------------------------------------
   // Method defined to normalize the Z axis so all models are treated temporarily
@@ -640,7 +616,6 @@ public:
 
   std::map<std::string, std::string> AliasMap;
 
-  std::string CurrentVerboseLevel;
 
   vtkNew<vtkCellPicker> CellPicker;
   vtkNew<vtkPointPicker> PointPicker;
@@ -952,27 +927,11 @@ interactor& interactor_impl::initCommands()
   this->addCommand("cycle_verbose_level",
     [&](const std::vector<std::string>&)
     {
-      constexpr std::array<F3DLog::Severity, 5> levels = { F3DLog::Severity::Debug,
-        F3DLog::Severity::Info, F3DLog::Severity::Warning, F3DLog::Severity::Error,
-        F3DLog::Severity::Quiet };
+      log::VerboseLevel currentLevel = log::getVerboseLevel();
+      log::VerboseLevel newLevel = static_cast<log::VerboseLevel>(
+        (static_cast<int>(currentLevel) + 1) % 5);
 
-      F3DLog::Severity currentLevel = F3DLog::VerboseLevel;
-      size_t currentIdx = 0;
-      for (size_t i = 0; i < levels.size(); ++i)
-      {
-        if (levels[i] == currentLevel)
-        {
-          currentIdx = i;
-          break;
-        }
-      }
-
-      currentIdx = (currentIdx + 1) % levels.size();
-      F3DLog::Severity newLevel = levels[currentIdx];
-
-      log::setVerboseLevel(this->Internals->SeverityToVerboseLevel(newLevel));
-
-      this->Internals->CurrentVerboseLevel = this->Internals->SeverityLevelToString(newLevel);
+      log::setVerboseLevel(newLevel);
 
       vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
       vtkF3DRenderer* ren =
@@ -982,7 +941,7 @@ interactor& interactor_impl::initCommands()
         ren->SetCheatSheetConfigured(false);
       }
 
-      log::info("Verbose level changed to: ", this->Internals->CurrentVerboseLevel);
+      log::info("Verbose level changed to: ", this->Internals->VerboseLevelToString(newLevel));
     });
   return *this;
 }
@@ -1202,7 +1161,7 @@ interactor& interactor_impl::initBindings()
 
   // "Cycle verbose level", "current_level"
   auto docVerbose = [&]()
-  { return std::pair("Cycle verbose level", this->Internals->CurrentVerboseLevel); };
+  { return std::pair("Cycle verbose level", this->Internals->VerboseLevelToString(log::getVerboseLevel())); };
 
   // clang-format off
   this->addBinding({mod_t::NONE, "W"}, "cycle_animation", "Scene", docAnim);
