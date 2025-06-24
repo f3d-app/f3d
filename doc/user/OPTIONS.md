@@ -30,6 +30,7 @@ F3D behavior can be fully controlled from the command line using the following o
 | -D, \-\-define=\<libf3d.option=value\>                | special<br>-                      | A repeatable option to set [libf3d](../libf3d/OPTIONS.md) and [reader](SUPPORTED_FORMATS.md#reader-options) option manually. May trigger unexpected behavior.                                                                                                                          |
 | -R, \-\-reset=\<libf3d.option\>                       | special<br>-                      | A repeatable option to reset [libf3d options](../libf3d/OPTIONS.md) manually. Useful when overidding option set in [configuration files](CONFIGURATION_FILE.md).                                                                                                                       |
 | \-\-skip-unsupported-files                            | bool<br>true                      | Automatically skip the unsupported files                                                                                                                                                                                                                                               |
+
 ## General Options
 
 | Options                                              | Type<br>Default  | Description                                                                                                                                                                                                            |
