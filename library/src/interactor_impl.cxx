@@ -927,8 +927,8 @@ interactor& interactor_impl::initCommands()
     [&](const std::vector<std::string>&)
     {
       log::VerboseLevel currentLevel = log::getVerboseLevel();
-      log::VerboseLevel newLevel = static_cast<log::VerboseLevel>(
-        (static_cast<int>(currentLevel) + 1) % 5);
+      log::VerboseLevel newLevel =
+        static_cast<log::VerboseLevel>((static_cast<int>(currentLevel) + 1) % 5);
 
       log::setVerboseLevel(newLevel);
 
