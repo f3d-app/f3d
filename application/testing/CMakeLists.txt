@@ -276,6 +276,8 @@ f3d_test(NAME TestMultiFilePositionals DATA mb/recursive/mb_0_0.vtu mb/recursive
 f3d_test(NAME TestMultiFileNonCoherentComponentNames DATA bluntfin.vts bluntfin_t.vtu ARGS --multi-file-mode=all --scalar-coloring --coloring-array=Momentum --coloring-component=2 --coloring-scalar-bar)
 f3d_test(NAME TestMultiInputArg ARGS --input ${F3D_SOURCE_DIR}/testing/data/mb/recursive/mb_0_0.vtu ${F3D_SOURCE_DIR}/testing/data/mb/recursive/mb_1_0.vtp --multi-file-mode=all -s --coloring-array=Polynomial -b)
 f3d_test(NAME TestMultiInputMultiArgs ARGS --input ${F3D_SOURCE_DIR}/testing/data/mb/recursive/mb_0_0.vtu --input ${F3D_SOURCE_DIR}/testing/data/mb/recursive/mb_1_0.vtp --multi-file-mode=all -s --coloring-array=Polynomial -b)
+f3d_test(NAME TestMultiFileSkipUnsupportedFiles ARGS ${F3D_SOURCE_DIR}/testing/data/unsupportedFile.dummy ${F3D_SOURCE_DIR}/testing/data/cow.vtk)
+f3d_test(NAME TestMultiFileNoSkipUnsupportedFiles NO_DATA_FORCE_RENDER ARGS ${F3D_SOURCE_DIR}/testing/data/unsupportedFile.dummy ${F3D_SOURCE_DIR}/testing/data/cow.vtk --skip-unsupported-files=false)
 f3d_test(NAME TestInvalidUpDirection DATA suzanne.ply ARGS -g --up=W REGEXP "Could not set 'up'" NO_BASELINE)
 f3d_test(NAME TestUpDirectionNoSign DATA suzanne.ply ARGS --up=X)
 f3d_test(NAME TestTextureMatCap DATA suzanne.ply ARGS --texture-matcap=${F3D_SOURCE_DIR}/testing/data/skin.png)
@@ -941,8 +943,11 @@ f3d_test(NAME TestInteractionVolumeInverse DATA HeadMRVolume.mhd ARGS --camera-p
 f3d_test(NAME TestInteractionMultiFileVolume DATA multi ARGS --multi-file-mode=all INTERACTION) #SSVB
 f3d_test(NAME TestInteractionPointCloud DATA pointsCloud.vtp ARGS --point-sprites-size=20 INTERACTION) #O
 f3d_test(NAME TestInteractionDirectory DATA mb INTERACTION ARGS --scalar-coloring) #Right;Right;Right;Left;Up;
-f3d_test(NAME TestInteractionDirectoryLoop DATA mb/recursive INTERACTION ARGS --scalar-coloring --filename UI) #Left;Left;Left;Left;Left;
-f3d_test(NAME TestInteractionDirectoryEmpty DATA mb INTERACTION NO_DATA_FORCE_RENDER UI) #Right;Right;Right;
+f3d_test(NAME TestInteractionDirectoryLoopNoSkipUnsuppored DATA mb/recursive INTERACTION ARGS --skip-unsupported-files=false --scalar-coloring --filename UI) #Left;Left;Left;Left;Left;
+f3d_test(NAME TestInteractionDirectoryLoopSkipUnsuppored DATA mb/recursive INTERACTION ARGS --scalar-coloring --filename UI) #Left;Left;Left;Left;Left;
+f3d_test(NAME TestInteractionDirectoryEmpty DATA mb ARGS --skip-unsupported-files=false INTERACTION NO_DATA_FORCE_RENDER UI) #Right;Right;Right;
+f3d_test(NAME TestInteractionSkipUnsupported DATA 16bit.fbx unsupportedFile.dummy ARGS INTERACTION UI) #Right * 9
+f3d_test(NAME TestInteractionNoSkipUnsupported DATA 16bit.fbx unsupportedFile.dummy ARGS --skip-unsupported-files=false INTERACTION NO_DATA_FORCE_RENDER UI) #Right * 9
 f3d_test(NAME TestInteractionDirectoryEmptyVerbose DATA mb ARGS --verbose NO_BASELINE INTERACTION REGEXP "is not a file of a supported file format") #Right;Right;Right;HMCSY
 f3d_test(NAME TestInteractionAnimationNotStopped DATA InterpolationTest.glb NO_BASELINE INTERACTION)#Space;
 f3d_test(NAME TestInteractionResetCamera DATA dragon.vtu INTERACTION LONG_TIMEOUT)#MouseMovements;Return;
