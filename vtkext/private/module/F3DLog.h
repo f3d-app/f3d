@@ -57,10 +57,6 @@ void SetUseColoring(bool use);
  */
 void SetStandardStream(StandardStream mode);
 
-/**
- * Get the current verbose level
- */
-Severity GetVerboseLevel();
 };
 
 #endif

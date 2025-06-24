@@ -171,7 +171,7 @@ public:
 
   void InitializeCurrentVerboseLevel()
   {
-    this->CurrentVerboseLevel = this->SeverityLevelToString(F3DLog::GetVerboseLevel());
+    this->CurrentVerboseLevel = this->SeverityLevelToString(F3DLog::VerboseLevel);
   }
 
   //----------------------------------------------------------------------------
@@ -956,7 +956,7 @@ interactor& interactor_impl::initCommands()
         F3DLog::Severity::Info, F3DLog::Severity::Warning, F3DLog::Severity::Error,
         F3DLog::Severity::Quiet };
 
-      F3DLog::Severity currentLevel = F3DLog::GetVerboseLevel();
+      F3DLog::Severity currentLevel = F3DLog::VerboseLevel;
       size_t currentIdx = 0;
       for (size_t i = 0; i < levels.size(); ++i)
       {
