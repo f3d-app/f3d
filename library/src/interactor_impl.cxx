@@ -1160,7 +1160,10 @@ interactor& interactor_impl::initBindings()
 
   // "Cycle verbose level", "current_level"
   auto docVerbose = [&]()
-  { return std::pair("Cycle verbose level", this->Internals->VerboseLevelToString(log::getVerboseLevel())); };
+  {
+    return std::pair(
+      "Cycle verbose level", this->Internals->VerboseLevelToString(log::getVerboseLevel()));
+  };
 
   // clang-format off
   this->addBinding({mod_t::NONE, "W"}, "cycle_animation", "Scene", docAnim);
