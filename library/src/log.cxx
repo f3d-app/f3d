@@ -76,7 +76,6 @@ void log::setVerboseLevel(log::VerboseLevel level, bool forceStdErr)
 
   if (level == log::VerboseLevel::QUIET)
   {
-    F3DLog::VerboseLevel = F3DLog::Severity::Quiet;
     F3DLog::SetStandardStream(F3DLog::StandardStream::None);
   }
   else
