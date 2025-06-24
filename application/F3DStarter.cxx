@@ -103,6 +103,7 @@ public:
     std::string InteractionTestRecordFile;
     std::string InteractionTestPlayFile;
     std::string CommandScriptFile;
+    bool SkipUnsupportedFiles;
   };
 
   void SetupCamera(const CameraConfiguration& camConf)
@@ -718,6 +719,7 @@ public:
     this->ParseOption(appOptions, "resolution", this->AppOptions.Resolution);
     this->ParseOption(appOptions, "position", this->AppOptions.Position);
     this->ParseOption(appOptions, "colormap-file", this->AppOptions.ColorMapFile);
+    this->ParseOption(appOptions, "skip-unsupported-files", this->AppOptions.SkipUnsupportedFiles);
 
     this->ParseOption(appOptions, "camera-position", this->AppOptions.CamConf.CameraPosition);
     this->ParseOption(appOptions, "camera-focal-point", this->AppOptions.CamConf.CameraFocalPoint);
@@ -916,6 +918,7 @@ public:
   std::vector<std::pair<std::string, std::vector<fs::path>>> FilesGroups;
   std::vector<fs::path> LoadedFiles;
   int CurrentFilesGroupIndex = -1;
+  int CurrentFileLoadingResult = 1;
 
 #if F3D_MODULE_DMON
   // dmon related
@@ -1360,6 +1363,9 @@ int F3DStarter::Start(int argc, char** argv)
 void F3DStarter::LoadFileGroup(int index, bool relativeIndex, bool forceClear)
 {
   int groupIndex = this->Internals->CurrentFilesGroupIndex;
+  auto& loadingResult = this->Internals->CurrentFileLoadingResult;
+  int maximumLoadingCounter = 0;
+
   if (relativeIndex)
   {
     groupIndex += index;
@@ -1369,34 +1375,57 @@ void F3DStarter::LoadFileGroup(int index, bool relativeIndex, bool forceClear)
     groupIndex = index;
   }
 
-  // Compute a modulo to ensure 0 < groupIndex < size
-  // XXX Do not work if groupIndex + size < 0
-  int size = static_cast<int>(this->Internals->FilesGroups.size());
-  if (size != 0)
+  while (true)
   {
-    groupIndex = (groupIndex + size) % size;
-  }
-  else
-  {
-    groupIndex = -1;
-  }
+    int skipDirection = index < 0 ? -1 : 1;
 
-  if (groupIndex >= 0)
-  {
-    // Clear only if we change the group to load
-    bool clear = forceClear ? true : this->Internals->CurrentFilesGroupIndex != groupIndex;
-    this->Internals->CurrentFilesGroupIndex = groupIndex;
+    // Compute a modulo to ensure 0 < groupIndex < size
+    // XXX Do not work if groupIndex + size < 0
+    int size = static_cast<int>(this->Internals->FilesGroups.size());
+    if (size != 0)
+    {
+      groupIndex = (groupIndex + size) % size;
+    }
+    else
+    {
+      groupIndex = -1;
+    }
 
-    // Create a nice looking group index eg: "(1/5)"
-    // XXX: Each group contains at least one path
-    std::string groupIdx = "(" + std::to_string(groupIndex + 1) + "/" +
-      std::to_string(this->Internals->FilesGroups.size()) + ")";
-    this->LoadFileGroup(this->Internals->FilesGroups[groupIndex].second, clear, groupIdx);
-  }
-  else
-  {
-    this->Internals->CurrentFilesGroupIndex = groupIndex;
-    this->LoadFileGroup(std::vector<fs::path>{}, true, "");
+    if (groupIndex >= 0)
+    {
+      // Clear only if we change the group to load
+      bool clear = forceClear ? true : this->Internals->CurrentFilesGroupIndex != groupIndex;
+      this->Internals->CurrentFilesGroupIndex = groupIndex;
+
+      // Create a nice looking group index eg: "(1/5)"
+      // XXX: Each group contains at least one path
+      std::string groupIdx = "(" + std::to_string(groupIndex + 1) + "/" +
+        std::to_string(this->Internals->FilesGroups.size()) + ")";
+      this->LoadFileGroup(this->Internals->FilesGroups[groupIndex].second, clear, groupIdx);
+    }
+    else
+    {
+      this->Internals->CurrentFilesGroupIndex = groupIndex;
+      this->LoadFileGroup(std::vector<fs::path>{}, true, "");
+      break;
+    }
+
+    if (!this->Internals->AppOptions.SkipUnsupportedFiles)
+    {
+      break;
+    }
+
+    if (loadingResult == 1)
+    {
+      break;
+    }
+    groupIndex += skipDirection;
+
+    maximumLoadingCounter++;
+    if (maximumLoadingCounter > this->Internals->FilesGroups.size())
+    {
+      break;
+    }
   }
 }
 
@@ -1429,8 +1458,8 @@ void F3DStarter::LoadFileGroup(
     {
       if (!dynamicOptions.hasValue(name))
       {
-        // If a dynamic option has been changed and does not have value, it means it was reset using
-        // the command line reset it using the dedicated syntax
+        // If a dynamic option has been changed and does not have value, it means it was reset
+        // using the command line reset it using the dedicated syntax
         dynamicOptionsDict["reset-" + name] = "";
       }
       else
@@ -1442,8 +1471,8 @@ void F3DStarter::LoadFileGroup(
     }
   }
 
-  // Add the dynamicOptionsDict into the entries, which grows over time if option keep changing and
-  // files keep being loaded
+  // Add the dynamicOptionsDict into the entries, which grows over time if option keep changing
+  // and files keep being loaded
   this->Internals->DynamicOptionsEntries.emplace_back(
     dynamicOptionsDict, "", "", "dynamic options");
 
@@ -1478,9 +1507,9 @@ void F3DStarter::LoadFileGroup(
     }
     else
     {
-      // Update app and libf3d options based on config entries, selecting block using the input file
-      // config < cli < dynamic
-      // Options must be updated before checking the supported files in order to load plugins
+      // Update app and libf3d options based on config entries, selecting block using the input
+      // file config < cli < dynamic Options must be updated before checking the supported files
+      // in order to load plugins
       std::vector<fs::path> configPaths = this->Internals->LoadedFiles;
       std::copy(paths.begin(), paths.end(), std::back_inserter(configPaths));
       this->Internals->UpdateOptions(
@@ -1628,6 +1657,8 @@ void F3DStarter::LoadFileGroup(
       this->Internals->SetupCamera(this->Internals->AppOptions.CamConf);
     }
   }
+
+  this->Internals->CurrentFileLoadingResult = unsupported ? 0 : 1;
 
   // XXX: Here we potentially override user set libf3d options
   // but there is no way to detect if an option has been set
