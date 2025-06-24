@@ -1364,7 +1364,7 @@ void F3DStarter::LoadFileGroup(int index, bool relativeIndex, bool forceClear)
 {
   int groupIndex = this->Internals->CurrentFilesGroupIndex;
   auto& loadingResult = this->Internals->CurrentFileLoadingResult;
-  int maximumLoadingCounter = 0;
+  size_t maximumLoadingCounter = 0;
 
   if (relativeIndex)
   {
@@ -1375,7 +1375,7 @@ void F3DStarter::LoadFileGroup(int index, bool relativeIndex, bool forceClear)
     groupIndex = index;
   }
 
-  while (true)
+  do
   {
     int skipDirection = index < 0 ? -1 : 1;
 
@@ -1422,11 +1422,7 @@ void F3DStarter::LoadFileGroup(int index, bool relativeIndex, bool forceClear)
     groupIndex += skipDirection;
 
     maximumLoadingCounter++;
-    if (maximumLoadingCounter > this->Internals->FilesGroups.size())
-    {
-      break;
-    }
-  }
+  } while (maximumLoadingCounter < this->Internals->FilesGroups.size());
 }
 
 //----------------------------------------------------------------------------
