@@ -13,17 +13,13 @@
 
 #include "vtkOpenGLRenderPass.h"
 
-class vtkOpenGLFramebufferObject;
-class vtkOpenGLQuadHelper;
-class vtkOpenGLVertexArrayObject;
-class vtkShaderProgram;
-class vtkTextureObject;
+class vtkOpenGLRenderWindow;
 
 class vtkF3DStochasticTransparentPass : public vtkOpenGLRenderPass
 {
 public:
   static vtkF3DStochasticTransparentPass* New();
-  vtkTypeMacro(vtkF3DStochasticTransparentPass, vtkRenderPass);
+  vtkTypeMacro(vtkF3DStochasticTransparentPass, vtkOpenGLRenderPass);
 
   void Render(const vtkRenderState* s) override;
   void ReleaseGraphicsResources(vtkWindow* w) override;
@@ -33,12 +29,16 @@ public:
 
   bool PreReplaceShaderValues(std::string& vertexShader, std::string& geometryShader, std::string& fragmentShader, vtkAbstractMapper* mapper, vtkProp* prop) override;
 
+  bool SetShaderParameters(vtkShaderProgram* program, vtkAbstractMapper* mapper,
+    vtkProp* prop, vtkOpenGLVertexArrayObject* VAO = nullptr) override;
+
 private:
   vtkF3DStochasticTransparentPass();
   ~vtkF3DStochasticTransparentPass() override;
 
   vtkRenderPass* TranslucentPass = nullptr;
   vtkRenderPass* VolumetricPass = nullptr;
+  vtkOpenGLRenderWindow* RenWin = nullptr;
 
   vtkF3DStochasticTransparentPass(const vtkF3DStochasticTransparentPass&) = delete;
   void operator=(const vtkF3DStochasticTransparentPass&) = delete;

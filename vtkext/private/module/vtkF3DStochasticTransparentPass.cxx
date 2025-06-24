@@ -27,8 +27,7 @@ vtkF3DStochasticTransparentPass::~vtkF3DStochasticTransparentPass() = default;
 //------------------------------------------------------------------------------
 void vtkF3DStochasticTransparentPass::Render(const vtkRenderState* s)
 {
-  vtkOpenGLRenderWindow* renWin =
-    static_cast<vtkOpenGLRenderWindow*>(s->GetRenderer()->GetRenderWindow());
+  this->RenWin = static_cast<vtkOpenGLRenderWindow*>(s->GetRenderer()->GetRenderWindow());
 
   // Setup vtkOpenGLRenderPass
   this->PreRender(s);
@@ -66,6 +65,16 @@ void vtkF3DStochasticTransparentPass::Render(const vtkRenderState* s)
 }
 
 //------------------------------------------------------------------------------
+bool vtkF3DStochasticTransparentPass::SetShaderParameters(vtkShaderProgram* program,
+  vtkAbstractMapper* mapper, vtkProp* prop, vtkOpenGLVertexArrayObject* VAO)
+{
+  // TODO: unused here, but blue noise should be better than white noise in theory
+  program->SetUniformi("texNoise", this->RenWin->GetNoiseTextureUnit());
+
+  return this->Superclass::SetShaderParameters(program, mapper, prop, VAO);
+}
+
+//------------------------------------------------------------------------------
 bool vtkF3DStochasticTransparentPass::PreReplaceShaderValues(std::string& vertexShader,
   std::string& geometryShader, std::string& fragmentShader, vtkAbstractMapper* mapper,
   vtkProp* prop)
@@ -77,8 +86,8 @@ bool vtkF3DStochasticTransparentPass::PreReplaceShaderValues(std::string& vertex
 
     vtkShaderProgram::Substitute(fragmentShader, "  //VTK::Color::Impl",
       "  //VTK::Color::Impl\n"
-      "  if (random(gl_FragCoord.xyz) >= opacity) discard;\n"
-      "  //opacity = 1.0;\n\n");
+      "  if (random(vec3(gl_FragCoord.xy, gl_PrimitiveID)) >= opacity) discard;\n"
+      "  opacity = 1.0;\n\n");
   }
 
   return true;
