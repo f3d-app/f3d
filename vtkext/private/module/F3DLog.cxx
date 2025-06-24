@@ -69,3 +69,4 @@ void F3DLog::SetStandardStream(StandardStream mode)
   }
 }
 
+
