@@ -8,7 +8,6 @@
 
 namespace f3d
 {
-
 //----------------------------------------------------------------------------
 void log::printInternal(log::VerboseLevel level, const std::string& str)
 {
