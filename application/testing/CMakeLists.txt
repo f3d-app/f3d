@@ -943,8 +943,8 @@ f3d_test(NAME TestInteractionVolumeInverse DATA HeadMRVolume.mhd ARGS --camera-p
 f3d_test(NAME TestInteractionMultiFileVolume DATA multi ARGS --multi-file-mode=all INTERACTION) #SSVB
 f3d_test(NAME TestInteractionPointCloud DATA pointsCloud.vtp ARGS --point-sprites-size=20 INTERACTION) #O
 f3d_test(NAME TestInteractionDirectory DATA mb INTERACTION ARGS --scalar-coloring) #Right;Right;Right;Left;Up;
-f3d_test(NAME TestInteractionDirectoryLoopNoSkipUnsuppored DATA mb/recursive INTERACTION ARGS --skip-unsupported-files=false --scalar-coloring --filename UI) #Left;Left;Left;Left;Left;
-f3d_test(NAME TestInteractionDirectoryLoopSkipUnsuppored DATA mb/recursive INTERACTION ARGS --scalar-coloring --filename UI) #Left;Left;Left;Left;Left;
+f3d_test(NAME TestInteractionDirectoryLoopNoSkipUnsupported DATA mb/recursive INTERACTION ARGS --skip-unsupported-files=false --scalar-coloring --filename UI) #Left;Left;Left;Left;Left;
+f3d_test(NAME TestInteractionDirectoryLoopSkipUnsupported DATA mb/recursive INTERACTION ARGS --scalar-coloring --filename UI) #Left;Left;Left;Left;Left;
 f3d_test(NAME TestInteractionDirectoryEmpty DATA mb ARGS --skip-unsupported-files=false INTERACTION NO_DATA_FORCE_RENDER UI) #Right;Right;Right;
 f3d_test(NAME TestInteractionSkipUnsupported DATA 16bit.fbx unsupportedFile.dummy ARGS INTERACTION UI) #Right * 9
 f3d_test(NAME TestInteractionNoSkipUnsupported DATA 16bit.fbx unsupportedFile.dummy ARGS --skip-unsupported-files=false INTERACTION NO_DATA_FORCE_RENDER UI) #Right * 9
