@@ -127,7 +127,6 @@ public:
 
     this->Recorder = vtkSmartPointer<vtkF3DInteractorEventRecorder>::New();
     this->Recorder->SetInteractor(this->VTKInteractor);
-
   }
 
   std::string VerboseLevelToString(log::VerboseLevel level)
