@@ -277,7 +277,7 @@ f3d_test(NAME TestMultiFileNonCoherentComponentNames DATA bluntfin.vts bluntfin_
 f3d_test(NAME TestMultiInputArg ARGS --input ${F3D_SOURCE_DIR}/testing/data/mb/recursive/mb_0_0.vtu ${F3D_SOURCE_DIR}/testing/data/mb/recursive/mb_1_0.vtp --multi-file-mode=all -s --coloring-array=Polynomial -b)
 f3d_test(NAME TestMultiInputMultiArgs ARGS --input ${F3D_SOURCE_DIR}/testing/data/mb/recursive/mb_0_0.vtu --input ${F3D_SOURCE_DIR}/testing/data/mb/recursive/mb_1_0.vtp --multi-file-mode=all -s --coloring-array=Polynomial -b)
 f3d_test(NAME TestMultiFileSkipUnsupportedFiles ARGS ${F3D_SOURCE_DIR}/testing/data/unsupportedFile.dummy ${F3D_SOURCE_DIR}/testing/data/cow.vtk)
-f3d_test(NAME TestMultiFileNoSkipUnsupportedFiles NO_DATA_FORCE_RENDER ARGS ${F3D_SOURCE_DIR}/testing/data/unsupportedFile.dummy ${F3D_SOURCE_DIR}/testing/data/cow.vtk --skip-unsupported-files=false)
+f3d_test(NAME TestMultiFileNoSkipUnsupportedFiles NO_DATA_FORCE_RENDER ARGS ${F3D_SOURCE_DIR}/testing/data/unsupportedFile.dummy ${F3D_SOURCE_DIR}/testing/data/cow.vtk --skip-unsupported-files=false NO_DATA_FORCE_RENDER UI)
 f3d_test(NAME TestInvalidUpDirection DATA suzanne.ply ARGS -g --up=W REGEXP "Could not set 'up'" NO_BASELINE)
 f3d_test(NAME TestUpDirectionNoSign DATA suzanne.ply ARGS --up=X)
 f3d_test(NAME TestTextureMatCap DATA suzanne.ply ARGS --texture-matcap=${F3D_SOURCE_DIR}/testing/data/skin.png)
