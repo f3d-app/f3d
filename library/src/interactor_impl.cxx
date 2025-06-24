@@ -148,7 +148,6 @@ public:
     }
   }
 
-
   //----------------------------------------------------------------------------
   // Method defined to normalize the Z axis so all models are treated temporarily
   // as Z-up axis models.
@@ -614,7 +613,6 @@ public:
   std::vector<std::string> OrderedBindGroups;
 
   std::map<std::string, std::string> AliasMap;
-
 
   vtkNew<vtkCellPicker> CellPicker;
   vtkNew<vtkPointPicker> PointPicker;
