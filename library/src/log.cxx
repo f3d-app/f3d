@@ -125,6 +125,8 @@ log::VerboseLevel log::getVerboseLevel()
       return log::VerboseLevel::ERROR;
     case F3DLog::Severity::Quiet:
       return log::VerboseLevel::QUIET;
+    default:
+      return log::VerboseLevel::INFO;
   }
 }
 }

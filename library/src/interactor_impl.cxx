@@ -142,6 +142,8 @@ public:
         return "Error";
       case log::VerboseLevel::QUIET:
         return "Quiet";
+      default:
+        return "Info";
     }
   }
 
