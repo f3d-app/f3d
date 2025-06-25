@@ -186,6 +186,7 @@ jobs:
         vtk_version:
           [
             "${{needs.default_versions.outputs.vtk_commit_sha}}",
+            v9.5.0,
             v9.4.2,
             v9.3.1,
             v9.2.6,
@@ -275,6 +276,7 @@ jobs:
         vtk_version:
           [
             "${{needs.default_versions.outputs.vtk_commit_sha}}",
+            v9.5.0,
             v9.4.2,
             v9.3.1,
             v9.2.6,
@@ -337,7 +339,7 @@ jobs:
         uses: ./source/.github/actions/generic-ci
         with:
           build_type: fast
-          vtk_version: v9.4.2
+          vtk_version: v9.5.0
           raytracing_label: no-raytracing
           rendering_backend: auto
           optional_deps_label: no-optional-deps
@@ -359,6 +361,7 @@ jobs:
         vtk_version:
           [
             "${{needs.default_versions.outputs.vtk_commit_sha}}",
+            v9.5.0,
             v9.4.2,
             v9.3.1,
             v9.2.6,
@@ -523,6 +526,7 @@ jobs:
         vtk_version:
           [
             "${{needs.default_versions.outputs.vtk_commit_sha}}",
+            v9.5.0,
             v9.4.2,
             v9.3.1,
             v9.2.6,
@@ -568,6 +572,7 @@ jobs:
       matrix:
         vtk_version: [
             "${{needs.default_versions.outputs.vtk_commit_sha}}",
+            v9.5.0,
             v9.4.2,
             v9.3.1,
           ] # VTK 9.2.6 not compatible with recent clang version on macOS
