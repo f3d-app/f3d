@@ -56,7 +56,6 @@ void SetUseColoring(bool use);
  * are written to stdout.
  */
 void SetStandardStream(StandardStream mode);
-
 };
 
 #endif

@@ -7,7 +7,6 @@
 #include "utils.h"
 #include "window_impl.h"
 
-#include "F3DLog.h"
 #include "vtkF3DConsoleOutputWindow.h"
 
 #if F3D_MODULE_UI
@@ -143,8 +142,6 @@ public:
         return "Error";
       case log::VerboseLevel::QUIET:
         return "Quiet";
-      default:
-        return "Info";
     }
   }
 
@@ -926,17 +923,15 @@ interactor& interactor_impl::initCommands()
     {
       log::VerboseLevel currentLevel = log::getVerboseLevel();
       log::VerboseLevel newLevel =
-        static_cast<log::VerboseLevel>((static_cast<int>(currentLevel) + 1) % 5);
+        static_cast<log::VerboseLevel>((static_cast<unsigned char>(currentLevel) + 1) % 5);
 
       log::setVerboseLevel(newLevel);
 
       vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
       vtkF3DRenderer* ren =
         vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
-      if (ren)
-      {
-        ren->SetCheatSheetConfigured(false);
-      }
+      assert(ren);
+      ren->SetCheatSheetConfigured(false);
 
       log::info("Verbose level changed to: ", this->Internals->VerboseLevelToString(newLevel));
     });
