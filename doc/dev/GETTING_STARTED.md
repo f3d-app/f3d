@@ -95,7 +95,7 @@ mkdir dev
 cd dev
 mkdir vtk
 cd vtk
-git clone --depth 1 --branch v9.4.2 https://gitlab.kitware.com/vtk/vtk.git src
+git clone --depth 1 --branch v9.5.0 https://gitlab.kitware.com/vtk/vtk.git src
 mkdir build
 mkdir install
 cd ..
@@ -147,7 +147,7 @@ Note: These commands will take a while.
 
 ```sh
 cd C:\dev\f3d\build
-cmake -DVTK_DIR=C:/dev/vtk/install/lib/cmake/vtk-9.4 ../src
+cmake -DVTK_DIR=C:/dev/vtk/install/lib/cmake/vtk-9.5 ../src
 cmake --build . --config Debug
 ```
 
