@@ -31,3 +31,5 @@ float floatConstruct( uint m ) {
 
 // Pseudo-random value in half-open range [0:1].
 float random( vec3  v ) { return floatConstruct(hash(floatBitsToUint(v))); }
+float random( float  v ) { return floatConstruct(hash(floatBitsToUint(v))); }
+float random( uint  v ) { return floatConstruct(hash(v)); }
