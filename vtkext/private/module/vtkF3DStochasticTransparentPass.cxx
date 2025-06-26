@@ -82,12 +82,19 @@ bool vtkF3DStochasticTransparentPass::PreReplaceShaderValues(std::string& vertex
   if (!vtkF3DOpenGLGridMapper::SafeDownCast(mapper))
   {
     // add random function utilities
-    vtkShaderProgram::Substitute(fragmentShader, "//VTK::Color::Dec", vtkF3DRandomFS);
+    std::string dec = vtkF3DRandomFS;
+    dec += "\nuniform sampler2D texNoise;\n";
+
+    vtkShaderProgram::Substitute(fragmentShader, "//VTK::Color::Dec", dec);
 
     vtkShaderProgram::Substitute(fragmentShader, "  //VTK::Color::Impl",
       "  //VTK::Color::Impl\n"
-      "  if (random(vec3(gl_FragCoord.xy, gl_PrimitiveID)) >= opacity) discard;\n"
-      "  opacity = 1.0;\n\n");
+      "  vec2 nsz = vec2(64, 64);\n"
+      //"  float randomAngle = random(gl_PrimitiveID) * 6.28318530718;\n"
+      //"  vec2 jitter = vec2(cos(randomAngle), sin(randomAngle));\n"
+      //"  if (texture(texNoise, (gl_FragCoord.xy + jitter) / nsz).x >= opacity) discard;\n"
+      //"  if (random(vec3(gl_FragCoord.xy, gl_PrimitiveID)) >= opacity) discard;\n"
+      "  opacity = random(gl_FragCoord.x);\n\n");
   }
 
   return true;
