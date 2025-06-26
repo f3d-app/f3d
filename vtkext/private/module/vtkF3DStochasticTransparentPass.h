@@ -13,6 +13,7 @@
 
 #include "vtkOpenGLRenderPass.h"
 
+class vtkInformationIntegerKey;
 class vtkOpenGLRenderWindow;
 
 class vtkF3DStochasticTransparentPass : public vtkOpenGLRenderPass
@@ -31,6 +32,8 @@ public:
 
   bool SetShaderParameters(vtkShaderProgram* program, vtkAbstractMapper* mapper,
     vtkProp* prop, vtkOpenGLVertexArrayObject* VAO = nullptr) override;
+
+  static vtkInformationIntegerKey* PropIndex();
 
 private:
   vtkF3DStochasticTransparentPass();

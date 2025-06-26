@@ -6,6 +6,7 @@
 #include "vtkF3DRandomFS.h"
 
 #include <vtkInformation.h>
+#include <vtkInformationIntegerKey.h>
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLActor.h>
 #include <vtkOpenGLRenderWindow.h>
@@ -17,6 +18,8 @@
 vtkStandardNewMacro(vtkF3DStochasticTransparentPass);
 vtkCxxSetObjectMacro(vtkF3DStochasticTransparentPass, TranslucentPass, vtkRenderPass);
 vtkCxxSetObjectMacro(vtkF3DStochasticTransparentPass, VolumetricPass, vtkRenderPass);
+
+vtkInformationKeyMacro(vtkF3DStochasticTransparentPass, PropIndex, Integer);
 
 //------------------------------------------------------------------------------
 vtkF3DStochasticTransparentPass::vtkF3DStochasticTransparentPass() = default;
@@ -45,6 +48,7 @@ void vtkF3DStochasticTransparentPass::Render(const vtkRenderState* s)
       info->FastDelete();
     }
     info->Set(vtkOpenGLActor::GLDepthMaskOverride(), 1);
+    info->Set(vtkF3DStochasticTransparentPass::PropIndex(), j);
   }
 
   this->TranslucentPass->Render(s);
@@ -71,6 +75,9 @@ bool vtkF3DStochasticTransparentPass::SetShaderParameters(vtkShaderProgram* prog
   // TODO: unused here, but blue noise should be better than white noise in theory
   program->SetUniformi("texNoise", this->RenWin->GetNoiseTextureUnit());
 
+  vtkInformation* info = prop->GetPropertyKeys();
+  program->SetUniformi("propIndex", info->Get(vtkF3DStochasticTransparentPass::PropIndex()));
+
   return this->Superclass::SetShaderParameters(program, mapper, prop, VAO);
 }
 
@@ -84,17 +91,17 @@ bool vtkF3DStochasticTransparentPass::PreReplaceShaderValues(std::string& vertex
     // add random function utilities
     std::string dec = vtkF3DRandomFS;
     dec += "\nuniform sampler2D texNoise;\n";
+    dec += "\nuniform int propIndex;\n";
 
     vtkShaderProgram::Substitute(fragmentShader, "//VTK::Color::Dec", dec);
 
     vtkShaderProgram::Substitute(fragmentShader, "  //VTK::Color::Impl",
       "  //VTK::Color::Impl\n"
       "  vec2 nsz = vec2(64, 64);\n"
-      //"  float randomAngle = random(gl_PrimitiveID) * 6.28318530718;\n"
-      //"  vec2 jitter = vec2(cos(randomAngle), sin(randomAngle));\n"
-      //"  if (texture(texNoise, (gl_FragCoord.xy + jitter) / nsz).x >= opacity) discard;\n"
-      //"  if (random(vec3(gl_FragCoord.xy, gl_PrimitiveID)) >= opacity) discard;\n"
-      "  opacity = random(gl_FragCoord.x);\n\n");
+      "  vec2 jitter = vec2(random(uint(propIndex)), random(uint(gl_PrimitiveID)));\n"
+      "  if (texture(texNoise, 0.8 * jitter + (gl_FragCoord.xy) / nsz).x >= opacity) discard;\n"
+      //"  if (random(vec3(gl_FragCoord.xy, propIndex)) >= opacity) discard;\n"
+      "  opacity = 1.0;\n\n");
   }
 
   return true;
