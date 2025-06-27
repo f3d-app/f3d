@@ -105,6 +105,11 @@ public:
    */
   static void setVerboseLevel(VerboseLevel level, bool forceStdErr = false);
 
+  /**
+   * Get the current verbose level.
+   */
+  static VerboseLevel getVerboseLevel();
+
 protected:
   //! @cond
   static void appendArg(std::stringstream&)

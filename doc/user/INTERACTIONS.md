@@ -76,6 +76,7 @@ Other hotkeys and interactions are available:
 - <kbd>Esc</kbd>: display the console or hide console/minimal console.
 - <kbd>:</kbd>: display the minimal console
 - <kbd>Space</kbd>: play the animation if any.
+- <kbd>Shift</kbd> + <kbd>V</kbd>: cycle between verbosity levels.
 - <kbd>&larr;</kbd>: load the previous file if any and reset the camera.
 - <kbd>&rarr;</kbd>: load the next file if any and reset the camera.
 - <kbd>&uarr;</kbd>: reload the currently loaded files.

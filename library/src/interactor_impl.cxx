@@ -128,6 +128,25 @@ public:
     this->Recorder->SetInteractor(this->VTKInteractor);
   }
 
+  std::string VerboseLevelToString(log::VerboseLevel level)
+  {
+    switch (level)
+    {
+      case log::VerboseLevel::DEBUG:
+        return "Debug";
+      case log::VerboseLevel::INFO:
+        return "Info";
+      case log::VerboseLevel::WARN:
+        return "Warning";
+      case log::VerboseLevel::ERROR:
+        return "Error";
+      case log::VerboseLevel::QUIET:
+        return "Quiet";
+      default:
+        return "Info";
+    }
+  }
+
   //----------------------------------------------------------------------------
   // Method defined to normalize the Z axis so all models are treated temporarily
   // as Z-up axis models.
@@ -900,6 +919,24 @@ interactor& interactor_impl::initCommands()
       log::info(
         "Alias " + aliasName + " added with command " + this->Internals->AliasMap[aliasName]);
     });
+
+  this->addCommand("cycle_verbose_level",
+    [&](const std::vector<std::string>&)
+    {
+      log::VerboseLevel currentLevel = log::getVerboseLevel();
+      log::VerboseLevel newLevel =
+        static_cast<log::VerboseLevel>((static_cast<unsigned char>(currentLevel) + 1) % 5);
+
+      log::setVerboseLevel(newLevel);
+
+      vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
+      vtkF3DRenderer* ren =
+        vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+      assert(ren);
+      ren->SetCheatSheetConfigured(false);
+
+      log::info("Verbose level changed to: ", this->Internals->VerboseLevelToString(newLevel));
+    });
   return *this;
 }
 
@@ -1116,6 +1153,13 @@ interactor& interactor_impl::initBindings()
   auto docTglOpt = [](const std::string& doc, const std::optional<bool>& val)
   { return std::pair(doc, (val.has_value() ? (val.value() ? "ON" : "OFF") : "Unset")); };
 
+  // "Cycle verbose level", "current_level"
+  auto docVerbose = [&]()
+  {
+    return std::pair(
+      "Cycle verbose level", this->Internals->VerboseLevelToString(log::getVerboseLevel()));
+  };
+
   // clang-format off
   this->addBinding({mod_t::NONE, "W"}, "cycle_animation", "Scene", docAnim);
   this->addBinding({mod_t::NONE, "C"}, "cycle_coloring field", "Scene", docField);
@@ -1166,6 +1210,7 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "Return"}, "reset_camera", "Others", std::bind(docStr, "Reset camera to initial parameters"));
   this->addBinding({mod_t::NONE, "Space"}, "toggle_animation", "Others", std::bind(docStr, "Play/Pause animation if any"));
   this->addBinding({mod_t::NONE, "Drop"}, "add_files", "Others", std::bind(docStr, "Add files to the scene"));
+  this->addBinding({mod_t::SHIFT, "V"}, "cycle_verbose_level", "Others", docVerbose);
   // clang-format on
 
   return *this;
