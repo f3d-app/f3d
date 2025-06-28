@@ -62,7 +62,7 @@
 #include <vtksys/MD5.h>
 #include <vtksys/SystemTools.hxx>
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20250513)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
 #include <vtkGridAxesActor3D.h>
 #endif
 
@@ -271,7 +271,7 @@ void vtkF3DRenderer::Initialize()
   this->AddActor(this->SkyboxActor);
   this->AddActor(this->UIActor);
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20250513)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
   this->AddActor(this->GridAxesActor);
 #endif
 
@@ -720,7 +720,7 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowAxesGrid(bool show)
 {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20250513)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
   if (this->AxesGridVisible != show)
   {
     this->AxesGridVisible = show;
@@ -734,7 +734,7 @@ void vtkF3DRenderer::ShowAxesGrid(bool show)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureGridAxesUsingCurrentActors()
 {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20250513)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
   bool show = this->AxesGridVisible;
   if (show)
   {

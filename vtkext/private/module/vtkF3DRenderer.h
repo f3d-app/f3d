@@ -526,7 +526,7 @@ private:
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
 
     // Does vtk version support GridAxesActor
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20250513)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
   vtkNew<vtkGridAxesActor3D> GridAxesActor;
 #endif
 
