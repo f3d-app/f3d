@@ -833,6 +833,45 @@ if(F3D_PLUGIN_BUILD_HDF)
     f3d_test(NAME TestPluginFullPath DATA disk_out_ref.ex2 ARGS --verbose --load-plugins "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_SHARED_MODULE_PREFIX}f3d-plugin-hdf${CMAKE_SHARED_MODULE_SUFFIX}" NO_BASELINE REGEXP "Loaded plugin hdf from")
   endif()
 
+  # NetCDF tests
+  # Basic rendering tests 
+  f3d_test(NAME TestNetCDF DATA temperature_grid.nc ARGS --load-plugins=hdf -s)
+  f3d_test(NAME TestNetCDFNCDF DATA temperature_grid.ncdf ARGS --load-plugins=hdf -s)
+  
+  # Verbose output validation tests - should have 1000 points
+  f3d_test(NAME TestNetCDFVerbose DATA temperature_grid.nc ARGS --load-plugins=hdf --verbose NO_RENDER NO_BASELINE REGEXP "Number of points: 1000")
+  f3d_test(NAME TestNetCDFCDF DATA temperature_grid.cdf ARGS --load-plugins=hdf --verbose NO_RENDER NO_BASELINE REGEXP "Number of points: 1000")
+  f3d_test(NAME TestNetCDFNCDFVerbose DATA temperature_grid.ncdf ARGS --load-plugins=hdf --verbose NO_RENDER NO_BASELINE REGEXP "Number of points: 1000")
+
+  # Scalar field validation tests - NetCDF reader should enable temperature array
+  f3d_test(NAME TestNetCDFScalarField DATA temperature_grid.nc ARGS --load-plugins=hdf --verbose NO_RENDER NO_BASELINE REGEXP "temperature")
+  f3d_test(NAME TestNetCDFCDFScalarField DATA temperature_grid.cdf ARGS --load-plugins=hdf --verbose NO_RENDER NO_BASELINE REGEXP "temperature")
+  f3d_test(NAME TestNetCDFNCDFScalarField DATA temperature_grid.ncdf ARGS --load-plugins=hdf --verbose NO_RENDER NO_BASELINE REGEXP "temperature")
+
+  # Scalar range validation tests - temperature should be in [0, 27] range
+  f3d_test(NAME TestNetCDFScalarRange DATA temperature_grid.nc ARGS --load-plugins=hdf --verbose NO_RENDER NO_BASELINE REGEXP "temperature.*0, 27")
+  f3d_test(NAME TestNetCDFCDFScalarRange DATA temperature_grid.cdf ARGS --load-plugins=hdf --verbose NO_RENDER NO_BASELINE REGEXP "temperature.*0, 27")
+  f3d_test(NAME TestNetCDFNCDFScalarRange DATA temperature_grid.ncdf ARGS --load-plugins=hdf --verbose NO_RENDER NO_BASELINE REGEXP "temperature.*0, 27")
+
+  # Metadata validation tests - should have units metadata
+  f3d_test(NAME TestNetCDFMetadata DATA temperature_grid.nc ARGS --load-plugins=hdf --verbose NO_RENDER NO_BASELINE REGEXP "temperature_units.*degrees_C")
+  f3d_test(NAME TestNetCDFCDFMetadata DATA temperature_grid.cdf ARGS --load-plugins=hdf --verbose NO_RENDER NO_BASELINE REGEXP "temperature_units.*degrees_C")
+  f3d_test(NAME TestNetCDFNCDFMetadata DATA temperature_grid.ncdf ARGS --load-plugins=hdf --verbose NO_RENDER NO_BASELINE REGEXP "temperature_units.*degrees_C")
+
+  # Coordinate metadata validation tests
+  f3d_test(NAME TestNetCDFCoordinateUnits DATA temperature_grid.nc ARGS --load-plugins=hdf --verbose NO_RENDER NO_BASELINE REGEXP "x_units.*meters")
+  f3d_test(NAME TestNetCDFCDFCoordinateUnits DATA temperature_grid.cdf ARGS --load-plugins=hdf --verbose NO_RENDER NO_BASELINE REGEXP "x_units.*meters")
+  f3d_test(NAME TestNetCDFNCDFCoordinateUnits DATA temperature_grid.ncdf ARGS --load-plugins=hdf --verbose NO_RENDER NO_BASELINE REGEXP "x_units.*meters")
+
+  # Dimension warning tests - should warn about skipped coordinate variables
+  f3d_test(NAME TestNetCDFDimensionWarnings DATA temperature_grid.nc ARGS --load-plugins=hdf --verbose NO_RENDER NO_BASELINE REGEXP "Variable x dimensions.*are different.*Skipping")
+  f3d_test(NAME TestNetCDFCDFDimensionWarnings DATA temperature_grid.cdf ARGS --load-plugins=hdf --verbose NO_RENDER NO_BASELINE REGEXP "Variable x dimensions.*are different.*Skipping")
+  f3d_test(NAME TestNetCDFNCDFDimensionWarnings DATA temperature_grid.ncdf ARGS --load-plugins=hdf --verbose NO_RENDER NO_BASELINE REGEXP "Variable x dimensions.*are different.*Skipping")
+
+  # Configuration file tests
+  f3d_test(NAME TestNetCDFConfig DATA temperature_grid.nc CONFIG ${F3D_SOURCE_DIR}/testing/configs/netcdf.json ARGS -s)
+  f3d_test(NAME TestNetCDFCDFConfig DATA temperature_grid.cdf CONFIG ${F3D_SOURCE_DIR}/testing/configs/netcdf.json ARGS -s)
+  f3d_test(NAME TestNetCDFNCDFConfig DATA temperature_grid.ncdf CONFIG ${F3D_SOURCE_DIR}/testing/configs/netcdf.json ARGS -s)
 endif()
 
 if(F3D_PLUGIN_BUILD_OCCT)

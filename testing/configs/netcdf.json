@@ -1,0 +1,16 @@
+[
+  {
+    "match-type": "glob",
+    "match": "*.nc",
+    "options": {
+      "load-plugins": "hdf"
+    }
+  },
+  {
+    "match-type": "glob", 
+    "match": "*.cdf",
+    "options": {
+      "load-plugins": "hdf"
+    }
+  }
+] 
