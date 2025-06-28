@@ -3,14 +3,27 @@
     "match-type": "glob",
     "match": "*.nc",
     "options": {
-      "load-plugins": "hdf"
+      "load-plugins": "hdf",
+      "scalar-coloring": true,
+      "coloring-scalar-bar": true
     }
   },
   {
     "match-type": "glob", 
     "match": "*.cdf",
     "options": {
-      "load-plugins": "hdf"
+      "load-plugins": "hdf",
+      "scalar-coloring": true,
+      "coloring-scalar-bar": true
+    }
+  },
+  {
+    "match-type": "glob",
+    "match": "*.ncdf", 
+    "options": {
+      "load-plugins": "hdf",
+      "scalar-coloring": true,
+      "coloring-scalar-bar": true
     }
   }
 ] 
