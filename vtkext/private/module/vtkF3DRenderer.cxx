@@ -20,7 +20,6 @@
 #include <vtkCullerCollection.h>
 #include <vtkDiscretizableColorTransferFunction.h>
 #include <vtkFloatArray.h>
-#include <vtkGridAxesActor3D.h>
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Factory.h>
@@ -62,6 +61,10 @@
 #include <vtksys/FStream.hxx>
 #include <vtksys/MD5.h>
 #include <vtksys/SystemTools.hxx>
+
+#if F3D_HAS_GRID_AXES
+#include <vtkGridAxesActor3D.h>
+#endif
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
 #include <vtkSphericalHarmonics.h>
@@ -265,9 +268,12 @@ void vtkF3DRenderer::Initialize()
 
   this->AddViewProp(this->ScalarBarActor);
   this->AddActor(this->GridActor);
-  this->AddActor(this->GridAxesActor);
   this->AddActor(this->SkyboxActor);
   this->AddActor(this->UIActor);
+
+#if F3D_HAS_GRID_AXES
+  this->AddActor(this->GridAxesActor);
+#endif
 
   this->GridConfigured = false;
   this->CheatSheetConfigured = false;
@@ -714,6 +720,7 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowAxesGrid(bool show)
 {
+#if F3D_HAS_GRID_AXES
   if (this->AxesGridVisible != show)
   {
     this->AxesGridVisible = show;
@@ -721,11 +728,13 @@ void vtkF3DRenderer::ShowAxesGrid(bool show)
     this->GridAxesConfigured = false;
     this->CheatSheetConfigured = false;
   }
+#endif
 }
 
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureGridAxesUsingCurrentActors()
 {
+#if F3D_HAS_GRID_AXES
   bool show = this->AxesGridVisible;
   if (show)
   {
@@ -777,6 +786,8 @@ void vtkF3DRenderer::ConfigureGridAxesUsingCurrentActors()
     }
   }
   this->GridAxesActor->SetVisibility(show);
+
+#endif
 }
 
 //----------------------------------------------------------------------------
