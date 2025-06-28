@@ -6,10 +6,13 @@ set(F3D_VTK_MODULES
   VTK::CommonColor
   VTK::IOImage
   VTK::InteractionWidgets
-  VTK::RenderingGridAxes
   f3d::vtkext
   f3d::vtkextPrivate
 )
+
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250513)
+  set(F3D_VTK_MODULES ${F3D_VTK_MODULES} VTK::RenderingGridAxes)
+endif()
 
 # Check modules
 if(F3D_MODULE_RAYTRACING)
