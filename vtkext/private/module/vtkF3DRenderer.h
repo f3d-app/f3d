@@ -525,8 +525,18 @@ private:
 
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
 
-  vtkNew<vtkActor> GridActor;
+    // Does vtk version support GridAxesActor
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20250514)
+  #define F3D_HAS_GRID_AXES 1
+#else
+  #define F3D_HAS_GRID_AXES 0
+#endif
+
+#if F3D_HAS_GRID_AXES
   vtkNew<vtkGridAxesActor3D> GridAxesActor;
+#endif
+
+  vtkNew<vtkActor> GridActor;
   vtkNew<vtkSkybox> SkyboxActor;
   vtkNew<vtkF3DUIActor> UIActor;
 
