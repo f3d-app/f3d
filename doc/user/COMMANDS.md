@@ -61,6 +61,8 @@ Supports `front`, `top`, `right`, `isometric` arguments. eg: `set_camera top`.
 
 `toggle_animation`: A specific command to start/stop the animation. No argument.
 
+`cycle_verbose_level` : Cycles between the verbose level (`Debug`, `Info`, `Warning`, `Error`, `Quiet`).
+
 `add_files [path/to/file1] [path/to/file2]`: A specific command to add files to the scene (overridden by a F3D specific command, see below). Take one or more files as arguments.
 eg: `add_files /path/to/dragon.vtu`.
 

@@ -963,7 +963,9 @@ f3d_test(NAME TestInteractionConfigFileMulti DATA multi CONFIG ${F3D_SOURCE_DIR}
 f3d_test(NAME TestInteractionConfigFileAndCommand DATA multi ARGS -o CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI) #OX;Right;N;Right;Right;Right
 f3d_test(NAME TestInteractionConfigFileImperative DATA dragon.vtu suzanne.stl ARGS --edges CONFIG ${F3D_SOURCE_DIR}/testing/configs/imperative.json INTERACTION) #E;Right
 f3d_test(NAME TestInteractionConfigFileImperativeNoData CONFIG ${F3D_SOURCE_DIR}/testing/configs/imperative.json INTERACTION NO_DATA_FORCE_RENDER UI) #X;Up
+f3d_test(NAME TestInteractionConfigFileOptional DATA zombie.mdl f3d.glb CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI) #Right
 f3d_test(NAME TestInteractionCycleVerbose DATA dragon.vtu ARGS --verbose -s NO_BASELINE INTERACTION REGEXP "Not coloring")#SSSSYC
+f3d_test(NAME TestInteractionCycleVerboseLevelsUsingBinding DATA dragon.vtu ARGS --verbose=info NO_BASELINE INTERACTION REGEXP "Verbose level changed to: Debug")#Shift+V;Shift+V;Shift+V;Shift+V;Shift+V
 f3d_test(NAME TestInteractionEmptyDrop INTERACTION REGEXP "Drop event without any provided files.")#DropEvent Empty;
 f3d_test(NAME TestInteractionCameraUpdate DATA dragon.vtu INTERACTION) #MouseWheel;MouseWheel;MouseWheel;S
 f3d_test(NAME TestInteractionFocalPointPickingDefault DATA dragon.vtu INTERACTION LONG_TIMEOUT)

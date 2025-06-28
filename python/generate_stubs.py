@@ -6,7 +6,7 @@ from contextlib import contextmanager
 from difflib import unified_diff
 from pathlib import Path
 from tempfile import gettempdir
-from typing import Iterable
+from typing import Callable, Iterable
 
 
 def main():
@@ -43,7 +43,7 @@ def run_pybind11_stubgen(out_dir: Path, module: str = "f3d"):
 
 
 def postprocess_generated_stubs(filenames: Iterable[Path]):
-    replacements = [
+    replacements: list[tuple[str, str | Callable[[re.Match[str]], str]]] = [
         (
             # change `point3_t` and `vector3_t` parameter annotations and return types
             # to `tuple[float, float, float]`
@@ -59,6 +59,12 @@ def postprocess_generated_stubs(filenames: Iterable[Path]):
             # remove `_pybind11_conduit_v1_` static methods
             r"^\s+@staticmethod\s+def _pybind11_conduit_v1_\(\*args, *\*\*kwargs\):\s*\.\.\.[\n\r]",
             "",
+        ),
+        (
+            # replace `list[...]` by `Sequence[...]` in function parameters (but not in returns)
+            # because pybind's `std::vector` typecaster actually accepts sequences not just lists
+            r"(def .*list\[.+)(\s*->.*)",
+            lambda m: re.sub(r" list\[", r" typing.Sequence[", m.group(1)) + m.group(2),
         ),
     ]
 

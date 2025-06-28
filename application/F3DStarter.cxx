@@ -691,7 +691,11 @@ public:
     std::optional<T>& option)
   {
     const std::string& optStr = appOptions.at(name);
-    if (!optStr.empty())
+    if (optStr.empty())
+    {
+      option = std::nullopt;
+    }
+    else
     {
       T localOption;
       this->ParseOption(appOptions, name, localOption);
