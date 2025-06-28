@@ -12,4 +12,4 @@ void applyCustomReader(vtkAlgorithm* algo, const std::string&) const override
       ncReader->SetVariableArrayStatus(arrayName, 1);
     }
   }
-} 
+}
