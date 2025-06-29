@@ -45,7 +45,7 @@ that is definitely possible. Feel free to reach out for guidance by opening an i
 ## Bounties
 
 The [F3D-APP Foundation](https://annuaire-entreprises.data.gouv.fr/entreprise/f3d-app-foundation-941551624), as a non-profit institution, would like to redistribute some donations to the contributors, for specific issues identified by maintainers as important for the project.
-Such issues have been identified with the ["bounty"](https://github.com/f3d-app/f3d/issues?q=is%3Aissue%20state%3Aopen%20label%3Abounty) label. The amount of money of there bounties is fairly small (up to a few hundred euros).
+Such issues have been identified with the ["bounty"](https://github.com/f3d-app/f3d/issues?q=is%3Aissue%20state%3Aopen%20label%3Abounty) label. The amount of money of their bounties is fairly small (up to a few hundred euros).
 
 In order to be eligible for the bounty you need to:
 
