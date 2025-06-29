@@ -13,6 +13,7 @@ list(APPEND libf3dSDKTests_list
      TestSDKScene.cxx
      TestSDKLog.cxx
      TestSDKMultiColoring.cxx
+     TestSDKMultipleEngines.cxx
      TestSDKOptions.cxx
      TestSDKOptionsIO.cxx
      TestSDKRenderFinalShader.cxx
