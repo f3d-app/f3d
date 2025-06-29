@@ -352,6 +352,12 @@ std::pair<double, double> scene_impl::animationTimeRange()
 }
 
 //----------------------------------------------------------------------------
+unsigned int scene_impl::availableAnimations() const
+{
+  return this->Internals->AnimationManager.GetNumberOfAvailableAnimations();
+}
+
+//----------------------------------------------------------------------------
 void scene_impl::SetInteractor(interactor_impl* interactor)
 {
   this->Internals->Interactor = interactor;

@@ -41,7 +41,7 @@ Window lets you `render`, `renderToImage` and control other parameters of the wi
 
 When provided by the engine, the interactor class lets you choose how to interact with the data.
 
-It contains the animation API to start and stop animation.
+It contains the animation API to start and stop animation as well as recover the number of available animations and their names.
 
 Interactor lets you add, remove and trigger your [commands](../user/COMMANDS.md).
 The commands let you interact with the libf3d in a very flexible manner.

@@ -531,6 +531,12 @@ public:
                 continue;
               }
 
+              // Handle CLI options deprecation
+              if (key == "animation-index")
+              {
+                f3d::log::warn("animation-index is deprecated, please use animation-indices");
+              }
+
               // Convert key into a libf3d option name if possible
               std::string libf3dOptionName = key;
               std::string keyForLog = key;

@@ -12,6 +12,8 @@ int TestSDKAnimation(int argc, char* argv[])
   f3d::interactor& inter = eng.getInteractor();
   sce.add(std::string(argv[1]) + "/data/f3d.glb");
 
+  test("availableAnimations", sce.availableAnimations() == 1);
+
   sce.loadAnimationTime(0.5);
   test("recover animationTimeRange", sce.animationTimeRange() == std::make_pair(0.0, 4.0));
 

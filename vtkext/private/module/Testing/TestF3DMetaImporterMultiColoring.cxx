@@ -1,13 +1,12 @@
+#include "vtkF3DGenericImporter.h"
+#include "vtkF3DMetaImporter.h"
+
 #include <vtkMathUtilities.h>
 #include <vtkNew.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
-#include <vtkTestUtilities.h>
 #include <vtkXMLStructuredGridReader.h>
 #include <vtkXMLUnstructuredGridReader.h>
-
-#include "vtkF3DGenericImporter.h"
-#include "vtkF3DMetaImporter.h"
 
 #include <iostream>
 
@@ -16,25 +15,6 @@ int TestF3DMetaImporterMultiColoring(int argc, char* argv[])
   vtkNew<vtkF3DMetaImporter> importer;
 
   // Check importer error code path
-  if (!importer->GetAnimationName(0).empty())
-  {
-    std::cerr << "Unexpected animation name that should be empty" << std::endl;
-    return EXIT_FAILURE;
-  }
-  if (importer->IsAnimationEnabled(0))
-  {
-    std::cerr << "Unexpected enabled animation that should not be" << std::endl;
-    return EXIT_FAILURE;
-  }
-
-  int nbTimeSteps;
-  double timeRange[2];
-  if (importer->GetTemporalInformation(0, 60, nbTimeSteps, timeRange, nullptr))
-  {
-    std::cerr << "Unexpected enabled animation that should not be" << std::endl;
-    return EXIT_FAILURE;
-  }
-
   if (!importer->GetCameraName(0).empty())
   {
     std::cerr << "Unexpected camera name that should be empty" << std::endl;
