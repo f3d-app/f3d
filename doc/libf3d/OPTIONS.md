@@ -20,16 +20,16 @@ See the [APIs](#APIs) details below for more info.
 
 ## Scene Options
 
-|            Option            | Type<br>Default<br>Trigger | Description                                                                                                                                  |         F3D option         |
-| :--------------------------: | :------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------: |
-|   scene.animation.autoplay   |   bool<br>false<br>load    | Automatically start animation.                                                                                                               |   \-\-animation-autoplay   |
-|    scene.animation.index     |      int<br>0<br>load      | Select the animation to load.<br>Any negative value means all animations (glTF only).<br>The default scene always has at most one animation. |    \-\-animation-index     |
-| scene.animation.speed_factor |    ratio<br>1<br>render    | Set the animation speed factor to slow, speed up or even invert animation.                                                                   | \-\-animation-speed-factor |
-|     scene.animation.time     | double<br>optional<br>load | Set the animation time to load.                                                                                                              |     \-\-animation-time     |
-|      scene.camera.index      |  int<br>optional<br>load   | Select the scene camera to use when available in the file.<br>The default scene always uses automatic camera.                                |      \-\-camera-index      |
-|      scene.up_direction      |  direction<br>+Y<br>load   | Define the Up direction. It impacts the grid, the axis, the HDRI and the camera.                                                             |           \-\-up           |
-|      scene.force_reader      | string<br>optional<br>load | Force a specific reader to be used, disregarding the file extension. See [user documentation](../user/SUPPORTED_FORMATS.md)                  |      \-\-force-reader      |
-|  scene.camera.orthographic   |  bool<br>optional<br>load  | Set to true to force orthographic projection. Model specified by default, which is false if not specified.                                   |  \-\-camera\-orthographic  |
+|            Option            | Type<br>Default<br>Trigger | Description                                                                                                                       |         F3D option         |
+| :--------------------------: | :------------------------: | :-------------------------------------------------------------------------------------------------------------------------------- | :------------------------: |
+|   scene.animation.autoplay   |   bool<br>false<br>load    | Automatically start animation.                                                                                                    |   \-\-animation-autoplay   |
+|   scene.animation.indices    | vector\<int\><br>0<br>load | Select the animations to load.<br>Any negative value means all animations.<br>The default scene always has at most one animation. |   \-\-animation-indices    |
+| scene.animation.speed_factor |    ratio<br>1<br>render    | Set the animation speed factor to slow, speed up or even invert animation.                                                        | \-\-animation-speed-factor |
+|     scene.animation.time     | double<br>optional<br>load | Set the animation time to load.                                                                                                   |     \-\-animation-time     |
+|      scene.camera.index      |  int<br>optional<br>load   | Select the scene camera to use when available in the file.<br>The default scene always uses automatic camera.                     |      \-\-camera-index      |
+|      scene.up_direction      |  direction<br>+Y<br>load   | Define the Up direction. It impacts the grid, the axis, the HDRI and the camera.                                                  |           \-\-up           |
+|      scene.force_reader      | string<br>optional<br>load | Force a specific reader to be used, disregarding the file extension. See [user documentation](../user/SUPPORTED_FORMATS.md)       |      \-\-force-reader      |
+|  scene.camera.orthographic   |  bool<br>optional<br>load  | Set to true to force orthographic projection. Model specified by default, which is false if not specified.                        |  \-\-camera\-orthographic  |
 
 ## Interactor Options
 

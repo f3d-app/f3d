@@ -37,6 +37,19 @@ public:
   void UpdateTimeStep(double timeValue) override;
 #endif
 
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 4, 20250507)
+  enum class AnimationSupportLevel : unsigned char{ NONE, UNIQUE, SINGLE, MULTI };
+
+  /**
+   * This method should be reimplemented in importer
+   * implementations to provide animation support level.
+   */
+  virtual AnimationSupportLevel GetAnimationSupportLevel()
+  {
+    return AnimationSupportLevel::MULTI;
+  }
+#endif
+
   /**
    * Call this method to set the status to failure if supported
    * by the VTK version in use

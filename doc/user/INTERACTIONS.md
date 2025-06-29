@@ -30,7 +30,7 @@ See the [coloring cycle](#cycling-coloring) section for more info.
 
 Other options can be toggled directly by pressing the following hotkeys:
 
-- <kbd>W</kbd>: cycle animations.
+- <kbd>W</kbd>: [cycle animations](ANIMATIONS.md#cycling-animations).
 - <kbd>B</kbd>: display of the scalar bar, only when coloring and not using direct scalars.
 - <kbd>V</kbd>: volume rendering, forces coloring.
 - <kbd>I</kbd>: opacity function inversion during volume rendering.

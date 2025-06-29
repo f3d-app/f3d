@@ -10,7 +10,7 @@ please take a look at our [getting started guide](GETTING_STARTED.md).
 - [VTK](https://vtk.org) >= 9.2.6 (9.5.0 recommended).
 - A C++17 compiler.
 - A CMake-compatible build system (Visual Studio, XCode, Ninja, Make, etc.).
-- Optionally, [Assimp](https://www.assimp.org/) >= 5.4.0.
+- Optionally, [Assimp](https://www.assimp.org/) >= 5.4.0 (6.0.2 recommended).
 - Optionally, Open CASCADE [OCCT](https://dev.opencascade.org/) >= 7.6.3.
 - Optionally, [Alembic](http://www.alembic.io/) >= 1.8.5.
 - Optionally, [OpenUSD](https://openusd.org/release/index.html) >= 24.08.

@@ -318,7 +318,8 @@ PYBIND11_MODULE(pyf3d, module)
     .def("add", py::overload_cast<const f3d::mesh_t&>(&f3d::scene::add),
       "Add a surfacic mesh from memory into the scene", py::arg("mesh"))
     .def("load_animation_time", &f3d::scene::loadAnimationTime)
-    .def("animation_time_range", &f3d::scene::animationTimeRange);
+    .def("animation_time_range", &f3d::scene::animationTimeRange)
+    .def("available_animations", &f3d::scene::availableAnimations);
 
   // f3d::camera_state_t
   py::class_<f3d::camera_state_t>(module, "CameraState")
