@@ -109,6 +109,7 @@ find_package(VTK 9.2.6 REQUIRED
     opengl
     IOExodus
     IOHDF
+    IONetCDF
     IOOpenVDB
     RenderingGridAxes
     RenderingRayTracing)

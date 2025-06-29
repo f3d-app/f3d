@@ -11,4 +11,10 @@
     <comment>VTKHDF file</comment>
     <glob pattern="*.vtkhdf"/>
   </mime-type>
+  <mime-type type="application/netcdf">
+    <comment>NetCDF file</comment>
+    <glob pattern="*.nc"/>
+    <glob pattern="*.cdf"/>
+    <glob pattern="*.ncdf"/>
+  </mime-type>
 </mime-info>
