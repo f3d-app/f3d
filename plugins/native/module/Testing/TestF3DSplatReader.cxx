@@ -19,7 +19,7 @@ int TestF3DSplatReader(int vtkNotUsed(argc), char* argv[])
   }
 
   vtkNew<vtkF3DSplatReader> reader;
-  reader->SetFileName(path.c_str());
+  reader->SetStream(stream);
   reader->Update();
 
   vtkIdType nbPoints = reader->GetOutput()->GetNumberOfPoints();
