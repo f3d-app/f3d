@@ -11,18 +11,13 @@
 #ifndef vtkF3DSplatReader_h
 #define vtkF3DSplatReader_h
 
-#include <vtkPolyDataAlgorithm.h>
+#include <vtkAbstractPolyDataReader.h>
 
-class vtkF3DSplatReader : public vtkPolyDataAlgorithm
+class vtkF3DSplatReader : public vtkAbstractPolyDataReader
 {
 public:
   static vtkF3DSplatReader* New();
   vtkTypeMacro(vtkF3DSplatReader, vtkPolyDataAlgorithm);
-
-  /**
-   * Set the file name.
-   */
-  vtkSetMacro(FileName, std::string);
 
 protected:
   vtkF3DSplatReader();
@@ -34,7 +29,6 @@ private:
   vtkF3DSplatReader(const vtkF3DSplatReader&) = delete;
   void operator=(const vtkF3DSplatReader&) = delete;
 
-  std::string FileName;
 };
 
 #endif

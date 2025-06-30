@@ -7,8 +7,21 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
   )
 endif()
 
+list(APPEND vtkextNativeTests_list
+    TestF3DSplatReader.cxx
+)
+
 vtk_add_test_cxx(vtkextNativeTests tests
   NO_DATA NO_VALID NO_OUTPUT
   ${vtkextNativeTests_list}
   ${CMAKE_SOURCE_DIR}/testing/ ${CMAKE_BINARY_DIR}/Testing/Temporary/)
 vtk_test_cxx_executable(vtkextNativeTests tests)
+
+
+target_link_libraries(vtkextNativeTests PRIVATE
+  vtkextNative
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::FiltersCore
+  VTK::IOCore
+)
