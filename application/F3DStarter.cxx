@@ -183,6 +183,25 @@ public:
     return false;
   }
 
+  static std::string GetVerboseLevelString(f3d::log::VerboseLevel level)
+  {
+    switch (level)
+    {
+      case f3d::log::VerboseLevel::QUIET:
+        return "quiet";
+      case f3d::log::VerboseLevel::ERROR:
+        return "error";
+      case f3d::log::VerboseLevel::WARN:
+        return "warning";
+      case f3d::log::VerboseLevel::INFO:
+        return "info";
+      case f3d::log::VerboseLevel::DEBUG:
+        return "debug";
+      default:
+        return "info";
+    }
+  }
+
   static void SetVerboseLevel(const std::string& level, bool forceStdErr)
   {
     // A switch/case over verbose level
@@ -1450,6 +1469,14 @@ void F3DStarter::LoadFileGroup(
         dynamicOptionsDict[name] = dynamicOptions.getAsString(name);
       }
     }
+  }
+
+  // Detect interactively changed verbose level and add it to dynamic options
+  f3d::log::VerboseLevel currentVerboseLevel = f3d::log::getVerboseLevel();
+  std::string currentVerboseLevelString = F3DInternals::GetVerboseLevelString(currentVerboseLevel);
+  if (currentVerboseLevelString != this->Internals->AppOptions.VerboseLevel)
+  {
+    dynamicOptionsDict["verbose"] = currentVerboseLevelString;
   }
 
   // Add the dynamicOptionsDict into the entries, which grows over time if option keep changing and
