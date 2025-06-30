@@ -12,3 +12,5 @@ PRIVATE_DEPENDS
 TEST_DEPENDS
   VTK::TestingCore
   VTK::CommonDataModel
+  VTK::FiltersCore
+  VTK::IOCore

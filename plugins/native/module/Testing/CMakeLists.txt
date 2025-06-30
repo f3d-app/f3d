@@ -16,12 +16,3 @@ vtk_add_test_cxx(vtkextNativeTests tests
   ${vtkextNativeTests_list}
   ${CMAKE_SOURCE_DIR}/testing/ ${CMAKE_BINARY_DIR}/Testing/Temporary/)
 vtk_test_cxx_executable(vtkextNativeTests tests)
-
-
-target_link_libraries(vtkextNativeTests PRIVATE
-  vtkextNative
-  VTK::CommonCore
-  VTK::CommonDataModel
-  VTK::FiltersCore
-  VTK::IOCore
-)
