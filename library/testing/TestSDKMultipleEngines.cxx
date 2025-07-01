@@ -6,23 +6,30 @@
 #include <window.h>
 
 #include <iostream>
+#include <thread>
+
+void RunEngine(int index)
+{
+  f3d::mesh_t mesh{ { 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f }, {}, {}, { 3 }, { 0, 1, 2 } };
+
+  // Test different flags combinations that makes sense
+  f3d::engine eng = f3d::engine::create();
+  eng.getOptions().model.color.rgb =
+    index == 0 ? f3d::color_t{ 1.0, 0.0, 0.0 } : f3d::color_t{ 0.0, 1.0, 0.0 };
+  eng.getScene().add(mesh);
+
+  eng.getInteractor().start();
+}
 
 int TestSDKMultipleEngines(int argc, char* argv[])
 {
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
 
-  f3d::mesh_t mesh{ { 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f }, {}, {}, { 3 }, { 0, 1, 2 } };
+  std::thread t0(RunEngine, 0);
+  std::thread t1(RunEngine, 1);
 
-  // Test different flags combinations that makes sense
-  f3d::engine eng0 = f3d::engine::create();
-  eng0.getOptions().model.color.rgb = f3d::color_t{1.0, 0.0, 0.0};
-  eng0.getScene().add(mesh);
-
-  f3d::engine eng1 = f3d::engine::create();
-  eng1.getOptions().model.color.rgb = f3d::color_t{0.0, 1.0, 0.0};
-  eng1.getScene().add(mesh);
-
-  eng0.getInteractor().start();
+  t0.join();
+  t1.join();
 
   return EXIT_SUCCESS;
 }

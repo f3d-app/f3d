@@ -27,6 +27,25 @@
 
 #include <optional>
 
+struct ContextSingleton
+{
+    ContextSingleton()
+    {
+
+  }
+
+    ~ContextSingleton()
+  {
+  }
+
+    // todo rule of three
+
+  std::unique_ptr<ContextSingleton> GetInstance()
+  {
+    static std::unique_ptr<ContextSingleton> instance = std::make_unique<ContextSingleton>();
+  }
+};
+
 struct vtkF3DImguiActor::Internals
 {
   void Initialize(vtkOpenGLRenderWindow* renWin)
@@ -242,6 +261,7 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
   // release existing context
   this->ReleaseGraphicsResources(renWin);
 
+  ImGui::SetCurrentContext(nullptr);
   ImGuiContext* ctx = ImGui::CreateContext();
   ImGui::SetCurrentContext(ctx);
 
