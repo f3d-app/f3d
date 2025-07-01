@@ -22,16 +22,16 @@ light_impl::light_impl()
 light_impl::~light_impl() = default;
 
 //----------------------------------------------------------------------------
-light& light_impl::setType(int type)
+light& light_impl::setType(const light_type& type)
 {
   this->Internals->VtkLight->SetLightType(type);
   return *this;
 }
 
 //----------------------------------------------------------------------------
-int light_impl::getType() const
+light_type light_impl::getType() const
 {
-  return this->Internals->VtkLight->GetLightType();
+  return static_cast<light_type>(this->Internals->VtkLight->GetLightType());
 }
 
 //----------------------------------------------------------------------------

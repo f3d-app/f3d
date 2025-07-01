@@ -32,8 +32,8 @@ public:
   /**
    * Documented public API
    */
-  light& setType(int type) override;
-  int getType() const override;
+  light& setType(const light_type& type) override;
+  light_type getType() const override;
   light& setPositionalLight(bool positional) override;
   bool isPositionalLight() const override;
   light& setPosition(const point3_t& pos) override;

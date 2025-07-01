@@ -5,9 +5,16 @@
 
 namespace f3d
 {
+enum F3D_EXPORT light_type
+{
+  HEADLIGHT = 1,
+  CAMERA_LIGHT = 2,
+  SCENE_LIGHT = 3,
+};
+
 struct F3D_EXPORT light_state_t
 {
-  int type = 2; // Default to scene light
+  light_type type = SCENE_LIGHT;
   point3_t position = { 0., 0., 0. };
   color_t color = { 1., 1., 1. };
   vector3_t direction = { 0., 0., 0. };
@@ -29,8 +36,8 @@ public:
   /**
    * Set/Get the light parameters.
    */
-  virtual light& setType(int lightType) = 0;
-  [[nodiscard]] virtual int getType() const = 0;
+  virtual light& setType(const light_type& lightType) = 0;
+  [[nodiscard]] virtual light_type getType() const = 0;
   virtual light& setPosition(const point3_t& pos) = 0;
   [[nodiscard]] virtual point3_t getPosition() const = 0;
   virtual light& setColor(const color_t& col) = 0;
