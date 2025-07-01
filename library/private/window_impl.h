@@ -48,6 +48,9 @@ public:
   Type getType() override;
   bool isOffscreen() override;
   camera& getCamera() override;
+  void addLight(const light_state_t& lightState) override;
+  void addLight(const light& light) override;
+  std::vector<light*> getLights() override;
   bool render() override;
   image renderToImage(bool noBackground = false) override;
   int getWidth() const override;
