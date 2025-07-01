@@ -266,7 +266,8 @@ int vtkF3DPLYReader::RequestData(
   rotation->SetNumberOfTuples(numPts);
   output->GetPointData()->AddArray(rotation);
 
-  auto initArray = [&](vtkUnsignedCharArray* shArray, const char* name) {
+  auto initArray = [&](vtkUnsignedCharArray* shArray, const char* name)
+  {
     shArray->SetName(name);
     shArray->SetNumberOfComponents(3);
     shArray->SetNumberOfTuples(numPts);
@@ -321,7 +322,8 @@ int vtkF3DPLYReader::RequestData(
     rotation->SetTypedComponent(j, 3, gaussian.rot_3);
 
     // sherical harmonics
-    auto setSHComponents = [&](vtkUnsignedCharArray* shArray, float shR, float shG, float shB) {
+    auto setSHComponents = [&](vtkUnsignedCharArray* shArray, float shR, float shG, float shB)
+    {
       shArray->SetTypedComponent(j, 0, quantizeSH(shR));
       shArray->SetTypedComponent(j, 1, quantizeSH(shG));
       shArray->SetTypedComponent(j, 2, quantizeSH(shB));
