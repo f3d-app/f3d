@@ -28,7 +28,6 @@ protected:
 private:
   vtkF3DSplatReader(const vtkF3DSplatReader&) = delete;
   void operator=(const vtkF3DSplatReader&) = delete;
-
 };
 
 #endif

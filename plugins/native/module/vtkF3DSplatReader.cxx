@@ -51,12 +51,12 @@ int vtkF3DSplatReader::RequestData(
   }
 
   stream->Seek(0, vtkResourceStream::SeekDirection::End);
-  size_t length = stream->Tell();  // <-- get buffer size
+  size_t length = stream->Tell(); // <-- get buffer size
 
   stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
 
   std::vector<unsigned char> buffer(length);
-  stream->Read(buffer.data(), length);  // <-- read into buffer
+  stream->Read(buffer.data(), length); // <-- read into buffer
 
   // position: 3 floats (12 bytes)
   // scale: 3 floats (12 bytes)
