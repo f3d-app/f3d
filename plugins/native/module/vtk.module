@@ -11,6 +11,7 @@ PRIVATE_DEPENDS
   VTK::RenderingOpenGL2
   VTK::zlib
 TEST_DEPENDS
+  VTK::IOPLY
   VTK::TestingCore
   VTK::CommonDataModel
   VTK::FiltersCore

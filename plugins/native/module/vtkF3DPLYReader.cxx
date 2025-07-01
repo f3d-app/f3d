@@ -206,27 +206,23 @@ int vtkF3DPLYReader::RequestData(
 
   if (this->ReadFromInputStream)
   {
-    if (!(ply = vtkPLY::ply_read(this->Stream, &nelems, &elist)))
-    {
-      vtkWarningMacro(<< "Could not open PLY file");
-      return 0;
-    }
+    // need to reset the stream position to the beginning
+    this->Stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+    ply = vtkPLY::ply_read(this->Stream, &nelems, &elist);
   }
   else if (this->ReadFromInputString)
   {
-    if (!(ply = vtkPLY::ply_open_for_reading_from_string(this->InputString, &nelems, &elist)))
-    {
-      vtkWarningMacro(<< "Could not open PLY file");
-      return 0;
-    }
+    ply = vtkPLY::ply_open_for_reading_from_string(this->InputString, &nelems, &elist);
   }
   else
   {
-    if (!(ply = vtkPLY::ply_open_for_reading(this->FileName, &nelems, &elist)))
-    {
-      vtkWarningMacro(<< "Could not open PLY file");
-      return 0;
-    }
+    ply = vtkPLY::ply_open_for_reading(this->FileName, &nelems, &elist);
+  }
+
+  if (ply == nullptr)
+  {
+    vtkWarningMacro(<< "Could not open PLY file");
+    return 0;
   }
 
   // clean up unused elements
