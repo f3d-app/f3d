@@ -229,6 +229,13 @@ int vtkF3DPLYReader::RequestData(
     }
   }
 
+  // clean up unused elements
+  for (int i = 0; i < nelems; i++)
+  {
+    free(elist[i]);
+  }
+  free(elist);
+
   PlyElement* elem = vtkPLY::find_element(ply, "vertex");
 
   int numPts;
