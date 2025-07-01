@@ -219,11 +219,7 @@ int vtkF3DPLYReader::RequestData(
     ply = vtkPLY::ply_open_for_reading(this->FileName, &nelems, &elist);
   }
 
-  if (ply == nullptr)
-  {
-    vtkWarningMacro(<< "Could not open PLY file");
-    return 0;
-  }
+  assert(ply != nullptr);
 
   // clean up unused elements
   for (int i = 0; i < nelems; i++)

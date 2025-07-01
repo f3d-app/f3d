@@ -9,12 +9,14 @@
 
 int TestF3DPLYReader(int vtkNotUsed(argc), char* argv[])
 {
-  std::string path = std::string(argv[1]) + "data/bonsai_small.ply";
+  std::string pathGaussians = std::string(argv[1]) + "data/bonsai_small.ply";
+  std::string pathSimplePoints = std::string(argv[1]) + "data/points.ply";
 
+  // check open from stream
   {
     vtkNew<vtkFileResourceStream> stream;
 
-    if (!stream->Open(path.c_str()))
+    if (!stream->Open(pathGaussians.c_str()))
     {
       std::cerr << "Cannot open file" << std::endl;
       return EXIT_FAILURE;
@@ -40,9 +42,10 @@ int TestF3DPLYReader(int vtkNotUsed(argc), char* argv[])
     }
   }
 
+  // check open from string
   {
     std::ifstream file;
-    file.open(path.c_str(), std::ios::binary);
+    file.open(pathGaussians.c_str(), std::ios::binary);
     if (!file.is_open())
     {
       std::cerr << "Cannot open file" << std::endl;
@@ -68,6 +71,27 @@ int TestF3DPLYReader(int vtkNotUsed(argc), char* argv[])
     if (reader->GetOutput()->GetPointData()->GetArray("sh10") == nullptr)
     {
       std::cerr << "Cannot find spherical harmonics" << std::endl;
+      return EXIT_FAILURE;
+    }
+  }
+
+  // check not 3d gaussians
+  {
+    vtkNew<vtkF3DPLYReader> reader;
+    reader->SetFileName(pathSimplePoints.c_str());
+    reader->Update();
+
+    vtkIdType nbPoints = reader->GetOutput()->GetNumberOfPoints();
+
+    if (nbPoints != 5)
+    {
+      std::cerr << "Incorrect number of points: " << nbPoints << std::endl;
+      return EXIT_FAILURE;
+    }
+
+    if (reader->GetOutput()->GetPointData()->GetArray("sh10") != nullptr)
+    {
+      std::cerr << "Should not have spherical harmonics" << std::endl;
       return EXIT_FAILURE;
     }
   }
