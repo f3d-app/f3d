@@ -2,7 +2,7 @@
  * @class light_impl
  * @brief Implementation of the light
  *
- * A concrete implementation of light that can provide an array of lights to be controled in a
+ * A concrete implementation of light that can provide an array of lights to be controlled in a
  * window.
  */
 #ifndef f3d_light_impl_h
