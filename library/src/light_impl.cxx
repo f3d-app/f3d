@@ -146,9 +146,9 @@ light_state_t light_impl::getState() const
 }
 
 //----------------------------------------------------------------------------
-void light_impl::SetVTKLight(vtkLight* light)
+void light_impl::SetVTKLight(vtkLight* lightObj)
 {
-  this->Internals->VtkLight = light;
+  this->Internals->VtkLight = lightObj;
 }
 
 //----------------------------------------------------------------------------

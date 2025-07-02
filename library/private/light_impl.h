@@ -53,7 +53,7 @@ public:
   /**
    * Implementation only API.
    */
-  void SetVTKLight(vtkLight* light);
+  void SetVTKLight(vtkLight* lightObj);
 
   /**
    * Implementation only API.
