@@ -15,6 +15,8 @@ vtk_add_test_cxx(vtkextNativeTests tests
   ${CMAKE_SOURCE_DIR}/testing/ ${CMAKE_BINARY_DIR}/Testing/Temporary/)
 vtk_test_cxx_executable(vtkextNativeTests tests)
 
-set_tests_properties(f3d::vtkextNativeCxx-TestF3DPLYReader
-  PROPERTIES
-  FAIL_REGULAR_EXPRESSION "")
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
+  set_tests_properties(f3d::vtkextNativeCxx-TestF3DPLYReader
+    PROPERTIES
+    FAIL_REGULAR_EXPRESSION "")
+endif()
