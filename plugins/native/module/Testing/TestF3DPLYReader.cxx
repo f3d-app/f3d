@@ -11,6 +11,7 @@ int TestF3DPLYReader(int vtkNotUsed(argc), char* argv[])
 {
   std::string pathGaussians = std::string(argv[1]) + "data/bonsai_small.ply";
   std::string pathSimplePoints = std::string(argv[1]) + "data/points.ply";
+  std::string pathInvalid = std::string(argv[1]) + "data/invalid.so";
 
   // check open from stream
   {
@@ -92,6 +93,21 @@ int TestF3DPLYReader(int vtkNotUsed(argc), char* argv[])
     if (reader->GetOutput()->GetPointData()->GetArray("sh10") != nullptr)
     {
       std::cerr << "Should not have spherical harmonics" << std::endl;
+      return EXIT_FAILURE;
+    }
+  }
+
+  // check invalid
+  {
+    vtkNew<vtkF3DPLYReader> reader;
+    reader->SetFileName(pathInvalid.c_str());
+    reader->Update();
+
+    vtkIdType nbPoints = reader->GetOutput()->GetNumberOfPoints();
+
+    if (nbPoints != 0)
+    {
+      std::cerr << "The file should be invalid" << std::endl;
       return EXIT_FAILURE;
     }
   }
