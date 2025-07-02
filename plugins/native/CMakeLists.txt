@@ -177,15 +177,6 @@ f3d_plugin_declare_reader(
 )
 
 f3d_plugin_declare_reader(
-  NAME Splat
-  SCORE 90
-  EXTENSIONS splat
-  MIMETYPES application/vnd.splat
-  VTK_READER vtkF3DSplatReader
-  FORMAT_DESCRIPTION "3D Gaussian splats"
-)
-
-f3d_plugin_declare_reader(
   NAME QuakeMDL
   EXTENSIONS mdl
   MIMETYPES application/vnd.mdl
@@ -203,6 +194,14 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221216)
     MIMETYPES application/vnd.spz
     VTK_READER vtkF3DSPZReader
     FORMAT_DESCRIPTION "Compressed 3D gaussian splats"
+  )
+  f3d_plugin_declare_reader(
+    NAME Splat
+    SCORE 90
+    EXTENSIONS splat
+    MIMETYPES application/vnd.splat
+    VTK_READER vtkF3DSplatReader
+    FORMAT_DESCRIPTION "3D Gaussian splats"
   )
 endif()
 

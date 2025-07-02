@@ -4,6 +4,7 @@
 #include <vtkCellData.h>
 #include <vtkCommand.h>
 #include <vtkDemandDrivenPipeline.h>
+#include <vtkFileResourceStream.h>
 #include <vtkFloatArray.h>
 #include <vtkIdTypeArray.h>
 #include <vtkInformation.h>
@@ -13,13 +14,10 @@
 #include <vtkPointData.h>
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
+#include <vtkResourceStream.h>
 #include <vtkStreamingDemandDrivenPipeline.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtkVersion.h>
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221216)
-#include <vtkFileResourceStream.h>
-#include <vtkResourceStream.h>
-#endif
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkF3DSplatReader);
