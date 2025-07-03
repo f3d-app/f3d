@@ -109,45 +109,81 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     texture->SetColorModeToDirectScalars();
     texture->UseSRGBColorSpaceOn();
 
-    // Read textures.
-    std::vector<mixed_pointer_array> skins = std::vector<mixed_pointer_array>(nbSkins);
-    for (unsigned int i = 0; i < nbSkins; i++)
-    {
-      skins[i].group = *reinterpret_cast<const int*>(buffer.data() + offset);
-      if (skins[i].group == 0)
-      {
-        skins[i].skin = buffer.data() + sizeof(int32_t) + offset;
-        offset += sizeof(int32_t) + skinWidth * skinHeight * sizeof(int8_t);
-      }
-      else
-      {
-        // XXX: groupskin not supported yet
-        vtkErrorWithObjectMacro(this->Parent, "Groupskin are not supported, aborting.");
-        return nullptr;
-      }
-    }
-
-    // Copy to imageData
-    vtkNew<vtkImageData> img;
-    img->SetDimensions(skinWidth, skinHeight, 1);
-    img->AllocateScalars(VTK_UNSIGNED_CHAR, 3);
-
     if (skinIndex >= nbSkins)
     {
       skinIndex = 0;
       vtkWarningWithObjectMacro(
         this->Parent, "QuakeMDL.skin_index is out of bounds. Defaulting to 0.");
     }
-    const unsigned char* selectedSkin = skins[skinIndex].skin;
-    for (int i = 0; i < skinHeight; i++)
+
+    vtkSmartPointer<vtkImageData> img;
+
+    auto make_new_skin = [&](vtkSmartPointer<vtkImageData>& skin)
     {
-      for (int j = 0; j < skinWidth; j++)
+      skin = vtkSmartPointer<vtkImageData>::New();
+      skin->SetDimensions(skinWidth, skinHeight, 1);
+      skin->AllocateScalars(VTK_UNSIGNED_CHAR, 3);
+      for (int x = 0; x < skinHeight; ++x)
       {
-        unsigned char index = *(selectedSkin + i * skinWidth + j);
-        unsigned char* ptr = static_cast<unsigned char*>(img->GetScalarPointer(j, i, 0));
-        std::copy(F3DMDLDefaultColorMap[index], F3DMDLDefaultColorMap[index] + 3, ptr);
+        for (int y = 0; y < skinWidth; ++y)
+        {
+          unsigned char index = *(buffer.data() + offset + x * skinWidth + y);
+          unsigned char* ptr = static_cast<unsigned char*>(skin->GetScalarPointer(y, x, 0));
+          std::copy(F3DMDLDefaultColorMap[index], F3DMDLDefaultColorMap[index] + 3, ptr);
+        }
+      }
+    };
+
+    // Read textures.
+    int skinSize = skinWidth * skinHeight;
+    for (unsigned int i = 0; i < nbSkins; i++)
+    {
+      int skinGroup = *reinterpret_cast<const int*>(buffer.data() + offset);
+      offset += sizeof(int32_t);
+      if (skinGroup == 0)
+      {
+        // Skip the skins that are not selected
+        if (i == skinIndex)
+        {
+          img = vtkSmartPointer<vtkImageData>::New();
+          img->SetDimensions(skinWidth, skinHeight, 1);
+          img->AllocateScalars(VTK_UNSIGNED_CHAR, 3);
+          make_new_skin(img);
+        }
+        offset += skinSize * sizeof(int8_t);
+      }
+      else
+      {
+        const int nb = *reinterpret_cast<const int*>(buffer.data() + offset);
+        offset += sizeof(int32_t);
+        if (i == skinIndex)
+        {
+          this->GroupSkins.resize(nb);
+          this->GroupSkinDurations.resize(nb);
+          for (int j = 0; j < nb; ++j)
+          {
+            this->GroupSkinDurations[j] = *reinterpret_cast<const float*>(buffer.data() + offset);
+            offset += sizeof(float);
+          }
+          // Take cumulative sum of durations for binary search during rendering
+          for (int j = 1; j < nb; ++j)
+          {
+            this->GroupSkinDurations[j] += this->GroupSkinDurations[j - 1];
+          }
+          for (int skinIdx = 0; skinIdx < nb; ++skinIdx)
+          {
+            make_new_skin(this->GroupSkins[skinIdx]);
+            offset += skinSize * sizeof(int8_t);
+          }
+          img = this->GroupSkins.front();
+        }
+        else
+        {
+          offset += nb * sizeof(float) + nb * skinSize * sizeof(int8_t);
+        }
       }
     }
+
     texture->SetInputData(img);
     return texture;
   }
@@ -428,6 +464,9 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   std::vector<std::vector<double>> AnimationTimes;
   std::vector<std::vector<vtkSmartPointer<vtkPolyData>>> AnimationFrames;
 
+  std::vector<vtkSmartPointer<vtkImageData>> GroupSkins;
+  std::vector<float> GroupSkinDurations;
+
   vtkIdType ActiveAnimation = -1;
 };
 
@@ -480,6 +519,17 @@ bool vtkF3DQuakeMDLImporter::UpdateAtTimeValue(double timeValue)
 
     this->Internals->Mapper->SetInputData(
       this->Internals->AnimationFrames[this->Internals->ActiveAnimation][frameIndex]);
+
+    // If the rendered skin is a group skin then update it
+    if (!this->Internals->GroupSkins.empty())
+    {
+      timeValue = std::fmod(timeValue, this->Internals->GroupSkinDurations.back());
+      const std::vector<float>& skinTimes = this->Internals->GroupSkinDurations;
+      const auto skinFound = std::lower_bound(skinTimes.begin(), skinTimes.end(), timeValue);
+      size_t skinIdx = skinFound == skinTimes.end() ? skinTimes.size() - 1
+                                                    : std::distance(skinTimes.begin(), skinFound);
+      this->Internals->Texture->SetInputData(this->Internals->GroupSkins[skinIdx]);
+    }
   }
   return true;
 }
@@ -532,5 +582,15 @@ bool vtkF3DQuakeMDLImporter::GetTemporalInformation(vtkIdType animationIndex,
   // F3D does not care about timesteps, only set time range
   timeRange[0] = times.front();
   timeRange[1] = times.back();
+
+  // If a group skin is selected, make sure timeRange >= texture animation of the group skin
+  if (!this->Internals->GroupSkinDurations.empty())
+  {
+    timeRange[0] =
+      std::min(timeRange[0], static_cast<double>(this->Internals->GroupSkinDurations.front()));
+    timeRange[1] =
+      std::max(timeRange[1], static_cast<double>(this->Internals->GroupSkinDurations.back()));
+  }
+
   return true;
 }
