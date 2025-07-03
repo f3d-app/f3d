@@ -4,6 +4,7 @@ set(vtkextNativeTests_list "")
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
   list(APPEND vtkextNativeTests_list
     TestF3DSPZReader.cxx
+    TestF3DSplatReader.cxx
   )
 endif()
 

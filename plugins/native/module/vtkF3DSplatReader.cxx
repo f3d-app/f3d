@@ -4,15 +4,20 @@
 #include <vtkCellData.h>
 #include <vtkCommand.h>
 #include <vtkDemandDrivenPipeline.h>
+#include <vtkFileResourceStream.h>
 #include <vtkFloatArray.h>
 #include <vtkIdTypeArray.h>
 #include <vtkInformation.h>
 #include <vtkInformationVector.h>
 #include <vtkNew.h>
+#include <vtkObjectFactory.h>
 #include <vtkPointData.h>
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
+#include <vtkResourceStream.h>
+#include <vtkStreamingDemandDrivenPipeline.h>
 #include <vtkUnsignedCharArray.h>
+#include <vtkVersion.h>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkF3DSplatReader);
@@ -29,9 +34,29 @@ int vtkF3DSplatReader::RequestData(
 {
   vtkPolyData* output = vtkPolyData::GetData(outputVector);
 
-  std::ifstream inputStream(this->FileName, std::ios::binary);
+  vtkSmartPointer<vtkResourceStream> stream;
 
-  std::vector<unsigned char> buffer(std::istreambuf_iterator<char>(inputStream), {});
+#if VTK_VERSION_NUMBER > VTK_VERSION_CHECK(9, 4, 20250501)
+  if (this->Stream)
+  {
+    stream = this->Stream;
+    assert(this->Stream->SupportSeek());
+  }
+  else
+#endif
+  {
+    vtkNew<vtkFileResourceStream> fileStream;
+    fileStream->Open(this->FileName);
+    stream = fileStream;
+  }
+
+  stream->Seek(0, vtkResourceStream::SeekDirection::End);
+  size_t length = stream->Tell(); // <-- get buffer size
+
+  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+
+  std::vector<unsigned char> buffer(length);
+  stream->Read(buffer.data(), length); // <-- read into buffer
 
   // position: 3 floats (12 bytes)
   // scale: 3 floats (12 bytes)
