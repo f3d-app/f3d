@@ -15,6 +15,7 @@ runs:
     #  run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
     - uses: friendlyanon/setup-vcpkg@v1
+      with: { committish: master }
 
     - name: Configure
       shell: bash
