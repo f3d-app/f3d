@@ -812,7 +812,7 @@ interactor& interactor_impl::initCommands()
     [&](const std::vector<std::string>& args)
     {
       check_args(args, 1, "elevation_camera");
-      this->Internals->Window.getCamera().yaw(options::parse<int>(args[0]));
+      this->Internals->Window.getCamera().elevation(options::parse<int>(args[0]));
       this->Internals->Style->SetTemporaryUp(
         this->Internals->Window.getCamera().getViewUp().data());
     });
