@@ -417,6 +417,7 @@ jobs:
     if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'VCPKG CI')) || (github.ref == 'refs/heads/master') }}
 
     strategy:
+      fail-fast: false
       matrix:
         os: [windows-latest, linux-latest]
 
