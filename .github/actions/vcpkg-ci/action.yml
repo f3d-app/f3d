@@ -10,9 +10,11 @@ runs:
       run: |
         mkdir build
 
-    - name: Set VCPKG_ROOT
-      shell: bash
-      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+    #- name: Set VCPKG_ROOT
+    #  shell: bash
+    #  run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - uses: friendlyanon/setup-vcpkg@v1
 
     - name: Configure
       shell: bash
