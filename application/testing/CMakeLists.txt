@@ -174,6 +174,7 @@ f3d_test(NAME TestQuakeMDLSkinIndexNegative DATA armor.mdl ARGS -DQuakeMDL.skin_
 f3d_test(NAME TestQuakeMDLSkinIndexNonInteger DATA armor.mdl ARGS -DQuakeMDL.skin_index=1.5)
 f3d_test(NAME TestQuakeMDLSkinIndexOutOfBounds DATA armor.mdl ARGS -DQuakeMDL.skin_index=4)
 f3d_test(NAME TestQuakeMDLSkinIndexOverflow DATA armor.mdl ARGS -DQuakeMDL.skin_index=9223372036854775808)
+f3d_test(NAME TestQuakeMDLGroupskin DATA groupskin.mdl)
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
   f3d_test(NAME TestQuakeMDLActorCollection DATA zombie.mdl ARGS --scalar-coloring)
 endif()
@@ -510,7 +511,6 @@ f3d_test(NAME TestVerboseAnimationWrongAnimationTimeLow DATA BoxAnimated.gltf AR
 f3d_test(NAME TestVerboseAnimationTimeRange DATA InterpolationTest.glb ARGS --verbose REGEXP "0, 1.66667" NO_BASELINE)
 f3d_test(NAME TestCommandScriptVerboseMultiAnimationTimeRange SCRIPT TestCommandScriptVerboseMultiAnimationTimeRange.txt DATA InterpolationTest.glb ARGS --verbose REGEXP "0, 1.70833" NO_BASELINE)# cycle_animation x3
 f3d_test(NAME TestVerboseQuakeMDLAnimationNoNamingScheme ARGS --verbose DATA v_rock2.mdl REGEXP "0: flame" NO_BASELINE)
-f3d_test(NAME TestVerboseQuakeMDLGroupSkinUnsupported ARGS --verbose DATA groupskin.mdl REGEXP "Groupskin are not supported" NO_BASELINE)
 f3d_test(NAME TestVerboseQuakeMDLInvalid ARGS --verbose DATA w_medkit_hl.mdl REGEXP "No frame read" NO_BASELINE)
 
 # Armature test
