@@ -2,6 +2,7 @@
 #include <vtkNew.h>
 #include <vtkPointData.h>
 #include <vtkTestUtilities.h>
+#include <vtkVersion.h>
 
 #include "vtkF3DPLYReader.h"
 
@@ -97,6 +98,7 @@ int TestF3DPLYReader(int vtkNotUsed(argc), char* argv[])
     }
   }
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20250703) // a leak was fixed in this version
   // check invalid
   {
     vtkNew<vtkF3DPLYReader> reader;
@@ -111,6 +113,7 @@ int TestF3DPLYReader(int vtkNotUsed(argc), char* argv[])
       return EXIT_FAILURE;
     }
   }
+#endif
 
   return EXIT_SUCCESS;
 }
