@@ -410,6 +410,31 @@ jobs:
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
+  # Windows VCPKG CI: Test build with VCPKG
+  #----------------------------------------------------------------------------
+  windows_vcpkg:
+    needs: [cache_lfs, detect_checkboxes]
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'VCPKG CI')) || (github.ref == 'refs/heads/master') }}
+
+    matrix:
+      os: [windows-latest, linux-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 0
+          lfs: false
+
+      - name: VCPKG CI
+        uses: ./source/.github/actions/vcpkg-ci
+        with:
+          lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+
+  #----------------------------------------------------------------------------
   # Linux CI: Build and test, cross-vtk build matrix
   #----------------------------------------------------------------------------
   linux:
