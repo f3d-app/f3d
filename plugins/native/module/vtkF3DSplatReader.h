@@ -6,6 +6,7 @@
  * This reader will probably evolve until there is no standard defined yet
  * An interesting discussion can be followed here:
  * https://github.com/mkkellogg/GaussianSplats3D/issues/47
+ * Does not support spherical harmonics.
  */
 
 #ifndef vtkF3DSplatReader_h

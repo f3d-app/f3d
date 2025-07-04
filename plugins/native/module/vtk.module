@@ -7,9 +7,11 @@ DEPENDS
   VTK::CommonExecutionModel
   f3d::vtkext
 PRIVATE_DEPENDS
+  VTK::IOPLY
   VTK::RenderingOpenGL2
   VTK::zlib
 TEST_DEPENDS
+  VTK::IOPLY
   VTK::TestingCore
   VTK::CommonDataModel
   VTK::FiltersCore
