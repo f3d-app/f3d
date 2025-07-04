@@ -640,5 +640,5 @@ void window_impl::RenderUIOnly()
 vtkF3DRenderer* window_impl::GetRenderer() const
 {
   return this->Internals->Renderer;
-};
+}
 }
