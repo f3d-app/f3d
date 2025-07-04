@@ -6,13 +6,13 @@
 #include "log.h"
 #include "options.h"
 #include "scene.h"
-#include "vtkF3DRenderer.h"
 #include "window_impl.h"
 
 #include "factory.h"
 #include "vtkF3DGenericImporter.h"
 #include "vtkF3DMemoryMesh.h"
 #include "vtkF3DMetaImporter.h"
+#include "vtkF3DRenderer.h"
 
 #include <optional>
 #include <vtkCallbackCommand.h>
