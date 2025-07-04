@@ -37,6 +37,9 @@ eg: `roll_camera 120`.
 `elevation_camera value`: A specific command to tilt the camera up or down, takes an angle in degrees as an argument.
 eg: `elevation_camera 120`.
 
+`azimuth_camera value`: A specific command to tilt the camera right or left, takes an angle in degrees as an argument.
+eg: `azimuth_camera 120`.
+
 `increase_light_intensity`: A specific command to increase light intensity. No argument.
 
 `decrease_light_intensity`: A specific command to decrease light intensity. No argument.
