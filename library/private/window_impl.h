@@ -21,6 +21,7 @@
 
 class vtkRenderWindow;
 class vtkF3DMetaImporter;
+class vtkF3DRenderer;
 namespace f3d
 {
 class options;
@@ -48,9 +49,6 @@ public:
   Type getType() override;
   bool isOffscreen() override;
   camera& getCamera() override;
-  void addLight(const light_state_t& lightState) override;
-  void addLight(const light& light) override;
-  std::vector<light*> getLights() override;
   bool render() override;
   image renderToImage(bool noBackground = false) override;
   int getWidth() const override;
@@ -125,6 +123,12 @@ public:
    * Does nothing if F3D_MODULE_UI is OFF
    */
   void RenderUIOnly();
+
+  /**
+   * Implementation only API.
+   * Get the internal renderer
+   */
+  [[nodiscard]] vtkF3DRenderer* GetRenderer() const;
 
 private:
   class internals;

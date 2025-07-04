@@ -4,7 +4,6 @@
 #include "camera.h"
 #include "export.h"
 #include "image.h"
-#include "light.h"
 
 #include <string>
 
@@ -61,20 +60,6 @@ public:
    * Get the camera provided by the window.
    */
   [[nodiscard]] virtual camera& getCamera() = 0;
-
-  /**
-   * Add a light based on a light state.
-   */
-  virtual void addLight(const light_state_t& lightState) = 0;
-  /**
-   * Add a light based on an existing light object.
-   */
-  virtual void addLight(const light& light) = 0;
-
-  /**
-   * Get all lights
-   */
-  [[nodiscard]] virtual std::vector<light*> getLights() = 0;
 
   /**
    * Perform a render of the window to the screen.

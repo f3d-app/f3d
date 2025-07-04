@@ -2,9 +2,11 @@
 
 #include "animationManager.h"
 #include "interactor_impl.h"
+#include "light_impl.h"
 #include "log.h"
 #include "options.h"
 #include "scene.h"
+#include "vtkF3DRenderer.h"
 #include "window_impl.h"
 
 #include "factory.h"
@@ -14,6 +16,7 @@
 
 #include <optional>
 #include <vtkCallbackCommand.h>
+#include <vtkLightCollection.h>
 #include <vtkProgressBarRepresentation.h>
 #include <vtkProgressBarWidget.h>
 #include <vtkTimerLog.h>
@@ -185,6 +188,7 @@ public:
   window_impl& Window;
   interactor_impl* Interactor = nullptr;
   animationManager AnimationManager;
+  std::vector<std::unique_ptr<light_impl>> Lights;
 
   vtkNew<vtkF3DMetaImporter> MetaImporter;
 };
@@ -328,6 +332,53 @@ scene& scene_impl::clear()
   this->Internals->Window.Initialize();
 
   return *this;
+}
+
+//----------------------------------------------------------------------------
+void scene_impl::addLight(const light_state_t& lightState)
+{
+  vtkNew<vtkLight> l;
+  auto lightImpl = std::make_unique<detail::light_impl>();
+  lightImpl->SetVTKLight(l);
+  lightImpl->setState(lightState);
+  this->Internals->Lights.push_back(std::move(lightImpl));
+  this->Internals->Window.GetRenderer()->AddLight(this->Internals->Lights.back()->GetVTKLight());
+}
+
+//----------------------------------------------------------------------------
+void scene_impl::addLight(const light& light)
+{
+  const auto& state = light.getState();
+  addLight(state);
+}
+
+//----------------------------------------------------------------------------
+std::vector<light*> scene_impl::getLights()
+{
+  std::vector<light*> lights;
+  vtkLightCollection* lc = this->Internals->Window.GetRenderer()->GetLights();
+  lc->InitTraversal();
+
+  // add existing lights to the internal list
+  for (vtkLight* vtkL = lc->GetNextItem(); vtkL != nullptr; vtkL = lc->GetNextItem())
+  {
+    bool found = std::find_if(this->Internals->Lights.begin(), this->Internals->Lights.end(),
+                   [vtkL](const std::unique_ptr<detail::light_impl>& l)
+                   { return l->GetVTKLight() == vtkL; }) != this->Internals->Lights.end();
+    if (!found)
+    {
+      auto lightImpl = std::make_unique<detail::light_impl>();
+      lightImpl->SetVTKLight(vtkL);
+      this->Internals->Lights.push_back(std::move(lightImpl));
+    }
+  }
+
+  for (const auto& lightImpl : this->Internals->Lights)
+  {
+    lights.push_back(lightImpl.get());
+  }
+
+  return lights;
 }
 
 //----------------------------------------------------------------------------

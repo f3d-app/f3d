@@ -2,7 +2,6 @@
 
 #include "camera_impl.h"
 #include "engine.h"
-#include "light_impl.h"
 #include "log.h"
 #include "macros.h"
 #include "options.h"
@@ -99,7 +98,6 @@ public:
   }
 
   std::unique_ptr<camera_impl> Camera;
-  std::vector<std::unique_ptr<light_impl>> Lights;
   vtkSmartPointer<vtkRenderWindow> RenWin;
   vtkNew<vtkF3DRenderer> Renderer;
   const options& Options;
@@ -268,53 +266,6 @@ bool window_impl::isOffscreen()
 camera& window_impl::getCamera()
 {
   return *this->Internals->Camera;
-}
-
-//----------------------------------------------------------------------------
-void window_impl::addLight(const light_state_t& lightState)
-{
-  vtkNew<vtkLight> l;
-  auto lightImpl = std::make_unique<detail::light_impl>();
-  lightImpl->SetVTKLight(l);
-  lightImpl->setState(lightState);
-  this->Internals->Lights.push_back(std::move(lightImpl));
-  this->Internals->Renderer->AddLight(this->Internals->Lights.back()->GetVTKLight());
-}
-
-//----------------------------------------------------------------------------
-void window_impl::addLight(const light& light)
-{
-  const auto& state = light.getState();
-  addLight(state);
-}
-
-//----------------------------------------------------------------------------
-std::vector<light*> window_impl::getLights()
-{
-  std::vector<light*> lights;
-  vtkLightCollection* lc = this->Internals->Renderer->GetLights();
-  lc->InitTraversal();
-
-  // add existing lights to the internal list
-  for (vtkLight* vtkL = lc->GetNextItem(); vtkL != nullptr; vtkL = lc->GetNextItem())
-  {
-    bool found = std::find_if(this->Internals->Lights.begin(), this->Internals->Lights.end(),
-                   [vtkL](const std::unique_ptr<detail::light_impl>& l)
-                   { return l->GetVTKLight() == vtkL; }) != this->Internals->Lights.end();
-    if (!found)
-    {
-      auto lightImpl = std::make_unique<detail::light_impl>();
-      lightImpl->SetVTKLight(vtkL);
-      this->Internals->Lights.push_back(std::move(lightImpl));
-    }
-  }
-
-  for (const auto& lightImpl : this->Internals->Lights)
-  {
-    lights.push_back(lightImpl.get());
-  }
-
-  return lights;
 }
 
 //----------------------------------------------------------------------------
@@ -684,4 +635,10 @@ void window_impl::RenderUIOnly()
   info->Remove(vtkF3DRenderPass::RENDER_UI_ONLY());
 #endif
 }
+
+//----------------------------------------------------------------------------
+vtkF3DRenderer* window_impl::GetRenderer() const
+{
+  return this->Internals->Renderer;
 };
+}
