@@ -6,9 +6,7 @@
     "bindings": {
       "Ctrl+Shift+O": "toggle ui.filename",
       "Any+3": "roll_camera -90",
-      "O": "set_camera isometric",
-      "Any+2": "elevation_camera 90",
-      "Any+8": "elevation_camera -90"
+      "O": "set_camera isometric"
     }
   },
   {
@@ -16,8 +14,6 @@
     "match": "*.vtu",
     "bindings": {
       "Any+3": "roll_camera 90",
-      "Any+2": "elevation_camera 90",
-      "Any+8": "elevation_camera -90",
       "Shift+O": "toggle model.point_sprites.enable",
       "Ctrl+O": [
         "toggle render.grid.enable",

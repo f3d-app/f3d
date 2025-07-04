@@ -1,0 +1,22 @@
+# StreamVersion 1.2
+
+KeyPressEvent 2113 316 0 56 1 8 0
+CharEvent 2113 316 0 56 1 8 0
+KeyReleaseEvent 2113 316 0 56 1 8 0
+
+TimerEvent 2113 316 0 56 1 8 0
+TimerEvent 2113 316 0 56 1 8 0
+
+KeyPressEvent 2113 316 0 56 1 8 0
+CharEvent 2113 316 0 56 1 8 0
+KeyReleaseEvent 2113 316 0 56 1 8 0
+
+TimerEvent 2113 316 0 56 1 8 0
+TimerEvent 2113 316 0 56 1 8 0
+
+KeyPressEvent 2113 316 0 50 1 2 0
+CharEvent 2113 316 0 50 1 2 0
+KeyReleaseEvent 2113 316 0 50 1 2 0
+
+TimerEvent 2113 316 0 50 1 2 0
+TimerEvent 2113 316 0 50 1 2 0
