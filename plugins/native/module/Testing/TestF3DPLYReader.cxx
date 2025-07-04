@@ -12,7 +12,6 @@ int TestF3DPLYReader(int vtkNotUsed(argc), char* argv[])
 {
   std::string pathGaussians = std::string(argv[1]) + "data/bonsai_small.ply";
   std::string pathSimplePoints = std::string(argv[1]) + "data/points.ply";
-  std::string pathInvalid = std::string(argv[1]) + "data/invalid.so";
 
   // check open from stream
   {
@@ -101,6 +100,8 @@ int TestF3DPLYReader(int vtkNotUsed(argc), char* argv[])
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20250703) // a leak was fixed in this version
   // check invalid
   {
+    std::string pathInvalid = std::string(argv[1]) + "data/invalid.so";
+
     vtkNew<vtkF3DPLYReader> reader;
     reader->SetFileName(pathInvalid.c_str());
     reader->Update();
