@@ -61,11 +61,13 @@ Note that the raytracing hotkeys are only available if F3D is build with raytrac
 Camera Hotkeys:
 
 - <kbd>1</kbd>: front view camera.
+- <kbd>2</kbd>: roll the camera up (elevation) by 90 degrees.
 - <kbd>3</kbd>: right view camera.
 - <kbd>4</kbd>: roll the camera left by 90 degrees.
 - <kbd>5</kbd>: toggle orthographic projection.
 - <kbd>6</kbd>: roll the camera right by 90 degrees.
 - <kbd>7</kbd>: top view camera.
+- <kbd>8</kbd>: roll the camera down (elevation) by 90 degrees.
 - <kbd>9</kbd>: isometric view camera.
 - <kbd>Enter</kbd>: reset the camera to its initial parameters.
 
