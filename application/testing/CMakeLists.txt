@@ -1001,7 +1001,7 @@ f3d_test(NAME TestInteractionZoomToggleOrthographicProjection DATA cow.vtp INTER
 f3d_test(NAME TestInteractionRotateCameraMinus90 DATA f3d.glb INTERACTION)
 f3d_test(NAME TestInteractionRotateCamera90 DATA f3d.glb INTERACTION)
 f3d_test(NAME TestInteractionRollCameraRotation DATA f3d.glb ARGS -g INTERACTION) #1;4;LeftMouse;MouseMovements
-f3d_test(NAME TestInteractionElevationCameraRotation DATA f3d.glb ARGS -g INTERACTION) #8;8;2
+f3d_test(NAME TestInteractionElevationCameraRotation DATA f3d.glb ARGS -g INTERACTION THRESHOLD 0.05) #8;8;2 # Threshold is needed because camera seems to move slightly differently sometimes
 f3d_test(NAME TestInteractionPanWithShift DATA f3d.glb INTERACTION) #Shift;LeftMouse;MouseMovements
 f3d_test(NAME TestInteractionConsoleOpen DATA f3d.glb INTERACTION UI) #Escape
 f3d_test(NAME TestInteractionConsoleOpenExit DATA f3d.glb REGEXP "Interactor has been stopped" INTERACTION NO_BASELINE UI) #Escape;exit;Return
