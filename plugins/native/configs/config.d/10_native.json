@@ -1,32 +1,37 @@
 [
   {
-    "match": ".*(dcm|nrrd|nhdr|mhd|mha|vt.)",
+    "match-type": "glob",
+    "match": "*.{dcm,nrrd,nhdr,mhd,mha,vtp,vtu,vtr,vti,vts,vtm}",
     "options": {
       "scalar-coloring": true,
       "coloring-scalar-bar": true
     }
   },
   {
-    "match": ".*(dcm|nrrd|nhdr|mhd|mha|vti)",
+    "match-type": "glob",
+    "match": "*.{dcm,nrrd,nhdr,mhd,mha,vti}",
     "options": {
       "volume": true
     }
   },
   {
-    "match": ".*(3ds|stl)",
+    "match-type": "glob",
+    "match": "*.{3ds,stl}",
     "options": {
       "up": "+Z",
       "camera-direction": "-1,1,-0.5"
     }
   },
   {
-    "match": ".*(stl|gml|pts)",
+    "match-type": "glob",
+    "match": "*.{stl,gml,pts}",
     "options": {
       "scalar-coloring": true
     }
   },
   {
-    "match": ".*(tif|tiff)",
+    "match-type": "glob",
+    "match": "*.{tif,tiff}",
     "options": {
       "scalar-coloring": true,
       "up": "-Y",
@@ -35,7 +40,8 @@
     }
   },
   {
-    "match": ".*(ply)",
+    "match-type": "glob",
+    "match": "*.ply",
     "options": {
       "scalar-coloring": true,
       "coloring-component": "-2",
@@ -43,7 +49,8 @@
     }
   },
   {
-    "match": ".*(splat)",
+    "match-type": "glob",
+    "match": "*.{splat,spz}",
     "options": {
       "point-sprites": true,
       "point-sprites-size": 1,
@@ -52,10 +59,7 @@
       "coloring-array": "color",
       "coloring-component": "-2",
       "background-color": "0, 0, 0",
-      "up": "-Y",
       "interaction-trackball": true,
-      "camera-position": "0,1,-5.2",
-      "camera-focal-point": "0,1,0",
       "tone-mapping": false,
       "grid": false,
       "anti-aliasing": false,
@@ -63,7 +67,25 @@
     }
   },
   {
-    "match": ".*(mdl)",
+    "match-type": "glob",
+    "match": "*.splat",
+    "options": {
+      "up": "-Y",
+      "camera-position": "0,1,-5.2",
+      "camera-focal-point": "0,1,0"
+    }
+  },
+  {
+    "match-type": "glob",
+    "match": "*.spz",
+    "options": {
+      "camera-position": "0,1,4",
+      "camera-focal-point": "0,0,0"
+    }
+  },
+  {
+    "match-type": "glob",
+    "match": "*.mdl",
     "options": {
       "up": "+Z"
     }

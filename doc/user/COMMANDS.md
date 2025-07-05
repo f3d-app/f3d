@@ -34,6 +34,12 @@ eg: `cycle_coloring array`.
 `roll_camera value`: A specific command to roll the camera on its side, takes an angle in degrees as an argument.
 eg: `roll_camera 120`.
 
+`elevation_camera value`: A specific command to tilt the camera up or down, takes an angle in degrees as an argument.
+eg: `elevation_camera 120`.
+
+`azimuth_camera value`: A specific command to tilt the camera right or left, takes an angle in degrees as an argument.
+eg: `azimuth_camera 120`.
+
 `increase_light_intensity`: A specific command to increase light intensity. No argument.
 
 `decrease_light_intensity`: A specific command to decrease light intensity. No argument.
@@ -60,6 +66,8 @@ Supports `front`, `top`, `right`, `isometric` arguments. eg: `set_camera top`.
 `reset_camera`: A specific command to reset the camera to its original location. No argument.
 
 `toggle_animation`: A specific command to start/stop the animation. No argument.
+
+`cycle_verbose_level` : Cycles between the verbose level (`Debug`, `Info`, `Warning`, `Error`, `Quiet`).
 
 `add_files [path/to/file1] [path/to/file2]`: A specific command to add files to the scene (overridden by a F3D specific command, see below). Take one or more files as arguments.
 eg: `add_files /path/to/dragon.vtu`.

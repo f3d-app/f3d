@@ -1,36 +1,35 @@
-name: 'Install F3D Dependencies'
-description: 'Install multiple F3D Dependencies'
+name: "Install F3D Dependencies"
+description: "Install multiple F3D Dependencies"
 inputs:
   cpu:
-    description: 'CPU architecture to build for'
+    description: "CPU architecture to build for"
     required: false
-    default: 'x86_64'
+    default: "x86_64"
   alembic_version:
-    description: 'Version of alembic to build'
+    description: "Version of alembic to build"
     required: false
   assimp_version:
-    description: 'Version of assimp to build'
+    description: "Version of assimp to build"
     required: false
   draco_version:
-    description: 'Version of draco to build'
+    description: "Version of draco to build"
     required: false
   occt_version:
-    description: 'Version of occt to build'
+    description: "Version of occt to build"
     required: false
   openexr_version:
-    description: 'Version of openexr to build'
+    description: "Version of openexr to build"
     required: false
   pybind11_version:
-    description: 'Version of pybind11 to build'
+    description: "Version of pybind11 to build"
     required: false
   usd_version:
-    description: 'Version of usd to build'
+    description: "Version of usd to build"
     required: false
 
 runs:
   using: "composite"
   steps:
-
     - name: Install OCCT dependency
       if: inputs.occt_version != ''
       uses: ./source/.github/actions/occt-install-dep

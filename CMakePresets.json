@@ -1,0 +1,64 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "vcpkg",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+        "F3D_PLUGIN_BUILD_HDF": "ON",
+        "F3D_PLUGIN_BUILD_ALEMBIC": "OFF",
+        "F3D_PLUGIN_BUILD_ASSIMP": "OFF",
+        "F3D_PLUGIN_BUILD_DRACO": "OFF",
+        "F3D_PLUGIN_BUILD_OCCT": "OFF",
+        "F3D_PLUGIN_BUILD_USD": "OFF"
+      }
+    },
+    {
+      "name": "vcpkg_alembic",
+      "inherits": "vcpkg",
+      "displayName": "vcpkg + alembic plugin",
+      "cacheVariables": {
+        "VCPKG_MANIFEST_FEATURES": "alembic",
+        "F3D_PLUGIN_BUILD_ALEMBIC": "ON"
+      }
+    },
+    {
+      "name": "vcpkg_assimp",
+      "inherits": "vcpkg",
+      "displayName": "vcpkg + assimp plugin",
+      "cacheVariables": {
+        "VCPKG_MANIFEST_FEATURES": "assimp",
+        "F3D_PLUGIN_BUILD_ASSIMP": "ON"
+      }
+    },
+    {
+      "name": "vcpkg_occt",
+      "inherits": "vcpkg",
+      "displayName": "vcpkg + occt plugin",
+      "cacheVariables": {
+        "VCPKG_MANIFEST_FEATURES": "occt",
+        "F3D_PLUGIN_BUILD_OCCT": "ON"
+      }
+    },
+    {
+      "name": "vcpkg_draco",
+      "inherits": "vcpkg",
+      "displayName": "vcpkg + draco plugin",
+      "cacheVariables": {
+        "VCPKG_MANIFEST_FEATURES": "draco",
+        "F3D_PLUGIN_BUILD_DRACO": "ON"
+      }
+    },
+    {
+      "name": "vcpkg_usd",
+      "inherits": "vcpkg",
+      "displayName": "vcpkg + usd plugin",
+      "cacheVariables": {
+        "VCPKG_MANIFEST_FEATURES": "usd",
+        "F3D_PLUGIN_BUILD_USD": "ON"
+      }
+    }
+  ]
+}

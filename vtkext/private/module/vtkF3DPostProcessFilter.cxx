@@ -3,9 +3,9 @@
 #include "F3DLog.h"
 
 #include <vtkAppendPolyData.h>
+#include <vtkCompositeDataIterator.h>
+#include <vtkCompositeDataSet.h>
 #include <vtkDataObject.h>
-#include <vtkDataObjectTree.h>
-#include <vtkDataObjectTreeIterator.h>
 #include <vtkDataSetSurfaceFilter.h>
 #include <vtkImageData.h>
 #include <vtkImageToPoints.h>
@@ -38,16 +38,14 @@ int vtkF3DPostProcessFilter::RequestData(vtkInformation* vtkNotUsed(request),
   vtkPolyData* outputPoints = vtkPolyData::GetData(outputVector, 1);
   vtkImageData* outputImage = vtkImageData::GetData(outputVector, 2);
 
-  vtkDataObjectTree* composite = vtkDataObjectTree::SafeDownCast(dataObject);
+  vtkCompositeDataSet* composite = vtkCompositeDataSet::SafeDownCast(dataObject);
   vtkSmartPointer<vtkDataSet> dataset = vtkDataSet::SafeDownCast(dataObject);
 
   // Extract data from a composite dataset
   if (composite)
   {
-    auto iter = vtkSmartPointer<vtkDataObjectTreeIterator>::Take(composite->NewTreeIterator());
-    iter->VisitOnlyLeavesOn();
+    auto iter = vtkSmartPointer<vtkCompositeDataIterator>::Take(composite->NewIterator());
     iter->SkipEmptyNodesOn();
-    iter->TraverseSubTreeOn();
 
     // If it contains a single leaf, extract it as is
     int nLeaf = 0;
@@ -57,7 +55,7 @@ int vtkF3DPostProcessFilter::RequestData(vtkInformation* vtkNotUsed(request),
       nLeaf++;
     }
 
-    // If multiple leafs, extract all surfaces and append them together
+    // If multiple leaves, extract all surfaces and append them together
     if (nLeaf > 1)
     {
       vtkNew<vtkAppendPolyData> append;
@@ -160,7 +158,7 @@ int vtkF3DPostProcessFilter::RequestData(vtkInformation* vtkNotUsed(request),
 int vtkF3DPostProcessFilter::FillInputPortInformation(int vtkNotUsed(port), vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
-  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObjectTree");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
   return 1;
 }
 

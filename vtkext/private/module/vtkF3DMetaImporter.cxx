@@ -19,6 +19,7 @@
 #include <numeric>
 #include <vector>
 
+//----------------------------------------------------------------------------
 struct vtkF3DMetaImporter::Internals
 {
   // Actors related vectors
@@ -44,6 +45,7 @@ struct vtkF3DMetaImporter::Internals
 #endif
 };
 
+//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkF3DMetaImporter);
 
 //----------------------------------------------------------------------------
@@ -250,7 +252,7 @@ bool vtkF3DMetaImporter::Update()
 
       // Create and configure point sprites actors
       this->Pimpl->PointSpritesActorsAndMappers.emplace_back(
-        vtkF3DMetaImporter::PointSpritesStruct());
+        vtkF3DMetaImporter::PointSpritesStruct(actor, importer));
       vtkF3DMetaImporter::PointSpritesStruct& pss =
         this->Pimpl->PointSpritesActorsAndMappers.back();
 
@@ -307,6 +309,54 @@ std::string vtkF3DMetaImporter::GetOutputsDescription()
     std::string(), [](const std::string& a, const auto& importerPair)
     { return a + "----------\n" + importerPair.Importer->GetOutputsDescription(); });
   return description;
+}
+
+//----------------------------------------------------------------------------
+vtkF3DImporter::AnimationSupportLevel vtkF3DMetaImporter::GetAnimationSupportLevel()
+{
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 4, 20250507)
+  vtkF3DImporter::AnimationSupportLevel levelAccum = vtkF3DImporter::AnimationSupportLevel::MULTI;
+#else
+  vtkImporter::AnimationSupportLevel levelAccum = vtkImporter::AnimationSupportLevel::NONE;
+  for (const auto& importerPair : this->Pimpl->Importers)
+  {
+    AnimationSupportLevel level = importerPair.Importer->GetAnimationSupportLevel();
+    switch (level)
+    {
+      case vtkImporter::AnimationSupportLevel::NONE:
+        // Nothing to do, levelAccum is not impacted
+        break;
+      case vtkImporter::AnimationSupportLevel::UNIQUE:
+        switch (levelAccum)
+        {
+          case vtkImporter::AnimationSupportLevel::NONE:
+            // UNIQUE + NONE = UNIQUE
+            levelAccum = vtkImporter::AnimationSupportLevel::UNIQUE;
+            break;
+          case vtkImporter::AnimationSupportLevel::UNIQUE:
+            // UNIQUE + UNIQUE = MULTI
+            levelAccum = vtkImporter::AnimationSupportLevel::MULTI;
+            break;
+          default:
+            // Other values have no impact on levelAccum
+            break;
+        }
+        break;
+      case vtkImporter::AnimationSupportLevel::SINGLE:
+        // SINGLE + Any = SINGLE
+        levelAccum = vtkImporter::AnimationSupportLevel::SINGLE;
+        break;
+      case vtkImporter::AnimationSupportLevel::MULTI:
+        // MULTI + SINGLE = SINGLE
+        // MULTI + Anything else = MULTI
+        levelAccum = levelAccum == vtkImporter::AnimationSupportLevel::SINGLE
+          ? vtkImporter::AnimationSupportLevel::SINGLE
+          : vtkImporter::AnimationSupportLevel::MULTI;
+        break;
+    }
+  }
+#endif
+  return levelAccum;
 }
 
 //----------------------------------------------------------------------------
@@ -502,6 +552,29 @@ bool vtkF3DMetaImporter::UpdateAtTimeValue(double timeValue)
     importerPair.Importer->UpdateTimeStep(timeValue);
 #endif
   }
+
+  // Update coloring and point sprites
+  for (auto& cs : this->Pimpl->ColoringActorsAndMappers)
+  {
+    cs.Mapper->SetInputData(
+      vtkPolyDataMapper::SafeDownCast(cs.OriginalActor->GetMapper())->GetInput());
+
+    bool visi = cs.Actor->GetVisibility();
+    cs.Actor->vtkProp3D::ShallowCopy(cs.OriginalActor);
+    cs.Actor->SetVisibility(visi);
+  }
+  for (auto& pss : this->Pimpl->PointSpritesActorsAndMappers)
+  {
+    if (!vtkF3DGenericImporter::SafeDownCast(pss.Importer))
+    {
+      pss.Mapper->SetInputData(
+        vtkPolyDataMapper::SafeDownCast(pss.OriginalActor->GetMapper())->GetInput());
+      bool visi = pss.Actor->GetVisibility();
+      pss.Actor->vtkProp3D::ShallowCopy(pss.OriginalActor);
+      pss.Actor->SetVisibility(visi);
+    }
+  }
+
   this->Pimpl->UpdateTime.Modified();
   return ret;
 }

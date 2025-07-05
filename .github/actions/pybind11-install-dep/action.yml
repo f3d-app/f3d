@@ -1,14 +1,13 @@
-name: 'Install pybind11 Dependency'
-description: 'Install pybind11 Dependency using cache when possible'
+name: "Install pybind11 Dependency"
+description: "Install pybind11 Dependency using cache when possible"
 inputs:
   version:
-    description: 'Version of pybind11 to build'
+    description: "Version of pybind11 to build"
     required: true
 
 runs:
   using: "composite"
   steps:
-
     - name: Cache pybind11
       id: cache-pybind11
       uses: actions/cache/restore@v4
@@ -22,7 +21,7 @@ runs:
       with:
         repository: pybind/pybind11
         submodules: true
-        path: './dependencies/pybind11'
+        path: "./dependencies/pybind11"
         ref: ${{inputs.version}}
 
     - name: Setup pybind11

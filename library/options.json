@@ -11,6 +11,11 @@
       },
       "index": {
         "type": "int",
+        "default_value": "0",
+        "deprecated": "use scene.animation.indices instead"
+      },
+      "indices": {
+        "type": "int_vector",
         "default_value": "0"
       },
       "speed_factor": {
@@ -25,6 +30,9 @@
       "orthographic": {
         "type": "bool"
       }
+    },
+    "force_reader": {
+      "type": "string"
     }
   },
   "render": {
@@ -178,6 +186,10 @@
       "type": "bool",
       "default_value": "false"
     },
+    "minimal_console": {
+      "type": "bool",
+      "default_value": "false"
+    },
     "dropzone": {
       "type": "bool",
       "default_value": "false"
@@ -246,9 +258,15 @@
       "roughness": {
         "type": "double"
       },
+      "base_ior": {
+        "type": "double"
+      },
       "texture": {
         "type": "path"
       }
+    },
+    "textures_transform": {
+      "type": "transform2d"
     },
     "scivis": {
       "enable": {
@@ -258,6 +276,9 @@
       "cells": {
         "type": "bool",
         "default_value": "false"
+      },
+      "discretization": {
+        "type": "int"
       },
       "array_name": {
         "type": "string"

@@ -30,7 +30,7 @@ See the [coloring cycle](#cycling-coloring) section for more info.
 
 Other options can be toggled directly by pressing the following hotkeys:
 
-- <kbd>W</kbd>: cycle animations.
+- <kbd>W</kbd>: [cycle animations](ANIMATIONS.md#cycling-animations).
 - <kbd>B</kbd>: display of the scalar bar, only when coloring and not using direct scalars.
 - <kbd>V</kbd>: volume rendering, forces coloring.
 - <kbd>I</kbd>: opacity function inversion during volume rendering.
@@ -61,11 +61,13 @@ Note that the raytracing hotkeys are only available if F3D is build with raytrac
 Camera Hotkeys:
 
 - <kbd>1</kbd>: front view camera.
+- <kbd>2</kbd>: roll the camera up (elevation) by 90 degrees.
 - <kbd>3</kbd>: right view camera.
 - <kbd>4</kbd>: roll the camera left by 90 degrees.
 - <kbd>5</kbd>: toggle orthographic projection.
 - <kbd>6</kbd>: roll the camera right by 90 degrees.
 - <kbd>7</kbd>: top view camera.
+- <kbd>8</kbd>: roll the camera down (elevation) by 90 degrees.
 - <kbd>9</kbd>: isometric view camera.
 - <kbd>Enter</kbd>: reset the camera to its initial parameters.
 
@@ -73,8 +75,10 @@ Other hotkeys and interactions are available:
 
 - <kbd>H</kbd>: key to toggle the display of a cheat sheet showing all these hotkeys and their statuses.
 - <kbd>CTRL</kbd> + <kbd>Q</kbd>: close the window and quit F3D.
-- <kbd>Esc</kbd>: display/hide the console.
+- <kbd>Esc</kbd>: display the console or hide console/minimal console.
+- <kbd>:</kbd>: display the minimal console
 - <kbd>Space</kbd>: play the animation if any.
+- <kbd>Shift</kbd> + <kbd>V</kbd>: cycle between verbosity levels.
 - <kbd>&larr;</kbd>: load the previous file if any and reset the camera.
 - <kbd>&rarr;</kbd>: load the next file if any and reset the camera.
 - <kbd>&uarr;</kbd>: reload the currently loaded files.
@@ -106,8 +110,17 @@ as specified above.
 
 The destination filename used to save the screenshots (created by pressing <kbd>F12</kbd> or <kbd>Ctrl</kbd> + <kbd>F12</kbd>) is configurable (using the `screenshot-filename` option) and can use template variables as described [on the options page](OPTIONS.md#filename-templating).
 
-Unless the configured filename template is an absolute path, images will be saved into the user's home directory
-(using the following environment variables, if defined and pointing to an existing directory, in that order: `XDG_PICTURES_DIR`, `HOME`, or `USERPROFILE`).
+Unless the configured filename template is an absolute path, images will be saved in dedicated directories:
+
+- Windows: `%USERPROFILE%\Pictures`
+- Linux: `${XDG_PICTURES_DIR}`,`${HOME}`
+- macOS: `${HOME}`
+
+So with default options, which are using [templates](OPTIONS.md#filename-templating), the screenshots will be saved as:
+
+- Windows: `%USERPROFILE%\Pictures\F3D\{model}_{n}.png`
+- Linux: `${XDG_PICTURES_DIR}/F3D/{model}_{n}.png`,`${HOME}/F3D/{model}_{n}.png`
+- macOS: `${HOME}/F3D/{model}_{n}.png`
 
 ## Configuring bindings
 

@@ -12,10 +12,13 @@
 
 #include <vtkF3DImporter.h>
 
+#include <memory>
+
 class vtkF3DQuakeMDLImporter : public vtkF3DImporter
 {
 public:
   static vtkF3DQuakeMDLImporter* New();
+  vtkTypeMacro(vtkF3DQuakeMDLImporter, vtkF3DImporter);
 
   /**
    * Set the file name.
@@ -26,6 +29,15 @@ public:
    * Update actors at the given time value.
    */
   bool UpdateAtTimeValue(double timeValue) override;
+
+  /**
+   * Get the level of animation support in this importer, which is always
+   * AnimationSupportLevel::SINGLE
+   */
+  AnimationSupportLevel GetAnimationSupportLevel() override
+  {
+    return AnimationSupportLevel::SINGLE;
+  }
 
   /**
    * Get the number of available animations.
@@ -52,6 +64,14 @@ public:
   bool GetTemporalInformation(vtkIdType animationIndex, double frameRate, int& nbTimeSteps,
     double timeRange[2], vtkDoubleArray* timeSteps) override;
 
+  ///@{
+  /**
+   * Set/Get the skin index.
+   */
+  vtkSetMacro(SkinIndex, unsigned int);
+  vtkGetMacro(SkinIndex, unsigned int);
+  ///@}
+
 protected:
   vtkF3DQuakeMDLImporter();
   ~vtkF3DQuakeMDLImporter() override = default;
@@ -65,6 +85,7 @@ private:
 
   struct vtkInternals;
   std::string FileName;
+  unsigned int SkinIndex = 0;
 
   std::unique_ptr<vtkInternals> Internals;
 };

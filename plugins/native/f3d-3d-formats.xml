@@ -41,4 +41,8 @@
     <comment>Quake 1 MDL File Format</comment>
     <glob pattern="*.mdl"/>
   </mime-type>
+  <mime-type type="application/vnd.spz">
+    <comment>Compressed 3D gaussian splats</comment>
+    <glob pattern="*.spz"/>
+  </mime-type>
 </mime-info>

@@ -1,14 +1,13 @@
-name: 'External build CI'
-description: 'External build CI'
+name: "External build CI"
+description: "External build CI"
 inputs:
   vtk_version:
-    description: 'Version of vtk to build'
+    description: "Version of vtk to build"
     required: true
 
 runs:
   using: "composite"
   steps:
-
     - name: Check required inputs
       shell: bash
       run: |
@@ -31,7 +30,7 @@ runs:
       uses: ./source/f3d/.github/actions/vtk-dependencies
       with:
         source_dir: ./source/f3d
- 
+
     - name: Install VTK dependency
       uses: ./source/f3d/.github/actions/vtk-install-dep
       with:

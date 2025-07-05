@@ -98,6 +98,11 @@ public:
    */
   [[nodiscard]] virtual std::pair<double, double> animationTimeRange() = 0;
 
+  /**
+   * Return the number of animations available in the currently loaded files.
+   */
+  [[nodiscard]] virtual unsigned int availableAnimations() const = 0;
+
 protected:
   //! @cond
   scene() = default;

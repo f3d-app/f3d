@@ -1,15 +1,14 @@
-name: 'Install ospray sb Dependency'
-description: 'Install ospray sb Dependency using cache when possible'
+name: "Install ospray sb Dependency"
+description: "Install ospray sb Dependency using cache when possible"
 inputs:
   cpu:
-    description: 'CPU architecture to build for'
+    description: "CPU architecture to build for"
     required: false
-    default: 'x86_64'
+    default: "x86_64"
 
 runs:
   using: "composite"
   steps:
-
     - name: Cache ospray
       id: cache-ospray
       uses: actions/cache/restore@v4
@@ -23,7 +22,7 @@ runs:
       uses: actions/checkout@v4
       with:
         repository: ospray/ospray
-        path: './dependencies/ospray'
+        path: "./dependencies/ospray"
         ref: v2.7.1
 
       # https://github.com/ospray/ospray/pull/550

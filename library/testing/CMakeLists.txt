@@ -62,6 +62,7 @@ endif()
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
   list(APPEND libf3dSDKTests_list
     TestSDKSceneInvalid.cxx
+    TestSDKInvalidForceReader.cxx
     )
 endif()
 
@@ -178,6 +179,8 @@ endif()
 if(F3D_MODULE_UI AND NOT F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS)
   set_tests_properties(libf3d::TestSDKInteractorCallBack PROPERTIES DISABLED ON)
 endif()
+
+set_tests_properties(libf3d::TestSDKUtils PROPERTIES ENVIRONMENT "F3D_TEST_ENV_STANDARD=TestEnv;F3D_TEST_ENV_EXTENDED=TestËnv;F3D_TEST_ENV_UTF8=🤔;")
 
 target_link_libraries(libf3dSDKTests libf3d ${libf3dSDKTests_link_libs})
 

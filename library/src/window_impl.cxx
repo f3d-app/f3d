@@ -5,6 +5,7 @@
 #include "log.h"
 #include "macros.h"
 #include "options.h"
+#include "utils.h"
 
 #include "vtkF3DExternalRenderWindow.h"
 
@@ -185,7 +186,7 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   this->Internals->Camera->SetVTKRenderer(this->Internals->Renderer);
 
   this->Internals->Renderer->SetConsoleBadgeEnabled(
-    !offscreen || std::getenv("CTEST_F3D_CONSOLE_BADGE"));
+    !offscreen || utils::getEnv("CTEST_F3D_CONSOLE_BADGE").has_value());
 
   this->Initialize();
 
@@ -406,6 +407,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->ShowMetaData(opt.ui.metadata);
   renderer->ShowCheatSheet(opt.ui.cheatsheet);
   renderer->ShowConsole(opt.ui.console);
+  renderer->ShowMinimalConsole(opt.ui.minimal_console);
   renderer->ShowDropZone(opt.ui.dropzone);
   renderer->SetDropZoneInfo(opt.ui.dropzone_info);
   renderer->ShowArmature(opt.render.armature.enable);
@@ -478,8 +480,10 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetSurfaceColor(opt.model.color.rgb);
   renderer->SetOpacity(opt.model.color.opacity);
   renderer->SetTextureBaseColor(opt.model.color.texture);
+  renderer->SetTexturesTransform(opt.model.textures_transform);
   renderer->SetRoughness(opt.model.material.roughness);
   renderer->SetMetallic(opt.model.material.metallic);
+  renderer->SetBaseIOR(opt.model.material.base_ior);
   renderer->SetTextureMaterial(opt.model.material.texture);
   renderer->SetTextureEmissive(opt.model.emissive.texture);
   renderer->SetEmissiveFactor(opt.model.emissive.factor);
@@ -494,6 +498,7 @@ void window_impl::UpdateDynamicOptions()
 
   renderer->SetScalarBarRange(opt.model.scivis.range);
   renderer->SetColormap(opt.model.scivis.colormap);
+  renderer->SetColormapDiscretization(opt.model.scivis.discretization);
   renderer->ShowScalarBar(opt.ui.scalar_bar);
 
   renderer->SetUsePointSprites(opt.model.point_sprites.enable);

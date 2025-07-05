@@ -4,6 +4,7 @@ set(test_sources
   TestF3DInteractorEventRecorder.cxx
   TestF3DLog.cxx
   TestF3DMetaImporterMultiColoring.cxx
+  TestF3DMetaImporterAnimation.cxx
   TestF3DObjectFactory.cxx
   TestF3DOpenGLGridMapper.cxx
   TestF3DRenderPass.cxx
@@ -14,7 +15,8 @@ set(test_sources
 if(F3D_MODULE_EXR)
   list(APPEND test_sources
        TestF3DEXRReader.cxx
-       TestF3DEXRReaderInvalid.cxx)
+       TestF3DEXRReaderInvalid.cxx
+       TestF3DEXRMemReader.cxx)
 endif()
 
 vtk_add_test_cxx(vtkextPrivateTests tests
@@ -34,7 +36,7 @@ set_tests_properties(f3d::vtkextPrivateCxx-TestF3DGenericImporter
   FAIL_REGULAR_EXPRESSION "")
 
 if(F3D_MODULE_EXR)
-  set_tests_properties(f3d::vtkextPrivateCxx-TestF3DEXRReaderInvalid
+  set_tests_properties(f3d::vtkextPrivateCxx-TestF3DEXRReaderInvalid f3d::vtkextPrivateCxx-TestF3DEXRMemReader
     PROPERTIES
     FAIL_REGULAR_EXPRESSION "")
 endif()

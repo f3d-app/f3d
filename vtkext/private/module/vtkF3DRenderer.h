@@ -23,6 +23,7 @@
 
 namespace fs = std::filesystem;
 
+class vtkDiscretizableColorTransferFunction;
 class vtkColorTransferFunction;
 class vtkCornerAnnotation;
 class vtkImageReader2;
@@ -59,6 +60,7 @@ public:
   void ShowFilename(bool show);
   void ShowCheatSheet(bool show);
   void ShowConsole(bool show);
+  void ShowMinimalConsole(bool show);
   void ShowDropZone(bool show);
   void ShowHDRISkybox(bool show);
   void ShowArmature(bool show);
@@ -203,6 +205,11 @@ public:
   void SetRoughness(const std::optional<double>& roughness);
 
   /**
+   * Set the index of refraction of the base layer on all actors
+   */
+  void SetBaseIOR(const std::optional<double>& baseIOR);
+
+  /**
    * Set the surface color on all actors
    */
   void SetSurfaceColor(const std::optional<std::vector<double>>& color);
@@ -211,6 +218,11 @@ public:
    * Set the emmissive factors on all actors
    */
   void SetEmissiveFactor(const std::optional<std::vector<double>>& factors);
+
+  /**
+   * Set the texture transform on all actors
+   */
+  void SetTexturesTransform(const std::optional<std::vector<double>>& transform);
 
   /**
    * Set the opacity on all actors
@@ -302,6 +314,12 @@ public:
    * Setting an empty vector will use default color map
    */
   void SetColormap(const std::vector<double>& colormap);
+
+  /**
+   * Set Colormap Discretization
+   * Defaults to std::nullopt which is no discretization.
+   */
+  void SetColormapDiscretization(std::optional<int> discretization);
 
   /**
    * Set the meta importer to recover coloring information from
@@ -493,6 +511,11 @@ private:
    */
   void ConfigureRangeAndCTFForColoring(const F3DColoringInfoHandler::ColoringInfo& info);
 
+  /**
+   * Convenience method to set texture transform in ConfigureActorsProperties()
+   */
+  void ConfigureActorTextureTransform(vtkActor* actorBase, const double* matrix);
+
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
 
   vtkNew<vtkActor> GridActor;
@@ -525,6 +548,7 @@ private:
   bool MetaDataVisible = false;
   bool CheatSheetVisible = false;
   bool ConsoleVisible = false;
+  bool MinimalConsoleVisible = false;
   bool DropZoneVisible = false;
   bool HDRISkyboxVisible = false;
   bool ArmatureVisible = false;
@@ -590,16 +614,18 @@ private:
   std::optional<double> Opacity;
   std::optional<double> Roughness;
   std::optional<double> Metallic;
+  std::optional<double> BaseIOR;
   std::optional<double> NormalScale;
   std::optional<std::vector<double>> SurfaceColor;
   std::optional<std::vector<double>> EmissiveFactor;
+  std::optional<std::vector<double>> TexturesTransform;
   std::optional<fs::path> TextureMatCap;
   std::optional<fs::path> TextureBaseColor;
   std::optional<fs::path> TextureMaterial;
   std::optional<fs::path> TextureEmissive;
   std::optional<fs::path> TextureNormal;
 
-  vtkSmartPointer<vtkColorTransferFunction> ColorTransferFunction;
+  vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorTransferFunction;
   bool ExpandingRangeSet = false;
   bool UsingExpandingRange = true;
   double ColorRange[2] = { 0.0, 1.0 };
@@ -617,6 +643,7 @@ private:
 
   std::optional<std::vector<double>> UserScalarBarRange;
   std::vector<double> Colormap;
+  std::optional<int> ColormapDiscretization;
 };
 
 #endif

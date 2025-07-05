@@ -1,15 +1,14 @@
-name: 'Install Imath Dependency'
-description: 'Install Imath Dependency using cache when possible'
+name: "Install Imath Dependency"
+description: "Install Imath Dependency using cache when possible"
 inputs:
   cpu:
-    description: 'CPU architecture to build for'
+    description: "CPU architecture to build for"
     required: false
-    default: 'x86_64'
+    default: "x86_64"
 
 runs:
   using: "composite"
   steps:
-
     - name: Cache Imath
       id: cache-imath
       uses: actions/cache/restore@v4
@@ -23,7 +22,7 @@ runs:
       uses: actions/checkout@v4
       with:
         repository: AcademySoftwareFoundation/Imath
-        path: './dependencies/imath'
+        path: "./dependencies/imath"
         ref: v3.1.12
 
     - name: Setup Imath

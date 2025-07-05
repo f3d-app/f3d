@@ -218,9 +218,19 @@ PYBIND11_MODULE(pyf3d, module)
   // f3d::utils
   py::class_<f3d::utils> utils(module, "Utils");
 
+  py::enum_<f3d::utils::KnownFolder>(utils, "KnownFolder")
+    .value("ROAMINGAPPDATA", f3d::utils::KnownFolder::ROAMINGAPPDATA)
+    .value("LOCALAPPDATA", f3d::utils::KnownFolder::LOCALAPPDATA)
+    .value("PICTURES", f3d::utils::KnownFolder::PICTURES)
+    .export_values();
+
   utils //
     .def_static("text_distance", &f3d::utils::textDistance)
-    .def_static("collapse_path", &f3d::utils::collapsePath);
+    .def_static("collapse_path", &f3d::utils::collapsePath)
+    .def_static(
+      "glob_to_regex", &f3d::utils::globToRegex, py::arg("glob"), py::arg("path_separator") = '/')
+    .def_static("get_env", &f3d::utils::getEnv)
+    .def_static("get_known_folder", &f3d::utils::getKnownFolder);
 
   // f3d::interactor
   py::class_<f3d::interaction_bind_t> interaction_bind(module, "InteractionBind");
@@ -308,14 +318,17 @@ PYBIND11_MODULE(pyf3d, module)
     .def("add", py::overload_cast<const f3d::mesh_t&>(&f3d::scene::add),
       "Add a surfacic mesh from memory into the scene", py::arg("mesh"))
     .def("load_animation_time", &f3d::scene::loadAnimationTime)
-    .def("animation_time_range", &f3d::scene::animationTimeRange);
+    .def("animation_time_range", &f3d::scene::animationTimeRange)
+    .def("available_animations", &f3d::scene::availableAnimations);
 
   // f3d::camera_state_t
   py::class_<f3d::camera_state_t>(module, "CameraState")
     .def(py::init<>())
     .def(py::init<const f3d::point3_t&, const f3d::point3_t&, const f3d::vector3_t&,
            const f3d::angle_deg_t&>(),
-      py::arg("position"), py::arg("focal_point"), py::arg("view_up"), py::arg("view_angle"))
+      py::arg("position") = f3d::point3_t({ 0., 0., 1. }),
+      py::arg("focal_point") = f3d::point3_t({ 0., 0., 0. }),
+      py::arg("view_up") = f3d::vector3_t({ 0, 1, 0 }), py::arg("view_angle") = 30.)
     .def_readwrite("position", &f3d::camera_state_t::position)
     .def_readwrite("focal_point", &f3d::camera_state_t::focalPoint)
     .def_readwrite("view_up", &f3d::camera_state_t::viewUp)
@@ -475,6 +488,7 @@ PYBIND11_MODULE(pyf3d, module)
   log //
     .def_static("set_verbose_level", &f3d::log::setVerboseLevel, py::arg("level"),
       py::arg("force_std_err") = false)
+    .def_static("get_verbose_level", &f3d::log::getVerboseLevel)
     .def_static("set_use_coloring", &f3d::log::setUseColoring)
     .def_static("print", [](f3d::log::VerboseLevel& level, const std::string& message)
       { f3d::log::print(level, message); });

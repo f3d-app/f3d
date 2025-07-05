@@ -1,35 +1,34 @@
-name: 'Sanitizer CI'
-description: 'Sanitizer CI'
+name: "Sanitizer CI"
+description: "Sanitizer CI"
 inputs:
   sanitizer_type:
-    description: 'Type of sanitizer'
+    description: "Type of sanitizer"
     required: true
   vtk_version:
-    description: 'VTK version'
+    description: "VTK version"
     required: true
   lfs_sha:
-    description: 'Cache LFS sha'
+    description: "Cache LFS sha"
     required: true
   alembic_version:
-    description: 'Version of alembic to build'
+    description: "Version of alembic to build"
     required: false
   assimp_version:
-    description: 'Version of assimp to build'
+    description: "Version of assimp to build"
     required: false
   draco_version:
-    description: 'Version of draco to build'
+    description: "Version of draco to build"
     required: false
   occt_version:
-    description: 'Version of occt to build'
+    description: "Version of occt to build"
     required: false
   openexr_version:
-    description: 'Version of openexr to build'
+    description: "Version of openexr to build"
     required: false
 
 runs:
   using: "composite"
   steps:
-
     - name: Check required inputs
       shell: bash
       run: |
@@ -40,9 +39,9 @@ runs:
     - name: Recover LFS Data
       uses: f3d-app/lfs-data-cache-action@v1
       with:
-        type: 'consumer'
+        type: "consumer"
         lfs_sha: ${{inputs.lfs_sha}}
-        cache_postfix: cache-0 
+        cache_postfix: cache-0
 
     - name: Install all F3D dependencies
       uses: ./source/.github/actions/generic-dependencies

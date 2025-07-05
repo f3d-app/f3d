@@ -152,6 +152,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   this->Pimpl->GeometryActor->GetProperty()->SetPointSize(10.0);
   this->Pimpl->GeometryActor->GetProperty()->SetLineWidth(1.0);
   this->Pimpl->GeometryActor->GetProperty()->SetRoughness(0.3);
+  this->Pimpl->GeometryActor->GetProperty()->SetBaseIOR(1.5);
   this->Pimpl->GeometryActor->GetProperty()->SetInterpolationToPBR();
 
   // add mappers
@@ -260,6 +261,13 @@ std::string vtkF3DGenericImporter::GetDataObjectDescription(vtkDataObject* objec
 //----------------------------------------------------------------------------
 bool vtkF3DGenericImporter::UpdateAtTimeValue(double timeValue)
 {
+
+  if (!this->Pimpl->AnimationEnabled)
+  {
+    // Animation is not enabled, nothing to do
+    return true;
+  }
+
   assert(this->Pimpl->Reader);
   if (!this->Pimpl->PostPro->UpdateTimeStep(timeValue) ||
     !this->Pimpl->Reader->GetOutputDataObject(0))

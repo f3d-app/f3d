@@ -1,0 +1,16 @@
+[
+  {
+    "match-type": "glob",
+    "match": "*vt?",
+    "options": {
+      "ui.axis": true
+    }
+  },
+  {
+    "match-type": "glob",
+    "match": "${GLOBSTAR_EXPR}",
+    "options": {
+      "edges": true
+    }
+  }
+]

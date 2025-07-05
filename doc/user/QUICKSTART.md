@@ -58,6 +58,7 @@ For **default scene** formats, certain default values are set automatically:
 - normal-scale: 1.0
 - metallic: 0.0
 - roughness: 0.3
+- base-ior: 1.5
 - camera-orthographic: false
 
 They will be overridden when using corresponding [options](OPTIONS.md), either from command line or [configuration file](CONFIGURATION_FILE.md).
@@ -87,7 +88,7 @@ F3D can play [animations](ANIMATIONS.md) for any [supported files](SUPPORTED_FOR
 
 With your file loaded into F3D, press the <kbd>W</kbd> hotkey to cycle through available animations. Then, press <kbd>Space</kbd> to play your selected animation.
 
-Alternatively, you can use the command line to play animations. Use the `--animation-index` [option](OPTIONS.md) to specify which animation you want to play. To play all animations at once, use `--animation-index=-1` (`.gltf`/`.glb` only).
+Alternatively, you can use the command line to play animations. Use the `--animation-indices` [option](OPTIONS.md) to specify which animation you want to play. To play all animations at once, use `--animation-indices=-1`.
 
 For more information, see the [Animations](ANIMATIONS.md) page.
 
