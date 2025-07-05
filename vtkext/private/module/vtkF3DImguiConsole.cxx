@@ -1,5 +1,7 @@
 #include "vtkF3DImguiConsole.h"
 
+#include "F3DImguiStyle.h"
+
 #include <vtkCallbackCommand.h>
 #include <vtkCommand.h>
 #include <vtkNew.h>
@@ -274,16 +276,16 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
           switch (severity)
           {
             case Internals::LogType::Error:
-              ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+              ImGui::PushStyleColor(ImGuiCol_Text, F3DImguiStyle::GetErrorColor());
               break;
             case Internals::LogType::Warning:
-              ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 0.0f, 1.0f));
+              ImGui::PushStyleColor(ImGuiCol_Text, F3DImguiStyle::GetWarningColor());
               break;
             case Internals::LogType::Typed:
-              ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 1.0f, 1.0f, 1.0f));
+              ImGui::PushStyleColor(ImGuiCol_Text, F3DImguiStyle::GetHighlightColor());
               break;
             case Internals::LogType::Completion:
-              ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.6f, 1.0f, 0.6f, 1.0f));
+              ImGui::PushStyleColor(ImGuiCol_Text, F3DImguiStyle::GetCompletionColor());
               break;
             default:
               hasColor = false;
@@ -318,7 +320,7 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
     ImGuiInputTextFlags_EscapeClearsAll | ImGuiInputTextFlags_CallbackCompletion |
     ImGuiInputTextFlags_CallbackHistory;
 
-  ImGui::Text("> ");
+  ImGui::Text(">");
   ImGui::SameLine();
 
   ImGui::PushItemWidth(-1);
@@ -329,8 +331,9 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
     return internals->TextEditCallback(data);
   };
 
-  bool runCommand = ImGui::InputText("##ConsoleInput", this->Pimpl->CurrentInput.data(),
-    sizeof(this->Pimpl->CurrentInput), inputFlags, TextEditCallbackStub, this->Pimpl.get());
+  bool runCommand = ImGui::InputTextWithHint("##ConsoleInput", "Type a command...",
+    this->Pimpl->CurrentInput.data(), sizeof(this->Pimpl->CurrentInput), inputFlags,
+    TextEditCallbackStub, this->Pimpl.get());
   ImGui::PopItemWidth();
 
   ImGui::SetItemDefaultFocus();
@@ -383,28 +386,25 @@ void vtkF3DImguiConsole::ShowBadge()
     ImGui::SetNextWindowPos(
       ImVec2(viewport->WorkSize.x - winSize.x - marginTopRight, marginTopRight));
     ImGui::SetNextWindowSize(winSize);
+    ImGui::SetNextWindowBgAlpha(0.9f);
 
     ImGuiWindowFlags winFlags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
       ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
 
     ImGui::Begin("ConsoleAlert", nullptr, winFlags);
 
-    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, F3DImguiStyle::GetHighlightColor());
 
-    const bool useColoring = this->GetUseColoring();
-
-    if (useColoring)
-    {
-      ImGui::PushStyleColor(ImGuiCol_Text,
-        this->Pimpl->NewError ? ImVec4(1.0f, 0.0f, 0.0f, 1.0f) : ImVec4(1.0f, 1.0f, 0.0f, 1.0f));
-    }
+    ImGui::PushStyleColor(ImGuiCol_Text,
+      this->Pimpl->NewError ? F3DImguiStyle::GetErrorColor() : F3DImguiStyle::GetWarningColor());
 
     if (ImGui::Button("!"))
     {
       this->InvokeEvent(vtkF3DImguiConsole::ShowEvent);
     }
 
-    ImGui::PopStyleColor(useColoring ? 2 : 1);
+    ImGui::PopStyleColor(3);
 
     ImGui::End();
   }
