@@ -1354,6 +1354,9 @@ f3d_test(NAME TestReadersList ARGS --list-readers REGEXP_FAIL "No registered rea
 # Test invalid component string coverage
 f3d_test(NAME TestInteractionInvalidComponent INTERACTION UI DATA cow.vtp ARGS --coloring-component=1 NO_BASELINE) #H
 
+# Test opening invalid file then switching to another file
+f3d_test(NAME TestInteractionInvalidFile INTERACTION DATA invalid.vtp cow.vtp ARGS --loading-progress) #Right
+
 # Test multi plugin list-readers
 if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME TestReadersListMultiplePlugins ARGS --list-readers --load-plugins=assimp,alembic NO_BASELINE REGEXP_FAIL "Plugin failed to load")
