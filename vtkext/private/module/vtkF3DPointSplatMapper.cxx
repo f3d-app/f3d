@@ -397,6 +397,10 @@ void vtkF3DSplatMapperHelper::ReplaceShaderColor(
     shStr << "  vertexColorVSOutput.rgb += sh3;\n";
   }
 
+  // With spherical harmonics, we can have very small negative values resulting in blending errors.
+  // The color needs to be clamped to positive values to avoid this.
+  shStr << "  vertexColorVSOutput.rgb = max(vertexColorVSOutput.rgb, vec3(0.));\n";
+
   vtkShaderProgram::Substitute(VSSource, "//VTK::Color::Impl", shStr.str(), false);
 
   shaders[vtkShader::Vertex]->SetSource(VSSource);
