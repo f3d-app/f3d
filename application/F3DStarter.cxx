@@ -512,7 +512,7 @@ public:
 
     // Initialize libf3dOptions
     f3d::options libOptions;
-    libOptions.ui.dropzone_info = "Drop a file or HDRI to load it\nPress H to show cheatsheet";
+    libOptions.ui.drop_zone.info = "Drop a file or HDRI to load it\nPress H to show cheatsheet";
 
     // Copy appOptions
     F3DOptionsTools::OptionsDict appOptions = F3DOptionsTools::DefaultAppOptions;
@@ -1445,7 +1445,7 @@ void F3DStarter::LoadFileGroup(
   f3d::options& dynamicOptions = this->Internals->Engine->getOptions();
 
   // reset forced options to avoid logging noise
-  dynamicOptions.ui.dropzone = false;
+  dynamicOptions.ui.drop_zone.enable = false;
   dynamicOptions.ui.filename_info = "";
 
   // Detect interactively changed options and store them into the dynamic options dict
@@ -1671,7 +1671,7 @@ void F3DStarter::LoadFileGroup(
   // but there is no way to detect if an option has been set
   // by the user or not.
   f3d::options& options = this->Internals->Engine->getOptions();
-  options.ui.dropzone = this->Internals->LoadedFiles.empty();
+  options.ui.drop_zone.enable = this->Internals->LoadedFiles.empty();
   options.ui.filename_info = filenameInfo;
 }
 
