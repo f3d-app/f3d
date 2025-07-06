@@ -189,6 +189,7 @@ bool animationManager::LoadAtTime(double timeValue)
   if (this->AvailAnimations == 0)
   {
     log::warn("No animation available, cannot load a specific animation time");
+    this->Playing = false;
     return false;
   }
 
