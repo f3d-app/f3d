@@ -20,10 +20,10 @@ PRIVATE_DEPENDS
   VTK::IOXML
   VTK::ImagingHybrid
   VTK::InteractionWidgets
-  VTK::RenderingGridAxes
 OPTIONAL_DEPENDS
   VTK::opengl
   VTK::RenderingRayTracing
+  VTK::RenderingGridAxes
 TEST_DEPENDS
   VTK::IOGeometry
   VTK::IOPLY
