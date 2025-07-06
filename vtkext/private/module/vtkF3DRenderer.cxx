@@ -775,7 +775,6 @@ void vtkF3DRenderer::ConfigureGridAxesUsingCurrentActors()
 
       double a, b, c, x, y, z;
       bbox.GetBounds(a, b, c, x, y, z);
-      double bounds[6] = { a, b, c, x, y, z };
       GridAxesActor->SetGridBounds(a, b, c, x, y, z);
 
       GridAxesActor->SetXTitle("X Axis");
