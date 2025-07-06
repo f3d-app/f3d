@@ -410,8 +410,8 @@ void window_impl::UpdateDynamicOptions()
   renderer->ShowCheatSheet(opt.ui.cheatsheet);
   renderer->ShowConsole(opt.ui.console);
   renderer->ShowMinimalConsole(opt.ui.minimal_console);
-  renderer->ShowDropZone(opt.ui.dropzone);
-  renderer->SetDropZoneInfo(opt.ui.dropzone_info);
+  renderer->ShowDropZone(opt.ui.drop_zone.enable);
+  renderer->SetDropZoneInfo(opt.ui.drop_zone.info);
   renderer->ShowArmature(opt.render.armature.enable);
 
   renderer->SetUseRaytracing(opt.render.raytracing.enable);
