@@ -52,7 +52,7 @@ wheel.packages = []
 version_file = "_version.py"
 version_scheme = "no-guess-dev"
 local_scheme = "no-local-version"
-fallback_version = "3.1.0"
+fallback_version = "3.2.0-RC1"
 
 [tool.scikit-build.cmake.define]
 CMAKE_OSX_DEPLOYMENT_TARGET = "10.15"
