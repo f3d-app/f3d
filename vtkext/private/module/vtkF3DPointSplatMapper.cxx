@@ -334,72 +334,84 @@ void vtkF3DSplatMapperHelper::RenderPieceDraw(vtkRenderer* ren, vtkActor* actor)
 void vtkF3DSplatMapperHelper::ReplaceShaderColor(
   std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor)
 {
-  std::string VSSource = shaders[vtkShader::Vertex]->GetSource();
-
-  vtkShaderProgram::Substitute(VSSource, "//VTK::Color::Dec",
-    "//VTK::Color::Dec\n\n"
-    "uniform sampler2DArray sphericalHarmonics;\n"
-    "uniform vec3 cameraDirection;\n"
-    "vec3 decode(ivec3 texelIndex)\n"
-    "{\n"
-    "  vec3 texel = texelFetch(sphericalHarmonics, texelIndex, 0).rgb;\n"
-    "  return texel * 2.0 - 1.0;\n"
-    "}\n\n",
-    false);
-
-  std::stringstream shStr;
-  shStr << "//VTK::Color::Impl\n";
-
-  if (this->SphericalHarmonicsDegree >= 1)
+  if (this->VBOs->GetNumberOfComponents("scalarColor") != 0 && !this->DrawingVertices)
   {
-    shStr << "  vec3 sh1 = vec3(0);\n";
-    shStr << "  ivec2 texelIndex = ivec2(gl_VertexID % " << this->MaxTextureSize
-          << ", gl_VertexID / " << this->MaxTextureSize << ");\n";
-    shStr << "  sh1 -= 0.48860251 * decode(ivec3(texelIndex, 0)) * cameraDirection.y;\n";
-    shStr << "  sh1 += 0.48860251 * decode(ivec3(texelIndex, 1)) * cameraDirection.z;\n";
-    shStr << "  sh1 -= 0.48860251 * decode(ivec3(texelIndex, 2)) * cameraDirection.x;\n";
-    shStr << "  vertexColorVSOutput.rgb += sh1;\n";
+    std::string VSSource = shaders[vtkShader::Vertex]->GetSource();
+
+    vtkShaderProgram::Substitute(VSSource, "//VTK::Color::Dec",
+      "//VTK::Color::Dec\n\n"
+      "uniform sampler2DArray sphericalHarmonics;\n"
+      "uniform vec3 cameraDirection;\n"
+      "vec3 decode(ivec3 texelIndex)\n"
+      "{\n"
+      "  vec3 texel = texelFetch(sphericalHarmonics, texelIndex, 0).rgb;\n"
+      "  return texel * 2.0 - 1.0;\n"
+      "}\n\n",
+      false);
+
+    std::stringstream shStr;
+    shStr << "//VTK::Color::Impl\n";
+
+    if (this->SphericalHarmonicsDegree >= 1)
+    {
+      shStr << "  vec3 sh1 = vec3(0);\n";
+      shStr << "  ivec2 texelIndex = ivec2(gl_VertexID % " << this->MaxTextureSize
+            << ", gl_VertexID / " << this->MaxTextureSize << ");\n";
+      shStr << "  sh1 -= 0.48860251 * decode(ivec3(texelIndex, 0)) * cameraDirection.y;\n";
+      shStr << "  sh1 += 0.48860251 * decode(ivec3(texelIndex, 1)) * cameraDirection.z;\n";
+      shStr << "  sh1 -= 0.48860251 * decode(ivec3(texelIndex, 2)) * cameraDirection.x;\n";
+      shStr << "  vertexColorVSOutput.rgb += sh1;\n";
+    }
+
+    if (this->SphericalHarmonicsDegree >= 2)
+    {
+      shStr << "  float xx = cameraDirection.x * cameraDirection.x;\n";
+      shStr << "  float yy = cameraDirection.y * cameraDirection.y;\n";
+      shStr << "  float zz = cameraDirection.z * cameraDirection.z;\n";
+      shStr << "  float xy = cameraDirection.x * cameraDirection.y;\n";
+      shStr << "  float yz = cameraDirection.y * cameraDirection.z;\n";
+      shStr << "  float xz = cameraDirection.x * cameraDirection.z;\n";
+      shStr << "  vec3 sh2 = vec3(0);\n";
+      shStr << "  sh2 += 1.092548430 * decode(ivec3(texelIndex, 3)) * xy;\n";
+      shStr << "  sh2 -= 1.09254843 * decode(ivec3(texelIndex, 4)) * yz;\n";
+      shStr << "  sh2 += 0.315391565 * decode(ivec3(texelIndex, 5)) * (3.0 * zz - 1.0);\n";
+      shStr << "  sh2 -= 1.09254843 * decode(ivec3(texelIndex, 6)) * xz;\n";
+      shStr << "  sh2 += 0.546274215 * decode(ivec3(texelIndex, 7)) * (xx - yy);\n";
+      shStr << "  vertexColorVSOutput.rgb += sh2;\n";
+    }
+
+    if (this->SphericalHarmonicsDegree >= 3)
+    {
+      shStr << "  vec3 sh3 = vec3(0);\n";
+      shStr
+        << "  sh3 -= 0.59004358 * decode(ivec3(texelIndex, 8)) * cameraDirection.y * (3.0 * xx - "
+           "yy);\n";
+      shStr << "  sh3 += 2.890611442 * decode(ivec3(texelIndex, 9)) * xy * cameraDirection.z;\n";
+      shStr
+        << "  sh3 -= 0.45704579 * decode(ivec3(texelIndex, 10)) * cameraDirection.y * (4.0 * zz "
+           "- xx - yy);\n";
+      shStr
+        << "  sh3 += 0.373176332 * decode(ivec3(texelIndex, 11)) * cameraDirection.z * (2.0 * zz "
+           "- 3.0 * xx - 3.0 * yy);\n";
+      shStr
+        << "  sh3 -= 0.45704579 * decode(ivec3(texelIndex, 12)) * cameraDirection.x * (4.0 * zz "
+           "- xx - yy);\n";
+      shStr << "  sh3 += 1.445305721 * decode(ivec3(texelIndex, 13)) * cameraDirection.z * (xx - "
+               "yy);\n";
+      shStr
+        << "  sh3 -= 0.59004358 * decode(ivec3(texelIndex, 14)) * cameraDirection.x * (xx - 3.0 "
+           "* yy);\n";
+      shStr << "  vertexColorVSOutput.rgb += sh3;\n";
+    }
+
+    // With spherical harmonics, we can have very small negative values resulting in blending
+    // errors. The color needs to be clamped to positive values to avoid this.
+    shStr << "  vertexColorVSOutput.rgb = max(vertexColorVSOutput.rgb, vec3(0.));\n";
+
+    vtkShaderProgram::Substitute(VSSource, "//VTK::Color::Impl", shStr.str(), false);
+
+    shaders[vtkShader::Vertex]->SetSource(VSSource);
   }
-
-  if (this->SphericalHarmonicsDegree >= 2)
-  {
-    shStr << "  float xx = cameraDirection.x * cameraDirection.x;\n";
-    shStr << "  float yy = cameraDirection.y * cameraDirection.y;\n";
-    shStr << "  float zz = cameraDirection.z * cameraDirection.z;\n";
-    shStr << "  float xy = cameraDirection.x * cameraDirection.y;\n";
-    shStr << "  float yz = cameraDirection.y * cameraDirection.z;\n";
-    shStr << "  float xz = cameraDirection.x * cameraDirection.z;\n";
-    shStr << "  vec3 sh2 = vec3(0);\n";
-    shStr << "  sh2 += 1.092548430 * decode(ivec3(texelIndex, 3)) * xy;\n";
-    shStr << "  sh2 -= 1.09254843 * decode(ivec3(texelIndex, 4)) * yz;\n";
-    shStr << "  sh2 += 0.315391565 * decode(ivec3(texelIndex, 5)) * (3.0 * zz - 1.0);\n";
-    shStr << "  sh2 -= 1.09254843 * decode(ivec3(texelIndex, 6)) * xz;\n";
-    shStr << "  sh2 += 0.546274215 * decode(ivec3(texelIndex, 7)) * (xx - yy);\n";
-    shStr << "  vertexColorVSOutput.rgb += sh2;\n";
-  }
-
-  if (this->SphericalHarmonicsDegree >= 3)
-  {
-    shStr << "  vec3 sh3 = vec3(0);\n";
-    shStr << "  sh3 -= 0.59004358 * decode(ivec3(texelIndex, 8)) * cameraDirection.y * (3.0 * xx - "
-             "yy);\n";
-    shStr << "  sh3 += 2.890611442 * decode(ivec3(texelIndex, 9)) * xy * cameraDirection.z;\n";
-    shStr << "  sh3 -= 0.45704579 * decode(ivec3(texelIndex, 10)) * cameraDirection.y * (4.0 * zz "
-             "- xx - yy);\n";
-    shStr << "  sh3 += 0.373176332 * decode(ivec3(texelIndex, 11)) * cameraDirection.z * (2.0 * zz "
-             "- 3.0 * xx - 3.0 * yy);\n";
-    shStr << "  sh3 -= 0.45704579 * decode(ivec3(texelIndex, 12)) * cameraDirection.x * (4.0 * zz "
-             "- xx - yy);\n";
-    shStr
-      << "  sh3 += 1.445305721 * decode(ivec3(texelIndex, 13)) * cameraDirection.z * (xx - yy);\n";
-    shStr << "  sh3 -= 0.59004358 * decode(ivec3(texelIndex, 14)) * cameraDirection.x * (xx - 3.0 "
-             "* yy);\n";
-    shStr << "  vertexColorVSOutput.rgb += sh3;\n";
-  }
-
-  vtkShaderProgram::Substitute(VSSource, "//VTK::Color::Impl", shStr.str(), false);
-
-  shaders[vtkShader::Vertex]->SetSource(VSSource);
 
   this->Superclass::ReplaceShaderColor(shaders, ren, actor);
 }
