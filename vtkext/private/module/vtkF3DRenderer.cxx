@@ -1649,6 +1649,16 @@ void vtkF3DRenderer::ShowDropZone(bool show)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::ShowDropZoneLogo(bool show)
+{
+  if (this->DropZoneLogoVisible != show)
+  {
+    this->DropZoneLogoVisible = show;
+    this->UIActor->SetDropZoneLogoVisibility(show);
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowHDRISkybox(bool show)
 {
   if (this->HDRISkyboxVisible != show)

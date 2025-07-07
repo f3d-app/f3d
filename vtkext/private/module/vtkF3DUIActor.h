@@ -37,6 +37,13 @@ public:
   void SetDropZoneVisibility(bool show);
 
   /**
+   * Set the logo dropzone visibility
+   * False by default
+   */
+  void SetDropZoneLogoVisibility(bool show);
+
+
+  /**
    * Set the dropzone string
    * Empty by default
    */
@@ -198,7 +205,7 @@ protected:
   virtual void RenderConsoleBadge()
   {
   }
-
+  bool DropZoneLogoVisible = false;
   bool DropZoneVisible = false;
   std::string DropText = "";
 
