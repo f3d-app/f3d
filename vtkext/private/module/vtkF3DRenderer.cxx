@@ -273,6 +273,7 @@ void vtkF3DRenderer::Initialize()
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
   this->AddActor(this->GridAxesActor);
+  this->GridAxesActor->SetUseBounds(false);
 #endif
 
   this->GridConfigured = false;
@@ -736,7 +737,6 @@ void vtkF3DRenderer::ConfigureGridAxesUsingCurrentActors()
 {
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
   bool show = this->AxesGridVisible;
-  this->GridAxesActor->SetUseBounds(false);
   if (show)
   {
     double* up = this->GetEnvironmentUp();
@@ -1790,7 +1790,6 @@ void vtkF3DRenderer::UpdateActors()
     this->ConfigureTextActors();
   }
 
-  // GridAxes should not affect bounds, UseBounds must be set false before configuring the render pass.
   if (!this->GridAxesConfigured)
   {
     this->ConfigureGridAxesUsingCurrentActors();

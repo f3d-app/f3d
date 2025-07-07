@@ -16,6 +16,7 @@
 
 #include <vtkLight.h>
 #include <vtkOpenGLRenderer.h>
+#include <vtkVersion.h>
 
 #include <filesystem>
 #include <map>
