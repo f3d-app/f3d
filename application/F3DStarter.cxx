@@ -1705,7 +1705,16 @@ void F3DStarter::LoadFileGroupInternal(
   // but there is no way to detect if an option has been set
   // by the user or not.
   f3d::options& options = this->Internals->Engine->getOptions();
-  options.ui.drop_zone.enable = this->Internals->LoadedFiles.empty();
+  // If new option is default (false), but old option is true, use old option.
+  if (!options.ui.drop_zone.enable && options.ui.dropzone)
+  {
+      f3d::log::warn << "'ui.dropzone' is deprecated. Please Use 'ui.drop_zone.enable' instead.\n";
+      options.ui.drop_zone.enable = options.ui.dropzone;
+  }
+  else
+  {
+      options.ui.drop_zone.enable = this->Internals->LoadedFiles.empty();
+  }
   options.ui.filename_info = filenameInfo;
 }
 

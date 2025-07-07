@@ -44,6 +44,15 @@ struct vtkF3DImguiActor::Internals
       this->FontTexture->SetContext(renWin);
       this->FontTexture->Create2DFromRaw(width, height, 4, VTK_UNSIGNED_CHAR, pixels);
 
+      // for logo
+      int logoWidth = ...; // fill in width
+      int logoHeight = ...; // fill in height
+      unsigned char* logoPixels = ...; // fill in pixel buffer RGBA
+
+      this->LogoTexture = vtkSmartPointer<vtkTextureObject>::New();
+      this->LogoTexture->SetContext(renWin);
+      this->LogoTexture->Create2DFromRaw(logoWidth, logoHeight, 4, VTK_UNSIGNED_CHAR, logoPixels);
+
       // Store our identifier
       io.Fonts->SetTexID((ImTextureID)this->FontTexture.Get());
 
@@ -93,6 +102,12 @@ struct vtkF3DImguiActor::Internals
         io.Fonts->SetTexID(0);
         this->FontTexture->ReleaseGraphicsResources(renWin);
         this->FontTexture = nullptr;
+      }
+
+      if (this->LogoTexture)
+      {
+        this->LogoTexture->ReleaseGraphicsResources(renWin);
+        this->LogoTexture = nullptr;
       }
 
       if (this->VertexBuffer)
@@ -201,9 +216,11 @@ struct vtkF3DImguiActor::Internals
     this->IndexBuffer->Release();
 
     this->FontTexture->Deactivate();
+    this->LogoTexture->Deactivate();
   }
 
   vtkSmartPointer<vtkTextureObject> FontTexture;
+  vtkSmartPointer<vtkTextureObject> LogoTexture;
   vtkSmartPointer<vtkOpenGLVertexArrayObject> VertexArray;
   vtkSmartPointer<vtkOpenGLBufferObject> VertexBuffer;
   vtkSmartPointer<vtkOpenGLBufferObject> IndexBuffer;
@@ -381,6 +398,33 @@ void vtkF3DImguiActor::RenderDropZone()
     ImGui::TextUnformatted(this->DropText.c_str());
     ImGui::End();
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DImguiActor::RenderDropZoneLogo()
+{
+  if (!this->DropZoneVisible || this->Pimpl->LogoTexture == nullptr)
+  {
+    return;
+  }
+
+  ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+  const ImVec2 logoSize(100, 100); // You can scale this as needed
+  const ImVec2 logoPos(viewport->GetWorkCenter().x - logoSize.x * 0.5f,
+                       viewport->GetWorkCenter().y - logoSize.y * 0.5f - 30.0f); // Slightly above text
+
+  ::SetupNextWindow(logoPos, logoSize);
+  ImGui::SetNextWindowBgAlpha(0.f);
+
+  ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
+    ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove |
+    ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoMouseInputs;
+
+  ImGui::Begin("DropZoneLogo", nullptr, flags);
+  ImGui::Image(reinterpret_cast<void*>(this->Pimpl->LogoTexture->GetHandle()),
+               logoSize);
+  ImGui::End();
 }
 
 //----------------------------------------------------------------------------

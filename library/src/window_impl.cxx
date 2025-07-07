@@ -412,6 +412,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->ShowMinimalConsole(opt.ui.minimal_console);
   renderer->ShowDropZone(opt.ui.drop_zone.enable);
   renderer->SetDropZoneInfo(opt.ui.drop_zone.info);
+  renderer->ShowDropZoneLogo(opt.ui.drop_zone.show_logo);
   renderer->ShowArmature(opt.render.armature.enable);
 
   renderer->SetUseRaytracing(opt.render.raytracing.enable);
