@@ -124,6 +124,9 @@ public:
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
     if (!this->MetaImporter->Update())
     {
+      this->MetaImporter->RemoveObservers(vtkCommand::ProgressEvent);
+      progressWidget->Off();
+
       this->MetaImporter->Clear();
       this->Window.Initialize();
       throw scene::load_failure_exception("failed to load scene");
