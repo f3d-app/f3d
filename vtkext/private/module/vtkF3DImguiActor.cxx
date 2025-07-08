@@ -35,8 +35,8 @@
 #define NANOSVG_IMPLEMENTATION
 #include "nanosvg.h"
 
-#define STB_IMAGE_RESIZE_IMPLEMENTATION
-#include "stb_image_resize2.h"
+// #define STB_IMAGE_RESIZE_IMPLEMENTATION
+// #include "stb_image_resize2.h"
 
 #define NANOSVGRAST_IMPLEMENTATION
 #include "nanosvgrast.h"
@@ -245,9 +245,6 @@ struct vtkF3DImguiActor::Internals
       for (int iCmd = 0; iCmd < cmdList->CmdBuffer.Size; iCmd++)
       {
         const ImDrawCmd* cmd = &cmdList->CmdBuffer[iCmd];
-        std::cout << "[DEBUG] CmdLists[" << n << "], Cmd[" << iCmd << "], TexID: "
-        << reinterpret_cast<void*>(cmd->GetTexID()) << ", ElemCount: " << cmd->ElemCount << std::endl;
-
 
         // Activate texture and set uniforms per draw command:
         vtkTextureObject* texObj = reinterpret_cast<vtkTextureObject*>(cmd->GetTexID());
@@ -469,8 +466,6 @@ void vtkF3DImguiActor::RenderDropZone()
       viewport->GetWorkCenter().y - 0.5f * dropTextSize.y));
     ImGui::TextUnformatted(this->DropText.c_str());
     ImGui::End();
-    // Now render the logo in its own window
-    this->RenderDropZoneLogo();
   }
 }
 
@@ -496,9 +491,6 @@ void vtkF3DImguiActor::RenderDropZoneLogo()
     ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoMouseInputs;
 
   ImGui::Begin("DropZoneLogo", nullptr, flags);
-  std::cout << "[DEBUG] Calling ImGui::Image() with LogoImTextureID: "
-  << reinterpret_cast<void*>(this->Pimpl->LogoImTextureID) << std::endl;
-
   ImGui::Image(this->Pimpl->LogoImTextureID, ImVec2(64, 64));
   ImGui::End();
 }

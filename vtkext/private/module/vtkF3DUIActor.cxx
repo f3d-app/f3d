@@ -16,7 +16,6 @@ vtkF3DUIActor::~vtkF3DUIActor() = default;
 void vtkF3DUIActor::SetDropZoneVisibility(bool show)
 {
   this->DropZoneVisible = show;
-  this->DropZoneLogoVisible = show;
 }
 
 //----------------------------------------------------------------------------

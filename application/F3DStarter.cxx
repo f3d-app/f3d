@@ -1709,11 +1709,11 @@ void F3DStarter::LoadFileGroupInternal(
   if (!options.ui.drop_zone.enable && options.ui.dropzone)
   {
       f3d::log::warn("'ui.dropzone' is deprecated. Please Use 'ui.drop_zone.enable' instead.");
-      options.ui.drop_zone.enable = options.ui.dropzone;
+      options.ui.drop_zone.enable = options.ui.drop_zone.show_logo = options.ui.dropzone;
   }
   else
   {
-      options.ui.drop_zone.enable = this->Internals->LoadedFiles.empty();
+      options.ui.drop_zone.enable = options.ui.drop_zone.show_logo = this->Internals->LoadedFiles.empty();
   }
   options.ui.filename_info = filenameInfo;
 }
