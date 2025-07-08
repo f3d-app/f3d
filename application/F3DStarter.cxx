@@ -1674,7 +1674,7 @@ void F3DStarter::LoadFileGroup(
   // If new option is default (false), but old option is true, use old option.
   if (!options.ui.drop_zone.enable && options.ui.dropzone)
   {
-      f3d::log::warn << "'ui.dropzone' is deprecated. Please Use 'ui.drop_zone.enable' instead.\n";
+      f3d::log::warn("'ui.dropzone' is deprecated. Please Use 'ui.drop_zone.enable' instead.");
       options.ui.drop_zone.enable = options.ui.dropzone;
   }
   else
