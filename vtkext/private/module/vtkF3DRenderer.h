@@ -568,6 +568,7 @@ private:
   bool ConsoleVisible = false;
   bool MinimalConsoleVisible = false;
   bool DropZoneVisible = false;
+  bool DropZoneLogoVisible = false;
   bool HDRISkyboxVisible = false;
   bool ArmatureVisible = false;
   bool UseRaytracing = false;
