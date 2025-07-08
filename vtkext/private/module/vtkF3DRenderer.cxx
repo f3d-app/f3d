@@ -719,7 +719,7 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::ShowAxesGrid(bool show)
+void vtkF3DRenderer::ShowAxesGrid([[maybe_unused]] bool show)
 {
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
   if (this->AxesGridVisible != show)
