@@ -13,6 +13,8 @@ unknownMacro
 *:external/dmon/dmon.h
 *:external/imgui/*.h
 *:external/imgui/*.cpp
+*:external/sbt/*.h
+*:external/nanosvg/*.h
 
 // generated files
 *:*vtkextTests.cxx

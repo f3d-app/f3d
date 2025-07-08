@@ -165,6 +165,13 @@ protected:
   }
 
   /**
+   * Render the dropzone logo UI widget
+   */
+  virtual void RenderDropZoneLogo()
+  {
+  }
+
+  /**
    * Render the filename UI widget
    */
   virtual void RenderFileName()
