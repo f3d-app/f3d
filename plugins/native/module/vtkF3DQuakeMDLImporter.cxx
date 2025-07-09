@@ -1,6 +1,8 @@
 #include "vtkF3DQuakeMDLImporter.h"
 #include "vtkF3DQuakeMDLImporterConstants.h"
 
+#include<vtkInterpolateDataSetAttributes.h>
+
 #include <vtkFloatArray.h>
 #include <vtkImageData.h>
 #include <vtkOpenGLTexture.h>
@@ -475,11 +477,42 @@ bool vtkF3DQuakeMDLImporter::UpdateAtTimeValue(double timeValue)
     const auto found = std::lower_bound(times.begin(), times.end(), timeValue);
     // If none, select last, if found, select distance
     const size_t i = found == times.end() ? times.size() - 1 : std::distance(times.begin(), found);
-    // If found time > timeValue, the the previous one
-    const size_t frameIndex = *found > timeValue && i > 0 ? i - 1 : i;
+    // If found time > timeValue, the the previous one - previous non Interpolated behavior
+    //const size_t frameIndex = *found > timeValue && i > 0 ? i - 1 : i;
+    //index for frame A
+    const size_t frameAIndex = *found > timeValue && i > 0 ? i - 1 : i;
+    //index for frame B, min to capture out of bounds
+    const size_t frameBIndex = std::min((frameAIndex + 1), times.size() - 1);
 
-    this->Internals->Mapper->SetInputData(
-      this->Internals->AnimationFrames[this->Internals->ActiveAnimation][frameIndex]);
+    //get time values
+    double timeA = times[frameAIndex];
+    double timeB = times[frameBIndex];
+
+    //calculating alpha
+    double alpha = (timeB != timeA) ? (timeValue - timeA) / (timeB - timeA) : 0.0;
+
+    //get both frames
+    auto frameA = this->Internals->AnimationFrames[this->Internals->ActiveAnimation][frameAIndex];
+    auto frameB = this->Internals->AnimationFrames[this->Internals->ActiveAnimation][frameBIndex];
+
+    //interpolation
+    if (frameAIndex != frameBIndex)
+    {
+      vtkNew<vtkInterpolateDataSetAttributes> interpolator;
+      vtkInterpolateDataSetAttributes* iPtr = interpolator.Get();
+      iPtr->SetInputData(0, frameA);
+      iPtr->SetInputData(1, frameB);
+      iPtr->SetT(alpha);
+      iPtr->Update();
+
+      this->Internals->Mapper->SetInputData(iPtr->GetPolyDataOutput());
+    }
+    else
+    {
+      this->Internals->Mapper->SetInputData(frameA);
+    }
+    /*this->Internals->Mapper->SetInputData(
+      this->Internals->AnimationFrames[this->Internals->ActiveAnimation][frameIndex]);*/
   }
   return true;
 }
