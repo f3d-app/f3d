@@ -434,11 +434,13 @@ void vtkF3DImguiActor::RenderCheatSheet()
 {
   ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-  constexpr float marginLeft = 5.f;
-  constexpr float marginTopBottom = 5.f;
+  constexpr float margin = 5.f;
 
   float textHeight = 0.f;
   float winWidth = 0.f;
+
+  // Use to create all rect with same size
+  float maxBindingTextWidth = 0.f;
 
   for (const auto& [group, content] : this->CheatSheet)
   {
@@ -457,16 +459,21 @@ void vtkF3DImguiActor::RenderCheatSheet()
 
       winWidth = std::max(winWidth, currentLine.x);
       textHeight += ImGui::GetTextLineHeightWithSpacing();
+
+      ImVec2 bindingLineSize = ImGui::CalcTextSize(bind.c_str());
+      if (bindingLineSize.x >= maxBindingTextWidth) {
+        maxBindingTextWidth = bindingLineSize.x;
+      }
     }
   }
 
-  winWidth += 2.f * ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().ScrollbarSize;
+  winWidth += 2.f * ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().ScrollbarSize + maxBindingTextWidth;
   textHeight += 2.f * ImGui::GetStyle().WindowPadding.y;
 
-  const float winTop = std::max(marginTopBottom, (viewport->WorkSize.y - textHeight) * 0.5f);
+  const float winTop = std::max(margin, (viewport->WorkSize.y - textHeight) * 0.5f);
 
-  ::SetupNextWindow(ImVec2(marginLeft, winTop),
-    ImVec2(winWidth, std::min(viewport->WorkSize.y - (2 * marginTopBottom), textHeight)));
+  ::SetupNextWindow(ImVec2(margin, winTop),
+    ImVec2(winWidth, std::min(viewport->WorkSize.y - (2 * margin), textHeight)));
   ImGui::SetNextWindowBgAlpha(0.9f);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
@@ -481,14 +488,38 @@ void vtkF3DImguiActor::RenderCheatSheet()
     ImGui::SeparatorText(group.c_str());
     for (const auto& [bind, desc, val] : list)
     {
-      if (!val.empty())
-      {
-        ImGui::Text("%s: %s [%s]", bind.c_str(), desc.c_str(), val.c_str());
+      ImDrawList *drawList = ImGui::GetWindowDrawList();
+      ImVec4 rec_color, text_color;
+
+      if(val == "ON") {
+        rec_color = F3DImguiStyle::GetHighlightColor();
+        text_color = F3DImguiStyle::GetHighlightColor();  
+      } else {
+        rec_color = F3DImguiStyle::GetMidColor();
+        text_color = F3DImguiStyle::GetTextColor();
       }
-      else
+
+      drawList->ChannelsSplit(2);
+
+      drawList->ChannelsSetCurrent(1);
+      ImGui::Text("%s", bind.c_str());
+      
+      drawList->ChannelsSetCurrent(0);
+      ImVec2 top_corner(ImGui::GetItemRectMin().x - margin, ImGui::GetItemRectMin().y - margin);
+      ImVec2 bottom_corner(ImGui::GetItemRectMin().x + maxBindingTextWidth + margin, ImGui::GetItemRectMax().y + margin);
+      drawList->AddRectFilled(top_corner, bottom_corner, ImColor(rec_color), 5.f);
+      drawList->ChannelsMerge();
+
+      ImGui::SameLine();
+      ImGui::SetCursorPosX(bottom_corner.x + ImGui::GetStyle().WindowPadding.x);
+      if (val.empty() || val == "ON" || val == "OFF")
       {
-        ImGui::Text("%s: %s", bind.c_str(), desc.c_str());
+        ImGui::TextColored(text_color, "%s", desc.c_str());
+      } else {  
+        ImGui::TextColored(text_color, "%s [%s]", desc.c_str(), val.c_str());
       }
+
+      ImGui::NewLine();
     }
   }
 
