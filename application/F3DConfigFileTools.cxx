@@ -86,7 +86,7 @@ std::vector<fs::path> GetConfigPaths(const std::string& configSearch)
 
 //----------------------------------------------------------------------------
 F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
-  const std::string& userConfig)
+  const std::string& userConfig, bool dryRun, f3d::log::VerboseLevel logLevel)
 {
   // Default config directory name
   std::string configSearch = "config";
@@ -136,7 +136,7 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
     // Recover all config files if needed in directories
     if (fs::is_directory(configPath))
     {
-      f3d::log::debug("Using config directory ", configPath.string());
+      f3d::log::print(logLevel, "Using config directory ", configPath.string());
       const size_t oldSize = actualConfigFilePaths.size();
       auto dirIter = fs::directory_iterator(configPath);
       std::copy(std::filesystem::begin(dirIter), std::filesystem::end(dirIter),
@@ -146,7 +146,7 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
     }
     else
     {
-      f3d::log::debug("Using config file ", configPath.string());
+      f3d::log::print(logLevel, "Using config file ", configPath.string());
       actualConfigFilePaths.emplace_back(configPath);
     }
   }
@@ -154,7 +154,13 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
   // If we used a configSearch but did not find any, inform the user
   if (!configSearch.empty() && actualConfigFilePaths.empty())
   {
-    f3d::log::info("Configuration file for \"", configSearch, "\" could not be found");
+    f3d::log::print(logLevel, "Configuration file for \"", configSearch, "\" could not be found");
+  }
+
+  // Clear config file paths to avoid reading them if dryRun is set
+  if (dryRun)
+  {
+    actualConfigFilePaths.clear();
   }
 
   // Read config files
