@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/vnd.arrow">
+    <comment>Apache Arrow file</comment>
+    <glob pattern="*.arrow"/>
+  </mime-type>
+  <mime-type type="application/vnd.bpf">
+    <comment>Binary Point Format file</comment>
+    <glob pattern="*.bpf"/>
+  </mime-type>
+  <mime-type type="application/vnd.las">
+    <comment>Cloud Optimized Point Cloud (Comparessed as a LASzip file)</comment>
+    <glob pattern="*.las"/>
+  </mime-type>
+  <mime-type type="application/vnd.drc">
+    <comment>Google Draco file</comment>
+    <glob pattern="*.drc"/>
+  </mime-type>
+  <mime-type type="application/vnd.json">
+    <comment>Entwine Point Tile (EPT) as JSON file</comment>
+    <glob pattern="*.json"/>
+  </mime-type>
+  <mime-type type="application/vnd.E57">
+    <comment>Matterport E57 File</comment>
+    <glob pattern="*.E57"/>
+  </mime-type>
+  <mime-type type="application/vnd.fbi">
+    <comment>FastBinary format File</comment>
+    <glob pattern="*.fbi"/>
+  </mime-type>
+  <mime-type type="application/vnd.hdf">
+    <comment>HDF5 File</comment>
+    <glob pattern="*.hdf"/>
+  </mime-type>
+  <mime-type type="application/vnd.ilvis2">
+    <comment>ILVIS2 File</comment>
+    <glob pattern="*.ilvis2"/>
+  </mime-type>
+  <mime-type type="application/vnd.mat">
+    <comment>MatLab File</comment>
+    <glob pattern="*.mat"/>
+  </mime-type>
+  <mime-type type="application/vnd.mat">
+    <comment>MatLab File</comment>
+    <glob pattern="*.mat"/>
+  </mime-type>
+  <mime-type type="application/vnd.npy">
+    <comment>Python Numpy File</comment>
+    <glob pattern="*.npy"/>
+  </mime-type>
+  <mime-type type="application/vnd.obj">
+    <comment>OBJ format File</comment>
+    <glob pattern="*.obj"/>
+  </mime-type>
+  <mime-type type="application/vnd.csd">
+    <comment>Corrected Sensor Data files</comment>
+    <glob pattern="*.csd"/>
+  </mime-type>
+  <mime-type type="application/vnd.pcd">
+    <comment>Point Cloud Data (PCD) formatted files</comment>
+    <glob pattern="*.pcd"/>
+  </mime-type>
+  <mime-type type="application/vnd.pcd">
+    <comment>Point Cloud Data (PCD) formatted files</comment>
+    <glob pattern="*.pcd"/>
+  </mime-type>
+  <mime-type type="application/vnd.ply">
+    <comment>Polygon file</comment>
+    <glob pattern="*.ply"/>
+  </mime-type>
+  <mime-type type="application/vnd.pts">
+    <comment>Leica Cyclone PTS file</comment>
+    <glob pattern="*.pts"/>
+  </mime-type>
+  <mime-type type="application/vnd.qfit">
+    <comment>QFIT format file</comment>
+    <glob pattern="*.qfit"/>
+  </mime-type>
+  <mime-type type="application/vnd.rdb">
+    <comment>RDB file</comment>
+    <glob pattern="*.rdb"/>
+  </mime-type>
+  <mime-type type="application/vnd.sbet">
+    <comment>SBET file</comment>
+    <glob pattern="*.sbet"/>
+  </mime-type>
+  <mime-type type="application/vnd.splk">
+    <comment>SPLK file</comment>
+    <glob pattern="*.splk"/>
+  </mime-type>
+  <mime-type type="application/vnd.spz">
+    <comment>SPZ file</comment>
+    <glob pattern="*.spz"/>
+  </mime-type>
+  <mime-type type="application/vnd.bin">
+    <comment>Terrasolid file (as a bin file)</comment>
+    <glob pattern="*.bin"/>
+  </mime-type>
+  <mime-type type="application/vnd.txt">
+    <comment>Text file</comment>
+    <glob pattern="*.txt"/>
+  </mime-type>
+</mime-info>

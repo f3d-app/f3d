@@ -1,0 +1,9 @@
+[
+  {
+    "match-type": "glob",
+    "match": "*.{arrow,bpf,copc,drc,ept,e57,fbi,hdf,ilvis2,las,mat,nitf,npy,obj,csd,pcd,ply,pts,ptx,qfit,rbd,rxp,sbet,slpk,bin,txt}",
+    "options": {
+      "load-plugins": "pdal"
+    }
+  }
+]
