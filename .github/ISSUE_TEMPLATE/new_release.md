@@ -35,7 +35,7 @@ Release Candidates :
 - [ ] Locally test the python wheels on Windows
 - If it fails,
   - [ ] Fix the issues in `release` branch,
-  - [ ] Edit this issuethis paragraph and increment `N`
+  - [ ] Edit this issue and increment `N`
   - [ ] Merge F3D release into master: https://github.com/f3d-app/f3d/compare/master...release
 - [ ] Else proceed to the next part
 
