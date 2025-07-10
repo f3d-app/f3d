@@ -22,7 +22,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/openvdb_install
-        key: openvdb-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-1
+        key: openvdb-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-2
 
     # Dependents (not version): vtk
     - name: Checkout OpenVDB
