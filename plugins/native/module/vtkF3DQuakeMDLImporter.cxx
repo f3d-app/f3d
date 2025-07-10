@@ -159,16 +159,12 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         if (i == skinIndex)
         {
           this->GroupSkins.resize(nb);
-          this->GroupSkinDurations.resize(nb);
-          for (int j = 0; j < nb; ++j)
+          this->GroupSkinDurations.resize(nb + 1);
+          this->GroupSkinDurations[0] = 0.0f;
+          for (int j = 1; j <= nb; ++j)
           {
             this->GroupSkinDurations[j] = *reinterpret_cast<const float*>(buffer.data() + offset);
             offset += sizeof(float);
-          }
-          // Take cumulative sum of durations for binary search during rendering
-          for (int j = 1; j < nb; ++j)
-          {
-            this->GroupSkinDurations[j] += this->GroupSkinDurations[j - 1];
           }
           for (int skinIdx = 0; skinIdx < nb; ++skinIdx)
           {
@@ -372,11 +368,8 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         {
           times.emplace_back(0.0);
         }
-        else
-        {
-          // Single frames are 10 fps
-          times.emplace_back(times.back() + 0.1);
-        }
+        // Single frames are 10 fps
+        times.emplace_back(times.back() + 0.1);
 
         // Create the animation frame
         vtkSmartPointer<vtkPolyData> mesh =
@@ -389,6 +382,8 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         std::string animationName;
         std::vector<double> times;
         std::vector<vtkSmartPointer<vtkPolyData>> meshes;
+
+        times.emplace_back(0.0);
 
         // Iterate over each frame in the group
         for (int groupFrameNum = 0; groupFrameNum < *pluginFramePtr.nb; groupFrameNum++)
@@ -405,7 +400,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
           }
 
           // Recover time for this frame from the dedicated table
-          times.emplace_back(pluginFramePtr.time[groupFrameNum]);
+          times.emplace_back(times.back() + pluginFramePtr.time[groupFrameNum]);
 
           // Recover mesh for this frame
           meshes.emplace_back(
@@ -503,12 +498,28 @@ void vtkF3DQuakeMDLImporter::ImportActors(vtkRenderer* renderer)
 //----------------------------------------------------------------------------
 bool vtkF3DQuakeMDLImporter::UpdateAtTimeValue(double timeValue)
 {
+  // Find frameIndex for the provided timeValue so that t0 <= timeValue < t1
+  const std::vector<double>& times =
+    this->Internals->AnimationTimes[this->Internals->ActiveAnimation];
+
   if (this->Internals->ActiveAnimation != -1)
   {
-    const std::vector<double>& times =
-      this->Internals->AnimationTimes[this->Internals->ActiveAnimation];
+    // If the rendered skin is a group skin then update it
+    if (!this->Internals->GroupSkins.empty())
+    {
+      const std::vector<float>& skinTimes = this->Internals->GroupSkinDurations;
+      const double groupSkinTimeValue = std::fmod(timeValue, skinTimes.back());
+      const auto skinFound =
+        std::lower_bound(skinTimes.begin(), skinTimes.end(), groupSkinTimeValue);
+      const size_t skin_i = (skinFound == skinTimes.end())
+        ? skinTimes.size() - 1
+        : std::distance(skinTimes.begin(), skinFound);
+      const size_t skinIndex =
+        (*skinFound > groupSkinTimeValue) && skin_i > 0 ? skin_i - 1 : skin_i;
+      this->Internals->Texture->SetInputData(this->Internals->GroupSkins[skinIndex]);
+    }
 
-    // Find frameIndex for the provided timeValue so that t0 <= timeValue < t1
+    timeValue = std::fmod(timeValue, times.back());
 
     // First time >= value
     const auto found = std::lower_bound(times.begin(), times.end(), timeValue);
@@ -519,17 +530,6 @@ bool vtkF3DQuakeMDLImporter::UpdateAtTimeValue(double timeValue)
 
     this->Internals->Mapper->SetInputData(
       this->Internals->AnimationFrames[this->Internals->ActiveAnimation][frameIndex]);
-
-    // If the rendered skin is a group skin then update it
-    if (!this->Internals->GroupSkins.empty())
-    {
-      timeValue = std::fmod(timeValue, this->Internals->GroupSkinDurations.back());
-      const std::vector<float>& skinTimes = this->Internals->GroupSkinDurations;
-      const auto skinFound = std::lower_bound(skinTimes.begin(), skinTimes.end(), timeValue);
-      size_t skinIdx = skinFound == skinTimes.end() ? skinTimes.size() - 1
-                                                    : std::distance(skinTimes.begin(), skinFound);
-      this->Internals->Texture->SetInputData(this->Internals->GroupSkins[skinIdx]);
-    }
   }
   return true;
 }
