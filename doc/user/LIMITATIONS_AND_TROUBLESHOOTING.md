@@ -59,6 +59,11 @@ Make sure that VTK has been built with _OpenImageDenoise_ support (`VTKOSPRAY_EN
 
 Your data probably contains some translucent data for some reason, turn on translucency support by pressing `P` or using the `-p` command line option.
 
+> My 3D Gaussian Splatting data in .ply format isn't opened properly.
+
+.ply is a generic file format, we cannot assumes it's a 3DGS, thus we do not give good presets for this specific use case.
+It's recommended to use these options: `--point-sprites-size=1 --point-sprites-type=gaussian -soyk`, but you can also add them in your [config file](CONFIGURATION_FILE.md).
+
 ## Linux
 
 > I have a link error related to `stdc++fs` not found or I'm unable to run F3D due to filesystem errors.
