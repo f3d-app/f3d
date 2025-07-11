@@ -10,7 +10,7 @@ unknownMacro
 *:external/cxxopts/cxxopts.hpp
 *:external/dmon/dmon.h
 *:external/imgui/*.h
-*:external/imgui/*.cpps
+*:external/imgui/*.cpp
 
 // specific checks
 knownConditionTrueFalse:library/testing/TestSDKImage.cxx

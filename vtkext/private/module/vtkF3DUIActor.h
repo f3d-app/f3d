@@ -42,7 +42,6 @@ public:
    */
   void SetDropZoneLogoVisibility(bool show);
 
-
   /**
    * Set the dropzone string
    * Empty by default
@@ -163,7 +162,6 @@ protected:
   virtual void RenderDropZone()
   {
   }
-
 
   /**
    * Render the filename UI widget
