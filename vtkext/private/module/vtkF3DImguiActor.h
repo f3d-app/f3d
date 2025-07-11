@@ -62,11 +62,6 @@ private:
   void RenderDropZone() override;
 
   /**
-   * Render the logo dropzone UI widget
-   */
-  void RenderDropZoneLogo() override;
-
-  /**
    * Render the filename UI widget
    */
   void RenderFileName() override;

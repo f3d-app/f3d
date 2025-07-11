@@ -27,55 +27,7 @@
 #include <imgui.h>
 
 #include <optional>
-
-#include <fstream>
-#include <iostream>
-#include <string>
-
-#define NANOSVG_IMPLEMENTATION
-#include "nanosvg.h"
-
-// #define STB_IMAGE_RESIZE_IMPLEMENTATION
-// #include "stb_image_resize2.h"
-
-#define NANOSVGRAST_IMPLEMENTATION
-#include "nanosvgrast.h"
-
-unsigned char* LoadSVGToRGBA(const std::string& path, int* outWidth, int* outHeight)
-{
-  // Choose final raster image size
-  const int targetWidth = 256;
-  const int targetHeight = 256;
-  *outWidth = targetWidth;
-  *outHeight = targetHeight;
-  // Load and parse SVG file using NanoSVG
-  NSVGimage* image = nsvgParseFromFile(path.c_str(), "px", 96.0f);  // 96 DPI
-  if (!image)
-  {
-    std::cerr << "Failed to load SVG file: " << path << std::endl;
-    return nullptr;
-  }
-  // Create a raw RGBA buffer to render into (RGBA, 4 channels)
-  unsigned char* rgba = new unsigned char[targetWidth * targetHeight * 4];
-  memset(rgba, 0, targetWidth * targetHeight * 4);
-  // Rasterize using NanoSVG rasterizer
-  NSVGrasterizer* rast = nsvgCreateRasterizer();
-  if (!rast)
-  {
-    std::cerr << "Failed to create NanoSVG rasterizer" << std::endl;
-    nsvgDelete(image);
-    delete[] rgba;
-    return nullptr;
-  }
-  // Rasterize into RGBA buffer
-  nsvgRasterize(rast, image, 0, 0,                      // pos
-                (float)targetWidth / image->width,      // scale
-                rgba, targetWidth, targetHeight, targetWidth * 4);
-  // Cleanup
-  nsvgDeleteRasterizer(rast);
-  nsvgDelete(image);
-  return rgba;  // Caller must delete[] it
-}
+#include "F3DLogoImgui.h"
 
 
 struct vtkF3DImguiActor::Internals
@@ -96,26 +48,6 @@ struct vtkF3DImguiActor::Internals
 
       // Store our identifier
       io.Fonts->SetTexID((ImTextureID)this->FontTexture.Get());
-
-      // Load and Upload LOGO texture
-      int logoWidth = 0;
-      int logoHeight = 0;
-      unsigned char* logoPixels = LoadSVGToRGBA("/Users/medyan/Desktop/projects/open_source/f3d/resources/logo-mono.svg", &logoWidth, &logoHeight);
-      this->logoWidth = logoWidth;
-      this->logoHeight = logoHeight;
-
-      if (logoPixels)
-      {
-        this->LogoTexture = vtkSmartPointer<vtkTextureObject>::New();
-        this->LogoTexture->SetContext(renWin);
-        this->LogoTexture->Create2DFromRaw(
-          logoWidth, logoHeight, 4, VTK_UNSIGNED_CHAR, logoPixels);
-
-        // Free buffer if it was heap-allocated
-        delete[] logoPixels;
-        // Store the logo texture ID somewhere global or accessible
-        this->LogoImTextureID = (ImTextureID)this->LogoTexture.Get();
-      }
 
       // Create VBO
       this->VertexBuffer = vtkSmartPointer<vtkOpenGLBufferObject>::New();
@@ -163,12 +95,6 @@ struct vtkF3DImguiActor::Internals
         io.Fonts->SetTexID(0);
         this->FontTexture->ReleaseGraphicsResources(renWin);
         this->FontTexture = nullptr;
-      }
-
-      if (this->LogoTexture)
-      {
-        this->LogoTexture->ReleaseGraphicsResources(renWin);
-        this->LogoTexture = nullptr;
       }
 
       if (this->VertexBuffer)
@@ -225,6 +151,12 @@ struct vtkF3DImguiActor::Internals
     shift[0] = -(2.f * drawData->DisplayPos.x + drawData->DisplaySize.x) / drawData->DisplaySize.x;
     shift[1] = (2.f * drawData->DisplayPos.y + drawData->DisplaySize.y) / drawData->DisplaySize.y;
 
+    this->FontTexture->Activate();
+
+    this->Program->SetUniform2f("Scale", scale);
+    this->Program->SetUniform2f("Shift", shift);
+    this->Program->SetUniformi("Texture", this->FontTexture->GetTextureUnit());
+
     // Render the UI
     this->VertexArray->Bind();
     this->VertexBuffer->Bind();
@@ -245,17 +177,6 @@ struct vtkF3DImguiActor::Internals
       for (int iCmd = 0; iCmd < cmdList->CmdBuffer.Size; iCmd++)
       {
         const ImDrawCmd* cmd = &cmdList->CmdBuffer[iCmd];
-
-        // Activate texture and set uniforms per draw command:
-        vtkTextureObject* texObj = reinterpret_cast<vtkTextureObject*>(cmd->GetTexID());
-        if (!texObj) texObj = this->FontTexture.Get();  // Fallback if null
-        if (texObj)
-        {
-          texObj->Activate();
-          this->Program->SetUniform2f("Scale", scale);
-          this->Program->SetUniform2f("Shift", shift);
-          this->Program->SetUniformi("Texture", texObj->GetTextureUnit());
-        }
 
         // Project scissor/clipping rectangles into framebuffer space
         ImVec2 clipMin(
@@ -282,18 +203,13 @@ struct vtkF3DImguiActor::Internals
     this->IndexBuffer->Release();
 
     this->FontTexture->Deactivate();
-    this->LogoTexture->Deactivate();
   }
 
   vtkSmartPointer<vtkTextureObject> FontTexture;
-  vtkSmartPointer<vtkTextureObject> LogoTexture;
   vtkSmartPointer<vtkOpenGLVertexArrayObject> VertexArray;
   vtkSmartPointer<vtkOpenGLBufferObject> VertexBuffer;
   vtkSmartPointer<vtkOpenGLBufferObject> IndexBuffer;
   vtkSmartPointer<vtkShaderProgram> Program;
-  int logoWidth = 0;
-  int logoHeight = 0;
-  ImTextureID LogoImTextureID = 0;
 };
 
 namespace
@@ -435,7 +351,9 @@ void vtkF3DImguiActor::RenderDropZone()
     ImGui::Begin("DropZoneText", nullptr, flags);
     /* Use background draw list to prevent "ignoring" NoBringToFrontOnFocus */
     ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
-
+    if (this->DropZoneLogoVisible){
+      add_f3d_logo_to_drawlist(draw_list, viewport->GetWorkCenter().x, viewport->GetWorkCenter().y, 25, color, 5);
+    }
     const ImVec2 p0(dropzonePad, dropzonePad);
     const ImVec2 p1(dropzonePad + dropZoneW, dropzonePad + dropZoneH);
 
@@ -463,37 +381,12 @@ void vtkF3DImguiActor::RenderDropZone()
 
     ImGui::Begin("DropZoneText", nullptr, flags);
     ImGui::SetCursorPos(ImVec2(viewport->GetWorkCenter().x - 0.5f * dropTextSize.x,
-      viewport->GetWorkCenter().y - 0.5f * dropTextSize.y));
+      viewport->GetWorkCenter().y - 0.5f * dropTextSize.y + 150));
     ImGui::TextUnformatted(this->DropText.c_str());
     ImGui::End();
   }
 }
 
-//----------------------------------------------------------------------------
-void vtkF3DImguiActor::RenderDropZoneLogo()
-{
-  if (!this->DropZoneVisible || this->Pimpl->LogoTexture == nullptr)
-  {
-    return;
-  }
-
-  ImGuiViewport* viewport = ImGui::GetMainViewport();
-
-  const ImVec2 logoSize(100, 100); // You can scale this as needed
-  const ImVec2 logoPos(viewport->GetWorkCenter().x - logoSize.x * 0.5f,
-                       viewport->GetWorkCenter().y - logoSize.y * 0.5f - 30.0f); // Slightly above text
-
-  ::SetupNextWindow(logoPos, logoSize);
-  ImGui::SetNextWindowBgAlpha(0.f);
-
-  ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
-    ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove |
-    ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoMouseInputs;
-
-  ImGui::Begin("DropZoneLogo", nullptr, flags);
-  ImGui::Image(this->Pimpl->LogoImTextureID, ImVec2(64, 64));
-  ImGui::End();
-}
 
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderFileName()
