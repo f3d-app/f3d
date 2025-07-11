@@ -149,7 +149,7 @@ jobs:
             usd_version: ${{needs.default_versions.outputs.usd_min_version}}
 
     runs-on: ${{matrix.os}}
-    container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
+    container: ${{ matrix.os == 'ubuntu-22.04' && 'mwestphal/f3d-ci' || null }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -226,7 +226,7 @@ jobs:
             openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
 
     runs-on: ${{matrix.os}}
-    container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
+    container: ${{ matrix.os == 'ubuntu-22.04' && 'mwestphal/f3d-ci' || null }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -322,7 +322,7 @@ jobs:
     if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Fast CI')) || (github.ref == 'refs/heads/master') }}
 
     runs-on: ubuntu-22.04
-    container: ghcr.io/f3d-app/f3d-ci
+    container: mwestphal/f3d-ci
 
     env:
       DISPLAY: :0
@@ -477,7 +477,7 @@ jobs:
             java_version: ${{needs.default_versions.outputs.java_min_version}}
 
     runs-on: ubuntu-22.04
-    container: ghcr.io/f3d-app/f3d-ci
+    container: mwestphal/f3d-ci
 
     env:
       DISPLAY: :0
@@ -641,7 +641,7 @@ jobs:
             python_version: "3.13"
 
     runs-on: ${{matrix.os}}
-    container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
+    container: ${{ matrix.os == 'ubuntu-22.04' && 'mwestphal/f3d-ci' || null }}
 
     env:
       DISPLAY: :0
@@ -678,7 +678,7 @@ jobs:
     if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Coverage cached CI')) || (github.ref == 'refs/heads/master') }}
 
     runs-on: ubuntu-22.04
-    container: ghcr.io/f3d-app/f3d-ci
+    container: mwestphal/f3d-ci
 
     # Add dummy F3D_PLUGINS_PATH for coverage
     env:
@@ -724,7 +724,7 @@ jobs:
         sanitizer_type: [address, thread, undefined]
 
     runs-on: ubuntu-22.04
-    container: ghcr.io/f3d-app/f3d-ci
+    container: mwestphal/f3d-ci
 
     env:
       DISPLAY: :0
@@ -764,7 +764,7 @@ jobs:
       fail-fast: false
 
     runs-on: ubuntu-22.04
-    container: ghcr.io/f3d-app/f3d-ci
+    container: mwestphal/f3d-ci
 
     env:
       CC: clang
@@ -802,7 +802,7 @@ jobs:
       fail-fast: false
 
     runs-on: ubuntu-22.04
-    container: ghcr.io/f3d-app/f3d-ci
+    container: mwestphal/f3d-ci
 
     steps:
       - name: Checkout

@@ -22,7 +22,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/alembic_install
-        key: alembic-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-0
+        key: alembic-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-1
 
     - name: Checkout Alembic
       if: steps.cache-alembic.outputs.cache-hit != 'true'
