@@ -5,6 +5,7 @@
  * @brief   A namespace to parse config files
  */
 #include "F3DOptionsTools.h"
+#include "log.h"
 
 #include <string>
 
@@ -24,8 +25,11 @@ struct ParsedConfigFiles
 /**
  * Read config files using userConfig if any, return a ParsedConfigFiles
  * containing ordered optionDict, ordered imperative optionDict and ordered bindingsEntries
+ * If dryRun is set, config files won't be read
+ * logLevel determines the VerboseLevel of any non-warning/error log calls
  */
-ParsedConfigFiles ReadConfigFiles(const std::string& userConfig);
+ParsedConfigFiles ReadConfigFiles(
+  const std::string& userConfig, bool dryRun, f3d::log::VerboseLevel logLevel);
 }
 
 #endif
