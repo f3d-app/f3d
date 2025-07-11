@@ -491,17 +491,17 @@ void vtkF3DImguiActor::RenderCheatSheet()
     for (const auto& [bind, desc, val] : list)
     {
       ImDrawList* drawList = ImGui::GetWindowDrawList();
-      ImVec4 rec_color, text_color;
+      ImVec4 bindingRectColor, descTextColor;
 
       if (val == "ON")
       {
-        rec_color = F3DImguiStyle::GetHighlightColor();
-        text_color = F3DImguiStyle::GetHighlightColor();
+        bindingRectColor = F3DImguiStyle::GetHighlightColor();
+        descTextColor = F3DImguiStyle::GetHighlightColor();
       }
       else
       {
-        rec_color = F3DImguiStyle::GetMidColor();
-        text_color = F3DImguiStyle::GetTextColor();
+        bindingRectColor = F3DImguiStyle::GetMidColor();
+        descTextColor = F3DImguiStyle::GetTextColor();
       }
 
       drawList->ChannelsSplit(2);
@@ -510,21 +510,23 @@ void vtkF3DImguiActor::RenderCheatSheet()
       ImGui::Text("%s", bind.c_str());
 
       drawList->ChannelsSetCurrent(0);
-      ImVec2 top_corner(ImGui::GetItemRectMin().x - margin, ImGui::GetItemRectMin().y - margin);
-      ImVec2 bottom_corner(ImGui::GetItemRectMin().x + maxBindingTextWidth + margin,
+      ImVec2 topBindingCorner(
+        ImGui::GetItemRectMin().x - margin, ImGui::GetItemRectMin().y - margin);
+      ImVec2 bottomBindingCorner(ImGui::GetItemRectMin().x + maxBindingTextWidth + margin,
         ImGui::GetItemRectMax().y + margin);
-      drawList->AddRectFilled(top_corner, bottom_corner, ImColor(rec_color), 5.f);
+      drawList->AddRectFilled(
+        topBindingCorner, bottomBindingCorner, ImColor(bindingRectColor), 5.f);
       drawList->ChannelsMerge();
 
       ImGui::SameLine();
-      ImGui::SetCursorPosX(bottom_corner.x + ImGui::GetStyle().WindowPadding.x);
+      ImGui::SetCursorPosX(bottomBindingCorner.x + ImGui::GetStyle().WindowPadding.x);
       if (val.empty() || val == "ON" || val == "OFF")
       {
-        ImGui::TextColored(text_color, "%s", desc.c_str());
+        ImGui::TextColored(descTextColor, "%s", desc.c_str());
       }
       else
       {
-        ImGui::TextColored(text_color, "%s [%s]", desc.c_str(), val.c_str());
+        ImGui::TextColored(descTextColor, "%s [%s]", desc.c_str(), val.c_str());
       }
 
       ImGui::NewLine();
