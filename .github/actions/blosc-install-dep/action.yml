@@ -26,7 +26,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/blosc_install
-        key: blosc-${{inputs.version}}-${{zlib_version}}-${{runner.os}}-${{inputs.cpu}}-0
+        key: blosc-${{inputs.version}}-${{inputs.zlib_version}}-${{runner.os}}-${{inputs.cpu}}-0
 
     # Dependents: openvdb vtk
     - name: Checkout blosc
