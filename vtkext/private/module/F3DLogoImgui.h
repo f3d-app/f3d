@@ -1,4 +1,5 @@
-void add_f3d_logo_to_drawlist(ImDrawList* drawlist, const float x, const float y, const float s, const ImU32 color, const float lw){
+void add_f3d_logo_to_drawlist(ImDrawList* drawlist, const float x, const float y, const float s, const ImU32 color, const float lw)
+{
     const ImVec2 pnts0[4] = { {x+s*2.f, y+s*-4.5f}, {x+s*-2.f, y+s*0.5f}, {x+s*-2.f, y+s*-1.5f}, {x+s*2.f, y+s*-4.5f} };
     drawlist->AddPolyline(pnts0, 4, color, 0, lw);
     drawlist->AddConvexPolyFilled(pnts0, 4, color);
