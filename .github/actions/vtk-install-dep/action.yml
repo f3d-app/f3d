@@ -15,6 +15,15 @@ inputs:
   openvdb_version:
     description: "Version of openvdb to build against"
     required: false
+  zlib_version:
+    description: "Version of zlib to build against"
+    required: true
+  blosc_version:
+    description: "Version of blosc to build against"
+    required: true
+  tbb_version:
+    description: "Version of tbb to build against"
+    required: true
 
 runs:
   using: "composite"
@@ -23,13 +32,16 @@ runs:
       shell: bash
       run: |
         [[ "${{ inputs.vtk_version }}" ]] || { echo "vtk_version input is empty" ; exit 1; }
+        [[ "${{ inputs.zlib_version }}" ]] || { echo "zlib_version input is empty" ; exit 1; }
+        [[ "${{ inputs.blosc_version }}" ]] || { echo "blosc_version input is empty" ; exit 1; }
+        [[ "${{ inputs.tbb_version }}" ]] || { echo "tbb_version input is empty" ; exit 1; }
 
     - name: Cache VTK
       id: cache-vtk
       uses: actions/cache/restore@v4
       with:
         path: dependencies/vtk_install
-        key: vtk-${{ inputs.vtk_version }}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.cpu}}-1
+        key: vtk-${{ inputs.vtk_version }}-${{inputs.zlib_version}}-${{inputs.blosc_version}}-${{inputs.tbb_version}}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.cpu}}-1
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'

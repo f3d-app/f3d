@@ -7,6 +7,15 @@ inputs:
   imath_version:
     description: "Version of imath to build"
     required: true
+  zlib_version:
+    description: "Version of zlib to build"
+    required: true
+  blosc_version:
+    description: "Version of blosc to build"
+    required: true
+  tbb_version:
+    description: "Version of tbb to build"
+    required: true
   alembic_version:
     description: "Version of alembic to build"
     required: true
@@ -60,12 +69,18 @@ runs:
         openexr_version: ${{inputs.openexr_version}}
         openvdb_version: ${{inputs.openvdb_version}}
         usd_version: ${{inputs.usd_version}}
+        zlib_version: ${{inputs.zlib_version}}
+        blosc_version: ${{inputs.blosc_version}}
+        tbb_version: ${{inputs.tbb_version}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
       with:
         vtk_version: ${{inputs.vtk_version}}
         openvdb_version: ${{inputs.openvdb_version}}
+        zlib_version: ${{inputs.zlib_version}}
+        blosc_version: ${{inputs.blosc_version}}
+        tbb_version: ${{inputs.tbb_version}}
 
     - name: Setup Build Directory
       shell: bash

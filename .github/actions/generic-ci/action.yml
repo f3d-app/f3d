@@ -42,6 +42,15 @@ inputs:
   imath_version:
     description: "Version of imath to build"
     required: false
+  zlib_version:
+    description: "Version of zlib to build"
+    required: true
+  blosc_version:
+    description: "Version of blosc to build"
+    required: true
+  tbb_version:
+    description: "Version of tbb to build"
+    required: true
   alembic_version:
     description: "Version of alembic to build"
     required: false
@@ -103,6 +112,9 @@ runs:
         openvdb_version: ${{inputs.openvdb_version}}
         pybind11_version: ${{inputs.pybind11_version}}
         usd_version: ${{inputs.usd_version}}
+        zlib_version: ${{inputs.zlib_version}}
+        blosc_version: ${{inputs.blosc_version}}
+        tbb_version: ${{inputs.tbb_version}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
@@ -111,6 +123,9 @@ runs:
         raytracing_label: ${{inputs.raytracing_label}}
         cpu: ${{inputs.cpu}}
         openvdb_version: ${{inputs.openvdb_version}}
+        zlib_version: ${{inputs.zlib_version}}
+        blosc_version: ${{inputs.blosc_version}}
+        tbb_version: ${{inputs.tbb_version}}
 
     - name: Set up Python
       if: |

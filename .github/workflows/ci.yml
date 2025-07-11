@@ -51,28 +51,34 @@ jobs:
     needs: detect_checkboxes
     if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'CI')) || (github.ref == 'refs/heads/master') }}
     outputs:
-      imath_version: ${{ steps.set_default_versions.outputs.imath_version }}
-      imath_min_version: ${{ steps.set_default_versions.outputs.imath_min_version }}
-      alembic_version: ${{ steps.set_default_versions.outputs.alembic_version }}
       alembic_min_version: ${{ steps.set_default_versions.outputs.alembic_min_version }}
-      assimp_version: ${{ steps.set_default_versions.outputs.assimp_version }}
+      alembic_version: ${{ steps.set_default_versions.outputs.alembic_version }}
       assimp_min_version: ${{ steps.set_default_versions.outputs.assimp_min_version }}
-      draco_version: ${{ steps.set_default_versions.outputs.draco_version }}
+      assimp_version: ${{ steps.set_default_versions.outputs.assimp_version }}
+      blosc_min_version: ${{ steps.set_default_versions.outputs.blosc_min_version }}
+      blosc_version: ${{ steps.set_default_versions.outputs.blosc_version }}
       draco_min_version: ${{ steps.set_default_versions.outputs.draco_min_version }}
-      occt_version: ${{ steps.set_default_versions.outputs.occt_version }}
-      occt_min_version: ${{ steps.set_default_versions.outputs.occt_min_version }}
-      openexr_version: ${{ steps.set_default_versions.outputs.openexr_version }}
-      openexr_min_version: ${{ steps.set_default_versions.outputs.openexr_min_version }}
-      openvdb_version: ${{ steps.set_default_versions.outputs.openvdb_version }}
-      openvdb_min_version: ${{ steps.set_default_versions.outputs.openvdb_min_version }}
-      pybind11_version: ${{ steps.set_default_versions.outputs.pybind11_version }}
-      pybind11_min_version: ${{ steps.set_default_versions.outputs.pybind11_min_version }}
-      python_version: ${{ steps.set_default_versions.outputs.python_version }}
-      python_min_version: ${{ steps.set_default_versions.outputs.python_min_version }}
-      usd_version: ${{ steps.set_default_versions.outputs.usd_version }}
-      usd_min_version: ${{ steps.set_default_versions.outputs.usd_min_version }}
-      java_version: ${{ steps.set_default_versions.outputs.java_version }}
+      draco_version: ${{ steps.set_default_versions.outputs.draco_version }}
+      imath_min_version: ${{ steps.set_default_versions.outputs.imath_min_version }}
+      imath_version: ${{ steps.set_default_versions.outputs.imath_version }}
       java_min_version: ${{ steps.set_default_versions.outputs.java_min_version }}
+      java_version: ${{ steps.set_default_versions.outputs.java_version }}
+      occt_min_version: ${{ steps.set_default_versions.outputs.occt_min_version }}
+      occt_version: ${{ steps.set_default_versions.outputs.occt_version }}
+      openexr_min_version: ${{ steps.set_default_versions.outputs.openexr_min_version }}
+      openexr_version: ${{ steps.set_default_versions.outputs.openexr_version }}
+      openvdb_min_version: ${{ steps.set_default_versions.outputs.openvdb_min_version }}
+      openvdb_version: ${{ steps.set_default_versions.outputs.openvdb_version }}
+      pybind11_min_version: ${{ steps.set_default_versions.outputs.pybind11_min_version }}
+      pybind11_version: ${{ steps.set_default_versions.outputs.pybind11_version }}
+      python_min_version: ${{ steps.set_default_versions.outputs.python_min_version }}
+      python_version: ${{ steps.set_default_versions.outputs.python_version }}
+      tbb_min_version: ${{ steps.set_default_versions.outputs.tbb_min_version }}
+      tbb_version: ${{ steps.set_default_versions.outputs.tbb_version }}
+      usd_min_version: ${{ steps.set_default_versions.outputs.usd_min_version }}
+      usd_version: ${{ steps.set_default_versions.outputs.usd_version }}
+      zlib_min_version: ${{ steps.set_default_versions.outputs.zlib_min_version }}
+      zlib_version: ${{ steps.set_default_versions.outputs.zlib_version }}
       vtk_commit_sha: ${{ steps.set_default_versions.outputs.vtk_commit_sha }}
       timestamp: ${{ steps.set_default_versions.outputs.timestamp }}
 
@@ -130,27 +136,33 @@ jobs:
           - cpu: x86_64
           - os: macos-14
             cpu: arm64
-          - imath_version: ${{needs.default_versions.outputs.imath_version}}
           - alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           - assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          - blosc_version: ${{needs.default_versions.outputs.blosc_version}}
           - draco_version: ${{needs.default_versions.outputs.draco_version}}
+          - imath_version: ${{needs.default_versions.outputs.imath_version}}
           - occt_version: ${{needs.default_versions.outputs.occt_version}}
           - openexr_version: ${{needs.default_versions.outputs.openexr_version}}
           - openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
           - pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
+          - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           - usd_version: ${{needs.default_versions.outputs.usd_version}}
+          - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           - build_type: mindeps
             os: ubuntu-22.04
             cpu: x86_64
-            imath_version: ${{needs.default_versions.outputs.imath_min_version}}
             alembic_version: ${{needs.default_versions.outputs.alembic_min_version}}
             assimp_version: ${{needs.default_versions.outputs.assimp_min_version}}
+            blosc_version: ${{needs.default_versions.outputs.blosc_min_version}}
             draco_version: ${{needs.default_versions.outputs.draco_min_version}}
+            imath_version: ${{needs.default_versions.outputs.imath_min_version}}
             occt_version: ${{needs.default_versions.outputs.occt_min_version}}
             openexr_version: ${{needs.default_versions.outputs.openexr_min_version}}
             openvdb_version: ${{needs.default_versions.outputs.openvdb_min_version}}
             pybind11_version: ${{needs.default_versions.outputs.pybind11_min_version}}
+            tbb_version: ${{needs.default_versions.outputs.tbb_min_version}}
             usd_version: ${{needs.default_versions.outputs.usd_min_version}}
+            zlib_version: ${{needs.default_versions.outputs.zlib_min_version}}
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
@@ -167,15 +179,18 @@ jobs:
         with:
           raytracing_label: raytracing
           cpu: ${{matrix.cpu}}
-          imath_version: ${{matrix.imath_version}}
           alembic_version: ${{matrix.alembic_version}}
           assimp_version: ${{matrix.assimp_version}}
+          blosc_version: ${{matrix.blosc_version}}
           draco_version: ${{matrix.draco_version}}
+          imath_version: ${{matrix.imath_version}}
           occt_version: ${{matrix.occt_version}}
           openexr_version: ${{matrix.openexr_version}}
           openvdb_version: ${{matrix.openvdb_version}}
           pybind11_version: ${{matrix.pybind11_version}}
+          tbb_version: ${{matrix.tbb_version}}
           usd_version: ${{matrix.usd_version}}
+          zlib_version: ${{matrix.zlib_version}}
 
   #----------------------------------------------------------------------------
   # Cache VTK Dependency: Checkout and compile VTK if not cached
@@ -209,7 +224,10 @@ jobs:
         include:
           - cpu: x86_64
           - raytracing_label: raytracing
+          - blosc_version: ${{needs.default_versions.outputs.blosc_version}}
           - openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+          - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
+          - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           - os: macos-14
             cpu: arm64
           - build_type: mindeps
@@ -217,18 +235,27 @@ jobs:
             vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             cpu: x86_64
             raytracing_label: raytracing
+            blosc_version: ${{needs.default_versions.outputs.blosc_min_version}}
             openvdb_version: ${{needs.default_versions.outputs.openvdb_min_version}}
+            tbb_version: ${{needs.default_versions.outputs.tbb_min_version}}
+            zlib_version: ${{needs.default_versions.outputs.zlib_min_version}}
           - build_type: no_optional_deps
             os: ubuntu-22.04
             vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             cpu: x86_64
             raytracing_label: no-raytracing
+            blosc_version: ${{needs.default_versions.outputs.blosc_version}}
+            tbb_version: ${{needs.default_versions.outputs.tbb_version}}
+            zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           - build_type: no_raytracing
             os: ubuntu-22.04
             vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             cpu: x86_64
             raytracing_label: no-raytracing
+            blosc_version: ${{needs.default_versions.outputs.blosc_version}}
             openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+            tbb_version: ${{needs.default_versions.outputs.tbb_version}}
+            zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
@@ -253,6 +280,9 @@ jobs:
         with:
           cpu: ${{matrix.cpu}}
           openvdb_version: ${{matrix.openvdb_version}}
+          blosc_version: ${{matrix.blosc_version}}
+          tbb_version: ${{matrix.tbb_version}}
+          zlib_version: ${{matrix.zlib_version}}
 
       - name: Install Raytracing Dependencies
         if: matrix.raytracing_label == 'raytracing'
@@ -266,7 +296,10 @@ jobs:
           vtk_version: ${{matrix.vtk_version}}
           raytracing_label: ${{matrix.raytracing_label}}
           cpu: ${{matrix.cpu}}
+          blosc_version: ${{matrix.blosc_version}}
           openvdb_version: ${{matrix.openvdb_version}}
+          tbb_version: ${{matrix.tbb_version}}
+          zlib_version: ${{matrix.zlib_version}}
 
   #----------------------------------------------------------------------------
   # Windows CI: Build and test, cross-vtk build matrix
@@ -308,17 +341,20 @@ jobs:
           raytracing_label: raytracing
           static_label: ${{matrix.static_label}}
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-          imath_version: ${{needs.default_versions.outputs.imath_version}}
           alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          blosc_version: ${{needs.default_versions.outputs.blosc_version}}
           draco_version: ${{needs.default_versions.outputs.draco_version}}
+          imath_version: ${{needs.default_versions.outputs.imath_version}}
+          java_version: ${{needs.default_versions.outputs.java_version}}
           occt_version: ${{needs.default_versions.outputs.occt_version}}
           openexr_version: ${{needs.default_versions.outputs.openexr_version}}
           openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
           pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
           python_version: ${{needs.default_versions.outputs.python_version}}
+          tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
-          java_version: ${{needs.default_versions.outputs.java_version}}
+          zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
   # Linux fast CI: Build and test a single fast CI
@@ -379,17 +415,20 @@ jobs:
           - optional_deps_label: optional-deps
           - rendering_backend: auto
           - static_label: no-static
-          - imath_version: ${{needs.default_versions.outputs.imath_version}}
           - alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           - assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          - blosc_version: ${{needs.default_versions.outputs.blosc_version}}
           - draco_version: ${{needs.default_versions.outputs.draco_version}}
+          - imath_version: ${{needs.default_versions.outputs.imath_version}}
+          - java_version: ${{needs.default_versions.outputs.java_version}}
           - occt_version: ${{needs.default_versions.outputs.occt_version}}
           - openexr_version: ${{needs.default_versions.outputs.openexr_version}}
           - openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
           - pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
           - python_version: ${{needs.default_versions.outputs.python_version}}
+          - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           - usd_version: ${{needs.default_versions.outputs.usd_version}}
-          - java_version: ${{needs.default_versions.outputs.java_version}}
+          - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           - build_type: egl
             vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             raytracing_label: raytracing
@@ -397,17 +436,20 @@ jobs:
             exclude_deprecated_label: no-exclude-deprecated
             rendering_backend: egl
             static_label: no-static
-            imath_version: ${{needs.default_versions.outputs.imath_version}}
             alembic_version: ${{needs.default_versions.outputs.alembic_version}}
             assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+            blosc_version: ${{needs.default_versions.outputs.blosc_version}}
             draco_version: ${{needs.default_versions.outputs.draco_version}}
+            imath_version: ${{needs.default_versions.outputs.imath_version}}
+            java_version: ${{needs.default_versions.outputs.java_version}}
             occt_version: ${{needs.default_versions.outputs.occt_version}}
             openexr_version: ${{needs.default_versions.outputs.openexr_version}}
             openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
             pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
             python_version: ${{needs.default_versions.outputs.python_version}}
+            tbb_version: ${{needs.default_versions.outputs.tbb_version}}
             usd_version: ${{needs.default_versions.outputs.usd_version}}
-            java_version: ${{needs.default_versions.outputs.java_version}}
+            zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           - build_type: osmesa
             vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             raytracing_label: raytracing
@@ -415,17 +457,20 @@ jobs:
             exclude_deprecated_label: no-exclude-deprecated
             rendering_backend: osmesa
             static_label: no-static
-            imath_version: ${{needs.default_versions.outputs.imath_version}}
             alembic_version: ${{needs.default_versions.outputs.alembic_version}}
             assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+            blosc_version: ${{needs.default_versions.outputs.blosc_version}}
             draco_version: ${{needs.default_versions.outputs.draco_version}}
+            imath_version: ${{needs.default_versions.outputs.imath_version}}
+            java_version: ${{needs.default_versions.outputs.java_version}}
             occt_version: ${{needs.default_versions.outputs.occt_version}}
             openexr_version: ${{needs.default_versions.outputs.openexr_version}}
             openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
             pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
             python_version: ${{needs.default_versions.outputs.python_version}}
+            tbb_version: ${{needs.default_versions.outputs.tbb_version}}
             usd_version: ${{needs.default_versions.outputs.usd_version}}
-            java_version: ${{needs.default_versions.outputs.java_version}}
+            zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           - build_type: exclude_deprecated
             vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             raytracing_label: raytracing
@@ -433,19 +478,25 @@ jobs:
             exclude_deprecated_label: exclude-deprecated
             rendering_backend: auto
             static_label: no-static
-            imath_version: ${{needs.default_versions.outputs.imath_version}}
             alembic_version: ${{needs.default_versions.outputs.alembic_version}}
             assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+            blosc_version: ${{needs.default_versions.outputs.blosc_version}}
             draco_version: ${{needs.default_versions.outputs.draco_version}}
+            imath_version: ${{needs.default_versions.outputs.imath_version}}
+            java_version: ${{needs.default_versions.outputs.java_version}}
             occt_version: ${{needs.default_versions.outputs.occt_version}}
             openexr_version: ${{needs.default_versions.outputs.openexr_version}}
             openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
             pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
             python_version: ${{needs.default_versions.outputs.python_version}}
+            tbb_version: ${{needs.default_versions.outputs.tbb_version}}
             usd_version: ${{needs.default_versions.outputs.usd_version}}
-            java_version: ${{needs.default_versions.outputs.java_version}}
+            zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           - build_type: no_optional_deps
+            blosc_version: ${{needs.default_versions.outputs.blosc_version}}
+            tbb_version: ${{needs.default_versions.outputs.tbb_version}}
             vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
+            zlib_version: ${{needs.default_versions.outputs.zlib_version}}
             raytracing_label: no-raytracing
             optional_deps_label: no-optional-deps
             exclude_deprecated_label: no-exclude-deprecated
@@ -458,17 +509,20 @@ jobs:
             exclude_deprecated_label: no-exclude-deprecated
             rendering_backend: auto
             static_label: static
-            imath_version: ${{needs.default_versions.outputs.imath_version}}
             alembic_version: ${{needs.default_versions.outputs.alembic_version}}
             assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+            blosc_version: ${{needs.default_versions.outputs.blosc_version}}
             draco_version: ${{needs.default_versions.outputs.draco_version}}
+            imath_version: ${{needs.default_versions.outputs.imath_version}}
+            java_version: ${{needs.default_versions.outputs.java_version}}
             occt_version: ${{needs.default_versions.outputs.occt_version}}
             openexr_version: ${{needs.default_versions.outputs.openexr_version}}
             openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
             pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
             python_version: ${{needs.default_versions.outputs.python_version}}
+            tbb_version: ${{needs.default_versions.outputs.tbb_version}}
             usd_version: ${{needs.default_versions.outputs.usd_version}}
-            java_version: ${{needs.default_versions.outputs.java_version}}
+            zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           - build_type: mindeps
             vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             raytracing_label: raytracing
@@ -476,17 +530,20 @@ jobs:
             exclude_deprecated_label: no-exclude-deprecated
             rendering_backend: auto
             static_label: no-static
-            imath_version: ${{needs.default_versions.outputs.imath_min_version}}
             alembic_version: ${{needs.default_versions.outputs.alembic_min_version}}
             assimp_version: ${{needs.default_versions.outputs.assimp_min_version}}
+            blosc_version: ${{needs.default_versions.outputs.blosc_min_version}}
             draco_version: ${{needs.default_versions.outputs.draco_min_version}}
+            imath_version: ${{needs.default_versions.outputs.imath_min_version}}
+            java_version: ${{needs.default_versions.outputs.java_min_version}}
             occt_version: ${{needs.default_versions.outputs.occt_min_version}}
             openexr_version: ${{needs.default_versions.outputs.openexr_min_version}}
             openvdb_version: ${{needs.default_versions.outputs.openvdb_min_version}}
             pybind11_version: ${{needs.default_versions.outputs.pybind11_min_version}}
             python_version: ${{needs.default_versions.outputs.python_min_version}}
+            tbb_version: ${{needs.default_versions.outputs.tbb_min_version}}
             usd_version: ${{needs.default_versions.outputs.usd_min_version}}
-            java_version: ${{needs.default_versions.outputs.java_min_version}}
+            zlib_version: ${{needs.default_versions.outputs.zlib_min_version}}
 
     runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
@@ -513,17 +570,20 @@ jobs:
           exclude_deprecated_label: ${{matrix.exclude_deprecated_label}}
           static_label: ${{matrix.static_label}}
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-          imath_version: ${{matrix.imath_version}}
           alembic_version: ${{matrix.alembic_version}}
           assimp_version: ${{matrix.assimp_version}}
+          blosc_version: ${{matrix.blosc_version}}
           draco_version: ${{matrix.draco_version}}
+          imath_version: ${{matrix.imath_version}}
+          java_version: ${{matrix.java_version}}
           occt_version: ${{matrix.occt_version}}
           openexr_version: ${{matrix.openexr_version}}
           openvdb_version: ${{matrix.openvdb_version}}
           pybind11_version: ${{matrix.pybind11_version}}
           python_version: ${{matrix.python_version}}
+          tbb_version: ${{matrix.tbb_version}}
           usd_version: ${{matrix.usd_version}}
-          java_version: ${{matrix.java_version}}
+          zlib_version: ${{matrix.zlib_version}}
 
   #----------------------------------------------------------------------------
   # MacOS CI: Build and test, cross-vtk build matrix
@@ -562,16 +622,19 @@ jobs:
           raytracing_label: raytracing
           cpu: x86_64
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-          imath_version: ${{needs.default_versions.outputs.imath_version}}
           alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          blosc_version: ${{needs.default_versions.outputs.blosc_version}}
           draco_version: ${{needs.default_versions.outputs.draco_version}}
+          imath_version: ${{needs.default_versions.outputs.imath_version}}
           occt_version: ${{needs.default_versions.outputs.occt_version}}
           openexr_version: ${{needs.default_versions.outputs.openexr_version}}
           openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
           pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
           python_version: ${{needs.default_versions.outputs.python_version}}
+          tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
+          zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
   # MacOS ARM CI: Build and test, cross-vtk build matrix with a few optional builds
@@ -619,16 +682,19 @@ jobs:
           static_label: ${{matrix.static_label}}
           cpu: arm64
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-          imath_version: ${{needs.default_versions.outputs.imath_version}}
           alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          blosc_version: ${{needs.default_versions.outputs.blosc_version}}
           draco_version: ${{needs.default_versions.outputs.draco_version}}
+          imath_version: ${{needs.default_versions.outputs.imath_version}}
           occt_version: ${{needs.default_versions.outputs.occt_version}}
           openexr_version: ${{needs.default_versions.outputs.openexr_version}}
           openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
           pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
           python_version: ${{needs.default_versions.outputs.python_version}}
+          tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
+          zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
   # Python packaging: Build and test the Python wheel
@@ -674,16 +740,19 @@ jobs:
         with:
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
           python_version: ${{matrix.python_version}}
-          imath_version: ${{needs.default_versions.outputs.imath_version}}
           alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          blosc_version: ${{needs.default_versions.outputs.blosc_version}}
           draco_version: ${{needs.default_versions.outputs.draco_version}}
+          imath_version: ${{needs.default_versions.outputs.imath_version}}
           occt_version: ${{needs.default_versions.outputs.occt_version}}
           openexr_version: ${{needs.default_versions.outputs.openexr_version}}
           openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
           pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
+          tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
+          zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
   # Coverage: Build and test on linux with last VTK with coverage option
@@ -714,15 +783,18 @@ jobs:
         with:
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
           codecov_token: ${{secrets.CODECOV_TOKEN}}
-          imath_version: ${{needs.default_versions.outputs.imath_version}}
           alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          blosc_version: ${{needs.default_versions.outputs.blosc_version}}
           draco_version: ${{needs.default_versions.outputs.draco_version}}
+          imath_version: ${{needs.default_versions.outputs.imath_version}}
           occt_version: ${{needs.default_versions.outputs.occt_version}}
           openexr_version: ${{needs.default_versions.outputs.openexr_version}}
           openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+          tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
+          zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
   # Sanitizer: Build and test on linux with last VTK with sanitizer options
@@ -762,13 +834,16 @@ jobs:
         with:
           sanitizer_type: ${{matrix.sanitizer_type}}
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-          imath_version: ${{needs.default_versions.outputs.imath_version}}
           alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          blosc_version: ${{needs.default_versions.outputs.blosc_version}}
           draco_version: ${{needs.default_versions.outputs.draco_version}}
+          imath_version: ${{needs.default_versions.outputs.imath_version}}
           occt_version: ${{needs.default_versions.outputs.occt_version}}
           openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+          tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
+          zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
   # static-analysis: Run static analysis on linux
@@ -800,15 +875,18 @@ jobs:
         uses: ./source/.github/actions/static-analysis-ci
         with:
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-          imath_version: ${{needs.default_versions.outputs.imath_version}}
           alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          blosc_version: ${{needs.default_versions.outputs.blosc_version}}
           draco_version: ${{needs.default_versions.outputs.draco_version}}
+          imath_version: ${{needs.default_versions.outputs.imath_version}}
           occt_version: ${{needs.default_versions.outputs.occt_version}}
           openexr_version: ${{needs.default_versions.outputs.openexr_version}}
           openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+          tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
+          zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
   # external-build: Check build of F3D as sub-project

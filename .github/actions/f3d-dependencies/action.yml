@@ -5,6 +5,9 @@ inputs:
     description: "CPU architecture to build for"
     required: false
     default: "x86_64"
+  tbb_version:
+    description: "Version of tbb to build"
+    required: true
   imath_version:
     description: "Version of imath to build"
     required: false
@@ -89,3 +92,4 @@ runs:
         cpu: ${{inputs.cpu}}
         version: ${{inputs.usd_version}}
         openexr_version: ${{inputs.openexr_version}}
+        tbb_version: ${{inputs.tbb_version}}
