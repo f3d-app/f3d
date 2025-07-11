@@ -461,13 +461,15 @@ void vtkF3DImguiActor::RenderCheatSheet()
       textHeight += ImGui::GetTextLineHeightWithSpacing();
 
       ImVec2 bindingLineSize = ImGui::CalcTextSize(bind.c_str());
-      if (bindingLineSize.x >= maxBindingTextWidth) {
+      if (bindingLineSize.x >= maxBindingTextWidth)
+      {
         maxBindingTextWidth = bindingLineSize.x;
       }
     }
   }
 
-  winWidth += 2.f * ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().ScrollbarSize + maxBindingTextWidth * 0.5f;
+  winWidth += 2.f * ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().ScrollbarSize +
+    maxBindingTextWidth * 0.5f;
   textHeight += 2.f * ImGui::GetStyle().WindowPadding.y;
 
   const float winTop = std::max(margin, (viewport->WorkSize.y - textHeight) * 0.5f);
@@ -488,13 +490,16 @@ void vtkF3DImguiActor::RenderCheatSheet()
     ImGui::SeparatorText(group.c_str());
     for (const auto& [bind, desc, val] : list)
     {
-      ImDrawList *drawList = ImGui::GetWindowDrawList();
+      ImDrawList* drawList = ImGui::GetWindowDrawList();
       ImVec4 rec_color, text_color;
 
-      if(val == "ON") {
+      if (val == "ON")
+      {
         rec_color = F3DImguiStyle::GetHighlightColor();
-        text_color = F3DImguiStyle::GetHighlightColor();  
-      } else {
+        text_color = F3DImguiStyle::GetHighlightColor();
+      }
+      else
+      {
         rec_color = F3DImguiStyle::GetMidColor();
         text_color = F3DImguiStyle::GetTextColor();
       }
@@ -503,10 +508,11 @@ void vtkF3DImguiActor::RenderCheatSheet()
 
       drawList->ChannelsSetCurrent(1);
       ImGui::Text("%s", bind.c_str());
-      
+
       drawList->ChannelsSetCurrent(0);
       ImVec2 top_corner(ImGui::GetItemRectMin().x - margin, ImGui::GetItemRectMin().y - margin);
-      ImVec2 bottom_corner(ImGui::GetItemRectMin().x + maxBindingTextWidth + margin, ImGui::GetItemRectMax().y + margin);
+      ImVec2 bottom_corner(ImGui::GetItemRectMin().x + maxBindingTextWidth + margin,
+        ImGui::GetItemRectMax().y + margin);
       drawList->AddRectFilled(top_corner, bottom_corner, ImColor(rec_color), 5.f);
       drawList->ChannelsMerge();
 
@@ -515,7 +521,9 @@ void vtkF3DImguiActor::RenderCheatSheet()
       if (val.empty() || val == "ON" || val == "OFF")
       {
         ImGui::TextColored(text_color, "%s", desc.c_str());
-      } else {  
+      }
+      else
+      {
         ImGui::TextColored(text_color, "%s [%s]", desc.c_str(), val.c_str());
       }
 
