@@ -467,7 +467,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
     }
   }
 
-  winWidth += 2.f * ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().ScrollbarSize + maxBindingTextWidth;
+  winWidth += 2.f * ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().ScrollbarSize + maxBindingTextWidth * 0.5f;
   textHeight += 2.f * ImGui::GetStyle().WindowPadding.y;
 
   const float winTop = std::max(margin, (viewport->WorkSize.y - textHeight) * 0.5f);
