@@ -352,7 +352,8 @@ void vtkF3DImguiActor::RenderDropZone()
     ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
 
     // Add the logo
-    if (this->DropZoneLogoVisible){
+    if (this->DropZoneLogoVisible)
+    {
       add_f3d_logo_to_drawlist(draw_list, viewport->GetWorkCenter().x, viewport->GetWorkCenter().y, 25, color, 5);
     }
 
