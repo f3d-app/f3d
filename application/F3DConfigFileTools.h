@@ -25,6 +25,8 @@ struct ParsedConfigFiles
 /**
  * Read config files using userConfig if any, return a ParsedConfigFiles
  * containing ordered optionDict, ordered imperative optionDict and ordered bindingsEntries
+ * If dryRun is set, config files won't be read
+ * logLevel determines the VerboseLevel of any non-warning/error log calls
  */
 ParsedConfigFiles ReadConfigFiles(
   const std::string& userConfig, bool dryRun, f3d::log::VerboseLevel logLevel);
