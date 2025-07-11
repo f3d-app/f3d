@@ -2,6 +2,7 @@
 
 #include "F3DFontBuffer.h"
 #include "F3DImguiStyle.h"
+#include "F3DLogoImgui.h"
 #include "vtkF3DImguiConsole.h"
 #include "vtkF3DImguiFS.h"
 #include "vtkF3DImguiVS.h"
@@ -27,8 +28,6 @@
 #include <imgui.h>
 
 #include <optional>
-#include "F3DLogoImgui.h"
-
 
 struct vtkF3DImguiActor::Internals
 {
@@ -351,9 +350,12 @@ void vtkF3DImguiActor::RenderDropZone()
     ImGui::Begin("DropZoneText", nullptr, flags);
     /* Use background draw list to prevent "ignoring" NoBringToFrontOnFocus */
     ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
+
+    // Add the logo
     if (this->DropZoneLogoVisible){
       add_f3d_logo_to_drawlist(draw_list, viewport->GetWorkCenter().x, viewport->GetWorkCenter().y, 25, color, 5);
     }
+
     const ImVec2 p0(dropzonePad, dropzonePad);
     const ImVec2 p1(dropzonePad + dropZoneW, dropzonePad + dropZoneH);
 
@@ -386,7 +388,6 @@ void vtkF3DImguiActor::RenderDropZone()
     ImGui::End();
   }
 }
-
 
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderFileName()
