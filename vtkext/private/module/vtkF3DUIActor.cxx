@@ -144,11 +144,6 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
   if (this->DropZoneVisible)
   {
     this->RenderDropZone();
-
-    if (this->DropZoneLogoVisible)
-    {
-      this->RenderDropZoneLogo();
-    }
   }
 
   if (this->FileNameVisible)
