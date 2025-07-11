@@ -13,7 +13,7 @@
     "occt": "V7_9_1",
     "openexr": "v3.3.4",
     "openvdb": "v12.0.1",
-    "pybind11": "v2.13.6",
+    "pybind11": "v3.0.0",
     "python": "3.13",
     "usd": "v25.05.01",
     "java": "21"
