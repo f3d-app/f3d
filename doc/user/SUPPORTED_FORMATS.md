@@ -73,7 +73,6 @@ For booleans, 0 means false, not 0 means true. Unsigned int will interpret anyth
 
 - Models texture are loaded with a simple PBR lighting (diffuse color only, no specular, index of refraction set to 1.0).
 - Selecting `skin` is not supported.
-- Loading `groupskin` is not supported.
 - Animation frames are split based on their names, eg: `stand1`, `stand2`, `stand3`, `run1`, `run2`, `run3`.
 
 ### 3D Gaussian splatting
