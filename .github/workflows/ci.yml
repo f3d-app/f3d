@@ -96,6 +96,10 @@ jobs:
         with:
           file: ./source/.github/workflows/versions.json
 
+      - name: echo tbb 
+        shell: bash
+        run: echo ===${{ steps.set_default_versions.outputs.tbb_version }}---
+
   #----------------------------------------------------------------------------
   # Cache LFS: Checkout LFS data and update the cache to limit LFS bandwidth
   #----------------------------------------------------------------------------
