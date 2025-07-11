@@ -51,6 +51,8 @@ jobs:
     needs: detect_checkboxes
     if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'CI')) || (github.ref == 'refs/heads/master') }}
     outputs:
+      imath_version: ${{ steps.set_default_versions.outputs.imath_version }}
+      imath_min_version: ${{ steps.set_default_versions.outputs.imath_min_version }}
       alembic_version: ${{ steps.set_default_versions.outputs.alembic_version }}
       alembic_min_version: ${{ steps.set_default_versions.outputs.alembic_min_version }}
       assimp_version: ${{ steps.set_default_versions.outputs.assimp_version }}
@@ -128,6 +130,7 @@ jobs:
           - cpu: x86_64
           - os: macos-14
             cpu: arm64
+          - imath_version: ${{needs.default_versions.outputs.imath_version}}
           - alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           - assimp_version: ${{needs.default_versions.outputs.assimp_version}}
           - draco_version: ${{needs.default_versions.outputs.draco_version}}
@@ -139,6 +142,7 @@ jobs:
           - build_type: mindeps
             os: ubuntu-22.04
             cpu: x86_64
+            imath_version: ${{needs.default_versions.outputs.imath_min_version}}
             alembic_version: ${{needs.default_versions.outputs.alembic_min_version}}
             assimp_version: ${{needs.default_versions.outputs.assimp_min_version}}
             draco_version: ${{needs.default_versions.outputs.draco_min_version}}
@@ -163,6 +167,7 @@ jobs:
         with:
           raytracing_label: raytracing
           cpu: ${{matrix.cpu}}
+          imath_version: ${{matrix.imath_version}}
           alembic_version: ${{matrix.alembic_version}}
           assimp_version: ${{matrix.assimp_version}}
           draco_version: ${{matrix.draco_version}}
@@ -303,6 +308,7 @@ jobs:
           raytracing_label: raytracing
           static_label: ${{matrix.static_label}}
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+          imath_version: ${{needs.default_versions.outputs.imath_version}}
           alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           assimp_version: ${{needs.default_versions.outputs.assimp_version}}
           draco_version: ${{needs.default_versions.outputs.draco_version}}
@@ -373,6 +379,7 @@ jobs:
           - optional_deps_label: optional-deps
           - rendering_backend: auto
           - static_label: no-static
+          - imath_version: ${{needs.default_versions.outputs.imath_version}}
           - alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           - assimp_version: ${{needs.default_versions.outputs.assimp_version}}
           - draco_version: ${{needs.default_versions.outputs.draco_version}}
@@ -390,6 +397,7 @@ jobs:
             exclude_deprecated_label: no-exclude-deprecated
             rendering_backend: egl
             static_label: no-static
+            imath_version: ${{needs.default_versions.outputs.imath_version}}
             alembic_version: ${{needs.default_versions.outputs.alembic_version}}
             assimp_version: ${{needs.default_versions.outputs.assimp_version}}
             draco_version: ${{needs.default_versions.outputs.draco_version}}
@@ -407,6 +415,7 @@ jobs:
             exclude_deprecated_label: no-exclude-deprecated
             rendering_backend: osmesa
             static_label: no-static
+            imath_version: ${{needs.default_versions.outputs.imath_version}}
             alembic_version: ${{needs.default_versions.outputs.alembic_version}}
             assimp_version: ${{needs.default_versions.outputs.assimp_version}}
             draco_version: ${{needs.default_versions.outputs.draco_version}}
@@ -424,6 +433,7 @@ jobs:
             exclude_deprecated_label: exclude-deprecated
             rendering_backend: auto
             static_label: no-static
+            imath_version: ${{needs.default_versions.outputs.imath_version}}
             alembic_version: ${{needs.default_versions.outputs.alembic_version}}
             assimp_version: ${{needs.default_versions.outputs.assimp_version}}
             draco_version: ${{needs.default_versions.outputs.draco_version}}
@@ -448,6 +458,7 @@ jobs:
             exclude_deprecated_label: no-exclude-deprecated
             rendering_backend: auto
             static_label: static
+            imath_version: ${{needs.default_versions.outputs.imath_version}}
             alembic_version: ${{needs.default_versions.outputs.alembic_version}}
             assimp_version: ${{needs.default_versions.outputs.assimp_version}}
             draco_version: ${{needs.default_versions.outputs.draco_version}}
@@ -465,6 +476,7 @@ jobs:
             exclude_deprecated_label: no-exclude-deprecated
             rendering_backend: auto
             static_label: no-static
+            imath_version: ${{needs.default_versions.outputs.imath_min_version}}
             alembic_version: ${{needs.default_versions.outputs.alembic_min_version}}
             assimp_version: ${{needs.default_versions.outputs.assimp_min_version}}
             draco_version: ${{needs.default_versions.outputs.draco_min_version}}
@@ -501,6 +513,7 @@ jobs:
           exclude_deprecated_label: ${{matrix.exclude_deprecated_label}}
           static_label: ${{matrix.static_label}}
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+          imath_version: ${{matrix.imath_version}}
           alembic_version: ${{matrix.alembic_version}}
           assimp_version: ${{matrix.assimp_version}}
           draco_version: ${{matrix.draco_version}}
@@ -549,6 +562,7 @@ jobs:
           raytracing_label: raytracing
           cpu: x86_64
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+          imath_version: ${{needs.default_versions.outputs.imath_version}}
           alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           assimp_version: ${{needs.default_versions.outputs.assimp_version}}
           draco_version: ${{needs.default_versions.outputs.draco_version}}
@@ -605,6 +619,7 @@ jobs:
           static_label: ${{matrix.static_label}}
           cpu: arm64
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+          imath_version: ${{needs.default_versions.outputs.imath_version}}
           alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           assimp_version: ${{needs.default_versions.outputs.assimp_version}}
           draco_version: ${{needs.default_versions.outputs.draco_version}}
@@ -659,6 +674,7 @@ jobs:
         with:
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
           python_version: ${{matrix.python_version}}
+          imath_version: ${{needs.default_versions.outputs.imath_version}}
           alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           assimp_version: ${{needs.default_versions.outputs.assimp_version}}
           draco_version: ${{needs.default_versions.outputs.draco_version}}
@@ -698,6 +714,7 @@ jobs:
         with:
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
           codecov_token: ${{secrets.CODECOV_TOKEN}}
+          imath_version: ${{needs.default_versions.outputs.imath_version}}
           alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           assimp_version: ${{needs.default_versions.outputs.assimp_version}}
           draco_version: ${{needs.default_versions.outputs.draco_version}}
@@ -745,6 +762,7 @@ jobs:
         with:
           sanitizer_type: ${{matrix.sanitizer_type}}
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+          imath_version: ${{needs.default_versions.outputs.imath_version}}
           alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           assimp_version: ${{needs.default_versions.outputs.assimp_version}}
           draco_version: ${{needs.default_versions.outputs.draco_version}}
@@ -782,6 +800,7 @@ jobs:
         uses: ./source/.github/actions/static-analysis-ci
         with:
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+          imath_version: ${{needs.default_versions.outputs.imath_version}}
           alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           assimp_version: ${{needs.default_versions.outputs.assimp_version}}
           draco_version: ${{needs.default_versions.outputs.draco_version}}

@@ -10,6 +10,7 @@
     "alembic": "1.8.8",
     "assimp": "v6.0.1",
     "draco": "1.5.7",
+    "imath": "v3.1.12",
     "occt": "V7_9_0",
     "openexr": "v3.3.3",
     "openvdb": "v12.0.1",
@@ -22,6 +23,7 @@
     "alembic": "1.8.5",
     "assimp": "v5.4.0",
     "draco": "1.5.6",
+    "imath": "v3.0.1",
     "occt": "V7_6_3",
     "openexr": "v3.0.1",
     "openvdb": "v12.0.0",
@@ -31,5 +33,5 @@
     "java": "17"
   },
   "vtk_commit_sha": "6ad1aadbfd484044f33b5d89b0eec56c9a5d8178",
-  "timestamp": "20250703_0"
+  "timestamp": "20250711_0"
 }

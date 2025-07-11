@@ -5,6 +5,9 @@ inputs:
     description: "CPU architecture to build for"
     required: false
     default: "x86_64"
+  imath_version:
+    description: "Version of imath to build"
+    required: false
   alembic_version:
     description: "Version of alembic to build"
     required: false
@@ -52,9 +55,11 @@ runs:
         version: ${{inputs.draco_version}}
 
     - name: Install Imath dependency
+      if: inputs.imath_version != ''
       uses: ./source/.github/actions/imath-install-dep
       with:
         cpu: ${{inputs.cpu}}
+        version: ${{inputs.imath_version}}
 
     - name: Install OpenEXR dependency
       if: inputs.openexr_version != ''
@@ -69,6 +74,7 @@ runs:
       with:
         cpu: ${{inputs.cpu}}
         version: ${{inputs.alembic_version}}
+        imath_version: ${{inputs.imath_version}}
 
     - name: Install pybind11 dependency
       if: inputs.pybind11_version != ''
