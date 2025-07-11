@@ -48,6 +48,17 @@ public:
     SSAA
   };
 
+  /**
+   * Enum listing possible rotation modes.
+   */
+  enum RotationAxis
+  {
+    FREE,
+    X_AXIS,
+    Y_AXIS,
+    Z_AXIS
+  };
+
   ///@{
   /**
    * Set visibility of different actors
@@ -126,6 +137,12 @@ public:
   ///@}
 
   /**
+   * Set/Get RotationAxis
+   */
+  void SetRotationAxis(RotationAxis axis);  
+  vtkGetMacro(RotationMode, RotationAxis);
+
+   /**
    * Reimplemented to configure:
    *  - ActorsProperties
    *  - Timer
@@ -562,6 +579,7 @@ private:
   std::optional<bool> UseOrthographicProjection = false;
   bool UseTrackball = false;
   bool InvertZoom = false;
+  RotationAxis RotationMode = RotationAxis::FREE;
 
   int RaytracingSamples = 0;
   double UpVector[3] = { 0.0, 1.0, 0.0 };

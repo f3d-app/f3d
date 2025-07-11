@@ -115,7 +115,7 @@ public:
    * Set temporary up vector to support rolled camera interaction.
    */
   void SetTemporaryUp(const double* tempUp);
-
+  
 protected:
   /**
    * Overridden to support being disabled
@@ -123,6 +123,13 @@ protected:
   void Dolly(double factor) override;
 
   bool CameraMovementDisabled = false;
+
+  /**
+   * Scene axes
+   */
+  double SceneUp[3] = { 0.0, 1.0, 0.0 };
+  double SceneRight[3] = { 1.0, 0.0, 0.0 };
+  double SceneForward[3] = { 0.0, 0.0, -1.0 };
 
   /**
    * Decrement `TemporaryUpFactor` by `factorDelta`

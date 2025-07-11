@@ -1205,6 +1205,9 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "O"}, "toggle model.point_sprites.enable","Scene", std::bind(docTgl, "Toggle point sprites rendering", std::cref(opts.model.point_sprites.enable)));
   this->addBinding({mod_t::NONE, "U"}, "toggle render.background.blur.enable","Scene", std::bind(docTgl, "Toggle blur background", std::cref(opts.render.background.blur.enable)));
   this->addBinding({mod_t::NONE, "K"}, "toggle interactor.trackball","Scene", std::bind(docTgl, "Toggle trackball interaction", std::cref(opts.interactor.trackball)));
+  this->addBinding({mod_t::CTRL, "X"}, "toggle interactor.lock_axis.x", "Scene", std::bind(docTgl, "Toggle x axis lock", std::cref(opts.interactor.lock_axis.x)));
+  this->addBinding({mod_t::CTRL, "Y"}, "toggle interactor.lock_axis.y", "Scene", std::bind(docTgl, "Toggle y axis lock", std::cref(opts.interactor.lock_axis.y)));
+  this->addBinding({mod_t::CTRL, "Z"}, "toggle interactor.lock_axis.z", "Scene", std::bind(docTgl, "Toggle z axis lock", std::cref(opts.interactor.lock_axis.z)));
   this->addBinding({mod_t::NONE, "F"}, "toggle render.hdri.ambient","Scene", std::bind(docTgl, "Toggle HDRI ambient lighting", std::cref(opts.render.hdri.ambient)));
   this->addBinding({mod_t::NONE, "J"}, "toggle render.background.skybox","Scene", std::bind(docTgl, "Toggle HDRI skybox", std::cref(opts.render.background.skybox)));
   this->addBinding({mod_t::NONE, "L"}, "increase_light_intensity", "Scene", std::bind(docDbl, "Increase lights intensity", std::cref(opts.render.light.intensity)));

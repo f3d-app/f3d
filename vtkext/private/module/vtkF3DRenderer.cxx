@@ -1655,6 +1655,16 @@ void vtkF3DRenderer::SetUseTrackball(bool use)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetRotationAxis(RotationAxis axis)
+{
+  if (this->RotationMode != axis)
+  {
+    this->RotationMode = axis;
+    this->CheatSheetConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::UpdateActors()
 {
   assert(this->Importer);

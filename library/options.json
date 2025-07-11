@@ -328,6 +328,20 @@
     "invert_zoom": {
       "type": "bool",
       "default_value": "false"
+    },
+    "lock_axis": {
+      "x": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "y": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "z": {
+        "type": "bool",
+        "default_value": "false"
+      }
     }
   }
 }
