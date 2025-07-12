@@ -179,72 +179,43 @@ void vtkF3DInteractorStyle::Rotate()
     vtkNew<vtkTransform> Transform;
     const double* fp = camera->GetFocalPoint();
     double newPos[3];
-    double newViewUp[3];
-    switch (ren->GetRotationMode())
+    if (ren->GetUseRotationAxis())
     {
-      case vtkF3DRenderer::RotationAxis::X_AXIS:
-        // Rotate camera around the focal point about the scene's up vector
-        Transform->Identity();
-        Transform->Translate(+fp[0], +fp[1], +fp[2]);
-        Transform->RotateWXYZ(rxf, this->SceneUp);
-        Transform->Translate(-fp[0], -fp[1], -fp[2]);
+      Transform->Identity();
+      Transform->Translate(+fp[0], +fp[1], +fp[2]);
+      Transform->RotateWXYZ(ren->GetMovementVector()[0] * rxf + ren->GetMovementVector()[1] * ryf,
+        ren->GetRotationVector());
+      Transform->Translate(-fp[0], -fp[1], -fp[2]);
 
-        Transform->TransformPoint(camera->GetPosition(), newPos);
-        camera->SetPosition(newPos);
+      Transform->TransformPoint(camera->GetPosition(), newPos);
+      camera->SetPosition(newPos);
 
-        Transform->TransformVector(camera->GetViewUp(), newViewUp);
-        camera->SetViewUp(newViewUp);
-        break;
-
-      case vtkF3DRenderer::RotationAxis::Y_AXIS:
-        // Rotate camera around the focal point about the scene's right vector
-        Transform->Identity();
-        Transform->Translate(+fp[0], +fp[1], +fp[2]);
-        Transform->RotateWXYZ(-ryf, this->SceneRight);
-        Transform->Translate(-fp[0], -fp[1], -fp[2]);
-
-        Transform->TransformPoint(camera->GetPosition(), newPos);
-        camera->SetPosition(newPos);
-
-        Transform->TransformVector(camera->GetViewUp(), newViewUp);
-        camera->SetViewUp(newViewUp);
-        break;
-
-      case vtkF3DRenderer::RotationAxis::Z_AXIS:
-        // Rotate camera around the focal point about the scene's forward vector
-        Transform->Identity();
-        Transform->Translate(+fp[0], +fp[1], +fp[2]);
-        Transform->RotateWXYZ(rxf, this->SceneForward);
-        Transform->Translate(-fp[0], -fp[1], -fp[2]);
-
-        Transform->TransformPoint(camera->GetPosition(), newPos);
-        camera->SetPosition(newPos);
-
-        Transform->TransformVector(camera->GetViewUp(), newViewUp);
-        camera->SetViewUp(newViewUp);
-        break;
-
-      case vtkF3DRenderer::RotationAxis::FREE:
-        // Rotate camera around the focal point about the environment's up vector
-        Transform->Identity();
-        Transform->Translate(+fp[0], +fp[1], +fp[2]);
-        Transform->RotateWXYZ(rxf, ren->GetUpVector());
-        Transform->Translate(-fp[0], -fp[1], -fp[2]);
-
-        Transform->TransformPoint(camera->GetPosition(), newPos);
-        camera->SetPosition(newPos);
-
-        // Clamp parameter to `camera->Elevation()` to maintain -90 < elevation < +90
-        constexpr double maxAbsElevation = 90 - 1e-10;
-        const double elevation = vtkMath::DegreesFromRadians(
-          vtkMath::AngleBetweenVectors(ren->GetUpVector(), camera->GetDirectionOfProjection()) -
-          vtkMath::Pi() / 2);
-        camera->Elevation(
-          std::clamp(ryf, -maxAbsElevation - elevation, +maxAbsElevation - elevation));
-
-        camera->SetViewUp(up);
-        break;
+      double newViewUp[3];
+      Transform->TransformVector(camera->GetViewUp(), newViewUp);
+      camera->SetViewUp(newViewUp);
     }
+    else
+    {
+      // Rotate camera around the focal point about the environment's up vector
+      Transform->Identity();
+      Transform->Translate(+fp[0], +fp[1], +fp[2]);
+      Transform->RotateWXYZ(rxf, ren->GetUpVector());
+      Transform->Translate(-fp[0], -fp[1], -fp[2]);
+
+      Transform->TransformPoint(camera->GetPosition(), newPos);
+      camera->SetPosition(newPos);
+
+      // Clamp parameter to `camera->Elevation()` to maintain -90 < elevation < +90
+      constexpr double maxAbsElevation = 90 - 1e-10;
+      const double elevation = vtkMath::DegreesFromRadians(
+        vtkMath::AngleBetweenVectors(ren->GetUpVector(), camera->GetDirectionOfProjection()) -
+        vtkMath::Pi() / 2);
+      camera->Elevation(
+        std::clamp(ryf, -maxAbsElevation - elevation, +maxAbsElevation - elevation));
+
+      camera->SetViewUp(up);
+    }
+
     camera->OrthogonalizeViewUp();
   }
   else

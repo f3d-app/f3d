@@ -125,13 +125,6 @@ protected:
   bool CameraMovementDisabled = false;
 
   /**
-   * Scene axes
-   */
-  double SceneUp[3] = { 0.0, 1.0, 0.0 };
-  double SceneRight[3] = { 1.0, 0.0, 0.0 };
-  double SceneForward[3] = { 0.0, 0.0, -1.0 };
-
-  /**
    * Decrement `TemporaryUpFactor` by `factorDelta`
    * and use it to interpolate `output` between `TemporaryUp` and `target`.
    */

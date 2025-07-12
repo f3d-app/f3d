@@ -341,6 +341,9 @@ void vtkF3DRenderer::InitializeUpVector(const std::vector<double>& upVec)
   this->RightVector[0] = right[0];
   this->RightVector[1] = right[1];
   this->RightVector[2] = right[2];
+  this->FrontVector[0] = front[0];
+  this->FrontVector[1] = front[1];
+  this->FrontVector[2] = front[2];
 
   double pos[3];
   vtkMath::Cross(this->UpVector, this->RightVector, pos);
@@ -1660,7 +1663,37 @@ void vtkF3DRenderer::SetRotationAxis(RotationAxis axis)
   if (this->RotationMode != axis)
   {
     this->RotationMode = axis;
+    this->UseRotationAxis = (axis != vtkF3DRenderer::RotationAxis::FREE);
     this->CheatSheetConfigured = false;
+
+    const double* sourceVector = nullptr;
+    double movement[2] = {};
+
+    if (axis == vtkF3DRenderer::RotationAxis::FREE)
+    {
+      return;
+    }
+    else if (axis == vtkF3DRenderer::RotationAxis::X_AXIS)
+    {
+      sourceVector = this->UpVector;
+      movement[0] = 1;
+    }
+    else if (axis == vtkF3DRenderer::RotationAxis::Y_AXIS)
+    {
+      sourceVector = this->RightVector;
+      movement[1] = -1;
+    }
+    else if (axis == vtkF3DRenderer::RotationAxis::Z_AXIS)
+    {
+      sourceVector = this->FrontVector;
+      movement[0] = -1;
+    }
+
+    this->RotationVector[0] = sourceVector[0];
+    this->RotationVector[1] = sourceVector[1];
+    this->RotationVector[2] = sourceVector[2];
+    this->MovementVector[0] = movement[0];
+    this->MovementVector[1] = movement[1];
   }
 }
 
