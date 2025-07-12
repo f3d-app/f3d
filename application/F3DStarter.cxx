@@ -911,16 +911,13 @@ public:
   }
 
   // Recover a vector of unique parent paths from a vector of paths
-  static std::vector<fs::path> ParentPaths(const std::vector<fs::path>& paths)
+  static std::set<fs::path> ParentPaths(const std::vector<fs::path>& paths)
   {
-    std::vector<fs::path> parents;
+    std::set<fs::path> parents;
     for (const auto& tmpPath : paths)
     {
       fs::path parentPath = tmpPath.parent_path();
-      if (std::find(parents.begin(), parents.end(), tmpPath) == parents.end())
-      {
-        parents.emplace_back(parentPath);
-      }
+      parents.insert(parentPath);
     }
     return parents;
   }
@@ -943,13 +940,14 @@ public:
   F3DConfigFileTools::BindingsEntries ConfigBindingsEntries;
   std::unique_ptr<f3d::engine> Engine;
   std::vector<std::pair<std::string, std::vector<fs::path>>> FilesGroups;
-  std::vector<fs::path> LoadedFiles;
+  std::vector<fs::path> LoadedFiles; // vector of LoadedFiles, successful or not
   int CurrentFilesGroupIndex = -1;
+  bool CurrentSceneEmpty = true;
 
 #if F3D_MODULE_DMON
   // dmon related
   std::mutex LoadedFilesMutex;
-  std::vector<dmon_watch_id> FolderWatchIds;
+  std::map<fs::path, dmon_watch_id> FolderWatchIds;
 #endif
 
   // Event loop atomics
@@ -1235,7 +1233,8 @@ int F3DStarter::Start(int argc, char** argv)
     // Render and compare with file if needed
     if (!reference.empty())
     {
-      if (this->Internals->LoadedFiles.empty() && !noDataForceRender.has_value())
+      if ((this->Internals->LoadedFiles.empty() || this->Internals->CurrentSceneEmpty) &&
+        !noDataForceRender.has_value())
       {
         f3d::log::error("No file loaded, no rendering performed");
         return EXIT_FAILURE;
@@ -1318,7 +1317,8 @@ int F3DStarter::Start(int argc, char** argv)
     // Render to file if needed
     else if (!output.empty())
     {
-      if (this->Internals->LoadedFiles.empty() && !noDataForceRender.has_value())
+      if ((this->Internals->LoadedFiles.empty() || this->Internals->CurrentSceneEmpty) &&
+        !noDataForceRender.has_value())
       {
         f3d::log::error("No files loaded, no rendering performed");
         return EXIT_FAILURE;
@@ -1487,7 +1487,6 @@ void F3DStarter::LoadFileGroup(
   // Recover file information
   f3d::scene& scene = this->Internals->Engine->getScene();
   bool unsupported = false;
-  bool invalid = false;
 
   std::vector<fs::path> localPaths;
   try
@@ -1501,6 +1500,7 @@ void F3DStarter::LoadFileGroup(
     {
       scene.clear();
       this->Internals->LoadedFiles.clear();
+      this->Internals->CurrentSceneEmpty = true;
     }
 
     if (paths.empty())
@@ -1569,8 +1569,14 @@ void F3DStarter::LoadFileGroup(
 
       if (!localPaths.empty())
       {
+        // Update loaded files before trying to add them
+        std::copy(
+          localPaths.begin(), localPaths.end(), std::back_inserter(this->Internals->LoadedFiles));
+
         // Add files to the scene
         scene.add(localPaths);
+
+        this->Internals->CurrentSceneEmpty = false;
 
         if (this->Internals->AppOptions.AnimationTime.has_value())
         {
@@ -1578,10 +1584,6 @@ void F3DStarter::LoadFileGroup(
             "Loading animation time: ", this->Internals->AppOptions.AnimationTime.value());
           scene.loadAnimationTime(this->Internals->AppOptions.AnimationTime.value());
         }
-
-        // Update loaded files
-        std::copy(
-          localPaths.begin(), localPaths.end(), std::back_inserter(this->Internals->LoadedFiles));
       }
     }
   }
@@ -1592,13 +1594,13 @@ void F3DStarter::LoadFileGroup(
     {
       f3d::log::error("  ", tmpPath.string());
     }
-    invalid = true;
+    this->Internals->CurrentSceneEmpty = true;
   }
 
   std::string filenameInfo;
-  if (this->Internals->LoadedFiles.size() > 0)
+  if (!this->Internals->CurrentSceneEmpty)
   {
-    // Loaded files, create a filename info like this:
+    // Scene is not empty, create a filename info like this:
     // "(1/5) cow.vtp + N [+UNSUPPORTED]"
     filenameInfo = groupIdx + " " + this->Internals->LoadedFiles.at(0).filename().string();
     if (this->Internals->LoadedFiles.size() > 1)
@@ -1609,44 +1611,45 @@ void F3DStarter::LoadFileGroup(
     {
       filenameInfo += " [+UNSUPPORTED]";
     }
+  }
 
 #if F3D_MODULE_DMON
-    // Update dmon watch logic
-    if (this->Internals->AppOptions.Watch)
-    {
-      // Always unwatch and watch current folder, even on reload
-      for (const auto& dmonId : this->Internals->FolderWatchIds)
-      {
-        if (dmonId.id > 0)
-        {
-          dmon_unwatch(dmonId);
-        }
-      }
-      this->Internals->FolderWatchIds.clear();
+  // Update dmon watch logic
+  if (this->Internals->AppOptions.Watch)
+  {
+    // Recover all parents paths in a set
+    std::set<fs::path> parentPaths = F3DInternals::ParentPaths(this->Internals->LoadedFiles);
 
-      for (const auto& parentPath : F3DInternals::ParentPaths(this->Internals->LoadedFiles))
+    // Unwatch and erase paths that should not be watched anymore
+    for (auto it = this->Internals->FolderWatchIds.begin();
+         it != this->Internals->FolderWatchIds.end();)
+    {
+      const fs::path& path = it->first;
+      const dmon_watch_id& dmonId = it->second;
+      if (dmonId.id > 0 && parentPaths.count(path) == 0)
       {
-        this->Internals->FolderWatchIds.emplace_back(
+        f3d::log::debug("Stopped watching: ", path.string());
+        dmon_unwatch(dmonId);
+        it = this->Internals->FolderWatchIds.erase(it);
+      }
+      else
+      {
+        it++;
+      }
+    }
+
+    // Watch any not yet watched paths
+    for (const auto& parentPath : parentPaths)
+    {
+      if (this->Internals->FolderWatchIds.count(parentPath) == 0)
+      {
+        f3d::log::debug("Started watching: ", parentPath.string());
+        this->Internals->FolderWatchIds.emplace(parentPath,
           dmon_watch(parentPath.string().c_str(), &F3DInternals::dmonFolderChanged, 0, this));
       }
     }
+  }
 #endif
-  }
-  else
-  {
-    // No files loaded, create a simple filename info like this:
-    // (1/5) cow.vtt [UNSUPPORTED]/[INVALID]
-    // (1/1) cow.vtt [+UNSUPPORTED]/[+INVALID]
-    if (unsupported || invalid)
-    {
-      filenameInfo = groupIdx + " " + paths.at(0).filename().string() + " [";
-      if (paths.size() > 1)
-      {
-        filenameInfo += "+";
-      }
-      filenameInfo += invalid ? "INVALID]" : "UNSUPPORTED]";
-    }
-  }
 
   if (!this->Internals->AppOptions.NoRender)
   {
@@ -1671,7 +1674,7 @@ void F3DStarter::LoadFileGroup(
   // but there is no way to detect if an option has been set
   // by the user or not.
   f3d::options& options = this->Internals->Engine->getOptions();
-  options.ui.dropzone = this->Internals->LoadedFiles.empty();
+  options.ui.dropzone = this->Internals->CurrentSceneEmpty;
   options.ui.filename_info = filenameInfo;
 }
 
