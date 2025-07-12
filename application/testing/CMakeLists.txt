@@ -1047,7 +1047,7 @@ if (F3D_MODULE_TINYFILEDIALOGS)
   f3d_test(NAME TestInteractionFileOpen INTERACTION NO_BASELINE ENV CTEST_OPEN_DIALOG_FILE=${F3D_SOURCE_DIR}/testing/data/cow.vtp)
 endif ()
 
-if(F3D_MODULE_DMON
+if(F3D_MODULE_DMON)
   f3d_test(NAME TestInteractionVerboseWatchUnwatch ARGS --watch --verbose DATA cow.vtp multi/dragon.vtu NO_BASELINE INTERACTION REGEXP "Stopped watching") #Right
 endif()
 
