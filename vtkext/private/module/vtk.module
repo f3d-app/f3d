@@ -23,6 +23,7 @@ PRIVATE_DEPENDS
 OPTIONAL_DEPENDS
   VTK::opengl
   VTK::RenderingRayTracing
+  VTK::RenderingGridAxes
 TEST_DEPENDS
   VTK::IOGeometry
   VTK::IOPLY
