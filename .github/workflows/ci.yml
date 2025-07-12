@@ -360,7 +360,7 @@ jobs:
   # Linux fast CI: Build and test a single fast CI
   #----------------------------------------------------------------------------
   linux_fast:
-    needs: [cache_lfs, detect_checkboxes]
+    needs: [cache_lfs, default_versions, detect_checkboxes]
     if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'Fast CI')) || (github.ref == 'refs/heads/master') }}
 
     runs-on: ubuntu-22.04
@@ -381,13 +381,17 @@ jobs:
         uses: ./source/.github/actions/generic-ci
         with:
           build_type: fast
-          vtk_version: v9.5.0
           raytracing_label: no-raytracing
           rendering_backend: auto
           optional_deps_label: no-optional-deps
           exclude_deprecated_label: exclude-deprecated
           static_label: no-static
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+          blosc_version: ${{needs.default_versions.blosc_version}}
+          tbb_version: ${{needs.default_versions.tbb_version}}
+          vtk_version: v9.5.0
+          zlib_version: ${{needs.default_versions.zlib_version}}
+
 
   #----------------------------------------------------------------------------
   # Linux CI: Build and test, cross-vtk build matrix
