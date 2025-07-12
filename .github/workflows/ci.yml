@@ -920,7 +920,6 @@ jobs:
           vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
-
   #----------------------------------------------------------------------------
   # Check android/wasm docker images
   #----------------------------------------------------------------------------
