@@ -392,7 +392,6 @@ jobs:
           vtk_version: v9.5.0
           zlib_version: ${{needs.default_versions.zlib_version}}
 
-
   #----------------------------------------------------------------------------
   # Linux CI: Build and test, cross-vtk build matrix
   #----------------------------------------------------------------------------
