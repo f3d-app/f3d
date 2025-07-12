@@ -387,10 +387,10 @@ jobs:
           exclude_deprecated_label: exclude-deprecated
           static_label: no-static
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
-          blosc_version: ${{needs.default_versions.blosc_version}}
-          tbb_version: ${{needs.default_versions.tbb_version}}
+          blosc_version: ${{needs.default_versions.outputs.blosc_version}}
+          tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           vtk_version: v9.5.0
-          zlib_version: ${{needs.default_versions.zlib_version}}
+          zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
   # Linux CI: Build and test, cross-vtk build matrix
