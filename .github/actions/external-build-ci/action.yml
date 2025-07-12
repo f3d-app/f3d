@@ -39,6 +39,9 @@ runs:
       uses: ./source/f3d/.github/actions/vtk-dependencies
       with:
         source_dir: ./source/f3d
+        blosc_version: ${{inputs.blosc_version}}
+        tbb_version: ${{inputs.tbb_version}}
+        zlib_version: ${{inputs.zlib_version}}
 
     - name: Install VTK dependency
       uses: ./source/f3d/.github/actions/vtk-install-dep
