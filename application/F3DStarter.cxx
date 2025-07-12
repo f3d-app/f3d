@@ -911,16 +911,13 @@ public:
   }
 
   // Recover a vector of unique parent paths from a vector of paths
-  static std::vector<fs::path> ParentPaths(const std::vector<fs::path>& paths)
+  static std::set<fs::path> ParentPaths(const std::vector<fs::path>& paths)
   {
-    std::vector<fs::path> parents;
+    std::set<fs::path> parents;
     for (const auto& tmpPath : paths)
     {
       fs::path parentPath = tmpPath.parent_path();
-      if (std::find(parents.begin(), parents.end(), tmpPath) == parents.end())
-      {
-        parents.emplace_back(parentPath);
-      }
+      parents.insert(parentPath);
     }
     return parents;
   }
@@ -950,7 +947,7 @@ public:
 #if F3D_MODULE_DMON
   // dmon related
   std::mutex LoadedFilesMutex;
-  std::vector<dmon_watch_id> FolderWatchIds;
+  std::map<fs::path, dmon_watch_id> FolderWatchIds;
 #endif
 
   // Event loop atomics
@@ -1618,20 +1615,35 @@ void F3DStarter::LoadFileGroup(
   // Update dmon watch logic
   if (this->Internals->AppOptions.Watch)
   {
-    // Always unwatch and watch current folder, even on reload
-    for (const auto& dmonId : this->Internals->FolderWatchIds)
+    // Recover all parents paths in a set
+    std::set<fs::path> parentPaths = F3DInternals::ParentPaths(this->Internals->LoadedFiles);
+
+    // Unwatch and erase paths that should not be watched anymore
+    for (auto it = this->Internals->FolderWatchIds.begin(); it != this->Internals->FolderWatchIds.end();)
     {
-      if (dmonId.id > 0)
+      const fs::path& path = it->first;
+      const dmon_watch_id& dmonId = it->second;
+      if (dmonId.id > 0 && parentPaths.count(path) == 0)
       {
+        f3d::log::debug("Stopped watching: ", path.string());
         dmon_unwatch(dmonId);
+        it = this->Internals->FolderWatchIds.erase(it);
+      }
+      else
+      {
+        it++;
       }
     }
-    this->Internals->FolderWatchIds.clear();
 
-    for (const auto& parentPath : F3DInternals::ParentPaths(this->Internals->LoadedFiles))
+    // Watch any not yet watched paths
+    for (const auto& parentPath : parentPaths)
     {
-      this->Internals->FolderWatchIds.emplace_back(
-        dmon_watch(parentPath.string().c_str(), &F3DInternals::dmonFolderChanged, 0, this));
+      if (this->Internals->FolderWatchIds.count(parentPath) == 0)
+      {
+        f3d::log::debug("Started watching: ", parentPath.string());
+        this->Internals->FolderWatchIds.emplace(parentPath,
+          dmon_watch(parentPath.string().c_str(), &F3DInternals::dmonFolderChanged, 0, this));
+      }
     }
   }
 #endif
