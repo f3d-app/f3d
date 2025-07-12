@@ -556,7 +556,7 @@ private:
   bool GridVisible = false;
   bool GridAbsolute = false;
   bool AxisVisible = false;
-  [[maybe_unused]] bool AxesGridVisible = false;
+  bool AxesGridVisible = false;
   std::optional<bool> EdgeVisible;
   bool TimerVisible = false;
   bool FilenameVisible = false;
