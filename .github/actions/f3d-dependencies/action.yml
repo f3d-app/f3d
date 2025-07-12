@@ -5,12 +5,6 @@ inputs:
     description: "CPU architecture to build for"
     required: false
     default: "x86_64"
-  tbb_version:
-    description: "Version of tbb to build"
-    required: true
-  imath_version:
-    description: "Version of imath to build"
-    required: false
   alembic_version:
     description: "Version of alembic to build"
     required: false
@@ -19,6 +13,9 @@ inputs:
     required: false
   draco_version:
     description: "Version of draco to build"
+    required: false
+  imath_version:
+    description: "Version of imath to build"
     required: false
   occt_version:
     description: "Version of occt to build"
@@ -29,6 +26,9 @@ inputs:
   pybind11_version:
     description: "Version of pybind11 to build"
     required: false
+  tbb_version:
+    description: "Version of tbb to build"
+    required: true
   usd_version:
     description: "Version of usd to build"
     required: false

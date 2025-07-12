@@ -9,18 +9,18 @@ inputs:
     description: "Source directory for actions"
     required: false
     default: "./source"
-  zlib_version:
-    description: "Version of zlib to build"
-    required: true
   blosc_version:
     description: "Version of blosc to build"
-    required: true
-  tbb_version:
-    description: "Version of tbb to build"
     required: true
   openvdb_version:
     description: "Version of openvdb to build"
     required: false
+  tbb_version:
+    description: "Version of tbb to build"
+    required: true
+  zlib_version:
+    description: "Version of zlib to build"
+    required: true
 
 runs:
   using: "composite"
@@ -57,6 +57,6 @@ runs:
       with:
         cpu: ${{inputs.cpu}}
         version: ${{inputs.openvdb_version}}
-        zlib_version: ${{inputs.zlib_version}}
         blosc_version: ${{inputs.blosc_version}}
         tbb_version: ${{inputs.tbb_version}}
+        zlib_version: ${{inputs.zlib_version}}

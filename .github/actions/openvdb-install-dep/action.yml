@@ -8,14 +8,14 @@ inputs:
   version:
     description: "Version of openvdb to build"
     required: true
-  zlib_version:
-    description: "Version of zlib to build against"
-    required: true
   blosc_version:
     description: "Version of blosc to build against"
     required: true
   tbb_version:
     description: "Version of tbb to build against"
+    required: true
+  zlib_version:
+    description: "Version of zlib to build against"
     required: true
 
 runs:
@@ -25,9 +25,9 @@ runs:
       shell: bash
       run: |
         [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
-        [[ "${{ inputs.zlib_version }}" ]] || { echo "zlib_version input is empty" ; exit 1; }
         [[ "${{ inputs.blosc_version }}" ]] || { echo "blosc_version input is empty" ; exit 1; }
         [[ "${{ inputs.tbb_version }}" ]] || { echo "tbb_version input is empty" ; exit 1; }
+        [[ "${{ inputs.zlib_version }}" ]] || { echo "zlib_version input is empty" ; exit 1; }
 
     - name: Cache OpenVDB
       id: cache-openvdb
