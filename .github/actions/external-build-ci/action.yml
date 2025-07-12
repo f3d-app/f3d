@@ -1,8 +1,17 @@
 name: "External build CI"
 description: "External build CI"
 inputs:
+  blosc_version:
+    description: "Version of blosc to build"
+    required: true
+  tbb_version:
+    description: "Version of tbb to build"
+    required: true
   vtk_version:
     description: "Version of vtk to build"
+    required: true
+  zlib_version:
+    description: "Version of zlib to build"
     required: true
 
 runs:
@@ -30,11 +39,17 @@ runs:
       uses: ./source/f3d/.github/actions/vtk-dependencies
       with:
         source_dir: ./source/f3d
+        blosc_version: ${{inputs.blosc_version}}
+        tbb_version: ${{inputs.tbb_version}}
+        zlib_version: ${{inputs.zlib_version}}
 
     - name: Install VTK dependency
       uses: ./source/f3d/.github/actions/vtk-install-dep
       with:
+        blosc_version: ${{inputs.blosc_version}}
+        tbb_version: ${{inputs.tbb_version}}
         vtk_version: ${{inputs.vtk_version}}
+        zlib_version: ${{inputs.zlib_version}}
 
     - name: Setup Build Directory
       shell: bash

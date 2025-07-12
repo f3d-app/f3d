@@ -5,16 +5,24 @@ inputs:
     description: "CPU architecture to build for"
     required: false
     default: "x86_64"
+  version:
+    description: "Version of zlib to build"
+    required: true
 
 runs:
   using: "composite"
   steps:
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+
     - name: Cache zlib
       id: cache-zlib
       uses: actions/cache/restore@v4
       with:
         path: dependencies/zlib_install
-        key: zlib-v1.3.1-${{runner.os}}-${{inputs.cpu}}-4
+        key: zlib-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-4
 
     # Dependents: blosc openvdb vtk
     - name: Checkout zlib
@@ -23,7 +31,7 @@ runs:
       with:
         repository: madler/zlib
         path: "./dependencies/zlib"
-        ref: v1.3.1
+        ref: ${{inputs.version}}
 
     - name: Setup zlib
       if: steps.cache-zlib.outputs.cache-hit != 'true'
