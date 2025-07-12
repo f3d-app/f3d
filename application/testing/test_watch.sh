@@ -11,6 +11,7 @@ tmp_dir=$3
 
 hires_data=$data_dir/cow.vtp
 lowres_data=$data_dir/cowlow.vtp
+invalid_data=$data_dir/invalid.vtp
 reloaded_data=$tmp_dir/cow.vtp
 
 cp $hires_data $reloaded_data
@@ -25,6 +26,8 @@ function cleanup()
 }
 trap "cleanup" EXIT
 
+sleep 3
+cp $invalid_data $reloaded_data
 sleep 3
 cp $lowres_data $reloaded_data
 sleep 3

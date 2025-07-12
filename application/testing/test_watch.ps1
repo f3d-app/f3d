@@ -8,6 +8,7 @@ $tmp_dir = $args[2]
 
 $hires_data = "$data_dir/cow.vtp"
 $lowres_data = "$data_dir/cowlow.vtp"
+$invalid_data = "$data_dir/invalid.vtp"
 $reloaded_data = "$tmp_dir/cow.vtp"
 
 Copy-Item $hires_data -Destination $reloaded_data
@@ -15,6 +16,8 @@ Copy-Item $hires_data -Destination $reloaded_data
 $log = "$tmp_dir/output.log"
 $id = (Start-Process -FilePath $f3d_cmd -ArgumentList "--watch --verbose $reloaded_data" -RedirectStandardOutput $log -PassThru).Id
 
+Start-Sleep -Seconds 3
+Copy-Item $invalid_data -Destination $reloaded_data
 Start-Sleep -Seconds 3
 Copy-Item $lowres_data -Destination $reloaded_data
 Start-Sleep -Seconds 3
