@@ -70,6 +70,7 @@ runs:
       with:
         cpu: ${{inputs.cpu}}
         version: ${{inputs.openexr_version}}
+        imath_version: ${{inputs.imath_version}}
 
     - name: Install Alembic dependency
       if: inputs.alembic_version != ''
