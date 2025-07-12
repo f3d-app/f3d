@@ -1233,7 +1233,8 @@ int F3DStarter::Start(int argc, char** argv)
     // Render and compare with file if needed
     if (!reference.empty())
     {
-      if ((this->Internals->LoadedFiles.empty() || this->Internals->CurrentSceneEmpty) && !noDataForceRender.has_value())
+      if ((this->Internals->LoadedFiles.empty() || this->Internals->CurrentSceneEmpty) &&
+        !noDataForceRender.has_value())
       {
         f3d::log::error("No file loaded, no rendering performed");
         return EXIT_FAILURE;
@@ -1316,7 +1317,8 @@ int F3DStarter::Start(int argc, char** argv)
     // Render to file if needed
     else if (!output.empty())
     {
-      if ((this->Internals->LoadedFiles.empty() || this->Internals->CurrentSceneEmpty) && !noDataForceRender.has_value())
+      if ((this->Internals->LoadedFiles.empty() || this->Internals->CurrentSceneEmpty) &&
+        !noDataForceRender.has_value())
       {
         f3d::log::error("No files loaded, no rendering performed");
         return EXIT_FAILURE;
@@ -1619,7 +1621,8 @@ void F3DStarter::LoadFileGroup(
     std::set<fs::path> parentPaths = F3DInternals::ParentPaths(this->Internals->LoadedFiles);
 
     // Unwatch and erase paths that should not be watched anymore
-    for (auto it = this->Internals->FolderWatchIds.begin(); it != this->Internals->FolderWatchIds.end();)
+    for (auto it = this->Internals->FolderWatchIds.begin();
+      it != this->Internals->FolderWatchIds.end();)
     {
       const fs::path& path = it->first;
       const dmon_watch_id& dmonId = it->second;
