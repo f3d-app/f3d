@@ -915,7 +915,11 @@ jobs:
       - name: External build CI
         uses: ./source/f3d/.github/actions/external-build-ci
         with:
+          blosc_version: ${{needs.default_versions.outputs.blosc_version}}
+          tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
+          zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+
 
   #----------------------------------------------------------------------------
   # Check android/wasm docker images
