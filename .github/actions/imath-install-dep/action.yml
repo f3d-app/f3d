@@ -24,7 +24,7 @@ runs:
         path: dependencies/imath_install
         key: imath-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-0
 
-    # Dependents: alembic
+    # Dependents: alembic openexr
     - name: Checkout Imath
       if: steps.cache-imath.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
