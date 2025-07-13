@@ -1,0 +1,12 @@
+diff --git a/ThirdParty/libproj/vtklibproj/src/proj_json_streaming_writer.hpp b/ThirdParty/libproj/vtklibproj/src/proj_json_streaming_writer.hpp
+index 6267684218..cf19b83af4 100644
+--- a/ThirdParty/libproj/vtklibproj/src/proj_json_streaming_writer.hpp
++++ b/ThirdParty/libproj/vtklibproj/src/proj_json_streaming_writer.hpp
+@@ -31,6 +31,7 @@
+ 
+ /*! @cond Doxygen_Suppress */
+ 
++#include <cstdint>
+ #include <vector>
+ #include <string>
+ 
