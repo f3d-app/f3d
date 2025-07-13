@@ -19,8 +19,14 @@ inputs:
   assimp_version:
     description: "Version of assimp to build"
     required: false
+  blosc_version:
+    description: "Version of blosc to build"
+    required: true
   draco_version:
     description: "Version of draco to build"
+    required: false
+  imath_version:
+    description: "Version of imath to build"
     required: false
   occt_version:
     description: "Version of occt to build"
@@ -34,9 +40,15 @@ inputs:
   pybind11_version:
     description: "Version of pybind11 to build"
     required: false
+  tbb_version:
+    description: "Version of tbb to build"
+    required: true
   usd_version:
     description: "Version of usd to build"
     required: false
+  zlib_version:
+    description: "Version of zlib to build"
+    required: true
 
 runs:
   using: "composite"
@@ -53,7 +65,10 @@ runs:
       uses: ./source/.github/actions/vtk-dependencies
       with:
         cpu: ${{inputs.cpu}}
+        blosc_version: ${{inputs.blosc_version}}
         openvdb_version: ${{inputs.openvdb_version}}
+        tbb_version: ${{inputs.tbb_version}}
+        zlib_version: ${{inputs.zlib_version}}
 
     - name: Install Raytracing Dependencies
       if: inputs.raytracing_label == 'raytracing'
@@ -69,7 +84,9 @@ runs:
         alembic_version: ${{inputs.alembic_version}}
         assimp_version: ${{inputs.assimp_version}}
         draco_version: ${{inputs.draco_version}}
+        imath_version: ${{inputs.imath_version}}
         occt_version: ${{inputs.occt_version}}
         openexr_version: ${{inputs.openexr_version}}
         pybind11_version: ${{inputs.pybind11_version}}
+        tbb_version: ${{inputs.tbb_version}}
         usd_version: ${{inputs.usd_version}}

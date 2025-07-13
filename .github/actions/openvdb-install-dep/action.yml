@@ -8,6 +8,15 @@ inputs:
   version:
     description: "Version of openvdb to build"
     required: true
+  blosc_version:
+    description: "Version of blosc to build against"
+    required: true
+  tbb_version:
+    description: "Version of tbb to build against"
+    required: true
+  zlib_version:
+    description: "Version of zlib to build against"
+    required: true
 
 runs:
   using: "composite"
@@ -16,15 +25,18 @@ runs:
       shell: bash
       run: |
         [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+        [[ "${{ inputs.blosc_version }}" ]] || { echo "blosc_version input is empty" ; exit 1; }
+        [[ "${{ inputs.tbb_version }}" ]] || { echo "tbb_version input is empty" ; exit 1; }
+        [[ "${{ inputs.zlib_version }}" ]] || { echo "zlib_version input is empty" ; exit 1; }
 
     - name: Cache OpenVDB
       id: cache-openvdb
       uses: actions/cache/restore@v4
       with:
         path: dependencies/openvdb_install
-        key: openvdb-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-0
+        key: openvdb-${{inputs.version}}-${{inputs.zlib_version}}-${{inputs.blosc_version}}-${{inputs.tbb_version}}-${{runner.os}}-${{inputs.cpu}}-0
 
-    # Dependents (not version): vtk
+    # Dependents: vtk
     - name: Checkout OpenVDB
       if: steps.cache-openvdb.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
