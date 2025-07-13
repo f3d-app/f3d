@@ -1625,9 +1625,9 @@ void F3DStarter::LoadFileGroup(
       filenameInfo += " [+UNSUPPORTED]";
     }
   }
-  else
+  else if (!groupIdx.empty())
   {
-    // Scene is empty, create a filename info like this:
+    // Scene is empty but groupIdx were not, create a filename info like this:
     // "(1/5) [EMPTY]"
     filenameInfo = groupIdx + " [EMPTY]";
   }

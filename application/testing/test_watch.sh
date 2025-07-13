@@ -14,7 +14,7 @@ lowres_data=$data_dir/cowlow.vtp
 invalid_data=$data_dir/invalid.vtp
 reloaded_data=$tmp_dir/cow.vtp
 
-rm $reloaded_data
+rm -rf $reloaded_data
 
 log=$tmp_dir/output.log
 $f3d_cmd --watch --verbose $reloaded_data > $log &
