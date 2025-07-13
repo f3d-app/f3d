@@ -916,8 +916,7 @@ public:
     std::set<fs::path> parents;
     for (const auto& tmpPath : paths)
     {
-      fs::path parentPath = tmpPath.parent_path();
-      parents.insert(parentPath);
+      parents.insert(tmpPath.parent_path());
     }
     return parents;
   }
