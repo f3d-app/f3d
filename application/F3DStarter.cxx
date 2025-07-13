@@ -1588,16 +1588,16 @@ void F3DStarter::LoadFileGroup(
         // Add files to the scene
         scene.add(localPaths);
 
-        // Update loaded files
-        std::copy(
-          localPaths.begin(), localPaths.end(), std::back_inserter(this->Internals->LoadedFiles));
-
         if (this->Internals->AppOptions.AnimationTime.has_value())
         {
           f3d::log::debug(
             "Loading animation time: ", this->Internals->AppOptions.AnimationTime.value());
           scene.loadAnimationTime(this->Internals->AppOptions.AnimationTime.value());
         }
+
+        // Update loaded files
+        std::copy(
+          localPaths.begin(), localPaths.end(), std::back_inserter(this->Internals->LoadedFiles));
       }
     }
   }
@@ -1847,7 +1847,6 @@ void F3DStarter::EventLoop()
 {
   if (this->Internals->ReloadFileRequested)
   {
-    std::cout << "ReloadFileRequested" << std::endl;
     this->LoadRelativeFileGroup(0, true, true);
     this->Internals->ReloadFileRequested = false;
   }
