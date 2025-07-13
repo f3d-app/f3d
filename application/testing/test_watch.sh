@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Test the watch feature by opening a file
-# rewriting it and checking the the file has been
-# automatically reloaded
+# Test the watch feature by opening an innexistent file
+# rewriting it as invalid, rewriting as lower resolution
+# and checking the the file has been automatically reloaded
 
 set -euo pipefail
 f3d_cmd=$1
@@ -14,7 +14,7 @@ lowres_data=$data_dir/cowlow.vtp
 invalid_data=$data_dir/invalid.vtp
 reloaded_data=$tmp_dir/cow.vtp
 
-cp $hires_data $reloaded_data
+rm $reloaded_data
 
 log=$tmp_dir/output.log
 $f3d_cmd --watch --verbose $reloaded_data > $log &
@@ -26,10 +26,12 @@ function cleanup()
 }
 trap "cleanup" EXIT
 
-sleep 3
+sleep 1
+cp $hires_data $reloaded_data
+sleep 1
 cp $invalid_data $reloaded_data
-sleep 3
+sleep 1
 cp $lowres_data $reloaded_data
-sleep 3
+sleep 1
 
 grep -q "Number of points: 634" $log

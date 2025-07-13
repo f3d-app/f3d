@@ -243,10 +243,10 @@ public:
     dmon_watch_id, dmon_action, const char*, const char* filename, const char*, void* userData)
   {
     F3DStarter* self = reinterpret_cast<F3DStarter*>(userData);
-    const std::lock_guard<std::mutex> lock(self->Internals->LoadedFilesMutex);
-    if (std::find_if(self->Internals->LoadedFiles.begin(), self->Internals->LoadedFiles.end(),
+    const std::lock_guard<std::mutex> lock(self->Internals->FilesToWatchMutex);
+    if (std::find_if(self->Internals->FilesToWatch.begin(), self->Internals->FilesToWatch.end(),
           [&](const auto& path)
-          { return path.filename() == filename; }) != self->Internals->LoadedFiles.end())
+          { return path.filename() == filename; }) != self->Internals->FilesToWatch.end())
     {
       self->Internals->ReloadFileRequested = true;
     }
@@ -910,8 +910,8 @@ public:
     }
   }
 
-  // Recover a vector of unique parent paths from a vector of paths
-  static std::set<fs::path> ParentPaths(const std::vector<fs::path>& paths)
+  // Recover a set of parent paths from paths
+  template <typename T> static std::set<fs::path> ParentPaths(const T& paths)
   {
     std::set<fs::path> parents;
     for (const auto& tmpPath : paths)
@@ -939,13 +939,13 @@ public:
   F3DConfigFileTools::BindingsEntries ConfigBindingsEntries;
   std::unique_ptr<f3d::engine> Engine;
   std::vector<std::pair<std::string, std::vector<fs::path>>> FilesGroups;
-  std::vector<fs::path> LoadedFiles; // vector of LoadedFiles, successful or not
+  std::vector<fs::path> LoadedFiles;
+  std::set<fs::path> FilesToWatch;
   int CurrentFilesGroupIndex = -1;
-  bool CurrentSceneEmpty = true;
 
 #if F3D_MODULE_DMON
   // dmon related
-  std::mutex LoadedFilesMutex;
+  std::mutex FilesToWatchMutex;
   std::map<fs::path, dmon_watch_id> FolderWatchIds;
 #endif
 
@@ -1232,7 +1232,7 @@ int F3DStarter::Start(int argc, char** argv)
     // Render and compare with file if needed
     if (!reference.empty())
     {
-      if ((this->Internals->LoadedFiles.empty() || this->Internals->CurrentSceneEmpty) &&
+      if (this->Internals->LoadedFiles.empty() &&
         !noDataForceRender.has_value())
       {
         f3d::log::error("No file loaded, no rendering performed");
@@ -1316,7 +1316,7 @@ int F3DStarter::Start(int argc, char** argv)
     // Render to file if needed
     else if (!output.empty())
     {
-      if ((this->Internals->LoadedFiles.empty() || this->Internals->CurrentSceneEmpty) &&
+      if (this->Internals->LoadedFiles.empty() &&
         !noDataForceRender.has_value())
       {
         f3d::log::error("No files loaded, no rendering performed");
@@ -1492,14 +1492,14 @@ void F3DStarter::LoadFileGroup(
   {
 #if F3D_MODULE_DMON
     // In the main thread, we only need to guard writing
-    const std::lock_guard<std::mutex> lock(this->Internals->LoadedFilesMutex);
+    const std::lock_guard<std::mutex> lock(this->Internals->FilesToWatchMutex);
 #endif
 
     if (clear)
     {
       scene.clear();
       this->Internals->LoadedFiles.clear();
-      this->Internals->CurrentSceneEmpty = true;
+      this->Internals->FilesToWatch.clear();
     }
 
     if (paths.empty())
@@ -1534,48 +1534,64 @@ void F3DStarter::LoadFileGroup(
         if (std::find(this->Internals->LoadedFiles.begin(), this->Internals->LoadedFiles.end(),
               tmpPath) == this->Internals->LoadedFiles.end())
         {
-          if (scene.supports(tmpPath))
+          // Always add files to the watch set
+          if (this->Internals->AppOptions.Watch)
           {
-            // Check the size of the file before loading it
-            static constexpr int BYTES_IN_MIB = 1048576;
-            if (this->Internals->AppOptions.MaxSize.has_value() &&
-              fs::file_size(tmpPath) >
-                static_cast<std::uintmax_t>(
-                  this->Internals->AppOptions.MaxSize.value() * BYTES_IN_MIB))
+            this->Internals->FilesToWatch.insert(tmpPath);
+          }
+
+          try
+          {
+            if (!fs::exists(tmpPath))
             {
-              f3d::log::info(tmpPath.string(), " skipped, file is bigger than max size");
+              f3d::log::error(tmpPath.string(), " does not exist");
+            }
+            else if (scene.supports(tmpPath))
+            {
+              // Check the size of the file before loading it
+              static constexpr int BYTES_IN_MIB = 1048576;
+              if (this->Internals->AppOptions.MaxSize.has_value() &&
+                fs::file_size(tmpPath) >
+                  static_cast<std::uintmax_t>(
+                    this->Internals->AppOptions.MaxSize.value() * BYTES_IN_MIB))
+              {
+                f3d::log::info(tmpPath.string(), " skipped, file is bigger than max size");
+              }
+              else
+              {
+                localPaths.emplace_back(tmpPath);
+              }
             }
             else
             {
-              localPaths.emplace_back(tmpPath);
+              auto forceReader = this->Internals->LibOptions.scene.force_reader;
+              if (forceReader)
+              {
+                f3d::log::warn("Forced reader ", *forceReader, " doesn't exist");
+              }
+              else
+              {
+                f3d::log::warn(tmpPath.string(), " is not a file of a supported file format");
+              }
+              unsupported = true;
             }
           }
-          else
+          catch (const fs::filesystem_error& ex)
           {
-            auto forceReader = this->Internals->LibOptions.scene.force_reader;
-            if (forceReader)
-            {
-              f3d::log::warn("Forced reader ", *forceReader, " doesn't exist");
-            }
-            else
-            {
-              f3d::log::warn(tmpPath.string(), " is not a file of a supported file format");
-            }
-            unsupported = true;
+            // Unreachable
+            f3d::log::error("Error loading file: ", ex.what());
           }
         }
       }
 
       if (!localPaths.empty())
       {
-        // Update loaded files before trying to add them
-        std::copy(
-          localPaths.begin(), localPaths.end(), std::back_inserter(this->Internals->LoadedFiles));
-
         // Add files to the scene
         scene.add(localPaths);
 
-        this->Internals->CurrentSceneEmpty = false;
+        // Update loaded files
+        std::copy(
+          localPaths.begin(), localPaths.end(), std::back_inserter(this->Internals->LoadedFiles));
 
         if (this->Internals->AppOptions.AnimationTime.has_value())
         {
@@ -1593,11 +1609,10 @@ void F3DStarter::LoadFileGroup(
     {
       f3d::log::error("  ", tmpPath.string());
     }
-    this->Internals->CurrentSceneEmpty = true;
   }
 
   std::string filenameInfo;
-  if (!this->Internals->CurrentSceneEmpty)
+  if (!this->Internals->LoadedFiles.empty())
   {
     // Scene is not empty, create a filename info like this:
     // "(1/5) cow.vtp + N [+UNSUPPORTED]"
@@ -1611,13 +1626,19 @@ void F3DStarter::LoadFileGroup(
       filenameInfo += " [+UNSUPPORTED]";
     }
   }
+  else
+  {
+    // Scene is empty, create a filename info like this:
+    // "(1/5) [EMPTY]"
+    filenameInfo = groupIdx + " [EMPTY]";
+  }
 
 #if F3D_MODULE_DMON
   // Update dmon watch logic
   if (this->Internals->AppOptions.Watch)
   {
     // Recover all parents paths in a set
-    std::set<fs::path> parentPaths = F3DInternals::ParentPaths(this->Internals->LoadedFiles);
+    std::set<fs::path> parentPaths = F3DInternals::ParentPaths(this->Internals->FilesToWatch);
 
     // Unwatch and erase paths that should not be watched anymore
     for (auto it = this->Internals->FolderWatchIds.begin();
@@ -1673,7 +1694,7 @@ void F3DStarter::LoadFileGroup(
   // but there is no way to detect if an option has been set
   // by the user or not.
   f3d::options& options = this->Internals->Engine->getOptions();
-  options.ui.dropzone = this->Internals->CurrentSceneEmpty;
+  options.ui.dropzone = this->Internals->LoadedFiles.empty();
   options.ui.filename_info = filenameInfo;
 }
 
@@ -1737,18 +1758,10 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
 {
   try
   {
-    // Check file exists
     auto tmpPath = fs::absolute(path);
-    if (!fs::exists(tmpPath))
-    {
-      if (!quiet)
-      {
-        f3d::log::error("File ", tmpPath.string(), " does not exist");
-      }
-      return -1;
-    }
-    // If file is a folder, add files recursively
-    else if (fs::is_directory(tmpPath))
+
+    // If file is a directory, add files recursively
+    if (fs::is_directory(tmpPath))
     {
       std::set<fs::path> sortedPaths;
       for (const auto& entry : fs::directory_iterator(tmpPath))
@@ -1835,6 +1848,7 @@ void F3DStarter::EventLoop()
 {
   if (this->Internals->ReloadFileRequested)
   {
+    std::cout<<"ReloadFileRequested"<<std::endl;
     this->LoadRelativeFileGroup(0, true, true);
     this->Internals->ReloadFileRequested = false;
   }
