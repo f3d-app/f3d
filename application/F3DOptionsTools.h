@@ -72,6 +72,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "grid-unit", "render.grid.unit" },
   { "grid-subdivisions", "render.grid.subdivisions" },
   { "grid-color", "render.grid.color" },
+  { "axes-grid", "render.axes_grid.enable" },
   { "edges", "render.show_edges" },
   { "armature", "render.armature.enable" },
   { "camera-index", "scene.camera.index" },

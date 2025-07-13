@@ -41,8 +41,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/vtk_install
-        key: vtk-${{ inputs.vtk_version }}-${{inputs.zlib_version}}-${{inputs.blosc_version}}-${{inputs.tbb_version}}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.cpu}}-1
-
+        key: vtk-${{ inputs.vtk_version }}-${{inputs.zlib_version}}-${{inputs.blosc_version}}-${{inputs.tbb_version}}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.cpu}}-2
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies
@@ -116,6 +115,7 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_InteractionWidgets=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingAnnotation=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingCore=YES
+        -DVTK_MODULE_ENABLE_VTK_RenderingGridAxes=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingOpenGL2=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingRayTracing=${{ inputs.raytracing_label == 'raytracing' && 'YES' || 'DEFAULT' }}
         -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2=YES

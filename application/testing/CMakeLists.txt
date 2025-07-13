@@ -188,6 +188,10 @@ f3d_test(NAME TestGridAbsolute DATA f3d.vtp ARGS -g --up=-Y --camera-direction=-
 f3d_test(NAME TestGridClipping DATA offset-flat-box.glb ARGS -g --grid-absolute --camera-position=70,120,350)
 f3d_test(NAME TestGridColor DATA suzanne.ply ARGS -g --grid-color=1,1,1)
 f3d_test(NAME TestAxis DATA suzanne.ply ARGS -x)
+# Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11209
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250513)
+  f3d_test(NAME TestAxesGridEnable DATA suzanne.ply ARGS --axes-grid THRESHOLD 0.08) # Threshold required for MacOS due to line rendering differences
+endif()
 f3d_test(NAME TestBackfaceVisible DATA backface.vtp ARGS --backface-type=visible)
 f3d_test(NAME TestBackfaceHidden DATA backface.vtp ARGS --backface-type=hidden)
 f3d_test(NAME TestPointCloud DATA pointsCloud.vtp ARGS -o --point-sprites-size=20)
