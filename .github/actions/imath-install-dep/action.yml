@@ -22,7 +22,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/imath_install
-        key: imath-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-0
+        key: imath-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-1
 
     # Dependents: alembic openexr
     - name: Checkout Imath
