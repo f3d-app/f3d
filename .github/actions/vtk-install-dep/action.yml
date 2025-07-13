@@ -77,7 +77,7 @@ runs:
       if: steps.cache-vtk.outputs.cache-hit != 'true' && inputs.vtk_version == 'v9.2.6'
       working-directory: ${{github.workspace}}/dependencies/vtk
       shell: bash
-      run: patch -p1 < $GITHUB_ACTION_PATH/proj_include_cstdint.patch
+      run: patch -p1 < $GITHUB_ACTION_PATH/include_cstdint.patch
 
       # OpenVDB_CMAKE_PATH is required because of
       # https://github.com/AcademySoftwareFoundation/openvdb/issues/1160 and

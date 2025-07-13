@@ -1,3 +1,15 @@
+diff --git a/IO/Image/vtkSEPReader.h b/IO/Image/vtkSEPReader.h
+index 83d127a41e..488ecb5b8f 100644
+--- a/IO/Image/vtkSEPReader.h
++++ b/IO/Image/vtkSEPReader.h
+@@ -25,6 +25,7 @@
+ #include "vtkImageAlgorithm.h"
+ #include "vtkNew.h" // for ivars
+ 
++#include <cstdint>
+ #include <array>  // for std::array
+ #include <string> // for std::string
+ 
 diff --git a/ThirdParty/libproj/vtklibproj/src/proj_json_streaming_writer.hpp b/ThirdParty/libproj/vtklibproj/src/proj_json_streaming_writer.hpp
 index 6267684218..cf19b83af4 100644
 --- a/ThirdParty/libproj/vtklibproj/src/proj_json_streaming_writer.hpp
