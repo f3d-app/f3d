@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cstdint>
 
 struct vtkF3DImguiConsole::Internals
 {
