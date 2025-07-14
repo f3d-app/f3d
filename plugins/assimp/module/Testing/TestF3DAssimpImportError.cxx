@@ -17,7 +17,7 @@ public:
 
   void Execute(vtkObject* caller, unsigned long vtkNotUsed(evId), void* data) override
   {
-    const auto importer = reinterpret_cast<vtkF3DAssimpImporter*>(caller);
+    const vtkF3DAssimpImporter* importer = reinterpret_cast<vtkF3DAssimpImporter*>(caller);
     char* message = static_cast<char*>(data);
     if (importer && message)
     {

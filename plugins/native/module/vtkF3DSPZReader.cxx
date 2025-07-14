@@ -51,8 +51,8 @@ struct Header
   uint32_t numPoints;
   uint8_t shDegree;
   uint8_t fractionalBits;
-  [[maybe_unused]] uint8_t flags;
-  [[maybe_unused]] uint8_t reserved;
+  uint8_t flags;
+  uint8_t reserved;
 };
 
 //----------------------------------------------------------------------------

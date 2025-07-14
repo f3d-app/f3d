@@ -15,10 +15,10 @@ unknownMacro
 *:external/imgui/*.cpp
 
 // generated files
-*:vtkextTests.cxx
-*:vtkextPrivateTests.cxx
-*:vtkextNativeTests.cxx
-*:VTKExtensionsPluginAlembic.cxx
+*:build/vtkext/public/module/Testing/vtkextTests.cxx
+*:vtkext/private/module/Testing/vtkextPrivateTests.cxx
+*:**/vtkextNativeTests.cxx
+*:**/plugins/alembic/module/Testing/VTKExtensionsPluginAlembic.cxx
 *:VTKExtensionsPluginAssimp.cxx
 *:vtkextDracoTests.cxx
 *:VTKExtensionsPluginUSD.cxx
@@ -34,3 +34,5 @@ unknownMacro:library/VTKExtensions/Applicative/vtkF3DObjectFactory.cxx
 constParameter:library/src/image.cxx
 invalidPointerCast:plugins/native/module/vtkF3DSplatReader.cxx
 invalidPointerCast:plugins/draco/module/vtkF3DGLTFDocumentLoader.cxx
+unusedStructMember:plugins/native/module/vtkF3DQuakeMDLImporter.cxx
+unusedStructMember:plugins/native/module/vtkF3DSPZReader.cxx

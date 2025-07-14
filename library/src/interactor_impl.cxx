@@ -1277,7 +1277,6 @@ interactor& interactor_impl::removeBinding(const interaction_bind_t& bind)
   this->Internals->Bindings.erase(bind);
 
   // Look for the group of the removed bind
-  std::string group;
   auto it = std::find_if(this->Internals->GroupedBinds.begin(), this->Internals->GroupedBinds.end(),
     [&](const auto& pair) { return pair.second == bind; });
 
@@ -1285,7 +1284,7 @@ interactor& interactor_impl::removeBinding(const interaction_bind_t& bind)
   {
     // Binds are unique
     // Erase the bind entry in the group
-    group = it->first;
+    std::string group = it->first;
     this->Internals->GroupedBinds.erase(it);
     if (this->Internals->GroupedBinds.count(group) == 0)
     {
