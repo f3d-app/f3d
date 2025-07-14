@@ -318,15 +318,15 @@ void PrintReadersList()
     plugColSize = std::max(plugColSize, reader.PluginName.length());
 
     extsColSize = std::accumulate(reader.Extensions.cbegin(), reader.Extensions.cend(), extsColSize,
-                    [](size_t extsColSize, const auto& ext)
+                    [](size_t size, const auto& ext)
                         {
-      return std::max(extsColSize, ext.length());
+      return std::max(size, ext.length());
     });
 
     mimeColSize = std::accumulate(reader.MimeTypes.cbegin(), reader.MimeTypes.cend(), mimeColSize,
-                    [](size_t mimeColSize, const auto& mime)
+                    [](size_t size, const auto& mime)
                         {
-      return std::max(mimeColSize, mime.length());
+      return std::max(size, mime.length());
     });
   }
   const size_t colGap = 4;
