@@ -1903,14 +1903,6 @@ int vtkF3DRenderer::UpdateLights()
 }
 
 //----------------------------------------------------------------------------
-bool vtkF3DRenderer::IsBackgroundDark()
-{
-  double luminance =
-    0.299 * this->Background[0] + 0.587 * this->Background[1] + 0.114 * this->Background[2];
-  return this->HDRISkyboxVisible ? true : luminance < 0.5;
-}
-
-//----------------------------------------------------------------------------
 void vtkF3DRenderer::CreateCacheDirectory()
 {
   assert(this->HasValidHDRIHash);

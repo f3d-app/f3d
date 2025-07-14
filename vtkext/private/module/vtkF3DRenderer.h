@@ -428,8 +428,6 @@ private:
 
   void ReleaseGraphicsResources(vtkWindow* w) override;
 
-  bool IsBackgroundDark();
-
   /**
    * Configure meta data actor visibility and content
    */
