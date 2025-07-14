@@ -1,7 +1,7 @@
 [
   {
     "match-type": "glob",
-    "match": "*.{arrow,bpf,copc,drc,ept,e57,fbi,hdf,ilvis2,las,mat,nitf,npy,obj,csd,pcd,ply,pts,ptx,qfit,rbd,rxp,sbet,slpk,bin,txt}",
+    "match": "*.{arrow,bpf,ilvis2,e57,fbi,mbio,npy,csd,pcd,ply,qfit,rdb,rxp,sbet,bin,tiledb,las,drc,ept.json,json,hdf,h5,mat,ntif,obj,pts,ptx,txt,splk,spz}",
     "options": {
       "load-plugins": "pdal"
     }
