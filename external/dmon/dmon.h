@@ -85,6 +85,7 @@
 //      1.3.5       Got rid of volatile for quit variable
 //      1.3.6       Fix deadlock when watch/unwatch API is called from the OnChange callback
 //      1.3.7       Fix deadlock caused by constantly locking the mutex in the thread loop (recent change)
+//      1.3.8       Fix a cpp compatiblity compiler bug after recent changes
 //      
 
 #include <stdbool.h>
@@ -648,6 +649,7 @@ DMON_API_IMPL dmon_watch_id dmon_watch(const char* rootdir,
     HANDLE dir_handle = INVALID_HANDLE_VALUE;
     int num_freelist = DMON_MAX_WATCHES - _dmon.num_watches;
     int index = _dmon.freelist[num_freelist - 1];
+    size_t rootdir_len;
 
     {
         _DMON_WINAPI_STR(rootdir, DMON_MAX_PATH);
@@ -694,7 +696,7 @@ DMON_API_IMPL dmon_watch_id dmon_watch(const char* rootdir,
 
     _dmon_strcpy(watch->rootdir, sizeof(watch->rootdir) - 1, rootdir);
     _dmon_unixpath(watch->rootdir, sizeof(watch->rootdir), rootdir);
-    size_t rootdir_len = strlen(watch->rootdir);
+    rootdir_len = strlen(watch->rootdir);
     if (watch->rootdir[rootdir_len - 1] != '/') {
         watch->rootdir[rootdir_len] = '/';
         watch->rootdir[rootdir_len + 1] = '\0';
