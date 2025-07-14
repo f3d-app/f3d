@@ -192,6 +192,34 @@ int TestSDKOptions(int argc, char* argv[])
     std::get<std::vector<double>>(opt.get("model.scivis.colormap")) ==
       std::vector<double>{ 0, 0, 0, 0, 1, 1, 1, 0 });
 
+  // Test transform2d_t
+  opt.setAsString("model.textures_transform", "1,0,0,0,-1,0,0,0,1");
+  test("setAsString vector transform2d", opt.getAsString("model.textures_transform"),
+    "1,0,0,0,-1,0,0,0,1");
+
+  opt.setAsString("model.textures_transform", "scale:0.1");
+  test("setAsString scale transform2d", opt.getAsString("model.textures_transform"),
+    "0.1,0,0,0,0.1,0,0,0,1");
+
+  opt.setAsString("model.textures_transform", "translation:0.51,2.1");
+  test("setAsString translation transform2d", opt.getAsString("model.textures_transform"),
+    "1,0,0.51,0,1,2.1,0,0,1");
+
+  opt.model.textures_transform = { 0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5 };
+  test("getAsString transform2d",
+    opt.getAsString("model.textures_transform") == "0.5,0,0,0,0.5,0,0,0,0.5");
+
+  opt.setAsString("model.textures_transform", "angle:0.21");
+  test("setAsString/get angle transform2d",
+    std::get<std::vector<double>>(opt.get("model.textures_transform")) ==
+      std::vector<double>{ cos(0.21), -sin(0.21), 0, sin(0.21), cos(0.21), 0, 0, 0, 1 });
+
+  opt.setAsString("model.textures_transform", "scale:0.1,translation:0.51,2.1,angle:0.21");
+  test("setAsString/get scale/translation/angle transform2d",
+    std::get<std::vector<double>>(opt.get("model.textures_transform")) ==
+      std::vector<double>{
+        0.1 * cos(0.21), 0.1 * -sin(0.21), 0.51, 0.1 * sin(0.21), 0.1 * cos(0.21), 2.1, 0, 0, 1 });
+
   // Test closest option
   auto closest = opt.getClosestOption("modle.sciivs.cell");
   test("closest option", closest.first == "model.scivis.cells" && closest.second == 5);

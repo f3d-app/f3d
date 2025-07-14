@@ -211,6 +211,39 @@ int TestSDKOptionsIO(int argc, char* argv[])
     "transform2d_t", "0,0,0,0,0,0,0,0,0", { 0, 0, 0, 0, 0, 0, 0, 0, 0 });
   test.parse<f3d::transform2d_t>(
     "transform2d_t", "0.5,0,0,0,0.5,0,0,0,0.5", { 0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5 });
+  test.parse<f3d::transform2d_t>("transform2d_t", "scale:0.1", { 0.1, 0, 0, 0, 0.1, 0, 0, 0, 1 });
+  test.parse<f3d::transform2d_t>(
+    "transform2d_t", "scale:0.1,0.2", { 0.1, 0, 0, 0, 0.2, 0, 0, 0, 1 });
+  test.parse<f3d::transform2d_t>(
+    "transform2d_t", "translation:0.51,2.1", { 1, 0, 0.51, 0, 1, 2.1, 0, 0, 1 });
+  test.parse<f3d::transform2d_t>(
+    "transform2d_t", "angle:0.21", { cos(0.21), -sin(0.21), 0, sin(0.21), cos(0.21), 0, 0, 0, 1 });
+  test.parse<f3d::transform2d_t>("transform2d_t", "scale:0.1,translation:0.51,2.1,angle:0.21",
+    { 0.1 * cos(0.21), 0.1 * -sin(0.21), 0.51, 0.1 * sin(0.21), 0.1 * cos(0.21), 2.1, 0, 0, 1 });
+  test.parse_expect<f3d::transform2d_t, parsing_exception>("vector too small", "1");
+  test.parse_expect<f3d::transform2d_t, parsing_exception>(
+    "vector too large", "1,2,3,4,5,6,7,8,9,0");
+  test.parse_expect<f3d::transform2d_t, parsing_exception>(
+    "text in transform notation", "1,2,three,4,5,6,7,8,9");
+  test.parse_expect<f3d::transform2d_t, parsing_exception>("invalid argument", "rotation:45.0");
+  test.parse_expect<f3d::transform2d_t, parsing_exception>("no value provided for scale", "scale:");
+  test.parse_expect<f3d::transform2d_t, parsing_exception>(
+    "no value provided for scale", "scale:,angle:0.5");
+  test.parse_expect<f3d::transform2d_t, parsing_exception>("too many scale values", "scale:1,2,3");
+  test.parse_expect<f3d::transform2d_t, parsing_exception>(
+    "no value provided for translation", "translation:");
+  test.parse_expect<f3d::transform2d_t, parsing_exception>(
+    "one value provided for translation", "translation:0.5");
+  test.parse_expect<f3d::transform2d_t, parsing_exception>(
+    "too many values provided for translation", "translation:1,2,3");
+  test.parse_expect<f3d::transform2d_t, parsing_exception>("no value provided for angle", "angle:");
+  test.parse_expect<f3d::transform2d_t, parsing_exception>("too many angle values", "angle:1,2,3");
+  test.parse_expect<f3d::transform2d_t, parsing_exception>(
+    "multiple scale transforms", "scale:1,2,scale:3,4");
+  test.parse_expect<f3d::transform2d_t, parsing_exception>(
+    "multiple translation transforms", "translation:1,2,translation:3,4");
+  test.parse_expect<f3d::transform2d_t, parsing_exception>(
+    "multiple angle transforms", "angle:0.1,angle:0.2");
   test.format<f3d::transform2d_t>(
     "transform2d_t", { 1, 0, 0, 0, -1, 0, 0, 0, 1 }, "1,0,0,0,-1,0,0,0,1");
   test.format<f3d::transform2d_t>(

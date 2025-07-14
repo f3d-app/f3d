@@ -494,14 +494,208 @@ colormap_t parse(const std::string& str)
 /**
  *  Parse provided string into a transform2d_t
  *  Supported format: double, double, double, ... as a sequence of 9 values
+ *  Alternatively, can appear as scale/translation/angle operations
+ *  e.g. --textures-transform=scale:0.1,translation:0.51,2.1,angle:0.21
  *  Can throw options::parsing_exception in case of failure to parse
  */
 template<>
 transform2d_t parse(const std::string& str)
 {
-  std::vector<double> input;
-  input = parse<std::vector<double>>(str);
-  return transform2d_t(input);
+  const std::string strCompact = std::regex_replace(str, std::regex("\\s"), "");
+
+  if (strCompact[0] >= '0' && strCompact[0] <= '9')
+  {
+    std::vector<double> input;
+    // since the input starts with a numeric char, we try to read as a double vector
+    try
+    {
+      input = parse<std::vector<double>>(strCompact);
+    }
+    catch (const options::parsing_exception&)
+    {
+      throw options::parsing_exception("Cannot convert input into a double vector: " + str);
+    }
+
+    if (input.size() > 9)
+    {
+      throw options::parsing_exception(
+        "Input vector too large to read as transform2d, size 9 required: " + str);
+    }
+    else if (input.size() < 9)
+    {
+      throw options::parsing_exception(
+        "Input vector too small to read as transform2d, size 9 required: " + str);
+    }
+
+    return transform2d_t(input);
+  }
+
+  // try to read with scale/translate/angle notation
+  //  read as a scale/translation/angle series
+  const std::regex settingCheck(
+    "^((scale\\:)|(translation\\:)|(angle\\:)).*", std::regex_constants::icase);
+  std::smatch matcher;
+  std::istringstream split(strCompact);
+  std::string each;
+  bool setScale = false;
+  std::vector<double> scaleVec;
+  std::vector<double> translationVec;
+  bool angleNext = false;
+  std::vector<double> angleVec;
+  bool hasScale = false;
+  bool hasTranslation = false;
+  bool hasAngle = false;
+
+  while (std::getline(split, each, ','))
+  {
+    if (std::regex_match(each, matcher, settingCheck))
+    {
+      // item specifies scale/translation angle, split off option from double and begin adding to
+      // vectors
+      std::istringstream subSplit(each);
+      std::string subStr;
+      while (std::getline(subSplit, subStr, ':'))
+      {
+        if (subStr == "scale")
+        {
+          if (hasScale)
+          {
+            throw options::parsing_exception("Input cannot have multiple scale transforms: " + str);
+          }
+          setScale = true;
+          hasScale = true;
+        }
+        else if (subStr == "translation")
+        {
+          if (hasTranslation)
+          {
+            throw options::parsing_exception(
+              "Input cannot have multiple translation transforms: " + str);
+          }
+          setScale = false;
+          hasTranslation = true;
+        }
+        else if (subStr == "angle")
+        {
+          if (hasAngle)
+          {
+            throw options::parsing_exception("Input cannot have multiple angle transforms: " + str);
+          }
+          angleNext = true;
+          hasAngle = true;
+        }
+        else
+        {
+          // read in a double to add as vector
+          double val;
+          try
+          {
+            val = parse<double>(subStr);
+          }
+          catch (const options::parsing_exception&)
+          {
+            throw options::parsing_exception(
+              "Cannot parse substring " + subStr + " as double from input: " + str);
+          }
+
+          if (angleNext)
+          {
+            angleVec.push_back(val);
+          }
+          else if (setScale)
+          {
+            scaleVec.push_back(val);
+          }
+          else
+          {
+            translationVec.push_back(val);
+          }
+        }
+      }
+    }
+    else
+    {
+      // read in a double to add to constructor
+      double val;
+      try
+      {
+        val = parse<double>(each);
+      }
+      catch (const options::parsing_exception&)
+      {
+        throw options::parsing_exception(
+          "Cannot parse input substring " + each + " as double from input: " + str);
+      }
+
+      if (angleNext)
+      {
+        angleVec.push_back(val);
+      }
+      else if (setScale)
+      {
+        scaleVec.push_back(val);
+      }
+      else
+      {
+        translationVec.push_back(val);
+      }
+    }
+  }
+  // input completed, validate vectors and apply
+  if (scaleVec.size() > 2)
+  {
+    throw options::parsing_exception(
+      "Too many scale values (" + std::to_string(scaleVec.size()) + ") in input: " + str);
+  }
+  else if (hasScale && scaleVec.size() == 0)
+  {
+    throw options::parsing_exception("Scale called without value in input: " + str);
+  }
+
+  if (translationVec.size() == 1)
+  {
+    throw options::parsing_exception("Translation requires two values, single translation value " +
+      std::to_string(translationVec[0]) + " in input: " + str);
+  }
+  else if (translationVec.size() > 2)
+  {
+    throw options::parsing_exception("Too many translation values (" +
+      std::to_string(translationVec.size()) + ") in input: " + str);
+  }
+  else if (hasTranslation && translationVec.size() == 0)
+  {
+    throw options::parsing_exception("Translation called without value in input: " + str);
+  }
+
+  if (angleVec.size() > 1)
+  {
+    throw options::parsing_exception(
+      "Multiple angle values (" + std::to_string(angleVec.size()) + ") in input: " + str);
+  }
+  else if (hasAngle && angleVec.size() == 0)
+  {
+    throw options::parsing_exception("Angle called without value in input: " + str);
+  }
+
+  // Clean up vectors to fit with constructor
+  if (scaleVec.size() == 0)
+  {
+    scaleVec = { 1, 1 };
+  }
+  else if (scaleVec.size() == 1)
+  {
+    scaleVec.push_back(scaleVec.front());
+  }
+  if (translationVec.size() == 0)
+  {
+    translationVec = { 0, 0 };
+  }
+  if (angleVec.size() == 0)
+  {
+    angleVec.push_back(0);
+  }
+
+  return transform2d_t(scaleVec[0], scaleVec[1], translationVec[0], translationVec[1], angleVec[0]);
 }
 
 //----------------------------------------------------------------------------
@@ -686,18 +880,11 @@ std::string format(const colormap_t& var)
 //----------------------------------------------------------------------------
 /**
  * Format provided var into a string from provided transform2d_t.
- * Rely on `format(double)` for each item in value array`
+ * Rely on format(std::vector<double>&)
  */
 std::string format(const transform2d_t& var)
 {
-  std::ostringstream stream;
-  std::vector<double> vec(var);
-  size_t size = vec.size();
-  for (unsigned int i = 0; i < size; i++)
-  {
-    stream << ((i > 0) ? "," : "") << options_tools::format(vec[i]);
-  }
-  return stream.str();
+  return options_tools::format(static_cast<std::vector<double>>(var));
 }
 
 } // option_tools
