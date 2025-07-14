@@ -1767,7 +1767,8 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
       std::set<fs::path> sortedPaths;
       for (const auto& entry : fs::directory_iterator(tmpPath))
       {
-        if (entry.is_regular_file() || (this->Internals->AppOptions.RecursiveDirAdd && entry.is_directory()))
+        if (entry.is_regular_file() ||
+          (this->Internals->AppOptions.RecursiveDirAdd && entry.is_directory()))
         {
           sortedPaths.insert(entry.path());
         }
