@@ -77,7 +77,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     mdl_vertex_t verts[1024]; // vertex list of the frame, maximum capacity is 1024
   };
 
-  enum FRAME_TYPE
+  enum FRAME_TYPE : std::uint8_t
   {
     SINGLE_FRAME = 0,
     GROUP_FRAME,
