@@ -2092,6 +2092,18 @@ void F3DStarter::AddCommands()
     { F3DConfigFileTools::ReadConfigFiles(std::string(), true, f3d::log::VerboseLevel::INFO); });
 
 
+  interactor.addCommand("print_config_info",
+    [this](const std::vector<std::string>&)
+    {
+      std::vector<std::filesystem::path> availableConfigPaths =
+        F3DConfigFileTools::GetConfigPaths("config");
+
+      for (const std::filesystem::path& path : availableConfigPaths)
+      {
+        f3d::log::info("Found available config path: ", path.string());
+      }
+    });
+
   interactor.addCommand("remove_file_groups",
 
     [this](const std::vector<std::string>&)

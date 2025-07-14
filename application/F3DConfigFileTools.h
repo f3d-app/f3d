@@ -22,6 +22,11 @@ struct ParsedConfigFiles
 };
 
 /**
+ * Recover a OS-specific vector of potential config file directories
+ */
+std::vector<std::filesystem::path> GetConfigPaths(const std::string& configSearch);
+
+/**
  * Read config files using userConfig if any, return a ParsedConfigFiles
  * containing ordered optionDict, ordered imperative optionDict and ordered bindingsEntries
  */
