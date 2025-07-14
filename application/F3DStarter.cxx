@@ -1897,6 +1897,21 @@ void F3DStarter::AddCommands()
     return f3d::options::parse<bool>(args[0]);
   };
 
+  interactor.addCommand("remove_current_file_group",
+    [this](const std::vector<std::string>&)
+    {
+      if (this->Internals->CurrentFilesGroupIndex >= 0)
+      {
+        if (!this->Internals->AppOptions.NoRender)
+        {
+          this->Internals->Engine->getInteractor().stopAnimation();
+        }
+        this->Internals->FilesGroups.erase(
+          this->Internals->FilesGroups.begin() + this->Internals->CurrentFilesGroupIndex);
+        this->LoadRelativeFileGroup(0, false, true);
+      }
+    });
+
   interactor.addCommand("remove_file_groups",
     [this](const std::vector<std::string>&)
     {
