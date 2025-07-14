@@ -188,6 +188,7 @@ f3d_test(NAME TestGridAbsolute DATA f3d.vtp ARGS -g --up=-Y --camera-direction=-
 f3d_test(NAME TestGridClipping DATA offset-flat-box.glb ARGS -g --grid-absolute --camera-position=70,120,350)
 f3d_test(NAME TestGridColor DATA suzanne.ply ARGS -g --grid-color=1,1,1)
 f3d_test(NAME TestAxis DATA suzanne.ply ARGS -x)
+f3d_test(NAME TestAxesGridToggle INTERACTION DATA cow.vtp)
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11209
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250513)
   f3d_test(NAME TestAxesGridEnable DATA suzanne.ply ARGS --axes-grid THRESHOLD 0.08) # Threshold required for MacOS due to line rendering differences
@@ -1562,5 +1563,3 @@ if(F3D_MODULE_DMON AND (WIN32 OR APPLE OR (F3D_TESTING_ENABLE_GLX_TESTS AND VTK_
   set_tests_properties(f3d::TestWatch PROPERTIES RUN_SERIAL TRUE TIMEOUT 30)
 endif()
 
-# Test axes grid toggle
-f3d_test(NAME TestAxesGridToggle INTERACTION DATA cow.vtp)
