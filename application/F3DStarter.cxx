@@ -94,6 +94,7 @@ public:
     std::string ScreenshotFilename;
     std::string VerboseLevel;
     std::string MultiFileMode;
+    bool RecursiveDirAdd;
     std::vector<int> Resolution;
     std::vector<int> Position;
     std::string ColorMapFile;
@@ -744,6 +745,7 @@ public:
     this->ParseOption(appOptions, "screenshot-filename", this->AppOptions.ScreenshotFilename);
     this->ParseOption(appOptions, "verbose", this->AppOptions.VerboseLevel);
     this->ParseOption(appOptions, "multi-file-mode", this->AppOptions.MultiFileMode);
+    this->ParseOption(appOptions, "recursive-dir-add", this->AppOptions.RecursiveDirAdd);
     this->ParseOption(appOptions, "resolution", this->AppOptions.Resolution);
     this->ParseOption(appOptions, "position", this->AppOptions.Position);
     this->ParseOption(appOptions, "colormap-file", this->AppOptions.ColorMapFile);
@@ -1765,7 +1767,10 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
       std::set<fs::path> sortedPaths;
       for (const auto& entry : fs::directory_iterator(tmpPath))
       {
-        sortedPaths.insert(entry.path());
+        if (entry.is_regular_file() || (this->Internals->AppOptions.RecursiveDirAdd && entry.is_directory()))
+        {
+          sortedPaths.insert(entry.path());
+        }
       }
       for (const auto& entryPath : sortedPaths)
       {

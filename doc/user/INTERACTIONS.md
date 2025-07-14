@@ -82,7 +82,7 @@ Other hotkeys and interactions are available:
 - <kbd>&larr;</kbd>: load the previous file if any and reset the camera.
 - <kbd>&rarr;</kbd>: load the next file if any and reset the camera.
 - <kbd>&uarr;</kbd>: reload the currently loaded files.
-- <kbd>&darr;</kbd>: add all current files parent directories to the list of files, reload the currently loaded files and reset the camera.
+- <kbd>&darr;</kbd>: add all current files parent directories to the list of files, reload the currently loaded files and reset the camera, respect the `--recursive-dir-add` CLI option.
 - <kbd>F12</kbd>: take a screenshot, ie. render the current view to an image file.
 - <kbd>Ctrl</kbd> + <kbd>F12</kbd>: take a "minimal" screenshot, ie. render the current view with no grid and no overlays to an image file with a transparent background.
 - _Drop_ a file, directory or HDRI into the F3D window to load it. F3D relies on the extension (`.hdr` or `.exr`) to detect if the dropped file is an HDRI.
