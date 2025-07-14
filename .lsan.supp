@@ -24,5 +24,7 @@ leak:libOSMesa
 # Potential mesa/VTK leak with incomplete callstack
 # forces us to hide all leaks from the tests using a render window
 # https://gitlab.kitware.com/vtk/vtk/-/issues/18504
-leak:libf3dSDKTests
-leak:vtkextPrivateTests
+# leak:libf3dSDKTests
+# leak:vtkextPrivateTests
+
+leak:libGLX_mesa

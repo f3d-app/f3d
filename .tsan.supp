@@ -13,3 +13,6 @@ race:libOpenEXR
 
 # OSMesa
 race:libOSMesa
+
+# mesa
+race:libgallium
