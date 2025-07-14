@@ -1041,7 +1041,7 @@ int F3DStarter::Start(int argc, char** argv)
   if (!noConfig)
   {
     F3DConfigFileTools::ParsedConfigFiles parsedConfigFiles =
-      F3DConfigFileTools::ReadConfigFiles(config, false, f3d::log::getVerboseLevel());
+      F3DConfigFileTools::ReadConfigFiles(config);
     this->Internals->ConfigOptionsEntries = parsedConfigFiles.Options;
     this->Internals->ImperativeConfigOptionsEntries = parsedConfigFiles.ImperativeOptions;
     this->Internals->ConfigBindingsEntries = parsedConfigFiles.Bindings;
@@ -1865,9 +1865,6 @@ void F3DStarter::AddCommands()
     // parsing_exception is caught within interactor implementation
     return f3d::options::parse<bool>(args[0]);
   };
-
-  interactor.addCommand("print_config_info", [this](const std::vector<std::string>&)
-    { F3DConfigFileTools::ReadConfigFiles(std::string(), true, f3d::log::VerboseLevel::INFO); });
 
   interactor.addCommand("remove_file_groups",
     [this](const std::vector<std::string>&)
