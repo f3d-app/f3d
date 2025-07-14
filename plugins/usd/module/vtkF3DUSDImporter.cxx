@@ -1259,18 +1259,9 @@ vtkIdType vtkF3DUSDImporter::GetNumberOfAnimations()
 
 //----------------------------------------------------------------------------
 bool vtkF3DUSDImporter::GetTemporalInformation(vtkIdType vtkNotUsed(animationIndex),
-  double frameRate, int& nbTimeSteps, double timeRange[2], vtkDoubleArray* timeSteps)
+  double vtkNotUsed(frameRate), int& vtkNotUsed(nbTimeSteps), double timeRange[2], vtkDoubleArray* vtkNotUsed(timeSteps))
 {
   this->Internals->GetTimeRange(timeRange);
-
-  nbTimeSteps = static_cast<int>((timeRange[1] - timeRange[0]) * frameRate);
-
-  for (int i = 0; i < nbTimeSteps; i++)
-  {
-    double timestep = timeRange[0] + static_cast<double>(i) / frameRate;
-    timeSteps->InsertNextTypedTuple(&timestep);
-  }
-
   return true;
 }
 
