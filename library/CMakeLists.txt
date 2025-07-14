@@ -10,11 +10,16 @@ set(F3D_VTK_MODULES
   f3d::vtkextPrivate
 )
 
+# Check modules
+
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250513)
-  set(F3D_VTK_MODULES ${F3D_VTK_MODULES} VTK::RenderingGridAxes)
+  if(TARGET VTK::RenderingGridAxes)
+    set(F3D_VTK_MODULES ${F3D_VTK_MODULES} VTK::RenderingGridAxes)
+  else()
+    message(FATAL_ERROR "VTK::RenderingGridAxes is not found, please enable it")
+  endif()
 endif()
 
-# Check modules
 if(F3D_MODULE_RAYTRACING)
   if(TARGET VTK::RenderingRayTracing)
     message(STATUS "VTK::RenderingRayTracing module found")
