@@ -20,7 +20,7 @@ vtkStandardNewMacro(vtkF3DCachedLUTTexture);
 void vtkF3DCachedLUTTexture::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "FileName: " << this->FileName << endl;
+  os << indent << "FileName: " << this->FileName << "\n";
 }
 
 //------------------------------------------------------------------------------

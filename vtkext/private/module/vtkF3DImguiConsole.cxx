@@ -14,7 +14,7 @@
 
 struct vtkF3DImguiConsole::Internals
 {
-  enum class LogType
+  enum class LogType : std::uint8_t
   {
     Log,
     Warning,
