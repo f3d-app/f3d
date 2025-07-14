@@ -641,6 +641,7 @@ transform2d_t parse(const std::string& str)
       }
     }
   }
+
   // input completed, validate vectors and apply
   if (scaleVec.size() > 2)
   {
