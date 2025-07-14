@@ -168,6 +168,7 @@ f3d_test(NAME TestQuakeMDLAnimationSimpleFrame DATA zombie.mdl ARGS --animation-
 f3d_test(NAME TestQuakeMDLAnimationBetween DATA zombie.mdl ARGS --animation-time=1.42)
 f3d_test(NAME TestQuakeMDLAnimationMulti DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5)
 f3d_test(NAME TestQuakeMDLAnimationGroupFrame DATA flame_mixed.mdl ARGS --animation-indices=1 --animation-time=0.5)
+f3d_test(NAME TestQuakeMDLAnimationLastFrame DATA flame_mixed.mdl ARGS --camera-position=90,0,0 --animation-time=0.65)
 f3d_test(NAME TestQuakeMDLDisableAnimation DATA zombie.mdl soldier_animations.mdl ARGS --multi-file-mode=all --animation-time=0.5)
 f3d_test(NAME TestQuakeMDLSkinIndex DATA armor.mdl ARGS -DQuakeMDL.skin_index=2)
 f3d_test(NAME TestQuakeMDLSkinIndexNegative DATA armor.mdl ARGS -DQuakeMDL.skin_index=-1)
