@@ -14,13 +14,8 @@
 
 namespace fs = std::filesystem;
 
-namespace
-{
 //----------------------------------------------------------------------------
-/**
- * Recover a OS-specific vector of potential config file directories
- */
-std::vector<fs::path> GetConfigPaths(const std::string& configSearch)
+std::vector<fs::path> F3DConfigFileTools::GetConfigPaths(const std::string& configSearch)
 {
   std::vector<fs::path> paths;
 
@@ -82,7 +77,6 @@ std::vector<fs::path> GetConfigPaths(const std::string& configSearch)
 
   return paths;
 }
-}
 
 //----------------------------------------------------------------------------
 F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
@@ -110,7 +104,7 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
   std::vector<fs::path> configPaths;
   if (!configSearch.empty())
   {
-    configPaths = ::GetConfigPaths(configSearch);
+    configPaths = GetConfigPaths(configSearch);
   }
   else
   {
