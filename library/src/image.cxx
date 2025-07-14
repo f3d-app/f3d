@@ -178,7 +178,7 @@ image::image(unsigned int width, unsigned int height, unsigned int channelCount,
 
 //----------------------------------------------------------------------------
 image::image(const fs::path& filePath)
-  : Internals(new image::internals())
+  : Internals(std::make_unique<image::internals>())
 {
   detail::init::initialize();
 
@@ -217,10 +217,7 @@ image::image(const fs::path& filePath)
 }
 
 //----------------------------------------------------------------------------
-image::~image()
-{
-  delete this->Internals;
-}
+image::~image() = default;
 
 //----------------------------------------------------------------------------
 image::image(const image& img)

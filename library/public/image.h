@@ -234,7 +234,7 @@ public:
 
 private:
   class internals;
-  internals* Internals;
+  std::unique_ptr<internals> Internals;
 };
 }
 

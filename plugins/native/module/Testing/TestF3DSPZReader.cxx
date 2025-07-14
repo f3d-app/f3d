@@ -14,7 +14,7 @@ int TestF3DSPZReader(int vtkNotUsed(argc), char* argv[])
 
   if (!stream->Open(path.c_str()))
   {
-    std::cerr << "Cannot open file" << std::endl;
+    std::cerr << "Cannot open file\n";
     return EXIT_FAILURE;
   }
 
@@ -26,7 +26,7 @@ int TestF3DSPZReader(int vtkNotUsed(argc), char* argv[])
 
   if (nbGaussians != 13296)
   {
-    std::cerr << "Incorrect number of gaussians: " << nbGaussians << std::endl;
+    std::cerr << "Incorrect number of gaussians: " << nbGaussians << "\n";
     return EXIT_FAILURE;
   }
 

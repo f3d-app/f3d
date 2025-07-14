@@ -21,7 +21,7 @@ int TestF3DEXRReader(int argc, char* argv[])
 
   if (dims[0] != 1024 && dims[1] != 512)
   {
-    std::cerr << "Incorrect EXR image size." << std::endl;
+    std::cerr << "Incorrect EXR image size.\n";
     return EXIT_FAILURE;
   }
 

@@ -46,7 +46,7 @@ int TestF3DEXRMemReader(int argc, char* argv[])
 
   if (dims[0] != 610 && dims[1] != 406)
   {
-    std::cerr << "Incorrect EXR image size." << dims[0] << ":" << dims[1] << std::endl;
+    std::cerr << "Incorrect EXR image size." << dims[0] << ":" << dims[1] << "\n";
     return EXIT_FAILURE;
   }
 
