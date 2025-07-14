@@ -17,8 +17,8 @@ unknownMacro
 // generated files
 *:build/vtkext/public/module/Testing/vtkextTests.cxx
 *:vtkext/private/module/Testing/vtkextPrivateTests.cxx
-*:**/vtkextNativeTests.cxx
-*:**/plugins/alembic/module/Testing/VTKExtensionsPluginAlembic.cxx
+*:*/vtkextNativeTests.cxx
+*:*/plugins/alembic/module/Testing/VTKExtensionsPluginAlembic.cxx
 *:VTKExtensionsPluginAssimp.cxx
 *:vtkextDracoTests.cxx
 *:VTKExtensionsPluginUSD.cxx
