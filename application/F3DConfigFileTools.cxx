@@ -62,9 +62,16 @@ std::vector<fs::path> GetConfigPaths(const std::string& configSearch)
 
       for (const auto& configName : configNames)
       {
-        configPath = dir / configName;
-        paths.emplace_back(configPath);
-        f3d::log::debug("Found potential config file: ", configPath.string());
+        configPath = dir / (configName);
+        if (fs::exists(configPath))
+        {
+          f3d::log::debug("Config file found: ", configPath.string());
+          paths.emplace_back(configPath);
+        }
+        else
+        {
+          f3d::log::debug("Candidate config file not found: ", configPath.string());
+        }
       }
     }
     catch (const fs::filesystem_error&)
@@ -122,16 +129,7 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
     }
     catch (const fs::filesystem_error&)
     {
-      // This (file not found) error is expected in dry run mode
-      if (dryRun)
-      {
-        f3d::log::print(logLevel, "Found available config location ", configPath.string());
-      }
-      else
-      {
-        f3d::log::debug(
-          "Configuration file does not exist: ", configPath.string(), " , ignoring it");
-      }
+      f3d::log::error("Configuration file does not exist: ", configPath.string(), " , ignoring it");
       continue;
     }
 
@@ -159,17 +157,16 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
     f3d::log::print(logLevel, "Configuration file for \"", configSearch, "\" could not be found");
   }
 
+  // Clear config file paths to avoid reading them if dryRun is set
+  if (dryRun)
+  {
+    actualConfigFilePaths.clear();
+  }
+
   // Read config files
   F3DOptionsTools::OptionsEntries optionsEntries;
   F3DOptionsTools::OptionsEntries imperativeOptionsEntries;
   F3DConfigFileTools::BindingsEntries bindingsEntries;
-  // Return early to avoid reading any config files
-  if (dryRun)
-  {
-    return F3DConfigFileTools::ParsedConfigFiles{ std::move(optionsEntries),
-      std::move(imperativeOptionsEntries), std::move(bindingsEntries) };
-  }
-
   for (const auto& configFilePath : actualConfigFilePaths)
   {
     std::ifstream file(configFilePath);
