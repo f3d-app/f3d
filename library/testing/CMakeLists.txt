@@ -88,7 +88,6 @@ if(F3D_TESTING_ENABLE_EXTERNAL_QT)
   list(APPEND libf3dSDKTests_list TestSDKExternalWindowQT.cxx)
   list(APPEND libf3dSDKTests_link_libs Qt5::OpenGL)
 endif()
-
 if(F3D_TESTING_ENABLE_GLX_TESTS AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240914)
   find_package(OpenGL COMPONENTS GLX REQUIRED)
   find_library(X11_LIB X11 REQUIRED)
