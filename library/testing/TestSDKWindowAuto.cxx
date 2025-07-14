@@ -14,8 +14,7 @@ int TestSDKWindowAuto(int argc, char* argv[])
 
   if (win.getWidth() != 300 || win.getHeight() != 300)
   {
-    std::cerr << "Unexpected window size: " << win.getWidth() << "x" << win.getHeight()
-              << "\n";
+    std::cerr << "Unexpected window size: " << win.getWidth() << "x" << win.getHeight() << "\n";
     return EXIT_FAILURE;
   }
 
