@@ -1168,7 +1168,7 @@ f3d_test(NAME TestCommandScriptMissingFile DATA dragon.vtu SCRIPT TestCommandScr
 f3d_test(NAME TestCommandScriptPrintScene DATA dragon.vtu SCRIPT TestCommandScriptPrintScene.txt REGEXP "Camera position: 2.23745, 3.83305, 507.598" NO_BASELINE) # print_scene_info
 
 f3d_test(NAME TestCommandScriptPrintScene DATA dragon.vtu SCRIPT TestCommandScriptPrintScene.txt REGEXP "Camera position: 2.23745,3.83305,507.598" NO_BASELINE) # print_scene_info
-f3d_test(NAME TestCommandScriptPrintConfig DATA dragon.vtu SCRIPT TestCommandScriptPrintConfig.txt REGEXP "Found available config location /etc/f3d/config.d" NO_BASELINE) # print_config_info 
+f3d_test(NAME TestCommandScriptPrintConfig DATA dragon.vtu SCRIPT TestCommandScriptPrintConfig.txt REGEXP "Found available config path" NO_BASELINE) # print_config_info 
 f3d_test(NAME TestCommandScriptPrintColoring DATA dragon.vtu SCRIPT TestCommandScriptPrintColoring.txt REGEXP "Not coloring" NO_BASELINE) # print_coloring_info
 f3d_test(NAME TestCommandScriptPrintMesh DATA dragon.vtu SCRIPT TestCommandScriptPrintMesh.txt REGEXP "Number of points: 13268" NO_BASELINE) # print_mesh_info
 f3d_test(NAME TestCommandScriptPrintOptions DATA dragon.vtu SCRIPT TestCommandScriptPrintOptions.txt REGEXP "interactor.invert_zoom: false" NO_BASELINE) # print_options_info
