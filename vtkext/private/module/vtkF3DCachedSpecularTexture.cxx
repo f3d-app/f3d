@@ -21,7 +21,7 @@ vtkStandardNewMacro(vtkF3DCachedSpecularTexture);
 void vtkF3DCachedSpecularTexture::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "FileName: " << this->FileName << endl;
+  os << indent << "FileName: " << this->FileName << "\n";
 }
 
 //------------------------------------------------------------------------------
