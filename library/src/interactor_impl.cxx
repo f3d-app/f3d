@@ -37,6 +37,7 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+#include <cstdint>
 #include <map>
 #include <numeric>
 #include <regex>
@@ -168,7 +169,7 @@ public:
 
   //----------------------------------------------------------------------------
   // Set the view orbit position on the viewport.
-  enum class ViewType
+  enum class ViewType : std::uint8_t
   {
     VT_FRONT,
     VT_RIGHT,
