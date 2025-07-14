@@ -211,7 +211,7 @@ scene& scene_impl::add(const fs::path& filePath)
 //----------------------------------------------------------------------------
 scene& scene_impl::add(const std::vector<std::string>& filePathStrings)
 {
-  std::vector<fs::path> paths;
+  std::vector<fs::path> paths(filePathStrings.size());
   std::copy(filePathStrings.begin(), filePathStrings.end(), paths.begin());
   return this->add(paths);
 }
