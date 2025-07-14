@@ -11,6 +11,7 @@ unknownMacro
 *:external/dmon/dmon.h
 *:external/imgui/*.h
 *:external/imgui/*.cpp
+*:external/sbt/*.h
 
 // specific checks
 knownConditionTrueFalse:library/testing/TestSDKImage.cxx

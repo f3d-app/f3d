@@ -149,3 +149,8 @@ endif ()
 if (F3D_MODULE_RAYTRACING)
   vtk_module_definitions(f3d::vtkextPrivate PRIVATE F3D_MODULE_RAYTRACING)
 endif ()
+
+vtk_module_include(f3d::vtkextPrivate
+  PUBLIC
+    "${F3D_SOURCE_DIR}/external/stb"
+)
