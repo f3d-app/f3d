@@ -212,11 +212,7 @@ scene& scene_impl::add(const fs::path& filePath)
 scene& scene_impl::add(const std::vector<std::string>& filePathStrings)
 {
   std::vector<fs::path> paths;
-  paths.reserve(filePathStrings.size());
-  for (const std::string& str : filePathStrings)
-  {
-    paths.emplace_back(str);
-  }
+  std::copy(filePathStrings.begin(), filePathStrings.end(), paths.begin());
   return this->add(paths);
 }
 
@@ -243,7 +239,7 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
     }
     std::optional<std::string> forceReader = this->Internals->Options.scene.force_reader;
     // Recover the importer for the provided file path
-    f3d::reader* reader = f3d::factory::instance()->getReader(filePath.string(), forceReader);
+    const f3d::reader* reader = f3d::factory::instance()->getReader(filePath.string(), forceReader);
     if (reader)
     {
       if (forceReader)

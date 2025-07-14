@@ -281,7 +281,7 @@ int TestSDKImage(int argc, char* argv[])
     {
       std::vector<unsigned char> buffer = img1.saveBuffer();
       std::ofstream outfile(tmpDir + "/metadata-buffer.png", std::ios::out | std::ios::binary);
-      outfile.write((const char*)&buffer[0], buffer.size());
+      outfile.write(reinterpret_cast<const char*>(&buffer[0]), buffer.size());
     }
 
     f3d::image img2(tmpDir + "/metadata-buffer.png");

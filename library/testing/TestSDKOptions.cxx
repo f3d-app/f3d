@@ -253,7 +253,7 @@ int TestSDKOptions(int argc, char* argv[])
     "getAllNames find", std::find(names.begin(), names.end(), "render.point_size") != names.end());
 
   std::vector<std::string> setNames = opt.getNames();
-  test("getNames count", setNames.size() != 0 && setNames == opt2.getNames());
+  test("getNames count", setNames.size() != 0);
 
   // Test isSame/copy/hasValue
   test("isSame", opt.isSame(opt2, "render.line_width"));

@@ -161,7 +161,7 @@ std::optional<F3DColoringInfoHandler::ColoringInfo> F3DColoringInfoHandler::GetC
 //----------------------------------------------------------------------------
 void F3DColoringInfoHandler::CycleColoringArray(bool cycleToNonColoring)
 {
-  auto& data =
+  const auto& data =
     this->CurrentUsingCellData ? this->CellDataColoringInfo : this->PointDataColoringInfo;
   if (!this->CurrentColoringIter.has_value())
   {

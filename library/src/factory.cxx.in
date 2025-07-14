@@ -70,9 +70,9 @@ reader* factory::getReader(const std::string& fileName, std::optional<std::strin
 //----------------------------------------------------------------------------
 bool factory::setReaderOption(const std::string& name, const std::string& value)
 {
-  for (auto& plugin : this->Plugins)
+  for (const auto& plugin : this->Plugins)
   {
-    for (auto& reader : plugin->getReaders())
+    for (const auto& reader : plugin->getReaders())
     {
       if (reader->setReaderOption(name, value))
       {
@@ -110,7 +110,7 @@ void factory::load(plugin* plug)
 //----------------------------------------------------------------------------
 void factory::autoload()
 {
-  for (auto& [str, init] : this->StaticPluginInitializers)
+  for (const auto& [str, init] : this->StaticPluginInitializers)
   {
     this->registerOnce(init());
   }
@@ -128,7 +128,7 @@ bool factory::registerOnce(plugin* plug)
     log::debug("  Description: " + plug->getDescription());
     log::debug("  Readers:");
 
-    for (auto read : plug->getReaders())
+    for (const auto& read : plug->getReaders())
     {
       log::debug("    " + read->getLongDescription());
     }

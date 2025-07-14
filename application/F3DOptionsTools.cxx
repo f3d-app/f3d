@@ -13,6 +13,7 @@
 #include <cassert>
 #include <filesystem>
 #include <iomanip>
+#include <numeric>
 #include <set>
 #include <sstream>
 
@@ -219,13 +220,9 @@ void PrintHelp(const std::string& execName, const cxxopts::Options& cxxOptions)
   }};
 
   f3d::log::setUseColoring(false);
-  std::vector<std::string> orderedCLIGroupNames;
-  orderedCLIGroupNames.reserve(::CLIOptions.size());
-  for (const ::CLIGroup& optionGroup : ::CLIOptions)
-  {
-    // This ensure help is provided in the expected group order
-    orderedCLIGroupNames.emplace_back(optionGroup.GroupName);
-  }
+  std::vector<std::string> orderedCLIGroupNames(CLIOptions.size());
+  std::transform(CLIOptions.cbegin(), CLIOptions.cend(), orderedCLIGroupNames.begin(),
+                 [&](const ::CLIGroup& cliGroup) { return cliGroup.GroupName; });
   f3d::log::info(cxxOptions.help(orderedCLIGroupNames));
   f3d::log::info("\nExamples:");
   for (const auto& [cmd, desc] : examples)
@@ -320,14 +317,17 @@ void PrintReadersList()
     descColSize = std::max(descColSize, reader.Description.length());
     plugColSize = std::max(plugColSize, reader.PluginName.length());
 
-    for (const auto& ext : reader.Extensions)
-    {
-      extsColSize = std::max(extsColSize, ext.length());
-    }
-    for (const auto& mime : reader.MimeTypes)
-    {
-      mimeColSize = std::max(mimeColSize, mime.length());
-    }
+    extsColSize = std::accumulate(reader.Extensions.cbegin(), reader.Extensions.cend(), extsColSize,
+                    [](size_t extsColSize, const auto& ext)
+                        {
+      return std::max(extsColSize, ext.length());
+    });
+
+    mimeColSize = std::accumulate(reader.MimeTypes.cbegin(), reader.MimeTypes.cend(), mimeColSize,
+                    [](size_t mimeColSize, const auto& mime)
+                        {
+      return std::max(mimeColSize, mime.length());
+    });
   }
   const size_t colGap = 4;
   nameColSize += colGap;

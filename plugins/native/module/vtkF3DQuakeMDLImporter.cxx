@@ -71,8 +71,8 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   // Simple frame
   struct mdl_simpleframe_t // 24 + nbVertices bytes
   {
-    mdl_vertex_t bboxmin;     // bounding box min
-    mdl_vertex_t bboxmax;     // bounding box max
+    [[maybe_unused]] mdl_vertex_t bboxmin;     // bounding box min
+    [[maybe_unused]] mdl_vertex_t bboxmax;     // bounding box max
     char name[16];            // frame name
     mdl_vertex_t verts[1024]; // vertex list of the frame, maximum capacity is 1024
   };
@@ -419,7 +419,6 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
 
   //----------------------------------------------------------------------------
   vtkF3DQuakeMDLImporter* Parent;
-  std::string Description;
   vtkSmartPointer<vtkPolyDataMapper> Mapper;
   vtkSmartPointer<vtkTexture> Texture;
 

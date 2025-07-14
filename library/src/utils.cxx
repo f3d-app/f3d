@@ -194,8 +194,7 @@ std::string utils::globToRegex(std::string_view glob, char pathSeparator)
             i++;
           }
           bool nextTokenSepOrEnd = i + 1 >= glob.size() ||
-            (i + 1 < glob.size() ? glob.substr(i + 1, globSeparator.size()) == globSeparator
-                                 : false);
+            glob.substr(i + 1, globSeparator.size()) == globSeparator;
           if (supportGlobStars)
           {
             if (starCount > 1 && prevTokenSepOrBeg && nextTokenSepOrEnd)

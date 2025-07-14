@@ -51,8 +51,8 @@ struct Header
   uint32_t numPoints;
   uint8_t shDegree;
   uint8_t fractionalBits;
-  uint8_t flags;
-  uint8_t reserved;
+  [[maybe_unused]] uint8_t flags;
+  [[maybe_unused]] uint8_t reserved;
 };
 
 //----------------------------------------------------------------------------
@@ -277,7 +277,7 @@ int vtkF3DSPZReader::RequestData(
 
   ::UncompressGzip(compressed, uncompressed);
 
-  Header* header = reinterpret_cast<Header*>(uncompressed.data());
+  const Header* header = reinterpret_cast<Header*>(uncompressed.data());
 
   assert(header->magic == 0x5053474e);
   assert(header->version == 2);

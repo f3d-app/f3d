@@ -255,9 +255,10 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
   ImFont* font = nullptr;
   if (this->FontFile.empty())
   {
+    // ImGui API is not very helpful with this
     fontConfig.FontDataOwnedByAtlas = false;
     font =
-      io.Fonts->AddFontFromMemoryTTF((void*)F3DFontBuffer, sizeof(F3DFontBuffer), 18, &fontConfig);
+      io.Fonts->AddFontFromMemoryTTF(const_cast<void*>(reinterpret_cast<const void*>(F3DFontBuffer)), sizeof(F3DFontBuffer), 18, &fontConfig);
   }
   else
   {
@@ -386,7 +387,7 @@ void vtkF3DImguiActor::RenderFileName()
 {
   if (!this->FileName.empty())
   {
-    ImGuiViewport* viewport = ImGui::GetMainViewport();
+    const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
     constexpr float marginTop = 5.f;
     ImVec2 winSize = ImGui::CalcTextSize(this->FileName.c_str());
@@ -408,7 +409,7 @@ void vtkF3DImguiActor::RenderFileName()
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderMetaData()
 {
-  ImGuiViewport* viewport = ImGui::GetMainViewport();
+  const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
   constexpr float marginRight = 5.f;
 
@@ -432,7 +433,7 @@ void vtkF3DImguiActor::RenderMetaData()
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderCheatSheet()
 {
-  ImGuiViewport* viewport = ImGui::GetMainViewport();
+  const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
   constexpr float marginLeft = 5.f;
   constexpr float marginTopBottom = 5.f;
@@ -498,7 +499,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderFpsCounter()
 {
-  ImGuiViewport* viewport = ImGui::GetMainViewport();
+  const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
   constexpr float marginRight = 3.f;
   constexpr float marginBottom = 3.f;

@@ -1,4 +1,5 @@
 // remove some checks
+duplInheritedMember
 missingIncludeSystem
 missingInclude
 unusedFunction
@@ -12,6 +13,16 @@ unknownMacro
 *:external/dmon/dmon.h
 *:external/imgui/*.h
 *:external/imgui/*.cpp
+
+// generated files
+*:vtkextTests.cxx
+*:vtkextPrivateTests.cxx
+*:vtkextNativeTests.cxx
+*:VTKExtensionsPluginAlembic.cxx
+*:VTKExtensionsPluginAssimp.cxx
+*:vtkextDracoTests.cxx
+*:VTKExtensionsPluginUSD.cxx
+*:libf3dSDKTests.cxx
 
 // specific checks
 knownConditionTrueFalse:library/testing/TestSDKImage.cxx

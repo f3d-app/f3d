@@ -40,7 +40,7 @@ int TestF3DObjectFactory(int argc, char* argv[])
 
   // Check actual factory mechanism
   vtkNew<vtkPolyDataMapper> mapper;
-  vtkF3DPolyDataMapper* mapperPtr = vtkF3DPolyDataMapper::SafeDownCast(mapper);
+  const vtkF3DPolyDataMapper* mapperPtr = vtkF3DPolyDataMapper::SafeDownCast(mapper);
   if (mapperPtr == nullptr)
   {
     std::cerr << "vtkF3DObjectFactory failed to create a vtkF3DPolyDataMapper\n";
@@ -60,7 +60,7 @@ int TestF3DObjectFactory(int argc, char* argv[])
 
   vtkNew<vtkOutputWindow> window;
 #if F3D_MODULE_UI
-  vtkF3DImguiConsole* windowPtr = vtkF3DImguiConsole::SafeDownCast(window);
+  const vtkF3DImguiConsole* windowPtr = vtkF3DImguiConsole::SafeDownCast(window);
 #else
   vtkF3DConsoleOutputWindow* windowPtr = vtkF3DConsoleOutputWindow::SafeDownCast(window);
 #endif

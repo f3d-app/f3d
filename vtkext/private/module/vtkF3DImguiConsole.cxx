@@ -209,7 +209,7 @@ void vtkF3DImguiConsole::DisplayText(const char* text)
 //----------------------------------------------------------------------------
 void vtkF3DImguiConsole::ShowConsole(bool minimal)
 {
-  ImGuiViewport* viewport = ImGui::GetMainViewport();
+  const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
   constexpr float marginConsole = 30.f;
   constexpr float marginTopRight = 5.f;
@@ -374,7 +374,7 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
 //----------------------------------------------------------------------------
 void vtkF3DImguiConsole::ShowBadge()
 {
-  ImGuiViewport* viewport = ImGui::GetMainViewport();
+  const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
   if (this->Pimpl->NewError || this->Pimpl->NewWarning)
   {

@@ -72,7 +72,7 @@ void vtkF3DCachedSpecularTexture::Load(vtkRenderer* ren)
       data[i] = firstImg->GetScalarPointer(0, 0, i);
     }
 
-    int* firstDims = firstImg->GetDimensions();
+    const int* firstDims = firstImg->GetDimensions();
     if (firstDims[0] != firstDims[1])
     {
       vtkWarningMacro("Specular cache has unexpected dimensions");

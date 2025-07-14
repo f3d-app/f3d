@@ -61,7 +61,7 @@ int TestSDKExternalWindowGLX(int argc, char* argv[])
   // glXCreateContextAttribsARB
   GLXContext ctx_old = glXCreateContext(display, vi, nullptr, GL_TRUE);
   glXCreateContextAttribsARB =
-    (glXCreateContextAttribsARBProc)glXGetProcAddress((const GLubyte*)"glXCreateContextAttribsARB");
+    reinterpret_cast<glXCreateContextAttribsARBProc>(glXGetProcAddress(reinterpret_cast<const GLubyte*>("glXCreateContextAttribsARB")));
   glXMakeCurrent(display, 0, nullptr);
   glXDestroyContext(display, ctx_old);
 
