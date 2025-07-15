@@ -1042,7 +1042,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240729)
 endif()
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250513)
-  f3d_test(NAME TestInteractionAxesGridToggle INTERACTION DATA cow.vtp)
+  f3d_test(NAME TestInteractionAxesGridToggle INTERACTION DATA cow.vtp)#Shift+x
 endif()
 
 f3d_test(NAME TestInteractionMinimalConsoleOpen DATA f3d.glb INTERACTION UI) #Colon
