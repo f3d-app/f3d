@@ -400,9 +400,6 @@ void vtkF3DImguiActor::RenderDropZone()
 
       ImVec2 logoPos(center.x - logoDisplayWidth * 0.5f, center.y - logoDisplayHeight * 0.5f);
 
-      // Use ImGui::GetWindowDrawList() to draw the image
-      ImDrawList* draw_list = ImGui::GetWindowDrawList();
-
       // VTK texture pointer to ImTextureID cast (void*)
       ImTextureID texID = (ImTextureID)(this->Pimpl->LogoTexture.Get());
 
