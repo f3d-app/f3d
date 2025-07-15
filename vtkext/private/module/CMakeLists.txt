@@ -154,3 +154,6 @@ vtk_module_include(f3d::vtkextPrivate
   PUBLIC
     "${F3D_SOURCE_DIR}/external/stb"
 )
+
+# Make F3D_SOURCE_DIR accessible from code
+add_definitions(-DF3D_RESOURCE_DIR="${F3D_SOURCE_DIR}")

@@ -31,6 +31,10 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+#ifndef F3D_RESOURCE_DIR
+#define F3D_RESOURCE_DIR "."
+#endif
+
 struct vtkF3DImguiActor::Internals
 {
   void Initialize(vtkOpenGLRenderWindow* renWin)
@@ -54,7 +58,8 @@ struct vtkF3DImguiActor::Internals
       this->VertexBuffer = vtkSmartPointer<vtkOpenGLBufferObject>::New();
 
       int channels;
-      unsigned char* logoPixels = stbi_load("/Users/medyan/Desktop/projects/open_source/f3d/resources/logo_white.png", &this->LogoWidth, &this->LogoHeight, &channels, 4);
+      std::string logoPath = std::string(F3D_RESOURCE_DIR) + "/resources/logo_white.png";
+      unsigned char* logoPixels = stbi_load(logoPath.c_str(), &this->LogoWidth, &this->LogoHeight, &channels, 4);
       if (logoPixels)
       {
         this->LogoTexture = vtkSmartPointer<vtkTextureObject>::New();
