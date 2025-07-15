@@ -456,6 +456,8 @@ void vtkF3DImguiActor::RenderCheatSheet()
 
   // Use to create all rect with same size
   float maxBindingTextWidth = 0.f;
+  float maxDescTextWidth = 0.f;
+  float maxValueTextWidth = 0.f;
 
   for (const auto& [group, content] : this->CheatSheet)
   {
@@ -475,13 +477,19 @@ void vtkF3DImguiActor::RenderCheatSheet()
       winWidth = std::max(winWidth, currentLine.x);
       textHeight += ImGui::GetTextLineHeightWithSpacing();
 
-      ImVec2 bindingLineSize = ImGui::CalcTextSize(bind.c_str());
+      ImVec2 bindingLineSize = ImGui::CalcTextSize(val.c_str());
       maxBindingTextWidth = std::max(maxBindingTextWidth, bindingLineSize.x);
+
+      ImVec2 descriptionLineSize = ImGui::CalcTextSize(desc.c_str());
+      maxDescTextWidth = std::max(maxDescTextWidth, descriptionLineSize.x);
+
+      ImVec2 valueLineSize = ImGui::CalcTextSize(val.c_str());
+      maxValueTextWidth = std::max(maxValueTextWidth, valueLineSize.x);
     }
   }
 
   winWidth += 2.f * ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().ScrollbarSize +
-    maxBindingTextWidth * 0.5f;
+    maxDescTextWidth * 0.5f;
   textHeight += 2.f * ImGui::GetStyle().WindowPadding.y;
 
   const float winTop = std::max(margin, (viewport->WorkSize.y - textHeight) * 0.5f);
@@ -500,9 +508,13 @@ void vtkF3DImguiActor::RenderCheatSheet()
   for (const auto& [group, list] : this->CheatSheet)
   {
     ImGui::SeparatorText(group.c_str());
-    ImGui::BeginTable("BindingsTable", 2);
-    ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed,
-      maxBindingTextWidth + 2.f * ImGui::GetStyle().WindowPadding.x + margin); // Default to 200.0f
+    ImGui::BeginTable("BindingsTable", 3);
+    ImGui::TableSetupColumn("Description", ImGuiTableColumnFlags_WidthFixed,
+      maxDescTextWidth + 2.f * ImGui::GetStyle().WindowPadding.x + margin);
+    ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthFixed,
+      maxValueTextWidth + 2.f * ImGui::GetStyle().WindowPadding.x + margin);
+    ImGui::TableSetupColumn("Bindings", ImGuiTableColumnFlags_WidthFixed,
+      maxBindingTextWidth + 2.f * ImGui::GetStyle().WindowPadding.x + margin);
     for (const auto& [bind, desc, val] : list)
     {
       ImVec4 bindingTextColor, bindingRectColor, descTextColor;
@@ -530,8 +542,20 @@ void vtkF3DImguiActor::RenderCheatSheet()
         ImGuiTableRowFlags_None, ImGui::GetTextLineHeightWithSpacing() + 2.0f * margin);
 
       ImGui::TableNextColumn();
+      ImGui::TextColored(descTextColor, "%s", desc.c_str());
+
+      ImGui::TableNextColumn();
+      ImGui::TextColored(descTextColor, "%s", val.c_str());
+
+      ImGui::TableNextColumn();
+      ImVec2 bindingSize = ImGui::CalcTextSize(bind.c_str());
+
       ImVec2 topBindingCorner, bottomBindingCorner;
       std::vector<std::string> splittedBinding = splitBindings(bind, '+');
+      const float maxCursorPosX = ImGui::GetCursorPosX() + ImGui::GetColumnWidth();
+      float posX = maxCursorPosX - ImGui::CalcTextSize(bind.c_str()).x - ImGui::GetScrollX() -
+        ((splittedBinding.size() * 2) - 1) * ImGui::GetStyle().ItemSpacing.x;
+      ImGui::SetCursorPosX(posX);
       for (std::string& key : splittedBinding)
       {
         ImDrawList* drawList = ImGui::GetWindowDrawList();
@@ -553,17 +577,8 @@ void vtkF3DImguiActor::RenderCheatSheet()
         }
         ImGui::SameLine();
       }
-
-      ImGui::TableNextColumn();
-      if (val.empty() || val == "ON" || val == "OFF")
-      {
-        ImGui::TextColored(descTextColor, "%s", desc.c_str());
-      }
-      else
-      {
-        ImGui::TextColored(descTextColor, "%s [%s]", desc.c_str(), val.c_str());
-      }
     }
+
     ImGui::EndTable();
   }
 
