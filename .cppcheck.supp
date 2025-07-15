@@ -1,6 +1,6 @@
 // remove some checks
-duplInheritedMember
-missingIncludeSystem
+duplInheritedMember  // VTK design
+missingIncludeSystem // cppcheck seems confused about this
 missingInclude
 unusedFunction
 unknownMacro
@@ -13,16 +13,7 @@ unknownMacro
 *:external/dmon/dmon.h
 *:external/imgui/*.h
 *:external/imgui/*.cpp
-
-// generated files
-*:build/vtkext/public/module/Testing/vtkextTests.cxx
-*:vtkext/private/module/Testing/vtkextPrivateTests.cxx
-*:*/vtkextNativeTests.cxx
-*:*/plugins/alembic/module/Testing/VTKExtensionsPluginAlembic.cxx
-*:VTKExtensionsPluginAssimp.cxx
-*:vtkextDracoTests.cxx
-*:VTKExtensionsPluginUSD.cxx
-*:libf3dSDKTests.cxx
+*:*vtkextTest*
 
 // specific checks
 knownConditionTrueFalse:library/testing/TestSDKImage.cxx
@@ -36,3 +27,4 @@ invalidPointerCast:plugins/native/module/vtkF3DSplatReader.cxx
 invalidPointerCast:plugins/draco/module/vtkF3DGLTFDocumentLoader.cxx
 unusedStructMember:plugins/native/module/vtkF3DQuakeMDLImporter.cxx
 unusedStructMember:plugins/native/module/vtkF3DSPZReader.cxx
+constParameterPointer:vtkext/private/module/vtkF3DMetaImporter.cxx
