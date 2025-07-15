@@ -199,7 +199,7 @@ struct vtkF3DImguiActor::Internals
         vtkTextureObject* texObj = reinterpret_cast<vtkTextureObject*>(cmd->GetTexID());
         if (!texObj)
         {
-          texObj = this->FontTexture.Get();  // Fallback if null
+          texObj = this->FontTexture.Get(); // Fallback if null
         }
         if (texObj)
         {
