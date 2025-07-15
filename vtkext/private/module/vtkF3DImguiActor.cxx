@@ -53,18 +53,10 @@ struct vtkF3DImguiActor::Internals
       // Create VBO
       this->VertexBuffer = vtkSmartPointer<vtkOpenGLBufferObject>::New();
 
-      vtkSmartPointer<vtkTextureObject> LogoTexture;
-      int LogoWidth = 512*4;
-      int LogoHeight = 512*4;
-
-      this->LogoWidth = LogoWidth;
-      this->LogoHeight = LogoHeight;
-
       int channels;
       unsigned char* logoPixels = stbi_load("/Users/medyan/Desktop/projects/open_source/f3d/resources/logo_white.png", &this->LogoWidth, &this->LogoHeight, &channels, 4);
       if (logoPixels)
       {
-        std::cout << "Debug message here" << std::endl;
         this->LogoTexture = vtkSmartPointer<vtkTextureObject>::New();
         this->LogoTexture->SetContext(renWin);
         this->LogoTexture->Create2DFromRaw(this->LogoWidth, this->LogoHeight, 4, VTK_UNSIGNED_CHAR, logoPixels);
@@ -200,7 +192,10 @@ struct vtkF3DImguiActor::Internals
 
         // Activate texture and set uniforms per draw command:
         vtkTextureObject* texObj = reinterpret_cast<vtkTextureObject*>(cmd->GetTexID());
-        if (!texObj) texObj = this->FontTexture.Get();  // Fallback if null
+        if (!texObj)
+        {
+          texObj = this->FontTexture.Get();  // Fallback if null
+        }
         if (texObj)
         {
           texObj->Activate();

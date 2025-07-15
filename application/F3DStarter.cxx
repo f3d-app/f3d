@@ -36,6 +36,7 @@
 #include "engine.h"
 #include "interactor.h"
 #include "log.h"
+#include "macros.h"
 #include "options.h"
 #include "utils.h"
 #include "window.h"
@@ -1694,6 +1695,8 @@ void F3DStarter::LoadFileGroup(
   // by the user or not.
   f3d::options& options = this->Internals->Engine->getOptions();
   // If new option is default (false), but old option is true, use old option.
+  F3D_SILENT_WARNING_PUSH()
+  F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
   if (!options.ui.drop_zone.enable && options.ui.dropzone)
   {
       f3d::log::warn("'ui.dropzone' is deprecated. Please Use 'ui.drop_zone.enable' instead.");
@@ -1703,6 +1706,7 @@ void F3DStarter::LoadFileGroup(
   {
       options.ui.drop_zone.enable = options.ui.drop_zone.show_logo = this->Internals->LoadedFiles.empty();
   }
+  F3D_SILENT_WARNING_POP()
   options.ui.filename_info = filenameInfo;
 }
 
