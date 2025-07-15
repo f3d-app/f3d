@@ -19,7 +19,7 @@ namespace f3d
 struct type_construction_exception : public exception
 {
   explicit type_construction_exception(const std::string& what = "")
-    : exception(what) {};
+    : exception(what){};
 };
 
 /**
@@ -29,7 +29,7 @@ struct type_construction_exception : public exception
 struct type_access_exception : public exception
 {
   explicit type_access_exception(const std::string& what = "")
-    : exception(what) {};
+    : exception(what){};
 };
 
 /**
@@ -310,6 +310,24 @@ struct mesh_t
    */
   F3D_EXPORT std::pair<bool, std::string> isValid() const;
 };
+
+enum class F3D_EXPORT light_type : int
+{
+  HEADLIGHT = 1,
+  CAMERA_LIGHT = 2,
+  SCENE_LIGHT = 3,
+};
+
+struct F3D_EXPORT light_state_t
+{
+  light_type type = light_type::SCENE_LIGHT;
+  point3_t position = { 0., 0., 0. };
+  color_t color = { 1., 1., 1. };
+  vector3_t direction = { 0., 0., 0. };
+  bool positionalLight = false;
+  double intensity = 1.0;
+};
+
 }
 
 #endif

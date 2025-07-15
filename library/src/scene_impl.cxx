@@ -2,7 +2,6 @@
 
 #include "animationManager.h"
 #include "interactor_impl.h"
-#include "light_impl.h"
 #include "log.h"
 #include "options.h"
 #include "scene.h"
@@ -188,7 +187,6 @@ public:
   window_impl& Window;
   interactor_impl* Interactor = nullptr;
   animationManager AnimationManager;
-  std::vector<std::unique_ptr<light_impl>> Lights;
 
   vtkNew<vtkF3DMetaImporter> MetaImporter;
 };
@@ -337,48 +335,95 @@ scene& scene_impl::clear()
 //----------------------------------------------------------------------------
 void scene_impl::addLight(const light_state_t& lightState)
 {
-  vtkNew<vtkLight> l;
-  auto lightImpl = std::make_unique<detail::light_impl>();
-  lightImpl->SetVTKLight(l);
-  lightImpl->setState(lightState);
-  this->Internals->Lights.push_back(std::move(lightImpl));
-  this->Internals->Window.GetRenderer()->AddLight(this->Internals->Lights.back()->GetVTKLight());
+  vtkNew<vtkLight> vtkLight;
+  vtkLight->SetLightType(static_cast<int>(lightState.type));
+  vtkLight->SetPosition(lightState.position[0], lightState.position[1], lightState.position[2]);
+  vtkLight->SetColor(lightState.color[0], lightState.color[1], lightState.color[2]);
+  vtkLight->SetPositional(lightState.positionalLight);
+  vtkLight->SetFocalPoint(lightState.position[0] + lightState.direction[0],
+    lightState.position[1] + lightState.direction[1],
+    lightState.position[2] + lightState.direction[2]);
+  vtkLight->SetIntensity(lightState.intensity);
+  this->Internals->Window.GetRenderer()->AddLight(vtkLight);
 }
 
 //----------------------------------------------------------------------------
-void scene_impl::addLight(const light& light)
+int scene_impl::getLightCount() const
 {
-  const auto& state = light.getState();
-  addLight(state);
-}
-
-//----------------------------------------------------------------------------
-std::vector<light*> scene_impl::getLights()
-{
-  std::vector<light*> lights;
   vtkLightCollection* lc = this->Internals->Window.GetRenderer()->GetLights();
   lc->InitTraversal();
 
-  // add existing lights to the internal list
+  int lightCount = 0;
   for (vtkLight* vtkL = lc->GetNextItem(); vtkL != nullptr; vtkL = lc->GetNextItem())
   {
-    bool found = std::find_if(this->Internals->Lights.begin(), this->Internals->Lights.end(),
-                   [vtkL](const std::unique_ptr<detail::light_impl>& l)
-                   { return l->GetVTKLight() == vtkL; }) != this->Internals->Lights.end();
-    if (!found)
+    if (vtkL->GetSwitch())
     {
-      auto lightImpl = std::make_unique<detail::light_impl>();
-      lightImpl->SetVTKLight(vtkL);
-      this->Internals->Lights.push_back(std::move(lightImpl));
+      lightCount++;
     }
   }
+  return lightCount;
+}
 
-  for (const auto& lightImpl : this->Internals->Lights)
+//----------------------------------------------------------------------------
+light_state_t scene_impl::getLight(int index)
+{
+  vtkLightCollection* lc = this->Internals->Window.GetRenderer()->GetLights();
+  lc->InitTraversal();
+
+  int lightCount = 0;
+  for (vtkLight* vtkL = lc->GetNextItem(); vtkL != nullptr; vtkL = lc->GetNextItem())
   {
-    lights.push_back(lightImpl.get());
+    if (vtkL->GetSwitch())
+    {
+      if (lightCount == index)
+      {
+        light_state_t lightState;
+        lightState.type = static_cast<light_type>(vtkL->GetLightType());
+        lightState.position = { vtkL->GetPosition()[0], vtkL->GetPosition()[1],
+          vtkL->GetPosition()[2] };
+        lightState.color = { vtkL->GetDiffuseColor()[0], vtkL->GetDiffuseColor()[1],
+          vtkL->GetDiffuseColor()[2] };
+        lightState.direction = { vtkL->GetFocalPoint()[0] - vtkL->GetPosition()[0],
+          vtkL->GetFocalPoint()[1] - vtkL->GetPosition()[1],
+          vtkL->GetFocalPoint()[2] - vtkL->GetPosition()[2] };
+        lightState.positionalLight = vtkL->GetPositional();
+        lightState.intensity = vtkL->GetIntensity();
+        return lightState;
+      }
+      lightCount++;
+    }
   }
+  log::warn("No light at index ", index, " to get");
+  return light_state_t{};
+}
 
-  return lights;
+//----------------------------------------------------------------------------
+void scene_impl::updateLight(int index, const light_state_t& lightState)
+{
+  vtkLightCollection* lc = this->Internals->Window.GetRenderer()->GetLights();
+  lc->InitTraversal();
+
+  int lightCount = 0;
+  for (vtkLight* vtkL = lc->GetNextItem(); vtkL != nullptr; vtkL = lc->GetNextItem())
+  {
+    if (vtkL->GetSwitch())
+    {
+      if (lightCount == index)
+      {
+        vtkL->SetLightType(static_cast<int>(lightState.type));
+        vtkL->SetPosition(lightState.position[0], lightState.position[1], lightState.position[2]);
+        vtkL->SetColor(lightState.color[0], lightState.color[1], lightState.color[2]);
+        vtkL->SetPositional(lightState.positionalLight);
+        vtkL->SetFocalPoint(lightState.position[0] + lightState.direction[0],
+          lightState.position[1] + lightState.direction[1],
+          lightState.position[2] + lightState.direction[2]);
+        vtkL->SetIntensity(lightState.intensity);
+        return;
+      }
+      lightCount++;
+    }
+  }
+  log::warn("No light at index ", index, " to update");
 }
 
 //----------------------------------------------------------------------------

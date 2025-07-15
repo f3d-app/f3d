@@ -38,7 +38,6 @@ f3d_generate_options(
 set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/animationManager.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/camera_impl.cxx
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/light_impl.cxx
   ${CMAKE_CURRENT_BINARY_DIR}/src/config.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/context.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/src/engine.cxx
@@ -67,7 +66,6 @@ set(F3D_PUBLIC_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/plugin/plugin.h
   ${CMAKE_CURRENT_SOURCE_DIR}/plugin/reader.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/camera.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/public/light.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/context.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/engine.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/exception.h

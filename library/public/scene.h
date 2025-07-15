@@ -3,7 +3,6 @@
 
 #include "exception.h"
 #include "export.h"
-#include "light.h"
 #include "types.h"
 
 #include <filesystem>
@@ -41,7 +40,7 @@ public:
   struct load_failure_exception : public exception
   {
     explicit load_failure_exception(const std::string& what = "")
-      : exception(what) {};
+      : exception(what){};
   };
 
   ///@{
@@ -84,15 +83,21 @@ public:
    * Add a light based on a light state.
    */
   virtual void addLight(const light_state_t& lightState) = 0;
+
   /**
-   * Add a light based on an existing light object.
+   * Get the number of lights.
    */
-  virtual void addLight(const light& light) = 0;
+  [[nodiscard]] virtual int getLightCount() const = 0;
 
   /**
    * Get all lights
    */
-  [[nodiscard]] virtual std::vector<light*> getLights() = 0;
+  [[nodiscard]] virtual light_state_t getLight(int index) = 0;
+
+  /**
+   * Update a light at provided index with the provided light state.
+   */
+  virtual void updateLight(int index, const light_state_t& lightState) = 0;
 
   /**
    * Return true if provided file path is supported, false otherwise.
