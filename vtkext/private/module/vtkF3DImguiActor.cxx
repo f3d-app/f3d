@@ -28,8 +28,23 @@
 
 #include <optional>
 
+static std::vector<std::string> splitBindings(const std::string& s, char delim)
+{
+  std::vector<std::string> result;
+  std::stringstream ss(s);
+  std::string item;
+
+  while (getline(ss, item, delim))
+  {
+    result.push_back(item);
+  }
+
+  return result;
+}
+
 struct vtkF3DImguiActor::Internals
 {
+
   void Initialize(vtkOpenGLRenderWindow* renWin)
   {
     if (this->FontTexture == nullptr)
@@ -461,10 +476,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
       textHeight += ImGui::GetTextLineHeightWithSpacing();
 
       ImVec2 bindingLineSize = ImGui::CalcTextSize(bind.c_str());
-      if (bindingLineSize.x >= maxBindingTextWidth)
-      {
-        maxBindingTextWidth = bindingLineSize.x;
-      }
+      maxBindingTextWidth = std::max(maxBindingTextWidth, bindingLineSize.x);
     }
   }
 
@@ -488,38 +500,61 @@ void vtkF3DImguiActor::RenderCheatSheet()
   for (const auto& [group, list] : this->CheatSheet)
   {
     ImGui::SeparatorText(group.c_str());
+    ImGui::BeginTable("BindingsTable", 2);
+    ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed,
+      maxBindingTextWidth + 2.f * ImGui::GetStyle().WindowPadding.x + margin); // Default to 200.0f
     for (const auto& [bind, desc, val] : list)
     {
-      ImDrawList* drawList = ImGui::GetWindowDrawList();
-      ImVec4 bindingRectColor, descTextColor;
+      ImVec4 bindingTextColor, bindingRectColor, descTextColor;
 
       if (val == "ON")
       {
+        bindingTextColor = F3DImguiStyle::GetTextColor();
         bindingRectColor = F3DImguiStyle::GetHighlightColor();
         descTextColor = F3DImguiStyle::GetHighlightColor();
       }
+      else if (!val.empty() && val != "OFF" && val != "Unset" && val != "none")
+      {
+        bindingTextColor = F3DImguiStyle::GetBackgroundColor();
+        bindingRectColor = F3DImguiStyle::GetWarningColor();
+        descTextColor = F3DImguiStyle::GetWarningColor();
+      }
       else
       {
+        bindingTextColor = F3DImguiStyle::GetTextColor();
         bindingRectColor = F3DImguiStyle::GetMidColor();
         descTextColor = F3DImguiStyle::GetTextColor();
       }
 
-      drawList->ChannelsSplit(2);
+      ImGui::TableNextRow(
+        ImGuiTableRowFlags_None, ImGui::GetTextLineHeightWithSpacing() + 2.0f * margin);
 
-      drawList->ChannelsSetCurrent(1);
-      ImGui::Text("%s", bind.c_str());
+      ImGui::TableNextColumn();
+      ImVec2 topBindingCorner, bottomBindingCorner;
+      std::vector<std::string> splittedBinding = splitBindings(bind, '+');
+      for (std::string& key : splittedBinding)
+      {
+        ImDrawList* drawList = ImGui::GetWindowDrawList();
+        drawList->ChannelsSplit(2);
+        drawList->ChannelsSetCurrent(1);
+        ImGui::TextColored(bindingTextColor, "%s", key.c_str());
+        drawList->ChannelsSetCurrent(0);
+        topBindingCorner =
+          ImVec2(ImGui::GetItemRectMin().x - margin, ImGui::GetItemRectMin().y - margin);
+        bottomBindingCorner =
+          ImVec2(ImGui::GetItemRectMax().x + margin, ImGui::GetItemRectMax().y + margin);
+        drawList->AddRectFilled(
+          topBindingCorner, bottomBindingCorner, ImColor(bindingRectColor), 5.f);
+        drawList->ChannelsMerge();
+        if (key != splittedBinding.at(splittedBinding.size() - 1))
+        {
+          ImGui::SameLine();
+          ImGui::Text("+");
+        }
+        ImGui::SameLine();
+      }
 
-      drawList->ChannelsSetCurrent(0);
-      ImVec2 topBindingCorner(
-        ImGui::GetItemRectMin().x - margin, ImGui::GetItemRectMin().y - margin);
-      ImVec2 bottomBindingCorner(ImGui::GetItemRectMin().x + maxBindingTextWidth + margin,
-        ImGui::GetItemRectMax().y + margin);
-      drawList->AddRectFilled(
-        topBindingCorner, bottomBindingCorner, ImColor(bindingRectColor), 5.f);
-      drawList->ChannelsMerge();
-
-      ImGui::SameLine();
-      ImGui::SetCursorPosX(bottomBindingCorner.x + ImGui::GetStyle().WindowPadding.x);
+      ImGui::TableNextColumn();
       if (val.empty() || val == "ON" || val == "OFF")
       {
         ImGui::TextColored(descTextColor, "%s", desc.c_str());
@@ -528,9 +563,8 @@ void vtkF3DImguiActor::RenderCheatSheet()
       {
         ImGui::TextColored(descTextColor, "%s [%s]", desc.c_str(), val.c_str());
       }
-
-      ImGui::NewLine();
     }
+    ImGui::EndTable();
   }
 
   ImGui::End();
