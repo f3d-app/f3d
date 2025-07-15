@@ -73,7 +73,7 @@ runs:
         mv patched.cmake CMake/vtkModule.cmake
 
     # VTK 9.2.6 needs patching with recent libstd
-    - name: Patch VTK Proj
+    - name: Patch VTK v9.2.6
       if: steps.cache-vtk.outputs.cache-hit != 'true' && inputs.vtk_version == 'v9.2.6'
       working-directory: ${{github.workspace}}/dependencies/vtk
       shell: bash
