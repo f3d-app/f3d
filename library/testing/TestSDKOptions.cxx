@@ -212,13 +212,14 @@ int TestSDKOptions(int argc, char* argv[])
   opt.setAsString("model.textures_transform", "angle:0.21");
   test("setAsString/get angle transform2d",
     std::get<std::vector<double>>(opt.get("model.textures_transform")) ==
-      std::vector<double>{ cos(0.21), -sin(0.21), 0, sin(0.21), cos(0.21), 0, 0, 0, 1 });
+      std::vector<double>{
+        std::cos(0.21), -std::sin(0.21), 0, std::sin(0.21), std::cos(0.21), 0, 0, 0, 1 });
 
   opt.setAsString("model.textures_transform", "scale:0.1,translation:0.51,2.1,angle:0.21");
   test("setAsString/get scale/translation/angle transform2d",
     std::get<std::vector<double>>(opt.get("model.textures_transform")) ==
-      std::vector<double>{
-        0.1 * cos(0.21), 0.1 * -sin(0.21), 0.51, 0.1 * sin(0.21), 0.1 * cos(0.21), 2.1, 0, 0, 1 });
+      std::vector<double>{ 0.1 * std::cos(0.21), 0.1 * -std::sin(0.21), 0.51, 0.1 * std::sin(0.21),
+        0.1 * std::cos(0.21), 2.1, 0, 0, 1 });
 
   // Test closest option
   auto closest = opt.getClosestOption("modle.sciivs.cell");
