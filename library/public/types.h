@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -251,9 +252,9 @@ public:
   // clang-format off
   /**
    *  The general form of a 3x3 transformation matrix M with scale S(x,y),
-   *  translation T(x,y), and angle a, is solved out to the following:
+   *  translation T(x,y), and angle a (in radians), is solved out to the following:
    * 
-   *      [cos(a)*S(x), -sin(t)*S(y),   T(x)]
+   *      [cos(a)*S(x), -sin(a)*S(y),   T(x)]
    *  M = [sin(a)*S(x), cos(a)*S(y),    T(y)]
    *      [0,           0,              1   ]
    * 
@@ -261,14 +262,14 @@ public:
    */
   // clang-format on
 
-  inline transform2d_t(double scaleX, double scaleY, double translationX, double translationY,
-    double angle)
+  inline transform2d_t(
+    double scaleX, double scaleY, double translationX, double translationY, double angle)
   {
-    (*this)[0] = cos(angle) * scaleX;
-    (*this)[1] = -sin(angle) * scaleY;
+    (*this)[0] = std::cos(angle) * scaleX;
+    (*this)[1] = -std::sin(angle) * scaleY;
     (*this)[2] = translationX;
-    (*this)[3] = sin(angle) * scaleX;
-    (*this)[4] = cos(angle) * scaleY;
+    (*this)[3] = std::sin(angle) * scaleX;
+    (*this)[4] = std::cos(angle) * scaleY;
     (*this)[5] = translationY;
     (*this)[6] = 0;
     (*this)[7] = 0;

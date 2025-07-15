@@ -115,6 +115,6 @@ When formatting a colormap into a string, it is formatted as `val, color, ...`.
 The following formats are supported when parsing a string into a transform2D:
 
 - A 9D double vector
-- At least one of the following: `scale: val, val`, `translation: val, val`, `angle: val` in any order, comma-separated. `scale` may be given one value, which will apply to both the x and y axes of the matrix.
+- At least one of the following: `scale: val, val`, `translation: val, val`, `angle: val` in any order, comma-separated. `scale` may be given one value, which will apply to both the x and y axes of the matrix. `angle` is expressed in radians.
 
 When formatting a transform2d into a string, it is formatted as a 9D double vector
