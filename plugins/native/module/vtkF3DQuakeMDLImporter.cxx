@@ -10,6 +10,8 @@
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
 
+#include <cstdint>
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkF3DQuakeMDLImporter);
 

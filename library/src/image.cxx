@@ -178,7 +178,7 @@ image::image(unsigned int width, unsigned int height, unsigned int channelCount,
 
 //----------------------------------------------------------------------------
 image::image(const fs::path& filePath)
-  : Internals(std::make_unique<image::internals>())
+  : Internals(new image::internals())
 {
   detail::init::initialize();
 
@@ -186,6 +186,7 @@ image::image(const fs::path& filePath)
   {
     if (!fs::exists(filePath))
     {
+      delete this->Internals;
       throw read_exception("Cannot open image " + filePath.string());
     }
 
@@ -207,17 +208,22 @@ image::image(const fs::path& filePath)
 
     if (!this->Internals->Image)
     {
+      delete this->Internals;
       throw read_exception("Cannot read image " + filePath.string());
     }
   }
   catch (const fs::filesystem_error& ex)
   {
+    delete this->Internals;
     throw read_exception(std::string("Cannot read image: ") + ex.what());
   }
 }
 
 //----------------------------------------------------------------------------
-image::~image() = default;
+image::~image()
+{
+  delete this->Internals;
+}
 
 //----------------------------------------------------------------------------
 image::image(const image& img)
