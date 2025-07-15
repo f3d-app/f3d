@@ -13,7 +13,17 @@ unknownMacro
 *:external/dmon/dmon.h
 *:external/imgui/*.h
 *:external/imgui/*.cpp
-*:*vtkextTest*
+
+// generated files
+*:*vtkextTest.cxx
+*:*vtkextPrivateTests.cxx
+*:*vtkextNativeTests.cxx
+*:*VTKExtensionsPluginAlembic.cxx
+*:*VTKExtensionsPluginAssimp.cxx
+*:*vtkextDracoTests.cxx
+*:*vtkextOCCTTests.cxx
+*:*VTKExtensionsPluginUSD.cxx
+*:*libf3dSDKTests.cxx
 
 // specific checks
 knownConditionTrueFalse:library/testing/TestSDKImage.cxx
