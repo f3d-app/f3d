@@ -222,6 +222,93 @@ public:
   virtual interactor& disableCameraMovement() = 0;
   ///@}
 
+  ///@{ @name Forwarding input events
+  /**
+   * Enumeration of supported mouse buttons.
+   */
+  enum class MouseButton : unsigned char
+  {
+    LEFT,
+    RIGHT,
+    MIDDLE
+  };
+
+  /**
+   * Enumeration of supported mouse wheel directions.
+   */
+  enum class WheelDirection : unsigned char
+  {
+    FORWARD,
+    BACKWARD,
+    LEFT,
+    RIGHT
+  };
+
+  /**
+   * Enumeration of supported input actions.
+   */
+  enum class InputAction : unsigned char
+  {
+    PRESS,
+    RELEASE
+  };
+
+  /**
+   * Enumeration of supported input modifiers.
+   */
+  enum class InputModifier : unsigned char
+  {
+    NONE,
+    CTRL,
+    SHIFT,
+    CTRL_SHIFT
+  };
+
+  /**
+   * Trigger a modifier update.
+   * This will update the internal modifier state of the interactor to match the provided one.
+   */
+  virtual interactor& triggerModUpdate(InputModifier mod) = 0;
+
+  /**
+   * Trigger a mouse button event.
+   * This will trigger the corresponding mouse button press or release event.
+   */
+  virtual interactor& triggerMouseButton(InputAction action, MouseButton button) = 0;
+
+  /**
+   * Trigger a mouse new position event.
+   * Positions are in window coordinates, with (0, 0) being the top-left corner.
+   */
+  virtual interactor& triggerMousePosition(double xpos, double ypos) = 0;
+
+  /**
+   * Trigger a mouse wheel event.
+   * At the moment, only vertical wheel events are observed, but it can change in the future.
+   */
+  virtual interactor& triggerMouseWheel(WheelDirection direction) = 0;
+
+  /**
+   * Trigger a keyboard key event.
+   * This is based on X11 key symbols, it's hard to list all of them, but here are a few:
+   * - "A", "B", "C", ..., "Z" for letters
+   * - "0", "1", "2", ..., "9" for numbers
+   * - "Left", "Right", "Up", "Down" for arrow keys
+   * - "Space", "Return", "Escape", "Tab", "BackSpace" for common keys
+   * - "F1", "F2", ..., "F25" for function keys
+   * - "KP_0", "KP_1", ..., "KP_9" for numpad keys
+   */
+  virtual interactor& triggerKeyboardKey(InputAction action, std::string_view keySym) = 0;
+
+  /**
+   * Trigger a text character input event.
+   * This will trigger the corresponding character input event, with the codepoint being the Unicode
+   * codepoint of the character.
+   * It's used for text input, like when typing in a the console input field.
+   */
+  virtual interactor& triggerTextCharacter(unsigned int codepoint) = 0;
+  ///@}
+
   /**
    * Play a VTK interaction file.
    * Provided file path is used as is and file existence will be checked.

@@ -1350,6 +1350,98 @@ std::pair<std::string, std::string> interactor_impl::getBindingDocumentation(
 }
 
 //----------------------------------------------------------------------------
+interactor& interactor_impl::triggerModUpdate(InputModifier mod)
+{
+  this->Internals->VTKInteractor->SetControlKey(
+    mod == InputModifier::CTRL || mod == InputModifier::CTRL_SHIFT);
+  this->Internals->VTKInteractor->SetShiftKey(
+    mod == InputModifier::SHIFT || mod == InputModifier::CTRL_SHIFT);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::triggerMouseButton(InputAction action, MouseButton button)
+{
+  unsigned long event = vtkCommand::AnyEvent;
+
+  switch (button)
+  {
+    case MouseButton::LEFT:
+      event = action == InputAction::PRESS ? vtkCommand::LeftButtonPressEvent
+                                           : vtkCommand::LeftButtonReleaseEvent;
+      break;
+    case MouseButton::RIGHT:
+      event = action == InputAction::PRESS ? vtkCommand::RightButtonPressEvent
+                                           : vtkCommand::RightButtonReleaseEvent;
+      break;
+    case MouseButton::MIDDLE:
+      event = action == InputAction::PRESS ? vtkCommand::MiddleButtonPressEvent
+                                           : vtkCommand::MiddleButtonReleaseEvent;
+      break;
+  }
+
+  this->Internals->VTKInteractor->InvokeEvent(event, nullptr);
+
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::triggerMousePosition(double xpos, double ypos)
+{
+  this->Internals->VTKInteractor->SetEventInformationFlipY(xpos, ypos);
+  this->Internals->VTKInteractor->InvokeEvent(vtkCommand::MouseMoveEvent, nullptr);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::triggerMouseWheel(WheelDirection direction)
+{
+  switch (direction)
+  {
+    case WheelDirection::LEFT:
+      this->Internals->VTKInteractor->InvokeEvent(vtkCommand::MouseWheelLeftEvent, nullptr);
+      break;
+    case WheelDirection::RIGHT:
+      this->Internals->VTKInteractor->InvokeEvent(vtkCommand::MouseWheelRightEvent, nullptr);
+      break;
+    case WheelDirection::FORWARD:
+      this->Internals->VTKInteractor->InvokeEvent(vtkCommand::MouseWheelForwardEvent, nullptr);
+      break;
+    case WheelDirection::BACKWARD:
+      this->Internals->VTKInteractor->InvokeEvent(vtkCommand::MouseWheelBackwardEvent, nullptr);
+      break;
+  }
+
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::triggerKeyboardKey(InputAction action, std::string_view keySym)
+{
+  if (!keySym.empty())
+  {
+    this->Internals->VTKInteractor->SetKeySym(keySym.data());
+
+    this->Internals->VTKInteractor->InvokeEvent(
+      action == InputAction::PRESS ? vtkCommand::KeyPressEvent : vtkCommand::KeyReleaseEvent,
+      nullptr);
+  }
+
+  return *this;
+}
+
+interactor& interactor_impl::triggerTextCharacter(unsigned int codepoint)
+{
+  if (codepoint > 0)
+  {
+    this->Internals->VTKInteractor->SetKeyCode(codepoint);
+    this->Internals->VTKInteractor->InvokeEvent(vtkCommand::CharEvent, nullptr);
+  }
+
+  return *this;
+}
+
+//----------------------------------------------------------------------------
 interactor& interactor_impl::toggleAnimation()
 {
   assert(this->Internals->AnimationManager);
