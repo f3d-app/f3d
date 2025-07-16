@@ -232,7 +232,8 @@
     },
     "color": {
       "opacity": {
-        "type": "double"
+        "type": "double",
+        "default_value": "1.0"
       },
       "rgb": {
         "type": "color"
