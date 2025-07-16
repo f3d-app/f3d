@@ -413,6 +413,19 @@ void window_impl::UpdateDynamicOptions()
   renderer->ShowDropZone(opt.ui.drop_zone.enable);
   renderer->SetDropZoneInfo(opt.ui.drop_zone.info);
   renderer->ShowDropZoneLogo(opt.ui.drop_zone.show_logo);
+  // F3D_DEPRECATED
+  // Remove this in the next major release
+  F3D_SILENT_WARNING_PUSH()
+  F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
+  if (opt.ui.dropzone)
+  {
+    log::warn("'ui.dropzone' is deprecated. Please Use 'ui.drop_zone.enable' instead.");
+    renderer->ShowDropZone(opt.ui.dropzone);
+    renderer->SetDropZoneInfo(opt.ui.drop_zone.info);
+    renderer->ShowDropZoneLogo(opt.ui.dropzone);
+  }
+  F3D_SILENT_WARNING_POP()
+
   renderer->ShowArmature(opt.render.armature.enable);
 
   renderer->SetUseRaytracing(opt.render.raytracing.enable);
