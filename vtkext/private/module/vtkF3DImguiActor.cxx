@@ -71,9 +71,6 @@ struct vtkF3DImguiActor::Internals
         this->LogoTexture = vtkSmartPointer<vtkTextureObject>::New();
         this->LogoTexture->SetContext(renWin);
         this->LogoTexture->Create2DFromRaw(this->LogoWidth, this->LogoHeight, 4, VTK_UNSIGNED_CHAR, logoPixels);
-
-        // Store the logo texture ID for ImGui usage
-        this->LogoImTextureID = (ImTextureID)this->LogoTexture->GetHandle();
       }
 
       // https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10589
@@ -250,7 +247,6 @@ struct vtkF3DImguiActor::Internals
   vtkSmartPointer<vtkShaderProgram> Program;
   int LogoWidth = 0;
   int LogoHeight = 0;
-  ImTextureID LogoImTextureID = 0;
   vtkSmartPointer<vtkTextureObject> LogoTexture;
 
 };
