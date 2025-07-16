@@ -95,6 +95,7 @@ public:
     std::string VerboseLevel;
     std::string MultiFileMode;
     bool RecursiveDirAdd;
+    bool RemoveEmptyFileGroups;
     std::vector<int> Resolution;
     std::vector<int> Position;
     std::string ColorMapFile;
@@ -746,6 +747,8 @@ public:
     this->ParseOption(appOptions, "verbose", this->AppOptions.VerboseLevel);
     this->ParseOption(appOptions, "multi-file-mode", this->AppOptions.MultiFileMode);
     this->ParseOption(appOptions, "recursive-dir-add", this->AppOptions.RecursiveDirAdd);
+    this->ParseOption(
+      appOptions, "remove-empty-file-groups", this->AppOptions.RemoveEmptyFileGroups);
     this->ParseOption(appOptions, "resolution", this->AppOptions.Resolution);
     this->ParseOption(appOptions, "position", this->AppOptions.Position);
     this->ParseOption(appOptions, "colormap-file", this->AppOptions.ColorMapFile);
@@ -1420,17 +1423,24 @@ void F3DStarter::LoadFileGroup(int index, bool relativeIndex, bool forceClear)
     // XXX: Each group contains at least one path
     std::string groupIdx = "(" + std::to_string(groupIndex + 1) + "/" +
       std::to_string(this->Internals->FilesGroups.size()) + ")";
-    this->LoadFileGroup(this->Internals->FilesGroups[groupIndex].second, clear, groupIdx);
+    this->LoadFileGroupInternal(this->Internals->FilesGroups[groupIndex].second, clear, groupIdx);
+
+    if (this->Internals->AppOptions.RemoveEmptyFileGroups && this->Internals->LoadedFiles.empty())
+    {
+      this->Internals->FilesGroups.erase(
+        this->Internals->FilesGroups.begin() + this->Internals->CurrentFilesGroupIndex);
+      this->LoadRelativeFileGroup(0, false, true);
+    }
   }
   else
   {
     this->Internals->CurrentFilesGroupIndex = groupIndex;
-    this->LoadFileGroup(std::vector<fs::path>{}, true, "");
+    this->LoadFileGroupInternal(std::vector<fs::path>{}, true, "");
   }
 }
 
 //----------------------------------------------------------------------------
-void F3DStarter::LoadFileGroup(
+void F3DStarter::LoadFileGroupInternal(
   const std::vector<fs::path>& paths, bool clear, const std::string& groupIdx)
 {
   // Make sure the animation is stopped before trying to load any file
