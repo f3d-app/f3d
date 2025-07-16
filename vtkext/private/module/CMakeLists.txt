@@ -20,6 +20,17 @@ if(F3D_MODULE_UI)
 
   list(APPEND sources ${CMAKE_CURRENT_BINARY_DIR}/F3DFontBuffer.cxx)
   list(APPEND private_headers ${CMAKE_CURRENT_BINARY_DIR}/F3DFontBuffer.h)
+
+  set(F3D_DEFAULT_LOGO "${F3D_SOURCE_DIR}/resources/logo-white.png" CACHE STRING "logo")
+  mark_as_advanced(F3D_DEFAULT_LOGO)
+
+  f3d_embed_file(
+    INPUT "${F3D_DEFAULT_LOGO}"
+    NAME F3DDefaultLogo
+    BINARY)
+
+  list(APPEND sources ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultLogo.cxx)
+  list(APPEND private_headers ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultLogo.h)
 endif()
 
 set(shader_files glsl/vtkF3DComputeDepthCS.glsl)
@@ -149,11 +160,3 @@ endif ()
 if (F3D_MODULE_RAYTRACING)
   vtk_module_definitions(f3d::vtkextPrivate PRIVATE F3D_MODULE_RAYTRACING)
 endif ()
-
-vtk_module_include(f3d::vtkextPrivate
-  PUBLIC
-    "${F3D_SOURCE_DIR}/external/stb"
-)
-
-# Make F3D_SOURCE_DIR accessible from code
-add_definitions(-DF3D_RESOURCE_DIR="${F3D_SOURCE_DIR}")

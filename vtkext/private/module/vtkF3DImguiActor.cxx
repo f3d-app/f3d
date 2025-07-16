@@ -1,17 +1,20 @@
 #include "vtkF3DImguiActor.h"
 
+#include "F3DDefaultLogo.h"
 #include "F3DFontBuffer.h"
 #include "F3DImguiStyle.h"
 #include "vtkF3DImguiConsole.h"
 #include "vtkF3DImguiFS.h"
 #include "vtkF3DImguiVS.h"
 
+#include <vtkImageData.h>
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLBufferObject.h>
 #include <vtkOpenGLRenderWindow.h>
 #include <vtkOpenGLShaderCache.h>
 #include <vtkOpenGLState.h>
 #include <vtkOpenGLVertexArrayObject.h>
+#include <vtkPNGReader.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkShader.h>
 #include <vtkShaderProgram.h>
@@ -28,12 +31,7 @@
 
 #include <optional>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
 
-#ifndef F3D_RESOURCE_DIR
-#define F3D_RESOURCE_DIR "."
-#endif
 
 struct vtkF3DImguiActor::Internals
 {
@@ -57,17 +55,27 @@ struct vtkF3DImguiActor::Internals
       // Create VBO
       this->VertexBuffer = vtkSmartPointer<vtkOpenGLBufferObject>::New();
 
-      int channels;
-      std::string logoPath = std::string(F3D_RESOURCE_DIR) + "/resources/logo_white.png";
-      unsigned char* logoPixels = stbi_load(logoPath.c_str(), &this->LogoWidth, &this->LogoHeight, &channels, 4);
+      // Load embedded PNG icon into texture
+      vtkNew<vtkPNGReader> iconReader;
+      iconReader->SetMemoryBuffer(F3DDefaultLogo);
+      iconReader->SetMemoryBufferLength(sizeof(F3DDefaultLogo));
+      iconReader->Update();
+
+      vtkImageData* imageData = iconReader->GetOutput();
+      int dims[3];
+      imageData->GetDimensions(dims);
+      this->LogoWidth = dims[0];
+      this->LogoHeight = dims[1];
+
+      unsigned char* logoPixels = static_cast<unsigned char*>(imageData->GetScalarPointer());
       if (logoPixels)
       {
         this->LogoTexture = vtkSmartPointer<vtkTextureObject>::New();
         this->LogoTexture->SetContext(renWin);
         this->LogoTexture->Create2DFromRaw(this->LogoWidth, this->LogoHeight, 4, VTK_UNSIGNED_CHAR, logoPixels);
-        stbi_image_free(logoPixels);
-        // Store the logo texture ID somewhere global or accessible
-        this->LogoImTextureID = (ImTextureID)this->LogoTexture.Get();
+
+        // Store the logo texture ID for ImGui usage
+        this->LogoImTextureID = (ImTextureID)this->LogoTexture->GetHandle();
       }
 
       // https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10589
