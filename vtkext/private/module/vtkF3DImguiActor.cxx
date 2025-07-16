@@ -31,8 +31,6 @@
 
 #include <optional>
 
-
-
 struct vtkF3DImguiActor::Internals
 {
   void Initialize(vtkOpenGLRenderWindow* renWin)
