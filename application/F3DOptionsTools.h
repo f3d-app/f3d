@@ -41,6 +41,7 @@ static inline const OptionsDict DefaultAppOptions = {
   { "verbose", "info" },
   { "multi-file-mode", "single" },
   { "recursive-dir-add", "false" },
+  { "remove-empty-file-groups", "false" },
   { "resolution", "1000, 600" },
   { "position", "" },
   { "colormap-file", "" },
