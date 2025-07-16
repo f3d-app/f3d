@@ -91,7 +91,7 @@ and the internal VCPKG to automatically build the dependencies.
 
 - Open Visual Studio
 - Select `Clone a repository`
-- Specify the repository address: `https://github.com/f3d-app/f3d.git` and the local folder of your choice
+- Specify the repository address: `https://github.com/f3d-app/f3d.git` and the local directory of your choice
 
 > [!WARNING]
 > The first run will take a while (up to 1 hour) because VTK is compiled twice (in Debug and Release mode)
@@ -133,7 +133,7 @@ git clone https://github.com/f3d-app/f3d.git src
 mkdir build
 ```
 
-Note: Resulting folder architecture should look like this:
+Note: Resulting directory architecture should look like this:
 
 ```
 dev
@@ -146,7 +146,7 @@ dev
     `-- src
 ```
 
-#### Build and install VTK in a dedicated folder
+#### Build and install VTK in a dedicated directory
 
 - Open x64 Native Tools Command Prompt for VS 2022
 
