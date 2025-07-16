@@ -21,7 +21,7 @@ eng.scene.add("f3d/testing/data/dragon.vtu")
 eng.interactor.start()
 ```
 
-You can see more examples using python bindings in the dedicated example folder [here](https://github.com/f3d-app/f3d/tree/master/examples/libf3d/python).
+You can see more examples using python bindings in the dedicated example directory [here](https://github.com/f3d-app/f3d/tree/master/examples/libf3d/python).
 
 ### Stubs
 
