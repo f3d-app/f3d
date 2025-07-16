@@ -41,6 +41,7 @@ Other options can be toggled directly by pressing the following hotkeys:
 - <kbd>E</kbd>: the display of cell edges.
 - <kbd>X</kbd>: the trihedral axes display.
 - <kbd>G</kbd>: the horizontal grid display.
+- <kbd>Shift</kbd>+<kbd>x</kbd>: show/hide axes grid
 - <kbd>N</kbd>: the display of the file name.
 - <kbd>M</kbd>: the display of the metadata if exists.
 - <kbd>Z</kbd>: the display of the FPS counter.
