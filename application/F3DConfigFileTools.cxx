@@ -9,18 +9,12 @@
 
 #include <filesystem>
 #include <fstream>
-#include <set>
 #include <vector>
 
 namespace fs = std::filesystem;
 
-namespace
-{
 //----------------------------------------------------------------------------
-/**
- * Recover a OS-specific vector of potential config file directories
- */
-std::vector<fs::path> GetConfigPaths(const std::string& configSearch)
+std::vector<fs::path> F3DConfigFileTools::GetConfigPaths(const std::string& configSearch)
 {
   std::vector<fs::path> paths;
 
@@ -63,15 +57,7 @@ std::vector<fs::path> GetConfigPaths(const std::string& configSearch)
       for (const auto& configName : configNames)
       {
         configPath = dir / (configName);
-        if (fs::exists(configPath))
-        {
-          f3d::log::debug("Config file found: ", configPath.string());
-          paths.emplace_back(configPath);
-        }
-        else
-        {
-          f3d::log::debug("Candidate config file not found: ", configPath.string());
-        }
+        paths.emplace_back(configPath);
       }
     }
     catch (const fs::filesystem_error&)
@@ -81,7 +67,6 @@ std::vector<fs::path> GetConfigPaths(const std::string& configSearch)
   }
 
   return paths;
-}
 }
 
 //----------------------------------------------------------------------------
@@ -110,7 +95,7 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
   std::vector<fs::path> configPaths;
   if (!configSearch.empty())
   {
-    configPaths = ::GetConfigPaths(configSearch);
+    configPaths = GetConfigPaths(configSearch);
   }
   else
   {
@@ -122,16 +107,13 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
   std::vector<fs::path> actualConfigFilePaths;
   for (auto configPath : configPaths)
   {
-    // Recover an absolute canonical path to config file
-    try
+    if (!fs::exists(configPath))
     {
-      configPath = fs::canonical(fs::path(configPath)).string();
-    }
-    catch (const fs::filesystem_error&)
-    {
-      f3d::log::error("Configuration file does not exist: ", configPath.string(), " , ignoring it");
       continue;
     }
+
+    // Recover an absolute canonical path to config file
+    configPath = fs::canonical(fs::path(configPath)).string();
 
     // Recover all config files if needed in directories
     if (fs::is_directory(configPath))
