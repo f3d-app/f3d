@@ -243,7 +243,7 @@ public:
   // Increase/Decrease opacity
   void IncreaseOpacity(bool negative)
   {
-    // current opacity, limited to 1.0 because we can't have more thant full opacity (1.0)
+    // current opacity, opacity could not be higher than 1.0
     const double currentOpacity = std::min(this->Options.model.color.opacity, 1.0);
 
     // new opacity, clamped between 0 and 1 if not already set outside that range
