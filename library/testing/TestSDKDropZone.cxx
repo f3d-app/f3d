@@ -11,6 +11,7 @@ int TestSDKDropZone(int argc, char* argv[])
   f3d::options& opt = eng.getOptions();
   win.setSize(300, 300);
   opt.ui.drop_zone.enable = true;
+  opt.ui.drop_zone.show_logo = true;
   opt.ui.drop_zone.info = "Drop a file to open it\nPress H to show cheatsheet";
 
   win.render();
