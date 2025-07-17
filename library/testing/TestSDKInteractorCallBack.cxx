@@ -51,8 +51,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   try
   {
     inter.addBinding({ mod_t::ANY, "7" }, "exception");
-    std::cerr << "An exception has not been thrown when adding a existing interaction command"
-              << "\n";
+    std::cerr << "An exception has not been thrown when adding a existing interaction command\n";
     return EXIT_FAILURE;
   }
   catch (const f3d::interactor::already_exists_exception& ex)
@@ -178,8 +177,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   if (!inter.playInteraction(
         std::string(argv[1]) + "recordings/TestSDKInteractorCallBackConsoleException.log"))
   {
-    std::cerr << "Unexcepted failure playing a console command triggering an exception"
-              << "\n";
+    std::cerr << "Unexcepted failure playing a console command triggering an exception\n";
     return EXIT_FAILURE;
   }
 

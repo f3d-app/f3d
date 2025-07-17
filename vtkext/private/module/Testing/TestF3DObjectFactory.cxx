@@ -66,8 +66,7 @@ int TestF3DObjectFactory(int argc, char* argv[])
 #endif
   if (windowPtr == nullptr)
   {
-    std::cerr << "vtkF3DObjectFactory failed to create the correct type of vtkOutputWindow"
-              << "\n";
+    std::cerr << "vtkF3DObjectFactory failed to create the correct type of vtkOutputWindow\n";
     return EXIT_FAILURE;
   }
 

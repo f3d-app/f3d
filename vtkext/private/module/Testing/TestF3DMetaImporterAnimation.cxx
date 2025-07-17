@@ -61,16 +61,14 @@ int TestF3DMetaImporterAnimation(int argc, char* argv[])
   importer->EnableAnimation(0);
   if (importer->IsAnimationEnabled(0))
   {
-    std::cerr << "Unexpected enable animation name after enabling without animation available"
-              << "\n";
+    std::cerr << "Unexpected enable animation name after enabling without animation available\n";
     return EXIT_FAILURE;
   }
 
   importer->DisableAnimation(0);
   if (importer->IsAnimationEnabled(0))
   {
-    std::cerr << "Unexpected enable animation name after disabling without animation available"
-              << "\n";
+    std::cerr << "Unexpected enable animation name after disabling without animation available\n";
     return EXIT_FAILURE;
   }
 

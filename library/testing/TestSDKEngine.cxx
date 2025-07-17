@@ -44,8 +44,7 @@ int TestSDKEngine(int argc, char* argv[])
   eng0.setOptions(opt);
   if (!eng0.getOptions().model.scivis.cells)
   {
-    std::cerr << "Unexpected options value using f3d::engine::setOptions(const options& opt)"
-              << "\n";
+    std::cerr << "Unexpected options value using f3d::engine::setOptions(const options& opt)\n";
     return EXIT_FAILURE;
   }
 
@@ -53,8 +52,7 @@ int TestSDKEngine(int argc, char* argv[])
   eng0.setOptions(std::move(opt));
   if (eng0.getOptions().render.line_width != 1.7)
   {
-    std::cerr << "Unexpected options value using f3d::engine::setOptions(options&& opt)"
-              << "\n";
+    std::cerr << "Unexpected options value using f3d::engine::setOptions(options&& opt)\n";
     return EXIT_FAILURE;
   }
 
