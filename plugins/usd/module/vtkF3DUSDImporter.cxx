@@ -757,7 +757,7 @@ public:
 
     if (occlusionImage)
     {
-      int* size = occlusionImage->GetDimensions();
+      const int* size = occlusionImage->GetDimensions();
 
       maxWidth = std::max(maxWidth, size[0]);
       maxHeight = std::max(maxHeight, size[1]);
@@ -765,7 +765,7 @@ public:
 
     if (roughnessImage)
     {
-      int* size = roughnessImage->GetDimensions();
+      const int* size = roughnessImage->GetDimensions();
 
       maxWidth = std::max(maxWidth, size[0]);
       maxHeight = std::max(maxHeight, size[1]);
@@ -773,7 +773,7 @@ public:
 
     if (metallicImage)
     {
-      int* size = metallicImage->GetDimensions();
+      const int* size = metallicImage->GetDimensions();
 
       maxWidth = std::max(maxWidth, size[0]);
       maxHeight = std::max(maxHeight, size[1]);

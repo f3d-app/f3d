@@ -10,6 +10,8 @@
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
 
+#include <cstdint>
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkF3DQuakeMDLImporter);
 
@@ -77,7 +79,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     mdl_vertex_t verts[1024]; // vertex list of the frame, maximum capacity is 1024
   };
 
-  enum FRAME_TYPE
+  enum FRAME_TYPE : std::uint8_t
   {
     SINGLE_FRAME = 0,
     GROUP_FRAME,
@@ -419,7 +421,6 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
 
   //----------------------------------------------------------------------------
   vtkF3DQuakeMDLImporter* Parent;
-  std::string Description;
   vtkSmartPointer<vtkPolyDataMapper> Mapper;
   vtkSmartPointer<vtkTexture> Texture;
 

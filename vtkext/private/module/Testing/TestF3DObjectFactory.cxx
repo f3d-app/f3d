@@ -29,21 +29,21 @@ int TestF3DObjectFactory(int argc, char* argv[])
   // Check factory utility methods
   if (strcmp(factory->GetVTKSourceVersion(), VTK_SOURCE_VERSION) != 0)
   {
-    std::cerr << "vtkF3DObjectFactory failed to provide correct VTK_SOURCE_VERSION" << std::endl;
+    std::cerr << "vtkF3DObjectFactory failed to provide correct VTK_SOURCE_VERSION\n";
     return EXIT_FAILURE;
   }
   if (strcmp(factory->GetDescription(), "F3D factory overrides.") != 0)
   {
-    std::cerr << "vtkF3DObjectFactory failed to provide expected description" << std::endl;
+    std::cerr << "vtkF3DObjectFactory failed to provide expected description\n";
     return EXIT_FAILURE;
   }
 
   // Check actual factory mechanism
   vtkNew<vtkPolyDataMapper> mapper;
-  vtkF3DPolyDataMapper* mapperPtr = vtkF3DPolyDataMapper::SafeDownCast(mapper);
+  const vtkF3DPolyDataMapper* mapperPtr = vtkF3DPolyDataMapper::SafeDownCast(mapper);
   if (mapperPtr == nullptr)
   {
-    std::cerr << "vtkF3DObjectFactory failed to create a vtkF3DPolyDataMapper" << std::endl;
+    std::cerr << "vtkF3DObjectFactory failed to create a vtkF3DPolyDataMapper\n";
     return EXIT_FAILURE;
   }
 
@@ -53,21 +53,20 @@ int TestF3DObjectFactory(int argc, char* argv[])
   vtkF3DPointSplatMapper* pointMapperPtr = vtkF3DPointSplatMapper::SafeDownCast(pointMapper);
   if (pointMapperPtr == nullptr)
   {
-    std::cerr << "vtkF3DObjectFactory failed to create a vtkF3DPointSplatMapper" << std::endl;
+    std::cerr << "vtkF3DObjectFactory failed to create a vtkF3DPointSplatMapper\n";
     return EXIT_FAILURE;
   }
 #endif
 
   vtkNew<vtkOutputWindow> window;
 #if F3D_MODULE_UI
-  vtkF3DImguiConsole* windowPtr = vtkF3DImguiConsole::SafeDownCast(window);
+  const vtkF3DImguiConsole* windowPtr = vtkF3DImguiConsole::SafeDownCast(window);
 #else
   vtkF3DConsoleOutputWindow* windowPtr = vtkF3DConsoleOutputWindow::SafeDownCast(window);
 #endif
   if (windowPtr == nullptr)
   {
-    std::cerr << "vtkF3DObjectFactory failed to create the correct type of vtkOutputWindow"
-              << std::endl;
+    std::cerr << "vtkF3DObjectFactory failed to create the correct type of vtkOutputWindow\n";
     return EXIT_FAILURE;
   }
 

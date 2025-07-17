@@ -140,7 +140,7 @@ int TestSDKImage(int argc, char* argv[])
   if (generated != baseline)
   {
     std::cerr << "Generated image is different from the png baseline: "
-              << generated.compare(baseline) << std::endl;
+              << generated.compare(baseline) << "\n";
     return EXIT_FAILURE;
   }
 
@@ -150,7 +150,7 @@ int TestSDKImage(int argc, char* argv[])
   if (generated != baselineTIF)
   {
     std::cerr << "Generated image is different from the tif baseline: "
-              << generated.compare(baselineTIF) << std::endl;
+              << generated.compare(baselineTIF) << "\n";
     return EXIT_FAILURE;
   }*/
 
@@ -168,7 +168,7 @@ int TestSDKImage(int argc, char* argv[])
   if (generated16 != baseline16)
   {
     std::cerr << "generated short image is different from the baseline: "
-              << generated16.compare(baseline16) << std::endl;
+              << generated16.compare(baseline16) << "\n";
     return EXIT_FAILURE;
   }
 
@@ -178,7 +178,7 @@ int TestSDKImage(int argc, char* argv[])
   if (generated16 != baseline16TIF)
   {
     std::cerr << "generated short image is different from the TIF baseline: "
-              << generated16.compare(baseline16TIF) << std::endl;
+              << generated16.compare(baseline16TIF) << "\n";
     return EXIT_FAILURE;
   }*/
 
@@ -197,7 +197,7 @@ int TestSDKImage(int argc, char* argv[])
   if (generated32 != baseline32)
   {
     std::cerr << "generated float image is different from the baseline: "
-              << generated32.compare(baseline32) << std::endl;
+              << generated32.compare(baseline32) << "\n";
     return EXIT_FAILURE;
   }
 #endif // F3D_SSIM_COMPARE
@@ -281,7 +281,7 @@ int TestSDKImage(int argc, char* argv[])
     {
       std::vector<unsigned char> buffer = img1.saveBuffer();
       std::ofstream outfile(tmpDir + "/metadata-buffer.png", std::ios::out | std::ios::binary);
-      outfile.write((const char*)&buffer[0], buffer.size());
+      outfile.write(reinterpret_cast<const char*>(buffer.data()), buffer.size());
     }
 
     f3d::image img2(tmpDir + "/metadata-buffer.png");
