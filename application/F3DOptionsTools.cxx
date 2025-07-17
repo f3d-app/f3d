@@ -222,7 +222,7 @@ void PrintHelp(const std::string& execName, const cxxopts::Options& cxxOptions)
   f3d::log::setUseColoring(false);
   std::vector<std::string> orderedCLIGroupNames(CLIOptions.size());
   std::transform(CLIOptions.cbegin(), CLIOptions.cend(), orderedCLIGroupNames.begin(),
-                 [](const ::CLIGroup& cliGroup) { return cliGroup.GroupName; });
+    [](const ::CLIGroup& cliGroup) { return cliGroup.GroupName; });
   f3d::log::info(cxxOptions.help(orderedCLIGroupNames));
   f3d::log::info("\nExamples:");
   for (const auto& [cmd, desc] : examples)
