@@ -1135,8 +1135,9 @@ f3d_test(NAME TestCommandScriptPrintMesh DATA dragon.vtu SCRIPT TestCommandScrip
 f3d_test(NAME TestCommandScriptPrintOptions DATA dragon.vtu SCRIPT TestCommandScriptPrintOptions.txt REGEXP "interactor.invert_zoom: false" NO_BASELINE) # print_options_info
 f3d_test(NAME TestCommandScriptAlias DATA dragon.vtu SCRIPT TestCommandScriptAlias.txt --reference=${F3D_SOURCE_DIR}/testing/baselines/TestCommandScriptAlias.png) # alias myrotate roll_camera 90;myrotate
 f3d_test(NAME TestCommandScriptReset DATA dragon.vtu suzanne.stl ARGS --edges SCRIPT TestCommandScriptReset.txt) # reset render.show_edges; load_next_file_group;
-f3d_test(NAME TestParseOptionalBoolExtraArg DATA dragon.vtu SCRIPT TestParseOptionalBoolExtraArg.txt REGEXP "Command: load_previous_file_group takes at most 1 argument, got 2 arguments instead." NO_BASELINE) # load_previous_file_group true extra
-f3d_test(NAME TestRemoveFileGroups DATA dragon.vtu SCRIPT TestRemoveFileGroups.txt NO_DATA_FORCE_RENDER UI) # remove_file_groups
+f3d_test(NAME TestCommandScriptParseOptionalBoolExtraArg DATA dragon.vtu SCRIPT TestCommandScriptParseOptionalBoolExtraArg.txt REGEXP "Command: load_previous_file_group takes at most 1 argument, got 2 arguments instead." NO_BASELINE) # load_previous_file_group true extra
+f3d_test(NAME TestCommandScriptRemoveCurrentFileGroup DATA cow.vtp dragon.vtu SCRIPT TestCommandScriptRemoveCurrentFileGroup.txt) # remove_current_file_group
+f3d_test(NAME TestCommandScriptRemoveFileGroups DATA dragon.vtu SCRIPT TestCommandScriptRemoveFileGroups.txt NO_DATA_FORCE_RENDER UI) # remove_file_groups
 f3d_test(NAME TestCommandScriptInvalidReaderOptions DATA dragon.vtu SCRIPT TestCommandScriptInvalidReaderOptions.txt REGEXP "point to an inexistent option, ignoring" NO_BASELINE) # set_reader_option invalid value
 
 # Window position test
