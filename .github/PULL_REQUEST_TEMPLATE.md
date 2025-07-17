@@ -16,6 +16,7 @@ Please check the checkbox of the CI you want to run, then push again on your bra
 
 - [ ] Style checks
 - [ ] Fast CI
+- [ ] vcpkg CI
 - [ ] Coverage cached CI
 - [ ] Analysis cached CI
 - [ ] WASM docker CI
