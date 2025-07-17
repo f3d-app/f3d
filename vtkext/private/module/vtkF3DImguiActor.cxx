@@ -450,6 +450,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
   ImGuiViewport* viewport = ImGui::GetMainViewport();
 
   constexpr float margin = 5.f;
+  constexpr float padding = 16.f;
 
   float textHeight = 0.f;
   float winWidth = 0.f;
@@ -465,19 +466,9 @@ void vtkF3DImguiActor::RenderCheatSheet()
       ImGui::GetTextLineHeightWithSpacing() + 2 * ImGui::GetStyle().SeparatorTextPadding.y;
     for (const auto& [bind, desc, val] : content)
     {
-      std::string line = bind;
-      line += ": ";
-      line += desc;
-      if (!val.empty())
-      {
-        line += " [" + val + "]";
-      }
-      ImVec2 currentLine = ImGui::CalcTextSize(line.c_str());
-
-      winWidth = std::max(winWidth, currentLine.x);
       textHeight += ImGui::GetTextLineHeightWithSpacing();
 
-      ImVec2 bindingLineSize = ImGui::CalcTextSize(val.c_str());
+      ImVec2 bindingLineSize = ImGui::CalcTextSize(bind.c_str());
       maxBindingTextWidth = std::max(maxBindingTextWidth, bindingLineSize.x);
 
       ImVec2 descriptionLineSize = ImGui::CalcTextSize(desc.c_str());
@@ -485,14 +476,17 @@ void vtkF3DImguiActor::RenderCheatSheet()
 
       ImVec2 valueLineSize = ImGui::CalcTextSize(val.c_str());
       maxValueTextWidth = std::max(maxValueTextWidth, valueLineSize.x);
+
+      winWidth = maxBindingTextWidth + maxDescTextWidth + maxValueTextWidth;
     }
   }
 
-  winWidth += 2.f * ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().ScrollbarSize +
-    maxDescTextWidth * 0.5f;
+  winWidth += ImGui::GetStyle().ScrollbarSize + 4.f * padding;
   textHeight += 2.f * ImGui::GetStyle().WindowPadding.y;
 
   const float winTop = std::max(margin, (viewport->WorkSize.y - textHeight) * 0.5f);
+
+  ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(padding, padding));
 
   ::SetupNextWindow(ImVec2(margin, winTop),
     ImVec2(winWidth, std::min(viewport->WorkSize.y - (2 * margin), textHeight)));
@@ -509,12 +503,9 @@ void vtkF3DImguiActor::RenderCheatSheet()
   {
     ImGui::SeparatorText(group.c_str());
     ImGui::BeginTable("BindingsTable", 3);
-    ImGui::TableSetupColumn("Description", ImGuiTableColumnFlags_WidthFixed,
-      maxDescTextWidth + 2.f * ImGui::GetStyle().WindowPadding.x + margin);
-    ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthFixed,
-      maxValueTextWidth + 2.f * ImGui::GetStyle().WindowPadding.x + margin);
-    ImGui::TableSetupColumn("Bindings", ImGuiTableColumnFlags_WidthFixed,
-      maxBindingTextWidth + 2.f * ImGui::GetStyle().WindowPadding.x + margin);
+    ImGui::TableSetupColumn("Description", ImGuiTableColumnFlags_WidthFixed, maxDescTextWidth);
+    ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthFixed, maxValueTextWidth);
+    ImGui::TableSetupColumn("Bindings", ImGuiTableColumnFlags_WidthStretch, maxBindingTextWidth);
     for (const auto& [bind, desc, val] : list)
     {
       ImVec4 bindingTextColor, bindingRectColor, descTextColor;
@@ -583,6 +574,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
   }
 
   ImGui::End();
+  ImGui::PopStyleVar();
 }
 
 //----------------------------------------------------------------------------
