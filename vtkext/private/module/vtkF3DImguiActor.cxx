@@ -403,7 +403,7 @@ void vtkF3DImguiActor::RenderDropZone()
       ImVec2 logoPos(center.x - logoDisplayWidth * 0.5f, center.y - logoDisplayHeight * 0.5f);
 
       // VTK texture pointer to ImTextureID cast (void*)
-      ImTextureID texID = (ImTextureID)(this->Pimpl->LogoTexture.Get());
+      ImTextureID texID = reinterpret_cast<ImTextureID>(this->Pimpl->LogoTexture.Get());
 
       draw_list->AddImage(texID, logoPos, ImVec2(logoPos.x + logoDisplayWidth, logoPos.y + logoDisplayHeight), ImVec2(0, 1), ImVec2(1, 0));
     }
