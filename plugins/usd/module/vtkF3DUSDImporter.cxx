@@ -1259,7 +1259,8 @@ vtkIdType vtkF3DUSDImporter::GetNumberOfAnimations()
 
 //----------------------------------------------------------------------------
 bool vtkF3DUSDImporter::GetTemporalInformation(vtkIdType vtkNotUsed(animationIndex),
-  double vtkNotUsed(frameRate), int& vtkNotUsed(nbTimeSteps), double timeRange[2], vtkDoubleArray* vtkNotUsed(timeSteps))
+  double vtkNotUsed(frameRate), int& vtkNotUsed(nbTimeSteps), double timeRange[2],
+  vtkDoubleArray* vtkNotUsed(timeSteps))
 {
   this->Internals->GetTimeRange(timeRange);
   return true;
