@@ -15,12 +15,12 @@ int TestF3DMetaImporterAnimation(int argc, char* argv[])
   // Check importer error code path
   if (!importer->GetAnimationName(0).empty())
   {
-    std::cerr << "Unexpected animation name that should be empty" << std::endl;
+    std::cerr << "Unexpected animation name that should be empty\n";
     return EXIT_FAILURE;
   }
   if (importer->IsAnimationEnabled(0))
   {
-    std::cerr << "Unexpected enabled animation that should not be" << std::endl;
+    std::cerr << "Unexpected enabled animation that should not be\n";
     return EXIT_FAILURE;
   }
 
@@ -28,7 +28,7 @@ int TestF3DMetaImporterAnimation(int argc, char* argv[])
   double timeRange[2];
   if (importer->GetTemporalInformation(0, 60, nbTimeSteps, timeRange, nullptr))
   {
-    std::cerr << "Unexpected enabled animation that should not be" << std::endl;
+    std::cerr << "Unexpected enabled animation that should not be\n";
     return EXIT_FAILURE;
   }
 
@@ -48,29 +48,27 @@ int TestF3DMetaImporterAnimation(int argc, char* argv[])
 
   if (importer->GetNumberOfAnimations() != 0)
   {
-    std::cerr << "Unexpected number of animations" << std::endl;
+    std::cerr << "Unexpected number of animations\n";
     return EXIT_FAILURE;
   }
 
   if (importer->GetAnimationName(0) != "")
   {
-    std::cerr << "Unexpected non-empty animation name" << std::endl;
+    std::cerr << "Unexpected non-empty animation name\n";
     return EXIT_FAILURE;
   }
 
   importer->EnableAnimation(0);
   if (importer->IsAnimationEnabled(0))
   {
-    std::cerr << "Unexpected enable animation name after enabling without animation available"
-              << std::endl;
+    std::cerr << "Unexpected enable animation name after enabling without animation available\n";
     return EXIT_FAILURE;
   }
 
   importer->DisableAnimation(0);
   if (importer->IsAnimationEnabled(0))
   {
-    std::cerr << "Unexpected enable animation name after disabling without animation available"
-              << std::endl;
+    std::cerr << "Unexpected enable animation name after disabling without animation available\n";
     return EXIT_FAILURE;
   }
 

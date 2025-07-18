@@ -589,7 +589,7 @@ std::string format(const std::vector<T>& var)
  * Formats in hex color string "#RRGGBB" if values are multiple of 1/255.
  * Otherwise rely on format(std::vector<double>&)
  */
-std::string format(color_t var)
+std::string format(const color_t& var)
 {
   const std::vector<double> colors = { var.r(), var.g(), var.b() };
   if (std::all_of(colors.begin(), colors.end(),
@@ -617,7 +617,7 @@ std::string format(color_t var)
  * Format provided var into a string from provided direction_t.
  * Format as `+X`/`+X-Y`/... if possible, otherwise rely on `format(std::vector<double>&)`
  */
-std::string format(direction_t var)
+std::string format(const direction_t& var)
 {
   const auto isZero = [](double a) { return std::abs(a) < 1e-12; };
   const auto absDiff = [](double a, double b) { return std::abs(a) - std::abs(b); };

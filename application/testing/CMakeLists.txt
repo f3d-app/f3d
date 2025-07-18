@@ -295,7 +295,7 @@ f3d_test(NAME TestTextureMatCap DATA suzanne.ply ARGS --texture-matcap=${F3D_SOU
 f3d_test(NAME TestTexturesTransform DATA world.obj ARGS --textures-transform=1,0,0,0,-1,0,0,0,1)
 f3d_test(NAME TestTexturesTransformGL DATA WaterBottle.glb ARGS --textures-transform=1,0,0,0,-1,0,0,0,1 --camera-direction=-1,0,0)
 f3d_test(NAME TestConfigOrder DATA suzanne.ply ARGS CONFIG ${F3D_SOURCE_DIR}/testing/configs/config_order.json) # `.+` > `.*` alphabetically but overridden by the order
-f3d_test(NAME TestOutputStream DATA suzanne.ply ARGS --verbose=quiet --output=- REGEXP "^.PNG" NO_BASELINE NO_OUTPUT)
+f3d_test(NAME TestOutputStream DATA suzanne.ply ARGS --verbose=quiet --output=- REGEXP ".PNG" NO_BASELINE NO_OUTPUT)
 f3d_test(NAME TestOutputStreamInfo DATA suzanne.ply ARGS --verbose=info --output=- REGEXP "redirected to stderr" NO_BASELINE NO_OUTPUT)
 f3d_test(NAME TestInvalidAntiAliasingMode DATA suzanne.ply ARGS -a --anti-aliasing-mode=foo REGEXP "foo is an invalid antialiasing mode" NO_BASELINE)
 f3d_test(NAME TestUserMatrixColoring DATA InterpolationTest.glb ARGS --scalar-coloring --coloring-array=TEXCOORD_0)

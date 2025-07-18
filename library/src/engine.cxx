@@ -497,7 +497,7 @@ std::vector<engine::readerInformation> engine::getReadersInfo()
 {
   std::vector<readerInformation> readersInfo;
   const auto& plugins = factory::instance()->getPlugins();
-  for (const auto& plugin : plugins)
+  for (const auto* plugin : plugins)
   {
     for (const auto& reader : plugin->getReaders())
     {

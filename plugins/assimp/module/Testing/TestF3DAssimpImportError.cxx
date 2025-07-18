@@ -17,7 +17,7 @@ public:
 
   void Execute(vtkObject* caller, unsigned long vtkNotUsed(evId), void* data) override
   {
-    auto importer = reinterpret_cast<vtkF3DAssimpImporter*>(caller);
+    const vtkF3DAssimpImporter* importer = reinterpret_cast<vtkF3DAssimpImporter*>(caller);
     char* message = static_cast<char*>(data);
     if (importer && message)
     {
@@ -47,28 +47,28 @@ int TestF3DAssimpImportError(int vtkNotUsed(argc), char* vtkNotUsed(argv)[])
   auto errorMessages = errorEventCallback->GetRecordedErrorMessages();
   if (errorMessages.empty())
   {
-    std::cerr << "No error triggered." << std::endl;
+    std::cerr << "No error triggered.\n";
     return EXIT_FAILURE;
   }
 
   auto lastMessage = errorMessages.back();
   if (lastMessage.find("Assimp error") == std::string::npos)
   {
-    std::cerr << "No Assimp error triggered!" << std::endl;
+    std::cerr << "No Assimp error triggered!\n";
     return EXIT_FAILURE;
   }
 
   if (importer->GetNumberOfAnimations() != 0)
   {
     std::cerr << "Importer has " << importer->GetNumberOfAnimations()
-              << " animations, expected 0 animation." << std::endl;
+              << " animations, expected 0 animation.\n";
     return EXIT_FAILURE;
   }
 
   if (!importer->UpdateAtTimeValue(0))
   {
     std::cerr << "Importer did not return true with no animation enabled "
-              << "when calling UpdateAtTimeValue()" << std::endl;
+              << "when calling UpdateAtTimeValue()\n";
     return EXIT_FAILURE;
   }
 
