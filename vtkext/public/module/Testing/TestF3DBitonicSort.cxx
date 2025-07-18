@@ -54,40 +54,40 @@ int TestF3DBitonicSort(int argc, char* argv[])
   // check invalid workgroup size
   if (sorter->Initialize(-1, VTK_FLOAT, VTK_FLOAT))
   {
-    std::cerr << "The invalid workgroup size is not failing" << std::endl;
+    std::cerr << "The invalid workgroup size is not failing\n";
     return EXIT_FAILURE;
   }
 
   // check invalid types
   if (sorter->Initialize(128, VTK_CHAR, VTK_FLOAT))
   {
-    std::cerr << "The invalid key type is not failing" << std::endl;
+    std::cerr << "The invalid key type is not failing\n";
     return EXIT_FAILURE;
   }
 
   if (sorter->Initialize(128, VTK_FLOAT, VTK_CHAR))
   {
-    std::cerr << "The invalid key type is not failing" << std::endl;
+    std::cerr << "The invalid key type is not failing\n";
     return EXIT_FAILURE;
   }
 
   if (sorter->Run(
         vtkOpenGLRenderWindow::SafeDownCast(renWin), nbElements, bufferKeys, bufferValues))
   {
-    std::cerr << "Uninitialized run is not failing" << std::endl;
+    std::cerr << "Uninitialized run is not failing\n";
     return EXIT_FAILURE;
   }
 
   if (!sorter->Initialize(128, VTK_DOUBLE, VTK_INT))
   {
-    std::cerr << "Valid Initialize call failed" << std::endl;
+    std::cerr << "Valid Initialize call failed\n";
     return EXIT_FAILURE;
   }
 
   if (!sorter->Run(
         vtkOpenGLRenderWindow::SafeDownCast(renWin), nbElements, bufferKeys, bufferValues))
   {
-    std::cerr << "Sorter Run call failed" << std::endl;
+    std::cerr << "Sorter Run call failed\n";
     return EXIT_FAILURE;
   }
 

@@ -28,7 +28,7 @@ vtkStandardNewMacro(vtkF3DBitonicSort);
 //----------------------------------------------------------------------------
 bool vtkF3DBitonicSort::Initialize(int workgroupSize, int keyType, int valueType)
 {
-  if (workgroupSize < 0)
+  if (workgroupSize <= 0)
   {
     vtkErrorMacro("Invalid workgroupSize");
     return false;
@@ -116,7 +116,7 @@ bool vtkF3DBitonicSort::Initialize(int workgroupSize, int keyType, int valueType
 bool vtkF3DBitonicSort::Run(vtkOpenGLRenderWindow* context, int nbPairs,
   vtkOpenGLBufferObject* keys, vtkOpenGLBufferObject* values)
 {
-  if (this->WorkgroupSize < 0)
+  if (this->WorkgroupSize <= 0)
   {
     vtkErrorMacro("Shaders are not initialized");
     return false;

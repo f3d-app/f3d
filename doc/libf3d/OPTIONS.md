@@ -143,11 +143,11 @@ Please note that when accessing optional options, special care must be used, eg:
   f3d::options& opt = eng.getOptions();
   if (opt.render.line_width.has_value())
   {
-    std::cout << "Line Width: " << opt.render.line_width.value() << std::endl;
+    std::cout << "Line Width: " << opt.render.line_width.value() << "\n";
   }
   else
   {
-    std::cout << "Line Width: unset" << std::endl;
+    std::cout << "Line Width: unset\n";
   }
 ```
 
@@ -175,15 +175,15 @@ When using this API make sure to catch exceptions has needed, eg:
 
   try
   {
-    std::cout << userProvidedName << ": " << opt.getAsString(userProvidedName) << std::endl;
+    std::cout << userProvidedName << ": " << opt.getAsString(userProvidedName) << "\n";
   }
   catch (const f3d::options::inexistent_exception&)
   {
-    std::cout << userProvidedName << " does not exist." << std::endl;
+    std::cout << userProvidedName << " does not exist.\n";
   }
   catch (const f3d::options::no_value_exception&)
   {
-    std::cout << userProvidedName << " is not set." << std::endl;
+    std::cout << userProvidedName << " is not set.\n";
   }
 ```
 

@@ -61,7 +61,7 @@ vtkF3DHexagonalBokehBlurPass::~vtkF3DHexagonalBokehBlurPass() = default;
 void vtkF3DHexagonalBokehBlurPass::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "CircleOfConfusion: " << this->CircleOfConfusionRadius << std::endl;
+  os << indent << "CircleOfConfusion: " << this->CircleOfConfusionRadius << "\n";
 }
 
 //------------------------------------------------------------------------------

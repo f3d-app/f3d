@@ -41,21 +41,21 @@ int TestF3DFpsCounter(int argc, char* argv[])
   // make sure only the 100 last records are kept
   if (uiActor->GetNumberOfFrameTimes() > 100)
   {
-    std::cerr << "Number of frame times must be at most 100" << std::endl;
+    std::cerr << "Number of frame times must be at most 100\n";
     return EXIT_FAILURE;
   }
 
   // make sure only the total time kept doesn't exceed 1 second
   if (uiActor->GetTotalFrameTimes() > 1.0)
   {
-    std::cerr << "Number of total frame times must be at most 1.0" << std::endl;
+    std::cerr << "Number of total frame times must be at most 1.0\n";
     return EXIT_FAILURE;
   }
 
   // make sure the FPS value is exactly 100
   if (uiActor->GetFpsValue() != 100)
   {
-    std::cerr << "Number of FPS value must be exactly 100" << std::endl;
+    std::cerr << "Number of FPS value must be exactly 100\n";
     return EXIT_FAILURE;
   }
 

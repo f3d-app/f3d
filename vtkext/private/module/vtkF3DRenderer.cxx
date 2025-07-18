@@ -2155,7 +2155,7 @@ void vtkF3DRenderer::ConfigureActorsProperties()
     if (this->TexturesTransform.has_value())
     {
       const std::vector<double> texTransform = this->TexturesTransform.value();
-      double transform[] = {                                    //
+      const double transform[] = {                              //
         texTransform[0], texTransform[1], texTransform[2], 0.0, //
         texTransform[3], texTransform[4], texTransform[5], 0.0, //
         texTransform[6], texTransform[7], texTransform[8], 0.0, //

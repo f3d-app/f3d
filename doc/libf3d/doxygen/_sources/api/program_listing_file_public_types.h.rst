@@ -60,7 +60,7 @@ Program Listing for File types.h
      }
    
    private:
-     double Value;
+     double Value = 0;
    };
    
    template<unsigned int N>

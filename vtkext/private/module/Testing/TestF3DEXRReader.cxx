@@ -17,11 +17,11 @@ int TestF3DEXRReader(int argc, char* argv[])
 
   vtkImageData* img = reader->GetOutput();
 
-  int* dims = img->GetDimensions();
+  const int* dims = img->GetDimensions();
 
   if (dims[0] != 1024 && dims[1] != 512)
   {
-    std::cerr << "Incorrect EXR image size." << std::endl;
+    std::cerr << "Incorrect EXR image size.\n";
     return EXIT_FAILURE;
   }
 

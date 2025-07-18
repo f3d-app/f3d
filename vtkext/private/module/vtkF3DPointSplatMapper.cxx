@@ -275,8 +275,8 @@ void vtkF3DSplatMapperHelper::SortSplats(vtkRenderer* ren)
 
   if (numVerts)
   {
-    double* focalPoint = ren->GetActiveCamera()->GetFocalPoint();
-    double* origin = ren->GetActiveCamera()->GetPosition();
+    const double* focalPoint = ren->GetActiveCamera()->GetFocalPoint();
+    const double* origin = ren->GetActiveCamera()->GetPosition();
     double direction[3];
 
     for (int i = 0; i < 3; ++i)

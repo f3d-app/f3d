@@ -75,7 +75,7 @@ private:
 
   // Current coloring state
   bool CurrentUsingCellData = false;
-  std::optional<ColoringMap::iterator> CurrentColoringIter;
+  std::optional<ColoringMap::const_iterator> CurrentColoringIter;
 };
 
 #endif

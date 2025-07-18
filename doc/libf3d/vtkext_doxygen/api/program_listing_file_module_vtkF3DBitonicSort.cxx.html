@@ -325,7 +325,7 @@ document.write(`
 <span class="c1">//----------------------------------------------------------------------------</span>
 <span class="kt">bool</span><span class="w"> </span><span class="nf">vtkF3DBitonicSort::Initialize</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">workgroupSize</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">keyType</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">valueType</span><span class="p">)</span>
 <span class="p">{</span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">workgroupSize</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">workgroupSize</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
 <span class="w">  </span><span class="p">{</span>
 <span class="w">    </span><span class="n">vtkErrorMacro</span><span class="p">(</span><span class="s">&quot;Invalid workgroupSize&quot;</span><span class="p">);</span>
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
@@ -413,7 +413,7 @@ document.write(`
 <span class="kt">bool</span><span class="w"> </span><span class="nf">vtkF3DBitonicSort::Run</span><span class="p">(</span><span class="n">vtkOpenGLRenderWindow</span><span class="o">*</span><span class="w"> </span><span class="n">context</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">nbPairs</span><span class="p">,</span>
 <span class="w">  </span><span class="n">vtkOpenGLBufferObject</span><span class="o">*</span><span class="w"> </span><span class="n">keys</span><span class="p">,</span><span class="w"> </span><span class="n">vtkOpenGLBufferObject</span><span class="o">*</span><span class="w"> </span><span class="n">values</span><span class="p">)</span>
 <span class="p">{</span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">WorkgroupSize</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">WorkgroupSize</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
 <span class="w">  </span><span class="p">{</span>
 <span class="w">    </span><span class="n">vtkErrorMacro</span><span class="p">(</span><span class="s">&quot;Shaders are not initialized&quot;</span><span class="p">);</span>
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
