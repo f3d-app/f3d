@@ -20,6 +20,7 @@
 #include <vtkInformation.h>
 #include <vtkPNGReader.h>
 #include <vtkPointGaussianMapper.h>
+#include <vtkRenderWindowInteractor.h>
 #include <vtkRendererCollection.h>
 #include <vtkRenderingOpenGLConfigure.h>
 #include <vtkVersion.h>
@@ -282,7 +283,7 @@ int window_impl::getHeight() const
 //----------------------------------------------------------------------------
 window& window_impl::setSize(int width, int height)
 {
-  this->Internals->RenWin->SetSize(width, height);
+  this->Internals->RenWin->GetInteractor()->UpdateSize(width, height);
   return *this;
 }
 

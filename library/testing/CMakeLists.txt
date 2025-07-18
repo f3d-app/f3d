@@ -33,6 +33,7 @@ if(F3D_MODULE_UI)
     TestSDKInteractorCallBack.cxx
     TestSDKInteractorDocumentation.cxx
     TestSDKMultiOptions.cxx
+    TestSDKTriggerInteractions.cxx
     )
 
   # HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767

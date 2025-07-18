@@ -80,3 +80,17 @@ def test_binding():
     assert len(inter.get_binds()) == 5
 
     inter.init_bindings()
+
+def test_trigger_key(capfd: pytest.CaptureFixture[str]):
+    engine = f3d.Engine.create(True)
+
+    engine.window.render()
+
+    engine.interactor.trigger_keyboard_key(f3d.Interactor.InputAction.PRESS, "E")
+    engine.interactor.trigger_keyboard_key(f3d.Interactor.InputAction.RELEASE, "E")
+    assert engine.options["render.show_edges"] is True
+
+    engine.interactor.trigger_mod_update(f3d.Interactor.InputModifier.SHIFT)
+    engine.interactor.trigger_keyboard_key(f3d.Interactor.InputAction.PRESS, "L")
+    engine.interactor.trigger_keyboard_key(f3d.Interactor.InputAction.RELEASE, "L")
+    assert engine.options["render.light.intensity"] == 0.98
