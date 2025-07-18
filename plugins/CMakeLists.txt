@@ -40,3 +40,12 @@ if (F3D_PLUGIN_BUILD_VDB)
     message(FATAL_ERROR "VDB plugin requires VTK >= 9.2.20220714")
   endif()
 endif()
+
+if (F3D_PLUGIN_BUILD_PDAL)
+  # PDAL plugin needs vtkPDALReader: https://gitlab.kitware.com/vtk/vtk/-/tree/master/IO/PDAL
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.0)
+    add_subdirectory(pdal)
+  else ()
+    message(FATAL_ERROR "VDB plugin requires VTK >= 9.4.0") # Lastest version of pdal
+  endif()
+endif()
