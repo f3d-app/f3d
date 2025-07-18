@@ -14,7 +14,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/ospray_install
-        key: ospray-sb-v2.7.1-${{runner.os}}-${{inputs.cpu}}-3
+        key: ospray-sb-v2.7.1-${{runner.os}}-${{inputs.cpu}}-4
 
     # Dependents: vtk
     - name: Checkout ospray

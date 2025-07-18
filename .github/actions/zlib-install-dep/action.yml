@@ -22,7 +22,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/zlib_install
-        key: zlib-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-4
+        key: zlib-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-5
 
     # Dependents: blosc openvdb vtk
     - name: Checkout zlib
