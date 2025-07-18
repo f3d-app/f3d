@@ -11,9 +11,11 @@
 #include "vtkF3DGenericImporter.h"
 #include "vtkF3DMemoryMesh.h"
 #include "vtkF3DMetaImporter.h"
+#include "vtkF3DRenderer.h"
 
 #include <optional>
 #include <vtkCallbackCommand.h>
+#include <vtkLightCollection.h>
 #include <vtkProgressBarRepresentation.h>
 #include <vtkProgressBarWidget.h>
 #include <vtkTimerLog.h>
@@ -327,6 +329,100 @@ scene& scene_impl::clear()
   this->Internals->Window.Initialize();
 
   return *this;
+}
+
+//----------------------------------------------------------------------------
+void scene_impl::addLight(const light_state_t& lightState)
+{
+  vtkNew<vtkLight> vtkLight;
+  vtkLight->SetLightType(static_cast<int>(lightState.type));
+  vtkLight->SetPosition(lightState.position[0], lightState.position[1], lightState.position[2]);
+  vtkLight->SetColor(lightState.color[0], lightState.color[1], lightState.color[2]);
+  vtkLight->SetPositional(lightState.positionalLight);
+  vtkLight->SetFocalPoint(lightState.position[0] + lightState.direction[0],
+    lightState.position[1] + lightState.direction[1],
+    lightState.position[2] + lightState.direction[2]);
+  vtkLight->SetIntensity(lightState.intensity);
+  this->Internals->Window.GetRenderer()->AddLight(vtkLight);
+}
+
+//----------------------------------------------------------------------------
+int scene_impl::getLightCount() const
+{
+  vtkLightCollection* lc = this->Internals->Window.GetRenderer()->GetLights();
+  lc->InitTraversal();
+
+  int lightCount = 0;
+  for (vtkLight* vtkL = lc->GetNextItem(); vtkL != nullptr; vtkL = lc->GetNextItem())
+  {
+    if (vtkL->GetSwitch())
+    {
+      lightCount++;
+    }
+  }
+  return lightCount;
+}
+
+//----------------------------------------------------------------------------
+light_state_t scene_impl::getLight(int index)
+{
+  vtkLightCollection* lc = this->Internals->Window.GetRenderer()->GetLights();
+  lc->InitTraversal();
+
+  int lightCount = 0;
+  for (vtkLight* vtkL = lc->GetNextItem(); vtkL != nullptr; vtkL = lc->GetNextItem())
+  {
+    if (vtkL->GetSwitch())
+    {
+      if (lightCount == index)
+      {
+        light_state_t lightState;
+        lightState.type = static_cast<light_type>(vtkL->GetLightType());
+        lightState.position = { vtkL->GetPosition()[0], vtkL->GetPosition()[1],
+          vtkL->GetPosition()[2] };
+        lightState.color = { vtkL->GetDiffuseColor()[0], vtkL->GetDiffuseColor()[1],
+          vtkL->GetDiffuseColor()[2] };
+        lightState.direction = { vtkL->GetFocalPoint()[0] - vtkL->GetPosition()[0],
+          vtkL->GetFocalPoint()[1] - vtkL->GetPosition()[1],
+          vtkL->GetFocalPoint()[2] - vtkL->GetPosition()[2] };
+        lightState.positionalLight = vtkL->GetPositional();
+        lightState.intensity = vtkL->GetIntensity();
+        return lightState;
+      }
+      lightCount++;
+    }
+  }
+  log::warn("No light at index ", index, " to get");
+  return light_state_t{};
+}
+
+//----------------------------------------------------------------------------
+void scene_impl::updateLight(int index, const light_state_t& lightState)
+{
+  vtkLightCollection* lc = this->Internals->Window.GetRenderer()->GetLights();
+  lc->InitTraversal();
+
+  int lightCount = 0;
+  for (vtkLight* vtkL = lc->GetNextItem(); vtkL != nullptr; vtkL = lc->GetNextItem())
+  {
+    if (vtkL->GetSwitch())
+    {
+      if (lightCount == index)
+      {
+        vtkL->SetLightType(static_cast<int>(lightState.type));
+        vtkL->SetPosition(lightState.position[0], lightState.position[1], lightState.position[2]);
+        vtkL->SetColor(lightState.color[0], lightState.color[1], lightState.color[2]);
+        vtkL->SetPositional(lightState.positionalLight);
+        vtkL->SetFocalPoint(lightState.position[0] + lightState.direction[0],
+          lightState.position[1] + lightState.direction[1],
+          lightState.position[2] + lightState.direction[2]);
+        vtkL->SetIntensity(lightState.intensity);
+        return;
+      }
+      lightCount++;
+    }
+  }
+  log::warn("No light at index ", index, " to update");
 }
 
 //----------------------------------------------------------------------------
