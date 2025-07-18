@@ -1,17 +1,20 @@
 #include "vtkF3DImguiActor.h"
 
+#include "F3DDefaultLogo.h"
 #include "F3DFontBuffer.h"
 #include "F3DImguiStyle.h"
 #include "vtkF3DImguiConsole.h"
 #include "vtkF3DImguiFS.h"
 #include "vtkF3DImguiVS.h"
 
+#include <vtkImageData.h>
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLBufferObject.h>
 #include <vtkOpenGLRenderWindow.h>
 #include <vtkOpenGLShaderCache.h>
 #include <vtkOpenGLState.h>
 #include <vtkOpenGLVertexArrayObject.h>
+#include <vtkPNGReader.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkShader.h>
 #include <vtkShaderProgram.h>
@@ -49,6 +52,26 @@ struct vtkF3DImguiActor::Internals
 
       // Create VBO
       this->VertexBuffer = vtkSmartPointer<vtkOpenGLBufferObject>::New();
+
+      // Load embedded PNG icon into texture
+      vtkNew<vtkPNGReader> iconReader;
+      iconReader->SetMemoryBuffer(F3DDefaultLogo);
+      iconReader->SetMemoryBufferLength(sizeof(F3DDefaultLogo));
+      iconReader->Update();
+
+      vtkImageData* imageData = iconReader->GetOutput();
+      int dims[3];
+      imageData->GetDimensions(dims);
+      this->LogoWidth = dims[0];
+      this->LogoHeight = dims[1];
+
+      unsigned char* logoPixels = static_cast<unsigned char*>(imageData->GetScalarPointer());
+      if (logoPixels)
+      {
+        this->LogoTexture = vtkSmartPointer<vtkTextureObject>::New();
+        this->LogoTexture->SetContext(renWin);
+        this->LogoTexture->Create2DFromRaw(this->LogoWidth, this->LogoHeight, 4, VTK_UNSIGNED_CHAR, logoPixels);
+      }
 
       // https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10589
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231016)
@@ -94,7 +117,11 @@ struct vtkF3DImguiActor::Internals
         this->FontTexture->ReleaseGraphicsResources(renWin);
         this->FontTexture = nullptr;
       }
-
+      if (this->LogoTexture)
+      {
+        this->LogoTexture->ReleaseGraphicsResources(renWin);
+        this->LogoTexture = nullptr;
+      }
       if (this->VertexBuffer)
       {
         this->VertexBuffer = nullptr;
@@ -149,11 +176,6 @@ struct vtkF3DImguiActor::Internals
     shift[0] = -(2.f * drawData->DisplayPos.x + drawData->DisplaySize.x) / drawData->DisplaySize.x;
     shift[1] = (2.f * drawData->DisplayPos.y + drawData->DisplaySize.y) / drawData->DisplaySize.y;
 
-    this->FontTexture->Activate();
-
-    this->Program->SetUniform2f("Scale", scale);
-    this->Program->SetUniform2f("Shift", shift);
-    this->Program->SetUniformi("Texture", this->FontTexture->GetTextureUnit());
 
     // Render the UI
     this->VertexArray->Bind();
@@ -175,6 +197,20 @@ struct vtkF3DImguiActor::Internals
       for (int iCmd = 0; iCmd < cmdList->CmdBuffer.Size; iCmd++)
       {
         const ImDrawCmd* cmd = &cmdList->CmdBuffer[iCmd];
+
+        // Activate texture and set uniforms per draw command:
+        vtkTextureObject* texObj = reinterpret_cast<vtkTextureObject*>(cmd->GetTexID());
+        if (!texObj)
+        {
+          texObj = this->FontTexture.Get(); // Fallback if null
+        }
+        if (texObj)
+        {
+          texObj->Activate();
+          this->Program->SetUniform2f("Scale", scale);
+          this->Program->SetUniform2f("Shift", shift);
+          this->Program->SetUniformi("Texture", texObj->GetTextureUnit());
+        }
 
         // Project scissor/clipping rectangles into framebuffer space
         ImVec2 clipMin(
@@ -201,6 +237,7 @@ struct vtkF3DImguiActor::Internals
     this->IndexBuffer->Release();
 
     this->FontTexture->Deactivate();
+    this->LogoTexture->Deactivate();
   }
 
   vtkSmartPointer<vtkTextureObject> FontTexture;
@@ -208,6 +245,10 @@ struct vtkF3DImguiActor::Internals
   vtkSmartPointer<vtkOpenGLBufferObject> VertexBuffer;
   vtkSmartPointer<vtkOpenGLBufferObject> IndexBuffer;
   vtkSmartPointer<vtkShaderProgram> Program;
+  int LogoWidth = 0;
+  int LogoHeight = 0;
+  vtkSmartPointer<vtkTextureObject> LogoTexture;
+
 };
 
 namespace
@@ -350,6 +391,23 @@ void vtkF3DImguiActor::RenderDropZone()
     /* Use background draw list to prevent "ignoring" NoBringToFrontOnFocus */
     ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
 
+    if (this->DropZoneLogoVisible && this->Pimpl->LogoTexture)
+    {
+      // Calculate logo position (centered)
+      ImVec2 center = viewport->GetWorkCenter();
+
+      // Choose desired size (e.g., 128x128 or scale as you want)
+      float logoDisplayWidth = 256.f;
+      float logoDisplayHeight = 256.f;
+
+      ImVec2 logoPos(center.x - logoDisplayWidth * 0.5f, center.y - logoDisplayHeight * 0.5f);
+
+      // VTK texture pointer to ImTextureID cast (void*)
+      ImTextureID texID = reinterpret_cast<ImTextureID>(this->Pimpl->LogoTexture.Get());
+
+      draw_list->AddImage(texID, logoPos, ImVec2(logoPos.x + logoDisplayWidth, logoPos.y + logoDisplayHeight), ImVec2(0, 1), ImVec2(1, 0));
+    }
+
     const ImVec2 p0(dropzonePad, dropzonePad);
     const ImVec2 p1(dropzonePad + dropZoneW, dropzonePad + dropZoneH);
 
@@ -377,7 +435,7 @@ void vtkF3DImguiActor::RenderDropZone()
 
     ImGui::Begin("DropZoneText", nullptr, flags);
     ImGui::SetCursorPos(ImVec2(viewport->GetWorkCenter().x - 0.5f * dropTextSize.x,
-      viewport->GetWorkCenter().y - 0.5f * dropTextSize.y));
+      viewport->GetWorkCenter().y - 0.5f * dropTextSize.y + 150));
     ImGui::TextUnformatted(this->DropText.c_str());
     ImGui::End();
   }
