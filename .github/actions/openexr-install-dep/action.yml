@@ -44,6 +44,13 @@ runs:
         mkdir openexr_build
         mkdir openexr_install
 
+    # OpenEXR 3.0.1 needs patching with recent libstd
+    - name: Patch VTK v3.0.1
+      if: steps.cache-openexr.outputs.cache-hit != 'true' && inputs.version == 'v3.0.1'
+      working-directory: ${{github.workspace}}/dependencies/openexr
+      shell: bash
+      run: patch -p1 < $GITHUB_ACTION_PATH/include_cstdint.patch
+
     - name: Configure OpenEXR
       if: steps.cache-openexr.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/openexr_build
