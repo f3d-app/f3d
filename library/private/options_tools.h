@@ -493,9 +493,10 @@ colormap_t parse(const std::string& str)
 //----------------------------------------------------------------------------
 /**
  *  Parse provided string into a transform2d_t
- *  Supported format: double, double, double, ... as a sequence of 9 values
- *  Alternatively, can appear as scale/translation/angle operations
- *  e.g. --textures-transform=scale:0.1,translation:0.51,2.1,angle:0.21
+ *  Supported formats:
+ *  - "double, double, double, ..." as a sequence of 9 values
+ *  - "scale,translation,angle" in any order, default values used if one or two options are omitted
+ *    "scale: double", "scale: double,double", "translation: double, double", "angle: double"
  *  Can throw options::parsing_exception in case of failure to parse
  */
 template<>
