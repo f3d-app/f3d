@@ -72,7 +72,8 @@ std::pair<bool, std::string> mesh_t::isValid() const
    */
 // clang-format on
 
-transform2d_t::transform2d_t(double_array_t<2> scale, double_array_t<2> translate, angle_deg_t angle)
+transform2d_t::transform2d_t(
+  double_array_t<2> scale, double_array_t<2> translate, angle_deg_t angle)
 {
   double angleRad = vtkMath::RadiansFromDegrees(angle);
   double sinA = std::sin(angleRad);
