@@ -1,4 +1,6 @@
 // remove some checks
+duplInheritedMember  // VTK design
+missingIncludeSystem // cppcheck seems confused about this
 missingInclude
 unusedFunction
 unknownMacro
@@ -12,6 +14,17 @@ unknownMacro
 *:external/imgui/*.h
 *:external/imgui/*.cpp
 
+// generated files
+*:*vtkextTests.cxx
+*:*vtkextPrivateTests.cxx
+*:*vtkextNativeTests.cxx
+*:*VTKExtensionsPluginAlembic.cxx
+*:*VTKExtensionsPluginAssimp.cxx
+*:*vtkextDracoTests.cxx
+*:*vtkextOCCTTests.cxx
+*:*VTKExtensionsPluginUSD.cxx
+*:*libf3dSDKTests.cxx
+
 // specific checks
 knownConditionTrueFalse:library/testing/TestSDKImage.cxx
 knownConditionTrueFalse:library/testing/TestSDKImageDeprecated.cxx
@@ -19,7 +32,9 @@ noExplicitConstructor:library/public/types.h
 preprocessorErrorDirective:library/src/engine.cxx
 preprocessorErrorDirective:plugins/draco/module/vtkF3DDracoReader.cxx
 unknownMacro:library/VTKExtensions/Applicative/vtkF3DObjectFactory.cxx
-unusedVariable:*factory.cxx*
 constParameter:library/src/image.cxx
 invalidPointerCast:plugins/native/module/vtkF3DSplatReader.cxx
 invalidPointerCast:plugins/draco/module/vtkF3DGLTFDocumentLoader.cxx
+unusedStructMember:plugins/native/module/vtkF3DQuakeMDLImporter.cxx
+unusedStructMember:plugins/native/module/vtkF3DSPZReader.cxx
+constParameterPointer:vtkext/private/module/vtkF3DMetaImporter.cxx
