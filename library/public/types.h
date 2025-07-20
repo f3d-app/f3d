@@ -249,8 +249,7 @@ public:
   }
 
   // scale/translation/angle constructor, explained in types.cxx
-  transform2d_t::transform2d_t(
-    double_array_t<2> scale, double_array_t<2> translate, angle_deg_t angleRad);
+  transform2d_t(double_array_t<2> scale, double_array_t<2> translate, angle_deg_t angleRad);
 };
 
 /**
