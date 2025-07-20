@@ -8,18 +8,18 @@
   ],
   "versions": {
     "alembic": "1.8.8",
-    "assimp": "v6.0.1",
+    "assimp": "v6.0.2",
     "blosc": "v1.21.6",
     "draco": "1.5.7",
     "imath": "v3.1.12",
     "java": "21",
-    "occt": "V7_9_0",
-    "openexr": "v3.3.3",
+    "occt": "V7_9_1",
+    "openexr": "v3.3.4",
     "openvdb": "v12.0.1",
     "pybind11": "v2.13.6",
     "python": "3.13",
-    "tbb": "v2021.12.0",
-    "usd": "v25.02a",
+    "tbb": "v2022.2.0",
+    "usd": "v25.05.01",
     "zlib": "v1.3.1"
   },
   "min_versions": {
@@ -39,5 +39,5 @@
     "zlib": "v1.2.13"
   },
   "vtk_commit_sha": "6ad1aadbfd484044f33b5d89b0eec56c9a5d8178",
-  "timestamp": "20250711_0"
+  "timestamp": "20250720_0"
 }
