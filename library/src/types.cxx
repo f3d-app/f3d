@@ -1,6 +1,8 @@
 #include "types.h"
+#include "vtkMath.h"
 
 #include <algorithm>
+#include <cmath>
 #include <numeric>
 
 namespace f3d
@@ -55,6 +57,45 @@ std::pair<bool, std::string> mesh_t::isValid() const
   }
 
   return { true, {} };
+}
+
+// clang-format off
+  /**
+   *  The general form of a 3x3 transformation matrix M with scale S(x,y),
+   *  translation T(x,y), and angle a (in degrees), is solved out to the following:
+   * 
+   *      [cos(a)*S(x), -sin(a)*S(y),   T(x)]
+   *  M = [sin(a)*S(x), cos(a)*S(y),    T(y)]
+   *      [0,           0,              1   ]
+   * 
+   *  Using this formula, we fill each cell using the values in the constructor
+   */
+// clang-format on
+
+transform2d_t::transform2d_t(double_array_t<2> scale, double_array_t<2> translate, angle_deg_t angle)
+{
+  double angleRad = vtkMath::RadiansFromDegrees(angle);
+  double sinA = std::sin(angleRad);
+  double cosA = std::cos(angleRad);
+
+  (*this)[0] = cosA * scale[0];
+  (*this)[1] = -sinA * scale[1];
+  (*this)[2] = translate[0];
+  (*this)[3] = sinA * scale[0];
+  (*this)[4] = cosA * scale[1];
+  (*this)[5] = translate[1];
+  (*this)[6] = 0;
+  (*this)[7] = 0;
+  (*this)[8] = 1;
+
+  // remove negative 0.0 wherever it occurs
+  for (int i = 0; i < 9; i++)
+  {
+    if ((*this)[i] == 0.0 && std::signbit((*this)[i]))
+    {
+      (*this)[i] = 0.0;
+    }
+  }
 }
 
 }

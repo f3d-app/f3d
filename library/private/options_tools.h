@@ -541,7 +541,7 @@ transform2d_t parse(const std::string& str)
   std::vector<double> scaleVec;
   std::vector<double> translationVec;
   bool angleNext = false;
-  std::vector<double> angleVec;
+  std::vector<angle_deg_t> angleVec;
   bool hasScale = false;
   bool hasTranslation = false;
   bool hasAngle = false;
@@ -696,7 +696,10 @@ transform2d_t parse(const std::string& str)
     angleVec.push_back(0);
   }
 
-  return transform2d_t(scaleVec[0], scaleVec[1], translationVec[0], translationVec[1], angleVec[0]);
+  double_array_t<2> scaleVecOut = double_array_t<2>(scaleVec);
+  double_array_t<2> translationVecOut = double_array_t<2>(translationVec);
+
+  return transform2d_t(scaleVecOut, translationVecOut, angleVec[0]);
 }
 
 //----------------------------------------------------------------------------
