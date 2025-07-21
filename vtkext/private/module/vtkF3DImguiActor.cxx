@@ -28,8 +28,23 @@
 
 #include <optional>
 
+static std::vector<std::string> splitBindings(const std::string& s, char delim)
+{
+  std::vector<std::string> result;
+  std::stringstream ss(s);
+  std::string item;
+
+  while (getline(ss, item, delim))
+  {
+    result.push_back(item);
+  }
+
+  return result;
+}
+
 struct vtkF3DImguiActor::Internals
 {
+
   void Initialize(vtkOpenGLRenderWindow* renWin)
   {
     if (this->FontTexture == nullptr)
@@ -436,11 +451,16 @@ void vtkF3DImguiActor::RenderCheatSheet()
 {
   const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-  constexpr float marginLeft = 5.f;
-  constexpr float marginTopBottom = 5.f;
+  constexpr float margin = 5.f;
+  constexpr float padding = 16.f;
 
   float textHeight = 0.f;
   float winWidth = 0.f;
+
+  // Use to create all rect with same size
+  float maxBindingTextWidth = 0.f;
+  float maxDescTextWidth = 0.f;
+  float maxValueTextWidth = 0.f;
 
   for (const auto& [group, content] : this->CheatSheet)
   {
@@ -448,27 +468,30 @@ void vtkF3DImguiActor::RenderCheatSheet()
       ImGui::GetTextLineHeightWithSpacing() + 2 * ImGui::GetStyle().SeparatorTextPadding.y;
     for (const auto& [bind, desc, val] : content)
     {
-      std::string line = bind;
-      line += ": ";
-      line += desc;
-      if (!val.empty())
-      {
-        line += " [" + val + "]";
-      }
-      ImVec2 currentLine = ImGui::CalcTextSize(line.c_str());
-
-      winWidth = std::max(winWidth, currentLine.x);
       textHeight += ImGui::GetTextLineHeightWithSpacing();
+
+      ImVec2 bindingLineSize = ImGui::CalcTextSize(bind.c_str());
+      maxBindingTextWidth = std::max(maxBindingTextWidth, bindingLineSize.x);
+
+      ImVec2 descriptionLineSize = ImGui::CalcTextSize(desc.c_str());
+      maxDescTextWidth = std::max(maxDescTextWidth, descriptionLineSize.x);
+
+      ImVec2 valueLineSize = ImGui::CalcTextSize(val.c_str());
+      maxValueTextWidth = std::max(maxValueTextWidth, valueLineSize.x);
+
+      winWidth = maxBindingTextWidth + maxDescTextWidth + maxValueTextWidth;
     }
   }
 
-  winWidth += 2.f * ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().ScrollbarSize;
+  winWidth += ImGui::GetStyle().ScrollbarSize + 4.f * padding;
   textHeight += 2.f * ImGui::GetStyle().WindowPadding.y;
 
-  const float winTop = std::max(marginTopBottom, (viewport->WorkSize.y - textHeight) * 0.5f);
+  const float winTop = std::max(margin, (viewport->WorkSize.y - textHeight) * 0.5f);
 
-  ::SetupNextWindow(ImVec2(marginLeft, winTop),
-    ImVec2(winWidth, std::min(viewport->WorkSize.y - (2 * marginTopBottom), textHeight)));
+  ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(padding, padding));
+
+  ::SetupNextWindow(ImVec2(margin, winTop),
+    ImVec2(winWidth, std::min(viewport->WorkSize.y - (2 * margin), textHeight)));
   ImGui::SetNextWindowBgAlpha(0.9f);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
@@ -481,20 +504,79 @@ void vtkF3DImguiActor::RenderCheatSheet()
   for (const auto& [group, list] : this->CheatSheet)
   {
     ImGui::SeparatorText(group.c_str());
+    ImGui::BeginTable("BindingsTable", 3);
+    ImGui::TableSetupColumn("Description", ImGuiTableColumnFlags_WidthFixed, maxDescTextWidth);
+    ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthFixed, maxValueTextWidth);
+    ImGui::TableSetupColumn("Bindings", ImGuiTableColumnFlags_WidthStretch, maxBindingTextWidth);
     for (const auto& [bind, desc, val] : list)
     {
-      if (!val.empty())
+      ImVec4 bindingTextColor, bindingRectColor, descTextColor;
+
+      if (val == "ON")
       {
-        ImGui::Text("%s: %s [%s]", bind.c_str(), desc.c_str(), val.c_str());
+        bindingTextColor = F3DImguiStyle::GetTextColor();
+        bindingRectColor = F3DImguiStyle::GetHighlightColor();
+        descTextColor = F3DImguiStyle::GetHighlightColor();
+      }
+      else if (!val.empty() && val != "OFF" && val != "Unset" && val != "none")
+      {
+        bindingTextColor = F3DImguiStyle::GetBackgroundColor();
+        bindingRectColor = F3DImguiStyle::GetWarningColor();
+        descTextColor = F3DImguiStyle::GetWarningColor();
       }
       else
       {
-        ImGui::Text("%s: %s", bind.c_str(), desc.c_str());
+        bindingTextColor = F3DImguiStyle::GetTextColor();
+        bindingRectColor = F3DImguiStyle::GetMidColor();
+        descTextColor = F3DImguiStyle::GetTextColor();
+      }
+
+      ImGui::TableNextRow(
+        ImGuiTableRowFlags_None, ImGui::GetTextLineHeightWithSpacing() + 2.0f * margin);
+
+      ImGui::TableNextColumn();
+      ImGui::TextColored(descTextColor, "%s", desc.c_str());
+
+      ImGui::TableNextColumn();
+      ImGui::TextColored(descTextColor, "%s", val.c_str());
+
+      ImGui::TableNextColumn();
+      ImVec2 bindingSize = ImGui::CalcTextSize(bind.c_str());
+
+      ImVec2 topBindingCorner, bottomBindingCorner;
+      std::vector<std::string> splittedBinding = splitBindings(bind, '+');
+      const float maxCursorPosX = ImGui::GetCursorPosX() + ImGui::GetColumnWidth();
+      float posX = maxCursorPosX - ImGui::CalcTextSize(bind.c_str()).x - ImGui::GetScrollX() -
+        ((splittedBinding.size() * 2) - 1) * ImGui::GetStyle().ItemSpacing.x;
+      ImGui::SetCursorPosX(posX);
+      for (std::string& key : splittedBinding)
+      {
+        ImDrawList* drawList = ImGui::GetWindowDrawList();
+        drawList->ChannelsSplit(2);
+        drawList->ChannelsSetCurrent(1);
+        ImGui::TextColored(bindingTextColor, "%s", key.c_str());
+        drawList->ChannelsSetCurrent(0);
+        topBindingCorner =
+          ImVec2(ImGui::GetItemRectMin().x - margin, ImGui::GetItemRectMin().y - margin);
+        bottomBindingCorner =
+          ImVec2(ImGui::GetItemRectMax().x + margin, ImGui::GetItemRectMax().y + margin);
+        drawList->AddRectFilled(
+          topBindingCorner, bottomBindingCorner, ImColor(bindingRectColor), 5.f);
+        drawList->ChannelsMerge();
+        if (key != splittedBinding.at(splittedBinding.size() - 1))
+        {
+          ImGui::SameLine();
+          ImGui::Text("+");
+        }
+        ImGui::SameLine();
       }
     }
+
+    ImGui::EndTable();
   }
 
   ImGui::End();
+  ImGui::PopStyleVar();
 }
 
 //----------------------------------------------------------------------------
