@@ -62,6 +62,10 @@
 #include <vtksys/MD5.h>
 #include <vtksys/SystemTools.hxx>
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
+#include <vtkGridAxesActor3D.h>
+#endif
+
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
 #include <vtkSphericalHarmonics.h>
 #endif
@@ -266,6 +270,11 @@ void vtkF3DRenderer::Initialize()
   this->AddActor(this->GridActor);
   this->AddActor(this->SkyboxActor);
   this->AddActor(this->UIActor);
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
+  this->AddActor(this->GridAxesActor);
+  this->GridAxesActor->SetUseBounds(false);
+#endif
 
   this->GridConfigured = false;
   this->CheatSheetConfigured = false;
@@ -707,6 +716,78 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
 
   this->GridActor->SetVisibility(show);
   this->ResetCameraClippingRange();
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ShowAxesGrid([[maybe_unused]] bool show)
+{
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
+  if (this->AxesGridVisible != show)
+  {
+    this->AxesGridVisible = show;
+    this->RenderPassesConfigured = false;
+    this->GridAxesConfigured = false;
+    this->CheatSheetConfigured = false;
+  }
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ConfigureGridAxesUsingCurrentActors()
+{
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
+  bool show = this->AxesGridVisible;
+  if (show)
+  {
+    double* up = this->GetEnvironmentUp();
+    double* right = this->GetEnvironmentRight();
+    double front[3];
+    vtkMath::Cross(right, up, front);
+
+    vtkNew<vtkMatrix4x4> upMatrix;
+    const double m[16] = {
+      right[0], right[1], right[2], 0, //
+      up[0], up[1], up[2], 0,          //
+      front[0], front[1], front[2], 0, //
+      0, 0, 0, 1,                      //
+    };
+    upMatrix->DeepCopy(m);
+    vtkNew<vtkMatrix4x4> upMatrixInv;
+    upMatrixInv->DeepCopy(upMatrix);
+    upMatrixInv->Transpose();
+
+    double orientation[3];
+    vtkTransform::GetOrientation(orientation, upMatrixInv);
+    const vtkBoundingBox bbox = this->ComputeVisiblePropOrientedBounds(upMatrix);
+
+    if (!bbox.IsValid())
+    {
+      show = false;
+    }
+    else
+    {
+      this->GridAxesActor->SetOrientation(orientation);
+      this->GridAxesActor->SetVisibility(true);
+
+      double center[4] = { 0, 0, 0, 1 };
+      bbox.GetCenter(center);
+
+      this->GridAxesActor->SetPosition(center);
+
+      double a, b, c, x, y, z;
+      bbox.GetBounds(a, b, c, x, y, z);
+      GridAxesActor->SetGridBounds(a, b, c, x, y, z);
+
+      GridAxesActor->SetXTitle("X Axis");
+      GridAxesActor->SetYTitle("Y Axis");
+      GridAxesActor->SetZTitle("Z Axis");
+
+      this->GridAxesConfigured = true;
+    }
+  }
+  this->GridAxesActor->SetVisibility(show);
+
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -1246,17 +1327,6 @@ void vtkF3DRenderer::ConfigureHDRISkybox()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureTextActors()
 {
-  // Dynamic text color
-  double textColor[3];
-  if (this->IsBackgroundDark())
-  {
-    textColor[0] = textColor[1] = textColor[2] = 0.9;
-  }
-  else
-  {
-    textColor[0] = textColor[1] = textColor[2] = 0.2;
-  }
-
   // Font
   std::string fontFileStr;
   if (this->FontFile.has_value())
@@ -1709,6 +1779,11 @@ void vtkF3DRenderer::UpdateActors()
     this->ConfigureTextActors();
   }
 
+  if (!this->GridAxesConfigured)
+  {
+    this->ConfigureGridAxesUsingCurrentActors();
+  }
+
   if (!this->RenderPassesConfigured)
   {
     this->ConfigureRenderPasses();
@@ -1825,14 +1900,6 @@ int vtkF3DRenderer::UpdateLights()
   }
 
   return lightCount;
-}
-
-//----------------------------------------------------------------------------
-bool vtkF3DRenderer::IsBackgroundDark()
-{
-  double luminance =
-    0.299 * this->Background[0] + 0.587 * this->Background[1] + 0.114 * this->Background[2];
-  return this->HDRISkyboxVisible ? true : luminance < 0.5;
 }
 
 //----------------------------------------------------------------------------
@@ -2088,7 +2155,7 @@ void vtkF3DRenderer::ConfigureActorsProperties()
     if (this->TexturesTransform.has_value())
     {
       const std::vector<double> texTransform = this->TexturesTransform.value();
-      double transform[] = {                                    //
+      const double transform[] = {                              //
         texTransform[0], texTransform[1], texTransform[2], 0.0, //
         texTransform[3], texTransform[4], texTransform[5], 0.0, //
         texTransform[6], texTransform[7], texTransform[8], 0.0, //

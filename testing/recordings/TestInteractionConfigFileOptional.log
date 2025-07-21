@@ -1,0 +1,14 @@
+# StreamVersion 1.2
+ConfigureEvent 960 1033 0 0 0 0 0
+ExposeEvent 0 1055 0 0 0 0 0
+RenderEvent 0 1055 0 0 0 0 0
+EnterEvent 477 494 0 0 0 0 0
+TimerEvent 477 494 0 0 0 0 0
+TimerEvent 477 494 0 0 0 0 0
+KeyPressEvent 477 494 0 0 1 Right 0
+CharEvent 477 494 0 0 1 Right 0
+TimerEvent 477 494 0 0 1 Right 0
+TimerEvent 477 494 0 0 1 Right 0
+KeyReleaseEvent 477 494 0 0 1 Right 0
+TimerEvent 477 494 0 0 1 Right 0
+TimerEvent 477 494 0 0 1 Right 0

@@ -277,7 +277,7 @@ int vtkF3DSPZReader::RequestData(
 
   ::UncompressGzip(compressed, uncompressed);
 
-  Header* header = reinterpret_cast<Header*>(uncompressed.data());
+  const Header* header = reinterpret_cast<Header*>(uncompressed.data());
 
   assert(header->magic == 0x5053474e);
   assert(header->version == 2);

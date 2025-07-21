@@ -42,6 +42,28 @@ You can then fix the issue or implement the feature on your side and contribute 
 Of course, if you are already using F3D and want to improve it for your specific needs, because you want a feature or found a bug,
 that is definitely possible. Feel free to reach out for guidance by opening an issue or asking on [Discord](https://discord.f3d.app).
 
+## Bounties
+
+The [F3D-APP Foundation](https://annuaire-entreprises.data.gouv.fr/entreprise/f3d-app-foundation-941551624), as a non-profit institution, would like to redistribute some donations to the contributors, for specific issues identified by maintainers as important for the project.
+Such issues have been identified with the ["bounty"](https://github.com/f3d-app/f3d/issues?q=is%3Aissue%20state%3Aopen%20label%3Abounty) label. The amount of money of their bounties is fairly small (up to a few hundred euros).
+
+In order to be eligible for the bounty you need to:
+
+- Be a [returning contributor](doc/dev/GOVERNANCE.md#12-returning-contributors)
+- Be able to provide an IBAN from a country located in the European Union where the money will be donated to
+
+If you are not eligible or are not interested by the donation, this is perfectly fine, you can still work on the issue, but there will be no donation.
+If you are eligible and interested, please comment on the issue and Maintainers will reach out to you privately to discuss the details and share the exact amount of the bounty
+for this particular issue. We will also decide together a targeted deadline for completion of the work.
+Maintainers will then vote to decide if you are a good fit for a specific issue and share the result of the vote with you.
+
+When working on a bounty, some form of communication is expected once a week, failure to do so may result on the issue being unassigned by maintainers opening it up to other contributors.
+You should then work on this issue as you would any other issue.
+
+When the maintainer close the issue, the donation will take place. This can sometimes requires multiple pull requests being merged.
+
+Please note the [F3D-APP foundation](https://annuaire-entreprises.data.gouv.fr/entreprise/f3d-app-foundation-941551624) is handling the donations.
+
 ## F3D Development Workflow
 
 F3D uses [GitLab Flow](https://about.gitlab.com/topics/version-control/what-is-gitlab-flow/). In a few words, here is how to contribute:

@@ -1,5 +1,65 @@
 # Changelog
 
+## v3.2.0
+
+For F3D users:
+
+- Added support for VTKHDF format, including AMR datasets
+- Added support for SPZ and PLY gaussian splatting format
+- Added a `--base-ior` option to control index of refraction
+- Added a `--multi-file-mode=dir` option mode to create file groups based on the folder organization
+- Added spherical harmonics support for gaussian splatting (SPZ and PLY)
+- Added a QuakeMDL reader option: `-DQuakeMDL.skin_index` to select skin to load
+- Added support for reading EXR texture in USD format
+- Added support for selection multiple animations using `--animation-indices=1,2,3`
+- Added a `--colormap-discretization` option to control scalar rendering discretization
+- Added glob support to configuration file
+- Added a `--textures-transform` option to set a transform on textures
+- Added listing of more exodus extensions `.e`, `.g` and `.exo`
+- Added a minimal console, open by pressing `:`
+- Added `increase_opacity` and `decrease_opacity` commands and bindings (`Ctrl+P` and `Shift+P`)
+- Added a `--force-reader` option to select the reader to use, even with the wrong extension
+- Added a binding to switch verbose level by pressing `Shift+V`
+- Added netcdf format support
+- Added `elevation_camera` and `azimuth_camera` commands
+- Added a `elevation_camera` binding (`2` and `8`)
+- Improved documentation
+- Improved logging
+- Improved camera management on special locations like looking straight down
+- Changed UI style to fit with new F3D design
+- Fixed multiple issues with coloring while skinning or morphing
+- Fixed an issue with normals in the QuakeMDL importer
+- Fixed a wobbling issue when rotating the camera
+- Fixed an issue where `--verbose=quiet` was not respected
+- Fixed multiple UI issues
+- Fixed an infamous crash on Windows when username has a special character in it
+- Fixed an issue where configuration file loading order was not respected
+- Fixed an issue where optional option were not kept when changing file group
+- Fixed a crash when using `Ctrl+O` but then selecting no files
+- Fixed an issue with colinear camera and Up vector
+- Deprecated `--animation-index` option
+
+For libf3d users:
+
+- Added `scene.animation.indices` to select multiple animations
+- Added `model.material.base_ior` to control index of refraction
+- Added `model.scivis.discretization` to control scalar rendering discretization
+- Added `model.textures_transform` to set a transform on textures
+- Added `scene.force_reader` to force a specific reader to be used
+- Added streaming support to Splat reader (not exposed yet)
+- Improved camera API and default values
+- Improved python stubs
+- Fixed `help(f3d)`
+- Deprecated `scene.animation.index` option
+
+For F3D packagers:
+
+- Fixed a missing include in vtkF3DQuakeMDLImporter
+- Fixed a configuration issue against assimp 6.0
+- Removed `f3d_PREFIX_DIR` and rely on `PACKAGE_PREFIX_DIR` instead
+- Renamed `F3D_PLUGIN_BUILD_EXODUS` into `F3D_PLUGIN_BUILD_HDF`
+- Added a few new VTK module dependencies
+
 ## v3.1.0
 
 For F3D users:

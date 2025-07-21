@@ -13,12 +13,12 @@ int TestSDKExternalWindowGLFW(int argc, char* argv[])
   // setup glfw window
   if (!glfwInit())
   {
-    std::cerr << "Can't initialize GLFW." << std::endl;
+    std::cerr << "Can't initialize GLFW.\n";
     return EXIT_FAILURE;
   }
 
   glfwSetErrorCallback([](int error, const char* desc) {
-    std::cerr << "GLFW error " << error << ": " << desc << std::endl;
+    std::cerr << "GLFW error " << error << ": " << desc << "\n";
   });
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
@@ -28,7 +28,7 @@ int TestSDKExternalWindowGLFW(int argc, char* argv[])
 
   if (!window)
   {
-    std::cerr << "Can't create GLFW window." << std::endl;
+    std::cerr << "Can't create GLFW window.\n";
     return EXIT_FAILURE;
   }
 

@@ -19,7 +19,7 @@ int TestSDKDropZoneMinSize(int, char*[])
   }
   catch (const std::exception& e)
   {
-    std::cerr << "Unexpected error during render: " << e.what() << std::endl;
+    std::cerr << "Unexpected error during render: " << e.what() << "\n";
     return EXIT_FAILURE;
   }
 

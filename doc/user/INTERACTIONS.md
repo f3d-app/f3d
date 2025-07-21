@@ -30,7 +30,7 @@ See the [coloring cycle](#cycling-coloring) section for more info.
 
 Other options can be toggled directly by pressing the following hotkeys:
 
-- <kbd>W</kbd>: cycle animations.
+- <kbd>W</kbd>: [cycle animations](ANIMATIONS.md#cycling-animations).
 - <kbd>B</kbd>: display of the scalar bar, only when coloring and not using direct scalars.
 - <kbd>V</kbd>: volume rendering, forces coloring.
 - <kbd>I</kbd>: opacity function inversion during volume rendering.
@@ -41,6 +41,7 @@ Other options can be toggled directly by pressing the following hotkeys:
 - <kbd>E</kbd>: the display of cell edges.
 - <kbd>X</kbd>: the trihedral axes display.
 - <kbd>G</kbd>: the horizontal grid display.
+- <kbd>Shift</kbd>+<kbd>x</kbd>: show/hide axes grid
 - <kbd>N</kbd>: the display of the file name.
 - <kbd>M</kbd>: the display of the metadata if exists.
 - <kbd>Z</kbd>: the display of the FPS counter.
@@ -61,11 +62,13 @@ Note that the raytracing hotkeys are only available if F3D is build with raytrac
 Camera Hotkeys:
 
 - <kbd>1</kbd>: front view camera.
+- <kbd>2</kbd>: roll the camera up (elevation) by 90 degrees.
 - <kbd>3</kbd>: right view camera.
 - <kbd>4</kbd>: roll the camera left by 90 degrees.
 - <kbd>5</kbd>: toggle orthographic projection.
 - <kbd>6</kbd>: roll the camera right by 90 degrees.
 - <kbd>7</kbd>: top view camera.
+- <kbd>8</kbd>: roll the camera down (elevation) by 90 degrees.
 - <kbd>9</kbd>: isometric view camera.
 - <kbd>Enter</kbd>: reset the camera to its initial parameters.
 
@@ -76,10 +79,11 @@ Other hotkeys and interactions are available:
 - <kbd>Esc</kbd>: display the console or hide console/minimal console.
 - <kbd>:</kbd>: display the minimal console
 - <kbd>Space</kbd>: play the animation if any.
+- <kbd>Shift</kbd> + <kbd>V</kbd>: cycle between verbosity levels.
 - <kbd>&larr;</kbd>: load the previous file if any and reset the camera.
 - <kbd>&rarr;</kbd>: load the next file if any and reset the camera.
 - <kbd>&uarr;</kbd>: reload the currently loaded files.
-- <kbd>&darr;</kbd>: add all current files parent directories to the list of files, reload the currently loaded files and reset the camera.
+- <kbd>&darr;</kbd>: add all current files parent directories to the list of files, reload the currently loaded files and reset the camera, respect the `--recursive-dir-add` CLI option.
 - <kbd>F12</kbd>: take a screenshot, ie. render the current view to an image file.
 - <kbd>Ctrl</kbd> + <kbd>F12</kbd>: take a "minimal" screenshot, ie. render the current view with no grid and no overlays to an image file with a transparent background.
 - _Drop_ a file, directory or HDRI into the F3D window to load it. F3D relies on the extension (`.hdr` or `.exr`) to detect if the dropped file is an HDRI.

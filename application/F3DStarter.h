@@ -72,7 +72,7 @@ private:
    * Set clear to true to clear the scene first
    * GroupIdx is only used for display purposes of the filename
    */
-  void LoadFileGroup(
+  void LoadFileGroupInternal(
     const std::vector<std::filesystem::path>& paths, bool clear, const std::string& groupIdx);
 
   /**

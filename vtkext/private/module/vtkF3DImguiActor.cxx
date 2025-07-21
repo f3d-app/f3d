@@ -1,6 +1,7 @@
 #include "vtkF3DImguiActor.h"
 
 #include "F3DFontBuffer.h"
+#include "F3DImguiStyle.h"
 #include "vtkF3DImguiConsole.h"
 #include "vtkF3DImguiFS.h"
 #include "vtkF3DImguiVS.h"
@@ -254,9 +255,11 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
   ImFont* font = nullptr;
   if (this->FontFile.empty())
   {
+    // ImGui API is not very helpful with this
     fontConfig.FontDataOwnedByAtlas = false;
-    font =
-      io.Fonts->AddFontFromMemoryTTF((void*)F3DFontBuffer, sizeof(F3DFontBuffer), 18, &fontConfig);
+    font = io.Fonts->AddFontFromMemoryTTF(
+      const_cast<void*>(reinterpret_cast<const void*>(F3DFontBuffer)), sizeof(F3DFontBuffer), 18,
+      &fontConfig);
   }
   else
   {
@@ -267,12 +270,26 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
   io.FontDefault = font;
   io.FontGlobalScale = this->FontScale;
 
+  ImVec4 colTransparent = ImVec4(0.0f, 0.0f, 0.0f, 0.0f); // #000000
+
   ImGuiStyle* style = &ImGui::GetStyle();
   style->AntiAliasedLines = false;
   style->GrabRounding = 4.0f;
-  style->WindowBorderSize = 0.f;
   style->WindowPadding = ImVec2(10, 10);
   style->WindowRounding = 8.f;
+  style->WindowBorderSize = 0.f;
+  style->FrameBorderSize = 0.f;
+  style->FramePadding = ImVec2(4, 2);
+  style->FrameRounding = 2.f;
+  style->Colors[ImGuiCol_Text] = F3DImguiStyle::GetTextColor();
+  style->Colors[ImGuiCol_WindowBg] = F3DImguiStyle::GetBackgroundColor();
+  style->Colors[ImGuiCol_FrameBg] = colTransparent;
+  style->Colors[ImGuiCol_FrameBgActive] = colTransparent;
+  style->Colors[ImGuiCol_ScrollbarBg] = colTransparent;
+  style->Colors[ImGuiCol_ScrollbarGrab] = F3DImguiStyle::GetMidColor();
+  style->Colors[ImGuiCol_ScrollbarGrabHovered] = F3DImguiStyle::GetHighlightColor();
+  style->Colors[ImGuiCol_ScrollbarGrabActive] = F3DImguiStyle::GetHighlightColor();
+  style->Colors[ImGuiCol_TextSelectedBg] = F3DImguiStyle::GetHighlightColor();
 
   // Setup backend name
   io.BackendPlatformName = io.BackendRendererName = "F3D/VTK";
@@ -301,7 +318,9 @@ void vtkF3DImguiActor::RenderDropZone()
       return;
     }
 
-    constexpr ImU32 color = IM_COL32(255, 255, 255, 255);
+    constexpr ImVec4 colorImv = F3DImguiStyle::GetTextColor();
+    constexpr ImU32 color =
+      IM_COL32(colorImv.x * 255, colorImv.y * 255, colorImv.z * 255, colorImv.w * 255);
 
     const int dropzonePad =
       static_cast<int>(std::min(viewport->WorkSize.x, viewport->WorkSize.y) * 0.1);
@@ -369,7 +388,7 @@ void vtkF3DImguiActor::RenderFileName()
 {
   if (!this->FileName.empty())
   {
-    ImGuiViewport* viewport = ImGui::GetMainViewport();
+    const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
     constexpr float marginTop = 5.f;
     ImVec2 winSize = ImGui::CalcTextSize(this->FileName.c_str());
@@ -377,7 +396,7 @@ void vtkF3DImguiActor::RenderFileName()
     winSize.y += 2.f * ImGui::GetStyle().WindowPadding.y;
 
     ::SetupNextWindow(ImVec2(viewport->GetWorkCenter().x - 0.5f * winSize.x, marginTop), winSize);
-    ImGui::SetNextWindowBgAlpha(0.35f);
+    ImGui::SetNextWindowBgAlpha(0.9f);
 
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
       ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
@@ -391,7 +410,7 @@ void vtkF3DImguiActor::RenderFileName()
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderMetaData()
 {
-  ImGuiViewport* viewport = ImGui::GetMainViewport();
+  const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
   constexpr float marginRight = 5.f;
 
@@ -402,7 +421,7 @@ void vtkF3DImguiActor::RenderMetaData()
   ::SetupNextWindow(ImVec2(viewport->WorkSize.x - winSize.x - marginRight,
                       viewport->GetWorkCenter().y - 0.5f * winSize.y),
     winSize);
-  ImGui::SetNextWindowBgAlpha(0.35f);
+  ImGui::SetNextWindowBgAlpha(0.9f);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
     ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
@@ -415,7 +434,7 @@ void vtkF3DImguiActor::RenderMetaData()
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderCheatSheet()
 {
-  ImGuiViewport* viewport = ImGui::GetMainViewport();
+  const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
   constexpr float marginLeft = 5.f;
   constexpr float marginTopBottom = 5.f;
@@ -450,7 +469,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
 
   ::SetupNextWindow(ImVec2(marginLeft, winTop),
     ImVec2(winWidth, std::min(viewport->WorkSize.y - (2 * marginTopBottom), textHeight)));
-  ImGui::SetNextWindowBgAlpha(0.35f);
+  ImGui::SetNextWindowBgAlpha(0.9f);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
     ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings |
@@ -481,7 +500,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderFpsCounter()
 {
-  ImGuiViewport* viewport = ImGui::GetMainViewport();
+  const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
   constexpr float marginRight = 3.f;
   constexpr float marginBottom = 3.f;
@@ -497,7 +516,7 @@ void vtkF3DImguiActor::RenderFpsCounter()
     viewport->WorkSize.y - winSize.y - marginBottom);
 
   ::SetupNextWindow(position, winSize);
-  ImGui::SetNextWindowBgAlpha(0.35f);
+  ImGui::SetNextWindowBgAlpha(0.9f);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
     ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;

@@ -43,6 +43,7 @@ public:
   bool supports(const std::filesystem::path& filePath) override;
   scene& loadAnimationTime(double timeValue) override;
   std::pair<double, double> animationTimeRange() override;
+  unsigned int availableAnimations() const override;
   ///@}
 
   /**

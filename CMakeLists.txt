@@ -30,7 +30,7 @@ include(f3dVersion)
 
 # Handle F3D_VERSION
 set(F3D_MAJOR_VERSION 3)
-set(F3D_MINOR_VERSION 1)
+set(F3D_MINOR_VERSION 2)
 set(F3D_PATCH_VERSION 0)
 set(F3D_VERSION ${F3D_MAJOR_VERSION}.${F3D_MINOR_VERSION}.${F3D_PATCH_VERSION})
 
@@ -109,7 +109,9 @@ find_package(VTK 9.2.6 REQUIRED
     opengl
     IOExodus
     IOHDF
+    IONetCDF
     IOOpenVDB
+    RenderingGridAxes
     RenderingRayTracing)
 message(STATUS "VTK ${VTK_VERSION} found")
 

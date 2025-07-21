@@ -12,9 +12,14 @@
 int TestF3DGenericImporter(int argc, char* argv[])
 {
   vtkNew<vtkF3DGenericImporter> importer;
+  if (importer->GetAnimationSupportLevel() != vtkF3DImporter::AnimationSupportLevel::UNIQUE)
+  {
+    std::cerr << "Unexpected animation support level\n";
+    return EXIT_FAILURE;
+  }
   if (importer->GetNumberOfAnimations() != 0)
   {
-    std::cerr << "Unexpected number of animations" << std::endl;
+    std::cerr << "Unexpected number of animations\n";
     return EXIT_FAILURE;
   }
 
@@ -24,7 +29,7 @@ int TestF3DGenericImporter(int argc, char* argv[])
 
   if (importer->GetTemporalInformation(0, 60, nbTimeSteps, timeRange, timeSteps))
   {
-    std::cerr << "Unexpected return value with GetTemporalInformation" << std::endl;
+    std::cerr << "Unexpected return value with GetTemporalInformation\n";
     return EXIT_FAILURE;
   }
 
@@ -41,21 +46,21 @@ int TestF3DGenericImporter(int argc, char* argv[])
   importer->Print(cout);
   if (importer->GetNumberOfAnimations() != 1)
   {
-    std::cerr << "Unexpected number of animations" << std::endl;
+    std::cerr << "Unexpected number of animations\n";
     return EXIT_FAILURE;
   }
 
   importer->EnableAnimation(0);
   if (!importer->IsAnimationEnabled(0))
   {
-    std::cerr << "Unexpected not enabled animation" << std::endl;
+    std::cerr << "Unexpected not enabled animation\n";
     return EXIT_FAILURE;
   }
 
   importer->DisableAnimation(0);
   if (importer->IsAnimationEnabled(0))
   {
-    std::cerr << "Unexpected enabled animation" << std::endl;
+    std::cerr << "Unexpected enabled animation\n";
     return EXIT_FAILURE;
   }
 
@@ -67,9 +72,9 @@ int TestF3DGenericImporter(int argc, char* argv[])
 
   importer->SetInternalReader(reader);
   importer->Update();
-  if (importer->UpdateAtTimeValue(0.1))
+  if (!importer->UpdateAtTimeValue(0.1))
   {
-    std::cerr << "Unexpected UpdateAtTimeValue success" << std::endl;
+    std::cerr << "Unexpected UpdateAtTimeValue failure\n";
     return EXIT_FAILURE;
   }
 #endif
@@ -77,7 +82,7 @@ int TestF3DGenericImporter(int argc, char* argv[])
   // Static method testing
   if (vtkF3DGenericImporter::GetDataObjectDescription(nullptr) != "")
   {
-    std::cerr << "Unexpected data object description with null input" << std::endl;
+    std::cerr << "Unexpected data object description with null input\n";
     return EXIT_FAILURE;
   }
 

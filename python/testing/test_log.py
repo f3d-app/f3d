@@ -37,6 +37,19 @@ def test_coloring():
     )
 
 
+def test_get_verbose_level():
+    assert (
+        run_python(
+            "from f3d import Log",
+            "Log.set_verbose_level(Log.DEBUG)",
+            "print(Log.get_verbose_level() == Log.DEBUG)",
+            "Log.set_verbose_level(Log.WARN)",
+            "print(Log.get_verbose_level() == Log.WARN)",
+        )
+        == "True\nTrue\n"
+    )
+
+
 def run_python(*statements: str):
     return subprocess.check_output(
         [sys.executable, "-c", "; ".join(statements)],

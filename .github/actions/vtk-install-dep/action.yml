@@ -12,9 +12,18 @@ inputs:
     description: "CPU architecture to build for"
     required: false
     default: "x86_64"
+  blosc_version:
+    description: "Version of blosc to build against"
+    required: true
   openvdb_version:
     description: "Version of openvdb to build against"
     required: false
+  tbb_version:
+    description: "Version of tbb to build against"
+    required: true
+  zlib_version:
+    description: "Version of zlib to build against"
+    required: true
 
 runs:
   using: "composite"
@@ -22,14 +31,17 @@ runs:
     - name: Check required inputs
       shell: bash
       run: |
+        [[ "${{ inputs.blosc_version }}" ]] || { echo "blosc_version input is empty" ; exit 1; }
+        [[ "${{ inputs.tbb_version }}" ]] || { echo "tbb_version input is empty" ; exit 1; }
         [[ "${{ inputs.vtk_version }}" ]] || { echo "vtk_version input is empty" ; exit 1; }
+        [[ "${{ inputs.zlib_version }}" ]] || { echo "zlib_version input is empty" ; exit 1; }
 
     - name: Cache VTK
       id: cache-vtk
       uses: actions/cache/restore@v4
       with:
         path: dependencies/vtk_install
-        key: vtk-${{ inputs.vtk_version }}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.cpu}}-0
+        key: vtk-${{ inputs.vtk_version }}-${{inputs.zlib_version}}-${{inputs.blosc_version}}-${{inputs.tbb_version}}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.cpu}}-4
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -52,13 +64,20 @@ runs:
 
     # CMake 3.31 introduced a new policy producing a warning when using vtkModule.cmake
     # See https://gitlab.kitware.com/vtk/vtk/-/issues/19526
-    - name: Patch VTK
+    - name: Patch VTK CMake
       if: steps.cache-vtk.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/vtk
       shell: bash
       run: |
         cat $GITHUB_ACTION_PATH/set_cmp0177_policy.cmake CMake/vtkModule.cmake > patched.cmake
         mv patched.cmake CMake/vtkModule.cmake
+
+    # VTK 9.2.6 needs patching with recent libstd
+    - name: Patch VTK v9.2.6
+      if: steps.cache-vtk.outputs.cache-hit != 'true' && inputs.vtk_version == 'v9.2.6'
+      working-directory: ${{github.workspace}}/dependencies/vtk
+      shell: bash
+      run: patch -p1 < $GITHUB_ACTION_PATH/include_cstdint.patch
 
       # OpenVDB_CMAKE_PATH is required because of
       # https://github.com/AcademySoftwareFoundation/openvdb/issues/1160 and
@@ -93,6 +112,7 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_IOHDF=YES
         -DVTK_MODULE_ENABLE_VTK_IOImage=YES
         -DVTK_MODULE_ENABLE_VTK_IOImport=YES
+        -DVTK_MODULE_ENABLE_VTK_IONetCDF=YES
         -DVTK_MODULE_ENABLE_VTK_IOOpenVDB=${{ inputs.openvdb_version != '' && 'YES' || 'DEFAULT' }}
         -DVTK_MODULE_ENABLE_VTK_IOPLY=YES
         -DVTK_MODULE_ENABLE_VTK_IOParallel=YES
@@ -103,6 +123,7 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_InteractionWidgets=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingAnnotation=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingCore=YES
+        -DVTK_MODULE_ENABLE_VTK_RenderingGridAxes=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingOpenGL2=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingRayTracing=${{ inputs.raytracing_label == 'raytracing' && 'YES' || 'DEFAULT' }}
         -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2=YES

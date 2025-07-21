@@ -4,6 +4,7 @@ set(test_sources
   TestF3DInteractorEventRecorder.cxx
   TestF3DLog.cxx
   TestF3DMetaImporterMultiColoring.cxx
+  TestF3DMetaImporterAnimation.cxx
   TestF3DObjectFactory.cxx
   TestF3DOpenGLGridMapper.cxx
   TestF3DRenderPass.cxx

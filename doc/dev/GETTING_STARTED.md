@@ -75,6 +75,34 @@ ctest
 
 ## Windows
 
+### Visual Studio with internal CMake/VCPKG integration
+
+On very recent Visual Studio versions, it's possible to rely on the internal CMake to automatically configure the project
+and the internal VCPKG to automatically build the dependencies.
+
+#### Install Dependencies
+
+- Download and install a recent version of [Visual Studio 2022 Community Edition][visual-studio]
+
+> [!WARNING]
+> This process has been tested successfully on 17.12 but is known to fail on 17.8
+
+#### Open the project
+
+- Open Visual Studio
+- Select `Clone a repository`
+- Specify the repository address: `https://github.com/f3d-app/f3d.git` and the local directory of your choice
+
+> [!WARNING]
+> The first run will take a while (up to 1 hour) because VTK is compiled twice (in Debug and Release mode)
+
+#### Build and the project
+
+- When the configuration is finished, press `F7` to compile F3D
+- Select `f3d.exe (bin\f3d.exe)` in the list of the target and to run F3D
+
+### Command line only
+
 The following steps were tested with Visual Studio Community 2022 using Windows 10, but should also work for other versions.
 This guide is relying a lot on terminal command in order to provide easy steps to follow.
 Alternatively, it is possible to use Visual Studio directly by opening .sln files and building in Visual Studio.
@@ -105,7 +133,7 @@ git clone https://github.com/f3d-app/f3d.git src
 mkdir build
 ```
 
-Note: Resulting folder architecture should look like this:
+Note: Resulting directory architecture should look like this:
 
 ```
 dev
@@ -118,7 +146,7 @@ dev
     `-- src
 ```
 
-#### Build and install VTK in a dedicated folder
+#### Build and install VTK in a dedicated directory
 
 - Open x64 Native Tools Command Prompt for VS 2022
 
