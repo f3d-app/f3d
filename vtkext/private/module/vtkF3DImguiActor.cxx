@@ -474,7 +474,9 @@ void vtkF3DImguiActor::RenderCheatSheet()
       ImVec2 descriptionLineSize = ImGui::CalcTextSize(desc.c_str());
       maxDescTextWidth = std::max(maxDescTextWidth, descriptionLineSize.x);
 
-      ImVec2 valueLineSize = ImGui::CalcTextSize(val.c_str());
+      std::string cyclingValue = "< " + val + " >";
+
+      ImVec2 valueLineSize = ImGui::CalcTextSize(cyclingValue.c_str());
       maxValueTextWidth = std::max(maxValueTextWidth, valueLineSize.x);
 
       winWidth = maxBindingTextWidth + maxDescTextWidth + maxValueTextWidth;
@@ -536,7 +538,11 @@ void vtkF3DImguiActor::RenderCheatSheet()
       ImGui::TextColored(descTextColor, "%s", desc.c_str());
 
       ImGui::TableNextColumn();
-      ImGui::TextColored(descTextColor, "%s", val.c_str());
+      if (!val.empty() && val != "OFF" && val != "ON" && val != "Unset") {
+        ImGui::TextColored(descTextColor, "< %s >", val.c_str());
+      } else {
+        ImGui::TextColored(descTextColor, "%s", val.c_str());
+      }
 
       ImGui::TableNextColumn();
       ImVec2 bindingSize = ImGui::CalcTextSize(bind.c_str());
