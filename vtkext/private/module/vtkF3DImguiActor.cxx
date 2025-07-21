@@ -512,15 +512,15 @@ void vtkF3DImguiActor::RenderCheatSheet()
 
       if (val == "ON")
       {
-        bindingTextColor = F3DImguiStyle::GetTextColor();
-        bindingRectColor = F3DImguiStyle::GetHighlightColor();
-        descTextColor = F3DImguiStyle::GetHighlightColor();
+        bindingTextColor = F3DImguiStyle::GetBackgroundColor();
+        bindingRectColor = F3DImguiStyle::GetWarningColor();
+        descTextColor = F3DImguiStyle::GetWarningColor();
       }
       else if (!val.empty() && val != "OFF" && val != "Unset" && val != "none")
       {
         bindingTextColor = F3DImguiStyle::GetBackgroundColor();
-        bindingRectColor = F3DImguiStyle::GetWarningColor();
-        descTextColor = F3DImguiStyle::GetWarningColor();
+        bindingRectColor = F3DImguiStyle::GetHighlightColor();
+        descTextColor = F3DImguiStyle::GetHighlightColor();
       }
       else
       {
