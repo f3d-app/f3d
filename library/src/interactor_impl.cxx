@@ -1100,24 +1100,24 @@ interactor& interactor_impl::initBindings()
     {
       desc = this->Internals->Options.render.effect.antialiasing.mode;
     }
-    return std::pair("Cycle anti-aliasing", std::move(desc));
+    return std::pair("Anti-aliasing", std::move(desc));
   };
 
   // "Cycle animation" , "animationName"
   auto docAnim = [&]()
-  { return std::pair("Cycle animation", this->Internals->AnimationManager->GetAnimationName()); };
+  { return std::pair("Animation", this->Internals->AnimationManager->GetAnimationName()); };
 
   // "Cycle point/cell data coloring" , "POINT/CELL"
   auto docField = [&]()
   {
     return std::pair(
-      std::string("Cycle point/cell data coloring"), (opts.model.scivis.cells ? "CELL" : "POINT"));
+      std::string("Data coloring"), (opts.model.scivis.cells ? "CELL" : "POINT"));
   };
 
   // "Cycle array to color with" , "arrayName"
   auto docArray = [&]()
   {
-    return std::pair("Cycle array to color with",
+    return std::pair("Color array",
       (opts.model.scivis.array_name.has_value()
           ? shortName(opts.model.scivis.array_name.value(), 15) +
             (opts.model.scivis.enable ? "" : " (forced)")
@@ -1130,7 +1130,7 @@ interactor& interactor_impl::initBindings()
     vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
     vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
     return std::pair(
-      "Cycle component to color with", ren->ComponentToString(opts.model.scivis.component));
+      "Color component", ren->ComponentToString(opts.model.scivis.component));
   };
 
   // "doc", ""
@@ -1175,7 +1175,7 @@ interactor& interactor_impl::initBindings()
   auto docVerbose = [&]()
   {
     return std::pair(
-      "Cycle verbose level", this->Internals->VerboseLevelToString(log::getVerboseLevel()));
+      "Verbose level", this->Internals->VerboseLevelToString(log::getVerboseLevel()));
   };
 
   // clang-format off
