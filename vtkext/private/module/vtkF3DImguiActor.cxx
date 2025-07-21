@@ -396,7 +396,7 @@ void vtkF3DImguiActor::RenderDropZone()
       // Calculate logo position (centered)
       ImVec2 center = viewport->GetWorkCenter();
 
-      // Choose desired size (e.g., 128x128 or scale as you want)
+      // Logo size
       float logoDisplayWidth = 256.f;
       float logoDisplayHeight = 256.f;
 
