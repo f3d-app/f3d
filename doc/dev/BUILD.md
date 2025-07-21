@@ -11,9 +11,9 @@ please take a look at our [getting started guide](GETTING_STARTED.md).
 - A C++17 compiler.
 - A CMake-compatible build system (Visual Studio, XCode, Ninja, Make, etc.).
 - Optionally, [Assimp](https://www.assimp.org/) >= 5.4.0 (6.0.2 recommended).
-- Optionally, Open CASCADE [OCCT](https://dev.opencascade.org/) >= 7.6.3.
+- Optionally, Open CASCADE [OCCT](https://dev.opencascade.org/) >= 7.6.3 (7.9.1 recommended).
 - Optionally, [Alembic](http://www.alembic.io/) >= 1.8.5.
-- Optionally, [OpenUSD](https://openusd.org/release/index.html) >= 24.08.
+- Optionally, [OpenUSD](https://openusd.org/release/index.html) >= 24.08 (25.05.01 recommended).
 - Optionally, [OpenVDB](https://www.openvdb.org/download/) >= 12.0.0, enable `IOOpenVDB` module during VTK configuration.
 - Optionally, [Draco](https://google.github.io/draco/) >= 1.5.6.
 - Optionally, [Python](https://www.python.org/) >= 3.9 and [pybind11](https://github.com/pybind/pybind11) >= 2.9.2.
