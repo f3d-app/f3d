@@ -283,6 +283,7 @@ int window_impl::getHeight() const
 //----------------------------------------------------------------------------
 window& window_impl::setSize(int width, int height)
 {
+  assert(this->Internals->RenWin->GetInteractor() != nullptr);
   this->Internals->RenWin->GetInteractor()->UpdateSize(width, height);
   return *this;
 }

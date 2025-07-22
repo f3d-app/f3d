@@ -1432,11 +1432,8 @@ interactor& interactor_impl::triggerKeyboardKey(InputAction action, std::string_
 
 interactor& interactor_impl::triggerTextCharacter(unsigned int codepoint)
 {
-  if (codepoint > 0)
-  {
-    this->Internals->VTKInteractor->SetKeyCode(codepoint);
-    this->Internals->VTKInteractor->InvokeEvent(vtkCommand::CharEvent, nullptr);
-  }
+  this->Internals->VTKInteractor->SetKeyCode(codepoint);
+  this->Internals->VTKInteractor->InvokeEvent(vtkCommand::CharEvent, nullptr);
 
   return *this;
 }

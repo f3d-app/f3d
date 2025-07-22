@@ -279,6 +279,7 @@ public:
   /**
    * Trigger a mouse new position event.
    * Positions are in window coordinates, with (0, 0) being the top-left corner.
+   * The coordinates are expressed in pixels.
    */
   virtual interactor& triggerMousePosition(double xpos, double ypos) = 0;
 
@@ -297,6 +298,8 @@ public:
    * - "Space", "Return", "Escape", "Tab", "BackSpace" for common keys
    * - "F1", "F2", ..., "F25" for function keys
    * - "KP_0", "KP_1", ..., "KP_9" for numpad keys
+   * @note
+   * It's possible to run F3D application in verbose mode and press keys to print their symbols.
    */
   virtual interactor& triggerKeyboardKey(InputAction action, std::string_view keySym) = 0;
 
