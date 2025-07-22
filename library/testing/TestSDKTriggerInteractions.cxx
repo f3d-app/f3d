@@ -18,22 +18,22 @@ struct TestTriggerHelper
   template<typename Func>
   void operator()(Func&& func) const
   {
-    f3d::engine eng = f3d::engine::create();
-    eng.getWindow().setSize(300, 300);
-    eng.getScene().add(this->DataPath);
-    eng.getWindow().render();
+    f3d::engine engine = f3d::engine::create();
+    engine.getWindow().setSize(300, 300);
+    engine.getScene().add(this->DataPath);
+    engine.getWindow().render();
 
-    func(eng);
+    func(engine);
   }
 
   // Run with baseline test
   template<typename Func>
   void operator()(const std::string& name, Func&& func) const
   {
-    (*this)([&](const f3d::engin& engine) {
+    (*this)([&](f3d::engine& engine) {
       func(engine);
 
-      if (!TestSDKHelpers::RenderTest(eng.getWindow(), this->BaselinePath, this->OutputPath, name))
+      if (!TestSDKHelpers::RenderTest(engine.getWindow(), this->BaselinePath, this->OutputPath, name))
       {
         throw std::runtime_error("Render test failed for " + name);
       }

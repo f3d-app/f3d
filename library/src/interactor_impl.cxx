@@ -1430,6 +1430,7 @@ interactor& interactor_impl::triggerKeyboardKey(InputAction action, std::string_
   return *this;
 }
 
+//----------------------------------------------------------------------------
 interactor& interactor_impl::triggerTextCharacter(unsigned int codepoint)
 {
   this->Internals->VTKInteractor->SetKeyCode(codepoint);
