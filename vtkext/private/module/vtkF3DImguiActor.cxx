@@ -464,7 +464,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
   {
     textHeight +=
       ImGui::GetTextLineHeightWithSpacing() + 2 * ImGui::GetStyle().SeparatorTextPadding.y;
-    for (const auto& [bind, desc, val] : content)
+    for (const auto& [bind, desc, val, type] : content)
     {
       textHeight += ImGui::GetTextLineHeightWithSpacing();
 
@@ -508,7 +508,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
     ImGui::TableSetupColumn("Description", ImGuiTableColumnFlags_WidthFixed, maxDescTextWidth);
     ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthFixed, maxValueTextWidth);
     ImGui::TableSetupColumn("Bindings", ImGuiTableColumnFlags_WidthStretch, maxBindingTextWidth);
-    for (const auto& [bind, desc, val] : list)
+    for (const auto& [bind, desc, val, type] : list)
     {
       ImVec4 bindingTextColor, bindingRectColor, descTextColor;
 
@@ -538,9 +538,16 @@ void vtkF3DImguiActor::RenderCheatSheet()
       ImGui::TextColored(descTextColor, "%s", desc.c_str());
 
       ImGui::TableNextColumn();
-      if (!val.empty() && val != "OFF" && val != "ON" && val != "Unset") {
+      if (!type.empty() && type == "Cyclic")
+      {
         ImGui::TextColored(descTextColor, "< %s >", val.c_str());
-      } else {
+      }
+      else if (!type.empty() && type == "Numerical")
+      {
+        ImGui::TextColored(descTextColor, "- %s +", val.c_str());
+      }
+      else
+      {
         ImGui::TextColored(descTextColor, "%s", val.c_str());
       }
 

@@ -60,7 +60,7 @@ int TestSDKInteractorDocumentation(int argc, char* argv[])
 
   // Add a dummy binding
   inter.addBinding({ mod_t::ANY, "DummyBind" }, "DummyCommand", "DummyGroup",
-    []() -> std::pair<std::string, std::string> { return std::pair("DummyDoc", "DummyVal"); });
+    []() -> std::tuple<std::string, std::string> { return std::tuple("DummyDoc", "DummyVal"); });
 
   {
     // Test dummy binding

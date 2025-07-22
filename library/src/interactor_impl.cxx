@@ -1100,28 +1100,31 @@ interactor& interactor_impl::initBindings()
     {
       desc = this->Internals->Options.render.effect.antialiasing.mode;
     }
-    return std::pair("Anti-aliasing", std::move(desc));
+    return std::tuple("Anti-aliasing", std::move(desc), "Cyclic");
   };
 
   // "Cycle animation" , "animationName"
   auto docAnim = [&]()
-  { return std::pair("Animation", this->Internals->AnimationManager->GetAnimationName()); };
+  {
+    return std::tuple("Animation", this->Internals->AnimationManager->GetAnimationName(), "Cyclic");
+  };
 
   // "Cycle point/cell data coloring" , "POINT/CELL"
   auto docField = [&]()
   {
-    return std::pair(
-      std::string("Data coloring"), (opts.model.scivis.cells ? "CELL" : "POINT"));
+    return std::tuple(
+      std::string("Data coloring"), (opts.model.scivis.cells ? "CELL" : "POINT"), "Cyclic");
   };
 
   // "Cycle array to color with" , "arrayName"
   auto docArray = [&]()
   {
-    return std::pair("Color array",
+    return std::tuple("Color array",
       (opts.model.scivis.array_name.has_value()
           ? shortName(opts.model.scivis.array_name.value(), 15) +
             (opts.model.scivis.enable ? "" : " (forced)")
-          : "OFF"));
+          : "OFF"),
+      "Cyclic");
   };
 
   // "Cycle component to color with" , "component"
@@ -1129,12 +1132,12 @@ interactor& interactor_impl::initBindings()
   {
     vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
     vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
-    return std::pair(
-      "Color component", ren->ComponentToString(opts.model.scivis.component));
+    return std::tuple(
+      "Color component", ren->ComponentToString(opts.model.scivis.component), "Cyclic");
   };
 
   // "doc", ""
-  auto docStr = [](const std::string& doc) { return std::pair(doc, ""); };
+  auto docStr = [](const std::string& doc) { return std::tuple(doc, "", ""); };
 
   // "doc", "value"
   auto docDbl = [](const std::string& doc, const double& val)
@@ -1143,7 +1146,7 @@ interactor& interactor_impl::initBindings()
     valStream.precision(2);
     valStream << std::fixed;
     valStream << val;
-    return std::pair(doc, valStream.str());
+    return std::tuple(doc, valStream.str(), "Numerical");
   };
 
   // "doc", "value/Unset"
@@ -1160,22 +1163,22 @@ interactor& interactor_impl::initBindings()
     {
       valStream << "Unset";
     }
-    return std::pair(doc, valStream.str());
+    return std::tuple(doc, valStream.str(), "Numerical");
   };
 
   // "doc", "ON/OFF"
   auto docTgl = [](const std::string& doc, const bool& val)
-  { return std::pair(doc, (val ? "ON" : "OFF")); };
+  { return std::tuple(doc, (val ? "ON" : "OFF"), "Toggle"); };
 
   // "doc", "ON/OFF/Unset"
   auto docTglOpt = [](const std::string& doc, const std::optional<bool>& val)
-  { return std::pair(doc, (val.has_value() ? (val.value() ? "ON" : "OFF") : "Unset")); };
+  { return std::tuple(doc, (val.has_value() ? (val.value() ? "ON" : "OFF") : "Unset"), "Toggle"); };
 
   // "Cycle verbose level", "current_level"
   auto docVerbose = [&]()
   {
-    return std::pair(
-      "Verbose level", this->Internals->VerboseLevelToString(log::getVerboseLevel()));
+    return std::tuple(
+      "Verbose level", this->Internals->VerboseLevelToString(log::getVerboseLevel()), "Cyclic");
   };
 
   // clang-format off
@@ -1335,7 +1338,7 @@ std::vector<interaction_bind_t> interactor_impl::getBinds() const
 }
 
 //----------------------------------------------------------------------------
-std::pair<std::string, std::string> interactor_impl::getBindingDocumentation(
+std::tuple<std::string, std::string, std::string> interactor_impl::getBindingDocumentation(
   const interaction_bind_t& bind) const
 {
   const auto& it = this->Internals->Bindings.find(bind);
@@ -1345,7 +1348,7 @@ std::pair<std::string, std::string> interactor_impl::getBindingDocumentation(
       std::string("Bind: ") + bind.format() + " does not exists");
   }
   const auto& docFunc = it->second.DocumentationCallback;
-  return docFunc ? docFunc() : std::make_pair(std::string(), std::string());
+  return docFunc ? docFunc() : std::make_tuple(std::string(), std::string(), std::string());
 }
 
 //----------------------------------------------------------------------------

@@ -516,10 +516,10 @@ void window_impl::UpdateDynamicOptions()
       std::vector<vtkF3DUIActor::CheatSheetTuple> groupList;
       for (const interaction_bind_t& bind : this->Internals->Interactor->getBindsForGroup(group))
       {
-        auto [doc, val] = this->Internals->Interactor->getBindingDocumentation(bind);
+        auto [doc, val, type] = this->Internals->Interactor->getBindingDocumentation(bind);
         if (!doc.empty())
         {
-          groupList.emplace_back(std::make_tuple(bind.format(), doc, val));
+          groupList.emplace_back(std::make_tuple(bind.format(), doc, val, type));
         }
       }
       cheatsheet.emplace_back(std::make_pair(group, std::move(groupList)));

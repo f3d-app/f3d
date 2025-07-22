@@ -20,7 +20,7 @@ public:
   static vtkF3DUIActor* New();
   vtkTypeMacro(vtkF3DUIActor, vtkProp);
 
-  using CheatSheetTuple = std::tuple<std::string, std::string, std::string>;
+  using CheatSheetTuple = std::tuple<std::string, std::string, std::string, std::string>;
   using CheatSheetGroup = std::pair<std::string, std::vector<CheatSheetTuple>>;
 
   /**

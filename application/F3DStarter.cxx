@@ -842,10 +842,10 @@ public:
       };
 
       // "doc", ""
-      auto docString = [](const std::string& doc) { return std::make_pair(doc, ""); };
+      auto docString = [](const std::string& doc) { return std::make_tuple(doc, "", ""); };
 
       auto docStringVec = [&](const std::vector<std::string>& docs)
-      { return std::make_pair(vecToString(docs), ""); };
+      { return std::make_tuple(vecToString(docs), "", ""); };
 
       using mod_t = f3d::interaction_bind_t::ModifierKeys;
 
@@ -1162,7 +1162,7 @@ int F3DStarter::Start(int argc, char** argv)
         for (const f3d::interaction_bind_t& bind : interactor.getBindsForGroup(group))
         {
           // XXX: Formatting could be improved here
-          auto [doc, val] = interactor.getBindingDocumentation(bind);
+          auto [doc, val, type] = interactor.getBindingDocumentation(bind);
           F3DOptionsTools::PrintHelpPair(bind.format(), doc, 12);
         }
         f3d::log::info("");
