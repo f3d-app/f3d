@@ -320,39 +320,6 @@ scene& scene_impl::add(const mesh_t& mesh)
 }
 
 //----------------------------------------------------------------------------
-scene& scene_impl::removeLight(int index)
-{
-  vtkLightCollection* lc = this->Internals->Window.GetRenderer()->GetLights();
-  lc->InitTraversal();
-
-  int lightCount = 0;
-  for (vtkLight* light = lc->GetNextItem(); light != nullptr; light = lc->GetNextItem())
-  {
-    if (lightCount == index)
-    {
-      this->Internals->Window.GetRenderer()->RemoveLight(light);
-      return *this;
-    }
-    lightCount++;
-  }
-  log::warn("No light at index ", index, " to remove");
-  return *this;
-}
-
-//----------------------------------------------------------------------------
-scene& scene_impl::removeAllLights()
-{
-  vtkLightCollection* lc = this->Internals->Window.GetRenderer()->GetLights();
-  lc->InitTraversal();
-
-  for (vtkLight* light = lc->GetNextItem(); light != nullptr; light = lc->GetNextItem())
-  {
-    this->Internals->Window.GetRenderer()->RemoveLight(light);
-  }
-  return *this;
-}
-
-//----------------------------------------------------------------------------
 scene& scene_impl::clear()
 {
   // Clear the meta importer from all importers
@@ -451,6 +418,39 @@ scene& scene_impl::updateLight(int index, const light_state_t& lightState)
     lightCount++;
   }
   log::warn("No light at index ", index, " to update");
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+scene& scene_impl::removeLight(int index)
+{
+  vtkLightCollection* lc = this->Internals->Window.GetRenderer()->GetLights();
+  lc->InitTraversal();
+
+  int lightCount = 0;
+  for (vtkLight* light = lc->GetNextItem(); light != nullptr; light = lc->GetNextItem())
+  {
+    if (lightCount == index)
+    {
+      this->Internals->Window.GetRenderer()->RemoveLight(light);
+      return *this;
+    }
+    lightCount++;
+  }
+  log::warn("No light at index ", index, " to remove");
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+scene& scene_impl::removeAllLights()
+{
+  vtkLightCollection* lc = this->Internals->Window.GetRenderer()->GetLights();
+  lc->InitTraversal();
+
+  for (vtkLight* light = lc->GetNextItem(); light != nullptr; light = lc->GetNextItem())
+  {
+    this->Internals->Window.GetRenderer()->RemoveLight(light);
+  }
   return *this;
 }
 
