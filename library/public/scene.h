@@ -100,6 +100,16 @@ public:
   virtual scene& updateLight(int index, const light_state_t& lightState) = 0;
 
   /**
+   * Remove a light at provided index.
+   */
+  virtual scene& removeLight(int index) = 0;
+
+  /**
+   * Remove all lights from the scene.
+   */
+  virtual scene& removeAllLights() = 0;
+
+  /**
    * Return true if provided file path is supported, false otherwise.
    */
   [[nodiscard]] virtual bool supports(const std::filesystem::path& filePath) = 0;

@@ -40,6 +40,8 @@ public:
   int getLightCount() const override;
   light_state_t getLight(int index) override;
   scene& updateLight(int index, const light_state_t& lightState) override;
+  scene& removeLight(int index) override;
+  scene& removeAllLights() override;
   bool supports(const std::filesystem::path& filePath) override;
   scene& loadAnimationTime(double timeValue) override;
   std::pair<double, double> animationTimeRange() override;
