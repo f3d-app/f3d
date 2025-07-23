@@ -103,6 +103,48 @@ Program Listing for File interactor.h
      virtual interactor& enableCameraMovement() = 0;
      virtual interactor& disableCameraMovement() = 0;
    
+   
+     enum class MouseButton : unsigned char
+     {
+       LEFT,
+       RIGHT,
+       MIDDLE
+     };
+   
+     enum class WheelDirection : unsigned char
+     {
+       FORWARD,
+       BACKWARD,
+       LEFT,
+       RIGHT
+     };
+   
+     enum class InputAction : unsigned char
+     {
+       PRESS,
+       RELEASE
+     };
+   
+     enum class InputModifier : unsigned char
+     {
+       NONE,
+       CTRL,
+       SHIFT,
+       CTRL_SHIFT
+     };
+   
+     virtual interactor& triggerModUpdate(InputModifier mod) = 0;
+   
+     virtual interactor& triggerMouseButton(InputAction action, MouseButton button) = 0;
+   
+     virtual interactor& triggerMousePosition(double xpos, double ypos) = 0;
+   
+     virtual interactor& triggerMouseWheel(WheelDirection direction) = 0;
+   
+     virtual interactor& triggerKeyboardKey(InputAction action, std::string_view keySym) = 0;
+   
+     virtual interactor& triggerTextCharacter(unsigned int codepoint) = 0;
+   
      virtual bool playInteraction(const std::filesystem::path& file, double deltaTime = 1.0 / 30,
        std::function<void()> userCallBack = nullptr) = 0;
    

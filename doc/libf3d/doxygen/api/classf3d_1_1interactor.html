@@ -364,6 +364,150 @@ document.write(`
 <dd><p>Class used to control interaction and animation. </p>
 <p>A class to control interaction with the window as well as animation. It also provide a timer callback if needed and can record/play interaction file. </p>
 <div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-forwarding-input-events">Forwarding input events</p>
+<dl class="cpp enum-class">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d10interactor11MouseButtonE">
+<span id="_CPPv3N3f3d10interactor11MouseButtonE"></span><span id="_CPPv2N3f3d10interactor11MouseButtonE"></span><span class="target" id="classf3d_1_1interactor_1a139b5304356e4ec448c1a2f0b30f5ca4"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MouseButton</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><a class="headerlink" href="#_CPPv4N3f3d10interactor11MouseButtonE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Enumeration of supported mouse buttons. </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d10interactor11MouseButton4LEFTE">
+<span id="_CPPv3N3f3d10interactor11MouseButton4LEFTE"></span><span id="_CPPv2N3f3d10interactor11MouseButton4LEFTE"></span><span class="target" id="classf3d_1_1interactor_1a139b5304356e4ec448c1a2f0b30f5ca4a684d325a7303f52e64011467ff5c5758"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LEFT</span></span></span><a class="headerlink" href="#_CPPv4N3f3d10interactor11MouseButton4LEFTE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d10interactor11MouseButton5RIGHTE">
+<span id="_CPPv3N3f3d10interactor11MouseButton5RIGHTE"></span><span id="_CPPv2N3f3d10interactor11MouseButton5RIGHTE"></span><span class="target" id="classf3d_1_1interactor_1a139b5304356e4ec448c1a2f0b30f5ca4a21507b40c80068eda19865706fdc2403"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RIGHT</span></span></span><a class="headerlink" href="#_CPPv4N3f3d10interactor11MouseButton5RIGHTE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d10interactor11MouseButton6MIDDLEE">
+<span id="_CPPv3N3f3d10interactor11MouseButton6MIDDLEE"></span><span id="_CPPv2N3f3d10interactor11MouseButton6MIDDLEE"></span><span class="target" id="classf3d_1_1interactor_1a139b5304356e4ec448c1a2f0b30f5ca4a43eedd8685eb86592022f8da962e3474"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MIDDLE</span></span></span><a class="headerlink" href="#_CPPv4N3f3d10interactor11MouseButton6MIDDLEE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="cpp enum-class">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d10interactor14WheelDirectionE">
+<span id="_CPPv3N3f3d10interactor14WheelDirectionE"></span><span id="_CPPv2N3f3d10interactor14WheelDirectionE"></span><span class="target" id="classf3d_1_1interactor_1adebcd9542f77a81f07c4bce98dfa73e6"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">WheelDirection</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><a class="headerlink" href="#_CPPv4N3f3d10interactor14WheelDirectionE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Enumeration of supported mouse wheel directions. </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d10interactor14WheelDirection7FORWARDE">
+<span id="_CPPv3N3f3d10interactor14WheelDirection7FORWARDE"></span><span id="_CPPv2N3f3d10interactor14WheelDirection7FORWARDE"></span><span class="target" id="classf3d_1_1interactor_1adebcd9542f77a81f07c4bce98dfa73e6abfec72bb37910c61f36b6c29a1f7ec31"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FORWARD</span></span></span><a class="headerlink" href="#_CPPv4N3f3d10interactor14WheelDirection7FORWARDE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d10interactor14WheelDirection8BACKWARDE">
+<span id="_CPPv3N3f3d10interactor14WheelDirection8BACKWARDE"></span><span id="_CPPv2N3f3d10interactor14WheelDirection8BACKWARDE"></span><span class="target" id="classf3d_1_1interactor_1adebcd9542f77a81f07c4bce98dfa73e6a6377b4908ae38f9a57fe9120cf179eb1"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BACKWARD</span></span></span><a class="headerlink" href="#_CPPv4N3f3d10interactor14WheelDirection8BACKWARDE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d10interactor14WheelDirection4LEFTE">
+<span id="_CPPv3N3f3d10interactor14WheelDirection4LEFTE"></span><span id="_CPPv2N3f3d10interactor14WheelDirection4LEFTE"></span><span class="target" id="classf3d_1_1interactor_1adebcd9542f77a81f07c4bce98dfa73e6a684d325a7303f52e64011467ff5c5758"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LEFT</span></span></span><a class="headerlink" href="#_CPPv4N3f3d10interactor14WheelDirection4LEFTE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d10interactor14WheelDirection5RIGHTE">
+<span id="_CPPv3N3f3d10interactor14WheelDirection5RIGHTE"></span><span id="_CPPv2N3f3d10interactor14WheelDirection5RIGHTE"></span><span class="target" id="classf3d_1_1interactor_1adebcd9542f77a81f07c4bce98dfa73e6a21507b40c80068eda19865706fdc2403"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RIGHT</span></span></span><a class="headerlink" href="#_CPPv4N3f3d10interactor14WheelDirection5RIGHTE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="cpp enum-class">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d10interactor11InputActionE">
+<span id="_CPPv3N3f3d10interactor11InputActionE"></span><span id="_CPPv2N3f3d10interactor11InputActionE"></span><span class="target" id="classf3d_1_1interactor_1a5c52dc4bedb695d4853b843a3257204c"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">InputAction</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><a class="headerlink" href="#_CPPv4N3f3d10interactor11InputActionE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Enumeration of supported input actions. </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d10interactor11InputAction5PRESSE">
+<span id="_CPPv3N3f3d10interactor11InputAction5PRESSE"></span><span id="_CPPv2N3f3d10interactor11InputAction5PRESSE"></span><span class="target" id="classf3d_1_1interactor_1a5c52dc4bedb695d4853b843a3257204ca93146f537356b7396d2f0413cf0bfc9e"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PRESS</span></span></span><a class="headerlink" href="#_CPPv4N3f3d10interactor11InputAction5PRESSE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d10interactor11InputAction7RELEASEE">
+<span id="_CPPv3N3f3d10interactor11InputAction7RELEASEE"></span><span id="_CPPv2N3f3d10interactor11InputAction7RELEASEE"></span><span class="target" id="classf3d_1_1interactor_1a5c52dc4bedb695d4853b843a3257204ca7d649ef069df9885e382417c79f3d5cd"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RELEASE</span></span></span><a class="headerlink" href="#_CPPv4N3f3d10interactor11InputAction7RELEASEE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="cpp enum-class">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d10interactor13InputModifierE">
+<span id="_CPPv3N3f3d10interactor13InputModifierE"></span><span id="_CPPv2N3f3d10interactor13InputModifierE"></span><span class="target" id="classf3d_1_1interactor_1a6b7cf5f64ee8812854766738325782ad"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">InputModifier</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><a class="headerlink" href="#_CPPv4N3f3d10interactor13InputModifierE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Enumeration of supported input modifiers. </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d10interactor13InputModifier4NONEE">
+<span id="_CPPv3N3f3d10interactor13InputModifier4NONEE"></span><span id="_CPPv2N3f3d10interactor13InputModifier4NONEE"></span><span class="target" id="classf3d_1_1interactor_1a6b7cf5f64ee8812854766738325782adab50339a10e1de285ac99d4c3990b8693"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NONE</span></span></span><a class="headerlink" href="#_CPPv4N3f3d10interactor13InputModifier4NONEE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d10interactor13InputModifier4CTRLE">
+<span id="_CPPv3N3f3d10interactor13InputModifier4CTRLE"></span><span id="_CPPv2N3f3d10interactor13InputModifier4CTRLE"></span><span class="target" id="classf3d_1_1interactor_1a6b7cf5f64ee8812854766738325782ada32f7eee2581c72a5561c21df3013a89a"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CTRL</span></span></span><a class="headerlink" href="#_CPPv4N3f3d10interactor13InputModifier4CTRLE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d10interactor13InputModifier5SHIFTE">
+<span id="_CPPv3N3f3d10interactor13InputModifier5SHIFTE"></span><span id="_CPPv2N3f3d10interactor13InputModifier5SHIFTE"></span><span class="target" id="classf3d_1_1interactor_1a6b7cf5f64ee8812854766738325782ada46afff2b309b8b16a46d812172a9235c"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SHIFT</span></span></span><a class="headerlink" href="#_CPPv4N3f3d10interactor13InputModifier5SHIFTE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d10interactor13InputModifier10CTRL_SHIFTE">
+<span id="_CPPv3N3f3d10interactor13InputModifier10CTRL_SHIFTE"></span><span id="_CPPv2N3f3d10interactor13InputModifier10CTRL_SHIFTE"></span><span class="target" id="classf3d_1_1interactor_1a6b7cf5f64ee8812854766738325782adab99320973a4dd4f1f442037248dcaf8f"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CTRL_SHIFT</span></span></span><a class="headerlink" href="#_CPPv4N3f3d10interactor13InputModifier10CTRL_SHIFTE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d10interactor16triggerModUpdateE13InputModifier">
+<span id="_CPPv3N3f3d10interactor16triggerModUpdateE13InputModifier"></span><span id="_CPPv2N3f3d10interactor16triggerModUpdateE13InputModifier"></span><span id="f3d::interactor::triggerModUpdate__InputModifier"></span><span class="target" id="classf3d_1_1interactor_1aae1a76b389b65b8a9a19ef07fab11e8e"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3f3d10interactorE" title="f3d::interactor"><span class="n"><span class="pre">interactor</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">triggerModUpdate</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3f3d10interactor13InputModifierE" title="f3d::interactor::InputModifier"><span class="n"><span class="pre">InputModifier</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">mod</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N3f3d10interactor16triggerModUpdateE13InputModifier" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Trigger a modifier update. This will update the internal modifier state of the interactor to match the provided one. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d10interactor18triggerMouseButtonE11InputAction11MouseButton">
+<span id="_CPPv3N3f3d10interactor18triggerMouseButtonE11InputAction11MouseButton"></span><span id="_CPPv2N3f3d10interactor18triggerMouseButtonE11InputAction11MouseButton"></span><span id="f3d::interactor::triggerMouseButton__InputAction.MouseButton"></span><span class="target" id="classf3d_1_1interactor_1a13f4308317204095482bbd3fe59efea1"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3f3d10interactorE" title="f3d::interactor"><span class="n"><span class="pre">interactor</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">triggerMouseButton</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3f3d10interactor11InputActionE" title="f3d::interactor::InputAction"><span class="n"><span class="pre">InputAction</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">action</span></span>, <a class="reference internal" href="#_CPPv4N3f3d10interactor11MouseButtonE" title="f3d::interactor::MouseButton"><span class="n"><span class="pre">MouseButton</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">button</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N3f3d10interactor18triggerMouseButtonE11InputAction11MouseButton" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Trigger a mouse button event. This will trigger the corresponding mouse button press or release event. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d10interactor20triggerMousePositionEdd">
+<span id="_CPPv3N3f3d10interactor20triggerMousePositionEdd"></span><span id="_CPPv2N3f3d10interactor20triggerMousePositionEdd"></span><span id="f3d::interactor::triggerMousePosition__double.double"></span><span class="target" id="classf3d_1_1interactor_1a8f6fe4e7a4daabecb9c7e0bb48640dc8"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3f3d10interactorE" title="f3d::interactor"><span class="n"><span class="pre">interactor</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">triggerMousePosition</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">xpos</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ypos</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N3f3d10interactor20triggerMousePositionEdd" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Trigger a mouse new position event. Positions are in window coordinates, with (0, 0) being the top-left corner. The coordinates are expressed in pixels. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d10interactor17triggerMouseWheelE14WheelDirection">
+<span id="_CPPv3N3f3d10interactor17triggerMouseWheelE14WheelDirection"></span><span id="_CPPv2N3f3d10interactor17triggerMouseWheelE14WheelDirection"></span><span id="f3d::interactor::triggerMouseWheel__WheelDirection"></span><span class="target" id="classf3d_1_1interactor_1a3221678893461c3186a75861bef7bf33"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3f3d10interactorE" title="f3d::interactor"><span class="n"><span class="pre">interactor</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">triggerMouseWheel</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3f3d10interactor14WheelDirectionE" title="f3d::interactor::WheelDirection"><span class="n"><span class="pre">WheelDirection</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">direction</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N3f3d10interactor17triggerMouseWheelE14WheelDirection" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Trigger a mouse wheel event. At the moment, only vertical wheel events are observed, but it can change in the future. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d10interactor18triggerKeyboardKeyE11InputActionNSt11string_viewE">
+<span id="_CPPv3N3f3d10interactor18triggerKeyboardKeyE11InputActionNSt11string_viewE"></span><span id="_CPPv2N3f3d10interactor18triggerKeyboardKeyE11InputActionNSt11string_viewE"></span><span id="f3d::interactor::triggerKeyboardKey__InputAction.std::string_view"></span><span class="target" id="classf3d_1_1interactor_1a7a3b0e57d18d3cafcafe0d65c00d17cb"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3f3d10interactorE" title="f3d::interactor"><span class="n"><span class="pre">interactor</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">triggerKeyboardKey</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3f3d10interactor11InputActionE" title="f3d::interactor::InputAction"><span class="n"><span class="pre">InputAction</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">action</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string_view</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">keySym</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N3f3d10interactor18triggerKeyboardKeyE11InputActionNSt11string_viewE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Trigger a keyboard key event. This is based on X11 key symbols, it’s hard to list all of them, but here are a few:<ul class="simple">
+<li><p>”A”, “B”, “C”, …, “Z” for letters</p></li>
+<li><p>”0”, “1”, “2”, …, “9” for numbers</p></li>
+<li><p>”Left”, “Right”, “Up”, “Down” for arrow keys</p></li>
+<li><p>”Space”, “Return”, “Escape”, “Tab”, “BackSpace” for common keys</p></li>
+<li><p>”F1”, “F2”, …, “F25” for function keys</p></li>
+<li><p>”KP_0”, “KP_1”, …, “KP_9” for numpad keys </p></li>
+</ul>
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It’s possible to run F3D application in verbose mode and press keys to print their symbols. </p>
+</div>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d10interactor20triggerTextCharacterEj">
+<span id="_CPPv3N3f3d10interactor20triggerTextCharacterEj"></span><span id="_CPPv2N3f3d10interactor20triggerTextCharacterEj"></span><span id="f3d::interactor::triggerTextCharacter__unsigned-i"></span><span class="target" id="classf3d_1_1interactor_1af6f808f87468f7e99a5b351f5f09d99b"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3f3d10interactorE" title="f3d::interactor"><span class="n"><span class="pre">interactor</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">triggerTextCharacter</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">codepoint</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N3f3d10interactor20triggerTextCharacterEj" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Trigger a text character input event. This will trigger the corresponding character input event, with the codepoint being the Unicode codepoint of the character. It’s used for text input, like when typing in a the console input field. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-bindings">Bindings</p>
 <dl class="cpp type">
 <dt class="sig sig-object cpp" id="_CPPv4N3f3d10interactor24documentation_callback_tE">
