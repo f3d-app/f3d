@@ -327,13 +327,22 @@ runs:
         cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DCMAKE_PREFIX_PATH:PATH=$(pwd)/dependencies/install/ -DBUILD_TESTING=ON -B build_python source/python
         cmake --build build_python --config Release
 
-    - name: Build and configure libf3d examples
+    - name: Configure libf3d examples
       if: inputs.static_label == 'no-static'
       shell: bash
       working-directory: ${{github.workspace}}
-      run: |
-        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DBUILD_TESTING=ON -B build_examples source/examples/libf3d
-        cmake --build build_examples --config Release
+      run: >
+        cmake -Werror=dev -Werror=deprecated --warn-uninitialized
+        -B build_examples -S source/examples/libf3d
+        -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d
+        -DBUILD_TESTING=ON
+        -DF3D_EXAMPLES_EXTERNAL_GLFW=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
+
+    - name: Build libf3d examples
+      if: inputs.static_label == 'no-static'
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: cmake --build build_examples --config Release
 
     - name: Install Mesa Windows examples
       if: |
