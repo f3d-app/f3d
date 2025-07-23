@@ -352,10 +352,10 @@ int scene_impl::addLight(const light_state_t& lightState)
 int scene_impl::getLightCount() const
 {
   vtkLightCollection* lc = this->Internals->Window.GetRenderer()->GetLights();
-  lc->InitTraversal();
-
+  vtkLight* light;
+  vtkCollectionSimpleIterator it;
   int lightCount = 0;
-  for (vtkLight* light = lc->GetNextItem(); light != nullptr; light = lc->GetNextItem())
+  for (lc->InitTraversal(it); (light = lc->GetNextLight(it));)
   {
     lightCount++;
   }
@@ -366,58 +366,49 @@ int scene_impl::getLightCount() const
 light_state_t scene_impl::getLight(int index)
 {
   vtkLightCollection* lc = this->Internals->Window.GetRenderer()->GetLights();
-  lc->InitTraversal();
-
-  int lightCount = 0;
-  for (vtkLight* light = lc->GetNextItem(); light != nullptr; light = lc->GetNextItem())
+  vtkLight* light = vtkLight::SafeDownCast(lc->GetItemAsObject(index));
+  if (!light)
   {
-    if (lightCount == index)
-    {
-      light_state_t lightState;
-      lightState.type = static_cast<light_type>(light->GetLightType());
-      lightState.position = { light->GetPosition()[0], light->GetPosition()[1],
-        light->GetPosition()[2] };
-      lightState.color = { light->GetDiffuseColor()[0], light->GetDiffuseColor()[1],
-        light->GetDiffuseColor()[2] };
-      lightState.direction = { light->GetFocalPoint()[0] - light->GetPosition()[0],
-        light->GetFocalPoint()[1] - light->GetPosition()[1],
-        light->GetFocalPoint()[2] - light->GetPosition()[2] };
-      lightState.positionalLight = light->GetPositional();
-      lightState.intensity = light->GetIntensity();
-      lightState.switchState = light->GetSwitch();
-      return lightState;
-    }
-    lightCount++;
+    log::warn("No light at index ", index, " to get");
+    return light_state_t{};
   }
-  log::warn("No light at index ", index, " to get");
-  return light_state_t{};
+
+  light_state_t lightState;
+  lightState.type = static_cast<light_type>(light->GetLightType());
+  lightState.position = { light->GetPosition()[0], light->GetPosition()[1],
+    light->GetPosition()[2] };
+  lightState.color = { light->GetDiffuseColor()[0], light->GetDiffuseColor()[1],
+    light->GetDiffuseColor()[2] };
+  lightState.direction = { light->GetFocalPoint()[0] - light->GetPosition()[0],
+    light->GetFocalPoint()[1] - light->GetPosition()[1],
+    light->GetFocalPoint()[2] - light->GetPosition()[2] };
+  lightState.positionalLight = light->GetPositional();
+  lightState.intensity = light->GetIntensity();
+  lightState.switchState = light->GetSwitch();
+  return lightState;
 }
 
 //----------------------------------------------------------------------------
 scene& scene_impl::updateLight(int index, const light_state_t& lightState)
 {
   vtkLightCollection* lc = this->Internals->Window.GetRenderer()->GetLights();
-  lc->InitTraversal();
-
-  int lightCount = 0;
-  for (vtkLight* light = lc->GetNextItem(); light != nullptr; light = lc->GetNextItem())
+  vtkLight* light = vtkLight::SafeDownCast(lc->GetItemAsObject(index));
+  if (!light)
   {
-    if (lightCount == index)
-    {
-      light->SetLightType(static_cast<int>(lightState.type));
-      light->SetPosition(lightState.position[0], lightState.position[1], lightState.position[2]);
-      light->SetColor(lightState.color[0], lightState.color[1], lightState.color[2]);
-      light->SetPositional(lightState.positionalLight);
-      light->SetFocalPoint(lightState.position[0] + lightState.direction[0],
-        lightState.position[1] + lightState.direction[1],
-        lightState.position[2] + lightState.direction[2]);
-      light->SetIntensity(lightState.intensity);
-      light->SetSwitch(lightState.switchState);
-      return *this;
-    }
-    lightCount++;
+    log::warn("No light at index ", index, " to update");
+    return *this;
   }
-  log::warn("No light at index ", index, " to update");
+
+  light->SetLightType(static_cast<int>(lightState.type));
+  light->SetPosition(lightState.position[0], lightState.position[1], lightState.position[2]);
+  light->SetColor(lightState.color[0], lightState.color[1], lightState.color[2]);
+  light->SetPositional(lightState.positionalLight);
+  light->SetFocalPoint(lightState.position[0] + lightState.direction[0],
+    lightState.position[1] + lightState.direction[1],
+    lightState.position[2] + lightState.direction[2]);
+  light->SetIntensity(lightState.intensity);
+  light->SetSwitch(lightState.switchState);
+
   return *this;
 }
 
@@ -425,32 +416,21 @@ scene& scene_impl::updateLight(int index, const light_state_t& lightState)
 scene& scene_impl::removeLight(int index)
 {
   vtkLightCollection* lc = this->Internals->Window.GetRenderer()->GetLights();
-  lc->InitTraversal();
-
-  int lightCount = 0;
-  for (vtkLight* light = lc->GetNextItem(); light != nullptr; light = lc->GetNextItem())
+  vtkLight* light = vtkLight::SafeDownCast(lc->GetItemAsObject(index));
+  if (!light)
   {
-    if (lightCount == index)
-    {
-      this->Internals->Window.GetRenderer()->RemoveLight(light);
-      return *this;
-    }
-    lightCount++;
+    log::warn("No light at index ", index, " to remove");
+    return *this;
   }
-  log::warn("No light at index ", index, " to remove");
+
+  this->Internals->Window.GetRenderer()->RemoveLight(light);
   return *this;
 }
 
 //----------------------------------------------------------------------------
 scene& scene_impl::removeAllLights()
 {
-  vtkLightCollection* lc = this->Internals->Window.GetRenderer()->GetLights();
-  lc->InitTraversal();
-
-  for (vtkLight* light = lc->GetNextItem(); light != nullptr; light = lc->GetNextItem())
-  {
-    this->Internals->Window.GetRenderer()->RemoveLight(light);
-  }
+  this->Internals->Window.GetRenderer()->RemoveAllLights();
   return *this;
 }
 
