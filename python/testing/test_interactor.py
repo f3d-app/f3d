@@ -81,6 +81,7 @@ def test_binding():
 
     inter.init_bindings()
 
+
 def test_trigger_key(capfd: pytest.CaptureFixture[str]):
     engine = f3d.Engine.create(True)
 

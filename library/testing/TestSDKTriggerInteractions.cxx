@@ -33,7 +33,8 @@ struct TestTriggerHelper
     (*this)([&](f3d::engine& engine) {
       func(engine);
 
-      if (!TestSDKHelpers::RenderTest(engine.getWindow(), this->BaselinePath, this->OutputPath, name))
+      if (!TestSDKHelpers::RenderTest(
+            engine.getWindow(), this->BaselinePath, this->OutputPath, name))
       {
         throw std::runtime_error("Render test failed for " + name);
       }

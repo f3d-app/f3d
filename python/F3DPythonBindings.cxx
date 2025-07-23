@@ -260,16 +260,12 @@ PYBIND11_MODULE(pyf3d, module)
       "Enable the camera interaction")
     .def("disable_camera_movement", &f3d::interactor::disableCameraMovement,
       "Disable the camera interaction")
-    .def("trigger_mod_update", &f3d::interactor::triggerModUpdate,
-      "Trigger a key modifier update")
-    .def("trigger_mouse_button", &f3d::interactor::triggerMouseButton,
-      "Trigger a mouse button")
-    .def("trigger_mouse_position", &f3d::interactor::triggerMousePosition,
-      "Trigger a mouse position")
-    .def("trigger_mouse_wheel", &f3d::interactor::triggerMouseWheel,
-      "Trigger a mouse wheel")
-    .def("trigger_keyboard_key", &f3d::interactor::triggerKeyboardKey,
-      "Trigger a keyboard input")
+    .def("trigger_mod_update", &f3d::interactor::triggerModUpdate, "Trigger a key modifier update")
+    .def("trigger_mouse_button", &f3d::interactor::triggerMouseButton, "Trigger a mouse button")
+    .def(
+      "trigger_mouse_position", &f3d::interactor::triggerMousePosition, "Trigger a mouse position")
+    .def("trigger_mouse_wheel", &f3d::interactor::triggerMouseWheel, "Trigger a mouse wheel")
+    .def("trigger_keyboard_key", &f3d::interactor::triggerKeyboardKey, "Trigger a keyboard input")
     .def("trigger_text_character", &f3d::interactor::triggerTextCharacter,
       "Trigger a text character input")
     .def("play_interaction", &f3d::interactor::playInteraction, "Play an interaction file")

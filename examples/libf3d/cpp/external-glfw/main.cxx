@@ -315,16 +315,16 @@ int main(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  glfwSetErrorCallback([](int error, const char* desc) {
-    std::cerr << "GLFW error " << error << ": " << desc << std::endl;
-  });
+  glfwSetErrorCallback([](int error, const char* desc)
+    { std::cerr << "GLFW error " << error << ": " << desc << std::endl; });
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  int defaultSize[] = { 1920, 1080};
+  int defaultSize[] = { 1920, 1080 };
 
-  GLFWwindow* window = glfwCreateWindow(defaultSize[0], defaultSize[1], "F3D GLFW External Window", nullptr, nullptr);
+  GLFWwindow* window =
+    glfwCreateWindow(defaultSize[0], defaultSize[1], "F3D GLFW External Window", nullptr, nullptr);
 
   if (!window)
   {
@@ -342,46 +342,59 @@ int main(int argc, char* argv[])
   glfwSetWindowUserPointer(window, &eng);
 
   // resize callback
-  glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
-    f3d::engine* pe = static_cast<f3d::engine*>(glfwGetWindowUserPointer(window));
-    pe->getWindow().setSize(width, height);
-  });
-
-  // key callback
-  glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
-    f3d::engine* pe = static_cast<f3d::engine*>(glfwGetWindowUserPointer(window));
-    pe->getInteractor().triggerModUpdate(translateMod(mods));
-    pe->getInteractor().triggerKeyboardKey(translateAction(action), translateKey(key));
-  });
-
-  glfwSetCharCallback(window, [](GLFWwindow* window, unsigned int codepoint) {
-    f3d::engine* pe = static_cast<f3d::engine*>(glfwGetWindowUserPointer(window));
-    pe->getInteractor().triggerTextCharacter(codepoint);
-  });
-
-  // mouse callback
-  glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int mods) {
-    f3d::engine* pe = static_cast<f3d::engine*>(glfwGetWindowUserPointer(window));
-    pe->getInteractor().triggerModUpdate(translateMod(mods));
-    pe->getInteractor().triggerMouseButton(translateAction(action), translateButton(button));
-  });
-
-  glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
-    f3d::engine* pe = static_cast<f3d::engine*>(glfwGetWindowUserPointer(window));
-    pe->getInteractor().triggerMousePosition(xpos, ypos);
-    pe->getWindow().render();
-    glfwSwapBuffers(window);
-  });
-
-  glfwSetScrollCallback(window, [](GLFWwindow* window, double xoffset, double yoffset) {
-    if (yoffset != 0.0)
+  glfwSetFramebufferSizeCallback(window,
+    [](GLFWwindow* window, int width, int height)
     {
       f3d::engine* pe = static_cast<f3d::engine*>(glfwGetWindowUserPointer(window));
-      pe->getInteractor().triggerMouseWheel(yoffset > 0 ? f3d::interactor::WheelDirection::FORWARD
-                                                     : f3d::interactor::WheelDirection::BACKWARD);
+      pe->getWindow().setSize(width, height);
+    });
+
+  // key callback
+  glfwSetKeyCallback(window,
+    [](GLFWwindow* window, int key, int scancode, int action, int mods)
+    {
+      f3d::engine* pe = static_cast<f3d::engine*>(glfwGetWindowUserPointer(window));
+      pe->getInteractor().triggerModUpdate(translateMod(mods));
+      pe->getInteractor().triggerKeyboardKey(translateAction(action), translateKey(key));
+    });
+
+  glfwSetCharCallback(window,
+    [](GLFWwindow* window, unsigned int codepoint)
+    {
+      f3d::engine* pe = static_cast<f3d::engine*>(glfwGetWindowUserPointer(window));
+      pe->getInteractor().triggerTextCharacter(codepoint);
+    });
+
+  // mouse callback
+  glfwSetMouseButtonCallback(window,
+    [](GLFWwindow* window, int button, int action, int mods)
+    {
+      f3d::engine* pe = static_cast<f3d::engine*>(glfwGetWindowUserPointer(window));
+      pe->getInteractor().triggerModUpdate(translateMod(mods));
+      pe->getInteractor().triggerMouseButton(translateAction(action), translateButton(button));
+    });
+
+  glfwSetCursorPosCallback(window,
+    [](GLFWwindow* window, double xpos, double ypos)
+    {
+      f3d::engine* pe = static_cast<f3d::engine*>(glfwGetWindowUserPointer(window));
+      pe->getInteractor().triggerMousePosition(xpos, ypos);
+      pe->getWindow().render();
       glfwSwapBuffers(window);
-    }
-  });
+    });
+
+  glfwSetScrollCallback(window,
+    [](GLFWwindow* window, double xoffset, double yoffset)
+    {
+      if (yoffset != 0.0)
+      {
+        f3d::engine* pe = static_cast<f3d::engine*>(glfwGetWindowUserPointer(window));
+        pe->getInteractor().triggerMouseWheel(yoffset > 0
+            ? f3d::interactor::WheelDirection::FORWARD
+            : f3d::interactor::WheelDirection::BACKWARD);
+        glfwSwapBuffers(window);
+      }
+    });
 
   eng.getScene().add(argv[1]);
 
