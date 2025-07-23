@@ -326,6 +326,7 @@ struct F3D_EXPORT light_state_t
   vector3_t direction = { 0., 0., 0. };
   bool positionalLight = false;
   double intensity = 1.0;
+  bool switchState = true;
 };
 
 }

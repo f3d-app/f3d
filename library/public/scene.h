@@ -80,9 +80,9 @@ public:
   virtual scene& clear() = 0;
 
   /**
-   * Add a light based on a light state.
+   * Add a light based on a light state, returns the index of the added light.
    */
-  virtual void addLight(const light_state_t& lightState) = 0;
+  virtual int addLight(const light_state_t& lightState) = 0;
 
   /**
    * Get the number of lights.
@@ -97,7 +97,7 @@ public:
   /**
    * Update a light at provided index with the provided light state.
    */
-  virtual void updateLight(int index, const light_state_t& lightState) = 0;
+  virtual scene& updateLight(int index, const light_state_t& lightState) = 0;
 
   /**
    * Return true if provided file path is supported, false otherwise.
