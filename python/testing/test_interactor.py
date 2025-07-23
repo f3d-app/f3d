@@ -95,3 +95,8 @@ def test_trigger_key(capfd: pytest.CaptureFixture[str]):
     engine.interactor.trigger_keyboard_key(f3d.Interactor.InputAction.PRESS, "L")
     engine.interactor.trigger_keyboard_key(f3d.Interactor.InputAction.RELEASE, "L")
     assert engine.options["render.light.intensity"] == 0.98
+
+    engine.interactor.trigger_mouse_button(f3d.Interactor.InputAction.PRESS, f3d.Interactor.MouseButton.LEFT)
+    engine.interactor.trigger_mouse_position(100, 100)
+    engine.interactor.trigger_mouse_wheel(f3d.Interactor.WheelDirection.FORWARD)
+    engine.interactor.trigger_text_character(0)
