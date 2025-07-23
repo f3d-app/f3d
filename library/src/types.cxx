@@ -1,4 +1,5 @@
 #include "types.h"
+
 #include "vtkMath.h"
 
 #include <algorithm>

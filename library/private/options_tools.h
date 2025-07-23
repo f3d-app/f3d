@@ -601,15 +601,15 @@ transform2d_t parse(const std::string& str)
 
           if (angleNext)
           {
-            angleVec.push_back(val);
+            angleVec.emplace_back(val);
           }
           else if (setScale)
           {
-            scaleVec.push_back(val);
+            scaleVec.emplace_back(val);
           }
           else
           {
-            translationVec.push_back(val);
+            translationVec.emplace_back(val);
           }
         }
       }
@@ -630,15 +630,15 @@ transform2d_t parse(const std::string& str)
 
       if (angleNext)
       {
-        angleVec.push_back(val);
+        angleVec.emplace_back(val);
       }
       else if (setScale)
       {
-        scaleVec.push_back(val);
+        scaleVec.emplace_back(val);
       }
       else
       {
-        translationVec.push_back(val);
+        translationVec.emplace_back(val);
       }
     }
   }
@@ -686,7 +686,7 @@ transform2d_t parse(const std::string& str)
   }
   else if (scaleVec.size() == 1)
   {
-    scaleVec.push_back(scaleVec.front());
+    scaleVec.emplace_back(scaleVec.front());
   }
   if (translationVec.size() == 0)
   {
@@ -694,7 +694,7 @@ transform2d_t parse(const std::string& str)
   }
   if (angleVec.size() == 0)
   {
-    angleVec.push_back(0);
+    angleVec.emplace_back(0);
   }
 
   double_array_t<2> scaleVecOut = double_array_t<2>(scaleVec);

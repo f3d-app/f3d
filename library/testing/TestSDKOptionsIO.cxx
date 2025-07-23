@@ -219,14 +219,15 @@ int TestSDKOptionsIO(int argc, char* argv[])
   test.parse<f3d::transform2d_t>(
     "transform2d_t", "translation:0.51,2.1", { 1, 0, 0.51, 0, 1, 2.1, 0, 0, 1 });
   test.parse<f3d::transform2d_t>("transform2d_t", "angle:90.0",
-    { cos(TestSDKHelpers::Degrees2Radians(90.0)), -sin(TestSDKHelpers::Degrees2Radians(90.0)), 0,
-      sin(TestSDKHelpers::Degrees2Radians(90.0)), cos(TestSDKHelpers::Degrees2Radians(90.0)), 0, 0,
-      0, 1 });
+    { std::cos(TestSDKHelpers::Degrees2Radians(90.0)),
+      -std::sin(TestSDKHelpers::Degrees2Radians(90.0)), 0,
+      std::sin(TestSDKHelpers::Degrees2Radians(90.0)),
+      std::cos(TestSDKHelpers::Degrees2Radians(90.0)), 0, 0, 0, 1 });
   test.parse<f3d::transform2d_t>("transform2d_t", "scale:0.1,translation:0.51,2.1,angle:60.0",
-    { 0.1 * cos(TestSDKHelpers::Degrees2Radians(60.0)),
-      0.1 * -sin(TestSDKHelpers::Degrees2Radians(60.0)), 0.51,
-      0.1 * sin(TestSDKHelpers::Degrees2Radians(60.0)),
-      0.1 * cos(TestSDKHelpers::Degrees2Radians(60.0)), 2.1, 0, 0, 1 });
+    { 0.1 * std::cos(TestSDKHelpers::Degrees2Radians(60.0)),
+      0.1 * -std::sin(TestSDKHelpers::Degrees2Radians(60.0)), 0.51,
+      0.1 * std::sin(TestSDKHelpers::Degrees2Radians(60.0)),
+      0.1 * std::cos(TestSDKHelpers::Degrees2Radians(60.0)), 2.1, 0, 0, 1 });
   test.parse_expect<f3d::transform2d_t, parsing_exception>("vector too small", "1");
   test.parse_expect<f3d::transform2d_t, parsing_exception>(
     "vector too large", "1,2,3,4,5,6,7,8,9,0");
