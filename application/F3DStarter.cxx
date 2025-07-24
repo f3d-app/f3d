@@ -1670,7 +1670,7 @@ void F3DStarter::LoadFileGroupInternal(
 
     // Unwatch and erase paths that should not be watched anymore
     for (auto it = this->Internals->FolderWatchIds.begin();
-      it != this->Internals->FolderWatchIds.end();)
+         it != this->Internals->FolderWatchIds.end();)
     {
       const fs::path& path = it->first;
       const dmon_watch_id& dmonId = it->second;
@@ -1814,7 +1814,7 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
       const auto pathToGroupKey = [&]()
       {
         // XXX more multi-file mode may be added in the future
-        const std::string tmpPathString = tmpPath.string();
+        std::string tmpPathString = tmpPath.string();
         if (!this->Internals->AppOptions.MultiFileRegex.empty())
         {
           const std::regex regex(this->Internals->AppOptions.MultiFileRegex);
