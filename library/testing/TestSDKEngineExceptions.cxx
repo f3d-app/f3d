@@ -15,6 +15,11 @@ int TestSDKEngineExceptions(int argc, char* argv[])
   PseudoUnitTest test;
 
   {
+    test.expect<f3d::engine::no_window_exception>(
+      "create empty external context", []() { std::ignore = f3d::engine::createExternal(nullptr); });
+  }
+
+  {
     f3d::engine eng = f3d::engine::createNone();
     test.expect<f3d::engine::no_window_exception>(
       "get non-existent window", [&]() { std::ignore = eng.getWindow(); });

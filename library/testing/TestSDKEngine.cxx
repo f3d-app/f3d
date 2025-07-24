@@ -11,10 +11,6 @@ int TestSDKEngine(int argc, char* argv[])
 {
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
 
-  // check that creating an external engine without loader does not crash
-  f3d::engine engExt = f3d::engine::createExternal(nullptr);
-  f3d::window& winExt = engExt.getWindow();
-
   // clang-format off
   // Load all plugins, built or not, already loaded or not
   try { f3d::engine::loadPlugin("native", {argv[3]}); } catch (...) {}
