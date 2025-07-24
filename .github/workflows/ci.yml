@@ -393,6 +393,31 @@ jobs:
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
+  # VCPKG CI: Build with VCPKG
+  #----------------------------------------------------------------------------
+  vcpkg_preset:
+    needs: [detect_checkboxes]
+    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'vcpkg CI')) || (github.ref == 'refs/heads/master') }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, linux-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 0
+          lfs: false
+
+      - name: VCPKG CI
+        uses: ./source/.github/actions/vcpkg-ci
+
+  #----------------------------------------------------------------------------
   # Linux CI: Build and test, cross-vtk build matrix
   #----------------------------------------------------------------------------
   linux:
