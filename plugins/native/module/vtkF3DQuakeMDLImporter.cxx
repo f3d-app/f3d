@@ -11,6 +11,7 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
+#include <iostream>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkF3DQuakeMDLImporter);
@@ -430,6 +431,8 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   std::vector<std::vector<double>> AnimationTimes;
   std::vector<std::vector<vtkSmartPointer<vtkPolyData>>> AnimationFrames;
 
+  vtkNew<vtkInterpolateDataSetAttributes> interpolator;
+
   vtkIdType ActiveAnimation = -1;
 };
 
@@ -495,15 +498,22 @@ bool vtkF3DQuakeMDLImporter::UpdateAtTimeValue(double timeValue)
     auto frameA = this->Internals->AnimationFrames[this->Internals->ActiveAnimation][frameAIndex];
     auto frameB = this->Internals->AnimationFrames[this->Internals->ActiveAnimation][frameBIndex];
 
+    std::cout << "FrameA Index: " << frameAIndex << ", FrameB Index: " << frameBIndex << std::endl;
+    std::cout << "Alpha: " << alpha << std::endl;
+
     //interpolation
     if (frameAIndex != frameBIndex)
     {
-      vtkNew<vtkInterpolateDataSetAttributes> interpolator;
-      vtkInterpolateDataSetAttributes* iPtr = interpolator.Get();
+      vtkInterpolateDataSetAttributes* iPtr = this->Internals->interpolator.Get();
       iPtr->SetInputData(0, frameA);
       iPtr->SetInputData(1, frameB);
       iPtr->SetT(alpha);
       iPtr->Update();
+
+      vtkPolyData* output = this->Internals->interpolator->GetPolyDataOutput();
+      std::cout << "Interpolated points: " << output->GetNumberOfPoints() << std::endl;
+      std::cout << "Interpolated polys: " << output->GetNumberOfPolys() << std::endl;
+
 
       this->Internals->Mapper->SetInputData(iPtr->GetPolyDataOutput());
     }
