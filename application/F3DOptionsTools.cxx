@@ -86,6 +86,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "loading-progress", "", "Show loading progress bar", "<bool>", "1" },
       { "animation-progress", "", "Show animation progress bar", "<bool>", "1" },
       { "multi-file-mode", "", R"(Choose the behavior when opening multiple files. "single" will show one file at a time, "all" will show all files in a single scene, "dir" will show files from the same directory in the same scene.)", "<single|all|dir>", "" },
+      { "multi-file-regex", "", R"(Regular expression pattern to group files)", "<regex>", "" },
       { "recursive-dir-add", "", "Add directories recursively", "<bool>", "1" },
       { "remove-empty-file-groups", "", "Remove file groups that results into an empty scene", "<bool>", "1" },
       { "up", "", "Up direction", "<direction>", "" },
