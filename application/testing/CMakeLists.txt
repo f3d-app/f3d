@@ -247,6 +247,13 @@ f3d_test(NAME TestMultiblockMetaData DATA mb.vtm ARGS -m UI)
 f3d_test(NAME TestRemoveEmptyFileGroups DATA mb/mb_3_0.vtt mb/mb_0_0.vtu ARGS -n --remove-empty-file-groups UI)
 f3d_test(NAME TestMultiFileMetaData DATA mb/recursive ARGS -m --multi-file-mode=all UI)
 f3d_test(NAME TestMultiFileModeDir DATA mb ARGS -n --multi-file-mode=dir --recursive-dir-add UI)
+set(MULTIFILES 
+  multi-file/cube-part1of2.glb multi-file/cube-part2of2.glb
+  multi-file/cube-part1of3.glb multi-file/cube-part2of3.glb multi-file/cube-part3of3.glb
+  multi-file/tet-part1of2.glb multi-file/tet-part2of2.glb
+  multi-file/tet-part1of3.glb multi-file/tet-part2of3.glb multi-file/tet-part3of3.glb)
+f3d_test(NAME TestMultiFileRegexA DATA ${MULTIFILES} ARGS -n "--multi-file-regex=(\\d+)of\\d" --camera-direction=-xyz UI)
+f3d_test(NAME TestMultiFileRegexB DATA ${MULTIFILES} ARGS -n "--multi-file-regex=part(.+)" --camera-direction=-xyz UI)
 f3d_test(NAME TestTIFF DATA f3d.tif ARGS -sy --up=-Y)
 f3d_test(NAME TestLightIntensityBrighter DATA cow.vtp ARGS --light-intensity=5.0)
 f3d_test(NAME TestLightIntensityDarker DATA cow.vtp ARGS --light-intensity=0.2)
