@@ -22,12 +22,12 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   // Sanity checks coverage
   if (inter.playInteraction(""))
   {
-    std::cerr << "Unexcepted playInteraction output" << std::endl;
+    std::cerr << "Unexcepted playInteraction output\n";
     return EXIT_FAILURE;
   }
   if (inter.recordInteraction(""))
   {
-    std::cerr << "Unexcepted recordInteraction output" << std::endl;
+    std::cerr << "Unexcepted recordInteraction output\n";
     return EXIT_FAILURE;
   }
 
@@ -38,7 +38,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   // Dragon.vtu; SZZYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
   if (!inter.playInteraction(interactionFilePath))
   {
-    std::cerr << "Unexcepted error playing interaction" << std::endl;
+    std::cerr << "Unexcepted error playing interaction\n";
     return EXIT_FAILURE;
   }
   if (!TestSDKHelpers::RenderTest(
@@ -51,8 +51,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   try
   {
     inter.addBinding({ mod_t::ANY, "7" }, "exception");
-    std::cerr << "An exception has not been thrown when adding a existing interaction command"
-              << std::endl;
+    std::cerr << "An exception has not been thrown when adding a existing interaction command\n";
     return EXIT_FAILURE;
   }
   catch (const f3d::interactor::already_exists_exception& ex)
@@ -106,7 +105,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   // Dragon.vtu; SZZYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
   if (!inter.playInteraction(interactionFilePath))
   {
-    std::cerr << "Unexcepted error playing interaction" << std::endl;
+    std::cerr << "Unexcepted error playing interaction\n";
     return EXIT_FAILURE;
   }
 
@@ -133,7 +132,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   // Dragon.vtu; SZZYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
   if (!inter.playInteraction(interactionFilePath))
   {
-    std::cerr << "Unexcepted error playing interaction" << std::endl;
+    std::cerr << "Unexcepted error playing interaction\n";
     return EXIT_FAILURE;
   }
 
@@ -151,25 +150,25 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   // Dragon.vtu; SZZYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
   if (!inter.playInteraction(interactionFilePath))
   {
-    std::cerr << "Unexcepted error playing interaction" << std::endl;
+    std::cerr << "Unexcepted error playing interaction\n";
     return EXIT_FAILURE;
   }
   if (!TestSDKHelpers::RenderTest(
         win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename + "DefaultAgain"))
   {
-    std::cerr << "Unexcepted rendering playing interaction" << std::endl;
+    std::cerr << "Unexcepted rendering playing interaction\n";
     return EXIT_FAILURE;
   }
 
   // Check error handling
   if (inter.recordInteraction("/" + std::string(257, 'x') + "/record.ext"))
   {
-    std::cerr << "Unexcepted success recording an invalid path" << std::endl;
+    std::cerr << "Unexcepted success recording an invalid path\n";
     return EXIT_FAILURE;
   }
   if (inter.playInteraction("/" + std::string(257, 'x') + "/play.ext"))
   {
-    std::cerr << "Unexcepted success playing an invalid path" << std::endl;
+    std::cerr << "Unexcepted success playing an invalid path\n";
     return EXIT_FAILURE;
   }
 
@@ -178,8 +177,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
   if (!inter.playInteraction(
         std::string(argv[1]) + "recordings/TestSDKInteractorCallBackConsoleException.log"))
   {
-    std::cerr << "Unexcepted failure playing a console command triggering an exception"
-              << std::endl;
+    std::cerr << "Unexcepted failure playing a console command triggering an exception\n";
     return EXIT_FAILURE;
   }
 

@@ -135,6 +135,7 @@ public:
    * Implement vtkImporter animation API by adding animations for each individual importers one
    * after the other No input checking on animationIndex
    */
+  AnimationSupportLevel GetAnimationSupportLevel() override;
   vtkIdType GetNumberOfAnimations() override;
   std::string GetAnimationName(vtkIdType animationIndex) override;
   void EnableAnimation(vtkIdType animationIndex) override;

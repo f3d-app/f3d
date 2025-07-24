@@ -13,6 +13,8 @@
 #include <vtkRenderer.h>
 #include <iostream>
 
+#include <cstdint>
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkF3DQuakeMDLImporter);
 
@@ -80,7 +82,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     mdl_vertex_t verts[1024]; // vertex list of the frame, maximum capacity is 1024
   };
 
-  enum FRAME_TYPE
+  enum FRAME_TYPE : std::uint8_t
   {
     SINGLE_FRAME = 0,
     GROUP_FRAME,
@@ -339,11 +341,8 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         {
           times.emplace_back(0.0);
         }
-        else
-        {
-          // Single frames are 10 fps
-          times.emplace_back(times.back() + 0.1);
-        }
+        // Single frames are 10 fps
+        times.emplace_back(times.back() + 0.1);
 
         // Create the animation frame
         vtkSmartPointer<vtkPolyData> mesh =
@@ -357,6 +356,8 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         std::vector<double> times;
         std::vector<vtkSmartPointer<vtkPolyData>> meshes;
 
+        // groupFrames always start at 0.0
+        times.emplace_back(0.0);
         // Iterate over each frame in the group
         for (int groupFrameNum = 0; groupFrameNum < *pluginFramePtr.nb; groupFrameNum++)
         {
@@ -423,7 +424,6 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
 
   //----------------------------------------------------------------------------
   vtkF3DQuakeMDLImporter* Parent;
-  std::string Description;
   vtkSmartPointer<vtkPolyDataMapper> Mapper;
   vtkSmartPointer<vtkTexture> Texture;
 
@@ -475,6 +475,7 @@ bool vtkF3DQuakeMDLImporter::UpdateAtTimeValue(double timeValue)
       this->Internals->AnimationTimes[this->Internals->ActiveAnimation];
 
     // Find frameIndex for the provided timeValue so that t0 <= timeValue < t1
+    // Animation range is from [Start time of first frame, Finish time of last frame]
 
     // First time >= value
     const auto found = std::lower_bound(times.begin(), times.end(), timeValue);
@@ -574,6 +575,7 @@ bool vtkF3DQuakeMDLImporter::GetTemporalInformation(vtkIdType animationIndex,
   const std::vector<double>& times = this->Internals->AnimationTimes[animationIndex];
   // F3D does not care about timesteps, only set time range
   timeRange[0] = times.front();
-  timeRange[1] = times.back();
+  // If single frame, keep animation duration = 0
+  timeRange[1] = times.size() == 2 ? times.front() : times.back();
   return true;
 }

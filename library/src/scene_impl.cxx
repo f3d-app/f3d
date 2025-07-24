@@ -124,6 +124,9 @@ public:
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
     if (!this->MetaImporter->Update())
     {
+      this->MetaImporter->RemoveObservers(vtkCommand::ProgressEvent);
+      progressWidget->Off();
+
       this->MetaImporter->Clear();
       this->Window.Initialize();
       throw scene::load_failure_exception("failed to load scene");
@@ -208,12 +211,8 @@ scene& scene_impl::add(const fs::path& filePath)
 //----------------------------------------------------------------------------
 scene& scene_impl::add(const std::vector<std::string>& filePathStrings)
 {
-  std::vector<fs::path> paths;
-  paths.reserve(filePathStrings.size());
-  for (const std::string& str : filePathStrings)
-  {
-    paths.emplace_back(str);
-  }
+  std::vector<fs::path> paths(filePathStrings.size());
+  std::copy(filePathStrings.begin(), filePathStrings.end(), paths.begin());
   return this->add(paths);
 }
 
@@ -240,7 +239,7 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
     }
     std::optional<std::string> forceReader = this->Internals->Options.scene.force_reader;
     // Recover the importer for the provided file path
-    f3d::reader* reader = f3d::factory::instance()->getReader(filePath.string(), forceReader);
+    const f3d::reader* reader = f3d::factory::instance()->getReader(filePath.string(), forceReader);
     if (reader)
     {
       if (forceReader)
@@ -349,6 +348,12 @@ scene& scene_impl::loadAnimationTime(double timeValue)
 std::pair<double, double> scene_impl::animationTimeRange()
 {
   return this->Internals->AnimationManager.GetTimeRange();
+}
+
+//----------------------------------------------------------------------------
+unsigned int scene_impl::availableAnimations() const
+{
+  return this->Internals->AnimationManager.GetNumberOfAvailableAnimations();
 }
 
 //----------------------------------------------------------------------------

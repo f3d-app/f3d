@@ -7,13 +7,13 @@ please take a look at our [getting started guide](GETTING_STARTED.md).
 ## Dependencies
 
 - [CMake](https://cmake.org) >= 3.1.
-- [VTK](https://vtk.org) >= 9.2.6 (9.4.2 recommended).
+- [VTK](https://vtk.org) >= 9.2.6 (9.5.0 recommended).
 - A C++17 compiler.
 - A CMake-compatible build system (Visual Studio, XCode, Ninja, Make, etc.).
-- Optionally, [Assimp](https://www.assimp.org/) >= 5.4.0.
-- Optionally, Open CASCADE [OCCT](https://dev.opencascade.org/) >= 7.6.3.
+- Optionally, [Assimp](https://www.assimp.org/) >= 5.4.0 (6.0.2 recommended).
+- Optionally, Open CASCADE [OCCT](https://dev.opencascade.org/) >= 7.6.3 (7.9.1 recommended).
 - Optionally, [Alembic](http://www.alembic.io/) >= 1.8.5.
-- Optionally, [OpenUSD](https://openusd.org/release/index.html) >= 24.08.
+- Optionally, [OpenUSD](https://openusd.org/release/index.html) >= 24.08 (25.05.01 recommended).
 - Optionally, [OpenVDB](https://www.openvdb.org/download/) >= 12.0.0, enable `IOOpenVDB` module during VTK configuration.
 - Optionally, [Draco](https://google.github.io/draco/) >= 1.5.6.
 - Optionally, [Python](https://www.python.org/) >= 3.9 and [pybind11](https://github.com/pybind/pybind11) >= 2.9.2.
@@ -24,7 +24,7 @@ F3D is tested continuously against versions recommended by the [VFX reference pl
 
 ## VTK compatibility
 
-As stated in the dependencies, F3D is compatible with VTK >= 9.2.6, however, some features may not be available. We suggest using VTK 9.4.2 with RenderingRayTracing, IOExodus, IOHDF and IOOpenVDB modules enabled in order to get as many features as possible in F3D.
+As stated in the dependencies, F3D is compatible with VTK >= 9.2.6, however, some features may not be available. We suggest using VTK 9.5.0 with RenderingRayTracing, IOExodus, IOHDF, IONetCDF and IOOpenVDB modules enabled in order to get as many features as possible in F3D.
 
 ## Configuration and building
 
@@ -46,7 +46,7 @@ Some modules, plugins and language bindings depending on external libraries can 
 - `F3D_MODULE_RAYTRACING`: Support for raytracing rendering. Requires that VTK has been built with `OSPRay` and `VTK_MODULE_ENABLE_VTK_RenderingRayTracing` turned on. Disabled by default.
 - `F3D_MODULE_EXR`: Support for OpenEXR images. Requires `OpenEXR`. Disabled by default.
 - `F3D_MODULE_UI`: Support for ImGui widgets. Uses provided ImGui. Enabled by default.
-- `F3D_PLUGIN_BUILD_HDF`: Support for VTKHDF (.vtkhdf) and ExodusII (.ex2) file formats. Requires that VTK has been built with `IOHDF` and `IOExodus` modules (and `hdf5`). Enabled by default.
+- `F3D_PLUGIN_BUILD_HDF`: Support for VTKHDF (.vtkhdf), ExodusII (.ex2), and NetCDF (.nc) file formats. Requires that VTK has been built with `IOHDF`, `IOExodus`, and `IONetCDF` modules (and `hdf5`). Enabled by default.
 - `F3D_PLUGIN_BUILD_OCCT`: Support for STEP, IGES, BREP, and XBF file formats. Requires `OpenCASCADE`. Disabled by default.
 - `F3D_PLUGIN_BUILD_ASSIMP`: Support for FBX, DAE, OFF, DXF, X and 3MF file formats. Requires `Assimp`. Disabled by default.
 - `F3D_PLUGIN_BUILD_ALEMBIC`: Support for ABC file format. Requires `Alembic`. Disabled by default.

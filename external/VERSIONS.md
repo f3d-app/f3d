@@ -1,5 +1,5 @@
-- cxxopts: v3.2.0
-- dmon: 1.3.7
-- imgui: v1.91.9b
+- cxxopts: v3.3.1
+- dmon: 1.3.8
+- imgui: v1.92.2
 - nlohmann_json: v3.12.0
 - tinyfiledialogs: v3.19.1

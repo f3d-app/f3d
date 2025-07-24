@@ -8,28 +8,36 @@
   ],
   "versions": {
     "alembic": "1.8.8",
-    "assimp": "v6.0.1",
+    "assimp": "v6.0.2",
+    "blosc": "v1.21.6",
     "draco": "1.5.7",
-    "occt": "V7_9_0",
-    "openexr": "v3.3.3",
+    "imath": "v3.1.12",
+    "java": "21",
+    "occt": "V7_9_1",
+    "openexr": "v3.3.4",
     "openvdb": "v12.0.1",
     "pybind11": "v2.13.6",
     "python": "3.13",
-    "usd": "v25.02a",
-    "java": "21"
+    "tbb": "v2021.12.0",
+    "usd": "v25.05.01",
+    "zlib": "v1.3.1"
   },
   "min_versions": {
     "alembic": "1.8.5",
     "assimp": "v5.4.0",
+    "blosc": "v1.17.0",
     "draco": "1.5.6",
+    "imath": "v3.0.1",
+    "java": "17",
     "occt": "V7_6_3",
     "openexr": "v3.0.1",
     "openvdb": "v12.0.0",
     "pybind11": "v2.9.2",
     "python": "3.9",
+    "tbb": "v2021.10.0",
     "usd": "v24.08",
-    "java": "17"
+    "zlib": "v1.2.13"
   },
-  "vtk_commit_sha": "29f48a8c06b1c1fe8b7b6869eb310ef6421d19a4",
-  "timestamp": "20250609_0"
+  "vtk_commit_sha": "6ad1aadbfd484044f33b5d89b0eec56c9a5d8178",
+  "timestamp": "20250720_0"
 }

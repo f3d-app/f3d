@@ -20,7 +20,8 @@ enum class Severity : unsigned char
   Debug = 0,
   Info,
   Warning,
-  Error
+  Error,
+  Quiet
 };
 
 enum class StandardStream : unsigned char

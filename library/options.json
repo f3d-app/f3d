@@ -11,6 +11,11 @@
       },
       "index": {
         "type": "int",
+        "default_value": "0",
+        "deprecated": "use scene.animation.indices instead"
+      },
+      "indices": {
+        "type": "int_vector",
         "default_value": "0"
       },
       "speed_factor": {
@@ -62,6 +67,12 @@
       "color": {
         "type": "color",
         "default_value": "0.0, 0.0, 0.0"
+      }
+    },
+    "axes_grid": {
+      "enable": {
+        "type": "bool",
+        "default_value": "false"
       }
     },
     "raytracing": {

@@ -68,7 +68,7 @@ public:
   }
 
 private:
-  double Value;
+  double Value = 0;
 };
 
 /**

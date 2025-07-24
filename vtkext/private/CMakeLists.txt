@@ -8,6 +8,7 @@ vtk_module_scan(
 
 vtk_module_build(
   MODULES ${modules}
+  ENABLE_WRAPPING OFF
   INSTALL_HEADERS OFF
   PACKAGE "f3d_vtkext_private")
 

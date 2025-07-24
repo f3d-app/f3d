@@ -55,7 +55,7 @@ void vtkF3DGenericImporter::UpdateTemporalInformation()
   vtkInformation* readerInfo = this->Pimpl->Reader->GetOutputInformation(0);
   if (readerInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_RANGE()))
   {
-    double* readerTimeRange = readerInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
+    const double* readerTimeRange = readerInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
     this->Pimpl->TimeRange[0] = readerTimeRange[0];
     this->Pimpl->TimeRange[1] = readerTimeRange[1];
     this->Pimpl->HasAnimation = true;
@@ -261,6 +261,13 @@ std::string vtkF3DGenericImporter::GetDataObjectDescription(vtkDataObject* objec
 //----------------------------------------------------------------------------
 bool vtkF3DGenericImporter::UpdateAtTimeValue(double timeValue)
 {
+
+  if (!this->Pimpl->AnimationEnabled)
+  {
+    // Animation is not enabled, nothing to do
+    return true;
+  }
+
   assert(this->Pimpl->Reader);
   if (!this->Pimpl->PostPro->UpdateTimeStep(timeValue) ||
     !this->Pimpl->Reader->GetOutputDataObject(0))

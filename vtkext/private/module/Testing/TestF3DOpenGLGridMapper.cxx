@@ -31,9 +31,9 @@ bool CheckBounds(const std::string& name, vtkF3DOpenGLGridMapper* mapper, //
   const std::array<double, 6> expected = { x0, x1, y0, y1, z0, z1 };
   if (actual != expected)
   {
-    std::cerr << "wrong bounds for " << name << " failed:" << std::endl;
-    std::cerr << "  got " << actual << std::endl;
-    std::cerr << "  expected " << expected << std::endl;
+    std::cerr << "wrong bounds for " << name << " failed:\n";
+    std::cerr << "  got " << actual << "\n";
+    std::cerr << "  expected " << expected << "\n";
     return false;
   }
   return true;

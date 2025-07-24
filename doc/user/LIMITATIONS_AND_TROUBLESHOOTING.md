@@ -14,8 +14,6 @@ Here is a non exhaustive list of F3D limitations:
 FBX, DAE, OFF, DXF, X and 3MF file formats rely on [Assimp](https://github.com/assimp/assimp) library. It comes with some known limitations:
 
 - PBR materials are not supported for FBX file format.
-- Complex animations are not working very well with Assimp 5.1, it's recommended to use Assimp 5.0 for this use case.
-- Only one animation can be shown at a time, showing all animations is not supported yet.
 - Some files can be empty, crash, or show artifacts.
 - DXF support is very limited: only files with polylines and 3D faces are displayed.
 - 3MF files may crash at exit (issue in Assimp: https://github.com/assimp/assimp/issues/5328)
@@ -29,7 +27,6 @@ ABC file formats rely on [Alembic](https://github.com/alembic/alembic) library. 
 - Does not support ArbGeomParam feature in Alembic.
 - Does not support Subdivision Meshes.
 - Does not support Materials.
-- Does not support Animations.
 
 ## USD
 
@@ -62,6 +59,11 @@ Make sure that VTK has been built with _OpenImageDenoise_ support (`VTKOSPRAY_EN
 
 Your data probably contains some translucent data for some reason, turn on translucency support by pressing `P` or using the `-p` command line option.
 
+> My 3D Gaussian Splatting data in .ply format isn't opened properly.
+
+.ply is a generic file format, we cannot assumes it's a 3DGS, thus we do not give good presets for this specific use case.
+It's recommended to use these options: `--point-sprites-size=1 --point-sprites-type=gaussian -soyk`, but you can also add them in your [config file](CONFIGURATION_FILE.md).
+
 ## Linux
 
 > I have a link error related to `stdc++fs` not found or I'm unable to run F3D due to filesystem errors.
@@ -80,7 +82,7 @@ The GCC flag `-latomic` is not being added automatically with specific architect
 - If they are working, then it is an issue specific to your file manager (see below for a potential work around).
 - If only a few format have working thumbnails, then it is an issue with the mime types database.
 - If no formats have working thumbnails, then it is can be an issue with sandboxing or with the `f3d-plugin-xxx.thumbnailer` files.
-- If only big file do not have thumbnails, this is intended, you can modify this behavior in the `thumbnail.d/05_all.json` configuration folder using the `max-size` option.
+- If only big file do not have thumbnails, this is intended, you can modify this behavior in the `thumbnail.d/05_all.json` configuration directory using the `max-size` option.
 
 > `--rendering-backend` CLI option is not working as expected
 
@@ -111,7 +113,7 @@ OpenGL applications like F3D can have issues when launched from Windows Server o
 You can try to use a software implementation of OpenGL, called [Mesa](https://github.com/pal1000/mesa-dist-win/releases).
 
 - Download the latest `release-msvc`.
-- copy `x64/opengl32.dll`, `libgallium_wgl.dll` and `x64/libglapi.dll` in the same folder as `f3d.exe`.
+- copy `x64/opengl32.dll`, `libgallium_wgl.dll` and `x64/libglapi.dll` in the same directory as `f3d.exe`.
 - set the environment variable `MESA_GL_VERSION_OVERRIDE` to 4.5.
 - run `f3d.exe`.
 

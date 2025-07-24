@@ -1,0 +1,1 @@
+remove_current_file_group
