@@ -254,6 +254,7 @@ set(MULTIFILES
   multi-file/tet-part1of3.glb multi-file/tet-part2of3.glb multi-file/tet-part3of3.glb)
 f3d_test(NAME TestMultiFileRegexA DATA ${MULTIFILES} ARGS -n "--multi-file-regex=(\\d+)of\\d" --camera-direction=-xyz UI)
 f3d_test(NAME TestMultiFileRegexB DATA ${MULTIFILES} ARGS -n "--multi-file-regex=part(.+)" --camera-direction=-xyz UI)
+f3d_test(NAME TestMultiFileRegexInvalid ARGS "--multi-file-regex=(.+" REGEXP "invalid regular expression: \"\\(.+")
 f3d_test(NAME TestTIFF DATA f3d.tif ARGS -sy --up=-Y)
 f3d_test(NAME TestLightIntensityBrighter DATA cow.vtp ARGS --light-intensity=5.0)
 f3d_test(NAME TestLightIntensityDarker DATA cow.vtp ARGS --light-intensity=0.2)
