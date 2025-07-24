@@ -523,7 +523,7 @@ bool vtkF3DQuakeMDLImporter::UpdateAtTimeValue(double timeValue)
       this->Internals->Mapper->SetInputData(frameA);
     }
     /*this->Internals->Mapper->SetInputData(
-      this->Internals->AnimationFrames[this->Internals->ActiveAnimation][frameIndex]);*/
+      this->Internals->AnimationFrames[this->Internals->ActiveAnimation][frameIndex]); */
   }
   return true;
 }
