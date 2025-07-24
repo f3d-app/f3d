@@ -1670,7 +1670,7 @@ void F3DStarter::LoadFileGroupInternal(
 
     // Unwatch and erase paths that should not be watched anymore
     for (auto it = this->Internals->FolderWatchIds.begin();
-         it != this->Internals->FolderWatchIds.end();)
+      it != this->Internals->FolderWatchIds.end();)
     {
       const fs::path& path = it->first;
       const dmon_watch_id& dmonId = it->second;
@@ -1827,7 +1827,8 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
             size_t j = 0;
             for (size_t i = 1; i <= regex.mark_count(); ++i)
             {
-              if (match.length(i) && match.position(i) >= j) // skip empty or nested groups
+              if (match.length(i) &&                                 // skip empty
+                match.position(i) >= static_cast<std::ptrdiff_t>(j)) // or nested groups
               {
                 groupKey << tmpPathString.substr(j, match.position(i) - j) << "*";
                 j = match.position(i) + match.length(i);
