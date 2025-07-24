@@ -391,15 +391,13 @@ void vtkF3DImguiActor::RenderDropZone()
     /* Use background draw list to prevent "ignoring" NoBringToFrontOnFocus */
     ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
 
+    // Logo size
+    float logoDisplayWidth = 256.f;
+    float logoDisplayHeight = 256.f;
     if (this->DropZoneLogoVisible && this->Pimpl->LogoTexture)
     {
       // Calculate logo position (centered)
       ImVec2 center = viewport->GetWorkCenter();
-
-      // Logo size
-      float logoDisplayWidth = 256.f;
-      float logoDisplayHeight = 256.f;
-
       ImVec2 logoPos(center.x - logoDisplayWidth * 0.5f, center.y - logoDisplayHeight * 0.5f);
 
       // VTK texture pointer to ImTextureID cast (void*)
@@ -434,8 +432,18 @@ void vtkF3DImguiActor::RenderDropZone()
     ImVec2 dropTextSize = ImGui::CalcTextSize(this->DropText.c_str());
 
     ImGui::Begin("DropZoneText", nullptr, flags);
-    ImGui::SetCursorPos(ImVec2(viewport->GetWorkCenter().x - 0.5f * dropTextSize.x,
-      viewport->GetWorkCenter().y - 0.5f * dropTextSize.y + 150));
+
+    // Position the text below the logo it is rendered
+    if (this->DropZoneLogoVisible && this->Pimpl->LogoTexture)
+    {
+      ImGui::SetCursorPos(ImVec2(viewport->GetWorkCenter().x - 0.5f * dropTextSize.x,
+      viewport->GetWorkCenter().y - 0.5f * dropTextSize.y + logoDisplayHeight/2 + 20)); // Add 20 for padding
+    }
+    else
+    {
+      ImGui::SetCursorPos(ImVec2(viewport->GetWorkCenter().x - 0.5f * dropTextSize.x,
+      viewport->GetWorkCenter().y - 0.5f * dropTextSize.y));
+    }
     ImGui::TextUnformatted(this->DropText.c_str());
     ImGui::End();
   }
