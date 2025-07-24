@@ -118,6 +118,10 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   }
   else if (type == Type::EXTERNAL)
   {
+    if (getProcAddress == nullptr)
+    {
+      throw engine::no_window_exception("Cannot create an external window without a context function");
+    }
     this->Internals->RenWin = vtkSmartPointer<vtkF3DExternalRenderWindow>::New();
   }
   else if (type == Type::EGL)
