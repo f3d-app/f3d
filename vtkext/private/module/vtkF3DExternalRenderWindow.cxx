@@ -39,7 +39,7 @@ void vtkF3DExternalRenderWindow::Render()
 
     if (!this->Initialized)
     {
-      // The context can fails to intialize if the OpenGL symbol loader is invalid.
+      // The context can fails to initialize if the OpenGL symbol loader is invalid.
       return;
     }
   }
