@@ -111,6 +111,7 @@ find_package(VTK 9.2.6 REQUIRED
     IOHDF
     IONetCDF
     IOOpenVDB
+    IOPDAL
     RenderingRayTracing)
 message(STATUS "VTK ${VTK_VERSION} found")
 
@@ -326,3 +327,4 @@ f3d_report_variable(F3D_PLUGIN_BUILD_HDF)
 f3d_report_variable(F3D_PLUGIN_BUILD_OCCT)
 f3d_report_variable(F3D_PLUGIN_BUILD_USD)
 f3d_report_variable(F3D_PLUGIN_BUILD_VDB)
+f3d_report_variable(F3D_PLUGIN_BUILD_PDAL)

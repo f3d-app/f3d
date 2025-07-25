@@ -15,9 +15,10 @@ f3d_plugin_init()
 
 f3d_plugin_declare_reader(
     NAME PDAL
-    EXTENSIONS arrow bpf ilvis2 e57 fbi mbio npy csd pcd ply qfit rdb rxp sbet bin tiledb las drc ept.json json hdf h5 mat ntif obj pts ptx txt splk spz
-    MIMETYPES application/octet-stream application/vnd.las model/draco application/json application/x-hdf application/x-matlab application/vnd.nitf text/plain application/vnd.splk application/vnd.spz
-    FORMAT_DESCRIPTION "pdal processes a variety of files: https://pdal.io/en/stable/stages/readers.html"
+    EXTENSIONS e57
+    MIMETYPES model/e57
+    VTK_READER vtkPDALReader
+    FORMAT_DESCRIPTION "PDAL processes a variety of files: https://pdal.io/en/stable/stages/readers.html"
     CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/pdal.inl"
 )
 
