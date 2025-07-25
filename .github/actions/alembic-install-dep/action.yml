@@ -8,6 +8,9 @@ inputs:
   version:
     description: "Version of alembic to build"
     required: true
+  imath_version:
+    description: "Version of imath to build against"
+    required: true
 
 runs:
   using: "composite"
@@ -16,13 +19,14 @@ runs:
       shell: bash
       run: |
         [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+        [[ "${{ inputs.imath_version }}" ]] || { echo "imath_version input is empty" ; exit 1; }
 
     - name: Cache Alembic
       id: cache-alembic
       uses: actions/cache/restore@v4
       with:
         path: dependencies/alembic_install
-        key: alembic-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-0
+        key: alembic-${{inputs.version}}-${{inputs.imath_version}}-${{runner.os}}-${{inputs.cpu}}-0
 
     - name: Checkout Alembic
       if: steps.cache-alembic.outputs.cache-hit != 'true'

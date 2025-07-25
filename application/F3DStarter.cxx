@@ -1487,6 +1487,7 @@ void F3DStarter::LoadFileGroup(
   // Recover file information
   f3d::scene& scene = this->Internals->Engine->getScene();
   bool unsupported = false;
+  bool invalid = false;
 
   std::vector<fs::path> localPaths;
   try
@@ -1591,7 +1592,7 @@ void F3DStarter::LoadFileGroup(
     {
       f3d::log::error("  ", tmpPath.string());
     }
-    unsupported = true;
+    invalid = true;
   }
 
   std::string filenameInfo;
@@ -1634,16 +1635,16 @@ void F3DStarter::LoadFileGroup(
   else
   {
     // No files loaded, create a simple filename info like this:
-    // (1/5) cow.vtt [UNSUPPORTED]
-    // (1/1) cow.vtt [+UNSUPPORTED]
-    if (unsupported)
+    // (1/5) cow.vtt [UNSUPPORTED]/[INVALID]
+    // (1/1) cow.vtt [+UNSUPPORTED]/[+INVALID]
+    if (unsupported || invalid)
     {
       filenameInfo = groupIdx + " " + paths.at(0).filename().string() + " [";
       if (paths.size() > 1)
       {
         filenameInfo += "+";
       }
-      filenameInfo += "UNSUPPORTED]";
+      filenameInfo += invalid ? "INVALID]" : "UNSUPPORTED]";
     }
   }
 
