@@ -80,6 +80,36 @@ public:
   virtual scene& clear() = 0;
 
   /**
+   * Add a light based on a light state, returns the index of the added light.
+   */
+  virtual int addLight(const light_state_t& lightState) = 0;
+
+  /**
+   * Get the number of lights.
+   */
+  [[nodiscard]] virtual int getLightCount() const = 0;
+
+  /**
+   * Get all lights
+   */
+  [[nodiscard]] virtual light_state_t getLight(int index) = 0;
+
+  /**
+   * Update a light at provided index with the provided light state.
+   */
+  virtual scene& updateLight(int index, const light_state_t& lightState) = 0;
+
+  /**
+   * Remove a light at provided index.
+   */
+  virtual scene& removeLight(int index) = 0;
+
+  /**
+   * Remove all lights from the scene.
+   */
+  virtual scene& removeAllLights() = 0;
+
+  /**
    * Return true if provided file path is supported, false otherwise.
    */
   [[nodiscard]] virtual bool supports(const std::filesystem::path& filePath) = 0;

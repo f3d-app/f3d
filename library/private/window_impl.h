@@ -21,6 +21,7 @@
 
 class vtkRenderWindow;
 class vtkF3DMetaImporter;
+class vtkF3DRenderer;
 namespace f3d
 {
 class options;
@@ -122,6 +123,12 @@ public:
    * Does nothing if F3D_MODULE_UI is OFF
    */
   void RenderUIOnly();
+
+  /**
+   * Implementation only API.
+   * Get the internal renderer
+   */
+  [[nodiscard]] vtkF3DRenderer* GetRenderer() const;
 
 private:
   class internals;
