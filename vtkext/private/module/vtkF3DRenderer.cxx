@@ -2757,6 +2757,7 @@ void vtkF3DRenderer::ConfigureScalarBarActorForColoring(
   scalarBar->SetWidth(0.8);
   scalarBar->SetHeight(0.07);
   scalarBar->SetPosition(0.1, 0.01);
+  scalarBar->SetMaximumNumberOfColors(512);
 }
 
 //----------------------------------------------------------------------------
