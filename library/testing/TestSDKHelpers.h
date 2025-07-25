@@ -15,7 +15,7 @@ static bool RenderTest(const f3d::image& img, const std::string& baselinePath,
 {
   if (baselinePath.empty() || outputPath.empty() || name.empty())
   {
-    std::cerr << "A path or name is empty, aborting" << std::endl;
+    std::cerr << "A path or name is empty, aborting\n";
     return false;
   }
 
@@ -29,7 +29,7 @@ static bool RenderTest(const f3d::image& img, const std::string& baselinePath,
       img.save(output);
       std::cerr << "Reference image "
                 << baseline + " does not exist, current rendering has been outputted to " << output
-                << std::endl;
+                << "\n";
       return false;
     }
   }
@@ -41,17 +41,17 @@ static bool RenderTest(const f3d::image& img, const std::string& baselinePath,
   if (error > threshold)
   {
     std::cerr << "Current rendering difference with reference image " << baseline << " : " << error
-              << " is higher than the threshold of " << threshold << std::endl;
-    std::cerr << "Result resolution: " << img.getWidth() << "x" << img.getHeight() << std::endl;
+              << " is higher than the threshold of " << threshold << "\n";
+    std::cerr << "Result resolution: " << img.getWidth() << "x" << img.getHeight() << "\n";
     std::cerr << "Reference resolution: " << reference.getWidth() << "x" << reference.getHeight()
-              << std::endl;
-    std::cerr << "Result image saved to " << output << std::endl;
+              << "\n";
+    std::cerr << "Result image saved to " << output << "\n";
     img.save(output);
     return false;
   }
 
   std::cout << "Successful render test against " << baseline + " with an error of " << error
-            << std::endl;
+            << "\n";
   return true;
 }
 

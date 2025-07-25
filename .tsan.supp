@@ -11,5 +11,6 @@ race:libvtkCommonDataModel
 # OpenEXR
 race:libOpenEXR
 
-# OSMesa
+# Mesa
 race:libOSMesa
+race:libgallium

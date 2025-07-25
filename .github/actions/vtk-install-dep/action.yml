@@ -41,7 +41,8 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/vtk_install
-        key: vtk-${{ inputs.vtk_version }}-${{inputs.zlib_version}}-${{inputs.blosc_version}}-${{inputs.tbb_version}}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.cpu}}-2
+        key: vtk-${{ inputs.vtk_version }}-${{inputs.zlib_version}}-${{inputs.blosc_version}}-${{inputs.tbb_version}}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.cpu}}-4
+
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies
@@ -63,13 +64,20 @@ runs:
 
     # CMake 3.31 introduced a new policy producing a warning when using vtkModule.cmake
     # See https://gitlab.kitware.com/vtk/vtk/-/issues/19526
-    - name: Patch VTK
+    - name: Patch VTK CMake
       if: steps.cache-vtk.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/vtk
       shell: bash
       run: |
         cat $GITHUB_ACTION_PATH/set_cmp0177_policy.cmake CMake/vtkModule.cmake > patched.cmake
         mv patched.cmake CMake/vtkModule.cmake
+
+    # VTK 9.2.6 needs patching with recent libstd
+    - name: Patch VTK v9.2.6
+      if: steps.cache-vtk.outputs.cache-hit != 'true' && inputs.vtk_version == 'v9.2.6'
+      working-directory: ${{github.workspace}}/dependencies/vtk
+      shell: bash
+      run: patch -p1 < $GITHUB_ACTION_PATH/include_cstdint.patch
 
       # OpenVDB_CMAKE_PATH is required because of
       # https://github.com/AcademySoftwareFoundation/openvdb/issues/1160 and

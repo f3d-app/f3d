@@ -101,8 +101,8 @@ engine::engine(
   this->Internals->Scene =
     std::make_unique<detail::scene_impl>(*this->Internals->Options, *this->Internals->Window);
 
-  // Do not create an interactor for NONE or EXTERNAL
-  if (windowType != window::Type::NONE && windowType != window::Type::EXTERNAL)
+  // Do not create an interactor for NONE
+  if (windowType != window::Type::NONE)
   {
     this->Internals->Interactor = std::make_unique<detail::interactor_impl>(
       *this->Internals->Options, *this->Internals->Window, *this->Internals->Scene);
@@ -497,7 +497,7 @@ std::vector<engine::readerInformation> engine::getReadersInfo()
 {
   std::vector<readerInformation> readersInfo;
   const auto& plugins = factory::instance()->getPlugins();
-  for (const auto& plugin : plugins)
+  for (const auto* plugin : plugins)
   {
     for (const auto& reader : plugin->getReaders())
     {

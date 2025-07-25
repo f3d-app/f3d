@@ -82,7 +82,7 @@ The GCC flag `-latomic` is not being added automatically with specific architect
 - If they are working, then it is an issue specific to your file manager (see below for a potential work around).
 - If only a few format have working thumbnails, then it is an issue with the mime types database.
 - If no formats have working thumbnails, then it is can be an issue with sandboxing or with the `f3d-plugin-xxx.thumbnailer` files.
-- If only big file do not have thumbnails, this is intended, you can modify this behavior in the `thumbnail.d/05_all.json` configuration folder using the `max-size` option.
+- If only big file do not have thumbnails, this is intended, you can modify this behavior in the `thumbnail.d/05_all.json` configuration directory using the `max-size` option.
 
 > `--rendering-backend` CLI option is not working as expected
 
@@ -113,7 +113,7 @@ OpenGL applications like F3D can have issues when launched from Windows Server o
 You can try to use a software implementation of OpenGL, called [Mesa](https://github.com/pal1000/mesa-dist-win/releases).
 
 - Download the latest `release-msvc`.
-- copy `x64/opengl32.dll`, `libgallium_wgl.dll` and `x64/libglapi.dll` in the same folder as `f3d.exe`.
+- copy `x64/opengl32.dll`, `libgallium_wgl.dll` and `x64/libglapi.dll` in the same directory as `f3d.exe`.
 - set the environment variable `MESA_GL_VERSION_OVERRIDE` to 4.5.
 - run `f3d.exe`.
 

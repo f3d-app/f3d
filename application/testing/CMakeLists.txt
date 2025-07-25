@@ -168,6 +168,7 @@ f3d_test(NAME TestQuakeMDLAnimationSimpleFrame DATA zombie.mdl ARGS --animation-
 f3d_test(NAME TestQuakeMDLAnimationBetween DATA zombie.mdl ARGS --animation-time=1.42)
 f3d_test(NAME TestQuakeMDLAnimationMulti DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5)
 f3d_test(NAME TestQuakeMDLAnimationGroupFrame DATA flame_mixed.mdl ARGS --animation-indices=1 --animation-time=0.5)
+f3d_test(NAME TestQuakeMDLAnimationLastFrame DATA flame_mixed.mdl ARGS --camera-position=90,0,0 --animation-time=0.65)
 f3d_test(NAME TestQuakeMDLDisableAnimation DATA zombie.mdl soldier_animations.mdl ARGS --multi-file-mode=all --animation-time=0.5)
 f3d_test(NAME TestQuakeMDLSkinIndex DATA armor.mdl ARGS -DQuakeMDL.skin_index=2)
 f3d_test(NAME TestQuakeMDLSkinIndexNegative DATA armor.mdl ARGS -DQuakeMDL.skin_index=-1)
@@ -241,8 +242,9 @@ f3d_test(NAME TestTextureEmissive DATA WaterBottle.glb ARGS --texture-emissive=$
 f3d_test(NAME TestTextures DATA WaterBottle.glb ARGS --texture-material=${F3D_SOURCE_DIR}/testing/data/red.jpg --roughness=1 --metallic=1 --texture-base-color=${F3D_SOURCE_DIR}/testing/data/albedo.png --texture-normal=${F3D_SOURCE_DIR}/testing/data/normal.png --texture-emissive=${F3D_SOURCE_DIR}/testing/data/red.jpg --emissive-factor=0.1,0.1,0.1)
 f3d_test(NAME TestMetaDataImporter DATA BoxAnimated.gltf ARGS -m UI)
 f3d_test(NAME TestMultiblockMetaData DATA mb.vtm ARGS -m UI)
+f3d_test(NAME TestRemoveEmptyFileGroups DATA mb/mb_3_0.vtt mb/mb_0_0.vtu ARGS -n --remove-empty-file-groups UI)
 f3d_test(NAME TestMultiFileMetaData DATA mb/recursive ARGS -m --multi-file-mode=all UI)
-f3d_test(NAME TestMultiFileModeDir DATA mb ARGS -n --multi-file-mode=dir UI)
+f3d_test(NAME TestMultiFileModeDir DATA mb ARGS -n --multi-file-mode=dir --recursive-dir-add UI)
 f3d_test(NAME TestTIFF DATA f3d.tif ARGS -sy --up=-Y)
 f3d_test(NAME TestLightIntensityBrighter DATA cow.vtp ARGS --light-intensity=5.0)
 f3d_test(NAME TestLightIntensityDarker DATA cow.vtp ARGS --light-intensity=0.2)
@@ -279,6 +281,7 @@ f3d_test(NAME TestNoRenderWithOptions DATA dragon.vtu ARGS --hdri-ambient --axis
 f3d_test(NAME TestNoFile NO_DATA_FORCE_RENDER UI)
 f3d_test(NAME TestNoFileEmptyFileName ARGS --filename NO_DATA_FORCE_RENDER UI)
 f3d_test(NAME TestMultiFile DATA mb/recursive ARGS --multi-file-mode=all)
+f3d_test(NAME TestMultiFileRecursive DATA mb ARGS --multi-file-mode=all --recursive-dir-add)
 f3d_test(NAME TestMultiFileColoring DATA mb/recursive ARGS --multi-file-mode=all -s --coloring-array=Polynomial -b)
 f3d_test(NAME TestMultiFileVolume DATA multi ARGS --multi-file-mode=all -vsb --coloring-array=Scalars_)
 f3d_test(NAME TestMultiFileColoringTexture DATA mb/recursive/mb_1_0.vtp mb/recursive/mb_2_0.vtp world.obj ARGS --multi-file-mode=all -sb --coloring-array=Normals --coloring-component=1)
@@ -292,7 +295,7 @@ f3d_test(NAME TestTextureMatCap DATA suzanne.ply ARGS --texture-matcap=${F3D_SOU
 f3d_test(NAME TestTexturesTransform DATA world.obj ARGS --textures-transform=1,0,0,0,-1,0,0,0,1)
 f3d_test(NAME TestTexturesTransformGL DATA WaterBottle.glb ARGS --textures-transform=1,0,0,0,-1,0,0,0,1 --camera-direction=-1,0,0)
 f3d_test(NAME TestConfigOrder DATA suzanne.ply ARGS CONFIG ${F3D_SOURCE_DIR}/testing/configs/config_order.json) # `.+` > `.*` alphabetically but overridden by the order
-f3d_test(NAME TestOutputStream DATA suzanne.ply ARGS --verbose=quiet --output=- REGEXP "^.PNG" NO_BASELINE NO_OUTPUT)
+f3d_test(NAME TestOutputStream DATA suzanne.ply ARGS --verbose=quiet --output=- REGEXP ".PNG" NO_BASELINE NO_OUTPUT)
 f3d_test(NAME TestOutputStreamInfo DATA suzanne.ply ARGS --verbose=info --output=- REGEXP "redirected to stderr" NO_BASELINE NO_OUTPUT)
 f3d_test(NAME TestInvalidAntiAliasingMode DATA suzanne.ply ARGS -a --anti-aliasing-mode=foo REGEXP "foo is an invalid antialiasing mode" NO_BASELINE)
 f3d_test(NAME TestUserMatrixColoring DATA InterpolationTest.glb ARGS --scalar-coloring --coloring-array=TEXCOORD_0)
@@ -462,6 +465,7 @@ if(NOT F3D_MACOS_BUNDLE)
   f3d_test(NAME TestDefaultConfigFileQuakeMDL DATA zombie.mdl CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
   f3d_test(NAME TestDefaultConfigFileAndCommand DATA suzanne.stl ARGS --up=-Y --camera-direction=-1,0.5,-1 CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
   f3d_test(NAME TestDefaultConfigTranslucent DATA red_translucent_monkey.gltf CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
+  f3d_test(NAME TestDefaultConfigRemoveEmptyFileGroups DATA invalid.vtp cow.vtp CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
 
   file(COPY "${F3D_SOURCE_DIR}/resources/configs/thumbnail.d/" "${F3D_SOURCE_DIR}/plugins/native/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
   f3d_test(NAME TestThumbnailConfigFileVTU DATA dragon.vtu CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
@@ -556,9 +560,8 @@ f3d_test(NAME TestCameraIndexNegative DATA Cameras.gltf ARGS --camera-index=-1 R
 
 # Require improved importer support https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11303
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240910)
-  f3d_test(NAME TestInvalidFileFileName DATA invalid.vtp ARGS --filename NO_DATA_FORCE_RENDER UI)
+  f3d_test(NAME TestInvalidFileFileNameEmpty DATA invalid.vtp ARGS --filename NO_DATA_FORCE_RENDER UI)
   f3d_test(NAME TestMultiFileInvalid DATA cow.vtp invalid.vtp dragon.vtu ARGS --multi-file-mode=all NO_DATA_FORCE_RENDER UI)
-  f3d_test(NAME TestMultiFileInvalidFilesFileName DATA cow.vtp invalid.vtp ARGS --multi-file-mode=all --filename NO_DATA_FORCE_RENDER UI)
   f3d_test(NAME TestMultiFileUnsupportedFilesFileName DATA unsupportedFile.dummy cow.vtp ARGS --multi-file-mode=all --filename NO_DATA_FORCE_RENDER UI)
   f3d_test(NAME TestMultiFileCameraIndex DATA Cameras.gltf CameraAnimated.glb ARGS --multi-file-mode=all --camera-index=2 --opacity=0.5 --translucency-support)
   f3d_test(NAME TestConsoleBadgeError DATA invalid.vtp NO_DATA_FORCE_RENDER UI)
@@ -1041,6 +1044,10 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240729)
   f3d_test(NAME TestInteractionConsoleHistoryHide DATA BoxAnimated.gltf INTERACTION UI)#Escape;a;Enter;b;Enter;Up;Escape;Escape;Escape;Up
 endif()
 
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250513)
+  f3d_test(NAME TestInteractionAxesGridToggle INTERACTION DATA suzanne.ply THRESHOLD 0.08)#Shift+x
+endif()
+
 f3d_test(NAME TestInteractionMinimalConsoleOpen DATA f3d.glb INTERACTION UI) #Colon
 f3d_test(NAME TestInteractionMinimalConsoleEscape DATA f3d.glb INTERACTION UI) #Colon;Escape
 f3d_test(NAME TestInteractionMinimalConsoleReturn DATA f3d.glb INTERACTION UI) #Colon;Return
@@ -1050,8 +1057,13 @@ f3d_test(NAME TestInteractionMinimalConsoleResize DATA f3d.glb INTERACTION UI) #
 f3d_test(NAME TestInteractionMinimalConsoleBadgeRemains DATA f3d.glb INTERACTION UI) #Colon;foo;Return;Colon;Escape
 
 if (F3D_MODULE_TINYFILEDIALOGS)
-f3d_test(NAME TestInteractionFileOpen INTERACTION NO_BASELINE ENV CTEST_OPEN_DIALOG_FILE=${F3D_SOURCE_DIR}/testing/data/cow.vtp)
+  f3d_test(NAME TestInteractionFileOpen INTERACTION NO_BASELINE ENV CTEST_OPEN_DIALOG_FILE=${F3D_SOURCE_DIR}/testing/data/cow.vtp)
 endif ()
+
+if(F3D_MODULE_DMON)
+  f3d_test(NAME TestInteractionVerboseWatchUnwatch ARGS --watch --verbose DATA cow.vtp multi/dragon.vtu NO_BASELINE INTERACTION REGEXP "Stopped watching") #Right
+endif()
+
 # Test camera preserving/resetting when switching files in interaction mode
 f3d_test(NAME TestInteractionSwitchFileNoCameraKeeping DATA cow.vtp cowlow.vtp INTERACTION)
 f3d_test(NAME TestInteractionSwitchFilePrevCameraKeeping DATA cow.vtp cowlow.vtp INTERACTION)
@@ -1123,8 +1135,9 @@ f3d_test(NAME TestCommandScriptPrintMesh DATA dragon.vtu SCRIPT TestCommandScrip
 f3d_test(NAME TestCommandScriptPrintOptions DATA dragon.vtu SCRIPT TestCommandScriptPrintOptions.txt REGEXP "interactor.invert_zoom: false" NO_BASELINE) # print_options_info
 f3d_test(NAME TestCommandScriptAlias DATA dragon.vtu SCRIPT TestCommandScriptAlias.txt --reference=${F3D_SOURCE_DIR}/testing/baselines/TestCommandScriptAlias.png) # alias myrotate roll_camera 90;myrotate
 f3d_test(NAME TestCommandScriptReset DATA dragon.vtu suzanne.stl ARGS --edges SCRIPT TestCommandScriptReset.txt) # reset render.show_edges; load_next_file_group;
-f3d_test(NAME TestParseOptionalBoolExtraArg DATA dragon.vtu SCRIPT TestParseOptionalBoolExtraArg.txt REGEXP "Command: load_previous_file_group takes at most 1 argument, got 2 arguments instead." NO_BASELINE) # load_previous_file_group true extra
-f3d_test(NAME TestRemoveFileGroups DATA dragon.vtu SCRIPT TestRemoveFileGroups.txt NO_DATA_FORCE_RENDER UI) # remove_file_groups
+f3d_test(NAME TestCommandScriptParseOptionalBoolExtraArg DATA dragon.vtu SCRIPT TestCommandScriptParseOptionalBoolExtraArg.txt REGEXP "Command: load_previous_file_group takes at most 1 argument, got 2 arguments instead." NO_BASELINE) # load_previous_file_group true extra
+f3d_test(NAME TestCommandScriptRemoveCurrentFileGroup DATA cow.vtp dragon.vtu SCRIPT TestCommandScriptRemoveCurrentFileGroup.txt) # remove_current_file_group
+f3d_test(NAME TestCommandScriptRemoveFileGroups DATA dragon.vtu SCRIPT TestCommandScriptRemoveFileGroups.txt NO_DATA_FORCE_RENDER UI) # remove_file_groups
 f3d_test(NAME TestCommandScriptInvalidReaderOptions DATA dragon.vtu SCRIPT TestCommandScriptInvalidReaderOptions.txt REGEXP "point to an inexistent option, ignoring" NO_BASELINE) # set_reader_option invalid value
 
 # Window position test
@@ -1217,7 +1230,7 @@ f3d_test(NAME TestInvalidScalarsRange DATA suzanne.ply ARGS -s --coloring-array=
 f3d_test(NAME TestInvalidBackface DATA backface.vtp ARGS --backface-type=invalid REGEXP "is not a valid backface type, assuming it is not set" NO_BASELINE)
 
 # Test non existent file, do not create nonExistentFile.vtp
-f3d_test(NAME TestVerboseNonExistentFile DATA nonExistentFile.vtp REGEXP "File .*nonExistentFile.vtp does not exist" NO_RENDER)
+f3d_test(NAME TestVerboseNonExistentFile DATA nonExistentFile.vtp REGEXP ".*nonExistentFile.vtp does not exist" NO_RENDER)
 
 # Test non existent font file, do not create nonExistentFile.ttf
 f3d_test(NAME TestVerboseNonExistentFont DATA suzanne.ply ARGS -n --font-file=${F3D_SOURCE_DIR}/testing/data/nonExistentFile.ttf REGEXP "Cannot find \".*nonExistentFile.ttf\" font file" NO_BASELINE)

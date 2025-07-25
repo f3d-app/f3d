@@ -13,6 +13,7 @@
 #include <cassert>
 #include <filesystem>
 #include <iomanip>
+#include <numeric>
 #include <set>
 #include <sstream>
 
@@ -85,6 +86,8 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "loading-progress", "", "Show loading progress bar", "<bool>", "1" },
       { "animation-progress", "", "Show animation progress bar", "<bool>", "1" },
       { "multi-file-mode", "", R"(Choose the behavior when opening multiple files. "single" will show one file at a time, "all" will show all files in a single scene, "dir" will show files from the same directory in the same scene.)", "<single|all|dir>", "" },
+      { "recursive-dir-add", "", "Add directories recursively", "<bool>", "1" },
+      { "remove-empty-file-groups", "", "Remove file groups that results into an empty scene", "<bool>", "1" },
       { "up", "", "Up direction", "<direction>", "" },
       { "axis", "x", "Show axes", "<bool>", "1" }, { "grid", "g", "Show grid", "<bool>", "1" },
       { "grid-absolute", "", "Position grid at the absolute origin instead of below the model", "<bool>", "1" },
@@ -217,13 +220,9 @@ void PrintHelp(const std::string& execName, const cxxopts::Options& cxxOptions)
   }};
 
   f3d::log::setUseColoring(false);
-  std::vector<std::string> orderedCLIGroupNames;
-  orderedCLIGroupNames.reserve(::CLIOptions.size());
-  for (const ::CLIGroup& optionGroup : ::CLIOptions)
-  {
-    // This ensure help is provided in the expected group order
-    orderedCLIGroupNames.emplace_back(optionGroup.GroupName);
-  }
+  std::vector<std::string> orderedCLIGroupNames(CLIOptions.size());
+  std::transform(CLIOptions.cbegin(), CLIOptions.cend(), orderedCLIGroupNames.begin(),
+    [](const ::CLIGroup& cliGroup) { return cliGroup.GroupName; });
   f3d::log::info(cxxOptions.help(orderedCLIGroupNames));
   f3d::log::info("\nExamples:");
   for (const auto& [cmd, desc] : examples)
@@ -318,14 +317,10 @@ void PrintReadersList()
     descColSize = std::max(descColSize, reader.Description.length());
     plugColSize = std::max(plugColSize, reader.PluginName.length());
 
-    for (const auto& ext : reader.Extensions)
-    {
-      extsColSize = std::max(extsColSize, ext.length());
-    }
-    for (const auto& mime : reader.MimeTypes)
-    {
-      mimeColSize = std::max(mimeColSize, mime.length());
-    }
+    extsColSize = std::accumulate(reader.Extensions.cbegin(), reader.Extensions.cend(), extsColSize,
+      [](size_t size, const auto& ext) { return std::max(size, ext.length()); });
+    mimeColSize = std::accumulate(reader.MimeTypes.cbegin(), reader.MimeTypes.cend(), mimeColSize,
+      [](size_t size, const auto& mime) { return std::max(size, mime.length()); });
   }
   const size_t colGap = 4;
   nameColSize += colGap;

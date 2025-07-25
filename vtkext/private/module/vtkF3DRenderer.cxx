@@ -1327,17 +1327,6 @@ void vtkF3DRenderer::ConfigureHDRISkybox()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureTextActors()
 {
-  // Dynamic text color
-  double textColor[3];
-  if (this->IsBackgroundDark())
-  {
-    textColor[0] = textColor[1] = textColor[2] = 0.9;
-  }
-  else
-  {
-    textColor[0] = textColor[1] = textColor[2] = 0.2;
-  }
-
   // Font
   std::string fontFileStr;
   if (this->FontFile.has_value())
@@ -1914,14 +1903,6 @@ int vtkF3DRenderer::UpdateLights()
 }
 
 //----------------------------------------------------------------------------
-bool vtkF3DRenderer::IsBackgroundDark()
-{
-  double luminance =
-    0.299 * this->Background[0] + 0.587 * this->Background[1] + 0.114 * this->Background[2];
-  return this->HDRISkyboxVisible ? true : luminance < 0.5;
-}
-
-//----------------------------------------------------------------------------
 void vtkF3DRenderer::CreateCacheDirectory()
 {
   assert(this->HasValidHDRIHash);
@@ -2174,7 +2155,7 @@ void vtkF3DRenderer::ConfigureActorsProperties()
     if (this->TexturesTransform.has_value())
     {
       const std::vector<double> texTransform = this->TexturesTransform.value();
-      double transform[] = {                                    //
+      const double transform[] = {                              //
         texTransform[0], texTransform[1], texTransform[2], 0.0, //
         texTransform[3], texTransform[4], texTransform[5], 0.0, //
         texTransform[6], texTransform[7], texTransform[8], 0.0, //

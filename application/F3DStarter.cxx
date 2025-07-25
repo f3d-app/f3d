@@ -94,6 +94,8 @@ public:
     std::string ScreenshotFilename;
     std::string VerboseLevel;
     std::string MultiFileMode;
+    bool RecursiveDirAdd;
+    bool RemoveEmptyFileGroups;
     std::vector<int> Resolution;
     std::vector<int> Position;
     std::string ColorMapFile;
@@ -243,10 +245,10 @@ public:
     dmon_watch_id, dmon_action, const char*, const char* filename, const char*, void* userData)
   {
     F3DStarter* self = reinterpret_cast<F3DStarter*>(userData);
-    const std::lock_guard<std::mutex> lock(self->Internals->LoadedFilesMutex);
-    if (std::find_if(self->Internals->LoadedFiles.begin(), self->Internals->LoadedFiles.end(),
+    const std::lock_guard<std::mutex> lock(self->Internals->FilesToWatchMutex);
+    if (std::find_if(self->Internals->FilesToWatch.begin(), self->Internals->FilesToWatch.end(),
           [&](const auto& path)
-          { return path.filename() == filename; }) != self->Internals->LoadedFiles.end())
+          { return path.filename() == filename; }) != self->Internals->FilesToWatch.end())
     {
       self->Internals->ReloadFileRequested = true;
     }
@@ -744,6 +746,9 @@ public:
     this->ParseOption(appOptions, "screenshot-filename", this->AppOptions.ScreenshotFilename);
     this->ParseOption(appOptions, "verbose", this->AppOptions.VerboseLevel);
     this->ParseOption(appOptions, "multi-file-mode", this->AppOptions.MultiFileMode);
+    this->ParseOption(appOptions, "recursive-dir-add", this->AppOptions.RecursiveDirAdd);
+    this->ParseOption(
+      appOptions, "remove-empty-file-groups", this->AppOptions.RemoveEmptyFileGroups);
     this->ParseOption(appOptions, "resolution", this->AppOptions.Resolution);
     this->ParseOption(appOptions, "position", this->AppOptions.Position);
     this->ParseOption(appOptions, "colormap-file", this->AppOptions.ColorMapFile);
@@ -910,17 +915,14 @@ public:
     }
   }
 
-  // Recover a vector of unique parent paths from a vector of paths
-  static std::vector<fs::path> ParentPaths(const std::vector<fs::path>& paths)
+  // Recover a set of parent paths from paths
+  template<typename T>
+  static std::set<fs::path> ParentPaths(const T& paths)
   {
-    std::vector<fs::path> parents;
+    std::set<fs::path> parents;
     for (const auto& tmpPath : paths)
     {
-      fs::path parentPath = tmpPath.parent_path();
-      if (std::find(parents.begin(), parents.end(), tmpPath) == parents.end())
-      {
-        parents.emplace_back(parentPath);
-      }
+      parents.insert(tmpPath.parent_path());
     }
     return parents;
   }
@@ -944,12 +946,13 @@ public:
   std::unique_ptr<f3d::engine> Engine;
   std::vector<std::pair<std::string, std::vector<fs::path>>> FilesGroups;
   std::vector<fs::path> LoadedFiles;
+  std::set<fs::path> FilesToWatch;
   int CurrentFilesGroupIndex = -1;
 
 #if F3D_MODULE_DMON
   // dmon related
-  std::mutex LoadedFilesMutex;
-  std::vector<dmon_watch_id> FolderWatchIds;
+  std::mutex FilesToWatchMutex;
+  std::map<fs::path, dmon_watch_id> FolderWatchIds;
 #endif
 
   // Event loop atomics
@@ -1420,17 +1423,24 @@ void F3DStarter::LoadFileGroup(int index, bool relativeIndex, bool forceClear)
     // XXX: Each group contains at least one path
     std::string groupIdx = "(" + std::to_string(groupIndex + 1) + "/" +
       std::to_string(this->Internals->FilesGroups.size()) + ")";
-    this->LoadFileGroup(this->Internals->FilesGroups[groupIndex].second, clear, groupIdx);
+    this->LoadFileGroupInternal(this->Internals->FilesGroups[groupIndex].second, clear, groupIdx);
+
+    if (this->Internals->AppOptions.RemoveEmptyFileGroups && this->Internals->LoadedFiles.empty())
+    {
+      this->Internals->FilesGroups.erase(
+        this->Internals->FilesGroups.begin() + this->Internals->CurrentFilesGroupIndex);
+      this->LoadRelativeFileGroup(0, false, true);
+    }
   }
   else
   {
     this->Internals->CurrentFilesGroupIndex = groupIndex;
-    this->LoadFileGroup(std::vector<fs::path>{}, true, "");
+    this->LoadFileGroupInternal(std::vector<fs::path>{}, true, "");
   }
 }
 
 //----------------------------------------------------------------------------
-void F3DStarter::LoadFileGroup(
+void F3DStarter::LoadFileGroupInternal(
   const std::vector<fs::path>& paths, bool clear, const std::string& groupIdx)
 {
   // Make sure the animation is stopped before trying to load any file
@@ -1487,20 +1497,20 @@ void F3DStarter::LoadFileGroup(
   // Recover file information
   f3d::scene& scene = this->Internals->Engine->getScene();
   bool unsupported = false;
-  bool invalid = false;
 
   std::vector<fs::path> localPaths;
   try
   {
 #if F3D_MODULE_DMON
     // In the main thread, we only need to guard writing
-    const std::lock_guard<std::mutex> lock(this->Internals->LoadedFilesMutex);
+    const std::lock_guard<std::mutex> lock(this->Internals->FilesToWatchMutex);
 #endif
 
     if (clear)
     {
       scene.clear();
       this->Internals->LoadedFiles.clear();
+      this->Internals->FilesToWatch.clear();
     }
 
     if (paths.empty())
@@ -1535,34 +1545,52 @@ void F3DStarter::LoadFileGroup(
         if (std::find(this->Internals->LoadedFiles.begin(), this->Internals->LoadedFiles.end(),
               tmpPath) == this->Internals->LoadedFiles.end())
         {
-          if (scene.supports(tmpPath))
+          // Always add files to the watch set
+          if (this->Internals->AppOptions.Watch)
           {
-            // Check the size of the file before loading it
-            static constexpr int BYTES_IN_MIB = 1048576;
-            if (this->Internals->AppOptions.MaxSize.has_value() &&
-              fs::file_size(tmpPath) >
-                static_cast<std::uintmax_t>(
-                  this->Internals->AppOptions.MaxSize.value() * BYTES_IN_MIB))
+            this->Internals->FilesToWatch.insert(tmpPath);
+          }
+
+          try
+          {
+            if (!fs::exists(tmpPath))
             {
-              f3d::log::info(tmpPath.string(), " skipped, file is bigger than max size");
+              f3d::log::error(tmpPath.string(), " does not exist");
+            }
+            else if (scene.supports(tmpPath))
+            {
+              // Check the size of the file before loading it
+              static constexpr int BYTES_IN_MIB = 1048576;
+              if (this->Internals->AppOptions.MaxSize.has_value() &&
+                fs::file_size(tmpPath) >
+                  static_cast<std::uintmax_t>(
+                    this->Internals->AppOptions.MaxSize.value() * BYTES_IN_MIB))
+              {
+                f3d::log::info(tmpPath.string(), " skipped, file is bigger than max size");
+              }
+              else
+              {
+                localPaths.emplace_back(tmpPath);
+              }
             }
             else
             {
-              localPaths.emplace_back(tmpPath);
+              auto forceReader = this->Internals->LibOptions.scene.force_reader;
+              if (forceReader)
+              {
+                f3d::log::warn("Forced reader ", *forceReader, " doesn't exist");
+              }
+              else
+              {
+                f3d::log::warn(tmpPath.string(), " is not a file of a supported file format");
+              }
+              unsupported = true;
             }
           }
-          else
+          catch (const fs::filesystem_error& ex)
           {
-            auto forceReader = this->Internals->LibOptions.scene.force_reader;
-            if (forceReader)
-            {
-              f3d::log::warn("Forced reader ", *forceReader, " doesn't exist");
-            }
-            else
-            {
-              f3d::log::warn(tmpPath.string(), " is not a file of a supported file format");
-            }
-            unsupported = true;
+            // Unreachable
+            f3d::log::error("Error loading file: ", ex.what());
           }
         }
       }
@@ -1592,13 +1620,12 @@ void F3DStarter::LoadFileGroup(
     {
       f3d::log::error("  ", tmpPath.string());
     }
-    invalid = true;
   }
 
   std::string filenameInfo;
-  if (this->Internals->LoadedFiles.size() > 0)
+  if (!this->Internals->LoadedFiles.empty())
   {
-    // Loaded files, create a filename info like this:
+    // Scene is not empty, create a filename info like this:
     // "(1/5) cow.vtp + N [+UNSUPPORTED]"
     filenameInfo = groupIdx + " " + this->Internals->LoadedFiles.at(0).filename().string();
     if (this->Internals->LoadedFiles.size() > 1)
@@ -1609,44 +1636,51 @@ void F3DStarter::LoadFileGroup(
     {
       filenameInfo += " [+UNSUPPORTED]";
     }
+  }
+  else if (!groupIdx.empty())
+  {
+    // Scene is empty but groupIdx were not, create a filename info like this:
+    // "(1/5) [EMPTY]"
+    filenameInfo = groupIdx + " [EMPTY]";
+  }
 
 #if F3D_MODULE_DMON
-    // Update dmon watch logic
-    if (this->Internals->AppOptions.Watch)
-    {
-      // Always unwatch and watch current folder, even on reload
-      for (const auto& dmonId : this->Internals->FolderWatchIds)
-      {
-        if (dmonId.id > 0)
-        {
-          dmon_unwatch(dmonId);
-        }
-      }
-      this->Internals->FolderWatchIds.clear();
+  // Update dmon watch logic
+  if (this->Internals->AppOptions.Watch)
+  {
+    // Recover all parents paths in a set
+    std::set<fs::path> parentPaths = F3DInternals::ParentPaths(this->Internals->FilesToWatch);
 
-      for (const auto& parentPath : F3DInternals::ParentPaths(this->Internals->LoadedFiles))
+    // Unwatch and erase paths that should not be watched anymore
+    for (auto it = this->Internals->FolderWatchIds.begin();
+         it != this->Internals->FolderWatchIds.end();)
+    {
+      const fs::path& path = it->first;
+      const dmon_watch_id& dmonId = it->second;
+      if (dmonId.id > 0 && parentPaths.count(path) == 0)
       {
-        this->Internals->FolderWatchIds.emplace_back(
+        f3d::log::debug("Stopped watching: ", path.string());
+        dmon_unwatch(dmonId);
+        it = this->Internals->FolderWatchIds.erase(it);
+      }
+      else
+      {
+        it++;
+      }
+    }
+
+    // Watch any not yet watched paths
+    for (const auto& parentPath : parentPaths)
+    {
+      if (this->Internals->FolderWatchIds.count(parentPath) == 0)
+      {
+        f3d::log::debug("Started watching: ", parentPath.string());
+        this->Internals->FolderWatchIds.emplace(parentPath,
           dmon_watch(parentPath.string().c_str(), &F3DInternals::dmonFolderChanged, 0, this));
       }
     }
+  }
 #endif
-  }
-  else
-  {
-    // No files loaded, create a simple filename info like this:
-    // (1/5) cow.vtt [UNSUPPORTED]/[INVALID]
-    // (1/1) cow.vtt [+UNSUPPORTED]/[+INVALID]
-    if (unsupported || invalid)
-    {
-      filenameInfo = groupIdx + " " + paths.at(0).filename().string() + " [";
-      if (paths.size() > 1)
-      {
-        filenameInfo += "+";
-      }
-      filenameInfo += invalid ? "INVALID]" : "UNSUPPORTED]";
-    }
-  }
 
   if (!this->Internals->AppOptions.NoRender)
   {
@@ -1735,23 +1769,19 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
 {
   try
   {
-    // Check file exists
     auto tmpPath = fs::absolute(path);
-    if (!fs::exists(tmpPath))
-    {
-      if (!quiet)
-      {
-        f3d::log::error("File ", tmpPath.string(), " does not exist");
-      }
-      return -1;
-    }
-    // If file is a folder, add files recursively
-    else if (fs::is_directory(tmpPath))
+
+    // If file is a directory, add files recursively
+    if (fs::is_directory(tmpPath))
     {
       std::set<fs::path> sortedPaths;
       for (const auto& entry : fs::directory_iterator(tmpPath))
       {
-        sortedPaths.insert(entry.path());
+        if (entry.is_regular_file() ||
+          (this->Internals->AppOptions.RecursiveDirAdd && entry.is_directory()))
+        {
+          sortedPaths.insert(entry.path());
+        }
       }
       for (const auto& entryPath : sortedPaths)
       {
@@ -1866,6 +1896,21 @@ void F3DStarter::AddCommands()
     // parsing_exception is caught within interactor implementation
     return f3d::options::parse<bool>(args[0]);
   };
+
+  interactor.addCommand("remove_current_file_group",
+    [this](const std::vector<std::string>&)
+    {
+      if (this->Internals->CurrentFilesGroupIndex >= 0)
+      {
+        if (!this->Internals->AppOptions.NoRender)
+        {
+          this->Internals->Engine->getInteractor().stopAnimation();
+        }
+        this->Internals->FilesGroups.erase(
+          this->Internals->FilesGroups.begin() + this->Internals->CurrentFilesGroupIndex);
+        this->LoadRelativeFileGroup(0, false, true);
+      }
+    });
 
   interactor.addCommand("remove_file_groups",
     [this](const std::vector<std::string>&)

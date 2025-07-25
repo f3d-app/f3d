@@ -153,7 +153,7 @@ protected:
   {
     const std::string line = message.empty() ? label : (label + ": " + message);
     const std::string icon = success ? u8"\u2714" : u8"\u2718";
-    (success ? std::cout : std::cerr) << icon << " " << line << std::endl;
+    (success ? std::cout : std::cerr) << icon << " " << line << "\n";
   }
 
 private:
