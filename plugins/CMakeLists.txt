@@ -5,6 +5,7 @@ option(F3D_PLUGIN_BUILD_HDF "HDF plugin (VTKHDF and EX2 files)" ON)
 option(F3D_PLUGIN_BUILD_OCCT "OpenCASCADE plugin (STEP and IGES files)" OFF)
 option(F3D_PLUGIN_BUILD_USD "Universal Scene Description plugin (USD files)" OFF)
 option(F3D_PLUGIN_BUILD_VDB "VDB plugin, using OpenVDB (VDB files)" OFF)
+option(F3D_PLUGIN_BUILD_PDAL "PDAL plugin, using PDAL (e57 files)" OFF)
 
 add_subdirectory(native)
 
@@ -38,5 +39,14 @@ if (F3D_PLUGIN_BUILD_VDB)
     add_subdirectory(vdb)
   else ()
     message(FATAL_ERROR "VDB plugin requires VTK >= 9.2.20220714")
+  endif()
+endif()
+
+if (F3D_PLUGIN_BUILD_PDAL)
+  # PDAL plugin needs vtkPDALReader: https://gitlab.kitware.com/vtk/vtk/-/merge_requests/3491
+  if(VTK_VERSION VERSION_GREATER_EQUAL 8.1.0)
+    add_subdirectory(pdal)
+  else ()
+    message(FATAL_ERROR "PDAL plugin requires VTK >= 8.1.0")
   endif()
 endif()
