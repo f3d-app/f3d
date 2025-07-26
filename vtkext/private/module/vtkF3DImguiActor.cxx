@@ -391,11 +391,12 @@ void vtkF3DImguiActor::RenderDropZone()
     /* Use background draw list to prevent "ignoring" NoBringToFrontOnFocus */
     ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
 
+    // logo height
+    float logoDisplayHeight = LOGO_DISPLAY_HEIGHT;
     if (this->DropZoneLogoVisible && this->Pimpl->LogoTexture)
     {
-      // Logo size
+      // Logo width
       float logoDisplayWidth = LOGO_DISPLAY_WIDTH;
-      float logoDisplayHeight = LOGO_DISPLAY_HEIGHT;
 
       // Calculate logo position (centered)
       ImVec2 center = viewport->GetWorkCenter();
