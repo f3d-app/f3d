@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 #include <iostream>
 
 int TestSDKOptions(int argc, char* argv[])
@@ -226,6 +227,11 @@ int TestSDKOptions(int argc, char* argv[])
         0.1 * -std::sin(TestSDKHelpers::Degrees2Radians(60.0)), 0.51,
         0.1 * std::sin(TestSDKHelpers::Degrees2Radians(60.0)),
         0.1 * std::cos(TestSDKHelpers::Degrees2Radians(60.0)), 2.1, 0, 0, 1 });
+
+  test.expect<f3d::type_construction_exception>("transform2d_t invalid NaN angle", [&]() {
+    f3d::transform2d_t(f3d::double_array_t<2>(std::vector<double>(2, 1)),
+      f3d::double_array_t<2>(std::vector<double>(2, 0)), std::nan(""));
+  });
 
   // Test closest option
   auto closest = opt.getClosestOption("modle.sciivs.cell");

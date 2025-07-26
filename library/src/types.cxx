@@ -4,7 +4,9 @@
 
 #include <algorithm>
 #include <cmath>
+#include <iostream>
 #include <numeric>
+#include <string>
 
 namespace f3d
 {
@@ -60,23 +62,22 @@ std::pair<bool, std::string> mesh_t::isValid() const
   return { true, {} };
 }
 
-// clang-format off
-  /**
-   *  The general form of a 3x3 transformation matrix M with scale S(x,y),
-   *  translation T(x,y), and angle a (in degrees), is solved out to the following:
-   * 
-   *      [cos(a)*S(x), -sin(a)*S(y),   T(x)]
-   *  M = [sin(a)*S(x), cos(a)*S(y),    T(y)]
-   *      [0,           0,              1   ]
-   * 
-   *  Using this formula, we fill each cell using the values in the constructor
-   */
-// clang-format on
-
-transform2d_t::transform2d_t(
+// see function explanation in types.h for explanation of logic
+//----------------------------------------------------------------------------
+F3D_EXPORT transform2d_t::transform2d_t(
   const double_array_t<2>& scale, const double_array_t<2>& translate, const angle_deg_t& angle)
 {
-  double angleRad = vtkMath::RadiansFromDegrees(angle);
+  double angleRad;
+  if (std::isnan(angle))
+  {
+    throw f3d::type_construction_exception(
+      "Invalid angle value passed into transform2d constructor: " + std::to_string(angle));
+  }
+  else
+  {
+    angleRad = vtkMath::RadiansFromDegrees(angle);
+  }
+
   double sinA = std::sin(angleRad);
   double cosA = std::cos(angleRad);
 
