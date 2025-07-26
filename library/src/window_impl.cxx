@@ -419,6 +419,7 @@ void window_impl::UpdateDynamicOptions()
   F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
   if (!opt.ui.dropzone_info.empty())
   {
+    log::warn("'ui.dropzone_info' is deprecated. Please Use 'ui.drop_zone.info' instead.");
     renderer->SetDropZoneInfo(opt.ui.dropzone_info);
   }
   if (opt.ui.dropzone)

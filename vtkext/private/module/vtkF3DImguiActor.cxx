@@ -31,6 +31,10 @@
 
 #include <optional>
 
+constexpr float LOGO_DISPLAY_WIDTH = 256.f;
+constexpr float LOGO_DISPLAY_HEIGHT = 256.f;
+constexpr float DROPZONE_LOGO_TEXT_PADDING = 20.f;
+
 struct vtkF3DImguiActor::Internals
 {
   void Initialize(vtkOpenGLRenderWindow* renWin)
@@ -62,15 +66,13 @@ struct vtkF3DImguiActor::Internals
       vtkImageData* imageData = iconReader->GetOutput();
       int dims[3];
       imageData->GetDimensions(dims);
-      this->LogoWidth = dims[0];
-      this->LogoHeight = dims[1];
 
       unsigned char* logoPixels = static_cast<unsigned char*>(imageData->GetScalarPointer());
       if (logoPixels)
       {
         this->LogoTexture = vtkSmartPointer<vtkTextureObject>::New();
         this->LogoTexture->SetContext(renWin);
-        this->LogoTexture->Create2DFromRaw(this->LogoWidth, this->LogoHeight, 4, VTK_UNSIGNED_CHAR, logoPixels);
+        this->LogoTexture->Create2DFromRaw(dims[0], dims[1], 4, VTK_UNSIGNED_CHAR, logoPixels);
       }
 
       // https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10589
@@ -245,8 +247,6 @@ struct vtkF3DImguiActor::Internals
   vtkSmartPointer<vtkOpenGLBufferObject> VertexBuffer;
   vtkSmartPointer<vtkOpenGLBufferObject> IndexBuffer;
   vtkSmartPointer<vtkShaderProgram> Program;
-  int LogoWidth = 0;
-  int LogoHeight = 0;
   vtkSmartPointer<vtkTextureObject> LogoTexture;
 
 };
@@ -392,8 +392,8 @@ void vtkF3DImguiActor::RenderDropZone()
     ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
 
     // Logo size
-    float logoDisplayWidth = 256.f;
-    float logoDisplayHeight = 256.f;
+    float logoDisplayWidth = LOGO_DISPLAY_WIDTH;
+    float logoDisplayHeight = LOGO_DISPLAY_HEIGHT;
     if (this->DropZoneLogoVisible && this->Pimpl->LogoTexture)
     {
       // Calculate logo position (centered)
@@ -437,7 +437,7 @@ void vtkF3DImguiActor::RenderDropZone()
     if (this->DropZoneLogoVisible && this->Pimpl->LogoTexture)
     {
       ImGui::SetCursorPos(ImVec2(viewport->GetWorkCenter().x - 0.5f * dropTextSize.x,
-      viewport->GetWorkCenter().y - 0.5f * dropTextSize.y + logoDisplayHeight/2 + 20)); // Add 20 for padding
+      viewport->GetWorkCenter().y - 0.5f * dropTextSize.y + logoDisplayHeight/2 + DROPZONE_LOGO_TEXT_PADDING));
     }
     else
     {
