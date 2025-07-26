@@ -7,8 +7,8 @@
 
 #include <algorithm>
 #include <cmath>
-#include <limits>
 #include <iostream>
+#include <limits>
 
 int TestSDKOptions(int argc, char* argv[])
 {
@@ -230,7 +230,7 @@ int TestSDKOptions(int argc, char* argv[])
 
   test.expect<f3d::type_construction_exception>("transform2d_t invalid NaN angle", [&]() {
     f3d::transform2d_t(f3d::double_array_t<2>(std::vector<double>(2, 1)),
-      f3d::double_array_t<2>(std::vector<double>(2, 0)), std::nan(""));
+      f3d::double_array_t<2>(std::vector<double>(2, 0)), std::numeric_limits<double>::quiet_NaN());
   });
 
   // Test closest option
