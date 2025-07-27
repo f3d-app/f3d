@@ -232,8 +232,7 @@ int TestSDKOptions(int argc, char* argv[])
     f3d::transform2d_t(f3d::double_array_t<2>(std::vector<double>(2, 1)),
       f3d::double_array_t<2>(std::vector<double>(2, 0)), std::numeric_limits<double>::quiet_NaN());
   opt.model.textures_transform = nanTransform;
-  test("NaN angle transform2d",
-    opt.getAsString("model.textures_transform") == "1,0,0,0,1,0,0,0,1");
+  test("NaN angle transform2d", opt.getAsString("model.textures_transform") == "1,0,0,0,1,0,0,0,1");
 
   // Test closest option
   auto closest = opt.getClosestOption("modle.sciivs.cell");
