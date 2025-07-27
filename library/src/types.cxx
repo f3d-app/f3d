@@ -67,16 +67,7 @@ std::pair<bool, std::string> mesh_t::isValid() const
 F3D_EXPORT transform2d_t::transform2d_t(
   const double_array_t<2>& scale, const double_array_t<2>& translate, const angle_deg_t& angle)
 {
-  double angleRad;
-  if (std::isnan(angle))
-  {
-    throw f3d::type_construction_exception(
-      "Invalid angle value passed into transform2d constructor: " + std::to_string(angle));
-  }
-  else
-  {
-    angleRad = vtkMath::RadiansFromDegrees(angle);
-  }
+  double angleRad = std::isnan(angle) ? 0.0 : vtkMath::RadiansFromDegrees(angle);
 
   double sinA = std::sin(angleRad);
   double cosA = std::cos(angleRad);

@@ -228,10 +228,12 @@ int TestSDKOptions(int argc, char* argv[])
         0.1 * std::sin(TestSDKHelpers::Degrees2Radians(60.0)),
         0.1 * std::cos(TestSDKHelpers::Degrees2Radians(60.0)), 2.1, 0, 0, 1 });
 
-  test.expect<f3d::type_construction_exception>("transform2d_t invalid NaN angle", [&]() {
+  f3d::transform2d_t nanTransform =
     f3d::transform2d_t(f3d::double_array_t<2>(std::vector<double>(2, 1)),
       f3d::double_array_t<2>(std::vector<double>(2, 0)), std::numeric_limits<double>::quiet_NaN());
-  });
+  opt.model.textures_transform = nanTransform;
+  test("NaN angle transform2d",
+    opt.getAsString("model.textures_transform") == "1,0,0,0,1,0,0,0,1");
 
   // Test closest option
   auto closest = opt.getClosestOption("modle.sciivs.cell");
