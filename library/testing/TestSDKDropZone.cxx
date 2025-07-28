@@ -32,11 +32,11 @@ int TestSDKDropZone(int argc, char* argv[])
 
   if (!newOptionResult)
   {
-    std::cerr << "[ERROR] NEW drop_zone option render test failed" << std::endl;
+    std::cerr << "[ERROR] NEW drop_zone option render test failed" << '\n';
   }
   if (!deprecatedOptionResult)
   {
-    std::cerr << "[ERROR] DEPRECATED dropzone option render test failed" << std::endl;
+    std::cerr << "[ERROR] DEPRECATED dropzone option render test failed" << '\n';
   }
 
   return (newOptionResult && deprecatedOptionResult) ? EXIT_SUCCESS : EXIT_FAILURE;
