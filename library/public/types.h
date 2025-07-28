@@ -19,7 +19,7 @@ namespace f3d
 struct type_construction_exception : public exception
 {
   explicit type_construction_exception(const std::string& what = "")
-    : exception(what){};
+    : exception(what) {};
 };
 
 /**
@@ -29,7 +29,7 @@ struct type_construction_exception : public exception
 struct type_access_exception : public exception
 {
   explicit type_access_exception(const std::string& what = "")
-    : exception(what){};
+    : exception(what) {};
 };
 
 /**
