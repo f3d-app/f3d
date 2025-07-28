@@ -178,7 +178,6 @@ struct vtkF3DImguiActor::Internals
     shift[0] = -(2.f * drawData->DisplayPos.x + drawData->DisplaySize.x) / drawData->DisplaySize.x;
     shift[1] = (2.f * drawData->DisplayPos.y + drawData->DisplaySize.y) / drawData->DisplaySize.y;
 
-
     // Render the UI
     this->VertexArray->Bind();
     this->VertexBuffer->Bind();
@@ -248,7 +247,6 @@ struct vtkF3DImguiActor::Internals
   vtkSmartPointer<vtkOpenGLBufferObject> IndexBuffer;
   vtkSmartPointer<vtkShaderProgram> Program;
   vtkSmartPointer<vtkTextureObject> LogoTexture;
-
 };
 
 namespace
@@ -405,7 +403,9 @@ void vtkF3DImguiActor::RenderDropZone()
       // VTK texture pointer to ImTextureID cast (void*)
       ImTextureID texID = reinterpret_cast<ImTextureID>(this->Pimpl->LogoTexture.Get());
 
-      draw_list->AddImage(texID, logoPos, ImVec2(logoPos.x + logoDisplayWidth, logoPos.y + logoDisplayHeight), ImVec2(0, 1), ImVec2(1, 0));
+      draw_list->AddImage(texID, logoPos,
+        ImVec2(logoPos.x + logoDisplayWidth, logoPos.y + logoDisplayHeight), ImVec2(0, 1),
+        ImVec2(1, 0));
     }
 
     const ImVec2 p0(dropzonePad, dropzonePad);
@@ -439,12 +439,13 @@ void vtkF3DImguiActor::RenderDropZone()
     if (this->DropZoneLogoVisible && this->Pimpl->LogoTexture)
     {
       ImGui::SetCursorPos(ImVec2(viewport->GetWorkCenter().x - 0.5f * dropTextSize.x,
-      viewport->GetWorkCenter().y - 0.5f * dropTextSize.y + logoDisplayHeight/2 + DROPZONE_LOGO_TEXT_PADDING));
+        viewport->GetWorkCenter().y - 0.5f * dropTextSize.y + logoDisplayHeight/2 +
+        DROPZONE_LOGO_TEXT_PADDING));
     }
     else
     {
       ImGui::SetCursorPos(ImVec2(viewport->GetWorkCenter().x - 0.5f * dropTextSize.x,
-      viewport->GetWorkCenter().y - 0.5f * dropTextSize.y));
+        viewport->GetWorkCenter().y - 0.5f * dropTextSize.y));
     }
     ImGui::TextUnformatted(this->DropText.c_str());
     ImGui::End();

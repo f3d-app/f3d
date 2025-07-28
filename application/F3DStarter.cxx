@@ -1705,7 +1705,8 @@ void F3DStarter::LoadFileGroupInternal(
   // but there is no way to detect if an option has been set
   // by the user or not.
   f3d::options& options = this->Internals->Engine->getOptions();
-  options.ui.drop_zone.enable = options.ui.drop_zone.show_logo = this->Internals->LoadedFiles.empty();
+  options.ui.drop_zone.enable = options.ui.drop_zone.show_logo =
+    this->Internals->LoadedFiles.empty();
   options.ui.filename_info = filenameInfo;
 }
 
