@@ -440,7 +440,7 @@ void vtkF3DImguiActor::RenderDropZone()
     {
       ImGui::SetCursorPos(ImVec2(viewport->GetWorkCenter().x - 0.5f * dropTextSize.x,
         viewport->GetWorkCenter().y - 0.5f * dropTextSize.y + logoDisplayHeight/2 +
-        DROPZONE_LOGO_TEXT_PADDING));
+          DROPZONE_LOGO_TEXT_PADDING));
     }
     else
     {
