@@ -12,7 +12,7 @@ int TestSDKDropZone(int argc, char* argv[])
   win.setSize(300, 300);
 
   // --- Test using the NEW option ---
-  std::cout << "[DEBUG] Running DropZone test with NEW drop_zone option" << std::endl;
+  std::cout << "[DEBUG] Running DropZone test with NEW drop_zone option" << '\n';
   opt.ui.drop_zone.enable = true;
   opt.ui.drop_zone.show_logo = true;
   opt.ui.drop_zone.info = "Drop a file to open it\nPress H to show cheatsheet";
@@ -22,7 +22,7 @@ int TestSDKDropZone(int argc, char* argv[])
     eng.getWindow(), std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKDropZone");
 
   // --- Test using the DEPRECATED option ---
-  std::cout << "[DEBUG] Running DropZone test with DEPRECATED dropzone option" << std::endl;
+  std::cout << "[DEBUG] Running DropZone test with DEPRECATED dropzone option" << '\n';
   opt.ui.dropzone = true;
   opt.ui.dropzone_info = "Drop a file to open it\nPress H to show cheatsheet";
   win.render();
