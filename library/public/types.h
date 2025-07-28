@@ -323,7 +323,7 @@ struct F3D_EXPORT light_state_t
   light_type type = light_type::SCENE_LIGHT;
   point3_t position = { 0., 0., 0. };
   color_t color = { 1., 1., 1. };
-  vector3_t direction = { 0., 0., 0. };
+  vector3_t direction = { 1., 0., 0. };
   bool positionalLight = false;
   double intensity = 1.0;
   bool switchState = true;

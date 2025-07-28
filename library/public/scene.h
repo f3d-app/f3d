@@ -40,7 +40,7 @@ public:
   struct load_failure_exception : public exception
   {
     explicit load_failure_exception(const std::string& what = "")
-      : exception(what) {};
+      : exception(what){};
   };
 
   ///@{
@@ -90,7 +90,7 @@ public:
   [[nodiscard]] virtual int getLightCount() const = 0;
 
   /**
-   * Get all lights
+   * Get the light state at provided index.
    */
   [[nodiscard]] virtual light_state_t getLight(int index) = 0;
 
