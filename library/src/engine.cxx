@@ -148,6 +148,11 @@ engine engine::createOSMesa()
 //----------------------------------------------------------------------------
 engine engine::createExternal(const context::function& getProcAddress)
 {
+  if (getProcAddress == nullptr)
+  {
+    throw engine::no_window_exception(
+      "Cannot create an external window without a context function");
+  }
   return { window::Type::EXTERNAL, false, getProcAddress };
 }
 
