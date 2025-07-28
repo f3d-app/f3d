@@ -68,16 +68,16 @@ F3D_EXPORT transform2d_t::transform2d_t(
   const double_array_t<2>& scale, const double_array_t<2>& translate, const angle_deg_t& angle)
 {
   double angleRad = std::isnan(angle) ? 0.0 : vtkMath::RadiansFromDegrees(angle);
-
+  
   double sinA = std::sin(angleRad);
   double cosA = std::cos(angleRad);
 
-  (*this)[0] = cosA * scale[0];
-  (*this)[1] = -sinA * scale[1];
-  (*this)[2] = translate[0];
-  (*this)[3] = sinA * scale[0];
-  (*this)[4] = cosA * scale[1];
-  (*this)[5] = translate[1];
+  (*this)[0] = cosA * (std::isnan(scale[0]) ? 1.0 : scale[0]);
+  (*this)[1] = -sinA * (std::isnan(scale[1]) ? 1.0 : scale[1]);
+  (*this)[2] = (std::isnan(translate[0]) ? 0.0 : translate[0]);
+  (*this)[3] = sinA * (std::isnan(scale[0]) ? 1.0 : scale[0]);
+  (*this)[4] = cosA * (std::isnan(scale[1]) ? 1.0 : scale[1]);
+  (*this)[5] = (std::isnan(translate[1]) ? 0.0 : translate[1]);
   (*this)[6] = 0;
   (*this)[7] = 0;
   (*this)[8] = 1;
