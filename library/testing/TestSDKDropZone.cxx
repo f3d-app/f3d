@@ -19,10 +19,7 @@ int TestSDKDropZone(int argc, char* argv[])
   win.render();
 
   bool newOptionResult = TestSDKHelpers::RenderTest(
-    eng.getWindow(),
-    std::string(argv[1]) + "baselines/",
-    std::string(argv[2]),
-    "TestSDKDropZone");
+    eng.getWindow(), std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKDropZone");
 
   // --- Test using the DEPRECATED option ---
   std::cout << "[DEBUG] Running DropZone test with DEPRECATED dropzone option" << std::endl;
@@ -31,10 +28,7 @@ int TestSDKDropZone(int argc, char* argv[])
   win.render();
 
   bool deprecatedOptionResult = TestSDKHelpers::RenderTest(
-    eng.getWindow(),
-    std::string(argv[1]) + "baselines/",
-    std::string(argv[2]),
-    "TestSDKDropZone");
+    eng.getWindow(), std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKDropZone");
 
   if (!newOptionResult)
   {
