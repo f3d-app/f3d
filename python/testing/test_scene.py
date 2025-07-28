@@ -34,6 +34,7 @@ def test_scene():
     sphere2 = testing_dir / "data/mb/recursive/mb_2_0.vtp"
     cube = testing_dir / "data/mb/recursive/mb_0_0.vtu"
     reference = testing_dir / "baselines/TestPythonScene.png"
+    reference_red_light = testing_dir / "baselines/TestPythonSceneRedLight.png"
     output = Path(tempfile.gettempdir()) / "TestPythonScene.png"
 
     engine = f3d.Engine.create(True)
@@ -52,3 +53,12 @@ def test_scene():
     img.save(output)
 
     assert img.compare(f3d.Image(reference)) < 0.05
+
+    engine.scene.remove_all_lights()
+    red_light = f3d.LightState(color = f3d.Color(1.0, 0.0, 0.0))
+    engine.scene.add_light(red_light)
+
+    img = engine.window.render_to_image()
+    img.save(output)
+
+    assert img.compare(f3d.Image(reference_red_light)) < 0.05

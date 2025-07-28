@@ -19,7 +19,7 @@ namespace f3d
 struct type_construction_exception : public exception
 {
   explicit type_construction_exception(const std::string& what = "")
-    : exception(what) {};
+    : exception(what){};
 };
 
 /**
@@ -29,7 +29,7 @@ struct type_construction_exception : public exception
 struct type_access_exception : public exception
 {
   explicit type_access_exception(const std::string& what = "")
-    : exception(what) {};
+    : exception(what){};
 };
 
 /**
@@ -327,6 +327,14 @@ struct F3D_EXPORT light_state_t
   bool positionalLight = false;
   double intensity = 1.0;
   bool switchState = true;
+
+  [[nodiscard]] bool operator==(const light_state_t& other) const
+  {
+    return this->type == other.type && this->position == other.position &&
+      this->color == other.color && this->direction == other.direction &&
+      this->positionalLight == other.positionalLight && this->intensity == other.intensity &&
+      this->switchState == other.switchState;
+  }
 };
 
 }

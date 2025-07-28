@@ -66,5 +66,41 @@ int TestSDKScene(int argc, char* argv[])
     }
   });
 
+  // light test
+  f3d::light_state_t defaultLight;
+  f3d::light_state_t redLight = { .color = { 1.0, 0, 0 } };
+  std::cout << sce.getLightCount() << " lights in the scene\n";
+  test("empty light count", [&]() {
+    sce.removeAllLights();
+    return sce.getLightCount() == 0;
+  });
+  test("add default light", [&]() {
+    int index = sce.addLight(defaultLight);
+    return index == 0 && sce.getLightCount() == 1;
+  });
+  test("add red light", [&]() {
+    int index = sce.addLight(redLight);
+    return index == 1 && sce.getLightCount() == 2;
+  });
+  test("light count after add", [&]() { return sce.getLightCount() == 2; });
+  test("get light at index 0", [&]() {
+    f3d::light_state_t light = sce.getLight(0);
+    return light == defaultLight;
+  });
+  test("get light at index 1", [&]() {
+    f3d::light_state_t light = sce.getLight(1);
+    return light == redLight;
+  });
+  sce.updateLight(0, redLight);
+  test("update light", sce.getLight(0) == sce.getLight(1));
+
+  test("render after add", [&]() {
+    if (!TestSDKHelpers::RenderTest(
+          win, std::string(argv[1]) + "baselines/", argv[2], "TestSDKSceneRedLight"))
+    {
+      throw "rendering test failed";
+    }
+  });
+
   return test.result();
 }
