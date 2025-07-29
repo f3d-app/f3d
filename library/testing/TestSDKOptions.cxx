@@ -220,7 +220,7 @@ int TestSDKOptions(int argc, char* argv[])
         std::sin(TestSDKHelpers::Degrees2Radians(90.0)),
         std::cos(TestSDKHelpers::Degrees2Radians(90.0)), 0, 0, 0, 1 });
 
-  opt.setAsString("model.textures_transform", "scale:0.1,translation:0.51,2.1,angle:60.0");
+  opt.setAsString("model.textures_transform", "scale:0.1;translation:0.51,2.1;angle:60.0");
   test("setAsString/get scale/translation/angle transform2d",
     std::get<std::vector<double>>(opt.get("model.textures_transform")) ==
       std::vector<double>{ 0.1 * std::cos(TestSDKHelpers::Degrees2Radians(60.0)),

@@ -535,6 +535,8 @@ transform2d_t parse(const std::string& str)
   //  read as a scale/translation/angle series
   const std::regex settingCheck(
     "^((scale\\:)|(translation\\:)|(angle\\:)).*", std::regex_constants::icase);
+  const std::regex keywordCheck(
+    "^((scale)|(translation)|(angle))", std::regex_constants::icase);
   std::smatch matcher;
   std::istringstream split(strCompact);
   std::string each;
@@ -547,99 +549,92 @@ transform2d_t parse(const std::string& str)
   bool hasTranslation = false;
   bool hasAngle = false;
 
-  while (std::getline(split, each, ','))
+  // split order for parsing: (example "scale:0.1;translation:0.51,2.1;angle:60.0")
+  //  - split substrings by ';' ("scale:0.1" "translation:0.51,2.1" "angle:60.0")
+  //  - split each substring by ':' (["scale" "0.1"]["translation" "0.51,2.1"]["angle" "60.0"])
+  //  - read remaining substrings as keyword or series of double values split by ','
+
+  while (std::getline(split, each, ';'))
   {
     if (std::regex_match(each, matcher, settingCheck))
     {
-      // item specifies scale/translation angle, split off option from double and begin adding to
-      // vectors
       std::istringstream subSplit(each);
       std::string subStr;
       while (std::getline(subSplit, subStr, ':'))
       {
-        if (subStr == "scale")
+        if (std::regex_match(subStr, matcher, keywordCheck))
         {
-          if (hasScale)
+          // read and apply keyword
+          if (subStr == "scale")
           {
-            throw options::parsing_exception("Input cannot have multiple scale transforms: " + str);
+            if (hasScale)
+            {
+              throw options::parsing_exception(
+                "Input cannot have multiple scale transforms: " + str);
+            }
+            setScale = true;
+            hasScale = true;
           }
-          setScale = true;
-          hasScale = true;
-        }
-        else if (subStr == "translation")
-        {
-          if (hasTranslation)
+          else if (subStr == "translation")
           {
-            throw options::parsing_exception(
-              "Input cannot have multiple translation transforms: " + str);
+            if (hasTranslation)
+            {
+              throw options::parsing_exception(
+                "Input cannot have multiple translation transforms: " + str);
+            }
+            setScale = false;
+            hasTranslation = true;
           }
-          setScale = false;
-          hasTranslation = true;
-        }
-        else if (subStr == "angle")
-        {
-          if (hasAngle)
+          else if (subStr == "angle")
           {
-            throw options::parsing_exception("Input cannot have multiple angle transforms: " + str);
+            if (hasAngle)
+            {
+              throw options::parsing_exception(
+                "Input cannot have multiple angle transforms: " + str);
+            }
+            angleNext = true;
+            hasAngle = true;
           }
-          angleNext = true;
-          hasAngle = true;
         }
         else
         {
-          // read in a double to add as vector
-          double val;
-          try
+          // read as series of double values
+          std::istringstream dblSeries(subStr);
+          std::string dblStr;
+          while (std::getline(dblSeries, dblStr, ','))
           {
-            val = parse<double>(subStr);
-          }
-          catch (const options::parsing_exception&)
-          {
-            throw options::parsing_exception(
-              "Cannot parse substring " + subStr + " as double from input: " + str);
-          }
+            double val;
+            try
+            {
+              val = parse<double>(dblStr);
+            }
+            catch (const options::parsing_exception&)
+            {
+              throw options::parsing_exception(
+                "Cannot parse input substring " + subStr + " as double series from input: " + str);
+            }
 
-          if (angleNext)
-          {
-            angleVec.emplace_back(val);
-          }
-          else if (setScale)
-          {
-            scaleVec.emplace_back(val);
-          }
-          else
-          {
-            translationVec.emplace_back(val);
+            if (angleNext)
+            {
+              angleVec.emplace_back(val);
+            }
+            else if (setScale)
+            {
+              scaleVec.emplace_back(val);
+            }
+            else
+            {
+              translationVec.emplace_back(val);
+            }
           }
         }
       }
     }
     else
     {
-      // read in a double to add to constructor
-      double val;
-      try
-      {
-        val = parse<double>(each);
-      }
-      catch (const options::parsing_exception&)
-      {
-        throw options::parsing_exception(
-          "Cannot parse input substring " + each + " as double from input: " + str);
-      }
-
-      if (angleNext)
-      {
-        angleVec.emplace_back(val);
-      }
-      else if (setScale)
-      {
-        scaleVec.emplace_back(val);
-      }
-      else
-      {
-        translationVec.emplace_back(val);
-      }
+      // option passed without scale/translation/angle keyword
+      throw options::parsing_exception(
+        "Cannot parse input substring " + each + " as option from input: " + str);
     }
   }
 

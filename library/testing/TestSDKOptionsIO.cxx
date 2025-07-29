@@ -223,7 +223,7 @@ int TestSDKOptionsIO(int argc, char* argv[])
       -std::sin(TestSDKHelpers::Degrees2Radians(90.0)), 0,
       std::sin(TestSDKHelpers::Degrees2Radians(90.0)),
       std::cos(TestSDKHelpers::Degrees2Radians(90.0)), 0, 0, 0, 1 });
-  test.parse<f3d::transform2d_t>("transform2d_t", "scale:0.1,translation:0.51,2.1,angle:60.0",
+  test.parse<f3d::transform2d_t>("transform2d_t", "scale:0.1;translation:0.51,2.1;angle:60.0",
     { 0.1 * std::cos(TestSDKHelpers::Degrees2Radians(60.0)),
       0.1 * -std::sin(TestSDKHelpers::Degrees2Radians(60.0)), 0.51,
       0.1 * std::sin(TestSDKHelpers::Degrees2Radians(60.0)),
@@ -235,7 +235,7 @@ int TestSDKOptionsIO(int argc, char* argv[])
     "text in vector notation", "1,2,three,4,5,6,7,8,9");
   test.parse_expect<f3d::transform2d_t, parsing_exception>("invalid argument", "rotation:45.0");
   test.parse_expect<f3d::transform2d_t, parsing_exception>(
-    "invalid argument after scale", "scale:2,rotation:45.0");
+    "invalid argument after scale", "scale:2;rotation:45.0");
   test.parse_expect<f3d::transform2d_t, parsing_exception>("no value provided for scale", "scale:");
   test.parse_expect<f3d::transform2d_t, parsing_exception>(
     "no value provided for scale", "scale:,angle:0.5");
@@ -250,11 +250,13 @@ int TestSDKOptionsIO(int argc, char* argv[])
   test.parse_expect<f3d::transform2d_t, parsing_exception>(
     "too many angle values", "angle:30.0,45.0,60.0");
   test.parse_expect<f3d::transform2d_t, parsing_exception>(
-    "multiple scale transforms", "scale:1,2,scale:3,4");
+    "multiple scale transforms", "scale:1,2;scale:3,4");
   test.parse_expect<f3d::transform2d_t, parsing_exception>(
-    "multiple translation transforms", "translation:1,2,translation:3,4");
+    "multiple translation transforms", "translation:1,2;translation:3,4");
   test.parse_expect<f3d::transform2d_t, parsing_exception>(
-    "multiple angle transforms", "angle:30.0,angle:60.0");
+    "multiple angle transforms", "angle:30.0;angle:60.0");
+  test.parse_expect<f3d::transform2d_t, parsing_exception>(
+    "comma-separated options", "scale:0.1,translation:0.51,2.1,angle:60.0");
   test.format<f3d::transform2d_t>(
     "transform2d_t", { 1, 0, 0, 0, -1, 0, 0, 0, 1 }, "1,0,0,0,-1,0,0,0,1");
   test.format<f3d::transform2d_t>(
