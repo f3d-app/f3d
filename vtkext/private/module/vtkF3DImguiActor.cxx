@@ -64,8 +64,7 @@ struct vtkF3DImguiActor::Internals
       iconReader->Update();
 
       vtkImageData* imageData = iconReader->GetOutput();
-      int dims[3];
-      imageData->GetDimensions(dims);
+      int* dims = imageData->GetDimensions();
 
       unsigned char* logoPixels = static_cast<unsigned char*>(imageData->GetScalarPointer());
       if (logoPixels)
@@ -201,17 +200,10 @@ struct vtkF3DImguiActor::Internals
 
         // Activate texture and set uniforms per draw command:
         vtkTextureObject* texObj = reinterpret_cast<vtkTextureObject*>(cmd->GetTexID());
-        if (!texObj)
-        {
-          texObj = this->FontTexture.Get(); // Fallback if null
-        }
-        if (texObj)
-        {
-          texObj->Activate();
-          this->Program->SetUniform2f("Scale", scale);
-          this->Program->SetUniform2f("Shift", shift);
-          this->Program->SetUniformi("Texture", texObj->GetTextureUnit());
-        }
+        texObj->Activate();
+        this->Program->SetUniform2f("Scale", scale);
+        this->Program->SetUniform2f("Shift", shift);
+        this->Program->SetUniformi("Texture", texObj->GetTextureUnit());
 
         // Project scissor/clipping rectangles into framebuffer space
         ImVec2 clipMin(

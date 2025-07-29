@@ -430,10 +430,6 @@ void window_impl::UpdateDynamicOptions()
     {
       renderer->SetDropZoneInfo(opt.ui.dropzone_info);
     }
-    else
-    {
-      renderer->SetDropZoneInfo(opt.ui.drop_zone.info);
-    }
     renderer->ShowDropZoneLogo(opt.ui.dropzone);
   }
   F3D_SILENT_WARNING_POP()
