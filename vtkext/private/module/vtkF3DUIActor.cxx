@@ -19,6 +19,12 @@ void vtkF3DUIActor::SetDropZoneVisibility(bool show)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DUIActor::SetDropZoneLogoVisibility(bool show)
+{
+  this->DropZoneLogoVisible = show;
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DUIActor::SetDropText(const std::string& info)
 {
   this->DropText = info;
