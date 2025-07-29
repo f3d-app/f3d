@@ -68,7 +68,8 @@ int TestSDKScene(int argc, char* argv[])
 
   // light test
   f3d::light_state_t defaultLight;
-  f3d::light_state_t redLight = { .color = { 1.0, 0, 0 } };
+  f3d::light_state_t redLight = defaultLight;
+  redLight.color = f3d::color_t(1.0, 0.0, 0.0);
   std::cout << sce.getLightCount() << " lights in the scene\n";
   test("empty light count", [&]() {
     sce.removeAllLights();
