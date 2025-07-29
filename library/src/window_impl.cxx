@@ -388,21 +388,7 @@ void window_impl::UpdateDynamicOptions()
     renderer->ShowAxis(opt.ui.axis);
     renderer->SetUseTrackball(opt.interactor.trackball);
     renderer->SetInvertZoom(opt.interactor.invert_zoom);
-
-    vtkF3DRenderer::RotationAxis axis = vtkF3DRenderer::RotationAxis::FREE;
-    if (opt.interactor.lock_axis.x)
-    {
-      axis = vtkF3DRenderer::RotationAxis::X_AXIS;
-    }
-    else if (opt.interactor.lock_axis.y)
-    {
-      axis = vtkF3DRenderer::RotationAxis::Y_AXIS;
-    }
-    else if (opt.interactor.lock_axis.z)
-    {
-      axis = vtkF3DRenderer::RotationAxis::Z_AXIS;
-    }
-    renderer->SetRotationAxis(axis);
+    renderer->SetRotationAxis(opt.interactor.axis_lock.enabled, opt.interactor.axis_lock.axis);
   }
 
   // XXX: model.point_sprites.type only has an effect on geometry scene

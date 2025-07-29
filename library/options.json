@@ -329,16 +329,12 @@
       "type": "bool",
       "default_value": "false"
     },
-    "lock_axis": {
-      "x": {
-        "type": "bool",
-        "default_value": "false"
+    "axis_lock": {
+      "axis": {
+        "type": "direction",
+        "default_value": "0,0,0"
       },
-      "y": {
-        "type": "bool",
-        "default_value": "false"
-      },
-      "z": {
+      "enabled": {
         "type": "bool",
         "default_value": "false"
       }

@@ -184,7 +184,7 @@ void vtkF3DInteractorStyle::Rotate()
       Transform->Identity();
       Transform->Translate(+fp[0], +fp[1], +fp[2]);
       Transform->RotateWXYZ(ren->GetMovementVector()[0] * rxf + ren->GetMovementVector()[1] * ryf,
-        ren->GetRotationVector());
+        ren->GetRotationAxis());
       Transform->Translate(-fp[0], -fp[1], -fp[2]);
 
       Transform->TransformPoint(camera->GetPosition(), newPos);

@@ -1658,42 +1658,50 @@ void vtkF3DRenderer::SetUseTrackball(bool use)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetRotationAxis(RotationAxis axis)
+void vtkF3DRenderer::SetRotationAxis(bool use, const std::vector<double>& direction)
 {
-  if (this->RotationMode != axis)
+  std::array<double, 3> prev = { RotationDirection[0], RotationDirection[1], RotationDirection[2] };
+  std::array<double, 3> curr = { direction[0], direction[1], direction[2] };
+
+  std::array<double, 3> x = { 1.0, 0.0, 0.0 };
+  std::array<double, 3> y = { 0.0, 1.0, 0.0 };
+  std::array<double, 3> z = { 0.0, 0.0, 1.0 };
+
+  if (use != this->UseRotationAxis || curr != prev)
   {
-    this->RotationMode = axis;
-    this->UseRotationAxis = (axis != vtkF3DRenderer::RotationAxis::FREE);
+    this->UseRotationAxis = use;
+
+    this->RotationDirection[0] = direction[0];
+    this->RotationDirection[1] = direction[1];
+    this->RotationDirection[2] = direction[2];
+    
+    this->MovementVector[0] = 1.0;
+    this->MovementVector[1] = 0.0;
+    
+    if (curr == x)
+    {
+      this->RotationAxis[0] = 0.0;
+      this->RotationAxis[1] = 1.0;
+      this->RotationAxis[2] = 0.0;
+    } else if (curr == y)
+    {
+      this->RotationAxis[0] = 1.0;
+      this->RotationAxis[1] = 0.0;
+      this->RotationAxis[2] = 0.0;
+
+      this->MovementVector[0] = 0.0;
+      this->MovementVector[1] = -1.0;
+    }
+    else if (curr == z)
+    {
+      this->RotationAxis[0] = 0.0;
+      this->RotationAxis[1] = 0.0;
+      this->RotationAxis[2] = 1.0;
+
+      this->MovementVector[0] = -1.0;
+      this->MovementVector[1] = 0.0;
+    }
     this->CheatSheetConfigured = false;
-
-    const double* sourceVector = nullptr;
-    double movement[2] = {};
-
-    if (axis == vtkF3DRenderer::RotationAxis::FREE)
-    {
-      return;
-    }
-    else if (axis == vtkF3DRenderer::RotationAxis::X_AXIS)
-    {
-      sourceVector = this->UpVector;
-      movement[0] = 1;
-    }
-    else if (axis == vtkF3DRenderer::RotationAxis::Y_AXIS)
-    {
-      sourceVector = this->RightVector;
-      movement[1] = -1;
-    }
-    else if (axis == vtkF3DRenderer::RotationAxis::Z_AXIS)
-    {
-      sourceVector = this->FrontVector;
-      movement[0] = -1;
-    }
-
-    this->RotationVector[0] = sourceVector[0];
-    this->RotationVector[1] = sourceVector[1];
-    this->RotationVector[2] = sourceVector[2];
-    this->MovementVector[0] = movement[0];
-    this->MovementVector[1] = movement[1];
   }
 }
 
