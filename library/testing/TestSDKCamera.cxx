@@ -77,7 +77,7 @@ int TestSDKCamera(int argc, char* argv[])
   f3d::point3_t pointDC = win.getDisplayFromWorld(point);
   if (!comparePoint(point, win.getWorldFromDisplay(pointDC)))
   {
-    std::cerr << "coordinates conversion is not behaving as expected" << std::endl;
+    std::cerr << "coordinates conversion is not behaving as expected\n";
     return EXIT_FAILURE;
   }
 
@@ -87,7 +87,7 @@ int TestSDKCamera(int argc, char* argv[])
   if (pos != testPos)
   {
     std::cerr << "set/get position is not behaving as expected: " << pos[0] << "," << pos[1] << ","
-              << pos[2] << std::endl;
+              << pos[2] << "\n";
     return EXIT_FAILURE;
   }
 
@@ -97,7 +97,7 @@ int TestSDKCamera(int argc, char* argv[])
   if (foc != testFoc)
   {
     std::cerr << "set/get focal point is not behaving as expected: " << foc[0] << "," << foc[1]
-              << "," << foc[2] << std::endl;
+              << "," << foc[2] << "\n";
     return EXIT_FAILURE;
   }
 
@@ -107,7 +107,7 @@ int TestSDKCamera(int argc, char* argv[])
   if (up != testUp)
   {
     std::cerr << "set/get view up is not behaving as expected: " << up[0] << "," << up[1] << ","
-              << up[2] << std::endl;
+              << up[2] << "\n";
     return EXIT_FAILURE;
   }
 
@@ -116,7 +116,7 @@ int TestSDKCamera(int argc, char* argv[])
   f3d::angle_deg_t angle = cam.setViewAngle(testAngle).getViewAngle();
   if (angle != testAngle)
   {
-    std::cerr << "set/get view angle is not behaving as expected: " << angle << std::endl;
+    std::cerr << "set/get view angle is not behaving as expected: " << angle << "\n";
     return EXIT_FAILURE;
   }
 
@@ -131,13 +131,13 @@ int TestSDKCamera(int argc, char* argv[])
   if (!comparePoint(pos, expectedPos) || !comparePoint(foc, expectedFoc) ||
     !compareVec(up, expectedUp))
   {
-    std::cerr << "Azimuth is not behaving as expected: " << std::endl;
+    std::cerr << "Azimuth is not behaving as expected: \n";
     std::cerr << std::setprecision(12) << "position: " << pos[0] << "," << pos[1] << "," << pos[2]
-              << std::endl;
+              << "\n";
     std::cerr << std::setprecision(12) << "focal point: " << foc[0] << "," << foc[1] << ","
-              << foc[2] << std::endl;
+              << foc[2] << "\n";
     std::cerr << std::setprecision(12) << "view up: " << up[0] << "," << up[1] << "," << up[2]
-              << std::endl;
+              << "\n";
     return EXIT_FAILURE;
   }
 
@@ -150,13 +150,13 @@ int TestSDKCamera(int argc, char* argv[])
   if (!comparePoint(pos, expectedPos) || !comparePoint(foc, expectedFoc) ||
     !compareVec(up, expectedUp))
   {
-    std::cerr << "Roll is not behaving as expected: " << std::endl;
+    std::cerr << "Roll is not behaving as expected: \n";
     std::cerr << std::setprecision(12) << "position: " << pos[0] << "," << pos[1] << "," << pos[2]
-              << std::endl;
+              << "\n";
     std::cerr << std::setprecision(12) << "focal point: " << foc[0] << "," << foc[1] << ","
-              << foc[2] << std::endl;
+              << foc[2] << "\n";
     std::cerr << std::setprecision(12) << "view up: " << up[0] << "," << up[1] << "," << up[2]
-              << std::endl;
+              << "\n";
     return EXIT_FAILURE;
   }
 
@@ -169,13 +169,13 @@ int TestSDKCamera(int argc, char* argv[])
   if (!comparePoint(pos, expectedPos) || !comparePoint(foc, expectedFoc) ||
     !compareVec(up, expectedUp))
   {
-    std::cerr << "Yaw is not behaving as expected: " << std::endl;
+    std::cerr << "Yaw is not behaving as expected: \n";
     std::cerr << std::setprecision(12) << "position: " << pos[0] << "," << pos[1] << "," << pos[2]
-              << std::endl;
+              << "\n";
     std::cerr << std::setprecision(12) << "focal point: " << foc[0] << "," << foc[1] << ","
-              << foc[2] << std::endl;
+              << foc[2] << "\n";
     std::cerr << std::setprecision(12) << "view up: " << up[0] << "," << up[1] << "," << up[2]
-              << std::endl;
+              << "\n";
     return EXIT_FAILURE;
   }
 
@@ -189,13 +189,13 @@ int TestSDKCamera(int argc, char* argv[])
   if (!comparePoint(pos, expectedPos) || !comparePoint(foc, expectedFoc) ||
     !compareVec(up, expectedUp))
   {
-    std::cerr << "Elevation is not behaving as expected: " << std::endl;
+    std::cerr << "Elevation is not behaving as expected: \n";
     std::cerr << std::setprecision(12) << "position: " << pos[0] << "," << pos[1] << "," << pos[2]
-              << std::endl;
+              << "\n";
     std::cerr << std::setprecision(12) << "focal point: " << foc[0] << "," << foc[1] << ","
-              << foc[2] << std::endl;
+              << foc[2] << "\n";
     std::cerr << std::setprecision(12) << "view up: " << up[0] << "," << up[1] << "," << up[2]
-              << std::endl;
+              << "\n";
     return EXIT_FAILURE;
   }
 
@@ -209,13 +209,13 @@ int TestSDKCamera(int argc, char* argv[])
   if (!comparePoint(pos, expectedPos) || !comparePoint(foc, expectedFoc) ||
     !compareVec(up, expectedUp))
   {
-    std::cerr << "Pitch is not behaving as expected: " << std::endl;
+    std::cerr << "Pitch is not behaving as expected: \n";
     std::cerr << std::setprecision(12) << "position: " << pos[0] << "," << pos[1] << "," << pos[2]
-              << std::endl;
+              << "\n";
     std::cerr << std::setprecision(12) << "focal point: " << foc[0] << "," << foc[1] << ","
-              << foc[2] << std::endl;
+              << foc[2] << "\n";
     std::cerr << std::setprecision(12) << "view up: " << up[0] << "," << up[1] << "," << up[2]
-              << std::endl;
+              << "\n";
     return EXIT_FAILURE;
   }
 
@@ -228,13 +228,13 @@ int TestSDKCamera(int argc, char* argv[])
   if (!comparePoint(pos, expectedPos) || !comparePoint(foc, expectedFoc) ||
     !compareVec(up, expectedUp))
   {
-    std::cerr << "Dolly is not behaving as expected: " << std::endl;
+    std::cerr << "Dolly is not behaving as expected: \n";
     std::cerr << std::setprecision(12) << "position: " << pos[0] << "," << pos[1] << "," << pos[2]
-              << std::endl;
+              << "\n";
     std::cerr << std::setprecision(12) << "focal point: " << foc[0] << "," << foc[1] << ","
-              << foc[2] << std::endl;
+              << foc[2] << "\n";
     std::cerr << std::setprecision(12) << "view up: " << up[0] << "," << up[1] << "," << up[2]
-              << std::endl;
+              << "\n";
     return EXIT_FAILURE;
   }
 
@@ -308,7 +308,7 @@ int TestSDKCamera(int argc, char* argv[])
   }
   catch (testFailure& e)
   {
-    std::cerr << e.what() << std::endl;
+    std::cerr << e.what() << "\n";
     return EXIT_FAILURE;
   }
 

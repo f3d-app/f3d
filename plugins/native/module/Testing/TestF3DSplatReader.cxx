@@ -14,7 +14,7 @@ int TestF3DSplatReader(int vtkNotUsed(argc), char* argv[])
 
   if (!stream->Open(path.c_str()))
   {
-    std::cerr << "Cannot open .splat file" << std::endl;
+    std::cerr << "Cannot open .splat file\n";
     return EXIT_FAILURE;
   }
 
@@ -26,7 +26,7 @@ int TestF3DSplatReader(int vtkNotUsed(argc), char* argv[])
 
   if (nbPoints != 52293) // <-- Change this to expected number of splats
   {
-    std::cerr << "Incorrect number of splats: " << nbPoints << std::endl;
+    std::cerr << "Incorrect number of splats: " << nbPoints << "\n";
     return EXIT_FAILURE;
   }
 

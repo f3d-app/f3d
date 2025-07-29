@@ -37,6 +37,7 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+#include <cstdint>
 #include <map>
 #include <numeric>
 #include <regex>
@@ -168,7 +169,7 @@ public:
 
   //----------------------------------------------------------------------------
   // Set the view orbit position on the viewport.
-  enum class ViewType
+  enum class ViewType : std::uint8_t
   {
     VT_FRONT,
     VT_RIGHT,
@@ -602,7 +603,6 @@ public:
   vtkNew<vtkF3DInteractorStyle> Style;
   vtkSmartPointer<vtkF3DInteractorEventRecorder> Recorder;
   vtkNew<vtkF3DUIObserver> UIObserver;
-  std::map<unsigned long, std::pair<int, std::function<void()>>> TimerCallBacks;
 
   std::map<std::string, std::function<void(const std::vector<std::string>&)>> Commands;
   std::optional<std::string> CommandBuffer;
@@ -1223,6 +1223,7 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "E"}, "toggle render.show_edges","Scene", std::bind(docTglOpt, "Toggle edges display", std::cref(opts.render.show_edges)));
   this->addBinding({mod_t::NONE, "X"}, "toggle ui.axis","Scene", std::bind(docTgl, "Toggle axes display", std::cref(opts.ui.axis)));
   this->addBinding({mod_t::NONE, "G"}, "toggle render.grid.enable","Scene", std::bind(docTgl, "Toggle grid display", std::cref(opts.render.grid.enable)));
+  this->addBinding({mod_t::SHIFT, "X"}, "toggle render.axes_grid.enable", "Scene", std::bind(docTgl, "Toggle axes grid display", std::cref(opts.render.axes_grid.enable)));
 #if F3D_MODULE_UI
   this->addBinding({mod_t::NONE, "N"}, "toggle ui.filename","Scene", std::bind(docTgl, "Toggle filename display", std::cref(opts.ui.filename)));
   this->addBinding({mod_t::NONE, "M"}, "toggle ui.metadata","Scene", std::bind(docTgl, "Toggle metadata display", std::cref(opts.ui.metadata)));
@@ -1311,26 +1312,23 @@ interactor& interactor_impl::removeBinding(const interaction_bind_t& bind)
   this->Internals->Bindings.erase(bind);
 
   // Look for the group of the removed bind
-  std::string group;
-  for (auto it = this->Internals->GroupedBinds.begin(); it != this->Internals->GroupedBinds.end();
-       it++)
+  auto it = std::find_if(this->Internals->GroupedBinds.begin(), this->Internals->GroupedBinds.end(),
+    [&](const auto& pair) { return pair.second == bind; });
+
+  if (it != this->Internals->GroupedBinds.end())
   {
-    if (it->second == bind)
+    // Binds are unique
+    // Erase the bind entry in the group
+    std::string group = it->first;
+    this->Internals->GroupedBinds.erase(it);
+    if (this->Internals->GroupedBinds.count(group) == 0)
     {
-      // Binds are unique
-      // Erase the bind entry in the group
-      group = it->first;
-      this->Internals->GroupedBinds.erase(it);
-      if (this->Internals->GroupedBinds.count(group) == 0)
-      {
-        // If it was the last one, remove it from the ordered group
-        // We know the group is present and unique in the vector, so only erase once
-        auto vecIt = std::find(this->Internals->OrderedBindGroups.begin(),
-          this->Internals->OrderedBindGroups.end(), group);
-        assert(vecIt != this->Internals->OrderedBindGroups.end());
-        this->Internals->OrderedBindGroups.erase(vecIt);
-      }
-      break;
+      // If it was the last one, remove it from the ordered group
+      // We know the group is present and unique in the vector, so only erase once
+      auto vecIt = std::find(this->Internals->OrderedBindGroups.begin(),
+        this->Internals->OrderedBindGroups.end(), group);
+      assert(vecIt != this->Internals->OrderedBindGroups.end());
+      this->Internals->OrderedBindGroups.erase(vecIt);
     }
   }
   return *this;
@@ -1381,6 +1379,96 @@ std::pair<std::string, std::string> interactor_impl::getBindingDocumentation(
   }
   const auto& docFunc = it->second.DocumentationCallback;
   return docFunc ? docFunc() : std::make_pair(std::string(), std::string());
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::triggerModUpdate(InputModifier mod)
+{
+  this->Internals->VTKInteractor->SetControlKey(
+    mod == InputModifier::CTRL || mod == InputModifier::CTRL_SHIFT);
+  this->Internals->VTKInteractor->SetShiftKey(
+    mod == InputModifier::SHIFT || mod == InputModifier::CTRL_SHIFT);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::triggerMouseButton(InputAction action, MouseButton button)
+{
+  unsigned long event = vtkCommand::AnyEvent;
+
+  switch (button)
+  {
+    case MouseButton::LEFT:
+      event = action == InputAction::PRESS ? vtkCommand::LeftButtonPressEvent
+                                           : vtkCommand::LeftButtonReleaseEvent;
+      break;
+    case MouseButton::RIGHT:
+      event = action == InputAction::PRESS ? vtkCommand::RightButtonPressEvent
+                                           : vtkCommand::RightButtonReleaseEvent;
+      break;
+    case MouseButton::MIDDLE:
+      event = action == InputAction::PRESS ? vtkCommand::MiddleButtonPressEvent
+                                           : vtkCommand::MiddleButtonReleaseEvent;
+      break;
+  }
+
+  this->Internals->VTKInteractor->InvokeEvent(event, nullptr);
+
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::triggerMousePosition(double xpos, double ypos)
+{
+  this->Internals->VTKInteractor->SetEventInformationFlipY(xpos, ypos);
+  this->Internals->VTKInteractor->InvokeEvent(vtkCommand::MouseMoveEvent, nullptr);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::triggerMouseWheel(WheelDirection direction)
+{
+  switch (direction)
+  {
+    case WheelDirection::LEFT:
+      this->Internals->VTKInteractor->InvokeEvent(vtkCommand::MouseWheelLeftEvent, nullptr);
+      break;
+    case WheelDirection::RIGHT:
+      this->Internals->VTKInteractor->InvokeEvent(vtkCommand::MouseWheelRightEvent, nullptr);
+      break;
+    case WheelDirection::FORWARD:
+      this->Internals->VTKInteractor->InvokeEvent(vtkCommand::MouseWheelForwardEvent, nullptr);
+      break;
+    case WheelDirection::BACKWARD:
+      this->Internals->VTKInteractor->InvokeEvent(vtkCommand::MouseWheelBackwardEvent, nullptr);
+      break;
+  }
+
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::triggerKeyboardKey(InputAction action, std::string_view keySym)
+{
+  if (!keySym.empty())
+  {
+    this->Internals->VTKInteractor->SetKeySym(keySym.data());
+
+    this->Internals->VTKInteractor->InvokeEvent(
+      action == InputAction::PRESS ? vtkCommand::KeyPressEvent : vtkCommand::KeyReleaseEvent,
+      nullptr);
+  }
+
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::triggerTextCharacter(unsigned int codepoint)
+{
+  this->Internals->VTKInteractor->SetKeyCode(codepoint);
+  this->Internals->VTKInteractor->InvokeEvent(vtkCommand::CharEvent, nullptr);
+
+  return *this;
 }
 
 //----------------------------------------------------------------------------

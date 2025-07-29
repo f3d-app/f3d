@@ -260,6 +260,14 @@ PYBIND11_MODULE(pyf3d, module)
       "Enable the camera interaction")
     .def("disable_camera_movement", &f3d::interactor::disableCameraMovement,
       "Disable the camera interaction")
+    .def("trigger_mod_update", &f3d::interactor::triggerModUpdate, "Trigger a key modifier update")
+    .def("trigger_mouse_button", &f3d::interactor::triggerMouseButton, "Trigger a mouse button")
+    .def(
+      "trigger_mouse_position", &f3d::interactor::triggerMousePosition, "Trigger a mouse position")
+    .def("trigger_mouse_wheel", &f3d::interactor::triggerMouseWheel, "Trigger a mouse wheel")
+    .def("trigger_keyboard_key", &f3d::interactor::triggerKeyboardKey, "Trigger a keyboard input")
+    .def("trigger_text_character", &f3d::interactor::triggerTextCharacter,
+      "Trigger a text character input")
     .def("play_interaction", &f3d::interactor::playInteraction, "Play an interaction file")
     .def("record_interaction", &f3d::interactor::recordInteraction, "Record an interaction file")
     .def("start", &f3d::interactor::start, "Start the interactor and the event loop",
@@ -288,6 +296,31 @@ PYBIND11_MODULE(pyf3d, module)
     .def("get_binds_for_group", &f3d::interactor::getBindsForGroup)
     .def("get_binds", &f3d::interactor::getBinds)
     .def("get_binding_documentation", &f3d::interactor::getBindingDocumentation);
+
+  py::enum_<f3d::interactor::MouseButton>(interactor, "MouseButton")
+    .value("LEFT", f3d::interactor::MouseButton::LEFT)
+    .value("MIDDLE", f3d::interactor::MouseButton::MIDDLE)
+    .value("RIGHT", f3d::interactor::MouseButton::RIGHT)
+    .export_values();
+
+  py::enum_<f3d::interactor::WheelDirection>(interactor, "WheelDirection")
+    .value("FORWARD", f3d::interactor::WheelDirection::FORWARD)
+    .value("BACKWARD", f3d::interactor::WheelDirection::BACKWARD)
+    .value("LEFT", f3d::interactor::WheelDirection::LEFT)
+    .value("RIGHT", f3d::interactor::WheelDirection::RIGHT)
+    .export_values();
+
+  py::enum_<f3d::interactor::InputAction>(interactor, "InputAction")
+    .value("PRESS", f3d::interactor::InputAction::PRESS)
+    .value("RELEASE", f3d::interactor::InputAction::RELEASE)
+    .export_values();
+
+  py::enum_<f3d::interactor::InputModifier>(interactor, "InputModifier")
+    .value("NONE", f3d::interactor::InputModifier::NONE)
+    .value("CTRL", f3d::interactor::InputModifier::CTRL)
+    .value("SHIFT", f3d::interactor::InputModifier::SHIFT)
+    .value("CTRL_SHIFT", f3d::interactor::InputModifier::CTRL_SHIFT)
+    .export_values();
 
   // f3d::mesh_t
   py::class_<f3d::mesh_t>(module, "Mesh")

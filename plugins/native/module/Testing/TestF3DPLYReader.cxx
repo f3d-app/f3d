@@ -19,7 +19,7 @@ int TestF3DPLYReader(int vtkNotUsed(argc), char* argv[])
 
     if (!stream->Open(pathGaussians.c_str()))
     {
-      std::cerr << "Cannot open file" << std::endl;
+      std::cerr << "Cannot open file\n";
       return EXIT_FAILURE;
     }
 
@@ -32,13 +32,13 @@ int TestF3DPLYReader(int vtkNotUsed(argc), char* argv[])
 
     if (nbGaussians != 2655)
     {
-      std::cerr << "Incorrect number of gaussians: " << nbGaussians << std::endl;
+      std::cerr << "Incorrect number of gaussians: " << nbGaussians << "\n";
       return EXIT_FAILURE;
     }
 
     if (reader->GetOutput()->GetPointData()->GetArray("sh10") == nullptr)
     {
-      std::cerr << "Cannot find spherical harmonics" << std::endl;
+      std::cerr << "Cannot find spherical harmonics\n";
       return EXIT_FAILURE;
     }
   }
@@ -49,7 +49,7 @@ int TestF3DPLYReader(int vtkNotUsed(argc), char* argv[])
     file.open(pathGaussians.c_str(), std::ios::binary);
     if (!file.is_open())
     {
-      std::cerr << "Cannot open file" << std::endl;
+      std::cerr << "Cannot open file\n";
       return EXIT_FAILURE;
     }
 
@@ -65,13 +65,13 @@ int TestF3DPLYReader(int vtkNotUsed(argc), char* argv[])
 
     if (nbGaussians != 2655)
     {
-      std::cerr << "Incorrect number of gaussians: " << nbGaussians << std::endl;
+      std::cerr << "Incorrect number of gaussians: " << nbGaussians << "\n";
       return EXIT_FAILURE;
     }
 
     if (reader->GetOutput()->GetPointData()->GetArray("sh10") == nullptr)
     {
-      std::cerr << "Cannot find spherical harmonics" << std::endl;
+      std::cerr << "Cannot find spherical harmonics\n";
       return EXIT_FAILURE;
     }
   }
@@ -86,13 +86,13 @@ int TestF3DPLYReader(int vtkNotUsed(argc), char* argv[])
 
     if (nbPoints != 5)
     {
-      std::cerr << "Incorrect number of points: " << nbPoints << std::endl;
+      std::cerr << "Incorrect number of points: " << nbPoints << "\n";
       return EXIT_FAILURE;
     }
 
     if (reader->GetOutput()->GetPointData()->GetArray("sh10") != nullptr)
     {
-      std::cerr << "Should not have spherical harmonics" << std::endl;
+      std::cerr << "Should not have spherical harmonics\n";
       return EXIT_FAILURE;
     }
   }
@@ -110,7 +110,7 @@ int TestF3DPLYReader(int vtkNotUsed(argc), char* argv[])
 
     if (nbPoints != 0)
     {
-      std::cerr << "The file should be invalid" << std::endl;
+      std::cerr << "The file should be invalid\n";
       return EXIT_FAILURE;
     }
   }

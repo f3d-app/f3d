@@ -56,6 +56,13 @@ public:
   std::pair<std::string, std::string> getBindingDocumentation(
     const interaction_bind_t& bind) const override;
 
+  interactor& triggerModUpdate(InputModifier mod) override;
+  interactor& triggerMouseButton(InputAction action, MouseButton button) override;
+  interactor& triggerMousePosition(double xpos, double ypos) override;
+  interactor& triggerMouseWheel(WheelDirection direction) override;
+  interactor& triggerKeyboardKey(InputAction action, std::string_view keySym) override;
+  interactor& triggerTextCharacter(unsigned int codepoint) override;
+
   interactor& toggleAnimation() override;
   interactor& startAnimation() override;
   interactor& stopAnimation() override;
