@@ -56,7 +56,7 @@ def test_scene():
 
     engine.scene.remove_all_lights()
     red_light = f3d.LightState(color=f3d.Color(1.0, 0.0, 0.0))
-    assert img.compare(f3d.Image(reference_red_light)) < 0.05
+    engine.scene.add_light(red_light)
 
     img = engine.window.render_to_image()
     img.save(output)
