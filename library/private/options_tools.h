@@ -535,8 +535,7 @@ transform2d_t parse(const std::string& str)
   //  read as a scale/translation/angle series
   const std::regex settingCheck(
     "^((scale\\:)|(translation\\:)|(angle\\:)).*", std::regex_constants::icase);
-  const std::regex keywordCheck(
-    "^((scale)|(translation)|(angle))", std::regex_constants::icase);
+  const std::regex keywordCheck("^((scale)|(translation)|(angle))", std::regex_constants::icase);
   std::smatch matcher;
   std::istringstream split(strCompact);
   std::string each;
