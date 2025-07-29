@@ -1,6 +1,8 @@
 #include "vtkF3DQuakeMDLImporter.h"
 #include "vtkF3DQuakeMDLImporterConstants.h"
 
+#include<vtkInterpolateDataSetAttributes.h>
+
 #include <vtkFloatArray.h>
 #include <vtkImageData.h>
 #include <vtkOpenGLTexture.h>
@@ -9,6 +11,7 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
+#include <iostream>
 
 #include <cstdint>
 
@@ -428,6 +431,8 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   std::vector<std::vector<double>> AnimationTimes;
   std::vector<std::vector<vtkSmartPointer<vtkPolyData>>> AnimationFrames;
 
+  vtkNew<vtkInterpolateDataSetAttributes> interpolator;
+
   vtkIdType ActiveAnimation = -1;
 };
 
@@ -472,18 +477,53 @@ bool vtkF3DQuakeMDLImporter::UpdateAtTimeValue(double timeValue)
     // Find frameIndex for the provided timeValue so that t0 <= timeValue < t1
     // Animation range is from [Start time of first frame, Finish time of last frame]
 
-    // First time >= value, excluding the last element as it only represents finish time of the last
-    // frame
-    const auto found = std::lower_bound(times.begin(), times.end() - 1, timeValue);
-    // If found at finish time of last frame, select last frame's start time (second last value),
-    // else select distance
-    const size_t i =
-      (found == times.end() - 1) ? times.size() - 2 : std::distance(times.begin(), found);
-    // If time at index i > timeValue, the choose the previous frame
-    const size_t frameIndex = times[i] > timeValue && i > 0 ? i - 1 : i;
+    // First time >= value
+    const auto found = std::lower_bound(times.begin(), times.end(), timeValue);
+    // If none, select last, if found, select distance
+    const size_t i = found == times.end() ? times.size() - 1 : std::distance(times.begin(), found);
+    // If found time > timeValue, the the previous one - previous non Interpolated behavior
+    //const size_t frameIndex = *found > timeValue && i > 0 ? i - 1 : i;
+    //index for frame A
+    const size_t frameAIndex = *found > timeValue && i > 0 ? i - 1 : i;
+    //index for frame B, min to capture out of bounds
+    const size_t frameBIndex = std::min((frameAIndex + 1), times.size() - 1);
 
-    this->Internals->Mapper->SetInputData(
-      this->Internals->AnimationFrames[this->Internals->ActiveAnimation][frameIndex]);
+    //get time values
+    double timeA = times[frameAIndex];
+    double timeB = times[frameBIndex];
+
+    //calculating alpha
+    double alpha = (timeB != timeA) ? (timeValue - timeA) / (timeB - timeA) : 0.0;
+
+    //get both frames
+    auto frameA = this->Internals->AnimationFrames[this->Internals->ActiveAnimation][frameAIndex];
+    auto frameB = this->Internals->AnimationFrames[this->Internals->ActiveAnimation][frameBIndex];
+
+    std::cout << "FrameA Index: " << frameAIndex << ", FrameB Index: " << frameBIndex << std::endl;
+    std::cout << "Alpha: " << alpha << std::endl;
+
+    //interpolation
+    if (frameAIndex != frameBIndex)
+    {
+      vtkInterpolateDataSetAttributes* iPtr = this->Internals->interpolator.Get();
+      iPtr->SetInputData(0, frameA);
+      iPtr->SetInputData(1, frameB);
+      iPtr->SetT(alpha);
+      iPtr->Update();
+
+      vtkPolyData* output = this->Internals->interpolator->GetPolyDataOutput();
+      std::cout << "Interpolated points: " << output->GetNumberOfPoints() << std::endl;
+      std::cout << "Interpolated polys: " << output->GetNumberOfPolys() << std::endl;
+
+
+      this->Internals->Mapper->SetInputData(iPtr->GetPolyDataOutput());
+    }
+    else
+    {
+      this->Internals->Mapper->SetInputData(frameA);
+    }
+    /*this->Internals->Mapper->SetInputData(
+      this->Internals->AnimationFrames[this->Internals->ActiveAnimation][frameIndex]); */
   }
   return true;
 }
