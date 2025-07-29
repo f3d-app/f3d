@@ -91,10 +91,26 @@ int TestSDKScene(int argc, char* argv[])
     f3d::light_state_t light = sce.getLight(1);
     return light == redLight;
   });
+  test("get light at invalid index", [&]() {
+    f3d::light_state_t light = sce.getLight(10);
+    return light == defaultLight;
+  });
+  test("update light at invalid index", [&]() {
+    sce.updateLight(10, redLight);
+    return sce.getLight(0) == defaultLight && sce.getLight(1) == redLight;
+  });
   sce.updateLight(0, redLight);
   test("update light", sce.getLight(0) == sce.getLight(1));
+  test("remove light at invalid index", [&]() {
+    sce.removeLight(10);
+    return sce.getLightCount() == 2;
+  });
+  test("remove light at index 0", [&]() {
+    sce.removeLight(0);
+    return sce.getLightCount() == 1;
+  });
 
-  test("render after add", [&]() {
+  test("render after light", [&]() {
     if (!TestSDKHelpers::RenderTest(
           win, std::string(argv[1]) + "baselines/", argv[2], "TestSDKSceneRedLight"))
     {
