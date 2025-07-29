@@ -135,7 +135,7 @@ protected:
 /**
  * Describe a RGB color.
  */
-class color_t : public double_array_t<3>
+class F3D_EXPORT color_t : public double_array_t<3>
 {
 public:
   inline color_t() = default;

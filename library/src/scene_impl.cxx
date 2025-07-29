@@ -352,7 +352,7 @@ int scene_impl::addLight(const light_state_t& lightState)
 int scene_impl::getLightCount() const
 {
   vtkLightCollection* lc = this->Internals->Window.GetRenderer()->GetLights();
-  vtkLight* light;
+  const vtkLight* light;
   vtkCollectionSimpleIterator it;
   int lightCount = 0;
   for (lc->InitTraversal(it); (light = lc->GetNextLight(it));)
