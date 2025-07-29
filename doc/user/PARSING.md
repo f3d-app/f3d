@@ -12,6 +12,7 @@ The following types are supported:
 - path: A path to a local file.
 - color: A RGB color.
 - direction: A 3D vector representing a direction.
+- transform2d: A 9D vector representing a 3x3 matrix.
 
 As well as a list for bool, int, double, ratio, string, noted as
 
@@ -108,3 +109,12 @@ The following formats are supported when parsing a string into a colormap:
 - `val, color, ...`
 
 When formatting a colormap into a string, it is formatted as `val, color, ...`.
+
+## Transform2D
+
+The following formats are supported when parsing a string into a transform2D:
+
+- A 9D double vector
+- At least one of the following: `scale: val, val`, `translation: val, val`, `angle: val` in any order, semicolon-separated. `scale` may be given one value, which will apply to both the x and y axes of the matrix. `angle` is expressed in degrees.
+
+When formatting a transform2d into a string, it is formatted as a 9D double vector

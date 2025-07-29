@@ -217,6 +217,12 @@ Program Listing for File types.h
        (*this)[7] = M3_2;
        (*this)[8] = M3_3;
      }
+   
+     // clang-format off
+     // clang-format on
+   
+     F3D_EXPORT transform2d_t(const double_array_t<2>& scale, const double_array_t<2>& translate,
+       const angle_deg_t& angleRad);
    };
    
    class colormap_t
