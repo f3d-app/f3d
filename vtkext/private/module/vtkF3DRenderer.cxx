@@ -350,9 +350,6 @@ void vtkF3DRenderer::InitializeUpVector(const std::vector<double>& upVec)
   this->RightVector[0] = right[0];
   this->RightVector[1] = right[1];
   this->RightVector[2] = right[2];
-  this->FrontVector[0] = front[0];
-  this->FrontVector[1] = front[1];
-  this->FrontVector[2] = front[2];
 
   double pos[3];
   vtkMath::Cross(this->UpVector, this->RightVector, pos);
@@ -1760,23 +1757,23 @@ void vtkF3DRenderer::SetRotationAxis(bool use, const std::vector<double>& direct
     
     if (curr == x)
     {
-      this->RotationAxis[0] = this->UpVector[0];
-      this->RotationAxis[1] = this->UpVector[1];
-      this->RotationAxis[2] = this->UpVector[2];
+      this->RotationAxis[0] = y[0];
+      this->RotationAxis[1] = y[1];
+      this->RotationAxis[2] = y[2];
     } else if (curr == y)
     {
-      this->RotationAxis[0] = this->RightVector[0];
-      this->RotationAxis[1] = this->RightVector[1];
-      this->RotationAxis[2] = this->RightVector[2];
+      this->RotationAxis[0] = x[0];
+      this->RotationAxis[1] = x[1];
+      this->RotationAxis[2] = x[2];
 
       this->MovementVector[0] = 0.0;
       this->MovementVector[1] = -1.0;
     }
     else if (curr == z)
     {
-      this->RotationAxis[0] = this->FrontVector[0];
-      this->RotationAxis[1] = this->FrontVector[1];
-      this->RotationAxis[2] = this->FrontVector[2];
+      this->RotationAxis[0] = z[0];
+      this->RotationAxis[1] = z[1];
+      this->RotationAxis[2] = z[2];
 
       this->MovementVector[0] = -1.0;
       this->MovementVector[1] = 0.0;

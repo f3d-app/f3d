@@ -799,20 +799,6 @@ interactor& interactor_impl::initCommands()
       this->Internals->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
     });
 
-  this->addCommand("unlock_axis",
-    [&](const std::vector<std::string>& args)
-    { 
-      this->Internals->Options.interactor.axis_lock.enabled = false;
-    });
-
-  this->addCommand("lock_axis",
-    [&](const std::vector<std::string>& args)
-    {
-      check_args(args, 1, "lock_axis");
-      this->Internals->Options.setAsString("interactor.axis_lock.axis", args[0]);
-      this->Internals->Options.interactor.axis_lock.enabled = true;
-    });
-
   this->addCommand("toggle_axis_lock",
     [&](const std::vector<std::string>& args)
     {
@@ -820,11 +806,12 @@ interactor& interactor_impl::initCommands()
       const std::string val{ this->Internals->Options.getAsString("interactor.axis_lock.axis") };
       if (args[0] == val && this->Internals->Options.interactor.axis_lock.enabled)
       {
-        triggerCommand("unlock_axis");
+        this->Internals->Options.interactor.axis_lock.enabled = false;
       }
       else
       {
-        triggerCommand("lock_axis " + args[0]);
+        this->Internals->Options.interactor.axis_lock.axis = options::parse<f3d::direction_t>(args[0]);
+        this->Internals->Options.interactor.axis_lock.enabled = true;
       }
     });
 

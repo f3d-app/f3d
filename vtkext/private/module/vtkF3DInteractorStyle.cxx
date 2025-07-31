@@ -127,13 +127,6 @@ void vtkF3DInteractorStyle::OnDropFiles(vtkStringArray* files)
 void vtkF3DInteractorStyle::OnKeyPress()
 {
   this->InvokeEvent(vtkF3DInteractorStyle::KeyPressEvent, nullptr);
-
-  std::string interaction = this->Interactor->GetKeySym();
-  if (!interaction.empty())
-  {
-    // Make sure key symbols starts with an upper char (e.g. "space" -> "Space")
-    interaction[0] = std::toupper(interaction[0]);
-  }
 }
 
 //------------------------------------------------------------------------------

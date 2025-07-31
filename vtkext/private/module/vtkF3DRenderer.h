@@ -595,7 +595,6 @@ private:
   int RaytracingSamples = 0;
   double UpVector[3] = { 0.0, 1.0, 0.0 };
   double RightVector[3] = { 1.0, 0.0, 0.0 };
-  double FrontVector[3] = { 0.0, 0.0, 1.0 };
   double CircleOfConfusionRadius = 20.0;
   std::optional<double> PointSize;
   std::optional<double> LineWidth;

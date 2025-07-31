@@ -115,7 +115,7 @@ public:
    * Set temporary up vector to support rolled camera interaction.
    */
   void SetTemporaryUp(const double* tempUp);
-  
+
 protected:
   /**
    * Overridden to support being disabled
