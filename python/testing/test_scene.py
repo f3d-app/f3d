@@ -56,7 +56,7 @@ def test_scene():
 
     engine.scene.remove_all_lights()
     red_light = f3d.LightState(color=f3d.Color(1.0, 0.0, 0.0))
-    green_light = f3d.LightState(color = f3d.Color(0.0, 1.0, 0.0))
+    green_light = f3d.LightState(color=f3d.Color(0.0, 1.0, 0.0))
     engine.scene.add_light(red_light)
     engine.scene.add_light(green_light)
 
