@@ -77,6 +77,7 @@ def test_scene():
     assert engine.scene.get_light(1).color.to_tuple() == blue_light.color.to_tuple()
     assert engine.scene.get_light(1).position == blue_light.position
     assert engine.scene.get_light(1).direction == blue_light.direction
+    assert engine.scene.get_light(1).intensity == blue_light.intensity
 
     engine.scene.remove_light(1)
     assert engine.scene.get_light_count() == 1
