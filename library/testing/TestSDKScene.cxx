@@ -70,7 +70,6 @@ int TestSDKScene(int argc, char* argv[])
   f3d::light_state_t defaultLight;
   f3d::light_state_t redLight = defaultLight;
   redLight.color = f3d::color_t(1.0, 0.0, 0.0);
-  std::cout << sce.getLightCount() << " lights in the scene\n";
   test("empty light count", [&]() {
     sce.removeAllLights();
     return sce.getLightCount() == 0;
@@ -92,20 +91,14 @@ int TestSDKScene(int argc, char* argv[])
     f3d::light_state_t light = sce.getLight(1);
     return light == redLight;
   });
-  test("get light at invalid index", [&]() {
-    f3d::light_state_t light = sce.getLight(10);
-    return light == defaultLight;
-  });
-  test("update light at invalid index", [&]() {
-    sce.updateLight(10, redLight);
-    return sce.getLight(0) == defaultLight && sce.getLight(1) == redLight;
-  });
+  test.expect<f3d::scene::load_failure_exception>(
+    "get light at invalid index", [&]() { f3d::light_state_t light = sce.getLight(10); });
+  test.expect<f3d::scene::load_failure_exception>(
+    "update light at invalid index", [&]() { sce.updateLight(10, redLight); });
   sce.updateLight(0, redLight);
   test("update light", sce.getLight(0) == sce.getLight(1));
-  test("remove light at invalid index", [&]() {
-    sce.removeLight(10);
-    return sce.getLightCount() == 2;
-  });
+  test.expect<f3d::scene::load_failure_exception>(
+    "remove light at invalid index", [&]() { sce.removeLight(10); });
   test("remove light at index 0", [&]() {
     sce.removeLight(0);
     return sce.getLightCount() == 1;

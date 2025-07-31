@@ -336,8 +336,8 @@ int scene_impl::addLight(const light_state_t& lightState)
 {
   vtkNew<vtkLight> newLight;
   newLight->SetLightType(static_cast<int>(lightState.type));
-  newLight->SetPosition(lightState.position[0], lightState.position[1], lightState.position[2]);
-  newLight->SetColor(lightState.color[0], lightState.color[1], lightState.color[2]);
+  newLight->SetPosition(lightState.position.data());
+  newLight->SetColor(lightState.color.data());
   newLight->SetPositional(lightState.positionalLight);
   newLight->SetFocalPoint(lightState.position[0] + lightState.direction[0],
     lightState.position[1] + lightState.direction[1],
@@ -345,21 +345,14 @@ int scene_impl::addLight(const light_state_t& lightState)
   newLight->SetIntensity(lightState.intensity);
   newLight->SetSwitch(lightState.switchState);
   this->Internals->Window.GetRenderer()->AddLight(newLight);
-  return getLightCount() - 1;
+  return this->getLightCount() - 1;
 }
 
 //----------------------------------------------------------------------------
 int scene_impl::getLightCount() const
 {
   vtkLightCollection* lc = this->Internals->Window.GetRenderer()->GetLights();
-  const vtkLight* light;
-  vtkCollectionSimpleIterator it;
-  int lightCount = 0;
-  for (lc->InitTraversal(it); (light = lc->GetNextLight(it));)
-  {
-    lightCount++;
-  }
-  return lightCount;
+  return lc->GetNumberOfItems();
 }
 
 //----------------------------------------------------------------------------
@@ -369,19 +362,19 @@ light_state_t scene_impl::getLight(int index)
   vtkLight* light = vtkLight::SafeDownCast(lc->GetItemAsObject(index));
   if (!light)
   {
-    log::warn("No light at index ", index, " to get");
-    return light_state_t{};
+    throw scene::load_failure_exception("No light at index " + std::to_string(index) + " to get");
   }
+
+  const double* position = light->GetPosition();
+  const double* color = light->GetDiffuseColor();
+  const double* focalPoint = light->GetFocalPoint();
 
   light_state_t lightState;
   lightState.type = static_cast<light_type>(light->GetLightType());
-  lightState.position = { light->GetPosition()[0], light->GetPosition()[1],
-    light->GetPosition()[2] };
-  lightState.color = { light->GetDiffuseColor()[0], light->GetDiffuseColor()[1],
-    light->GetDiffuseColor()[2] };
-  lightState.direction = { light->GetFocalPoint()[0] - light->GetPosition()[0],
-    light->GetFocalPoint()[1] - light->GetPosition()[1],
-    light->GetFocalPoint()[2] - light->GetPosition()[2] };
+  lightState.position = { position[0], position[1], position[2] };
+  lightState.color = { color[0], color[1], color[2] };
+  lightState.direction = { focalPoint[0] - position[0], focalPoint[1] - position[1],
+    focalPoint[2] - position[2] };
   lightState.positionalLight = light->GetPositional();
   lightState.intensity = light->GetIntensity();
   lightState.switchState = light->GetSwitch();
@@ -395,13 +388,13 @@ scene& scene_impl::updateLight(int index, const light_state_t& lightState)
   vtkLight* light = vtkLight::SafeDownCast(lc->GetItemAsObject(index));
   if (!light)
   {
-    log::warn("No light at index ", index, " to update");
-    return *this;
+    throw scene::load_failure_exception(
+      "No light at index " + std::to_string(index) + " to update");
   }
 
   light->SetLightType(static_cast<int>(lightState.type));
-  light->SetPosition(lightState.position[0], lightState.position[1], lightState.position[2]);
-  light->SetColor(lightState.color[0], lightState.color[1], lightState.color[2]);
+  light->SetPosition(lightState.position.data());
+  light->SetColor(lightState.color.data());
   light->SetPositional(lightState.positionalLight);
   light->SetFocalPoint(lightState.position[0] + lightState.direction[0],
     lightState.position[1] + lightState.direction[1],
@@ -419,8 +412,8 @@ scene& scene_impl::removeLight(int index)
   vtkLight* light = vtkLight::SafeDownCast(lc->GetItemAsObject(index));
   if (!light)
   {
-    log::warn("No light at index ", index, " to remove");
-    return *this;
+    throw scene::load_failure_exception(
+      "No light at index " + std::to_string(index) + " to remove");
   }
 
   this->Internals->Window.GetRenderer()->RemoveLight(light);

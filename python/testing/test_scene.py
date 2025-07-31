@@ -56,7 +56,14 @@ def test_scene():
 
     engine.scene.remove_all_lights()
     red_light = f3d.LightState(color=f3d.Color(1.0, 0.0, 0.0))
-    green_light = f3d.LightState(color=f3d.Color(0.0, 1.0, 0.0))
+    green_light = f3d.LightState(
+        color=f3d.Color(0.0, 1.0, 0.0),
+        position=(0.0, 1.0, 0.0),
+        direction=(0.0, -1.0, 0.0),
+        intensity=0.5,
+        positional_light=True,
+        switch_state=True,
+    )
     engine.scene.add_light(red_light)
     engine.scene.add_light(green_light)
 
@@ -64,8 +71,11 @@ def test_scene():
     assert engine.scene.get_light(0).color.to_tuple() == (1.0, 0.0, 0.0)
     assert engine.scene.get_light(1).color.to_tuple() == (0.0, 1.0, 0.0)
 
-    engine.scene.update_light(1, f3d.LightState(color=f3d.Color(0.0, 0.0, 1.0)))
+    engine.scene.update_light(
+        1, f3d.LightState(color=f3d.Color(0.0, 0.0, 1.0), position=green_light.position)
+    )
     assert engine.scene.get_light(1).color.to_tuple() == (0.0, 0.0, 1.0)
+    assert engine.scene.get_light(1).position == (0.0, 1.0, 0.0)
 
     engine.scene.remove_light(1)
     assert engine.scene.get_light_count() == 1

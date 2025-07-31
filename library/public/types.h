@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cstdint>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -311,7 +312,7 @@ struct mesh_t
   F3D_EXPORT std::pair<bool, std::string> isValid() const;
 };
 
-enum class F3D_EXPORT light_type : int
+enum class F3D_EXPORT light_type : std::uint8_t
 {
   HEADLIGHT = 1,
   CAMERA_LIGHT = 2,
