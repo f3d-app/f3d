@@ -71,11 +71,12 @@ def test_scene():
     assert engine.scene.get_light(0).color.to_tuple() == (1.0, 0.0, 0.0)
     assert engine.scene.get_light(1).color.to_tuple() == (0.0, 1.0, 0.0)
 
-    engine.scene.update_light(
-        1, f3d.LightState(color=f3d.Color(0.0, 0.0, 1.0), position=green_light.position)
-    )
-    assert engine.scene.get_light(1).color.to_tuple() == (0.0, 0.0, 1.0)
-    assert engine.scene.get_light(1).position == (0.0, 1.0, 0.0)
+    blue_light = green_light
+    blue_light.color = f3d.Color(0.0, 0.0, 1.0)
+    engine.scene.update_light(1, blue_light)
+    assert engine.scene.get_light(1).color.to_tuple() == blue_light.color.to_tuple()
+    assert engine.scene.get_light(1).position == blue_light.position
+    assert engine.scene.get_light(1).direction == blue_light.direction
 
     engine.scene.remove_light(1)
     assert engine.scene.get_light_count() == 1
