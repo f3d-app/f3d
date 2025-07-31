@@ -63,5 +63,10 @@ static bool RenderTest(f3d::window& win, const std::string& baselinePath,
     win.renderToImage(noBackground), baselinePath, outputPath, name, threshold);
 }
 
+constexpr double Degrees2Radians(double degrees)
+{
+  return (3.14159265358979323846 * degrees / 180.0);
+}
+
 }
 #endif

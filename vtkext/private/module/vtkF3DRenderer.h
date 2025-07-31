@@ -65,6 +65,7 @@ public:
   void ShowConsole(bool show);
   void ShowMinimalConsole(bool show);
   void ShowDropZone(bool show);
+  void ShowDropZoneLogo(bool show);
   void ShowHDRISkybox(bool show);
   void ShowArmature(bool show);
   ///@}
@@ -573,6 +574,7 @@ private:
   bool ConsoleVisible = false;
   bool MinimalConsoleVisible = false;
   bool DropZoneVisible = false;
+  bool DropZoneLogoVisible = false;
   bool HDRISkyboxVisible = false;
   bool ArmatureVisible = false;
   bool UseRaytracing = false;
