@@ -1750,23 +1750,23 @@ void vtkF3DRenderer::SetRotationAxis(bool use, const std::vector<double>& direct
     
     if (curr == x)
     {
-      this->RotationAxis[0] = 0.0;
-      this->RotationAxis[1] = 1.0;
-      this->RotationAxis[2] = 0.0;
+      this->RotationAxis[0] = this->UpVector[0];
+      this->RotationAxis[1] = this->UpVector[1];
+      this->RotationAxis[2] = this->UpVector[2];
     } else if (curr == y)
     {
-      this->RotationAxis[0] = 1.0;
-      this->RotationAxis[1] = 0.0;
-      this->RotationAxis[2] = 0.0;
+      this->RotationAxis[0] = this->RightVector[0];
+      this->RotationAxis[1] = this->RightVector[1];
+      this->RotationAxis[2] = this->RightVector[2];
 
       this->MovementVector[0] = 0.0;
       this->MovementVector[1] = -1.0;
     }
     else if (curr == z)
     {
-      this->RotationAxis[0] = 0.0;
-      this->RotationAxis[1] = 0.0;
-      this->RotationAxis[2] = 1.0;
+      this->RotationAxis[0] = this->FrontVector[0];
+      this->RotationAxis[1] = this->FrontVector[1];
+      this->RotationAxis[2] = this->FrontVector[2];
 
       this->MovementVector[0] = -1.0;
       this->MovementVector[1] = 0.0;
