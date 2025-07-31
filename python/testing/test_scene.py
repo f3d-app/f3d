@@ -56,7 +56,19 @@ def test_scene():
 
     engine.scene.remove_all_lights()
     red_light = f3d.LightState(color=f3d.Color(1.0, 0.0, 0.0))
+    green_light = f3d.LightState(color = f3d.Color(0.0, 1.0, 0.0))
     engine.scene.add_light(red_light)
+    engine.scene.add_light(green_light)
+
+    assert engine.scene.get_light_count() == 2
+    assert engine.scene.get_light(0).color.to_tuple() == (1.0, 0.0, 0.0)
+    assert engine.scene.get_light(1).color.to_tuple() == (0.0, 1.0, 0.0)
+
+    engine.scene.update_light(1, f3d.LightState(color=f3d.Color(0.0, 0.0, 1.0)))
+    assert engine.scene.get_light(1).color.to_tuple() == (0.0, 0.0, 1.0)
+
+    engine.scene.remove_light(1)
+    assert engine.scene.get_light_count() == 1
 
     img = engine.window.render_to_image()
     img.save(output)
