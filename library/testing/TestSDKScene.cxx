@@ -91,13 +91,13 @@ int TestSDKScene(int argc, char* argv[])
     f3d::light_state_t light = sce.getLight(1);
     return light == redLight;
   });
-  test.expect<f3d::scene::load_failure_exception>(
+  test.expect<f3d::scene::light_exception>(
     "get light at invalid index", [&]() { f3d::light_state_t light = sce.getLight(10); });
-  test.expect<f3d::scene::load_failure_exception>(
+  test.expect<f3d::scene::light_exception>(
     "update light at invalid index", [&]() { sce.updateLight(10, redLight); });
   sce.updateLight(0, redLight);
   test("update light", sce.getLight(0) == sce.getLight(1));
-  test.expect<f3d::scene::load_failure_exception>(
+  test.expect<f3d::scene::light_exception>(
     "remove light at invalid index", [&]() { sce.removeLight(10); });
   test("remove light at index 0", [&]() {
     sce.removeLight(0);

@@ -362,7 +362,7 @@ light_state_t scene_impl::getLight(int index)
   vtkLight* light = vtkLight::SafeDownCast(lc->GetItemAsObject(index));
   if (!light)
   {
-    throw scene::load_failure_exception("No light at index " + std::to_string(index) + " to get");
+    throw scene::light_exception("No light at index " + std::to_string(index) + " to get");
   }
 
   const double* position = light->GetPosition();
@@ -388,8 +388,7 @@ scene& scene_impl::updateLight(int index, const light_state_t& lightState)
   vtkLight* light = vtkLight::SafeDownCast(lc->GetItemAsObject(index));
   if (!light)
   {
-    throw scene::load_failure_exception(
-      "No light at index " + std::to_string(index) + " to update");
+    throw scene::light_exception("No light at index " + std::to_string(index) + " to update");
   }
 
   light->SetLightType(static_cast<int>(lightState.type));
@@ -412,8 +411,7 @@ scene& scene_impl::removeLight(int index)
   vtkLight* light = vtkLight::SafeDownCast(lc->GetItemAsObject(index));
   if (!light)
   {
-    throw scene::load_failure_exception(
-      "No light at index " + std::to_string(index) + " to remove");
+    throw scene::light_exception("No light at index " + std::to_string(index) + " to remove");
   }
 
   this->Internals->Window.GetRenderer()->RemoveLight(light);

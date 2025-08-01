@@ -63,6 +63,7 @@ def test_scene():
         intensity=0.5,
         positional_light=True,
         switch_state=True,
+        type=f3d.LightType.HEADLIGHT,
     )
     engine.scene.add_light(red_light)
     engine.scene.add_light(green_light)
@@ -73,11 +74,13 @@ def test_scene():
 
     blue_light = green_light
     blue_light.color = f3d.Color(0.0, 0.0, 1.0)
+    blue_light.type = f3d.LightType.CAMERA_LIGHT
     engine.scene.update_light(1, blue_light)
     assert engine.scene.get_light(1).color.to_tuple() == blue_light.color.to_tuple()
     assert engine.scene.get_light(1).position == blue_light.position
     assert engine.scene.get_light(1).direction == blue_light.direction
     assert engine.scene.get_light(1).intensity == blue_light.intensity
+    assert engine.scene.get_light(1).type == f3d.LightType.CAMERA_LIGHT
 
     engine.scene.remove_light(1)
     assert engine.scene.get_light_count() == 1

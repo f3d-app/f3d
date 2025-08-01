@@ -80,6 +80,16 @@ public:
   virtual scene& clear() = 0;
 
   /**
+   * An exception that can be thrown by the light
+   * when it fails to get or update a light state.
+   */
+  struct light_exception : public exception
+  {
+    explicit light_exception(const std::string& what = "")
+      : f3d::exception(what) {};
+  };
+
+  /**
    * Add a light based on a light state, returns the index of the added light.
    */
   virtual int addLight(const light_state_t& lightState) = 0;
