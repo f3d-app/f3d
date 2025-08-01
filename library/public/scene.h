@@ -80,7 +80,7 @@ public:
   virtual scene& clear() = 0;
 
   /**
-   * An exception that can be thrown by the light
+   * An exception that can be thrown by the scene
    * when it fails to index the light
    */
   struct light_exception : public exception
