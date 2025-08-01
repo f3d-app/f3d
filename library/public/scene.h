@@ -81,7 +81,7 @@ public:
 
   /**
    * An exception that can be thrown by the light
-   * when it fails to get or update a light state.
+   * when it fails to index the light
    */
   struct light_exception : public exception
   {
