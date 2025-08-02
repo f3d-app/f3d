@@ -1735,49 +1735,20 @@ void vtkF3DRenderer::SetUseTrackball(bool use)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetRotationAxis(bool use, const std::vector<double>& direction)
+void vtkF3DRenderer::SetRotationAxis(bool use, const std::vector<double>& axis)
 {
-  std::array<double, 3> prev = { RotationDirection[0], RotationDirection[1], RotationDirection[2] };
-  std::array<double, 3> curr = { direction[0], direction[1], direction[2] };
-
-  std::array<double, 3> x = { 1.0, 0.0, 0.0 };
-  std::array<double, 3> y = { 0.0, 1.0, 0.0 };
-  std::array<double, 3> z = { 0.0, 0.0, 1.0 };
+  std::array<double, 3> prev = { this->RotationAxis[0], this->RotationAxis[1],
+    this->RotationAxis[2] };
+  std::array<double, 3> curr = { axis[0], axis[1], axis[2] };
 
   if (use != this->UseRotationAxis || curr != prev)
   {
     this->UseRotationAxis = use;
 
-    this->RotationDirection[0] = direction[0];
-    this->RotationDirection[1] = direction[1];
-    this->RotationDirection[2] = direction[2];
-    
-    this->MovementVector[0] = 1.0;
-    this->MovementVector[1] = 0.0;
-    
-    if (curr == x)
-    {
-      this->RotationAxis[0] = y[0];
-      this->RotationAxis[1] = y[1];
-      this->RotationAxis[2] = y[2];
-    } else if (curr == y)
-    {
-      this->RotationAxis[0] = x[0];
-      this->RotationAxis[1] = x[1];
-      this->RotationAxis[2] = x[2];
-
-      this->MovementVector[0] = 0.0;
-      this->MovementVector[1] = -1.0;
-    }
-    else if (curr == z)
-    {
-      this->RotationAxis[0] = z[0];
-      this->RotationAxis[1] = z[1];
-      this->RotationAxis[2] = z[2];
-
-      this->MovementVector[0] = -1.0;
-      this->MovementVector[1] = 0.0;
-    }
+    this->RotationAxis[0] = axis[0];
+    this->RotationAxis[1] = axis[1];
+    this->RotationAxis[2] = axis[2];
+        
     this->CheatSheetConfigured = false;
   }
 }
