@@ -66,5 +66,51 @@ int TestSDKScene(int argc, char* argv[])
     }
   });
 
+  // light test
+  f3d::light_state_t defaultLight;
+  f3d::light_state_t redLight = defaultLight;
+  redLight.color = f3d::color_t(1.0, 0.0, 0.0);
+  test("empty light count", [&]() {
+    sce.removeAllLights();
+    return sce.getLightCount() == 0;
+  });
+  test("add default light", [&]() {
+    int index = sce.addLight(defaultLight);
+    return index == 0 && sce.getLightCount() == 1;
+  });
+  test("add red light", [&]() {
+    int index = sce.addLight(redLight);
+    return index == 1 && sce.getLightCount() == 2;
+  });
+  test("light count after add", [&]() { return sce.getLightCount() == 2; });
+  test("get light at index 0", [&]() {
+    f3d::light_state_t light = sce.getLight(0);
+    return light == defaultLight;
+  });
+  test("get light at index 1", [&]() {
+    f3d::light_state_t light = sce.getLight(1);
+    return light == redLight;
+  });
+  test.expect<f3d::scene::light_exception>(
+    "get light at invalid index", [&]() { f3d::light_state_t light = sce.getLight(10); });
+  test.expect<f3d::scene::light_exception>(
+    "update light at invalid index", [&]() { sce.updateLight(10, redLight); });
+  sce.updateLight(0, redLight);
+  test("update light", sce.getLight(0) == sce.getLight(1));
+  test.expect<f3d::scene::light_exception>(
+    "remove light at invalid index", [&]() { sce.removeLight(10); });
+  test("remove light at index 0", [&]() {
+    sce.removeLight(0);
+    return sce.getLightCount() == 1;
+  });
+
+  test("render after light", [&]() {
+    if (!TestSDKHelpers::RenderTest(
+          win, std::string(argv[1]) + "baselines/", argv[2], "TestSDKSceneRedLight"))
+    {
+      throw "rendering test failed";
+    }
+  });
+
   return test.result();
 }

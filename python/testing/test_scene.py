@@ -34,6 +34,7 @@ def test_scene():
     sphere2 = testing_dir / "data/mb/recursive/mb_2_0.vtp"
     cube = testing_dir / "data/mb/recursive/mb_0_0.vtu"
     reference = testing_dir / "baselines/TestPythonScene.png"
+    reference_red_light = testing_dir / "baselines/TestPythonSceneRedLight.png"
     output = Path(tempfile.gettempdir()) / "TestPythonScene.png"
 
     engine = f3d.Engine.create(True)
@@ -52,3 +53,39 @@ def test_scene():
     img.save(output)
 
     assert img.compare(f3d.Image(reference)) < 0.05
+
+    engine.scene.remove_all_lights()
+    red_light = f3d.LightState(color=f3d.Color(1.0, 0.0, 0.0))
+    green_light = f3d.LightState(
+        color=f3d.Color(0.0, 1.0, 0.0),
+        position=(0.0, 1.0, 0.0),
+        direction=(0.0, -1.0, 0.0),
+        intensity=0.5,
+        positional_light=True,
+        switch_state=True,
+        type=f3d.LightType.HEADLIGHT,
+    )
+    engine.scene.add_light(red_light)
+    engine.scene.add_light(green_light)
+
+    assert engine.scene.get_light_count() == 2
+    assert engine.scene.get_light(0).color.to_tuple() == (1.0, 0.0, 0.0)
+    assert engine.scene.get_light(1).color.to_tuple() == (0.0, 1.0, 0.0)
+
+    blue_light = green_light
+    blue_light.color = f3d.Color(0.0, 0.0, 1.0)
+    blue_light.type = f3d.LightType.CAMERA_LIGHT
+    engine.scene.update_light(1, blue_light)
+    assert engine.scene.get_light(1).color.to_tuple() == blue_light.color.to_tuple()
+    assert engine.scene.get_light(1).position == blue_light.position
+    assert engine.scene.get_light(1).direction == blue_light.direction
+    assert engine.scene.get_light(1).intensity == blue_light.intensity
+    assert engine.scene.get_light(1).type == f3d.LightType.CAMERA_LIGHT
+
+    engine.scene.remove_light(1)
+    assert engine.scene.get_light_count() == 1
+
+    img = engine.window.render_to_image()
+    img.save(output)
+
+    assert img.compare(f3d.Image(reference_red_light)) < 0.05

@@ -352,7 +352,66 @@ PYBIND11_MODULE(pyf3d, module)
       "Add a surfacic mesh from memory into the scene", py::arg("mesh"))
     .def("load_animation_time", &f3d::scene::loadAnimationTime)
     .def("animation_time_range", &f3d::scene::animationTimeRange)
-    .def("available_animations", &f3d::scene::availableAnimations);
+    .def("available_animations", &f3d::scene::availableAnimations)
+    .def("add_light", &f3d::scene::addLight, "Add a light to the scene", py::arg("light_state"))
+    .def(
+      "remove_light", &f3d::scene::removeLight, "Remove a light from the scene", py::arg("index"))
+    .def("update_light", &f3d::scene::updateLight, "Update a light in the scene", py::arg("index"),
+      py::arg("light_state"))
+    .def("get_light", &f3d::scene::getLight, "Get a light from the scene", py::arg("index"))
+    .def("get_light_count", &f3d::scene::getLightCount, "Get the number of lights in the scene")
+    .def("remove_all_lights", &f3d::scene::removeAllLights, "Remove all lights from the scene");
+
+  py::enum_<f3d::light_type>(module, "LightType")
+    .value("HEADLIGHT", f3d::light_type::HEADLIGHT)
+    .value("CAMERA_LIGHT", f3d::light_type::CAMERA_LIGHT)
+    .value("SCENE_LIGHT", f3d::light_type::SCENE_LIGHT)
+    .export_values();
+
+  // f3d::color_t
+  py::class_<f3d::color_t>(module, "Color")
+    .def(py::init<>())
+    .def(py::init<double, double, double>(), py::arg("r"), py::arg("g"), py::arg("b"))
+    .def_property(
+      "r", [](const f3d::color_t& color) { return color.r(); },
+      [](f3d::color_t& color, double value) { color[0] = value; })
+    .def_property(
+      "g", [](const f3d::color_t& color) { return color.g(); },
+      [](f3d::color_t& color, double value) { color[1] = value; })
+    .def_property(
+      "b", [](const f3d::color_t& color) { return color.b(); },
+      [](f3d::color_t& color, double value) { color[2] = value; })
+    .def(
+      "to_tuple",
+      [](const f3d::color_t& color) { return std::make_tuple(color.r(), color.g(), color.b()); },
+      "Convert color to a tuple of (r, g, b)")
+    .def(
+      "from_tuple",
+      [](f3d::color_t& color, const std::tuple<double, double, double>& tuple)
+      {
+        color[0] = std::get<0>(tuple);
+        color[1] = std::get<1>(tuple);
+        color[2] = std::get<2>(tuple);
+      },
+      "Set color from a tuple of (r, g, b)");
+
+  // f3d::light_state_t
+  py::class_<f3d::light_state_t>(module, "LightState")
+    .def(py::init<>())
+    .def(py::init<const f3d::light_type&, const f3d::point3_t&, const f3d::color_t&,
+           const f3d::vector3_t&, const bool&, const double&, const bool&>(),
+      py::arg("type") = f3d::light_type::SCENE_LIGHT,
+      py::arg("position") = f3d::point3_t({ 0.0, 0.0, 0.0 }),
+      py::arg("color") = f3d::color_t({ 1.0, 1.0, 1.0 }),
+      py::arg("direction") = f3d::vector3_t({ 1.0, 0.0, 0.0 }), py::arg("positional_light") = false,
+      py::arg("intensity") = 1.0, py::arg("switch_state") = true)
+    .def_readwrite("type", &f3d::light_state_t::type)
+    .def_readwrite("color", &f3d::light_state_t::color)
+    .def_readwrite("position", &f3d::light_state_t::position)
+    .def_readwrite("direction", &f3d::light_state_t::direction)
+    .def_readwrite("positional_light", &f3d::light_state_t::positionalLight)
+    .def_readwrite("intensity", &f3d::light_state_t::intensity)
+    .def_readwrite("switch_state", &f3d::light_state_t::switchState);
 
   // f3d::camera_state_t
   py::class_<f3d::camera_state_t>(module, "CameraState")
