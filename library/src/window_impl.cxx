@@ -642,4 +642,4 @@ vtkF3DRenderer* window_impl::GetRenderer() const
 {
   return this->Internals->Renderer;
 }
-}
+};
