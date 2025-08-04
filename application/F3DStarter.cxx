@@ -842,10 +842,11 @@ public:
       };
 
       // "doc", ""
-      auto docString = [](const std::string& doc) { return std::make_tuple(doc, "", ""); };
+      auto docString = [](const std::string& doc)
+      { return std::make_tuple(doc, "", f3d::binding_t::LAUNCHER); };
 
       auto docStringVec = [&](const std::vector<std::string>& docs)
-      { return std::make_tuple(vecToString(docs), "", ""); };
+      { return std::make_tuple(vecToString(docs), "", f3d::binding_t::LAUNCHER); };
 
       using mod_t = f3d::interaction_bind_t::ModifierKeys;
 

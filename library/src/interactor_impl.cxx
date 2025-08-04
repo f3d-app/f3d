@@ -1100,20 +1100,21 @@ interactor& interactor_impl::initBindings()
     {
       desc = this->Internals->Options.render.effect.antialiasing.mode;
     }
-    return std::tuple("Anti-aliasing", std::move(desc), "Cyclic");
+    return std::tuple("Anti-aliasing", std::move(desc), binding_t::CYCLIC);
   };
 
   // "Cycle animation" , "animationName"
   auto docAnim = [&]()
   {
-    return std::tuple("Animation", this->Internals->AnimationManager->GetAnimationName(), "Cyclic");
+    return std::tuple(
+      "Animation", this->Internals->AnimationManager->GetAnimationName(), binding_t::CYCLIC);
   };
 
   // "Cycle point/cell data coloring" , "POINT/CELL"
   auto docField = [&]()
   {
-    return std::tuple(
-      std::string("Data coloring"), (opts.model.scivis.cells ? "CELL" : "POINT"), "Cyclic");
+    return std::tuple(std::string("Data coloring"), (opts.model.scivis.cells ? "CELL" : "POINT"),
+      binding_t::CYCLIC);
   };
 
   // "Cycle array to color with" , "arrayName"
@@ -1124,7 +1125,7 @@ interactor& interactor_impl::initBindings()
           ? shortName(opts.model.scivis.array_name.value(), 15) +
             (opts.model.scivis.enable ? "" : " (forced)")
           : "OFF"),
-      "Cyclic");
+      binding_t::CYCLIC);
   };
 
   // "Cycle component to color with" , "component"
@@ -1133,11 +1134,11 @@ interactor& interactor_impl::initBindings()
     vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
     vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
     return std::tuple(
-      "Color component", ren->ComponentToString(opts.model.scivis.component), "Cyclic");
+      "Color component", ren->ComponentToString(opts.model.scivis.component), binding_t::CYCLIC);
   };
 
   // "doc", ""
-  auto docStr = [](const std::string& doc) { return std::tuple(doc, "", ""); };
+  auto docStr = [](const std::string& doc) { return std::tuple(doc, "", binding_t::LAUNCHER); };
 
   // "doc", "value"
   auto docDbl = [](const std::string& doc, const double& val)
@@ -1146,7 +1147,7 @@ interactor& interactor_impl::initBindings()
     valStream.precision(2);
     valStream << std::fixed;
     valStream << val;
-    return std::tuple(doc, valStream.str(), "Numerical");
+    return std::tuple(doc, valStream.str(), binding_t::NUMERICAL);
   };
 
   // "doc", "value/Unset"
@@ -1163,22 +1164,25 @@ interactor& interactor_impl::initBindings()
     {
       valStream << "Unset";
     }
-    return std::tuple(doc, valStream.str(), "Numerical");
+    return std::tuple(doc, valStream.str(), binding_t::NUMERICAL);
   };
 
   // "doc", "ON/OFF"
   auto docTgl = [](const std::string& doc, const bool& val)
-  { return std::tuple(doc, (val ? "ON" : "OFF"), "Toggle"); };
+  { return std::tuple(doc, (val ? "ON" : "OFF"), binding_t::TOGGLE); };
 
   // "doc", "ON/OFF/Unset"
   auto docTglOpt = [](const std::string& doc, const std::optional<bool>& val)
-  { return std::tuple(doc, (val.has_value() ? (val.value() ? "ON" : "OFF") : "Unset"), "Toggle"); };
+  {
+    return std::tuple(
+      doc, (val.has_value() ? (val.value() ? "ON" : "OFF") : "Unset"), binding_t::TOGGLE);
+  };
 
   // "Cycle verbose level", "current_level"
   auto docVerbose = [&]()
   {
-    return std::tuple(
-      "Verbose level", this->Internals->VerboseLevelToString(log::getVerboseLevel()), "Cyclic");
+    return std::tuple("Verbose level",
+      this->Internals->VerboseLevelToString(log::getVerboseLevel()), binding_t::CYCLIC);
   };
 
   // clang-format off
@@ -1347,8 +1351,15 @@ std::tuple<std::string, std::string, std::string> interactor_impl::getBindingDoc
     throw interactor_impl::does_not_exists_exception(
       std::string("Bind: ") + bind.format() + " does not exists");
   }
+
   const auto& docFunc = it->second.DocumentationCallback;
-  return docFunc ? docFunc() : std::make_tuple(std::string(), std::string(), std::string());
+  if (!docFunc)
+  {
+    return std::make_tuple(std::string(), std::string(), std::string());
+  }
+
+  auto [doc, value, type] = docFunc();
+  return std::make_tuple(doc, value, bindingsTypeName(type));
 }
 
 //----------------------------------------------------------------------------

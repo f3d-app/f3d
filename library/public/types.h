@@ -310,6 +310,17 @@ struct mesh_t
    */
   F3D_EXPORT std::pair<bool, std::string> isValid() const;
 };
+
+/**
+ * Describe the binding type.
+ */
+enum class binding_t : unsigned char
+{
+  LAUNCHER = 0x80, // 10000000
+  CYCLIC = 0x0,    // 00000000
+  TOGGLE = 0x1,    // 00000001
+  NUMERICAL = 0x2  // 00000010
+};
 }
 
 #endif

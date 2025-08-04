@@ -108,8 +108,7 @@ public:
   ///@}
 
   ///@{ @name Bindings
-  using documentation_callback_t =
-    std::function<std::tuple<std::string, std::string, std::string>()>;
+  using documentation_callback_t = std::function<std::tuple<std::string, std::string, binding_t>()>;
 
   /**
    * Remove all existing interaction commands and add all default bindings
@@ -163,6 +162,25 @@ public:
   {
     return this->addBinding(
       bind, std::vector<std::string>(list), std::move(group), std::move(documentationCallback));
+  }
+
+  /**
+   * Convenience method to convert binding_t enum to string
+   */
+  std::string bindingsTypeName(binding_t bindingType) const
+  {
+    switch (bindingType)
+    {
+      case binding_t::LAUNCHER:
+        return "Launcher";
+      case binding_t::CYCLIC:
+        return "Cyclic";
+      case binding_t::TOGGLE:
+        return "Toggle";
+      case binding_t::NUMERICAL:
+        return "Numerical";
+    }
+    return "";
   }
 
   /**
