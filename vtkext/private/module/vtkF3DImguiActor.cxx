@@ -475,7 +475,6 @@ void vtkF3DImguiActor::RenderCheatSheet()
       maxDescTextWidth = std::max(maxDescTextWidth, descriptionLineSize.x);
 
       std::string cyclingValue = "< " + val + " >";
-
       ImVec2 valueLineSize = ImGui::CalcTextSize(cyclingValue.c_str());
       maxValueTextWidth = std::max(maxValueTextWidth, valueLineSize.x);
 
@@ -518,7 +517,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
         bindingRectColor = F3DImguiStyle::GetWarningColor();
         descTextColor = F3DImguiStyle::GetWarningColor();
       }
-      else if (!val.empty() && val != "OFF" && val != "Unset" && val != "none")
+      else if (!val.empty() && val != "OFF" && val != "Unset")
       {
         bindingTextColor = F3DImguiStyle::GetBackgroundColor();
         bindingRectColor = F3DImguiStyle::GetHighlightColor();
@@ -538,13 +537,9 @@ void vtkF3DImguiActor::RenderCheatSheet()
       ImGui::TextColored(descTextColor, "%s", desc.c_str());
 
       ImGui::TableNextColumn();
-      if (!type.empty() && type == "Cyclic")
+      if (type == "Cyclic")
       {
         ImGui::TextColored(descTextColor, "< %s >", val.c_str());
-      }
-      else if (!type.empty() && type == "Numerical")
-      {
-        ImGui::TextColored(descTextColor, "- %s +", val.c_str());
       }
       else
       {
