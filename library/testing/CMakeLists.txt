@@ -26,6 +26,7 @@ if(F3D_MODULE_UI)
   list(APPEND libf3dSDKTests_list
     TestSDKConsole.cxx
     TestSDKDropZone.cxx
+    TestSDKDropZoneNoLogo.cxx
     TestSDKDropZoneMinSize.cxx
     TestSDKDynamicBackgroundColor.cxx
     TestSDKDynamicFontFile.cxx
@@ -33,6 +34,7 @@ if(F3D_MODULE_UI)
     TestSDKInteractorCallBack.cxx
     TestSDKInteractorDocumentation.cxx
     TestSDKMultiOptions.cxx
+    TestSDKTriggerInteractions.cxx
     )
 
   # HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767

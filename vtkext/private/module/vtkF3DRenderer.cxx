@@ -1638,6 +1638,16 @@ void vtkF3DRenderer::ShowDropZone(bool show)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::ShowDropZoneLogo(bool show)
+{
+  if (this->DropZoneLogoVisible != show)
+  {
+    this->DropZoneLogoVisible = show;
+    this->UIActor->SetDropZoneLogoVisibility(show);
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowHDRISkybox(bool show)
 {
   if (this->HDRISkyboxVisible != show)
@@ -2757,6 +2767,7 @@ void vtkF3DRenderer::ConfigureScalarBarActorForColoring(
   scalarBar->SetWidth(0.8);
   scalarBar->SetHeight(0.07);
   scalarBar->SetPosition(0.1, 0.01);
+  scalarBar->SetMaximumNumberOfColors(512);
 }
 
 //----------------------------------------------------------------------------
@@ -2884,12 +2895,18 @@ void vtkF3DRenderer::CycleFieldForColoring()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureActorTextureTransform(vtkActor* actorBase, const double* matrix)
 {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20250802)
+  vtkInformationDoubleVectorKey* generalTextureTransformKey = vtkProp::GENERAL_TEXTURE_TRANSFORM();
+#else
+  vtkInformationDoubleVectorKey* generalTextureTransformKey = vtkProp::GeneralTextureTransform();
+#endif
+
   vtkInformation* info = actorBase->GetPropertyKeys();
   if (info)
   {
     /**
      * The actor already has a property key dictionary
-     * Check that GeneralTextureTransform exists and combine,
+     * Check that the general texture transform exists and combine them together,
      * Otherwise set the property to our texture transform
      */
 
@@ -2899,13 +2916,13 @@ void vtkF3DRenderer::ConfigureActorTextureTransform(vtkActor* actorBase, const d
       finalTransform[i] = matrix[i];
     }
 
-    if (auto transformPtr = info->Get(vtkProp::GeneralTextureTransform()))
+    if (auto transformPtr = info->Get(generalTextureTransformKey))
     {
       // We need to create 4x4 vtk matrixes from the arrays
       vtkNew<vtkMatrix4x4> matTransform;
       matTransform->Multiply4x4(transformPtr, matrix, finalTransform);
     }
-    info->Set(vtkProp::GeneralTextureTransform(), finalTransform, 16);
+    info->Set(generalTextureTransformKey, finalTransform, 16);
   }
   else
   {
@@ -2913,7 +2930,7 @@ void vtkF3DRenderer::ConfigureActorTextureTransform(vtkActor* actorBase, const d
      * No dictionary found, add new dictionary with transform
      */
     vtkNew<vtkInformation> properties;
-    properties->Set(vtkProp::GeneralTextureTransform(), matrix, 16);
+    properties->Set(generalTextureTransformKey, matrix, 16);
     actorBase->SetPropertyKeys(properties);
   }
 }

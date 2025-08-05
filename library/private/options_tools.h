@@ -493,15 +493,208 @@ colormap_t parse(const std::string& str)
 //----------------------------------------------------------------------------
 /**
  *  Parse provided string into a transform2d_t
- *  Supported format: double, double, double, ... as a sequence of 9 values
+ *  Supported formats:
+ *  - "double, double, double, ..." as a sequence of 9 values
+ *  - "scale,translation,angle" in any order, default values used if one or two options are omitted
+ *    "scale: double", "scale: double,double", "translation: double, double", "angle: double"
  *  Can throw options::parsing_exception in case of failure to parse
  */
 template<>
 transform2d_t parse(const std::string& str)
 {
-  std::vector<double> input;
-  input = parse<std::vector<double>>(str);
-  return transform2d_t(input);
+  const std::string strCompact = std::regex_replace(str, std::regex("\\s"), "");
+
+  if (strCompact[0] >= '0' && strCompact[0] <= '9')
+  {
+    std::vector<double> input;
+    // since the input starts with a numeric char, we try to read as a double vector
+    try
+    {
+      input = parse<std::vector<double>>(strCompact);
+    }
+    catch (const options::parsing_exception&)
+    {
+      throw options::parsing_exception("Cannot convert input into a double vector: " + str);
+    }
+
+    if (input.size() > 9)
+    {
+      throw options::parsing_exception(
+        "Input vector too large to read as transform2d, size 9 required: " + str);
+    }
+    else if (input.size() < 9)
+    {
+      throw options::parsing_exception(
+        "Input vector too small to read as transform2d, size 9 required: " + str);
+    }
+
+    return transform2d_t(input);
+  }
+
+  // try to read with scale/translate/angle notation
+  //  read as a scale/translation/angle series
+  const std::regex settingCheck(
+    "^((scale\\:)|(translation\\:)|(angle\\:)).*", std::regex_constants::icase);
+  const std::regex keywordCheck("^((scale)|(translation)|(angle))", std::regex_constants::icase);
+  std::smatch matcher;
+  std::istringstream split(strCompact);
+  std::string each;
+  bool setScale = false;
+  std::vector<double> scaleVec;
+  std::vector<double> translationVec;
+  bool angleNext = false;
+  std::vector<angle_deg_t> angleVec;
+  bool hasScale = false;
+  bool hasTranslation = false;
+  bool hasAngle = false;
+
+  // split order for parsing: (example "scale:0.1;translation:0.51,2.1;angle:60.0")
+  //  - split substrings by ';' ("scale:0.1" "translation:0.51,2.1" "angle:60.0")
+  //  - split each substring by ':' (["scale" "0.1"]["translation" "0.51,2.1"]["angle" "60.0"])
+  //  - read remaining substrings as keyword or series of double values split by ','
+
+  while (std::getline(split, each, ';'))
+  {
+    if (std::regex_match(each, matcher, settingCheck))
+    {
+      std::istringstream subSplit(each);
+      std::string subStr;
+      while (std::getline(subSplit, subStr, ':'))
+      {
+        if (std::regex_match(subStr, matcher, keywordCheck))
+        {
+          // read and apply keyword
+          if (subStr == "scale")
+          {
+            if (hasScale)
+            {
+              throw options::parsing_exception(
+                "Input cannot have multiple scale transforms: " + str);
+            }
+            setScale = true;
+            hasScale = true;
+          }
+          else if (subStr == "translation")
+          {
+            if (hasTranslation)
+            {
+              throw options::parsing_exception(
+                "Input cannot have multiple translation transforms: " + str);
+            }
+            setScale = false;
+            hasTranslation = true;
+          }
+          else if (subStr == "angle")
+          {
+            if (hasAngle)
+            {
+              throw options::parsing_exception(
+                "Input cannot have multiple angle transforms: " + str);
+            }
+            angleNext = true;
+            hasAngle = true;
+          }
+        }
+        else
+        {
+          // read as series of double values
+          std::istringstream dblSeries(subStr);
+          std::string dblStr;
+          while (std::getline(dblSeries, dblStr, ','))
+          {
+            double val;
+            try
+            {
+              val = parse<double>(dblStr);
+            }
+            catch (const options::parsing_exception&)
+            {
+              throw options::parsing_exception(
+                "Cannot parse input substring " + subStr + " as double series from input: " + str);
+            }
+
+            if (angleNext)
+            {
+              angleVec.emplace_back(val);
+            }
+            else if (setScale)
+            {
+              scaleVec.emplace_back(val);
+            }
+            else
+            {
+              translationVec.emplace_back(val);
+            }
+          }
+        }
+      }
+    }
+    else
+    {
+      // option passed without scale/translation/angle keyword
+      throw options::parsing_exception(
+        "Cannot parse input substring " + each + " as option from input: " + str);
+    }
+  }
+
+  // input completed, validate vectors and apply
+  if (scaleVec.size() > 2)
+  {
+    throw options::parsing_exception(
+      "Too many scale values (" + std::to_string(scaleVec.size()) + ") in input: " + str);
+  }
+  else if (hasScale && scaleVec.size() == 0)
+  {
+    throw options::parsing_exception("Scale called without value in input: " + str);
+  }
+
+  if (translationVec.size() == 1)
+  {
+    throw options::parsing_exception("Translation requires two values, single translation value " +
+      std::to_string(translationVec[0]) + " in input: " + str);
+  }
+  else if (translationVec.size() > 2)
+  {
+    throw options::parsing_exception("Too many translation values (" +
+      std::to_string(translationVec.size()) + ") in input: " + str);
+  }
+  else if (hasTranslation && translationVec.size() == 0)
+  {
+    throw options::parsing_exception("Translation called without value in input: " + str);
+  }
+
+  if (angleVec.size() > 1)
+  {
+    throw options::parsing_exception(
+      "Multiple angle values (" + std::to_string(angleVec.size()) + ") in input: " + str);
+  }
+  else if (hasAngle && angleVec.size() == 0)
+  {
+    throw options::parsing_exception("Angle called without value in input: " + str);
+  }
+
+  // Clean up vectors to fit with constructor
+  if (scaleVec.size() == 0)
+  {
+    scaleVec = { 1, 1 };
+  }
+  else if (scaleVec.size() == 1)
+  {
+    scaleVec.emplace_back(scaleVec.front());
+  }
+  if (translationVec.size() == 0)
+  {
+    translationVec = { 0, 0 };
+  }
+  if (angleVec.size() == 0)
+  {
+    angleVec.emplace_back(0);
+  }
+
+  double_array_t<2> scaleVecOut = double_array_t<2>(scaleVec);
+  double_array_t<2> translationVecOut = double_array_t<2>(translationVec);
+
+  return transform2d_t(scaleVecOut, translationVecOut, angleVec[0]);
 }
 
 //----------------------------------------------------------------------------
@@ -686,18 +879,11 @@ std::string format(const colormap_t& var)
 //----------------------------------------------------------------------------
 /**
  * Format provided var into a string from provided transform2d_t.
- * Rely on `format(double)` for each item in value array`
+ * Rely on format(std::vector<double>&)
  */
 std::string format(const transform2d_t& var)
 {
-  std::ostringstream stream;
-  std::vector<double> vec(var);
-  size_t size = vec.size();
-  for (unsigned int i = 0; i < size; i++)
-  {
-    stream << ((i > 0) ? "," : "") << options_tools::format(vec[i]);
-  }
-  return stream.str();
+  return options_tools::format(static_cast<std::vector<double>>(var));
 }
 
 } // option_tools

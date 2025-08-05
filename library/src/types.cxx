@@ -1,7 +1,12 @@
 #include "types.h"
 
+#include "vtkMath.h"
+
 #include <algorithm>
+#include <cmath>
+#include <iostream>
 #include <numeric>
+#include <string>
 
 namespace f3d
 {
@@ -55,6 +60,36 @@ std::pair<bool, std::string> mesh_t::isValid() const
   }
 
   return { true, {} };
+}
+
+// see function explanation in types.h for explanation of logic
+//----------------------------------------------------------------------------
+F3D_EXPORT transform2d_t::transform2d_t(
+  const double_array_t<2>& scale, const double_array_t<2>& translate, const angle_deg_t& angle)
+{
+  double angleRad = std::isnan(angle) ? 0.0 : vtkMath::RadiansFromDegrees(angle);
+
+  double sinA = std::sin(angleRad);
+  double cosA = std::cos(angleRad);
+
+  (*this)[0] = cosA * (std::isnan(scale[0]) ? 1.0 : scale[0]);
+  (*this)[1] = -sinA * (std::isnan(scale[1]) ? 1.0 : scale[1]);
+  (*this)[2] = (std::isnan(translate[0]) ? 0.0 : translate[0]);
+  (*this)[3] = sinA * (std::isnan(scale[0]) ? 1.0 : scale[0]);
+  (*this)[4] = cosA * (std::isnan(scale[1]) ? 1.0 : scale[1]);
+  (*this)[5] = (std::isnan(translate[1]) ? 0.0 : translate[1]);
+  (*this)[6] = 0;
+  (*this)[7] = 0;
+  (*this)[8] = 1;
+
+  // remove negative 0.0 wherever it occurs
+  for (int i = 0; i < 9; i++)
+  {
+    if ((*this)[i] == 0.0 && std::signbit((*this)[i]))
+    {
+      (*this)[i] = 0.0;
+    }
+  }
 }
 
 }
