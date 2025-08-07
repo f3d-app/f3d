@@ -51,7 +51,7 @@ runs:
       shell: bash
       run: >
         cmake ../ospray/scripts/superbuild/
-        -DBUILD_EMBREE_FROM_SOURCE=ON
+        -DBUILD_EMBREE_FROM_SOURCE=${{ runner.os == 'Windows' && 'OFF' || 'ON' }}
         -DBUILD_GLFW=OFF
         -DBUILD_OIDN=ON
         -DBUILD_OIDN_FROM_SOURCE=ON
