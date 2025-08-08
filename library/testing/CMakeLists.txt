@@ -74,12 +74,12 @@ configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestSDKInteractorCallBack.l
 configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestSDKInteractorDropFullScene.log.in"
                "${CMAKE_BINARY_DIR}/TestSDKInteractorDropFullScene.log") # world.obj; S
 
+set(libf3dSDKTests_link_libs "")
+
 # External window tests
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240914)
   option(F3D_TESTING_ENABLE_EXTERNAL_GLFW "Test external GLFW" OFF)
   option(F3D_TESTING_ENABLE_EXTERNAL_QT "Test external QT" OFF)
-
-  set(libf3dSDKTests_link_libs "")
 
   if(F3D_TESTING_ENABLE_EXTERNAL_GLFW)
     find_package(glfw3 REQUIRED)
