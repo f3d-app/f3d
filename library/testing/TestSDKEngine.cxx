@@ -12,7 +12,13 @@ int TestSDKEngine(int argc, char* argv[])
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
 
   // For coverage, check that an invalid symbol loader is not crashing
-  try { std::ignore = f3d::engine::createExternal([](const char*) { return nullptr; }); } catch (...) {}
+  try
+  {
+    std::ignore = f3d::engine::createExternal([](const char*) { return nullptr; });
+  }
+  catch (...)
+  {
+  }
 
   // clang-format off
   // Load all plugins, built or not, already loaded or not
