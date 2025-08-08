@@ -146,7 +146,7 @@ engine engine::createOSMesa()
 }
 
 //----------------------------------------------------------------------------
-engine engine::createExternal(const context::function& getProcAddress)
+engine engine::createExternal([[maybe_unused]] const context::function& getProcAddress)
 {
 #if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 3, 20240914)
   throw engine::no_window_exception("VTK version < 9.4 does not support external windows");
