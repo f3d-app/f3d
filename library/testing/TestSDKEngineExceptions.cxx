@@ -12,6 +12,15 @@ namespace fs = std::filesystem;
 
 int TestSDKEngineExceptions(int argc, char* argv[])
 {
+  // For coverage, check that an invalid symbol loader is not crashing
+  try
+  {
+    std::ignore = f3d::engine::createExternal([](const char*) { return nullptr; });
+  }
+  catch (const f3d::engine::no_window_exception&)
+  {
+  }
+
   PseudoUnitTest test;
 
   test.expect<f3d::engine::no_window_exception>(
