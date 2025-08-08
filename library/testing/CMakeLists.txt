@@ -26,6 +26,7 @@ if(F3D_MODULE_UI)
   list(APPEND libf3dSDKTests_list
     TestSDKConsole.cxx
     TestSDKDropZone.cxx
+    TestSDKDropZoneNoLogo.cxx
     TestSDKDropZoneMinSize.cxx
     TestSDKDynamicBackgroundColor.cxx
     TestSDKDynamicFontFile.cxx

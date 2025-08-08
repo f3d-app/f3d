@@ -247,6 +247,22 @@ public:
     (*this)[7] = M3_2;
     (*this)[8] = M3_3;
   }
+
+  // clang-format off
+  /**
+   *  The general form of a 3x3 transformation matrix M with scale S(x,y),
+   *  translation T(x,y), and angle a (in degrees), is solved out to the following:
+   * 
+   *      [cos(a)*S(x), -sin(a)*S(y),   T(x)]
+   *  M = [sin(a)*S(x), cos(a)*S(y),    T(y)]
+   *      [0,           0,              1   ]
+   * 
+   *  Using this formula, we fill each cell using the values in the constructor
+   */
+  // clang-format on
+
+  F3D_EXPORT transform2d_t(const double_array_t<2>& scale, const double_array_t<2>& translate,
+    const angle_deg_t& angleRad);
 };
 
 /**
