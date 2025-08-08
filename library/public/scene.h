@@ -92,7 +92,7 @@ public:
   /**
    * Add a light based on a light state, returns the index of the added light.
    */
-  virtual int addLight(const light_state_t& lightState) = 0;
+  virtual int addLight(const light_state_t& lightState) const = 0;
 
   /**
    * Get the number of lights.
@@ -103,7 +103,7 @@ public:
    * Get the light state at provided index.
    * `light_exception` is thrown if the index is invalid.
    */
-  [[nodiscard]] virtual light_state_t getLight(int index) = 0;
+  [[nodiscard]] virtual light_state_t getLight(int index) const = 0;
 
   /**
    * Update a light at provided index with the provided light state.

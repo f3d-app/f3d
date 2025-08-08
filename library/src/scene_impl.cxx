@@ -332,7 +332,7 @@ scene& scene_impl::clear()
 }
 
 //----------------------------------------------------------------------------
-int scene_impl::addLight(const light_state_t& lightState)
+int scene_impl::addLight(const light_state_t& lightState) const
 {
   vtkNew<vtkLight> newLight;
   newLight->SetLightType(static_cast<int>(lightState.type));
@@ -356,7 +356,7 @@ int scene_impl::getLightCount() const
 }
 
 //----------------------------------------------------------------------------
-light_state_t scene_impl::getLight(int index)
+light_state_t scene_impl::getLight(int index) const
 {
   vtkLightCollection* lc = this->Internals->Window.GetRenderer()->GetLights();
   vtkLight* light = vtkLight::SafeDownCast(lc->GetItemAsObject(index));
