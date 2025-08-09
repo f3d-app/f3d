@@ -72,6 +72,8 @@ public:
    */
   virtual interactor& initCommands() = 0;
 
+  virtual std::string getDropZoneInfo() const = 0;
+
   /**
    * Use this method to add a command to be called using triggerCommand.
    * Adding a command with an already existing action throw a
@@ -90,7 +92,7 @@ public:
   /**
    * Return a string vector containing all currently defined actions of commands
    */
-  [[nodiscard]] virtual std::vector<std::string> getCommandActions() const = 0;
+  virtual std::vector<std::string> getCommandActions() const = 0;
 
   /**
    * Trigger provided command, see COMMANDS.md for details about supported
@@ -142,7 +144,8 @@ public:
    * Adding commands for an existing bind will throw a interactor::already_exists_exception.
    */
   virtual interactor& addBinding(const interaction_bind_t& bind, std::vector<std::string> commands,
-    std::string group = {}, documentation_callback_t documentationCallback = nullptr) = 0;
+    std::string group = {}, documentation_callback_t documentationCallback = nullptr,
+    bool showInDropZone = false) = 0;
 
   /**
    * See addBinding
@@ -152,16 +155,18 @@ public:
    * Adding command for an existing bind will throw a interactor::already_exists_exception.
    */
   virtual interactor& addBinding(const interaction_bind_t& bind, std::string command,
-    std::string group = {}, documentation_callback_t documentationCallback = nullptr) = 0;
+    std::string group = {}, documentation_callback_t documentationCallback = nullptr,
+    bool showInDropZone = false) = 0;
 
   /**
    * Convenience initializer list signature for add binding method
    */
   interactor& addBinding(const interaction_bind_t& bind, std::initializer_list<std::string> list,
-    std::string group = {}, documentation_callback_t documentationCallback = nullptr)
+    std::string group = {}, documentation_callback_t documentationCallback = nullptr,
+    bool showInDropZone = false)
   {
     return this->addBinding(
-      bind, std::vector<std::string>(list), std::move(group), std::move(documentationCallback));
+      bind, std::vector<std::string>(list), std::move(group), std::move(documentationCallback), showInDropZone);
   }
 
   /**
