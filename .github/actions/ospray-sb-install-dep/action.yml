@@ -12,7 +12,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-
     - name: Check required inputs
       shell: bash
       run: |
