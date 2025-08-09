@@ -64,6 +64,8 @@ Classes
 -------
 
 
+- :ref:`exhale_struct_structf3d_1_1scene_1_1light__exception`
+
 - :ref:`exhale_struct_structf3d_1_1scene_1_1load__failure__exception`
 
 - :ref:`exhale_class_classf3d_1_1scene`

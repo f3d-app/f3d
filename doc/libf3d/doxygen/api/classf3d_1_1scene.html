@@ -148,8 +148,10 @@
 <li class="toctree-l2"><a class="reference internal" href="structf3d_1_1interactor_1_1command__runtime__exception.html">Struct interactor::command_runtime_exception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="structf3d_1_1interactor_1_1does__not__exists__exception.html">Struct interactor::does_not_exists_exception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="structf3d_1_1interactor_1_1invalid__args__exception.html">Struct interactor::invalid_args_exception</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1light__state__t.html">Struct light_state_t</a></li>
 <li class="toctree-l2"><a class="reference internal" href="structf3d_1_1mesh__t.html">Struct mesh_t</a></li>
 <li class="toctree-l2"><a class="reference internal" href="structf3d_1_1point3__t.html">Struct point3_t</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1scene_1_1light__exception.html">Struct scene::light_exception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="structf3d_1_1scene_1_1load__failure__exception.html">Struct scene::load_failure_exception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="structf3d_1_1type__access__exception.html">Struct type_access_exception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="structf3d_1_1type__construction__exception.html">Struct type_construction_exception</a></li>
@@ -174,6 +176,9 @@
 <li class="toctree-l2"><a class="reference internal" href="classf3d_1_1utils.html">Class utils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classf3d_1_1utils_1_1string__template.html">Class utils::string_template</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classf3d_1_1window.html">Class window</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variable_types_8h_1aa00b99d10397b786c4d08f690cf37bde.html">Variable f3d::CAMERA_LIGHT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variable_types_8h_1abf2507668577f7e4f3f728cd68724320.html">Variable f3d::light_type</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variable_types_8h_1a05caa6569d9851cec58bebd695c05d3d.html">Variable f3d::SCENE_LIGHT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="typedef_types_8h_1a62f3e15e4e18455b52854622b27c02ed.html">Typedef f3d::angle_deg_t</a></li>
 </ul>
 </li>
@@ -349,6 +354,7 @@ document.write(`
 <section id="nested-types">
 <h3>Nested Types<a class="headerlink" href="#nested-types" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
+<li><p><a class="reference internal" href="structf3d_1_1scene_1_1light__exception.html#exhale-struct-structf3d-1-1scene-1-1light-exception"><span class="std std-ref">Struct scene::light_exception</span></a></p></li>
 <li><p><a class="reference internal" href="structf3d_1_1scene_1_1load__failure__exception.html#exhale-struct-structf3d-1-1scene-1-1load-failure-exception"><span class="std std-ref">Struct scene::load_failure_exception</span></a></p></li>
 </ul>
 </section>
@@ -422,6 +428,42 @@ document.write(`
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3f3d5scene8addLightERK13light_state_t">
+<span id="_CPPv3NK3f3d5scene8addLightERK13light_state_t"></span><span id="_CPPv2NK3f3d5scene8addLightERK13light_state_t"></span><span id="f3d::scene::addLight__light_state_tCRC"></span><span class="target" id="classf3d_1_1scene_1ae0dbd636405f91b884a41798c0488000"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">addLight</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="structf3d_1_1light__state__t.html#_CPPv4N3f3d13light_state_tE" title="f3d::light_state_t"><span class="n"><span class="pre">light_state_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">lightState</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK3f3d5scene8addLightERK13light_state_t" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Add a light based on a light state, returns the index of the added light. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3f3d5scene13getLightCountEv">
+<span id="_CPPv3NK3f3d5scene13getLightCountEv"></span><span id="_CPPv2NK3f3d5scene13getLightCountEv"></span><span id="f3d::scene::getLightCountC"></span><span class="target" id="classf3d_1_1scene_1a05905e5c7dc7540ba29303153b881af6"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getLightCount</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK3f3d5scene13getLightCountEv" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Get the number of lights. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3f3d5scene8getLightEi">
+<span id="_CPPv3NK3f3d5scene8getLightEi"></span><span id="_CPPv2NK3f3d5scene8getLightEi"></span><span id="f3d::scene::getLight__iC"></span><span class="target" id="classf3d_1_1scene_1a7dd307c6b9005ca6673d5738a9df6ef2"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="structf3d_1_1light__state__t.html#_CPPv4N3f3d13light_state_tE" title="f3d::light_state_t"><span class="n"><span class="pre">light_state_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getLight</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK3f3d5scene8getLightEi" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Get the light state at provided index. <code class="docutils literal notranslate"><a class="reference internal" href="structf3d_1_1scene_1_1light__exception.html#structf3d_1_1scene_1_1light__exception"><span class="std std-ref"><span class="pre">light_exception</span></span></a></code> is thrown if the index is invalid. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d5scene11updateLightEiRK13light_state_t">
+<span id="_CPPv3N3f3d5scene11updateLightEiRK13light_state_t"></span><span id="_CPPv2N3f3d5scene11updateLightEiRK13light_state_t"></span><span id="f3d::scene::updateLight__i.light_state_tCR"></span><span class="target" id="classf3d_1_1scene_1a77e8a0bad217262f01f902e756ba49c2"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3f3d5sceneE" title="f3d::scene"><span class="n"><span class="pre">scene</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">updateLight</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="structf3d_1_1light__state__t.html#_CPPv4N3f3d13light_state_tE" title="f3d::light_state_t"><span class="n"><span class="pre">light_state_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">lightState</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N3f3d5scene11updateLightEiRK13light_state_t" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Update a light at provided index with the provided light state. <code class="docutils literal notranslate"><a class="reference internal" href="structf3d_1_1scene_1_1light__exception.html#structf3d_1_1scene_1_1light__exception"><span class="std std-ref"><span class="pre">light_exception</span></span></a></code> is thrown if the index is invalid. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d5scene11removeLightEi">
+<span id="_CPPv3N3f3d5scene11removeLightEi"></span><span id="_CPPv2N3f3d5scene11removeLightEi"></span><span id="f3d::scene::removeLight__i"></span><span class="target" id="classf3d_1_1scene_1ad3b235b9a70810f1cbfa609d9802fa34"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3f3d5sceneE" title="f3d::scene"><span class="n"><span class="pre">scene</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">removeLight</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N3f3d5scene11removeLightEi" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Remove a light at provided index. <code class="docutils literal notranslate"><a class="reference internal" href="structf3d_1_1scene_1_1light__exception.html#structf3d_1_1scene_1_1light__exception"><span class="std std-ref"><span class="pre">light_exception</span></span></a></code> is thrown if the index is invalid. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d5scene15removeAllLightsEv">
+<span id="_CPPv3N3f3d5scene15removeAllLightsEv"></span><span id="_CPPv2N3f3d5scene15removeAllLightsEv"></span><span id="f3d::scene::removeAllLights"></span><span class="target" id="classf3d_1_1scene_1adcd47d1cee28ec70333ac691d3db48aa"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3f3d5sceneE" title="f3d::scene"><span class="n"><span class="pre">scene</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">removeAllLights</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N3f3d5scene15removeAllLightsEv" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Remove all lights from the scene. </p>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N3f3d5scene8supportsERKNSt10filesystem4pathE">
 <span id="_CPPv3N3f3d5scene8supportsERKNSt10filesystem4pathE"></span><span id="_CPPv2N3f3d5scene8supportsERKNSt10filesystem4pathE"></span><span id="f3d::scene::supports__std::filesystem::pathCR"></span><span class="target" id="classf3d_1_1scene_1a7542a5ca95dd82a89a3b7772cb416dfd"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">supports</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">filesystem</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">path</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">filePath</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N3f3d5scene8supportsERKNSt10filesystem4pathE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Return true if provided file path is supported, false otherwise. </p>
@@ -446,6 +488,20 @@ document.write(`
 </dd></dl>
 
 </div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d5scene15light_exceptionE">
+<span id="_CPPv3N3f3d5scene15light_exceptionE"></span><span id="_CPPv2N3f3d5scene15light_exceptionE"></span><span id="f3d::scene::light_exception"></span><span class="target" id="structf3d_1_1scene_1_1light__exception"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">light_exception</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">f3d</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="class_structf3d_1_1exception.html#_CPPv4N3f3d9exceptionE" title="f3d::exception"><span class="n"><span class="pre">exception</span></span></a><a class="headerlink" href="#_CPPv4N3f3d5scene15light_exceptionE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>An exception that can be thrown by the scene when it fails to index the light </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d5scene15light_exception15light_exceptionERKNSt6stringE">
+<span id="_CPPv3N3f3d5scene15light_exception15light_exceptionERKNSt6stringE"></span><span id="_CPPv2N3f3d5scene15light_exception15light_exceptionERKNSt6stringE"></span><span id="f3d::scene::light_exception::light_exception__ssCR"></span><span class="target" id="structf3d_1_1scene_1_1light__exception_1acd6c3a9a9db4c724d13df35fa1a455ed"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">light_exception</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">what</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;&quot;</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3f3d5scene15light_exception15light_exceptionERKNSt6stringE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv4N3f3d5scene22load_failure_exceptionE">
 <span id="_CPPv3N3f3d5scene22load_failure_exceptionE"></span><span id="_CPPv2N3f3d5scene22load_failure_exceptionE"></span><span id="f3d::scene::load_failure_exception"></span><span class="target" id="structf3d_1_1scene_1_1load__failure__exception"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">load_failure_exception</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">f3d</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="class_structf3d_1_1exception.html#_CPPv4N3f3d9exceptionE" title="f3d::exception"><span class="n"><span class="pre">exception</span></span></a><a class="headerlink" href="#_CPPv4N3f3d5scene22load_failure_exceptionE" title="Permalink to this definition">#</a><br /></dt>

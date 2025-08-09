@@ -145,8 +145,10 @@
 <li class="toctree-l2"><a class="reference internal" href="api/structf3d_1_1interactor_1_1command__runtime__exception.html">Struct interactor::command_runtime_exception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/structf3d_1_1interactor_1_1does__not__exists__exception.html">Struct interactor::does_not_exists_exception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/structf3d_1_1interactor_1_1invalid__args__exception.html">Struct interactor::invalid_args_exception</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/structf3d_1_1light__state__t.html">Struct light_state_t</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/structf3d_1_1mesh__t.html">Struct mesh_t</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/structf3d_1_1point3__t.html">Struct point3_t</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/structf3d_1_1scene_1_1light__exception.html">Struct scene::light_exception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/structf3d_1_1scene_1_1load__failure__exception.html">Struct scene::load_failure_exception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/structf3d_1_1type__access__exception.html">Struct type_access_exception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/structf3d_1_1type__construction__exception.html">Struct type_construction_exception</a></li>
@@ -171,6 +173,9 @@
 <li class="toctree-l2"><a class="reference internal" href="api/classf3d_1_1utils.html">Class utils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/classf3d_1_1utils_1_1string__template.html">Class utils::string_template</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/classf3d_1_1window.html">Class window</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/variable_types_8h_1aa00b99d10397b786c4d08f690cf37bde.html">Variable f3d::CAMERA_LIGHT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/variable_types_8h_1abf2507668577f7e4f3f728cd68724320.html">Variable f3d::light_type</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/variable_types_8h_1a05caa6569d9851cec58bebd695c05d3d.html">Variable f3d::SCENE_LIGHT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/typedef_types_8h_1a62f3e15e4e18455b52854622b27c02ed.html">Typedef f3d::angle_deg_t</a></li>
 </ul>
 </li>
@@ -329,6 +334,8 @@ document.write(`
       <li><a href="api/classf3d_1_1camera.html#_CPPv4N3f3d6camera3yawE11angle_deg_t">f3d::camera::yaw (C++ function)</a>
 </li>
       <li><a href="api/classf3d_1_1camera.html#_CPPv4N3f3d6camera4zoomEd">f3d::camera::zoom (C++ function)</a>
+</li>
+      <li><a href="api/variable_types_8h_1aa00b99d10397b786c4d08f690cf37bde.html#_CPPv4N3f3d12CAMERA_LIGHTE">f3d::CAMERA_LIGHT (C++ member)</a>
 </li>
       <li><a href="api/structf3d_1_1camera__state__t.html#_CPPv4N3f3d14camera_state_tE">f3d::camera_state_t (C++ struct)</a>
 </li>
@@ -600,8 +607,6 @@ document.write(`
 </li>
       <li><a href="api/classf3d_1_1image.html#_CPPv4N3f3d5image15write_exceptionE">f3d::image::write_exception (C++ struct)</a>, <a href="api/structf3d_1_1image_1_1write__exception.html#_CPPv4N3f3d5image15write_exceptionE">[1]</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/classf3d_1_1image.html#_CPPv4N3f3d5image15write_exception15write_exceptionERKNSt6stringE">f3d::image::write_exception::write_exception (C++ function)</a>, <a href="api/structf3d_1_1image_1_1write__exception.html#_CPPv4N3f3d5image15write_exception15write_exceptionERKNSt6stringE">[1]</a>
 </li>
       <li><a href="api/classf3d_1_1image.html#_CPPv4N3f3d5imageD0Ev">f3d::image::~image (C++ function)</a>
@@ -620,6 +625,8 @@ document.write(`
 </li>
       <li><a href="api/structf3d_1_1interaction__bind__t.html#_CPPv4N3f3d18interaction_bind_t12ModifierKeys4CTRLE">f3d::interaction_bind_t::ModifierKeys::CTRL (C++ enumerator)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/structf3d_1_1interaction__bind__t.html#_CPPv4N3f3d18interaction_bind_t12ModifierKeys10CTRL_SHIFTE">f3d::interaction_bind_t::ModifierKeys::CTRL_SHIFT (C++ enumerator)</a>
 </li>
       <li><a href="api/structf3d_1_1interaction__bind__t.html#_CPPv4N3f3d18interaction_bind_t12ModifierKeys4NONEE">f3d::interaction_bind_t::ModifierKeys::NONE (C++ enumerator)</a>
@@ -744,6 +751,26 @@ document.write(`
 </li>
       <li><a href="api/classf3d_1_1interactor.html#_CPPv4N3f3d10interactor14WheelDirection5RIGHTE">f3d::interactor::WheelDirection::RIGHT (C++ enumerator)</a>
 </li>
+      <li><a href="api/structf3d_1_1light__state__t.html#_CPPv4N3f3d13light_state_tE">f3d::light_state_t (C++ struct)</a>
+</li>
+      <li><a href="api/structf3d_1_1light__state__t.html#_CPPv4N3f3d13light_state_t5colorE">f3d::light_state_t::color (C++ member)</a>
+</li>
+      <li><a href="api/structf3d_1_1light__state__t.html#_CPPv4N3f3d13light_state_t9directionE">f3d::light_state_t::direction (C++ member)</a>
+</li>
+      <li><a href="api/structf3d_1_1light__state__t.html#_CPPv4N3f3d13light_state_t9intensityE">f3d::light_state_t::intensity (C++ member)</a>
+</li>
+      <li><a href="api/structf3d_1_1light__state__t.html#_CPPv4NK3f3d13light_state_teqERK13light_state_t">f3d::light_state_t::operator== (C++ function)</a>
+</li>
+      <li><a href="api/structf3d_1_1light__state__t.html#_CPPv4N3f3d13light_state_t8positionE">f3d::light_state_t::position (C++ member)</a>
+</li>
+      <li><a href="api/structf3d_1_1light__state__t.html#_CPPv4N3f3d13light_state_t15positionalLightE">f3d::light_state_t::positionalLight (C++ member)</a>
+</li>
+      <li><a href="api/structf3d_1_1light__state__t.html#_CPPv4N3f3d13light_state_t11switchStateE">f3d::light_state_t::switchState (C++ member)</a>
+</li>
+      <li><a href="api/structf3d_1_1light__state__t.html#_CPPv4N3f3d13light_state_t4typeE">f3d::light_state_t::type (C++ member)</a>
+</li>
+      <li><a href="api/variable_types_8h_1abf2507668577f7e4f3f728cd68724320.html#_CPPv4N3f3d10light_typeE">f3d::light_type (C++ member)</a>
+</li>
       <li><a href="api/classf3d_1_1log.html#_CPPv4N3f3d3logE">f3d::log (C++ class)</a>
 </li>
       <li><a href="api/classf3d_1_1log.html#_CPPv4IDpEN3f3d3log5debugEvDp4Args">f3d::log::debug (C++ function)</a>
@@ -798,11 +825,21 @@ document.write(`
 </li>
       <li><a href="api/classf3d_1_1scene.html#_CPPv4N3f3d5scene3addENSt16initializer_listINSt10filesystem4pathEEE">f3d::scene::add (C++ function)</a>, <a href="api/classf3d_1_1scene.html#_CPPv4N3f3d5scene3addENSt16initializer_listINSt6stringEEE">[1]</a>, <a href="api/classf3d_1_1scene.html#_CPPv4N3f3d5scene3addERK6mesh_t">[2]</a>, <a href="api/classf3d_1_1scene.html#_CPPv4N3f3d5scene3addERKNSt10filesystem4pathE">[3]</a>, <a href="api/classf3d_1_1scene.html#_CPPv4N3f3d5scene3addERKNSt6vectorINSt10filesystem4pathEEE">[4]</a>, <a href="api/classf3d_1_1scene.html#_CPPv4N3f3d5scene3addERKNSt6vectorINSt6stringEEE">[5]</a>
 </li>
+      <li><a href="api/classf3d_1_1scene.html#_CPPv4NK3f3d5scene8addLightERK13light_state_t">f3d::scene::addLight (C++ function)</a>
+</li>
       <li><a href="api/classf3d_1_1scene.html#_CPPv4N3f3d5scene18animationTimeRangeEv">f3d::scene::animationTimeRange (C++ function)</a>
 </li>
       <li><a href="api/classf3d_1_1scene.html#_CPPv4NK3f3d5scene19availableAnimationsEv">f3d::scene::availableAnimations (C++ function)</a>
 </li>
       <li><a href="api/classf3d_1_1scene.html#_CPPv4N3f3d5scene5clearEv">f3d::scene::clear (C++ function)</a>
+</li>
+      <li><a href="api/classf3d_1_1scene.html#_CPPv4NK3f3d5scene8getLightEi">f3d::scene::getLight (C++ function)</a>
+</li>
+      <li><a href="api/classf3d_1_1scene.html#_CPPv4NK3f3d5scene13getLightCountEv">f3d::scene::getLightCount (C++ function)</a>
+</li>
+      <li><a href="api/classf3d_1_1scene.html#_CPPv4N3f3d5scene15light_exceptionE">f3d::scene::light_exception (C++ struct)</a>, <a href="api/structf3d_1_1scene_1_1light__exception.html#_CPPv4N3f3d5scene15light_exceptionE">[1]</a>
+</li>
+      <li><a href="api/classf3d_1_1scene.html#_CPPv4N3f3d5scene15light_exception15light_exceptionERKNSt6stringE">f3d::scene::light_exception::light_exception (C++ function)</a>, <a href="api/structf3d_1_1scene_1_1light__exception.html#_CPPv4N3f3d5scene15light_exception15light_exceptionERKNSt6stringE">[1]</a>
 </li>
       <li><a href="api/classf3d_1_1scene.html#_CPPv4N3f3d5scene22load_failure_exceptionE">f3d::scene::load_failure_exception (C++ struct)</a>, <a href="api/structf3d_1_1scene_1_1load__failure__exception.html#_CPPv4N3f3d5scene22load_failure_exceptionE">[1]</a>
 </li>
@@ -810,7 +847,15 @@ document.write(`
 </li>
       <li><a href="api/classf3d_1_1scene.html#_CPPv4N3f3d5scene17loadAnimationTimeEd">f3d::scene::loadAnimationTime (C++ function)</a>
 </li>
+      <li><a href="api/classf3d_1_1scene.html#_CPPv4N3f3d5scene15removeAllLightsEv">f3d::scene::removeAllLights (C++ function)</a>
+</li>
+      <li><a href="api/classf3d_1_1scene.html#_CPPv4N3f3d5scene11removeLightEi">f3d::scene::removeLight (C++ function)</a>
+</li>
       <li><a href="api/classf3d_1_1scene.html#_CPPv4N3f3d5scene8supportsERKNSt10filesystem4pathE">f3d::scene::supports (C++ function)</a>
+</li>
+      <li><a href="api/classf3d_1_1scene.html#_CPPv4N3f3d5scene11updateLightEiRK13light_state_t">f3d::scene::updateLight (C++ function)</a>
+</li>
+      <li><a href="api/variable_types_8h_1a05caa6569d9851cec58bebd695c05d3d.html#_CPPv4N3f3d11SCENE_LIGHTE">f3d::SCENE_LIGHT (C++ member)</a>
 </li>
       <li><a href="api/classf3d_1_1transform2d__t.html#_CPPv4N3f3d13transform2d_tE">f3d::transform2d_t (C++ class)</a>
 </li>

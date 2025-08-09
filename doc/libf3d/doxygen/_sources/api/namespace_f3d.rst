@@ -51,9 +51,13 @@ Classes
 
 - :ref:`exhale_struct_structf3d_1_1interactor_1_1invalid__args__exception`
 
+- :ref:`exhale_struct_structf3d_1_1light__state__t`
+
 - :ref:`exhale_struct_structf3d_1_1mesh__t`
 
 - :ref:`exhale_struct_structf3d_1_1point3__t`
+
+- :ref:`exhale_struct_structf3d_1_1scene_1_1light__exception`
 
 - :ref:`exhale_struct_structf3d_1_1scene_1_1load__failure__exception`
 
@@ -109,3 +113,14 @@ Typedefs
 
 
 - :ref:`exhale_typedef_types_8h_1a62f3e15e4e18455b52854622b27c02ed`
+
+
+Variables
+---------
+
+
+- :ref:`exhale_variable_types_8h_1aa00b99d10397b786c4d08f690cf37bde`
+
+- :ref:`exhale_variable_types_8h_1abf2507668577f7e4f3f728cd68724320`
+
+- :ref:`exhale_variable_types_8h_1a05caa6569d9851cec58bebd695c05d3d`

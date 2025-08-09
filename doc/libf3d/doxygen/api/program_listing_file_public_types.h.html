@@ -146,8 +146,10 @@
 <li class="toctree-l2"><a class="reference internal" href="structf3d_1_1interactor_1_1command__runtime__exception.html">Struct interactor::command_runtime_exception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="structf3d_1_1interactor_1_1does__not__exists__exception.html">Struct interactor::does_not_exists_exception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="structf3d_1_1interactor_1_1invalid__args__exception.html">Struct interactor::invalid_args_exception</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1light__state__t.html">Struct light_state_t</a></li>
 <li class="toctree-l2"><a class="reference internal" href="structf3d_1_1mesh__t.html">Struct mesh_t</a></li>
 <li class="toctree-l2"><a class="reference internal" href="structf3d_1_1point3__t.html">Struct point3_t</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1scene_1_1light__exception.html">Struct scene::light_exception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="structf3d_1_1scene_1_1load__failure__exception.html">Struct scene::load_failure_exception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="structf3d_1_1type__access__exception.html">Struct type_access_exception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="structf3d_1_1type__construction__exception.html">Struct type_construction_exception</a></li>
@@ -172,6 +174,9 @@
 <li class="toctree-l2"><a class="reference internal" href="classf3d_1_1utils.html">Class utils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classf3d_1_1utils_1_1string__template.html">Class utils::string_template</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classf3d_1_1window.html">Class window</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variable_types_8h_1aa00b99d10397b786c4d08f690cf37bde.html">Variable f3d::CAMERA_LIGHT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variable_types_8h_1abf2507668577f7e4f3f728cd68724320.html">Variable f3d::light_type</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variable_types_8h_1a05caa6569d9851cec58bebd695c05d3d.html">Variable f3d::SCENE_LIGHT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="typedef_types_8h_1a62f3e15e4e18455b52854622b27c02ed.html">Typedef f3d::angle_deg_t</a></li>
 </ul>
 </li>
@@ -334,6 +339,7 @@ document.write(`
 
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;algorithm&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;array&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;cstdint&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;string&gt;</span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;vector&gt;</span>
@@ -437,7 +443,7 @@ document.write(`
 <span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">array</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Array</span><span class="p">{</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">};</span>
 <span class="p">};</span>
 
-<span class="k">class</span><span class="w"> </span><span class="nc">color_t</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">double_array_t</span><span class="o">&lt;</span><span class="mi">3</span><span class="o">&gt;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">F3D_EXPORT</span><span class="w"> </span><span class="n">color_t</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="n">double_array_t</span><span class="o">&lt;</span><span class="mi">3</span><span class="o">&gt;</span>
 <span class="p">{</span>
 <span class="k">public</span><span class="o">:</span>
 <span class="w">  </span><span class="kr">inline</span><span class="w"> </span><span class="n">color_t</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">default</span><span class="p">;</span>
@@ -584,6 +590,33 @@ document.write(`
 
 <span class="w">  </span><span class="n">F3D_EXPORT</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">pair</span><span class="o">&lt;</span><span class="kt">bool</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="w"> </span><span class="n">isValid</span><span class="p">()</span><span class="w"> </span><span class="k">const</span><span class="p">;</span>
 <span class="p">};</span>
+
+<span class="k">enum</span><span class="w"> </span><span class="k">class</span><span class="w"> </span><span class="nc">F3D_EXPORT</span><span class="w"> </span><span class="n">light_type</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="kt">uint8_t</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="n">HEADLIGHT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">  </span><span class="n">CAMERA_LIGHT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+<span class="w">  </span><span class="n">SCENE_LIGHT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
+<span class="p">};</span>
+
+<span class="k">struct</span><span class="w"> </span><span class="nc">F3D_EXPORT</span><span class="w"> </span><span class="n">light_state_t</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="n">light_type</span><span class="w"> </span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">light_type</span><span class="o">::</span><span class="n">SCENE_LIGHT</span><span class="p">;</span>
+<span class="w">  </span><span class="n">point3_t</span><span class="w"> </span><span class="n">position</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="w"> </span><span class="p">};</span>
+<span class="w">  </span><span class="n">color_t</span><span class="w"> </span><span class="n">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mf">1.</span><span class="p">,</span><span class="w"> </span><span class="mf">1.</span><span class="p">,</span><span class="w"> </span><span class="mf">1.</span><span class="w"> </span><span class="p">};</span>
+<span class="w">  </span><span class="n">vector3_t</span><span class="w"> </span><span class="n">direction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mf">1.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="p">,</span><span class="w"> </span><span class="mf">0.</span><span class="w"> </span><span class="p">};</span>
+<span class="w">  </span><span class="kt">bool</span><span class="w"> </span><span class="n">positionalLight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="w">  </span><span class="kt">double</span><span class="w"> </span><span class="n">intensity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span>
+<span class="w">  </span><span class="kt">bool</span><span class="w"> </span><span class="n">switchState</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+
+<span class="w">  </span><span class="p">[[</span><span class="n">nodiscard</span><span class="p">]]</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="k">operator</span><span class="o">==</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">light_state_t</span><span class="o">&amp;</span><span class="w"> </span><span class="n">other</span><span class="p">)</span><span class="w"> </span><span class="k">const</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">type</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">other</span><span class="p">.</span><span class="n">type</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">position</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">other</span><span class="p">.</span><span class="n">position</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<span class="w">      </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">color</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">other</span><span class="p">.</span><span class="n">color</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">direction</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">other</span><span class="p">.</span><span class="n">direction</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<span class="w">      </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">positionalLight</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">other</span><span class="p">.</span><span class="n">positionalLight</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">intensity</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">other</span><span class="p">.</span><span class="n">intensity</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<span class="w">      </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">switchState</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">other</span><span class="p">.</span><span class="n">switchState</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">};</span>
+
 <span class="p">}</span>
 
 <span class="cp">#endif</span>

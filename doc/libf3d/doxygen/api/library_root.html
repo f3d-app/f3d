@@ -148,8 +148,10 @@
 <li class="toctree-l2"><a class="reference internal" href="structf3d_1_1interactor_1_1command__runtime__exception.html">Struct interactor::command_runtime_exception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="structf3d_1_1interactor_1_1does__not__exists__exception.html">Struct interactor::does_not_exists_exception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="structf3d_1_1interactor_1_1invalid__args__exception.html">Struct interactor::invalid_args_exception</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1light__state__t.html">Struct light_state_t</a></li>
 <li class="toctree-l2"><a class="reference internal" href="structf3d_1_1mesh__t.html">Struct mesh_t</a></li>
 <li class="toctree-l2"><a class="reference internal" href="structf3d_1_1point3__t.html">Struct point3_t</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1scene_1_1light__exception.html">Struct scene::light_exception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="structf3d_1_1scene_1_1load__failure__exception.html">Struct scene::load_failure_exception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="structf3d_1_1type__access__exception.html">Struct type_access_exception</a></li>
 <li class="toctree-l2"><a class="reference internal" href="structf3d_1_1type__construction__exception.html">Struct type_construction_exception</a></li>
@@ -174,6 +176,9 @@
 <li class="toctree-l2"><a class="reference internal" href="classf3d_1_1utils.html">Class utils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classf3d_1_1utils_1_1string__template.html">Class utils::string_template</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classf3d_1_1window.html">Class window</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variable_types_8h_1aa00b99d10397b786c4d08f690cf37bde.html">Variable f3d::CAMERA_LIGHT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variable_types_8h_1abf2507668577f7e4f3f728cd68724320.html">Variable f3d::light_type</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variable_types_8h_1a05caa6569d9851cec58bebd695c05d3d.html">Variable f3d::SCENE_LIGHT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="typedef_types_8h_1a62f3e15e4e18455b52854622b27c02ed.html">Typedef f3d::angle_deg_t</a></li>
 </ul>
 </li>
@@ -330,6 +335,9 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#classes-and-structs">Classes and Structs</a><ul class="nav section-nav flex-column">
 </ul>
 </li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#variables">Variables</a><ul class="nav section-nav flex-column">
+</ul>
+</li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#typedefs">Typedefs</a></li>
 </ul>
 </li>
@@ -351,7 +359,7 @@ document.write(`
 <ul class="treeView" id="class-treeView">
   <li>
     <ul class="collapsibleList">
-      <li class="lastChild">Namespace <a href="namespace_f3d.html#namespace-f3d">f3d</a><ul><li>Struct <a href="structf3d_1_1camera__state__t.html#exhale-struct-structf3d-1-1camera-state-t">camera_state_t</a></li><li>Struct <a href="structf3d_1_1interaction__bind__t.html#exhale-struct-structf3d-1-1interaction-bind-t">interaction_bind_t</a></li><li>Struct <a href="structf3d_1_1mesh__t.html#exhale-struct-structf3d-1-1mesh-t">mesh_t</a></li><li>Struct <a href="structf3d_1_1point3__t.html#exhale-struct-structf3d-1-1point3-t">point3_t</a></li><li>Struct <a href="structf3d_1_1type__access__exception.html#exhale-struct-structf3d-1-1type-access-exception">type_access_exception</a></li><li>Struct <a href="structf3d_1_1type__construction__exception.html#exhale-struct-structf3d-1-1type-construction-exception">type_construction_exception</a></li><li>Struct <a href="structf3d_1_1vector3__t.html#exhale-struct-structf3d-1-1vector3-t">vector3_t</a></li><li>Class <a href="classf3d_1_1camera.html#exhale-class-classf3d-1-1camera">camera</a></li><li>Class <a href="classf3d_1_1color__t.html#exhale-class-classf3d-1-1color-t">color_t</a></li><li>Class <a href="classf3d_1_1colormap__t.html#exhale-class-classf3d-1-1colormap-t">colormap_t</a></li><li>Class <a href="classf3d_1_1context.html#exhale-class-classf3d-1-1context">context</a><ul><li>Struct <a href="structf3d_1_1context_1_1loading__exception.html#exhale-struct-structf3d-1-1context-1-1loading-exception">context::loading_exception</a></li><li class="lastChild">Struct <a href="structf3d_1_1context_1_1symbol__exception.html#exhale-struct-structf3d-1-1context-1-1symbol-exception">context::symbol_exception</a></li></ul></li><li>Class <a href="classf3d_1_1direction__t.html#exhale-class-classf3d-1-1direction-t">direction_t</a></li><li>Template Class <a href="classf3d_1_1double__array__t.html#exhale-class-classf3d-1-1double-array-t">double_array_t</a></li><li>Class <a href="classf3d_1_1engine.html#exhale-class-classf3d-1-1engine">engine</a><ul><li>Struct <a href="structf3d_1_1engine_1_1cache__exception.html#exhale-struct-structf3d-1-1engine-1-1cache-exception">engine::cache_exception</a></li><li>Struct <a href="structf3d_1_1engine_1_1libInformation.html#exhale-struct-structf3d-1-1engine-1-1libInformation">engine::libInformation</a></li><li>Struct <a href="structf3d_1_1engine_1_1no__interactor__exception.html#exhale-struct-structf3d-1-1engine-1-1no-interactor-exception">engine::no_interactor_exception</a></li><li>Struct <a href="structf3d_1_1engine_1_1no__window__exception.html#exhale-struct-structf3d-1-1engine-1-1no-window-exception">engine::no_window_exception</a></li><li>Struct <a href="structf3d_1_1engine_1_1plugin__exception.html#exhale-struct-structf3d-1-1engine-1-1plugin-exception">engine::plugin_exception</a></li><li class="lastChild">Struct <a href="structf3d_1_1engine_1_1readerInformation.html#exhale-struct-structf3d-1-1engine-1-1readerInformation">engine::readerInformation</a></li></ul></li><li>Class <a href="class_structf3d_1_1exception.html#exhale-class-structf3d-1-1exception">exception</a></li><li>Class <a href="classf3d_1_1image.html#exhale-class-classf3d-1-1image">image</a><ul><li>Struct <a href="structf3d_1_1image_1_1metadata__exception.html#exhale-struct-structf3d-1-1image-1-1metadata-exception">image::metadata_exception</a></li><li>Struct <a href="structf3d_1_1image_1_1read__exception.html#exhale-struct-structf3d-1-1image-1-1read-exception">image::read_exception</a></li><li class="lastChild">Struct <a href="structf3d_1_1image_1_1write__exception.html#exhale-struct-structf3d-1-1image-1-1write-exception">image::write_exception</a></li></ul></li><li>Class <a href="classf3d_1_1interactor.html#exhale-class-classf3d-1-1interactor">interactor</a><ul><li>Struct <a href="structf3d_1_1interactor_1_1already__exists__exception.html#exhale-struct-structf3d-1-1interactor-1-1already-exists-exception">interactor::already_exists_exception</a></li><li>Struct <a href="structf3d_1_1interactor_1_1command__runtime__exception.html#exhale-struct-structf3d-1-1interactor-1-1command-runtime-exception">interactor::command_runtime_exception</a></li><li>Struct <a href="structf3d_1_1interactor_1_1does__not__exists__exception.html#exhale-struct-structf3d-1-1interactor-1-1does-not-exists-exception">interactor::does_not_exists_exception</a></li><li class="lastChild">Struct <a href="structf3d_1_1interactor_1_1invalid__args__exception.html#exhale-struct-structf3d-1-1interactor-1-1invalid-args-exception">interactor::invalid_args_exception</a></li></ul></li><li>Class <a href="classf3d_1_1log.html#exhale-class-classf3d-1-1log">log</a></li><li>Class <a href="classf3d_1_1ratio__t.html#exhale-class-classf3d-1-1ratio-t">ratio_t</a></li><li>Class <a href="classf3d_1_1scene.html#exhale-class-classf3d-1-1scene">scene</a><ul><li class="lastChild">Struct <a href="structf3d_1_1scene_1_1load__failure__exception.html#exhale-struct-structf3d-1-1scene-1-1load-failure-exception">scene::load_failure_exception</a></li></ul></li><li>Class <a href="classf3d_1_1transform2d__t.html#exhale-class-classf3d-1-1transform2d-t">transform2d_t</a></li><li>Class <a href="classf3d_1_1utils.html#exhale-class-classf3d-1-1utils">utils</a><ul><li>Struct <a href="structf3d_1_1utils_1_1glob__exception.html#exhale-struct-structf3d-1-1utils-1-1glob-exception">utils::glob_exception</a></li><li>Struct <a href="structf3d_1_1utils_1_1tokenize__exception.html#exhale-struct-structf3d-1-1utils-1-1tokenize-exception">utils::tokenize_exception</a></li><li class="lastChild">Class <a href="classf3d_1_1utils_1_1string__template.html#exhale-class-classf3d-1-1utils-1-1string-template">utils::string_template</a><ul><li class="lastChild">Struct <a href="structf3d_1_1utils_1_1string__template_1_1lookup__error.html#exhale-struct-structf3d-1-1utils-1-1string-template-1-1lookup-error">string_template::lookup_error</a></li></ul></li></ul></li><li class="lastChild">Class <a href="classf3d_1_1window.html#exhale-class-classf3d-1-1window">window</a></li></ul></li>
+      <li class="lastChild">Namespace <a href="namespace_f3d.html#namespace-f3d">f3d</a><ul><li>Struct <a href="structf3d_1_1camera__state__t.html#exhale-struct-structf3d-1-1camera-state-t">camera_state_t</a></li><li>Struct <a href="structf3d_1_1interaction__bind__t.html#exhale-struct-structf3d-1-1interaction-bind-t">interaction_bind_t</a></li><li>Struct <a href="structf3d_1_1light__state__t.html#exhale-struct-structf3d-1-1light-state-t">light_state_t</a></li><li>Struct <a href="structf3d_1_1mesh__t.html#exhale-struct-structf3d-1-1mesh-t">mesh_t</a></li><li>Struct <a href="structf3d_1_1point3__t.html#exhale-struct-structf3d-1-1point3-t">point3_t</a></li><li>Struct <a href="structf3d_1_1type__access__exception.html#exhale-struct-structf3d-1-1type-access-exception">type_access_exception</a></li><li>Struct <a href="structf3d_1_1type__construction__exception.html#exhale-struct-structf3d-1-1type-construction-exception">type_construction_exception</a></li><li>Struct <a href="structf3d_1_1vector3__t.html#exhale-struct-structf3d-1-1vector3-t">vector3_t</a></li><li>Class <a href="classf3d_1_1camera.html#exhale-class-classf3d-1-1camera">camera</a></li><li>Class <a href="classf3d_1_1color__t.html#exhale-class-classf3d-1-1color-t">color_t</a></li><li>Class <a href="classf3d_1_1colormap__t.html#exhale-class-classf3d-1-1colormap-t">colormap_t</a></li><li>Class <a href="classf3d_1_1context.html#exhale-class-classf3d-1-1context">context</a><ul><li>Struct <a href="structf3d_1_1context_1_1loading__exception.html#exhale-struct-structf3d-1-1context-1-1loading-exception">context::loading_exception</a></li><li class="lastChild">Struct <a href="structf3d_1_1context_1_1symbol__exception.html#exhale-struct-structf3d-1-1context-1-1symbol-exception">context::symbol_exception</a></li></ul></li><li>Class <a href="classf3d_1_1direction__t.html#exhale-class-classf3d-1-1direction-t">direction_t</a></li><li>Template Class <a href="classf3d_1_1double__array__t.html#exhale-class-classf3d-1-1double-array-t">double_array_t</a></li><li>Class <a href="classf3d_1_1engine.html#exhale-class-classf3d-1-1engine">engine</a><ul><li>Struct <a href="structf3d_1_1engine_1_1cache__exception.html#exhale-struct-structf3d-1-1engine-1-1cache-exception">engine::cache_exception</a></li><li>Struct <a href="structf3d_1_1engine_1_1libInformation.html#exhale-struct-structf3d-1-1engine-1-1libInformation">engine::libInformation</a></li><li>Struct <a href="structf3d_1_1engine_1_1no__interactor__exception.html#exhale-struct-structf3d-1-1engine-1-1no-interactor-exception">engine::no_interactor_exception</a></li><li>Struct <a href="structf3d_1_1engine_1_1no__window__exception.html#exhale-struct-structf3d-1-1engine-1-1no-window-exception">engine::no_window_exception</a></li><li>Struct <a href="structf3d_1_1engine_1_1plugin__exception.html#exhale-struct-structf3d-1-1engine-1-1plugin-exception">engine::plugin_exception</a></li><li class="lastChild">Struct <a href="structf3d_1_1engine_1_1readerInformation.html#exhale-struct-structf3d-1-1engine-1-1readerInformation">engine::readerInformation</a></li></ul></li><li>Class <a href="class_structf3d_1_1exception.html#exhale-class-structf3d-1-1exception">exception</a></li><li>Class <a href="classf3d_1_1image.html#exhale-class-classf3d-1-1image">image</a><ul><li>Struct <a href="structf3d_1_1image_1_1metadata__exception.html#exhale-struct-structf3d-1-1image-1-1metadata-exception">image::metadata_exception</a></li><li>Struct <a href="structf3d_1_1image_1_1read__exception.html#exhale-struct-structf3d-1-1image-1-1read-exception">image::read_exception</a></li><li class="lastChild">Struct <a href="structf3d_1_1image_1_1write__exception.html#exhale-struct-structf3d-1-1image-1-1write-exception">image::write_exception</a></li></ul></li><li>Class <a href="classf3d_1_1interactor.html#exhale-class-classf3d-1-1interactor">interactor</a><ul><li>Struct <a href="structf3d_1_1interactor_1_1already__exists__exception.html#exhale-struct-structf3d-1-1interactor-1-1already-exists-exception">interactor::already_exists_exception</a></li><li>Struct <a href="structf3d_1_1interactor_1_1command__runtime__exception.html#exhale-struct-structf3d-1-1interactor-1-1command-runtime-exception">interactor::command_runtime_exception</a></li><li>Struct <a href="structf3d_1_1interactor_1_1does__not__exists__exception.html#exhale-struct-structf3d-1-1interactor-1-1does-not-exists-exception">interactor::does_not_exists_exception</a></li><li class="lastChild">Struct <a href="structf3d_1_1interactor_1_1invalid__args__exception.html#exhale-struct-structf3d-1-1interactor-1-1invalid-args-exception">interactor::invalid_args_exception</a></li></ul></li><li>Class <a href="classf3d_1_1log.html#exhale-class-classf3d-1-1log">log</a></li><li>Class <a href="classf3d_1_1ratio__t.html#exhale-class-classf3d-1-1ratio-t">ratio_t</a></li><li>Class <a href="classf3d_1_1scene.html#exhale-class-classf3d-1-1scene">scene</a><ul><li>Struct <a href="structf3d_1_1scene_1_1light__exception.html#exhale-struct-structf3d-1-1scene-1-1light-exception">scene::light_exception</a></li><li class="lastChild">Struct <a href="structf3d_1_1scene_1_1load__failure__exception.html#exhale-struct-structf3d-1-1scene-1-1load-failure-exception">scene::load_failure_exception</a></li></ul></li><li>Class <a href="classf3d_1_1transform2d__t.html#exhale-class-classf3d-1-1transform2d-t">transform2d_t</a></li><li>Class <a href="classf3d_1_1utils.html#exhale-class-classf3d-1-1utils">utils</a><ul><li>Struct <a href="structf3d_1_1utils_1_1glob__exception.html#exhale-struct-structf3d-1-1utils-1-1glob-exception">utils::glob_exception</a></li><li>Struct <a href="structf3d_1_1utils_1_1tokenize__exception.html#exhale-struct-structf3d-1-1utils-1-1tokenize-exception">utils::tokenize_exception</a></li><li class="lastChild">Class <a href="classf3d_1_1utils_1_1string__template.html#exhale-class-classf3d-1-1utils-1-1string-template">utils::string_template</a><ul><li class="lastChild">Struct <a href="structf3d_1_1utils_1_1string__template_1_1lookup__error.html#exhale-struct-structf3d-1-1utils-1-1string-template-1-1lookup-error">string_template::lookup_error</a></li></ul></li></ul></li><li class="lastChild">Class <a href="classf3d_1_1window.html#exhale-class-classf3d-1-1window">window</a></li></ul></li>
     </ul>
   </li><!-- only tree view element -->
 </ul><!-- /treeView class-treeView --></section>
@@ -373,6 +381,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="namespace_f3d.html">Namespace f3d</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="namespace_f3d.html#classes">Classes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="namespace_f3d.html#typedefs">Typedefs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="namespace_f3d.html#variables">Variables</a></li>
 </ul>
 </li>
 </ul>
@@ -585,6 +594,14 @@ document.write(`
 </div>
 <div class="toctree-wrapper compound">
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="structf3d_1_1light__state__t.html">Struct light_state_t</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1light__state__t.html#struct-documentation">Struct Documentation</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="structf3d_1_1mesh__t.html">Struct mesh_t</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="structf3d_1_1mesh__t.html#struct-documentation">Struct Documentation</a></li>
 </ul>
@@ -599,6 +616,19 @@ document.write(`
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="structf3d_1_1point3__t.html#struct-documentation">Struct Documentation</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="structf3d_1_1scene_1_1light__exception.html">Struct scene::light_exception</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1scene_1_1light__exception.html#nested-relationships">Nested Relationships</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1scene_1_1light__exception.html#inheritance-relationships">Inheritance Relationships</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="structf3d_1_1scene_1_1light__exception.html#base-type">Base Type</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1scene_1_1light__exception.html#struct-documentation">Struct Documentation</a></li>
 </ul>
 </li>
 </ul>
@@ -873,6 +903,33 @@ document.write(`
 </ul>
 </div>
 </section>
+<section id="variables">
+<h3>Variables<a class="headerlink" href="#variables" title="Permalink to this heading">#</a></h3>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="variable_types_8h_1aa00b99d10397b786c4d08f690cf37bde.html">Variable f3d::CAMERA_LIGHT</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="variable_types_8h_1aa00b99d10397b786c4d08f690cf37bde.html#variable-documentation">Variable Documentation</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="variable_types_8h_1abf2507668577f7e4f3f728cd68724320.html">Variable f3d::light_type</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="variable_types_8h_1abf2507668577f7e4f3f728cd68724320.html#variable-documentation">Variable Documentation</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="variable_types_8h_1a05caa6569d9851cec58bebd695c05d3d.html">Variable f3d::SCENE_LIGHT</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="variable_types_8h_1a05caa6569d9851cec58bebd695c05d3d.html#variable-documentation">Variable Documentation</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
 <section id="typedefs">
 <h3>Typedefs<a class="headerlink" href="#typedefs" title="Permalink to this heading">#</a></h3>
 <div class="toctree-wrapper compound">
@@ -934,6 +991,9 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#full-api">Full API</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#namespaces">Namespaces</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#classes-and-structs">Classes and Structs</a><ul class="nav section-nav flex-column">
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#variables">Variables</a><ul class="nav section-nav flex-column">
 </ul>
 </li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#typedefs">Typedefs</a></li>

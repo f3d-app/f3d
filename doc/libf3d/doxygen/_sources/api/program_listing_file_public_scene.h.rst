@@ -51,6 +51,24 @@ Program Listing for File scene.h
    
      virtual scene& clear() = 0;
    
+     struct light_exception : public exception
+     {
+       explicit light_exception(const std::string& what = "")
+         : f3d::exception(what) {};
+     };
+   
+     virtual int addLight(const light_state_t& lightState) const = 0;
+   
+     [[nodiscard]] virtual int getLightCount() const = 0;
+   
+     [[nodiscard]] virtual light_state_t getLight(int index) const = 0;
+   
+     virtual scene& updateLight(int index, const light_state_t& lightState) = 0;
+   
+     virtual scene& removeLight(int index) = 0;
+   
+     virtual scene& removeAllLights() = 0;
+   
      [[nodiscard]] virtual bool supports(const std::filesystem::path& filePath) = 0;
    
      virtual scene& loadAnimationTime(double timeValue) = 0;

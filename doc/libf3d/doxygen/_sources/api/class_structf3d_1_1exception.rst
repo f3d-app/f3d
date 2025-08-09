@@ -31,6 +31,7 @@ Derived Types
 - ``public f3d::interactor::command_runtime_exception`` (:ref:`exhale_struct_structf3d_1_1interactor_1_1command__runtime__exception`)
 - ``public f3d::interactor::does_not_exists_exception`` (:ref:`exhale_struct_structf3d_1_1interactor_1_1does__not__exists__exception`)
 - ``public f3d::interactor::invalid_args_exception`` (:ref:`exhale_struct_structf3d_1_1interactor_1_1invalid__args__exception`)
+- ``public f3d::scene::light_exception`` (:ref:`exhale_struct_structf3d_1_1scene_1_1light__exception`)
 - ``public f3d::scene::load_failure_exception`` (:ref:`exhale_struct_structf3d_1_1scene_1_1load__failure__exception`)
 - ``public f3d::type_access_exception`` (:ref:`exhale_struct_structf3d_1_1type__access__exception`)
 - ``public f3d::type_construction_exception`` (:ref:`exhale_struct_structf3d_1_1type__construction__exception`)

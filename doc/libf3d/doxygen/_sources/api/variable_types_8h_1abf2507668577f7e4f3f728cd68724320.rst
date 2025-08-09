@@ -1,0 +1,14 @@
+.. _exhale_variable_types_8h_1abf2507668577f7e4f3f728cd68724320:
+
+Variable f3d::light_type
+========================
+
+- Defined in :ref:`file_public_types.h`
+
+
+Variable Documentation
+----------------------
+
+
+.. doxygenvariable:: f3d::light_type
+   :project: libf3d

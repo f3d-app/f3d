@@ -1,0 +1,500 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Struct light_state_t &#8212; libf3d 3.2.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/collapsible-lists/css/tree_view.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d" />
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script src="../_static/collapsible-lists/js/CollapsibleLists.compressed.js"></script>
+    <script src="../_static/collapsible-lists/js/apply-collapsible-lists.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/structf3d_1_1light__state__t';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Struct mesh_t" href="structf3d_1_1mesh__t.html" />
+    <link rel="prev" title="Struct interactor::invalid_args_exception" href="structf3d_1_1interactor_1_1invalid__args__exception.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    <p class="title logo__title">libf3d 3.2.0 documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="library_root.html">Library API</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="namespace_f3d.html">Namespace f3d</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1camera__state__t.html">Struct camera_state_t</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1context_1_1loading__exception.html">Struct context::loading_exception</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1context_1_1symbol__exception.html">Struct context::symbol_exception</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1engine_1_1cache__exception.html">Struct engine::cache_exception</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1engine_1_1libInformation.html">Struct engine::libInformation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1engine_1_1no__interactor__exception.html">Struct engine::no_interactor_exception</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1engine_1_1no__window__exception.html">Struct engine::no_window_exception</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1engine_1_1plugin__exception.html">Struct engine::plugin_exception</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1engine_1_1readerInformation.html">Struct engine::readerInformation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1image_1_1metadata__exception.html">Struct image::metadata_exception</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1image_1_1read__exception.html">Struct image::read_exception</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1image_1_1write__exception.html">Struct image::write_exception</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1interaction__bind__t.html">Struct interaction_bind_t</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1interactor_1_1already__exists__exception.html">Struct interactor::already_exists_exception</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1interactor_1_1command__runtime__exception.html">Struct interactor::command_runtime_exception</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1interactor_1_1does__not__exists__exception.html">Struct interactor::does_not_exists_exception</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1interactor_1_1invalid__args__exception.html">Struct interactor::invalid_args_exception</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Struct light_state_t</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1mesh__t.html">Struct mesh_t</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1point3__t.html">Struct point3_t</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1scene_1_1light__exception.html">Struct scene::light_exception</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1scene_1_1load__failure__exception.html">Struct scene::load_failure_exception</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1type__access__exception.html">Struct type_access_exception</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1type__construction__exception.html">Struct type_construction_exception</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1utils_1_1glob__exception.html">Struct utils::glob_exception</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1utils_1_1string__template_1_1lookup__error.html">Struct string_template::lookup_error</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1utils_1_1tokenize__exception.html">Struct utils::tokenize_exception</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structf3d_1_1vector3__t.html">Struct vector3_t</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classf3d_1_1camera.html">Class camera</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classf3d_1_1color__t.html">Class color_t</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classf3d_1_1colormap__t.html">Class colormap_t</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classf3d_1_1context.html">Class context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classf3d_1_1direction__t.html">Class direction_t</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classf3d_1_1double__array__t.html">Template Class double_array_t</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classf3d_1_1engine.html">Class engine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="class_structf3d_1_1exception.html">Class exception</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classf3d_1_1image.html">Class image</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classf3d_1_1interactor.html">Class interactor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classf3d_1_1log.html">Class log</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classf3d_1_1ratio__t.html">Class ratio_t</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classf3d_1_1scene.html">Class scene</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classf3d_1_1transform2d__t.html">Class transform2d_t</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classf3d_1_1utils.html">Class utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classf3d_1_1utils_1_1string__template.html">Class utils::string_template</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classf3d_1_1window.html">Class window</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variable_types_8h_1aa00b99d10397b786c4d08f690cf37bde.html">Variable f3d::CAMERA_LIGHT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variable_types_8h_1abf2507668577f7e4f3f728cd68724320.html">Variable f3d::light_type</a></li>
+<li class="toctree-l2"><a class="reference internal" href="variable_types_8h_1a05caa6569d9851cec58bebd695c05d3d.html">Variable f3d::SCENE_LIGHT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="typedef_types_8h_1a62f3e15e4e18455b52854622b27c02ed.html">Typedef f3d::angle_deg_t</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/api/structf3d_1_1light__state__t.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Struct light_state_t</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#struct-documentation">Struct Documentation</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="struct-light-state-t">
+<span id="exhale-struct-structf3d-1-1light-state-t"></span><h1>Struct light_state_t<a class="headerlink" href="#struct-light-state-t" title="Permalink to this heading">#</a></h1>
+<ul class="simple">
+<li><p>Defined in <a class="reference internal" href="file_public_types.h.html#file-public-types-h"><span class="std std-ref">File types.h</span></a></p></li>
+</ul>
+<section id="struct-documentation">
+<h2>Struct Documentation<a class="headerlink" href="#struct-documentation" title="Permalink to this heading">#</a></h2>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d13light_state_tE">
+<span id="_CPPv3N3f3d13light_state_tE"></span><span id="_CPPv2N3f3d13light_state_tE"></span><span id="f3d::light_state_t"></span><span class="target" id="structf3d_1_1light__state__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">light_state_t</span></span></span><a class="headerlink" href="#_CPPv4N3f3d13light_state_tE" title="Permalink to this definition">#</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3f3d13light_state_teqERK13light_state_t">
+<span id="_CPPv3NK3f3d13light_state_teqERK13light_state_t"></span><span id="_CPPv2NK3f3d13light_state_teqERK13light_state_t"></span><span id="f3d::light_state_t::eq-operator__light_state_tCRC"></span><span class="target" id="structf3d_1_1light__state__t_1aa0c6bb838ea67037f4a318549da66168"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">==</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3f3d13light_state_tE" title="f3d::light_state_t"><span class="n"><span class="pre">light_state_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">other</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3f3d13light_state_teqERK13light_state_t" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d13light_state_t4typeE">
+<span id="_CPPv3N3f3d13light_state_t4typeE"></span><span id="_CPPv2N3f3d13light_state_t4typeE"></span><span id="f3d::light_state_t::type__light_type"></span><span class="target" id="structf3d_1_1light__state__t_1a9686287a8a646fcbb4d1071f78165a11"></span><a class="reference internal" href="variable_types_8h_1abf2507668577f7e4f3f728cd68724320.html#_CPPv4N3f3d10light_typeE" title="f3d::light_type"><span class="n"><span class="pre">light_type</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="variable_types_8h_1abf2507668577f7e4f3f728cd68724320.html#_CPPv4N3f3d10light_typeE" title="f3d::light_type"><span class="n"><span class="pre">light_type</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">SCENE_LIGHT</span></span><a class="headerlink" href="#_CPPv4N3f3d13light_state_t4typeE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d13light_state_t8positionE">
+<span id="_CPPv3N3f3d13light_state_t8positionE"></span><span id="_CPPv2N3f3d13light_state_t8positionE"></span><span id="f3d::light_state_t::position__point3_t"></span><span class="target" id="structf3d_1_1light__state__t_1a54a1ed683ee594e405061ed1f7502b4a"></span><a class="reference internal" href="structf3d_1_1point3__t.html#_CPPv4N3f3d8point3_tE" title="f3d::point3_t"><span class="n"><span class="pre">point3_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">position</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="m"><span class="pre">0.</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">0.</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">0.</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N3f3d13light_state_t8positionE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d13light_state_t5colorE">
+<span id="_CPPv3N3f3d13light_state_t5colorE"></span><span id="_CPPv2N3f3d13light_state_t5colorE"></span><span id="f3d::light_state_t::color__color_t"></span><span class="target" id="structf3d_1_1light__state__t_1adbbb786c2bcf02d19a4cec2f4c754633"></span><a class="reference internal" href="classf3d_1_1color__t.html#_CPPv4N3f3d7color_tE" title="f3d::color_t"><span class="n"><span class="pre">color_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">color</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="m"><span class="pre">1.</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1.</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N3f3d13light_state_t5colorE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d13light_state_t9directionE">
+<span id="_CPPv3N3f3d13light_state_t9directionE"></span><span id="_CPPv2N3f3d13light_state_t9directionE"></span><span id="f3d::light_state_t::direction__vector3_t"></span><span class="target" id="structf3d_1_1light__state__t_1afaac12a01b4b165cf25d3dffa056a465"></span><a class="reference internal" href="structf3d_1_1vector3__t.html#_CPPv4N3f3d9vector3_tE" title="f3d::vector3_t"><span class="n"><span class="pre">vector3_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">direction</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="m"><span class="pre">1.</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">0.</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">0.</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N3f3d13light_state_t9directionE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d13light_state_t15positionalLightE">
+<span id="_CPPv3N3f3d13light_state_t15positionalLightE"></span><span id="_CPPv2N3f3d13light_state_t15positionalLightE"></span><span id="f3d::light_state_t::positionalLight__b"></span><span class="target" id="structf3d_1_1light__state__t_1a953b11665623a73c83dffe27238b6b24"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">positionalLight</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N3f3d13light_state_t15positionalLightE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d13light_state_t9intensityE">
+<span id="_CPPv3N3f3d13light_state_t9intensityE"></span><span id="_CPPv2N3f3d13light_state_t9intensityE"></span><span id="f3d::light_state_t::intensity__double"></span><span class="target" id="structf3d_1_1light__state__t_1ac67bbfa7a078033cf9e97b0648bb15d6"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">intensity</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1.0</span></span><a class="headerlink" href="#_CPPv4N3f3d13light_state_t9intensityE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d13light_state_t11switchStateE">
+<span id="_CPPv3N3f3d13light_state_t11switchStateE"></span><span id="_CPPv2N3f3d13light_state_t11switchStateE"></span><span id="f3d::light_state_t::switchState__b"></span><span class="target" id="structf3d_1_1light__state__t_1a9ed6434bb4f3a39aa97d9d79b9175b9a"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">switchState</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><a class="headerlink" href="#_CPPv4N3f3d13light_state_t11switchStateE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="structf3d_1_1interactor_1_1invalid__args__exception.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Struct interactor::invalid_args_exception</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="structf3d_1_1mesh__t.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Struct mesh_t</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#struct-documentation">Struct Documentation</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            <div class="bd-footer-content__inner">
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Michael Migliore and Mathieu Westphal
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2025, Michael Migliore and Mathieu Westphal.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div></div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
