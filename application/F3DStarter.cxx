@@ -515,7 +515,9 @@ public:
 
     // Initialize libf3dOptions
     f3d::options libOptions;
-    libOptions.ui.drop_zone.info = "Drop a file or HDRI to load it\nPress H to show cheatsheet";
+    f3d::interactor& interactor = this->Engine->getInteractor();
+    // libOptions.ui.drop_zone.info = interactor.getDropZoneInfo();
+    // "Drop a file or HDRI to load it\nPress H to show cheatsheet";
 
     // Copy appOptions
     F3DOptionsTools::OptionsDict appOptions = F3DOptionsTools::DefaultAppOptions;
@@ -857,12 +859,15 @@ public:
 
       f3d::interactor& interactor = this->Engine->getInteractor();
       interactor.initBindings();
+      // f3d::options libOptions;
+      // f3d::interactor& interactor = this->Engine->getInteractor();
+      LibOptions.ui.drop_zone.info = interactor.getDropZoneInfo();
 
       // clang-format off
       interactor.addBinding({ mod_t::NONE, "Left" }, "load_previous_file_group", "Others", std::bind(docString, "Load previous file group"));
       interactor.addBinding({ mod_t::NONE, "Right" }, "load_next_file_group", "Others", std::bind(docString, "Load next file group"));
-      interactor.addBinding({ mod_t::CTRL, "Left" }, "load_previous_file_group true", "Others", std::bind(docString, "Load previous file group, keeping camera"));
-      interactor.addBinding({ mod_t::CTRL, "Right" }, "load_next_file_group true", "Others", std::bind(docString, "Load next file group, keeping camera"));
+      interactor.addBinding({ mod_t::CTRL, "Left" }, "load_previous_file_group true", "Others", std::bind(docString, "Load previous file group, keeping camera"), true);
+      interactor.addBinding({ mod_t::CTRL, "Right" }, "load_next_file_group true", "Others", std::bind(docString, "Load next file group, keeping camera"), true);
       interactor.addBinding({ mod_t::NONE, "Up" }, "reload_current_file_group", "Others", std::bind(docString, "Reload current file group"));
       interactor.addBinding({ mod_t::NONE, "Down" }, "add_current_directories", "Others", std::bind(docString, "Add files from dir of current file"));
       interactor.addBinding({ mod_t::NONE, "F12" }, "take_screenshot", "Others", std::bind(docString, "Take a screenshot"));
