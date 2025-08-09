@@ -4,7 +4,8 @@
     "OpenEXR is part of VFX reference platform (CY2025: 3.3.x)",
     "OpenVDB is part of VFX reference platform (CY2025: 12.x)",
     "OpenVDB min version is not enforced by F3D code and missing from VTK code",
-    "Python is part of VFX reference platform (CY2025: 3.11)"
+    "Python is part of VFX reference platform (CY2025: 3.11)",
+    "OSPRay is fixed at 2.12.0 until full support for OSPRay 3.0 is added in VTK"
   ],
   "versions": {
     "alembic": "1.8.8",
@@ -41,5 +42,5 @@
     "zlib": "v1.2.13"
   },
   "vtk_commit_sha": "f79f45bccf13df70c8937ea99f1e492eb5b7cf94",
-  "timestamp": "20250802_0"
+  "timestamp": "20250809_0"
 }
