@@ -15,10 +15,6 @@ runs:
 
     - name: Check required inputs
       shell: bash
-      run: echo ${{ inputs.version }}
-
-    - name: Check required inputs
-      shell: bash
       run: |
         [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
 
