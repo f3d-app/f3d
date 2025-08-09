@@ -638,7 +638,12 @@ public:
   unsigned long EventLoopTimerId = 0;
   int EventLoopObserverId = -1;
   std::atomic<bool> RenderRequested = false;
+
+  // Add inside Internals class definition
+  std::vector<f3d::interaction_bind_t> DropZoneBindings;
 };
+
+
 
 //----------------------------------------------------------------------------
 interactor_impl::interactor_impl(options& options, window_impl& window, scene_impl& scene)
@@ -1260,6 +1265,7 @@ interactor& interactor_impl::initBindings()
   this->Internals->Bindings.clear();
   this->Internals->GroupedBinds.clear();
   this->Internals->OrderedBindGroups.clear();
+  this->Internals->DropZoneBindings.clear();
   f3d::options& opts = this->Internals->Options;
 
   // Define lambdas used for documentation
@@ -1423,6 +1429,33 @@ interactor& interactor_impl::initBindings()
 }
 
 //----------------------------------------------------------------------------
+std::string interactor_impl::getDropZoneInfo() const
+{
+  std::stringstream info;
+
+  // Add a general prefix message or instructions if desired
+  info << "Drop a file or HDRI to load it\n";
+
+  // Iterate over bindings marked for drop zone
+  for (const auto& bind : this->Internals->DropZoneBindings)
+  {
+    auto it = this->Internals->Bindings.find(bind);
+    if (it != this->Internals->Bindings.end())
+      {
+        if (it->second.DocumentationCallback)
+        {
+          const auto& docPair = it->second.DocumentationCallback();
+          info << "- " << docPair.first << "\n";
+        }
+      }
+  }
+
+  info << "Press H to show cheatsheet";
+
+  return info.str();
+}
+
+//----------------------------------------------------------------------------
 interactor& interactor_impl::addBinding(const interaction_bind_t& bind,
   std::vector<std::string> commands, std::string group,
   documentation_callback_t documentationCallback, BindingType type)
@@ -1443,6 +1476,10 @@ interactor& interactor_impl::addBinding(const interaction_bind_t& bind,
     {
       // Add the group in order if first addition
       this->Internals->OrderedBindGroups.emplace_back(groupIt->first);
+    }
+    if (showInDropZone)
+    {
+      this->Internals->DropZoneBindings.push_back(bind);
     }
   }
   return *this;

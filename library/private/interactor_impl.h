@@ -35,6 +35,7 @@ public:
   interactor_impl(options& options, window_impl& window, scene_impl& scene);
   ~interactor_impl() override;
 
+  std::string getDropZoneInfo() const override;
   interactor& initCommands() override;
   interactor& addCommand(const std::string& action,
     std::function<void(const std::vector<std::string>&)> callback,

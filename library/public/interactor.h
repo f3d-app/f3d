@@ -75,6 +75,8 @@ public:
    */
   virtual interactor& initCommands() = 0;
 
+  virtual std::string getDropZoneInfo() const = 0;
+
   /**
    * Use this method to add a command to be called using triggerCommand.
    * Adding a command with an already existing action throw a
@@ -96,7 +98,7 @@ public:
   /**
    * Return a string vector containing all currently defined actions of commands
    */
-  [[nodiscard]] virtual std::vector<std::string> getCommandActions() const = 0;
+  virtual std::vector<std::string> getCommandActions() const = 0;
 
   /**
    * Trigger provided command, see COMMANDS.md for details about supported
