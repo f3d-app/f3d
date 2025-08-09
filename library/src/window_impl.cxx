@@ -660,4 +660,10 @@ void window_impl::RenderUIOnly()
   info->Remove(vtkF3DRenderPass::RENDER_UI_ONLY());
 #endif
 }
+
+//----------------------------------------------------------------------------
+vtkF3DRenderer* window_impl::GetRenderer() const
+{
+  return this->Internals->Renderer;
+}
 };
