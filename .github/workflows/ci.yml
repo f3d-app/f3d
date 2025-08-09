@@ -286,7 +286,6 @@ jobs:
           tbb_version: ${{matrix.tbb_version}}
           zlib_version: ${{matrix.zlib_version}}
 
-      # TODO CHECK THIS IS WORKING AS EXPECTED
       - name: Install Raytracing Dependencies
         if: matrix.ospray_version != ''
         uses: ./source/.github/actions/ospray-sb-install-dep

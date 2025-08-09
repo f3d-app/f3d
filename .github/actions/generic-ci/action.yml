@@ -167,8 +167,10 @@ runs:
       working-directory: ${{github.workspace}}
       run: echo "PATH=$env:PATH;$(pwd)\dependencies\install\bin\;$(pwd)\dependencies\install\lib\;$(pwd)\install\bin\;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-    - name: Set DYLD_LIBRARY_PATH macOS
-      if: runner.os == 'macOS'
+    - name: Set DYLD_LIBRARY_PATH on macOS for OSPRay dynamic loading
+      if: | 
+        runner.os == 'macOS' &&
+        inputs.ospray_version != ''
       shell: bash
       run: echo "DYLD_LIBRARY_PATH=$(pwd)/dependencies/install/lib" >> $GITHUB_ENV
 

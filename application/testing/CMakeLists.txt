@@ -626,7 +626,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   f3d_test(NAME TestInteractionHDRIFullFromNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr LONG_TIMEOUT INTERACTION)
 
   if(F3D_MODULE_RAYTRACING)
-    # https://gitlab.kitware.com/vtk/vtk/-/issues/19039
+    # https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10753
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20231213)
       # XXX: These tests are impacted by https://github.com/f3d-app/f3d/issues/933
       f3d_test(NAME TestHDRIRaytracing DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -rd --raytracing-samples=4)
@@ -666,7 +666,7 @@ endif()
 
 if(F3D_MODULE_RAYTRACING)
   # Ideally we could test these with ospray 2.7 and VTK 9.3
-  # https://gitlab.kitware.com/vtk/vtk/-/issues/19039
+  # https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10753
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20231213)
     f3d_test(NAME TestRaytracingGLTF DATA WaterBottle.glb ARGS -rd --raytracing-samples=4)
     f3d_test(NAME TestRaytracingBackground DATA suzanne.ply ARGS -rd --raytracing-samples=4 --background-color=1,0,0 THRESHOLD 0.05) # Threshold needed because of difference in rendering in VTK 9.3
