@@ -58,6 +58,8 @@ jobs:
       openexr_version: ${{ steps.set_default_versions.outputs.openexr_version }}
       openvdb_min_version: ${{ steps.set_default_versions.outputs.openvdb_min_version }}
       openvdb_version: ${{ steps.set_default_versions.outputs.openvdb_version }}
+      ospray_min_version: ${{ steps.set_default_versions.outputs.ospray_min_version }}
+      ospray_version: ${{ steps.set_default_versions.outputs.ospray_version }}
       pybind11_min_version: ${{ steps.set_default_versions.outputs.pybind11_min_version }}
       pybind11_version: ${{ steps.set_default_versions.outputs.pybind11_version }}
       python_min_version: ${{ steps.set_default_versions.outputs.python_min_version }}
@@ -131,7 +133,6 @@ jobs:
         uses: ./source/.github/actions/generic-ci
         with:
           vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
-          raytracing_label: raytracing
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
           alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           assimp_version: ${{needs.default_versions.outputs.assimp_version}}
@@ -142,6 +143,7 @@ jobs:
           occt_version: ${{needs.default_versions.outputs.occt_version}}
           openexr_version: ${{needs.default_versions.outputs.openexr_version}}
           openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+          ospray_version: ${{needs.default_versions.outputs.ospray_version}}
           pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
           python_version: ${{needs.default_versions.outputs.python_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
@@ -183,7 +185,6 @@ jobs:
         with:
           build_type: ${{matrix.build_type}}
           vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
-          raytracing_label: raytracing
           rendering_backend: ${{matrix.rendering_backend}}
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
           alembic_version: ${{needs.default_versions.outputs.alembic_version}}
@@ -195,6 +196,7 @@ jobs:
           occt_version: ${{needs.default_versions.outputs.occt_version}}
           openexr_version: ${{needs.default_versions.outputs.openexr_version}}
           openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+          ospray_version: ${{needs.default_versions.outputs.ospray_version}}
           pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
           python_version: ${{needs.default_versions.outputs.python_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
@@ -235,6 +237,7 @@ jobs:
           occt_version: ${{needs.default_versions.outputs.occt_version}}
           openexr_version: ${{needs.default_versions.outputs.openexr_version}}
           openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+          ospray_version: ${{needs.default_versions.outputs.ospray_version}}
           pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
           python_version: ${{needs.default_versions.outputs.python_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
@@ -275,6 +278,7 @@ jobs:
           occt_version: ${{needs.default_versions.outputs.occt_version}}
           openexr_version: ${{needs.default_versions.outputs.openexr_version}}
           openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+          ospray_version: ${{needs.default_versions.outputs.ospray_version}}
           pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
           python_version: ${{needs.default_versions.outputs.python_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}

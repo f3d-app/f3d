@@ -5,10 +5,6 @@ inputs:
     description: "Name of the build"
     required: false
     default: "standard"
-  raytracing_label:
-    description: "Label to control raytracing"
-    required: false
-    default: "no-raytracing"
   optional_deps_label:
     description: "Label to optional dependencies"
     required: false
@@ -63,6 +59,9 @@ inputs:
   openvdb_version:
     description: "Version of openvdb to build"
     required: false
+  ospray_version:
+    description: "Version of ospray to build"
+    required: false
   pybind11_version:
     description: "Version of pybind11 to build"
     required: false
@@ -102,7 +101,6 @@ runs:
       uses: ./source/.github/actions/generic-dependencies
       with:
         cpu: ${{inputs.cpu}}
-        raytracing_label: ${{inputs.raytracing_label}}
         alembic_version: ${{inputs.alembic_version}}
         assimp_version: ${{inputs.assimp_version}}
         blosc_version: ${{inputs.blosc_version}}
@@ -111,6 +109,7 @@ runs:
         occt_version: ${{inputs.occt_version}}
         openexr_version: ${{inputs.openexr_version}}
         openvdb_version: ${{inputs.openvdb_version}}
+        ospray_version: ${{inputs.ospray_version}}
         pybind11_version: ${{inputs.pybind11_version}}
         tbb_version: ${{inputs.tbb_version}}
         usd_version: ${{inputs.usd_version}}
@@ -119,10 +118,10 @@ runs:
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
       with:
-        raytracing_label: ${{inputs.raytracing_label}}
         cpu: ${{inputs.cpu}}
         blosc_version: ${{inputs.blosc_version}}
         openvdb_version: ${{inputs.openvdb_version}}
+        ospray_version: ${{inputs.ospray_version}}
         tbb_version: ${{inputs.tbb_version}}
         vtk_version: ${{inputs.vtk_version}}
         zlib_version: ${{inputs.zlib_version}}
@@ -168,6 +167,13 @@ runs:
       working-directory: ${{github.workspace}}
       run: echo "PATH=$env:PATH;$(pwd)\dependencies\install\bin\;$(pwd)\dependencies\install\lib\;$(pwd)\install\bin\;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
+    - name: Set DYLD_LIBRARY_PATH on macOS for OSPRay dynamic loading
+      if: |
+        runner.os == 'macOS' &&
+        inputs.ospray_version != ''
+      shell: bash
+      run: echo "DYLD_LIBRARY_PATH=$(pwd)/dependencies/install/lib" >> $GITHUB_ENV
+
     # Works around for https://github.com/actions/runner-images/issues/10055
     - name: Remove conflicting libraries for Java bindings on Windows
       if: runner.os == 'Windows'
@@ -208,7 +214,7 @@ runs:
         -DF3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
         -DF3D_MACOS_BUNDLE=${{ inputs.bundle_label == 'bundle' && 'ON' || 'OFF' }}
         -DF3D_MODULE_EXR=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
-        -DF3D_MODULE_RAYTRACING=${{ inputs.raytracing_label == 'raytracing' && 'ON' || 'OFF' }}
+        -DF3D_MODULE_RAYTRACING=${{ inputs.ospray_version != '' && 'ON' || 'OFF' }}
         -DF3D_MODULE_UI=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_MODULE_DMON=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_MODULE_TINYFILEDIALOGS=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
