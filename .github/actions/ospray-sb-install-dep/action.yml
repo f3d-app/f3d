@@ -19,7 +19,8 @@ runs:
 
     - name: Check required inputs
       shell: bash
-      run: [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+      run: |
+        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
 
     - name: Cache ospray
       id: cache-ospray
