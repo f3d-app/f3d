@@ -515,9 +515,9 @@ public:
 
     // Initialize libf3dOptions
     f3d::options libOptions;
-    f3d::interactor& interactor = this->Engine->getInteractor();
-    // libOptions.ui.drop_zone.info = interactor.getDropZoneInfo();
-    // "Drop a file or HDRI to load it\nPress H to show cheatsheet";
+    // f3d::interactor& interactor2 = this->Engine->getInteractor();
+    // libOptions.ui.drop_zone.info = interactor2.getDropZoneInfo();
+    libOptions.ui.drop_zone.info = "Drop a file or HDRI to load it\nPress H to show cheatsheet";
 
     // Copy appOptions
     F3DOptionsTools::OptionsDict appOptions = F3DOptionsTools::DefaultAppOptions;
@@ -859,20 +859,18 @@ public:
 
       f3d::interactor& interactor = this->Engine->getInteractor();
       interactor.initBindings();
-      // f3d::options libOptions;
-      // f3d::interactor& interactor = this->Engine->getInteractor();
-      LibOptions.ui.drop_zone.info = interactor.getDropZoneInfo();
+      f3d::options libOptions;
 
       // clang-format off
       interactor.addBinding({ mod_t::NONE, "Left" }, "load_previous_file_group", "Others", std::bind(docString, "Load previous file group"));
       interactor.addBinding({ mod_t::NONE, "Right" }, "load_next_file_group", "Others", std::bind(docString, "Load next file group"));
-      interactor.addBinding({ mod_t::CTRL, "Left" }, "load_previous_file_group true", "Others", std::bind(docString, "Load previous file group, keeping camera"), true);
-      interactor.addBinding({ mod_t::CTRL, "Right" }, "load_next_file_group true", "Others", std::bind(docString, "Load next file group, keeping camera"), true);
+      interactor.addBinding({ mod_t::CTRL, "Left" }, "load_previous_file_group true", "Others", std::bind(docString, "Load previous file group, keeping camera"));
+      interactor.addBinding({ mod_t::CTRL, "Right" }, "load_next_file_group true", "Others", std::bind(docString, "Load next file group, keeping camera"));
       interactor.addBinding({ mod_t::NONE, "Up" }, "reload_current_file_group", "Others", std::bind(docString, "Reload current file group"));
       interactor.addBinding({ mod_t::NONE, "Down" }, "add_current_directories", "Others", std::bind(docString, "Add files from dir of current file"));
       interactor.addBinding({ mod_t::NONE, "F12" }, "take_screenshot", "Others", std::bind(docString, "Take a screenshot"));
 #if F3D_MODULE_TINYFILEDIALOGS
-      interactor.addBinding({ mod_t::CTRL, "O" }, "open_file_dialog", "Others", std::bind(docString, "Open File Dialog"));
+      interactor.addBinding({ mod_t::CTRL, "O" }, "open_file_dialog", "Others", std::bind(docString, "Open File Dialog"), true);
 #endif
       interactor.addBinding({ mod_t::CTRL, "F12" }, "take_minimal_screenshot", "Others", std::bind(docString, "Take a minimal screenshot"));
 
@@ -885,6 +883,13 @@ public:
       interactor.removeBinding({mod_t::CTRL, "Q"});
       interactor.addBinding({mod_t::CTRL, "Q"}, "exit", "Others", std::bind(docString, "Quit"));
       // clang-format on
+
+      // libOptions.ui.drop_zone.info = interactor.getDropZoneInfo();
+      // std::cerr << "[DEBUG] DocumentationCallback returned: '" << libOptions.ui.drop_zone.info << "'" << std::endl;
+      // this->LibOptions = libOptions;
+
+      // // Update options that depends on both app and libf3d options
+      // this->UpdateInterdependentOptions();
 
       f3d::log::debug("Adding config defined bindings if any: ");
       bool logBindings = this->AppOptions.VerboseLevel == "debug";
@@ -1542,6 +1547,10 @@ void F3DStarter::LoadFileGroupInternal(
           this->Internals->DynamicOptionsEntries, this->Internals->ImperativeConfigOptionsEntries },
         configPaths, false);
       this->Internals->UpdateBindings(configPaths);
+      // this->Internals->UpdateOptions(
+      //   { this->Internals->ConfigOptionsEntries, this->Internals->CLIOptionsEntries,
+      //     this->Internals->DynamicOptionsEntries, this->Internals->ImperativeConfigOptionsEntries },
+      //   configPaths, false);
 
       this->Internals->Engine->setOptions(this->Internals->LibOptions);
 
