@@ -491,8 +491,33 @@ void vtkF3DImguiActor::RenderDropZone()
 
     auto parsedInfo = parseDropZoneInfo(this->DropText.c_str());
 
-        // Style parameters
-    float margin = 4.0f;
+    // Calculate max width for each column before rendering
+    float margin = 5.f;
+    float maxDescTextWidth = 0.0f;
+    float maxBindingsTextWidth = 0.0f;
+
+    for (const auto& item : parsedInfo)
+    {
+      // Description column width
+      ImVec2 descSize = ImGui::CalcTextSize(item.description.c_str());
+      maxDescTextWidth = std::max(maxDescTextWidth, descSize.x);
+
+      // Bindings column width (sum of bindings + '+' separators)
+      float totalBindingsWidth = 0.0f;
+      for (size_t i = 0; i < item.bindings.size(); ++i)
+      {
+        totalBindingsWidth += ImGui::CalcTextSize(item.bindings[i].c_str()).x + 2.0f * margin;
+        if (i < item.bindings.size() - 1)
+        {
+          totalBindingsWidth += ImGui::GetStyle().ItemSpacing.x +
+                                ImGui::CalcTextSize("+").x +
+                                ImGui::GetStyle().ItemSpacing.x;
+        }
+      }
+      maxBindingsTextWidth = std::max(maxBindingsTextWidth, totalBindingsWidth);
+    }
+
+    // Style parameters
     ImVec4 descTextColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
     ImVec4 bindingTextColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
     ImVec4 bindingRectColor = ImVec4(0.3f, 0.3f, 0.3f, 0.7f); // dark semi-transparent background
@@ -514,6 +539,9 @@ void vtkF3DImguiActor::RenderDropZone()
     if (ImGui::BeginTable("DropZoneBindingsTable", 2,
         ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_NoBordersInBody))
     {
+      ImGui::TableSetupColumn("Action", ImGuiTableColumnFlags_WidthFixed, maxDescTextWidth + 2.0f * margin);
+      ImGui::TableSetupColumn("Key", ImGuiTableColumnFlags_WidthFixed, maxBindingsTextWidth + 2.0f * margin);
+
       for (const auto& item : parsedInfo)
       {
         ImGui::TableNextRow(ImGuiTableRowFlags_None,
@@ -526,7 +554,7 @@ void vtkF3DImguiActor::RenderDropZone()
         // Second column: bindings as rectangles
         ImGui::TableSetColumnIndex(1);
 
-        const float maxCursorPosX = ImGui::GetCursorPosX() + ImGui::GetColumnWidth();
+        // const float maxCursorPosX = ImGui::GetCursorPosX() + ImGui::GetColumnWidth();
         float totalBindingsWidth = 0.0f;
         for (size_t i = 0; i < item.bindings.size(); ++i)
         {
@@ -537,9 +565,6 @@ void vtkF3DImguiActor::RenderDropZone()
                                   ImGui::CalcTextSize("+").x +
                                   ImGui::GetStyle().ItemSpacing.x;
         }
-
-        float posX = maxCursorPosX - totalBindingsWidth - ImGui::GetScrollX();
-        ImGui::SetCursorPosX(posX);
 
         for (size_t i = 0; i < item.bindings.size(); ++i)
         {
