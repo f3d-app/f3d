@@ -98,7 +98,7 @@ public:
   /**
    * Return a string vector containing all currently defined actions of commands
    */
-  virtual std::vector<std::string> getCommandActions() const = 0;
+  [[nodiscard]] virtual std::vector<std::string> getCommandActions() const = 0;
 
   /**
    * Trigger provided command, see COMMANDS.md for details about supported

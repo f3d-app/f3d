@@ -391,6 +391,8 @@ void window_impl::UpdateDynamicOptions()
     renderer->ShowAxis(opt.ui.axis);
     renderer->SetUseTrackball(opt.interactor.trackball);
     renderer->SetInvertZoom(opt.interactor.invert_zoom);
+
+    renderer->SetDropZoneInfo(this->Internals->Interactor->getDropZoneInfo());
   }
 
   // XXX: model.point_sprites.type only has an effect on geometry scene
@@ -412,7 +414,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->ShowConsole(opt.ui.console);
   renderer->ShowMinimalConsole(opt.ui.minimal_console);
   renderer->ShowDropZone(opt.ui.drop_zone.enable);
-  renderer->SetDropZoneInfo(opt.ui.drop_zone.info);
+  // renderer->SetDropZoneInfo(opt.ui.drop_zone.info);
   renderer->ShowDropZoneLogo(opt.ui.drop_zone.show_logo);
   // F3D_DEPRECATED
   // Remove this in the next major release
@@ -534,6 +536,8 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetUseInverseOpacityFunction(opt.model.volume.inverse);
 
   renderer->UpdateActors();
+
+  std::cerr << "[WINDOW]" << std::endl;
 
   // Update the cheatsheet if needed
   if (this->Internals->Interactor && renderer->CheatSheetNeedsUpdate())
