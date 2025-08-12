@@ -44,6 +44,7 @@
 #include <vector>
 
 #include "camera.h"
+#include <iostream>
 
 namespace fs = std::filesystem;
 
@@ -1428,29 +1429,57 @@ interactor& interactor_impl::initBindings()
   return *this;
 }
 
-//----------------------------------------------------------------------------
+
 std::string interactor_impl::getDropZoneInfo() const
 {
+
+  auto modifierToString = [](interaction_bind_t::ModifierKeys mod) -> std::string
+  {
+    switch (mod)
+    {
+      case interaction_bind_t::ModifierKeys::CTRL:        return "Ctrl+";
+      case interaction_bind_t::ModifierKeys::SHIFT:       return "Shift+";
+      case interaction_bind_t::ModifierKeys::CTRL_SHIFT:  return "Ctrl+Shift+";
+      case interaction_bind_t::ModifierKeys::ANY:         return ""; // or "Any+"
+      case interaction_bind_t::ModifierKeys::NONE:        return "";
+    }
+    return "";
+  };
+
+
   std::stringstream info;
 
+  std::cerr << "[DEBUG] Starting getDropZoneInfo()" << std::endl;
   // Add a general prefix message or instructions if desired
-  info << "Drop a file or HDRI to load it\n";
+  // info << "Drop a file or HDRI to load it\n";
 
   // Iterate over bindings marked for drop zone
   for (const auto& bind : this->Internals->DropZoneBindings)
   {
+    std::cerr << "[DEBUG] Processing binding at address: " << &bind << std::endl;
+
     auto it = this->Internals->Bindings.find(bind);
     if (it != this->Internals->Bindings.end())
-      {
-        if (it->second.DocumentationCallback)
-        {
-          const auto& docPair = it->second.DocumentationCallback();
-          info << "- " << docPair.first << "\n";
-        }
-      }
+    {
+      const auto& bindData = it->first;
+      const auto& docPair = it->second.DocumentationCallback();
+      std::string modStr = modifierToString(bindData.mod);
+
+      std::cerr << "[DEBUG]   Modifier: " << modStr << std::endl;
+      std::cerr << "[DEBUG]   Key: " << bindData.inter << std::endl;
+
+      info << docPair.first << ": " << modStr << bindData.inter << "\n";
+
+    }
+    else
+    {
+      std::cerr << "[DEBUG] Binding not found in Bindings map" << std::endl;
+    }
   }
 
-  info << "Press H to show cheatsheet";
+  // info << "Press H to show cheatsheet";
+  std::cerr << "[DEBUG] Finished building drop zone info string" << std::endl;
+  std::cerr << "[DEBUG] returned: '" << info.str() << "'" << std::endl;
 
   return info.str();
 }
