@@ -519,8 +519,8 @@ void vtkF3DImguiActor::RenderDropZone()
 
     // Style parameters
     ImVec4 descTextColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
-    ImVec4 bindingTextColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
-    ImVec4 bindingRectColor = ImVec4(0.3f, 0.3f, 0.3f, 0.7f); // dark semi-transparent background
+    ImVec4 bindingTextColor = ImVec4(0.0f, 0.0f, 0.0f, 1.0f); // black text
+    ImVec4 bindingRectColor = ImVec4(0.85f, 0.85f, 0.85f, 1.0f); // light gray
 
     ImGui::Begin("DropZoneText", nullptr, flags);
 

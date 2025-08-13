@@ -537,8 +537,6 @@ void window_impl::UpdateDynamicOptions()
 
   renderer->UpdateActors();
 
-  std::cerr << "[WINDOW]" << std::endl;
-
   // Update the cheatsheet if needed
   if (this->Internals->Interactor && renderer->CheatSheetNeedsUpdate())
   {
