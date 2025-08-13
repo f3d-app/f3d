@@ -644,8 +644,6 @@ public:
   std::vector<f3d::interaction_bind_t> DropZoneBindings;
 };
 
-
-
 //----------------------------------------------------------------------------
 interactor_impl::interactor_impl(options& options, window_impl& window, scene_impl& scene)
   : Internals(std::make_unique<interactor_impl::internals>(options, window, scene, *this))
@@ -1449,37 +1447,18 @@ std::string interactor_impl::getDropZoneInfo() const
 
   std::stringstream info;
 
-  std::cerr << "[DEBUG] Starting getDropZoneInfo()" << std::endl;
-  // Add a general prefix message or instructions if desired
-  // info << "Drop a file or HDRI to load it\n";
-
   // Iterate over bindings marked for drop zone
   for (const auto& bind : this->Internals->DropZoneBindings)
   {
-    std::cerr << "[DEBUG] Processing binding at address: " << &bind << std::endl;
-
     auto it = this->Internals->Bindings.find(bind);
     if (it != this->Internals->Bindings.end())
     {
       const auto& bindData = it->first;
       const auto& docPair = it->second.DocumentationCallback();
       std::string modStr = modifierToString(bindData.mod);
-
-      std::cerr << "[DEBUG]   Modifier: " << modStr << std::endl;
-      std::cerr << "[DEBUG]   Key: " << bindData.inter << std::endl;
-
       info << docPair.first << ": " << modStr << bindData.inter << "\n";
-
-    }
-    else
-    {
-      std::cerr << "[DEBUG] Binding not found in Bindings map" << std::endl;
     }
   }
-
-  // info << "Press H to show cheatsheet";
-  std::cerr << "[DEBUG] Finished building drop zone info string" << std::endl;
-  std::cerr << "[DEBUG] returned: '" << info.str() << "'" << std::endl;
 
   return info.str();
 }
