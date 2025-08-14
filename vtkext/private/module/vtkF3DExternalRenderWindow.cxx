@@ -36,6 +36,12 @@ void vtkF3DExternalRenderWindow::Render()
   {
     // skip vtkGenericOpenGLRenderWindow because it calls OpenGL before it's even initialized
     this->vtkOpenGLRenderWindow::OpenGLInit();
+
+    if (!this->Initialized)
+    {
+      // The context can fails to initialize if the OpenGL symbol loader is invalid.
+      return;
+    }
   }
 
   this->Superclass::Render();
