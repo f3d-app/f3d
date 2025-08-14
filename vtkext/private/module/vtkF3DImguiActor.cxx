@@ -39,6 +39,12 @@ constexpr float LOGO_DISPLAY_WIDTH = 256.f;
 constexpr float LOGO_DISPLAY_HEIGHT = 256.f;
 constexpr float DROPZONE_LOGO_TEXT_PADDING = 20.f;
 
+struct DropZoneInfo
+{
+  std::string description;
+  std::vector<std::vector<std::string>> bindings; // outer = groups (OR), inner = keys (+)
+};
+
 static std::vector<std::string> splitBindings(const std::string& s, char delim)
 {
   std::vector<std::string> result;
@@ -53,17 +59,18 @@ static std::vector<std::string> splitBindings(const std::string& s, char delim)
   return result;
 }
 
-struct DropZoneInfo
-{
-  std::string description;
-  std::vector<std::string> bindings;
-};
-
 static std::vector<DropZoneInfo> parseDropZoneInfo(const std::string& input)
 {
-  std::vector<DropZoneInfo> parsedInfo;
+  std::map<std::string, std::vector<std::vector<std::string>>> infoMap;
   std::stringstream ss(input);
   std::string line;
+
+  auto trim = [](std::string& str) {
+    size_t start = str.find_first_not_of(" \t");
+    size_t end = str.find_last_not_of(" \t");
+    if (start == std::string::npos) { str.clear(); return; }
+    str = str.substr(start, end - start + 1);
+  };
 
   while (std::getline(ss, line))
   {
@@ -75,21 +82,19 @@ static std::vector<DropZoneInfo> parseDropZoneInfo(const std::string& input)
     std::string desc = line.substr(0, colonPos);
     std::string bindingPart = line.substr(colonPos + 1);
 
-    auto trim = [](std::string& str) {
-      size_t start = str.find_first_not_of(" \t");
-      size_t end = str.find_last_not_of(" \t");
-      if (start == std::string::npos) { str.clear(); return; }
-      str = str.substr(start, end - start + 1);
-    };
     trim(desc);
     trim(bindingPart);
 
-    DropZoneInfo info;
-    info.description = desc;
-    info.bindings = splitBindings(bindingPart, '+');
-    parsedInfo.push_back(info);
+    auto keys = splitBindings(bindingPart, '+');
+    if (!keys.empty())
+      infoMap[desc].push_back(keys);
   }
 
+  std::vector<DropZoneInfo> parsedInfo;
+  for (auto& [desc, groups] : infoMap)
+  {
+    parsedInfo.push_back({desc, groups});
+  }
   return parsedInfo;
 }
 
@@ -502,15 +507,26 @@ void vtkF3DImguiActor::RenderDropZone()
       ImVec2 descSize = ImGui::CalcTextSize(item.description.c_str());
       maxDescTextWidth = std::max(maxDescTextWidth, descSize.x);
 
-      // Bindings column width (sum of bindings + '+' separators)
+      // Bindings column width (sum of keys + '+' between keys, 'or' between groups)
       float totalBindingsWidth = 0.0f;
-      for (size_t i = 0; i < item.bindings.size(); ++i)
+      for (size_t g = 0; g < item.bindings.size(); ++g) // groups
       {
-        totalBindingsWidth += ImGui::CalcTextSize(item.bindings[i].c_str()).x + 2.0f * margin;
-        if (i < item.bindings.size() - 1)
+        const auto& group = item.bindings[g];
+        for (size_t k = 0; k < group.size(); ++k) // keys
+        {
+          totalBindingsWidth += ImGui::CalcTextSize(group[k].c_str()).x + 2.0f * margin;
+          if (k < group.size() - 1) // plus between keys
+          {
+            totalBindingsWidth += ImGui::GetStyle().ItemSpacing.x +
+                                  ImGui::CalcTextSize("+").x +
+                                  ImGui::GetStyle().ItemSpacing.x;
+          }
+        }
+
+        if (g < item.bindings.size() - 1) // or between groups
         {
           totalBindingsWidth += ImGui::GetStyle().ItemSpacing.x +
-                                ImGui::CalcTextSize("+").x +
+                                ImGui::CalcTextSize("or").x +
                                 ImGui::GetStyle().ItemSpacing.x;
         }
       }
@@ -519,8 +535,10 @@ void vtkF3DImguiActor::RenderDropZone()
 
     // Style parameters
     ImVec4 descTextColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
-    ImVec4 bindingTextColor = ImVec4(0.0f, 0.0f, 0.0f, 1.0f); // black text
-    ImVec4 bindingRectColor = ImVec4(0.85f, 0.85f, 0.85f, 1.0f); // light gray
+    // ImVec4 bindingTextColor = ImVec4(0.0f, 0.0f, 0.0f, 1.0f); // black text
+    // ImVec4 bindingRectColor = ImVec4(0.85f, 0.85f, 0.85f, 1.0f); // light gray
+    ImVec4 bindingRectColor = F3DImguiStyle::GetHighlightColor(); // F3D blue
+    ImVec4 bindingTextColor = F3DImguiStyle::GetBackgroundColor(); // text color on blue
 
     ImGui::Begin("DropZoneText", nullptr, flags);
 
@@ -555,41 +573,66 @@ void vtkF3DImguiActor::RenderDropZone()
         ImGui::TableSetColumnIndex(1);
 
         // const float maxCursorPosX = ImGui::GetCursorPosX() + ImGui::GetColumnWidth();
+        // Calculate total bindings width considering "+" inside groups and "or" between groups
         float totalBindingsWidth = 0.0f;
-        for (size_t i = 0; i < item.bindings.size(); ++i)
+        for (size_t g = 0; g < item.bindings.size(); ++g) // outer vector: groups
         {
-          totalBindingsWidth += ImGui::CalcTextSize(item.bindings[i].c_str()).x +
-                                2 * margin;
-          if (i < item.bindings.size() - 1)
+          const auto& group = item.bindings[g];
+          for (size_t k = 0; k < group.size(); ++k)
+          {
+            totalBindingsWidth += ImGui::CalcTextSize(group[k].c_str()).x + 2 * margin;
+            if (k < group.size() - 1) // plus between keys
+            {
+              totalBindingsWidth += ImGui::GetStyle().ItemSpacing.x +
+                                    ImGui::CalcTextSize("+").x +
+                                    ImGui::GetStyle().ItemSpacing.x;
+            }
+          }
+          if (g < item.bindings.size() - 1) // or between groups
+          {
             totalBindingsWidth += ImGui::GetStyle().ItemSpacing.x +
-                                  ImGui::CalcTextSize("+").x +
+                                  ImGui::CalcTextSize("or").x +
                                   ImGui::GetStyle().ItemSpacing.x;
+          }
         }
 
-        for (size_t i = 0; i < item.bindings.size(); ++i)
+        // Render bindings
+        for (size_t g = 0; g < item.bindings.size(); ++g)
         {
-          const std::string& key = item.bindings[i];
-          ImDrawList* drawList = ImGui::GetWindowDrawList();
+          const auto& group = item.bindings[g];
+          for (size_t k = 0; k < group.size(); ++k)
+          {
+            const std::string& key = group[k];
+            ImDrawList* drawList = ImGui::GetWindowDrawList();
 
-          // Draw text first in a separate channel
-          drawList->ChannelsSplit(2);
-          drawList->ChannelsSetCurrent(1);
-          ImGui::TextColored(bindingTextColor, "%s", key.c_str());
+            // Draw text first in a separate channel
+            drawList->ChannelsSplit(2);
+            drawList->ChannelsSetCurrent(1);
+            ImGui::TextColored(bindingTextColor, "%s", key.c_str());
 
-          drawList->ChannelsSetCurrent(0);
-          ImVec2 topBindingCorner(ImGui::GetItemRectMin().x - margin,
-                                  ImGui::GetItemRectMin().y - margin);
-          ImVec2 bottomBindingCorner(ImGui::GetItemRectMax().x + margin,
-                                     ImGui::GetItemRectMax().y + margin);
-          drawList->AddRectFilled(topBindingCorner, bottomBindingCorner,
-                                  ImColor(bindingRectColor), 5.f);
-          drawList->ChannelsMerge();
+            drawList->ChannelsSetCurrent(0);
+            ImVec2 topBindingCorner(ImGui::GetItemRectMin().x - margin,
+                                    ImGui::GetItemRectMin().y - margin);
+            ImVec2 bottomBindingCorner(ImGui::GetItemRectMax().x + margin,
+                                      ImGui::GetItemRectMax().y + margin);
+            drawList->AddRectFilled(topBindingCorner, bottomBindingCorner,
+                                    ImColor(bindingRectColor), 5.f);
+            drawList->ChannelsMerge();
 
-          // Draw "+" between keys
-          if (i < item.bindings.size() - 1)
+            // Plus between keys in same group
+            if (k < group.size() - 1)
+            {
+              ImGui::SameLine();
+              ImGui::Text("+");
+              ImGui::SameLine();
+            }
+          }
+
+          // "or" between different groups
+          if (g < item.bindings.size() - 1)
           {
             ImGui::SameLine();
-            ImGui::Text("+");
+            ImGui::Text("or");
             ImGui::SameLine();
           }
         }
