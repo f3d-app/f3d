@@ -47,7 +47,8 @@ public:
   {
     NONE,
     FXAA,
-    SSAA
+    SSAA,
+    TAA
   };
 
   ///@{
@@ -509,6 +510,15 @@ private:
     bool cellFlag = false, bool inverseOpacityFlag = false);
 
   /**
+   * Screen spaced jittering for TAA
+   */
+  void EnableJitter(bool enable);
+  /**
+   * Configure Halton sequence for TAA
+   */
+  static float ConfigureHaltonSequence(int base, int* numerator, int* denominator);
+
+  /**
    * Convenience method for configuring a scalar bar actor for coloring
    */
   void ConfigureScalarBarActorForColoring(vtkScalarBarActor* scalarBar, std::string arrayName,
@@ -537,6 +547,11 @@ private:
   vtkNew<vtkF3DUIActor> UIActor;
 
   unsigned int Timer = 0; // Timer OpenGL query
+
+  int taaNx = 0;
+  int taaDx = 1;
+  int taaNy = 0;
+  int taaDy = 1;
 
   bool CheatSheetConfigured = false;
   bool ActorsPropertiesConfigured = false;

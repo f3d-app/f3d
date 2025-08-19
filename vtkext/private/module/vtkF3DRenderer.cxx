@@ -44,6 +44,7 @@
 #include <vtkRenderWindow.h>
 #include <vtkSSAAPass.h>
 #include <vtkScalarBarActor.h>
+#include <vtkShaderProperty.h>
 #include <vtkSkybox.h>
 #include <vtkTable.h>
 #include <vtkTextActor.h>
@@ -51,6 +52,7 @@
 #include <vtkTextureObject.h>
 #include <vtkToneMappingPass.h>
 #include <vtkTransform.h>
+#include <vtkUniforms.h>
 #include <vtkVersion.h>
 #include <vtkVolumeProperty.h>
 #include <vtkXMLImageDataReader.h>
@@ -1825,6 +1827,8 @@ void vtkF3DRenderer::UpdateActors()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::Render()
 {
+  EnableJitter(this->AntiAliasingModeEnabled == vtkF3DRenderer::AntiAliasingMode::TAA);
+
   if (!this->TimerVisible)
   {
     this->Superclass::Render();
@@ -2766,6 +2770,71 @@ bool vtkF3DRenderer::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vt
 
   volume->SetProperty(property);
   return true;
+}
+
+void vtkF3DRenderer::EnableJitter(bool enable)
+{
+  vtkActorCollection* actors = this->GetActors();
+  actors->InitTraversal();
+  vtkActor* actor;
+
+  float jitter[2];
+  jitter[0] = ConfigureHaltonSequence(2, &taaNx, &taaDx);
+  jitter[1] = ConfigureHaltonSequence(3, &taaNy, &taaDy);
+  vtkRenderWindow* renderWindow = this->GetRenderWindow();
+  int width = renderWindow->GetSize()[0];
+  int height = renderWindow->GetSize()[1];
+  jitter[0] = ((jitter[0] - 0.5f) / width) * 2.0f;
+  jitter[1] = ((jitter[1] - 0.5f) / height) * 2.0f;
+
+  while ((actor = actors->GetNextActor()))
+  {
+    vtkPolyDataMapper* mapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
+    if (mapper)
+    {
+      vtkShaderProperty* shaderProp = actor->GetShaderProperty();
+      vtkUniforms* uniforms = shaderProp->GetVertexCustomUniforms();
+      if (enable)
+      {
+        uniforms->SetUniform2f("jitter", jitter);
+        vtkInformation* information = this->GetInformation();
+        information->Remove(vtkF3DRenderPass::RENDER_UI_ONLY());
+      }
+      else
+      {
+        uniforms->RemoveUniform("jitter");
+      }
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+float vtkF3DRenderer::ConfigureHaltonSequence(int base, int* numerator, int* denominator)
+{
+  int n = *numerator;
+  int d = *denominator;
+
+  int x = d - n;
+  if (x == 1)
+  {
+    n = 1;
+    d *= base;
+  }
+  else
+  {
+    int y = d / base;
+    while (x <= y && y > 0)
+    {
+      y = y / base;
+    }
+
+    n = (base + 1) * y - x;
+  }
+
+  *numerator = n;
+  *denominator = d;
+
+  return static_cast<float>(n) / static_cast<float>(d);
 }
 
 //----------------------------------------------------------------------------
