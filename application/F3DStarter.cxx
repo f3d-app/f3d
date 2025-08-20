@@ -1946,6 +1946,7 @@ void F3DStarter::AddCommands()
   };
 
 
+
   auto complFilesystem = [](const std::vector<std::string>& args)
   {
     std::vector<std::string> candidates;
@@ -2103,6 +2104,10 @@ void F3DStarter::AddCommands()
         f3d::log::info("Found available config path: ", path.string());
       }
     });
+
+  interactor.addCommand("print_config_info", [this](const std::vector<std::string>&)
+    { F3DConfigFileTools::PrintConfigInfo(F3DConfigFileTools::GetConfigPaths("config")); });
+
 
   interactor.addCommand("remove_file_groups",
 
