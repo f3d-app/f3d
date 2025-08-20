@@ -19,7 +19,7 @@ f3d_plugin_declare_reader(
     MIMETYPES model/e57
     VTK_READER vtkPDALReader
     FORMAT_DESCRIPTION "PDAL processes a variety of files: https://pdal.io/en/stable/stages/readers.html"
-    CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/pdal.inl"
+    CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/pdal.inl"
 )
 
 f3d_plugin_build(
