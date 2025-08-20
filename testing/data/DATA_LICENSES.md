@@ -68,6 +68,7 @@
 - Wolf.fbx: OLEKSO: [CC-NC 4.0](http://creativecommons.org/licenses/by-nc/4.0/)
 - world\*: VTK Data: BSD-3-Clause
 - zombie\*.mdl: LibreQuake Project: BSD-3-Clause
+- bunnyInt19.e57: IOPDAL, e57 File: (http://www.libe57.org/data.html)
 
 All other datasets are licensed under the BSD-3-Clause F3D license.
 
