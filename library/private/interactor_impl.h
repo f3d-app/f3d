@@ -37,7 +37,7 @@ public:
 
   interactor& initCommands() override;
   interactor& addCommand(
-    std::string action, std::function<void(const std::vector<std::string>&)> callback) override;
+    std::string action, std::function<void(const std::vector<std::string>&)> callback, documentation_callback_t documentationCallback = nullptr,  std::function<std::vector<std::string>(const std::vector<std::string>&)> completionCallback = nullptr) override;
   interactor& removeCommand(const std::string& action) override;
   std::vector<std::string> getCommandActions() const override;
   bool triggerCommand(std::string_view command) override;

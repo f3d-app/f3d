@@ -61,6 +61,13 @@ public:
     BindingType Type;
   };
 
+  struct CommandCallbacks
+  {
+    std::function<void(const std::vector<std::string>&)> Callback;
+    documentation_callback_t DocumentationCallback;
+    std::function<std::vector<std::string>(const std::vector<std::string>&)> CompletionCallback;
+  };
+
   internals(options& options, window_impl& window, scene_impl& scene, interactor_impl& inter)
     : Options(options)
     , Window(window)
@@ -605,7 +612,7 @@ public:
   vtkSmartPointer<vtkF3DInteractorEventRecorder> Recorder;
   vtkNew<vtkF3DUIObserver> UIObserver;
 
-  std::map<std::string, std::function<void(const std::vector<std::string>&)>> Commands;
+  std::map<std::string, CommandCallbacks> Commands;
   std::optional<std::string> CommandBuffer;
 
   std::map<interaction_bind_t, BindingCommands> Bindings;
@@ -648,16 +655,45 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
     {
       // Build a list of candidates
       std::vector<std::string> candidates;
-      // Copy all commands that start with the pattern
-      auto startWith = [&pattern](const std::string& s)
+
+      std::vector<std::string> tokens;
+      try
       {
-        return s.rfind(pattern, 0) == 0; // To avoid dependency for C++20 starts_with
+        tokens = utils::tokenize(pattern);
+      }
+      catch (const utils::tokenize_exception&)
+      {
+        log::error("Command: unable to tokenize command:\"", pattern, "\", ignoring");
+        return candidates;
+      }
+
+      std::string actionPattern;
+      if (!tokens.empty())
+      {
+        actionPattern = tokens[0];
+      }
+
+      // Copy all commands that start with the pattern
+      auto startWith = [&actionPattern](const std::string& s)
+      {
+        return s.rfind(actionPattern, 0) == 0; // To avoid dependency for C++20 starts_with
       };
-      for (auto const& [action, callback] : this->Internals->Commands)
+
+      bool exact = false;
+      for (auto const& [action, callbacks] : this->Internals->Commands)
       {
         if (startWith(action))
         {
-          candidates.push_back(action);
+          if (action == actionPattern)
+          {
+            // pattern is an actual action, do not add to candidates yet
+            exact = true;
+            break;
+          }
+          else
+          {
+            candidates.push_back(action);
+          }
         }
         else
         {
@@ -666,6 +702,17 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
           {
             break;
           }
+        }
+      }
+    
+
+      if (exact)
+      {
+        std::vector<std::string> argsCandidates = this->Internals->Commands.at(actionPattern).CompletionCallback({ tokens.begin() + 1, tokens.end() });
+
+        for(const std::string& arg : argsCandidates)
+        {
+          candidates.emplace_back(actionPattern + " " + arg);
         }
       }
       return candidates;
@@ -696,13 +743,46 @@ interactor& interactor_impl::initCommands()
     }
   };
 
+  // "doc", ""
+  auto docStr = [](const std::string& doc) { return std::pair(doc, ""); };
+
+  auto complOptions = [&](const std::vector<std::string>& args) 
+  { 
+    if (args.size() < 1)
+    {
+      return this->Internals->Options.getNames();
+    }
+
+    // TODO factorize
+
+    // Build a list of candidates
+    std::vector<std::string> candidates;
+    // Copy all options that start with the pattern
+    auto startWith = [&args](const std::string& s)
+    {
+      return s.rfind(args[0], 0) == 0; // To avoid dependency for C++20 starts_with
+    };
+
+    for (const std::string& optionName : this->Internals->Options.getNames())
+    {
+      std::cout<<args.size()<<std::endl;
+      std::cout<<args[0]<<std::endl;
+      if (startWith(optionName))
+      {
+        candidates.push_back(optionName);
+      }
+    }
+    return candidates;
+
+  };
+
   // Add default callbacks
   this->addCommand("set",
     [&](const std::vector<std::string>& args)
     {
       check_args(args, 2, "set");
       this->Internals->Options.setAsString(args[0], args[1]);
-    });
+    }, std::bind(docStr, "set option.name values: set a libf3d option"), complOptions);
 
   this->addCommand("toggle",
     [&](const std::vector<std::string>& args)
@@ -956,15 +1036,32 @@ interactor& interactor_impl::initCommands()
 
       log::info("Verbose level changed to: ", this->Internals->VerboseLevelToString(newLevel));
     });
+
+  this->addCommand("help",
+    [&](const std::vector<std::string>& args)
+    {
+      check_args(args, 1, "help");
+      const auto it = this->Internals->Commands.find(args[0]);
+      if (it != this->Internals->Commands.end())
+      {
+        log::print(log::VerboseLevel::INFO, it->second.DocumentationCallback().first);
+      }
+      else
+      {
+      throw interactor::invalid_args_exception(
+        std::string("Command: help arg:\"") + args[0] + "\" is not a recognized command.");
+      }
+    });
+
   return *this;
 }
 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::addCommand(
-  std::string action, std::function<void(const std::vector<std::string>&)> callback)
+  std::string action, std::function<void(const std::vector<std::string>&)> callback, documentation_callback_t documentationCallback, std::function<std::vector<std::string>(const std::vector<std::string>&)> completionCallback)
 {
   const auto [it, success] =
-    this->Internals->Commands.insert({ std::move(action), std::move(callback) });
+    this->Internals->Commands.insert({ std::move(action), { std::move(callback), std::move(documentationCallback), std::move(completionCallback) }});
   if (!success)
   {
     throw interactor::already_exists_exception(
@@ -984,7 +1081,7 @@ interactor& interactor_impl::removeCommand(const std::string& action)
 std::vector<std::string> interactor_impl::getCommandActions() const
 {
   std::vector<std::string> actions;
-  for (auto const& [action, callback] : this->Internals->Commands)
+  for (auto const& [action, callbacks] : this->Internals->Commands)
   {
     actions.emplace_back(action);
   }
@@ -1026,7 +1123,7 @@ bool interactor_impl::triggerCommand(std::string_view command)
     auto callbackIt = this->Internals->Commands.find(action);
     if (callbackIt != this->Internals->Commands.end())
     {
-      callbackIt->second({ tokens.begin() + 1, tokens.end() });
+      callbackIt->second.Callback({ tokens.begin() + 1, tokens.end() });
       return true;
     }
     else

@@ -66,6 +66,8 @@ struct interaction_bind_t
 class F3D_EXPORT interactor
 {
 public:
+  using documentation_callback_t = std::function<std::pair<std::string, std::string>()>;
+
   ///@{ @name Command
   /**
    * Remove all existing commands and add all default commands,
@@ -81,7 +83,7 @@ public:
    * eg: `my_app::action`
    */
   virtual interactor& addCommand(
-    std::string action, std::function<void(const std::vector<std::string>&)> callback) = 0;
+    std::string action, std::function<void(const std::vector<std::string>&)> callback, documentation_callback_t documentationCallback = nullptr, std::function<std::vector<std::string>(const std::vector<std::string>&)> completionCallback = nullptr) = 0;
 
   /**
    * Remove a command for provided action, does not do anything if it does not exists.
@@ -109,7 +111,6 @@ public:
   ///@}
 
   ///@{ @name Bindings
-  using documentation_callback_t = std::function<std::pair<std::string, std::string>()>;
 
   /**
    * Enumeration of binding types.
