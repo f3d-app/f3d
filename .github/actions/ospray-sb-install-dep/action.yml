@@ -82,7 +82,9 @@ runs:
     - name: Copy to install
       working-directory: ${{github.workspace}}/dependencies/ospray_install
       shell: bash
-      run: cp -r ./* ../install/
+      run: |
+        cp -r ./* ../install/
+        ldd ../install/lib/libispcrt_device_cpu.so
 
     - name: Save cache
       if: steps.cache-ospray.outputs.cache-hit != 'true'
