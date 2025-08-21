@@ -15,18 +15,6 @@
 namespace f3d
 {
 
-/**
- * Enumeration of binding types.
- */
-enum class binding_type_t : std::uint8_t
-{
-  ANY = 0,
-  CYCLIC = 1,
-  NUMERICAL = 2,
-  TOGGLE = 3,
-  LAUNCHER = 4,
-};
-
 struct interaction_bind_t
 {
   /**
@@ -124,6 +112,18 @@ public:
   using documentation_callback_t = std::function<std::pair<std::string, std::string>()>;
 
   /**
+   * Enumeration of binding types.
+   */
+  enum class BindingType : std::uint8_t
+  {
+    UNDEFINED = 0,
+    CYCLIC = 1,
+    NUMERICAL = 2,
+    TOGGLE = 3,
+    LAUNCHER = 4,
+  };
+
+  /**
    * Remove all existing interaction commands and add all default bindings
    * see INTERACTIONS.md for details.
    */
@@ -145,8 +145,8 @@ public:
    * the first is the doc itself, the second is the current value as a string, if any.
    * Use `getBindingDocumentation` to access this doc.
    *
-   * bindingType is an optional type to provide, it can be used for presenting the
-   * binding in a coherent way in outputs and cheatsheet.
+   * type is an optional type of binding to provide, it can be used for presenting the
+   * binding in a coherent way in logs and cheatsheet.
    *
    * When the corresponding bind happens, the provided commands will be triggered using
    * triggerCommand. Considering checking if an interaction exists or removing it before adding it
@@ -158,7 +158,7 @@ public:
    * Adding commands for an existing bind will throw a interactor::already_exists_exception.
    */
   virtual interactor& addBinding(const interaction_bind_t& bind, std::vector<std::string> commands,
-    std::string group = {}, documentation_callback_t documentationCallback = nullptr, binding_type_t bindingType = binding_type_t::ANY) = 0;
+    std::string group = {}, documentation_callback_t documentationCallback = nullptr, BindingType type = BindingType::UNDEFINED) = 0;
 
   /**
    * See addBinding
@@ -168,13 +168,13 @@ public:
    * Adding command for an existing bind will throw a interactor::already_exists_exception.
    */
   virtual interactor& addBinding(const interaction_bind_t& bind, std::string command,
-    std::string group = {}, documentation_callback_t documentationCallback = nullptr, binding_type_t bindingType = binding_type_t::ANY) = 0;
+    std::string group = {}, documentation_callback_t documentationCallback = nullptr, BindingType type = BindingType::UNDEFINED) = 0;
 
   /**
    * Convenience initializer list signature for add binding method
    */
   interactor& addBinding(const interaction_bind_t& bind, std::initializer_list<std::string> list,
-    std::string group = {}, documentation_callback_t documentationCallback = nullptr, binding_type_t bindingType = binding_type_t::ANY)
+    std::string group = {}, documentation_callback_t documentationCallback = nullptr, BindingType type = BindingType::UNDEFINED)
   {
     return this->addBinding(
       bind, std::vector<std::string>(list), std::move(group), std::move(documentationCallback));
@@ -225,7 +225,7 @@ public:
    *
    * Getting type for a bind that does not exists will throw a does_not_exists_exception.
    */
-  [[nodiscard]] virtual binding_type_t getBindingType(
+  [[nodiscard]] virtual BindingType getBindingType(
     const interaction_bind_t& bind) const = 0;
   ///@}
 

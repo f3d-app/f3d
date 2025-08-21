@@ -51,30 +51,35 @@ def test_binding():
         "dummy command",
         "DummyGroup",
         doc_fn,
+        f3d.Interactor.BindingType.UNDEFINED,
     )
     inter.add_binding(
         f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.NONE, "P"),
         "dummy command",
         "DummyGroup",
         doc_fn,
+        f3d.Interactor.BindingType.CYCLIC,
     )
     inter.add_binding(
         f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.CTRL, "P"),
         "dummy command",
         "DummyGroup",
         doc_fn,
+        f3d.Interactor.BindingType.NUMERICAL,
     )
     inter.add_binding(
         f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.SHIFT, "P"),
         "dummy command",
         "DummyGroup",
         doc_fn,
+        f3d.Interactor.BindingType.TOGGLE,
     )
     inter.add_binding(
         f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.CTRL_SHIFT, "P"),
         ["dummy command", "dummy command"],
         "DummyGroup",
         doc_fn,
+        f3d.Interactor.BindingType.LAUNCHER,
     )
     assert len(inter.get_bind_groups()) == 1
     assert len(inter.get_binds()) == 5

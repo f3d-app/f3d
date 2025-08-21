@@ -58,7 +58,7 @@ public:
   {
     std::vector<std::string> CommandVector;
     documentation_callback_t DocumentationCallback;
-    binding_type_t BindingType;
+    BindingType Type;
   };
 
   internals(options& options, window_impl& window, scene_impl& scene, interactor_impl& inter)
@@ -1241,10 +1241,10 @@ interactor& interactor_impl::initBindings()
 //----------------------------------------------------------------------------
 interactor& interactor_impl::addBinding(const interaction_bind_t& bind,
   std::vector<std::string> commands, std::string group,
-  documentation_callback_t documentationCallback, binding_type_t bindingType)
+  documentation_callback_t documentationCallback, BindingType type)
 {
   const auto [it, success] = this->Internals->Bindings.insert(
-    { bind, { std::move(commands), std::move(documentationCallback), std::move(bindingType) } });
+    { bind, { std::move(commands), std::move(documentationCallback), std::move(type) } });
   if (!success)
   {
     throw interactor::already_exists_exception(
@@ -1266,10 +1266,10 @@ interactor& interactor_impl::addBinding(const interaction_bind_t& bind,
 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::addBinding(const interaction_bind_t& bind, std::string command,
-  std::string group, documentation_callback_t documentationCallback, binding_type_t bindingType)
+  std::string group, documentation_callback_t documentationCallback, BindingType type)
 {
   return this->addBinding(bind, std::vector<std::string>{ std::move(command) }, std::move(group),
-    std::move(documentationCallback), std::move(bindingType));
+    std::move(documentationCallback), std::move(type));
 }
 
 //----------------------------------------------------------------------------
@@ -1348,7 +1348,7 @@ std::pair<std::string, std::string> interactor_impl::getBindingDocumentation(
 }
 
 //----------------------------------------------------------------------------
-binding_type_t interactor_impl::getBindingType(
+f3d::interactor::BindingType interactor_impl::getBindingType(
   const interaction_bind_t& bind) const
 {
   const auto& it = this->Internals->Bindings.find(bind);
@@ -1357,7 +1357,7 @@ binding_type_t interactor_impl::getBindingType(
     throw interactor_impl::does_not_exists_exception(
       std::string("Bind: ") + bind.format() + " does not exists");
   }
-  return it->second.BindingType;
+  return it->second.Type;
 }
 
 //----------------------------------------------------------------------------

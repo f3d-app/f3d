@@ -60,7 +60,7 @@ int TestSDKInteractorDocumentation(int argc, char* argv[])
 
   // Add a dummy binding
   inter.addBinding({ mod_t::ANY, "DummyBind" }, "DummyCommand", "DummyGroup",
-    []() -> std::pair<std::string, std::string> { return std::pair("DummyDoc", "DummyVal"); });
+    []() -> std::pair<std::string, std::string> { return std::pair("DummyDoc", "DummyVal"); }, f3d::interactor::BindingType::LAUNCHER);
 
   {
     // Test dummy binding
@@ -69,6 +69,7 @@ int TestSDKInteractorDocumentation(int argc, char* argv[])
     test("Dummy nBinds DummyGroup", inter.getBindsForGroup("DummyGroup").size() == 1);
     const auto& [doc, val] = inter.getBindingDocumentation({ mod_t::ANY, "DummyBind" });
     test("Dummy doc and val", doc == "DummyDoc" && val == "DummyVal");
+    test("Dummy binding type", inter.getBindingType({ mod_t::ANY, "DummyBind" }) == f3d::interactor::BindingType::LAUNCHER);
   }
 
   // Initialize two times
