@@ -44,11 +44,11 @@ public:
 
   interactor& initBindings() override;
   interactor& addBinding(const interaction_bind_t& bind, std::vector<std::string> commands,
-    std::string group = std::string(),
-    documentation_callback_t documentationCallback = nullptr, BindingType type = BindingType::UNDEFINED) override;
+    std::string group = std::string(), documentation_callback_t documentationCallback = nullptr,
+    BindingType type = BindingType::UNDEFINED) override;
   interactor& addBinding(const interaction_bind_t& bind, std::string command,
-    std::string group = std::string(),
-    documentation_callback_t documentationCallback = nullptr, BindingType type = BindingType::UNDEFINED) override;
+    std::string group = std::string(), documentation_callback_t documentationCallback = nullptr,
+    BindingType type = BindingType::UNDEFINED) override;
   interactor& removeBinding(const interaction_bind_t& bind) override;
   std::vector<std::string> getBindGroups() const override;
   std::vector<interaction_bind_t> getBindsForGroup(std::string group) const override;
