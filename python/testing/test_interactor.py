@@ -51,7 +51,6 @@ def test_binding():
         "dummy command",
         "DummyGroup",
         doc_fn,
-        f3d.Interactor.BindingType.UNDEFINED,
     )
     inter.add_binding(
         f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.NONE, "P"),
@@ -79,7 +78,7 @@ def test_binding():
         ["dummy command", "dummy command"],
         "DummyGroup",
         doc_fn,
-        f3d.Interactor.BindingType.LAUNCHER,
+        f3d.Interactor.BindingType.OTHER,
     )
     assert len(inter.get_bind_groups()) == 1
     assert len(inter.get_binds()) == 5

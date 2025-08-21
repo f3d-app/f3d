@@ -116,11 +116,10 @@ public:
    */
   enum class BindingType : std::uint8_t
   {
-    UNDEFINED = 0,
-    CYCLIC = 1,
-    NUMERICAL = 2,
-    TOGGLE = 3,
-    LAUNCHER = 4,
+    CYCLIC = 0,
+    NUMERICAL = 1,
+    TOGGLE = 2,
+    OTHER = 3,
   };
 
   /**
@@ -159,7 +158,7 @@ public:
    */
   virtual interactor& addBinding(const interaction_bind_t& bind, std::vector<std::string> commands,
     std::string group = {}, documentation_callback_t documentationCallback = nullptr,
-    BindingType type = BindingType::UNDEFINED) = 0;
+    BindingType type = BindingType::OTHER) = 0;
 
   /**
    * See addBinding
@@ -170,17 +169,17 @@ public:
    */
   virtual interactor& addBinding(const interaction_bind_t& bind, std::string command,
     std::string group = {}, documentation_callback_t documentationCallback = nullptr,
-    BindingType type = BindingType::UNDEFINED) = 0;
+    BindingType type = BindingType::OTHER) = 0;
 
   /**
    * Convenience initializer list signature for add binding method
    */
   interactor& addBinding(const interaction_bind_t& bind, std::initializer_list<std::string> list,
     std::string group = {}, documentation_callback_t documentationCallback = nullptr,
-    BindingType type = BindingType::UNDEFINED)
+    BindingType type = BindingType::OTHER)
   {
     return this->addBinding(
-      bind, std::vector<std::string>(list), std::move(group), std::move(documentationCallback));
+      bind, std::vector<std::string>(list), std::move(group), std::move(documentationCallback), type);
   }
 
   /**

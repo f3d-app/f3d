@@ -283,16 +283,6 @@ PYBIND11_MODULE(pyf3d, module)
     .def("trigger_command", &f3d::interactor::triggerCommand, "Trigger a command")
     .def("init_bindings", &f3d::interactor::initBindings,
       "Remove all bindings and add default bindings")
-    .def("add_binding",
-      py::overload_cast<const f3d::interaction_bind_t&, std::string, std::string,
-        std::function<std::pair<std::string, std::string>()>, f3d::interactor::BindingType>(
-        &f3d::interactor::addBinding),
-      "Add a binding command")
-    .def("add_binding",
-      py::overload_cast<const f3d::interaction_bind_t&, std::vector<std::string>, std::string,
-        std::function<std::pair<std::string, std::string>()>, f3d::interactor::BindingType>(
-        &f3d::interactor::addBinding),
-      "Add binding commands")
     .def("remove_binding", &f3d::interactor::removeBinding, "Remove interaction commands")
     .def("get_bind_groups", &f3d::interactor::getBindGroups)
     .def("get_binds_for_group", &f3d::interactor::getBindsForGroup)
@@ -301,12 +291,22 @@ PYBIND11_MODULE(pyf3d, module)
     .def("get_binding_type", &f3d::interactor::getBindingType);
 
   py::enum_<f3d::interactor::BindingType>(interactor, "BindingType")
-    .value("UNDEFINED", f3d::interactor::BindingType::UNDEFINED)
     .value("CYCLIC", f3d::interactor::BindingType::CYCLIC)
     .value("NUMERICAL", f3d::interactor::BindingType::NUMERICAL)
     .value("TOGGLE", f3d::interactor::BindingType::TOGGLE)
-    .value("LAUNCHER", f3d::interactor::BindingType::LAUNCHER)
+    .value("OTHER", f3d::interactor::BindingType::OTHER)
     .export_values();
+
+  interactor.def("add_binding",
+      py::overload_cast<const f3d::interaction_bind_t&, std::string, std::string,
+        std::function<std::pair<std::string, std::string>()>, f3d::interactor::BindingType>(
+        &f3d::interactor::addBinding),
+      "Add a binding command", py::arg("bind"), py::arg("command"), py::arg("group"), py::arg("documentationCallback") = nullptr, py::arg("type") = f3d::interactor::BindingType::OTHER)
+    .def("add_binding",
+      py::overload_cast<const f3d::interaction_bind_t&, std::vector<std::string>, std::string,
+        std::function<std::pair<std::string, std::string>()>, f3d::interactor::BindingType>(
+        &f3d::interactor::addBinding),
+      "Add binding commands", py::arg("bind"), py::arg("command"), py::arg("group"), py::arg("documentationCallback") = nullptr, py::arg("type") = f3d::interactor::BindingType::OTHER);
 
   py::enum_<f3d::interactor::MouseButton>(interactor, "MouseButton")
     .value("LEFT", f3d::interactor::MouseButton::LEFT)

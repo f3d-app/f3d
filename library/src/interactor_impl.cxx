@@ -1244,7 +1244,7 @@ interactor& interactor_impl::addBinding(const interaction_bind_t& bind,
   documentation_callback_t documentationCallback, BindingType type)
 {
   const auto [it, success] = this->Internals->Bindings.insert(
-    { bind, { std::move(commands), std::move(documentationCallback), std::move(type) } });
+    { bind, { std::move(commands), std::move(documentationCallback), type } });
   if (!success)
   {
     throw interactor::already_exists_exception(
@@ -1269,7 +1269,7 @@ interactor& interactor_impl::addBinding(const interaction_bind_t& bind, std::str
   std::string group, documentation_callback_t documentationCallback, BindingType type)
 {
   return this->addBinding(bind, std::vector<std::string>{ std::move(command) }, std::move(group),
-    std::move(documentationCallback), std::move(type));
+    std::move(documentationCallback), type);
 }
 
 //----------------------------------------------------------------------------
