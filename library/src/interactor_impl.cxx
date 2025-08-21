@@ -1348,8 +1348,7 @@ std::pair<std::string, std::string> interactor_impl::getBindingDocumentation(
 }
 
 //----------------------------------------------------------------------------
-f3d::interactor::BindingType interactor_impl::getBindingType(
-  const interaction_bind_t& bind) const
+f3d::interactor::BindingType interactor_impl::getBindingType(const interaction_bind_t& bind) const
 {
   const auto& it = this->Internals->Bindings.find(bind);
   if (it == this->Internals->Bindings.end())
