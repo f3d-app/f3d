@@ -18,8 +18,7 @@ f3d_plugin_declare_reader(
     EXTENSIONS e57
     MIMETYPES model/e57
     VTK_READER vtkPDALReader
-    FORMAT_DESCRIPTION "PDAL processes a variety of files: https://pdal.io/en/stable/stages/readers.html"
-    CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/pdal.inl"
+    FORMAT_DESCRIPTION "E57 Lidar Point Cloud Format"
 )
 
 f3d_plugin_build(

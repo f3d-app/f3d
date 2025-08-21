@@ -44,9 +44,5 @@ endif()
 
 if (F3D_PLUGIN_BUILD_PDAL)
   # PDAL plugin needs vtkPDALReader: https://gitlab.kitware.com/vtk/vtk/-/merge_requests/3491
-  if(VTK_VERSION VERSION_GREATER_EQUAL 8.1.0)
-    add_subdirectory(pdal)
-  else ()
-    message(FATAL_ERROR "PDAL plugin requires VTK >= 8.1.0")
-  endif()
+  add_subdirectory(pdal)
 endif()
