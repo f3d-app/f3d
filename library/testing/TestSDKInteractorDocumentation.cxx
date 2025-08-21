@@ -54,8 +54,8 @@ int TestSDKInteractorDocumentation(int argc, char* argv[])
     test.expect<f3d::interactor::does_not_exists_exception>(
       "Empty group", [&]() { std::ignore = inter.getBindsForGroup("Camera"); });
 
-    test.expect<f3d::interactor::does_not_exists_exception>(
-      "Empty documentation", [&]() { std::ignore = inter.getBindingDocumentation({ mod_t::ANY, "5" }); });
+    test.expect<f3d::interactor::does_not_exists_exception>("Empty documentation",
+      [&]() { std::ignore = inter.getBindingDocumentation({ mod_t::ANY, "5" }); });
 
     test.expect<f3d::interactor::does_not_exists_exception>(
       "Empty type", [&]() { std::ignore = inter.getBindingType({ mod_t::ANY, "5" }); });

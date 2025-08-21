@@ -297,16 +297,21 @@ PYBIND11_MODULE(pyf3d, module)
     .value("OTHER", f3d::interactor::BindingType::OTHER)
     .export_values();
 
-  interactor.def("add_binding",
+  interactor
+    .def("add_binding",
       py::overload_cast<const f3d::interaction_bind_t&, std::string, std::string,
         std::function<std::pair<std::string, std::string>()>, f3d::interactor::BindingType>(
         &f3d::interactor::addBinding),
-      "Add a binding command", py::arg("bind"), py::arg("command"), py::arg("group"), py::arg("documentationCallback") = nullptr, py::arg("type") = f3d::interactor::BindingType::OTHER)
+      "Add a binding command", py::arg("bind"), py::arg("command"), py::arg("group"),
+      py::arg("documentationCallback") = nullptr,
+      py::arg("type") = f3d::interactor::BindingType::OTHER)
     .def("add_binding",
       py::overload_cast<const f3d::interaction_bind_t&, std::vector<std::string>, std::string,
         std::function<std::pair<std::string, std::string>()>, f3d::interactor::BindingType>(
         &f3d::interactor::addBinding),
-      "Add binding commands", py::arg("bind"), py::arg("command"), py::arg("group"), py::arg("documentationCallback") = nullptr, py::arg("type") = f3d::interactor::BindingType::OTHER);
+      "Add binding commands", py::arg("bind"), py::arg("command"), py::arg("group"),
+      py::arg("documentationCallback") = nullptr,
+      py::arg("type") = f3d::interactor::BindingType::OTHER);
 
   py::enum_<f3d::interactor::MouseButton>(interactor, "MouseButton")
     .value("LEFT", f3d::interactor::MouseButton::LEFT)

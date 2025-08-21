@@ -178,8 +178,8 @@ public:
     std::string group = {}, documentation_callback_t documentationCallback = nullptr,
     BindingType type = BindingType::OTHER)
   {
-    return this->addBinding(
-      bind, std::vector<std::string>(list), std::move(group), std::move(documentationCallback), type);
+    return this->addBinding(bind, std::vector<std::string>(list), std::move(group),
+      std::move(documentationCallback), type);
   }
 
   /**
