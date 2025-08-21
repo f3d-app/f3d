@@ -83,6 +83,8 @@ def test_binding():
     )
     assert len(inter.get_bind_groups()) == 1
     assert len(inter.get_binds()) == 5
+    assert inter.get_binding_documentation(f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.CTRL, "P")) == doc_fn()
+    assert inter.get_binding_type(f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.CTRL, "P")) == f3d.Interactor.BindingType.NUMERICAL
 
     inter.init_bindings()
 

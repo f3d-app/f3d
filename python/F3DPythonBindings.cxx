@@ -295,7 +295,8 @@ PYBIND11_MODULE(pyf3d, module)
     .def("get_bind_groups", &f3d::interactor::getBindGroups)
     .def("get_binds_for_group", &f3d::interactor::getBindsForGroup)
     .def("get_binds", &f3d::interactor::getBinds)
-    .def("get_binding_documentation", &f3d::interactor::getBindingDocumentation);
+    .def("get_binding_documentation", &f3d::interactor::getBindingDocumentation)
+    .def("get_binding_type", &f3d::interactor::getBindingType);
 
   py::enum_<f3d::interactor::BindingType>(interactor, "BindingType")
     .value("UNDEFINED", f3d::interactor::BindingType::UNDEFINED)
