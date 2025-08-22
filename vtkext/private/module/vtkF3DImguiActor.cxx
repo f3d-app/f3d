@@ -31,9 +31,72 @@
 
 #include <optional>
 
+#include <sstream>
+
+
 constexpr float LOGO_DISPLAY_WIDTH = 256.f;
 constexpr float LOGO_DISPLAY_HEIGHT = 256.f;
 constexpr float DROPZONE_LOGO_TEXT_PADDING = 20.f;
+
+struct DropZoneInfo
+{
+  std::string description;
+  std::vector<std::vector<std::string>> bindings; // outer = groups (OR), inner = keys (+)
+};
+
+static std::vector<std::string> splitBindings(const std::string& s, char delim)
+{
+  std::vector<std::string> result;
+  std::stringstream ss(s);
+  std::string item;
+
+  while (getline(ss, item, delim))
+  {
+    result.push_back(item);
+  }
+
+  return result;
+}
+
+static std::vector<DropZoneInfo> parseDropZoneInfo(const std::string& input)
+{
+  std::map<std::string, std::vector<std::vector<std::string>>> infoMap;
+  std::stringstream ss(input);
+  std::string line;
+
+  auto trim = [](std::string& str) {
+    size_t start = str.find_first_not_of(" \t");
+    size_t end = str.find_last_not_of(" \t");
+    if (start == std::string::npos) { str.clear(); return; }
+    str = str.substr(start, end - start + 1);
+  };
+
+  while (std::getline(ss, line))
+  {
+    if (line.empty()) continue;
+
+    size_t colonPos = line.find(':');
+    if (colonPos == std::string::npos) continue;
+
+    std::string desc = line.substr(0, colonPos);
+    std::string bindingPart = line.substr(colonPos + 1);
+
+    trim(desc);
+    trim(bindingPart);
+
+    auto keys = splitBindings(bindingPart, '+');
+    if (!keys.empty())
+      infoMap[desc].push_back(keys);
+  }
+
+  std::vector<DropZoneInfo> parsedInfo;
+  for (auto& [desc, groups] : infoMap)
+  {
+    parsedInfo.push_back({desc, groups});
+  }
+  return parsedInfo;
+}
+
 
 struct vtkF3DImguiActor::Internals
 {
@@ -423,23 +486,173 @@ void vtkF3DImguiActor::RenderDropZone()
 
     ImGui::End();
 
-    ImVec2 dropTextSize = ImGui::CalcTextSize(this->DropText.c_str());
+    auto parsedInfo = parseDropZoneInfo(this->DropText.c_str());
+
+    // Calculate max width for each column before rendering
+    float margin = 5.f;
+    float maxDescTextWidth = 0.0f;
+    float maxBindingsTextWidth = 0.0f;
+
+    for (const auto& item : parsedInfo)
+    {
+      // Description column width
+      ImVec2 descSize = ImGui::CalcTextSize(item.description.c_str());
+      maxDescTextWidth = std::max(maxDescTextWidth, descSize.x);
+
+      // Bindings column width (sum of keys + '+' between keys, 'or' between groups)
+      float totalBindingsWidth = 0.0f;
+      for (size_t g = 0; g < item.bindings.size(); ++g) // groups
+      {
+        const auto& group = item.bindings[g];
+        for (size_t k = 0; k < group.size(); ++k) // keys
+        {
+          totalBindingsWidth += ImGui::CalcTextSize(group[k].c_str()).x + 2.0f * margin;
+          if (k < group.size() - 1) // plus between keys
+          {
+            totalBindingsWidth += ImGui::GetStyle().ItemSpacing.x +
+                                  ImGui::CalcTextSize("+").x +
+                                  ImGui::GetStyle().ItemSpacing.x;
+          }
+        }
+
+        if (g < item.bindings.size() - 1) // or between groups
+        {
+          totalBindingsWidth += ImGui::GetStyle().ItemSpacing.x +
+                                ImGui::CalcTextSize("or").x +
+                                ImGui::GetStyle().ItemSpacing.x;
+        }
+      }
+      maxBindingsTextWidth = std::max(maxBindingsTextWidth, totalBindingsWidth);
+    }
+
+    // Style parameters
+    ImVec4 descTextColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+    // ImVec4 bindingTextColor = ImVec4(0.0f, 0.0f, 0.0f, 1.0f); // black text
+    // ImVec4 bindingRectColor = ImVec4(0.85f, 0.85f, 0.85f, 1.0f); // light gray
+    // ImVec4 bindingRectColor = F3DImguiStyle::GetHighlightColor(); // F3D blue
+    // ImVec4 bindingTextColor = F3DImguiStyle::GetBackgroundColor(); // text color on blue
+    // ImVec4 bindingRectColor = ImVec4(0.0f, 0.0f, 0.0f, 1.0f); // Black background
+    // ImVec4 bindingRectColor = ImVec4(20.0f/255.0f, 20.0f/255.0f, 20.0f/255.0f, 1.0f); // #141414
+    // ImVec4 bindingTextColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); // White text
+    ImVec4 bindingRectColor = ImVec4(192.0f/255.0f, 192.0f/255.0f, 192.0f/255.0f, 1.0f); // light gray
+    ImVec4 bindingTextColor = ImVec4(0.0f, 0.0f, 0.0f, 1.0f); // black text
 
     ImGui::Begin("DropZoneText", nullptr, flags);
 
-    // Position the text below the logo it is rendered
+    // Position table below logo if needed
     if (this->DropZoneLogoVisible && this->Pimpl->LogoTexture)
     {
-      ImGui::SetCursorPos(ImVec2(viewport->GetWorkCenter().x - 0.5f * dropTextSize.x,
-        viewport->GetWorkCenter().y - 0.5f * dropTextSize.y + logoDisplayHeight / 2 +
-          DROPZONE_LOGO_TEXT_PADDING));
+      ImGui::SetCursorPos(ImVec2(viewport->GetWorkCenter().x - 150,
+        viewport->GetWorkCenter().y + logoDisplayHeight / 2 + DROPZONE_LOGO_TEXT_PADDING));
     }
     else
     {
-      ImGui::SetCursorPos(ImVec2(viewport->GetWorkCenter().x - 0.5f * dropTextSize.x,
-        viewport->GetWorkCenter().y - 0.5f * dropTextSize.y));
+      ImGui::SetCursorPos(ImVec2(viewport->GetWorkCenter().x - 150,
+        viewport->GetWorkCenter().y));
     }
-    ImGui::TextUnformatted(this->DropText.c_str());
+
+    if (ImGui::BeginTable("DropZoneBindingsTable", 2,
+        ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_NoBordersInBody))
+    {
+      ImGui::TableSetupColumn("Action", ImGuiTableColumnFlags_WidthFixed, maxDescTextWidth + 2.0f * margin);
+      ImGui::TableSetupColumn("Key", ImGuiTableColumnFlags_WidthFixed, maxBindingsTextWidth + 2.0f * margin);
+
+      for (const auto& item : parsedInfo)
+      {
+        ImGui::TableNextRow(ImGuiTableRowFlags_None,
+          ImGui::GetTextLineHeightWithSpacing() + 2.0f * margin);
+
+        // First column: description
+        ImGui::TableSetColumnIndex(0);
+        ImGui::TextColored(descTextColor, "%s", item.description.c_str());
+
+        // Second column: bindings as rectangles
+        ImGui::TableSetColumnIndex(1);
+
+        // const float maxCursorPosX = ImGui::GetCursorPosX() + ImGui::GetColumnWidth();
+        // Calculate total bindings width considering "+" inside groups and "or" between groups
+        float totalBindingsWidth = 0.0f;
+        for (size_t g = 0; g < item.bindings.size(); ++g) // outer vector: groups
+        {
+          const auto& group = item.bindings[g];
+          for (size_t k = 0; k < group.size(); ++k)
+          {
+            totalBindingsWidth += ImGui::CalcTextSize(group[k].c_str()).x + 2 * margin;
+            if (k < group.size() - 1) // plus between keys
+            {
+              totalBindingsWidth += ImGui::GetStyle().ItemSpacing.x +
+                                    ImGui::CalcTextSize("+").x +
+                                    ImGui::GetStyle().ItemSpacing.x;
+            }
+          }
+          if (g < item.bindings.size() - 1) // or between groups
+          {
+            totalBindingsWidth += ImGui::GetStyle().ItemSpacing.x +
+                                  ImGui::CalcTextSize("or").x +
+                                  ImGui::GetStyle().ItemSpacing.x;
+          }
+        }
+
+        for (size_t g = 0; g < item.bindings.size(); ++g)
+        {
+          const auto& group = item.bindings[g];
+          for (size_t k = 0; k < group.size(); ++k)
+          {
+            const std::string& key = group[k];
+            ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+            // Split the draw list into two channels to draw the background and the foreground text
+            drawList->ChannelsSplit(2);
+
+            // Channel 0: Draw the button background
+            drawList->ChannelsSetCurrent(0);
+            ImVec2 textPos = ImGui::GetCursorScreenPos();
+            ImVec2 textSize = ImGui::CalcTextSize(key.c_str());
+            ImVec2 padding(5.0f, 2.0f);
+            ImVec2 rectMin = ImVec2(textPos.x - padding.x, textPos.y - padding.y);
+            ImVec2 rectMax = ImVec2(textPos.x + textSize.x + padding.x, textPos.y + textSize.y + padding.y);
+
+            // ImVec2 rectMin = textPos - padding;
+            // ImVec2 rectMax = textPos + textSize + padding;
+            float cornerRounding = 4.0f;
+            float shadowOffset = 5.0f;
+
+            // Draw the darker, recessed part of the button
+            ImVec4 bindingRectColorDark = ImVec4(100.0f/255.0f, 100.0f/255.0f, 100.0f/255.0f, 1.0f);
+            drawList->AddRectFilled(ImVec2(rectMin.x, rectMin.y + shadowOffset), ImVec2(rectMax.x, rectMax.y + shadowOffset), ImColor(bindingRectColorDark), cornerRounding);
+
+            // drawList->AddRectFilled(rectMin + ImVec2(0, shadowOffset), rectMax + ImVec2(0, shadowOffset), ImColor(bindingRectColorDark), cornerRounding);
+
+            // Draw the lighter, raised part of the button
+            drawList->AddRectFilled(rectMin, rectMax, ImColor(bindingRectColor), cornerRounding);
+
+            // Channel 1: Draw the text on top
+            drawList->ChannelsSetCurrent(1);
+            ImGui::SetCursorScreenPos(textPos);
+            ImGui::TextColored(bindingTextColor, "%s", key.c_str());
+
+            // Merge the channels to render the final button
+            drawList->ChannelsMerge();
+            ImGui::SameLine();
+            // Plus between keys in same group
+            if (k < group.size() - 1)
+            {
+              ImGui::Text("+");
+              ImGui::SameLine();
+            }
+          }
+
+          // "or" between different groups
+          if (g < item.bindings.size() - 1)
+          {
+            ImGui::Text("or");
+            ImGui::SameLine();
+          }
+        }
+      }
+      ImGui::EndTable();
+    }
+
     ImGui::End();
   }
 }

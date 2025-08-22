@@ -44,6 +44,7 @@
 #include <vector>
 
 #include "camera.h"
+#include <iostream>
 
 namespace fs = std::filesystem;
 
@@ -625,6 +626,9 @@ public:
   unsigned long EventLoopTimerId = 0;
   int EventLoopObserverId = -1;
   std::atomic<bool> RenderRequested = false;
+
+  // Add inside Internals class definition
+  std::vector<f3d::interaction_bind_t> DropZoneBindings;
 };
 
 //----------------------------------------------------------------------------
@@ -1071,6 +1075,7 @@ interactor& interactor_impl::initBindings()
   this->Internals->Bindings.clear();
   this->Internals->GroupedBinds.clear();
   this->Internals->OrderedBindGroups.clear();
+  this->Internals->DropZoneBindings.clear();
   f3d::options& opts = this->Internals->Options;
 
   // Define lambdas used for documentation
@@ -1223,8 +1228,8 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::ANY, "8"}, "elevation_camera 90", "Camera", std::bind(docStr, "Rotate camera up"));
   this->addBinding({mod_t::ANY, "9"}, "set_camera isometric", "Camera", std::bind(docStr, "Isometric View camera"));
 #if F3D_MODULE_UI
-  this->addBinding({mod_t::NONE, "H"}, "toggle ui.cheatsheet", "Others", std::bind(docStr, "Toggle cheatsheet display"));
-  this->addBinding({mod_t::NONE, "Escape"}, "toggle ui.console", "Others", std::bind(docStr, "Toggle console display"));
+  this->addBinding({mod_t::NONE, "H"}, "toggle ui.cheatsheet", "Others", std::bind(docStr, "Open Cheatsheet"));
+  this->addBinding({mod_t::NONE, "Escape"}, "toggle ui.console", "Others", std::bind(docStr, "Open Console"));
   this->addBinding({mod_t::ANY, "Colon"}, "toggle ui.minimal_console", "Others", std::bind(docStr, "Toggle minimal console display"));
 #endif
   this->addBinding({mod_t::CTRL, "Q"}, "stop_interactor", "Others", std::bind(docStr, "Stop the interactor"));
@@ -1235,6 +1240,43 @@ interactor& interactor_impl::initBindings()
   // clang-format on
 
   return *this;
+}
+
+
+std::string interactor_impl::getDropZoneInfo(
+  const std::vector<interaction_bind_t>& requestedBinds) const
+{
+
+  auto modifierToString = [](interaction_bind_t::ModifierKeys mod) -> std::string
+  {
+    switch (mod)
+    {
+      case interaction_bind_t::ModifierKeys::CTRL:        return "Ctrl+";
+      case interaction_bind_t::ModifierKeys::SHIFT:       return "Shift+";
+      case interaction_bind_t::ModifierKeys::CTRL_SHIFT:  return "Ctrl+Shift+";
+      case interaction_bind_t::ModifierKeys::ANY:         return ""; // or "Any+"
+      case interaction_bind_t::ModifierKeys::NONE:        return "";
+    }
+    return "";
+  };
+
+
+  std::stringstream info;
+
+  // Iterate only over requested binds
+  for (const auto& bind : requestedBinds)
+  {
+    auto it = this->Internals->Bindings.find(bind);
+    if (it != this->Internals->Bindings.end())
+    {
+      const auto& bindData = it->first;
+      const auto& docPair = it->second.DocumentationCallback();
+      std::string modStr = modifierToString(bindData.mod);
+      info << docPair.first << ": " << modStr << bindData.inter << "\n";
+    }
+  }
+
+  return info.str();
 }
 
 //----------------------------------------------------------------------------

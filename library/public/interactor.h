@@ -72,6 +72,8 @@ public:
    */
   virtual interactor& initCommands() = 0;
 
+  virtual std::string getDropZoneInfo(const std::vector<interaction_bind_t>& requestedBinds) const = 0;
+
   /**
    * Use this method to add a command to be called using triggerCommand.
    * Adding a command with an already existing action throw a
@@ -158,7 +160,8 @@ public:
    * Convenience initializer list signature for add binding method
    */
   interactor& addBinding(const interaction_bind_t& bind, std::initializer_list<std::string> list,
-    std::string group = {}, documentation_callback_t documentationCallback = nullptr)
+    std::string group = {}, documentation_callback_t documentationCallback = nullptr,
+    bool showInDropZone = false)
   {
     return this->addBinding(
       bind, std::vector<std::string>(list), std::move(group), std::move(documentationCallback));

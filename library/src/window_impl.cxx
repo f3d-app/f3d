@@ -390,6 +390,15 @@ void window_impl::UpdateDynamicOptions()
     renderer->ShowAxis(opt.ui.axis);
     renderer->SetUseTrackball(opt.interactor.trackball);
     renderer->SetInvertZoom(opt.interactor.invert_zoom);
+    using mod_t = f3d::interaction_bind_t::ModifierKeys;
+    std::vector<interaction_bind_t> custom_binds = {
+    {mod_t::NONE, "Drop"},
+    {mod_t::CTRL, "O"},
+    {mod_t::NONE, "H"},
+    {mod_t::NONE, "Escape"}
+    };
+
+    renderer->SetDropZoneInfo(this->Internals->Interactor->getDropZoneInfo(custom_binds));
   }
 
   // XXX: model.point_sprites.type only has an effect on geometry scene
@@ -411,7 +420,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->ShowConsole(opt.ui.console);
   renderer->ShowMinimalConsole(opt.ui.minimal_console);
   renderer->ShowDropZone(opt.ui.drop_zone.enable);
-  renderer->SetDropZoneInfo(opt.ui.drop_zone.info);
+  // renderer->SetDropZoneInfo(opt.ui.drop_zone.info);
   renderer->ShowDropZoneLogo(opt.ui.drop_zone.show_logo);
   // F3D_DEPRECATED
   // Remove this in the next major release
