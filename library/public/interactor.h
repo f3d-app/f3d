@@ -75,7 +75,7 @@ public:
    */
   virtual interactor& initCommands() = 0;
 
-  virtual std::string getDropZoneInfo() const = 0;
+  virtual std::string getDropZoneInfo(const std::vector<interaction_bind_t>& requestedBinds) const = 0;
 
   /**
    * Use this method to add a command to be called using triggerCommand.
