@@ -51,7 +51,7 @@ namespace f3d::detail
 {
 using mod_t = interaction_bind_t::ModifierKeys;
 
-bool StartWith(const std::string& str, const std::string& pattern)
+bool StartWith(std::string_view str, std::string_view pattern)
 {
   return str.rfind(pattern, 0) == 0; // To avoid dependency for C++20 starts_with
 };
@@ -757,7 +757,6 @@ interactor& interactor_impl::initCommands()
     for (const std::string& name : names)
     {
       // Copy all name that start with the pattern
-      std::cout<<"=="<<name<<"== =="<<args[0]<<"=="<<std::endl;
       if (f3d::detail::StartWith(name, args[0]))
       {
         candidates.emplace_back(name);

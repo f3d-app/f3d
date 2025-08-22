@@ -76,7 +76,7 @@ struct vtkF3DImguiConsole::Internals
           // Multiple matches. Complete as much as we can.
           // So inputting "C"+Tab will complete to "CL" then display "CLEAR" and "CLASSIFY" as
           // matches.
-          size_t matchLen = pattern.size();
+          size_t matchLen = 0;
           bool allCandidatesMatches = true;
           // Find the common prefix to all candidates
           while (allCandidatesMatches)
