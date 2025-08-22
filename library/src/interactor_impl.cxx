@@ -1428,7 +1428,8 @@ interactor& interactor_impl::initBindings()
 }
 
 
-std::string interactor_impl::getDropZoneInfo() const
+std::string interactor_impl::getDropZoneInfo(
+  const std::vector<interaction_bind_t>& requestedBinds) const
 {
 
   auto modifierToString = [](interaction_bind_t::ModifierKeys mod) -> std::string
@@ -1447,8 +1448,8 @@ std::string interactor_impl::getDropZoneInfo() const
 
   std::stringstream info;
 
-  // Iterate over bindings marked for drop zone
-  for (const auto& bind : this->Internals->DropZoneBindings)
+  // Iterate only over requested binds
+  for (const auto& bind : requestedBinds)
   {
     auto it = this->Internals->Bindings.find(bind);
     if (it != this->Internals->Bindings.end())
@@ -1484,10 +1485,6 @@ interactor& interactor_impl::addBinding(const interaction_bind_t& bind,
     {
       // Add the group in order if first addition
       this->Internals->OrderedBindGroups.emplace_back(groupIt->first);
-    }
-    if (showInDropZone)
-    {
-      this->Internals->DropZoneBindings.push_back(bind);
     }
   }
   return *this;
