@@ -1228,8 +1228,8 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::ANY, "8"}, "elevation_camera 90", "Camera", std::bind(docStr, "Rotate camera up"));
   this->addBinding({mod_t::ANY, "9"}, "set_camera isometric", "Camera", std::bind(docStr, "Isometric View camera"));
 #if F3D_MODULE_UI
-  this->addBinding({mod_t::NONE, "H"}, "toggle ui.cheatsheet", "Others", std::bind(docStr, "Open Cheatsheet"), true);
-  this->addBinding({mod_t::NONE, "Escape"}, "toggle ui.console", "Others", std::bind(docStr, "Open Console"), true);
+  this->addBinding({mod_t::NONE, "H"}, "toggle ui.cheatsheet", "Others", std::bind(docStr, "Open Cheatsheet"));
+  this->addBinding({mod_t::NONE, "Escape"}, "toggle ui.console", "Others", std::bind(docStr, "Open Console"));
   this->addBinding({mod_t::ANY, "Colon"}, "toggle ui.minimal_console", "Others", std::bind(docStr, "Toggle minimal console display"));
 #endif
   this->addBinding({mod_t::CTRL, "Q"}, "stop_interactor", "Others", std::bind(docStr, "Stop the interactor"));
@@ -1243,7 +1243,8 @@ interactor& interactor_impl::initBindings()
 }
 
 
-std::string interactor_impl::getDropZoneInfo() const
+std::string interactor_impl::getDropZoneInfo(
+  const std::vector<interaction_bind_t>& requestedBinds) const
 {
 
   auto modifierToString = [](interaction_bind_t::ModifierKeys mod) -> std::string
@@ -1262,8 +1263,8 @@ std::string interactor_impl::getDropZoneInfo() const
 
   std::stringstream info;
 
-  // Iterate over bindings marked for drop zone
-  for (const auto& bind : this->Internals->DropZoneBindings)
+  // Iterate only over requested binds
+  for (const auto& bind : requestedBinds)
   {
     auto it = this->Internals->Bindings.find(bind);
     if (it != this->Internals->Bindings.end())
@@ -1281,7 +1282,7 @@ std::string interactor_impl::getDropZoneInfo() const
 //----------------------------------------------------------------------------
 interactor& interactor_impl::addBinding(const interaction_bind_t& bind,
   std::vector<std::string> commands, std::string group,
-  documentation_callback_t documentationCallback, bool showInDropZone)
+  documentation_callback_t documentationCallback)
 {
   const auto [it, success] = this->Internals->Bindings.insert(
     { bind, { std::move(commands), std::move(documentationCallback) } });
@@ -1300,20 +1301,16 @@ interactor& interactor_impl::addBinding(const interaction_bind_t& bind,
       // Add the group in order if first addition
       this->Internals->OrderedBindGroups.emplace_back(groupIt->first);
     }
-    if (showInDropZone)
-    {
-      this->Internals->DropZoneBindings.push_back(bind);
-    }
   }
   return *this;
 }
 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::addBinding(const interaction_bind_t& bind, std::string command,
-  std::string group, documentation_callback_t documentationCallback, bool showInDropZone)
+  std::string group, documentation_callback_t documentationCallback)
 {
   return this->addBinding(bind, std::vector<std::string>{ std::move(command) }, std::move(group),
-    std::move(documentationCallback), showInDropZone);
+    std::move(documentationCallback));
 }
 
 //----------------------------------------------------------------------------

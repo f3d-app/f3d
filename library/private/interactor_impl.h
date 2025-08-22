@@ -35,7 +35,7 @@ public:
   interactor_impl(options& options, window_impl& window, scene_impl& scene);
   ~interactor_impl() override;
 
-  std::string getDropZoneInfo() const override;
+  std::string getDropZoneInfo(const std::vector<interaction_bind_t>& requestedBinds) const override;
   interactor& initCommands() override;
   interactor& addCommand(
     std::string action, std::function<void(const std::vector<std::string>&)> callback) override;
@@ -46,10 +46,10 @@ public:
   interactor& initBindings() override;
   interactor& addBinding(const interaction_bind_t& bind, std::vector<std::string> commands,
     std::string group = std::string(),
-    documentation_callback_t documentationCallback = nullptr, bool showInDropZone = false) override;
+    documentation_callback_t documentationCallback = nullptr) override;
   interactor& addBinding(const interaction_bind_t& bind, std::string command,
     std::string group = std::string(),
-    documentation_callback_t documentationCallback = nullptr, bool showInDropZone = false) override;
+    documentation_callback_t documentationCallback = nullptr) override;
   interactor& removeBinding(const interaction_bind_t& bind) override;
   std::vector<std::string> getBindGroups() const override;
   std::vector<interaction_bind_t> getBindsForGroup(std::string group) const override;
