@@ -31,7 +31,7 @@ struct vtkF3DImguiConsole::Internals
   std::pair<size_t, size_t> Completions{ 0,
     0 }; // Index for start and length of completions in Logs
   std::function<std::vector<std::string>(const std::string& pattern)>
-    GetCommandsMatchCallback; // Callback to get the list of commands matching pattern
+    CompletionCallback; // Callback to get the list of commands matching pattern
   std::vector<std::string> CommandHistory;
   std::pair<std::string, int> LastInput; // Last input before navigating history
   int CommandHistoryIndexInv = -1;       // Current inverted index in command history navigation
@@ -58,10 +58,10 @@ struct vtkF3DImguiConsole::Internals
     {
       case ImGuiInputTextFlags_CallbackCompletion:
       {
-        assert(this->GetCommandsMatchCallback);
+        assert(this->CompletionCallback);
         std::string pattern{ data->Buf };
         std::vector<std::string> candidates =
-          this->GetCommandsMatchCallback(pattern); // List of supported commands
+          this->CompletionCallback(pattern); // List of candidates completion
 
         if (candidates.size() == 1)
         {
@@ -420,8 +420,8 @@ void vtkF3DImguiConsole::Clear()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DImguiConsole::SetCommandsMatchCallback(
+void vtkF3DImguiConsole::SetCompletionCallback(
   std::function<std::vector<std::string>(const std::string& pattern)> callback)
 {
-  this->Pimpl->GetCommandsMatchCallback = std::move(callback);
+  this->Pimpl->CompletionCallback = std::move(callback);
 }
