@@ -682,16 +682,15 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
       bool exact = false;
       for (auto const& [action, callbacks] : this->Internals->Commands)
       {
-        if (action == actionPattern)
-        {
-          // pattern is an actual action, complete the action instead
-          exact = true;
-          break;
-        }
-        else if (f3d::detail::StartWith(action, actionPattern))
+        if (f3d::detail::StartWith(action, actionPattern))
         {
           // Copy all action that start with the pattern
           candidates.emplace_back(action);
+          if (action == actionPattern)
+          {
+            // pattern is the actual action
+            exact = true;
+          }
         }
         // List is sorted so we can break early
         else if (!candidates.empty())
@@ -700,8 +699,9 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
         }
       }
 
-      if (exact)
+      if (exact && actionPattern != pattern)
       {
+        candidates.clear();
         auto complCallback = this->Internals->Commands.at(actionPattern).CompletionCallback;
         if (complCallback)
         {
@@ -757,6 +757,7 @@ interactor& interactor_impl::initCommands()
     for (const std::string& name : names)
     {
       // Copy all name that start with the pattern
+      std::cout<<"=="<<name<<"== =="<<args[0]<<"=="<<std::endl;
       if (f3d::detail::StartWith(name, args[0]))
       {
         candidates.emplace_back(name);
