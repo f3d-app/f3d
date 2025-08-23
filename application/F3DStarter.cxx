@@ -49,6 +49,7 @@
 #include <iomanip>
 #include <iostream>
 #include <mutex>
+#include <numeric>
 #include <regex>
 #include <set>
 
@@ -1944,19 +1945,12 @@ void F3DStarter::AddCommands()
     // Multi args, reconstruct the full condidates
     if (args.size() > 1)
     {
-      // TODO use std::accumulate instead
-      std::string accum;
-      for (size_t i = 0; i < args.size() - 1; i++)
-      {
-        accum += args[i] + " ";
-      }
-
-      for(size_t i = 0; i < candidates.size(); i++)
-      {
-        // Reconstruct complete candidates
-        // Use std::transform TODO
-        candidates[i] = accum + candidates[i];
-      }
+      std::vector<std::string> multiArgsCandidate;
+      const std::string accum = std::accumulate(args.begin() + 1, args.end() - 1, args[0],
+        [](const std::string& a, const std::string& b) { return a + " " + b; });
+      std::transform(candidates.begin(), candidates.end(),
+        std::back_inserter(multiArgsCandidate), [&](const auto& candidate) { return accum + " " + candidate; });
+      return multiArgsCandidate;
     }
 
     return candidates;
@@ -2019,7 +2013,6 @@ void F3DStarter::AddCommands()
       }
     }, "add all files from the current file or file group directories");
 
-  // TODO filesystem completion ?
   interactor.addCommand("take_screenshot",
     [this](const std::vector<std::string>& args)
     {
@@ -2029,7 +2022,6 @@ void F3DStarter::AddCommands()
       this->SaveScreenshot(filename);
     }, "take_screenshot [filename]: take a screenshot into provided file or --screenshot-filename", complFilesystem);
 
-  // TODO filesystem completion ?
   interactor.addCommand("take_minimal_screenshot",
     [this](const std::vector<std::string>& args)
     {
@@ -2041,7 +2033,6 @@ void F3DStarter::AddCommands()
 
   // This replace an existing command in libf3d
   interactor.removeCommand("add_files");
-  // TODO filesystem completion ?
   interactor.addCommand("add_files",
     [this](const std::vector<std::string>& files)
     {
@@ -2056,7 +2047,6 @@ void F3DStarter::AddCommands()
       }
     }, "add_files [path/to/file1] [path/to/file2]: A specific command to add files to the scene", complFilesystem);
 
-  // TODO filesystem completion ?
   interactor.addCommand("set_hdri",
     [this](const std::vector<std::string>& files)
     {
@@ -2073,7 +2063,6 @@ void F3DStarter::AddCommands()
       }
     }, "set_hdri [path/to/hdri]: set and use an HDRI image", complFilesystem);
 
-  // TODO filesystem completion ?
   interactor.addCommand("add_files_or_set_hdri",
     [this](const std::vector<std::string>& files)
     {

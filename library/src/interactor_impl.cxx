@@ -699,6 +699,9 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
         }
       }
 
+      // If exact and the pattern is not exactly the actionPattern
+      // then it means that the command currently looks like:
+      // `action val` or `action `, so we dispatch completion to the action completer if any
       if (exact && actionPattern != pattern)
       {
         candidates.clear();
@@ -707,12 +710,8 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
         {
           // Use the completion callback of the action with its args if any
           std::vector<std::string> argsCandidates = complCallback({ tokens.begin() + 1, tokens.end() });
-          for(const std::string& arg : argsCandidates)
-          {
-            // Reconstruct complete candidates
-            // Use std::transform TODO
-            candidates.emplace_back(actionPattern + " " + arg);
-          }
+          std::transform(argsCandidates.begin(), argsCandidates.end(),
+            std::back_inserter(candidates), [&](const auto& argCandidate) { return actionPattern + " " + argCandidate; });
         }
       }
       else if (candidates.size() == 1)
@@ -757,16 +756,10 @@ interactor& interactor_impl::initCommands()
       return names;
     }
 
+    // Recover all names that starts with args[0]
     std::vector<std::string> candidates;
-    // TODO std::find_if instead ?
-    for (const std::string& name : names)
-    {
-      // Copy all name that start with the pattern
-      if (f3d::detail::StartWith(name, args[0]))
-      {
-        candidates.emplace_back(name);
-      }
-    }
+    std::copy_if(names.begin(), names.end(), std::back_inserter(candidates),
+      [&](const std::string& name) { return f3d::detail::StartWith(name, args[0]); });
 
     if (candidates.size() == 1)
     {
