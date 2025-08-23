@@ -715,6 +715,11 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
           }
         }
       }
+      else if (candidates.size() == 1)
+      {
+        // Single candidate, add a space separator
+        candidates[0] += " ";
+      }
       return candidates;
     });
 #endif
@@ -761,6 +766,12 @@ interactor& interactor_impl::initCommands()
       {
         candidates.emplace_back(name);
       }
+    }
+
+    if (candidates.size() == 1)
+    {
+      // Single candidate, add a space separator
+      candidates[0] += " ";
     }
     return candidates;
   };
