@@ -1901,33 +1901,31 @@ void F3DStarter::AddCommands()
   auto complFilesystem = [](const std::vector<std::string>& args)
   {
     std::vector<std::string> candidates;
+
+    // With no args we search current directory without pattern
     fs::path parentDirectory = ".";
+    std::string filePattern = "";
+
+    // With an arg, get the last one, recover its parent directory
+    // and use its filename as pattern
     fs::path completionPath;
-    std::string pathPattern;
     if (!args.empty())
     {
-      pathPattern = args[0];
-      completionPath = pathPattern;
+      completionPath = args.back();
+      filePattern = completionPath.filename().string();
       parentDirectory = completionPath.parent_path();
     }
 
-    fs::path baseDirectory;
-    std::string filePattern;
-    if (fs::exists(completionPath) && fs::is_directory(completionPath) && !pathPattern.empty() &&pathPattern.back() == fs::path::preferred_separator)
+    // If the path to complete exists and is a directory with a separator at the end, explore its content instead
+    if (fs::exists(completionPath) && fs::is_directory(completionPath) && !filePattern.empty() && filePattern.back() == fs::path::preferred_separator)
     {
-      // Directory exists and terminated by a separator, explore its contents
-      baseDirectory = completionPath;
-    }
-    else if (fs::exists(parentDirectory))
-    {
-      // Explore parentDirectory instead
-      baseDirectory = parentDirectory;
-      filePattern = completionPath.filename().string();
+      parentDirectory = completionPath;
+      filePattern = "";
     }
 
-    if (!baseDirectory.empty())
+    if (fs::exists(parentDirectory))
     {
-      for (auto& entry : fs::directory_iterator(baseDirectory))
+      for (auto& entry : fs::directory_iterator(parentDirectory))
       {
         // Add candidates that starts with filePattern
         if (entry.path().filename().string().rfind(filePattern, 0) == 0)
@@ -1941,6 +1939,24 @@ void F3DStarter::AddCommands()
     {
       // Single directory candidate, add a separator
       candidates[0] += fs::path::preferred_separator;
+    }
+
+    // Multi args, reconstruct the full condidates
+    if (args.size() > 1)
+    {
+      // TODO use std::accumulate instead
+      std::string accum;
+      for (size_t i = 0; i < args.size() - 1; i++)
+      {
+        accum += args[i] + " ";
+      }
+
+      for(size_t i = 0; i < candidates.size(); i++)
+      {
+        // Reconstruct complete candidates
+        // Use std::transform TODO
+        candidates[i] = accum + candidates[i];
+      }
     }
 
     return candidates;
@@ -2011,7 +2027,7 @@ void F3DStarter::AddCommands()
       std::string filename =
         args.empty() ? this->Internals->AppOptions.ScreenshotFilename : args[0];
       this->SaveScreenshot(filename);
-    }, "take_screenshot [filename]: take a screenshot into provided file or --screenshot-filename");
+    }, "take_screenshot [filename]: take a screenshot into provided file or --screenshot-filename", complFilesystem);
 
   // TODO filesystem completion ?
   interactor.addCommand("take_minimal_screenshot",
@@ -2021,7 +2037,7 @@ void F3DStarter::AddCommands()
       std::string filename =
         args.empty() ? this->Internals->AppOptions.ScreenshotFilename : args[0];
       this->SaveScreenshot(filename, true);
-    }, "take_minimal_screenshot [filename]: take a minimal screenshot into provided file or --screenshot-filename");
+    }, "take_minimal_screenshot [filename]: take a minimal screenshot into provided file or --screenshot-filename", complFilesystem);
 
   // This replace an existing command in libf3d
   interactor.removeCommand("add_files");
@@ -2055,7 +2071,7 @@ void F3DStarter::AddCommands()
         // Rendering now is needed for correct lighting
         this->Render();
       }
-    }, "set_hdri [path/to/hdri]: set and use an HDRI image");
+    }, "set_hdri [path/to/hdri]: set and use an HDRI image", complFilesystem);
 
   // TODO filesystem completion ?
   interactor.addCommand("add_files_or_set_hdri",
@@ -2086,7 +2102,7 @@ void F3DStarter::AddCommands()
       {
         this->LoadFileGroup(index);
       }
-    }, "add_files_or_set_hdri [path/to/file1] [path/to/file2]: add_files or set_hdri depending on the file extension");
+    }, "add_files_or_set_hdri [path/to/file1] [path/to/file2]: add_files or set_hdri depending on the file extension", complFilesystem);
 
 #if F3D_MODULE_TINYFILEDIALOGS
   // TODO ADD DOC!!!
