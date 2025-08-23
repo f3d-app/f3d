@@ -36,13 +36,13 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   f3d::image generated(width, height, channels);
   std::vector<uint8_t> pixels(width * height * channels);
-  std::generate(std::begin(pixels), std::end(pixels), [&]() { return randGenerator() % 256; });
+  std::generate(std::begin(pixels), std::end(pixels), [&]() { return static_cast<uint8_t>(randGenerator() % 256); });
   generated.setContent(pixels.data());
 
   f3d::image generated16(width, height, channels, f3d::image::ChannelType::SHORT);
   std::vector<uint16_t> pixels16(width * height * channels);
   std::generate(
-    std::begin(pixels16), std::end(pixels16), [&]() { return randGenerator() % 65536; });
+    std::begin(pixels16), std::end(pixels16), [&]() { return static_cast<uint16_t>(randGenerator() % 65536); });
   generated16.setContent(pixels16.data());
 
   std::uniform_real_distribution<float> dist(

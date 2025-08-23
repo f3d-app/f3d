@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-int TestPseudoUnitTest(int argc, char* argv[])
+int TestPseudoUnitTest([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   PseudoUnitTest metatest;
 

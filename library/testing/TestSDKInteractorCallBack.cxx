@@ -54,7 +54,7 @@ int TestSDKInteractorCallBack([[maybe_unused]] int argc, [[maybe_unused]] char* 
     std::cerr << "An exception has not been thrown when adding a existing interaction command\n";
     return EXIT_FAILURE;
   }
-  catch (const f3d::interactor::already_exists_exception& ex)
+  catch (const f3d::interactor::already_exists_exception&)
   {
   }
 
