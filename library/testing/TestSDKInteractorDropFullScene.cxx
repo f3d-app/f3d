@@ -7,7 +7,7 @@
 
 #include "TestSDKHelpers.h"
 
-int TestSDKInteractorDropFullScene(int argc, char* argv[])
+int TestSDKInteractorDropFullScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   f3d::engine eng = f3d::engine::create(true);
   std::ignore = eng.getOptions();

@@ -10,7 +10,7 @@
 
 namespace fs = std::filesystem;
 
-int TestSDKEngineExceptions(int argc, char* argv[])
+int TestSDKEngineExceptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   PseudoUnitTest test;
 

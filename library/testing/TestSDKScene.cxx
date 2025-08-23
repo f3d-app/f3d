@@ -8,7 +8,7 @@
 
 namespace fs = std::filesystem;
 
-int TestSDKScene(int argc, char* argv[])
+int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   PseudoUnitTest test;
 

@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-int TestSDKEngine(int argc, char* argv[])
+int TestSDKEngine([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
 

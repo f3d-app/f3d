@@ -1,7 +1,7 @@
 #include <engine.h>
 #include <interactor.h>
 
-int TestSDKEngineRecreation(int argc, char* argv[])
+int TestSDKEngineRecreation([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   std::string filename = "TestSDKEngineRecreation";
   std::string interactionFilePath = std::string(argv[1]) + "/recordings/" + filename + ".log";

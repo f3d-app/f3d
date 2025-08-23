@@ -2,7 +2,7 @@
 #include <interactor.h>
 #include <scene.h>
 
-int TestSDKStartInteractor(int argc, char* argv[])
+int TestSDKStartInteractor([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   // Using an onscreen window to mimic standard usage
   f3d::engine eng = f3d::engine::create();

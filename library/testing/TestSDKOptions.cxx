@@ -10,7 +10,7 @@
 #include <iostream>
 #include <limits>
 
-int TestSDKOptions(int argc, char* argv[])
+int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   PseudoUnitTest test;
 

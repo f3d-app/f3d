@@ -4,7 +4,7 @@
 #include <interactor.h>
 #include <options.h>
 
-int TestSDKInteractorCommand(int argc, char* argv[])
+int TestSDKInteractorCommand([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   f3d::engine eng = f3d::engine::create(true);
   f3d::options& options = eng.getOptions();

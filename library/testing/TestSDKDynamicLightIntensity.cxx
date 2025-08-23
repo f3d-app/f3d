@@ -5,7 +5,7 @@
 
 #include "TestSDKHelpers.h"
 
-int TestSDKDynamicLightIntensity(int argc, char* argv[])
+int TestSDKDynamicLightIntensity([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   f3d::engine eng = f3d::engine::create(true);
   f3d::scene& Scene = eng.getScene();

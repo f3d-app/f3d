@@ -6,7 +6,7 @@
 #include <scene.h>
 #include <window.h>
 
-int TestSDKSceneFromMemory(int argc, char* argv[])
+int TestSDKSceneFromMemory([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   PseudoUnitTest test;
 

@@ -11,7 +11,7 @@
 #include <set>
 #include <sstream>
 
-int TestSDKImage(int argc, char* argv[])
+int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   PseudoUnitTest test;
 

@@ -46,7 +46,7 @@ public:
   }
 };
 
-int TestSDKOptionsIO(int argc, char* argv[])
+int TestSDKOptionsIO([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   const std::string outOfRangeDoubleStr(
     "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012"

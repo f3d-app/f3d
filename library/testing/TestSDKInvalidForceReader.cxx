@@ -6,7 +6,7 @@
 #include <window.h>
 
 namespace fs = std::filesystem;
-int TestSDKInvalidForceReader(int argc, char* argv[])
+int TestSDKInvalidForceReader([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   PseudoUnitTest test;
 
