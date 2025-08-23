@@ -16,7 +16,7 @@ int TestSDKInteractorDocumentation(int argc, char* argv[])
   f3d::interactor& inter = eng.getInteractor();
 
   // Avoid testing something that changes often
-  int nBinds = inter.getBinds().size();
+  size_t nBinds = inter.getBinds().size();
 
   PseudoUnitTest test;
 

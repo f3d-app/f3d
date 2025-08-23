@@ -10,7 +10,7 @@
 int TestSDKInteractorDropFullScene(int argc, char* argv[])
 {
   f3d::engine eng = f3d::engine::create(true);
-  const f3d::options& options = eng.getOptions();
+  std::ignore = eng.getOptions();
   f3d::window& win = eng.getWindow();
   f3d::interactor& inter = eng.getInteractor();
   win.setSize(300, 300);
