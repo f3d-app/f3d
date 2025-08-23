@@ -1903,43 +1903,50 @@ void F3DStarter::AddCommands()
   {
     std::vector<std::string> candidates;
 
-    // With no args we search current directory without pattern
-    fs::path parentDirectory = ".";
-    std::string filePattern = "";
-
-    // With an arg, get the last one, recover its parent directory
-    // and use its filename as pattern
-    fs::path completionPath;
-    if (!args.empty())
+    try
     {
-      completionPath = args.back();
-      filePattern = completionPath.filename().string();
-      parentDirectory = completionPath.parent_path();
-    }
+      // With no args we search current directory without pattern
+      fs::path parentDirectory = ".";
+      std::string filePattern = "";
 
-    // If the path to complete exists and is a directory with a separator at the end, explore its content instead
-    if (fs::exists(completionPath) && fs::is_directory(completionPath) && !filePattern.empty() && filePattern.back() == fs::path::preferred_separator)
-    {
-      parentDirectory = completionPath;
-      filePattern = "";
-    }
-
-    if (fs::exists(parentDirectory))
-    {
-      for (auto& entry : fs::directory_iterator(parentDirectory))
+      // With an arg, get the last one, recover its parent directory
+      // and use its filename as pattern
+      fs::path completionPath;
+      if (!args.empty())
       {
-        // Add candidates that starts with filePattern
-        if (entry.path().filename().string().rfind(filePattern, 0) == 0)
+        completionPath = args.back();
+        filePattern = completionPath.filename().string();
+        parentDirectory = completionPath.parent_path();
+      }
+
+      // If the path to complete exists and is a directory with a separator at the end, explore its content instead
+      if (fs::exists(completionPath) && fs::is_directory(completionPath) && !filePattern.empty() && filePattern.back() == fs::path::preferred_separator)
+      {
+        parentDirectory = completionPath;
+        filePattern = "";
+      }
+
+      if (fs::exists(parentDirectory))
+      {
+        for (auto& entry : fs::directory_iterator(parentDirectory))
         {
-          candidates.emplace_back(entry.path());
+          // Add candidates that starts with filePattern
+          if (entry.path().filename().string().rfind(filePattern, 0) == 0)
+          {
+            candidates.emplace_back(entry.path());
+          }
         }
       }
-    }
 
-    if (candidates.size() == 1 && fs::is_directory(candidates[0]))
+      if (candidates.size() == 1 && fs::is_directory(candidates[0]))
+      {
+        // Single directory candidate, add a separator
+        candidates[0] += fs::path::preferred_separator;
+      }
+    }
+    catch (const fs::filesystem_error& ex)
     {
-      // Single directory candidate, add a separator
-      candidates[0] += fs::path::preferred_separator;
+      f3d::log::error("Error completing a filesystem path: ", ex.what());
     }
 
     // Multi args, reconstruct the full condidates
