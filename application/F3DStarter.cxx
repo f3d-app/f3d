@@ -1916,6 +1916,7 @@ void F3DStarter::AddCommands()
       {
         completionPath = args.back();
         filePattern = completionPath.filename().string();
+        // TODO does not work when completionPath contains just a relative filename
         parentDirectory = completionPath.parent_path();
       }
 
@@ -1928,12 +1929,19 @@ void F3DStarter::AddCommands()
 
       if (fs::exists(parentDirectory))
       {
+        // TODO better way to do this ?
+        std::vector<fs::path> dirContent { parentDirectory / ".", parentDirectory / ".."};
         for (auto& entry : fs::directory_iterator(parentDirectory))
         {
+          dirContent.emplace_back(entry.path());
+        }
+
+        for(const auto& path : dirContent)
+        {
           // Add candidates that starts with filePattern
-          if (entry.path().filename().string().rfind(filePattern, 0) == 0)
+          if (path.filename().string().rfind(filePattern, 0) == 0)
           {
-            candidates.emplace_back(entry.path());
+            candidates.emplace_back(path);
           }
         }
       }

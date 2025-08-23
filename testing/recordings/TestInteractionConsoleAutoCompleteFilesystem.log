@@ -34,6 +34,54 @@ KeyPressEvent 199 142 0 9 1 Tab 0
 CharEvent 199 142 0 9 1 Tab 0
 KeyReleaseEvent 199 142 0 9 1 Tab 0
 
+KeyPressEvent 199 142 0 46 1 period 0
+CharEvent 199 142 0 46 1 period 0
+KeyReleaseEvent 199 142 0 46 1 period 0
+
+KeyPressEvent 199 142 0 46 1 period 0
+CharEvent 199 142 0 46 1 period 0
+KeyReleaseEvent 199 142 0 46 1 period 0
+
+KeyPressEvent 199 142 0 9 1 Tab 0
+CharEvent 199 142 0 9 1 Tab 0
+KeyReleaseEvent 199 142 0 9 1 Tab 0
+
+KeyPressEvent 199 142 0 46 1 period 0
+CharEvent 199 142 0 46 1 period 0
+KeyReleaseEvent 199 142 0 46 1 period 0
+
+KeyPressEvent 199 142 0 46 1 period 0
+CharEvent 199 142 0 46 1 period 0
+KeyReleaseEvent 199 142 0 46 1 period 0
+
+KeyPressEvent 199 142 0 9 1 Tab 0
+CharEvent 199 142 0 9 1 Tab 0
+KeyReleaseEvent 199 142 0 9 1 Tab 0
+
+KeyPressEvent 199 142 0 116 1 t 0
+CharEvent 199 142 0 116 1 t 0
+KeyReleaseEvent 199 142 0 116 1 t 0
+
+KeyPressEvent 199 142 0 9 1 Tab 0
+CharEvent 199 142 0 9 1 Tab 0
+KeyReleaseEvent 199 142 0 9 1 Tab 0
+
+KeyPressEvent 199 142 0 100 1 d 0
+CharEvent 199 142 0 100 1 d 0
+KeyReleaseEvent 199 142 0 100 1 d 0
+
+KeyPressEvent 199 142 0 9 1 Tab 0
+CharEvent 199 142 0 9 1 Tab 0
+KeyReleaseEvent 199 142 0 9 1 Tab 0
+
+KeyPressEvent 199 142 0 99 1 c 0
+CharEvent 199 142 0 99 1 c 0
+KeyReleaseEvent 199 142 0 99 1 c 0
+
+KeyPressEvent 199 142 0 9 1 Tab 0
+CharEvent 199 142 0 9 1 Tab 0
+KeyReleaseEvent 199 142 0 9 1 Tab 0
+
 KeyPressEvent 199 142 0 13 1 Return 0
 CharEvent 199 142 0 13 1 Return 0
 KeyReleaseEvent 199 142 0 13 1 Return 0
