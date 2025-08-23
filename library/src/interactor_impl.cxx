@@ -993,6 +993,8 @@ interactor& interactor_impl::initCommands()
   this->addCommand("toggle_animation",
     [&](const std::vector<std::string>&) { this->Internals->AnimationManager->ToggleAnimation(); }, "start/stop the animation");
 
+  // XXX: No filesystem completion here, F3DStarter will add its own
+  // command anyway
   this->addCommand("add_files",
     [&](const std::vector<std::string>& files)
     {
