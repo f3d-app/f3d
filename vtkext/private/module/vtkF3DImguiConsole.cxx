@@ -69,7 +69,7 @@ struct vtkF3DImguiConsole::Internals
           // nice casing.
           data->DeleteChars(0, static_cast<int>(pattern.size()));
           data->InsertChars(data->CursorPos, candidates[0].c_str());
-          data->InsertChars(data->CursorPos, " ");
+    //      data->InsertChars(data->CursorPos, " ");
         }
         else if (candidates.size() > 1)
         {

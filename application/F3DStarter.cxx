@@ -1898,6 +1898,54 @@ void F3DStarter::AddCommands()
     return f3d::options::parse<bool>(args[0]);
   };
 
+  auto complFilesystem = [](const std::vector<std::string>& args)
+  {
+    std::vector<std::string> candidates;
+    fs::path parentDirectory = ".";
+    fs::path completionPath;
+    std::string pathPattern;
+    if (!args.empty())
+    {
+      pathPattern = args[0];
+      completionPath = pathPattern;
+      parentDirectory = completionPath.parent_path();
+    }
+
+    fs::path baseDirectory;
+    std::string filePattern;
+    if (fs::exists(completionPath) && fs::is_directory(completionPath) && !pathPattern.empty() &&pathPattern.back() == fs::path::preferred_separator)
+    {
+      // Directory exists and terminated by a separator, explore its contents
+      baseDirectory = completionPath;
+    }
+    else if (fs::exists(parentDirectory))
+    {
+      // Explore parentDirectory instead
+      baseDirectory = parentDirectory;
+      filePattern = completionPath.filename().string();
+    }
+
+    if (!baseDirectory.empty())
+    {
+      for (auto& entry : fs::directory_iterator(baseDirectory))
+      {
+        // Add candidates that starts with filePattern
+        if (entry.path().filename().string().rfind(filePattern, 0) == 0)
+        {
+          candidates.emplace_back(entry.path());
+        }
+      }
+    }
+
+    if (candidates.size() == 1 && fs::is_directory(candidates[0]))
+    {
+      // Single directory candidate, add a separator
+      candidates[0] += fs::path::preferred_separator;
+    }
+
+    return candidates;
+  };
+
   interactor.addCommand("remove_current_file_group",
     [this](const std::vector<std::string>&)
     {
@@ -1990,7 +2038,7 @@ void F3DStarter::AddCommands()
       {
         this->LoadFileGroup(index);
       }
-    }, "add_files [path/to/file1] [path/to/file2]: A specific command to add files to the scene");
+    }, "add_files [path/to/file1] [path/to/file2]: A specific command to add files to the scene", complFilesystem);
 
   // TODO filesystem completion ?
   interactor.addCommand("set_hdri",
