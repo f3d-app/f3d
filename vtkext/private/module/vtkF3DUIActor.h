@@ -20,7 +20,7 @@ public:
   static vtkF3DUIActor* New();
   vtkTypeMacro(vtkF3DUIActor, vtkProp);
 
-  using CheatSheetTuple = std::tuple<std::string, std::string, std::string, std::string>;
+  using CheatSheetTuple = std::tuple<std::string, std::string, std::string>;
   using CheatSheetGroup = std::pair<std::string, std::vector<CheatSheetTuple>>;
 
   /**
@@ -35,6 +35,12 @@ public:
    * False by default
    */
   void SetDropZoneVisibility(bool show);
+
+  /**
+   * Set the logo dropzone visibility
+   * False by default
+   */
+  void SetDropZoneLogoVisibility(bool show);
 
   /**
    * Set the dropzone string
@@ -198,7 +204,7 @@ protected:
   virtual void RenderConsoleBadge()
   {
   }
-
+  bool DropZoneLogoVisible = false;
   bool DropZoneVisible = false;
   std::string DropText = "";
 

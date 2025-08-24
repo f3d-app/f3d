@@ -164,7 +164,7 @@ Supported interactions are legion, eg:
   - `Enter`
   - `Delete`
 - Other interactions, eg:
-  - `Drop` when files or folders are dropped on F3D window
+  - `Drop` when files or directories are dropped on F3D window
 
 To identify the interaction to use, just use `f3d --verbose` and perform the interaction, F3D will log it like this:
 

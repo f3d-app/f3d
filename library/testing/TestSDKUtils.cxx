@@ -7,7 +7,7 @@
 
 namespace fs = std::filesystem;
 
-int TestSDKUtils(int argc, char* argv[])
+int TestSDKUtils([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   PseudoUnitTest test;
 

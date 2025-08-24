@@ -69,6 +69,12 @@
         "default_value": "0.0, 0.0, 0.0"
       }
     },
+    "axes_grid": {
+      "enable": {
+        "type": "bool",
+        "default_value": "false"
+      }
+    },
     "raytracing": {
       "enable": {
         "type": "bool",
@@ -192,11 +198,27 @@
     },
     "dropzone": {
       "type": "bool",
-      "default_value": "false"
+      "default_value": "false",
+      "deprecated": "use ui.drop_zone.enable instead"
     },
     "dropzone_info": {
       "type": "string",
-      "default_value": ""
+      "default_value": "",
+      "deprecated": "use ui.drop_zone.info instead"
+    },
+    "drop_zone": {
+      "enable": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "info": {
+        "type": "string",
+        "default_value": ""
+      },
+      "show_logo": {
+        "type": "bool",
+        "default_value": "false"
+      }
     },
     "metadata": {
       "type": "bool",

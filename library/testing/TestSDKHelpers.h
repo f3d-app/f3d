@@ -10,12 +10,12 @@
 namespace TestSDKHelpers
 {
 
-static bool RenderTest(const f3d::image& img, const std::string& baselinePath,
+inline bool RenderTest(const f3d::image& img, const std::string& baselinePath,
   const std::string& outputPath, const std::string& name, double threshold = 0.05)
 {
   if (baselinePath.empty() || outputPath.empty() || name.empty())
   {
-    std::cerr << "A path or name is empty, aborting" << std::endl;
+    std::cerr << "A path or name is empty, aborting\n";
     return false;
   }
 
@@ -29,7 +29,7 @@ static bool RenderTest(const f3d::image& img, const std::string& baselinePath,
       img.save(output);
       std::cerr << "Reference image "
                 << baseline + " does not exist, current rendering has been outputted to " << output
-                << std::endl;
+                << "\n";
       return false;
     }
   }
@@ -41,26 +41,31 @@ static bool RenderTest(const f3d::image& img, const std::string& baselinePath,
   if (error > threshold)
   {
     std::cerr << "Current rendering difference with reference image " << baseline << " : " << error
-              << " is higher than the threshold of " << threshold << std::endl;
-    std::cerr << "Result resolution: " << img.getWidth() << "x" << img.getHeight() << std::endl;
+              << " is higher than the threshold of " << threshold << "\n";
+    std::cerr << "Result resolution: " << img.getWidth() << "x" << img.getHeight() << "\n";
     std::cerr << "Reference resolution: " << reference.getWidth() << "x" << reference.getHeight()
-              << std::endl;
-    std::cerr << "Result image saved to " << output << std::endl;
+              << "\n";
+    std::cerr << "Result image saved to " << output << "\n";
     img.save(output);
     return false;
   }
 
   std::cout << "Successful render test against " << baseline + " with an error of " << error
-            << std::endl;
+            << "\n";
   return true;
 }
 
-static bool RenderTest(f3d::window& win, const std::string& baselinePath,
+inline bool RenderTest(f3d::window& win, const std::string& baselinePath,
   const std::string& outputPath, const std::string& name, double threshold = 0.05,
   bool noBackground = false)
 {
   return TestSDKHelpers::RenderTest(
     win.renderToImage(noBackground), baselinePath, outputPath, name, threshold);
+}
+
+constexpr double Degrees2Radians(double degrees)
+{
+  return (3.14159265358979323846 * degrees / 180.0);
 }
 
 }

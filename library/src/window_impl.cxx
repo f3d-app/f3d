@@ -20,6 +20,7 @@
 #include <vtkInformation.h>
 #include <vtkPNGReader.h>
 #include <vtkPointGaussianMapper.h>
+#include <vtkRenderWindowInteractor.h>
 #include <vtkRendererCollection.h>
 #include <vtkRenderingOpenGLConfigure.h>
 #include <vtkVersion.h>
@@ -282,7 +283,8 @@ int window_impl::getHeight() const
 //----------------------------------------------------------------------------
 window& window_impl::setSize(int width, int height)
 {
-  this->Internals->RenWin->SetSize(width, height);
+  assert(this->Internals->RenWin->GetInteractor() != nullptr);
+  this->Internals->RenWin->GetInteractor()->UpdateSize(width, height);
   return *this;
 }
 
@@ -293,8 +295,8 @@ window& window_impl::setPosition(int x, int y)
   {
     // vtkCocoaRenderWindow has a different behavior than other render windows
     // https://gitlab.kitware.com/vtk/vtk/-/issues/18681
-    int* screenSize = this->Internals->RenWin->GetScreenSize();
-    int* winSize = this->Internals->RenWin->GetSize();
+    const int* screenSize = this->Internals->RenWin->GetScreenSize();
+    const int* winSize = this->Internals->RenWin->GetSize();
     this->Internals->RenWin->SetPosition(x, screenSize[1] - winSize[1] - y);
   }
   else
@@ -408,8 +410,30 @@ void window_impl::UpdateDynamicOptions()
   renderer->ShowCheatSheet(opt.ui.cheatsheet);
   renderer->ShowConsole(opt.ui.console);
   renderer->ShowMinimalConsole(opt.ui.minimal_console);
-  renderer->ShowDropZone(opt.ui.dropzone);
-  renderer->SetDropZoneInfo(opt.ui.dropzone_info);
+  renderer->ShowDropZone(opt.ui.drop_zone.enable);
+  renderer->SetDropZoneInfo(opt.ui.drop_zone.info);
+  renderer->ShowDropZoneLogo(opt.ui.drop_zone.show_logo);
+  // F3D_DEPRECATED
+  // Remove this in the next major release
+  F3D_SILENT_WARNING_PUSH()
+  F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
+  if (!opt.ui.dropzone_info.empty())
+  {
+    log::warn("'ui.dropzone_info' is deprecated. Please Use 'ui.drop_zone.info' instead.");
+    renderer->SetDropZoneInfo(opt.ui.dropzone_info);
+  }
+  if (opt.ui.dropzone)
+  {
+    log::warn("'ui.dropzone' is deprecated. Please Use 'ui.drop_zone.enable' instead.");
+    renderer->ShowDropZone(opt.ui.dropzone);
+    if (!opt.ui.dropzone_info.empty())
+    {
+      renderer->SetDropZoneInfo(opt.ui.dropzone_info);
+    }
+    renderer->ShowDropZoneLogo(opt.ui.dropzone);
+  }
+  F3D_SILENT_WARNING_POP()
+
   renderer->ShowArmature(opt.render.armature.enable);
 
   renderer->SetUseRaytracing(opt.render.raytracing.enable);
@@ -472,6 +496,8 @@ void window_impl::UpdateDynamicOptions()
   renderer->ShowGrid(opt.render.grid.enable);
   renderer->SetGridColor(opt.render.grid.color);
 
+  renderer->ShowAxesGrid(opt.render.axes_grid.enable);
+
   if (!opt.scene.camera.index.has_value())
   {
     renderer->SetUseOrthographicProjection(opt.scene.camera.orthographic);
@@ -516,10 +542,11 @@ void window_impl::UpdateDynamicOptions()
       std::vector<vtkF3DUIActor::CheatSheetTuple> groupList;
       for (const interaction_bind_t& bind : this->Internals->Interactor->getBindsForGroup(group))
       {
-        auto [doc, val, type] = this->Internals->Interactor->getBindingDocumentation(bind);
+        auto [doc, val] = this->Internals->Interactor->getBindingDocumentation(bind);
+        f3d::interactor::BindingType type = this->Internals->Interactor->getBindingType(bind);
         if (!doc.empty())
         {
-          groupList.emplace_back(std::make_tuple(bind.format(), doc, val, type));
+          groupList.emplace_back(std::make_tuple(bind.format(), doc, val));
         }
       }
       cheatsheet.emplace_back(std::make_pair(group, std::move(groupList)));
@@ -578,7 +605,7 @@ image window_impl::renderToImage(bool noBackground)
   exporter->SetInputConnection(rtW2if->GetOutputPort());
   exporter->ImageLowerLeftOn();
 
-  int* dims = exporter->GetDataDimensions();
+  const int* dims = exporter->GetDataDimensions();
   int cmp = exporter->GetDataNumberOfScalarComponents();
 
   image output(dims[0], dims[1], cmp);
@@ -633,5 +660,11 @@ void window_impl::RenderUIOnly()
   renWin->Render();
   info->Remove(vtkF3DRenderPass::RENDER_UI_ONLY());
 #endif
+}
+
+//----------------------------------------------------------------------------
+vtkF3DRenderer* window_impl::GetRenderer() const
+{
+  return this->Internals->Renderer;
 }
 };

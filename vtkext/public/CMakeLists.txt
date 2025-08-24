@@ -33,6 +33,7 @@ endif()
 
 vtk_module_build(
   MODULES ${modules}
+  ENABLE_WRAPPING OFF
   INSTALL_EXPORT ${export_name}
   INSTALL_HEADERS ON
   HEADERS_COMPONENT ${headers_component}

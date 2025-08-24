@@ -9,7 +9,7 @@
 
 #include <random>
 
-int TestSDKDynamicHDRI(int argc, char* argv[])
+int TestSDKDynamicHDRI([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::INFO);
 
@@ -27,7 +27,7 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
   bool ret = win.render();
   if (!ret)
   {
-    std::cerr << "First render failed" << std::endl;
+    std::cerr << "First render failed\n";
     return EXIT_FAILURE;
   }
 
@@ -45,7 +45,7 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
     std::string(argv[2]), "TestSDKDynamicHDRIDefault");
   if (!ret)
   {
-    std::cerr << "Render with Default HDRI failed" << std::endl;
+    std::cerr << "Render with Default HDRI failed\n";
     return EXIT_FAILURE;
   }
 
@@ -55,7 +55,7 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
     std::string(argv[2]), "TestSDKDynamicHDRI");
   if (!ret)
   {
-    std::cerr << "Render with HDRI failed" << std::endl;
+    std::cerr << "Render with HDRI failed\n";
     return EXIT_FAILURE;
   }
 
@@ -63,7 +63,7 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
   std::ifstream lutFile(cachePath + "/lut.vti");
   if (!lutFile.is_open())
   {
-    std::cerr << "LUT cache file not found" << std::endl;
+    std::cerr << "LUT cache file not found\n";
     return EXIT_FAILURE;
   }
 
@@ -73,7 +73,7 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
     std::string(argv[2]), "TestSDKDynamicHDRI");
   if (!ret)
   {
-    std::cerr << "Render with HDRI with another cache path failed" << std::endl;
+    std::cerr << "Render with HDRI with another cache path failed\n";
     return EXIT_FAILURE;
   }
 
@@ -83,7 +83,7 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
     std::string(argv[2]), "TestSDKDynamicHDRI");
   if (!ret)
   {
-    std::cerr << "Render with HDRI with existing cache path failed" << std::endl;
+    std::cerr << "Render with HDRI with existing cache path failed\n";
     return EXIT_FAILURE;
   }
 
@@ -95,7 +95,7 @@ int TestSDKDynamicHDRI(int argc, char* argv[])
 
   if (!ret)
   {
-    std::cerr << "Render with EXR HDRI failed" << std::endl;
+    std::cerr << "Render with EXR HDRI failed\n";
     return EXIT_FAILURE;
   }
 #endif

@@ -4,7 +4,7 @@
 #include <interactor.h>
 #include <scene.h>
 
-int TestSDKAnimation(int argc, char* argv[])
+int TestSDKAnimation([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   PseudoUnitTest test;
   f3d::engine eng = f3d::engine::create(true);

@@ -57,26 +57,64 @@ def test_binding():
         "dummy command",
         "DummyGroup",
         doc_fn,
+        f3d.Interactor.BindingType.CYCLIC,
     )
     inter.add_binding(
         f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.CTRL, "P"),
         "dummy command",
         "DummyGroup",
         doc_fn,
+        f3d.Interactor.BindingType.NUMERICAL,
     )
     inter.add_binding(
         f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.SHIFT, "P"),
         "dummy command",
         "DummyGroup",
         doc_fn,
+        f3d.Interactor.BindingType.TOGGLE,
     )
     inter.add_binding(
         f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.CTRL_SHIFT, "P"),
         ["dummy command", "dummy command"],
         "DummyGroup",
         doc_fn,
+        f3d.Interactor.BindingType.OTHER,
     )
     assert len(inter.get_bind_groups()) == 1
     assert len(inter.get_binds()) == 5
+    assert (
+        inter.get_binding_documentation(
+            f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.CTRL, "P")
+        )
+        == doc_fn()
+    )
+    assert (
+        inter.get_binding_type(
+            f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.CTRL, "P")
+        )
+        == f3d.Interactor.BindingType.NUMERICAL
+    )
 
     inter.init_bindings()
+
+
+def test_trigger_key(capfd: pytest.CaptureFixture[str]):
+    engine = f3d.Engine.create(True)
+
+    engine.window.render()
+
+    engine.interactor.trigger_keyboard_key(f3d.Interactor.InputAction.PRESS, "E")
+    engine.interactor.trigger_keyboard_key(f3d.Interactor.InputAction.RELEASE, "E")
+    assert engine.options["render.show_edges"] is True
+
+    engine.interactor.trigger_mod_update(f3d.Interactor.InputModifier.SHIFT)
+    engine.interactor.trigger_keyboard_key(f3d.Interactor.InputAction.PRESS, "L")
+    engine.interactor.trigger_keyboard_key(f3d.Interactor.InputAction.RELEASE, "L")
+    assert engine.options["render.light.intensity"] == 0.98
+
+    engine.interactor.trigger_mouse_button(
+        f3d.Interactor.InputAction.PRESS, f3d.Interactor.MouseButton.LEFT
+    )
+    engine.interactor.trigger_mouse_position(100, 100)
+    engine.interactor.trigger_mouse_wheel(f3d.Interactor.WheelDirection.FORWARD)
+    engine.interactor.trigger_text_character(0)

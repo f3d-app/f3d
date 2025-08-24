@@ -14,6 +14,7 @@
 
 namespace f3d
 {
+
 struct interaction_bind_t
 {
   /**
@@ -108,7 +109,18 @@ public:
   ///@}
 
   ///@{ @name Bindings
-  using documentation_callback_t = std::function<std::tuple<std::string, std::string, binding_t>()>;
+  using documentation_callback_t = std::function<std::tuple<std::string, std::string>()>;
+
+  /**
+   * Enumeration of binding types.
+   */
+  enum class BindingType : std::uint8_t
+  {
+    CYCLIC = 0,
+    NUMERICAL = 1,
+    TOGGLE = 2,
+    OTHER = 3,
+  };
 
   /**
    * Remove all existing interaction commands and add all default bindings
@@ -132,6 +144,9 @@ public:
    * the first is the doc itself, the second is the current value as a string, if any.
    * Use `getBindingDocumentation` to access this doc.
    *
+   * type is an optional type of binding to provide, it can be used for presenting the
+   * binding in a coherent way in logs and cheatsheet.
+   *
    * When the corresponding bind happens, the provided commands will be triggered using
    * triggerCommand. Considering checking if an interaction exists or removing it before adding it
    * to avoid potential conflicts.
@@ -142,7 +157,8 @@ public:
    * Adding commands for an existing bind will throw a interactor::already_exists_exception.
    */
   virtual interactor& addBinding(const interaction_bind_t& bind, std::vector<std::string> commands,
-    std::string group = {}, documentation_callback_t documentationCallback = nullptr) = 0;
+    std::string group = {}, documentation_callback_t documentationCallback = nullptr,
+    BindingType type = BindingType::OTHER) = 0;
 
   /**
    * See addBinding
@@ -152,35 +168,18 @@ public:
    * Adding command for an existing bind will throw a interactor::already_exists_exception.
    */
   virtual interactor& addBinding(const interaction_bind_t& bind, std::string command,
-    std::string group = {}, documentation_callback_t documentationCallback = nullptr) = 0;
+    std::string group = {}, documentation_callback_t documentationCallback = nullptr,
+    BindingType type = BindingType::OTHER) = 0;
 
   /**
    * Convenience initializer list signature for add binding method
    */
   interactor& addBinding(const interaction_bind_t& bind, std::initializer_list<std::string> list,
-    std::string group = {}, documentation_callback_t documentationCallback = nullptr)
+    std::string group = {}, documentation_callback_t documentationCallback = nullptr,
+    BindingType type = BindingType::OTHER)
   {
-    return this->addBinding(
-      bind, std::vector<std::string>(list), std::move(group), std::move(documentationCallback));
-  }
-
-  /**
-   * Convenience method to convert binding_t enum to string
-   */
-  std::string bindingsTypeName(binding_t bindingType) const
-  {
-    switch (bindingType)
-    {
-      case binding_t::LAUNCHER:
-        return "Launcher";
-      case binding_t::CYCLIC:
-        return "Cyclic";
-      case binding_t::TOGGLE:
-        return "Toggle";
-      case binding_t::NUMERICAL:
-        return "Numerical";
-    }
-    return "";
+    return this->addBinding(bind, std::vector<std::string>(list), std::move(group),
+      std::move(documentationCallback), type);
   }
 
   /**
@@ -219,8 +218,16 @@ public:
    *
    * Getting documentation for a bind that does not exists will throw a does_not_exists_exception.
    */
-  [[nodiscard]] virtual std::tuple<std::string, std::string, std::string> getBindingDocumentation(
+  [[nodiscard]] virtual std::tuple<std::string, std::string> getBindingDocumentation(
     const interaction_bind_t& bind) const = 0;
+  ///@}
+
+  /**
+   * Get the type of a binding.
+   *
+   * Getting type for a bind that does not exists will throw a does_not_exists_exception.
+   */
+  [[nodiscard]] virtual BindingType getBindingType(const interaction_bind_t& bind) const = 0;
   ///@}
 
   ///@{ @name Animation
@@ -239,6 +246,96 @@ public:
    */
   virtual interactor& enableCameraMovement() = 0;
   virtual interactor& disableCameraMovement() = 0;
+  ///@}
+
+  ///@{ @name Forwarding input events
+  /**
+   * Enumeration of supported mouse buttons.
+   */
+  enum class MouseButton : unsigned char
+  {
+    LEFT,
+    RIGHT,
+    MIDDLE
+  };
+
+  /**
+   * Enumeration of supported mouse wheel directions.
+   */
+  enum class WheelDirection : unsigned char
+  {
+    FORWARD,
+    BACKWARD,
+    LEFT,
+    RIGHT
+  };
+
+  /**
+   * Enumeration of supported input actions.
+   */
+  enum class InputAction : unsigned char
+  {
+    PRESS,
+    RELEASE
+  };
+
+  /**
+   * Enumeration of supported input modifiers.
+   */
+  enum class InputModifier : unsigned char
+  {
+    NONE,
+    CTRL,
+    SHIFT,
+    CTRL_SHIFT
+  };
+
+  /**
+   * Trigger a modifier update.
+   * This will update the internal modifier state of the interactor to match the provided one.
+   */
+  virtual interactor& triggerModUpdate(InputModifier mod) = 0;
+
+  /**
+   * Trigger a mouse button event.
+   * This will trigger the corresponding mouse button press or release event.
+   */
+  virtual interactor& triggerMouseButton(InputAction action, MouseButton button) = 0;
+
+  /**
+   * Trigger a mouse new position event.
+   * Positions are in window coordinates, with (0, 0) being the top-left corner.
+   * The coordinates are expressed in pixels.
+   */
+  virtual interactor& triggerMousePosition(double xpos, double ypos) = 0;
+
+  /**
+   * Trigger a mouse wheel event.
+   * At the moment, only vertical wheel events are observed, but it can change in the future.
+   */
+  virtual interactor& triggerMouseWheel(WheelDirection direction) = 0;
+
+  /**
+   * Trigger a keyboard key event.
+   * This is based on X11 key symbols, it's hard to list all of them, but here are a few:
+   * - "A", "B", "C", ..., "Z" for letters
+   * - "0", "1", "2", ..., "9" for numbers
+   * - "Left", "Right", "Up", "Down" for arrow keys
+   * - "Space", "Return", "Escape", "Tab", "BackSpace" for common keys
+   * - "F1", "F2", ..., "F25" for function keys
+   * - "KP_0", "KP_1", ..., "KP_9" for numpad keys
+   * @note
+   * It's possible to run F3D application in verbose mode and press keys to print their symbols.
+   */
+  virtual interactor& triggerKeyboardKey(InputAction action, std::string_view keySym) = 0;
+
+  /**
+   * Trigger a text character input event.
+   * This will trigger the corresponding character input event, with the codepoint being the Unicode
+   * codepoint of the character.
+   * It's used for text input, like when typing in a the console input field.
+   */
+  virtual interactor& triggerTextCharacter(unsigned int codepoint) = 0;
   ///@}
 
   /**

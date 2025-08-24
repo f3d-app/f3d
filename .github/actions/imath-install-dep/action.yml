@@ -5,25 +5,33 @@ inputs:
     description: "CPU architecture to build for"
     required: false
     default: "x86_64"
+  version:
+    description: "Version of imath to build"
+    required: true
 
 runs:
   using: "composite"
   steps:
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+
     - name: Cache Imath
       id: cache-imath
       uses: actions/cache/restore@v4
       with:
         path: dependencies/imath_install
-        key: imath-v3.1.12-${{runner.os}}-${{inputs.cpu}}-0
+        key: imath-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-1
 
-    # Dependents: alembic
+    # Dependents: alembic openexr
     - name: Checkout Imath
       if: steps.cache-imath.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
       with:
         repository: AcademySoftwareFoundation/Imath
         path: "./dependencies/imath"
-        ref: v3.1.12
+        ref: ${{inputs.version}}
 
     - name: Setup Imath
       if: steps.cache-imath.outputs.cache-hit != 'true'

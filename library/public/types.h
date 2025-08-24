@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cstdint>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -68,7 +69,7 @@ public:
   }
 
 private:
-  double Value;
+  double Value = 0;
 };
 
 /**
@@ -135,7 +136,7 @@ protected:
 /**
  * Describe a RGB color.
  */
-class color_t : public double_array_t<3>
+class F3D_EXPORT color_t : public double_array_t<3>
 {
 public:
   inline color_t() = default;
@@ -228,7 +229,7 @@ public:
   /**
    *  The variables of this function are based on the mathematical notation for matrices,
    *  where the coordinates correspond to the following:
-   * 
+   *
    *        [M1_1, M1_2, M1_3]
    *  M =   [M2_1, M2_2, M2_3]
    *        [M3_1, M3_2, M3_3]
@@ -247,6 +248,22 @@ public:
     (*this)[7] = M3_2;
     (*this)[8] = M3_3;
   }
+
+  // clang-format off
+  /**
+   *  The general form of a 3x3 transformation matrix M with scale S(x,y),
+   *  translation T(x,y), and angle a (in degrees), is solved out to the following:
+   *
+   *      [cos(a)*S(x), -sin(a)*S(y),   T(x)]
+   *  M = [sin(a)*S(x), cos(a)*S(y),    T(y)]
+   *      [0,           0,              1   ]
+   *
+   *  Using this formula, we fill each cell using the values in the constructor
+   */
+  // clang-format on
+
+  F3D_EXPORT transform2d_t(const double_array_t<2>& scale, const double_array_t<2>& translate,
+    const angle_deg_t& angleRad);
 };
 
 /**
@@ -311,16 +328,32 @@ struct mesh_t
   F3D_EXPORT std::pair<bool, std::string> isValid() const;
 };
 
-/**
- * Describe the binding type.
- */
-enum class binding_t : unsigned char
+enum class F3D_EXPORT light_type : std::uint8_t
 {
-  LAUNCHER = 0x80, // 10000000
-  CYCLIC = 0x0,    // 00000000
-  TOGGLE = 0x1,    // 00000001
-  NUMERICAL = 0x2  // 00000010
+  HEADLIGHT = 1,
+  CAMERA_LIGHT = 2,
+  SCENE_LIGHT = 3,
 };
+
+struct F3D_EXPORT light_state_t
+{
+  light_type type = light_type::SCENE_LIGHT;
+  point3_t position = { 0., 0., 0. };
+  color_t color = { 1., 1., 1. };
+  vector3_t direction = { 1., 0., 0. };
+  bool positionalLight = false;
+  double intensity = 1.0;
+  bool switchState = true;
+
+  [[nodiscard]] bool operator==(const light_state_t& other) const
+  {
+    return this->type == other.type && this->position == other.position &&
+      this->color == other.color && this->direction == other.direction &&
+      this->positionalLight == other.positionalLight && this->intensity == other.intensity &&
+      this->switchState == other.switchState;
+  }
+};
+
 }
 
 #endif

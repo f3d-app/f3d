@@ -26,6 +26,7 @@ if(F3D_MODULE_UI)
   list(APPEND libf3dSDKTests_list
     TestSDKConsole.cxx
     TestSDKDropZone.cxx
+    TestSDKDropZoneNoLogo.cxx
     TestSDKDropZoneMinSize.cxx
     TestSDKDynamicBackgroundColor.cxx
     TestSDKDynamicFontFile.cxx
@@ -33,6 +34,7 @@ if(F3D_MODULE_UI)
     TestSDKInteractorCallBack.cxx
     TestSDKInteractorDocumentation.cxx
     TestSDKMultiOptions.cxx
+    TestSDKTriggerInteractions.cxx
     )
 
   # HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767
@@ -183,6 +185,8 @@ endif()
 set_tests_properties(libf3d::TestSDKUtils PROPERTIES ENVIRONMENT "F3D_TEST_ENV_STANDARD=TestEnv;F3D_TEST_ENV_EXTENDED=TestËnv;F3D_TEST_ENV_UTF8=🤔;")
 
 target_link_libraries(libf3dSDKTests libf3d ${libf3dSDKTests_link_libs})
+target_compile_options(libf3dSDKTests PUBLIC ${f3d_compile_options_public} PRIVATE ${f3d_compile_options_private})
+target_link_options(libf3dSDKTests PUBLIC ${f3d_link_options_public})
 
 # make sure the libf3d API is compatible with the right C++ standard
 set_target_properties(libf3dSDKTests PROPERTIES CXX_STANDARD 17)

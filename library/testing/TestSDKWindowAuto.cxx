@@ -5,7 +5,7 @@
 
 #include "TestSDKHelpers.h"
 
-int TestSDKWindowAuto(int argc, char* argv[])
+int TestSDKWindowAuto([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
   f3d::engine eng = f3d::engine::create(true);
@@ -14,20 +14,19 @@ int TestSDKWindowAuto(int argc, char* argv[])
 
   if (win.getWidth() != 300 || win.getHeight() != 300)
   {
-    std::cerr << "Unexpected window size: " << win.getWidth() << "x" << win.getHeight()
-              << std::endl;
+    std::cerr << "Unexpected window size: " << win.getWidth() << "x" << win.getHeight() << "\n";
     return EXIT_FAILURE;
   }
 
   if (win.getType() == f3d::window::Type::UNKNOWN)
   {
-    std::cerr << "Unexpected window type" << std::endl;
+    std::cerr << "Unexpected window type\n";
     return EXIT_FAILURE;
   }
 
   if (!win.isOffscreen())
   {
-    std::cerr << "Window should be offscreen" << std::endl;
+    std::cerr << "Window should be offscreen\n";
     return EXIT_FAILURE;
   }
 

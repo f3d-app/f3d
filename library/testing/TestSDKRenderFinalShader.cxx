@@ -5,7 +5,7 @@
 
 #include "TestSDKHelpers.h"
 
-int TestSDKRenderFinalShader(int argc, char* argv[])
+int TestSDKRenderFinalShader([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   f3d::engine eng = f3d::engine::create(true);
 

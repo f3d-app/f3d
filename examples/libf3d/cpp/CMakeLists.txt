@@ -11,3 +11,8 @@ add_subdirectory(render-interact)
 add_subdirectory(use-options-string)
 add_subdirectory(use-options-struct)
 add_subdirectory(use-options-variant)
+
+option(F3D_EXAMPLES_EXTERNAL_GLFW "Enable external-glfw example (requires GLFW)" OFF)
+if(F3D_EXAMPLES_EXTERNAL_GLFW)
+  add_subdirectory(external-glfw)
+endif()

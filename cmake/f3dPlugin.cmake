@@ -255,6 +255,7 @@ macro(f3d_plugin_build)
 
     vtk_module_build(
       MODULES ${modules}
+      ENABLE_WRAPPING OFF
       INSTALL_HEADERS OFF
       PACKAGE "f3d_${F3D_PLUGIN_NAME}_vtkext_private")
 

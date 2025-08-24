@@ -31,7 +31,6 @@ target_link_options(f3djs PRIVATE
   "SHELL:-sFORCE_FILESYSTEM"
   "SHELL:-sEXPORTED_RUNTIME_METHODS=FS"
   "SHELL:-sWASM_BIGINT"
-  "SHELL:-sNO_DISABLE_EXCEPTION_CATCHING"
 )
 
 # Option to copy app.html file to index.html in the binary folder

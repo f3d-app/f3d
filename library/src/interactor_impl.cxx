@@ -37,6 +37,7 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+#include <cstdint>
 #include <map>
 #include <numeric>
 #include <regex>
@@ -57,6 +58,7 @@ public:
   {
     std::vector<std::string> CommandVector;
     documentation_callback_t DocumentationCallback;
+    BindingType Type;
   };
 
   internals(options& options, window_impl& window, scene_impl& scene, interactor_impl& inter)
@@ -168,7 +170,7 @@ public:
 
   //----------------------------------------------------------------------------
   // Set the view orbit position on the viewport.
-  enum class ViewType
+  enum class ViewType : std::uint8_t
   {
     VT_FRONT,
     VT_RIGHT,
@@ -602,7 +604,6 @@ public:
   vtkNew<vtkF3DInteractorStyle> Style;
   vtkSmartPointer<vtkF3DInteractorEventRecorder> Recorder;
   vtkNew<vtkF3DUIObserver> UIObserver;
-  std::map<unsigned long, std::pair<int, std::function<void()>>> TimerCallBacks;
 
   std::map<std::string, std::function<void(const std::vector<std::string>&)>> Commands;
   std::optional<std::string> CommandBuffer;
@@ -1100,21 +1101,20 @@ interactor& interactor_impl::initBindings()
     {
       desc = this->Internals->Options.render.effect.antialiasing.mode;
     }
-    return std::tuple("Anti-aliasing", std::move(desc), binding_t::CYCLIC);
+    return std::tuple("Anti-aliasing", std::move(desc));
   };
 
   // "Cycle animation" , "animationName"
   auto docAnim = [&]()
   {
     return std::tuple(
-      "Animation", this->Internals->AnimationManager->GetAnimationName(), binding_t::CYCLIC);
+      "Animation", this->Internals->AnimationManager->GetAnimationName());
   };
 
   // "Cycle point/cell data coloring" , "POINT/CELL"
   auto docField = [&]()
   {
-    return std::tuple(std::string("Data coloring"), (opts.model.scivis.cells ? "CELL" : "POINT"),
-      binding_t::CYCLIC);
+    return std::tuple(std::string("Data coloring"), (opts.model.scivis.cells ? "CELL" : "POINT"));
   };
 
   // "Cycle array to color with" , "arrayName"
@@ -1124,8 +1124,7 @@ interactor& interactor_impl::initBindings()
       (opts.model.scivis.array_name.has_value()
           ? shortName(opts.model.scivis.array_name.value(), 15) +
             (opts.model.scivis.enable ? "" : " (forced)")
-          : "OFF"),
-      binding_t::CYCLIC);
+          : "OFF"));
   };
 
   // "Cycle component to color with" , "component"
@@ -1134,11 +1133,11 @@ interactor& interactor_impl::initBindings()
     vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
     vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
     return std::tuple(
-      "Color component", ren->ComponentToString(opts.model.scivis.component), binding_t::CYCLIC);
+      "Color component", ren->ComponentToString(opts.model.scivis.component));
   };
 
   // "doc", ""
-  auto docStr = [](const std::string& doc) { return std::tuple(doc, "", binding_t::LAUNCHER); };
+  auto docStr = [](const std::string& doc) { return std::tuple(doc, ""); };
 
   // "doc", "value"
   auto docDbl = [](const std::string& doc, const double& val)
@@ -1147,7 +1146,7 @@ interactor& interactor_impl::initBindings()
     valStream.precision(2);
     valStream << std::fixed;
     valStream << val;
-    return std::tuple(doc, valStream.str(), binding_t::NUMERICAL);
+    return std::tuple(doc, valStream.str());
   };
 
   // "doc", "value/Unset"
@@ -1164,25 +1163,25 @@ interactor& interactor_impl::initBindings()
     {
       valStream << "Unset";
     }
-    return std::tuple(doc, valStream.str(), binding_t::NUMERICAL);
+    return std::tuple(doc, valStream.str());
   };
 
   // "doc", "ON/OFF"
   auto docTgl = [](const std::string& doc, const bool& val)
-  { return std::tuple(doc, (val ? "ON" : "OFF"), binding_t::TOGGLE); };
+  { return std::tuple(doc, (val ? "ON" : "OFF")); };
 
   // "doc", "ON/OFF/Unset"
   auto docTglOpt = [](const std::string& doc, const std::optional<bool>& val)
   {
     return std::tuple(
-      doc, (val.has_value() ? (val.value() ? "ON" : "OFF") : "Unset"), binding_t::TOGGLE);
+      doc, (val.has_value() ? (val.value() ? "ON" : "OFF") : "Unset"));
   };
 
   // "Cycle verbose level", "current_level"
   auto docVerbose = [&]()
   {
     return std::tuple("Verbose level",
-      this->Internals->VerboseLevelToString(log::getVerboseLevel()), binding_t::CYCLIC);
+      this->Internals->VerboseLevelToString(log::getVerboseLevel()));
   };
 
   // clang-format off
@@ -1194,10 +1193,11 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "P"}, "toggle render.effect.translucency_support", "Scene", std::bind(docTgl, "Translucency", std::cref(opts.render.effect.translucency_support)));
   this->addBinding({mod_t::NONE, "Q"}, "toggle render.effect.ambient_occlusion","Scene", std::bind(docTgl, "Ambient occlusion", std::cref(opts.render.effect.ambient_occlusion)));
   this->addBinding({mod_t::NONE, "A"}, "cycle_anti_aliasing","Scene", docAA);
-  this->addBinding({mod_t::NONE, "T"}, "toggle render.effect.tone_mapping","Scene", std::bind(docTgl, "Tone mapping", std::cref(opts.render.effect.tone_mapping)));
-  this->addBinding({mod_t::NONE, "E"}, "toggle render.show_edges","Scene", std::bind(docTglOpt, "Edges", std::cref(opts.render.show_edges)));
-  this->addBinding({mod_t::NONE, "X"}, "toggle ui.axis","Scene", std::bind(docTgl, "Axes", std::cref(opts.ui.axis)));
-  this->addBinding({mod_t::NONE, "G"}, "toggle render.grid.enable","Scene", std::bind(docTgl, "Grid", std::cref(opts.render.grid.enable)));
+  this->addBinding({mod_t::NONE, "T"}, "toggle render.effect.tone_mapping","Scene", std::bind(docTgl, "Toggle tone mapping", std::cref(opts.render.effect.tone_mapping)));
+  this->addBinding({mod_t::NONE, "E"}, "toggle render.show_edges","Scene", std::bind(docTglOpt, "Toggle edges display", std::cref(opts.render.show_edges)));
+  this->addBinding({mod_t::NONE, "X"}, "toggle ui.axis","Scene", std::bind(docTgl, "Toggle axes display", std::cref(opts.ui.axis)));
+  this->addBinding({mod_t::NONE, "G"}, "toggle render.grid.enable","Scene", std::bind(docTgl, "Toggle grid display", std::cref(opts.render.grid.enable)));
+  this->addBinding({mod_t::SHIFT, "X"}, "toggle render.axes_grid.enable", "Scene", std::bind(docTgl, "Toggle axes grid display", std::cref(opts.render.axes_grid.enable)));
 #if F3D_MODULE_UI
   this->addBinding({mod_t::NONE, "N"}, "toggle ui.filename","Scene", std::bind(docTgl, "Filename", std::cref(opts.ui.filename)));
   this->addBinding({mod_t::NONE, "M"}, "toggle ui.metadata","Scene", std::bind(docTgl, "Metadata", std::cref(opts.ui.metadata)));
@@ -1246,10 +1246,10 @@ interactor& interactor_impl::initBindings()
 //----------------------------------------------------------------------------
 interactor& interactor_impl::addBinding(const interaction_bind_t& bind,
   std::vector<std::string> commands, std::string group,
-  documentation_callback_t documentationCallback)
+  documentation_callback_t documentationCallback, BindingType type)
 {
   const auto [it, success] = this->Internals->Bindings.insert(
-    { bind, { std::move(commands), std::move(documentationCallback) } });
+    { bind, { std::move(commands), std::move(documentationCallback), type } });
   if (!success)
   {
     throw interactor::already_exists_exception(
@@ -1271,10 +1271,10 @@ interactor& interactor_impl::addBinding(const interaction_bind_t& bind,
 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::addBinding(const interaction_bind_t& bind, std::string command,
-  std::string group, documentation_callback_t documentationCallback)
+  std::string group, documentation_callback_t documentationCallback, BindingType type)
 {
   return this->addBinding(bind, std::vector<std::string>{ std::move(command) }, std::move(group),
-    std::move(documentationCallback));
+    std::move(documentationCallback), type);
 }
 
 //----------------------------------------------------------------------------
@@ -1283,26 +1283,23 @@ interactor& interactor_impl::removeBinding(const interaction_bind_t& bind)
   this->Internals->Bindings.erase(bind);
 
   // Look for the group of the removed bind
-  std::string group;
-  for (auto it = this->Internals->GroupedBinds.begin(); it != this->Internals->GroupedBinds.end();
-       it++)
+  auto it = std::find_if(this->Internals->GroupedBinds.begin(), this->Internals->GroupedBinds.end(),
+    [&](const auto& pair) { return pair.second == bind; });
+
+  if (it != this->Internals->GroupedBinds.end())
   {
-    if (it->second == bind)
+    // Binds are unique
+    // Erase the bind entry in the group
+    std::string group = it->first;
+    this->Internals->GroupedBinds.erase(it);
+    if (this->Internals->GroupedBinds.count(group) == 0)
     {
-      // Binds are unique
-      // Erase the bind entry in the group
-      group = it->first;
-      this->Internals->GroupedBinds.erase(it);
-      if (this->Internals->GroupedBinds.count(group) == 0)
-      {
-        // If it was the last one, remove it from the ordered group
-        // We know the group is present and unique in the vector, so only erase once
-        auto vecIt = std::find(this->Internals->OrderedBindGroups.begin(),
-          this->Internals->OrderedBindGroups.end(), group);
-        assert(vecIt != this->Internals->OrderedBindGroups.end());
-        this->Internals->OrderedBindGroups.erase(vecIt);
-      }
-      break;
+      // If it was the last one, remove it from the ordered group
+      // We know the group is present and unique in the vector, so only erase once
+      auto vecIt = std::find(this->Internals->OrderedBindGroups.begin(),
+        this->Internals->OrderedBindGroups.end(), group);
+      assert(vecIt != this->Internals->OrderedBindGroups.end());
+      this->Internals->OrderedBindGroups.erase(vecIt);
     }
   }
   return *this;
@@ -1342,7 +1339,7 @@ std::vector<interaction_bind_t> interactor_impl::getBinds() const
 }
 
 //----------------------------------------------------------------------------
-std::tuple<std::string, std::string, std::string> interactor_impl::getBindingDocumentation(
+std::tuple<std::string, std::string> interactor_impl::getBindingDocumentation(
   const interaction_bind_t& bind) const
 {
   const auto& it = this->Internals->Bindings.find(bind);
@@ -1353,13 +1350,109 @@ std::tuple<std::string, std::string, std::string> interactor_impl::getBindingDoc
   }
 
   const auto& docFunc = it->second.DocumentationCallback;
-  if (!docFunc)
+  return docFunc ? docFunc() : std::make_tuple(std::string(), std::string());
+}
+
+//----------------------------------------------------------------------------
+f3d::interactor::BindingType interactor_impl::getBindingType(const interaction_bind_t& bind) const
+{
+  const auto& it = this->Internals->Bindings.find(bind);
+  if (it == this->Internals->Bindings.end())
   {
-    return std::make_tuple(std::string(), std::string(), std::string());
+    throw interactor_impl::does_not_exists_exception(
+      std::string("Bind: ") + bind.format() + " does not exists");
+  }
+  return it->second.Type;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::triggerModUpdate(InputModifier mod)
+{
+  this->Internals->VTKInteractor->SetControlKey(
+    mod == InputModifier::CTRL || mod == InputModifier::CTRL_SHIFT);
+  this->Internals->VTKInteractor->SetShiftKey(
+    mod == InputModifier::SHIFT || mod == InputModifier::CTRL_SHIFT);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::triggerMouseButton(InputAction action, MouseButton button)
+{
+  unsigned long event = vtkCommand::AnyEvent;
+
+  switch (button)
+  {
+    case MouseButton::LEFT:
+      event = action == InputAction::PRESS ? vtkCommand::LeftButtonPressEvent
+                                           : vtkCommand::LeftButtonReleaseEvent;
+      break;
+    case MouseButton::RIGHT:
+      event = action == InputAction::PRESS ? vtkCommand::RightButtonPressEvent
+                                           : vtkCommand::RightButtonReleaseEvent;
+      break;
+    case MouseButton::MIDDLE:
+      event = action == InputAction::PRESS ? vtkCommand::MiddleButtonPressEvent
+                                           : vtkCommand::MiddleButtonReleaseEvent;
+      break;
   }
 
-  auto [doc, value, type] = docFunc();
-  return std::make_tuple(doc, value, bindingsTypeName(type));
+  this->Internals->VTKInteractor->InvokeEvent(event, nullptr);
+
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::triggerMousePosition(double xpos, double ypos)
+{
+  this->Internals->VTKInteractor->SetEventInformationFlipY(xpos, ypos);
+  this->Internals->VTKInteractor->InvokeEvent(vtkCommand::MouseMoveEvent, nullptr);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::triggerMouseWheel(WheelDirection direction)
+{
+  switch (direction)
+  {
+    case WheelDirection::LEFT:
+      this->Internals->VTKInteractor->InvokeEvent(vtkCommand::MouseWheelLeftEvent, nullptr);
+      break;
+    case WheelDirection::RIGHT:
+      this->Internals->VTKInteractor->InvokeEvent(vtkCommand::MouseWheelRightEvent, nullptr);
+      break;
+    case WheelDirection::FORWARD:
+      this->Internals->VTKInteractor->InvokeEvent(vtkCommand::MouseWheelForwardEvent, nullptr);
+      break;
+    case WheelDirection::BACKWARD:
+      this->Internals->VTKInteractor->InvokeEvent(vtkCommand::MouseWheelBackwardEvent, nullptr);
+      break;
+  }
+
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::triggerKeyboardKey(InputAction action, std::string_view keySym)
+{
+  if (!keySym.empty())
+  {
+    this->Internals->VTKInteractor->SetKeySym(keySym.data());
+
+    this->Internals->VTKInteractor->InvokeEvent(
+      action == InputAction::PRESS ? vtkCommand::KeyPressEvent : vtkCommand::KeyReleaseEvent,
+      nullptr);
+  }
+
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::triggerTextCharacter(unsigned int codepoint)
+{
+  this->Internals->VTKInteractor->SetKeyCode(codepoint);
+  this->Internals->VTKInteractor->InvokeEvent(vtkCommand::CharEvent, nullptr);
+
+  return *this;
 }
 
 //----------------------------------------------------------------------------
