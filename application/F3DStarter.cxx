@@ -1960,27 +1960,6 @@ void F3DStarter::AddCommands()
         candidates[0] += fs::path::preferred_separator;
       }
 
-      // On system using backward slash as separator, escape them
-      if (fs::path::preferred_separator == '\\')
-      {
-        std::vector<std::string> originalCandidates = candidates;
-        candidates.clear();
-
-        // TODO: Is there a better way to do this ?
-        std::transform(originalCandidates.begin(), originalCandidates.end(), std::back_inserter(candidates),
-          [&](std::string candidate)
-          {
-            for(size_t i = 0; i < candidate.size(); i++)
-            {
-              if (candidate[i] == '\\')
-              {
-                candidate.insert(i, 1, '\\');
-              }
-              i++;
-            }
-            return candidate;
-          });
-      }
     }
     catch (const fs::filesystem_error& ex)
     {
@@ -1990,12 +1969,36 @@ void F3DStarter::AddCommands()
     // Multi args, reconstruct the full candidates
     if (args.size() > 1)
     {
+      std::vector<std::string> originalCandidates = candidates;
+      candidates.clear();
+
       std::vector<std::string> multiArgsCandidate;
       const std::string accum = std::accumulate(args.begin() + 1, args.end() - 1, args[0],
         [](const std::string& a, const std::string& b) { return a + " " + b; });
-      std::transform(candidates.begin(), candidates.end(), std::back_inserter(multiArgsCandidate),
+      std::transform(originalCandidates.begin(), originalCandidates.end(), std::back_inserter(candidates),
         [&](const auto& candidate) { return accum + " " + candidate; });
-      return multiArgsCandidate;
+    }
+
+    // On system using backward slash as separator, escape them
+    if (fs::path::preferred_separator == '\\')
+    {
+      std::vector<std::string> originalCandidates = candidates;
+      candidates.clear();
+
+      // TODO: Is there a better way to do this ?
+      std::transform(originalCandidates.begin(), originalCandidates.end(), std::back_inserter(candidates),
+        [&](std::string candidate)
+        {
+          for(size_t i = 0; i < candidate.size(); i++)
+          {
+            if (candidate[i] == '\\')
+            {
+              candidate.insert(i, 1, '\\');
+            }
+            i++;
+          }
+          return candidate;
+        });
     }
 
     return candidates;
