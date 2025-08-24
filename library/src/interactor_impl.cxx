@@ -829,7 +829,6 @@ interactor& interactor_impl::initCommands()
     "print option.name: print the value of an libf3d option",
     std::bind(complNames, std::placeholders::_1, this->Internals->Options.getNames()));
 
-  // TODO ADD DOC!!!
   this->addCommand(
     "set_reader_option",
     [&](const std::vector<std::string>& args)
@@ -969,7 +968,6 @@ interactor& interactor_impl::initCommands()
     { this->Internals->Scene.PrintImporterDescription(log::VerboseLevel::INFO); },
     "print information from the mesh importer");
 
-  // TODO update doc
   this->addCommand(
     "print_options_info",
     [&](const std::vector<std::string>&)
@@ -1058,7 +1056,6 @@ interactor& interactor_impl::initCommands()
     },
     "add files to the scene");
 
-  // TODO update doc
   this->addCommand(
     "alias",
     [&](const std::vector<std::string>& args)
@@ -1081,7 +1078,6 @@ interactor& interactor_impl::initCommands()
     },
     "create an alias for a command");
 
-  // TODO update doc
   this->addCommand(
     "cycle_verbose_level",
     [&](const std::vector<std::string>&)

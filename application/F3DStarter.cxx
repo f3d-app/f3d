@@ -2143,7 +2143,6 @@ void F3DStarter::AddCommands()
     complFilesystem);
 
 #if F3D_MODULE_TINYFILEDIALOGS
-  // TODO ADD DOC!!!
   interactor.addCommand(
     "open_file_dialog",
     [this](const std::vector<std::string>&)
@@ -2184,7 +2183,7 @@ void F3DStarter::AddCommands()
         }
       }
     },
-    "open a native file dialog to load a file");
+    "open a file dialog to select a file to load");
 #endif
   interactor.addCommand(
     "exit", [&](const std::vector<std::string>&) { interactor.stop(); }, "quit the application");
