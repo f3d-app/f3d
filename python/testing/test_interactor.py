@@ -11,6 +11,10 @@ def doc_fn():
     return "dummyDoc", "dummyValue"
 
 
+def compl_fn():
+    return "compl"
+
+
 def test_command(capfd: pytest.CaptureFixture[str]):
     engine = f3d.Engine.create(True)
     inter = engine.interactor
@@ -30,6 +34,7 @@ def test_command(capfd: pytest.CaptureFixture[str]):
 
     # Smoke test
     inter.init_commands()
+    inter.add_command("my_cmd2", print_fn, "doc", compl_fn)
 
 
 def test_binding():
