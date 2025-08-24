@@ -391,14 +391,17 @@ void window_impl::UpdateDynamicOptions()
     renderer->ShowAxis(opt.ui.axis);
     renderer->SetUseTrackball(opt.interactor.trackball);
     renderer->SetInvertZoom(opt.interactor.invert_zoom);
-    using mod_t = f3d::interaction_bind_t::ModifierKeys;
-    std::vector<interaction_bind_t> custom_binds = {
-    {mod_t::NONE, "Drop"},
-    {mod_t::CTRL, "O"},
-    {mod_t::NONE, "H"},
-    {mod_t::NONE, "Escape"}
-    };
 
+    std::vector<interaction_bind_t> custom_binds;
+    std::string bindsStr = opt.ui.drop_zone.custom_binds;
+    std::istringstream ss(bindsStr);
+    std::string token;
+
+    while (std::getline(ss, token, ',')) {
+        if (!token.empty()) {
+            custom_binds.push_back(interaction_bind_t::parse(token));
+        }
+    }
     renderer->SetDropZoneInfo(this->Internals->Interactor->getDropZoneInfo(custom_binds));
   }
 

@@ -535,15 +535,8 @@ void vtkF3DImguiActor::RenderDropZone()
 
     // Style parameters
     ImVec4 descTextColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
-    // ImVec4 bindingTextColor = ImVec4(0.0f, 0.0f, 0.0f, 1.0f); // black text
-    // ImVec4 bindingRectColor = ImVec4(0.85f, 0.85f, 0.85f, 1.0f); // light gray
-    // ImVec4 bindingRectColor = F3DImguiStyle::GetHighlightColor(); // F3D blue
-    // ImVec4 bindingTextColor = F3DImguiStyle::GetBackgroundColor(); // text color on blue
-    // ImVec4 bindingRectColor = ImVec4(0.0f, 0.0f, 0.0f, 1.0f); // Black background
-    // ImVec4 bindingRectColor = ImVec4(20.0f/255.0f, 20.0f/255.0f, 20.0f/255.0f, 1.0f); // #141414
-    // ImVec4 bindingTextColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); // White text
-    ImVec4 bindingRectColor = ImVec4(192.0f/255.0f, 192.0f/255.0f, 192.0f/255.0f, 1.0f); // light gray
-    ImVec4 bindingTextColor = ImVec4(0.0f, 0.0f, 0.0f, 1.0f); // black text
+    ImVec4 bindingRectColor = F3DImguiStyle::GetMidColor();
+    ImVec4 bindingTextColor = F3DImguiStyle::GetTextColor();
 
     ImGui::Begin("DropZoneText", nullptr, flags);
 
@@ -620,16 +613,7 @@ void vtkF3DImguiActor::RenderDropZone()
             ImVec2 rectMin = ImVec2(textPos.x - padding.x, textPos.y - padding.y);
             ImVec2 rectMax = ImVec2(textPos.x + textSize.x + padding.x, textPos.y + textSize.y + padding.y);
 
-            // ImVec2 rectMin = textPos - padding;
-            // ImVec2 rectMax = textPos + textSize + padding;
             float cornerRounding = 4.0f;
-            float shadowOffset = 5.0f;
-
-            // Draw the darker, recessed part of the button
-            ImVec4 bindingRectColorDark = ImVec4(100.0f/255.0f, 100.0f/255.0f, 100.0f/255.0f, 1.0f);
-            drawList->AddRectFilled(ImVec2(rectMin.x, rectMin.y + shadowOffset), ImVec2(rectMax.x, rectMax.y + shadowOffset), ImColor(bindingRectColorDark), cornerRounding);
-
-            // drawList->AddRectFilled(rectMin + ImVec2(0, shadowOffset), rectMax + ImVec2(0, shadowOffset), ImColor(bindingRectColorDark), cornerRounding);
 
             // Draw the lighter, raised part of the button
             drawList->AddRectFilled(rectMin, rectMax, ImColor(bindingRectColor), cornerRounding);
