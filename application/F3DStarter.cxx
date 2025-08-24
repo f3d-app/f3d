@@ -1957,7 +1957,8 @@ void F3DStarter::AddCommands()
       if (candidates.size() == 1 && fs::is_directory(candidates[0]))
       {
         // Single directory candidate, add a separator
-        candidates[0] += fs::path::preferred_separator;
+        const std::string sep = fs::path::preferred_separator == '\\' ? R"(\\)" : std::string(1, fs::path::preferred_separator);
+        candidates[0] += sep;
       }
     }
     catch (const fs::filesystem_error& ex)
