@@ -1961,7 +1961,7 @@ void F3DStarter::AddCommands()
           // Add candidates that starts with filePattern
           if (path.filename().string().rfind(filePattern, 0) == 0)
           {
-            candidates.emplace_back(completionParentPath / path.filename().string());
+            candidates.emplace_back((completionParentPath / path.filename()).string());
           }
         }
       }
