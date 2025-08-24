@@ -26,6 +26,7 @@ Program Listing for File interactor.h
    
    namespace f3d
    {
+   
    struct interaction_bind_t
    {
      enum class ModifierKeys : unsigned char
@@ -66,19 +67,30 @@ Program Listing for File interactor.h
    
      using documentation_callback_t = std::function<std::pair<std::string, std::string>()>;
    
+     enum class BindingType : std::uint8_t
+     {
+       CYCLIC = 0,
+       NUMERICAL = 1,
+       TOGGLE = 2,
+       OTHER = 3,
+     };
+   
      virtual interactor& initBindings() = 0;
    
      virtual interactor& addBinding(const interaction_bind_t& bind, std::vector<std::string> commands,
-       std::string group = {}, documentation_callback_t documentationCallback = nullptr) = 0;
+       std::string group = {}, documentation_callback_t documentationCallback = nullptr,
+       BindingType type = BindingType::OTHER) = 0;
    
      virtual interactor& addBinding(const interaction_bind_t& bind, std::string command,
-       std::string group = {}, documentation_callback_t documentationCallback = nullptr) = 0;
+       std::string group = {}, documentation_callback_t documentationCallback = nullptr,
+       BindingType type = BindingType::OTHER) = 0;
    
      interactor& addBinding(const interaction_bind_t& bind, std::initializer_list<std::string> list,
-       std::string group = {}, documentation_callback_t documentationCallback = nullptr)
+       std::string group = {}, documentation_callback_t documentationCallback = nullptr,
+       BindingType type = BindingType::OTHER)
      {
-       return this->addBinding(
-         bind, std::vector<std::string>(list), std::move(group), std::move(documentationCallback));
+       return this->addBinding(bind, std::vector<std::string>(list), std::move(group),
+         std::move(documentationCallback), type);
      }
    
      virtual interactor& removeBinding(const interaction_bind_t& bind) = 0;
@@ -92,6 +104,8 @@ Program Listing for File interactor.h
    
      [[nodiscard]] virtual std::pair<std::string, std::string> getBindingDocumentation(
        const interaction_bind_t& bind) const = 0;
+   
+     [[nodiscard]] virtual BindingType getBindingType(const interaction_bind_t& bind) const = 0;
    
    
      virtual interactor& toggleAnimation() = 0;
