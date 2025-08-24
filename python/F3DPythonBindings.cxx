@@ -277,7 +277,8 @@ PYBIND11_MODULE(pyf3d, module)
       "request_render", &f3d::interactor::requestRender, "Request a render on the next event loop")
     .def("init_commands", &f3d::interactor::initCommands,
       "Remove all commands and add all default command callbacks")
-    .def("add_command", &f3d::interactor::addCommand, "Add a command", py::arg("action"), py::arg("callback"), py::arg("doc") = "", py::arg("completionCallback") = nullptr)
+    .def("add_command", &f3d::interactor::addCommand, "Add a command", py::arg("action"),
+      py::arg("callback"), py::arg("doc") = "", py::arg("completionCallback") = nullptr)
     .def("remove_command", &f3d::interactor::removeCommand, "Remove a command")
     .def("get_command_actions", &f3d::interactor::getCommandActions, "Get all command actions")
     .def("trigger_command", &f3d::interactor::triggerCommand, "Trigger a command")

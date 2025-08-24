@@ -1940,9 +1940,8 @@ void F3DStarter::AddCommands()
 
         // Copy the directory content as paths
         fs::directory_iterator iter(parentPath);
-        std::transform(fs::begin(iter), fs::end(iter),
-          std::back_inserter(dirContent),
-          [&](const auto& entry) { return entry.path();});
+        std::transform(fs::begin(iter), fs::end(iter), std::back_inserter(dirContent),
+          [&](const auto& entry) { return entry.path(); });
 
         for (const auto& path : dirContent)
         {
