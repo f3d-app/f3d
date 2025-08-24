@@ -54,13 +54,18 @@ int TestSDKInteractorDocumentation(int argc, char* argv[])
     test.expect<f3d::interactor::does_not_exists_exception>(
       "Empty group", [&]() { std::ignore = inter.getBindsForGroup("Camera"); });
 
+    test.expect<f3d::interactor::does_not_exists_exception>("Empty documentation",
+      [&]() { std::ignore = inter.getBindingDocumentation({ mod_t::ANY, "5" }); });
+
     test.expect<f3d::interactor::does_not_exists_exception>(
-      "Empty bind", [&]() { std::ignore = inter.getBindingDocumentation({ mod_t::ANY, "5" }); });
+      "Empty type", [&]() { std::ignore = inter.getBindingType({ mod_t::ANY, "5" }); });
   }
 
   // Add a dummy binding
-  inter.addBinding({ mod_t::ANY, "DummyBind" }, "DummyCommand", "DummyGroup",
-    []() -> std::pair<std::string, std::string> { return std::pair("DummyDoc", "DummyVal"); });
+  inter.addBinding(
+    { mod_t::ANY, "DummyBind" }, "DummyCommand", "DummyGroup",
+    []() -> std::pair<std::string, std::string> { return std::pair("DummyDoc", "DummyVal"); },
+    f3d::interactor::BindingType::CYCLIC);
 
   {
     // Test dummy binding
@@ -69,6 +74,8 @@ int TestSDKInteractorDocumentation(int argc, char* argv[])
     test("Dummy nBinds DummyGroup", inter.getBindsForGroup("DummyGroup").size() == 1);
     const auto& [doc, val] = inter.getBindingDocumentation({ mod_t::ANY, "DummyBind" });
     test("Dummy doc and val", doc == "DummyDoc" && val == "DummyVal");
+    test("Dummy binding type",
+      inter.getBindingType({ mod_t::ANY, "DummyBind" }) == f3d::interactor::BindingType::CYCLIC);
   }
 
   // Initialize two times
