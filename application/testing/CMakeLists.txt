@@ -1052,8 +1052,12 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240729)
   f3d_test(NAME TestInteractionConsoleAutoCompleteCamera DATA BoxAnimated.gltf INTERACTION UI) #Escape;se;Tab;_c;Tab;i;Tab;Enter
   f3d_test(NAME TestInteractionConsoleAutoCompleteHelp DATA BoxAnimated.gltf INTERACTION UI) #Escape;h;Tab;h;Tab;Enter
   f3d_test(NAME TestInteractionConsoleAutoCompleteTokenizeError DATA BoxAnimated.gltf INTERACTION UI NO_BASELINE REGEXP "unable to tokenize") #Escape;";Tab;
+
+  # Windows and Linux path are different, test both at the same time, first part is Windows path, second part is unix path
+  # The differences lies in the current directory used to run tests, not the separators.
   file(COPY "${F3D_SOURCE_DIR}/testing/data/cow.vtp" DESTINATION "${CMAKE_BINARY_DIR}/testing/data/")
-  f3d_test(NAME TestInteractionConsoleAutoCompleteFilesystem INTERACTION UI) #Escape;ad;Tab;_f;Tab; ;Tab;..;Tab;..;Tab;t;Tab;Tab;d;Tab;cow.vtp;Tab;Enter
+  f3d_test(NAME TestInteractionConsoleAutoCompleteFilesystem ARGS --multi-file-mode=all INTERACTION UI) #Escape;ad;Tab;_f;Tab; ;Tab;..;Tab;T;Tab;i;Tab;d;Tab;Tab; ;..;Tab;t;Tab;Tab;d;Tab;cow.vtp;Tab;Enter;Esc
+
   f3d_test(NAME TestInteractionConsoleHistory DATA BoxAnimated.gltf INTERACTION UI) #Escape;ro;Tab;45;Enter;set_c;Tab;top;Enter;Up;Up;Enter;Up;Up;Up;Up;Down;Down;Down;Down
   f3d_test(NAME TestInteractionConsoleHistoryEmpty DATA BoxAnimated.gltf INTERACTION UI)#Escape;Up;Down
   f3d_test(NAME TestInteractionConsoleHistoryHide DATA BoxAnimated.gltf INTERACTION UI)#Escape;a;Enter;b;Enter;Up;Escape;Escape;Escape;Up
