@@ -42,6 +42,18 @@ KeyPressEvent 199 142 0 9 1 Tab 0
 CharEvent 199 142 0 9 1 Tab 0
 KeyReleaseEvent 199 142 0 9 1 Tab 0
 
+KeyPressEvent 199 142 0 46 1 period 0
+CharEvent 199 142 0 46 1 period 0
+KeyReleaseEvent 199 142 0 46 1 period 0
+
+KeyPressEvent 199 142 0 46 1 period 0
+CharEvent 199 142 0 46 1 period 0
+KeyReleaseEvent 199 142 0 46 1 period 0
+
+KeyPressEvent 199 142 0 9 1 Tab 0
+CharEvent 199 142 0 9 1 Tab 0
+KeyReleaseEvent 199 142 0 9 1 Tab 0
+
 KeyPressEvent 199 142 0 84 1 T 0
 CharEvent 199 142 0 84 1 T 0
 KeyReleaseEvent 199 142 0 84 1 T 0
@@ -73,70 +85,6 @@ KeyReleaseEvent 199 142 0 9 1 Tab 0
 KeyPressEvent 199 142 0 32 1 space 0
 CharEvent 199 142 0 32 1 space 0
 KeyReleaseEvent 199 142 0 32 1 space 0
-
-KeyPressEvent 199 142 0 46 1 period 0
-CharEvent 199 142 0 46 1 period 0
-KeyReleaseEvent 199 142 0 46 1 period 0
-
-KeyPressEvent 199 142 0 46 1 period 0
-CharEvent 199 142 0 46 1 period 0
-KeyReleaseEvent 199 142 0 46 1 period 0
-
-KeyPressEvent 199 142 0 9 1 Tab 0
-CharEvent 199 142 0 9 1 Tab 0
-KeyReleaseEvent 199 142 0 9 1 Tab 0
-
-KeyPressEvent 199 142 0 46 1 period 0
-CharEvent 199 142 0 46 1 period 0
-KeyReleaseEvent 199 142 0 46 1 period 0
-
-KeyPressEvent 199 142 0 46 1 period 0
-CharEvent 199 142 0 46 1 period 0
-KeyReleaseEvent 199 142 0 46 1 period 0
-
-KeyPressEvent 199 142 0 9 1 Tab 0
-CharEvent 199 142 0 9 1 Tab 0
-KeyReleaseEvent 199 142 0 9 1 Tab 0
-
-KeyPressEvent 199 142 0 116 1 t 0
-CharEvent 199 142 0 116 1 t 0
-KeyReleaseEvent 199 142 0 116 1 t 0
-
-KeyPressEvent 199 142 0 9 1 Tab 0
-CharEvent 199 142 0 9 1 Tab 0
-KeyReleaseEvent 199 142 0 9 1 Tab 0
-
-KeyPressEvent 199 142 0 100 1 d 0
-CharEvent 199 142 0 100 1 d 0
-KeyReleaseEvent 199 142 0 100 1 d 0
-
-KeyPressEvent 199 142 0 9 1 Tab 0
-CharEvent 199 142 0 9 1 Tab 0
-KeyReleaseEvent 199 142 0 9 1 Tab 0
-
-KeyPressEvent 199 142 0 99 1 c 0
-CharEvent 199 142 0 99 1 c 0
-KeyReleaseEvent 199 142 0 99 1 c 0
-
-KeyPressEvent 199 142 0 111 1 o 0
-CharEvent 199 142 0 111 1 o 0
-KeyReleaseEvent 199 142 0 111 1 o 0
-
-KeyPressEvent 199 142 0 119 1 w 0
-CharEvent 199 142 0 119 1 w 0
-KeyReleaseEvent 199 142 0 119 1 w 0
-
-KeyPressEvent 199 142 0 46 1 period 0
-CharEvent 199 142 0 46 1 period 0
-KeyReleaseEvent 199 142 0 46 1 period 0
-
-KeyPressEvent 199 142 0 118 1 v 0
-CharEvent 199 142 0 118 1 v 0
-KeyReleaseEvent 199 142 0 118 1 v 0
-
-KeyPressEvent 199 142 0 116 1 t 0
-CharEvent 199 142 0 116 1 t 0
-KeyReleaseEvent 199 142 0 116 1 t 0
 
 KeyPressEvent 199 142 0 112 1 p 0
 CharEvent 199 142 0 112 1 p 0
