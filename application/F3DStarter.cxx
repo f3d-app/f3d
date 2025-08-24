@@ -1906,18 +1906,26 @@ void F3DStarter::AddCommands()
     try
     {
       // With no args we search current directory without pattern
-      fs::path parentDirectory = ".";
+      fs::path parentDirectory = std::filesystem::current_path();
       std::string filePattern = "";
 
       // With an arg, get the last one, recover its parent directory
       // and use its filename as pattern
       fs::path completionPath;
+      fs::path completionParentPath;
       if (!args.empty())
       {
         completionPath = args.back();
+        completionParentPath = completionPath.parent_path();
         filePattern = completionPath.filename().string();
-        // TODO does not work when completionPath contains just a relative filename
-        parentDirectory = completionPath.parent_path();
+        if (completionPath.is_relative())
+        {
+          parentDirectory /= completionParentPath;
+        }
+        else
+        {
+          parentDirectory = completionParentPath;
+        }
       }
 
       // If the path to complete exists and is a directory with a separator at the end, explore its
@@ -1926,24 +1934,34 @@ void F3DStarter::AddCommands()
         filePattern.back() == fs::path::preferred_separator)
       {
         parentDirectory = completionPath;
+        completionParentPath = completionPath;
         filePattern = "";
       }
 
       if (fs::exists(parentDirectory))
       {
+        std::vector<fs::path> dirContent;
+
         // TODO better way to do this ?
-        std::vector<fs::path> dirContent{ parentDirectory / ".", parentDirectory / ".." };
+        if (!filePattern.empty() && filePattern[0] == '.')
+        {
+          dirContent.emplace_back(".");
+          dirContent.emplace_back("..");
+        }
+
+        // TODO std::transform
         for (auto& entry : fs::directory_iterator(parentDirectory))
         {
           dirContent.emplace_back(entry.path());
         }
 
+        // TODO std::copy_if
         for (const auto& path : dirContent)
         {
           // Add candidates that starts with filePattern
           if (path.filename().string().rfind(filePattern, 0) == 0)
           {
-            candidates.emplace_back(path.string());
+            candidates.emplace_back(completionParentPath / path.filename().string());
           }
         }
       }
@@ -2074,7 +2092,6 @@ void F3DStarter::AddCommands()
       int index = -1;
       for (const std::string& file : files)
       {
-        std::cout<<file<<std::endl;
         index = this->AddFile(f3d::utils::collapsePath(file));
       }
       if (index > -1)
