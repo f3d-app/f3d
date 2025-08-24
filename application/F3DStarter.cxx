@@ -1994,8 +1994,8 @@ void F3DStarter::AddCommands()
             if (candidate[i] == '\\')
             {
               candidate.insert(i, 1, '\\');
+              i++;
             }
-            i++;
           }
           return candidate;
         });
