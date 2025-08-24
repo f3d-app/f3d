@@ -1905,62 +1905,51 @@ void F3DStarter::AddCommands()
 
     try
     {
-      // With no args we search current directory without pattern
-      fs::path parentDirectory = std::filesystem::current_path();
+      // Without args, explore the current directory with an empty pattern
       std::string filePattern = "";
-
-      // With an arg, get the last one, recover its parent directory
-      // and use its filename as pattern
+      fs::path parentPath = fs::current_path();
       fs::path completionPath;
       fs::path completionParentPath;
+
+      // With an arg, get the last one, recover its parent directory
+      // and use its filename as pattern.
+      // If the arg contains a completed path ending with a separator
+      // then the filePattern is empty
       if (!args.empty())
       {
         completionPath = args.back();
         completionParentPath = completionPath.parent_path();
         filePattern = completionPath.filename().string();
-        if (completionPath.is_relative())
+        if (!completionParentPath.empty())
         {
-          parentDirectory /= completionParentPath;
-        }
-        else
-        {
-          parentDirectory = completionParentPath;
+          // collapsePath is needed for HOME support
+          parentPath = f3d::utils::collapsePath(completionParentPath);
         }
       }
 
-      // If the path to complete exists and is a directory with a separator at the end, explore its
-      // content instead
-      if (fs::exists(completionPath) && fs::is_directory(completionPath) && !filePattern.empty() &&
-        filePattern.back() == fs::path::preferred_separator)
-      {
-        parentDirectory = completionPath;
-        completionParentPath = completionPath;
-        filePattern = "";
-      }
-
-      if (fs::exists(parentDirectory))
+      if (fs::exists(parentPath))
       {
         std::vector<fs::path> dirContent;
 
-        // TODO better way to do this ?
+        // Auto complete dot and dot-dot only if the pattern start with a dot
         if (!filePattern.empty() && filePattern[0] == '.')
         {
           dirContent.emplace_back(".");
           dirContent.emplace_back("..");
         }
 
-        // TODO std::transform
-        for (auto& entry : fs::directory_iterator(parentDirectory))
-        {
-          dirContent.emplace_back(entry.path());
-        }
+        // Copy the directory content as paths
+        fs::directory_iterator iter(parentPath);
+        std::transform(fs::begin(iter), fs::end(iter),
+          std::back_inserter(dirContent),
+          [&](const auto& entry) { return entry.path();});
 
-        // TODO std::copy_if
         for (const auto& path : dirContent)
         {
           // Add candidates that starts with filePattern
           if (path.filename().string().rfind(filePattern, 0) == 0)
           {
+            // Keep the completionParentPath to avoid path normalization
             candidates.emplace_back((completionParentPath / path.filename()).string());
           }
         }
