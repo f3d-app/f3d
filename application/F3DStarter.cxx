@@ -1959,7 +1959,6 @@ void F3DStarter::AddCommands()
         // Single directory candidate, add a separator
         candidates[0] += fs::path::preferred_separator;
       }
-
     }
     catch (const fs::filesystem_error& ex)
     {
@@ -1975,7 +1974,8 @@ void F3DStarter::AddCommands()
       std::vector<std::string> multiArgsCandidate;
       const std::string accum = std::accumulate(args.begin() + 1, args.end() - 1, args[0],
         [](const std::string& a, const std::string& b) { return a + " " + b; });
-      std::transform(originalCandidates.begin(), originalCandidates.end(), std::back_inserter(candidates),
+      std::transform(originalCandidates.begin(), originalCandidates.end(),
+        std::back_inserter(candidates),
         [&](const auto& candidate) { return accum + " " + candidate; });
     }
 
@@ -1986,10 +1986,11 @@ void F3DStarter::AddCommands()
       candidates.clear();
 
       // TODO: Is there a better way to do this ?
-      std::transform(originalCandidates.begin(), originalCandidates.end(), std::back_inserter(candidates),
+      std::transform(originalCandidates.begin(), originalCandidates.end(),
+        std::back_inserter(candidates),
         [&](std::string candidate)
         {
-          for(size_t i = 0; i < candidate.size(); i++)
+          for (size_t i = 0; i < candidate.size(); i++)
           {
             if (candidate[i] == '\\')
             {
