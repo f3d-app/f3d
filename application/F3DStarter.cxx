@@ -1957,8 +1957,29 @@ void F3DStarter::AddCommands()
       if (candidates.size() == 1 && fs::is_directory(candidates[0]))
       {
         // Single directory candidate, add a separator
-        const std::string sep = fs::path::preferred_separator == '\\' ? R"(\\)" : std::string(1, fs::path::preferred_separator);
-        candidates[0] += sep;
+        candidates[0] += fs::path::preferred_separator;
+      }
+
+      // On system using backward slash as separator, escape them
+      if (fs::path::preferred_separator == '\\')
+      {
+        std::vector<std::string> originalCandidates = candidates;
+        candidates.clear();
+
+        // TODO: Is there a better way to do this ?
+        std::transform(originalCandidates.begin(), originalCandidates.end(), std::back_inserter(candidates),
+          [&](std::string candidate)
+          {
+            for(size_t i = 0; i < candidate.size(); i++)
+            {
+              if (candidate[i] == '\\')
+              {
+                candidate.insert(i, 1, '\\');
+              }
+              i++;
+            }
+            return candidate;
+          });
       }
     }
     catch (const fs::filesystem_error& ex)
