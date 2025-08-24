@@ -1155,6 +1155,7 @@ f3d_test(NAME TestCommandScriptRemoveCurrentFileGroup DATA cow.vtp dragon.vtu SC
 f3d_test(NAME TestCommandScriptRemoveFileGroups DATA dragon.vtu SCRIPT TestCommandScriptRemoveFileGroups.txt NO_DATA_FORCE_RENDER UI) # remove_file_groups
 f3d_test(NAME TestCommandScriptInvalidReaderOptions DATA dragon.vtu SCRIPT TestCommandScriptInvalidReaderOptions.txt REGEXP "point to an inexistent option, ignoring" NO_BASELINE) # set_reader_option invalid value
 f3d_test(NAME TestCommandScriptHelp DATA dragon.vtu SCRIPT TestCommandScriptHelp.txt REGEX "set a libf3d option" NO_BASELINE) # help set
+f3d_test(NAME TestCommandScriptHelpInvalid DATA dragon.vtu SCRIPT TestCommandScriptHelpInvalid.txt REGEX "is not a recognized command" NO_BASELINE) # help invalid
 
 # Window position test
 f3d_test(NAME TestPosition DATA dragon.vtu ARGS --position=100,100 NO_BASELINE)
