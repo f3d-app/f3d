@@ -1980,7 +1980,7 @@ void F3DStarter::AddCommands()
     }
 
     // On system using backward slash as separator, escape them
-    if (fs::path::preferred_separator == '\\')
+    if constexpr(fs::path::preferred_separator == '\\')
     {
       std::vector<std::string> originalCandidates = candidates;
       candidates.clear();
