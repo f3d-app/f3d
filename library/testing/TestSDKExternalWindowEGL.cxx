@@ -4,7 +4,7 @@
 
 #include <EGL/egl.h>
 
-int TestSDKExternalWindowEGL(int argc, char* argv[])
+int TestSDKExternalWindowEGL([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   EGLDisplay eglDpy = eglGetDisplay(EGL_DEFAULT_DISPLAY);
 

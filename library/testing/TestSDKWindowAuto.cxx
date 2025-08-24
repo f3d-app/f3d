@@ -5,7 +5,7 @@
 
 #include "TestSDKHelpers.h"
 
-int TestSDKWindowAuto(int argc, char* argv[])
+int TestSDKWindowAuto([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
   f3d::engine eng = f3d::engine::create(true);

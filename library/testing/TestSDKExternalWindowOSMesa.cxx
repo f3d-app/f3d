@@ -4,7 +4,7 @@
 
 #include <GL/osmesa.h>
 
-int TestSDKExternalWindowOSMesa(int argc, char* argv[])
+int TestSDKExternalWindowOSMesa([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   int size[] = { 300, 300 };
 

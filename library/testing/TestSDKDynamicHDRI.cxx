@@ -9,7 +9,7 @@
 
 #include <random>
 
-int TestSDKDynamicHDRI(int argc, char* argv[])
+int TestSDKDynamicHDRI([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::INFO);
 

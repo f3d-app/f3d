@@ -48,7 +48,7 @@
 
 @end
 
-int TestSDKExternalWindowCOCOA(int argc, char* argv[])
+int TestSDKExternalWindowCOCOA([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   @autoreleasepool {
     NSApplication *app = [NSApplication sharedApplication];

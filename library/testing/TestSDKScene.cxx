@@ -8,7 +8,7 @@
 
 namespace fs = std::filesystem;
 
-int TestSDKScene(int argc, char* argv[])
+int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   PseudoUnitTest test;
 
@@ -92,7 +92,7 @@ int TestSDKScene(int argc, char* argv[])
     return light == redLight;
   });
   test.expect<f3d::scene::light_exception>(
-    "get light at invalid index", [&]() { f3d::light_state_t light = sce.getLight(10); });
+    "get light at invalid index", [&]() { std::ignore = sce.getLight(10); });
   test.expect<f3d::scene::light_exception>(
     "update light at invalid index", [&]() { sce.updateLight(10, redLight); });
   sce.updateLight(0, redLight);

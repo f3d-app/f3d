@@ -15,7 +15,7 @@
 using glXCreateContextAttribsARBProc = GLXContext (*)(
   Display*, GLXFBConfig, GLXContext, Bool, const int*);
 
-int TestSDKExternalWindowGLX(int argc, char* argv[])
+int TestSDKExternalWindowGLX([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   Display* display = XOpenDisplay(nullptr);
 

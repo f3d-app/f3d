@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-int TestSDKEngine(int argc, char* argv[])
+int TestSDKEngine([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
 
@@ -25,17 +25,17 @@ int TestSDKEngine(int argc, char* argv[])
 
   // Test different flags combinations that makes sense
   f3d::engine eng0 = f3d::engine::createNone();
-  const f3d::scene& sce = eng0.getScene();
+  std::ignore = eng0.getScene();
 
   f3d::engine eng1 = f3d::engine::create();
-  const f3d::scene& sce1 = eng1.getScene();
-  const f3d::window& window1 = eng1.getWindow();
-  const f3d::interactor& inter1 = eng1.getInteractor();
+  std::ignore = eng1.getScene();
+  std::ignore = eng1.getWindow();
+  std::ignore = eng1.getInteractor();
 
   f3d::engine eng2 = f3d::engine::create(true);
-  const f3d::scene& sce2 = eng2.getScene();
-  const f3d::window& window2 = eng2.getWindow();
-  const f3d::interactor& inter2 = eng2.getInteractor();
+  std::ignore = eng2.getScene();
+  std::ignore = eng2.getWindow();
+  std::ignore = eng2.getInteractor();
 
   // Test option setters
   f3d::options opt;

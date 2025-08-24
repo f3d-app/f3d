@@ -10,7 +10,7 @@
 namespace TestSDKHelpers
 {
 
-static bool RenderTest(const f3d::image& img, const std::string& baselinePath,
+inline bool RenderTest(const f3d::image& img, const std::string& baselinePath,
   const std::string& outputPath, const std::string& name, double threshold = 0.05)
 {
   if (baselinePath.empty() || outputPath.empty() || name.empty())
@@ -55,7 +55,7 @@ static bool RenderTest(const f3d::image& img, const std::string& baselinePath,
   return true;
 }
 
-static bool RenderTest(f3d::window& win, const std::string& baselinePath,
+inline bool RenderTest(f3d::window& win, const std::string& baselinePath,
   const std::string& outputPath, const std::string& name, double threshold = 0.05,
   bool noBackground = false)
 {

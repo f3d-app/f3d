@@ -10,13 +10,13 @@ constexpr int nBindsCamera = 9;
 constexpr std::string_view initDoc = "Toggle Orthographic Projection";
 constexpr std::string_view initVal = "Unset";
 
-int TestSDKInteractorDocumentation(int argc, char* argv[])
+int TestSDKInteractorDocumentation([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   f3d::engine eng = f3d::engine::create(true);
   f3d::interactor& inter = eng.getInteractor();
 
   // Avoid testing something that changes often
-  int nBinds = inter.getBinds().size();
+  size_t nBinds = inter.getBinds().size();
 
   PseudoUnitTest test;
 
