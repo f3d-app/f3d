@@ -1124,12 +1124,12 @@ interactor& interactor_impl::initCommands()
 }
 
 //----------------------------------------------------------------------------
-interactor& interactor_impl::addCommand(std::string action,
+interactor& interactor_impl::addCommand(const std::string& action,
   std::function<void(const std::vector<std::string>&)> callback, const std::string& doc,
   std::function<std::vector<std::string>(const std::vector<std::string>&)> completionCallback)
 {
   const auto [it, success] = this->Internals->Commands.insert(
-    { std::move(action), { std::move(callback), doc, std::move(completionCallback) } });
+    { action, { std::move(callback), doc, std::move(completionCallback) } });
   if (!success)
   {
     throw interactor::already_exists_exception(

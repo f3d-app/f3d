@@ -1943,7 +1943,7 @@ void F3DStarter::AddCommands()
           // Add candidates that starts with filePattern
           if (path.filename().string().rfind(filePattern, 0) == 0)
           {
-            candidates.emplace_back(path);
+            candidates.emplace_back(path.string());
           }
         }
       }
@@ -2074,6 +2074,7 @@ void F3DStarter::AddCommands()
       int index = -1;
       for (const std::string& file : files)
       {
+        std::cout<<file<<std::endl;
         index = this->AddFile(f3d::utils::collapsePath(file));
       }
       if (index > -1)
