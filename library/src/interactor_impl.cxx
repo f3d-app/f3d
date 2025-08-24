@@ -69,7 +69,7 @@ public:
   struct CommandCallbacks
   {
     std::function<void(const std::vector<std::string>&)> Callback;
-    std::string DocumentationCallback;
+    std::string Documentation;
     std::function<std::vector<std::string>(const std::vector<std::string>&)> CompletionCallback;
   };
 
@@ -752,14 +752,19 @@ interactor& interactor_impl::initCommands()
   // Completion method for a vector of names
   auto complNames = [](const std::vector<std::string>& args, const std::vector<std::string>& names)
   {
+    std::vector<std::string> candidates;
     if (args.size() < 1)
     {
       // No arguments, return all option names
       return names;
     }
+    else if (args.size() > 1)
+    {
+      // Multi arguments, do not complete
+      return candidates;
+    }
 
     // Recover all names that starts with args[0]
-    std::vector<std::string> candidates;
     std::copy_if(names.begin(), names.end(), std::back_inserter(candidates),
       [&](const std::string& name) { return f3d::detail::StartWith(name, args[0]); });
 
@@ -1045,8 +1050,7 @@ interactor& interactor_impl::initCommands()
     "toggle_animation", [&](const std::vector<std::string>&)
     { this->Internals->AnimationManager->ToggleAnimation(); }, "start/stop the animation");
 
-  // XXX: No filesystem completion here, F3DStarter will add its own
-  // command anyway
+  // XXX: No filesystem completion, F3DStarter add its own command anyway
   this->addCommand(
     "add_files",
     [&](const std::vector<std::string>& files)
@@ -1096,7 +1100,7 @@ interactor& interactor_impl::initCommands()
 
       log::info("Verbose level changed to: ", this->Internals->VerboseLevelToString(newLevel));
     },
-    "cycles between the verbose level");
+    "cycle between verbose levels");
 
   this->addCommand(
     "help",
@@ -1106,7 +1110,7 @@ interactor& interactor_impl::initCommands()
       const auto it = this->Internals->Commands.find(args[0]);
       if (it != this->Internals->Commands.end())
       {
-        log::print(log::VerboseLevel::INFO, it->second.DocumentationCallback);
+        log::print(log::VerboseLevel::INFO, it->second.Documentation);
       }
       else
       {

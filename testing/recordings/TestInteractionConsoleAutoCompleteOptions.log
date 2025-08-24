@@ -6,13 +6,13 @@ KeyPressEvent 199 142 0 27 1 Escape 0
 CharEvent 199 142 0 27 1 Escape 0
 KeyReleaseEvent 199 142 0 27 1 Escape 0
 
-KeyPressEvent 199 142 0 112 1 p 0
-CharEvent 199 142 0 112 1 p 0
-KeyReleaseEvent 199 142 0 112 1 p 0
+KeyPressEvent 199 142 0 115 1 s 0
+CharEvent 199 142 0 115 1 s 0
+KeyReleaseEvent 199 142 0 115 1 s 0
 
-KeyPressEvent 199 142 0 114 1 r 0
-CharEvent 199 142 0 114 1 r 0
-KeyReleaseEvent 199 142 0 114 1 r 0
+KeyPressEvent 199 142 0 101 1 e 0
+CharEvent 199 142 0 101 1 e 0
+KeyReleaseEvent 199 142 0 101 1 e 0
 
 KeyPressEvent 199 142 0 9 1 Tab 0
 CharEvent 199 142 0 9 1 Tab 0
@@ -45,6 +45,14 @@ KeyReleaseEvent 199 142 0 9 1 Tab 0
 KeyPressEvent 199 142 0 101 1 e 0
 CharEvent 199 142 0 101 1 e 0
 KeyReleaseEvent 199 142 0 101 1 e 0
+
+KeyPressEvent 199 142 0 9 1 Tab 0
+CharEvent 199 142 0 9 1 Tab 0
+KeyReleaseEvent 199 142 0 9 1 Tab 0
+
+KeyPressEvent 199 142 0 50 1 2 0
+CharEvent 199 142 0 50 1 2 0
+KeyReleaseEvent 199 142 0 50 1 2 0
 
 KeyPressEvent 199 142 0 9 1 Tab 0
 CharEvent 199 142 0 9 1 Tab 0

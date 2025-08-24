@@ -23,7 +23,7 @@ The libf3d provides a few commands, many related to manipulating libf3d (options
 
 `print option.name`: A command to print the value of an libf3d option, eg: `print scene.up.direction`.
 
-`set_reader_option Reader.option_name value`: A specific command to set a [reader option](SUPPORTED_FORMATS.md#reader-options), eg: `set_reader_option QuakeMDL.skin_index 1` 
+`set_reader_option Reader.option_name value`: A specific command to set a [reader option](SUPPORTED_FORMATS.md#reader-options), eg: `set_reader_option QuakeMDL.skin_index 1`
 
 `cycle_anti_aliasing`: A specific command to cycle between the anti-aliasing method (`none`,`fxaa`,`ssaa`).
 
