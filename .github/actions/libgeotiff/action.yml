@@ -22,12 +22,12 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/libgeotiff_install
-        key: 
+        key: libgeotiff-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-5
 
     - name: Checkout libgeotiff
       if: steps.cache-libgeotiff.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
-      with: 
+      with:
         repository: OSGeo/libgeotiff
         path: "./dependencies/libgeotiff"
         ref: ${{inputs.version}}
