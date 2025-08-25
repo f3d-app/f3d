@@ -490,6 +490,38 @@ colormap_t parse(const std::string& str)
   return colormap_t(colormapVec);
 }
 
+
+//----------------------------------------------------------------------------
+template<>
+inline bind_vector_t parse(const std::string& str)
+{
+  try
+  {
+    std::vector<interaction_bind_t> result;
+    std::istringstream ss(str);
+    std::string token;
+
+    while (std::getline(ss, token, ','))
+    {
+      if (!token.empty())
+      {
+        // trim whitespace
+        size_t start = token.find_first_not_of(" \t");
+        size_t end = token.find_last_not_of(" \t");
+        std::string_view trimmed = (start == std::string::npos) ? "" : std::string_view(token).substr(start, end - start + 1);
+
+        result.push_back(interaction_bind_t::parse(trimmed));
+      }
+    }
+
+    return bind_vector_t(result);
+  }
+  catch (const options::parsing_exception&)
+  {
+    throw options::parsing_exception("Cannot parse " + str + " into a bind_vector_t");
+  }
+}
+
 //----------------------------------------------------------------------------
 /**
  *  Parse provided string into a transform2d_t
@@ -876,6 +908,21 @@ std::string format(const colormap_t& var)
   return stream.str();
 }
 
+//----------------------------------------------------------------------------
+inline std::string format(const bind_vector_t& var)
+{
+  const auto& binds = static_cast<std::vector<interaction_bind_t>>(var);
+  std::ostringstream oss;
+  for (size_t i = 0; i < binds.size(); ++i)
+  {
+    oss << binds[i].format();  // ✅ use the existing format()
+    if (i + 1 < binds.size())
+    {
+      oss << ", ";
+    }
+  }
+  return oss.str();
+}
 //----------------------------------------------------------------------------
 /**
  * Format provided var into a string from provided transform2d_t.

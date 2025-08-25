@@ -3,6 +3,7 @@
 
 #include "exception.h"
 #include "export.h"
+#include "interactor.h"
 
 #include <algorithm>
 #include <array>
@@ -302,6 +303,46 @@ public:
 protected:
   std::vector<double> Vector;
 };
+
+class bind_vector_t
+{
+public:
+  bind_vector_t() = default;
+
+  explicit bind_vector_t(const std::vector<interaction_bind_t>& vec)
+    : Vector(vec)
+  {
+  }
+
+  bind_vector_t(const std::initializer_list<interaction_bind_t>& list)
+    : Vector(list)
+  {
+  }
+
+  [[nodiscard]] operator std::vector<interaction_bind_t>() const
+  {
+    return this->Vector;
+  }
+
+  [[nodiscard]] bool operator==(const bind_vector_t& other) const
+  {
+    return this->Vector == other.Vector;
+  }
+
+  [[nodiscard]] bool operator!=(const bind_vector_t& other) const
+  {
+    return this->Vector != other.Vector;
+  }
+
+  [[nodiscard]] const interaction_bind_t* data() const
+  {
+    return this->Vector.data();
+  }
+
+protected:
+  std::vector<interaction_bind_t> Vector;
+};
+
 
 /**
  * Describe a 3D surfacic mesh.
