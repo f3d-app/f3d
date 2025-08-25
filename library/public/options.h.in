@@ -1,6 +1,6 @@
 #ifndef f3d_options_h
 #define f3d_options_h
-
+// #include "interactor.h"
 #include "exception.h"
 #include "export.h"
 #include "types.h"
@@ -12,9 +12,15 @@
 #include <variant>
 #include <vector>
 
+#include <sstream>
+
+
 namespace f3d
 {
 // Declared here for simplicity
+// struct interaction_bind_t;
+// using bind_vector_t = std::vector<interaction_bind_t>;
+
 using option_variant_t =
   std::variant<bool, int, double, std::string, std::vector<double>, std::vector<int>>;
 
@@ -220,4 +226,12 @@ inline std::ostream& operator<<(std::ostream& os, const f3d::transform2d_t& tran
   os << f3d::options::format(transform);
   return os;
 }
+
+inline std::ostream& operator<<(std::ostream& os, const f3d::bind_vector_t& cb)
+{
+  os << f3d::options::format(cb);
+  return os;
+}
+
+
 #endif
