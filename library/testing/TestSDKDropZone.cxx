@@ -4,7 +4,18 @@
 
 #include "TestSDKHelpers.h"
 
-int TestSDKDropZone(int argc, char* argv[])
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4996)
+#elif defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+int TestSDKDropZone([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   f3d::engine eng = f3d::engine::create(true);
   f3d::window& win = eng.getWindow();
@@ -39,3 +50,11 @@ int TestSDKDropZone(int argc, char* argv[])
 
   return (newOptionResult && deprecatedOptionResult) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#elif defined(__clang__)
+#pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif

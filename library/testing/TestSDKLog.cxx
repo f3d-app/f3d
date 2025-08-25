@@ -1,6 +1,6 @@
 #include <log.h>
 
-int TestSDKLog(int argc, char* argv[])
+int TestSDKLog([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   f3d::log::setUseColoring(false);
 

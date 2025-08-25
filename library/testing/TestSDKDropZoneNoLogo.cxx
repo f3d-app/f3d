@@ -4,7 +4,7 @@
 
 #include "TestSDKHelpers.h"
 
-int TestSDKDropZoneNoLogo(int argc, char* argv[])
+int TestSDKDropZoneNoLogo([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   f3d::engine eng = f3d::engine::create(true);
   f3d::window& win = eng.getWindow();
