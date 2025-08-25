@@ -49,7 +49,6 @@
 #include <iomanip>
 #include <iostream>
 #include <mutex>
-#include <numeric>
 #include <regex>
 #include <set>
 
@@ -1899,114 +1898,7 @@ void F3DStarter::AddCommands()
     return f3d::options::parse<bool>(args[0]);
   };
 
-  auto complFilesystem = [](const std::vector<std::string>& args)
-  {
-    std::vector<std::string> candidates;
-
-    try
-    {
-      // Without args, explore the current directory with an empty pattern
-      std::string filePattern = "";
-      fs::path parentPath = fs::current_path();
-      fs::path completionPath;
-      fs::path completionParentPath;
-
-      // With an arg, get the last one, recover its parent directory
-      // and use its filename as pattern.
-      // If the arg contains a completed path ending with a separator
-      // then the filePattern is empty
-      if (!args.empty())
-      {
-        completionPath = args.back();
-        completionParentPath = completionPath.parent_path();
-        filePattern = completionPath.filename().string();
-        if (!completionParentPath.empty())
-        {
-          // collapsePath is needed for HOME support
-          parentPath = f3d::utils::collapsePath(completionParentPath);
-        }
-      }
-
-      if (fs::exists(parentPath))
-      {
-        std::vector<fs::path> dirContent;
-
-        // Auto complete dot and dot-dot only if the pattern start with a dot
-        if (!filePattern.empty() && filePattern[0] == '.')
-        {
-          dirContent.emplace_back(".");
-          dirContent.emplace_back("..");
-        }
-
-        // Copy the directory content as paths
-        fs::directory_iterator iter(parentPath);
-        std::transform(fs::begin(iter), fs::end(iter), std::back_inserter(dirContent),
-          [&](const auto& entry) { return entry.path(); });
-
-        for (const auto& path : dirContent)
-        {
-          // Add candidates that starts with filePattern
-          if (path.filename().string().rfind(filePattern, 0) == 0)
-          {
-            // Keep the completionParentPath to avoid path normalization
-            candidates.emplace_back((completionParentPath / path.filename()).string());
-          }
-        }
-      }
-
-      if (candidates.size() == 1 && fs::is_directory(candidates[0]))
-      {
-        // Single directory candidate, add a separator
-        candidates[0] += fs::path::preferred_separator;
-      }
-    }
-    catch (const fs::filesystem_error& ex)
-    {
-      f3d::log::error("Error completing a filesystem path: ", ex.what());
-    }
-
-    // Multi args, reconstruct the full candidates
-    if (args.size() > 1)
-    {
-      std::vector<std::string> originalCandidates = candidates;
-      candidates.clear();
-
-      std::vector<std::string> multiArgsCandidate;
-      const std::string accum = std::accumulate(args.begin() + 1, args.end() - 1, args[0],
-        [](const std::string& a, const std::string& b) { return a + " " + b; });
-      std::transform(originalCandidates.begin(), originalCandidates.end(),
-        std::back_inserter(candidates),
-        [&](const auto& candidate) { return accum + " " + candidate; });
-    }
-
-    // On system using backward slash as separator, escape them
-    if constexpr (fs::path::preferred_separator == '\\')
-    {
-      std::vector<std::string> originalCandidates = candidates;
-      candidates.clear();
-
-      // TODO: Is there a better way to do this ?
-      std::transform(originalCandidates.begin(), originalCandidates.end(),
-        std::back_inserter(candidates),
-        [&](std::string candidate)
-        {
-          for (size_t i = 0; i < candidate.size(); i++)
-          {
-            if (candidate[i] == '\\')
-            {
-              candidate.insert(i, 1, '\\');
-              i++;
-            }
-          }
-          return candidate;
-        });
-    }
-
-    return candidates;
-  };
-
-  interactor.addCommand(
-    "remove_current_file_group",
+  interactor.addCommand("remove_current_file_group",
     [this](const std::vector<std::string>&)
     {
       if (this->Internals->CurrentFilesGroupIndex >= 0)
@@ -2019,11 +1911,9 @@ void F3DStarter::AddCommands()
           this->Internals->FilesGroups.begin() + this->Internals->CurrentFilesGroupIndex);
         this->LoadRelativeFileGroup(0, false, true);
       }
-    },
-    "remove current file group and load the next file group if any");
+    });
 
-  interactor.addCommand(
-    "remove_file_groups",
+  interactor.addCommand("remove_file_groups",
     [this](const std::vector<std::string>&)
     {
       if (!this->Internals->AppOptions.NoRender)
@@ -2033,32 +1923,26 @@ void F3DStarter::AddCommands()
       this->Internals->FilesGroups.clear();
       this->LoadFileGroup(0, false, true);
       this->ResetWindowName();
-    },
-    "remove all files");
+    });
 
-  interactor.addCommand(
-    "load_previous_file_group",
+  interactor.addCommand("load_previous_file_group",
     [this](const std::vector<std::string>& args)
     {
       this->LoadRelativeFileGroup(
         -1, parse_optional_bool_flag(args, "load_previous_file_group", false));
-    },
-    "load_previous_file_group [keep_camera]: load the previous file or file group");
+    });
 
-  interactor.addCommand(
-    "load_next_file_group",
-    [this](const std::vector<std::string>& args) {
+  interactor.addCommand("load_next_file_group",
+    [this](const std::vector<std::string>& args)
+    {
       this->LoadRelativeFileGroup(
         +1, parse_optional_bool_flag(args, "load_next_file_group", false));
-    },
-    "load_next_file_group [keep_camera]: load the next file or file group");
+    });
 
-  interactor.addCommand(
-    "reload_current_file_group", [this](const std::vector<std::string>&)
-    { this->LoadRelativeFileGroup(0, true, true); }, "reload the current file or file group");
+  interactor.addCommand("reload_current_file_group",
+    [this](const std::vector<std::string>&) { this->LoadRelativeFileGroup(0, true, true); });
 
-  interactor.addCommand(
-    "add_current_directories",
+  interactor.addCommand("add_current_directories",
     [this](const std::vector<std::string>&)
     {
       if (!this->Internals->LoadedFiles.empty())
@@ -2069,38 +1953,29 @@ void F3DStarter::AddCommands()
         }
         this->LoadRelativeFileGroup(0);
       }
-    },
-    "add all files from the current file or file group directories");
+    });
 
-  interactor.addCommand(
-    "take_screenshot",
+  interactor.addCommand("take_screenshot",
     [this](const std::vector<std::string>& args)
     {
       // XXX: Add a test for this one this can be reached with a non empty filename
       std::string filename =
         args.empty() ? this->Internals->AppOptions.ScreenshotFilename : args[0];
       this->SaveScreenshot(filename);
-    },
-    "take_screenshot [filename]: take a screenshot into provided file or --screenshot-filename",
-    complFilesystem);
+    });
 
-  interactor.addCommand(
-    "take_minimal_screenshot",
+  interactor.addCommand("take_minimal_screenshot",
     [this](const std::vector<std::string>& args)
     {
       // XXX: Add a test for this one this can be reached with a non empty filename
       std::string filename =
         args.empty() ? this->Internals->AppOptions.ScreenshotFilename : args[0];
       this->SaveScreenshot(filename, true);
-    },
-    "take_minimal_screenshot [filename]: take a minimal screenshot into provided file or "
-    "--screenshot-filename",
-    complFilesystem);
+    });
 
   // This replace an existing command in libf3d
   interactor.removeCommand("add_files");
-  interactor.addCommand(
-    "add_files",
+  interactor.addCommand("add_files",
     [this](const std::vector<std::string>& files)
     {
       int index = -1;
@@ -2112,12 +1987,9 @@ void F3DStarter::AddCommands()
       {
         this->LoadFileGroup(index);
       }
-    },
-    "add_files [path/to/file1] [path/to/file2]: A specific command to add files to the scene",
-    complFilesystem);
+    });
 
-  interactor.addCommand(
-    "set_hdri",
+  interactor.addCommand("set_hdri",
     [this](const std::vector<std::string>& files)
     {
       if (!files.empty())
@@ -2131,11 +2003,9 @@ void F3DStarter::AddCommands()
         // Rendering now is needed for correct lighting
         this->Render();
       }
-    },
-    "set_hdri [path/to/hdri]: set and use an HDRI image", complFilesystem);
+    });
 
-  interactor.addCommand(
-    "add_files_or_set_hdri",
+  interactor.addCommand("add_files_or_set_hdri",
     [this](const std::vector<std::string>& files)
     {
       int index = -1;
@@ -2163,14 +2033,10 @@ void F3DStarter::AddCommands()
       {
         this->LoadFileGroup(index);
       }
-    },
-    "add_files_or_set_hdri [path/to/file1] [path/to/file2]: add_files or set_hdri depending on the "
-    "file extension",
-    complFilesystem);
+    });
 
 #if F3D_MODULE_TINYFILEDIALOGS
-  interactor.addCommand(
-    "open_file_dialog",
+  interactor.addCommand("open_file_dialog",
     [this](const std::vector<std::string>&)
     {
       std::vector<std::string> filters;
@@ -2208,9 +2074,7 @@ void F3DStarter::AddCommands()
           this->LoadFileGroup(index);
         }
       }
-    },
-    "open a file dialog to select a file to load");
+    });
 #endif
-  interactor.addCommand(
-    "exit", [&](const std::vector<std::string>&) { interactor.stop(); }, "quit the application");
+  interactor.addCommand("exit", [&](const std::vector<std::string>&) { interactor.stop(); });
 }
