@@ -51,6 +51,11 @@ namespace f3d::detail
 {
 using mod_t = interaction_bind_t::ModifierKeys;
 
+bool StartWith(std::string_view str, std::string_view pattern)
+{
+  return str.rfind(pattern, 0) == 0; // To avoid dependency for C++20 starts_with
+};
+
 class interactor_impl::internals
 {
 public:
@@ -59,6 +64,13 @@ public:
     std::vector<std::string> CommandVector;
     documentation_callback_t DocumentationCallback;
     BindingType Type;
+  };
+
+  struct CommandCallbacks
+  {
+    std::function<void(const std::vector<std::string>&)> Callback;
+    std::string Documentation;
+    std::function<std::vector<std::string>(const std::vector<std::string>&)> CompletionCallback;
   };
 
   internals(options& options, window_impl& window, scene_impl& scene, interactor_impl& inter)
@@ -605,7 +617,7 @@ public:
   vtkSmartPointer<vtkF3DInteractorEventRecorder> Recorder;
   vtkNew<vtkF3DUIObserver> UIObserver;
 
-  std::map<std::string, std::function<void(const std::vector<std::string>&)>> Commands;
+  std::map<std::string, CommandCallbacks> Commands;
   std::optional<std::string> CommandBuffer;
 
   std::map<interaction_bind_t, BindingCommands> Bindings;
@@ -642,31 +654,72 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
 #if F3D_MODULE_UI
   vtkF3DImguiConsole* console = vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
   assert(console != nullptr);
-  // Set the callback to get the list of commands
-  console->SetCommandsMatchCallback(
+  console->SetCompletionCallback(
     [this](const std::string& pattern)
     {
-      // Build a list of candidates
+      // Create a vector of candidate strings
       std::vector<std::string> candidates;
-      // Copy all commands that start with the pattern
-      auto startWith = [&pattern](const std::string& s)
+
+      // Tokenize the complete command
+      std::vector<std::string> tokens;
+      try
       {
-        return s.rfind(pattern, 0) == 0; // To avoid dependency for C++20 starts_with
-      };
-      for (auto const& [action, callback] : this->Internals->Commands)
+        tokens = utils::tokenize(pattern);
+      }
+      catch (const utils::tokenize_exception&)
       {
-        if (startWith(action))
+        log::error("Command: unable to tokenize command:\"", pattern, "\", ignoring");
+        return candidates;
+      }
+
+      // Recover the action pattern if any
+      std::string actionPattern;
+      if (!tokens.empty())
+      {
+        actionPattern = tokens[0];
+      }
+
+      bool exact = false;
+      for (auto const& [action, callbacks] : this->Internals->Commands)
+      {
+        if (f3d::detail::StartWith(action, actionPattern))
         {
-          candidates.push_back(action);
-        }
-        else
-        {
-          // List is sorted so we can break early
-          if (!candidates.empty())
+          // Copy all action that start with the pattern
+          candidates.emplace_back(action);
+          if (action == actionPattern)
           {
-            break;
+            // pattern is the actual action
+            exact = true;
           }
         }
+        // List is sorted so we can break early
+        else if (!candidates.empty())
+        {
+          break;
+        }
+      }
+
+      // If exact and the pattern is not exactly the actionPattern
+      // then it means that the command currently looks like:
+      // `action val` or `action `, so we dispatch completion to the action completer if any
+      if (exact && actionPattern != pattern)
+      {
+        candidates.clear();
+        auto complCallback = this->Internals->Commands.at(actionPattern).CompletionCallback;
+        if (complCallback)
+        {
+          // Use the completion callback of the action with its args if any
+          std::vector<std::string> argsCandidates =
+            complCallback({ tokens.begin() + 1, tokens.end() });
+          std::transform(argsCandidates.begin(), argsCandidates.end(),
+            std::back_inserter(candidates),
+            [&](const auto& argCandidate) { return actionPattern + " " + argCandidate; });
+        }
+      }
+      else if (candidates.size() == 1)
+      {
+        // Single candidate, add a space separator
+        candidates[0] += " ";
       }
       return candidates;
     });
@@ -696,29 +749,69 @@ interactor& interactor_impl::initCommands()
     }
   };
 
+  // Completion method for a vector of names
+  auto complNames = [](const std::vector<std::string>& args, const std::vector<std::string>& names)
+  {
+    std::vector<std::string> candidates;
+    if (args.size() < 1)
+    {
+      // No arguments, return all option names
+      return names;
+    }
+    else if (args.size() > 1)
+    {
+      // Multi arguments, do not complete
+      return candidates;
+    }
+
+    // Recover all names that starts with args[0]
+    std::copy_if(names.begin(), names.end(), std::back_inserter(candidates),
+      [&](const std::string& name) { return f3d::detail::StartWith(name, args[0]); });
+
+    if (candidates.size() == 1)
+    {
+      // Single candidate, add a space separator
+      candidates[0] += " ";
+    }
+    return candidates;
+  };
+
+  auto complCommandActions = [&](const std::vector<std::string>& args)
+  { return complNames(args, this->getCommandActions()); };
+
   // Add default callbacks
-  this->addCommand("set",
+  this->addCommand(
+    "set",
     [&](const std::vector<std::string>& args)
     {
       check_args(args, 2, "set");
       this->Internals->Options.setAsString(args[0], args[1]);
-    });
+    },
+    "set option.name values: set a libf3d option",
+    std::bind(complNames, std::placeholders::_1, this->Internals->Options.getNames()));
 
-  this->addCommand("toggle",
+  this->addCommand(
+    "toggle",
     [&](const std::vector<std::string>& args)
     {
       check_args(args, 1, "toggle");
       this->Internals->Options.toggle(args[0]);
-    });
+    },
+    "toggle option.name: toggle a boolean libf3d option",
+    std::bind(complNames, std::placeholders::_1, this->Internals->Options.getNames()));
 
-  this->addCommand("reset",
+  this->addCommand(
+    "reset",
     [&](const std::vector<std::string>& args)
     {
       check_args(args, 1, "reset");
       this->Internals->Options.reset(args[0]);
-    });
+    },
+    "reset option.name: reset a libf3d option to its default values",
+    std::bind(complNames, std::placeholders::_1, this->Internals->Options.getNames()));
 
-  this->addCommand("clear",
+  this->addCommand(
+    "clear",
     [&](const std::vector<std::string>& args)
     {
       check_args(args, 0, "clear");
@@ -728,26 +821,36 @@ interactor& interactor_impl::initCommands()
       assert(console != nullptr);
       console->Clear();
 #endif
-    });
+    },
+    "clear: clear console");
 
-  this->addCommand("print",
+  this->addCommand(
+    "print",
     [&](const std::vector<std::string>& args)
     {
       check_args(args, 1, "print");
       log::info(this->Internals->Options.getAsString(args[0]));
-    });
+    },
+    "print option.name: print the value of an libf3d option",
+    std::bind(complNames, std::placeholders::_1, this->Internals->Options.getNames()));
 
-  this->addCommand("set_reader_option",
+  this->addCommand(
+    "set_reader_option",
     [&](const std::vector<std::string>& args)
     {
       check_args(args, 2, "set_reader_option");
       f3d::engine::setReaderOption(args[0], args[1]);
-    });
+    },
+    "set_reader_option ReaderName.option_name value: set a reader option",
+    std::bind(complNames, std::placeholders::_1, f3d::engine::getAllReaderOptionNames()));
 
-  this->addCommand("cycle_animation",
-    [&](const std::vector<std::string>&) { this->Internals->AnimationManager->CycleAnimation(); });
+  this->addCommand(
+    "cycle_animation",
+    [&](const std::vector<std::string>&) { this->Internals->AnimationManager->CycleAnimation(); },
+    "cycle scene.animation.index option using model information");
 
-  this->addCommand("cycle_anti_aliasing",
+  this->addCommand(
+    "cycle_anti_aliasing",
     [&](const std::vector<std::string>&)
     {
       bool& enabled = this->Internals->Options.render.effect.antialiasing.enable;
@@ -769,9 +872,12 @@ interactor& interactor_impl::initCommands()
         }
       }
       this->Internals->Window.render();
-    });
+    },
+    "cycle between the anti-aliasing method (none,fxaa,ssaa)");
 
-  this->addCommand("cycle_coloring",
+  std::vector<std::string> cycleColoringValidArgs = { "field", "array", "component" };
+  this->addCommand(
+    "cycle_coloring",
     [&](const std::vector<std::string>& args)
     {
       check_args(args, 1, "cycle_coloring");
@@ -798,57 +904,77 @@ interactor& interactor_impl::initCommands()
       }
       this->Internals->SynchronizeScivisOptions(this->Internals->Options, ren);
       this->Internals->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
-    });
+    },
+    "cycle_coloring field/array/component: cycle scivis options using model information",
+    std::bind(complNames, std::placeholders::_1,
+      std::vector<std::string>{ "field", "array", "component" }));
 
-  this->addCommand("roll_camera",
+  this->addCommand(
+    "roll_camera",
     [&](const std::vector<std::string>& args)
     {
       check_args(args, 1, "roll_camera");
       this->Internals->Window.getCamera().roll(options::parse<int>(args[0]));
       this->Internals->Style->SetTemporaryUp(
         this->Internals->Window.getCamera().getViewUp().data());
-    });
+    },
+    "roll_camera value: roll the camera on its side");
 
-  this->addCommand("elevation_camera",
+  this->addCommand(
+    "elevation_camera",
     [&](const std::vector<std::string>& args)
     {
       check_args(args, 1, "elevation_camera");
       this->Internals->Window.getCamera().elevation(options::parse<int>(args[0]));
       this->Internals->Style->SetTemporaryUp(
         this->Internals->Window.getCamera().getViewUp().data());
-    });
+    },
+    "elevation_camera value: tilt the camera up or down");
 
-  this->addCommand("azimuth_camera",
+  this->addCommand(
+    "azimuth_camera",
     [&](const std::vector<std::string>& args)
     {
       check_args(args, 1, "azimuth_camera");
       this->Internals->Window.getCamera().azimuth(options::parse<int>(args[0]));
       this->Internals->Style->SetTemporaryUp(
         this->Internals->Window.getCamera().getViewUp().data());
-    });
+    },
+    "azimuth_camera value: tilt the camera right or left");
 
-  this->addCommand("increase_light_intensity",
-    [&](const std::vector<std::string>&) { this->Internals->IncreaseLightIntensity(false); });
+  this->addCommand(
+    "increase_light_intensity", [&](const std::vector<std::string>&)
+    { this->Internals->IncreaseLightIntensity(false); }, "increase light intensity");
 
-  this->addCommand("decrease_light_intensity",
-    [&](const std::vector<std::string>&) { this->Internals->IncreaseLightIntensity(true); });
+  this->addCommand(
+    "decrease_light_intensity", [&](const std::vector<std::string>&)
+    { this->Internals->IncreaseLightIntensity(true); }, "decrease light intensity");
 
-  this->addCommand("increase_opacity",
-    [&](const std::vector<std::string>&) { this->Internals->IncreaseOpacity(false); });
+  this->addCommand(
+    "increase_opacity", [&](const std::vector<std::string>&)
+    { this->Internals->IncreaseOpacity(false); }, "increase opacity");
 
-  this->addCommand("decrease_opacity",
-    [&](const std::vector<std::string>&) { this->Internals->IncreaseOpacity(true); });
+  this->addCommand(
+    "decrease_opacity", [&](const std::vector<std::string>&)
+    { this->Internals->IncreaseOpacity(true); }, "decrease opacity");
 
-  this->addCommand("print_scene_info", [&](const std::vector<std::string>&)
-    { this->Internals->Window.PrintSceneDescription(log::VerboseLevel::INFO); });
+  this->addCommand(
+    "print_scene_info", [&](const std::vector<std::string>&)
+    { this->Internals->Window.PrintSceneDescription(log::VerboseLevel::INFO); },
+    "print information about the scene");
 
-  this->addCommand("print_coloring_info", [&](const std::vector<std::string>&)
-    { this->Internals->Window.PrintColoringDescription(log::VerboseLevel::INFO); });
+  this->addCommand(
+    "print_coloring_info", [&](const std::vector<std::string>&)
+    { this->Internals->Window.PrintColoringDescription(log::VerboseLevel::INFO); },
+    "print information about coloring settings");
 
-  this->addCommand("print_mesh_info", [&](const std::vector<std::string>&)
-    { this->Internals->Scene.PrintImporterDescription(log::VerboseLevel::INFO); });
+  this->addCommand(
+    "print_mesh_info", [&](const std::vector<std::string>&)
+    { this->Internals->Scene.PrintImporterDescription(log::VerboseLevel::INFO); },
+    "print information from the mesh importer");
 
-  this->addCommand("print_options_info",
+  this->addCommand(
+    "print_options_info",
     [&](const std::vector<std::string>&)
     {
       for (const std::string& option : this->Internals->Options.getNames())
@@ -858,9 +984,11 @@ interactor& interactor_impl::initCommands()
         descr.append(option).append(": ").append(val);
         log::print(log::VerboseLevel::INFO, descr);
       }
-    });
+    },
+    "print libf3d options that have a value");
 
-  this->addCommand("set_camera",
+  this->addCommand(
+    "set_camera",
     [&](const std::vector<std::string>& args)
     {
       check_args(args, 1, "set_camera");
@@ -890,36 +1018,50 @@ interactor& interactor_impl::initCommands()
         throw interactor::invalid_args_exception(
           std::string("Command: set_camera arg:\"") + std::string(type) + "\" is not recognized.");
       }
-    });
+    },
+    "set_camera front/top/right/isometric: position the camera in the specified location",
+    std::bind(complNames, std::placeholders::_1,
+      std::vector<std::string>{ "front", "top", "right", "isometric" }));
 
-  this->addCommand("toggle_volume_rendering",
+  this->addCommand(
+    "toggle_volume_rendering",
     [&](const std::vector<std::string>&)
     {
       this->Internals->Options.model.volume.enable = !this->Internals->Options.model.volume.enable;
       this->Internals->Window.render();
       this->Internals->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
-    });
+    },
+    "toggle model.volume.enable and print coloring information");
 
-  this->addCommand("stop_interactor", [&](const std::vector<std::string>&) { this->stop(); });
+  this->addCommand(
+    "stop_interactor", [&](const std::vector<std::string>&) { this->stop(); },
+    "stop the interactor hence quit the application");
 
-  this->addCommand("reset_camera",
+  this->addCommand(
+    "reset_camera",
     [&](const std::vector<std::string>&)
     {
       this->Internals->Window.getCamera().resetToDefault();
       this->Internals->Style->ResetTemporaryUp();
-    });
+    },
+    "reset the camera to its original location");
 
-  this->addCommand("toggle_animation",
-    [&](const std::vector<std::string>&) { this->Internals->AnimationManager->ToggleAnimation(); });
+  this->addCommand(
+    "toggle_animation", [&](const std::vector<std::string>&)
+    { this->Internals->AnimationManager->ToggleAnimation(); }, "start/stop the animation");
 
-  this->addCommand("add_files",
+  // XXX: No filesystem completion, F3DStarter add its own command anyway
+  this->addCommand(
+    "add_files",
     [&](const std::vector<std::string>& files)
     {
       this->Internals->AnimationManager->StopAnimation();
       this->Internals->Scene.add(files);
-    });
+    },
+    "add files to the scene");
 
-  this->addCommand("alias",
+  this->addCommand(
+    "alias",
     [&](const std::vector<std::string>& args)
     {
       if (args.size() < 2)
@@ -937,9 +1079,11 @@ interactor& interactor_impl::initCommands()
 
       log::info(
         "Alias " + aliasName + " added with command " + this->Internals->AliasMap[aliasName]);
-    });
+    },
+    "create an alias for a command");
 
-  this->addCommand("cycle_verbose_level",
+  this->addCommand(
+    "cycle_verbose_level",
     [&](const std::vector<std::string>&)
     {
       log::VerboseLevel currentLevel = log::getVerboseLevel();
@@ -955,16 +1099,37 @@ interactor& interactor_impl::initCommands()
       ren->SetCheatSheetConfigured(false);
 
       log::info("Verbose level changed to: ", this->Internals->VerboseLevelToString(newLevel));
-    });
+    },
+    "cycle between verbose levels");
+
+  this->addCommand(
+    "help",
+    [&](const std::vector<std::string>& args)
+    {
+      check_args(args, 1, "help");
+      const auto it = this->Internals->Commands.find(args[0]);
+      if (it != this->Internals->Commands.end())
+      {
+        log::print(log::VerboseLevel::INFO, it->second.Documentation);
+      }
+      else
+      {
+        throw interactor::invalid_args_exception(
+          std::string("Command: help arg:\"") + args[0] + "\" is not a recognized command.");
+      }
+    },
+    "help action: print help about a specific command action", complCommandActions);
+
   return *this;
 }
 
 //----------------------------------------------------------------------------
-interactor& interactor_impl::addCommand(
-  std::string action, std::function<void(const std::vector<std::string>&)> callback)
+interactor& interactor_impl::addCommand(const std::string& action,
+  std::function<void(const std::vector<std::string>&)> callback, const std::string& doc,
+  std::function<std::vector<std::string>(const std::vector<std::string>&)> completionCallback)
 {
-  const auto [it, success] =
-    this->Internals->Commands.insert({ std::move(action), std::move(callback) });
+  const auto [it, success] = this->Internals->Commands.insert(
+    { action, { std::move(callback), doc, std::move(completionCallback) } });
   if (!success)
   {
     throw interactor::already_exists_exception(
@@ -984,7 +1149,7 @@ interactor& interactor_impl::removeCommand(const std::string& action)
 std::vector<std::string> interactor_impl::getCommandActions() const
 {
   std::vector<std::string> actions;
-  for (auto const& [action, callback] : this->Internals->Commands)
+  for (auto const& [action, callbacks] : this->Internals->Commands)
   {
     actions.emplace_back(action);
   }
@@ -1026,7 +1191,7 @@ bool interactor_impl::triggerCommand(std::string_view command)
     auto callbackIt = this->Internals->Commands.find(action);
     if (callbackIt != this->Internals->Commands.end())
     {
-      callbackIt->second({ tokens.begin() + 1, tokens.end() });
+      callbackIt->second.Callback({ tokens.begin() + 1, tokens.end() });
       return true;
     }
     else

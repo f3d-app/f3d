@@ -80,8 +80,10 @@ public:
    * Considering namespacing dedicated action to avoid conflicts with default action,
    * eg: `my_app::action`
    */
-  virtual interactor& addCommand(
-    std::string action, std::function<void(const std::vector<std::string>&)> callback) = 0;
+  virtual interactor& addCommand(const std::string& action,
+    std::function<void(const std::vector<std::string>&)> callback, const std::string& doc = "",
+    std::function<std::vector<std::string>(const std::vector<std::string>&)> completionCallback =
+      nullptr) = 0;
 
   /**
    * Remove a command for provided action, does not do anything if it does not exists.
