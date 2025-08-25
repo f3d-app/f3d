@@ -392,16 +392,21 @@ void window_impl::UpdateDynamicOptions()
     renderer->SetUseTrackball(opt.interactor.trackball);
     renderer->SetInvertZoom(opt.interactor.invert_zoom);
 
-    std::vector<interaction_bind_t> custom_binds;
-    std::string bindsStr = opt.ui.drop_zone.custom_binds;
-    std::istringstream ss(bindsStr);
-    std::string token;
+    // std::vector<interaction_bind_t> custom_binds;
+    // std::string bindsStr = opt.ui.drop_zone.custom_binds;
+    // std::istringstream ss(bindsStr);
+    // std::string token;
 
-    while (std::getline(ss, token, ',')) {
-        if (!token.empty()) {
-            custom_binds.push_back(interaction_bind_t::parse(token));
-        }
-    }
+    // while (std::getline(ss, token, ',')) {
+    //     if (!token.empty()) {
+    //         custom_binds.push_back(interaction_bind_t::parse(token));
+    //     }
+    // }
+    bind_vector_t custom_binds = opt.ui.drop_zone.custom_binds;
+    // std::vector<interaction_bind_t> custom_binds = options::parse<bind_vector_t>(opt.ui.drop_zone.custom_binds);
+
+    // renderer->SetDropZoneInfo(this->Internals->Interactor->getDropZoneInfo(custom_binds));
+
     renderer->SetDropZoneInfo(this->Internals->Interactor->getDropZoneInfo(custom_binds));
   }
 

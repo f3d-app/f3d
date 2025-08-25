@@ -225,9 +225,9 @@
         "type": "bool",
         "default_value": "false"
       },
-      "custom_binds": {
-        "type": "string",
-        "default_value": "None+Drop,Ctrl+O,None+H,None+Escape"
+      "bind_vector": {
+        "type": "bind_vector",
+        "default_value": "None+Drop, Ctrl+O, None+H, None+Escape"
       }
     },
     "metadata": {
