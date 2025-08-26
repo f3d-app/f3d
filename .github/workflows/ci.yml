@@ -176,9 +176,9 @@ jobs:
             tbb_version: ${{needs.default_versions.outputs.tbb_min_version}}
             usd_version: ${{needs.default_versions.outputs.usd_min_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_min_version}}
-            pdal_min_version: ${{needs.default_versions.outputs.pdal_min_version}}
-            gdal_min_version: ${{needs.default_versions.outputs.gdal_min_version}}
-            libgeotiff_min_version: ${{needs.default_versions.outputs.libgeotiff_min_version}}
+            pdal_min_version: ${{ steps.set_default_versions.outputs.pdal_min_version }}
+            gdal_min_version: ${{ steps.set_default_versions.outputs.gdal_min_version }}
+            libgeotiff_min_version: ${{ steps.set_default_versions.outputs.libgeotiff_min_version }}
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
@@ -207,9 +207,9 @@ jobs:
           tbb_version: ${{matrix.tbb_version}}
           usd_version: ${{matrix.usd_version}}
           zlib_version: ${{matrix.zlib_version}}
-          pdal_version: ${{matrix.pdal_version}}
-          gdal_version: ${{matrix.gdal_version}}
-          libgeotiff_version: ${{matrix.libgeotiff_version}}
+          pdal_version: ${{ matrix.pdal_version }}
+          gdal_version: ${{ matrix.gdal_version }}
+          libgeotiff_version: ${{ matrix.libgeotiff_version }}
 
   #----------------------------------------------------------------------------
   # Cache VTK Dependency: Checkout and compile VTK if not cached
@@ -247,9 +247,9 @@ jobs:
           - ospray_version: ${{needs.default_versions.outputs.ospray_version}}
           - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-          - pdal_version: ${{needs.default_versions.outputs.pdal_version}}
-          - gdal_version: ${{needs.default_versions.outputs.gdal_version}}
-          - libgeotiff_version: ${{needs.default_versions.outputs.libgeotiff_version}}
+          - pdal_version: ${{ needs.default_versions.outputs.pdal_version }}
+          - gdal_version: ${{ needs.default_versions.outputs.gdal_version }}
+          - libgeotiff_version: ${{ needs.default_versions.outputs.libgeotiff_version }}
           - os: macos-14
             cpu: arm64
           - build_type: mindeps
@@ -261,9 +261,9 @@ jobs:
             ospray_version: ${{needs.default_versions.outputs.ospray_min_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_min_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_min_version}}
-            pdal_version: ${{needs.default_versions.outputs.pdal_min_version}}
-            gdal_version: ${{needs.default_versions.outputs.gdal_min_version}}
-            libgeotiff_version: ${{needs.default_versions.outputs.libgeotiff_min_version}}
+            pdal_version: ${{ needs.default_versions.outputs.pdal_min_version }}
+            gdal_version: ${{ needs.default_versions.outputs.gdal_min_version }}
+            libgeotiff_version: ${{ needs.default_versions.outputs.libgeotiff_min_version }}
             build_type: no_optional_deps
             os: ubuntu-22.04
             vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
@@ -271,8 +271,8 @@ jobs:
             blosc_version: ${{needs.default_versions.outputs.blosc_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-            gdal_version: ${{needs.default_versions.outputs.gdal_version}}
-            libgeotiff_version: ${{needs.default_versions.outputs.libgeotiff_version}}
+            gdal_version: ${{ needs.default_versions.outputs.gdal_version }}
+            libgeotiff_version: ${{ needs.default_versions.outputs.libgeotiff_version }}
           - build_type: no_raytracing
             os: ubuntu-22.04
             vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
@@ -281,9 +281,9 @@ jobs:
             openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-            pdal_version: ${{needs.default_versions.outputs.pdal_version}}
-            gdal_version: ${{needs.default_versions.outputs.gdal_version}}
-            libgeotiff_version: ${{needs.default_versions.outputs.libgeotiff_version}}
+            pdal_version: ${{ needs.default_versions.outputs.pdal_version }}
+            gdal_version: ${{ needs.default_versions.outputs.gdal_version }}
+            libgeotiff_version: ${{ needs.default_versions.outputs.libgeotiff_version }}
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
