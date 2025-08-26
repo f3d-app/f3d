@@ -654,7 +654,7 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
 #if F3D_MODULE_UI
   vtkF3DImguiConsole* console = vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
   assert(console != nullptr);
-  console->SetCompletionCallback(
+/*  console->SetCompletionCallback(
     [this](const std::string& pattern)
     {
       // Create a vector of candidate strings
@@ -722,7 +722,7 @@ interactor_impl::interactor_impl(options& options, window_impl& window, scene_im
         candidates[0] += " ";
       }
       return candidates;
-    });
+    });*/
 #endif
 }
 
@@ -753,7 +753,7 @@ interactor& interactor_impl::initCommands()
   auto complNames = [](const std::vector<std::string>& args, const std::vector<std::string>& names)
   {
     std::vector<std::string> candidates;
-    if (args.size() < 1)
+/*    if (args.size() < 1)
     {
       // No arguments, return all option names
       return names;
@@ -772,7 +772,7 @@ interactor& interactor_impl::initCommands()
     {
       // Single candidate, add a space separator
       candidates[0] += " ";
-    }
+    }*/
     return candidates;
   };
 
