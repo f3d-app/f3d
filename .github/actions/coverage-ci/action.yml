@@ -84,7 +84,7 @@ runs:
         occt_version: ${{inputs.occt_version}}
         openexr_version: ${{inputs.openexr_version}}
         openvdb_version: ${{inputs.openvdb_version}}
-        pdal_version: ${{inputs.pdal_version}}
+        iopdal_version: ${{inputs.iopdal_version}}
         ospray_version: ${{inputs.ospray_version}}
         tbb_version: ${{inputs.tbb_version}}
         usd_version: ${{inputs.usd_version}}
@@ -97,7 +97,7 @@ runs:
       with:
         blosc_version: ${{inputs.blosc_version}}
         openvdb_version: ${{inputs.openvdb_version}}
-        pdal_version: ${{inputs.pdal_version}}
+        iopdal_version: ${{inputs.iopdal_version}}
         ospray_version: ${{inputs.ospray_version}}
         tbb_version: ${{inputs.tbb_version}}
         vtk_version: ${{inputs.vtk_version}}
