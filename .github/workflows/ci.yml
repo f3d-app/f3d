@@ -157,9 +157,9 @@ jobs:
           - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           - usd_version: ${{needs.default_versions.outputs.usd_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-          - pdal_version: ${{ steps.set_default_versions.outputs.pdal_version }}
-          - gdal_version: ${{ steps.set_default_versions.outputs.gdal_version }}
-          - libgeotiff_version: ${{ steps.set_default_versions.outputs.libgeotiff_version }}
+          - pdal_version: ${{ needs_default_versions.outputs.pdal_version }}
+          - gdal_version: ${{ needs_default_versions.outputs.gdal_version }}
+          - libgeotiff_version: ${{ needs_default_versions.outputs.libgeotiff_version }}
           - build_type: mindeps
             os: ubuntu-22.04
             cpu: x86_64
