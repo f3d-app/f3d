@@ -750,7 +750,7 @@ interactor& interactor_impl::initCommands()
   };
 
   // Completion method for a vector of names
-/*  auto complNames = [](const std::vector<std::string>& args, const std::vector<std::string>& names)
+  auto complNames = [](const std::vector<std::string>& args, const std::vector<std::string>& names)
   {
     std::vector<std::string> candidates;
     if (args.size() < 1)
@@ -774,7 +774,7 @@ interactor& interactor_impl::initCommands()
       candidates[0] += " ";
     }
     return candidates;
-  };*/
+  };
 
 /*  auto complCommandActions = [&](const std::vector<std::string>& args)
   { return complNames(args, this->getCommandActions()); };*/
@@ -786,9 +786,9 @@ interactor& interactor_impl::initCommands()
     {
       check_args(args, 2, "set");
       this->Internals->Options.setAsString(args[0], args[1]);
-    });
-//    "set option.name values: set a libf3d option",
-//    std::bind(complNames, std::placeholders::_1, this->Internals->Options.getNames()));
+    },
+    "set option.name values: set a libf3d option",
+    std::bind(complNames, std::placeholders::_1, this->Internals->Options.getNames()));
 
   this->addCommand(
     "toggle",
