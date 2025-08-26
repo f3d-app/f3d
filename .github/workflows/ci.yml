@@ -264,7 +264,7 @@ jobs:
             pdal_version: ${{needs.default_versions.outputs.pdal_min_version}}
             gdal_version: ${{needs.default_versions.outputs.gdal_min_version}}
             libgeotiff_version: ${{needs.default_versions.outputs.libgeotiff_min_version}}
-          - build_type: no_optional_deps
+            build_type: no_optional_deps
             os: ubuntu-22.04
             vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             cpu: x86_64
