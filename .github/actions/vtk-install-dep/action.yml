@@ -23,12 +23,6 @@ inputs:
   zlib_version:
     description: "Version of zlib to build against"
     required: true
-  gdal_version:
-    description: "Version of gdal to build against"
-    required: true
-  libgeotiff_version:
-    description: "Version of libgeotiff to build against"
-    required: true
 
 runs:
   using: "composite"
@@ -48,7 +42,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/vtk_install
-        key: vtk-${{ inputs.vtk_version }}-${{inputs.zlib_version}}-${{inputs.blosc_version}}-${{inputs.tbb_version}}-${{inputs.gdal_version}}-${{inputs.libgeotiff_version}}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}${{ inputs.pdal_version != '' && format('-pdal-{0}', inputs.pdal_version) || '' }}${{ inputs.ospray_version != '' && format('-ospray-{0}', inputs.ospray_version) || '' }}-${{runner.os}}-${{inputs.cpu}}-0
+        key: vtk-${{ inputs.vtk_version }}-${{inputs.zlib_version}}-${{inputs.blosc_version}}-${{inputs.tbb_version}}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}${{ inputs.ospray_version != '' && format('-ospray-{0}', inputs.ospray_version) || '' }}-${{runner.os}}-${{inputs.cpu}}-0
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
