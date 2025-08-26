@@ -40,6 +40,15 @@ inputs:
   zlib_version:
     description: "Version of zlib to build"
     required: true
+  pdal_version:
+    description: "Version of pdal to build"
+    required: true
+  gdal_version:
+    description: "Version of gdal to build"
+    required: true
+  libgeotiff_version:
+    description: "Version of libgeotiff to build"
+    required: true
 
 runs:
   using: "composite"
@@ -72,6 +81,9 @@ runs:
         tbb_version: ${{inputs.tbb_version}}
         usd_version: ${{inputs.usd_version}}
         zlib_version: ${{inputs.zlib_version}}
+        pdal_version: ${{inputs.pdal_version}}
+        libgeotiff_version: ${{inputs.libgeotiff_version}}
+        gdal_version: ${{inputs.gdal_version}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
@@ -81,6 +93,9 @@ runs:
         tbb_version: ${{inputs.tbb_version}}
         vtk_version: ${{inputs.vtk_version}}
         zlib_version: ${{inputs.zlib_version}}
+        pdal_version: ${{inputs.pdal_version}}
+        libgeotiff_version: ${{inputs.libgeotiff_version}}
+        gdal_version: ${{inputs.gdal_version}}
 
     - name: Setup Build Directory
       shell: bash

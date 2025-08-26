@@ -34,6 +34,8 @@ runs:
         [[ "${{ inputs.tbb_version }}" ]] || { echo "tbb_version input is empty" ; exit 1; }
         [[ "${{ inputs.vtk_version }}" ]] || { echo "vtk_version input is empty" ; exit 1; }
         [[ "${{ inputs.zlib_version }}" ]] || { echo "zlib_version input is empty" ; exit 1; }
+        [[ "${{ inputs.libgeotiff_version }}" ]] || { echo "libgeotiff_version input is empty" ; exit 1; }
+        [[ "${{ inputs.gdal_version }}" ]] || { echo "gdal_version input is empty" ; exit 1; }
 
     - name: Cache VTK
       id: cache-vtk

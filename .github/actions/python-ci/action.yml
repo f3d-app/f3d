@@ -46,6 +46,15 @@ inputs:
   zlib_version:
     description: "Version of zlib to build"
     required: true
+  pdal_version:
+    description: "Version of pdal to build"
+    required: true
+  gdal_version:
+    description: "Version of gdal to build"
+    required: true
+  libgeotiff_version:
+    description: "Version of libgeotiff to build"
+    required: true
 
 runs:
   using: "composite"
@@ -79,6 +88,9 @@ runs:
         tbb_version: ${{inputs.tbb_version}}
         usd_version: ${{inputs.usd_version}}
         zlib_version: ${{inputs.zlib_version}}
+        pdal_version: ${{inputs.pdal_version}}
+        libgeotiff_version: ${{inputs.libgeotiff_version}}
+        gdal_version: ${{inputs.gdal_version}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
@@ -88,6 +100,9 @@ runs:
         tbb_version: ${{inputs.tbb_version}}
         vtk_version: ${{inputs.vtk_version}}
         zlib_version: ${{inputs.zlib_version}}
+        pdal_version: ${{inputs.pdal_version}}
+        libgeotiff_version: ${{inputs.libgeotiff_version}}
+        gdal_version: ${{inputs.gdal_version}}
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -133,6 +148,7 @@ runs:
         -DF3D_PLUGIN_BUILD_DRACO=ON;
         -DF3D_PLUGIN_BUILD_OCCT=ON;
         -DF3D_PLUGIN_BUILD_USD=ON;
+        -DF3D_PLUGIN_BUILD_PDAL=ON;
         -DF3D_PLUGIN_BUILD_VDB=${{ runner.os == 'macOS' && 'OFF' || 'ON' }};
         -DF3D_MACOS_BUNDLE=OFF;
         -DF3D_MODULE_EXR=ON;
