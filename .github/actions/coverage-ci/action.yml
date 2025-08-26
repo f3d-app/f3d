@@ -102,8 +102,6 @@ runs:
         tbb_version: ${{inputs.tbb_version}}
         vtk_version: ${{inputs.vtk_version}}
         zlib_version: ${{inputs.zlib_version}}
-        libgeotiff_version: ${{inputs.libgeotiff_version}}
-        gdal_version: ${{inputs.gdal_version}}
 
     # coverage build is done in source as it seems to be required for codecov
     # CMAKE_MODULE_PATH is required because of

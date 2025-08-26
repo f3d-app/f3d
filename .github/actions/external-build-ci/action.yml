@@ -13,12 +13,6 @@ inputs:
   zlib_version:
     description: "Version of zlib to build"
     required: true
-  gdal_version:
-    description: "Version of gdal to build"
-    required: true
-  libgeotiff_version:
-    description: "Version of libgeotiff to build"
-    required: true
 
 runs:
   using: "composite"
@@ -48,8 +42,6 @@ runs:
         blosc_version: ${{inputs.blosc_version}}
         tbb_version: ${{inputs.tbb_version}}
         zlib_version: ${{inputs.zlib_version}}
-        gdal_version: ${{inputs.gdal_version}}
-        libgeotiff_version: ${{inputs.libgeotiff_version}}
 
     - name: Install VTK dependency
       uses: ./source/f3d/.github/actions/vtk-install-dep
@@ -58,8 +50,6 @@ runs:
         tbb_version: ${{inputs.tbb_version}}
         vtk_version: ${{inputs.vtk_version}}
         zlib_version: ${{inputs.zlib_version}}
-        gdal_version: ${{inputs.gdal_version}}
-        libgeotiff_version: ${{inputs.libgeotiff_version}}
 
     - name: Setup Build Directory
       shell: bash
