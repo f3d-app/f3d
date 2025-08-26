@@ -43,5 +43,6 @@ if (F3D_PLUGIN_BUILD_VDB)
 endif()
 
 if (F3D_PLUGIN_BUILD_PDAL)
+  # PDAL plugin needs vtkPDALReader: https://gitlab.kitware.com/vtk/vtk/-/merge_requests/3491
   add_subdirectory(pdal)
 endif()
