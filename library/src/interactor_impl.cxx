@@ -792,7 +792,7 @@ interactor& interactor_impl::initCommands()
       this->Internals->Options.setAsString(args[0], args[1]);
     },
     "set option.name values: set a libf3d option",
-    std::bind(complDummy, std::placeholders::_1, std::vector<std::string>{}));
+    std::bind(complDummy, std::placeholders::_1, this->Internals->Options.getNames()));
 
   this->addCommand(
     "toggle",
