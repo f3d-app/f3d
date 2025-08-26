@@ -313,7 +313,7 @@ jobs:
           zlib_version: ${{matrix.zlib_version}}
           pdal_version: ${{matrix.pdal_version}}
           gdal_version: ${{matrix.gdal_version}}
-          libgeotiff_version: ${{matrix..libgeotiff_version}}
+          libgeotiff_version: ${{matrix.libgeotiff_version}}
 
       - name: Install Raytracing Dependencies
         if: matrix.ospray_version != ''
