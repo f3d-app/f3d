@@ -25,7 +25,7 @@
     "zlib": "v1.3.1",
     "pdal": "v2.9.1",
     "gdal": "v3.11.3",
-    "libgeotiff": "1.7.4"
+    "libgeotiff": "v1.7.4"
   },
   "min_versions": {
     "alembic": "1.8.5",
@@ -45,7 +45,7 @@
     "zlib": "v1.2.13",
     "pdal": "v2.0.0",
     "gdal": "v3.0.0",
-    "libgeotiff": "1.3.0"
+    "libgeotiff": "v1.3.0"
   },
   "vtk_commit_sha": "f79f45bccf13df70c8937ea99f1e492eb5b7cf94",
   "timestamp": "20250809_0"
