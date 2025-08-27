@@ -83,6 +83,9 @@ inputs:
   gdal_version:
     description: "Version of gdal to build"
     required: true
+  proj_version:
+    description: "Version of proj to build"
+    required: true
   vtk_version:
     description: "VTK version"
     required: true
@@ -126,6 +129,7 @@ runs:
         pdal_version: ${{inputs.pdal_version}}
         gdal_version: ${{inputs.gdal_version}}
         libgeotiff_version: ${{inputs.libgeotiff_version}}
+        proj_version: ${{inputs.proj_version}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
@@ -139,6 +143,7 @@ runs:
         zlib_version: ${{inputs.zlib_version}}
         gdal_version: ${{inputs.gdal_version}}
         libgeotiff_version: ${{inputs.libgeotiff_version}}
+        proj_version: ${{inputs.proj_version}}
 
     - name: Set up Python
       if: |

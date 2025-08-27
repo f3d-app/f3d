@@ -56,6 +56,9 @@ inputs:
   libgeotiff_version:
     description: "Version of libgeotiff to build"
     required: true
+  proj_version:
+    description: "Version of PROJ to build"
+    required: true
 
 runs:
   using: "composite"
@@ -91,6 +94,7 @@ runs:
         zlib_version: ${{inputs.zlib_version}}
         libgeotiff_version: ${{inputs.libgeotiff_version}}
         gdal_version: ${{inputs.gdal_version}}
+        proj_version: ${{inputs.proj_version}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep

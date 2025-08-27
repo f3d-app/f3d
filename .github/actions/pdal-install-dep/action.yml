@@ -14,6 +14,9 @@ inputs:
   libgeotiff_version:
     description: "Version of libgeotiff to build against"
     required: true
+  proj_version:
+    description: "Version of proj to build against"
+    required: true
 
 runs:
   using: "composite"
@@ -22,6 +25,7 @@ runs:
       shell: bash
       run: |
         [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+        [[ "${{ inputs.proj_version }}" ]] || { echo "proj_version input is empty" ; exit 1; }
         [[ "${{ inputs.gdal_version }}" ]] || { echo "gdal_version input is empty" ; exit 1; }
         [[ "${{ inputs.libgeotiff_version }}" ]] || { echo "libgeotiff_version input is empty" ; exit 1; }
 
@@ -30,7 +34,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/pdal_install
-        key: pdal-${{inputs.version}}-${{inputs.gdal_version}}-${{inputs.libgeotiff_version}}-${{runner.os}}-${{inputs.cpu}}-0
+        key: pdal-${{inputs.version}}-${{inputs.proj_version}}-${{inputs.gdal_version}}-${{inputs.libgeotiff_version}}-${{runner.os}}-${{inputs.cpu}}-0
 
     - name: Checkout PDAL
       if: steps.cache-pdal.outputs.cache-hit != 'true'
@@ -60,6 +64,7 @@ runs:
         -DCMAKE_INSTALL_LIBDIR:PATH=lib
         -DCMAKE_INSTALL_PREFIX=../pdal_install
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
+        -DUSE_PROJ:BOOL=ON
         -DUSE_GDAL:BOOL=ON
         -DUSE_LIBGEOTIFF:BOOL=ON
         -DUSE_EXPLICIT_INSTANTIATION:BOOL=OFF

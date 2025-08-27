@@ -152,6 +152,7 @@ jobs:
           - usd_version: ${{needs.default_versions.outputs.usd_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           - pdal_version: v2.9.1
+          - proj_version: v9.6.2
           - libgeotiff_version: v1.7.4
           - gdal_version: v3.11.3
           - build_type: mindeps
@@ -170,6 +171,7 @@ jobs:
             tbb_version: ${{needs.default_versions.outputs.tbb_min_version}}
             usd_version: ${{needs.default_versions.outputs.usd_min_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_min_version}}
+            proj_version: v6.3.0
             pdal_version: v2.9.1
             libgeotiff_version: v1.7.4
             gdal_version: v3.11.3
@@ -202,6 +204,7 @@ jobs:
           usd_version: ${{matrix.usd_version}}
           zlib_version: ${{matrix.zlib_version}}
           pdal_version: v2.9.1
+          proj_version: v9.6.2
           libgeotiff_version: v1.7.4
           gdal_version: v3.11.3
 
@@ -444,6 +447,7 @@ jobs:
           - usd_version: ${{needs.default_versions.outputs.usd_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           - pdal_version: v2.9.1
+          - proj_version: v9.6.2
           - libgeotiff_version: v1.7.4
           - gdal_version: v3.11.3
           - build_type: egl

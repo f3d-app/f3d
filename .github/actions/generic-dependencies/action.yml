@@ -57,6 +57,9 @@ inputs:
   gdal_version:
     description: "Version of gdal to build"
     required: true
+  proj_version:
+    description: "Version of proj to build"
+    required: true
 
 runs:
   using: "composite"
@@ -80,6 +83,7 @@ runs:
         pdal_version: ${{inputs.pdal_version}}
         gdal_version: ${{inputs.gdal_version}}
         libgeotiff_version: ${{inputs.libgeotiff_version}}
+        proj_version: ${{inputs.proj_version}}
 
     - name: Install Raytracing Dependencies
       if: inputs.ospray_version != ''
