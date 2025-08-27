@@ -1058,7 +1058,8 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240729)
   f3d_test(NAME TestInteractionConsoleHistoryHide DATA BoxAnimated.gltf INTERACTION UI)#Escape;a;Enter;b;Enter;Up;Escape;Escape;Escape;Up
 
   file(COPY "${F3D_SOURCE_DIR}/testing/data/cow.vtp" DESTINATION "${CMAKE_BINARY_DIR}/Testing/data/") # Capital T, to avoid confusion on Windows and in-sources build
-  f3d_test(NAME TestInteractionConsoleAutoCompleteFilesystem ARGS --multi-file-mode=all INTERACTION UI) #Escape;ad;Tab;_f;Tab; ;Tab;..;Tab;T;Tab;i;Tab;d;Tab;Tab; ;p;Tab;Enter;Esc
+  # First file (`.d`) doesn't exist and is there to test multi args
+  f3d_test(NAME TestInteractionConsoleAutoCompleteFilesystem INTERACTION UI) #Escape;ad;Tab;_f;Tab; ;.;Tab;d ..;Tab;T;Tab;i;Tab;d;Tab;Tab;Enter;Esc
 
   if(NOT WIN32)
     # Does not work on windows as it uses hard coded slash

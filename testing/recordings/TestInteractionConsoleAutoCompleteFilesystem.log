@@ -34,6 +34,22 @@ KeyPressEvent 199 142 0 46 1 period 0
 CharEvent 199 142 0 46 1 period 0
 KeyReleaseEvent 199 142 0 46 1 period 0
 
+KeyPressEvent 199 142 0 9 1 Tab 0
+CharEvent 199 142 0 9 1 Tab 0
+KeyReleaseEvent 199 142 0 9 1 Tab 0
+
+KeyPressEvent 199 142 0 100 1 d 0
+CharEvent 199 142 0 100 1 d 0
+KeyReleaseEvent 199 142 0 100 1 d 0
+
+KeyPressEvent 199 142 0 32 1 space 0
+CharEvent 199 142 0 32 1 space 0
+KeyReleaseEvent 199 142 0 32 1 space 0
+
+KeyPressEvent 199 142 0 46 1 period 0
+CharEvent 199 142 0 46 1 period 0
+KeyReleaseEvent 199 142 0 46 1 period 0
+
 KeyPressEvent 199 142 0 46 1 period 0
 CharEvent 199 142 0 46 1 period 0
 KeyReleaseEvent 199 142 0 46 1 period 0
@@ -77,18 +93,6 @@ KeyReleaseEvent 199 142 0 100 1 d 0
 KeyPressEvent 199 142 0 9 1 Tab 0
 CharEvent 199 142 0 9 1 Tab 0
 KeyReleaseEvent 199 142 0 9 1 Tab 0
-
-KeyPressEvent 199 142 0 9 1 Tab 0
-CharEvent 199 142 0 9 1 Tab 0
-KeyReleaseEvent 199 142 0 9 1 Tab 0
-
-KeyPressEvent 199 142 0 32 1 space 0
-CharEvent 199 142 0 32 1 space 0
-KeyReleaseEvent 199 142 0 32 1 space 0
-
-KeyPressEvent 199 142 0 112 1 p 0
-CharEvent 199 142 0 112 1 p 0
-KeyReleaseEvent 199 142 0 112 1 p 0
 
 KeyPressEvent 199 142 0 9 1 Tab 0
 CharEvent 199 142 0 9 1 Tab 0
