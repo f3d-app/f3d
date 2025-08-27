@@ -1055,6 +1055,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240729)
 
   file(COPY "${F3D_SOURCE_DIR}/testing/data/cow.vtp" DESTINATION "${CMAKE_BINARY_DIR}/Testing/data/") # Capital T, to avoid confusion on Windows and in-sources build
   f3d_test(NAME TestInteractionConsoleAutoCompleteFilesystem ARGS --multi-file-mode=all INTERACTION UI) #Escape;ad;Tab;_f;Tab; ;Tab;..;Tab;T;Tab;i;Tab;d;Tab;Tab; ;p;Tab;Enter;Esc
+  f3d_test(NAME TestInteractionConsoleAutoCompleteFilesystemError INTERACTION UI NO_BASELINE REGEXP "File name too long") #Escape;ad;Tab;_f;Tab; ;Tab;300*a/a;Tab;Esc
 
   f3d_test(NAME TestInteractionConsoleHistory DATA BoxAnimated.gltf INTERACTION UI) #Escape;ro;Tab;45;Enter;set_c;Tab;top;Enter;Up;Up;Enter;Up;Up;Up;Up;Down;Down;Down;Down
   f3d_test(NAME TestInteractionConsoleHistoryEmpty DATA BoxAnimated.gltf INTERACTION UI)#Escape;Up;Down
