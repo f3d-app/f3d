@@ -34,7 +34,7 @@ def test_command(capfd: pytest.CaptureFixture[str]):
 
     # Smoke test
     inter.init_commands()
-    inter.add_command("my_cmd2", print_fn, "doc", compl_fn)
+    inter.add_command("my_cmd2", print_fn, ["my_cmd2", "doc"], compl_fn)
 
 
 def test_binding():

@@ -67,6 +67,8 @@ class F3D_EXPORT interactor
 {
 public:
   ///@{ @name Command
+  using command_documentation_t = std::pair<std::string, std::string>;
+
   /**
    * Remove all existing commands and add all default commands,
    * see COMMANDS.md for details.
@@ -81,7 +83,7 @@ public:
    * eg: `my_app::action`
    */
   virtual interactor& addCommand(const std::string& action,
-    std::function<void(const std::vector<std::string>&)> callback, const std::string& doc = "",
+    std::function<void(const std::vector<std::string>&)> callback, const std::optional<command_documentation_t> doc = std::nullopt,
     std::function<std::vector<std::string>(const std::vector<std::string>&)> completionCallback =
       nullptr) = 0;
 

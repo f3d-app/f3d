@@ -69,7 +69,7 @@ public:
   struct CommandCallbacks
   {
     std::function<void(const std::vector<std::string>&)> Callback;
-    std::string Documentation;
+    std::optional<command_documentation_t> Documentation;
     std::function<std::vector<std::string>(const std::vector<std::string>&)> CompletionCallback;
   };
 
@@ -790,7 +790,7 @@ interactor& interactor_impl::initCommands()
       check_args(args, 2, "set");
       this->Internals->Options.setAsString(args[0], args[1]);
     },
-    "set option.name values: set a libf3d option", complOptionNames);
+    command_documentation_t{"set option.name values", "set a libf3d option"}, complOptionNames);
 
   this->addCommand(
     "toggle",
@@ -799,7 +799,7 @@ interactor& interactor_impl::initCommands()
       check_args(args, 1, "toggle");
       this->Internals->Options.toggle(args[0]);
     },
-    "toggle option.name: toggle a boolean libf3d option", complOptionNames);
+    command_documentation_t{"toggle option.name", "toggle a boolean libf3d option"}, complOptionNames);
 
   this->addCommand(
     "reset",
@@ -808,7 +808,7 @@ interactor& interactor_impl::initCommands()
       check_args(args, 1, "reset");
       this->Internals->Options.reset(args[0]);
     },
-    "reset option.name: reset a libf3d option to its default values", complOptionNames);
+    command_documentation_t{"reset option.name", "reset a libf3d option to its default values"}, complOptionNames);
 
   this->addCommand(
     "clear",
@@ -822,7 +822,7 @@ interactor& interactor_impl::initCommands()
       console->Clear();
 #endif
     },
-    "clear: clear console");
+    command_documentation_t{"clear", "clear console"});
 
   this->addCommand(
     "print",
@@ -831,7 +831,7 @@ interactor& interactor_impl::initCommands()
       check_args(args, 1, "print");
       log::info(this->Internals->Options.getAsString(args[0]));
     },
-    "print option.name: print the value of an libf3d option", complOptionNames);
+    command_documentation_t{"print option.name", "print the value of an libf3d option"}, complOptionNames);
 
   this->addCommand(
     "set_reader_option",
@@ -840,13 +840,13 @@ interactor& interactor_impl::initCommands()
       check_args(args, 2, "set_reader_option");
       f3d::engine::setReaderOption(args[0], args[1]);
     },
-    "set_reader_option ReaderName.option_name value: set a reader option",
+    command_documentation_t{"set_reader_option ReaderName.option_name value", "set a reader option"},
     std::bind(complNames, std::placeholders::_1, f3d::engine::getAllReaderOptionNames()));
 
   this->addCommand(
     "cycle_animation",
     [&](const std::vector<std::string>&) { this->Internals->AnimationManager->CycleAnimation(); },
-    "cycle scene.animation.index option using model information");
+    command_documentation_t{"cycle_animation", "cycle scene.animation.index option using model information"});
 
   this->addCommand(
     "cycle_anti_aliasing",
@@ -872,7 +872,7 @@ interactor& interactor_impl::initCommands()
       }
       this->Internals->Window.render();
     },
-    "cycle between the anti-aliasing method (none,fxaa,ssaa)");
+    command_documentation_t{"cycle_anti_aliasing", "cycle between the anti-aliasing method (none,fxaa,ssaa)"});
 
   std::vector<std::string> cycleColoringValidArgs = { "field", "array", "component" };
   this->addCommand(
@@ -904,7 +904,7 @@ interactor& interactor_impl::initCommands()
       this->Internals->SynchronizeScivisOptions(this->Internals->Options, ren);
       this->Internals->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
     },
-    "cycle_coloring field/array/component: cycle scivis options using model information",
+    command_documentation_t{"cycle_coloring field/array/component", "cycle scivis options using model information"},
     std::bind(complNames, std::placeholders::_1,
       std::vector<std::string>{ "field", "array", "component" }));
 
@@ -917,7 +917,7 @@ interactor& interactor_impl::initCommands()
       this->Internals->Style->SetTemporaryUp(
         this->Internals->Window.getCamera().getViewUp().data());
     },
-    "roll_camera value: roll the camera on its side");
+    command_documentation_t{"roll_camera value", "roll the camera on its side"});
 
   this->addCommand(
     "elevation_camera",
@@ -928,7 +928,7 @@ interactor& interactor_impl::initCommands()
       this->Internals->Style->SetTemporaryUp(
         this->Internals->Window.getCamera().getViewUp().data());
     },
-    "elevation_camera value: tilt the camera up or down");
+    command_documentation_t{"elevation_camera value", "tilt the camera up or down"});
 
   this->addCommand(
     "azimuth_camera",
@@ -939,38 +939,38 @@ interactor& interactor_impl::initCommands()
       this->Internals->Style->SetTemporaryUp(
         this->Internals->Window.getCamera().getViewUp().data());
     },
-    "azimuth_camera value: tilt the camera right or left");
+    command_documentation_t{"azimuth_camera value", "tilt the camera right or left"});
 
   this->addCommand(
     "increase_light_intensity", [&](const std::vector<std::string>&)
-    { this->Internals->IncreaseLightIntensity(false); }, "increase light intensity");
+    { this->Internals->IncreaseLightIntensity(false); }, command_documentation_t{"increase_light_intensity","increase light intensity"});
 
   this->addCommand(
     "decrease_light_intensity", [&](const std::vector<std::string>&)
-    { this->Internals->IncreaseLightIntensity(true); }, "decrease light intensity");
+    { this->Internals->IncreaseLightIntensity(true); }, command_documentation_t{"decrease_light_intensity","decrease light intensity"});
 
   this->addCommand(
     "increase_opacity", [&](const std::vector<std::string>&)
-    { this->Internals->IncreaseOpacity(false); }, "increase opacity");
+    { this->Internals->IncreaseOpacity(false); }, command_documentation_t{"increase_opacity","increase opacity"});
 
   this->addCommand(
     "decrease_opacity", [&](const std::vector<std::string>&)
-    { this->Internals->IncreaseOpacity(true); }, "decrease opacity");
+    { this->Internals->IncreaseOpacity(true); }, command_documentation_t{"decrease_opacity","decrease opacity"});
 
   this->addCommand(
     "print_scene_info", [&](const std::vector<std::string>&)
     { this->Internals->Window.PrintSceneDescription(log::VerboseLevel::INFO); },
-    "print information about the scene");
+    command_documentation_t{"print_scene_info","print information about the scene"});
 
   this->addCommand(
     "print_coloring_info", [&](const std::vector<std::string>&)
     { this->Internals->Window.PrintColoringDescription(log::VerboseLevel::INFO); },
-    "print information about coloring settings");
+    command_documentation_t{"print_coloring_info","print information about coloring settings"});
 
   this->addCommand(
     "print_mesh_info", [&](const std::vector<std::string>&)
     { this->Internals->Scene.PrintImporterDescription(log::VerboseLevel::INFO); },
-    "print information from the mesh importer");
+    command_documentation_t{"print_mesh_info","print information from the mesh importer"});
 
   this->addCommand(
     "print_options_info",
@@ -984,7 +984,7 @@ interactor& interactor_impl::initCommands()
         log::print(log::VerboseLevel::INFO, descr);
       }
     },
-    "print libf3d options that have a value");
+    command_documentation_t{"print_options_info","print libf3d options that have a value"});
 
   this->addCommand(
     "set_camera",
@@ -1018,7 +1018,7 @@ interactor& interactor_impl::initCommands()
           std::string("Command: set_camera arg:\"") + std::string(type) + "\" is not recognized.");
       }
     },
-    "set_camera front/top/right/isometric: position the camera in the specified location",
+    command_documentation_t{"set_camera front/top/right/isometric", "position the camera in the specified location"},
     std::bind(complNames, std::placeholders::_1,
       std::vector<std::string>{ "front", "top", "right", "isometric" }));
 
@@ -1030,11 +1030,11 @@ interactor& interactor_impl::initCommands()
       this->Internals->Window.render();
       this->Internals->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
     },
-    "toggle model.volume.enable and print coloring information");
+    command_documentation_t{"toggle_volume_rendering", "toggle model.volume.enable and print coloring information"});
 
   this->addCommand(
     "stop_interactor", [&](const std::vector<std::string>&) { this->stop(); },
-    "stop the interactor hence quit the application");
+    command_documentation_t{"stop_interactor", "stop the interactor hence quit the application"});
 
   this->addCommand(
     "reset_camera",
@@ -1043,11 +1043,11 @@ interactor& interactor_impl::initCommands()
       this->Internals->Window.getCamera().resetToDefault();
       this->Internals->Style->ResetTemporaryUp();
     },
-    "reset the camera to its original location");
+    command_documentation_t{"reset_camera", "reset the camera to its original location"});
 
   this->addCommand(
     "toggle_animation", [&](const std::vector<std::string>&)
-    { this->Internals->AnimationManager->ToggleAnimation(); }, "start/stop the animation");
+    { this->Internals->AnimationManager->ToggleAnimation(); }, command_documentation_t{"toggle_animation", "start/stop the animation"});
 
   // XXX: No filesystem completion, F3DStarter add its own command anyway
   this->addCommand(
@@ -1057,7 +1057,7 @@ interactor& interactor_impl::initCommands()
       this->Internals->AnimationManager->StopAnimation();
       this->Internals->Scene.add(files);
     },
-    "add files to the scene");
+    command_documentation_t{"add_files", "add files to the scene"});
 
   this->addCommand(
     "alias",
@@ -1079,7 +1079,7 @@ interactor& interactor_impl::initCommands()
       log::info(
         "Alias " + aliasName + " added with command " + this->Internals->AliasMap[aliasName]);
     },
-    "create an alias for a command");
+    command_documentation_t{"alias", "create an alias for a command"});
 
   this->addCommand(
     "cycle_verbose_level",
@@ -1099,7 +1099,7 @@ interactor& interactor_impl::initCommands()
 
       log::info("Verbose level changed to: ", this->Internals->VerboseLevelToString(newLevel));
     },
-    "cycle between verbose levels");
+    command_documentation_t{"cycle_verbose_level", "cycle between verbose levels"});
 
   this->addCommand(
     "help",
@@ -1109,7 +1109,14 @@ interactor& interactor_impl::initCommands()
       const auto it = this->Internals->Commands.find(args[0]);
       if (it != this->Internals->Commands.end())
       {
-        log::print(log::VerboseLevel::INFO, it->second.Documentation);
+        if (it->second.Documentation)
+        {
+          log::print(log::VerboseLevel::INFO, it->second.Documentation->first, ": ", it->second.Documentation->second);
+        }
+        else
+        {
+          log::print(log::VerboseLevel::INFO, "No documentation");
+        }
       }
       else
       {
@@ -1117,18 +1124,18 @@ interactor& interactor_impl::initCommands()
           std::string("Command: help arg:\"") + args[0] + "\" is not a recognized command.");
       }
     },
-    "help action: print help about a specific command action", complCommandActions);
+    command_documentation_t{"help action", "print help about a specific command action"}, complCommandActions);
 
   return *this;
 }
 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::addCommand(const std::string& action,
-  std::function<void(const std::vector<std::string>&)> callback, const std::string& doc,
+  std::function<void(const std::vector<std::string>&)> callback, const std::optional<command_documentation_t> doc,
   std::function<std::vector<std::string>(const std::vector<std::string>&)> completionCallback)
 {
   const auto [it, success] = this->Internals->Commands.insert(
-    { action, { std::move(callback), doc, std::move(completionCallback) } });
+    { action, { std::move(callback), std::move(doc), std::move(completionCallback) } });
   if (!success)
   {
     throw interactor::already_exists_exception(
