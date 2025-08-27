@@ -779,6 +779,10 @@ interactor& interactor_impl::initCommands()
 /*  auto complCommandActions = [&](const std::vector<std::string>& args)
   { return complNames(args, this->getCommandActions()); };*/
 
+  auto complEt = [&](const std::vector<std::string>& args)
+  { return complNames(args, this->Internals->Options.getNames()); };
+
+
   auto complDummy = [&](const std::vector<std::string>& args,  const std::vector<std::string>& names)
   { return std::vector<std::string>{}; };
 
@@ -792,7 +796,7 @@ interactor& interactor_impl::initCommands()
       this->Internals->Options.setAsString(args[0], args[1]);
     },
     "set option.name values: set a libf3d option",
-    std::bind(complDummy, std::placeholders::_1, std::vector<std::string>{ "field", "array", "component" }));
+    complEt);
 
   this->addCommand(
     "toggle",
