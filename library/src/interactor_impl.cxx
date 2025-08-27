@@ -779,6 +779,9 @@ interactor& interactor_impl::initCommands()
   auto complCommandActions = [&](const std::vector<std::string>& args)
   { return complNames(args, this->getCommandActions()); };
 
+  auto complOptionNames = [&](const std::vector<std::string>& args)
+  { return complNames(args, this->Internals->Options.getAllNames()); };
+
   // Add default callbacks
   this->addCommand(
     "set",
@@ -787,8 +790,7 @@ interactor& interactor_impl::initCommands()
       check_args(args, 2, "set");
       this->Internals->Options.setAsString(args[0], args[1]);
     },
-    "set option.name values: set a libf3d option",
-    std::bind(complNames, std::placeholders::_1, this->Internals->Options.getNames()));
+    "set option.name values: set a libf3d option", complOptionNames);
 
   this->addCommand(
     "toggle",
@@ -797,8 +799,7 @@ interactor& interactor_impl::initCommands()
       check_args(args, 1, "toggle");
       this->Internals->Options.toggle(args[0]);
     },
-    "toggle option.name: toggle a boolean libf3d option",
-    std::bind(complNames, std::placeholders::_1, this->Internals->Options.getNames()));
+    "toggle option.name: toggle a boolean libf3d option", complOptionNames);
 
   this->addCommand(
     "reset",
@@ -807,8 +808,7 @@ interactor& interactor_impl::initCommands()
       check_args(args, 1, "reset");
       this->Internals->Options.reset(args[0]);
     },
-    "reset option.name: reset a libf3d option to its default values",
-    std::bind(complNames, std::placeholders::_1, this->Internals->Options.getNames()));
+    "reset option.name: reset a libf3d option to its default values", complOptionNames);
 
   this->addCommand(
     "clear",
@@ -831,8 +831,7 @@ interactor& interactor_impl::initCommands()
       check_args(args, 1, "print");
       log::info(this->Internals->Options.getAsString(args[0]));
     },
-    "print option.name: print the value of an libf3d option",
-    std::bind(complNames, std::placeholders::_1, this->Internals->Options.getNames()));
+    "print option.name: print the value of an libf3d option", complOptionNames);
 
   this->addCommand(
     "set_reader_option",
