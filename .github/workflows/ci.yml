@@ -151,6 +151,9 @@ jobs:
           - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           - usd_version: ${{needs.default_versions.outputs.usd_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          - pdal_version: v2.9.1
+          - libgeotiff_version: v1.7.4
+          - gdal_version: v3.11.3
           - build_type: mindeps
             os: ubuntu-22.04
             cpu: x86_64
@@ -167,6 +170,9 @@ jobs:
             tbb_version: ${{needs.default_versions.outputs.tbb_min_version}}
             usd_version: ${{needs.default_versions.outputs.usd_min_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_min_version}}
+            pdal_version: v2.9.1
+            libgeotiff_version: v1.7.4
+            gdal_version: v3.11.3
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
