@@ -82,7 +82,7 @@ inputs:
     required: true
   gdal_version:
     description: "Version of gdal to build"
-    required: gdal
+    required: true
   vtk_version:
     description: "VTK version"
     required: true
