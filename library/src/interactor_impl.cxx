@@ -1148,7 +1148,7 @@ interactor& interactor_impl::initCommands()
 //----------------------------------------------------------------------------
 interactor& interactor_impl::addCommand(const std::string& action,
   std::function<void(const std::vector<std::string>&)> callback,
-  const std::optional<command_documentation_t> doc,
+  std::optional<command_documentation_t> doc,
   std::function<std::vector<std::string>(const std::vector<std::string>&)> completionCallback)
 {
   const auto [it, success] = this->Internals->Commands.insert(
