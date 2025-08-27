@@ -25,7 +25,7 @@ struct vtkF3DImguiConsole::Internals
   };
 
   std::vector<std::pair<LogType, std::string>> Logs;
-  std::array<char, 256> CurrentInput = {};
+  std::array<char, 1024> CurrentInput = {};
   bool NewError = false;
   bool NewWarning = false;
   std::pair<size_t, size_t> Completions{ 0,
