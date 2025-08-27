@@ -50,12 +50,12 @@ runs:
 
     - name: Configure PDAL
       if: steps.cache-pdal.outputs.cache-hit != 'true'
-      working-directory: ${{github.workspace}}/dependencies
+      working-directory: ${{github.workspace}}/dependencies/pdal_build
       shell: bash
       run: >
         cmake ../pdal
         -DBUILD_APPS=ON
-        -BUILD_SHARED_LIBS=ON
+        -DBUILD_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_LIBDIR:PATH=lib
         -DCMAKE_INSTALL_PREFIX=../pdal_install
