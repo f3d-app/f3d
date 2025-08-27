@@ -434,9 +434,9 @@ jobs:
           - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           - usd_version: ${{needs.default_versions.outputs.usd_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-          - pdal_version: 2.9.1
-          - libgeotiff_version: 1.7.4
-          - gdal_version: 3.11.3
+          - pdal_version: v2.9.1
+          - libgeotiff_version: v1.7.4
+          - gdal_version: v3.11.3
           - build_type: egl
             vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             optional_deps_label: optional-deps
