@@ -22,7 +22,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/libgeotiff_install
-        key: 
+        key: libgeotiff-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-0
 
     - name: Checkout libgeotiff
       if: steps.cache-libgeotiff.outputs.cache-hit != 'true'

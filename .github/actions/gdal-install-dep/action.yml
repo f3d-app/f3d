@@ -22,7 +22,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/gdal_install
-        key: 
+        key: gdal-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-0
 
     - name: Checkout GDAL
       if: steps.cache-gdal.outputs.cache-hit != 'true'
