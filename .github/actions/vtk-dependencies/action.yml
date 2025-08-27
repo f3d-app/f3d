@@ -21,6 +21,15 @@ inputs:
   zlib_version:
     description: "Version of zlib to build"
     required: true
+  pdal_version:
+    description: "Version of pdal to build against"
+    required: false
+  gdal_version:
+    description: "Version of gdal to build against"
+    required: true
+  libgeotiff_version:
+    description: "Version of libgeotiff to build against"
+    required: true
 
 runs:
   using: "composite"
@@ -60,3 +69,24 @@ runs:
         blosc_version: ${{inputs.blosc_version}}
         tbb_version: ${{inputs.tbb_version}}
         zlib_version: ${{inputs.zlib_version}}
+
+    - name: Install gdal
+      uses: ./.actions/gdal-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        version: ${{inputs.gdal_version}}
+
+    - name: Install libgeotiff
+      uses: ./.actions/libgeotiff-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        version: ${{inputs.libgeotiff_version}}
+
+    - name: Install PDAL
+      if: inputs.pdal != ''
+      uses: ./.actions/pdal-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        version: ${{inputs.pdal_version}}
+        gdal_version: ${{inputs.gdal_version}}
+        libgeotiff_version: ${{inputs.libgeotiff_version}}
