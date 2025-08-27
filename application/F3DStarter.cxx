@@ -2020,7 +2020,8 @@ void F3DStarter::AddCommands()
         this->LoadRelativeFileGroup(0, false, true);
       }
     },
-    f3d::interactor::command_documentation_t{"remove_current_file_group", "remove current file group and load the next file group if any"});
+    f3d::interactor::command_documentation_t{ "remove_current_file_group",
+      "remove current file group and load the next file group if any" });
 
   interactor.addCommand(
     "remove_file_groups",
@@ -2034,7 +2035,7 @@ void F3DStarter::AddCommands()
       this->LoadFileGroup(0, false, true);
       this->ResetWindowName();
     },
-    f3d::interactor::command_documentation_t{"remove_file_groups", "remove all files"});
+    f3d::interactor::command_documentation_t{ "remove_file_groups", "remove all files" });
 
   interactor.addCommand(
     "load_previous_file_group",
@@ -2043,19 +2044,24 @@ void F3DStarter::AddCommands()
       this->LoadRelativeFileGroup(
         -1, parse_optional_bool_flag(args, "load_previous_file_group", false));
     },
-    f3d::interactor::command_documentation_t{"load_previous_file_group [keep_camera]", "load the previous file or file group"});
+    f3d::interactor::command_documentation_t{
+      "load_previous_file_group [keep_camera]", "load the previous file or file group" });
 
   interactor.addCommand(
     "load_next_file_group",
-    [this](const std::vector<std::string>& args) {
+    [this](const std::vector<std::string>& args)
+    {
       this->LoadRelativeFileGroup(
         +1, parse_optional_bool_flag(args, "load_next_file_group", false));
     },
-    f3d::interactor::command_documentation_t{"load_next_file_group [keep_camera]", "load the next file or file group"});
+    f3d::interactor::command_documentation_t{
+      "load_next_file_group [keep_camera]", "load the next file or file group" });
 
   interactor.addCommand(
-    "reload_current_file_group", [this](const std::vector<std::string>&)
-    { this->LoadRelativeFileGroup(0, true, true); }, f3d::interactor::command_documentation_t{"reload_current_file_group", "reload the current file or file group"});
+    "reload_current_file_group",
+    [this](const std::vector<std::string>&) { this->LoadRelativeFileGroup(0, true, true); },
+    f3d::interactor::command_documentation_t{
+      "reload_current_file_group", "reload the current file or file group" });
 
   interactor.addCommand(
     "add_current_directories",
@@ -2070,7 +2076,8 @@ void F3DStarter::AddCommands()
         this->LoadRelativeFileGroup(0);
       }
     },
-    f3d::interactor::command_documentation_t{"add_current_directories", "add all files from the current file or file group directories"});
+    f3d::interactor::command_documentation_t{
+      "add_current_directories", "add all files from the current file or file group directories" });
 
   interactor.addCommand(
     "take_screenshot",
@@ -2081,7 +2088,8 @@ void F3DStarter::AddCommands()
         args.empty() ? this->Internals->AppOptions.ScreenshotFilename : args[0];
       this->SaveScreenshot(filename);
     },
-    f3d::interactor::command_documentation_t{"take_screenshot [filename]", "take a screenshot into provided file or --screenshot-filename"},
+    f3d::interactor::command_documentation_t{ "take_screenshot [filename]",
+      "take a screenshot into provided file or --screenshot-filename" },
     complFilesystem);
 
   interactor.addCommand(
@@ -2093,7 +2101,8 @@ void F3DStarter::AddCommands()
         args.empty() ? this->Internals->AppOptions.ScreenshotFilename : args[0];
       this->SaveScreenshot(filename, true);
     },
-    f3d::interactor::command_documentation_t{"take_minimal_screenshot [filename]", "take a minimal screenshot into provided file or --screenshot-filename"},
+    f3d::interactor::command_documentation_t{ "take_minimal_screenshot [filename]",
+      "take a minimal screenshot into provided file or --screenshot-filename" },
     complFilesystem);
 
   // This replace an existing command in libf3d
@@ -2112,7 +2121,8 @@ void F3DStarter::AddCommands()
         this->LoadFileGroup(index);
       }
     },
-    f3d::interactor::command_documentation_t{"add_files path/to/file [path/to/another_file]", "add files to the scene"},
+    f3d::interactor::command_documentation_t{
+      "add_files path/to/file [path/to/another_file]", "add files to the scene" },
     complFilesystem);
 
   interactor.addCommand(
@@ -2131,7 +2141,9 @@ void F3DStarter::AddCommands()
         this->Render();
       }
     },
-    f3d::interactor::command_documentation_t{"set_hdri [path/to/hdri]", "set and use an HDRI image"}, complFilesystem);
+    f3d::interactor::command_documentation_t{
+      "set_hdri [path/to/hdri]", "set and use an HDRI image" },
+    complFilesystem);
 
   interactor.addCommand(
     "add_files_or_set_hdri",
@@ -2163,7 +2175,9 @@ void F3DStarter::AddCommands()
         this->LoadFileGroup(index);
       }
     },
-    f3d::interactor::command_documentation_t{"add_files_or_set_hdri [path/to/file1] [path/to/file2]", "add_files or set_hdri depending on the file extension"},
+    f3d::interactor::command_documentation_t{
+      "add_files_or_set_hdri [path/to/file1] [path/to/file2]",
+      "add_files or set_hdri depending on the file extension" },
     complFilesystem);
 
 #if F3D_MODULE_TINYFILEDIALOGS
@@ -2207,8 +2221,10 @@ void F3DStarter::AddCommands()
         }
       }
     },
-    f3d::interactor::command_documentation_t{"open_file_dialog", "open a file dialog to select a file to load"});
+    f3d::interactor::command_documentation_t{
+      "open_file_dialog", "open a file dialog to select a file to load" });
 #endif
   interactor.addCommand(
-    "exit", [&](const std::vector<std::string>&) { interactor.stop(); }, f3d::interactor::command_documentation_t{"exit", "quit the application"});
+    "exit", [&](const std::vector<std::string>&) { interactor.stop(); },
+    f3d::interactor::command_documentation_t{ "exit", "quit the application" });
 }
