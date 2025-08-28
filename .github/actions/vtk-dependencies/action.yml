@@ -26,7 +26,7 @@ inputs:
     required: false
   sqlite_version:
     description: "Version of sqlite to build against"
-    required: false
+    required: true
   gdal_version:
     description: "Version of gdal to build against"
     required: true
@@ -76,6 +76,12 @@ runs:
         tbb_version: ${{inputs.tbb_version}}
         zlib_version: ${{inputs.zlib_version}}
 
+    - name: Install sqlite
+      uses: ./.actions/sqlite-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        version: ${{inputs.sqlite_version}}
+
     - name: Install proj
       uses: ./.actions/proj-install-dep
       with:
@@ -100,6 +106,7 @@ runs:
       with:
         cpu: ${{inputs.cpu}}
         version: ${{inputs.pdal_version}}
+        sqlite_version: ${{inputs.sqlite_version}}
         proj_version: ${{inputs.proj_version}}
         gdal_version: ${{inputs.gdal_version}}
         libgeotiff_version: ${{inputs.libgeotiff_version}}
