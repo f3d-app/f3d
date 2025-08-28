@@ -397,15 +397,19 @@ void window_impl::UpdateDynamicOptions()
     std::istringstream ss(bindsStr);
     std::string token;
 
+    auto trim = [](std::string& str) {
+      size_t start = str.find_first_not_of(" \t");
+      size_t end = str.find_last_not_of(" \t");
+      if (start == std::string::npos) { str.clear(); return; }
+      str = str.substr(start, end - start + 1);
+    };
+
     while (std::getline(ss, token, ',')) {
+        trim(token);
         if (!token.empty()) {
             custom_binds.push_back(interaction_bind_t::parse(token));
         }
     }
-    // bind_vector_t custom_binds = opt.ui.drop_zone.custom_binds;
-    // std::vector<interaction_bind_t> custom_binds = options::parse<bind_vector_t>(opt.ui.drop_zone.custom_binds);
-
-    // renderer->SetDropZoneInfo(this->Internals->Interactor->getDropZoneInfo(custom_binds));
 
     renderer->SetDropZoneInfo(this->Internals->Interactor->getDropZoneInfo(custom_binds));
   }
@@ -429,7 +433,6 @@ void window_impl::UpdateDynamicOptions()
   renderer->ShowConsole(opt.ui.console);
   renderer->ShowMinimalConsole(opt.ui.minimal_console);
   renderer->ShowDropZone(opt.ui.drop_zone.enable);
-  // renderer->SetDropZoneInfo(opt.ui.drop_zone.info);
   renderer->ShowDropZoneLogo(opt.ui.drop_zone.show_logo);
   // F3D_DEPRECATED
   // Remove this in the next major release

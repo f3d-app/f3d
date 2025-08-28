@@ -497,7 +497,6 @@ void vtkF3DImguiActor::RenderDropZone()
     auto parsedInfo = parseDropZoneInfo(this->DropText.c_str());
 
     // Calculate max width for each column before rendering
-    float margin = 5.f;
     float maxDescTextWidth = 0.0f;
     float maxBindingsTextWidth = 0.0f;
 
@@ -514,7 +513,7 @@ void vtkF3DImguiActor::RenderDropZone()
         const auto& group = item.bindings[g];
         for (size_t k = 0; k < group.size(); ++k) // keys
         {
-          totalBindingsWidth += ImGui::CalcTextSize(group[k].c_str()).x + 2.0f * margin;
+          totalBindingsWidth += ImGui::CalcTextSize(group[k].c_str()).x + 0.5f * DROPZONE_LOGO_TEXT_PADDING;
           if (k < group.size() - 1) // plus between keys
           {
             totalBindingsWidth += ImGui::GetStyle().ItemSpacing.x +
@@ -540,28 +539,33 @@ void vtkF3DImguiActor::RenderDropZone()
 
     ImGui::Begin("DropZoneText", nullptr, flags);
 
+    // before positioning the table, compute its total width
+    float tableWidth = maxDescTextWidth + maxBindingsTextWidth + DROPZONE_LOGO_TEXT_PADDING +
+                      ImGui::GetStyle().ItemSpacing.x;
+
+
     // Position table below logo if needed
     if (this->DropZoneLogoVisible && this->Pimpl->LogoTexture)
     {
-      ImGui::SetCursorPos(ImVec2(viewport->GetWorkCenter().x - 150,
+      ImGui::SetCursorPos(ImVec2(viewport->GetWorkCenter().x - tableWidth * 0.5f,
         viewport->GetWorkCenter().y + logoDisplayHeight / 2 + DROPZONE_LOGO_TEXT_PADDING));
     }
     else
     {
-      ImGui::SetCursorPos(ImVec2(viewport->GetWorkCenter().x - 150,
+      ImGui::SetCursorPos(ImVec2(viewport->GetWorkCenter().x - tableWidth * 0.5f,
         viewport->GetWorkCenter().y));
     }
 
     if (ImGui::BeginTable("DropZoneBindingsTable", 2,
         ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_NoBordersInBody))
     {
-      ImGui::TableSetupColumn("Action", ImGuiTableColumnFlags_WidthFixed, maxDescTextWidth + 2.0f * margin);
-      ImGui::TableSetupColumn("Key", ImGuiTableColumnFlags_WidthFixed, maxBindingsTextWidth + 2.0f * margin);
+      ImGui::TableSetupColumn("Action", ImGuiTableColumnFlags_WidthFixed, maxDescTextWidth + 0.5f * DROPZONE_LOGO_TEXT_PADDING);
+      ImGui::TableSetupColumn("Key", ImGuiTableColumnFlags_WidthFixed, maxBindingsTextWidth + 0.5f * DROPZONE_LOGO_TEXT_PADDING);
 
       for (const auto& item : parsedInfo)
       {
         ImGui::TableNextRow(ImGuiTableRowFlags_None,
-          ImGui::GetTextLineHeightWithSpacing() + 2.0f * margin);
+          ImGui::GetTextLineHeightWithSpacing() + 0.5f * DROPZONE_LOGO_TEXT_PADDING);
 
         // First column: description
         ImGui::TableSetColumnIndex(0);
@@ -578,7 +582,7 @@ void vtkF3DImguiActor::RenderDropZone()
           const auto& group = item.bindings[g];
           for (size_t k = 0; k < group.size(); ++k)
           {
-            totalBindingsWidth += ImGui::CalcTextSize(group[k].c_str()).x + 2 * margin;
+            totalBindingsWidth += ImGui::CalcTextSize(group[k].c_str()).x + 0.5f * DROPZONE_LOGO_TEXT_PADDING;
             if (k < group.size() - 1) // plus between keys
             {
               totalBindingsWidth += ImGui::GetStyle().ItemSpacing.x +
@@ -615,7 +619,7 @@ void vtkF3DImguiActor::RenderDropZone()
 
             float cornerRounding = 4.0f;
 
-            // Draw the lighter, raised part of the button
+            // Draw the button
             drawList->AddRectFilled(rectMin, rectMax, ImColor(bindingRectColor), cornerRounding);
 
             // Channel 1: Draw the text on top
