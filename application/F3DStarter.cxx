@@ -1959,7 +1959,7 @@ void F3DStarter::AddCommands()
           {
             // filter out candidate files with the unsupported extensions
             if (fs::is_regular_file(path) &&
-              supportedExtensions.find(path.extension()) == supportedExtensions.end())
+              supportedExtensions.find(path.extension().string()) == supportedExtensions.end())
             {
               continue;
             }
