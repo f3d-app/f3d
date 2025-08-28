@@ -42,7 +42,7 @@ F3D supports the following file formats:
 ## Reader options
 
 Readers can provide option that can be set using the `-D/--define` [command line option](OPTIONS.md).
-eg: `-DVDB.downsampling_factor=0.5`.
+eg: `-DVDB.downsampling_factor=0.5` or using the `set_reader_option` [command](COMMANDS.md).
 
 For booleans, 0 means false, not 0 means true. Unsigned int will interpret anything that is not a non-negative integer as the default value.
 

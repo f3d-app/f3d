@@ -53,11 +53,15 @@ Program Listing for File interactor.h
    class F3D_EXPORT interactor
    {
    public:
+     using command_documentation_t = std::pair<std::string, std::string>;
    
      virtual interactor& initCommands() = 0;
    
-     virtual interactor& addCommand(
-       std::string action, std::function<void(const std::vector<std::string>&)> callback) = 0;
+     virtual interactor& addCommand(const std::string& action,
+       std::function<void(const std::vector<std::string>&)> callback,
+       std::optional<command_documentation_t> doc = std::nullopt,
+       std::function<std::vector<std::string>(const std::vector<std::string>&)> completionCallback =
+         nullptr) = 0;
    
      virtual interactor& removeCommand(const std::string& action) = 0;
    
