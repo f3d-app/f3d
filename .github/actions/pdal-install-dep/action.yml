@@ -14,9 +14,6 @@ inputs:
   libgeotiff_version:
     description: "Version of libgeotiff to build against"
     required: true
-  sqlite_version:
-    description: "Version of sqlite to build against"
-    required: false
   proj_version:
     description: "Version of proj to build against"
     required: true
@@ -37,7 +34,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/pdal_install
-        key: pdal-${{inputs.version}}-${{inputs.sqlite_version}}-${{inputs.proj_version}}-${{inputs.gdal_version}}-${{inputs.libgeotiff_version}}-${{runner.os}}-${{inputs.cpu}}-0
+        key: pdal-${{inputs.version}}-${{inputs.proj_version}}-${{inputs.gdal_version}}-${{inputs.libgeotiff_version}}-${{runner.os}}-${{inputs.cpu}}-0
 
     - name: Checkout PDAL
       if: steps.cache-pdal.outputs.cache-hit != 'true'

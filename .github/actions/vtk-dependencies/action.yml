@@ -24,9 +24,6 @@ inputs:
   pdal_version:
     description: "Version of pdal to build against"
     required: false
-  sqlite_version:
-    description: "Version of sqlite to build against"
-    required: false
   gdal_version:
     description: "Version of gdal to build against"
     required: true
