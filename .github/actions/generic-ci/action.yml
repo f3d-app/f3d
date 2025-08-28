@@ -74,6 +74,9 @@ inputs:
   usd_version:
     description: "Version of usd to build"
     required: false
+  sqlite_version:
+    description: "Version of sqlite to build"
+    required: false
   pdal_version:
     description: "Version of pdal to build"
     required: false

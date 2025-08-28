@@ -59,6 +59,9 @@ inputs:
   proj_version:
     description: "Version of PROJ to build"
     required: true
+  sqlite_version:
+    description: "Version of SQLite to build"
+    required: false
 
 runs:
   using: "composite"

@@ -29,6 +29,9 @@ inputs:
   gdal_version:
     description: "Version of gdal to build against"
     required: true
+  sqlite_version:
+    description: "Version of sqlite to build against"
+    required: false
   libgeotiff_version:
     description: "Version of libgeotiff to build against"
     required: true
