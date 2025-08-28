@@ -44,7 +44,6 @@
 #include <vector>
 
 #include "camera.h"
-#include <iostream>
 
 namespace fs = std::filesystem;
 

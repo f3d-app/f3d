@@ -3,7 +3,6 @@
 
 #include "exception.h"
 #include "export.h"
-#include "interactor.h"
 
 #include <algorithm>
 #include <array>
