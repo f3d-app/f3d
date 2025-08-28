@@ -526,7 +526,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
   {
     textHeight +=
       ImGui::GetTextLineHeightWithSpacing() + 2 * ImGui::GetStyle().SeparatorTextPadding.y;
-    for (const auto& [bind, desc, val] : content)
+    for (const auto& [bind, desc, val, type] : content)
     {
       textHeight += ImGui::GetTextLineHeightWithSpacing();
 
@@ -569,27 +569,23 @@ void vtkF3DImguiActor::RenderCheatSheet()
     ImGui::TableSetupColumn("Description", ImGuiTableColumnFlags_WidthFixed, maxDescTextWidth);
     ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthFixed, maxValueTextWidth);
     ImGui::TableSetupColumn("Bindings", ImGuiTableColumnFlags_WidthStretch, maxBindingTextWidth);
-    for (const auto& [bind, desc, val] : list)
+    for (const auto& [bind, desc, val, type] : list)
     {
-      ImVec4 bindingTextColor, bindingRectColor, descTextColor;
+      ImVec4 bindingTextColor, bindingRectColor, descTextColor, valueTextColor;
 
-      if (val == "ON")
+      if (type == CheatSheetBindingType::TOGGLE && val == "ON")
       {
         bindingTextColor = F3DImguiStyle::GetBackgroundColor();
         bindingRectColor = F3DImguiStyle::GetWarningColor();
         descTextColor = F3DImguiStyle::GetWarningColor();
-      }
-      else if (!val.empty() && val != "OFF" && val != "Unset")
-      {
-        bindingTextColor = F3DImguiStyle::GetBackgroundColor();
-        bindingRectColor = F3DImguiStyle::GetHighlightColor();
-        descTextColor = F3DImguiStyle::GetHighlightColor();
+        valueTextColor = F3DImguiStyle::GetWarningColor();
       }
       else
       {
         bindingTextColor = F3DImguiStyle::GetTextColor();
         bindingRectColor = F3DImguiStyle::GetMidColor();
         descTextColor = F3DImguiStyle::GetTextColor();
+        valueTextColor = F3DImguiStyle::GetHighlightColor();
       }
 
       ImGui::TableNextRow(
@@ -599,15 +595,14 @@ void vtkF3DImguiActor::RenderCheatSheet()
       ImGui::TextColored(descTextColor, "%s", desc.c_str());
 
       ImGui::TableNextColumn();
-      // if (type == "Cyclic")
-      // {
-      //   ImGui::TextColored(descTextColor, "< %s >", val.c_str());
-      // }
-      // else
-      // {
-      //   ImGui::TextColored(descTextColor, "%s", val.c_str());
-      // }
-      ImGui::TextColored(descTextColor, "%s", val.c_str());
+      if (type == CheatSheetBindingType::CYCLIC)
+      {
+        ImGui::TextColored(valueTextColor, "< %s >", val.c_str());
+      }
+      else if (type == CheatSheetBindingType::NUMERICAL || type == CheatSheetBindingType::OTHER)
+      {
+        ImGui::TextColored(valueTextColor, "%s", val.c_str());
+      }
 
       ImGui::TableNextColumn();
       ImVec2 bindingSize = ImGui::CalcTextSize(bind.c_str());
