@@ -68,7 +68,6 @@ runs:
         -DCMAKE_INSTALL_LIBDIR:PATH=lib
         -DCMAKE_INSTALL_PREFIX=../pdal_install
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
-        -DUSE_SQLITE:BOOL=ON
         -DUSE_PROJ:BOOL=ON
         -DUSE_GDAL:BOOL=ON
         -DUSE_LIBGEOTIFF:BOOL=ON

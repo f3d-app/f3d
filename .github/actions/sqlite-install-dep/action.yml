@@ -28,7 +28,7 @@ runs:
       if: steps.cache-sqlite.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
       with: 
-        repository: sqlite/sqlite
+        repository: sjinks/sqlite3-cmake
         path: "./dependencies/sqlite"
         ref: ${{inputs.version}}
 
