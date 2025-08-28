@@ -2001,7 +2001,6 @@ void F3DStarter::AddCommands()
       std::vector<std::string> originalCandidates = candidates;
       candidates.clear();
 
-      // TODO: Is there a better way to do this ?
       std::transform(originalCandidates.begin(), originalCandidates.end(),
         std::back_inserter(candidates),
         [&](std::string candidate)
