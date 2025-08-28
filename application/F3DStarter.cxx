@@ -1943,11 +1943,25 @@ void F3DStarter::AddCommands()
         std::transform(fs::begin(iter), fs::end(iter), std::back_inserter(dirContent),
           [&](const auto& entry) { return entry.path(); });
 
+        // Recover supported extensions
+        std::set<std::string> supportedExtensions;
+        for (const auto& info : f3d::engine::getReadersInfo())
+        {
+          std::transform(info.Extensions.begin(), info.Extensions.end(), std::inserter(supportedExtensions, supportedExtensions.begin()),
+            [&](const std::string& ext) { return "." + ext; });
+        }
+
         for (const auto& path : dirContent)
         {
-          // Add candidates that starts with filePattern
+          // Select candidates that starts with filePattern
           if (path.filename().string().rfind(filePattern, 0) == 0)
           {
+            // filter out candidate files with the unsupported extensions
+            if (fs::is_regular_file(path) && supportedExtensions.find(path.extension()) == supportedExtensions.end())
+            {
+              continue;
+            }
+
             // Keep the completionParentPath to avoid path normalization
             candidates.emplace_back((completionParentPath / path.filename()).string());
           }
