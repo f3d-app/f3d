@@ -61,7 +61,7 @@ inputs:
     required: true
   sqlite_version:
     description: "Version of SQLite to build"
-    required: true
+    required: false
 
 runs:
   using: "composite"
@@ -98,7 +98,6 @@ runs:
         libgeotiff_version: ${{inputs.libgeotiff_version}}
         gdal_version: ${{inputs.gdal_version}}
         proj_version: ${{inputs.proj_version}}
-        sqlite_version: ${{inputs.sqlite_version}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep

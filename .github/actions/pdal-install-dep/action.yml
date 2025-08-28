@@ -16,7 +16,7 @@ inputs:
     required: true
   sqlite_version:
     description: "Version of sqlite to build against"
-    required: true
+    required: false
   proj_version:
     description: "Version of proj to build against"
     required: true
@@ -28,7 +28,6 @@ runs:
       shell: bash
       run: |
         [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
-        [[ "${{ inputs.sqlite_version }}" ]] || { echo "sqlite_version input is empty" ; exit 1; }
         [[ "${{ inputs.proj_version }}" ]] || { echo "proj_version input is empty" ; exit 1; }
         [[ "${{ inputs.gdal_version }}" ]] || { echo "gdal_version input is empty" ; exit 1; }
         [[ "${{ inputs.libgeotiff_version }}" ]] || { echo "libgeotiff_version input is empty" ; exit 1; }
@@ -68,7 +67,6 @@ runs:
         -DCMAKE_INSTALL_LIBDIR:PATH=lib
         -DCMAKE_INSTALL_PREFIX=../pdal_install
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
-        -DUSE_SQLITE:BOOL=ON
         -DUSE_PROJ:BOOL=ON
         -DUSE_GDAL:BOOL=ON
         -DUSE_LIBGEOTIFF:BOOL=ON
