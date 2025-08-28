@@ -225,8 +225,8 @@
         "type": "bool",
         "default_value": "false"
       },
-      "bind_vector": {
-        "type": "bind_vector",
+      "custom_binds": {
+        "type": "string",
         "default_value": "None+Drop, Ctrl+O, None+H, None+Escape"
       }
     },

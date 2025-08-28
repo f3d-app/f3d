@@ -4,7 +4,6 @@ F3D_SILENT_WARNING_PUSH()
 F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
 #include "options.h"
 F3D_SILENT_WARNING_POP()
-#include "interactor.h"
 
 #include "options_generated.h"
 #include "options_tools.h"
@@ -203,56 +202,6 @@ std::string options::format(const T& var)
   return options_tools::format(var);
 }
 
-// template<>
-// inline f3d::bind_vector_t options::parse<f3d::bind_vector_t>(const std::vector<std::string>& arr)
-// {
-//     f3d::bind_vector_t result;
-//     for (const auto& s : arr) {
-//         if (!s.empty())
-//             result.get().push_back(interaction_bind_t::parse(s));
-//     }
-//     return result;
-// }
-template<>
-f3d::bind_vector_t options::parse<f3d::bind_vector_t>(const std::string& str)
-{
-    try
-    {
-        // Split the comma-separated string into a vector of strings
-        std::vector<std::string> arr = options_tools::split(str, ',');
-        for (auto& s : arr)
-            options_tools::trim(s);
-
-        // Convert each string to an interaction_bind_t and construct bind_vector_t
-        f3d::bind_vector_t result;
-        for (const auto& s : arr)
-        {
-            if (!s.empty())
-                result.get().push_back(interaction_bind_t::parse(s));
-        }
-
-        return result;
-    }
-    catch (const options::parsing_exception&)
-    {
-        throw options::parsing_exception("Cannot parse " + str + " into a bind_vector_t");
-    }
-}
-
-
-
-// template<>
-// inline std::string options::format<f3d::bind_vector_t>(const f3d::bind_vector_t& vec)
-// {
-//     std::ostringstream os;
-//     for (size_t i = 0; i < vec.size(); ++i) {
-//         if (i > 0) os << ",";
-//         os << vec[i].to_string(); // make sure interaction_bind_t::to_string() exists
-//     }
-//     return os.str();
-// }
-
-
 //----------------------------------------------------------------------------
 #define F3D_DECL_TYPE(TYPE)                                                                        \
   template F3D_EXPORT TYPE options::parse<TYPE>(const std::string& str);                           \
@@ -270,7 +219,6 @@ F3D_DECL_TYPE(direction_t);
 F3D_DECL_TYPE(colormap_t);
 F3D_DECL_TYPE(transform2d_t);
 F3D_DECL_TYPE(std::filesystem::path);
-F3D_DECL_TYPE(bind_vector_t);
 
 //----------------------------------------------------------------------------
 options::parsing_exception::parsing_exception(const std::string& what)
