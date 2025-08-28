@@ -1947,7 +1947,8 @@ void F3DStarter::AddCommands()
         std::set<std::string> supportedExtensions;
         for (const auto& info : f3d::engine::getReadersInfo())
         {
-          std::transform(info.Extensions.begin(), info.Extensions.end(), std::inserter(supportedExtensions, supportedExtensions.begin()),
+          std::transform(info.Extensions.begin(), info.Extensions.end(),
+            std::inserter(supportedExtensions, supportedExtensions.begin()),
             [&](const std::string& ext) { return "." + ext; });
         }
 
@@ -1957,7 +1958,8 @@ void F3DStarter::AddCommands()
           if (path.filename().string().rfind(filePattern, 0) == 0)
           {
             // filter out candidate files with the unsupported extensions
-            if (fs::is_regular_file(path) && supportedExtensions.find(path.extension()) == supportedExtensions.end())
+            if (fs::is_regular_file(path) &&
+              supportedExtensions.find(path.extension()) == supportedExtensions.end())
             {
               continue;
             }
