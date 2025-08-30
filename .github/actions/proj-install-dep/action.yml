@@ -19,13 +19,14 @@ runs:
       shell: bash
       run: |
         [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+        [[ "${{ inputs.sqlite_version }}" ]] || { echo "sqlite3 input is empty" ; exit 1; }
 
     - name: Cache PROJ
       id: cache-proj
       uses: actions/cache/restore@v4
       with:
         path: dependencies/proj_install
-        key: proj-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-0
+        key: proj-${{inputs.version}}-${{inputs.sqlite_version}}-${{runner.os}}-${{inputs.cpu}}-0
 
     - name: Checkout PROJ
       if: steps.cache-proj.outputs.cache-hit != 'true'
