@@ -8,6 +8,9 @@ inputs:
   version:
     description: "Version of PROJ to build"
     required: true
+  sqlite_version:
+    description: "Version of sqlite3 to build against"
+    required: true
 
 runs:
   using: "composite"

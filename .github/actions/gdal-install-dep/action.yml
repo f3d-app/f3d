@@ -8,6 +8,9 @@ inputs:
   version:
     description: "Version of gdal to build"
     required: true
+  proj_version:
+    description: "Version of PROJ to build against"
+    required: true
 
 runs:
   using: "composite"
@@ -49,7 +52,6 @@ runs:
         -DBUILD_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX=../gdal_install
-        -DUSE_PROJ:BOOL=ON
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 

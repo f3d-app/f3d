@@ -14,12 +14,6 @@ inputs:
   libgeotiff_version:
     description: "Version of libgeotiff to build against"
     required: true
-  sqlite_version:
-    description: "Version of sqlite to build against"
-    required: true
-  proj_version:
-    description: "Version of proj to build against"
-    required: true
 
 runs:
   using: "composite"
