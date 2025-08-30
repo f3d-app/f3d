@@ -57,6 +57,9 @@ int TestSDKInteractorCommand([[maybe_unused]] int argc, [[maybe_unused]] char* a
   inter.triggerCommand("test_toggle");
   test("addCommand", options.model.scivis.cells == false);
 
+  // Coverage help with no doc
+  test("help test_toggle", inter.triggerCommand("help test_toggle") == true);
+
   inter.removeCommand("test_toggle");
   test("removeCommand", inter.triggerCommand("test_toggle") == false);
 
