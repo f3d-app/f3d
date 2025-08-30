@@ -31,22 +31,23 @@
 
 #include <optional>
 
+constexpr float LOGO_DISPLAY_WIDTH = 256.f;
+constexpr float LOGO_DISPLAY_HEIGHT = 256.f;
+constexpr float DROPZONE_LOGO_TEXT_PADDING = 20.f;
+
 static std::vector<std::string> splitBindings(const std::string& s, char delim)
 {
   std::vector<std::string> result;
-  std::stringstream ss(s);
+  std::stringstream stream(s);
   std::string item;
 
-  while (getline(ss, item, delim))
+  while (getline(stream, item, delim))
   {
     result.push_back(item);
   }
 
   return result;
 }
-constexpr float LOGO_DISPLAY_WIDTH = 256.f;
-constexpr float LOGO_DISPLAY_HEIGHT = 256.f;
-constexpr float DROPZONE_LOGO_TEXT_PADDING = 20.f;
 
 struct vtkF3DImguiActor::Internals
 {
