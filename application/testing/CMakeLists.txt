@@ -1400,7 +1400,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
 endif()
 
 # Test bindings-list display
-f3d_test(NAME TestBindingsList ARGS --list-bindings REGEXP "Any.5        Toggle Orthographic Projection")
+f3d_test(NAME TestBindingsList ARGS --list-bindings REGEXP "Any.5        Orthographic Projection")
 
 # Test rendering backends
 # For some reason the sanitizer detects leaks because of EGL and OSMesa
