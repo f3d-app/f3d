@@ -1101,26 +1101,26 @@ interactor& interactor_impl::initBindings()
     {
       desc = this->Internals->Options.render.effect.antialiasing.mode;
     }
-    return std::tuple("Anti-aliasing", std::move(desc));
+    return std::pair("Anti-aliasing", std::move(desc));
   };
 
   // "Cycle animation" , "animationName"
   auto docAnim = [&]()
   {
-    return std::tuple(
+    return std::pair(
       "Animation", this->Internals->AnimationManager->GetAnimationName());
   };
 
   // "Cycle point/cell data coloring" , "POINT/CELL"
   auto docField = [&]()
   {
-    return std::tuple(std::string("Data coloring"), (opts.model.scivis.cells ? "CELL" : "POINT"));
+    return std::pair(std::string("Data coloring"), (opts.model.scivis.cells ? "CELL" : "POINT"));
   };
 
   // "Cycle array to color with" , "arrayName"
   auto docArray = [&]()
   {
-    return std::tuple("Color array",
+    return std::pair("Color array",
       (opts.model.scivis.array_name.has_value()
           ? shortName(opts.model.scivis.array_name.value(), 15) +
             (opts.model.scivis.enable ? "" : " (forced)")
@@ -1132,7 +1132,7 @@ interactor& interactor_impl::initBindings()
   {
     vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
     vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
-    return std::tuple(
+    return std::pair(
       "Color component", ren->ComponentToString(opts.model.scivis.component));
   };
 
@@ -1146,7 +1146,7 @@ interactor& interactor_impl::initBindings()
     valStream.precision(2);
     valStream << std::fixed;
     valStream << val;
-    return std::tuple(doc, valStream.str());
+    return std::pair(doc, valStream.str());
   };
 
   // "doc", "value/Unset"
@@ -1163,24 +1163,24 @@ interactor& interactor_impl::initBindings()
     {
       valStream << "Unset";
     }
-    return std::tuple(doc, valStream.str());
+    return std::pair(doc, valStream.str());
   };
 
   // "doc", "ON/OFF"
   auto docTgl = [](const std::string& doc, const bool& val)
-  { return std::tuple(doc, (val ? "ON" : "OFF")); };
+  { return std::pair(doc, (val ? "ON" : "OFF")); };
 
   // "doc", "ON/OFF/Unset"
   auto docTglOpt = [](const std::string& doc, const std::optional<bool>& val)
   {
-    return std::tuple(
+    return std::pair(
       doc, (val.has_value() ? (val.value() ? "ON" : "OFF") : "Unset"));
   };
 
   // "Cycle verbose level", "current_level"
   auto docVerbose = [&]()
   {
-    return std::tuple("Verbose level",
+    return std::pair("Verbose level",
       this->Internals->VerboseLevelToString(log::getVerboseLevel()));
   };
 

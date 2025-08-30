@@ -109,7 +109,7 @@ public:
   ///@}
 
   ///@{ @name Bindings
-  using documentation_callback_t = std::function<std::tuple<std::string, std::string>()>;
+  using documentation_callback_t = std::function<std::pair<std::string, std::string>()>;
 
   /**
    * Enumeration of binding types.
@@ -218,7 +218,7 @@ public:
    *
    * Getting documentation for a bind that does not exists will throw a does_not_exists_exception.
    */
-  [[nodiscard]] virtual std::tuple<std::string, std::string> getBindingDocumentation(
+  [[nodiscard]] virtual std::pair<std::string, std::string> getBindingDocumentation(
     const interaction_bind_t& bind) const = 0;
   ///@}
 
