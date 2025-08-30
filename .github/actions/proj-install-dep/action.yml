@@ -56,6 +56,7 @@ runs:
       run: >
         cmake ../proj
         -DBUILD_SHARED_LIBS=ON
+        -DBUILD_PROJSYNC=OFF
         -DCMAKE_BUILD_TYPE=Release
         -DENABLE_TIFF=OFF
         -DENABLE_CURL=OFF
