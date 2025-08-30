@@ -1137,7 +1137,7 @@ interactor& interactor_impl::initBindings()
   };
 
   // "doc", ""
-  auto docStr = [](const std::string& doc) { return std::tuple(doc, ""); };
+  auto docStr = [](const std::string& doc) { return std::pair(doc, ""); };
 
   // "doc", "value"
   auto docDbl = [](const std::string& doc, const double& val)
@@ -1339,7 +1339,7 @@ std::vector<interaction_bind_t> interactor_impl::getBinds() const
 }
 
 //----------------------------------------------------------------------------
-std::tuple<std::string, std::string> interactor_impl::getBindingDocumentation(
+std::pair<std::string, std::string> interactor_impl::getBindingDocumentation(
   const interaction_bind_t& bind) const
 {
   const auto& it = this->Internals->Bindings.find(bind);
@@ -1350,7 +1350,7 @@ std::tuple<std::string, std::string> interactor_impl::getBindingDocumentation(
   }
 
   const auto& docFunc = it->second.DocumentationCallback;
-  return docFunc ? docFunc() : std::make_tuple(std::string(), std::string());
+  return docFunc ? docFunc() : std::make_pair(std::string(), std::string());
 }
 
 //----------------------------------------------------------------------------
