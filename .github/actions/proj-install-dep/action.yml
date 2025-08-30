@@ -24,13 +24,19 @@ runs:
         path: dependencies/proj_install
         key: proj-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-0
 
-    - name: Checkout proj
+    - name: Checkout PROJ
       if: steps.cache-proj.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
-      with: 
+      with:
         repository: OSGeo/PROJ
         path: "./dependencies/proj"
         ref: ${{inputs.version}}
+
+    - name: Patch PROJ
+      if: steps.cache-proj.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/proj
+      shell: bash
+      run: patch p1 < $GITHUB_ACTION_PATH/proj-install-bin.patch
 
     - name: Setup PROJ
       if: steps.cache-proj.outputs.cache-hit != 'true'
