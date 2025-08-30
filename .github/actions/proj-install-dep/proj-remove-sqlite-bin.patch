@@ -1,0 +1,20 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 20826ba3..5d6befec 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -202,15 +202,6 @@ endif()
+ 
+ message(STATUS "nlohmann/json: ${NLOHMANN_JSON}")
+ 
+-################################################################################
+-# Check for sqlite3
+-################################################################################
+-
+-find_program(EXE_SQLITE3 sqlite3)
+-if(NOT EXE_SQLITE3)
+-  message(SEND_ERROR "sqlite3 binary not found!")
+-endif()
+-
+ # Deprecated variables since PROJ 9.4.0
+ if(DEFINED SQLITE3_INCLUDE_DIR)
+   message(DEPRECATION "Use SQLite3_INCLUDE_DIR instead of SQLITE3_INCLUDE_DIR")
