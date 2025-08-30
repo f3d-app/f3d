@@ -58,6 +58,7 @@ runs:
         -DBUILD_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
         -DENABLE_TIFF=OFF
+        -DENABLE_CURL=OFF
         -DCMAKE_INSTALL_PREFIX=../proj_install
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
