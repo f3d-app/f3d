@@ -45,13 +45,14 @@ runs:
       shell: bash
       run: >
         ./configure 
+        --prefix=${{github.workspace}}/
         --enable-all
 
     - name: Build sqlite
       if: steps.cache-sqlite.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/sqlite_build
       shell: bash
-      run: cmake --build . --parallel 2 --target install --config Release
+      run: make install
 
     - name: Copy to install
       working-directory: ${{github.workspace}}/dependencies/sqlite_install
