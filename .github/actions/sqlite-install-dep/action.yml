@@ -37,7 +37,7 @@ runs:
       working-directory: ${{github.workspace}}/dependencies
       shell: bash
       run: |
-        mkdir sqlite_local
+        mkdir sqlite_build
 
     - name: Configure sqlite
       if: steps.cache-sqlite.outputs.cache-hit != 'true'
