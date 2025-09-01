@@ -38,8 +38,8 @@ runs:
       shell: bash
       run: |
         apt install -y tcl8.6
-        ./configure 
-        --prefix=${{github.workspace}}
+        ./configure \
+        --prefix=${{github.workspace}} \
         --enable-all
 
     - name: Build sqlite
