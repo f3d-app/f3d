@@ -34,11 +34,11 @@ runs:
 
     - name: Configure sqlite
       if: steps.cache-sqlite.outputs.cache-hit != 'true'
-      working-directory: ${{github.workspace}}/dependencies
+      working-directory: ${{github.workspace}}/dependencies/sqlite
       shell: bash
       run: >
         ./configure 
-        --prefix=${{github.workspace}}/dependencies
+        --prefix=${{github.workspace}}
         --enable-all
 
     - name: Build sqlite
