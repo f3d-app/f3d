@@ -33,11 +33,11 @@ runs:
         ref: ${{inputs.version}}
 
     - name: Setup sqlite
-      if: steps.cache-openvdb.outputs.cache-hit != 'true'
+      if: steps.cache-sqlite.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies
       shell: bash
-      run: ^
-        mkdir openvdb_install
+      run: |
+        mkdir sqlite_install
 
     - name: Configure sqlite
       if: steps.cache-sqlite.outputs.cache-hit != 'true'
