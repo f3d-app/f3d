@@ -36,7 +36,7 @@ runs:
       if: steps.cache-sqlite.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/sqlite
       shell: bash
-      run: >
+      run: |
         apt install -y tcl8.6
         ./configure 
         --prefix=${{github.workspace}}
