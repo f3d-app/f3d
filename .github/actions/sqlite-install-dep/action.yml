@@ -39,7 +39,7 @@ runs:
       run: |
         apt install -y tcl8.6
         ./configure \
-        --prefix=${{github.workspace}} \
+        --prefix=${{github.workspace}}/dependencies/sqlite \
         --enable-all
 
     - name: Build sqlite
