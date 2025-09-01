@@ -10,6 +10,7 @@
 
 #include <vtkProp.h>
 
+#include <cstdint>
 #include <deque>
 
 class vtkOpenGLRenderWindow;

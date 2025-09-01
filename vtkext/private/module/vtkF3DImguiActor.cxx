@@ -606,7 +606,6 @@ void vtkF3DImguiActor::RenderCheatSheet()
       }
 
       ImGui::TableNextColumn();
-      ImVec2 bindingSize = ImGui::CalcTextSize(bind.c_str());
 
       ImVec2 topBindingCorner, bottomBindingCorner;
       std::vector<std::string> splittedBinding = splitBindings(bind, '+');
