@@ -38,7 +38,7 @@ runs:
       shell: bash
       run: |
         apt install -y tcl8.6
-        ./configure ...
+        ./configure ..
         make install
 
     - name: Configure sqlite
