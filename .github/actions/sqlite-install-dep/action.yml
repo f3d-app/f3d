@@ -31,6 +31,15 @@ runs:
         repository: sqlite/sqlite
         path: "./dependencies/sqlite"
         ref: ${{inputs.version}}
+    
+    - name: Installing tcl
+      if: steps.cache-sqlite.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/sqlite
+      shell: bash
+      run: |
+        apt install -y tcl8.6
+        ./configure ...
+        make install
 
     - name: Configure sqlite
       if: steps.cache-sqlite.outputs.cache-hit != 'true'
