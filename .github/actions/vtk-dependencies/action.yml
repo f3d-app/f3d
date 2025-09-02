@@ -80,6 +80,7 @@ runs:
         zlib_version: ${{inputs.zlib_version}}
 
     - name: Install sqlite
+      if: runner.os == 'Linux'
       uses: ./.actions/sqlite-install-dep
       with:
         cpu: ${{inputs.cpu}}
