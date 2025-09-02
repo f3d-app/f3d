@@ -35,6 +35,9 @@ inputs:
   libgeotiff_version:
     description: "Version of libgeotiff to build against"
     required: true
+  libtiff_version:
+    description: "Version of libtiff to build against"
+    required: true
   proj_version:
     description: "Version of proj to build against"
     required: true
@@ -53,13 +56,14 @@ runs:
         [[ "${{ inputs.proj_version }}" ]] || { echo "proj_version input is empty" ; exit 1; }
         [[ "${{ inputs.gdal_version }}" ]] || { echo "gdal_version input is empty" ; exit 1; }
         [[ "${{ inputs.libgeotiff_version }}" ]] || { echo "libgeotiff_version input is empty" ; exit 1; }
+        [[ "${{ inputs.libtiff_version }}" ]] || { echo "libtiff_version input is empty" ; exit 1; }
 
     - name: Cache VTK
       id: cache-vtk
       uses: actions/cache/restore@v4
       with:
         path: dependencies/vtk_install
-        key: vtk-${{ inputs.vtk_version }}-${{inputs.zlib_version}}-${{inputs.blosc_version}}-${{inputs.tbb_version}}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}${{ inputs.ospray_version != '' && format('-ospray-{0}', inputs.ospray_version) || '' }}-${{inputs.proj_version}}-${{inputs.gdal_version}}-${{inputs.libgeotiff_version}}-${{inputs.sqlite_version}}-${{inputs.pdal_version}}-${{runner.os}}-${{inputs.cpu}}-0
+        key: vtk-${{ inputs.vtk_version }}-${{inputs.zlib_version}}-${{inputs.blosc_version}}-${{inputs.tbb_version}}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}${{ inputs.ospray_version != '' && format('-ospray-{0}', inputs.ospray_version) || '' }}-${{inputs.proj_version}}-${{inputs.gdal_version}}-${{inputs.libgeotiff_version}}-${{inputs.libtiff_version}}-${{inputs.sqlite_version}}-${{inputs.pdal_version}}-${{runner.os}}-${{inputs.cpu}}-0
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'

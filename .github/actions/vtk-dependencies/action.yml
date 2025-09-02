@@ -33,6 +33,9 @@ inputs:
   libgeotiff_version:
     description: "Version of libgeotiff to build against"
     required: true
+  libtiff_version:
+    description: "Version of libtiff to build against"
+    required: true
   proj_version:
     description: "Version of proj to build against"
     required: true
@@ -96,12 +99,20 @@ runs:
         version: ${{inputs.gdal_version}}
         proj_version: ${{inputs.proj_version}}
 
+    - name: Install libtiff
+      uses: ./.actions/libtiff-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        version: ${{inputs.libtiff_version}}
+        proj_version: ${{inputs.proj_version}}
+
     - name: Install libgeotiff
       uses: ./.actions/libgeotiff-install-dep
       with:
         cpu: ${{inputs.cpu}}
         version: ${{inputs.libgeotiff_version}}
         proj_version: ${{inputs.proj_version}}
+        libtiff_version: ${{inputs.libtiff_version}}
 
     - name: Install PDAL
       if: inputs.pdal != ''

@@ -62,6 +62,9 @@ inputs:
   sqlite_version:
     description: "Version of SQLite to build"
     required: true
+  libtiff_version:
+    description: "Version of libtiff to build"
+    required: true
 
 runs:
   using: "composite"
@@ -96,6 +99,7 @@ runs:
         usd_version: ${{inputs.usd_version}}
         zlib_version: ${{inputs.zlib_version}}
         libgeotiff_version: ${{inputs.libgeotiff_version}}
+        libtiff_version: ${{inputs.libtiff_version}}
         gdal_version: ${{inputs.gdal_version}}
         proj_version: ${{inputs.proj_version}}
         sqlite_version: ${{inputs.sqlite_version}}

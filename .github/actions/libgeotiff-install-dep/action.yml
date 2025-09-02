@@ -11,6 +11,9 @@ inputs:
   proj_version:
     description: "Version of PROJ to build against"
     required: true
+  libtiff_version:
+    description: "Version of libtiff to build against"
+    required: true
 
 runs:
   using: "composite"
@@ -20,13 +23,14 @@ runs:
       run: |
         [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
         [[ "${{ inputs.proj_version }}" ]] || { echo "proj_version input is empty" ; exit 1; }
+        [[ "${{ inputs.libtiff_version }}" ]] || { echo "libtiff_version input is empty" ; exit 1; }
 
     - name: Cache libgeotiff
       id: cache-libgeotiff
       uses: actions/cache/restore@v4
       with:
         path: dependencies/libgeotiff_install
-        key: libgeotiff-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-0
+        key: libgeotiff-${{inputs.version}}-${{inputs.prof_version}}-${{inputs.libtiff_version}}-${{runner.os}}-${{inputs.cpu}}-0
 
     - name: Checkout libgeotiff
       if: steps.cache-libgeotiff.outputs.cache-hit != 'true'
@@ -52,7 +56,6 @@ runs:
         cmake ../libgeotiff/libgeotiff
         -DBUILD_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
-        -DENABLE_TIFF=OFF
         -DCMAKE_INSTALL_PREFIX=../libgeotiff_install
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
