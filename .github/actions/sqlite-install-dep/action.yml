@@ -44,7 +44,7 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/sqlite
       shell: bash
       run: |
-        apt install -y tcl8.6 libsqlite3-dev
+        apt install -y tcl8.6
         ./configure \
         --prefix=$(pwd)/dependencies/sqlite_install \
         --enable-all
