@@ -34,7 +34,7 @@ runs:
 
     - name: Setup sqlite
       if: steps.cache-sqlite.outputs.cache-hit != 'true'
-      working-directory: $(pwd)/dependencies
+      working-directory: ${{github.workspace}}/dependencies
       shell: bash
       run: |
         mkdir sqlite_install
