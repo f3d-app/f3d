@@ -8,6 +8,9 @@ inputs:
   version:
     description: "Version of libgeotiff to build"
     required: true
+  proj_version:
+    description: "Version of PROJ to build against"
+    required: true
 
 runs:
   using: "composite"
@@ -16,6 +19,7 @@ runs:
       shell: bash
       run: |
         [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+        [[ "${{ inputs.proj_version }}" ]] || { echo "proj_version input is empty" ; exit 1; }
 
     - name: Cache libgeotiff
       id: cache-libgeotiff

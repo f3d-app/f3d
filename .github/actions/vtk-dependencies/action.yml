@@ -87,18 +87,21 @@ runs:
       with:
         cpu: ${{inputs.cpu}}
         version: ${{inputs.proj_version}}
+        sqlite_version: ${{inputs.sqlite_version}}
 
     - name: Install gdal
       uses: ./.actions/gdal-install-dep
       with:
         cpu: ${{inputs.cpu}}
         version: ${{inputs.gdal_version}}
+        proj_version: ${{inputs.proj_version}}
 
     - name: Install libgeotiff
       uses: ./.actions/libgeotiff-install-dep
       with:
         cpu: ${{inputs.cpu}}
         version: ${{inputs.libgeotiff_version}}
+        proj_version: ${{inputs.proj_version}}
 
     - name: Install PDAL
       if: inputs.pdal != ''
@@ -106,7 +109,5 @@ runs:
       with:
         cpu: ${{inputs.cpu}}
         version: ${{inputs.pdal_version}}
-        sqlite_version: ${{inputs.sqlite_version}}
-        proj_version: ${{inputs.proj_version}}
         gdal_version: ${{inputs.gdal_version}}
         libgeotiff_version: ${{inputs.libgeotiff_version}}
