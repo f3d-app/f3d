@@ -154,7 +154,7 @@ jobs:
           - sqlite_version: version-3.42.1
           - pdal_version: v2.9.1
           - proj_version: 9.6.2
-          - libgeotiff_version: v1.7.4
+          - libgeotiff_version: 1.7.4
           - gdal_version: v3.11.3
           - build_type: mindeps
             os: ubuntu-22.04
@@ -175,7 +175,7 @@ jobs:
             sqlite_version: version-3.42.1
             proj_version: v6.3.0
             pdal_version: v2.9.1
-            libgeotiff_version: v1.7.4
+            libgeotiff_version: 1.7.4
             gdal_version: v3.11.3
 
     runs-on: ${{matrix.os}}
@@ -208,7 +208,7 @@ jobs:
           pdal_version: v2.9.1
           sqlite_version: version-3.42.1
           proj_version: 9.6.2
-          libgeotiff_version: v1.7.4
+          libgeotiff_version: 1.7.4
           gdal_version: v3.11.3
 
   #----------------------------------------------------------------------------
@@ -452,7 +452,7 @@ jobs:
           - pdal_version: v2.9.1
           - sqlite_version: version-3.42.1
           - proj_version: 9.6.2
-          - libgeotiff_version: v1.7.4
+          - libgeotiff_version: 1.7.4
           - gdal_version: v3.11.3
           - build_type: egl
             vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
