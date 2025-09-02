@@ -51,12 +51,12 @@ runs:
 
     - name: Build sqlite
       if: steps.cache-sqlite.outputs.cache-hit != 'true'
-      working-directory: $({{github.workspace})}/dependencies/sqlite
+      working-directory: $(pwd)/dependencies/sqlite
       shell: bash
       run: make install
 
     - name: Copy to install
-      working-directory: $({{github.workspace}})/dependencies/sqlite_install
+      working-directory: $(pwd)/dependencies/sqlite_install
       shell: bash
       run: cp -r ./* ../install/
 
