@@ -2,18 +2,16 @@
   "name": "f3d",
   "version": "3.2.0",
   "description": "Fast and minimalist 3D viewer framework",
-  "main": "f3d.js",
+  "main": "./dist/f3d.js",
   "files": [
-    "main.js",
     "dist/f3d.*"
   ],
   "scripts": {
     "_docker": "docker run --rm -e CMAKE_BUILD_PARALLEL_LEVEL -v $(pwd)/..:/src ghcr.io/f3d-app/f3d-wasm:latest",
     "clean": "npm run _docker -- rm -rf /src/webassembly/dist",
-    "build:rel": "npm run _docker -- /src/webassembly/build.sh Release",
-    "build:deb": "npm run _docker -- /src/webassembly/build.sh Debug",
-    "serve": "npx serve dist",
-    "prepare": "npm run clean && npm run build:rel"
+    "build": "npm run _docker -- /src/webassembly/build.sh Release",
+    "test": "testing/test.sh",
+    "prepare": "npm run clean && npm run build"
   },
   "repository": "github:f3d-app/f3d",
   "keywords": [
@@ -27,7 +25,7 @@
     "stl"
   ],
   "author": "Michael Migliore and Mathieu Westphal",
-  "license": "BSD-2-Clause",
+  "license": "BSD-3-Clause",
   "bugs": "https://github.com/f3d-app/f3d/issues",
   "funding": "https://github.com/sponsors/f3d-app",
   "homepage": "https://f3d.app"

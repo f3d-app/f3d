@@ -17,6 +17,7 @@ _version.py
 
 # wasm process related
 node_modules
+wasm_testing_out
 
 # testing related
 .cache

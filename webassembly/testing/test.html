@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>F3D Testing</title>
+    <style>
+      #main {
+        min-height: 70vh;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container" id="main">
+      <canvas id="canvas"></canvas>
+    </div>
+    <script type="module" src="../dist/f3d.js"></script>
+    <script type="module">
+
+      import f3d from '../dist/f3d.js';
+
+      const settings = {
+        canvas: document.getElementById("canvas"),
+        setupOptions: (options) => {
+          // background must be set to black for proper blending with transparent canvas
+          options.set_color("render.background.color", 0, 0, 0);
+
+          // setup coloring
+          options.toggle("model.scivis.enable");
+          options.set_string("model.scivis.array_name", "Colors");
+          options.set_integer("model.scivis.component", -2);
+          options.toggle("model.scivis.cells");
+
+          // make it look nice
+          options.toggle("render.effect.antialiasing.enable");
+          options.toggle("render.effect.tone_mapping");
+          options.toggle("render.effect.ambient_occlusion");
+          options.toggle("render.hdri.ambient");
+
+          // display widgets
+          options.toggle("ui.axis");
+          options.toggle("render.grid.enable");
+
+          // default to +Z
+          options.set_as_string("scene.up_direction", "+Z");
+        },
+      };
+
+      f3d(settings)
+        .then(async (Module) => {
+
+          // write in the filesystem
+          const defaultFile = await fetch("./f3d.vtp").then(b => b.arrayBuffer());
+          Module.FS.writeFile("f3d.vtp", new Uint8Array(defaultFile));
+
+          // automatically load all supported file format readers
+          Module.Engine.autoloadPlugins();
+
+          Module.engineInstance = Module.Engine.create();
+
+          Module.setupOptions(Module.engineInstance.getOptions());
+
+          // setup the window size based on the canvas size
+          const main = document.getElementById("main");
+          const scale = window.devicePixelRatio;
+          Module.engineInstance
+            .getWindow()
+            .setSize(scale * main.clientWidth, scale * main.clientHeight);
+
+          const filePath = "/f3d.vtp";
+          const scene = Module.engineInstance.getScene();
+          scene.add(filePath);
+
+          // do a first render and start the interactor
+          Module.engineInstance.getWindow().render();
+          Module.engineInstance.getInteractor().start();
+        })
+        .catch((error) => console.error("Internal exception: " + error));
+    </script>
+  </body>
+</html>

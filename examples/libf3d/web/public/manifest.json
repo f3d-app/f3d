@@ -1,0 +1,15 @@
+{
+  "short_name": "F3D",
+  "name": "F3D Web",
+  "icons": [
+    {
+      "src": "./icon256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#788BFF",
+  "background_color": "#14161A"
+}
