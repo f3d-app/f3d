@@ -227,7 +227,7 @@
       },
       "custom_binds": {
         "type": "string",
-        "default_value": "None+Drop, Ctrl+O, None+H, None+Escape"
+        "default_value": "None+Drop, Ctrl+O"
       }
     },
     "metadata": {
