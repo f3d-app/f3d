@@ -87,6 +87,7 @@ runs:
         version: ${{inputs.sqlite_version}}
 
     - name: Install proj
+      if: runner.os == 'Linux'
       uses: ./.actions/proj-install-dep
       with:
         cpu: ${{inputs.cpu}}
@@ -94,6 +95,7 @@ runs:
         sqlite_version: ${{inputs.sqlite_version}}
 
     - name: Install gdal
+      if: runner.os == 'Linux'
       uses: ./.actions/gdal-install-dep
       with:
         cpu: ${{inputs.cpu}}
@@ -108,6 +110,7 @@ runs:
         proj_version: ${{inputs.proj_version}}
 
     - name: Install libgeotiff
+      if: runner.os == 'Linux'
       uses: ./.actions/libgeotiff-install-dep
       with:
         cpu: ${{inputs.cpu}}
@@ -116,6 +119,7 @@ runs:
         libtiff_version: ${{inputs.libtiff_version}}
 
     - name: Install PDAL
+      if: runner.os == 'Linux'
       if: inputs.pdal != ''
       uses: ./.actions/pdal-install-dep
       with:
