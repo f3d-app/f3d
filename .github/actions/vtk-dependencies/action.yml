@@ -91,7 +91,6 @@ runs:
         cpu: ${{inputs.cpu}}
         version: ${{inputs.proj_version}}
         sqlite_version: ${{inputs.sqlite_version}}
-        libtiff_version: ${{inputs.libtiff_version}}
 
     - name: Install gdal
       uses: ./.actions/gdal-install-dep
