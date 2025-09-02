@@ -590,7 +590,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
       }
 
       ImGui::TableNextRow(
-        ImGuiTableRowFlags_None, ImGui::GetTextLineHeightWithSpacing() + 2.0f * margin);
+        ImGuiTableRowFlags_None, ImGui::GetTextLineHeightWithSpacing() + margin);
 
       ImGui::TableNextColumn();
       ImGui::TextColored(descTextColor, "%s", desc.c_str());
@@ -621,9 +621,9 @@ void vtkF3DImguiActor::RenderCheatSheet()
         ImGui::TextColored(bindingTextColor, "%s", key.c_str());
         drawList->ChannelsSetCurrent(0);
         topBindingCorner =
-          ImVec2(ImGui::GetItemRectMin().x - margin, ImGui::GetItemRectMin().y - margin);
+          ImVec2(ImGui::GetItemRectMin().x - margin, ImGui::GetItemRectMin().y - (margin * .5f) );
         bottomBindingCorner =
-          ImVec2(ImGui::GetItemRectMax().x + margin, ImGui::GetItemRectMax().y + margin);
+          ImVec2(ImGui::GetItemRectMax().x + margin, ImGui::GetItemRectMax().y + (margin * .5f));
         drawList->AddRectFilled(
           topBindingCorner, bottomBindingCorner, ImColor(bindingRectColor), 5.f);
         drawList->ChannelsMerge();
