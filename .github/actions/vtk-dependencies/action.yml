@@ -120,7 +120,6 @@ runs:
 
     - name: Install PDAL
       if: runner.os == 'Linux'
-      if: inputs.pdal != ''
       uses: ./.actions/pdal-install-dep
       with:
         cpu: ${{inputs.cpu}}
