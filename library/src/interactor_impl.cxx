@@ -638,9 +638,6 @@ public:
   unsigned long EventLoopTimerId = 0;
   int EventLoopObserverId = -1;
   std::atomic<bool> RenderRequested = false;
-
-  // Add inside Internals class definition
-  std::vector<f3d::interaction_bind_t> DropZoneBindings;
 };
 
 //----------------------------------------------------------------------------
@@ -1263,7 +1260,6 @@ interactor& interactor_impl::initBindings()
   this->Internals->Bindings.clear();
   this->Internals->GroupedBinds.clear();
   this->Internals->OrderedBindGroups.clear();
-  this->Internals->DropZoneBindings.clear();
   f3d::options& opts = this->Internals->Options;
 
   // Define lambdas used for documentation
@@ -1426,7 +1422,7 @@ interactor& interactor_impl::initBindings()
   return *this;
 }
 
-
+//----------------------------------------------------------------------------
 std::string interactor_impl::getDropZoneInfo(
   const std::vector<interaction_bind_t>& requestedBinds) const
 {
