@@ -38,10 +38,10 @@ constexpr float DROPZONE_LOGO_TEXT_PADDING = 20.f;
 static std::vector<std::string> splitBindings(const std::string& s, char delim)
 {
   std::vector<std::string> result;
-  std::stringstream stream(s);
+  std::stringstream ss(s);
   std::string item;
 
-  while (getline(stream, item, delim))
+  while (getline(ss, item, delim))
   {
     result.push_back(item);
   }
@@ -621,7 +621,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
         ImGui::TextColored(bindingTextColor, "%s", key.c_str());
         drawList->ChannelsSetCurrent(0);
         topBindingCorner =
-          ImVec2(ImGui::GetItemRectMin().x - margin, ImGui::GetItemRectMin().y - (margin * .5f) );
+          ImVec2(ImGui::GetItemRectMin().x - margin, ImGui::GetItemRectMin().y - (margin * .5f));
         bottomBindingCorner =
           ImVec2(ImGui::GetItemRectMax().x + margin, ImGui::GetItemRectMax().y + (margin * .5f));
         drawList->AddRectFilled(
