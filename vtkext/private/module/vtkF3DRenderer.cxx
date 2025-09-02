@@ -495,7 +495,7 @@ std::string vtkF3DRenderer::GetSceneDescription()
   double bounds[6];
   this->ComputeVisiblePropBounds(bounds);
 
-  stream << "Scene bounding box: "                                //
+  stream << "Scene bounding box: "                                  //
          << bounds[0] << u8" \u2264 x \u2264 " << bounds[1] << ", " //
          << bounds[2] << u8" \u2264 y \u2264 " << bounds[3] << ", " //
          << bounds[4] << u8" \u2264 z \u2264 " << bounds[5] << "\n\n";
