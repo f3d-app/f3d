@@ -25,7 +25,7 @@ runs:
       id: cache-proj
       uses: actions/cache/restore@v4
       with:
-        path: dependencies/proj_install
+        path: ${{github.workspace}}/dependencies/proj_install
         key: proj-${{inputs.version}}-${{inputs.sqlite_version}}-${{runner.os}}-${{inputs.cpu}}-0
 
     - name: Checkout PROJ

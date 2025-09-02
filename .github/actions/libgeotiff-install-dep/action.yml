@@ -29,7 +29,7 @@ runs:
       id: cache-libgeotiff
       uses: actions/cache/restore@v4
       with:
-        path: dependencies/libgeotiff_install
+        path: ${{github.workspace}}/dependencies/libgeotiff_install
         key: libgeotiff-${{inputs.version}}-${{inputs.prof_version}}-${{inputs.libtiff_version}}-${{runner.os}}-${{inputs.cpu}}-0
 
     - name: Checkout libgeotiff

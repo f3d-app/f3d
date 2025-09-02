@@ -21,7 +21,7 @@ runs:
       id: cache-libtiff
       uses: actions/cache/restore@v4
       with:
-        path: dependencies/libtiff_install
+        path: ${{github.workspace}}/dependencies/libtiff_install
         key: libtiff-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-0
 
     - name: Checkout libtiff
