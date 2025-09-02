@@ -21,7 +21,7 @@ runs:
       id: cache-sqlite
       uses: actions/cache/restore@v4
       with:
-        path: dependencies/sqlite_install
+        path: ${{github.workspace}}/dependencies/sqlite_install
         key: sqlite-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-0
 
     - name: Checkout sqlite
