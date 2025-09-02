@@ -23,7 +23,7 @@ runs:
       run: |
         [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
         [[ "${{ inputs.sqlite_version }}" ]] || { echo "sqlite_version input is empty" ; exit 1; }
-        [[ "${{ inputs.libtiff_version }}" ]] || { echo "sqlitlibtiff_version input is empty" ; exit 1; }
+        [[ "${{ inputs.libtiff_version }}" ]] || { echo "libtiff_version input is empty" ; exit 1; }
 
     - name: Cache PROJ
       id: cache-proj
