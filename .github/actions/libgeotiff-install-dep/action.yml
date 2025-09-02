@@ -49,7 +49,7 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/libgeotiff_build
       shell: bash
       run: >
-        cmake ../libgeotiff
+        cmake ../libgeotiff/libgeotiff
         -DBUILD_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX=../libgeotiff_install
