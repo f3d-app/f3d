@@ -388,11 +388,10 @@ int vtkF3DSPZReader::RequestData(
   rotationArray->SetNumberOfTuples(nbSplats);
   rotationArray->SetName("rotation");
 
+  // rotation is stored just after the 16-bytes header, positions, colors, alphas and scales
   int rotationShift = 16 + (9 + 4 + 3) * nbSplats;
 
-  // rotation is stored just after the 16-bytes header, positions, colors, alphas and scales
   if (header->version == 2) {
-    // rotation is stored just after the 16-bytes header, positions, colors, alphas and scales
     PackedRotationV2* rotation =
         reinterpret_cast<PackedRotationV2*>(uncompressed.data() + rotationShift);
     for (vtkIdType splatIndex = 0; splatIndex < static_cast<vtkIdType>(nbSplats); splatIndex++)
