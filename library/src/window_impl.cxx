@@ -411,7 +411,7 @@ void window_impl::UpdateDynamicOptions()
         }
     }
 
-    renderer->SetDropZoneInfo(this->Internals->Interactor->getDropZoneInfo(custom_binds));
+    renderer->SetDropZoneInfo(this->Internals->Interactor->getBindsDocString(custom_binds));
   }
 
   // XXX: model.point_sprites.type only has an effect on geometry scene
