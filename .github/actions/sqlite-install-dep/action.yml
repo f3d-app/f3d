@@ -52,9 +52,7 @@ runs:
       if: steps.cache-sqlite.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/sqlite
       shell: bash
-      run: |
-        make sqlite3
-        make install
+      run: make install
 
     - name: Copy to install
       working-directory: ${{github.workspace}}/dependencies/sqlite
