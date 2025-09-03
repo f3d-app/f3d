@@ -53,8 +53,8 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/sqlite
       shell: bash
       run: |
-        make libsqlite3.la
-        make install-libLTLIBRARIES install-includeHEADERS
+        make sqlite3
+        make install
 
     - name: Copy to install
       working-directory: ${{github.workspace}}/dependencies/sqlite
