@@ -1423,7 +1423,7 @@ interactor& interactor_impl::initBindings()
 }
 
 //----------------------------------------------------------------------------
-std::string interactor_impl::getDropZoneInfo(
+std::string interactor_impl::getBindsDocString(
   const std::vector<interaction_bind_t>& requestedBinds) const
 {
 
