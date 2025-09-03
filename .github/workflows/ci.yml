@@ -1016,14 +1016,24 @@ jobs:
           sphinx-build -M html ./vtkext/public/doxygen ./vtkext/public/doxygen/build/
           sudo mv vtkext/public/doxygen/build/html _site/doc/libf3d/vtkext_doxygen
 
-      - name: Retrieve web assembly binaries
+      - name: Retrieve f3d package
+        working-directory: ${{github.workspace}}/examples/libf3d/web
         uses: actions/download-artifact@v4
         with:
-          name: f3d-wasm
-          path: ./web
+          name: f3d-wasm-package
 
-      - name: Copy web assembly binaries
-        run: sudo mv web _site/
+      - name: Install f3d package
+        working-directory: ${{github.workspace}}/examples/libf3d/web
+        run: |
+          npm install f3d-3.2.0.tgz
+
+      - name: Build F3D web app
+        working-directory: ${{github.workspace}}/examples/libf3d/web
+        run: |
+          npm run build
+
+      - name: Copy F3D web app
+        run: sudo mv dist _site/web
 
       - name: Deploy
         if: github.ref == 'refs/heads/master'
