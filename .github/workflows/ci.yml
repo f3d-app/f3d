@@ -974,7 +974,6 @@ jobs:
       fail-fast: false
 
     runs-on: ubuntu-22.04
-    container: ghcr.io/f3d-app/f3d-wasm:${{needs.default_versions.outputs.timestamp}}
 
     steps:
       # Note that LFS is needed in order to include the default model
@@ -987,6 +986,8 @@ jobs:
 
       - name: WebAssembly CI
         uses: ./source/.github/actions/wasm-ci
+        with:
+          timestamp: ${{needs.default_versions.outputs.timestamp}}
 
   #----------------------------------------------------------------------------
   # generate website

@@ -7,9 +7,9 @@
     "dist/f3d.*"
   ],
   "scripts": {
-    "_docker": "docker run --rm -e CMAKE_BUILD_PARALLEL_LEVEL -v $(pwd)/..:/src ghcr.io/f3d-app/f3d-wasm:latest",
+    "_docker": "docker run --rm -e CMAKE_BUILD_PARALLEL_LEVEL -v $(pwd)/..:/src ghcr.io/f3d-app/f3d-wasm:${F3D_DOCKER_TIMESTAMP:-latest}",
     "clean": "npm run _docker -- rm -rf /src/webassembly/dist",
-    "build": "npm run _docker -- /src/webassembly/build.sh Release",
+    "build": "npm run _docker -- /src/webassembly/build.sh Debug",
     "test": "testing/test.sh",
     "prepare": "npm run clean && npm run build"
   },

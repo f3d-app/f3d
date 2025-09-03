@@ -13,10 +13,18 @@ chromium \
     --no-default-browser-check \
     --no-first-run \
     --enable-logging=stderr \
-    --v=INFO:CONSOLE \
     --user-data-dir=$DIR/wasm_testing_out \
-    --enable-features=WebAssemblyExperimentalJSPI \
     --allow-file-access-from-files \
-    file://"$DIR/test.html"
+    file://"$DIR/test.html" 2> >(tee "$DIR/wasm_testing_out/stderr.log" >&2)
 
+if grep -q "f3d_exit_code=0" "$DIR/wasm_testing_out/stderr.log"; then
+  exit 0
+fi
 
+if grep -q "f3d_exit_code=1" "$DIR/wasm_testing_out/stderr.log"; then
+  exit 1
+fi
+
+if grep -q "f3d_exit_code=2" "$DIR/wasm_testing_out/stderr.log"; then
+  exit 2
+fi
