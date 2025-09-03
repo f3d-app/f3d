@@ -221,7 +221,7 @@
       },
       "custom_binds": {
         "type": "string",
-        "default_value": "None+Drop, Ctrl+O"
+        "default_value": ""
       }
     },
     "metadata": {
