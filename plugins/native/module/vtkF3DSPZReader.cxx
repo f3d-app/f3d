@@ -114,7 +114,6 @@ struct PackedRotationV2
   }
 };
 
-
 //----------------------------------------------------------------------------
 struct PackedRotationV3
 {
@@ -123,29 +122,29 @@ struct PackedRotationV3
   std::array<float, 4> decode() const
   {
     float rotation[4];
-    constexpr float sqrt1_2 = (float)0.707106781186547524401; // 1/sqrt(2)
+    constexpr float sqrt12 = 0.707106781186547524401f; // 1/sqrt(2)
     constexpr uint32_t compMask = (1u << 9u) - 1u;
 
     uint32_t comp = packed[0] + (packed[1] << 8) + (packed[2] << 16) + (packed[3] << 24);
 
-    const int i_largest = comp >> 30;
-    float sum_squares = 0;
+    const int largestCompIndex = comp >> 30;
+    float sumSquares = 0;
     for (int i = 3; i >= 0; --i)
     {
-      if (i != i_largest)
+      if (i != largestCompIndex)
       {
         float mag = comp & compMask;
         uint32_t isNegative = (comp >> 9u) & 0x1u;
         comp = comp >> 10u;
-        rotation[i] = sqrt1_2 * (mag / float(compMask));
+        rotation[i] = sqrt12 * (mag / float(compMask));
         if (isNegative == 1)
         {
           rotation[i] = -rotation[i];
         }
-        sum_squares += rotation[i] * rotation[i];
+        sumSquares += rotation[i] * rotation[i];
       }
     }
-    rotation[i_largest] = sqrt(1.0f - sum_squares);
+    rotation[largestCompIndex] = sqrt(1.0f - sumSquares);
 
     return { rotation[0], rotation[1], rotation[2], rotation[3] };
   }
@@ -317,7 +316,7 @@ int vtkF3DSPZReader::RequestData(
   const Header* header = reinterpret_cast<Header*>(uncompressed.data());
 
   assert(header->magic == 0x5053474e);
-  assert(2 >= header->version <= 3);
+  assert(header->version >= 2 && header->version <= 3);
 
   uint32_t nbSplats = header->numPoints;
 
@@ -391,20 +390,23 @@ int vtkF3DSPZReader::RequestData(
   // rotation is stored just after the 16-bytes header, positions, colors, alphas and scales
   int rotationShift = 16 + (9 + 4 + 3) * nbSplats;
 
-  if (header->version == 2) {
+  if (header->version == 2)
+  {
     PackedRotationV2* rotation =
-        reinterpret_cast<PackedRotationV2*>(uncompressed.data() + rotationShift);
+      reinterpret_cast<PackedRotationV2*>(uncompressed.data() + rotationShift);
     for (vtkIdType splatIndex = 0; splatIndex < static_cast<vtkIdType>(nbSplats); splatIndex++)
     {
-        rotationArray->SetTypedTuple(splatIndex, (rotation++)->decode().data());
+      rotationArray->SetTypedTuple(splatIndex, (rotation++)->decode().data());
     }
-  } else if (header->version == 3) {
-      PackedRotationV3* rotation =
-          reinterpret_cast<PackedRotationV3*>(uncompressed.data() + rotationShift);
-      for (vtkIdType splatIndex = 0; splatIndex < static_cast<vtkIdType>(nbSplats); splatIndex++)
-      {
-          rotationArray->SetTypedTuple(splatIndex, (rotation++)->decode().data());
-      }
+  }
+  else if (header->version == 3)
+  {
+    PackedRotationV3* rotation =
+      reinterpret_cast<PackedRotationV3*>(uncompressed.data() + rotationShift);
+    for (vtkIdType splatIndex = 0; splatIndex < static_cast<vtkIdType>(nbSplats); splatIndex++)
+    {
+      rotationArray->SetTypedTuple(splatIndex, (rotation++)->decode().data());
+    }
   }
 
   output->GetPointData()->AddArray(rotationArray);
