@@ -5,13 +5,6 @@ import f3d from 'f3d'
 
 document.querySelector('#app').innerHTML = `
   <section class="section">
-      <div class="notification is-warning">
-        <button class="delete"></button>
-        This web application is experimental and currently not well tested. It's
-        deployed continuously and can break at anytime. Don't hesitate to reach
-        out on <a href="https://discord.f3d.app">Discord</a>
-        if it's currently not working or if you want to contribute.
-      </div>
       <div class="columns">
         <div class="column">
           <h1 class="title">F3D Web</h1>
@@ -146,17 +139,6 @@ document.querySelector('#app').innerHTML = `
       </div>
     </section>
 `
-
-// remove warning when delete button is clicked
-document.querySelectorAll(".notification .delete").forEach(
-  ($delete) => {
-    const $notification = $delete.parentNode;
-
-    $delete.addEventListener("click", () => {
-      $notification.parentNode.removeChild($notification);
-    });
-  },
-);
 
 const settings = {
   canvas: document.getElementById("canvas"),
@@ -327,15 +309,12 @@ f3d(settings)
       // Build filename given extension urlparam or response header content-disposition
       if (extension_parsed) {
         return `model_urlparam.${extension_parsed}`;
-      } else if (contentDisposition) {
+      }
+      if (contentDisposition) {
         // If extension is not provided by user, try to get it auto from content-disposition header of url extension
         return contentDisposition.split("filename=")[1].split(";")[0];
-      } else {
-        return model_url.split("/").pop();
       }
-      throw new Error(
-        `Could not parse filename/extension from either urlparam extension, response header content-disposition, nor filename present in url`,
-      );
+      return model_url.split("/").pop();
     }
 
     // Have fetch support onProgress event
