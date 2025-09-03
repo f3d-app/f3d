@@ -56,7 +56,7 @@ runs:
       run: make install
 
     - name: Copy to install
-      working-directory: ${{github.workspace}}/dependencies/sqlite_install
+      working-directory: ${{github.workspace}}/dependencies/sqlite
       shell: bash
       run: cp -r ./* ../install/
 
