@@ -390,6 +390,27 @@ void window_impl::UpdateDynamicOptions()
     renderer->ShowAxis(opt.ui.axis);
     renderer->SetUseTrackball(opt.interactor.trackball);
     renderer->SetInvertZoom(opt.interactor.invert_zoom);
+
+    std::vector<interaction_bind_t> custom_binds;
+    std::string bindsStr = opt.ui.drop_zone.custom_binds;
+    std::istringstream ss(bindsStr);
+    std::string token;
+
+    auto trim = [](std::string& str) {
+      size_t start = str.find_first_not_of(" \t");
+      size_t end = str.find_last_not_of(" \t");
+      if (start == std::string::npos) { str.clear(); return; }
+      str = str.substr(start, end - start + 1);
+    };
+
+    while (std::getline(ss, token, ',')) {
+        trim(token);
+        if (!token.empty()) {
+            custom_binds.push_back(interaction_bind_t::parse(token));
+        }
+    }
+
+    renderer->SetDropZoneInfo(this->Internals->Interactor->getBindsDocString(custom_binds));
   }
 
   // XXX: model.point_sprites.type only has an effect on geometry scene
@@ -411,7 +432,6 @@ void window_impl::UpdateDynamicOptions()
   renderer->ShowConsole(opt.ui.console);
   renderer->ShowMinimalConsole(opt.ui.minimal_console);
   renderer->ShowDropZone(opt.ui.drop_zone.enable);
-  renderer->SetDropZoneInfo(opt.ui.drop_zone.info);
   renderer->ShowDropZoneLogo(opt.ui.drop_zone.show_logo);
   // F3D_DEPRECATED
   // Remove this in the next major release
