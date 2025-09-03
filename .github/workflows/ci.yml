@@ -48,7 +48,7 @@ jobs:
   default_versions:
     runs-on: ubuntu-22.04
     name: Set default versions
-    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:full_run')) || (github.ref == 'refs/heads/master') }}
     outputs:
       alembic_min_version: ${{ steps.set_default_versions.outputs.alembic_min_version }}
       alembic_version: ${{ steps.set_default_versions.outputs.alembic_version }}
