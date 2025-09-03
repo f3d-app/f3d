@@ -13,6 +13,10 @@ runs:
       working-directory: ${{github.workspace}}/source/webassembly
       run: npm run build
 
+    - name: Run Xvfb
+      shell: bash
+      run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
+
     - name: Test
       shell: bash
       working-directory: ${{github.workspace}}/source/webassembly

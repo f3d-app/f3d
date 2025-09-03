@@ -975,6 +975,10 @@ jobs:
 
     runs-on: ubuntu-22.04
 
+    env:
+      CMAKE_BUILD_PARALLEL_LEVEL: 4
+      DISPLAY: :0
+
     steps:
       # Note that LFS is needed in order to include the default model
       - name: Checkout
