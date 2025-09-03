@@ -46,7 +46,7 @@ runs:
       run: |
         ./configure \
         --prefix=$(pwd)/dependencies/sqlite_install \
-        --enable-all \ 
+        --enable-all
         --disable-tcl
 
     - name: Build sqlite
