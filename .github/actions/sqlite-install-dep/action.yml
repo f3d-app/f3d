@@ -50,6 +50,7 @@ runs:
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_LIBDIR:PATH=lib
         -DCMAKE_INSTALL_PREFIX=../sqlite_install
+        -DBUILD_SQLITE3_BINARY=ON
 
     - name: Build sqlite
       if: steps.cache-sqlite.outputs.cache-hit != 'true'
