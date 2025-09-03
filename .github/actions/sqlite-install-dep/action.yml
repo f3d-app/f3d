@@ -47,7 +47,6 @@ runs:
         ./configure \
         --prefix=$(pwd)/dependencies/sqlite_install \
         --enable-all
-        --disable-tcl
 
     - name: Build sqlite
       if: steps.cache-sqlite.outputs.cache-hit != 'true'
