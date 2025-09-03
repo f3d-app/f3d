@@ -9,6 +9,8 @@ chromium \
     --disable-extensions \
     --disable-notifications \
     --disable-restore-session-state \
+    --disable-gpu \
+    --enable-unsafe-swiftshader \
     --new-window \
     --no-default-browser-check \
     --no-first-run \
