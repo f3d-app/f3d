@@ -1,9 +1,5 @@
 name: "WebAssembly CI"
 description: "WebAssembly CI"
-inputs:
-  timestamp:
-    description: "Docker image timestamp"
-    required: true
 
 runs:
   using: "composite"
