@@ -978,6 +978,7 @@ jobs:
     env:
       CMAKE_BUILD_PARALLEL_LEVEL: 4
       DISPLAY: :0
+      LIBGL_ALWAYS_INDIRECT: 1
 
     steps:
       # Note that LFS is needed in order to include the default model

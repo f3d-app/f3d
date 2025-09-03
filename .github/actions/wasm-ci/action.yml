@@ -8,10 +8,10 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Build
+    - name: Build and pack
       shell: bash
       working-directory: ${{github.workspace}}/source/webassembly
-      run: npm run build
+      run: npm pack
 
     - name: Run Xvfb
       shell: bash
@@ -21,11 +21,6 @@ runs:
       shell: bash
       working-directory: ${{github.workspace}}/source/webassembly
       run: npm test
-
-    - name: Pack
-      shell: bash
-      working-directory: ${{github.workspace}}/source/webassembly
-      run: npm pack
 
     - name: Upload package
       uses: actions/upload-artifact@v4
