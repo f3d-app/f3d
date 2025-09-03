@@ -58,8 +58,8 @@ runs:
         -DCMAKE_INSTALL_PREFIX=../proj_install
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
         -DEXE_SQLITE3=../sqlite_install/bin/sqlite3
-        -DSQLite3_INCLUDE_DIR=../sqlite_install
-        -DSQLite3_LIBRARY=../sqlite_install
+        -DSQLite3_INCLUDE_DIR=$(pwd)/../install/
+        -DSQLite3_LIBRARY=$(pwd)/../install/
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
