@@ -1033,8 +1033,7 @@ jobs:
           npm run build
 
       - name: Copy F3D web app
-        working-directory: ${{github.workspace}}/examples/libf3d/web
-        run: sudo mv dist _site/web
+        run: sudo mv ${{github.workspace}}/examples/libf3d/web/dist _site/web
 
       - name: Deploy
         if: github.ref == 'refs/heads/master'
