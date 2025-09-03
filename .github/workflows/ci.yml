@@ -1017,10 +1017,10 @@ jobs:
           sudo mv vtkext/public/doxygen/build/html _site/doc/libf3d/vtkext_doxygen
 
       - name: Retrieve f3d package
-        working-directory: ${{github.workspace}}/examples/libf3d/web
         uses: actions/download-artifact@v4
         with:
           name: f3d-wasm-package
+          path: ${{github.workspace}}/examples/libf3d/web
 
       - name: Install f3d package
         working-directory: ${{github.workspace}}/examples/libf3d/web
