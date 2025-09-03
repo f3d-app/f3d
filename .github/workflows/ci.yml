@@ -151,7 +151,7 @@ jobs:
           - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           - usd_version: ${{needs.default_versions.outputs.usd_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-          - sqlite_version: 3.38.2
+          - sqlite_version: version-3.42.1
           - pdal_version: v2.9.1
           - proj_version: 9.6.2
           - libgeotiff_version: 1.7.4
@@ -173,7 +173,7 @@ jobs:
             tbb_version: ${{needs.default_versions.outputs.tbb_min_version}}
             usd_version: ${{needs.default_versions.outputs.usd_min_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_min_version}}
-            sqlite_version: 3.38.2
+            sqlite_version: version-3.42.1
             proj_version: v6.3.0
             pdal_version: v2.9.1
             libgeotiff_version: 1.7.4
@@ -208,7 +208,7 @@ jobs:
           usd_version: ${{matrix.usd_version}}
           zlib_version: ${{matrix.zlib_version}}
           pdal_version: v2.9.1
-          sqlite_version: 3.38.2
+          sqlite_version: version-3.42.1
           proj_version: 9.6.2
           libgeotiff_version: 1.7.4
           libtiff_version: v4.7.0
@@ -453,7 +453,7 @@ jobs:
           - usd_version: ${{needs.default_versions.outputs.usd_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           - pdal_version: v2.9.1
-          - sqlite_version: 3.38.2
+          - sqlite_version: version-3.42.1
           - proj_version: 9.6.2
           - libgeotiff_version: 1.7.4
           - libtiff_version: v4.7.0
