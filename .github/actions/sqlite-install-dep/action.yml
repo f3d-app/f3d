@@ -28,7 +28,7 @@ runs:
       if: steps.cache-sqlite.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
       with: 
-        repository: azadkuh/sqlite-amalgamation
+        repository: sqlite/sqlite
         path: "./dependencies/sqlite"
         ref: ${{inputs.version}}
 
@@ -37,29 +37,28 @@ runs:
       working-directory: ${{github.workspace}}/dependencies
       shell: bash
       run: |
-        mkdir sqlite_build
         mkdir sqlite_install
 
     - name: Configure sqlite
       if: steps.cache-sqlite.outputs.cache-hit != 'true'
-      working-directory: ${{github.workspace}}/dependencies/sqlite_build
+      working-directory: ${{github.workspace}}/dependencies/sqlite
       shell: bash
-      run: >
-        cmake ../sqlite
-        -DBUILD_SHARED_LIBS=ON
-        -DCMAKE_BUILD_TYPE=Release
-        -DCMAKE_INSTALL_LIBDIR:PATH=lib
-        -DCMAKE_INSTALL_PREFIX=../sqlite_install
+      run: |
+        ./configure \
+        --prefix=$(pwd)/dependencies/sqlite_install \
+        --enable-all
+        --disable-tcl
 
     - name: Build sqlite
       if: steps.cache-sqlite.outputs.cache-hit != 'true'
-      working-directory: ${{github.workspace}}/dependencies/sqlite_build
+      working-directory: ${{github.workspace}}/dependencies/sqlite
       shell: bash
       run: |
-        cmake --build . --parallel 2 --target install --config Release
+        make libsqlite3.la
+        make install-libLTLIBRARIES install-includeHEADERS
 
     - name: Copy to install
-      working-directory: ${{github.workspace}}/dependencies/sqlite_install
+      working-directory: ${{github.workspace}}/dependencies/sqlite
       shell: bash
       run: cp -r ./* ../install/
 
