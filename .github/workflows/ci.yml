@@ -1025,7 +1025,7 @@ jobs:
       - name: Install f3d package
         working-directory: ${{github.workspace}}/examples/libf3d/web
         run: |
-          npm install f3d-3.2.0.tgz
+          npm install f3d-*.tgz
 
       - name: Build F3D web app
         working-directory: ${{github.workspace}}/examples/libf3d/web
