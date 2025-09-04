@@ -92,6 +92,7 @@ To run the CI, just add a comment like this in your PR:
 - `\ci full`: Complete CI, required before merge, contains `ci:main`.
 
 After this, the CI will always be run every time you push to your branch.
+To remove a label, use the same syntax with a `-` before the label, eg: `\ci -fast`.
 
 F3D continuous integration will also check the coverage as it is a good way to evaluate if new features are being tested or not.
 When adding code to F3D, always try to cover it by adding/modifying [tests](doc/dev/TESTING.md).
