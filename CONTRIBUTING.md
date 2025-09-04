@@ -86,9 +86,10 @@ It also means that adding a new feature or behavior means adding an associated t
 Make sure to check the results for yourself and ask for help if needed.
 
 To run the CI, just add a comment like this in your PR:
- - `\label ci:fast`: Style checks and a fast linux job
- - `\label ci:main`: Cross platform CI that cover most usecases, including coverage, contains `ci:fast`.
- - `\label ci:full`: Complete CI, required before merge, contains `ci:main`.
+
+- `\label ci:fast`: Style checks and a fast linux job
+- `\label ci:main`: Cross platform CI that cover most usecases, including coverage, contains `ci:fast`.
+- `\label ci:full`: Complete CI, required before merge, contains `ci:main`.
 
 After this, the CI will always be run every time you push to your branch.
 

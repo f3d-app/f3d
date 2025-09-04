@@ -279,8 +279,7 @@ jobs:
   # Windows CI: Build and test, cross-vtk build matrix
   #----------------------------------------------------------------------------
   windows:
-    needs:
-      [cache_lfs, cache_vtk_dependency, default_versions]
+    needs: [cache_lfs, cache_vtk_dependency, default_versions]
     if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:main')) || (contains(github.event.pull_request.labels.*.name, 'ci:full')) || (github.ref == 'refs/heads/master') }}
     strategy:
       fail-fast: false
@@ -560,8 +559,7 @@ jobs:
   # MacOS CI: Build and test, cross-vtk build matrix
   #----------------------------------------------------------------------------
   macos:
-    needs:
-      [cache_lfs, cache_vtk_dependency, default_versions]
+    needs: [cache_lfs, cache_vtk_dependency, default_versions]
     if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:main')) || (contains(github.event.pull_request.labels.*.name, 'ci:full')) || (github.ref == 'refs/heads/master') }}
     strategy:
       fail-fast: false
@@ -610,8 +608,7 @@ jobs:
   # MacOS ARM CI: Build and test, cross-vtk build matrix with a few optional builds
   #----------------------------------------------------------------------------
   macos_arm:
-    needs:
-      [cache_lfs, cache_vtk_dependency, default_versions]
+    needs: [cache_lfs, cache_vtk_dependency, default_versions]
     if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:main')) || (contains(github.event.pull_request.labels.*.name, 'ci:full')) || (github.ref == 'refs/heads/master') }}
     strategy:
       fail-fast: false
@@ -769,8 +766,7 @@ jobs:
   # "memory" returns false positives in VTK:
   # https://stackoverflow.com/questions/60097307/memory-sanitizer-reports-use-of-uninitialized-value-in-global-object-constructio
   sanitizer:
-    needs:
-      [cache_lfs, cache_vtk_dependency, default_versions]
+    needs: [cache_lfs, cache_vtk_dependency, default_versions]
     if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:full')) || (github.ref == 'refs/heads/master') }}
     strategy:
       fail-fast: false
