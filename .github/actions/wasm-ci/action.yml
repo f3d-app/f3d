@@ -6,16 +6,16 @@ runs:
   steps:
     - name: Build and pack
       shell: bash
-      working-directory: ${{github.workspace}}/source/webassembly
+      working-directory: ${{github.workspace}}/source
       run: npm pack
 
     - name: Test
       shell: bash
-      working-directory: ${{github.workspace}}/source/webassembly
+      working-directory: ${{github.workspace}}/source
       run: npm test
 
     - name: Upload package
       uses: actions/upload-artifact@v4
       with:
-        path: ./source/webassembly/f3d-*.tgz
+        path: ./source/f3d-*.tgz
         name: f3d-wasm-package
