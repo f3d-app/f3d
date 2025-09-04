@@ -12,5 +12,5 @@
 
 ### Continuous integration
 
-Please write a comment to run CI, eg: `\label ci:fast`.
+Please write a comment to run CI, eg: `\ci fast`.
 See [here](https://f3d.app/CONTRIBUTING.html#continuous-integration) for more info.

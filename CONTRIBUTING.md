@@ -87,9 +87,9 @@ Make sure to check the results for yourself and ask for help if needed.
 
 To run the CI, just add a comment like this in your PR:
 
-- `\label ci:fast`: Style checks and a fast linux job
-- `\label ci:main`: Cross platform CI that cover most usecases, including coverage, contains `ci:fast`.
-- `\label ci:full`: Complete CI, required before merge, contains `ci:main`.
+- `\ci fast`: Style checks and a fast linux job
+- `\ci main`: Cross platform CI that cover most usecases, including coverage, contains `ci:fast`.
+- `\ci full`: Complete CI, required before merge, contains `ci:main`.
 
 After this, the CI will always be run every time you push to your branch.
 
