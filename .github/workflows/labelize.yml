@@ -15,7 +15,6 @@ jobs:
         shell: bash
         run: |
           label=$(cut -d " " -f2- <<< "${{ github.event.comment.body }}")
-          echo $label
           gh issue edit ${{ github.event.issue.number }} --add-label "$label"
         env:
           GH_REPO: ${{ github.repository }}
