@@ -42,20 +42,9 @@ Run the following command:
 npm pack
 ```
 
-It will build and generate
-
-Five different files should be located in `webassembly/dist` directory:
-
-- `f3d.js`: javascript library
-- `f3d.wasm`: webassembly binaries
-- `f3d.data`: virtual filesystem containing the file specified in `F3D_WASM_DATA_FILE`
-- `index.html`: example file setting up the web page
-- `favicon.ico`: icon used to display the logo in the browser tab
-
-Again, use a npm command to test locally by running a HTTP server:
+It will build and generate a `f3d-vX.X.X.tgz` file.
+This file can be imported into your project:
 
 ```sh
-npm run serve
+npm install f3d-vX.X.X.tgz
 ```
-
-Going to http://localhost:3000 should display the web page and load F3D web app.
