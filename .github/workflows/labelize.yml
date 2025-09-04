@@ -14,7 +14,7 @@ jobs:
         if: contains(github.event.comment.body, '\label ci:')
         shell: bash
         run: |
-          label=${${{ github.event.comment.body }}#* }
+          label=$(cut -d " " -f2- <<< "${{ github.event.comment.body }}")
           echo $label
           gh issue edit ${{ github.event.issue.number }} --add-label "$label"
         env:
