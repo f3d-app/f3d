@@ -1,15 +1,3 @@
-{
-  "short_name": "F3D",
-  "name": "F3D Web",
-  "icons": [
-    {
-      "src": "./icon256.png",
-      "sizes": "256x256",
-      "type": "image/png"
-    }
-  ],
-  "start_url": ".",
-  "display": "standalone",
-  "theme_color": "#788BFF",
-  "background_color": "#14161A"
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:7a262bdde7abc4b8cc63b03096202eb2987e02cca091c1a297df9a93c01e6e7e
+size 267
