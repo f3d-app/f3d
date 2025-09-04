@@ -2,15 +2,15 @@
   "name": "f3d",
   "version": "3.2.0",
   "description": "Fast and minimalist 3D viewer framework",
-  "main": "./dist/f3d.js",
+  "export": "./dist/f3d.js",
   "files": [
     "./dist/f3d.*"
   ],
   "scripts": {
-    "_docker": "docker run --rm -e CMAKE_BUILD_PARALLEL_LEVEL -v $(pwd):/src ghcr.io/f3d-app/f3d-wasm:${F3D_DOCKER_TIMESTAMP:-latest}",
+    "_docker": "${F3D_DOCKER_CLIENT:-docker} run --rm -e CMAKE_BUILD_PARALLEL_LEVEL -v $(pwd):/src ghcr.io/f3d-app/f3d-wasm:${F3D_DOCKER_TIMESTAMP:-latest}",
     "clean": "npm run _docker -- rm -rf /src/dist /src/_wasm_build",
-    "build": "npm run _docker -- /src/webassembly/build.sh Debug",
-    "test": "npm run _docker -- ctest --test-dir /src/_wasm_build/webassembly -VV",
+    "build": "npm run _docker -- /src/webassembly/build.sh Release",
+    "test": "npm run _docker -- ctest --test-dir /src/_wasm_build/webassembly --output-on-failure",
     "prepare": "npm run clean && npm run build"
   },
   "repository": "github:f3d-app/f3d",
