@@ -17,10 +17,9 @@
     <div id="main">
       <canvas id="canvas"></canvas>
     </div>
-    <script type="module" src="../dist/f3d.js"></script>
     <script type="module">
 
-      import f3d from '../dist/f3d.js';
+      import f3d from '../../dist/f3d.js';
 
       const settings = {
         canvas: document.getElementById("canvas"),
@@ -53,10 +52,10 @@
         .then(async (Module) => {
 
           // write in the filesystem
-          const modelFile = await fetch("./f3d.vtp").then(b => b.arrayBuffer());
+          const modelFile = await fetch("../../testing/data/f3d.vtp").then(b => b.arrayBuffer());
           Module.FS.writeFile("f3d.vtp", new Uint8Array(modelFile));
 
-          const baselineFile = await fetch("./baseline.png").then(b => b.arrayBuffer());
+          const baselineFile = await fetch("../../testing/baselines/TestWasmOptions.png").then(b => b.arrayBuffer());
           Module.FS.writeFile("baseline.png", new Uint8Array(baselineFile));
 
           // automatically load all supported file format readers
@@ -67,12 +66,10 @@
           Module.setupOptions(Module.engineInstance.getOptions());
 
           // setup the window size based on the canvas size
-          const main = document.getElementById("main");
-
           const scale = window.devicePixelRatio;
           Module.engineInstance
             .getWindow()
-            .setSize(scale * main.clientWidth, scale * main.clientHeight);
+            .setSize(scale * Module.canvas.clientWidth, scale * Module.canvas.clientHeight);
 
           const filePath = "/f3d.vtp";
           const scene = Module.engineInstance.getScene();

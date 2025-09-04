@@ -6,7 +6,7 @@ DIR="$(cd "$(dirname "${BASH_SOURCE}")" && pwd)"
 
 mkdir -p "$DIR/wasm_testing_out"
 
-chromium \
+${F3D_BROWSER:-chromium} \
     --disable-application-cache \
     --disable-extensions \
     --disable-notifications \

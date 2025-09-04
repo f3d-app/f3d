@@ -52,8 +52,6 @@ f3d(settings)
     Module.setupOptions(Module.engineInstance.getOptions());
 
     // setup the window size based on the canvas size
-    const main = document.getElementById("canvas");
-
     const scale = window.devicePixelRatio;
     Module.engineInstance
       .getWindow()

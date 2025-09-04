@@ -16,5 +16,5 @@ cmake -S /src -B /build \
 cmake --build /build
 
 # Copy generated js/wasm to dist
-mkdir -p /src/webassembly/dist
-mv /build/bin/* /src/webassembly/dist
+mkdir -p /src/dist
+mv /build/bin/* /src/dist
