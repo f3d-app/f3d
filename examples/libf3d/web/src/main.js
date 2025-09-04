@@ -1,9 +1,9 @@
-import './style.css'
-import 'bulma/css/bulma.min.css'
-import 'bulma-switch/dist/css/bulma-switch.min.css'
-import f3d from 'f3d'
+import "./style.css";
+import "bulma/css/bulma.min.css";
+import "bulma-switch/dist/css/bulma-switch.min.css";
+import f3d from "f3d";
 
-document.querySelector('#app').innerHTML = `
+document.querySelector("#app").innerHTML = `
   <section class="section">
       <div class="columns">
         <div class="column">
@@ -138,7 +138,7 @@ document.querySelector('#app').innerHTML = `
         </progress>
       </div>
     </section>
-`
+`;
 
 const settings = {
   canvas: document.getElementById("canvas"),
@@ -170,7 +170,7 @@ const settings = {
 f3d(settings)
   .then(async (Module) => {
     // write in the filesystem
-    const defaultFile = await fetch("f3d.vtp").then(b => b.arrayBuffer());
+    const defaultFile = await fetch("f3d.vtp").then((b) => b.arrayBuffer());
     Module.FS.writeFile("f3d.vtp", new Uint8Array(defaultFile));
 
     // automatically load all supported file format readers
@@ -230,12 +230,10 @@ f3d(settings)
 
     // toggle callback
     const mapToggleIdToOption = (id, option) => {
-      document
-        .querySelector("#" + id)
-        .addEventListener("change", (evt) => {
-          Module.engineInstance.getOptions().toggle(option);
-          Module.engineInstance.getWindow().render();
-        });
+      document.querySelector("#" + id).addEventListener("change", (evt) => {
+        Module.engineInstance.getOptions().toggle(option);
+        Module.engineInstance.getWindow().render();
+      });
     };
 
     // This assumes all toggles are 'on' before mapping their state to options
@@ -401,7 +399,7 @@ f3d(settings)
             console.log("error caught during fetch", error);
             alert(
               "Error occurred while fetching the model at provided url (passed as url-param). \n\nThis might be a CORS issue (you can avoid it by using a Allow-CORS plugin) because server does not allow cross-origin requests, or the url to the file is wrong. \n\nComplete error message: " +
-              error.message,
+                error.message,
             );
           });
       } else {

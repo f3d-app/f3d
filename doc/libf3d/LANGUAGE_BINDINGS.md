@@ -94,7 +94,9 @@ const settings = {
 f3d(settings)
   .then(async (Module) => {
     // write a 3D file located on the server to the internal filesystem
-    const modelFile = await fetch("/assets/example.obj").then((b) => b.arrayBuffer());
+    const modelFile = await fetch("/assets/example.obj").then((b) =>
+      b.arrayBuffer(),
+    );
     Module.FS.writeFile("example.obj", new Uint8Array(modelFile));
 
     // automatically load all supported file format readers

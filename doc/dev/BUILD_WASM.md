@@ -32,7 +32,6 @@ From the root of the repository, after the build step, run the following command
 npm test
 ```
 
-
 # Integrating
 
 It's possible to generate a local package to use in other javascript projects.
