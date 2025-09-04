@@ -11,8 +11,12 @@ jobs:
 
     steps:
       - name: Comment on PR
+        if: contains(github.event.comment.body, '\label ci:')
         shell: bash
-        run: gh issue edit ${{ github.event.issue.number }} --add-label "ci:fast"
+        run: |
+          label=${${{ github.event.comment.body }}#* }
+          echo $label
+          gh issue edit ${{ github.event.issue.number }} --add-label "$label"
         env:
           GH_REPO: ${{ github.repository }}
           GH_TOKEN: ${{ secrets.F3D_CI_LABEL }}
