@@ -12,16 +12,5 @@
 
 ### Continuous integration
 
-Please check the checkbox of the CI you want to run, then push again on your branch.
-
-- [ ] Style checks
-- [ ] Fast CI
-- [ ] Coverage cached CI
-- [ ] Analysis cached CI
-- [ ] WASM docker CI
-- [ ] Android docker CI
-- [ ] macOS Intel cached CI
-- [ ] macOS ARM cached CI
-- [ ] Windows cached CI
-- [ ] Linux cached CI
-- [ ] Other cached CI
+Please write a comment to run CI, eg: `\label ci:fast`.
+See [here](https://f3d.app/CONTRIBUTING.html#continuous-integration) for more info.
