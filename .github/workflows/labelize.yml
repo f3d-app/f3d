@@ -1,9 +1,4 @@
-on:
-  pull_request_target:
-    types: [issue_comment]
-    branches:
-      - master
-      - release
+on: issue_comment
 name: Labelize
 jobs:
   #----------------------------------------------------------------------------
