@@ -25,7 +25,7 @@ jobs:
       - name: Add label on PR
         if: ${{!contains(env.F3D_LABEL_COMMENT, '-')}}
         shell: bash
-        run: gh issue edit ${{ github.event.issue.number }} --add-label "${{env.F3D_LABEL_COMMENT}}"
+        run: gh issue edit ${{ github.event.issue.number }} --add-label "ci:${{env.F3D_LABEL_COMMENT}}"
 
       - name: Remove label on PR
         if: contains(env.F3D_LABEL_COMMENT, '-')
@@ -33,4 +33,4 @@ jobs:
         run: |
           label="${{env.F3D_LABEL_COMMENT}}"
           label=${label#*-}
-          gh issue edit ${{ github.event.issue.number }} --remove-label "$label"
+          gh issue edit ${{ github.event.issue.number }} --remove-label "ci:$label"
