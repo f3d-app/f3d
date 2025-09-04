@@ -13,3 +13,5 @@ jobs:
       - name: Comment on PR
         shell: bash
         run: gh issue edit ${{ github.event.issue.number }} --add-label "ci:fast"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
