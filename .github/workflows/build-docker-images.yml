@@ -16,7 +16,7 @@ jobs:
   default_versions:
     runs-on: ubuntu-22.04
     name: Set default versions
-    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:full')) }}
+    if: contains(github.event.pull_request.labels.*.name, 'ci:full')
     outputs:
       timestamp: ${{ steps.set_default_versions.outputs.timestamp }}
 

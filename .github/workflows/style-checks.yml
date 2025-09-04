@@ -12,7 +12,10 @@ jobs:
   style_checks:
     name: Formatting Check
     runs-on: ubuntu-latest
-    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:fast')) || (contains(github.event.pull_request.labels.*.name, 'ci:main')) || (contains(github.event.pull_request.labels.*.name, 'ci:full')) }}
+    if: |
+      contains(github.event.pull_request.labels.*.name, 'ci:fast') ||
+      contains(github.event.pull_request.labels.*.name, 'ci:main') ||
+      contains(github.event.pull_request.labels.*.name, 'ci:full')
     env:
       ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
