@@ -21,7 +21,7 @@ jobs:
   default_versions:
     runs-on: ubuntu-22.04
     name: Set default versions
-    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:versions')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:fast')) || (contains(github.event.pull_request.labels.*.name, 'ci:main')) || (contains(github.event.pull_request.labels.*.name, 'ci:full')) || (github.ref == 'refs/heads/master') }}
     outputs:
       alembic_min_version: ${{ steps.set_default_versions.outputs.alembic_min_version }}
       alembic_version: ${{ steps.set_default_versions.outputs.alembic_version }}
@@ -76,7 +76,7 @@ jobs:
   cache_lfs:
     runs-on: ubuntu-22.04
     name: Update LFS data cache
-    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:cached')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:fast')) || (contains(github.event.pull_request.labels.*.name, 'ci:main')) || (contains(github.event.pull_request.labels.*.name, 'ci:full')) || (github.ref == 'refs/heads/master') }}
     outputs:
       lfs_sha: ${{ steps.lfs_sha_recover.outputs.lfs_sha }}
     steps:
@@ -99,7 +99,7 @@ jobs:
   cache_dependencies:
     name: Cache dependencies
     needs: [default_versions]
-    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:cached')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:main')) || (contains(github.event.pull_request.labels.*.name, 'ci:full')) || (github.ref == 'refs/heads/master') }}
     strategy:
       fail-fast: false
       matrix:
@@ -173,7 +173,7 @@ jobs:
   cache_vtk_dependency:
     name: Cache VTK dependency
     needs: [default_versions, cache_dependencies]
-    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:cached')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:main')) || (contains(github.event.pull_request.labels.*.name, 'ci:full')) || (github.ref == 'refs/heads/master') }}
     strategy:
       fail-fast: false
       matrix:
@@ -281,7 +281,7 @@ jobs:
   windows:
     needs:
       [cache_lfs, cache_vtk_dependency, default_versions]
-    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:windows')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:main')) || (contains(github.event.pull_request.labels.*.name, 'ci:full')) || (github.ref == 'refs/heads/master') }}
     strategy:
       fail-fast: false
       matrix:
@@ -335,7 +335,7 @@ jobs:
   #----------------------------------------------------------------------------
   linux_fast:
     needs: [cache_lfs, default_versions]
-    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:fast')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:fast')) || (contains(github.event.pull_request.labels.*.name, 'ci:main')) || (contains(github.event.pull_request.labels.*.name, 'ci:full')) || (github.ref == 'refs/heads/master') }}
     runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
 
@@ -369,7 +369,7 @@ jobs:
   #----------------------------------------------------------------------------
   linux:
     needs: [cache_lfs, cache_vtk_dependency, default_versions]
-    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:linux')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:main')) || (contains(github.event.pull_request.labels.*.name, 'ci:full')) || (github.ref == 'refs/heads/master') }}
     strategy:
       fail-fast: false
       matrix:
@@ -562,7 +562,7 @@ jobs:
   macos:
     needs:
       [cache_lfs, cache_vtk_dependency, default_versions]
-    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:macos_intel')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:main')) || (contains(github.event.pull_request.labels.*.name, 'ci:full')) || (github.ref == 'refs/heads/master') }}
     strategy:
       fail-fast: false
       matrix:
@@ -612,7 +612,7 @@ jobs:
   macos_arm:
     needs:
       [cache_lfs, cache_vtk_dependency, default_versions]
-    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:macos_arm')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:main')) || (contains(github.event.pull_request.labels.*.name, 'ci:full')) || (github.ref == 'refs/heads/master') }}
     strategy:
       fail-fast: false
       matrix:
@@ -670,7 +670,7 @@ jobs:
   #----------------------------------------------------------------------------
   python-packaging:
     needs: [cache_lfs, cache_vtk_dependency, default_versions]
-    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:other')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:full')) || (github.ref == 'refs/heads/master') }}
     strategy:
       fail-fast: false
       matrix:
@@ -726,7 +726,7 @@ jobs:
   #----------------------------------------------------------------------------
   coverage:
     needs: [cache_lfs, cache_vtk_dependency, default_versions]
-    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:coverage')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:main')) || (contains(github.event.pull_request.labels.*.name, 'ci:full')) || (github.ref == 'refs/heads/master') }}
     runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
 
@@ -771,7 +771,7 @@ jobs:
   sanitizer:
     needs:
       [cache_lfs, cache_vtk_dependency, default_versions]
-    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:other')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:full')) || (github.ref == 'refs/heads/master') }}
     strategy:
       fail-fast: false
       matrix:
@@ -815,7 +815,7 @@ jobs:
   #----------------------------------------------------------------------------
   static-analysis:
     needs: [cache_lfs, cache_vtk_dependency, default_versions]
-    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:analysis')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:full')) || (github.ref == 'refs/heads/master') }}
     strategy:
       fail-fast: false
 
@@ -856,7 +856,7 @@ jobs:
   #----------------------------------------------------------------------------
   external-build:
     needs: [cache_vtk_dependency, default_versions]
-    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:other')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:full')) || (github.ref == 'refs/heads/master') }}
     strategy:
       fail-fast: false
 
@@ -900,7 +900,7 @@ jobs:
   # android: Check build of F3D for android
   #----------------------------------------------------------------------------
   android:
-    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:android')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:full')) || (github.ref == 'refs/heads/master') }}
     strategy:
       fail-fast: false
       matrix:
@@ -927,7 +927,7 @@ jobs:
   #----------------------------------------------------------------------------
   webassembly:
     needs: [default_versions, check_docker_images]
-    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:wasm')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:full')) || (github.ref == 'refs/heads/master') }}
     strategy:
       fail-fast: false
 
