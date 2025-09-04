@@ -106,7 +106,7 @@ jobs:
   #----------------------------------------------------------------------------
   cache_dependencies:
     name: Cache dependencies
-    needs: [default_versions]
+    needs: default_versions
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:main') ||
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
@@ -937,6 +937,7 @@ jobs:
   # android: Check build of F3D for android
   #----------------------------------------------------------------------------
   android:
+    needs: [default_versions, check_docker_images]
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
