@@ -1,0 +1,20 @@
+on:
+  pull_request_target:
+    types: [issue_comment]
+    branches:
+      - master
+      - release
+name: Labelize
+jobs:
+  #----------------------------------------------------------------------------
+  # Labelize
+  #----------------------------------------------------------------------------
+  labelize:
+    name: Labelize
+    runs-on: ubuntu-latest
+    if: ${{ github.event.issue.pull_request }}
+
+    steps:
+      - name: Comment on PR
+        shell: bash
+        run: gh issue edit ${{ github.event.issue.number }} --add-label "ci:fast"
