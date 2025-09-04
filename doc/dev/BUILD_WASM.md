@@ -16,15 +16,33 @@ Install `Docker` and `npm` locally.
 
 ## Building F3D
 
-Go to the `webassembly` directory and run the following command to build F3D:
+From the root of the repository run the following command:
 
 ```sh
-npm run build:deb # or build:rel for optimized build
+npm run build
 ```
 
-On completion, a directory `webassembly/dist` is created containing the artifacts.
+On completion, a directory `dist` is created containing the artifacts.
 
-# Testing it locally
+# Run tests
+
+From the root of the repository, after the build step, run the following command:
+
+```sh
+npm test
+```
+
+
+# Integrating
+
+It's possible to generate a local package to use in other javascript projects.
+Run the following command:
+
+```sh
+npm pack
+```
+
+It will build and generate
 
 Five different files should be located in `webassembly/dist` directory:
 

@@ -29,3 +29,6 @@ target_link_options(f3djs PRIVATE
   "SHELL:-sEXPORTED_RUNTIME_METHODS=FS"
   "SHELL:-sWASM_BIGINT"
 )
+
+enable_testing()
+add_subdirectory(testing)
