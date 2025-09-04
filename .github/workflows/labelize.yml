@@ -14,4 +14,5 @@ jobs:
         shell: bash
         run: gh issue edit ${{ github.event.issue.number }} --add-label "ci:fast"
         env:
+          GH_REPO: ${{ github.repository }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
