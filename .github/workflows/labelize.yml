@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       ${{ github.event.issue.pull_request }} &&
-      contains(github.event.comment.body, '\ci')
+      ${{ contains(github.event.comment.body, '\ci') }}
     env:
       GH_REPO: ${{ github.repository }}
       GH_TOKEN: ${{ secrets.F3D_CI_LABEL }}
@@ -33,7 +33,7 @@ jobs:
 
       - name: Add label on PR
         if: |
-          contains(github.event.comment.body, '\ci') &&
+          ${{ contains(github.event.comment.body, '\ci') }} &&
           ${{!contains(env.F3D_LABEL_COMMENT, '-')}}
         shell: bash
         run: gh issue edit ${{ github.event.issue.number }} --add-label "ci:${{env.F3D_LABEL_COMMENT}}"
