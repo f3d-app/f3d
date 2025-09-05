@@ -80,7 +80,7 @@ f3d(settings)
 
     Module.setupOptions(Module.engineInstance.getOptions());
 
-    // Storing dom el ids to f3d option mappings since also useful for url-param parsing
+    // Storing DOM element ids to f3d option mappings since also useful for url-param parsing
     const idOptionMappings = [
       ["grid", "render.grid.enable"],
       ["axis", "ui.axis"],

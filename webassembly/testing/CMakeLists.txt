@@ -2,6 +2,12 @@ set(f3djsTests_list
   "test_options"
 )
 
+find_program(CHROMIUM_EXECUTABLE chromium)
+
+if (NOT ${CHROMIUM_EXECUTABLE})
+  message(FATAL_ERROR "chromium executable not found.")
+endif()
+
 # Add all the ADD_TEST for each test
 foreach(test_name ${f3djsTests_list})
 
@@ -12,7 +18,7 @@ foreach(test_name ${f3djsTests_list})
     @ONLY)
 
   add_test(NAME f3djs::${test_name}
-    COMMAND chromium
+    COMMAND ${CHROMIUM_EXECUTABLE}
       --disable-application-cache
       --disable-extensions
       --disable-notifications

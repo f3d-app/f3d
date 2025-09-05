@@ -1023,13 +1023,11 @@ jobs:
 
       - name: Install f3d package
         working-directory: ${{github.workspace}}/examples/libf3d/web
-        run: |
-          npm install f3d-*.tgz
+        run: npm install f3d-*.tgz
 
       - name: Build F3D web app
         working-directory: ${{github.workspace}}/examples/libf3d/web
-        run: |
-          npm run build
+        run: npm run build
 
       - name: Copy F3D web app
         run: sudo mv ${{github.workspace}}/examples/libf3d/web/dist _site/web
