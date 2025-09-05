@@ -55,11 +55,19 @@ jobs:
           dry: True
           prettier_options: "-w **/*.{js,json,md,html,yml}"
 
+      - name: Echo Diff
+        shell: bash
+        run: git diff --color=always --exit-code
+
       - name: Generate Diff
+        if: failure()
         shell: bash
         run: |
-          diff=$(git diff --color=always --exit-code)
+          echo "toto"
+          diff=$(git diff)
+          echo $diff
           echo "F3D_STYLE_DIFF=$diff" >> $GITHUB_ENV
+          echo $diff
           echo $diff > f3d_style_diff.patch
           echo $diff
 
@@ -71,6 +79,7 @@ jobs:
           name: f3d_style_diff
 
       - name: Write sticky comment
+        if: failure()
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           message: |
