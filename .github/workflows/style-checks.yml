@@ -64,26 +64,33 @@ jobs:
         shell: bash
         run: |
           diff=$(git diff)
-          echo "$diff" > ./f3d_style_diff.patch
+          echo "$diff" > ./f3d_style_checks_diff.patch
           {
             echo 'F3D_STYLE_DIFF<<EOF'
             echo "$diff"
             echo EOF
           } >> "$GITHUB_ENV"
 
-      - name: Upload Tests Artifact
+      - name: Upload diff as an Artifact
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           path: ./f3d_style_diff.patch
-          name: f3d_style_diff
+          name: f3d-style-checks-diff-${{ github.event.pull_request.head.ref }}
 
       - name: Write sticky comment
         if: failure()
         uses: marocchino/sticky-pull-request-comment@v2
         with:
+          recreate: true
           message: |
-            Style Diff:
+            Style Checks CI failed:
             ```
             ${{env.F3D_STYLE_DIFF}}
             ```
+
+      - name: Delete sticky comment
+        if: success()
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          delete: true
