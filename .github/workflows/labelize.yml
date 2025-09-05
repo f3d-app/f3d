@@ -48,4 +48,5 @@ jobs:
         with:
           body: |
             > ${{github.event.comment.body}}
+
             ❌ Invalid CI command "${{env.F3D_LABEL_COMMENT}}"
