@@ -315,8 +315,15 @@ int vtkF3DSPZReader::RequestData(
 
   const Header* header = reinterpret_cast<Header*>(uncompressed.data());
 
-  assert(header->magic == 0x5053474e);
-  assert(header->version >= 2 && header->version <= 3);
+  if (header->magic != 0x5053474e) {
+      vtkErrorMacro("Incompatible SPZ header.");
+      return 0;
+  }
+
+  if (header->version < 2 && header->version > 3) {
+      vtkErrorMacro("Incompatible SPZ version. F3D could only load SPZ version 2 and 3");
+      return 0;
+  }
 
   uint32_t nbSplats = header->numPoints;
 
