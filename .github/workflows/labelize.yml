@@ -38,11 +38,11 @@ jobs:
       - name: Add ack reaction
         uses: GrantBirki/comment@v2.1.1
         with:
-          comment-id: ${{ github.event.issue.id }}
+          comment-id: ${{ github.event.issue.number }}
           reactions: eyes
 
       - name: Create comment for invalid command
         if: failure()
         uses: GrantBirki/comment@v2.1.1
         with:
-          body: Invalid ci command ${{env.F3D_LABEL_COMMENT}}
+          body: ❌Invalid ci command "${{env.F3D_LABEL_COMMENT}}"
