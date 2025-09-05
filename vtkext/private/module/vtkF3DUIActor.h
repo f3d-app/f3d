@@ -10,6 +10,7 @@
 
 #include <vtkProp.h>
 
+#include <cstdint>
 #include <deque>
 
 class vtkOpenGLRenderWindow;
@@ -20,7 +21,18 @@ public:
   static vtkF3DUIActor* New();
   vtkTypeMacro(vtkF3DUIActor, vtkProp);
 
-  using CheatSheetTuple = std::tuple<std::string, std::string, std::string>;
+  /**
+   * Enumeration of available cheatsheet binding types.
+   */
+  enum class CheatSheetBindingType : std::uint8_t
+  {
+    CYCLIC = 0,
+    NUMERICAL = 1,
+    TOGGLE = 2,
+    OTHER = 3,
+  };
+
+  using CheatSheetTuple = std::tuple<std::string, std::string, std::string, CheatSheetBindingType>;
   using CheatSheetGroup = std::pair<std::string, std::vector<CheatSheetTuple>>;
 
   /**

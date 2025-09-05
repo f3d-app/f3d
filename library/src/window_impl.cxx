@@ -2,6 +2,7 @@
 
 #include "camera_impl.h"
 #include "engine.h"
+#include "interactor.h"
 #include "log.h"
 #include "macros.h"
 #include "options.h"
@@ -543,9 +544,11 @@ void window_impl::UpdateDynamicOptions()
       for (const interaction_bind_t& bind : this->Internals->Interactor->getBindsForGroup(group))
       {
         auto [doc, val] = this->Internals->Interactor->getBindingDocumentation(bind);
+        f3d::interactor::BindingType type = this->Internals->Interactor->getBindingType(bind);
         if (!doc.empty())
         {
-          groupList.emplace_back(std::make_tuple(bind.format(), doc, val));
+          groupList.emplace_back(
+            std::make_tuple(bind.format(), doc, val, vtkF3DUIActor::CheatSheetBindingType(type)));
         }
       }
       cheatsheet.emplace_back(std::make_pair(group, std::move(groupList)));
