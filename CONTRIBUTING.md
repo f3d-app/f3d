@@ -81,12 +81,18 @@ F3D uses [GitLab Flow](https://about.gitlab.com/topics/version-control/what-is-g
 ## Continuous Integration
 
 F3D has pretty extensive continuous integration trying to cover all usecases for F3D.
-It means that if the change in your pull request breaks continuous integration, it will not be merged until it passes successfully.
+It means that if the change in your pull request breaks continuous integration, it will not be merged until the full CI passes successfully.
 It also means that adding a new feature or behavior means adding an associated test.
 Make sure to check the results for yourself and ask for help if needed.
 
-To run the CI, just check the CI related checkboxes in your pull request and push anything to your branch.
+To run the CI, just add a comment like this in your PR:
+
+- `\ci fast`: Style checks and a fast linux job
+- `\ci main`: Cross platform CI that cover most usecases, including coverage, contains `ci:fast`.
+- `\ci full`: Complete CI, required before merge, contains `ci:main`.
+
 After this, the CI will always be run every time you push to your branch.
+To remove a label, use the same syntax with a `-` before the label, eg: `\ci -fast`.
 
 F3D continuous integration will also check the coverage as it is a good way to evaluate if new features are being tested or not.
 When adding code to F3D, always try to cover it by adding/modifying [tests](doc/dev/TESTING.md).
