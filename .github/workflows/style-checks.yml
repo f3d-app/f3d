@@ -71,14 +71,20 @@ jobs:
             echo EOF
           } >> "$GITHUB_ENV"
 
-      - name: Upload diff as an Artifact
+      - name: Upload diff as an artifact
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           path: ./f3d_style_diff.patch
           name: f3d-style-checks-diff-${{ github.event.pull_request.head.ref }}
 
-      - name: Write sticky comment
+      - name: Delete comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: style
+          delete: true
+
+      - name: Create comment
         if: failure()
         uses: marocchino/sticky-pull-request-comment@v2
         with:
@@ -88,10 +94,3 @@ jobs:
             ```diff
             ${{env.F3D_STYLE_DIFF}}
             ```
-
-      - name: Delete sticky comment
-        if: success()
-        uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          header: style
-          delete: true
