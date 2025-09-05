@@ -83,7 +83,6 @@ jobs:
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: style
-          hide_and_recreate: true
           message: |
             Style Checks CI failed:
             ```diff
