@@ -8,8 +8,8 @@ jobs:
     name: Labelize
     runs-on: ubuntu-latest
     if: |
-      ${{ github.event.issue.pull_request }} &&
-      ${{ contains(github.event.comment.body, '\ci') }}
+      github.event.issue.pull_request == &&
+      contains(github.event.comment.body, '\ci')
     env:
       GH_REPO: ${{ github.repository }}
       GH_TOKEN: ${{ secrets.F3D_CI_LABEL }}
@@ -32,9 +32,7 @@ jobs:
           reactions: eyes
 
       - name: Add label on PR
-        if: |
-          ${{ contains(github.event.comment.body, '\ci') }} &&
-          ${{!contains(env.F3D_LABEL_COMMENT, '-')}}
+        if: ${{ contains(github.event.comment.body, '\ci') && !contains(env.F3D_LABEL_COMMENT, '-')}}
         shell: bash
         run: gh issue edit ${{ github.event.issue.number }} --add-label "ci:${{env.F3D_LABEL_COMMENT}}"
 
@@ -52,4 +50,4 @@ jobs:
         if: failure()
         uses: GrantBirki/comment@v2.1.1
         with:
-          body: ❌ Invalid ci command "${{env.F3D_LABEL_COMMENT}}"
+          body: ❌ Invalid CI command "${{env.F3D_LABEL_COMMENT}}"
