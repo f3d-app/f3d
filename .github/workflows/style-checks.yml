@@ -63,14 +63,12 @@ jobs:
         if: failure()
         shell: bash
         run: |
-          echo "toto"
           diff=$(git diff)
-          echo "$diff"
-          echo "$diff" > f3d_style_diff.patch
-          echo "$diff"
+          echo "$diff" > ./f3d_style_diff.patch
           {
-            echo "TEST_RESULT<<$diff"
+            echo 'F3D_STYLE_DIFF<<EOF'
             echo "$diff"
+            echo EOF
           } >> "$GITHUB_ENV"
 
       - name: Upload Tests Artifact
@@ -85,9 +83,7 @@ jobs:
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           message: |
-            Lest Try a
-            Mult
-            Line
-            Message
             Style Diff:
-            ${{env.TEST_RESULT}}
+            ```
+            ${{env.F3D_STYLE_DIFF}}
+            ```
