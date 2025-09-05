@@ -16,7 +16,6 @@ jobs:
 
     steps:
       - name: Analyze comment
-        if: contains(github.event.comment.body, '\ci')
         shell: bash
         run: |
           label="${{github.event.comment.body}}"
@@ -25,21 +24,18 @@ jobs:
           echo "F3D_LABEL_COMMENT=$label" >> $GITHUB_ENV
 
       - name: Add ack reaction
-        if: contains(github.event.comment.body, '\ci')
         uses: GrantBirki/comment@v2.1.1
         with:
           comment-id: ${{ github.event.comment.id }}
           reactions: eyes
 
       - name: Add label on PR
-        if: ${{ contains(github.event.comment.body, '\ci') && !contains(env.F3D_LABEL_COMMENT, '-')}}
+        if: ${{!contains(env.F3D_LABEL_COMMENT, '-')}}
         shell: bash
         run: gh issue edit ${{ github.event.issue.number }} --add-label "ci:${{env.F3D_LABEL_COMMENT}}"
 
       - name: Remove label on PR
-        if: |
-          contains(github.event.comment.body, '\ci') &&
-          contains(env.F3D_LABEL_COMMENT, '-')
+        if: contains(env.F3D_LABEL_COMMENT, '-')
         shell: bash
         run: |
           label="${{env.F3D_LABEL_COMMENT}}"
