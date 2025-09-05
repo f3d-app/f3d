@@ -7,7 +7,9 @@ jobs:
   labelize:
     name: Labelize
     runs-on: ubuntu-latest
-    if: ${{ github.event.issue.pull_request }}
+    if: |
+      ${{ github.event.issue.pull_request }} &&
+      contains(github.event.comment.body, '\ci')
     env:
       GH_REPO: ${{ github.repository }}
       GH_TOKEN: ${{ secrets.F3D_CI_LABEL }}
