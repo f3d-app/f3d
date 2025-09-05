@@ -66,10 +66,12 @@ jobs:
           echo "toto"
           diff=$(git diff)
           echo "$diff"
-          echo "F3D_STYLE_DIFF=\"$diff\"" >> $GITHUB_ENV
-          echo "$diff"
           echo "$diff" > f3d_style_diff.patch
           echo "$diff"
+          {
+            echo "TEST_RESULT<<$diff"
+            echo "$diff"
+          } >> "$GITHUB_ENV"
 
       - name: Upload Tests Artifact
         if: failure()
@@ -88,6 +90,4 @@ jobs:
             Line
             Message
             Style Diff:
-            ```
-            ${{env.F3D_STYLE_DIFF}}
-            ```
+            ${{env.TEST_RESULT}}
