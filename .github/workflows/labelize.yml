@@ -8,7 +8,7 @@ jobs:
     name: Labelize
     runs-on: ubuntu-latest
     if: |
-      github.event.issue.pull_request == &&
+      github.event.issue.pull_request &&
       contains(github.event.comment.body, '\ci')
     env:
       GH_REPO: ${{ github.repository }}
