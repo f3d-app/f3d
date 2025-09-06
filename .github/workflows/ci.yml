@@ -926,7 +926,6 @@ jobs:
     # Pull request can require a rebuild of docker image, wait for it to be done
     # This job does not do anything in master branch but is not skipped for simpler logic
     steps:
-
       - name: Extract branch name
         if: contains(github.event.pull_request.labels.*.name, 'ci:full')
         shell: bash
