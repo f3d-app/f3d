@@ -930,7 +930,7 @@ jobs:
 
       - name: Extract branch name
         shell: bash
-        run: echo "F3D_BRANCH_NAME=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+        run: echo "F3D_BRANCH_NAME=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_ENV
 
       - name: Recover run-id
         run: gh run list -w build-docker-images.yml --repo f3d-app/f3d -L 1 -b ${{ env.F3D_BRANCH_NAME }}
