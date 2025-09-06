@@ -31,5 +31,9 @@ target_link_options(f3djs PRIVATE
   "SHELL:-sWASM_BIGINT"
 )
 
+# The tests rely on the presence of chromium
+# Since we rely on Docker, we know it's there so testing is always enabled
+# Moreover, we cannot use BUILD_TESTING since it enables testing in our VTK modules
+# and breaks the configuration (we should fix that properly at some point)
 enable_testing()
 add_subdirectory(testing)

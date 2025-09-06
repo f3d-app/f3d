@@ -4,7 +4,7 @@ set(f3djsTests_list
 
 find_program(CHROMIUM_EXECUTABLE chromium)
 
-if (NOT ${CHROMIUM_EXECUTABLE})
+if (NOT CHROMIUM_EXECUTABLE)
   message(FATAL_ERROR "chromium executable not found.")
 endif()
 

@@ -22,7 +22,10 @@ From the root of the repository run the following command:
 npm run build
 ```
 
-On completion, a directory `dist` is created containing the artifacts.
+By default, the latest Docker image is pulled automatically, but you can force a specific Docker image by setting the environment variable `F3D_DOCKER_TIMESTAMP` to a timetamp (see `.github/workflows/versions.json` file)
+It's also possible to use `podman` instead of `docker`, please set the `F3D_DOCKER_CLIENT` environment variable to `podman`.
+On completion, a directory `dist` is created containing the artifacts (`f3d.js` and `f3d.wasm`).
+`assimp`, `occt` and `draco` plugins are automatically included.
 
 # Run tests
 
