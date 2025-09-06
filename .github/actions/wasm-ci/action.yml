@@ -4,29 +4,18 @@ description: "WebAssembly CI"
 runs:
   using: "composite"
   steps:
-    - name: Configure
+    - name: Build and pack
       shell: bash
-      working-directory: ${{github.workspace}}
-      run: >
-        cmake -S source -B build
-        -DBUILD_SHARED_LIBS=OFF
-        -DCMAKE_BUILD_TYPE=Release
-        -DCMAKE_FIND_ROOT_PATH:PATH=/depends
-        -DF3D_MODULE_UI=OFF
-        -DF3D_PLUGIN_BUILD_ASSIMP=ON
-        -DF3D_PLUGIN_BUILD_DRACO=ON
-        -DF3D_PLUGIN_BUILD_HDF=ON
-        -DF3D_PLUGIN_BUILD_OCCT=ON
-        -DF3D_STRICT_BUILD=ON
-        -DF3D_WASM_COPY_APP=ON
+      working-directory: ${{github.workspace}}/source
+      run: npm pack
 
-    - name: Build
+    - name: Test
       shell: bash
-      working-directory: ${{github.workspace}}
-      run: cmake --build build --parallel 2
+      working-directory: ${{github.workspace}}/source
+      run: npm test
 
-    - name: Upload wasm binaries
+    - name: Upload package
       uses: actions/upload-artifact@v4
       with:
-        path: ./build/bin/*
-        name: f3d-wasm
+        path: ./source/f3d-*.tgz
+        name: f3d-wasm-package

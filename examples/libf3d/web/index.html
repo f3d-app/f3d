@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>F3D Web</title>
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    <link rel="manifest" href="manifest.json" />
+    <style>
+      #main {
+        min-height: 70vh;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <section class="section">
+        <div class="columns">
+          <div class="column">
+            <h1 class="title">F3D Web</h1>
+            <p class="subtitle">A WebAssembly application using libf3d</p>
+          </div>
+          <div class="column">
+            <div class="field is-pulled-right">
+              <input
+                id="dark"
+                type="checkbox"
+                name="dark"
+                class="switch is-rounded"
+                checked
+              />
+              <label for="dark">Dark theme</label>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="section">
+        <div class="columns">
+          <aside class="menu">
+            <div class="file has-name">
+              <label class="file-label">
+                <input
+                  class="file-input"
+                  type="file"
+                  id="file-selector"
+                  accept=".gml,.gltf,.glb,.obj,.ply,.pts,.stl,.vtk,.vtp,.vtu,.vtkhdf,.3ds,.wrl,.vrml,.fbx,.off,.x,.dae,.ex2,.exo,.e,.g,.stp,.step,.igs,.iges,.brep,.xbf,.drc,.mdl,.nc,.cdf,.ncdf"
+                />
+                <span class="file-cta">
+                  <span class="file-label">Open a file...</span>
+                </span>
+                <span class="file-name" id="file-name"></span>
+              </label>
+            </div>
+            <div class="is-flex is-flex-direction-row is-align-items-center">
+              <button id="y-up" class="button mx-1 is-small">+Y</button>
+              <button id="z-up" class="button mx-1 is-small is-active">
+                +Z
+              </button>
+              <label class="mx-1">Up</label>
+            </div>
+            <p class="menu-label">Widgets</p>
+            <div class="field">
+              <input
+                id="grid"
+                type="checkbox"
+                name="grid"
+                class="switch is-rounded"
+                checked
+              />
+              <label for="grid">Grid</label>
+            </div>
+            <div class="field">
+              <input
+                id="axis"
+                type="checkbox"
+                name="axis"
+                class="switch is-rounded"
+                checked
+              />
+              <label for="axis">Axis</label>
+            </div>
+            <p class="menu-label">Rendering</p>
+            <div class="field">
+              <input
+                id="fxaa"
+                type="checkbox"
+                name="fxaa"
+                class="switch is-rounded"
+                checked
+              />
+              <label for="fxaa">Anti-aliasing</label>
+            </div>
+            <div class="field">
+              <input
+                id="tone"
+                type="checkbox"
+                name="tone"
+                class="switch is-rounded"
+                checked
+              />
+              <label for="tone">Tone mapping</label>
+            </div>
+            <div class="field">
+              <input
+                id="ssao"
+                type="checkbox"
+                name="ssao"
+                class="switch is-rounded"
+                checked
+              />
+              <label for="ssao">Ambient occlusion</label>
+            </div>
+            <p class="menu-label">Lighting</p>
+            <div class="field">
+              <input
+                id="ambient"
+                type="checkbox"
+                name="ambient"
+                class="switch is-rounded"
+                checked
+              />
+              <label for="ambient">Ambient light</label>
+            </div>
+          </aside>
+          <div class="column">
+            <div class="container" id="main">
+              <canvas id="canvas"></canvas>
+            </div>
+          </div>
+        </div>
+        <div
+          class="event-log"
+          style="
+            position: absolute;
+            z-index: 10;
+            bottom: 50px;
+            width: 100%;
+            display: none;
+          "
+        >
+          <p style="text-align: center">Loading 3D object...</p>
+          <progress
+            class="progress is-primary"
+            id="progressEl"
+            value="0"
+            max="100"
+            style="transition: all 2s; width: 500px; margin: auto"
+          >
+            30%
+          </progress>
+        </div>
+      </section>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
