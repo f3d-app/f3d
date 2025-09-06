@@ -929,6 +929,8 @@ jobs:
     steps:
       - name: Recover run-id
         run: gh run list -w build-docker-images.yml --repo f3d-app/f3d -L 1 -b ${{github.ref_name}}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Wait on build-docker-images workflow
         if: ${{ github.event_name == 'pull_request' }}
