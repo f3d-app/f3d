@@ -144,7 +144,7 @@ struct PackedRotationV3
         sumSquares += rotation[i] * rotation[i];
       }
     }
-    rotation[largestCompIndex] = sqrt(1.0f - sumSquares);
+    rotation[largestCompIndex] = std::sqrt(1.0f - sumSquares);
 
     return { rotation[0], rotation[1], rotation[2], rotation[3] };
   }
