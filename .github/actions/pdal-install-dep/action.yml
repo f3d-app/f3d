@@ -63,7 +63,7 @@ runs:
         -DUSE_PROJ:BOOL=ON
         -DUSE_GDAL:BOOL=ON
         -DUSE_LIBGEOTIFF:BOOL=ON
-        -DWITH_CURL=OFF
+        -DUSE_CURL=OFF
         -DUSE_EXPLICIT_INSTANTIATION:BOOL=OFF
         -DSQLite3_LIBRARY=$(pwd)/../sqlite/dependencies/sqlite_install/lib/libsqlite3.so
         -DSQLite3_INCLUDE_DIR=$(pwd)/../sqlite/dependencies/sqlite_install/include
