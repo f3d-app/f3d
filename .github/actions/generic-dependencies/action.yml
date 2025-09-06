@@ -48,6 +48,24 @@ inputs:
   zlib_version:
     description: "Version of zlib to build"
     required: true
+  pdal_version:
+    description: "Version of pdal to build"
+    required: false
+  libgeotiff_version:
+    description: "Version of libgeotiff to build"
+    required: true
+  libtiff_version:
+    description: "Version of libtiff to build"
+    required: true
+  sqlite_version:
+    description: "Version of sqlite to build"
+    required: true
+  gdal_version:
+    description: "Version of gdal to build"
+    required: true
+  proj_version:
+    description: "Version of proj to build"
+    required: true
 
 runs:
   using: "composite"
@@ -68,6 +86,12 @@ runs:
         openvdb_version: ${{inputs.openvdb_version}}
         tbb_version: ${{inputs.tbb_version}}
         zlib_version: ${{inputs.zlib_version}}
+        pdal_version: ${{inputs.pdal_version}}
+        gdal_version: ${{inputs.gdal_version}}
+        libgeotiff_version: ${{inputs.libgeotiff_version}}
+        libtiff_version: ${{inputs.libtiff_version}}
+        sqlite_version: ${{inputs.sqlite_version}}
+        proj_version: ${{inputs.proj_version}}
 
     - name: Install Raytracing Dependencies
       if: inputs.ospray_version != ''

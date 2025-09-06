@@ -133,6 +133,12 @@ jobs:
           - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           - usd_version: ${{needs.default_versions.outputs.usd_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          - sqlite_version: version-3.42.1
+          - pdal_version: 2.9.2
+          - proj_version: 9.6.2
+          - libgeotiff_version: 1.7.4
+          - libtiff_version: v4.7.0
+          - gdal_version: v3.11.3
           - build_type: mindeps
             os: ubuntu-22.04
             cpu: x86_64
@@ -149,6 +155,12 @@ jobs:
             tbb_version: ${{needs.default_versions.outputs.tbb_min_version}}
             usd_version: ${{needs.default_versions.outputs.usd_min_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_min_version}}
+            sqlite_version: version-3.42.1
+            proj_version: v6.3.0
+            pdal_version: 2.9.2
+            libgeotiff_version: 1.7.4
+            libtiff_version: v4.7.0
+            gdal_version: v3.11.3
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
@@ -177,6 +189,12 @@ jobs:
           tbb_version: ${{matrix.tbb_version}}
           usd_version: ${{matrix.usd_version}}
           zlib_version: ${{matrix.zlib_version}}
+          pdal_version: 2.9.2
+          sqlite_version: version-3.42.1
+          proj_version: 9.6.2
+          libgeotiff_version: 1.7.4
+          libtiff_version: v4.7.0
+          gdal_version: v3.11.3
 
   #----------------------------------------------------------------------------
   # Cache VTK Dependency: Checkout and compile VTK if not cached
@@ -425,6 +443,12 @@ jobs:
           - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           - usd_version: ${{needs.default_versions.outputs.usd_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          - pdal_version: 2.9.2
+          - sqlite_version: version-3.42.1
+          - proj_version: 9.6.2
+          - libgeotiff_version: 1.7.4
+          - libtiff_version: v4.7.0
+          - gdal_version: v3.11.3
           - build_type: egl
             vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             optional_deps_label: optional-deps
