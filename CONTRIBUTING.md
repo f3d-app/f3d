@@ -76,7 +76,7 @@ F3D uses [GitLab Flow](https://about.gitlab.com/topics/version-control/what-is-g
 - Maintainers and returning contributors will provide help to interpret the CI and fix issues that may arise.
 - Your PR will be reviewed by maintainers and returning contributors, please take their feedback into account and resolve discussions when adresssed.
 - Once the PR is approved and CI comes back clean, a maintainer will merge your pull request in the master branch.
-- The master now contains your changes and will be present in the next minor/major release, any documentation related changes are visible in <https://f3d.app>!
+- The master now contains your changes and will be present in the next minor/major release, any documentation related changes are visible in [https://f3d.app](https://f3d.app)!
 
 ## Continuous Integration
 
