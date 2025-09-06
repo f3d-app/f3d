@@ -924,6 +924,7 @@ jobs:
     runs-on: ubuntu-22.04
 
     # Pull request can require a rebuild of docker image, wait for it to be done
+    # This job does not do anything in master branch but is not skipped for simpler logic
     steps:
 
       - name: Extract branch name
@@ -931,7 +932,7 @@ jobs:
         shell: bash
         run: echo "F3D_BRANCH_NAME=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_ENV
 
-      - name: Recover run-id
+      - name: Wait for docker images
         if: contains(github.event.pull_request.labels.*.name, 'ci:full')
         run: |
           gh run list -w build-docker-images.yml --repo ${{ github.repository }} -L 1 -b ${{ env.F3D_BRANCH_NAME }}
