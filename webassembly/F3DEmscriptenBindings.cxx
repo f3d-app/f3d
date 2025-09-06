@@ -27,6 +27,11 @@ template<>
 void raw_destructor<f3d::options>(f3d::options* ptr)
 {
 }
+
+template<>
+void raw_destructor<f3d::image>(f3d::image* ptr)
+{
+}
 }
 
 f3d::options& toggle(f3d::options& o, const std::string& name)
@@ -83,9 +88,25 @@ f3d::interactor& start(f3d::interactor& inter)
   return inter;
 }
 
+double compare(const f3d::image& current, const f3d::image& other)
+{
+  return current.compare(other);
+}
+
+f3d::image& save(f3d::image& img, const std::string& path)
+{
+  img.save(std::filesystem::path(path));
+  return img;
+}
+
 f3d::engine createEngine()
 {
   return f3d::engine::create();
+}
+
+f3d::image createImage(const std::string& path)
+{
+  return f3d::image(std::filesystem::path(path));
 }
 
 EMSCRIPTEN_BINDINGS(f3d)
@@ -105,10 +126,17 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function("add", &add, emscripten::return_value_policy::reference())
     .function("clear", &clear, emscripten::return_value_policy::reference());
 
+  // f3d::image
+  emscripten::class_<f3d::image>("Image")
+    .class_function("create", &createImage, emscripten::return_value_policy::take_ownership())
+    .function("compare", &compare)
+    .function("save", &save, emscripten::return_value_policy::reference());
+
   // f3d::window
   emscripten::class_<f3d::window>("Window")
     .function("setSize", &f3d::window::setSize, emscripten::return_value_policy::reference())
     .function("render", &f3d::window::render)
+    .function("renderToImage", &f3d::window::renderToImage)
     .function("resetCamera", &resetCamera, emscripten::return_value_policy::reference());
 
   // f3d::interactor
