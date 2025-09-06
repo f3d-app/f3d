@@ -932,7 +932,7 @@ jobs:
         run: echo "F3D_BRANCH_NAME=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_ENV
 
       - name: Recover run-id
-        run: echo "F3D_BUILD_DOCKER_RUN_ID=$(gh run list -w build-docker-images.yml --repo f3d-app/f3d -L 1 -b ${{ env.F3D_BRANCH_NAME }} --json databaseId | jq '.[]| .databaseId') >> $GITHUB_ENV
+        run: echo "F3D_BUILD_DOCKER_RUN_ID=$(gh run list -w build-docker-images.yml --repo f3d-app/f3d -L 1 -b ${{ env.F3D_BRANCH_NAME }} --json databaseId | jq '.[]| .databaseId')" >> $GITHUB_ENV
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
