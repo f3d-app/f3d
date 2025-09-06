@@ -283,6 +283,12 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
 
   ImFontConfig fontConfig;
 
+  ImVector<ImWchar> ranges;
+  ImFontGlyphRangesBuilder builder;
+  builder.AddRanges(io.Fonts->GetGlyphRangesDefault());
+  builder.AddChar(0x2264); // Less-Than or Equal To
+  builder.BuildRanges(&ranges);
+
   ImFont* font = nullptr;
   if (this->FontFile.empty())
   {
@@ -290,11 +296,11 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
     fontConfig.FontDataOwnedByAtlas = false;
     font = io.Fonts->AddFontFromMemoryTTF(
       const_cast<void*>(reinterpret_cast<const void*>(F3DFontBuffer)), sizeof(F3DFontBuffer), 18,
-      &fontConfig);
+      &fontConfig, ranges.Data);
   }
   else
   {
-    font = io.Fonts->AddFontFromFileTTF(this->FontFile.c_str(), 18, &fontConfig);
+    font = io.Fonts->AddFontFromFileTTF(this->FontFile.c_str(), 18, &fontConfig, ranges.Data);
   }
 
   io.Fonts->Build();

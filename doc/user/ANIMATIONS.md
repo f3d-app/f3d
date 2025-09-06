@@ -8,21 +8,21 @@ For files containing multiple animations, F3D allows the user to either play eac
 
 This specific example uses an animation file which can be downloaded [here](https://github.com/f3d-app/f3d/blob/606089959c9520085a9cbf70660fb0ffc68fb934/testing/data/InterpolationTest.glb).
 
-<img width="1024" alt="1" src="https://media.githubusercontent.com/media/f3d-app/f3d-media/main/media/animation_0.png">
+<img width="1024" alt="1" src="https://media.githubusercontent.com/media/f3d-app/f3d-media/main/media/animation_0.png" />
 
 Load the example animation file shown above by executing within command line: `f3d InterpolationTest.glb`
 
-<img width="1024" alt="2" src="https://media.githubusercontent.com/media/f3d-app/f3d-media/main/media/animation_1.png">
+<img width="1024" alt="2" src="https://media.githubusercontent.com/media/f3d-app/f3d-media/main/media/animation_1.png" />
 To view current animation name, press <kbd>H</kbd> to open up cheatsheet menu
 
-<img width="1024" alt="3" src="https://media.githubusercontent.com/media/f3d-app/f3d-media/main/media/animation_2.png">
+<img width="1024" alt="3" src="https://media.githubusercontent.com/media/f3d-app/f3d-media/main/media/animation_2.png" />
 Press <kbd>W</kbd> to cycle through available animations
 
-<img width="1024" alt="4" src="https://media.githubusercontent.com/media/f3d-app/f3d-media/main/media/animation_3.png">
+<img width="1024" alt="4" src="https://media.githubusercontent.com/media/f3d-app/f3d-media/main/media/animation_3.png" />
 Press <kbd>space</kbd> to play/pause current animation.
 Note: A red bar runs along the bottom of screen to indicate the current time interval of the animation sequence if animation-progress was turned on.
 
-<img width="1024" alt="5" src="https://media.githubusercontent.com/media/f3d-app/f3d-media/main/media/animation_4.png">
+<img width="1024" alt="5" src="https://media.githubusercontent.com/media/f3d-app/f3d-media/main/media/animation_4.png" />
 "All Animations" will play all animations at the same time if supported by the file format.
 
 ## Command line options
