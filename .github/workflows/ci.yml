@@ -921,28 +921,32 @@ jobs:
   #----------------------------------------------------------------------------
   check_docker_images:
     needs: default_versions
-    if: contains(github.event.pull_request.labels.*.name, 'ci:full')
     runs-on: ubuntu-22.04
 
     # Pull request can require a rebuild of docker image, wait for it to be done
     steps:
 
       - name: Extract branch name
+        if: contains(github.event.pull_request.labels.*.name, 'ci:full')
         shell: bash
         run: echo "F3D_BRANCH_NAME=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_ENV
 
       - name: Recover run-id
+        if: contains(github.event.pull_request.labels.*.name, 'ci:full')
         run: echo "F3D_BUILD_DOCKER_RUN_ID=$(gh run list -w build-docker-images.yml --repo f3d-app/f3d -L 1 -b ${{ env.F3D_BRANCH_NAME }} --json databaseId | jq '.[]| .databaseId')" >> $GITHUB_ENV
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Wait on build-docker-images workflow
-        uses: ArcticLampyrid/action-wait-for-workflow@v1.2.0
+        if: contains(github.event.pull_request.labels.*.name, 'ci:full')
+        uses: kamilchodola/wait-for-workflow-action@1.1.0
         with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          workflow_id: 'build-docker-images.yml'
           run_id: ${{ env.F3D_BUILD_DOCKER_RUN_ID }}
-          workflow: build-docker-images.yml
-          branch: ${{ env.F3D_BRANCH_NAME }}
-          allowed-conclusions: success
+          org_name: 'f3d-app'
+          repo_name: 'f3d'
+          ref: '${{ github.ref }}'
 
   #----------------------------------------------------------------------------
   # android: Check build of F3D for android
