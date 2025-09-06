@@ -922,7 +922,6 @@ jobs:
   check_docker_images:
     needs: default_versions
     if: contains(github.event.pull_request.labels.*.name, 'ci:full')
-
     runs-on: ubuntu-22.04
 
     # Pull request can require a rebuild of docker image, wait for it to be done
@@ -933,14 +932,14 @@ jobs:
         run: echo "F3D_BRANCH_NAME=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_ENV
 
       - name: Recover run-id
-        run: gh run list -w build-docker-images.yml --repo f3d-app/f3d -L 1 -b ${{ env.F3D_BRANCH_NAME }}
+        run: echo "F3D_BUILD_DOCKER_RUN_ID=$(gh run list -w build-docker-images.yml --repo f3d-app/f3d -L 1 -b ${{ env.F3D_BRANCH_NAME }} --json databaseId | jq '.[]| .databaseId') >> $GITHUB_ENV
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Wait on build-docker-images workflow
-        if: ${{ github.event_name == 'pull_request' }}
         uses: ArcticLampyrid/action-wait-for-workflow@v1.2.0
         with:
+          run_id: ${{ env.F3D_BUILD_DOCKER_RUN_ID }}
           workflow: build-docker-images.yml
           branch: ${{ env.F3D_BRANCH_NAME }}
           allowed-conclusions: success
