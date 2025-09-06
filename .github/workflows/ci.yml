@@ -921,6 +921,7 @@ jobs:
   #----------------------------------------------------------------------------
   check_docker_images:
     needs: default_versions
+    if: contains(github.event.pull_request.labels.*.name, 'ci:full')
 
     runs-on: ubuntu-22.04
 
