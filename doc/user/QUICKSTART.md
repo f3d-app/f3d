@@ -95,7 +95,7 @@ For more information, see the [Animations](ANIMATIONS.md) page.
 ## Further Reading
 
 - [A list of all F3D command-line options.](OPTIONS.md)
-- [How to interact with scenes in F3D.](INTERACTIONS.MD)
+- [How to interact with scenes in F3D.](INTERACTIONS.md)
 - [How to play animations in F3D.](ANIMATIONS.md)
 - [How to specify colormaps in F3D.](COLOR_MAPS.md)
 - [How to configure plugins in F3D.](PLUGINS.md)

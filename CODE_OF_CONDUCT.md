@@ -52,7 +52,7 @@ not aligned to this Code of Conduct, and will communicate reasons for moderation
 decisions when appropriate.
 
 In case of any issues please reach out, either to any moderators or maintainers
-on [discord] or at <contact@f3d.app>.
+on [discord] or at [contact@f3d.app](mailto:contact@f3d.app).
 
 ## Scope
 

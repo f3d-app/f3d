@@ -53,13 +53,4 @@ Here's the list of all supported image formats that can be used as color maps:
 
 If no colormap file is specified, it is also possible to set values manually using the `--colormap` option with a dedicated [parsing](PARSING.md#colormap).
 For example, the default value corresponds to the `hot` preset which can be defined manually with `--colormap=0.0,rgb(0,0,0),0.4,rgb(230,0,0),0.8,rgb(230,230,0),1.0,rgb(255,255,255)`.
-It consists of 4 tuples:
-
-| Value | RGB                                                               |
-| ----- | ----------------------------------------------------------------- |
-| 0.0   | <span style="color:rgb(0,0,0)">&#9632;</span> 0, 0, 0             |
-| 0.4   | <span style="color:rgb(230,0,0)">&#9632;</span> 230, 0, 0         |
-| 0.8   | <span style="color:rgb(230,230,0)">&#9632;</span> 230, 230, 0     |
-| 1.0   | <span style="color:rgb(255,255,255)">&#9632;</span> 255, 255, 255 |
-
-Values in between are interpolated.
+It consists of 4 pairs of increasing scalar values ranging from 0 to 1, and corresponding colors. Values in between are interpolated.
