@@ -321,7 +321,7 @@ int vtkF3DSPZReader::RequestData(
   }
 
   if (header->version < 2 || header->version > 3) {
-      vtkErrorMacro("Incompatible SPZ version. F3D could only load SPZ version 2 and 3");
+      vtkErrorMacro("Incompatible SPZ version. Only 2 and 3 are supported");
       return 0;
   }
 
