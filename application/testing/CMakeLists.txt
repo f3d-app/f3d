@@ -419,6 +419,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240203)
 
       f3d_test(NAME TestDefaultConfigFileSPZ DATA hornedlizard_small_d3.spz CONFIG config_build LONG_TIMEOUT UI)
       f3d_test(NAME TestThumbnailConfigFileSPZ DATA hornedlizard_small_d3.spz CONFIG thumbnail_build LONG_TIMEOUT)
+      f3d_test(NAME TestSPZVersion3 DATA bonsai.spz ARGS -osy --up=-Y --point-sprites-size=1 --point-sprites-type=gaussian --camera-position=-2.6,0.5,-3.2)
     endif()
   endif()
 endif()
