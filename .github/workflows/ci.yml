@@ -940,6 +940,7 @@ jobs:
             echo "Waiting 1s"
             sleep 1;
           done
+          gh run list -w build-docker-images.yml --repo ${{ github.repository }} -L 1 -b ${{ env.F3D_BRANCH_NAME }} --json conlusion | jq '.[]| .conclusion' | grep -q "success"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
