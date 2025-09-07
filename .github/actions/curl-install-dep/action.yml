@@ -37,6 +37,7 @@ runs:
       working-directory: ${{github.workspace}}/dependencies
       shell: bash
       run: |
+        ./autogen.sh
         mkdir curl_install
 
     - name: Configure curl
@@ -51,7 +52,7 @@ runs:
       if: steps.cache-curl.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/curl
       shell: bash
-      run: >
+      run: |
         make
         make install
 
