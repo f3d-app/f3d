@@ -44,7 +44,6 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/curl
       shell: bash
       run: |
-        ./autogen.sh
         ./configure \
         --prefix=$(pwd)/dependencies/curl_install
 
