@@ -28,4 +28,5 @@ const wasmMiddleware = () => {
 
 export default defineConfig({
   plugins: [wasmMiddleware()],
+  base: "./",
 });
