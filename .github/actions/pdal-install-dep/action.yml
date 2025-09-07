@@ -14,6 +14,12 @@ inputs:
   libgeotiff_version:
     description: "Version of libgeotiff to build against"
     required: true
+  sqlite_version:
+    description: "Version of sqlite3 to build against"
+    required: true
+  curl_version:
+    description: "Version of curl to build against"
+    required: true
 
 runs:
   using: "composite"
@@ -24,13 +30,15 @@ runs:
         [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
         [[ "${{ inputs.gdal_version }}" ]] || { echo "gdal_version input is empty" ; exit 1; }
         [[ "${{ inputs.libgeotiff_version }}" ]] || { echo "libgeotiff_version input is empty" ; exit 1; }
+        [[ "${{ inputs.sqlite_version }}" ]] || { echo "sqlite_version input is empty" ; exit 1; }
+        [[ "${{ inputs.curl_version }}" ]] || { echo "curl_version input is empty" ; exit 1; }
 
     - name: Cache PDAL
       id: cache-pdal
       uses: actions/cache/restore@v4
       with:
         path: ${{github.workspace}}/dependencies/pdal_install
-        key: pdal-${{inputs.version}}-${{inputs.proj_version}}-${{inputs.gdal_version}}-${{runner.os}}-${{inputs.cpu}}-0
+        key: pdal-${{inputs.version}}-${{inputs.proj_version}}-${{inputs.sqlite_version}}-${{inputs.curl_version}}-${{inputs.gdal_version}}-${{runner.os}}-${{inputs.cpu}}-0
 
     - name: Checkout PDAL
       if: steps.cache-pdal.outputs.cache-hit != 'true'

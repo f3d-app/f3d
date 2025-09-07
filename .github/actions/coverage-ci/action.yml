@@ -65,6 +65,9 @@ inputs:
   libtiff_version:
     description: "Version of libtiff to build"
     required: true
+  curl_version:
+    description: "Version of CURL to build"
+    required: true
 
 runs:
   using: "composite"
@@ -103,6 +106,7 @@ runs:
         gdal_version: ${{inputs.gdal_version}}
         proj_version: ${{inputs.proj_version}}
         sqlite_version: ${{inputs.sqlite_version}}
+        curl_version: ${{inputs.curl_version}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep

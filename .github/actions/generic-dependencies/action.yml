@@ -60,6 +60,9 @@ inputs:
   sqlite_version:
     description: "Version of sqlite to build"
     required: true
+  curl_version:
+    description: "Version of curl to build"
+    required: true
   gdal_version:
     description: "Version of gdal to build"
     required: true
@@ -91,6 +94,7 @@ runs:
         libgeotiff_version: ${{inputs.libgeotiff_version}}
         libtiff_version: ${{inputs.libtiff_version}}
         sqlite_version: ${{inputs.sqlite_version}}
+        curl_version: ${{inputs.curl_version}}
         proj_version: ${{inputs.proj_version}}
 
     - name: Install Raytracing Dependencies

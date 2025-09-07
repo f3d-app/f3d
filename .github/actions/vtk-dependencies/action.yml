@@ -27,6 +27,9 @@ inputs:
   sqlite_version:
     description: "Version of sqlite to build against"
     required: true
+  curl_version:
+    description: "Version of curl to build against"
+    required: true
   gdal_version:
     description: "Version of gdal to build against"
     required: true
@@ -86,6 +89,13 @@ runs:
         cpu: ${{inputs.cpu}}
         version: ${{inputs.sqlite_version}}
 
+    - name: Install curl
+      if: runner.os == 'Linux'
+      uses: ./.actions/curl-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        version: ${{inputs.curl_version}}
+
     - name: Install proj
       if: runner.os == 'Linux'
       uses: ./.actions/proj-install-dep
@@ -126,3 +136,5 @@ runs:
         version: ${{inputs.pdal_version}}
         gdal_version: ${{inputs.gdal_version}}
         libgeotiff_version: ${{inputs.libgeotiff_version}}
+        sqlite_version: ${{inputs.sqlite_version}}
+        curl_version: ${{inputs.curl_version}}

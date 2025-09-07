@@ -1,0 +1,67 @@
+name: "Install curl Dependency"
+description: "Install curl Dependency using cache when possible"
+inputs:
+  cpu:
+    description: "CPU architecture to build for"
+    required: false
+    default: "x86_64"
+  version:
+    description: "Version of curl to build"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+
+    - name: Cache curl
+      id: cache-curl
+      uses: actions/cache/restore@v4
+      with:
+        path: ${{github.workspace}}/dependencies/curl_install
+        key: curl-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-0
+
+    - name: Checkout curl
+      if: steps.cache-curl.outputs.cache-hit != 'true'
+      uses: actions/checkout@v4
+      with: 
+        repository: curl/curl
+        path: "./dependencies/curl"
+        ref: ${{inputs.version}}
+
+    - name: Setup curl
+      if: steps.cache-curl.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir curl_install
+
+    - name: Configure curl
+      if: steps.cache-curl.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/curl
+      shell: bash
+      run: |
+        ./configure \
+        --prefix=$(pwd)/dependencies/curl_install \
+        --enable-all
+
+    - name: Build curl
+      if: steps.cache-curl.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/curl
+      shell: bash
+      run: make install
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/curl
+      shell: bash
+      run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-curl.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-curl.outputs.cache-primary-key }}
+        path: dependencies/curl_install
