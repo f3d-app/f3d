@@ -44,6 +44,7 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/curl
       shell: bash
       run: |
+        cd src \
         ./configure \
         --prefix=$(pwd)/dependencies/curl_install
 
