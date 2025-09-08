@@ -1,0 +1,101 @@
+# StreamVersion 1.2
+EnterEvent 293 98 0 0 0 0 0
+RenderEvent 199 142 0 0 0 0 0
+
+KeyPressEvent 199 142 0 27 1 Escape 0
+CharEvent 199 142 0 27 1 Escape 0
+KeyReleaseEvent 199 142 0 27 1 Escape 0
+
+KeyPressEvent 199 142 0 97 1 a 0
+CharEvent 199 142 0 97 1 a 0
+KeyReleaseEvent 199 142 0 97 1 a 0
+
+KeyPressEvent 199 142 0 100 1 d 0
+CharEvent 199 142 0 100 1 d 0
+KeyReleaseEvent 199 142 0 100 1 d 0
+
+KeyPressEvent 199 142 0 9 1 Tab 0
+CharEvent 199 142 0 9 1 Tab 0
+KeyReleaseEvent 199 142 0 9 1 Tab 0
+
+KeyPressEvent 199 142 0 102 1 f 0
+CharEvent 199 142 0 102 1 f 0
+KeyReleaseEvent 199 142 0 102 1 f 0
+
+KeyPressEvent 199 142 0 9 1 Tab 0
+CharEvent 199 142 0 9 1 Tab 0
+KeyReleaseEvent 199 142 0 9 1 Tab 0
+
+KeyPressEvent 199 142 0 32 1 space 0
+CharEvent 199 142 0 32 1 space 0
+KeyReleaseEvent 199 142 0 32 1 space 0
+
+KeyPressEvent 199 142 0 46 1 period 0
+CharEvent 199 142 0 46 1 period 0
+KeyReleaseEvent 199 142 0 46 1 period 0
+
+KeyPressEvent 199 142 0 9 1 Tab 0
+CharEvent 199 142 0 9 1 Tab 0
+KeyReleaseEvent 199 142 0 9 1 Tab 0
+
+KeyPressEvent 199 142 0 100 1 d 0
+CharEvent 199 142 0 100 1 d 0
+KeyReleaseEvent 199 142 0 100 1 d 0
+
+KeyPressEvent 199 142 0 32 1 space 0
+CharEvent 199 142 0 32 1 space 0
+KeyReleaseEvent 199 142 0 32 1 space 0
+
+KeyPressEvent 199 142 0 46 1 period 0
+CharEvent 199 142 0 46 1 period 0
+KeyReleaseEvent 199 142 0 46 1 period 0
+
+KeyPressEvent 199 142 0 46 1 period 0
+CharEvent 199 142 0 46 1 period 0
+KeyReleaseEvent 199 142 0 46 1 period 0
+
+KeyPressEvent 199 142 0 9 1 Tab 0
+CharEvent 199 142 0 9 1 Tab 0
+KeyReleaseEvent 199 142 0 9 1 Tab 0
+
+KeyPressEvent 199 142 0 46 1 period 0
+CharEvent 199 142 0 46 1 period 0
+KeyReleaseEvent 199 142 0 46 1 period 0
+
+KeyPressEvent 199 142 0 46 1 period 0
+CharEvent 199 142 0 46 1 period 0
+KeyReleaseEvent 199 142 0 46 1 period 0
+
+KeyPressEvent 199 142 0 9 1 Tab 0
+CharEvent 199 142 0 9 1 Tab 0
+KeyReleaseEvent 199 142 0 9 1 Tab 0
+
+KeyPressEvent 199 142 0 84 1 T 0
+CharEvent 199 142 0 84 1 T 0
+KeyReleaseEvent 199 142 0 84 1 T 0
+
+KeyPressEvent 199 142 0 9 1 Tab 0
+CharEvent 199 142 0 9 1 Tab 0
+KeyReleaseEvent 199 142 0 9 1 Tab 0
+
+KeyPressEvent 199 142 0 100 1 d 0
+CharEvent 199 142 0 100 1 d 0
+KeyReleaseEvent 199 142 0 100 1 d 0
+
+KeyPressEvent 199 142 0 9 1 Tab 0
+CharEvent 199 142 0 9 1 Tab 0
+KeyReleaseEvent 199 142 0 9 1 Tab 0
+
+KeyPressEvent 199 142 0 9 1 Tab 0
+CharEvent 199 142 0 9 1 Tab 0
+KeyReleaseEvent 199 142 0 9 1 Tab 0
+
+KeyPressEvent 199 142 0 13 1 Return 0
+CharEvent 199 142 0 13 1 Return 0
+KeyReleaseEvent 199 142 0 13 1 Return 0
+
+KeyPressEvent 199 142 0 27 1 Escape 0
+CharEvent 199 142 0 27 1 Escape 0
+KeyReleaseEvent 199 142 0 27 1 Escape 0
+
+TimerEvent 351 169 0 0 0 0 0

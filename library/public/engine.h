@@ -107,12 +107,11 @@ public:
   /**
    * Create an engine with an external window.
    * A context to retrieve OpenGL symbols is required.
-   * The context can be nullptr for an external Cocoa window.
    * Here's an example if a GLFW window is used:
    * \code{.cpp}
    *  f3d::engine eng = f3d::engine::createExternal(glfwGetProcAddress);
    * \endcode
-   * Throws a engine::no_window_exception if the window cannot be created for another reason
+   * Throws a engine::no_window_exception if the window cannot be created
    * Throws a engine::cache_exception if the default cache directory cannot be used
    */
   [[nodiscard]] static engine createExternal(const context::function& getProcAddress);
