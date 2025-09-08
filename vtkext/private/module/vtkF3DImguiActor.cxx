@@ -620,7 +620,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
       float posX = maxCursorPosX - ImGui::CalcTextSize(bind.c_str()).x - ImGui::GetScrollX() -
         ((splittedBinding.size() * 2) - 1) * ImGui::GetStyle().ItemSpacing.x;
       ImGui::SetCursorPosX(posX);
-      for (std::string& key : splittedBinding)
+      for (const std::string& key : splittedBinding)
       {
         ImDrawList* drawList = ImGui::GetWindowDrawList();
         drawList->ChannelsSplit(2);
@@ -634,7 +634,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
         drawList->AddRectFilled(
           topBindingCorner, bottomBindingCorner, ImColor(bindingRectColor), 5.f);
         drawList->ChannelsMerge();
-        if (key != splittedBinding.at(splittedBinding.size() - 1))
+        if (key != splittedBinding.back())
         {
           ImGui::SameLine();
           ImGui::Text("+");
