@@ -317,7 +317,7 @@ int vtkF3DSPZReader::RequestData(
 
   if (header->magic != 0x5053474e)
   {
-    vtkErrorMacro("Incompatible SPZ header.");
+    vtkErrorMacro("Incompatible SPZ header");
     return 0;
   }
 
