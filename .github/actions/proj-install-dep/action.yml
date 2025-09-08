@@ -31,7 +31,7 @@ runs:
     - name: Checkout PROJ
       if: steps.cache-proj.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
-      with: 
+      with:
         repository: OSGeo/PROJ
         path: "./dependencies/proj"
         ref: ${{inputs.version}}

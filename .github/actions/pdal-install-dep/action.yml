@@ -43,7 +43,7 @@ runs:
     - name: Checkout PDAL
       if: steps.cache-pdal.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
-      with: 
+      with:
         repository: PDAL/PDAL
         path: "./dependencies/pdal"
         ref: ${{inputs.version}}

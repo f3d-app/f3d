@@ -35,7 +35,7 @@ runs:
     - name: Checkout libgeotiff
       if: steps.cache-libgeotiff.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
-      with: 
+      with:
         repository: OSGeo/libgeotiff
         path: "./dependencies/libgeotiff"
         ref: ${{inputs.version}}

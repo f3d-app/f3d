@@ -31,7 +31,7 @@ runs:
     - name: Checkout GDAL
       if: steps.cache-gdal.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
-      with: 
+      with:
         repository: OSGeo/gdal
         path: "./dependencies/gdal"
         ref: ${{inputs.version}}

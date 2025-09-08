@@ -27,7 +27,7 @@ runs:
     - name: Checkout curl
       if: steps.cache-curl.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
-      with: 
+      with:
         repository: curl/curl
         path: "./dependencies/curl"
         ref: ${{inputs.version}}

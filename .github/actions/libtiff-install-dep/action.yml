@@ -27,7 +27,7 @@ runs:
     - name: Checkout libtiff
       if: steps.cache-libtiff.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
-      with: 
+      with:
         repository: libsdl-org/libtiff
         path: "./dependencies/libtiff"
         ref: ${{inputs.version}}
