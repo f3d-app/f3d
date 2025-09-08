@@ -37,24 +37,28 @@ runs:
       working-directory: ${{github.workspace}}/dependencies
       shell: bash
       run: |
+        mkdir curl_build
         mkdir curl_install
 
     - name: Configure curl
       if: steps.cache-curl.outputs.cache-hit != 'true'
-      working-directory: ${{github.workspace}}/dependencies/curl
+      working-directory: ${{github.workspace}}/dependencies/curl_build
       shell: bash
-      run: |
-        autoreconf -fi
-        ./configure \
-        --prefix=$(pwd)/dependencies/curl_install
+      run: >
+        cmake ../curl
+        -DBUILD_APPS=ON
+        -DBUILD_SHARED_LIBS=ON
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_LIBDIR:PATH=lib
+        -DCMAKE_INSTALL_PREFIX=../curl_install
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
+        -DCURL_USE_LIBPSL=OFF
 
     - name: Build curl
       if: steps.cache-curl.outputs.cache-hit != 'true'
-      working-directory: ${{github.workspace}}/dependencies/curl
+      working-directory: ${{github.workspace}}/dependencies/curl_build
       shell: bash
-      run: |
-        make
-        make install
+      run: cmake --build . --parallel 2 --target install --config Release
 
     - name: Copy to install
       working-directory: ${{github.workspace}}/dependencies/curl
