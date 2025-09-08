@@ -27,7 +27,7 @@ runs:
     - name: Checkout sqlite
       if: steps.cache-sqlite.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
-      with: 
+      with:
         repository: sqlite/sqlite
         path: "./dependencies/sqlite"
         ref: ${{inputs.version}}
