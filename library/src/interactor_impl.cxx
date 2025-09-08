@@ -173,9 +173,15 @@ public:
     double fwd[3];
     vtkMath::Cross(right, up, fwd);
     const double m[9] = {
-      right[0], right[1], right[2], //
-      fwd[0], fwd[1], fwd[2],       //
-      up[0], up[1], up[2],          //
+      right[0],
+      right[1],
+      right[2], //
+      fwd[0],
+      fwd[1],
+      fwd[2], //
+      up[0],
+      up[1],
+      up[2], //
     };
     transform->DeepCopy(m);
   }
@@ -1294,16 +1300,11 @@ interactor& interactor_impl::initBindings()
 
   // "Cycle animation" , "animationName"
   auto docAnim = [&]()
-  {
-    return std::pair(
-      "Animation", this->Internals->AnimationManager->GetAnimationName());
-  };
+  { return std::pair("Animation", this->Internals->AnimationManager->GetAnimationName()); };
 
   // "Cycle point/cell data coloring" , "POINT/CELL"
   auto docField = [&]()
-  {
-    return std::pair(std::string("Data coloring"), (opts.model.scivis.cells ? "CELL" : "POINT"));
-  };
+  { return std::pair(std::string("Data coloring"), (opts.model.scivis.cells ? "CELL" : "POINT")); };
 
   // "Cycle array to color with" , "arrayName"
   auto docArray = [&]()
@@ -1320,8 +1321,7 @@ interactor& interactor_impl::initBindings()
   {
     vtkRenderWindow* renWin = this->Internals->Window.GetRenderWindow();
     vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
-    return std::pair(
-      "Color component", ren->ComponentToString(opts.model.scivis.component));
+    return std::pair("Color component", ren->ComponentToString(opts.model.scivis.component));
   };
 
   // "doc", ""
@@ -1360,16 +1360,13 @@ interactor& interactor_impl::initBindings()
 
   // "doc", "ON/OFF/Unset"
   auto docTglOpt = [](const std::string& doc, const std::optional<bool>& val)
-  {
-    return std::pair(
-      doc, (val.has_value() ? (val.value() ? "ON" : "OFF") : "Unset"));
-  };
+  { return std::pair(doc, (val.has_value() ? (val.value() ? "ON" : "OFF") : "Unset")); };
 
   // "Cycle verbose level", "current_level"
   auto docVerbose = [&]()
   {
-    return std::pair("Verbose level",
-      this->Internals->VerboseLevelToString(log::getVerboseLevel()));
+    return std::pair(
+      "Verbose level", this->Internals->VerboseLevelToString(log::getVerboseLevel()));
   };
 
   // clang-format off

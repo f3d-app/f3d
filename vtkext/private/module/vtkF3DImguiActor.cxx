@@ -596,8 +596,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
         valueTextColor = F3DImguiStyle::GetHighlightColor();
       }
 
-      ImGui::TableNextRow(
-        ImGuiTableRowFlags_None, ImGui::GetTextLineHeightWithSpacing() + margin);
+      ImGui::TableNextRow(ImGuiTableRowFlags_None, ImGui::GetTextLineHeightWithSpacing() + margin);
 
       ImGui::TableNextColumn();
       ImGui::TextColored(descTextColor, "%s", desc.c_str());
