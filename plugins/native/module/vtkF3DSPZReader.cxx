@@ -323,8 +323,8 @@ int vtkF3DSPZReader::RequestData(
 
   if (!::UncompressGzip(compressed, uncompressed))
   {
-      vtkErrorMacro("Truncated spz file");
-      return 0;
+    vtkErrorMacro("Truncated spz file");
+    return 0;
   }
 
   const Header* header = reinterpret_cast<Header*>(uncompressed.data());
