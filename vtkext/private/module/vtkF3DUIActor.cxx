@@ -30,6 +30,11 @@ void vtkF3DUIActor::SetDropText(const std::string& info)
   this->DropText = info;
 }
 
+void vtkF3DUIActor::SetDropInfo(const std::vector<DropZoneInfo>& info)
+{
+  this->DropInfo = info;
+}
+
 //----------------------------------------------------------------------------
 void vtkF3DUIActor::SetFileNameVisibility(bool show)
 {

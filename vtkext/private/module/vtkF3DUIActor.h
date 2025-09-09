@@ -13,6 +13,12 @@
 #include <cstdint>
 #include <deque>
 
+  struct DropZoneInfo
+  {
+    std::string description;
+    std::vector<std::vector<std::string>> bindings; // outer = groups (OR), inner = keys (+)
+  };
+
 class vtkOpenGLRenderWindow;
 
 class vtkF3DUIActor : public vtkProp
@@ -35,6 +41,7 @@ public:
 
   using CheatSheetTuple = std::tuple<std::string, std::string, std::string, CheatSheetBindingType>;
   using CheatSheetGroup = std::pair<std::string, std::vector<CheatSheetTuple>>;
+
 
   /**
    * Initialize the UI actor resources
@@ -60,6 +67,7 @@ public:
    * Empty by default
    */
   void SetDropText(const std::string& info);
+  void SetDropInfo(const std::vector<DropZoneInfo>& info);
 
   /**
    * Set the filename visibility
@@ -225,6 +233,7 @@ protected:
   bool DropZoneLogoVisible = false;
   bool DropZoneVisible = false;
   std::string DropText = "";
+  std::vector<DropZoneInfo> DropInfo;
 
   bool FileNameVisible = false;
   std::string FileName = "";
