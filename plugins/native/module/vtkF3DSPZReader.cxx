@@ -16,7 +16,7 @@
 namespace
 {
 //----------------------------------------------------------------------------
-void UncompressGzip(
+bool UncompressGzip(
   const std::vector<unsigned char>& compressed, std::vector<unsigned char>& uncompressed)
 {
   std::vector<uint8_t> buffer(8192);
@@ -35,12 +35,16 @@ void UncompressGzip(
     stream.avail_out = static_cast<unsigned int>(buffer.size());
 
     res = inflate(&stream, Z_NO_FLUSH);
-    assert(res == Z_OK || res == Z_STREAM_END);
+    if (!(res == Z_OK || res == Z_STREAM_END))
+    {
+      return false;
+    }
 
     uncompressed.insert(
       uncompressed.end(), buffer.data(), buffer.data() + buffer.size() - stream.avail_out);
   }
   inflateEnd(&stream);
+  return true;
 }
 
 //----------------------------------------------------------------------------
@@ -317,7 +321,11 @@ int vtkF3DSPZReader::RequestData(
   std::vector<unsigned char> uncompressed;
   uncompressed.reserve(uncompressedLength);
 
-  ::UncompressGzip(compressed, uncompressed);
+  if (!::UncompressGzip(compressed, uncompressed))
+  {
+      vtkErrorMacro("Truncated gzip file");
+      return 0;
+  }
 
   const Header* header = reinterpret_cast<Header*>(uncompressed.data());
 
