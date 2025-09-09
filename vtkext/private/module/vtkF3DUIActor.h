@@ -13,11 +13,11 @@
 #include <cstdint>
 #include <deque>
 
-  struct DropZoneInfo
-  {
-    std::string description;
-    std::vector<std::vector<std::string>> bindings; // outer = groups (OR), inner = keys (+)
-  };
+struct DropZoneInfo
+{
+  std::string description;
+  std::vector<std::vector<std::string>> bindings; // outer = groups (OR), inner = keys (+)
+};
 
 class vtkOpenGLRenderWindow;
 
@@ -41,7 +41,6 @@ public:
 
   using CheatSheetTuple = std::tuple<std::string, std::string, std::string, CheatSheetBindingType>;
   using CheatSheetGroup = std::pair<std::string, std::vector<CheatSheetTuple>>;
-
 
   /**
    * Initialize the UI actor resources
