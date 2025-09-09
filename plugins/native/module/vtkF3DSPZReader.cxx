@@ -323,7 +323,7 @@ int vtkF3DSPZReader::RequestData(
 
   if (!::UncompressGzip(compressed, uncompressed))
   {
-      vtkErrorMacro("Truncated gzip file");
+      vtkErrorMacro("Truncated spz file");
       return 0;
   }
 
