@@ -49,6 +49,7 @@ runs:
         -DBUILD_APPS=ON
         -DBUILD_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX=../xercesc_install
 
     - name: Build xerces-c
       if: steps.cache-xercesc.outputs.cache-hit != 'true'
