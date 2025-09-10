@@ -23,6 +23,7 @@ public:
 
   /**
    * Enumeration of available cheatsheet binding types.
+   * Duplicate of library/public/interactor.h
    */
   enum class CheatSheetBindingType : std::uint8_t
   {
