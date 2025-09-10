@@ -287,9 +287,9 @@ defaults:
       nav_order: 10
 
   - scope:
-      path: "MENTORING.md"
+      path: "doc/dev/MENTORING.md"
     values:
-      title: MENTORING
+      title: Mentoring
       parent: Developer Documentation
       nav_order: 11
 
