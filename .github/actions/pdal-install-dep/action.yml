@@ -85,7 +85,7 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/pdal_build
       shell: bash
       run: cmake --build . --parallel 2 --target install --config Release
-    
+
     - name: Copy to install
       working-directory: ${{github.workspace}}/dependencies/pdal_install
       shell: bash
