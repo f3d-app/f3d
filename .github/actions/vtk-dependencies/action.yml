@@ -27,6 +27,9 @@ inputs:
   sqlite_version:
     description: "Version of sqlite to build against"
     required: true
+  xercesc_version:
+    description: "Version of xerces-c to build against"
+    required: true
   curl_version:
     description: "Version of curl to build against"
     required: true
@@ -89,6 +92,13 @@ runs:
         cpu: ${{inputs.cpu}}
         version: ${{inputs.sqlite_version}}
 
+    - name: Install xerces-c
+      if: runner.os == 'Linux'
+      uses: ./.actions/xercesc-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        version: ${{inputs.xercesc_version}}
+
     - name: Install curl
       if: runner.os == 'Linux'
       uses: ./.actions/curl-install-dep
@@ -138,3 +148,4 @@ runs:
         libgeotiff_version: ${{inputs.libgeotiff_version}}
         sqlite_version: ${{inputs.sqlite_version}}
         curl_version: ${{inputs.curl_version}}
+        xercesc_version: ${{inputs.xercesc_version}}

@@ -32,6 +32,9 @@ inputs:
   sqlite_version:
     description: "Version of sqlite to build against"
     required: true
+  xercesc_version:
+    description: "Version of xerces-c to build against"
+    required: true
   curl_version:
     description: "Version of curl to build against"
     required: true
@@ -56,6 +59,7 @@ runs:
         [[ "${{ inputs.vtk_version }}" ]] || { echo "vtk_version input is empty" ; exit 1; }
         [[ "${{ inputs.zlib_version }}" ]] || { echo "zlib_version input is empty" ; exit 1; }
         [[ "${{ inputs.sqlite_version }}" ]] || { echo "sqlite_version input is empty" ; exit 1; }
+        [[ "${{ inputs.xercesc_version }}" ]] || { echo "xercesc_version input is empty" ; exit 1; }
         [[ "${{ inputs.curl_version }}" ]] || { echo "curl_version input is empty" ; exit 1; }
         [[ "${{ inputs.proj_version }}" ]] || { echo "proj_version input is empty" ; exit 1; }
         [[ "${{ inputs.gdal_version }}" ]] || { echo "gdal_version input is empty" ; exit 1; }
@@ -67,7 +71,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/vtk_install
-        key: vtk-${{ inputs.vtk_version }}-${{inputs.zlib_version}}-${{inputs.blosc_version}}-${{inputs.tbb_version}}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}${{ inputs.ospray_version != '' && format('-ospray-{0}', inputs.ospray_version) || '' }}-${{inputs.proj_version}}-${{inputs.gdal_version}}-${{inputs.libgeotiff_version}}-${{inputs.libtiff_version}}-${{inputs.sqlite_version}}-${{inputs.curl_version}}-${{inputs.pdal_version}}-${{runner.os}}-${{inputs.cpu}}-0
+        key: vtk-${{ inputs.vtk_version }}-${{inputs.zlib_version}}-${{inputs.blosc_version}}-${{inputs.tbb_version}}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}${{ inputs.ospray_version != '' && format('-ospray-{0}', inputs.ospray_version) || '' }}-${{inputs.proj_version}}-${{inputs.gdal_version}}-${{inputs.libgeotiff_version}}-${{inputs.libtiff_version}}-${{inputs.sqlite_version}}-${{inputs.xercesc_version}}-${{inputs.curl_version}}-${{inputs.pdal_version}}-${{runner.os}}-${{inputs.cpu}}-0
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'

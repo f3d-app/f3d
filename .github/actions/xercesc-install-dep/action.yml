@@ -1,0 +1,69 @@
+name: "Install xerces-c Dependency"
+description: "Install xerces-c Dependency using cache when possible"
+inputs:
+  cpu:
+    description: "CPU architecture to build for"
+    required: false
+    default: "x86_64"
+  version:
+    description: "Version of xerces-c to build"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+
+    - name: Cache xerces-c
+      id: cache-xercesc
+      uses: actions/cache/restore@v4
+      with:
+        path: ${{github.workspace}}/dependencies/xercesc_install
+        key: xercesc-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-0
+
+    - name: Checkout xerces-c
+      if: steps.cache-xercesc.outputs.cache-hit != 'true'
+      uses: actions/checkout@v4
+      with:
+        repository: apache/xerces-c
+        path: "./dependencies/xercesc"
+        ref: ${{inputs.version}}
+
+    - name: Setup xerces-c
+      if: steps.cache-xercesc.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir xercesc_build
+        mkdir xercesc_install
+
+    - name: Configure xerces-c
+      if: steps.cache-xercesc.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/xercesc_build
+      shell: bash
+      run: >
+        cmake ../xercesc
+        -DBUILD_APPS=ON
+        -DBUILD_SHARED_LIBS=ON
+        -DCMAKE_BUILD_TYPE=Release
+
+    - name: Build xerces-c
+      if: steps.cache-xercesc.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/xercesc_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/xercesc_install
+      shell: bash
+      run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-xercesc.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-xercesc.outputs.cache-primary-key }}
+        path: dependencies/xercesc_install

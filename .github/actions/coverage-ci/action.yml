@@ -68,6 +68,9 @@ inputs:
   curl_version:
     description: "Version of curl to build"
     required: true
+  xercesc_version:
+    description: "Version of xercesc to build"
+    required: true
 
 runs:
   using: "composite"
@@ -107,6 +110,7 @@ runs:
         proj_version: ${{inputs.proj_version}}
         sqlite_version: ${{inputs.sqlite_version}}
         curl_version: ${{inputs.curl_version}}
+        xercesc_version: ${{inputs.xercesc_version}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
