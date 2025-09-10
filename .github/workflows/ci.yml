@@ -352,13 +352,6 @@ jobs:
           ospray_version: ${{matrix.ospray_version}}
           tbb_version: ${{matrix.tbb_version}}
           zlib_version: ${{matrix.zlib_version}}
-          sqlite_version: version-3.42.1
-          curl_version: curl-8_15_0
-          proj_version: v6.3.0
-          pdal_version: 2.9.2
-          libgeotiff_version: 1.7.4
-          libtiff_version: v4.7.0
-          gdal_version: v3.11.3
 
   #----------------------------------------------------------------------------
   # Windows CI: Build and test, cross-vtk build matrix
