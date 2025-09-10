@@ -36,22 +36,22 @@ Usually it looks like this:
 
 Generic Resources:
 
-- How to ask questions the smart way: http://www.catb.org/esr/faqs/smart-questions.html
-- CMake practical guide: https://crascit.com/professional-cmake/
-- LearnCPP: https://www.learncpp.com/
-- LeanOpenGL: https://learnopengl.com/
-- VTK: https://docs.vtk.org/en/latest/
-- ImGui: https://github.com/ocornut/imgui/wiki/
+- [How to ask questions the smart way](http://www.catb.org/esr/faqs/smart-questions.html)
+- [CMake practical guide](https://crascit.com/professional-cmake/)
+- [LearnCPP](https://www.learncpp.com/)
+- [LeanOpenGL](https://learnopengl.com/)
+- [VTK documentation](https://docs.vtk.org/en/latest/)
+- [ImGui documentation](https://github.com/ocornut/imgui/wiki/)
 
 F3D pull request examples:
 
-- PR that makes a small doc change: https://github.com/f3d-app/f3d/pull/2450
-- PR that fixes a simple issue: https://github.com/f3d-app/f3d/pull/2397
-- PR that adds a CLI option: https://github.com/f3d-app/f3d/pull/2402
-- PR that adds a CLI and libf3d option: https://github.com/f3d-app/f3d/pull/2181
-- PR that adds a new interaction binding: https://github.com/f3d-app/f3d/pull/2404
-- PR that adds a new reader: https://github.com/f3d-app/f3d/pull/1579
-- PR that adds a new plugin: https://github.com/f3d-app/f3d/pull/1128
+- [PR that makes a small doc change](https://github.com/f3d-app/f3d/pull/2450)
+- [PR that fixes a simple issue](https://github.com/f3d-app/f3d/pull/2397)
+- [PR that adds a CLI option](https://github.com/f3d-app/f3d/pull/2402)
+- [PR that adds a CLI and libf3d option](https://github.com/f3d-app/f3d/pull/2181)
+- [PR that adds a new interaction binding](https://github.com/f3d-app/f3d/pull/2404)
+- [PR that adds a new reader](https://github.com/f3d-app/f3d/pull/1579)
+- [PR that adds a new plugin](https://github.com/f3d-app/f3d/pull/1128)
 
 ## Mentors
 
