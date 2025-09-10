@@ -229,7 +229,7 @@ public:
   /**
    *  The variables of this function are based on the mathematical notation for matrices,
    *  where the coordinates correspond to the following:
-   * 
+   *
    *        [M1_1, M1_2, M1_3]
    *  M =   [M2_1, M2_2, M2_3]
    *        [M3_1, M3_2, M3_3]
@@ -253,11 +253,11 @@ public:
   /**
    *  The general form of a 3x3 transformation matrix M with scale S(x,y),
    *  translation T(x,y), and angle a (in degrees), is solved out to the following:
-   * 
+   *
    *      [cos(a)*S(x), -sin(a)*S(y),   T(x)]
    *  M = [sin(a)*S(x), cos(a)*S(y),    T(y)]
    *      [0,           0,              1   ]
-   * 
+   *
    *  Using this formula, we fill each cell using the values in the constructor
    */
   // clang-format on
