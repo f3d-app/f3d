@@ -11,4 +11,5 @@
 - [Governance.](GOVERNANCE.md)
 - [Maintainers and Contributors.](MAINTAINERS_AND_CONTRIBUTORS.md)
 - [Code of conduct.](../../CODE_OF_CONDUCT.md)
+- [Mentoring.](MENTORING.md)
 - [How to build F3D for webassembly.](BUILD_WASM.md)

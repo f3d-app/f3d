@@ -22,12 +22,13 @@ Anyone interested to become a moderators should just reach out to existing Maint
 
 ### 1.2. Returning Contributors
 
-Returning Contributors are those who have made multiple contributions to the Project and want to be acknowledged as such. Returning Contributors are also very much welcome to share their ideas and feedbacks about the development and maintenance of F3D. Returning contributors may be asked by others about their contributions, provide reviews on code they are familiar with, provide technical insight during discussions and take part in any related activities they wish to.
+Returning Contributors are those who have made multiple contributions to the Project over multiple release and want to be acknowledged as such. Returning Contributors are also very much welcome to share their ideas and feedbacks about the development and maintenance of F3D. Returning contributors may be asked by others about their contributions, provide reviews on code they are familiar with, provide technical insight during discussions and take part in any related activities they wish to.
 
-Returning Contributors can also work on ["bounty" issues](../../CONTRIBUTING.md#bounties) in order to receive donations.
-To become a Returning Contributor, one need to have merged at least two pull requests into the F3D repositories. Returning Contributors are part of the f3d-app github organization with a "member" role and are listed in the [dedicated](./MAINTAINERS_AND_CONTRIBUTORS.md) file.
+To become a Returning Contributor, one need to have merged at least two pull requests into the F3D repositories over the course of multiple releases.
+Returning Contributors are part of the f3d-app github organization with a "member" role and are listed in the [dedicated](./MAINTAINERS_AND_CONTRIBUTORS.md) file.
 
-Usually Maintainers will reach out to potential Returning Contributors but in case it was missed, one should reach out to Maintainers for consideration.
+Usually Maintainers will reach out to potential Returning Contributors after new releases but in case it was missed, one should reach out to Maintainers for consideration.
+Returning contributors also usually takes care of [mentoring Mentees](./MENTORING.md).
 
 Maintainers may decide to list a returning contributor as inactive after a year without contributions, in that case they will be removed from the f3d-app github organization until active again.
 
@@ -37,8 +38,8 @@ Contributors are those who have made or want to make contributions to the Projec
 
 ### 1.4. Mentees
 
-Mentees are contributors that are enrolled in the mentoring program of F3D. It is open to anyone willing to learn more about open source contribution to F3D
-and be helped by Maintainers and Contributors on [discord](https://discord.f3d.app).
+Mentees are contributors that are enrolled in the [mentoring program](./MENTORING.md) of F3D.
+It is open to anyone willing to learn more about open source contribution to F3D and be helped by Maintainers and Contributors.
 
 ### 1.5. Sponsor
 
