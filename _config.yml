@@ -287,11 +287,18 @@ defaults:
       nav_order: 10
 
   - scope:
+      path: "MENTORING.md"
+    values:
+      title: MENTORING
+      parent: Developer Documentation
+      nav_order: 11
+
+  - scope:
       path: "doc/dev/BUILD_WASM.md"
     values:
       title: Build (WebAssembly)
       parent: Developer Documentation
-      nav_order: 11
+      nav_order: 12
 
   # Licenses doc
   # _licenses.md uses front matter
