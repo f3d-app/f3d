@@ -173,12 +173,9 @@ public:
     double fwd[3];
     vtkMath::Cross(right, up, fwd);
     const double m[9] = {
-      right[0], right[1],
-      right[2], //
-      fwd[0], fwd[1],
-      fwd[2], //
-      up[0], up[1],
-      up[2], //
+      right[0], right[1], right[2], //
+      fwd[0], fwd[1], fwd[2], //
+      up[0], up[1], up[2], //
     };
     transform->DeepCopy(m);
   }
