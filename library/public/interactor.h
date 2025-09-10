@@ -118,6 +118,7 @@ public:
 
   /**
    * Enumeration of binding types.
+   * Duplication present in vtkext/private/module/vtkF3DUIActor.h.
    */
   enum class BindingType : std::uint8_t
   {

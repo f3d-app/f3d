@@ -47,4 +47,4 @@ If you or your company are using F3D in any capacity and you want to ensure F3D 
 You can sponsor F3D through the non-profit F3D-APP FOUNDATION and we will acknowledge your support by displaying your logo on our [README.md](../../README.md) as
 well as sharing about your support whenever we get the chance.
 
-Please reach out at <contact@f3d.app>.
+Please reach out at [contact@f3d.app](mailto:contact@f3d.app).
