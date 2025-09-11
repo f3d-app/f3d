@@ -447,18 +447,8 @@ void window_impl::UpdateDynamicOptions()
 
     std::vector<interaction_bind_t> custom_binds;
     std::string bindsStr = opt.ui.drop_zone.custom_binds;
-    std::istringstream ss(bindsStr);
-    std::string token;
 
-    auto trim = [](std::string& str) {
-      size_t start = str.find_first_not_of(" \t");
-      size_t end = str.find_last_not_of(" \t");
-      if (start == std::string::npos) { str.clear(); return; }
-      str = str.substr(start, end - start + 1);
-    };
-
-    while (std::getline(ss, token, ',')) {
-        trim(token);
+    for (auto& token : utils::tokenize(bindsStr)) {
         if (!token.empty()) {
             custom_binds.push_back(interaction_bind_t::parse(token));
         }
