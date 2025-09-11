@@ -41,7 +41,7 @@ int TestSDKEngineExceptions([[maybe_unused]] int argc, [[maybe_unused]] char* ar
 
     // cover operator=(engine&&)
     eng = f3d::engine::create(false);
-    test("engine assignment operator", eng.getWindow().isOffscreen() == false);
+    test("engine assignment operator", eng.getWindow().getType() != f3d::window::Type::NONE);
   }
 
 #if defined(__linux__) || defined(__FreeBSD__)
