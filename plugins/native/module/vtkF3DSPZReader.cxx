@@ -312,18 +312,12 @@ int vtkF3DSPZReader::RequestData(
     (static_cast<uint32_t>(compressed[compressedLength - 2]) << 16) |
     (static_cast<uint32_t>(compressed[compressedLength - 1]) << 24);
 
-  if (uncompressedLength < 2 || compressed[0] != 0x1F || compressed[1] != 0x8B)
-  {
-    vtkErrorMacro("Invalid gzip compression");
-    return 0;
-  }
-
   std::vector<unsigned char> uncompressed;
   uncompressed.reserve(uncompressedLength);
 
   if (!::UncompressGzip(compressed, uncompressed))
   {
-    vtkErrorMacro("Truncated spz file");
+    vtkErrorMacro("Invalid GZIP file");
     return 0;
   }
 
