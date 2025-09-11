@@ -1,5 +1,6 @@
 name: "Install VTK Dependency"
 description: "Install VTK Dependency using cache when possible"
+if: runner.os == 'Linux'
 inputs:
   vtk_version:
     description: "VTK version"
