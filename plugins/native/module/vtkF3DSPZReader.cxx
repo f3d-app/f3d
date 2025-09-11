@@ -16,7 +16,7 @@
 namespace
 {
 //----------------------------------------------------------------------------
-void UncompressGzip(
+bool UncompressGzip(
   const std::vector<unsigned char>& compressed, std::vector<unsigned char>& uncompressed)
 {
   std::vector<uint8_t> buffer(8192);
@@ -35,12 +35,16 @@ void UncompressGzip(
     stream.avail_out = static_cast<unsigned int>(buffer.size());
 
     res = inflate(&stream, Z_NO_FLUSH);
-    assert(res == Z_OK || res == Z_STREAM_END);
+    if (!(res == Z_OK || res == Z_STREAM_END))
+    {
+      return false;
+    }
 
     uncompressed.insert(
       uncompressed.end(), buffer.data(), buffer.data() + buffer.size() - stream.avail_out);
   }
   inflateEnd(&stream);
+  return true;
 }
 
 //----------------------------------------------------------------------------
@@ -99,7 +103,7 @@ struct LogScale
 };
 
 //----------------------------------------------------------------------------
-struct PackedRotation
+struct PackedRotationV2
 {
   uint8_t packed[3]; // 24-bits
 
@@ -111,6 +115,42 @@ struct PackedRotation
     float w = std::sqrt(std::max(0.0f, 1.0f - vtkMath::Dot(xyz, xyz)));
 
     return { w, xyz[0], xyz[1], xyz[2] };
+  }
+};
+
+//----------------------------------------------------------------------------
+struct PackedRotationV3
+{
+  uint8_t packed[4]; // 32-bits
+
+  std::array<float, 4> decode() const
+  {
+    float rotation[4];
+    constexpr float sqrt12 = 0.707106781186547524401f; // 1/sqrt(2)
+    constexpr uint32_t compMask = (1u << 9u) - 1u;
+
+    uint32_t comp = packed[0] + (packed[1] << 8) + (packed[2] << 16) + (packed[3] << 24);
+
+    const int largestCompIndex = comp >> 30;
+    float sumSquares = 0;
+    for (int i = 3; i >= 0; --i)
+    {
+      if (i != largestCompIndex)
+      {
+        float mag = comp & compMask;
+        uint32_t isNegative = (comp >> 9u) & 0x1u;
+        comp = comp >> 10u;
+        rotation[i] = sqrt12 * (mag / float(compMask));
+        if (isNegative == 1)
+        {
+          rotation[i] = -rotation[i];
+        }
+        sumSquares += rotation[i] * rotation[i];
+      }
+    }
+    rotation[largestCompIndex] = std::sqrt(1.0f - sumSquares);
+
+    return { rotation[0], rotation[1], rotation[2], rotation[3] };
   }
 };
 
@@ -272,15 +312,34 @@ int vtkF3DSPZReader::RequestData(
     (static_cast<uint32_t>(compressed[compressedLength - 2]) << 16) |
     (static_cast<uint32_t>(compressed[compressedLength - 1]) << 24);
 
+  if (uncompressedLength < 2 || compressed[0] != 0x1F || compressed[1] != 0x8B)
+  {
+    vtkErrorMacro("Invalid gzip compression");
+    return 0;
+  }
+
   std::vector<unsigned char> uncompressed;
   uncompressed.reserve(uncompressedLength);
 
-  ::UncompressGzip(compressed, uncompressed);
+  if (!::UncompressGzip(compressed, uncompressed))
+  {
+    vtkErrorMacro("Truncated spz file");
+    return 0;
+  }
 
   const Header* header = reinterpret_cast<Header*>(uncompressed.data());
 
-  assert(header->magic == 0x5053474e);
-  assert(header->version == 2);
+  if (header->magic != 0x5053474e)
+  {
+    vtkErrorMacro("Incompatible SPZ header");
+    return 0;
+  }
+
+  if (header->version < 2 || header->version > 3)
+  {
+    vtkErrorMacro("Incompatible SPZ version. Only 2 and 3 are supported");
+    return 0;
+  }
 
   uint32_t nbSplats = header->numPoints;
 
@@ -346,18 +405,31 @@ int vtkF3DSPZReader::RequestData(
 
   output->GetPointData()->AddArray(scaleArray);
 
-  // rotation is stored just after the 16-bytes header, positions, colors, alphas and scales
-  PackedRotation* rotation =
-    reinterpret_cast<PackedRotation*>(uncompressed.data() + 16 + (9 + 4 + 3) * nbSplats);
-
   vtkNew<vtkFloatArray> rotationArray;
   rotationArray->SetNumberOfComponents(4);
   rotationArray->SetNumberOfTuples(nbSplats);
   rotationArray->SetName("rotation");
 
-  for (vtkIdType splatIndex = 0; splatIndex < static_cast<vtkIdType>(nbSplats); splatIndex++)
+  // rotation is stored just after the 16-bytes header, positions, colors, alphas and scales
+  int rotationShift = 16 + (9 + 4 + 3) * nbSplats;
+
+  if (header->version == 2)
   {
-    rotationArray->SetTypedTuple(splatIndex, (rotation++)->decode().data());
+    PackedRotationV2* rotation =
+      reinterpret_cast<PackedRotationV2*>(uncompressed.data() + rotationShift);
+    for (vtkIdType splatIndex = 0; splatIndex < static_cast<vtkIdType>(nbSplats); splatIndex++)
+    {
+      rotationArray->SetTypedTuple(splatIndex, (rotation++)->decode().data());
+    }
+  }
+  else if (header->version == 3)
+  {
+    PackedRotationV3* rotation =
+      reinterpret_cast<PackedRotationV3*>(uncompressed.data() + rotationShift);
+    for (vtkIdType splatIndex = 0; splatIndex < static_cast<vtkIdType>(nbSplats); splatIndex++)
+    {
+      rotationArray->SetTypedTuple(splatIndex, (rotation++)->decode().data());
+    }
   }
 
   output->GetPointData()->AddArray(rotationArray);
