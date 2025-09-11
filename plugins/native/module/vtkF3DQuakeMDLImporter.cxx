@@ -471,60 +471,104 @@ bool vtkF3DQuakeMDLImporter::UpdateAtTimeValue(double timeValue)
 {
   if (this->Internals->ActiveAnimation != -1)
   {
-    const std::vector<double>& times =
-      this->Internals->AnimationTimes[this->Internals->ActiveAnimation];
-
     // Find frameIndex for the provided timeValue so that t0 <= timeValue < t1
     // Animation range is from [Start time of first frame, Finish time of last frame]
 
-    // First time >= value
-    const auto found = std::lower_bound(times.begin(), times.end(), timeValue);
-    // If none, select last, if found, select distance
-    const size_t i = found == times.end() ? times.size() - 1 : std::distance(times.begin(), found);
-    // If found time > timeValue, the the previous one - previous non Interpolated behavior
-    //const size_t frameIndex = *found > timeValue && i > 0 ? i - 1 : i;
-    //index for frame A
+    // First time >= value, excluding the last element as it only represents finish time of the last
+    // frame
+
+    // Animation in AnimationFrames are mesh animations and at greater indices texture animations
+    // are rendered
+    bool isMeshAnimation = this->Internals->ActiveAnimation <
+      static_cast<vtkIdType>(this->Internals->AnimationNames.size());
+    size_t animIndex = isMeshAnimation
+      ? this->Internals->ActiveAnimation
+      : this->Internals->ActiveAnimation - this->Internals->AnimationNames.size();
+
+    const std::vector<double>& times = isMeshAnimation
+      ? this->Internals->AnimationTimes[animIndex]
+      : this->Internals->GroupSkinDurations[animIndex];
+
+    if (times.size() < 2)
+    {
+      std::cerr << "Not enough time keys for interpolation!" << std::endl;
+      return false;
+    }
+
+    const auto found = std::lower_bound(times.begin(), times.end() - 1, timeValue);
+
+    // If found at finish time of last frame, select last frame's start time (second last value),
+    // else select distance
+    const size_t i =
+      (found == times.end() - 1) ? times.size() - 2 : std::distance(times.begin(), found);
+
+    // If time at index i > timeValue, then choose the previous frame
+    // index for frame A
     const size_t frameAIndex = *found > timeValue && i > 0 ? i - 1 : i;
-    //index for frame B, min to capture out of bounds
+
+    // index for frame B, min to capture out of bounds
     const size_t frameBIndex = std::min((frameAIndex + 1), times.size() - 1);
 
-    //get time values
+    // get time values
     double timeA = times[frameAIndex];
     double timeB = times[frameBIndex];
 
-    //calculating alpha
+    // calculating alpha
     double alpha = (timeB != timeA) ? (timeValue - timeA) / (timeB - timeA) : 0.0;
+    alpha = std::clamp(alpha, 0.0, 1.0);
 
-    //get both frames
-    auto frameA = this->Internals->AnimationFrames[this->Internals->ActiveAnimation][frameAIndex];
-    auto frameB = this->Internals->AnimationFrames[this->Internals->ActiveAnimation][frameBIndex];
+    if (this->Internals->ActiveAnimation >= this->Internals->AnimationFrames.size())
+    {
+      std::cerr << "ActiveAnimation index out of bounds!" << std::endl;
+      return false;
+    }
 
-    std::cout << "FrameA Index: " << frameAIndex << ", FrameB Index: " << frameBIndex << std::endl;
-    std::cout << "Alpha: " << alpha << std::endl;
+    const auto& frames = this->Internals->AnimationFrames[this->Internals->ActiveAnimation];
 
-    //interpolation
+    if (frameAIndex >= frames.size() || frameBIndex >= frames.size())
+    {
+      std::cerr << "Frame indices out of bounds! "
+                << "A: " << frameAIndex << ", B: " << frameBIndex
+                << ", Frames size: " << frames.size() << std::endl;
+      return false;
+    }
+
+    auto frameA = frames[frameAIndex];
+    auto frameB = frames[frameBIndex];
+
+    std::cout << "FrameA Index: " << frameAIndex << ", FrameB Index: " << frameBIndex
+              << ", Alpha: " << alpha << std::endl;
+
+    // interpolation
     if (frameAIndex != frameBIndex)
     {
       vtkInterpolateDataSetAttributes* iPtr = this->Internals->interpolator.Get();
       iPtr->SetInputData(0, frameA);
       iPtr->SetInputData(1, frameB);
+      iPtr->AddInputData(frameA);
+      iPtr->AddInputData(frameB);
       iPtr->SetT(alpha);
       iPtr->Update();
 
-      vtkPolyData* output = this->Internals->interpolator->GetPolyDataOutput();
-      std::cout << "Interpolated points: " << output->GetNumberOfPoints() << std::endl;
-      std::cout << "Interpolated polys: " << output->GetNumberOfPolys() << std::endl;
+      vtkPolyData* output = iPtr->GetPolyDataOutput();
 
+      if (!output || output->GetNumberOfPoints() == 0)
+      {
+        std::cerr << "Interpolation produced empty geometry!" << std::endl;
+        return false;
+      }
 
-      this->Internals->Mapper->SetInputData(iPtr->GetPolyDataOutput());
+      this->Internals->Mapper->SetInputData(output);
     }
     else
     {
       this->Internals->Mapper->SetInputData(frameA);
     }
+
     /*this->Internals->Mapper->SetInputData(
       this->Internals->AnimationFrames[this->Internals->ActiveAnimation][frameIndex]); */
   }
+
   return true;
 }
 
