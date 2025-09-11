@@ -921,17 +921,28 @@ jobs:
   #----------------------------------------------------------------------------
   check_docker_images:
     needs: default_versions
-
     runs-on: ubuntu-22.04
 
     # Pull request can require a rebuild of docker image, wait for it to be done
+    # This job does not do anything in master branch but is not skipped for simpler logic
     steps:
-      - name: Wait on build-docker-images workflow
-        if: ${{ github.event_name == 'pull_request' }}
-        uses: ArcticLampyrid/action-wait-for-workflow@v1.2.0
-        with:
-          workflow: build-docker-images.yml
-          allowed-conclusions: success
+      - name: Extract branch name
+        if: contains(github.event.pull_request.labels.*.name, 'ci:full')
+        shell: bash
+        run: echo "F3D_BRANCH_NAME=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_ENV
+
+      - name: Wait for docker images
+        if: contains(github.event.pull_request.labels.*.name, 'ci:full')
+        run: |
+          gh run list -w build-docker-images.yml --repo ${{ github.repository }} -L 1 -b ${{ env.F3D_BRANCH_NAME }}
+          until gh run list -w build-docker-images.yml --repo ${{ github.repository }} -L 1 -b ${{ env.F3D_BRANCH_NAME }} --json status | jq '.[]| .status' | grep -q "completed";
+          do
+            echo "Waiting 1s"
+            sleep 1;
+          done
+          gh run list -w build-docker-images.yml --repo ${{ github.repository }} -L 1 -b ${{ env.F3D_BRANCH_NAME }} --json conclusion | jq '.[]| .conclusion' | grep -q "success"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   #----------------------------------------------------------------------------
   # android: Check build of F3D for android
@@ -974,7 +985,10 @@ jobs:
       fail-fast: false
 
     runs-on: ubuntu-22.04
-    container: ghcr.io/f3d-app/f3d-wasm:${{needs.default_versions.outputs.timestamp}}
+
+    env:
+      CMAKE_BUILD_PARALLEL_LEVEL: 4
+      F3D_DOCKER_TIMESTAMP: ${{needs.default_versions.outputs.timestamp}}
 
     steps:
       # Note that LFS is needed in order to include the default model
@@ -998,6 +1012,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
 
       - name: Build Jekyll
         uses: actions/jekyll-build-pages@v1
@@ -1012,14 +1029,22 @@ jobs:
           sphinx-build -M html ./vtkext/public/doxygen ./vtkext/public/doxygen/build/
           sudo mv vtkext/public/doxygen/build/html _site/doc/libf3d/vtkext_doxygen
 
-      - name: Retrieve web assembly binaries
+      - name: Retrieve f3d package
         uses: actions/download-artifact@v4
         with:
-          name: f3d-wasm
-          path: ./web
+          name: f3d-wasm-package
+          path: ${{github.workspace}}/examples/libf3d/web
 
-      - name: Copy web assembly binaries
-        run: sudo mv web _site/
+      - name: Install f3d package
+        working-directory: ${{github.workspace}}/examples/libf3d/web
+        run: npm install f3d-*.tgz
+
+      - name: Build F3D web app
+        working-directory: ${{github.workspace}}/examples/libf3d/web
+        run: npm run build
+
+      - name: Copy F3D web app
+        run: sudo mv ${{github.workspace}}/examples/libf3d/web/dist _site/web
 
       - name: Deploy
         if: github.ref == 'refs/heads/master'
