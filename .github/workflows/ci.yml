@@ -455,6 +455,14 @@ jobs:
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           vtk_version: v9.5.0
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          sqlite_version: version-3.42.1
+          xercesc_version: v3.3.0
+          curl_version: curl-8_15_0
+          pdal_version: 2.9.2
+          proj_version: 9.6.2
+          libgeotiff_version: 1.7.4
+          libtiff_version: v4.7.0
+          gdal_version: v3.11.3
 
   #----------------------------------------------------------------------------
   # Linux CI: Build and test, cross-vtk build matrix
