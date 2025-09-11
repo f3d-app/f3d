@@ -241,6 +241,14 @@ jobs:
           - ospray_version: ${{needs.default_versions.outputs.ospray_version}}
           - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          - sqlite_version: version-3.42.1
+          - xercesc_version: v3.3.0
+          - curl_version: curl-8_15_0
+          - pdal_version: 2.9.2
+          - proj_version: 9.6.2
+          - libgeotiff_version: 1.7.4
+          - libtiff_version: v4.7.0
+          - gdal_version: v3.11.3
           - os: macos-14
             cpu: arm64
           - build_type: mindeps
@@ -252,6 +260,14 @@ jobs:
             ospray_version: ${{needs.default_versions.outputs.ospray_min_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_min_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_min_version}}
+            sqlite_version: version-3.42.1
+            xercesc_version: v3.3.0
+            curl_version: curl-8_15_0
+            pdal_version: 2.9.2
+            proj_version: 9.6.2
+            libgeotiff_version: 1.7.4
+            libtiff_version: v4.7.0
+            gdal_version: v3.11.3
           - build_type: no_optional_deps
             os: ubuntu-22.04
             vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
@@ -259,6 +275,14 @@ jobs:
             blosc_version: ${{needs.default_versions.outputs.blosc_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+            sqlite_version: version-3.42.1
+            xercesc_version: v3.3.0
+            curl_version: curl-8_15_0
+            pdal_version: 2.9.2
+            proj_version: 9.6.2
+            libgeotiff_version: 1.7.4
+            libtiff_version: v4.7.0
+            gdal_version: v3.11.3
           - build_type: no_raytracing
             os: ubuntu-22.04
             vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
@@ -267,6 +291,14 @@ jobs:
             openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+            sqlite_version: version-3.42.1
+            xercesc_version: v3.3.0
+            curl_version: curl-8_15_0
+            pdal_version: 2.9.2
+            proj_version: 9.6.2
+            libgeotiff_version: 1.7.4
+            libtiff_version: v4.7.0
+            gdal_version: v3.11.3
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
@@ -294,6 +326,14 @@ jobs:
           blosc_version: ${{matrix.blosc_version}}
           tbb_version: ${{matrix.tbb_version}}
           zlib_version: ${{matrix.zlib_version}}
+          sqlite_version: version-3.42.1
+          xercesc_version: v3.3.0
+          curl_version: curl-8_15_0
+          pdal_version: 2.9.2
+          proj_version: 9.6.2
+          libgeotiff_version: 1.7.4
+          libtiff_version: v4.7.0
+          gdal_version: v3.11.3
 
       - name: Install Raytracing Dependencies
         if: matrix.ospray_version != ''
@@ -312,6 +352,14 @@ jobs:
           ospray_version: ${{matrix.ospray_version}}
           tbb_version: ${{matrix.tbb_version}}
           zlib_version: ${{matrix.zlib_version}}
+          sqlite_version: version-3.42.1
+          xercesc_version: v3.3.0
+          curl_version: curl-8_15_0
+          pdal_version: 2.9.2
+          proj_version: 9.6.2
+          libgeotiff_version: 1.7.4
+          libtiff_version: v4.7.0
+          gdal_version: v3.11.3
 
   #----------------------------------------------------------------------------
   # Windows CI: Build and test, cross-vtk build matrix
