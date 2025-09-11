@@ -577,8 +577,8 @@ f3d_test(NAME TestGLTFURI DATA Lantern/Lantern.gltf)
 
 f3d_test(NAME TestNoBackground DATA cow.vtp ARGS --no-background)
 
-# HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
+# HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12397
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250903)
   f3d_test(NAME TestHDRI DATA suzanne.ply HDRI palermo_park_1k.hdr)
   f3d_test(NAME TestHDRICache DATA suzanne.ply HDRI palermo_park_1k.hdr DEPENDS TestHDRI)
   f3d_test(NAME TestHDRIBlur DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -u)
@@ -1117,8 +1117,8 @@ if(WIN32)
   f3d_test(NAME TestInteractionDropFileBackslashes ARGS -n INTERACTION_CONFIGURE)#X;DropEvent path\to\cow.vtp;
 endif()
 
-# HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
+# HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12397
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250903)
   f3d_test(NAME TestInteractionDropHDRI INTERACTION_CONFIGURE LONG_TIMEOUT)#X;DropEvent dragon.vtu;DropEvent palermo.hdr;
   f3d_test(NAME TestInteractionDropHDRIInvert INTERACTION_CONFIGURE LONG_TIMEOUT)#X;DropEvent palermo.hdr;DropEvent dragon.vtu;
   f3d_test(NAME TestInteractionDropHDRIMulti INTERACTION_CONFIGURE LONG_TIMEOUT)#X;DropEvent dragon.vtu palermo.hdr;
@@ -1502,7 +1502,7 @@ if(NOT WIN32)
   f3d_test(NAME TestHOMEFontFile DATA suzanne.stl ARGS -n --font-file=~/testing/data/Crosterian.ttf ENV "HOME=${F3D_SOURCE_DIR}" UI)
   f3d_test(NAME TestHOMETexture DATA suzanne.ply ARGS --texture-matcap=~/testing/data/skin.png ENV "HOME=${F3D_SOURCE_DIR}")
 
-  if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250903)
     f3d_test(NAME TestHOMEHDRI DATA suzanne.stl ARGS --hdri-file=~/testing/data/palermo_park_1k.hdr --hdri-ambient --hdri-skybox ENV "HOME=${F3D_SOURCE_DIR}" LONG_TIMEOUT)
     f3d_test(NAME TestHOMEInteractionDropHDRICollapse INTERACTION_CONFIGURE ENV "HOME=${F3D_SOURCE_DIR}" LONG_TIMEOUT)#X;DropEvent dragon.vtu;DropEvent palermo.hdr;
   endif()
