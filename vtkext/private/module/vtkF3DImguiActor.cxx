@@ -448,6 +448,20 @@ void vtkF3DImguiActor::RenderDropZone()
 
     ImGui::End();
 
+    ImDrawList* draw_list2 = ImGui::GetBackgroundDrawList();
+
+    // If DropText is provided, render it and skip binds
+    if (!this->DropText.empty())
+    {
+      ImVec2 textSize = ImGui::CalcTextSize(this->DropText.c_str());
+      ImVec2 textPos(viewport->GetWorkCenter().x - textSize.x * 0.5f,
+                     viewport->GetWorkCenter().y + LOGO_DISPLAY_HEIGHT * 0.5f +
+                       DROPZONE_LOGO_TEXT_PADDING);
+      draw_list2->AddText(textPos, ImColor(F3DImguiStyle::GetTextColor()), this->DropText.c_str());
+      return;
+    }
+
+    // Otherwise: render parsed binds
     auto parsedInfo = this->DropInfo;
 
     // Calculate max width for each column before rendering
@@ -466,8 +480,9 @@ void vtkF3DImguiActor::RenderDropZone()
         const auto& group = item.bindings[g];
         for (size_t k = 0; k < group.size(); ++k) // keys
         {
-          totalBindingsWidth += ImGui::CalcTextSize(group[k].c_str()).x + 0.5f * DROPZONE_LOGO_TEXT_PADDING;
-          if (k < group.size() - 1) // plus between keys
+          totalBindingsWidth += ImGui::CalcTextSize(group[k].c_str()).x +
+                                0.5f * DROPZONE_LOGO_TEXT_PADDING;
+          if (k < group.size() - 1)
           {
             totalBindingsWidth += ImGui::GetStyle().ItemSpacing.x +
                                   ImGui::CalcTextSize("+").x +
@@ -475,7 +490,7 @@ void vtkF3DImguiActor::RenderDropZone()
           }
         }
 
-        if (g < item.bindings.size() - 1) // or between groups
+        if (g < item.bindings.size() - 1)
         {
           totalBindingsWidth += ImGui::GetStyle().ItemSpacing.x +
                                 ImGui::CalcTextSize("or").x +
@@ -489,8 +504,6 @@ void vtkF3DImguiActor::RenderDropZone()
     ImVec4 bindingRectColor = F3DImguiStyle::GetMidColor();
     ImVec4 bindingTextColor = F3DImguiStyle::GetTextColor();
 
-    ImDrawList* draw_list2 = ImGui::GetBackgroundDrawList();
-
     float tableWidth = maxDescTextWidth + maxBindingsTextWidth + DROPZONE_LOGO_TEXT_PADDING +
                       ImGui::GetStyle().ItemSpacing.x;
 
@@ -499,7 +512,8 @@ void vtkF3DImguiActor::RenderDropZone()
     if (this->DropZoneLogoVisible && this->Pimpl->LogoTexture)
     {
       startPos = ImVec2(viewport->GetWorkCenter().x - tableWidth * 0.5f,
-                        viewport->GetWorkCenter().y + logoDisplayHeight / 2 + DROPZONE_LOGO_TEXT_PADDING);
+                        viewport->GetWorkCenter().y + LOGO_DISPLAY_HEIGHT / 2 +
+                          DROPZONE_LOGO_TEXT_PADDING);
     }
     else
     {
@@ -511,12 +525,9 @@ void vtkF3DImguiActor::RenderDropZone()
 
     for (const auto& item : parsedInfo)
     {
-      // Description
       draw_list2->AddText(cursor, ImColor(descTextColor), item.description.c_str());
-
       float rowHeight = ImGui::GetTextLineHeightWithSpacing() + 0.5f * DROPZONE_LOGO_TEXT_PADDING;
 
-      // Bindings next to description
       float xBindings = cursor.x + maxDescTextWidth + DROPZONE_LOGO_TEXT_PADDING;
       ImVec2 bindingPos(xBindings, cursor.y);
 
