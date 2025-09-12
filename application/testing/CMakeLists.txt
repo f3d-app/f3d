@@ -58,11 +58,8 @@ function(f3d_test)
   if(F3D_TEST_RENDERING_BACKEND)
     list(APPEND F3D_TEST_ARGS "--rendering-backend=${F3D_TEST_RENDERING_BACKEND}")
   else()
-    # If no rendering backend is specified by the test, "auto" is used.
-    # However, F3D_TESTING_FORCE_RENDERING_BACKEND can be used to force the rendering backend for these tests
-    if(F3D_TESTING_FORCE_RENDERING_BACKEND)
-      list(APPEND F3D_TEST_ARGS "--rendering-backend=${F3D_TESTING_FORCE_RENDERING_BACKEND}")
-    endif()
+    # If no rendering backend is specified by the test, the value of F3D_TESTING_FORCE_RENDERING_BACKEND is used.
+    list(APPEND F3D_TEST_ARGS "--rendering-backend=${F3D_TESTING_FORCE_RENDERING_BACKEND}")
   endif()
 
   add_test(NAME "f3d::${F3D_TEST_NAME}" COMMAND $<TARGET_FILE:f3d> ${F3D_TEST_ARGS} COMMAND_EXPAND_LISTS)
@@ -455,31 +452,34 @@ if(BUILD_SHARED_LIBS)
 endif()
 
 if(NOT F3D_MACOS_BUNDLE)
-  # On linux, we can easily test the config file search from the binary code by positioning a config file in the binary dir
-  configure_file("${F3D_SOURCE_DIR}/testing/configs/complex.json" "${CMAKE_BINARY_DIR}/share/f3d/configs/complex_build.json" COPYONLY)
-  f3d_test(NAME TestConfigFileBuild DATA dragon.vtu CONFIG complex_build.json UI)
-  f3d_test(NAME TestConfigStemBuild DATA dragon.vtu CONFIG complex_build UI)
-  f3d_test(NAME TestConfigFileUpperCase DATA suzanne_upper.STL CONFIG complex_build)
-  f3d_test(NAME TestConfigFileMultiFileSTL DATA mb/recursive/mb_1_0.vtp suzanne.stl ARGS --multi-file-mode=all CONFIG complex_build)
-  f3d_test(NAME TestConfigFileMultiFileVTP DATA mb/recursive/mb_1_0.vtp suzanne.stl mb/recursive/mb_2_0.vtp ARGS --multi-file-mode=all CONFIG complex_build UI)
-
   file(COPY "${F3D_SOURCE_DIR}/resources/configs/config.d/" "${F3D_SOURCE_DIR}/plugins/native/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
-  f3d_test(NAME TestDefaultConfigFileVTU DATA dragon.vtu CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
-  f3d_test(NAME TestDefaultConfigFileVTI DATA vase_4comp.vti CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
-  f3d_test(NAME TestDefaultConfigFileSTL DATA suzanne.stl CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
-  f3d_test(NAME TestDefaultConfigFileTIFF DATA f3d.tif CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI) # Note: This tests config file order as camera_direction is set in different files
-  f3d_test(NAME TestDefaultConfigFilePLY DATA suzanneRGBA.ply CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
-  f3d_test(NAME TestDefaultConfigFileQuakeMDL DATA zombie.mdl CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
-  f3d_test(NAME TestDefaultConfigFileAndCommand DATA suzanne.stl ARGS --up=-Y --camera-direction=-1,0.5,-1 CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
-  f3d_test(NAME TestDefaultConfigTranslucent DATA red_translucent_monkey.gltf CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
-  f3d_test(NAME TestDefaultConfigRemoveEmptyFileGroups DATA invalid.vtp cow.vtp CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
-
   file(COPY "${F3D_SOURCE_DIR}/resources/configs/thumbnail.d/" "${F3D_SOURCE_DIR}/plugins/native/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
-  f3d_test(NAME TestThumbnailConfigFileVTU DATA dragon.vtu CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
-  f3d_test(NAME TestThumbnailConfigFileVTI DATA vase_4comp.vti CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
-  f3d_test(NAME TestThumbnailConfigFileSTL DATA suzanne.stl CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
-  f3d_test(NAME TestThumbnailConfigFilePLY DATA suzanneRGBA.ply CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
-  f3d_test(NAME TestThumbnailConfigFileQuakeMDL DATA zombie.mdl CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
+
+  if (VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250903)
+    # On linux, we can easily test the config file search from the binary code by positioning a config file in the binary dir
+    configure_file("${F3D_SOURCE_DIR}/testing/configs/complex.json" "${CMAKE_BINARY_DIR}/share/f3d/configs/complex_build.json" COPYONLY)
+    f3d_test(NAME TestConfigFileBuild DATA dragon.vtu CONFIG complex_build.json UI)
+    f3d_test(NAME TestConfigStemBuild DATA dragon.vtu CONFIG complex_build UI)
+    f3d_test(NAME TestConfigFileUpperCase DATA suzanne_upper.STL CONFIG complex_build)
+    f3d_test(NAME TestConfigFileMultiFileSTL DATA mb/recursive/mb_1_0.vtp suzanne.stl ARGS --multi-file-mode=all CONFIG complex_build)
+    f3d_test(NAME TestConfigFileMultiFileVTP DATA mb/recursive/mb_1_0.vtp suzanne.stl mb/recursive/mb_2_0.vtp ARGS --multi-file-mode=all CONFIG complex_build UI)
+    
+    f3d_test(NAME TestDefaultConfigFileVTU DATA dragon.vtu CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
+    f3d_test(NAME TestDefaultConfigFileVTI DATA vase_4comp.vti CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
+    f3d_test(NAME TestDefaultConfigFileSTL DATA suzanne.stl CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
+    f3d_test(NAME TestDefaultConfigFileTIFF DATA f3d.tif CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI) # Note: This tests config file order as camera_direction is set in different files
+    f3d_test(NAME TestDefaultConfigFilePLY DATA suzanneRGBA.ply CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
+    f3d_test(NAME TestDefaultConfigFileQuakeMDL DATA zombie.mdl CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
+    f3d_test(NAME TestDefaultConfigFileAndCommand DATA suzanne.stl ARGS --up=-Y --camera-direction=-1,0.5,-1 CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
+    f3d_test(NAME TestDefaultConfigTranslucent DATA red_translucent_monkey.gltf CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
+    f3d_test(NAME TestDefaultConfigRemoveEmptyFileGroups DATA invalid.vtp cow.vtp CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
+    
+    f3d_test(NAME TestThumbnailConfigFileVTU DATA dragon.vtu CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
+    f3d_test(NAME TestThumbnailConfigFileVTI DATA vase_4comp.vti CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
+    f3d_test(NAME TestThumbnailConfigFileSTL DATA suzanne.stl CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
+    f3d_test(NAME TestThumbnailConfigFilePLY DATA suzanneRGBA.ply CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
+    f3d_test(NAME TestThumbnailConfigFileQuakeMDL DATA zombie.mdl CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
+  endif()
 endif()
 
 # color texture with opacity needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9467
@@ -582,8 +582,8 @@ f3d_test(NAME TestGLTFURI DATA Lantern/Lantern.gltf)
 
 f3d_test(NAME TestNoBackground DATA cow.vtp ARGS --no-background)
 
-# HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
+# HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12397
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250903)
   f3d_test(NAME TestHDRI DATA suzanne.ply HDRI palermo_park_1k.hdr)
   f3d_test(NAME TestHDRICache DATA suzanne.ply HDRI palermo_park_1k.hdr DEPENDS TestHDRI)
   f3d_test(NAME TestHDRIBlur DATA suzanne.ply HDRI palermo_park_1k.hdr ARGS -u)
@@ -622,6 +622,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
   f3d_test(NAME TestHDRIAmbientOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-ambient LONG_TIMEOUT)
   f3d_test(NAME TestHDRIAmbientOnlyNoBackground DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-ambient --no-background LONG_TIMEOUT)
   f3d_test(NAME TestHDRINone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr LONG_TIMEOUT)
+  f3d_test(NAME TestHDRIToneMappingSSAA DATA suzanne.ply HDRI palermo_park_1k.hdr TONE_MAPPING ARGS -t -a --anti-aliasing-mode=ssaa)
 
   f3d_test(NAME TestInteractionHDRICache DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION DEPENDS TestHDRI) #FFFFJJJJ
   f3d_test(NAME TestInteractionHDRIRemoveSkybox DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION)
@@ -647,11 +648,6 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
       f3d_test(NAME TestInteractionHDRIRaytracingFullFromNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr -rd --raytracing-samples=4 INTERACTION LONG_TIMEOUT)
     endif()
   endif()
-endif()
-
-# SSAA with HDR framebuffer support in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12026
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250329)
-  f3d_test(NAME TestHDRIToneMappingSSAA DATA suzanne.ply HDRI palermo_park_1k.hdr TONE_MAPPING ARGS -t -a --anti-aliasing-mode=ssaa)
 endif()
 
 # Zoom factor was introduced in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9958
@@ -702,7 +698,7 @@ if(F3D_PLUGIN_BUILD_ALEMBIC)
   f3d_test(NAME TestABCNonFaceVarying DATA tetrahedron_non_facevarying_uv.abc ARGS -s --load-plugins=alembic)
   f3d_test(NAME TestABCAnimation DATA drop.abc ARGS --animation-time=2 --load-plugins=alembic --animation-progress)
 
-  if(NOT F3D_MACOS_BUNDLE)
+  if(NOT F3D_MACOS_BUNDLE AND VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250903)
     file(COPY "${F3D_SOURCE_DIR}/plugins/alembic/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     f3d_test(NAME TestDefaultConfigFileAlembic DATA suzanne.abc CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
 
@@ -755,7 +751,7 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
     f3d_test(NAME TestFBXSkinningAnimation DATA punch.fbx ARGS --load-plugins=assimp --animation-time=1 --animation-progress)
   endif()
 
-  if(NOT F3D_MACOS_BUNDLE)
+  if(NOT F3D_MACOS_BUNDLE AND VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250903)
     file(COPY "${F3D_SOURCE_DIR}/plugins/assimp/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     f3d_test(NAME TestDefaultConfigFileAssimpFBX DATA phong_cube.fbx CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
     f3d_test(NAME TestDefaultConfigFileAssimpDXF DATA PinkEggFromLW.dxf ARGS -p CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
@@ -787,7 +783,7 @@ if(F3D_PLUGIN_BUILD_DRACO)
     f3d_test(NAME TestGLTFDracoImporterWithoutCompression DATA BoxAnimated.gltf ARGS --load-plugins=draco --animation-time=2 --animation-progress)
   endif()
 
-  if(NOT F3D_MACOS_BUNDLE)
+  if(NOT F3D_MACOS_BUNDLE AND VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250903)
     file(COPY "${F3D_SOURCE_DIR}/plugins/draco/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     f3d_test(NAME TestDefaultConfigFileDraco DATA suzanne.drc CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
 
@@ -848,7 +844,7 @@ if(F3D_PLUGIN_BUILD_HDF)
     f3d_test(NAME TestMultiFileAnimationMultiUnique DATA f3d.glb blob.vtkhdf ARGS --animation-time=2 --animation-indices=0,1 --multi-file-mode=all --opacity=0.5 --load-plugins=hdf )
   endif()
 
-  if(NOT F3D_MACOS_BUNDLE)
+  if(NOT F3D_MACOS_BUNDLE AND VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250903)
     file(COPY "${F3D_SOURCE_DIR}/plugins/hdf/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     f3d_test(NAME TestDefaultConfigFileExodus DATA disk_out_ref.ex2 CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
 
@@ -874,7 +870,7 @@ if(F3D_PLUGIN_BUILD_HDF)
   # Basic rendering test with scalar coloring
   f3d_test(NAME TestNetCDF DATA temperature_grid.nc ARGS --load-plugins=hdf -s)
 
-  if(NOT F3D_MACOS_BUNDLE)
+  if(NOT F3D_MACOS_BUNDLE AND VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250903)
     f3d_test(NAME TestDefaultConfigFileNetCDF DATA temperature_grid.nc CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
     f3d_test(NAME TestThumbnailConfigFileNetCDF DATA temperature_grid.nc CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
   endif()
@@ -902,7 +898,7 @@ if(F3D_PLUGIN_BUILD_OCCT)
       f3d_test(NAME TestInvalidXBF DATA invalid.xbf ARGS --verbose --load-plugins=occt REGEXP "failed to load scene" NO_BASELINE)
     endif()
 
-    if (NOT F3D_MACOS_BUNDLE)
+    if (NOT F3D_MACOS_BUNDLE AND VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250903)
       file(COPY "${F3D_SOURCE_DIR}/plugins/occt/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
       f3d_test(NAME TestDefaultConfigFileOCCT DATA f3d.stp CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
 
@@ -932,7 +928,7 @@ if(F3D_PLUGIN_BUILD_USD)
   f3d_test(NAME TestUSDZMaterialsInterationReload DATA McUsd.usdz ARGS --load-plugins=usd INTERACTION NO_BASELINE) # Up
   f3d_test(NAME TestUSDZMemEXR DATA small.usdz ARGS --load-plugins=usd)
 
-  if(NOT F3D_MACOS_BUNDLE)
+  if(NOT F3D_MACOS_BUNDLE AND VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250903)
     file(COPY "${F3D_SOURCE_DIR}/plugins/usd/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     f3d_test(NAME TestDefaultConfigFileUSD DATA suzanne.usd CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
 
@@ -951,7 +947,7 @@ if(F3D_PLUGIN_BUILD_VDB)
   f3d_test(NAME TestVDBDefinesDownsamplingFactorOutOfRangeError DATA icosahedron.vdb ARGS --load-plugins=vdb -DVDB.downsampling_factor=${_outOfRangeDoubleStr} --verbose REGEXP "VDB.downsampling_factor out of range" NO_BASELINE)
   f3d_test(NAME TestVDBCommandScriptReaderOptions DATA icosahedron.vdb ARGS --load-plugins=vdb --volume --volume-inverse SCRIPT TestVDBCommandScriptReaderOptions.txt) # set_reader_option VDB.downsampling_factor 0.2; reload_current_file_group
 
-  if(NOT F3D_MACOS_BUNDLE)
+  if(NOT F3D_MACOS_BUNDLE AND VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250903)
     file(COPY "${F3D_SOURCE_DIR}/plugins/vdb/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     f3d_test(NAME TestDefaultConfigFileVDB DATA icosahedron.vdb CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
 
@@ -1122,8 +1118,8 @@ if(WIN32)
   f3d_test(NAME TestInteractionDropFileBackslashes ARGS -n INTERACTION_CONFIGURE)#X;DropEvent path\to\cow.vtp;
 endif()
 
-# HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
+# HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12397
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250903)
   f3d_test(NAME TestInteractionDropHDRI INTERACTION_CONFIGURE LONG_TIMEOUT)#X;DropEvent dragon.vtu;DropEvent palermo.hdr;
   f3d_test(NAME TestInteractionDropHDRIInvert INTERACTION_CONFIGURE LONG_TIMEOUT)#X;DropEvent palermo.hdr;DropEvent dragon.vtu;
   f3d_test(NAME TestInteractionDropHDRIMulti INTERACTION_CONFIGURE LONG_TIMEOUT)#X;DropEvent dragon.vtu palermo.hdr;
@@ -1471,7 +1467,7 @@ add_test(NAME f3d::TestInvalidCLIArgs COMMAND $<TARGET_FILE:f3d> --up)
 set_tests_properties(f3d::TestInvalidCLIArgs PROPERTIES PASS_REGULAR_EXPRESSION "Error parsing command line arguments")
 
 # Test that f3d resolution can be controlled from config file
-add_test(NAME f3d::TestConfigResolution COMMAND $<TARGET_FILE:f3d> --config=${F3D_SOURCE_DIR}/testing/configs/resolution.json ${F3D_SOURCE_DIR}/testing/data/suzanne.stl --output=${CMAKE_BINARY_DIR}/Testing/Temporary/TestConfigResolution.png --reference=${F3D_SOURCE_DIR}/testing/baselines/TestConfigResolution.png)
+add_test(NAME f3d::TestConfigResolution COMMAND $<TARGET_FILE:f3d> --config=${F3D_SOURCE_DIR}/testing/configs/resolution.json ${F3D_SOURCE_DIR}/testing/data/suzanne.stl --output=${CMAKE_BINARY_DIR}/Testing/Temporary/TestConfigResolution.png --reference=${F3D_SOURCE_DIR}/testing/baselines/TestConfigResolution.png --rendering-backend=${F3D_TESTING_FORCE_RENDERING_BACKEND})
 
 # Test filename template with multiple files
 add_test(NAME f3d::TestMultiFileFileNameTemplate COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/suzanne.stl ${F3D_SOURCE_DIR}/testing/data/dragon.vtu --output=${CMAKE_BINARY_DIR}/Testing/Temporary/{model.ext}.png --multi-file-mode=all --verbose)
@@ -1489,7 +1485,7 @@ if(NOT WIN32)
   set_tests_properties(f3d::TestHOMEOutput PROPERTIES ENVIRONMENT "HOME=${CMAKE_BINARY_DIR}")
   set_tests_properties(f3d::TestHOMEOutput PROPERTIES FIXTURES_SETUP f3d::TestHOMEOutput_FIXTURE)
 
-  add_test(NAME f3d::TestHOMEReference COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/suzanne.stl --output=${CMAKE_BINARY_DIR}/Testing/Temporary/TestHOMEReference.png --reference=~/Testing/Temporary/TestHOMEOutput.png --resolution=300,300 --no-config)
+  add_test(NAME f3d::TestHOMEReference COMMAND $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data/suzanne.stl --output=${CMAKE_BINARY_DIR}/Testing/Temporary/TestHOMEReference.png --reference=~/Testing/Temporary/TestHOMEOutput.png --resolution=300,300 --no-config --rendering-backend=${F3D_TESTING_FORCE_RENDERING_BACKEND})
   set_tests_properties(f3d::TestHOMEReference PROPERTIES ENVIRONMENT "HOME=${CMAKE_BINARY_DIR}")
   set_tests_properties(f3d::TestHOMEReference PROPERTIES FIXTURES_REQUIRED f3d::TestHOMEOutput_FIXTURE)
 
@@ -1507,7 +1503,7 @@ if(NOT WIN32)
   f3d_test(NAME TestHOMEFontFile DATA suzanne.stl ARGS -n --font-file=~/testing/data/Crosterian.ttf ENV "HOME=${F3D_SOURCE_DIR}" UI)
   f3d_test(NAME TestHOMETexture DATA suzanne.ply ARGS --texture-matcap=~/testing/data/skin.png ENV "HOME=${F3D_SOURCE_DIR}")
 
-  if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250903)
     f3d_test(NAME TestHOMEHDRI DATA suzanne.stl ARGS --hdri-file=~/testing/data/palermo_park_1k.hdr --hdri-ambient --hdri-skybox ENV "HOME=${F3D_SOURCE_DIR}" LONG_TIMEOUT)
     f3d_test(NAME TestHOMEInteractionDropHDRICollapse INTERACTION_CONFIGURE ENV "HOME=${F3D_SOURCE_DIR}" LONG_TIMEOUT)#X;DropEvent dragon.vtu;DropEvent palermo.hdr;
   endif()
