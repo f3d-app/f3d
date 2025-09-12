@@ -1,6 +1,5 @@
 name: "Install VTK Dependencies"
 description: "Install multiple VTK Dependencies"
-if: runner.os == 'Linux'
 inputs:
   cpu:
     description: "CPU architecture to build for"

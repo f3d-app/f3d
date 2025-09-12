@@ -319,6 +319,7 @@ jobs:
           mkdir install
 
       - name: Install VTK dependencies
+        if: runner.os == 'Linux'
         uses: ./source/.github/actions/vtk-dependencies
         with:
           cpu: ${{matrix.cpu}}
