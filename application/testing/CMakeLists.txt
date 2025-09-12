@@ -449,7 +449,7 @@ if(BUILD_SHARED_LIBS)
   f3d_test(NAME TestPluginNoInit ARGS --verbose --load-plugins=${_dirname}/${CMAKE_SHARED_LIBRARY_PREFIX}f3d${CMAKE_SHARED_LIBRARY_SUFFIX} NO_BASELINE REGEXP "Cannot find init_plugin symbol in library")
 endif()
 
-if(NOT F3D_MACOS_BUNDLE)
+if(NOT F3D_MACOS_BUNDLE AND VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250903)
   # On linux, we can easily test the config file search from the binary code by positioning a config file in the binary dir
   configure_file("${F3D_SOURCE_DIR}/testing/configs/complex.json" "${CMAKE_BINARY_DIR}/share/f3d/configs/complex_build.json" COPYONLY)
   f3d_test(NAME TestConfigFileBuild DATA dragon.vtu CONFIG complex_build.json UI)
@@ -697,7 +697,7 @@ if(F3D_PLUGIN_BUILD_ALEMBIC)
   f3d_test(NAME TestABCNonFaceVarying DATA tetrahedron_non_facevarying_uv.abc ARGS -s --load-plugins=alembic)
   f3d_test(NAME TestABCAnimation DATA drop.abc ARGS --animation-time=2 --load-plugins=alembic --animation-progress)
 
-  if(NOT F3D_MACOS_BUNDLE)
+  if(NOT F3D_MACOS_BUNDLE AND VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250903)
     file(COPY "${F3D_SOURCE_DIR}/plugins/alembic/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     f3d_test(NAME TestDefaultConfigFileAlembic DATA suzanne.abc CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
 
@@ -750,7 +750,7 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
     f3d_test(NAME TestFBXSkinningAnimation DATA punch.fbx ARGS --load-plugins=assimp --animation-time=1 --animation-progress)
   endif()
 
-  if(NOT F3D_MACOS_BUNDLE)
+  if(NOT F3D_MACOS_BUNDLE AND VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250903)
     file(COPY "${F3D_SOURCE_DIR}/plugins/assimp/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     f3d_test(NAME TestDefaultConfigFileAssimpFBX DATA phong_cube.fbx CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
     f3d_test(NAME TestDefaultConfigFileAssimpDXF DATA PinkEggFromLW.dxf ARGS -p CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
@@ -782,7 +782,7 @@ if(F3D_PLUGIN_BUILD_DRACO)
     f3d_test(NAME TestGLTFDracoImporterWithoutCompression DATA BoxAnimated.gltf ARGS --load-plugins=draco --animation-time=2 --animation-progress)
   endif()
 
-  if(NOT F3D_MACOS_BUNDLE)
+  if(NOT F3D_MACOS_BUNDLE AND VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250903)
     file(COPY "${F3D_SOURCE_DIR}/plugins/draco/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     f3d_test(NAME TestDefaultConfigFileDraco DATA suzanne.drc CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
 
@@ -843,7 +843,7 @@ if(F3D_PLUGIN_BUILD_HDF)
     f3d_test(NAME TestMultiFileAnimationMultiUnique DATA f3d.glb blob.vtkhdf ARGS --animation-time=2 --animation-indices=0,1 --multi-file-mode=all --opacity=0.5 --load-plugins=hdf )
   endif()
 
-  if(NOT F3D_MACOS_BUNDLE)
+  if(NOT F3D_MACOS_BUNDLE AND VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250903)
     file(COPY "${F3D_SOURCE_DIR}/plugins/hdf/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     f3d_test(NAME TestDefaultConfigFileExodus DATA disk_out_ref.ex2 CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
 
@@ -869,7 +869,7 @@ if(F3D_PLUGIN_BUILD_HDF)
   # Basic rendering test with scalar coloring
   f3d_test(NAME TestNetCDF DATA temperature_grid.nc ARGS --load-plugins=hdf -s)
 
-  if(NOT F3D_MACOS_BUNDLE)
+  if(NOT F3D_MACOS_BUNDLE AND VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250903)
     f3d_test(NAME TestDefaultConfigFileNetCDF DATA temperature_grid.nc CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
     f3d_test(NAME TestThumbnailConfigFileNetCDF DATA temperature_grid.nc CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
   endif()
@@ -897,7 +897,7 @@ if(F3D_PLUGIN_BUILD_OCCT)
       f3d_test(NAME TestInvalidXBF DATA invalid.xbf ARGS --verbose --load-plugins=occt REGEXP "failed to load scene" NO_BASELINE)
     endif()
 
-    if (NOT F3D_MACOS_BUNDLE)
+    if (NOT F3D_MACOS_BUNDLE AND VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250903)
       file(COPY "${F3D_SOURCE_DIR}/plugins/occt/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
       f3d_test(NAME TestDefaultConfigFileOCCT DATA f3d.stp CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
 
@@ -927,7 +927,7 @@ if(F3D_PLUGIN_BUILD_USD)
   f3d_test(NAME TestUSDZMaterialsInterationReload DATA McUsd.usdz ARGS --load-plugins=usd INTERACTION NO_BASELINE) # Up
   f3d_test(NAME TestUSDZMemEXR DATA small.usdz ARGS --load-plugins=usd)
 
-  if(NOT F3D_MACOS_BUNDLE)
+  if(NOT F3D_MACOS_BUNDLE AND VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250903)
     file(COPY "${F3D_SOURCE_DIR}/plugins/usd/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     f3d_test(NAME TestDefaultConfigFileUSD DATA suzanne.usd CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
 
@@ -946,7 +946,7 @@ if(F3D_PLUGIN_BUILD_VDB)
   f3d_test(NAME TestVDBDefinesDownsamplingFactorOutOfRangeError DATA icosahedron.vdb ARGS --load-plugins=vdb -DVDB.downsampling_factor=${_outOfRangeDoubleStr} --verbose REGEXP "VDB.downsampling_factor out of range" NO_BASELINE)
   f3d_test(NAME TestVDBCommandScriptReaderOptions DATA icosahedron.vdb ARGS --load-plugins=vdb --volume --volume-inverse SCRIPT TestVDBCommandScriptReaderOptions.txt) # set_reader_option VDB.downsampling_factor 0.2; reload_current_file_group
 
-  if(NOT F3D_MACOS_BUNDLE)
+  if(NOT F3D_MACOS_BUNDLE AND VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250903)
     file(COPY "${F3D_SOURCE_DIR}/plugins/vdb/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     f3d_test(NAME TestDefaultConfigFileVDB DATA icosahedron.vdb CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
 
