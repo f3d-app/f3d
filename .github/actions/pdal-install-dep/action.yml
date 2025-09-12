@@ -23,6 +23,9 @@ inputs:
   curl_version:
     description: "Version of curl to build against"
     required: true
+  proj_version:
+    description: "Version of proj to build against"
+    required: true
 
 runs:
   using: "composite"
@@ -36,6 +39,7 @@ runs:
         [[ "${{ inputs.sqlite_version }}" ]] || { echo "sqlite_version input is empty" ; exit 1; }
         [[ "${{ inputs.curl_version }}" ]] || { echo "curl_version input is empty" ; exit 1; }
         [[ "${{ inputs.xercesc_version }}" ]] || { echo "xercesc_version input is empty" ; exit 1; }
+        [[ "${{ inputs.proj_version }}" ]] || { echo "proj_version input is empty" ; exit 1; }
 
     - name: Cache PDAL
       id: cache-pdal
