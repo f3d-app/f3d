@@ -124,6 +124,7 @@ runs:
         proj_version: ${{inputs.proj_version}}
 
     - name: Install libtiff
+      if: runner.os == 'Linux'
       uses: ./.actions/libtiff-install-dep
       with:
         cpu: ${{inputs.cpu}}
