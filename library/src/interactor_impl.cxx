@@ -1423,6 +1423,43 @@ interactor& interactor_impl::initBindings()
 }
 
 //----------------------------------------------------------------------------
+std::string interactor_impl::getBindsDocString(
+  const std::vector<interaction_bind_t>& requestedBinds) const
+{
+
+  auto modifierToString = [](interaction_bind_t::ModifierKeys mod) -> std::string
+  {
+    switch (mod)
+    {
+      case interaction_bind_t::ModifierKeys::CTRL:        return "Ctrl+";
+      case interaction_bind_t::ModifierKeys::SHIFT:       return "Shift+";
+      case interaction_bind_t::ModifierKeys::CTRL_SHIFT:  return "Ctrl+Shift+";
+      case interaction_bind_t::ModifierKeys::ANY:         return ""; // or "Any+"
+      case interaction_bind_t::ModifierKeys::NONE:        return "";
+    }
+    return "";
+  };
+
+
+  std::stringstream info;
+
+  // Iterate only over requested binds
+  for (const auto& bind : requestedBinds)
+  {
+    auto it = this->Internals->Bindings.find(bind);
+    if (it != this->Internals->Bindings.end())
+    {
+      const auto& bindData = it->first;
+      const auto& docPair = it->second.DocumentationCallback();
+      std::string modStr = modifierToString(bindData.mod);
+      info << docPair.first << ": " << modStr << bindData.inter << "\n";
+    }
+  }
+
+  return info.str();
+}
+
+//----------------------------------------------------------------------------
 interactor& interactor_impl::addBinding(const interaction_bind_t& bind,
   std::vector<std::string> commands, std::string group,
   documentation_callback_t documentationCallback, BindingType type)

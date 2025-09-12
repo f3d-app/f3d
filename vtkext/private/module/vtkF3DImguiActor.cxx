@@ -32,6 +32,9 @@
 #include <sstream>
 #include <string>
 
+#include <sstream>
+
+
 constexpr float LOGO_DISPLAY_WIDTH = 256.f;
 constexpr float LOGO_DISPLAY_HEIGHT = 256.f;
 constexpr float DROPZONE_LOGO_TEXT_PADDING = 20.f;
@@ -42,7 +45,7 @@ static std::vector<std::string> splitBindings(const std::string& s, char delim)
   std::stringstream ss(s);
   std::string item;
 
-  while (std::getline(ss, item, delim))
+  while (getline(ss, item, delim))
   {
     result.push_back(item);
   }
@@ -445,24 +448,125 @@ void vtkF3DImguiActor::RenderDropZone()
 
     ImGui::End();
 
-    ImVec2 dropTextSize = ImGui::CalcTextSize(this->DropText.c_str());
+    // If DropText is provided, render it and skip binds
+    if (!this->DropText.empty())
+    {
+      ImVec2 textSize = ImGui::CalcTextSize(this->DropText.c_str());
+      ImVec2 textPos(viewport->GetWorkCenter().x - textSize.x * 0.5f,
+                     viewport->GetWorkCenter().y + LOGO_DISPLAY_HEIGHT * 0.5f +
+                       DROPZONE_LOGO_TEXT_PADDING);
+      draw_list->AddText(textPos, ImColor(F3DImguiStyle::GetTextColor()), this->DropText.c_str());
+      return;
+    }
 
-    ImGui::Begin("DropZoneText", nullptr, flags);
+    // Otherwise: render parsed binds
+    auto parsedInfo = this->DropInfo;
 
-    // Position the text below the logo it is rendered
+    // Calculate max width for each column before rendering
+    float maxDescTextWidth = 0.0f;
+    float maxBindingsTextWidth = 0.0f;
+    const float spacingX = ImGui::GetStyle().ItemSpacing.x;
+    const float plusWidth = ImGui::CalcTextSize("+").x;
+    const float orWidth = ImGui::CalcTextSize("or").x;
+
+
+    for (const auto& item : parsedInfo)
+    {
+      ImVec2 descSize = ImGui::CalcTextSize(item.description.c_str());
+      maxDescTextWidth = std::max(maxDescTextWidth, descSize.x);
+
+      // Bindings column width (sum of keys + '+' between keys, 'or' between groups)
+      float totalBindingsWidth = 0.0f;
+      for (const auto& group : item.bindings)
+      {
+        // sum of all keys in group
+        for (const auto& key : group)
+        {
+          totalBindingsWidth += ImGui::CalcTextSize(key.c_str()).x +
+                                0.5f * DROPZONE_LOGO_TEXT_PADDING;
+        }
+
+        // add '+' separators between keys
+        if (group.size() > 1)
+        {
+          totalBindingsWidth += (group.size() - 1) * (spacingX + plusWidth + spacingX);
+        }
+      }
+
+      // add 'or' separators between groups
+      if (item.bindings.size() > 1)
+      {
+        totalBindingsWidth += (item.bindings.size() - 1) * (spacingX + orWidth + spacingX);
+      }
+      maxBindingsTextWidth = std::max(maxBindingsTextWidth, totalBindingsWidth);
+    }
+
+    ImVec4 descTextColor = F3DImguiStyle::GetTextColor();
+    ImVec4 bindingRectColor = F3DImguiStyle::GetMidColor();
+    ImVec4 bindingTextColor = F3DImguiStyle::GetTextColor();
+
+    float tableWidth = maxDescTextWidth + maxBindingsTextWidth + DROPZONE_LOGO_TEXT_PADDING +
+                      ImGui::GetStyle().ItemSpacing.x;
+
+    // Position table below logo if needed
+    ImVec2 startPos;
     if (this->DropZoneLogoVisible && this->Pimpl->LogoTexture)
     {
-      ImGui::SetCursorPos(ImVec2(viewport->GetWorkCenter().x - 0.5f * dropTextSize.x,
-        viewport->GetWorkCenter().y - 0.5f * dropTextSize.y + logoDisplayHeight / 2 +
-          DROPZONE_LOGO_TEXT_PADDING));
+      startPos = ImVec2(viewport->GetWorkCenter().x - tableWidth * 0.5f,
+                        viewport->GetWorkCenter().y + LOGO_DISPLAY_HEIGHT / 2 +
+                          DROPZONE_LOGO_TEXT_PADDING);
     }
     else
     {
-      ImGui::SetCursorPos(ImVec2(viewport->GetWorkCenter().x - 0.5f * dropTextSize.x,
-        viewport->GetWorkCenter().y - 0.5f * dropTextSize.y));
+      startPos = ImVec2(viewport->GetWorkCenter().x - tableWidth * 0.5f,
+                        viewport->GetWorkCenter().y);
     }
-    ImGui::TextUnformatted(this->DropText.c_str());
-    ImGui::End();
+
+    ImVec2 cursor = startPos;
+
+    for (const auto& item : parsedInfo)
+    {
+      draw_list->AddText(cursor, ImColor(descTextColor), item.description.c_str());
+      float rowHeight = ImGui::GetTextLineHeightWithSpacing() + 0.5f * DROPZONE_LOGO_TEXT_PADDING;
+
+      float xBindings = cursor.x + maxDescTextWidth + DROPZONE_LOGO_TEXT_PADDING;
+      ImVec2 bindingPos(xBindings, cursor.y);
+
+      for (size_t g = 0; g < item.bindings.size(); ++g)
+      {
+        const auto& group = item.bindings[g];
+        for (size_t k = 0; k < group.size(); ++k)
+        {
+          const std::string& key = group[k];
+          ImVec2 textSize = ImGui::CalcTextSize(key.c_str());
+          ImVec2 padding(5.0f, 2.0f);
+
+          ImVec2 rectMin = ImVec2(bindingPos.x, bindingPos.y);
+          ImVec2 rectMax = ImVec2(rectMin.x + textSize.x + padding.x * 2,
+                                  rectMin.y + textSize.y + padding.y * 2);
+
+          draw_list->AddRectFilled(rectMin, rectMax, ImColor(bindingRectColor), 4.0f);
+          draw_list->AddText(ImVec2(rectMin.x + padding.x, rectMin.y + padding.y),
+                              ImColor(bindingTextColor), key.c_str());
+
+          bindingPos.x = rectMax.x + ImGui::GetStyle().ItemSpacing.x;
+
+          if (k < group.size() - 1)
+          {
+            draw_list->AddText(bindingPos, ImColor(descTextColor), "+");
+            bindingPos.x += ImGui::CalcTextSize("+").x + ImGui::GetStyle().ItemSpacing.x;
+          }
+        }
+
+        if (g < item.bindings.size() - 1)
+        {
+          draw_list->AddText(bindingPos, ImColor(descTextColor), "or");
+          bindingPos.x += ImGui::CalcTextSize("or").x + ImGui::GetStyle().ItemSpacing.x;
+        }
+      }
+
+      cursor.y += rowHeight;
+    }
   }
 }
 

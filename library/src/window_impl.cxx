@@ -45,6 +45,59 @@
 
 #include <sstream>
 
+static std::vector<std::string> splitBindings(const std::string& s, char delim)
+{
+  std::vector<std::string> result;
+  std::stringstream ss(s);
+  std::string item;
+
+  while (getline(ss, item, delim))
+  {
+    result.push_back(item);
+  }
+
+  return result;
+}
+
+static std::vector<DropZoneInfo> parseDropZoneInfo(const std::string& input)
+{
+  std::map<std::string, std::vector<std::vector<std::string>>> infoMap;
+  std::stringstream ss(input);
+  std::string line;
+
+  auto trim = [](std::string& str) {
+    size_t start = str.find_first_not_of(" \t");
+    size_t end = str.find_last_not_of(" \t");
+    if (start == std::string::npos) { str.clear(); return; }
+    str = str.substr(start, end - start + 1);
+  };
+
+  while (std::getline(ss, line))
+  {
+    if (line.empty()) continue;
+
+    size_t colonPos = line.find(':');
+    if (colonPos == std::string::npos) continue;
+
+    std::string desc = line.substr(0, colonPos);
+    std::string bindingPart = line.substr(colonPos + 1);
+
+    trim(desc);
+    trim(bindingPart);
+
+    auto keys = splitBindings(bindingPart, '+');
+    if (!keys.empty())
+      infoMap[desc].push_back(keys);
+  }
+
+  std::vector<DropZoneInfo> parsedInfo;
+  for (auto& [desc, groups] : infoMap)
+  {
+    parsedInfo.push_back({desc, groups});
+  }
+  return parsedInfo;
+}
+
 namespace fs = std::filesystem;
 
 namespace f3d::detail
@@ -391,6 +444,17 @@ void window_impl::UpdateDynamicOptions()
     renderer->ShowAxis(opt.ui.axis);
     renderer->SetUseTrackball(opt.interactor.trackball);
     renderer->SetInvertZoom(opt.interactor.invert_zoom);
+
+    std::vector<interaction_bind_t> custom_binds;
+    std::string bindsStr = opt.ui.drop_zone.custom_binds;
+
+    for (auto& token : utils::tokenize(bindsStr)) {
+        if (!token.empty()) {
+            custom_binds.push_back(interaction_bind_t::parse(token));
+        }
+    }
+
+    renderer->SetDropZoneBindsInfo(parseDropZoneInfo(this->Internals->Interactor->getBindsDocString(custom_binds)));
   }
 
   // XXX: model.point_sprites.type only has an effect on geometry scene
@@ -412,25 +476,27 @@ void window_impl::UpdateDynamicOptions()
   renderer->ShowConsole(opt.ui.console);
   renderer->ShowMinimalConsole(opt.ui.minimal_console);
   renderer->ShowDropZone(opt.ui.drop_zone.enable);
-  renderer->SetDropZoneInfo(opt.ui.drop_zone.info);
   renderer->ShowDropZoneLogo(opt.ui.drop_zone.show_logo);
   // F3D_DEPRECATED
   // Remove this in the next major release
   F3D_SILENT_WARNING_PUSH()
   F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
+
   if (!opt.ui.dropzone_info.empty())
   {
-    log::warn("'ui.dropzone_info' is deprecated. Please Use 'ui.drop_zone.info' instead.");
+    log::warn("'ui.dropzone_info' is deprecated. Please Use 'ui.drop_zone.custom_binds' instead.");
     renderer->SetDropZoneInfo(opt.ui.dropzone_info);
   }
+  else if (!opt.ui.drop_zone.info.empty())
+  {
+    log::warn("'ui.drop_zone.info' is deprecated. Please Use 'ui.drop_zone.custom_binds' instead.");
+    renderer->SetDropZoneInfo(opt.ui.drop_zone.info);
+  }
+
   if (opt.ui.dropzone)
   {
     log::warn("'ui.dropzone' is deprecated. Please Use 'ui.drop_zone.enable' instead.");
     renderer->ShowDropZone(opt.ui.dropzone);
-    if (!opt.ui.dropzone_info.empty())
-    {
-      renderer->SetDropZoneInfo(opt.ui.dropzone_info);
-    }
     renderer->ShowDropZoneLogo(opt.ui.dropzone);
   }
   F3D_SILENT_WARNING_POP()
