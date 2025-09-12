@@ -620,6 +620,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250903)
   f3d_test(NAME TestHDRIAmbientOnly DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-ambient LONG_TIMEOUT)
   f3d_test(NAME TestHDRIAmbientOnlyNoBackground DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr --hdri-ambient --no-background LONG_TIMEOUT)
   f3d_test(NAME TestHDRINone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr LONG_TIMEOUT)
+  f3d_test(NAME TestHDRIToneMappingSSAA DATA suzanne.ply HDRI palermo_park_1k.hdr TONE_MAPPING ARGS -t -a --anti-aliasing-mode=ssaa)
 
   f3d_test(NAME TestInteractionHDRICache DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION DEPENDS TestHDRI) #FFFFJJJJ
   f3d_test(NAME TestInteractionHDRIRemoveSkybox DATA suzanne.ply HDRI palermo_park_1k.hdr INTERACTION)
@@ -645,11 +646,6 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250903)
       f3d_test(NAME TestInteractionHDRIRaytracingFullFromNone DATA suzanne.ply ARGS --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr -rd --raytracing-samples=4 INTERACTION LONG_TIMEOUT)
     endif()
   endif()
-endif()
-
-# SSAA with HDR framebuffer support in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12026
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250329)
-  f3d_test(NAME TestHDRIToneMappingSSAA DATA suzanne.ply HDRI palermo_park_1k.hdr TONE_MAPPING ARGS -t -a --anti-aliasing-mode=ssaa)
 endif()
 
 # Zoom factor was introduced in https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9958
