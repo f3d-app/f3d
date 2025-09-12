@@ -477,23 +477,26 @@ void vtkF3DImguiActor::RenderDropZone()
 
       // Bindings column width (sum of keys + '+' between keys, 'or' between groups)
       float totalBindingsWidth = 0.0f;
-      for (size_t g = 0; g < item.bindings.size(); ++g) // groups
+      for (const auto& group : item.bindings)
       {
-        const auto& group = item.bindings[g];
-        for (size_t k = 0; k < group.size(); ++k) // keys
+        // sum of all keys in group
+        for (const auto& key : group)
         {
-          totalBindingsWidth += ImGui::CalcTextSize(group[k].c_str()).x +
+          totalBindingsWidth += ImGui::CalcTextSize(key.c_str()).x +
                                 0.5f * DROPZONE_LOGO_TEXT_PADDING;
-          if (k < group.size() - 1)
-          {
-            totalBindingsWidth += spacingX + plusWidth + spacingX;
-          }
         }
 
-        if (g < item.bindings.size() - 1)
+        // add '+' separators between keys
+        if (group.size() > 1)
         {
-          totalBindingsWidth += spacingX + orWidth + spacingX;
+          totalBindingsWidth += (group.size() - 1) * (spacingX + plusWidth + spacingX);
         }
+      }
+
+      // add 'or' separators between groups
+      if (item.bindings.size() > 1)
+      {
+        totalBindingsWidth += (item.bindings.size() - 1) * (spacingX + orWidth + spacingX);
       }
       maxBindingsTextWidth = std::max(maxBindingsTextWidth, totalBindingsWidth);
     }
