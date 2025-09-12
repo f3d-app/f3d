@@ -448,8 +448,6 @@ void vtkF3DImguiActor::RenderDropZone()
 
     ImGui::End();
 
-    ImDrawList* draw_list2 = ImGui::GetBackgroundDrawList();
-
     // If DropText is provided, render it and skip binds
     if (!this->DropText.empty())
     {
@@ -457,7 +455,7 @@ void vtkF3DImguiActor::RenderDropZone()
       ImVec2 textPos(viewport->GetWorkCenter().x - textSize.x * 0.5f,
                      viewport->GetWorkCenter().y + LOGO_DISPLAY_HEIGHT * 0.5f +
                        DROPZONE_LOGO_TEXT_PADDING);
-      draw_list2->AddText(textPos, ImColor(F3DImguiStyle::GetTextColor()), this->DropText.c_str());
+      draw_list->AddText(textPos, ImColor(F3DImguiStyle::GetTextColor()), this->DropText.c_str());
       return;
     }
 
@@ -467,6 +465,10 @@ void vtkF3DImguiActor::RenderDropZone()
     // Calculate max width for each column before rendering
     float maxDescTextWidth = 0.0f;
     float maxBindingsTextWidth = 0.0f;
+    const float spacingX = ImGui::GetStyle().ItemSpacing.x;
+    const float plusWidth = ImGui::CalcTextSize("+").x;
+    const float orWidth = ImGui::CalcTextSize("or").x;
+
 
     for (const auto& item : parsedInfo)
     {
@@ -484,23 +486,19 @@ void vtkF3DImguiActor::RenderDropZone()
                                 0.5f * DROPZONE_LOGO_TEXT_PADDING;
           if (k < group.size() - 1)
           {
-            totalBindingsWidth += ImGui::GetStyle().ItemSpacing.x +
-                                  ImGui::CalcTextSize("+").x +
-                                  ImGui::GetStyle().ItemSpacing.x;
+            totalBindingsWidth += spacingX + plusWidth + spacingX;
           }
         }
 
         if (g < item.bindings.size() - 1)
         {
-          totalBindingsWidth += ImGui::GetStyle().ItemSpacing.x +
-                                ImGui::CalcTextSize("or").x +
-                                ImGui::GetStyle().ItemSpacing.x;
+          totalBindingsWidth += spacingX + orWidth + spacingX;
         }
       }
       maxBindingsTextWidth = std::max(maxBindingsTextWidth, totalBindingsWidth);
     }
 
-    ImVec4 descTextColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+    ImVec4 descTextColor = F3DImguiStyle::GetTextColor();
     ImVec4 bindingRectColor = F3DImguiStyle::GetMidColor();
     ImVec4 bindingTextColor = F3DImguiStyle::GetTextColor();
 
@@ -525,7 +523,7 @@ void vtkF3DImguiActor::RenderDropZone()
 
     for (const auto& item : parsedInfo)
     {
-      draw_list2->AddText(cursor, ImColor(descTextColor), item.description.c_str());
+      draw_list->AddText(cursor, ImColor(descTextColor), item.description.c_str());
       float rowHeight = ImGui::GetTextLineHeightWithSpacing() + 0.5f * DROPZONE_LOGO_TEXT_PADDING;
 
       float xBindings = cursor.x + maxDescTextWidth + DROPZONE_LOGO_TEXT_PADDING;
@@ -544,22 +542,22 @@ void vtkF3DImguiActor::RenderDropZone()
           ImVec2 rectMax = ImVec2(rectMin.x + textSize.x + padding.x * 2,
                                   rectMin.y + textSize.y + padding.y * 2);
 
-          draw_list2->AddRectFilled(rectMin, rectMax, ImColor(bindingRectColor), 4.0f);
-          draw_list2->AddText(ImVec2(rectMin.x + padding.x, rectMin.y + padding.y),
+          draw_list->AddRectFilled(rectMin, rectMax, ImColor(bindingRectColor), 4.0f);
+          draw_list->AddText(ImVec2(rectMin.x + padding.x, rectMin.y + padding.y),
                               ImColor(bindingTextColor), key.c_str());
 
           bindingPos.x = rectMax.x + ImGui::GetStyle().ItemSpacing.x;
 
           if (k < group.size() - 1)
           {
-            draw_list2->AddText(bindingPos, ImColor(descTextColor), "+");
+            draw_list->AddText(bindingPos, ImColor(descTextColor), "+");
             bindingPos.x += ImGui::CalcTextSize("+").x + ImGui::GetStyle().ItemSpacing.x;
           }
         }
 
         if (g < item.bindings.size() - 1)
         {
-          draw_list2->AddText(bindingPos, ImColor(descTextColor), "or");
+          draw_list->AddText(bindingPos, ImColor(descTextColor), "or");
           bindingPos.x += ImGui::CalcTextSize("or").x + ImGui::GetStyle().ItemSpacing.x;
         }
       }
