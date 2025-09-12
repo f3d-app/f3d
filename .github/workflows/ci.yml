@@ -345,6 +345,7 @@ jobs:
 
       - name: VTK dependency
         uses: ./source/.github/actions/vtk-install-dep
+        if: runner.os == 'Linux'
         with:
           vtk_version: ${{matrix.vtk_version}}
           cpu: ${{matrix.cpu}}
