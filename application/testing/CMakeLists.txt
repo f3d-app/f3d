@@ -449,32 +449,35 @@ if(BUILD_SHARED_LIBS)
   f3d_test(NAME TestPluginNoInit ARGS --verbose --load-plugins=${_dirname}/${CMAKE_SHARED_LIBRARY_PREFIX}f3d${CMAKE_SHARED_LIBRARY_SUFFIX} NO_BASELINE REGEXP "Cannot find init_plugin symbol in library")
 endif()
 
-if(NOT F3D_MACOS_BUNDLE AND VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250903)
-  # On linux, we can easily test the config file search from the binary code by positioning a config file in the binary dir
-  configure_file("${F3D_SOURCE_DIR}/testing/configs/complex.json" "${CMAKE_BINARY_DIR}/share/f3d/configs/complex_build.json" COPYONLY)
-  f3d_test(NAME TestConfigFileBuild DATA dragon.vtu CONFIG complex_build.json UI)
-  f3d_test(NAME TestConfigStemBuild DATA dragon.vtu CONFIG complex_build UI)
-  f3d_test(NAME TestConfigFileUpperCase DATA suzanne_upper.STL CONFIG complex_build)
-  f3d_test(NAME TestConfigFileMultiFileSTL DATA mb/recursive/mb_1_0.vtp suzanne.stl ARGS --multi-file-mode=all CONFIG complex_build)
-  f3d_test(NAME TestConfigFileMultiFileVTP DATA mb/recursive/mb_1_0.vtp suzanne.stl mb/recursive/mb_2_0.vtp ARGS --multi-file-mode=all CONFIG complex_build UI)
-
+if(NOT F3D_MACOS_BUNDLE)
   file(COPY "${F3D_SOURCE_DIR}/resources/configs/config.d/" "${F3D_SOURCE_DIR}/plugins/native/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
-  f3d_test(NAME TestDefaultConfigFileVTU DATA dragon.vtu CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
-  f3d_test(NAME TestDefaultConfigFileVTI DATA vase_4comp.vti CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
-  f3d_test(NAME TestDefaultConfigFileSTL DATA suzanne.stl CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
-  f3d_test(NAME TestDefaultConfigFileTIFF DATA f3d.tif CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI) # Note: This tests config file order as camera_direction is set in different files
-  f3d_test(NAME TestDefaultConfigFilePLY DATA suzanneRGBA.ply CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
-  f3d_test(NAME TestDefaultConfigFileQuakeMDL DATA zombie.mdl CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
-  f3d_test(NAME TestDefaultConfigFileAndCommand DATA suzanne.stl ARGS --up=-Y --camera-direction=-1,0.5,-1 CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
-  f3d_test(NAME TestDefaultConfigTranslucent DATA red_translucent_monkey.gltf CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
-  f3d_test(NAME TestDefaultConfigRemoveEmptyFileGroups DATA invalid.vtp cow.vtp CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
-
   file(COPY "${F3D_SOURCE_DIR}/resources/configs/thumbnail.d/" "${F3D_SOURCE_DIR}/plugins/native/configs/thumbnail.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/thumbnail_build.d")
-  f3d_test(NAME TestThumbnailConfigFileVTU DATA dragon.vtu CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
-  f3d_test(NAME TestThumbnailConfigFileVTI DATA vase_4comp.vti CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
-  f3d_test(NAME TestThumbnailConfigFileSTL DATA suzanne.stl CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
-  f3d_test(NAME TestThumbnailConfigFilePLY DATA suzanneRGBA.ply CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
-  f3d_test(NAME TestThumbnailConfigFileQuakeMDL DATA zombie.mdl CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
+
+  if (VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250903)
+    # On linux, we can easily test the config file search from the binary code by positioning a config file in the binary dir
+    configure_file("${F3D_SOURCE_DIR}/testing/configs/complex.json" "${CMAKE_BINARY_DIR}/share/f3d/configs/complex_build.json" COPYONLY)
+    f3d_test(NAME TestConfigFileBuild DATA dragon.vtu CONFIG complex_build.json UI)
+    f3d_test(NAME TestConfigStemBuild DATA dragon.vtu CONFIG complex_build UI)
+    f3d_test(NAME TestConfigFileUpperCase DATA suzanne_upper.STL CONFIG complex_build)
+    f3d_test(NAME TestConfigFileMultiFileSTL DATA mb/recursive/mb_1_0.vtp suzanne.stl ARGS --multi-file-mode=all CONFIG complex_build)
+    f3d_test(NAME TestConfigFileMultiFileVTP DATA mb/recursive/mb_1_0.vtp suzanne.stl mb/recursive/mb_2_0.vtp ARGS --multi-file-mode=all CONFIG complex_build UI)
+    
+    f3d_test(NAME TestDefaultConfigFileVTU DATA dragon.vtu CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
+    f3d_test(NAME TestDefaultConfigFileVTI DATA vase_4comp.vti CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
+    f3d_test(NAME TestDefaultConfigFileSTL DATA suzanne.stl CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
+    f3d_test(NAME TestDefaultConfigFileTIFF DATA f3d.tif CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI) # Note: This tests config file order as camera_direction is set in different files
+    f3d_test(NAME TestDefaultConfigFilePLY DATA suzanneRGBA.ply CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
+    f3d_test(NAME TestDefaultConfigFileQuakeMDL DATA zombie.mdl CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
+    f3d_test(NAME TestDefaultConfigFileAndCommand DATA suzanne.stl ARGS --up=-Y --camera-direction=-1,0.5,-1 CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
+    f3d_test(NAME TestDefaultConfigTranslucent DATA red_translucent_monkey.gltf CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
+    f3d_test(NAME TestDefaultConfigRemoveEmptyFileGroups DATA invalid.vtp cow.vtp CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
+    
+    f3d_test(NAME TestThumbnailConfigFileVTU DATA dragon.vtu CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
+    f3d_test(NAME TestThumbnailConfigFileVTI DATA vase_4comp.vti CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
+    f3d_test(NAME TestThumbnailConfigFileSTL DATA suzanne.stl CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
+    f3d_test(NAME TestThumbnailConfigFilePLY DATA suzanneRGBA.ply CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
+    f3d_test(NAME TestThumbnailConfigFileQuakeMDL DATA zombie.mdl CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
+  endif()
 endif()
 
 # color texture with opacity needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9467
