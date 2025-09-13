@@ -1,0 +1,81 @@
+name: "Install PROJ Dependency"
+description: "Install PROJ Dependency using cache when possible"
+inputs:
+  cpu:
+    description: "CPU architecture to build for"
+    required: false
+    default: "x86_64"
+  version:
+    description: "Version of PROJ to build"
+    required: true
+  sqlite_version:
+    description: "Version of sqlite3 to build against"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+        [[ "${{ inputs.sqlite_version }}" ]] || { echo "sqlite_version input is empty" ; exit 1; }
+
+    - name: Cache PROJ
+      id: cache-proj
+      uses: actions/cache/restore@v4
+      with:
+        path: ${{github.workspace}}/dependencies/proj_install
+        key: proj-${{inputs.version}}-${{inputs.sqlite_version}}-${{runner.os}}-${{inputs.cpu}}-0
+
+    - name: Checkout PROJ
+      if: steps.cache-proj.outputs.cache-hit != 'true'
+      uses: actions/checkout@v4
+      with:
+        repository: OSGeo/PROJ
+        path: "./dependencies/proj"
+        ref: ${{inputs.version}}
+
+    - name: Setup PROJ
+      if: steps.cache-proj.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir proj_build
+        mkdir proj_install
+
+    - name: Configure PROJ
+      if: steps.cache-proj.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/proj_build
+      shell: bash
+      run: >
+        cmake ../proj
+        -DBUILD_SHARED_LIBS=ON
+        -DBUILD_PROJSYNC=OFF
+        -DCMAKE_BUILD_TYPE=Release
+        -DENABLE_TIFF=OFF
+        -DENABLE_CURL=OFF
+        -DCMAKE_INSTALL_PREFIX=../proj_install
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
+        -DSQLite3_LIBRARY=$(pwd)/../sqlite/dependencies/sqlite_install/lib/libsqlite3.so
+        -DSQLite3_INCLUDE_DIR=$(pwd)/../sqlite/dependencies/sqlite_install/include
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+
+    - name: Build PROJ
+      if: steps.cache-proj.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/proj_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/proj_install
+      shell: bash
+      run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-proj.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-proj.outputs.cache-primary-key }}
+        path: dependencies/proj_install
