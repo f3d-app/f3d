@@ -479,7 +479,7 @@ void vtkF3DImguiActor::RenderFileName()
     winSize.y += 2.f * ImGui::GetStyle().WindowPadding.y;
 
     ::SetupNextWindow(ImVec2(viewport->GetWorkCenter().x - 0.5f * winSize.x, marginTop), winSize);
-    ImGui::SetNextWindowBgAlpha(0.9f);
+    ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
 
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
       ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
@@ -504,7 +504,7 @@ void vtkF3DImguiActor::RenderMetaData()
   ::SetupNextWindow(ImVec2(viewport->WorkSize.x - winSize.x - marginRight,
                       viewport->GetWorkCenter().y - 0.5f * winSize.y),
     winSize);
-  ImGui::SetNextWindowBgAlpha(0.9f);
+  ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
     ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
@@ -561,7 +561,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
 
   ::SetupNextWindow(ImVec2(margin, winTop),
     ImVec2(winWidth, std::min(viewport->WorkSize.y - (2 * margin), textHeight)));
-  ImGui::SetNextWindowBgAlpha(0.9f);
+  ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
     ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings |
@@ -668,7 +668,7 @@ void vtkF3DImguiActor::RenderFpsCounter()
     viewport->WorkSize.y - winSize.y - marginBottom);
 
   ::SetupNextWindow(position, winSize);
-  ImGui::SetNextWindowBgAlpha(0.9f);
+  ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
     ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
