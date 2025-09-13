@@ -211,6 +211,15 @@ angle_deg_t camera_impl::getYaw()
   //  return vtkMath::DegreesFromRadians(angleRad);
 }
 //----------------------------------------------------------------------------
+angle_deg_t camera_impl::getElevation()
+{
+  vector3_t up;
+  this->getViewUp(up);
+  vtkCamera* cam = this->GetVTKCamera();
+  return vtkMath::DegreesFromRadians(
+    vtkMath::AngleBetweenVectors(up.data(), cam->GetDirectionOfProjection()) - vtkMath::Pi() / 2);
+}
+//----------------------------------------------------------------------------
 camera& camera_impl::dolly(double val)
 {
   vtkCamera* cam = this->GetVTKCamera();
