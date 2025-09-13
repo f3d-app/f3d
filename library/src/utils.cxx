@@ -109,7 +109,6 @@ std::vector<std::string> utils::tokenize(std::string_view str)
         }
         if (!escaped && !quoted)
         {
-          // we need to check next char in order to ensure that we are a comment
           comment = true;
         }
         else
@@ -125,6 +124,7 @@ std::vector<std::string> utils::tokenize(std::string_view str)
         {
           color = true;
           comment = false;
+          // Add missing previous '#' in order to be able to parse the HEX Color
           accumulate('#');
         }
         else if ((comment || color) && !isValidHexToken)
