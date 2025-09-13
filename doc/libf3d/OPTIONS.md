@@ -119,6 +119,7 @@ See the [APIs](#APIs) details below for more info.
 |  ui.drop_zone.enable   |  bool<br/>false<br/>render   | Show a drop zone. Rendering is disabled when the viewport is smaller than 10×10 pixels.                           |           -            |
 |   ui.drop_zone.info    |   string<br/>-<br/>render    | Content of the drop zone text to display.                                                                         |           -            |
 | ui.drop_zone.show_logo |  bool<br/>false<br/>render   | Display the logo. Needs ui.drop_zone.enable to be true.                                                           |           -            |
+| ui.backdrop.opacity | double<br/>0.95<br/>render  | Set the opacity of the backdrop behind the UI elements. Value is between 0.0 (fully transparent) and 1.0 (fully opaque). |       \-\-backdrop-opacity        |
 
 # APIs
 
