@@ -29,6 +29,7 @@ std::vector<std::string> utils::tokenize(std::string_view str)
 {
   std::vector<std::string> tokens;
   std::string token;
+  const std::string colorHexTokens = "0123456789abcdefABCDEF";
   const auto accumulate = [&](const char& c) { token.push_back(c); };
   const auto emit = [&]()
   {
@@ -40,20 +41,34 @@ std::vector<std::string> utils::tokenize(std::string_view str)
   };
   bool escaped = false;
   char quoted = '\0';
+  bool color = false;
+  bool comment = false;
   bool commented = false;
   for (char c : str)
   {
     switch (c)
     {
       case '\\':
-        if (escaped)
+        if (comment || color)
+        {
+          commented = true;
+          token.clear();
+          break;
+        }
+        else if (escaped)
         {
           accumulate(c);
         }
         escaped = !escaped;
         break;
       case ' ':
-        if (!escaped && !quoted)
+        if (comment || color)
+        {
+          commented = true;
+          token.clear();
+          break;
+        }
+        else if (!escaped && !quoted)
         {
           emit();
         }
@@ -66,7 +81,13 @@ std::vector<std::string> utils::tokenize(std::string_view str)
       case '"':
       case '\'':
       case '`':
-        if (!escaped && quoted == c)
+        if (comment || color)
+        {
+          commented = true;
+          token.clear();
+          break;
+        }
+        else if (!escaped && quoted == c)
         {
           emit();
           quoted = '\0';
@@ -82,9 +103,14 @@ std::vector<std::string> utils::tokenize(std::string_view str)
         escaped = false;
         break;
       case '#':
-        if (!escaped && !quoted)
+        if (comment)
         {
           commented = true;
+        }
+        if (!escaped && !quoted)
+        {
+          // we need to check next char in order to ensure that we are a comment
+          comment = true;
         }
         else
         {
@@ -93,9 +119,24 @@ std::vector<std::string> utils::tokenize(std::string_view str)
         escaped = false;
         break;
       default:
+      {
+        bool isValidHexToken = colorHexTokens.find(c) != std::string::npos;
+        if (comment && isValidHexToken)
+        {
+          color = true;
+          comment = false;
+          accumulate('#');
+        }
+        else if ((comment || color) && !isValidHexToken)
+        {
+          commented = true;
+          break;
+        }
+
         accumulate(c);
         escaped = false;
         break;
+      }
     }
 
     if (commented)
