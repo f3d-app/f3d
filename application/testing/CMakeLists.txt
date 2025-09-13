@@ -310,9 +310,9 @@ f3d_test(NAME TestAnimationInputChangeColoring DATA v_rock2.mdl ARGS --scalar-co
 f3d_test(NAME TestAnimationUserMatrixPointSprites DATA BoxAnimated.gltf ARGS --point-sprites --point-sprites-size=50 --animation-time=2)
 f3d_test(NAME TestCollinearVectors DATA dragon.vtu ARGS --up=0,1,0 --camera-direction=0,2,0)
 f3d_test(NAME TestAnimationInputChangePointSprites DATA v_rock2.mdl ARGS --point-sprites --point-sprites-size=50 --animation-time=0.01 --animation-indices=1)
-f3d_test(NAME TestBackdropOpacity1 DATA suzanne.ply ARGS -n --backdrop-opacity=1.0)
-f3d_test(NAME TestBackdropOpacity0 DATA suzanne.ply ARGS -n --backdrop-opacity=0.0)
-f3d_test(NAME TestBackdropOpacity05 DATA suzanne.ply ARGS -n --backdrop-opacity=0.5)
+f3d_test(NAME TestBackdropOpacity1 DATA suzanne.ply ARGS -n --backdrop-opacity=1.0 UI)
+f3d_test(NAME TestBackdropOpacity0 DATA suzanne.ply ARGS -n --backdrop-opacity=0.0 UI)
+f3d_test(NAME TestBackdropOpacity05 DATA suzanne.ply ARGS -n --backdrop-opacity=0.5 UI)
 
 # Color map files testing
 f3d_test(NAME TestColorMapFileFullPath DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis8.png --scalar-coloring --coloring-component=1)
