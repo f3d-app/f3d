@@ -89,6 +89,7 @@ public:
   void SetGridUnitSquare(const std::optional<double>& unitSquare);
   void SetGridSubdivisions(int subdivisions);
   void SetGridColor(const std::vector<double>& color);
+  void SetBackdropOpacity(const double backdropOpacity);
   ///@}
 
   ///@{
@@ -604,6 +605,8 @@ private:
 
   std::optional<fs::path> FontFile;
   double FontScale = 1.0;
+
+  double BackdropOpacity = 0.95;
 
   double LightIntensity = 1.0;
   std::map<vtkLight*, double> OriginalLightIntensities;

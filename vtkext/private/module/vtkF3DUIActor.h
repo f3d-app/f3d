@@ -145,6 +145,11 @@ public:
   int RenderOverlay(vtkViewport* vp) override;
 
   /**
+   * Set the backdrop opacity
+   */
+  void SetBackdropOpacity(const double backdropOpacity);
+
+  /**
    * Set the delta time (time between UI frames) in seconds
    */
   virtual void SetDeltaTime(double)
@@ -244,6 +249,8 @@ protected:
 
   std::string FontFile = "";
   double FontScale = 1.0;
+
+  double BackdropOpacity = 0.95;
 
 private:
   vtkF3DUIActor(const vtkF3DUIActor&) = delete;
