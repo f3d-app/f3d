@@ -183,6 +183,34 @@ void camera_impl::getState(camera_state_t& state)
   state.viewAngle = cam->GetViewAngle();
 }
 //----------------------------------------------------------------------------
+angle_deg_t camera_impl::getYaw()
+{
+  point3_t pos, foc;
+  vector3_t dir, up, right;
+
+  this->getPosition(pos);
+  this->getFocalPoint(foc);
+  this->getViewUp(up);
+
+  // Forward vector (focal - position)
+  vtkMath::Subtract(foc, pos, dir);
+  vtkMath::Normalize(dir.data());
+  vtkMath::Normalize(up.data());
+
+  // Project forward onto plane perpendicular to up
+  double dot = vtkMath::Dot(dir.data(), up.data());
+  vector3_t projected;
+  for (int i = 0; i < 3; ++i)
+  {
+    projected[i] = dir[i] - dot * up[i];
+  }
+  vtkMath::Normalize(projected.data());
+
+  // here I should calculate the angle between the right vector and the projected one.
+  //  convert it to degrees and return it
+  //  return vtkMath::DegreesFromRadians(angleRad);
+}
+//----------------------------------------------------------------------------
 camera& camera_impl::dolly(double val)
 {
   vtkCamera* cam = this->GetVTKCamera();
