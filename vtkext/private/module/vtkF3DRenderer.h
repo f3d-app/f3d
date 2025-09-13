@@ -85,7 +85,7 @@ public:
   void SetLightIntensity(const double intensity);
   void SetFilenameInfo(const std::string& info);
   void SetDropZoneInfo(const std::string& info);
-  void SetDropZoneBindsInfo(const std::vector<DropZoneInfo>& info);
+  void SetDropZoneBindsInfo(const std::map<std::string, std::vector<std::string>>& aggregatedBinds);
   void SetGridAbsolute(bool absolute);
   void SetGridUnitSquare(const std::optional<double>& unitSquare);
   void SetGridSubdivisions(int subdivisions);

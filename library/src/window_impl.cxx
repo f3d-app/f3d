@@ -45,29 +45,15 @@
 
 #include <sstream>
 
-static std::vector<std::string> splitBindings(const std::string& s, char delim)
+static std::map<std::string, std::vector<std::string>>aggregateBindings(const std::string& input)
 {
-  std::vector<std::string> result;
-  std::stringstream ss(s);
-  std::string item;
-
-  while (getline(ss, item, delim))
-  {
-    result.push_back(item);
-  }
-
-  return result;
-}
-
-static std::vector<DropZoneInfo> parseDropZoneInfo(const std::string& input)
-{
-  std::map<std::string, std::vector<std::vector<std::string>>> infoMap;
+  std::map<std::string, std::vector<std::string>> infoMap;
   std::stringstream ss(input);
   std::string line;
 
   auto trim = [](std::string& str) {
     size_t start = str.find_first_not_of(" \t");
-    size_t end = str.find_last_not_of(" \t");
+    size_t end   = str.find_last_not_of(" \t");
     if (start == std::string::npos) { str.clear(); return; }
     str = str.substr(start, end - start + 1);
   };
@@ -79,23 +65,20 @@ static std::vector<DropZoneInfo> parseDropZoneInfo(const std::string& input)
     size_t colonPos = line.find(':');
     if (colonPos == std::string::npos) continue;
 
-    std::string desc = line.substr(0, colonPos);
+    std::string desc        = line.substr(0, colonPos);
     std::string bindingPart = line.substr(colonPos + 1);
 
     trim(desc);
     trim(bindingPart);
 
-    auto keys = splitBindings(bindingPart, '+');
-    if (!keys.empty())
-      infoMap[desc].push_back(keys);
+    if (!bindingPart.empty())
+    {
+      // Store raw binding string, don't split yet
+      infoMap[desc].push_back(bindingPart);
+    }
   }
 
-  std::vector<DropZoneInfo> parsedInfo;
-  for (auto& [desc, groups] : infoMap)
-  {
-    parsedInfo.push_back({desc, groups});
-  }
-  return parsedInfo;
+  return infoMap;
 }
 
 namespace fs = std::filesystem;
@@ -453,8 +436,8 @@ void window_impl::UpdateDynamicOptions()
             custom_binds.push_back(interaction_bind_t::parse(token));
         }
     }
-
-    renderer->SetDropZoneBindsInfo(parseDropZoneInfo(this->Internals->Interactor->getBindsDocString(custom_binds)));
+    auto aggregatedBinds = aggregateBindings(this->Internals->Interactor->getBindsDocString(custom_binds));
+    renderer->SetDropZoneBindsInfo(aggregatedBinds);
   }
 
   // XXX: model.point_sprites.type only has an effect on geometry scene

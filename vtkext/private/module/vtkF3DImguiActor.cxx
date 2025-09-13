@@ -53,6 +53,29 @@ static std::vector<std::string> splitBindings(const std::string& s, char delim)
   return result;
 }
 
+static std::vector<DropZoneInfo>
+toDropZoneInfo(const std::map<std::string, std::vector<std::string>>& aggregatedBinds)
+{
+  std::vector<DropZoneInfo> parsedInfo;
+
+  for (auto& [desc, binds] : aggregatedBinds)
+  {
+    std::vector<std::vector<std::string>> groups;
+
+    for (auto& bind : binds)
+    {
+      auto keys = splitBindings(bind, '+');
+      if (!keys.empty())
+        groups.push_back(keys);
+    }
+
+    parsedInfo.push_back({desc, groups});
+  }
+
+  return parsedInfo;
+}
+
+
 struct vtkF3DImguiActor::Internals
 {
 
@@ -460,7 +483,7 @@ void vtkF3DImguiActor::RenderDropZone()
     }
 
     // Otherwise: render parsed binds
-    auto parsedInfo = this->DropInfo;
+    auto parsedInfo = toDropZoneInfo(this->DropInfo);
 
     // Calculate max width for each column before rendering
     float maxDescTextWidth = 0.0f;

@@ -66,7 +66,7 @@ public:
    * Empty by default
    */
   void SetDropText(const std::string& info);
-  void SetDropInfo(const std::vector<DropZoneInfo>& info);
+  void SetDropInfo(const std::map<std::string, std::vector<std::string>>& aggregatedBinds);
 
   /**
    * Set the filename visibility
@@ -232,7 +232,7 @@ protected:
   bool DropZoneLogoVisible = false;
   bool DropZoneVisible = false;
   std::string DropText = "";
-  std::vector<DropZoneInfo> DropInfo;
+  std::map<std::string, std::vector<std::string>> DropInfo;
 
   bool FileNameVisible = false;
   std::string FileName = "";
