@@ -29,6 +29,7 @@ std::vector<std::string> utils::tokenize(std::string_view str)
 {
   std::vector<std::string> tokens;
   std::string token;
+  const std::string colorHexTokens = "0123456789abcdefABCDEF";
   const auto accumulate = [&](const char& c) { token.push_back(c); };
   const auto emit = [&]()
   {
@@ -40,6 +41,7 @@ std::vector<std::string> utils::tokenize(std::string_view str)
   };
   bool escaped = false;
   char quoted = '\0';
+  bool commentStarted = false;
   bool commented = false;
   for (char c : str)
   {
@@ -53,7 +55,11 @@ std::vector<std::string> utils::tokenize(std::string_view str)
         escaped = !escaped;
         break;
       case ' ':
-        if (!escaped && !quoted)
+        if (commentStarted)
+        {
+            commented = true;
+        }
+        else if (!escaped && !quoted)
         {
           emit();
         }
@@ -84,7 +90,8 @@ std::vector<std::string> utils::tokenize(std::string_view str)
       case '#':
         if (!escaped && !quoted)
         {
-          commented = true;
+          // we need to check next char in order to ensure that we are a comment
+          commentStarted = true;
         }
         else
         {
@@ -93,6 +100,11 @@ std::vector<std::string> utils::tokenize(std::string_view str)
         escaped = false;
         break;
       default:
+        if(commentStarted && colorHexTokens.find(c) != std::string::npos)
+        {
+          commentStarted = false;
+          accumulate('#');
+        }
         accumulate(c);
         escaped = false;
         break;
