@@ -169,7 +169,7 @@ runs:
       if: steps.cache-vtk.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/vtk_build
       shell: bash
-      run: cmake --build . --parallel 1 --target install --config Release
+      run: cmake --build . --parallel 2 --DCMAKE_CXX_STANDARD=14 --target install --config Release
 
     - name: Copy to install
       working-directory: ${{github.workspace}}/dependencies/vtk_install
