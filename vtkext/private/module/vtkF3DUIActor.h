@@ -250,7 +250,7 @@ protected:
   std::string FontFile = "";
   double FontScale = 1.0;
 
-  double BackdropOpacity = 0.95;
+  double BackdropOpacity = 0.9;
 
 private:
   vtkF3DUIActor(const vtkF3DUIActor&) = delete;
