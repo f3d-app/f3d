@@ -1,0 +1,15 @@
+diff --git a/Rendering/OpenGL2/Private/vtkEGLDefaultConfig.cxx b/Rendering/OpenGL2/Private/vtkEGLDefaultConfig.cxx
+index 17495776a9..8492565531 100644
+--- a/Rendering/OpenGL2/Private/vtkEGLDefaultConfig.cxx
++++ b/Rendering/OpenGL2/Private/vtkEGLDefaultConfig.cxx
+@@ -16,8 +16,8 @@ vtkEGLDefaultConfig::vtkEGLDefaultConfig()
+ //------------------------------------------------------------------------------
+ void vtkEGLDefaultConfig::CreateContext(EGLContext& context, EGLDisplay display, EGLConfig config)
+ {
+-  const EGLint contextES2[] = { EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE };
+-  context = eglCreateContext(display, config, EGL_NO_CONTEXT, contextES2);
++  const EGLint attribs[] = { EGL_CONTEXT_MAJOR_VERSION, 3, EGL_CONTEXT_MINOR_VERSION, 2, EGL_NONE };
++  context = eglCreateContext(display, config, EGL_NO_CONTEXT, attribs);
+ }
+ 
+ //------------------------------------------------------------------------------

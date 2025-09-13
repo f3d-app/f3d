@@ -40,7 +40,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/vtk_install
-        key: vtk-${{ inputs.vtk_version }}-${{inputs.zlib_version}}-${{inputs.blosc_version}}-${{inputs.tbb_version}}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}${{ inputs.ospray_version != '' && format('-ospray-{0}', inputs.ospray_version) || '' }}-${{runner.os}}-${{inputs.cpu}}-0
+        key: vtk-${{ inputs.vtk_version }}-${{inputs.zlib_version}}-${{inputs.blosc_version}}-${{inputs.tbb_version}}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}${{ inputs.ospray_version != '' && format('-ospray-{0}', inputs.ospray_version) || '' }}-${{runner.os}}-${{inputs.cpu}}-1
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -77,6 +77,13 @@ runs:
       working-directory: ${{github.workspace}}/dependencies/vtk
       shell: bash
       run: patch -p1 < $GITHUB_ACTION_PATH/include_cstdint.patch
+
+    # blah
+    - name: Patch VTK test
+      if: steps.cache-vtk.outputs.cache-hit != 'true' && inputs.vtk_version == 'bacd81d69effc4ccaf38a813521c873767d2f872'
+      working-directory: ${{github.workspace}}/dependencies/vtk
+      shell: bash
+      run: patch -p1 < $GITHUB_ACTION_PATH/egl-fix.patch
 
       # OpenVDB_CMAKE_PATH is required because of
       # https://github.com/AcademySoftwareFoundation/openvdb/issues/1160 and
