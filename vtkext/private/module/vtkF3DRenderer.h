@@ -606,7 +606,7 @@ private:
   std::optional<fs::path> FontFile;
   double FontScale = 1.0;
 
-  double BackdropOpacity = 0.95;
+  double BackdropOpacity = 0.9;
 
   double LightIntensity = 1.0;
   std::map<vtkLight*, double> OriginalLightIntensities;
