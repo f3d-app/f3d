@@ -153,6 +153,18 @@ void camera_impl::getViewAngle(angle_deg_t& angle)
 }
 
 //----------------------------------------------------------------------------
+void camera_impl::setElevationAngle(camera_state_t& state, angle_deg_t& angle)
+{
+  state.elevationAngle = angle;
+}
+
+//----------------------------------------------------------------------------
+angle_deg_t camera_impl::getElevationAngle(const camera_state_t& state)
+{
+  return state.elevationAngle;
+}
+
+//----------------------------------------------------------------------------
 camera& camera_impl::setState(const camera_state_t& state)
 {
   vtkCamera* cam = this->GetVTKCamera();

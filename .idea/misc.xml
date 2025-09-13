@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Black">
+    <option name="sdkName" value="Python 3.11 (f3d)" />
+  </component>
+  <component name="CMakePythonSetting">
+    <option name="pythonIntegrationState" value="YES" />
+  </component>
+  <component name="CMakeWorkspace" PROJECT_DIR="$PROJECT_DIR$" />
+</project>
