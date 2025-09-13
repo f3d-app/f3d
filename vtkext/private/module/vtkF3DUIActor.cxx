@@ -146,6 +146,13 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
     this->RenderDropZone();
   }
 
+  if (this->ConsoleVisible)
+  {
+    this->RenderConsole(false);
+    this->EndFrame(renWin);
+    return 1;
+  }
+
   if (this->FileNameVisible)
   {
     this->RenderFileName();
@@ -166,12 +173,7 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
     this->RenderFpsCounter();
   }
 
-  // Only one console can be visible at a time, console has priority over minimal console
-  if (this->ConsoleVisible)
-  {
-    this->RenderConsole(false);
-  }
-  else if (this->MinimalConsoleVisible)
+  if (this->MinimalConsoleVisible)
   {
     this->RenderConsole(true);
   }
