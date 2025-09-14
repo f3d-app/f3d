@@ -26,7 +26,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: ${{github.workspace}}/dependencies/proj_install
-        key: proj-${{inputs.version}}-${{inputs.sqlite_version}}-${{runner.os}}-${{inputs.cpu}}-0
+        key: proj-${{inputs.version}}-${{inputs.sqlite_version}}-${{runner.os}}-${{inputs.cpu}}-cxx17-1
 
     - name: Checkout PROJ
       if: steps.cache-proj.outputs.cache-hit != 'true'
@@ -50,6 +50,8 @@ runs:
       shell: bash
       run: >
         cmake ../proj
+        -DCMAKE_CXX_STANDARD=17
+        -DCMAKE_CXX_STANDARD_REQUIRED=ON
         -DBUILD_SHARED_LIBS=ON
         -DBUILD_PROJSYNC=OFF
         -DCMAKE_BUILD_TYPE=Release

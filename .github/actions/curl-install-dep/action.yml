@@ -22,7 +22,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: ${{github.workspace}}/dependencies/curl_install
-        key: curl-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-0
+        key: curl-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-cxx17-1
 
     - name: Checkout curl
       if: steps.cache-curl.outputs.cache-hit != 'true'
@@ -46,6 +46,8 @@ runs:
       shell: bash
       run: >
         cmake ../curl
+        -DCMAKE_CXX_STANDARD=17
+        -DCMAKE_CXX_STANDARD_REQUIRED=ON
         -DBUILD_APPS=ON
         -DBUILD_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
