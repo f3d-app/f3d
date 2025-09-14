@@ -46,7 +46,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: ${{github.workspace}}/dependencies/pdal_install
-        key: pdal-${{inputs.version}}-${{inputs.proj_version}}-${{inputs.sqlite_version}}-${{inputs.xercesc_version}}-${{inputs.curl_version}}-${{inputs.gdal_version}}-${{runner.os}}-${{inputs.cpu}}-0
+        key: pdal-${{inputs.version}}-${{inputs.proj_version}}-${{inputs.sqlite_version}}-${{inputs.xercesc_version}}-${{inputs.curl_version}}-${{inputs.gdal_version}}-${{runner.os}}-${{inputs.cpu}}-cxx17-0
 
     - name: Checkout PDAL
       if: steps.cache-pdal.outputs.cache-hit != 'true'
@@ -71,6 +71,7 @@ runs:
       run: >
         cmake ../pdal
         -DCMAKE_CXX_STANDARD=17
+        -DCMAKE_CXX_STANDARD_REQUIRED=ON
         -DBUILD_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_LIBDIR:PATH=lib
