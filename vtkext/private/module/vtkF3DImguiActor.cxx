@@ -38,6 +38,9 @@
 constexpr float LOGO_DISPLAY_WIDTH = 256.f;
 constexpr float LOGO_DISPLAY_HEIGHT = 256.f;
 constexpr float DROPZONE_LOGO_TEXT_PADDING = 20.f;
+constexpr float DROPZONE_MARGIN = 0.5f;
+constexpr float DROPZONE_PADDING_X = 5.0f;
+constexpr float DROPZONE_PADDING_Y = 2.0f;
 
 static std::vector<std::string> splitBindings(const std::string& s, char delim)
 {
@@ -406,7 +409,7 @@ void vtkF3DImguiActor::RenderDropZone()
 
     ImGui::Begin("DropZoneText", nullptr, flags);
     /* Use background draw list to prevent "ignoring" NoBringToFrontOnFocus */
-    ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
+    ImDrawList* drawList = ImGui::GetBackgroundDrawList();
 
     // Logo rendering
     float logoDisplayHeight = LOGO_DISPLAY_HEIGHT;
@@ -417,12 +420,12 @@ void vtkF3DImguiActor::RenderDropZone()
 
       // Calculate logo position (centered)
       ImVec2 center = viewport->GetWorkCenter();
-      ImVec2 logoPos(center.x - logoDisplayWidth * 0.5f, center.y - logoDisplayHeight * 0.5f);
+      ImVec2 logoPos(center.x - logoDisplayWidth * DROPZONE_MARGIN, center.y - logoDisplayHeight * DROPZONE_MARGIN);
 
       // VTK texture pointer to ImTextureID cast (void*)
       ImTextureID texID = reinterpret_cast<ImTextureID>(this->Pimpl->LogoTexture.Get());
 
-      draw_list->AddImage(texID, logoPos,
+      drawList->AddImage(texID, logoPos,
         ImVec2(logoPos.x + logoDisplayWidth, logoPos.y + logoDisplayHeight), ImVec2(0, 1),
         ImVec2(1, 0));
     }
@@ -435,8 +438,8 @@ void vtkF3DImguiActor::RenderDropZone()
     {
       const float y0 = p0.y + halfTickThickness;
       const float x1 = std::min(p1.x, x + tickLength);
-      draw_list->AddLine(ImVec2(x, y0), ImVec2(x1, y0), color, tickThickness);
-      draw_list->AddLine(ImVec2(x, p1.y), ImVec2(x1, p1.y), color, tickThickness);
+      drawList->AddLine(ImVec2(x, y0), ImVec2(x1, y0), color, tickThickness);
+      drawList->AddLine(ImVec2(x, p1.y), ImVec2(x1, p1.y), color, tickThickness);
     }
 
     // Draw left and right line
@@ -444,8 +447,8 @@ void vtkF3DImguiActor::RenderDropZone()
     {
       const float x1 = p1.x - halfTickThickness;
       const float y1 = std::min(p1.y, y + tickLength);
-      draw_list->AddLine(ImVec2(p0.x, y), ImVec2(p0.x, y1), color, tickThickness);
-      draw_list->AddLine(ImVec2(x1, y), ImVec2(x1, y1), color, tickThickness);
+      drawList->AddLine(ImVec2(p0.x, y), ImVec2(p0.x, y1), color, tickThickness);
+      drawList->AddLine(ImVec2(x1, y), ImVec2(x1, y1), color, tickThickness);
     }
 
     ImGui::End();
@@ -454,10 +457,10 @@ void vtkF3DImguiActor::RenderDropZone()
     if (!this->DropText.empty())
     {
       ImVec2 textSize = ImGui::CalcTextSize(this->DropText.c_str());
-      ImVec2 textPos(viewport->GetWorkCenter().x - textSize.x * 0.5f,
-                     viewport->GetWorkCenter().y + LOGO_DISPLAY_HEIGHT * 0.5f +
+      ImVec2 textPos(viewport->GetWorkCenter().x - textSize.x * DROPZONE_MARGIN,
+                     viewport->GetWorkCenter().y + LOGO_DISPLAY_HEIGHT * DROPZONE_MARGIN +
                        DROPZONE_LOGO_TEXT_PADDING);
-      draw_list->AddText(textPos, ImColor(F3DImguiStyle::GetTextColor()), this->DropText.c_str());
+      drawList->AddText(textPos, ImColor(F3DImguiStyle::GetTextColor()), this->DropText.c_str());
       return;
     }
 
@@ -481,7 +484,7 @@ void vtkF3DImguiActor::RenderDropZone()
         for (const auto& key : keys)
         {
           totalBindingsWidth += ImGui::CalcTextSize(key.c_str()).x +
-                                0.5f * DROPZONE_LOGO_TEXT_PADDING;
+                                DROPZONE_MARGIN * DROPZONE_LOGO_TEXT_PADDING;
         }
         if (keys.size() > 1)
           totalBindingsWidth += (keys.size() - 1) * (spacingX + plusWidth + spacingX);
@@ -492,7 +495,7 @@ void vtkF3DImguiActor::RenderDropZone()
       maxBindingsTextWidth = std::max(maxBindingsTextWidth, totalBindingsWidth);
     }
 
-    ImVec4 descTextColor = F3DImguiStyle::GetTextColor();
+    const ImColor descTextColor = F3DImguiStyle::GetTextColor();
     ImVec4 bindingRectColor = F3DImguiStyle::GetMidColor();
     ImVec4 bindingTextColor = F3DImguiStyle::GetTextColor();
 
@@ -503,13 +506,13 @@ void vtkF3DImguiActor::RenderDropZone()
     ImVec2 startPos;
     if (this->DropZoneLogoVisible && this->Pimpl->LogoTexture)
     {
-      startPos = ImVec2(viewport->GetWorkCenter().x - tableWidth * 0.5f,
+      startPos = ImVec2(viewport->GetWorkCenter().x - tableWidth * DROPZONE_MARGIN,
                         viewport->GetWorkCenter().y + LOGO_DISPLAY_HEIGHT / 2 +
                           DROPZONE_LOGO_TEXT_PADDING);
     }
     else
     {
-      startPos = ImVec2(viewport->GetWorkCenter().x - tableWidth * 0.5f,
+      startPos = ImVec2(viewport->GetWorkCenter().x - tableWidth * DROPZONE_MARGIN,
                         viewport->GetWorkCenter().y);
     }
 
@@ -517,8 +520,8 @@ void vtkF3DImguiActor::RenderDropZone()
 
     for (const auto& [desc, binds] : this->DropInfo)
     {
-      draw_list->AddText(cursor, ImColor(descTextColor), desc.c_str());
-      float rowHeight = ImGui::GetTextLineHeightWithSpacing() + 0.5f * DROPZONE_LOGO_TEXT_PADDING;
+      drawList->AddText(cursor, descTextColor, desc.c_str());
+      float rowHeight = ImGui::GetTextLineHeightWithSpacing() + DROPZONE_MARGIN * DROPZONE_LOGO_TEXT_PADDING;
 
       float xBindings = cursor.x + maxDescTextWidth + DROPZONE_LOGO_TEXT_PADDING;
       ImVec2 bindingPos(xBindings, cursor.y);
@@ -530,28 +533,28 @@ void vtkF3DImguiActor::RenderDropZone()
         {
           const std::string& key = keys[k];
           ImVec2 textSize = ImGui::CalcTextSize(key.c_str());
-          ImVec2 padding(5.0f, 2.0f);
+          ImVec2 padding(DROPZONE_PADDING_X, DROPZONE_PADDING_Y);
 
           ImVec2 rectMin = ImVec2(bindingPos.x, bindingPos.y);
           ImVec2 rectMax = ImVec2(rectMin.x + textSize.x + padding.x * 2,
                                   rectMin.y + textSize.y + padding.y * 2);
 
-          draw_list->AddRectFilled(rectMin, rectMax, ImColor(bindingRectColor), 4.0f);
-          draw_list->AddText(ImVec2(rectMin.x + padding.x, rectMin.y + padding.y),
+          drawList->AddRectFilled(rectMin, rectMax, ImColor(bindingRectColor), 4.0f);
+          drawList->AddText(ImVec2(rectMin.x + padding.x, rectMin.y + padding.y),
                               ImColor(bindingTextColor), key.c_str());
 
           bindingPos.x = rectMax.x + ImGui::GetStyle().ItemSpacing.x;
 
           if (k < keys.size() - 1)
           {
-            draw_list->AddText(bindingPos, ImColor(descTextColor), "+");
+            drawList->AddText(bindingPos, descTextColor, "+");
             bindingPos.x += plusWidth + ImGui::GetStyle().ItemSpacing.x;
           }
         }
 
         if (g < binds.size() - 1)
         {
-          draw_list->AddText(bindingPos, ImColor(descTextColor), "or");
+          drawList->AddText(bindingPos, descTextColor, "or");
           bindingPos.x += orWidth + ImGui::GetStyle().ItemSpacing.x;
         }
       }
