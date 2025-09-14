@@ -103,9 +103,11 @@ std::vector<std::string> utils::tokenize(std::string_view str)
         escaped = false;
         break;
       case '#':
-        if (comment)
+        if (comment || color)
         {
           commented = true;
+          token.clear();
+          break;
         }
         if (!escaped && !quoted)
         {
