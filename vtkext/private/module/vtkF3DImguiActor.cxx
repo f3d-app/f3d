@@ -53,27 +53,6 @@ static std::vector<std::string> splitBindings(const std::string& s, char delim)
   return result;
 }
 
-static std::vector<DropZoneInfo>
-toDropZoneInfo(const std::map<std::string, std::vector<std::string>>& aggregatedBinds)
-{
-  std::vector<DropZoneInfo> parsedInfo;
-
-  for (auto& [desc, binds] : aggregatedBinds)
-  {
-    std::vector<std::vector<std::string>> groups;
-
-    for (auto& bind : binds)
-    {
-      auto keys = splitBindings(bind, '+');
-      if (!keys.empty())
-        groups.push_back(keys);
-    }
-
-    parsedInfo.push_back({desc, groups});
-  }
-
-  return parsedInfo;
-}
 
 
 struct vtkF3DImguiActor::Internals
@@ -429,7 +408,7 @@ void vtkF3DImguiActor::RenderDropZone()
     /* Use background draw list to prevent "ignoring" NoBringToFrontOnFocus */
     ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
 
-    // logo height
+    // Logo rendering
     float logoDisplayHeight = LOGO_DISPLAY_HEIGHT;
     if (this->DropZoneLogoVisible && this->Pimpl->LogoTexture)
     {
@@ -451,7 +430,7 @@ void vtkF3DImguiActor::RenderDropZone()
     const ImVec2 p0(dropzonePad, dropzonePad);
     const ImVec2 p1(dropzonePad + dropZoneW, dropzonePad + dropZoneH);
 
-    // Draw top and bottom line
+    // Border lines
     for (float x = p0.x - 1; x < p1.x; x += tickLength + tickSpaceW)
     {
       const float y0 = p0.y + halfTickThickness;
@@ -471,7 +450,7 @@ void vtkF3DImguiActor::RenderDropZone()
 
     ImGui::End();
 
-    // If DropText is provided, render it and skip binds
+    // If DropText is provided, render and skip binds
     if (!this->DropText.empty())
     {
       ImVec2 textSize = ImGui::CalcTextSize(this->DropText.c_str());
@@ -482,45 +461,34 @@ void vtkF3DImguiActor::RenderDropZone()
       return;
     }
 
-    // Otherwise: render parsed binds
-    auto parsedInfo = toDropZoneInfo(this->DropInfo);
-
-    // Calculate max width for each column before rendering
     float maxDescTextWidth = 0.0f;
     float maxBindingsTextWidth = 0.0f;
     const float spacingX = ImGui::GetStyle().ItemSpacing.x;
     const float plusWidth = ImGui::CalcTextSize("+").x;
     const float orWidth = ImGui::CalcTextSize("or").x;
 
-
-    for (const auto& item : parsedInfo)
+    // First pass: compute max widths
+    for (const auto& [desc, binds] : this->DropInfo)
     {
-      ImVec2 descSize = ImGui::CalcTextSize(item.description.c_str());
+      ImVec2 descSize = ImGui::CalcTextSize(desc.c_str());
       maxDescTextWidth = std::max(maxDescTextWidth, descSize.x);
 
       // Bindings column width (sum of keys + '+' between keys, 'or' between groups)
       float totalBindingsWidth = 0.0f;
-      for (const auto& group : item.bindings)
+      for (const auto& bind : binds)
       {
-        // sum of all keys in group
-        for (const auto& key : group)
+        auto keys = splitBindings(bind, '+');
+        for (const auto& key : keys)
         {
           totalBindingsWidth += ImGui::CalcTextSize(key.c_str()).x +
                                 0.5f * DROPZONE_LOGO_TEXT_PADDING;
         }
-
-        // add '+' separators between keys
-        if (group.size() > 1)
-        {
-          totalBindingsWidth += (group.size() - 1) * (spacingX + plusWidth + spacingX);
-        }
+        if (keys.size() > 1)
+          totalBindingsWidth += (keys.size() - 1) * (spacingX + plusWidth + spacingX);
       }
+      if (binds.size() > 1)
+        totalBindingsWidth += (binds.size() - 1) * (spacingX + orWidth + spacingX);
 
-      // add 'or' separators between groups
-      if (item.bindings.size() > 1)
-      {
-        totalBindingsWidth += (item.bindings.size() - 1) * (spacingX + orWidth + spacingX);
-      }
       maxBindingsTextWidth = std::max(maxBindingsTextWidth, totalBindingsWidth);
     }
 
@@ -547,20 +515,20 @@ void vtkF3DImguiActor::RenderDropZone()
 
     ImVec2 cursor = startPos;
 
-    for (const auto& item : parsedInfo)
+    for (const auto& [desc, binds] : this->DropInfo)
     {
-      draw_list->AddText(cursor, ImColor(descTextColor), item.description.c_str());
+      draw_list->AddText(cursor, ImColor(descTextColor), desc.c_str());
       float rowHeight = ImGui::GetTextLineHeightWithSpacing() + 0.5f * DROPZONE_LOGO_TEXT_PADDING;
 
       float xBindings = cursor.x + maxDescTextWidth + DROPZONE_LOGO_TEXT_PADDING;
       ImVec2 bindingPos(xBindings, cursor.y);
 
-      for (size_t g = 0; g < item.bindings.size(); ++g)
+      for (size_t g = 0; g < binds.size(); ++g)
       {
-        const auto& group = item.bindings[g];
-        for (size_t k = 0; k < group.size(); ++k)
+        auto keys = splitBindings(binds[g], '+');
+        for (size_t k = 0; k < keys.size(); ++k)
         {
-          const std::string& key = group[k];
+          const std::string& key = keys[k];
           ImVec2 textSize = ImGui::CalcTextSize(key.c_str());
           ImVec2 padding(5.0f, 2.0f);
 
@@ -574,17 +542,17 @@ void vtkF3DImguiActor::RenderDropZone()
 
           bindingPos.x = rectMax.x + ImGui::GetStyle().ItemSpacing.x;
 
-          if (k < group.size() - 1)
+          if (k < keys.size() - 1)
           {
             draw_list->AddText(bindingPos, ImColor(descTextColor), "+");
-            bindingPos.x += ImGui::CalcTextSize("+").x + ImGui::GetStyle().ItemSpacing.x;
+            bindingPos.x += plusWidth + ImGui::GetStyle().ItemSpacing.x;
           }
         }
 
-        if (g < item.bindings.size() - 1)
+        if (g < binds.size() - 1)
         {
           draw_list->AddText(bindingPos, ImColor(descTextColor), "or");
-          bindingPos.x += ImGui::CalcTextSize("or").x + ImGui::GetStyle().ItemSpacing.x;
+          bindingPos.x += orWidth + ImGui::GetStyle().ItemSpacing.x;
         }
       }
 

@@ -13,12 +13,6 @@
 #include <cstdint>
 #include <deque>
 
-struct DropZoneInfo
-{
-  std::string description;
-  std::vector<std::vector<std::string>> bindings; // outer = groups (OR), inner = keys (+)
-};
-
 class vtkOpenGLRenderWindow;
 
 class vtkF3DUIActor : public vtkProp
@@ -66,7 +60,7 @@ public:
    * Empty by default
    */
   void SetDropText(const std::string& info);
-  void SetDropInfo(const std::map<std::string, std::vector<std::string>>& aggregatedBinds);
+  void SetDropInfo(const std::map<std::string, std::vector<std::string>>& dropZoneBindsInfo);
 
   /**
    * Set the filename visibility

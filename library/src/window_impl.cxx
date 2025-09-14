@@ -436,8 +436,8 @@ void window_impl::UpdateDynamicOptions()
             custom_binds.push_back(interaction_bind_t::parse(token));
         }
     }
-    auto aggregatedBinds = aggregateBindings(this->Internals->Interactor->getBindsDocString(custom_binds));
-    renderer->SetDropZoneBindsInfo(aggregatedBinds);
+    auto dropZoneBindsInfo = aggregateBindings(this->Internals->Interactor->getBindsDocString(custom_binds));
+    renderer->SetDropZoneBindsInfo(dropZoneBindsInfo);
   }
 
   // XXX: model.point_sprites.type only has an effect on geometry scene

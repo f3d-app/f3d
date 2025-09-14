@@ -30,9 +30,9 @@ void vtkF3DUIActor::SetDropText(const std::string& info)
   this->DropText = info;
 }
 
-void vtkF3DUIActor::SetDropInfo(const std::map<std::string, std::vector<std::string>>& aggregatedBinds)
+void vtkF3DUIActor::SetDropInfo(const std::map<std::string, std::vector<std::string>>& dropZoneBindsInfo)
 {
-  this->DropInfo = aggregatedBinds;
+  this->DropInfo = dropZoneBindsInfo;
 }
 
 //----------------------------------------------------------------------------
