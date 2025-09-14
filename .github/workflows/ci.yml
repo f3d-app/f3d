@@ -136,7 +136,7 @@ jobs:
           - sqlite_version: version-3.42.1
           - xercesc_version: v3.3.0
           - curl_version: curl-8_15_0
-          - pdal_version: 2.3.0
+          - pdal_version: 2.9.2
           - proj_version: 9.6.2
           - libgeotiff_version: 1.7.4
           - libtiff_version: v4.7.0
@@ -161,7 +161,7 @@ jobs:
             xercesc_version: v3.3.0
             curl_version: curl-8_15_0
             proj_version: v6.3.0
-            pdal_version: 2.3.0
+            pdal_version: 2.9.2
             libgeotiff_version: 1.7.4
             libtiff_version: v4.7.0
             gdal_version: v3.11.3
@@ -193,7 +193,7 @@ jobs:
           tbb_version: ${{matrix.tbb_version}}
           usd_version: ${{matrix.usd_version}}
           zlib_version: ${{matrix.zlib_version}}
-          pdal_version: 2.3.0
+          pdal_version: 2.9.2
           sqlite_version: version-3.42.1
           xercesc_version: v3.3.0
           curl_version: curl-8_15_0
@@ -244,7 +244,7 @@ jobs:
           - sqlite_version: version-3.42.1
           - xercesc_version: v3.3.0
           - curl_version: curl-8_15_0
-          - pdal_version: 2.3.0
+          - pdal_version: 2.9.2
           - proj_version: 9.6.2
           - libgeotiff_version: 1.7.4
           - libtiff_version: v4.7.0
@@ -263,7 +263,7 @@ jobs:
             sqlite_version: version-3.42.1
             xercesc_version: v3.3.0
             curl_version: curl-8_15_0
-            pdal_version: 2.3.0
+            pdal_version: 2.9.2
             proj_version: 9.6.2
             libgeotiff_version: 1.7.4
             libtiff_version: v4.7.0
@@ -278,7 +278,7 @@ jobs:
             sqlite_version: version-3.42.1
             xercesc_version: v3.3.0
             curl_version: curl-8_15_0
-            pdal_version: 2.3.0
+            pdal_version: 2.9.2
             proj_version: 9.6.2
             libgeotiff_version: 1.7.4
             libtiff_version: v4.7.0
@@ -294,7 +294,7 @@ jobs:
             sqlite_version: version-3.42.1
             xercesc_version: v3.3.0
             curl_version: curl-8_15_0
-            pdal_version: 2.3.0
+            pdal_version: 2.9.2
             proj_version: 9.6.2
             libgeotiff_version: 1.7.4
             libtiff_version: v4.7.0
@@ -330,7 +330,7 @@ jobs:
           sqlite_version: version-3.42.1
           xercesc_version: v3.3.0
           curl_version: curl-8_15_0
-          pdal_version: 2.3.0
+          pdal_version: 2.9.2
           proj_version: 9.6.2
           libgeotiff_version: 1.7.4
           libtiff_version: v4.7.0
@@ -357,7 +357,7 @@ jobs:
           sqlite_version: version-3.42.1
           xercesc_version: v3.3.0
           curl_version: curl-8_15_0
-          pdal_version: 2.3.0
+          pdal_version: 2.9.2
           proj_version: 9.6.2
           libgeotiff_version: 1.7.4
           libtiff_version: v4.7.0
@@ -460,7 +460,7 @@ jobs:
           sqlite_version: version-3.42.1
           xercesc_version: v3.3.0
           curl_version: curl-8_15_0
-          pdal_version: 2.3.0
+          pdal_version: 2.9.2
           proj_version: 9.6.2
           libgeotiff_version: 1.7.4
           libtiff_version: v4.7.0
@@ -507,7 +507,7 @@ jobs:
           - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           - usd_version: ${{needs.default_versions.outputs.usd_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-          - pdal_version: 2.3.0
+          - pdal_version: 2.9.2
           - sqlite_version: version-3.42.1
           - xercesc_version: v3.3.0
           - curl_version: curl-8_15_0
