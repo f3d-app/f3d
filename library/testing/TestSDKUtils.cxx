@@ -64,15 +64,15 @@ int TestSDKUtils([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
       std::vector<std::string>{ "set", "render.hdri.file", "file" });
 
   test("tokenize comments without space with valid hex token as first letter",
-      f3d::utils::tokenize(R"(set render.hdri.file file #A comment)") ==
+    f3d::utils::tokenize(R"(set render.hdri.file file #A comment)") ==
       std::vector<std::string>{ "set", "render.hdri.file", "file"});
 
   test("tokenize comments without space with valid hex token as two first letters",
-      f3d::utils::tokenize(R"(set render.hdri.file file #A1 comment)") ==
+    f3d::utils::tokenize(R"(set render.hdri.file file #A1 comment)") ==
       std::vector<std::string>{ "set", "render.hdri.file", "file"});
 
   test("tokenize comments without space with valid hex token as three first letters",
-      f3d::utils::tokenize(R"(set render.hdri.file file #A1d comment)") ==
+    f3d::utils::tokenize(R"(set render.hdri.file file #A1d comment)") ==
       std::vector<std::string>{ "set", "render.hdri.file", "file"});
 
   test("tokenize base color",
