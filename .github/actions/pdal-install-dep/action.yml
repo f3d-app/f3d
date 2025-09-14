@@ -46,7 +46,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: ${{github.workspace}}/dependencies/pdal_install
-        key: pdal-${{inputs.version}}-${{inputs.proj_version}}-${{inputs.sqlite_version}}-${{inputs.xercesc_version}}-${{inputs.curl_version}}-${{inputs.gdal_version}}-${{runner.os}}-${{inputs.cpu}}-cxx17-0
+        key: pdal-${{inputs.version}}-${{inputs.proj_version}}-${{inputs.sqlite_version}}-${{inputs.xercesc_version}}-${{inputs.curl_version}}-${{inputs.gdal_version}}-${{runner.os}}-${{inputs.cpu}}-cxx17-1
 
     - name: Checkout PDAL
       if: steps.cache-pdal.outputs.cache-hit != 'true'
