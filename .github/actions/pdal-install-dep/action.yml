@@ -70,7 +70,6 @@ runs:
       shell: bash
       run: >
         cmake ../pdal
-        -DCMAKE_CXX_STANDARD=17
         -DBUILD_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_LIBDIR:PATH=lib
