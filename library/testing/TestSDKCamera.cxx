@@ -134,8 +134,8 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     std::cerr << "get azimuth is not behaving as expected: " << azimuth << " != " << testAzimuth << "\n";
     return EXIT_FAILURE;
   }
-  cam.azimuth(90);
-  testAzimuth = 90.0;
+    testAzimuth = 90.0;
+    cam.azimuth(testAzimuth);
   azimuth = cam.getAzimuth();
   if (!compareDouble(azimuth, testAzimuth))
   {
