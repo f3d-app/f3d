@@ -85,9 +85,8 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   cam.setPosition({ -1, 0, 0 });
   cam.setFocalPoint({ 0, 0, 0 });
   cam.setViewUp({ 0, 1, 0 });
-  f3d::angle_deg_t testYaw = 0.0;
   f3d::angle_deg_t yaw = cam.getYaw();
-  if (!compareDouble(yaw, testYaw))
+  if (!compareDouble(yaw, 0.))
   {
     std::cerr << "get yaw is not behaving as expected: " << yaw << " " << "\n";
     return EXIT_FAILURE;
