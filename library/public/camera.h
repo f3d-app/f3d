@@ -93,9 +93,16 @@ public:
   virtual camera& elevation(angle_deg_t angle) = 0;
   /** Rotate the camera about its horizontal axis, centered the camera's position. */
   virtual camera& pitch(angle_deg_t angle) = 0;
-
   ///@}
 
+  ///@{ @name Getters
+  /// Yaw, azimuth and elevation getter methods(calculated on call). Angles are in degrees.
+
+  [[nodiscard]] virtual angle_deg_t getYaw() = 0;
+  [[nodiscard]] virtual angle_deg_t getAzimuth() = 0;
+  [[nodiscard]] virtual angle_deg_t getElevation() = 0;
+  ///@}
+  
   /**
    * Store the current camera configuration as default.
    */

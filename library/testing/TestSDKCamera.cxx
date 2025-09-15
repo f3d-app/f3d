@@ -91,8 +91,8 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     std::cerr << "get yaw is not behaving as expected: " << yaw << " " << "\n";
     return EXIT_FAILURE;
   }
-    testYaw = 90.0;
-    cam.yaw(testYaw);
+  f3d::angle_deg_t testYaw = 90.0;
+  cam.yaw(testYaw);
   yaw = cam.getYaw();
   if (!compareDouble(yaw, testYaw))
   {
@@ -130,15 +130,17 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   f3d::angle_deg_t azimuth = cam.getAzimuth();
   if (!compareDouble(azimuth, testAzimuth))
   {
-    std::cerr << "get azimuth is not behaving as expected: " << azimuth << " != " << testAzimuth << "\n";
+    std::cerr << "get azimuth is not behaving as expected: " << azimuth << " != " << testAzimuth
+              << "\n";
     return EXIT_FAILURE;
   }
-    testAzimuth = 90.0;
-    cam.azimuth(testAzimuth);
+  testAzimuth = 90.0;
+  cam.azimuth(testAzimuth);
   azimuth = cam.getAzimuth();
   if (!compareDouble(azimuth, testAzimuth))
   {
-    std::cerr << "get azimuth after azimuth +90 is not behaving as expected: " << azimuth << " != " << testAzimuth << "\n";
+    std::cerr << "get azimuth after azimuth +90 is not behaving as expected: " << azimuth
+              << " != " << testAzimuth << "\n";
     return EXIT_FAILURE;
   }
 
