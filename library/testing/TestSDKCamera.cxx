@@ -92,8 +92,8 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     std::cerr << "get yaw is not behaving as expected: " << yaw << " " << "\n";
     return EXIT_FAILURE;
   }
-  cam.yaw(90);
-  testYaw = 90.0;
+    testYaw = 90.0;
+    cam.yaw(testYaw);
   yaw = cam.getYaw();
   if (!compareDouble(yaw, testYaw))
   {
