@@ -244,13 +244,10 @@ angle_deg_t camera_impl::getAzimuth()
   }
   vtkMath::Normalize(projected.data());
 
-  // Azimuth is the signed angle between right and projected forward, using up as the normal
   double angleRad = vtkMath::AngleBetweenVectors(right, projected.data());
-  // Determine sign using cross product
   vector3_t cross;
   vtkMath::Cross(right, projected.data(), cross.data());
   double sign = vtkMath::Dot(cross.data(), up) >= 0 ? 1.0 : -1.0;
-
   return sign * vtkMath::DegreesFromRadians(angleRad);
 }
 //----------------------------------------------------------------------------

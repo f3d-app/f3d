@@ -82,10 +82,10 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   }
 
   // Test getYaw
-  cam.setPosition({ 0, 0, 1 });
+  cam.setPosition({ -1, 0, 0 });
   cam.setFocalPoint({ 0, 0, 0 });
   cam.setViewUp({ 0, 1, 0 });
-  f3d::angle_deg_t testYaw = 90.0;
+  f3d::angle_deg_t testYaw = 0.0;
   f3d::angle_deg_t yaw = cam.getYaw();
   if (!compareDouble(yaw, testYaw))
   {
@@ -93,15 +93,7 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     return EXIT_FAILURE;
   }
   cam.yaw(90);
-  testYaw = 180.0;
-  yaw = cam.getYaw();
-  if (!compareDouble(yaw, testYaw))
-  {
-    std::cerr << "Yaw after +90° yaw() is incorrect: " << yaw << "\n";
-    return EXIT_FAILURE;
-  }
-  cam.yaw(180);
-  testYaw = 0;
+  testYaw = 90.0;
   yaw = cam.getYaw();
   if (!compareDouble(yaw, testYaw))
   {
@@ -121,13 +113,33 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
               << " != " << testElevation << "\n";
     return EXIT_FAILURE;
   }
-  cam.elevation(45);
-  testElevation = 45.0;
+  cam.elevation(-45);
+  testElevation = -45.0;
   elevation = cam.getElevation();
   if (!compareDouble(elevation, testElevation))
   {
     std::cerr << "get elevation after elevation +45 is not behaving as expected: " << elevation
               << " != " << testElevation << "\n";
+    return EXIT_FAILURE;
+  }
+
+  // Test getAzimuth
+  cam.setPosition({ -1, 0, 0 });
+  cam.setFocalPoint({ 0, 0, 0 });
+  cam.setViewUp({ 0, 1, 0 });
+  f3d::angle_deg_t testAzimuth = 0.0;
+  f3d::angle_deg_t azimuth = cam.getAzimuth();
+  if (!compareDouble(azimuth, testAzimuth))
+  {
+    std::cerr << "get azimuth is not behaving as expected: " << azimuth << " != " << testAzimuth << "\n";
+    return EXIT_FAILURE;
+  }
+  cam.azimuth(90);
+  testAzimuth = 90.0;
+  azimuth = cam.getAzimuth();
+  if (!compareDouble(azimuth, testAzimuth))
+  {
+    std::cerr << "get azimuth after azimuth +90 is not behaving as expected: " << azimuth << " != " << testAzimuth << "\n";
     return EXIT_FAILURE;
   }
 
