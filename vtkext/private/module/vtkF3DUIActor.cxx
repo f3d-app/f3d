@@ -128,6 +128,7 @@ void vtkF3DUIActor::SetFontScale(const double fontScale)
   }
 }
 
+//----------------------------------------------------------------------------
 void vtkF3DUIActor::SetBackdropOpacity(const double backdropOpacity)
 {
   if (this->BackdropOpacity != backdropOpacity)
