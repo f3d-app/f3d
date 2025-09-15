@@ -5,7 +5,7 @@ option(F3D_PLUGIN_BUILD_HDF "HDF plugin (VTKHDF and EX2 files)" ON)
 option(F3D_PLUGIN_BUILD_OCCT "OpenCASCADE plugin (STEP and IGES files)" OFF)
 option(F3D_PLUGIN_BUILD_USD "Universal Scene Description plugin (USD files)" OFF)
 option(F3D_PLUGIN_BUILD_VDB "VDB plugin, using OpenVDB (VDB files)" OFF)
-option(F3D_PLUGIN_BUILD_PDAL "PDAL plugin, using PDAL (e57 files)" OFF)
+option(F3D_PLUGIN_BUILD_PDAL "PDAL plugin, using PDAL (e57 files)" ON)
 
 add_subdirectory(native)
 
