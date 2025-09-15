@@ -214,8 +214,7 @@ angle_deg_t camera_impl::getYaw()
 //----------------------------------------------------------------------------
 angle_deg_t camera_impl::getElevation()
 {
-  double* up;
-  up = this->Internals->VTKRenderer->GetEnvironmentUp();
+  double* up = this->Internals->VTKRenderer->GetEnvironmentUp();
   vtkCamera* cam = this->GetVTKCamera();
   return vtkMath::DegreesFromRadians(
     vtkMath::AngleBetweenVectors(up, cam->GetDirectionOfProjection()) - vtkMath::Pi() / 2);
