@@ -49,6 +49,9 @@ public:
   virtual camera& setState(const camera_state_t& state) = 0;
   [[nodiscard]] virtual camera_state_t getState() = 0;
   virtual void getState(camera_state_t& state) = 0;
+  [[nodiscard]] virtual angle_deg_t getYaw() = 0;
+  [[nodiscard]] virtual angle_deg_t getAzimuth() = 0;
+  [[nodiscard]] virtual angle_deg_t getElevation() = 0;
   ///@}
 
   ///@{ @name Manipulation
