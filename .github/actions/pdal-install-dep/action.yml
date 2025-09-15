@@ -60,7 +60,7 @@ runs:
       if: steps.cache-proj.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/pdal
       shell: bash
-      run: patch p1 < $GITHUB_ACTION_PATH/pdal-include-cstdint-header.patch
+      run: patch -p1 < $GITHUB_ACTION_PATH/pdal-include-cstdint-header.patch
 
     - name: Setup PDAL
       if: steps.cache-pdal.outputs.cache-hit != 'true'
