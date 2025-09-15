@@ -473,12 +473,12 @@ void vtkF3DImguiActor::RenderFileName()
   {
     const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-    constexpr float marginTop = 5.f;
+    constexpr float margin = F3DImguiStyle::GetDefaultMargin();
     ImVec2 winSize = ImGui::CalcTextSize(this->FileName.c_str());
     winSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
     winSize.y += 2.f * ImGui::GetStyle().WindowPadding.y;
 
-    ::SetupNextWindow(ImVec2(viewport->GetWorkCenter().x - 0.5f * winSize.x, marginTop), winSize);
+    ::SetupNextWindow(ImVec2(viewport->GetWorkCenter().x - 0.5f * winSize.x, margin), winSize);
     ImGui::SetNextWindowBgAlpha(0.9f);
 
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
@@ -495,13 +495,13 @@ void vtkF3DImguiActor::RenderMetaData()
 {
   const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-  constexpr float marginRight = 5.f;
+  constexpr float margin = F3DImguiStyle::GetDefaultMargin();
 
   ImVec2 winSize = ImGui::CalcTextSize(this->MetaData.c_str());
   winSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
   winSize.y += 2.f * ImGui::GetStyle().WindowPadding.y;
 
-  ::SetupNextWindow(ImVec2(viewport->WorkSize.x - winSize.x - marginRight,
+  ::SetupNextWindow(ImVec2(viewport->WorkSize.x - winSize.x - margin,
                       viewport->GetWorkCenter().y - 0.5f * winSize.y),
     winSize);
   ImGui::SetNextWindowBgAlpha(0.9f);
@@ -519,7 +519,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
 {
   const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-  constexpr float margin = 5.f;
+  constexpr float margin = F3DImguiStyle::GetDefaultMargin();
   constexpr float padding = 16.f;
 
   float textHeight = 0.f;
@@ -654,8 +654,7 @@ void vtkF3DImguiActor::RenderFpsCounter()
 {
   const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-  constexpr float marginRight = 3.f;
-  constexpr float marginBottom = 3.f;
+  constexpr float margin = F3DImguiStyle::GetDefaultMargin();
 
   std::string fpsString = std::to_string(this->FpsValue);
   fpsString += " fps";
@@ -664,8 +663,8 @@ void vtkF3DImguiActor::RenderFpsCounter()
   winSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
   winSize.y += 2.f * ImGui::GetStyle().WindowPadding.y;
 
-  ImVec2 position(viewport->WorkSize.x - winSize.x - marginRight,
-    viewport->WorkSize.y - winSize.y - marginBottom);
+  ImVec2 position(
+    viewport->WorkSize.x - winSize.x - margin, viewport->WorkSize.y - winSize.y - margin);
 
   ::SetupNextWindow(position, winSize);
   ImGui::SetNextWindowBgAlpha(0.9f);

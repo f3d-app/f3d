@@ -210,8 +210,7 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
 {
   const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-  constexpr float marginConsole = 30.f;
-  constexpr float marginTopRight = 5.f;
+  constexpr float margin = F3DImguiStyle::GetDefaultMargin();
   const float padding = ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().FramePadding.x;
 
   // explicitly calculate size of minimal console to avoid extra flashing frame
@@ -220,15 +219,15 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
     if (this->Pimpl->NewError || this->Pimpl->NewWarning)
     {
       // prevent overlap with console badge in minimal console
-      ImGui::SetNextWindowPos(ImVec2(marginTopRight, marginTopRight));
-      ImGui::SetNextWindowSize(ImVec2(
-        viewport->WorkSize.x - 2.f * marginConsole, ImGui::CalcTextSize(">").y + 2.f * padding));
+      ImGui::SetNextWindowPos(ImVec2(margin, margin));
+      ImGui::SetNextWindowSize(
+        ImVec2(viewport->WorkSize.x - 2.f * margin, ImGui::CalcTextSize(">").y + 2.f * padding));
     }
     else
     {
-      ImGui::SetNextWindowPos(ImVec2(marginTopRight, marginTopRight));
-      ImGui::SetNextWindowSize(ImVec2(
-        viewport->WorkSize.x - 2.f * marginTopRight, ImGui::CalcTextSize(">").y + 2.f * padding));
+      ImGui::SetNextWindowPos(ImVec2(margin, margin));
+      ImGui::SetNextWindowSize(
+        ImVec2(viewport->WorkSize.x - 2.f * margin, ImGui::CalcTextSize(">").y + 2.f * padding));
     }
   }
   else
@@ -237,9 +236,9 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
     this->Pimpl->NewError = false;
     this->Pimpl->NewWarning = false;
 
-    ImGui::SetNextWindowPos(ImVec2(marginConsole, marginConsole));
-    ImGui::SetNextWindowSize(ImVec2(
-      viewport->WorkSize.x - 2.f * marginConsole, viewport->WorkSize.y - 2.f * marginConsole));
+    ImGui::SetNextWindowPos(ImVec2(margin, margin));
+    ImGui::SetNextWindowSize(
+      ImVec2(viewport->WorkSize.x - 2.f * margin, viewport->WorkSize.y - 2.f * margin));
   }
 
   ImGui::SetNextWindowBgAlpha(0.9f);
@@ -377,14 +376,13 @@ void vtkF3DImguiConsole::ShowBadge()
 
   if (this->Pimpl->NewError || this->Pimpl->NewWarning)
   {
-    constexpr float marginTopRight = 5.f;
+    constexpr float margin = F3DImguiStyle::GetDefaultMargin();
     const float padding = ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().FramePadding.x;
     ImVec2 winSize = ImGui::CalcTextSize("!");
     winSize.x += 2.f * padding;
     winSize.y += 2.f * padding;
 
-    ImGui::SetNextWindowPos(
-      ImVec2(viewport->WorkSize.x - winSize.x - marginTopRight, marginTopRight));
+    ImGui::SetNextWindowPos(ImVec2(viewport->WorkSize.x - winSize.x - margin, margin));
     ImGui::SetNextWindowSize(winSize);
     ImGui::SetNextWindowBgAlpha(0.9f);
 
