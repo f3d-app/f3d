@@ -89,6 +89,7 @@ public:
   void SetGridUnitSquare(const std::optional<double>& unitSquare);
   void SetGridSubdivisions(int subdivisions);
   void SetGridColor(const std::vector<double>& color);
+  void SetBackdropOpacity(const double backdropOpacity);
   ///@}
 
   ///@{
