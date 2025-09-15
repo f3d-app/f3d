@@ -108,7 +108,9 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "font-file", "", "Path to a FreeType compatible font file", "<file_path>", ""},
       { "font-scale", "", "Scale fonts", "<ratio>", ""},
       { "command-script", "", "Path to a script file containing commands to execute", "<file_path>", "" },
+#if F3D_MODULE_UI
       { "backdrop-opacity", "", "UI backdrop opacity", "<value>", ""} } },
+#endif
   { "Material",
     { {"point-sprites", "o", "Show sphere sprites instead of surfaces", "<bool>", "1" },
       {"point-sprites-type", "", "Point sprites type", "<sphere|gaussian>", ""},
