@@ -26,7 +26,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: ${{github.workspace}}/dependencies/gdal_install
-        key: gdal-${{inputs.version}}-${{inputs.proj_version}}-${{runner.os}}-${{inputs.cpu}}-cxx17-1
+        key: gdal-${{inputs.version}}-${{inputs.proj_version}}-${{runner.os}}-${{inputs.cpu}}-0
 
     - name: Checkout GDAL
       if: steps.cache-gdal.outputs.cache-hit != 'true'
@@ -50,8 +50,6 @@ runs:
       shell: bash
       run: >
         cmake ../gdal
-        -DCMAKE_CXX_STANDARD=17
-        -DCMAKE_CXX_STANDARD_REQUIRED=ON
         -DBUILD_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX=../gdal_install

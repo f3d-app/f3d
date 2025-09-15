@@ -22,7 +22,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: ${{github.workspace}}/dependencies/xercesc_install
-        key: xercesc-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-cxx17-1
+        key: xercesc-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-0
 
     - name: Checkout xerces-c
       if: steps.cache-xercesc.outputs.cache-hit != 'true'
@@ -46,8 +46,6 @@ runs:
       shell: bash
       run: >
         cmake ../xercesc
-        -DCMAKE_CXX_STANDARD=17
-        -DCMAKE_CXX_STANDARD_REQUIRED=ON
         -DBUILD_APPS=ON
         -DBUILD_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release

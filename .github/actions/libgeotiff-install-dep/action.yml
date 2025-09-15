@@ -30,7 +30,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: ${{github.workspace}}/dependencies/libgeotiff_install
-        key: libgeotiff-${{inputs.version}}-${{inputs.prof_version}}-${{inputs.libtiff_version}}-${{runner.os}}-${{inputs.cpu}}-cxx17-1
+        key: libgeotiff-${{inputs.version}}-${{inputs.prof_version}}-${{inputs.libtiff_version}}-${{runner.os}}-${{inputs.cpu}}-0
 
     - name: Checkout libgeotiff
       if: steps.cache-libgeotiff.outputs.cache-hit != 'true'
@@ -54,8 +54,6 @@ runs:
       shell: bash
       run: >
         cmake ../libgeotiff/libgeotiff
-        -DCMAKE_CXX_STANDARD=17
-        -DCMAKE_CXX_STANDARD_REQUIRED=ON
         -DBUILD_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX=../libgeotiff_install
