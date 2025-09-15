@@ -113,8 +113,8 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
               << " != " << testElevation << "\n";
     return EXIT_FAILURE;
   }
-  cam.elevation(-45);
   testElevation = -45.0;
+  cam.elevation(testElevation);
   elevation = cam.getElevation();
   if (!compareDouble(elevation, testElevation))
   {
