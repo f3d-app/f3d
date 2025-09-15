@@ -182,73 +182,7 @@ void camera_impl::getState(camera_state_t& state)
   cam->GetViewUp(state.viewUp.data());
   state.viewAngle = cam->GetViewAngle();
 }
-//----------------------------------------------------------------------------
-angle_deg_t camera_impl::getYaw()
-{
-  point3_t pos, foc;
-  vector3_t dir;
-  double *up, *right;
-  this->getPosition(pos);
-  this->getFocalPoint(foc);
-  double* up = this->Internals->VTKRenderer->GetEnvironmentUp();
-  double* right = this->Internals->VTKRenderer->GetEnvironmentRight();
-  // Forward vector (focal - position)
-  vtkMath::Subtract(foc, pos, dir);
-  vtkMath::Normalize(dir.data());
-  vtkMath::Normalize(up);
 
-  // Project forward onto plane perpendicular to up
-  double dot = vtkMath::Dot(dir.data(), up);
-  vector3_t projected;
-  for (int i = 0; i < 3; ++i)
-  {
-    projected[i] = dir[i] - dot * up[i];
-  }
-  vtkMath::Normalize(projected.data());
-  vector3_t cross;
-  vtkMath::Cross(right, projected.data(), cross.data());
-  double sign = (vtkMath::Dot(cross, up) >= 0) ? 1 : -1;
-  double angleRad = vtkMath::AngleBetweenVectors(right, projected.data());
-  return sign * vtkMath::DegreesFromRadians(angleRad);
-}
-//----------------------------------------------------------------------------
-angle_deg_t camera_impl::getElevation()
-{
-  double* up = this->Internals->VTKRenderer->GetEnvironmentUp();
-  vtkCamera* cam = this->GetVTKCamera();
-  return vtkMath::DegreesFromRadians(
-    vtkMath::AngleBetweenVectors(up, cam->GetDirectionOfProjection()) - vtkMath::Pi() / 2);
-}
-//----------------------------------------------------------------------------
-angle_deg_t camera_impl::getAzimuth()
-{
-  point3_t pos, foc;
-  vector3_t dir;
-  double* up = this->Internals->VTKRenderer->GetEnvironmentUp();
-  double* right = this->Internals->VTKRenderer->GetEnvironmentRight();
-  this->getPosition(pos);
-  this->getFocalPoint(foc);
-
-  // Forward vector (focal - position)
-  vtkMath::Subtract(foc, pos, dir);
-  vtkMath::Normalize(dir.data());
-  vtkMath::Normalize(up);
-
-  // Project forward onto plane perpendicular to up
-  double dot = vtkMath::Dot(dir.data(), up);
-  vector3_t projected;
-  for (int i = 0; i < 3; ++i)
-  {
-    projected[i] = dir[i] - dot * up[i];
-  }
-  vtkMath::Normalize(projected.data());
-
-  double angleRad = vtkMath::AngleBetweenVectors(right, projected.data());
-  vector3_t cross;
-  vtkMath::Cross(right, projected.data(), cross.data());
-  double sign = vtkMath::Dot(cross.data(), up) >= 0 ? 1.0 : -1.0;
-  return sign * vtkMath::DegreesFromRadians(angleRad);
-}
 //----------------------------------------------------------------------------
 camera& camera_impl::dolly(double val)
 {
@@ -347,6 +281,73 @@ camera& camera_impl::pitch(angle_deg_t angle)
   this->Internals->OrthogonalizeViewUp(cam);
   this->Internals->VTKRenderer->ResetCameraClippingRange();
   return *this;
+}
+
+//----------------------------------------------------------------------------
+angle_deg_t camera_impl::getYaw()
+{
+  point3_t pos, foc;
+  vector3_t dir, projectedAlongUp, projected;
+  double* up = this->Internals->VTKRenderer->GetEnvironmentUp();
+  double* right = this->Internals->VTKRenderer->GetEnvironmentRight();
+  this->getPosition(pos);
+  this->getFocalPoint(foc);
+
+  // Forward vector (focal - position)
+  vtkMath::Subtract(foc, pos, dir);
+  vtkMath::Normalize(dir.data());
+  vtkMath::Normalize(up);
+
+  // Project forward vector onto up vector
+  vtkMath::ProjectVector(dir.data(), up, projectedAlongUp.data());
+  vtkMath::Normalize(projectedAlongUp.data());
+
+  // Projection of forward vector along the plane perpendicular to up vector
+  vtkMath::Subtract(dir,projectedAlongUp,projected);
+
+  vector3_t cross;
+  vtkMath::Cross(right, projected.data(), cross.data());
+  double sign = (vtkMath::Dot(cross.data(), up) >= 0) ? 1.0 : -1.0;
+  double angleRad = vtkMath::AngleBetweenVectors(right, projected.data());
+  return sign * vtkMath::DegreesFromRadians(angleRad);
+}
+
+//----------------------------------------------------------------------------
+angle_deg_t camera_impl::getAzimuth()
+{
+  point3_t pos, foc;
+  vector3_t dir, projectedAlongUp, projected;
+  double* up = this->Internals->VTKRenderer->GetEnvironmentUp();
+  double* right = this->Internals->VTKRenderer->GetEnvironmentRight();
+  this->getPosition(pos);
+  this->getFocalPoint(foc);
+
+  // Forward vector (focal - position)
+  vtkMath::Subtract(foc, pos, dir);
+  vtkMath::Normalize(dir.data());
+  vtkMath::Normalize(up);
+
+   // Project forward vector onto up vector
+  vtkMath::ProjectVector(dir.data(), up, projectedAlongUp.data());
+  vtkMath::Normalize(projectedAlongUp.data());
+
+  //Projection of forward vector along the plane perpendicular to up vector
+  vtkMath::Subtract(dir,projectedAlongUp,projected);
+
+  double angleRad = vtkMath::AngleBetweenVectors(right, projected.data());
+  vector3_t cross;
+  vtkMath::Cross(right, projected.data(), cross.data());
+  double sign = vtkMath::Dot(cross.data(), up) >= 0 ? 1.0 : -1.0;
+  return sign * vtkMath::DegreesFromRadians(angleRad);
+}
+
+//----------------------------------------------------------------------------
+angle_deg_t camera_impl::getElevation()
+{
+  double* up = this->Internals->VTKRenderer->GetEnvironmentUp();
+  vtkCamera* cam = this->GetVTKCamera();
+  return vtkMath::DegreesFromRadians(
+    vtkMath::AngleBetweenVectors(up, cam->GetDirectionOfProjection()) - vtkMath::Pi() / 2);
 }
 
 //----------------------------------------------------------------------------
