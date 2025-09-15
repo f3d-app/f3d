@@ -40,7 +40,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/vtk_install
-        key: vtk-${{ inputs.vtk_version }}-${{inputs.zlib_version}}-${{inputs.blosc_version}}-${{inputs.tbb_version}}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}${{ inputs.ospray_version != '' && format('-ospray-{0}', inputs.ospray_version) || '' }}-${{runner.os}}-${{inputs.cpu}}-1
+        key: vtk-${{ inputs.vtk_version }}-${{inputs.zlib_version}}-${{inputs.blosc_version}}-${{inputs.tbb_version}}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}${{ inputs.ospray_version != '' && format('-ospray-{0}', inputs.ospray_version) || '' }}-${{runner.os}}-${{inputs.cpu}}-2
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
