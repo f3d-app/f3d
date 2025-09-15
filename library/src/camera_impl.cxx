@@ -190,8 +190,8 @@ angle_deg_t camera_impl::getYaw()
   double *up, *right;
   this->getPosition(pos);
   this->getFocalPoint(foc);
-  up = this->Internals->VTKRenderer->GetEnvironmentUp();
-  right = this->Internals->VTKRenderer->GetEnvironmentRight();
+  double* up = this->Internals->VTKRenderer->GetEnvironmentUp();
+  double* right = this->Internals->VTKRenderer->GetEnvironmentRight();
   // Forward vector (focal - position)
   vtkMath::Subtract(foc, pos, dir);
   vtkMath::Normalize(dir.data());
