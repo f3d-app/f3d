@@ -1393,6 +1393,13 @@ void vtkF3DRenderer::SetFontScale(const double fontScale)
     this->TextActorsConfigured = false;
   }
 }
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetBackdropOpacity(const double backdropOpacity)
+{
+  this->UIActor->SetBackdropOpacity(backdropOpacity);
+}
+
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetBackground(const double* color)
 {

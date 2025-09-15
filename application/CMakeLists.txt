@@ -82,6 +82,11 @@ function(f3d_create_exec target_name)
     target_compile_definitions(${target_name} PRIVATE F3D_MODULE_DMON)
   endif ()
 
+  #ui
+  if (F3D_MODULE_UI)
+    target_compile_definitions(${target_name} PRIVATE F3D_MODULE_UI)
+  endif()
+
   # tinyfiledialogs
   if (F3D_MODULE_TINYFILEDIALOGS)
     target_compile_definitions(${target_name} PRIVATE F3D_MODULE_TINYFILEDIALOGS)
