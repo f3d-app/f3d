@@ -71,9 +71,6 @@ runs:
       run: >
         cmake ../pdal
         -DBUILD_SHARED_LIBS=ON
-        -DCMAKE_CXX_STANDARD=17
-        -DCMAKE_CXX_STANDARD_REQUIRED=ON
-        -DCMAKE_VERBOSE_MAKEFILE=ON 
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_LIBDIR:PATH=lib
         -DCMAKE_INSTALL_PREFIX=../pdal_install
