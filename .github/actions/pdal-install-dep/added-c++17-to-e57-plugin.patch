@@ -1,0 +1,15 @@
+diff --git a/plugins/e57/libE57Format/CMakeLists.txt b/plugins/e57/libE57Format/CMakeLists.txt
+index 130e9917d..59b202d49 100644
+--- a/plugins/e57/libE57Format/CMakeLists.txt
++++ b/plugins/e57/libE57Format/CMakeLists.txt
+@@ -37,6 +37,10 @@ set(${PROJECT_NAME}_MAJOR_VERSION 2)
+ set(${PROJECT_NAME}_MINOR_VERSION 0)
+ set(${PROJECT_NAME}_PATCH_VERSION 1)
+ 
++set(CMAKE_CXX_STANDARD 17)
++set(CMAKE_CXX_STANDARD_REQUIRED ON)
++set(CMAKE_CXX_EXTENSIONS OFF)
++
+ find_package(XercesC REQUIRED)
+ 
+ #
