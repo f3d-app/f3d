@@ -87,8 +87,6 @@ runs:
         -DSQLite3_LIBRARY=$(pwd)/../sqlite/dependencies/sqlite_install/lib/libsqlite3.so
         -DSQLite3_INCLUDE_DIR=$(pwd)/../sqlite/dependencies/sqlite_install/include
         -DCURL_INCLUDE_DIR=$(pwd)/../curl_install/include
-        -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=TRUE
-        -DCMAKE_INSTALL_RPATH='$ORIGIN/../lib'
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
