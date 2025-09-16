@@ -81,7 +81,6 @@ runs:
         -DCMAKE_POSITION_INDEPENDENT_CODE=ON
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
         -DBUILD_PLUGIN_E57=ON
-        -DBUILD_PLUGIN_BLOSC=ON
         -DSQLite3_LIBRARY=$(pwd)/../sqlite/dependencies/sqlite_install/lib/libsqlite3.so
         -DSQLite3_INCLUDE_DIR=$(pwd)/../sqlite/dependencies/sqlite_install/include
         -DCURL_INCLUDE_DIR=$(pwd)/../curl_install/include
