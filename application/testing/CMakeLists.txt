@@ -956,7 +956,7 @@ if(F3D_PLUGIN_BUILD_VDB)
 endif ()
 
 if(F3D_PLUGIN_BUILD_PDAL)
-  f3d_test(NAME TestE57 DATA bunnyInt19.e57 ARGS --load-plugins=pdal --no-config)
+  f3d_test(NAME TestE57 DATA bunnyInt19.e57 ENV "LD_LIBRARY_PATH=${F3D_SOURCE_DIR}/testing/data:${CMAKE_PREFIX_PATH}/lib" ARGS --load-plugins=pdal)
 endif()
 
 if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
