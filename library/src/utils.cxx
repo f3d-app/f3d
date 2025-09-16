@@ -29,7 +29,6 @@ std::vector<std::string> utils::tokenize(std::string_view str, bool skipComment)
 {
   std::vector<std::string> tokens;
   std::string token;
-  const std::string colorHexTokens = "0123456789abcdefABCDEF";
   const auto accumulate = [&](const char& c) { token.push_back(c); };
   const auto emit = [&]()
   {
