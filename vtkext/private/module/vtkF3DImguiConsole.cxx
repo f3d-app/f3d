@@ -221,8 +221,8 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
     {
       // prevent overlap with console badge in minimal console
       ImGui::SetNextWindowPos(ImVec2(margin, margin));
-      ImGui::SetNextWindowSize(
-        ImVec2(viewport->WorkSize.x - 2.f * marginBadge, ImGui::CalcTextSize(">").y + 2.f * padding));
+      ImGui::SetNextWindowSize(ImVec2(
+        viewport->WorkSize.x - 2.f * marginBadge, ImGui::CalcTextSize(">").y + 2.f * padding));
     }
     else
     {
