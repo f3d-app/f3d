@@ -164,6 +164,12 @@
     }
   },
   "ui": {
+    "backdrop": {
+      "opacity": {
+        "type": "double",
+        "default_value": "0.9"
+      }
+    },
     "axis": {
       "type": "bool",
       "default_value": "false"

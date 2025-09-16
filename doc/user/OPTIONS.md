@@ -58,6 +58,7 @@ F3D behavior can be fully controlled from the command line using the following o
 | \-\-font-file=\<font file\>                          | path<br/>-          | Use the provided FreeType compatible font file to display text.<br/>Can be useful to display non-ASCII filenames.                                                                                                      |
 | \-\-font-scale=\<ratio\>                             | ratio<br/>1.0       | Scale fonts.                                                                                                                                                                                                           |
 | \-\-command-script=\<command script\>                | script<br/>-        | Provide a script file containing a list of commands to be executed sequentially.<br/>Allows automation of multiple commands or pre-defined tasks.                                                                      |
+| \-\-backdrop-opacity=\<opacity\>                     | double<br/>0.9      | Set the opacity of the backdrop behind text information such as FPS, filename, metadata or cheatsheet.                                                                                                                 |
 
 ## Material options
 
