@@ -75,8 +75,6 @@ runs:
       run: >
         cmake ../pdal
         -DBUILD_SHARED_LIBS=ON
-        -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=TRUE
-        -DCMAKE_INSTALL_RPATH='$ORIGIN/../lib:$ORIGIN'
         -DCMAKE_CXX_STANDARD=17
         -DCMAKE_CXX_STANDARD_REQUIRED=ON
         -DCMAKE_CXX_EXTENSIONS=OFF
