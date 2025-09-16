@@ -210,6 +210,7 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
 {
   const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
+  constexpr float marginBadge = 26.5f;
   constexpr float margin = F3DImguiStyle::GetDefaultMargin();
   const float padding = ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().FramePadding.x;
 
@@ -221,7 +222,7 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
       // prevent overlap with console badge in minimal console
       ImGui::SetNextWindowPos(ImVec2(margin, margin));
       ImGui::SetNextWindowSize(
-        ImVec2(viewport->WorkSize.x - 2.f * margin, ImGui::CalcTextSize(">").y + 2.f * padding));
+        ImVec2(viewport->WorkSize.x - 2.f * marginBadge, ImGui::CalcTextSize(">").y + 2.f * padding));
     }
     else
     {
