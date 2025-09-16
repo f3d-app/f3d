@@ -25,7 +25,7 @@ unsigned int utils::textDistance(std::string_view strA, std::string_view strB)
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::string> utils::tokenize(std::string_view str)
+std::vector<std::string> utils::tokenize(std::string_view str, bool skipComment)
 {
   std::vector<std::string> tokens;
   std::string token;
@@ -41,34 +41,20 @@ std::vector<std::string> utils::tokenize(std::string_view str)
   };
   bool escaped = false;
   char quoted = '\0';
-  bool color = false;
-  bool comment = false;
   bool commented = false;
   for (char c : str)
   {
     switch (c)
     {
       case '\\':
-        if (comment || color)
-        {
-          commented = true;
-          token.clear();
-          break;
-        }
-        else if (escaped)
+        if (escaped)
         {
           accumulate(c);
         }
         escaped = !escaped;
         break;
       case ' ':
-        if (comment || color)
-        {
-          commented = true;
-          token.clear();
-          break;
-        }
-        else if (!escaped && !quoted)
+        if (!escaped && !quoted)
         {
           emit();
         }
@@ -81,13 +67,7 @@ std::vector<std::string> utils::tokenize(std::string_view str)
       case '"':
       case '\'':
       case '`':
-        if (comment || color)
-        {
-          commented = true;
-          token.clear();
-          break;
-        }
-        else if (!escaped && quoted == c)
+        if (!escaped && quoted == c)
         {
           emit();
           quoted = '\0';
@@ -103,15 +83,9 @@ std::vector<std::string> utils::tokenize(std::string_view str)
         escaped = false;
         break;
       case '#':
-        if (comment || color)
+        if (!escaped && !quoted && !skipComment)
         {
           commented = true;
-          token.clear();
-          break;
-        }
-        if (!escaped && !quoted)
-        {
-          comment = true;
         }
         else
         {
@@ -120,25 +94,9 @@ std::vector<std::string> utils::tokenize(std::string_view str)
         escaped = false;
         break;
       default:
-      {
-        bool isValidHexToken = colorHexTokens.find(c) != std::string::npos;
-        if (comment && isValidHexToken)
-        {
-          color = true;
-          comment = false;
-          // Add missing previous '#' in order to be able to parse the HEX Color
-          accumulate('#');
-        }
-        else if ((comment || color) && !isValidHexToken)
-        {
-          commented = true;
-          break;
-        }
-
         accumulate(c);
         escaped = false;
         break;
-      }
     }
 
     if (commented)

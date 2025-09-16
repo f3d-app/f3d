@@ -110,7 +110,7 @@ public:
    * Note that default commands will never throw this exception, but adding commands
    * without exception catching may trigger this behavior.
    */
-  virtual bool triggerCommand(std::string_view command) = 0;
+  virtual bool triggerCommand(std::string_view command, bool skipComment=false) = 0;
   ///@}
 
   ///@{ @name Bindings

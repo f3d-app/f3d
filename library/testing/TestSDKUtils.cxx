@@ -59,41 +59,17 @@ int TestSDKUtils([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     f3d::utils::tokenize(R"(set render.hdri.file file # A comment)") ==
       std::vector<std::string>{ "set", "render.hdri.file", "file" });
 
-  test("tokenize comments without space",
-    f3d::utils::tokenize(R"(set render.hdri.file file #This is a comment)") ==
-      std::vector<std::string>{ "set", "render.hdri.file", "file" });
-
-  test("tokenize comments without space with valid hex token as first letter",
-    f3d::utils::tokenize(R"(set render.hdri.file file #A comment)") ==
-      std::vector<std::string>{ "set", "render.hdri.file", "file" });
-
-  test("tokenize comments without space with valid hex token as two first letters",
-    f3d::utils::tokenize(R"(set render.hdri.file file #A1 comment)") ==
-      std::vector<std::string>{ "set", "render.hdri.file", "file" });
-
-  test("tokenize comments without space with valid hex token as three first letters",
-    f3d::utils::tokenize(R"(set render.hdri.file file #A1d comment)") ==
-      std::vector<std::string>{ "set", "render.hdri.file", "file" });
+  test("tokenize comments with skip comment flag",
+    f3d::utils::tokenize(R"(set render.hdri.file file # A comment)", true) ==
+      std::vector<std::string>{ "set", "render.hdri.file", "file", "#", "A", "comment" });
 
   test("tokenize base color",
     f3d::utils::tokenize(R"(set render.background.color #000)") ==
+      std::vector<std::string>{ "set", "render.background.color" });
+
+  test("tokenize base color with skip comment flag",
+    f3d::utils::tokenize(R"(set render.background.color #000)", true) ==
       std::vector<std::string>{ "set", "render.background.color", "#000" });
-
-  test("tokenize upper case color",
-    f3d::utils::tokenize(R"(set render.background.color #FFF)") ==
-      std::vector<std::string>{ "set", "render.background.color", "#FFF" });
-
-  test("tokenize lower case color",
-    f3d::utils::tokenize(R"(set render.background.color #fff)") ==
-      std::vector<std::string>{ "set", "render.background.color", "#fff" });
-
-  test("tokenize mixed case color",
-    f3d::utils::tokenize(R"(set render.background.color #fEf)") ==
-      std::vector<std::string>{ "set", "render.background.color", "#fEf" });
-
-  test("tokenize mixed letter and number color",
-    f3d::utils::tokenize(R"(set render.background.color #fE1)") ==
-      std::vector<std::string>{ "set", "render.background.color", "#fE1" });
 
   test("tokenize escaped comments",
     f3d::utils::tokenize(R"(set render.hdri.file fi\#le)") ==

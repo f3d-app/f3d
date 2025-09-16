@@ -54,7 +54,7 @@ public:
    * `set scene.up.direction "+Z` -> tokenize_exception
    * `set scene.up.direction +Z\` -> tokenize_exception
    */
-  [[nodiscard]] static std::vector<std::string> tokenize(std::string_view str);
+  [[nodiscard]] static std::vector<std::string> tokenize(std::string_view str, bool skipComment=false);
   // clang-format on
 
   /**
