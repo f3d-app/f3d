@@ -75,19 +75,13 @@ runs:
       run: >
         cmake ../pdal
         -DBUILD_SHARED_LIBS=ON
-        -DCMAKE_CXX_STANDARD=17
-        -DCMAKE_CXX_STANDARD_REQUIRED=ON
-        -DCMAKE_CXX_EXTENSIONS=OFF
         -DCMAKE_BUILD_TYPE=Release
-        -DCMAKE_VERBOSE_MAKEFILE=ON
-        -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
-        -DCMAKE_MODULE_PATH=$(pwd)/../dependencies/install/lib/cmake/pdal/
         -DCMAKE_INSTALL_LIBDIR:PATH=lib
         -DCMAKE_INSTALL_PREFIX=../pdal_install
         -DCMAKE_POSITION_INDEPENDENT_CODE=ON
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
         -DBUILD_PLUGIN_E57=ON
-        -DUSE_BLOSC:BOOL=ON
+        -DBUILD_PLUGIN_BLOSC=ON
         -DSQLite3_LIBRARY=$(pwd)/../sqlite/dependencies/sqlite_install/lib/libsqlite3.so
         -DSQLite3_INCLUDE_DIR=$(pwd)/../sqlite/dependencies/sqlite_install/include
         -DCURL_INCLUDE_DIR=$(pwd)/../curl_install/include
