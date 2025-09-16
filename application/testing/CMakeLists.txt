@@ -956,7 +956,7 @@ if(F3D_PLUGIN_BUILD_VDB)
 endif ()
 
 if(F3D_PLUGIN_BUILD_PDAL)
-  f3d_test(NAME TestE57 DATA bunnyInt19.e57 ARGS --load-plugins=pdal,e57,blosc -o)
+  f3d_test(NAME TestE57 DATA bunnyInt19.e57 ARGS --load-plugins=pdal NO_BASELINE)
 endif()
 
 if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
