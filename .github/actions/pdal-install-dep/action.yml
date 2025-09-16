@@ -26,6 +26,9 @@ inputs:
   proj_version:
     description: "Version of proj to build against"
     required: true
+  blosc_version:
+    description: "Version of blosc to build against"
+    required: true
 
 runs:
   using: "composite"
@@ -40,13 +43,14 @@ runs:
         [[ "${{ inputs.curl_version }}" ]] || { echo "curl_version input is empty" ; exit 1; }
         [[ "${{ inputs.xercesc_version }}" ]] || { echo "xercesc_version input is empty" ; exit 1; }
         [[ "${{ inputs.proj_version }}" ]] || { echo "proj_version input is empty" ; exit 1; }
+        [[ "${{ inputs.blosc_version }}" ]] || { echo "blosc_version input is empty" ; exit 1; }
 
     - name: Cache PDAL
       id: cache-pdal
       uses: actions/cache/restore@v4
       with:
         path: ${{github.workspace}}/dependencies/pdal_install
-        key: pdal-${{inputs.version}}-${{inputs.proj_version}}-${{inputs.sqlite_version}}-${{inputs.xercesc_version}}-${{inputs.curl_version}}-${{inputs.gdal_version}}-${{runner.os}}-${{inputs.cpu}}-0
+        key: pdal-${{inputs.version}}-${{inputs.proj_version}}-${{inputs.sqlite_version}}-${{inputs.xercesc_version}}-${{inputs.curl_version}}-${{inputs.gdal_version}}-${{inputs.blosc_version}}-${{runner.os}}-${{inputs.cpu}}-0
 
     - name: Checkout PDAL
       if: steps.cache-pdal.outputs.cache-hit != 'true'

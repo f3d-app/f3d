@@ -151,3 +151,4 @@ runs:
         curl_version: ${{inputs.curl_version}}
         xercesc_version: ${{inputs.xercesc_version}}
         proj_version: ${{inputs.proj_version}}
+        blosc_version: ${{inputs.blosc_version}}
