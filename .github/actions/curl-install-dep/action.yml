@@ -46,7 +46,6 @@ runs:
       shell: bash
       run: >
         cmake ../curl
-        -DBUILD_APPS=ON
         -DBUILD_SHARED_LIBS=ON
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_LIBDIR:PATH=lib
