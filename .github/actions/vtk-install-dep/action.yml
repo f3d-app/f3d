@@ -137,8 +137,6 @@ runs:
         -DVTK_GROUP_ENABLE_Rendering=DEFAULT
         -DVTK_GROUP_ENABLE_StandAlone=DEFAULT
         -DVTK_LEGACY_REMOVE=ON
-        -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=TRUE
-        -DCMAKE_INSTALL_RPATH='$ORIGIN/../lib'
         -DVTK_MODULE_ENABLE_VTK_CommonSystem=YES
         -DVTK_MODULE_ENABLE_VTK_FiltersGeneral=YES
         -DVTK_MODULE_ENABLE_VTK_FiltersGeometry=YES
