@@ -82,7 +82,7 @@ runs:
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_LIBDIR:PATH=lib
         -DCMAKE_INSTALL_PREFIX=../pdal_install
-        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/:$(pwd)/../blosc_install
         -DBUILD_PLUGIN_E57=ON
         -DSQLite3_LIBRARY=$(pwd)/../sqlite/dependencies/sqlite_install/lib/libsqlite3.so
         -DSQLite3_INCLUDE_DIR=$(pwd)/../sqlite/dependencies/sqlite_install/include
