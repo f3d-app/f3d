@@ -222,7 +222,6 @@ jobs:
             v9.5.0,
             v9.4.2,
             v9.3.1,
-            v9.2.6,
           ]
         build_type: [standard]
         exclude:
@@ -484,7 +483,6 @@ jobs:
             v9.5.0,
             v9.4.2,
             v9.3.1,
-            v9.2.6,
           ]
         build_type: [standard]
         include:
