@@ -929,7 +929,8 @@ interactor& interactor_impl::initCommands()
         this->Internals->Options.interactor.axis_lock.axis = options::parse<f3d::direction_t>(args[0]);
         this->Internals->Options.interactor.axis_lock.enabled = true;
       }
-    });
+    },
+    command_documentation_t{ "toggle_axis_lock direction", "lock rotation to one direction" });
 
   this->addCommand(
     "roll_camera",
