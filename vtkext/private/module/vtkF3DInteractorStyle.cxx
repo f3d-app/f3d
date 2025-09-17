@@ -174,10 +174,14 @@ void vtkF3DInteractorStyle::Rotate()
     double newPos[3];
     if (ren->GetUseRotationAxis())
     {
+
+      // pick whichever mouse component is larger
+      bool use_dx = std::abs(dx) > std::abs(dy);
+      double delta = 20.0 * this->MotionFactor * (use_dx ? dx * 1.0 / size[0] : dy * -1.0 / size[1]);
+
       Transform->Identity();
       Transform->Translate(+fp[0], +fp[1], +fp[2]);
-      Transform->RotateWXYZ(ren->GetMovementVector()[0] * rxf + ren->GetMovementVector()[1] * ryf,
-        ren->GetRotationAxis());
+      Transform->RotateWXYZ(delta, ren->GetRotationAxis());
       Transform->Translate(-fp[0], -fp[1], -fp[2]);
 
       Transform->TransformPoint(camera->GetPosition(), newPos);
