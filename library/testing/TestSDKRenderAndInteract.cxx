@@ -3,7 +3,7 @@
 #include <scene.h>
 #include <window.h>
 
-int TestSDKRenderAndInteract(int argc, char* argv[])
+int TestSDKRenderAndInteract([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   // Order of allocation matter for VTK
   // This tests ensure that rendering then using

@@ -1,5 +1,8 @@
 # Build guide
 
+> [!NOTE]
+> For WebAssembly cross-compilation, follow the dedicated guide [here](./BUILD_WASM.md).
+
 F3D uses a CMake based build system, so building F3D just requires installing
 needed dependencies, configuring and building. If you are not used to such processes
 please take a look at our [getting started guide](GETTING_STARTED.md).
@@ -15,6 +18,7 @@ please take a look at our [getting started guide](GETTING_STARTED.md).
 - Optionally, [Alembic](http://www.alembic.io/) >= 1.8.5.
 - Optionally, [OpenUSD](https://openusd.org/release/index.html) >= 24.08 (25.05.01 recommended).
 - Optionally, [OpenVDB](https://www.openvdb.org/download/) >= 12.0.0, enable `IOOpenVDB` module during VTK configuration.
+- Optionally, [OSPray](https://www.ospray.org/) == v2.12.0, enable `RenderingRayTracing` module during VTK configuration.
 - Optionally, [Draco](https://google.github.io/draco/) >= 1.5.6.
 - Optionally, [Python](https://www.python.org/) >= 3.9 and [pybind11](https://github.com/pybind/pybind11) >= 2.9.2.
 - Optionally, [Java](https://www.java.com) >= 17.
@@ -43,7 +47,7 @@ Here is some CMake options of interest:
 
 Some modules, plugins and language bindings depending on external libraries can be optionally enabled with the following CMake variables:
 
-- `F3D_MODULE_RAYTRACING`: Support for raytracing rendering. Requires that VTK has been built with `OSPRay` and `VTK_MODULE_ENABLE_VTK_RenderingRayTracing` turned on. Disabled by default.
+- `F3D_MODULE_RAYTRACING`: Support for raytracing rendering. Requires that VTK has been built with `OSPRay` and `RenderingRayTracing` turned on. Disabled by default.
 - `F3D_MODULE_EXR`: Support for OpenEXR images. Requires `OpenEXR`. Disabled by default.
 - `F3D_MODULE_UI`: Support for ImGui widgets. Uses provided ImGui. Enabled by default.
 - `F3D_PLUGIN_BUILD_HDF`: Support for VTKHDF (.vtkhdf), ExodusII (.ex2), and NetCDF (.nc) file formats. Requires that VTK has been built with `IOHDF`, `IOExodus`, and `IONetCDF` modules (and `hdf5`). Enabled by default.

@@ -12,15 +12,15 @@ It is fully controllable from the command line and support configuration files. 
 
 F3D also contains the libf3d, a simple library to render meshes, with a C++17 API, Python Bindings, and experimental Java and Javascript bindings.
 
-<img src="https://media.githubusercontent.com/media/f3d-app/f3d-media/95b76c22d927bb24759bbe0246b6260121f2933b/media/typical.png" width="640">
+<img src="https://media.githubusercontent.com/media/f3d-app/f3d-media/95b76c22d927bb24759bbe0246b6260121f2933b/media/typical.png" width="640" />
 
 _A typical render by F3D_
 
-<img src="https://user-images.githubusercontent.com/3129530/194735261-dd6f1c1c-fa57-47b0-9d27-f735d18ccd5e.gif" width="640">
+<img src="https://user-images.githubusercontent.com/3129530/194735261-dd6f1c1c-fa57-47b0-9d27-f735d18ccd5e.gif" width="640" />
 
 _Animation of a glTF file within F3D_
 
-<img src="https://user-images.githubusercontent.com/3129530/194735272-5bcd3e7c-a333-41f5-8066-9b0bec9885e8.png" width="640">
+<img src="https://user-images.githubusercontent.com/3129530/194735272-5bcd3e7c-a333-41f5-8066-9b0bec9885e8.png" width="640" />
 
 _A direct scalars render by F3D_
 

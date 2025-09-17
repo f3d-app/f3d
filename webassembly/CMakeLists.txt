@@ -5,9 +5,6 @@ if(NOT VTK_VERSION VERSION_GREATER_EQUAL 9.3.20231007)
   message(FATAL_ERROR "Cannot build emscripten bindings with VTK version below 9.3.20231007")
 endif()
 
-set(F3D_WASM_DATA_FILE "${F3D_SOURCE_DIR}/testing/data/f3d.vtp"
-  CACHE PATH "File to copy in the webassembly root virtual filesystem")
-
 add_executable(f3djs F3DEmscriptenBindings.cxx)
 
 set_target_properties(f3djs PROPERTIES
@@ -20,11 +17,12 @@ target_link_options(f3djs PRIVATE
   "$<IF:$<CONFIG:Release>,-Oz,-O0>"
   "--bind"
   "--closure 1"
-  "SHELL:--preload-file ${F3D_WASM_DATA_FILE}@/"
   "SHELL:-sEXPORT_NAME=f3d"
   "SHELL:-sALLOW_MEMORY_GROWTH=1"
   "SHELL:-sEMULATE_FUNCTION_POINTER_CASTS=0"
   "SHELL:-sMODULARIZE=1"
+  "SHELL:-sEXPORT_ES6=1"
+  "SHELL:-sENVIRONMENT=web"
   "SHELL:-sUSE_PTHREADS=0"
   "SHELL:-sSTACK_SIZE=1048576"
   "SHELL:-sWASM=1"
@@ -33,28 +31,9 @@ target_link_options(f3djs PRIVATE
   "SHELL:-sWASM_BIGINT"
 )
 
-# Option to copy app.html file to index.html in the binary folder
-# In order to test the app:
-# - go to the binary folder where f3d.js, f3d.wasm and f3d.data are located
-# - run `python -m http.server 8000`
-# - open a browser to http://localhost:8000
-option(F3D_WASM_COPY_APP "Copy HTML app file to binary folder" ON)
-
-if(F3D_WASM_COPY_APP)
-  configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/app.html"
-    "${CMAKE_BINARY_DIR}/bin/index.html"
-    COPYONLY)
-  configure_file(
-    "${F3D_SOURCE_DIR}/resources/logo.ico"
-    "${CMAKE_BINARY_DIR}/bin/favicon.ico"
-    COPYONLY)
-  configure_file(
-    "${F3D_SOURCE_DIR}/resources/logo256.png"
-    "${CMAKE_BINARY_DIR}/bin/icon256.png"
-    COPYONLY)
-  configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/manifest.json"
-    "${CMAKE_BINARY_DIR}/bin/manifest.json"
-    COPYONLY)
-endif()
+# The tests rely on the presence of chromium
+# Since we rely on Docker, we know it's there so testing is always enabled
+# Moreover, we cannot use BUILD_TESTING since it enables testing in our VTK modules
+# and breaks the configuration (we should fix that properly at some point)
+enable_testing()
+add_subdirectory(testing)

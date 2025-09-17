@@ -11,6 +11,10 @@ def doc_fn():
     return "dummyDoc", "dummyValue"
 
 
+def compl_fn():
+    return "compl"
+
+
 def test_command(capfd: pytest.CaptureFixture[str]):
     engine = f3d.Engine.create(True)
     inter = engine.interactor
@@ -30,6 +34,7 @@ def test_command(capfd: pytest.CaptureFixture[str]):
 
     # Smoke test
     inter.init_commands()
+    inter.add_command("my_cmd2", print_fn, ["my_cmd2", "doc"], compl_fn)
 
 
 def test_binding():
@@ -57,27 +62,43 @@ def test_binding():
         "dummy command",
         "DummyGroup",
         doc_fn,
+        f3d.Interactor.BindingType.CYCLIC,
     )
     inter.add_binding(
         f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.CTRL, "P"),
         "dummy command",
         "DummyGroup",
         doc_fn,
+        f3d.Interactor.BindingType.NUMERICAL,
     )
     inter.add_binding(
         f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.SHIFT, "P"),
         "dummy command",
         "DummyGroup",
         doc_fn,
+        f3d.Interactor.BindingType.TOGGLE,
     )
     inter.add_binding(
         f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.CTRL_SHIFT, "P"),
         ["dummy command", "dummy command"],
         "DummyGroup",
         doc_fn,
+        f3d.Interactor.BindingType.OTHER,
     )
     assert len(inter.get_bind_groups()) == 1
     assert len(inter.get_binds()) == 5
+    assert (
+        inter.get_binding_documentation(
+            f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.CTRL, "P")
+        )
+        == doc_fn()
+    )
+    assert (
+        inter.get_binding_type(
+            f3d.InteractionBind(f3d.InteractionBind.ModifierKeys.CTRL, "P")
+        )
+        == f3d.Interactor.BindingType.NUMERICAL
+    )
 
     inter.init_bindings()
 

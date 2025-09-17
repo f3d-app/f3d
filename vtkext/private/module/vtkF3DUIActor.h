@@ -10,6 +10,7 @@
 
 #include <vtkProp.h>
 
+#include <cstdint>
 #include <deque>
 
 class vtkOpenGLRenderWindow;
@@ -20,7 +21,19 @@ public:
   static vtkF3DUIActor* New();
   vtkTypeMacro(vtkF3DUIActor, vtkProp);
 
-  using CheatSheetTuple = std::tuple<std::string, std::string, std::string>;
+  /**
+   * Enumeration of available cheatsheet binding types.
+   * Duplicate of library/public/interactor.h
+   */
+  enum class CheatSheetBindingType : std::uint8_t
+  {
+    CYCLIC = 0,
+    NUMERICAL = 1,
+    TOGGLE = 2,
+    OTHER = 3,
+  };
+
+  using CheatSheetTuple = std::tuple<std::string, std::string, std::string, CheatSheetBindingType>;
   using CheatSheetGroup = std::pair<std::string, std::vector<CheatSheetTuple>>;
 
   /**
@@ -132,6 +145,11 @@ public:
   int RenderOverlay(vtkViewport* vp) override;
 
   /**
+   * Set the backdrop opacity
+   */
+  void SetBackdropOpacity(const double backdropOpacity);
+
+  /**
    * Set the delta time (time between UI frames) in seconds
    */
   virtual void SetDeltaTime(double)
@@ -231,6 +249,8 @@ protected:
 
   std::string FontFile = "";
   double FontScale = 1.0;
+
+  double BackdropOpacity = 0.9;
 
 private:
   vtkF3DUIActor(const vtkF3DUIActor&) = delete;

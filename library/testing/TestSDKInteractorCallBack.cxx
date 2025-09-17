@@ -10,7 +10,7 @@
 
 using mod_t = f3d::interaction_bind_t::ModifierKeys;
 
-int TestSDKInteractorCallBack(int argc, char* argv[])
+int TestSDKInteractorCallBack([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   f3d::engine eng = f3d::engine::create(true);
   f3d::scene& sce = eng.getScene();
@@ -54,7 +54,7 @@ int TestSDKInteractorCallBack(int argc, char* argv[])
     std::cerr << "An exception has not been thrown when adding a existing interaction command\n";
     return EXIT_FAILURE;
   }
-  catch (const f3d::interactor::already_exists_exception& ex)
+  catch (const f3d::interactor::already_exists_exception&)
   {
   }
 

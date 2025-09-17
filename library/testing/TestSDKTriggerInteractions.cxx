@@ -46,7 +46,7 @@ struct TestTriggerHelper
   std::string OutputPath;
 };
 
-int TestSDKTriggerInteractions(int argc, char* argv[])
+int TestSDKTriggerInteractions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   TestTriggerHelper helper(
     std::string(argv[1]) + "/data/cow.vtp", std::string(argv[1]) + "baselines/", argv[2]);

@@ -1,6 +1,9 @@
 name: "Install ospray sb Dependency"
 description: "Install ospray sb Dependency using cache when possible"
 inputs:
+  version:
+    description: "Version of ospray to build"
+    required: true
   cpu:
     description: "CPU architecture to build for"
     required: false
@@ -9,21 +12,26 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+
     - name: Cache ospray
       id: cache-ospray
       uses: actions/cache/restore@v4
       with:
         path: dependencies/ospray_install
-        key: ospray-sb-v2.7.1-${{runner.os}}-${{inputs.cpu}}-4
+        key: ospray-sb-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-0
 
     # Dependents: vtk
     - name: Checkout ospray
       if: steps.cache-ospray.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
       with:
-        repository: ospray/ospray
+        repository: RenderKit/ospray
         path: "./dependencies/ospray"
-        ref: v2.7.1
+        ref: ${{inputs.version}}
 
       # https://github.com/ospray/ospray/pull/550
     - name: Patch ospray rkcommon superbuild
@@ -51,7 +59,7 @@ runs:
       shell: bash
       run: >
         cmake ../ospray/scripts/superbuild/
-        -DBUILD_EMBREE_FROM_SOURCE=ON
+        -DBUILD_EMBREE_FROM_SOURCE=${{ runner.os == 'Windows' && 'OFF' || 'ON' }}
         -DBUILD_GLFW=OFF
         -DBUILD_OIDN=ON
         -DBUILD_OIDN_FROM_SOURCE=ON

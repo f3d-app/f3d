@@ -11,6 +11,7 @@
 #include <vtkRenderer.h>
 
 #include <cstdint>
+#include <cstring>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkF3DQuakeMDLImporter);
@@ -111,46 +112,77 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     texture->SetColorModeToDirectScalars();
     texture->UseSRGBColorSpaceOn();
 
-    // Read textures.
-    std::vector<mixed_pointer_array> skins = std::vector<mixed_pointer_array>(nbSkins);
-    for (unsigned int i = 0; i < nbSkins; i++)
-    {
-      skins[i].group = *reinterpret_cast<const int*>(buffer.data() + offset);
-      if (skins[i].group == 0)
-      {
-        skins[i].skin = buffer.data() + sizeof(int32_t) + offset;
-        offset += sizeof(int32_t) + skinWidth * skinHeight * sizeof(int8_t);
-      }
-      else
-      {
-        // XXX: groupskin not supported yet
-        vtkErrorWithObjectMacro(this->Parent, "Groupskin are not supported, aborting.");
-        return nullptr;
-      }
-    }
-
-    // Copy to imageData
-    vtkNew<vtkImageData> img;
-    img->SetDimensions(skinWidth, skinHeight, 1);
-    img->AllocateScalars(VTK_UNSIGNED_CHAR, 3);
-
     if (skinIndex >= nbSkins)
     {
       skinIndex = 0;
       vtkWarningWithObjectMacro(
         this->Parent, "QuakeMDL.skin_index is out of bounds. Defaulting to 0.");
     }
-    const unsigned char* selectedSkin = skins[skinIndex].skin;
-    for (int i = 0; i < skinHeight; i++)
+
+    auto make_new_skin = [&](vtkNew<vtkImageData>& skin)
     {
-      for (int j = 0; j < skinWidth; j++)
+      skin->SetDimensions(skinWidth, skinHeight, 1);
+      skin->AllocateScalars(VTK_UNSIGNED_CHAR, 3);
+      for (int x = 0; x < skinHeight; ++x)
       {
-        unsigned char index = *(selectedSkin + i * skinWidth + j);
-        unsigned char* ptr = static_cast<unsigned char*>(img->GetScalarPointer(j, i, 0));
-        std::copy(F3DMDLDefaultColorMap[index], F3DMDLDefaultColorMap[index] + 3, ptr);
+        for (int y = 0; y < skinWidth; ++y)
+        {
+          unsigned char index = *(buffer.data() + offset + x * skinWidth + y);
+          unsigned char* ptr = static_cast<unsigned char*>(skin->GetScalarPointer(y, x, 0));
+          std::copy(F3DMDLDefaultColorMap[index], F3DMDLDefaultColorMap[index] + 3, ptr);
+        }
+      }
+    };
+
+    // Read textures.
+    int skinSize = skinWidth * skinHeight;
+    int groupSkinCount = 0;
+    for (unsigned int i = 0; i < nbSkins; i++)
+    {
+      int skinGroup = *reinterpret_cast<const int*>(buffer.data() + offset);
+      offset += sizeof(int32_t);
+      if (skinGroup == 0)
+      {
+        // Skip the skins that are not selected
+        if (i == skinIndex)
+        {
+          vtkNew<vtkImageData> img;
+          make_new_skin(img);
+          texture->SetInputData(img);
+        }
+        offset += skinSize * sizeof(int8_t);
+      }
+      else
+      {
+        std::string skinAnimationName = "skin_" + std::to_string(groupSkinCount);
+        this->GroupSkinAnimationNames.emplace_back(skinAnimationName);
+        int nb;
+        std::memcpy(&nb, buffer.data() + offset, sizeof(nb));
+        offset += sizeof(nb);
+        this->GroupSkins.emplace_back(nb);
+        this->GroupSkinDurations.emplace_back(nb + 1, 0.0f);
+        for (int j = 1; j <= nb; ++j)
+        {
+          float timeValue;
+          std::memcpy(&timeValue, buffer.data() + offset, sizeof(timeValue));
+          this->GroupSkinDurations[groupSkinCount][j] = static_cast<double>(timeValue);
+          offset += sizeof(timeValue);
+        }
+        for (int skinIdx = 0; skinIdx < nb; ++skinIdx)
+        {
+          vtkNew<vtkImageData> skinTemp;
+          make_new_skin(skinTemp);
+          this->GroupSkins[groupSkinCount][skinIdx] = skinTemp;
+          offset += skinSize * sizeof(int8_t);
+        }
+        if (i == skinIndex)
+        {
+          texture->SetInputData(this->GroupSkins[groupSkinCount].front());
+        }
+        ++groupSkinCount;
       }
     }
-    texture->SetInputData(img);
+
     return texture;
   }
 
@@ -428,6 +460,10 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   std::vector<std::vector<double>> AnimationTimes;
   std::vector<std::vector<vtkSmartPointer<vtkPolyData>>> AnimationFrames;
 
+  std::vector<std::string> GroupSkinAnimationNames;
+  std::vector<std::vector<vtkSmartPointer<vtkImageData>>> GroupSkins;
+  std::vector<std::vector<double>> GroupSkinDurations;
+
   vtkIdType ActiveAnimation = -1;
 };
 
@@ -466,24 +502,38 @@ bool vtkF3DQuakeMDLImporter::UpdateAtTimeValue(double timeValue)
 {
   if (this->Internals->ActiveAnimation != -1)
   {
-    const std::vector<double>& times =
-      this->Internals->AnimationTimes[this->Internals->ActiveAnimation];
-
     // Find frameIndex for the provided timeValue so that t0 <= timeValue < t1
     // Animation range is from [Start time of first frame, Finish time of last frame]
 
     // First time >= value, excluding the last element as it only represents finish time of the last
     // frame
+
+    // Animation in AnimationFrames are mesh animations and at greater indices texture animations
+    // are rendered
+    bool isMeshAnimation = this->Internals->ActiveAnimation <
+      static_cast<vtkIdType>(this->Internals->AnimationNames.size());
+    size_t animIndex = isMeshAnimation
+      ? this->Internals->ActiveAnimation
+      : this->Internals->ActiveAnimation - this->Internals->AnimationNames.size();
+    const std::vector<double>& times = isMeshAnimation
+      ? this->Internals->AnimationTimes[animIndex]
+      : this->Internals->GroupSkinDurations[animIndex];
     const auto found = std::lower_bound(times.begin(), times.end() - 1, timeValue);
     // If found at finish time of last frame, select last frame's start time (second last value),
     // else select distance
     const size_t i =
       (found == times.end() - 1) ? times.size() - 2 : std::distance(times.begin(), found);
-    // If time at index i > timeValue, the choose the previous frame
+    // If time at index i > timeValue, then choose the previous frame
     const size_t frameIndex = times[i] > timeValue && i > 0 ? i - 1 : i;
-
-    this->Internals->Mapper->SetInputData(
-      this->Internals->AnimationFrames[this->Internals->ActiveAnimation][frameIndex]);
+    if (isMeshAnimation)
+    {
+      this->Internals->Mapper->SetInputData(
+        this->Internals->AnimationFrames[animIndex][frameIndex]);
+    }
+    else
+    {
+      this->Internals->Texture->SetInputData(this->Internals->GroupSkins[animIndex][frameIndex]);
+    }
   }
   return true;
 }
@@ -491,15 +541,24 @@ bool vtkF3DQuakeMDLImporter::UpdateAtTimeValue(double timeValue)
 //----------------------------------------------------------------------------
 vtkIdType vtkF3DQuakeMDLImporter::GetNumberOfAnimations()
 {
-  return this->Internals->AnimationNames.size();
+  return static_cast<vtkIdType>(
+    this->Internals->AnimationNames.size() + this->Internals->GroupSkinAnimationNames.size());
 }
 
 //----------------------------------------------------------------------------
 std::string vtkF3DQuakeMDLImporter::GetAnimationName(vtkIdType animationIndex)
 {
-  assert(animationIndex < static_cast<vtkIdType>(this->Internals->AnimationNames.size()));
+  assert(animationIndex < static_cast<vtkIdType>(this->Internals->AnimationNames.size() +
+                            this->Internals->GroupSkinAnimationNames.size()));
   assert(animationIndex >= 0);
-  return this->Internals->AnimationNames[animationIndex];
+
+  if (animationIndex < static_cast<vtkIdType>(this->Internals->AnimationNames.size()))
+  {
+    return this->Internals->AnimationNames[animationIndex];
+  }
+  // Skin group animations are rendered for indices larger than frame animations
+  return this->Internals
+    ->GroupSkinAnimationNames[animationIndex - this->Internals->AnimationNames.size()];
 }
 
 //----------------------------------------------------------------------------
@@ -529,10 +588,14 @@ bool vtkF3DQuakeMDLImporter::GetTemporalInformation(vtkIdType animationIndex,
   double vtkNotUsed(frameRate), int& vtkNotUsed(nbTimeSteps), double timeRange[2],
   vtkDoubleArray* vtkNotUsed(timeSteps))
 {
-  assert(animationIndex < static_cast<vtkIdType>(this->Internals->AnimationNames.size()));
+  assert(animationIndex < static_cast<vtkIdType>(this->Internals->AnimationNames.size() +
+                            this->Internals->GroupSkinAnimationNames.size()));
   assert(animationIndex >= 0);
 
-  const std::vector<double>& times = this->Internals->AnimationTimes[animationIndex];
+  const std::vector<double>& times =
+    animationIndex < static_cast<vtkIdType>(this->Internals->AnimationNames.size())
+    ? this->Internals->AnimationTimes[animationIndex]
+    : this->Internals->GroupSkinDurations[animationIndex - this->Internals->AnimationNames.size()];
   // F3D does not care about timesteps, only set time range
   timeRange[0] = times.front();
   // If single frame, keep animation duration = 0

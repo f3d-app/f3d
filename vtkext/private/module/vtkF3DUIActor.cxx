@@ -129,6 +129,16 @@ void vtkF3DUIActor::SetFontScale(const double fontScale)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DUIActor::SetBackdropOpacity(const double backdropOpacity)
+{
+  if (this->BackdropOpacity != backdropOpacity)
+  {
+    this->BackdropOpacity = backdropOpacity;
+    this->Initialized = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
 {
   vtkOpenGLRenderWindow* renWin = vtkOpenGLRenderWindow::SafeDownCast(vp->GetVTKWindow());

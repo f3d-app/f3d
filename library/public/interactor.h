@@ -14,6 +14,7 @@
 
 namespace f3d
 {
+
 struct interaction_bind_t
 {
   /**
@@ -66,6 +67,8 @@ class F3D_EXPORT interactor
 {
 public:
   ///@{ @name Command
+  using command_documentation_t = std::pair<std::string, std::string>;
+
   /**
    * Remove all existing commands and add all default commands,
    * see COMMANDS.md for details.
@@ -79,8 +82,11 @@ public:
    * Considering namespacing dedicated action to avoid conflicts with default action,
    * eg: `my_app::action`
    */
-  virtual interactor& addCommand(
-    std::string action, std::function<void(const std::vector<std::string>&)> callback) = 0;
+  virtual interactor& addCommand(const std::string& action,
+    std::function<void(const std::vector<std::string>&)> callback,
+    std::optional<command_documentation_t> doc = std::nullopt,
+    std::function<std::vector<std::string>(const std::vector<std::string>&)> completionCallback =
+      nullptr) = 0;
 
   /**
    * Remove a command for provided action, does not do anything if it does not exists.
@@ -111,6 +117,18 @@ public:
   using documentation_callback_t = std::function<std::pair<std::string, std::string>()>;
 
   /**
+   * Enumeration of binding types.
+   * Duplication present in vtkext/private/module/vtkF3DUIActor.h.
+   */
+  enum class BindingType : std::uint8_t
+  {
+    CYCLIC = 0,
+    NUMERICAL = 1,
+    TOGGLE = 2,
+    OTHER = 3,
+  };
+
+  /**
    * Remove all existing interaction commands and add all default bindings
    * see INTERACTIONS.md for details.
    */
@@ -132,6 +150,9 @@ public:
    * the first is the doc itself, the second is the current value as a string, if any.
    * Use `getBindingDocumentation` to access this doc.
    *
+   * type is an optional type of binding to provide, it can be used for presenting the
+   * binding in a coherent way in logs and cheatsheet.
+   *
    * When the corresponding bind happens, the provided commands will be triggered using
    * triggerCommand. Considering checking if an interaction exists or removing it before adding it
    * to avoid potential conflicts.
@@ -142,7 +163,8 @@ public:
    * Adding commands for an existing bind will throw a interactor::already_exists_exception.
    */
   virtual interactor& addBinding(const interaction_bind_t& bind, std::vector<std::string> commands,
-    std::string group = {}, documentation_callback_t documentationCallback = nullptr) = 0;
+    std::string group = {}, documentation_callback_t documentationCallback = nullptr,
+    BindingType type = BindingType::OTHER) = 0;
 
   /**
    * See addBinding
@@ -152,16 +174,18 @@ public:
    * Adding command for an existing bind will throw a interactor::already_exists_exception.
    */
   virtual interactor& addBinding(const interaction_bind_t& bind, std::string command,
-    std::string group = {}, documentation_callback_t documentationCallback = nullptr) = 0;
+    std::string group = {}, documentation_callback_t documentationCallback = nullptr,
+    BindingType type = BindingType::OTHER) = 0;
 
   /**
    * Convenience initializer list signature for add binding method
    */
   interactor& addBinding(const interaction_bind_t& bind, std::initializer_list<std::string> list,
-    std::string group = {}, documentation_callback_t documentationCallback = nullptr)
+    std::string group = {}, documentation_callback_t documentationCallback = nullptr,
+    BindingType type = BindingType::OTHER)
   {
-    return this->addBinding(
-      bind, std::vector<std::string>(list), std::move(group), std::move(documentationCallback));
+    return this->addBinding(bind, std::vector<std::string>(list), std::move(group),
+      std::move(documentationCallback), type);
   }
 
   /**
@@ -202,6 +226,14 @@ public:
    */
   [[nodiscard]] virtual std::pair<std::string, std::string> getBindingDocumentation(
     const interaction_bind_t& bind) const = 0;
+  ///@}
+
+  /**
+   * Get the type of a binding.
+   *
+   * Getting type for a bind that does not exists will throw a does_not_exists_exception.
+   */
+  [[nodiscard]] virtual BindingType getBindingType(const interaction_bind_t& bind) const = 0;
   ///@}
 
   ///@{ @name Animation

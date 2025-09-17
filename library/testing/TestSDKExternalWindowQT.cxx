@@ -79,7 +79,7 @@ private:
   std::string mOutputPath;
 };
 
-int TestSDKExternalWindowQT(int argc, char* argv[])
+int TestSDKExternalWindowQT([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   QGuiApplication a(argc, argv);
 

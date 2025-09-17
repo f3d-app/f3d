@@ -4,10 +4,6 @@ inputs:
   vtk_version:
     description: "VTK version"
     required: true
-  raytracing_label:
-    description: "Label to control raytracing"
-    required: false
-    default: "no-raytracing"
   cpu:
     description: "CPU architecture to build for"
     required: false
@@ -17,6 +13,9 @@ inputs:
     required: true
   openvdb_version:
     description: "Version of openvdb to build against"
+    required: false
+  ospray_version:
+    description: "Version of ospray to build against"
     required: false
   tbb_version:
     description: "Version of tbb to build against"
@@ -41,7 +40,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/vtk_install
-        key: vtk-${{ inputs.vtk_version }}-${{inputs.zlib_version}}-${{inputs.blosc_version}}-${{inputs.tbb_version}}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}-${{runner.os}}-${{inputs.raytracing_label}}-${{inputs.cpu}}-4
+        key: vtk-${{ inputs.vtk_version }}-${{inputs.zlib_version}}-${{inputs.blosc_version}}-${{inputs.tbb_version}}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}${{ inputs.ospray_version != '' && format('-ospray-{0}', inputs.ospray_version) || '' }}-${{runner.os}}-${{inputs.cpu}}-0
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -125,7 +124,7 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_RenderingCore=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingGridAxes=YES
         -DVTK_MODULE_ENABLE_VTK_RenderingOpenGL2=YES
-        -DVTK_MODULE_ENABLE_VTK_RenderingRayTracing=${{ inputs.raytracing_label == 'raytracing' && 'YES' || 'DEFAULT' }}
+        -DVTK_MODULE_ENABLE_VTK_RenderingRayTracing=${{ inputs.ospray_version != '' && 'YES' || 'DEFAULT' }}
         -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2=YES
         -DVTK_MODULE_ENABLE_VTK_TestingCore=YES
         -DVTK_OPENGL_HAS_EGL=${{ runner.os != 'macOS' && inputs.vtk_version != 'v9.2.6' && inputs.vtk_version != 'v9.3.1' && 'ON' || 'OFF' }}

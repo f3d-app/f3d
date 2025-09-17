@@ -11,9 +11,11 @@
 #include "vtkF3DGenericImporter.h"
 #include "vtkF3DMemoryMesh.h"
 #include "vtkF3DMetaImporter.h"
+#include "vtkF3DRenderer.h"
 
 #include <optional>
 #include <vtkCallbackCommand.h>
+#include <vtkLightCollection.h>
 #include <vtkProgressBarRepresentation.h>
 #include <vtkProgressBarWidget.h>
 #include <vtkTimerLog.h>
@@ -326,6 +328,100 @@ scene& scene_impl::clear()
   // Clear the window of all actors
   this->Internals->Window.Initialize();
 
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+int scene_impl::addLight(const light_state_t& lightState) const
+{
+  vtkNew<vtkLight> newLight;
+  newLight->SetLightType(static_cast<int>(lightState.type));
+  newLight->SetPosition(lightState.position.data());
+  newLight->SetColor(lightState.color.data());
+  newLight->SetPositional(lightState.positionalLight);
+  newLight->SetFocalPoint(lightState.position[0] + lightState.direction[0],
+    lightState.position[1] + lightState.direction[1],
+    lightState.position[2] + lightState.direction[2]);
+  newLight->SetIntensity(lightState.intensity);
+  newLight->SetSwitch(lightState.switchState);
+  this->Internals->Window.GetRenderer()->AddLight(newLight);
+  return this->getLightCount() - 1;
+}
+
+//----------------------------------------------------------------------------
+int scene_impl::getLightCount() const
+{
+  vtkLightCollection* lc = this->Internals->Window.GetRenderer()->GetLights();
+  return lc->GetNumberOfItems();
+}
+
+//----------------------------------------------------------------------------
+light_state_t scene_impl::getLight(int index) const
+{
+  vtkLightCollection* lc = this->Internals->Window.GetRenderer()->GetLights();
+  vtkLight* light = vtkLight::SafeDownCast(lc->GetItemAsObject(index));
+  if (!light)
+  {
+    throw scene::light_exception("No light at index " + std::to_string(index) + " to get");
+  }
+
+  const double* position = light->GetPosition();
+  const double* color = light->GetDiffuseColor();
+  const double* focalPoint = light->GetFocalPoint();
+
+  light_state_t lightState;
+  lightState.type = static_cast<light_type>(light->GetLightType());
+  lightState.position = { position[0], position[1], position[2] };
+  lightState.color = { color[0], color[1], color[2] };
+  lightState.direction = { focalPoint[0] - position[0], focalPoint[1] - position[1],
+    focalPoint[2] - position[2] };
+  lightState.positionalLight = light->GetPositional();
+  lightState.intensity = light->GetIntensity();
+  lightState.switchState = light->GetSwitch();
+  return lightState;
+}
+
+//----------------------------------------------------------------------------
+scene& scene_impl::updateLight(int index, const light_state_t& lightState)
+{
+  vtkLightCollection* lc = this->Internals->Window.GetRenderer()->GetLights();
+  vtkLight* light = vtkLight::SafeDownCast(lc->GetItemAsObject(index));
+  if (!light)
+  {
+    throw scene::light_exception("No light at index " + std::to_string(index) + " to update");
+  }
+
+  light->SetLightType(static_cast<int>(lightState.type));
+  light->SetPosition(lightState.position.data());
+  light->SetColor(lightState.color.data());
+  light->SetPositional(lightState.positionalLight);
+  light->SetFocalPoint(lightState.position[0] + lightState.direction[0],
+    lightState.position[1] + lightState.direction[1],
+    lightState.position[2] + lightState.direction[2]);
+  light->SetIntensity(lightState.intensity);
+  light->SetSwitch(lightState.switchState);
+
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+scene& scene_impl::removeLight(int index)
+{
+  vtkLightCollection* lc = this->Internals->Window.GetRenderer()->GetLights();
+  vtkLight* light = vtkLight::SafeDownCast(lc->GetItemAsObject(index));
+  if (!light)
+  {
+    throw scene::light_exception("No light at index " + std::to_string(index) + " to remove");
+  }
+
+  this->Internals->Window.GetRenderer()->RemoveLight(light);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+scene& scene_impl::removeAllLights()
+{
+  this->Internals->Window.GetRenderer()->RemoveAllLights();
   return *this;
 }
 

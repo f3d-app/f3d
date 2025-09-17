@@ -495,8 +495,10 @@ std::string vtkF3DRenderer::GetSceneDescription()
   double bounds[6];
   this->ComputeVisiblePropBounds(bounds);
 
-  stream << "Scene bounding box: " << bounds[0] << "," << bounds[1] << "," << bounds[2] << ","
-         << bounds[3] << "," << bounds[4] << "," << bounds[5] << "\n\n";
+  stream << "Scene bounding box: "                                  //
+         << bounds[0] << u8" \u2264 x \u2264 " << bounds[1] << ", " //
+         << bounds[2] << u8" \u2264 y \u2264 " << bounds[3] << ", " //
+         << bounds[4] << u8" \u2264 z \u2264 " << bounds[5] << "\n\n";
 
   // Camera Info
   vtkCamera* cam = this->GetActiveCamera();
@@ -507,9 +509,9 @@ std::string vtkF3DRenderer::GetSceneDescription()
   cam->GetFocalPoint(focal);
   cam->GetViewUp(up);
 
-  stream << "Camera position: " << position[0] << "," << position[1] << "," << position[2] << "\n"
-         << "Camera focal point: " << focal[0] << "," << focal[1] << "," << focal[2] << "\n"
-         << "Camera view up: " << up[0] << "," << up[1] << "," << up[2] << "\n"
+  stream << "Camera position: " << position[0] << ", " << position[1] << ", " << position[2] << "\n"
+         << "Camera focal point: " << focal[0] << ", " << focal[1] << ", " << focal[2] << "\n"
+         << "Camera view up: " << up[0] << ", " << up[1] << ", " << up[2] << "\n"
          << "Camera view angle: " << cam->GetViewAngle() << "\n\n";
   descr += stream.str();
 
@@ -1391,6 +1393,13 @@ void vtkF3DRenderer::SetFontScale(const double fontScale)
     this->TextActorsConfigured = false;
   }
 }
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetBackdropOpacity(const double backdropOpacity)
+{
+  this->UIActor->SetBackdropOpacity(backdropOpacity);
+}
+
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetBackground(const double* color)
 {

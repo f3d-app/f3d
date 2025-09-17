@@ -8,7 +8,7 @@
 
 #include <iostream>
 
-int TestSDKExternalWindowGLFW(int argc, char* argv[])
+int TestSDKExternalWindowGLFW([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   // setup glfw window
   if (!glfwInit())
@@ -38,10 +38,10 @@ int TestSDKExternalWindowGLFW(int argc, char* argv[])
   eng.getWindow().setSize(300, 300);
 
   // key callback
-  glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+  glfwSetKeyCallback(window, [](GLFWwindow* win, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
     {
-      glfwSetWindowShouldClose(window, 1);
+      glfwSetWindowShouldClose(win, 1);
     }
   });
 

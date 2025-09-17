@@ -10,7 +10,7 @@
 #include <iostream>
 #include <limits>
 
-int TestSDKOptions(int argc, char* argv[])
+int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   PseudoUnitTest test;
 
@@ -146,9 +146,9 @@ int TestSDKOptions(int argc, char* argv[])
   test("color operator[]", color[0] == 0.7);
   test("color operator[] const", (*colorPtr)[0] == 0.7);
   test.expect<f3d::type_access_exception>(
-    "color_t invalid access", [&]() { double val = color[3]; });
+    "color_t invalid access", [&]() { std::ignore = color[3]; });
   test.expect<f3d::type_access_exception>(
-    "color_t const invalid access", [&]() { double val = (*colorPtr)[3]; });
+    "color_t const invalid access", [&]() { std::ignore = (*colorPtr)[3]; });
   test("color red", color.r() == 0.7);
   test("color green", color.g() == 0.2);
   test("color blue", color.b() == 0.3);
