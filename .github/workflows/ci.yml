@@ -400,7 +400,6 @@ jobs:
       - name: Generic CI
         uses: ./source/.github/actions/generic-ci
         with:
-          vtk_version: ${{matrix.vtk_version}}
           static_label: ${{matrix.static_label}}
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
           alembic_version: ${{needs.default_versions.outputs.alembic_version}}
@@ -534,6 +533,14 @@ jobs:
             tbb_version: ${{needs.default_versions.outputs.tbb_version}}
             usd_version: ${{needs.default_versions.outputs.usd_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+            pdal_version: 2.9.2
+            sqlite_version: version-3.42.1
+            xercesc_version: v3.3.0
+            curl_version: curl-8_15_0
+            proj_version: 9.6.2
+            libgeotiff_version: 1.7.4
+            libtiff_version: v4.7.0
+            gdal_version: v3.11.3
           - build_type: osmesa
             vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             optional_deps_label: optional-deps
@@ -555,6 +562,14 @@ jobs:
             tbb_version: ${{needs.default_versions.outputs.tbb_version}}
             usd_version: ${{needs.default_versions.outputs.usd_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+            pdal_version: 2.9.2
+            sqlite_version: version-3.42.1
+            xercesc_version: v3.3.0
+            curl_version: curl-8_15_0
+            proj_version: 9.6.2
+            libgeotiff_version: 1.7.4
+            libtiff_version: v4.7.0
+            gdal_version: v3.11.3
           - build_type: exclude_deprecated
             vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             optional_deps_label: optional-deps
@@ -576,6 +591,14 @@ jobs:
             tbb_version: ${{needs.default_versions.outputs.tbb_version}}
             usd_version: ${{needs.default_versions.outputs.usd_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+            pdal_version: 2.9.2
+            sqlite_version: version-3.42.1
+            xercesc_version: v3.3.0
+            curl_version: curl-8_15_0
+            proj_version: 9.6.2
+            libgeotiff_version: 1.7.4
+            libtiff_version: v4.7.0
+            gdal_version: v3.11.3
           - build_type: no_optional_deps
             blosc_version: ${{needs.default_versions.outputs.blosc_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_version}}
@@ -605,6 +628,14 @@ jobs:
             tbb_version: ${{needs.default_versions.outputs.tbb_version}}
             usd_version: ${{needs.default_versions.outputs.usd_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+            pdal_version: 2.9.2
+            sqlite_version: version-3.42.1
+            xercesc_version: v3.3.0
+            curl_version: curl-8_15_0
+            proj_version: 9.6.2
+            libgeotiff_version: 1.7.4
+            libtiff_version: v4.7.0
+            gdal_version: v3.11.3
           - build_type: mindeps
             vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
             optional_deps_label: optional-deps
@@ -626,6 +657,14 @@ jobs:
             tbb_version: ${{needs.default_versions.outputs.tbb_min_version}}
             usd_version: ${{needs.default_versions.outputs.usd_min_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_min_version}}
+            pdal_version: 2.9.2
+            sqlite_version: version-3.42.1
+            xercesc_version: v3.3.0
+            curl_version: curl-8_15_0
+            proj_version: 9.6.2
+            libgeotiff_version: 1.7.4
+            libtiff_version: v4.7.0
+            gdal_version: v3.11.3
 
     runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
@@ -666,6 +705,14 @@ jobs:
           tbb_version: ${{matrix.tbb_version}}
           usd_version: ${{matrix.usd_version}}
           zlib_version: ${{matrix.zlib_version}}
+          sqlite_version: version-3.42.1
+          xercesc_version: v3.3.0
+          curl_version: curl-8_15_0
+          pdal_version: 2.9.2
+          proj_version: 9.6.2
+          libgeotiff_version: 1.7.4
+          libtiff_version: v4.7.0
+          gdal_version: v3.11.3
 
   #----------------------------------------------------------------------------
   # MacOS CI: Build and test, cross-vtk build matrix
@@ -701,7 +748,6 @@ jobs:
       - name: Generic CI
         uses: ./source/.github/actions/generic-ci
         with:
-          vtk_version: ${{matrix.vtk_version}}
           cpu: x86_64
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
           alembic_version: ${{needs.default_versions.outputs.alembic_version}}
@@ -760,7 +806,6 @@ jobs:
       - name: Generic CI
         uses: ./source/.github/actions/generic-ci
         with:
-          vtk_version: ${{matrix.vtk_version}}
           bundle_label: ${{matrix.bundle_label}}
           static_label: ${{matrix.static_label}}
           cpu: arm64
@@ -881,6 +926,14 @@ jobs:
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          pdal_version: 2.9.2
+          sqlite_version: version-3.42.1
+          xercesc_version: v3.3.0
+          curl_version: curl-8_15_0
+          proj_version: 9.6.2
+          libgeotiff_version: 1.7.4
+          libtiff_version: v4.7.0
+          gdal_version: v3.11.3
 
   #----------------------------------------------------------------------------
   # Sanitizer: Build and test on linux with last VTK with sanitizer options
