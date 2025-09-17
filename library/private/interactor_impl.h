@@ -35,7 +35,8 @@ public:
   interactor_impl(options& options, window_impl& window, scene_impl& scene);
   ~interactor_impl() override;
 
-  std::string getBindsDocString(const std::vector<interaction_bind_t>& requestedBinds) const override;
+  std::map<std::string, std::vector<std::string>> getBindsDocString(
+    const std::vector<interaction_bind_t>& requestedBinds) const override;
   interactor& initCommands() override;
   interactor& addCommand(const std::string& action,
     std::function<void(const std::vector<std::string>&)> callback,

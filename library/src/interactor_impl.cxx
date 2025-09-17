@@ -1423,10 +1423,9 @@ interactor& interactor_impl::initBindings()
 }
 
 //----------------------------------------------------------------------------
-std::string interactor_impl::getBindsDocString(
+std::map<std::string, std::vector<std::string>> interactor_impl::getBindsDocString(
   const std::vector<interaction_bind_t>& requestedBinds) const
 {
-
   auto modifierToString = [](interaction_bind_t::ModifierKeys mod) -> std::string
   {
     switch (mod)
@@ -1440,8 +1439,7 @@ std::string interactor_impl::getBindsDocString(
     return "";
   };
 
-
-  std::stringstream info;
+  std::map<std::string, std::vector<std::string>> infoMap;
 
   // Iterate only over requested binds
   for (const auto& bind : requestedBinds)
@@ -1450,13 +1448,17 @@ std::string interactor_impl::getBindsDocString(
     if (it != this->Internals->Bindings.end())
     {
       const auto& bindData = it->first;
-      const auto& docPair = it->second.DocumentationCallback();
-      std::string modStr = modifierToString(bindData.mod);
-      info << docPair.first << ": " << modStr << bindData.inter << "\n";
+      const auto& docPair  = it->second.DocumentationCallback();
+
+      std::string modStr   = modifierToString(bindData.mod);
+      std::string binding  = modStr + bindData.inter;
+
+      // docPair.first is the description
+      infoMap[docPair.first].push_back(binding);
     }
   }
 
-  return info.str();
+  return infoMap;
 }
 
 //----------------------------------------------------------------------------

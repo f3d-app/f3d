@@ -45,42 +45,6 @@
 
 #include <sstream>
 
-static std::map<std::string, std::vector<std::string>>aggregateBindings(const std::string& input)
-{
-  std::map<std::string, std::vector<std::string>> infoMap;
-  std::stringstream ss(input);
-  std::string line;
-
-  auto trim = [](std::string& str) {
-    size_t start = str.find_first_not_of(" \t");
-    size_t end   = str.find_last_not_of(" \t");
-    if (start == std::string::npos) { str.clear(); return; }
-    str = str.substr(start, end - start + 1);
-  };
-
-  while (std::getline(ss, line))
-  {
-    if (line.empty()) continue;
-
-    size_t colonPos = line.find(':');
-    if (colonPos == std::string::npos) continue;
-
-    std::string desc        = line.substr(0, colonPos);
-    std::string bindingPart = line.substr(colonPos + 1);
-
-    trim(desc);
-    trim(bindingPart);
-
-    if (!bindingPart.empty())
-    {
-      // Store raw binding string, don't split yet
-      infoMap[desc].push_back(bindingPart);
-    }
-  }
-
-  return infoMap;
-}
-
 namespace fs = std::filesystem;
 
 namespace f3d::detail
@@ -436,7 +400,7 @@ void window_impl::UpdateDynamicOptions()
             custom_binds.push_back(interaction_bind_t::parse(token));
         }
     }
-    auto dropZoneBindsInfo = aggregateBindings(this->Internals->Interactor->getBindsDocString(custom_binds));
+    auto dropZoneBindsInfo = this->Internals->Interactor->getBindsDocString(custom_binds);
     renderer->SetDropZoneBindsInfo(dropZoneBindsInfo);
   }
 
