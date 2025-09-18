@@ -81,6 +81,67 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     return EXIT_FAILURE;
   }
 
+  // Test getYaw
+  cam.setPosition({ -1, 0, 0 });
+  cam.setFocalPoint({ 0, 0, 0 });
+  cam.setViewUp({ 0, 1, 0 });
+  f3d::angle_deg_t yaw = cam.getYaw();
+  if (!compareDouble(yaw, 0.))
+  {
+    std::cerr << "get yaw is not behaving as expected: " << yaw << " " << "\n";
+    return EXIT_FAILURE;
+  }
+  f3d::angle_deg_t testYaw = 90.0;
+  cam.yaw(testYaw);
+  yaw = cam.getYaw();
+  if (!compareDouble(yaw, testYaw))
+  {
+    std::cerr << "Yaw after +90° yaw() is incorrect: " << yaw << "\n";
+    return EXIT_FAILURE;
+  }
+
+  // Test getElevation
+  cam.setPosition({ 0, 0, -1 });
+  cam.setFocalPoint({ 0, 0, 0 });
+  cam.setViewUp({ 0, 1, 0 });
+  f3d::angle_deg_t elevation = cam.getElevation();
+  if (!compareDouble(elevation, 0.))
+  {
+    std::cerr << "get elevation is not behaving as expected: " << elevation
+              << " != " << testElevation << "\n";
+    return EXIT_FAILURE;
+  }
+  testElevation = -45.0;
+  cam.elevation(testElevation);
+  elevation = cam.getElevation();
+  if (!compareDouble(elevation, testElevation))
+  {
+    std::cerr << "get elevation after elevation +45 is not behaving as expected: " << elevation
+              << " != " << testElevation << "\n";
+    return EXIT_FAILURE;
+  }
+
+  // Test getAzimuth
+  cam.setPosition({ -1, 0, 0 });
+  cam.setFocalPoint({ 0, 0, 0 });
+  cam.setViewUp({ 0, 1, 0 });
+  f3d::angle_deg_t azimuth = cam.getAzimuth();
+  if (!compareDouble(azimuth, 0.))
+  {
+    std::cerr << "get azimuth is not behaving as expected: " << azimuth << " != " << testAzimuth
+              << "\n";
+    return EXIT_FAILURE;
+  }
+  testAzimuth = 90.0;
+  cam.azimuth(testAzimuth);
+  azimuth = cam.getAzimuth();
+  if (!compareDouble(azimuth, testAzimuth))
+  {
+    std::cerr << "get azimuth after azimuth +90 is not behaving as expected: " << azimuth
+              << " != " << testAzimuth << "\n";
+    return EXIT_FAILURE;
+  }
+
   // Test position
   f3d::point3_t testPos = { 0., 0., 10. };
   f3d::point3_t pos = cam.setPosition(testPos).getPosition();
