@@ -129,7 +129,7 @@ runs:
         xercesc_version: ${{inputs.xercesc_version}}
         curl_version: ${{inputs.curl_version}}
         proj_version: ${{inputs.proj_version}}
-        
+
     # coverage build is done in source as it seems to be required for codecov
     # CMAKE_MODULE_PATH is required because of
     # https://github.com/AcademySoftwareFoundation/openvdb/issues/1160
