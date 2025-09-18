@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.21)
 include(CMakeDependentOption)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 # Generic CMake variables, should be done before project()
 set(output_postfix "")
 get_property(F3D_MULTI_CONFIG_GENERATOR GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
@@ -112,6 +116,7 @@ find_package(VTK 9.2.6 REQUIRED
     IONetCDF
     IOOpenVDB
     RenderingGridAxes
+    IOPDAL
     RenderingRayTracing)
 message(STATUS "VTK ${VTK_VERSION} found")
 
@@ -327,3 +332,4 @@ f3d_report_variable(F3D_PLUGIN_BUILD_HDF)
 f3d_report_variable(F3D_PLUGIN_BUILD_OCCT)
 f3d_report_variable(F3D_PLUGIN_BUILD_USD)
 f3d_report_variable(F3D_PLUGIN_BUILD_VDB)
+f3d_report_variable(F3D_PLUGIN_BUILD_PDAL)
