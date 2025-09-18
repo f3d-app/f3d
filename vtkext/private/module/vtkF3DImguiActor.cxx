@@ -491,8 +491,8 @@ void vtkF3DImguiActor::RenderDropZone()
     }
 
     const ImColor descTextColor = F3DImguiStyle::GetTextColor();
-    ImVec4 bindingRectColor = F3DImguiStyle::GetMidColor();
-    ImVec4 bindingTextColor = F3DImguiStyle::GetTextColor();
+    const ImColor bindingRectColor = F3DImguiStyle::GetMidColor();
+    const ImColor bindingTextColor = F3DImguiStyle::GetTextColor();
 
     float tableWidth = maxDescTextWidth + maxBindingsTextWidth + DROPZONE_LOGO_TEXT_PADDING +
                       ImGui::GetStyle().ItemSpacing.x;
@@ -534,9 +534,9 @@ void vtkF3DImguiActor::RenderDropZone()
           ImVec2 rectMax = ImVec2(rectMin.x + textSize.x + padding.x * 2,
                                   rectMin.y + textSize.y + padding.y * 2);
 
-          drawList->AddRectFilled(rectMin, rectMax, ImColor(bindingRectColor), 4.0f);
+          drawList->AddRectFilled(rectMin, rectMax, bindingRectColor, 4.0f);
           drawList->AddText(ImVec2(rectMin.x + padding.x, rectMin.y + padding.y),
-                              ImColor(bindingTextColor), key.c_str());
+                              bindingTextColor, key.c_str());
 
           bindingPos.x = rectMax.x + ImGui::GetStyle().ItemSpacing.x;
 
