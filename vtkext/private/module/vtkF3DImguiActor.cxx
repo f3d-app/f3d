@@ -32,9 +32,6 @@
 #include <sstream>
 #include <string>
 
-#include <sstream>
-
-
 constexpr float LOGO_DISPLAY_WIDTH = 256.f;
 constexpr float LOGO_DISPLAY_HEIGHT = 256.f;
 constexpr float DROPZONE_LOGO_TEXT_PADDING = 20.f;
@@ -48,15 +45,13 @@ static std::vector<std::string> splitBindings(const std::string& s, char delim)
   std::stringstream ss(s);
   std::string item;
 
-  while (getline(ss, item, delim))
+  while (std::getline(ss, item, delim))
   {
     result.push_back(item);
   }
 
   return result;
 }
-
-
 
 struct vtkF3DImguiActor::Internals
 {
