@@ -22,7 +22,7 @@
 
 class vtkOpenGLRenderWindow;
 class vtkWindow;
-class ImVec2;
+struct ImVec2;
 
 class vtkF3DImguiConsole : public vtkF3DConsoleOutputWindow
 {
