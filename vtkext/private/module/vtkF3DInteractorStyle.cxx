@@ -169,23 +169,49 @@ void vtkF3DInteractorStyle::Rotate()
       this->InterpolateTemporaryUp(0.1, ren->GetUpVector(), up);
     }
 
-    // Rotate camera around the focal point about the environment's up vector
     vtkNew<vtkTransform> Transform;
-    Transform->Identity();
     const double* fp = camera->GetFocalPoint();
-    Transform->Translate(+fp[0], +fp[1], +fp[2]);
-    Transform->RotateWXYZ(rxf, ren->GetUpVector());
-    Transform->Translate(-fp[0], -fp[1], -fp[2]);
-    Transform->TransformPoint(camera->GetPosition(), camera->GetPosition());
+    double newPos[3];
+    if (ren->GetUseRotationAxis())
+    {
 
-    camera->SetViewUp(up);
+      // pick whichever mouse component is larger
+      bool use_dx = std::abs(dx) > std::abs(dy);
+      double delta = 20.0 * this->MotionFactor * (use_dx ? dx * 1.0 / size[0] : dy * -1.0 / size[1]);
 
-    // Clamp parameter to `camera->Elevation()` to maintain -90 < elevation < +90
-    constexpr double maxAbsElevation = 90 - 1e-10;
-    const double elevation = vtkMath::DegreesFromRadians(
-      vtkMath::AngleBetweenVectors(ren->GetUpVector(), camera->GetDirectionOfProjection()) -
-      vtkMath::Pi() / 2);
-    camera->Elevation(std::clamp(ryf, -maxAbsElevation - elevation, +maxAbsElevation - elevation));
+      Transform->Identity();
+      Transform->Translate(+fp[0], +fp[1], +fp[2]);
+      Transform->RotateWXYZ(delta, ren->GetRotationAxis());
+      Transform->Translate(-fp[0], -fp[1], -fp[2]);
+
+      Transform->TransformPoint(camera->GetPosition(), newPos);
+      camera->SetPosition(newPos);
+
+      double newViewUp[3];
+      Transform->TransformVector(camera->GetViewUp(), newViewUp);
+      camera->SetViewUp(newViewUp);
+    }
+    else
+    {
+      // Rotate camera around the focal point about the environment's up vector
+      Transform->Identity();
+      Transform->Translate(+fp[0], +fp[1], +fp[2]);
+      Transform->RotateWXYZ(rxf, ren->GetUpVector());
+      Transform->Translate(-fp[0], -fp[1], -fp[2]);
+
+      Transform->TransformPoint(camera->GetPosition(), newPos);
+      camera->SetPosition(newPos);
+
+      // Clamp parameter to `camera->Elevation()` to maintain -90 < elevation < +90
+      constexpr double maxAbsElevation = 90 - 1e-10;
+      const double elevation = vtkMath::DegreesFromRadians(
+        vtkMath::AngleBetweenVectors(ren->GetUpVector(), camera->GetDirectionOfProjection()) -
+        vtkMath::Pi() / 2);
+      camera->Elevation(
+        std::clamp(ryf, -maxAbsElevation - elevation, +maxAbsElevation - elevation));
+
+      camera->SetViewUp(up);
+    }
 
     camera->OrthogonalizeViewUp();
   }
