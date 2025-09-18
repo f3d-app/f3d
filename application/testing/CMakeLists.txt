@@ -1047,6 +1047,7 @@ f3d_test(NAME TestInteractionConsoleRender ARGS --coloring-by-cells DATA wavelet
 f3d_test(NAME TestInteractionConsoleCamera DATA f3d.glb INTERACTION UI) #Escape;set_camera top;Return
 f3d_test(NAME TestInteractionConsoleScrollbar DATA f3d.glb INTERACTION UI) #Escape;a;Enter;Grab scrollbar
 f3d_test(NAME TestInteractionConsoleEmptyCommand DATA f3d.glb INTERACTION UI) #Escape;Enter
+f3d_test(NAME TestInteractionConsoleOverCheatSheet DATA f3d.glb INTERACTION UI) #h;Escape;Enter
 
 # Need SSIM comparison for some reason
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240729)
@@ -1086,6 +1087,8 @@ f3d_test(NAME TestInteractionMinimalConsoleValidCommand DATA f3d.glb INTERACTION
 f3d_test(NAME TestInteractionMinimalConsoleInvalidCommand DATA f3d.glb INTERACTION UI) #Colon;foo;Return
 f3d_test(NAME TestInteractionMinimalConsoleResize DATA f3d.glb INTERACTION UI) #Colon;foo;Return;Colon
 f3d_test(NAME TestInteractionMinimalConsoleBadgeRemains DATA f3d.glb INTERACTION UI) #Colon;foo;Return;Colon;Escape
+f3d_test(NAME TestInteractionMinimalConsoleOverCheatSheet DATA f3d.glb INTERACTION UI) #h;:
+f3d_test(NAME TestInteractionMinimalConsoleOverCheatSheetAndFilename DATA f3d.glb INTERACTION UI) #h;n;:
 
 if (F3D_MODULE_TINYFILEDIALOGS)
   f3d_test(NAME TestInteractionFileOpen INTERACTION NO_BASELINE ENV CTEST_OPEN_DIALOG_FILE=${F3D_SOURCE_DIR}/testing/data/cow.vtp)
