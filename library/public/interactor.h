@@ -104,8 +104,8 @@ public:
    *
    * If the command fails, it prints a debug log explaining why.
    *
-   * When keepComments argument is true, comments are supported with `#`, any characters after are ignored
-   * otherwise '#' and any characters after will be handled as standard character
+   * When keepComments argument is true, comments are supported with `#`, any characters after are
+   * ignored otherwise '#' and any characters after will be handled as standard character
    *
    * Return true if the command succeeded, false otherwise.
    * Throw an interactor::command_runtime_exception if the command callback
