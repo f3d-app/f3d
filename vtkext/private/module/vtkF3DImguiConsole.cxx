@@ -232,8 +232,7 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
     this->Pimpl->NewError = false;
     this->Pimpl->NewWarning = false;
 
-    ImGui::SetNextWindowSize(
-      ImVec2(windowWidth, viewport->WorkSize.y - 2.f * margin));
+    ImGui::SetNextWindowSize(ImVec2(windowWidth, viewport->WorkSize.y - 2.f * margin));
   }
 
   ImGui::SetNextWindowBgAlpha(0.9f);
@@ -403,11 +402,11 @@ void vtkF3DImguiConsole::ShowBadge()
 //----------------------------------------------------------------------------
 ImVec2 vtkF3DImguiConsole::GetBadgeSize()
 {
-    const float padding = ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().FramePadding.x;
-    ImVec2 badgeSize = ImGui::CalcTextSize("!");
-    badgeSize.x += 2.f * padding;
-    badgeSize.y += 2.f * padding;
-    return badgeSize;
+  const float padding = ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().FramePadding.x;
+  ImVec2 badgeSize = ImGui::CalcTextSize("!");
+  badgeSize.x += 2.f * padding;
+  badgeSize.y += 2.f * padding;
+  return badgeSize;
 }
 
 //----------------------------------------------------------------------------
