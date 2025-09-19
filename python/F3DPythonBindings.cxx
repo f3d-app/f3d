@@ -227,7 +227,7 @@ PYBIND11_MODULE(pyf3d, module)
   utils //
     .def_static("text_distance", &f3d::utils::textDistance)
     .def_static("collapse_path", &f3d::utils::collapsePath)
-    .def_static("tokenize", &f3d::utils::tokenize, py::arg("str"), py::arg("keepComments") = true)
+    .def_static("tokenize", &f3d::utils::tokenize, py::arg("str"), py::arg("keep_comments") = true)
     .def_static(
       "glob_to_regex", &f3d::utils::globToRegex, py::arg("glob"), py::arg("path_separator") = '/')
     .def_static("get_env", &f3d::utils::getEnv)
