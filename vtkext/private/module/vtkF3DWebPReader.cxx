@@ -67,11 +67,9 @@ void vtkF3DWebPReader::ExecuteInformation()
 
   if (!WebPGetInfo(this->BufferData.data(), this->BufferData.size(), &width, &height))
   {
-    // error
-    std::cout << "ERROR" << std::endl;
+    vtkErrorMacro(<< "Could get webp infos");
+    return;
   }
-
-  std::cout << "w= " << width << std::endl;
 
   this->DataExtent[0] = 0;
   this->DataExtent[1] = width - 1;
