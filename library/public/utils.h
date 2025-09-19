@@ -39,7 +39,7 @@ public:
    *  - Use escaped \ quotes, spaces and escape to add them verbatim
    *  - When keepComments argument is true, comments are supported with `#`, any characters after are ignored
    * otherwise '#' and any characters after will be handled as standard character
-   *  - Use escaped \# to add it verbatim
+   *  - Use escaped \# to add it verbatim when using keepComments = true
    *  - Other escaped characters are also added verbatim
    * Throw a tokenize_exception if a quoted section is not closed or if finishing with an escape
    *
