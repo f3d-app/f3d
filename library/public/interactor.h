@@ -11,7 +11,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include <map>
 
 namespace f3d
 {
