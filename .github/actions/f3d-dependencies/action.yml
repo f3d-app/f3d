@@ -99,7 +99,7 @@ runs:
         tbb_version: ${{inputs.tbb_version}}
 
     - name: Install webp dependency
-      if: inputs.webp != ''
+      if: inputs.webp_version != ''
       uses: ./source/.github/actions/webp-install-dep
       with:
         cpu: ${{inputs.cpu}}
