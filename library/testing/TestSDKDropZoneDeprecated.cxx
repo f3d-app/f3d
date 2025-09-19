@@ -22,7 +22,6 @@ int TestSDKDropZoneDeprecated([[maybe_unused]] int argc, [[maybe_unused]] char* 
   f3d::options& opt = eng.getOptions();
   win.setSize(300, 300);
 
-
   // --- Test using the DEPRECATED option ---
 
   opt.ui.drop_zone.enable = true;
@@ -30,21 +29,20 @@ int TestSDKDropZoneDeprecated([[maybe_unused]] int argc, [[maybe_unused]] char* 
   opt.ui.drop_zone.info = "Drop a file to open it\nPress H to show cheatsheet";
   win.render();
 
-  bool deprecatedOptionResult1 = TestSDKHelpers::RenderTest(
-    eng.getWindow(), std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKDropZoneDeprecated");
+  bool deprecatedOptionResult1 = TestSDKHelpers::RenderTest(eng.getWindow(),
+    std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKDropZoneDeprecated");
 
   if (!deprecatedOptionResult1)
   {
     std::cerr << "[ERROR] DEPRECATED drop_zone.info option render test failed" << '\n';
   }
 
-
   opt.ui.dropzone = true;
   opt.ui.dropzone_info = "Drop a file to open it\nPress H to show cheatsheet";
   win.render();
 
-  bool deprecatedOptionResult2 = TestSDKHelpers::RenderTest(
-    eng.getWindow(), std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKDropZoneDeprecated");
+  bool deprecatedOptionResult2 = TestSDKHelpers::RenderTest(eng.getWindow(),
+    std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKDropZoneDeprecated");
 
   if (!deprecatedOptionResult2)
   {

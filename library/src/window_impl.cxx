@@ -395,7 +395,8 @@ void window_impl::UpdateDynamicOptions()
     std::vector<interaction_bind_t> custom_binds;
     std::string bindsStr = opt.ui.drop_zone.custom_binds;
 
-    for (auto& token : utils::tokenize(bindsStr)) {
+    for (auto& token : utils::tokenize(bindsStr))
+    {
       if (!token.empty())
       {
         custom_binds.push_back(interaction_bind_t::parse(token));
