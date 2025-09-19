@@ -396,9 +396,10 @@ void window_impl::UpdateDynamicOptions()
     std::string bindsStr = opt.ui.drop_zone.custom_binds;
 
     for (auto& token : utils::tokenize(bindsStr)) {
-        if (!token.empty()) {
-            custom_binds.push_back(interaction_bind_t::parse(token));
-        }
+      if (!token.empty())
+      {
+        custom_binds.push_back(interaction_bind_t::parse(token));
+      }
     }
     auto dropZoneBindsInfo = this->Internals->Interactor->getBindsDocString(custom_binds);
     renderer->SetDropZoneBindsInfo(dropZoneBindsInfo);

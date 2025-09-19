@@ -12,7 +12,7 @@ int TestSDKDropZoneNoLogo([[maybe_unused]] int argc, [[maybe_unused]] char* argv
   win.setSize(300, 300);
   opt.ui.drop_zone.enable = true;
   opt.ui.drop_zone.show_logo = false;
-  opt.ui.drop_zone.info = "Drop a file to open it\nPress H to show cheatsheet";
+  opt.ui.drop_zone.custom_binds = "None+Drop Ctrl+O None+H";
 
   win.render();
 
