@@ -22,7 +22,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/webp_install
-        key: webp-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-0
+        key: webp-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-1
 
     # Dependents: usd
     - name: Checkout WebP
@@ -51,6 +51,16 @@ runs:
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../webp_install
         -DCMAKE_PREFIX_PATH:PATH=../install/
+        -DWEBP_BUILD_ANIM_UTILS=OFF
+        -DWEBP_BUILD_CWEBP=OFF
+        -DWEBP_BUILD_DWEBP=OFF
+        -DWEBP_BUILD_GIF2WEBP=OFF
+        -DWEBP_BUILD_IMG2WEBP=OFF
+        -DWEBP_BUILD_VWEBP=OFF
+        -DWEBP_BUILD_WEBPINFO=OFF
+        -DWEBP_BUILD_LIBWEBPMUX=OFF
+        -DWEBP_BUILD_WEBPMUX=OFF
+        -DWEBP_BUILD_EXTRAS=OFF
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0 -DCMAKE_MACOSX_RPATH=ON' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
