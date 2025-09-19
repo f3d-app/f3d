@@ -56,11 +56,6 @@ bool StartWith(std::string_view str, std::string_view pattern)
   return str.rfind(pattern, 0) == 0; // To avoid dependency for C++20 starts_with
 };
 
-static const std::map<interaction_bind_t, std::string> bindGroups = {
-    { interaction_bind_t{interaction_bind_t::ModifierKeys::NONE, "Drop"}, "File operations" },
-    { interaction_bind_t{interaction_bind_t::ModifierKeys::CTRL, "O"}, "File operations" }
-};
-
 class interactor_impl::internals
 {
 public:
@@ -1428,35 +1423,23 @@ interactor& interactor_impl::initBindings()
 }
 
 //----------------------------------------------------------------------------
-std::map<std::string, std::vector<std::string>> interactor_impl::getBindsDocString(
+std::vector<std::pair<std::string, std::string>> interactor_impl::getBindsDocString(
   const std::vector<interaction_bind_t>& requestedBinds) const
 {
-  std::map<std::string, std::vector<std::string>> infoMap;
+  std::vector<std::pair<std::string, std::string>> bindsDocVec;
   for (const auto& bind : requestedBinds)
   {
     try
     {
-      std::string key;
-      // Check if bind belongs to a group
-      auto groupDoc = bindGroups.find(bind);
-      if (groupDoc != bindGroups.end())
-      {
-        key = groupDoc->second; // use group doc string
-      }
-      else
-      {
-        // fallback: use normal documentation
-        auto docPair = this->getBindingDocumentation(bind);
-        key = docPair.first;
-      }
-      infoMap[key].push_back(bind.format());
+      auto docPair = this->getBindingDocumentation(bind);
+      bindsDocVec.push_back({ docPair.first, bind.format() });
     }
     catch (const interactor_impl::does_not_exists_exception&)
     {
       // skip non-existent binds
     }
   }
-  return infoMap;
+  return bindsDocVec;
 }
 
 //----------------------------------------------------------------------------

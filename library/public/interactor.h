@@ -76,7 +76,7 @@ public:
    */
   virtual interactor& initCommands() = 0;
 
-  virtual std::map<std::string, std::vector<std::string>> getBindsDocString(
+  virtual std::vector<std::pair<std::string, std::string>> getBindsDocString(
     const std::vector<interaction_bind_t>& requestedBinds) const = 0;
 
   /**
