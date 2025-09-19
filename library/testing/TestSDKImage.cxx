@@ -25,7 +25,8 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   test("supported formats EXR", std::find(formats.begin(), formats.end(), ".exr") != formats.end());
 #endif
 #if F3D_MODULE_WEBP
-  test("supported formats WebP", std::find(formats.begin(), formats.end(), ".webp") != formats.end());
+  test(
+    "supported formats WebP", std::find(formats.begin(), formats.end(), ".webp") != formats.end());
 #endif
 
   constexpr unsigned int width = 64;
@@ -122,8 +123,7 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 #if F3D_MODULE_WEBP
   // check reading WebP
   f3d::image exrImg(testingDir + "/data/image.webp");
-  test("check width WebP image channel type",
-    exrImg.getWidth() == 1024);
+  test("check width WebP image channel type", exrImg.getWidth() == 1024);
 #endif
 
   // check reading invalid image

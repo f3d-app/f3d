@@ -1,12 +1,12 @@
 #include "vtkF3DWebPReader.h"
 
-#include "vtkUnsignedCharArray.h"
+#include "vtkFileResourceStream.h"
 #include "vtkImageData.h"
+#include "vtkMemoryResourceStream.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
-#include "vtkMemoryResourceStream.h"
-#include "vtkFileResourceStream.h"
+#include "vtkUnsignedCharArray.h"
 #include "vtksys/FStream.hxx"
 
 #include "webp/decode.h"
@@ -67,7 +67,7 @@ void vtkF3DWebPReader::ExecuteInformation()
 
   if (!WebPGetInfo(this->BufferData.data(), this->BufferData.size(), &width, &height))
   {
-    //error
+    // error
     std::cout << "ERROR" << std::endl;
   }
 
@@ -110,7 +110,8 @@ void vtkF3DWebPReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInfo
     return;
   }
 
-  vtkUnsignedCharArray* scalars = vtkUnsignedCharArray::SafeDownCast(data->GetPointData()->GetScalars());
+  vtkUnsignedCharArray* scalars =
+    vtkUnsignedCharArray::SafeDownCast(data->GetPointData()->GetScalars());
   if (!scalars)
   {
     vtkErrorMacro(<< "Could not find expected scalar array");
@@ -119,7 +120,8 @@ void vtkF3DWebPReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInfo
 
   scalars->SetName("Pixels");
 
-  uint8_t* pixels = WebPDecodeRGBA(static_cast<uint8_t*>(this->BufferData.data()), this->BufferData.size(), nullptr, nullptr);
+  uint8_t* pixels = WebPDecodeRGBA(
+    static_cast<uint8_t*>(this->BufferData.data()), this->BufferData.size(), nullptr, nullptr);
   std::copy_n(pixels, scalars->GetSize(), scalars->GetPointer(0));
 
   WebPFree(pixels);
