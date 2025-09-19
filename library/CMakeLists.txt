@@ -186,7 +186,7 @@ if (F3D_MODULE_EXR)
   target_compile_definitions(libf3d PRIVATE F3D_MODULE_EXR)
 endif ()
 
-# exr
+# webp
 if (F3D_MODULE_WEBP)
   target_compile_definitions(libf3d PRIVATE F3D_MODULE_WEBP)
 endif ()
