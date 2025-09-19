@@ -8,6 +8,10 @@
 #include "vtkF3DEXRReader.h"
 #endif
 
+#if F3D_MODULE_WEBP
+#include "vtkF3DWebPReader.h"
+#endif
+
 #include <vtkImageReader2Factory.h>
 #include <vtkLogger.h>
 #include <vtkNew.h>
@@ -54,8 +58,13 @@ init::init()
 #endif
 
 #if F3D_MODULE_EXR
-  vtkNew<vtkF3DEXRReader> reader;
-  vtkImageReader2Factory::RegisterReader(reader);
+  vtkNew<vtkF3DEXRReader> exrReader;
+  vtkImageReader2Factory::RegisterReader(exrReader);
+#endif
+
+#if F3D_MODULE_WEBP
+  vtkNew<vtkF3DWebPReader> webpReader;
+  vtkImageReader2Factory::RegisterReader(webpReader);
 #endif
 }
 }
