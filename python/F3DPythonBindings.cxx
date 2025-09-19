@@ -282,7 +282,8 @@ PYBIND11_MODULE(pyf3d, module)
       py::arg("callback"), py::arg("doc") = std::nullopt, py::arg("completionCallback") = nullptr)
     .def("remove_command", &f3d::interactor::removeCommand, "Remove a command")
     .def("get_command_actions", &f3d::interactor::getCommandActions, "Get all command actions")
-    .def("trigger_command", &f3d::interactor::triggerCommand, "Trigger a command", py::arg("command"), py::arg("keepComments") = true)
+    .def("trigger_command", &f3d::interactor::triggerCommand, "Trigger a command",
+      py::arg("command"), py::arg("keepComments") = true)
     .def("init_bindings", &f3d::interactor::initBindings,
       "Remove all bindings and add default bindings")
     .def("remove_binding", &f3d::interactor::removeBinding, "Remove interaction commands")
