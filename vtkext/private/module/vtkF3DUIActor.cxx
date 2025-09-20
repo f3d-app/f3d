@@ -156,9 +156,35 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
     this->RenderDropZone();
   }
 
-  if (this->FileNameVisible)
+  if (this->ConsoleVisible)
   {
-    this->RenderFileName();
+    // To improve user readability when console is visible, all other overlays won't be shown
+    this->RenderConsole(false);
+    this->EndFrame(renWin);
+    return 1;
+  }
+
+  if (this->MinimalConsoleVisible)
+  {
+    // To improve user readability when minimal console is visible cheatsheet and filename
+    // are not shown
+    this->RenderConsole(true);
+  }
+  else
+  {
+    if (this->FileNameVisible)
+    {
+      this->RenderFileName();
+    }
+    if (this->CheatSheetVisible)
+    {
+      this->RenderCheatSheet();
+    }
+  }
+
+  if (this->ConsoleBadgeEnabled)
+  {
+    this->RenderConsoleBadge();
   }
 
   if (this->MetaDataVisible)
@@ -166,29 +192,9 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
     this->RenderMetaData();
   }
 
-  if (this->CheatSheetVisible)
-  {
-    this->RenderCheatSheet();
-  }
-
   if (this->FpsCounterVisible)
   {
     this->RenderFpsCounter();
-  }
-
-  // Only one console can be visible at a time, console has priority over minimal console
-  if (this->ConsoleVisible)
-  {
-    this->RenderConsole(false);
-  }
-  else if (this->MinimalConsoleVisible)
-  {
-    this->RenderConsole(true);
-  }
-
-  if (this->ConsoleBadgeEnabled)
-  {
-    this->RenderConsoleBadge();
   }
 
   this->EndFrame(renWin);
