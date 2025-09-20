@@ -75,9 +75,6 @@ public:
    */
   virtual interactor& initCommands() = 0;
 
-  virtual std::vector<std::pair<std::string, std::string>> getBindsDocString(
-    const std::vector<interaction_bind_t>& requestedBinds) const = 0;
-
   /**
    * Use this method to add a command to be called using triggerCommand.
    * Adding a command with an already existing action throw a

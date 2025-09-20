@@ -1431,10 +1431,10 @@ void vtkF3DRenderer::SetDropZoneInfo(const std::string& info)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetDropZoneBindsInfo(
+void vtkF3DRenderer::SetDropZoneBinds(
   const std::vector<std::pair<std::string, std::string>>& dropZoneBindsInfo)
 {
-  this->UIActor->SetDropInfo(dropZoneBindsInfo);
+  this->UIActor->SetDropBinds(dropZoneBindsInfo);
 }
 
 //----------------------------------------------------------------------------

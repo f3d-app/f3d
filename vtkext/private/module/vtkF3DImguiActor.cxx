@@ -28,6 +28,7 @@
 #endif
 
 #include <imgui.h>
+#include <numeric>
 #include <optional>
 #include <sstream>
 #include <string>
@@ -463,7 +464,7 @@ void vtkF3DImguiActor::RenderDropZone()
     const float plusWidth = ImGui::CalcTextSize("+").x;
 
     // Compute widths
-    for (const auto& pair : this->DropInfo)
+    for (const auto& pair : this->DropBinds)
     {
       const auto& desc = pair.first;
       const auto& bind = pair.second;
@@ -473,11 +474,15 @@ void vtkF3DImguiActor::RenderDropZone()
       maxDescTextWidth = std::max(maxDescTextWidth, descSize.x);
 
       auto keys = splitBindings(bind, '+');
-      for (const auto& key : keys)
-      {
-        totalBindingsWidth +=
-          ImGui::CalcTextSize(key.c_str()).x + DROPZONE_MARGIN * DROPZONE_LOGO_TEXT_PADDING;
-      }
+
+      totalBindingsWidth += std::accumulate(
+        keys.begin(), keys.end(), 0.0f, // use float init since CalcTextSize returns float
+        [](float sum, const std::string& key) {
+          return sum + ImGui::CalcTextSize(key.c_str()).x
+            + DROPZONE_MARGIN * DROPZONE_LOGO_TEXT_PADDING;
+        }
+      );
+
       if (keys.size() > 1)
       {
         totalBindingsWidth += (keys.size() - 1) * (spacingX + plusWidth + spacingX);
@@ -508,7 +513,7 @@ void vtkF3DImguiActor::RenderDropZone()
 
     ImVec2 cursor = startPos;
 
-    for (const auto& pair : this->DropInfo)
+    for (const auto& pair : this->DropBinds)
     {
       const auto& desc = pair.first;
       const auto& bind = pair.second;

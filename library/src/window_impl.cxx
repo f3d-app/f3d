@@ -392,18 +392,26 @@ void window_impl::UpdateDynamicOptions()
     renderer->SetUseTrackball(opt.interactor.trackball);
     renderer->SetInvertZoom(opt.interactor.invert_zoom);
 
-    std::vector<interaction_bind_t> custom_binds;
     std::string bindsStr = opt.ui.drop_zone.custom_binds;
+    std::vector<std::pair<std::string, std::string>> dropZoneBindsInfo;
 
     for (auto& token : utils::tokenize(bindsStr))
     {
       if (!token.empty())
       {
-        custom_binds.push_back(interaction_bind_t::parse(token));
+        try
+        {
+          auto bind = interaction_bind_t::parse(token);
+          auto docPair = this->Internals->Interactor->getBindingDocumentation(bind);
+          dropZoneBindsInfo.push_back({ docPair.first, bind.format() });
+        }
+        catch (const interactor_impl::does_not_exists_exception&)
+        {
+          // skip non-existent binds
+        }
       }
     }
-    auto dropZoneBindsInfo = this->Internals->Interactor->getBindsDocString(custom_binds);
-    renderer->SetDropZoneBindsInfo(dropZoneBindsInfo);
+    renderer->SetDropZoneBinds(dropZoneBindsInfo);
   }
 
   // XXX: model.point_sprites.type only has an effect on geometry scene

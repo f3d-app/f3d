@@ -1423,26 +1423,6 @@ interactor& interactor_impl::initBindings()
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::pair<std::string, std::string>> interactor_impl::getBindsDocString(
-  const std::vector<interaction_bind_t>& requestedBinds) const
-{
-  std::vector<std::pair<std::string, std::string>> bindsDocVec;
-  for (const auto& bind : requestedBinds)
-  {
-    try
-    {
-      auto docPair = this->getBindingDocumentation(bind);
-      bindsDocVec.push_back({ docPair.first, bind.format() });
-    }
-    catch (const interactor_impl::does_not_exists_exception&)
-    {
-      // skip non-existent binds
-    }
-  }
-  return bindsDocVec;
-}
-
-//----------------------------------------------------------------------------
 interactor& interactor_impl::addBinding(const interaction_bind_t& bind,
   std::vector<std::string> commands, std::string group,
   documentation_callback_t documentationCallback, BindingType type)
