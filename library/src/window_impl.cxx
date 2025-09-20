@@ -395,7 +395,7 @@ void window_impl::UpdateDynamicOptions()
     std::string bindsStr = opt.ui.drop_zone.custom_binds;
     std::vector<std::pair<std::string, std::string>> dropZoneBindsInfo;
 
-    for (auto& token : utils::tokenize(bindsStr))
+    for (const auto& token : utils::tokenize(bindsStr))
     {
       if (!token.empty())
       {
