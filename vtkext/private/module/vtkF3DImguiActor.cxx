@@ -475,13 +475,13 @@ void vtkF3DImguiActor::RenderDropZone()
 
       auto keys = splitBindings(bind, '+');
 
-      totalBindingsWidth += std::accumulate(
-        keys.begin(), keys.end(), 0.0f, // use float init since CalcTextSize returns float
-        [](float sum, const std::string& key) {
-          return sum + ImGui::CalcTextSize(key.c_str()).x
-            + DROPZONE_MARGIN * DROPZONE_LOGO_TEXT_PADDING;
-        }
-      );
+      totalBindingsWidth += std::accumulate(keys.begin(), keys.end(),
+        0.0f, // use float init since CalcTextSize returns float
+        [](float sum, const std::string& key)
+        {
+          return sum + ImGui::CalcTextSize(key.c_str()).x +
+            DROPZONE_MARGIN * DROPZONE_LOGO_TEXT_PADDING;
+        });
 
       if (keys.size() > 1)
       {
