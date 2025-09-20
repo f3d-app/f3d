@@ -12,6 +12,14 @@ def test_collapse_path():
     assert f3d.Utils.collapse_path("/folder/../file.ext", ".") == Path("/file.ext")
 
 
+def test_tokenize():
+    out = f3d.Utils.tokenize("my_cmd arg1 arg2")
+    assert out == ["my_cmd", "arg1", "arg2"]
+
+    out = f3d.Utils.tokenize("my_cmd arg1 arg2 #000", False)
+    assert out == ["my_cmd", "arg1", "arg2", "#000"]
+
+
 def test_glob_to_regex():
     assert f3d.Utils.glob_to_regex("*vt?") == ".*vt."
     assert f3d.Utils.glob_to_regex("**/*vt?") == "(?:[^/]*(?:/|$))*[^/]*vt[^/]"

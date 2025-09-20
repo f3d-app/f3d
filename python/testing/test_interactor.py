@@ -32,6 +32,13 @@ def test_command(capfd: pytest.CaptureFixture[str]):
     out, _err = capfd.readouterr()
     assert out == "['arg1', 'arg2']\n"
 
+    # Check a command can be triggered with #
+    inter.add_command("my_cmd", print_fn)
+    inter.trigger_command("my_cmd arg1 arg2 #000", False)
+    inter.remove_command("my_cmd")
+    out, _err = capfd.readouterr()
+    assert out == "['arg1', 'arg2', '#000']\n"
+
     # Smoke test
     inter.init_commands()
     inter.add_command("my_cmd2", print_fn, ["my_cmd2", "doc"], compl_fn)
