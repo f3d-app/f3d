@@ -605,6 +605,37 @@ void vtkF3DImguiActor::RenderMetaData()
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DImguiActor::RenderAxisBackdrop()
+{
+  const ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+  ImVec2 winSize(this->ViewportNormalizedCoords[2], this->ViewportNormalizedCoords[3]);
+  winSize.x -= this->ViewportNormalizedCoords[0];
+  winSize.y -= this->ViewportNormalizedCoords[1];
+  winSize.x *= viewport->WorkSize.x;
+  winSize.y *= viewport->WorkSize.y;
+
+  float diffSizeX = winSize.x / 2;
+  float diffSizeY = winSize.y * 0.15;
+  winSize.x -= diffSizeX;
+  winSize.y -= diffSizeY;
+
+  ImVec2 winPos(this->ViewportNormalizedCoords[0] * viewport->WorkSize.x,
+    (1.0 - this->ViewportNormalizedCoords[1]) * viewport->WorkSize.y);
+  winPos.x += diffSizeX / 2;
+  winPos.y -= winSize.y + diffSizeY / 2;
+
+  ::SetupNextWindow(winPos, winSize);
+  ImGui::SetNextWindowBgAlpha(0.9f);
+
+  ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
+    ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
+
+  ImGui::Begin("Backdrop", nullptr, flags);
+  ImGui::End();
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderCheatSheet()
 {
   const ImGuiViewport* viewport = ImGui::GetMainViewport();

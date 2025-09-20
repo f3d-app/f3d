@@ -62,6 +62,18 @@ void vtkF3DUIActor::SetMetaData(const std::string& metadata)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DUIActor::SetAxisBackdropVisibility(bool show)
+{
+  this->AxisBackdropVisibility = show;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DUIActor::SetViewportNormalizedCoords(const std::array<double, 4>& viewportCoords)
+{
+  this->ViewportNormalizedCoords = viewportCoords;
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DUIActor::SetCheatSheetVisibility(bool show)
 {
   this->CheatSheetVisible = show;
@@ -192,6 +204,11 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
   if (this->ConsoleBadgeEnabled)
   {
     this->RenderConsoleBadge();
+  }
+
+  if (this->AxisBackdropVisibility)
+  {
+    this->RenderAxisBackdrop();
   }
 
   if (this->MetaDataVisible)
