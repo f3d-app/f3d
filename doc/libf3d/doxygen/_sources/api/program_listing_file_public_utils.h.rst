@@ -32,7 +32,7 @@ Program Listing for File utils.h
      [[nodiscard]] static unsigned int textDistance(std::string_view strA, std::string_view strB);
    
      // clang-format off
-     [[nodiscard]] static std::vector<std::string> tokenize(std::string_view str);
+     [[nodiscard]] static std::vector<std::string> tokenize(std::string_view str, bool keepComments = true);
      // clang-format on
    
      [[nodiscard]] static std::filesystem::path collapsePath(

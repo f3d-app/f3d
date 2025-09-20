@@ -67,7 +67,7 @@ Program Listing for File interactor.h
    
      [[nodiscard]] virtual std::vector<std::string> getCommandActions() const = 0;
    
-     virtual bool triggerCommand(std::string_view command) = 0;
+     virtual bool triggerCommand(std::string_view command, bool keepComments = true) = 0;
    
      using documentation_callback_t = std::function<std::pair<std::string, std::string>()>;
    

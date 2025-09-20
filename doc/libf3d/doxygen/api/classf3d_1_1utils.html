@@ -402,15 +402,16 @@ document.write(`
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N3f3d5utils8tokenizeENSt11string_viewE">
-<span id="_CPPv3N3f3d5utils8tokenizeENSt11string_viewE"></span><span id="_CPPv2N3f3d5utils8tokenizeENSt11string_viewE"></span><span id="f3d::utils::tokenize__std::string_view"></span><span class="target" id="classf3d_1_1utils_1a03c09feae794dc46ae13839a9cc4d281"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tokenize</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string_view</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">str</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3f3d5utils8tokenizeENSt11string_viewE" title="Permalink to this definition">#</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N3f3d5utils8tokenizeENSt11string_viewEb">
+<span id="_CPPv3N3f3d5utils8tokenizeENSt11string_viewEb"></span><span id="_CPPv2N3f3d5utils8tokenizeENSt11string_viewEb"></span><span id="f3d::utils::tokenize__std::string_view.b"></span><span class="target" id="classf3d_1_1utils_1ae1cfff8e2b9d13a7556133db81b7971f"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tokenize</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string_view</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">str</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">keepComments</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3f3d5utils8tokenizeENSt11string_viewEb" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Tokenize provided string_view into a vector of strings, using the same logic as bash.<ul class="simple">
 <li><p>Split by spaces unless between quotes</p></li>
 <li><p>Split by quoted section and remove the quotes</p></li>
 <li><p><p>Supported quotes are: ‘”&lt;tt&gt;</p>
 <p>- Use escaped \ quotes, spaces and escape to add them verbatim</p>
-<p>- Comments are supported with&lt;/tt&gt;#`, any characters after are ignored</p>
-<p>- Use escaped \# to add it verbatim</p>
+<p>- When keepComments argument is true, comments are supported with&lt;/tt&gt;#&amp;lsquo;, any characters after are ignored</p>
+<p>otherwise &amp;rsquo;#’ and any characters after will be handled as standard character</p>
+<p>- Use escaped \# to add it verbatim when using keepComments = true</p>
 <p>- Other escaped characters are also added verbatim</p>
 <p>Throw a tokenize_exception if a quoted section is not closed or if finishing with an escape</p>
 <p>Examples:</p>
