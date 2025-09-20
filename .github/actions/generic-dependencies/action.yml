@@ -45,6 +45,9 @@ inputs:
   usd_version:
     description: "Version of usd to build"
     required: false
+  webp_version:
+    description: "Version of webp to build"
+    required: false
   zlib_version:
     description: "Version of zlib to build"
     required: true
@@ -90,3 +93,4 @@ runs:
         pybind11_version: ${{inputs.pybind11_version}}
         tbb_version: ${{inputs.tbb_version}}
         usd_version: ${{inputs.usd_version}}
+        webp_version: ${{inputs.webp_version}}

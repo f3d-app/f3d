@@ -700,6 +700,11 @@ if(F3D_MODULE_EXR)
   f3d_test(NAME TestVersionEXR ARGS --version REGEXP "Module OpenEXR: ON")
 endif()
 
+if(F3D_MODULE_WEBP)
+  f3d_test(NAME TestVersionWebP ARGS --version REGEXP "Module WebP: ON")
+  f3d_test(NAME TestOBJWebP DATA cube_webp.obj)
+endif()
+
 if(F3D_PLUGIN_BUILD_ALEMBIC)
   f3d_test(NAME TestABC DATA suzanne.abc ARGS -s --load-plugins=alembic)
   f3d_test(NAME TestABCNonFaceVarying DATA tetrahedron_non_facevarying_uv.abc ARGS -s --load-plugins=alembic)

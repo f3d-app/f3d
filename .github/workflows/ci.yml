@@ -55,6 +55,8 @@ jobs:
       tbb_version: ${{ steps.set_default_versions.outputs.tbb_version }}
       usd_min_version: ${{ steps.set_default_versions.outputs.usd_min_version }}
       usd_version: ${{ steps.set_default_versions.outputs.usd_version }}
+      webp_min_version: ${{ steps.set_default_versions.outputs.webp_min_version }}
+      webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
       zlib_min_version: ${{ steps.set_default_versions.outputs.zlib_min_version }}
       zlib_version: ${{ steps.set_default_versions.outputs.zlib_version }}
       vtk_commit_sha: ${{ steps.set_default_versions.outputs.vtk_commit_sha }}
@@ -132,6 +134,7 @@ jobs:
           - pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
           - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           - usd_version: ${{needs.default_versions.outputs.usd_version}}
+          - webp_version: ${{needs.default_versions.outputs.webp_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           - build_type: mindeps
             os: ubuntu-22.04
@@ -148,6 +151,7 @@ jobs:
             pybind11_version: ${{needs.default_versions.outputs.pybind11_min_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_min_version}}
             usd_version: ${{needs.default_versions.outputs.usd_min_version}}
+            webp_version: ${{needs.default_versions.outputs.webp_min_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_min_version}}
 
     runs-on: ${{matrix.os}}
@@ -176,6 +180,7 @@ jobs:
           pybind11_version: ${{matrix.pybind11_version}}
           tbb_version: ${{matrix.tbb_version}}
           usd_version: ${{matrix.usd_version}}
+          webp_version: ${{matrix.webp_version}}
           zlib_version: ${{matrix.zlib_version}}
 
   #----------------------------------------------------------------------------
@@ -344,6 +349,7 @@ jobs:
           python_version: ${{needs.default_versions.outputs.python_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
+          webp_version: ${{needs.default_versions.outputs.webp_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
@@ -424,6 +430,7 @@ jobs:
           - python_version: ${{needs.default_versions.outputs.python_version}}
           - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           - usd_version: ${{needs.default_versions.outputs.usd_version}}
+          - webp_version: ${{needs.default_versions.outputs.webp_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           - build_type: egl
             vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
@@ -445,6 +452,7 @@ jobs:
             python_version: ${{needs.default_versions.outputs.python_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_version}}
             usd_version: ${{needs.default_versions.outputs.usd_version}}
+            webp_version: ${{needs.default_versions.outputs.webp_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           - build_type: osmesa
             vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
@@ -466,6 +474,7 @@ jobs:
             python_version: ${{needs.default_versions.outputs.python_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_version}}
             usd_version: ${{needs.default_versions.outputs.usd_version}}
+            webp_version: ${{needs.default_versions.outputs.webp_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           - build_type: exclude_deprecated
             vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
@@ -487,6 +496,7 @@ jobs:
             python_version: ${{needs.default_versions.outputs.python_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_version}}
             usd_version: ${{needs.default_versions.outputs.usd_version}}
+            webp_version: ${{needs.default_versions.outputs.webp_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           - build_type: no_optional_deps
             blosc_version: ${{needs.default_versions.outputs.blosc_version}}
@@ -516,6 +526,7 @@ jobs:
             python_version: ${{needs.default_versions.outputs.python_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_version}}
             usd_version: ${{needs.default_versions.outputs.usd_version}}
+            webp_version: ${{needs.default_versions.outputs.webp_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           - build_type: mindeps
             vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
@@ -537,6 +548,7 @@ jobs:
             python_version: ${{needs.default_versions.outputs.python_min_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_min_version}}
             usd_version: ${{needs.default_versions.outputs.usd_min_version}}
+            webp_version: ${{needs.default_versions.outputs.webp_min_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_min_version}}
 
     runs-on: ubuntu-22.04
@@ -577,6 +589,7 @@ jobs:
           python_version: ${{matrix.python_version}}
           tbb_version: ${{matrix.tbb_version}}
           usd_version: ${{matrix.usd_version}}
+          webp_version: ${{matrix.webp_version}}
           zlib_version: ${{matrix.zlib_version}}
 
   #----------------------------------------------------------------------------
@@ -629,6 +642,7 @@ jobs:
           python_version: ${{needs.default_versions.outputs.python_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
+          webp_version: ${{needs.default_versions.outputs.webp_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
@@ -690,6 +704,7 @@ jobs:
           python_version: ${{needs.default_versions.outputs.python_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
+          webp_version: ${{needs.default_versions.outputs.webp_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
@@ -748,6 +763,7 @@ jobs:
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
+          webp_version: ${{needs.default_versions.outputs.webp_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
@@ -792,6 +808,7 @@ jobs:
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
+          webp_version: ${{needs.default_versions.outputs.webp_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
@@ -841,6 +858,7 @@ jobs:
           openexr_version: ${{needs.default_versions.outputs.openexr_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
+          webp_version: ${{needs.default_versions.outputs.webp_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
@@ -884,6 +902,7 @@ jobs:
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
+          webp_version: ${{needs.default_versions.outputs.webp_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------

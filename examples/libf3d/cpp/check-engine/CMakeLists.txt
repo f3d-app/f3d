@@ -15,6 +15,7 @@ endfunction()
 check_variable_defined(f3d_MODULE_RAYTRACING)
 check_variable_defined(f3d_MODULE_EXR)
 check_variable_defined(f3d_MODULE_UI)
+check_variable_defined(f3d_MODULE_WEBP)
 check_variable_defined(f3d_BINDINGS_PYTHON)
 check_variable_defined(f3d_BINDINGS_JAVA)
 

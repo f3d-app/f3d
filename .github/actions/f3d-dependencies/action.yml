@@ -32,6 +32,9 @@ inputs:
   usd_version:
     description: "Version of usd to build"
     required: false
+  webp_version:
+    description: "Version of webp to build"
+    required: false
 
 runs:
   using: "composite"
@@ -94,3 +97,10 @@ runs:
         version: ${{inputs.usd_version}}
         openexr_version: ${{inputs.openexr_version}}
         tbb_version: ${{inputs.tbb_version}}
+
+    - name: Install webp dependency
+      if: inputs.webp_version != ''
+      uses: ./source/.github/actions/webp-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        version: ${{inputs.webp_version}}
