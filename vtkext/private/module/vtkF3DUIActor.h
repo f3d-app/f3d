@@ -60,6 +60,12 @@ public:
    * Empty by default
    */
   void SetDropText(const std::string& info);
+
+  /**
+   * Set the dropzone binds information
+   * Each pair contains a key and its associated description
+   * Empty by default
+   */
   void SetDropBinds(const std::vector<std::pair<std::string, std::string>>& dropZoneBindsInfo);
 
   /**
