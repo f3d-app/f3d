@@ -10,6 +10,7 @@
 
 #include <vtkProp.h>
 
+#include <array>
 #include <cstdint>
 #include <deque>
 
@@ -91,6 +92,18 @@ public:
    * Empty by default
    */
   void SetMetaData(const std::string& metadata);
+
+  /**
+   * Set the axis backdrop visibility
+   * False by default
+   */
+  void SetAxisBackdropVisibility(bool show);
+
+  /**
+   * Set the axis viewport coords
+   * 0 by default
+   */
+  void SetViewportNormalizedCoords(const std::array<double, 4>& viewportCoords);
 
   /**
    * Set the cheatsheet visibility
@@ -203,6 +216,13 @@ protected:
   }
 
   /**
+   * Render the axis backdrop
+   */
+  virtual void RenderAxisBackdrop()
+  {
+  }
+
+  /**
    * Render the cheatsheet UI widget
    */
   virtual void RenderCheatSheet()
@@ -239,6 +259,9 @@ protected:
 
   bool MetaDataVisible = false;
   std::string MetaData = "";
+
+  bool AxisBackdropVisibility = false;
+  std::array<double, 4> ViewportNormalizedCoords{};
 
   bool CheatSheetVisible = false;
   std::vector<CheatSheetGroup> CheatSheet;

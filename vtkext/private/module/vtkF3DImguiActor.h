@@ -72,6 +72,11 @@ private:
   void RenderMetaData() override;
 
   /**
+   * Render the axis backdrop
+   */
+  void RenderAxisBackdrop() override;
+
+  /**
    * Render the cheatsheet UI widget
    */
   void RenderCheatSheet() override;
