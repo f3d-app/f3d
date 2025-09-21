@@ -94,6 +94,30 @@ int vtkF3DWebPReader::CanReadFile(const char* fname)
     return 0;
   }
 
+  // The file must begin with magic number RIFF
+  if ((ifs.get() != 'R') || (ifs.get() != 'I') || (ifs.get() != 'F') || (ifs.get() != 'F'))
+  {
+    ifs.close();
+    return 0;
+  }
+
+  // Skip 4 bytes (file size field) to get to position 8
+  ifs.ignore(4);
+
+  // Check for WEBP signature at bytes 8-11
+  if ((ifs.get() != 'W') || (ifs.get() != 'E') || (ifs.get() != 'B') || (ifs.get() != 'P'))
+  {
+    ifs.close();
+    return 0;
+  }
+
+  // Check for VP8 signature at bytes 12-15
+  if ((ifs.get() != 'V') || (ifs.get() != 'P') || (ifs.get() != '8') || (ifs.get() != ' '))
+  {
+    ifs.close();
+    return 0;
+  }
+
   ifs.close();
   return 1;
 }
