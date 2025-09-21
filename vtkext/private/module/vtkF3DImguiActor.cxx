@@ -42,7 +42,7 @@ constexpr float DROPZONE_MARGIN = 0.5f;
 constexpr float DROPZONE_PADDING_X = 5.0f;
 constexpr float DROPZONE_PADDING_Y = 2.0f;
 
-static std::vector<std::string> splitBindings(const std::string& s, char delim)
+static std::vector<std::string> SplitBindings(const std::string& s, char delim)
 {
   std::vector<std::string> result;
   std::stringstream ss(s);
@@ -476,7 +476,7 @@ void vtkF3DImguiActor::RenderDropZone()
       ImVec2 descSize = ImGui::CalcTextSize(desc.c_str());
       maxDescTextWidth = std::max(maxDescTextWidth, descSize.x);
 
-      auto keys = splitBindings(bind, '+');
+      auto keys = ::SplitBindings(bind, '+');
 
       totalBindingsWidth += std::accumulate(keys.begin(), keys.end(),
         0.0f, // use float init since CalcTextSize returns float
@@ -528,7 +528,7 @@ void vtkF3DImguiActor::RenderDropZone()
       float xBindings = cursor.x + maxDescTextWidth + ::DROPZONE_LOGO_TEXT_PADDING;
       ImVec2 bindingPos(xBindings, cursor.y);
 
-      auto keys = splitBindings(bind, '+');
+      auto keys = ::SplitBindings(bind, '+');
       for (size_t k = 0; k < keys.size(); ++k)
       {
         const std::string& key = keys[k];
@@ -704,7 +704,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
       ImGui::TableNextColumn();
 
       ImVec2 topBindingCorner, bottomBindingCorner;
-      std::vector<std::string> splittedBinding = splitBindings(bind, '+');
+      std::vector<std::string> splittedBinding = ::SplitBindings(bind, '+');
       const float maxCursorPosX = ImGui::GetCursorPosX() + ImGui::GetColumnWidth();
       float posX = maxCursorPosX - ImGui::CalcTextSize(bind.c_str()).x - ImGui::GetScrollX() -
         ((splittedBinding.size() * 2) - 1) * ImGui::GetStyle().ItemSpacing.x;
