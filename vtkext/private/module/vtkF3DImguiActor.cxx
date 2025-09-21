@@ -413,11 +413,11 @@ void vtkF3DImguiActor::RenderDropZone()
     // Logo rendering
     if (this->DropZoneLogoVisible && this->Pimpl->LogoTexture)
     {
-      float logoDisplayWidth = LOGO_DISPLAY_WIDTH;
-      float logoDisplayHeight = LOGO_DISPLAY_HEIGHT;
+      float logoDisplayWidth = ::LOGO_DISPLAY_WIDTH;
+      float logoDisplayHeight = ::LOGO_DISPLAY_HEIGHT;
       ImVec2 center = viewport->GetWorkCenter();
-      ImVec2 logoPos(center.x - logoDisplayWidth * DROPZONE_MARGIN,
-        center.y - logoDisplayHeight * DROPZONE_MARGIN);
+      ImVec2 logoPos(center.x - logoDisplayWidth * ::DROPZONE_MARGIN,
+        center.y - logoDisplayHeight * ::DROPZONE_MARGIN);
 
       // VTK texture pointer to ImTextureID cast (void*)
       ImTextureID texID = reinterpret_cast<ImTextureID>(this->Pimpl->LogoTexture.Get());
@@ -454,9 +454,9 @@ void vtkF3DImguiActor::RenderDropZone()
     if (!this->DropText.empty())
     {
       ImVec2 textSize = ImGui::CalcTextSize(this->DropText.c_str());
-      ImVec2 textPos(viewport->GetWorkCenter().x - textSize.x * DROPZONE_MARGIN,
-        viewport->GetWorkCenter().y - DROPZONE_MARGIN * textSize.y + LOGO_DISPLAY_HEIGHT / 2 +
-          DROPZONE_LOGO_TEXT_PADDING);
+      ImVec2 textPos(viewport->GetWorkCenter().x - textSize.x * ::DROPZONE_MARGIN,
+        viewport->GetWorkCenter().y - ::DROPZONE_MARGIN * textSize.y + ::LOGO_DISPLAY_HEIGHT / 2 +
+          ::DROPZONE_LOGO_TEXT_PADDING);
       drawList->AddText(textPos, ImColor(F3DImguiStyle::GetTextColor()), this->DropText.c_str());
       return;
     }
@@ -483,7 +483,7 @@ void vtkF3DImguiActor::RenderDropZone()
         [](float sum, const std::string& key)
         {
           return sum + ImGui::CalcTextSize(key.c_str()).x +
-            DROPZONE_MARGIN * DROPZONE_LOGO_TEXT_PADDING;
+            ::DROPZONE_MARGIN * ::DROPZONE_LOGO_TEXT_PADDING;
         });
 
       if (keys.size() > 1)
@@ -498,20 +498,20 @@ void vtkF3DImguiActor::RenderDropZone()
     const ImColor bindingRectColor = F3DImguiStyle::GetMidColor();
     const ImColor bindingTextColor = F3DImguiStyle::GetTextColor();
 
-    float tableWidth = maxDescTextWidth + maxBindingsTextWidth + DROPZONE_LOGO_TEXT_PADDING +
+    float tableWidth = maxDescTextWidth + maxBindingsTextWidth + ::DROPZONE_LOGO_TEXT_PADDING +
       ImGui::GetStyle().ItemSpacing.x;
 
     // Position table below logo if needed
     ImVec2 startPos;
     if (this->DropZoneLogoVisible && this->Pimpl->LogoTexture)
     {
-      startPos = ImVec2(viewport->GetWorkCenter().x - tableWidth * DROPZONE_MARGIN,
-        viewport->GetWorkCenter().y + LOGO_DISPLAY_HEIGHT / 2 + DROPZONE_MARGIN);
+      startPos = ImVec2(viewport->GetWorkCenter().x - tableWidth * ::DROPZONE_MARGIN,
+        viewport->GetWorkCenter().y + ::LOGO_DISPLAY_HEIGHT / 2 + ::DROPZONE_MARGIN);
     }
     else
     {
       startPos = ImVec2(
-        viewport->GetWorkCenter().x - tableWidth * DROPZONE_MARGIN, viewport->GetWorkCenter().y);
+        viewport->GetWorkCenter().x - tableWidth * ::DROPZONE_MARGIN, viewport->GetWorkCenter().y);
     }
 
     ImVec2 cursor = startPos;
@@ -523,9 +523,9 @@ void vtkF3DImguiActor::RenderDropZone()
 
       drawList->AddText(cursor, descTextColor, desc.c_str());
       float rowHeight =
-        ImGui::GetTextLineHeightWithSpacing() + DROPZONE_MARGIN * DROPZONE_LOGO_TEXT_PADDING;
+        ImGui::GetTextLineHeightWithSpacing() + ::DROPZONE_MARGIN * ::DROPZONE_LOGO_TEXT_PADDING;
 
-      float xBindings = cursor.x + maxDescTextWidth + DROPZONE_LOGO_TEXT_PADDING;
+      float xBindings = cursor.x + maxDescTextWidth + ::DROPZONE_LOGO_TEXT_PADDING;
       ImVec2 bindingPos(xBindings, cursor.y);
 
       auto keys = splitBindings(bind, '+');
@@ -533,7 +533,7 @@ void vtkF3DImguiActor::RenderDropZone()
       {
         const std::string& key = keys[k];
         ImVec2 textSize = ImGui::CalcTextSize(key.c_str());
-        ImVec2 padding(DROPZONE_PADDING_X, DROPZONE_PADDING_Y);
+        ImVec2 padding(::DROPZONE_PADDING_X, ::DROPZONE_PADDING_Y);
 
         ImVec2 rectMin = ImVec2(bindingPos.x, bindingPos.y);
         ImVec2 rectMax =

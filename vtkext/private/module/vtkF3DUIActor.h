@@ -62,11 +62,11 @@ public:
   void SetDropText(const std::string& info);
 
   /**
-   * Set the dropzone binds information
-   * Each pair contains an interaction bind and its associated description
+   * Set the dropzone binds
+   * Each pair contains a description and its associated interaction bind
    * Empty by default
    */
-  void SetDropBinds(const std::vector<std::pair<std::string, std::string>>& dropZoneBindsInfo);
+  void SetDropBinds(const std::vector<std::pair<std::string, std::string>>& dropZoneBinds);
 
   /**
    * Set the filename visibility
