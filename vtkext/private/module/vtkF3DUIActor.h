@@ -101,7 +101,7 @@ public:
 
   /**
    * Set the axis viewport coords
-   * 0 by default
+   * contain only zeros by default
    */
   void SetViewportNormalizedCoords(const std::array<double, 4>& viewportCoords);
 
