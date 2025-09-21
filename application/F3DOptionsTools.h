@@ -40,6 +40,7 @@ static inline const OptionsDict DefaultAppOptions = {
   { "screenshot-filename", "{app}/{model}_{n}.png" },
   { "verbose", "info" },
   { "multi-file-mode", "single" },
+  { "multi-file-regex", "" },
   { "recursive-dir-add", "false" },
   { "remove-empty-file-groups", "false" },
   { "resolution", "1000, 600" },
