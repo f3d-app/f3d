@@ -111,13 +111,6 @@ int vtkF3DWebPReader::CanReadFile(const char* fname)
     return 0;
   }
 
-  // Check for VP8 signature at bytes 12-15
-  if ((ifs.get() != 'V') || (ifs.get() != 'P') || (ifs.get() != '8') || (ifs.get() != ' '))
-  {
-    ifs.close();
-    return 0;
-  }
-
   ifs.close();
   return 1;
 }
