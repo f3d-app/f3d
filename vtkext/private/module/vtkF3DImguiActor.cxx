@@ -626,7 +626,7 @@ void vtkF3DImguiActor::RenderAxisBackdrop()
   winPos.y -= winSize.y + diffSizeY / 2;
 
   ::SetupNextWindow(winPos, winSize);
-  ImGui::SetNextWindowBgAlpha(0.9f);
+  ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
     ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
