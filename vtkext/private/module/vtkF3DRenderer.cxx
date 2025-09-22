@@ -1431,6 +1431,13 @@ void vtkF3DRenderer::SetDropZoneInfo(const std::string& info)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetDropZoneBinds(
+  const std::vector<std::pair<std::string, std::string>>& dropZoneBinds)
+{
+  this->UIActor->SetDropBinds(dropZoneBinds);
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetUseDepthPeelingPass(bool use)
 {
   if (this->UseDepthPeelingPass != use)
