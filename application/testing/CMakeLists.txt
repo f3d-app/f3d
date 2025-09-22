@@ -702,7 +702,10 @@ endif()
 
 if(F3D_MODULE_WEBP)
   f3d_test(NAME TestVersionWebP ARGS --version REGEXP "Module WebP: ON")
-  f3d_test(NAME TestOBJWebP DATA cube_webp.obj)
+  # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11922
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250220)
+    f3d_test(NAME TestOBJWebP DATA cube_webp.obj)
+  endif()
 endif()
 
 if(F3D_PLUGIN_BUILD_ALEMBIC)
