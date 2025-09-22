@@ -147,7 +147,6 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     cam.setFocalPoint({ 0, 0, 0 });
     cam.setViewUp({ 0, 1, 0 });
 
-    // Initial orientation
     if (!compareDouble(cam.getYaw(), 0.0) || !compareDouble(cam.getElevation(), 0.0) ||
       !compareDouble(cam.getAzimuth(), 0.0))
     {
@@ -155,7 +154,6 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
       return EXIT_FAILURE;
     }
 
-    // Apply yaw(90)
     cam.yaw(90.0);
     if (!compareDouble(cam.getYaw(), 90.0) || !compareDouble(cam.getElevation(), 0.0) ||
       !compareDouble(cam.getAzimuth(), 90.0))
@@ -164,7 +162,6 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
       return EXIT_FAILURE;
     }
 
-    // Apply elevation(45)
     cam.elevation(45.0);
     if (!compareDouble(cam.getYaw(), 90.0) || !compareDouble(cam.getElevation(), 45.0) ||
       !compareDouble(cam.getAzimuth(), 90.0))
@@ -173,7 +170,6 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
       return EXIT_FAILURE;
     }
 
-    // Apply azimuth(90)
     cam.azimuth(90.0);
     if (!compareDouble(cam.getYaw(), 180.0) || !compareDouble(cam.getElevation(), 0.0) ||
       !compareDouble(cam.getAzimuth(), 180.0))

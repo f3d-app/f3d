@@ -315,30 +315,7 @@ angle_deg_t camera_impl::getYaw()
 //----------------------------------------------------------------------------
 angle_deg_t camera_impl::getAzimuth()
 {
-  point3_t pos, foc;
-  vector3_t dir, projectedAlongUp, projected;
-  double* up = this->Internals->VTKRenderer->GetEnvironmentUp();
-  double* right = this->Internals->VTKRenderer->GetEnvironmentRight();
-  this->getPosition(pos);
-  this->getFocalPoint(foc);
-
-  // Forward vector (focal - position)
-  vtkMath::Subtract(foc, pos, dir);
-  vtkMath::Normalize(dir.data());
-  vtkMath::Normalize(up);
-
-   // Project forward vector onto up vector
-  vtkMath::ProjectVector(dir.data(), up, projectedAlongUp.data());
-  vtkMath::Normalize(projectedAlongUp.data());
-
-  //Projection of forward vector along the plane perpendicular to up vector
-  vtkMath::Subtract(dir,projectedAlongUp,projected);
-
-  double angleRad = vtkMath::AngleBetweenVectors(right, projected.data());
-  vector3_t cross;
-  vtkMath::Cross(right, projected.data(), cross.data());
-  double sign = vtkMath::Dot(cross.data(), up) >= 0 ? 1.0 : -1.0;
-  return sign * vtkMath::DegreesFromRadians(angleRad);
+  return camera_impl::getYaw();
 }
 
 //----------------------------------------------------------------------------
