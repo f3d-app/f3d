@@ -1,5 +1,5 @@
 import pytest
-
+import math
 import f3d
 
 
@@ -104,15 +104,27 @@ def test_state_compare():
 def test_moves():
     engine = f3d.Engine.create(True)
     camera = engine.window.camera
+    pos = -1, 0, 0
+    foc = 0, 0, 0
+    up = 0, 1, 0
 
-    camera.dolly(10)
+    camera.position = pos
+    camera.focal_point = foc
+    camera.view_up = up
     angle = 30
-    camera.roll(angle)
+    
     camera.azimuth(angle)
+    az_value = camera.get_azimuth()
+    assert math.isclose(az_value, angle, abs_tol=1e-3), f"Expected azimuth ~{angle}, got {az_value}"
     camera.yaw(angle)
+    yaw_value = camera.get_yaw()
+    assert math.isclose(yaw_value, 2*angle, abs_tol=1e-3), f"Expected azimuth ~{2*angle}, got {yaw_value}"
     camera.elevation(angle)
+    elev_value = camera.get_elevation()
+    assert math.isclose(elev_value, angle, abs_tol=1e-3), f"Expected azimuth ~{angle}, got {elev_value}"
     camera.pitch(angle)
-
+    camera.roll(angle)
+    camera.dolly(10)    
 
 def test_pan():
     engine = f3d.Engine.create(True)
