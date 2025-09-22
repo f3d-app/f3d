@@ -31,6 +31,13 @@ void vtkF3DUIActor::SetDropText(const std::string& info)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DUIActor::SetDropBinds(
+  const std::vector<std::pair<std::string, std::string>>& dropZoneBinds)
+{
+  this->DropBinds = dropZoneBinds;
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DUIActor::SetFileNameVisibility(bool show)
 {
   this->FileNameVisible = show;
