@@ -80,9 +80,10 @@ public:
    */
   [[nodiscard]] virtual angle_deg_t getYaw() = 0;   
 
-  /** Calculates the horizontal rotation angle of the forward vector
- *  around the up vector, measured from the right vector. (-180 to 180 degrees)
- */
+  /**
+   * Calculates the horizontal rotation angle of the forward vector
+   * around the up vector, measured from the right vector. (-180 to 180 degrees)
+   */
 [[nodiscard]] virtual angle_deg_t getAzimuth() = 0;
 
 
