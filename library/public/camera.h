@@ -110,7 +110,9 @@ public:
 [[nodiscard]] virtual angle_deg_t getAzimuth() = 0;
 
 
-  /** Calculates the angle between the forward vector and the up vector (-90 to +90 degrees) */
+  /** 
+    * Calculates the angle between the forward vector and the up vector (-90 to +90 degrees) 
+    */
   [[nodiscard]] virtual angle_deg_t getElevation() = 0;
   ///@}
   
