@@ -13,7 +13,7 @@ int TestF3DWebPReader(int argc, char* argv[])
   reader->SetFileName(filename.c_str());
   reader->Update();
 
-  std::cout << "Reader Name: " << reader->GetDescriptiveName() << std::endl;
+  std::cout << "Reader Name: " << reader->GetDescriptiveName() << '\n';
   reader->Print(cout);
 
   vtkImageData* img = reader->GetOutput();
