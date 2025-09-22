@@ -22,12 +22,6 @@ vtkF3DWebPReader::vtkF3DWebPReader() = default;
 vtkF3DWebPReader::~vtkF3DWebPReader() = default;
 
 //------------------------------------------------------------------------------
-void vtkF3DWebPReader::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os, indent);
-}
-
-//------------------------------------------------------------------------------
 void vtkF3DWebPReader::ExecuteInformation()
 {
   // XXX: Needed because of VTK initialize file pattern in the constructor for some reasons

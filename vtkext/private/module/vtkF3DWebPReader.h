@@ -12,7 +12,6 @@ class vtkF3DWebPReader : public vtkImageReader
 public:
   static vtkF3DWebPReader* New();
   vtkTypeMacro(vtkF3DWebPReader, vtkImageReader);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Return 1 if the reader is compatible with the given file

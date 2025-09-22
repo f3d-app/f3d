@@ -21,6 +21,7 @@ int TestF3DWebPMemReader(int argc, char* argv[])
   std::ifstream file(std::string(argv[1]) + "data/image.webp", std::ios::binary | std::ios::ate);
   if (!file)
   {
+    std::cerr << "Cannot open the file\n";
     return EXIT_FAILURE;
   }
 
@@ -30,6 +31,7 @@ int TestF3DWebPMemReader(int argc, char* argv[])
   std::vector<char> buff(size);
   if (!file.read(buff.data(), size))
   {
+    std::cerr << "Cannot read the file\n";
     return EXIT_FAILURE;
   }
 
