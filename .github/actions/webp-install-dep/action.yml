@@ -24,7 +24,6 @@ runs:
         path: dependencies/webp_install
         key: webp-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-1
 
-    # Dependents: usd
     - name: Checkout WebP
       if: steps.cache-webp.outputs.cache-hit != 'true'
       uses: actions/checkout@v4
