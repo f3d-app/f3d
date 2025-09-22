@@ -141,6 +141,48 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     return EXIT_FAILURE;
   }
 
+  // Combined test for yaw, elevation, and azimuth
+  {
+    cam.setPosition({ -1, 0, 0 });
+    cam.setFocalPoint({ 0, 0, 0 });
+    cam.setViewUp({ 0, 1, 0 });
+
+    // Initial orientation
+    if (!compareDouble(cam.getYaw(), 0.0) || !compareDouble(cam.getElevation(), 0.0) ||
+      !compareDouble(cam.getAzimuth(), 0.0))
+    {
+      std::cerr << "Initial orientation not as expected\n";
+      return EXIT_FAILURE;
+    }
+
+    // Apply yaw(90)
+    cam.yaw(90.0);
+    if (!compareDouble(cam.getYaw(), 90.0) || !compareDouble(cam.getElevation(), 0.0) ||
+      !compareDouble(cam.getAzimuth(), 90.0))
+    {
+      std::cerr << "After yaw(90): unexpected orientation\n";
+      return EXIT_FAILURE;
+    }
+
+    // Apply elevation(45)
+    cam.elevation(45.0);
+    if (!compareDouble(cam.getYaw(), 90.0) || !compareDouble(cam.getElevation(), 45.0) ||
+      !compareDouble(cam.getAzimuth(), 90.0))
+    {
+      std::cerr << "After elevation(45): unexpected orientation\n";
+      return EXIT_FAILURE;
+    }
+
+    // Apply azimuth(90)
+    cam.azimuth(90.0);
+    if (!compareDouble(cam.getYaw(), 180.0) || !compareDouble(cam.getElevation(), 0.0) ||
+      !compareDouble(cam.getAzimuth(), 180.0))
+    {
+      std::cerr << "After azimuth(90): unexpected orientation\n";
+      return EXIT_FAILURE;
+    }
+  }
+
   // Test position
   f3d::point3_t testPos = { 0., 0., 10. };
   f3d::point3_t pos = cam.setPosition(testPos).getPosition();
