@@ -1,3 +1,7 @@
+/**
+ * @class   vtkF3DWebPReader
+ * @brief   Read a WebP image file
+ */
 #ifndef vtkF3DWebPReader_h
 #define vtkF3DWebPReader_h
 
@@ -37,9 +41,6 @@ protected:
 
   void ExecuteInformation() override;
   void ExecuteDataWithInformation(vtkDataObject* out, vtkInformation* outInfo) override;
-
-  int GetWidth() const;
-  int GetHeight() const;
 
 private:
   vtkF3DWebPReader(const vtkF3DWebPReader&) = delete;

@@ -141,15 +141,3 @@ void vtkF3DWebPReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInfo
 
   WebPFree(pixels);
 }
-
-//------------------------------------------------------------------------------
-int vtkF3DWebPReader::GetWidth() const
-{
-  return this->DataExtent[1] - this->DataExtent[0] + 1;
-}
-
-//------------------------------------------------------------------------------
-int vtkF3DWebPReader::GetHeight() const
-{
-  return this->DataExtent[3] - this->DataExtent[2] + 1;
-}

@@ -18,7 +18,9 @@ int TestF3DWebPReader(int argc, char* argv[])
 
   vtkImageData* img = reader->GetOutput();
 
-  if (reader->GetWidth() != 1024 && reader->GetHeight() != 1024)
+  const int* dims = img->GetDimensions();
+
+  if (dims[0] != 1024 && dims[1] != 1024)
   {
     std::cerr << "Incorrect WebP image size.\n";
     return EXIT_FAILURE;
