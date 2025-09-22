@@ -120,11 +120,6 @@ void vtkF3DWebPReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInfo
 {
   vtkImageData* data = this->AllocateOutputData(output, outInfo);
 
-  if (this->UpdateExtentIsEmpty(outInfo, output))
-  {
-    return;
-  }
-
   vtkUnsignedCharArray* scalars =
     vtkUnsignedCharArray::SafeDownCast(data->GetPointData()->GetScalars());
   if (!scalars)
