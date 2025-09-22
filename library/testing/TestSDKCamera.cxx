@@ -107,11 +107,11 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   f3d::angle_deg_t elevation = cam.getElevation();
   if (!compareDouble(elevation, 0.))
   {
-    std::cerr << "get elevation is not behaving as expected: " << elevation
-              << " != " << testElevation << "\n";
+    std::cerr << "get elevation is not behaving as expected: " << elevation << " != " << 0.0
+              << "\n";
     return EXIT_FAILURE;
   }
-  testElevation = -45.0;
+  f3d::angle_deg_t testElevation = -45.0;
   cam.elevation(testElevation);
   elevation = cam.getElevation();
   if (!compareDouble(elevation, testElevation))
@@ -128,11 +128,10 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   f3d::angle_deg_t azimuth = cam.getAzimuth();
   if (!compareDouble(azimuth, 0.))
   {
-    std::cerr << "get azimuth is not behaving as expected: " << azimuth << " != " << testAzimuth
-              << "\n";
+    std::cerr << "get azimuth is not behaving as expected: " << azimuth << " != " << 0.0 << "\n";
     return EXIT_FAILURE;
   }
-  testAzimuth = 90.0;
+  f3d::angle_deg_t testAzimuth = 90.0;
   cam.azimuth(testAzimuth);
   azimuth = cam.getAzimuth();
   if (!compareDouble(azimuth, testAzimuth))
