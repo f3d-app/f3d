@@ -43,6 +43,9 @@ inputs:
   vtk_version:
     description: "Version of vtk to build"
     required: true
+  webp_version:
+    description: "Version of webp to build"
+    required: true
   zlib_version:
     description: "Version of zlib to build"
     required: true
@@ -78,6 +81,7 @@ runs:
         pybind11_version: ${{inputs.pybind11_version}}
         tbb_version: ${{inputs.tbb_version}}
         usd_version: ${{inputs.usd_version}}
+        webp_version: ${{inputs.webp_version}}
         zlib_version: ${{inputs.zlib_version}}
 
     - name: Install VTK dependency
@@ -137,6 +141,7 @@ runs:
         -DF3D_MACOS_BUNDLE=OFF;
         -DF3D_MODULE_EXR=ON;
         -DF3D_MODULE_UI=ON;
+        -DF3D_MODULE_WEBP=ON;
         -DF3D_BUILD_APPLICATION=OFF" >> $GITHUB_ENV
 
     - name: Build wheel
