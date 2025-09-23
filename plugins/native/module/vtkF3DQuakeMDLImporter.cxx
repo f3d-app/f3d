@@ -476,7 +476,7 @@ vtkF3DQuakeMDLImporter::vtkF3DQuakeMDLImporter()
 //----------------------------------------------------------------------------
 int vtkF3DQuakeMDLImporter::ImportBegin()
 {
-  return this->Internals->ReadScene(this->FileName);
+  return this->Internals->ReadScene(this->GetFileName());
 }
 
 //----------------------------------------------------------------------------

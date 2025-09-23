@@ -909,7 +909,7 @@ vtkF3DAssimpImporter::~vtkF3DAssimpImporter() = default;
 //----------------------------------------------------------------------------
 int vtkF3DAssimpImporter::ImportBegin()
 {
-  return this->Internals->ReadScene(this->FileName);
+  return this->Internals->ReadScene(this->GetFileName());
 }
 
 //----------------------------------------------------------------------------
@@ -1150,11 +1150,4 @@ void vtkF3DAssimpImporter::ImportCameras(vtkRenderer* renderer)
 void vtkF3DAssimpImporter::ImportLights(vtkRenderer* renderer)
 {
   this->Internals->ImportLights(renderer);
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DAssimpImporter::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os, indent);
-  os << indent << "FileName: " << this->FileName << "\n";
 }
