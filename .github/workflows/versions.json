@@ -43,6 +43,6 @@
     "webp": "v1.2.4",
     "zlib": "v1.2.13"
   },
-  "vtk_commit_sha": "bcd1413a7fa5bb503c2c5c07826b343f7e788fb9",
+  "vtk_commit_sha": "326aec6d1115535f4a17707008222682fc3cf6b2",
   "timestamp": "20250923_0"
 }
