@@ -75,7 +75,8 @@ public:
   ///@{ @name Getters
   /// Yaw, azimuth and elevation getter methods(calculated on call). Angles are in degrees.
 
-  /** Calculates angle between the projection of the forward vector (on
+  /** 
+   * Calculates angle between the projection of the forward vector (on
    *  the plane perpendicular to the up vector) and the right vector (-180 to 180 degrees)
    */
   [[nodiscard]] virtual angle_deg_t getYaw() = 0;   
