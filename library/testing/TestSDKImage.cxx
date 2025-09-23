@@ -24,6 +24,10 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 #if F3D_MODULE_EXR
   test("supported formats EXR", std::find(formats.begin(), formats.end(), ".exr") != formats.end());
 #endif
+#if F3D_MODULE_WEBP
+  test(
+    "supported formats WebP", std::find(formats.begin(), formats.end(), ".webp") != formats.end());
+#endif
 
   constexpr unsigned int width = 64;
   constexpr unsigned int height = 64;
@@ -114,6 +118,12 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   f3d::image exrImg(testingDir + "/data/kloofendal_43d_clear_1k.exr");
   test("check 32-bits EXR image channel type",
     exrImg.getChannelType() == f3d::image::ChannelType::FLOAT);
+#endif
+
+#if F3D_MODULE_WEBP
+  // check reading WebP
+  f3d::image webpImg(testingDir + "/data/image.webp");
+  test("check width WebP image channel type", webpImg.getWidth() == 1024);
 #endif
 
   // check reading invalid image

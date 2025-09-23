@@ -63,6 +63,11 @@ constexpr ImVec4 GetBackgroundColor()
   // F3D black
   return DecomposeImv4(0x141414);
 }
+
+constexpr float GetDefaultMargin()
+{
+  return 5.f;
+}
 };
 
 #endif

@@ -37,8 +37,9 @@ public:
    *  - Split by quoted section and remove the quotes
    *  - Supported quotes are: '"`
    *  - Use escaped \ quotes, spaces and escape to add them verbatim
-   *  - Comments are supported with `#`, any characters after are ignored
-   *  - Use escaped \# to add it verbatim
+   *  - When keepComments argument is true, comments are supported with `#`, any characters after are ignored
+   * otherwise '#' and any characters after will be handled as standard character
+   *  - Use escaped \# to add it verbatim when using keepComments = true
    *  - Other escaped characters are also added verbatim
    * Throw a tokenize_exception if a quoted section is not closed or if finishing with an escape
    *
@@ -54,7 +55,7 @@ public:
    * `set scene.up.direction "+Z` -> tokenize_exception
    * `set scene.up.direction +Z\` -> tokenize_exception
    */
-  [[nodiscard]] static std::vector<std::string> tokenize(std::string_view str);
+  [[nodiscard]] static std::vector<std::string> tokenize(std::string_view str, bool keepComments = true);
   // clang-format on
 
   /**

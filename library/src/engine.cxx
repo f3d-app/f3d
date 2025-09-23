@@ -473,6 +473,12 @@ engine::libInformation engine::getLibInfo()
   libInfo.Modules["OpenEXR"] = false;
 #endif
 
+#if F3D_MODULE_WEBP
+  libInfo.Modules["WebP"] = true;
+#else
+  libInfo.Modules["WebP"] = false;
+#endif
+
 #if F3D_MODULE_UI
   libInfo.Modules["ImGui"] = true;
 #else

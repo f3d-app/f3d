@@ -164,6 +164,12 @@
     }
   },
   "ui": {
+    "backdrop": {
+      "opacity": {
+        "type": "double",
+        "default_value": "0.9"
+      }
+    },
     "axis": {
       "type": "bool",
       "default_value": "false"
@@ -204,7 +210,7 @@
     "dropzone_info": {
       "type": "string",
       "default_value": "",
-      "deprecated": "use ui.drop_zone.info instead"
+      "deprecated": "use ui.drop_zone.custom_binds instead"
     },
     "drop_zone": {
       "enable": {
@@ -213,11 +219,16 @@
       },
       "info": {
         "type": "string",
-        "default_value": ""
+        "default_value": "",
+        "deprecated": "use ui.drop_zone.custom_binds instead"
       },
       "show_logo": {
         "type": "bool",
         "default_value": "false"
+      },
+      "custom_binds": {
+        "type": "string",
+        "default_value": ""
       }
     },
     "metadata": {

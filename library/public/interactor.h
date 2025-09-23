@@ -104,13 +104,16 @@ public:
    *
    * If the command fails, it prints a debug log explaining why.
    *
+   * When keepComments argument is true, comments are supported with `#`, any characters after are
+   * ignored otherwise '#' and any characters after will be handled as standard character
+   *
    * Return true if the command succeeded, false otherwise.
    * Throw an interactor::command_runtime_exception if the command callback
    * throw an unrecognized exception.
    * Note that default commands will never throw this exception, but adding commands
    * without exception catching may trigger this behavior.
    */
-  virtual bool triggerCommand(std::string_view command) = 0;
+  virtual bool triggerCommand(std::string_view command, bool keepComments = true) = 0;
   ///@}
 
   ///@{ @name Bindings

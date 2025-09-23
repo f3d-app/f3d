@@ -34,6 +34,9 @@ inputs:
   vtk_version:
     description: "VTK version"
     required: true
+  webp_version:
+    description: "webP version"
+    required: true
   zlib_version:
     description: "Version of zlib to build"
     required: true
@@ -66,6 +69,7 @@ runs:
         occt_version: ${{inputs.occt_version}}
         openexr_version: ${{inputs.openexr_version}}
         tbb_version: ${{inputs.tbb_version}}
+        webp_version: ${{inputs.webp_version}}
         zlib_version: ${{inputs.zlib_version}}
 
     - name: Install VTK dependency
@@ -97,6 +101,7 @@ runs:
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_MODULE_EXR=ON
         -DF3D_MODULE_UI=ON
+        -DF3D_MODULE_WEBP=ON
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
         -DF3D_PLUGIN_BUILD_ASSIMP=ON
         -DF3D_PLUGIN_BUILD_DRACO=ON

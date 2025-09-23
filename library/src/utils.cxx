@@ -25,7 +25,7 @@ unsigned int utils::textDistance(std::string_view strA, std::string_view strB)
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::string> utils::tokenize(std::string_view str)
+std::vector<std::string> utils::tokenize(std::string_view str, bool keepComments)
 {
   std::vector<std::string> tokens;
   std::string token;
@@ -82,7 +82,7 @@ std::vector<std::string> utils::tokenize(std::string_view str)
         escaped = false;
         break;
       case '#':
-        if (!escaped && !quoted)
+        if (!escaped && !quoted && keepComments)
         {
           commented = true;
         }

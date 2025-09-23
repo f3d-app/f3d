@@ -62,6 +62,13 @@ public:
   void SetDropText(const std::string& info);
 
   /**
+   * Set the dropzone binds
+   * Each pair contains a description and its associated interaction bind
+   * Empty by default
+   */
+  void SetDropBinds(const std::vector<std::pair<std::string, std::string>>& dropZoneBinds);
+
+  /**
    * Set the filename visibility
    * False by default
    */
@@ -145,6 +152,11 @@ public:
   int RenderOverlay(vtkViewport* vp) override;
 
   /**
+   * Set the backdrop opacity
+   */
+  void SetBackdropOpacity(const double backdropOpacity);
+
+  /**
    * Set the delta time (time between UI frames) in seconds
    */
   virtual void SetDeltaTime(double)
@@ -220,6 +232,7 @@ protected:
   bool DropZoneLogoVisible = false;
   bool DropZoneVisible = false;
   std::string DropText = "";
+  std::vector<std::pair<std::string, std::string>> DropBinds;
 
   bool FileNameVisible = false;
   std::string FileName = "";
@@ -244,6 +257,8 @@ protected:
 
   std::string FontFile = "";
   double FontScale = 1.0;
+
+  double BackdropOpacity = 0.9;
 
 private:
   vtkF3DUIActor(const vtkF3DUIActor&) = delete;

@@ -77,10 +77,20 @@ function(f3d_create_exec target_name)
     target_compile_definitions(${target_name} PRIVATE F3D_MODULE_EXR)
   endif ()
 
+  # webp
+  if (F3D_MODULE_WEBP)
+    target_compile_definitions(${target_name} PRIVATE F3D_MODULE_WEBP)
+  endif ()
+
   # dmon
   if (F3D_MODULE_DMON)
     target_compile_definitions(${target_name} PRIVATE F3D_MODULE_DMON)
   endif ()
+
+  #ui
+  if (F3D_MODULE_UI)
+    target_compile_definitions(${target_name} PRIVATE F3D_MODULE_UI)
+  endif()
 
   # tinyfiledialogs
   if (F3D_MODULE_TINYFILEDIALOGS)

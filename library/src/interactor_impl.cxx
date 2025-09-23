@@ -582,7 +582,7 @@ public:
       {
         // XXX: Ignore the boolean return of triggerCommand,
         // error is already logged by triggerCommand
-        this->Interactor.triggerCommand(this->CommandBuffer.value());
+        this->Interactor.triggerCommand(this->CommandBuffer.value(), false);
       }
       catch (const f3d::interactor::command_runtime_exception& ex)
       {
@@ -1180,7 +1180,7 @@ std::vector<std::string> interactor_impl::getCommandActions() const
 }
 
 //----------------------------------------------------------------------------
-bool interactor_impl::triggerCommand(std::string_view command)
+bool interactor_impl::triggerCommand(std::string_view command, bool keepComments)
 {
   log::debug("Command: ", command);
 
@@ -1194,7 +1194,7 @@ bool interactor_impl::triggerCommand(std::string_view command)
   std::vector<std::string> tokens;
   try
   {
-    tokens = utils::tokenize(command);
+    tokens = utils::tokenize(command, keepComments);
   }
   catch (const utils::tokenize_exception&)
   {

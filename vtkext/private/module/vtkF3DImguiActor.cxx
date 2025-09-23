@@ -28,15 +28,21 @@
 #endif
 
 #include <imgui.h>
+#include <numeric>
 #include <optional>
 #include <sstream>
 #include <string>
 
+namespace
+{
 constexpr float LOGO_DISPLAY_WIDTH = 256.f;
 constexpr float LOGO_DISPLAY_HEIGHT = 256.f;
 constexpr float DROPZONE_LOGO_TEXT_PADDING = 20.f;
+constexpr float DROPZONE_MARGIN = 0.5f;
+constexpr float DROPZONE_PADDING_X = 5.0f;
+constexpr float DROPZONE_PADDING_Y = 2.0f;
 
-static std::vector<std::string> splitBindings(const std::string& s, char delim)
+static std::vector<std::string> SplitBindings(const std::string& s, char delim)
 {
   std::vector<std::string> result;
   std::stringstream ss(s);
@@ -48,6 +54,7 @@ static std::vector<std::string> splitBindings(const std::string& s, char delim)
   }
 
   return result;
+}
 }
 
 struct vtkF3DImguiActor::Internals
@@ -401,23 +408,21 @@ void vtkF3DImguiActor::RenderDropZone()
 
     ImGui::Begin("DropZoneText", nullptr, flags);
     /* Use background draw list to prevent "ignoring" NoBringToFrontOnFocus */
-    ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
+    ImDrawList* drawList = ImGui::GetBackgroundDrawList();
 
-    // logo height
-    float logoDisplayHeight = LOGO_DISPLAY_HEIGHT;
+    // Logo rendering
     if (this->DropZoneLogoVisible && this->Pimpl->LogoTexture)
     {
-      // Logo width
-      float logoDisplayWidth = LOGO_DISPLAY_WIDTH;
-
-      // Calculate logo position (centered)
+      float logoDisplayWidth = ::LOGO_DISPLAY_WIDTH;
+      float logoDisplayHeight = ::LOGO_DISPLAY_HEIGHT;
       ImVec2 center = viewport->GetWorkCenter();
-      ImVec2 logoPos(center.x - logoDisplayWidth * 0.5f, center.y - logoDisplayHeight * 0.5f);
+      ImVec2 logoPos(center.x - logoDisplayWidth * ::DROPZONE_MARGIN,
+        center.y - logoDisplayHeight * ::DROPZONE_MARGIN);
 
       // VTK texture pointer to ImTextureID cast (void*)
       ImTextureID texID = reinterpret_cast<ImTextureID>(this->Pimpl->LogoTexture.Get());
 
-      draw_list->AddImage(texID, logoPos,
+      drawList->AddImage(texID, logoPos,
         ImVec2(logoPos.x + logoDisplayWidth, logoPos.y + logoDisplayHeight), ImVec2(0, 1),
         ImVec2(1, 0));
     }
@@ -425,13 +430,13 @@ void vtkF3DImguiActor::RenderDropZone()
     const ImVec2 p0(dropzonePad, dropzonePad);
     const ImVec2 p1(dropzonePad + dropZoneW, dropzonePad + dropZoneH);
 
-    // Draw top and bottom line
+    // Border lines
     for (float x = p0.x - 1; x < p1.x; x += tickLength + tickSpaceW)
     {
       const float y0 = p0.y + halfTickThickness;
       const float x1 = std::min(p1.x, x + tickLength);
-      draw_list->AddLine(ImVec2(x, y0), ImVec2(x1, y0), color, tickThickness);
-      draw_list->AddLine(ImVec2(x, p1.y), ImVec2(x1, p1.y), color, tickThickness);
+      drawList->AddLine(ImVec2(x, y0), ImVec2(x1, y0), color, tickThickness);
+      drawList->AddLine(ImVec2(x, p1.y), ImVec2(x1, p1.y), color, tickThickness);
     }
 
     // Draw left and right line
@@ -439,30 +444,115 @@ void vtkF3DImguiActor::RenderDropZone()
     {
       const float x1 = p1.x - halfTickThickness;
       const float y1 = std::min(p1.y, y + tickLength);
-      draw_list->AddLine(ImVec2(p0.x, y), ImVec2(p0.x, y1), color, tickThickness);
-      draw_list->AddLine(ImVec2(x1, y), ImVec2(x1, y1), color, tickThickness);
+      drawList->AddLine(ImVec2(p0.x, y), ImVec2(p0.x, y1), color, tickThickness);
+      drawList->AddLine(ImVec2(x1, y), ImVec2(x1, y1), color, tickThickness);
     }
 
     ImGui::End();
 
-    ImVec2 dropTextSize = ImGui::CalcTextSize(this->DropText.c_str());
+    // If DropText is provided, render and skip binds
+    if (!this->DropText.empty())
+    {
+      ImVec2 textSize = ImGui::CalcTextSize(this->DropText.c_str());
+      ImVec2 textPos(viewport->GetWorkCenter().x - textSize.x * ::DROPZONE_MARGIN,
+        viewport->GetWorkCenter().y - ::DROPZONE_MARGIN * textSize.y + ::LOGO_DISPLAY_HEIGHT / 2 +
+          ::DROPZONE_LOGO_TEXT_PADDING);
+      drawList->AddText(textPos, ImColor(F3DImguiStyle::GetTextColor()), this->DropText.c_str());
+      return;
+    }
 
-    ImGui::Begin("DropZoneText", nullptr, flags);
+    float maxDescTextWidth = 0.0f;
+    float maxBindingsTextWidth = 0.0f;
+    const float spacingX = ImGui::GetStyle().ItemSpacing.x;
+    const float plusWidth = ImGui::CalcTextSize("+").x;
 
-    // Position the text below the logo it is rendered
+    // Compute widths
+    for (const auto& pair : this->DropBinds)
+    {
+      const auto& desc = pair.first;
+      const auto& bind = pair.second;
+      float totalBindingsWidth = 0.0f;
+
+      ImVec2 descSize = ImGui::CalcTextSize(desc.c_str());
+      maxDescTextWidth = std::max(maxDescTextWidth, descSize.x);
+
+      auto keys = ::SplitBindings(bind, '+');
+
+      totalBindingsWidth += std::accumulate(keys.begin(), keys.end(),
+        0.0f, // use float init since CalcTextSize returns float
+        [](float sum, const std::string& key)
+        {
+          return sum + ImGui::CalcTextSize(key.c_str()).x +
+            ::DROPZONE_MARGIN * ::DROPZONE_LOGO_TEXT_PADDING;
+        });
+
+      if (keys.size() > 1)
+      {
+        totalBindingsWidth += (keys.size() - 1) * (spacingX + plusWidth + spacingX);
+      }
+
+      maxBindingsTextWidth = std::max(maxBindingsTextWidth, totalBindingsWidth);
+    }
+
+    const ImColor descTextColor = F3DImguiStyle::GetTextColor();
+    const ImColor bindingRectColor = F3DImguiStyle::GetMidColor();
+    const ImColor bindingTextColor = F3DImguiStyle::GetTextColor();
+
+    float tableWidth = maxDescTextWidth + maxBindingsTextWidth + ::DROPZONE_LOGO_TEXT_PADDING +
+      ImGui::GetStyle().ItemSpacing.x;
+
+    // Position table below logo if needed
+    ImVec2 startPos;
     if (this->DropZoneLogoVisible && this->Pimpl->LogoTexture)
     {
-      ImGui::SetCursorPos(ImVec2(viewport->GetWorkCenter().x - 0.5f * dropTextSize.x,
-        viewport->GetWorkCenter().y - 0.5f * dropTextSize.y + logoDisplayHeight / 2 +
-          DROPZONE_LOGO_TEXT_PADDING));
+      startPos = ImVec2(viewport->GetWorkCenter().x - tableWidth * ::DROPZONE_MARGIN,
+        viewport->GetWorkCenter().y + ::LOGO_DISPLAY_HEIGHT / 2 + ::DROPZONE_MARGIN);
     }
     else
     {
-      ImGui::SetCursorPos(ImVec2(viewport->GetWorkCenter().x - 0.5f * dropTextSize.x,
-        viewport->GetWorkCenter().y - 0.5f * dropTextSize.y));
+      startPos = ImVec2(
+        viewport->GetWorkCenter().x - tableWidth * ::DROPZONE_MARGIN, viewport->GetWorkCenter().y);
     }
-    ImGui::TextUnformatted(this->DropText.c_str());
-    ImGui::End();
+
+    ImVec2 cursor = startPos;
+
+    for (const auto& pair : this->DropBinds)
+    {
+      const auto& desc = pair.first;
+      const auto& bind = pair.second;
+
+      drawList->AddText(cursor, descTextColor, desc.c_str());
+      float rowHeight =
+        ImGui::GetTextLineHeightWithSpacing() + ::DROPZONE_MARGIN * ::DROPZONE_LOGO_TEXT_PADDING;
+
+      float xBindings = cursor.x + maxDescTextWidth + ::DROPZONE_LOGO_TEXT_PADDING;
+      ImVec2 bindingPos(xBindings, cursor.y);
+
+      auto keys = ::SplitBindings(bind, '+');
+      for (size_t k = 0; k < keys.size(); ++k)
+      {
+        const std::string& key = keys[k];
+        ImVec2 textSize = ImGui::CalcTextSize(key.c_str());
+        ImVec2 padding(::DROPZONE_PADDING_X, ::DROPZONE_PADDING_Y);
+
+        ImVec2 rectMin = ImVec2(bindingPos.x, bindingPos.y);
+        ImVec2 rectMax =
+          ImVec2(rectMin.x + textSize.x + padding.x * 2, rectMin.y + textSize.y + padding.y * 2);
+
+        drawList->AddRectFilled(rectMin, rectMax, bindingRectColor, 4.0f);
+        drawList->AddText(
+          ImVec2(rectMin.x + padding.x, rectMin.y + padding.y), bindingTextColor, key.c_str());
+
+        bindingPos.x = rectMax.x + ImGui::GetStyle().ItemSpacing.x;
+
+        if (k < keys.size() - 1)
+        {
+          drawList->AddText(bindingPos, descTextColor, "+");
+          bindingPos.x += plusWidth + ImGui::GetStyle().ItemSpacing.x;
+        }
+      }
+      cursor.y += rowHeight;
+    }
   }
 }
 
@@ -473,13 +563,13 @@ void vtkF3DImguiActor::RenderFileName()
   {
     const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-    constexpr float marginTop = 5.f;
+    constexpr float margin = F3DImguiStyle::GetDefaultMargin();
     ImVec2 winSize = ImGui::CalcTextSize(this->FileName.c_str());
     winSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
     winSize.y += 2.f * ImGui::GetStyle().WindowPadding.y;
 
-    ::SetupNextWindow(ImVec2(viewport->GetWorkCenter().x - 0.5f * winSize.x, marginTop), winSize);
-    ImGui::SetNextWindowBgAlpha(0.9f);
+    ::SetupNextWindow(ImVec2(viewport->GetWorkCenter().x - 0.5f * winSize.x, margin), winSize);
+    ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
 
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
       ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
@@ -495,16 +585,16 @@ void vtkF3DImguiActor::RenderMetaData()
 {
   const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-  constexpr float marginRight = 5.f;
+  constexpr float margin = F3DImguiStyle::GetDefaultMargin();
 
   ImVec2 winSize = ImGui::CalcTextSize(this->MetaData.c_str());
   winSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
   winSize.y += 2.f * ImGui::GetStyle().WindowPadding.y;
 
-  ::SetupNextWindow(ImVec2(viewport->WorkSize.x - winSize.x - marginRight,
+  ::SetupNextWindow(ImVec2(viewport->WorkSize.x - winSize.x - margin,
                       viewport->GetWorkCenter().y - 0.5f * winSize.y),
     winSize);
-  ImGui::SetNextWindowBgAlpha(0.9f);
+  ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
     ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
@@ -519,7 +609,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
 {
   const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-  constexpr float margin = 5.f;
+  constexpr float margin = F3DImguiStyle::GetDefaultMargin();
   constexpr float padding = 16.f;
 
   float textHeight = 0.f;
@@ -561,7 +651,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
 
   ::SetupNextWindow(ImVec2(margin, winTop),
     ImVec2(winWidth, std::min(viewport->WorkSize.y - (2 * margin), textHeight)));
-  ImGui::SetNextWindowBgAlpha(0.9f);
+  ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
     ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings |
@@ -614,7 +704,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
       ImGui::TableNextColumn();
 
       ImVec2 topBindingCorner, bottomBindingCorner;
-      std::vector<std::string> splittedBinding = splitBindings(bind, '+');
+      std::vector<std::string> splittedBinding = ::SplitBindings(bind, '+');
       const float maxCursorPosX = ImGui::GetCursorPosX() + ImGui::GetColumnWidth();
       float posX = maxCursorPosX - ImGui::CalcTextSize(bind.c_str()).x - ImGui::GetScrollX() -
         ((splittedBinding.size() * 2) - 1) * ImGui::GetStyle().ItemSpacing.x;
@@ -654,8 +744,7 @@ void vtkF3DImguiActor::RenderFpsCounter()
 {
   const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-  constexpr float marginRight = 3.f;
-  constexpr float marginBottom = 3.f;
+  constexpr float margin = F3DImguiStyle::GetDefaultMargin();
 
   std::string fpsString = std::to_string(this->FpsValue);
   fpsString += " fps";
@@ -664,11 +753,11 @@ void vtkF3DImguiActor::RenderFpsCounter()
   winSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
   winSize.y += 2.f * ImGui::GetStyle().WindowPadding.y;
 
-  ImVec2 position(viewport->WorkSize.x - winSize.x - marginRight,
-    viewport->WorkSize.y - winSize.y - marginBottom);
+  ImVec2 position(
+    viewport->WorkSize.x - winSize.x - margin, viewport->WorkSize.y - winSize.y - margin);
 
   ::SetupNextWindow(position, winSize);
-  ImGui::SetNextWindowBgAlpha(0.9f);
+  ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
 
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
     ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;

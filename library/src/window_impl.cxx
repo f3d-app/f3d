@@ -386,13 +386,6 @@ void window_impl::UpdateDynamicOptions()
 
   const options& opt = this->Internals->Options;
 
-  if (this->Internals->Interactor)
-  {
-    renderer->ShowAxis(opt.ui.axis);
-    renderer->SetUseTrackball(opt.interactor.trackball);
-    renderer->SetInvertZoom(opt.interactor.invert_zoom);
-  }
-
   // XXX: model.point_sprites.type only has an effect on geometry scene
   // but we set it here for practical reasons
   const int pointSpritesSize = opt.model.point_sprites.size;
@@ -412,25 +405,57 @@ void window_impl::UpdateDynamicOptions()
   renderer->ShowConsole(opt.ui.console);
   renderer->ShowMinimalConsole(opt.ui.minimal_console);
   renderer->ShowDropZone(opt.ui.drop_zone.enable);
-  renderer->SetDropZoneInfo(opt.ui.drop_zone.info);
   renderer->ShowDropZoneLogo(opt.ui.drop_zone.show_logo);
+
+  if (this->Internals->Interactor)
+  {
+    renderer->ShowAxis(opt.ui.axis);
+    renderer->SetUseTrackball(opt.interactor.trackball);
+    renderer->SetInvertZoom(opt.interactor.invert_zoom);
+
+    std::string bindsStr = opt.ui.drop_zone.custom_binds;
+    std::vector<std::pair<std::string, std::string>> dropZoneBinds;
+
+    for (const std::string& token : utils::tokenize(bindsStr))
+    {
+      if (!token.empty())
+      {
+        try
+        {
+          auto bind = interaction_bind_t::parse(token);
+          auto docPair = this->Internals->Interactor->getBindingDocumentation(bind);
+          dropZoneBinds.push_back({ docPair.first, bind.format() });
+        }
+        catch (const interactor_impl::does_not_exists_exception&)
+        {
+          // skip non-existent binds
+          log::warn("Bind ", token, " does not exist and will be ignored.");
+        }
+      }
+    }
+    renderer->SetDropZoneBinds(dropZoneBinds);
+  }
+
   // F3D_DEPRECATED
   // Remove this in the next major release
   F3D_SILENT_WARNING_PUSH()
   F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
+
   if (!opt.ui.dropzone_info.empty())
   {
-    log::warn("'ui.dropzone_info' is deprecated. Please Use 'ui.drop_zone.info' instead.");
+    log::warn("'ui.dropzone_info' is deprecated. Please Use 'ui.drop_zone.custom_binds' instead.");
     renderer->SetDropZoneInfo(opt.ui.dropzone_info);
   }
+  else if (!opt.ui.drop_zone.info.empty())
+  {
+    log::warn("'ui.drop_zone.info' is deprecated. Please Use 'ui.drop_zone.custom_binds' instead.");
+    renderer->SetDropZoneInfo(opt.ui.drop_zone.info);
+  }
+
   if (opt.ui.dropzone)
   {
     log::warn("'ui.dropzone' is deprecated. Please Use 'ui.drop_zone.enable' instead.");
     renderer->ShowDropZone(opt.ui.dropzone);
-    if (!opt.ui.dropzone_info.empty())
-    {
-      renderer->SetDropZoneInfo(opt.ui.dropzone_info);
-    }
     renderer->ShowDropZoneLogo(opt.ui.dropzone);
   }
   F3D_SILENT_WARNING_POP()
@@ -490,6 +515,7 @@ void window_impl::UpdateDynamicOptions()
 
   renderer->SetFontFile(opt.ui.font_file);
   renderer->SetFontScale(opt.ui.scale);
+  renderer->SetBackdropOpacity(opt.ui.backdrop.opacity);
 
   renderer->SetGridUnitSquare(opt.render.grid.unit);
   renderer->SetGridSubdivisions(opt.render.grid.subdivisions);

@@ -227,6 +227,7 @@ PYBIND11_MODULE(pyf3d, module)
   utils //
     .def_static("text_distance", &f3d::utils::textDistance)
     .def_static("collapse_path", &f3d::utils::collapsePath)
+    .def_static("tokenize", &f3d::utils::tokenize, py::arg("str"), py::arg("keep_comments") = true)
     .def_static(
       "glob_to_regex", &f3d::utils::globToRegex, py::arg("glob"), py::arg("path_separator") = '/')
     .def_static("get_env", &f3d::utils::getEnv)
@@ -281,7 +282,8 @@ PYBIND11_MODULE(pyf3d, module)
       py::arg("callback"), py::arg("doc") = std::nullopt, py::arg("completionCallback") = nullptr)
     .def("remove_command", &f3d::interactor::removeCommand, "Remove a command")
     .def("get_command_actions", &f3d::interactor::getCommandActions, "Get all command actions")
-    .def("trigger_command", &f3d::interactor::triggerCommand, "Trigger a command")
+    .def("trigger_command", &f3d::interactor::triggerCommand, "Trigger a command",
+      py::arg("command"), py::arg("keep_comments") = true)
     .def("init_bindings", &f3d::interactor::initBindings,
       "Remove all bindings and add default bindings")
     .def("remove_binding", &f3d::interactor::removeBinding, "Remove interaction commands")

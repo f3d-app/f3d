@@ -31,6 +31,13 @@ void vtkF3DUIActor::SetDropText(const std::string& info)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DUIActor::SetDropBinds(
+  const std::vector<std::pair<std::string, std::string>>& dropZoneBinds)
+{
+  this->DropBinds = dropZoneBinds;
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DUIActor::SetFileNameVisibility(bool show)
 {
   this->FileNameVisible = show;
@@ -129,6 +136,16 @@ void vtkF3DUIActor::SetFontScale(const double fontScale)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DUIActor::SetBackdropOpacity(const double backdropOpacity)
+{
+  if (this->BackdropOpacity != backdropOpacity)
+  {
+    this->BackdropOpacity = backdropOpacity;
+    this->Initialized = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
 {
   vtkOpenGLRenderWindow* renWin = vtkOpenGLRenderWindow::SafeDownCast(vp->GetVTKWindow());
@@ -146,9 +163,35 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
     this->RenderDropZone();
   }
 
-  if (this->FileNameVisible)
+  if (this->ConsoleVisible)
   {
-    this->RenderFileName();
+    // To improve user readability when console is visible, all other overlays won't be shown
+    this->RenderConsole(false);
+    this->EndFrame(renWin);
+    return 1;
+  }
+
+  if (this->MinimalConsoleVisible)
+  {
+    // To improve user readability when minimal console is visible cheatsheet and filename
+    // are not shown
+    this->RenderConsole(true);
+  }
+  else
+  {
+    if (this->FileNameVisible)
+    {
+      this->RenderFileName();
+    }
+    if (this->CheatSheetVisible)
+    {
+      this->RenderCheatSheet();
+    }
+  }
+
+  if (this->ConsoleBadgeEnabled)
+  {
+    this->RenderConsoleBadge();
   }
 
   if (this->MetaDataVisible)
@@ -156,29 +199,9 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
     this->RenderMetaData();
   }
 
-  if (this->CheatSheetVisible)
-  {
-    this->RenderCheatSheet();
-  }
-
   if (this->FpsCounterVisible)
   {
     this->RenderFpsCounter();
-  }
-
-  // Only one console can be visible at a time, console has priority over minimal console
-  if (this->ConsoleVisible)
-  {
-    this->RenderConsole(false);
-  }
-  else if (this->MinimalConsoleVisible)
-  {
-    this->RenderConsole(true);
-  }
-
-  if (this->ConsoleBadgeEnabled)
-  {
-    this->RenderConsoleBadge();
   }
 
   this->EndFrame(renWin);

@@ -101,24 +101,25 @@ See the [APIs](#APIs) details below for more info.
 
 ## UI Options
 
-|         Option         | Type<br/>Default<br/>Trigger | Description                                                                                                       |       F3D option       |
-| :--------------------: | :--------------------------: | :---------------------------------------------------------------------------------------------------------------- | :--------------------: |
-|        ui.axis         |  bool<br/>false<br/>render   | Show _axes_ as a trihedron in the scene. Requires an interactor.                                                  |        \-\-axis        |
-|     ui.scalar_bar      |  bool<br/>false<br/>render   | Show _scalar bar_ of the coloring by data array.                                                                  |        \-\-bar         |
-|     ui.cheatsheet      |  bool<br/>false<br/>render   | Show a interaction cheatsheet                                                                                     |           -            |
-|       ui.console       |  bool<br/>false<br/>render   | Show the console                                                                                                  |           -            |
-|   ui.minimal_console   |  bool<br/>false<br/>render   | Show the minimal console. Useful to execute a quick command and exit.                                             |           -            |
-|      ui.filename       |  bool<br/>false<br/>render   | Display the _filename info content_ on top of the window.                                                         |      \-\-filename      |
-|    ui.filename_info    |   string<br/>-<br/>render    | Content of _filename info_ to display.                                                                            |           -            |
-|      ui.font_file      | path<br/>optional<br/>render | Use the provided FreeType compatible font file to display text.<br/>Can be useful to display non-ASCII filenames. |     \-\-font-file      |
-|        ui.scale        |   ratio<br/>1.0<br/>render   | Scale fonts.                                                                                                      |     \-\-font-scale     |
-|         ui.fps         |  bool<br/>false<br/>render   | Display a _frame per second counter_.                                                                             |        \-\-fps         |
-|   ui.loader_progress   |   bool<br/>false<br/>load    | Show a _progress bar_ when loading the file.                                                                      |      \-\-progress      |
-| ui.animation_progress  |   bool<br/>false<br/>load    | Show a _progress bar_ when playing the animation.                                                                 | \-\-animation-progress |
-|      ui.metadata       |  bool<br/>false<br/>render   | Display the _metadata_.                                                                                           |      \-\-metadata      |
-|  ui.drop_zone.enable   |  bool<br/>false<br/>render   | Show a drop zone. Rendering is disabled when the viewport is smaller than 10×10 pixels.                           |           -            |
-|   ui.drop_zone.info    |   string<br/>-<br/>render    | Content of the drop zone text to display.                                                                         |           -            |
-| ui.drop_zone.show_logo |  bool<br/>false<br/>render   | Display the logo. Needs ui.drop_zone.enable to be true.                                                           |           -            |
+|          Option           | Type<br/>Default<br/>Trigger | Description                                                                                                              |       F3D option       |
+| :-----------------------: | :--------------------------: | :----------------------------------------------------------------------------------------------------------------------- | :--------------------: |
+|          ui.axis          |  bool<br/>false<br/>render   | Show _axes_ as a trihedron in the scene. Requires an interactor.                                                         |        \-\-axis        |
+|       ui.scalar_bar       |  bool<br/>false<br/>render   | Show _scalar bar_ of the coloring by data array.                                                                         |        \-\-bar         |
+|       ui.cheatsheet       |  bool<br/>false<br/>render   | Show a interaction cheatsheet                                                                                            |           -            |
+|        ui.console         |  bool<br/>false<br/>render   | Show the console                                                                                                         |           -            |
+|    ui.minimal_console     |  bool<br/>false<br/>render   | Show the minimal console. Useful to execute a quick command and exit.                                                    |           -            |
+|        ui.filename        |  bool<br/>false<br/>render   | Display the _filename info content_ on top of the window.                                                                |      \-\-filename      |
+|     ui.filename_info      |   string<br/>-<br/>render    | Content of _filename info_ to display.                                                                                   |           -            |
+|       ui.font_file        | path<br/>optional<br/>render | Use the provided FreeType compatible font file to display text.<br/>Can be useful to display non-ASCII filenames.        |     \-\-font-file      |
+|         ui.scale          |   ratio<br/>1.0<br/>render   | Scale fonts.                                                                                                             |     \-\-font-scale     |
+|          ui.fps           |  bool<br/>false<br/>render   | Display a _frame per second counter_.                                                                                    |        \-\-fps         |
+|    ui.loader_progress     |   bool<br/>false<br/>load    | Show a _progress bar_ when loading the file.                                                                             |      \-\-progress      |
+|   ui.animation_progress   |   bool<br/>false<br/>load    | Show a _progress bar_ when playing the animation.                                                                        | \-\-animation-progress |
+|        ui.metadata        |  bool<br/>false<br/>render   | Display the _metadata_.                                                                                                  |      \-\-metadata      |
+|    ui.drop_zone.enable    |  bool<br/>false<br/>render   | Show a drop zone. Rendering is disabled when the viewport is smaller than 10×10 pixels.                                  |           -            |
+| ui.drop_zone.custom_binds |   string<br/>-<br/>render    | Space separated custom key bindings to display in the drop zone.                                                         |           -            |
+|  ui.drop_zone.show_logo   |  bool<br/>false<br/>render   | Display the logo. Needs ui.drop_zone.enable to be true.                                                                  |           -            |
+|    ui.backdrop.opacity    |  double<br/>0.9<br/>render   | Set the opacity of the backdrop behind the UI elements. Value is between 0.0 (fully transparent) and 1.0 (fully opaque). |  \-\-backdrop-opacity  |
 
 # APIs
 

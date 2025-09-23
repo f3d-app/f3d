@@ -1393,6 +1393,13 @@ void vtkF3DRenderer::SetFontScale(const double fontScale)
     this->TextActorsConfigured = false;
   }
 }
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetBackdropOpacity(const double backdropOpacity)
+{
+  this->UIActor->SetBackdropOpacity(backdropOpacity);
+}
+
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetBackground(const double* color)
 {
@@ -1421,6 +1428,13 @@ void vtkF3DRenderer::SetFilenameInfo(const std::string& info)
 void vtkF3DRenderer::SetDropZoneInfo(const std::string& info)
 {
   this->UIActor->SetDropText(info);
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetDropZoneBinds(
+  const std::vector<std::pair<std::string, std::string>>& dropZoneBinds)
+{
+  this->UIActor->SetDropBinds(dropZoneBinds);
 }
 
 //----------------------------------------------------------------------------
