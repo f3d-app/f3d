@@ -100,7 +100,7 @@ public:
 
   /**
    * Calculates angle between the projection of the forward vector (on
-   *  the plane perpendicular to the up vector) and the right vector (-180 to 180 degrees)
+   * the plane perpendicular to the up vector) and the right vector (-180 to 180 degrees)
    */
   [[nodiscard]] virtual angle_deg_t getYaw() = 0;
 
