@@ -90,8 +90,6 @@
 #include <chrono>
 #include <sstream>
 
-constexpr std::array<double, 4> VIEWPORT_NORMALIZED_COORDS = { 0.85, 0.0, 1.0, 0.15 };
-
 namespace
 {
 std::string DeprecatedCollapsePath(const fs::path& path)
@@ -236,8 +234,6 @@ vtkF3DRenderer::vtkF3DRenderer()
   this->SkyboxActor->GammaCorrectOn();
 
   this->SkyboxActor->VisibilityOff();
-
-  this->UIActor->SetViewportNormalizedCoords(VIEWPORT_NORMALIZED_COORDS);
 
   // Make sure an active camera is available on the renderer
   this->GetActiveCamera();
@@ -549,7 +545,18 @@ void vtkF3DRenderer::ShowAxis(bool show)
 #endif
       this->AxisWidget->SetOrientationMarker(axes);
       this->AxisWidget->SetInteractor(this->RenderWindow->GetInteractor());
-      this->AxisWidget->SetViewport(VIEWPORT_NORMALIZED_COORDS.data());
+
+      int* windowSize = this->RenderWindow->GetSize();
+      double winWidth = static_cast<double>(windowSize[0]);
+      double winHeight = static_cast<double>(windowSize[1]);
+      double squareSize = 0.15;
+      double xmax = 1.0;
+      double xmin = xmax - squareSize * (winHeight / winWidth);
+      double ymin = 0.0;
+      double ymax = ymin + squareSize;
+
+      this->AxisWidget->SetViewport(xmin, ymin, xmax, ymax);
+      this->UIActor->SetViewportNormalizedCoords({ xmin, ymin, xmax, ymax });
       this->AxisWidget->On();
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20220907)
       this->AxisWidget->InteractiveOff();

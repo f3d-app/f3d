@@ -609,21 +609,12 @@ void vtkF3DImguiActor::RenderAxisBackdrop()
 {
   const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-  ImVec2 winSize(this->ViewportNormalizedCoords[2], this->ViewportNormalizedCoords[3]);
-  winSize.x -= this->ViewportNormalizedCoords[0];
-  winSize.y -= this->ViewportNormalizedCoords[1];
-  winSize.x *= viewport->WorkSize.x;
-  winSize.y *= viewport->WorkSize.y;
-
-  float diffSizeX = winSize.x / 2;
-  float diffSizeY = winSize.y * 0.15;
-  winSize.x -= diffSizeX;
-  winSize.y -= diffSizeY;
+  ImVec2 winSize(
+    (this->ViewportNormalizedCoords[2] - this->ViewportNormalizedCoords[0]) * viewport->WorkSize.x,
+    (this->ViewportNormalizedCoords[3] - this->ViewportNormalizedCoords[1]) * viewport->WorkSize.y);
 
   ImVec2 winPos(this->ViewportNormalizedCoords[0] * viewport->WorkSize.x,
-    (1.0 - this->ViewportNormalizedCoords[1]) * viewport->WorkSize.y);
-  winPos.x += diffSizeX / 2;
-  winPos.y -= winSize.y + diffSizeY / 2;
+    viewport->WorkSize.y - (this->ViewportNormalizedCoords[1] * viewport->WorkSize.y) - winSize.y);
 
   ::SetupNextWindow(winPos, winSize);
   ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
