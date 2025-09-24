@@ -1237,7 +1237,7 @@ vtkF3DUSDImporter::~vtkF3DUSDImporter() = default;
 //----------------------------------------------------------------------------
 int vtkF3DUSDImporter::ImportBegin()
 {
-  this->Internals->ReadScene(this->FileName);
+  this->Internals->ReadScene(this->GetFileName());
 
   return 1;
 }
@@ -1278,6 +1278,5 @@ bool vtkF3DUSDImporter::UpdateAtTimeValue(double timeValue)
 void vtkF3DUSDImporter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "FileName: " << this->FileName << "\n";
   os << indent << "AnimationEnabled: " << std::boolalpha << this->AnimationEnabled << "\n";
 }
