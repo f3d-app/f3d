@@ -303,7 +303,7 @@ angle_deg_t camera_impl::getYaw()
   vtkMath::Normalize(projectedAlongUp.data());
 
   // Projection of forward vector along the plane perpendicular to up vector
-  vtkMath::Subtract(dir,projectedAlongUp,projected);
+  vtkMath::Subtract(dir, projectedAlongUp, projected);
 
   vector3_t cross;
   vtkMath::Cross(right, projected.data(), cross.data());
