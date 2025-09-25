@@ -528,7 +528,7 @@ void vtkF3DRenderer::ShowAxis(bool show)
 {
   // Dynamic visible axis
   // XXX this could be handled in UpdateActors
-  // but it is not needed as axis actor is not impacted by
+  // but it is not needed as axis actor is not impacted
   // by any other parameters and require special
   // care when destructing this renderer
   if (this->AxisVisible != show)
@@ -545,7 +545,18 @@ void vtkF3DRenderer::ShowAxis(bool show)
 #endif
       this->AxisWidget->SetOrientationMarker(axes);
       this->AxisWidget->SetInteractor(this->RenderWindow->GetInteractor());
-      this->AxisWidget->SetViewport(0.85, 0.0, 1.0, 0.15);
+
+      int* windowSize = this->RenderWindow->GetSize();
+      double winWidth = static_cast<double>(windowSize[0]);
+      double winHeight = static_cast<double>(windowSize[1]);
+      double squareSize = 0.15;
+      double xmax = 1.0;
+      double xmin = xmax - squareSize * (winHeight / winWidth);
+      double ymin = 0.0;
+      double ymax = ymin + squareSize;
+
+      this->AxisWidget->SetViewport(xmin, ymin, xmax, ymax);
+      this->UIActor->SetViewportNormalizedCoords({ xmin, ymin, xmax, ymax });
       this->AxisWidget->On();
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20220907)
       this->AxisWidget->InteractiveOff();
@@ -554,6 +565,7 @@ void vtkF3DRenderer::ShowAxis(bool show)
     }
 
     this->AxisVisible = show;
+    this->UIActor->SetAxisBackdropVisibility(show);
     this->RenderPassesConfigured = false;
     this->CheatSheetConfigured = false;
   }
