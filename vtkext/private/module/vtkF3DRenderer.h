@@ -132,7 +132,7 @@ public:
   ///@}
 
   /**
-   * Set RotationAxis
+   * Set/Get RotationAxis
    */
   void SetRotationAxis(const std::optional<std::array<double, 3>>& axis);  
   vtkGetMacro(UseRotationAxis, bool);

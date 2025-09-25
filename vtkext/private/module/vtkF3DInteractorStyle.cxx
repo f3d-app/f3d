@@ -153,46 +153,45 @@ void vtkF3DInteractorStyle::Rotate()
 
   vtkCamera* camera = ren->GetActiveCamera();
 
-  if (!ren->GetUseTrackball())
+  vtkNew<vtkTransform> Transform;
+  const double* fp = camera->GetFocalPoint();
+  double newPos[3];
+
+  if (ren->GetUseRotationAxis())
   {
-    double up[3];
-    this->InterpolateTemporaryUp(0.1, ren->GetUpVector(), up);
+    // pick whichever mouse component is larger
+    double delta = (std::abs(rxf) > std::abs(ryf)) ? rxf : ryf;
 
-    double envUpCamDirCross[3];
-    vtkMath::Cross(up, camera->GetDirectionOfProjection(), envUpCamDirCross);
-    constexpr double EPSILON = 128 * std::numeric_limits<double>::epsilon();
-    if (vtkMath::Norm(envUpCamDirCross) < EPSILON)
+    Transform->Identity();
+    Transform->Translate(+fp[0], +fp[1], +fp[2]);
+    Transform->RotateWXYZ(delta, ren->GetRotationAxis());
+    Transform->Translate(-fp[0], -fp[1], -fp[2]);
+
+    Transform->TransformPoint(camera->GetPosition(), newPos);
+    camera->SetPosition(newPos);
+
+    double newViewUp[3];
+    Transform->TransformVector(camera->GetViewUp(), newViewUp);
+    camera->SetViewUp(newViewUp);
+  }
+  else
+  {
+    if (!ren->GetUseTrackball())
     {
-      // Keep setting the temporary up to the camera's up vector until the interpolated up vector
-      // and the camera direction vector are not collinear
-      this->SetTemporaryUp(camera->GetViewUp());
+      double up[3];
       this->InterpolateTemporaryUp(0.1, ren->GetUpVector(), up);
-    }
 
-    vtkNew<vtkTransform> Transform;
-    const double* fp = camera->GetFocalPoint();
-    double newPos[3];
-    if (ren->GetUseRotationAxis())
-    {
+      double envUpCamDirCross[3];
+      vtkMath::Cross(up, camera->GetDirectionOfProjection(), envUpCamDirCross);
+      constexpr double EPSILON = 128 * std::numeric_limits<double>::epsilon();
+      if (vtkMath::Norm(envUpCamDirCross) < EPSILON)
+      {
+        // Keep setting the temporary up to the camera's up vector until the interpolated up vector
+        // and the camera direction vector are not collinear
+        this->SetTemporaryUp(camera->GetViewUp());
+        this->InterpolateTemporaryUp(0.1, ren->GetUpVector(), up);
+      }
 
-      // pick whichever mouse component is larger
-      bool use_dx = std::abs(dx) > std::abs(dy);
-      double delta = 20.0 * this->MotionFactor * (use_dx ? dx * 1.0 / size[0] : dy * -1.0 / size[1]);
-
-      Transform->Identity();
-      Transform->Translate(+fp[0], +fp[1], +fp[2]);
-      Transform->RotateWXYZ(delta, ren->GetRotationAxis());
-      Transform->Translate(-fp[0], -fp[1], -fp[2]);
-
-      Transform->TransformPoint(camera->GetPosition(), newPos);
-      camera->SetPosition(newPos);
-
-      double newViewUp[3];
-      Transform->TransformVector(camera->GetViewUp(), newViewUp);
-      camera->SetViewUp(newViewUp);
-    }
-    else
-    {
       // Rotate camera around the focal point about the environment's up vector
       Transform->Identity();
       Transform->Translate(+fp[0], +fp[1], +fp[2]);
@@ -212,15 +211,14 @@ void vtkF3DInteractorStyle::Rotate()
 
       camera->SetViewUp(up);
     }
+    else
+    {
+      camera->Azimuth(rxf);
+      camera->Elevation(ryf);
+    }
+  }
 
-    camera->OrthogonalizeViewUp();
-  }
-  else
-  {
-    camera->Azimuth(rxf);
-    camera->Elevation(ryf);
-    camera->OrthogonalizeViewUp();
-  }
+  camera->OrthogonalizeViewUp();
 
   this->UpdateRendererAfterInteraction();
 
