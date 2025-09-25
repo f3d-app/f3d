@@ -358,14 +358,7 @@
       "default_value": "false"
     },
     "axis_lock": {
-      "axis": {
-        "type": "direction",
-        "default_value": "0,0,0"
-      },
-      "enabled": {
-        "type": "bool",
-        "default_value": "false"
-      }
+      "type": "direction"
     }
   }
 }

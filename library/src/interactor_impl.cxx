@@ -919,15 +919,14 @@ interactor& interactor_impl::initCommands()
     [&](const std::vector<std::string>& args)
     {
       check_args(args, 1, "toggle_axis_lock");
-      const std::string val{ this->Internals->Options.getAsString("interactor.axis_lock.axis") };
-      if (args[0] == val && this->Internals->Options.interactor.axis_lock.enabled)
+      if (this->Internals->Options.interactor.axis_lock &&
+        args[0] == this->Internals->Options.getAsString("interactor.axis_lock"))
       {
-        this->Internals->Options.interactor.axis_lock.enabled = false;
+        this->Internals->Options.interactor.axis_lock = std::nullopt;
       }
       else
       {
-        this->Internals->Options.interactor.axis_lock.axis = options::parse<f3d::direction_t>(args[0]);
-        this->Internals->Options.interactor.axis_lock.enabled = true;
+        this->Internals->Options.interactor.axis_lock = options::parse<f3d::direction_t>(args[0]);
       }
     },
     command_documentation_t{ "toggle_axis_lock direction", "lock rotation to one direction" });
@@ -1381,7 +1380,13 @@ interactor& interactor_impl::initBindings()
   };
 
   auto docAxisTgl = [&](const std::string& doc, const std::string& val)
-  { return std::pair(doc, (this->Internals->Options.interactor.axis_lock.enabled && val == this->Internals->Options.getAsString("interactor.axis_lock.axis") ? "ON" : "OFF")); };
+  {
+    return std::make_pair(doc,
+      (opts.interactor.axis_lock &&
+        val == this->Internals->Options.getAsString("interactor.axis_lock"))
+        ? "ON"
+        : "OFF");
+  };
 
   // clang-format off
   this->addBinding({mod_t::NONE, "W"}, "cycle_animation", "Scene", docAnim, f3d::interactor::BindingType::CYCLIC);

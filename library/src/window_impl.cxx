@@ -391,7 +391,7 @@ void window_impl::UpdateDynamicOptions()
     renderer->ShowAxis(opt.ui.axis);
     renderer->SetUseTrackball(opt.interactor.trackball);
     renderer->SetInvertZoom(opt.interactor.invert_zoom);
-    renderer->SetRotationAxis(opt.interactor.axis_lock.enabled, opt.interactor.axis_lock.axis);
+    renderer->SetRotationAxis(opt.interactor.axis_lock);
   }
 
   // XXX: model.point_sprites.type only has an effect on geometry scene

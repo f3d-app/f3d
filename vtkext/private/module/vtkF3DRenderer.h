@@ -131,9 +131,9 @@ public:
   ///@}
 
   /**
-   * Set/Get RotationAxis
+   * Set RotationAxis
    */
-  void SetRotationAxis(bool use, const std::vector<double>& axis);  
+  void SetRotationAxis(const std::optional<std::array<double, 3>>& axis);  
   vtkGetMacro(UseRotationAxis, bool);
   vtkGetVector3Macro(RotationAxis, double);
 
