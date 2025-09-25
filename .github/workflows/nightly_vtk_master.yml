@@ -68,6 +68,8 @@ jobs:
       tbb_version: ${{ steps.set_default_versions.outputs.tbb_version }}
       usd_min_version: ${{ steps.set_default_versions.outputs.usd_min_version }}
       usd_version: ${{ steps.set_default_versions.outputs.usd_version }}
+      webp_min_version: ${{ steps.set_default_versions.outputs.webp_min_version }}
+      webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
       zlib_min_version: ${{ steps.set_default_versions.outputs.zlib_min_version }}
       zlib_version: ${{ steps.set_default_versions.outputs.zlib_version }}
       timestamp: ${{ steps.set_default_versions.outputs.timestamp }}
@@ -148,6 +150,7 @@ jobs:
           python_version: ${{needs.default_versions.outputs.python_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
+          webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
@@ -201,6 +204,7 @@ jobs:
           python_version: ${{needs.default_versions.outputs.python_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
+          webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
@@ -242,6 +246,7 @@ jobs:
           python_version: ${{needs.default_versions.outputs.python_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
+          webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
@@ -283,6 +288,7 @@ jobs:
           python_version: ${{needs.default_versions.outputs.python_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
+          webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
@@ -336,6 +342,7 @@ jobs:
           python_version: ${{needs.default_versions.outputs.python_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
+          webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
