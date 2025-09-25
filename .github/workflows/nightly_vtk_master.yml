@@ -40,35 +40,21 @@ jobs:
     runs-on: ubuntu-22.04
     name: Set default versions
     outputs:
-      alembic_min_version: ${{ steps.set_default_versions.outputs.alembic_min_version }}
       alembic_version: ${{ steps.set_default_versions.outputs.alembic_version }}
-      assimp_min_version: ${{ steps.set_default_versions.outputs.assimp_min_version }}
       assimp_version: ${{ steps.set_default_versions.outputs.assimp_version }}
-      blosc_min_version: ${{ steps.set_default_versions.outputs.blosc_min_version }}
       blosc_version: ${{ steps.set_default_versions.outputs.blosc_version }}
-      draco_min_version: ${{ steps.set_default_versions.outputs.draco_min_version }}
       draco_version: ${{ steps.set_default_versions.outputs.draco_version }}
-      imath_min_version: ${{ steps.set_default_versions.outputs.imath_min_version }}
       imath_version: ${{ steps.set_default_versions.outputs.imath_version }}
-      java_min_version: ${{ steps.set_default_versions.outputs.java_min_version }}
       java_version: ${{ steps.set_default_versions.outputs.java_version }}
-      occt_min_version: ${{ steps.set_default_versions.outputs.occt_min_version }}
       occt_version: ${{ steps.set_default_versions.outputs.occt_version }}
-      openexr_min_version: ${{ steps.set_default_versions.outputs.openexr_min_version }}
       openexr_version: ${{ steps.set_default_versions.outputs.openexr_version }}
-      openvdb_min_version: ${{ steps.set_default_versions.outputs.openvdb_min_version }}
       openvdb_version: ${{ steps.set_default_versions.outputs.openvdb_version }}
-      ospray_min_version: ${{ steps.set_default_versions.outputs.ospray_min_version }}
       ospray_version: ${{ steps.set_default_versions.outputs.ospray_version }}
-      pybind11_min_version: ${{ steps.set_default_versions.outputs.pybind11_min_version }}
       pybind11_version: ${{ steps.set_default_versions.outputs.pybind11_version }}
-      python_min_version: ${{ steps.set_default_versions.outputs.python_min_version }}
       python_version: ${{ steps.set_default_versions.outputs.python_version }}
-      tbb_min_version: ${{ steps.set_default_versions.outputs.tbb_min_version }}
       tbb_version: ${{ steps.set_default_versions.outputs.tbb_version }}
-      usd_min_version: ${{ steps.set_default_versions.outputs.usd_min_version }}
       usd_version: ${{ steps.set_default_versions.outputs.usd_version }}
-      zlib_min_version: ${{ steps.set_default_versions.outputs.zlib_min_version }}
+      webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
       zlib_version: ${{ steps.set_default_versions.outputs.zlib_version }}
       timestamp: ${{ steps.set_default_versions.outputs.timestamp }}
 
@@ -148,6 +134,7 @@ jobs:
           python_version: ${{needs.default_versions.outputs.python_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
+          webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
@@ -201,6 +188,7 @@ jobs:
           python_version: ${{needs.default_versions.outputs.python_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
+          webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
@@ -242,6 +230,7 @@ jobs:
           python_version: ${{needs.default_versions.outputs.python_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
+          webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
@@ -283,6 +272,7 @@ jobs:
           python_version: ${{needs.default_versions.outputs.python_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
+          webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
@@ -336,6 +326,7 @@ jobs:
           python_version: ${{needs.default_versions.outputs.python_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
+          webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
