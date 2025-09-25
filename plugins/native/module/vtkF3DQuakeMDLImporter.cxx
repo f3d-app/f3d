@@ -476,7 +476,7 @@ vtkF3DQuakeMDLImporter::vtkF3DQuakeMDLImporter()
 //----------------------------------------------------------------------------
 int vtkF3DQuakeMDLImporter::ImportBegin()
 {
-  return this->Internals->ReadScene(this->FileName);
+  return this->Internals->ReadScene(this->GetFileName());
 }
 
 //----------------------------------------------------------------------------
@@ -564,7 +564,8 @@ std::string vtkF3DQuakeMDLImporter::GetAnimationName(vtkIdType animationIndex)
 //----------------------------------------------------------------------------
 void vtkF3DQuakeMDLImporter::EnableAnimation(vtkIdType animationIndex)
 {
-  assert(animationIndex < static_cast<vtkIdType>(this->Internals->AnimationNames.size()));
+  assert(animationIndex < static_cast<vtkIdType>(this->Internals->AnimationNames.size() +
+                            this->Internals->GroupSkinAnimationNames.size()));
   assert(animationIndex >= 0);
   this->Internals->ActiveAnimation = animationIndex;
 }
@@ -578,7 +579,8 @@ void vtkF3DQuakeMDLImporter::DisableAnimation(vtkIdType vtkNotUsed(animationInde
 //----------------------------------------------------------------------------
 bool vtkF3DQuakeMDLImporter::IsAnimationEnabled(vtkIdType animationIndex)
 {
-  assert(animationIndex < static_cast<vtkIdType>(this->Internals->AnimationNames.size()));
+  assert(animationIndex < static_cast<vtkIdType>(this->Internals->AnimationNames.size() +
+                            this->Internals->GroupSkinAnimationNames.size()));
   assert(animationIndex >= 0);
   return this->Internals->ActiveAnimation == animationIndex;
 }

@@ -22,6 +22,7 @@
     "python": "3.13",
     "tbb": "v2021.12.0",
     "usd": "v25.05.01",
+    "webp": "v1.6.0",
     "zlib": "v1.3.1"
   },
   "min_versions": {
@@ -39,8 +40,9 @@
     "python": "3.9",
     "tbb": "v2021.10.0",
     "usd": "v24.08",
+    "webp": "v1.2.4",
     "zlib": "v1.2.13"
   },
-  "vtk_commit_sha": "f79f45bccf13df70c8937ea99f1e492eb5b7cf94",
-  "timestamp": "20250809_0"
+  "vtk_commit_sha": "a55d2791b5a10660ec29f2a2bf330318f0096390",
+  "timestamp": "20250924_0"
 }

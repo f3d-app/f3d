@@ -186,6 +186,11 @@ if (F3D_MODULE_EXR)
   target_compile_definitions(libf3d PRIVATE F3D_MODULE_EXR)
 endif ()
 
+# webp
+if (F3D_MODULE_WEBP)
+  target_compile_definitions(libf3d PRIVATE F3D_MODULE_WEBP)
+endif ()
+
 # ui
 if (F3D_MODULE_UI)
   target_compile_definitions(libf3d PRIVATE F3D_MODULE_UI)

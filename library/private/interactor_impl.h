@@ -43,7 +43,7 @@ public:
       nullptr) override;
   interactor& removeCommand(const std::string& action) override;
   std::vector<std::string> getCommandActions() const override;
-  bool triggerCommand(std::string_view command) override;
+  bool triggerCommand(std::string_view command, bool keepComments = true) override;
 
   interactor& initBindings() override;
   interactor& addBinding(const interaction_bind_t& bind, std::vector<std::string> commands,
