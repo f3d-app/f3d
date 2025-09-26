@@ -134,7 +134,7 @@ jobs:
           python_version: ${{needs.default_versions.outputs.python_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
-          webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
+          webp_version: ${{ needs.default_versions.outputs.webp_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
@@ -188,7 +188,7 @@ jobs:
           python_version: ${{needs.default_versions.outputs.python_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
-          webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
+          webp_version: ${{ needs.default_versions.outputs.webp_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
@@ -230,7 +230,7 @@ jobs:
           python_version: ${{needs.default_versions.outputs.python_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
-          webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
+          webp_version: ${{ needs.default_versions.outputs.webp_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
@@ -272,7 +272,7 @@ jobs:
           python_version: ${{needs.default_versions.outputs.python_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
-          webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
+          webp_version: ${{ needs.default_versions.outputs.webp_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
@@ -326,7 +326,7 @@ jobs:
           python_version: ${{needs.default_versions.outputs.python_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
-          webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
+          webp_version: ${{ needs.default_versions.outputs.webp_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
