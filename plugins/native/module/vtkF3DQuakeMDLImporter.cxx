@@ -485,21 +485,11 @@ vtkF3DQuakeMDLImporter::vtkF3DQuakeMDLImporter()
 int vtkF3DQuakeMDLImporter::ImportBegin()
 {
   // Stream is higher priority than filename.
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20250923)
   vtkResourceStream* stream = this->GetStream();
-#else
-  vtkResourceStream* stream = nullptr;
-#endif
-
   vtkNew<vtkFileResourceStream> fileStream;
   if (!stream)
   {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20250923)
-    const char* filename = this->GetFileName();
-#else
-    const char* filename = this->GetFileName().c_str();
-#endif
-    if (!fileStream->Open(filename))
+    if (!fileStream->Open(this->GetFileName()))
     {
       vtkErrorMacro("Unable to open " << this->GetFileName() << " , aborting.");
       return 0;
