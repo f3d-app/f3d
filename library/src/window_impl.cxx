@@ -412,6 +412,7 @@ void window_impl::UpdateDynamicOptions()
     renderer->ShowAxis(opt.ui.axis);
     renderer->SetUseTrackball(opt.interactor.trackball);
     renderer->SetInvertZoom(opt.interactor.invert_zoom);
+    renderer->SetRotationAxis(opt.interactor.axis_lock);
 
     std::string bindsStr = opt.ui.drop_zone.custom_binds;
     std::vector<std::pair<std::string, std::string>> dropZoneBinds;
