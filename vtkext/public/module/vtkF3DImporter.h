@@ -14,6 +14,11 @@
 #include <vtkImporter.h>
 #include <vtkVersion.h>
 
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 5, 20250923)
+#include <vtkResourceStream.h>
+#include <vtkSmartPointer.h>
+#endif
+
 class vtkInformationIntegerKey;
 
 class VTKEXT_EXPORT vtkF3DImporter : public vtkImporter
@@ -55,6 +60,30 @@ public:
    * by the VTK version in use
    */
   void SetFailureStatus();
+
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 5, 20250923)
+  ///@{
+  /**
+   * Specify file name of the file to read
+   */
+  vtkSetFilePathMacro(FileName);
+  vtkGetFilePathMacro(FileName);
+  ///@}
+
+  ///@{
+  /**
+   * Specify stream to read from
+   */
+  vtkSetSmartPointerMacro(Stream, vtkResourceStream);
+  vtkGetSmartPointerMacro(Stream, vtkResourceStream);
+  ///@}
+#endif
+
+private:
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 5, 20250923)
+  char* FileName = nullptr;
+  vtkSmartPointer<vtkResourceStream> Stream;
+#endif
 };
 
 #endif
