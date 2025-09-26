@@ -131,6 +131,7 @@ public:
   vtkGetMacro(InvertZoom, bool);
   ///@}
 
+  ///@{
   /**
    * Set/Get RotationAxis
    */
