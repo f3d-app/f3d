@@ -386,7 +386,10 @@ jobs:
       fail-fast: false
 
     runs-on: ubuntu-22.04
-    container: ghcr.io/f3d-app/f3d-wasm:${{needs.default_versions.outputs.timestamp}}_${{needs.check_nightly.outputs.vtk_sha}}
+
+    env:
+      CMAKE_BUILD_PARALLEL_LEVEL: 4
+      F3D_DOCKER_TIMESTAMP: ${{needs.default_versions.outputs.timestamp}}
 
     steps:
       - name: Checkout
@@ -394,7 +397,7 @@ jobs:
         with:
           path: "source"
           fetch-depth: 0
-          lfs: false
+          lfs: true
 
       - name: WebAssembly CI
         uses: ./source/.github/actions/wasm-ci
