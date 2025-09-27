@@ -182,6 +182,7 @@ void camera_impl::getState(camera_state_t& state)
   cam->GetViewUp(state.viewUp.data());
   state.viewAngle = cam->GetViewAngle();
 }
+
 //----------------------------------------------------------------------------
 camera& camera_impl::dolly(double val)
 {
@@ -280,6 +281,50 @@ camera& camera_impl::pitch(angle_deg_t angle)
   this->Internals->OrthogonalizeViewUp(cam);
   this->Internals->VTKRenderer->ResetCameraClippingRange();
   return *this;
+}
+
+//----------------------------------------------------------------------------
+angle_deg_t camera_impl::getYaw()
+{
+  point3_t pos, foc;
+  vector3_t dir, projectedAlongUp, projected;
+  double* up = this->Internals->VTKRenderer->GetEnvironmentUp();
+  double* right = this->Internals->VTKRenderer->GetEnvironmentRight();
+  this->getPosition(pos);
+  this->getFocalPoint(foc);
+
+  // Forward vector (focal - position)
+  vtkMath::Subtract(foc, pos, dir);
+  vtkMath::Normalize(dir.data());
+  vtkMath::Normalize(up);
+
+  // Project forward vector onto up vector
+  vtkMath::ProjectVector(dir.data(), up, projectedAlongUp.data());
+  vtkMath::Normalize(projectedAlongUp.data());
+
+  // Projection of forward vector along the plane perpendicular to up vector
+  vtkMath::Subtract(dir, projectedAlongUp, projected);
+
+  vector3_t cross;
+  vtkMath::Cross(right, projected.data(), cross.data());
+  double sign = (vtkMath::Dot(cross.data(), up) >= 0) ? 1.0 : -1.0;
+  double angleRad = vtkMath::AngleBetweenVectors(right, projected.data());
+  return sign * vtkMath::DegreesFromRadians(angleRad);
+}
+
+//----------------------------------------------------------------------------
+angle_deg_t camera_impl::getAzimuth()
+{
+  return camera_impl::getYaw();
+}
+
+//----------------------------------------------------------------------------
+angle_deg_t camera_impl::getElevation()
+{
+  double* up = this->Internals->VTKRenderer->GetEnvironmentUp();
+  vtkCamera* cam = this->GetVTKCamera();
+  return vtkMath::DegreesFromRadians(
+    vtkMath::AngleBetweenVectors(up, cam->GetDirectionOfProjection()) - vtkMath::Pi() / 2);
 }
 
 //----------------------------------------------------------------------------

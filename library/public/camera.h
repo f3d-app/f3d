@@ -70,7 +70,28 @@ public:
   virtual camera& elevation(angle_deg_t angle) = 0;
   /** Rotate the camera about its horizontal axis, centered the camera's position. */
   virtual camera& pitch(angle_deg_t angle) = 0;
+  ///@}
 
+  ///@{ @name Getters
+  /// Yaw, azimuth and elevation getter methods(calculated on call). Angles are in degrees.
+
+  /**
+   * Calculates angle between the projection of the forward vector (on
+   * the plane perpendicular to the up vector) and the right vector (-180 to 180 degrees)
+   */
+  [[nodiscard]] virtual angle_deg_t getYaw() = 0;
+
+  /**
+   * Calculates the horizontal rotation angle of the forward vector
+   * around the up vector, measured from the right vector. (-180 to 180 degrees)
+   * Mathematically the same as getYaw()
+   */
+  [[nodiscard]] virtual angle_deg_t getAzimuth() = 0;
+
+  /**
+   * Calculates the angle between the forward vector and the up vector (-90 to +90 degrees)
+   */
+  [[nodiscard]] virtual angle_deg_t getElevation() = 0;
   ///@}
 
   /**
