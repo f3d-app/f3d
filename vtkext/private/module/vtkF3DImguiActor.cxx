@@ -605,6 +605,29 @@ void vtkF3DImguiActor::RenderMetaData()
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DImguiActor::RenderAxisBackdrop()
+{
+  const ImGuiViewport* viewport = ImGui::GetMainViewport();
+  constexpr float padding = 3;
+
+  ImVec2 winSize(
+    (this->ViewportNormalizedCoords[2] - this->ViewportNormalizedCoords[0]) * viewport->WorkSize.x,
+    (this->ViewportNormalizedCoords[3] - this->ViewportNormalizedCoords[1]) * viewport->WorkSize.y);
+
+  ImVec2 winPos(this->ViewportNormalizedCoords[0] * viewport->WorkSize.x + padding,
+    viewport->WorkSize.y - (this->ViewportNormalizedCoords[1] * viewport->WorkSize.y) - winSize.y);
+
+  ::SetupNextWindow(winPos, winSize);
+  ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
+
+  ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
+    ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
+
+  ImGui::Begin("Backdrop", nullptr, flags);
+  ImGui::End();
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderCheatSheet()
 {
   const ImGuiViewport* viewport = ImGui::GetMainViewport();
