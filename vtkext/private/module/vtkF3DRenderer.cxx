@@ -546,13 +546,18 @@ void vtkF3DRenderer::ShowAxis(bool show)
       this->AxisWidget->SetOrientationMarker(axes);
       this->AxisWidget->SetInteractor(this->RenderWindow->GetInteractor());
 
+      int marginPx = 10;
+      double squareSize = 0.15;
       int* windowSize = this->RenderWindow->GetSize();
       double winWidth = static_cast<double>(windowSize[0]);
       double winHeight = static_cast<double>(windowSize[1]);
-      double squareSize = 0.15;
-      double xmax = 1.0;
+
+      double marginX = static_cast<double>(marginPx) / winWidth;
+      double marginY = static_cast<double>(marginPx) / winHeight;
+
+      double xmax = 1.0 - marginX;
       double xmin = xmax - squareSize * (winHeight / winWidth);
-      double ymin = 0.0;
+      double ymin = 0.0 + marginY;
       double ymax = ymin + squareSize;
 
       this->AxisWidget->SetViewport(xmin, ymin, xmax, ymax);
