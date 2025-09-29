@@ -1,5 +1,4 @@
 import pytest
-import math
 import f3d
 
 
@@ -115,19 +114,13 @@ def test_moves():
 
     camera.azimuth(angle)
     az_value = camera.get_azimuth()
-    assert math.isclose(
-        az_value, angle, abs_tol=1e-3
-    ), f"Expected azimuth ~{angle}, got {az_value}"
+    assert az_value == pytest.approx(angle)
     camera.yaw(angle)
     yaw_value = camera.get_yaw()
-    assert math.isclose(
-        yaw_value, 2 * angle, abs_tol=1e-3
-    ), f"Expected azimuth ~{2*angle}, got {yaw_value}"
+    assert yaw_value == pytest.approx(2 * angle)
     camera.elevation(angle)
     elev_value = camera.get_elevation()
-    assert math.isclose(
-        elev_value, angle, abs_tol=1e-3
-    ), f"Expected azimuth ~{angle}, got {elev_value}"
+    assert elev_value == pytest.approx(angle)
     camera.pitch(angle)
     camera.roll(angle)
     camera.dolly(10)
