@@ -35,10 +35,10 @@ public:
   vtkTypeMacro(vtkF3DUSDImporter, vtkF3DImporter);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  /**
-   * Set the file name.
-   */
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 5, 20250923)
   vtkSetMacro(FileName, std::string);
+  vtkGetMacro(FileName, std::string);
+#endif
 
   /**
    * Get the level of animation support in this importer, which is always
@@ -89,7 +89,9 @@ protected:
 
   bool UpdateAtTimeValue(double timeValue) override;
 
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 5, 20250923)
   std::string FileName;
+#endif
   bool AnimationEnabled = false;
 
 private:

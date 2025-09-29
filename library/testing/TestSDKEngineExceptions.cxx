@@ -40,8 +40,9 @@ int TestSDKEngineExceptions([[maybe_unused]] int argc, [[maybe_unused]] char* ar
       [&]() { eng.setCachePath("/" + std::string(257, 'x')); });
 
     // cover operator=(engine&&)
-    eng = f3d::engine::create(false);
-    test("engine assignment operator", eng.getWindow().isOffscreen() == false);
+    // test with offscreen window because it works with all backends
+    eng = f3d::engine::create(true);
+    test("engine assignment operator", eng.getWindow().isOffscreen() == true);
   }
 
 #if defined(__linux__) || defined(__FreeBSD__)
