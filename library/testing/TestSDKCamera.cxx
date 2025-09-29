@@ -11,9 +11,9 @@
 
 // TODO these methods should be put in types.h at some point.
 // https://github.com/f3d-app/f3d/issues/361
-bool compareDouble(double a, double b)
+bool compareDouble(double a, double b, double tol = 128 * std::numeric_limits<double>::epsilon())
 {
-  return std::fabs(a - b) < 128 * std::numeric_limits<double>::epsilon();
+  return std::fabs(a - b) < tol;
 }
 
 bool compareVec(const f3d::vector3_t& vec1, const f3d::vector3_t& vec2)
