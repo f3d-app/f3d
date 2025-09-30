@@ -27,6 +27,7 @@ Contributors with a single contribution or that may not want to are not listed h
 | Nig3l                           | Ni-g-3l        | Yes        |
 | Luke                            | lknknm         | Yes        |
 | Larry Skuse                     | skusel         | Yes        |
+| Medyan Naser                    | Medyan-Naser   | Yes        |
 
 ---
 
