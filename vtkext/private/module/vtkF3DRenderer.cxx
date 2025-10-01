@@ -10,6 +10,7 @@
 #include "vtkF3DPolyDataMapper.h"
 #include "vtkF3DRenderPass.h"
 #include "vtkF3DSolidBackgroundPass.h"
+#include "vtkF3DTAAResolvePass.h"
 #include "vtkF3DUserRenderPass.h"
 
 #include <vtkAxesActor.h>
@@ -439,6 +440,13 @@ void vtkF3DRenderer::ConfigureRenderPasses()
 
     this->SetPass(fxaaP);
     renderingPass = fxaaP;
+  }
+
+  if (this->AntiAliasingModeEnabled == vtkF3DRenderer::AntiAliasingMode::TAA)
+  {
+    vtkNew<vtkF3dTAAResolvePass> taaP;
+    taaP->SetDelegatePass(renderingPass);
+    renderingPass = taaP;
   }
 
   if (this->FinalShader.has_value())
