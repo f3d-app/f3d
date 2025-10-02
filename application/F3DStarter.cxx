@@ -1051,13 +1051,27 @@ int F3DStarter::Start(int argc, char** argv)
     this->Internals->ConfigBindingsEntries = parsedConfigFiles.Bindings;
   }
 
-  // Update app and libf3d options based on config entries, with an empty input file
-  // config < cli.
-  // Force it to be quiet has another options update happens later.
-  this->Internals->UpdateOptions(
-    { this->Internals->ConfigOptionsEntries, this->Internals->CLIOptionsEntries,
-      this->Internals->ImperativeConfigOptionsEntries },
-    { "" }, true);
+	// Build initialPaths from the actual CLI input files (or keep "" if none)
+	std::vector<std::filesystem::path> initialPaths;
+	if (inputFiles.empty())
+	{
+	  // no positional files: keep current behavior
+	  initialPaths = { "" };
+	}
+	else
+	{
+	  // use the real CLI files so `match` blocks apply on first load
+	  for (const auto& f : inputFiles)
+	  {
+		initialPaths.emplace_back(f3d::utils::collapsePath(f));
+	  }
+	}
+
+	this->Internals->UpdateOptions(
+	  { this->Internals->ConfigOptionsEntries,
+		this->Internals->CLIOptionsEntries,
+		this->Internals->ImperativeConfigOptionsEntries },
+	  initialPaths, /*quiet=*/true);
 
   const auto& mode = this->Internals->AppOptions.MultiFileMode;
   if (mode != "single" && mode != "all" && mode != "dir")
@@ -1135,7 +1149,7 @@ int F3DStarter::Start(int argc, char** argv)
     this->ResetWindowName();
     this->Internals->ApplyPositionAndResolution();
     this->AddCommands();
-    this->Internals->UpdateBindings({ "" });
+    this->Internals->UpdateBindings(initialPaths); // Changed this from "" to initialPaths to keep it consistent with UpdateOptions changes
   }
 
   this->Internals->Engine->setOptions(this->Internals->LibOptions);
