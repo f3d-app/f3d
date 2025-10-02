@@ -1061,7 +1061,7 @@ int F3DStarter::Start(int argc, char** argv)
 	else
 	{
 	  // use the real CLI files so `match` blocks apply on first load
-	  for (const auto& f : inputFiles)
+	  for (const std::string& file : inputFiles)
 	  {
 		initialPaths.emplace_back(f3d::utils::collapsePath(f));
 	  }
