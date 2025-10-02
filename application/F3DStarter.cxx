@@ -1149,7 +1149,7 @@ int F3DStarter::Start(int argc, char** argv)
     this->ResetWindowName();
     this->Internals->ApplyPositionAndResolution();
     this->AddCommands();
-    this->Internals->UpdateBindings(initialPaths); // Changed this from "" to initialPaths to keep it consistent with UpdateOptions changes
+    this->Internals->UpdateBindings(initialPaths);
   }
 
   this->Internals->Engine->setOptions(this->Internals->LibOptions);
