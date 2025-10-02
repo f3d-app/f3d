@@ -1055,7 +1055,7 @@ int F3DStarter::Start(int argc, char** argv)
 	std::vector<std::filesystem::path> initialPaths;
 	if (inputFiles.empty())
 	{
-	  // no positional files: keep current behavior
+	  // no input files: use an empty string
 	  initialPaths = { "" };
 	}
 	else
