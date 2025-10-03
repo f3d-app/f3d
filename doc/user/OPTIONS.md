@@ -129,7 +129,7 @@ Enable trackball interaction.
 ### `--animation-autoplay` (_bool_, default: `false`)
 Automatically start animation.
 
-### `--animation-indices=<idx1,idx2>` (_vector<int>_, default: `0`)
+### `--animation-indices=<idx1,idx2>` (_vector\<int\>_, default: `0`)
 Select the animations to show.
 Any negative value all animations.
 The default scene always has at most one animation.
@@ -242,10 +242,10 @@ Importer may set a default value depending on file type. If a default value exis
 Set the window _background color_.
 Ignored if _hdri_ is set.
 
-### `--resolution=<width,height>` (_vector<double>_, default: `1000, 600`)
+### `--resolution=<width,height>` (_vector\<double\>_, default: `1000, 600`)
 Set the _window resolution_.
 
-### `--position=<x,y>` (_vector<double>_)
+### `--position=<x,y>` (_vector\<double\>_)
 Set the _window position_ (top left corner) , in pixels, starting from the top left of your screens.
 
 ### `-z, --fps` (_bool_, default: `false`)
@@ -289,7 +289,7 @@ When using _direct values_, components are used as L, LA, RGB, RGBA values depen
 Specify that the scalar array is to be found _on the cells_ instead of on the points.
 Use with the scalar option.
 
-### `--range=<min,max>` (_vector<double>_)
+### `--range=<min,max>` (_vector\<double\>_)
 Set the _coloring range_. Automatically computed by default.
 Use with the scalar option.
 
@@ -319,10 +319,10 @@ Inverse the linear opacity function used for volume rendering.
 
 ## Camera configuration options
 
-### `--camera-position=<X,Y,Z>` (_vector<double>_)
+### `--camera-position=<X,Y,Z>` (_vector\<double\>_)
 Set the camera position, overrides --camera-direction and camera-zoom-factor.
 
-### `--camera-focal-point=<X,Y,Z>` (_vector<double>_)
+### `--camera-focal-point=<X,Y,Z>` (_vector\<double\>_)
 Set the camera focal point.
 
 ### `--camera-view-up=<direction>` (_direction_)
