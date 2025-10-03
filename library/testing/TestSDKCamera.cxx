@@ -171,7 +171,7 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   if (!compareDouble(cam.getYaw(), 90.0, 1e-6) || !compareDouble(cam.getElevation(), 90.0, 1e-6) ||
     !compareDouble(cam.getAzimuth(), 90.0, 1e-6))
   {
-    std::cerr << "After elevation(45): unexpected orientation\n"
+    std::cerr << "After elevation(90): unexpected orientation\n"
               << "Yaw: expected 90, got " << cam.getYaw() << "\n"
               << "Elevation: expected 90, got " << cam.getElevation() << "\n"
               << "Azimuth: expected 90, got " << cam.getAzimuth() << "\n";
@@ -179,13 +179,13 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   }
 
   cam.azimuth(90.0);
-  if (!compareDouble(cam.getYaw(), 180.0, 1e-6) || !compareDouble(cam.getElevation(), 0.0, 1e-6) ||
-    !compareDouble(cam.getAzimuth(), 180.0, 1e-6))
+  if (!compareDouble(cam.getYaw(), 135.0, 1e-6) || !compareDouble(cam.getElevation(), 0.0, 1e-6) ||
+    !compareDouble(cam.getAzimuth(), 135.0, 1e-6))
   {
     std::cerr << "After azimuth(90): unexpected orientation\n"
-              << "Yaw: expected 180, got " << cam.getYaw() << "\n"
+              << "Yaw: expected 135, got " << cam.getYaw() << "\n"
               << "Elevation: expected 0, got " << cam.getElevation() << "\n"
-              << "Azimuth: expected 180, got " << cam.getAzimuth() << "\n";
+              << "Azimuth: expected 135, got " << cam.getAzimuth() << "\n";
     return EXIT_FAILURE;
   }
 
