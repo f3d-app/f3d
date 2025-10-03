@@ -200,7 +200,7 @@ jobs:
         vtk_version:
           [
             "${{needs.default_versions.outputs.vtk_commit_sha}}",
-            v9.5.0,
+            v9.5.2,
             v9.4.2,
             v9.3.1,
             v9.2.6,
@@ -309,7 +309,7 @@ jobs:
         vtk_version:
           [
             "${{needs.default_versions.outputs.vtk_commit_sha}}",
-            v9.5.0,
+            v9.5.2,
             v9.4.2,
             v9.3.1,
             v9.2.6,
@@ -387,7 +387,7 @@ jobs:
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
           blosc_version: ${{needs.default_versions.outputs.blosc_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
-          vtk_version: v9.5.0
+          vtk_version: v9.5.2
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
@@ -405,7 +405,7 @@ jobs:
         vtk_version:
           [
             "${{needs.default_versions.outputs.vtk_commit_sha}}",
-            v9.5.0,
+            v9.5.2,
             v9.4.2,
             v9.3.1,
             v9.2.6,
@@ -607,7 +607,7 @@ jobs:
         vtk_version:
           [
             "${{needs.default_versions.outputs.vtk_commit_sha}}",
-            v9.5.0,
+            v9.5.2,
             v9.4.2,
             v9.3.1,
             v9.2.6,
@@ -659,7 +659,7 @@ jobs:
       matrix:
         vtk_version: [
             "${{needs.default_versions.outputs.vtk_commit_sha}}",
-            v9.5.0,
+            v9.5.2,
             v9.4.2,
             v9.3.1,
           ] # VTK 9.2.6 not compatible with recent clang version on macOS
