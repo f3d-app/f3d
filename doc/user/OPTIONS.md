@@ -15,22 +15,22 @@ Instead of showing a render view and render into it, _render directly into a png
 ### `--no-background` (_bool_, default: `false`)
 Use with --output to output a png file with a transparent background.
 
-### -h, --help
+### `-h, --help`
 Print _help_ and exit. Ignore `--verbose`.
 
-### --version
+### `--version`
 Show _version_ information and exit. Ignore `--verbose`.
 
-### --list-readers
+### `--list-readers`
 List available _readers_ and exit. Ignore `--verbose`.
 
 ### `--force-reader=<reader>` (_string_)
 Force a specific [reader](SUPPORTED_FORMATS.md) to be used, disregarding the file extension.
 
-### --list-bindings
+### `--list-bindings`
 List available _bindings_ and exit. Ignore `--verbose`.
 
-### --list-rendering-backends
+### `--list-rendering-backends`
 List available _rendering backends_ and exit. Ignore `--verbose`.
 
 ### `--config=<config file path/name/stem>` (_string_, default: `config`)
@@ -54,7 +54,7 @@ Frame rate used to refresh animation and other repeated tasks (watch, UI). Does 
 ### `--load-plugins=<paths or names>` (_string_)
 List of plugins to load separated with a comma. Official plugins are `alembic`, `assimp`, `draco`, `hdf`, `occt`, `usd`, `vdb`. See [plugins](PLUGINS.md) for more info.
 
-### --scan-plugins
+### `--scan-plugins`
 Scan standard directories for plugins and display their names, results may be incomplete. See [plugins](PLUGINS.md) for more info.
 
 ### `--screenshot-filename=<png file>` (_string_, default: ``{app}/{model}_{n}.png``)
@@ -402,7 +402,6 @@ Some rendering options are not compatible between them, here is the precedence o
 - Raytracing (`-r`)
 - Volume (`-v`)
 - Point Sprites (`-o`)
-
 
 ## Options syntax
 
