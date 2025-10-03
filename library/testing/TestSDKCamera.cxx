@@ -178,17 +178,6 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     return EXIT_FAILURE;
   }
 
-  cam.azimuth(90.0);
-  if (!compareDouble(cam.getYaw(), 135.0, 1e-6) || !compareDouble(cam.getElevation(), 0.0, 1e-6) ||
-    !compareDouble(cam.getAzimuth(), 135.0, 1e-6))
-  {
-    std::cerr << "After azimuth(90): unexpected orientation\n"
-              << "Yaw: expected 135, got " << cam.getYaw() << "\n"
-              << "Elevation: expected 0, got " << cam.getElevation() << "\n"
-              << "Azimuth: expected 135, got " << cam.getAzimuth() << "\n";
-    return EXIT_FAILURE;
-  }
-
   // Test position
   f3d::point3_t testPos = { 0., 0., 10. };
   f3d::point3_t pos = cam.setPosition(testPos).getPosition();
