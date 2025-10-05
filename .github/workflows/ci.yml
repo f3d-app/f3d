@@ -156,6 +156,10 @@ jobs:
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
+
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -251,6 +255,10 @@ jobs:
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
+
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -321,6 +329,9 @@ jobs:
 
     runs-on: windows-latest
 
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -366,6 +377,7 @@ jobs:
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
       DISPLAY: :0
 
     steps:
@@ -555,6 +567,7 @@ jobs:
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
       DISPLAY: :0
 
     steps:
@@ -615,6 +628,9 @@ jobs:
 
     runs-on: macos-13
 
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -674,6 +690,9 @@ jobs:
             static_label: static
 
     runs-on: macos-14
+
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
 
     steps:
       - name: Checkout
@@ -737,6 +756,7 @@ jobs:
 
     env:
       DISPLAY: :0
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
 
     steps:
       - name: Checkout
@@ -831,6 +851,7 @@ jobs:
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
       DISPLAY: :0
       CC: clang
       CXX: clang++
@@ -876,6 +897,7 @@ jobs:
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
       CC: clang
       CXX: clang++
 
@@ -918,6 +940,9 @@ jobs:
 
     runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
+
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
 
     steps:
       - name: Checkout
