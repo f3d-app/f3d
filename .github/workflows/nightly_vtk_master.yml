@@ -202,6 +202,9 @@ jobs:
 
     runs-on: macos-15-intel
 
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5 
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -243,6 +246,9 @@ jobs:
       fail-fast: false
 
     runs-on: macos-15
+
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5 
 
     steps:
       - name: Checkout
