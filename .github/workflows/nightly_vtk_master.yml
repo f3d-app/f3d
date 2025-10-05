@@ -200,7 +200,10 @@ jobs:
     strategy:
       fail-fast: false
 
-    runs-on: macos-13
+    runs-on: macos-15-intel
+
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5 
 
     steps:
       - name: Checkout
@@ -242,7 +245,10 @@ jobs:
     strategy:
       fail-fast: false
 
-    runs-on: macos-14
+    runs-on: macos-15
+
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5 
 
     steps:
       - name: Checkout
