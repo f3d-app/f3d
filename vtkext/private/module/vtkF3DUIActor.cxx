@@ -146,6 +146,12 @@ void vtkF3DUIActor::SetBackdropOpacity(const double backdropOpacity)
 }
 
 //----------------------------------------------------------------------------
+double vtkF3DUIActor::GetBackdropOpacity() const
+{
+  return this->BackdropOpacity;
+}
+
+//----------------------------------------------------------------------------
 int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
 {
   vtkOpenGLRenderWindow* renWin = vtkOpenGLRenderWindow::SafeDownCast(vp->GetVTKWindow());

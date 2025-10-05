@@ -86,9 +86,6 @@ if(NOT ANDROID AND NOT EMSCRIPTEN AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.2024
   set(classes ${classes} vtkF3DPointSplatMapper)
 endif()
 
-if(NOT VTK_VERSION VERSION_GREATER_EQUAL 9.2.20220907)
-  set(classes ${classes} vtkF3DOrientationMarkerWidget)
-endif()
 
 if(WIN32)
   list(APPEND classes vtkF3DWGLRenderWindow)

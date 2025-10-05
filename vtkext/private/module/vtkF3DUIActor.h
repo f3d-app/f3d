@@ -157,6 +157,11 @@ public:
   void SetBackdropOpacity(const double backdropOpacity);
 
   /**
+   * Get the backdrop opacity
+   */
+  double GetBackdropOpacity() const;
+
+  /**
    * Set the delta time (time between UI frames) in seconds
    */
   virtual void SetDeltaTime(double)

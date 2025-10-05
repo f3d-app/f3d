@@ -12,7 +12,6 @@
 #include "vtkF3DSolidBackgroundPass.h"
 #include "vtkF3DUserRenderPass.h"
 
-#include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
 #include <vtkCamera.h>
 #include <vtkCellData.h>
@@ -70,11 +69,7 @@
 #include <vtkSphericalHarmonics.h>
 #endif
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20220907)
-#include <vtkOrientationMarkerWidget.h>
-#else
-#include "vtkF3DOrientationMarkerWidget.h"
-#endif
+#include <vtkCameraOrientationWidget.h>
 
 #if F3D_MODULE_RAYTRACING
 #include <vtkOSPRayRendererNode.h>
@@ -537,20 +532,14 @@ void vtkF3DRenderer::ShowAxis(bool show)
     if (show)
     {
       assert(this->RenderWindow->GetInteractor());
-      vtkNew<vtkAxesActor> axes;
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20220907)
-      this->AxisWidget = vtkSmartPointer<vtkOrientationMarkerWidget>::New();
-#else
-      this->AxisWidget = vtkSmartPointer<vtkF3DOrientationMarkerWidget>::New();
-#endif
-      this->AxisWidget->SetOrientationMarker(axes);
+      this->AxisWidget = vtkSmartPointer<vtkCameraOrientationWidget>::New();
+      this->AxisWidget->SetParentRenderer(this);
       this->AxisWidget->SetInteractor(this->RenderWindow->GetInteractor());
       this->AxisWidget->SetViewport(0.85, 0.0, 1.0, 0.15);
-      this->AxisWidget->On();
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20220907)
-      this->AxisWidget->InteractiveOff();
-#endif
-      this->AxisWidget->SetKeyPressActivation(false);
+      this->AxisWidget->SetEnabled(true);
+      // Configure backdrop opacity to match F3D's UI backdrop opacity
+      // Use the same opacity as UIActor (default: 0.9)
+      this->AxisWidget->SetOpacity(this->UIActor->GetBackdropOpacity());
     }
 
     this->AxisVisible = show;
@@ -1398,6 +1387,11 @@ void vtkF3DRenderer::SetFontScale(const double fontScale)
 void vtkF3DRenderer::SetBackdropOpacity(const double backdropOpacity)
 {
   this->UIActor->SetBackdropOpacity(backdropOpacity);
+  // Also update axis widget opacity to match
+  if (this->AxisWidget && this->AxisVisible)
+  {
+    this->AxisWidget->SetOpacity(backdropOpacity);
+  }
 }
 
 //----------------------------------------------------------------------------

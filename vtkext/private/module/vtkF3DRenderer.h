@@ -29,7 +29,7 @@ class vtkColorTransferFunction;
 class vtkCornerAnnotation;
 class vtkGridAxesActor3D;
 class vtkImageReader2;
-class vtkOrientationMarkerWidget;
+class vtkCameraOrientationWidget;
 class vtkScalarBarActor;
 class vtkSkybox;
 class vtkTextActor;
@@ -525,7 +525,7 @@ private:
    */
   void ConfigureActorTextureTransform(vtkActor* actorBase, const double* matrix);
 
-  vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
+  vtkSmartPointer<vtkCameraOrientationWidget> AxisWidget;
 
   // Does vtk version support GridAxesActor
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
