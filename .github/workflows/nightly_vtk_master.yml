@@ -107,6 +107,9 @@ jobs:
       fail-fast: false
     runs-on: windows-latest
 
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -157,6 +160,7 @@ jobs:
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
       DISPLAY: :0
 
     steps:
@@ -202,6 +206,9 @@ jobs:
 
     runs-on: macos-13
 
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -243,6 +250,9 @@ jobs:
       fail-fast: false
 
     runs-on: macos-14
+
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
 
     steps:
       - name: Checkout
@@ -294,6 +304,7 @@ jobs:
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
       DISPLAY: :0
       CC: clang
       CXX: clang++
