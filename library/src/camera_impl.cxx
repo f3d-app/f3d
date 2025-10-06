@@ -304,7 +304,12 @@ angle_deg_t camera_impl::getYaw()
 
   // Projection of forward vector along the plane perpendicular to up vector
   vtkMath::Subtract(dir, projectedAlongUp, projected);
-
+  static constexpr double EPSILON = 128 * std::numeric_limits<double>::epsilon();
+  if (vtkMath::Norm(projected.data()) <= EPSILON)
+  {
+    return 0;
+  }
+  
   vector3_t cross;
   vtkMath::Cross(right, projected.data(), cross.data());
   double sign = (vtkMath::Dot(cross.data(), up) >= 0) ? 1.0 : -1.0;
