@@ -309,7 +309,7 @@ angle_deg_t camera_impl::getYaw()
   {
     return 0;
   }
-  
+
   vector3_t cross;
   vtkMath::Cross(right, projected.data(), cross.data());
   double sign = (vtkMath::Dot(cross.data(), up) >= 0) ? 1.0 : -1.0;
