@@ -26,14 +26,6 @@ Definition (``public/exception.h``)
 
 
 
-Includes
---------
-
-
-- ``stdexcept``
-
-- ``string``
-
 
 
 Included By

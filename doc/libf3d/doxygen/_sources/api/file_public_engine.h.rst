@@ -38,15 +38,9 @@ Includes
 
 - ``interactor.h`` (:ref:`file_public_interactor.h`)
 
-- ``map``
-
 - ``options.h``
 
 - ``scene.h`` (:ref:`file_public_scene.h`)
-
-- ``string``
-
-- ``vector``
 
 - ``window.h`` (:ref:`file_public_window.h`)
 

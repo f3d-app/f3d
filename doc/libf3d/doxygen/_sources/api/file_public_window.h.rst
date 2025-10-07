@@ -36,8 +36,6 @@ Includes
 
 - ``image.h`` (:ref:`file_public_image.h`)
 
-- ``string``
-
 
 
 Included By

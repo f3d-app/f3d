@@ -30,21 +30,9 @@ Includes
 --------
 
 
-- ``algorithm``
-
-- ``array``
-
-- ``cstdint``
-
 - ``exception.h`` (:ref:`file_public_exception.h`)
 
 - ``export.h``
-
-- ``iostream``
-
-- ``string``
-
-- ``vector``
 
 
 

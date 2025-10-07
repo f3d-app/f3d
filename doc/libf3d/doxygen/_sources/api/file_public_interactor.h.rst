@@ -34,17 +34,9 @@ Includes
 
 - ``export.h``
 
-- ``functional``
-
 - ``log.h`` (:ref:`file_public_log.h`)
 
 - ``options.h``
-
-- ``string``
-
-- ``utility``
-
-- ``vector``
 
 - ``window.h`` (:ref:`file_public_window.h`)
 
