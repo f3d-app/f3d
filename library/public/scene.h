@@ -5,9 +5,11 @@
 #include "export.h"
 #include "types.h"
 
+/// @cond
 #include <filesystem>
 #include <string>
 #include <vector>
+/// @endcond
 
 namespace f3d
 {

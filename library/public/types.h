@@ -4,12 +4,14 @@
 #include "exception.h"
 #include "export.h"
 
+/// @cond
 #include <algorithm>
 #include <array>
 #include <cstdint>
 #include <iostream>
 #include <string>
 #include <vector>
+/// @endcond
 
 namespace f3d
 {

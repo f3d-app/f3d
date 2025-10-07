@@ -4,8 +4,10 @@
 #include "export.h"
 #include "types.h"
 
+/// @cond
 #include <array>
 #include <string>
+/// @endcond
 
 namespace f3d
 {

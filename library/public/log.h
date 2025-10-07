@@ -3,8 +3,10 @@
 
 #include "export.h"
 
+/// @cond
 #include <sstream>
 #include <string>
+/// @endcond
 
 namespace f3d
 {
