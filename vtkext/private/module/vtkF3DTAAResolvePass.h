@@ -16,7 +16,7 @@ class vtkF3dTAAResolvePass : public vtkImageProcessingPass
 {
 public:
   static vtkF3dTAAResolvePass* New();
-  // vtkTypeMacro(vtkF3dTAAResolvePass, vtkImageProcessingPass);
+  vtkTypeMacro(vtkF3dTAAResolvePass, vtkImageProcessingPass);
 
   /**
    * Perform rendering according to a render state.
@@ -28,12 +28,22 @@ public:
    */
   void ReleaseGraphicsResources(vtkWindow* w) override;
 
+protected:
+  void InspectCameraMovement(vtkRenderer* renderer);
+
 private:
   vtkF3dTAAResolvePass() = default;
   ~vtkF3dTAAResolvePass() override = default;
 
   vtkSmartPointer<vtkOpenGLFramebufferObject> FrameBufferObject;
   vtkSmartPointer<vtkTextureObject> ColorTexture;
+  vtkSmartPointer<vtkTextureObject> HistoryTexture;
 
   std::shared_ptr<vtkOpenGLQuadHelper> QuadHelper;
+
+  bool HistoryInitialized = false;
+
+  double LastPosition[3];
+  double LastFocalPoint[3];
+  double LastViewUp[3];
 };
