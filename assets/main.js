@@ -25,9 +25,9 @@ function enhance_install_page() {
   }
 
   function retrieve_downloads(target_platform_re) {
-    var downloads = [];
+    const downloads = [];
     for (const table of document.querySelectorAll("table")) {
-      const th = document.querySelector("th");
+      const th = table.querySelector("th");
       if (th) {
         if (/Platform/i.test(th.innerText)) {
           for (const table_row of table.querySelectorAll("tr")) {
