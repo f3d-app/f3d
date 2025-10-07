@@ -180,6 +180,10 @@ void vtkF3dTAAResolvePass::ReleaseGraphicsResources(vtkWindow* w)
   {
     this->FrameBufferObject->ReleaseGraphicsResources(w);
   }
+  if (this->ColorTexture)
+  {
+    this->ColorTexture->ReleaseGraphicsResources(w);
+  }
   if (this->HistoryTexture)
   {
     this->HistoryTexture->ReleaseGraphicsResources(w);

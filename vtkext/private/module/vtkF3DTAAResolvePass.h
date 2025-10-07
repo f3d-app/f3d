@@ -1,3 +1,11 @@
+/**
+ * @class   vtkF3dTAAResolvePass
+ * @brief   Temporal Anti-Aliasing resolve pass
+ *
+ * This pass is used to resolve the jittered rendering for Temporal Anti-Aliasing.
+ * Adapted from https://sugulee.wordpress.com/2021/06/21/temporal-anti-aliasingtaa-tutorial/
+ */
+
 #ifndef vtkF3DTAAResolvePass_h
 #define vtkF3DTAAResolvePass_h
 
