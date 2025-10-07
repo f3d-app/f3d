@@ -548,11 +548,6 @@ private:
 
   unsigned int Timer = 0; // Timer OpenGL query
 
-  int taaNx = 0;
-  int taaDx = 1;
-  int taaNy = 0;
-  int taaDy = 1;
-
   bool CheatSheetConfigured = false;
   bool ActorsPropertiesConfigured = false;
   bool GridConfigured = false;
@@ -678,6 +673,11 @@ private:
   std::optional<std::vector<double>> UserScalarBarRange;
   std::vector<double> Colormap;
   std::optional<int> ColormapDiscretization;
+
+  int TaaNx = 0;
+  int TaaDx = 1;
+  int TaaNy = 0;
+  int TaaDy = 1;
 };
 
 #endif

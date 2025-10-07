@@ -2787,8 +2787,8 @@ void vtkF3DRenderer::EnableJitter(bool enable)
   vtkActor* actor;
 
   float jitter[2];
-  jitter[0] = ConfigureHaltonSequence(2, &taaNx, &taaDx);
-  jitter[1] = ConfigureHaltonSequence(3, &taaNy, &taaDy);
+  jitter[0] = ConfigureHaltonSequence(2, &TaaNx, &TaaDx);
+  jitter[1] = ConfigureHaltonSequence(3, &TaaNy, &TaaDy);
   vtkRenderWindow* renderWindow = this->GetRenderWindow();
   int width = renderWindow->GetSize()[0];
   int height = renderWindow->GetSize()[1];
