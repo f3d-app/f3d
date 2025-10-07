@@ -86,13 +86,13 @@ void vtkF3dTAAResolvePass::Render(const vtkRenderState* s)
     vtkShaderProgram::Substitute(TAAResolveFS, "//VTK::FSQ::Decl",
       "uniform sampler2D colorTexture;\n"
       "uniform sampler2D historyTexture;\n"
-      "uniform float blendFactor;"
+      "uniform float blendFactor;\n"
       "//VTK::FSQ::Decl");
 
     vtkShaderProgram::Substitute(TAAResolveFS, "//VTK::FSQ::Impl",
-      "vec4 current = texture(colorTexture, texCoord);"
-      "vec4 history = texture(historyTexture, texCoord);"
-      "gl_FragData[0] = mix(current, history, blendFactor);"
+      "vec4 current = texture(colorTexture, texCoord);\n"
+      "vec4 history = texture(historyTexture, texCoord);\n"
+      "gl_FragData[0] = mix(current, history, blendFactor);\n"
       "//VTK::FSQ::Impl");
     this->QuadHelper =
       std::make_shared<vtkOpenGLQuadHelper>(renWin, nullptr, TAAResolveFS.c_str(), nullptr);
