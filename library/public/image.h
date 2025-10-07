@@ -4,9 +4,11 @@
 #include "exception.h"
 #include "export.h"
 
+/// @cond
 #include <filesystem>
 #include <string>
 #include <vector>
+/// @endcond
 
 namespace f3d
 {

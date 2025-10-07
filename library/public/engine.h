@@ -9,9 +9,11 @@
 #include "scene.h"
 #include "window.h"
 
+/// @cond
 #include <map>
 #include <string>
 #include <vector>
+/// @endcond
 
 namespace f3d
 {

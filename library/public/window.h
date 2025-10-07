@@ -5,7 +5,9 @@
 #include "export.h"
 #include "image.h"
 
+/// @cond
 #include <string>
+/// @endcond
 
 namespace f3d
 {

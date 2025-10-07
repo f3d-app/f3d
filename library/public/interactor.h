@@ -7,10 +7,12 @@
 #include "options.h"
 #include "window.h"
 
+/// @cond
 #include <functional>
 #include <string>
 #include <utility>
 #include <vector>
+/// @endcond
 
 namespace f3d
 {

@@ -4,8 +4,10 @@
 #include "exception.h"
 #include "export.h"
 
+/// @cond
 #include <functional>
 #include <string>
+/// @endcond
 
 namespace f3d
 {

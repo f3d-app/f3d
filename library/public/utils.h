@@ -4,6 +4,7 @@
 #include "exception.h"
 #include "export.h"
 
+/// @cond
 #include <filesystem>
 #include <map>
 #include <optional>
@@ -11,6 +12,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+/// @endcond
 
 namespace f3d
 {
