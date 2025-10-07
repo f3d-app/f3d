@@ -97,6 +97,7 @@ endif()
 # In theory the test should be `if (VTK_USE_X)` but this variable is
 # only exported starting from VTK 9.4
 if(UNIX AND NOT APPLE AND NOT EMSCRIPTEN AND NOT ANDROID)
+  find_package(X11 REQUIRED)
   list(APPEND classes vtkF3DGLXRenderWindow)
 endif()
 
@@ -142,6 +143,13 @@ vtk_module_add_module(f3d::vtkextPrivate
 
 if(MSVC)
   vtk_module_definitions(f3d::vtkextPrivate PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS _CRT_SECURE_NO_WARNINGS)
+endif()
+
+# glx
+# In theory the test should be `if (VTK_USE_X)` but this variable is
+# only exported starting from VTK 9.4
+if(UNIX AND NOT APPLE AND NOT EMSCRIPTEN AND NOT ANDROID)
+  vtk_module_link(f3d::vtkextPrivate PRIVATE X11::X11)
 endif()
 
 # exr
