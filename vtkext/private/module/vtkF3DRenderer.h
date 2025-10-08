@@ -516,7 +516,7 @@ private:
   /**
    * Configure Halton sequence for TAA
    */
-  static float ConfigureHaltonSequence(int base, int* numerator, int* denominator);
+  float ConfigureHaltonSequence(int base, int& numerator, int& denominator);
 
   /**
    * Convenience method for configuring a scalar bar actor for coloring

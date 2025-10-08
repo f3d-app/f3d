@@ -14,10 +14,10 @@
 #include "vtkTextureObject.h"
 #include <vtkCamera.h>
 
-vtkStandardNewMacro(vtkF3dTAAResolvePass);
+vtkStandardNewMacro(vtkF3DTAAResolvePass);
 
 //------------------------------------------------------------------------------
-void vtkF3dTAAResolvePass::Render(const vtkRenderState* s)
+void vtkF3DTAAResolvePass::Render(const vtkRenderState* s)
 {
   vtkOpenGLClearErrorMacro();
   this->NumberOfRenderedProps = 0;
@@ -31,7 +31,7 @@ void vtkF3dTAAResolvePass::Render(const vtkRenderState* s)
 
   assert(this->DelegatePass != nullptr);
 
-  InspectCameraMovement(renderer);
+  this->InspectCameraMovement(renderer);
 
   // create framebuffer and textures
   int pos[2];
@@ -134,7 +134,7 @@ void vtkF3dTAAResolvePass::Render(const vtkRenderState* s)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3dTAAResolvePass::InspectCameraMovement(vtkRenderer* renderer)
+void vtkF3DTAAResolvePass::InspectCameraMovement(vtkRenderer* renderer)
 {
   vtkCamera* cam = renderer->GetActiveCamera();
   if (!cam)
@@ -172,7 +172,7 @@ void vtkF3dTAAResolvePass::InspectCameraMovement(vtkRenderer* renderer)
 }
 
 //------------------------------------------------------------------------------
-void vtkF3dTAAResolvePass::ReleaseGraphicsResources(vtkWindow* w)
+void vtkF3DTAAResolvePass::ReleaseGraphicsResources(vtkWindow* w)
 {
   this->Superclass::ReleaseGraphicsResources(w);
 

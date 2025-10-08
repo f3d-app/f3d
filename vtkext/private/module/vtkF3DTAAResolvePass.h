@@ -14,17 +14,16 @@
 #include <vtkSmartPointer.h>
 
 #include <memory>
-#endif
 
 class vtkOpenGLFramebufferObject;
 class vtkOpenGLQuadHelper;
 class vtkTextureObject;
 
-class vtkF3dTAAResolvePass : public vtkImageProcessingPass
+class vtkF3DTAAResolvePass : public vtkImageProcessingPass
 {
 public:
-  static vtkF3dTAAResolvePass* New();
-  vtkTypeMacro(vtkF3dTAAResolvePass, vtkImageProcessingPass);
+  static vtkF3DTAAResolvePass* New();
+  vtkTypeMacro(vtkF3DTAAResolvePass, vtkImageProcessingPass);
 
   /**
    * Perform rendering according to a render state.
@@ -40,8 +39,8 @@ protected:
   void InspectCameraMovement(vtkRenderer* renderer);
 
 private:
-  vtkF3dTAAResolvePass() = default;
-  ~vtkF3dTAAResolvePass() override = default;
+  vtkF3DTAAResolvePass() = default;
+  ~vtkF3DTAAResolvePass() override = default;
 
   vtkSmartPointer<vtkOpenGLFramebufferObject> FrameBufferObject;
   vtkSmartPointer<vtkTextureObject> ColorTexture;
@@ -55,3 +54,4 @@ private:
   double LastFocalPoint[3];
   double LastViewUp[3];
 };
+#endif

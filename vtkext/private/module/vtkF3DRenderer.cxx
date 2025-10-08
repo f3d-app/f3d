@@ -444,7 +444,7 @@ void vtkF3DRenderer::ConfigureRenderPasses()
 
   if (this->AntiAliasingModeEnabled == vtkF3DRenderer::AntiAliasingMode::TAA)
   {
-    vtkNew<vtkF3dTAAResolvePass> taaP;
+    vtkNew<vtkF3DTAAResolvePass> taaP;
     taaP->SetDelegatePass(renderingPass);
     renderingPass = taaP;
   }
@@ -1835,7 +1835,7 @@ void vtkF3DRenderer::UpdateActors()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::Render()
 {
-  EnableJitter(this->AntiAliasingModeEnabled == vtkF3DRenderer::AntiAliasingMode::TAA);
+  this->EnableJitter(this->AntiAliasingModeEnabled == vtkF3DRenderer::AntiAliasingMode::TAA);
 
   if (!this->TimerVisible)
   {
@@ -2787,8 +2787,8 @@ void vtkF3DRenderer::EnableJitter(bool enable)
   vtkActor* actor;
 
   float jitter[2];
-  jitter[0] = ConfigureHaltonSequence(2, &TaaNx, &TaaDx);
-  jitter[1] = ConfigureHaltonSequence(3, &TaaNy, &TaaDy);
+  jitter[0] = this->ConfigureHaltonSequence(2, TaaNx, TaaDx);
+  jitter[1] = this->ConfigureHaltonSequence(3, TaaNy, TaaDy);
   vtkRenderWindow* renderWindow = this->GetRenderWindow();
   int width = renderWindow->GetSize()[0];
   int height = renderWindow->GetSize()[1];
@@ -2817,10 +2817,10 @@ void vtkF3DRenderer::EnableJitter(bool enable)
 }
 
 //----------------------------------------------------------------------------
-float vtkF3DRenderer::ConfigureHaltonSequence(int base, int* numerator, int* denominator)
+float vtkF3DRenderer::ConfigureHaltonSequence(int base, int& numerator, int& denominator)
 {
-  int n = *numerator;
-  int d = *denominator;
+  int n = numerator;
+  int d = denominator;
 
   int x = d - n;
   if (x == 1)
@@ -2839,8 +2839,8 @@ float vtkF3DRenderer::ConfigureHaltonSequence(int base, int* numerator, int* den
     n = (base + 1) * y - x;
   }
 
-  *numerator = n;
-  *denominator = d;
+  numerator = n;
+  denominator = d;
 
   return static_cast<float>(n) / static_cast<float>(d);
 }
