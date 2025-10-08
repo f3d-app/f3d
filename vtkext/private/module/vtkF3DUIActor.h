@@ -60,6 +60,7 @@ public:
    * Empty by default
    */
   void SetDropText(const std::string& info);
+  void SetHierarchy(const std::string& info);
 
   /**
    * Set the dropzone binds
@@ -188,6 +189,10 @@ protected:
   {
   }
 
+  virtual void RenderSceneHierarchy()
+  {
+  }
+
   /**
    * Render the filename UI widget
    */
@@ -233,6 +238,7 @@ protected:
   bool DropZoneVisible = false;
   std::string DropText = "";
   std::vector<std::pair<std::string, std::string>> DropBinds;
+  std::string Hierarchy = "";
 
   bool FileNameVisible = false;
   std::string FileName = "";
