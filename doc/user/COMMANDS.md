@@ -25,7 +25,7 @@ The libf3d provides a few commands, many related to manipulating libf3d (options
 
 `set_reader_option Reader.option_name value`: A specific command to set a [reader option](SUPPORTED_FORMATS.md#reader-options), eg: `set_reader_option QuakeMDL.skin_index 1`
 
-`cycle_anti_aliasing`: A specific command to cycle between the anti-aliasing method (`none`,`fxaa`,`ssaa`).
+`cycle_anti_aliasing`: A specific command to cycle between the anti-aliasing method (`none`,`fxaa`,`ssaa`,`taa`).
 
 `cycle_animation`: A specific command to cycle `scene.animation.index` option using model information, No argument.
 
