@@ -65,6 +65,14 @@ public:
 private:
   class internals;
   std::unique_ptr<internals> Internals;
+
+public:
+  /**
+   * Prototype: return VTK scene hierarchy + actor collection
+   */
+  // void* getSceneHierarchy(void** outActorCollection) override;
+  std::string getSceneHierarchy() override;
+  // std::string GetSceneNodes(vtkDataAssembly* assembly);
 };
 }
 }

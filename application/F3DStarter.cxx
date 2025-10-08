@@ -1903,6 +1903,8 @@ void F3DStarter::LoadFileGroupInternal(
   options.ui.drop_zone.enable = options.ui.drop_zone.show_logo =
     this->Internals->LoadedFiles.empty();
   options.ui.filename_info = filenameInfo;
+  // options.ui.hierarchy = f3d::scene& scene = this->Internals->Engine->getScene();
+  options.ui.hierarchy = scene.getSceneHierarchy();
 }
 
 //----------------------------------------------------------------------------
