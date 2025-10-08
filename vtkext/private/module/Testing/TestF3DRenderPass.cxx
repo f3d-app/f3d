@@ -5,6 +5,7 @@
 
 #include "vtkF3DHexagonalBokehBlurPass.h"
 #include "vtkF3DRenderPass.h"
+#include "vtkF3DTAAResolvePass.h"
 #include "vtkF3DUserRenderPass.h"
 
 #include <iostream>
@@ -14,8 +15,12 @@ int TestF3DRenderPass(int argc, char* argv[])
   vtkNew<vtkF3DRenderPass> pass;
   pass->Print(std::cout);
 
+  vtkNew<vtkF3DTAAResolvePass> taaP;
+  taaP->SetDelegatePass(pass);
+  taaP->Print(std::cout);
+
   vtkNew<vtkF3DHexagonalBokehBlurPass> bokeh;
-  bokeh->SetDelegatePass(pass);
+  bokeh->SetDelegatePass(taaP);
   bokeh->Print(std::cout);
 
   bokeh->SetCircleOfConfusionRadius(30.f);

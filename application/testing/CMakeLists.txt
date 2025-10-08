@@ -527,6 +527,9 @@ f3d_test(NAME TestInteractionAnimationFrameRate DATA f3d.glb ARGS --animation-pr
 f3d_test(NAME TestInteractionAnimationCameraMovement DATA CameraAnimated.glb ARGS --camera-index=0 --animation-progress INTERACTION)#Space;MouseMovement;Space;
 f3d_test(NAME TestInteractionAnimationInvert DATA f3d.glb ARGS --animation-speed-factor=-1 --animation-progress INTERACTION)#Space;Wait;Space;
 
+# Test temporal anti-aliasing
+f3d_test(NAME TestInteractionTAA DATA suzanne.ply ARGS --anti-aliasing=true --anti-aliasing-mode=taa INTERACTION) #Render;Render...
+
 # Need SSIM comparison for some reason
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240729)
   # Test scrolling cheatsheet with no model by mouse wheel and by using scrollbar
