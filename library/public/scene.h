@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 /// @endcond
+// #include <vtkDataAssembly.h>
 
 namespace f3d
 {
@@ -198,6 +199,18 @@ protected:
   scene& operator=(const scene& opt) = delete;
   scene& operator=(scene&& opt) = delete;
   //! @endcond
+
+public:
+  /**
+   * Prototype API to expose scene hierarchy for glTF inspection.
+   * Returns a pointer to the vtkDataAssembly (scene hierarchy) and
+   * the imported vtkActorCollection. Intended for prototype only.
+   */
+  virtual std::string getSceneHierarchy()
+    {
+        return ""; // default base implementation
+    }
+  // virtual std::string GetSceneNodes(vtkDataAssembly* assembly);
 };
 }
 

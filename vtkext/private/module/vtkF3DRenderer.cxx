@@ -1674,6 +1674,13 @@ void vtkF3DRenderer::SetDropZoneBinds(
 
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetBlendingMode(BlendingMode mode)
+void vtkF3DRenderer::SetHierarchy(const std::string& Hierarchy)
+{
+  this->UIActor->SetHierarchy(Hierarchy);
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetUseDepthPeelingPass(bool use)
 {
   if (this->BlendingModeEnabled != mode)
   {

@@ -26,6 +26,15 @@
 
 #include <vector>
 
+
+#include <vtkXMLUtilities.h>
+#include <vtkXMLDataElement.h>
+#include <vtkRenderWindow.h>
+#include <vtkRenderer.h>
+#include <iostream>
+#include <sstream>
+#include <string>
+
 namespace fs = std::filesystem;
 
 namespace f3d::detail
@@ -555,4 +564,56 @@ void scene_impl::PrintImporterDescription(log::VerboseLevel level)
 {
   scene_impl::internals::DisplayImporterDescription(level, this->Internals->MetaImporter);
 }
+
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+std::string scene_impl::getSceneHierarchy()
+{
+    if (!this->Internals || !this->Internals->MetaImporter)
+    {
+        return "";
+    }
+
+    vtkDataAssembly* assembly = this->Internals->MetaImporter->GetSceneHierarchy();
+    if (!assembly)
+        return "";
+
+    std::ostringstream oss;
+    assembly->Print(oss);
+
+    std::string content = oss.str();
+    auto pos = content.find("<?xml");
+    if (pos == std::string::npos)
+        return "";
+
+    std::string xmlStr = content.substr(pos);
+    auto xml = vtkXMLUtilities::ReadElementFromString(xmlStr.c_str());
+    if (!xml)
+        return "";
+
+    std::vector<std::string> nodes;
+    std::vector<vtkXMLDataElement*> stack{xml};
+    while (!stack.empty())
+    {
+        auto elem = stack.back();
+        stack.pop_back();
+        if (const char* name = elem->GetName())
+            nodes.push_back(name);
+
+        for (int i = 0; i < elem->GetNumberOfNestedElements(); ++i)
+            stack.push_back(elem->GetNestedElement(i));
+    }
+
+    // Join nodes with commas
+    std::ostringstream result;
+    for (size_t i = 0; i < nodes.size(); ++i)
+    {
+        result << nodes[i];
+        if (i != nodes.size() - 1)
+            result << ", ";
+    }
+
+    return result.str();
+}
+
 }

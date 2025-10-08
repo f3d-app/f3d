@@ -61,6 +61,9 @@ private:
    */
   void RenderDropZone() override;
 
+  void RenderSceneHierarchy() override;
+
+
   /**
    * Render the filename UI widget
    */

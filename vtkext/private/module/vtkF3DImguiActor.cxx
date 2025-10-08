@@ -39,6 +39,8 @@
 #include <optional>
 #include <sstream>
 #include <string>
+#include <iostream> // for std::cout
+
 
 namespace
 {
@@ -400,8 +402,115 @@ void vtkF3DImguiActor::ReleaseGraphicsResources(vtkWindow* w)
 vtkF3DImguiActor::~vtkF3DImguiActor() = default;
 
 //----------------------------------------------------------------------------
+// void vtkF3DImguiActor::RenderSceneHierarchy(vtkRenderer* renderer)
+// {
+//     const ImGuiViewport* viewport = ImGui::GetMainViewport();
+//     ::SetupNextWindow(ImVec2(10, 10), ImVec2(300, viewport->WorkSize.y - 20));
+//     ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
+
+//     ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+//                              ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings;
+
+//     ImGui::Begin("Scene Hierarchy", nullptr, flags);
+
+//     if (!renderer) {
+//         ImGui::Text("No renderer available");
+//         ImGui::End();
+//         return;
+//     }
+
+//     vtkPropCollection* props = renderer->GetViewProps();
+//     props->InitTraversal();
+//     vtkProp* prop;
+//     while ((prop = props->GetNextProp())) {
+//         vtkActor* actor = vtkActor::SafeDownCast(prop);
+//         if (actor) {
+//             std::string name = actor->GetClassName();
+//             if (ImGui::TreeNode(name.c_str())) {
+//                 ImGui::Text("Actor address: %p", actor);
+//                 ImGui::TreePop();
+//             }
+//         }
+//     }
+
+//     ImGui::End();
+// }
+
+
+void vtkF3DImguiActor::RenderSceneHierarchy()
+{
+    std::cout << "[RenderSceneHierarchy] Start rendering hierarchy..." << std::endl;
+
+    const ImGuiViewport* viewport = ImGui::GetMainViewport();
+    if (!viewport) {
+        std::cout << "[RenderSceneHierarchy] Error: No ImGui viewport available!" << std::endl;
+        return;
+    }
+    std::cout << "[RenderSceneHierarchy] Viewport size: " << viewport->WorkSize.x
+              << " x " << viewport->WorkSize.y << std::endl;
+
+    ::SetupNextWindow(ImVec2(10, 10), ImVec2(300, viewport->WorkSize.y - 20));
+    ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
+
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+                             ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings;
+
+    std::cout << "[RenderSceneHierarchy] Beginning ImGui window..." << std::endl;
+    ImGui::Begin("Scene Hierarchy", nullptr, flags);
+
+    if (this->Hierarchy.empty()) {
+        std::cout << "[RenderSceneHierarchy] Hierarchy is empty." << std::endl;
+        ImGui::Text("No hierarchy available");
+        ImGui::End();
+        return;
+    }
+
+    // Split the comma-separated hierarchy into individual nodes
+    std::vector<std::string> nodes;
+    std::stringstream ss(this->Hierarchy);
+    std::string item;
+    while (std::getline(ss, item, ',')) {
+        // Optional: trim leading/trailing whitespace
+        item.erase(0, item.find_first_not_of(" \t\n\r"));
+        item.erase(item.find_last_not_of(" \t\n\r") + 1);
+        if (!item.empty())
+            nodes.push_back(item);
+    }
+
+    std::cout << "[RenderSceneHierarchy] Hierarchy has " << nodes.size() << " nodes." << std::endl;
+
+    // Render hierarchy as a collapsible tree
+    for (size_t i = 0; i < nodes.size(); ++i) {
+        const std::string& node = nodes[i];
+        std::cout << "[RenderSceneHierarchy] Rendering node " << i << ": " << node << std::endl;
+
+        // Make last node a leaf
+        if (i == nodes.size() - 1) {
+            ImGui::BulletText("%s", node.c_str());
+            std::cout << "[RenderSceneHierarchy] Rendered leaf node: " << node << std::endl;
+        } else {
+            ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+            if (ImGui::TreeNode(node.c_str())) {
+                std::cout << "[RenderSceneHierarchy] Rendered intermediate node: " << node << std::endl;
+                // Nothing inside intermediate nodes for now
+                ImGui::TreePop();
+            } else {
+                std::cout << "[RenderSceneHierarchy] TreeNode collapsed by default: " << node << std::endl;
+            }
+        }
+    }
+
+    ImGui::End();
+    std::cout << "[RenderSceneHierarchy] Finished rendering hierarchy." << std::endl;
+}
+
+
+
+//----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderDropZone()
 {
+  // std::vector<std::string> myHierarchy = {"Root", "Node A", "Node B"};
+  // RenderSceneHierarchy(myHierarchy);
   if (this->DropZoneVisible)
   {
     ImGuiViewport* viewport = ImGui::GetMainViewport();

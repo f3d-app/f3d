@@ -3,6 +3,9 @@
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLRenderWindow.h>
 #include <vtkViewport.h>
+// #include "scene_impl.h"
+// #include "../../library/private/scene_impl.h"
+
 
 vtkObjectFactoryNewMacro(vtkF3DUIActor);
 
@@ -35,6 +38,12 @@ void vtkF3DUIActor::SetDropBinds(
   const std::vector<std::pair<std::string, std::string>>& dropZoneBinds)
 {
   this->DropBinds = dropZoneBinds;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DUIActor::SetHierarchy(const std::string& info)
+{
+  this->Hierarchy = info;
 }
 
 //----------------------------------------------------------------------------
@@ -179,11 +188,17 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
   }
 
   this->StartFrame(renWin);
+  // std::vector<std::string> myHierarchy = {"Root", "Node A", "Node B"};
+  // this->RenderSceneHierarchy(myHierarchy);
+  // f3d::scene& scene = this->Internals->Engine->getScene();
+  // std::vector<std::string> myHierarchy = scene.getSceneHierarchy();
+  this->RenderSceneHierarchy();
 
   if (this->DropZoneVisible)
   {
     this->RenderDropZone();
   }
+  
 
   if (this->ConsoleVisible)
   {
