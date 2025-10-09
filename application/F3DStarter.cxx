@@ -516,7 +516,13 @@ public:
 
     // Initialize libf3dOptions
     f3d::options libOptions;
+#if F3D_MODULE_UI
+#if F3D_MODULE_TINYFILEDIALOGS
     libOptions.ui.drop_zone.custom_binds = "None+Drop Ctrl+O None+H";
+#else
+    libOptions.ui.drop_zone.custom_binds = "None+Drop None+H";
+#endif
+#endif
 
     // Copy appOptions
     F3DOptionsTools::OptionsDict appOptions = F3DOptionsTools::DefaultAppOptions;
