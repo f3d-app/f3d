@@ -2816,8 +2816,6 @@ void vtkF3DRenderer::EnableJitter(bool enable)
 
     vtkShaderProperty* shaderProp = actor->GetShaderProperty();
     vtkUniforms* uniforms = shaderProp->GetVertexCustomUniforms();
-
-    vtkUniforms::TupleType type = uniforms->GetUniformTupleType("jitter");
     uniforms->SetUniform2f("jitter", jitter);
 
     if (enable)
