@@ -2780,6 +2780,7 @@ bool vtkF3DRenderer::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vt
   return true;
 }
 
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::EnableJitter(bool enable)
 {
   vtkActorCollection* actors = this->GetActors();
@@ -2787,31 +2788,42 @@ void vtkF3DRenderer::EnableJitter(bool enable)
   vtkActor* actor;
 
   float jitter[2];
-  jitter[0] = this->ConfigureHaltonSequence(2, TaaNx, TaaDx);
-  jitter[1] = this->ConfigureHaltonSequence(3, TaaNy, TaaDy);
-  vtkRenderWindow* renderWindow = this->GetRenderWindow();
-  int width = renderWindow->GetSize()[0];
-  int height = renderWindow->GetSize()[1];
-  jitter[0] = ((jitter[0] - 0.5f) / width) * 2.0f;
-  jitter[1] = ((jitter[1] - 0.5f) / height) * 2.0f;
+  if (enable)
+  {
+    jitter[0] = this->ConfigureHaltonSequence(2, TaaNx, TaaDx);
+    jitter[1] = this->ConfigureHaltonSequence(3, TaaNy, TaaDy);
+
+    vtkRenderWindow* renderWindow = this->GetRenderWindow();
+    int width = renderWindow->GetSize()[0];
+    int height = renderWindow->GetSize()[1];
+
+    jitter[0] = ((jitter[0] - 0.5f) / width) * 2.0f;
+    jitter[1] = ((jitter[1] - 0.5f) / height) * 2.0f;
+  }
+  else
+  {
+    jitter[0] = 0.0f;
+    jitter[1] = 0.0f;
+  }
 
   while ((actor = actors->GetNextActor()))
   {
     vtkPolyDataMapper* mapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
-    if (mapper)
+    if (!mapper)
     {
-      vtkShaderProperty* shaderProp = actor->GetShaderProperty();
-      vtkUniforms* uniforms = shaderProp->GetVertexCustomUniforms();
-      if (enable)
-      {
-        uniforms->SetUniform2f("jitter", jitter);
-        vtkInformation* information = this->GetInformation();
-        information->Remove(vtkF3DRenderPass::RENDER_UI_ONLY());
-      }
-      else
-      {
-        uniforms->RemoveUniform("jitter");
-      }
+      continue;
+    }
+
+    vtkShaderProperty* shaderProp = actor->GetShaderProperty();
+    vtkUniforms* uniforms = shaderProp->GetVertexCustomUniforms();
+
+    vtkUniforms::TupleType type = uniforms->GetUniformTupleType("jitter");
+    uniforms->SetUniform2f("jitter", jitter);
+
+    if (enable)
+    {
+      vtkInformation* information = this->GetInformation();
+      information->Remove(vtkF3DRenderPass::RENDER_UI_ONLY());
     }
   }
 }
