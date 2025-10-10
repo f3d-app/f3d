@@ -1,10 +1,7 @@
-# libf3d - A library to render 3D meshes
-
-By Michael Migliore and Mathieu Westphal.
+# libf3d
 
 libf3d is a BSD-licensed C++17 library to open and render 3D meshes. It is of course used by F3D.
 libf3d API is simple and easy to learn. Python bindings are provided through pybind11. Java bindings are also available.
-libf3d API is still in alpha version and may change drastically in the future.
 
 ## Getting Started
 
@@ -126,13 +123,15 @@ For the complete documentation, please consult the [libf3d doxygen documentation
 
 ## Building against the libf3d
 
-Please follow instructions in the [F3D build guide](../dev/BUILD.md), make sure to build with `BUILD_SHARED_LIBS=ON` and to install the `sdk` component then use CMake to find the libf3d
-and link against it like this in your CMakeLists.txt:
+> [!NOTE]
+> `libf3d` works best when built as a shared library, make sure it's the case. The `sdk` component must also be installed in order to be able to use CMake to find `libf3d`.
+
+It's as simple as linking against it like this in your CMakeLists.txt:
 
 ```cmake
 find_package(f3d REQUIRED COMPONENTS library)
 [...]
-target_link_libraries(target f3d::libf3d)
+target_link_libraries(your_target f3d::libf3d)
 ```
 
 ## find_package COMPONENTS

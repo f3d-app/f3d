@@ -1,5 +1,3 @@
-<!-- {% assign model = "{{model}}" %} set variable to prevent Jekyll from swallowing `{{model}}` when expanding template variables -->
-
 # Command line options
 
 F3D behavior can be fully controlled from the command line using the following options.

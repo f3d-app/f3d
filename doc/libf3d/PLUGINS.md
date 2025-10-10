@@ -1,9 +1,12 @@
 # Plugin SDK
 
-Please follow instructions in the [F3D build guide](../dev/BUILD.md), make sure to build with `BUILD_SHARED_LIBS=ON` and to install the `plugin_sdk` component.
+> [!NOTE]
+> `libf3d` works best when built as a shared library, make sure it's the case. The `plugin_sdk` component must also be installed in order to be able to create a new plugin.
+
 You will then be able to call `find_package(f3d REQUIRED COMPONENTS pluginsdk)` in your plugin CMakeLists.txt, a few macros are made available to you to generate a plugin which allow you to extend libf3d to support your own file format. Access to a f3d::vtkext VTK module is also provided if needed.
 
-> Please consider [contributing](../../CONTRIBUTING.md) your plugin in [F3D directly](https://github.com/f3d-app/f3d/tree/master/plugins) if you think it can be useful to the community.
+> [!NOTE]
+> Please consider contributing your plugin in [F3D directly](https://github.com/f3d-app/f3d/tree/master/plugins) if you think it can be useful to the community.
 > You can also consider contributing directly [in VTK](https://gitlab.kitware.com/vtk/vtk/blob/master/Documentation/dev/git/develop.md).
 
 ## Creating a plugin

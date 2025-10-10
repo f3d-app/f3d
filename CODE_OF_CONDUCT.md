@@ -1,4 +1,4 @@
-# F3D Code of Conduct
+# Code of Conduct
 
 ## Our Pledge
 
