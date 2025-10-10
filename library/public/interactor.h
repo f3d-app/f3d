@@ -231,7 +231,6 @@ public:
    */
   [[nodiscard]] virtual std::pair<std::string, std::string> getBindingDocumentation(
     const interaction_bind_t& bind) const = 0;
-  ///@}
 
   /**
    * Get the type of a binding.
