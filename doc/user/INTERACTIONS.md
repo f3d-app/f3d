@@ -15,7 +15,8 @@ Simple interaction with the displayed data is possible directly within the windo
 - _Click and drag_ with the _middle_ mouse button to translate the camera.
 - _Click_ with the _middle_ mouse button to center the camera on the point under the cursor (hold <kbd>Shift</kbd> to allow forward or backward movement).
 
-> Note: When playing an animation with a scene camera, camera interactions are locked.
+> [!NOTE]
+> When playing an animation with a scene camera, camera interactions are locked.
 
 ## Bindings
 
