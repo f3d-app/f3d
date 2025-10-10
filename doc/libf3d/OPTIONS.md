@@ -1,4 +1,4 @@
-# Options exhaustive list
+# Options
 
 An option is a specific value stored in different struct in an `options` instance.
 They can be accessed directly through the structs, through a string API or through a std::variant API.
@@ -16,7 +16,7 @@ Please note certain options are taken into account when rendering, others when l
 See the exhaustive list below, but note that this may change in the future.
 
 Please note certain options are `optional` by default, which means they are not set initially,
-See the [APIs](#APIs) details below for more info.
+See the [APIs](#struct-api) details below for more info.
 
 ## Scene Options
 
