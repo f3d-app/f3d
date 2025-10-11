@@ -513,10 +513,11 @@ private:
    * Screen spaced jittering for TAA
    */
   void EnableJitter(bool enable);
+
   /**
    * Configure Halton sequence for TAA
    */
-  float ConfigureHaltonSequence(int base, int& numerator, int& denominator);
+  float ConfigureHaltonSequence(int direction);
 
   /**
    * Convenience method for configuring a scalar bar actor for coloring

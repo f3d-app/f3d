@@ -2790,8 +2790,8 @@ void vtkF3DRenderer::EnableJitter(bool enable)
   float jitter[2];
   if (enable)
   {
-    jitter[0] = this->ConfigureHaltonSequence(2, TaaNx, TaaDx);
-    jitter[1] = this->ConfigureHaltonSequence(3, TaaNy, TaaDy);
+    jitter[0] = this->ConfigureHaltonSequence(0);
+    jitter[1] = this->ConfigureHaltonSequence(1);
 
     vtkRenderWindow* renderWindow = this->GetRenderWindow();
     int width = renderWindow->GetSize()[0];
@@ -2827,10 +2827,11 @@ void vtkF3DRenderer::EnableJitter(bool enable)
 }
 
 //----------------------------------------------------------------------------
-float vtkF3DRenderer::ConfigureHaltonSequence(int base, int& numerator, int& denominator)
+float vtkF3DRenderer::ConfigureHaltonSequence(int direction)
 {
-  int n = numerator;
-  int d = denominator;
+  int base = (direction == 0) ? 2 : 3;
+  int& n = (direction == 0) ? TaaNx : TaaNy;
+  int& d = (direction == 0) ? TaaDx : TaaDy;
 
   int x = d - n;
   if (x == 1)
@@ -2848,9 +2849,6 @@ float vtkF3DRenderer::ConfigureHaltonSequence(int base, int& numerator, int& den
 
     n = (base + 1) * y - x;
   }
-
-  numerator = n;
-  denominator = d;
 
   return static_cast<float>(n) / static_cast<float>(d);
 }

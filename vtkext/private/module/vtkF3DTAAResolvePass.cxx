@@ -1,18 +1,18 @@
 #include "vtkF3DTAAResolvePass.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkOpenGLError.h"
-#include "vtkOpenGLFramebufferObject.h"
-#include "vtkOpenGLQuadHelper.h"
-#include "vtkOpenGLRenderUtilities.h"
-#include "vtkOpenGLRenderWindow.h"
-#include "vtkOpenGLShaderCache.h"
-#include "vtkOpenGLState.h"
-#include "vtkRenderState.h"
-#include "vtkRenderer.h"
-#include "vtkShaderProgram.h"
-#include "vtkTextureObject.h"
 #include <vtkCamera.h>
+#include <vtkObjectFactory.h>
+#include <vtkOpenGLError.h>
+#include <vtkOpenGLFramebufferObject.h>
+#include <vtkOpenGLQuadHelper.h>
+#include <vtkOpenGLRenderUtilities.h>
+#include <vtkOpenGLRenderWindow.h>
+#include <vtkOpenGLShaderCache.h>
+#include <vtkOpenGLState.h>
+#include <vtkRenderState.h>
+#include <vtkRenderer.h>
+#include <vtkShaderProgram.h>
+#include <vtkTextureObject.h>
 
 vtkStandardNewMacro(vtkF3DTAAResolvePass);
 

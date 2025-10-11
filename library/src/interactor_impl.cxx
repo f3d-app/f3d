@@ -883,6 +883,7 @@ interactor& interactor_impl::initCommands()
     },
     command_documentation_t{
       "cycle_anti_aliasing", "cycle between the anti-aliasing method (none,fxaa,ssaa)" });
+      "cycle_anti_aliasing", "cycle between the anti-aliasing method (none,fxaa,ssaa,taa)" });
 
   std::vector<std::string> cycleColoringValidArgs = { "field", "array", "component" };
   this->addCommand(
