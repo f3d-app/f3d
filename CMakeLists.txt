@@ -242,6 +242,12 @@ endif()
 # F3D Application
 cmake_dependent_option(F3D_BUILD_APPLICATION "Build the application" ON "NOT ANDROID AND NOT EMSCRIPTEN" OFF)
 
+# Doxygen documentation
+option(F3D_GENERATE_DOXYGEN_XML "Build doxygen XML files" OFF)
+if(F3D_GENERATE_DOXYGEN_XML)
+  find_package(Doxygen REQUIRED)
+endif()
+
 # Build VTK extension modules
 add_subdirectory(vtkext)
 

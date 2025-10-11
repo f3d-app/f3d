@@ -35,3 +35,20 @@ vtk_module_add_module(f3d::vtkext
   SOURCES ${sources}
   PRIVATE_HEADERS ${private_headers}
   )
+
+# vtkext documentation
+if(F3D_GENERATE_DOXYGEN_XML)
+  set(F3D_DOXYGEN_INPUT ${CMAKE_CURRENT_SOURCE_DIR})
+  set(F3D_DOXYGEN_OUTPUT_DIR ${CMAKE_BINARY_DIR}/doxygen-vtkext)
+
+  configure_file(
+    ${CMAKE_SOURCE_DIR}/cmake/Doxyfile.in
+    ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+    @ONLY)
+
+  add_custom_target(doxygen-vtkext
+    COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    COMMENT "Generating API documentation for vtkext"
+    VERBATIM)
+endif()

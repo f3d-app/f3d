@@ -233,6 +233,23 @@ if(BUILD_TESTING)
   add_subdirectory(testing)
 endif()
 
+# libf3d documentation
+if(F3D_GENERATE_DOXYGEN_XML)
+  list(JOIN F3D_PUBLIC_HEADERS " " F3D_DOXYGEN_INPUT)
+  set(F3D_DOXYGEN_OUTPUT_DIR ${CMAKE_BINARY_DIR}/doxygen-libf3d)
+
+  configure_file(
+    ${CMAKE_SOURCE_DIR}/cmake/Doxyfile.in
+    ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+    @ONLY)
+
+  add_custom_target(doxygen-libf3d
+    COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    COMMENT "Generating API documentation for libf3d"
+    VERBATIM)
+endif()
+
 # Installing
 
 ## Install f3dConfig.cmake and f3dVersion.cmake so the f3d::f3d target can be found
