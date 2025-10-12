@@ -166,6 +166,12 @@ public:
    */
   vtkMTimeType GetUpdateMTime();
 
+  /**
+  * Returns the scene hierarchy if any of the importers is a GLTF importer.
+  * Returns nullptr if no GLTF importer was added.
+  */
+  vtkDataAssembly* GetSceneHierarchy();
+
 protected:
   vtkF3DMetaImporter();
   ~vtkF3DMetaImporter() override;
