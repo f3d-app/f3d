@@ -467,7 +467,7 @@ Enable _anti-aliasing_. This technique is used to reduce aliasing.
 
 ### `--anti-aliasing-mode` (_string_, default: `fxaa`)
 
-Anti-aliasing method (`fxaa`: fast, `ssaa`: quality)
+Anti-aliasing method (`fxaa`: fast, `ssaa`: quality, `taa`: balanced)
 
 ### `-t`, `--tone-mapping` (_bool_, default: `false`)
 
