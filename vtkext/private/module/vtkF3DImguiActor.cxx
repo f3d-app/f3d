@@ -439,15 +439,15 @@ vtkF3DImguiActor::~vtkF3DImguiActor() = default;
 
 void vtkF3DImguiActor::RenderSceneHierarchy()
 {
-    std::cout << "[RenderSceneHierarchy] Start rendering hierarchy..." << std::endl;
+    // std::cout << "[RenderSceneHierarchy] Start rendering hierarchy..." << std::endl;
 
     const ImGuiViewport* viewport = ImGui::GetMainViewport();
     if (!viewport) {
         std::cout << "[RenderSceneHierarchy] Error: No ImGui viewport available!" << std::endl;
         return;
     }
-    std::cout << "[RenderSceneHierarchy] Viewport size: " << viewport->WorkSize.x
-              << " x " << viewport->WorkSize.y << std::endl;
+    // std::cout << "[RenderSceneHierarchy] Viewport size: " << viewport->WorkSize.x
+              // << " x " << viewport->WorkSize.y << std::endl;
 
     ::SetupNextWindow(ImVec2(10, 10), ImVec2(300, viewport->WorkSize.y - 20));
     ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
@@ -455,11 +455,11 @@ void vtkF3DImguiActor::RenderSceneHierarchy()
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
                              ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings;
 
-    std::cout << "[RenderSceneHierarchy] Beginning ImGui window..." << std::endl;
+    // std::cout << "[RenderSceneHierarchy] Beginning ImGui window..." << std::endl;
     ImGui::Begin("Scene Hierarchy", nullptr, flags);
 
     if (this->Hierarchy.empty()) {
-        std::cout << "[RenderSceneHierarchy] Hierarchy is empty." << std::endl;
+        // std::cout << "[RenderSceneHierarchy] Hierarchy is empty." << std::endl;
         ImGui::Text("No hierarchy available");
         ImGui::End();
         return;
@@ -501,7 +501,7 @@ void vtkF3DImguiActor::RenderSceneHierarchy()
     }
 
     ImGui::End();
-    std::cout << "[RenderSceneHierarchy] Finished rendering hierarchy." << std::endl;
+    // std::cout << "[RenderSceneHierarchy] Finished rendering hierarchy." << std::endl;
 }
 
 

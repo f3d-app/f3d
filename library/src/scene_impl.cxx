@@ -35,6 +35,12 @@
 #include <sstream>
 #include <string>
 
+#include <typeinfo>
+#include <cxxabi.h>
+#include "vtkF3DGLTFImporter.h"
+// #include "vtkGLTFImporter.h"
+
+
 namespace fs = std::filesystem;
 
 namespace f3d::detail
@@ -569,39 +575,64 @@ void scene_impl::PrintImporterDescription(log::VerboseLevel level)
 //----------------------------------------------------------------------------
 std::string scene_impl::getSceneHierarchy()
 {
-    if (!this->Internals || !this->Internals->MetaImporter)
+    std::cout << "[DEBUG] getSceneHierarchy() called" << std::endl;
+
+    if (!this->Internals)
     {
+        std::cout << "[DEBUG] Internals is null" << std::endl;
         return "";
     }
 
     vtkDataAssembly* assembly = this->Internals->MetaImporter->GetSceneHierarchy();
+    // vtkDataAssembly* assembly = gltfImporter->GetSceneHierarchy();
     if (!assembly)
+    {
+        std::cout << "[DEBUG] GetSceneHierarchy() returned null assembly" << std::endl;
         return "";
+    }
 
     std::ostringstream oss;
     assembly->Print(oss);
 
     std::string content = oss.str();
+    std::cout << "[DEBUG] Assembly content size: " << content.size() << std::endl;
+
     auto pos = content.find("<?xml");
     if (pos == std::string::npos)
+    {
+        std::cout << "[DEBUG] XML header not found in assembly content" << std::endl;
         return "";
+    }
 
     std::string xmlStr = content.substr(pos);
+    std::cout << "[DEBUG] Extracted XML substring length: " << xmlStr.size() << std::endl;
+
     auto xml = vtkXMLUtilities::ReadElementFromString(xmlStr.c_str());
     if (!xml)
+    {
+        std::cout << "[DEBUG] Failed to parse XML from string" << std::endl;
         return "";
+    }
 
     std::vector<std::string> nodes;
     std::vector<vtkXMLDataElement*> stack{xml};
+
+    std::cout << "[DEBUG] Starting XML traversal" << std::endl;
     while (!stack.empty())
     {
         auto elem = stack.back();
         stack.pop_back();
+
         if (const char* name = elem->GetName())
+        {
             nodes.push_back(name);
+            std::cout << "[DEBUG] Found node: " << name << std::endl;
+        }
 
         for (int i = 0; i < elem->GetNumberOfNestedElements(); ++i)
+        {
             stack.push_back(elem->GetNestedElement(i));
+        }
     }
 
     // Join nodes with commas
@@ -613,7 +644,10 @@ std::string scene_impl::getSceneHierarchy()
             result << ", ";
     }
 
-    return result.str();
+    std::string finalResult = result.str();
+    std::cout << "[DEBUG] getSceneHierarchy() returning: " << finalResult << std::endl;
+
+    return finalResult;
 }
 
 }
