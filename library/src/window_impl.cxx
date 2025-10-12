@@ -376,6 +376,15 @@ window_impl::~window_impl()
   }
 }
 
+void window_impl::SetSceneHierarchy(std::string hierarchy)
+{
+    if (this->Internals->Renderer)
+    {
+      this->Internals->Renderer->SetHierarchy(hierarchy);
+    }
+}
+
+
 //----------------------------------------------------------------------------
 void window_impl::UpdateDynamicOptions()
 {
@@ -433,7 +442,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->ShowMinimalConsole(opt.ui.minimal_console);
   renderer->ShowDropZone(opt.ui.drop_zone.enable);
   renderer->ShowDropZoneLogo(opt.ui.drop_zone.show_logo);
-  renderer->SetHierarchy(opt.ui.hierarchy);
+  // renderer->SetHierarchy(opt.ui.hierarchy);
 
   if (this->Internals->Interactor)
   {
