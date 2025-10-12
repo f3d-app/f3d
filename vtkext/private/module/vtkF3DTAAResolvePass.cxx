@@ -47,7 +47,7 @@ void vtkF3DTAAResolvePass::Render(const vtkRenderState* s)
     this->HistoryTexture->SetWrapS(vtkTextureObject::ClampToEdge);
     this->HistoryTexture->SetWrapT(vtkTextureObject::ClampToEdge);
     renderer->GetTiledSizeAndOrigin(&size[0], &size[1], &pos[0], &pos[1]);
-    this->HistoryTexture->Allocate2D(size[0], size[1], 4, VTK_UNSIGNED_CHAR);
+    this->HistoryTexture->Allocate2D(size[0], size[1], 4, VTK_FLOAT);
     this->HistoryInitialized = false;
   }
   this->HistoryTexture->Resize(size[0], size[1]);
@@ -60,7 +60,7 @@ void vtkF3DTAAResolvePass::Render(const vtkRenderState* s)
     this->ColorTexture->SetMagnificationFilter(vtkTextureObject::Linear);
     this->ColorTexture->SetWrapS(vtkTextureObject::ClampToEdge);
     this->ColorTexture->SetWrapT(vtkTextureObject::ClampToEdge);
-    this->ColorTexture->Allocate2D(size[0], size[1], 4, VTK_UNSIGNED_CHAR);
+    this->ColorTexture->Allocate2D(size[0], size[1], 4, VTK_FLOAT);
   }
   this->ColorTexture->Resize(size[0], size[1]);
 
