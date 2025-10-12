@@ -170,7 +170,7 @@ public:
   * Returns the scene hierarchy if any of the importers is a GLTF importer.
   * Returns nullptr if no GLTF importer was added.
   */
-  vtkDataAssembly* GetSceneHierarchy();
+  vtkDataAssembly* GetSceneHierarchy() override;
 
 protected:
   vtkF3DMetaImporter();

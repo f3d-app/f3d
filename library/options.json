@@ -213,10 +213,6 @@
       "type": "string",
       "default_value": ""
     },
-    "hierarchy": {
-      "type": "string",
-      "default_value": ""
-    },
     "fps": {
       "type": "bool",
       "default_value": "false"
