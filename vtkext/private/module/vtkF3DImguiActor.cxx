@@ -402,41 +402,6 @@ void vtkF3DImguiActor::ReleaseGraphicsResources(vtkWindow* w)
 vtkF3DImguiActor::~vtkF3DImguiActor() = default;
 
 //----------------------------------------------------------------------------
-// void vtkF3DImguiActor::RenderSceneHierarchy(vtkRenderer* renderer)
-// {
-//     const ImGuiViewport* viewport = ImGui::GetMainViewport();
-//     ::SetupNextWindow(ImVec2(10, 10), ImVec2(300, viewport->WorkSize.y - 20));
-//     ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
-
-//     ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
-//                              ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings;
-
-//     ImGui::Begin("Scene Hierarchy", nullptr, flags);
-
-//     if (!renderer) {
-//         ImGui::Text("No renderer available");
-//         ImGui::End();
-//         return;
-//     }
-
-//     vtkPropCollection* props = renderer->GetViewProps();
-//     props->InitTraversal();
-//     vtkProp* prop;
-//     while ((prop = props->GetNextProp())) {
-//         vtkActor* actor = vtkActor::SafeDownCast(prop);
-//         if (actor) {
-//             std::string name = actor->GetClassName();
-//             if (ImGui::TreeNode(name.c_str())) {
-//                 ImGui::Text("Actor address: %p", actor);
-//                 ImGui::TreePop();
-//             }
-//         }
-//     }
-
-//     ImGui::End();
-// }
-
-
 void vtkF3DImguiActor::RenderSceneHierarchy()
 {
     // std::cout << "[RenderSceneHierarchy] Start rendering hierarchy..." << std::endl;

@@ -456,6 +456,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->ShowDropZone(opt.ui.drop_zone.enable);
   renderer->ShowDropZoneLogo(opt.ui.drop_zone.show_logo);
   renderer->SetBackdropOpacity(opt.ui.backdrop.opacity);
+  renderer->SetHierarchy(opt.ui.hierarchy);
 
   if (this->Internals->Interactor)
   {
