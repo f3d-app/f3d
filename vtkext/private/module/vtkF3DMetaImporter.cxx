@@ -21,6 +21,8 @@
 #include <numeric>
 #include <vector>
 
+#include "vtkF3DGLTFImporter.h"
+
 //----------------------------------------------------------------------------
 struct vtkF3DMetaImporter::Internals
 {
@@ -728,3 +730,20 @@ vtkMTimeType vtkF3DMetaImporter::GetUpdateMTime()
 {
   return this->Pimpl->UpdateTime.GetMTime();
 }
+
+//----------------------------------------------------------------------------
+vtkDataAssembly* vtkF3DMetaImporter::GetSceneHierarchy()
+{
+    for (const auto& importerPair : this->Pimpl->Importers)
+    {
+        vtkF3DGLTFImporter* gltfImporter = vtkF3DGLTFImporter::SafeDownCast(importerPair.Importer);
+        if (gltfImporter)
+        {
+            // Returns the GLTF scene hierarchy
+            return gltfImporter->GetSceneHierarchy();
+        }
+    }
+    // No GLTF importer found
+    return nullptr;
+}
+
