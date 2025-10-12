@@ -25,8 +25,7 @@ using option_variant_t =
  * @brief   Class used to control the different options
  *
  * A class to control the different options of f3d.
- * See the README_libf3d.md for the full listing of options.
- * The struct below can also be consulted.
+ *
  */
 class F3D_EXPORT options
 {
@@ -47,58 +46,66 @@ public:
    * Set an option as a variant based on its name
    * Please note that, on Windows, using an explicit std::string may be required:
    * https://stackoverflow.com/questions/60681710/prefer-stdstring-in-stdvariantbool-stdstring-for-const-char
-   * Throw an options::inexistent_exception if option does not exist.
-   * Throw an options::incompatible_exception if value is not compatible with option.
+   *
+   * Throws an options::inexistent_exception if option does not exist.
+   * Throws an options::incompatible_exception if value is not compatible with option.
    */
   options& set(std::string_view name, const option_variant_t& value);
 
   /**
    * Get an option as a variant based on its name
-   * Throw an options::inexistent_exception if option does not exist.
-   * Throw an options::no_value_exception if option has not been set.
+   *
+   * Throws an options::inexistent_exception if option does not exist.
+   * Throws an options::no_value_exception if option has not been set.
    */
   [[nodiscard]] option_variant_t get(std::string_view name) const;
 
   /**
    * Set an option as a string based on its name
    * Use dedicated parsing code, see the related doc in PARSING.md.
-   * Throw an options::inexistent_exception if option does not exist.
-   * Throw an options::parsing_exception if parsing failed.
+   *
+   * Throws an options::inexistent_exception if option does not exist.
+   * Throws an options::parsing_exception if parsing failed.
    */
   options& setAsString(std::string_view name, const std::string& str);
 
   /**
    * Get an option as a string based on its name
-   * Throw an options::inexistent_exception if option does not exist.
-   * Throw an options::no_value_exception if option has not been set.
+   *
+   * Throws an options::inexistent_exception if option does not exist.
+   * Throws an options::no_value_exception if option has not been set.
    */
   [[nodiscard]] std::string getAsString(std::string_view name) const;
 
   /**
    * A boolean option specific method to toggle it.
    * If the option has not been set yet, set it to true.
-   * Throw an options::inexistent_exception if option does not exist.
-   * Throw an options::incompatible_exception if option is not boolean.
+   *
+   * Throws an options::inexistent_exception if option does not exist.
+   * Throws an options::incompatible_exception if option is not boolean.
    */
   options& toggle(std::string_view name);
 
   /**
    * Compare an option between this and a provided other.
    * Return true if they are the same value, false otherwise.
-   * Throw an options::inexistent_exception if option does not exist.
+   *
+   * Throws an options::inexistent_exception if option does not exist.
    */
   [[nodiscard]] bool isSame(const options& other, std::string_view name) const;
 
   /**
    * Return true if an option has a value, false otherwise
    * Always returns true for non-optional options.
-   * Throw an options::inexistent_exception if option does not exist.
+   *
+   * Throws an options::inexistent_exception if option does not exist.
    */
   [[nodiscard]] bool hasValue(std::string_view name) const;
 
   /**
    * Copy the value of an option from this to the provided other.
-   * Throw an options::inexistent_exception if option does not exist.
+   *
+   * Throws an options::inexistent_exception if option does not exist.
    */
   options& copy(const options& other, std::string_view name);
 
@@ -120,18 +127,21 @@ public:
 
   /**
    *  Returns true if the option is optional else returns false.
+   *
    *  Throws an options::inexistent_exception if option does not exist.
    */
   [[nodiscard]] bool isOptional(std::string_view option) const;
 
   /**
    *  Resets the option to default value.
+   *
    *  Throws an options::inexistent_exception if option does not exist.
    */
   options& reset(std::string_view name);
 
   /**
    *  Unset the option if it is optional else throws options::incompatible_exception.
+   *
    *  Throws an options::inexistent_exception if option does not exist.
    */
   options& removeValue(std::string_view name);
@@ -140,7 +150,8 @@ public:
    * Templated parsing method used internally to parse strings.
    * Implemented for the different supported types,
    * see PARSING.md for more info.
-   * Throw an options::parsing_exception if parsing failed.
+   *
+   * Throws an options::parsing_exception if parsing failed.
    */
   template<typename T>
   [[nodiscard]] static T parse(const std::string& str);
@@ -148,6 +159,7 @@ public:
   /**
    * Templated parsing method used internally to format var into strings.
    * Implemented for the different supported types,
+   *
    * see PARSING.md for more info.
    */
   template<typename T>
