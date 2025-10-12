@@ -119,6 +119,8 @@ public:
    */
   [[nodiscard]] virtual point3_t getDisplayFromWorld(const point3_t& worldPoint) const = 0;
 
+  virtual void SetSceneHierarchy(std::string hierarchy) = 0;
+
 protected:
   //! @cond
   window() = default;
