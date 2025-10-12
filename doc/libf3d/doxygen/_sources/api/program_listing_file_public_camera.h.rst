@@ -50,6 +50,7 @@ Program Listing for File camera.h
      virtual void getState(camera_state_t& state) = 0;
    
    
+   
      virtual camera& dolly(double val) = 0;
      virtual camera& pan(double right, double up, double forward = 0) = 0;
      virtual camera& zoom(double factor) = 0;

@@ -357,10 +357,18 @@ document.write(`
 <dl class="cpp enum-class">
 <dt class="sig sig-object cpp" id="_CPPv4N3f3d6window4TypeE">
 <span id="_CPPv3N3f3d6window4TypeE"></span><span id="_CPPv2N3f3d6window4TypeE"></span><span class="target" id="classf3d_1_1window_1a4742753b53b500ca62f402424aa1f471"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Type</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><a class="headerlink" href="#_CPPv4N3f3d6window4TypeE" title="Permalink to this definition">#</a><br /></dt>
-<dd><section id="classf3d_1_1window_1autotoc_md2">
-<h3>Enumeration of supported window types<a class="headerlink" href="#classf3d_1_1window_1autotoc_md2" title="Permalink to this heading">#</a></h3>
-<p id="classf3d_1_1window_1autotoc_md2">NONE: A mock window without rendering capabilities. EXTERNAL: An external window that assume the OpenGL context would have been created by another framework. GLX: A window using GLX. WGL: A window using WGL. COCOA: A window using COCOA. EGL: An offscreen window using hardware acceleration that can run headless. OSMESA: An offscreen window using software rendering that is always run headless. WASM: A webassembly window (when libf3d is built with emscripten). UNKNOWN: An unknown window (should not happen). </p>
-</section>
+<dd><p>Enumeration of supported window types<ul class="simple">
+<li><p>NONE: A mock window without rendering capabilities.</p></li>
+<li><p>EXTERNAL: An external window that assume the OpenGL context would have been created by another framework.</p></li>
+<li><p>GLX: A window using GLX.</p></li>
+<li><p>WGL: A window using WGL.</p></li>
+<li><p>COCOA: A window using COCOA.</p></li>
+<li><p>EGL: An offscreen window using hardware acceleration that can run headless.</p></li>
+<li><p>OSMESA: An offscreen window using software rendering that is always run headless.</p></li>
+<li><p>WASM: A webassembly window (when libf3d is built with emscripten).</p></li>
+<li><p>UNKNOWN: An unknown window (should not happen). </p></li>
+</ul>
+</p>
 <p><em>Values:</em></p>
 <dl class="cpp enumerator">
 <dt class="sig sig-object cpp" id="_CPPv4N3f3d6window4Type4NONEE">
@@ -439,7 +447,7 @@ document.write(`
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N3f3d6window13renderToImageEb">
 <span id="_CPPv3N3f3d6window13renderToImageEb"></span><span id="_CPPv2N3f3d6window13renderToImageEb"></span><span id="f3d::window::renderToImage__b"></span><span class="target" id="classf3d_1_1window_1a5f680e97668e40cb8640a9c6d8340b57"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="classf3d_1_1image.html#_CPPv4N3f3d5imageE" title="f3d::image"><span class="n"><span class="pre">image</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">renderToImage</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">noBackground</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N3f3d6window13renderToImageEb" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Perform a render of the window to the screen and save the result in a <a class="reference internal" href="classf3d_1_1image.html#classf3d_1_1image"><span class="std std-ref">f3d::image</span></a>. of ChannelType BYTE and 3 or 4 components (RGB or RGBA). Set noBackground to true to have a transparent background. Return the resulting <a class="reference internal" href="classf3d_1_1image.html#classf3d_1_1image"><span class="std std-ref">f3d::image</span></a>. </p>
+<dd><p>Perform a render of the window to the screen and save the result in a <a class="reference internal" href="classf3d_1_1image.html#classf3d_1_1image"><span class="std std-ref">f3d::image</span></a>. of ChannelType BYTE and 3 or 4 components (RGB or RGBA). Set noBackground to true to have a transparent background. Returns the resulting <a class="reference internal" href="classf3d_1_1image.html#classf3d_1_1image"><span class="std std-ref">f3d::image</span></a>. </p>
 </dd></dl>
 
 <dl class="cpp function">
