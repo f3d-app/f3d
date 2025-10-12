@@ -1,4 +1,6 @@
-# Limitations
+# Limitations & Troubleshooting
+
+## Limitations
 
 Here is a non exhaustive list of F3D limitations:
 
@@ -9,7 +11,7 @@ Here is a non exhaustive list of F3D limitations:
 - The `--camera-zoom-factor` option require VTK >= 9.3.0
 - Information about the failure to load a file is not provided before VTK >= 9.4.0
 
-## Assimp
+### Assimp
 
 FBX, DAE, OFF, DXF, X and 3MF file formats rely on [Assimp](https://github.com/assimp/assimp) library. It comes with some known limitations:
 
@@ -19,7 +21,7 @@ FBX, DAE, OFF, DXF, X and 3MF file formats rely on [Assimp](https://github.com/a
 - 3MF files may crash at exit (issue in Assimp: https://github.com/assimp/assimp/issues/5328)
 - Only support RBGA 8-bits embedded textures
 
-## Alembic
+### Alembic
 
 ABC file formats rely on [Alembic](https://github.com/alembic/alembic) library. It comes with some known limitations:
 
@@ -28,7 +30,7 @@ ABC file formats rely on [Alembic](https://github.com/alembic/alembic) library. 
 - Does not support Subdivision Meshes.
 - Does not support Materials.
 
-## USD
+### USD
 
 USD file formats rely on [OpenUSD](https://github.com/PixarAnimationStudios/OpenUSD) library. It comes with some known limitations:
 
@@ -36,20 +38,20 @@ USD file formats rely on [OpenUSD](https://github.com/PixarAnimationStudios/Open
 - Does not support Face-varying attributes.
 - The `usd` plugin is not shipped in the python wheels yet.
 
-## VDB
+### VDB
 
 VDB file formats rely on [OpenVDB](https://github.com/AcademySoftwareFoundation/openvdb) and VTK libraries. It currently comes with some known limitations:
 
 - VDB Grid files are opened with a hard-coded 0.1 sampling rate.
 - The `vdb` plugin is not shipped in the python wheels yet.
 
-## Gaussian splatting
+### Gaussian splatting
 
 Gaussian splatting (option `--point-sprites-type=gaussian`) needs depth sorting which is done internally using a compute shader. This requires support for OpenGL 4.3 which is not supported by macOS and old GPUs/drivers.
 
-# Troubleshooting
+## Troubleshooting
 
-## General
+### General
 
 > I have built F3D with raytracing support but the denoiser is not working.
 
@@ -64,7 +66,7 @@ Your data probably contains some translucent data for some reason, turn on trans
 .ply is a generic file format, we cannot assumes it's a 3DGS, thus we do not give good presets for this specific use case.
 It's recommended to use these options: `--point-sprites-size=1 --point-sprites-type=gaussian -soyk`, but you can also add them in your [config file](CONFIGURATION_FILE.md).
 
-## Linux
+### Linux
 
 > I have a link error related to `stdc++fs` not found or I'm unable to run F3D due to filesystem errors.
 
@@ -86,13 +88,13 @@ The GCC flag `-latomic` is not being added automatically with specific architect
 
 > `--rendering-backend` CLI option is not working as expected
 
-Dynamically switching rendering backend require VTK 9.4.0, you may need to update VTK or to use our [binary release](INSTALLATION.md).
+Dynamically switching rendering backend require VTK 9.4.0, you may need to update VTK or to use our binary release.
 
 > I'm unable to link C++ examples against my local F3D install directory, it complains about missing VTK symbols
 
 Make sure to have VTK installed in your system or to add VTK install lib directory to `LD_LIBRARY_PATH`.
 
-## Windows
+### Windows
 
 > Using the portable binary release, I'm unable to run F3D because Windows warns about a security risk
 
@@ -135,9 +137,9 @@ It's a limitation from the Windows "subsystem". Use `f3d-console.exe` instead.
 
 > When playing an animation, the animation appear to move too slowly
 
-This is a limitation of older VTK version before VTK 9.5.0, use our [binaries](INSTALLATION.md) or compile a recent version of VTK.
+This is a limitation of older VTK version before VTK 9.5.0, use our binaries or compile a recent version of VTK.
 
-## macOS
+### MacOS
 
 > I'm unable to use the binary release, macOS complains the file is invalid or corrupted
 
@@ -149,7 +151,7 @@ xattr -cr /Applications/F3D.app
 
 Then F3D should work as expected.
 
-## Python
+### Python
 
 > I can't find `usd` and `vdb` plugins after installing f3d with pip
 

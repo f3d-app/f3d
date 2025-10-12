@@ -413,6 +413,7 @@ void window_impl::UpdateDynamicOptions()
     renderer->SetUseTrackball(opt.interactor.trackball);
     renderer->SetInvertZoom(opt.interactor.invert_zoom);
 
+#if F3D_MODULE_UI
     std::string bindsStr = opt.ui.drop_zone.custom_binds;
     std::vector<std::pair<std::string, std::string>> dropZoneBinds;
 
@@ -434,6 +435,7 @@ void window_impl::UpdateDynamicOptions()
       }
     }
     renderer->SetDropZoneBinds(dropZoneBinds);
+#endif
   }
 
   // F3D_DEPRECATED
