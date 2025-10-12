@@ -103,19 +103,19 @@ public:
 
   /**
    * Get the light state at provided index.
-   * `light_exception` is thrown if the index is invalid.
+   * light_exception is thrown if the index is invalid.
    */
   [[nodiscard]] virtual light_state_t getLight(int index) const = 0;
 
   /**
    * Update a light at provided index with the provided light state.
-   * `light_exception` is thrown if the index is invalid.
+   * light_exception is thrown if the index is invalid.
    */
   virtual scene& updateLight(int index, const light_state_t& lightState) = 0;
 
   /**
    * Remove a light at provided index.
-   * `light_exception` is thrown if the index is invalid.
+   * light_exception is thrown if the index is invalid.
    */
   virtual scene& removeLight(int index) = 0;
 
