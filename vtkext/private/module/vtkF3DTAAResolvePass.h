@@ -50,8 +50,8 @@ private:
 
   bool HistoryInitialized = false;
 
-  double LastPosition[3];
-  double LastFocalPoint[3];
-  double LastViewUp[3];
+  double LastPosition[3] = { 0.0, 0.0, 0.0 };
+  double LastFocalPoint[3] = { 0.0, 0.0, 0.0 };
+  double LastViewUp[3] = { 0.0, 0.0, 0.0 };
 };
 #endif

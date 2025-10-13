@@ -2808,7 +2808,7 @@ void vtkF3DRenderer::EnableJitter(bool enable)
 
   while ((actor = actors->GetNextActor()))
   {
-    vtkPolyDataMapper* mapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
+    const vtkPolyDataMapper* mapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
     if (!mapper)
     {
       continue;
@@ -2817,12 +2817,12 @@ void vtkF3DRenderer::EnableJitter(bool enable)
     vtkShaderProperty* shaderProp = actor->GetShaderProperty();
     vtkUniforms* uniforms = shaderProp->GetVertexCustomUniforms();
     uniforms->SetUniform2f("jitter", jitter);
+  }
 
-    if (enable)
-    {
-      vtkInformation* information = this->GetInformation();
-      information->Remove(vtkF3DRenderPass::RENDER_UI_ONLY());
-    }
+  if (enable)
+  {
+    vtkInformation* information = this->GetInformation();
+    information->Remove(vtkF3DRenderPass::RENDER_UI_ONLY());
   }
 }
 
