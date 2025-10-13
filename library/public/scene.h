@@ -9,6 +9,23 @@
 #include <string>
 #include <vector>
 // #include <vtkDataAssembly.h>
+#include <string>
+#include <vector>
+#include <vtkActor.h>
+// #include <vtkRenderingCore/vtkActor.h>
+
+
+#ifndef NODEINFO_H
+#define NODEINFO_H
+
+struct NodeInfo
+{
+    std::string name;
+    vtkActor* actor = nullptr;
+    std::vector<NodeInfo> children;
+};
+
+#endif // NODEINFO_H
 
 namespace f3d
 {
@@ -34,6 +51,7 @@ namespace f3d
 class F3D_EXPORT scene
 {
 public:
+  virtual ~scene()= default;
   /**
    * An exception that can be thrown by the scene
    * when it failed to load a file for some reason.
@@ -150,7 +168,7 @@ public:
 protected:
   //! @cond
   scene() = default;
-  virtual ~scene() = default;
+  // virtual ~scene() = default;
   scene(const scene& opt) = delete;
   scene(scene&& opt) = delete;
   scene& operator=(const scene& opt) = delete;
@@ -167,6 +185,8 @@ public:
     {
         return ""; // default base implementation
     }
+  // virtual std::vector<NodeInfo> GetSceneHierarchyNodes();
+  virtual std::vector<NodeInfo> GetSceneHierarchyNodes() = 0;
   // virtual std::string GetSceneNodes(vtkDataAssembly* assembly);
 };
 }

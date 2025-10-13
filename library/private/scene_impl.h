@@ -69,6 +69,7 @@ public:
    */
   // void* getSceneHierarchy(void** outActorCollection) override;
   std::string getSceneHierarchy() override;
+  std::vector<NodeInfo> GetSceneHierarchyNodes() override;
   // std::string GetSceneNodes(vtkDataAssembly* assembly);
 };
 }
