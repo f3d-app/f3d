@@ -30,8 +30,6 @@ Includes
 --------
 
 
-- ``string``
-
 - ``vtkextModule.h``
 
 

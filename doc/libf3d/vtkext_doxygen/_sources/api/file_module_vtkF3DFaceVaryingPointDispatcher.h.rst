@@ -30,8 +30,6 @@ Includes
 --------
 
 
-- ``vtkPolyDataAlgorithm.h``
-
 - ``vtkextModule.h``
 
 

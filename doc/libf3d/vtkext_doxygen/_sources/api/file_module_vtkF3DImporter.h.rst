@@ -30,10 +30,6 @@ Includes
 --------
 
 
-- ``vtkImporter.h``
-
-- ``vtkVersion.h``
-
 - ``vtkextModule.h``
 
 

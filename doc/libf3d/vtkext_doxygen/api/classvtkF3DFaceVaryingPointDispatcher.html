@@ -327,9 +327,9 @@ document.write(`
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv432vtkF3DFaceVaryingPointDispatcher">
 <span id="_CPPv332vtkF3DFaceVaryingPointDispatcher"></span><span id="_CPPv232vtkF3DFaceVaryingPointDispatcher"></span><span id="vtkF3DFaceVaryingPointDispatcher"></span><span class="target" id="classvtkF3DFaceVaryingPointDispatcher"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">vtkF3DFaceVaryingPointDispatcher</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">vtkPolyDataAlgorithm</span></span><a class="headerlink" href="#_CPPv432vtkF3DFaceVaryingPointDispatcher" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>dispatch face-varying attributes by duplicating points. </p>
+<dd><p>Dispatch face-varying attributes by duplicating points. </p>
 <p>This filter processes arrays on point data in case some of them are flagged as face-varying in which case points must be duplicated before rendering</p>
-<p>Face-varying attributes are a special case between point and cell data where the number of tuples in the attributes is equal to the cell connectivity array size. For example, if we have two adjacent quads, we will have 6 points and 8 cell indices (4 per quad) Face-varying attributes, even if located on point data will have 8 tuples, and not 6 It can be seen as attributes, but this filter will normalize it by outputting 8 points. </p>
+<p>Face-varying attributes are a special case between point and cell data where the number of tuples in the attributes is equal to the cell connectivity array size. For example, if we have two adjacent quads, we will have 6 points and 8 cell indices (4 per quad). Face-varying attributes, even if located on point data will have 8 tuples, and not 6. It can be seen as attributes, but this filter will normalize it by outputting 8 points. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">

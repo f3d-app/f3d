@@ -30,10 +30,6 @@ Includes
 --------
 
 
-- ``vtkNew.h``
-
-- ``vtkObject.h``
-
 - ``vtkextModule.h``
 
 

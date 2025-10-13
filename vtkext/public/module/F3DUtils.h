@@ -10,7 +10,9 @@
 
 #include "vtkextModule.h"
 
+/// @cond
 #include <string>
+/// @endcond
 
 namespace F3DUtils
 {

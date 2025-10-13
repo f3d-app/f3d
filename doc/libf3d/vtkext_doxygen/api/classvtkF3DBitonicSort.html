@@ -328,7 +328,7 @@ document.write(`
 <dt class="sig sig-object cpp" id="_CPPv417vtkF3DBitonicSort">
 <span id="_CPPv317vtkF3DBitonicSort"></span><span id="_CPPv217vtkF3DBitonicSort"></span><span id="vtkF3DBitonicSort"></span><span class="target" id="classvtkF3DBitonicSort"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">vtkF3DBitonicSort</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">vtkObject</span></span><a class="headerlink" href="#_CPPv417vtkF3DBitonicSort" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Compute shader used to sort key/value pairs. </p>
-<p>This class is used to sort buffers based on the Bitonic Sort algorithm. Inspired by <a class="reference external" href="https://poniesandlight.co.uk/reflect/bitonic_merge_sort/">https://poniesandlight.co.uk/reflect/bitonic_merge_sort/</a> The original code can be found there: <a class="github reference external" href="https://github.com/tgfrerer/island">tgfrerer/island</a> It’s mostly rewritten but some parts are copied (MIT license, Tim Gfrerer) </p>
+<p>This class is used to sort buffers based on the Bitonic Sort algorithm. Inspired by <a class="reference external" href="https://poniesandlight.co.uk/reflect/bitonic_merge_sort/">https://poniesandlight.co.uk/reflect/bitonic_merge_sort/</a>. The original code can be found there: <a class="github reference external" href="https://github.com/tgfrerer/island">tgfrerer/island</a>. It’s mostly rewritten but some parts are copied (MIT license, Tim Gfrerer). </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
@@ -339,13 +339,37 @@ document.write(`
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N17vtkF3DBitonicSort10InitializeEiii">
 <span id="_CPPv3N17vtkF3DBitonicSort10InitializeEiii"></span><span id="_CPPv2N17vtkF3DBitonicSort10InitializeEiii"></span><span id="vtkF3DBitonicSort::Initialize__i.i.i"></span><span class="target" id="classvtkF3DBitonicSort_1a16c2b14d63d94a27412b3edb0f4a89e8"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Initialize</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">workgroupSize</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">keyType</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">valueType</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17vtkF3DBitonicSort10InitializeEiii" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Initialize the compute shaders. workgroupSize is the number of threads running in a single GPU workgroup keyType and valueType are the VTK types of the key and value to sort respectively Only VTK_DOUBLE, VTK_FLOAT, VTK_INT and VTK_UNSIGNED_INT are supported Returns true if succeeded </p>
+<dd><p>Initialize the compute shaders. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>workgroupSize</strong> – The number of threads running in a single GPU workgroup. </p></li>
+<li><p><strong>keyType</strong> – The VTK type of the key to sort. </p></li>
+<li><p><strong>valueType</strong> – The VTK type of the value to sort. Only VTK_DOUBLE, VTK_FLOAT, VTK_INT and VTK_UNSIGNED_INT are supported </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>true if succeeded. </p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N17vtkF3DBitonicSort3RunEP21vtkOpenGLRenderWindowiP21vtkOpenGLBufferObjectP21vtkOpenGLBufferObject">
 <span id="_CPPv3N17vtkF3DBitonicSort3RunEP21vtkOpenGLRenderWindowiP21vtkOpenGLBufferObjectP21vtkOpenGLBufferObject"></span><span id="_CPPv2N17vtkF3DBitonicSort3RunEP21vtkOpenGLRenderWindowiP21vtkOpenGLBufferObjectP21vtkOpenGLBufferObject"></span><span id="vtkF3DBitonicSort::Run__vtkOpenGLRenderWindowP.i.vtkOpenGLBufferObjectP.vtkOpenGLBufferObjectP"></span><span class="target" id="classvtkF3DBitonicSort_1aab9ad18a9dc9dad0848d64a2e9b982d9"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Run</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">vtkOpenGLRenderWindow</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">context</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nbPairs</span></span>, <span class="n"><span class="pre">vtkOpenGLBufferObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">keys</span></span>, <span class="n"><span class="pre">vtkOpenGLBufferObject</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">values</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N17vtkF3DBitonicSort3RunEP21vtkOpenGLRenderWindowiP21vtkOpenGLBufferObjectP21vtkOpenGLBufferObject" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Run the compute shader and sort the buffers. An OpenGL context must exists and given as input in the first argument nbPairs is the number of element in the buffer keys and values OpenGL buffers keys and values must be valid and containing data types specified when this class has been initialized Returns true if succeeded </p>
+<dd><p>Run the compute shader and sort the buffers. An OpenGL context must exists and given as input in the first argument </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nbPairs</strong> – The number of element in the buffer keys and values. </p></li>
+<li><p><strong>keys</strong> – OpenGL buffers keys. Must be valid and match data type specified during initialization. </p></li>
+<li><p><strong>values</strong> – OpenGL buffers values. Must be valid and match data type specified during initialization. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>true if succeeded. </p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
