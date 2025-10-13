@@ -60,7 +60,9 @@ public:
   point3_t getWorldFromDisplay(const point3_t& displayPoint) const override;
   point3_t getDisplayFromWorld(const point3_t& worldPoint) const override;
 
-  void SetSceneHierarchy(std::string hierarchy) override;
+  // void SetSceneHierarchy(std::string hierarchy) override;
+  void SetSceneHierarchy(const std::vector<NodeInfo>& hierarchy) override;
+
   ///@}
 
   /**
