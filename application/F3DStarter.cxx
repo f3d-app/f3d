@@ -1906,8 +1906,11 @@ void F3DStarter::LoadFileGroupInternal(
   options.ui.filename_info = filenameInfo;
   // options.ui.hierarchy = f3d::scene& scene = this->Internals->Engine->getScene();
   // options.ui.hierarchy = scene.getSceneHierarchy();
-  auto hierarchy = scene.getSceneHierarchy();
+  // auto hierarchy = scene.getSceneHierarchy();
+  // this->Internals->Engine->getWindow().SetSceneHierarchy(hierarchy);
+  auto hierarchy = scene.GetSceneHierarchyNodes(); // changed to NodeInfo vector
   this->Internals->Engine->getWindow().SetSceneHierarchy(hierarchy);
+  // this->Internals->Engine->getWindow().HierarchyNodes = hierarchy;
 }
 
 //----------------------------------------------------------------------------

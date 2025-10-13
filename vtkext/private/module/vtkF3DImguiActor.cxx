@@ -42,6 +42,7 @@
 #include <iostream> // for std::cout
 
 
+
 namespace
 {
 constexpr float LOGO_DISPLAY_WIDTH = 256.f;
@@ -402,71 +403,89 @@ void vtkF3DImguiActor::ReleaseGraphicsResources(vtkWindow* w)
 vtkF3DImguiActor::~vtkF3DImguiActor() = default;
 
 //----------------------------------------------------------------------------
+// Render a single node and its children in ImGui
+void vtkF3DImguiActor::RenderNode(NodeInfo* node)
+{
+    if (!node)
+        return;
+
+    if (node->actor)
+    {
+        // Use the actor pointer as unique ImGui ID
+        ImGui::PushID((void*)node->actor);
+
+        // Read current visibility
+        bool visible_before = (node->actor->GetVisibility() != 0);
+        bool visible = visible_before;
+
+        // Debug: print before toggling
+        // (You could optionally print to console or a log)
+        std::cout << "[DBG] RenderNode: actor = " << node->name
+                  << " visible_before = " << visible_before << std::endl;
+
+        if (ImGui::Checkbox(node->name.c_str(), &visible))
+        {
+            // The user toggled the checkbox
+            std::cout << "[DBG] Checkbox toggled for actor '" << node->name
+                      << "' (pointer=" << node->actor
+                      << "): new visible = " << visible << std::endl;
+
+            // Set visibility
+            node->actor->SetVisibility(visible ? 1 : 0);
+            // node->actor->SetVisibility(false);
+
+            // Immediately after, read back
+            bool visible_after = (node->actor->GetVisibility() != 0);
+            std::cout << "[DBG] After SetVisibility: visible_after = " << visible_after << std::endl;
+
+        }
+
+        ImGui::PopID();
+    }
+    else
+    {
+        ImGui::Text("%s", node->name.c_str());
+    }
+
+    // Recursively render children
+    for (auto& child : node->children)
+    {
+        ImGui::Indent(10);
+        RenderNode(&child);
+        ImGui::Unindent(10);
+    }
+}
+
 void vtkF3DImguiActor::RenderSceneHierarchy()
 {
-    // std::cout << "[RenderSceneHierarchy] Start rendering hierarchy..." << std::endl;
-
+    std::cout << "[DBG] RenderSceneHierarchy is called " << std::endl;
     const ImGuiViewport* viewport = ImGui::GetMainViewport();
-    if (!viewport) {
-        std::cout << "[RenderSceneHierarchy] Error: No ImGui viewport available!" << std::endl;
+    if (!viewport)
         return;
-    }
-    // std::cout << "[RenderSceneHierarchy] Viewport size: " << viewport->WorkSize.x
-              // << " x " << viewport->WorkSize.y << std::endl;
 
     ::SetupNextWindow(ImVec2(10, 10), ImVec2(300, viewport->WorkSize.y - 20));
     ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
 
-    ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
-                             ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoSavedSettings;
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar |
+                             ImGuiWindowFlags_NoResize |
+                             ImGuiWindowFlags_NoCollapse |
+                             ImGuiWindowFlags_NoSavedSettings;
 
-    // std::cout << "[RenderSceneHierarchy] Beginning ImGui window..." << std::endl;
     ImGui::Begin("Scene Hierarchy", nullptr, flags);
 
-    if (this->Hierarchy.empty()) {
-        // std::cout << "[RenderSceneHierarchy] Hierarchy is empty." << std::endl;
+    if (this->HierarchyNodes.empty())
+    {
         ImGui::Text("No hierarchy available");
         ImGui::End();
         return;
     }
 
-    // Split the comma-separated hierarchy into individual nodes
-    std::vector<std::string> nodes;
-    std::stringstream ss(this->Hierarchy);
-    std::string item;
-    while (std::getline(ss, item, ',')) {
-        // Optional: trim leading/trailing whitespace
-        item.erase(0, item.find_first_not_of(" \t\n\r"));
-        item.erase(item.find_last_not_of(" \t\n\r") + 1);
-        if (!item.empty())
-            nodes.push_back(item);
-    }
-
-    std::cout << "[RenderSceneHierarchy] Hierarchy has " << nodes.size() << " nodes." << std::endl;
-
-    // Render hierarchy as a collapsible tree
-    for (size_t i = 0; i < nodes.size(); ++i) {
-        const std::string& node = nodes[i];
-        std::cout << "[RenderSceneHierarchy] Rendering node " << i << ": " << node << std::endl;
-
-        // Make last node a leaf
-        if (i == nodes.size() - 1) {
-            ImGui::BulletText("%s", node.c_str());
-            std::cout << "[RenderSceneHierarchy] Rendered leaf node: " << node << std::endl;
-        } else {
-            ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-            if (ImGui::TreeNode(node.c_str())) {
-                std::cout << "[RenderSceneHierarchy] Rendered intermediate node: " << node << std::endl;
-                // Nothing inside intermediate nodes for now
-                ImGui::TreePop();
-            } else {
-                std::cout << "[RenderSceneHierarchy] TreeNode collapsed by default: " << node << std::endl;
-            }
-        }
+    for (auto& node : this->HierarchyNodes)
+    {
+        RenderNode(&node);
     }
 
     ImGui::End();
-    // std::cout << "[RenderSceneHierarchy] Finished rendering hierarchy." << std::endl;
 }
 
 

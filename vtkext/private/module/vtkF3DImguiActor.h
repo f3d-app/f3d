@@ -62,6 +62,7 @@ private:
   void RenderDropZone() override;
 
   void RenderSceneHierarchy() override;
+  void RenderNode(NodeInfo* node) override;
 
 
   /**

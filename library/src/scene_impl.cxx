@@ -40,6 +40,12 @@
 #include "vtkF3DGLTFImporter.h"
 // #include "vtkGLTFImporter.h"
 
+#include <vtkDataAssembly.h>
+#include <vtkProp3DCollection.h>
+#include <vtkActor.h>
+#include <vtkNew.h>
+#include <vtkCollection.h>
+#include <unordered_set>
 
 namespace fs = std::filesystem;
 
@@ -649,5 +655,51 @@ std::string scene_impl::getSceneHierarchy()
 
     return finalResult;
 }
+
+// ------------------------------------------------------
+// Return top-level hierarchy nodes (actors)
+// ------------------------------------------------------
+std::vector<NodeInfo> scene_impl::GetSceneHierarchyNodes()
+{
+    std::vector<NodeInfo> hierarchy;
+
+    if (!this->Internals)
+    {
+        std::cout << "[DEBUG] Internals null in GetSceneHierarchyNodes()" << std::endl;
+        return hierarchy;
+    }
+
+    if (!this->Internals->MetaImporter)
+    {
+        std::cout << "[DEBUG] MetaImporter null in GetSceneHierarchyNodes()" << std::endl;
+        return hierarchy;
+    }
+
+    // Get the raw hierarchy
+    std::vector<NodeInfo> rawHierarchy = this->Internals->MetaImporter->GetActorHierarchy();
+
+    std::cout << "[DEBUG] GetSceneHierarchyNodes() returned " << rawHierarchy.size() << " actors." << std::endl;
+
+    // Filter duplicates based on vtkActor*
+    std::vector<NodeInfo> uniqueHierarchy;
+    std::unordered_set<vtkActor*> seenActors;
+    for (const auto& node : rawHierarchy)
+    {
+        if (node.actor && seenActors.insert(node.actor).second) // insert only if not seen
+        {
+            uniqueHierarchy.push_back(node);
+        }
+    }
+
+    // Optional: debug output for filtered hierarchy
+    for (size_t i = 0; i < uniqueHierarchy.size(); ++i)
+    {
+        std::cout << "[DEBUG] Unique Actor " << i << ": " << uniqueHierarchy[i].name 
+                  << ", visibility=" << uniqueHierarchy[i].actor->GetVisibility() << std::endl;
+    }
+
+    return uniqueHierarchy;
+}
+
 
 }

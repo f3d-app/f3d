@@ -41,10 +41,16 @@ void vtkF3DUIActor::SetDropBinds(
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DUIActor::SetHierarchy(const std::string& info)
+// void vtkF3DUIActor::SetHierarchy(const std::string& info)
+// {
+//   this->HierarchyNodes = info;
+// }
+
+void vtkF3DUIActor::SetHierarchy(const std::vector<NodeInfo>& hierarchy)
 {
-  this->Hierarchy = info;
+    this->HierarchyNodes = hierarchy; // <-- change member variable type to vector<NodeInfo>
 }
+
 
 //----------------------------------------------------------------------------
 void vtkF3DUIActor::SetFileNameVisibility(bool show)
