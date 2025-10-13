@@ -5,6 +5,7 @@
  * This is overridden by vtkF3DImguiActor if F3D_MODULE_UI is enabled
  */
 
+
 #ifndef vtkF3DUIActor_h
 #define vtkF3DUIActor_h
 
@@ -13,6 +14,21 @@
 #include <cstdint>
 #include <deque>
 
+#include <string>
+#include <vector>
+#include <vtkActor.h>
+
+#ifndef NODEINFO_H
+#define NODEINFO_H
+
+struct NodeInfo
+{
+    std::string name;
+    vtkActor* actor = nullptr;
+    std::vector<NodeInfo> children;
+};
+
+#endif // NODEINFO_H
 class vtkOpenGLRenderWindow;
 
 class vtkF3DUIActor : public vtkProp
@@ -60,7 +76,8 @@ public:
    * Empty by default
    */
   void SetDropText(const std::string& info);
-  void SetHierarchy(const std::string& info);
+  // void SetHierarchy(const std::string& info);
+  void SetHierarchy(const std::vector<NodeInfo>& hierarchy);
 
   /**
    * Set the dropzone binds
@@ -192,6 +209,10 @@ protected:
   virtual void RenderSceneHierarchy()
   {
   }
+  virtual void RenderNode(NodeInfo*)
+  {
+  }
+
 
   /**
    * Render the filename UI widget
@@ -265,6 +286,7 @@ protected:
   double FontScale = 1.0;
 
   double BackdropOpacity = 0.9;
+  std::vector<NodeInfo> HierarchyNodes;
 
 private:
   vtkF3DUIActor(const vtkF3DUIActor&) = delete;
