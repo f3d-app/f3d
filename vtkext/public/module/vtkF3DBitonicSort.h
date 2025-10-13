@@ -30,21 +30,23 @@ public:
 
   /**
    * Initialize the compute shaders.
-   * @param workgroupSize the number of threads running in a single GPU workgroup
-   * @param keyType the VTK type of the key to sort
-   * @param valueType the VTK type of the value to sort
+   * @param workgroupSize The number of threads running in a single GPU workgroup.
+   * @param keyType The VTK type of the key to sort.
+   * @param valueType The VTK type of the value to sort.
    * Only VTK_DOUBLE, VTK_FLOAT, VTK_INT and VTK_UNSIGNED_INT are supported
-   * @return true if succeeded
+   * @return true if succeeded.
    */
   bool Initialize(int workgroupSize, int keyType, int valueType);
 
   /**
    * Run the compute shader and sort the buffers.
    * An OpenGL context must exists and given as input in the first argument
-   * @param nbPairs the number of element in the buffer keys and values
-   * @param keys OpenGL buffers keys. Must be valid and match data type specified during initialization
-   * @param values OpenGL buffers values. Must be valid and match data type specified during initialization
-   * @return true if succeeded
+   * @param nbPairs The number of element in the buffer keys and values.
+   * @param keys OpenGL buffers keys. Must be valid and match data type specified during
+   * initialization.
+   * @param values OpenGL buffers values. Must be valid and match data type specified during
+   * initialization.
+   * @return true if succeeded.
    */
   bool Run(vtkOpenGLRenderWindow* context, int nbPairs, vtkOpenGLBufferObject* keys,
     vtkOpenGLBufferObject* values);
