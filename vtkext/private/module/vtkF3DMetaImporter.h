@@ -3,6 +3,7 @@
  * @brief
  */
 
+
 #ifndef vtkF3DMetaImporter_h
 #define vtkF3DMetaImporter_h
 
@@ -25,6 +26,21 @@
 #include <optional>
 #include <string>
 #include <vector>
+
+#include <string>
+#include <vector>
+#include <vtkActor.h>
+#ifndef NODEINFO_H
+#define NODEINFO_H
+
+struct NodeInfo
+{
+    std::string name;
+    vtkActor* actor = nullptr;
+    std::vector<NodeInfo> children;
+};
+
+#endif // NODEINFO_H
 
 class vtkF3DMetaImporter : public vtkF3DImporter
 {
@@ -171,6 +187,7 @@ public:
   * Returns nullptr if no GLTF importer was added.
   */
   vtkDataAssembly* GetSceneHierarchy() override;
+  std::vector<NodeInfo> GetActorHierarchy();
 
 protected:
   vtkF3DMetaImporter();

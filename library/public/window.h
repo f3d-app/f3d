@@ -9,6 +9,21 @@
 #include <string>
 /// @endcond
 
+#include <string>
+#include <vector>
+#include <vtkActor.h>
+
+#ifndef NODEINFO_H
+#define NODEINFO_H
+
+struct NodeInfo
+{
+    std::string name;
+    vtkActor* actor = nullptr;
+    std::vector<NodeInfo> children;
+};
+#endif // NODEINFO_H
+
 namespace f3d
 {
 /**
@@ -119,7 +134,8 @@ public:
    */
   [[nodiscard]] virtual point3_t getDisplayFromWorld(const point3_t& worldPoint) const = 0;
 
-  virtual void SetSceneHierarchy(std::string hierarchy) = 0;
+  // virtual void SetSceneHierarchy(std::string hierarchy) = 0;
+  virtual void SetSceneHierarchy(const std::vector<NodeInfo>& hierarchy) = 0;
 
 protected:
   //! @cond
