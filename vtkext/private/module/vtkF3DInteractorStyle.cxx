@@ -153,48 +153,72 @@ void vtkF3DInteractorStyle::Rotate()
 
   vtkCamera* camera = ren->GetActiveCamera();
 
-  if (!ren->GetUseTrackball())
+  vtkNew<vtkTransform> Transform;
+  const double* fp = camera->GetFocalPoint();
+  double newPos[3];
+
+  if (ren->GetUseRotationAxis())
   {
-    double up[3];
-    this->InterpolateTemporaryUp(0.1, ren->GetUpVector(), up);
+    // pick whichever mouse component is larger
+    double delta = (std::abs(rxf) > std::abs(ryf)) ? rxf : ryf;
 
-    double envUpCamDirCross[3];
-    vtkMath::Cross(up, camera->GetDirectionOfProjection(), envUpCamDirCross);
-    constexpr double EPSILON = 128 * std::numeric_limits<double>::epsilon();
-    if (vtkMath::Norm(envUpCamDirCross) < EPSILON)
-    {
-      // Keep setting the temporary up to the camera's up vector until the interpolated up vector
-      // and the camera direction vector are not collinear
-      this->SetTemporaryUp(camera->GetViewUp());
-      this->InterpolateTemporaryUp(0.1, ren->GetUpVector(), up);
-    }
-
-    // Rotate camera around the focal point about the environment's up vector
-    vtkNew<vtkTransform> Transform;
     Transform->Identity();
-    const double* fp = camera->GetFocalPoint();
     Transform->Translate(+fp[0], +fp[1], +fp[2]);
-    Transform->RotateWXYZ(rxf, ren->GetUpVector());
+    Transform->RotateWXYZ(delta, ren->GetRotationAxis());
     Transform->Translate(-fp[0], -fp[1], -fp[2]);
-    Transform->TransformPoint(camera->GetPosition(), camera->GetPosition());
 
-    camera->SetViewUp(up);
+    Transform->TransformPoint(camera->GetPosition(), newPos);
+    camera->SetPosition(newPos);
 
-    // Clamp parameter to `camera->Elevation()` to maintain -90 < elevation < +90
-    constexpr double maxAbsElevation = 90 - 1e-10;
-    const double elevation = vtkMath::DegreesFromRadians(
-      vtkMath::AngleBetweenVectors(ren->GetUpVector(), camera->GetDirectionOfProjection()) -
-      vtkMath::Pi() / 2);
-    camera->Elevation(std::clamp(ryf, -maxAbsElevation - elevation, +maxAbsElevation - elevation));
-
-    camera->OrthogonalizeViewUp();
+    double newViewUp[3];
+    Transform->TransformVector(camera->GetViewUp(), newViewUp);
+    camera->SetViewUp(newViewUp);
   }
   else
   {
-    camera->Azimuth(rxf);
-    camera->Elevation(ryf);
-    camera->OrthogonalizeViewUp();
+    if (!ren->GetUseTrackball())
+    {
+      double up[3];
+      this->InterpolateTemporaryUp(0.1, ren->GetUpVector(), up);
+
+      double envUpCamDirCross[3];
+      vtkMath::Cross(up, camera->GetDirectionOfProjection(), envUpCamDirCross);
+      constexpr double EPSILON = 128 * std::numeric_limits<double>::epsilon();
+      if (vtkMath::Norm(envUpCamDirCross) < EPSILON)
+      {
+        // Keep setting the temporary up to the camera's up vector until the interpolated up vector
+        // and the camera direction vector are not collinear
+        this->SetTemporaryUp(camera->GetViewUp());
+        this->InterpolateTemporaryUp(0.1, ren->GetUpVector(), up);
+      }
+
+      // Rotate camera around the focal point about the environment's up vector
+      Transform->Identity();
+      Transform->Translate(+fp[0], +fp[1], +fp[2]);
+      Transform->RotateWXYZ(rxf, ren->GetUpVector());
+      Transform->Translate(-fp[0], -fp[1], -fp[2]);
+
+      Transform->TransformPoint(camera->GetPosition(), newPos);
+      camera->SetPosition(newPos);
+
+      // Clamp parameter to `camera->Elevation()` to maintain -90 < elevation < +90
+      constexpr double maxAbsElevation = 90 - 1e-10;
+      const double elevation = vtkMath::DegreesFromRadians(
+        vtkMath::AngleBetweenVectors(ren->GetUpVector(), camera->GetDirectionOfProjection()) -
+        vtkMath::Pi() / 2);
+      camera->Elevation(
+        std::clamp(ryf, -maxAbsElevation - elevation, +maxAbsElevation - elevation));
+
+      camera->SetViewUp(up);
+    }
+    else
+    {
+      camera->Azimuth(rxf);
+      camera->Elevation(ryf);
+    }
   }
+
+  camera->OrthogonalizeViewUp();
 
   this->UpdateRendererAfterInteraction();
 
