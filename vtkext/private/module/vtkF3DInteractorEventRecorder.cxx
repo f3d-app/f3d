@@ -31,17 +31,20 @@ void vtkF3DInteractorEventRecorder::SetInteractor(vtkRenderWindowInteractor* int
 
   this->Interactor = interactor;
 
-  // Make sure RenderEvent triggers renders
-  vtkNew<vtkCallbackCommand> renderCallback;
-  renderCallback->SetClientData(this->Interactor->GetRenderWindow());
-  renderCallback->SetCallback(
-    [](vtkObject*, unsigned long, void* clientData, void*)
-    {
-      vtkRenderWindow* window = static_cast<vtkRenderWindow*>(clientData);
-      window->Render();
-    });
+  if (this->Interactor)
+  {
+    // Make sure RenderEvent triggers renders
+    vtkNew<vtkCallbackCommand> renderCallback;
+    renderCallback->SetClientData(this->Interactor->GetRenderWindow());
+    renderCallback->SetCallback(
+      [](vtkObject*, unsigned long, void* clientData, void*)
+      {
+        vtkRenderWindow* window = static_cast<vtkRenderWindow*>(clientData);
+        window->Render();
+      });
 
-  this->Interactor->AddObserver(vtkCommand::RenderEvent, renderCallback);
+    this->Interactor->AddObserver(vtkCommand::RenderEvent, renderCallback);
+  }
 
   this->Modified();
 }
