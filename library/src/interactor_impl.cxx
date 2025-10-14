@@ -1697,12 +1697,12 @@ bool interactor_impl::playInteraction(
 
     // Make sure RenderEvent triggers renders
     vtkNew<vtkCallbackCommand> renderCallback;
-    renderCallback->SetClientData(this);
+    renderCallback->SetClientData(this->Internals->Window);
     renderCallback->SetCallback(
-      [](vtkObject*, unsigned long, void* clientData, void* callData)
+      [](vtkObject*, unsigned long, void* clientData, void*)
       {
-        interactor_impl* interactor = static_cast<interactor_impl*>(clientData);
-        interactor->Internals->Window.render();
+        vtkRenderWindow* window = static_cast<vtkRenderWindow*>(clientData);
+        window->Render();
       });
 
     this->Internals->VTKInteractor->AddObserver(vtkCommand::RenderEvent, renderCallback);
