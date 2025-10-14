@@ -34,6 +34,7 @@ void vtkF3DInteractorEventRecorder::SetInteractor(vtkRenderWindowInteractor* int
   if (this->Interactor)
   {
     // Make sure RenderEvent triggers renders
+    // TODO: Ideally, RenderEvent should be triggered from VTK side
     vtkNew<vtkCallbackCommand> renderCallback;
     renderCallback->SetClientData(this->Interactor->GetRenderWindow());
     renderCallback->SetCallback(
