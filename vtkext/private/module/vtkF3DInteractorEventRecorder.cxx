@@ -3,6 +3,7 @@
 #include <vtkCallbackCommand.h>
 #include <vtkObjectFactory.h>
 #include <vtkRenderWindowInteractor.h>
+#include <vtkRenderWindow.h>
 #include <vtkVersion.h>
 
 vtkStandardNewMacro(vtkF3DInteractorEventRecorder);
@@ -29,6 +30,19 @@ void vtkF3DInteractorEventRecorder::SetInteractor(vtkRenderWindowInteractor* int
   }
 
   this->Interactor = interactor;
+
+  // Make sure RenderEvent triggers renders
+  vtkNew<vtkCallbackCommand> renderCallback;
+  renderCallback->SetClientData(this->Interactor->GetRenderWindow());
+  renderCallback->SetCallback(
+    [](vtkObject*, unsigned long, void* clientData, void*)
+    {
+      vtkRenderWindow* window = static_cast<vtkRenderWindow*>(clientData);
+      window->Render();
+    });
+
+  this->Interactor->AddObserver(vtkCommand::RenderEvent, renderCallback);
+
   this->Modified();
 }
 

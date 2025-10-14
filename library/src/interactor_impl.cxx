@@ -1695,18 +1695,6 @@ bool interactor_impl::playInteraction(
     this->Internals->Recorder->Off();
     this->Internals->Recorder->Clear();
 
-    // Make sure RenderEvent triggers renders
-    vtkNew<vtkCallbackCommand> renderCallback;
-    renderCallback->SetClientData(&this->Internals->Window);
-    renderCallback->SetCallback(
-      [](vtkObject*, unsigned long, void* clientData, void*)
-      {
-        window_impl* window = static_cast<window_impl*>(clientData);
-        window->render();
-      });
-
-    this->Internals->VTKInteractor->AddObserver(vtkCommand::RenderEvent, renderCallback);
-
     this->Internals->StartEventLoop(loopTime, std::move(userCallBack));
     this->Internals->Recorder->SetFileName(file.string().c_str());
     this->Internals->Recorder->Play();
