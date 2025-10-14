@@ -64,10 +64,7 @@ String are formatted as is.
 
 ## Path
 
-Path are formatted by creating a [std::filesystem::path](https://en.cppreference.com/w/cpp/filesystem/path/path)
-and then collapsed using [f3d::utils::collapsePath](https://f3d.app/doc/libf3d/doxygen/api/classf3d_1_1utils.html#_CPPv4N3f3d5utils12collapsePathERKNSt10filesystem4pathERKNSt10filesystem4pathE).
-
-Path are formatted using [std::filesystem::path::string](https://en.cppreference.com/w/cpp/filesystem/path/string).
+Path are collapsed and tilda (`~`) is supported.
 
 ## Vectors
 

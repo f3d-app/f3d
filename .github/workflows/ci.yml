@@ -1047,11 +1047,10 @@ jobs:
         uses: ./source/.github/actions/wasm-ci
 
   #----------------------------------------------------------------------------
-  # generate website
+  # build webassembly example
   #----------------------------------------------------------------------------
-  generate-website:
+  webassembly-build-example:
     needs: webassembly
-    name: Generate Website
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -1059,19 +1058,6 @@ jobs:
         with:
           fetch-depth: 0
           lfs: true
-
-      - name: Build Jekyll
-        uses: actions/jekyll-build-pages@v1
-
-      - name: Install doxygen and build doxygen doc
-        working-directory: ${{github.workspace}}
-        run: |
-          pip install "sphinx==5.3.0" "pydata-sphinx-theme==0.13.1" sphinx-book-theme exhale
-          sudo apt install doxygen
-          sphinx-build -M html ./library/doxygen ./library/doxygen/build/
-          sudo mv library/doxygen/build/html _site/doc/libf3d/doxygen
-          sphinx-build -M html ./vtkext/public/doxygen ./vtkext/public/doxygen/build/
-          sudo mv vtkext/public/doxygen/build/html _site/doc/libf3d/vtkext_doxygen
 
       - name: Retrieve f3d package
         uses: actions/download-artifact@v4
@@ -1086,14 +1072,3 @@ jobs:
       - name: Build F3D web app
         working-directory: ${{github.workspace}}/examples/libf3d/web
         run: npm run build
-
-      - name: Copy F3D web app
-        run: sudo mv ${{github.workspace}}/examples/libf3d/web/dist _site/web
-
-      - name: Deploy
-        if: github.ref == 'refs/heads/master'
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: _site
-          token: ${{ secrets.GITHUB_TOKEN }}
-          clean: true

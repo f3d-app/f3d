@@ -85,4 +85,4 @@ F3D provides access to a VTK modules containing utilities that may be useful for
 - `vtkF3DImporter`: An Importer class that abstract away support for different version of VTK after some API changes.
 - `vtkF3DGLTFImporter`: An custom glTF importer class that support armatures, useful when creating other plugin supporting glTF extensions.
 
-For the complete documentation, please consult the [vtkext doxygen documentation.](https://f3d.app/doc/libf3d/vtkext_doxygen/).
+For the complete documentation, please consult the [vtkext doxygen documentation.](https://f3d.app/docs/next/category/vtkext-api-reference).
