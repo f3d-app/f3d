@@ -45,7 +45,7 @@ cmake.minimum-version = "3.21"
 ninja.make-fallback = false
 ninja.minimum-version = "1.10"
 wheel.install-dir = "f3d"
-wheel.license-files = ["LICENSE.md", "doc/THIRD_PARTY_LICENSES.md"]
+wheel.license-files = ["LICENSE.md", "THIRD_PARTY_LICENSES.md"]
 wheel.packages = []
 
 [tool.setuptools_scm]
