@@ -1,5 +1,5 @@
 /**
- * @class   vtkF3dTAAResolvePass
+ * @class   vtkF3DTAAResolvePass
  * @brief   Temporal Anti-Aliasing resolve pass
  *
  * This pass is used to resolve the jittered rendering for Temporal Anti-Aliasing.
@@ -35,12 +35,11 @@ public:
    */
   void ReleaseGraphicsResources(vtkWindow* w) override;
 
-protected:
-  void InspectCameraMovement(vtkRenderer* renderer);
-
 private:
   vtkF3DTAAResolvePass() = default;
   ~vtkF3DTAAResolvePass() override = default;
+
+  void InspectCameraMovement(vtkRenderer* renderer);
 
   vtkSmartPointer<vtkOpenGLFramebufferObject> FrameBufferObject;
   vtkSmartPointer<vtkTextureObject> ColorTexture;

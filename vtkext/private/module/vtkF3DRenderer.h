@@ -515,7 +515,7 @@ private:
   void EnableJitter(bool enable);
 
   /**
-   * Configure Halton sequence for TAA
+   * Configure Halton sequence for TAA. Valid direction values are 0 and 1.
    */
   float ConfigureHaltonSequence(int direction);
 
@@ -675,10 +675,8 @@ private:
   std::vector<double> Colormap;
   std::optional<int> ColormapDiscretization;
 
-  int TaaNx = 0;
-  int TaaDx = 1;
-  int TaaNy = 0;
-  int TaaDy = 1;
+  int TaaN[2] = { 0, 0 };
+  int TaaD[2] = { 1, 1 };
 };
 
 #endif

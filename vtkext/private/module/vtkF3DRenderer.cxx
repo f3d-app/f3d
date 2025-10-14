@@ -2791,6 +2791,9 @@ void vtkF3DRenderer::EnableJitter(bool enable)
   float jitter[2];
   if (enable)
   {
+    vtkInformation* information = this->GetInformation();
+    information->Remove(vtkF3DRenderPass::RENDER_UI_ONLY());
+
     jitter[0] = this->ConfigureHaltonSequence(0);
     jitter[1] = this->ConfigureHaltonSequence(1);
 
@@ -2819,20 +2822,15 @@ void vtkF3DRenderer::EnableJitter(bool enable)
     vtkUniforms* uniforms = shaderProp->GetVertexCustomUniforms();
     uniforms->SetUniform2f("jitter", jitter);
   }
-
-  if (enable)
-  {
-    vtkInformation* information = this->GetInformation();
-    information->Remove(vtkF3DRenderPass::RENDER_UI_ONLY());
-  }
 }
 
 //----------------------------------------------------------------------------
 float vtkF3DRenderer::ConfigureHaltonSequence(int direction)
 {
-  int base = (direction == 0) ? 2 : 3;
-  int& n = (direction == 0) ? TaaNx : TaaNy;
-  int& d = (direction == 0) ? TaaDx : TaaDy;
+  assert(direction == 0 || direction == 1);
+  int base = 2 + direction;
+  int& n = TaaN[direction];
+  int& d = TaaD[direction];
 
   int x = d - n;
   if (x == 1)

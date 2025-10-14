@@ -473,6 +473,10 @@ Enable _anti-aliasing_. This technique is used to reduce aliasing.
 
 Anti-aliasing method (`fxaa`: fast, `ssaa`: quality, `taa`: balanced)
 
+> [!WARNING]
+> `taa` forces rendering of the scene at regular interval and will introduce ghosting artifacts on animated scenes.
+> It also doesn't work with offscreen rendering (when using `--output` option)
+
 ### `-t`, `--tone-mapping` (_bool_, default: `false`)
 
 Enable generic filmic _Tone Mapping Pass_. This technique is used to map colors properly to the monitor colors.
