@@ -48,8 +48,11 @@ Release :
 - [ ] Merge F3D release into master: https://github.com/f3d-app/f3d/compare/master...release
 - [ ] Trigger a release build using https://github.com/f3d-app/f3d-superbuild actions with `vX.Y.Z` F3D version, `vX.Y.Z` sb version and prerelease publish true
 - [ ] Finalize release note and add them to the release
+- [ ] Format the release note into a changelog and commit/review/merge them into https://github.com/f3d-app/f3d
+- [ ] Update dev and nightly docs as described [here](https://f3d.app/dev/TOOLING#how-to-update-the-doc-using-latest-master), commit/review/merge into https://github.com/f3d-app/f3d-website
+- [ ] Add a **new versioned doc** as described [here](https://f3d.app/dev/TOOLING#how-to-update-the-doc-for-a-new-release), commit/review/merge into https://github.com/f3d-app/f3d-website
+- [ ] Update **download links** using `GITHUB_TOKEN=$PAT npm run update-downloads`, commit/review/merge into https://github.com/f3d-app/f3d-website
 - [ ] Release
-- [ ] Update **download links** and **changelog** in https://github.com/f3d-app/f3d `doc`
 - [ ] Communicate on discord
 - [ ] Communicate on reddit
 - [ ] Communicate on hackernews
@@ -57,7 +60,7 @@ Release :
 - [ ] Communicate on mastodon
 - [ ] Communicate on bluesky
 - [ ] Move all issue from current milestone to next milestone, close current roadmap issue and open a next roadmap issue
-- [ ] Update `doc/dev/ROADMAPS_AND_RELEASES.md` for next release
+- [ ] Update `dev/ROADMAPS_AND_RELEASES.md` for next release in https://github.com/f3d-app/f3d-website
 - [ ] Create an issue for updating dependencies in CI and superbuild
 - [ ] Update `.github/ISSUE_TEMPLATE/new_release.md` in https://github.com/f3d-app/f3d if needed
 
