@@ -2,6 +2,7 @@
 
 #include <vtkCallbackCommand.h>
 #include <vtkObjectFactory.h>
+#include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkVersion.h>
 
@@ -29,6 +30,23 @@ void vtkF3DInteractorEventRecorder::SetInteractor(vtkRenderWindowInteractor* int
   }
 
   this->Interactor = interactor;
+
+  if (this->Interactor)
+  {
+    // Make sure RenderEvent triggers renders
+    // TODO: Ideally, RenderEvent should be triggered from VTK side
+    vtkNew<vtkCallbackCommand> renderCallback;
+    renderCallback->SetClientData(this->Interactor->GetRenderWindow());
+    renderCallback->SetCallback(
+      [](vtkObject*, unsigned long, void* clientData, void*)
+      {
+        vtkRenderWindow* window = static_cast<vtkRenderWindow*>(clientData);
+        window->Render();
+      });
+
+    this->Interactor->AddObserver(vtkCommand::RenderEvent, renderCallback);
+  }
+
   this->Modified();
 }
 

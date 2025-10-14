@@ -1763,13 +1763,15 @@ void vtkF3DRenderer::UpdateActors()
   {
     this->ActorsPropertiesConfigured = false;
     this->GridConfigured = false;
+    this->MetaDataConfigured = false;
   }
   this->ImporterTimeStamp = importerMTime;
 
   // XXX: Handle animation update in importer, which may have an impact on the colormap
   // We assume animation change do not change the number of actors
   vtkMTimeType importerUpdateMTime = this->Importer->GetUpdateMTime();
-  if (this->UsingExpandingRange && importerUpdateMTime > this->ImporterTimeStamp)
+  if (this->UsingExpandingRange && (importerUpdateMTime > this->ImporterTimeStamp) &&
+    (this->EnableColoring || (!this->UseRaytracing && this->UseVolume)))
   {
     // XXX: This could be improved further to only configure mappers and actors
     // when the coloring range actually change
@@ -1778,7 +1780,6 @@ void vtkF3DRenderer::UpdateActors()
     this->PointSpritesMappersConfigured = false;
     this->VolumePropsAndMappersConfigured = false;
     this->ScalarBarActorConfigured = false;
-    this->MetaDataConfigured = false;
     this->ColoringConfigured = false;
   }
   this->ImporterUpdateTimeStamp = importerUpdateMTime;
