@@ -2,8 +2,8 @@
 
 #include <vtkCallbackCommand.h>
 #include <vtkObjectFactory.h>
-#include <vtkRenderWindowInteractor.h>
 #include <vtkRenderWindow.h>
+#include <vtkRenderWindowInteractor.h>
 #include <vtkVersion.h>
 
 vtkStandardNewMacro(vtkF3DInteractorEventRecorder);
