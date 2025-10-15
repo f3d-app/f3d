@@ -2789,6 +2789,8 @@ void vtkF3DRenderer::ConfigureJitter(bool enable)
   vtkActor* actor;
 
   float jitter[2];
+
+  // TODO: Replace this with RemoveUniform after the VTK fix is updated
   if (enable)
   {
     vtkInformation* information = this->GetInformation();
