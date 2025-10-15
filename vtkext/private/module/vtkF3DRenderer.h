@@ -510,7 +510,7 @@ private:
     bool cellFlag = false, bool inverseOpacityFlag = false);
 
   /**
-   * Screen spaced jittering for TAA
+   * Configure screen spaced jittering for TAA
    */
   void ConfigureJitter(bool enable);
 

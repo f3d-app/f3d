@@ -2790,7 +2790,8 @@ void vtkF3DRenderer::ConfigureJitter(bool enable)
 
   float jitter[2];
 
-  // TODO: Replace this with RemoveUniform after the VTK fix is updated
+  // TODO: Replace this with RemoveUniform after the VTK fix is updated,
+  // https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12534
   if (enable)
   {
     vtkInformation* information = this->GetInformation();
