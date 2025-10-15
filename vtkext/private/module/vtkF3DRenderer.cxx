@@ -1836,7 +1836,7 @@ void vtkF3DRenderer::UpdateActors()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::Render()
 {
-  this->EnableJitter(this->AntiAliasingModeEnabled == vtkF3DRenderer::AntiAliasingMode::TAA);
+  this->ConfigureJitter(this->AntiAliasingModeEnabled == vtkF3DRenderer::AntiAliasingMode::TAA);
 
   if (!this->TimerVisible)
   {
@@ -2782,7 +2782,7 @@ bool vtkF3DRenderer::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vt
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::EnableJitter(bool enable)
+void vtkF3DRenderer::ConfigureJitter(bool enable)
 {
   vtkActorCollection* actors = this->GetActors();
   actors->InitTraversal();
@@ -2828,28 +2828,29 @@ void vtkF3DRenderer::EnableJitter(bool enable)
 float vtkF3DRenderer::ConfigureHaltonSequence(int direction)
 {
   assert(direction == 0 || direction == 1);
-  int base = 2 + direction;
-  int& n = TaaN[direction];
-  int& d = TaaD[direction];
 
-  int x = d - n;
-  if (x == 1)
+  int base = 2 + direction;
+  int& numerator = this->TaaHaltonNumerator[direction];
+  int& denominator = this->TaaHaltonDenominator[direction];
+
+  int difference = denominator - numerator;
+  if (difference == 1)
   {
-    n = 1;
-    d *= base;
+    numerator = 1;
+    denominator *= base;
   }
   else
   {
-    int y = d / base;
-    while (x <= y && y > 0)
+    int quotient = denominator / base;
+    while (difference <= quotient && quotient > 0)
     {
-      y = y / base;
+      quotient = quotient / base;
     }
 
-    n = (base + 1) * y - x;
+    numerator = (base + 1) * quotient - difference;
   }
 
-  return static_cast<float>(n) / static_cast<float>(d);
+  return static_cast<float>(numerator) / static_cast<float>(denominator);
 }
 
 //----------------------------------------------------------------------------

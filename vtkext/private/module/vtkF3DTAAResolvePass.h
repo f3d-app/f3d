@@ -28,12 +28,12 @@ public:
   /**
    * Perform rendering according to a render state.
    */
-  void Render(const vtkRenderState* s) override;
+  void Render(const vtkRenderState* state) override;
 
   /**
    * Release graphics resources and ask components to release their own resources.
    */
-  void ReleaseGraphicsResources(vtkWindow* w) override;
+  void ReleaseGraphicsResources(vtkWindow* window) override;
 
 private:
   vtkF3DTAAResolvePass() = default;

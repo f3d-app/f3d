@@ -17,12 +17,12 @@
 vtkStandardNewMacro(vtkF3DTAAResolvePass);
 
 //------------------------------------------------------------------------------
-void vtkF3DTAAResolvePass::Render(const vtkRenderState* s)
+void vtkF3DTAAResolvePass::Render(const vtkRenderState* state)
 {
   vtkOpenGLClearErrorMacro();
   this->NumberOfRenderedProps = 0;
 
-  vtkRenderer* renderer = s->GetRenderer();
+  vtkRenderer* renderer = state->GetRenderer();
   vtkOpenGLRenderWindow* renWin = vtkOpenGLRenderWindow::SafeDownCast(renderer->GetRenderWindow());
   vtkOpenGLState* ostate = renWin->GetState();
 
@@ -72,7 +72,7 @@ void vtkF3DTAAResolvePass::Render(const vtkRenderState* s)
 
   renWin->GetState()->PushFramebufferBindings();
   this->RenderDelegate(
-    s, size[0], size[1], size[0], size[1], this->FrameBufferObject, this->ColorTexture);
+    state, size[0], size[1], size[0], size[1], this->FrameBufferObject, this->ColorTexture);
   renWin->GetState()->PopFramebufferBindings();
 
   if (this->QuadHelper && this->QuadHelper->ShaderChangeValue < this->GetMTime())
@@ -114,9 +114,9 @@ void vtkF3DTAAResolvePass::Render(const vtkRenderState* s)
   this->QuadHelper->Program->SetUniformi("colorTexture", this->ColorTexture->GetTextureUnit());
   this->QuadHelper->Program->SetUniformi("historyTexture", this->HistoryTexture->GetTextureUnit());
 
-  float blendFactor = this->HistoryInitialized ? 0.9f : 0.0f;
+  const float blendFactor = this->HistoryInitialized ? 0.9f : 0.0f;
   this->QuadHelper->Program->SetUniformf("blendFactor", blendFactor);
-
+  this->QuadHelper->Program->SetUniformf("blendFactor", blendFactor);
   ostate->vtkglDisable(GL_BLEND);
   ostate->vtkglDisable(GL_DEPTH_TEST);
   ostate->vtkglClear(GL_DEPTH_BUFFER_BIT);
@@ -172,20 +172,20 @@ void vtkF3DTAAResolvePass::InspectCameraMovement(vtkRenderer* renderer)
 }
 
 //------------------------------------------------------------------------------
-void vtkF3DTAAResolvePass::ReleaseGraphicsResources(vtkWindow* w)
+void vtkF3DTAAResolvePass::ReleaseGraphicsResources(vtkWindow* window)
 {
-  this->Superclass::ReleaseGraphicsResources(w);
+  this->Superclass::ReleaseGraphicsResources(window);
 
   if (this->FrameBufferObject)
   {
-    this->FrameBufferObject->ReleaseGraphicsResources(w);
+    this->FrameBufferObject->ReleaseGraphicsResources(window);
   }
   if (this->ColorTexture)
   {
-    this->ColorTexture->ReleaseGraphicsResources(w);
+    this->ColorTexture->ReleaseGraphicsResources(window);
   }
   if (this->HistoryTexture)
   {
-    this->HistoryTexture->ReleaseGraphicsResources(w);
+    this->HistoryTexture->ReleaseGraphicsResources(window);
   }
 }

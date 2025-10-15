@@ -512,10 +512,11 @@ private:
   /**
    * Screen spaced jittering for TAA
    */
-  void EnableJitter(bool enable);
+  void ConfigureJitter(bool enable);
 
   /**
-   * Configure Halton sequence for TAA. Valid direction values are 0 and 1.
+   * Configure Halton sequence for TAA. Valid direction values are 0 and 1. Returns a value that is
+   * used for jitter
    */
   float ConfigureHaltonSequence(int direction);
 
@@ -675,8 +676,8 @@ private:
   std::vector<double> Colormap;
   std::optional<int> ColormapDiscretization;
 
-  int TaaN[2] = { 0, 0 };
-  int TaaD[2] = { 1, 1 };
+  int TaaHaltonNumerator[2] = { 0, 0 };
+  int TaaHaltonDenominator[2] = { 1, 1 };
 };
 
 #endif
