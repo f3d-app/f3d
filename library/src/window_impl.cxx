@@ -19,6 +19,7 @@
 #include <vtkImageData.h>
 #include <vtkImageExport.h>
 #include <vtkInformation.h>
+#include <vtkMemoryResourceStream.h>
 #include <vtkPNGReader.h>
 #include <vtkPointGaussianMapper.h>
 #include <vtkRenderWindowInteractor.h>
@@ -312,8 +313,14 @@ window& window_impl::setIcon(const unsigned char* icon, size_t iconSize)
 {
   // XXX This code requires that the interactor has already been set on the render window
   vtkNew<vtkPNGReader> iconReader;
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+  vtkNew<vtkMemoryResourceStream> stream;
+  stream->SetBuffer(icon, iconSize);
+  iconReader->SetStream(stream);
+#else
   iconReader->SetMemoryBuffer(icon);
   iconReader->SetMemoryBufferLength(iconSize);
+#endif
   iconReader->Update();
   this->Internals->RenWin->SetIcon(iconReader->GetOutput());
   return *this;
