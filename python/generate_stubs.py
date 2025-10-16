@@ -39,6 +39,7 @@ def run_pybind11_stubgen(out_dir: Path, module: str = "f3d"):
         *("--ignore-unresolved-names", r"f3d\.(vector3_t|point3_t)"),
         # output directory so we can retrieve and post process
         *("--output-dir", out_dir),
+        "--exit-code",
     )
     with retrieve_changed_files(out_dir, f"{module}/**/*.pyi") as changed_files:
         subprocess.check_call(stubgen_cmd)
