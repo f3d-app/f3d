@@ -395,7 +395,7 @@ PYBIND11_MODULE(pyf3d, module)
            const f3d::vector3_t&, const bool&, const double&, const bool&>(),
       py::arg("type") = f3d::light_type::SCENE_LIGHT,
       py::arg("position") = f3d::point3_t({ 0.0, 0.0, 0.0 }),
-      py::arg("color") = f3d::color_t({ 1.0, 1.0, 1.0 }),
+      py::arg_v("color", f3d::color_t({ 1.0, 1.0, 1.0 }), "Color(1.0, 1.0, 1.0)"),
       py::arg("direction") = f3d::vector3_t({ 1.0, 0.0, 0.0 }), py::arg("positional_light") = false,
       py::arg("intensity") = 1.0, py::arg("switch_state") = true)
     .def_readwrite("type", &f3d::light_state_t::type)
