@@ -471,7 +471,11 @@ Enable _anti-aliasing_. This technique is used to reduce aliasing.
 
 ### `--anti-aliasing-mode` (_string_, default: `fxaa`)
 
-Anti-aliasing method (`fxaa`: fast, `ssaa`: quality)
+Anti-aliasing method (`fxaa`: fast, `ssaa`: quality, `taa`: balanced)
+
+> [!WARNING]
+> `taa` forces rendering of the scene at regular interval and will introduce ghosting artifacts on animated scenes.
+> It also doesn't work with offscreen rendering (when using `--output` option)
 
 ### `-t`, `--tone-mapping` (_bool_, default: `false`)
 

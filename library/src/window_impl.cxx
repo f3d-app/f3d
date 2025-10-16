@@ -492,10 +492,14 @@ void window_impl::UpdateDynamicOptions()
     {
       aaMode = vtkF3DRenderer::AntiAliasingMode::SSAA;
     }
+    else if (opt.render.effect.antialiasing.mode == "taa")
+    {
+      aaMode = vtkF3DRenderer::AntiAliasingMode::TAA;
+    }
     else
     {
       log::warn(opt.render.effect.antialiasing.mode,
-        R"( is an invalid antialiasing mode. Valid modes are: "fxaa", "ssaa")");
+        R"( is an invalid antialiasing mode. Valid modes are: "fxaa", "ssaa", "taa)");
     }
   }
 

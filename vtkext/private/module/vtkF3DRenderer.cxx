@@ -10,6 +10,7 @@
 #include "vtkF3DPolyDataMapper.h"
 #include "vtkF3DRenderPass.h"
 #include "vtkF3DSolidBackgroundPass.h"
+#include "vtkF3DTAAResolvePass.h"
 #include "vtkF3DUserRenderPass.h"
 
 #include <vtkAxesActor.h>
@@ -44,6 +45,7 @@
 #include <vtkRenderWindow.h>
 #include <vtkSSAAPass.h>
 #include <vtkScalarBarActor.h>
+#include <vtkShaderProperty.h>
 #include <vtkSkybox.h>
 #include <vtkTable.h>
 #include <vtkTextActor.h>
@@ -51,6 +53,7 @@
 #include <vtkTextureObject.h>
 #include <vtkToneMappingPass.h>
 #include <vtkTransform.h>
+#include <vtkUniforms.h>
 #include <vtkVersion.h>
 #include <vtkVolumeProperty.h>
 #include <vtkXMLImageDataReader.h>
@@ -437,6 +440,13 @@ void vtkF3DRenderer::ConfigureRenderPasses()
 
     this->SetPass(fxaaP);
     renderingPass = fxaaP;
+  }
+
+  if (this->AntiAliasingModeEnabled == vtkF3DRenderer::AntiAliasingMode::TAA)
+  {
+    vtkNew<vtkF3DTAAResolvePass> taaP;
+    taaP->SetDelegatePass(renderingPass);
+    renderingPass = taaP;
   }
 
   if (this->FinalShader.has_value())
@@ -1826,6 +1836,8 @@ void vtkF3DRenderer::UpdateActors()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::Render()
 {
+  this->ConfigureJitter(this->AntiAliasingModeEnabled == vtkF3DRenderer::AntiAliasingMode::TAA);
+
   if (!this->TimerVisible)
   {
     this->Superclass::Render();
@@ -2767,6 +2779,81 @@ bool vtkF3DRenderer::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vt
 
   volume->SetProperty(property);
   return true;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ConfigureJitter(bool enable)
+{
+  vtkActorCollection* actors = this->GetActors();
+  actors->InitTraversal();
+  vtkActor* actor;
+
+  float jitter[2];
+
+  // TODO: Replace this with RemoveUniform after the VTK fix is updated,
+  // https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12534
+  if (enable)
+  {
+    vtkInformation* information = this->GetInformation();
+    information->Remove(vtkF3DRenderPass::RENDER_UI_ONLY());
+
+    jitter[0] = this->ConfigureHaltonSequence(0);
+    jitter[1] = this->ConfigureHaltonSequence(1);
+
+    vtkRenderWindow* renderWindow = this->GetRenderWindow();
+    int width = renderWindow->GetSize()[0];
+    int height = renderWindow->GetSize()[1];
+
+    jitter[0] = ((jitter[0] - 0.5f) / width) * 2.0f;
+    jitter[1] = ((jitter[1] - 0.5f) / height) * 2.0f;
+  }
+  else
+  {
+    jitter[0] = 0.0f;
+    jitter[1] = 0.0f;
+  }
+
+  while ((actor = actors->GetNextActor()))
+  {
+    const vtkPolyDataMapper* mapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
+    if (!mapper)
+    {
+      continue;
+    }
+
+    vtkShaderProperty* shaderProp = actor->GetShaderProperty();
+    vtkUniforms* uniforms = shaderProp->GetVertexCustomUniforms();
+    uniforms->SetUniform2f("jitter", jitter);
+  }
+}
+
+//----------------------------------------------------------------------------
+float vtkF3DRenderer::ConfigureHaltonSequence(int direction)
+{
+  assert(direction == 0 || direction == 1);
+
+  int base = 2 + direction;
+  int& numerator = this->TaaHaltonNumerator[direction];
+  int& denominator = this->TaaHaltonDenominator[direction];
+
+  int difference = denominator - numerator;
+  if (difference == 1)
+  {
+    numerator = 1;
+    denominator *= base;
+  }
+  else
+  {
+    int quotient = denominator / base;
+    while (difference <= quotient && quotient > 0)
+    {
+      quotient = quotient / base;
+    }
+
+    numerator = (base + 1) * quotient - difference;
+  }
+
+  return static_cast<float>(numerator) / static_cast<float>(denominator);
 }
 
 //----------------------------------------------------------------------------
