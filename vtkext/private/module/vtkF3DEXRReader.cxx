@@ -199,12 +199,25 @@ void vtkF3DEXRReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInfor
   {
     Imf::setGlobalThreadCount(std::thread::hardware_concurrency());
 
-    if (this->MemoryBuffer)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+    if (this->GetStream())
     {
-      MemStream memoryStream("EXRmemoryStream", this->MemoryBuffer, this->MemoryBufferLength);
+      // F3D only uses stream from memory
+      vtkMemoryResourceStream* stream = vtkMemoryResourceStream::SafeDownCast(this->GetStream());
+      assert(stream);
+
+      MemStream memoryStream("EXRmemoryStream", this->GetBuffer(), this->GetSize());
       Imf::RgbaInputFile file = Imf::RgbaInputFile(memoryStream);
       readContent(file);
     }
+#else
+    if (this->GetMemoryBuffer())
+    {
+      MemStream memoryStream("EXRmemoryStream", this->GetMemoryBuffer(), this->GetMemoryBufferLength());
+      Imf::RgbaInputFile file = Imf::RgbaInputFile(memoryStream);
+      readContent(file);
+    }
+#endif
     else
     {
       Imf::RgbaInputFile file(this->InternalFileName);

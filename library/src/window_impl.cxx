@@ -19,7 +19,6 @@
 #include <vtkImageData.h>
 #include <vtkImageExport.h>
 #include <vtkInformation.h>
-#include <vtkMemoryResourceStream.h>
 #include <vtkPNGReader.h>
 #include <vtkPointGaussianMapper.h>
 #include <vtkRenderWindowInteractor.h>
@@ -38,6 +37,10 @@
 
 #ifdef VTK_OPENGL_HAS_EGL
 #include <vtkF3DEGLRenderWindow.h>
+#endif
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+#include <vtkMemoryResourceStream.h>
 #endif
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)

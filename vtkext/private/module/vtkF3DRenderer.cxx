@@ -28,7 +28,6 @@
 #include <vtkLightKit.h>
 #include <vtkMath.h>
 #include <vtkMatrix4x4.h>
-#include <vtkMemoryResourceStream.h>
 #include <vtkMultiBlockDataSet.h>
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLFXAAPass.h>
@@ -62,6 +61,10 @@
 #include <vtksys/FStream.hxx>
 #include <vtksys/MD5.h>
 #include <vtksys/SystemTools.hxx>
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+#include <vtkMemoryResourceStream.h>
+#endif
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
 #include <vtkGridAxesActor3D.h>

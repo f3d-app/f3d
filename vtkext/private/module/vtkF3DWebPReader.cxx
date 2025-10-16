@@ -2,12 +2,15 @@
 
 #include "vtkFileResourceStream.h"
 #include "vtkImageData.h"
-#include "vtkMemoryResourceStream.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtksys/FStream.hxx"
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+#include <vtkMemoryResourceStream.h>
+#endif
 
 #include "webp/decode.h"
 

@@ -34,6 +34,10 @@
 #include <vtkTriangleFilter.h>
 #include <vtkVersion.h>
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+#include <vtkMemoryResourceStream.h>
+#endif
+
 #if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 3, 0)
 #include <vtkCapsuleSource.h>
 #endif
@@ -906,8 +910,14 @@ public:
           return nullptr;
         }
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+        vtkNew<vtkMemoryResourceStream> stream;
+        stream->SetBuffer(buffer.get(), asset->GetSize());
+        reader->SetStream(stream);
+#else
         reader->SetMemoryBuffer(buffer.get());
         reader->SetMemoryBufferLength(asset->GetSize());
+#endif
         reader->Update();
 
         tex = reader->GetOutput();
