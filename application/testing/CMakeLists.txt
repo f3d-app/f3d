@@ -247,7 +247,7 @@ f3d_test(NAME TestMultiblockMetaData DATA mb.vtm ARGS -m UI)
 f3d_test(NAME TestRemoveEmptyFileGroups DATA mb/mb_3_0.vtt mb/mb_0_0.vtu ARGS -n --remove-empty-file-groups UI)
 f3d_test(NAME TestMultiFileMetaData DATA mb/recursive ARGS -m --multi-file-mode=all UI)
 f3d_test(NAME TestMultiFileModeDir DATA mb ARGS -n --multi-file-mode=dir --recursive-dir-add UI)
-set(MULTIFILES 
+set(MULTIFILES
   multi-file/cube-part1of2.glb multi-file/cube-part2of2.glb
   multi-file/cube-part1of3.glb multi-file/cube-part2of3.glb multi-file/cube-part3of3.glb
   multi-file/tet-part1of2.glb multi-file/tet-part2of2.glb
@@ -949,7 +949,11 @@ if(F3D_PLUGIN_BUILD_USD)
   f3d_test(NAME TestUSDZRigged DATA RiggedSimple.usdz ARGS --load-plugins=usd --animation-time=0.3)
   f3d_test(NAME TestUSDZMaterials DATA McUsd.usdz ARGS --load-plugins=usd --camera-position=1055,912,-247 --camera-focal-point=69,173,63 THRESHOLD 0.3) # High threshold because of legacy comparison methods in VTK 9.3
   f3d_test(NAME TestUSDZMaterialsInterationReload DATA McUsd.usdz ARGS --load-plugins=usd INTERACTION NO_BASELINE) # Up
-  f3d_test(NAME TestUSDZMemEXR DATA small.usdz ARGS --load-plugins=usd)
+
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221216)
+    # Needs vtkResourceStream (https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9663)
+    f3d_test(NAME TestUSDZMemEXR DATA small.usdz ARGS --load-plugins=usd)
+  endif()
 
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${F3D_SOURCE_DIR}/plugins/usd/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")

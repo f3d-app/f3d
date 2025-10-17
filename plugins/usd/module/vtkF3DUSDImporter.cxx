@@ -890,6 +890,7 @@ public:
         if (!reader)
         {
           // cannot read the image file
+          vtkErrorWithObjectMacro(nullptr, "Cannot create reader for image: "<< assetPath);
           return nullptr;
         }
 
@@ -899,6 +900,7 @@ public:
         if (!asset)
         {
           // cannot get USD asset
+          vtkErrorWithObjectMacro(nullptr, "Cannot recover USD asset");
           return nullptr;
         }
 
@@ -907,6 +909,7 @@ public:
         if (!buffer)
         {
           // buffer invalid
+          vtkErrorWithObjectMacro(nullptr, "Cannot recover buffer");
           return nullptr;
         }
 
