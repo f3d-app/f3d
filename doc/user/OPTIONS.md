@@ -195,7 +195,7 @@ Scale fonts.
 
 ### `--command-script=<command script>` (_script_)
 
-Provide a script file containing a list of commands to be executed sequentially.
+Provide a script file containing a list of [commands](COMMANDS.md) to be executed sequentially.
 Allows automation of multiple commands or pre-defined tasks.
 
 ### `--backdrop-opacity=<opacity>` (_double_, default: `0.9`)
@@ -236,7 +236,7 @@ Model specified by default.
 ### `--opacity=<opacity>` (_double_)
 
 Set _opacity_ on the geometry. Multiplied with the base color texture when present.
-Model specified by default. Usually used with Depth Peeling option.
+Model specified by default. Usually used with `--translucency-support`.
 
 ### `--roughness=<roughness>` (_double_)
 
@@ -275,7 +275,7 @@ Model specified by default.
 
 ### `--texture-material=<texture file>` (_path_)
 
-Set the texture file to control the occlusion, roughness and metallic values of the object. Please note this will be multiplied with the roughness and metallic options, which have impactful default values. To obtain true results, use --roughness=1 --metallic=1. Must be in linear color space.
+Set the texture file to control the occlusion, roughness and metallic values of the object. Please note this will be multiplied with the roughness and metallic options, which have impactful default values. To obtain true results, use `--roughness=1` and `--metallic=1`. Must be in linear color space.
 Model specified by default.
 
 ### `--texture-emissive=<texture file>` (_path_)
@@ -301,14 +301,14 @@ Model specified by default.
 ### `--textures-transform=<transform2d>` (_transform2d_)
 
 Set the 2d transform to use for all textures applied to the model.
-Importer may set a default value depending on file type. If a default value exists, the default value is multiplied by the transform.
+Importer may set a default value depending on file type. If a default value exists, the default value is multiplied by the provided transform.
 
 ## Window options
 
 ### `--background-color=<color>` (_color_, default: `0.2, 0.2, 0.2`)
 
 Set the window _background color_.
-Ignored if _hdri_ is set.
+Ignored if `--hdri-skybox` is enabled.
 
 ### `--resolution=<width,height>` (_vector\<double\>_, default: `1000, 600`)
 
@@ -332,7 +332,7 @@ Display the _metadata_.
 
 ### `--hdri-skybox` (_bool_, default: `false`)
 
-Show the HDRI as a skybox. Overrides --background-color and --no-background.
+Show the HDRI as a skybox. Overrides `--background-color` and `--no-background`.
 
 ### `-u`, `--blur-background` (_bool_, default: `false`)
 
@@ -356,7 +356,7 @@ Enable scalar coloring if present in the file. If `--coloring-array` is not set,
 ### `--coloring-array=<array_name>` (_string_)
 
 The coloring array name to use when coloring.
-Use --verbose to recover the usable array names.
+Use `--verbose` to recover the usable array names.
 
 ### `-y`, `--comp=<comp_index>` (_int_, default: `-1`)
 
@@ -393,7 +393,7 @@ Use with the scalar option.
 
 ### `--colormap-discretization=<colors>` (_int_)
 
-Set How many distinct colors from [1, N] will be used in the colormap. Any values outside the valid range will result in smooth shading.
+Set the number of distinct colors from [1, N] will be used in the colormap. Any values outside the valid range will result in smooth shading.
 
 ### `-v`, `--volume` (_bool_, default: `false`)
 
@@ -407,7 +407,7 @@ Inverse the linear opacity function used for volume rendering.
 
 ### `--camera-position=<X,Y,Z>` (_vector\<double\>_)
 
-Set the camera position, overrides --camera-direction and camera-zoom-factor.
+Set the camera position, overrides `--camera-direction` and `--camera-zoom-factor`.
 
 ### `--camera-focal-point=<X,Y,Z>` (_vector\<double\>_)
 
