@@ -1,4 +1,3 @@
-#include <vtkExecutive.h>
 #include <vtkImageData.h>
 #include <vtkMemoryResourceStream.h>
 #include <vtkNew.h>
