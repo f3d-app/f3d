@@ -685,6 +685,8 @@ private:
 
   int TaaHaltonNumerator[2] = { 0, 0 };
   int TaaHaltonDenominator[2] = { 1, 1 };
+
+  int CurrentViewportSize[2] = { 0, 0 };
 };
 
 #endif

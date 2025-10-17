@@ -2,6 +2,7 @@
 
 #include "F3DColoringInfoHandler.h"
 #include "F3DDefaultHDRI.h"
+#include "F3DImguiStyle.h"
 #include "F3DLog.h"
 #include "vtkF3DCachedLUTTexture.h"
 #include "vtkF3DCachedSpecularTexture.h"
@@ -535,9 +536,9 @@ std::string vtkF3DRenderer::GetSceneDescription()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::UpdateAxisSize()
 {
+  int* size = this->GetSize();
   if (this->AxisRepresentation)
   {
-    int* size = this->GetSize();
     int widgetSize = static_cast<int>(std::min(size[0], size[1]) * 0.15);
     this->AxisRepresentation->SetSize(widgetSize, widgetSize);
   }
@@ -570,8 +571,9 @@ void vtkF3DRenderer::ShowAxis(bool show)
       auto containerProperty = this->AxisRepresentation->GetContainerProperty();
       if (containerProperty)
       {
-        containerProperty->SetColor(0.15, 0.15, 0.15);
-        containerProperty->SetOpacity(0.6);
+        containerProperty->SetColor(F3DImguiStyle::GetBackgroundColor().x,
+          F3DImguiStyle::GetBackgroundColor().y, F3DImguiStyle::GetBackgroundColor().z);
+        containerProperty->SetOpacity(0.7);
       }
 
       this->AxisWidget = vtkSmartPointer<vtkCameraOrientationWidget>::New();
@@ -1859,7 +1861,13 @@ void vtkF3DRenderer::Render()
 {
   this->ConfigureJitter(this->AntiAliasingModeEnabled == vtkF3DRenderer::AntiAliasingMode::TAA);
 
-  UpdateAxisSize();
+  if (int* size = this->GetSize();
+      CurrentViewportSize[0] != size[0] || CurrentViewportSize[1] != size[1])
+  {
+    UpdateAxisSize();
+    this->CurrentViewportSize[0] = size[0];
+    this->CurrentViewportSize[1] = size[1];
+  }
 
   if (!this->TimerVisible)
   {
