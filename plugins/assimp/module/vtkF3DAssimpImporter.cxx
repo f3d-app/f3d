@@ -28,8 +28,11 @@
 #include <vtkUniforms.h>
 #include <vtkUnsignedShortArray.h>
 #include <vtkVersion.h>
-
 #include <vtksys/SystemTools.hxx>
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+#include <vtkMemoryResourceStream.h>
+#endif
 
 #include <assimp/Exceptional.h>
 #include <assimp/Importer.hpp>
@@ -251,8 +254,15 @@ public:
 
       if (reader)
       {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+        vtkNew<vtkMemoryResourceStream> stream;
+        stream->SetBuffer(aTexture->pcData, aTexture->mWidth);
+        reader->SetStream(stream);
+#else
         reader->SetMemoryBuffer(aTexture->pcData);
         reader->SetMemoryBufferLength(aTexture->mWidth);
+#endif
+        reader->Update();
         vTexture->SetInputConnection(reader->GetOutputPort());
       }
     }
