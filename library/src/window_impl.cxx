@@ -39,6 +39,10 @@
 #include <vtkF3DEGLRenderWindow.h>
 #endif
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+#include <vtkMemoryResourceStream.h>
+#endif
+
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
 #include <vtkOSOpenGLRenderWindow.h>
 #endif
@@ -312,8 +316,14 @@ window& window_impl::setIcon(const unsigned char* icon, size_t iconSize)
 {
   // XXX This code requires that the interactor has already been set on the render window
   vtkNew<vtkPNGReader> iconReader;
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+  vtkNew<vtkMemoryResourceStream> stream;
+  stream->SetBuffer(icon, iconSize);
+  iconReader->SetStream(stream);
+#else
   iconReader->SetMemoryBuffer(icon);
   iconReader->SetMemoryBufferLength(iconSize);
+#endif
   iconReader->Update();
   this->Internals->RenWin->SetIcon(iconReader->GetOutput());
   return *this;

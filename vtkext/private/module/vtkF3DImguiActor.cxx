@@ -21,6 +21,10 @@
 #include <vtkTextureObject.h>
 #include <vtkVersion.h>
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+#include <vtkMemoryResourceStream.h>
+#endif
+
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
 #include <vtk_glad.h>
 #else
@@ -82,8 +86,14 @@ struct vtkF3DImguiActor::Internals
 
       // Load embedded PNG icon into texture
       vtkNew<vtkPNGReader> iconReader;
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+      vtkNew<vtkMemoryResourceStream> stream;
+      stream->SetBuffer(F3DDefaultLogo, sizeof(F3DDefaultLogo));
+      iconReader->SetStream(stream);
+#else
       iconReader->SetMemoryBuffer(F3DDefaultLogo);
       iconReader->SetMemoryBufferLength(sizeof(F3DDefaultLogo));
+#endif
       iconReader->Update();
 
       vtkImageData* imageData = iconReader->GetOutput();

@@ -65,6 +65,10 @@
 #include <vtksys/MD5.h>
 #include <vtksys/SystemTools.hxx>
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+#include <vtkMemoryResourceStream.h>
+#endif
+
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
 #include <vtkGridAxesActor3D.h>
 #endif
@@ -1071,10 +1075,16 @@ void vtkF3DRenderer::ConfigureHDRIReader()
     {
       // No valid HDRI file have been provided, read the default HDRI
       // TODO add support for memory buffer in the vtkHDRReader in VTK
-      // https://github.com/f3d-app/f3d/issues/935
+      // https://github.com/f3d-app/f3d/issues/1100
       this->HDRIReader = vtkSmartPointer<vtkPNGReader>::New();
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+      vtkNew<vtkMemoryResourceStream> stream;
+      stream->SetBuffer(F3DDefaultHDRI, sizeof(F3DDefaultHDRI));
+      this->HDRIReader->SetStream(stream);
+#else
       this->HDRIReader->SetMemoryBuffer(F3DDefaultHDRI);
       this->HDRIReader->SetMemoryBufferLength(sizeof(F3DDefaultHDRI));
+#endif
       this->UseDefaultHDRI = true;
     }
     this->HasValidHDRIReader = true;

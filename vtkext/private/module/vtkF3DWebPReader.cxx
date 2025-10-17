@@ -1,13 +1,14 @@
 #include "vtkF3DWebPReader.h"
 
-#include "vtkFileResourceStream.h"
-#include "vtkImageData.h"
-#include "vtkMemoryResourceStream.h"
-#include "vtkNew.h"
-#include "vtkObjectFactory.h"
-#include "vtkPointData.h"
-#include "vtkUnsignedCharArray.h"
-#include "vtksys/FStream.hxx"
+#include <vtkFileResourceStream.h>
+#include <vtkImageData.h>
+#include <vtkMemoryResourceStream.h>
+#include <vtkNew.h>
+#include <vtkObjectFactory.h>
+#include <vtkPointData.h>
+#include <vtkUnsignedCharArray.h>
+#include <vtkVersion.h>
+#include <vtksys/FStream.hxx>
 
 #include "webp/decode.h"
 
@@ -30,23 +31,36 @@ void vtkF3DWebPReader::ExecuteInformation()
 
   // Setup filename to read the header
   this->ComputeInternalFileName(this->DataExtent[4]);
-  if ((this->InternalFileName == nullptr || this->InternalFileName[0] == '\0') &&
-    !this->MemoryBuffer)
+  if ((this->InternalFileName == nullptr || this->InternalFileName[0] == '\0'))
   {
-    return;
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+    if (!this->GetStream())
+#else
+    if (!this->GetMemoryBuffer())
+#endif
+    {
+      return;
+    }
   }
 
-  vtkSmartPointer<vtkResourceStream> stream;
+  vtkResourceStream* stream;
+  vtkNew<vtkFileResourceStream> fileStream;
 
-  if (this->MemoryBuffer)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+  if (this->GetStream())
   {
-    vtkNew<vtkMemoryResourceStream> memStream;
-    memStream->SetBuffer(this->MemoryBuffer, this->MemoryBufferLength);
+    stream = this->GetStream();
+  }
+#else
+  vtkNew<vtkMemoryResourceStream> memStream;
+  if (this->GetMemoryBuffer())
+  {
+    memStream->SetBuffer(this->GetMemoryBuffer(), this->GetMemoryBufferLength());
     stream = memStream;
   }
+#endif
   else
   {
-    vtkNew<vtkFileResourceStream> fileStream;
     fileStream->Open(this->InternalFileName);
     stream = fileStream;
   }

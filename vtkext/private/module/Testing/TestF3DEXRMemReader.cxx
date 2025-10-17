@@ -1,5 +1,7 @@
 #include <vtkImageData.h>
+#include <vtkMemoryResourceStream.h>
 #include <vtkNew.h>
+#include <vtkVersion.h>
 
 #include "vtkF3DEXRReader.h"
 
@@ -13,8 +15,14 @@ int TestF3DEXRMemReader(int argc, char* argv[])
   reader->SetFileName("readFromMem.exr");
 
   // check failure
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+  vtkNew<vtkMemoryResourceStream> nullStream;
+  nullStream->SetBuffer(nullptr, 0);
+  reader->SetStream(nullStream);
+#else
   reader->SetMemoryBuffer("foo");
   reader->SetMemoryBufferLength(0);
+#endif
   reader->Update();
 
   // read file to buffer
@@ -34,8 +42,14 @@ int TestF3DEXRMemReader(int argc, char* argv[])
   }
 
   // set buffer and read
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+  vtkNew<vtkMemoryResourceStream> stream;
+  stream->SetBuffer(buff.data(), buff.size());
+  reader->SetStream(stream);
+#else
   reader->SetMemoryBuffer(buff.data());
   reader->SetMemoryBufferLength(buff.size());
+#endif
   reader->Update();
 
   reader->Print(cout);
@@ -46,7 +60,7 @@ int TestF3DEXRMemReader(int argc, char* argv[])
 
   if (dims[0] != 610 && dims[1] != 406)
   {
-    std::cerr << "Incorrect EXR image size." << dims[0] << ":" << dims[1] << "\n";
+    std::cerr << "Incorrect EXR image size: " << dims[0] << "x" << dims[1] << "\n";
     return EXIT_FAILURE;
   }
 
