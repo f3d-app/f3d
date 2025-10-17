@@ -561,9 +561,12 @@ void vtkF3DRenderer::ShowAxis(bool show)
       this->AxisRepresentation->SetRenderer(this);
       this->AxisRepresentation->AnchorToLowerRight();
       this->AxisRepresentation->ContainerVisibilityOn();
-      this->AxisRepresentation->SetXAxisColor(1.f, 0.f, 0.f);
-      this->AxisRepresentation->SetYAxisColor(0.f, 1.f, 0.f);
-      this->AxisRepresentation->SetZAxisColor(0.f, 0.f, 1.f);
+
+      // closest colors to red, green, blue in OKHSL space at 95% saturation and 50% lightness
+      this->AxisRepresentation->SetXAxisColor(0.841107, 0.16327, 0.120593);
+      this->AxisRepresentation->SetYAxisColor(0.19516, 0.553311, 0.174);
+      this->AxisRepresentation->SetZAxisColor(0.127357, 0.429147, 0.937383);
+
       auto containerProperty = this->AxisRepresentation->GetContainerProperty();
       if (containerProperty)
       {
