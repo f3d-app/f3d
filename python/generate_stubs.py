@@ -32,7 +32,7 @@ def run_pybind11_stubgen(out_dir: Path, module: str = "f3d"):
         *("--enum-class-locations", "SaveFormat:Image"),
         # more enums
         *("--enum-class-locations", "BindingType:Interactor"),
-        *("--enum-class-locations", "LightType:f3d"),
+        # *("--enum-class-locations", "LightType:f3d"),
         # ignore `f3d.vector3_t` and `f3d.point3_t` as we dont actually map them
         # but let them auto-convert from and to `tuple[float, float, float]`
         # (all occurrences will be postprocessed later)
