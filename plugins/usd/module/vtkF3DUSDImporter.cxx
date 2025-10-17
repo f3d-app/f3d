@@ -890,7 +890,7 @@ public:
         if (!reader)
         {
           // cannot read the image file
-          vtkErrorWithObjectMacro(nullptr, "Cannot create reader for image: "<< assetPath);
+          vtkErrorWithObjectMacro(nullptr, "Cannot create reader for image: " << assetPath);
           return nullptr;
         }
 
