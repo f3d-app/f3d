@@ -130,7 +130,8 @@ void vtkF3DEXRReader::ExecuteInformation()
 #else
     if (this->GetMemoryBuffer())
     {
-      MemStream memoryStream("EXRmemoryStream", this->GetMemoryBuffer(), this->GetMemoryBufferLength());
+      MemStream memoryStream(
+        "EXRmemoryStream", this->GetMemoryBuffer(), this->GetMemoryBufferLength());
       Imf::RgbaInputFile file = Imf::RgbaInputFile(memoryStream);
       checkChannels(file);
     }
@@ -234,7 +235,8 @@ void vtkF3DEXRReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInfor
 #else
     if (this->GetMemoryBuffer())
     {
-      MemStream memoryStream("EXRmemoryStream", this->GetMemoryBuffer(), this->GetMemoryBufferLength());
+      MemStream memoryStream(
+        "EXRmemoryStream", this->GetMemoryBuffer(), this->GetMemoryBufferLength());
       Imf::RgbaInputFile file = Imf::RgbaInputFile(memoryStream);
       readContent(file);
     }
