@@ -27,6 +27,7 @@
 #include <vtkTriangleFilter.h>
 #include <vtkUniforms.h>
 #include <vtkUnsignedShortArray.h>
+#include <vtkVersion.h>
 
 #include <vtksys/SystemTools.hxx>
 
