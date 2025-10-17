@@ -2,9 +2,11 @@
 
 #include "vtkFloatArray.h"
 #include "vtkImageData.h"
+#include "vtkMemoryResourceStream.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
+#include "vtkVersion.h"
 #include "vtksys/FStream.hxx"
 
 #include <ImfArray.h>
@@ -85,10 +87,16 @@ void vtkF3DEXRReader::ExecuteInformation()
 
   // Setup filename to read the header
   this->ComputeInternalFileName(this->DataExtent[4]);
-  if ((this->InternalFileName == nullptr || this->InternalFileName[0] == '\0') &&
-    !this->MemoryBuffer)
+  if ((this->InternalFileName == nullptr || this->InternalFileName[0] == '\0'))
   {
-    return;
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+    if (!this->GetStream())
+#else
+    if (!this->GetMemoryBuffer())
+#endif
+    {
+      return;
+    }
   }
 
   auto checkChannels = [&](Imf::RgbaInputFile& file)
@@ -108,12 +116,25 @@ void vtkF3DEXRReader::ExecuteInformation()
 
   try
   {
-    if (this->MemoryBuffer)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+    if (this->GetStream())
     {
-      MemStream memoryStream("EXRmemoryStream", this->MemoryBuffer, this->MemoryBufferLength);
+      // F3D only uses stream from memory
+      vtkMemoryResourceStream* stream = vtkMemoryResourceStream::SafeDownCast(this->GetStream());
+      assert(stream);
+
+      MemStream memoryStream("EXRmemoryStream", stream->GetBuffer(), stream->GetSize());
       Imf::RgbaInputFile file = Imf::RgbaInputFile(memoryStream);
       checkChannels(file);
     }
+#else
+    if (this->GetMemoryBuffer())
+    {
+      MemStream memoryStream("EXRmemoryStream", this->GetMemoryBuffer(), this->GetMemoryBufferLength());
+      Imf::RgbaInputFile file = Imf::RgbaInputFile(memoryStream);
+      checkChannels(file);
+    }
+#endif
     else
     {
       Imf::RgbaInputFile file(this->InternalFileName);
@@ -206,7 +227,7 @@ void vtkF3DEXRReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInfor
       vtkMemoryResourceStream* stream = vtkMemoryResourceStream::SafeDownCast(this->GetStream());
       assert(stream);
 
-      MemStream memoryStream("EXRmemoryStream", this->GetBuffer(), this->GetSize());
+      MemStream memoryStream("EXRmemoryStream", stream->GetBuffer(), stream->GetSize());
       Imf::RgbaInputFile file = Imf::RgbaInputFile(memoryStream);
       readContent(file);
     }
