@@ -6,6 +6,11 @@
 #include <vtkRenderer.h>
 #include <vtkVersion.h>
 
+namespace
+{
+constexpr double EPSILON = 128 * std::numeric_limits<double>::epsilon();
+}
+
 namespace f3d::detail
 {
 class camera_impl::internals
@@ -21,7 +26,6 @@ public:
     cam->OrthogonalizeViewUp();
     vector3_t orthogonalizedUp;
     cam->GetViewUp(orthogonalizedUp.data());
-    static constexpr double EPSILON = 128 * std::numeric_limits<double>::epsilon();
     for (size_t i = 0; vtkMath::Norm(orthogonalizedUp.data()) < EPSILON && i < up.size(); i++)
     {
       // find closest up vector that cam->OrthogonalizeViewUp() does not transform into a zero
@@ -298,13 +302,21 @@ angle_deg_t camera_impl::getYaw()
   vtkMath::Normalize(dir.data());
   vtkMath::Normalize(up);
 
+  if (vtkMath::Norm(dir.data()) <= EPSILON)
+  {
+    return 0;
+  }
+
   // Project forward vector onto up vector
   vtkMath::ProjectVector(dir.data(), up, projectedAlongUp.data());
+  if (abs(vtkMath::AngleBetweenVectors(dir.data(), up) - M_PI / 2) <= EPSILON)
+  {
+    projectedAlongUp = { 0, 0, 0 };
+  }
   vtkMath::Normalize(projectedAlongUp.data());
 
   // Projection of forward vector along the plane perpendicular to up vector
   vtkMath::Subtract(dir, projectedAlongUp, projected);
-  static constexpr double EPSILON = 128 * std::numeric_limits<double>::epsilon();
   if (vtkMath::Norm(projected.data()) <= EPSILON)
   {
     return 0;
