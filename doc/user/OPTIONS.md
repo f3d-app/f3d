@@ -397,7 +397,7 @@ Set the number of distinct colors from [1, N] will be used in the colormap. Any 
 
 ### `-v`, `--volume` (_bool_, default: `false`)
 
-Enable _volume rendering_. It is only fonctionnal for 3D image data (VTKXMLVTI, DICOM, NRRD, MetaImage files) and will display nothing with other formats. It forces coloring.
+Enable _volume rendering_. It is only functional for 3D image data (VTKXMLVTI, DICOM, NRRD, MetaImage files) and will display nothing with other formats. It forces coloring.
 
 ### `-i`, `--inverse` (_bool_, default: `false`)
 
