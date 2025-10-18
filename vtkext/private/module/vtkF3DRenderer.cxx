@@ -2,6 +2,7 @@
 
 #include "F3DColoringInfoHandler.h"
 #include "F3DDefaultHDRI.h"
+#include "F3DImguiStyle.h"
 #include "F3DLog.h"
 #include "vtkF3DCachedLUTTexture.h"
 #include "vtkF3DCachedSpecularTexture.h"
@@ -16,6 +17,8 @@
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
 #include <vtkCamera.h>
+#include <vtkCameraOrientationRepresentation.h>
+#include <vtkCameraOrientationWidget.h>
 #include <vtkCellData.h>
 #include <vtkCornerAnnotation.h>
 #include <vtkCullerCollection.h>
@@ -75,12 +78,6 @@
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
 #include <vtkSphericalHarmonics.h>
-#endif
-
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20220907)
-#include <vtkOrientationMarkerWidget.h>
-#else
-#include "vtkF3DOrientationMarkerWidget.h"
 #endif
 
 #if F3D_MODULE_RAYTRACING
@@ -538,6 +535,18 @@ std::string vtkF3DRenderer::GetSceneDescription()
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::UpdateAxisSize()
+{
+  int* size = this->GetSize();
+  if (this->AxisRepresentation)
+  {
+    // Maintain the axis widget size proportional (15%) to the shortest viewport dimension.
+    int widgetSize = static_cast<int>(std::min(size[0], size[1]) * 0.15);
+    this->AxisRepresentation->SetSize(widgetSize, widgetSize);
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowAxis(bool show)
 {
   // Dynamic visible axis
@@ -548,23 +557,35 @@ void vtkF3DRenderer::ShowAxis(bool show)
   if (this->AxisVisible != show)
   {
     this->AxisWidget = nullptr;
+    this->AxisRepresentation = nullptr;
     if (show)
     {
-      assert(this->RenderWindow->GetInteractor());
-      vtkNew<vtkAxesActor> axes;
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20220907)
-      this->AxisWidget = vtkSmartPointer<vtkOrientationMarkerWidget>::New();
-#else
-      this->AxisWidget = vtkSmartPointer<vtkF3DOrientationMarkerWidget>::New();
-#endif
-      this->AxisWidget->SetOrientationMarker(axes);
-      this->AxisWidget->SetInteractor(this->RenderWindow->GetInteractor());
-      this->AxisWidget->SetViewport(0.85, 0.0, 1.0, 0.15);
-      this->AxisWidget->On();
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20220907)
-      this->AxisWidget->InteractiveOff();
-#endif
+      this->AxisRepresentation = vtkSmartPointer<vtkCameraOrientationRepresentation>::New();
+      this->AxisRepresentation->SetRenderer(this);
+      this->AxisRepresentation->AnchorToLowerRight();
+      this->AxisRepresentation->ContainerVisibilityOn();
+
+      // Closest colors to red, green, blue in OKHSL space at 95% saturation and 50% lightness
+      this->AxisRepresentation->SetXAxisColor(0.841107, 0.16327, 0.120593);
+      this->AxisRepresentation->SetYAxisColor(0.19516, 0.553311, 0.174);
+      this->AxisRepresentation->SetZAxisColor(0.127357, 0.429147, 0.937383);
+
+      auto containerProperty = this->AxisRepresentation->GetContainerProperty();
+
+      // Adjust opacity to visually match ImGui background (VTK appears darker)
+      double opacity = std::clamp(this->UIActor->GetBackdropOpacity() * 0.8, 0.0, 1.0);
+      containerProperty->SetOpacity(opacity);
+      containerProperty->SetColor(F3DImguiStyle::GetBackgroundColor().x,
+        F3DImguiStyle::GetBackgroundColor().y, F3DImguiStyle::GetBackgroundColor().z);
+
+      this->AxisWidget = vtkSmartPointer<vtkCameraOrientationWidget>::New();
+      this->AxisWidget->SetParentRenderer(this);
+      this->AxisWidget->SetRepresentation(this->AxisRepresentation);
       this->AxisWidget->SetKeyPressActivation(false);
+      this->AxisWidget->SetProcessEvents(false);
+      this->AxisWidget->On();
+
+      this->UpdateAxisSize();
     }
 
     this->AxisVisible = show;
@@ -1847,6 +1868,14 @@ void vtkF3DRenderer::UpdateActors()
 void vtkF3DRenderer::Render()
 {
   this->ConfigureJitter(this->AntiAliasingModeEnabled == vtkF3DRenderer::AntiAliasingMode::TAA);
+
+  if (int* size = this->GetSize();
+      CurrentViewportSize[0] != size[0] || CurrentViewportSize[1] != size[1])
+  {
+    UpdateAxisSize();
+    this->CurrentViewportSize[0] = size[0];
+    this->CurrentViewportSize[1] = size[1];
+  }
 
   if (!this->TimerVisible)
   {
