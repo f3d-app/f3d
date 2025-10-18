@@ -17,6 +17,8 @@
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
 #include <vtkCamera.h>
+#include <vtkCameraOrientationRepresentation.h>
+#include <vtkCameraOrientationWidget.h>
 #include <vtkCellData.h>
 #include <vtkCornerAnnotation.h>
 #include <vtkCullerCollection.h>
@@ -72,11 +74,6 @@
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
 #include <vtkSphericalHarmonics.h>
-#endif
-
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20220907)
-#include <vtkCameraOrientationRepresentation.h>
-#include <vtkCameraOrientationWidget.h>
 #endif
 
 #if F3D_MODULE_RAYTRACING
@@ -539,6 +536,7 @@ void vtkF3DRenderer::UpdateAxisSize()
   int* size = this->GetSize();
   if (this->AxisRepresentation)
   {
+    // Maintain the axis widget size proportional (15%) to the shortest viewport dimension.
     int widgetSize = static_cast<int>(std::min(size[0], size[1]) * 0.15);
     this->AxisRepresentation->SetSize(widgetSize, widgetSize);
   }
@@ -563,18 +561,18 @@ void vtkF3DRenderer::ShowAxis(bool show)
       this->AxisRepresentation->AnchorToLowerRight();
       this->AxisRepresentation->ContainerVisibilityOn();
 
-      // closest colors to red, green, blue in OKHSL space at 95% saturation and 50% lightness
+      // Closest colors to red, green, blue in OKHSL space at 95% saturation and 50% lightness
       this->AxisRepresentation->SetXAxisColor(0.841107, 0.16327, 0.120593);
       this->AxisRepresentation->SetYAxisColor(0.19516, 0.553311, 0.174);
       this->AxisRepresentation->SetZAxisColor(0.127357, 0.429147, 0.937383);
 
       auto containerProperty = this->AxisRepresentation->GetContainerProperty();
-      if (containerProperty)
-      {
-        containerProperty->SetColor(F3DImguiStyle::GetBackgroundColor().x,
-          F3DImguiStyle::GetBackgroundColor().y, F3DImguiStyle::GetBackgroundColor().z);
-        containerProperty->SetOpacity(0.7);
-      }
+
+      // Adjust opacity to visually match ImGui background (VTK appears darker)
+      double opacity = std::clamp(this->UIActor->GetBackdropOpacity() * 0.8, 0.0, 1.0);
+      containerProperty->SetOpacity(opacity);
+      containerProperty->SetColor(F3DImguiStyle::GetBackgroundColor().x,
+        F3DImguiStyle::GetBackgroundColor().y, F3DImguiStyle::GetBackgroundColor().z);
 
       this->AxisWidget = vtkSmartPointer<vtkCameraOrientationWidget>::New();
       this->AxisWidget->SetParentRenderer(this);
