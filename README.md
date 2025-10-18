@@ -60,6 +60,14 @@ If you are an industry user of F3D and want to make sure it can keep growing and
 
 In any case, please star it on github and share the word about it!
 
+## Diamond level sponsors
+
+<p style="font-size:21px; color:black;">
+  <a href="https://www.lambdatest.com/?utm_source=f3d&utm_medium=sponsor" target="_blank">
+    <img src="https://www.lambdatest.com/blue-logo.png" style="vertical-align: middle;" width="250" height="45" />
+  </a>
+</p>
+
 # Vision
 
 As a minimalist 3D viewer F3D aims to:
