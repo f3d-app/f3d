@@ -1047,20 +1047,20 @@ jobs:
 
       # TODO: it's currently NOT using NPM, let's fix it when 3.3 is available
       - name: Build F3D web app with npm F3D package
-        working-directory: ${{github.workspace}}/examples/libf3d/web
+        working-directory: ${{github.workspace}}/source/examples/libf3d/web
         run: npm run build
 
       - name: Retrieve f3d package
         uses: actions/download-artifact@v4
         with:
           name: f3d-wasm-package
-          path: ${{github.workspace}}/examples/libf3d/web
+          path: ${{github.workspace}}/source/examples/libf3d/web
 
       # Override with the locally built package
       - name: Install f3d package
-        working-directory: ${{github.workspace}}/examples/libf3d/web
+        working-directory: ${{github.workspace}}/source/examples/libf3d/web
         run: npm install f3d-*.tgz
 
       - name: Build F3D web app with package just built from branch
-        working-directory: ${{github.workspace}}/examples/libf3d/web
+        working-directory: ${{github.workspace}}/source/examples/libf3d/web
         run: npm run build
