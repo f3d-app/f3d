@@ -6,12 +6,12 @@ const settings = {
   canvas: document.getElementById("canvas"),
   setupOptions: (options) => {
     // background must be set to black for proper blending with transparent canvas
-    options.set_color("render.background.color", 0, 0, 0);
+    options.setAsString("render.background.color", "#000000");
 
     // setup coloring
     options.toggle("model.scivis.enable");
-    options.set_string("model.scivis.array_name", "Colors");
-    options.set_integer("model.scivis.component", -2);
+    options.setAsString("model.scivis.array_name", "Colors");
+    options.setAsString("model.scivis.component", "-2");
     options.toggle("model.scivis.cells");
 
     // make it look nice
@@ -25,7 +25,7 @@ const settings = {
     options.toggle("render.grid.enable");
 
     // default to +Z
-    options.set_as_string("scene.up_direction", "+Z");
+    options.setAsString("scene.up_direction", "+Z");
   },
 };
 
@@ -50,7 +50,7 @@ f3d(settings)
       } else {
         console.error("File " + filePath + " cannot be opened");
       }
-      Module.engineInstance.getWindow().resetCamera();
+      Module.engineInstance.getWindow().getCamera().resetToBounds(0.9);
       Module.engineInstance.getWindow().render();
     };
 

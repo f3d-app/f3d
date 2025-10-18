@@ -42,7 +42,7 @@ const utils = {
 
         // compare images
         const result = Module.engineInstance.getWindow().renderToImage(true);
-        const baseline = Module.Image.create("/baseline.png");
+        const baseline = new Module.Image("/baseline.png");
         const ssim = result.compare(baseline);
 
         if (ssim <= 0.05) {
