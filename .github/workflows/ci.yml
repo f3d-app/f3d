@@ -1046,6 +1046,10 @@ jobs:
         uses: ./source/.github/actions/wasm-ci
 
       # TODO: it's currently NOT using NPM, let's fix it when 3.3 is available
+      - name: Install dependencies
+        working-directory: ${{github.workspace}}/source/examples/libf3d/web
+        run: npm install
+      
       - name: Build F3D web app with npm F3D package
         working-directory: ${{github.workspace}}/source/examples/libf3d/web
         run: npm run build
