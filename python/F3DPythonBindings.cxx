@@ -243,7 +243,6 @@ PYBIND11_MODULE(pyf3d, module)
     .value("SHIFT", f3d::interaction_bind_t::ModifierKeys::SHIFT)
     .value("CTRL_SHIFT", f3d::interaction_bind_t::ModifierKeys::CTRL_SHIFT)
     .export_values();
-
   interaction_bind.def(py::init<const f3d::interaction_bind_t::ModifierKeys&, const std::string&>())
     .def_readwrite("mod", &f3d::interaction_bind_t::mod)
     .def_readwrite("inter", &f3d::interaction_bind_t::inter)
@@ -251,6 +250,38 @@ PYBIND11_MODULE(pyf3d, module)
 
   py::class_<f3d::interactor, std::unique_ptr<f3d::interactor, py::nodelete>> interactor(
     module, "Interactor");
+
+  py::enum_<f3d::interactor::BindingType>(interactor, "BindingType")
+    .value("CYCLIC", f3d::interactor::BindingType::CYCLIC)
+    .value("NUMERICAL", f3d::interactor::BindingType::NUMERICAL)
+    .value("TOGGLE", f3d::interactor::BindingType::TOGGLE)
+    .value("OTHER", f3d::interactor::BindingType::OTHER)
+    .export_values();
+  py::enum_<f3d::interactor::MouseButton>(interactor, "MouseButton")
+    .value("LEFT", f3d::interactor::MouseButton::LEFT)
+    .value("MIDDLE", f3d::interactor::MouseButton::MIDDLE)
+    .value("RIGHT", f3d::interactor::MouseButton::RIGHT)
+    .export_values();
+
+  py::enum_<f3d::interactor::WheelDirection>(interactor, "WheelDirection")
+    .value("FORWARD", f3d::interactor::WheelDirection::FORWARD)
+    .value("BACKWARD", f3d::interactor::WheelDirection::BACKWARD)
+    .value("LEFT", f3d::interactor::WheelDirection::LEFT)
+    .value("RIGHT", f3d::interactor::WheelDirection::RIGHT)
+    .export_values();
+
+  py::enum_<f3d::interactor::InputAction>(interactor, "InputAction")
+    .value("PRESS", f3d::interactor::InputAction::PRESS)
+    .value("RELEASE", f3d::interactor::InputAction::RELEASE)
+    .export_values();
+
+  py::enum_<f3d::interactor::InputModifier>(interactor, "InputModifier")
+    .value("NONE", f3d::interactor::InputModifier::NONE)
+    .value("CTRL", f3d::interactor::InputModifier::CTRL)
+    .value("SHIFT", f3d::interactor::InputModifier::SHIFT)
+    .value("CTRL_SHIFT", f3d::interactor::InputModifier::CTRL_SHIFT)
+    .export_values();
+
   interactor //
     .def("toggle_animation", &f3d::interactor::toggleAnimation, "Toggle the animation")
     .def("start_animation", &f3d::interactor::startAnimation, "Start the animation")
@@ -293,13 +324,6 @@ PYBIND11_MODULE(pyf3d, module)
     .def("get_binding_documentation", &f3d::interactor::getBindingDocumentation)
     .def("get_binding_type", &f3d::interactor::getBindingType);
 
-  py::enum_<f3d::interactor::BindingType>(interactor, "BindingType")
-    .value("CYCLIC", f3d::interactor::BindingType::CYCLIC)
-    .value("NUMERICAL", f3d::interactor::BindingType::NUMERICAL)
-    .value("TOGGLE", f3d::interactor::BindingType::TOGGLE)
-    .value("OTHER", f3d::interactor::BindingType::OTHER)
-    .export_values();
-
   interactor
     .def("add_binding",
       py::overload_cast<const f3d::interaction_bind_t&, std::string, std::string,
@@ -316,31 +340,6 @@ PYBIND11_MODULE(pyf3d, module)
       py::arg("documentationCallback") = nullptr,
       py::arg("type") = f3d::interactor::BindingType::OTHER);
 
-  py::enum_<f3d::interactor::MouseButton>(interactor, "MouseButton")
-    .value("LEFT", f3d::interactor::MouseButton::LEFT)
-    .value("MIDDLE", f3d::interactor::MouseButton::MIDDLE)
-    .value("RIGHT", f3d::interactor::MouseButton::RIGHT)
-    .export_values();
-
-  py::enum_<f3d::interactor::WheelDirection>(interactor, "WheelDirection")
-    .value("FORWARD", f3d::interactor::WheelDirection::FORWARD)
-    .value("BACKWARD", f3d::interactor::WheelDirection::BACKWARD)
-    .value("LEFT", f3d::interactor::WheelDirection::LEFT)
-    .value("RIGHT", f3d::interactor::WheelDirection::RIGHT)
-    .export_values();
-
-  py::enum_<f3d::interactor::InputAction>(interactor, "InputAction")
-    .value("PRESS", f3d::interactor::InputAction::PRESS)
-    .value("RELEASE", f3d::interactor::InputAction::RELEASE)
-    .export_values();
-
-  py::enum_<f3d::interactor::InputModifier>(interactor, "InputModifier")
-    .value("NONE", f3d::interactor::InputModifier::NONE)
-    .value("CTRL", f3d::interactor::InputModifier::CTRL)
-    .value("SHIFT", f3d::interactor::InputModifier::SHIFT)
-    .value("CTRL_SHIFT", f3d::interactor::InputModifier::CTRL_SHIFT)
-    .export_values();
-
   // f3d::mesh_t
   py::class_<f3d::mesh_t>(module, "Mesh")
     .def(py::init<>())
@@ -355,37 +354,6 @@ PYBIND11_MODULE(pyf3d, module)
     .def_readwrite("texture_coordinates", &f3d::mesh_t::texture_coordinates)
     .def_readwrite("face_sides", &f3d::mesh_t::face_sides)
     .def_readwrite("face_indices", &f3d::mesh_t::face_indices);
-
-  // f3d::scene
-  py::class_<f3d::scene, std::unique_ptr<f3d::scene, py::nodelete>> scene(module, "Scene");
-  scene //
-    .def("supports", &f3d::scene::supports)
-    .def("clear", &f3d::scene::clear)
-    .def("add", py::overload_cast<const std::filesystem::path&>(&f3d::scene::add),
-      "Add a file the scene", py::arg("file_path"))
-    .def("add", py::overload_cast<const std::vector<std::filesystem::path>&>(&f3d::scene::add),
-      "Add multiple filepaths to the scene", py::arg("file_path_vector"))
-    .def("add", py::overload_cast<const std::vector<std::string>&>(&f3d::scene::add),
-      "Add multiple filenames to the scene", py::arg("file_name_vector"))
-    .def("add", py::overload_cast<const f3d::mesh_t&>(&f3d::scene::add),
-      "Add a surfacic mesh from memory into the scene", py::arg("mesh"))
-    .def("load_animation_time", &f3d::scene::loadAnimationTime)
-    .def("animation_time_range", &f3d::scene::animationTimeRange)
-    .def("available_animations", &f3d::scene::availableAnimations)
-    .def("add_light", &f3d::scene::addLight, "Add a light to the scene", py::arg("light_state"))
-    .def(
-      "remove_light", &f3d::scene::removeLight, "Remove a light from the scene", py::arg("index"))
-    .def("update_light", &f3d::scene::updateLight, "Update a light in the scene", py::arg("index"),
-      py::arg("light_state"))
-    .def("get_light", &f3d::scene::getLight, "Get a light from the scene", py::arg("index"))
-    .def("get_light_count", &f3d::scene::getLightCount, "Get the number of lights in the scene")
-    .def("remove_all_lights", &f3d::scene::removeAllLights, "Remove all lights from the scene");
-
-  py::enum_<f3d::light_type>(module, "LightType")
-    .value("HEADLIGHT", f3d::light_type::HEADLIGHT)
-    .value("CAMERA_LIGHT", f3d::light_type::CAMERA_LIGHT)
-    .value("SCENE_LIGHT", f3d::light_type::SCENE_LIGHT)
-    .export_values();
 
   // f3d::color_t
   py::class_<f3d::color_t>(module, "Color")
@@ -414,6 +382,12 @@ PYBIND11_MODULE(pyf3d, module)
       },
       "Set color from a tuple of (r, g, b)");
 
+  py::enum_<f3d::light_type>(module, "LightType")
+    .value("HEADLIGHT", f3d::light_type::HEADLIGHT)
+    .value("CAMERA_LIGHT", f3d::light_type::CAMERA_LIGHT)
+    .value("SCENE_LIGHT", f3d::light_type::SCENE_LIGHT)
+    .export_values();
+
   // f3d::light_state_t
   py::class_<f3d::light_state_t>(module, "LightState")
     .def(py::init<>())
@@ -421,7 +395,7 @@ PYBIND11_MODULE(pyf3d, module)
            const f3d::vector3_t&, const bool&, const double&, const bool&>(),
       py::arg("type") = f3d::light_type::SCENE_LIGHT,
       py::arg("position") = f3d::point3_t({ 0.0, 0.0, 0.0 }),
-      py::arg("color") = f3d::color_t({ 1.0, 1.0, 1.0 }),
+      py::arg_v("color", f3d::color_t({ 1.0, 1.0, 1.0 }), "Color(1.0, 1.0, 1.0)"),
       py::arg("direction") = f3d::vector3_t({ 1.0, 0.0, 0.0 }), py::arg("positional_light") = false,
       py::arg("intensity") = 1.0, py::arg("switch_state") = true)
     .def_readwrite("type", &f3d::light_state_t::type)
@@ -431,6 +405,31 @@ PYBIND11_MODULE(pyf3d, module)
     .def_readwrite("positional_light", &f3d::light_state_t::positionalLight)
     .def_readwrite("intensity", &f3d::light_state_t::intensity)
     .def_readwrite("switch_state", &f3d::light_state_t::switchState);
+
+  // f3d::scene
+  py::class_<f3d::scene, std::unique_ptr<f3d::scene, py::nodelete>> scene(module, "Scene");
+  scene //
+    .def("supports", &f3d::scene::supports)
+    .def("clear", &f3d::scene::clear)
+    .def("add", py::overload_cast<const std::filesystem::path&>(&f3d::scene::add),
+      "Add a file the scene", py::arg("file_path"))
+    .def("add", py::overload_cast<const std::vector<std::filesystem::path>&>(&f3d::scene::add),
+      "Add multiple filepaths to the scene", py::arg("file_path_vector"))
+    .def("add", py::overload_cast<const std::vector<std::string>&>(&f3d::scene::add),
+      "Add multiple filenames to the scene", py::arg("file_name_vector"))
+    .def("add", py::overload_cast<const f3d::mesh_t&>(&f3d::scene::add),
+      "Add a surfacic mesh from memory into the scene", py::arg("mesh"))
+    .def("load_animation_time", &f3d::scene::loadAnimationTime)
+    .def("animation_time_range", &f3d::scene::animationTimeRange)
+    .def("available_animations", &f3d::scene::availableAnimations)
+    .def("add_light", &f3d::scene::addLight, "Add a light to the scene", py::arg("light_state"))
+    .def(
+      "remove_light", &f3d::scene::removeLight, "Remove a light from the scene", py::arg("index"))
+    .def("update_light", &f3d::scene::updateLight, "Update a light in the scene", py::arg("index"),
+      py::arg("light_state"))
+    .def("get_light", &f3d::scene::getLight, "Get a light from the scene", py::arg("index"))
+    .def("get_light_count", &f3d::scene::getLightCount, "Get the number of lights in the scene")
+    .def("remove_all_lights", &f3d::scene::removeAllLights, "Remove all lights from the scene");
 
   // f3d::camera_state_t
   py::class_<f3d::camera_state_t>(module, "CameraState")
