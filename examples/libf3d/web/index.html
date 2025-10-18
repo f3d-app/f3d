@@ -3,9 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>F3D Web</title>
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
-    <link rel="manifest" href="manifest.json" />
+    <title>F3D Web example</title>
     <style>
       #main {
         min-height: 70vh;
@@ -18,7 +16,7 @@
         <div class="columns">
           <div class="column">
             <h1 class="title">F3D Web</h1>
-            <p class="subtitle">A WebAssembly application using libf3d</p>
+            <p class="subtitle">A WebAssembly example using libf3d</p>
           </div>
           <div class="column">
             <div class="field is-pulled-right">
@@ -127,27 +125,6 @@
               <canvas id="canvas"></canvas>
             </div>
           </div>
-        </div>
-        <div
-          class="event-log"
-          style="
-            position: absolute;
-            z-index: 10;
-            bottom: 50px;
-            width: 100%;
-            display: none;
-          "
-        >
-          <p style="text-align: center">Loading 3D object...</p>
-          <progress
-            class="progress is-primary"
-            id="progressEl"
-            value="0"
-            max="100"
-            style="transition: all 2s; width: 500px; margin: auto"
-          >
-            30%
-          </progress>
         </div>
       </section>
     </div>

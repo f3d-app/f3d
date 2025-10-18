@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "bulma": "^1.0.4",
-    "bulma-switch": "^2.0.4"
+    "bulma-switch": "^2.0.4",
+    "f3d": "file:../../.."
   }
 }
