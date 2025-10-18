@@ -308,7 +308,7 @@ CLI: `--grid`.
 
 Position the grid at the _absolute origin_ of the model's coordinate system instead of below the model.
 
-CLI: `--grid`.
+CLI: `--grid-absolute`.
 
 ### `render.grid.unit` (_double_, optional)
 
