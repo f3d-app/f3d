@@ -191,7 +191,7 @@ Can be useful to display non-ASCII filenames.
 
 ### `--font-scale=<ratio>` (_ratio_, default: `1.0`)
 
-Scale fonts.
+Scale fonts. Useful for HiDPI displays.
 
 ### `--command-script=<command script>` (_script_)
 
@@ -218,44 +218,44 @@ Set the _size_ of point sprites.
 
 ### `--point-size=<size>` (_double_)
 
-Set the _size_ of points when showing vertices. Model specified by default.
+Set the _size_ of points when showing vertices. Model-specified by default.
 
 ### `--line-width=<size>` (_double_)
 
-Set the _width_ of lines when showing edges. Model specified by default.
+Set the _width_ of lines when showing edges. Model-specified by default.
 
 ### `--backface-type=<visible|hidden>` (_string_)
 
-Set the Backface type. Model specified by default.
+Set the Backface type. Model-specified by default.
 
 ### `--color=<color>` (_color_)
 
 Set a _color_ on the geometry. Multiplied with the base color texture when present.
-Model specified by default.
+Model-specified by default.
 
 ### `--opacity=<opacity>` (_double_)
 
 Set _opacity_ on the geometry. Multiplied with the base color texture when present.
-Model specified by default. Usually used with `--translucency-support`.
+Model-specified by default. Usually used with `--translucency-support`.
 
 ### `--roughness=<roughness>` (_double_)
 
 Set the _roughness coefficient_ on the geometry (0.0-1.0). Multiplied with the material texture when present.
-Model specified by default.
+Model-specified by default.
 
 ### `--metallic=<metallic>` (_double_)
 
 Set the _metallic coefficient_ on the geometry (0.0-1.0). Multiplied with the material texture when present.
-Model specified by default.
+Model-specified by default.
 
 ### `--base-ior=<base-ior>` (_double_)
 
-Set the _index of refraction of the base layer_ (1.0-2.5). Model specified by default.
+Set the _index of refraction of the base layer_ (1.0-2.5). Model-specified by default.
 
 ### `--hdri-file=<HDRI file>` (_path_)
 
 Set the _HDRI_ image that can be used as ambient lighting and skybox.
-Valid file format are hdr, exr, png, jpg, pnm, tiff, bmp.
+Valid file format are `.hdr`, `.exr`, `.png`, `.jpg`, `.pnm`, `.tiff`, `.bmp`.
 If not set, a default is provided.
 
 ### `--hdri-ambient` (_string_)
@@ -266,37 +266,37 @@ The environment act as a light source and is reflected on the material.
 ### `--texture-matcap=<texture file>` (_path_)
 
 Set the texture file to control the material capture of the object. All other model options for surfaces are ignored if this is set. Must be in linear color space.
-Model specified by default.
+Model-specified by default.
 
 ### `--texture-base-color=<texture file>` (_path_)
 
 Set the texture file to control the color of the object. Please note this will be multiplied with the color and opacity options. Must be in sRGB color space.
-Model specified by default.
+Model-specified by default.
 
 ### `--texture-material=<texture file>` (_path_)
 
 Set the texture file to control the occlusion, roughness and metallic values of the object. Please note this will be multiplied with the roughness and metallic options, which have impactful default values. To obtain true results, use `--roughness=1` and `--metallic=1`. Must be in linear color space.
-Model specified by default.
+Model-specified by default.
 
 ### `--texture-emissive=<texture file>` (_path_)
 
 Set the texture file to control the emitted light of the object. Please note this will be multiplied with the emissive factor. Must be in sRGB color space.
-Model specified by default.
+Model-specified by default.
 
 ### `--emissive-factor=<color>` (_color_)
 
 Set the emissive factor. This value is multiplied with the emissive color when an emissive texture is present.
-Model specified by default.
+Model-specified by default.
 
 ### `--texture-normal=<texture file>` (_path_)
 
 Set the texture file to control the normal map of the object. Must be in sRGB color space.
-Model specified by default.
+Model-specified by default.
 
 ### `--normal-scale=<color>` (_double_)
 
 Set the normal scale. This value affects the strength of the normal deviation from the normal texture.
-Model specified by default.
+Model-specified by default.
 
 ### `--textures-transform=<transform2d>` (_transform2d_)
 
@@ -397,7 +397,7 @@ Set the number of distinct colors from [1, N] will be used in the colormap. Any 
 
 ### `-v`, `--volume` (_bool_, default: `false`)
 
-Enable _volume rendering_. It is only available for 3D image data (vti, dcm, nrrd, mhd files) and will display nothing with other formats. It forces coloring.
+Enable _volume rendering_. It is only fonctionnal for 3D image data (VTKXMLVTI, DICOM, NRRD, MetaImage files) and will display nothing with other formats. It forces coloring.
 
 ### `-i`, `--inverse` (_bool_, default: `false`)
 
@@ -439,7 +439,7 @@ Apply an elevation transformation to the camera, in degrees, added after other c
 
 ### `--camera-orthographic` (_bool_)
 
-Set the camera to use the orthographic projection. Model specified by default.
+Set the camera to use the orthographic projection. Model-specified by default.
 
 ## Raytracing options
 

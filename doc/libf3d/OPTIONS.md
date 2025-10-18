@@ -66,7 +66,7 @@ CLI: `--force-reader`.
 
 ### `scene.camera.orthographic` (_bool_, optional, **on load**)
 
-Set to true to force orthographic projection. Model specified by default, which is false if not specified.
+Set to true to force orthographic projection. Model-specified by default, which is false if not specified.
 
 CLI: `--camera-orthographic`.
 
@@ -88,73 +88,73 @@ CLI: `--invert-zoom`.
 
 ### `model.matcap.texture` (_path_, optional)
 
-Path to a texture file containing a material capture. All other model options for surfaces are ignored if this is set. Model specified by default.
+Path to a texture file containing a material capture. All other model options for surfaces are ignored if this is set. Model-specified by default.
 
 CLI: `--texture-matcap`.
 
 ### `model.color.opacity` (_double_, optional)
 
-Set _opacity_ on the geometry. Usually used with Depth Peeling option. Multiplied with the `model.color.texture` when present. Model specified by default.
+Set _opacity_ on the geometry. Usually used with Depth Peeling option. Multiplied with the `model.color.texture` when present. Model-specified by default.
 
 CLI: `--opacity`.
 
 ### `model.color.rgb` (_color_, optional)
 
-Set a _color_ on the geometry. Multiplied with the `model.color.texture` when present. Model specified by default.
+Set a _color_ on the geometry. Multiplied with the `model.color.texture` when present. Model-specified by default.
 
 CLI: `--color`.
 
 ### `model.color.texture` (_path_, optional)
 
-Path to a texture file that sets the color of the object. Will be multiplied with rgb and opacity. Model specified by default.
+Path to a texture file that sets the color of the object. Will be multiplied with rgb and opacity. Model-specified by default.
 
 CLI: `--texture-base-color`.
 
 ### `model.emissive.factor` (_color_, optional)
 
-Multiply the emissive color when an emissive texture is present. Model specified by default.
+Multiply the emissive color when an emissive texture is present. Model-specified by default.
 
 CLI: `--emissive-factor`.
 
 ### `model.emissive.texture` (_path_, default: ``)
 
-Path to a texture file that sets the emitted light of the object. Multiplied with the `model.emissive.factor`. Model specified by default.
+Path to a texture file that sets the emitted light of the object. Multiplied with the `model.emissive.factor`. Model-specified by default.
 
 CLI: `--texture-emissive`.
 
 ### `model.material.metallic` (_double_, optional)
 
-Set the _metallic coefficient_ on the geometry (0.0-1.0). Multiplied with the `model.material.texture` when present. Model specified by default.
+Set the _metallic coefficient_ on the geometry (between `0.0` and `1.0`). Multiplied with the `model.material.texture` when present. Model-specified by default.
 
 CLI: `--metallic`.
 
 ### `model.material.roughness` (_double_, optional)
 
-Set the _roughness coefficient_ on the geometry (0.0-1.0). Multiplied with the `model.material.texture` when present. Model specified by default.
+Set the _roughness coefficient_ on the geometry (between `0.0` and `1.0`). Multiplied with the `model.material.texture` when present. Model-specified by default.
 
 CLI: `--roughness`.
 
 ### `model.material.base_ior` (_double_, optional)
 
-Set the _index of refraction of the base layer_ (1.0-2.5). Model specified by default.
+Set the _index of refraction of the base layer_ (between `1.0` and `2.5`). Model-specified by default.
 
 CLI: `--base-ior`.
 
 ### `model.material.texture` (_path_, optional)
 
-Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object. Multiplied with the `model.material.roughness` and `model.material.metallic`, set both of them to 1.0 to get a true result. Model specified by default.
+Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object. Multiplied with the `model.material.roughness` and `model.material.metallic`, set both of them to `1.0` to get a true result. Model-specified by default.
 
 CLI: `--texture-material`.
 
 ### `model.normal.scale` (_double_, optional)
 
-Normal scale affects the strength of the normal deviation from the normal texture. Model specified by default.
+Normal scale affects the strength of the normal deviation from the normal texture. Model-specified by default.
 
 CLI: `--normal-scale`.
 
 ### `model.normal.texture` (_path_, optional)
 
-Path to a texture file that sets the normal map of the object. Model specified by default.
+Path to a texture file that sets the normal map of the object. Model-specified by default.
 
 CLI: `--texture-normal`.
 
@@ -172,7 +172,7 @@ CLI: `--cells`.
 
 ### `model.scivis.discretization` (_int_, optional)
 
-Set how many distinct colors will be used from the colormap. [1, N] will discretize, values outside that range will result in smooth shading.
+Set how many distinct colors will be used from the colormap. Should be `>=1`.
 
 CLI: `--colormap-discretization`.
 
@@ -184,7 +184,7 @@ CLI: `--colormap`.
 
 ### `model.scivis.component` (_int_, default: `-1`)
 
-Specify the component to color with. -1 means _magnitude_. -2 means _direct values_.
+Specify the component to color with. `-1` means _magnitude_. `-2` means _direct values_.
 
 CLI: `--comp`.
 
@@ -220,7 +220,7 @@ CLI: `--point-sprites-size`.
 
 ### `model.volume.enable` (_bool_, default: `false`)
 
-Enable _volume rendering_. It is only available for 3D image data (vti, dcm, nrrd, mhd files) and will display nothing with other formats. It forces coloring.
+Enable _volume rendering_. It is only available for 3D image data and will display nothing with incompatible data. It forces coloring.
 
 CLI: `--volume`.
 
@@ -252,7 +252,7 @@ CLI: `--anti-aliasing`.
 
 ### `render.effect.antialiasing.mode` (_string_, default: `fxaa`)
 
-Set the anti-aliasing technique. Valid options are: FXAA (fast), SSAA (quality), TAA (balanced)
+Set the anti-aliasing technique. Valid options are: `fxaa` (fast), `ssaa` (quality), `taa` (balanced)
 
 CLI: `--anti-aliasing-mode`.
 
@@ -276,25 +276,25 @@ CLI: `--final-shader`
 
 ### `render.line_width` (_double_, optional)
 
-Set the _width_ of lines when showing edges. Model specified by default.
+Set the _width_ of lines when showing edges. Model-specified by default.
 
 CLI: `--line-width`.
 
 ### `render.show_edges` (_bool_, optional)
 
-Set to true to show the _cell edges_. Model specified by default.
+Set to true to show the _cell edges_. Model-specified by default.
 
 CLI: `--edges`.
 
 ### `render.point_size` (_double_, optional)
 
-Set the _size_ of points when showing vertices. Model specified by default.
+Set the _size_ of points when showing vertices. Model-specified by default.
 
 CLI: `--point-size`.
 
 ### `render.backface_type` (_string_, optional)
 
-Set the Backface type, can be `visible` or `hidden`, model specified by default.
+Set the Backface type, can be `visible` or `hidden`, Model-specified by default.
 
 CLI: `--backface-type`.
 
@@ -349,7 +349,7 @@ CLI: `--denoise`.
 ### `render.hdri.file` (_path_, optional)
 
 Set the _HDRI_ image that can be used for ambient lighting and skybox.
-Valid file format are hdr, exr, png, jpg, pnm, tiff, bmp.
+Valid file format are `.hdr`, `.exr`, `.png`, `.jpg`, `.pnm`, `.tiff`, `.bmp`.
 If not set, a default is provided.
 
 CLI: `--hdri-file`.
@@ -442,7 +442,7 @@ CLI: `--font-file`.
 
 ### `ui.scale` (_ratio_, default: `1.0`)
 
-Scale fonts.
+Scale fonts. Useful for HiDPI displays.
 
 CLI: `--font-scale`.
 
