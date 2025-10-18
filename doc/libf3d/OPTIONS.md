@@ -116,7 +116,7 @@ Multiply the emissive color when an emissive texture is present. Model-specified
 
 CLI: `--emissive-factor`.
 
-### `model.emissive.texture` (_path_, default: ``)
+### `model.emissive.texture` (_path_, optional)
 
 Path to a texture file that sets the emitted light of the object. Multiplied with the `model.emissive.factor`. Model-specified by default.
 
@@ -188,7 +188,7 @@ Specify the component to color with. `-1` means _magnitude_. `-2` means _direct 
 
 CLI: `--comp`.
 
-### `model.scivis.array_name` (_string_, default: ``)
+### `model.scivis.array_name` (_string_, optional)
 
 Select the name of the array to color with.
 
