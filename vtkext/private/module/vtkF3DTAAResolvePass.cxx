@@ -75,11 +75,6 @@ void vtkF3DTAAResolvePass::Render(const vtkRenderState* state)
     state, size[0], size[1], size[0], size[1], this->FrameBufferObject, this->ColorTexture);
   renWin->GetState()->PopFramebufferBindings();
 
-  if (this->QuadHelper && this->QuadHelper->ShaderChangeValue < this->GetMTime())
-  {
-    this->QuadHelper = nullptr;
-  }
-
   if (!this->QuadHelper)
   {
     std::string TAAResolveFS = vtkOpenGLRenderUtilities::GetFullScreenQuadFragmentShaderTemplate();
@@ -103,11 +98,7 @@ void vtkF3DTAAResolvePass::Render(const vtkRenderState* state)
     renWin->GetShaderCache()->ReadyShaderProgram(this->QuadHelper->Program);
   }
 
-  if (!this->QuadHelper->Program || !this->QuadHelper->Program->GetCompiled())
-  {
-    vtkErrorMacro("Couldn't build the shader program.");
-    return;
-  }
+  assert(this->QuadHelper->Program && this->QuadHelper->Program->GetCompiled());
 
   this->HistoryTexture->Activate();
   this->ColorTexture->Activate();
@@ -137,10 +128,8 @@ void vtkF3DTAAResolvePass::Render(const vtkRenderState* state)
 void vtkF3DTAAResolvePass::InspectCameraMovement(vtkRenderer* renderer)
 {
   vtkCamera* cam = renderer->GetActiveCamera();
-  if (!cam)
-  {
-    return;
-  }
+
+  assert(cam != nullptr);
 
   double position[3];
   cam->GetPosition(position);
