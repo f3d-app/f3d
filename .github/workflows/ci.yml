@@ -1035,7 +1035,6 @@ jobs:
       F3D_DOCKER_TIMESTAMP: ${{needs.default_versions.outputs.timestamp}}
 
     steps:
-      # Note that LFS is needed in order to include the default model
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -1046,29 +1045,26 @@ jobs:
       - name: WebAssembly CI
         uses: ./source/.github/actions/wasm-ci
 
-  #----------------------------------------------------------------------------
-  # build webassembly example
-  #----------------------------------------------------------------------------
-  webassembly-build-example:
-    needs: webassembly
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          lfs: true
+      # TODO: it's currently NOT using NPM, let's fix it when 3.3 is available
+      - name: Install dependencies
+        working-directory: ${{github.workspace}}/source/examples/libf3d/web
+        run: npm install
+
+      - name: Build F3D web app with npm F3D package
+        working-directory: ${{github.workspace}}/source/examples/libf3d/web
+        run: npm run build
 
       - name: Retrieve f3d package
         uses: actions/download-artifact@v4
         with:
           name: f3d-wasm-package
-          path: ${{github.workspace}}/examples/libf3d/web
+          path: ${{github.workspace}}/source/examples/libf3d/web
 
+      # Override with the locally built package
       - name: Install f3d package
-        working-directory: ${{github.workspace}}/examples/libf3d/web
+        working-directory: ${{github.workspace}}/source/examples/libf3d/web
         run: npm install f3d-*.tgz
 
-      - name: Build F3D web app
-        working-directory: ${{github.workspace}}/examples/libf3d/web
+      - name: Build F3D web app with package just built from branch
+        working-directory: ${{github.workspace}}/source/examples/libf3d/web
         run: npm run build
