@@ -60,6 +60,14 @@ If you are an industry user of F3D and want to make sure it can keep growing and
 
 In any case, please star it on github and share the word about it!
 
+## Sponsors
+
+Many thanks to our sponsors for supporting F3D
+
+<a href="https://nlnet.nl/project/F3D/" target="_blank"><img src="https://nlnet.nl/image/logos/NGI0Core_tag.svg" height="45"/></a>
+<a href="https://www.lambdatest.com/?utm_source=f3d&utm_medium=sponsor" target="_blank"><img src="https://www.lambdatest.com/blue-logo.png" height="45" /></a>
+<a href="https://www.opendronemap.org/" target="_blank"><img src="https://f3d.app/assets/images/opendronemap-95d4ad6e24c091a06ec00e1828e1eb38.png" height="45" /></a>
+
 # Vision
 
 As a minimalist 3D viewer F3D aims to:
