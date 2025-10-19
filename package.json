@@ -1,6 +1,6 @@
 {
   "name": "f3d",
-  "version": "3.3.0-RC1",
+  "version": "3.3.0-RC2",
   "description": "Fast and minimalist 3D viewer framework",
   "exports": "./dist/f3d.js",
   "files": [
