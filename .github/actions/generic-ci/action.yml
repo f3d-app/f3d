@@ -5,13 +5,6 @@ inputs:
     description: "Name of the build"
     required: false
     default: "standard"
-  vtk_version:
-    description: "VTK version"
-    required: true
-  raytracing_label:
-    description: "Label to control raytracing"
-    required: false
-    default: "no-raytracing"
   optional_deps_label:
     description: "Label to optional dependencies"
     required: false
@@ -45,8 +38,17 @@ inputs:
   assimp_version:
     description: "Version of assimp to build"
     required: false
+  blosc_version:
+    description: "Version of blosc to build"
+    required: true
   draco_version:
     description: "Version of draco to build"
+    required: false
+  imath_version:
+    description: "Version of imath to build"
+    required: false
+  java_version:
+    description: "Version of java to install"
     required: false
   occt_version:
     description: "Version of occt to build"
@@ -57,18 +59,30 @@ inputs:
   openvdb_version:
     description: "Version of openvdb to build"
     required: false
+  ospray_version:
+    description: "Version of ospray to build"
+    required: false
   pybind11_version:
     description: "Version of pybind11 to build"
     required: false
   python_version:
     description: "Version of python to install"
     required: false
+  tbb_version:
+    description: "Version of tbb to build"
+    required: true
   usd_version:
     description: "Version of usd to build"
     required: false
-  java_version:
-    description: "Version of java to install"
-    required: false
+  vtk_version:
+    description: "VTK version"
+    required: true
+  webp_version:
+    description: "Version of webp to build"
+    required: true
+  zlib_version:
+    description: "Version of zlib to build"
+    required: true
 
 runs:
   using: "composite"
@@ -90,23 +104,31 @@ runs:
       uses: ./source/.github/actions/generic-dependencies
       with:
         cpu: ${{inputs.cpu}}
-        raytracing_label: ${{inputs.raytracing_label}}
         alembic_version: ${{inputs.alembic_version}}
         assimp_version: ${{inputs.assimp_version}}
+        blosc_version: ${{inputs.blosc_version}}
         draco_version: ${{inputs.draco_version}}
+        imath_version: ${{inputs.imath_version}}
         occt_version: ${{inputs.occt_version}}
         openexr_version: ${{inputs.openexr_version}}
         openvdb_version: ${{inputs.openvdb_version}}
+        ospray_version: ${{inputs.ospray_version}}
         pybind11_version: ${{inputs.pybind11_version}}
+        tbb_version: ${{inputs.tbb_version}}
         usd_version: ${{inputs.usd_version}}
+        webp_version: ${{inputs.webp_version}}
+        zlib_version: ${{inputs.zlib_version}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
       with:
-        vtk_version: ${{inputs.vtk_version}}
-        raytracing_label: ${{inputs.raytracing_label}}
         cpu: ${{inputs.cpu}}
+        blosc_version: ${{inputs.blosc_version}}
         openvdb_version: ${{inputs.openvdb_version}}
+        ospray_version: ${{inputs.ospray_version}}
+        tbb_version: ${{inputs.tbb_version}}
+        vtk_version: ${{inputs.vtk_version}}
+        zlib_version: ${{inputs.zlib_version}}
 
     - name: Set up Python
       if: |
@@ -149,6 +171,13 @@ runs:
       working-directory: ${{github.workspace}}
       run: echo "PATH=$env:PATH;$(pwd)\dependencies\install\bin\;$(pwd)\dependencies\install\lib\;$(pwd)\install\bin\;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
+    - name: Set DYLD_LIBRARY_PATH on macOS for OSPRay dynamic loading
+      if: |
+        runner.os == 'macOS' &&
+        inputs.ospray_version != ''
+      shell: bash
+      run: echo "DYLD_LIBRARY_PATH=$(pwd)/dependencies/install/lib" >> $GITHUB_ENV
+
     # Works around for https://github.com/actions/runner-images/issues/10055
     - name: Remove conflicting libraries for Java bindings on Windows
       if: runner.os == 'Windows'
@@ -189,7 +218,8 @@ runs:
         -DF3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
         -DF3D_MACOS_BUNDLE=${{ inputs.bundle_label == 'bundle' && 'ON' || 'OFF' }}
         -DF3D_MODULE_EXR=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
-        -DF3D_MODULE_RAYTRACING=${{ inputs.raytracing_label == 'raytracing' && 'ON' || 'OFF' }}
+        -DF3D_MODULE_WEBP=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_MODULE_RAYTRACING=${{ inputs.ospray_version != '' && 'ON' || 'OFF' }}
         -DF3D_MODULE_UI=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_MODULE_DMON=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_MODULE_TINYFILEDIALOGS=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
@@ -254,7 +284,7 @@ runs:
         runner.os == 'macOS' &&
         inputs.cpu == 'x86_64'
       shell: bash
-      run: echo "F3D_CTEST_EXCEPTIONS=(TestDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestInteractionAnimationSlow)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionCycleComp)|(TestGLTFRigArmature)|(TestInteractionNoModelScrollWheel)|(TestInteractionNoModelScrollBar)" >> $GITHUB_ENV
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestInteractionAnimationSlow)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionCycleComp)|(TestGLTFRigArmature)|(TestInteractionNoModelScrollWheel)|(TestInteractionNoModelScrollBar)|(TestInteractionTrackball)|(TestInteractionTrackballBind)" >> $GITHUB_ENV
 
     # Certain tests are failing on macOS arm64 for unknown reasons
     # https://github.com/f3d-app/f3d/issues/1276
@@ -265,7 +295,7 @@ runs:
         runner.os == 'macOS' &&
         inputs.cpu == 'arm64'
       shell: bash
-      run: echo "F3D_CTEST_EXCEPTIONS=(TestDepthPeelingToneMapping)|(TestDepthPeeling)|(TestTextureColor)|(TestDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)|(TestInteractionActors)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionAnimationSlow)|(TestInteractionConfigFileInteractions)|(TestGLTFRigArmature)|(TestInteractionRollCameraRotation)|(TestInteractionDragRotateVertical)|(TestInteractionCheatsheetConfigFile)" >> $GITHUB_ENV
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestDepthPeelingToneMapping)|(TestDepthPeeling)|(TestTextureColor)|(TestDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)|(TestInteractionActors)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionAnimationSlow)|(TestInteractionConfigFileInteractions)|(TestGLTFRigArmature)|(TestInteractionRollCameraRotation)|(TestInteractionDragRotateVertical)|(TestInteractionCheatsheetConfigFile)|(TestInteractionCheatsheetWhiteBG)|(TestInteractionCheatsheetBlackBG)|(TestInteractionCheatsheetNoFile)|(TestInteractionCheatsheetOpacity)|(TestInteractionCheatsheetAnimationName)|(TestInteractionCheatsheetSSAA)|(TestMaxSizeAboveMultiFile)" >> $GITHUB_ENV
 
     - name: Test
       shell: bash
@@ -308,13 +338,22 @@ runs:
         cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DCMAKE_PREFIX_PATH:PATH=$(pwd)/dependencies/install/ -DBUILD_TESTING=ON -B build_python source/python
         cmake --build build_python --config Release
 
-    - name: Build and configure libf3d examples
+    - name: Configure libf3d examples
       if: inputs.static_label == 'no-static'
       shell: bash
       working-directory: ${{github.workspace}}
-      run: |
-        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DBUILD_TESTING=ON -B build_examples source/examples/libf3d
-        cmake --build build_examples --config Release
+      run: >
+        cmake -Werror=dev -Werror=deprecated --warn-uninitialized
+        -B build_examples -S source/examples/libf3d
+        -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d
+        -DBUILD_TESTING=ON
+        -DF3D_EXAMPLES_EXTERNAL_GLFW=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
+
+    - name: Build libf3d examples
+      if: inputs.static_label == 'no-static'
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: cmake --build build_examples --config Release
 
     - name: Install Mesa Windows examples
       if: |

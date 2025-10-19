@@ -1,7 +1,7 @@
 # Classes Introduction
 
 This is only an introduction to libf3d classes.
-For the complete documentation, please consult the [libf3d doxygen documentation.](https://f3d.app/doc/libf3d/doxygen/).
+For the complete documentation, please consult the [libf3d doxygen documentation.](https://f3d.app/docs/next/category/libf3d-api-reference).
 
 ## Engine class
 
@@ -49,7 +49,7 @@ The commands let you interact with the libf3d in a very flexible manner.
 Interactor also lets you add and remove bindings in order to modify how
 the libf3d react to different interactions, eg. when a key is pressed or when a file is dropped.
 The libf3d has [default bindings](../user/INTERACTIONS.md) but this API lets you defined your own
-by specifying [binds](../user/CONFIGURATION_FILE.md#Bind) and commands.
+by specifying [binds](../user/CONFIGURATION_FILE.md#bindings) and commands.
 This API also lets you control the content of the cheatsheet.
 
 Use `log::setVerboseLevel(log::VerboseLevel::DEBUG)` to print debug information on interaction and command use.

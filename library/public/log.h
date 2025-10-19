@@ -3,8 +3,10 @@
 
 #include "export.h"
 
+/// @cond
 #include <sstream>
 #include <string>
+/// @endcond
 
 namespace f3d
 {
@@ -22,12 +24,11 @@ class F3D_EXPORT log
 public:
   /**
    * Enumeration of verbose levels
-   * =============================
-   * DEBUG: All logs are displayed, including from third parties.
-   * INFO: Standard logging level, the default.
-   * WARN: Only warnings and errors are displayed.
-   * ERROR: Only errors are displayed.
-   * QUIET: Logging is fully disabled.
+   * - DEBUG: All logs are displayed, including from third parties.
+   * - INFO: Standard logging level, the default.
+   * - WARN: Only warnings and errors are displayed.
+   * - ERROR: Only errors are displayed.
+   * - QUIET: Logging is fully disabled.
    */
   enum class VerboseLevel : unsigned char
   {

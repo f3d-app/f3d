@@ -14,6 +14,9 @@ inputs:
   draco_version:
     description: "Version of draco to build"
     required: false
+  imath_version:
+    description: "Version of imath to build"
+    required: false
   occt_version:
     description: "Version of occt to build"
     required: false
@@ -23,8 +26,14 @@ inputs:
   pybind11_version:
     description: "Version of pybind11 to build"
     required: false
+  tbb_version:
+    description: "Version of tbb to build"
+    required: true
   usd_version:
     description: "Version of usd to build"
+    required: false
+  webp_version:
+    description: "Version of webp to build"
     required: false
 
 runs:
@@ -52,9 +61,11 @@ runs:
         version: ${{inputs.draco_version}}
 
     - name: Install Imath dependency
+      if: inputs.imath_version != ''
       uses: ./source/.github/actions/imath-install-dep
       with:
         cpu: ${{inputs.cpu}}
+        version: ${{inputs.imath_version}}
 
     - name: Install OpenEXR dependency
       if: inputs.openexr_version != ''
@@ -62,6 +73,7 @@ runs:
       with:
         cpu: ${{inputs.cpu}}
         version: ${{inputs.openexr_version}}
+        imath_version: ${{inputs.imath_version}}
 
     - name: Install Alembic dependency
       if: inputs.alembic_version != ''
@@ -69,6 +81,7 @@ runs:
       with:
         cpu: ${{inputs.cpu}}
         version: ${{inputs.alembic_version}}
+        imath_version: ${{inputs.imath_version}}
 
     - name: Install pybind11 dependency
       if: inputs.pybind11_version != ''
@@ -83,3 +96,11 @@ runs:
         cpu: ${{inputs.cpu}}
         version: ${{inputs.usd_version}}
         openexr_version: ${{inputs.openexr_version}}
+        tbb_version: ${{inputs.tbb_version}}
+
+    - name: Install webp dependency
+      if: inputs.webp_version != ''
+      uses: ./source/.github/actions/webp-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        version: ${{inputs.webp_version}}

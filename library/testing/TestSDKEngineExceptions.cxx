@@ -10,9 +10,21 @@
 
 namespace fs = std::filesystem;
 
-int TestSDKEngineExceptions(int argc, char* argv[])
+int TestSDKEngineExceptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
+  // For coverage, check that an invalid symbol loader is not crashing
+  try
+  {
+    std::ignore = f3d::engine::createExternal([](const char*) { return nullptr; });
+  }
+  catch (const f3d::engine::no_window_exception&)
+  {
+  }
+
   PseudoUnitTest test;
+
+  test.expect<f3d::engine::no_window_exception>(
+    "create empty external context", []() { std::ignore = f3d::engine::createExternal(nullptr); });
 
   {
     f3d::engine eng = f3d::engine::createNone();
@@ -28,8 +40,9 @@ int TestSDKEngineExceptions(int argc, char* argv[])
       [&]() { eng.setCachePath("/" + std::string(257, 'x')); });
 
     // cover operator=(engine&&)
-    eng = f3d::engine::create(false);
-    test("engine assignment operator", eng.getWindow().isOffscreen() == false);
+    // test with offscreen window because it works with all backends
+    eng = f3d::engine::create(true);
+    test("engine assignment operator", eng.getWindow().isOffscreen() == true);
   }
 
 #if defined(__linux__) || defined(__FreeBSD__)

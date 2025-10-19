@@ -10,6 +10,7 @@
 #include "vtkF3DPolyDataMapper.h"
 #include "vtkF3DRenderPass.h"
 #include "vtkF3DSolidBackgroundPass.h"
+#include "vtkF3DTAAResolvePass.h"
 #include "vtkF3DUserRenderPass.h"
 
 #include <vtkAxesActor.h>
@@ -44,6 +45,7 @@
 #include <vtkRenderWindow.h>
 #include <vtkSSAAPass.h>
 #include <vtkScalarBarActor.h>
+#include <vtkShaderProperty.h>
 #include <vtkSkybox.h>
 #include <vtkTable.h>
 #include <vtkTextActor.h>
@@ -51,6 +53,7 @@
 #include <vtkTextureObject.h>
 #include <vtkToneMappingPass.h>
 #include <vtkTransform.h>
+#include <vtkUniforms.h>
 #include <vtkVersion.h>
 #include <vtkVolumeProperty.h>
 #include <vtkXMLImageDataReader.h>
@@ -61,6 +64,14 @@
 #include <vtksys/FStream.hxx>
 #include <vtksys/MD5.h>
 #include <vtksys/SystemTools.hxx>
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+#include <vtkMemoryResourceStream.h>
+#endif
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
+#include <vtkGridAxesActor3D.h>
+#endif
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
 #include <vtkSphericalHarmonics.h>
@@ -267,6 +278,11 @@ void vtkF3DRenderer::Initialize()
   this->AddActor(this->SkyboxActor);
   this->AddActor(this->UIActor);
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
+  this->AddActor(this->GridAxesActor);
+  this->GridAxesActor->SetUseBounds(false);
+#endif
+
   this->GridConfigured = false;
   this->CheatSheetConfigured = false;
   this->ActorsPropertiesConfigured = false;
@@ -430,6 +446,13 @@ void vtkF3DRenderer::ConfigureRenderPasses()
     renderingPass = fxaaP;
   }
 
+  if (this->AntiAliasingModeEnabled == vtkF3DRenderer::AntiAliasingMode::TAA)
+  {
+    vtkNew<vtkF3DTAAResolvePass> taaP;
+    taaP->SetDelegatePass(renderingPass);
+    renderingPass = taaP;
+  }
+
   if (this->FinalShader.has_value())
   {
     // basic validation
@@ -486,8 +509,10 @@ std::string vtkF3DRenderer::GetSceneDescription()
   double bounds[6];
   this->ComputeVisiblePropBounds(bounds);
 
-  stream << "Scene bounding box: " << bounds[0] << "," << bounds[1] << "," << bounds[2] << ","
-         << bounds[3] << "," << bounds[4] << "," << bounds[5] << "\n\n";
+  stream << "Scene bounding box: "                                  //
+         << bounds[0] << u8" \u2264 x \u2264 " << bounds[1] << ", " //
+         << bounds[2] << u8" \u2264 y \u2264 " << bounds[3] << ", " //
+         << bounds[4] << u8" \u2264 z \u2264 " << bounds[5] << "\n\n";
 
   // Camera Info
   vtkCamera* cam = this->GetActiveCamera();
@@ -498,9 +523,9 @@ std::string vtkF3DRenderer::GetSceneDescription()
   cam->GetFocalPoint(focal);
   cam->GetViewUp(up);
 
-  stream << "Camera position: " << position[0] << "," << position[1] << "," << position[2] << "\n"
-         << "Camera focal point: " << focal[0] << "," << focal[1] << "," << focal[2] << "\n"
-         << "Camera view up: " << up[0] << "," << up[1] << "," << up[2] << "\n"
+  stream << "Camera position: " << position[0] << ", " << position[1] << ", " << position[2] << "\n"
+         << "Camera focal point: " << focal[0] << ", " << focal[1] << ", " << focal[2] << "\n"
+         << "Camera view up: " << up[0] << ", " << up[1] << ", " << up[2] << "\n"
          << "Camera view angle: " << cam->GetViewAngle() << "\n\n";
   descr += stream.str();
 
@@ -707,6 +732,78 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
 
   this->GridActor->SetVisibility(show);
   this->ResetCameraClippingRange();
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ShowAxesGrid([[maybe_unused]] bool show)
+{
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
+  if (this->AxesGridVisible != show)
+  {
+    this->AxesGridVisible = show;
+    this->RenderPassesConfigured = false;
+    this->GridAxesConfigured = false;
+    this->CheatSheetConfigured = false;
+  }
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ConfigureGridAxesUsingCurrentActors()
+{
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
+  bool show = this->AxesGridVisible;
+  if (show)
+  {
+    double* up = this->GetEnvironmentUp();
+    double* right = this->GetEnvironmentRight();
+    double front[3];
+    vtkMath::Cross(right, up, front);
+
+    vtkNew<vtkMatrix4x4> upMatrix;
+    const double m[16] = {
+      right[0], right[1], right[2], 0, //
+      up[0], up[1], up[2], 0,          //
+      front[0], front[1], front[2], 0, //
+      0, 0, 0, 1,                      //
+    };
+    upMatrix->DeepCopy(m);
+    vtkNew<vtkMatrix4x4> upMatrixInv;
+    upMatrixInv->DeepCopy(upMatrix);
+    upMatrixInv->Transpose();
+
+    double orientation[3];
+    vtkTransform::GetOrientation(orientation, upMatrixInv);
+    const vtkBoundingBox bbox = this->ComputeVisiblePropOrientedBounds(upMatrix);
+
+    if (!bbox.IsValid())
+    {
+      show = false;
+    }
+    else
+    {
+      this->GridAxesActor->SetOrientation(orientation);
+      this->GridAxesActor->SetVisibility(true);
+
+      double center[4] = { 0, 0, 0, 1 };
+      bbox.GetCenter(center);
+
+      this->GridAxesActor->SetPosition(center);
+
+      double a, b, c, x, y, z;
+      bbox.GetBounds(a, b, c, x, y, z);
+      GridAxesActor->SetGridBounds(a, b, c, x, y, z);
+
+      GridAxesActor->SetXTitle("X Axis");
+      GridAxesActor->SetYTitle("Y Axis");
+      GridAxesActor->SetZTitle("Z Axis");
+
+      this->GridAxesConfigured = true;
+    }
+  }
+  this->GridAxesActor->SetVisibility(show);
+
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -978,10 +1075,16 @@ void vtkF3DRenderer::ConfigureHDRIReader()
     {
       // No valid HDRI file have been provided, read the default HDRI
       // TODO add support for memory buffer in the vtkHDRReader in VTK
-      // https://github.com/f3d-app/f3d/issues/935
+      // https://github.com/f3d-app/f3d/issues/1100
       this->HDRIReader = vtkSmartPointer<vtkPNGReader>::New();
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+      vtkNew<vtkMemoryResourceStream> stream;
+      stream->SetBuffer(F3DDefaultHDRI, sizeof(F3DDefaultHDRI));
+      this->HDRIReader->SetStream(stream);
+#else
       this->HDRIReader->SetMemoryBuffer(F3DDefaultHDRI);
       this->HDRIReader->SetMemoryBufferLength(sizeof(F3DDefaultHDRI));
+#endif
       this->UseDefaultHDRI = true;
     }
     this->HasValidHDRIReader = true;
@@ -1246,17 +1349,6 @@ void vtkF3DRenderer::ConfigureHDRISkybox()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureTextActors()
 {
-  // Dynamic text color
-  double textColor[3];
-  if (this->IsBackgroundDark())
-  {
-    textColor[0] = textColor[1] = textColor[2] = 0.9;
-  }
-  else
-  {
-    textColor[0] = textColor[1] = textColor[2] = 0.2;
-  }
-
   // Font
   std::string fontFileStr;
   if (this->FontFile.has_value())
@@ -1321,6 +1413,13 @@ void vtkF3DRenderer::SetFontScale(const double fontScale)
     this->TextActorsConfigured = false;
   }
 }
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetBackdropOpacity(const double backdropOpacity)
+{
+  this->UIActor->SetBackdropOpacity(backdropOpacity);
+}
+
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetBackground(const double* color)
 {
@@ -1349,6 +1448,13 @@ void vtkF3DRenderer::SetFilenameInfo(const std::string& info)
 void vtkF3DRenderer::SetDropZoneInfo(const std::string& info)
 {
   this->UIActor->SetDropText(info);
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetDropZoneBinds(
+  const std::vector<std::pair<std::string, std::string>>& dropZoneBinds)
+{
+  this->UIActor->SetDropBinds(dropZoneBinds);
 }
 
 //----------------------------------------------------------------------------
@@ -1568,6 +1674,16 @@ void vtkF3DRenderer::ShowDropZone(bool show)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::ShowDropZoneLogo(bool show)
+{
+  if (this->DropZoneLogoVisible != show)
+  {
+    this->DropZoneLogoVisible = show;
+    this->UIActor->SetDropZoneLogoVisibility(show);
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowHDRISkybox(bool show)
 {
   if (this->HDRISkyboxVisible != show)
@@ -1667,13 +1783,15 @@ void vtkF3DRenderer::UpdateActors()
   {
     this->ActorsPropertiesConfigured = false;
     this->GridConfigured = false;
+    this->MetaDataConfigured = false;
   }
   this->ImporterTimeStamp = importerMTime;
 
   // XXX: Handle animation update in importer, which may have an impact on the colormap
   // We assume animation change do not change the number of actors
   vtkMTimeType importerUpdateMTime = this->Importer->GetUpdateMTime();
-  if (this->UsingExpandingRange && importerUpdateMTime > this->ImporterTimeStamp)
+  if (this->UsingExpandingRange && (importerUpdateMTime > this->ImporterTimeStamp) &&
+    (this->EnableColoring || (!this->UseRaytracing && this->UseVolume)))
   {
     // XXX: This could be improved further to only configure mappers and actors
     // when the coloring range actually change
@@ -1682,7 +1800,6 @@ void vtkF3DRenderer::UpdateActors()
     this->PointSpritesMappersConfigured = false;
     this->VolumePropsAndMappersConfigured = false;
     this->ScalarBarActorConfigured = false;
-    this->MetaDataConfigured = false;
     this->ColoringConfigured = false;
   }
   this->ImporterUpdateTimeStamp = importerUpdateMTime;
@@ -1709,6 +1826,11 @@ void vtkF3DRenderer::UpdateActors()
     this->ConfigureTextActors();
   }
 
+  if (!this->GridAxesConfigured)
+  {
+    this->ConfigureGridAxesUsingCurrentActors();
+  }
+
   if (!this->RenderPassesConfigured)
   {
     this->ConfigureRenderPasses();
@@ -1724,6 +1846,8 @@ void vtkF3DRenderer::UpdateActors()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::Render()
 {
+  this->ConfigureJitter(this->AntiAliasingModeEnabled == vtkF3DRenderer::AntiAliasingMode::TAA);
+
   if (!this->TimerVisible)
   {
     this->Superclass::Render();
@@ -1825,14 +1949,6 @@ int vtkF3DRenderer::UpdateLights()
   }
 
   return lightCount;
-}
-
-//----------------------------------------------------------------------------
-bool vtkF3DRenderer::IsBackgroundDark()
-{
-  double luminance =
-    0.299 * this->Background[0] + 0.587 * this->Background[1] + 0.114 * this->Background[2];
-  return this->HDRISkyboxVisible ? true : luminance < 0.5;
 }
 
 //----------------------------------------------------------------------------
@@ -2088,7 +2204,7 @@ void vtkF3DRenderer::ConfigureActorsProperties()
     if (this->TexturesTransform.has_value())
     {
       const std::vector<double> texTransform = this->TexturesTransform.value();
-      double transform[] = {                                    //
+      const double transform[] = {                              //
         texTransform[0], texTransform[1], texTransform[2], 0.0, //
         texTransform[3], texTransform[4], texTransform[5], 0.0, //
         texTransform[6], texTransform[7], texTransform[8], 0.0, //
@@ -2676,6 +2792,81 @@ bool vtkF3DRenderer::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vt
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::ConfigureJitter(bool enable)
+{
+  vtkActorCollection* actors = this->GetActors();
+  actors->InitTraversal();
+  vtkActor* actor;
+
+  float jitter[2];
+
+  // TODO: Replace this with RemoveUniform after the VTK fix is updated,
+  // https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12534
+  if (enable)
+  {
+    vtkInformation* information = this->GetInformation();
+    information->Remove(vtkF3DRenderPass::RENDER_UI_ONLY());
+
+    jitter[0] = this->ConfigureHaltonSequence(0);
+    jitter[1] = this->ConfigureHaltonSequence(1);
+
+    vtkRenderWindow* renderWindow = this->GetRenderWindow();
+    int width = renderWindow->GetSize()[0];
+    int height = renderWindow->GetSize()[1];
+
+    jitter[0] = ((jitter[0] - 0.5f) / width) * 2.0f;
+    jitter[1] = ((jitter[1] - 0.5f) / height) * 2.0f;
+  }
+  else
+  {
+    jitter[0] = 0.0f;
+    jitter[1] = 0.0f;
+  }
+
+  while ((actor = actors->GetNextActor()))
+  {
+    const vtkPolyDataMapper* mapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
+    if (!mapper)
+    {
+      continue;
+    }
+
+    vtkShaderProperty* shaderProp = actor->GetShaderProperty();
+    vtkUniforms* uniforms = shaderProp->GetVertexCustomUniforms();
+    uniforms->SetUniform2f("jitter", jitter);
+  }
+}
+
+//----------------------------------------------------------------------------
+float vtkF3DRenderer::ConfigureHaltonSequence(int direction)
+{
+  assert(direction == 0 || direction == 1);
+
+  int base = 2 + direction;
+  int& numerator = this->TaaHaltonNumerator[direction];
+  int& denominator = this->TaaHaltonDenominator[direction];
+
+  int difference = denominator - numerator;
+  if (difference == 1)
+  {
+    numerator = 1;
+    denominator *= base;
+  }
+  else
+  {
+    int quotient = denominator / base;
+    while (difference <= quotient && quotient > 0)
+    {
+      quotient = quotient / base;
+    }
+
+    numerator = (base + 1) * quotient - difference;
+  }
+
+  return static_cast<float>(numerator) / static_cast<float>(denominator);
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureScalarBarActorForColoring(
   vtkScalarBarActor* scalarBar, std::string arrayName, int component, vtkColorTransferFunction* ctf)
 {
@@ -2690,6 +2881,7 @@ void vtkF3DRenderer::ConfigureScalarBarActorForColoring(
   scalarBar->SetWidth(0.8);
   scalarBar->SetHeight(0.07);
   scalarBar->SetPosition(0.1, 0.01);
+  scalarBar->SetMaximumNumberOfColors(512);
 }
 
 //----------------------------------------------------------------------------
@@ -2817,12 +3009,18 @@ void vtkF3DRenderer::CycleFieldForColoring()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureActorTextureTransform(vtkActor* actorBase, const double* matrix)
 {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20250802)
+  vtkInformationDoubleVectorKey* generalTextureTransformKey = vtkProp::GENERAL_TEXTURE_TRANSFORM();
+#else
+  vtkInformationDoubleVectorKey* generalTextureTransformKey = vtkProp::GeneralTextureTransform();
+#endif
+
   vtkInformation* info = actorBase->GetPropertyKeys();
   if (info)
   {
     /**
      * The actor already has a property key dictionary
-     * Check that GeneralTextureTransform exists and combine,
+     * Check that the general texture transform exists and combine them together,
      * Otherwise set the property to our texture transform
      */
 
@@ -2832,13 +3030,13 @@ void vtkF3DRenderer::ConfigureActorTextureTransform(vtkActor* actorBase, const d
       finalTransform[i] = matrix[i];
     }
 
-    if (auto transformPtr = info->Get(vtkProp::GeneralTextureTransform()))
+    if (auto transformPtr = info->Get(generalTextureTransformKey))
     {
       // We need to create 4x4 vtk matrixes from the arrays
       vtkNew<vtkMatrix4x4> matTransform;
       matTransform->Multiply4x4(transformPtr, matrix, finalTransform);
     }
-    info->Set(vtkProp::GeneralTextureTransform(), finalTransform, 16);
+    info->Set(generalTextureTransformKey, finalTransform, 16);
   }
   else
   {
@@ -2846,7 +3044,7 @@ void vtkF3DRenderer::ConfigureActorTextureTransform(vtkActor* actorBase, const d
      * No dictionary found, add new dictionary with transform
      */
     vtkNew<vtkInformation> properties;
-    properties->Set(vtkProp::GeneralTextureTransform(), matrix, 16);
+    properties->Set(generalTextureTransformKey, matrix, 16);
     actorBase->SetPropertyKeys(properties);
   }
 }

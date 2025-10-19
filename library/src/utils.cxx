@@ -25,7 +25,7 @@ unsigned int utils::textDistance(std::string_view strA, std::string_view strB)
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::string> utils::tokenize(std::string_view str)
+std::vector<std::string> utils::tokenize(std::string_view str, bool keepComments)
 {
   std::vector<std::string> tokens;
   std::string token;
@@ -82,7 +82,7 @@ std::vector<std::string> utils::tokenize(std::string_view str)
         escaped = false;
         break;
       case '#':
-        if (!escaped && !quoted)
+        if (!escaped && !quoted && keepComments)
         {
           commented = true;
         }
@@ -193,9 +193,8 @@ std::string utils::globToRegex(std::string_view glob, char pathSeparator)
             starCount++;
             i++;
           }
-          bool nextTokenSepOrEnd = i + 1 >= glob.size() ||
-            (i + 1 < glob.size() ? glob.substr(i + 1, globSeparator.size()) == globSeparator
-                                 : false);
+          bool nextTokenSepOrEnd =
+            i + 1 >= glob.size() || glob.substr(i + 1, globSeparator.size()) == globSeparator;
           if (supportGlobStars)
           {
             if (starCount > 1 && prevTokenSepOrBeg && nextTokenSepOrEnd)

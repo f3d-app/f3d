@@ -41,25 +41,21 @@ jobs:
     name: Set default versions
     outputs:
       alembic_version: ${{ steps.set_default_versions.outputs.alembic_version }}
-      alembic_min_version: ${{ steps.set_default_versions.outputs.alembic_min_version }}
       assimp_version: ${{ steps.set_default_versions.outputs.assimp_version }}
-      assimp_min_version: ${{ steps.set_default_versions.outputs.assimp_min_version }}
+      blosc_version: ${{ steps.set_default_versions.outputs.blosc_version }}
       draco_version: ${{ steps.set_default_versions.outputs.draco_version }}
-      draco_min_version: ${{ steps.set_default_versions.outputs.draco_min_version }}
-      occt_version: ${{ steps.set_default_versions.outputs.occt_version }}
-      occt_min_version: ${{ steps.set_default_versions.outputs.occt_min_version }}
-      openexr_version: ${{ steps.set_default_versions.outputs.openexr_version }}
-      openexr_min_version: ${{ steps.set_default_versions.outputs.openexr_min_version }}
-      openvdb_version: ${{ steps.set_default_versions.outputs.openvdb_version }}
-      openvdb_min_version: ${{ steps.set_default_versions.outputs.openvdb_min_version }}
-      pybind11_version: ${{ steps.set_default_versions.outputs.pybind11_version }}
-      pybind11_min_version: ${{ steps.set_default_versions.outputs.pybind11_min_version }}
-      python_version: ${{ steps.set_default_versions.outputs.python_version }}
-      python_min_version: ${{ steps.set_default_versions.outputs.python_min_version }}
-      usd_version: ${{ steps.set_default_versions.outputs.usd_version }}
-      usd_min_version: ${{ steps.set_default_versions.outputs.usd_min_version }}
+      imath_version: ${{ steps.set_default_versions.outputs.imath_version }}
       java_version: ${{ steps.set_default_versions.outputs.java_version }}
-      java_min_version: ${{ steps.set_default_versions.outputs.java_min_version }}
+      occt_version: ${{ steps.set_default_versions.outputs.occt_version }}
+      openexr_version: ${{ steps.set_default_versions.outputs.openexr_version }}
+      openvdb_version: ${{ steps.set_default_versions.outputs.openvdb_version }}
+      ospray_version: ${{ steps.set_default_versions.outputs.ospray_version }}
+      pybind11_version: ${{ steps.set_default_versions.outputs.pybind11_version }}
+      python_version: ${{ steps.set_default_versions.outputs.python_version }}
+      tbb_version: ${{ steps.set_default_versions.outputs.tbb_version }}
+      usd_version: ${{ steps.set_default_versions.outputs.usd_version }}
+      webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
+      zlib_version: ${{ steps.set_default_versions.outputs.zlib_version }}
       timestamp: ${{ steps.set_default_versions.outputs.timestamp }}
 
     steps:
@@ -111,6 +107,9 @@ jobs:
       fail-fast: false
     runs-on: windows-latest
 
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -123,18 +122,23 @@ jobs:
         uses: ./source/.github/actions/generic-ci
         with:
           vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
-          raytracing_label: raytracing
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
           alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          blosc_version: ${{needs.default_versions.outputs.blosc_version}}
           draco_version: ${{needs.default_versions.outputs.draco_version}}
+          imath_version: ${{needs.default_versions.outputs.imath_version}}
+          java_version: ${{needs.default_versions.outputs.java_version}}
           occt_version: ${{needs.default_versions.outputs.occt_version}}
           openexr_version: ${{needs.default_versions.outputs.openexr_version}}
           openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+          ospray_version: ${{needs.default_versions.outputs.ospray_version}}
           pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
           python_version: ${{needs.default_versions.outputs.python_version}}
+          tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
-          java_version: ${{needs.default_versions.outputs.java_version}}
+          webp_version: ${{ needs.default_versions.outputs.webp_version }}
+          zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
   # Linux CI: Build and test
@@ -156,6 +160,7 @@ jobs:
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
       DISPLAY: :0
 
     steps:
@@ -171,19 +176,24 @@ jobs:
         with:
           build_type: ${{matrix.build_type}}
           vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
-          raytracing_label: raytracing
           rendering_backend: ${{matrix.rendering_backend}}
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
           alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          blosc_version: ${{needs.default_versions.outputs.blosc_version}}
           draco_version: ${{needs.default_versions.outputs.draco_version}}
+          imath_version: ${{needs.default_versions.outputs.imath_version}}
+          java_version: ${{needs.default_versions.outputs.java_version}}
           occt_version: ${{needs.default_versions.outputs.occt_version}}
           openexr_version: ${{needs.default_versions.outputs.openexr_version}}
           openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+          ospray_version: ${{needs.default_versions.outputs.ospray_version}}
           pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
           python_version: ${{needs.default_versions.outputs.python_version}}
+          tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
-          java_version: ${{needs.default_versions.outputs.java_version}}
+          webp_version: ${{ needs.default_versions.outputs.webp_version }}
+          zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
   # MacOS CI: Build and test
@@ -195,6 +205,9 @@ jobs:
       fail-fast: false
 
     runs-on: macos-13
+
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
 
     steps:
       - name: Checkout
@@ -212,14 +225,20 @@ jobs:
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
           alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          blosc_version: ${{needs.default_versions.outputs.blosc_version}}
           draco_version: ${{needs.default_versions.outputs.draco_version}}
+          imath_version: ${{needs.default_versions.outputs.imath_version}}
+          java_version: ${{needs.default_versions.outputs.java_version}}
           occt_version: ${{needs.default_versions.outputs.occt_version}}
           openexr_version: ${{needs.default_versions.outputs.openexr_version}}
           openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+          ospray_version: ${{needs.default_versions.outputs.ospray_version}}
           pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
           python_version: ${{needs.default_versions.outputs.python_version}}
+          tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
-          java_version: ${{needs.default_versions.outputs.java_version}}
+          webp_version: ${{ needs.default_versions.outputs.webp_version }}
+          zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
   # MacOS arm64 CI: Build and test
@@ -231,6 +250,9 @@ jobs:
       fail-fast: false
 
     runs-on: macos-14
+
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
 
     steps:
       - name: Checkout
@@ -248,14 +270,20 @@ jobs:
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
           alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          blosc_version: ${{needs.default_versions.outputs.blosc_version}}
           draco_version: ${{needs.default_versions.outputs.draco_version}}
+          imath_version: ${{needs.default_versions.outputs.imath_version}}
+          java_version: ${{needs.default_versions.outputs.java_version}}
           occt_version: ${{needs.default_versions.outputs.occt_version}}
           openexr_version: ${{needs.default_versions.outputs.openexr_version}}
           openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+          ospray_version: ${{needs.default_versions.outputs.ospray_version}}
           pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
           python_version: ${{needs.default_versions.outputs.python_version}}
+          tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
-          java_version: ${{needs.default_versions.outputs.java_version}}
+          webp_version: ${{ needs.default_versions.outputs.webp_version }}
+          zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
   # Sanitizer: Build and test on linux with last VTK with sanitizer options
@@ -276,6 +304,7 @@ jobs:
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
       DISPLAY: :0
       CC: clang
       CXX: clang++
@@ -297,14 +326,19 @@ jobs:
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
           alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          blosc_version: ${{needs.default_versions.outputs.blosc_version}}
           draco_version: ${{needs.default_versions.outputs.draco_version}}
+          imath_version: ${{needs.default_versions.outputs.imath_version}}
+          java_version: ${{needs.default_versions.outputs.java_version}}
           occt_version: ${{needs.default_versions.outputs.occt_version}}
           openexr_version: ${{needs.default_versions.outputs.openexr_version}}
           openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
           pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
           python_version: ${{needs.default_versions.outputs.python_version}}
+          tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
-          java_version: ${{needs.default_versions.outputs.java_version}}
+          webp_version: ${{ needs.default_versions.outputs.webp_version }}
+          zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
   # Build android/wasm docker images
@@ -363,10 +397,10 @@ jobs:
       fail-fast: false
 
     runs-on: ubuntu-22.04
-    container: ghcr.io/f3d-app/f3d-wasm:${{needs.default_versions.outputs.timestamp}}
-    # Will be fixed once VTK fixes wasm
-    # https://github.com/f3d-app/f3d/issues/2289
-    # container: ghcr.io/f3d-app/f3d-wasm:${{needs.default_versions.outputs.timestamp}}_${{needs.check_nightly.outputs.vtk_sha}}
+
+    env:
+      CMAKE_BUILD_PARALLEL_LEVEL: 4
+      F3D_DOCKER_TIMESTAMP: ${{needs.default_versions.outputs.timestamp}}
 
     steps:
       - name: Checkout
@@ -374,7 +408,7 @@ jobs:
         with:
           path: "source"
           fetch-depth: 0
-          lfs: false
+          lfs: true
 
       - name: WebAssembly CI
         uses: ./source/.github/actions/wasm-ci

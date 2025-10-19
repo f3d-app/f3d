@@ -135,22 +135,27 @@ public:
   {
     int nbCells = mesh->num_faces();
 
-    vtkNew<vtkIdTypeArray> triangles;
-    triangles->SetNumberOfTuples(4 * nbCells);
+    vtkNew<vtkIdTypeArray> offsets;
+    vtkNew<vtkIdTypeArray> connectivity;
+    offsets->SetNumberOfTuples(nbCells + 1);
+    connectivity->SetNumberOfTuples(3 * nbCells);
 
     for (int i = 0; i < nbCells; i++)
     {
       const draco::Mesh::Face& face = mesh->face(draco::FaceIndex(i));
 
-      triangles->SetTypedComponent(4 * i, 0, 3);
+      offsets->SetTypedComponent(i, 0, 3 * i);
+
       for (int j = 0; j < 3; j++)
       {
-        triangles->SetTypedComponent(4 * i + j + 1, 0, face[j].value());
+        connectivity->SetTypedComponent(3 * i + j, 0, face[j].value());
       }
     }
 
+    offsets->SetTypedComponent(nbCells, 0, 3 * nbCells);
+
     vtkNew<vtkCellArray> cells;
-    cells->SetCells(nbCells, triangles);
+    cells->SetData(offsets, connectivity);
 
     output->SetPolys(cells);
   }

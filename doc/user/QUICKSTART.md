@@ -6,7 +6,7 @@ As an overview, you'll learn how to run F3D and open files, configure basic scen
 
 ## Prerequisites
 
-To use F3D, you'll need to install F3D. See the [Installation](INSTALLATION.md) page for the latest release package supported by your system.
+To use F3D, you'll need to install F3D. See the download page for the latest release package supported by your system.
 
 ## Running F3D
 
@@ -95,7 +95,7 @@ For more information, see the [Animations](ANIMATIONS.md) page.
 ## Further Reading
 
 - [A list of all F3D command-line options.](OPTIONS.md)
-- [How to interact with scenes in F3D.](INTERACTIONS.MD)
+- [How to interact with scenes in F3D.](INTERACTIONS.md)
 - [How to play animations in F3D.](ANIMATIONS.md)
 - [How to specify colormaps in F3D.](COLOR_MAPS.md)
 - [How to configure plugins in F3D.](PLUGINS.md)

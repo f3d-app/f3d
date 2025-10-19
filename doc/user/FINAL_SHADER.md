@@ -1,4 +1,4 @@
-# Final shaders
+# Final Shaders
 
 It is possible to specify a final full screen shader with the option `--final-shader`.
 It is executed as the last shader in the rendering pipeline.

@@ -5,9 +5,11 @@
 #include "export.h"
 #include "types.h"
 
+/// @cond
 #include <filesystem>
 #include <string>
 #include <vector>
+/// @endcond
 
 namespace f3d
 {
@@ -78,6 +80,49 @@ public:
    * Clear the scene of all added files
    */
   virtual scene& clear() = 0;
+
+  /**
+   * An exception that can be thrown by the scene
+   * when it fails to index the light
+   */
+  struct light_exception : public exception
+  {
+    explicit light_exception(const std::string& what = "")
+      : f3d::exception(what) {};
+  };
+
+  /**
+   * Add a light based on a light state, returns the index of the added light.
+   */
+  virtual int addLight(const light_state_t& lightState) const = 0;
+
+  /**
+   * Get the number of lights.
+   */
+  [[nodiscard]] virtual int getLightCount() const = 0;
+
+  /**
+   * Get the light state at provided index.
+   * light_exception is thrown if the index is invalid.
+   */
+  [[nodiscard]] virtual light_state_t getLight(int index) const = 0;
+
+  /**
+   * Update a light at provided index with the provided light state.
+   * light_exception is thrown if the index is invalid.
+   */
+  virtual scene& updateLight(int index, const light_state_t& lightState) = 0;
+
+  /**
+   * Remove a light at provided index.
+   * light_exception is thrown if the index is invalid.
+   */
+  virtual scene& removeLight(int index) = 0;
+
+  /**
+   * Remove all lights from the scene.
+   */
+  virtual scene& removeAllLights() = 0;
 
   /**
    * Return true if provided file path is supported, false otherwise.

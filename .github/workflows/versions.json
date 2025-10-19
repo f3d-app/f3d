@@ -4,32 +4,45 @@
     "OpenEXR is part of VFX reference platform (CY2025: 3.3.x)",
     "OpenVDB is part of VFX reference platform (CY2025: 12.x)",
     "OpenVDB min version is not enforced by F3D code and missing from VTK code",
-    "Python is part of VFX reference platform (CY2025: 3.11)"
+    "Python is part of VFX reference platform (CY2025: 3.11)",
+    "OSPRay is fixed at 2.12.0 until full support for OSPRay 3.0 is added in VTK"
   ],
   "versions": {
     "alembic": "1.8.8",
-    "assimp": "v6.0.1",
+    "assimp": "v6.0.2",
+    "blosc": "v1.21.6",
     "draco": "1.5.7",
-    "occt": "V7_9_0",
-    "openexr": "v3.3.3",
+    "imath": "v3.1.12",
+    "java": "21",
+    "occt": "V7_9_1",
+    "openexr": "v3.3.4",
     "openvdb": "v12.0.1",
+    "ospray": "v2.12.0",
     "pybind11": "v2.13.6",
     "python": "3.13",
-    "usd": "v25.02a",
-    "java": "21"
+    "tbb": "v2021.12.0",
+    "usd": "v25.05.01",
+    "webp": "v1.6.0",
+    "zlib": "v1.3.1"
   },
   "min_versions": {
     "alembic": "1.8.5",
     "assimp": "v5.4.0",
+    "blosc": "v1.17.0",
     "draco": "1.5.6",
+    "imath": "v3.0.1",
+    "java": "17",
     "occt": "V7_6_3",
     "openexr": "v3.0.1",
     "openvdb": "v12.0.0",
+    "ospray": "v2.12.0",
     "pybind11": "v2.9.2",
     "python": "3.9",
+    "tbb": "v2021.10.0",
     "usd": "v24.08",
-    "java": "17"
+    "webp": "v1.2.4",
+    "zlib": "v1.2.13"
   },
-  "vtk_commit_sha": "6ad1aadbfd484044f33b5d89b0eec56c9a5d8178",
-  "timestamp": "20250703_0"
+  "vtk_commit_sha": "01b47f3856dcd5d0fd353037236f2d09a8c513af",
+  "timestamp": "20251018_0"
 }

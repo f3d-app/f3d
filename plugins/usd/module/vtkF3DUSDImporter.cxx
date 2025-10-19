@@ -34,6 +34,10 @@
 #include <vtkTriangleFilter.h>
 #include <vtkVersion.h>
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+#include <vtkMemoryResourceStream.h>
+#endif
+
 #if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 3, 0)
 #include <vtkCapsuleSource.h>
 #endif
@@ -757,7 +761,7 @@ public:
 
     if (occlusionImage)
     {
-      int* size = occlusionImage->GetDimensions();
+      const int* size = occlusionImage->GetDimensions();
 
       maxWidth = std::max(maxWidth, size[0]);
       maxHeight = std::max(maxHeight, size[1]);
@@ -765,7 +769,7 @@ public:
 
     if (roughnessImage)
     {
-      int* size = roughnessImage->GetDimensions();
+      const int* size = roughnessImage->GetDimensions();
 
       maxWidth = std::max(maxWidth, size[0]);
       maxHeight = std::max(maxHeight, size[1]);
@@ -773,7 +777,7 @@ public:
 
     if (metallicImage)
     {
-      int* size = metallicImage->GetDimensions();
+      const int* size = metallicImage->GetDimensions();
 
       maxWidth = std::max(maxWidth, size[0]);
       maxHeight = std::max(maxHeight, size[1]);
@@ -886,6 +890,7 @@ public:
         if (!reader)
         {
           // cannot read the image file
+          vtkErrorWithObjectMacro(nullptr, "Cannot create reader for image: " << assetPath);
           return nullptr;
         }
 
@@ -895,6 +900,7 @@ public:
         if (!asset)
         {
           // cannot get USD asset
+          vtkErrorWithObjectMacro(nullptr, "Cannot recover USD asset");
           return nullptr;
         }
 
@@ -903,11 +909,18 @@ public:
         if (!buffer)
         {
           // buffer invalid
+          vtkErrorWithObjectMacro(nullptr, "Cannot recover buffer");
           return nullptr;
         }
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+        vtkNew<vtkMemoryResourceStream> stream;
+        stream->SetBuffer(buffer.get(), asset->GetSize());
+        reader->SetStream(stream);
+#else
         reader->SetMemoryBuffer(buffer.get());
         reader->SetMemoryBufferLength(asset->GetSize());
+#endif
         reader->Update();
 
         tex = reader->GetOutput();
@@ -1237,7 +1250,7 @@ vtkF3DUSDImporter::~vtkF3DUSDImporter() = default;
 //----------------------------------------------------------------------------
 int vtkF3DUSDImporter::ImportBegin()
 {
-  this->Internals->ReadScene(this->FileName);
+  this->Internals->ReadScene(this->GetFileName());
 
   return 1;
 }
@@ -1259,18 +1272,10 @@ vtkIdType vtkF3DUSDImporter::GetNumberOfAnimations()
 
 //----------------------------------------------------------------------------
 bool vtkF3DUSDImporter::GetTemporalInformation(vtkIdType vtkNotUsed(animationIndex),
-  double frameRate, int& nbTimeSteps, double timeRange[2], vtkDoubleArray* timeSteps)
+  double vtkNotUsed(frameRate), int& vtkNotUsed(nbTimeSteps), double timeRange[2],
+  vtkDoubleArray* vtkNotUsed(timeSteps))
 {
   this->Internals->GetTimeRange(timeRange);
-
-  nbTimeSteps = static_cast<int>((timeRange[1] - timeRange[0]) * frameRate);
-
-  for (int i = 0; i < nbTimeSteps; i++)
-  {
-    double timestep = timeRange[0] + static_cast<double>(i) / frameRate;
-    timeSteps->InsertNextTypedTuple(&timestep);
-  }
-
   return true;
 }
 
@@ -1286,6 +1291,5 @@ bool vtkF3DUSDImporter::UpdateAtTimeValue(double timeValue)
 void vtkF3DUSDImporter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "FileName: " << this->FileName << "\n";
   os << indent << "AnimationEnabled: " << std::boolalpha << this->AnimationEnabled << "\n";
 }

@@ -10,8 +10,14 @@ inputs:
   assimp_version:
     description: "Version of assimp to build"
     required: true
+  blosc_version:
+    description: "Version of blosc to build"
+    required: true
   draco_version:
     description: "Version of draco to build"
+    required: true
+  imath_version:
+    description: "Version of imath to build"
     required: true
   occt_version:
     description: "Version of occt to build"
@@ -25,8 +31,17 @@ inputs:
   usd_version:
     description: "Version of usd to build"
     required: true
+  tbb_version:
+    description: "Version of tbb to build"
+    required: true
   vtk_version:
     description: "Version of vtk to build"
+    required: true
+  webp_version:
+    description: "Version of webp to build"
+    required: true
+  zlib_version:
+    description: "Version of zlib to build"
     required: true
 
 runs:
@@ -51,17 +66,25 @@ runs:
       with:
         alembic_version: ${{inputs.alembic_version}}
         assimp_version: ${{inputs.assimp_version}}
+        blosc_version: ${{inputs.blosc_version}}
         draco_version: ${{inputs.draco_version}}
+        imath_version: ${{inputs.imath_version}}
         occt_version: ${{inputs.occt_version}}
         openexr_version: ${{inputs.openexr_version}}
         openvdb_version: ${{inputs.openvdb_version}}
+        tbb_version: ${{inputs.tbb_version}}
         usd_version: ${{inputs.usd_version}}
+        webp_version: ${{inputs.webp_version}}
+        zlib_version: ${{inputs.zlib_version}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
       with:
-        vtk_version: ${{inputs.vtk_version}}
+        blosc_version: ${{inputs.blosc_version}}
         openvdb_version: ${{inputs.openvdb_version}}
+        tbb_version: ${{inputs.tbb_version}}
+        vtk_version: ${{inputs.vtk_version}}
+        zlib_version: ${{inputs.zlib_version}}
 
     - name: Setup Build Directory
       shell: bash
@@ -84,6 +107,7 @@ runs:
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_MODULE_EXR=ON
         -DF3D_MODULE_UI=ON
+        -DF3D_MODULE_WEBP=ON
         -DF3D_PLUGIN_BUILD_ALEMBIC=ON
         -DF3D_PLUGIN_BUILD_ASSIMP=ON
         -DF3D_PLUGIN_BUILD_DRACO=ON

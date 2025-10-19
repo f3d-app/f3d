@@ -5,16 +5,24 @@ inputs:
     description: "CPU architecture to build for"
     required: false
     default: "x86_64"
+  version:
+    description: "Version of tbb to build"
+    required: true
 
 runs:
   using: "composite"
   steps:
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+
     - name: Cache TBB
       id: cache-tbb
       uses: actions/cache/restore@v4
       with:
         path: dependencies/tbb_install
-        key: tbb-v2021.12.0-${{runner.os}}-${{inputs.cpu}}-2
+        key: tbb-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-3
 
     # Dependents: usd openvdb vtk
     # v2021.13.0 somehow cause memory issue in draco and alembic
@@ -25,7 +33,7 @@ runs:
       with:
         repository: oneapi-src/oneTBB
         path: "./dependencies/tbb"
-        ref: v2021.12.0
+        ref: ${{inputs.version}}
 
     - name: Setup TBB
       if: steps.cache-tbb.outputs.cache-hit != 'true'

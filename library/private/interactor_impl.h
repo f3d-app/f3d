@@ -36,25 +36,36 @@ public:
   ~interactor_impl() override;
 
   interactor& initCommands() override;
-  interactor& addCommand(
-    std::string action, std::function<void(const std::vector<std::string>&)> callback) override;
+  interactor& addCommand(const std::string& action,
+    std::function<void(const std::vector<std::string>&)> callback,
+    std::optional<command_documentation_t> doc = std::nullopt,
+    std::function<std::vector<std::string>(const std::vector<std::string>&)> completionCallback =
+      nullptr) override;
   interactor& removeCommand(const std::string& action) override;
   std::vector<std::string> getCommandActions() const override;
-  bool triggerCommand(std::string_view command) override;
+  bool triggerCommand(std::string_view command, bool keepComments = true) override;
 
   interactor& initBindings() override;
   interactor& addBinding(const interaction_bind_t& bind, std::vector<std::string> commands,
-    std::string group = std::string(),
-    documentation_callback_t documentationCallback = nullptr) override;
+    std::string group = std::string(), documentation_callback_t documentationCallback = nullptr,
+    BindingType type = BindingType::OTHER) override;
   interactor& addBinding(const interaction_bind_t& bind, std::string command,
-    std::string group = std::string(),
-    documentation_callback_t documentationCallback = nullptr) override;
+    std::string group = std::string(), documentation_callback_t documentationCallback = nullptr,
+    BindingType type = BindingType::OTHER) override;
   interactor& removeBinding(const interaction_bind_t& bind) override;
   std::vector<std::string> getBindGroups() const override;
   std::vector<interaction_bind_t> getBindsForGroup(std::string group) const override;
   std::vector<interaction_bind_t> getBinds() const override;
   std::pair<std::string, std::string> getBindingDocumentation(
     const interaction_bind_t& bind) const override;
+  BindingType getBindingType(const interaction_bind_t& bind) const override;
+
+  interactor& triggerModUpdate(InputModifier mod) override;
+  interactor& triggerMouseButton(InputAction action, MouseButton button) override;
+  interactor& triggerMousePosition(double xpos, double ypos) override;
+  interactor& triggerMouseWheel(WheelDirection direction) override;
+  interactor& triggerKeyboardKey(InputAction action, std::string_view keySym) override;
+  interactor& triggerTextCharacter(unsigned int codepoint) override;
 
   interactor& toggleAnimation() override;
   interactor& startAnimation() override;

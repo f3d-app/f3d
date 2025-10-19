@@ -1,4 +1,4 @@
-# Parsing options
+# Parsing Options
 
 When setting options from the [CLI Options](OPTIONS.md), the [commands](COMMANDS.md) or using the [libf3d options string API](../libf3d/OPTIONS.md#string-api), the values are parsed according to their type. If parsing fails, the value is not changed.
 
@@ -12,6 +12,7 @@ The following types are supported:
 - path: A path to a local file.
 - color: A RGB color.
 - direction: A 3D vector representing a direction.
+- transform2d: A 9D vector representing a 3x3 matrix.
 
 As well as a list for bool, int, double, ratio, string, noted as
 
@@ -61,12 +62,9 @@ When formatting a ratio into a string, it is formatted as a double.
 String are trimmed of leading and trailing space when parsed.
 String are formatted as is.
 
-## String
+## Path
 
-Path are formatted by creating a [std::filesystem::path](https://en.cppreference.com/w/cpp/filesystem/path/path)
-and then collapsed using [f3d::utils::collapsePath](https://f3d.app/doc/libf3d/doxygen/api/classf3d_1_1utils.html#_CPPv4N3f3d5utils12collapsePathERKNSt10filesystem4pathERKNSt10filesystem4pathE).
-
-Path are formatted using [std::filesystem::path::string](https://en.cppreference.com/w/cpp/filesystem/path/string).
+Path are collapsed and tilda (`~`) is supported.
 
 ## Vectors
 
@@ -108,3 +106,12 @@ The following formats are supported when parsing a string into a colormap:
 - `val, color, ...`
 
 When formatting a colormap into a string, it is formatted as `val, color, ...`.
+
+## Transform2D
+
+The following formats are supported when parsing a string into a transform2D:
+
+- A 9D double vector
+- At least one of the following: `scale: val, val`, `translation: val, val`, `angle: val` in any order, semicolon-separated. `scale` may be given one value, which will apply to both the x and y axes of the matrix. `angle` is expressed in degrees.
+
+When formatting a transform2d into a string, it is formatted as a 9D double vector

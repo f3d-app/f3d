@@ -7,13 +7,16 @@
 #include "options.h"
 #include "window.h"
 
+/// @cond
 #include <functional>
 #include <string>
 #include <utility>
 #include <vector>
+/// @endcond
 
 namespace f3d
 {
+
 struct interaction_bind_t
 {
   /**
@@ -66,6 +69,8 @@ class F3D_EXPORT interactor
 {
 public:
   ///@{ @name Command
+  using command_documentation_t = std::pair<std::string, std::string>;
+
   /**
    * Remove all existing commands and add all default commands,
    * see COMMANDS.md for details.
@@ -76,11 +81,15 @@ public:
    * Use this method to add a command to be called using triggerCommand.
    * Adding a command with an already existing action throw a
    * interactor::already_exists_exception.
+   *
    * Considering namespacing dedicated action to avoid conflicts with default action,
    * eg: `my_app::action`
    */
-  virtual interactor& addCommand(
-    std::string action, std::function<void(const std::vector<std::string>&)> callback) = 0;
+  virtual interactor& addCommand(const std::string& action,
+    std::function<void(const std::vector<std::string>&)> callback,
+    std::optional<command_documentation_t> doc = std::nullopt,
+    std::function<std::vector<std::string>(const std::vector<std::string>&)> completionCallback =
+      nullptr) = 0;
 
   /**
    * Remove a command for provided action, does not do anything if it does not exists.
@@ -98,17 +107,33 @@ public:
    *
    * If the command fails, it prints a debug log explaining why.
    *
+   * When keepComments argument is true, comments are supported with `#`, any characters after are
+   * ignored otherwise `#` and any characters after will be handled as standard character
+   *
    * Return true if the command succeeded, false otherwise.
    * Throw an interactor::command_runtime_exception if the command callback
    * throw an unrecognized exception.
+   *
    * Note that default commands will never throw this exception, but adding commands
    * without exception catching may trigger this behavior.
    */
-  virtual bool triggerCommand(std::string_view command) = 0;
+  virtual bool triggerCommand(std::string_view command, bool keepComments = true) = 0;
   ///@}
 
   ///@{ @name Bindings
   using documentation_callback_t = std::function<std::pair<std::string, std::string>()>;
+
+  /**
+   * Enumeration of binding types.
+   * Duplication present in vtkext/private/module/vtkF3DUIActor.h.
+   */
+  enum class BindingType : std::uint8_t
+  {
+    CYCLIC = 0,
+    NUMERICAL = 1,
+    TOGGLE = 2,
+    OTHER = 3,
+  };
 
   /**
    * Remove all existing interaction commands and add all default bindings
@@ -125,12 +150,15 @@ public:
    * "Left", "Right", "Up", "Down", "Space", "Enter", "Escape", "Question".
    *
    * group is an optional arg to group bindings together for better display of the documentation.
-   * Groups are kept in order of addition when recovered using `getBindGroups`.
-   * Bindings are kept in order of addition when recovered using `getBindsForGroup`.
+   * Groups are kept in order of addition when recovered using getBindGroups().
+   * Bindings are kept in order of addition when recovered using getBindsForGroup().
    *
    * documentationCallback is an optional function that returns a pair of string,
    * the first is the doc itself, the second is the current value as a string, if any.
-   * Use `getBindingDocumentation` to access this doc.
+   * Use getBindingDocumentation() to access this doc.
+   *
+   * type is an optional type of binding to provide, it can be used for presenting the
+   * binding in a coherent way in logs and cheatsheet.
    *
    * When the corresponding bind happens, the provided commands will be triggered using
    * triggerCommand. Considering checking if an interaction exists or removing it before adding it
@@ -142,26 +170,29 @@ public:
    * Adding commands for an existing bind will throw a interactor::already_exists_exception.
    */
   virtual interactor& addBinding(const interaction_bind_t& bind, std::vector<std::string> commands,
-    std::string group = {}, documentation_callback_t documentationCallback = nullptr) = 0;
+    std::string group = {}, documentation_callback_t documentationCallback = nullptr,
+    BindingType type = BindingType::OTHER) = 0;
 
   /**
    * See addBinding
    * Convenience method to add a single command for an interaction,
-   * similar as `addBinding(bind, {command})`
+   * similar as `addBinding(bind, {command})`.
    *
    * Adding command for an existing bind will throw a interactor::already_exists_exception.
    */
   virtual interactor& addBinding(const interaction_bind_t& bind, std::string command,
-    std::string group = {}, documentation_callback_t documentationCallback = nullptr) = 0;
+    std::string group = {}, documentation_callback_t documentationCallback = nullptr,
+    BindingType type = BindingType::OTHER) = 0;
 
   /**
    * Convenience initializer list signature for add binding method
    */
   interactor& addBinding(const interaction_bind_t& bind, std::initializer_list<std::string> list,
-    std::string group = {}, documentation_callback_t documentationCallback = nullptr)
+    std::string group = {}, documentation_callback_t documentationCallback = nullptr,
+    BindingType type = BindingType::OTHER)
   {
-    return this->addBinding(
-      bind, std::vector<std::string>(list), std::move(group), std::move(documentationCallback));
+    return this->addBinding(bind, std::vector<std::string>(list), std::move(group),
+      std::move(documentationCallback), type);
   }
 
   /**
@@ -192,8 +223,10 @@ public:
    * Get a pair of string documenting a binding.
    * The first string is the documentation of the binding,
    * eg: "Toggle anti aliasing", "Print scene descr to terminal", "Decrease light intensity"
+   *
    * The second string is the current value of the binding,
    * eg: "OFF", "" if there is no value or "1.12".
+   *
    * If a binding was not documented on addition, the provided strings will be empty.
    * The possible string can depends on the bindings but boolean value are expected to be
    * "ON", "OFF", "N/A" (for optional values).
@@ -202,6 +235,13 @@ public:
    */
   [[nodiscard]] virtual std::pair<std::string, std::string> getBindingDocumentation(
     const interaction_bind_t& bind) const = 0;
+
+  /**
+   * Get the type of a binding.
+   *
+   * Getting type for a bind that does not exists will throw a does_not_exists_exception.
+   */
+  [[nodiscard]] virtual BindingType getBindingType(const interaction_bind_t& bind) const = 0;
   ///@}
 
   ///@{ @name Animation
@@ -222,25 +262,115 @@ public:
   virtual interactor& disableCameraMovement() = 0;
   ///@}
 
+  ///@{ @name Forwarding input events
+  /**
+   * Enumeration of supported mouse buttons.
+   */
+  enum class MouseButton : unsigned char
+  {
+    LEFT,
+    RIGHT,
+    MIDDLE
+  };
+
+  /**
+   * Enumeration of supported mouse wheel directions.
+   */
+  enum class WheelDirection : unsigned char
+  {
+    FORWARD,
+    BACKWARD,
+    LEFT,
+    RIGHT
+  };
+
+  /**
+   * Enumeration of supported input actions.
+   */
+  enum class InputAction : unsigned char
+  {
+    PRESS,
+    RELEASE
+  };
+
+  /**
+   * Enumeration of supported input modifiers.
+   */
+  enum class InputModifier : unsigned char
+  {
+    NONE,
+    CTRL,
+    SHIFT,
+    CTRL_SHIFT
+  };
+
+  /**
+   * Trigger a modifier update.
+   * This will update the internal modifier state of the interactor to match the provided one.
+   */
+  virtual interactor& triggerModUpdate(InputModifier mod) = 0;
+
+  /**
+   * Trigger a mouse button event.
+   * This will trigger the corresponding mouse button press or release event.
+   */
+  virtual interactor& triggerMouseButton(InputAction action, MouseButton button) = 0;
+
+  /**
+   * Trigger a mouse new position event.
+   * Positions are in window coordinates, with (0, 0) being the top-left corner.
+   * The coordinates are expressed in pixels.
+   */
+  virtual interactor& triggerMousePosition(double xpos, double ypos) = 0;
+
+  /**
+   * Trigger a mouse wheel event.
+   * At the moment, only vertical wheel events are observed, but it can change in the future.
+   */
+  virtual interactor& triggerMouseWheel(WheelDirection direction) = 0;
+
+  /**
+   * Trigger a keyboard key event.
+   * This is based on X11 key symbols, it's hard to list all of them, but here are a few:
+   * - "A", "B", "C", ..., "Z" for letters
+   * - "0", "1", "2", ..., "9" for numbers
+   * - "Left", "Right", "Up", "Down" for arrow keys
+   * - "Space", "Return", "Escape", "Tab", "BackSpace" for common keys
+   * - "F1", "F2", ..., "F25" for function keys
+   * - "KP_0", "KP_1", ..., "KP_9" for numpad keys
+   *
+   * It's possible to run F3D application in verbose mode and press keys to print their symbols.
+   */
+  virtual interactor& triggerKeyboardKey(InputAction action, std::string_view keySym) = 0;
+
+  /**
+   * Trigger a text character input event.
+   * This will trigger the corresponding character input event, with the codepoint being the Unicode
+   * codepoint of the character.
+   * It's used for text input, like when typing in a the console input field.
+   */
+  virtual interactor& triggerTextCharacter(unsigned int codepoint) = 0;
+  ///@}
+
   /**
    * Play a VTK interaction file.
    * Provided file path is used as is and file existence will be checked.
    * The event loop will be triggered every deltaTime in seconds, and userCallBack will be called at
-   * the start of the event loop
+   * the start of the event loop.
    */
   virtual bool playInteraction(const std::filesystem::path& file, double deltaTime = 1.0 / 30,
     std::function<void()> userCallBack = nullptr) = 0;
 
   /**
    * Start interaction and record it all in a VTK interaction file.
-   * Provided file path will be used as is and the parent directories of the file will be created
+   * Provided file path will be used as is and the parent directories of the file will be created.
    */
   virtual bool recordInteraction(const std::filesystem::path& file) = 0;
 
   /**
    * Start the interactor event loop.
    * The event loop will be triggered every deltaTime in seconds, and userCallBack will be called at
-   * the start of the event loop
+   * the start of the event loop.
    */
   virtual interactor& start(
     double deltaTime = 1.0 / 30, std::function<void()> userCallBack = nullptr) = 0;
@@ -251,8 +381,8 @@ public:
   virtual interactor& stop() = 0;
 
   /**
-   * Request a render to be done on the next event loop
-   * Safe to call in a multithreaded environment
+   * Request a render to be done on the next event loop.
+   * Safe to call in a multithreaded environment.
    */
   virtual interactor& requestRender() = 0;
 

@@ -16,6 +16,7 @@
 
 #include <vtkLight.h>
 #include <vtkOpenGLRenderer.h>
+#include <vtkVersion.h>
 
 #include <filesystem>
 #include <map>
@@ -26,6 +27,7 @@ namespace fs = std::filesystem;
 class vtkDiscretizableColorTransferFunction;
 class vtkColorTransferFunction;
 class vtkCornerAnnotation;
+class vtkGridAxesActor3D;
 class vtkImageReader2;
 class vtkOrientationMarkerWidget;
 class vtkScalarBarActor;
@@ -45,7 +47,8 @@ public:
   {
     NONE,
     FXAA,
-    SSAA
+    SSAA,
+    TAA
   };
 
   ///@{
@@ -54,6 +57,7 @@ public:
    */
   void ShowAxis(bool show);
   void ShowGrid(bool show);
+  void ShowAxesGrid(bool show);
   void ShowEdge(const std::optional<bool>& show);
   void ShowTimer(bool show);
   void ShowMetaData(bool show);
@@ -62,6 +66,7 @@ public:
   void ShowConsole(bool show);
   void ShowMinimalConsole(bool show);
   void ShowDropZone(bool show);
+  void ShowDropZoneLogo(bool show);
   void ShowHDRISkybox(bool show);
   void ShowArmature(bool show);
   ///@}
@@ -81,10 +86,12 @@ public:
   void SetLightIntensity(const double intensity);
   void SetFilenameInfo(const std::string& info);
   void SetDropZoneInfo(const std::string& info);
+  void SetDropZoneBinds(const std::vector<std::pair<std::string, std::string>>& dropZoneBinds);
   void SetGridAbsolute(bool absolute);
   void SetGridUnitSquare(const std::optional<double>& unitSquare);
   void SetGridSubdivisions(int subdivisions);
   void SetGridColor(const std::vector<double>& color);
+  void SetBackdropOpacity(const double backdropOpacity);
   ///@}
 
   ///@{
@@ -425,8 +432,6 @@ private:
 
   void ReleaseGraphicsResources(vtkWindow* w) override;
 
-  bool IsBackgroundDark();
-
   /**
    * Configure meta data actor visibility and content
    */
@@ -470,6 +475,11 @@ private:
   void ConfigureGridUsingCurrentActors();
 
   /**
+   * Configure the Grid Axes actor
+   */
+  void ConfigureGridAxesUsingCurrentActors();
+
+  /**
    * Configure the different render passes
    */
   void ConfigureRenderPasses();
@@ -500,6 +510,17 @@ private:
     bool cellFlag = false, bool inverseOpacityFlag = false);
 
   /**
+   * Configure screen spaced jittering for TAA
+   */
+  void ConfigureJitter(bool enable);
+
+  /**
+   * Configure Halton sequence for TAA. Valid direction values are 0 and 1. Returns a value that is
+   * used for jitter
+   */
+  float ConfigureHaltonSequence(int direction);
+
+  /**
    * Convenience method for configuring a scalar bar actor for coloring
    */
   void ConfigureScalarBarActorForColoring(vtkScalarBarActor* scalarBar, std::string arrayName,
@@ -518,6 +539,11 @@ private:
 
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
 
+  // Does vtk version support GridAxesActor
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
+  vtkNew<vtkGridAxesActor3D> GridAxesActor;
+#endif
+
   vtkNew<vtkActor> GridActor;
   vtkNew<vtkSkybox> SkyboxActor;
   vtkNew<vtkF3DUIActor> UIActor;
@@ -527,6 +553,7 @@ private:
   bool CheatSheetConfigured = false;
   bool ActorsPropertiesConfigured = false;
   bool GridConfigured = false;
+  bool GridAxesConfigured = false;
   bool RenderPassesConfigured = false;
   bool LightIntensitiesConfigured = false;
   bool TextActorsConfigured = false;
@@ -542,6 +569,9 @@ private:
   bool GridVisible = false;
   bool GridAbsolute = false;
   bool AxisVisible = false;
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
+  bool AxesGridVisible = false;
+#endif
   std::optional<bool> EdgeVisible;
   bool TimerVisible = false;
   bool FilenameVisible = false;
@@ -550,6 +580,7 @@ private:
   bool ConsoleVisible = false;
   bool MinimalConsoleVisible = false;
   bool DropZoneVisible = false;
+  bool DropZoneLogoVisible = false;
   bool HDRISkyboxVisible = false;
   bool ArmatureVisible = false;
   bool UseRaytracing = false;
@@ -644,6 +675,9 @@ private:
   std::optional<std::vector<double>> UserScalarBarRange;
   std::vector<double> Colormap;
   std::optional<int> ColormapDiscretization;
+
+  int TaaHaltonNumerator[2] = { 0, 0 };
+  int TaaHaltonDenominator[2] = { 1, 1 };
 };
 
 #endif

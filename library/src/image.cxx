@@ -186,6 +186,7 @@ image::image(const fs::path& filePath)
   {
     if (!fs::exists(filePath))
     {
+      delete this->Internals;
       throw read_exception("Cannot open image " + filePath.string());
     }
 
@@ -207,11 +208,13 @@ image::image(const fs::path& filePath)
 
     if (!this->Internals->Image)
     {
+      delete this->Internals;
       throw read_exception("Cannot read image " + filePath.string());
     }
   }
   catch (const fs::filesystem_error& ex)
   {
+    delete this->Internals;
     throw read_exception(std::string("Cannot read image: ") + ex.what());
   }
 }

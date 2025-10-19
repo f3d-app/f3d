@@ -35,21 +35,24 @@ Release Candidates :
 - [ ] Locally test the python wheels on Windows
 - If it fails,
   - [ ] Fix the issues in `release` branch,
-  - [ ] Edit this issuethis paragraph and increment `N`
+  - [ ] Edit this issue and increment `N`
   - [ ] Merge F3D release into master: https://github.com/f3d-app/f3d/compare/master...release
 - [ ] Else proceed to the next part
 
 Release :
 
-- [ ] Commit, review and merge `vX.Y.Z` version change in https://github.com/f3d-app/f3d `CMakeLists.txt`, `pyproject.toml`, `webassembly/package.json` and the multiple `doxygen\conf.py` in the `release` branch
+- [ ] Commit, review and merge `vX.Y.Z` version change in https://github.com/f3d-app/f3d `CMakeLists.txt`, `pyproject.toml`, `package.json` and the multiple `doxygen\conf.py` in the `release` branch
 - [ ] Tag `vX.Y.Z` and push it to https://github.com/f3d-app/f3d: `git tag vX.Y.Z -m vX.Y.Z`
 - [ ] Commit, review and merge adding `X.Y.Z` in https://github.com/f3d-app/f3d-superbuild `versions.cmake` in the `main` branch
 - [ ] Tag `vX.Y.Z` and push it to https://github.com/f3d-app/f3d-superbuild: `git tag vX.Y.Z -m vX.Y.Z`
 - [ ] Merge F3D release into master: https://github.com/f3d-app/f3d/compare/master...release
 - [ ] Trigger a release build using https://github.com/f3d-app/f3d-superbuild actions with `vX.Y.Z` F3D version, `vX.Y.Z` sb version and prerelease publish true
 - [ ] Finalize release note and add them to the release
+- [ ] Format the release note into a changelog and commit/review/merge them into https://github.com/f3d-app/f3d
+- [ ] Update dev and nightly docs as described [here](https://f3d.app/dev/TOOLING#how-to-update-the-doc-using-latest-master), commit/review/merge into https://github.com/f3d-app/f3d-website
+- [ ] Add a **new versioned doc** as described [here](https://f3d.app/dev/TOOLING#how-to-update-the-doc-for-a-new-release), commit/review/merge into https://github.com/f3d-app/f3d-website
+- [ ] Update **download links** using `GITHUB_TOKEN=$PAT npm run update-downloads`, commit/review/merge into https://github.com/f3d-app/f3d-website
 - [ ] Release
-- [ ] Update **download links** and **changelog** in https://github.com/f3d-app/f3d `doc`
 - [ ] Communicate on discord
 - [ ] Communicate on reddit
 - [ ] Communicate on hackernews
@@ -57,7 +60,7 @@ Release :
 - [ ] Communicate on mastodon
 - [ ] Communicate on bluesky
 - [ ] Move all issue from current milestone to next milestone, close current roadmap issue and open a next roadmap issue
-- [ ] Update `doc/dev/ROADMAPS_AND_RELEASES.md` for next release
+- [ ] Update `dev/ROADMAPS_AND_RELEASES.md` for next release in https://github.com/f3d-app/f3d-website
 - [ ] Create an issue for updating dependencies in CI and superbuild
 - [ ] Update `.github/ISSUE_TEMPLATE/new_release.md` in https://github.com/f3d-app/f3d if needed
 
