@@ -3,12 +3,13 @@ import utils from "./utils.js";
 const settings = {
   setupOptions: (options) => {
     // background must be set to black for proper blending with transparent canvas
-    options.set_color("render.background.color", 0, 0, 0);
+    options.setAsString("render.background.color", "#000000");
 
     // setup coloring
     options.toggle("model.scivis.enable");
-    options.set_string("model.scivis.array_name", "Colors");
-    options.set_integer("model.scivis.component", -2);
+    options.setAsString("model.scivis.array_name", "Colors");
+    options.setAsString("model.scivis.component", "-2");
+    options.setAsString("model.scivis.range", "0.7,1.4"); // not used for the baseline, only for coverage
     options.toggle("model.scivis.cells");
 
     // make it look nice
@@ -22,7 +23,32 @@ const settings = {
     options.toggle("render.grid.enable");
 
     // default to +Z
-    options.set_as_string("scene.up_direction", "+Z");
+    options.setAsString("scene.up_direction", "+Z");
+
+    // check that the getter works
+    utils.assert(
+      options.get("model.scivis.enable") === true,
+      "options getter for boolean failed",
+    );
+    utils.assert(
+      options.get("model.scivis.component") === -2,
+      "options getter for int failed",
+    );
+    utils.assert(
+      options.get("model.point_sprites.size") === 10.0,
+      "options getter for double failed",
+    );
+    utils.assert(
+      options.get("model.point_sprites.type") === "sphere",
+      "options getter for string failed",
+    );
+
+    // comparing JS arrays
+    utils.assert(
+      JSON.stringify(options.get("model.scivis.range")) ===
+        JSON.stringify([0.7, 1.4]),
+      "options getter for vec<double> failed",
+    );
   },
   dataPath: "f3d.vtp",
   baselinePath: "TestWasmOptions.png",
