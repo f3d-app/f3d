@@ -65,7 +65,8 @@ In any case, please star it on github and share the word about it!
 <a href="https://nlnet.nl/project/F3D/">
   <img src="https://nlnet.nl/logo/banner.svg" style="vertical-align: middle;" width="250" height="45"/>
 </a>
-<a href="https://nlnet.nl/project/F3D/" style="text-decoration: none;">
+<a href="https://www.google.com/" style="color: black; text-decoration: underline;text-decoration-style: dotted;">custom link</a>
+<a href="https://nlnet.nl/project/F3D/" target="_blank" style="text-decoration: none;">
   <img src="https://nlnet.nl/image/logos/NGI0Core_tag.svg" style="vertical-align: middle;" width="250" height="45"/>
 </a>
 <a href="https://www.lambdatest.com/?utm_source=f3d&utm_medium=sponsor" target="_blank">
