@@ -78,7 +78,7 @@ EMSCRIPTEN_BINDINGS(f3d)
             return jsArray;
           }
         }
-        catch(f3d::exception)
+        catch (f3d::exception)
         {
           return emscripten::val::undefined();
         }

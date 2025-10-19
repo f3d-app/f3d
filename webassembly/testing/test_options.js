@@ -26,13 +26,28 @@ const settings = {
     options.setAsString("scene.up_direction", "+Z");
 
     // check that the getter works
-    utils.assert(options.get("model.scivis.enable") === true, "options getter for boolean failed");
-    utils.assert(options.get("model.scivis.component") === -2, "options getter for int failed");
-    utils.assert(options.get("model.point_sprites.size") === 10.0, "options getter for double failed");
-    utils.assert(options.get("model.point_sprites.type") === "sphere", "options getter for string failed");
+    utils.assert(
+      options.get("model.scivis.enable") === true, 
+      "options getter for boolean failed"
+    );
+    utils.assert(
+      options.get("model.scivis.component") === -2,
+      "options getter for int failed"
+    );
+    utils.assert(
+      options.get("model.point_sprites.size") === 10.0,
+      "options getter for double failed"
+    );
+    utils.assert(
+      options.get("model.point_sprites.type") === "sphere",
+      "options getter for string failed"
+    );
 
     // comparing JS arrays
-    utils.assert(JSON.stringify(options.get("model.scivis.range")) === JSON.stringify([0.7,1.4]), "options getter for vec<double> failed");
+    utils.assert(
+      JSON.stringify(options.get("model.scivis.range")) === JSON.stringify([0.7, 1.4]),
+      "options getter for vec<double> failed"
+    );
   },
   dataPath: "f3d.vtp",
   baselinePath: "TestWasmOptions.png",

@@ -2,8 +2,7 @@ import f3d from "../../dist/f3d.js";
 
 const utils = {
   assert: (condition, description) => {
-    if (!condition)
-    {
+    if (!condition) {
       console.error("F3D_ERROR:" + description);
     }
   },
