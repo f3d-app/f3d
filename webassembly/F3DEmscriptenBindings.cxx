@@ -224,7 +224,7 @@ EMSCRIPTEN_BINDINGS(f3d)
   // Not bound on purpose because usually used for external interactors:
   // trigger*
   // TODO:
-  // - bindings?
+  // - bindings
   emscripten::class_<f3d::interactor>("Interactor")
     .function(
       "initCommands", &f3d::interactor::initCommands, emscripten::return_value_policy::reference())
