@@ -131,12 +131,14 @@ public:
   vtkGetMacro(InvertZoom, bool);
   ///@}
 
+  ///@{
   /**
    * Set/Get RotationAxis
    */
   void SetRotationAxis(const std::optional<std::array<double, 3>>& axis);  
   vtkGetMacro(UseRotationAxis, bool);
   vtkGetVector3Macro(RotationAxis, double);
+  ///@}
 
    /**
    * Reimplemented to configure:
