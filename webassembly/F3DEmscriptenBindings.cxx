@@ -207,9 +207,6 @@ EMSCRIPTEN_BINDINGS(f3d)
   // f3d::window
   // Not bound on purpose because these functions make no sense on the web:
   // getType, isOffscreen, setPosition, setIcon, setWindowName
-  // TODO:
-  // - getCamera
-  //
   emscripten::class_<f3d::window>("Window")
     .function("getCamera", &f3d::window::getCamera, emscripten::return_value_policy::reference())
     .function("render", &f3d::window::render)
