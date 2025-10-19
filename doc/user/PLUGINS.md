@@ -1,4 +1,4 @@
-## Plugins
+# Plugins
 
 F3D officially supports plugins for certain file formats. If you installed F3D using the binary
 release, there's no need to manually load these plugins when opening your file.
@@ -18,25 +18,26 @@ multiple plugins in a single comma-separated list, like in the example below:
 
 ```
 [
-{
-  "match": ".*(file_extension)",
-  "options":
   {
-    "load-plugins": "plugin1", "plugin2"
+    "match": ".*(file_extension)",
+    "options":
+    {
+      "load-plugins": "plugin1", "plugin2"
+    }
   }
-}
 ]
 ```
 
-### Supported plugins
+## Supported plugins
 
 F3D supports loading plugins and contains the following plugins:
 `native`, `alembic`, `assimp`, `draco`, `hdf`, `occt`, `usd`, `vdb`.
 
 see [the format list](SUPPORTED_FORMATS.md) for more details.
 
-> Note: Native plugin is always loaded automatically.
-> Note: If you downloaded the binaries from the release page, it's not necessary to specify manually the plugins above. F3D loads them automatically.
+> [!NOTE]
+> Native plugin is always loaded automatically.
+> If you downloaded the binaries from the release page, it's not necessary to specify manually the plugins above. F3D loads them automatically.
 
 Here is how the plugins are searched (in preceding order):
 

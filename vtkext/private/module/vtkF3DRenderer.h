@@ -47,7 +47,8 @@ public:
   {
     NONE,
     FXAA,
-    SSAA
+    SSAA,
+    TAA
   };
 
   ///@{
@@ -518,6 +519,17 @@ private:
     bool cellFlag = false, bool inverseOpacityFlag = false);
 
   /**
+   * Configure screen spaced jittering for TAA
+   */
+  void ConfigureJitter(bool enable);
+
+  /**
+   * Configure Halton sequence for TAA. Valid direction values are 0 and 1. Returns a value that is
+   * used for jitter
+   */
+  float ConfigureHaltonSequence(int direction);
+
+  /**
    * Convenience method for configuring a scalar bar actor for coloring
    */
   void ConfigureScalarBarActorForColoring(vtkScalarBarActor* scalarBar, std::string arrayName,
@@ -674,6 +686,9 @@ private:
   std::optional<std::vector<double>> UserScalarBarRange;
   std::vector<double> Colormap;
   std::optional<int> ColormapDiscretization;
+
+  int TaaHaltonNumerator[2] = { 0, 0 };
+  int TaaHaltonDenominator[2] = { 1, 1 };
 };
 
 #endif

@@ -292,7 +292,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
 
     // Draw cells and scale texture coordinates
     vtkNew<vtkCellArray> cells;
-    cells->Allocate(header->numTriangles);
+    cells->AllocateExact(header->numTriangles, 3 * header->numTriangles);
     vtkNew<vtkFloatArray> textureCoordinates;
     textureCoordinates->SetNumberOfComponents(2);
     textureCoordinates->SetName("TextureCoordinates");

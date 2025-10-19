@@ -34,6 +34,10 @@
 #include <vtkTriangleFilter.h>
 #include <vtkVersion.h>
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+#include <vtkMemoryResourceStream.h>
+#endif
+
 #if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 3, 0)
 #include <vtkCapsuleSource.h>
 #endif
@@ -886,6 +890,7 @@ public:
         if (!reader)
         {
           // cannot read the image file
+          vtkErrorWithObjectMacro(nullptr, "Cannot create reader for image: " << assetPath);
           return nullptr;
         }
 
@@ -895,6 +900,7 @@ public:
         if (!asset)
         {
           // cannot get USD asset
+          vtkErrorWithObjectMacro(nullptr, "Cannot recover USD asset");
           return nullptr;
         }
 
@@ -903,11 +909,18 @@ public:
         if (!buffer)
         {
           // buffer invalid
+          vtkErrorWithObjectMacro(nullptr, "Cannot recover buffer");
           return nullptr;
         }
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+        vtkNew<vtkMemoryResourceStream> stream;
+        stream->SetBuffer(buffer.get(), asset->GetSize());
+        reader->SetStream(stream);
+#else
         reader->SetMemoryBuffer(buffer.get());
         reader->SetMemoryBufferLength(asset->GetSize());
+#endif
         reader->Update();
 
         tex = reader->GetOutput();

@@ -107,6 +107,9 @@ jobs:
       fail-fast: false
     runs-on: windows-latest
 
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -134,7 +137,7 @@ jobs:
           python_version: ${{needs.default_versions.outputs.python_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
-          webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
+          webp_version: ${{ needs.default_versions.outputs.webp_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
@@ -157,6 +160,7 @@ jobs:
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
       DISPLAY: :0
 
     steps:
@@ -188,7 +192,7 @@ jobs:
           python_version: ${{needs.default_versions.outputs.python_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
-          webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
+          webp_version: ${{ needs.default_versions.outputs.webp_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
@@ -201,6 +205,9 @@ jobs:
       fail-fast: false
 
     runs-on: macos-13
+
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
 
     steps:
       - name: Checkout
@@ -230,7 +237,7 @@ jobs:
           python_version: ${{needs.default_versions.outputs.python_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
-          webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
+          webp_version: ${{ needs.default_versions.outputs.webp_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
@@ -243,6 +250,9 @@ jobs:
       fail-fast: false
 
     runs-on: macos-14
+
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
 
     steps:
       - name: Checkout
@@ -272,7 +282,7 @@ jobs:
           python_version: ${{needs.default_versions.outputs.python_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
-          webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
+          webp_version: ${{ needs.default_versions.outputs.webp_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
@@ -294,6 +304,7 @@ jobs:
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
       DISPLAY: :0
       CC: clang
       CXX: clang++
@@ -326,7 +337,7 @@ jobs:
           python_version: ${{needs.default_versions.outputs.python_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
-          webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
+          webp_version: ${{ needs.default_versions.outputs.webp_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
@@ -386,7 +397,10 @@ jobs:
       fail-fast: false
 
     runs-on: ubuntu-22.04
-    container: ghcr.io/f3d-app/f3d-wasm:${{needs.default_versions.outputs.timestamp}}_${{needs.check_nightly.outputs.vtk_sha}}
+
+    env:
+      CMAKE_BUILD_PARALLEL_LEVEL: 4
+      F3D_DOCKER_TIMESTAMP: ${{needs.default_versions.outputs.timestamp}}
 
     steps:
       - name: Checkout
@@ -394,7 +408,7 @@ jobs:
         with:
           path: "source"
           fetch-depth: 0
-          lfs: false
+          lfs: true
 
       - name: WebAssembly CI
         uses: ./source/.github/actions/wasm-ci

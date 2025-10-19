@@ -11,8 +11,10 @@
 
 #include "vtkextModule.h"
 
+/// @cond
 #include <vtkImporter.h>
 #include <vtkVersion.h>
+/// @endcond
 
 class vtkInformationIntegerKey;
 

@@ -95,6 +95,7 @@ public:
     std::string ScreenshotFilename;
     std::string VerboseLevel;
     std::string MultiFileMode;
+    std::string MultiFileRegex;
     bool RecursiveDirAdd;
     bool RemoveEmptyFileGroups;
     std::vector<int> Resolution;
@@ -515,7 +516,13 @@ public:
 
     // Initialize libf3dOptions
     f3d::options libOptions;
+#if F3D_MODULE_UI
+#if F3D_MODULE_TINYFILEDIALOGS
     libOptions.ui.drop_zone.custom_binds = "None+Drop Ctrl+O None+H";
+#else
+    libOptions.ui.drop_zone.custom_binds = "None+Drop None+H";
+#endif
+#endif
 
     // Copy appOptions
     F3DOptionsTools::OptionsDict appOptions = F3DOptionsTools::DefaultAppOptions;
@@ -747,6 +754,7 @@ public:
     this->ParseOption(appOptions, "screenshot-filename", this->AppOptions.ScreenshotFilename);
     this->ParseOption(appOptions, "verbose", this->AppOptions.VerboseLevel);
     this->ParseOption(appOptions, "multi-file-mode", this->AppOptions.MultiFileMode);
+    this->ParseOption(appOptions, "multi-file-regex", this->AppOptions.MultiFileRegex);
     this->ParseOption(appOptions, "recursive-dir-add", this->AppOptions.RecursiveDirAdd);
     this->ParseOption(
       appOptions, "remove-empty-file-groups", this->AppOptions.RemoveEmptyFileGroups);
@@ -1064,6 +1072,20 @@ int F3DStarter::Start(int argc, char** argv)
   {
     f3d::log::warn("Unrecognized multi-file-mode: ", mode, ". Assuming \"single\" mode.");
     this->Internals->AppOptions.MultiFileMode = "single";
+  }
+
+  if (!this->Internals->AppOptions.MultiFileRegex.empty())
+  {
+    try
+    {
+      std::regex regex(this->Internals->AppOptions.MultiFileRegex);
+    }
+    catch (const std::regex_error&)
+    {
+      f3d::log::error(
+        "invalid regular expression: ", std::quoted(this->Internals->AppOptions.MultiFileRegex));
+      this->Internals->AppOptions.MultiFileRegex = "";
+    }
   }
 
 #if __APPLE__
@@ -1798,6 +1820,30 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
       const auto pathToGroupKey = [&]()
       {
         // XXX more multi-file mode may be added in the future
+        std::string tmpPathString = tmpPath.string();
+        if (!this->Internals->AppOptions.MultiFileRegex.empty())
+        {
+          const std::regex regex(this->Internals->AppOptions.MultiFileRegex);
+          std::smatch match;
+          if (std::regex_search(tmpPathString, match, regex))
+          {
+            // Replace captured groups with `*` so that, for example,
+            // `"foo-part12.xyz"` matching `part(\d+)` becomes `"foo-part*.xyz"`
+            std::stringstream groupKey;
+            size_t j = 0;
+            for (size_t i = 1; i <= regex.mark_count(); ++i)
+            {
+              if (match.length(i) &&                                 // skip empty
+                match.position(i) >= static_cast<std::ptrdiff_t>(j)) // or nested groups
+              {
+                groupKey << tmpPathString.substr(j, match.position(i) - j) << "*";
+                j = match.position(i) + match.length(i);
+              }
+            }
+            groupKey << tmpPathString.substr(j);
+            return groupKey.str();
+          }
+        }
         if (this->Internals->AppOptions.MultiFileMode == "all")
         {
           return std::string("");
@@ -1806,7 +1852,7 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
         {
           return tmpPath.parent_path().string();
         }
-        return tmpPath.string();
+        return tmpPathString;
       };
 
       const std::string groupKey = pathToGroupKey();

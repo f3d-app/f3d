@@ -870,6 +870,10 @@ interactor& interactor_impl::initCommands()
         {
           mode = "ssaa";
         }
+        else if (mode == "ssaa")
+        {
+          mode = "taa";
+        }
         else
         {
           enabled = false;
@@ -878,7 +882,7 @@ interactor& interactor_impl::initCommands()
       this->Internals->Window.render();
     },
     command_documentation_t{
-      "cycle_anti_aliasing", "cycle between the anti-aliasing method (none,fxaa,ssaa)" });
+      "cycle_anti_aliasing", "cycle between the anti-aliasing method (none,fxaa,ssaa,taa)" });
 
   std::vector<std::string> cycleColoringValidArgs = { "field", "array", "component" };
   this->addCommand(

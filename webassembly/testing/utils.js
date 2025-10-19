@@ -1,6 +1,12 @@
 import f3d from "../../dist/f3d.js";
 
 const utils = {
+  assert: (condition, description) => {
+    if (!condition) {
+      console.error("F3D_ERROR:" + description);
+    }
+  },
+
   runTest: (settings) => {
     settings.canvas = document.getElementById("canvas");
 
@@ -42,13 +48,13 @@ const utils = {
 
         // compare images
         const result = Module.engineInstance.getWindow().renderToImage(true);
-        const baseline = Module.Image.create("/baseline.png");
+        const baseline = new Module.Image("/baseline.png");
         const ssim = result.compare(baseline);
 
         if (ssim <= 0.05) {
           console.log("Passed with SSIM = " + ssim);
         } else {
-          console.error("F3D_ERROR: Comparison failed with SSIM " + ssim);
+          assert("Comparison failed with SSIM " + ssim);
 
           result.save("/result.png");
 

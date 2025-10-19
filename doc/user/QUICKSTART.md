@@ -6,7 +6,7 @@ As an overview, you'll learn how to run F3D and open files, configure basic scen
 
 ## Prerequisites
 
-To use F3D, you'll need to install F3D. See the [Installation](INSTALLATION.md) page for the latest release package supported by your system.
+To use F3D, you'll need to install F3D. See the download page for the latest release package supported by your system.
 
 ## Running F3D
 

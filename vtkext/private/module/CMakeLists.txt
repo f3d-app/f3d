@@ -75,6 +75,7 @@ set(classes
   vtkF3DUIObserver
   vtkF3DUIActor
   vtkF3DUserRenderPass
+  vtkF3DTAAResolvePass
   )
 
 if (F3D_MODULE_UI)

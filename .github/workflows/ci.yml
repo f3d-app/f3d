@@ -156,6 +156,10 @@ jobs:
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
+
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -200,7 +204,7 @@ jobs:
         vtk_version:
           [
             "${{needs.default_versions.outputs.vtk_commit_sha}}",
-            v9.5.0,
+            v9.5.2,
             v9.4.2,
             v9.3.1,
             v9.2.6,
@@ -251,6 +255,10 @@ jobs:
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
+
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -309,7 +317,7 @@ jobs:
         vtk_version:
           [
             "${{needs.default_versions.outputs.vtk_commit_sha}}",
-            v9.5.0,
+            v9.5.2,
             v9.4.2,
             v9.3.1,
             v9.2.6,
@@ -320,6 +328,9 @@ jobs:
             static_label: static
 
     runs-on: windows-latest
+
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
 
     steps:
       - name: Checkout
@@ -366,6 +377,7 @@ jobs:
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
       DISPLAY: :0
 
     steps:
@@ -387,7 +399,7 @@ jobs:
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
           blosc_version: ${{needs.default_versions.outputs.blosc_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
-          vtk_version: v9.5.0
+          vtk_version: v9.5.2
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
 
   #----------------------------------------------------------------------------
@@ -405,7 +417,7 @@ jobs:
         vtk_version:
           [
             "${{needs.default_versions.outputs.vtk_commit_sha}}",
-            v9.5.0,
+            v9.5.2,
             v9.4.2,
             v9.3.1,
             v9.2.6,
@@ -555,6 +567,7 @@ jobs:
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
       DISPLAY: :0
 
     steps:
@@ -607,13 +620,16 @@ jobs:
         vtk_version:
           [
             "${{needs.default_versions.outputs.vtk_commit_sha}}",
-            v9.5.0,
+            v9.5.2,
             v9.4.2,
             v9.3.1,
             v9.2.6,
           ]
 
     runs-on: macos-13
+
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
 
     steps:
       - name: Checkout
@@ -659,7 +675,7 @@ jobs:
       matrix:
         vtk_version: [
             "${{needs.default_versions.outputs.vtk_commit_sha}}",
-            v9.5.0,
+            v9.5.2,
             v9.4.2,
             v9.3.1,
           ] # VTK 9.2.6 not compatible with recent clang version on macOS
@@ -674,6 +690,9 @@ jobs:
             static_label: static
 
     runs-on: macos-14
+
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
 
     steps:
       - name: Checkout
@@ -737,6 +756,7 @@ jobs:
 
     env:
       DISPLAY: :0
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
 
     steps:
       - name: Checkout
@@ -831,6 +851,7 @@ jobs:
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
       DISPLAY: :0
       CC: clang
       CXX: clang++
@@ -876,6 +897,7 @@ jobs:
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
       CC: clang
       CXX: clang++
 
@@ -918,6 +940,9 @@ jobs:
 
     runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
+
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
 
     steps:
       - name: Checkout
@@ -1010,7 +1035,6 @@ jobs:
       F3D_DOCKER_TIMESTAMP: ${{needs.default_versions.outputs.timestamp}}
 
     steps:
-      # Note that LFS is needed in order to include the default model
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -1021,54 +1045,26 @@ jobs:
       - name: WebAssembly CI
         uses: ./source/.github/actions/wasm-ci
 
-  #----------------------------------------------------------------------------
-  # generate website
-  #----------------------------------------------------------------------------
-  generate-website:
-    needs: webassembly
-    name: Generate Website
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          lfs: true
+      # TODO: it's currently NOT using NPM, let's fix it when 3.3 is available
+      - name: Install dependencies
+        working-directory: ${{github.workspace}}/source/examples/libf3d/web
+        run: npm install
 
-      - name: Build Jekyll
-        uses: actions/jekyll-build-pages@v1
-
-      - name: Install doxygen and build doxygen doc
-        working-directory: ${{github.workspace}}
-        run: |
-          pip install "sphinx==5.3.0" "pydata-sphinx-theme==0.13.1" sphinx-book-theme exhale
-          sudo apt install doxygen
-          sphinx-build -M html ./library/doxygen ./library/doxygen/build/
-          sudo mv library/doxygen/build/html _site/doc/libf3d/doxygen
-          sphinx-build -M html ./vtkext/public/doxygen ./vtkext/public/doxygen/build/
-          sudo mv vtkext/public/doxygen/build/html _site/doc/libf3d/vtkext_doxygen
+      - name: Build F3D web app with npm F3D package
+        working-directory: ${{github.workspace}}/source/examples/libf3d/web
+        run: npm run build
 
       - name: Retrieve f3d package
         uses: actions/download-artifact@v4
         with:
           name: f3d-wasm-package
-          path: ${{github.workspace}}/examples/libf3d/web
+          path: ${{github.workspace}}/source/examples/libf3d/web
 
+      # Override with the locally built package
       - name: Install f3d package
-        working-directory: ${{github.workspace}}/examples/libf3d/web
+        working-directory: ${{github.workspace}}/source/examples/libf3d/web
         run: npm install f3d-*.tgz
 
-      - name: Build F3D web app
-        working-directory: ${{github.workspace}}/examples/libf3d/web
+      - name: Build F3D web app with package just built from branch
+        working-directory: ${{github.workspace}}/source/examples/libf3d/web
         run: npm run build
-
-      - name: Copy F3D web app
-        run: sudo mv ${{github.workspace}}/examples/libf3d/web/dist _site/web
-
-      - name: Deploy
-        if: github.ref == 'refs/heads/master'
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: _site
-          token: ${{ secrets.GITHUB_TOKEN }}
-          clean: true

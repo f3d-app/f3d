@@ -96,8 +96,8 @@ endif()
 
 # Modules
 option(F3D_MODULE_RAYTRACING "Raytracing module" OFF)
-option(F3D_MODULE_EXR "OpenEXR images module" OFF)
 # Needs vtkResourceStream (https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9663)
+cmake_dependent_option(F3D_MODULE_EXR "OpenEXR images module" OFF "VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221216" OFF)
 cmake_dependent_option(F3D_MODULE_WEBP "WebP images module" OFF "VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221216" OFF)
 option(F3D_MODULE_UI "ImGui widgets module" ON)
 option(F3D_MODULE_DMON "dmon (watch) module" ON)
@@ -296,7 +296,7 @@ install(FILES LICENSE.md
   DESTINATION ${F3D_LIC_DIR} COMPONENT licenses)
 
 if (F3D_BUILD_APPLICATION)
-  install(FILES doc/THIRD_PARTY_LICENSES.md
+  install(FILES THIRD_PARTY_LICENSES.md
     DESTINATION ${F3D_LIC_DIR} COMPONENT licenses)
 endif ()
 

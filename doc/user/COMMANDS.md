@@ -25,7 +25,7 @@ The libf3d provides a few commands, many related to manipulating libf3d (options
 
 `set_reader_option Reader.option_name value`: A specific command to set a [reader option](SUPPORTED_FORMATS.md#reader-options), eg: `set_reader_option QuakeMDL.skin_index 1`
 
-`cycle_anti_aliasing`: A specific command to cycle between the anti-aliasing method (`none`,`fxaa`,`ssaa`).
+`cycle_anti_aliasing`: A specific command to cycle between the anti-aliasing method (`none`,`fxaa`,`ssaa`,`taa`).
 
 `cycle_animation`: A specific command to cycle `scene.animation.index` option using model information, No argument.
 
@@ -148,8 +148,11 @@ Command syntax is similar to bash, as in they will be split by "token" to be pro
 - Quotes inside quotes are supported as well, eg: `set render.hdri.file "/path/to/file'with'quotes.png"`.
 - Quotes and spaces can be escaped, eg: `set render.hdri.file /path/to/file\ with\ spaces\ and\ \'quotes\".png`.
 - Comment are supported using `#`, Any character after will be ignored. Use `\#` to add it verbatim.
-  > Comments are only supported in command script, in interactive console `#` and all characters after will be handled
-  > as standard character.
+
+> [!NOTE]
+> Comments are only supported in command script, in interactive console `#` and all characters after will be handled
+> as standard character.
+
 - Escapes can be escaped too: eg: `set render.hdri.file C:\\path\\to\\windows\\file.png`.
 - Other escaped character will be processed as if the escape was not present, eg: `set scene.up.direction +\Z`
 - Unfinished quoted section is invalid, eg: `set scene.up.direction "+Z`

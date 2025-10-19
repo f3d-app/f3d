@@ -24,9 +24,9 @@ _Animation of a glTF file within F3D_
 
 _A direct scalars render by F3D_
 
-See the [gallery](doc/GALLERY.md) for more images, take a look at the [changelog](doc/CHANGELOG.md) or go to the [install guide](doc/user/INSTALLATION.md) to download and install F3D!
+See the [gallery](https://f3d.app/gallery) for more images, take a look at the [changelog](doc/CHANGELOG.md) or go to the [download page](https://f3d.app/download) to download and install F3D!
 
-You can even use F3D directly in your [browser](https://f3d.app/web)!
+You can even use F3D directly in your [browser](https://f3d.app/viewer)!
 
 If you need any help or want to discuss with other F3D users and developers, head over to our [discord](https://discord.f3d.app).
 
@@ -44,21 +44,29 @@ See the [Quickstart Guide](doc/user/QUICKSTART.md) for more information about ge
 
 # Documentation
 
-- To get started, please take a look at the [user documentation](doc/user/README_USER.md).
+- To get started, please take a look at the [user documentation](doc/user/QUICKSTART.md).
 - If you need any help, are looking for a feature or found a bug, please open an [issue](https://github.com/f3d-app/f3d/issues).
-- If you want to use the libf3d, please take a look at its [documentation](doc/libf3d/README_LIBF3D.md).
-- If you want to build F3D, please take a look at the [developer documentation](doc/dev/README_DEV.md).
+- If you want to use the libf3d, please take a look at its [documentation](doc/libf3d/OVERVIEW.md).
+- If you want to build F3D, please take a look at the [contribution guide](CONTRIBUTING.md).
 
 # Support
 
 F3D needs your help!
 
 If you can, please consider sponsoring F3D. Even a small donation would help us offset the recurring maintenance costs.
-With enough sponsors we would be able to make F3D grow faster and stronger! Read more about it [here](doc/user/SPONSORING.md).
+With enough sponsors we would be able to make F3D grow faster and stronger! Read more about it [here](https://f3d.app/thanks).
 
-If you are an industry user of F3D and want to make sure it can keep growing and being maintained, [please reach out](doc/user/SPONSORING.md#industry-sponsors)!
+If you are an industry user of F3D and want to make sure it can keep growing and being maintained, [please reach out](https://f3d.app/thanks)!
 
 In any case, please star it on github and share the word about it!
+
+## Sponsors
+
+Many thanks to our sponsors for supporting F3D
+
+<a href="https://nlnet.nl/project/F3D/" target="_blank"><img src="https://nlnet.nl/image/logos/NGI0Core_tag.svg" height="45"/></a>
+<a href="https://www.lambdatest.com/?utm_source=f3d&utm_medium=sponsor" target="_blank"><img src="https://www.lambdatest.com/blue-logo.png" height="45" /></a>
+<a href="https://www.opendronemap.org/" target="_blank"><img src="https://f3d.app/assets/images/opendronemap-95d4ad6e24c091a06ec00e1828e1eb38.png" height="45" /></a>
 
 # Vision
 
@@ -81,7 +89,7 @@ but there is no plan to:
 
 # Contributing
 
-F3D as a community-driven, inclusive and beginner-friendly project. We love to see how the project is growing thanks to the contributions from the community. We would love to see your face in the list below! If you want to contribute to F3D, you are very welcome to! Take a look at our [contribution documentation](CONTRIBUTING.md), [governance documentation](doc/dev/GOVERNANCE.md) and [code of conduct](CODE_OF_CONDUCT.md).
+F3D as a community-driven, inclusive and beginner-friendly project. We love to see how the project is growing thanks to the contributions from the community. We would love to see your face in the list below! If you want to contribute to F3D, you are very welcome to! Take a look at our [contribution documentation](CONTRIBUTING.md), [governance documentation](https://f3d.app/dev/GOVERNANCE) and [code of conduct](CODE_OF_CONDUCT.md).
 
 <a href="https://github.com/f3d-app/f3d/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=f3d-app/f3d" />
@@ -94,5 +102,5 @@ F3D was initially created by [Kitware SAS](https://www.kitware.eu/) and is relyi
 # License
 
 F3D can be used and distributed under the 3-Clause BSD License, see the [license](LICENSE.md).
-F3D integrate the sources of other libraries and tools, all under permissive licenses, see the [third party licenses](doc/THIRD_PARTY_LICENSES.md).
+F3D integrate the sources of other libraries and tools, all under permissive licenses, see the [third party licenses](THIRD_PARTY_LICENSES.md).
 F3D packages relies on other libraries and tools, all under permissive licenses, all listed in the respective packages.

@@ -39,6 +39,10 @@
 #include <vtkF3DEGLRenderWindow.h>
 #endif
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+#include <vtkMemoryResourceStream.h>
+#endif
+
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
 #include <vtkOSOpenGLRenderWindow.h>
 #endif
@@ -312,8 +316,14 @@ window& window_impl::setIcon(const unsigned char* icon, size_t iconSize)
 {
   // XXX This code requires that the interactor has already been set on the render window
   vtkNew<vtkPNGReader> iconReader;
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+  vtkNew<vtkMemoryResourceStream> stream;
+  stream->SetBuffer(icon, iconSize);
+  iconReader->SetStream(stream);
+#else
   iconReader->SetMemoryBuffer(icon);
   iconReader->SetMemoryBufferLength(iconSize);
+#endif
   iconReader->Update();
   this->Internals->RenWin->SetIcon(iconReader->GetOutput());
   return *this;
@@ -414,6 +424,7 @@ void window_impl::UpdateDynamicOptions()
     renderer->SetInvertZoom(opt.interactor.invert_zoom);
     renderer->SetRotationAxis(opt.interactor.axis_lock);
 
+#if F3D_MODULE_UI
     std::string bindsStr = opt.ui.drop_zone.custom_binds;
     std::vector<std::pair<std::string, std::string>> dropZoneBinds;
 
@@ -435,6 +446,7 @@ void window_impl::UpdateDynamicOptions()
       }
     }
     renderer->SetDropZoneBinds(dropZoneBinds);
+#endif
   }
 
   // F3D_DEPRECATED
@@ -491,10 +503,14 @@ void window_impl::UpdateDynamicOptions()
     {
       aaMode = vtkF3DRenderer::AntiAliasingMode::SSAA;
     }
+    else if (opt.render.effect.antialiasing.mode == "taa")
+    {
+      aaMode = vtkF3DRenderer::AntiAliasingMode::TAA;
+    }
     else
     {
       log::warn(opt.render.effect.antialiasing.mode,
-        R"( is an invalid antialiasing mode. Valid modes are: "fxaa", "ssaa")");
+        R"( is an invalid antialiasing mode. Valid modes are: "fxaa", "ssaa", "taa)");
     }
   }
 

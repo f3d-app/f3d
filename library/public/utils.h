@@ -4,6 +4,7 @@
 #include "exception.h"
 #include "export.h"
 
+/// @cond
 #include <filesystem>
 #include <map>
 #include <optional>
@@ -11,6 +12,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+/// @endcond
 
 namespace f3d
 {
@@ -41,19 +43,20 @@ public:
    * otherwise '#' and any characters after will be handled as standard character
    *  - Use escaped \# to add it verbatim when using keepComments = true
    *  - Other escaped characters are also added verbatim
+   *
    * Throw a tokenize_exception if a quoted section is not closed or if finishing with an escape
    *
    * Examples:
-   * `set scene.up.direction +Z` -> `set` `scene.up.direction` `+Z`
-   * `set render.hdri.file "/path/to/file with spaces.png"` -> `set`, `render.hdri.file`, `/path/to/file with spaces.png`
-   * `set render.hdri.file '/path/to/file with spaces.png'` -> `set`, `render.hdri.file`, `/path/to/file with spaces.png`
-   * `set render.hdri.file "/path/to/file'with'quotes.png"` -> `set`, `render.hdri.file`, `/path/to/file'with'quotes.png`
-   * `set render.hdri.file /path/to/file\ spaces\ \'quotes\".png` -> `set`, `render.hdri.file`, `/path/to/file spaces 'quotes".png`
-   * `set render.hdri.file C:\\path\\to\\windows\\file.png` -> `set`, `render.hdri.file`, `C:\path\to\windows\file.png`
-   * `set scene.up.direction +Z # A comment` -> `set`, `scene.up.direction`, `+Z`
-   * `set scene.up.direction +\Z` -> `set`, `scene.up.direction`, `+Z`
-   * `set scene.up.direction "+Z` -> tokenize_exception
-   * `set scene.up.direction +Z\` -> tokenize_exception
+   *  - `set scene.up.direction +Z` -> `set` `scene.up.direction` `+Z`
+   *  - `set render.hdri.file "/path/to/file with spaces.png"` -> `set`, `render.hdri.file`, `/path/to/file with spaces.png`
+   *  - `set render.hdri.file '/path/to/file with spaces.png'` -> `set`, `render.hdri.file`, `/path/to/file with spaces.png`
+   *  - `set render.hdri.file "/path/to/file'with'quotes.png"` -> `set`, `render.hdri.file`, `/path/to/file'with'quotes.png`
+   *  - `set render.hdri.file /path/to/file\ spaces\ \'quotes\".png` -> `set`, `render.hdri.file`, `/path/to/file spaces 'quotes".png`
+   *  - `set render.hdri.file C:\\path\\to\\windows\\file.png` -> `set`, `render.hdri.file`, `C:\path\to\windows\file.png`
+   *  - `set scene.up.direction +Z # A comment` -> `set`, `scene.up.direction`, `+Z`
+   *  - `set scene.up.direction +\Z` -> `set`, `scene.up.direction`, `+Z`
+   *  - `set scene.up.direction "+Z` -> tokenize_exception
+   *  - `set scene.up.direction +Z\` -> tokenize_exception
    */
   [[nodiscard]] static std::vector<std::string> tokenize(std::string_view str, bool keepComments = true);
   // clang-format on
@@ -64,6 +67,7 @@ public:
    * - Transform relative path into an absolute path based on basedDirectory if provided, or the
    * current directory if not
    * - Remove any `..` if any
+   *
    * Rely on vtksys::SystemTools::CollapseFullPath but return empty string if the provided
    * string is empty.
    */
@@ -82,7 +86,7 @@ public:
    * - `{a,b,c}`: Alternation, matches any of the given comma-separated patterns
    * - `**`: Matches any number of characters including path separators
    *
-   * Throws a `utils::glob_exception` if a character class or alternation is not closed or
+   * Throws a utils::glob_exception if a character class or alternation is not closed or
    * the expression ends with an escape.
    */
   [[nodiscard]] static std::string globToRegex(std::string_view glob, char pathSeparator = '/');
@@ -124,12 +128,13 @@ public:
     explicit glob_exception(const std::string& what = "");
   };
 
-  /** String template allowing substitution of variables enclosed in curly braces.
-    ```
-    string_template("{greeting} {name}!")
-      .substitute({ { "greeting", "hello" }, { "name", "World" } })
-      .str() == "hello World!"
-    ```
+  /**
+   * String template allowing substitution of variables enclosed in curly braces.
+   * \code{.cpp}
+   * string_template("{greeting} {name}!")
+   *   .substitute({ { "greeting", "hello" }, { "name", "World" } })
+   *   .str() == "hello World!"
+   * \endcode
    */
   class string_template
   {
@@ -138,14 +143,18 @@ public:
   public:
     explicit string_template(const std::string& templateString);
 
-    /** Substitute variables based on a `std::string(const std::string&)` function.
-     * Variables for which the function throws a `string_template::lookup_error` exception
+    /**
+     * Substitute variables based on a `std::string(const std::string&)` function.
+     *
+     * Variables for which the function throws a string_template::lookup_error exception
      * are left untouched.
      */
     template<typename F>
     string_template& substitute(F lookup);
 
-    /** Substitute variables based on a map.
+    /**
+     * Substitute variables based on a map.
+     *
      * Variables for which the map does not contain a key are left untouched.
      */
     string_template& substitute(const std::map<std::string, std::string>& lookup);
