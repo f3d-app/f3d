@@ -1,6 +1,13 @@
 import f3d from "../../dist/f3d.js";
 
 const utils = {
+  assert: (condition, description) => {
+    if (!condition)
+    {
+      console.error("F3D_ERROR:" + description);
+    }
+  },
+
   runTest: (settings) => {
     settings.canvas = document.getElementById("canvas");
 
@@ -48,7 +55,7 @@ const utils = {
         if (ssim <= 0.05) {
           console.log("Passed with SSIM = " + ssim);
         } else {
-          console.error("F3D_ERROR: Comparison failed with SSIM " + ssim);
+          assert("Comparison failed with SSIM " + ssim);
 
           result.save("/result.png");
 

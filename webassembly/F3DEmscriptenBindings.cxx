@@ -36,38 +36,54 @@ EMSCRIPTEN_BINDINGS(f3d)
   // f3d::options
   emscripten::class_<f3d::options>("Options")
     .constructor<>()
-    //.function("set", &setOption, emscripten::return_value_policy::reference())
     .function(
       "get",
       +[](f3d::options& options, const std::string& name) -> emscripten::val
       {
-        f3d::option_variant_t value = options.get(name);
-        if (std::holds_alternative<bool>(value))
+        try
         {
-          return emscripten::val(std::get<bool>(value));
+          f3d::option_variant_t value = options.get(name);
+          if (std::holds_alternative<bool>(value))
+          {
+            return emscripten::val(std::get<bool>(value));
+          }
+          if (std::holds_alternative<int>(value))
+          {
+            return emscripten::val(std::get<int>(value));
+          }
+          if (std::holds_alternative<double>(value))
+          {
+            return emscripten::val(std::get<double>(value));
+          }
+          if (std::holds_alternative<std::string>(value))
+          {
+            return emscripten::val(std::get<std::string>(value));
+          }
+          if (std::holds_alternative<std::vector<double>>(value))
+          {
+            emscripten::val jsArray = emscripten::val::array();
+            for (double elem : std::get<std::vector<double>>(value))
+            {
+              jsArray.call<void>("push", elem);
+            }
+            return jsArray;
+          }
+          if (std::holds_alternative<std::vector<int>>(value))
+          {
+            emscripten::val jsArray = emscripten::val::array();
+            for (int elem : std::get<std::vector<int>>(value))
+            {
+              jsArray.call<void>("push", elem);
+            }
+            return jsArray;
+          }
         }
-        if (std::holds_alternative<int>(value))
+        catch(f3d::exception)
         {
-          return emscripten::val(std::get<int>(value));
-        }
-        if (std::holds_alternative<double>(value))
-        {
-          return emscripten::val(std::get<double>(value));
-        }
-        if (std::holds_alternative<std::string>(value))
-        {
-          return emscripten::val(std::get<std::string>(value));
-        }
-        if (std::holds_alternative<std::vector<double>>(value))
-        {
-          return emscripten::val(std::get<std::vector<double>>(value));
-        }
-        if (std::holds_alternative<std::vector<int>>(value))
-        {
-          return emscripten::val(std::get<std::vector<int>>(value));
+          return emscripten::val::undefined();
         }
 
-        throw std::runtime_error("Cannot get type of " + name);
+        return emscripten::val::undefined();
       })
     .function(
       "setAsString",
@@ -161,15 +177,18 @@ EMSCRIPTEN_BINDINGS(f3d)
   emscripten::class_<f3d::camera>("Camera")
     .function(
       "setPosition", &f3d::camera::setPosition, emscripten::return_value_policy::reference())
-    .function("getPosition", static_cast<f3d::point3_t(f3d::camera::*)()>(&f3d::camera::getPosition))
+    .function(
+      "getPosition", static_cast<f3d::point3_t (f3d::camera::*)()>(&f3d::camera::getPosition))
     .function(
       "setFocalPoint", &f3d::camera::setFocalPoint, emscripten::return_value_policy::reference())
-    .function("getFocalPoint", static_cast<f3d::point3_t(f3d::camera::*)()>(&f3d::camera::getFocalPoint))
+    .function(
+      "getFocalPoint", static_cast<f3d::point3_t (f3d::camera::*)()>(&f3d::camera::getFocalPoint))
     .function("setViewUp", &f3d::camera::setViewUp, emscripten::return_value_policy::reference())
-    .function("getViewUp", static_cast<f3d::vector3_t(f3d::camera::*)()>(&f3d::camera::getViewUp))
+    .function("getViewUp", static_cast<f3d::vector3_t (f3d::camera::*)()>(&f3d::camera::getViewUp))
     .function(
       "setViewAngle", &f3d::camera::setViewAngle, emscripten::return_value_policy::reference())
-    .function("getViewAngle", static_cast<f3d::angle_deg_t(f3d::camera::*)()>(&f3d::camera::getViewAngle))
+    .function(
+      "getViewAngle", static_cast<f3d::angle_deg_t (f3d::camera::*)()>(&f3d::camera::getViewAngle))
     .function("dolly", &f3d::camera::dolly, emscripten::return_value_policy::reference())
     .function("pan", &f3d::camera::pan, emscripten::return_value_policy::reference())
     .function("zoom", &f3d::camera::zoom, emscripten::return_value_policy::reference())
