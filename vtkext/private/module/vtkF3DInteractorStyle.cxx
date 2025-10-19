@@ -157,18 +157,32 @@ void vtkF3DInteractorStyle::Rotate()
   const double* fp = camera->GetFocalPoint();
   double newPos[3];
 
+  constexpr double maxAbsElevation = 90 - 1e-10;
+
   if (ren->GetUseRotationAxis())
   {
     // pick whichever mouse component is larger
     double delta = (std::abs(rxf) > std::abs(ryf)) ? rxf : ryf;
+    
+    const double* axis = ren->GetRotationAxis();
+    if (axis[0] == 1.0 && axis[1] == 0.0 && axis[2] == 0.0 && !ren->GetUseTrackball())
+    {
+      double elevation = vtkMath::DegreesFromRadians(
+        vtkMath::AngleBetweenVectors(ren->GetUpVector(), camera->GetDirectionOfProjection()) -
+        vtkMath::Pi() / 2);
+      camera->Elevation(
+        std::clamp(delta, -maxAbsElevation - elevation, +maxAbsElevation - elevation));
+    }
+    else
+    {
+      Transform->Identity();
+      Transform->Translate(+fp[0], +fp[1], +fp[2]);
+      Transform->RotateWXYZ(delta, ren->GetRotationAxis());
+      Transform->Translate(-fp[0], -fp[1], -fp[2]);
 
-    Transform->Identity();
-    Transform->Translate(+fp[0], +fp[1], +fp[2]);
-    Transform->RotateWXYZ(delta, ren->GetRotationAxis());
-    Transform->Translate(-fp[0], -fp[1], -fp[2]);
-
-    Transform->TransformPoint(camera->GetPosition(), newPos);
-    camera->SetPosition(newPos);
+      Transform->TransformPoint(camera->GetPosition(), newPos);
+      camera->SetPosition(newPos);
+    }
 
     double newViewUp[3];
     Transform->TransformVector(camera->GetViewUp(), newViewUp);
@@ -202,8 +216,7 @@ void vtkF3DInteractorStyle::Rotate()
       camera->SetPosition(newPos);
 
       // Clamp parameter to `camera->Elevation()` to maintain -90 < elevation < +90
-      constexpr double maxAbsElevation = 90 - 1e-10;
-      const double elevation = vtkMath::DegreesFromRadians(
+      double elevation = vtkMath::DegreesFromRadians(
         vtkMath::AngleBetweenVectors(ren->GetUpVector(), camera->GetDirectionOfProjection()) -
         vtkMath::Pi() / 2);
       camera->Elevation(
