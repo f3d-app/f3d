@@ -63,8 +63,11 @@ In any case, please star it on github and share the word about it!
 ## Diamond level sponsors
 
 <p style="font-size:21px; color:black;">
-  <a href="https://nlnet.nl/project/F3D/" target="_blank">
-    <img src="https://nlnet.nl/logo/banner-320x120.png" style="vertical-align: middle;" width="250" />
+  <a href="https://nlnet.nl/project/F3D/">
+    <img src="https://nlnet.nl/logo/banner.svg"/>
+  </a>
+  <a href="https://nlnet.nl/project/F3D/">
+    <img src="https://nlnet.nl/image/logos/NGI0Core_tag.svg"/>
   </a>
   <a href="https://www.lambdatest.com/?utm_source=f3d&utm_medium=sponsor" target="_blank">
     <img src="https://www.lambdatest.com/blue-logo.png" style="vertical-align: middle;" width="250" height="45" />
