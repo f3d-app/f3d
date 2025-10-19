@@ -134,7 +134,7 @@ eng.interactor.start()
 
 Webassembly testing protocol:
 
-- Clone `f3d-website`
+- Clone https://github.com/f3d-app/f3d-website
 - Remove current `f3d` version
 - Install the last RC version
 - Run the website and check the web viewer page
