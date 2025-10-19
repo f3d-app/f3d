@@ -6,18 +6,7 @@
 vtkStandardNewMacro(vtkF3DConsoleOutputWindow);
 
 //----------------------------------------------------------------------------
-#ifdef WIN32
-vtkF3DConsoleOutputWindow::vtkF3DConsoleOutputWindow()
-{
-  // enable formatting on windows terminal
-  HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-  DWORD dwMode;
-  GetConsoleMode(hOut, &dwMode);
-  SetConsoleMode(hOut, dwMode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
-}
-#else
 vtkF3DConsoleOutputWindow::vtkF3DConsoleOutputWindow() = default;
-#endif
 
 //----------------------------------------------------------------------------
 void vtkF3DConsoleOutputWindow::DisplayText(const char* txt)

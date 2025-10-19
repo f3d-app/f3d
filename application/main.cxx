@@ -43,6 +43,12 @@ int main(int argc, char** argv)
 
 int WINAPI wWinMain(HINSTANCE, HINSTANCE, LPWSTR, int)
 {
+  // enable formatting on windows terminal
+  HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+  DWORD dwMode;
+  GetConsoleMode(hOut, &dwMode);
+  SetConsoleMode(hOut, dwMode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+
   // Set console code page to UTF-8 so console known how to interpret string data
   SetConsoleOutputCP(CP_UTF8);
 
