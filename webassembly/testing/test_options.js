@@ -2,7 +2,6 @@ import utils from "./utils.js";
 
 const settings = {
   run: (Module) => {
-
     Module.Log.setVerboseLevel(Module.LogVerboseLevel.INFO, false);
 
     const options = new Module.Options();
@@ -46,46 +45,78 @@ const settings = {
     );
 
     // try not valued option
-    utils.assert(options.get("model.color.opacity") === undefined,
+    utils.assert(
+      options.get("model.color.opacity") === undefined,
       "options getter for undefined",
     );
 
     // try not existing option
-    utils.assert(options.get("foo") === undefined,
+    utils.assert(
+      options.get("foo") === undefined,
       "options getter for not existing",
     );
 
     const options2 = new Module.Options();
     options2.toggle("model.scivis.enable");
 
-    utils.assert(options.isSame(options2, "model.scivis.enable"), "options isSame");
-    utils.assert(!options.isSame(options2, "render.background.color"), "options !isSame");
+    utils.assert(
+      options.isSame(options2, "model.scivis.enable"),
+      "options isSame",
+    );
+    utils.assert(
+      !options.isSame(options2, "render.background.color"),
+      "options !isSame",
+    );
     options.copy(options2, "render.background.color");
-    utils.assert(options.isSame(options2, "render.background.color"), "options isSame after copy");
+    utils.assert(
+      options.isSame(options2, "render.background.color"),
+      "options isSame after copy",
+    );
 
-    utils.assert(options.hasValue("model.scivis.array_name"), "options hasValue")
-    utils.assert(!options.hasValue("model.color.opacity"), "options !hasValue")
+    utils.assert(
+      options.hasValue("model.scivis.array_name"),
+      "options hasValue",
+    );
+    utils.assert(!options.hasValue("model.color.opacity"), "options !hasValue");
 
-    utils.assert(Module.Options.getAllNames().includes("ui.drop_zone.enable"), "options getAllNames");
-    utils.assert(options.getNames().includes("ui.drop_zone.enable"), "options getNames");
-    utils.assert(!options.getNames().includes("model.color.rgb"), "options getNames not set");
+    utils.assert(
+      Module.Options.getAllNames().includes("ui.drop_zone.enable"),
+      "options getAllNames",
+    );
+    utils.assert(
+      options.getNames().includes("ui.drop_zone.enable"),
+      "options getNames",
+    );
+    utils.assert(
+      !options.getNames().includes("model.color.rgb"),
+      "options getNames not set",
+    );
 
     const closestOptions = options.getClosestOption("modele.colr.rgb");
-    utils.assert(closestOptions[0] === "model.color.rgb", "closest option name");
+    utils.assert(
+      closestOptions[0] === "model.color.rgb",
+      "closest option name",
+    );
     utils.assert(closestOptions[1] === 2, "closest option distance");
 
     utils.assert(options.isOptional("model.color.rgb"), "options isOptional");
-    utils.assert(!options.isOptional("model.point_sprites.size"), "options !isOptional");
+    utils.assert(
+      !options.isOptional("model.point_sprites.size"),
+      "options !isOptional",
+    );
 
     options.removeValue("model.scivis.array_name");
-    utils.assert(!options.hasValue("model.scivis.array_name"), "options !hasValue after removal");
+    utils.assert(
+      !options.hasValue("model.scivis.array_name"),
+      "options !hasValue after removal",
+    );
 
     options.reset("model.scivis.enable");
     utils.assert(
       options.get("model.scivis.enable") === false,
       "options getter after reset",
     );
-  }
+  },
 };
 
 utils.runBasicTest(settings);

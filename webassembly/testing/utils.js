@@ -10,7 +10,6 @@ const utils = {
   runBasicTest: (settings) => {
     f3d(settings)
       .then(async (Module) => {
-
         Module.run(Module);
 
         window.close();
@@ -27,9 +26,9 @@ const utils = {
     f3d(settings)
       .then(async (Module) => {
         // write in the wasm filesystem
-        const modelFile = await fetch(
-          "../../../testing/data/" + dataPath,
-        ).then((b) => b.arrayBuffer());
+        const modelFile = await fetch("../../../testing/data/" + dataPath).then(
+          (b) => b.arrayBuffer(),
+        );
         Module.FS.writeFile(dataPath, new Uint8Array(modelFile));
 
         const baselineFile = await fetch(
