@@ -33,6 +33,7 @@ Release Candidates :
 - [ ] Locally test the python wheels on Linux
 - [ ] Locally test the python wheels on macOS (Silicon)
 - [ ] Locally test the python wheels on Windows
+- [ ] Locally test the wasm package
 - If it fails,
   - [ ] Fix the issues in `release` branch,
   - [ ] Edit this issue and increment `N`
@@ -130,6 +131,17 @@ eng.interactor.start()
 - Check the following
   - The name of the window is `f3d` at all time
   - Python provides suggestions whenever the "Tab" key is pressed
+
+Webassembly testing protocol:
+
+- Clone https://github.com/f3d-app/f3d-website
+- Replace the current `f3d` version by the last RC available and run the website locally to check the web viewer:
+
+```bash
+npm uninstall f3d
+npm install f3d --tag next
+npm run start
+```
 
 Once a release cycle:
 
