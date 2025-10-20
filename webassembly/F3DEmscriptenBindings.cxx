@@ -93,16 +93,56 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function(
       "toggle", +[](f3d::options& o, const std::string& name) -> f3d::options&
       { return o.toggle(name); }, emscripten::return_value_policy::reference())
-    .function("isSame", &f3d::options::isSame)
-    .function("hasValue", &f3d::options::hasValue)
-    .function("copy", &f3d::options::copy, emscripten::return_value_policy::reference())
-    .class_function("getAllNames", &f3d::options::getAllNames)
-    .function("getNames", &f3d::options::getNames)
-    .function("getClosestOption", &f3d::options::getClosestOption)
-    .function("isOptional", &f3d::options::isOptional)
-    .function("reset", &f3d::options::reset, emscripten::return_value_policy::reference())
     .function(
-      "removeValue", &f3d::options::removeValue, emscripten::return_value_policy::reference());
+      "isSame", +[](f3d::options& o, f3d::options& other, const std::string& name) -> bool
+      { return o.isSame(other, name); })
+    .function(
+      "hasValue",
+      +[](f3d::options& o, const std::string& name) -> bool { return o.hasValue(name); })
+    .function(
+      "copy", +[](f3d::options& o, f3d::options& other, const std::string& name) -> f3d::options&
+      { return o.copy(other, name); }, emscripten::return_value_policy::reference())
+    .class_function(
+      "getAllNames",
+      +[]() -> emscripten::val
+      {
+        emscripten::val jsArray = emscripten::val::array();
+        for (const std::string& elem : f3d::options::getAllNames())
+        {
+          jsArray.call<void>("push", elem);
+        }
+        return jsArray;
+      })
+    .function(
+      "getNames",
+      +[](f3d::options& o) -> emscripten::val
+      {
+        emscripten::val jsArray = emscripten::val::array();
+        for (const std::string& elem : o.getNames())
+        {
+          jsArray.call<void>("push", elem);
+        }
+        return jsArray;
+      })
+    .function(
+      "getClosestOption",
+      +[](f3d::options& o, const std::string& name) -> emscripten::val
+      {
+        emscripten::val jsArray = emscripten::val::array();
+        auto closest = o.getClosestOption(name);
+        jsArray.call<void>("push", closest.first);
+        jsArray.call<void>("push", closest.second);
+        return jsArray;
+      })
+    .function(
+      "isOptional",
+      +[](f3d::options& o, const std::string& name) -> bool { return o.isOptional(name); })
+    .function(
+      "reset", +[](f3d::options& o, const std::string& name) -> f3d::options&
+      { return o.reset(name); }, emscripten::return_value_policy::reference())
+    .function(
+      "removeValue", +[](f3d::options& o, const std::string& name) -> f3d::options&
+      { return o.removeValue(name); }, emscripten::return_value_policy::reference());
 
   // f3d::scene
   // TODO:
@@ -295,4 +335,14 @@ EMSCRIPTEN_BINDINGS(f3d)
     .class_function("setReaderOption", &f3d::engine::setReaderOption)
     .class_function("getLibInfo", &f3d::engine::getLibInfo)
     .class_function("getReadersInfo", &f3d::engine::getReadersInfo);
+
+  // f3d::log
+  emscripten::enum_<f3d::log::VerboseLevel>("LogVerboseLevel")
+    .value("DEBUG", f3d::log::VerboseLevel::DEBUG)
+    .value("INFO", f3d::log::VerboseLevel::INFO)
+    .value("WARN", f3d::log::VerboseLevel::WARN)
+    .value("ERROR", f3d::log::VerboseLevel::ERROR)
+    .value("QUIET", f3d::log::VerboseLevel::QUIET);
+
+  emscripten::class_<f3d::log>("Log").class_function("setVerboseLevel", f3d::log::setVerboseLevel);
 }
