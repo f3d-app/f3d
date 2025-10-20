@@ -135,9 +135,7 @@ eng.interactor.start()
 Webassembly testing protocol:
 
 - Clone https://github.com/f3d-app/f3d-website
-- Remove current `f3d` version
-- Install the last RC version
-- Run the website and check the web viewer page
+- Replace the current `f3d` version by the last RC available and run the website locally to check the web viewer:
 
 ```bash
 npm uninstall f3d
