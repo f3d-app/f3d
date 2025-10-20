@@ -3,7 +3,7 @@ import f3d from "../../dist/f3d.js";
 const utils = {
   assert: (condition, description) => {
     if (!condition) {
-      console.error("F3D_ERROR:" + description);
+      console.error("F3D_ERROR: " + description);
     }
   },
 
@@ -20,19 +20,19 @@ const utils = {
       });
   },
 
-  runRenderTest: (settings, dataPath, baselinePath) => {
+  runRenderTest: (settings, args) => {
     settings.canvas = document.getElementById("canvas");
 
     f3d(settings)
       .then(async (Module) => {
         // write in the wasm filesystem
-        const modelFile = await fetch("../../../testing/data/" + dataPath).then(
+        const modelFile = await fetch("../../../testing/data/" + args.data).then(
           (b) => b.arrayBuffer(),
         );
-        Module.FS.writeFile(dataPath, new Uint8Array(modelFile));
+        Module.FS.writeFile(args.data, new Uint8Array(modelFile));
 
         const baselineFile = await fetch(
-          "../../../testing/baselines/" + baselinePath,
+          "../../../testing/baselines/" + args.baseline,
         ).then((b) => b.arrayBuffer());
         Module.FS.writeFile("baseline.png", new Uint8Array(baselineFile));
 
@@ -40,8 +40,6 @@ const utils = {
         Module.Engine.autoloadPlugins();
 
         Module.engineInstance = Module.Engine.create();
-
-        Module.setupOptions(Module.engineInstance.getOptions());
 
         // setup the window size based on the canvas size
         const scale = window.devicePixelRatio;
@@ -53,7 +51,14 @@ const utils = {
           );
 
         const scene = Module.engineInstance.getScene();
-        scene.add(dataPath);
+
+        utils.assert(scene.supports(args.data), args.data + " is not supported");
+
+        Module.runBefore?.(Module);
+
+        scene.add(args.data);
+
+        Module.runAfter?.(Module);
 
         // do a first render and start the interactor
         Module.engineInstance.getWindow().render();
@@ -67,9 +72,9 @@ const utils = {
         if (ssim <= 0.05) {
           console.log("Passed with SSIM = " + ssim);
         } else {
-          assert("Comparison failed with SSIM " + ssim);
+          console.log("F3D_ERROR: Comparison failed with SSIM " + ssim);
 
-          result.save("/result.png");
+          result.save("/result.png", Module.ImageSaveFormat.PNG);
 
           const uint8ToBase64 = (uint8Array) => {
             let binary = "";

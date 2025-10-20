@@ -169,7 +169,16 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function("clear", &f3d::scene::clear, emscripten::return_value_policy::reference())
     .function("loadAnimationTime", &f3d::scene::loadAnimationTime,
       emscripten::return_value_policy::reference())
-    .function("animationTimeRange", &f3d::scene::animationTimeRange)
+    .function(
+      "animationTimeRange",
+      +[](f3d::scene& o) -> emscripten::val
+      {
+        emscripten::val jsArray = emscripten::val::array();
+        auto range = o.animationTimeRange();
+        jsArray.call<void>("push", range.first);
+        jsArray.call<void>("push", range.second);
+        return jsArray;
+      })
     .function("availableAnimations", &f3d::scene::availableAnimations);
 
   // f3d::image
@@ -300,16 +309,59 @@ EMSCRIPTEN_BINDINGS(f3d)
     .property("buildDate", &f3d::engine::libInformation::BuildDate)
     .property("buildSystem", &f3d::engine::libInformation::BuildSystem)
     .property("compiler", &f3d::engine::libInformation::Compiler)
-    .property("modules", &f3d::engine::libInformation::Modules)
+    .property(
+      "modules",
+      +[](const f3d::engine::libInformation& libInfo) -> emscripten::val
+      {
+        emscripten::val jsArray = emscripten::val::array();
+        for (const auto& [module, enabled] : libInfo.Modules)
+        {
+          emscripten::val pair = emscripten::val::array();
+          pair.call<void>("push", module);
+          pair.call<void>("push", enabled);
+          jsArray.call<void>("push", pair);
+        }
+        return jsArray;
+      })
     .property("vtkVersion", &f3d::engine::libInformation::VTKVersion)
-    .property("copyrights", &f3d::engine::libInformation::Copyrights)
+    .property(
+      "copyrights",
+      +[](const f3d::engine::libInformation& libInfo) -> emscripten::val
+      {
+        emscripten::val jsArray = emscripten::val::array();
+        for (const std::string& elem : libInfo.Copyrights)
+        {
+          jsArray.call<void>("push", elem);
+        }
+        return jsArray;
+      })
     .property("license", &f3d::engine::libInformation::License);
 
   emscripten::class_<f3d::engine::readerInformation>("EngineReaderInformation")
     .property("name", &f3d::engine::readerInformation::Name)
     .property("description", &f3d::engine::readerInformation::Description)
-    .property("extensions", &f3d::engine::readerInformation::Extensions)
-    .property("mimeTypes", &f3d::engine::readerInformation::MimeTypes)
+    .property(
+      "extensions",
+      +[](const f3d::engine::readerInformation& readerInfo) -> emscripten::val
+      {
+        emscripten::val jsArray = emscripten::val::array();
+        for (const std::string& elem : readerInfo.Extensions)
+        {
+          jsArray.call<void>("push", elem);
+        }
+        return jsArray;
+      })
+    .property(
+      "mimeTypes",
+      +[](const f3d::engine::readerInformation& readerInfo) -> emscripten::val
+      {
+        emscripten::val jsArray = emscripten::val::array();
+        for (const std::string& elem : readerInfo.MimeTypes)
+        {
+          jsArray.call<void>("push", elem);
+        }
+        return jsArray;
+      })
     .property("pluginName", &f3d::engine::readerInformation::PluginName)
     .property("hasSceneReader", &f3d::engine::readerInformation::HasSceneReader)
     .property("hasGeometryReader", &f3d::engine::readerInformation::HasGeometryReader);
@@ -328,13 +380,31 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function("getScene", &f3d::engine::getScene, emscripten::return_value_policy::reference())
     .function(
       "getInteractor", &f3d::engine::getInteractor, emscripten::return_value_policy::reference())
-    .class_function("loadPlugin", &f3d::engine::loadPlugin)
     .class_function("autoloadPlugins", &f3d::engine::autoloadPlugins)
-    .class_function("getPluginsList", &f3d::engine::getPluginsList)
-    .class_function("getAllReaderOptionNames", &f3d::engine::getAllReaderOptionNames)
+    .class_function(
+      "getAllReaderOptionNames",
+      +[]() -> emscripten::val
+      {
+        emscripten::val jsArray = emscripten::val::array();
+        for (const std::string& elem : f3d::engine::getAllReaderOptionNames())
+        {
+          jsArray.call<void>("push", elem);
+        }
+        return jsArray;
+      })
     .class_function("setReaderOption", &f3d::engine::setReaderOption)
     .class_function("getLibInfo", &f3d::engine::getLibInfo)
-    .class_function("getReadersInfo", &f3d::engine::getReadersInfo);
+    .class_function(
+      "getReadersInfo",
+      +[]() -> emscripten::val
+      {
+        emscripten::val jsArray = emscripten::val::array();
+        for (const f3d::engine::readerInformation& elem : f3d::engine::getReadersInfo())
+        {
+          jsArray.call<void>("push", elem);
+        }
+        return jsArray;
+      });
 
   // f3d::log
   emscripten::enum_<f3d::log::VerboseLevel>("LogVerboseLevel")

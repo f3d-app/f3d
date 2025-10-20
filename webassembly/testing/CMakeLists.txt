@@ -1,6 +1,8 @@
 set(f3djsTests_list
+  "test_engine"
   "test_options"
   "test_render"
+  "test_scene"
 )
 
 find_program(CHROMIUM_EXECUTABLE chromium)
