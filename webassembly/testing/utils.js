@@ -7,6 +7,18 @@ const utils = {
     }
   },
 
+  numArrayEquals: (arr1, arr2, epsilon = Number.EPSILON) => {
+    if (arr1.length !== arr2.length) {
+      return false;
+    }
+    for (let i = 0; i < arr1.length; i++) {
+      if (Math.abs(arr1[i] - arr2[i]) > epsilon) {
+        return false;
+      }
+    }
+    return true;
+  },
+
   runBasicTest: (settings) => {
     f3d(settings)
       .then(async (Module) => {

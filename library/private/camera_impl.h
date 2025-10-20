@@ -36,20 +36,20 @@ public:
    * Documented public API
    */
   camera& setPosition(const point3_t& pos) override;
-  point3_t getPosition() override;
-  void getPosition(point3_t& pos) override;
+  point3_t getPosition() const override;
+  void getPosition(point3_t& pos) const override;
   camera& setFocalPoint(const point3_t& foc) override;
-  point3_t getFocalPoint() override;
-  void getFocalPoint(point3_t& foc) override;
+  point3_t getFocalPoint() const override;
+  void getFocalPoint(point3_t& foc) const override;
   camera& setViewUp(const vector3_t& up) override;
-  vector3_t getViewUp() override;
-  void getViewUp(vector3_t& up) override;
+  vector3_t getViewUp() const override;
+  void getViewUp(vector3_t& up) const override;
   camera& setViewAngle(const angle_deg_t& angle) override;
-  angle_deg_t getViewAngle() override;
-  void getViewAngle(angle_deg_t& angle) override;
+  angle_deg_t getViewAngle() const override;
+  void getViewAngle(angle_deg_t& angle) const override;
   camera& setState(const camera_state_t& state) override;
-  camera_state_t getState() override;
-  void getState(camera_state_t& state) override;
+  camera_state_t getState() const override;
+  void getState(camera_state_t& state) const override;
 
   camera& dolly(double val) override;
   camera& pan(double right, double up, double forward) override;
@@ -77,7 +77,7 @@ public:
    * This should only be called after the renderer have been set and initialized
    * so that a camera is available.
    */
-  vtkCamera* GetVTKCamera();
+  vtkCamera* GetVTKCamera() const;
 
 private:
   class internals;

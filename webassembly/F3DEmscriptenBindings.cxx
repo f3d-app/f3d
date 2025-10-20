@@ -224,20 +224,53 @@ EMSCRIPTEN_BINDINGS(f3d)
   // TODO:
   // - camera state
   emscripten::class_<f3d::camera>("Camera")
-    .function(
-      "setPosition", &f3d::camera::setPosition, emscripten::return_value_policy::reference())
-    .function(
-      "getPosition", static_cast<f3d::point3_t (f3d::camera::*)()>(&f3d::camera::getPosition))
-    .function(
-      "setFocalPoint", &f3d::camera::setFocalPoint, emscripten::return_value_policy::reference())
-    .function(
-      "getFocalPoint", static_cast<f3d::point3_t (f3d::camera::*)()>(&f3d::camera::getFocalPoint))
-    .function("setViewUp", &f3d::camera::setViewUp, emscripten::return_value_policy::reference())
-    .function("getViewUp", static_cast<f3d::vector3_t (f3d::camera::*)()>(&f3d::camera::getViewUp))
-    .function(
-      "setViewAngle", &f3d::camera::setViewAngle, emscripten::return_value_policy::reference())
-    .function(
-      "getViewAngle", static_cast<f3d::angle_deg_t (f3d::camera::*)()>(&f3d::camera::getViewAngle))
+    .property(
+      "position",
+      +[](const f3d::camera& cam) -> emscripten::val
+      {
+        f3d::point3_t pt = cam.getPosition();
+        emscripten::val jsArray = emscripten::val::array();
+        jsArray.call<void>("push", pt[0]);
+        jsArray.call<void>("push", pt[1]);
+        jsArray.call<void>("push", pt[2]);
+        return jsArray;
+      },
+      +[](f3d::camera& cam, emscripten::val jsArray)
+      {
+        cam.setPosition({ jsArray[0].as<float>(), jsArray[1].as<float>(), jsArray[2].as<float>() });
+      })
+    .property(
+      "focalPoint",
+      +[](const f3d::camera& cam) -> emscripten::val
+      {
+        f3d::point3_t pt = cam.getFocalPoint();
+        emscripten::val jsArray = emscripten::val::array();
+        jsArray.call<void>("push", pt[0]);
+        jsArray.call<void>("push", pt[1]);
+        jsArray.call<void>("push", pt[2]);
+        return jsArray;
+      },
+      +[](f3d::camera& cam, emscripten::val jsArray)
+      {
+        cam.setFocalPoint(
+          { jsArray[0].as<float>(), jsArray[1].as<float>(), jsArray[2].as<float>() });
+      })
+    .property(
+      "viewUp",
+      +[](const f3d::camera& cam) -> emscripten::val
+      {
+        f3d::vector3_t vec = cam.getViewUp();
+        emscripten::val jsArray = emscripten::val::array();
+        jsArray.call<void>("push", vec[0]);
+        jsArray.call<void>("push", vec[1]);
+        jsArray.call<void>("push", vec[2]);
+        return jsArray;
+      },
+      +[](f3d::camera& cam, emscripten::val jsArray)
+      {
+        cam.setViewUp({ jsArray[0].as<float>(), jsArray[1].as<float>(), jsArray[2].as<float>() });
+      })
+    .property("viewAngle", static_cast<f3d::angle_deg_t (f3d::camera::*)() const>(&f3d::camera::getViewAngle), &f3d::camera::setViewAngle)
     .function("dolly", &f3d::camera::dolly, emscripten::return_value_policy::reference())
     .function("pan", &f3d::camera::pan, emscripten::return_value_policy::reference())
     .function("zoom", &f3d::camera::zoom, emscripten::return_value_policy::reference())

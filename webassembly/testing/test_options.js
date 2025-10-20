@@ -33,14 +33,11 @@ const settings = {
 
     // comparing JS arrays
     utils.assert(
-      JSON.stringify(options.get("model.scivis.range")) ===
-        JSON.stringify([0.7, 1.4]),
+      utils.numArrayEquals(options.get("model.scivis.range"), [0.7, 1.4]),
       "options getter for vec<double> failed",
     );
 
-    utils.assert(
-      JSON.stringify(options.get("scene.animation.indices")) ===
-        JSON.stringify([0]),
+    utils.assert(utils.numArrayEquals(options.get("scene.animation.indices"), [0]),
       "options getter for vec<int> failed",
     );
 
