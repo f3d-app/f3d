@@ -2,7 +2,6 @@ import utils from "./utils.js";
 
 const settings = {
   runBefore: (Module) => {
-
     const options = Module.engineInstance.getOptions();
 
     // background must be set to black for proper blending with transparent canvas
@@ -29,4 +28,7 @@ const settings = {
   },
 };
 
-utils.runRenderTest(settings, { data: "f3d.vtp", baseline: "TestWasmOptions.png" });
+utils.runRenderTest(settings, {
+  data: "f3d.vtp",
+  baseline: "TestWasmOptions.png",
+});

@@ -38,9 +38,9 @@ const utils = {
     f3d(settings)
       .then(async (Module) => {
         // write in the wasm filesystem
-        const modelFile = await fetch("../../../testing/data/" + args.data).then(
-          (b) => b.arrayBuffer(),
-        );
+        const modelFile = await fetch(
+          "../../../testing/data/" + args.data,
+        ).then((b) => b.arrayBuffer());
         Module.FS.writeFile(args.data, new Uint8Array(modelFile));
 
         const baselineFile = await fetch(
@@ -64,7 +64,10 @@ const utils = {
 
         const scene = Module.engineInstance.getScene();
 
-        utils.assert(scene.supports(args.data), args.data + " is not supported");
+        utils.assert(
+          scene.supports(args.data),
+          args.data + " is not supported",
+        );
 
         Module.runBefore?.(Module);
 

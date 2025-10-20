@@ -37,7 +37,8 @@ const settings = {
       "options getter for vec<double> failed",
     );
 
-    utils.assert(utils.numArrayEquals(options.get("scene.animation.indices"), [0]),
+    utils.assert(
+      utils.numArrayEquals(options.get("scene.animation.indices"), [0]),
       "options getter for vec<int> failed",
     );
 
