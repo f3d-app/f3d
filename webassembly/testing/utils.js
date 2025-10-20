@@ -7,19 +7,32 @@ const utils = {
     }
   },
 
-  runTest: (settings) => {
+  runBasicTest: (settings) => {
+    f3d(settings)
+      .then(async (Module) => {
+        Module.run(Module);
+
+        window.close();
+      })
+      .catch((error) => {
+        console.error('F3D_ERROR: exception thrown "' + error + '"');
+        window.close();
+      });
+  },
+
+  runRenderTest: (settings, dataPath, baselinePath) => {
     settings.canvas = document.getElementById("canvas");
 
     f3d(settings)
       .then(async (Module) => {
         // write in the wasm filesystem
-        const modelFile = await fetch(
-          "../../../testing/data/" + Module.dataPath,
-        ).then((b) => b.arrayBuffer());
-        Module.FS.writeFile(Module.dataPath, new Uint8Array(modelFile));
+        const modelFile = await fetch("../../../testing/data/" + dataPath).then(
+          (b) => b.arrayBuffer(),
+        );
+        Module.FS.writeFile(dataPath, new Uint8Array(modelFile));
 
         const baselineFile = await fetch(
-          "../../../testing/baselines/" + Module.baselinePath,
+          "../../../testing/baselines/" + baselinePath,
         ).then((b) => b.arrayBuffer());
         Module.FS.writeFile("baseline.png", new Uint8Array(baselineFile));
 
@@ -40,7 +53,7 @@ const utils = {
           );
 
         const scene = Module.engineInstance.getScene();
-        scene.add(Module.dataPath);
+        scene.add(dataPath);
 
         // do a first render and start the interactor
         Module.engineInstance.getWindow().render();
