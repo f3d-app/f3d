@@ -24,6 +24,7 @@ Release Candidates :
 
 - [ ] Commit, review and merge a `vX.Y.Z-RCN` version change in https://github.com/f3d-app/f3d `CMakeLists.txt` and `pyproject.toml` in the `release` branch
 - [ ] Tag and push to https://github.com/f3d-app/f3d: `git tag vX.Y.Z-RCN -m vX.Y.Z-RCN`
+- [ ] Create a new [NPM token](https://www.npmjs.com/package/f3d) and replace the existing `NPM_TOKEN` in https://github.com/f3d-app/f3d-superbuild/settings/secrets/actions
 - [ ] Trigger a release build using https://github.com/f3d-app/f3d-superbuild actions with `vX.Y.Z-RCN` F3D version, superbuild `main` branch and prerelease publish `true`
 - [ ] Download the prerelease from https://github.com/f3d-app/f3d/releases
 - [ ] Locally test the prerelease on Linux
