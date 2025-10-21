@@ -41,33 +41,33 @@ public:
   /** Set the position of the camera to the provided arg */
   virtual camera& setPosition(const point3_t& pos) = 0;
   /** Return the position of the camera */
-  [[nodiscard]] virtual point3_t getPosition() = 0;
+  [[nodiscard]] virtual point3_t getPosition() const = 0;
   /** Get the position of the camera into the provided arg */
-  virtual void getPosition(point3_t& pos) = 0;
+  virtual void getPosition(point3_t& pos) const = 0;
   /** Set the focal point of the camera to the provided arg */
   virtual camera& setFocalPoint(const point3_t& foc) = 0;
   /** Return the focal point of the camera */
-  [[nodiscard]] virtual point3_t getFocalPoint() = 0;
+  [[nodiscard]] virtual point3_t getFocalPoint() const = 0;
   /** Get the focal point of the camera into the provided arg */
-  virtual void getFocalPoint(point3_t& foc) = 0;
+  virtual void getFocalPoint(point3_t& foc) const = 0;
   /** Set the view up of the camera to the provided arg */
   virtual camera& setViewUp(const vector3_t& up) = 0;
   /** Return the view up of the camera */
-  [[nodiscard]] virtual vector3_t getViewUp() = 0;
+  [[nodiscard]] virtual vector3_t getViewUp() const = 0;
   /** Get the view up of the camera into the provided arg */
-  virtual void getViewUp(vector3_t& up) = 0;
+  virtual void getViewUp(vector3_t& up) const = 0;
   /** Set the view angle in degrees of the camera to the provided arg */
   virtual camera& setViewAngle(const angle_deg_t& angle) = 0;
   /** Return the view angle in degrees of the camera */
-  [[nodiscard]] virtual angle_deg_t getViewAngle() = 0;
+  [[nodiscard]] virtual angle_deg_t getViewAngle() const = 0;
   /** Get the view angle in degrees of the camera into the provided arg */
-  virtual void getViewAngle(angle_deg_t& angle) = 0;
+  virtual void getViewAngle(angle_deg_t& angle) const = 0;
   /** Set the complete state of the provided arg */
   virtual camera& setState(const camera_state_t& state) = 0;
   /** Return the complete state of the camera */
-  [[nodiscard]] virtual camera_state_t getState() = 0;
+  [[nodiscard]] virtual camera_state_t getState() const = 0;
   /** Get the complete state of the camera into the provided arg */
-  virtual void getState(camera_state_t& state) = 0;
+  virtual void getState(camera_state_t& state) const = 0;
 
   ///@}
 

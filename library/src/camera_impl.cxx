@@ -63,7 +63,7 @@ camera& camera_impl::setPosition(const point3_t& pos)
 }
 
 //----------------------------------------------------------------------------
-point3_t camera_impl::getPosition()
+point3_t camera_impl::getPosition() const
 {
   point3_t pos;
   this->getPosition(pos);
@@ -71,7 +71,7 @@ point3_t camera_impl::getPosition()
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::getPosition(point3_t& pos)
+void camera_impl::getPosition(point3_t& pos) const
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->GetPosition(pos.data());
@@ -88,7 +88,7 @@ camera& camera_impl::setFocalPoint(const point3_t& foc)
 }
 
 //----------------------------------------------------------------------------
-point3_t camera_impl::getFocalPoint()
+point3_t camera_impl::getFocalPoint() const
 {
   point3_t foc;
   this->getFocalPoint(foc);
@@ -96,7 +96,7 @@ point3_t camera_impl::getFocalPoint()
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::getFocalPoint(point3_t& foc)
+void camera_impl::getFocalPoint(point3_t& foc) const
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->GetFocalPoint(foc.data());
@@ -113,7 +113,7 @@ camera& camera_impl::setViewUp(const vector3_t& up)
 }
 
 //----------------------------------------------------------------------------
-vector3_t camera_impl::getViewUp()
+vector3_t camera_impl::getViewUp() const
 {
   vector3_t up;
   this->getViewUp(up);
@@ -121,7 +121,7 @@ vector3_t camera_impl::getViewUp()
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::getViewUp(vector3_t& up)
+void camera_impl::getViewUp(vector3_t& up) const
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->GetViewUp(up.data());
@@ -138,7 +138,7 @@ camera& camera_impl::setViewAngle(const angle_deg_t& angle)
 }
 
 //----------------------------------------------------------------------------
-angle_deg_t camera_impl::getViewAngle()
+angle_deg_t camera_impl::getViewAngle() const
 {
   angle_deg_t angle;
   this->getViewAngle(angle);
@@ -146,7 +146,7 @@ angle_deg_t camera_impl::getViewAngle()
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::getViewAngle(angle_deg_t& angle)
+void camera_impl::getViewAngle(angle_deg_t& angle) const
 {
   vtkCamera* cam = this->GetVTKCamera();
   angle = cam->GetViewAngle();
@@ -166,7 +166,7 @@ camera& camera_impl::setState(const camera_state_t& state)
 }
 
 //----------------------------------------------------------------------------
-camera_state_t camera_impl::getState()
+camera_state_t camera_impl::getState() const
 {
   camera_state_t state;
   this->getState(state);
@@ -174,7 +174,7 @@ camera_state_t camera_impl::getState()
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::getState(camera_state_t& state)
+void camera_impl::getState(camera_state_t& state) const
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->GetPosition(state.position.data());
@@ -319,7 +319,7 @@ void camera_impl::SetVTKRenderer(vtkRenderer* renderer)
 }
 
 //----------------------------------------------------------------------------
-vtkCamera* camera_impl::GetVTKCamera()
+vtkCamera* camera_impl::GetVTKCamera() const
 {
   return this->Internals->VTKRenderer->GetActiveCamera();
 }
