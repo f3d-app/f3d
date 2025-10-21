@@ -178,27 +178,62 @@ EMSCRIPTEN_BINDINGS(f3d)
     .constructor<const std::string&>()
     .constructor<unsigned int, unsigned int, unsigned int, f3d::image::ChannelType>()
     .function("equals", &f3d::image::operator==)
-    .function("getNormalizedPixel", &f3d::image::getNormalizedPixel)
-    .class_function("getSupportedFormats", &f3d::image::getSupportedFormats)
+    .function(
+      "getNormalizedPixel", +[](const f3d::image& img, int x, int y) -> emscripten::val
+      { return containerToJSArray(img.getNormalizedPixel({ x, y })); })
+    .class_function(
+      "getSupportedFormats",
+      +[]() -> emscripten::val { return containerToJSArray(f3d::image::getSupportedFormats()); })
     .property("width", &f3d::image::getWidth)
     .property("height", &f3d::image::getHeight)
     .property("channelCount", &f3d::image::getChannelCount)
     .property("channelType", &f3d::image::getChannelType)
     .property("channelTypeSize", &f3d::image::getChannelTypeSize)
-    .function("setContent", &f3d::image::setContent, emscripten::allow_raw_pointers())
-    .function("getContent", &f3d::image::getContent, emscripten::allow_raw_pointers())
+    .function(
+      "setContent",
+      +[](f3d::image& img, emscripten::val jsbuf) -> f3d::image&
+      {
+        std::vector<uint8_t> data = emscripten::vecFromJSArray<uint8_t>(jsbuf);
+        size_t expected = static_cast<size_t>(img.getWidth()) * img.getHeight() *
+          img.getChannelCount() * img.getChannelTypeSize();
+        if (data.size() != expected)
+        {
+          throw std::runtime_error("Buffer size does not match image size");
+        }
+        img.setContent(data.data());
+        return img;
+      },
+      emscripten::allow_raw_pointers())
+    .function(
+      "getContent",
+      +[](const f3d::image& img) -> emscripten::val
+      {
+        size_t totalSize =
+          img.getWidth() * img.getHeight() * img.getChannelCount() * img.getChannelTypeSize();
+        return emscripten::val(
+          emscripten::typed_memory_view(totalSize, static_cast<const uint8_t*>(img.getContent())));
+      },
+      emscripten::allow_raw_pointers())
     .function("compare", &f3d::image::compare)
     .function(
       "save",
       +[](const f3d::image& img, const std::string& path,
          f3d::image::SaveFormat format) -> const f3d::image& { return img.save(path, format); },
       emscripten::allow_raw_pointers())
-    .function("saveBuffer", &f3d::image::saveBuffer)
+    .function(
+      "saveBuffer",
+      +[](const f3d::image& img, f3d::image::SaveFormat format) -> emscripten::val
+      {
+        std::vector<uint8_t> buffer = img.saveBuffer(format);
+        return emscripten::val(emscripten::typed_memory_view(buffer.size(), buffer.data()));
+      })
     .function("toTerminalText",
       static_cast<std::string (f3d::image::*)() const>(&f3d::image::toTerminalText))
     .function("setMetadata", &f3d::image::setMetadata, emscripten::allow_raw_pointers())
     .function("getMetadata", &f3d::image::getMetadata)
-    .function("allMetadata", &f3d::image::allMetadata);
+    .function(
+      "allMetadata", +[](const f3d::image& img) -> emscripten::val
+      { return containerToJSArray(img.allMetadata()); });
 
   // f3d::camera
   // TODO:
