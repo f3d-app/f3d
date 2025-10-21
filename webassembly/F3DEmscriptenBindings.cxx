@@ -284,10 +284,12 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function("render", &f3d::window::render)
     .function("renderToImage", &f3d::window::renderToImage)
     .function("setSize", &f3d::window::setSize, emscripten::return_value_policy::reference())
-    .function("getWidth", &f3d::window::getWidth)
-    .function("getHeight", &f3d::window::getHeight)
-    .function("getWorldFromDisplay", &f3d::window::getWorldFromDisplay)
-    .function("getDisplayFromWorld", &f3d::window::getDisplayFromWorld);
+    .property("width", &f3d::window::getWidth)
+    .property("height", &f3d::window::getHeight)
+    .function("getWorldFromDisplay", +[](const f3d::window& win, emscripten::val jsArray) -> emscripten::val
+      { return containerToJSArray(win.getWorldFromDisplay({ jsArray[0].as<float>(), jsArray[1].as<float>(), jsArray[2].as<float>() })); })
+    .function("getDisplayFromWorld", +[](const f3d::window& win, emscripten::val jsArray) -> emscripten::val
+      { return containerToJSArray(win.getDisplayFromWorld({ jsArray[0].as<float>(), jsArray[1].as<float>(), jsArray[2].as<float>() })); });
 
   // f3d::interactor
   // Not bound on purpose because usually used for external interactors:
@@ -297,12 +299,22 @@ EMSCRIPTEN_BINDINGS(f3d)
   emscripten::class_<f3d::interactor>("Interactor")
     .function(
       "initCommands", &f3d::interactor::initCommands, emscripten::return_value_policy::reference())
-    .function(
-      "addCommand", &f3d::interactor::addCommand, emscripten::return_value_policy::reference())
+    .function("addCommand",
+      +[](f3d::interactor& interactor, const std::string& action, const emscripten::val& callback) -> f3d::interactor&
+      {
+        auto wrapCallback = [=](const std::vector<std::string>& args)
+        {
+          callback(containerToJSArray(args));
+        };
+        return interactor.addCommand(action, wrapCallback);
+      },
+      emscripten::return_value_policy::reference())
     .function("removeCommand", &f3d::interactor::removeCommand,
       emscripten::return_value_policy::reference())
-    .function("getCommandActions", &f3d::interactor::getCommandActions)
-    .function("triggerCommand", &f3d::interactor::triggerCommand)
+    .function("getCommandActions", +[](const f3d::interactor& interactor) -> emscripten::val
+      { return containerToJSArray(interactor.getCommandActions()); })
+    .function("triggerCommand", +[](f3d::interactor& interactor, const std::string& command, bool keepComments) -> bool
+      { return interactor.triggerCommand(command, keepComments); })
     .function("toggleAnimation", &f3d::interactor::toggleAnimation,
       emscripten::return_value_policy::reference())
     .function("startAnimation", &f3d::interactor::startAnimation,
@@ -314,8 +326,6 @@ EMSCRIPTEN_BINDINGS(f3d)
       emscripten::return_value_policy::reference())
     .function("disableCameraMovement", &f3d::interactor::disableCameraMovement,
       emscripten::return_value_policy::reference())
-    .function("playInteraction", &f3d::interactor::playInteraction)
-    .function("recordInteraction", &f3d::interactor::recordInteraction)
     .function(
       "start", +[](f3d::interactor& interactor) -> f3d::interactor& { return interactor.start(); },
       emscripten::return_value_policy::reference())

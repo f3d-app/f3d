@@ -26,6 +26,19 @@ const settings = {
     // default to +Z
     options.setAsString("scene.up_direction", "+Z");
   },
+
+  runAfter: (Module) => {
+    // check that space conversion works
+    const window = Module.engineInstance.getWindow();
+
+    const ptWorld = window.getWorldFromDisplay([0, 0, 0]);
+
+    utils.assert(!utils.numArrayEquals(ptWorld, [0, 0, 0], 0.001), "point has no been transformed");
+
+    const ptDisplay = window.getDisplayFromWorld(ptWorld);
+
+    utils.assert(utils.numArrayEquals(ptDisplay, [0, 0, 0], 0.001), "point has no been restored to original value");
+  },
 };
 
 utils.runRenderTest(settings, {

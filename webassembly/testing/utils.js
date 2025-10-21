@@ -90,6 +90,9 @@ const utils = {
             scale * Module.canvas.clientHeight,
           );
 
+        utils.assert(Module.engineInstance.getWindow().width === scale * Module.canvas.clientWidth, "Failed to get width");
+        utils.assert(Module.engineInstance.getWindow().height === scale * Module.canvas.clientHeight, "Failed to get height");
+
         const scene = Module.engineInstance.getScene();
 
         utils.assert(
