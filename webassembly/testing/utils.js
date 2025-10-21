@@ -1,4 +1,4 @@
-import f3d from "../../dist/f3d.js";
+import f3d from "/src/dist/f3d.js";
 
 const utils = {
   assert: (condition, description) => {
@@ -38,13 +38,13 @@ const utils = {
     f3d(settings)
       .then(async (Module) => {
         // write in the wasm filesystem
-        const modelFile = await fetch(
-          "../../../testing/data/" + args.data,
-        ).then((b) => b.arrayBuffer());
+        const modelFile = await fetch("/src/testing/data/" + args.data).then(
+          (b) => b.arrayBuffer(),
+        );
         Module.FS.writeFile(args.data, new Uint8Array(modelFile));
 
         const baselineFile = await fetch(
-          "../../../testing/baselines/" + args.baseline,
+          "/src/testing/baselines/" + args.baseline,
         ).then((b) => b.arrayBuffer());
         Module.FS.writeFile("baseline.png", new Uint8Array(baselineFile));
 

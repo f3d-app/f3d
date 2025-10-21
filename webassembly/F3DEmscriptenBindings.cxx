@@ -180,11 +180,11 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function("equals", &f3d::image::operator==)
     .function("getNormalizedPixel", &f3d::image::getNormalizedPixel)
     .class_function("getSupportedFormats", &f3d::image::getSupportedFormats)
-    .function("getWidth", &f3d::image::getWidth)
-    .function("getHeight", &f3d::image::getHeight)
-    .function("getChannelCount", &f3d::image::getChannelCount)
-    .function("getChannelType", &f3d::image::getChannelType)
-    .function("getChannelTypeSize", &f3d::image::getChannelTypeSize)
+    .property("width", &f3d::image::getWidth)
+    .property("height", &f3d::image::getHeight)
+    .property("channelCount", &f3d::image::getChannelCount)
+    .property("channelType", &f3d::image::getChannelType)
+    .property("channelTypeSize", &f3d::image::getChannelTypeSize)
     .function("setContent", &f3d::image::setContent, emscripten::allow_raw_pointers())
     .function("getContent", &f3d::image::getContent, emscripten::allow_raw_pointers())
     .function("compare", &f3d::image::compare)
@@ -207,23 +207,20 @@ EMSCRIPTEN_BINDINGS(f3d)
     .property(
       "position", +[](const f3d::camera& cam) -> emscripten::val
       { return containerToJSArray(cam.getPosition()); },
-      +[](f3d::camera& cam, emscripten::val jsArray)
-      {
+      +[](f3d::camera& cam, emscripten::val jsArray) {
         cam.setPosition({ jsArray[0].as<float>(), jsArray[1].as<float>(), jsArray[2].as<float>() });
       })
     .property(
       "focalPoint", +[](const f3d::camera& cam) -> emscripten::val
       { return containerToJSArray(cam.getFocalPoint()); },
-      +[](f3d::camera& cam, emscripten::val jsArray)
-      {
+      +[](f3d::camera& cam, emscripten::val jsArray) {
         cam.setFocalPoint(
           { jsArray[0].as<float>(), jsArray[1].as<float>(), jsArray[2].as<float>() });
       })
     .property(
       "viewUp", +[](const f3d::camera& cam) -> emscripten::val
       { return containerToJSArray(cam.getViewUp()); },
-      +[](f3d::camera& cam, emscripten::val jsArray)
-      {
+      +[](f3d::camera& cam, emscripten::val jsArray) {
         cam.setViewUp({ jsArray[0].as<float>(), jsArray[1].as<float>(), jsArray[2].as<float>() });
       })
     .property("viewAngle",
