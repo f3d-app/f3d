@@ -19,7 +19,7 @@
     "openvdb": "v12.0.1",
     "ospray": "v2.12.0",
     "pybind11": "v2.13.6",
-    "python": "3.13",
+    "python": "3.14",
     "tbb": "v2021.12.0",
     "usd": "v25.05.01",
     "webp": "v1.6.0",
@@ -44,5 +44,5 @@
     "zlib": "v1.2.13"
   },
   "vtk_commit_sha": "01b47f3856dcd5d0fd353037236f2d09a8c513af",
-  "timestamp": "20251018_0"
+  "timestamp": "20251021_0"
 }
