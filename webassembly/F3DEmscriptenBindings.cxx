@@ -286,10 +286,20 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function("setSize", &f3d::window::setSize, emscripten::return_value_policy::reference())
     .property("width", &f3d::window::getWidth)
     .property("height", &f3d::window::getHeight)
-    .function("getWorldFromDisplay", +[](const f3d::window& win, emscripten::val jsArray) -> emscripten::val
-      { return containerToJSArray(win.getWorldFromDisplay({ jsArray[0].as<float>(), jsArray[1].as<float>(), jsArray[2].as<float>() })); })
-    .function("getDisplayFromWorld", +[](const f3d::window& win, emscripten::val jsArray) -> emscripten::val
-      { return containerToJSArray(win.getDisplayFromWorld({ jsArray[0].as<float>(), jsArray[1].as<float>(), jsArray[2].as<float>() })); });
+    .function(
+      "getWorldFromDisplay",
+      +[](const f3d::window& win, emscripten::val jsArray) -> emscripten::val
+      {
+        return containerToJSArray(win.getWorldFromDisplay(
+          { jsArray[0].as<float>(), jsArray[1].as<float>(), jsArray[2].as<float>() }));
+      })
+    .function(
+      "getDisplayFromWorld",
+      +[](const f3d::window& win, emscripten::val jsArray) -> emscripten::val
+      {
+        return containerToJSArray(win.getDisplayFromWorld(
+          { jsArray[0].as<float>(), jsArray[1].as<float>(), jsArray[2].as<float>() }));
+      });
 
   // f3d::interactor
   // Not bound on purpose because usually used for external interactors:
@@ -299,21 +309,24 @@ EMSCRIPTEN_BINDINGS(f3d)
   emscripten::class_<f3d::interactor>("Interactor")
     .function(
       "initCommands", &f3d::interactor::initCommands, emscripten::return_value_policy::reference())
-    .function("addCommand",
-      +[](f3d::interactor& interactor, const std::string& action, const emscripten::val& callback) -> f3d::interactor&
+    .function(
+      "addCommand",
+      +[](f3d::interactor& interactor, const std::string& action,
+         const emscripten::val& callback) -> f3d::interactor&
       {
         auto wrapCallback = [=](const std::vector<std::string>& args)
-        {
-          callback(containerToJSArray(args));
-        };
+        { callback(containerToJSArray(args)); };
         return interactor.addCommand(action, wrapCallback);
       },
       emscripten::return_value_policy::reference())
     .function("removeCommand", &f3d::interactor::removeCommand,
       emscripten::return_value_policy::reference())
-    .function("getCommandActions", +[](const f3d::interactor& interactor) -> emscripten::val
+    .function(
+      "getCommandActions", +[](const f3d::interactor& interactor) -> emscripten::val
       { return containerToJSArray(interactor.getCommandActions()); })
-    .function("triggerCommand", +[](f3d::interactor& interactor, const std::string& command, bool keepComments) -> bool
+    .function(
+      "triggerCommand",
+      +[](f3d::interactor& interactor, const std::string& command, bool keepComments) -> bool
       { return interactor.triggerCommand(command, keepComments); })
     .function("toggleAnimation", &f3d::interactor::toggleAnimation,
       emscripten::return_value_policy::reference())

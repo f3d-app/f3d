@@ -23,28 +23,49 @@ const settings = {
 
     let callbackCalled = false;
 
-    interactor.addCommand("foo", (args) => { utils.assert(args[0] === "bar"); callbackCalled = true; });
+    interactor.addCommand("foo", (args) => {
+      utils.assert(args[0] === "bar");
+      callbackCalled = true;
+    });
 
-    utils.assert(interactor.getCommandActions().includes("foo"), "command not added");
+    utils.assert(
+      interactor.getCommandActions().includes("foo"),
+      "command not added",
+    );
 
     interactor.triggerCommand("foo bar baz", true);
 
     utils.assert(callbackCalled, "command callback not called");
 
     interactor.removeCommand("foo");
-    utils.assert(!interactor.getCommandActions().includes("foo"), "command not removed");
+    utils.assert(
+      !interactor.getCommandActions().includes("foo"),
+      "command not removed",
+    );
 
     // animations
-    utils.assert(!interactor.isPlayingAnimation(), "animation should not be playing");
+    utils.assert(
+      !interactor.isPlayingAnimation(),
+      "animation should not be playing",
+    );
 
     interactor.startAnimation();
-    utils.assert(interactor.isPlayingAnimation(), "animation should be playing");
+    utils.assert(
+      interactor.isPlayingAnimation(),
+      "animation should be playing",
+    );
 
     interactor.stopAnimation();
-    utils.assert(!interactor.isPlayingAnimation(), "animation should not be playing");
+    utils.assert(
+      !interactor.isPlayingAnimation(),
+      "animation should not be playing",
+    );
 
     interactor.toggleAnimation();
-    utils.assert(interactor.isPlayingAnimation(), "animation should be playing");
+    utils.assert(
+      interactor.isPlayingAnimation(),
+      "animation should be playing",
+    );
 
     // only for coverage, do not test the actual feature yet
     interactor.disableCameraMovement();
