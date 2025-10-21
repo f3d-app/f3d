@@ -36,9 +36,7 @@ const utils = {
     const base64 = uint8ToBase64(imgData);
 
     console.log(
-      "New baseline png file:\n\n\ndata:image/png;base64," +
-      base64 +
-      "\n\n\n",
+      "New baseline png file:\n\n\ndata:image/png;base64," + base64 + "\n\n\n",
     );
   },
 
