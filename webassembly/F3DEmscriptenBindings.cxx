@@ -31,6 +31,26 @@ void raw_destructor(f3d::camera* ptr)
 }
 }
 
+template<typename T>
+emscripten::val containerToJSArray(const T& container)
+{
+  emscripten::val jsArray = emscripten::val::array();
+  for (const auto& elem : container)
+  {
+    jsArray.call<void>("push", elem);
+  }
+  return jsArray;
+}
+
+template<typename U, typename V>
+emscripten::val pairToJSArray(const std::pair<U, V>& p)
+{
+  emscripten::val jsArray = emscripten::val::array();
+  jsArray.call<void>("push", p.first);
+  jsArray.call<void>("push", p.second);
+  return jsArray;
+}
+
 EMSCRIPTEN_BINDINGS(f3d)
 {
   // f3d::options
@@ -61,21 +81,11 @@ EMSCRIPTEN_BINDINGS(f3d)
           }
           if (std::holds_alternative<std::vector<double>>(value))
           {
-            emscripten::val jsArray = emscripten::val::array();
-            for (double elem : std::get<std::vector<double>>(value))
-            {
-              jsArray.call<void>("push", elem);
-            }
-            return jsArray;
+            return containerToJSArray(std::get<std::vector<double>>(value));
           }
           if (std::holds_alternative<std::vector<int>>(value))
           {
-            emscripten::val jsArray = emscripten::val::array();
-            for (int elem : std::get<std::vector<int>>(value))
-            {
-              jsArray.call<void>("push", elem);
-            }
-            return jsArray;
+            return containerToJSArray(std::get<std::vector<int>>(value));
           }
         }
         catch (f3d::exception)
@@ -93,16 +103,33 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function(
       "toggle", +[](f3d::options& o, const std::string& name) -> f3d::options&
       { return o.toggle(name); }, emscripten::return_value_policy::reference())
-    .function("isSame", &f3d::options::isSame)
-    .function("hasValue", &f3d::options::hasValue)
-    .function("copy", &f3d::options::copy, emscripten::return_value_policy::reference())
-    .class_function("getAllNames", &f3d::options::getAllNames)
-    .function("getNames", &f3d::options::getNames)
-    .function("getClosestOption", &f3d::options::getClosestOption)
-    .function("isOptional", &f3d::options::isOptional)
-    .function("reset", &f3d::options::reset, emscripten::return_value_policy::reference())
     .function(
-      "removeValue", &f3d::options::removeValue, emscripten::return_value_policy::reference());
+      "isSame", +[](f3d::options& o, f3d::options& other, const std::string& name) -> bool
+      { return o.isSame(other, name); })
+    .function(
+      "hasValue",
+      +[](f3d::options& o, const std::string& name) -> bool { return o.hasValue(name); })
+    .function(
+      "copy", +[](f3d::options& o, f3d::options& other, const std::string& name) -> f3d::options&
+      { return o.copy(other, name); }, emscripten::return_value_policy::reference())
+    .class_function(
+      "getAllNames",
+      +[]() -> emscripten::val { return containerToJSArray(f3d::options::getAllNames()); })
+    .function(
+      "getNames",
+      +[](f3d::options& o) -> emscripten::val { return containerToJSArray(o.getNames()); })
+    .function(
+      "getClosestOption", +[](f3d::options& o, const std::string& name) -> emscripten::val
+      { return pairToJSArray(o.getClosestOption(name)); })
+    .function(
+      "isOptional",
+      +[](f3d::options& o, const std::string& name) -> bool { return o.isOptional(name); })
+    .function(
+      "reset", +[](f3d::options& o, const std::string& name) -> f3d::options&
+      { return o.reset(name); }, emscripten::return_value_policy::reference())
+    .function(
+      "removeValue", +[](f3d::options& o, const std::string& name) -> f3d::options&
+      { return o.removeValue(name); }, emscripten::return_value_policy::reference());
 
   // f3d::scene
   // TODO:
@@ -129,7 +156,9 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function("clear", &f3d::scene::clear, emscripten::return_value_policy::reference())
     .function("loadAnimationTime", &f3d::scene::loadAnimationTime,
       emscripten::return_value_policy::reference())
-    .function("animationTimeRange", &f3d::scene::animationTimeRange)
+    .function(
+      "animationTimeRange",
+      +[](f3d::scene& o) -> emscripten::val { return pairToJSArray(o.animationTimeRange()); })
     .function("availableAnimations", &f3d::scene::availableAnimations);
 
   // f3d::image
@@ -149,46 +178,89 @@ EMSCRIPTEN_BINDINGS(f3d)
     .constructor<const std::string&>()
     .constructor<unsigned int, unsigned int, unsigned int, f3d::image::ChannelType>()
     .function("equals", &f3d::image::operator==)
-    .function("getNormalizedPixel", &f3d::image::getNormalizedPixel)
-    .class_function("getSupportedFormats", &f3d::image::getSupportedFormats)
-    .function("getWidth", &f3d::image::getWidth)
-    .function("getHeight", &f3d::image::getHeight)
-    .function("getChannelCount", &f3d::image::getChannelCount)
-    .function("getChannelType", &f3d::image::getChannelType)
-    .function("getChannelTypeSize", &f3d::image::getChannelTypeSize)
-    .function("setContent", &f3d::image::setContent, emscripten::allow_raw_pointers())
-    .function("getContent", &f3d::image::getContent, emscripten::allow_raw_pointers())
+    .function(
+      "getNormalizedPixel", +[](const f3d::image& img, int x, int y) -> emscripten::val
+      { return containerToJSArray(img.getNormalizedPixel({ x, y })); })
+    .class_function(
+      "getSupportedFormats",
+      +[]() -> emscripten::val { return containerToJSArray(f3d::image::getSupportedFormats()); })
+    .property("width", &f3d::image::getWidth)
+    .property("height", &f3d::image::getHeight)
+    .property("channelCount", &f3d::image::getChannelCount)
+    .property("channelType", &f3d::image::getChannelType)
+    .property("channelTypeSize", &f3d::image::getChannelTypeSize)
+    .function(
+      "setContent",
+      +[](f3d::image& img, emscripten::val jsbuf) -> f3d::image&
+      {
+        std::vector<uint8_t> data = emscripten::vecFromJSArray<uint8_t>(jsbuf);
+        size_t expected = static_cast<size_t>(img.getWidth()) * img.getHeight() *
+          img.getChannelCount() * img.getChannelTypeSize();
+        if (data.size() != expected)
+        {
+          throw std::runtime_error("Buffer size does not match image size");
+        }
+        img.setContent(data.data());
+        return img;
+      },
+      emscripten::allow_raw_pointers())
+    .function(
+      "getContent",
+      +[](const f3d::image& img) -> emscripten::val
+      {
+        size_t totalSize =
+          img.getWidth() * img.getHeight() * img.getChannelCount() * img.getChannelTypeSize();
+        return emscripten::val(
+          emscripten::typed_memory_view(totalSize, static_cast<const uint8_t*>(img.getContent())));
+      },
+      emscripten::allow_raw_pointers())
     .function("compare", &f3d::image::compare)
     .function(
       "save",
       +[](const f3d::image& img, const std::string& path,
          f3d::image::SaveFormat format) -> const f3d::image& { return img.save(path, format); },
       emscripten::allow_raw_pointers())
-    .function("saveBuffer", &f3d::image::saveBuffer)
+    .function(
+      "saveBuffer",
+      +[](const f3d::image& img, f3d::image::SaveFormat format) -> emscripten::val
+      {
+        std::vector<uint8_t> buffer = img.saveBuffer(format);
+        return emscripten::val(emscripten::typed_memory_view(buffer.size(), buffer.data()));
+      })
     .function("toTerminalText",
       static_cast<std::string (f3d::image::*)() const>(&f3d::image::toTerminalText))
     .function("setMetadata", &f3d::image::setMetadata, emscripten::allow_raw_pointers())
     .function("getMetadata", &f3d::image::getMetadata)
-    .function("allMetadata", &f3d::image::allMetadata);
+    .function(
+      "allMetadata", +[](const f3d::image& img) -> emscripten::val
+      { return containerToJSArray(img.allMetadata()); });
 
   // f3d::camera
   // TODO:
   // - camera state
   emscripten::class_<f3d::camera>("Camera")
-    .function(
-      "setPosition", &f3d::camera::setPosition, emscripten::return_value_policy::reference())
-    .function(
-      "getPosition", static_cast<f3d::point3_t (f3d::camera::*)()>(&f3d::camera::getPosition))
-    .function(
-      "setFocalPoint", &f3d::camera::setFocalPoint, emscripten::return_value_policy::reference())
-    .function(
-      "getFocalPoint", static_cast<f3d::point3_t (f3d::camera::*)()>(&f3d::camera::getFocalPoint))
-    .function("setViewUp", &f3d::camera::setViewUp, emscripten::return_value_policy::reference())
-    .function("getViewUp", static_cast<f3d::vector3_t (f3d::camera::*)()>(&f3d::camera::getViewUp))
-    .function(
-      "setViewAngle", &f3d::camera::setViewAngle, emscripten::return_value_policy::reference())
-    .function(
-      "getViewAngle", static_cast<f3d::angle_deg_t (f3d::camera::*)()>(&f3d::camera::getViewAngle))
+    .property(
+      "position", +[](const f3d::camera& cam) -> emscripten::val
+      { return containerToJSArray(cam.getPosition()); },
+      +[](f3d::camera& cam, emscripten::val jsArray) {
+        cam.setPosition({ jsArray[0].as<float>(), jsArray[1].as<float>(), jsArray[2].as<float>() });
+      })
+    .property(
+      "focalPoint", +[](const f3d::camera& cam) -> emscripten::val
+      { return containerToJSArray(cam.getFocalPoint()); },
+      +[](f3d::camera& cam, emscripten::val jsArray) {
+        cam.setFocalPoint(
+          { jsArray[0].as<float>(), jsArray[1].as<float>(), jsArray[2].as<float>() });
+      })
+    .property(
+      "viewUp", +[](const f3d::camera& cam) -> emscripten::val
+      { return containerToJSArray(cam.getViewUp()); },
+      +[](f3d::camera& cam, emscripten::val jsArray) {
+        cam.setViewUp({ jsArray[0].as<float>(), jsArray[1].as<float>(), jsArray[2].as<float>() });
+      })
+    .property("viewAngle",
+      static_cast<f3d::angle_deg_t (f3d::camera::*)() const>(&f3d::camera::getViewAngle),
+      &f3d::camera::setViewAngle)
     .function("dolly", &f3d::camera::dolly, emscripten::return_value_policy::reference())
     .function("pan", &f3d::camera::pan, emscripten::return_value_policy::reference())
     .function("zoom", &f3d::camera::zoom, emscripten::return_value_policy::reference())
@@ -212,10 +284,22 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function("render", &f3d::window::render)
     .function("renderToImage", &f3d::window::renderToImage)
     .function("setSize", &f3d::window::setSize, emscripten::return_value_policy::reference())
-    .function("getWidth", &f3d::window::getWidth)
-    .function("getHeight", &f3d::window::getHeight)
-    .function("getWorldFromDisplay", &f3d::window::getWorldFromDisplay)
-    .function("getDisplayFromWorld", &f3d::window::getDisplayFromWorld);
+    .property("width", &f3d::window::getWidth)
+    .property("height", &f3d::window::getHeight)
+    .function(
+      "getWorldFromDisplay",
+      +[](const f3d::window& win, emscripten::val jsArray) -> emscripten::val
+      {
+        return containerToJSArray(win.getWorldFromDisplay(
+          { jsArray[0].as<float>(), jsArray[1].as<float>(), jsArray[2].as<float>() }));
+      })
+    .function(
+      "getDisplayFromWorld",
+      +[](const f3d::window& win, emscripten::val jsArray) -> emscripten::val
+      {
+        return containerToJSArray(win.getDisplayFromWorld(
+          { jsArray[0].as<float>(), jsArray[1].as<float>(), jsArray[2].as<float>() }));
+      });
 
   // f3d::interactor
   // Not bound on purpose because usually used for external interactors:
@@ -226,11 +310,24 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function(
       "initCommands", &f3d::interactor::initCommands, emscripten::return_value_policy::reference())
     .function(
-      "addCommand", &f3d::interactor::addCommand, emscripten::return_value_policy::reference())
+      "addCommand",
+      +[](f3d::interactor& interactor, const std::string& action,
+         const emscripten::val& callback) -> f3d::interactor&
+      {
+        auto wrapCallback = [=](const std::vector<std::string>& args)
+        { callback(containerToJSArray(args)); };
+        return interactor.addCommand(action, wrapCallback);
+      },
+      emscripten::return_value_policy::reference())
     .function("removeCommand", &f3d::interactor::removeCommand,
       emscripten::return_value_policy::reference())
-    .function("getCommandActions", &f3d::interactor::getCommandActions)
-    .function("triggerCommand", &f3d::interactor::triggerCommand)
+    .function(
+      "getCommandActions", +[](const f3d::interactor& interactor) -> emscripten::val
+      { return containerToJSArray(interactor.getCommandActions()); })
+    .function(
+      "triggerCommand",
+      +[](f3d::interactor& interactor, const std::string& command, bool keepComments) -> bool
+      { return interactor.triggerCommand(command, keepComments); })
     .function("toggleAnimation", &f3d::interactor::toggleAnimation,
       emscripten::return_value_policy::reference())
     .function("startAnimation", &f3d::interactor::startAnimation,
@@ -242,8 +339,6 @@ EMSCRIPTEN_BINDINGS(f3d)
       emscripten::return_value_policy::reference())
     .function("disableCameraMovement", &f3d::interactor::disableCameraMovement,
       emscripten::return_value_policy::reference())
-    .function("playInteraction", &f3d::interactor::playInteraction)
-    .function("recordInteraction", &f3d::interactor::recordInteraction)
     .function(
       "start", +[](f3d::interactor& interactor) -> f3d::interactor& { return interactor.start(); },
       emscripten::return_value_policy::reference())
@@ -260,16 +355,35 @@ EMSCRIPTEN_BINDINGS(f3d)
     .property("buildDate", &f3d::engine::libInformation::BuildDate)
     .property("buildSystem", &f3d::engine::libInformation::BuildSystem)
     .property("compiler", &f3d::engine::libInformation::Compiler)
-    .property("modules", &f3d::engine::libInformation::Modules)
+    .property(
+      "modules",
+      +[](const f3d::engine::libInformation& libInfo) -> emscripten::val
+      {
+        emscripten::val jsArray = emscripten::val::array();
+        for (const auto& [module, enabled] : libInfo.Modules)
+        {
+          emscripten::val pair = emscripten::val::array();
+          pair.call<void>("push", module);
+          pair.call<void>("push", enabled);
+          jsArray.call<void>("push", pair);
+        }
+        return jsArray;
+      })
     .property("vtkVersion", &f3d::engine::libInformation::VTKVersion)
-    .property("copyrights", &f3d::engine::libInformation::Copyrights)
+    .property(
+      "copyrights", +[](const f3d::engine::libInformation& libInfo) -> emscripten::val
+      { return containerToJSArray(libInfo.Copyrights); })
     .property("license", &f3d::engine::libInformation::License);
 
   emscripten::class_<f3d::engine::readerInformation>("EngineReaderInformation")
     .property("name", &f3d::engine::readerInformation::Name)
     .property("description", &f3d::engine::readerInformation::Description)
-    .property("extensions", &f3d::engine::readerInformation::Extensions)
-    .property("mimeTypes", &f3d::engine::readerInformation::MimeTypes)
+    .property(
+      "extensions", +[](const f3d::engine::readerInformation& readerInfo) -> emscripten::val
+      { return containerToJSArray(readerInfo.Extensions); })
+    .property(
+      "mimeTypes", +[](const f3d::engine::readerInformation& readerInfo) -> emscripten::val
+      { return containerToJSArray(readerInfo.MimeTypes); })
     .property("pluginName", &f3d::engine::readerInformation::PluginName)
     .property("hasSceneReader", &f3d::engine::readerInformation::HasSceneReader)
     .property("hasGeometryReader", &f3d::engine::readerInformation::HasGeometryReader);
@@ -288,11 +402,23 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function("getScene", &f3d::engine::getScene, emscripten::return_value_policy::reference())
     .function(
       "getInteractor", &f3d::engine::getInteractor, emscripten::return_value_policy::reference())
-    .class_function("loadPlugin", &f3d::engine::loadPlugin)
     .class_function("autoloadPlugins", &f3d::engine::autoloadPlugins)
-    .class_function("getPluginsList", &f3d::engine::getPluginsList)
-    .class_function("getAllReaderOptionNames", &f3d::engine::getAllReaderOptionNames)
+    .class_function(
+      "getAllReaderOptionNames", +[]() -> emscripten::val
+      { return containerToJSArray(f3d::engine::getAllReaderOptionNames()); })
     .class_function("setReaderOption", &f3d::engine::setReaderOption)
     .class_function("getLibInfo", &f3d::engine::getLibInfo)
-    .class_function("getReadersInfo", &f3d::engine::getReadersInfo);
+    .class_function(
+      "getReadersInfo",
+      +[]() -> emscripten::val { return containerToJSArray(f3d::engine::getReadersInfo()); });
+
+  // f3d::log
+  emscripten::enum_<f3d::log::VerboseLevel>("LogVerboseLevel")
+    .value("DEBUG", f3d::log::VerboseLevel::DEBUG)
+    .value("INFO", f3d::log::VerboseLevel::INFO)
+    .value("WARN", f3d::log::VerboseLevel::WARN)
+    .value("ERROR", f3d::log::VerboseLevel::ERROR)
+    .value("QUIET", f3d::log::VerboseLevel::QUIET);
+
+  emscripten::class_<f3d::log>("Log").class_function("setVerboseLevel", f3d::log::setVerboseLevel);
 }

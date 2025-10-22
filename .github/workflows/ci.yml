@@ -738,7 +738,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-22.04, windows-latest, macos-13]
-        python_version: ["3.11"]
+        python_version: ["3.14"]
         include:
           - os: ubuntu-22.04
             python_version: "3.9"
@@ -750,6 +750,8 @@ jobs:
             python_version: "3.12"
           - os: ubuntu-22.04
             python_version: "3.13"
+          - os: ubuntu-22.04
+            python_version: "3.14"
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
