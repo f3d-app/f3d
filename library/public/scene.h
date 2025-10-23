@@ -60,7 +60,7 @@ public:
   /**
    * Add and load provided mesh into the scene
    */
-  virtual scene& add(const mesh_t& mesh) = 0;
+  virtual scene& add(const mesh_t& mesh, const double timeStamp = 0) = 0;
 
   ///@{
   /**

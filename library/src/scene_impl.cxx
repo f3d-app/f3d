@@ -192,6 +192,9 @@ public:
   animationManager AnimationManager;
 
   vtkNew<vtkF3DMetaImporter> MetaImporter;
+  vtkNew<vtkF3DMemoryMesh> VtkSource;
+  vtkNew<vtkF3DGenericImporter> MemoryMeshImporter;
+  bool MemoryMeshLoaded;
 };
 
 //----------------------------------------------------------------------------
@@ -296,7 +299,7 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
 }
 
 //----------------------------------------------------------------------------
-scene& scene_impl::add(const mesh_t& mesh)
+scene& scene_impl::add(const mesh_t& mesh, const double timeStamp)
 {
   // sanity checks
   auto [valid, err] = mesh.isValid();
@@ -305,17 +308,32 @@ scene& scene_impl::add(const mesh_t& mesh)
     throw scene::load_failure_exception(err);
   }
 
-  vtkNew<vtkF3DMemoryMesh> vtkSource;
-  vtkSource->SetPoints(mesh.points);
-  vtkSource->SetNormals(mesh.normals);
-  vtkSource->SetTCoords(mesh.texture_coordinates);
-  vtkSource->SetFaces(mesh.face_sides, mesh.face_indices);
-
-  vtkSmartPointer<vtkF3DGenericImporter> importer = vtkSmartPointer<vtkF3DGenericImporter>::New();
-  importer->SetInternalReader(vtkSource);
+  auto& memoryMesh = Internals->VtkSource;
+  auto& importer = this->Internals->MemoryMeshImporter;
 
   log::debug("Loading 3D scene from memory");
-  this->Internals->Load({ importer });
+
+  memoryMesh->SetPoints(mesh.points, timeStamp);
+  memoryMesh->SetNormals(mesh.normals, timeStamp);
+  memoryMesh->SetTCoords(mesh.texture_coordinates, timeStamp);
+  memoryMesh->SetFaces(mesh.face_sides, mesh.face_indices, timeStamp);
+
+  if (!this->Internals->MemoryMeshLoaded)
+  {
+    importer->SetInternalReader(memoryMesh);
+    Internals->Load({ importer });
+    this->Internals->MemoryMeshLoaded = true;
+  }
+  else
+  {
+    memoryMesh->Modified();
+    memoryMesh->Update();
+
+    importer->Modified();
+    importer->Update();
+    this->Internals->AnimationManager.Initialize();
+  }
+
   return *this;
 }
 
@@ -327,7 +345,6 @@ scene& scene_impl::clear()
 
   // Clear the window of all actors
   this->Internals->Window.Initialize();
-
   return *this;
 }
 

@@ -1,14 +1,13 @@
 #include "vtkF3DMemoryMesh.h"
 
-#include "vtkDataArrayRange.h"
 #include "vtkFloatArray.h"
 #include "vtkIdTypeArray.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkSMPTools.h"
-
-#include <numeric>
+#include <vtkInformation.h>
+#include <vtkStreamingDemandDrivenPipeline.h>
 
 vtkStandardNewMacro(vtkF3DMemoryMesh);
 
@@ -46,30 +45,30 @@ vtkF3DMemoryMesh::vtkF3DMemoryMesh()
 vtkF3DMemoryMesh::~vtkF3DMemoryMesh() = default;
 
 //------------------------------------------------------------------------------
-void vtkF3DMemoryMesh::SetPoints(const std::vector<float>& positions)
+void vtkF3DMemoryMesh::SetPoints(const std::vector<float>& positions, const double timeStamp)
 {
   vtkNew<vtkPoints> points;
   points->SetDataTypeToFloat();
   points->SetData(ConvertToFloatArray<3>(positions));
 
-  this->Mesh->SetPoints(points);
+  this->Meshes[timeStamp]->SetPoints(points);
 }
 
 //------------------------------------------------------------------------------
-void vtkF3DMemoryMesh::SetNormals(const std::vector<float>& normals)
+void vtkF3DMemoryMesh::SetNormals(const std::vector<float>& normals, const double timeStamp)
 {
-  this->Mesh->GetPointData()->SetNormals(ConvertToFloatArray<3>(normals));
+  this->Meshes[timeStamp]->GetPointData()->SetNormals(ConvertToFloatArray<3>(normals));
 }
 
 //------------------------------------------------------------------------------
-void vtkF3DMemoryMesh::SetTCoords(const std::vector<float>& tcoords)
+void vtkF3DMemoryMesh::SetTCoords(const std::vector<float>& tcoords, const double timeStamp)
 {
-  this->Mesh->GetPointData()->SetTCoords(ConvertToFloatArray<2>(tcoords));
+  this->Meshes[timeStamp]->GetPointData()->SetTCoords(ConvertToFloatArray<2>(tcoords));
 }
 
 //------------------------------------------------------------------------------
-void vtkF3DMemoryMesh::SetFaces(
-  const std::vector<unsigned int>& faceSizes, const std::vector<unsigned int>& faceIndices)
+void vtkF3DMemoryMesh::SetFaces(const std::vector<unsigned int>& faceSizes,
+  const std::vector<unsigned int>& faceIndices, const double timeStamp)
 {
   vtkNew<vtkIdTypeArray> offsets;
   vtkNew<vtkIdTypeArray> connectivity;
@@ -97,16 +96,44 @@ void vtkF3DMemoryMesh::SetFaces(
   vtkNew<vtkCellArray> polys;
   polys->SetData(offsets, connectivity);
 
-  this->Mesh->SetPolys(polys);
+  this->Meshes[timeStamp]->SetPolys(polys);
+}
+
+//------------------------------------------------------------------------------
+int vtkF3DMemoryMesh::RequestInformation(vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* outputVector)
+{
+  // timeRange = {map_min, map_max}, map_min always <= map_max
+  const auto timeRange = std::array<double, 2>{ Meshes.begin()->first, Meshes.rbegin()->first };
+
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
+  outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange.data(), 2);
+
+  return 1;
 }
 
 //------------------------------------------------------------------------------
 int vtkF3DMemoryMesh::RequestData(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* outputVector)
 {
-  vtkPolyData* output = vtkPolyData::GetData(outputVector->GetInformationObject(0));
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
+  vtkPolyData* output = vtkPolyData::GetData(outInfo);
 
-  output->ShallowCopy(this->Mesh);
+  if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()) && !this->Meshes.empty())
+  {
+    const double requestedTimeValue =
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
+    auto iter = Meshes.upper_bound(requestedTimeValue);
+    if (iter != Meshes.begin())
+    {
+      iter = std::prev(iter);
+    }
+    output->ShallowCopy(iter->second);
+  }
+  else
+  {
+    output->ShallowCopy(this->Meshes[0.0]);
+  }
 
   return 1;
 }
