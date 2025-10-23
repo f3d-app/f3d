@@ -22,7 +22,7 @@ public:
    * Length of the list must be a multiple of 3.
    * The list is copied internally.
    */
-  void SetPoints(const std::vector<float>& positions);
+  void SetPoints(const std::vector<float>& positions, size_t timeIdx = 0);
 
   /**
    * Set contiguous list of normals.
@@ -31,7 +31,7 @@ public:
    * The list is copied internally.
    * The list can be empty.
    */
-  void SetNormals(const std::vector<float>& normals);
+  void SetNormals(const std::vector<float>& normals, size_t timeIdx = 0);
 
   /**
    * Set contiguous list of texture coordinates.
@@ -40,7 +40,7 @@ public:
    * The list is copied internally.
    * The list can be empty.
    */
-  void SetTCoords(const std::vector<float>& tcoords);
+  void SetTCoords(const std::vector<float>& tcoords, size_t timeIdx = 0);
 
   /**
    * Set faces by vertex indices.
@@ -50,20 +50,46 @@ public:
    * The lists are copied internally.
    * The lists can be empty, resulting in a point cloud.
    */
-  void SetFaces(
-    const std::vector<unsigned int>& faceSizes, const std::vector<unsigned int>& faceIndices);
+  void SetFaces(const std::vector<unsigned int>& faceSizes,
+    const std::vector<unsigned int>& faceIndices, size_t timeIdx = 0);
+
+  /**
+   * Set time range in seconds for the saved frames, [0,0] by default, no animation.
+   */
+  void SetTimeRange(std::pair<double, double> newTimeRange);
+
+  /**
+   * Set time step in seconds for the saved frames, 1 by default.
+   */
+  void SetTimeStep(double newTimeStep);
+
+  /** Get number of animation frames.ß
+   * result * timeStep is a total animation length in seconds.
+   */
+  size_t GetTemporalStateCount();
+
+  /**
+   * Resize underlying vector to store temporal sequence.
+   * By default vector is of size one and acts like mesh without animation, it's a must to resize
+   * the vector for animation sequence. newSize is the resulting size of the resised vector, in
+   * other words number of animation frames.
+   */
+  void ReserveTemporalEntries(size_t newSize);
 
 protected:
   vtkF3DMemoryMesh();
   ~vtkF3DMemoryMesh() override;
 
+  int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
 private:
   vtkF3DMemoryMesh(const vtkF3DMemoryMesh&) = delete;
   void operator=(const vtkF3DMemoryMesh&) = delete;
 
-  vtkNew<vtkPolyData> Mesh;
+  std::vector<vtkNew<vtkPolyData>> Meshes;
+  std::pair<double, double> timeRange;
+  double timeStep;
 };
 
 #endif

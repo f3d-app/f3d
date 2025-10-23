@@ -55,6 +55,7 @@ public:
   virtual scene& add(const std::filesystem::path& filePath) = 0;
   virtual scene& add(const std::vector<std::filesystem::path>& filePath) = 0;
   virtual scene& add(const std::vector<std::string>& filePathStrings) = 0;
+  virtual scene& add(const std::vector<mesh_t>& mesh, double timeStep) = 0;
   ///@}
 
   /**
