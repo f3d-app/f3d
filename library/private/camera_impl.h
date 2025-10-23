@@ -63,6 +63,8 @@ public:
   camera& setCurrentAsDefault() override;
   camera& resetToDefault() override;
   camera& resetToBounds(double zoomFactor = 0.9) override;
+  /* Check if camera was successfully reset with resetToBounds */
+  bool isSuccessfullyReset() const;
   ///@}
 
   /**

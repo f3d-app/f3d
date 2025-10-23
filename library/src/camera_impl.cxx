@@ -41,6 +41,7 @@ public:
   //--------------------------------------------------------------------------
   vtkRenderer* VTKRenderer = nullptr;
   camera_state_t DefaultCamera;
+  bool IsSuccessfullyReset = true; // could be false only if resetToBounds was called
 };
 
 //----------------------------------------------------------------------------
@@ -299,10 +300,29 @@ camera& camera_impl::resetToDefault()
 //----------------------------------------------------------------------------
 camera& camera_impl::resetToBounds([[maybe_unused]] double zoomFactor)
 {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251102)
+#if __ANDROID__
+  this->Internals->IsSuccessfullyReset = this->Internals->VTKRenderer->ResetCamera();
+#else
+  this->Internals->IsSuccessfullyReset =
+    this->Internals->VTKRenderer->ResetCameraScreenSpace(zoomFactor);
+#endif
+#else
 #if __ANDROID__
   this->Internals->VTKRenderer->ResetCamera();
 #else
   this->Internals->VTKRenderer->ResetCameraScreenSpace(zoomFactor);
+#endif
+  // VTK doesn't provide a way to know if the bounds were initialized, perform rough check
+  point3_t pos = this->getPosition();
+  if (vtkMath::Distance2BetweenPoints(pos, point3_t{ 0, 0, 1 }) <= 1e-6)
+  {
+    this->Internals->IsSuccessfullyReset = false;
+  }
+  else
+  {
+    this->Internals->IsSuccessfullyReset = true;
+  }
 #endif
   this->Internals->VTKRenderer->ResetCameraClippingRange();
   return *this;
@@ -319,4 +339,10 @@ vtkCamera* camera_impl::GetVTKCamera() const
 {
   return this->Internals->VTKRenderer->GetActiveCamera();
 }
+
+bool camera_impl::isSuccessfullyReset() const
+{
+  return this->Internals->IsSuccessfullyReset;
+}
+
 };
