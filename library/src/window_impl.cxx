@@ -653,6 +653,13 @@ vtkRenderWindow* window_impl::GetRenderWindow()
 bool window_impl::render()
 {
   this->UpdateDynamicOptions();
+  const options& opt = this->Internals->Options;
+  if ((!opt.scene.camera.index.has_value()) && (!this->Internals->Camera->GetSuccessfullyReset()))
+  {
+    // Camera wasn't successfully reset last time, it could be a chance that update of dynamic
+    // options will enable successful reset of camera
+    this->Internals->Camera->resetToBounds();
+  }
   this->Internals->RenWin->Render();
   return true;
 }
