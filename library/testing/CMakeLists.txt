@@ -10,6 +10,7 @@ list(APPEND libf3dSDKTests_list
      TestSDKInteractorDropFullScene.cxx
      TestSDKInteractorCommand.cxx
      TestSDKSceneFromMemory.cxx
+     TestSDKSceneTemporalFromMemory.cxx
      TestSDKScene.cxx
      TestSDKLog.cxx
      TestSDKMultiColoring.cxx

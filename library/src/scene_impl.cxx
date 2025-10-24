@@ -320,6 +320,47 @@ scene& scene_impl::add(const mesh_t& mesh)
 }
 
 //----------------------------------------------------------------------------
+scene& scene_impl::add(const std::vector<mesh_t>& meshes, double_t timeStep)
+{
+  if (meshes.empty())
+  {
+    throw scene::load_failure_exception("No mesh provided for temporal scene");
+  }
+
+  if (timeStep <= 0.0)
+  {
+    throw scene::load_failure_exception("Time step must be strictly positive");
+  }
+
+  vtkNew<vtkF3DMemoryMesh> vtkSource;
+  vtkSource->ReserveTemporalEntries(meshes.size());
+
+  for (size_t idx = 0; idx < meshes.size(); idx++)
+  {
+    auto [valid, err] = meshes[idx].isValid();
+    if (!valid)
+    {
+      throw scene::load_failure_exception(err);
+    }
+
+    vtkSource->SetPoints(meshes[idx].points, idx);
+    vtkSource->SetNormals(meshes[idx].normals, idx);
+    vtkSource->SetTCoords(meshes[idx].texture_coordinates, idx);
+    vtkSource->SetFaces(meshes[idx].face_sides, meshes[idx].face_indices, idx);
+  }
+  vtkSource->SetTimeStep(timeStep);
+  const double endTime = timeStep * static_cast<double>(meshes.size() - 1);
+  vtkSource->SetTimeRange({ 0, endTime });
+
+  vtkSmartPointer<vtkF3DGenericImporter> importer = vtkSmartPointer<vtkF3DGenericImporter>::New();
+  importer->SetInternalReader(vtkSource);
+
+  log::debug("Loading 3D scene from memory");
+  this->Internals->Load({ importer });
+  return *this;
+}
+
+//----------------------------------------------------------------------------
 scene& scene_impl::clear()
 {
   // Clear the meta importer from all importers
