@@ -1043,6 +1043,12 @@ interactor& interactor_impl::initCommands()
     [&](const std::vector<std::string>&)
     {
       this->Internals->Options.model.volume.enable = !this->Internals->Options.model.volume.enable;
+      // Update all window options and reset camera to bounds if needed
+      this->Internals->Window.UpdateDynamicOptions();
+      if (!this->Internals->Options.scene.camera.index.has_value())
+      {
+        this->Internals->Window.getCamera().resetToBounds();
+      }
       this->Internals->Window.render();
       this->Internals->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
     },
