@@ -142,6 +142,10 @@ Set the number of subdivisions for the grid.
 
 Set the color grid lines.
 
+### `--grid-absolute` (_bool_, default: `false`)
+
+Position the grid at absolute origin instead of below the model.
+
 ### `--axes-grid` (_bool_, default: `false`)
 
 Show _axes grid_ in the scene.

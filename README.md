@@ -10,7 +10,7 @@ F3D (pronounced `/fɛd/`) is a fast and minimalist 3D viewer desktop application
 
 It is fully controllable from the command line and support configuration files. It can provide thumbnails, support interactive hotkeys, drag&drop and integration into file managers.
 
-F3D also contains the libf3d, a simple library to render meshes, with a C++17 API, Python Bindings, and experimental Java and Javascript bindings.
+F3D also contains the libf3d, a simple library to render meshes, with a C++17 API, Python and Javascript Bindings, and experimental Java bindings.
 
 <img src="https://media.githubusercontent.com/media/f3d-app/f3d-media/95b76c22d927bb24759bbe0246b6260121f2933b/media/typical.png" width="640" />
 
