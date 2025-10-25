@@ -17,7 +17,7 @@ target_link_options(f3djs PRIVATE
   "$<IF:$<CONFIG:Release>,-Oz,-O0>"
   "--bind"
   "--closure 1"
-  "--emit-tsd f3d.d.ts"
+  "--emit-tsd ./bin/f3d.d.ts"
   "SHELL:-sEXPORT_NAME=f3d"
   "SHELL:-sALLOW_MEMORY_GROWTH=1"
   "SHELL:-sEMULATE_FUNCTION_POINTER_CASTS=0"
