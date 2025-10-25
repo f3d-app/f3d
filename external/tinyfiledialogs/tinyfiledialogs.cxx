@@ -4224,7 +4224,6 @@ int tfd_zenityVersion(void)
 	static int lZenityVersion = -1 ;
 	char lBuff[MAX_PATH_OR_CMD] ;
 	FILE * lIn ;
-	int lIntTmp ;
 
 	if ( lZenityVersion < 0 )
 	{
@@ -4738,7 +4737,7 @@ int tinyfd_messageBox(
 						if (aTitle&&!strcmp(aTitle,"tinyfd_query")){strcpy(tinyfd_response,"shanty");return 1;}
 						strcpy( lDialogString , "szAnswer=$(shanty" ) ;
 				}
-				else ;
+				else {};
 				strcat(lDialogString, " --");
 
 				if ( aDialogType && ! strcmp( "okcancel" , aDialogType ) )
@@ -5954,7 +5953,7 @@ char * tinyfd_inputBox(
 					if (aTitle&&!strcmp(aTitle,"tinyfd_query")){strcpy(tinyfd_response,"shanty");return (char *)1;}
 					strcpy( lDialogString ,  "szAnswer=$(shanty" ) ;
 			}
-			else ;
+			else {};
 			
 			strcat( lDialogString ," --entry" ) ;
 
@@ -6557,7 +6556,7 @@ char * tinyfd_saveFileDialog(
 						if (aTitle&&!strcmp(aTitle,"tinyfd_query")){strcpy(tinyfd_response,"shanty");return (char *)1;}
 						strcpy( lDialogString , "shanty" ) ;
 				}
-				else ;
+				else {};
 				
 				strcat(lDialogString, " --file-selection --save --confirm-overwrite" ) ;
 
@@ -7097,7 +7096,7 @@ char * tinyfd_openFileDialog(
 						if (aTitle&&!strcmp(aTitle,"tinyfd_query")){strcpy(tinyfd_response,"shanty");return (char *)1;}
 						strcpy( lDialogString , "shanty" ) ;
 				}
-				else;
+				else {};
 				
 				strcat( lDialogString , " --file-selection" ) ;
 
@@ -7585,7 +7584,7 @@ char * tinyfd_selectFolderDialog(
 						if (aTitle&&!strcmp(aTitle,"tinyfd_query")){strcpy(tinyfd_response,"shanty");return (char *)1;}
 						strcpy( lDialogString , "shanty" ) ;
 				}
-				else ;
+				else {};
 
 				strcat( lDialogString , " --file-selection --directory" ) ;
 
@@ -7932,7 +7931,7 @@ to set mycolor to choose color default color {");
 						if (aTitle&&!strcmp(aTitle,"tinyfd_query")){strcpy(tinyfd_response,"shanty");return (char *)1;}
 						strcpy( lDialogString , "shanty" ) ;
 				}
-				else ;
+				else {};
 				
 				strcat( lDialogString , " --color-selection" ) ;
 				if ( tfd_zenityVersion()>=2032 || tfd_matedialogPresent() || tfd_shellementaryPresent() || tfd_qarmaPresent() || tfd_boxerPresent() )
