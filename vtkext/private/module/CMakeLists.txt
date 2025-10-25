@@ -87,10 +87,6 @@ if(NOT ANDROID AND NOT EMSCRIPTEN AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.2024
   set(classes ${classes} vtkF3DPointSplatMapper)
 endif()
 
-if(NOT VTK_VERSION VERSION_GREATER_EQUAL 9.2.20220907)
-  set(classes ${classes} vtkF3DOrientationMarkerWidget)
-endif()
-
 if(WIN32)
   list(APPEND classes vtkF3DWGLRenderWindow)
 endif()
@@ -128,13 +124,8 @@ if(F3D_MODULE_UI AND NOT F3D_USE_EXTERNAL_IMGUI)
     "${F3D_SOURCE_DIR}/external/imgui/imgui_widgets.cpp")
 endif()
 
-set(_no_install "")
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20220928)
-  set(_no_install "NO_INSTALL")
-endif()
-
 vtk_module_add_module(f3d::vtkextPrivate
-  ${_no_install}
+  NO_INSTALL
   FORCE_STATIC
   CLASSES ${classes}
   SOURCES ${sources}

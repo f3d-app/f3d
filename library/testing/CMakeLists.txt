@@ -1,4 +1,5 @@
 list(APPEND libf3dSDKTests_list
+     TestPseudoUnitTest.cxx
      TestSDKAnimation.cxx
      TestSDKCamera.cxx
      TestSDKCompareWithFile.cxx
@@ -6,19 +7,21 @@ list(APPEND libf3dSDKTests_list
      TestSDKDynamicLightIntensity.cxx
      TestSDKEngine.cxx
      TestSDKEngineExceptions.cxx
+     TestSDKEngineRecreation.cxx
      TestSDKImage.cxx
-     TestSDKInteractorDropFullScene.cxx
      TestSDKInteractorCommand.cxx
-     TestSDKSceneFromMemory.cxx
-     TestSDKScene.cxx
+     TestSDKInteractorDropFullScene.cxx
      TestSDKLog.cxx
      TestSDKMultiColoring.cxx
      TestSDKOptions.cxx
      TestSDKOptionsIO.cxx
+     TestSDKRenderAndInteract.cxx
      TestSDKRenderFinalShader.cxx
+     TestSDKScene.cxx
+     TestSDKSceneFromMemory.cxx
+     TestSDKStartInteractor.cxx
      TestSDKUtils.cxx
      TestSDKWindowAuto.cxx
-     TestPseudoUnitTest.cxx
 )
 
 # Tests having UI widgets
@@ -31,33 +34,13 @@ if(F3D_MODULE_UI)
     TestSDKDropZoneMinSize.cxx
     TestSDKDynamicBackgroundColor.cxx
     TestSDKDynamicFontFile.cxx
+    TestSDKDynamicHDRI.cxx
     TestSDKDynamicProperties.cxx
     TestSDKInteractorCallBack.cxx
     TestSDKInteractorDocumentation.cxx
     TestSDKMultiOptions.cxx
     TestSDKTriggerInteractions.cxx
     )
-
-  # HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767
-  if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
-    list(APPEND libf3dSDKTests_list
-      TestSDKDynamicHDRI.cxx
-      )
-  endif()
-endif()
-
-# These tests needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10155
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20230426)
-  list(APPEND libf3dSDKTests_list
-    TestSDKRenderAndInteract.cxx
-    TestSDKStartInteractor.cxx
-    )
-endif()
-
-if (VTK_VERSION VERSION_GREATER 9.2.6)
-    list(APPEND libf3dSDKTests_list
-        TestSDKEngineRecreation.cxx
-        )
 endif()
 
 # Invalid scene codepath needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11287
@@ -178,7 +161,7 @@ Test Warning\nTest Error\nTest Error\n\
 Test Print Debug\nTest Print Info\nTest Print Warning\nTest Print Error\n\
 Test Debug Coloring")
 
-if(F3D_MODULE_UI AND VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
+if(F3D_MODULE_UI)
   set_tests_properties(libf3d::TestSDKDynamicHDRI PROPERTIES TIMEOUT 120)
   if(NOT F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS)
     set_tests_properties(libf3d::TestSDKDynamicHDRI PROPERTIES DISABLED ON)
