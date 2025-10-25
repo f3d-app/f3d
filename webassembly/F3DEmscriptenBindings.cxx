@@ -101,8 +101,7 @@ EMSCRIPTEN_BINDINGS(f3d)
       { return o.setAsString(name, value); }, emscripten::return_value_policy::reference())
     .function(
       "getAsString",
-      +[](f3d::options& o, const std::string& name) -> std::string
-      { return o.getAsString(name); })
+      +[](f3d::options& o, const std::string& name) -> std::string { return o.getAsString(name); })
     .function(
       "toggle", +[](f3d::options& o, const std::string& name) -> f3d::options&
       { return o.toggle(name); }, emscripten::return_value_policy::reference())
@@ -396,7 +395,8 @@ EMSCRIPTEN_BINDINGS(f3d)
       "create", +[]() { return f3d::engine::create(); },
       emscripten::return_value_policy::take_ownership())
     .function(
-      "setCachePath", &f3d::engine::setCachePath, emscripten::return_value_policy::reference())
+      "setCachePath", +[](f3d::engine& engine, const std::string& path) -> f3d::engine&
+      { return engine.setCachePath(path); }, emscripten::return_value_policy::reference())
     .function("setOptions",
       static_cast<f3d::engine& (f3d::engine::*)(const f3d::options&)>(&f3d::engine::setOptions),
       emscripten::return_value_policy::reference())
