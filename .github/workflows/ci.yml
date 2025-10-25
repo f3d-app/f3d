@@ -206,14 +206,14 @@ jobs:
             "${{needs.default_versions.outputs.vtk_commit_sha}}",
             v9.5.2,
             v9.4.2,
-            v9.3.1,
+            v9.3.0,
           ]
         build_type: [standard]
         exclude:
           - os: macos-13
-            vtk_version: v9.3.1
+            vtk_version: v9.3.0
           - os: macos-14
-            vtk_version: v9.3.1
+            vtk_version: v9.3.0
         include:
           - cpu: x86_64
           - blosc_version: ${{needs.default_versions.outputs.blosc_version}}
@@ -314,7 +314,7 @@ jobs:
             "${{needs.default_versions.outputs.vtk_commit_sha}}",
             v9.5.2,
             v9.4.2,
-            v9.3.1,
+            v9.3.0,
           ]
         static_label: [no-static]
         include:
@@ -413,7 +413,7 @@ jobs:
             "${{needs.default_versions.outputs.vtk_commit_sha}}",
             v9.5.2,
             v9.4.2,
-            v9.3.1,
+            v9.3.0,
           ]
         build_type: [standard]
         include:
@@ -615,7 +615,7 @@ jobs:
             "${{needs.default_versions.outputs.vtk_commit_sha}}",
             v9.5.2,
             v9.4.2,
-            v9.3.1,
+            v9.3.0,
           ]
 
     runs-on: macos-13
@@ -670,7 +670,7 @@ jobs:
             "${{needs.default_versions.outputs.vtk_commit_sha}}",
             v9.5.2,
             v9.4.2,
-            v9.3.1,
+            v9.3.0,
           ]
         bundle_label: [no-bundle]
         static_label: [no-static]
