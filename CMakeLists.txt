@@ -55,7 +55,7 @@ mark_as_advanced(F3D_EXCLUDE_DEPRECATED)
 # VTK dependency
 # Optional components should list VTK modules
 # needed by plugins and optional modules
-find_package(VTK 9.2.6 REQUIRED
+find_package(VTK 9.3.0 REQUIRED
   COMPONENTS
     CommonCore
     CommonDataModel
@@ -96,9 +96,8 @@ endif()
 
 # Modules
 option(F3D_MODULE_RAYTRACING "Raytracing module" OFF)
-# Needs vtkResourceStream (https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9663)
-cmake_dependent_option(F3D_MODULE_EXR "OpenEXR images module" OFF "VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221216" OFF)
-cmake_dependent_option(F3D_MODULE_WEBP "WebP images module" OFF "VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221216" OFF)
+option(F3D_MODULE_EXR "OpenEXR images module" OFF)
+option(F3D_MODULE_WEBP "WebP images module" OFF)
 option(F3D_MODULE_UI "ImGui widgets module" ON)
 option(F3D_MODULE_DMON "dmon (watch) module" ON)
 option(F3D_MODULE_TINYFILEDIALOGS "tinyfiledialogs module" ON)
