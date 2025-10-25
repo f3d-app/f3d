@@ -99,7 +99,10 @@ EMSCRIPTEN_BINDINGS(f3d)
       "setAsString",
       +[](f3d::options& o, const std::string& name, const std::string& value) -> f3d::options&
       { return o.setAsString(name, value); }, emscripten::return_value_policy::reference())
-    .function("getAsString", &f3d::options::getAsString)
+    .function(
+      "getAsString",
+      +[](f3d::options& o, const std::string& name) -> std::string
+      { return o.getAsString(name); })
     .function(
       "toggle", +[](f3d::options& o, const std::string& name) -> f3d::options&
       { return o.toggle(name); }, emscripten::return_value_policy::reference())
