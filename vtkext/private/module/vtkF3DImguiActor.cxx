@@ -344,13 +344,14 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
 
   ImGuiStyle* style = &ImGui::GetStyle();
   style->AntiAliasedLines = false;
-  style->GrabRounding = 4.0f;
-  style->WindowPadding = ImVec2(10, 10);
-  style->WindowRounding = 8.f;
-  style->WindowBorderSize = 0.f;
   style->FrameBorderSize = 0.f;
   style->FramePadding = ImVec2(4, 2);
   style->FrameRounding = 2.f;
+  style->GrabRounding = 4.0f;
+  style->ScrollbarPadding = 2.f;
+  style->WindowBorderSize = 0.f;
+  style->WindowPadding = ImVec2(10, 10);
+  style->WindowRounding = 8.f;
   style->Colors[ImGuiCol_Text] = F3DImguiStyle::GetTextColor();
   style->Colors[ImGuiCol_WindowBg] = F3DImguiStyle::GetBackgroundColor();
   style->Colors[ImGuiCol_FrameBg] = colTransparent;
