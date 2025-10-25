@@ -207,18 +207,13 @@ jobs:
             v9.5.2,
             v9.4.2,
             v9.3.1,
-            v9.2.6,
           ]
         build_type: [standard]
         exclude:
           - os: macos-13
             vtk_version: v9.3.1
-          - os: macos-13
-            vtk_version: v9.2.6
           - os: macos-14
             vtk_version: v9.3.1
-          - os: macos-14
-            vtk_version: v9.2.6
         include:
           - cpu: x86_64
           - blosc_version: ${{needs.default_versions.outputs.blosc_version}}
@@ -320,7 +315,6 @@ jobs:
             v9.5.2,
             v9.4.2,
             v9.3.1,
-            v9.2.6,
           ]
         static_label: [no-static]
         include:
@@ -420,7 +414,6 @@ jobs:
             v9.5.2,
             v9.4.2,
             v9.3.1,
-            v9.2.6,
           ]
         build_type: [standard]
         include:
@@ -623,7 +616,6 @@ jobs:
             v9.5.2,
             v9.4.2,
             v9.3.1,
-            v9.2.6,
           ]
 
     runs-on: macos-13
@@ -673,12 +665,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [
+        vtk_version:
+          [
             "${{needs.default_versions.outputs.vtk_commit_sha}}",
             v9.5.2,
             v9.4.2,
             v9.3.1,
-          ] # VTK 9.2.6 not compatible with recent clang version on macOS
+          ]
         bundle_label: [no-bundle]
         static_label: [no-static]
         include:

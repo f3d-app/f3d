@@ -35,6 +35,7 @@
 #include <vtkOpenGLRenderWindow.h>
 #include <vtkOpenGLRenderer.h>
 #include <vtkOpenGLTexture.h>
+#include <vtkOrientationMarkerWidget.h>
 #include <vtkPBRLUTTexture.h>
 #include <vtkPNGReader.h>
 #include <vtkPiecewiseFunction.h>
@@ -47,6 +48,7 @@
 #include <vtkScalarBarActor.h>
 #include <vtkShaderProperty.h>
 #include <vtkSkybox.h>
+#include <vtkSphericalHarmonics.h>
 #include <vtkTable.h>
 #include <vtkTextActor.h>
 #include <vtkTextProperty.h>
@@ -71,16 +73,6 @@
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
 #include <vtkGridAxesActor3D.h>
-#endif
-
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
-#include <vtkSphericalHarmonics.h>
-#endif
-
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20220907)
-#include <vtkOrientationMarkerWidget.h>
-#else
-#include "vtkF3DOrientationMarkerWidget.h"
 #endif
 
 #if F3D_MODULE_RAYTRACING
@@ -119,7 +111,6 @@ std::string DeprecatedCollapsePath(const fs::path& path)
   return collapsed;
 }
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
 //----------------------------------------------------------------------------
 // Compute the MD5 hash of an existing file on disk
 std::string ComputeFileHash(const std::string& filepath)
@@ -171,7 +162,6 @@ vtkSmartPointer<vtkImageData> SaveTextureToImage(
 
   return img;
 }
-#endif
 #endif
 
 //----------------------------------------------------------------------------
@@ -233,9 +223,7 @@ vtkF3DRenderer::vtkF3DRenderer()
   this->EnvMapLookupTable = vtkF3DCachedLUTTexture::New();
   this->EnvMapPrefiltered = vtkF3DCachedSpecularTexture::New();
 #endif
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
   this->EnvMapPrefiltered->HalfPrecisionOff();
-#endif
 
   this->SkyboxActor->SetProjection(vtkSkybox::Sphere);
   this->SkyboxActor->GammaCorrectOn();
@@ -552,18 +540,12 @@ void vtkF3DRenderer::ShowAxis(bool show)
     {
       assert(this->RenderWindow->GetInteractor());
       vtkNew<vtkAxesActor> axes;
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20220907)
       this->AxisWidget = vtkSmartPointer<vtkOrientationMarkerWidget>::New();
-#else
-      this->AxisWidget = vtkSmartPointer<vtkF3DOrientationMarkerWidget>::New();
-#endif
       this->AxisWidget->SetOrientationMarker(axes);
       this->AxisWidget->SetInteractor(this->RenderWindow->GetInteractor());
       this->AxisWidget->SetViewport(0.85, 0.0, 1.0, 0.15);
       this->AxisWidget->On();
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20220907)
       this->AxisWidget->InteractiveOff();
-#endif
       this->AxisWidget->SetKeyPressActivation(false);
     }
 
@@ -1095,7 +1077,6 @@ void vtkF3DRenderer::ConfigureHDRIReader()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureHDRIHash()
 {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
   if (!this->HasValidHDRIHash && this->GetUseImageBasedLighting() && this->HasValidHDRIReader)
   {
     if (this->UseDefaultHDRI)
@@ -1110,8 +1091,6 @@ void vtkF3DRenderer::ConfigureHDRIHash()
     this->HasValidHDRIHash = true;
     this->CreateCacheDirectory();
   }
-#endif
-  this->HDRIHashConfigured = true;
 }
 
 //----------------------------------------------------------------------------
@@ -1121,7 +1100,6 @@ void vtkF3DRenderer::ConfigureHDRITexture()
   {
     bool needHDRITexture = this->HDRISkyboxVisible || this->GetUseImageBasedLighting();
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
     if (this->HasValidHDRIHash)
     {
       std::string dummy;
@@ -1130,7 +1108,6 @@ void vtkF3DRenderer::ConfigureHDRITexture()
           (!this->CheckForSHCache(dummy) || !this->CheckForSpecCache(dummy) ||
             this->UseRaytracing));
     }
-#endif
 
     if (needHDRITexture)
     {
@@ -1173,8 +1150,7 @@ void vtkF3DRenderer::ConfigureHDRITexture()
     // No cache support before 20221220
     // IBL without textures has been added in VTK in
     // https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10454
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220) &&                                     \
-  VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 3, 20230902)
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 3, 20230902)
     if (this->SphericalHarmonics)
     {
       this->SphericalHarmonics->Modified();
@@ -1192,7 +1168,6 @@ void vtkF3DRenderer::ConfigureHDRITexture()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureHDRILUT()
 {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
   if (this->GetUseImageBasedLighting() && !this->HasValidHDRILUT)
   {
     vtkF3DCachedLUTTexture* lut = vtkF3DCachedLUTTexture::SafeDownCast(this->EnvMapLookupTable);
@@ -1229,14 +1204,12 @@ void vtkF3DRenderer::ConfigureHDRILUT()
     }
     this->HasValidHDRILUT = true;
   }
-#endif
   this->HDRILUTConfigured = true;
 }
 
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureHDRISphericalHarmonics()
 {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
   if (this->GetUseImageBasedLighting() && !this->HasValidHDRISH)
   {
     // Check spherical harmonics cache
@@ -1275,14 +1248,12 @@ void vtkF3DRenderer::ConfigureHDRISphericalHarmonics()
     }
     this->HasValidHDRISH = true;
   }
-#endif
   this->HDRISphericalHarmonicsConfigured = true;
 }
 
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureHDRISpecular()
 {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20221220)
   if (this->GetUseImageBasedLighting() && !this->HasValidHDRISpec)
   {
     vtkF3DCachedSpecularTexture* spec =
@@ -1333,7 +1304,6 @@ void vtkF3DRenderer::ConfigureHDRISpecular()
     }
     this->HasValidHDRISpec = true;
   }
-#endif
 
   this->HDRISpecularConfigured = true;
 }

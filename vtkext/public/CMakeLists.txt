@@ -24,10 +24,8 @@ if(BUILD_SHARED_LIBS AND NOT f3d_vtk_target_type STREQUAL STATIC_LIBRARY)
   set(export_name "f3d_vtkext")
   set(headers_component "plugin_sdk")
 else()
-  if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20220928)
-    # When building as a static lib or against a static VTK, the module is not installed at all
-    set(f3d_vtk_no_install "NO_INSTALL")
-  endif()
+  # When building as a static lib or against a static VTK, the module is not installed at all
+  set(f3d_vtk_no_install "NO_INSTALL")
   set(f3d_vtk_force_static "FORCE_STATIC")
 endif()
 
