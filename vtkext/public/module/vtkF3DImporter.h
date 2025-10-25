@@ -13,6 +13,7 @@
 
 /// @cond
 #include <vtkImporter.h>
+#include <vtkResourceStream.h>
 #include <vtkVersion.h>
 /// @endcond
 
@@ -57,6 +58,30 @@ public:
    * by the VTK version in use
    */
   void SetFailureStatus();
+
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 5, 20250923)
+  ///@{
+  /**
+   * Specify file name of the file to read
+   */
+  vtkSetFilePathMacro(FileName);
+  vtkGetFilePathMacro(FileName);
+  ///@}
+
+  ///@{
+  /**
+   * Specify stream to read from
+   */
+  vtkSetSmartPointerMacro(Stream, vtkResourceStream);
+  vtkGetSmartPointerMacro(Stream, vtkResourceStream);
+  ///@}
+#endif
+
+private:
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 5, 20250923)
+  char* FileName = nullptr;
+  vtkSmartPointer<vtkResourceStream> Stream;
+#endif
 };
 
 #endif
