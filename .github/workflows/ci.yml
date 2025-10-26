@@ -117,11 +117,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, windows-latest, macos-13, macos-14]
+        os: [ubuntu-22.04, windows-latest, macos-15-intel, macos-15]
         build_type: [standard]
         include:
           - cpu: x86_64
-          - os: macos-14
+          - os: macos-15
             cpu: arm64
           - alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           - assimp_version: ${{needs.default_versions.outputs.assimp_version}}
@@ -202,7 +202,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, windows-latest, macos-13, macos-14]
+        os: [ubuntu-22.04, windows-latest, macos-15-intel, macos-15]
         vtk_version:
           [
             "${{needs.default_versions.outputs.vtk_commit_sha}}",
@@ -212,9 +212,9 @@ jobs:
           ]
         build_type: [standard]
         exclude:
-          - os: macos-13
+          - os: macos-15-intel
             vtk_version: v9.3.0
-          - os: macos-14
+          - os: macos-15
             vtk_version: v9.3.0
         include:
           - cpu: x86_64
@@ -223,7 +223,7 @@ jobs:
           - ospray_version: ${{needs.default_versions.outputs.ospray_version}}
           - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-          - os: macos-14
+          - os: macos-15
             cpu: arm64
           - build_type: mindeps
             os: ubuntu-22.04
@@ -619,14 +619,9 @@ jobs:
       fail-fast: false
       matrix:
         vtk_version:
-          [
-            "${{needs.default_versions.outputs.vtk_commit_sha}}",
-            v9.5.2,
-            v9.4.2,
-            v9.3.0,
-          ]
+          ["${{needs.default_versions.outputs.vtk_commit_sha}}", v9.5.2, v9.4.2]
 
-    runs-on: macos-13
+    runs-on: macos-15-intel
 
     env:
       CMAKE_POLICY_VERSION_MINIMUM: 3.5
@@ -675,12 +670,7 @@ jobs:
       fail-fast: false
       matrix:
         vtk_version:
-          [
-            "${{needs.default_versions.outputs.vtk_commit_sha}}",
-            v9.5.2,
-            v9.4.2,
-            v9.3.0,
-          ]
+          ["${{needs.default_versions.outputs.vtk_commit_sha}}", v9.5.2, v9.4.2]
         bundle_label: [no-bundle]
         static_label: [no-static]
         include:
@@ -691,7 +681,7 @@ jobs:
             bundle_label: no-bundle
             static_label: static
 
-    runs-on: macos-14
+    runs-on: macos-15
 
     env:
       CMAKE_POLICY_VERSION_MINIMUM: 3.5
@@ -740,7 +730,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, windows-latest, macos-13]
+        os: [ubuntu-22.04, windows-latest, macos-15-intel]
         python_version: ["3.14"]
         include:
           - os: ubuntu-22.04
