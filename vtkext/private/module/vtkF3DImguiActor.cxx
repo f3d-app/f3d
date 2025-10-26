@@ -8,6 +8,8 @@
 #include "vtkF3DImguiVS.h"
 
 #include <vtkImageData.h>
+#include <vtkInformation.h>
+#include <vtkInformationIntegerKey.h>
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLBufferObject.h>
 #include <vtkOpenGLRenderWindow.h>
@@ -15,11 +17,16 @@
 #include <vtkOpenGLState.h>
 #include <vtkOpenGLVertexArrayObject.h>
 #include <vtkPNGReader.h>
+#include <vtkRenderer.h>
+#include <vtkRendererCollection.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkShader.h>
 #include <vtkShaderProgram.h>
 #include <vtkTextureObject.h>
 #include <vtkVersion.h>
+#include <vtkCallbackCommand.h>
+#include <vtkCommand.h>
+#include <vtkSmartPointer.h>
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
 #include <vtkMemoryResourceStream.h>
@@ -41,7 +48,7 @@
 #include <string>
 #include <iostream> // for std::cout
 
-
+vtkInformationKeyMacro(vtkF3DImguiActor, USER_VISIBILITY, Integer);
 
 namespace
 {
@@ -402,6 +409,26 @@ void vtkF3DImguiActor::ReleaseGraphicsResources(vtkWindow* w)
 //----------------------------------------------------------------------------
 vtkF3DImguiActor::~vtkF3DImguiActor() = default;
 
+
+
+// Call this once per frame, before rendering the scene
+void vtkF3DImguiActor::SyncActorVisibility(NodeInfo* node)
+{
+    if (!node || !node->prop)
+        return;
+
+    auto it = NodeVisibilityState.find(node->prop);
+    if (it != NodeVisibilityState.end())
+    {
+        node->prop->SetVisibility(it->second ? 1 : 0);
+        node->prop->Modified();
+    }
+
+    for (auto& child : node->children)
+        SyncActorVisibility(&child);
+}
+
+
 //----------------------------------------------------------------------------
 // Render a single node and its children in ImGui
 void vtkF3DImguiActor::RenderNode(NodeInfo* node)
@@ -409,35 +436,41 @@ void vtkF3DImguiActor::RenderNode(NodeInfo* node)
     if (!node)
         return;
 
-    if (node->actor)
+    if (node->prop)
     {
-        // Use the actor pointer as unique ImGui ID
-        ImGui::PushID((void*)node->actor);
+        ImGui::PushID((void*)node->prop);
 
-        // Read current visibility
-        bool visible_before = (node->actor->GetVisibility() != 0);
-        bool visible = visible_before;
-
-        // Debug: print before toggling
-        // (You could optionally print to console or a log)
-        std::cout << "[DBG] RenderNode: actor = " << node->name
-                  << " visible_before = " << visible_before << std::endl;
+        // Retrieve previous state or initialize from actor
+        bool visible = true;
+        auto it = NodeVisibilityState.find(node->prop);
+        if (it != NodeVisibilityState.end())
+        {
+            visible = it->second;
+        }
+        else
+        {
+            visible = node->prop->GetVisibility() != 0;
+            NodeVisibilityState[node->prop] = visible;
+        }
 
         if (ImGui::Checkbox(node->name.c_str(), &visible))
         {
-            // The user toggled the checkbox
-            std::cout << "[DBG] Checkbox toggled for actor '" << node->name
-                      << "' (pointer=" << node->actor
-                      << "): new visible = " << visible << std::endl;
-
-            // Set visibility
-            node->actor->SetVisibility(visible ? 1 : 0);
-            // node->actor->SetVisibility(false);
-
-            // Immediately after, read back
-            bool visible_after = (node->actor->GetVisibility() != 0);
-            std::cout << "[DBG] After SetVisibility: visible_after = " << visible_after << std::endl;
-
+            NodeVisibilityState[node->prop] = visible;
+            node->prop->SetVisibility(visible ? 1 : 0); // immediate update
+            node->prop->Modified();
+            
+            // Mark this prop as user-controlled
+            vtkInformation* info = node->prop->GetPropertyKeys();
+            if (!info)
+            {
+                info = vtkInformation::New();
+                node->prop->SetPropertyKeys(info);
+                info->Delete();
+            }
+            info->Set(vtkF3DImguiActor::USER_VISIBILITY(), visible ? 1 : 0);
+            
+            // Mark that we need to re-render the scene
+            this->VisibilityChangedThisFrame = true;
         }
 
         ImGui::PopID();
@@ -447,7 +480,6 @@ void vtkF3DImguiActor::RenderNode(NodeInfo* node)
         ImGui::Text("%s", node->name.c_str());
     }
 
-    // Recursively render children
     for (auto& child : node->children)
     {
         ImGui::Indent(10);
@@ -456,9 +488,10 @@ void vtkF3DImguiActor::RenderNode(NodeInfo* node)
     }
 }
 
+
 void vtkF3DImguiActor::RenderSceneHierarchy()
 {
-    std::cout << "[DBG] RenderSceneHierarchy is called " << std::endl;
+    // std::cout << "[DBG] RenderSceneHierarchy is called " << std::endl;
     const ImGuiViewport* viewport = ImGui::GetMainViewport();
     if (!viewport)
         return;
@@ -489,10 +522,10 @@ void vtkF3DImguiActor::RenderSceneHierarchy()
 }
 
 
-
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderDropZone()
 {
+  std::cout << "[DBG] RenderDropZone is called " << std::endl;
   // std::vector<std::string> myHierarchy = {"Root", "Node A", "Node B"};
   // RenderSceneHierarchy(myHierarchy);
   if (this->DropZoneVisible)
@@ -1044,12 +1077,17 @@ void vtkF3DImguiActor::StartFrame(vtkOpenGLRenderWindow* renWin)
     this->Initialize(renWin);
   }
 
+  RenderWindow = renWin;
+
   int* size = renWin->GetSize();
 
   ImGuiIO& io = ImGui::GetIO();
   io.DisplaySize = ImVec2(static_cast<float>(size[0]), static_cast<float>(size[1]));
 
   this->Pimpl->Initialize(renWin);
+  
+  // Reset the visibility change flag at the start of each frame
+  this->VisibilityChangedThisFrame = false;
 
   ImGui::NewFrame();
 }
@@ -1059,6 +1097,33 @@ void vtkF3DImguiActor::EndFrame(vtkOpenGLRenderWindow* renWin)
 {
   ImGui::Render();
   this->Pimpl->RenderDrawData(renWin, ImGui::GetDrawData());
+  
+  // If visibility changed this frame, schedule a render after this one completes
+  if (this->VisibilityChangedThisFrame && renWin)
+  {
+    vtkRenderWindowInteractor* iren = renWin->GetInteractor();
+    if (iren)
+    {
+      // Use a one-shot timer to defer the render until after the current render completes
+      static vtkSmartPointer<vtkCallbackCommand> renderCallback = nullptr;
+      if (!renderCallback)
+      {
+        renderCallback = vtkSmartPointer<vtkCallbackCommand>::New();
+        renderCallback->SetCallback(
+          [](vtkObject*, unsigned long eventId, void* clientData, void* callData)
+          {
+            vtkRenderWindowInteractor* interactor = static_cast<vtkRenderWindowInteractor*>(clientData);
+            if (interactor && interactor->GetRenderWindow())
+            {
+              interactor->GetRenderWindow()->Render();
+            }
+          });
+      }
+      renderCallback->SetClientData(iren);
+      int timerId = iren->CreateOneShotTimer(1); // 1ms delay
+      iren->AddObserver(vtkCommand::TimerEvent, renderCallback);
+    }
+  }
 }
 
 //----------------------------------------------------------------------------

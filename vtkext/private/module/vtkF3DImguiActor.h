@@ -9,17 +9,25 @@
 #define vtkF3DImguiActor_h
 
 #include "vtkF3DUIActor.h"
+#include <vtkRenderWindow.h>
+#include <vtkProp.h>
+
 
 #include <memory>
 
 class vtkOpenGLRenderWindow;
 class vtkWindow;
 
+class vtkInformationIntegerKey;
+
 class vtkF3DImguiActor : public vtkF3DUIActor
 {
 public:
   static vtkF3DImguiActor* New();
   vtkTypeMacro(vtkF3DImguiActor, vtkF3DUIActor);
+  
+  // Information key to track user-controlled visibility
+  static vtkInformationIntegerKey* USER_VISIBILITY();
 
   /**
    * Initialize the UI actor resources
@@ -43,6 +51,10 @@ protected:
 private:
   struct Internals;
   std::unique_ptr<Internals> Pimpl;
+  vtkRenderWindow* RenderWindow = nullptr;
+  std::unordered_map<vtkProp*, bool> NodeVisibilityState;
+  bool VisibilityChangedThisFrame = false;
+
 
   /**
    * Called at the beginning of the rendering step
@@ -63,6 +75,8 @@ private:
 
   void RenderSceneHierarchy() override;
   void RenderNode(NodeInfo* node) override;
+  void SyncActorVisibility(NodeInfo* node) override;
+  
 
 
   /**

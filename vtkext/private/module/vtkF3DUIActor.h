@@ -17,7 +17,7 @@
 
 #include <string>
 #include <vector>
-#include <vtkActor.h>
+#include <vtkProp.h>
 
 #ifndef NODEINFO_H
 #define NODEINFO_H
@@ -25,8 +25,9 @@
 struct NodeInfo
 {
     std::string name;
-    vtkActor* actor = nullptr;
+    vtkProp* prop = nullptr; 
     std::vector<NodeInfo> children;
+    std::string displayName;
 };
 
 #endif // NODEINFO_H
@@ -230,6 +231,12 @@ protected:
   virtual void RenderNode(NodeInfo*)
   {
   }
+
+  virtual void SyncActorVisibility(NodeInfo*)
+  {
+  }
+
+  
 
 
   /**

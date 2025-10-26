@@ -17,6 +17,10 @@
 #include "vtkF3DSolidBackgroundPass.h"
 #include "vtkF3DUserRenderPass.h"
 
+#if F3D_MODULE_UI
+#include "vtkF3DImguiActor.h"
+#endif
+
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
 #include <vtkCamera.h>
@@ -55,6 +59,8 @@
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkSSAAPass.h>
+#include <vtkInformation.h>
+#include <vtkInformationIntegerKey.h>
 #include <vtkScalarBarActor.h>
 #include <vtkShaderProperty.h>
 #include <vtkSkybox.h>
@@ -2179,6 +2185,7 @@ void vtkF3DRenderer::Render()
 
   vtkInformation* info = this->GetInformation();
 
+  info->Remove(vtkF3DRenderPass::RENDER_UI_ONLY());
   bool uiOnly = info->Get(vtkF3DRenderPass::RENDER_UI_ONLY());
 
   if (!uiOnly)
@@ -3084,13 +3091,54 @@ void vtkF3DRenderer::ConfigureColoring()
             this->UseCellColoring);
         }
       }
-      coloring.Actor->SetVisibility(visible);
+      
+      // Check for user visibility override
+#if F3D_MODULE_UI
+      vtkInformation* coloringInfo = coloring.Actor->GetPropertyKeys();
+      if (coloringInfo && coloringInfo->Has(vtkF3DImguiActor::USER_VISIBILITY()))
+      {
+        visible = coloringInfo->Get(vtkF3DImguiActor::USER_VISIBILITY()) != 0;
+      }
+      vtkInformation* originalInfo = coloring.OriginalActor->GetPropertyKeys();
+      if (originalInfo && originalInfo->Has(vtkF3DImguiActor::USER_VISIBILITY()))
+      {
+        coloring.OriginalActor->SetVisibility(originalInfo->Get(vtkF3DImguiActor::USER_VISIBILITY()));
+      }
+      else
+      {
+        coloring.OriginalActor->SetVisibility(!visible);
+      }
+#else
       coloring.OriginalActor->SetVisibility(!visible);
+#endif
+      coloring.Actor->SetVisibility(visible);
     }
     else
     {
+      // Check for user visibility override even when not geometriesVisible
+#if F3D_MODULE_UI
+      vtkInformation* coloringInfo = coloring.Actor->GetPropertyKeys();
+      if (coloringInfo && coloringInfo->Has(vtkF3DImguiActor::USER_VISIBILITY()))
+      {
+        coloring.Actor->SetVisibility(coloringInfo->Get(vtkF3DImguiActor::USER_VISIBILITY()));
+      }
+      else
+      {
+        coloring.Actor->SetVisibility(false);
+      }
+      vtkInformation* originalInfo = coloring.OriginalActor->GetPropertyKeys();
+      if (originalInfo && originalInfo->Has(vtkF3DImguiActor::USER_VISIBILITY()))
+      {
+        coloring.OriginalActor->SetVisibility(originalInfo->Get(vtkF3DImguiActor::USER_VISIBILITY()));
+      }
+      else
+      {
+        coloring.OriginalActor->SetVisibility(false);
+      }
+#else
       coloring.Actor->SetVisibility(false);
       coloring.OriginalActor->SetVisibility(false);
+#endif
     }
   }
   if (geometriesVisible)

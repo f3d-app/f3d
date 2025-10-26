@@ -675,31 +675,17 @@ std::vector<NodeInfo> scene_impl::GetSceneHierarchyNodes()
         return hierarchy;
     }
 
-    // Get the raw hierarchy
     std::vector<NodeInfo> rawHierarchy = this->Internals->MetaImporter->GetActorHierarchy();
 
-    std::cout << "[DEBUG] GetSceneHierarchyNodes() returned " << rawHierarchy.size() << " actors." << std::endl;
-
-    // Filter duplicates based on vtkActor*
-    std::vector<NodeInfo> uniqueHierarchy;
-    std::unordered_set<vtkActor*> seenActors;
+    std::unordered_set<vtkProp*> seenProps;
     for (const auto& node : rawHierarchy)
     {
-        if (node.actor && seenActors.insert(node.actor).second) // insert only if not seen
-        {
-            uniqueHierarchy.push_back(node);
-        }
+        if (node.prop && seenProps.insert(node.prop).second)
+            hierarchy.push_back(node);
     }
 
-    // Optional: debug output for filtered hierarchy
-    for (size_t i = 0; i < uniqueHierarchy.size(); ++i)
-    {
-        std::cout << "[DEBUG] Unique Actor " << i << ": " << uniqueHierarchy[i].name 
-                  << ", visibility=" << uniqueHierarchy[i].actor->GetVisibility() << std::endl;
-    }
-
-    return uniqueHierarchy;
+    std::cout << "[DEBUG] Unique props in hierarchy: " << hierarchy.size() << std::endl;
+    return hierarchy;
 }
-
 
 }

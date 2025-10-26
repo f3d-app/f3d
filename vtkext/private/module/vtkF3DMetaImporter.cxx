@@ -783,35 +783,23 @@ std::vector<NodeInfo> vtkF3DMetaImporter::GetActorHierarchy()
 {
     std::vector<NodeInfo> nodes;
 
-    for (const auto& importerPair : this->Pimpl->Importers)
+    // Return only the original imported actors, not internal F3D rendering actors
+    vtkCollectionSimpleIterator ait;
+    this->ActorCollection->InitTraversal(ait);
+    while (vtkActor* actor = this->ActorCollection->GetNextActor(ait))
     {
-        vtkF3DGLTFImporter* gltfImporter = vtkF3DGLTFImporter::SafeDownCast(importerPair.Importer);
-        if (gltfImporter)
-        {
-            vtkRenderer* renderer = gltfImporter->GetRenderer();
-            if (!renderer) continue;
+        if (!actor)
+            continue;
 
-            vtkPropCollection* props = renderer->GetViewProps();
-            props->InitTraversal();
-            vtkProp* prop = nullptr;
-
-            while ((prop = props->GetNextProp()))
-            {
-                if (vtkActor* actor = vtkActor::SafeDownCast(prop))
-                {
-                    NodeInfo node;
-                    node.actor = actor;
-                    // Attempt to use a better name if available, otherwise fallback to class name
-                    // Assuming gltfImporter has a way to map actors to node names, 
-                    // if not, the original class name fallback is used.
-                    // THIS PART MAY NEED CUSTOM ADJUSTMENT DEPENDING ON F3D/VTK internals
-                    node.name = actor->GetClassName(); // Default fallback
-                    // A better approach would be to get the actual GLTF node name associated with the actor.
-                    nodes.push_back(node);
-                }
-            }
-        }
+        NodeInfo node;
+        node.prop = actor;
+        // Use a more meaningful name if available, otherwise use class name
+        node.name = actor->GetClassName();
+        nodes.push_back(node);
     }
+
+    std::cout << "[DEBUG] vtkF3DMetaImporter::GetActorHierarchy() collected "
+              << nodes.size() << " original actors" << std::endl;
 
     return nodes;
 }
