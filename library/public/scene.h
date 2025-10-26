@@ -11,7 +11,7 @@
 // #include <vtkDataAssembly.h>
 #include <string>
 #include <vector>
-#include <vtkActor.h>
+#include <vtkProp.h>
 // #include <vtkRenderingCore/vtkActor.h>
 
 
@@ -21,8 +21,9 @@
 struct NodeInfo
 {
     std::string name;
-    vtkActor* actor = nullptr;
+    vtkProp* prop = nullptr; 
     std::vector<NodeInfo> children;
+    std::string displayName;
 };
 
 #endif // NODEINFO_H
