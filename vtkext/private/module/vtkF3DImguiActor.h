@@ -75,8 +75,6 @@ private:
 
   void RenderSceneHierarchy() override;
   void RenderNode(NodeInfo* node) override;
-  void SyncActorVisibility(NodeInfo* node) override;
-  
 
 
   /**

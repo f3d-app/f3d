@@ -3,7 +3,6 @@
  * @brief
  */
 
-
 #ifndef vtkF3DMetaImporter_h
 #define vtkF3DMetaImporter_h
 
@@ -27,8 +26,6 @@
 #include <string>
 #include <vector>
 
-#include <string>
-#include <vector>
 #include <vtkProp.h>
 
 #ifndef NODEINFO_H
@@ -36,10 +33,10 @@
 
 struct NodeInfo
 {
-    std::string name;
-    vtkProp* prop = nullptr; 
-    std::vector<NodeInfo> children;
-    std::string displayName;
+  std::string name;
+  vtkProp* prop = nullptr;
+  std::vector<NodeInfo> children;
+  std::string displayName;
 };
 
 #endif // NODEINFO_H

@@ -46,7 +46,6 @@
 #include <optional>
 #include <sstream>
 #include <string>
-#include <iostream> // for std::cout
 
 vtkInformationKeyMacro(vtkF3DImguiActor, USER_VISIBILITY, Integer);
 
@@ -409,28 +408,7 @@ void vtkF3DImguiActor::ReleaseGraphicsResources(vtkWindow* w)
 //----------------------------------------------------------------------------
 vtkF3DImguiActor::~vtkF3DImguiActor() = default;
 
-
-
-// Call this once per frame, before rendering the scene
-void vtkF3DImguiActor::SyncActorVisibility(NodeInfo* node)
-{
-    if (!node || !node->prop)
-        return;
-
-    auto it = NodeVisibilityState.find(node->prop);
-    if (it != NodeVisibilityState.end())
-    {
-        node->prop->SetVisibility(it->second ? 1 : 0);
-        node->prop->Modified();
-    }
-
-    for (auto& child : node->children)
-        SyncActorVisibility(&child);
-}
-
-
 //----------------------------------------------------------------------------
-// Render a single node and its children in ImGui
 void vtkF3DImguiActor::RenderNode(NodeInfo* node)
 {
     if (!node)
@@ -491,7 +469,6 @@ void vtkF3DImguiActor::RenderNode(NodeInfo* node)
 
 void vtkF3DImguiActor::RenderSceneHierarchy()
 {
-    // std::cout << "[DBG] RenderSceneHierarchy is called " << std::endl;
     const ImGuiViewport* viewport = ImGui::GetMainViewport();
     if (!viewport)
         return;
@@ -525,9 +502,6 @@ void vtkF3DImguiActor::RenderSceneHierarchy()
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderDropZone()
 {
-  std::cout << "[DBG] RenderDropZone is called " << std::endl;
-  // std::vector<std::string> myHierarchy = {"Root", "Node A", "Node B"};
-  // RenderSceneHierarchy(myHierarchy);
   if (this->DropZoneVisible)
   {
     ImGuiViewport* viewport = ImGui::GetMainViewport();

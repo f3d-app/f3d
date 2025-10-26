@@ -221,17 +221,11 @@ protected:
 
 public:
   /**
-   * Prototype API to expose scene hierarchy for glTF inspection.
-   * Returns a pointer to the vtkDataAssembly (scene hierarchy) and
-   * the imported vtkActorCollection. Intended for prototype only.
+   * Get the scene hierarchy nodes for display and control.
+   * Returns a vector of NodeInfo structures representing the actors in the scene.
+   * This is used to populate the scene hierarchy UI widget.
    */
-  virtual std::string getSceneHierarchy()
-    {
-        return ""; // default base implementation
-    }
-  // virtual std::vector<NodeInfo> GetSceneHierarchyNodes();
   virtual std::vector<NodeInfo> GetSceneHierarchyNodes() = 0;
-  // virtual std::string GetSceneNodes(vtkDataAssembly* assembly);
 };
 }
 

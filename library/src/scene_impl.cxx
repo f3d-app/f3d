@@ -25,26 +25,6 @@
 #include <vtksys/SystemTools.hxx>
 
 #include <vector>
-
-
-#include <vtkXMLUtilities.h>
-#include <vtkXMLDataElement.h>
-#include <vtkRenderWindow.h>
-#include <vtkRenderer.h>
-#include <iostream>
-#include <sstream>
-#include <string>
-
-#include <typeinfo>
-#include <cxxabi.h>
-#include "vtkF3DGLTFImporter.h"
-// #include "vtkGLTFImporter.h"
-
-#include <vtkDataAssembly.h>
-#include <vtkProp3DCollection.h>
-#include <vtkActor.h>
-#include <vtkNew.h>
-#include <vtkCollection.h>
 #include <unordered_set>
 
 namespace fs = std::filesystem;
@@ -578,114 +558,28 @@ void scene_impl::PrintImporterDescription(log::VerboseLevel level)
 }
 
 //----------------------------------------------------------------------------
-//----------------------------------------------------------------------------
-std::string scene_impl::getSceneHierarchy()
-{
-    std::cout << "[DEBUG] getSceneHierarchy() called" << std::endl;
-
-    if (!this->Internals)
-    {
-        std::cout << "[DEBUG] Internals is null" << std::endl;
-        return "";
-    }
-
-    vtkDataAssembly* assembly = this->Internals->MetaImporter->GetSceneHierarchy();
-    // vtkDataAssembly* assembly = gltfImporter->GetSceneHierarchy();
-    if (!assembly)
-    {
-        std::cout << "[DEBUG] GetSceneHierarchy() returned null assembly" << std::endl;
-        return "";
-    }
-
-    std::ostringstream oss;
-    assembly->Print(oss);
-
-    std::string content = oss.str();
-    std::cout << "[DEBUG] Assembly content size: " << content.size() << std::endl;
-
-    auto pos = content.find("<?xml");
-    if (pos == std::string::npos)
-    {
-        std::cout << "[DEBUG] XML header not found in assembly content" << std::endl;
-        return "";
-    }
-
-    std::string xmlStr = content.substr(pos);
-    std::cout << "[DEBUG] Extracted XML substring length: " << xmlStr.size() << std::endl;
-
-    auto xml = vtkXMLUtilities::ReadElementFromString(xmlStr.c_str());
-    if (!xml)
-    {
-        std::cout << "[DEBUG] Failed to parse XML from string" << std::endl;
-        return "";
-    }
-
-    std::vector<std::string> nodes;
-    std::vector<vtkXMLDataElement*> stack{xml};
-
-    std::cout << "[DEBUG] Starting XML traversal" << std::endl;
-    while (!stack.empty())
-    {
-        auto elem = stack.back();
-        stack.pop_back();
-
-        if (const char* name = elem->GetName())
-        {
-            nodes.push_back(name);
-            std::cout << "[DEBUG] Found node: " << name << std::endl;
-        }
-
-        for (int i = 0; i < elem->GetNumberOfNestedElements(); ++i)
-        {
-            stack.push_back(elem->GetNestedElement(i));
-        }
-    }
-
-    // Join nodes with commas
-    std::ostringstream result;
-    for (size_t i = 0; i < nodes.size(); ++i)
-    {
-        result << nodes[i];
-        if (i != nodes.size() - 1)
-            result << ", ";
-    }
-
-    std::string finalResult = result.str();
-    std::cout << "[DEBUG] getSceneHierarchy() returning: " << finalResult << std::endl;
-
-    return finalResult;
-}
-
-// ------------------------------------------------------
-// Return top-level hierarchy nodes (actors)
-// ------------------------------------------------------
 std::vector<NodeInfo> scene_impl::GetSceneHierarchyNodes()
 {
-    std::vector<NodeInfo> hierarchy;
+  std::vector<NodeInfo> hierarchy;
 
-    if (!this->Internals)
-    {
-        std::cout << "[DEBUG] Internals null in GetSceneHierarchyNodes()" << std::endl;
-        return hierarchy;
-    }
-
-    if (!this->Internals->MetaImporter)
-    {
-        std::cout << "[DEBUG] MetaImporter null in GetSceneHierarchyNodes()" << std::endl;
-        return hierarchy;
-    }
-
-    std::vector<NodeInfo> rawHierarchy = this->Internals->MetaImporter->GetActorHierarchy();
-
-    std::unordered_set<vtkProp*> seenProps;
-    for (const auto& node : rawHierarchy)
-    {
-        if (node.prop && seenProps.insert(node.prop).second)
-            hierarchy.push_back(node);
-    }
-
-    std::cout << "[DEBUG] Unique props in hierarchy: " << hierarchy.size() << std::endl;
+  if (!this->Internals || !this->Internals->MetaImporter)
+  {
     return hierarchy;
+  }
+
+  std::vector<NodeInfo> rawHierarchy = this->Internals->MetaImporter->GetActorHierarchy();
+
+  // Remove duplicate props
+  std::unordered_set<vtkProp*> seenProps;
+  for (const auto& node : rawHierarchy)
+  {
+    if (node.prop && seenProps.insert(node.prop).second)
+    {
+      hierarchy.push_back(node);
+    }
+  }
+
+  return hierarchy;
 }
 
 }
