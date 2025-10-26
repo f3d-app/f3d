@@ -109,7 +109,7 @@ int TestSDKInteractorCallBack([[maybe_unused]] int argc, [[maybe_unused]] char* 
     return EXIT_FAILURE;
   }
 
-  // With VTK 9.2.6 and 9.3.0, rendering is slightly different
+  // With VTK 9.3.0, rendering is slightly different
   if (!TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
         filename + "Modified", 0.11))
   {
@@ -136,7 +136,7 @@ int TestSDKInteractorCallBack([[maybe_unused]] int argc, [[maybe_unused]] char* 
     return EXIT_FAILURE;
   }
 
-  // With VTK 9.2.6 and 9.3.0, rendering is slightly different
+  // With VTK 9.3.0, rendering is slightly different
   if (!TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
         filename + "ModifiedAgain", 0.11))
   {

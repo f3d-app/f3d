@@ -71,13 +71,6 @@ runs:
         cat $GITHUB_ACTION_PATH/set_cmp0177_policy.cmake CMake/vtkModule.cmake > patched.cmake
         mv patched.cmake CMake/vtkModule.cmake
 
-    # VTK 9.2.6 needs patching with recent libstd
-    - name: Patch VTK v9.2.6
-      if: steps.cache-vtk.outputs.cache-hit != 'true' && inputs.vtk_version == 'v9.2.6'
-      working-directory: ${{github.workspace}}/dependencies/vtk
-      shell: bash
-      run: patch -p1 < $GITHUB_ACTION_PATH/include_cstdint.patch
-
       # OpenVDB_CMAKE_PATH is required because of
       # https://github.com/AcademySoftwareFoundation/openvdb/issues/1160 and
       # https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10393
@@ -127,7 +120,7 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_RenderingRayTracing=${{ inputs.ospray_version != '' && 'YES' || 'DEFAULT' }}
         -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2=YES
         -DVTK_MODULE_ENABLE_VTK_TestingCore=YES
-        -DVTK_OPENGL_HAS_EGL=${{ runner.os != 'macOS' && inputs.vtk_version != 'v9.2.6' && inputs.vtk_version != 'v9.3.1' && 'ON' || 'OFF' }}
+        -DVTK_OPENGL_HAS_EGL=${{ runner.os != 'macOS' && inputs.vtk_version != 'v9.3.0' && 'ON' || 'OFF' }}
         -DVTK_SMP_IMPLEMENTATION_TYPE=TBB
         -DVTK_VERSIONED_INSTALL=OFF
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
