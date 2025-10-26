@@ -22,7 +22,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/assimp_install
-        key: assimp-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-1
+        key: assimp-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{env.CI_CACHE_TIMESTAMP}}-1
 
     - name: Checkout ASSIMP
       if: steps.cache-assimp.outputs.cache-hit != 'true'

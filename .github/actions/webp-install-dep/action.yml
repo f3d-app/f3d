@@ -22,7 +22,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/webp_install
-        key: webp-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-1
+        key: webp-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{env.CI_CACHE_TIMESTAMP}}-1
 
     - name: Checkout WebP
       if: steps.cache-webp.outputs.cache-hit != 'true'

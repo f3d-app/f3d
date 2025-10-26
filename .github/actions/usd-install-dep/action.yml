@@ -30,7 +30,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/usd_install
-        key: usd-${{inputs.version}}-${{inputs.openexr_version}}-${{inputs.tbb_version}}-${{runner.os}}-${{inputs.cpu}}-1
+        key: usd-${{inputs.version}}-${{inputs.openexr_version}}-${{inputs.tbb_version}}-${{runner.os}}-${{inputs.cpu}}-${{env.CI_CACHE_TIMESTAMP}}-1
 
     - name: Checkout USD
       if: steps.cache-usd.outputs.cache-hit != 'true'

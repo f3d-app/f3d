@@ -13,7 +13,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/pybind11_install
-        key: pybind11-${{inputs.version}}-${{runner.os}}-1
+        key: pybind11-${{inputs.version}}-${{runner.os}}-${{env.CI_CACHE_TIMESTAMP}}-1
 
     - name: Checkout pybind11
       if: steps.cache-pybind11.outputs.cache-hit != 'true'

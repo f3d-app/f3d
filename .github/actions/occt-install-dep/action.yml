@@ -22,7 +22,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/occt_install
-        key: occt-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-5
+        key: occt-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{env.CI_CACHE_TIMESTAMP}}-5
 
     - name: Checkout OCCT
       if: steps.cache-occt.outputs.cache-hit != 'true'

@@ -159,6 +159,7 @@ jobs:
 
     env:
       CMAKE_POLICY_VERSION_MINIMUM: 3.5
+      CI_CACHE_TIMESTAMP: ${{needs.default_versions.outputs.timestamp}}
 
     steps:
       - name: Checkout
@@ -258,6 +259,7 @@ jobs:
 
     env:
       CMAKE_POLICY_VERSION_MINIMUM: 3.5
+      CI_CACHE_TIMESTAMP: ${{needs.default_versions.outputs.timestamp}}
 
     steps:
       - name: Checkout
@@ -331,6 +333,7 @@ jobs:
 
     env:
       CMAKE_POLICY_VERSION_MINIMUM: 3.5
+      CI_CACHE_TIMESTAMP: ${{needs.default_versions.outputs.timestamp}}
 
     steps:
       - name: Checkout
@@ -378,6 +381,7 @@ jobs:
 
     env:
       CMAKE_POLICY_VERSION_MINIMUM: 3.5
+      CI_CACHE_TIMESTAMP: ${{needs.default_versions.outputs.timestamp}}
       DISPLAY: :0
 
     steps:
@@ -568,6 +572,7 @@ jobs:
 
     env:
       CMAKE_POLICY_VERSION_MINIMUM: 3.5
+      CI_CACHE_TIMESTAMP: ${{needs.default_versions.outputs.timestamp}}
       DISPLAY: :0
 
     steps:
@@ -630,6 +635,7 @@ jobs:
 
     env:
       CMAKE_POLICY_VERSION_MINIMUM: 3.5
+      CI_CACHE_TIMESTAMP: ${{needs.default_versions.outputs.timestamp}}
 
     steps:
       - name: Checkout
@@ -693,6 +699,7 @@ jobs:
 
     env:
       CMAKE_POLICY_VERSION_MINIMUM: 3.5
+      CI_CACHE_TIMESTAMP: ${{needs.default_versions.outputs.timestamp}}
 
     steps:
       - name: Checkout
@@ -759,6 +766,7 @@ jobs:
     env:
       DISPLAY: :0
       CMAKE_POLICY_VERSION_MINIMUM: 3.5
+      CI_CACHE_TIMESTAMP: ${{needs.default_versions.outputs.timestamp}}
 
     steps:
       - name: Checkout
@@ -802,6 +810,7 @@ jobs:
 
     # Add dummy F3D_PLUGINS_PATH for coverage
     env:
+      CI_CACHE_TIMESTAMP: ${{needs.default_versions.outputs.timestamp}}
       DISPLAY: :0
       F3D_PLUGINS_PATH: /dummy1:/dummy2
 
@@ -854,6 +863,7 @@ jobs:
 
     env:
       CMAKE_POLICY_VERSION_MINIMUM: 3.5
+      CI_CACHE_TIMESTAMP: ${{needs.default_versions.outputs.timestamp}}
       DISPLAY: :0
       CC: clang
       CXX: clang++
@@ -900,6 +910,7 @@ jobs:
 
     env:
       CMAKE_POLICY_VERSION_MINIMUM: 3.5
+      CI_CACHE_TIMESTAMP: ${{needs.default_versions.outputs.timestamp}}
       CC: clang
       CXX: clang++
 
@@ -945,6 +956,7 @@ jobs:
 
     env:
       CMAKE_POLICY_VERSION_MINIMUM: 3.5
+      CI_CACHE_TIMESTAMP: ${{needs.default_versions.outputs.timestamp}}
 
     steps:
       - name: Checkout
