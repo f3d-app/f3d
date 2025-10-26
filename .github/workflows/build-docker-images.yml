@@ -35,6 +35,11 @@ jobs:
         with:
           file: ./source/.github/workflows/versions.json
 
+      - name: Output
+        shell: bash
+        run: echo ${{needs.default_versions.outputs.docker_timestamp}}
+
+
   #----------------------------------------------------------------------------
   # Build android/wasm docker images if needed
   #----------------------------------------------------------------------------
