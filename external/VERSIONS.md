@@ -1,3 +1,4 @@
+- clip: v1.12.0
 - cxxopts: v3.3.1
 - dmon: 1.3.8
 - imgui: v1.92.2

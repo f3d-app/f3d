@@ -360,6 +360,20 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
     }
   }
 
+  // copy button
+  ImGui::SetCursorPos(ImVec2{ windowWidth - ImGui::CalcTextSize("Copy").x - padding * 2, padding });
+  ImGui::BeginChild("Copy button");
+  if (ImGui::Button("Copy"))
+  {
+    std::ostringstream oss;
+    for (const auto& [severity, msg] : this->Pimpl->Logs)
+    {
+      oss << msg << '\n';
+    }
+    ImGui::SetClipboardText(oss.str().c_str());
+  }
+  ImGui::EndChild();
+
   ImGui::End();
 }
 
