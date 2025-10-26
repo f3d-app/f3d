@@ -83,7 +83,7 @@ Some [formatting rules](https://f3d.app/dev/CODING_STYLE) are not enforced by cl
 When making changes to the `libf3d` public API, continuous integration will warn about making related changes to the bindings.
 This is required in order to merge the pull request.
 
-When making changes to the `default_versions.json` file, continuous integration will warn about updating the timestamp in the same file.
+When making changes to the `default_versions.json` file, continuous integration will warn about updating the docker timestamp in the same file.
 This is required in order to merge the pull request.
 
 The continuous integration is just code, as the rest of F3D is. If you want to fix or improve it, you are very welcome to!
