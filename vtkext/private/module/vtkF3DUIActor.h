@@ -214,13 +214,6 @@ protected:
   {
   }
 
-  virtual void SyncActorVisibility(NodeInfo*)
-  {
-  }
-
-  
-
-
   /**
    * Render the filename UI widget
    */
