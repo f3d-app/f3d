@@ -56,7 +56,7 @@ jobs:
       usd_version: ${{ steps.set_default_versions.outputs.usd_version }}
       webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
       zlib_version: ${{ steps.set_default_versions.outputs.zlib_version }}
-      timestamp: ${{ steps.set_default_versions.outputs.timestamp }}
+      docker_timestamp: ${{ steps.set_default_versions.outputs.docker_timestamp }}
 
     steps:
       - name: Checkout
@@ -373,7 +373,7 @@ jobs:
         arch: [armeabi-v7a, arm64-v8a, x86, x86_64]
 
     runs-on: ubuntu-22.04
-    container: ghcr.io/f3d-app/f3d-android-${{ matrix.arch }}:${{needs.default_versions.outputs.timestamp}}_${{needs.check_nightly.outputs.vtk_sha}}
+    container: ghcr.io/f3d-app/f3d-android-${{ matrix.arch }}:${{needs.default_versions.outputs.docker_timestamp}}_${{needs.check_nightly.outputs.vtk_sha}}
 
     steps:
       - name: Checkout
@@ -400,7 +400,7 @@ jobs:
 
     env:
       CMAKE_BUILD_PARALLEL_LEVEL: 4
-      F3D_DOCKER_TIMESTAMP: ${{needs.default_versions.outputs.timestamp}}
+      F3D_DOCKER_TIMESTAMP: ${{needs.default_versions.outputs.docker_timestamp}}
 
     steps:
       - name: Checkout

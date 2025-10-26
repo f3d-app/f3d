@@ -8,7 +8,7 @@
 - [ ] I have added [tests](https://f3d.app/dev/TESTING) for new features and bugfixes
 - [ ] I have added [documentation](https://f3d.app/docs/next/user/QUICKSTART) for new features
 - [ ] If it is a modifying the libf3d API, I have updated bindings
-- [ ] If it is a modifying the `.github/workflows/versions.json`, I have updated `timestamp`
+- [ ] If it is a modifying the `.github/workflows/versions.json`, I have updated `docker_timestamp`
 
 ### Continuous integration
 
