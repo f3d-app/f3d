@@ -445,7 +445,7 @@ f3d_test(NAME TestPluginNonExistent ARGS --load-plugins=dummy REGEXP "Plugin fai
 if(WIN32)
   set(_TEST_PLUGIN_INVALID_REGEXP "is not a valid Win32 application")
 elseif(APPLE)
-  set(_TEST_PLUGIN_INVALID_REGEXP "not a mach-o file")
+  set(_TEST_PLUGIN_INVALID_REGEXP "not.*mach-o file")
 else()
   set(_TEST_PLUGIN_INVALID_REGEXP "file too short")
 endif()
