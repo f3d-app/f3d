@@ -1675,9 +1675,8 @@ void vtkF3DRenderer::SetHierarchy(const std::string& Hierarchy)
 
 void vtkF3DRenderer::SetHierarchy(const std::vector<NodeInfo>& hierarchy)
 {
-    this->UIActor->SetHierarchy(hierarchy);
+  this->UIActor->SetHierarchy(hierarchy);
 }
-
 
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetUseDepthPeelingPass(bool use)

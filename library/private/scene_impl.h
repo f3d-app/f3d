@@ -68,12 +68,9 @@ private:
 
 public:
   /**
-   * Prototype: return VTK scene hierarchy + actor collection
+   * Get scene hierarchy nodes for display and control
    */
-  // void* getSceneHierarchy(void** outActorCollection) override;
-  std::string getSceneHierarchy() override;
   std::vector<NodeInfo> GetSceneHierarchyNodes() override;
-  // std::string GetSceneNodes(vtkDataAssembly* assembly);
 };
 }
 }

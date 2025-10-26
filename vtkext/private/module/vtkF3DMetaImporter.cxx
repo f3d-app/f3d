@@ -734,72 +734,37 @@ vtkMTimeType vtkF3DMetaImporter::GetUpdateMTime()
 //----------------------------------------------------------------------------
 vtkDataAssembly* vtkF3DMetaImporter::GetSceneHierarchy()
 {
-    for (const auto& importerPair : this->Pimpl->Importers)
+  for (const auto& importerPair : this->Pimpl->Importers)
+  {
+    vtkF3DGLTFImporter* gltfImporter = vtkF3DGLTFImporter::SafeDownCast(importerPair.Importer);
+    if (gltfImporter)
     {
-        vtkF3DGLTFImporter* gltfImporter = vtkF3DGLTFImporter::SafeDownCast(importerPair.Importer);
-        if (gltfImporter)
-        {
-            // Returns the GLTF scene hierarchy
-            return gltfImporter->GetSceneHierarchy();
-        }
+      return gltfImporter->GetSceneHierarchy();
     }
-    // No GLTF importer found
-    return nullptr;
+  }
+  return nullptr;
 }
 
-// std::vector<NodeInfo> vtkF3DMetaImporter::GetActorHierarchy()
-// {
-//     std::vector<NodeInfo> nodes;
-
-//     for (const auto& importerPair : this->Pimpl->Importers)
-//     {
-//         vtkF3DGLTFImporter* gltfImporter = vtkF3DGLTFImporter::SafeDownCast(importerPair.Importer);
-//         if (gltfImporter)
-//         {
-//             vtkRenderer* renderer = gltfImporter->GetRenderer();
-//             if (!renderer) continue;
-
-//             vtkPropCollection* props = renderer->GetViewProps();
-//             props->InitTraversal();
-//             vtkProp* prop = nullptr;
-
-//             while ((prop = props->GetNextProp()))
-//             {
-//                 if (vtkActor* actor = vtkActor::SafeDownCast(prop))
-//                 {
-//                     NodeInfo node;
-//                     node.actor = actor;
-//                     node.name = actor->GetClassName(); // or use gltfImporter-specific node name if available
-//                     nodes.push_back(node);
-//                 }
-//             }
-//         }
-//     }
-
-//     return nodes;
-// }
-
+//----------------------------------------------------------------------------
 std::vector<NodeInfo> vtkF3DMetaImporter::GetActorHierarchy()
 {
-    std::vector<NodeInfo> nodes;
+  std::vector<NodeInfo> nodes;
 
-    // Return only the original imported actors, not internal F3D rendering actors
-    vtkCollectionSimpleIterator ait;
-    this->ActorCollection->InitTraversal(ait);
-    while (vtkActor* actor = this->ActorCollection->GetNextActor(ait))
+  // Return only the original imported actors, not internal F3D rendering actors
+  vtkCollectionSimpleIterator ait;
+  this->ActorCollection->InitTraversal(ait);
+  while (vtkActor* actor = this->ActorCollection->GetNextActor(ait))
+  {
+    if (!actor)
     {
-        if (!actor)
-            continue;
-
-        NodeInfo node;
-        node.prop = actor;
-        // Use a more meaningful name if available, otherwise use class name
-        node.name = actor->GetClassName();
-        nodes.push_back(node);
+      continue;
     }
 
-    std::cout << "[DEBUG] vtkF3DMetaImporter::GetActorHierarchy() collected "
-              << nodes.size() << " original actors" << std::endl;
+    NodeInfo node;
+    node.prop = actor;
+    node.name = actor->GetClassName();
+    nodes.push_back(node);
+  }
 
-    return nodes;
+  return nodes;
 }
