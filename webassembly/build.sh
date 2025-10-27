@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+# todo: install in docker image directly
+npm install -g typescript
+
 cmake -S /src -B /src/_wasm_build \
     -DBUILD_SHARED_LIBS=OFF \
     -DCMAKE_BUILD_TYPE=$1 \

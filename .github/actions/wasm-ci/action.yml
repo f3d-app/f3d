@@ -4,11 +4,6 @@ description: "WebAssembly CI"
 runs:
   using: "composite"
   steps:
-    - name: Install dependencies
-      shell: bash
-      working-directory: ${{github.workspace}}/source
-      run: npm install
-
     - name: Build and pack
       shell: bash
       working-directory: ${{github.workspace}}/source

@@ -14,9 +14,6 @@
     "test": "npm run _docker -- ctest --test-dir /src/_wasm_build/webassembly --output-on-failure",
     "prepare": "npm run clean && npm run build"
   },
-  "devDependencies": {
-    "typescript": "^5.9.3"
-  },
   "repository": "github:f3d-app/f3d",
   "keywords": [
     "3d",
