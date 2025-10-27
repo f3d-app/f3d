@@ -8,6 +8,9 @@ inputs:
   version:
     description: "Version of occt to build"
     required: true
+  global_cache_index:
+    description: "Global cache index"
+    required: true
 
 runs:
   using: "composite"
@@ -16,13 +19,14 @@ runs:
       shell: bash
       run: |
         [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
 
     - name: Cache OCCT
       id: cache-occt
       uses: actions/cache/restore@v4
       with:
         path: dependencies/occt_install
-        key: occt-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-5
+        key: occt-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-0
 
     - name: Checkout OCCT
       if: steps.cache-occt.outputs.cache-hit != 'true'

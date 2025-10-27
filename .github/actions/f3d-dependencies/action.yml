@@ -35,6 +35,9 @@ inputs:
   webp_version:
     description: "Version of webp to build"
     required: false
+  global_cache_index:
+    description: "Global cache index"
+    required: true
 
 runs:
   using: "composite"
@@ -45,6 +48,7 @@ runs:
       with:
         cpu: ${{inputs.cpu}}
         version: ${{inputs.occt_version}}
+        global_cache_index: ${{inputs.global_cache_index}}
 
     - name: Install Assimp dependency
       if: inputs.assimp_version != ''
@@ -52,6 +56,7 @@ runs:
       with:
         cpu: ${{inputs.cpu}}
         version: ${{inputs.assimp_version}}
+        global_cache_index: ${{inputs.global_cache_index}}
 
     - name: Install Draco dependency
       if: inputs.draco_version != ''
@@ -59,6 +64,7 @@ runs:
       with:
         cpu: ${{inputs.cpu}}
         version: ${{inputs.draco_version}}
+        global_cache_index: ${{inputs.global_cache_index}}
 
     - name: Install Imath dependency
       if: inputs.imath_version != ''
@@ -66,6 +72,7 @@ runs:
       with:
         cpu: ${{inputs.cpu}}
         version: ${{inputs.imath_version}}
+        global_cache_index: ${{inputs.global_cache_index}}
 
     - name: Install OpenEXR dependency
       if: inputs.openexr_version != ''
@@ -74,6 +81,7 @@ runs:
         cpu: ${{inputs.cpu}}
         version: ${{inputs.openexr_version}}
         imath_version: ${{inputs.imath_version}}
+        global_cache_index: ${{inputs.global_cache_index}}
 
     - name: Install Alembic dependency
       if: inputs.alembic_version != ''
@@ -82,12 +90,14 @@ runs:
         cpu: ${{inputs.cpu}}
         version: ${{inputs.alembic_version}}
         imath_version: ${{inputs.imath_version}}
+        global_cache_index: ${{inputs.global_cache_index}}
 
     - name: Install pybind11 dependency
       if: inputs.pybind11_version != ''
       uses: ./source/.github/actions/pybind11-install-dep
       with:
         version: ${{inputs.pybind11_version}}
+        global_cache_index: ${{inputs.global_cache_index}}
 
     - name: Install USD dependency
       if: inputs.usd_version != ''
@@ -97,6 +107,7 @@ runs:
         version: ${{inputs.usd_version}}
         openexr_version: ${{inputs.openexr_version}}
         tbb_version: ${{inputs.tbb_version}}
+        global_cache_index: ${{inputs.global_cache_index}}
 
     - name: Install webp dependency
       if: inputs.webp_version != ''
@@ -104,3 +115,4 @@ runs:
       with:
         cpu: ${{inputs.cpu}}
         version: ${{inputs.webp_version}}
+        global_cache_index: ${{inputs.global_cache_index}}
