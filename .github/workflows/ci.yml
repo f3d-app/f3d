@@ -61,6 +61,7 @@ jobs:
       zlib_version: ${{ steps.set_default_versions.outputs.zlib_version }}
       vtk_commit_sha: ${{ steps.set_default_versions.outputs.vtk_commit_sha }}
       docker_timestamp: ${{ steps.set_default_versions.outputs.docker_timestamp }}
+      global_cache_index: ${{ steps.set_default_versions.outputs.global_cache_index }}
 
     steps:
       - name: Checkout
@@ -186,6 +187,7 @@ jobs:
           usd_version: ${{matrix.usd_version}}
           webp_version: ${{matrix.webp_version}}
           zlib_version: ${{matrix.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # Cache VTK Dependency: Checkout and compile VTK if not cached
@@ -278,6 +280,7 @@ jobs:
           blosc_version: ${{matrix.blosc_version}}
           tbb_version: ${{matrix.tbb_version}}
           zlib_version: ${{matrix.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
       - name: Install Raytracing Dependencies
         if: matrix.ospray_version != ''
@@ -285,6 +288,7 @@ jobs:
         with:
           version: ${{matrix.ospray_version}}
           cpu: ${{matrix.cpu}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
       - name: VTK dependency
         uses: ./source/.github/actions/vtk-install-dep
@@ -296,6 +300,7 @@ jobs:
           ospray_version: ${{matrix.ospray_version}}
           tbb_version: ${{matrix.tbb_version}}
           zlib_version: ${{matrix.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # Windows CI: Build and test, cross-vtk build matrix
@@ -356,6 +361,7 @@ jobs:
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           webp_version: ${{needs.default_versions.outputs.webp_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # Linux fast CI: Build and test a single fast CI
@@ -395,6 +401,7 @@ jobs:
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           vtk_version: v9.5.2
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # Linux CI: Build and test, cross-vtk build matrix
@@ -597,6 +604,7 @@ jobs:
           usd_version: ${{matrix.usd_version}}
           webp_version: ${{matrix.webp_version}}
           zlib_version: ${{matrix.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # MacOS CI: Build and test, cross-vtk build matrix
@@ -652,6 +660,7 @@ jobs:
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           webp_version: ${{needs.default_versions.outputs.webp_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # MacOS ARM CI: Build and test, cross-vtk build matrix with a few optional builds
@@ -718,6 +727,7 @@ jobs:
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           webp_version: ${{needs.default_versions.outputs.webp_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # Python packaging: Build and test the Python wheel
@@ -780,6 +790,7 @@ jobs:
           vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
           webp_version: ${{needs.default_versions.outputs.webp_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # Coverage: Build and test on linux with last VTK with coverage option
@@ -825,6 +836,7 @@ jobs:
           vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
           webp_version: ${{needs.default_versions.outputs.webp_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # Sanitizer: Build and test on linux with last VTK with sanitizer options
@@ -876,6 +888,7 @@ jobs:
           vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
           webp_version: ${{needs.default_versions.outputs.webp_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # static-analysis: Run static analysis on linux
@@ -921,6 +934,7 @@ jobs:
           vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
           webp_version: ${{needs.default_versions.outputs.webp_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # external-build: Check build of F3D as sub-project
@@ -954,6 +968,7 @@ jobs:
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # Check android/wasm docker images

@@ -57,6 +57,7 @@ jobs:
       webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
       zlib_version: ${{ steps.set_default_versions.outputs.zlib_version }}
       docker_timestamp: ${{ steps.set_default_versions.outputs.docker_timestamp }}
+      global_cache_index: ${{ steps.set_default_versions.outputs.global_cache_index }}
 
     steps:
       - name: Checkout
@@ -139,6 +140,7 @@ jobs:
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           webp_version: ${{ needs.default_versions.outputs.webp_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # Linux CI: Build and test
@@ -194,6 +196,7 @@ jobs:
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           webp_version: ${{ needs.default_versions.outputs.webp_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # MacOS CI: Build and test
@@ -239,6 +242,7 @@ jobs:
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           webp_version: ${{ needs.default_versions.outputs.webp_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # MacOS arm64 CI: Build and test
@@ -284,6 +288,7 @@ jobs:
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           webp_version: ${{ needs.default_versions.outputs.webp_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # Sanitizer: Build and test on linux with last VTK with sanitizer options
@@ -339,6 +344,7 @@ jobs:
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           webp_version: ${{ needs.default_versions.outputs.webp_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # Build android/wasm docker images

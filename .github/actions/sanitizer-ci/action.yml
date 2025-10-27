@@ -40,6 +40,9 @@ inputs:
   zlib_version:
     description: "Version of zlib to build"
     required: true
+  global_cache_index:
+    description: "Global cache index"
+    required: true
 
 runs:
   using: "composite"
@@ -71,6 +74,7 @@ runs:
         tbb_version: ${{inputs.tbb_version}}
         webp_version: ${{inputs.webp_version}}
         zlib_version: ${{inputs.zlib_version}}
+        global_cache_index: ${{inputs.global_cache_index}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
@@ -79,6 +83,7 @@ runs:
         tbb_version: ${{inputs.tbb_version}}
         vtk_version: ${{inputs.vtk_version}}
         zlib_version: ${{inputs.zlib_version}}
+        global_cache_index: ${{inputs.global_cache_index}}
 
     - name: Setup Build Directory
       shell: bash

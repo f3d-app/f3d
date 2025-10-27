@@ -21,6 +21,9 @@ inputs:
   zlib_version:
     description: "Version of zlib to build"
     required: true
+  global_cache_index:
+    description: "Global cache index"
+    required: true
 
 runs:
   using: "composite"
@@ -37,12 +40,14 @@ runs:
       with:
         cpu: ${{inputs.cpu}}
         version: ${{inputs.tbb_version}}
+        global_cache_index: ${{inputs.global_cache_index}}
 
     - name: Install zlib
       uses: ./.actions/zlib-install-dep
       with:
         cpu: ${{inputs.cpu}}
         version: ${{inputs.zlib_version}}
+        global_cache_index: ${{inputs.global_cache_index}}
 
     - name: Install blosc
       uses: ./.actions/blosc-install-dep
@@ -50,6 +55,7 @@ runs:
         cpu: ${{inputs.cpu}}
         version: ${{inputs.blosc_version}}
         zlib_version: ${{inputs.zlib_version}}
+        global_cache_index: ${{inputs.global_cache_index}}
 
     - name: Install OpenVDB
       if: inputs.openvdb_version != ''
@@ -60,3 +66,4 @@ runs:
         blosc_version: ${{inputs.blosc_version}}
         tbb_version: ${{inputs.tbb_version}}
         zlib_version: ${{inputs.zlib_version}}
+        global_cache_index: ${{inputs.global_cache_index}}
