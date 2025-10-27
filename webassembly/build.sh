@@ -3,7 +3,7 @@
 set -euo pipefail
 
 # todo: install in docker image directly
-apt install nodejs npm
+apt-get -y install nodejs npm
 npm install -g typescript
 
 cmake -S /src -B /src/_wasm_build \
