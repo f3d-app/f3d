@@ -13,6 +13,8 @@ const settings = {
     options.setAsString("model.scivis.component", "-2");
     options.setAsString("model.scivis.range", "0.7,1.4"); // not used for the baseline, only for coverage
 
+    utils.assert(options.getAsString("model.scivis.array_name") === "Colors");
+
     // check that the getter works
     utils.assert(
       options.get("model.scivis.enable") === true,
