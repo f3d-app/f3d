@@ -2086,10 +2086,10 @@ void F3DStarter::AddCommands()
     f3d::interactor::command_documentation_t{ "remove_current_file_group",
       "remove current file group and load the next file group if any" });
 
-  interactor.addCommand(
-    "remove_file_groups",
+ /* interactor.addCommand(
+    "remove_file_groups",*/
 
-  interactor.addCommand("print_config_info", [this](const std::vector<std::string>&)
+ /* interactor.addCommand("print_config_info", [this](const std::vector<std::string>&)
     { F3DConfigFileTools::ReadConfigFiles(std::string(), true, f3d::log::VerboseLevel::INFO); });
 
 
@@ -2103,7 +2103,7 @@ void F3DStarter::AddCommands()
       {
         f3d::log::info("Found available config path: ", path.string());
       }
-    });
+    });*/
 
   interactor.addCommand("print_config_info", [this](const std::vector<std::string>&)
     { F3DConfigFileTools::PrintConfigInfo(F3DConfigFileTools::GetConfigPaths("config")); });

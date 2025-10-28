@@ -74,14 +74,7 @@ void F3DConfigFileTools::PrintConfigInfo(const std::vector<fs::path>& configPath
 {
   for (const fs::path& path : F3DConfigFileTools::GetConfigPaths("config"))
   {
-    if (fs::exists(path))
-    {
-      f3d::log::info("Config file found: ", path);
-    }
-    else
-    {
-      f3d::log::info("Candidate config file not found: ", path);
-    }
+    f3d::log::info("- ", path, fs::exists(path) ? "(found)" : "(not found)");
   }
 }
 
