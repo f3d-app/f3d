@@ -37,12 +37,19 @@ runs:
         path: "./dependencies/ospray"
         ref: ${{inputs.version}}
 
-      # https://github.com/ospray/ospray/pull/550
+    # https://github.com/ospray/ospray/pull/550
     - name: Patch ospray rkcommon superbuild
       if: steps.cache-ospray.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/ospray
       shell: bash
       run: patch -p1 < $GITHUB_ACTION_PATH/0001-Fix-INSTALL_RPATH-in-rkcommon-superbuild.patch
+
+    # https://github.com/RenderKit/embree/issues/486
+    - name: Patch ospray embree superbuild
+      if: steps.cache-ospray.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/ospray
+      shell: bash
+      run: patch -p1 < $GITHUB_ACTION_PATH/0001-fix-embree-for-modern-clang.patch
 
     - name: Setup ospray
       if: steps.cache-ospray.outputs.cache-hit != 'true'
