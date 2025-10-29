@@ -308,10 +308,13 @@ angle_deg_t camera_impl::getYaw()
   }
 
   // Project forward vector onto up vector
-  vtkMath::ProjectVector(dir.data(), up, projectedAlongUp.data());
-  if (abs(vtkMath::AngleBetweenVectors(dir.data(), up) - M_PI / 2) <= EPSILON)
+  if (abs(vtkMath::AngleBetweenVectors(dir.data(), up) - vtkMath::Pi() / 2) <= EPSILON)
   {
     projectedAlongUp = { 0, 0, 0 };
+  }
+  else
+  {
+    vtkMath::ProjectVector(dir.data(), up, projectedAlongUp.data());
   }
   vtkMath::Normalize(projectedAlongUp.data());
 
