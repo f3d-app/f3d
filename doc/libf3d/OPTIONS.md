@@ -64,7 +64,7 @@ Force a specific reader to be used, disregarding the file extension. See [user d
 
 CLI: `--force-reader`.
 
-### `scene.camera.orthographic` (_bool_, optional, **on load**)
+### `scene.camera.orthographic` (_bool_, optional)
 
 Set to true to force orthographic projection. Model-specified by default, which is false if not specified.
 
@@ -176,7 +176,7 @@ Set how many distinct colors will be used from the colormap. Should be `>=1`.
 
 CLI: `--colormap-discretization`.
 
-### `model.scivis.colormap` (_colormap_, default: `\<inferno\>`)
+### `model.scivis.colormap` (_colormap_, default: `<inferno>`)
 
 Set a _custom colormap for the coloring_.See [colormap parsing](../user/PARSING.md#colormap) for details.
 
@@ -292,7 +292,7 @@ Set the _size_ of points when showing vertices. Model-specified by default.
 
 CLI: `--point-size`.
 
-### `render.backface_type` (_string_, optional)
+### `render.backface_type` (_string_, optional, **on load**)
 
 Set the Backface type, can be `visible` or `hidden`, Model-specified by default.
 
