@@ -1,0 +1,26 @@
+From 99caa8156fb65a1c0a97ef4b168ca720787e04b8 Mon Sep 17 00:00:00 2001
+From: Mathieu Westphal <mathieu.westphal@kitware.com>
+Date: Thu, 30 Oct 2025 08:49:47 +0100
+Subject: [PATCH] fix_cmake_rpath
+
+---
+ lib/Alembic/CMakeLists.txt | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/lib/Alembic/CMakeLists.txt b/lib/Alembic/CMakeLists.txt
+index 8cb8ddb9..b5a73a6d 100644
+--- a/lib/Alembic/CMakeLists.txt
++++ b/lib/Alembic/CMakeLists.txt
+@@ -67,6 +67,9 @@ IF (ALEMBIC_SHARED_LIBS)
+     VERSION ${PROJECT_VERSION})
+ ENDIF()
+ 
++if (APPLE OR UNIX)
++  set_target_properties(Alembic PROPERTIES INSTALL_RPATH "$<TARGET_FILE_DIR:Imath::Imath>")
++endif ()
+ 
+ TARGET_LINK_LIBRARIES(Alembic
+     LINK_PUBLIC
+-- 
+2.51.1
+
