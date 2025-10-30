@@ -68,10 +68,6 @@ public:
   [[nodiscard]] virtual camera_state_t getState() const = 0;
   /** Get the complete state of the camera into the provided arg */
   virtual void getState(camera_state_t& state) const = 0;
-
-  [[nodiscard]] virtual angle_deg_t getYaw() = 0;
-  [[nodiscard]] virtual angle_deg_t getAzimuth() = 0;
-  [[nodiscard]] virtual angle_deg_t getElevation() = 0;
   ///@}
 
   ///@{ @name Manipulation
