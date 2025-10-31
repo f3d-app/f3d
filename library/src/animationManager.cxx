@@ -247,11 +247,11 @@ bool animationManager::LoadAtTime(double timeValue)
 
 bool animationManager::LoadAtFrame(int frame)
 {
-    this->PrepareForAnimationIndices();
-    if (this->PreparedAnimationIndices.value().empty())
-    {
-      return false;
-    }
+  this->PrepareForAnimationIndices();
+  if (this->PreparedAnimationIndices.value().empty())
+  {
+    return false;
+  }
 
   int nbTimeSteps;
   vtkIdType currentAnimation = this->PreparedAnimationIndices.value()[0];
@@ -280,7 +280,8 @@ bool animationManager::LoadAtFrame(int frame)
   {
     return false;
   }
-  this->CurrentTime = std::clamp(timeSteps->GetValue(currentFrameIndex + frame), this->TimeRange[0], this->TimeRange[1]);
+  this->CurrentTime = std::clamp(
+    timeSteps->GetValue(currentFrameIndex + frame), this->TimeRange[0], this->TimeRange[1]);
   return this->LoadAtTime(this->CurrentTime);
 }
 
