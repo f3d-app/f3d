@@ -245,6 +245,60 @@ bool animationManager::LoadAtTime(double timeValue)
   return true;
 }
 
+bool animationManager::LoadAtFrame(int frame)
+{
+  this->PrepareForAnimationIndices();
+  if (this->PreparedAnimationIndices.value().empty())
+  {
+    return false;
+  }
+
+  int nbTimeSteps;
+  vtkIdType currentAnimation = this->PreparedAnimationIndices.value()[0];
+  vtkNew<vtkDoubleArray> timeSteps;
+  const bool tempInfoExists = this->Importer->GetTemporalInformation(
+    currentAnimation, 60, nbTimeSteps, this->TimeRange, timeSteps
+  );
+
+  if (!tempInfoExists)
+  {
+    return false;
+  }
+
+  int currentFrameIndex = -1;
+  const double tolerance = 1e-6;
+  const vtkIdType numTuples = timeSteps->GetNumberOfTuples();
+  for (vtkIdType i = 0; i < numTuples; ++i)
+  {
+    if (std::abs(timeSteps->GetValue(i) - this->CurrentTime) < tolerance)
+    {
+      currentFrameIndex = i;
+      break;
+    }
+  }
+  if (currentFrameIndex == -1)
+  {
+    return false;
+  }
+  this->CurrentTime = std::clamp(
+    timeSteps->GetValue(currentFrameIndex + frame), this->TimeRange[0], this->TimeRange[1]);
+  return this->LoadAtTime(this->CurrentTime);
+}
+
+void animationManager::NextFrame() {
+  if (this->LoadAtFrame(1))
+  {
+    this->Window.render();
+  }
+}
+
+void animationManager::PreviousFrame() {
+  if (this->LoadAtFrame(-1))
+  {
+    this->Window.render();
+  }
+}
+
 // ---------------------------------------------------------------------------------
 void animationManager::CycleAnimation()
 {
