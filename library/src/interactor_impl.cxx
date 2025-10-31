@@ -1063,6 +1063,16 @@ interactor& interactor_impl::initCommands()
     command_documentation_t{ "reset_camera", "reset the camera to its original location" });
 
   this->addCommand(
+    "next_frame_animation",
+    [&](const std::vector<std::string>&) {this->Internals->AnimationManager->NextFrame(); },
+    command_documentation_t{ "next_frame_animation", "Play animation's next frame" });
+
+  this->addCommand(
+    "previous_frame_animation",
+    [&](const std::vector<std::string>&) { this->Internals->AnimationManager->PreviousFrame(); },
+    command_documentation_t{ "previous_frame_animation", "Play animation's previous frame" });
+
+  this->addCommand(
     "toggle_animation",
     [&](const std::vector<std::string>&) { this->Internals->AnimationManager->ToggleAnimation(); },
     command_documentation_t{ "toggle_animation", "start/stop the animation" });
@@ -1418,7 +1428,9 @@ interactor& interactor_impl::initBindings()
 #endif
   this->addBinding({mod_t::CTRL, "Q"}, "stop_interactor", "Others", std::bind(docStr, "Stop the interactor"));
   this->addBinding({mod_t::NONE, "Return"}, "reset_camera", "Others", std::bind(docStr, "Reset camera to initial parameters"));
+  this->addBinding({mod_t::SHIFT, "Space"}, "previous_frame_animation", "Others", std::bind(docStr, "Play animation's next frame if any"));
   this->addBinding({mod_t::NONE, "Space"}, "toggle_animation", "Others", std::bind(docStr, "Play/Pause animation if any"));
+  this->addBinding({mod_t::CTRL, "Space"}, "next_frame_animation", "Others", std::bind(docStr, "Play animation's next frame if any"));
   this->addBinding({mod_t::NONE, "Drop"}, "add_files", "Others", std::bind(docStr, "Add files to the scene"));
   this->addBinding({mod_t::SHIFT, "V"}, "cycle_verbose_level", "Others", docVerbose, f3d::interactor::BindingType::CYCLIC);
   // clang-format on

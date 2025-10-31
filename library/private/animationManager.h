@@ -90,6 +90,9 @@ public:
    */
   void Tick();
 
+  void NextFrame();
+  void PreviousFrame();
+
   /**
    * Load animation at provided time value
    */

@@ -245,6 +245,22 @@ bool animationManager::LoadAtTime(double timeValue)
   return true;
 }
 
+
+void animationManager::NextFrame() {
+    this->CurrentTime += this->DeltaTime * this->Options.scene.animation.speed_factor;
+    if (this->LoadAtTime(this->CurrentTime))
+    {
+      this->Window.render();
+    }
+}
+void animationManager::PreviousFrame() {
+    this->CurrentTime -= this->DeltaTime * this->Options.scene.animation.speed_factor;
+    if (this->LoadAtTime(this->CurrentTime))
+    {
+      this->Window.render();
+    }
+}
+
 // ---------------------------------------------------------------------------------
 void animationManager::CycleAnimation()
 {
