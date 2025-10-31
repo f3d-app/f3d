@@ -2112,6 +2112,47 @@ void vtkF3DRenderer::ConfigureActorsProperties()
 
   for (const auto& coloring : this->Importer->GetColoringActorsAndMappers())
   {
+    // convert to PBR materials if needed
+    if (coloring.OriginalActor->GetProperty()->GetInterpolation() != VTK_PBR)
+    {
+      coloring.Actor->GetProperty()->SetInterpolationToPBR();
+      coloring.OriginalActor->GetProperty()->SetInterpolationToPBR();
+
+      coloring.Actor->GetProperty()->LightingOn();
+      coloring.OriginalActor->GetProperty()->LightingOn();
+
+      // Convert to linear space
+      auto toLinear = [](double c) { return std::pow(c, 2.2); };
+      double diffuseColor[3];
+      coloring.OriginalActor->GetProperty()->GetColor(diffuseColor);
+      coloring.Actor->GetProperty()->SetColor(
+        toLinear(diffuseColor[0]), toLinear(diffuseColor[1]), toLinear(diffuseColor[2]));
+      coloring.OriginalActor->GetProperty()->SetColor(
+        toLinear(diffuseColor[0]), toLinear(diffuseColor[1]), toLinear(diffuseColor[2]));
+
+      // restore specular to 1
+      coloring.Actor->GetProperty()->SetSpecular(1.0);
+      coloring.OriginalActor->GetProperty()->SetSpecular(1.0);
+
+      // restore diffuse to 1
+      coloring.Actor->GetProperty()->SetDiffuse(1.0);
+      coloring.OriginalActor->GetProperty()->SetDiffuse(1.0);
+
+      // texture diffuse is now base color
+      auto diffuseTex = coloring.OriginalActor->GetTexture();
+      if (diffuseTex)
+      {
+        coloring.Actor->GetProperty()->SetColor(1.0, 1.0, 1.0);
+        coloring.OriginalActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
+        coloring.Actor->GetProperty()->SetBaseColorTexture(diffuseTex);
+        coloring.OriginalActor->GetProperty()->SetBaseColorTexture(diffuseTex);
+
+        diffuseTex->UseSRGBColorSpaceOn();
+        coloring.Actor->SetTexture(nullptr);
+        coloring.OriginalActor->SetTexture(nullptr);
+      }
+    }
+
     if (this->EdgeVisible.has_value())
     {
       coloring.Actor->GetProperty()->SetEdgeVisibility(this->EdgeVisible.value());
