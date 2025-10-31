@@ -1945,6 +1945,8 @@ void F3DStarter::AddCommands()
     return f3d::options::parse<bool>(args[0]);
   };
 
+
+
   auto complFilesystem = [](const std::vector<std::string>& args)
   {
     std::vector<std::string> candidates;
@@ -2084,8 +2086,14 @@ void F3DStarter::AddCommands()
     f3d::interactor::command_documentation_t{ "remove_current_file_group",
       "remove current file group and load the next file group if any" });
 
-  interactor.addCommand(
-    "remove_file_groups",
+
+  interactor.addCommand("print_config_info", [this](const std::vector<std::string>&)
+    { F3DConfigFileTools::PrintConfigInfo(F3DConfigFileTools::GetConfigPaths("config")); });
+
+
+
+  interactor.addCommand("remove_file_groups",
+
     [this](const std::vector<std::string>&)
     {
       if (!this->Internals->AppOptions.NoRender)

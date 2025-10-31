@@ -13,6 +13,7 @@ namespace F3DConfigFileTools
 using BindingsVector = std::vector<std::pair<std::string, std::vector<std::string>>>;
 using BindingsEntry = std::tuple<BindingsVector, std::string, std::string, std::string>;
 using BindingsEntries = std::vector<BindingsEntry>;
+namespace fs = std::filesystem;
 
 struct ParsedConfigFiles
 {
@@ -20,6 +21,16 @@ struct ParsedConfigFiles
   F3DOptionsTools::OptionsEntries ImperativeOptions;
   BindingsEntries Bindings;
 };
+
+/**
+ * Recover a OS-specific vector of potential config file directories
+ */
+std::vector<std::filesystem::path> GetConfigPaths(const std::string& configSearch);
+
+/**
+ * Print information about all candidate config files/directories (usually from GetConfigPaths)
+ */
+void PrintConfigInfo(const std::vector<fs::path>& configPaths);
 
 /**
  * Read config files using userConfig if any, return a ParsedConfigFiles
