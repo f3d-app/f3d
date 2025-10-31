@@ -245,20 +245,54 @@ bool animationManager::LoadAtTime(double timeValue)
   return true;
 }
 
+bool animationManager::LoadAtFrame(int frame)
+{
+  if (this->Options.scene.animation.indices.empty())
+  {
+    return false;
+  }
+
+  int nbTimeSteps;
+  vtkNew<vtkDoubleArray> timeSteps;
+  const bool tempInfoExists = this->Importer->GetTemporalInformation(
+    this->Options.scene.animation.indices[0], 60, nbTimeSteps, this->TimeRange, timeSteps);
+
+  if (!tempInfoExists)
+  {
+    return false;
+  }
+
+  int currentFrameIndex = -1;
+  const double tolerance = 1e-6;
+  const vtkIdType numTuples = timeSteps->GetNumberOfTuples();
+  for (vtkIdType i = 0; i < numTuples; ++i)
+  {
+    if (std::abs(timeSteps->GetValue(i) - this->CurrentTime) < tolerance)
+    {
+      currentFrameIndex = i;
+      break;
+    }
+  }
+  if (currentFrameIndex == -1)
+  {
+    return false;
+  }
+  this->CurrentTime = timeSteps->GetValue(std::max(0, currentFrameIndex + frame));
+  return this->LoadAtTime(this->CurrentTime);
+}
 
 void animationManager::NextFrame() {
-    this->CurrentTime += this->DeltaTime * this->Options.scene.animation.speed_factor;
-    if (this->LoadAtTime(this->CurrentTime))
-    {
-      this->Window.render();
-    }
+  if (this->LoadAtFrame(1))
+  {
+    this->Window.render();
+  }
 }
+
 void animationManager::PreviousFrame() {
-    this->CurrentTime -= this->DeltaTime * this->Options.scene.animation.speed_factor;
-    if (this->LoadAtTime(this->CurrentTime))
-    {
-      this->Window.render();
-    }
+  if (this->LoadAtFrame(-1))
+  {
+    this->Window.render();
+  }
 }
 
 // ---------------------------------------------------------------------------------
