@@ -280,7 +280,7 @@ bool animationManager::LoadAtFrame(int frame)
   {
     return false;
   }
-  this->CurrentTime = timeSteps->GetValue(std::max(0, currentFrameIndex + frame));
+  this->CurrentTime = std::clamp(timeSteps->GetValue(currentFrameIndex + frame), this->TimeRange[0], this->TimeRange[1]);
   return this->LoadAtTime(this->CurrentTime);
 }
 
