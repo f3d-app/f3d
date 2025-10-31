@@ -247,15 +247,18 @@ bool animationManager::LoadAtTime(double timeValue)
 
 bool animationManager::LoadAtFrame(int frame)
 {
-  if (this->Options.scene.animation.indices.empty())
-  {
-    return false;
-  }
+    this->PrepareForAnimationIndices();
+    if (this->PreparedAnimationIndices.value().empty())
+    {
+      return false;
+    }
 
   int nbTimeSteps;
+  vtkIdType currentAnimation = this->PreparedAnimationIndices.value()[0];
   vtkNew<vtkDoubleArray> timeSteps;
   const bool tempInfoExists = this->Importer->GetTemporalInformation(
-    this->Options.scene.animation.indices[0], 60, nbTimeSteps, this->TimeRange, timeSteps);
+    currentAnimation, 60, nbTimeSteps, this->TimeRange, timeSteps
+  );
 
   if (!tempInfoExists)
   {
