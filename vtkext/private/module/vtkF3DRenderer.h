@@ -540,7 +540,7 @@ private:
   void ConfigureActorTextureTransform(vtkActor* actorBase, const double* matrix);
 
   /**
-   * Convenience method to update axis size
+   * Updates the axis widget size based on the window size
    */
   void UpdateAxisWidgetSize();
 

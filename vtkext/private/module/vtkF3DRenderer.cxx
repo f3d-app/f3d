@@ -571,8 +571,9 @@ void vtkF3DRenderer::ShowAxis(bool show)
       this->AxisRepresentation->SetRenderer(this);
       this->AxisRepresentation->AnchorToLowerRight();
       this->AxisRepresentation->ContainerVisibilityOn();
+
       // Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
-#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 5, 20251001)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251001)
       // Closest colors to red, green, blue in OKHSL space at 95% saturation and 50% lightness
       this->AxisRepresentation->SetXAxisColor(0.841107, 0.16327, 0.120593);
       this->AxisRepresentation->SetYAxisColor(0.19516, 0.553311, 0.174);
