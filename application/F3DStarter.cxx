@@ -2107,6 +2107,9 @@ void F3DStarter::AddCommands()
     return candidates;
   };
 
+  interactor.addCommand("print_config_info", [this](const std::vector<std::string>&)
+    { F3DConfigFileTools::PrintConfigInfo(F3DConfigFileTools::GetConfigPaths("config")); });
+
   interactor.addCommand(
     "remove_current_file_group",
     [this](const std::vector<std::string>&)
