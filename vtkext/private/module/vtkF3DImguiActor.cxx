@@ -389,8 +389,8 @@ void vtkF3DImguiActor::RenderDropZone()
       return;
     }
 
-    constexpr ImVec4 colorImv = F3DStyle::GetTextColor();
-    constexpr ImU32 color =
+    const ImVec4 colorImv = F3DStyle::GetTextColor();
+    const ImU32 color =
       IM_COL32(colorImv.x * 255, colorImv.y * 255, colorImv.z * 255, colorImv.w * 255);
 
     const int dropzonePad =

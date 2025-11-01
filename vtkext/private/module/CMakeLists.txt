@@ -7,7 +7,7 @@ f3d_embed_file(
   BINARY)
 
 set(sources ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultHDRI.cxx)
-set(private_headers F3DStyle.h ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultHDRI.h)
+set(private_headers ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultHDRI.h)
 
 if(F3D_MODULE_UI)
   set(F3D_FONT_FILE "${F3D_SOURCE_DIR}/resources/MonaspaceNeon-Regular.otf" CACHE STRING "Font used in UI widgets")
@@ -52,6 +52,7 @@ endforeach()
 
 set(classes
   F3DLog
+  F3DStyle
   F3DColoringInfoHandler
   vtkF3DCachedLUTTexture
   vtkF3DCachedSpecularTexture

@@ -8,8 +8,9 @@
 #ifndef F3DStyle_h
 #define F3DStyle_h
 
-#include <imgui.h>
 #include <tuple>
+
+struct ImVec4;
 
 namespace F3DStyle
 {
@@ -68,52 +69,18 @@ constexpr std::tuple<float, float, float> GetF3DBlack()
   return DecomposeFloatTuple(F3D_BLACK);
 }
 
-constexpr ImVec4 GetErrorColor()
-{
-  auto [r, g, b] = DecomposeFloatTuple(F3D_RED);
-  return ImVec4(r, g, b, 1.f);
-}
-
-constexpr ImVec4 GetWarningColor()
-{
-  auto [r, g, b] = DecomposeFloatTuple(F3D_YELLOW);
-  return ImVec4(r, g, b, 1.f);
-}
-
-constexpr ImVec4 GetHighlightColor()
-{
-  auto [r, g, b] = DecomposeFloatTuple(F3D_BLUE);
-  return ImVec4(r, g, b, 1.f);
-}
-
-static constexpr ImVec4 GetCompletionColor()
-{
-    auto [r, g, b] = DecomposeFloatTuple(F3D_GREEN);
-    return ImVec4(r, g, b, 1.f);
-}
-
-constexpr ImVec4 GetTextColor()
-{
-    auto [r, g, b] = DecomposeFloatTuple(F3D_WHITE);
-    return ImVec4(r, g, b, 1.f);
-}
-
-constexpr ImVec4 GetMidColor()
-{
-    auto [r, g, b] = DecomposeFloatTuple(F3D_GREY);
-    return ImVec4(r, g, b, 1.f);
-}
-
-constexpr ImVec4 GetBackgroundColor()
-{
-    auto [r, g, b] = DecomposeFloatTuple(F3D_BLACK);
-    return ImVec4(r, g, b, 1.f);
-}
-
 constexpr float GetDefaultMargin()
 {
   return 5.f;
 }
+
+const ImVec4 GetErrorColor();
+const ImVec4 GetWarningColor();
+const ImVec4 GetHighlightColor();
+const ImVec4 GetCompletionColor();
+const ImVec4 GetTextColor();
+const ImVec4 GetMidColor();
+const ImVec4 GetBackgroundColor();
 };
 
 #endif
