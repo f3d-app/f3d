@@ -8,6 +8,7 @@
 #include "window_impl.h"
 
 #include "factory.h"
+#include "F3DStyle.h"
 #include "vtkF3DGenericImporter.h"
 #include "vtkF3DMemoryMesh.h"
 #include "vtkF3DMetaImporter.h"
@@ -80,7 +81,8 @@ public:
     progressRep->SetPosition(0.0, 0.0);
     progressRep->SetPosition2(1.0, 0.0);
     progressRep->SetMinimumSize(0, 5);
-    progressRep->SetProgressBarColor(0.97647, 0.69803, 0.03137);
+    auto [r, g, b] = F3DStyle::GetF3DYellow();
+    progressRep->SetProgressBarColor(r, g, b);
     progressRep->DrawBackgroundOff();
     progressRep->DragableOff();
     progressRep->SetShowBorderToOff();

@@ -6,6 +6,7 @@
 #include "options.h"
 #include "window_impl.h"
 
+#include "F3DStyle.h"
 #include "vtkF3DRenderer.h"
 
 #include <vtkDoubleArray.h>
@@ -68,7 +69,8 @@ void animationManager::Initialize()
     progressRep->SetPosition(0.0, 0.0);
     progressRep->SetPosition2(1.0, 0.0);
     progressRep->SetMinimumSize(0, 5);
-    progressRep->SetProgressBarColor(0.47058, 0.54509, 1);
+    auto [r, g, b] = F3DStyle::GetF3DBlue();
+    progressRep->SetProgressBarColor(r, g, b);
     progressRep->DrawBackgroundOff();
     progressRep->DragableOff();
     progressRep->SetShowBorderToOff();
