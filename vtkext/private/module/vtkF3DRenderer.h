@@ -21,6 +21,7 @@
 #include <filesystem>
 #include <map>
 #include <optional>
+#include <vtkCallbackCommand.h>
 
 namespace fs = std::filesystem;
 
@@ -29,7 +30,8 @@ class vtkColorTransferFunction;
 class vtkCornerAnnotation;
 class vtkGridAxesActor3D;
 class vtkImageReader2;
-class vtkOrientationMarkerWidget;
+class vtkCameraOrientationRepresentation;
+class vtkCameraOrientationWidget;
 class vtkScalarBarActor;
 class vtkSkybox;
 class vtkTextActor;
@@ -537,7 +539,15 @@ private:
    */
   void ConfigureActorTextureTransform(vtkActor* actorBase, const double* matrix);
 
-  vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
+  /**
+   * Updates the axis widget size based on the window size
+   */
+  void UpdateAxisWidgetSize();
+
+  vtkSmartPointer<vtkCameraOrientationWidget> AxisWidget;
+  vtkSmartPointer<vtkCameraOrientationRepresentation> AxisRepresentation;
+  vtkSmartPointer<vtkCallbackCommand> AxisWidgetResizeCallback;
+  double AxisBackdropOpacity = 0.0;
 
   // Does vtk version support GridAxesActor
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
