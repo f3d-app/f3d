@@ -31,6 +31,7 @@
 #include <vtk_glew.h>
 #endif
 
+#include <clip.h>
 #include <imgui.h>
 #include <numeric>
 #include <optional>
@@ -80,6 +81,15 @@ struct vtkF3DImguiActor::Internals
 
       // Store our identifier
       io.Fonts->SetTexID((ImTextureID)this->FontTexture.Get());
+
+      // Setup copy/paste callbacks
+      io.SetClipboardTextFn = [](void* user_data, const char* text) { clip::set_text(text); };
+      io.GetClipboardTextFn = [](void* user_data) -> const char*
+      {
+        std::string text;
+        clip::get_text(text);
+        return text.c_str();
+      };
 
       // Create VBO
       this->VertexBuffer = vtkSmartPointer<vtkOpenGLBufferObject>::New();
