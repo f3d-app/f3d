@@ -1,6 +1,7 @@
 #include "vtkF3DQuakeMDLImporter.h"
 #include "vtkF3DQuakeMDLImporterConstants.h"
 
+#include <vtkFileResourceStream.h>
 #include <vtkFloatArray.h>
 #include <vtkImageData.h>
 #include <vtkOpenGLTexture.h>
@@ -9,6 +10,7 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
+#include <vtkResourceStream.h>
 
 #include <cstdint>
 #include <cstring>
@@ -417,10 +419,16 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   }
 
   //----------------------------------------------------------------------------
-  bool ReadScene(const std::string& filePath)
+  bool ReadScene(vtkResourceStream* stream)
   {
-    std::ifstream inputStream(filePath, std::ios::binary);
-    std::vector<unsigned char> buffer(std::istreambuf_iterator<char>(inputStream), {});
+    // Recover length of stream
+    stream->Seek(0, vtkResourceStream::SeekDirection::End);
+    size_t length = stream->Tell();
+    stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+
+    // Read stream into buffer
+    std::vector<unsigned char> buffer(length);
+    stream->Read(buffer.data(), length);
 
     // Read header
     // XXX: This is completely unsafe, should be rewritten using modern API
@@ -476,7 +484,21 @@ vtkF3DQuakeMDLImporter::vtkF3DQuakeMDLImporter()
 //----------------------------------------------------------------------------
 int vtkF3DQuakeMDLImporter::ImportBegin()
 {
-  return this->Internals->ReadScene(this->GetFileName());
+  // Stream is higher priority than filename.
+  vtkResourceStream* stream = this->GetStream();
+  vtkNew<vtkFileResourceStream> fileStream;
+  if (!stream)
+  {
+    if (!fileStream->Open(this->GetFileName()))
+    {
+      vtkErrorMacro("Unable to open " << this->GetFileName() << " , aborting.");
+      return 0;
+    }
+
+    stream = fileStream;
+  }
+
+  return this->Internals->ReadScene(stream);
 }
 
 //----------------------------------------------------------------------------
