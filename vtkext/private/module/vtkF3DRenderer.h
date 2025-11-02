@@ -73,6 +73,7 @@ public:
   void ShowTimer(bool show);
   void ShowMetaData(bool show);
   void ShowFilename(bool show);
+  void ShowHDRIFilename(bool show);
   void ShowCheatSheet(bool show);
   void ShowConsole(bool show);
   void ShowMinimalConsole(bool show);
@@ -592,6 +593,7 @@ private:
   bool TimerVisible = false;
   bool FilenameVisible = false;
   bool MetaDataVisible = false;
+  bool HDRIFilenameVisible = false;
   bool CheatSheetVisible = false;
   bool ConsoleVisible = false;
   bool MinimalConsoleVisible = false;

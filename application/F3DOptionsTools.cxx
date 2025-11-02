@@ -142,6 +142,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       {"fps", "z", "Display rendering frame per second", "<bool>", "1"},
       {"filename", "n", "Display filename", "<bool>", "1"},
       {"metadata", "m", "Display file metadata", "<bool>", "1"},
+      {"hdri-filename", "", "Display hdri filename", "<bool>", "1"},
       {"blur-background", "u", "Blur background", "<bool>", "1" },
       {"blur-coc", "", "Blur circle of confusion radius", "<value>", ""},
       {"light-intensity", "", "Light intensity", "<value>", ""} } },

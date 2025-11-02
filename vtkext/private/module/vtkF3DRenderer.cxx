@@ -1065,6 +1065,8 @@ void vtkF3DRenderer::ConfigureHDRIReader()
         if (this->HDRIReader)
         {
           this->HDRIReader->SetFileName(this->HDRIFile.c_str());
+          std::filesystem::path hdriPath(this->HDRIFile);
+          this->UIActor->SetHDRIFileName(hdriPath.filename().string().c_str());
         }
         else
         {
@@ -1602,6 +1604,17 @@ void vtkF3DRenderer::ShowMetaData(bool show)
     this->MetaDataVisible = show;
     this->UIActor->SetMetaDataVisibility(show);
     this->MetaDataConfigured = false;
+    this->CheatSheetConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ShowHDRIFilename(bool show)
+{
+  if (this->HDRIFilenameVisible != show)
+  {
+    this->HDRIFilenameVisible = show;
+    this->UIActor->SetHDRIFileNameVisibility(show);
     this->CheatSheetConfigured = false;
   }
 }
