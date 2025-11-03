@@ -78,6 +78,9 @@ bool vtkF3DStochasticTransparentPass::SetShaderParameters(vtkShaderProgram* prog
   vtkInformation* info = prop->GetPropertyKeys();
   program->SetUniformi("propIndex", info->Get(vtkF3DStochasticTransparentPass::PropIndex()));
 
+  static int frameCount = 0;
+  program->SetUniformi("frameCount", frameCount++);
+
   return this->Superclass::SetShaderParameters(program, mapper, prop, VAO);
 }
 
@@ -92,15 +95,17 @@ bool vtkF3DStochasticTransparentPass::PreReplaceShaderValues(std::string& vertex
     std::string dec = vtkF3DRandomFS;
     dec += "\nuniform sampler2D texNoise;\n";
     dec += "\nuniform int propIndex;\n";
+    dec += "\nuniform int frameCount;\n";
 
     vtkShaderProgram::Substitute(fragmentShader, "//VTK::Color::Dec", dec);
 
     vtkShaderProgram::Substitute(fragmentShader, "  //VTK::Color::Impl",
       "  //VTK::Color::Impl\n"
-      "  vec2 nsz = vec2(64, 64);\n"
-      "  vec2 jitter = vec2(random(uint(propIndex)), random(uint(gl_PrimitiveID)));\n"
-      "  if (texture(texNoise, 0.8 * jitter + (gl_FragCoord.xy) / nsz).x >= opacity) discard;\n"
+      //"  vec2 nsz = vec2(64, 64);\n"
+      //"  vec2 jitter = vec2(random(uint(propIndex)), random(uint(gl_PrimitiveID)));\n"
+      //"  if (texture(texNoise, 0.8 * jitter + (gl_FragCoord.xy) / nsz).x >= opacity) discard;\n"
       //"  if (random(vec3(gl_FragCoord.xy, propIndex)) >= opacity) discard;\n"
+      "  if (random_ign(gl_FragCoord.xy, frameCount + propIndex + gl_PrimitiveID) >= opacity) discard;\n"
       "  opacity = 1.0;\n\n");
   }
 

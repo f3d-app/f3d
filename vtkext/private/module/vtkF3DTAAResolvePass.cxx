@@ -51,7 +51,7 @@ void vtkF3DTAAResolvePass::Render(const vtkRenderState* state)
     this->HistoryTexture->SetWrapT(vtkTextureObject::ClampToEdge);
     renderer->GetTiledSizeAndOrigin(&size[0], &size[1], &pos[0], &pos[1]);
     this->HistoryTexture->Allocate2D(size[0], size[1], 4, VTK_FLOAT);
-    this->HistoryInitialized = false;
+    this->HistoryIteration = 0;
   }
   this->HistoryTexture->Resize(size[0], size[1]);
 
@@ -111,8 +111,7 @@ void vtkF3DTAAResolvePass::Render(const vtkRenderState* state)
   this->QuadHelper->Program->SetUniformi("colorTexture", this->ColorTexture->GetTextureUnit());
   this->QuadHelper->Program->SetUniformi("historyTexture", this->HistoryTexture->GetTextureUnit());
 
-  const float blendFactor = this->HistoryInitialized ? 0.9f : 0.0f;
-  this->QuadHelper->Program->SetUniformf("blendFactor", blendFactor);
+  const float blendFactor = this->HistoryIteration / (this->HistoryIteration + 1.0f);
   this->QuadHelper->Program->SetUniformf("blendFactor", blendFactor);
   ostate->vtkglDisable(GL_BLEND);
   ostate->vtkglDisable(GL_DEPTH_TEST);
@@ -125,7 +124,7 @@ void vtkF3DTAAResolvePass::Render(const vtkRenderState* state)
   this->ColorTexture->Deactivate();
   this->HistoryTexture->Deactivate();
   this->HistoryTexture->CopyFromFrameBuffer(pos[0], pos[1], size[0], size[1], size[0], size[1]);
-  this->HistoryInitialized = true;
+  this->HistoryIteration++;
 
   vtkOpenGLCheckErrorMacro("failed after Render");
 }
@@ -150,7 +149,7 @@ void vtkF3DTAAResolvePass::InspectCameraMovement(vtkRenderer* renderer)
     this->LastViewUp[0] != viewUp[0] || this->LastViewUp[1] != viewUp[1] ||
     this->LastViewUp[2] != viewUp[2])
   {
-    this->HistoryInitialized = false;
+    this->HistoryIteration = 0;
 
     this->LastPosition[0] = position[0];
     this->LastPosition[1] = position[1];

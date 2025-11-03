@@ -47,7 +47,7 @@ private:
 
   std::shared_ptr<vtkOpenGLQuadHelper> QuadHelper;
 
-  bool HistoryInitialized = false;
+  int HistoryIteration = 0;
 
   double LastPosition[3] = { 0.0, 0.0, 0.0 };
   double LastFocalPoint[3] = { 0.0, 0.0, 0.0 };

@@ -33,3 +33,9 @@ float floatConstruct( uint m ) {
 float random( vec3  v ) { return floatConstruct(hash(floatBitsToUint(v))); }
 float random( float  v ) { return floatConstruct(hash(floatBitsToUint(v))); }
 float random( uint  v ) { return floatConstruct(hash(v)); }
+
+float random_ign(vec2 coord, int index)
+{
+    coord = floor(coord) + 5.588238 * vec2(index % 64);
+    return fract(fract(dot(coord, vec2(0.06711056, 0.00583715))) * 52.9829189);
+}
