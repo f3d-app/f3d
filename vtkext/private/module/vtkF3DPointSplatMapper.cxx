@@ -324,7 +324,7 @@ void vtkF3DSplatMapperHelper::RenderPieceDraw(vtkRenderer* ren, vtkActor* actor)
 {
   if (vtkShader::IsComputeShaderSupported() && actor->GetForceTranslucent())
   {
-    this->SortSplats(ren);
+    //this->SortSplats(ren);
   }
 
   vtkOpenGLPointGaussianMapperHelper::RenderPieceDraw(ren, actor);

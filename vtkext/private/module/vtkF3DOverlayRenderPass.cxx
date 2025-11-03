@@ -130,7 +130,7 @@ void vtkF3DOverlayRenderPass::CompositeOverlay(const vtkRenderState* s)
     this->ColorTexture->SetMagnificationFilter(vtkTextureObject::Linear);
     this->ColorTexture->SetWrapS(vtkTextureObject::ClampToEdge);
     this->ColorTexture->SetWrapT(vtkTextureObject::ClampToEdge);
-    this->ColorTexture->Allocate2D(size[0], size[1], 4, VTK_UNSIGNED_CHAR);
+    this->ColorTexture->Allocate2D(size[0], size[1], 4, VTK_FLOAT);
   }
   this->ColorTexture->Resize(size[0], size[1]);
 
