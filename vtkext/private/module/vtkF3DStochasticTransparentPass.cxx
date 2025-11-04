@@ -72,14 +72,11 @@ void vtkF3DStochasticTransparentPass::Render(const vtkRenderState* s)
 bool vtkF3DStochasticTransparentPass::SetShaderParameters(vtkShaderProgram* program,
   vtkAbstractMapper* mapper, vtkProp* prop, vtkOpenGLVertexArrayObject* VAO)
 {
-  // TODO: unused here, but blue noise should be better than white noise in theory
-  program->SetUniformi("texNoise", this->RenWin->GetNoiseTextureUnit());
-
   vtkInformation* info = prop->GetPropertyKeys();
   program->SetUniformi("propIndex", info->Get(vtkF3DStochasticTransparentPass::PropIndex()));
 
-  static int frameCount = 0;
-  program->SetUniformi("frameCount", frameCount++);
+  static int seed = 0; // todo: random
+  program->SetUniformi("seed", seed++);
 
   return this->Superclass::SetShaderParameters(program, mapper, prop, VAO);
 }
@@ -93,29 +90,14 @@ bool vtkF3DStochasticTransparentPass::PreReplaceShaderValues(std::string& vertex
   {
     // add random function utilities
     std::string dec = vtkF3DRandomFS;
-    dec += "\nuniform sampler2D texNoise;\n";
     dec += "\nuniform int propIndex;\n";
-    dec += "\nuniform int frameCount;\n";
+    dec += "\nuniform int seed;\n";
 
     vtkShaderProgram::Substitute(fragmentShader, "//VTK::Color::Dec", dec);
 
     vtkShaderProgram::Substitute(fragmentShader, "  //VTK::Color::Impl",
       "  //VTK::Color::Impl\n"
-
-      /* blue noise */
-      //"  vec2 nsz = vec2(64, 64);\n"
-      //"  vec2 jitter = vec2(random(uint(propIndex)), random(uint(gl_PrimitiveID)));\n"
-      //"  if (texture(texNoise, 0.8 * jitter + (gl_FragCoord.xy) / nsz).x >= opacity) discard;\n"
-
-      /* white noise */
-      //"  if (random(vec3(gl_FragCoord.xy, hash(uvec3(frameCount, propIndex, gl_PrimitiveID))) >= opacity) discard;\n"
-
-      /* IGN */
-      "  if (random_ign(gl_FragCoord.xy, hash(uvec3(frameCount, propIndex, gl_PrimitiveID))) >= opacity) discard;\n"
-
-      /* R2 */
-      //"  if (random_roberts(uvec2(gl_FragCoord.xy), hash(uvec3(frameCount, propIndex, gl_PrimitiveID))) >= opacity) discard;\n"
-
+      "  if (random_ign(gl_FragCoord.xy, hash(uvec3(seed, propIndex, gl_PrimitiveID))) >= opacity) discard;\n"
       "  opacity = 1.0;\n\n"
     );
   }

@@ -884,6 +884,33 @@ interactor& interactor_impl::initCommands()
     command_documentation_t{
       "cycle_anti_aliasing", "cycle between the anti-aliasing method (none,fxaa,ssaa,taa)" });
 
+  this->addCommand(
+    "cycle_translucency",
+    [&](const std::vector<std::string>&)
+    {
+      bool& enabled = this->Internals->Options.render.effect.translucency.enable;
+      std::string& mode = this->Internals->Options.render.effect.translucency.mode;
+      if (!enabled)
+      {
+        enabled = true;
+        mode = "ddp";
+      }
+      else
+      {
+        if (mode == "ddp")
+        {
+          mode = "stochastic";
+        }
+        else
+        {
+          enabled = false;
+        }
+      }
+      this->Internals->Window.render();
+    },
+    command_documentation_t{
+      "cycle_translucency", "cycle between the translucency method (none,ddp,stochastic)" });
+
   std::vector<std::string> cycleColoringValidArgs = { "field", "array", "component" };
   this->addCommand(
     "cycle_coloring",
@@ -1296,6 +1323,21 @@ interactor& interactor_impl::initBindings()
     return std::pair("Anti-aliasing", std::move(desc));
   };
 
+  // "Cycle translucency" , "none/ddp/stochastic"
+  auto docTrans = [&]()
+  {
+    std::string desc;
+    if (!this->Internals->Options.render.effect.translucency.enable)
+    {
+      desc = "none";
+    }
+    else
+    {
+      desc = this->Internals->Options.render.effect.translucency.mode;
+    }
+    return std::pair("Translucency", std::move(desc));
+  };
+
   // "Cycle animation" , "animationName"
   auto docAnim = [&]()
   { return std::pair("Animation", this->Internals->AnimationManager->GetAnimationName()); };
@@ -1373,7 +1415,7 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "S"}, "cycle_coloring array", "Scene", docArray, f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "Y"}, "cycle_coloring component", "Scene", docComp, f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "B"}, "toggle ui.scalar_bar", "Scene", std::bind(docTgl, "Scalar bar", std::cref(opts.ui.scalar_bar)), f3d::interactor::BindingType::TOGGLE);
-  this->addBinding({mod_t::NONE, "P"}, "toggle render.effect.translucency_support", "Scene", std::bind(docTgl, "Translucency", std::cref(opts.render.effect.translucency_support)), f3d::interactor::BindingType::TOGGLE);
+  this->addBinding({mod_t::NONE, "P"}, "cycle_translucency", "Scene", docTrans);
   this->addBinding({mod_t::NONE, "Q"}, "toggle render.effect.ambient_occlusion","Scene", std::bind(docTgl, "Ambient occlusion", std::cref(opts.render.effect.ambient_occlusion)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "A"}, "cycle_anti_aliasing","Scene", docAA, f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "T"}, "toggle render.effect.tone_mapping","Scene", std::bind(docTgl, "Toggle tone mapping", std::cref(opts.render.effect.tone_mapping)), f3d::interactor::BindingType::TOGGLE);

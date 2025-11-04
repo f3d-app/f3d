@@ -2,6 +2,7 @@
 
 #include "vtkF3DHexagonalBokehBlurPass.h"
 #include "vtkF3DImporter.h"
+#include "vtkF3DRenderer.h"
 #include "vtkF3DStochasticTransparentPass.h"
 
 #include <vtkBoundingBox.h>
@@ -48,7 +49,6 @@ void vtkF3DRenderPass::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "UseRaytracing: " << this->UseRaytracing << "\n";
   os << indent << "UseSSAOPass: " << this->UseSSAOPass << "\n";
-  os << indent << "UseDepthPeelingPass: " << this->UseDepthPeelingPass << "\n";
   os << indent << "UseBlurBackground: " << this->UseBlurBackground << "\n";
   os << indent << "ForceOpaqueBackground: " << this->ForceOpaqueBackground << "\n";
 }
@@ -115,7 +115,10 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     return;
   }
 
-  this->ReleaseGraphicsResources(s->GetRenderer()->GetRenderWindow());
+  vtkF3DRenderer* renderer = vtkF3DRenderer::SafeDownCast(s->GetRenderer());
+  assert(renderer);
+
+  this->ReleaseGraphicsResources(renderer->GetRenderWindow());
 
   // background pass, setup framebuffer, clear and draw skybox
   vtkNew<vtkOpaquePass> bgP;
@@ -183,8 +186,15 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
       collection->AddItem(opaqueP);
     }
 
-    // translucent and volumic passes
-    if (this->UseDepthPeelingPass)
+    // translucent and volumic 
+    if (renderer->GetTranslucencyMode() == vtkF3DRenderer::TranslucencyMode::DUAL_DEPTH_PEELING)
+    {
+      vtkNew<vtkDualDepthPeelingPass> ddpP;
+      ddpP->SetTranslucentPass(translucentP);
+      ddpP->SetVolumetricPass(volumeP);
+      collection->AddItem(ddpP);
+    }
+    else if (renderer->GetTranslucencyMode() == vtkF3DRenderer::TranslucencyMode::STOCHASTIC)
     {
       vtkNew<vtkF3DStochasticTransparentPass> stochasticP;
       stochasticP->SetTranslucentPass(translucentP);

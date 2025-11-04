@@ -238,11 +238,17 @@ CLI: `--textures-transform`.
 
 ## Render Options
 
-### `render.effect.translucency_support` (_bool_, default: `false`)
+### `render.effect.translucency.enable` (_bool_, default: `false`)
 
-Enable _translucency support_. This is a technique used to correctly render translucent objects, implemented using depth peeling
+Enable _translucency support_. This is a technique used to correctly render translucent objects
 
 CLI: `--translucency-support`.
+
+### `render.effect.translucency.mode` (_bool_, default: `ddp`)
+
+Set the translucency support technique. Valid options are: `ddp` (quality), `stochastic` (fast)
+
+CLI: `--translucency-support-mode`.
 
 ### `render.effect.antialiasing.enable` (_string_, default: `false`)
 

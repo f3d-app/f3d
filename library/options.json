@@ -92,7 +92,18 @@
     "effect": {
       "translucency_support": {
         "type": "bool",
-        "default_value": "false"
+        "default_value": "false",
+        "deprecated": "use render.effect.translucency.enable instead"
+      },
+      "translucency": {
+        "enable": {
+          "type": "bool",
+          "default_value": "false"
+        },
+        "mode": {
+          "type": "string",
+          "default_value": "ddp"
+        }
       },
       "anti_aliasing": {
         "type": "bool",

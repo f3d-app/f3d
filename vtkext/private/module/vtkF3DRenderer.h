@@ -51,6 +51,16 @@ public:
     TAA
   };
 
+  /**
+   * Enum listing possible translucency modes.
+   */
+  enum class TranslucencyMode : unsigned char
+  {
+    NONE,
+    DUAL_DEPTH_PEELING,
+    STOCHASTIC
+  };
+
   ///@{
   /**
    * Set visibility of different actors
@@ -100,7 +110,7 @@ public:
    */
   void SetUseRaytracing(bool use);
   void SetUseRaytracingDenoiser(bool use);
-  void SetUseDepthPeelingPass(bool use);
+  void SetTranslucencyMode(TranslucencyMode mode);
   void SetUseSSAOPass(bool use);
   void SetAntiAliasingMode(AntiAliasingMode mode);
   void SetUseToneMappingPass(bool use);
@@ -110,6 +120,11 @@ public:
   void SetBackfaceType(const std::optional<std::string>& backfaceType);
   void SetFinalShader(const std::optional<std::string>& finalShader);
   ///@}
+
+  /**
+   * Get TranslucencyMode
+   */
+  TranslucencyMode GetTranslucencyMode() const;
 
   /**
    * Set SetUseOrthographicProjection
@@ -585,8 +600,8 @@ private:
   bool ArmatureVisible = false;
   bool UseRaytracing = false;
   bool UseRaytracingDenoiser = false;
-  bool UseDepthPeelingPass = false;
   AntiAliasingMode AntiAliasingModeEnabled = AntiAliasingMode::NONE;
+  TranslucencyMode TranslucencyModeEnabled = TranslucencyMode::NONE;
   bool UseSSAOPass = false;
   bool UseToneMappingPass = false;
   bool UseBlurBackground = false;
