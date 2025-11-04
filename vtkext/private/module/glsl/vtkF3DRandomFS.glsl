@@ -34,8 +34,15 @@ float random( vec3  v ) { return floatConstruct(hash(floatBitsToUint(v))); }
 float random( float  v ) { return floatConstruct(hash(floatBitsToUint(v))); }
 float random( uint  v ) { return floatConstruct(hash(v)); }
 
-float random_ign(vec2 coord, int index)
+float random_ign(vec2 coord, uint index)
 {
-    coord = floor(coord) + 5.588238 * vec2(index % 512);
+    coord = floor(coord) + 5.588238 * vec2(index % 2048);
     return fract(fract(dot(coord, vec2(0.06711056, 0.00583715))) * 52.9829189);
+}
+
+float random_roberts(uvec2 p, uint index)
+{  
+    p.x += index % 4096;
+    uvec2 umagic = uvec2(3242174889u, 2447445413u);
+    return float(p.x * umagic.x + p.y * umagic.y) * exp2(-32.0);
 }
