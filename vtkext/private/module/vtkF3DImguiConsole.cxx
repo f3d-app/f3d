@@ -269,16 +269,16 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
           switch (severity)
           {
             case Internals::LogType::Error:
-              ImGui::PushStyleColor(ImGuiCol_Text, F3DStyle::GetErrorColor());
+              ImGui::PushStyleColor(ImGuiCol_Text, F3DStyle::imgui::GetErrorColor());
               break;
             case Internals::LogType::Warning:
-              ImGui::PushStyleColor(ImGuiCol_Text, F3DStyle::GetWarningColor());
+              ImGui::PushStyleColor(ImGuiCol_Text, F3DStyle::imgui::GetWarningColor());
               break;
             case Internals::LogType::Typed:
-              ImGui::PushStyleColor(ImGuiCol_Text, F3DStyle::GetHighlightColor());
+              ImGui::PushStyleColor(ImGuiCol_Text, F3DStyle::imgui::GetHighlightColor());
               break;
             case Internals::LogType::Completion:
-              ImGui::PushStyleColor(ImGuiCol_Text, F3DStyle::GetCompletionColor());
+              ImGui::PushStyleColor(ImGuiCol_Text, F3DStyle::imgui::GetCompletionColor());
               break;
             default:
               hasColor = false;
@@ -383,10 +383,11 @@ void vtkF3DImguiConsole::ShowBadge()
     ImGui::Begin("ConsoleAlert", nullptr, winFlags);
 
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, F3DStyle::GetHighlightColor());
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, F3DStyle::imgui::GetHighlightColor());
 
     ImGui::PushStyleColor(ImGuiCol_Text,
-      this->Pimpl->NewError ? F3DStyle::GetErrorColor() : F3DStyle::GetWarningColor());
+      this->Pimpl->NewError ? F3DStyle::imgui::GetErrorColor()
+                            : F3DStyle::imgui::GetWarningColor());
 
     if (ImGui::Button("!"))
     {

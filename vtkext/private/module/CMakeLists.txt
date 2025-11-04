@@ -19,7 +19,7 @@ if(F3D_MODULE_UI)
     BINARY)
 
   list(APPEND sources ${CMAKE_CURRENT_BINARY_DIR}/F3DFontBuffer.cxx)
-  list(APPEND private_headers ${CMAKE_CURRENT_BINARY_DIR}/F3DFontBuffer.h)
+  list(APPEND private_headers F3DStyle ${CMAKE_CURRENT_BINARY_DIR}/F3DFontBuffer.h)
 
   set(F3D_DEFAULT_LOGO "${F3D_SOURCE_DIR}/resources/logo-black.png" CACHE STRING "logo")
   mark_as_advanced(F3D_DEFAULT_LOGO)
@@ -52,7 +52,6 @@ endforeach()
 
 set(classes
   F3DLog
-  F3DStyle
   F3DColoringInfoHandler
   vtkF3DCachedLUTTexture
   vtkF3DCachedSpecularTexture
@@ -80,7 +79,7 @@ set(classes
   )
 
 if (F3D_MODULE_UI)
-  set(classes ${classes} vtkF3DImguiActor vtkF3DImguiConsole vtkF3DImguiObserver)
+  set(classes ${classes} vtkF3DImguiActor vtkF3DImguiConsole vtkF3DImguiObserver F3DStyle)
 endif ()
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10675

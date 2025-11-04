@@ -352,15 +352,15 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
   style->WindowBorderSize = 0.f;
   style->WindowPadding = ImVec2(10, 10);
   style->WindowRounding = 8.f;
-  style->Colors[ImGuiCol_Text] = F3DStyle::GetTextColor();
-  style->Colors[ImGuiCol_WindowBg] = F3DStyle::GetBackgroundColor();
+  style->Colors[ImGuiCol_Text] = F3DStyle::imgui::GetTextColor();
+  style->Colors[ImGuiCol_WindowBg] = F3DStyle::imgui::GetBackgroundColor();
   style->Colors[ImGuiCol_FrameBg] = colTransparent;
   style->Colors[ImGuiCol_FrameBgActive] = colTransparent;
   style->Colors[ImGuiCol_ScrollbarBg] = colTransparent;
-  style->Colors[ImGuiCol_ScrollbarGrab] = F3DStyle::GetMidColor();
-  style->Colors[ImGuiCol_ScrollbarGrabHovered] = F3DStyle::GetHighlightColor();
-  style->Colors[ImGuiCol_ScrollbarGrabActive] = F3DStyle::GetHighlightColor();
-  style->Colors[ImGuiCol_TextSelectedBg] = F3DStyle::GetHighlightColor();
+  style->Colors[ImGuiCol_ScrollbarGrab] = F3DStyle::imgui::GetMidColor();
+  style->Colors[ImGuiCol_ScrollbarGrabHovered] = F3DStyle::imgui::GetHighlightColor();
+  style->Colors[ImGuiCol_ScrollbarGrabActive] = F3DStyle::imgui::GetHighlightColor();
+  style->Colors[ImGuiCol_TextSelectedBg] = F3DStyle::imgui::GetHighlightColor();
 
   // Setup backend name
   io.BackendPlatformName = io.BackendRendererName = "F3D/VTK";
@@ -389,7 +389,7 @@ void vtkF3DImguiActor::RenderDropZone()
       return;
     }
 
-    const ImVec4 colorImv = F3DStyle::GetTextColor();
+    const ImVec4 colorImv = F3DStyle::imgui::GetTextColor();
     const ImU32 color =
       IM_COL32(colorImv.x * 255, colorImv.y * 255, colorImv.z * 255, colorImv.w * 255);
 
@@ -468,7 +468,7 @@ void vtkF3DImguiActor::RenderDropZone()
       ImVec2 textPos(viewport->GetWorkCenter().x - textSize.x * ::DROPZONE_MARGIN,
         viewport->GetWorkCenter().y - ::DROPZONE_MARGIN * textSize.y + ::LOGO_DISPLAY_HEIGHT / 2 +
           ::DROPZONE_LOGO_TEXT_PADDING);
-      drawList->AddText(textPos, ImColor(F3DStyle::GetTextColor()), this->DropText.c_str());
+      drawList->AddText(textPos, ImColor(F3DStyle::imgui::GetTextColor()), this->DropText.c_str());
       return;
     }
 
@@ -505,9 +505,9 @@ void vtkF3DImguiActor::RenderDropZone()
       maxBindingsTextWidth = std::max(maxBindingsTextWidth, totalBindingsWidth);
     }
 
-    const ImColor descTextColor = F3DStyle::GetTextColor();
-    const ImColor bindingRectColor = F3DStyle::GetMidColor();
-    const ImColor bindingTextColor = F3DStyle::GetTextColor();
+    const ImColor descTextColor = F3DStyle::imgui::GetTextColor();
+    const ImColor bindingRectColor = F3DStyle::imgui::GetMidColor();
+    const ImColor bindingTextColor = F3DStyle::imgui::GetTextColor();
 
     float tableWidth = maxDescTextWidth + maxBindingsTextWidth + ::DROPZONE_LOGO_TEXT_PADDING +
       ImGui::GetStyle().ItemSpacing.x;
@@ -684,17 +684,17 @@ void vtkF3DImguiActor::RenderCheatSheet()
 
       if (type == CheatSheetBindingType::TOGGLE && val == "ON")
       {
-        bindingTextColor = F3DStyle::GetBackgroundColor();
-        bindingRectColor = F3DStyle::GetWarningColor();
-        descTextColor = F3DStyle::GetWarningColor();
-        valueTextColor = F3DStyle::GetWarningColor();
+        bindingTextColor = F3DStyle::imgui::GetBackgroundColor();
+        bindingRectColor = F3DStyle::imgui::GetWarningColor();
+        descTextColor = F3DStyle::imgui::GetWarningColor();
+        valueTextColor = F3DStyle::imgui::GetWarningColor();
       }
       else
       {
-        bindingTextColor = F3DStyle::GetTextColor();
-        bindingRectColor = F3DStyle::GetMidColor();
-        descTextColor = F3DStyle::GetTextColor();
-        valueTextColor = F3DStyle::GetHighlightColor();
+        bindingTextColor = F3DStyle::imgui::GetTextColor();
+        bindingRectColor = F3DStyle::imgui::GetMidColor();
+        descTextColor = F3DStyle::imgui::GetTextColor();
+        valueTextColor = F3DStyle::imgui::GetHighlightColor();
       }
 
       ImGui::TableNextRow(ImGuiTableRowFlags_None, ImGui::GetTextLineHeightWithSpacing() + margin);

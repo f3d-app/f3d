@@ -26,12 +26,10 @@ constexpr int F3D_WHITE = 0xf4f4f4;
 constexpr int F3D_GREY = 0x545454;
 constexpr int F3D_BLACK = 0x141414;
 
-constexpr std::tuple<float, float, float> DecomposeFloatTuple(int val) {
-    return std::make_tuple(
-        ((val >> 16) & 0xff) / 255.f,
-        ((val >> 8) & 0xff) / 255.f,
-        (val & 0xff) / 255.f
-    );
+constexpr std::tuple<float, float, float> DecomposeFloatTuple(int val)
+{
+  return std::make_tuple(
+    ((val >> 16) & 0xff) / 255.f, ((val >> 8) & 0xff) / 255.f, (val & 0xff) / 255.f);
 }
 
 constexpr std::tuple<float, float, float> GetF3DRed()
@@ -74,6 +72,11 @@ constexpr float GetDefaultMargin()
   return 5.f;
 }
 
+#ifdef F3D_MODULE_UI
+
+namespace imgui
+{
+
 const ImVec4 GetErrorColor();
 const ImVec4 GetWarningColor();
 const ImVec4 GetHighlightColor();
@@ -81,6 +84,9 @@ const ImVec4 GetCompletionColor();
 const ImVec4 GetTextColor();
 const ImVec4 GetMidColor();
 const ImVec4 GetBackgroundColor();
+
+};
+#endif
 };
 
 #endif
