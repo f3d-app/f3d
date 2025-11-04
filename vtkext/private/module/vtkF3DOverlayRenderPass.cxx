@@ -170,6 +170,7 @@ void vtkF3DOverlayRenderPass::CompositeOverlay(const vtkRenderState* s)
       "  vec4 sceneSample = texture(texScene, texCoord);\n"
       "  vec3 initialSceneColor = sceneSample.rgb;\n"
       "  sceneSample.rgb = toLinear(sceneSample.rgb);\n"
+      "  sceneSample = max(sceneSample, vec4(0.0));\n"
       "  sceneSample.rgb *= sceneSample.a;\n"
       "//VTK::FSQ::Impl");
 

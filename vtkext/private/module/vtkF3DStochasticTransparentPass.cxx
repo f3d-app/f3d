@@ -108,10 +108,13 @@ bool vtkF3DStochasticTransparentPass::PreReplaceShaderValues(std::string& vertex
       //"  if (texture(texNoise, 0.8 * jitter + (gl_FragCoord.xy) / nsz).x >= opacity) discard;\n"
 
       /* white noise */
-      //"  if (random(vec3(gl_FragCoord.xy, frameCount + propIndex + gl_PrimitiveID)) >= opacity) discard;\n"
+      //"  if (random(vec3(gl_FragCoord.xy, hash(uvec3(frameCount, propIndex, gl_PrimitiveID))) >= opacity) discard;\n"
 
       /* IGN */
-      "  if (random_ign(gl_FragCoord.xy, frameCount + propIndex + gl_PrimitiveID) >= opacity) discard;\n"
+      "  if (random_ign(gl_FragCoord.xy, hash(uvec3(frameCount, propIndex, gl_PrimitiveID))) >= opacity) discard;\n"
+
+      /* R2 */
+      //"  if (random_roberts(uvec2(gl_FragCoord.xy), hash(uvec3(frameCount, propIndex, gl_PrimitiveID))) >= opacity) discard;\n"
 
       "  opacity = 1.0;\n\n"
     );
