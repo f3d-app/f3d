@@ -24,16 +24,6 @@ public:
   static vtkF3DAssimpImporter* New();
   vtkTypeMacro(vtkF3DAssimpImporter, vtkF3DImporter);
 
-#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 5, 20250923)
-  ///@{
-  /**
-   * Set/Get the file name.
-   */
-  vtkSetMacro(FileName, std::string);
-  vtkGetMacro(FileName, std::string);
-  ///@}
-#endif
-
   /**
    * Update actors at the given time value.
    */
@@ -116,14 +106,11 @@ protected:
   void ImportCameras(vtkRenderer*) override;
   void ImportLights(vtkRenderer*) override;
 
-#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 5, 20250923)
-  std::string FileName;
-#endif
-  bool ColladaFixup = false;
-
 private:
   vtkF3DAssimpImporter(const vtkF3DAssimpImporter&) = delete;
   void operator=(const vtkF3DAssimpImporter&) = delete;
+
+  bool ColladaFixup = false;
 
   class vtkInternals;
   std::unique_ptr<vtkInternals> Internals;
