@@ -28,10 +28,11 @@ public:
   void SetTranslucentPass(vtkRenderPass* translucentPass);
   void SetVolumetricPass(vtkRenderPass* volumetricPass);
 
-  bool PreReplaceShaderValues(std::string& vertexShader, std::string& geometryShader, std::string& fragmentShader, vtkAbstractMapper* mapper, vtkProp* prop) override;
+  bool PreReplaceShaderValues(std::string& vertexShader, std::string& geometryShader,
+    std::string& fragmentShader, vtkAbstractMapper* mapper, vtkProp* prop) override;
 
-  bool SetShaderParameters(vtkShaderProgram* program, vtkAbstractMapper* mapper,
-    vtkProp* prop, vtkOpenGLVertexArrayObject* VAO = nullptr) override;
+  bool SetShaderParameters(vtkShaderProgram* program, vtkAbstractMapper* mapper, vtkProp* prop,
+    vtkOpenGLVertexArrayObject* VAO = nullptr) override;
 
   static vtkInformationIntegerKey* PropIndex();
 
@@ -42,6 +43,8 @@ private:
   vtkRenderPass* TranslucentPass = nullptr;
   vtkRenderPass* VolumetricPass = nullptr;
   vtkOpenGLRenderWindow* RenWin = nullptr;
+
+  int Seed = 0;
 
   vtkF3DStochasticTransparentPass(const vtkF3DStochasticTransparentPass&) = delete;
   void operator=(const vtkF3DStochasticTransparentPass&) = delete;

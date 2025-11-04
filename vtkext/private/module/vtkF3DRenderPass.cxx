@@ -115,10 +115,7 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     return;
   }
 
-  vtkF3DRenderer* renderer = vtkF3DRenderer::SafeDownCast(s->GetRenderer());
-  assert(renderer);
-
-  this->ReleaseGraphicsResources(renderer->GetRenderWindow());
+  this->ReleaseGraphicsResources(s->GetRenderer()->GetRenderWindow());
 
   // background pass, setup framebuffer, clear and draw skybox
   vtkNew<vtkOpaquePass> bgP;
@@ -186,15 +183,16 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
       collection->AddItem(opaqueP);
     }
 
-    // translucent and volumic 
-    if (renderer->GetBlendingMode() == vtkF3DRenderer::BlendingMode::DUAL_DEPTH_PEELING)
+    // translucent and volumic
+    vtkF3DRenderer* renderer = vtkF3DRenderer::SafeDownCast(s->GetRenderer());
+    if (renderer && renderer->GetBlendingMode() == vtkF3DRenderer::BlendingMode::DUAL_DEPTH_PEELING)
     {
       vtkNew<vtkDualDepthPeelingPass> ddpP;
       ddpP->SetTranslucentPass(translucentP);
       ddpP->SetVolumetricPass(volumeP);
       collection->AddItem(ddpP);
     }
-    else if (renderer->GetBlendingMode() == vtkF3DRenderer::BlendingMode::STOCHASTIC)
+    else if (renderer && renderer->GetBlendingMode() == vtkF3DRenderer::BlendingMode::STOCHASTIC)
     {
       vtkNew<vtkF3DStochasticTransparentPass> stochasticP;
       stochasticP->SetTranslucentPass(translucentP);
