@@ -7,8 +7,8 @@
 #include "scene.h"
 #include "window_impl.h"
 
-#include "factory.h"
 #include "F3DStyle.h"
+#include "factory.h"
 #include "vtkF3DGenericImporter.h"
 #include "vtkF3DMemoryMesh.h"
 #include "vtkF3DMetaImporter.h"
