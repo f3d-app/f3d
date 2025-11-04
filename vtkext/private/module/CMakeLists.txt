@@ -19,7 +19,7 @@ if(F3D_MODULE_UI)
     BINARY)
 
   list(APPEND sources ${CMAKE_CURRENT_BINARY_DIR}/F3DFontBuffer.cxx)
-  list(APPEND private_headers F3DStyle ${CMAKE_CURRENT_BINARY_DIR}/F3DFontBuffer.h)
+  list(APPEND private_headers F3DStyle.h ${CMAKE_CURRENT_BINARY_DIR}/F3DFontBuffer.h)
 
   set(F3D_DEFAULT_LOGO "${F3D_SOURCE_DIR}/resources/logo-black.png" CACHE STRING "logo")
   mark_as_advanced(F3D_DEFAULT_LOGO)
