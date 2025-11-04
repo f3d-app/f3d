@@ -15,6 +15,7 @@
 #include "vtkF3DRenderer.h"
 
 #include <optional>
+#include <tuple>
 #include <vtkCallbackCommand.h>
 #include <vtkLightCollection.h>
 #include <vtkProgressBarRepresentation.h>
@@ -48,7 +49,7 @@ public:
     vtkProgressBarWidget* widget;
   };
 
-  static void CreateProgressRepresentationAndCallback(
+  void CreateProgressRepresentationAndCallback(
     ProgressDataStruct* data, vtkImporter* importer, interactor_impl* interactor)
   {
     vtkNew<vtkCallbackCommand> progressCallback;
@@ -81,8 +82,15 @@ public:
     progressRep->SetPosition(0.0, 0.0);
     progressRep->SetPosition2(1.0, 0.0);
     progressRep->SetMinimumSize(0, 5);
-    auto [r, g, b] = F3DStyle::GetF3DYellow();
-    progressRep->SetProgressBarColor(r, g, b);
+    if (this->Options.ui.progress_legacy_color)
+    {
+      progressRep->SetProgressBarColor(1.f, 1.f, 1.f);
+    }
+    else
+    {
+      auto [r, g, b] = F3DStyle::GetF3DYellow();
+      progressRep->SetProgressBarColor(r, g, b);
+    }
     progressRep->DrawBackgroundOff();
     progressRep->DragableOff();
     progressRep->SetShowBorderToOff();

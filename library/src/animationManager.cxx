@@ -69,8 +69,15 @@ void animationManager::Initialize()
     progressRep->SetPosition(0.0, 0.0);
     progressRep->SetPosition2(1.0, 0.0);
     progressRep->SetMinimumSize(0, 5);
-    auto [r, g, b] = F3DStyle::GetF3DBlue();
-    progressRep->SetProgressBarColor(r, g, b);
+    if (this->Options.ui.progress_legacy_color)
+    {
+      progressRep->SetProgressBarColor(1.f, 0.f, 0.f);
+    }
+    else
+    {
+      auto [r, g, b] = F3DStyle::GetF3DBlue();
+      progressRep->SetProgressBarColor(r, g, b);
+    }
     progressRep->DrawBackgroundOff();
     progressRep->DragableOff();
     progressRep->SetShowBorderToOff();

@@ -463,6 +463,11 @@ CLI: `--progress`.
 Show a _progress bar_ when playing the animation.
 CLI: `--animation-progress`.
 
+### `ui.progress_legacy_color` (_bool_, default: `false`, **on load**)
+
+Use legacy colors to display animation and loading progress bar. (RED for animation, WHITE for loading)
+CLI: `--progress-legacy-color`.
+
 ### `ui.metadata` (_bool_, default: `false`)
 
 Display the _metadata_.
