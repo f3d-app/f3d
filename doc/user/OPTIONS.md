@@ -465,6 +465,14 @@ _Denoise_ the image when using raytracing.
 
 Enable _translucency support_. This is a technique used to correctly render translucent objects.
 
+### `-p`, `--translucency-support-mode` (_string_, default: `ddp`)
+
+Translucency support method (`ddp`: quality, `stochastic`: fast).
+
+> [!WARNING]
+> `stochastic` is introducing a lot of noise with strong translucency.
+> It works better when combined with temporal anti-aliasing (when using `--anti-aliasing-mode=taa` option)
+
 ### `-q`, `--ambient-occlusion` (_bool_, default: `false`)
 
 Enable _ambient occlusion_. This is a technique used to improve the depth perception of the object.

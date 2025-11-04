@@ -26,7 +26,6 @@
 #include <vtkRenderingOpenGLConfigure.h>
 #include <vtkVersion.h>
 #include <vtkWindowToImageFilter.h>
-#include <vtkOpenGLShaderCache.h>
 
 #ifdef VTK_USE_X
 #include <vtkF3DGLXRenderWindow.h>
@@ -175,9 +174,6 @@ window_impl::window_impl(const options& options, const std::optional<Type>& type
   vtkOpenGLRenderWindow* oglRenWin = vtkOpenGLRenderWindow::SafeDownCast(this->Internals->RenWin);
   if (oglRenWin)
   {
-    vtkOpenGLShaderCache* shaderCache = oglRenWin->GetShaderCache();
-    shaderCache->SyncGLSLShaderVersionOn();
-
     if (this->Internals->GetProcAddress)
     {
       oglRenWin->SetOpenGLSymbolLoader(&internals::SymbolLoader, &this->Internals->GetProcAddress);
@@ -483,6 +479,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetUseRaytracingDenoiser(opt.render.raytracing.denoise);
 
   vtkF3DRenderer::AntiAliasingMode aaMode = vtkF3DRenderer::AntiAliasingMode::NONE;
+  vtkF3DRenderer::TranslucencyMode transMode = vtkF3DRenderer::TranslucencyMode::NONE;
 
   // F3D_DEPRECATED
   // Remove this in the next major release
@@ -493,6 +490,12 @@ void window_impl::UpdateDynamicOptions()
     log::warn("render.effect.anti_aliasing is deprecated, please use "
               "render.effect.antialiasing.enable instead");
     aaMode = vtkF3DRenderer::AntiAliasingMode::FXAA;
+  }
+  if (opt.render.effect.translucency_support)
+  {
+    log::warn("render.effect.translucency_support is deprecated, please use "
+              "render.effect.translucency.enable instead");
+    transMode = vtkF3DRenderer::TranslucencyMode::DUAL_DEPTH_PEELING;
   }
   F3D_SILENT_WARNING_POP()
 
@@ -517,10 +520,27 @@ void window_impl::UpdateDynamicOptions()
     }
   }
 
+  if (opt.render.effect.translucency.enable)
+  {
+    if (opt.render.effect.translucency.mode == "ddp")
+    {
+      transMode = vtkF3DRenderer::TranslucencyMode::DUAL_DEPTH_PEELING;
+    }
+    else if (opt.render.effect.translucency.mode == "stochastic")
+    {
+      transMode = vtkF3DRenderer::TranslucencyMode::STOCHASTIC;
+    }
+    else
+    {
+      log::warn(opt.render.effect.translucency.mode,
+        R"( is an invalid translucency mode. Valid modes are: "ddp", "stochastic")");
+    }
+  }
+
   renderer->SetUseSSAOPass(opt.render.effect.ambient_occlusion);
   renderer->SetAntiAliasingMode(aaMode);
   renderer->SetUseToneMappingPass(opt.render.effect.tone_mapping);
-  renderer->SetUseDepthPeelingPass(opt.render.effect.translucency_support);
+  renderer->SetTranslucencyMode(transMode);
   renderer->SetBackfaceType(opt.render.backface_type);
   renderer->SetFinalShader(opt.render.effect.final_shader);
 

@@ -38,7 +38,6 @@ public:
   vtkSetMacro(ArmatureVisible, bool);
   vtkSetMacro(UseRaytracing, bool);
   vtkSetMacro(UseSSAOPass, bool);
-  vtkSetMacro(UseDepthPeelingPass, bool);
   vtkSetMacro(UseBlurBackground, bool);
   vtkSetMacro(ForceOpaqueBackground, bool);
   vtkSetVector6Macro(Bounds, double);
@@ -62,7 +61,6 @@ protected:
   bool ArmatureVisible = false;
   bool UseRaytracing = false;
   bool UseSSAOPass = false;
-  bool UseDepthPeelingPass = false;
   bool UseBlurBackground = false;
   bool ForceOpaqueBackground = false;
 

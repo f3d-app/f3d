@@ -15,7 +15,7 @@ def main():
         "scene.up_direction": "+Y",
         "render.effect.tone_mapping": True,
         "render.effect.ambient_occlusion": True,
-        "render.effect.translucency_support": True,
+        "render.effect.translucency.enable": True,
         "render.effect.antialiasing.enable": True,
     }
     anim_fps = 30
