@@ -414,32 +414,34 @@ endif()
 # Needs splat sorting with compute shaders
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240203)
   if(NOT APPLE) # MacOS does not support compute shaders
-    f3d_test(NAME Test3DGaussiansSplatting DATA small.splat ARGS -osy --up=-Y --point-sprites-size=1 --point-sprites-type=gaussian --camera-position=-3.6,0.5,-4.2)
+    f3d_test(NAME Test3DGaussiansSplatting DATA small.splat ARGS -osyp --up=-Y --point-sprites-size=1 --point-sprites-type=gaussian --translucency-support-mode=sort --camera-position=-3.6,0.5,-4.2)
     f3d_test(NAME TestDefaultConfigFileSPLAT DATA small.splat CONFIG config_build LONG_TIMEOUT UI)
     f3d_test(NAME TestThumbnailConfigFileSPLAT DATA small.splat CONFIG thumbnail_build LONG_TIMEOUT)
 
-    f3d_test(NAME Test3DGSPLY DATA bonsai_small.ply ARGS -osy --up=-Y --point-sprites-size=1 --point-sprites-type=gaussian --camera-position=-2.6,0.5,-3.2)
-    f3d_test(NAME Test3DGSPLYHDRI DATA bonsai_small.ply HDRI shanghai_bund_1k.hdr ARGS -osy --up=-Y --point-sprites-size=1 --point-sprites-type=gaussian --camera-position=-2.6,0.5,-3.2)
+    f3d_test(NAME Test3DGSPLY DATA bonsai_small.ply ARGS -osyp --up=-Y --point-sprites-size=1 --point-sprites-type=gaussian --translucency-support-mode=sort --camera-position=-2.6,0.5,-3.2)
+    f3d_test(NAME Test3DGSPLYHDRI DATA bonsai_small.ply HDRI shanghai_bund_1k.hdr ARGS -osyp --up=-Y --point-sprites-size=1 --point-sprites-type=gaussian --translucency-support-mode=sort --camera-position=-2.6,0.5,-3.2)
 
-    f3d_test(NAME TestSPZDegree0 DATA hornedlizard_small_d0.spz ARGS -osy --point-sprites-size=1 --point-sprites-type=gaussian --camera-position=-3.6,0.5,4.2)
-    f3d_test(NAME TestInvalidSH DATA invalidSH.vtp ARGS -osy --verbose REGEXP "Spherical harmonics array is not valid" NO_BASELINE)
+    f3d_test(NAME TestSPZDegree0 DATA hornedlizard_small_d0.spz ARGS -osyp --point-sprites-size=1 --point-sprites-type=gaussian --translucency-support-mode=sort --camera-position=-3.6,0.5,4.2)
+    f3d_test(NAME TestInvalidSH DATA invalidSH.vtp ARGS -osyp --verbose REGEXP "Spherical harmonics array is not valid" NO_BASELINE)
 
     # Needs texture array support: https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12112
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250513)
-      f3d_test(NAME TestSPZDegree1 DATA hornedlizard_small_d1.spz ARGS -osy --point-sprites-size=1 --point-sprites-type=gaussian --camera-position=-3.6,0.5,4.2)
-      f3d_test(NAME TestSPZDegree2 DATA hornedlizard_small_d2.spz ARGS -osy --point-sprites-size=1 --point-sprites-type=gaussian --camera-position=-3.6,0.5,4.2)
-      f3d_test(NAME TestSPZDegree3 DATA hornedlizard_small_d3.spz ARGS -osy --point-sprites-size=1 --point-sprites-type=gaussian --camera-position=-3.6,0.5,4.2)
+      f3d_test(NAME TestSPZDegree1 DATA hornedlizard_small_d1.spz ARGS -osyp --point-sprites-size=1 --point-sprites-type=gaussian --translucency-support-mode=sort --camera-position=-3.6,0.5,4.2)
+      f3d_test(NAME TestSPZDegree2 DATA hornedlizard_small_d2.spz ARGS -osyp --point-sprites-size=1 --point-sprites-type=gaussian --translucency-support-mode=sort --camera-position=-3.6,0.5,4.2)
+      f3d_test(NAME TestSPZDegree3 DATA hornedlizard_small_d3.spz ARGS -osyp --point-sprites-size=1 --point-sprites-type=gaussian --translucency-support-mode=sort --camera-position=-3.6,0.5,4.2)
 
       f3d_test(NAME TestDefaultConfigFileSPZ DATA hornedlizard_small_d3.spz CONFIG config_build LONG_TIMEOUT UI)
       f3d_test(NAME TestThumbnailConfigFileSPZ DATA hornedlizard_small_d3.spz CONFIG thumbnail_build LONG_TIMEOUT)
-      f3d_test(NAME TestSPZVersion3 DATA bonsai.spz ARGS -osy --up=-Y --point-sprites-size=1 --point-sprites-type=gaussian --camera-position=-2.6,0.5,-3.2)
-      f3d_test(NAME TestSPZCorruptedGZIP DATA wrong_spz_gzip_corrupted.spz ARGS -osy --verbose REGEXP "Invalid GZIP file" NO_BASELINE)
-      f3d_test(NAME TestSPZTruncatedGZIP DATA truncated_gzip.spz ARGS -osy --verbose REGEXP "Invalid GZIP file" NO_BASELINE)
-      f3d_test(NAME TestWrongSPZMagic DATA wrong_spz_magic.spz ARGS -osy --verbose REGEXP "Incompatible SPZ header" NO_BASELINE)
-      f3d_test(NAME TestWrongSPZVersion DATA wrong_spz_version.spz ARGS -osy --verbose REGEXP "Incompatible SPZ version. Only 2 and 3 are supported" NO_BASELINE)
+      f3d_test(NAME TestSPZVersion3 DATA bonsai.spz ARGS -osyp --up=-Y --point-sprites-size=1 --point-sprites-type=gaussian --translucency-support-mode=sort --camera-position=-2.6,0.5,-3.2)
+      f3d_test(NAME TestSPZCorruptedGZIP DATA wrong_spz_gzip_corrupted.spz ARGS -osyp --verbose REGEXP "Invalid GZIP file" NO_BASELINE)
+      f3d_test(NAME TestSPZTruncatedGZIP DATA truncated_gzip.spz ARGS -osyp --verbose REGEXP "Invalid GZIP file" NO_BASELINE)
+      f3d_test(NAME TestWrongSPZMagic DATA wrong_spz_magic.spz ARGS -osyp --verbose REGEXP "Incompatible SPZ header" NO_BASELINE)
+      f3d_test(NAME TestWrongSPZVersion DATA wrong_spz_version.spz ARGS -osyp --verbose REGEXP "Incompatible SPZ version. Only 2 and 3 are supported" NO_BASELINE)
     endif()
   endif()
 endif()
+
+f3d_test(NAME Test3DGaussiansSplattingStochastic DATA small.splat ARGS -osyp --up=-Y --point-sprites-size=1 --point-sprites-type=gaussian --translucency-support-mode=stochastic --camera-position=-3.6,0.5,-4.2)
 
 # Test plugin fail code path
 f3d_test(NAME TestPluginVerbose ARGS --verbose REGEXP "Loading plugin \"native\"" NO_BASELINE)

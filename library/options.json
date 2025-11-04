@@ -93,9 +93,9 @@
       "translucency_support": {
         "type": "bool",
         "default_value": "false",
-        "deprecated": "use render.effect.translucency.enable instead"
+        "deprecated": "use render.effect.blending.enable instead"
       },
-      "translucency": {
+      "blending": {
         "enable": {
           "type": "bool",
           "default_value": "false"

@@ -52,12 +52,13 @@ public:
   };
 
   /**
-   * Enum listing possible translucency modes.
+   * Enum listing possible blending modes.
    */
-  enum class TranslucencyMode : unsigned char
+  enum class BlendingMode : unsigned char
   {
     NONE,
     DUAL_DEPTH_PEELING,
+    SORT,
     STOCHASTIC
   };
 
@@ -110,7 +111,7 @@ public:
    */
   void SetUseRaytracing(bool use);
   void SetUseRaytracingDenoiser(bool use);
-  void SetTranslucencyMode(TranslucencyMode mode);
+  void SetBlendingMode(BlendingMode mode);
   void SetUseSSAOPass(bool use);
   void SetAntiAliasingMode(AntiAliasingMode mode);
   void SetUseToneMappingPass(bool use);
@@ -122,9 +123,9 @@ public:
   ///@}
 
   /**
-   * Get TranslucencyMode
+   * Get BlendingMode
    */
-  TranslucencyMode GetTranslucencyMode() const;
+  BlendingMode GetBlendingMode() const;
 
   /**
    * Set SetUseOrthographicProjection
@@ -601,7 +602,7 @@ private:
   bool UseRaytracing = false;
   bool UseRaytracingDenoiser = false;
   AntiAliasingMode AntiAliasingModeEnabled = AntiAliasingMode::NONE;
-  TranslucencyMode TranslucencyModeEnabled = TranslucencyMode::NONE;
+  BlendingMode BlendingModeEnabled = BlendingMode::NONE;
   bool UseSSAOPass = false;
   bool UseToneMappingPass = false;
   bool UseBlurBackground = false;

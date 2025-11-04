@@ -146,7 +146,7 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     vtkNew<vtkOSPRayPass> ospP;
     this->MainPass = vtkSmartPointer<vtkFramebufferPass>::New();
     this->MainPass->SetDelegatePass(ospP);
-    this->MainPass->SetColorFormat(vtkTextureObject::Float32);
+    this->MainPass->SetColorFormat(vtkTextureObject::Float16);
   }
   else
 #endif
@@ -187,14 +187,14 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     }
 
     // translucent and volumic 
-    if (renderer->GetTranslucencyMode() == vtkF3DRenderer::TranslucencyMode::DUAL_DEPTH_PEELING)
+    if (renderer->GetBlendingMode() == vtkF3DRenderer::BlendingMode::DUAL_DEPTH_PEELING)
     {
       vtkNew<vtkDualDepthPeelingPass> ddpP;
       ddpP->SetTranslucentPass(translucentP);
       ddpP->SetVolumetricPass(volumeP);
       collection->AddItem(ddpP);
     }
-    else if (renderer->GetTranslucencyMode() == vtkF3DRenderer::TranslucencyMode::STOCHASTIC)
+    else if (renderer->GetBlendingMode() == vtkF3DRenderer::BlendingMode::STOCHASTIC)
     {
       vtkNew<vtkF3DStochasticTransparentPass> stochasticP;
       stochasticP->SetTranslucentPass(translucentP);
@@ -215,7 +215,7 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
 
     this->MainPass = vtkSmartPointer<vtkFramebufferPass>::New();
     this->MainPass->SetDelegatePass(camP);
-    this->MainPass->SetColorFormat(vtkTextureObject::Float32);
+    this->MainPass->SetColorFormat(vtkTextureObject::Float16);
 
     // Needed because VTK can pick the wrong format with certain drivers
     this->MainPass->SetDepthFormat(vtkTextureObject::Fixed32);

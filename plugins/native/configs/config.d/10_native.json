@@ -63,7 +63,7 @@
       "tone-mapping": false,
       "grid": false,
       "anti-aliasing": "none",
-      "translucency-support": false
+      "blending": "sort"
     }
   },
   {

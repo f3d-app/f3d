@@ -479,7 +479,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetUseRaytracingDenoiser(opt.render.raytracing.denoise);
 
   vtkF3DRenderer::AntiAliasingMode aaMode = vtkF3DRenderer::AntiAliasingMode::NONE;
-  vtkF3DRenderer::TranslucencyMode transMode = vtkF3DRenderer::TranslucencyMode::NONE;
+  vtkF3DRenderer::BlendingMode transMode = vtkF3DRenderer::BlendingMode::NONE;
 
   // F3D_DEPRECATED
   // Remove this in the next major release
@@ -494,8 +494,8 @@ void window_impl::UpdateDynamicOptions()
   if (opt.render.effect.translucency_support)
   {
     log::warn("render.effect.translucency_support is deprecated, please use "
-              "render.effect.translucency.enable instead");
-    transMode = vtkF3DRenderer::TranslucencyMode::DUAL_DEPTH_PEELING;
+              "render.effect.blending.enable instead");
+    transMode = vtkF3DRenderer::BlendingMode::DUAL_DEPTH_PEELING;
   }
   F3D_SILENT_WARNING_POP()
 
@@ -520,27 +520,31 @@ void window_impl::UpdateDynamicOptions()
     }
   }
 
-  if (opt.render.effect.translucency.enable)
+  if (opt.render.effect.blending.enable)
   {
-    if (opt.render.effect.translucency.mode == "ddp")
+    if (opt.render.effect.blending.mode == "ddp")
     {
-      transMode = vtkF3DRenderer::TranslucencyMode::DUAL_DEPTH_PEELING;
+      transMode = vtkF3DRenderer::BlendingMode::DUAL_DEPTH_PEELING;
     }
-    else if (opt.render.effect.translucency.mode == "stochastic")
+    else if (opt.render.effect.blending.mode == "sort")
     {
-      transMode = vtkF3DRenderer::TranslucencyMode::STOCHASTIC;
+      transMode = vtkF3DRenderer::BlendingMode::SORT;
+    }
+    else if (opt.render.effect.blending.mode == "stochastic")
+    {
+      transMode = vtkF3DRenderer::BlendingMode::STOCHASTIC;
     }
     else
     {
-      log::warn(opt.render.effect.translucency.mode,
-        R"( is an invalid translucency mode. Valid modes are: "ddp", "stochastic")");
+      log::warn(opt.render.effect.blending.mode,
+        R"( is an invalid blending mode. Valid modes are: "ddp", "sort", "stochastic")");
     }
   }
 
   renderer->SetUseSSAOPass(opt.render.effect.ambient_occlusion);
   renderer->SetAntiAliasingMode(aaMode);
   renderer->SetUseToneMappingPass(opt.render.effect.tone_mapping);
-  renderer->SetTranslucencyMode(transMode);
+  renderer->SetBlendingMode(transMode);
   renderer->SetBackfaceType(opt.render.backface_type);
   renderer->SetFinalShader(opt.render.effect.final_shader);
 

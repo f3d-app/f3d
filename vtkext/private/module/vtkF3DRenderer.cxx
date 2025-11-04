@@ -1434,20 +1434,20 @@ void vtkF3DRenderer::SetDropZoneBinds(
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetTranslucencyMode(TranslucencyMode mode)
+void vtkF3DRenderer::SetBlendingMode(BlendingMode mode)
 {
-  if (this->TranslucencyModeEnabled != mode)
+  if (this->BlendingModeEnabled != mode)
   {
-    this->TranslucencyModeEnabled = mode;
+    this->BlendingModeEnabled = mode;
     this->RenderPassesConfigured = false;
     this->CheatSheetConfigured = false;
   }
 }
 
 //----------------------------------------------------------------------------
-vtkF3DRenderer::TranslucencyMode vtkF3DRenderer::GetTranslucencyMode() const
+vtkF3DRenderer::BlendingMode vtkF3DRenderer::GetBlendingMode() const
 {
-  return this->TranslucencyModeEnabled;
+  return this->BlendingModeEnabled;
 }
 
 //----------------------------------------------------------------------------

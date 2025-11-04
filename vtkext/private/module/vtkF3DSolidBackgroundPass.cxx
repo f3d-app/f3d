@@ -41,6 +41,9 @@ void vtkF3DSolidBackgroundPass::Render(const vtkRenderState* state)
   {
     this->ColorTexture = vtkSmartPointer<vtkTextureObject>::New();
     this->ColorTexture->SetContext(renWin);
+    this->ColorTexture->SetFormat(GL_RGBA);
+    this->ColorTexture->SetInternalFormat(GL_RGBA16F);
+    this->ColorTexture->SetDataType(GL_FLOAT);
     this->ColorTexture->SetMinificationFilter(vtkTextureObject::Linear);
     this->ColorTexture->SetMagnificationFilter(vtkTextureObject::Linear);
     this->ColorTexture->SetWrapS(vtkTextureObject::ClampToEdge);
