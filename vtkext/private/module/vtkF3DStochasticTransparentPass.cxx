@@ -5,6 +5,7 @@
 
 #include "vtkF3DRandomFS.h"
 
+#include <vtkF3DOpenGLGridMapper.h>
 #include <vtkInformation.h>
 #include <vtkInformationIntegerKey.h>
 #include <vtkObjectFactory.h>
@@ -13,7 +14,6 @@
 #include <vtkRenderState.h>
 #include <vtkRenderer.h>
 #include <vtkShaderProgram.h>
-#include <vtkF3DOpenGLGridMapper.h>
 
 vtkStandardNewMacro(vtkF3DStochasticTransparentPass);
 vtkCxxSetObjectMacro(vtkF3DStochasticTransparentPass, TranslucentPass, vtkRenderPass);
@@ -74,9 +74,7 @@ bool vtkF3DStochasticTransparentPass::SetShaderParameters(vtkShaderProgram* prog
 {
   vtkInformation* info = prop->GetPropertyKeys();
   program->SetUniformi("propIndex", info->Get(vtkF3DStochasticTransparentPass::PropIndex()));
-
-  static int seed = 0; // todo: random
-  program->SetUniformi("seed", seed++);
+  program->SetUniformi("seed", this->Seed++);
 
   return this->Superclass::SetShaderParameters(program, mapper, prop, VAO);
 }
@@ -97,9 +95,9 @@ bool vtkF3DStochasticTransparentPass::PreReplaceShaderValues(std::string& vertex
 
     vtkShaderProgram::Substitute(fragmentShader, "  //VTK::Color::Impl",
       "  //VTK::Color::Impl\n"
-      "  if (random_ign(gl_FragCoord.xy, hash(uvec3(seed, propIndex, gl_PrimitiveID))) >= opacity) discard;\n"
-      "  opacity = 1.0;\n\n"
-    );
+      "  float rd = random_ign(gl_FragCoord.xy, hash(uvec3(seed, propIndex, gl_PrimitiveID)));\n"
+      "  if (rd >= opacity) discard;\n"
+      "  opacity = 1.0;\n\n");
   }
 
   return true;
