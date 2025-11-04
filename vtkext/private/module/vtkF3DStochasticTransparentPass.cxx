@@ -25,7 +25,17 @@ vtkInformationKeyMacro(vtkF3DStochasticTransparentPass, PropIndex, Integer);
 vtkF3DStochasticTransparentPass::vtkF3DStochasticTransparentPass() = default;
 
 //------------------------------------------------------------------------------
-vtkF3DStochasticTransparentPass::~vtkF3DStochasticTransparentPass() = default;
+vtkF3DStochasticTransparentPass::~vtkF3DStochasticTransparentPass()
+{
+  if (this->TranslucentPass)
+  {
+    this->TranslucentPass->Delete();
+  }
+  if (this->VolumetricPass)
+  {
+    this->VolumetricPass->Delete();
+  }
+}
 
 //------------------------------------------------------------------------------
 void vtkF3DStochasticTransparentPass::Render(const vtkRenderState* s)
@@ -106,4 +116,14 @@ bool vtkF3DStochasticTransparentPass::PreReplaceShaderValues(std::string& vertex
 //------------------------------------------------------------------------------
 void vtkF3DStochasticTransparentPass::ReleaseGraphicsResources(vtkWindow* win)
 {
+  this->Superclass::ReleaseGraphicsResources(win);
+
+  if (this->TranslucentPass)
+  {
+    this->TranslucentPass->ReleaseGraphicsResources(win);
+  }
+  if (this->VolumetricPass)
+  {
+    this->VolumetricPass->ReleaseGraphicsResources(win);
+  }
 }
