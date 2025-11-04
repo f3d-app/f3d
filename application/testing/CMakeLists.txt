@@ -517,6 +517,7 @@ f3d_test(NAME TestVerboseAnimation DATA InterpolationTest.glb ARGS --verbose NO_
 
 # Test interactive animation and speed factor
 f3d_test(NAME TestInteractionAnimation DATA f3d.glb ARGS --animation-progress INTERACTION)#Space;Wait;Space;
+f3d_test(NAME TestInteractionAnimationLegacyColor DATA f3d.glb ARGS --animation-progress --progress-legacy-color INTERACTION)#Space;Wait;Space;
 f3d_test(NAME TestInteractionAnimationFast DATA f3d.glb ARGS --animation-progress --animation-speed-factor=1.5 INTERACTION)#Space;Wait;Space;
 f3d_test(NAME TestInteractionAnimationSlow DATA f3d.glb ARGS --animation-progress --animation-speed-factor=0.5 INTERACTION)#Space;Wait;Space;
 f3d_test(NAME TestInteractionAnimationFrameRate DATA f3d.glb ARGS --animation-progress --frame-rate=1 INTERACTION)#Space;Wait;Space;
