@@ -136,7 +136,9 @@ public:
    */
   [[nodiscard]] virtual point3_t getDisplayFromWorld(const point3_t& worldPoint) const = 0;
 
-  // virtual void SetSceneHierarchy(std::string hierarchy) = 0;
+  /**
+   * Set the scene hierarchy for display in UI
+   */
   virtual void SetSceneHierarchy(const std::vector<NodeInfo>& hierarchy) = 0;
 
 protected:

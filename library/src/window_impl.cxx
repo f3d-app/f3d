@@ -376,14 +376,6 @@ window_impl::~window_impl()
   }
 }
 
-// void window_impl::SetSceneHierarchy(std::string hierarchy)
-// {
-//     if (this->Internals->Renderer)
-//     {
-//       this->Internals->Renderer->SetHierarchy(hierarchy);
-//     }
-// }
-
 void window_impl::SetSceneHierarchy(const std::vector<NodeInfo>& hierarchy)
 {
     if (this->Internals->Renderer)
@@ -428,12 +420,12 @@ void window_impl::UpdateDynamicOptions()
   renderer->ShowFilename(opt.ui.filename);
   renderer->SetFilenameInfo(opt.ui.filename_info);
   renderer->ShowMetaData(opt.ui.metadata);
+  renderer->ShowSceneHierarchy(opt.ui.scene_hierarchy);
   renderer->ShowCheatSheet(opt.ui.cheatsheet);
   renderer->ShowConsole(opt.ui.console);
   renderer->ShowMinimalConsole(opt.ui.minimal_console);
   renderer->ShowDropZone(opt.ui.drop_zone.enable);
   renderer->ShowDropZoneLogo(opt.ui.drop_zone.show_logo);
-  // renderer->SetHierarchy(opt.ui.hierarchy);
 
   if (this->Internals->Interactor)
   {
