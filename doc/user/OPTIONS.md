@@ -467,11 +467,12 @@ Enable _translucency support_. This is a technique used to correctly render tran
 
 ### `-p`, `--translucency-support-mode` (_string_, default: `ddp`)
 
-Translucency support method (`ddp`: quality, `stochastic`: fast).
+Translucency support method (`ddp`: quality, `sort`: gaussians, `stochastic`: fast).
 
 > [!WARNING]
 > `stochastic` is introducing a lot of noise with strong translucency.
 > It works better when combined with temporal anti-aliasing (when using `--anti-aliasing-mode=taa` option)
+> `sort` is only working for 3D gaussians and requires compute shaders support.
 
 ### `-q`, `--ambient-occlusion` (_bool_, default: `false`)
 
