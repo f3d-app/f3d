@@ -1898,6 +1898,16 @@ void vtkF3DRenderer::ConfigureMetaData()
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::ShowSceneHierarchy(bool show)
+{
+  if (this->SceneHierarchyVisible != show)
+  {
+    this->SceneHierarchyVisible = show;
+    this->UIActor->SetSceneHierarchyVisibility(show);
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowCheatSheet(bool show)
 {
   if (this->CheatSheetVisible != show)

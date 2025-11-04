@@ -469,6 +469,12 @@ void vtkF3DImguiActor::RenderNode(NodeInfo* node)
 
 void vtkF3DImguiActor::RenderSceneHierarchy()
 {
+    // Only render if visibility is enabled
+    if (!this->SceneHierarchyVisible)
+    {
+        return;
+    }
+
     const ImGuiViewport* viewport = ImGui::GetMainViewport();
     if (!viewport)
         return;

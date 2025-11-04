@@ -78,7 +78,10 @@ public:
    * Empty by default
    */
   void SetDropText(const std::string& info);
-  // void SetHierarchy(const std::string& info);
+
+  /**
+   * Set the scene hierarchy
+   */
   void SetHierarchy(const std::vector<NodeInfo>& hierarchy);
 
   /**
@@ -117,6 +120,12 @@ public:
    * False by default
    */
   void SetMetaDataVisibility(bool show);
+
+  /**
+   * Set the scene hierarchy visibility
+   * False by default
+   */
+  void SetSceneHierarchyVisibility(bool show);
 
   /**
    * Set the filename string
@@ -284,7 +293,6 @@ protected:
   bool DropZoneVisible = false;
   std::string DropText = "";
   std::vector<std::pair<std::string, std::string>> DropBinds;
-  std::string Hierarchy = "";
 
   bool FileNameVisible = false;
   std::string FileName = "";
@@ -294,6 +302,8 @@ protected:
 
   bool MetaDataVisible = false;
   std::string MetaData = "";
+
+  bool SceneHierarchyVisible = false;
 
   bool CheatSheetVisible = false;
   std::vector<CheatSheetGroup> CheatSheet;

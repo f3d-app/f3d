@@ -7,7 +7,9 @@
 #include <vtkActorCollection.h>
 #include <vtkCallbackCommand.h>
 #include <vtkCamera.h>
+#include <vtkDataSet.h>
 #include <vtkImageData.h>
+#include <vtkMapper.h>
 #include <vtkObjectFactory.h>
 #include <vtkPolyData.h>
 #include <vtkRenderWindow.h>
@@ -753,6 +755,7 @@ std::vector<NodeInfo> vtkF3DMetaImporter::GetActorHierarchy()
   // Return only the original imported actors, not internal F3D rendering actors
   vtkCollectionSimpleIterator ait;
   this->ActorCollection->InitTraversal(ait);
+  int actorIndex = 0;
   while (vtkActor* actor = this->ActorCollection->GetNextActor(ait))
   {
     if (!actor)
@@ -762,8 +765,37 @@ std::vector<NodeInfo> vtkF3DMetaImporter::GetActorHierarchy()
 
     NodeInfo node;
     node.prop = actor;
-    node.name = actor->GetClassName();
+
+    // Try to get a meaningful name for the actor
+    std::string actorName;
+
+    // First, try to use the actor's ObjectName if set
+    std::string objectName = actor->GetObjectName();
+    if (!objectName.empty())
+    {
+      actorName = objectName;
+    }
+    // Second, try to get name from mapper's input if available
+    else if (actor->GetMapper() && actor->GetMapper()->GetInput())
+    {
+      vtkDataSet* input = actor->GetMapper()->GetInput();
+      std::string inputName = input->GetObjectName();
+      if (!inputName.empty())
+      {
+        actorName = inputName;
+      }
+    }
+
+    // If no meaningful name found, use a generic name with index
+    if (actorName.empty())
+    {
+      actorName = "Actor " + std::to_string(actorIndex);
+    }
+
+    node.name = actorName;
+    node.displayName = actorName;
     nodes.push_back(node);
+    actorIndex++;
   }
 
   return nodes;

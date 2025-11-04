@@ -75,6 +75,12 @@ void vtkF3DUIActor::SetMetaDataVisibility(bool show)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DUIActor::SetSceneHierarchyVisibility(bool show)
+{
+  this->SceneHierarchyVisible = show;
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DUIActor::SetMetaData(const std::string& metadata)
 {
   this->MetaData = metadata;

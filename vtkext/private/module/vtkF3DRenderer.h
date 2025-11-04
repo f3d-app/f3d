@@ -103,6 +103,7 @@ public:
   void ShowDropZoneLogo(bool show);
   void ShowHDRISkybox(bool show);
   void ShowArmature(bool show);
+  void ShowSceneHierarchy(bool show);
   ///@}
 
   using vtkOpenGLRenderer::SetBackground;
@@ -123,7 +124,6 @@ public:
   void SetFilenameInfo(const std::string& info);
   void SetDropZoneInfo(const std::string& info);
   void SetDropZoneBinds(const std::vector<std::pair<std::string, std::string>>& dropZoneBinds);
-  // void SetHierarchy(const std::string& info);
   void SetHierarchy(const std::vector<NodeInfo>& hierarchy);
   void SetGridAbsolute(bool absolute);
   void SetGridUnitSquare(const std::optional<double>& unitSquare);
@@ -676,7 +676,11 @@ private:
   bool TimerVisible = false;
   bool FilenameVisible = false;
   bool MetaDataVisible = false;
+<<<<<<< HEAD
   bool HDRIFilenameVisible = false;
+=======
+  bool SceneHierarchyVisible = false;
+>>>>>>> aa51b800 (Add key bind for showing the hierarchy)
   bool CheatSheetVisible = false;
   bool ConsoleVisible = false;
   bool MinimalConsoleVisible = false;
