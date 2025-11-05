@@ -82,16 +82,17 @@ public:
     progressRep->SetPosition(0.0, 0.0);
     progressRep->SetPosition2(1.0, 0.0);
     progressRep->SetMinimumSize(0, 5);
-    if (this->Options.ui.progress_legacy_color)
+    if (this->Options.ui.loader_color.has_value())
     {
-      progressRep->SetProgressBarColor(1.f, 1.f, 1.f);
+      const f3d::color_t color = this->Options.ui.loader_color.value();
+      progressRep->SetProgressBarColor(color[0], color[1], color[2]);
     }
     else
     {
-      auto [r, g, b] = F3DStyle::GetF3DYellow();
+      const auto [r, g, b] = F3DStyle::GetF3DYellow();
       progressRep->SetProgressBarColor(r, g, b);
     }
-    progressRep->DrawBackgroundOff();
+    progressRep->DragableOff();
     progressRep->DragableOff();
     progressRep->SetShowBorderToOff();
     progressRep->DrawFrameOff();
