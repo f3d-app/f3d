@@ -90,9 +90,9 @@ bool vtkF3DStochasticTransparentPass::SetShaderParameters(vtkShaderProgram* prog
 }
 
 //------------------------------------------------------------------------------
-bool vtkF3DStochasticTransparentPass::PreReplaceShaderValues(std::string& vertexShader,
-  std::string& geometryShader, std::string& fragmentShader, vtkAbstractMapper* mapper,
-  vtkProp* prop)
+bool vtkF3DStochasticTransparentPass::PreReplaceShaderValues(std::string& vtkNotUsed(vertexShader),
+  std::string& vtkNotUsed(geometryShader), std::string& fragmentShader, vtkAbstractMapper* mapper,
+  vtkProp* vtkNotUsed(prop))
 {
   if (!vtkF3DOpenGLGridMapper::SafeDownCast(mapper))
   {
