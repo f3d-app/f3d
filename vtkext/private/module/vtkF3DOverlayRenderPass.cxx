@@ -171,6 +171,7 @@ void vtkF3DOverlayRenderPass::CompositeOverlay(const vtkRenderState* s)
     // the scene texture is not alpha premultiplied, so it should not be divided
     vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Impl",
       "  vec4 sceneSample = texture(texScene, texCoord);\n"
+      "  sceneSample = max(sceneSample, vec4(0.0));\n"
       "  vec3 initialSceneColor = sceneSample.rgb;\n"
       "  sceneSample.rgb = toLinear(sceneSample.rgb);\n"
       "  sceneSample = max(sceneSample, vec4(0.0));\n"
