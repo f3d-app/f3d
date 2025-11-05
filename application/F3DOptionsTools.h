@@ -68,7 +68,6 @@ static inline const OptionsDict DefaultAppOptions = {
 static inline const std::map<std::string_view, std::string_view> LibOptionsNames = {
   { "loading-progress", "ui.loader_progress" },
   { "animation-progress", "ui.animation_progress" },
-  { "progress-legacy-color", "ui.progress_legacy_color" },
   { "up", "scene.up_direction" },
   { "axis", "ui.axis" },
   { "grid", "render.grid.enable" },
