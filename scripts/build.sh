@@ -107,6 +107,10 @@ if [ -d "${BUNDLE_DIR}/lib" ]; then
   rmdir "${BUNDLE_DIR}/lib" 2>/dev/null || true
 fi
 
+echo "Renaming app to F3D.app" "${BUNDLE_DIR}/f3d.app" "${BUNDLE_DIR}/F3D.app"
+mv "${BUNDLE_DIR}/f3d.app" "${BUNDLE_DIR}/F3D2.app"
+mv "${BUNDLE_DIR}/F3D2.app" "${BUNDLE_DIR}/F3D.app"
+
 # Final output hint
 echo "Full macOS bundle staged at: ${BUNDLE_DIR}"
 echo "- App: ${BUNDLE_DIR}/f3d.app"

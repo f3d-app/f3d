@@ -66,4 +66,4 @@ exec ${DOCKER_CLIENT} run --rm \
     && rm -rf /build/.build_tmp
   "
 
-
+tar -C "$BUILD_DIR" -cJf ./f3d_linux_x86_64.tar.xz ./F3D-3.3.0-Linux-x86_64

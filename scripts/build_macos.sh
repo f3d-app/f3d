@@ -107,7 +107,12 @@ if [ -d "${BUNDLE_DIR}/lib" ]; then
   rmdir "${BUNDLE_DIR}/lib" 2>/dev/null || true
 fi
 
+mv "${BUNDLE_DIR}/f3d.app" "${BUNDLE_DIR}/F3D2.app"
+mv "${BUNDLE_DIR}/F3D2.app" "${BUNDLE_DIR}/F3D.app"
+
 # Final output hint
 echo "Full macOS bundle staged at: ${BUNDLE_DIR}"
 echo "- App: ${BUNDLE_DIR}/F3D.app"
 echo "- Libs inside app: ${FRAMEWORKS_DIR}"
+
+tar -C "$BUNDLE_DIR" -cJf ./f3d_darwin_arm64.tar.xz ./F3D.app
