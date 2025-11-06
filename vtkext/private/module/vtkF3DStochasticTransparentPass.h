@@ -1,11 +1,21 @@
-// SPDX-FileCopyrightText: Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
-// SPDX-License-Identifier: BSD-3-Clause
-
 /**
  * @class   vtkF3DStochasticTransparentPass
- * @brief   Implements the stochastic transparent algorithm.
+ * @brief   Implements a stochastic transparency rendering pass.
  *
- * TODO: link to paper
+ * This render pass implements a stochastic transparency technique based on
+ * Enderton et al.'s "Stochastic Transparency". Instead of sorting and
+ * compositing transparent objects, the pass applies a pseudo-random per-fragment
+ * masking strategy so that over many independent samples the correct blended result is converged to
+ * the expected result. This eliminates the need for draw-order sorting for translucent geometry and
+ * can improve performance in complex scenes.
+ *
+ * Reference:
+ * - Enderton, Eric, et al.
+ *   "Stochastic transparency."
+ *   Proceedings of the 2010 ACM SIGGRAPH symposium on Interactive 3D Graphics and Games. 2010.
+ * - Kheradmand, Shakiba, et al.
+ *   "StochasticSplats: Stochastic Rasterization for Sorting-Free 3D Gaussian Splatting."
+ *   arXiv preprint arXiv:2503.24366 (2025).
  */
 
 #ifndef vtkF3DStochasticTransparentPass_h

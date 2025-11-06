@@ -1,6 +1,3 @@
-// SPDX-FileCopyrightText: Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
-// SPDX-License-Identifier: BSD-3-Clause
-
 #include "vtkF3DStochasticTransparentPass.h"
 
 #include "vtkF3DRandomFS.h"
@@ -51,12 +48,6 @@ void vtkF3DStochasticTransparentPass::Render(const vtkRenderState* s)
   {
     vtkProp* prop = s->GetPropArray()[j];
     vtkInformation* info = prop->GetPropertyKeys();
-    if (!info)
-    {
-      info = vtkInformation::New();
-      prop->SetPropertyKeys(info);
-      info->FastDelete();
-    }
     info->Set(vtkOpenGLActor::GLDepthMaskOverride(), 1);
     info->Set(vtkF3DStochasticTransparentPass::PropIndex(), j);
   }
@@ -71,10 +62,7 @@ void vtkF3DStochasticTransparentPass::Render(const vtkRenderState* s)
   {
     vtkProp* prop = s->GetPropArray()[j];
     vtkInformation* info = prop->GetPropertyKeys();
-    if (info)
-    {
-      info->Remove(vtkOpenGLActor::GLDepthMaskOverride());
-    }
+    info->Remove(vtkOpenGLActor::GLDepthMaskOverride());
   }
 }
 
