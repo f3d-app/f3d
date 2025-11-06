@@ -49,7 +49,7 @@ void vtkF3DTAAResolvePass::Render(const vtkRenderState* state)
     this->HistoryTexture->SetWrapT(vtkTextureObject::ClampToEdge);
     renderer->GetTiledSizeAndOrigin(&size[0], &size[1], &pos[0], &pos[1]);
     this->HistoryTexture->Allocate2D(size[0], size[1], 4, VTK_FLOAT);
-    this->HistoryIteration = 0;
+    this->ResetIterations();
   }
   this->HistoryTexture->Resize(size[0], size[1]);
 
