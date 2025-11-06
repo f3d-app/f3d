@@ -11,3 +11,6 @@ KeyReleaseEvent 738 539 0 104 1 a
 KeyPressEvent 738 539 0 104 1 a
 CharEvent 738 539 0 104 1 a
 KeyReleaseEvent 738 539 0 104 1 a
+KeyPressEvent 738 539 0 104 1 p
+CharEvent 738 539 0 104 1 p
+KeyReleaseEvent 738 539 0 104 1 p
