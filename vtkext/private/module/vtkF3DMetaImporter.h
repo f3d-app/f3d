@@ -116,6 +116,12 @@ public:
   ///@}
 
   /**
+   * Set a world-space clip plane (ax+by+cz+d=0) to be applied at load time.
+   * Pass std::nullopt to clear.
+   */
+  void SetClipPlaneWorld(const std::optional<std::array<double, 4>>& plane);
+
+  /**
    * XXX: HIDE the vtkImporter::Update method and declare our own
    * Import each of of the add importers into the first renderer of the render window.
    * Importers that have already been imported will be skipped
@@ -187,6 +193,8 @@ private:
 
   struct Internals;
   std::unique_ptr<Internals> Pimpl;
+
+  std::optional<std::array<double, 4>> ClipPlaneWorld;
 
 #if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 3, 20240707)
   vtkNew<vtkActorCollection> ActorCollection;

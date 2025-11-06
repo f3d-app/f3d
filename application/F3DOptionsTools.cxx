@@ -139,6 +139,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
     { {"background-color", "", "Background color", "<color>", ""},
       {"resolution", "", "Window resolution", "<width,height>", ""},
       {"position", "", "Window position", "<x,y>", ""},
+      {"clip-plane", "", "Clip plane in world coordinates (THREE.js style ax+by+cz+d=0)", "<A,B,C,D>", ""},
       {"fps", "z", "Display rendering frame per second", "<bool>", "1"},
       {"filename", "n", "Display filename", "<bool>", "1"},
       {"metadata", "m", "Display file metadata", "<bool>", "1"},

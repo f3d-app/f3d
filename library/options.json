@@ -33,6 +33,9 @@
     },
     "force_reader": {
       "type": "string"
+    },
+    "clip_plane": {
+      "type": "double_vector"
     }
   },
   "render": {
@@ -200,7 +203,7 @@
     },
     "minimal_console": {
       "type": "bool",
-      "default_value": "false"
+        "default_value": "false"
     },
     "dropzone": {
       "type": "bool",

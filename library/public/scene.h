@@ -6,6 +6,7 @@
 #include "types.h"
 
 /// @cond
+#include <array>
 #include <filesystem>
 #include <string>
 #include <vector>
@@ -147,6 +148,11 @@ public:
    * Return the number of animations available in the currently loaded files.
    */
   [[nodiscard]] virtual unsigned int availableAnimations() const = 0;
+
+  /**
+   * Set a world-space clipping plane defined as {nx, ny, nz, d}.
+   */
+  virtual scene& setClipPlane(const std::array<double, 4>& plane) = 0;
 
 protected:
   //! @cond

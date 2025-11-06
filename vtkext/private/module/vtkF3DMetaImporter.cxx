@@ -13,9 +13,15 @@
 #include <vtkRendererCollection.h>
 #include <vtkSmartPointer.h>
 #include <vtkVersion.h>
+#include <vtkMatrix4x4.h>
+#include <vtkPointData.h>
+#include <vtkPoints.h>
+#include <vtkCellArray.h>
 
 #include <cassert>
 #include <iostream>
+#include <sstream>
+#include <cstdlib>
 #include <numeric>
 #include <vector>
 
@@ -60,6 +66,12 @@ vtkF3DMetaImporter::~vtkF3DMetaImporter()
   // XXX by doing this we ensure ~vtkImporter does not delete it
   // As we have our own way of handling renderer lifetime
   this->Renderer = nullptr;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DMetaImporter::SetClipPlaneWorld(const std::optional<std::array<double, 4>>& plane)
+{
+  this->ClipPlaneWorld = plane;
 }
 
 //----------------------------------------------------------------------------
@@ -262,6 +274,71 @@ bool vtkF3DMetaImporter::Update()
         // For generic importer, use the single imported points
         // TODO when supporting composite, handle with an actor based index
         points = genericImporter->GetImportedPoints();
+      }
+
+      // Early hard clip of splat points using ClipPlaneWorld if set (world space)
+      if (this->ClipPlaneWorld.has_value())
+      {
+        const auto& wpv = this->ClipPlaneWorld.value();
+        double wp[4] = { wpv[0], wpv[1], wpv[2], wpv[3] };
+        double mp[4];
+        // world plane -> model plane using inverse-transpose of actor matrix
+        vtkNew<vtkMatrix4x4> inv;
+        vtkMatrix4x4::Invert(actor->GetMatrix(), inv);
+        vtkNew<vtkMatrix4x4> invT;
+        invT->DeepCopy(inv);
+        invT->Transpose();
+        for (int i = 0; i < 4; ++i)
+        {
+          mp[i] = invT->GetElement(i, 0) * wp[0] + invT->GetElement(i, 1) * wp[1] +
+            invT->GetElement(i, 2) * wp[2] + invT->GetElement(i, 3) * wp[3];
+        }
+
+        vtkIdType inCount = points->GetNumberOfPoints();
+        vtkNew<vtkPoints> newPts;
+        newPts->SetDataType(points->GetPoints() ? points->GetPoints()->GetDataType() : VTK_FLOAT);
+
+        // Prepare point data arrays copy
+        vtkPointData* inPD = points->GetPointData();
+        vtkNew<vtkPointData> outPD;
+        outPD->CopyAllocate(inPD);
+
+        vtkNew<vtkCellArray> verts;
+
+        int kept = 0;
+        for (vtkIdType i = 0; i < inCount; ++i)
+        {
+          double p[3];
+          points->GetPoint(i, p);
+          const double s = mp[0] * p[0] + mp[1] * p[1] + mp[2] * p[2] + mp[3];
+          if (s >= 0.0)
+          {
+            vtkIdType id = newPts->InsertNextPoint(p);
+            outPD->CopyData(inPD, i, id);
+            verts->InsertNextCell(1, &id);
+            kept++;
+          }
+        }
+
+        if (kept < inCount)
+        {
+          vtkSmartPointer<vtkPolyData> filtered = vtkSmartPointer<vtkPolyData>::New();
+          filtered->SetPoints(newPts);
+          filtered->SetVerts(verts);
+          filtered->GetPointData()->ShallowCopy(outPD);
+
+          F3DLog::Print(F3DLog::Severity::Warning,
+            std::string("Clip plane applied: ") + std::to_string(wp[0]) + "," + std::to_string(wp[1]) + "," + std::to_string(wp[2]) + "," + std::to_string(wp[3]) +
+              ": filtered splats " + std::to_string(inCount - kept) + "/" +
+              std::to_string(inCount));
+
+          // Apply to both point sprites and coloring mappers so whichever path renders is clipped
+          pss.Mapper->SetInputData(filtered);
+          cs.Mapper->SetInputData(filtered);
+          this->Renderer->AddActor(pss.Actor);
+          pss.Actor->VisibilityOff();
+          continue; // mapper is set, skip default path below
+        }
       }
       pss.Mapper->SetInputData(points);
       this->Renderer->AddActor(pss.Actor);

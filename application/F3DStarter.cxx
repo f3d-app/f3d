@@ -100,6 +100,7 @@ public:
     bool RemoveEmptyFileGroups;
     std::vector<int> Resolution;
     std::vector<int> Position;
+    std::vector<double> ClipPlane;
     std::string ColorMapFile;
     CameraConfiguration CamConf;
     std::string Reference;
@@ -760,6 +761,7 @@ public:
       appOptions, "remove-empty-file-groups", this->AppOptions.RemoveEmptyFileGroups);
     this->ParseOption(appOptions, "resolution", this->AppOptions.Resolution);
     this->ParseOption(appOptions, "position", this->AppOptions.Position);
+    this->ParseOption(appOptions, "clip-plane", this->AppOptions.ClipPlane);
     this->ParseOption(appOptions, "colormap-file", this->AppOptions.ColorMapFile);
 
     this->ParseOption(appOptions, "camera-position", this->AppOptions.CamConf.CameraPosition);
@@ -1170,6 +1172,17 @@ int F3DStarter::Start(int argc, char** argv)
   }
 
   // Load a file
+  // Ensure clip plane env is set just before import
+  if (this->Internals->AppOptions.ClipPlane.size() == 4)
+  {
+    f3d::scene& scn = this->Internals->Engine->getScene();
+    std::array<double, 4> plane = { this->Internals->AppOptions.ClipPlane[0],
+      this->Internals->AppOptions.ClipPlane[1], this->Internals->AppOptions.ClipPlane[2],
+      this->Internals->AppOptions.ClipPlane[3] };
+    scn.setClipPlane(plane);
+    f3d::log::warn("Using clip plane " + std::to_string(plane[0]) + "," +
+      std::to_string(plane[1]) + "," + std::to_string(plane[2]) + "," + std::to_string(plane[3]));
+  }
   this->LoadFileGroup();
 
   if (!this->Internals->AppOptions.NoRender)

@@ -46,6 +46,7 @@ public:
   scene& loadAnimationTime(double timeValue) override;
   std::pair<double, double> animationTimeRange() override;
   unsigned int availableAnimations() const override;
+  scene& setClipPlane(const std::array<double, 4>& plane) override;
   ///@}
 
   /**

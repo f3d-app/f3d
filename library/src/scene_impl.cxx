@@ -14,6 +14,7 @@
 #include "vtkF3DRenderer.h"
 
 #include <optional>
+#include <array>
 #include <vtkCallbackCommand.h>
 #include <vtkLightCollection.h>
 #include <vtkProgressBarRepresentation.h>
@@ -108,6 +109,20 @@ public:
     if (this->Options.scene.camera.index.has_value())
     {
       this->MetaImporter->SetCameraIndex(this->Options.scene.camera.index.value());
+    }
+
+    // Forward clip plane from options if present
+    if (this->Options.scene.clip_plane.has_value())
+    {
+      const auto& v = this->Options.scene.clip_plane.value();
+      if (v.size() == 4)
+      {
+        this->MetaImporter->SetClipPlaneWorld(std::array<double, 4>{ v[0], v[1], v[2], v[3] });
+      }
+      else
+      {
+        this->MetaImporter->SetClipPlaneWorld(std::nullopt);
+      }
     }
 
     // Manage progress bar
@@ -450,6 +465,13 @@ std::pair<double, double> scene_impl::animationTimeRange()
 unsigned int scene_impl::availableAnimations() const
 {
   return this->Internals->AnimationManager.GetNumberOfAvailableAnimations();
+}
+
+//----------------------------------------------------------------------------
+scene& scene_impl::setClipPlane(const std::array<double, 4>& plane)
+{
+  this->Internals->MetaImporter->SetClipPlaneWorld(plane);
+  return *this;
 }
 
 //----------------------------------------------------------------------------

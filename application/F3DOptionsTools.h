@@ -45,6 +45,7 @@ static inline const OptionsDict DefaultAppOptions = {
   { "remove-empty-file-groups", "false" },
   { "resolution", "1000, 600" },
   { "position", "" },
+  { "clip-plane", "" },
   { "colormap-file", "" },
   { "camera-position", "" },
   { "camera-focal-point", "" },
@@ -138,6 +139,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "tone-mapping", "render.effect.tone_mapping" },
   { "final-shader", "render.effect.final_shader" },
   { "textures-transform", "model.textures_transform" },
+  { "clip-plane", "scene.clip_plane" },
 };
 
 /**
