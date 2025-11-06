@@ -121,7 +121,7 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
   vtkNew<vtkCameraPass> bgCamP;
   bgCamP->SetDelegatePass(bgP);
   this->BackgroundPass = vtkSmartPointer<vtkFramebufferPass>::New();
-  this->BackgroundPass->SetColorFormat(vtkTextureObject::Float32);
+  this->BackgroundPass->SetColorFormat(vtkTextureObject::Float16);
 
   if (this->UseBlurBackground)
   {
