@@ -308,6 +308,7 @@ f3d_test(NAME TestConfigOrder DATA suzanne.ply ARGS CONFIG ${F3D_SOURCE_DIR}/tes
 f3d_test(NAME TestOutputStream DATA suzanne.ply ARGS --verbose=quiet --output=- REGEXP ".PNG" NO_BASELINE NO_OUTPUT)
 f3d_test(NAME TestOutputStreamInfo DATA suzanne.ply ARGS --verbose=info --output=- REGEXP "redirected to stderr" NO_BASELINE NO_OUTPUT)
 f3d_test(NAME TestInvalidAntiAliasingMode DATA suzanne.ply ARGS --anti-aliasing=foo REGEXP "foo is an invalid antialiasing mode" NO_BASELINE)
+f3d_test(NAME TestInvalidBlendingMode DATA suzanne.ply ARGS --blending=foo REGEXP "foo is an invalid blending mode" NO_BASELINE)
 f3d_test(NAME TestAntiAliasingModeDeprecated DATA suzanne.ply ARGS -a --anti-aliasing-mode=ssaa REGEXP "--anti-aliasing-mode is deprecated" NO_BASELINE)
 f3d_test(NAME TestAntiAliasingDeprecated DATA suzanne.ply ARGS --anti-aliasing=true REGEXP "please specify the type of anti-aliasing" NO_BASELINE)
 f3d_test(NAME TestUserMatrixColoring DATA InterpolationTest.glb ARGS --scalar-coloring --coloring-array=TEXCOORD_0)
@@ -441,7 +442,10 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240203)
   endif()
 endif()
 
-f3d_test(NAME Test3DGaussiansSplattingStochastic DATA small.splat ARGS -osyp --up=-Y --point-sprites-size=1 --point-sprites-type=gaussian --translucency-support-mode=stochastic --camera-position=-3.6,0.5,-4.2)
+# Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10662
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20231102)
+  f3d_test(NAME Test3DGaussiansSplattingStochastic DATA small.splat ARGS -osyp --up=-Y --point-sprites-size=1 --point-sprites-type=gaussian --translucency-support-mode=stochastic --camera-position=-3.6,0.5,-4.2)
+endif()
 
 # Test plugin fail code path
 f3d_test(NAME TestPluginVerbose ARGS --verbose REGEXP "Loading plugin \"native\"" NO_BASELINE)
@@ -995,6 +999,7 @@ f3d_test(NAME TestInteractionCycleCell DATA waveletArrays.vti INTERACTION LONG_T
 f3d_test(NAME TestInteractionCycleComp DATA dragon.vtu INTERACTION) #SYYYY
 f3d_test(NAME TestInteractionCycleScalars DATA dragon.vtu INTERACTION) #BSSSS
 f3d_test(NAME TestInteractionCycleCellInvalidIndex DATA waveletArrays.vti INTERACTION) #SSC
+f3d_test(NAME TestInteractionCycleBlending DATA suzanne.ply ARGS --opacity=0.8 INTERACTION) #PPP # Cycle to stochastic
 f3d_test(NAME TestInteractionVolumeCycle DATA waveletArrays.vti ARGS INTERACTION) #VSS
 f3d_test(NAME TestInteractionVolumeAfterColoring DATA waveletArrays.vti ARGS INTERACTION) #SSSV
 f3d_test(NAME TestInteractionVolumeInverse DATA HeadMRVolume.mhd ARGS --camera-position=127.5,-400,127.5 --camera-view-up=0,0,1 INTERACTION THRESHOLD 0.05)#VI #Small rendering differences due to volume rendering
