@@ -122,7 +122,7 @@ void vtkF3DTAAResolvePass::Render(const vtkRenderState* state)
   this->ColorTexture->Deactivate();
   this->HistoryTexture->Deactivate();
   this->HistoryTexture->CopyFromFrameBuffer(pos[0], pos[1], size[0], size[1], size[0], size[1]);
-  this->HistoryIteration++;
+  this->HistoryIteration = std::min(this->HistoryIteration + 1, 1024);
 
   vtkOpenGLCheckErrorMacro("failed after Render");
 }
