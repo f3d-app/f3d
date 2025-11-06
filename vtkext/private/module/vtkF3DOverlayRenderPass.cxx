@@ -126,14 +126,11 @@ void vtkF3DOverlayRenderPass::CompositeOverlay(const vtkRenderState* s)
   {
     this->ColorTexture = vtkSmartPointer<vtkTextureObject>::New();
     this->ColorTexture->SetContext(renWin);
-    this->ColorTexture->SetFormat(GL_RGBA);
-    this->ColorTexture->SetInternalFormat(GL_RGBA16F);
-    this->ColorTexture->SetDataType(GL_HALF_FLOAT);
     this->ColorTexture->SetMinificationFilter(vtkTextureObject::Linear);
     this->ColorTexture->SetMagnificationFilter(vtkTextureObject::Linear);
     this->ColorTexture->SetWrapS(vtkTextureObject::ClampToEdge);
     this->ColorTexture->SetWrapT(vtkTextureObject::ClampToEdge);
-    this->ColorTexture->Allocate2D(size[0], size[1], 4, VTK_FLOAT);
+    this->ColorTexture->Allocate2D(size[0], size[1], 4, VTK_UNSIGNED_CHAR);
   }
   this->ColorTexture->Resize(size[0], size[1]);
 
@@ -171,10 +168,8 @@ void vtkF3DOverlayRenderPass::CompositeOverlay(const vtkRenderState* s)
     // the scene texture is not alpha premultiplied, so it should not be divided
     vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Impl",
       "  vec4 sceneSample = texture(texScene, texCoord);\n"
-      "  sceneSample = max(sceneSample, vec4(0.0));\n"
       "  vec3 initialSceneColor = sceneSample.rgb;\n"
       "  sceneSample.rgb = toLinear(sceneSample.rgb);\n"
-      "  sceneSample = max(sceneSample, vec4(0.0));\n"
       "  sceneSample.rgb *= sceneSample.a;\n"
       "//VTK::FSQ::Impl");
 

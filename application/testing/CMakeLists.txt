@@ -527,7 +527,11 @@ f3d_test(NAME TestInteractionAnimationInvert DATA f3d.glb ARGS --animation-speed
 
 # Test temporal anti-aliasing
 f3d_test(NAME TestInteractionTAA DATA suzanne.ply ARGS --anti-aliasing=true --anti-aliasing-mode=taa INTERACTION) #Render;Render...
-f3d_test(NAME TestInteractionStochasticTAA DATA alpha.glb ARGS -ap --anti-aliasing-mode=taa --translucency-support-mode=stochastic INTERACTION) #Render;Render...
+
+# Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12098
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250504)
+  f3d_test(NAME TestInteractionStochasticTAA DATA alpha.glb ARGS -ap --anti-aliasing-mode=taa --translucency-support-mode=stochastic INTERACTION) #Render;Render...
+endif()
 
 # Need SSIM comparison for some reason
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240729)
