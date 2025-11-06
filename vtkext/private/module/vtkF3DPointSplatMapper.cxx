@@ -30,6 +30,8 @@
 #include <sstream>
 #include <algorithm>
 #include <vector>
+#include <cstdlib>
+#include <cstring>
 
 //----------------------------------------------------------------------------
 class vtkF3DSplatMapperHelper : public vtkOpenGLPointGaussianMapperHelper

@@ -1,0 +1,47 @@
+FROM debian:bookworm-slim
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+    build-essential \
+    ca-certificates \
+    cmake \
+    curl \
+    git \
+    patchelf \
+    ninja-build \
+    pkg-config \
+    libgl1-mesa-dev \
+    libegl1-mesa-dev \
+    libosmesa6-dev \
+    libx11-dev \
+    libxext-dev \
+    libxrandr-dev \
+    libxinerama-dev \
+    libxcursor-dev \
+    libxi-dev \
+    libxt-dev \
+    zlib1g-dev \
+    libexpat1-dev \
+ && rm -rf /var/lib/apt/lists/*
+
+# Build and install VTK >= 9.3 (using 9.5.2)
+ARG VTK_VERSION=v9.5.2
+RUN set -eux; \
+    mkdir -p /tmp/vtk-src; cd /tmp/vtk-src; \
+    curl -fsSL -o vtk.tar.gz https://github.com/Kitware/VTK/archive/refs/tags/${VTK_VERSION}.tar.gz; \
+    tar -xzf vtk.tar.gz --strip-components=1; \
+    cmake -S . -B build -G Ninja \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DBUILD_TESTING=OFF \
+      -DVTK_BUILD_EXAMPLES=OFF \
+      -DVTK_BUILD_DOCUMENTATION=OFF \
+      -DCMAKE_INSTALL_PREFIX=/opt/vtk; \
+    cmake --build build --parallel; \
+    cmake --install build; \
+    rm -rf /tmp/vtk-src
+
+WORKDIR /workspace
+
+
