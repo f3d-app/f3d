@@ -48,7 +48,7 @@ mkdir -p "${BUNDLE_DIR}"
 cmake --build "${BUILD_DIR}" --parallel
 
 # Install components to produce a self-contained bundle
-# - application: installs f3d.app at prefix root
+# - application: installs F3D.app at prefix root
 # - library: installs libf3d and any shared libs built here
 # - configuration: default configs into bundle Resources on macOS
 # - colormaps: default colormaps into Resources
@@ -60,7 +60,7 @@ cmake --install "${BUILD_DIR}" --prefix "${BUNDLE_DIR}" --component colormaps
 cmake --install "${BUILD_DIR}" --prefix "${BUNDLE_DIR}" --component dependencies
 
 # macOS bundle fixup: move dylibs into the .app and rewrite install names/rpaths
-APP_DIR="${BUNDLE_DIR}/f3d.app"
+APP_DIR="${BUNDLE_DIR}/F3D.app"
 EXE_PATH="${APP_DIR}/Contents/MacOS/f3d"
 FRAMEWORKS_DIR="${APP_DIR}/Contents/Frameworks"
 mkdir -p "${FRAMEWORKS_DIR}"
@@ -109,5 +109,5 @@ fi
 
 # Final output hint
 echo "Full macOS bundle staged at: ${BUNDLE_DIR}"
-echo "- App: ${BUNDLE_DIR}/f3d.app"
+echo "- App: ${BUNDLE_DIR}/F3D.app"
 echo "- Libs inside app: ${FRAMEWORKS_DIR}"
