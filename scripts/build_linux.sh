@@ -40,7 +40,7 @@ fi
 # Run as the current user to avoid root-owned outputs
 uid_gid=("--user" "$(id -u):$(id -g)")
 
-exec ${DOCKER_CLIENT} run --rm \
+${DOCKER_CLIENT} run --rm \
   ${platform_args} \
   "${uid_gid[@]}" \
   -e CMAKE_BUILD_PARALLEL_LEVEL \
@@ -66,4 +66,5 @@ exec ${DOCKER_CLIENT} run --rm \
     && rm -rf /build/.build_tmp
   "
 
+echo "Linux bundle installed to: $BUILD_DIR"
 tar -C "$BUILD_DIR" -cJf ./f3d_linux_x86_64.tar.xz ./F3D-3.3.0-Linux-x86_64
