@@ -15,22 +15,12 @@
 #include <cstdint>
 #include <deque>
 
+#include <map>
 #include <string>
 #include <vector>
-#include <vtkProp.h>
 
-#ifndef NODEINFO_H
-#define NODEINFO_H
+#include "F3DNodeInfo.h"
 
-struct NodeInfo
-{
-    std::string name;
-    vtkProp* prop = nullptr; 
-    std::vector<NodeInfo> children;
-    std::string displayName;
-};
-
-#endif // NODEINFO_H
 class vtkOpenGLRenderWindow;
 
 class vtkF3DUIActor : public vtkProp

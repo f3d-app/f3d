@@ -30,6 +30,11 @@ struct NodeInfo
 };
 
 #endif // NODEINFO_H
+#include "F3DNodeInfo.h"
+
+#include <filesystem>
+#include <string>
+#include <vector>
 
 namespace f3d
 {
