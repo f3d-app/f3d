@@ -5,6 +5,7 @@
 #include "F3DLog.h"
 #include "vtkF3DCachedLUTTexture.h"
 #include "vtkF3DCachedSpecularTexture.h"
+#include "vtkF3DInteractorStyle.h"
 #include "vtkF3DOpenGLGridMapper.h"
 #include "vtkF3DOverlayRenderPass.h"
 #include "vtkF3DPolyDataMapper.h"
@@ -44,6 +45,7 @@
 #include <vtkPolyData.h>
 #include <vtkProperty.h>
 #include <vtkRenderWindow.h>
+#include <vtkRenderWindowInteractor.h>
 #include <vtkSSAAPass.h>
 #include <vtkScalarBarActor.h>
 #include <vtkShaderProperty.h>
@@ -439,6 +441,11 @@ void vtkF3DRenderer::ConfigureRenderPasses()
     vtkNew<vtkF3DTAAResolvePass> taaP;
     taaP->SetDelegatePass(renderingPass);
     renderingPass = taaP;
+
+    this->RenderWindow->AddObserver(
+      vtkCommand::WindowResizeEvent, taaP.Get(), &vtkF3DTAAResolvePass::ResetIterations);
+    this->RenderWindow->GetInteractor()->GetInteractorStyle()->AddObserver(
+      vtkCommand::InteractionEvent, taaP.Get(), &vtkF3DTAAResolvePass::ResetIterations);
   }
 
   if (this->FinalShader.has_value())
