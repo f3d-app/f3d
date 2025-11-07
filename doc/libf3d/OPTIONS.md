@@ -458,7 +458,7 @@ Show a _progress bar_ when loading the file.
 
 ### `ui.loader_color` (_color_, optional, **on load**)
 
-Set color for loading progress bar color.
+Set loader progress bar color or use default one #FFFFFF if not set.
 
 CLI: `--progress`.
 
@@ -469,7 +469,7 @@ CLI: `--animation-progress`.
 
 ### `ui.animation_color` (_color_, optional, **on load**)
 
-Set color for animation progress bar color.
+Set animation progress bar color or use default one #788BFF if not set.
 
 ### `ui.metadata` (_bool_, default: `false`)
 
