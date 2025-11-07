@@ -567,19 +567,8 @@ std::vector<NodeInfo> scene_impl::GetSceneHierarchyNodes()
     return hierarchy;
   }
 
-  std::vector<NodeInfo> rawHierarchy = this->Internals->MetaImporter->GetActorHierarchy();
-
-  // Remove duplicate props
-  std::unordered_set<vtkProp*> seenProps;
-  for (const auto& node : rawHierarchy)
-  {
-    if (node.prop && seenProps.insert(node.prop).second)
-    {
-      hierarchy.push_back(node);
-    }
-  }
-
-  return hierarchy;
+  // Get the raw hierarchy directly - it already handles duplicates and hierarchy
+  return this->Internals->MetaImporter->GetActorHierarchy();
 }
 
 }

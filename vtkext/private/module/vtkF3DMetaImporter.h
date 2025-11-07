@@ -188,6 +188,13 @@ public:
   vtkDataAssembly* GetSceneHierarchy() override;
   std::vector<NodeInfo> GetActorHierarchy();
 
+private:
+  /**
+   * Build hierarchical node structure from vtkDataAssembly
+   */
+  void BuildHierarchyFromAssembly(vtkDataAssembly* assembly, int nodeId, 
+    NodeInfo& parentNode, std::map<std::string, vtkProp*>& actorMap);
+
 protected:
   vtkF3DMetaImporter();
   ~vtkF3DMetaImporter() override;

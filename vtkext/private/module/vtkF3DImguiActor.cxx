@@ -431,7 +431,8 @@ void vtkF3DImguiActor::RenderNode(NodeInfo* node)
             NodeVisibilityState[node->prop] = visible;
         }
 
-        if (ImGui::Checkbox(node->name.c_str(), &visible))
+        const std::string& displayText = node->displayName.empty() ? node->name : node->displayName;
+        if (ImGui::Checkbox(displayText.c_str(), &visible))
         {
             NodeVisibilityState[node->prop] = visible;
             node->prop->SetVisibility(visible ? 1 : 0); // immediate update
@@ -479,11 +480,12 @@ void vtkF3DImguiActor::RenderSceneHierarchy()
     if (!viewport)
         return;
 
-    ::SetupNextWindow(ImVec2(10, 10), ImVec2(300, viewport->WorkSize.y - 20));
+    // Wider window to accommodate material information text (RGB + Opacity)
+    ::SetupNextWindow(ImVec2(10, 10), ImVec2(500, viewport->WorkSize.y - 20));
     ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
 
+    // Allow resizing so users can adjust width if needed
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar |
-                             ImGuiWindowFlags_NoResize |
                              ImGuiWindowFlags_NoCollapse |
                              ImGuiWindowFlags_NoSavedSettings;
 
