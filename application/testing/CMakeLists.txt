@@ -525,6 +525,7 @@ f3d_test(NAME TestInteractionAnimationInvert DATA f3d.glb ARGS --animation-speed
 
 # Test temporal anti-aliasing
 f3d_test(NAME TestInteractionTAA DATA suzanne.ply ARGS --anti-aliasing=true --anti-aliasing-mode=taa INTERACTION) #Render;Render...
+f3d_test(NAME TestInteractionTAADolly DATA suzanne.ply ARGS --anti-aliasing=true --anti-aliasing-mode=taa INTERACTION) #Render;Render...;MouseWheelBackwardEvent
 
 # Need SSIM comparison for some reason
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240729)

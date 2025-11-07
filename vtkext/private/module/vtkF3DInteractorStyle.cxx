@@ -264,6 +264,7 @@ void vtkF3DInteractorStyle::Dolly(double factor)
   {
     this->Superclass::Dolly(factor);
   }
+  this->InvokeEvent(vtkCommand::InteractionEvent, nullptr);
 }
 
 //----------------------------------------------------------------------------
