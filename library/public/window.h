@@ -8,23 +8,10 @@
 /// @cond
 #include <string>
 /// @endcond
+#include "F3DNodeInfo.h"
 
 #include <string>
 #include <vector>
-#include <vtkProp.h>
-
-#ifndef NODEINFO_H
-#define NODEINFO_H
-
-struct NodeInfo
-{
-    std::string name;
-    vtkProp* prop = nullptr; 
-    std::vector<NodeInfo> children;
-    std::string displayName;
-};
-
-#endif // NODEINFO_H
 
 namespace f3d
 {
