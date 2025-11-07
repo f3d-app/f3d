@@ -3064,6 +3064,26 @@ void vtkF3DRenderer::SetComponentForColoring(int component)
 }
 
 //----------------------------------------------------------------------------
+namespace
+{
+/**
+ * Helper to get user-controlled visibility from actor's property keys
+ * Returns the user-set visibility if available, otherwise returns defaultValue
+ */
+bool GetUserVisibility(vtkProp* prop, bool defaultValue)
+{
+#if F3D_MODULE_UI
+  vtkInformation* info = prop->GetPropertyKeys();
+  if (info && info->Has(vtkF3DImguiActor::USER_VISIBILITY()))
+  {
+    return info->Get(vtkF3DImguiActor::USER_VISIBILITY()) != 0;
+  }
+#endif
+  return defaultValue;
+}
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureColoring()
 {
   assert(this->Importer);
@@ -3101,53 +3121,16 @@ void vtkF3DRenderer::ConfigureColoring()
         }
       }
       
-      // Check for user visibility override
-#if F3D_MODULE_UI
-      vtkInformation* coloringInfo = coloring.Actor->GetPropertyKeys();
-      if (coloringInfo && coloringInfo->Has(vtkF3DImguiActor::USER_VISIBILITY()))
-      {
-        visible = coloringInfo->Get(vtkF3DImguiActor::USER_VISIBILITY()) != 0;
-      }
-      vtkInformation* originalInfo = coloring.OriginalActor->GetPropertyKeys();
-      if (originalInfo && originalInfo->Has(vtkF3DImguiActor::USER_VISIBILITY()))
-      {
-        coloring.OriginalActor->SetVisibility(originalInfo->Get(vtkF3DImguiActor::USER_VISIBILITY()));
-      }
-      else
-      {
-        coloring.OriginalActor->SetVisibility(!visible);
-      }
-#else
-      coloring.OriginalActor->SetVisibility(!visible);
-#endif
+      // Apply visibility, respecting user overrides
+      visible = GetUserVisibility(coloring.Actor, visible);
       coloring.Actor->SetVisibility(visible);
+      coloring.OriginalActor->SetVisibility(GetUserVisibility(coloring.OriginalActor, !visible));
     }
     else
     {
-      // Check for user visibility override even when not geometriesVisible
-#if F3D_MODULE_UI
-      vtkInformation* coloringInfo = coloring.Actor->GetPropertyKeys();
-      if (coloringInfo && coloringInfo->Has(vtkF3DImguiActor::USER_VISIBILITY()))
-      {
-        coloring.Actor->SetVisibility(coloringInfo->Get(vtkF3DImguiActor::USER_VISIBILITY()));
-      }
-      else
-      {
-        coloring.Actor->SetVisibility(false);
-      }
-      vtkInformation* originalInfo = coloring.OriginalActor->GetPropertyKeys();
-      if (originalInfo && originalInfo->Has(vtkF3DImguiActor::USER_VISIBILITY()))
-      {
-        coloring.OriginalActor->SetVisibility(originalInfo->Get(vtkF3DImguiActor::USER_VISIBILITY()));
-      }
-      else
-      {
-        coloring.OriginalActor->SetVisibility(false);
-      }
-#else
-      coloring.Actor->SetVisibility(false);
-      coloring.OriginalActor->SetVisibility(false);
-#endif
+      // When geometries not visible, hide both unless user-controlled
+      coloring.Actor->SetVisibility(GetUserVisibility(coloring.Actor, false));
+      coloring.OriginalActor->SetVisibility(GetUserVisibility(coloring.OriginalActor, false));
     }
   }
   if (geometriesVisible)

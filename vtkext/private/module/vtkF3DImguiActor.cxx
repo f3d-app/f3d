@@ -326,8 +326,12 @@ vtkStandardNewMacro(vtkF3DImguiActor);
 
 //----------------------------------------------------------------------------
 vtkF3DImguiActor::vtkF3DImguiActor()
-  : Pimpl(new Internals())
 {
+  this->Pimpl = std::make_unique<Internals>();
+  
+  // Initialize deferred render callback
+  this->DeferredRenderCallback->SetCallback(vtkF3DImguiActor::OnDeferredRender);
+  this->DeferredRenderCallback->SetClientData(this);
 }
 
 //----------------------------------------------------------------------------
@@ -400,8 +404,17 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::ReleaseGraphicsResources(vtkWindow* w)
 {
+  // Clean up any pending deferred render observers
+  if (this->RenderWindow)
+  {
+    vtkRenderWindowInteractor* iren = this->RenderWindow->GetInteractor();
+    if (iren)
+    {
+      iren->RemoveObservers(vtkCommand::TimerEvent, this->DeferredRenderCallback);
+    }
+  }
+  
   this->Superclass::ReleaseGraphicsResources(w);
-
   this->Pimpl->Release(vtkOpenGLRenderWindow::SafeDownCast(w));
 }
 
@@ -1080,30 +1093,43 @@ void vtkF3DImguiActor::EndFrame(vtkOpenGLRenderWindow* renWin)
   ImGui::Render();
   this->Pimpl->RenderDrawData(renWin, ImGui::GetDrawData());
   
-  // If visibility changed this frame, schedule a render after this one completes
+  /**
+   * If visibility changed, schedule a deferred render.
+   * 
+   * CRITICAL: We cannot call Render() directly here because we're still inside
+   * the main render loop. Direct rendering would cause reentrancy where:
+   * - Main render is executing
+   * - We call Render() again
+   * - VTK's internal state becomes inconsistent
+   * - Visibility changes don't propagate correctly
+   * 
+   * Solution: Use a one-shot timer to schedule the render for AFTER the current
+   * render completes. The 1ms delay is minimal and ensures clean separation.
+   */
   if (this->VisibilityChangedThisFrame && renWin)
   {
     vtkRenderWindowInteractor* iren = renWin->GetInteractor();
     if (iren)
     {
-      // Use a one-shot timer to defer the render until after the current render completes
-      static vtkSmartPointer<vtkCallbackCommand> renderCallback = nullptr;
-      if (!renderCallback)
-      {
-        renderCallback = vtkSmartPointer<vtkCallbackCommand>::New();
-        renderCallback->SetCallback(
-          [](vtkObject*, unsigned long eventId, void* clientData, void* callData)
-          {
-            vtkRenderWindowInteractor* interactor = static_cast<vtkRenderWindowInteractor*>(clientData);
-            if (interactor && interactor->GetRenderWindow())
-            {
-              interactor->GetRenderWindow()->Render();
-            }
-          });
-      }
-      renderCallback->SetClientData(iren);
-      int timerId = iren->CreateOneShotTimer(1); // 1ms delay
-      iren->AddObserver(vtkCommand::TimerEvent, renderCallback);
+      iren->CreateOneShotTimer(1);
+      iren->AddObserver(vtkCommand::TimerEvent, this->DeferredRenderCallback);
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DImguiActor::OnDeferredRender(vtkObject* caller, unsigned long, void* clientData, void*)
+{
+  auto* self = static_cast<vtkF3DImguiActor*>(clientData);
+  if (self && self->RenderWindow)
+  {
+    // Trigger the deferred render
+    self->RenderWindow->Render();
+    
+    // Remove the observer to prevent accumulation
+    if (vtkRenderWindowInteractor* iren = vtkRenderWindowInteractor::SafeDownCast(caller))
+    {
+      iren->RemoveObserver(self->DeferredRenderCallback);
     }
   }
 }

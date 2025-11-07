@@ -9,11 +9,13 @@
 #define vtkF3DImguiActor_h
 
 #include "vtkF3DUIActor.h"
+#include <vtkCallbackCommand.h>
+#include <vtkNew.h>
 #include <vtkRenderWindow.h>
 #include <vtkProp.h>
 
-
 #include <memory>
+#include <unordered_map>
 
 class vtkOpenGLRenderWindow;
 class vtkWindow;
@@ -52,8 +54,20 @@ private:
   struct Internals;
   std::unique_ptr<Internals> Pimpl;
   vtkRenderWindow* RenderWindow = nullptr;
+  
+  // Track visibility state for each node
   std::unordered_map<vtkProp*, bool> NodeVisibilityState;
+  
+  // Flag to trigger deferred render when visibility changes
   bool VisibilityChangedThisFrame = false;
+  
+  // Callback for deferred rendering (avoids render reentrancy)
+  vtkNew<vtkCallbackCommand> DeferredRenderCallback;
+  
+  /**
+   * Static callback for deferred rendering after visibility changes
+   */
+  static void OnDeferredRender(vtkObject* caller, unsigned long eid, void* clientData, void* callData);
 
 
   /**
