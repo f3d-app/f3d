@@ -49,8 +49,8 @@ public:
     vtkProgressBarWidget* widget;
   };
 
-  void CreateProgressRepresentationAndCallback(
-    ProgressDataStruct* data, vtkImporter* importer, interactor_impl* interactor)
+  static void CreateProgressRepresentationAndCallback(ProgressDataStruct* data,
+    vtkImporter* importer, interactor_impl* interactor, const f3d::color_t color)
   {
     vtkNew<vtkCallbackCommand> progressCallback;
     progressCallback->SetClientData(data);
@@ -82,17 +82,7 @@ public:
     progressRep->SetPosition(0.0, 0.0);
     progressRep->SetPosition2(1.0, 0.0);
     progressRep->SetMinimumSize(0, 5);
-    if (this->Options.ui.loader_color.has_value())
-    {
-      const f3d::color_t color = this->Options.ui.loader_color.value();
-      progressRep->SetProgressBarColor(color[0], color[1], color[2]);
-    }
-    else
-    {
-      const auto [r, g, b] = F3DStyle::GetF3DYellow();
-      progressRep->SetProgressBarColor(r, g, b);
-    }
-    progressRep->DragableOff();
+    progressRep->SetProgressBarColor(color.r(), color.g(), color.b());
     progressRep->DragableOff();
     progressRep->SetShowBorderToOff();
     progressRep->DrawFrameOff();
@@ -129,8 +119,18 @@ public:
     callbackData.widget = progressWidget;
     if (this->Options.ui.loader_progress && this->Interactor)
     {
+      f3d::color_t color;
+      if (!this->Options.ui.loader_color.has_value())
+      {
+        const auto [r, g, b] = F3DStyle::GetF3DYellow();
+        color = color_t(r, g, b);
+      }
+      else
+      {
+        color = this->Options.ui.loader_color.value();
+      }
       scene_impl::internals::CreateProgressRepresentationAndCallback(
-        &callbackData, this->MetaImporter, this->Interactor);
+        &callbackData, this->MetaImporter, this->Interactor, color);
     }
 
     // Update the meta importer, the will only update importers that have not been updated before

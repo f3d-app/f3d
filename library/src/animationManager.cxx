@@ -69,16 +69,17 @@ void animationManager::Initialize()
     progressRep->SetPosition(0.0, 0.0);
     progressRep->SetPosition2(1.0, 0.0);
     progressRep->SetMinimumSize(0, 5);
-    if (this->Options.ui.animation_color.has_value())
+    f3d::color_t color;
+    if (!this->Options.ui.loader_color.has_value())
     {
-      const f3d::color_t color = this->Options.ui.animation_color.value();
-      progressRep->SetProgressBarColor(color[0], color[1], color[2]);
+      const auto [r, g, b] = F3DStyle::GetF3DBlue();
+      color = color_t(r, g, b);
     }
     else
     {
-      const auto [r, g, b] = F3DStyle::GetF3DBlue();
-      progressRep->SetProgressBarColor(r, g, b);
+      color = this->Options.ui.loader_color.value();
     }
+    progressRep->SetProgressBarColor(color.r(), color.g(), color.b());
     progressRep->DrawBackgroundOff();
     progressRep->DragableOff();
     progressRep->SetShowBorderToOff();
