@@ -35,11 +35,17 @@ public:
    */
   void ReleaseGraphicsResources(vtkWindow* window) override;
 
+  /**
+   * Reset the iterations count.
+   */
+  void ResetIterations()
+  {
+    this->HistoryIteration = 0;
+  }
+
 private:
   vtkF3DTAAResolvePass() = default;
   ~vtkF3DTAAResolvePass() override = default;
-
-  void InspectCameraMovement(vtkRenderer* renderer);
 
   vtkSmartPointer<vtkOpenGLFramebufferObject> FrameBufferObject;
   vtkSmartPointer<vtkTextureObject> ColorTexture;
@@ -47,10 +53,6 @@ private:
 
   std::shared_ptr<vtkOpenGLQuadHelper> QuadHelper;
 
-  bool HistoryInitialized = false;
-
-  double LastPosition[3] = { 0.0, 0.0, 0.0 };
-  double LastFocalPoint[3] = { 0.0, 0.0, 0.0 };
-  double LastViewUp[3] = { 0.0, 0.0, 0.0 };
+  int HistoryIteration = 0;
 };
 #endif
