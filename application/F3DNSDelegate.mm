@@ -6,6 +6,8 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-method-return-type"
 #import "AppKit/NSApplication.h"
+#import "AppKit/NSOpenPanel.h"
+#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 #pragma clang diagnostic pop
 
 #import "F3DConfig.h"
@@ -125,13 +127,66 @@
   ShouldHandleFileOpening = true;
 }
 
+- (void)openFileDialogWithAllowedTypes:(NSArray<NSString*>*)allowedTypes
+{
+  NSOpenPanel* openPanel = [NSOpenPanel openPanel];
+
+  [openPanel setCanChooseFiles:YES];
+  [openPanel setCanChooseDirectories:NO];
+  [openPanel setAllowsMultipleSelection:NO];
+
+  NSMutableArray<UTType *> *contentTypes = [NSMutableArray array];
+  for (NSString *type in allowedTypes) 
+  {
+      UTType *utType = [UTType typeWithFilenameExtension:type];
+      if (utType)
+      {
+          [contentTypes addObject:utType];
+      }
+  }
+  openPanel.allowedContentTypes = contentTypes;
+
+  NSModalResponse result = [openPanel runModal];
+  if (result == NSModalResponseOK)
+  {
+    NSURL *selectedFile = [[openPanel URLs] firstObject];
+    if (selectedFile) 
+    {
+      int index = self.Starter->AddFile([[selectedFile path] UTF8String]);
+      if (index > -1)
+      {
+        self.Starter->LoadFileGroup(index);
+      }
+      self.Starter->Render();
+    }
+  }
+}
+
 @end
 
 // ----------------------------------------------------------------------------
+static F3DNSDelegateInternal* delegate = nullptr;
+
 void F3DNSDelegate::InitializeDelegate(F3DStarter* Starter)
 {
-  F3DNSDelegateInternal* delegate = [F3DNSDelegateInternal alloc];
+  delegate = [F3DNSDelegateInternal alloc];
   [NSApplication sharedApplication];
   [NSApp setDelegate:delegate];
   [delegate setStarter:Starter];
+}
+
+void F3DNSDelegate::ShowOpenFileDialog(const char* const* extensions, unsigned long long extensions_len)
+{
+  if (!delegate)
+  {
+    return;
+  }
+
+  NSMutableArray<NSString*>* allowedTypes = [NSMutableArray arrayWithCapacity:extensions_len];
+  for (size_t i = 0; i < extensions_len; ++i)
+  {
+    [allowedTypes addObject:[NSString stringWithUTF8String:extensions[i]]];
+  }
+
+  [delegate openFileDialogWithAllowedTypes:allowedTypes];
 }

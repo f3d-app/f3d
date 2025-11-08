@@ -15,6 +15,7 @@ class F3DNSDelegate
 {
 public:
   static void InitializeDelegate(F3DStarter* Starter);
+  static void ShowOpenFileDialog(const char* const* extensions, unsigned long long extensions_len);
 };
 
 #endif
