@@ -254,7 +254,7 @@ CLI: `--anti-aliasing`.
 
 Set the anti-aliasing technique. Valid options are: `fxaa` (fast), `ssaa` (quality), `taa` (balanced)
 
-CLI: `--anti-aliasing-mode`.
+CLI: `--anti-aliasing`.
 
 ### `render.effect.ambient_occlusion` (_bool_, default: `false`)
 

@@ -60,6 +60,8 @@ static inline const OptionsDict DefaultAppOptions = {
   { "interaction-test-play", "" },
   { "command-script", "" },
   { "frame-rate", "30.0" },
+  { "anti-aliasing", "none" },
+  { "anti-aliasing-mode", "" },
 };
 
 /**
@@ -133,8 +135,6 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "raytracing-denoise", "render.raytracing.denoise" },
   { "translucency-support", "render.effect.translucency_support" },
   { "ambient-occlusion", "render.effect.ambient_occlusion" },
-  { "anti-aliasing", "render.effect.antialiasing.enable" },
-  { "anti-aliasing-mode", "render.effect.antialiasing.mode" },
   { "tone-mapping", "render.effect.tone_mapping" },
   { "final-shader", "render.effect.final_shader" },
   { "textures-transform", "model.textures_transform" },

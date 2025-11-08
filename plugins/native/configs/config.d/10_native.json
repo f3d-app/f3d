@@ -62,7 +62,7 @@
       "interaction-trackball": true,
       "tone-mapping": false,
       "grid": false,
-      "anti-aliasing": false,
+      "anti-aliasing": "none",
       "translucency-support": false
     }
   },
