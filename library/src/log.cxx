@@ -8,6 +8,27 @@
 
 namespace f3d
 {
+namespace detail
+{
+log::VerboseLevel convertLevel(F3DLog::Severity level)
+{
+  switch (level)
+  {
+    case F3DLog::Severity::Debug:
+      return log::VerboseLevel::DEBUG;
+    case F3DLog::Severity::Info:
+      return log::VerboseLevel::INFO;
+    case F3DLog::Severity::Warning:
+      return log::VerboseLevel::WARN;
+    case F3DLog::Severity::Error:
+      return log::VerboseLevel::ERROR;
+    case F3DLog::Severity::Quiet:
+    default:
+      return log::VerboseLevel::QUIET;
+  }
+}
+}
+
 //----------------------------------------------------------------------------
 void log::printInternal(log::VerboseLevel level, const std::string& str)
 {
@@ -113,20 +134,21 @@ log::VerboseLevel log::getVerboseLevel()
 {
   detail::init::initialize();
 
-  switch (F3DLog::VerboseLevel)
+  return detail::convertLevel(F3DLog::VerboseLevel);
+}
+
+//----------------------------------------------------------------------------
+void log::forward(std::function<void(VerboseLevel, const std::string&)> callback)
+{
+  detail::init::initialize();
+
+  if (callback == nullptr)
   {
-    case F3DLog::Severity::Debug:
-      return log::VerboseLevel::DEBUG;
-    case F3DLog::Severity::Info:
-      return log::VerboseLevel::INFO;
-    case F3DLog::Severity::Warning:
-      return log::VerboseLevel::WARN;
-    case F3DLog::Severity::Error:
-      return log::VerboseLevel::ERROR;
-    case F3DLog::Severity::Quiet:
-      return log::VerboseLevel::QUIET;
-    default:
-      return log::VerboseLevel::INFO;
+    F3DLog::Forward(nullptr);
+    return;
   }
+
+  F3DLog::Forward([=](F3DLog::Severity sev, const std::string& msg)
+    { callback(detail::convertLevel(sev), msg); });
 }
 }

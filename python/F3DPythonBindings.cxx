@@ -601,5 +601,6 @@ PYBIND11_MODULE(pyf3d, module)
     .def_static("get_verbose_level", &f3d::log::getVerboseLevel)
     .def_static("set_use_coloring", &f3d::log::setUseColoring)
     .def_static("print", [](f3d::log::VerboseLevel& level, const std::string& message)
-      { f3d::log::print(level, message); });
+      { f3d::log::print(level, message); })
+    .def_static("forward", &f3d::log::forward, py::arg("level"), py::arg("callback"))
 }

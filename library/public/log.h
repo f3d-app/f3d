@@ -4,6 +4,7 @@
 #include "export.h"
 
 /// @cond
+#include <functional>
 #include <sstream>
 #include <string>
 /// @endcond
@@ -110,6 +111,14 @@ public:
    * Get the current verbose level.
    */
   static VerboseLevel getVerboseLevel();
+
+  /**
+   * Set a callback function to forward log messages.
+   * The callback will be invoked with the level and the message string whenever a message is
+   * logged, regardless of the verbose level.
+   * Set to nullptr to disable forwarding.
+   */
+  static void forward(std::function<void(VerboseLevel, const std::string&)> callback);
 
 protected:
   //! @cond
