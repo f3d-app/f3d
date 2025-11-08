@@ -469,11 +469,7 @@ Enable _translucency support_. This is a technique used to correctly render tran
 
 Enable _ambient occlusion_. This is a technique used to improve the depth perception of the object.
 
-### `-a`, `--anti-aliasing` (_bool_, default: `false`)
-
-Enable _anti-aliasing_. This technique is used to reduce aliasing.
-
-### `--anti-aliasing-mode` (_string_, default: `fxaa`)
+### `-a`, `--anti-aliasing` (_string_, default: `fxaa`)
 
 Anti-aliasing method (`fxaa`: fast, `ssaa`: quality, `taa`: balanced)
 
