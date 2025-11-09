@@ -246,7 +246,7 @@
       "type": "bool",
       "default_value": "false"
     },
-    "loader_color": {
+    "loader_progress_color": {
       "type": "color"
     },
     "animation_progress": {

@@ -456,7 +456,7 @@ CLI: `--fps`.
 
 Show a _progress bar_ when loading the file.
 
-### `ui.loader_color` (_color_, optional, **on load**)
+### `ui.loader_progress_color` (_color_, optional, **on load**)
 
 Set loader progress bar color or use default one #FFFFFF if not set.
 

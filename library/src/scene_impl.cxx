@@ -120,14 +120,14 @@ public:
     if (this->Options.ui.loader_progress && this->Interactor)
     {
       f3d::color_t color;
-      if (!this->Options.ui.loader_color.has_value())
+      if (!this->Options.ui.loader_progress_color.has_value())
       {
         const auto [r, g, b] = F3DStyle::GetF3DYellow();
         color = color_t(r, g, b);
       }
       else
       {
-        color = this->Options.ui.loader_color.value();
+        color = this->Options.ui.loader_progress_color.value();
       }
       scene_impl::internals::CreateProgressRepresentationAndCallback(
         &callbackData, this->MetaImporter, this->Interactor, color);
