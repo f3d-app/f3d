@@ -253,7 +253,7 @@
       "type": "bool",
       "default_value": "false"
     },
-    "animation_color": {
+    "animation_progress_color": {
       "type": "color"
     }
   },

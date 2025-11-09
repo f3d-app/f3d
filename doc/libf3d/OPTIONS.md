@@ -467,7 +467,7 @@ CLI: `--progress`.
 Show a _progress bar_ when playing the animation.
 CLI: `--animation-progress`.
 
-### `ui.animation_color` (_color_, optional, **on load**)
+### `ui.animation_progress_color` (_color_, optional, **on load**)
 
 Set animation progress bar color or use default one #788BFF if not set.
 
