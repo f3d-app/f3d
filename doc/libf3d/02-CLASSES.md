@@ -71,12 +71,12 @@ A class to control logging in the libf3d. Simple using the different dedicated m
 
 ## Options class
 
-This class lets you control the behavior of the libf3d. An option is basically a value that can be a optional or not. There is different API to access it, see the exhaustive [doc](OPTIONS.md).
+This class lets you control the behavior of the libf3d. An option is basically a value that can be a optional or not. There is different API to access it, see the exhaustive [doc](03-OPTIONS.md).
 
 ## Reader class
 
-This class is used internally by the [plugin SDK](PLUGINS.md) and is not intended to be used directly.
+This class is used internally by the [plugin SDK](05-PLUGINS.md) and is not intended to be used directly.
 
 ## Plugin class
 
-This class is used internally by the [plugin SDK](PLUGINS.md) and is not intended to be used directly.
+This class is used internally by the [plugin SDK](05-PLUGINS.md) and is not intended to be used directly.
