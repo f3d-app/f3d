@@ -43,11 +43,11 @@ It is open to anyone willing to learn more about open source contribution to F3D
 
 ### 1.5. Sponsor
 
-Sponsor are users that are currently sponsoring the project. They are acknowledged as specified in our [donation page](https://meakk.github.io/f3d-website/thanks).
+Sponsor are users that are currently sponsoring the project. They are acknowledged as specified in our [donation page](https://f3d.app/thanks).
 
 ### 1.6 Industry sponsor
 
-Industry sponsor are company that are currently sponsoring the project. They are acknowledged as specified in our [donation page](https://meakk.github.io/f3d-website/thanks).
+Industry sponsor are company that are currently sponsoring the project. They are acknowledged as specified in our [donation page](https://f3d.app/thanks).
 
 ## 2. Decisions
 
