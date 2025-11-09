@@ -63,7 +63,7 @@ Each of these modules also contains [tests](05-TESTING.md#vtkextensions-layer) i
 
 ## plugins
 
-`plugins` contains [libf3d plugins](../libf3d/05-PLUGINS.md) that are provided by default in the F3D packages. Each of these plugins correspond to a specific dependency and are named accordingly. Each of these plugins provide access to specific readers for specific formats. Without plugins, F3D and the libf3d would not be able to open any file. These plugins can be loaded statically or dynamically, which makes the dependencies truly optional if needed.
+`plugins` contains [libf3d plugins](../libf4d/05-PLUGINS.md) that are provided by default in the F3D packages. Each of these plugins correspond to a specific dependency and are named accordingly. Each of these plugins provide access to specific readers for specific formats. Without plugins, F3D and the libf3d would not be able to open any file. These plugins can be loaded statically or dynamically, which makes the dependencies truly optional if needed.
 
 ## library
 
