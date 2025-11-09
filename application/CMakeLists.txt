@@ -156,8 +156,7 @@ function(f3d_create_exec target_name)
   endif()
 
   if(APPLE)
-    target_link_libraries(${target_name} PRIVATE "-framework Cocoa")
-    target_link_libraries(${target_name} PRIVATE "-framework UniformTypeIdentifiers")
+    target_link_libraries(${target_name} PRIVATE "-framework Cocoa -framework UniformTypeIdentifiers")
   endif()
 
   if(WIN32)

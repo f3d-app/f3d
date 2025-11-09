@@ -2250,7 +2250,7 @@ void F3DStarter::AddCommands()
       {
         for (const auto& ext : info.Extensions)
         {
-#if defined(MAC_OS_X_VERSION_MAX_ALLOWED) && MAC_OS_X_VERSION_MAX_ALLOWED >= 101900
+#if defined(MAC_OS_X_VERSION_MAX_ALLOWED) && MAC_OS_X_VERSION_MAX_ALLOWED >= 1090
           filters.push_back(ext);
 #else
           filters.push_back("*." + ext);
@@ -2268,7 +2268,7 @@ void F3DStarter::AddCommands()
       std::optional<std::string> file = f3d::utils::getEnv("CTEST_OPEN_DIALOG_FILE");
       if (!file.has_value())
       {
-#if defined(MAC_OS_X_VERSION_MAX_ALLOWED) && MAC_OS_X_VERSION_MAX_ALLOWED >= 101900
+#if defined(MAC_OS_X_VERSION_MAX_ALLOWED) && MAC_OS_X_VERSION_MAX_ALLOWED >= 1090
         F3DNSDelegate::ShowOpenFileDialog(cstrings.data(), cstrings.size());
 #else
         char* ptr = tinyfd_openFileDialog("Open File", nullptr, static_cast<int>(cstrings.size()),
