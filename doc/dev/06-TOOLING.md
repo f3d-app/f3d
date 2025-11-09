@@ -26,7 +26,7 @@ Requires `clang` toolchain.
 
 Please note the search bar is not working locally, this is expected.
 
-## How to update the doc using latest master
+## How to generate the doc for latest master
 
 1. Generate and run as described above
 2. Select master: `export F3D_TAG=master`

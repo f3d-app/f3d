@@ -16,7 +16,7 @@ This architecture is reflected by the directories organisation.
 - testing: all testing related resources, does not contain the test themselves
 - **vtkext**: extensions to VTK and related tests, see below
 - webassembly: [webassembly/javascript bindings](../libf3d/04-LANGUAGE_BINDINGS.md#javascript) and [F3DWeb](https://f3d.app/viewer) application code
-- winshellext: shell extension for Windows, provide [thumbnails for Windows](../user/11-DESKTOP_INTEGRATION#windows)
+- winshellext: shell extension for Windows, provide [thumbnails for Windows](../user/11-DESKTOP_INTEGRATION.md#windows)
 
 Here is diagram explaining how some of these parts interact together:
 
@@ -90,6 +90,6 @@ There is also a dedicated `testing` directory which contains all of the [applica
 Although almost everything is contained in the [f3d-app/f3d](https://github.com/f3d-app/f3d) repository, other repositories in the [f3d-app](https://github.com/f3d-app) organisation are handling certains specific tasks in the F3D ecosystem.
 
 - The [f3d-superbuild](https://github.com/f3d-app/f3d-superbuild) handles the packaging and the creation of the binaries provided in the [releases page](https://github.com/f3d-app/f3d/releases).
-- [f3d-media](https://github.com/f3d-app/f3d-media) backups all images and video used in this documentation
+- [f3d-website](https://github.com/f3d-app/f3d-website) contains the website generated from our documentation and deployed [here](https://f3d.app).
 - A collection of actions: [sccache-setup](https://github.com/f3d-app/sccache-setup-action), [lfs-data-cache](https://github.com/f3d-app/lfs-data-cache-action) and [install-mesa-windows](https://github.com/f3d-app/install-mesa-windows-action) used by the CI of F3D
 - A collection of [docker files](https://github.com/f3d-app/f3d-docker-images) used for generating docker images used by the CI of F3D

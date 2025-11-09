@@ -461,6 +461,7 @@ CLI: `--progress`.
 ### `ui.animation_progress` (_bool_, default: `false`, **on load**)
 
 Show a _progress bar_ when playing the animation.
+
 CLI: `--animation-progress`.
 
 ### `ui.metadata` (_bool_, default: `false`)
