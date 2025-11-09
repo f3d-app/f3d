@@ -8,15 +8,15 @@ This architecture is reflected by the directories organisation.
 - doc: this very documentation
 - examples: examples usage of the libf3d and plugin framework in python and C++
 - external: dependencies that are included directly in the code
-- java: [java bindings](/docs/next/libf3d/LANGUAGE_BINDINGS#java-experimental) and associated tests.
-- **library**: the [libf3d](/docs/next/libf3d/OVERVIEW) itself, see below
-- **plugins**: all the [plugins](/docs/next/libf3d/PLUGINS) providing different readers, see below
-- python: [python bindings](/docs/next/libf3d/LANGUAGE_BINDINGS#python) and tests
+- java: [java bindings](../libf3d/04-LANGUAGE_BINDINGS.md#java-experimental) and associated tests.
+- **library**: the [libf3d](../libf3d/01-OVERVIEW.md) itself, see below
+- **plugins**: all the [plugins](../libf3d/05-PLUGINS.md) providing different readers, see below
+- python: [python bindings](../libf3d/04-LANGUAGE_BINDINGS.md#python) and tests
 - resources: all non code, non doc, like icon, configs and such
 - testing: all testing related resources, does not contain the test themselves
 - **vtkext**: extensions to VTK and related tests, see below
-- webassembly: [webassembly/javascript bindings](/docs/next/libf3d/LANGUAGE_BINDINGS#javascript) and [F3DWeb](https://f3d.app/viewer) application code
-- winshellext: shell extension for Windows, provide [thumbnails for Windows](/docs/next/user/DESKTOP_INTEGRATION#windows)
+- webassembly: [webassembly/javascript bindings](../libf3d/04-LANGUAGE_BINDINGS.md#javascript) and [F3DWeb](https://f3d.app/viewer) application code
+- winshellext: shell extension for Windows, provide [thumbnails for Windows](../user/11-DESKTOP_INTEGRATION#windows)
 
 Here is diagram explaining how some of these parts interact together:
 
@@ -63,7 +63,7 @@ Each of these modules also contains [tests](05-TESTING.md#vtkextensions-layer) i
 
 ## plugins
 
-`plugins` contains [libf3d plugins](/docs/next/libf3d/PLUGINS) that are provided by default in the F3D packages. Each of these plugins correspond to a specific dependency and are named accordingly. Each of these plugins provide access to specific readers for specific formats. Without plugins, F3D and the libf3d would not be able to open any file. These plugins can be loaded statically or dynamically, which makes the dependencies truly optional if needed.
+`plugins` contains [libf3d plugins](../libf3d/05-PLUGINS.md) that are provided by default in the F3D packages. Each of these plugins correspond to a specific dependency and are named accordingly. Each of these plugins provide access to specific readers for specific formats. Without plugins, F3D and the libf3d would not be able to open any file. These plugins can be loaded statically or dynamically, which makes the dependencies truly optional if needed.
 
 ## library
 
@@ -75,7 +75,7 @@ Logically, it is structured in 3 parts, `public` which contains the public API h
 
 There is also a dedicated `testing` directory which contains the [unit and functional testing](05-TESTING.md#library-layer) of the libf3d.
 
-It also contains the `options.json` file, which is the file used to generate all [options](/docs/next/libf3d/OPTIONS) code.
+It also contains the `options.json` file, which is the file used to generate all [options](../libf3d/03-OPTIONS.md) code.
 
 ## application
 
