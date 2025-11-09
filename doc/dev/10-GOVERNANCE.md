@@ -1,6 +1,6 @@
 # Governance Policy
 
-This document provides the governance policy for F3D (the "Project"). [Every person](./11-MAINTAINERS_AND_CONTRIBUTORS.md) responsible for its maintenance (the "Maintainers") agrees to this policy and to abide by all Project policies, including the [code of conduct](09-CODE_OF_CONDUCT.md) by adding their name to the [MAINTAINERS_AND_CONTRIBUTORS.md](./11-MAINTAINERS_AND_CONTRIBUTORS.md) file.
+This document provides the governance policy for F3D (the "Project"). [Every person](./11-MAINTAINERS_AND_CONTRIBUTORS.md) responsible for its maintenance (the "Maintainers") agrees to this policy and to abide by all Project policies, including the [code of conduct](../../CODE_OF_CONDUCT.md) by adding their name to the [MAINTAINERS_AND_CONTRIBUTORS.md](./11-MAINTAINERS_AND_CONTRIBUTORS.md) file.
 
 ## 1. Roles
 
@@ -8,7 +8,7 @@ This Project includes the following roles.
 
 ### 1.1. Maintainers
 
-Maintainers are responsible for organizing activities around developing, maintaining, and updating the Project. Maintainers are responsible of upholding the [Code of Conduct](09-CODE_OF_CONDUCT.md). Maintainers are also responsible for determining consensus for technical or community matters. The Project may add or remove Maintainers by affirmative vote of 2/3 of all Maintainers. Maintainers are de-facto moderators. Maintainers are part of the f3d-app github organization with a "owner" role and listed in the [dedicated](11-MAINTAINERS_AND_CONTRIBUTORS.md) file.
+Maintainers are responsible for organizing activities around developing, maintaining, and updating the Project. Maintainers are responsible of upholding the [Code of Conduct](../../CODE_OF_CONDUCT.md). Maintainers are also responsible for determining consensus for technical or community matters. The Project may add or remove Maintainers by affirmative vote of 2/3 of all Maintainers. Maintainers are de-facto moderators. Maintainers are part of the f3d-app github organization with a "owner" role and listed in the [dedicated](11-MAINTAINERS_AND_CONTRIBUTORS.md) file.
 
 Maintainers is an important role and as such, will be evaluated by the community yearly and exit interview may be conducted in case of a Maintainer leaving the role.
 
@@ -16,7 +16,7 @@ Any Returning Contributor interested to become a Maintainer should just reach ou
 
 ### 1.1. Moderators
 
-Moderators are responsible of upholding the [Code of Conduct](09-CODE_OF_CONDUCT.md). Moderators are responsible for determining consensus for community matters. The Project may add or remove Maintainers by affirmative vote of 2/3 of all Maintainers.
+Moderators are responsible of upholding the [Code of Conduct](../../CODE_OF_CONDUCT.md). Moderators are responsible for determining consensus for community matters. The Project may add or remove Maintainers by affirmative vote of 2/3 of all Maintainers.
 
 Anyone interested to become a moderators should just reach out to existing Maintainers for consideration.
 
