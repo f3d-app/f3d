@@ -43,13 +43,13 @@ When provided by the engine, the interactor class lets you choose how to interac
 
 It contains the animation API to start and stop animation as well as recover the number of available animations and their names.
 
-Interactor lets you add, remove and trigger your [commands](../user/COMMANDS.md).
+Interactor lets you add, remove and trigger your [commands](../user/07-COMMANDS.md).
 The commands let you interact with the libf3d in a very flexible manner.
 
 Interactor also lets you add and remove bindings in order to modify how
 the libf3d react to different interactions, eg. when a key is pressed or when a file is dropped.
-The libf3d has [default bindings](../user/INTERACTIONS.md) but this API lets you defined your own
-by specifying [binds](../user/CONFIGURATION_FILE.md#bindings) and commands.
+The libf3d has [default bindings](../user/04-INTERACTIONS.md) but this API lets you defined your own
+by specifying [binds](../user/06-CONFIGURATION_FILE.md#bindings) and commands.
 This API also lets you control the content of the cheatsheet.
 
 Use `log::setVerboseLevel(log::VerboseLevel::DEBUG)` to print debug information on interaction and command use.
@@ -75,8 +75,8 @@ This class lets you control the behavior of the libf3d. An option is basically a
 
 ## Reader class
 
-This class is used internally by the [plugin SDK](PLUGINS.md) and is not intended to be used directly.
+This class is used internally by the [plugin SDK](12-PLUGINS.md) and is not intended to be used directly.
 
 ## Plugin class
 
-This class is used internally by the [plugin SDK](PLUGINS.md) and is not intended to be used directly.
+This class is used internally by the [plugin SDK](12-PLUGINS.md) and is not intended to be used directly.

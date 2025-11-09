@@ -60,7 +60,7 @@ CLI: `--up`.
 
 ### `scene.force_reader` (_string_, optional, **on load**)
 
-Force a specific reader to be used, disregarding the file extension. See [user documentation](../user/SUPPORTED_FORMATS.md).
+Force a specific reader to be used, disregarding the file extension. See [user documentation](../user/02-SUPPORTED_FORMATS.md).
 
 CLI: `--force-reader`.
 
@@ -178,7 +178,7 @@ CLI: `--colormap-discretization`.
 
 ### `model.scivis.colormap` (_colormap_, default: `<inferno>`)
 
-Set a _custom colormap for the coloring_.See [colormap parsing](../user/PARSING.md#colormap) for details.
+Set a _custom colormap for the coloring_.See [colormap parsing](../user/08-PARSING.md#colormap) for details.
 
 CLI: `--colormap`.
 
@@ -270,7 +270,7 @@ CLI: `--tone-mapping`.
 
 ### `render.effect.final_shader` (_string_, optional)
 
-Add a final shader to the output image. See [user documentation](../user/FINAL_SHADER.md).
+Add a final shader to the output image. See [user documentation](../user/10-FINAL_SHADER.md).
 
 CLI: `--final-shader`
 
@@ -524,7 +524,7 @@ It's even more true with the few optional boolean options as std::optional has a
 ## String API
 
 The most generic and flexible API, as it rely on parsing and string generation.
-See the [parsing documentation](../user/PARSING.md) for more details.
+See the [parsing documentation](../user/08-PARSING.md) for more details.
 
 ```cpp
   f3d::engine eng = f3d::engine::create();

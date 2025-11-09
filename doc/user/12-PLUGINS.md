@@ -9,11 +9,11 @@ it's possible that the packager chose to bundle the plugins into different packa
 to list plugin dependencies as optional in order to reduce the number of dependencies of the main package.
 
 In order to open a file that requires a plugin, make sure you've installed all necessary
-dependencies. You can then specify the `--load-plugins=<path or name>` [option](OPTIONS.md)
+dependencies. You can then specify the `--load-plugins=<path or name>` [option](03-OPTIONS.md)
 in the command line to load your plugin.
 
 Alternatively, you can add your plugin directly in the
-[configuration file](CONFIGURATION_FILE.md) if it isn't there already. You can specify one or
+[configuration file](06-CONFIGURATION_FILE.md) if it isn't there already. You can specify one or
 multiple plugins in a single comma-separated list, like in the example below:
 
 ```

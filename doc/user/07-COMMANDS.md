@@ -1,6 +1,6 @@
 # Commands
 
-F3D provides access to commands through [interactive console](#interactive-console), [command script](#command-script---command-script) and [bindings configuration](CONFIGURATION_FILE.md#bindings).
+F3D provides access to commands through [interactive console](#interactive-console), [command script](#command-script---command-script) and [bindings configuration](06-CONFIGURATION_FILE.md#bindings).
 Commands let you trigger specific behavior that may not be available otherwise.
 Please note commands are currently experimental and the behaviors, actions may be added or removed without deprecation.
 Action names and arguments may also change without deprecation.
@@ -23,14 +23,14 @@ The libf3d provides a few commands, many related to manipulating libf3d (options
 
 `print option.name`: A command to print the value of an libf3d option, eg: `print scene.up.direction`.
 
-`set_reader_option Reader.option_name value`: A specific command to set a [reader option](SUPPORTED_FORMATS.md#reader-options), eg: `set_reader_option QuakeMDL.skin_index 1`
+`set_reader_option Reader.option_name value`: A specific command to set a [reader option](02-SUPPORTED_FORMATS.md#reader-options), eg: `set_reader_option QuakeMDL.skin_index 1`
 
 `cycle_anti_aliasing`: A specific command to cycle between the anti-aliasing method (`none`,`fxaa`,`ssaa`,`taa`).
 
 `cycle_animation`: A specific command to cycle `scene.animation.index` option using model information, No argument.
 
 `cycle_coloring field/array/component`: A specific command to manipulate scivis options using model information.
-Supports `field`, `array` or `component` arguments, see [documentation](INTERACTIONS.md#cycling-coloring).
+Supports `field`, `array` or `component` arguments, see [documentation](04-INTERACTIONS.md#cycling-coloring).
 eg: `cycle_coloring array`.
 
 `roll_camera value`: A specific command to roll the camera on its side, takes an angle in degrees as an argument.
@@ -93,10 +93,10 @@ The F3D application provides a few more commands.
 
 `add_current_directories`: A specific command to add all files from the current file or file group directories. No argument.
 
-`take_screenshot [filename]`: A specific command to [take a screenshot](INTERACTIONS.md#taking-screenshots). If filename is not specified,
+`take_screenshot [filename]`: A specific command to [take a screenshot](04-INTERACTIONS.md#taking-screenshots). If filename is not specified,
 rely on the `--screenshot-filename` CLI option. eg: `take_screenshot path/to/file.png`.
 
-`take_minimal_screenshot [filename]`: A specific command to [take a minimal screenshot](INTERACTIONS.md#taking-screenshots). If filename is not specified,
+`take_minimal_screenshot [filename]`: A specific command to [take a minimal screenshot](04-INTERACTIONS.md#taking-screenshots). If filename is not specified,
 rely on the `--screenshot-filename` CLI option. eg: `take_screenshot path/to/file.png`.
 
 `add_files [path/to/file1] [path/to/file2]`: A specific command to add files to the scene according to the current grouping logic. Take one or more files as arguments.
@@ -116,7 +116,7 @@ eg: `add_files_or_set_hdri /path/to/dragon.vtu /path/to/file.hdr`.
 
 ## Command Script (`--command-script`)
 
-F3D provides a feature to execute commands from a script file using the `--command-script` [CLI option](OPTIONS.md). This allows users to automate a sequence of commands by listing them in a plain text file, eg: `f3d --command-script path/to/command_script.txt`.
+F3D provides a feature to execute commands from a script file using the `--command-script` [CLI option](03-OPTIONS.md). This allows users to automate a sequence of commands by listing them in a plain text file, eg: `f3d --command-script path/to/command_script.txt`.
 
 Example Command Script, commands are separated by new lines, comments are supported:
 
@@ -157,4 +157,4 @@ Command syntax is similar to bash, as in they will be split by "token" to be pro
 - Other escaped character will be processed as if the escape was not present, eg: `set scene.up.direction +\Z`
 - Unfinished quoted section is invalid, eg: `set scene.up.direction "+Z`
 - A escape at the end is also invalid, eg: `set scene.up.direction +Z\`
-- Options values are [parsed](PARSING.md) according to their types.
+- Options values are [parsed](08-PARSING.md) according to their types.

@@ -30,7 +30,7 @@ List available _readers_ and exit. Ignore `--verbose`.
 
 ### `--force-reader=<reader>` (_string_)
 
-Force a specific [reader](SUPPORTED_FORMATS.md) to be used, disregarding the file extension.
+Force a specific [reader](02-SUPPORTED_FORMATS.md) to be used, disregarding the file extension.
 
 ### `--list-bindings`
 
@@ -42,7 +42,7 @@ List available _rendering backends_ and exit. Ignore `--verbose`.
 
 ### `--config=<config file path/name/stem>` (_string_, default: `config`)
 
-Specify the [configuration file](CONFIGURATION_FILE.md) to use. Supports absolute/relative path but also filename/filestem to search for in standard configuration file locations.
+Specify the [configuration file](06-CONFIGURATION_FILE.md) to use. Supports absolute/relative path but also filename/filestem to search for in standard configuration file locations.
 
 ### `--no-config` (_bool_, default: `false`)
 
@@ -66,15 +66,15 @@ Frame rate used to refresh animation and other repeated tasks (watch, UI). Does 
 
 ### `--load-plugins=<paths or names>` (_string_)
 
-List of plugins to load separated with a comma. Official plugins are `alembic`, `assimp`, `draco`, `hdf`, `occt`, `usd`, `vdb`. See [plugins](PLUGINS.md) for more info.
+List of plugins to load separated with a comma. Official plugins are `alembic`, `assimp`, `draco`, `hdf`, `occt`, `usd`, `vdb`. See [plugins](12-PLUGINS.md) for more info.
 
 ### `--scan-plugins`
 
-Scan standard directories for plugins and display their names, results may be incomplete. See [plugins](PLUGINS.md) for more info.
+Scan standard directories for plugins and display their names, results may be incomplete. See [plugins](12-PLUGINS.md) for more info.
 
 ### `--screenshot-filename=<png file>` (_string_, default: `{app}/{model}_{n}.png`)
 
-Filename to save [screenshots](INTERACTIONS.md#taking-screenshots) to. Can use [template variables](#filename-templating). Supports relative paths [as described](INTERACTIONS.md#taking-screenshots).
+Filename to save [screenshots](04-INTERACTIONS.md#taking-screenshots) to. Can use [template variables](#filename-templating). Supports relative paths [as described](04-INTERACTIONS.md#taking-screenshots).
 
 ### `--rendering-backend=<auto|egl|osmesa|glx|wgl>` (_string_, default: `auto`)
 
@@ -82,11 +82,11 @@ Rendering backend to load, `auto` means to let F3D pick the correct one for you 
 
 ### `-D`, `--define=<libf3d.option=value>` (_special_)
 
-A repeatable option to set [libf3d](../libf3d/OPTIONS.md) and [reader](SUPPORTED_FORMATS.md#reader-options) option manually. May trigger unexpected behavior.
+A repeatable option to set [libf3d](../libf3d/OPTIONS.md) and [reader](02-SUPPORTED_FORMATS.md#reader-options) option manually. May trigger unexpected behavior.
 
 ### `-R`, `--reset=<libf3d.option>` (_special_)
 
-A repeatable option to reset [libf3d options](../libf3d/OPTIONS.md) manually. Useful when overidding option set in [configuration files](CONFIGURATION_FILE.md).
+A repeatable option to reset [libf3d options](../libf3d/OPTIONS.md) manually. Useful when overidding option set in [configuration files](06-CONFIGURATION_FILE.md).
 
 ## General Options
 
@@ -199,7 +199,7 @@ Scale fonts. Useful for HiDPI displays.
 
 ### `--command-script=<command script>` (_script_)
 
-Provide a script file containing a list of [commands](COMMANDS.md) to be executed sequentially.
+Provide a script file containing a list of [commands](07-COMMANDS.md) to be executed sequentially.
 Allows automation of multiple commands or pre-defined tasks.
 
 ### `--backdrop-opacity=<opacity>` (_double_, default: `0.9`)
@@ -386,12 +386,12 @@ Use with the scalar option.
 ### `--colormap-file=<name>` (_string_)
 
 Set a _colormap file for the coloring_.
-See [color maps](COLOR_MAPS.md).
+See [color maps](09-COLOR_MAPS.md).
 Use with the scalar option.
 
 ### `--colormap=<colormap>` (_colormap_)
 
-Set a _custom colormap for the coloring_.See [colormap parsing](PARSING.md#colormap) for details.
+Set a _custom colormap for the coloring_.See [colormap parsing](08-PARSING.md#colormap) for details.
 Ignored if `--colormap-file` option is specified.
 Use with the scalar option.
 
@@ -483,7 +483,7 @@ Enable generic filmic _Tone Mapping Pass_. This technique is used to map colors 
 
 ### `--final-shader` (_string_)
 
-Add a final shader to the output image. See the [dedicated documentation](FINAL_SHADER.md) for more details.
+Add a final shader to the output image. See the [dedicated documentation](10-FINAL_SHADER.md) for more details.
 
 ## Testing options
 
@@ -521,7 +521,7 @@ The `-R` short option has a special syntax: `-Rlibf3d.option` but can also be us
 
 The `-D/--define` option has a special syntax: `-Dlibf3d.option=value` or `--define=libf3d.option=value`.
 
-All options are parsed according to their type, see the [parsing documentation](PARSING.md) for more details.
+All options are parsed according to their type, see the [parsing documentation](08-PARSING.md) for more details.
 
 ## Filename templating
 

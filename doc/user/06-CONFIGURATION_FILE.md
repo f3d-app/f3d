@@ -2,7 +2,7 @@
 
 ## Options
 
-Almost all the command-line [options](OPTIONS.md) can be controlled using configuration files.
+Almost all the command-line [options](03-OPTIONS.md) can be controlled using configuration files.
 Configuration files uses the "long" version of the command-line options in a JSON
 formatted file to provide values for these options. It is also possible to use
 the [libf3d options](../libf3d/OPTIONS.md) syntax.
@@ -127,8 +127,8 @@ A typical config file with bindings may look like this:
 ```
 
 Here, the first block define new bindings for all and any files.
-It even replace an existing default [interaction](INTERACTIONS.md) on the `O` key with its own.
-Each bind is associated to the [command](COMMANDS.md) to execute when it is pressed.
+It even replace an existing default [interaction](04-INTERACTIONS.md) on the `O` key with its own.
+Each bind is associated to the [command](07-COMMANDS.md) to execute when it is pressed.
 
 In the second block, new bindings are defined for files ending in `.vtu`, and there bindings
 will only be available when loading such a file.
