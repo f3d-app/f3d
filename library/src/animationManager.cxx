@@ -247,6 +247,9 @@ bool animationManager::LoadAtTime(double timeValue)
 
 bool animationManager::LoadAtFrame(int frame)
 {
+  const double frameRate = this->DeltaTime > 0 ? 1 / this->DeltaTime : this->DeltaTime;
+  const vtkIdType currentAnimation = this->PreparedAnimationIndices.value()[0];
+
   this->PrepareForAnimationIndices();
   if (this->PreparedAnimationIndices.value().empty())
   {
@@ -254,11 +257,9 @@ bool animationManager::LoadAtFrame(int frame)
   }
 
   int nbTimeSteps;
-  vtkIdType currentAnimation = this->PreparedAnimationIndices.value()[0];
   vtkNew<vtkDoubleArray> timeSteps;
   const bool tempInfoExists = this->Importer->GetTemporalInformation(
-    currentAnimation, 60, nbTimeSteps, this->TimeRange, timeSteps
-  );
+    currentAnimation, frameRate, nbTimeSteps, this->TimeRange, timeSteps);
 
   if (!tempInfoExists)
   {
@@ -280,19 +281,23 @@ bool animationManager::LoadAtFrame(int frame)
   {
     return false;
   }
+
   this->CurrentTime = std::clamp(
     timeSteps->GetValue(currentFrameIndex + frame), this->TimeRange[0], this->TimeRange[1]);
+
   return this->LoadAtTime(this->CurrentTime);
 }
 
-void animationManager::NextFrame() {
+void animationManager::NextFrame()
+{
   if (this->LoadAtFrame(1))
   {
     this->Window.render();
   }
 }
 
-void animationManager::PreviousFrame() {
+void animationManager::PreviousFrame()
+{
   if (this->LoadAtFrame(-1))
   {
     this->Window.render();
@@ -520,7 +525,9 @@ void animationManager::PrepareForAnimationIndices()
       double timeRange[2];
       int nbTimeSteps;
       vtkNew<vtkDoubleArray> timeSteps;
-      this->Importer->GetTemporalInformation(animIndex, 0, nbTimeSteps, timeRange, timeSteps);
+      const double frameRate = this->DeltaTime > 0 ? 1 / this->DeltaTime : this->DeltaTime;
+      this->Importer->GetTemporalInformation(
+        animIndex, frameRate, nbTimeSteps, timeRange, timeSteps);
 
       // Accumulate time ranges
       this->TimeRange[0] = std::min(timeRange[0], this->TimeRange[0]);
