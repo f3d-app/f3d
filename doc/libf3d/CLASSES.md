@@ -75,8 +75,8 @@ This class lets you control the behavior of the libf3d. An option is basically a
 
 ## Reader class
 
-This class is used internally by the [plugin SDK](12-PLUGINS.md) and is not intended to be used directly.
+This class is used internally by the [plugin SDK](PLUGINS.md) and is not intended to be used directly.
 
 ## Plugin class
 
-This class is used internally by the [plugin SDK](12-PLUGINS.md) and is not intended to be used directly.
+This class is used internally by the [plugin SDK](PLUGINS.md) and is not intended to be used directly.
