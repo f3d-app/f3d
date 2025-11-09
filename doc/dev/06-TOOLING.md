@@ -30,15 +30,15 @@ Please note the search bar is not working locally, this is expected.
 
 1. Generate and run as described above
 2. Select master: `export F3D_TAG=master`
-2. Update the doc: `npm run update-doc`
-3. Refresh the website to see the new doc
+3. Update the doc: `npm run update-doc`
+4. Refresh the website to see the new doc
 
 ## How to update the doc for a new release
 
 1. Generate and run as described above
 2. Select release: `export F3D_TAG=release`
-2. Update the doc: `npm run update-doc`
-3. Add a new versioned doc: `npm run docusaurus docs:version X.Y`
-4. Add `X.Y` in the `docsVersionDropdown` in `docusaurus.config.ts`
-5. Rebuild the website: `npm run start`
-6. Refresh the website to see the new versionned doc
+3. Update the doc: `npm run update-doc`
+4. Add a new versioned doc: `npm run docusaurus docs:version X.Y`
+5. Add `X.Y` in the `docsVersionDropdown` in `docusaurus.config.ts`
+6. Rebuild the website: `npm run start`
+7. Refresh the website to see the new versionned doc

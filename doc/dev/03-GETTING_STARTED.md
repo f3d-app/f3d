@@ -86,9 +86,8 @@ and the internal VCPKG to automatically build the dependencies.
 
 - Download and install a recent version of [Visual Studio 2022 Community Edition][visual-studio]
 
-:::warning
+> [!WARNING]
 > This process has been tested successfully on 17.12 but is known to fail on 17.8
-:::
 
 #### Open the project
 
@@ -96,9 +95,8 @@ and the internal VCPKG to automatically build the dependencies.
 - Select `Clone a repository`
 - Specify the repository address: `https://github.com/f3d-app/f3d.git` and the local directory of your choice
 
-:::warning
+> [!WARNING]
 > The first run will take a while (up to 1 hour) because VTK is compiled twice (in Debug and Release mode)
-:::
 
 #### Build and the project
 
