@@ -50,7 +50,7 @@ public:
   };
 
   static void CreateProgressRepresentationAndCallback(ProgressDataStruct* data,
-    vtkImporter* importer, interactor_impl* interactor, const f3d::color_t color)
+    vtkImporter* importer, interactor_impl* interactor, const f3d::color_t& color)
   {
     vtkNew<vtkCallbackCommand> progressCallback;
     progressCallback->SetClientData(data);
