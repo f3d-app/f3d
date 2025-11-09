@@ -173,12 +173,12 @@ void F3DNSDelegate::InitializeDelegate(F3DStarter* Starter)
   [delegate setStarter:Starter];
 }
 
-void F3DNSDelegate::ShowOpenFileDialog(const char* const* extensions, unsigned long long extensions_len)
+void F3DNSDelegate::ShowOpenFileDialog(const char* const* extensions, unsigned long long extensionsSize)
 {
   F3DNSDelegateInternal* delegate = (F3DNSDelegateInternal*)[NSApp delegate];
 
-  NSMutableArray<NSString*>* allowedTypes = [NSMutableArray arrayWithCapacity:extensions_len];
-  for (size_t i = 0; i < extensions_len; ++i)
+  NSMutableArray<NSString*>* allowedTypes = [NSMutableArray arrayWithCapacity:extensionsSize];
+  for (size_t i = 0; i < extensionsSize; ++i)
   {
     [allowedTypes addObject:[NSString stringWithUTF8String:extensions[i]]];
   }
