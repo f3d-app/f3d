@@ -5,7 +5,7 @@
 Almost all the command-line [options](03-OPTIONS.md) can be controlled using configuration files.
 Configuration files uses the "long" version of the command-line options in a JSON
 formatted file to provide values for these options. It is also possible to use
-the [libf3d options](../libf3d/OPTIONS.md) syntax.
+the [libf3d options](../libf3d/03-OPTIONS.md) syntax.
 
 These options can be organized by block using a regular expression, glob, or exact match
 for each block in order to provide different default values for the different filetypes. For

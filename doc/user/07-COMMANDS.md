@@ -11,7 +11,7 @@ Commands have the following syntax:
 
 ## libf3d provided commands
 
-The libf3d provides a few commands, many related to manipulating libf3d (options)[../libf3d/OPTIONS.md].
+The libf3d provides a few commands, many related to manipulating libf3d (options)[../libf3d/03-OPTIONS.md].
 
 `set option.name values`: A command to set a libf3d option, eg: `set scene.up.direction +Z` or `set render.hdri.file "/path/to/file with spaces.png"`
 

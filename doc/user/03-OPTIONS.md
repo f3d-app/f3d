@@ -82,11 +82,11 @@ Rendering backend to load, `auto` means to let F3D pick the correct one for you 
 
 ### `-D`, `--define=<libf3d.option=value>` (_special_)
 
-A repeatable option to set [libf3d](../libf3d/OPTIONS.md) and [reader](02-SUPPORTED_FORMATS.md#reader-options) option manually. May trigger unexpected behavior.
+A repeatable option to set [libf3d](../libf3d/03-OPTIONS.md) and [reader](02-SUPPORTED_FORMATS.md#reader-options) option manually. May trigger unexpected behavior.
 
 ### `-R`, `--reset=<libf3d.option>` (_special_)
 
-A repeatable option to reset [libf3d options](../libf3d/OPTIONS.md) manually. Useful when overidding option set in [configuration files](06-CONFIGURATION_FILE.md).
+A repeatable option to reset [libf3d options](../libf3d/03-OPTIONS.md) manually. Useful when overidding option set in [configuration files](06-CONFIGURATION_FILE.md).
 
 ## General Options
 

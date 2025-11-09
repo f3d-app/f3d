@@ -15,7 +15,7 @@ This architecture is reflected by the directories organisation.
 - resources: all non code, non doc, like icon, configs and such
 - testing: all testing related resources, does not contain the test themselves
 - **vtkext**: extensions to VTK and related tests, see below
-- webassembly: [webassembly/javascript bindings](/docs/next/libf3d/LANGUAGE_BINDINGS#javascript) and [F3DWeb](https://meakk.github.io/f3d-website/viewer) application code
+- webassembly: [webassembly/javascript bindings](/docs/next/libf3d/LANGUAGE_BINDINGS#javascript) and [F3DWeb](https://f3d.app/viewer) application code
 - winshellext: shell extension for Windows, provide [thumbnails for Windows](/docs/next/user/DESKTOP_INTEGRATION#windows)
 
 Here is diagram explaining how some of these parts interact together:
@@ -54,7 +54,7 @@ Here is diagram explaining how some of these parts interact together:
 `vtkext` contains two [VTK modules](https://docs.vtk.org/en/latest/api/cmake/ModuleSystem.html) that are used extensively in the libf3d. The public one is used in the plugins.
 
 `public` is a VTK module that contains classes and utilities that can be installed as part of the `plugin_sdk` and used by plugins, including externals plugins. `vtkF3DImporter` is a class
-that is specifically made for plugin developers to inherit their importers from. The documentation of this module can be found [here](https://meakk.github.io/f3d-website/docs/next/next/libf3d/VTKEXT_TODO).
+that is specifically made for plugin developers to inherit their importers from. The documentation of this module can be found [here](https://f3d.app/docs/next/category/vtkext-api-reference).
 
 `private` is a VTK module that contains many classes and utilities used by the libf3d to provide all features of F3D, especially the rendering, interactions and UI.
 A notable class is `vtkF3DRenderer` that is responsible to actually add the different actors in the 3D scene.
@@ -83,7 +83,7 @@ It also contains the `options.json` file, which is the file used to generate all
 The most important class in the `F3DStarter` which contains most of the top logic on the application. `F3DOptionsTools` is also notable as it handles most of
 the command line options logic.
 
-There is also a dedicated `testing` directory which contains all of the [applicative testing](TESTING#application-layer) of the F3D application as well as many functional testing of the libf3d.
+There is also a dedicated `testing` directory which contains all of the [applicative testing](05-TESTING.md#application-layer) of the F3D application as well as many functional testing of the libf3d.
 
 ## Other f3d-app repositories
 
