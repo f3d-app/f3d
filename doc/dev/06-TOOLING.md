@@ -41,4 +41,4 @@ Please note the search bar is not working locally, this is expected.
 4. Add a new versioned doc: `npm run docusaurus docs:version X.Y`
 5. Add `X.Y` in the `docsVersionDropdown` in `docusaurus.config.ts`
 6. Rebuild the website: `npm run start`
-7. Refresh the website to see the new versionned doc
+7. Refresh the website to see the new versioned doc
