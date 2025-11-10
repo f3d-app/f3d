@@ -107,6 +107,8 @@ public:
     std::string InteractionTestRecordFile;
     std::string InteractionTestPlayFile;
     std::string CommandScriptFile;
+    std::string AntiAliasing;
+    std::string AntiAliasingMode; // Deprecated
   };
 
   void SetupCamera(const CameraConfiguration& camConf)
@@ -693,8 +695,8 @@ public:
     // Update libf3d options
     this->LibOptions = libOptions;
 
-    // Update options that depends on both app and libf3d options
-    this->UpdateInterdependentOptions();
+    // Update options that requires a custom logic
+    this->UpdateCustomLogicOptions();
   }
 
   template<typename T>
@@ -780,10 +782,40 @@ public:
     this->ParseOption(
       appOptions, "interaction-test-play", this->AppOptions.InteractionTestPlayFile);
     this->ParseOption(appOptions, "command-script", this->AppOptions.CommandScriptFile);
+    this->ParseOption(appOptions, "anti-aliasing", this->AppOptions.AntiAliasing);
+    this->ParseOption(appOptions, "anti-aliasing-mode", this->AppOptions.AntiAliasingMode);
   }
 
-  void UpdateInterdependentOptions()
+  void UpdateCustomLogicOptions()
   {
+    // AntiAliasing is handled in two options in lib
+    if (this->AppOptions.AntiAliasing != "none")
+    {
+      // Handle deprecated boolean option
+      bool deprecatedBooleanOption;
+      if (this->Parse(this->AppOptions.AntiAliasing, deprecatedBooleanOption))
+      {
+        f3d::log::warn("--anti-aliasing is a now a string, please specify the type of "
+                       "anti-aliasing or use the implicit default");
+        this->LibOptions.render.effect.antialiasing.enable = deprecatedBooleanOption;
+      }
+      else
+      {
+        this->LibOptions.render.effect.antialiasing.enable = true;
+        this->LibOptions.render.effect.antialiasing.mode = this->AppOptions.AntiAliasing;
+      }
+    }
+    else
+    {
+      this->LibOptions.render.effect.antialiasing.enable = false;
+    }
+
+    if (!this->AppOptions.AntiAliasingMode.empty())
+    {
+      f3d::log::warn("--anti-aliasing-mode is deprecated");
+      this->LibOptions.render.effect.antialiasing.mode = this->AppOptions.AntiAliasingMode;
+    }
+
     // colormap-file and colormap are interdependent
     const std::string& colorMapFile = this->AppOptions.ColorMapFile;
     if (!colorMapFile.empty())

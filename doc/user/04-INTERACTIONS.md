@@ -31,7 +31,7 @@ See the [coloring cycle](#cycling-coloring) section for more info.
 
 Other options can be toggled directly by pressing the following hotkeys:
 
-- <kbd>W</kbd>: [cycle animations](ANIMATIONS.md#cycling-animations).
+- <kbd>W</kbd>: [cycle animations](05-ANIMATIONS.md#cycling-animations).
 - <kbd>B</kbd>: display of the scalar bar, only when coloring and not using direct scalars.
 - <kbd>V</kbd>: volume rendering, forces coloring.
 - <kbd>I</kbd>: opacity function inversion during volume rendering.
@@ -91,7 +91,7 @@ Other hotkeys and interactions are available:
 - <kbd>Ctrl</kbd> + _Drop_ a file, directory and load it.
 - <kbd>Shift</kbd> + _Drop_ a HDRI and use it, no extensions checks performed.
 
-When loading another file or reloading, options that have been changed interactively are kept as is, except when using [imperative options](CONFIGURATION_FILE.md#imperative-options) in configuration files.
+When loading another file or reloading, options that have been changed interactively are kept as is, except when using [imperative options](06-CONFIGURATION_FILE.md#imperative-options) in configuration files.
 
 ## Cycling Coloring
 
@@ -110,7 +110,7 @@ as specified above.
 
 ## Taking Screenshots
 
-The destination filename used to save the screenshots (created by pressing <kbd>F12</kbd> or <kbd>Ctrl</kbd> + <kbd>F12</kbd>) is configurable (using the `screenshot-filename` option) and can use template variables as described [on the options page](OPTIONS.md#filename-templating).
+The destination filename used to save the screenshots (created by pressing <kbd>F12</kbd> or <kbd>Ctrl</kbd> + <kbd>F12</kbd>) is configurable (using the `screenshot-filename` option) and can use template variables as described [on the options page](03-OPTIONS.md#filename-templating).
 
 Unless the configured filename template is an absolute path, images will be saved in dedicated directories:
 
@@ -118,7 +118,7 @@ Unless the configured filename template is an absolute path, images will be save
 - Linux: `${XDG_PICTURES_DIR}`,`${HOME}`
 - macOS: `${HOME}`
 
-So with default options, which are using [templates](OPTIONS.md#filename-templating), the screenshots will be saved as:
+So with default options, which are using [templates](03-OPTIONS.md#filename-templating), the screenshots will be saved as:
 
 - Windows: `%USERPROFILE%\Pictures\F3D\{model}_{n}.png`
 - Linux: `${XDG_PICTURES_DIR}/F3D/{model}_{n}.png`,`${HOME}/F3D/{model}_{n}.png`
@@ -126,4 +126,4 @@ So with default options, which are using [templates](OPTIONS.md#filename-templat
 
 ## Configuring bindings
 
-It is supported to change all bindings above using a specific syntax in the [configuration file](CONFIGURATION_FILE.md) using [commands](COMMANDS.md).
+It is supported to change all bindings above using a specific syntax in the [configuration file](06-CONFIGURATION_FILE.md) using [commands](07-COMMANDS.md).

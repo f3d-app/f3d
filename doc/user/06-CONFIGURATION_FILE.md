@@ -2,10 +2,10 @@
 
 ## Options
 
-Almost all the command-line [options](OPTIONS.md) can be controlled using configuration files.
+Almost all the command-line [options](03-OPTIONS.md) can be controlled using configuration files.
 Configuration files uses the "long" version of the command-line options in a JSON
 formatted file to provide values for these options. It is also possible to use
-the [libf3d options](../libf3d/OPTIONS.md) syntax.
+the [libf3d options](../libf3d/03-OPTIONS.md) syntax.
 
 These options can be organized by block using a regular expression, glob, or exact match
 for each block in order to provide different default values for the different filetypes. For
@@ -127,8 +127,8 @@ A typical config file with bindings may look like this:
 ```
 
 Here, the first block define new bindings for all and any files.
-It even replace an existing default [interaction](INTERACTIONS.md) on the `O` key with its own.
-Each bind is associated to the [command](COMMANDS.md) to execute when it is pressed.
+It even replace an existing default [interaction](04-INTERACTIONS.md) on the `O` key with its own.
+Each bind is associated to the [command](07-COMMANDS.md) to execute when it is pressed.
 
 In the second block, new bindings are defined for files ending in `.vtu`, and there bindings
 will only be available when loading such a file.
@@ -243,7 +243,7 @@ Existing configuration files are read in order and combined with later entries, 
 - Windows: `[install_dir]\share\f3d\configs\(config.json,.d)`, `%APPDATA%\f3d\(config.json,.d)`
 - macOS: `/usr/local/etc/f3d/config(.json,.d)`, `f3d.app/Contents/Resources/configs/config(.json,.d)`, `${HOME}/Library/Application Support/f3d/config(.json,.d)`
 
-Please note that, on Linux, `XDG_CONFIG_HOME` implementation can fallback on `HOME` environment variables as specified [here](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html).
+Please note that, on Linux, `XDG_CONFIG_HOME` implementation can fallback on `HOME` environment variables as specified [here](https://specifications.freedesktop.org/basedir/latest/).
 
 The binary release will install the default config directory.
 On Linux, they will be installed in `[install_dir]/share/f3d/configs/`, on Windows, they will be installed in `[install_dir]\share\f3d\configs\`, on macOS, it will be installed in the bundle.

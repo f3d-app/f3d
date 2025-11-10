@@ -70,7 +70,7 @@ this include `--animation-time` that first load the initial time before loading 
 
 ## Animation Support Level
 
-The animation support level is listed for each reader [here](SUPPORTED_FORMATS.md).
+The animation support level is listed for each reader [here](02-SUPPORTED_FORMATS.md).
 
 - NONE: Animation is not supported, either by the file format or the implementation
 - UNIQUE: There will never be more then one animation
