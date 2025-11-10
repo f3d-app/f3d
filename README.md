@@ -1,8 +1,8 @@
-[![CI](https://img.shields.io/github/actions/workflow/status/f3d-app/f3d/ci.yml?label=CI&logo=github)](https://github.com/f3d-app/f3d/actions/workflows/ci.yml) [![Packaging](https://img.shields.io/github/actions/workflow/status/f3d-app/f3d-superbuild/nightly.yml?label=Packaging&logo=github)](https://github.com/f3d-app/f3d-superbuild) [![codecov](https://codecov.io/gh/f3d-app/f3d/branch/master/graph/badge.svg?token=siwG82IXK7)](https://codecov.io/gh/f3d-app/f3d) [![Downloads](https://img.shields.io/github/downloads/f3d-app/f3d/total.svg)](https://github.com/f3d-app/f3d/releases) [![Sponsors](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/f3d-app) [![Discord](https://discordapp.com/api/guilds/1046005690809978911/widget.png?style=shield)](https://discord.f3d.app) [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
+[![CI](https://img.shields.io/github/actions/workflow/status/f3d-app/f3d/ci.yml?label=CI&logo=github)](https://github.com/f3d-app/f3d/actions/workflows/ci.yml) [![Packaging](https://img.shields.io/github/actions/workflow/status/f3d-app/f3d-superbuild/nightly.yml?label=Packaging&logo=github)](https://github.com/f3d-app/f3d-superbuild) [![codecov](https://codecov.io/gh/f3d-app/f3d/branch/master/graph/badge.svg?token=siwG82IXK7)](https://codecov.io/gh/f3d-app/f3d) [![Downloads](https://img.shields.io/github/downloads/f3d-app/f3d/total.svg)](https://github.com/f3d-app/f3d/releases) [![Sponsors](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://f3d.app/thanks) [![Discord](https://discordapp.com/api/guilds/1046005690809978911/widget.png?style=shield)](https://discord.f3d.app) [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
 
 # F3D - Fast and minimalist 3D viewer
 
-By Michael Migliore and Mathieu Westphal.
+By the F3D-APP Foundation.
 
 <img src="https://raw.githubusercontent.com/f3d-app/f3d/master/resources/logo.svg" align="left" width="20px"/>
 F3D (pronounced `/fɛd/`) is a fast and minimalist 3D viewer desktop application. It supports many file formats, from digital content to scientific datasets (including glTF, USD, STL, STEP, PLY, OBJ, FBX, Alembic), can show animations and support thumbnails and many rendering and texturing options including real time physically based rendering and raytracing.
@@ -12,7 +12,7 @@ It is fully controllable from the command line and support configuration files. 
 
 F3D also contains the libf3d, a simple library to render meshes, with a C++17 API, Python and Javascript Bindings, and experimental Java bindings.
 
-<img src="https://media.githubusercontent.com/media/f3d-app/f3d-media/95b76c22d927bb24759bbe0246b6260121f2933b/media/typical.png" width="640" />
+<img src="https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/static/images/typical.png" width="640" />
 
 _A typical render by F3D_
 
@@ -20,7 +20,7 @@ _A typical render by F3D_
 
 _Animation of a glTF file within F3D_
 
-<img src="https://user-images.githubusercontent.com/3129530/194735272-5bcd3e7c-a333-41f5-8066-9b0bec9885e8.png" width="640" />
+<img src="https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/static/images/directScalars.png" width="640" />
 
 _A direct scalars render by F3D_
 
@@ -97,7 +97,7 @@ F3D as a community-driven, inclusive and beginner-friendly project. We love to s
 
 # Acknowledgments
 
-F3D was initially created by [Kitware SAS](https://www.kitware.eu/) and is relying on many awesome open source projects, including [VTK](https://vtk.org/), [OCCT](https://dev.opencascade.org/), [Assimp](https://www.assimp.org/), [Alembic](http://www.alembic.io/), [Draco](https://google.github.io/draco/), [OpenUSD](https://openusd.org/release/index.html), [OpenVDB](https://www.openvdb.org/), [OSPRay](https://www.ospray.org/) and [ImGui](https://github.com/ocornut/imgui/).
+F3D was initially created by [Kitware SAS](https://www.kitware.eu/), by Joachim Pouderoux, Michael Migliore and Mathieu Westphal, and is relying on many awesome open source projects, including [VTK](https://vtk.org/), [OCCT](https://dev.opencascade.org/), [Assimp](https://www.assimp.org/), [Alembic](http://www.alembic.io/), [Draco](https://google.github.io/draco/), [OpenUSD](https://openusd.org/release/index.html), [OpenVDB](https://www.openvdb.org/), [OSPRay](https://www.ospray.org/) and [ImGui](https://github.com/ocornut/imgui/).
 
 # License
 

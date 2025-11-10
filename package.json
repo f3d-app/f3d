@@ -25,9 +25,9 @@
     "vtk",
     "stl"
   ],
-  "author": "Michael Migliore and Mathieu Westphal",
+  "author": "F3D-APP Foundation",
   "license": "BSD-3-Clause",
   "bugs": "https://github.com/f3d-app/f3d/issues",
-  "funding": "https://github.com/sponsors/f3d-app",
+  "funding": "https://f3d.app/thanks/",
   "homepage": "https://f3d.app"
 }
