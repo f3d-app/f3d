@@ -246,7 +246,7 @@ CLI: `--blending`.
 
 ### `render.effect.blending.mode` (_string_, default: `ddp`)
 
-Set the blending technique. Valid options are: `ddp` (quality), `sort` (only for gaussians), `stochastic` (fast)
+Set the blending technique. Valid options are: `ddp` (dual depth peeling, quality), `sort` (only for gaussians), `stochastic` (fast)
 
 CLI: `--blending`.
 
