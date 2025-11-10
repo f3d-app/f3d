@@ -266,6 +266,11 @@ bool animationManager::LoadAtFrame(int frame)
   auto it = std::find_if(frameTimes.begin(), frameTimes.end(),
     [&](double step) { return std::abs(step - this->CurrentTime) < tolerance; });
 
+  if (it == frameTimes.end())
+  {
+    return false;
+  }
+
   this->CurrentTime = std::clamp(*(it + frame), this->TimeRange[0], this->TimeRange[1]);
   return this->LoadAtTime(this->CurrentTime);
 }
