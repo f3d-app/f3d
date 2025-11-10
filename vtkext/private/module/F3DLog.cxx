@@ -2,11 +2,21 @@
 
 #include "vtkF3DConsoleOutputWindow.h"
 
+#include <vtkCallbackCommand.h>
+#include <vtkNew.h>
+
+// extern variables
 F3DLog::Severity F3DLog::VerboseLevel = F3DLog::Severity::Info;
+std::function<void(F3DLog::Severity, const std::string&)> F3DLog::Forwarder;
 
 //----------------------------------------------------------------------------
 void F3DLog::Print(Severity sev, const std::string& str)
 {
+  if (F3DLog::Forwarder)
+  {
+    F3DLog::Forwarder(sev, str);
+  }
+
   vtkOutputWindow* win = vtkOutputWindow::GetInstance();
   switch (sev)
   {
@@ -67,4 +77,10 @@ void F3DLog::SetStandardStream(StandardStream mode)
       win->SetDisplayMode(vtkOutputWindow::ALWAYS);
       break;
   }
+}
+
+//----------------------------------------------------------------------------
+void F3DLog::Forward(std::function<void(Severity, const std::string&)> userCallback)
+{
+  F3DLog::Forwarder = std::move(userCallback);
 }

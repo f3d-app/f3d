@@ -595,11 +595,17 @@ PYBIND11_MODULE(pyf3d, module)
     .value("QUIET", f3d::log::VerboseLevel::QUIET)
     .export_values();
 
+  auto forwardWrapper = [](f3d::log::forward_fn_t callback) { f3d::log::forward(callback); };
+
+  module.add_object("forwardcleanup",
+    py::capsule(&forwardWrapper, nullptr, [](PyObject*) { f3d::log::forward(nullptr); }));
+
   log //
     .def_static("set_verbose_level", &f3d::log::setVerboseLevel, py::arg("level"),
       py::arg("force_std_err") = false)
     .def_static("get_verbose_level", &f3d::log::getVerboseLevel)
     .def_static("set_use_coloring", &f3d::log::setUseColoring)
     .def_static("print", [](f3d::log::VerboseLevel& level, const std::string& message)
-      { f3d::log::print(level, message); });
+      { f3d::log::print(level, message); })
+    .def_static("forward", forwardWrapper, py::arg("callback"));
 }
