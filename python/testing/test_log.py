@@ -65,8 +65,6 @@ def test_forward():
     Log.print(Log.VerboseLevel.WARN, "O_o")
     Log.print(Log.VerboseLevel.ERROR, "x_x")
 
-    Log.forward(None) # Workaround exit crash
-
     assert forwarded == {
         Log.VerboseLevel.DEBUG: ["._."],
         Log.VerboseLevel.INFO: ["^_^"],

@@ -113,12 +113,17 @@ public:
   static VerboseLevel getVerboseLevel();
 
   /**
+   * Alias for log forwarder callback.
+   */
+  using forward_fn_t = std::function<void(VerboseLevel, const std::string&)>;
+
+  /**
    * Set a callback function to forward log messages.
    * The callback will be invoked with the level and the message string whenever a message is
    * logged, regardless of the verbose level.
    * Set to nullptr to disable forwarding.
    */
-  static void forward(std::function<void(VerboseLevel, const std::string&)> callback);
+  static void forward(forward_fn_t callback);
 
 protected:
   //! @cond
