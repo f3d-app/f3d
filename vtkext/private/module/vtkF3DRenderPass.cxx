@@ -184,7 +184,7 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
     }
 
     // translucent and volumic
-    vtkF3DRenderer* renderer = vtkF3DRenderer::SafeDownCast(s->GetRenderer());
+    const vtkF3DRenderer* renderer = vtkF3DRenderer::SafeDownCast(s->GetRenderer());
     if (renderer && renderer->GetBlendingMode() == vtkF3DRenderer::BlendingMode::DUAL_DEPTH_PEELING)
     {
       vtkNew<vtkDualDepthPeelingPass> ddpP;

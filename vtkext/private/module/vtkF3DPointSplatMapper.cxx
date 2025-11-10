@@ -323,7 +323,7 @@ void vtkF3DSplatMapperHelper::SortSplats(vtkRenderer* ren)
 //----------------------------------------------------------------------------
 void vtkF3DSplatMapperHelper::RenderPieceDraw(vtkRenderer* ren, vtkActor* actor)
 {
-  vtkF3DRenderer* renderer = vtkF3DRenderer::SafeDownCast(ren);
+  const vtkF3DRenderer* renderer = vtkF3DRenderer::SafeDownCast(ren);
 
   if (renderer->GetBlendingMode() == vtkF3DRenderer::BlendingMode::SORT &&
     vtkShader::IsComputeShaderSupported() && actor->GetForceTranslucent())

@@ -820,17 +820,17 @@ public:
       this->LibOptions.render.effect.antialiasing.mode = this->AppOptions.AntiAliasingMode;
     }
 
+    if (this->AppOptions.Blending != "none")
+    {
+      this->LibOptions.render.effect.blending.enable = true;
+      this->LibOptions.render.effect.blending.mode = this->AppOptions.Blending;
+    }
+
     if (this->AppOptions.TranslucencySupport)
     {
       f3d::log::warn("--translucency-support is deprecated, please use --blending instead");
       this->LibOptions.render.effect.blending.enable = true;
       this->LibOptions.render.effect.blending.mode = "ddp";
-    }
-
-    if (this->AppOptions.Blending != "none")
-    {
-      this->LibOptions.render.effect.blending.enable = true;
-      this->LibOptions.render.effect.blending.mode = this->AppOptions.Blending;
     }
 
     // colormap-file and colormap are interdependent
