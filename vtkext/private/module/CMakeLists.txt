@@ -116,6 +116,10 @@ if(F3D_MODULE_WEBP)
   list(APPEND classes vtkF3DWebPReader)
 endif()
 
+if(F3D_MODULE_CLIP)
+  find_package(clip REQUIRED)
+endif()
+
 if(F3D_MODULE_UI AND NOT F3D_USE_EXTERNAL_IMGUI)
   list(APPEND sources
     "${F3D_SOURCE_DIR}/external/imgui/imgui.cpp"
@@ -147,19 +151,9 @@ if(F3D_MODULE_WEBP)
   vtk_module_link(f3d::vtkextPrivate PRIVATE WebP::webp)
 endif()
 
-# clip
 if(F3D_MODULE_CLIP)
-  # Disable unnecessary clip features
-  set(CLIP_ENABLE_IMAGE OFF CACHE BOOL "Compile clip copy/paste images" FORCE)
-  set(CLIP_X11_WITH_PNG OFF CACHE BOOL "Compile clip copy/paste images in X11" FORCE)
-  set(CLIP_EXAMPLES OFF CACHE BOOL "Compile clip examples" FORCE)
-  set(CLIP_TESTS OFF CACHE BOOL "Compile clip tests" FORCE)
-
-  add_subdirectory(${F3D_SOURCE_DIR}/external/clip ${CMAKE_BINARY_DIR}/external/clip)
-
-  vtk_module_link(f3d::vtkextPrivate PRIVATE clip)
-  vtk_module_include(f3d::vtkextPrivate PRIVATE "${F3D_SOURCE_DIR}/external/clip")
   vtk_module_definitions(f3d::vtkextPrivate PRIVATE F3D_MODULE_CLIP)
+  vtk_module_link(f3d::vtkextPrivate PRIVATE clip::clip)
 endif()
 
 # imgui

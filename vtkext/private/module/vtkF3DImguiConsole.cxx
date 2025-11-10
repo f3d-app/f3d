@@ -248,7 +248,6 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
     this->Pimpl->ClearCompletions();          // Clear completion on hiding
     this->InvokeEvent(vtkF3DImguiConsole::HideEvent);
   }
-
   ImGui::Begin("Console", nullptr, winFlags);
 
   // Log window, will only show if not in minimal mode
@@ -360,19 +359,29 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
     }
   }
 
-  // copy button
-  ImGui::SetCursorPos(ImVec2{ windowWidth - ImGui::CalcTextSize("Copy").x - padding * 2, padding });
-  ImGui::BeginChild("Copy button");
-  if (ImGui::Button("Copy"))
+#ifdef F3D_MODULE_CLIP
+  // the copy button doesn't work without callbacks from the clip module
+  if (!minimal)
   {
-    std::ostringstream oss;
-    for (const auto& [severity, msg] : this->Pimpl->Logs)
+    ImGui::SetCursorPos(
+      ImVec2{ windowWidth - ImGui::CalcTextSize("Copy").x - padding * 2, padding });
+    ImGui::BeginChild("Copy button");
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.25f, 0.25f, 0.25f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.35f, 0.35f, 0.35f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.20f, 0.20f, 0.20f, 1.0f));
+    if (ImGui::Button("Copy"))
     {
-      oss << msg << '\n';
+      std::ostringstream oss;
+      for (const auto& [severity, msg] : this->Pimpl->Logs)
+      {
+        oss << msg << '\n';
+      }
+      ImGui::SetClipboardText(oss.str().c_str());
     }
-    ImGui::SetClipboardText(oss.str().c_str());
+    ImGui::PopStyleColor(3);
+    ImGui::EndChild();
   }
-  ImGui::EndChild();
+#endif
 
   ImGui::End();
 }

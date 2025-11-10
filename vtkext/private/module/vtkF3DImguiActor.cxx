@@ -31,7 +31,10 @@
 #include <vtk_glew.h>
 #endif
 
+#ifdef F3D_MODULE_CLIP
 #include <clip.h>
+#endif
+
 #include <imgui.h>
 #include <numeric>
 #include <optional>
@@ -83,13 +86,20 @@ struct vtkF3DImguiActor::Internals
       io.Fonts->SetTexID((ImTextureID)this->FontTexture.Get());
 
       // Setup copy/paste callbacks
+#ifdef F3D_MODULE_CLIP
+      static std::string imgui_clipboard_storage;
+      io.ClipboardUserData = &imgui_clipboard_storage;
       io.SetClipboardTextFn = [](void* user_data, const char* text) { clip::set_text(text); };
       io.GetClipboardTextFn = [](void* user_data) -> const char*
       {
-        std::string text;
-        clip::get_text(text);
-        return text.c_str();
+        auto storage = static_cast<std::string*>(user_data);
+        if (!clip::get_text(*storage))
+        {
+          storage->clear();
+        }
+        return storage->c_str();
       };
+#endif
 
       // Create VBO
       this->VertexBuffer = vtkSmartPointer<vtkOpenGLBufferObject>::New();
