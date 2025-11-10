@@ -464,7 +464,7 @@ _Denoise_ the image when using raytracing.
 ### `-p`, `--blending` (_string_, default: `ddp`)
 
 Enable _translucency blending support_.
-This is a technique used to correctly render translucent objects (`ddp`: quality, `sort`: gaussians, `stochastic`: fast).
+This is a technique used to correctly render translucent objects (`ddp`: dual depth peeling for quality, `sort`: for gaussians, `stochastic`: fast).
 
 > [!WARNING]
 > `stochastic` is introducing a lot of noise with strong translucency.
