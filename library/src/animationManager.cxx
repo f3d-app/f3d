@@ -250,28 +250,20 @@ bool animationManager::LoadAtFrame(int frame)
   const double frameRate = this->DeltaTime > 0 ? 1 / this->DeltaTime : this->DeltaTime;
   const vtkIdType currentAnimation = this->PreparedAnimationIndices.value()[0];
 
-  this->PrepareForAnimationIndices();
-  if (this->PreparedAnimationIndices.value().empty())
+  if (this->AnimationFrameTimes.empty())
   {
-    return false;
+    this->PreparedAnimationIndices.reset();
+    this->PrepareForAnimationIndices();
   }
 
   int nbTimeSteps;
-  vtkNew<vtkDoubleArray> timeSteps;
-  const bool tempInfoExists = this->Importer->GetTemporalInformation(
-    currentAnimation, frameRate, nbTimeSteps, this->TimeRange, timeSteps);
-
-  if (!tempInfoExists)
-  {
-    return false;
-  }
+  std::vector<double> timeSteps = this->AnimationFrameTimes[currentAnimation];
 
   int currentFrameIndex = -1;
   const double tolerance = 1e-6;
-  const vtkIdType numTuples = timeSteps->GetNumberOfTuples();
-  for (vtkIdType i = 0; i < numTuples; ++i)
+  for (unsigned int i = 0; i < timeSteps.size(); ++i)
   {
-    if (std::abs(timeSteps->GetValue(i) - this->CurrentTime) < tolerance)
+    if (std::abs(timeSteps[i] - this->CurrentTime) < tolerance)
     {
       currentFrameIndex = i;
       break;
@@ -282,8 +274,8 @@ bool animationManager::LoadAtFrame(int frame)
     return false;
   }
 
-  this->CurrentTime = std::clamp(
-    timeSteps->GetValue(currentFrameIndex + frame), this->TimeRange[0], this->TimeRange[1]);
+  this->CurrentTime =
+    std::clamp(timeSteps[currentFrameIndex + frame], this->TimeRange[0], this->TimeRange[1]);
 
   return this->LoadAtTime(this->CurrentTime);
 }
@@ -528,6 +520,17 @@ void animationManager::PrepareForAnimationIndices()
       const double frameRate = this->DeltaTime > 0 ? 1 / this->DeltaTime : this->DeltaTime;
       this->Importer->GetTemporalInformation(
         animIndex, frameRate, nbTimeSteps, timeRange, timeSteps);
+
+      if (nbTimeSteps)
+      {
+        std::vector<double> frameTimes;
+        frameTimes.resize(nbTimeSteps);
+        for (unsigned int i = 0; i < nbTimeSteps; ++i)
+        {
+          frameTimes[i] = timeSteps->GetValue(i);
+        }
+        this->AnimationFrameTimes.push_back(frameTimes);
+      }
 
       // Accumulate time ranges
       this->TimeRange[0] = std::min(timeRange[0], this->TimeRange[0]);
