@@ -1,6 +1,8 @@
 import subprocess
 import sys
 
+from f3d import Log
+
 
 def test_default_level():
     assert (
@@ -48,6 +50,29 @@ def test_get_verbose_level():
         )
         == "True\nTrue\n"
     )
+
+
+def test_forward():
+    forwarded: dict[Log.VerboseLevel, list[str]] = {}
+    def forward(level: Log.VerboseLevel, message: str):
+        forwarded.setdefault(level, []).append(message)
+
+    Log.forward(forward)
+    Log.set_verbose_level(Log.VerboseLevel.DEBUG)
+
+    Log.print(Log.VerboseLevel.DEBUG, "._.")
+    Log.print(Log.VerboseLevel.INFO, "^_^")
+    Log.print(Log.VerboseLevel.WARN, "O_o")
+    Log.print(Log.VerboseLevel.ERROR, "x_x")
+
+    Log.forward(None) # Workaround exit crash
+
+    assert forwarded == {
+        Log.VerboseLevel.DEBUG: ["._."],
+        Log.VerboseLevel.INFO: ["^_^"],
+        Log.VerboseLevel.WARN: ["O_o"],
+        Log.VerboseLevel.ERROR: ["x_x"],
+    }
 
 
 def run_python(*statements: str):
