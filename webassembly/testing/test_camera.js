@@ -34,8 +34,33 @@ const settings = {
     utils.assert(utils.numArrayEquals(camera.viewUp, [0, 0, 1], 0.01));
     utils.assert(Math.abs(camera.viewAngle - 70) < 0.01);
 
+    // Save default state
     camera.setCurrentAsDefault();
 
+    // Test getYaw and getElevation
+    console.log("\nInitial angles:");
+    console.log("Yaw:", camera.getYaw());
+    console.log("Elevation:", camera.getElevation());
+    console.log("Azimuth:", camera.getAzimuth());
+
+    // Test yaw rotation
+    camera.yaw(45);
+    console.log("Yaw:", camera.getYaw());
+    console.log("Elevation:", camera.getElevation());
+
+    utils.assert(Math.abs(camera.getYaw() - 45) < 0.01, "Yaw should be 45 after yaw(45)");
+    utils.assert(Math.abs(camera.getElevation()) < 0.01, "Elevation should remain 0");
+
+    // Test elevation rotation
+    // camera.resetToDefault();
+    // camera.elevation(30);
+    // utils.assert(Math.abs(camera.getYaw()) < 0.01, "Yaw should remain 0");
+    // utils.assert(Math.abs(camera.getElevation() - 30) < 0.01, "Elevation should be 30");
+
+    // Reset to default state
+    camera.resetToDefault();
+
+    // Continue with existing test
     camera.resetToBounds(0.9);
 
     // just call every control function

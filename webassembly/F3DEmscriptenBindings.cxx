@@ -271,6 +271,9 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function("yaw", &f3d::camera::yaw, emscripten::return_value_policy::reference())
     .function("elevation", &f3d::camera::elevation, emscripten::return_value_policy::reference())
     .function("pitch", &f3d::camera::pitch, emscripten::return_value_policy::reference())
+    .function("getYaw", &f3d::camera::getYaw)
+    .function("getAzimuth", &f3d::camera::getAzimuth)
+    .function("getElevation", &f3d::camera::getElevation)
     .function("setCurrentAsDefault", &f3d::camera::setCurrentAsDefault,
       emscripten::return_value_policy::reference())
     .function(
