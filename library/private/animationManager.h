@@ -139,7 +139,7 @@ private:
   int AvailAnimations = 0;
 
   std::optional<std::vector<int>> PreparedAnimationIndices;
-  std::vector<std::vector<double>> AnimationFrameTimes;
+  std::vector<vtkSmartPointer<vtkDoubleArray>> AnimationFrameTimes;
   double TimeRange[2] = { 0.0, 0.0 };
   bool Playing = false;
   double CurrentTime = 0;
