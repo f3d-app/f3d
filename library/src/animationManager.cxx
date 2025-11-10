@@ -84,6 +84,7 @@ void animationManager::Initialize()
 
   // Reset animation indices before updating
   this->PreparedAnimationIndices.reset();
+  this->AnimationFrameTimes.clear();
   this->PrepareForAnimationIndices();
 
   if (this->AvailAnimations == 0)
