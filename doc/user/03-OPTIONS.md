@@ -240,7 +240,7 @@ Model-specified by default.
 ### `--opacity=<opacity>` (_double_)
 
 Set _opacity_ on the geometry. Multiplied with the base color texture when present.
-Model-specified by default. Usually used with `--translucency-support`.
+Model-specified by default. Usually used with `--blending`.
 
 ### `--roughness=<roughness>` (_double_)
 
@@ -461,13 +461,10 @@ _Denoise_ the image when using raytracing.
 
 ## PostFX (OpenGL) options
 
-### `-p`, `--translucency-support` (_bool_, default: `false`)
+### `-p`, `--blending` (_string_, default: `ddp`)
 
-Enable _translucency support_. This is a technique used to correctly render translucent objects.
-
-### `-p`, `--translucency-support-mode` (_string_, default: `ddp`)
-
-Translucency support method (`ddp`: quality, `sort`: gaussians, `stochastic`: fast).
+Enable _translucency blending support_.
+This is a technique used to correctly render translucent objects (`ddp`: quality, `sort`: gaussians, `stochastic`: fast).
 
 > [!WARNING]
 > `stochastic` is introducing a lot of noise with strong translucency.

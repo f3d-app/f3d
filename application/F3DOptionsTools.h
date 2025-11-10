@@ -62,6 +62,8 @@ static inline const OptionsDict DefaultAppOptions = {
   { "frame-rate", "30.0" },
   { "anti-aliasing", "none" },
   { "anti-aliasing-mode", "" },
+  { "translucency-support", "0" },
+  { "blending", "none" },
 };
 
 /**
@@ -133,8 +135,6 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "raytracing", "render.raytracing.enable" },
   { "raytracing-samples", "render.raytracing.samples" },
   { "raytracing-denoise", "render.raytracing.denoise" },
-  { "translucency-support", "render.effect.blending.enable" },
-  { "translucency-support-mode", "render.effect.blending.mode" },
   { "ambient-occlusion", "render.effect.ambient_occlusion" },
   { "tone-mapping", "render.effect.tone_mapping" },
   { "final-shader", "render.effect.final_shader" },

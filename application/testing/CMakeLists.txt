@@ -281,7 +281,7 @@ f3d_test(NAME TestMultiFileAnimationNoAnimationSupport DATA f3d.glb world.obj AR
 f3d_test(NAME TestAnimationAutoplay DATA InterpolationTest.glb ARGS --animation-autoplay)
 f3d_test(NAME TestMaxSizeBelow DATA suzanne.stl ARGS --max-size=1)
 f3d_test(NAME TestMaxSizeAbove DATA WaterBottle.glb ARGS --max-size=0.2 REGEXP "file is bigger than max size" NO_BASELINE)
-f3d_test(NAME TestMaxSizeAboveMultiFile DATA suzanne.obj WaterBottle.glb ARGS --multi-file-mode=all --max-size=0.6 --translucency-support --opacity=0.5)
+f3d_test(NAME TestMaxSizeAboveMultiFile DATA suzanne.obj WaterBottle.glb ARGS --multi-file-mode=all --max-size=0.6 --blending --opacity=0.5)
 f3d_test(NAME TestAlternativeOptionSyntax DATA WaterBottle.glb ARGS --max-size 0.2 REGEXP "file is bigger than max size" NO_BASELINE)
 f3d_test(NAME TestNonExistentFile DATA nonExistentFile.vtp ARGS --filename WILL_FAIL)
 f3d_test(NAME TestUnsupportedFile DATA unsupportedFile.dummy ARGS --filename WILL_FAIL)
@@ -308,9 +308,10 @@ f3d_test(NAME TestConfigOrder DATA suzanne.ply ARGS CONFIG ${F3D_SOURCE_DIR}/tes
 f3d_test(NAME TestOutputStream DATA suzanne.ply ARGS --verbose=quiet --output=- REGEXP ".PNG" NO_BASELINE NO_OUTPUT)
 f3d_test(NAME TestOutputStreamInfo DATA suzanne.ply ARGS --verbose=info --output=- REGEXP "redirected to stderr" NO_BASELINE NO_OUTPUT)
 f3d_test(NAME TestInvalidAntiAliasingMode DATA suzanne.ply ARGS --anti-aliasing=foo REGEXP "foo is an invalid antialiasing mode" NO_BASELINE)
-f3d_test(NAME TestInvalidBlendingMode DATA suzanne.ply ARGS --blending=foo REGEXP "foo is an invalid blending mode" NO_BASELINE)
 f3d_test(NAME TestAntiAliasingModeDeprecated DATA suzanne.ply ARGS -a --anti-aliasing-mode=ssaa REGEXP "--anti-aliasing-mode is deprecated" NO_BASELINE)
 f3d_test(NAME TestAntiAliasingDeprecated DATA suzanne.ply ARGS --anti-aliasing=true REGEXP "please specify the type of anti-aliasing" NO_BASELINE)
+f3d_test(NAME TestTranslucencySupportDeprecated DATA suzanne.ply ARGS --translucency-support REGEXP "--translucency-support is deprecated" NO_BASELINE)
+f3d_test(NAME TestInvalidBlendingMode DATA suzanne.ply ARGS --blending=foo REGEXP "foo is an invalid blending mode" NO_BASELINE)
 f3d_test(NAME TestUserMatrixColoring DATA InterpolationTest.glb ARGS --scalar-coloring --coloring-array=TEXCOORD_0)
 f3d_test(NAME TestSkinColoring DATA SimpleSkin.gltf ARGS --scalar-coloring --coloring-array=WEIGHTS_0)
 f3d_test(NAME TestMorphColoring DATA SimpleMorph.gltf ARGS --scalar-coloring)
@@ -394,7 +395,7 @@ endif()
 set_tests_properties(f3d::TestScreenshotUserModelN PROPERTIES ENVIRONMENT "XDG_PICTURES_DIR=${_screenshot_user_dir};HOME=${_screenshot_user_dir};USERPROFILE=${_screenshot_user_dir}")
 
 if(NOT APPLE OR VTK_VERSION VERSION_GREATER_EQUAL 9.3.0)
-  f3d_test(NAME TestTextureColor DATA WaterBottle.glb ARGS --texture-base-color=${F3D_SOURCE_DIR}/testing/data/albedo_mod.png --translucency-support)
+  f3d_test(NAME TestTextureColor DATA WaterBottle.glb ARGS --texture-base-color=${F3D_SOURCE_DIR}/testing/data/albedo_mod.png --blending)
 endif()
 
 # Needs SSBO: https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10675
@@ -415,25 +416,25 @@ endif()
 # Needs splat sorting with compute shaders
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240203)
   if(NOT APPLE) # MacOS does not support compute shaders
-    f3d_test(NAME Test3DGaussiansSplatting DATA small.splat ARGS -osyp --up=-Y --point-sprites-size=1 --point-sprites-type=gaussian --translucency-support-mode=sort --camera-position=-3.6,0.5,-4.2)
+    f3d_test(NAME Test3DGaussiansSplatting DATA small.splat ARGS -osyp --up=-Y --point-sprites-size=1 --point-sprites-type=gaussian --blending=sort --camera-position=-3.6,0.5,-4.2)
     f3d_test(NAME TestDefaultConfigFileSPLAT DATA small.splat CONFIG config_build LONG_TIMEOUT UI)
     f3d_test(NAME TestThumbnailConfigFileSPLAT DATA small.splat CONFIG thumbnail_build LONG_TIMEOUT)
 
-    f3d_test(NAME Test3DGSPLY DATA bonsai_small.ply ARGS -osyp --up=-Y --point-sprites-size=1 --point-sprites-type=gaussian --translucency-support-mode=sort --camera-position=-2.6,0.5,-3.2)
-    f3d_test(NAME Test3DGSPLYHDRI DATA bonsai_small.ply HDRI shanghai_bund_1k.hdr ARGS -osyp --up=-Y --point-sprites-size=1 --point-sprites-type=gaussian --translucency-support-mode=sort --camera-position=-2.6,0.5,-3.2)
+    f3d_test(NAME Test3DGSPLY DATA bonsai_small.ply ARGS -osyp --up=-Y --point-sprites-size=1 --point-sprites-type=gaussian --blending=sort --camera-position=-2.6,0.5,-3.2)
+    f3d_test(NAME Test3DGSPLYHDRI DATA bonsai_small.ply HDRI shanghai_bund_1k.hdr ARGS -osyp --up=-Y --point-sprites-size=1 --point-sprites-type=gaussian --blending=sort --camera-position=-2.6,0.5,-3.2)
 
-    f3d_test(NAME TestSPZDegree0 DATA hornedlizard_small_d0.spz ARGS -osyp --point-sprites-size=1 --point-sprites-type=gaussian --translucency-support-mode=sort --camera-position=-3.6,0.5,4.2)
+    f3d_test(NAME TestSPZDegree0 DATA hornedlizard_small_d0.spz ARGS -osyp --point-sprites-size=1 --point-sprites-type=gaussian --blending=sort --camera-position=-3.6,0.5,4.2)
     f3d_test(NAME TestInvalidSH DATA invalidSH.vtp ARGS -osyp --verbose REGEXP "Spherical harmonics array is not valid" NO_BASELINE)
 
     # Needs texture array support: https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12112
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250513)
-      f3d_test(NAME TestSPZDegree1 DATA hornedlizard_small_d1.spz ARGS -osyp --point-sprites-size=1 --point-sprites-type=gaussian --translucency-support-mode=sort --camera-position=-3.6,0.5,4.2)
-      f3d_test(NAME TestSPZDegree2 DATA hornedlizard_small_d2.spz ARGS -osyp --point-sprites-size=1 --point-sprites-type=gaussian --translucency-support-mode=sort --camera-position=-3.6,0.5,4.2)
-      f3d_test(NAME TestSPZDegree3 DATA hornedlizard_small_d3.spz ARGS -osyp --point-sprites-size=1 --point-sprites-type=gaussian --translucency-support-mode=sort --camera-position=-3.6,0.5,4.2)
+      f3d_test(NAME TestSPZDegree1 DATA hornedlizard_small_d1.spz ARGS -osyp --point-sprites-size=1 --point-sprites-type=gaussian --blending=sort --camera-position=-3.6,0.5,4.2)
+      f3d_test(NAME TestSPZDegree2 DATA hornedlizard_small_d2.spz ARGS -osyp --point-sprites-size=1 --point-sprites-type=gaussian --blending=sort --camera-position=-3.6,0.5,4.2)
+      f3d_test(NAME TestSPZDegree3 DATA hornedlizard_small_d3.spz ARGS -osyp --point-sprites-size=1 --point-sprites-type=gaussian --blending=sort --camera-position=-3.6,0.5,4.2)
 
       f3d_test(NAME TestDefaultConfigFileSPZ DATA hornedlizard_small_d3.spz CONFIG config_build LONG_TIMEOUT UI)
       f3d_test(NAME TestThumbnailConfigFileSPZ DATA hornedlizard_small_d3.spz CONFIG thumbnail_build LONG_TIMEOUT)
-      f3d_test(NAME TestSPZVersion3 DATA bonsai.spz ARGS -osyp --up=-Y --point-sprites-size=1 --point-sprites-type=gaussian --translucency-support-mode=sort --camera-position=-2.6,0.5,-3.2)
+      f3d_test(NAME TestSPZVersion3 DATA bonsai.spz ARGS -osyp --up=-Y --point-sprites-size=1 --point-sprites-type=gaussian --blending=sort --camera-position=-2.6,0.5,-3.2)
       f3d_test(NAME TestSPZCorruptedGZIP DATA wrong_spz_gzip_corrupted.spz ARGS -osyp --verbose REGEXP "Invalid GZIP file" NO_BASELINE)
       f3d_test(NAME TestSPZTruncatedGZIP DATA truncated_gzip.spz ARGS -osyp --verbose REGEXP "Invalid GZIP file" NO_BASELINE)
       f3d_test(NAME TestWrongSPZMagic DATA wrong_spz_magic.spz ARGS -osyp --verbose REGEXP "Incompatible SPZ header" NO_BASELINE)
@@ -444,7 +445,7 @@ endif()
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10662
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20231102)
-  f3d_test(NAME Test3DGaussiansSplattingStochastic DATA small.splat ARGS -osyp --up=-Y --point-sprites-size=1 --point-sprites-type=gaussian --translucency-support-mode=stochastic --camera-position=-3.6,0.5,-4.2)
+  f3d_test(NAME Test3DGaussiansSplattingStochastic DATA small.splat ARGS -osyp --up=-Y --point-sprites-size=1 --point-sprites-type=gaussian --blending=stochastic --camera-position=-3.6,0.5,-4.2)
 endif()
 
 # Test plugin fail code path
@@ -501,7 +502,7 @@ if(NOT F3D_MACOS_BUNDLE)
   f3d_test(NAME TestThumbnailConfigFileQuakeMDL DATA zombie.mdl CONFIG thumbnail_build LONG_TIMEOUT TONE_MAPPING)
 endif()
 
-f3d_test(NAME TestTextureColorWithOptions DATA WaterBottle.glb ARGS --texture-base-color=${F3D_SOURCE_DIR}/testing/data/albedo_mod.png --color=1,1,0 --opacity=0.4 --translucency-support)
+f3d_test(NAME TestTextureColorWithOptions DATA WaterBottle.glb ARGS --texture-base-color=${F3D_SOURCE_DIR}/testing/data/albedo_mod.png --color=1,1,0 --opacity=0.4 --blending)
 f3d_test(NAME TestGLTFImporterUnlit DATA UnlitTest.glb)
 f3d_test(NAME TestMaterial DATA suzanne.ply ARGS --color=0.72,0.45,0.2 --metallic=0.7 --roughness=0.2)
 f3d_test(NAME TestMaterialFullScene DATA WaterBottle.glb ARGS --color=0.9,0.1,0.1 --metallic=0.7 --roughness=0.2)
@@ -593,7 +594,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240910)
   f3d_test(NAME TestInvalidFileFileNameEmpty DATA invalid.vtp ARGS --filename NO_DATA_FORCE_RENDER UI)
   f3d_test(NAME TestMultiFileInvalid DATA cow.vtp invalid.vtp dragon.vtu ARGS --multi-file-mode=all NO_DATA_FORCE_RENDER UI)
   f3d_test(NAME TestMultiFileUnsupportedFilesFileName DATA unsupportedFile.dummy cow.vtp ARGS --multi-file-mode=all --filename NO_DATA_FORCE_RENDER UI)
-  f3d_test(NAME TestMultiFileCameraIndex DATA Cameras.gltf CameraAnimated.glb ARGS --multi-file-mode=all --camera-index=2 --opacity=0.5 --translucency-support)
+  f3d_test(NAME TestMultiFileCameraIndex DATA Cameras.gltf CameraAnimated.glb ARGS --multi-file-mode=all --camera-index=2 --opacity=0.5 --blending)
   f3d_test(NAME TestConsoleBadgeError DATA invalid.vtp NO_DATA_FORCE_RENDER UI)
 endif()
 

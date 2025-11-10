@@ -242,13 +242,13 @@ CLI: `--textures-transform`.
 
 Enable _blending support_. This is a technique used to correctly render translucent objects.
 
-CLI: `--translucency-support`.
+CLI: `--blending`.
 
-### `render.effect.blending.mode` (_bool_, default: `ddp`)
+### `render.effect.blending.mode` (_string_, default: `ddp`)
 
 Set the blending technique. Valid options are: `ddp` (quality), `sort` (only for gaussians), `stochastic` (fast)
 
-CLI: `--translucency-support-mode`.
+CLI: `--blending`.
 
 ### `render.effect.antialiasing.enable` (_string_, default: `false`)
 

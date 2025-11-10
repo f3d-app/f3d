@@ -28,7 +28,7 @@
     "options": {
       "scalar-coloring": true,
       "coloring-component": "-2",
-      "translucency-support": true
+      "blending": "ddp"
     }
   },
   {
