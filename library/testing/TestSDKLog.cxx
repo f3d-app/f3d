@@ -15,7 +15,7 @@ int TestSDKLog([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   // Test forwarding
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::QUIET);
   f3d::log::forward(
-    [&](f3d::log::VerboseLevel, const std::string&) { std::cerr << "Test Forward" << std::endl; });
+    [&](f3d::log::VerboseLevel, const std::string&) { std::cerr << "Test Forward\n"; });
   f3d::log::error("xxx");
   f3d::log::forward(nullptr);
 
