@@ -1,0 +1,38 @@
+on:
+  pull_request_target:
+    types: [assigned, opened, synchronize, reopened, labeled]
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+name: Build website
+jobs:
+  #----------------------------------------------------------------------------
+  # Build website
+  #----------------------------------------------------------------------------
+  build_website:
+    name: Build website
+    if: |
+      contains(github.event.pull_request.labels.*.name, 'ci:fast') ||
+      contains(github.event.pull_request.labels.*.name, 'ci:main') ||
+      contains(github.event.pull_request.labels.*.name, 'ci:full')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set WEBSITE_SKIP_DEPLOY
+        shell: bash
+        run: echo "WEBSITE_SKIP_DEPLOY=${{ github.ref == 'refs/heads/master' && github.event_name == 'push' && 'false' || 'true' }}" >> $GITHUB_ENV
+
+      - name: Trigger docker images build
+        uses: convictional/trigger-workflow-and-wait@v1.6.5
+        with:
+          owner: f3d-app
+          repo: f3d-website
+          github_token: ${{ secrets.F3D_WEBSITE_CI_DISPATCH }}
+          workflow_file_name: static.yml
+          wait_interval: 60
+          client_payload: '{"skip_deploy": "${{ env.WEBSITE_SKIP_DEPLOY }}" , "docs_tag": "${{github.event.pull_request.head.ref}}", "docs_repository": "${{github.event.pull_request.head.repo.full_name}}" }'
+          propagate_failure: true
+          trigger_workflow: true
+          wait_workflow: true
