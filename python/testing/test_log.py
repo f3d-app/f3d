@@ -54,6 +54,7 @@ def test_get_verbose_level():
 
 def test_forward():
     forwarded: dict[Log.VerboseLevel, list[str]] = {}
+
     def forward(level: Log.VerboseLevel, message: str):
         forwarded.setdefault(level, []).append(message)
 

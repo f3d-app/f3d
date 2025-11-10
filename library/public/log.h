@@ -123,7 +123,7 @@ public:
    * logged, regardless of the verbose level.
    * Set to nullptr to disable forwarding.
    */
-  static void forward(forward_fn_t callback);
+  static void forward(const forward_fn_t& callback);
 
 protected:
   //! @cond

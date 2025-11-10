@@ -138,7 +138,7 @@ log::VerboseLevel log::getVerboseLevel()
 }
 
 //----------------------------------------------------------------------------
-void log::forward(forward_fn_t callback)
+void log::forward(const forward_fn_t& callback)
 {
   detail::init::initialize();
 
