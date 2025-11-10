@@ -247,7 +247,7 @@ bool animationManager::LoadAtTime(double timeValue)
 
 bool animationManager::LoadAtFrame(int frame)
 {
-  const double frameRate = this->DeltaTime > 0 ? 1 / this->DeltaTime : this->DeltaTime;
+  const double tolerance = 1e-6;
   const vtkIdType currentAnimation = this->PreparedAnimationIndices.value()[0];
 
   if (this->AnimationFrameTimes.empty())
