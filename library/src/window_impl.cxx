@@ -479,7 +479,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetUseRaytracingDenoiser(opt.render.raytracing.denoise);
 
   vtkF3DRenderer::AntiAliasingMode aaMode = vtkF3DRenderer::AntiAliasingMode::NONE;
-  vtkF3DRenderer::BlendingMode transMode = vtkF3DRenderer::BlendingMode::NONE;
+  vtkF3DRenderer::BlendingMode blendMode = vtkF3DRenderer::BlendingMode::NONE;
 
   // F3D_DEPRECATED
   // Remove this in the next major release
@@ -495,7 +495,7 @@ void window_impl::UpdateDynamicOptions()
   {
     log::warn("render.effect.translucency_support is deprecated, please use "
               "render.effect.blending.enable instead");
-    transMode = vtkF3DRenderer::BlendingMode::DUAL_DEPTH_PEELING;
+    blendMode = vtkF3DRenderer::BlendingMode::DUAL_DEPTH_PEELING;
   }
   F3D_SILENT_WARNING_POP()
 
@@ -524,15 +524,15 @@ void window_impl::UpdateDynamicOptions()
   {
     if (opt.render.effect.blending.mode == "ddp")
     {
-      transMode = vtkF3DRenderer::BlendingMode::DUAL_DEPTH_PEELING;
+      blendMode = vtkF3DRenderer::BlendingMode::DUAL_DEPTH_PEELING;
     }
     else if (opt.render.effect.blending.mode == "sort")
     {
-      transMode = vtkF3DRenderer::BlendingMode::SORT;
+      blendMode = vtkF3DRenderer::BlendingMode::SORT;
     }
     else if (opt.render.effect.blending.mode == "stochastic")
     {
-      transMode = vtkF3DRenderer::BlendingMode::STOCHASTIC;
+      blendMode = vtkF3DRenderer::BlendingMode::STOCHASTIC;
     }
     else
     {
@@ -544,7 +544,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetUseSSAOPass(opt.render.effect.ambient_occlusion);
   renderer->SetAntiAliasingMode(aaMode);
   renderer->SetUseToneMappingPass(opt.render.effect.tone_mapping);
-  renderer->SetBlendingMode(transMode);
+  renderer->SetBlendingMode(blendMode);
   renderer->SetBackfaceType(opt.render.backface_type);
   renderer->SetFinalShader(opt.render.effect.final_shader);
 
