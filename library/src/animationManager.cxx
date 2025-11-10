@@ -256,27 +256,11 @@ bool animationManager::LoadAtFrame(int frame)
     this->PrepareForAnimationIndices();
   }
 
-  int nbTimeSteps;
-  std::vector<double> timeSteps = this->AnimationFrameTimes[currentAnimation];
+  std::vector<double> frameTimes = this->AnimationFrameTimes[currentAnimation];
+  auto it = std::find_if(frameTimes.begin(), frameTimes.end(),
+    [&](double step) { return std::abs(step - this->CurrentTime) < tolerance; });
 
-  int currentFrameIndex = -1;
-  const double tolerance = 1e-6;
-  for (unsigned int i = 0; i < timeSteps.size(); ++i)
-  {
-    if (std::abs(timeSteps[i] - this->CurrentTime) < tolerance)
-    {
-      currentFrameIndex = i;
-      break;
-    }
-  }
-  if (currentFrameIndex == -1)
-  {
-    return false;
-  }
-
-  this->CurrentTime =
-    std::clamp(timeSteps[currentFrameIndex + frame], this->TimeRange[0], this->TimeRange[1]);
-
+  this->CurrentTime = std::clamp(*(it + frame), this->TimeRange[0], this->TimeRange[1]);
   return this->LoadAtTime(this->CurrentTime);
 }
 
