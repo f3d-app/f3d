@@ -515,10 +515,7 @@ void animationManager::PrepareForAnimationIndices()
       {
         std::vector<double> frameTimes;
         frameTimes.resize(nbTimeSteps);
-        for (unsigned int i = 0; i < nbTimeSteps; ++i)
-        {
-          frameTimes[i] = timeSteps->GetValue(i);
-        }
+        std::copy_n(timeSteps->GetPointer(0), nbTimeSteps, frameTimes.begin());
         this->AnimationFrameTimes.push_back(frameTimes);
       }
 
