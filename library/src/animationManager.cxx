@@ -248,14 +248,19 @@ bool animationManager::LoadAtTime(double timeValue)
 
 bool animationManager::LoadAtFrame(int frame)
 {
-  const double tolerance = 1e-6;
-  const vtkIdType currentAnimation = this->PreparedAnimationIndices.value()[0];
-
   if (this->AnimationFrameTimes.empty())
   {
     this->PreparedAnimationIndices.reset();
     this->PrepareForAnimationIndices();
   }
+
+  if (!this->PreparedAnimationIndices.has_value() || this->AnimationFrameTimes.empty())
+  {
+    return false;
+  }
+
+  const double tolerance = 1e-6;
+  const vtkIdType currentAnimation = this->PreparedAnimationIndices.value()[0];
 
   std::vector<double> frameTimes = this->AnimationFrameTimes[currentAnimation];
   auto it = std::find_if(frameTimes.begin(), frameTimes.end(),
