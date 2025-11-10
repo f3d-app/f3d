@@ -2,6 +2,7 @@
 
 #include "vtkF3DBitonicSort.h"
 #include "vtkF3DComputeDepthCS.h"
+#include "vtkF3DRenderer.h"
 
 #include <vtkCamera.h>
 #include <vtkObjectFactory.h>
@@ -322,7 +323,10 @@ void vtkF3DSplatMapperHelper::SortSplats(vtkRenderer* ren)
 //----------------------------------------------------------------------------
 void vtkF3DSplatMapperHelper::RenderPieceDraw(vtkRenderer* ren, vtkActor* actor)
 {
-  if (vtkShader::IsComputeShaderSupported() && actor->GetForceTranslucent())
+  const vtkF3DRenderer* renderer = vtkF3DRenderer::SafeDownCast(ren);
+
+  if (renderer->GetBlendingMode() == vtkF3DRenderer::BlendingMode::SORT &&
+    vtkShader::IsComputeShaderSupported() && actor->GetForceTranslucent())
   {
     this->SortSplats(ren);
   }

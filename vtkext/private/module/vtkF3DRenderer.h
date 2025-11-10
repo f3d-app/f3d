@@ -51,6 +51,17 @@ public:
     TAA
   };
 
+  /**
+   * Enum listing possible blending modes.
+   */
+  enum class BlendingMode : unsigned char
+  {
+    NONE,
+    DUAL_DEPTH_PEELING,
+    SORT,
+    STOCHASTIC
+  };
+
   ///@{
   /**
    * Set visibility of different actors
@@ -100,7 +111,7 @@ public:
    */
   void SetUseRaytracing(bool use);
   void SetUseRaytracingDenoiser(bool use);
-  void SetUseDepthPeelingPass(bool use);
+  void SetBlendingMode(BlendingMode mode);
   void SetUseSSAOPass(bool use);
   void SetAntiAliasingMode(AntiAliasingMode mode);
   void SetUseToneMappingPass(bool use);
@@ -110,6 +121,11 @@ public:
   void SetBackfaceType(const std::optional<std::string>& backfaceType);
   void SetFinalShader(const std::optional<std::string>& finalShader);
   ///@}
+
+  /**
+   * Get BlendingMode
+   */
+  BlendingMode GetBlendingMode() const;
 
   /**
    * Set SetUseOrthographicProjection
@@ -585,8 +601,8 @@ private:
   bool ArmatureVisible = false;
   bool UseRaytracing = false;
   bool UseRaytracingDenoiser = false;
-  bool UseDepthPeelingPass = false;
   AntiAliasingMode AntiAliasingModeEnabled = AntiAliasingMode::NONE;
+  BlendingMode BlendingModeEnabled = BlendingMode::NONE;
   bool UseSSAOPass = false;
   bool UseToneMappingPass = false;
   bool UseBlurBackground = false;

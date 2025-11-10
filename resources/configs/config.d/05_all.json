@@ -9,7 +9,7 @@
       "filename": true,
       "camera-direction": "-1,-0.5,-1",
       "hdri-ambient": true,
-      "translucency-support": true,
+      "blending": "ddp",
       "animation-progress": true,
       "remove-empty-file-groups": true
     }

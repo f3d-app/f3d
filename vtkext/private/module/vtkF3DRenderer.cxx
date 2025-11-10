@@ -381,7 +381,6 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   newPass->SetUseRaytracing(this->UseRaytracing);
 #endif
   newPass->SetUseSSAOPass(this->UseSSAOPass);
-  newPass->SetUseDepthPeelingPass(this->UseDepthPeelingPass);
   newPass->SetUseBlurBackground(this->UseBlurBackground);
   newPass->SetCircleOfConfusionRadius(this->CircleOfConfusionRadius);
   newPass->SetForceOpaqueBackground(this->HDRISkyboxVisible);
@@ -1435,14 +1434,20 @@ void vtkF3DRenderer::SetDropZoneBinds(
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetUseDepthPeelingPass(bool use)
+void vtkF3DRenderer::SetBlendingMode(BlendingMode mode)
 {
-  if (this->UseDepthPeelingPass != use)
+  if (this->BlendingModeEnabled != mode)
   {
-    this->UseDepthPeelingPass = use;
+    this->BlendingModeEnabled = mode;
     this->RenderPassesConfigured = false;
     this->CheatSheetConfigured = false;
   }
+}
+
+//----------------------------------------------------------------------------
+vtkF3DRenderer::BlendingMode vtkF3DRenderer::GetBlendingMode() const
+{
+  return this->BlendingModeEnabled;
 }
 
 //----------------------------------------------------------------------------
