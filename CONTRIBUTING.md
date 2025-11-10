@@ -22,9 +22,9 @@ You can follow the workflow described below.
 ## How to Get Started With Development
 
 To contribute to F3D as a developer, first you may want to try and build F3D for yourself.
-If you are already familiar with software compilation, you can take a look at our [build guide](https://f3d.app/dev/BUILD).
-If not, you may want to look at our [getting started guide](https://f3d.app/dev/GETTING_STARTED), that provide steps to compile F3D.
-You may also want to take a look into the [F3D mentoring program](https://f3d.app/dev/MENTORING) in order to get help with all the
+If you are already familiar with software compilation, you can take a look at our [build guide](doc/dev/BUILD).
+If not, you may want to look at our [getting started guide](doc/dev/GETTING_STARTED), that provide steps to compile F3D.
+You may also want to take a look into the [F3D mentoring program](doc/dev/MENTORING) in order to get help with all the
 contributing steps.
 
 Once you are able to build F3D, you may want to take a look at the open [issues](https://github.com/f3d-app/f3d/issues)!
@@ -33,11 +33,11 @@ If you already have some experience with programming and contribution, definitel
 If an issue is interesting to you and is not yet assigned, then you should _comment on the issue_ and ask for any help or clarification needed.
 F3D maintainers will see your comment, assign the issue to you and provide guidance as needed.
 
-To get involved more deeply, please take a look at the [roadmaps](https://f3d.app/dev/ROADMAPS_AND_RELEASES) for the upcoming releases.
+To get involved more deeply, please take a look at the [roadmaps](doc/dev/ROADMAPS_AND_RELEASES) for the upcoming releases.
 
 It is also recommended to reach out on [Discord](https://discord.f3d.app) to simplify communication, but it is not required.
 
-You may also want to understand the overall [architecture](https://f3d.app/dev/ARCHITECTURE) of the F3D project.
+You may also want to understand the overall [architecture](doc/dev/ARCHITECTURE) of the F3D project.
 
 You can then fix the issue or implement the feature on your side and contribute it to the F3D repository by following the workflow described below.
 
@@ -56,7 +56,7 @@ F3D uses [GitLab Flow](https://about.gitlab.com/topics/version-control/what-is-g
 - Maintainers and returning contributors will provide help to interpret the CI and fix issues that may arise.
 - Your PR will be reviewed by maintainers and returning contributors, please take their feedback into account and resolve discussions when adresssed.
 - Once the PR is approved and CI comes back clean, a maintainer will merge your pull request in the master branch.
-- The master now contains your changes and will be present in the next minor/major release, any documentation related changes are visible in [https://f3d.app](https://f3d.app)!
+- The master now contains your changes and will be present in the next minor/major release, any documentation related changes are visible on [the website](https://f3d.app)!
 
 ## Continuous Integration
 
@@ -75,10 +75,10 @@ After this, the CI will always be run every time you push to your branch.
 To remove a label, use the same syntax with a `-` before the label, eg: `\ci -fast`.
 
 F3D continuous integration will also check the coverage as it is a good way to evaluate if new features are being tested or not.
-When adding code to F3D, always try to cover it by adding/modifying [tests](https://f3d.app/dev/TESTING).
+When adding code to F3D, always try to cover it by adding/modifying [tests](doc/dev/TESTING).
 
 F3D continuous integration also checks formatting using clang-format and other tools and will inform you if changes needs to be made.
-Some [formatting rules](https://f3d.app/dev/CODING_STYLE) are not enforced by clang-format and will be checked during the review process.
+Some [formatting rules](doc/dev/CODING_STYLE) are not enforced by clang-format and will be checked during the review process.
 
 When making changes to the `libf3d` public API, continuous integration will warn about making related changes to the bindings.
 This is required in order to merge the pull request.

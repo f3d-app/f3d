@@ -114,7 +114,7 @@ eng.getScene().add("path/to/file.ext");
 eng.getInteractor().start();
 ```
 
-Most options are dynamic, some are only taken into account when loading a file. See the [options](OPTIONS.md) documentation.
+Most options are dynamic, some are only taken into account when loading a file. See the [options](03-OPTIONS.md) documentation.
 
 Find more examples in the [examples directory](https://github.com/f3d-app/f3d/tree/master/examples),
 you can also find other usages in the [testing directory](https://github.com/f3d-app/f3d/tree/master/library/testing).
@@ -146,5 +146,5 @@ see the installed `f3dConfig.cmake` file for more info.
 
 ## Extending libf3d with plugins
 
-In order to add new supported file format to libf3d, you can create a plugin using CMake macros. Please follow instructions in the [F3D plugin SDK guide](PLUGINS.md).
+In order to add new supported file format to libf3d, you can create a plugin using CMake macros. Please follow instructions in the [F3D plugin SDK guide](05-PLUGINS.md).
 Also make sure the `plugin_sdk` component have been installed as well as the `sdk` component.

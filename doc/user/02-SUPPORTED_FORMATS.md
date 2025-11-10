@@ -41,8 +41,8 @@ F3D supports the following file formats:
 
 ## Reader options
 
-Readers can provide option that can be set using the `-D/--define` [command line option](OPTIONS.md).
-eg: `-DVDB.downsampling_factor=0.5` or using the `set_reader_option` [command](COMMANDS.md).
+Readers can provide option that can be set using the `-D/--define` [command line option](03-OPTIONS.md).
+eg: `-DVDB.downsampling_factor=0.5` or using the `set_reader_option` [command](07-COMMANDS.md).
 
 For booleans, 0 means false, not 0 means true. Unsigned int will interpret anything that is not a non-negative integer as the default value.
 
@@ -85,4 +85,4 @@ Currently, 3 different formats are supported by F3D:
 
 Note that no config files come with the `.ply` format because this format isn't dedicated to 3DGS only so we cannot generalize.
 If you are using `.ply` for 3DGS only, you can set up a config file similar to what is done for `.splat` or `.spz`.
-See configuration file [documentation](./CONFIGURATION_FILE.md)
+See configuration file [documentation](./06-CONFIGURATION_FILE.md)

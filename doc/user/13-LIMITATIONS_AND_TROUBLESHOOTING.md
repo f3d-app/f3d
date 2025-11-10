@@ -64,7 +64,7 @@ Your data probably contains some translucent data for some reason, turn on trans
 > My 3D Gaussian Splatting data in .ply format isn't opened properly.
 
 .ply is a generic file format, we cannot assumes it's a 3DGS, thus we do not give good presets for this specific use case.
-It's recommended to use these options: `--point-sprites-size=1 --point-sprites-type=gaussian -soyk`, but you can also add them in your [config file](CONFIGURATION_FILE.md).
+It's recommended to use these options: `--point-sprites-size=1 --point-sprites-type=gaussian -soyk`, but you can also add them in your [config file](06-CONFIGURATION_FILE.md).
 
 ### Linux
 

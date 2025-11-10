@@ -33,7 +33,7 @@ it is possible to specify it using the `--rendering-backend` CLI option.
   - `libOSMesa.so`
 
 You can use that feature for thumbnail generation whenever needed (e.g., Nautilus or other sandboxing file browser),
-by modifying the [thumbnail config file](CONFIGURATION_FILE.md), eg:`~/.config/f3d/thumbnail.json`:
+by modifying the [thumbnail config file](06-CONFIGURATION_FILE.md), eg:`~/.config/f3d/thumbnail.json`:
 
 ```javascript
 {
