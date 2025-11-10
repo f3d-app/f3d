@@ -109,7 +109,7 @@ public:
     std::string CommandScriptFile;
     std::string AntiAliasing;
     std::string AntiAliasingMode; // Deprecated
-    bool TranslucencySupport; // Deprecated
+    bool TranslucencySupport;     // Deprecated
     std::string Blending;
   };
 
