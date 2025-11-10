@@ -9,10 +9,7 @@ dynamic = ["version"]
 description = "F3D, a fast and minimalist 3D viewer"
 readme = "README.md"
 license = {text = "BSD 3-Clause License"}
-authors = [
-  {name = "Michael Migliore"},
-  {name = "Mathieu Westphal"},
-]
+authors = [{name = "F3D-APP Foundation"}]
 maintainers = [
   {name = "Michael Migliore", email = "mcmigliore+pip@gmail.com"}
 ]
