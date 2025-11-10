@@ -72,7 +72,7 @@
 #include <vtksys/SystemTools.hxx>
 
 #if F3D_MODULE_UI
-#include "F3DImguiStyle.h"
+#include "F3DStyle.h"
 #endif
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
@@ -615,8 +615,8 @@ void vtkF3DRenderer::ShowAxis(bool show)
 #if F3D_MODULE_UI
       auto containerProperty = this->ModernAxisRepresentation->GetContainerProperty();
       containerProperty->SetOpacity(this->ModernAxisBackdropOpacity);
-      containerProperty->SetColor(F3DImguiStyle::GetBackgroundColor().x,
-        F3DImguiStyle::GetBackgroundColor().y, F3DImguiStyle::GetBackgroundColor().z);
+      const auto [r, g, b] = F3DStyle::GetF3DBlack();
+      containerProperty->SetColor(r, g, b);
 #endif
 
       this->ModernAxisWidget->SetRepresentation(this->ModernAxisRepresentation);

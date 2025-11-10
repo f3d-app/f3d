@@ -190,7 +190,9 @@ f3d_test(NAME TestGridClipping DATA offset-flat-box.glb ARGS -g --grid-absolute 
 f3d_test(NAME TestGridColor DATA suzanne.ply ARGS -g --grid-color=1,1,1)
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-  f3d_test(NAME TestAxis DATA suzanne.ply ARGS -x)
+  if (F3D_TEST_UI)
+    f3d_test(NAME TestAxis DATA suzanne.ply ARGS -x)
+  endif()
 endif()
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11209
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250513)
@@ -490,17 +492,17 @@ if(BUILD_SHARED_LIBS)
 endif()
 
 if(NOT F3D_MACOS_BUNDLE)
+  # On linux, we can easily test the config file search from the binary code by positioning a config file in the binary dir
+  configure_file("${F3D_SOURCE_DIR}/testing/configs/complex.json" "${CMAKE_BINARY_DIR}/share/f3d/configs/complex_build.json" COPYONLY)
+  file(COPY "${F3D_SOURCE_DIR}/resources/configs/config.d/" "${F3D_SOURCE_DIR}/plugins/native/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
   # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-    # On linux, we can easily test the config file search from the binary code by positioning a config file in the binary dir
-    configure_file("${F3D_SOURCE_DIR}/testing/configs/complex.json" "${CMAKE_BINARY_DIR}/share/f3d/configs/complex_build.json" COPYONLY)
     f3d_test(NAME TestConfigFileBuild DATA dragon.vtu CONFIG complex_build.json UI)
     f3d_test(NAME TestConfigStemBuild DATA dragon.vtu CONFIG complex_build UI)
     f3d_test(NAME TestConfigFileUpperCase DATA suzanne_upper.STL CONFIG complex_build UI)
     f3d_test(NAME TestConfigFileMultiFileSTL DATA mb/recursive/mb_1_0.vtp suzanne.stl ARGS --multi-file-mode=all CONFIG complex_build UI)
     f3d_test(NAME TestConfigFileMultiFileVTP DATA mb/recursive/mb_1_0.vtp suzanne.stl mb/recursive/mb_2_0.vtp ARGS --multi-file-mode=all CONFIG complex_build UI)
 
-    file(COPY "${F3D_SOURCE_DIR}/resources/configs/config.d/" "${F3D_SOURCE_DIR}/plugins/native/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     f3d_test(NAME TestDefaultConfigFileVTU DATA dragon.vtu CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
     f3d_test(NAME TestDefaultConfigFileVTI DATA vase_4comp.vti CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
     f3d_test(NAME TestDefaultConfigFileSTL DATA suzanne.stl CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
@@ -750,9 +752,9 @@ if(F3D_PLUGIN_BUILD_ALEMBIC)
   f3d_test(NAME TestABCAnimation DATA drop.abc ARGS --animation-time=2 --load-plugins=alembic --animation-progress)
 
   if(NOT F3D_MACOS_BUNDLE)
+      file(COPY "${F3D_SOURCE_DIR}/plugins/alembic/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-      file(COPY "${F3D_SOURCE_DIR}/plugins/alembic/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
       f3d_test(NAME TestDefaultConfigFileAlembic DATA suzanne.abc CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
     endif()
 
@@ -806,9 +808,9 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
   endif()
 
   if(NOT F3D_MACOS_BUNDLE)
+      file(COPY "${F3D_SOURCE_DIR}/plugins/assimp/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-      file(COPY "${F3D_SOURCE_DIR}/plugins/assimp/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
       f3d_test(NAME TestDefaultConfigFileAssimpFBX DATA phong_cube.fbx CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
       f3d_test(NAME TestDefaultConfigFileAssimpDXF DATA PinkEggFromLW.dxf ARGS -p CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
       f3d_test(NAME TestDefaultConfigFileAssimpOFF DATA teapot.off CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
@@ -841,9 +843,9 @@ if(F3D_PLUGIN_BUILD_DRACO)
   endif()
 
   if(NOT F3D_MACOS_BUNDLE)
+    file(COPY "${F3D_SOURCE_DIR}/plugins/draco/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
   # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-    file(COPY "${F3D_SOURCE_DIR}/plugins/draco/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     f3d_test(NAME TestDefaultConfigFileDraco DATA suzanne.drc CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
   endif()
 
@@ -905,9 +907,9 @@ if(F3D_PLUGIN_BUILD_HDF)
   endif()
 
   if(NOT F3D_MACOS_BUNDLE)
+      file(COPY "${F3D_SOURCE_DIR}/plugins/hdf/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-      file(COPY "${F3D_SOURCE_DIR}/plugins/hdf/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
       f3d_test(NAME TestDefaultConfigFileExodus DATA disk_out_ref.ex2 CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
     endif()
 
@@ -968,9 +970,9 @@ if(F3D_PLUGIN_BUILD_OCCT)
     endif()
 
     if (NOT F3D_MACOS_BUNDLE)
+        file(COPY "${F3D_SOURCE_DIR}/plugins/occt/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
       # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
       if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-        file(COPY "${F3D_SOURCE_DIR}/plugins/occt/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
         f3d_test(NAME TestDefaultConfigFileOCCT DATA f3d.stp CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
       endif()
 
@@ -1001,9 +1003,9 @@ if(F3D_PLUGIN_BUILD_USD)
   f3d_test(NAME TestUSDZMaterialsInterationReload DATA McUsd.usdz ARGS --load-plugins=usd INTERACTION NO_BASELINE) # Up
 
   if(NOT F3D_MACOS_BUNDLE)
+      file(COPY "${F3D_SOURCE_DIR}/plugins/usd/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-      file(COPY "${F3D_SOURCE_DIR}/plugins/usd/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
       f3d_test(NAME TestDefaultConfigFileUSD DATA suzanne.usd CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
     endif()
 
@@ -1023,9 +1025,9 @@ if(F3D_PLUGIN_BUILD_VDB)
   f3d_test(NAME TestVDBCommandScriptReaderOptions DATA icosahedron.vdb ARGS --load-plugins=vdb --volume --volume-inverse SCRIPT TestVDBCommandScriptReaderOptions.txt) # set_reader_option VDB.downsampling_factor 0.2; reload_current_file_group
 
   if(NOT F3D_MACOS_BUNDLE)
+      file(COPY "${F3D_SOURCE_DIR}/plugins/vdb/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
-      file(COPY "${F3D_SOURCE_DIR}/plugins/vdb/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
       f3d_test(NAME TestDefaultConfigFileVDB DATA icosahedron.vdb CONFIG config_build LONG_TIMEOUT TONE_MAPPING UI)
     endif()
 
