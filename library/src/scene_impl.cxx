@@ -15,7 +15,6 @@
 #include "vtkF3DRenderer.h"
 
 #include <optional>
-#include <tuple>
 #include <vtkCallbackCommand.h>
 #include <vtkLightCollection.h>
 #include <vtkProgressBarRepresentation.h>
