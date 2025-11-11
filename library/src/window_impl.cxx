@@ -377,14 +377,14 @@ window_impl::~window_impl()
   }
 }
 
+//----------------------------------------------------------------------------
 void window_impl::SetSceneHierarchy(const std::vector<NodeInfo>& hierarchy)
 {
-    if (this->Internals->Renderer)
-    {
-        this->Internals->Renderer->SetHierarchy(hierarchy);
-    }
+  if (this->Internals->Renderer)
+  {
+    this->Internals->Renderer->SetHierarchy(hierarchy);
+  }
 }
-
 
 //----------------------------------------------------------------------------
 void window_impl::UpdateDynamicOptions()
