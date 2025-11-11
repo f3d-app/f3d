@@ -42,6 +42,7 @@
 #include <array>
 #include <cstdint>
 #include <imgui.h>
+#include <functional>
 #include <numeric>
 #include <optional>
 #include <sstream>
@@ -483,13 +484,15 @@ void vtkF3DImguiActor::RenderSceneHierarchy()
     return;
   }
 
-  // Wider window to accommodate hierarchy tree
-  ::SetupNextWindow(ImVec2(10, 10), ImVec2(500, viewport->WorkSize.y - 20));
+  constexpr float margin = F3DImguiStyle::GetDefaultMargin();
+  float winWidth = this->CalculateHierarchyWidth();
+  float winHeight = viewport->WorkSize.y - 2.0f * margin;
+
+  ::SetupNextWindow(ImVec2(margin, margin), ImVec2(winWidth, winHeight));
   ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
 
-  // Allow resizing so users can adjust width if needed
   ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
-    ImGuiWindowFlags_NoSavedSettings;
+    ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoResize;
 
   ImGui::Begin("Scene Hierarchy", nullptr, flags);
 
@@ -508,6 +511,36 @@ void vtkF3DImguiActor::RenderSceneHierarchy()
   ImGui::End();
 }
 
+//----------------------------------------------------------------------------
+float vtkF3DImguiActor::CalculateHierarchyWidth()
+{
+  float maxWidth = 0.0f;
+
+  std::function<void(const NodeInfo&, int)> processNode = [&](const NodeInfo& node, int depth)
+  {
+    const std::string& displayText = node.displayName.empty() ? node.name : node.displayName;
+    ImVec2 textSize = ImGui::CalcTextSize(displayText.c_str());
+    float nodeWidth = textSize.x + depth * 10.0f; // 10px indent per level
+    maxWidth = std::max(maxWidth, nodeWidth);
+
+    for (const auto& child : node.children)
+    {
+      processNode(child, depth + 1);
+    }
+  };
+
+  for (const auto& node : this->HierarchyNodes)
+  {
+    processNode(node, 0);
+  }
+
+  // Add padding for checkbox, window padding, and margin
+  constexpr float checkboxWidth = 20.0f;
+  float totalWidth = maxWidth + checkboxWidth + 2.0f * ImGui::GetStyle().WindowPadding.x + 30.0f;
+
+  // Clamp to reasonable bounds
+  return std::max(200.0f, std::min(totalWidth, 800.0f));
+}
 
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderDropZone()

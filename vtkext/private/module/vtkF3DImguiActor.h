@@ -84,6 +84,11 @@ private:
   void RenderNode(NodeInfo* node) override;
 
   /**
+   * Calculate the maximum text width needed for the hierarchy
+   */
+  float CalculateHierarchyWidth();
+
+  /**
    * Render the filename UI widget
    */
   void RenderFileName() override;
