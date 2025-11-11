@@ -19,6 +19,7 @@
 #include <vtkVersion.h>
 
 #include <filesystem>
+#include <functional>
 #include <map>
 #include <optional>
 
@@ -443,6 +444,11 @@ public:
    * Set console badge enabled status
    */
   void SetConsoleBadgeEnabled(bool enabled);
+
+  /**
+   * Set a callback to request a render safely from within the render loop
+   */
+  void SetRenderRequestCallback(std::function<void()> callback);
 
 private:
   vtkF3DRenderer();
