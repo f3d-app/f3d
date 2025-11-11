@@ -410,99 +410,102 @@ vtkF3DImguiActor::~vtkF3DImguiActor() = default;
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderNode(NodeInfo* node)
 {
-    if (!node)
-        return;
+  if (!node)
+  {
+    return;
+  }
 
-    if (node->prop)
+  if (node->prop)
+  {
+    ImGui::PushID((void*)node->prop);
+
+    // Retrieve previous state or initialize from actor
+    bool visible = true;
+    auto it = NodeVisibilityState.find(node->prop);
+    if (it != NodeVisibilityState.end())
     {
-        ImGui::PushID((void*)node->prop);
-
-        // Retrieve previous state or initialize from actor
-        bool visible = true;
-        auto it = NodeVisibilityState.find(node->prop);
-        if (it != NodeVisibilityState.end())
-        {
-            visible = it->second;
-        }
-        else
-        {
-            visible = node->prop->GetVisibility() != 0;
-            NodeVisibilityState[node->prop] = visible;
-        }
-
-        const std::string& displayText = node->displayName.empty() ? node->name : node->displayName;
-        if (ImGui::Checkbox(displayText.c_str(), &visible))
-        {
-            NodeVisibilityState[node->prop] = visible;
-            node->prop->SetVisibility(visible ? 1 : 0); // immediate update
-            node->prop->Modified();
-            
-            // Mark this prop as user-controlled
-            vtkInformation* info = node->prop->GetPropertyKeys();
-            if (!info)
-            {
-                info = vtkInformation::New();
-                node->prop->SetPropertyKeys(info);
-                info->Delete();
-            }
-            info->Set(vtkF3DImguiActor::USER_VISIBILITY(), visible ? 1 : 0);
-            
-            // Mark that we need to re-render the scene
-            this->VisibilityChangedThisFrame = true;
-        }
-
-        ImGui::PopID();
+      visible = it->second;
     }
     else
     {
-        ImGui::Text("%s", node->name.c_str());
+      visible = node->prop->GetVisibility() != 0;
+      NodeVisibilityState[node->prop] = visible;
     }
 
-    for (auto& child : node->children)
+    const std::string& displayText = node->displayName.empty() ? node->name : node->displayName;
+    if (ImGui::Checkbox(displayText.c_str(), &visible))
     {
-        ImGui::Indent(10);
-        RenderNode(&child);
-        ImGui::Unindent(10);
+      NodeVisibilityState[node->prop] = visible;
+      node->prop->SetVisibility(visible ? 1 : 0);
+      node->prop->Modified();
+
+      // Mark this prop as user-controlled
+      vtkInformation* info = node->prop->GetPropertyKeys();
+      if (!info)
+      {
+        info = vtkInformation::New();
+        node->prop->SetPropertyKeys(info);
+        info->Delete();
+      }
+      info->Set(vtkF3DImguiActor::USER_VISIBILITY(), visible ? 1 : 0);
+
+      // Request a render to update the scene
+      this->VisibilityChangedThisFrame = true;
     }
+
+    ImGui::PopID();
+  }
+  else
+  {
+    ImGui::Text("%s", node->name.c_str());
+  }
+
+  for (auto& child : node->children)
+  {
+    ImGui::Indent(10);
+    RenderNode(&child);
+    ImGui::Unindent(10);
+  }
 }
 
 
+//----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderSceneHierarchy()
 {
-    // Only render if visibility is enabled
-    if (!this->SceneHierarchyVisible)
-    {
-        return;
-    }
+  if (!this->SceneHierarchyVisible)
+  {
+    return;
+  }
 
-    const ImGuiViewport* viewport = ImGui::GetMainViewport();
-    if (!viewport)
-        return;
+  const ImGuiViewport* viewport = ImGui::GetMainViewport();
+  if (!viewport)
+  {
+    return;
+  }
 
-    // Wider window to accommodate material information text (RGB + Opacity)
-    ::SetupNextWindow(ImVec2(10, 10), ImVec2(500, viewport->WorkSize.y - 20));
-    ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
+  // Wider window to accommodate hierarchy tree
+  ::SetupNextWindow(ImVec2(10, 10), ImVec2(500, viewport->WorkSize.y - 20));
+  ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
 
-    // Allow resizing so users can adjust width if needed
-    ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar |
-                             ImGuiWindowFlags_NoCollapse |
-                             ImGuiWindowFlags_NoSavedSettings;
+  // Allow resizing so users can adjust width if needed
+  ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
+    ImGuiWindowFlags_NoSavedSettings;
 
-    ImGui::Begin("Scene Hierarchy", nullptr, flags);
+  ImGui::Begin("Scene Hierarchy", nullptr, flags);
 
-    if (this->HierarchyNodes.empty())
-    {
-        ImGui::Text("No hierarchy available");
-        ImGui::End();
-        return;
-    }
-
-    for (auto& node : this->HierarchyNodes)
-    {
-        RenderNode(&node);
-    }
-
+  if (this->HierarchyNodes.empty())
+  {
+    ImGui::Text("No hierarchy available");
     ImGui::End();
+    return;
+  }
+
+  for (auto& node : this->HierarchyNodes)
+  {
+    RenderNode(&node);
+  }
+
+  ImGui::End();
 }
 
 

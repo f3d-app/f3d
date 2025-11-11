@@ -5,7 +5,6 @@
  * This is overridden by vtkF3DImguiActor if F3D_MODULE_UI is enabled
  */
 
-
 #ifndef vtkF3DUIActor_h
 #define vtkF3DUIActor_h
 
@@ -234,9 +233,16 @@ protected:
   {
   }
 
+  /**
+   * Render the scene hierarchy UI widget
+   */
   virtual void RenderSceneHierarchy()
   {
   }
+
+  /**
+   * Recursively render a node in the scene hierarchy tree
+   */
   virtual void RenderNode(NodeInfo*)
   {
   }

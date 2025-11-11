@@ -49,13 +49,12 @@ protected:
 private:
   struct Internals;
   std::unique_ptr<Internals> Pimpl;
-  
+
   // Track visibility state for each node
   std::unordered_map<vtkProp*, bool> NodeVisibilityState;
-  
+
   // Flag to trigger render when visibility changes
   bool VisibilityChangedThisFrame = false;
-
 
   /**
    * Called at the beginning of the rendering step
@@ -74,9 +73,15 @@ private:
    */
   void RenderDropZone() override;
 
+  /**
+   * Render the scene hierarchy UI widget
+   */
   void RenderSceneHierarchy() override;
-  void RenderNode(NodeInfo* node) override;
 
+  /**
+   * Recursively render a node in the scene hierarchy tree
+   */
+  void RenderNode(NodeInfo* node) override;
 
   /**
    * Render the filename UI widget
