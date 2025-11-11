@@ -783,6 +783,16 @@ void window_impl::SetCachePath(const fs::path& cachePath)
 void window_impl::SetInteractor(interactor_impl* interactor)
 {
   this->Internals->Interactor = interactor;
+  
+  // Set up render request callback on the UI actor
+  // This allows the UI to safely request renders from within the render loop
+  if (interactor)
+  {
+    this->Internals->Renderer->SetRenderRequestCallback([interactor]()
+    {
+      interactor->requestRender();
+    });
+  }
 }
 
 //----------------------------------------------------------------------------

@@ -14,6 +14,7 @@
 #include <array>
 #include <cstdint>
 #include <deque>
+#include <functional>
 
 #include <map>
 #include <string>
@@ -199,6 +200,15 @@ public:
   {
   }
 
+  /**
+   * Set a callback to request a render outside the render loop
+   * This is safe to call from within rendering code
+   */
+  void SetRenderRequestCallback(std::function<void()> callback)
+  {
+    this->RenderRequestCallback = std::move(callback);
+  }
+
 protected:
   vtkF3DUIActor();
   ~vtkF3DUIActor() override;
@@ -321,6 +331,9 @@ protected:
 
   double BackdropOpacity = 0.9;
   std::vector<NodeInfo> HierarchyNodes;
+
+  // Callback to request a render safely
+  std::function<void()> RenderRequestCallback;
 
 private:
   vtkF3DUIActor(const vtkF3DUIActor&) = delete;
