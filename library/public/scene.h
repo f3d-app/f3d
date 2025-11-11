@@ -17,19 +17,6 @@
 #include <vtkProp.h>
 // #include <vtkRenderingCore/vtkActor.h>
 
-
-#ifndef NODEINFO_H
-#define NODEINFO_H
-
-struct NodeInfo
-{
-    std::string name;
-    vtkProp* prop = nullptr; 
-    std::vector<NodeInfo> children;
-    std::string displayName;
-};
-
-#endif // NODEINFO_H
 #include "F3DNodeInfo.h"
 
 #include <filesystem>
