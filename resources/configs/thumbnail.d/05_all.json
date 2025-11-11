@@ -8,7 +8,7 @@
       "no-background": true,
       "verbose": "quiet",
       "tone-mapping": true,
-      "translucency-support": true
+      "blending": "ddp"
     }
   }
 ]

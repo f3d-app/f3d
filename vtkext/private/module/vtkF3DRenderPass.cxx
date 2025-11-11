@@ -2,6 +2,8 @@
 
 #include "vtkF3DHexagonalBokehBlurPass.h"
 #include "vtkF3DImporter.h"
+#include "vtkF3DRenderer.h"
+#include "vtkF3DStochasticTransparentPass.h"
 
 #include <vtkBoundingBox.h>
 #include <vtkCameraPass.h>
@@ -47,7 +49,6 @@ void vtkF3DRenderPass::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "UseRaytracing: " << this->UseRaytracing << "\n";
   os << indent << "UseSSAOPass: " << this->UseSSAOPass << "\n";
-  os << indent << "UseDepthPeelingPass: " << this->UseDepthPeelingPass << "\n";
   os << indent << "UseBlurBackground: " << this->UseBlurBackground << "\n";
   os << indent << "ForceOpaqueBackground: " << this->ForceOpaqueBackground << "\n";
 }
@@ -182,13 +183,21 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
       collection->AddItem(opaqueP);
     }
 
-    // translucent and volumic passes
-    if (this->UseDepthPeelingPass)
+    // translucent and volumic
+    const vtkF3DRenderer* renderer = vtkF3DRenderer::SafeDownCast(s->GetRenderer());
+    if (renderer && renderer->GetBlendingMode() == vtkF3DRenderer::BlendingMode::DUAL_DEPTH_PEELING)
     {
       vtkNew<vtkDualDepthPeelingPass> ddpP;
       ddpP->SetTranslucentPass(translucentP);
       ddpP->SetVolumetricPass(volumeP);
       collection->AddItem(ddpP);
+    }
+    else if (renderer && renderer->GetBlendingMode() == vtkF3DRenderer::BlendingMode::STOCHASTIC)
+    {
+      vtkNew<vtkF3DStochasticTransparentPass> stochasticP;
+      stochasticP->SetTranslucentPass(translucentP);
+      stochasticP->SetVolumetricPass(volumeP);
+      collection->AddItem(stochasticP);
     }
     else
     {
