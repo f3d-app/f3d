@@ -33,6 +33,11 @@ public:
   void LoadFileGroup(int index = 0, bool relativeIndex = false, bool forceClear = false);
 
   /**
+   * Get supported extensions for open file command
+   */
+  static std::vector<const char*> GetExtensions();
+
+  /**
    * Trigger a render on the next event loop
    */
   void RequestRender();
