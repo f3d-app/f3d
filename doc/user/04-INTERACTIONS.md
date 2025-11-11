@@ -45,6 +45,7 @@ Other options can be toggled directly by pressing the following hotkeys:
 - <kbd>Shift</kbd>+<kbd>x</kbd>: show/hide axes grid
 - <kbd>N</kbd>: the display of the file name.
 - <kbd>M</kbd>: the display of the metadata if exists.
+- <kbd>Shift</kbd>+<kbd>H</kbd>: the display of the scene hierarchy.
 - <kbd>Z</kbd>: the display of the FPS counter.
 - <kbd>R</kbd>: raytracing.
 - <kbd>D</kbd>: the denoiser when raytracing.

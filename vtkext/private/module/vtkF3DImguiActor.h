@@ -11,15 +11,21 @@
 #include "vtkF3DUIActor.h"
 
 #include <memory>
+#include <unordered_map>
 
 class vtkOpenGLRenderWindow;
 class vtkWindow;
+
+class vtkInformationIntegerKey;
 
 class vtkF3DImguiActor : public vtkF3DUIActor
 {
 public:
   static vtkF3DImguiActor* New();
   vtkTypeMacro(vtkF3DImguiActor, vtkF3DUIActor);
+  
+  // Information key to track user-controlled visibility
+  static vtkInformationIntegerKey* USER_VISIBILITY();
 
   /**
    * Initialize the UI actor resources
@@ -44,6 +50,12 @@ private:
   struct Internals;
   std::unique_ptr<Internals> Pimpl;
 
+  // Track visibility state for each node
+  std::unordered_map<vtkProp*, bool> NodeVisibilityState;
+
+  // Flag to trigger render when visibility changes
+  bool VisibilityChangedThisFrame = false;
+
   /**
    * Called at the beginning of the rendering step
    * Initialize the imgui context if needed and setup a new frame
@@ -60,6 +72,21 @@ private:
    * Render the dropzone UI widget
    */
   void RenderDropZone() override;
+
+  /**
+   * Render the scene hierarchy UI widget
+   */
+  void RenderSceneHierarchy() override;
+
+  /**
+   * Recursively render a node in the scene hierarchy tree
+   */
+  void RenderNode(NodeInfo* node) override;
+
+  /**
+   * Calculate the maximum text width needed for the hierarchy
+   */
+  float CalculateHierarchyWidth();
 
   /**
    * Render the filename UI widget

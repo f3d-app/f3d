@@ -62,6 +62,12 @@ public:
 private:
   class internals;
   std::unique_ptr<internals> Internals;
+
+public:
+  /**
+   * Get scene hierarchy nodes for display and control
+   */
+  std::vector<NodeInfo> GetSceneHierarchyNodes() override;
 };
 }
 }

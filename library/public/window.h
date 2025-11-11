@@ -8,6 +8,10 @@
 /// @cond
 #include <string>
 /// @endcond
+#include "F3DNodeInfo.h"
+
+#include <string>
+#include <vector>
 
 namespace f3d
 {
@@ -118,6 +122,11 @@ public:
    * Convert a point in world coordinate to display coordinate.
    */
   [[nodiscard]] virtual point3_t getDisplayFromWorld(const point3_t& worldPoint) const = 0;
+
+  /**
+   * Set the scene hierarchy for display in UI
+   */
+  virtual void SetSceneHierarchy(const std::vector<NodeInfo>& hierarchy) = 0;
 
 protected:
   //! @cond

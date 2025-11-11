@@ -23,6 +23,7 @@
 #include <vtksys/SystemTools.hxx>
 
 #include <vector>
+#include <unordered_set>
 
 namespace fs = std::filesystem;
 
@@ -464,4 +465,19 @@ void scene_impl::PrintImporterDescription(log::VerboseLevel level)
 {
   scene_impl::internals::DisplayImporterDescription(level, this->Internals->MetaImporter);
 }
+
+//----------------------------------------------------------------------------
+std::vector<NodeInfo> scene_impl::GetSceneHierarchyNodes()
+{
+  std::vector<NodeInfo> hierarchy;
+
+  if (!this->Internals || !this->Internals->MetaImporter)
+  {
+    return hierarchy;
+  }
+
+  // Get the raw hierarchy directly - it already handles duplicates and hierarchy
+  return this->Internals->MetaImporter->GetActorHierarchy();
+}
+
 }

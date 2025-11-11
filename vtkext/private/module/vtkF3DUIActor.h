@@ -12,6 +12,13 @@
 
 #include <cstdint>
 #include <deque>
+#include <functional>
+
+#include <map>
+#include <string>
+#include <vector>
+
+#include "F3DNodeInfo.h"
 
 class vtkOpenGLRenderWindow;
 
@@ -62,6 +69,11 @@ public:
   void SetDropText(const std::string& info);
 
   /**
+   * Set the scene hierarchy
+   */
+  void SetHierarchy(const std::vector<NodeInfo>& hierarchy);
+
+  /**
    * Set the dropzone binds
    * Each pair contains a description and its associated interaction bind
    * Empty by default
@@ -85,6 +97,12 @@ public:
    * False by default
    */
   void SetMetaDataVisibility(bool show);
+
+  /**
+   * Set the scene hierarchy visibility
+   * False by default
+   */
+  void SetSceneHierarchyVisibility(bool show);
 
   /**
    * Set the filename string
@@ -163,6 +181,15 @@ public:
   {
   }
 
+  /**
+   * Set a callback to request a render outside the render loop
+   * This is safe to call from within rendering code
+   */
+  void SetRenderRequestCallback(std::function<void()> callback)
+  {
+    this->RenderRequestCallback = std::move(callback);
+  }
+
 protected:
   vtkF3DUIActor();
   ~vtkF3DUIActor() override;
@@ -185,6 +212,20 @@ protected:
    * Render the dropzone UI widget
    */
   virtual void RenderDropZone()
+  {
+  }
+
+  /**
+   * Render the scene hierarchy UI widget
+   */
+  virtual void RenderSceneHierarchy()
+  {
+  }
+
+  /**
+   * Recursively render a node in the scene hierarchy tree
+   */
+  virtual void RenderNode(NodeInfo*)
   {
   }
 
@@ -240,6 +281,8 @@ protected:
   bool MetaDataVisible = false;
   std::string MetaData = "";
 
+  bool SceneHierarchyVisible = false;
+
   bool CheatSheetVisible = false;
   std::vector<CheatSheetGroup> CheatSheet;
 
@@ -259,6 +302,10 @@ protected:
   double FontScale = 1.0;
 
   double BackdropOpacity = 0.9;
+  std::vector<NodeInfo> HierarchyNodes;
+
+  // Callback to request a render safely
+  std::function<void()> RenderRequestCallback;
 
 private:
   vtkF3DUIActor(const vtkF3DUIActor&) = delete;
