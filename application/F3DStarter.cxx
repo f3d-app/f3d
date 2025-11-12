@@ -2320,7 +2320,7 @@ void F3DStarter::AddCommands()
     "open_file_dialog",
     [this](const std::vector<std::string>&)
     {
-      std::vector<const char*> cstrings = GetExtensions();
+      std::vector<const char*> cstrings = F3DStarter::GetExtensions();
 
       std::optional<std::string> file = f3d::utils::getEnv("CTEST_OPEN_DIALOG_FILE");
       if (!file.has_value())
