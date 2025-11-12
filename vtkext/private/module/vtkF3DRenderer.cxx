@@ -2806,8 +2806,6 @@ void vtkF3DRenderer::ConfigureJitter(bool enable)
 
   if (enable)
   {
-    vtkInformation* information = this->GetInformation();
-
     jitter[0] = this->ConfigureHaltonSequence(0);
     jitter[1] = this->ConfigureHaltonSequence(1);
 
