@@ -513,7 +513,7 @@ void animationManager::PrepareForAnimationIndices()
     {
       double timeRange[2];
       int nbTimeSteps;
-      vtkSmartPointer<vtkDoubleArray> timeSteps = vtkSmartPointer<vtkDoubleArray>::New();
+      vtkNew<vtkDoubleArray> timeSteps;
       this->Importer->GetTemporalInformation(animIndex, 0, nbTimeSteps, timeRange, timeSteps);
 
       // Accumulate time ranges
