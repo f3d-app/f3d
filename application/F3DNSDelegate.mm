@@ -138,7 +138,7 @@
   ShouldHandleFileOpening = true;
 }
 
-- (void)openFile
+- (void)openFile:(id)sender
 {
   auto cstrings = F3DStarter::GetExtensions();
   F3DNSDelegate::ShowOpenFileDialog(cstrings.data(), cstrings.size());

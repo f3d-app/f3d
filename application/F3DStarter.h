@@ -36,7 +36,7 @@ public:
    * Get supported extensions for open file command
    * On macOS, the extensions are returned in the format: {"x", "y", "z"}
    * On other operating systems, the format is: {"*.x", "*.y", "*.z"}
-   * Returns a vector of supported file extension strings.
+   * Returns a vector of supported file extension strings
    */
   static std::vector<const char*> GetExtensions();
 
