@@ -21,6 +21,7 @@ list(APPEND libf3dSDKTests_list
      TestSDKSceneFromMemory.cxx
      TestSDKStartInteractor.cxx
      TestSDKUtils.cxx
+     TestSDKUI.cxx
      TestSDKWindowAuto.cxx
 )
 

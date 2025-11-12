@@ -7,7 +7,7 @@ f3d_embed_file(
   BINARY)
 
 set(sources ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultHDRI.cxx)
-set(private_headers F3DImguiStyle.h ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultHDRI.h)
+set(private_headers ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultHDRI.h)
 
 if(F3D_MODULE_UI)
   set(F3D_FONT_FILE "${F3D_SOURCE_DIR}/resources/MonaspaceNeon-Regular.otf" CACHE STRING "Font used in UI widgets")
@@ -19,7 +19,7 @@ if(F3D_MODULE_UI)
     BINARY)
 
   list(APPEND sources ${CMAKE_CURRENT_BINARY_DIR}/F3DFontBuffer.cxx)
-  list(APPEND private_headers ${CMAKE_CURRENT_BINARY_DIR}/F3DFontBuffer.h)
+  list(APPEND private_headers F3DStyle.h ${CMAKE_CURRENT_BINARY_DIR}/F3DFontBuffer.h)
 
   set(F3D_DEFAULT_LOGO "${F3D_SOURCE_DIR}/resources/logo-black.png" CACHE STRING "logo")
   mark_as_advanced(F3D_DEFAULT_LOGO)
@@ -80,7 +80,7 @@ set(classes
   )
 
 if (F3D_MODULE_UI)
-  set(classes ${classes} vtkF3DImguiActor vtkF3DImguiConsole vtkF3DImguiObserver)
+  set(classes ${classes} vtkF3DImguiActor vtkF3DImguiConsole vtkF3DImguiObserver F3DStyle)
 endif ()
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10675

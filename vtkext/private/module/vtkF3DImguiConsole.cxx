@@ -1,6 +1,6 @@
 #include "vtkF3DImguiConsole.h"
 
-#include "F3DImguiStyle.h"
+#include "F3DStyle.h"
 
 #include <vtkCallbackCommand.h>
 #include <vtkCommand.h>
@@ -210,7 +210,7 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
 {
   const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-  constexpr float margin = F3DImguiStyle::GetDefaultMargin();
+  constexpr float margin = F3DStyle::GetDefaultMargin();
   const float padding = ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().FramePadding.x;
   float windowWidth = viewport->WorkSize.x - 2.f * margin;
 
@@ -269,16 +269,16 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
           switch (severity)
           {
             case Internals::LogType::Error:
-              ImGui::PushStyleColor(ImGuiCol_Text, F3DImguiStyle::GetErrorColor());
+              ImGui::PushStyleColor(ImGuiCol_Text, F3DStyle::imgui::GetErrorColor());
               break;
             case Internals::LogType::Warning:
-              ImGui::PushStyleColor(ImGuiCol_Text, F3DImguiStyle::GetWarningColor());
+              ImGui::PushStyleColor(ImGuiCol_Text, F3DStyle::imgui::GetWarningColor());
               break;
             case Internals::LogType::Typed:
-              ImGui::PushStyleColor(ImGuiCol_Text, F3DImguiStyle::GetHighlightColor());
+              ImGui::PushStyleColor(ImGuiCol_Text, F3DStyle::imgui::GetHighlightColor());
               break;
             case Internals::LogType::Completion:
-              ImGui::PushStyleColor(ImGuiCol_Text, F3DImguiStyle::GetCompletionColor());
+              ImGui::PushStyleColor(ImGuiCol_Text, F3DStyle::imgui::GetCompletionColor());
               break;
             default:
               hasColor = false;
@@ -370,7 +370,7 @@ void vtkF3DImguiConsole::ShowBadge()
 
   if (this->Pimpl->NewError || this->Pimpl->NewWarning)
   {
-    constexpr float margin = F3DImguiStyle::GetDefaultMargin();
+    constexpr float margin = F3DStyle::GetDefaultMargin();
     ImVec2 badgeSize = this->GetBadgeSize();
 
     ImGui::SetNextWindowPos(ImVec2(viewport->WorkSize.x - badgeSize.x - margin, margin));
@@ -383,10 +383,11 @@ void vtkF3DImguiConsole::ShowBadge()
     ImGui::Begin("ConsoleAlert", nullptr, winFlags);
 
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, F3DImguiStyle::GetHighlightColor());
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, F3DStyle::imgui::GetHighlightColor());
 
     ImGui::PushStyleColor(ImGuiCol_Text,
-      this->Pimpl->NewError ? F3DImguiStyle::GetErrorColor() : F3DImguiStyle::GetWarningColor());
+      this->Pimpl->NewError ? F3DStyle::imgui::GetErrorColor()
+                            : F3DStyle::imgui::GetWarningColor());
 
     if (ImGui::Button("!"))
     {

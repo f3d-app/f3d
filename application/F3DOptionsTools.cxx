@@ -109,7 +109,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "font-file", "", "Path to a FreeType compatible font file", "<file_path>", ""},
       { "font-scale", "", "Scale fonts", "<ratio>", ""},
 #if F3D_MODULE_UI
-      { "backdrop-opacity", "", "UI backdrop opacity", "<value>", ""}, 
+      { "backdrop-opacity", "", "UI backdrop opacity", "<value>", ""},
 #endif
       { "command-script", "", "Path to a script file containing commands to execute", "<file_path>", "" } } },
   { "Material",

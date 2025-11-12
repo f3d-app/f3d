@@ -7,6 +7,7 @@
 #include "scene.h"
 #include "window_impl.h"
 
+#include "F3DStyle.h"
 #include "factory.h"
 #include "vtkF3DGenericImporter.h"
 #include "vtkF3DMemoryMesh.h"
@@ -47,8 +48,8 @@ public:
     vtkProgressBarWidget* widget;
   };
 
-  static void CreateProgressRepresentationAndCallback(
-    ProgressDataStruct* data, vtkImporter* importer, interactor_impl* interactor)
+  static void CreateProgressRepresentationAndCallback(ProgressDataStruct* data,
+    vtkImporter* importer, interactor_impl* interactor, const f3d::color_t& color)
   {
     vtkNew<vtkCallbackCommand> progressCallback;
     progressCallback->SetClientData(data);
@@ -80,8 +81,7 @@ public:
     progressRep->SetPosition(0.0, 0.0);
     progressRep->SetPosition2(1.0, 0.0);
     progressRep->SetMinimumSize(0, 5);
-    progressRep->SetProgressBarColor(1, 1, 1);
-    progressRep->DrawBackgroundOff();
+    progressRep->SetProgressBarColor(color.r(), color.g(), color.b());
     progressRep->DragableOff();
     progressRep->SetShowBorderToOff();
     progressRep->DrawFrameOff();
@@ -118,8 +118,18 @@ public:
     callbackData.widget = progressWidget;
     if (this->Options.ui.loader_progress && this->Interactor)
     {
+      f3d::color_t color;
+      if (!this->Options.ui.loader_progress_color.has_value())
+      {
+        const auto [r, g, b] = F3DStyle::GetF3DYellow();
+        color = color_t(r, g, b);
+      }
+      else
+      {
+        color = this->Options.ui.loader_progress_color.value();
+      }
       scene_impl::internals::CreateProgressRepresentationAndCallback(
-        &callbackData, this->MetaImporter, this->Interactor);
+        &callbackData, this->MetaImporter, this->Interactor, color);
     }
 
     // Update the meta importer, the will only update importers that have not been updated before

@@ -462,6 +462,10 @@ CLI: `--fps`.
 
 Show a _progress bar_ when loading the file.
 
+### `ui.loader_progress_color` (_color_, optional, **on load**)
+
+Set loader progress bar color or use default one #FFFFFF if not set.
+
 CLI: `--progress`.
 
 ### `ui.animation_progress` (_bool_, default: `false`, **on load**)
@@ -469,6 +473,10 @@ CLI: `--progress`.
 Show a _progress bar_ when playing the animation.
 
 CLI: `--animation-progress`.
+
+### `ui.animation_progress_color` (_color_, optional, **on load**)
+
+Set animation progress bar color or use default one #788BFF if not set.
 
 ### `ui.metadata` (_bool_, default: `false`)
 
