@@ -1973,6 +1973,25 @@ void F3DStarter::ResetWindowName()
 }
 
 //----------------------------------------------------------------------------
+std::vector<std::string> F3DStarter::GetExtensions()
+{
+  std::vector<std::string> filters;
+  for (const auto& info : f3d::engine::getReadersInfo())
+  {
+    for (const auto& ext : info.Extensions)
+    {
+#ifdef __APPLE__
+      filters.push_back(ext);
+#else
+      filters.push_back("*." + ext);
+#endif
+    }
+  }
+
+  return filters;
+}
+
+//----------------------------------------------------------------------------
 void F3DStarter::AddCommands()
 {
   f3d::interactor& interactor = this->Internals->Engine->getInteractor();
@@ -2294,19 +2313,7 @@ void F3DStarter::AddCommands()
     "open_file_dialog",
     [this](const std::vector<std::string>&)
     {
-      std::vector<std::string> filters;
-      for (const auto& info : f3d::engine::getReadersInfo())
-      {
-        for (const auto& ext : info.Extensions)
-        {
-#ifdef __APPLE__
-          filters.push_back(ext);
-#else
-          filters.push_back("*." + ext);
-#endif
-        }
-      }
-
+      std::vector<std::string> filters = F3DStarter::GetExtensions();
       std::vector<const char*> cstrings;
       cstrings.reserve(filters.size());
       for (const auto& filter : filters)

@@ -90,6 +90,17 @@
                       action:@selector(terminate:)
               keyEquivalent:@"q"];
 
+  // setup "file menu"
+  NSMenuItem* fileMenuItem = [bar addItemWithTitle:@"" action:nil keyEquivalent:@""];
+  NSMenu* fileMenu = [[NSMenu alloc] initWithTitle:@"File"];
+  [fileMenuItem setSubmenu:fileMenu];
+  [fileMenu release];
+
+  [fileMenuItem setSubmenu:fileMenu];
+  [fileMenu addItemWithTitle:@"Open File"
+                        action:@selector(openFile:)
+                  keyEquivalent:@"o"];
+
   // setup "window menu"
   NSMenuItem* windowMenuItem = [bar addItemWithTitle:@"" action:nil keyEquivalent:@""];
   NSMenu* windowMenu = [[NSMenu alloc] initWithTitle:@"Window"];
@@ -125,6 +136,19 @@
 - (void)applicationDidFinishLaunching:(NSNotification *)notification
 {
   ShouldHandleFileOpening = true;
+}
+
+- (void)openFile:(id)sender
+{
+  const auto& extensions = F3DStarter::GetExtensions();
+  NSMutableArray<NSString*>* allowedTypes = [NSMutableArray arrayWithCapacity:extensions.size()];
+
+  for (const auto& ext : extensions)
+  {
+    [allowedTypes addObject:[NSString stringWithUTF8String:ext.c_str()]];
+  }
+
+  [self openFileDialogWithAllowedTypes:allowedTypes];
 }
 
 - (void)openFileDialogWithAllowedTypes:(NSArray<NSString*>*)allowedTypes
