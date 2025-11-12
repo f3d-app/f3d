@@ -84,7 +84,6 @@ void animationManager::Initialize()
 
   // Reset animation indices before updating
   this->PreparedAnimationIndices.reset();
-  this->AnimationFrameTimes.clear();
   this->PrepareForAnimationIndices();
 
   if (this->AvailAnimations == 0)
@@ -248,21 +247,24 @@ bool animationManager::LoadAtTime(double timeValue)
 
 bool animationManager::LoadAtFrame(int frame)
 {
-  if (this->AnimationFrameTimes.empty())
+  if (!this->PreparedAnimationIndices.has_value())
   {
-    this->PreparedAnimationIndices.reset();
     this->PrepareForAnimationIndices();
   }
 
-  if (!this->PreparedAnimationIndices.has_value() || this->AnimationFrameTimes.empty())
+  if (!this->PreparedAnimationIndices.has_value())
   {
     return false;
   }
 
   const double tolerance = 1e-6;
+  int nbTimeSteps;
+  vtkNew<vtkDoubleArray> frameTimes;
   const vtkIdType currentAnimation = this->PreparedAnimationIndices.value()[0];
 
-  vtkSmartPointer<vtkDoubleArray> frameTimes = this->AnimationFrameTimes[currentAnimation];
+  this->Importer->GetTemporalInformation(
+    currentAnimation, 1 / this->DeltaTime, nbTimeSteps, this->TimeRange, frameTimes);
+
   auto it = std::find_if(frameTimes->Begin(), frameTimes->End(),
     [&](double step) { return std::abs(step - this->CurrentTime) < tolerance; });
 
@@ -512,14 +514,7 @@ void animationManager::PrepareForAnimationIndices()
       double timeRange[2];
       int nbTimeSteps;
       vtkSmartPointer<vtkDoubleArray> timeSteps = vtkSmartPointer<vtkDoubleArray>::New();
-      const double frameRate = this->DeltaTime > 0 ? 1 / this->DeltaTime : this->DeltaTime;
-      this->Importer->GetTemporalInformation(
-        animIndex, frameRate, nbTimeSteps, timeRange, timeSteps);
-
-      if (timeSteps->GetNumberOfTuples())
-      {
-        this->AnimationFrameTimes.push_back(timeSteps);
-      }
+      this->Importer->GetTemporalInformation(animIndex, 0, nbTimeSteps, timeRange, timeSteps);
 
       // Accumulate time ranges
       this->TimeRange[0] = std::min(timeRange[0], this->TimeRange[0]);
