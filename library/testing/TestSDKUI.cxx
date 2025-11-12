@@ -31,6 +31,7 @@ int TestSDKUI([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   }
 
   // Set loader_progress_color only for coverage
+  options.ui.loader_progress = true;
   options.ui.loader_progress_color = f3d::color_t(0.f, 1.f, 1.f);
 
   return EXIT_SUCCESS;
