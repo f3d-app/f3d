@@ -594,7 +594,12 @@ public:
 
     this->AnimationManager->Tick();
 
-    if (this->RenderRequested)
+    // Determine if we need a full render or just a UI render
+    // At the moment, only TAA requires a full render each frame
+    bool forceRender = (this->Options.render.effect.antialiasing.enable &&
+      this->Options.render.effect.antialiasing.mode == "taa");
+
+    if (this->RenderRequested || forceRender)
     {
       this->Window.render();
       this->RenderRequested = false;
