@@ -14,6 +14,11 @@ int TestSDKUI([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   win.setSize(300, 300);
 
   f3d::options& options = eng.getOptions();
+
+  // Set loader_progress_color only for coverage
+  options.ui.loader_progress = true;
+  options.ui.loader_progress_color = f3d::color_t(0.f, 1.f, 1.f);
+
   options.ui.animation_progress = true;
   options.ui.animation_progress_color = f3d::color_t(0.f, 1.f, 0.f);
 
@@ -29,10 +34,6 @@ int TestSDKUI([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     std::cerr << "Animation progress color failure";
     return EXIT_FAILURE;
   }
-
-  // Set loader_progress_color only for coverage
-  options.ui.loader_progress = true;
-  options.ui.loader_progress_color = f3d::color_t(0.f, 1.f, 1.f);
 
   return EXIT_SUCCESS;
 }
