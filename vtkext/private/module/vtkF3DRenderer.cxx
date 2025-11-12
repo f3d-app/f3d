@@ -207,7 +207,7 @@ vtkSmartPointer<vtkTexture> GetTexture(const fs::path& filePath, bool isSRGB = f
 }
 
 template<typename F>
-void DoOnAllPolyDataUniforms(vtkActorCollection* actors, F&& func)
+void ExecFuncOnAllPolyDataUniforms(vtkActorCollection* actors, F&& func)
 {
   actors->InitTraversal();
   vtkActor* actor = nullptr;
@@ -2796,7 +2796,7 @@ void vtkF3DRenderer::ConfigureJitter(bool enable)
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251017)
   if (!enable)
   {
-    DoOnAllPolyDataUniforms(
+    ExecFuncOnAllPolyDataUniforms(
       this->GetActors(), [](vtkUniforms* uniforms) { uniforms->RemoveUniform("jitter"); });
     return;
   }
@@ -2822,7 +2822,7 @@ void vtkF3DRenderer::ConfigureJitter(bool enable)
     jitter[1] = 0.0f;
   }
 
-  DoOnAllPolyDataUniforms(
+  ExecFuncOnAllPolyDataUniforms(
     this->GetActors(), [&](vtkUniforms* uniforms) { uniforms->SetUniform2f("jitter", jitter); });
 }
 
