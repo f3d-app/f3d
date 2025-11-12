@@ -1973,7 +1973,7 @@ void F3DStarter::ResetWindowName()
 }
 
 //----------------------------------------------------------------------------
-std::vector<const char*> F3DStarter::GetExtensions()
+std::vector<std::string> F3DStarter::GetExtensions()
 {
   std::vector<std::string> filters;
   for (const auto& info : f3d::engine::getReadersInfo())
@@ -1988,14 +1988,7 @@ std::vector<const char*> F3DStarter::GetExtensions()
     }
   }
 
-  std::vector<const char*> cstrings;
-  cstrings.reserve(filters.size());
-  for (const auto& filter : filters)
-  {
-    cstrings.push_back(filter.c_str());
-  }
-
-  return cstrings;
+  return filters;
 }
 
 //----------------------------------------------------------------------------
@@ -2320,7 +2313,13 @@ void F3DStarter::AddCommands()
     "open_file_dialog",
     [this](const std::vector<std::string>&)
     {
-      std::vector<const char*> cstrings = F3DStarter::GetExtensions();
+      std::vector<std::string> filters = F3DStarter::GetExtensions();
+      std::vector<const char*> cstrings;
+      cstrings.reserve(filters.size());
+      for (const auto& filter : filters)
+      {
+        cstrings.push_back(filter.c_str());
+      }
 
       std::optional<std::string> file = f3d::utils::getEnv("CTEST_OPEN_DIALOG_FILE");
       if (!file.has_value())

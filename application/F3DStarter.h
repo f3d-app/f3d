@@ -38,7 +38,7 @@ public:
    * On other operating systems, the format is: {"*.x", "*.y", "*.z"}
    * Returns a vector of supported file extension strings
    */
-  static std::vector<const char*> GetExtensions();
+  static std::vector<std::string> GetExtensions();
 
   /**
    * Trigger a render on the next event loop

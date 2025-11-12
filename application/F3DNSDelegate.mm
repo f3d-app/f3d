@@ -140,8 +140,15 @@
 
 - (void)openFile:(id)sender
 {
-  auto cstrings = F3DStarter::GetExtensions();
-  F3DNSDelegate::ShowOpenFileDialog(cstrings.data(), cstrings.size());
+  const auto& extensions = F3DStarter::GetExtensions();
+  NSMutableArray<NSString*>* allowedTypes = [NSMutableArray arrayWithCapacity:extensions.size()];
+
+  for (const auto& ext : extensions)
+  {
+    [allowedTypes addObject:[NSString stringWithUTF8String:ext.c_str()]];
+  }
+
+  [self openFileDialogWithAllowedTypes:allowedTypes];
 }
 
 - (void)openFileDialogWithAllowedTypes:(NSArray<NSString*>*)allowedTypes
