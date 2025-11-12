@@ -2793,12 +2793,11 @@ bool vtkF3DRenderer::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vt
 void vtkF3DRenderer::ConfigureJitter(bool enable)
 {
   // needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12534
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251017) 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251017)
   if (!enable)
   {
-    DoOnAllPolyDataUniforms(this->GetActors(), [](vtkUniforms* uniforms) {
-      uniforms->RemoveUniform("jitter");
-    });
+    DoOnAllPolyDataUniforms(
+      this->GetActors(), [](vtkUniforms* uniforms) { uniforms->RemoveUniform("jitter"); });
     return;
   }
 #endif
@@ -2825,9 +2824,8 @@ void vtkF3DRenderer::ConfigureJitter(bool enable)
     jitter[1] = 0.0f;
   }
 
-  DoOnAllPolyDataUniforms(this->GetActors(), [&](vtkUniforms* uniforms) {
-      uniforms->SetUniform2f("jitter", jitter);
-    });
+  DoOnAllPolyDataUniforms(
+    this->GetActors(), [&](vtkUniforms* uniforms) { uniforms->SetUniform2f("jitter", jitter); });
 }
 
 //----------------------------------------------------------------------------
