@@ -84,6 +84,7 @@ void animationManager::Initialize()
 
   // Reset animation indices before updating
   this->PreparedAnimationIndices.reset();
+  this->AnimationTimeSteps.reset();
   this->PrepareForAnimationIndices();
 
   if (this->AvailAnimations == 0)
@@ -259,16 +260,22 @@ bool animationManager::LoadAtFrame(int frame)
 
   const double tolerance = 1e-6;
   int nbTimeSteps;
-  vtkNew<vtkDoubleArray> frameTimes;
+  vtkSmartPointer<vtkDoubleArray> timeSteps = vtkSmartPointer<vtkDoubleArray>::New();
+
   const vtkIdType currentAnimation = this->PreparedAnimationIndices.value()[0];
+  if (!this->AnimationTimeSteps.has_value())
+  {
+    this->Importer->GetTemporalInformation(
+      currentAnimation, 1 / this->DeltaTime, nbTimeSteps, this->TimeRange, timeSteps);
+    this->AnimationTimeSteps = timeSteps;
+  }
 
-  this->Importer->GetTemporalInformation(
-    currentAnimation, 1 / this->DeltaTime, nbTimeSteps, this->TimeRange, frameTimes);
+  timeSteps = this->AnimationTimeSteps.value();
 
-  auto it = std::find_if(frameTimes->Begin(), frameTimes->End(),
+  auto it = std::find_if(timeSteps->Begin(), timeSteps->End(),
     [&](double step) { return std::abs(step - this->CurrentTime) < tolerance; });
 
-  if (it == frameTimes->End())
+  if (it == timeSteps->End())
   {
     return false;
   }
