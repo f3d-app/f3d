@@ -10,7 +10,11 @@ def test_text_distance():
 
 def test_collapse_path():
     assert f3d.Utils.collapse_path("/folder/../file.ext", ".") == Path("/file.ext")
-    assert f3d.Utils.collapse_path("/folder/../file.ext", ".").is_absolute()
+
+    # ensure we're getting a `Path` back
+    assert isinstance(f3d.Utils.collapse_path("/folder/../file.ext", Path(".")), Path)
+    # ensure the typing says we're getting `Path` back (pytest won't know but type checkers would)
+    assert f3d.Utils.collapse_path(Path("/folder/../file.ext"), ".").parent
 
 
 def test_tokenize():
