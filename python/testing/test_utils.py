@@ -10,6 +10,7 @@ def test_text_distance():
 
 def test_collapse_path():
     assert f3d.Utils.collapse_path("/folder/../file.ext", ".") == Path("/file.ext")
+    assert f3d.Utils.collapse_path("/folder/../file.ext", ".").is_absolute()
 
 
 def test_tokenize():
@@ -30,11 +31,11 @@ def test_glob_to_regex():
 
 
 def test_get_env():
-    assert f3d.Utils.get_env("F3D_TEST_ENV_EMPTY") == None
+    assert f3d.Utils.get_env("F3D_TEST_ENV_EMPTY") is None
 
 
 def test_get_know_folder():
     if os.name == "nt":
-        assert f3d.Utils.get_known_folder(f3d.Utils.KnownFolder.PICTURES) != None
+        assert f3d.Utils.get_known_folder(f3d.Utils.KnownFolder.PICTURES) is not None
     else:
-        assert f3d.Utils.get_known_folder(f3d.Utils.KnownFolder.PICTURES) == None
+        assert f3d.Utils.get_known_folder(f3d.Utils.KnownFolder.PICTURES) is None
