@@ -399,9 +399,21 @@ void window_impl::UpdateDynamicOptions()
   // XXX: model.point_sprites.type only has an effect on geometry scene
   // but we set it here for practical reasons
   const int pointSpritesSize = opt.model.point_sprites.size;
-  const vtkF3DRenderer::SplatType splatType = opt.model.point_sprites.type == "gaussian"
-    ? vtkF3DRenderer::SplatType::GAUSSIAN
-    : vtkF3DRenderer::SplatType::SPHERE;
+  vtkF3DRenderer::SplatType splatType = vtkF3DRenderer::SplatType::SPHERE;
+
+  if (opt.model.point_sprites.type == "gaussian")
+  {
+    splatType = vtkF3DRenderer::SplatType::GAUSSIAN;
+  }
+  else if (opt.model.point_sprites.type == "circle")
+  {
+    splatType = vtkF3DRenderer::SplatType::CIRCLE;
+  }
+  else if (opt.model.point_sprites.type == "cross")
+  {
+    splatType = vtkF3DRenderer::SplatType::CROSS;
+  }
+  
   renderer->SetPointSpritesProperties(splatType, pointSpritesSize);
 
   renderer->SetLineWidth(opt.render.line_width);
