@@ -1,6 +1,7 @@
 #include "vtkF3DQuakeMDLImporter.h"
 #include "vtkF3DQuakeMDLImporterConstants.h"
 
+#include <vtkCommand.h>
 #include <vtkFileResourceStream.h>
 #include <vtkFloatArray.h>
 #include <vtkImageData.h>
@@ -11,6 +12,7 @@
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
 #include <vtkResourceStream.h>
+#include <vtkType.h>
 
 #include <cstdint>
 #include <cstring>
@@ -234,6 +236,15 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   //----------------------------------------------------------------------------
   bool CreateMesh(const std::vector<unsigned char>& buffer, int offset, const mdl_header_t* header)
   {
+    const unsigned long totalProgress = header->numFrames * 2 + header->numTriangles;
+    unsigned long currentProgress = 0;
+
+    auto reportProgress = [&currentProgress, &totalProgress, this]()
+    {
+      double progress = static_cast<double>(currentProgress) / totalProgress;
+      this->Parent->InvokeEvent(vtkCommand::ProgressEvent, static_cast<void*>(&progress));
+    };
+
     constexpr int mdl_simpleframe_t_fixed_size =
       2 * sizeof(mdl_vertex_t) + 16 * sizeof(int8_t); // Size of bboxmin, bboxmax and name.
 
@@ -290,6 +301,12 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
           offset += mdl_simpleframe_t_fixed_size + sizeof(mdl_vertex_t) * header->numVertices;
         }
       }
+
+      currentProgress++;
+      if (i % 128 == 0)
+      {
+        reportProgress();
+      }
     }
 
     // Draw cells and scale texture coordinates
@@ -319,6 +336,12 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       // triangle winding order is inverted in Quake MDL
       vtkIdType triangle[3] = { i * 3, i * 3 + 2, i * 3 + 1 };
       cells->InsertNextCell(3, triangle);
+
+      currentProgress++;
+      if (i % 128 == 0)
+      {
+        reportProgress();
+      }
     }
 
     // Extract animation name from frame name and recover animation index accordingly
@@ -414,7 +437,16 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         this->AnimationTimes.emplace_back(times);
         this->AnimationFrames.emplace_back(meshes);
       }
+
+      currentProgress++;
+      if (frameNum % 128 == 0)
+      {
+        reportProgress();
+      }
     }
+
+    currentProgress = totalProgress;
+    reportProgress();
     return true;
   }
 
