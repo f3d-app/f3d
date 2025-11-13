@@ -196,6 +196,8 @@ Can be useful to display non-ASCII filenames.
 ### `--font-scale=<ratio>` (_ratio_, default: `1.0`)
 
 Scale fonts. Useful for HiDPI displays.
+> [!NOTE]
+> When font scale is not set (default to `1`), your actual font scale is automatically adjusted according to your screen DPI. For example, if your screen DPI is 72, your actual font size display on app should look like your font scale is set to `1.5` (Although if you use `print ui.scale` command on app console you will see the print value is `1`). To truly display font size to a ratio of `1`, you need to set the value to `1.001` (When ratio is set to any value other than `1`, the `print ui.scale` command will print actual font scale value that you set).
 
 ### `--command-script=<command script>` (_script_)
 
