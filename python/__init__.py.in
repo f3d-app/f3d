@@ -18,6 +18,8 @@ F3D_ABSOLUTE_DLLS: list[str] = [
 F3D_RELATIVE_DLLS: list[str] = [
     # @F3D_RELATIVE_DLLS_FIXUP@
 ]
+
+
 def _add_dll_directories():
     if sys.version_info >= (3, 8) and sys.platform == "win32":
         for abs_path in F3D_ABSOLUTE_DLLS:
@@ -25,6 +27,7 @@ def _add_dll_directories():
         root = Path(__file__).parent
         for rel_path in F3D_RELATIVE_DLLS:
             os.add_dll_directory((root / rel_path).resolve())
+
 
 _add_dll_directories()
 
