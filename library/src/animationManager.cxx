@@ -250,11 +250,6 @@ bool animationManager::LoadAtFrame(int frame)
 {
   if (!this->PreparedAnimationIndices.has_value())
   {
-    this->PrepareForAnimationIndices();
-  }
-
-  if (!this->PreparedAnimationIndices.has_value())
-  {
     return false;
   }
 
