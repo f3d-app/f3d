@@ -1344,6 +1344,18 @@ void vtkF3DRenderer::ConfigureTextActors()
         F3DLog::Severity::Warning, std::string("Cannot find \"") + fontFileStr + "\" font file.");
     }
   }
+  // If font scale is set, use set value, otherwise adjust font scale by screen DPI
+  if (0.999 < this->FontScale && this->FontScale < 1.001)
+  {
+    vtkWindow* vtkWindow = this->GetVTKWindow();
+
+    const int dpi = vtkWindow->GetDPI();
+    const double base = 48.0;
+    // Default ratio to 1.5 when DPI = 72
+    const double adjustedScale = static_cast<double>(dpi) / base;
+
+    this->FontScale = adjustedScale;
+  }
 
   this->UIActor->SetFontScale(this->FontScale);
 
