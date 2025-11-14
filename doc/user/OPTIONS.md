@@ -180,6 +180,10 @@ Select the animations to show.
 Any negative value all animations.
 The default scene always has at most one animation.
 
+### `--animation-frame-jump` (_int_, default: `1`)
+
+Set the animation frame jump.
+
 ### `--animation-speed-factor=<ratio>` (_ratio_, default: `1`)
 
 Set the animation speed factor to slow, speed up or even invert animation time.
