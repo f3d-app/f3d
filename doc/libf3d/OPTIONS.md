@@ -34,6 +34,12 @@ The default scene always has at most one animation.
 
 CLI: `--animation-indices`.
 
+### `scene.animation.frame_jump` (_int_, default: `1`, **on load**)
+
+Set the animation frame jump.
+
+CLI: `--animation-frame-jump`.
+
 ### `scene.animation.speed_factor` (_ratio_, default: `1`)
 
 Set the animation speed factor to slow, speed up or even invert animation.

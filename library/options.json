@@ -21,6 +21,10 @@
       "speed_factor": {
         "type": "ratio",
         "default_value": "1.0"
+      },
+      "frame_jump": {
+        "type": "int",
+        "default_value": "1"
       }
     },
     "camera": {
