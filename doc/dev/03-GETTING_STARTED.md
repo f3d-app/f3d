@@ -154,22 +154,12 @@ dev
 
 ```sh
 cd C:\dev\vtk\build
-cmake -DCMAKE_INSTALL_PREFIX=../install ../src
+cmake -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=../install ../src
 cmake --build . -j 16 --config Debug
 cmake --install . --config Debug
 ```
 
 Note: These commands will take a while.
-
-#### Add VTK libraries to the PATH
-
-- Search for "Environment variables" in Windows menu and open associated control panel
-- Click on "Environment variables.." button
-- Double click on "Path"
-- Click on "New" and write "C:\dev\vtk\install\bin"
-- Press Ok
-- Press Ok
-- Press Ok
 
 #### Build F3D
 
