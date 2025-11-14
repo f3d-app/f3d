@@ -79,6 +79,11 @@ public:
    */
   vtkCamera* GetVTKCamera() const;
 
+  /**
+   * Check if camera was successfully reset with resetToBounds.
+   */
+  bool GetSuccessfullyReset() const;
+
 private:
   class internals;
   std::unique_ptr<internals> Internals;

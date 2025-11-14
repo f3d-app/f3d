@@ -24,10 +24,12 @@ def main():
         print("\n".join(diff))
 
 
-def run_pybind11_stubgen(out_dir: Path, module: str = "f3d"):
+def run_pybind11_stubgen(
+    out_dir: Path, module: str = "f3d", submodule: str = "f3d.pyf3d"
+):
     stubgen_cmd = (
         # use current python interpreter to run stubs generation for the `f3d` module
-        *(sys.executable, "-m", "pybind11_stubgen", module),
+        *(sys.executable, "-m", "pybind11_stubgen", submodule),
         # fix enum for default values in `Image.save()` and `Image.save_buffer()`
         *("--enum-class-locations", "SaveFormat:Image"),
         # more enums
