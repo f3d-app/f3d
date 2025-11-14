@@ -12,18 +12,24 @@ import warnings
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Union
 
-F3D_ABSOLUTE_DLLS = [
+F3D_ABSOLUTE_DLLS: list[str] = [
     # @F3D_ABSOLUTE_DLLS_FIXUP@
 ]
-F3D_RELATIVE_DLLS = [
+F3D_RELATIVE_DLLS: list[str] = [
     # @F3D_RELATIVE_DLLS_FIXUP@
 ]
-if sys.version_info >= (3, 8) and sys.platform == "win32":
-    for abs_path in F3D_ABSOLUTE_DLLS:
-        os.add_dll_directory(abs_path)
-    root = Path(__file__).parent
-    for rel_path in F3D_RELATIVE_DLLS:
-        os.add_dll_directory((root / rel_path).resolve())
+
+
+def _add_dll_directories():
+    if sys.version_info >= (3, 8) and sys.platform == "win32":
+        for abs_path in F3D_ABSOLUTE_DLLS:
+            os.add_dll_directory(abs_path)
+        root = Path(__file__).parent
+        for rel_path in F3D_RELATIVE_DLLS:
+            os.add_dll_directory((root / rel_path).resolve())
+
+
+_add_dll_directories()
 
 from .pyf3d import *
 

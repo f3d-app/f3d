@@ -11,8 +11,8 @@ def doc_fn():
     return "dummyDoc", "dummyValue"
 
 
-def compl_fn():
-    return "compl"
+def compl_fn(args: list[str]):
+    return ["compl"]
 
 
 def test_command(capfd: pytest.CaptureFixture[str]):
@@ -41,7 +41,7 @@ def test_command(capfd: pytest.CaptureFixture[str]):
 
     # Smoke test
     inter.init_commands()
-    inter.add_command("my_cmd2", print_fn, ["my_cmd2", "doc"], compl_fn)
+    inter.add_command("my_cmd2", print_fn, ("my_cmd2", "doc"), compl_fn)
 
 
 def test_binding():
