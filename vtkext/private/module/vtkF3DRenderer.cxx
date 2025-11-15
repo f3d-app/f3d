@@ -2340,9 +2340,11 @@ void vtkF3DRenderer::SetPointSpritesProperties(SplatType type, double pointSprit
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
       sprites.Mapper->AnisotropicOff();
       sprites.Mapper->SetLowpassMatrix(0., 0., 0.);
+      sprites.Mapper->SetRotationArray(nullptr);
 #endif
 
       sprites.Mapper->SetScaleFactor(scaleFactor);
+      sprites.Mapper->SetScaleArray(nullptr);
 
       sprites.Mapper->SetSplatShaderCode(
         "//VTK::Color::Impl\n"
