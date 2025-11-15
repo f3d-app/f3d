@@ -20,7 +20,7 @@ please take a look at our [getting started guide](03-GETTING_STARTED.md).
 - Optionally, [OpenVDB](https://www.openvdb.org/download/) >= 12.0.0, enable `IOOpenVDB` module during VTK configuration.
 - Optionally, [OSPray](https://www.ospray.org/) == v2.12.0, enable `RenderingRayTracing` module during VTK configuration.
 - Optionally, [Draco](https://google.github.io/draco/) >= 1.5.6.
-- Optionally, [Python](https://www.python.org/) >= 3.9 and [pybind11](https://github.com/pybind/pybind11) >= 2.9.2.
+- Optionally, [Python](https://www.python.org/) >= 3.10 and [pybind11](https://github.com/pybind/pybind11) >= 2.9.2.
 - Optionally, [Java](https://www.java.com) >= 17.
 - Optionally, [OpenEXR](https://openexr.com/en/latest/) >= 3.0.1.
 
