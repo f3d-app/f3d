@@ -399,7 +399,7 @@ void window_impl::UpdateDynamicOptions()
   // XXX: model.point_sprites.type only has an effect on geometry scene
   // but we set it here for practical reasons
   renderer->SetUsePointSprites(opt.model.point_sprites.enable);
-  vtkF3DRenderer::SplatType splatType;
+  vtkF3DRenderer::SplatType splatType = vtkF3DRenderer::SplatType::SPHERE;
   if (opt.model.point_sprites.enable)
   {
     if (opt.model.point_sprites.type == "gaussian")
@@ -413,9 +413,10 @@ void window_impl::UpdateDynamicOptions()
     else
     {
       log::warn(opt.model.point_sprites.type,
-        R"( is an invalid point sprites typea. Valid modes are: "sphere", "gaussian")");
+        R"( is an invalid point sprites type. Valid modes are: "sphere", "gaussian")");
     }
-    renderer->SetPointSpritesProperties(splatType, opt.model.point_sprites.size);
+    renderer->SetPointSpritesType(splatType);
+    renderer->SetPointSpritesSize(opt.model.point_sprites.size);
   }
 
   renderer->SetLineWidth(opt.render.line_width);
