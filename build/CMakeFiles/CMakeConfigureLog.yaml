@@ -1,0 +1,2304 @@
+
+---
+events:
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineSystem.cmake:212 (message)"
+      - "CMakeLists.txt:23 (project)"
+    message: |
+      The system is: Windows - 10.0.26200 - AMD64
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:462 (find_file)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:500 (CMAKE_DETERMINE_COMPILER_ID_WRITE)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:8 (CMAKE_DETERMINE_COMPILER_ID_BUILD)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCCompiler.cmake:122 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:23 (project)"
+    mode: "file"
+    variable: "src_in"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "CMakeCCompilerId.c.in"
+    candidate_directories:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/"
+    found: "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeCCompilerId.c.in"
+    search_context:
+      ENV{PATH}:
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\MinGW\\bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files (x86)\\Microsoft SQL Server\\160\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\160\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\Client SDK\\ODBC\\170\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\160\\DTS\\Binn\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Android\\sdk\\cmdline-tools\\latest\\bin"
+        - "C:\\Android\\sdk\\platform-tools"
+        - "C:\\Program Files\\Java\\jdk-22.0.2\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\java8path"
+        - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\MinGW\\bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Pub\\Cache\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\flutter\\bin"
+        - "C:\\Program Files\\Git\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Program Files\\Java\\jdk-22.0.2\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\MinGW\\bin"
+        - "C:\\npm-global\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Muse Hub\\lib"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\Scripts"
+        - "C:\\src\\flutter\\bin"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCCompiler.cmake:122 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:23 (project)"
+    message: |
+      Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+      Compiler:  
+      Build flags: 
+      Id flags:  
+      
+      The output was:
+      0
+      MSBuild version 18.1.0-preview-25527-05+567af5e9d for .NET Framework
+      Build started 16-11-2025 02:54:58.
+      
+      Project "C:\\Users\\Nikhil Kumar Yadav\\f3d\\build\\CMakeFiles\\4.2.0-rc3\\CompilerIdC\\CompilerIdC.vcxproj" on node 1 (default targets).
+      PrepareForBuild:
+        Creating directory "Debug\\".
+        Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+        Creating directory "Debug\\CompilerIdC.tlog\\".
+      InitializeBuildStatus:
+        Creating "Debug\\CompilerIdC.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+        Touching "Debug\\CompilerIdC.tlog\\unsuccessfulbuild".
+      ClCompile:
+        C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\CL.exe /c /nologo /W0 /WX- /diagnostics:column /Od /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\\\" /Fd"Debug\\vc145.pdb" /external:W0 /Gd /TC /FC /errorReport:queue CMakeCCompilerId.c
+        CMakeCCompilerId.c
+      Link:
+        C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:".\\CompilerIdC.exe" /INCREMENTAL:NO /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /PDB:".\\CompilerIdC.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:".\\CompilerIdC.lib" /MACHINE:X64 Debug\\CMakeCCompilerId.obj
+        CompilerIdC.vcxproj -> C:\\Users\\Nikhil Kumar Yadav\\f3d\\build\\CMakeFiles\\4.2.0-rc3\\CompilerIdC\\CompilerIdC.exe
+      PostBuildEvent:
+        for %%i in (cl.exe) do @echo CMAKE_C_COMPILER=%%~$PATH:i
+        :VCEnd
+        CMAKE_C_COMPILER=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe
+      FinalizeBuildStatus:
+        Deleting file "Debug\\CompilerIdC.tlog\\unsuccessfulbuild".
+        Touching "Debug\\CompilerIdC.tlog\\CompilerIdC.lastbuildstate".
+      Done Building Project "C:\\Users\\Nikhil Kumar Yadav\\f3d\\build\\CMakeFiles\\4.2.0-rc3\\CompilerIdC\\CompilerIdC.vcxproj" (default targets).
+      
+      Build succeeded.
+          0 Warning(s)
+          0 Error(s)
+      
+      Time Elapsed 00:00:00.84
+      
+      
+      Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CompilerIdC.exe"
+      
+      Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CompilerIdC.vcxproj"
+      
+      The C compiler identification is MSVC, found in:
+        C:/Users/Nikhil Kumar Yadav/f3d/build/CMakeFiles/4.2.0-rc3/CompilerIdC/CompilerIdC.exe
+      
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:37 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:65 (__resolve_tool_path)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:103 (__resolve_linker_path)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:23 (project)"
+    mode: "program"
+    variable: "_CMAKE_TOOL_WITH_PATH"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "link"
+    candidate_directories:
+      - "C:/Program Files/Microsoft Visual Studio/18/Insiders/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files/dotnet/"
+      - "C:/MinGW/bin/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/Program Files/nodejs/"
+      - "C:/Program Files (x86)/Microsoft SQL Server/160/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/160/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/160/DTS/Binn/"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Android/Sdk/cmdline-tools/latest/bin/"
+      - "C:/Android/Sdk/platform-tools/"
+      - "C:/Program Files/Java/jdk-22.0.2/bin/"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/javapath/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Pub/Cache/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/flutter/bin/"
+      - "C:/Program Files/Git/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/npm-global/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Roaming/npm/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Muse Hub/lib/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/cursor/resources/app/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0/LocalCache/local-packages/Python311/Scripts/"
+      - "C:/src/flutter/bin/"
+    searched_directories:
+      - "C:/Program Files/Microsoft Visual Studio/18/Insiders/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/link.com"
+    found: "C:/Program Files/Microsoft Visual Studio/18/Insiders/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/link.exe"
+    search_context:
+      ENV{PATH}:
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\MinGW\\bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files (x86)\\Microsoft SQL Server\\160\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\160\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\Client SDK\\ODBC\\170\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\160\\DTS\\Binn\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Android\\sdk\\cmdline-tools\\latest\\bin"
+        - "C:\\Android\\sdk\\platform-tools"
+        - "C:\\Program Files\\Java\\jdk-22.0.2\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\java8path"
+        - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\MinGW\\bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Pub\\Cache\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\flutter\\bin"
+        - "C:\\Program Files\\Git\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Program Files\\Java\\jdk-22.0.2\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\MinGW\\bin"
+        - "C:\\npm-global\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Muse Hub\\lib"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\Scripts"
+        - "C:\\src\\flutter\\bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:37 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:65 (__resolve_tool_path)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:104 (__resolve_linker_path)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:23 (project)"
+    mode: "program"
+    variable: "_CMAKE_TOOL_WITH_PATH"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "lld-link"
+    candidate_directories:
+      - "C:/Program Files/Microsoft Visual Studio/18/Insiders/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files/dotnet/"
+      - "C:/MinGW/bin/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/Program Files/nodejs/"
+      - "C:/Program Files (x86)/Microsoft SQL Server/160/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/160/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/160/DTS/Binn/"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Android/Sdk/cmdline-tools/latest/bin/"
+      - "C:/Android/Sdk/platform-tools/"
+      - "C:/Program Files/Java/jdk-22.0.2/bin/"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/javapath/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Pub/Cache/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/flutter/bin/"
+      - "C:/Program Files/Git/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/npm-global/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Roaming/npm/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Muse Hub/lib/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/cursor/resources/app/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0/LocalCache/local-packages/Python311/Scripts/"
+      - "C:/src/flutter/bin/"
+    searched_directories:
+      - "C:/Program Files/Microsoft Visual Studio/18/Insiders/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/lld-link.com"
+      - "C:/Program Files/Microsoft Visual Studio/18/Insiders/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/lld-link.exe"
+      - "C:/Program Files/Microsoft Visual Studio/18/Insiders/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/lld-link"
+      - "C:/Windows/System32/lld-link.com"
+      - "C:/Windows/System32/lld-link.exe"
+      - "C:/Windows/System32/lld-link"
+      - "C:/Windows/lld-link.com"
+      - "C:/Windows/lld-link.exe"
+      - "C:/Windows/lld-link"
+      - "C:/Windows/System32/wbem/lld-link.com"
+      - "C:/Windows/System32/wbem/lld-link.exe"
+      - "C:/Windows/System32/wbem/lld-link"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/lld-link.com"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/lld-link.exe"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/lld-link"
+      - "C:/Windows/System32/OpenSSH/lld-link.com"
+      - "C:/Windows/System32/OpenSSH/lld-link.exe"
+      - "C:/Windows/System32/OpenSSH/lld-link"
+      - "C:/Program Files/dotnet/lld-link.com"
+      - "C:/Program Files/dotnet/lld-link.exe"
+      - "C:/Program Files/dotnet/lld-link"
+      - "C:/MinGW/bin/lld-link.com"
+      - "C:/MinGW/bin/lld-link.exe"
+      - "C:/MinGW/bin/lld-link"
+      - "C:/Program Files/Git/cmd/lld-link.com"
+      - "C:/Program Files/Git/cmd/lld-link.exe"
+      - "C:/Program Files/Git/cmd/lld-link"
+      - "C:/Program Files/nodejs/lld-link.com"
+      - "C:/Program Files/nodejs/lld-link.exe"
+      - "C:/Program Files/nodejs/lld-link"
+      - "C:/Program Files (x86)/Microsoft SQL Server/160/Tools/Binn/lld-link.com"
+      - "C:/Program Files (x86)/Microsoft SQL Server/160/Tools/Binn/lld-link.exe"
+      - "C:/Program Files (x86)/Microsoft SQL Server/160/Tools/Binn/lld-link"
+      - "C:/Program Files/Microsoft SQL Server/160/Tools/Binn/lld-link.com"
+      - "C:/Program Files/Microsoft SQL Server/160/Tools/Binn/lld-link.exe"
+      - "C:/Program Files/Microsoft SQL Server/160/Tools/Binn/lld-link"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/lld-link.com"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/lld-link.exe"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/lld-link"
+      - "C:/Program Files/Microsoft SQL Server/160/DTS/Binn/lld-link.com"
+      - "C:/Program Files/Microsoft SQL Server/160/DTS/Binn/lld-link.exe"
+      - "C:/Program Files/Microsoft SQL Server/160/DTS/Binn/lld-link"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/lld-link.com"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/lld-link.exe"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/lld-link"
+      - "C:/Program Files/CMake/bin/lld-link.com"
+      - "C:/Program Files/CMake/bin/lld-link.exe"
+      - "C:/Program Files/CMake/bin/lld-link"
+      - "C:/Android/Sdk/cmdline-tools/latest/bin/lld-link.com"
+      - "C:/Android/Sdk/cmdline-tools/latest/bin/lld-link.exe"
+      - "C:/Android/Sdk/cmdline-tools/latest/bin/lld-link"
+      - "C:/Android/Sdk/platform-tools/lld-link.com"
+      - "C:/Android/Sdk/platform-tools/lld-link.exe"
+      - "C:/Android/Sdk/platform-tools/lld-link"
+      - "C:/Program Files/Java/jdk-22.0.2/bin/lld-link.com"
+      - "C:/Program Files/Java/jdk-22.0.2/bin/lld-link.exe"
+      - "C:/Program Files/Java/jdk-22.0.2/bin/lld-link"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/lld-link.com"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/lld-link.exe"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/lld-link"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/javapath/lld-link.com"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/javapath/lld-link.exe"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/javapath/lld-link"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Pub/Cache/bin/lld-link.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Pub/Cache/bin/lld-link.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Pub/Cache/bin/lld-link"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/flutter/bin/lld-link.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/flutter/bin/lld-link.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/flutter/bin/lld-link"
+      - "C:/Program Files/Git/bin/lld-link.com"
+      - "C:/Program Files/Git/bin/lld-link.exe"
+      - "C:/Program Files/Git/bin/lld-link"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Microsoft/WindowsApps/lld-link.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Microsoft/WindowsApps/lld-link.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Microsoft/WindowsApps/lld-link"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/GitHubDesktop/bin/lld-link.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/GitHubDesktop/bin/lld-link.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/GitHubDesktop/bin/lld-link"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/Microsoft VS Code/bin/lld-link.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/Microsoft VS Code/bin/lld-link.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/Microsoft VS Code/bin/lld-link"
+      - "C:/npm-global/bin/lld-link.com"
+      - "C:/npm-global/bin/lld-link.exe"
+      - "C:/npm-global/bin/lld-link"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Roaming/npm/lld-link.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Roaming/npm/lld-link.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Roaming/npm/lld-link"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Muse Hub/lib/lld-link.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Muse Hub/lib/lld-link.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Muse Hub/lib/lld-link"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/cursor/resources/app/bin/lld-link.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/cursor/resources/app/bin/lld-link.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/cursor/resources/app/bin/lld-link"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0/LocalCache/local-packages/Python311/Scripts/lld-link.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0/LocalCache/local-packages/Python311/Scripts/lld-link.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0/LocalCache/local-packages/Python311/Scripts/lld-link"
+      - "C:/src/flutter/bin/lld-link.com"
+      - "C:/src/flutter/bin/lld-link.exe"
+      - "C:/src/flutter/bin/lld-link"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\MinGW\\bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files (x86)\\Microsoft SQL Server\\160\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\160\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\Client SDK\\ODBC\\170\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\160\\DTS\\Binn\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Android\\sdk\\cmdline-tools\\latest\\bin"
+        - "C:\\Android\\sdk\\platform-tools"
+        - "C:\\Program Files\\Java\\jdk-22.0.2\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\java8path"
+        - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\MinGW\\bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Pub\\Cache\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\flutter\\bin"
+        - "C:\\Program Files\\Git\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Program Files\\Java\\jdk-22.0.2\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\MinGW\\bin"
+        - "C:\\npm-global\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Muse Hub\\lib"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\Scripts"
+        - "C:\\src\\flutter\\bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:23 (project)"
+    mode: "program"
+    variable: "CMAKE_LINKER"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "link"
+    candidate_directories:
+      - "C:/Program Files/Microsoft Visual Studio/18/Insiders/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files/dotnet/"
+      - "C:/MinGW/bin/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/Program Files/nodejs/"
+      - "C:/Program Files (x86)/Microsoft SQL Server/160/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/160/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/160/DTS/Binn/"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Android/Sdk/cmdline-tools/latest/bin/"
+      - "C:/Android/Sdk/platform-tools/"
+      - "C:/Program Files/Java/jdk-22.0.2/bin/"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/javapath/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Pub/Cache/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/flutter/bin/"
+      - "C:/Program Files/Git/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/npm-global/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Roaming/npm/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Muse Hub/lib/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/cursor/resources/app/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0/LocalCache/local-packages/Python311/Scripts/"
+      - "C:/src/flutter/bin/"
+    searched_directories:
+      - "C:/Program Files/Microsoft Visual Studio/18/Insiders/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/link.com"
+    found: "C:/Program Files/Microsoft Visual Studio/18/Insiders/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/link.exe"
+    search_context:
+      ENV{PATH}:
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\MinGW\\bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files (x86)\\Microsoft SQL Server\\160\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\160\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\Client SDK\\ODBC\\170\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\160\\DTS\\Binn\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Android\\sdk\\cmdline-tools\\latest\\bin"
+        - "C:\\Android\\sdk\\platform-tools"
+        - "C:\\Program Files\\Java\\jdk-22.0.2\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\java8path"
+        - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\MinGW\\bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Pub\\Cache\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\flutter\\bin"
+        - "C:\\Program Files\\Git\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Program Files\\Java\\jdk-22.0.2\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\MinGW\\bin"
+        - "C:\\npm-global\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Muse Hub\\lib"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\Scripts"
+        - "C:\\src\\flutter\\bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:23 (project)"
+    mode: "program"
+    variable: "CMAKE_MT"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "mt"
+    candidate_directories:
+      - "C:/Program Files/Microsoft Visual Studio/18/Insiders/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files/dotnet/"
+      - "C:/MinGW/bin/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/Program Files/nodejs/"
+      - "C:/Program Files (x86)/Microsoft SQL Server/160/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/160/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/160/DTS/Binn/"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Android/Sdk/cmdline-tools/latest/bin/"
+      - "C:/Android/Sdk/platform-tools/"
+      - "C:/Program Files/Java/jdk-22.0.2/bin/"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/javapath/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Pub/Cache/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/flutter/bin/"
+      - "C:/Program Files/Git/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/npm-global/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Roaming/npm/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Muse Hub/lib/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/cursor/resources/app/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0/LocalCache/local-packages/Python311/Scripts/"
+      - "C:/src/flutter/bin/"
+    searched_directories:
+      - "C:/Program Files/Microsoft Visual Studio/18/Insiders/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/mt.com"
+      - "C:/Program Files/Microsoft Visual Studio/18/Insiders/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/mt.exe"
+      - "C:/Program Files/Microsoft Visual Studio/18/Insiders/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/mt"
+      - "C:/Windows/System32/mt.com"
+      - "C:/Windows/System32/mt.exe"
+      - "C:/Windows/System32/mt"
+      - "C:/Windows/mt.com"
+      - "C:/Windows/mt.exe"
+      - "C:/Windows/mt"
+      - "C:/Windows/System32/wbem/mt.com"
+      - "C:/Windows/System32/wbem/mt.exe"
+      - "C:/Windows/System32/wbem/mt"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/mt.com"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/mt.exe"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/mt"
+      - "C:/Windows/System32/OpenSSH/mt.com"
+      - "C:/Windows/System32/OpenSSH/mt.exe"
+      - "C:/Windows/System32/OpenSSH/mt"
+      - "C:/Program Files/dotnet/mt.com"
+      - "C:/Program Files/dotnet/mt.exe"
+      - "C:/Program Files/dotnet/mt"
+      - "C:/MinGW/bin/mt.com"
+      - "C:/MinGW/bin/mt.exe"
+      - "C:/MinGW/bin/mt"
+      - "C:/Program Files/Git/cmd/mt.com"
+      - "C:/Program Files/Git/cmd/mt.exe"
+      - "C:/Program Files/Git/cmd/mt"
+      - "C:/Program Files/nodejs/mt.com"
+      - "C:/Program Files/nodejs/mt.exe"
+      - "C:/Program Files/nodejs/mt"
+      - "C:/Program Files (x86)/Microsoft SQL Server/160/Tools/Binn/mt.com"
+      - "C:/Program Files (x86)/Microsoft SQL Server/160/Tools/Binn/mt.exe"
+      - "C:/Program Files (x86)/Microsoft SQL Server/160/Tools/Binn/mt"
+      - "C:/Program Files/Microsoft SQL Server/160/Tools/Binn/mt.com"
+      - "C:/Program Files/Microsoft SQL Server/160/Tools/Binn/mt.exe"
+      - "C:/Program Files/Microsoft SQL Server/160/Tools/Binn/mt"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/mt.com"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/mt.exe"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/mt"
+      - "C:/Program Files/Microsoft SQL Server/160/DTS/Binn/mt.com"
+      - "C:/Program Files/Microsoft SQL Server/160/DTS/Binn/mt.exe"
+      - "C:/Program Files/Microsoft SQL Server/160/DTS/Binn/mt"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/mt.com"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/mt.exe"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/mt"
+      - "C:/Program Files/CMake/bin/mt.com"
+      - "C:/Program Files/CMake/bin/mt.exe"
+      - "C:/Program Files/CMake/bin/mt"
+      - "C:/Android/Sdk/cmdline-tools/latest/bin/mt.com"
+      - "C:/Android/Sdk/cmdline-tools/latest/bin/mt.exe"
+      - "C:/Android/Sdk/cmdline-tools/latest/bin/mt"
+      - "C:/Android/Sdk/platform-tools/mt.com"
+      - "C:/Android/Sdk/platform-tools/mt.exe"
+      - "C:/Android/Sdk/platform-tools/mt"
+      - "C:/Program Files/Java/jdk-22.0.2/bin/mt.com"
+      - "C:/Program Files/Java/jdk-22.0.2/bin/mt.exe"
+      - "C:/Program Files/Java/jdk-22.0.2/bin/mt"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/mt.com"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/mt.exe"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/mt"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/javapath/mt.com"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/javapath/mt.exe"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/javapath/mt"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Pub/Cache/bin/mt.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Pub/Cache/bin/mt.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Pub/Cache/bin/mt"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/flutter/bin/mt.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/flutter/bin/mt.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/flutter/bin/mt"
+      - "C:/Program Files/Git/bin/mt.com"
+      - "C:/Program Files/Git/bin/mt.exe"
+      - "C:/Program Files/Git/bin/mt"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Microsoft/WindowsApps/mt.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Microsoft/WindowsApps/mt.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Microsoft/WindowsApps/mt"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/GitHubDesktop/bin/mt.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/GitHubDesktop/bin/mt.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/GitHubDesktop/bin/mt"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/Microsoft VS Code/bin/mt.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/Microsoft VS Code/bin/mt.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/Microsoft VS Code/bin/mt"
+      - "C:/npm-global/bin/mt.com"
+      - "C:/npm-global/bin/mt.exe"
+      - "C:/npm-global/bin/mt"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Roaming/npm/mt.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Roaming/npm/mt.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Roaming/npm/mt"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Muse Hub/lib/mt.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Muse Hub/lib/mt.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Muse Hub/lib/mt"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/cursor/resources/app/bin/mt.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/cursor/resources/app/bin/mt.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/cursor/resources/app/bin/mt"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0/LocalCache/local-packages/Python311/Scripts/mt.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0/LocalCache/local-packages/Python311/Scripts/mt.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0/LocalCache/local-packages/Python311/Scripts/mt"
+      - "C:/src/flutter/bin/mt.com"
+      - "C:/src/flutter/bin/mt.exe"
+      - "C:/src/flutter/bin/mt"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\MinGW\\bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files (x86)\\Microsoft SQL Server\\160\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\160\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\Client SDK\\ODBC\\170\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\160\\DTS\\Binn\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Android\\sdk\\cmdline-tools\\latest\\bin"
+        - "C:\\Android\\sdk\\platform-tools"
+        - "C:\\Program Files\\Java\\jdk-22.0.2\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\java8path"
+        - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\MinGW\\bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Pub\\Cache\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\flutter\\bin"
+        - "C:\\Program Files\\Git\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Program Files\\Java\\jdk-22.0.2\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\MinGW\\bin"
+        - "C:\\npm-global\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Muse Hub\\lib"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\Scripts"
+        - "C:\\src\\flutter\\bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:23 (project)"
+    mode: "program"
+    variable: "CMAKE_AR"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "lib"
+    candidate_directories:
+      - "C:/Program Files/Microsoft Visual Studio/18/Insiders/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files/dotnet/"
+      - "C:/MinGW/bin/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/Program Files/nodejs/"
+      - "C:/Program Files (x86)/Microsoft SQL Server/160/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/160/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/160/DTS/Binn/"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Android/Sdk/cmdline-tools/latest/bin/"
+      - "C:/Android/Sdk/platform-tools/"
+      - "C:/Program Files/Java/jdk-22.0.2/bin/"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/javapath/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Pub/Cache/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/flutter/bin/"
+      - "C:/Program Files/Git/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/npm-global/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Roaming/npm/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Muse Hub/lib/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/cursor/resources/app/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0/LocalCache/local-packages/Python311/Scripts/"
+      - "C:/src/flutter/bin/"
+    searched_directories:
+      - "C:/Program Files/Microsoft Visual Studio/18/Insiders/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/lib.com"
+    found: "C:/Program Files/Microsoft Visual Studio/18/Insiders/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/lib.exe"
+    search_context:
+      ENV{PATH}:
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\MinGW\\bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files (x86)\\Microsoft SQL Server\\160\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\160\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\Client SDK\\ODBC\\170\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\160\\DTS\\Binn\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Android\\sdk\\cmdline-tools\\latest\\bin"
+        - "C:\\Android\\sdk\\platform-tools"
+        - "C:\\Program Files\\Java\\jdk-22.0.2\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\java8path"
+        - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\MinGW\\bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Pub\\Cache\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\flutter\\bin"
+        - "C:\\Program Files\\Git\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Program Files\\Java\\jdk-22.0.2\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\MinGW\\bin"
+        - "C:\\npm-global\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Muse Hub\\lib"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\Scripts"
+        - "C:\\src\\flutter\\bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:462 (find_file)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:500 (CMAKE_DETERMINE_COMPILER_ID_WRITE)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:8 (CMAKE_DETERMINE_COMPILER_ID_BUILD)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:23 (project)"
+    mode: "file"
+    variable: "src_in"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "CMakeCXXCompilerId.cpp.in"
+    candidate_directories:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/"
+    found: "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeCXXCompilerId.cpp.in"
+    search_context:
+      ENV{PATH}:
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\MinGW\\bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files (x86)\\Microsoft SQL Server\\160\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\160\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\Client SDK\\ODBC\\170\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\160\\DTS\\Binn\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Android\\sdk\\cmdline-tools\\latest\\bin"
+        - "C:\\Android\\sdk\\platform-tools"
+        - "C:\\Program Files\\Java\\jdk-22.0.2\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\java8path"
+        - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\MinGW\\bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Pub\\Cache\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\flutter\\bin"
+        - "C:\\Program Files\\Git\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Program Files\\Java\\jdk-22.0.2\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\MinGW\\bin"
+        - "C:\\npm-global\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Muse Hub\\lib"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\Scripts"
+        - "C:\\src\\flutter\\bin"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:23 (project)"
+    message: |
+      Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+      Compiler:  
+      Build flags: 
+      Id flags:  
+      
+      The output was:
+      0
+      MSBuild version 18.1.0-preview-25527-05+567af5e9d for .NET Framework
+      Build started 16-11-2025 02:54:59.
+      
+      Project "C:\\Users\\Nikhil Kumar Yadav\\f3d\\build\\CMakeFiles\\4.2.0-rc3\\CompilerIdCXX\\CompilerIdCXX.vcxproj" on node 1 (default targets).
+      PrepareForBuild:
+        Creating directory "Debug\\".
+        Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+        Creating directory "Debug\\CompilerIdCXX.tlog\\".
+      InitializeBuildStatus:
+        Creating "Debug\\CompilerIdCXX.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+        Touching "Debug\\CompilerIdCXX.tlog\\unsuccessfulbuild".
+      ClCompile:
+        C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\CL.exe /c /nologo /W0 /WX- /diagnostics:column /Od /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\\\" /Fd"Debug\\vc145.pdb" /external:W0 /Gd /TP /FC /errorReport:queue CMakeCXXCompilerId.cpp
+        CMakeCXXCompilerId.cpp
+      Link:
+        C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:".\\CompilerIdCXX.exe" /INCREMENTAL:NO /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /PDB:".\\CompilerIdCXX.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:".\\CompilerIdCXX.lib" /MACHINE:X64 Debug\\CMakeCXXCompilerId.obj
+        CompilerIdCXX.vcxproj -> C:\\Users\\Nikhil Kumar Yadav\\f3d\\build\\CMakeFiles\\4.2.0-rc3\\CompilerIdCXX\\CompilerIdCXX.exe
+      PostBuildEvent:
+        for %%i in (cl.exe) do @echo CMAKE_CXX_COMPILER=%%~$PATH:i
+        :VCEnd
+        CMAKE_CXX_COMPILER=C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.50.35717\\bin\\Hostx64\\x64\\cl.exe
+      FinalizeBuildStatus:
+        Deleting file "Debug\\CompilerIdCXX.tlog\\unsuccessfulbuild".
+        Touching "Debug\\CompilerIdCXX.tlog\\CompilerIdCXX.lastbuildstate".
+      Done Building Project "C:\\Users\\Nikhil Kumar Yadav\\f3d\\build\\CMakeFiles\\4.2.0-rc3\\CompilerIdCXX\\CompilerIdCXX.vcxproj" (default targets).
+      
+      Build succeeded.
+          0 Warning(s)
+          0 Error(s)
+      
+      Time Elapsed 00:00:00.54
+      
+      
+      Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CompilerIdCXX.exe"
+      
+      Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CompilerIdCXX.vcxproj"
+      
+      The CXX compiler identification is MSVC, found in:
+        C:/Users/Nikhil Kumar Yadav/f3d/build/CMakeFiles/4.2.0-rc3/CompilerIdCXX/CompilerIdCXX.exe
+      
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:37 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:65 (__resolve_tool_path)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:104 (__resolve_linker_path)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:23 (project)"
+    mode: "program"
+    variable: "_CMAKE_TOOL_WITH_PATH"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "lld-link"
+    candidate_directories:
+      - "C:/Program Files/Microsoft Visual Studio/18/Insiders/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/"
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files/dotnet/"
+      - "C:/MinGW/bin/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/Program Files/nodejs/"
+      - "C:/Program Files (x86)/Microsoft SQL Server/160/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/160/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/160/DTS/Binn/"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Android/Sdk/cmdline-tools/latest/bin/"
+      - "C:/Android/Sdk/platform-tools/"
+      - "C:/Program Files/Java/jdk-22.0.2/bin/"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/javapath/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Pub/Cache/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/flutter/bin/"
+      - "C:/Program Files/Git/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/npm-global/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Roaming/npm/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Muse Hub/lib/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/cursor/resources/app/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0/LocalCache/local-packages/Python311/Scripts/"
+      - "C:/src/flutter/bin/"
+    searched_directories:
+      - "C:/Program Files/Microsoft Visual Studio/18/Insiders/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/lld-link.com"
+      - "C:/Program Files/Microsoft Visual Studio/18/Insiders/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/lld-link.exe"
+      - "C:/Program Files/Microsoft Visual Studio/18/Insiders/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/lld-link"
+      - "C:/Windows/System32/lld-link.com"
+      - "C:/Windows/System32/lld-link.exe"
+      - "C:/Windows/System32/lld-link"
+      - "C:/Windows/lld-link.com"
+      - "C:/Windows/lld-link.exe"
+      - "C:/Windows/lld-link"
+      - "C:/Windows/System32/wbem/lld-link.com"
+      - "C:/Windows/System32/wbem/lld-link.exe"
+      - "C:/Windows/System32/wbem/lld-link"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/lld-link.com"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/lld-link.exe"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/lld-link"
+      - "C:/Windows/System32/OpenSSH/lld-link.com"
+      - "C:/Windows/System32/OpenSSH/lld-link.exe"
+      - "C:/Windows/System32/OpenSSH/lld-link"
+      - "C:/Program Files/dotnet/lld-link.com"
+      - "C:/Program Files/dotnet/lld-link.exe"
+      - "C:/Program Files/dotnet/lld-link"
+      - "C:/MinGW/bin/lld-link.com"
+      - "C:/MinGW/bin/lld-link.exe"
+      - "C:/MinGW/bin/lld-link"
+      - "C:/Program Files/Git/cmd/lld-link.com"
+      - "C:/Program Files/Git/cmd/lld-link.exe"
+      - "C:/Program Files/Git/cmd/lld-link"
+      - "C:/Program Files/nodejs/lld-link.com"
+      - "C:/Program Files/nodejs/lld-link.exe"
+      - "C:/Program Files/nodejs/lld-link"
+      - "C:/Program Files (x86)/Microsoft SQL Server/160/Tools/Binn/lld-link.com"
+      - "C:/Program Files (x86)/Microsoft SQL Server/160/Tools/Binn/lld-link.exe"
+      - "C:/Program Files (x86)/Microsoft SQL Server/160/Tools/Binn/lld-link"
+      - "C:/Program Files/Microsoft SQL Server/160/Tools/Binn/lld-link.com"
+      - "C:/Program Files/Microsoft SQL Server/160/Tools/Binn/lld-link.exe"
+      - "C:/Program Files/Microsoft SQL Server/160/Tools/Binn/lld-link"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/lld-link.com"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/lld-link.exe"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/lld-link"
+      - "C:/Program Files/Microsoft SQL Server/160/DTS/Binn/lld-link.com"
+      - "C:/Program Files/Microsoft SQL Server/160/DTS/Binn/lld-link.exe"
+      - "C:/Program Files/Microsoft SQL Server/160/DTS/Binn/lld-link"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/lld-link.com"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/lld-link.exe"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/lld-link"
+      - "C:/Program Files/CMake/bin/lld-link.com"
+      - "C:/Program Files/CMake/bin/lld-link.exe"
+      - "C:/Program Files/CMake/bin/lld-link"
+      - "C:/Android/Sdk/cmdline-tools/latest/bin/lld-link.com"
+      - "C:/Android/Sdk/cmdline-tools/latest/bin/lld-link.exe"
+      - "C:/Android/Sdk/cmdline-tools/latest/bin/lld-link"
+      - "C:/Android/Sdk/platform-tools/lld-link.com"
+      - "C:/Android/Sdk/platform-tools/lld-link.exe"
+      - "C:/Android/Sdk/platform-tools/lld-link"
+      - "C:/Program Files/Java/jdk-22.0.2/bin/lld-link.com"
+      - "C:/Program Files/Java/jdk-22.0.2/bin/lld-link.exe"
+      - "C:/Program Files/Java/jdk-22.0.2/bin/lld-link"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/lld-link.com"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/lld-link.exe"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/lld-link"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/javapath/lld-link.com"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/javapath/lld-link.exe"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/javapath/lld-link"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Pub/Cache/bin/lld-link.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Pub/Cache/bin/lld-link.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Pub/Cache/bin/lld-link"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/flutter/bin/lld-link.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/flutter/bin/lld-link.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/flutter/bin/lld-link"
+      - "C:/Program Files/Git/bin/lld-link.com"
+      - "C:/Program Files/Git/bin/lld-link.exe"
+      - "C:/Program Files/Git/bin/lld-link"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Microsoft/WindowsApps/lld-link.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Microsoft/WindowsApps/lld-link.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Microsoft/WindowsApps/lld-link"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/GitHubDesktop/bin/lld-link.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/GitHubDesktop/bin/lld-link.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/GitHubDesktop/bin/lld-link"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/Microsoft VS Code/bin/lld-link.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/Microsoft VS Code/bin/lld-link.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/Microsoft VS Code/bin/lld-link"
+      - "C:/npm-global/bin/lld-link.com"
+      - "C:/npm-global/bin/lld-link.exe"
+      - "C:/npm-global/bin/lld-link"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Roaming/npm/lld-link.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Roaming/npm/lld-link.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Roaming/npm/lld-link"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Muse Hub/lib/lld-link.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Muse Hub/lib/lld-link.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Muse Hub/lib/lld-link"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/cursor/resources/app/bin/lld-link.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/cursor/resources/app/bin/lld-link.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/cursor/resources/app/bin/lld-link"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0/LocalCache/local-packages/Python311/Scripts/lld-link.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0/LocalCache/local-packages/Python311/Scripts/lld-link.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0/LocalCache/local-packages/Python311/Scripts/lld-link"
+      - "C:/src/flutter/bin/lld-link.com"
+      - "C:/src/flutter/bin/lld-link.exe"
+      - "C:/src/flutter/bin/lld-link"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\MinGW\\bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files (x86)\\Microsoft SQL Server\\160\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\160\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\Client SDK\\ODBC\\170\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\160\\DTS\\Binn\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Android\\sdk\\cmdline-tools\\latest\\bin"
+        - "C:\\Android\\sdk\\platform-tools"
+        - "C:\\Program Files\\Java\\jdk-22.0.2\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\java8path"
+        - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\MinGW\\bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Pub\\Cache\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\flutter\\bin"
+        - "C:\\Program Files\\Git\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Program Files\\Java\\jdk-22.0.2\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\MinGW\\bin"
+        - "C:\\npm-global\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Muse Hub\\lib"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\Scripts"
+        - "C:\\src\\flutter\\bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineRCCompiler.cmake:40 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/Platform/Windows-MSVC.cmake:580 (enable_language)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/Platform/Windows-MSVC.cmake:553 (__windows_compiler_msvc_enable_rc)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/Platform/Windows-MSVC-C.cmake:5 (__windows_compiler_msvc)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeCInformation.cmake:48 (include)"
+      - "CMakeLists.txt:23 (project)"
+    mode: "program"
+    variable: "CMAKE_RC_COMPILER"
+    description: "RC compiler"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "rc"
+    candidate_directories:
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files/dotnet/"
+      - "C:/MinGW/bin/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/Program Files/nodejs/"
+      - "C:/Program Files (x86)/Microsoft SQL Server/160/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/160/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/160/DTS/Binn/"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Android/Sdk/cmdline-tools/latest/bin/"
+      - "C:/Android/Sdk/platform-tools/"
+      - "C:/Program Files/Java/jdk-22.0.2/bin/"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/javapath/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Pub/Cache/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/flutter/bin/"
+      - "C:/Program Files/Git/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/npm-global/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Roaming/npm/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Muse Hub/lib/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/cursor/resources/app/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0/LocalCache/local-packages/Python311/Scripts/"
+      - "C:/src/flutter/bin/"
+      - "C:/Program Files/bin/"
+      - "C:/Program Files/sbin/"
+      - "C:/Program Files/"
+      - "C:/Program Files (x86)/bin/"
+      - "C:/Program Files (x86)/sbin/"
+      - "C:/Program Files (x86)/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files/CMake/sbin/"
+      - "C:/Program Files/CMake/"
+      - "C:/Program Files (x86)/F3D/bin/"
+      - "C:/Program Files (x86)/F3D/sbin/"
+      - "C:/Program Files (x86)/F3D/"
+    searched_directories:
+      - "C:/Windows/System32/rc.com"
+      - "C:/Windows/System32/rc.exe"
+      - "C:/Windows/System32/rc"
+      - "C:/Windows/rc.com"
+      - "C:/Windows/rc.exe"
+      - "C:/Windows/rc"
+      - "C:/Windows/System32/wbem/rc.com"
+      - "C:/Windows/System32/wbem/rc.exe"
+      - "C:/Windows/System32/wbem/rc"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/rc.com"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/rc.exe"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/rc"
+      - "C:/Windows/System32/OpenSSH/rc.com"
+      - "C:/Windows/System32/OpenSSH/rc.exe"
+      - "C:/Windows/System32/OpenSSH/rc"
+      - "C:/Program Files/dotnet/rc.com"
+      - "C:/Program Files/dotnet/rc.exe"
+      - "C:/Program Files/dotnet/rc"
+      - "C:/MinGW/bin/rc.com"
+      - "C:/MinGW/bin/rc.exe"
+      - "C:/MinGW/bin/rc"
+      - "C:/Program Files/Git/cmd/rc.com"
+      - "C:/Program Files/Git/cmd/rc.exe"
+      - "C:/Program Files/Git/cmd/rc"
+      - "C:/Program Files/nodejs/rc.com"
+      - "C:/Program Files/nodejs/rc.exe"
+      - "C:/Program Files/nodejs/rc"
+      - "C:/Program Files (x86)/Microsoft SQL Server/160/Tools/Binn/rc.com"
+      - "C:/Program Files (x86)/Microsoft SQL Server/160/Tools/Binn/rc.exe"
+      - "C:/Program Files (x86)/Microsoft SQL Server/160/Tools/Binn/rc"
+      - "C:/Program Files/Microsoft SQL Server/160/Tools/Binn/rc.com"
+      - "C:/Program Files/Microsoft SQL Server/160/Tools/Binn/rc.exe"
+      - "C:/Program Files/Microsoft SQL Server/160/Tools/Binn/rc"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/rc.com"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/rc.exe"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/rc"
+      - "C:/Program Files/Microsoft SQL Server/160/DTS/Binn/rc.com"
+      - "C:/Program Files/Microsoft SQL Server/160/DTS/Binn/rc.exe"
+      - "C:/Program Files/Microsoft SQL Server/160/DTS/Binn/rc"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/rc.com"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/rc.exe"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/rc"
+      - "C:/Program Files/CMake/bin/rc.com"
+      - "C:/Program Files/CMake/bin/rc.exe"
+      - "C:/Program Files/CMake/bin/rc"
+      - "C:/Android/Sdk/cmdline-tools/latest/bin/rc.com"
+      - "C:/Android/Sdk/cmdline-tools/latest/bin/rc.exe"
+      - "C:/Android/Sdk/cmdline-tools/latest/bin/rc"
+      - "C:/Android/Sdk/platform-tools/rc.com"
+      - "C:/Android/Sdk/platform-tools/rc.exe"
+      - "C:/Android/Sdk/platform-tools/rc"
+      - "C:/Program Files/Java/jdk-22.0.2/bin/rc.com"
+      - "C:/Program Files/Java/jdk-22.0.2/bin/rc.exe"
+      - "C:/Program Files/Java/jdk-22.0.2/bin/rc"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/rc.com"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/rc.exe"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/rc"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/javapath/rc.com"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/javapath/rc.exe"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/javapath/rc"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Pub/Cache/bin/rc.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Pub/Cache/bin/rc.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Pub/Cache/bin/rc"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/flutter/bin/rc.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/flutter/bin/rc.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/flutter/bin/rc"
+      - "C:/Program Files/Git/bin/rc.com"
+      - "C:/Program Files/Git/bin/rc.exe"
+      - "C:/Program Files/Git/bin/rc"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Microsoft/WindowsApps/rc.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Microsoft/WindowsApps/rc.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Microsoft/WindowsApps/rc"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/GitHubDesktop/bin/rc.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/GitHubDesktop/bin/rc.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/GitHubDesktop/bin/rc"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/Microsoft VS Code/bin/rc.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/Microsoft VS Code/bin/rc.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/Microsoft VS Code/bin/rc"
+      - "C:/npm-global/bin/rc.com"
+      - "C:/npm-global/bin/rc.exe"
+      - "C:/npm-global/bin/rc"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Roaming/npm/rc.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Roaming/npm/rc.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Roaming/npm/rc"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Muse Hub/lib/rc.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Muse Hub/lib/rc.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Muse Hub/lib/rc"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/cursor/resources/app/bin/rc.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/cursor/resources/app/bin/rc.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/cursor/resources/app/bin/rc"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0/LocalCache/local-packages/Python311/Scripts/rc.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0/LocalCache/local-packages/Python311/Scripts/rc.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0/LocalCache/local-packages/Python311/Scripts/rc"
+      - "C:/src/flutter/bin/rc.com"
+      - "C:/src/flutter/bin/rc.exe"
+      - "C:/src/flutter/bin/rc"
+      - "C:/Program Files/bin/rc.com"
+      - "C:/Program Files/bin/rc.exe"
+      - "C:/Program Files/bin/rc"
+      - "C:/Program Files/sbin/rc.com"
+      - "C:/Program Files/sbin/rc.exe"
+      - "C:/Program Files/sbin/rc"
+      - "C:/Program Files/rc.com"
+      - "C:/Program Files/rc.exe"
+      - "C:/Program Files/rc"
+      - "C:/Program Files (x86)/bin/rc.com"
+      - "C:/Program Files (x86)/bin/rc.exe"
+      - "C:/Program Files (x86)/bin/rc"
+      - "C:/Program Files (x86)/sbin/rc.com"
+      - "C:/Program Files (x86)/sbin/rc.exe"
+      - "C:/Program Files (x86)/sbin/rc"
+      - "C:/Program Files (x86)/rc.com"
+      - "C:/Program Files (x86)/rc.exe"
+      - "C:/Program Files (x86)/rc"
+      - "C:/Program Files/CMake/bin/rc.com"
+      - "C:/Program Files/CMake/bin/rc.exe"
+      - "C:/Program Files/CMake/bin/rc"
+      - "C:/Program Files/CMake/sbin/rc.com"
+      - "C:/Program Files/CMake/sbin/rc.exe"
+      - "C:/Program Files/CMake/sbin/rc"
+      - "C:/Program Files/CMake/rc.com"
+      - "C:/Program Files/CMake/rc.exe"
+      - "C:/Program Files/CMake/rc"
+      - "C:/Program Files (x86)/F3D/bin/rc.com"
+      - "C:/Program Files (x86)/F3D/bin/rc.exe"
+      - "C:/Program Files (x86)/F3D/bin/rc"
+      - "C:/Program Files (x86)/F3D/sbin/rc.com"
+      - "C:/Program Files (x86)/F3D/sbin/rc.exe"
+      - "C:/Program Files (x86)/F3D/sbin/rc"
+      - "C:/Program Files (x86)/F3D/rc.com"
+      - "C:/Program Files (x86)/F3D/rc.exe"
+      - "C:/Program Files (x86)/F3D/rc"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\MinGW\\bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files (x86)\\Microsoft SQL Server\\160\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\160\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\Client SDK\\ODBC\\170\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\160\\DTS\\Binn\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Android\\sdk\\cmdline-tools\\latest\\bin"
+        - "C:\\Android\\sdk\\platform-tools"
+        - "C:\\Program Files\\Java\\jdk-22.0.2\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\java8path"
+        - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\MinGW\\bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Pub\\Cache\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\flutter\\bin"
+        - "C:\\Program Files\\Git\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Program Files\\Java\\jdk-22.0.2\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\MinGW\\bin"
+        - "C:\\npm-global\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Muse Hub\\lib"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\Scripts"
+        - "C:\\src\\flutter\\bin"
+      CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/F3D"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "C:/Program Files"
+        - "C:/Program Files (x86)"
+        - "C:/Program Files/CMake"
+        - "C:/Program Files (x86)/F3D"
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerABI.cmake:83 (try_compile)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:23 (project)"
+    checks:
+      - "Detecting C compiler ABI info"
+    directories:
+      source: "C:/Users/Nikhil Kumar Yadav/f3d/build/CMakeFiles/CMakeScratch/TryCompile-pxgmgw"
+      binary: "C:/Users/Nikhil Kumar Yadav/f3d/build/CMakeFiles/CMakeScratch/TryCompile-pxgmgw"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+    buildResult:
+      variable: "CMAKE_C_ABI_COMPILED"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Users/Nikhil Kumar Yadav/f3d/build/CMakeFiles/CMakeScratch/TryCompile-pxgmgw'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/18/Insiders/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_07bbd.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=18.0 /v:n
+        MSBuild version 18.1.0-preview-25527-05+567af5e9d for .NET Framework
+        Build started 16-11-2025 02:55:00.
+        
+        Project "C:\\Users\\Nikhil Kumar Yadav\\f3d\\build\\CMakeFiles\\CMakeScratch\\TryCompile-pxgmgw\\cmTC_07bbd.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+          Creating directory "C:\\Users\\Nikhil Kumar Yadav\\f3d\\build\\CMakeFiles\\CMakeScratch\\TryCompile-pxgmgw\\Debug\\".
+          Creating directory "cmTC_07bbd.dir\\Debug\\cmTC_07bbd.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_07bbd.dir\\Debug\\cmTC_07bbd.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_07bbd.dir\\Debug\\cmTC_07bbd.tlog\\unsuccessfulbuild".
+        ClCompile:
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /Fo"cmTC_07bbd.dir\\Debug\\\\" /Fd"cmTC_07bbd.dir\\Debug\\vc145.pdb" /external:W1 /TC /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.2\\Modules\\CMakeCCompilerABI.c"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.50.35717 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /Fo"cmTC_07bbd.dir\\Debug\\\\" /Fd"cmTC_07bbd.dir\\Debug\\vc145.pdb" /external:W1 /TC /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.2\\Modules\\CMakeCCompilerABI.c"
+          CMakeCCompilerABI.c
+        Link:
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\Users\\Nikhil Kumar Yadav\\f3d\\build\\CMakeFiles\\CMakeScratch\\TryCompile-pxgmgw\\Debug\\cmTC_07bbd.exe" /INCREMENTAL /ILK:"cmTC_07bbd.dir\\Debug\\cmTC_07bbd.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Users/Nikhil Kumar Yadav/f3d/build/CMakeFiles/CMakeScratch/TryCompile-pxgmgw/Debug/cmTC_07bbd.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/Users/Nikhil Kumar Yadav/f3d/build/CMakeFiles/CMakeScratch/TryCompile-pxgmgw/Debug/cmTC_07bbd.lib" /MACHINE:X64  /machine:x64 cmTC_07bbd.dir\\Debug\\CMakeCCompilerABI.obj
+          cmTC_07bbd.vcxproj -> C:\\Users\\Nikhil Kumar Yadav\\f3d\\build\\CMakeFiles\\CMakeScratch\\TryCompile-pxgmgw\\Debug\\cmTC_07bbd.exe
+        FinalizeBuildStatus:
+          Deleting file "cmTC_07bbd.dir\\Debug\\cmTC_07bbd.tlog\\unsuccessfulbuild".
+          Touching "cmTC_07bbd.dir\\Debug\\cmTC_07bbd.tlog\\cmTC_07bbd.lastbuildstate".
+        Done Building Project "C:\\Users\\Nikhil Kumar Yadav\\f3d\\build\\CMakeFiles\\CMakeScratch\\TryCompile-pxgmgw\\cmTC_07bbd.vcxproj" (default targets).
+        
+        Build succeeded.
+            0 Warning(s)
+            0 Error(s)
+        
+        Time Elapsed 00:00:00.49
+        
+      exitCode: 0
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerABI.cmake:253 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:23 (project)"
+    message: |
+      Parsed C implicit link information:
+        link line regex: [^( *|.*[/\\])(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|link\\.exe|lld-link(\\.exe)?|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
+        linker tool regex: [^[ 	]*(->|"|[0-9]+>[ 	-]*Build:[ 	0-9]+ ms[ 	]*)?[ 	]*(([^"]*[/\\])?(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|link\\.exe|lld-link(\\.exe)?))("|,| |$)]
+        linker tool for 'C': C:/Program Files/Microsoft Visual Studio/18/Insiders/VC/Tools/MSVC/14.50.35717/bin/HostX64/x64/link.exe
+        implicit libs: []
+        implicit objs: []
+        implicit dirs: []
+        implicit fwks: []
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/Internal/CMakeDetermineLinkerId.cmake:38 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerABI.cmake:299 (cmake_determine_linker_id)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:23 (project)"
+    message: |
+      Running the C compiler's linker: "C:/Program Files/Microsoft Visual Studio/18/Insiders/VC/Tools/MSVC/14.50.35717/bin/HostX64/x64/link.exe" "-v"
+      Microsoft (R) Incremental Linker Version 14.50.35717.0
+      Copyright (C) Microsoft Corporation.  All rights reserved.
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerABI.cmake:83 (try_compile)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:23 (project)"
+    checks:
+      - "Detecting CXX compiler ABI info"
+    directories:
+      source: "C:/Users/Nikhil Kumar Yadav/f3d/build/CMakeFiles/CMakeScratch/TryCompile-rlgi4o"
+      binary: "C:/Users/Nikhil Kumar Yadav/f3d/build/CMakeFiles/CMakeScratch/TryCompile-rlgi4o"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /EHsc"
+      CMAKE_CXX_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_CXX_SCAN_FOR_MODULES: "OFF"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+    buildResult:
+      variable: "CMAKE_CXX_ABI_COMPILED"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Users/Nikhil Kumar Yadav/f3d/build/CMakeFiles/CMakeScratch/TryCompile-rlgi4o'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/18/Insiders/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_73bea.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=18.0 /v:n
+        MSBuild version 18.1.0-preview-25527-05+567af5e9d for .NET Framework
+        Build started 16-11-2025 02:55:01.
+        
+        Project "C:\\Users\\Nikhil Kumar Yadav\\f3d\\build\\CMakeFiles\\CMakeScratch\\TryCompile-rlgi4o\\cmTC_73bea.vcxproj" on node 1 (default targets).
+        PrepareForBuild:
+          Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+          Creating directory "C:\\Users\\Nikhil Kumar Yadav\\f3d\\build\\CMakeFiles\\CMakeScratch\\TryCompile-rlgi4o\\Debug\\".
+          Creating directory "cmTC_73bea.dir\\Debug\\cmTC_73bea.tlog\\".
+        InitializeBuildStatus:
+          Creating "cmTC_73bea.dir\\Debug\\cmTC_73bea.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_73bea.dir\\Debug\\cmTC_73bea.tlog\\unsuccessfulbuild".
+        ClCompile:
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /Fo"cmTC_73bea.dir\\Debug\\\\" /Fd"cmTC_73bea.dir\\Debug\\vc145.pdb" /external:W1 /TP /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.2\\Modules\\CMakeCXXCompilerABI.cpp"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.50.35717 for x64
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D _MBCS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /Fo"cmTC_73bea.dir\\Debug\\\\" /Fd"cmTC_73bea.dir\\Debug\\vc145.pdb" /external:W1 /TP /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.2\\Modules\\CMakeCXXCompilerABI.cpp"
+          CMakeCXXCompilerABI.cpp
+        Link:
+          C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\VC\\Tools\\MSVC\\14.50.35717\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\Users\\Nikhil Kumar Yadav\\f3d\\build\\CMakeFiles\\CMakeScratch\\TryCompile-rlgi4o\\Debug\\cmTC_73bea.exe" /INCREMENTAL /ILK:"cmTC_73bea.dir\\Debug\\cmTC_73bea.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Users/Nikhil Kumar Yadav/f3d/build/CMakeFiles/CMakeScratch/TryCompile-rlgi4o/Debug/cmTC_73bea.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/Users/Nikhil Kumar Yadav/f3d/build/CMakeFiles/CMakeScratch/TryCompile-rlgi4o/Debug/cmTC_73bea.lib" /MACHINE:X64  /machine:x64 cmTC_73bea.dir\\Debug\\CMakeCXXCompilerABI.obj
+          cmTC_73bea.vcxproj -> C:\\Users\\Nikhil Kumar Yadav\\f3d\\build\\CMakeFiles\\CMakeScratch\\TryCompile-rlgi4o\\Debug\\cmTC_73bea.exe
+        FinalizeBuildStatus:
+          Deleting file "cmTC_73bea.dir\\Debug\\cmTC_73bea.tlog\\unsuccessfulbuild".
+          Touching "cmTC_73bea.dir\\Debug\\cmTC_73bea.tlog\\cmTC_73bea.lastbuildstate".
+        Done Building Project "C:\\Users\\Nikhil Kumar Yadav\\f3d\\build\\CMakeFiles\\CMakeScratch\\TryCompile-rlgi4o\\cmTC_73bea.vcxproj" (default targets).
+        
+        Build succeeded.
+            0 Warning(s)
+            0 Error(s)
+        
+        Time Elapsed 00:00:00.47
+        
+      exitCode: 0
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerABI.cmake:253 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:23 (project)"
+    message: |
+      Parsed CXX implicit link information:
+        link line regex: [^( *|.*[/\\])(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|link\\.exe|lld-link(\\.exe)?|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
+        linker tool regex: [^[ 	]*(->|"|[0-9]+>[ 	-]*Build:[ 	0-9]+ ms[ 	]*)?[ 	]*(([^"]*[/\\])?(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|link\\.exe|lld-link(\\.exe)?))("|,| |$)]
+        linker tool for 'CXX': C:/Program Files/Microsoft Visual Studio/18/Insiders/VC/Tools/MSVC/14.50.35717/bin/HostX64/x64/link.exe
+        implicit libs: []
+        implicit objs: []
+        implicit dirs: []
+        implicit fwks: []
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/Internal/CMakeDetermineLinkerId.cmake:38 (message)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeDetermineCompilerABI.cmake:299 (cmake_determine_linker_id)"
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:23 (project)"
+    message: |
+      Running the CXX compiler's linker: "C:/Program Files/Microsoft Visual Studio/18/Insiders/VC/Tools/MSVC/14.50.35717/bin/HostX64/x64/link.exe" "-v"
+      Microsoft (R) Incremental Linker Version 14.50.35717.0
+      Copyright (C) Microsoft Corporation.  All rights reserved.
+  -
+    kind: "find-v1"
+    backtrace:
+      - "C:/Program Files/CMake/share/cmake-4.2/Modules/FindGit.cmake:111 (find_program)"
+      - "CMakeLists.txt:44 (find_package)"
+    mode: "program"
+    variable: "GIT_EXECUTABLE"
+    description: "Git command line client"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "git.cmd"
+      - "git"
+    candidate_directories:
+      - "C:/Windows/System32/"
+      - "C:/Windows/"
+      - "C:/Windows/System32/wbem/"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/"
+      - "C:/Windows/System32/OpenSSH/"
+      - "C:/Program Files/dotnet/"
+      - "C:/MinGW/bin/"
+      - "C:/Program Files/Git/cmd/"
+      - "C:/Program Files/nodejs/"
+      - "C:/Program Files (x86)/Microsoft SQL Server/160/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/160/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/"
+      - "C:/Program Files/Microsoft SQL Server/160/DTS/Binn/"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Android/Sdk/cmdline-tools/latest/bin/"
+      - "C:/Android/Sdk/platform-tools/"
+      - "C:/Program Files/Java/jdk-22.0.2/bin/"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/javapath/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Pub/Cache/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/flutter/bin/"
+      - "C:/Program Files/Git/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Microsoft/WindowsApps/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/GitHubDesktop/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "C:/npm-global/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Roaming/npm/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Muse Hub/lib/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/cursor/resources/app/bin/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0/LocalCache/local-packages/Python311/Scripts/"
+      - "C:/src/flutter/bin/"
+      - "C:/Program Files/bin/"
+      - "C:/Program Files/sbin/"
+      - "C:/Program Files/"
+      - "C:/Program Files (x86)/bin/"
+      - "C:/Program Files (x86)/sbin/"
+      - "C:/Program Files (x86)/"
+      - "C:/Program Files/CMake/bin/"
+      - "C:/Program Files/CMake/sbin/"
+      - "C:/Program Files/CMake/"
+      - "C:/Program Files (x86)/F3D/bin/"
+      - "C:/Program Files (x86)/F3D/sbin/"
+      - "C:/Program Files (x86)/F3D/"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Atlassian/SourceTree/git_local/bin/"
+    searched_directories:
+      - "C:/Windows/System32/git.cmd.com"
+      - "C:/Windows/System32/git.cmd.exe"
+      - "C:/Windows/System32/git.cmd"
+      - "C:/Windows/git.cmd.com"
+      - "C:/Windows/git.cmd.exe"
+      - "C:/Windows/git.cmd"
+      - "C:/Windows/System32/wbem/git.cmd.com"
+      - "C:/Windows/System32/wbem/git.cmd.exe"
+      - "C:/Windows/System32/wbem/git.cmd"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/git.cmd.com"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/git.cmd.exe"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/git.cmd"
+      - "C:/Windows/System32/OpenSSH/git.cmd.com"
+      - "C:/Windows/System32/OpenSSH/git.cmd.exe"
+      - "C:/Windows/System32/OpenSSH/git.cmd"
+      - "C:/Program Files/dotnet/git.cmd.com"
+      - "C:/Program Files/dotnet/git.cmd.exe"
+      - "C:/Program Files/dotnet/git.cmd"
+      - "C:/MinGW/bin/git.cmd.com"
+      - "C:/MinGW/bin/git.cmd.exe"
+      - "C:/MinGW/bin/git.cmd"
+      - "C:/Program Files/Git/cmd/git.cmd.com"
+      - "C:/Program Files/Git/cmd/git.cmd.exe"
+      - "C:/Program Files/Git/cmd/git.cmd"
+      - "C:/Program Files/nodejs/git.cmd.com"
+      - "C:/Program Files/nodejs/git.cmd.exe"
+      - "C:/Program Files/nodejs/git.cmd"
+      - "C:/Program Files (x86)/Microsoft SQL Server/160/Tools/Binn/git.cmd.com"
+      - "C:/Program Files (x86)/Microsoft SQL Server/160/Tools/Binn/git.cmd.exe"
+      - "C:/Program Files (x86)/Microsoft SQL Server/160/Tools/Binn/git.cmd"
+      - "C:/Program Files/Microsoft SQL Server/160/Tools/Binn/git.cmd.com"
+      - "C:/Program Files/Microsoft SQL Server/160/Tools/Binn/git.cmd.exe"
+      - "C:/Program Files/Microsoft SQL Server/160/Tools/Binn/git.cmd"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/git.cmd.com"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/git.cmd.exe"
+      - "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/git.cmd"
+      - "C:/Program Files/Microsoft SQL Server/160/DTS/Binn/git.cmd.com"
+      - "C:/Program Files/Microsoft SQL Server/160/DTS/Binn/git.cmd.exe"
+      - "C:/Program Files/Microsoft SQL Server/160/DTS/Binn/git.cmd"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/git.cmd.com"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/git.cmd.exe"
+      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/git.cmd"
+      - "C:/Program Files/CMake/bin/git.cmd.com"
+      - "C:/Program Files/CMake/bin/git.cmd.exe"
+      - "C:/Program Files/CMake/bin/git.cmd"
+      - "C:/Android/Sdk/cmdline-tools/latest/bin/git.cmd.com"
+      - "C:/Android/Sdk/cmdline-tools/latest/bin/git.cmd.exe"
+      - "C:/Android/Sdk/cmdline-tools/latest/bin/git.cmd"
+      - "C:/Android/Sdk/platform-tools/git.cmd.com"
+      - "C:/Android/Sdk/platform-tools/git.cmd.exe"
+      - "C:/Android/Sdk/platform-tools/git.cmd"
+      - "C:/Program Files/Java/jdk-22.0.2/bin/git.cmd.com"
+      - "C:/Program Files/Java/jdk-22.0.2/bin/git.cmd.exe"
+      - "C:/Program Files/Java/jdk-22.0.2/bin/git.cmd"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/git.cmd.com"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/git.cmd.exe"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/java8path/git.cmd"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/javapath/git.cmd.com"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/javapath/git.cmd.exe"
+      - "C:/Program Files (x86)/Common Files/Oracle/Java/javapath/git.cmd"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Pub/Cache/bin/git.cmd.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Pub/Cache/bin/git.cmd.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Pub/Cache/bin/git.cmd"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/flutter/bin/git.cmd.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/flutter/bin/git.cmd.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/flutter/bin/git.cmd"
+      - "C:/Program Files/Git/bin/git.cmd.com"
+      - "C:/Program Files/Git/bin/git.cmd.exe"
+      - "C:/Program Files/Git/bin/git.cmd"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Microsoft/WindowsApps/git.cmd.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Microsoft/WindowsApps/git.cmd.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Microsoft/WindowsApps/git.cmd"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/GitHubDesktop/bin/git.cmd.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/GitHubDesktop/bin/git.cmd.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/GitHubDesktop/bin/git.cmd"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/Microsoft VS Code/bin/git.cmd.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/Microsoft VS Code/bin/git.cmd.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/Microsoft VS Code/bin/git.cmd"
+      - "C:/npm-global/bin/git.cmd.com"
+      - "C:/npm-global/bin/git.cmd.exe"
+      - "C:/npm-global/bin/git.cmd"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Roaming/npm/git.cmd.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Roaming/npm/git.cmd.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Roaming/npm/git.cmd"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Muse Hub/lib/git.cmd.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Muse Hub/lib/git.cmd.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Muse Hub/lib/git.cmd"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/cursor/resources/app/bin/git.cmd.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/cursor/resources/app/bin/git.cmd.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/cursor/resources/app/bin/git.cmd"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0/LocalCache/local-packages/Python311/Scripts/git.cmd.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0/LocalCache/local-packages/Python311/Scripts/git.cmd.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0/LocalCache/local-packages/Python311/Scripts/git.cmd"
+      - "C:/src/flutter/bin/git.cmd.com"
+      - "C:/src/flutter/bin/git.cmd.exe"
+      - "C:/src/flutter/bin/git.cmd"
+      - "C:/Program Files/bin/git.cmd.com"
+      - "C:/Program Files/bin/git.cmd.exe"
+      - "C:/Program Files/bin/git.cmd"
+      - "C:/Program Files/sbin/git.cmd.com"
+      - "C:/Program Files/sbin/git.cmd.exe"
+      - "C:/Program Files/sbin/git.cmd"
+      - "C:/Program Files/git.cmd.com"
+      - "C:/Program Files/git.cmd.exe"
+      - "C:/Program Files/git.cmd"
+      - "C:/Program Files (x86)/bin/git.cmd.com"
+      - "C:/Program Files (x86)/bin/git.cmd.exe"
+      - "C:/Program Files (x86)/bin/git.cmd"
+      - "C:/Program Files (x86)/sbin/git.cmd.com"
+      - "C:/Program Files (x86)/sbin/git.cmd.exe"
+      - "C:/Program Files (x86)/sbin/git.cmd"
+      - "C:/Program Files (x86)/git.cmd.com"
+      - "C:/Program Files (x86)/git.cmd.exe"
+      - "C:/Program Files (x86)/git.cmd"
+      - "C:/Program Files/CMake/bin/git.cmd.com"
+      - "C:/Program Files/CMake/bin/git.cmd.exe"
+      - "C:/Program Files/CMake/bin/git.cmd"
+      - "C:/Program Files/CMake/sbin/git.cmd.com"
+      - "C:/Program Files/CMake/sbin/git.cmd.exe"
+      - "C:/Program Files/CMake/sbin/git.cmd"
+      - "C:/Program Files/CMake/git.cmd.com"
+      - "C:/Program Files/CMake/git.cmd.exe"
+      - "C:/Program Files/CMake/git.cmd"
+      - "C:/Program Files (x86)/F3D/bin/git.cmd.com"
+      - "C:/Program Files (x86)/F3D/bin/git.cmd.exe"
+      - "C:/Program Files (x86)/F3D/bin/git.cmd"
+      - "C:/Program Files (x86)/F3D/sbin/git.cmd.com"
+      - "C:/Program Files (x86)/F3D/sbin/git.cmd.exe"
+      - "C:/Program Files (x86)/F3D/sbin/git.cmd"
+      - "C:/Program Files (x86)/F3D/git.cmd.com"
+      - "C:/Program Files (x86)/F3D/git.cmd.exe"
+      - "C:/Program Files (x86)/F3D/git.cmd"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Atlassian/SourceTree/git_local/bin/git.cmd.com"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Atlassian/SourceTree/git_local/bin/git.cmd.exe"
+      - "C:/Users/Nikhil Kumar Yadav/AppData/Local/Atlassian/SourceTree/git_local/bin/git.cmd"
+      - "C:/Windows/System32/git.com"
+      - "C:/Windows/System32/git.exe"
+      - "C:/Windows/System32/git"
+      - "C:/Windows/git.com"
+      - "C:/Windows/git.exe"
+      - "C:/Windows/git"
+      - "C:/Windows/System32/wbem/git.com"
+      - "C:/Windows/System32/wbem/git.exe"
+      - "C:/Windows/System32/wbem/git"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/git.com"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/git.exe"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/git"
+      - "C:/Windows/System32/OpenSSH/git.com"
+      - "C:/Windows/System32/OpenSSH/git.exe"
+      - "C:/Windows/System32/OpenSSH/git"
+      - "C:/Program Files/dotnet/git.com"
+      - "C:/Program Files/dotnet/git.exe"
+      - "C:/Program Files/dotnet/git"
+      - "C:/MinGW/bin/git.com"
+      - "C:/MinGW/bin/git.exe"
+      - "C:/MinGW/bin/git"
+      - "C:/Program Files/Git/cmd/git.com"
+    found: "C:/Program Files/Git/cmd/git.exe"
+    search_context:
+      ENV{PATH}:
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\MinGW\\bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files (x86)\\Microsoft SQL Server\\160\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\160\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\Client SDK\\ODBC\\170\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\160\\DTS\\Binn\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Android\\sdk\\cmdline-tools\\latest\\bin"
+        - "C:\\Android\\sdk\\platform-tools"
+        - "C:\\Program Files\\Java\\jdk-22.0.2\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\java8path"
+        - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\MinGW\\bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Pub\\Cache\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\flutter\\bin"
+        - "C:\\Program Files\\Git\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Program Files\\Java\\jdk-22.0.2\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\MinGW\\bin"
+        - "C:\\npm-global\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Muse Hub\\lib"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\Scripts"
+        - "C:\\src\\flutter\\bin"
+      CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/F3D"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "C:/Program Files"
+        - "C:/Program Files (x86)"
+        - "C:/Program Files/CMake"
+        - "C:/Program Files (x86)/F3D"
+  -
+    kind: "find_package-v1"
+    backtrace:
+      - "CMakeLists.txt:58 (find_package)"
+    name: "VTK"
+    components:
+      -
+        name: "CommonCore"
+        required: true
+        found: false
+      -
+        name: "CommonDataModel"
+        required: true
+        found: false
+      -
+        name: "CommonExecutionModel"
+        required: true
+        found: false
+      -
+        name: "FiltersGeneral"
+        required: true
+        found: false
+      -
+        name: "FiltersGeometry"
+        required: true
+        found: false
+      -
+        name: "ImagingCore"
+        required: true
+        found: false
+      -
+        name: "ImagingHybrid"
+        required: true
+        found: false
+      -
+        name: "InteractionStyle"
+        required: true
+        found: false
+      -
+        name: "InteractionWidgets"
+        required: true
+        found: false
+      -
+        name: "IOCityGML"
+        required: true
+        found: false
+      -
+        name: "IOGeometry"
+        required: true
+        found: false
+      -
+        name: "IOImage"
+        required: true
+        found: false
+      -
+        name: "IOImport"
+        required: true
+        found: false
+      -
+        name: "IOParallel"
+        required: true
+        found: false
+      -
+        name: "IOPLY"
+        required: true
+        found: false
+      -
+        name: "IOXML"
+        required: true
+        found: false
+      -
+        name: "RenderingAnnotation"
+        required: true
+        found: false
+      -
+        name: "RenderingCore"
+        required: true
+        found: false
+      -
+        name: "RenderingOpenGL2"
+        required: true
+        found: false
+      -
+        name: "RenderingVolumeOpenGL2"
+        required: true
+        found: false
+      -
+        name: "TestingCore"
+        required: true
+        found: false
+      -
+        name: "jsoncpp"
+        required: true
+        found: false
+      -
+        name: "opengl"
+        required: false
+        found: false
+      -
+        name: "IOExodus"
+        required: false
+        found: false
+      -
+        name: "IOHDF"
+        required: false
+        found: false
+      -
+        name: "IONetCDF"
+        required: false
+        found: false
+      -
+        name: "IOOpenVDB"
+        required: false
+        found: false
+      -
+        name: "RenderingGridAxes"
+        required: false
+        found: false
+      -
+        name: "RenderingRayTracing"
+        required: false
+        found: false
+    configs:
+      -
+        filename: "VTKConfig.cmake"
+        kind: "cmake"
+      -
+        filename: "vtk-config.cmake"
+        kind: "cmake"
+    version_request:
+      version: "9.3.0"
+      version_complete: "9.3.0"
+      exact: false
+    settings:
+      required: "required_explicit"
+      quiet: false
+      global: false
+      policy_scope: true
+      bypass_provider: false
+      names:
+        - "VTK"
+      path_suffixes:
+        - ""
+      paths:
+        CMAKE_FIND_USE_CMAKE_PATH: true
+        CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+        CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+        CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+        CMAKE_FIND_USE_INSTALL_PREFIX: true
+        CMAKE_FIND_USE_PACKAGE_ROOT_PATH: true
+        CMAKE_FIND_USE_CMAKE_PACKAGE_REGISTRY: true
+        CMAKE_FIND_USE_SYSTEM_PACKAGE_REGISTRY: true
+        CMAKE_FIND_ROOT_PATH_MODE: "BOTH"
+    candidates:
+      -
+        path: "C:/Users/Nikhil Kumar Yadav/f3d/build/CMakeFiles/pkgRedirects/VTKConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/Nikhil Kumar Yadav/f3d/build/CMakeFiles/pkgRedirects/vtk-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Windows/System32/VTKConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Windows/System32/vtk-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Windows/VTKConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Windows/vtk-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Windows/System32/wbem/VTKConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Windows/System32/wbem/vtk-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Windows/System32/WindowsPowerShell/v1.0/VTKConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Windows/System32/WindowsPowerShell/v1.0/vtk-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Windows/System32/OpenSSH/VTKConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Windows/System32/OpenSSH/vtk-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/dotnet/VTKConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/dotnet/vtk-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/MinGW/VTKConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/MinGW/vtk-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/Git/cmd/VTKConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/Git/cmd/vtk-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/nodejs/VTKConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/nodejs/vtk-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files (x86)/Microsoft SQL Server/160/Tools/Binn/VTKConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files (x86)/Microsoft SQL Server/160/Tools/Binn/vtk-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/Microsoft SQL Server/160/Tools/Binn/VTKConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/Microsoft SQL Server/160/Tools/Binn/vtk-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/VTKConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/Microsoft SQL Server/Client SDK/ODBC/170/Tools/Binn/vtk-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/Microsoft SQL Server/160/DTS/Binn/VTKConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/Microsoft SQL Server/160/DTS/Binn/vtk-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/VTKConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/vtk-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/CMake/VTKConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/CMake/vtk-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Android/Sdk/cmdline-tools/latest/VTKConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Android/Sdk/cmdline-tools/latest/vtk-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Android/Sdk/platform-tools/VTKConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Android/Sdk/platform-tools/vtk-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/Java/jdk-22.0.2/VTKConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/Java/jdk-22.0.2/vtk-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/Nikhil Kumar Yadav/AppData/Local/Pub/Cache/VTKConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/Nikhil Kumar Yadav/AppData/Local/Pub/Cache/vtk-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/Git/VTKConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/Git/vtk-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/Nikhil Kumar Yadav/AppData/Local/Microsoft/WindowsApps/VTKConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/Nikhil Kumar Yadav/AppData/Local/Microsoft/WindowsApps/vtk-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/Microsoft VS Code/VTKConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/Microsoft VS Code/vtk-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/npm-global/VTKConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/npm-global/vtk-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/Nikhil Kumar Yadav/AppData/Roaming/npm/VTKConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/Nikhil Kumar Yadav/AppData/Roaming/npm/vtk-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/cursor/resources/app/VTKConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/Nikhil Kumar Yadav/AppData/Local/Programs/cursor/resources/app/vtk-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/Nikhil Kumar Yadav/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0/LocalCache/local-packages/Python311/Scripts/VTKConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/Nikhil Kumar Yadav/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0/LocalCache/local-packages/Python311/Scripts/vtk-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/src/flutter/VTKConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/src/flutter/vtk-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/VTKConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/vtk-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/CMake/VTKConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files/CMake/vtk-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files (x86)/VTKConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Program Files (x86)/vtk-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+    found: null
+    search_context:
+      ENV{PATH}:
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\MinGW\\bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files (x86)\\Microsoft SQL Server\\160\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\160\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\Client SDK\\ODBC\\170\\Tools\\Binn\\"
+        - "C:\\Program Files\\Microsoft SQL Server\\160\\DTS\\Binn\\"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Android\\sdk\\cmdline-tools\\latest\\bin"
+        - "C:\\Android\\sdk\\platform-tools"
+        - "C:\\Program Files\\Java\\jdk-22.0.2\\bin"
+        - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\java8path"
+        - "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath"
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\MinGW\\bin"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Pub\\Cache\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\flutter\\bin"
+        - "C:\\Program Files\\Git\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Program Files\\Java\\jdk-22.0.2\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\MinGW\\bin"
+        - "C:\\npm-global\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Muse Hub\\lib"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "C:\\Users\\Nikhil Kumar Yadav\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\Scripts"
+        - "C:\\src\\flutter\\bin"
+      CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/F3D"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "C:/Program Files"
+        - "C:/Program Files (x86)"
+        - "C:/Program Files/CMake"
+        - "C:/Program Files (x86)/F3D"
+      CMAKE_MODULE_PATH:
+        - "C:/Users/Nikhil Kumar Yadav/f3d/cmake"
+...

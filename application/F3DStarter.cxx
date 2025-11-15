@@ -1838,11 +1838,27 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate, bool minima
 }
 
 //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int F3DStarter::AddFile(const fs::path& path, bool quiet)
 {
   try
   {
     auto tmpPath = fs::absolute(path);
+
+    // =======================
+    // ASCII-only filename check
+    // =======================
+    std::string fname = tmpPath.filename().string();
+    for (unsigned char c : fname)
+    {
+      if (c > 127)
+      {
+        f3d::log::error("Non-ASCII filename detected: ", fname,
+                        ". F3D currently supports ASCII filenames only.");
+        throw std::runtime_error("Non-ASCII filename not supported");
+      }
+    }
+    // =======================
 
     // If file is a directory, add files recursively
     if (fs::is_directory(tmpPath))
@@ -1868,7 +1884,6 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
       // Compute a key to identify the group the file should go in
       const auto pathToGroupKey = [&]()
       {
-        // XXX more multi-file mode may be added in the future
         std::string tmpPathString = tmpPath.string();
         if (!this->Internals->AppOptions.MultiFileRegex.empty())
         {
@@ -1876,14 +1891,12 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
           std::smatch match;
           if (std::regex_search(tmpPathString, match, regex))
           {
-            // Replace captured groups with `*` so that, for example,
-            // `"foo-part12.xyz"` matching `part(\d+)` becomes `"foo-part*.xyz"`
             std::stringstream groupKey;
             size_t j = 0;
             for (size_t i = 1; i <= regex.mark_count(); ++i)
             {
-              if (match.length(i) &&                                 // skip empty
-                match.position(i) >= static_cast<std::ptrdiff_t>(j)) // or nested groups
+              if (match.length(i) &&
+                match.position(i) >= static_cast<std::ptrdiff_t>(j))
               {
                 groupKey << tmpPathString.substr(j, match.position(i) - j) << "*";
                 j = match.position(i) + match.length(i);
@@ -1910,7 +1923,6 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
       {
         if (key == groupKey)
         {
-          // Check if file has already been added
           if (std::find(paths.begin(), paths.end(), tmpPath) == paths.end())
           {
             paths.emplace_back(tmpPath);
@@ -1919,7 +1931,7 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
         }
         ++groupIndex;
       }
-      // Create new group if we haven't found one and returned already
+
       this->Internals->FilesGroups.emplace_back(groupKey, std::vector<fs::path>({ tmpPath }));
       return static_cast<int>(this->Internals->FilesGroups.size()) - 1;
     }
@@ -1933,6 +1945,7 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
     return -1;
   }
 }
+
 
 //----------------------------------------------------------------------------
 bool F3DStarter::LoadRelativeFileGroup(int index, bool restoreCamera, bool forceClear)
