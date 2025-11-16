@@ -148,4 +148,4 @@ Once a release cycle:
 
 - Check that completions are still working with `fish` and `zsh` when tab is pressed
 - Check that F3D is added for extensions on a fresh Windows installation
-- Check that the font scale has been auto-scaled correctly when app launched
+- Check that the font scale has been auto-scaled correctly when app launched (Currently only work on Windows platform)
