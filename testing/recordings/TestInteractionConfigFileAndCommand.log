@@ -3,35 +3,56 @@ ConfigureEvent 1249 1374 0 0 0 0 0
 ExposeEvent 0 1406 0 0 0 0 0
 RenderEvent 0 1406 0 0 0 0 0
 TimerEvent 0 1406 0 0 0 0 0
+
+# O
 KeyPressEvent 345 106 0 111 1 o 0
 CharEvent 345 106 0 111 1 o 0
 TimerEvent 345 106 0 111 1 o 0
 KeyReleaseEvent 345 106 0 111 1 o 0
 TimerEvent 345 106 0 111 1 o 0
+
+# O
+KeyPressEvent 345 106 0 111 1 o 0
+CharEvent 345 106 0 111 1 o 0
+TimerEvent 345 106 0 111 1 o 0
+KeyReleaseEvent 345 106 0 111 1 o 0
+TimerEvent 345 106 0 111 1 o 0
+
+# X
 KeyPressEvent 345 106 0 120 1 x 0
 CharEvent 345 106 0 120 1 x 0
 TimerEvent 345 106 0 120 1 x 0
 KeyReleaseEvent 345 106 0 120 1 x 0
 TimerEvent 345 106 0 120 1 x 0
+
+# Right
 KeyPressEvent 345 106 0 0 1 Right 0
 CharEvent 345 106 0 0 1 Right 0
 TimerEvent 345 106 0 0 1 Right 0
 KeyReleaseEvent 345 106 0 0 1 Right 0
 TimerEvent 345 106 0 0 1 Right 0
+
+# N
 KeyPressEvent 345 106 0 110 1 n 0
 CharEvent 345 106 0 110 1 n 0
 TimerEvent 345 106 0 110 1 n 0
 KeyReleaseEvent 345 106 0 110 1 n 0
 TimerEvent 345 106 0 110 1 n 0
+
+# Right
 KeyPressEvent 345 106 0 0 1 Right 0
 CharEvent 345 106 0 0 1 Right 0
 KeyReleaseEvent 345 106 0 0 1 Right 0
 TimerEvent 345 106 0 0 1 Right 0
+
+# Right
 KeyPressEvent 345 106 0 0 1 Right 0
 CharEvent 345 106 0 0 1 Right 0
 TimerEvent 345 106 0 0 1 Right 0
 KeyReleaseEvent 345 106 0 0 1 Right 0
 TimerEvent 345 106 0 0 1 Right 0
+
+# Right
 KeyPressEvent 345 106 0 0 1 Right 0
 CharEvent 345 106 0 0 1 Right 0
 TimerEvent 345 106 0 0 1 Right 0
