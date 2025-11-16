@@ -1569,7 +1569,7 @@ void vtkF3DRenderer::ConfigureTextActors()
   }
 
   vtkWindow* vtkWindow = this->GetVTKWindow();
-  // Detect and set logical DPI (Currently only work on Windows platform)
+  // Detect and set logical DPI
   vtkWindow->DetectDPI();
   // Return logical DPI is scaled by system scale
   // Default return value = 72 when DPI was not detected
