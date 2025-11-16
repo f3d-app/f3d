@@ -5,6 +5,7 @@ DESCRIPTION
 DEPENDS
   VTK::CommonExecutionModel
   VTK::IOImport
+  VTK::IOCore
 PRIVATE_DEPENDS
   VTK::CommonCore
   VTK::RenderingOpenGL2
