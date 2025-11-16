@@ -398,11 +398,25 @@ void window_impl::UpdateDynamicOptions()
 
   // XXX: model.point_sprites.type only has an effect on geometry scene
   // but we set it here for practical reasons
-  const int pointSpritesSize = opt.model.point_sprites.size;
-  const vtkF3DRenderer::SplatType splatType = opt.model.point_sprites.type == "gaussian"
-    ? vtkF3DRenderer::SplatType::GAUSSIAN
-    : vtkF3DRenderer::SplatType::SPHERE;
-  renderer->SetPointSpritesProperties(splatType, pointSpritesSize);
+  renderer->SetUsePointSprites(opt.model.point_sprites.enable);
+  vtkF3DRenderer::SplatType splatType;
+  if (opt.model.point_sprites.enable)
+  {
+    if (opt.model.point_sprites.type == "gaussian")
+    {
+      splatType = vtkF3DRenderer::SplatType::GAUSSIAN;
+    }
+    else if (opt.model.point_sprites.type == "sphere")
+    {
+      splatType = vtkF3DRenderer::SplatType::SPHERE;
+    }
+    else
+    {
+      log::warn(opt.model.point_sprites.type,
+        R"( is an invalid point sprites typea. Valid modes are: "sphere", "gaussian")");
+    }
+    renderer->SetPointSpritesProperties(splatType, opt.model.point_sprites.size);
+  }
 
   renderer->SetLineWidth(opt.render.line_width);
   renderer->SetPointSize(opt.render.point_size);
@@ -599,7 +613,6 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetColormapDiscretization(opt.model.scivis.discretization);
   renderer->ShowScalarBar(opt.ui.scalar_bar);
 
-  renderer->SetUsePointSprites(opt.model.point_sprites.enable);
   renderer->SetUseVolume(opt.model.volume.enable);
   renderer->SetUseInverseOpacityFunction(opt.model.volume.inverse);
 

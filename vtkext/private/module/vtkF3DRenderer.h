@@ -62,6 +62,15 @@ public:
     STOCHASTIC
   };
 
+  /**
+   * Enum listing possible splat types.
+   */
+  enum class SplatType : unsigned char
+  {
+    SPHERE,
+    GAUSSIAN
+  };
+
   ///@{
   /**
    * Set visibility of different actors
@@ -289,12 +298,6 @@ public:
    * Set the normal texture on all actors
    */
   void SetTextureNormal(const std::optional<fs::path>& tex);
-
-  enum class SplatType
-  {
-    SPHERE,
-    GAUSSIAN
-  };
 
   /**
    * Set the point sprites size and the splat type on the pointGaussianMapper

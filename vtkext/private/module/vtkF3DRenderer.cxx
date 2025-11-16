@@ -2300,7 +2300,6 @@ void vtkF3DRenderer::ConfigureActorsProperties()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetPointSpritesProperties(SplatType type, double pointSpritesSize)
 {
-  this->CheatSheetConfigured = false;
   assert(this->Importer);
 
   if (type == SplatType::GAUSSIAN)
@@ -2374,6 +2373,7 @@ void vtkF3DRenderer::SetPointSpritesProperties(SplatType type, double pointSprit
       sprites.Actor->ForceTranslucentOff();
     }
   }
+  this->CheatSheetConfigured = false;
 }
 
 //----------------------------------------------------------------------------
