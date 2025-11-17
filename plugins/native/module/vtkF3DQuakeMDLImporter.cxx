@@ -239,12 +239,6 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     const unsigned long totalProgress = header->numFrames * 2 + header->numTriangles;
     unsigned long currentProgress = 0;
 
-    auto reportProgress = [&currentProgress, &totalProgress, this]()
-    {
-      double progress = static_cast<double>(currentProgress) / totalProgress;
-      this->Parent->InvokeEvent(vtkCommand::ProgressEvent, static_cast<void*>(&progress));
-    };
-
     constexpr int mdl_simpleframe_t_fixed_size =
       2 * sizeof(mdl_vertex_t) + 16 * sizeof(int8_t); // Size of bboxmin, bboxmax and name.
 
@@ -305,7 +299,8 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       currentProgress++;
       if (i % 128 == 0)
       {
-        reportProgress();
+        this->Parent->InvokeEvent(vtkCommand::ProgressEvent,
+          static_cast<void*>(new double{ static_cast<double>(currentProgress) / totalProgress }));
       }
     }
 
@@ -340,7 +335,8 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       currentProgress++;
       if (i % 128 == 0)
       {
-        reportProgress();
+        this->Parent->InvokeEvent(vtkCommand::ProgressEvent,
+          static_cast<void*>(new double{ static_cast<double>(currentProgress) / totalProgress }));
       }
     }
 
@@ -441,12 +437,14 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       currentProgress++;
       if (frameNum % 128 == 0)
       {
-        reportProgress();
+        this->Parent->InvokeEvent(vtkCommand::ProgressEvent,
+          static_cast<void*>(new double{ static_cast<double>(currentProgress) / totalProgress }));
       }
     }
 
     currentProgress = totalProgress;
-    reportProgress();
+    this->Parent->InvokeEvent(vtkCommand::ProgressEvent,
+      static_cast<void*>(new double{ static_cast<double>(currentProgress) / totalProgress }));
     return true;
   }
 
