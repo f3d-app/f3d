@@ -6,7 +6,7 @@ add_test(NAME test_check-engine COMMAND "$<TARGET_FILE:check-engine>")
 # multi-files
 add_test(NAME test_multi-files COMMAND "$<TARGET_FILE:multi-files>" "${CMAKE_CURRENT_SOURCE_DIR}/data/mb")
 set_tests_properties(test_multi-files PROPERTIES
-        PASS_REGULAR_EXPRESSION "Scene bounding box: -0.487464,1,-0.487464,1,-0.5,1")
+        PASS_REGULAR_EXPRESSION "Scene bounding box: -0.487464 ≤ x ≤ 1, -0.487464 ≤ y ≤ 1, -0.5 ≤ z ≤ 1")
 
 # render-image
 add_test(NAME test_render-image COMMAND "$<TARGET_FILE:render-image>" "${CMAKE_CURRENT_SOURCE_DIR}/data/cow.vtp" "${CMAKE_CURRENT_BINARY_DIR}/cow.png")
