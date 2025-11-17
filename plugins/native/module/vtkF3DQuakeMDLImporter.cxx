@@ -12,7 +12,6 @@
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
 #include <vtkResourceStream.h>
-#include <vtkType.h>
 
 #include <cstdint>
 #include <cstring>
@@ -238,6 +237,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   {
     const unsigned long totalProgress = header->numFrames * 2 + header->numTriangles;
     unsigned long currentProgress = 0;
+    double progressRate;
 
     constexpr int mdl_simpleframe_t_fixed_size =
       2 * sizeof(mdl_vertex_t) + 16 * sizeof(int8_t); // Size of bboxmin, bboxmax and name.
@@ -299,8 +299,8 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       currentProgress++;
       if (i % 128 == 0)
       {
-        this->Parent->InvokeEvent(vtkCommand::ProgressEvent,
-          static_cast<void*>(new double{ static_cast<double>(currentProgress) / totalProgress }));
+        progressRate = static_cast<double>(currentProgress) / totalProgress;
+        this->Parent->InvokeEvent(vtkCommand::ProgressEvent, static_cast<void*>(&progressRate));
       }
     }
 
@@ -335,8 +335,8 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       currentProgress++;
       if (i % 128 == 0)
       {
-        this->Parent->InvokeEvent(vtkCommand::ProgressEvent,
-          static_cast<void*>(new double{ static_cast<double>(currentProgress) / totalProgress }));
+        progressRate = static_cast<double>(currentProgress) / totalProgress;
+        this->Parent->InvokeEvent(vtkCommand::ProgressEvent, static_cast<void*>(&progressRate));
       }
     }
 
@@ -437,14 +437,14 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       currentProgress++;
       if (frameNum % 128 == 0)
       {
-        this->Parent->InvokeEvent(vtkCommand::ProgressEvent,
-          static_cast<void*>(new double{ static_cast<double>(currentProgress) / totalProgress }));
+        progressRate = static_cast<double>(currentProgress) / totalProgress;
+        this->Parent->InvokeEvent(vtkCommand::ProgressEvent, static_cast<void*>(&progressRate));
       }
     }
 
     currentProgress = totalProgress;
-    this->Parent->InvokeEvent(vtkCommand::ProgressEvent,
-      static_cast<void*>(new double{ static_cast<double>(currentProgress) / totalProgress }));
+    progressRate = 1.0;
+    this->Parent->InvokeEvent(vtkCommand::ProgressEvent, static_cast<void*>(&progressRate));
     return true;
   }
 
