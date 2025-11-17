@@ -253,7 +253,6 @@ bool animationManager::LoadAtFrame(int frame)
     return false;
   }
 
-  const double tolerance = 1e-6;
   int nbTimeSteps;
   vtkSmartPointer<vtkDoubleArray> timeSteps = vtkSmartPointer<vtkDoubleArray>::New();
 
@@ -267,8 +266,8 @@ bool animationManager::LoadAtFrame(int frame)
 
   timeSteps = this->AnimationTimeSteps.value();
 
-  auto it = std::find_if(timeSteps->Begin(), timeSteps->End(),
-    [&](double step) { return std::abs(step - this->CurrentTime) < tolerance; });
+  auto it = std::find_if(
+    timeSteps->Begin(), timeSteps->End(), [&](double step) { return step >= this->CurrentTime; });
 
   if (it == timeSteps->End())
   {
