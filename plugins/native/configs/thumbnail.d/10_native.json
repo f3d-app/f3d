@@ -35,9 +35,8 @@
     "match-type": "glob",
     "match": "*.{splat,spz}",
     "options": {
-      "point-sprites": true,
+      "point-sprites": "gaussian",
       "point-sprites-size": 1,
-      "point-sprites-type": "gaussian",
       "scalar-coloring": true,
       "coloring-array": "color",
       "coloring-component": "-2",
