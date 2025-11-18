@@ -293,7 +293,12 @@ public:
   enum class SplatType
   {
     SPHERE,
-    GAUSSIAN
+    GAUSSIAN,
+    CIRCLE,
+    STD_DEV,
+    FLOW,
+    BOUND,
+    CROSS
   };
 
   /**

@@ -214,8 +214,7 @@ void ExecFuncOnAllPolyDataUniforms(vtkActorCollection* actors, F&& func)
 
   while ((actor = actors->GetNextActor()))
   {
-    const vtkPolyDataMapper* mapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
-    if (mapper)
+    if (actor->GetMapper() && actor->GetMapper()->IsA("vtkPolyDataMapper"))
     {
       func(actor->GetShaderProperty()->GetVertexCustomUniforms());
     }
@@ -2302,38 +2301,14 @@ void vtkF3DRenderer::SetPointSpritesProperties(SplatType type, double pointSprit
 {
   assert(this->Importer);
 
-  if (type == SplatType::GAUSSIAN)
-  {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
-    if (!vtkShader::IsComputeShaderSupported())
-    {
-      F3DLog::Print(F3DLog::Severity::Warning,
-        "Compute shaders are not supported, gaussians are not sorted, resulting in blending "
-        "artifacts");
-    }
-#endif
-  }
-
-  const vtkBoundingBox& bbox = this->Importer->GetGeometryBoundingBox();
-
-  double scaleFactor = 1.0;
-  if (bbox.IsValid())
-  {
-    scaleFactor = pointSpritesSize * bbox.GetDiagonalLength() * 0.001;
-  }
-
   for (const auto& sprites : this->Importer->GetPointSpritesActorsAndMappers())
   {
     sprites.Mapper->EmissiveOff();
-    if (type == SplatType::GAUSSIAN)
-    {
-      sprites.Mapper->SetScaleFactor(1.0);
-      sprites.Mapper->SetSplatShaderCode(nullptr); // gaussian is the default VTK shader
-      sprites.Mapper->SetScaleArray("scale");
+    sprites.Mapper->SetScaleFactor(pointSpritesSize);
+    sprites.Mapper->SetScaleArray("scale");
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
       sprites.Mapper->AnisotropicOn();
-      sprites.Mapper->SetBoundScale(3.0);
       sprites.Mapper->SetRotationArray("rotation");
 
       int* viewport = this->GetSize();
@@ -2346,19 +2321,19 @@ void vtkF3DRenderer::SetPointSpritesProperties(SplatType type, double pointSprit
         "Gaussian splatting selected but VTK <= 9.3 only supports isotropic gaussians");
 #endif
 
-      sprites.Actor->ForceTranslucentOn();
-    }
-    else
+    if (type == SplatType::GAUSSIAN)
     {
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
-      sprites.Mapper->AnisotropicOff();
-      sprites.Mapper->SetLowpassMatrix(0., 0., 0.);
-      sprites.Mapper->SetRotationArray(nullptr);
+      sprites.Mapper->SetBoundScale(3.0);
 #endif
-
-      sprites.Mapper->SetScaleFactor(scaleFactor);
-      sprites.Mapper->SetScaleArray(nullptr);
-
+      sprites.Mapper->SetSplatShaderCode(nullptr); // gaussian is the default VTK shader
+      sprites.Actor->ForceTranslucentOn();
+    }
+    else if (type == SplatType::SPHERE)
+    {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
+      sprites.Mapper->SetBoundScale(1.0);
+#endif
       sprites.Mapper->SetSplatShaderCode(
         "//VTK::Color::Impl\n"
         "float dist = dot(offsetVCVSOutput.xy, offsetVCVSOutput.xy);\n"
@@ -2368,6 +2343,76 @@ void vtkF3DRenderer::SetPointSpritesProperties(SplatType type, double pointSprit
         "  float scale = (1.0 - dist);\n"
         "  ambientColor *= scale;\n"
         "  diffuseColor *= scale;\n"
+        "}\n");
+
+      sprites.Actor->ForceTranslucentOff();
+    }
+    else if (type == SplatType::CIRCLE)
+    {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
+      sprites.Mapper->SetBoundScale(1.1);
+#endif
+      sprites.Mapper->SetSplatShaderCode(
+        "//VTK::Color::Impl\n"
+        "float dist = dot(offsetVCVSOutput.xy, offsetVCVSOutput.xy);\n"
+        "if (dist > 1.21 || dist < 0.81) {\n"
+        "  discard;\n"
+        "}\n");
+
+      sprites.Actor->ForceTranslucentOff();
+    }
+    else if (type == SplatType::STD_DEV)
+    {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
+      sprites.Mapper->SetBoundScale(3.0);
+#endif
+      sprites.Mapper->SetSplatShaderCode(
+        "//VTK::Color::Impl\n"
+        "float dist2 = dot(offsetVCVSOutput.xy, offsetVCVSOutput.xy);\n"
+        "float val = mod(sqrt(dist2), 1.0);\n"
+        "if (dist2 > 9.0 || val < 0.9) {\n"
+        "  discard;\n"
+        "}\n");
+
+      sprites.Actor->ForceTranslucentOff();
+    }
+    else if (type == SplatType::FLOW)
+    {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
+      sprites.Mapper->SetBoundScale(2.0);
+#endif
+      sprites.Mapper->SetSplatShaderCode(
+        "//VTK::Color::Impl\n"
+        "if (abs(offsetVCVSOutput.y) > 0.1) {\n"
+        "  discard;\n"
+        "}\n");
+
+      sprites.Actor->ForceTranslucentOff();
+    }
+    else if (type == SplatType::BOUND)
+    {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
+      sprites.Mapper->SetBoundScale(3.0);
+#endif
+      sprites.Mapper->SetSplatShaderCode(
+        "//VTK::Color::Impl\n"
+        "float dist = dot(offsetVCVSOutput.xy, offsetVCVSOutput.xy);\n"
+        "if (abs(offsetVCVSOutput.x) < 2.9 && abs(offsetVCVSOutput.y) < 2.9) {\n"
+        "  discard;\n"
+        "}\n");
+
+      sprites.Actor->ForceTranslucentOff();
+    }
+    else if (type == SplatType::CROSS)
+    {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
+      sprites.Mapper->SetBoundScale(1.0);
+#endif
+      sprites.Mapper->SetSplatShaderCode(
+        "//VTK::Color::Impl\n"
+        "float dist = dot(offsetVCVSOutput.xy, offsetVCVSOutput.xy);\n"
+        "if (abs(offsetVCVSOutput.x) > 0.1 && abs(offsetVCVSOutput.y) > 0.1) {\n"
+        "  discard;\n"
         "}\n");
 
       sprites.Actor->ForceTranslucentOff();
