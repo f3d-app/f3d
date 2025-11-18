@@ -2,8 +2,8 @@
 #include "vtkF3DQuakeMDLImporterConstants.h"
 
 #include <vtkCommand.h>
-#include <vtkFileResourceStream.h>
 #include <vtkDoubleArray.h>
+#include <vtkFileResourceStream.h>
 #include <vtkFloatArray.h>
 #include <vtkImageData.h>
 #include <vtkOpenGLTexture.h>
