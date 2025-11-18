@@ -522,6 +522,9 @@ public:
       }
     }
 
+    // Update the dynamic options of the animation manager so check if the cheatsheet needs an
+    // update.
+    this->AnimationManager->UpdateDynamicOptions();
     // Always render after interaction
     this->Window.render();
   }
