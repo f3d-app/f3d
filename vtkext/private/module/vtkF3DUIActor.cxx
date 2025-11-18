@@ -50,6 +50,18 @@ void vtkF3DUIActor::SetFileName(const std::string& filename)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DUIActor::SetHDRIFileNameVisibility(bool show)
+{
+  this->HDRIFileNameVisible = show;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DUIActor::SetHDRIFileName(const std::string& filename)
+{
+  this->HDRIFileName = filename;
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DUIActor::SetMetaDataVisibility(bool show)
 {
   this->MetaDataVisible = show;
@@ -182,6 +194,10 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
     if (this->FileNameVisible)
     {
       this->RenderFileName();
+    }
+    if (this->HDRIFileNameVisible)
+    {
+      this->RenderHDRIFileName();
     }
     if (this->CheatSheetVisible)
     {

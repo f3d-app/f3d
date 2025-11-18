@@ -118,6 +118,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "fps", "ui.fps" },
   { "filename", "ui.filename" },
   { "metadata", "ui.metadata" },
+  { "hdri-filename", "ui.hdri_filename" },
   { "blur-background", "render.background.blur.enable" },
   { "blur-coc", "render.background.blur.coc" },
   { "scalar-coloring", "model.scivis.enable" },

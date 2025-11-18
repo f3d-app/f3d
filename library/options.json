@@ -246,6 +246,10 @@
       "type": "bool",
       "default_value": "false"
     },
+    "hdri_filename": {
+      "type": "bool",
+      "default_value": "false"
+    },
     "font_file": {
       "type": "path"
     },

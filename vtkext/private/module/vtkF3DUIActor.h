@@ -81,6 +81,18 @@ public:
   void SetFileName(const std::string& filename);
 
   /**
+   * Set the HDRI filename visibility
+   * False by default
+   */
+  void SetHDRIFileNameVisibility(bool show);
+
+  /**
+   * Set the HDRI filename string
+   * Empty by default
+   */
+  void SetHDRIFileName(const std::string& filename);
+
+  /**
    * Set the metadata visibility
    * False by default
    */
@@ -203,6 +215,13 @@ protected:
   }
 
   /**
+   * Render the HDRI filename UI widget
+   */
+  virtual void RenderHDRIFileName()
+  {
+  }
+
+  /**
    * Render the cheatsheet UI widget
    */
   virtual void RenderCheatSheet()
@@ -236,6 +255,9 @@ protected:
 
   bool FileNameVisible = false;
   std::string FileName = "";
+
+  bool HDRIFileNameVisible = false;
+  std::string HDRIFileName = "";
 
   bool MetaDataVisible = false;
   std::string MetaData = "";
