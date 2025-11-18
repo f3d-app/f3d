@@ -426,6 +426,7 @@ void vtkF3DSplatMapperHelper::ReplaceShaderColor(
   this->Superclass::ReplaceShaderColor(shaders, ren, actor);
 }
 
+//----------------------------------------------------------------------------
 void vtkF3DSplatMapperHelper::ReplaceShaderPositionVC(std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor)
 {
   vtkUniforms* uniforms = actor->GetShaderProperty()->GetVertexCustomUniforms();
@@ -436,11 +437,11 @@ void vtkF3DSplatMapperHelper::ReplaceShaderPositionVC(std::map<vtkShader::Type, 
   {
     std::string VSSource = shaders[vtkShader::Vertex]->GetSource();
 
-    vtkShaderProgram::Substitute(VSSource, "in vec4 vertexMC;", "in vec4 vertexMC;\n"
+    vtkShaderProgram::Substitute(VSSource, "//VTK::Camera::Dec", "//VTK::Camera::Dec\n"
       "  uniform vec2 jitter;\n",
       false);
 
-    vtkShaderProgram::Substitute(VSSource, "gl_Position = posDC;", "gl_Position = posDC;\n"
+    vtkShaderProgram::Substitute(VSSource, "//VTK::Picking::Impl", "//VTK::Picking::Impl\n"
       "  // apply temporal jittering for TAA\n"
       "  gl_Position.xy += jitter * gl_Position.w;\n",
       false);

@@ -399,19 +399,40 @@ void window_impl::UpdateDynamicOptions()
   // XXX: model.point_sprites.type only has an effect on geometry scene
   // but we set it here for practical reasons
   const int pointSpritesSize = opt.model.point_sprites.size;
-  vtkF3DRenderer::SplatType splatType = vtkF3DRenderer::SplatType::SPHERE;
+  vtkF3DRenderer::SplatType splatType = vtkF3DRenderer::SplatType::GAUSSIAN;
 
   if (opt.model.point_sprites.type == "gaussian")
   {
     splatType = vtkF3DRenderer::SplatType::GAUSSIAN;
   }
+  else if (opt.model.point_sprites.type == "sphere")
+  {
+    splatType = vtkF3DRenderer::SplatType::SPHERE;
+  }
   else if (opt.model.point_sprites.type == "circle")
   {
     splatType = vtkF3DRenderer::SplatType::CIRCLE;
   }
+  else if (opt.model.point_sprites.type == "stddev")
+  {
+    splatType = vtkF3DRenderer::SplatType::STD_DEV;
+  }
+  else if (opt.model.point_sprites.type == "bound")
+  {
+    splatType = vtkF3DRenderer::SplatType::BOUND;
+  }
+  else if (opt.model.point_sprites.type == "flow")
+  {
+    splatType = vtkF3DRenderer::SplatType::FLOW;
+  }
   else if (opt.model.point_sprites.type == "cross")
   {
     splatType = vtkF3DRenderer::SplatType::CROSS;
+  }
+  else
+  {
+    log::warn(opt.model.point_sprites.type,
+      R"( is an invalid point sprites type. Valid types are: "gaussian", "sphere", "circle", "stddev", "flow", "bound", "cross"). Falling back to "gaussian".)");
   }
   
   renderer->SetPointSpritesProperties(splatType, pointSpritesSize);
@@ -529,114 +550,114 @@ void window_impl::UpdateDynamicOptions()
     {
       log::warn(opt.render.effect.antialiasing.mode,
         R"( is an invalid antialiasing mode. Valid modes are: "fxaa", "ssaa", "taa)");
-    }
   }
+}
 
-  if (opt.render.effect.blending.enable)
+if (opt.render.effect.blending.enable)
+{
+  if (opt.render.effect.blending.mode == "ddp")
   {
-    if (opt.render.effect.blending.mode == "ddp")
-    {
-      blendMode = vtkF3DRenderer::BlendingMode::DUAL_DEPTH_PEELING;
-    }
-    else if (opt.render.effect.blending.mode == "sort")
-    {
-      blendMode = vtkF3DRenderer::BlendingMode::SORT;
-    }
-    else if (opt.render.effect.blending.mode == "stochastic")
-    {
-      blendMode = vtkF3DRenderer::BlendingMode::STOCHASTIC;
-    }
-    else
-    {
-      log::warn(opt.render.effect.blending.mode,
-        R"( is an invalid blending mode. Valid modes are: "ddp", "sort", "stochastic")");
-    }
+    blendMode = vtkF3DRenderer::BlendingMode::DUAL_DEPTH_PEELING;
   }
-
-  renderer->SetUseSSAOPass(opt.render.effect.ambient_occlusion);
-  renderer->SetAntiAliasingMode(aaMode);
-  renderer->SetUseToneMappingPass(opt.render.effect.tone_mapping);
-  renderer->SetBlendingMode(blendMode);
-  renderer->SetBackfaceType(opt.render.backface_type);
-  renderer->SetFinalShader(opt.render.effect.final_shader);
-
-  renderer->SetBackground(opt.render.background.color.data());
-  renderer->SetUseBlurBackground(opt.render.background.blur.enable);
-  renderer->SetBlurCircleOfConfusionRadius(opt.render.background.blur.coc);
-  renderer->SetLightIntensity(opt.render.light.intensity);
-
-  renderer->SetHDRIFile(opt.render.hdri.file);
-  renderer->SetUseImageBasedLighting(opt.render.hdri.ambient);
-  renderer->ShowHDRISkybox(opt.render.background.skybox);
-
-  renderer->SetFontFile(opt.ui.font_file);
-  renderer->SetFontScale(opt.ui.scale);
-  renderer->SetBackdropOpacity(opt.ui.backdrop.opacity);
-
-  renderer->SetGridUnitSquare(opt.render.grid.unit);
-  renderer->SetGridSubdivisions(opt.render.grid.subdivisions);
-  renderer->SetGridAbsolute(opt.render.grid.absolute);
-  renderer->ShowGrid(opt.render.grid.enable);
-  renderer->SetGridColor(opt.render.grid.color);
-
-  renderer->ShowAxesGrid(opt.render.axes_grid.enable);
-
-  if (!opt.scene.camera.index.has_value())
+  else if (opt.render.effect.blending.mode == "sort")
   {
-    renderer->SetUseOrthographicProjection(opt.scene.camera.orthographic);
+    blendMode = vtkF3DRenderer::BlendingMode::SORT;
   }
-
-  renderer->SetSurfaceColor(opt.model.color.rgb);
-  renderer->SetOpacity(opt.model.color.opacity);
-  renderer->SetTextureBaseColor(opt.model.color.texture);
-  renderer->SetTexturesTransform(opt.model.textures_transform);
-  renderer->SetRoughness(opt.model.material.roughness);
-  renderer->SetMetallic(opt.model.material.metallic);
-  renderer->SetBaseIOR(opt.model.material.base_ior);
-  renderer->SetTextureMaterial(opt.model.material.texture);
-  renderer->SetTextureEmissive(opt.model.emissive.texture);
-  renderer->SetEmissiveFactor(opt.model.emissive.factor);
-  renderer->SetTextureNormal(opt.model.normal.texture);
-  renderer->SetNormalScale(opt.model.normal.scale);
-  renderer->SetTextureMatCap(opt.model.matcap.texture);
-
-  renderer->SetEnableColoring(opt.model.scivis.enable);
-  renderer->SetUseCellColoring(opt.model.scivis.cells);
-  renderer->SetArrayNameForColoring(opt.model.scivis.array_name);
-  renderer->SetComponentForColoring(opt.model.scivis.component);
-
-  renderer->SetScalarBarRange(opt.model.scivis.range);
-  renderer->SetColormap(opt.model.scivis.colormap);
-  renderer->SetColormapDiscretization(opt.model.scivis.discretization);
-  renderer->ShowScalarBar(opt.ui.scalar_bar);
-
-  renderer->SetUsePointSprites(opt.model.point_sprites.enable);
-  renderer->SetUseVolume(opt.model.volume.enable);
-  renderer->SetUseInverseOpacityFunction(opt.model.volume.inverse);
-
-  renderer->UpdateActors();
-
-  // Update the cheatsheet if needed
-  if (this->Internals->Interactor && renderer->CheatSheetNeedsUpdate())
+  else if (opt.render.effect.blending.mode == "stochastic")
   {
-    std::vector<vtkF3DUIActor::CheatSheetGroup> cheatsheet;
-    for (const std::string& group : this->Internals->Interactor->getBindGroups())
+    blendMode = vtkF3DRenderer::BlendingMode::STOCHASTIC;
+  }
+  else
+  {
+    log::warn(opt.render.effect.blending.mode,
+      R"( is an invalid blending mode. Valid modes are: "ddp", "sort", "stochastic")");
+  }
+}
+
+renderer->SetUseSSAOPass(opt.render.effect.ambient_occlusion);
+renderer->SetAntiAliasingMode(aaMode);
+renderer->SetUseToneMappingPass(opt.render.effect.tone_mapping);
+renderer->SetBlendingMode(blendMode);
+renderer->SetBackfaceType(opt.render.backface_type);
+renderer->SetFinalShader(opt.render.effect.final_shader);
+
+renderer->SetBackground(opt.render.background.color.data());
+renderer->SetUseBlurBackground(opt.render.background.blur.enable);
+renderer->SetBlurCircleOfConfusionRadius(opt.render.background.blur.coc);
+renderer->SetLightIntensity(opt.render.light.intensity);
+
+renderer->SetHDRIFile(opt.render.hdri.file);
+renderer->SetUseImageBasedLighting(opt.render.hdri.ambient);
+renderer->ShowHDRISkybox(opt.render.background.skybox);
+
+renderer->SetFontFile(opt.ui.font_file);
+renderer->SetFontScale(opt.ui.scale);
+renderer->SetBackdropOpacity(opt.ui.backdrop.opacity);
+
+renderer->SetGridUnitSquare(opt.render.grid.unit);
+renderer->SetGridSubdivisions(opt.render.grid.subdivisions);
+renderer->SetGridAbsolute(opt.render.grid.absolute);
+renderer->ShowGrid(opt.render.grid.enable);
+renderer->SetGridColor(opt.render.grid.color);
+
+renderer->ShowAxesGrid(opt.render.axes_grid.enable);
+
+if (!opt.scene.camera.index.has_value())
+{
+  renderer->SetUseOrthographicProjection(opt.scene.camera.orthographic);
+}
+
+renderer->SetSurfaceColor(opt.model.color.rgb);
+renderer->SetOpacity(opt.model.color.opacity);
+renderer->SetTextureBaseColor(opt.model.color.texture);
+renderer->SetTexturesTransform(opt.model.textures_transform);
+renderer->SetRoughness(opt.model.material.roughness);
+renderer->SetMetallic(opt.model.material.metallic);
+renderer->SetBaseIOR(opt.model.material.base_ior);
+renderer->SetTextureMaterial(opt.model.material.texture);
+renderer->SetTextureEmissive(opt.model.emissive.texture);
+renderer->SetEmissiveFactor(opt.model.emissive.factor);
+renderer->SetTextureNormal(opt.model.normal.texture);
+renderer->SetNormalScale(opt.model.normal.scale);
+renderer->SetTextureMatCap(opt.model.matcap.texture);
+
+renderer->SetEnableColoring(opt.model.scivis.enable);
+renderer->SetUseCellColoring(opt.model.scivis.cells);
+renderer->SetArrayNameForColoring(opt.model.scivis.array_name);
+renderer->SetComponentForColoring(opt.model.scivis.component);
+
+renderer->SetScalarBarRange(opt.model.scivis.range);
+renderer->SetColormap(opt.model.scivis.colormap);
+renderer->SetColormapDiscretization(opt.model.scivis.discretization);
+renderer->ShowScalarBar(opt.ui.scalar_bar);
+
+renderer->SetUsePointSprites(opt.model.point_sprites.enable);
+renderer->SetUseVolume(opt.model.volume.enable);
+renderer->SetUseInverseOpacityFunction(opt.model.volume.inverse);
+
+renderer->UpdateActors();
+
+// Update the cheatsheet if needed
+if (this->Internals->Interactor && renderer->CheatSheetNeedsUpdate())
+{
+  std::vector<vtkF3DUIActor::CheatSheetGroup> cheatsheet;
+  for (const std::string& group : this->Internals->Interactor->getBindGroups())
+  {
+    std::vector<vtkF3DUIActor::CheatSheetTuple> groupList;
+    for (const interaction_bind_t& bind : this->Internals->Interactor->getBindsForGroup(group))
     {
-      std::vector<vtkF3DUIActor::CheatSheetTuple> groupList;
-      for (const interaction_bind_t& bind : this->Internals->Interactor->getBindsForGroup(group))
+      auto [doc, val] = this->Internals->Interactor->getBindingDocumentation(bind);
+      f3d::interactor::BindingType type = this->Internals->Interactor->getBindingType(bind);
+      if (!doc.empty())
       {
-        auto [doc, val] = this->Internals->Interactor->getBindingDocumentation(bind);
-        f3d::interactor::BindingType type = this->Internals->Interactor->getBindingType(bind);
-        if (!doc.empty())
-        {
-          groupList.emplace_back(
-            std::make_tuple(bind.format(), doc, val, vtkF3DUIActor::CheatSheetBindingType(type)));
-        }
+        groupList.emplace_back(
+          std::make_tuple(bind.format(), doc, val, vtkF3DUIActor::CheatSheetBindingType(type)));
       }
-      cheatsheet.emplace_back(std::make_pair(group, std::move(groupList)));
     }
-    renderer->ConfigureCheatSheet(cheatsheet);
+    cheatsheet.emplace_back(std::make_pair(group, std::move(groupList)));
   }
+  renderer->ConfigureCheatSheet(cheatsheet);
+}
 }
 
 //----------------------------------------------------------------------------
@@ -758,4 +779,4 @@ vtkF3DRenderer* window_impl::GetRenderer() const
 {
   return this->Internals->Renderer;
 }
-};
+}

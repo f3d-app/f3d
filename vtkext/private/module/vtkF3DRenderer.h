@@ -294,6 +294,9 @@ public:
     SPHERE,
     GAUSSIAN,
     CIRCLE,
+    STD_DEV,
+    FLOW,
+    BOUND,
     CROSS
   };
 
