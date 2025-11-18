@@ -46,6 +46,7 @@ init::init()
   vtkNew<vtkF3DObjectFactory> factory;
   vtkObjectFactory::RegisterFactory(factory);
   vtkObjectFactory::SetAllEnableFlags(0, "vtkPolyDataMapper", "vtkOpenGLPolyDataMapper");
+  vtkObjectFactory::SetAllEnableFlags(0, "vtkPolyDataMapper", "vtkOpenGLLowMemoryPolyDataMapper");
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240203)
   vtkObjectFactory::SetAllEnableFlags(0, "vtkPointGaussianMapper", "vtkOpenGLPointGaussianMapper");
