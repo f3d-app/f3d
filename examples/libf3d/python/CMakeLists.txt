@@ -18,14 +18,14 @@ add_test(
 add_test(
   NAME test_interactive-app
   COMMAND ${Python3_EXECUTABLE}
-  ${CMAKE_CURRENT_SOURCE_DIR}/interactive-app/interactive_app.py ${CMAKE_CURRENT_SOURCE_DIR}/tests/data/cow.vtp
+  ${CMAKE_CURRENT_SOURCE_DIR}/interactive-app/interactive_app.py ${CMAKE_CURRENT_SOURCE_DIR}/tests/data/cow.vtp --timeout 1
 )
 
 # offscreen-thumbnail
 add_test(
   NAME test_offscreen-thumbnail
   COMMAND ${Python3_EXECUTABLE}
-  ${CMAKE_CURRENT_SOURCE_DIR}/offscreen-thumbnail/offscreen_thumbnail.py ${CMAKE_CURRENT_SOURCE_DIR}/tests/data/cow.vtp ${CMAKE_CURRENT_BINARY_DIR}/thumbnail.png 256 256
+  ${CMAKE_CURRENT_SOURCE_DIR}/offscreen-thumbnail/offscreen_thumbnail.py ${CMAKE_CURRENT_SOURCE_DIR}/tests/data/cow.vtp ${CMAKE_CURRENT_BINARY_DIR}/thumbnail.png 256
 )
 add_test(
   NAME test_check-offscreen-thumbnail
@@ -45,7 +45,7 @@ add_test(
 add_test(
   NAME test_render-interact
   COMMAND ${Python3_EXECUTABLE}
-  ${CMAKE_CURRENT_SOURCE_DIR}/render-interact/render_interact.py
+  ${CMAKE_CURRENT_SOURCE_DIR}/render-interact/render_interact.py --timeout 1
 )
 
 # render-terminal
