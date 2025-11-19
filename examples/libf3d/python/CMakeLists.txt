@@ -21,6 +21,19 @@ add_test(
   ${CMAKE_CURRENT_SOURCE_DIR}/interactive-app/interactive_app.py ${CMAKE_CURRENT_SOURCE_DIR}/tests/data/cow.vtp
 )
 
+# offscreen-thumbnail
+add_test(
+  NAME test_offscreen-thumbnail
+  COMMAND ${Python3_EXECUTABLE}
+  ${CMAKE_CURRENT_SOURCE_DIR}/offscreen-thumbnail/offscreen_thumbnail.py ${CMAKE_CURRENT_SOURCE_DIR}/tests/data/cow.vtp ${CMAKE_CURRENT_BINARY_DIR}/thumbnail.png 256 256
+)
+add_test(
+  NAME test_check-offscreen-thumbnail
+  COMMAND ${Python3_EXECUTABLE}
+  ${CMAKE_CURRENT_SOURCE_DIR}/img-cmp/img-cmp.py ${CMAKE_CURRENT_BINARY_DIR}/thumbnail.png ${CMAKE_CURRENT_SOURCE_DIR}/tests/baselines/thumbnail.png
+)
+set_tests_properties(test_check-offscreen-thumbnail PROPERTIES DEPENDS test_offscreen-thumbnail)
+
 # render-image
 add_test(
   NAME test_render-image
