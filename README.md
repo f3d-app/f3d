@@ -40,7 +40,7 @@ f3d /path/to/file.ext
 
 Optionally, append `--output=/path/to/img.png` to save the rendering into an image file.
 
-See the [Quickstart Guide](doc/user/QUICKSTART.md) for more information about getting started with F3D.
+See the [Quickstart Guide](doc/user/01-QUICKSTART.md) for more information about getting started with F3D.
 
 # Documentation
 
@@ -89,7 +89,7 @@ but there is no plan to:
 
 # Contributing
 
-F3D as a community-driven, inclusive and beginner-friendly project. We love to see how the project is growing thanks to the contributions from the community. We would love to see your face in the list below! If you want to contribute to F3D, you are very welcome to! Take a look at our [contribution documentation](CONTRIBUTING.md), [governance documentation](https://f3d.app/dev/GOVERNANCE) and [code of conduct](CODE_OF_CONDUCT.md).
+F3D as a community-driven, inclusive and beginner-friendly project. We love to see how the project is growing thanks to the contributions from the community. We would love to see your face in the list below! If you want to contribute to F3D, you are very welcome to! Take a look at our [contribution documentation](CONTRIBUTING.md), [governance documentation](doc/dev/10-GOVERNANCE.md) and [code of conduct](CODE_OF_CONDUCT.md).
 
 <a href="https://github.com/f3d-app/f3d/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=f3d-app/f3d" />
