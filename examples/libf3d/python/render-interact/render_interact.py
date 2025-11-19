@@ -8,6 +8,12 @@ TEST_DATA_DIR = Path(__file__).parent.parent.parent.parent.parent / "testing/dat
 if __name__ == "__main__":
     argparser = ArgumentParser()
     argparser.add_argument("models", nargs="*")
+    argparser.add_argument(
+        "--timeout",
+        type=int,
+        default=None,
+        help="Optional timeout (in seconds) before closing the viewer.",
+    )
 
     args = argparser.parse_args()
 
@@ -25,7 +31,11 @@ if __name__ == "__main__":
     # Render
     eng.window.render()
 
-    def stop(eng):
-        eng.interactor.stop()
+    if args.timeout:
 
-    eng.interactor.start(1, lambda: stop(eng))
+        def stop(eng):
+            eng.interactor.stop()
+
+        eng.interactor.start(args.timeout, lambda: stop(eng))
+    else:
+        eng.interactor.start()

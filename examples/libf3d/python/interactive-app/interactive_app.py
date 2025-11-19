@@ -1,5 +1,74 @@
-import sys
+import re
+from argparse import ArgumentParser
+
 import f3d
+
+
+def main():
+    parser = ArgumentParser()
+    parser.add_argument("file")
+    parser.add_argument(
+        "--timeout",
+        type=int,
+        default=None,
+        help="Optional timeout (in seconds) before closing the viewer.",
+    )
+
+    args = parser.parse_args()
+
+    f3d.Engine.autoload_plugins()
+
+    # Create a native-window engine
+    eng = f3d.Engine.create(False)
+
+    # Modify options using the struct-like API
+    opt = eng.options
+    opt.update(
+        {
+            "render.grid.enable": True,
+            "render.show_edges": True,
+            # UI overlays: axis + some HUD
+            "ui.axis": True,
+            "ui.fps": True,
+            "ui.animation_progress": True,
+            "ui.filename": True,
+            # FXAA + tone mapping
+            "render.effect.antialiasing.enable": True,
+            "render.effect.antialiasing.mode": "fxaa",
+            "render.effect.tone_mapping": True,
+        }
+    )
+
+    AddCustomCommands(eng)
+    AddCustomBindings(eng)
+
+    # Add a model to the scene
+    try:
+        eng.scene.add(args.file)
+    except Exception as e:
+        print(e)
+
+    # Initial render
+    win = eng.window
+    win.render()
+
+    if args.timeout:
+
+        def stop(eng):
+            eng.interactor.stop()
+
+        eng.interactor.start(args.timeout, lambda: stop(eng))
+    else:
+        eng.interactor.start()
+
+
+def parse_size(size: str):
+    if m := re.fullmatch(r"(\d+)([,x](\d+))?", size):
+        w = int(m.group(1))
+        h = int(m.group(3)) if m.group(3) else w
+        return w, h
+    else:
+        raise ValueError(f"cannot parse size from {size!r}")
 
 
 def AddCustomCommands(eng: f3d.Engine):
@@ -173,55 +242,6 @@ def AddCustomBindings(eng: f3d.Engine):
         lambda: docTgl("Toggle FXAA", "render.effect.antialiasing.enable"),
         f3d.Interactor.BindingType.TOGGLE,
     )
-
-
-def main():
-    if len(sys.argv) != 2:
-        print(f"Usage: {sys.argv[0]} <file>")
-        sys.exit(1)
-
-    file = sys.argv[1]
-
-    f3d.Engine.autoload_plugins()
-
-    # Create a native-window engine
-    eng = f3d.Engine.create(False)
-
-    # Modify options using the struct-like API
-    opt = eng.options
-    opt.update(
-        {
-            "render.grid.enable": True,
-            "render.show_edges": True,
-            # UI overlays: axis + some HUD
-            "ui.axis": True,
-            "ui.fps": True,
-            "ui.animation_progress": True,
-            "ui.filename": True,
-            # FXAA + tone mapping
-            "render.effect.antialiasing.enable": True,
-            "render.effect.antialiasing.mode": "fxaa",
-            "render.effect.tone_mapping": True,
-        }
-    )
-
-    AddCustomCommands(eng)
-    AddCustomBindings(eng)
-
-    # Add a model to the scene
-    try:
-        eng.scene.add(file)
-    except Exception as e:
-        print(e)
-
-    # Initial render
-    win = eng.window
-    win.render()
-
-    def stop(eng):
-        eng.interactor.stop()
-
-    eng.interactor.start(1, lambda: stop(eng))
 
 
 if __name__ == "__main__":
