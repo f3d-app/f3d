@@ -7,7 +7,11 @@
 #ifndef vtkF3DPolyDataMapper_h
 #define vtkF3DPolyDataMapper_h
 
+#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
 #include <vtkOpenGLPolyDataMapper.h>
+#else
+#include <vtkOpenGLLowMemoryPolyDataMapper.h>
+#endif
 #include <vtkVersion.h>
 
 class vtkF3DPolyDataMapper
