@@ -7,3 +7,4 @@ if(BUILD_TESTING)
 endif()
 
 add_subdirectory(cpp)
+add_subdirectory(python)
