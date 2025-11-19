@@ -1,7 +1,9 @@
 #include "vtkF3DPointSplatMapper.h"
 
+#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
 #include "vtkF3DBitonicSort.h"
 #include "vtkF3DComputeDepthCS.h"
+#endif
 #include "vtkF3DRenderer.h"
 
 #include <vtkCamera.h>

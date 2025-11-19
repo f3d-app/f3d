@@ -10,7 +10,12 @@
 #include <vtkOpenGLPolyDataMapper.h>
 #include <vtkVersion.h>
 
-class vtkF3DPolyDataMapper : public vtkOpenGLPolyDataMapper
+class vtkF3DPolyDataMapper
+#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
+  : public vtkOpenGLPolyDataMapper
+#else
+  : public vtkOpenGLLowMemoryPolyDataMapper
+#endif
 {
 public:
   static vtkF3DPolyDataMapper* New();
