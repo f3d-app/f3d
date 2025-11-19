@@ -21,6 +21,7 @@
 #include <filesystem>
 #include <map>
 #include <optional>
+#include <vtkCallbackCommand.h>
 
 namespace fs = std::filesystem;
 
@@ -30,6 +31,8 @@ class vtkCornerAnnotation;
 class vtkGridAxesActor3D;
 class vtkImageReader2;
 class vtkOrientationMarkerWidget;
+class vtkCameraOrientationRepresentation;
+class vtkCameraOrientationWidget;
 class vtkScalarBarActor;
 class vtkSkybox;
 class vtkTextActor;
@@ -103,6 +106,9 @@ public:
   void SetGridUnitSquare(const std::optional<double>& unitSquare);
   void SetGridSubdivisions(int subdivisions);
   void SetGridColor(const std::vector<double>& color);
+  /**
+   * Should be called before ShowAxis
+   */
   void SetBackdropOpacity(const double backdropOpacity);
   ///@}
 
@@ -554,7 +560,16 @@ private:
    */
   void ConfigureActorTextureTransform(vtkActor* actorBase, const double* matrix);
 
+  /**
+   * Updates the axis widget size based on the window size
+   */
+  void UpdateAxisWidgetSize();
+
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
+  vtkSmartPointer<vtkCameraOrientationWidget> ModernAxisWidget;
+  vtkSmartPointer<vtkCameraOrientationRepresentation> ModernAxisRepresentation;
+  vtkSmartPointer<vtkCallbackCommand> ModernAxisWidgetResizeCallback;
+  double ModernAxisBackdropOpacity = 0.0;
 
   // Does vtk version support GridAxesActor
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
