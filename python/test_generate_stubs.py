@@ -37,14 +37,14 @@ def test_transformer_f3d_lists():
     src = """
     class A:
         xs: list[T]  # should stay
-        def f(xs: list[T]) -> list[T]: ...  # only argument should become `Sequence`
-        def g(cb: Callable[[list[T]], list[T]]): ...  # cb return shloud become `Sequence`
+        def f(xs: collections.abc.Sequence[T]) -> collections.abc.Sequence[T]: ...  # return should be `list`
+        def g(cb: Callable[[collections.abc.Sequence[T]], collections.abc.Sequence[T]]): ...  # cb arg shloud become `list`
     """
     expected = """
     class A:
         xs: list[T]
-        def f(xs: typing.Sequence[T]) -> list[T]: ...
-        def g(cb: Callable[[list[T]], typing.Sequence[T]]): ...
+        def f(xs: collections.abc.Sequence[T]) -> list[T]: ...
+        def g(cb: Callable[[list[T]], collections.abc.Sequence[T]]): ...
     """
     assert postprocess_generated_stub(dedent(src)) == parse_unparse(expected)
 
@@ -53,13 +53,12 @@ def test_transformer_f3d_path():
     src = """
     class A:
         xs: pathlib.Path  # should be `pathlib.Path`
-        def f(p: os.PathLike) -> os.PathLike: ...   # arg should be `os.PathLike[str]|str`
-                                                    # return should be `pathlib.Path`
+        def f(p: os.PathLike | str | bytes) -> pathlib.Path: ...   # arg should be `os.PathLike[str]|str|bytes`
     """
     expected = """
     class A:
         xs: pathlib.Path
-        def f(p: os.PathLike[str]|str) -> pathlib.Path: ...
+        def f(p: os.PathLike[str] | str | bytes) -> pathlib.Path: ...
     """
     assert postprocess_generated_stub(dedent(src)) == parse_unparse(expected)
 

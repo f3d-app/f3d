@@ -58,27 +58,19 @@ def postprocess_generated_stub(source: str):
             r"tuple[float, float, float]",
         ),
         TypeFix(
-            # add missing template parameter to raw `os.PathLike` in args and also allow `str`
-            # `os.PathLike` -> `os.PathLike[str] | str`
+            # add missing template parameter to raw `os.PathLike` (`os.PathLike[str]`)
             r"(os\.PathLike)(?!\[)",
-            r"\1[str] | str",
-            only_for=("arg", "cb_return"),
+            r"\1[str]",
         ),
         TypeFix(
-            # change `os.PathLike` to `pathlib.Path` in returns
-            r"(os\.PathLike(\[.+\])?)",
-            r"pathlib.Path",
+            # replace `Sequence[...]` by `list[...]` in function returns
+            # because pybind outputs `std::vector` as `list`
+            r"collections\.abc\.Sequence\[",
+            r"list[",
             only_for=("return", "cb_arg"),
         ),
-        TypeFix(
-            # replace `list[...]` by `Sequence[...]` in function parameters
-            # because pybind's `std::vector` typecaster actually accepts sequences not just lists
-            r"list\[",
-            r"typing.Sequence[",
-            only_for=("arg", "cb_return"),
-        ),
     )
-    extra_imports = ("pathlib",)
+    extra_imports = "pathlib", "os"
 
     transformer = StubTransformer(type_fixes, extra_imports)
     tree = ast.parse(source)
@@ -159,7 +151,8 @@ class StubTransformer(ast.NodeTransformer):
 
     def visit_arg(self, node: ast.arg):
         if isinstance(node.annotation, ast.Subscript) and re.match(
-            r"(typing\.)?Callable", ast.unparse(node.annotation.value)
+            r"(typing\.|collections\.abc\.)?Callable",
+            ast.unparse(node.annotation.value),
         ):
             assert isinstance(node.annotation.slice, ast.Tuple)
             args, ret = node.annotation.slice.elts
