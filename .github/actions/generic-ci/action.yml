@@ -366,7 +366,7 @@ runs:
         inputs.static_label == 'no-static'
       uses: f3d-app/install-mesa-windows-action@v2
       with:
-        path: ${{github.workspace}}\build_examples\*\Release
+        path: ${{github.workspace}}\build_examples\*\*\Release
 
     # older VTK version create different renderings so they are not tested
     - name: Test libf3d examples
