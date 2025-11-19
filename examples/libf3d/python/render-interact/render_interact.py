@@ -25,4 +25,7 @@ if __name__ == "__main__":
     # Render
     eng.window.render()
 
-    eng.interactor.start()
+    def stop(eng):
+        eng.interactor.stop()
+
+    eng.interactor.start(1, lambda: stop(eng))
