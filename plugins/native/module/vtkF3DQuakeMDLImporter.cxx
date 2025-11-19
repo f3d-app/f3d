@@ -661,7 +661,7 @@ bool vtkF3DQuakeMDLImporter::GetTemporalInformation(vtkIdType animationIndex, do
       nbTimeSteps = times.size();
       timeSteps->SetNumberOfTuples(times.size());
 
-      for (uint i = 0; i < times.size(); ++i)
+      for (unsigned int i = 0; i < times.size(); ++i)
       {
         timeSteps->SetValue(i, times[i]);
       }
