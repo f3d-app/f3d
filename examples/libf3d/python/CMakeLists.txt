@@ -14,6 +14,13 @@ add_test(
   ${CMAKE_CURRENT_SOURCE_DIR}/img-cmp/img-cmp.py ${CMAKE_CURRENT_SOURCE_DIR}/tests/baselines/cow.png ${CMAKE_CURRENT_SOURCE_DIR}/tests/baselines/cow.png
 )
 
+# interactive-app
+add_test(
+  NAME test_interactive-app
+  COMMAND ${Python3_EXECUTABLE}
+  ${CMAKE_CURRENT_SOURCE_DIR}/interactive-app/interactive_app.py ${CMAKE_CURRENT_SOURCE_DIR}/tests/data/cow.vtp
+)
+
 # render-image
 add_test(
   NAME test_render-image
