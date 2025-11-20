@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 import f3d
 
 
-def main():
+def main(argv=None):
     parser = ArgumentParser()
     parser.add_argument("file")
     parser.add_argument(
@@ -14,7 +14,7 @@ def main():
         help="Optional timeout (in seconds) before closing the viewer.",
     )
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     f3d.Engine.autoload_plugins()
 
@@ -47,17 +47,15 @@ def main():
         eng.scene.add(args.file)
     except Exception as e:
         print(e)
+        return 1
 
     # Initial render
     win = eng.window
     win.render()
 
     if args.timeout:
-
-        def stop(eng):
-            eng.interactor.stop()
-
-        eng.interactor.start(args.timeout, lambda: stop(eng))
+        # For testing purposes only, exit after `timeout` seconds
+        eng.interactor.start(args.timeout, eng.interactor.stop)
     else:
         eng.interactor.start()
 
