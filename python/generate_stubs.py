@@ -69,6 +69,13 @@ def postprocess_generated_stub(source: str):
             r"list[",
             only_for=("return", "cb_arg"),
         ),
+        TypeFix(
+            # replace `Sequence[...]` by `list[...]` in function arguments
+            # because pybind accepts `std::vector` as any `Sequence`
+            r"list\[",
+            r"collections.abc.Sequence[",
+            only_for=("arg", "cb_return"),
+        ),
     )
     extra_imports = "pathlib", "os"
 

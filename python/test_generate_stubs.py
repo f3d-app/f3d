@@ -39,12 +39,14 @@ def test_transformer_f3d_lists():
         xs: list[T]  # should stay
         def f(xs: collections.abc.Sequence[T]) -> collections.abc.Sequence[T]: ...  # return should be `list`
         def g(cb: Callable[[collections.abc.Sequence[T]], collections.abc.Sequence[T]]): ...  # cb arg shloud become `list`
+        def h(cb: collections.abc.Callable[[collections.abc.Sequence[str]], list[str]]=None): ...
     """
     expected = """
     class A:
         xs: list[T]
         def f(xs: collections.abc.Sequence[T]) -> list[T]: ...
         def g(cb: Callable[[list[T]], collections.abc.Sequence[T]]): ...
+        def h(cb: collections.abc.Callable[[list[str]], collections.abc.Sequence[str]]=None): ...
     """
     assert postprocess_generated_stub(dedent(src)) == parse_unparse(expected)
 
