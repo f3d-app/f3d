@@ -305,7 +305,7 @@ runs:
     - name: Test
       shell: bash
       working-directory: ${{github.workspace}}/build
-      run: ctest -E "${{ env.F3D_CTEST_EXCEPTIONS }}" -C Release -j 2 --output-on-failure || ctest -E "${{ env.F3D_CTEST_EXCEPTIONS }}" -C Release -j 1 --rerun-failed -VV
+      run: ctest -E "${{ env.F3D_CTEST_EXCEPTIONS }}" -C Release -j 2 --output-on-failure --no-tests=error || ctest -E "${{ env.F3D_CTEST_EXCEPTIONS }}" -C Release -j 1 --rerun-failed --no-tests=error -VV
 
     - name: Upload Tests Artifact
       if: failure()
@@ -366,14 +366,14 @@ runs:
         inputs.static_label == 'no-static'
       uses: f3d-app/install-mesa-windows-action@v2
       with:
-        path: ${{github.workspace}}\build_examples\*\Release
+        path: ${{github.workspace}}\build_examples\*\*\Release
 
     # older VTK version create different renderings so they are not tested
     - name: Test libf3d examples
       if: inputs.static_label == 'no-static'
       shell: bash
       working-directory: ${{github.workspace}}
-      run: ctest --test-dir build_examples -C Release -VV
+      run: ctest --test-dir build_examples --no-tests=error -C Release -VV
 
     - name: Install optional component f3d plugins
       shell: bash
@@ -394,7 +394,7 @@ runs:
       if: inputs.static_label == 'no-static'
       shell: bash
       working-directory: ${{github.workspace}}
-      run: ctest --test-dir build_plugins -C Release -VV
+      run: ctest --test-dir build_plugins --no-tests=error -C Release -VV
 
     - name: Set F3D binary path Linux
       if: runner.os == 'Linux'
