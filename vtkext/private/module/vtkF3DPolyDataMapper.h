@@ -1,25 +1,20 @@
 /**
  * @class   vtkF3DPolyDataMapper
- * @brief   Custom surface mapper used to include skinning and morphing for glTF format
+ * @brief   Custom surface mapper used to include F3D features
  *
+ * This mapper is used to add many F3D custom features:
+ * - skinning and morphing capabilities
+ * - support for MatCap rendering
+ * - support for TAA jittering
  */
 
 #ifndef vtkF3DPolyDataMapper_h
 #define vtkF3DPolyDataMapper_h
 
-#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
 #include <vtkOpenGLPolyDataMapper.h>
-#else
-#include <vtkOpenGLLowMemoryPolyDataMapper.h>
-#endif
 #include <vtkVersion.h>
 
-class vtkF3DPolyDataMapper
-#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
-  : public vtkOpenGLPolyDataMapper
-#else
-  : public vtkOpenGLLowMemoryPolyDataMapper
-#endif
+class vtkF3DPolyDataMapper : public vtkOpenGLPolyDataMapper
 {
 public:
   static vtkF3DPolyDataMapper* New();
