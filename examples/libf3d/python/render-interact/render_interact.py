@@ -5,7 +5,8 @@ import f3d
 
 TEST_DATA_DIR = Path(__file__).parent.parent.parent.parent.parent / "testing/data"
 
-if __name__ == "__main__":
+
+def main(argv: list[str] | None = None):
     argparser = ArgumentParser()
     argparser.add_argument("models", nargs="*")
     argparser.add_argument(
@@ -15,7 +16,7 @@ if __name__ == "__main__":
         help="Optional timeout (in seconds) before closing the viewer.",
     )
 
-    args = argparser.parse_args()
+    args = argparser.parse_args(argv)
 
     input_paths = args.models or [TEST_DATA_DIR / "suzanne.obj"]
 
@@ -32,10 +33,11 @@ if __name__ == "__main__":
     eng.window.render()
 
     if args.timeout:
-
-        def stop(eng):
-            eng.interactor.stop()
-
-        eng.interactor.start(args.timeout, lambda: stop(eng))
+        # For testing purposes only, exit after `timeout` seconds
+        eng.interactor.start(args.timeout, eng.interactor.stop)
     else:
         eng.interactor.start()
+
+
+if __name__ == "__main__":
+    main()

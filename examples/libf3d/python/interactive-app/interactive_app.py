@@ -4,17 +4,16 @@ from argparse import ArgumentParser
 import f3d
 
 
-def main():
+def main(argv: list[str] | None = None):
     parser = ArgumentParser()
     parser.add_argument("file")
     parser.add_argument(
         "--timeout",
         type=int,
-        default=None,
         help="Optional timeout (in seconds) before closing the viewer.",
     )
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     f3d.Engine.autoload_plugins()
 
@@ -39,25 +38,23 @@ def main():
         }
     )
 
-    AddCustomCommands(eng)
-    AddCustomBindings(eng)
+    add_custom_commands(eng)
+    add_custom_bindings(eng)
 
     # Add a model to the scene
     try:
         eng.scene.add(args.file)
     except Exception as e:
         print(e)
+        return 1
 
     # Initial render
     win = eng.window
     win.render()
 
     if args.timeout:
-
-        def stop(eng):
-            eng.interactor.stop()
-
-        eng.interactor.start(args.timeout, lambda: stop(eng))
+        # For testing purposes only, exit after `timeout` seconds
+        eng.interactor.start(args.timeout, eng.interactor.stop)
     else:
         eng.interactor.start()
 
@@ -71,7 +68,7 @@ def parse_size(size: str):
         raise ValueError(f"cannot parse size from {size!r}")
 
 
-def AddCustomCommands(eng: f3d.Engine):
+def add_custom_commands(eng: f3d.Engine):
     # Get the interactor
     inter = eng.interactor
     inter.init_commands()
@@ -82,7 +79,7 @@ def AddCustomCommands(eng: f3d.Engine):
     # Keep a copy of the initial options
     initial_options = dict(opt)
 
-    def reset_options(_):
+    def reset_options(_args: list[str]):
         opt.update(initial_options)
 
     inter.add_command(
@@ -92,7 +89,7 @@ def AddCustomCommands(eng: f3d.Engine):
     )
 
     # Increase animation speed factor
-    def increase_animation_speed_factor(_):
+    def increase_animation_speed_factor(_args: list[str]):
         val = opt["scene.animation.speed_factor"]
         opt["scene.animation.speed_factor"] = val + 0.05
 
@@ -103,7 +100,7 @@ def AddCustomCommands(eng: f3d.Engine):
     )
 
     # Decrease animation speed factor
-    def decrease_animation_speed_factor(_):
+    def decrease_animation_speed_factor(_args: list[str]):
         val = opt["scene.animation.speed_factor"]
         opt["scene.animation.speed_factor"] = val - 0.05
 
@@ -116,7 +113,7 @@ def AddCustomCommands(eng: f3d.Engine):
     # Toggle grid visibility
     inter.remove_command("toggle_grid")
 
-    def toggle_grid(_):
+    def toggle_grid(_args: list[str]):
         opt["render.grid.enable"] = not opt["render.grid.enable"]
 
     inter.add_command(
@@ -128,7 +125,7 @@ def AddCustomCommands(eng: f3d.Engine):
     # Toggle axis
     inter.remove_command("toggle_axis")
 
-    def toggle_axis(_):
+    def toggle_axis(_args: list[str]):
         opt["ui.axis"] = not opt["ui.axis"]
 
     inter.add_command(
@@ -154,7 +151,7 @@ def AddCustomCommands(eng: f3d.Engine):
     )
 
 
-def AddCustomBindings(eng: f3d.Engine):
+def add_custom_bindings(eng: f3d.Engine):
     # Get the interactor
     inter = eng.interactor
     inter.init_bindings()
@@ -162,19 +159,17 @@ def AddCustomBindings(eng: f3d.Engine):
     opt = eng.options
 
     # Helpers for documentation
-    def docTgl(doc, key):
+    def docTgl(doc: str, key: str):
         return doc, "ON" if opt[key] else "OFF"
 
-    def docStr(doc):
+    def docStr(doc: str):
         return doc, ""
 
-    def docDblOpt(doc, key):
+    def docDblOpt(doc: str, key: str):
         val = opt[key]
-        if val is None:
-            return doc, "Unset"
         try:
-            return doc, f"{float(val):.2f}"
-        except:
+            return doc, f"{val:.2f}"
+        except (ValueError, TypeError):
             return doc, str(val)
 
     # R: reset options

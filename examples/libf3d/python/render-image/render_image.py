@@ -7,12 +7,13 @@ import f3d
 
 TEST_DATA_DIR = Path(__file__).parent.parent.parent.parent.parent / "testing/data"
 
-if __name__ == "__main__":
+
+def main(argv: list[str] | None = None):
     argparser = ArgumentParser()
     argparser.add_argument("models", nargs="*")
     argparser.add_argument("--into", default=gettempdir())
 
-    args = argparser.parse_args()
+    args = argparser.parse_args(argv)
 
     input_paths = args.models or [TEST_DATA_DIR / "suzanne.obj"]
     output_path = Path(args.into) / "f3d.png"
@@ -31,3 +32,7 @@ if __name__ == "__main__":
         print("F3D encountered an unexpected exception:")
         print(e)
         sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
