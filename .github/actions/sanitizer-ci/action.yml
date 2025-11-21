@@ -55,7 +55,7 @@ runs:
         [[ "${{ inputs.vtk_version }}" ]] || { echo "vtk_version input is empty" ; exit 1; }
 
     - name: Recover LFS Data
-      uses: f3d-app/lfs-data-cache-action@v1
+      uses: f3d-app/lfs-data-cache-action@v2
       with:
         type: "consumer"
         lfs_sha: ${{inputs.lfs_sha}}
