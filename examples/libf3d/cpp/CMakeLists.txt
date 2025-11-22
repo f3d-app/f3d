@@ -2,6 +2,7 @@ find_package(f3d REQUIRED COMPONENTS library)
 
 add_subdirectory(check-engine)
 add_subdirectory(multi-files)
+add_subdirectory(offscreen-thumbnail)
 add_subdirectory(render-image)
 add_subdirectory(render-interact)
 add_subdirectory(use-options-string)
