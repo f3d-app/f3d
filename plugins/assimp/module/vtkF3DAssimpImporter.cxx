@@ -27,8 +27,12 @@
 #include <vtkTriangleFilter.h>
 #include <vtkUniforms.h>
 #include <vtkUnsignedShortArray.h>
-
+#include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+#include <vtkMemoryResourceStream.h>
+#endif
 
 #include <assimp/Exceptional.h>
 #include <assimp/Importer.hpp>
@@ -250,8 +254,15 @@ public:
 
       if (reader)
       {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+        vtkNew<vtkMemoryResourceStream> stream;
+        stream->SetBuffer(aTexture->pcData, aTexture->mWidth);
+        reader->SetStream(stream);
+#else
         reader->SetMemoryBuffer(aTexture->pcData);
         reader->SetMemoryBufferLength(aTexture->mWidth);
+#endif
+        reader->Update();
         vTexture->SetInputConnection(reader->GetOutputPort());
       }
     }
@@ -893,7 +904,6 @@ public:
   vtkIdType ActiveCameraIndex = -1;
   std::unordered_map<std::string, vtkSmartPointer<vtkActorCollection>> NodeActors;
   std::unordered_map<std::string, vtkSmartPointer<vtkMatrix4x4>> NodeLocalMatrix;
-  std::unordered_map<std::string, vtkSmartPointer<vtkMatrix4x4>> NodeTRSMatrix;
   std::unordered_map<std::string, vtkSmartPointer<vtkMatrix4x4>> NodeGlobalMatrix;
   vtkF3DAssimpImporter* Parent;
 };
@@ -910,7 +920,7 @@ vtkF3DAssimpImporter::~vtkF3DAssimpImporter() = default;
 //----------------------------------------------------------------------------
 int vtkF3DAssimpImporter::ImportBegin()
 {
-  return this->Internals->ReadScene(this->FileName);
+  return this->Internals->ReadScene(this->GetFileName());
 }
 
 //----------------------------------------------------------------------------
@@ -1151,11 +1161,4 @@ void vtkF3DAssimpImporter::ImportCameras(vtkRenderer* renderer)
 void vtkF3DAssimpImporter::ImportLights(vtkRenderer* renderer)
 {
   this->Internals->ImportLights(renderer);
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DAssimpImporter::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os, indent);
-  os << indent << "FileName: " << this->FileName << "\n";
 }

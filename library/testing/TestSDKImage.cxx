@@ -11,7 +11,7 @@
 #include <set>
 #include <sstream>
 
-int TestSDKImage(int argc, char* argv[])
+int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   PseudoUnitTest test;
 
@@ -23,6 +23,10 @@ int TestSDKImage(int argc, char* argv[])
   test("supported formats PNG", std::find(formats.begin(), formats.end(), ".png") != formats.end());
 #if F3D_MODULE_EXR
   test("supported formats EXR", std::find(formats.begin(), formats.end(), ".exr") != formats.end());
+#endif
+#if F3D_MODULE_WEBP
+  test(
+    "supported formats WebP", std::find(formats.begin(), formats.end(), ".webp") != formats.end());
 #endif
 
   constexpr unsigned int width = 64;
@@ -36,13 +40,14 @@ int TestSDKImage(int argc, char* argv[])
 
   f3d::image generated(width, height, channels);
   std::vector<uint8_t> pixels(width * height * channels);
-  std::generate(std::begin(pixels), std::end(pixels), [&]() { return randGenerator() % 256; });
+  std::generate(std::begin(pixels), std::end(pixels),
+    [&]() { return static_cast<uint8_t>(randGenerator() % 256); });
   generated.setContent(pixels.data());
 
   f3d::image generated16(width, height, channels, f3d::image::ChannelType::SHORT);
   std::vector<uint16_t> pixels16(width * height * channels);
-  std::generate(
-    std::begin(pixels16), std::end(pixels16), [&]() { return randGenerator() % 65536; });
+  std::generate(std::begin(pixels16), std::end(pixels16),
+    [&]() { return static_cast<uint16_t>(randGenerator() % 65536); });
   generated16.setContent(pixels16.data());
 
   std::uniform_real_distribution<float> dist(
@@ -115,6 +120,12 @@ int TestSDKImage(int argc, char* argv[])
     exrImg.getChannelType() == f3d::image::ChannelType::FLOAT);
 #endif
 
+#if F3D_MODULE_WEBP
+  // check reading WebP
+  f3d::image webpImg(testingDir + "/data/image.webp");
+  test("check width WebP image channel type", webpImg.getWidth() == 1024);
+#endif
+
   // check reading invalid image
   test.expect<f3d::image::read_exception>(
     "read invalid image", [&]() { f3d::image invalidImg(testingDir + "/data/invalid.png"); });
@@ -140,7 +151,7 @@ int TestSDKImage(int argc, char* argv[])
   if (generated != baseline)
   {
     std::cerr << "Generated image is different from the png baseline: "
-              << generated.compare(baseline) << std::endl;
+              << generated.compare(baseline) << "\n";
     return EXIT_FAILURE;
   }
 
@@ -150,7 +161,7 @@ int TestSDKImage(int argc, char* argv[])
   if (generated != baselineTIF)
   {
     std::cerr << "Generated image is different from the tif baseline: "
-              << generated.compare(baselineTIF) << std::endl;
+              << generated.compare(baselineTIF) << "\n";
     return EXIT_FAILURE;
   }*/
 
@@ -168,7 +179,7 @@ int TestSDKImage(int argc, char* argv[])
   if (generated16 != baseline16)
   {
     std::cerr << "generated short image is different from the baseline: "
-              << generated16.compare(baseline16) << std::endl;
+              << generated16.compare(baseline16) << "\n";
     return EXIT_FAILURE;
   }
 
@@ -178,7 +189,7 @@ int TestSDKImage(int argc, char* argv[])
   if (generated16 != baseline16TIF)
   {
     std::cerr << "generated short image is different from the TIF baseline: "
-              << generated16.compare(baseline16TIF) << std::endl;
+              << generated16.compare(baseline16TIF) << "\n";
     return EXIT_FAILURE;
   }*/
 
@@ -197,7 +208,7 @@ int TestSDKImage(int argc, char* argv[])
   if (generated32 != baseline32)
   {
     std::cerr << "generated float image is different from the baseline: "
-              << generated32.compare(baseline32) << std::endl;
+              << generated32.compare(baseline32) << "\n";
     return EXIT_FAILURE;
   }
 #endif // F3D_SSIM_COMPARE
@@ -281,7 +292,7 @@ int TestSDKImage(int argc, char* argv[])
     {
       std::vector<unsigned char> buffer = img1.saveBuffer();
       std::ofstream outfile(tmpDir + "/metadata-buffer.png", std::ios::out | std::ios::binary);
-      outfile.write((const char*)&buffer[0], buffer.size());
+      outfile.write(reinterpret_cast<const char*>(buffer.data()), buffer.size());
     }
 
     f3d::image img2(tmpDir + "/metadata-buffer.png");

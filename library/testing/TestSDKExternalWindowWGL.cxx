@@ -23,7 +23,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
   return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
-int TestSDKExternalWindowWGL(int argc, char* argv[])
+int TestSDKExternalWindowWGL([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   HINSTANCE hInstance = GetModuleHandle(NULL);
 

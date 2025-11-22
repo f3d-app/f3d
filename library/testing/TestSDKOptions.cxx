@@ -1,13 +1,16 @@
 #include "PseudoUnitTest.h"
+#include "TestSDKHelpers.h"
 
 #include <export.h>
 #include <options.h>
 #include <types.h>
 
 #include <algorithm>
+#include <cmath>
 #include <iostream>
+#include <limits>
 
-int TestSDKOptions(int argc, char* argv[])
+int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   PseudoUnitTest test;
 
@@ -143,9 +146,9 @@ int TestSDKOptions(int argc, char* argv[])
   test("color operator[]", color[0] == 0.7);
   test("color operator[] const", (*colorPtr)[0] == 0.7);
   test.expect<f3d::type_access_exception>(
-    "color_t invalid access", [&]() { double val = color[3]; });
+    "color_t invalid access", [&]() { std::ignore = color[3]; });
   test.expect<f3d::type_access_exception>(
-    "color_t const invalid access", [&]() { double val = (*colorPtr)[3]; });
+    "color_t const invalid access", [&]() { std::ignore = (*colorPtr)[3]; });
   test("color red", color.r() == 0.7);
   test("color green", color.g() == 0.2);
   test("color blue", color.b() == 0.3);
@@ -191,6 +194,53 @@ int TestSDKOptions(int argc, char* argv[])
   test("set/get colormap",
     std::get<std::vector<double>>(opt.get("model.scivis.colormap")) ==
       std::vector<double>{ 0, 0, 0, 0, 1, 1, 1, 0 });
+
+  // Test transform2d_t
+  opt.setAsString("model.textures_transform", "1,0,0,0,-1,0,0,0,1");
+  test("setAsString vector transform2d", opt.getAsString("model.textures_transform"),
+    "1,0,0,0,-1,0,0,0,1");
+
+  opt.setAsString("model.textures_transform", "scale:0.1");
+  test("setAsString scale transform2d", opt.getAsString("model.textures_transform"),
+    "0.1,0,0,0,0.1,0,0,0,1");
+
+  opt.setAsString("model.textures_transform", "translation:0.51,2.1");
+  test("setAsString translation transform2d", opt.getAsString("model.textures_transform"),
+    "1,0,0.51,0,1,2.1,0,0,1");
+
+  opt.model.textures_transform = { 0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5 };
+  test("getAsString transform2d",
+    opt.getAsString("model.textures_transform") == "0.5,0,0,0,0.5,0,0,0,0.5");
+
+  opt.setAsString("model.textures_transform", "angle:90.0");
+  test("setAsString/get angle transform2d",
+    std::get<std::vector<double>>(opt.get("model.textures_transform")) ==
+      std::vector<double>{ std::cos(TestSDKHelpers::Degrees2Radians(90.0)),
+        -std::sin(TestSDKHelpers::Degrees2Radians(90.0)), 0,
+        std::sin(TestSDKHelpers::Degrees2Radians(90.0)),
+        std::cos(TestSDKHelpers::Degrees2Radians(90.0)), 0, 0, 0, 1 });
+
+  opt.setAsString("model.textures_transform", "scale:0.1;translation:0.51,2.1;angle:60.0");
+  test("setAsString/get scale/translation/angle transform2d",
+    std::get<std::vector<double>>(opt.get("model.textures_transform")) ==
+      std::vector<double>{ 0.1 * std::cos(TestSDKHelpers::Degrees2Radians(60.0)),
+        0.1 * -std::sin(TestSDKHelpers::Degrees2Radians(60.0)), 0.51,
+        0.1 * std::sin(TestSDKHelpers::Degrees2Radians(60.0)),
+        0.1 * std::cos(TestSDKHelpers::Degrees2Radians(60.0)), 2.1, 0, 0, 1 });
+
+  f3d::transform2d_t nanTransform =
+    f3d::transform2d_t(f3d::double_array_t<2>(std::vector<double>(2, 1)),
+      f3d::double_array_t<2>(std::vector<double>(2, 0)), std::numeric_limits<double>::quiet_NaN());
+  opt.model.textures_transform = nanTransform;
+  test("NaN angle transform2d", opt.getAsString("model.textures_transform") == "1,0,0,0,1,0,0,0,1");
+
+  nanTransform = f3d::transform2d_t(
+    f3d::double_array_t<2>(std::vector<double>(2, std::numeric_limits<double>::quiet_NaN())),
+    f3d::double_array_t<2>(std::vector<double>(2, std::numeric_limits<double>::quiet_NaN())),
+    std::numeric_limits<double>::quiet_NaN());
+  opt.model.textures_transform = nanTransform;
+  test(
+    "NaN values transform2d", opt.getAsString("model.textures_transform") == "1,0,0,0,1,0,0,0,1");
 
   // Test closest option
   auto closest = opt.getClosestOption("modle.sciivs.cell");
@@ -253,7 +303,7 @@ int TestSDKOptions(int argc, char* argv[])
     "getAllNames find", std::find(names.begin(), names.end(), "render.point_size") != names.end());
 
   std::vector<std::string> setNames = opt.getNames();
-  test("getNames count", setNames.size() != 0 && setNames == opt2.getNames());
+  test("getNames count", setNames.size() != 0);
 
   // Test isSame/copy/hasValue
   test("isSame", opt.isSame(opt2, "render.line_width"));

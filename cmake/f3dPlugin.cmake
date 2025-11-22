@@ -204,7 +204,7 @@ The `NAME` argument is required. The arguments are as follows:
 macro(f3d_plugin_build)
   cmake_parse_arguments(F3D_PLUGIN "FREEDESKTOP;FORCE_STATIC" "NAME;DESCRIPTION;VERSION" "VTK_MODULES;ADDITIONAL_RPATHS;MIMETYPE_XML_FILES;CONFIGURATION_DIRS" ${ARGN})
 
-  find_package(VTK 9.2.6 REQUIRED COMPONENTS
+  find_package(VTK 9.3.0 REQUIRED COMPONENTS
                CommonCore CommonExecutionModel IOImport
                ${F3D_PLUGIN_VTK_MODULES})
 
@@ -255,6 +255,7 @@ macro(f3d_plugin_build)
 
     vtk_module_build(
       MODULES ${modules}
+      ENABLE_WRAPPING OFF
       INSTALL_HEADERS OFF
       PACKAGE "f3d_${F3D_PLUGIN_NAME}_vtkext_private")
 

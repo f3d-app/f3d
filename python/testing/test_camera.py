@@ -92,11 +92,15 @@ def test_state_init():
 
 
 @pytest.mark.xfail(reason="CameraState equality not implemented")
-def test_state_compare():
+def test_state_compare_eq():
     state1 = f3d.CameraState((1, 2, 3), (1, 22, 3), (0, 0, 1), 32)
     state2 = f3d.CameraState((1, 2, 3), (1, 22, 3), (0, 0, 1), 32)
     assert state1 == state2
 
+
+@pytest.mark.xfail(reason="CameraState equality not implemented")
+def test_state_compare_neq():
+    state1 = f3d.CameraState((1, 2, 3), (1, 22, 3), (0, 0, 1), 32)
     state3 = f3d.CameraState((1, 2, 3), (1, 22, 3), (0, 0, 1), 25)
     assert state1 != state3
 

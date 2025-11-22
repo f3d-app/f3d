@@ -6,6 +6,7 @@
 #include "options.h"
 #include "window_impl.h"
 
+#include "F3DStyle.h"
 #include "vtkF3DRenderer.h"
 
 #include <vtkDoubleArray.h>
@@ -68,7 +69,17 @@ void animationManager::Initialize()
     progressRep->SetPosition(0.0, 0.0);
     progressRep->SetPosition2(1.0, 0.0);
     progressRep->SetMinimumSize(0, 5);
-    progressRep->SetProgressBarColor(1, 0, 0);
+    f3d::color_t color;
+    if (!this->Options.ui.animation_progress_color.has_value())
+    {
+      const auto [r, g, b] = F3DStyle::GetF3DBlue();
+      color = color_t(r, g, b);
+    }
+    else
+    {
+      color = this->Options.ui.animation_progress_color.value();
+    }
+    progressRep->SetProgressBarColor(color.r(), color.g(), color.b());
     progressRep->DrawBackgroundOff();
     progressRep->DragableOff();
     progressRep->SetShowBorderToOff();
@@ -466,11 +477,7 @@ void animationManager::PrepareForAnimationIndices()
       double timeRange[2];
       int nbTimeSteps;
       vtkNew<vtkDoubleArray> timeSteps;
-
-      // Discard timesteps, F3D only cares about elapsed time using time range and deltaTime
-      // Specifying a frame rate (60) in the next call is not needed after VTK 9.2.20230603 :
-      // VTK_VERSION_CHECK(9, 2, 20230603)
-      this->Importer->GetTemporalInformation(animIndex, 60, nbTimeSteps, timeRange, timeSteps);
+      this->Importer->GetTemporalInformation(animIndex, 0, nbTimeSteps, timeRange, timeSteps);
 
       // Accumulate time ranges
       this->TimeRange[0] = std::min(timeRange[0], this->TimeRange[0]);

@@ -14,33 +14,33 @@
         </p> 
     </description>
     <url type="homepage">https://f3d.app/</url>
-    <url type="help">https://f3d.app/doc/user/README_USER.html</url>
+    <url type="help">https://f3d.app/docs/next/user/QUICKSTART</url>
     <url type="bugtracker">https://github.com/f3d-app/f3d/issues</url>
-    <developer_name>Michael Migliore and Mathieu Westphal</developer_name>
+    <developer_name>F3D-APP Foundation</developer_name>
     <screenshots>
         <screenshot type="default">
-            <image>https://media.githubusercontent.com/media/f3d-app/f3d-media/95b76c22d927bb24759bbe0246b6260121f2933b/media/typical.png</image>
+            <image>https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/static/images/typical.png</image>
         </screenshot>
         <screenshot>
-            <image>https://user-images.githubusercontent.com/3129530/194735363-d2be23bb-90b6-4e90-941d-14b6dc24b476.png</image>
+            <image>https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/static/images/realisticMask.png</image>
         </screenshot>
         <screenshot>
-            <image>https://user-images.githubusercontent.com/3129530/194735370-4d1f067c-704c-4118-9d94-c1adf4039c39.png</image>
+            <image>https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/static/images/step.png</image>
         </screenshot>
         <screenshot>
-            <image>https://user-images.githubusercontent.com/3129530/194735376-3a476643-00d6-4cfc-9a88-e0dd33658564.png</image>
+            <image>https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/static/images/realisticHelmet.png</image>
         </screenshot>
         <screenshot>
-            <image>https://user-images.githubusercontent.com/3129530/194735272-5bcd3e7c-a333-41f5-8066-9b0bec9885e8.png</image>
+            <image>https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/static/images/directScalars.png</image>
         </screenshot>
         <screenshot>
-            <image>https://user-images.githubusercontent.com/3129530/194735378-b8be4df2-e030-4d13-b12f-24806cbb385b.png</image>
+            <image>https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/static/images/cad.png</image>
         </screenshot>
         <screenshot>
-            <image>https://user-images.githubusercontent.com/3129530/194735377-127fa5d8-ece5-40c7-8176-672279ebdacc.png</image>
+            <image>https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/static/images/volume.png</image>
         </screenshot>
         <screenshot>
-            <image>https://user-images.githubusercontent.com/3129530/194735354-486999dd-3c57-4ab1-a9ad-b8e97bac0da0.png</image>
+            <image>https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/static/images/volumeMedical.png</image>
         </screenshot>
     </screenshots>
     <content_rating type="oars-1.1"/>

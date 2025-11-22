@@ -99,7 +99,6 @@ void vtkF3DOverlayRenderPass::Initialize(const vtkRenderState* s)
 
   this->OverlayPass = vtkSmartPointer<vtkFramebufferPass>::New();
   this->OverlayPass->SetDelegatePass(overlayCamP);
-  this->OverlayPass->SetColorFormat(vtkTextureObject::Float32);
 }
 
 // ----------------------------------------------------------------------------

@@ -1,6 +1,8 @@
 #include <log.h>
 
-int TestSDKLog(int argc, char* argv[])
+#include <iostream>
+
+int TestSDKLog([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   f3d::log::setUseColoring(false);
 
@@ -9,6 +11,13 @@ int TestSDKLog(int argc, char* argv[])
   f3d::log::info("Test Info");
   f3d::log::warn("Test Warning");
   f3d::log::error("Test Error");
+
+  // Test forwarding
+  f3d::log::setVerboseLevel(f3d::log::VerboseLevel::QUIET);
+  f3d::log::forward(
+    [&](f3d::log::VerboseLevel, const std::string&) { std::cerr << "Test Forward\n"; });
+  f3d::log::error("xxx");
+  f3d::log::forward(nullptr);
 
   f3d::log::setVerboseLevel(
     f3d::log::VerboseLevel::INFO); // Next log calls should print like default

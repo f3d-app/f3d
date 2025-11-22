@@ -13,6 +13,7 @@
 #include <cassert>
 #include <filesystem>
 #include <iomanip>
+#include <numeric>
 #include <set>
 #include <sstream>
 
@@ -85,6 +86,9 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "loading-progress", "", "Show loading progress bar", "<bool>", "1" },
       { "animation-progress", "", "Show animation progress bar", "<bool>", "1" },
       { "multi-file-mode", "", R"(Choose the behavior when opening multiple files. "single" will show one file at a time, "all" will show all files in a single scene, "dir" will show files from the same directory in the same scene.)", "<single|all|dir>", "" },
+      { "multi-file-regex", "", R"_(Regular expression pattern to group files. Captured groups are replaced with "*" so that, for example, the pattern "part(\d+)" would group files "foo-part1.xyz" and "foo-part2.xyz" together as "foo-part*.xyz")_", "<regex>", "" },
+      { "recursive-dir-add", "", "Add directories recursively", "<bool>", "1" },
+      { "remove-empty-file-groups", "", "Remove file groups that results into an empty scene", "<bool>", "1" },
       { "up", "", "Up direction", "<direction>", "" },
       { "axis", "x", "Show axes", "<bool>", "1" }, { "grid", "g", "Show grid", "<bool>", "1" },
       { "grid-absolute", "", "Position grid at the absolute origin instead of below the model", "<bool>", "1" },
@@ -104,6 +108,9 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "animation-time", "", "Set animation time to load", "<time>", "" },
       { "font-file", "", "Path to a FreeType compatible font file", "<file_path>", ""},
       { "font-scale", "", "Scale fonts", "<ratio>", ""},
+#if F3D_MODULE_UI
+      { "backdrop-opacity", "", "UI backdrop opacity", "<value>", ""},
+#endif
       { "command-script", "", "Path to a script file containing commands to execute", "<file_path>", "" } } },
   { "Material",
     { {"point-sprites", "o", "Show sphere sprites instead of surfaces", "<bool>", "1" },
@@ -135,6 +142,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       {"fps", "z", "Display rendering frame per second", "<bool>", "1"},
       {"filename", "n", "Display filename", "<bool>", "1"},
       {"metadata", "m", "Display file metadata", "<bool>", "1"},
+      {"hdri-filename", "", "Display hdri filename", "<bool>", "1"},
       {"blur-background", "u", "Blur background", "<bool>", "1" },
       {"blur-coc", "", "Blur circle of confusion radius", "<value>", ""},
       {"light-intensity", "", "Light intensity", "<value>", ""} } },
@@ -168,10 +176,11 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       {"raytracing-denoise", "d", "Denoise the image", "<bool>", "1"} } },
 #endif
   {"PostFX (OpenGL)",
-    { {"translucency-support", "p", "Enable translucency support, implemented using depth peeling", "<bool>", "1"},
+    { {"blending", "p", R"(Select translucency blending mode ("none", "ddp", "sort" or "stochastic"))", "<string>", "ddp"},
+      {"translucency-support", "", "Enable translucency blending (deprecated)", "<bool>", "1"},
       {"ambient-occlusion", "q", "Enable ambient occlusion providing approximate shadows for better depth perception, implemented using SSAO", "<bool>", "1"},
-      {"anti-aliasing", "a", "Enable anti-aliasing", "<bool>", "1"},
-      {"anti-aliasing-mode", "", R"(Select anti-aliasing method ("fxaa" or "ssaa"))", "<string>", "fxaa"},
+      {"anti-aliasing", "a", R"(Select anti-aliasing method ("none", "fxaa", "ssaa" or "taa"))", "<string>", "fxaa"},
+      {"anti-aliasing-mode", "", R"(Select anti-aliasing method ("fxaa", "ssaa" or "taa") (deprecated))", "<string>", "fxaa"},
       {"tone-mapping", "t", "Enable Tone Mapping, providing balanced coloring", "<bool>", "1"},
       {"final-shader", "", "Execute the final shader at the end of the rendering pipeline", "<GLSL code>", ""} } },
   {"Testing",
@@ -217,13 +226,9 @@ void PrintHelp(const std::string& execName, const cxxopts::Options& cxxOptions)
   }};
 
   f3d::log::setUseColoring(false);
-  std::vector<std::string> orderedCLIGroupNames;
-  orderedCLIGroupNames.reserve(::CLIOptions.size());
-  for (const ::CLIGroup& optionGroup : ::CLIOptions)
-  {
-    // This ensure help is provided in the expected group order
-    orderedCLIGroupNames.emplace_back(optionGroup.GroupName);
-  }
+  std::vector<std::string> orderedCLIGroupNames(CLIOptions.size());
+  std::transform(CLIOptions.cbegin(), CLIOptions.cend(), orderedCLIGroupNames.begin(),
+    [](const ::CLIGroup& cliGroup) { return cliGroup.GroupName; });
   f3d::log::info(cxxOptions.help(orderedCLIGroupNames));
   f3d::log::info("\nExamples:");
   for (const auto& [cmd, desc] : examples)
@@ -318,14 +323,10 @@ void PrintReadersList()
     descColSize = std::max(descColSize, reader.Description.length());
     plugColSize = std::max(plugColSize, reader.PluginName.length());
 
-    for (const auto& ext : reader.Extensions)
-    {
-      extsColSize = std::max(extsColSize, ext.length());
-    }
-    for (const auto& mime : reader.MimeTypes)
-    {
-      mimeColSize = std::max(mimeColSize, mime.length());
-    }
+    extsColSize = std::accumulate(reader.Extensions.cbegin(), reader.Extensions.cend(), extsColSize,
+      [](size_t size, const auto& ext) { return std::max(size, ext.length()); });
+    mimeColSize = std::accumulate(reader.MimeTypes.cbegin(), reader.MimeTypes.cend(), mimeColSize,
+      [](size_t size, const auto& mime) { return std::max(size, mime.length()); });
   }
   const size_t colGap = 4;
   nameColSize += colGap;

@@ -10,6 +10,7 @@
 
 #include <vtkProp.h>
 
+#include <cstdint>
 #include <deque>
 
 class vtkOpenGLRenderWindow;
@@ -20,7 +21,19 @@ public:
   static vtkF3DUIActor* New();
   vtkTypeMacro(vtkF3DUIActor, vtkProp);
 
-  using CheatSheetTuple = std::tuple<std::string, std::string, std::string>;
+  /**
+   * Enumeration of available cheatsheet binding types.
+   * Duplicate of library/public/interactor.h
+   */
+  enum class CheatSheetBindingType : std::uint8_t
+  {
+    CYCLIC = 0,
+    NUMERICAL = 1,
+    TOGGLE = 2,
+    OTHER = 3,
+  };
+
+  using CheatSheetTuple = std::tuple<std::string, std::string, std::string, CheatSheetBindingType>;
   using CheatSheetGroup = std::pair<std::string, std::vector<CheatSheetTuple>>;
 
   /**
@@ -37,10 +50,23 @@ public:
   void SetDropZoneVisibility(bool show);
 
   /**
+   * Set the logo dropzone visibility
+   * False by default
+   */
+  void SetDropZoneLogoVisibility(bool show);
+
+  /**
    * Set the dropzone string
    * Empty by default
    */
   void SetDropText(const std::string& info);
+
+  /**
+   * Set the dropzone binds
+   * Each pair contains a description and its associated interaction bind
+   * Empty by default
+   */
+  void SetDropBinds(const std::vector<std::pair<std::string, std::string>>& dropZoneBinds);
 
   /**
    * Set the filename visibility
@@ -53,6 +79,18 @@ public:
    * Empty by default
    */
   void SetFileName(const std::string& filename);
+
+  /**
+   * Set the HDRI filename visibility
+   * False by default
+   */
+  void SetHDRIFileNameVisibility(bool show);
+
+  /**
+   * Set the HDRI filename string
+   * Empty by default
+   */
+  void SetHDRIFileName(const std::string& filename);
 
   /**
    * Set the metadata visibility
@@ -126,6 +164,11 @@ public:
   int RenderOverlay(vtkViewport* vp) override;
 
   /**
+   * Set the backdrop opacity
+   */
+  void SetBackdropOpacity(const double backdropOpacity);
+
+  /**
    * Set the delta time (time between UI frames) in seconds
    */
   virtual void SetDeltaTime(double)
@@ -172,6 +215,13 @@ protected:
   }
 
   /**
+   * Render the HDRI filename UI widget
+   */
+  virtual void RenderHDRIFileName()
+  {
+  }
+
+  /**
    * Render the cheatsheet UI widget
    */
   virtual void RenderCheatSheet()
@@ -198,12 +248,16 @@ protected:
   virtual void RenderConsoleBadge()
   {
   }
-
+  bool DropZoneLogoVisible = false;
   bool DropZoneVisible = false;
   std::string DropText = "";
+  std::vector<std::pair<std::string, std::string>> DropBinds;
 
   bool FileNameVisible = false;
   std::string FileName = "";
+
+  bool HDRIFileNameVisible = false;
+  std::string HDRIFileName = "";
 
   bool MetaDataVisible = false;
   std::string MetaData = "";
@@ -225,6 +279,8 @@ protected:
 
   std::string FontFile = "";
   double FontScale = 1.0;
+
+  double BackdropOpacity = 0.9;
 
 private:
   vtkF3DUIActor(const vtkF3DUIActor&) = delete;

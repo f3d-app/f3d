@@ -8,6 +8,9 @@ inputs:
   version:
     description: "Version of tbb to build"
     required: true
+  global_cache_index:
+    description: "Global cache index"
+    required: true
 
 runs:
   using: "composite"
@@ -16,13 +19,14 @@ runs:
       shell: bash
       run: |
         [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
 
     - name: Cache TBB
       id: cache-tbb
       uses: actions/cache/restore@v4
       with:
         path: dependencies/tbb_install
-        key: tbb-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-2
+        key: tbb-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-0
 
     # Dependents: usd openvdb vtk
     # v2021.13.0 somehow cause memory issue in draco and alembic

@@ -22,6 +22,7 @@
 
 class vtkOpenGLRenderWindow;
 class vtkWindow;
+struct ImVec2;
 
 class vtkF3DImguiConsole : public vtkF3DConsoleOutputWindow
 {
@@ -50,9 +51,14 @@ public:
   void Clear();
 
   /**
-   * Set the callback to get the list of commands matching pattern
+   * Get Badge window size
    */
-  void SetCommandsMatchCallback(
+  ImVec2 GetBadgeSize();
+
+  /**
+   * Set the callback to get completion candidates
+   */
+  void SetCompletionCallback(
     std::function<std::vector<std::string>(const std::string& pattern)> callback);
 
 protected:

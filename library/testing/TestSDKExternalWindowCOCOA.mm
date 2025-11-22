@@ -34,7 +34,7 @@
   self.openGLContext = [[NSOpenGLContext alloc] initWithFormat:pixelFormat shareContext:nil];
   [self.openGLContext makeCurrentContext];
 
-  f3d::engine engine = f3d::engine::createExternal(nullptr);
+  f3d::engine engine = f3d::engine::createExternal(f3d::context::cocoa());
   engine.getWindow().setSize(300, 300);
   engine.getScene().add(_dataPath + "/data/cow.vtp");
 
@@ -48,7 +48,7 @@
 
 @end
 
-int TestSDKExternalWindowCOCOA(int argc, char* argv[])
+int TestSDKExternalWindowCOCOA([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   @autoreleasepool {
     NSApplication *app = [NSApplication sharedApplication];

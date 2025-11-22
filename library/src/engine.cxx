@@ -101,8 +101,8 @@ engine::engine(
   this->Internals->Scene =
     std::make_unique<detail::scene_impl>(*this->Internals->Options, *this->Internals->Window);
 
-  // Do not create an interactor for NONE or EXTERNAL
-  if (windowType != window::Type::NONE && windowType != window::Type::EXTERNAL)
+  // Do not create an interactor for NONE
+  if (windowType != window::Type::NONE)
   {
     this->Internals->Interactor = std::make_unique<detail::interactor_impl>(
       *this->Internals->Options, *this->Internals->Window, *this->Internals->Scene);
@@ -146,9 +146,18 @@ engine engine::createOSMesa()
 }
 
 //----------------------------------------------------------------------------
-engine engine::createExternal(const context::function& getProcAddress)
+engine engine::createExternal([[maybe_unused]] const context::function& getProcAddress)
 {
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 3, 20240914)
+  throw engine::no_window_exception("VTK version < 9.4 does not support external windows");
+#else
+  if (getProcAddress == nullptr)
+  {
+    throw engine::no_window_exception(
+      "Cannot create an external window without a context function");
+  }
   return { window::Type::EXTERNAL, false, getProcAddress };
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -464,6 +473,12 @@ engine::libInformation engine::getLibInfo()
   libInfo.Modules["OpenEXR"] = false;
 #endif
 
+#if F3D_MODULE_WEBP
+  libInfo.Modules["WebP"] = true;
+#else
+  libInfo.Modules["WebP"] = false;
+#endif
+
 #if F3D_MODULE_UI
   libInfo.Modules["ImGui"] = true;
 #else
@@ -487,6 +502,7 @@ engine::libInformation engine::getLibInfo()
 
   libInfo.Copyrights.emplace_back("2019-2021 Kitware SAS");
   libInfo.Copyrights.emplace_back("2021-2025 Michael Migliore, Mathieu Westphal");
+  libInfo.Copyrights.emplace_back("2025 F3D-APP Foundation");
   libInfo.License = "BSD-3-Clause";
 
   return libInfo;
@@ -497,7 +513,7 @@ std::vector<engine::readerInformation> engine::getReadersInfo()
 {
   std::vector<readerInformation> readersInfo;
   const auto& plugins = factory::instance()->getPlugins();
-  for (const auto& plugin : plugins)
+  for (const auto* plugin : plugins)
   {
     for (const auto& reader : plugin->getReaders())
     {

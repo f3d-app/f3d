@@ -148,13 +148,13 @@ def test_update_from_kv_pairs():
 def test_update_from_invalid_kv_pairs():
     options = f3d.Options()
 
-    items = (
+    items: Any = (
         ("ui.axis", True),
         ("model.material.roughness", 0.8),
         ("a", "b", 3),
     )
     with pytest.raises(ValueError):
-        options.update(items)  # type: ignore
+        options.update(items)
 
 
 def test_is_same():

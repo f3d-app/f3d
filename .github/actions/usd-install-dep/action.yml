@@ -14,6 +14,9 @@ inputs:
   tbb_version:
     description: "Version of tbb to build against"
     required: true
+  global_cache_index:
+    description: "Global cache index"
+    required: true
 
 runs:
   using: "composite"
@@ -24,13 +27,14 @@ runs:
         [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
         [[ "${{ inputs.openexr_version }}" ]] || { echo "openexr_version input is empty" ; exit 1; }
         [[ "${{ inputs.tbb_version }}" ]] || { echo "tbb_version input is empty" ; exit 1; }
+        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
 
     - name: Cache USD
       id: cache-usd
       uses: actions/cache/restore@v4
       with:
         path: dependencies/usd_install
-        key: usd-${{inputs.version}}-${{inputs.openexr_version}}-${{inputs.tbb_version}}-${{runner.os}}-${{inputs.cpu}}-0
+        key: usd-${{inputs.version}}-${{inputs.openexr_version}}-${{inputs.tbb_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-0
 
     - name: Checkout USD
       if: steps.cache-usd.outputs.cache-hit != 'true'
@@ -42,7 +46,14 @@ runs:
 
     # Upstream issue: https://github.com/PixarAnimationStudios/OpenUSD/issues/2490
     - name: Patch USD
-      if: steps.cache-usd.outputs.cache-hit != 'true'
+      if: steps.cache-usd.outputs.cache-hit != 'true' && inputs.version == 'v24.08'
+      working-directory: ${{github.workspace}}/dependencies/usd
+      shell: bash
+      run: patch -p1 < $GITHUB_ACTION_PATH/usd-install-bin-mindep.patch
+
+    # Upstream issue: https://github.com/PixarAnimationStudios/OpenUSD/issues/2490
+    - name: Patch USD
+      if: steps.cache-usd.outputs.cache-hit != 'true' && inputs.version != 'v24.08'
       working-directory: ${{github.workspace}}/dependencies/usd
       shell: bash
       run: patch -p1 < $GITHUB_ACTION_PATH/usd-install-bin.patch

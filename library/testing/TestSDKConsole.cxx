@@ -3,7 +3,7 @@
 
 #include "TestSDKHelpers.h"
 
-int TestSDKConsole(int argc, char* argv[])
+int TestSDKConsole([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::INFO);
 

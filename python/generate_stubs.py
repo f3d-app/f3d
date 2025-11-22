@@ -24,18 +24,24 @@ def main():
         print("\n".join(diff))
 
 
-def run_pybind11_stubgen(out_dir: Path, module: str = "f3d"):
+def run_pybind11_stubgen(
+    out_dir: Path, module: str = "f3d", submodule: str = "f3d.pyf3d"
+):
     stubgen_cmd = (
         # use current python interpreter to run stubs generation for the `f3d` module
-        *(sys.executable, "-m", "pybind11_stubgen", module),
+        *(sys.executable, "-m", "pybind11_stubgen", submodule),
         # fix enum for default values in `Image.save()` and `Image.save_buffer()`
         *("--enum-class-locations", "SaveFormat:Image"),
+        # more enums
+        *("--enum-class-locations", "BindingType:Interactor"),
+        *("--enum-class-locations", "LightType:f3d"),
         # ignore `f3d.vector3_t` and `f3d.point3_t` as we dont actually map them
         # but let them auto-convert from and to `tuple[float, float, float]`
         # (all occurrences will be postprocessed later)
         *("--ignore-unresolved-names", r"f3d\.(vector3_t|point3_t)"),
         # output directory so we can retrieve and post process
         *("--output-dir", out_dir),
+        "--exit-code",
     )
     with retrieve_changed_files(out_dir, f"{module}/**/*.pyi") as changed_files:
         subprocess.check_call(stubgen_cmd)

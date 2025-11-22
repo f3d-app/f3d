@@ -47,7 +47,19 @@ public:
   {
     NONE,
     FXAA,
-    SSAA
+    SSAA,
+    TAA
+  };
+
+  /**
+   * Enum listing possible blending modes.
+   */
+  enum class BlendingMode : unsigned char
+  {
+    NONE,
+    DUAL_DEPTH_PEELING,
+    SORT,
+    STOCHASTIC
   };
 
   ///@{
@@ -61,10 +73,12 @@ public:
   void ShowTimer(bool show);
   void ShowMetaData(bool show);
   void ShowFilename(bool show);
+  void ShowHDRIFilename(bool show);
   void ShowCheatSheet(bool show);
   void ShowConsole(bool show);
   void ShowMinimalConsole(bool show);
   void ShowDropZone(bool show);
+  void ShowDropZoneLogo(bool show);
   void ShowHDRISkybox(bool show);
   void ShowArmature(bool show);
   ///@}
@@ -84,10 +98,12 @@ public:
   void SetLightIntensity(const double intensity);
   void SetFilenameInfo(const std::string& info);
   void SetDropZoneInfo(const std::string& info);
+  void SetDropZoneBinds(const std::vector<std::pair<std::string, std::string>>& dropZoneBinds);
   void SetGridAbsolute(bool absolute);
   void SetGridUnitSquare(const std::optional<double>& unitSquare);
   void SetGridSubdivisions(int subdivisions);
   void SetGridColor(const std::vector<double>& color);
+  void SetBackdropOpacity(const double backdropOpacity);
   ///@}
 
   ///@{
@@ -96,7 +112,7 @@ public:
    */
   void SetUseRaytracing(bool use);
   void SetUseRaytracingDenoiser(bool use);
-  void SetUseDepthPeelingPass(bool use);
+  void SetBlendingMode(BlendingMode mode);
   void SetUseSSAOPass(bool use);
   void SetAntiAliasingMode(AntiAliasingMode mode);
   void SetUseToneMappingPass(bool use);
@@ -106,6 +122,11 @@ public:
   void SetBackfaceType(const std::optional<std::string>& backfaceType);
   void SetFinalShader(const std::optional<std::string>& finalShader);
   ///@}
+
+  /**
+   * Get BlendingMode
+   */
+  BlendingMode GetBlendingMode() const;
 
   /**
    * Set SetUseOrthographicProjection
@@ -428,8 +449,6 @@ private:
 
   void ReleaseGraphicsResources(vtkWindow* w) override;
 
-  bool IsBackgroundDark();
-
   /**
    * Configure meta data actor visibility and content
    */
@@ -508,6 +527,17 @@ private:
     bool cellFlag = false, bool inverseOpacityFlag = false);
 
   /**
+   * Configure screen spaced jittering for TAA
+   */
+  void ConfigureJitter(bool enable);
+
+  /**
+   * Configure Halton sequence for TAA. Valid direction values are 0 and 1. Returns a value that is
+   * used for jitter
+   */
+  float ConfigureHaltonSequence(int direction);
+
+  /**
    * Convenience method for configuring a scalar bar actor for coloring
    */
   void ConfigureScalarBarActorForColoring(vtkScalarBarActor* scalarBar, std::string arrayName,
@@ -563,16 +593,18 @@ private:
   bool TimerVisible = false;
   bool FilenameVisible = false;
   bool MetaDataVisible = false;
+  bool HDRIFilenameVisible = false;
   bool CheatSheetVisible = false;
   bool ConsoleVisible = false;
   bool MinimalConsoleVisible = false;
   bool DropZoneVisible = false;
+  bool DropZoneLogoVisible = false;
   bool HDRISkyboxVisible = false;
   bool ArmatureVisible = false;
   bool UseRaytracing = false;
   bool UseRaytracingDenoiser = false;
-  bool UseDepthPeelingPass = false;
   AntiAliasingMode AntiAliasingModeEnabled = AntiAliasingMode::NONE;
+  BlendingMode BlendingModeEnabled = BlendingMode::NONE;
   bool UseSSAOPass = false;
   bool UseToneMappingPass = false;
   bool UseBlurBackground = false;
@@ -661,6 +693,9 @@ private:
   std::optional<std::vector<double>> UserScalarBarRange;
   std::vector<double> Colormap;
   std::optional<int> ColormapDiscretization;
+
+  int TaaHaltonNumerator[2] = { 0, 0 };
+  int TaaHaltonDenominator[2] = { 1, 1 };
 };
 
 #endif

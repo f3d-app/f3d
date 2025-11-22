@@ -1,6 +1,6 @@
 on:
   pull_request_target:
-    types: [assigned, opened, synchronize, reopened]
+    types: [assigned, opened, synchronize, reopened, labeled]
     branches:
       - master
       - release
@@ -11,40 +11,14 @@ on:
 name: Build docker images
 jobs:
   #----------------------------------------------------------------------------
-  # Detect checkboxes are checked
-  #----------------------------------------------------------------------------
-  detect_checkboxes:
-    name: Detect Checkboxes
-    runs-on: ubuntu-latest
-    outputs:
-      checked: ${{ steps.detect.outputs.checked }}
-      unchecked: ${{ steps.detect.outputs.unchecked }}
-
-    permissions:
-      pull-requests: write
-
-    steps:
-      - name: Checkbox Trigger
-        id: detect
-        uses: AhmedBaset/checklist@3
-        with:
-          token: ${{ github.token }}
-
-      - name: list changes
-        run: |
-          echo "checked=${{ steps.detect.outputs.checked }}"
-          echo "unchecked=${{ steps.detect.outputs.unchecked }}"
-
-  #----------------------------------------------------------------------------
   # Default versions: Set default version for all dependencies
   #----------------------------------------------------------------------------
   default_versions:
     runs-on: ubuntu-22.04
     name: Set default versions
-    needs: detect_checkboxes
-    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'docker CI')) }}
+    if: contains(github.event.pull_request.labels.*.name, 'ci:full')
     outputs:
-      timestamp: ${{ steps.set_default_versions.outputs.timestamp }}
+      docker_timestamp: ${{ steps.set_default_versions.outputs.docker_timestamp }}
 
     steps:
       - uses: actions/checkout@v4
@@ -74,11 +48,11 @@ jobs:
         working-directory: ${{github.workspace}}
         run: |
           res=0
-          docker manifest inspect ghcr.io/f3d-app/f3d-wasm:${{needs.default_versions.outputs.timestamp}} || res=$?
-          docker manifest inspect ghcr.io/f3d-app/f3d-android-armeabi-v7a:${{needs.default_versions.outputs.timestamp}} || res=$?
-          docker manifest inspect ghcr.io/f3d-app/f3d-android-arm64-v8a:${{needs.default_versions.outputs.timestamp}} || res=$?
-          docker manifest inspect ghcr.io/f3d-app/f3d-android-x86:${{needs.default_versions.outputs.timestamp}} || res=$?
-          docker manifest inspect ghcr.io/f3d-app/f3d-android-x86_64:${{needs.default_versions.outputs.timestamp}} || res=$?
+          docker manifest inspect ghcr.io/f3d-app/f3d-wasm:${{needs.default_versions.outputs.docker_timestamp}} || res=$?
+          docker manifest inspect ghcr.io/f3d-app/f3d-android-armeabi-v7a:${{needs.default_versions.outputs.docker_timestamp}} || res=$?
+          docker manifest inspect ghcr.io/f3d-app/f3d-android-arm64-v8a:${{needs.default_versions.outputs.docker_timestamp}} || res=$?
+          docker manifest inspect ghcr.io/f3d-app/f3d-android-x86:${{needs.default_versions.outputs.docker_timestamp}} || res=$?
+          docker manifest inspect ghcr.io/f3d-app/f3d-android-x86_64:${{needs.default_versions.outputs.docker_timestamp}} || res=$?
           echo "F3D_DOCKER_IMAGE_AVAILABLE=$res" >> $GITHUB_ENV
 
       # This require a F3D_DOCKER_CI_DISPATCH secret contain a PAT with read and write admin access

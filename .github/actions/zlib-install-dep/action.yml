@@ -8,6 +8,9 @@ inputs:
   version:
     description: "Version of zlib to build"
     required: true
+  global_cache_index:
+    description: "Global cache index"
+    required: true
 
 runs:
   using: "composite"
@@ -16,13 +19,14 @@ runs:
       shell: bash
       run: |
         [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
 
     - name: Cache zlib
       id: cache-zlib
       uses: actions/cache/restore@v4
       with:
         path: dependencies/zlib_install
-        key: zlib-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-4
+        key: zlib-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-0
 
     # Dependents: blosc openvdb vtk
     - name: Checkout zlib

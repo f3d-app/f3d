@@ -5,7 +5,7 @@
 
 #include "TestSDKHelpers.h"
 
-int TestSDKDynamicBackgroundColor(int argc, char* argv[])
+int TestSDKDynamicBackgroundColor([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   f3d::engine eng = f3d::engine::create(true);
   f3d::scene& sce = eng.getScene();

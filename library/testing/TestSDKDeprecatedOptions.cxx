@@ -16,7 +16,7 @@
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
 
-int TestSDKDeprecatedOptions(int argc, char* argv[])
+int TestSDKDeprecatedOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   f3d::engine eng = f3d::engine::create(true);
   f3d::scene& sce = eng.getScene();
@@ -25,6 +25,7 @@ int TestSDKDeprecatedOptions(int argc, char* argv[])
   win.setSize(300, 300);
 
   opt.render.effect.anti_aliasing = true;
+  opt.render.effect.translucency_support = true;
 
   sce.add(std::string(argv[1]) + "/data/cow.vtp");
 

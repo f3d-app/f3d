@@ -8,6 +8,9 @@ inputs:
   version:
     description: "Version of assimp to build"
     required: true
+  global_cache_index:
+    description: "Global cache index"
+    required: true
 
 runs:
   using: "composite"
@@ -16,13 +19,14 @@ runs:
       shell: bash
       run: |
         [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
 
     - name: Cache ASSIMP
       id: cache-assimp
       uses: actions/cache/restore@v4
       with:
         path: dependencies/assimp_install
-        key: assimp-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-0
+        key: assimp-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-1
 
     - name: Checkout ASSIMP
       if: steps.cache-assimp.outputs.cache-hit != 'true'

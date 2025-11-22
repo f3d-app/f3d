@@ -4,24 +4,13 @@
 
 ### Checklist for finalizing the PR
 
-- [ ] I have performed a [self-review](https://f3d.app/doc/dev/CODING_STYLE.html) of my code
-- [ ] I have added [tests](https://f3d.app/doc/dev/TESTING.html) for new features and bugfixes
-- [ ] I have added [documentation](https://f3d.app/) for new features
+- [ ] I have performed a [self-review](https://f3d.app/dev/CODING_STYLE) of my code
+- [ ] I have added [tests](https://f3d.app/dev/TESTING) for new features and bugfixes
+- [ ] I have added [documentation](https://f3d.app/docs/next/user/QUICKSTART) for new features
 - [ ] If it is a modifying the libf3d API, I have updated bindings
-- [ ] If it is a modifying the `.github/workflows/versions.json`, I have updated `timestamp`
+- [ ] If it is a modifying the `.github/workflows/versions.json`, I have updated `docker_timestamp`
 
 ### Continuous integration
 
-Please check the checkbox of the CI you want to run, then push again on your branch.
-
-- [ ] Style checks
-- [ ] Fast CI
-- [ ] Coverage cached CI
-- [ ] Analysis cached CI
-- [ ] WASM docker CI
-- [ ] Android docker CI
-- [ ] macOS Intel cached CI
-- [ ] macOS ARM cached CI
-- [ ] Windows cached CI
-- [ ] Linux cached CI
-- [ ] Other cached CI
+Please write a comment to run CI, eg: `\ci fast`.
+See [here](https://f3d.app/dev/CONTRIBUTING#continuous-integration) for more info.

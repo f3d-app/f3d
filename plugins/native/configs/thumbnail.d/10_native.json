@@ -28,7 +28,7 @@
     "options": {
       "scalar-coloring": true,
       "coloring-component": "-2",
-      "translucency-support": true
+      "blending": "ddp"
     }
   },
   {
@@ -43,8 +43,8 @@
       "coloring-component": "-2",
       "tone-mapping": false,
       "grid": false,
-      "anti-aliasing": false,
-      "translucency-support": false
+      "anti-aliasing": "none",
+      "blending": "sort"
     }
   },
   {

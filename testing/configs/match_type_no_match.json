@@ -2,7 +2,7 @@
   {
     "match-type": "glob",
     "options": {
-      "anti-aliasing": true
+      "anti-aliasing": "fxaa"
     }
   }
 ]

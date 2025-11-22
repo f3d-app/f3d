@@ -1,0 +1,19 @@
+{
+  "name": "f3d-example",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^7.1.2"
+  },
+  "dependencies": {
+    "bulma": "^1.0.4",
+    "bulma-switch": "^2.0.4",
+    "f3d": "file:../../.."
+  }
+}

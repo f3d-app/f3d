@@ -2,6 +2,7 @@
 
 #include "camera_impl.h"
 #include "engine.h"
+#include "interactor.h"
 #include "log.h"
 #include "macros.h"
 #include "options.h"
@@ -20,6 +21,7 @@
 #include <vtkInformation.h>
 #include <vtkPNGReader.h>
 #include <vtkPointGaussianMapper.h>
+#include <vtkRenderWindowInteractor.h>
 #include <vtkRendererCollection.h>
 #include <vtkRenderingOpenGLConfigure.h>
 #include <vtkVersion.h>
@@ -35,6 +37,10 @@
 
 #ifdef VTK_OPENGL_HAS_EGL
 #include <vtkF3DEGLRenderWindow.h>
+#endif
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+#include <vtkMemoryResourceStream.h>
 #endif
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
@@ -282,7 +288,8 @@ int window_impl::getHeight() const
 //----------------------------------------------------------------------------
 window& window_impl::setSize(int width, int height)
 {
-  this->Internals->RenWin->SetSize(width, height);
+  assert(this->Internals->RenWin->GetInteractor() != nullptr);
+  this->Internals->RenWin->GetInteractor()->UpdateSize(width, height);
   return *this;
 }
 
@@ -293,8 +300,8 @@ window& window_impl::setPosition(int x, int y)
   {
     // vtkCocoaRenderWindow has a different behavior than other render windows
     // https://gitlab.kitware.com/vtk/vtk/-/issues/18681
-    int* screenSize = this->Internals->RenWin->GetScreenSize();
-    int* winSize = this->Internals->RenWin->GetSize();
+    const int* screenSize = this->Internals->RenWin->GetScreenSize();
+    const int* winSize = this->Internals->RenWin->GetSize();
     this->Internals->RenWin->SetPosition(x, screenSize[1] - winSize[1] - y);
   }
   else
@@ -309,8 +316,14 @@ window& window_impl::setIcon(const unsigned char* icon, size_t iconSize)
 {
   // XXX This code requires that the interactor has already been set on the render window
   vtkNew<vtkPNGReader> iconReader;
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+  vtkNew<vtkMemoryResourceStream> stream;
+  stream->SetBuffer(icon, iconSize);
+  iconReader->SetStream(stream);
+#else
   iconReader->SetMemoryBuffer(icon);
   iconReader->SetMemoryBufferLength(iconSize);
+#endif
   iconReader->Update();
   this->Internals->RenWin->SetIcon(iconReader->GetOutput());
   return *this;
@@ -383,13 +396,6 @@ void window_impl::UpdateDynamicOptions()
 
   const options& opt = this->Internals->Options;
 
-  if (this->Internals->Interactor)
-  {
-    renderer->ShowAxis(opt.ui.axis);
-    renderer->SetUseTrackball(opt.interactor.trackball);
-    renderer->SetInvertZoom(opt.interactor.invert_zoom);
-  }
-
   // XXX: model.point_sprites.type only has an effect on geometry scene
   // but we set it here for practical reasons
   const int pointSpritesSize = opt.model.point_sprites.size;
@@ -405,11 +411,68 @@ void window_impl::UpdateDynamicOptions()
   renderer->ShowFilename(opt.ui.filename);
   renderer->SetFilenameInfo(opt.ui.filename_info);
   renderer->ShowMetaData(opt.ui.metadata);
+  renderer->ShowHDRIFilename(opt.ui.hdri_filename);
   renderer->ShowCheatSheet(opt.ui.cheatsheet);
   renderer->ShowConsole(opt.ui.console);
   renderer->ShowMinimalConsole(opt.ui.minimal_console);
-  renderer->ShowDropZone(opt.ui.dropzone);
-  renderer->SetDropZoneInfo(opt.ui.dropzone_info);
+  renderer->ShowDropZone(opt.ui.drop_zone.enable);
+  renderer->ShowDropZoneLogo(opt.ui.drop_zone.show_logo);
+
+  if (this->Internals->Interactor)
+  {
+    renderer->ShowAxis(opt.ui.axis);
+    renderer->SetUseTrackball(opt.interactor.trackball);
+    renderer->SetInvertZoom(opt.interactor.invert_zoom);
+
+#if F3D_MODULE_UI
+    std::string bindsStr = opt.ui.drop_zone.custom_binds;
+    std::vector<std::pair<std::string, std::string>> dropZoneBinds;
+
+    for (const std::string& token : utils::tokenize(bindsStr))
+    {
+      if (!token.empty())
+      {
+        try
+        {
+          auto bind = interaction_bind_t::parse(token);
+          auto docPair = this->Internals->Interactor->getBindingDocumentation(bind);
+          dropZoneBinds.push_back({ docPair.first, bind.format() });
+        }
+        catch (const interactor_impl::does_not_exists_exception&)
+        {
+          // skip non-existent binds
+          log::warn("Bind ", token, " does not exist and will be ignored.");
+        }
+      }
+    }
+    renderer->SetDropZoneBinds(dropZoneBinds);
+#endif
+  }
+
+  // F3D_DEPRECATED
+  // Remove this in the next major release
+  F3D_SILENT_WARNING_PUSH()
+  F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
+
+  if (!opt.ui.dropzone_info.empty())
+  {
+    log::warn("'ui.dropzone_info' is deprecated. Please Use 'ui.drop_zone.custom_binds' instead.");
+    renderer->SetDropZoneInfo(opt.ui.dropzone_info);
+  }
+  else if (!opt.ui.drop_zone.info.empty())
+  {
+    log::warn("'ui.drop_zone.info' is deprecated. Please Use 'ui.drop_zone.custom_binds' instead.");
+    renderer->SetDropZoneInfo(opt.ui.drop_zone.info);
+  }
+
+  if (opt.ui.dropzone)
+  {
+    log::warn("'ui.dropzone' is deprecated. Please Use 'ui.drop_zone.enable' instead.");
+    renderer->ShowDropZone(opt.ui.dropzone);
+    renderer->ShowDropZoneLogo(opt.ui.dropzone);
+  }
+  F3D_SILENT_WARNING_POP()
+
   renderer->ShowArmature(opt.render.armature.enable);
 
   renderer->SetUseRaytracing(opt.render.raytracing.enable);
@@ -417,6 +480,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetUseRaytracingDenoiser(opt.render.raytracing.denoise);
 
   vtkF3DRenderer::AntiAliasingMode aaMode = vtkF3DRenderer::AntiAliasingMode::NONE;
+  vtkF3DRenderer::BlendingMode blendMode = vtkF3DRenderer::BlendingMode::NONE;
 
   // F3D_DEPRECATED
   // Remove this in the next major release
@@ -427,6 +491,12 @@ void window_impl::UpdateDynamicOptions()
     log::warn("render.effect.anti_aliasing is deprecated, please use "
               "render.effect.antialiasing.enable instead");
     aaMode = vtkF3DRenderer::AntiAliasingMode::FXAA;
+  }
+  if (opt.render.effect.translucency_support)
+  {
+    log::warn("render.effect.translucency_support is deprecated, please use "
+              "render.effect.blending.enable instead");
+    blendMode = vtkF3DRenderer::BlendingMode::DUAL_DEPTH_PEELING;
   }
   F3D_SILENT_WARNING_POP()
 
@@ -440,17 +510,42 @@ void window_impl::UpdateDynamicOptions()
     {
       aaMode = vtkF3DRenderer::AntiAliasingMode::SSAA;
     }
+    else if (opt.render.effect.antialiasing.mode == "taa")
+    {
+      aaMode = vtkF3DRenderer::AntiAliasingMode::TAA;
+    }
     else
     {
       log::warn(opt.render.effect.antialiasing.mode,
-        R"( is an invalid antialiasing mode. Valid modes are: "fxaa", "ssaa")");
+        R"( is an invalid antialiasing mode. Valid modes are: "fxaa", "ssaa", "taa)");
+    }
+  }
+
+  if (opt.render.effect.blending.enable)
+  {
+    if (opt.render.effect.blending.mode == "ddp")
+    {
+      blendMode = vtkF3DRenderer::BlendingMode::DUAL_DEPTH_PEELING;
+    }
+    else if (opt.render.effect.blending.mode == "sort")
+    {
+      blendMode = vtkF3DRenderer::BlendingMode::SORT;
+    }
+    else if (opt.render.effect.blending.mode == "stochastic")
+    {
+      blendMode = vtkF3DRenderer::BlendingMode::STOCHASTIC;
+    }
+    else
+    {
+      log::warn(opt.render.effect.blending.mode,
+        R"( is an invalid blending mode. Valid modes are: "ddp", "sort", "stochastic")");
     }
   }
 
   renderer->SetUseSSAOPass(opt.render.effect.ambient_occlusion);
   renderer->SetAntiAliasingMode(aaMode);
   renderer->SetUseToneMappingPass(opt.render.effect.tone_mapping);
-  renderer->SetUseDepthPeelingPass(opt.render.effect.translucency_support);
+  renderer->SetBlendingMode(blendMode);
   renderer->SetBackfaceType(opt.render.backface_type);
   renderer->SetFinalShader(opt.render.effect.final_shader);
 
@@ -465,6 +560,7 @@ void window_impl::UpdateDynamicOptions()
 
   renderer->SetFontFile(opt.ui.font_file);
   renderer->SetFontScale(opt.ui.scale);
+  renderer->SetBackdropOpacity(opt.ui.backdrop.opacity);
 
   renderer->SetGridUnitSquare(opt.render.grid.unit);
   renderer->SetGridSubdivisions(opt.render.grid.subdivisions);
@@ -519,9 +615,11 @@ void window_impl::UpdateDynamicOptions()
       for (const interaction_bind_t& bind : this->Internals->Interactor->getBindsForGroup(group))
       {
         auto [doc, val] = this->Internals->Interactor->getBindingDocumentation(bind);
+        f3d::interactor::BindingType type = this->Internals->Interactor->getBindingType(bind);
         if (!doc.empty())
         {
-          groupList.emplace_back(std::make_tuple(bind.format(), doc, val));
+          groupList.emplace_back(
+            std::make_tuple(bind.format(), doc, val, vtkF3DUIActor::CheatSheetBindingType(type)));
         }
       }
       cheatsheet.emplace_back(std::make_pair(group, std::move(groupList)));
@@ -556,6 +654,13 @@ vtkRenderWindow* window_impl::GetRenderWindow()
 bool window_impl::render()
 {
   this->UpdateDynamicOptions();
+  const options& opt = this->Internals->Options;
+  if ((!opt.scene.camera.index.has_value()) && (!this->Internals->Camera->GetSuccessfullyReset()))
+  {
+    // Camera wasn't successfully reset last time, it could be a chance that update of dynamic
+    // options will enable successful reset of camera
+    this->Internals->Camera->resetToBounds();
+  }
   this->Internals->RenWin->Render();
   return true;
 }
@@ -580,7 +685,7 @@ image window_impl::renderToImage(bool noBackground)
   exporter->SetInputConnection(rtW2if->GetOutputPort());
   exporter->ImageLowerLeftOn();
 
-  int* dims = exporter->GetDataDimensions();
+  const int* dims = exporter->GetDataDimensions();
   int cmp = exporter->GetDataNumberOfScalarComponents();
 
   image output(dims[0], dims[1], cmp);
@@ -635,5 +740,11 @@ void window_impl::RenderUIOnly()
   renWin->Render();
   info->Remove(vtkF3DRenderPass::RENDER_UI_ONLY());
 #endif
+}
+
+//----------------------------------------------------------------------------
+vtkF3DRenderer* window_impl::GetRenderer() const
+{
+  return this->Internals->Renderer;
 }
 };

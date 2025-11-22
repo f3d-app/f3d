@@ -1,4 +1,5 @@
 list(APPEND libf3dSDKTests_list
+     TestPseudoUnitTest.cxx
      TestSDKAnimation.cxx
      TestSDKCamera.cxx
      TestSDKCompareWithFile.cxx
@@ -6,19 +7,22 @@ list(APPEND libf3dSDKTests_list
      TestSDKDynamicLightIntensity.cxx
      TestSDKEngine.cxx
      TestSDKEngineExceptions.cxx
+     TestSDKEngineRecreation.cxx
      TestSDKImage.cxx
-     TestSDKInteractorDropFullScene.cxx
      TestSDKInteractorCommand.cxx
-     TestSDKSceneFromMemory.cxx
-     TestSDKScene.cxx
+     TestSDKInteractorDropFullScene.cxx
      TestSDKLog.cxx
      TestSDKMultiColoring.cxx
      TestSDKOptions.cxx
      TestSDKOptionsIO.cxx
+     TestSDKRenderAndInteract.cxx
      TestSDKRenderFinalShader.cxx
+     TestSDKScene.cxx
+     TestSDKSceneFromMemory.cxx
+     TestSDKStartInteractor.cxx
      TestSDKUtils.cxx
+     TestSDKUI.cxx
      TestSDKWindowAuto.cxx
-     TestPseudoUnitTest.cxx
 )
 
 # Tests having UI widgets
@@ -26,35 +30,18 @@ if(F3D_MODULE_UI)
   list(APPEND libf3dSDKTests_list
     TestSDKConsole.cxx
     TestSDKDropZone.cxx
+    TestSDKDropZoneDeprecated.cxx
+    TestSDKDropZoneNoLogo.cxx
     TestSDKDropZoneMinSize.cxx
     TestSDKDynamicBackgroundColor.cxx
     TestSDKDynamicFontFile.cxx
+    TestSDKDynamicHDRI.cxx
     TestSDKDynamicProperties.cxx
     TestSDKInteractorCallBack.cxx
     TestSDKInteractorDocumentation.cxx
     TestSDKMultiOptions.cxx
+    TestSDKTriggerInteractions.cxx
     )
-
-  # HDRI test needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9767
-  if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
-    list(APPEND libf3dSDKTests_list
-      TestSDKDynamicHDRI.cxx
-      )
-  endif()
-endif()
-
-# These tests needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10155
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20230426)
-  list(APPEND libf3dSDKTests_list
-    TestSDKRenderAndInteract.cxx
-    TestSDKStartInteractor.cxx
-    )
-endif()
-
-if (VTK_VERSION VERSION_GREATER 9.2.6)
-    list(APPEND libf3dSDKTests_list
-        TestSDKEngineRecreation.cxx
-        )
 endif()
 
 # Invalid scene codepath needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11287
@@ -72,48 +59,50 @@ configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestSDKInteractorCallBack.l
 configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestSDKInteractorDropFullScene.log.in"
                "${CMAKE_BINARY_DIR}/TestSDKInteractorDropFullScene.log") # world.obj; S
 
-# External window tests
-option(F3D_TESTING_ENABLE_EXTERNAL_GLFW "Test external GLFW" OFF)
-option(F3D_TESTING_ENABLE_EXTERNAL_QT "Test external QT" OFF)
-
 set(libf3dSDKTests_link_libs "")
 
-if(F3D_TESTING_ENABLE_EXTERNAL_GLFW)
-  find_package(glfw3 REQUIRED)
-  list(APPEND libf3dSDKTests_list TestSDKExternalWindowGLFW.cxx)
-  list(APPEND libf3dSDKTests_link_libs glfw)
-endif()
-if(F3D_TESTING_ENABLE_EXTERNAL_QT)
-  find_package(Qt5 COMPONENTS OpenGL REQUIRED)
-  list(APPEND libf3dSDKTests_list TestSDKExternalWindowQT.cxx)
-  list(APPEND libf3dSDKTests_link_libs Qt5::OpenGL)
-endif()
-if(F3D_TESTING_ENABLE_OSMESA_TESTS AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240914)
-  find_library(OSMesa_LIB OSMesa REQUIRED)
-  list(APPEND libf3dSDKTests_list TestSDKExternalWindowOSMesa.cxx)
-  list(APPEND libf3dSDKTests_link_libs "${OSMesa_LIB}")
-endif()
-if(F3D_TESTING_ENABLE_GLX_TESTS AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240914)
-  find_package(OpenGL COMPONENTS GLX REQUIRED)
-  find_library(X11_LIB X11 REQUIRED)
-  list(APPEND libf3dSDKTests_list TestSDKExternalWindowGLX.cxx)
-  list(APPEND libf3dSDKTests_link_libs OpenGL::GLX "${X11_LIB}")
-endif()
-if(F3D_TESTING_ENABLE_EGL_TESTS AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240914)
-  find_package(OpenGL COMPONENTS EGL REQUIRED)
-  list(APPEND libf3dSDKTests_list TestSDKExternalWindowEGL.cxx)
-  list(APPEND libf3dSDKTests_link_libs OpenGL::EGL)
-endif()
-if(WIN32)
-  find_package(OpenGL COMPONENTS OpenGL REQUIRED)
-  list(APPEND libf3dSDKTests_list TestSDKExternalWindowWGL.cxx)
-  list(APPEND libf3dSDKTests_link_libs OpenGL::GL)
-endif()
-if(APPLE)
-  find_library(COCOA_LIBRARY Cocoa)
-  find_library(OpenGL_LIBRARY OpenGL)
-  list(APPEND libf3dSDKTests_list TestSDKExternalWindowCOCOA.mm)
-  list(APPEND libf3dSDKTests_link_libs "${COCOA_LIBRARY}" "${OpenGL_LIBRARY}")
+# External window tests
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240914)
+  option(F3D_TESTING_ENABLE_EXTERNAL_GLFW "Test external GLFW" OFF)
+  option(F3D_TESTING_ENABLE_EXTERNAL_QT "Test external QT" OFF)
+
+  if(F3D_TESTING_ENABLE_EXTERNAL_GLFW)
+    find_package(glfw3 REQUIRED)
+    list(APPEND libf3dSDKTests_list TestSDKExternalWindowGLFW.cxx)
+    list(APPEND libf3dSDKTests_link_libs glfw)
+  endif()
+  if(F3D_TESTING_ENABLE_EXTERNAL_QT)
+    find_package(Qt5 COMPONENTS OpenGL REQUIRED)
+    list(APPEND libf3dSDKTests_list TestSDKExternalWindowQT.cxx)
+    list(APPEND libf3dSDKTests_link_libs Qt5::OpenGL)
+  endif()
+  if(F3D_TESTING_ENABLE_OSMESA_TESTS)
+    find_library(OSMesa_LIB OSMesa REQUIRED)
+    list(APPEND libf3dSDKTests_list TestSDKExternalWindowOSMesa.cxx)
+    list(APPEND libf3dSDKTests_link_libs "${OSMesa_LIB}")
+  endif()
+  if(F3D_TESTING_ENABLE_GLX_TESTS)
+    find_package(OpenGL COMPONENTS GLX REQUIRED)
+    find_library(X11_LIB X11 REQUIRED)
+    list(APPEND libf3dSDKTests_list TestSDKExternalWindowGLX.cxx)
+    list(APPEND libf3dSDKTests_link_libs OpenGL::GLX "${X11_LIB}")
+  endif()
+  if(F3D_TESTING_ENABLE_EGL_TESTS)
+    find_package(OpenGL COMPONENTS EGL REQUIRED)
+    list(APPEND libf3dSDKTests_list TestSDKExternalWindowEGL.cxx)
+    list(APPEND libf3dSDKTests_link_libs OpenGL::EGL)
+  endif()
+  if(WIN32)
+    find_package(OpenGL COMPONENTS OpenGL REQUIRED)
+    list(APPEND libf3dSDKTests_list TestSDKExternalWindowWGL.cxx)
+    list(APPEND libf3dSDKTests_link_libs OpenGL::GL)
+  endif()
+  if(APPLE)
+    find_library(COCOA_LIBRARY Cocoa)
+    find_library(OpenGL_LIBRARY OpenGL)
+    list(APPEND libf3dSDKTests_list TestSDKExternalWindowCOCOA.mm)
+    list(APPEND libf3dSDKTests_link_libs "${COCOA_LIBRARY}" "${OpenGL_LIBRARY}")
+  endif()
 endif()
 
 # create the testing file and list of tests
@@ -130,7 +119,7 @@ set_target_properties(libf3dSDKTests PROPERTIES
   CXX_VISIBILITY_PRESET hidden
   )
 
-target_compile_definitions(libf3dSDKTests PRIVATE F3D_MODULE_EXR=$<BOOL:${F3D_MODULE_EXR}>)
+target_compile_definitions(libf3dSDKTests PRIVATE GL_SILENCE_DEPRECATION)
 
 # Remove this once VTK 9.3 support is removed
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240729)
@@ -139,6 +128,10 @@ endif()
 
 if (F3D_MODULE_EXR)
   target_compile_definitions(libf3dSDKTests PRIVATE F3D_MODULE_EXR)
+endif ()
+
+if (F3D_MODULE_WEBP)
+  target_compile_definitions(libf3dSDKTests PRIVATE F3D_MODULE_WEBP)
 endif ()
 
 # List tests that do not require rendering
@@ -164,12 +157,12 @@ endforeach ()
 set_tests_properties(libf3d::TestSDKLog PROPERTIES PASS_REGULAR_EXPRESSION
 "\
 Test Info\nTest Warning\nTest Error\n\
-Test Info\nTest Warning\nTest Error\n\
+Test Forward\nTest Info\nTest Warning\nTest Error\n\
 Test Warning\nTest Error\nTest Error\n\
 Test Print Debug\nTest Print Info\nTest Print Warning\nTest Print Error\n\
 Test Debug Coloring")
 
-if(F3D_MODULE_UI AND VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221220)
+if(F3D_MODULE_UI)
   set_tests_properties(libf3d::TestSDKDynamicHDRI PROPERTIES TIMEOUT 120)
   if(NOT F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS)
     set_tests_properties(libf3d::TestSDKDynamicHDRI PROPERTIES DISABLED ON)
@@ -178,11 +171,14 @@ endif()
 
 if(F3D_MODULE_UI AND NOT F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS)
   set_tests_properties(libf3d::TestSDKInteractorCallBack PROPERTIES DISABLED ON)
+  set_tests_properties(libf3d::TestSDKTriggerInteractions PROPERTIES DISABLED ON)
 endif()
 
 set_tests_properties(libf3d::TestSDKUtils PROPERTIES ENVIRONMENT "F3D_TEST_ENV_STANDARD=TestEnv;F3D_TEST_ENV_EXTENDED=TestËnv;F3D_TEST_ENV_UTF8=🤔;")
 
 target_link_libraries(libf3dSDKTests libf3d ${libf3dSDKTests_link_libs})
+target_compile_options(libf3dSDKTests PUBLIC ${f3d_compile_options_public} PRIVATE ${f3d_compile_options_private})
+target_link_options(libf3dSDKTests PUBLIC ${f3d_link_options_public})
 
 # make sure the libf3d API is compatible with the right C++ standard
 set_target_properties(libf3dSDKTests PROPERTIES CXX_STANDARD 17)

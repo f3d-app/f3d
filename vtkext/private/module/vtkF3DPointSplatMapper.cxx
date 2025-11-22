@@ -1,7 +1,10 @@
 #include "vtkF3DPointSplatMapper.h"
 
+#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
 #include "vtkF3DBitonicSort.h"
 #include "vtkF3DComputeDepthCS.h"
+#endif
+#include "vtkF3DRenderer.h"
 
 #include <vtkCamera.h>
 #include <vtkObjectFactory.h>
@@ -61,6 +64,7 @@ protected:
     vtkOpenGLHelper& cellBO, vtkRenderer* ren, vtkActor* actor) override;
 
 private:
+#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
   void SortSplats(vtkRenderer* ren);
 
   vtkNew<vtkShader> DepthComputeShader;
@@ -71,6 +75,7 @@ private:
 
   double DirectionThreshold = 0.999;
   double LastDirection[3] = { 0.0, 0.0, 0.0 };
+#endif
 
   int MaxTextureSize = 0;
   vtkNew<vtkTextureObject> SphericalHarmonicsTexture;
@@ -83,11 +88,13 @@ vtkStandardNewMacro(vtkF3DSplatMapperHelper);
 //----------------------------------------------------------------------------
 vtkF3DSplatMapperHelper::vtkF3DSplatMapperHelper()
 {
+#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
   this->DepthComputeShader->SetType(vtkShader::Compute);
   this->DepthComputeShader->SetSource(vtkF3DComputeDepthCS);
   this->DepthProgram->SetComputeShader(this->DepthComputeShader);
 
   this->Sorter->Initialize(512, VTK_FLOAT, VTK_UNSIGNED_INT);
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -104,9 +111,11 @@ void vtkF3DSplatMapperHelper::BuildBufferObjects(vtkRenderer* ren, vtkActor* act
 
   vtkOpenGLPointGaussianMapperHelper::BuildBufferObjects(ren, act);
 
+#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
   // allocate a buffer of depths used for sorting splats
   this->DepthBuffer->Allocate(splatCount * sizeof(float), vtkOpenGLBufferObject::ArrayBuffer,
     vtkOpenGLBufferObject::DynamicCopy);
+#endif
 
   this->SphericalHarmonicsDegree = 0;
 
@@ -268,6 +277,7 @@ void vtkF3DSplatMapperHelper::SetCameraShaderParameters(
   this->Superclass::SetCameraShaderParameters(cellBO, ren, actor);
 }
 
+#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
 //----------------------------------------------------------------------------
 void vtkF3DSplatMapperHelper::SortSplats(vtkRenderer* ren)
 {
@@ -275,8 +285,8 @@ void vtkF3DSplatMapperHelper::SortSplats(vtkRenderer* ren)
 
   if (numVerts)
   {
-    double* focalPoint = ren->GetActiveCamera()->GetFocalPoint();
-    double* origin = ren->GetActiveCamera()->GetPosition();
+    const double* focalPoint = ren->GetActiveCamera()->GetFocalPoint();
+    const double* origin = ren->GetActiveCamera()->GetPosition();
     double direction[3];
 
     for (int i = 0; i < 3; ++i)
@@ -318,15 +328,20 @@ void vtkF3DSplatMapperHelper::SortSplats(vtkRenderer* ren)
     }
   }
 }
+#endif
 
 //----------------------------------------------------------------------------
 void vtkF3DSplatMapperHelper::RenderPieceDraw(vtkRenderer* ren, vtkActor* actor)
 {
-  if (vtkShader::IsComputeShaderSupported() && actor->GetForceTranslucent())
+#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
+  const vtkF3DRenderer* renderer = vtkF3DRenderer::SafeDownCast(ren);
+
+  if (renderer->GetBlendingMode() == vtkF3DRenderer::BlendingMode::SORT &&
+    vtkShader::IsComputeShaderSupported() && actor->HasTranslucentPolygonalGeometry())
   {
     this->SortSplats(ren);
   }
-
+#endif
   vtkOpenGLPointGaussianMapperHelper::RenderPieceDraw(ren, actor);
 }
 
@@ -338,16 +353,19 @@ void vtkF3DSplatMapperHelper::ReplaceShaderColor(
   {
     std::string VSSource = shaders[vtkShader::Vertex]->GetSource();
 
-    vtkShaderProgram::Substitute(VSSource, "//VTK::Color::Dec",
-      "//VTK::Color::Dec\n\n"
-      "uniform sampler2DArray sphericalHarmonics;\n"
-      "uniform vec3 cameraDirection;\n"
-      "vec3 decode(ivec3 texelIndex)\n"
-      "{\n"
-      "  vec3 texel = texelFetch(sphericalHarmonics, texelIndex, 0).rgb;\n"
-      "  return texel * 2.0 - 1.0;\n"
-      "}\n\n",
-      false);
+    if (this->SphericalHarmonicsDegree > 0)
+    {
+      vtkShaderProgram::Substitute(VSSource, "//VTK::Color::Dec",
+        "//VTK::Color::Dec\n\n"
+        "uniform sampler2DArray sphericalHarmonics;\n"
+        "uniform vec3 cameraDirection;\n"
+        "vec3 decode(ivec3 texelIndex)\n"
+        "{\n"
+        "  vec3 texel = texelFetch(sphericalHarmonics, texelIndex, 0).rgb;\n"
+        "  return texel * 2.0 - 1.0;\n"
+        "}\n\n",
+        false);
+    }
 
     std::stringstream shStr;
     shStr << "//VTK::Color::Impl\n";

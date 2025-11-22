@@ -4,7 +4,7 @@
 #include <interactor.h>
 #include <options.h>
 
-int TestSDKInteractorCommand(int argc, char* argv[])
+int TestSDKInteractorCommand([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   f3d::engine eng = f3d::engine::create(true);
   f3d::options& options = eng.getOptions();
@@ -56,6 +56,9 @@ int TestSDKInteractorCommand(int argc, char* argv[])
     "test_toggle", [&](const std::vector<std::string>&) { options.toggle("model.scivis.cells"); });
   inter.triggerCommand("test_toggle");
   test("addCommand", options.model.scivis.cells == false);
+
+  // Coverage help with no doc
+  test("help test_toggle", inter.triggerCommand("help test_toggle") == true);
 
   inter.removeCommand("test_toggle");
   test("removeCommand", inter.triggerCommand("test_toggle") == false);

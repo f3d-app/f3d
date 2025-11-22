@@ -36,11 +36,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
-   * Set the file name.
-   */
-  vtkSetMacro(FileName, std::string);
-
-  /**
    * Get the level of animation support in this importer, which is always
    * AnimationSupportLevel::UNIQUE
    */
@@ -66,9 +61,33 @@ public:
   }
 
   /**
+   * Return if the animation is enabled
+   */
+  bool IsAnimationEnabled(vtkIdType vtkNotUsed(animationIndex)) override
+  {
+    return this->AnimationEnabled;
+  }
+
+  /**
+   * Return 1 if an animation is available, 0 otherwise
+   */
+  vtkIdType GetNumberOfAnimations() override;
+
+  /**
    * Information key used to propagate the array name used as texture coordinates
    */
   static vtkInformationStringKey* TCOORDS_NAME();
+
+  /**
+   * Recover animation timeRange, all other args are ignored
+   */
+  bool GetTemporalInformation(vtkIdType animationIndex, double frameRate, int& nbTimeSteps,
+    double timeRange[2], vtkDoubleArray* timeSteps) override;
+
+  /**
+   * Update importer at provided timeValue
+   */
+  bool UpdateAtTimeValue(double timeValue) override;
 
 protected:
   vtkF3DUSDImporter();
@@ -77,24 +96,11 @@ protected:
   int ImportBegin() override;
   void ImportActors(vtkRenderer*) override;
 
-  bool IsAnimationEnabled(vtkIdType vtkNotUsed(animationIndex)) override
-  {
-    return this->AnimationEnabled;
-  }
-
-  vtkIdType GetNumberOfAnimations() override;
-
-  bool GetTemporalInformation(vtkIdType animationIndex, double frameRate, int& nbTimeSteps,
-    double timeRange[2], vtkDoubleArray* timeSteps) override;
-
-  bool UpdateAtTimeValue(double timeValue) override;
-
-  std::string FileName;
-  bool AnimationEnabled = false;
-
 private:
   vtkF3DUSDImporter(const vtkF3DUSDImporter&) = delete;
   void operator=(const vtkF3DUSDImporter&) = delete;
+
+  bool AnimationEnabled = false;
 
   class vtkInternals;
   std::unique_ptr<vtkInternals> Internals;

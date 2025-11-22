@@ -5,7 +5,9 @@
 #include "export.h"
 #include "image.h"
 
+/// @cond
 #include <string>
+/// @endcond
 
 namespace f3d
 {
@@ -21,17 +23,16 @@ class F3D_EXPORT window
 public:
   /**
    * Enumeration of supported window types
-   * =====================================
-   * NONE: A mock window without rendering capabilities.
-   * EXTERNAL: An external window that assume the OpenGL context would have been created by another
-   * framework.
-   * GLX: A window using GLX.
-   * WGL: A window using WGL.
-   * COCOA: A window using COCOA.
-   * EGL: An offscreen window using hardware acceleration that can run headless.
-   * OSMESA: An offscreen window using software rendering that is always run headless.
-   * WASM: A webassembly window (when libf3d is built with emscripten).
-   * UNKNOWN: An unknown window (should not happen).
+   * - NONE: A mock window without rendering capabilities.
+   * - EXTERNAL: An external window that assume the OpenGL context would have been created by
+   * another framework.
+   * - GLX: A window using GLX.
+   * - WGL: A window using WGL.
+   * - COCOA: A window using COCOA.
+   * - EGL: An offscreen window using hardware acceleration that can run headless.
+   * - OSMESA: An offscreen window using software rendering that is always run headless.
+   * - WASM: A webassembly window (when libf3d is built with emscripten).
+   * - UNKNOWN: An unknown window (should not happen).
    */
   enum class Type : unsigned char
   {
@@ -72,7 +73,7 @@ public:
    * Perform a render of the window to the screen and save the result in a f3d::image.
    * of ChannelType BYTE and 3 or 4 components (RGB or RGBA).
    * Set noBackground to true to have a transparent background.
-   * Return the resulting f3d::image.
+   * Returns the resulting f3d::image.
    */
   [[nodiscard]] virtual image renderToImage(bool noBackground = false) = 0;
 

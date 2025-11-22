@@ -15,6 +15,15 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250513)
 endif()
 
 # Check modules
+
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250513)
+  if(TARGET VTK::RenderingGridAxes)
+    set(F3D_VTK_MODULES ${F3D_VTK_MODULES} VTK::RenderingGridAxes)
+  else()
+    message(FATAL_ERROR "VTK::RenderingGridAxes is not found, please enable it")
+  endif()
+endif()
+
 if(F3D_MODULE_RAYTRACING)
   if(TARGET VTK::RenderingRayTracing)
     message(STATUS "VTK::RenderingRayTracing module found")
@@ -179,6 +188,11 @@ endif()
 # exr
 if (F3D_MODULE_EXR)
   target_compile_definitions(libf3d PRIVATE F3D_MODULE_EXR)
+endif ()
+
+# webp
+if (F3D_MODULE_WEBP)
+  target_compile_definitions(libf3d PRIVATE F3D_MODULE_WEBP)
 endif ()
 
 # ui

@@ -1,8 +1,10 @@
 #ifndef f3d_exception_h
 #define f3d_exception_h
 
+/// @cond
 #include <stdexcept>
 #include <string>
+/// @endcond
 
 namespace f3d
 {

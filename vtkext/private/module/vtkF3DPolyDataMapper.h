@@ -1,7 +1,11 @@
 /**
  * @class   vtkF3DPolyDataMapper
- * @brief   Custom surface mapper used to include skinning and morphing for glTF format
+ * @brief   Custom surface mapper used to include F3D features
  *
+ * This mapper is used to add many F3D custom features:
+ * - skinning and morphing capabilities
+ * - support for MatCap rendering
+ * - support for TAA jittering
  */
 
 #ifndef vtkF3DPolyDataMapper_h

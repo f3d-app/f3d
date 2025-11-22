@@ -4,7 +4,7 @@
 #include <log.h>
 #include <scene.h>
 
-int TestSDKSceneInvalid(int argc, char* argv[])
+int TestSDKSceneInvalid([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   PseudoUnitTest test;
 

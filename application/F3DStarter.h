@@ -33,6 +33,14 @@ public:
   void LoadFileGroup(int index = 0, bool relativeIndex = false, bool forceClear = false);
 
   /**
+   * Get supported extensions for open file command
+   * On macOS, the extensions are returned in the format: {"x", "y", "z"}
+   * On other operating systems, the format is: {"*.x", "*.y", "*.z"}
+   * Returns a vector of supported file extension strings
+   */
+  static std::vector<std::string> GetExtensions();
+
+  /**
    * Trigger a render on the next event loop
    */
   void RequestRender();
@@ -72,7 +80,7 @@ private:
    * Set clear to true to clear the scene first
    * GroupIdx is only used for display purposes of the filename
    */
-  void LoadFileGroup(
+  void LoadFileGroupInternal(
     const std::vector<std::filesystem::path>& paths, bool clear, const std::string& groupIdx);
 
   /**

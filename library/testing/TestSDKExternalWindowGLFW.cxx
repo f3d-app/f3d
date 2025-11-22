@@ -8,17 +8,17 @@
 
 #include <iostream>
 
-int TestSDKExternalWindowGLFW(int argc, char* argv[])
+int TestSDKExternalWindowGLFW([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   // setup glfw window
   if (!glfwInit())
   {
-    std::cerr << "Can't initialize GLFW." << std::endl;
+    std::cerr << "Can't initialize GLFW.\n";
     return EXIT_FAILURE;
   }
 
   glfwSetErrorCallback([](int error, const char* desc) {
-    std::cerr << "GLFW error " << error << ": " << desc << std::endl;
+    std::cerr << "GLFW error " << error << ": " << desc << "\n";
   });
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
@@ -28,7 +28,7 @@ int TestSDKExternalWindowGLFW(int argc, char* argv[])
 
   if (!window)
   {
-    std::cerr << "Can't create GLFW window." << std::endl;
+    std::cerr << "Can't create GLFW window.\n";
     return EXIT_FAILURE;
   }
 
@@ -38,10 +38,10 @@ int TestSDKExternalWindowGLFW(int argc, char* argv[])
   eng.getWindow().setSize(300, 300);
 
   // key callback
-  glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+  glfwSetKeyCallback(window, [](GLFWwindow* win, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
     {
-      glfwSetWindowShouldClose(window, 1);
+      glfwSetWindowShouldClose(win, 1);
     }
   });
 

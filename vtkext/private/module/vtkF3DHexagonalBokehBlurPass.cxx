@@ -61,7 +61,7 @@ vtkF3DHexagonalBokehBlurPass::~vtkF3DHexagonalBokehBlurPass() = default;
 void vtkF3DHexagonalBokehBlurPass::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "CircleOfConfusion: " << this->CircleOfConfusionRadius << std::endl;
+  os << indent << "CircleOfConfusion: " << this->CircleOfConfusionRadius << "\n";
 }
 
 //------------------------------------------------------------------------------
@@ -72,42 +72,42 @@ void vtkF3DHexagonalBokehBlurPass::InitializeGraphicsResources(
   {
     this->BackgroundTexture = vtkSmartPointer<vtkTextureObject>::New();
     this->BackgroundTexture->SetContext(renWin);
-    this->BackgroundTexture->SetFormat(GL_RGBA);
-    this->BackgroundTexture->SetInternalFormat(GL_RGBA32F);
-    this->BackgroundTexture->SetDataType(GL_FLOAT);
+    this->BackgroundTexture->SetFormat(GL_RGB);
+    this->BackgroundTexture->SetInternalFormat(GL_RGB16F);
+    this->BackgroundTexture->SetDataType(GL_HALF_FLOAT);
     this->BackgroundTexture->SetMinificationFilter(vtkTextureObject::Linear);
     this->BackgroundTexture->SetMagnificationFilter(vtkTextureObject::Linear);
     this->BackgroundTexture->SetWrapS(vtkTextureObject::ClampToEdge);
     this->BackgroundTexture->SetWrapT(vtkTextureObject::ClampToEdge);
-    this->BackgroundTexture->Allocate2D(width, height, 4, VTK_FLOAT);
+    this->BackgroundTexture->Allocate2D(width, height, 3, VTK_FLOAT);
   }
 
   if (this->VerticalBlurTexture == nullptr)
   {
     this->VerticalBlurTexture = vtkSmartPointer<vtkTextureObject>::New();
     this->VerticalBlurTexture->SetContext(renWin);
-    this->VerticalBlurTexture->SetFormat(GL_RGBA);
-    this->VerticalBlurTexture->SetInternalFormat(GL_RGBA32F);
-    this->VerticalBlurTexture->SetDataType(GL_FLOAT);
+    this->VerticalBlurTexture->SetFormat(GL_RGB);
+    this->VerticalBlurTexture->SetInternalFormat(GL_RGB16F);
+    this->VerticalBlurTexture->SetDataType(GL_HALF_FLOAT);
     this->VerticalBlurTexture->SetMinificationFilter(vtkTextureObject::Linear);
     this->VerticalBlurTexture->SetMagnificationFilter(vtkTextureObject::Linear);
     this->VerticalBlurTexture->SetWrapS(vtkTextureObject::ClampToEdge);
     this->VerticalBlurTexture->SetWrapT(vtkTextureObject::ClampToEdge);
-    this->VerticalBlurTexture->Allocate2D(width, height, 4, VTK_FLOAT);
+    this->VerticalBlurTexture->Allocate2D(width, height, 3, VTK_FLOAT);
   }
 
   if (this->DiagonalBlurTexture == nullptr)
   {
     this->DiagonalBlurTexture = vtkSmartPointer<vtkTextureObject>::New();
     this->DiagonalBlurTexture->SetContext(renWin);
-    this->DiagonalBlurTexture->SetFormat(GL_RGBA);
-    this->DiagonalBlurTexture->SetInternalFormat(GL_RGBA32F);
-    this->DiagonalBlurTexture->SetDataType(GL_FLOAT);
+    this->DiagonalBlurTexture->SetFormat(GL_RGB);
+    this->DiagonalBlurTexture->SetInternalFormat(GL_RGB16F);
+    this->DiagonalBlurTexture->SetDataType(GL_HALF_FLOAT);
     this->DiagonalBlurTexture->SetMinificationFilter(vtkTextureObject::Linear);
     this->DiagonalBlurTexture->SetMagnificationFilter(vtkTextureObject::Linear);
     this->DiagonalBlurTexture->SetWrapS(vtkTextureObject::ClampToEdge);
     this->DiagonalBlurTexture->SetWrapT(vtkTextureObject::ClampToEdge);
-    this->DiagonalBlurTexture->Allocate2D(width, height, 4, VTK_FLOAT);
+    this->DiagonalBlurTexture->Allocate2D(width, height, 3, VTK_FLOAT);
   }
 
   if (this->FrameBufferObject == nullptr)

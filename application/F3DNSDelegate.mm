@@ -6,6 +6,8 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-method-return-type"
 #import "AppKit/NSApplication.h"
+#import "AppKit/NSOpenPanel.h"
+#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 #pragma clang diagnostic pop
 
 #import "F3DConfig.h"
@@ -88,6 +90,17 @@
                       action:@selector(terminate:)
               keyEquivalent:@"q"];
 
+  // setup "file menu"
+  NSMenuItem* fileMenuItem = [bar addItemWithTitle:@"" action:nil keyEquivalent:@""];
+  NSMenu* fileMenu = [[NSMenu alloc] initWithTitle:@"File"];
+  [fileMenuItem setSubmenu:fileMenu];
+  [fileMenu release];
+
+  [fileMenuItem setSubmenu:fileMenu];
+  [fileMenu addItemWithTitle:@"Open File"
+                        action:@selector(openFile:)
+                  keyEquivalent:@"o"];
+
   // setup "window menu"
   NSMenuItem* windowMenuItem = [bar addItemWithTitle:@"" action:nil keyEquivalent:@""];
   NSMenu* windowMenu = [[NSMenu alloc] initWithTitle:@"Window"];
@@ -125,6 +138,54 @@
   ShouldHandleFileOpening = true;
 }
 
+- (void)openFile:(id)sender
+{
+  const auto& extensions = F3DStarter::GetExtensions();
+  NSMutableArray<NSString*>* allowedTypes = [NSMutableArray arrayWithCapacity:extensions.size()];
+
+  for (const auto& ext : extensions)
+  {
+    [allowedTypes addObject:[NSString stringWithUTF8String:ext.c_str()]];
+  }
+
+  [self openFileDialogWithAllowedTypes:allowedTypes];
+}
+
+- (void)openFileDialogWithAllowedTypes:(NSArray<NSString*>*)allowedTypes
+{
+  NSOpenPanel* openPanel = [NSOpenPanel openPanel];
+
+  [openPanel setCanChooseFiles:YES];
+  [openPanel setCanChooseDirectories:NO];
+  [openPanel setAllowsMultipleSelection:NO];
+
+  NSMutableArray<UTType *> *contentTypes = [NSMutableArray array];
+  for (NSString *type in allowedTypes) 
+  {
+      UTType *utType = [UTType typeWithFilenameExtension:type];
+      if (utType)
+      {
+          [contentTypes addObject:utType];
+      }
+  }
+  openPanel.allowedContentTypes = contentTypes;
+
+  NSModalResponse result = [openPanel runModal];
+  if (result == NSModalResponseOK)
+  {
+    NSURL *selectedFile = [[openPanel URLs] firstObject];
+    if (selectedFile) 
+    {
+      int index = self.Starter->AddFile([[selectedFile path] UTF8String]);
+      if (index > -1)
+      {
+        self.Starter->LoadFileGroup(index);
+      }
+      self.Starter->Render();
+    }
+  }
+}
+
 @end
 
 // ----------------------------------------------------------------------------
@@ -134,4 +195,17 @@ void F3DNSDelegate::InitializeDelegate(F3DStarter* Starter)
   [NSApplication sharedApplication];
   [NSApp setDelegate:delegate];
   [delegate setStarter:Starter];
+}
+
+void F3DNSDelegate::ShowOpenFileDialog(const char* const* extensions, unsigned long long extensionsSize)
+{
+  F3DNSDelegateInternal* delegate = (F3DNSDelegateInternal*)[NSApp delegate];
+
+  NSMutableArray<NSString*>* allowedTypes = [NSMutableArray arrayWithCapacity:extensionsSize];
+  for (size_t i = 0; i < extensionsSize; ++i)
+  {
+    [allowedTypes addObject:[NSString stringWithUTF8String:extensions[i]]];
+  }
+
+  [delegate openFileDialogWithAllowedTypes:allowedTypes];
 }

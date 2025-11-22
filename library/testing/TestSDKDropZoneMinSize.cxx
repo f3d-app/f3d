@@ -10,8 +10,9 @@ int TestSDKDropZoneMinSize(int, char*[])
 
   win.setSize(5, 5);
 
-  opt.ui.dropzone = true;
-  opt.ui.dropzone_info = "This should not be rendered due to small viewport.";
+  opt.ui.drop_zone.enable = true;
+  opt.ui.drop_zone.show_logo = true;
+  opt.ui.drop_zone.custom_binds = "None+Drop Ctrl+O None+H";
 
   try
   {
@@ -19,7 +20,7 @@ int TestSDKDropZoneMinSize(int, char*[])
   }
   catch (const std::exception& e)
   {
-    std::cerr << "Unexpected error during render: " << e.what() << std::endl;
+    std::cerr << "Unexpected error during render: " << e.what() << "\n";
     return EXIT_FAILURE;
   }
 

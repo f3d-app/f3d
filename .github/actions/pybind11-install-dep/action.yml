@@ -4,16 +4,25 @@ inputs:
   version:
     description: "Version of pybind11 to build"
     required: true
+  global_cache_index:
+    description: "Global cache index"
+    required: true
 
 runs:
   using: "composite"
   steps:
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
+
     - name: Cache pybind11
       id: cache-pybind11
       uses: actions/cache/restore@v4
       with:
         path: dependencies/pybind11_install
-        key: pybind11-${{inputs.version}}-${{runner.os}}-0
+        key: pybind11-${{inputs.version}}-${{runner.os}}-${{inputs.global_cache_index}}-0
 
     - name: Checkout pybind11
       if: steps.cache-pybind11.outputs.cache-hit != 'true'

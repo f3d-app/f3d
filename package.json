@@ -1,0 +1,33 @@
+{
+  "name": "f3d",
+  "version": "3.3.0",
+  "description": "Fast and minimalist 3D viewer framework",
+  "exports": "./dist/f3d.js",
+  "types": "./dist/f3d.d.ts",
+  "files": [
+    "./dist/f3d.*"
+  ],
+  "scripts": {
+    "_docker": "${F3D_DOCKER_CLIENT:-docker} run --rm -e CMAKE_BUILD_PARALLEL_LEVEL -v $(pwd):/src ghcr.io/f3d-app/f3d-wasm:${F3D_DOCKER_TIMESTAMP:-latest}",
+    "clean": "npm run _docker -- rm -rf /src/dist /src/_wasm_build",
+    "build": "npm run _docker -- /src/webassembly/build.sh Release",
+    "test": "npm run _docker -- ctest --test-dir /src/_wasm_build/webassembly --output-on-failure",
+    "prepare": "npm run clean && npm run build"
+  },
+  "repository": "github:f3d-app/f3d",
+  "keywords": [
+    "3d",
+    "webassembly",
+    "viewer",
+    "animation",
+    "cad",
+    "gltf",
+    "vtk",
+    "stl"
+  ],
+  "author": "F3D-APP Foundation",
+  "license": "BSD-3-Clause",
+  "bugs": "https://github.com/f3d-app/f3d/issues",
+  "funding": "https://f3d.app/thanks/",
+  "homepage": "https://f3d.app"
+}
