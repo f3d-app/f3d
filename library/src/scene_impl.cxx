@@ -152,6 +152,7 @@ public:
     progressWidget->Off();
 
     // Initialize the animation using temporal information from the importer
+    this->AnimationManager.UpdateDynamicOptions();
     this->AnimationManager.Initialize();
 
     // Update all window options and reset camera to bounds if needed

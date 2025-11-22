@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 3.10)
 # check-engine
 add_test(NAME test_check-engine COMMAND "$<TARGET_FILE:check-engine>")
 
+# interactive-app
+add_test(NAME test_interactive-app COMMAND "$<TARGET_FILE:interactive-app>" "${CMAKE_CURRENT_SOURCE_DIR}/data/cow.vtp" 1)
+
 # multi-files
 add_test(NAME test_multi-files COMMAND "$<TARGET_FILE:multi-files>" "${CMAKE_CURRENT_SOURCE_DIR}/data/mb")
 set_tests_properties(test_multi-files PROPERTIES

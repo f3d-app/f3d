@@ -112,8 +112,7 @@ void animationManager::Initialize()
     log::debug(i, ": ", this->Importer->GetAnimationName(i));
   }
 
-  bool autoplay = this->Options.scene.animation.autoplay;
-  if (autoplay)
+  if (this->Autoplay)
   {
     this->StartAnimation();
   }
@@ -171,7 +170,7 @@ void animationManager::Tick()
 {
   if (this->Playing)
   {
-    this->CurrentTime += this->DeltaTime * this->Options.scene.animation.speed_factor;
+    this->CurrentTime += this->DeltaTime * this->SpeedFactor;
 
     // Modulo computation, compute CurrentTime in the time range.
     if (this->CurrentTime < this->TimeRange[0] || this->CurrentTime > this->TimeRange[1])
@@ -517,5 +516,39 @@ unsigned int animationManager::GetNumberOfAvailableAnimations() const
 {
   assert(this->AvailAnimations >= 0);
   return static_cast<unsigned int>(this->AvailAnimations);
+}
+
+//----------------------------------------------------------------------------
+void animationManager::SetCheatSheetConfigured(bool configured)
+{
+  vtkF3DRenderer* ren = this->Window.GetRenderer();
+  ren->SetCheatSheetConfigured(configured);
+}
+
+//----------------------------------------------------------------------------
+void animationManager::SetAutoplay(bool enable)
+{
+  if (this->Autoplay != enable)
+  {
+    this->Autoplay = enable;
+    this->SetCheatSheetConfigured(false);
+  }
+}
+
+//----------------------------------------------------------------------------
+void animationManager::SetSpeedFactor(double speedFactor)
+{
+  if (this->SpeedFactor != speedFactor)
+  {
+    this->SpeedFactor = speedFactor;
+    this->SetCheatSheetConfigured(false);
+  }
+}
+
+//----------------------------------------------------------------------------
+void animationManager::UpdateDynamicOptions()
+{
+  this->SetAutoplay(this->Options.scene.animation.autoplay);
+  this->SetSpeedFactor(this->Options.scene.animation.speed_factor);
 }
 }
