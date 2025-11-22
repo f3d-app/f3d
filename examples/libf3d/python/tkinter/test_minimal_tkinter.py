@@ -1,6 +1,6 @@
 import pytest
 
-pytest.importorskip("tkinter")  # tkinter is missing on linux for now
+pytest.importorskip("tkinter")
 pytest.importorskip("pyopengltk")
 
 from minimal_tkinter import main
