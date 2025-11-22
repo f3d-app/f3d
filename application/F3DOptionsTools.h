@@ -5,6 +5,8 @@
  * @class   F3DOptionsTools
  * @brief   A namespace to handle and parse F3D Options
  */
+#include <options.h>
+
 #include <filesystem>
 #include <map>
 #include <string>
@@ -60,10 +62,6 @@ static inline const OptionsDict DefaultAppOptions = {
   { "interaction-test-play", "" },
   { "command-script", "" },
   { "frame-rate", "30.0" },
-  { "anti-aliasing", "none" },
-  { "anti-aliasing-mode", "" },
-  { "translucency-support", "0" },
-  { "blending", "none" },
 };
 
 /**
@@ -143,6 +141,22 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
 };
 
 /**
+ * List of CLI option names that requires custom mapping
+ */
+static inline const std::map<std::string_view, std::string_view> CustomMappingOptions = {
+  { "anti-aliasing", "none" },
+  { "anti-aliasing-mode", "" },
+  { "translucency-support", "false" },
+  { "blending", "none" },
+};
+
+/**
+ * Convert a CLI options key/value to a vector of libf3d options key/value
+ */
+std::vector<std::pair<std::string, std::string>> ConvertToLibf3dOptions(
+  const std::string& key, const std::string& value);
+
+/**
  * Browse through all possible option names to find one that have the smallest distance to the
  * provided option.
  * If checkLibAndReaders is true, even check in the libf3d and reader option names from plugins
@@ -164,6 +178,25 @@ F3DOptionsTools::OptionsDict ParseCLIOptions(
  */
 void PrintHelpPair(
   std::string_view key, std::string_view help, int keyWidth = 10, int helpWidth = 70);
+
+/**
+ * Parse provided string into provided typed var.
+ * Return true if successful, false otherwise.
+ */
+template<typename T>
+bool Parse(const std::string& optionString, T& option)
+{
+  try
+  {
+    option = f3d::options::parse<T>(optionString);
+    return true;
+  }
+  catch (const f3d::options::parsing_exception&)
+  {
+    return false;
+  }
+}
+
 };
 
 #endif
