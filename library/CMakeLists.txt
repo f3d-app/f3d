@@ -10,10 +10,6 @@ set(F3D_VTK_MODULES
   f3d::vtkextPrivate
 )
 
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250513)
-  set(F3D_VTK_MODULES ${F3D_VTK_MODULES} VTK::RenderingGridAxes)
-endif()
-
 # Check modules
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250513)
