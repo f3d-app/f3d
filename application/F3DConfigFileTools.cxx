@@ -9,18 +9,12 @@
 
 #include <filesystem>
 #include <fstream>
-#include <set>
 #include <vector>
 
 namespace fs = std::filesystem;
 
-namespace
-{
 //----------------------------------------------------------------------------
-/**
- * Recover a OS-specific vector of potential config file directories
- */
-std::vector<fs::path> GetConfigPaths(const std::string& configSearch)
+std::vector<fs::path> F3DConfigFileTools::GetConfigPaths(const std::string& configSearch)
 {
   std::vector<fs::path> paths;
 
@@ -63,15 +57,7 @@ std::vector<fs::path> GetConfigPaths(const std::string& configSearch)
       for (const auto& configName : configNames)
       {
         configPath = dir / (configName);
-        if (fs::exists(configPath))
-        {
-          f3d::log::debug("Config file found: ", configPath.string());
-          paths.emplace_back(configPath);
-        }
-        else
-        {
-          f3d::log::debug("Candidate config file not found: ", configPath.string());
-        }
+        paths.emplace_back(configPath);
       }
     }
     catch (const fs::filesystem_error&)
@@ -82,6 +68,21 @@ std::vector<fs::path> GetConfigPaths(const std::string& configSearch)
 
   return paths;
 }
+
+//----------------------------------------------------------------------------
+void F3DConfigFileTools::PrintConfigInfo(const std::vector<fs::path>& configPaths)
+{
+  for (const fs::path& path : F3DConfigFileTools::GetConfigPaths("config"))
+  {
+    if (fs::exists(path))
+    {
+      f3d::log::info("Config file found: ", path);
+    }
+    else
+    {
+      f3d::log::info("Candidate config file not found: ", path);
+    }
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -110,7 +111,7 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
   std::vector<fs::path> configPaths;
   if (!configSearch.empty())
   {
-    configPaths = ::GetConfigPaths(configSearch);
+    configPaths = F3DConfigFileTools::GetConfigPaths(configSearch);
   }
   else
   {
@@ -118,36 +119,45 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
     configPaths.emplace_back(f3d::utils::collapsePath(userConfig));
   }
 
+  if (f3d::log::getVerboseLevel() == f3d::log::VerboseLevel::DEBUG)
+  {
+    F3DConfigFileTools::PrintConfigInfo(configPaths);
+  }
+
   // Recover actual individual config file paths
   std::vector<fs::path> actualConfigFilePaths;
   for (auto configPath : configPaths)
   {
-    // Recover an absolute canonical path to config file
     try
     {
-      configPath = fs::canonical(fs::path(configPath)).string();
-    }
-    catch (const fs::filesystem_error&)
-    {
-      f3d::log::error("Configuration file does not exist: ", configPath.string(), " , ignoring it");
-      continue;
-    }
+      if (!fs::exists(configPath))
+      {
+        continue;
+      }
 
-    // Recover all config files if needed in directories
-    if (fs::is_directory(configPath))
-    {
-      f3d::log::debug("Using config directory ", configPath.string());
-      const size_t oldSize = actualConfigFilePaths.size();
-      auto dirIter = fs::directory_iterator(configPath);
-      std::copy(std::filesystem::begin(dirIter), std::filesystem::end(dirIter),
-        std::back_inserter(actualConfigFilePaths));
-      // directory_iterator is not ordered, enforce alphabetical ordering for the added files.
-      std::sort(actualConfigFilePaths.begin() + oldSize, actualConfigFilePaths.end());
+      // Recover an absolute canonical path to config file
+      configPath = fs::canonical(fs::path(configPath)).string();
+
+      // Recover all config files if needed in directories
+      if (fs::is_directory(configPath))
+      {
+        f3d::log::debug("Using config directory ", configPath.string());
+        const size_t oldSize = actualConfigFilePaths.size();
+        auto dirIter = fs::directory_iterator(configPath);
+        std::copy(std::filesystem::begin(dirIter), std::filesystem::end(dirIter),
+          std::back_inserter(actualConfigFilePaths));
+        // directory_iterator is not ordered, enforce alphabetical ordering for the added files.
+        std::sort(actualConfigFilePaths.begin() + oldSize, actualConfigFilePaths.end());
+      }
+      else
+      {
+        f3d::log::debug("Using config file ", configPath.string());
+        actualConfigFilePaths.emplace_back(configPath);
+      }
     }
-    else
+    catch (const std::filesystem::filesystem_error& e)
     {
-      f3d::log::debug("Using config file ", configPath.string());
-      actualConfigFilePaths.emplace_back(configPath);
+      f3d::log::error("Error while locating config path: ", e.what());
     }
   }
 
