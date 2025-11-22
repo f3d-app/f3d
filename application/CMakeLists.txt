@@ -12,6 +12,10 @@ function(f3d_create_exec target_name)
     target_link_libraries(${target_name} PRIVATE stdc++fs)
   endif()
 
+  if(F3D_MODULE_CLIP)
+    find_package(clip REQUIRED)
+  endif()
+
   set_target_properties(${target_name} PROPERTIES
     CXX_VISIBILITY_PRESET hidden
     CXX_STANDARD 17
@@ -51,6 +55,10 @@ function(f3d_create_exec target_name)
       target_include_directories(${target_name} PUBLIC $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/dmon>)
     endif ()
   endif ()
+
+  if(F3D_MODULE_CLIP)
+    target_link_libraries(${target_name} PRIVATE clip::clip)
+  endif()
 
   target_include_directories(${target_name} PUBLIC $<BUILD_INTERFACE:${F3D_SOURCE_DIR}/external/tinyfiledialogs>)
 
