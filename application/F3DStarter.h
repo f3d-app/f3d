@@ -44,10 +44,6 @@ public:
    * Trigger a render on the next event loop
    */
   void RequestRender();
-  /**
-   * Stop on the next event loop
-   */
-  void RequestStop();
 
   /**
    * Trigger a render immediately (must be called by the main thread)
