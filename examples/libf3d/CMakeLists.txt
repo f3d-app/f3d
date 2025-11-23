@@ -7,3 +7,6 @@ if(BUILD_TESTING)
 endif()
 
 add_subdirectory(cpp)
+if (F3D_BINDINGS_PYTHON)
+  add_subdirectory(python)
+endif ()
