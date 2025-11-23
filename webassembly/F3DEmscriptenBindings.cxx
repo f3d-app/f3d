@@ -346,7 +346,9 @@ EMSCRIPTEN_BINDINGS(f3d)
       emscripten::return_value_policy::reference())
     .function("stop", &f3d::interactor::stop, emscripten::return_value_policy::reference())
     .function("requestRender", &f3d::interactor::requestRender,
-      emscripten::return_value_policy::reference());
+      emscripten::return_value_policy::reference())
+    .function(
+      "requestStop", &f3d::interactor::requestStop, emscripten::return_value_policy::reference());
 
   // f3d::engine
   // Not bound on purpose because only one engine is supported:

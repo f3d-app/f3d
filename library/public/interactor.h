@@ -385,6 +385,7 @@ public:
    * Safe to call in a multithreaded environment.
    */
   virtual interactor& requestRender() = 0;
+  virtual interactor& requestStop() = 0;
 
   /**
    * An exception that can be thrown by the interactor
