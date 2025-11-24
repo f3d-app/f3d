@@ -574,6 +574,11 @@ public:
   //----------------------------------------------------------------------------
   void EventLoop()
   {
+    if (this->StopRequested)
+    {
+      this->Interactor.stop();
+      return;
+    }
     if (this->EventLoopUserCallBack)
     {
       this->EventLoopUserCallBack();
@@ -646,6 +651,7 @@ public:
   unsigned long EventLoopTimerId = 0;
   int EventLoopObserverId = -1;
   std::atomic<bool> RenderRequested = false;
+  std::atomic<bool> StopRequested = false;
 };
 
 //----------------------------------------------------------------------------
@@ -1831,6 +1837,13 @@ interactor& interactor_impl::stop()
 interactor& interactor_impl::requestRender()
 {
   this->Internals->RenderRequested = true;
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::requestStop()
+{
+  this->Internals->StopRequested = true;
   return *this;
 }
 

@@ -18,3 +18,9 @@ def test_request_render():
     inter = engine.interactor
     inter.request_render()
     inter.start(1 / 30, partial(stop_fn, inter))
+
+
+def test_request_stop():
+    engine = f3d.Engine.create(True)
+
+    engine.interactor.start(1 / 30, engine.interactor.request_stop)

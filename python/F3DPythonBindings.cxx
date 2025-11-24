@@ -307,6 +307,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def("stop", &f3d::interactor::stop, "Stop the interactor and the event loop")
     .def(
       "request_render", &f3d::interactor::requestRender, "Request a render on the next event loop")
+    .def("request_stop", &f3d::interactor::requestStop, "Stop on the next event loop")
     .def("init_commands", &f3d::interactor::initCommands,
       "Remove all commands and add all default command callbacks")
     .def("add_command", &f3d::interactor::addCommand, "Add a command", py::arg("action"),

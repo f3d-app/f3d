@@ -937,7 +937,7 @@ public:
   {
     if (GlobalInteractor)
     {
-      GlobalInteractor->stop();
+      GlobalInteractor->requestStop();
       GlobalInteractor = nullptr;
     }
   }

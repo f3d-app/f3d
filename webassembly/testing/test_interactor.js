@@ -71,6 +71,7 @@ const settings = {
     interactor.disableCameraMovement();
     interactor.enableCameraMovement();
     interactor.requestRender();
+    interactor.requestStop();
     interactor.stop();
   },
 };
