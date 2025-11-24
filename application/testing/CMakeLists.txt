@@ -1026,7 +1026,6 @@ f3d_test(NAME TestInteractionCycleScalarsCompCheck DATA dragon.vtu ARGS -b --sca
 f3d_test(NAME TestInteractionConfigFileNoColorBar DATA multi CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION) #Right;Right;Left
 f3d_test(NAME TestInteractionConfigFileBindings DATA dragon.vtu CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json INTERACTION UI) #Ctrl+Shift+O;Ctrl+O;Shift+O;O;3
 f3d_test(NAME TestInteractionConfigFileMulti DATA multi CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI) #SY;Right;XG;Right;N;Right;Right
-f3d_test(NAME TestInteractionConfigFileAndCommand DATA multi ARGS -o CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI LONG_TIMEOUT) #OOX;Right;N;Right;Right;Right
 f3d_test(NAME TestInteractionConfigFileImperative DATA dragon.vtu suzanne.stl ARGS --edges CONFIG ${F3D_SOURCE_DIR}/testing/configs/imperative.json INTERACTION) #E;Right
 f3d_test(NAME TestInteractionConfigFileImperativeNoData CONFIG ${F3D_SOURCE_DIR}/testing/configs/imperative.json INTERACTION NO_DATA_FORCE_RENDER UI) #X;Up
 f3d_test(NAME TestInteractionConfigFileOptional DATA zombie.mdl f3d.glb CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI) #Right
@@ -1075,6 +1074,11 @@ f3d_test(NAME TestInteractionConsoleScrollbar DATA f3d.glb INTERACTION UI) #Esca
 f3d_test(NAME TestInteractionConsoleEmptyCommand DATA f3d.glb INTERACTION UI) #Escape;Enter
 f3d_test(NAME TestInteractionConsoleOverCheatSheet DATA f3d.glb INTERACTION UI) #h;Escape;Enter
 f3d_test(NAME TestInteractionCorrectCameraForVolumeSwitch ARGS --no-config -v DATA dragon.vtu INTERACTION UI) #v
+
+# Cycling through gaussian splatting require > 9.3 to not warn
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240203)
+  f3d_test(NAME TestInteractionConfigFileAndCommand DATA multi ARGS -o CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI LONG_TIMEOUT) #OOX;Right;N;Right;Right;Right
+endif()
 
 # Need SSIM comparison for some reason
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240729)
