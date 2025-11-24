@@ -387,6 +387,12 @@ public:
   virtual interactor& requestRender() = 0;
 
   /**
+   * Request the interactor to stop on the next event loop.
+   * Safe to call in a multithreaded environment.
+   */
+  virtual interactor& requestStop() = 0;
+
+  /**
    * An exception that can be thrown by the interactor
    * when adding something that already exists internally
    */

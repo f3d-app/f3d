@@ -579,7 +579,16 @@ void vtkF3DImguiActor::RenderFileName()
     winSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
     winSize.y += 2.f * ImGui::GetStyle().WindowPadding.y;
 
-    ::SetupNextWindow(ImVec2(viewport->GetWorkCenter().x - 0.5f * winSize.x, margin), winSize);
+    // Adjust position if HDRIFileName is also visible
+    float totalWidth = winSize.x;
+    if (this->HDRIFileNameVisible && !this->HDRIFileName.empty())
+    {
+      ImVec2 hdriWinSize = ImGui::CalcTextSize(this->HDRIFileName.c_str());
+      hdriWinSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
+      totalWidth += hdriWinSize.x + ImGui::GetStyle().WindowPadding.x;
+    }
+
+    ::SetupNextWindow(ImVec2(viewport->GetWorkCenter().x - 0.5f * totalWidth, margin), winSize);
     ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
 
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
@@ -613,6 +622,42 @@ void vtkF3DImguiActor::RenderMetaData()
   ImGui::Begin("MetaData", nullptr, flags);
   ImGui::TextUnformatted(this->MetaData.c_str());
   ImGui::End();
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DImguiActor::RenderHDRIFileName()
+{
+  if (!this->HDRIFileName.empty())
+  {
+    const ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+    constexpr float margin = F3DStyle::GetDefaultMargin();
+    ImVec2 winSize = ImGui::CalcTextSize(this->HDRIFileName.c_str());
+    winSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
+    winSize.y += 2.f * ImGui::GetStyle().WindowPadding.y;
+
+    // Adjust position if FileName is also visible
+    float totalWidth = winSize.x;
+    float winOffsetX = 0.f;
+    if (this->FileNameVisible && !this->FileName.empty())
+    {
+      ImVec2 fileWinSize = ImGui::CalcTextSize(this->FileName.c_str());
+      fileWinSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
+      totalWidth += fileWinSize.x + ImGui::GetStyle().WindowPadding.x;
+      winOffsetX = fileWinSize.x + ImGui::GetStyle().WindowPadding.x;
+    }
+
+    ::SetupNextWindow(
+      ImVec2(viewport->GetWorkCenter().x - 0.5f * totalWidth + winOffsetX, margin), winSize);
+    ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
+
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
+      ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
+
+    ImGui::Begin("HDRIFileName", nullptr, flags);
+    ImGui::TextUnformatted(this->HDRIFileName.c_str());
+    ImGui::End();
+  }
 }
 
 //----------------------------------------------------------------------------

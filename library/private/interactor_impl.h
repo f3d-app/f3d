@@ -82,6 +82,7 @@ public:
   interactor& start(double deltaTime, std::function<void()> userCallBack) override;
   interactor& stop() override;
   interactor& requestRender() override;
+  interactor& requestStop() override;
   ///@}
 
   /**

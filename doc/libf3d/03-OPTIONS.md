@@ -439,6 +439,12 @@ Display the _filename info content_ on top of the window.
 
 Content of _filename info_ to display.
 
+### `ui.hdri_filename` (_bool_, default: `false`)
+
+Display the _HDRI filename info content_ on top of the window.
+
+CLI: `--hdri-filename`.
+
 ### `ui.font_file` (_path_, optional)
 
 Use the provided FreeType compatible font file to display text.

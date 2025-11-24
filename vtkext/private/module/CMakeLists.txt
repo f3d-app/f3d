@@ -33,7 +33,11 @@ if(F3D_MODULE_UI)
   list(APPEND private_headers ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultLogo.h)
 endif()
 
-set(shader_files glsl/vtkF3DComputeDepthCS.glsl glsl/vtkF3DRandomFS.glsl)
+set(shader_files glsl/vtkF3DRandomFS.glsl)
+
+if (NOT ANDROID AND NOT EMSCRIPTEN)
+  list(APPEND shader_files glsl/vtkF3DComputeDepthCS.glsl)
+endif()
 
 if(F3D_MODULE_UI)
   list(APPEND shader_files glsl/vtkF3DImguiFS.glsl glsl/vtkF3DImguiVS.glsl)
@@ -84,7 +88,7 @@ if (F3D_MODULE_UI)
 endif ()
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10675
-if(NOT ANDROID AND NOT EMSCRIPTEN AND VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240203)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240203)
   set(classes ${classes} vtkF3DPointSplatMapper)
 endif()
 
