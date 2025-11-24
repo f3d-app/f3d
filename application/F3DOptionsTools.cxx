@@ -142,6 +142,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       {"fps", "z", "Display rendering frame per second", "<bool>", "1"},
       {"filename", "n", "Display filename", "<bool>", "1"},
       {"metadata", "m", "Display file metadata", "<bool>", "1"},
+      {"hdri-filename", "", "Display hdri filename", "<bool>", "1"},
       {"blur-background", "u", "Blur background", "<bool>", "1" },
       {"blur-coc", "", "Blur circle of confusion radius", "<value>", ""},
       {"light-intensity", "", "Light intensity", "<value>", ""} } },
@@ -392,6 +393,12 @@ std::pair<std::string, int> F3DOptionsTools::GetClosestOption(const std::string&
     checkDistance(key, option, ret);
   }
 
+  // Check cli names in custom mapping options
+  for (const auto& [key, value] : F3DOptionsTools::CustomMappingOptions)
+  {
+    checkDistance(std::string(key), option, ret);
+  }
+
   // Check cli names for libf3d options
   for (const auto& [key, value] : F3DOptionsTools::LibOptionsNames)
   {
@@ -460,23 +467,32 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
           // Add the default value to the help text if any
           std::string defaultValue;
           std::string helpText(cliOption.HelpText);
+          std::string longName(cliOption.LongName);
 
           // Recover default value from app options
-          auto appIter = F3DOptionsTools::DefaultAppOptions.find(std::string(cliOption.LongName));
+          auto appIter = F3DOptionsTools::DefaultAppOptions.find(longName);
           if (appIter != F3DOptionsTools::DefaultAppOptions.end())
           {
             defaultValue = appIter->second;
           }
           else
           {
-            // Recover default value from lib options
-            auto libIter = F3DOptionsTools::LibOptionsNames.find(cliOption.LongName);
-            if (libIter != F3DOptionsTools::LibOptionsNames.end())
+            auto customIter = F3DOptionsTools::CustomMappingOptions.find(longName);
+            if (customIter != F3DOptionsTools::CustomMappingOptions.end())
             {
-              f3d::options opt;
-              std::string name = std::string(libIter->second);
-              // let default value empty for unset options
-              defaultValue = opt.hasValue(name) ? opt.getAsString(name) : "";
+              defaultValue = customIter->second;
+            }
+            else
+            {
+              // Recover default value from lib options
+              auto libIter = F3DOptionsTools::LibOptionsNames.find(cliOption.LongName);
+              if (libIter != F3DOptionsTools::LibOptionsNames.end())
+              {
+                f3d::options opt;
+                std::string name = std::string(libIter->second);
+                // let default value empty for unset options
+                defaultValue = opt.hasValue(name) ? opt.getAsString(name) : "";
+              }
             }
           }
 
@@ -625,4 +641,78 @@ void F3DOptionsTools::PrintHelpPair(
   }
   ss << " " << std::setw(helpWidth) << help;
   f3d::log::info(ss.str());
+}
+
+//----------------------------------------------------------------------------
+std::vector<std::pair<std::string, std::string>> F3DOptionsTools::ConvertToLibf3dOptions(const std::string& key, const std::string& value)
+{
+  std::vector<std::pair<std::string, std::string>> libf3dOptions;
+
+  // Simple one-to-one case
+  auto libf3dIter = F3DOptionsTools::LibOptionsNames.find(key);
+  if (libf3dIter != F3DOptionsTools::LibOptionsNames.end())
+  {
+    libf3dOptions.emplace_back(std::make_pair(libf3dIter->second, value));
+  }
+
+  // anti-aliasing is handled in two options in the lib
+  else if (key == "anti-aliasing")
+  {
+    if (value != "none")
+    {
+      // Handle deprecated boolean option
+      bool deprecatedBooleanOption;
+      if (F3DOptionsTools::Parse(value, deprecatedBooleanOption))
+      {
+        f3d::log::warn("--anti-aliasing is a now a string, please specify the type of "
+                       "anti-aliasing or use the implicit default");
+        libf3dOptions.emplace_back(std::make_pair("render.effect.antialiasing.enable", value));
+      }
+      else
+      {
+        libf3dOptions.emplace_back(std::make_pair("render.effect.antialiasing.enable", "true"));
+        libf3dOptions.emplace_back(std::make_pair("render.effect.antialiasing.mode", value));
+      }
+    }
+    else
+    {
+      libf3dOptions.emplace_back(std::make_pair("render.effect.antialiasing.enable", "false"));
+    }
+  }
+
+  // handle deprecated anti-aliasing option
+  else if (key == "anti-aliasing-mode")
+  {
+    f3d::log::warn("--anti-aliasing-mode is deprecated");
+    libf3dOptions.emplace_back(std::make_pair("render.effect.antialiasing.mode", value));
+  }
+
+  // blending is handled in two options in the lib
+  else if (key == "blending")
+  {
+    if (value != "none")
+    {
+      libf3dOptions.emplace_back(std::make_pair("render.effect.blending.enable", "true"));
+      libf3dOptions.emplace_back(std::make_pair("render.effect.blending.mode", value));
+    }
+    else
+    {
+      libf3dOptions.emplace_back(std::make_pair("render.effect.blending.enable", "false"));
+    }
+  }
+
+  // handle deprecated translucency support
+  else if (key == "translucency-support")
+  {
+    f3d::log::warn("--translucency-support is deprecated, please use --blending instead");
+    libf3dOptions.emplace_back(std::make_pair("render.effect.blending.enable", value));
+  }
+
+  else
+  {
+    // If nothing to convert, just return the input
+    libf3dOptions.emplace_back(std::make_pair(key, value));
+  }
+
+  return libf3dOptions;
 }

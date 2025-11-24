@@ -334,6 +334,10 @@ Display the _name of the file_ on top of the window.
 
 Display the _metadata_.
 
+### `--hdri-filename` (_bool_, default: `false`)
+
+Display the _hdri-filename_.
+
 ### `--hdri-skybox` (_bool_, default: `false`)
 
 Show the HDRI as a skybox. Overrides `--background-color` and `--no-background`.

@@ -1,9 +1,13 @@
-set(shader_files
-  glsl/vtkF3DBitonicSortGlobalDisperseCS.glsl
-  glsl/vtkF3DBitonicSortGlobalFlipCS.glsl
-  glsl/vtkF3DBitonicSortLocalDisperseCS.glsl
-  glsl/vtkF3DBitonicSortLocalSortCS.glsl
-  glsl/vtkF3DBitonicSortFunctions.glsl)
+set(shader_files "")
+
+if(NOT ANDROID AND NOT EMSCRIPTEN)
+  set(shader_files ${shader_files}
+    glsl/vtkF3DBitonicSortGlobalDisperseCS.glsl
+    glsl/vtkF3DBitonicSortGlobalFlipCS.glsl
+    glsl/vtkF3DBitonicSortLocalDisperseCS.glsl
+    glsl/vtkF3DBitonicSortLocalSortCS.glsl
+    glsl/vtkF3DBitonicSortFunctions.glsl)
+endif()
 
 foreach(file IN LISTS shader_files)
   vtk_encode_string(

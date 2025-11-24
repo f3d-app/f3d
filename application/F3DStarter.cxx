@@ -564,117 +564,114 @@ public:
                 continue;
               }
 
-              // Handle CLI options deprecation
+              // Handle CLI options deprecation simple warnings
               if (key == "animation-index")
               {
                 f3d::log::warn("animation-index is deprecated, please use animation-indices");
               }
 
               // Convert key into a libf3d option name if possible
-              std::string libf3dOptionName = key;
               std::string keyForLog = key;
-              auto libf3dIter = F3DOptionsTools::LibOptionsNames.find(libf3dOptionName);
-              if (libf3dIter != F3DOptionsTools::LibOptionsNames.end())
+              for (const auto& libf3dOption : F3DOptionsTools::ConvertToLibf3dOptions(key, value))
               {
-                libf3dOptionName = std::string(libf3dIter->second);
-              }
+                auto [libf3dOptionName, libf3dOptionValue] = libf3dOption;
 
-              std::string libf3dOptionValue = value;
-              bool reset = false;
+                bool reset = false;
 
-              // Handle options reset
-              // XXX: Use starts_with once C++20 is supported
-              if (libf3dOptionName.rfind("reset-", 0) == 0)
-              {
-                if (libf3dOptionName.size() > 6)
+                // Handle options reset
+                // XXX: Use starts_with once C++20 is supported
+                if (libf3dOptionName.rfind("reset-", 0) == 0)
                 {
-                  reset = true;
-                  libf3dOptionName = libf3dOptionName.substr(6);
-                  keyForLog = libf3dOptionName;
-                  libf3dOptionValue = "reset";
+                  if (libf3dOptionName.size() > 6)
+                  {
+                    reset = true;
+                    libf3dOptionName = libf3dOptionName.substr(6);
+                    keyForLog = libf3dOptionName;
+                    libf3dOptionValue = "reset";
+                  }
+                  else
+                  {
+                    f3d::log::warn("Invalid option: 'reset' must be followed by a valid option "
+                                   "name, ignoring entry");
+                    continue;
+                  }
                 }
-                else
+
+                // Handle reader options
+                std::vector<std::string> readerOptionNames = f3d::engine::getAllReaderOptionNames();
+                if (std::find(readerOptionNames.begin(), readerOptionNames.end(),
+                      libf3dOptionName) != readerOptionNames.end())
                 {
-                  f3d::log::warn("Invalid option: 'reset' must be followed by a valid option "
-                                 "name, ignoring entry");
+                  f3d::engine::setReaderOption(libf3dOptionName, libf3dOptionValue);
                   continue;
                 }
-              }
 
-              // Handle reader options
-              std::vector<std::string> readerOptionNames = f3d::engine::getAllReaderOptionNames();
-              if (std::find(readerOptionNames.begin(), readerOptionNames.end(), libf3dOptionName) !=
-                readerOptionNames.end())
-              {
-                f3d::engine::setReaderOption(libf3dOptionName, libf3dOptionValue);
-                continue;
-              }
-
-              try
-              {
-                // Assume this is a libf3d option and set/reset the value
-                if (reset)
+                try
                 {
-                  libOptions.reset(libf3dOptionName);
-                }
-                else
-                {
-                  libOptions.setAsString(libf3dOptionName, libf3dOptionValue);
-                }
-
-                // Log the option if needed
-                if (logOptions)
-                {
-                  loggingMap[libf3dOptionName] =
-                    std::tuple(keyForLog, source, matchType, match, libf3dOptionValue);
-                }
-              }
-              catch (const f3d::options::parsing_exception& ex)
-              {
-                if (!quiet)
-                {
-                  std::string origin;
-                  if (source.empty())
+                  // Assume this is a libf3d option and set/reset the value
+                  if (reset)
                   {
-                    origin = match;
+                    libOptions.reset(libf3dOptionName);
                   }
                   else
                   {
-                    // TODO: Use std::format once C++20 is supported
-                    origin = source;
-                    origin += ":`";
-                    origin += match;
-                    origin += "` (";
-                    origin += matchType;
-                    origin += ")";
+                    libOptions.setAsString(libf3dOptionName, libf3dOptionValue);
                   }
-                  f3d::log::warn("Could not set '", keyForLog, "' to '", libf3dOptionValue,
-                    "' from ", origin, " because: ", ex.what());
+
+                  // Log the option if needed
+                  if (logOptions)
+                  {
+                    loggingMap[libf3dOptionName] =
+                      std::tuple(keyForLog, source, matchType, match, libf3dOptionValue);
+                  }
                 }
-              }
-              catch (const f3d::options::inexistent_exception&)
-              {
-                if (!quiet)
+                catch (const f3d::options::parsing_exception& ex)
                 {
-                  std::string origin;
-                  if (source.empty())
+                  if (!quiet)
                   {
-                    origin = match;
+                    std::string origin;
+                    if (source.empty())
+                    {
+                      origin = match;
+                    }
+                    else
+                    {
+                      // TODO: Use std::format once C++20 is supported
+                      origin = source;
+                      origin += ":`";
+                      origin += match;
+                      origin += "` (";
+                      origin += matchType;
+                      origin += ")";
+                    }
+                    f3d::log::warn("Could not set '", keyForLog, "' to '", libf3dOptionValue,
+                      "' from ", origin, " because: ", ex.what());
                   }
-                  else
+                }
+                catch (const f3d::options::inexistent_exception&)
+                {
+                  if (!quiet)
                   {
-                    // TODO: Use std::format once C++20 is supported
-                    origin = source;
-                    origin += ":`";
-                    origin += match;
-                    origin += "` (";
-                    origin += matchType;
-                    origin += ")";
+                    std::string origin;
+                    if (source.empty())
+                    {
+                      origin = match;
+                    }
+                    else
+                    {
+                      // TODO: Use std::format once C++20 is supported
+                      origin = source;
+                      origin += ":`";
+                      origin += match;
+                      origin += "` (";
+                      origin += matchType;
+                      origin += ")";
+                    }
+                    auto [closestName, dist] =
+                      F3DOptionsTools::GetClosestOption(libf3dOptionName, true);
+                    f3d::log::warn("'", keyForLog, "' option from ", origin,
+                      " does not exists , did you mean '", closestName, "'?");
                   }
-                  auto [closestName, dist] =
-                    F3DOptionsTools::GetClosestOption(libf3dOptionName, true);
-                  f3d::log::warn("'", keyForLog, "' option from ", origin,
-                    " does not exists , did you mean '", closestName, "'?");
                 }
               }
             }
@@ -697,34 +694,30 @@ public:
     // Update libf3d options
     this->LibOptions = libOptions;
 
-    // Update options that requires a custom logic
-    this->UpdateCustomLogicOptions();
+    // Update options that depends on both libf3d and app options
+    // Note that this should not be used for interactive options
+    // As this break the logic of updating options by priority
+    // TODO: Rework to avoid this
+    this->UpdateInterdependantOptions();
   }
 
-  template<typename T>
-  bool Parse(const std::string& optionString, T& option)
-  {
-    try
-    {
-      option = f3d::options::parse<T>(optionString);
-      return true;
-    }
-    catch (const f3d::options::parsing_exception&)
-    {
-      return false;
-    }
-  }
-
+  /**
+   * Parse a named string option from appOptions into provided typed option.
+   */
   template<typename T>
   void ParseOption(
     const F3DOptionsTools::OptionsDict& appOptions, const std::string& name, T& option)
   {
-    if (!this->Parse(appOptions.at(name), option))
+    if (!F3DOptionsTools::Parse(appOptions.at(name), option))
     {
       f3d::log::warn("Could not parse '" + appOptions.at(name) + "' into '" + name + "' option");
     }
   }
 
+  /**
+   * Parse a named string option from appOptions into provided typed optional option.
+   * If the string is empty, set it to nullopt
+   */
   template<typename T>
   void ParseOption(const F3DOptionsTools::OptionsDict& appOptions, const std::string& name,
     std::optional<T>& option)
@@ -784,55 +777,10 @@ public:
     this->ParseOption(
       appOptions, "interaction-test-play", this->AppOptions.InteractionTestPlayFile);
     this->ParseOption(appOptions, "command-script", this->AppOptions.CommandScriptFile);
-    this->ParseOption(appOptions, "anti-aliasing", this->AppOptions.AntiAliasing);
-    this->ParseOption(appOptions, "anti-aliasing-mode", this->AppOptions.AntiAliasingMode);
-    this->ParseOption(appOptions, "translucency-support", this->AppOptions.TranslucencySupport);
-    this->ParseOption(appOptions, "blending", this->AppOptions.Blending);
   }
 
-  void UpdateCustomLogicOptions()
+  void UpdateInterdependantOptions()
   {
-    // AntiAliasing is handled in two options in lib
-    if (this->AppOptions.AntiAliasing != "none")
-    {
-      // Handle deprecated boolean option
-      bool deprecatedBooleanOption;
-      if (this->Parse(this->AppOptions.AntiAliasing, deprecatedBooleanOption))
-      {
-        f3d::log::warn("--anti-aliasing is a now a string, please specify the type of "
-                       "anti-aliasing or use the implicit default");
-        this->LibOptions.render.effect.antialiasing.enable = deprecatedBooleanOption;
-      }
-      else
-      {
-        this->LibOptions.render.effect.antialiasing.enable = true;
-        this->LibOptions.render.effect.antialiasing.mode = this->AppOptions.AntiAliasing;
-      }
-    }
-    else
-    {
-      this->LibOptions.render.effect.antialiasing.enable = false;
-    }
-
-    if (!this->AppOptions.AntiAliasingMode.empty())
-    {
-      f3d::log::warn("--anti-aliasing-mode is deprecated");
-      this->LibOptions.render.effect.antialiasing.mode = this->AppOptions.AntiAliasingMode;
-    }
-
-    if (this->AppOptions.Blending != "none")
-    {
-      this->LibOptions.render.effect.blending.enable = true;
-      this->LibOptions.render.effect.blending.mode = this->AppOptions.Blending;
-    }
-
-    if (this->AppOptions.TranslucencySupport)
-    {
-      f3d::log::warn("--translucency-support is deprecated, please use --blending instead");
-      this->LibOptions.render.effect.blending.enable = true;
-      this->LibOptions.render.effect.blending.mode = "ddp";
-    }
-
     // colormap-file and colormap are interdependent
     const std::string& colorMapFile = this->AppOptions.ColorMapFile;
     if (!colorMapFile.empty())
@@ -989,7 +937,7 @@ public:
   {
     if (GlobalInteractor)
     {
-      GlobalInteractor->stop();
+      GlobalInteractor->requestStop();
       GlobalInteractor = nullptr;
     }
   }
@@ -1057,7 +1005,7 @@ int F3DStarter::Start(int argc, char** argv)
   iter = cliOptionsDict.find("no-config");
   if (iter != cliOptionsDict.end())
   {
-    if (!this->Internals->Parse(iter->second, noConfig))
+    if (!F3DOptionsTools::Parse(iter->second, noConfig))
     {
       f3d::log::warn(
         "Could not parse '" + iter->second + "' into 'no-config' option, assuming false");
@@ -1071,7 +1019,7 @@ int F3DStarter::Start(int argc, char** argv)
     if (iter != cliOptionsDict.end())
     {
       // XXX: Discarding bool return because this cannot return false with a string
-      this->Internals->Parse(iter->second, config);
+      F3DOptionsTools::Parse(iter->second, config);
     }
   }
 
@@ -1081,7 +1029,7 @@ int F3DStarter::Start(int argc, char** argv)
   {
     std::string localOutput;
     // XXX: Discarding bool return because this cannot return false with a string
-    this->Internals->Parse(iter->second, localOutput);
+    F3DOptionsTools::Parse(iter->second, localOutput);
     renderToStdout = localOutput == "-";
   }
 
@@ -1090,7 +1038,7 @@ int F3DStarter::Start(int argc, char** argv)
   if (iter != cliOptionsDict.end())
   {
     // XXX: Discarding bool return because this cannot return false with a string
-    this->Internals->Parse(iter->second, this->Internals->AppOptions.VerboseLevel);
+    F3DOptionsTools::Parse(iter->second, this->Internals->AppOptions.VerboseLevel);
   }
 
   // Set verbosity level early from command line

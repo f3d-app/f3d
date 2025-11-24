@@ -94,7 +94,7 @@ jobs:
 
       - name: Cache LFS Data
         id: lfs_sha_recover
-        uses: f3d-app/lfs-data-cache-action@v1
+        uses: f3d-app/lfs-data-cache-action@v2
         with:
           cache_postfix: cache-0
 
@@ -398,7 +398,7 @@ jobs:
   # webassembly: Build webassembly artifacts
   #----------------------------------------------------------------------------
   webassembly:
-    needs: [check_nightly, default_versions, build_docker_images]
+    needs: [cache_lfs, check_nightly, default_versions, build_docker_images]
     strategy:
       fail-fast: false
 
@@ -414,7 +414,9 @@ jobs:
         with:
           path: "source"
           fetch-depth: 0
-          lfs: true
+          lfs: false
 
       - name: WebAssembly CI
         uses: ./source/.github/actions/wasm-ci
+        with:
+          lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}

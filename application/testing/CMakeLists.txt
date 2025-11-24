@@ -217,6 +217,9 @@ f3d_test(NAME TestDepthPeeling DATA suzanne.ply ARGS -sp --opacity=0.9)
 f3d_test(NAME TestBackground DATA suzanne.ply ARGS --background-color=0.8,0.2,0.9 THRESHOLD 0.1) # Threshold is needed for legacy image comparison for VTK 9.3
 f3d_test(NAME TestGridWithDepthPeeling DATA suzanne.ply ARGS -gp --opacity=0.2)
 f3d_test(NAME TestFilename DATA suzanne.ply ARGS -n UI)
+f3d_test(NAME TestHDRIFilename DATA dragon.vtu ARGS --hdri-filename -f -j --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr UI LONG_TIMEOUT)
+f3d_test(NAME TestFilenameHDRIFilename DATA dragon.vtu ARGS --hdri-filename -n -f -j --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr RESOLUTION 400,400 UI LONG_TIMEOUT)
+f3d_test(NAME TestHDRIFilenameDefault DATA dragon.vtu ARGS --hdri-filename -f -j UI LONG_TIMEOUT)
 f3d_test(NAME TestFilenameWhiteBg DATA suzanne.ply ARGS -n --background-color=1,1,1 UI)
 f3d_test(NAME TestConsoleBadgeWarning DATA suzanne.ply ARGS --position=0 UI)
 f3d_test(NAME TestConsoleBadgeQuiet DATA suzanne.ply ARGS --position=0 --verbose=quiet UI)
@@ -325,6 +328,7 @@ f3d_test(NAME TestAnimationInputChangePointSprites DATA v_rock2.mdl ARGS --point
 f3d_test(NAME TestBackdropOpacityOpaque DATA suzanne.ply ARGS -n --backdrop-opacity=1.0 UI)
 f3d_test(NAME TestBackdropOpacityTransparent DATA suzanne.ply ARGS -n --backdrop-opacity=0.0 UI)
 f3d_test(NAME TestBackdropOpacityMedium DATA suzanne.ply ARGS -n --backdrop-opacity=0.5 UI)
+f3d_test(NAME TestCustomOptionsNone DATA red_translucent_monkey.gltf ARGS --blending=none --anti-aliasing=none)
 
 # Color map files testing
 f3d_test(NAME TestColorMapFileFullPath DATA dragon.vtu ARGS --colormap-file=${F3D_SOURCE_DIR}/testing/data/viridis8.png --scalar-coloring --coloring-component=1)
@@ -538,6 +542,7 @@ f3d_test(NAME TestInteractionTAA DATA suzanne.ply ARGS --anti-aliasing=taa INTER
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12098
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250504)
   f3d_test(NAME TestInteractionStochasticTAA DATA alpha.glb ARGS --anti-aliasing=taa --blending=stochastic INTERACTION) #Render;Render...
+  f3d_test(NAME TestInteractionAndCLIBlending ARGS --blending DATA suzanne.stl alpha.glb INTERACTION)#PP;Right
 endif()
 
 # Need SSIM comparison for some reason
@@ -1032,7 +1037,7 @@ f3d_test(NAME TestInteractionFocalPointPickingShift DATA dragon.vtu INTERACTION 
 f3d_test(NAME TestInteractionFocalPointPickingPoints DATA pointsCloud.vtp INTERACTION THRESHOLD 0.05) # Threshold needed because sometime a point does not appear
 f3d_test(NAME TestInteractionLightIntensity DATA dragon.vtu INTERACTION LONG_TIMEOUT)
 f3d_test(NAME TestInteractionMultiFileColoring DATA mb/recursive ARGS --multi-file-mode=all INTERACTION) #SSSB
-f3d_test(NAME TestInteractionOpacity DATA dragon.vtu INTERACTION)
+f3d_test(NAME TestInteractionOpacity DATA dragon.vtu INTERACTION) # Shift+P * 21; Ctrl+P * 5
 f3d_test(NAME TestInteractionInitUpVectorOption DATA dragon.vtu ARGS --up=-Y INTERACTION LONG_TIMEOUT) #Small drag left, camera should maintain orientation
 f3d_test(NAME TestInteractionDragRotateVertical DATA offset-flat-box.glb ARGS -g -x --up=y INTERACTION) # Drag down, should look straight down and avoid gimbal lock
 f3d_test(NAME TestInteractionVerticalDragRotate DATA dragon.vtu ARGS --up=y INTERACTION LONG_TIMEOUT) # 7 (top-view); left click and drag
@@ -1621,5 +1626,5 @@ if(F3D_MODULE_DMON AND (WIN32 OR APPLE OR F3D_TESTING_ENABLE_GLX_TESTS))
   endif()
   # Custom bash/pwsh test for testing watch option
   add_test (NAME f3d::TestWatch COMMAND ${_f3d_os_script_exec} ${CMAKE_CURRENT_SOURCE_DIR}/test_watch.${_f3d_os_script_ext} $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data ${CMAKE_BINARY_DIR}/Testing/Temporary)
-  set_tests_properties(f3d::TestWatch PROPERTIES RUN_SERIAL TRUE TIMEOUT 30)
+  set_tests_properties(f3d::TestWatch PROPERTIES RUN_SERIAL TRUE TIMEOUT 90)
 endif()

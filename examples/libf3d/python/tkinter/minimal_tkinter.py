@@ -1,4 +1,5 @@
 import tkinter as tk  # Works also on CustomTKinter
+from argparse import ArgumentParser
 
 import f3d
 from pyopengltk import OpenGLFrame
@@ -28,7 +29,17 @@ class Frame(OpenGLFrame):
         self.engine.window.render()
 
 
-if __name__ == "__main__":
+def main(argv: list[str] | None = None):
+    argparser = ArgumentParser()
+    argparser.add_argument(
+        "--timeout",
+        type=int,
+        default=None,
+        help="Optional timeout (in seconds) before closing the viewer.",
+    )
+
+    args = argparser.parse_args(argv)
+
     # Create main window and define size, position and title
     root = tk.Tk()
     root.geometry("640x480+100+100")
@@ -37,5 +48,12 @@ if __name__ == "__main__":
     F3D = Frame()
     F3D.pack(fill=tk.BOTH, expand=tk.YES)
 
+    if args.timeout:
+        # For testing purposes only, exit after `timeout` seconds
+        root.after(args.timeout * 1000, root.destroy)
     # Run TKinter mainloop
     root.mainloop()
+
+
+if __name__ == "__main__":
+    main()

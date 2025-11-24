@@ -5,7 +5,6 @@ import pytest
 import f3d
 
 
-@pytest.fixture
 def test_plugins_list():
     base_dir = Path(f3d.__file__).parent
     plugins = f3d.Engine.get_plugins_list(base_dir / "share/f3d/plugins")

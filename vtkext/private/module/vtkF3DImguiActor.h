@@ -72,6 +72,11 @@ private:
   void RenderMetaData() override;
 
   /**
+   * Render the HDRI filename UI widget
+   */
+  void RenderHDRIFileName() override;
+
+  /**
    * Render the cheatsheet UI widget
    */
   void RenderCheatSheet() override;

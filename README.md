@@ -40,13 +40,13 @@ f3d /path/to/file.ext
 
 Optionally, append `--output=/path/to/img.png` to save the rendering into an image file.
 
-See the [Quickstart Guide](doc/user/QUICKSTART.md) for more information about getting started with F3D.
+See the [Quickstart Guide](doc/user/01-QUICKSTART.md) for more information about getting started with F3D.
 
 # Documentation
 
-- To get started, please take a look at the [user documentation](doc/user/QUICKSTART.md).
+- To get started, please take a look at the [user documentation](doc/user/01-QUICKSTART.md).
 - If you need any help, are looking for a feature or found a bug, please open an [issue](https://github.com/f3d-app/f3d/issues).
-- If you want to use the libf3d, please take a look at its [documentation](doc/libf3d/OVERVIEW.md).
+- If you want to use the libf3d, please take a look at its [documentation](doc/libf3d/01-OVERVIEW.md).
 - If you want to build F3D, please take a look at the [contribution guide](CONTRIBUTING.md).
 
 # Support
@@ -89,7 +89,7 @@ but there is no plan to:
 
 # Contributing
 
-F3D as a community-driven, inclusive and beginner-friendly project. We love to see how the project is growing thanks to the contributions from the community. We would love to see your face in the list below! If you want to contribute to F3D, you are very welcome to! Take a look at our [contribution documentation](CONTRIBUTING.md), [governance documentation](https://f3d.app/dev/GOVERNANCE) and [code of conduct](CODE_OF_CONDUCT.md).
+F3D as a community-driven, inclusive and beginner-friendly project. We love to see how the project is growing thanks to the contributions from the community. We would love to see your face in the list below! If you want to contribute to F3D, you are very welcome to! Take a look at our [contribution documentation](CONTRIBUTING.md), [governance documentation](doc/dev/10-GOVERNANCE.md) and [code of conduct](CODE_OF_CONDUCT.md).
 
 <a href="https://github.com/f3d-app/f3d/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=f3d-app/f3d" />
