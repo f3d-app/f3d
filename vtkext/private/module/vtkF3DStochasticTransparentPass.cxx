@@ -13,6 +13,7 @@
 #include <vtkRenderState.h>
 #include <vtkRenderer.h>
 #include <vtkShaderProgram.h>
+#include <vtkVersion.h>
 
 vtkStandardNewMacro(vtkF3DStochasticTransparentPass);
 vtkCxxSetObjectMacro(vtkF3DStochasticTransparentPass, TranslucentPass, vtkRenderPass);
@@ -91,9 +92,10 @@ bool vtkF3DStochasticTransparentPass::PreReplaceShaderValues(std::string& vtkNot
     dec += "\nuniform int propIndex;\n";
     dec += "\nuniform int seed;\n";
 
-    std::string primIdDef = "\n#define primId gl_PrimitiveId\n";
+    std::string primIdDef = "\n#define primId gl_PrimitiveID\n";
 
     // If we are using instancing, use the instance id instead of the primitive id
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251120)
     vtkOpenGLPointGaussianMapperHelper* splatHelper =
       vtkOpenGLPointGaussianMapperHelper::SafeDownCast(mapper);
 
@@ -107,6 +109,7 @@ bool vtkF3DStochasticTransparentPass::PreReplaceShaderValues(std::string& vtkNot
         primIdDef = "\n#define primId instanceId\n";
       }
     }
+#endif
 
     dec += primIdDef;
 

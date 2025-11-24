@@ -86,6 +86,8 @@ private:
   double LastDirection[3] = { 0.0, 0.0, 0.0 };
 #endif
 
+  bool OwnerUseInstancing();
+
   int MaxTextureSize = 0;
   vtkNew<vtkTextureObject> SphericalHarmonicsTexture;
   int SphericalHarmonicsDegree = 0;
@@ -110,7 +112,7 @@ vtkF3DSplatMapperHelper::vtkF3DSplatMapperHelper()
 void vtkF3DSplatMapperHelper::GetShaderTemplate(
   std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor)
 {
-  if (vtkF3DPointSplatMapper::SafeDownCast(this->Owner)->GetUseInstancing())
+  if (this->OwnerUseInstancing())
   {
     this->vtkOpenGLPolyDataMapper::GetShaderTemplate(shaders, ren, actor);
 
@@ -288,7 +290,7 @@ void vtkF3DSplatMapperHelper::SetMapperShaderParameters(
   }
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251120)
-  this->VBOs->SetInstancing(vtkF3DPointSplatMapper::SafeDownCast(this->Owner)->GetUseInstancing());
+  this->VBOs->SetInstancing(this->OwnerUseInstancing());
 #endif
 
   this->Superclass::SetMapperShaderParameters(cellBO, ren, actor);
@@ -373,7 +375,7 @@ void vtkF3DSplatMapperHelper::RenderPieceDraw(vtkRenderer* ren, vtkActor* actor)
   }
 #endif
 
-  if (vtkF3DPointSplatMapper::SafeDownCast(this->Owner)->GetUseInstancing())
+  if (this->OwnerUseInstancing())
   {
     int numVerts = this->VBOs->GetNumberOfTuples("vertexMC");
     if (numVerts)
@@ -396,7 +398,7 @@ void vtkF3DSplatMapperHelper::RenderPieceDraw(vtkRenderer* ren, vtkActor* actor)
 void vtkF3DSplatMapperHelper::ReplaceShaderPositionVC(
   std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor)
 {
-  if (vtkF3DPointSplatMapper::SafeDownCast(this->Owner)->GetUseInstancing())
+  if (this->OwnerUseInstancing())
   {
     std::string FSSource = shaders[vtkShader::Fragment]->GetSource();
 
@@ -409,7 +411,7 @@ void vtkF3DSplatMapperHelper::ReplaceShaderPositionVC(
 
   std::string VSSource = shaders[vtkShader::Vertex]->GetSource();
 
-  if (vtkF3DPointSplatMapper::SafeDownCast(this->Owner)->GetUseInstancing())
+  if (this->OwnerUseInstancing())
   {
     vtkShaderProgram::Substitute(VSSource, "//VTK::PositionVC::Dec\n",
       "uniform float boundScale;\n"
@@ -479,7 +481,7 @@ void vtkF3DSplatMapperHelper::ReplaceShaderColor(
     {
       shStr << "  vec3 sh1 = vec3(0);\n";
 
-      if (vtkF3DPointSplatMapper::SafeDownCast(this->Owner)->GetUseInstancing())
+      if (this->OwnerUseInstancing())
       {
         shStr << "  ivec2 texelIndex = ivec2(gl_InstanceID % " << this->MaxTextureSize
               << ", gl_InstanceID / " << this->MaxTextureSize << ");\n";
@@ -547,6 +549,18 @@ void vtkF3DSplatMapperHelper::ReplaceShaderColor(
   }
 
   this->Superclass::ReplaceShaderColor(shaders, ren, actor);
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DSplatMapperHelper::OwnerUseInstancing()
+{
+  bool useInstancing = false;
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251120)
+  useInstancing = this->OwnerUseInstancing();
+#endif
+
+  return useInstancing;
 }
 
 //----------------------------------------------------------------------------
