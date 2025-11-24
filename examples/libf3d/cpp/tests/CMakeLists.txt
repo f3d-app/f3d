@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.10)
 
+# for image comparisons
+add_executable(check-image check.cxx)
+target_link_libraries(check-image f3d::libf3d)
+set_target_properties(check-image PROPERTIES CXX_STANDARD 17)
+
 # check-engine
 add_test(NAME test_check-engine COMMAND "$<TARGET_FILE:check-engine>")
 
@@ -10,6 +15,11 @@ add_test(NAME test_interactive-app COMMAND "$<TARGET_FILE:interactive-app>" "${C
 add_test(NAME test_multi-files COMMAND "$<TARGET_FILE:multi-files>" "${CMAKE_CURRENT_SOURCE_DIR}/data/mb" 1)
 set_tests_properties(test_multi-files PROPERTIES
         PASS_REGULAR_EXPRESSION "Scene bounding box: -0.487464 ≤ x ≤ 1, -0.487464 ≤ y ≤ 1, -0.5 ≤ z ≤ 1")
+
+# offscreen-thumbnail
+add_test(NAME test_offscreen-thumbnail COMMAND "$<TARGET_FILE:offscreen-thumbnail>" "${CMAKE_CURRENT_SOURCE_DIR}/data/cow.vtp" "${CMAKE_CURRENT_BINARY_DIR}/thumbnail.png" 256 256)
+add_test(NAME test_check-offscreen-thumbnail COMMAND "$<TARGET_FILE:check-image>" "${CMAKE_CURRENT_BINARY_DIR}/thumbnail.png" "${CMAKE_CURRENT_SOURCE_DIR}/baselines/thumbnail.png")
+set_tests_properties(test_check-offscreen-thumbnail PROPERTIES DEPENDS "test_offscreen-thumbnail")
 
 # render-image
 add_test(NAME test_render-image COMMAND "$<TARGET_FILE:render-image>" "${CMAKE_CURRENT_SOURCE_DIR}/data/cow.vtp" "${CMAKE_CURRENT_BINARY_DIR}/cow.png")
