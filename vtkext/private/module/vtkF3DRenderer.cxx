@@ -1574,8 +1574,15 @@ void vtkF3DRenderer::ConfigureTextActors()
   // Return logical DPI is scaled by system scale
   // Default return value = 72 when DPI was not detected
   const int dpi = vtkWindow->GetDPI();
-  // Default scale factor to 1
+  // To prevent VTK text render effected by `SetDPI()` we need to set DPI back to default value
+  vtkWindow->SetDPI(72);
+
+#ifdef _WIN32
+  // `GetDeviceCaps(this->DeviceContext, LOGPIXELSY)` default return value 96
+  const double scaleFactor = static_cast<double>(dpi) / 96;
+#else
   const double scaleFactor = static_cast<double>(dpi) / 72;
+#endif
   const double adjustedFontScale = this->FontScale * scaleFactor;
 
   this->UIActor->SetFontScale(adjustedFontScale);
