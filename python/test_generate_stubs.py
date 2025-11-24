@@ -50,6 +50,7 @@ def test_transformer_f3d_lists():
     """
     assert postprocess_generated_stub(dedent(src)) == parse_unparse(expected)
 
+
 def test_transformer_f3d_void_callbacks():
     src = """
     class A:
