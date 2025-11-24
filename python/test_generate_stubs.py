@@ -50,6 +50,19 @@ def test_transformer_f3d_lists():
     """
     assert postprocess_generated_stub(dedent(src)) == parse_unparse(expected)
 
+def test_transformer_f3d_void_callbacks():
+    src = """
+    class A:
+        def g(cb: Callable[[A,B], C]): ...
+        def g(cb: Callable[[A,B], None]): ... # cb return can be `Any`
+    """
+    expected = """
+    class A:
+        def g(cb: Callable[[A,B], C]): ...
+        def g(cb: Callable[[A,B], typing.Any]): ...
+    """
+    assert postprocess_generated_stub(dedent(src)) == parse_unparse(expected)
+
 
 def test_transformer_f3d_path():
     src = """

@@ -76,6 +76,14 @@ def postprocess_generated_stub(source: str):
             r"collections.abc.Sequence[",
             only_for=("arg", "cb_return"),
         ),
+        TypeFix(
+            # replace `None` with `Any` in callback returns
+            # so that functions expecting a `void` callback can accept anything
+            # (and discard the return)
+            r"None",
+            r"typing.Any",
+            only_for=("cb_return",),
+        ),
     )
     extra_imports = "pathlib", "os"
 
