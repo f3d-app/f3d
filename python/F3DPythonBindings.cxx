@@ -300,6 +300,8 @@ PYBIND11_MODULE(pyf3d, module)
     .def("trigger_keyboard_key", &f3d::interactor::triggerKeyboardKey, "Trigger a keyboard input")
     .def("trigger_text_character", &f3d::interactor::triggerTextCharacter,
       "Trigger a text character input")
+    .def(
+      "trigger_event_loop", &f3d::interactor::triggerEventLoop, "Manually trigger the event loop.")
     .def("play_interaction", &f3d::interactor::playInteraction, "Play an interaction file")
     .def("record_interaction", &f3d::interactor::recordInteraction, "Record an interaction file")
     .def("start", &f3d::interactor::start, "Start the interactor and the event loop",
