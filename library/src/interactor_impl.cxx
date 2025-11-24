@@ -764,23 +764,32 @@ interactor& interactor_impl::initCommands()
   };
 
   // Completion method for a vector of names
-  auto complNames = [](const std::vector<std::string>& args, const std::vector<std::string>& names)
+  auto complNames = [](const std::vector<std::string>& args, const std::vector<std::string>& names, size_t indexToCheck = 0)
   {
     std::vector<std::string> candidates;
-    if (args.size() < 1)
+    if (args.size() < indexToCheck + 1)
     {
       // No arguments, return all option names
       return names;
     }
-    else if (args.size() > 1)
+    else if (args.size() > indexToCheck + 1)
     {
       // Multi arguments, do not complete
       return candidates;
     }
 
-    // Recover all names that starts with args[0]
+    // Recover all names that starts with args[indexToCheck]
     std::copy_if(names.begin(), names.end(), std::back_inserter(candidates),
-      [&](const std::string& name) { return f3d::detail::StartWith(name, args[0]); });
+      [&](const std::string& name) { return f3d::detail::StartWith(name, args[indexToCheck]); });
+
+    // Create an arg pattern before the indexToCheck
+    std::string argPattern;
+    for (int i = 0; i < indexToCheck; i++)
+    {
+      argPattern += args[i] + " ";
+    }
+    // Include it in front of the candidates
+    std::transform(candidates.begin(), candidates.end(), candidates.begin(), [&](const auto& argCandidate) { return argPattern + argCandidate; });
 
     if (candidates.size() == 1)
     {
@@ -796,6 +805,65 @@ interactor& interactor_impl::initCommands()
   auto complOptionNames = [&](const std::vector<std::string>& args)
   { return complNames(args, this->Internals->Options.getAllNames()); };
 
+  static const std::map<std::string, std::vector<std::string>> COMPL_OPTIONS_SET = { 
+    { "model.point_sprites.type", { "sphere", "gaussian" } }, 
+    { "render.effect.antialiasing.mode", { "fxaa", "ssaa", "taa" } }, 
+    { "render.effect.blending.mode", { "ddp", "sort", "stochastic" } }, 
+  } ;
+  auto complOptionSet = [&](const std::vector<std::string>& args)
+  { 
+    std::vector<std::string> optionNames = this->Internals->Options.getAllNames();
+    std::vector<std::string> candidates;
+    if (args.size() == 0)
+    {
+      // No args, return all option names
+      return optionNames;
+    }
+    else if (args.size() == 1)
+    {
+      // One arg, check if its an option
+      if (std::find(optionNames.begin(), optionNames.end(), args[0]) != optionNames.end())
+      {
+        // Its an existing option, check if it should be completed
+        const auto it = COMPL_OPTIONS_SET.find(args[0]);
+        if (it != COMPL_OPTIONS_SET.end())
+        {
+          // Transform potential values into found option
+          for (const std::string& value : it->second)
+          {
+            candidates.emplace_back(args[0] + " " + value);
+          }
+        }
+        else
+        {
+          // no value completion, return option by itself
+          candidates.emplace_back(args[0]);
+        }
+      }
+      else
+      {
+        // Not an existing option, try completing with option names
+        return complNames(args, optionNames); 
+      }
+    }
+    else
+    {
+      // Complete the option value if possible
+      const auto it = COMPL_OPTIONS_SET.find(args[0]);
+      if ( it != COMPL_OPTIONS_SET.end())
+      {
+        return complNames(args, it->second, 1);
+      }
+    }
+
+    if (candidates.size() == 1)
+    {
+      // Single candidate, add a space separator
+      candidates[0] += " ";
+    }
+    return candidates;
+  };
+
   // Add default callbacks
   this->addCommand(
     "set",
@@ -804,7 +872,7 @@ interactor& interactor_impl::initCommands()
       check_args(args, 2, "set");
       this->Internals->Options.setAsString(args[0], args[1]);
     },
-    command_documentation_t{ "set option.name values", "set a libf3d option" }, complOptionNames);
+    command_documentation_t{ "set option.name values", "set a libf3d option" }, complOptionSet);
 
   this->addCommand(
     "toggle",
