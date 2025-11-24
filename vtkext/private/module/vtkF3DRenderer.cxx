@@ -2364,10 +2364,9 @@ void vtkF3DRenderer::ConfigurePointSprites()
 
   for (const auto& sprites : this->Importer->GetPointSpritesActorsAndMappers())
   {
-    vtkF3DPointSplatMapper* splatMapper = vtkF3DPointSplatMapper::SafeDownCast(sprites.Mapper);
-
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251120)
     // Old VTK versions do not support instancing
+    vtkF3DPointSplatMapper* splatMapper = vtkF3DPointSplatMapper::SafeDownCast(sprites.Mapper);
     splatMapper->SetUseInstancing(useInstancing);
 #endif
 
