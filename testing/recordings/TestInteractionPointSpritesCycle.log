@@ -1,21 +1,31 @@
 # StreamVersion 1.1
 ExposeEvent 0 599 0 0 0 0
+
+# O
 RenderEvent 0 599 0 0 0 0
 KeyPressEvent 752 51 0 111 1 o
 CharEvent 752 51 0 111 1 o
 KeyReleaseEvent 752 51 0 111 1 o
+
+# O
 RenderEvent 0 599 0 0 0 0
 KeyPressEvent 752 51 0 111 1 o
 CharEvent 752 51 0 111 1 o
 KeyReleaseEvent 752 51 0 111 1 o
+
+# O
 RenderEvent 0 599 0 0 0 0
 KeyPressEvent 752 51 0 111 1 o
 CharEvent 752 51 0 111 1 o
 KeyReleaseEvent 752 51 0 111 1 o
+
+# O
 RenderEvent 0 599 0 0 0 0
 KeyPressEvent 752 51 0 111 1 o
 CharEvent 752 51 0 111 1 o
 KeyReleaseEvent 752 51 0 111 1 o
+
+# O
 RenderEvent 0 599 0 0 0 0
 KeyPressEvent 752 51 0 111 1 o
 CharEvent 752 51 0 111 1 o
