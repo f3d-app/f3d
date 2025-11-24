@@ -557,7 +557,7 @@ bool vtkF3DSplatMapperHelper::OwnerUseInstancing()
   bool useInstancing = false;
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251120)
-  useInstancing = this->OwnerUseInstancing();
+  useInstancing = vtkF3DPointSplatMapper::SafeDownCast(this->Owner)->GetUseInstancing();
 #endif
 
   return useInstancing;
