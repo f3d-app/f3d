@@ -80,15 +80,10 @@ public:
   }
 
   /**
-   * Set the animation in delta time in seconds
-   */
-  void SetDeltaTime(double deltaTime);
-
-  /**
-   * Advance animationTime of DeltaTime and call loadAtTime accordingly
+   * Advance animationTime of deltaTime and call loadAtTime accordingly
    * Do nothing if IsPlaying is false
    */
-  void Tick();
+  void Tick(double deltaTime);
 
   /**
    * Load animation at provided time value
@@ -146,7 +141,6 @@ private:
   double TimeRange[2] = { 0.0, 0.0 };
   bool Playing = false;
   double CurrentTime = 0;
-  double DeltaTime = 0;
   bool CurrentTimeSet = false;
 
   // Dynamic options

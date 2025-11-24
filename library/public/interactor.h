@@ -353,6 +353,12 @@ public:
   ///@}
 
   /**
+   * Manually trigger the event loop.
+   * Advances the internal timers of `deltaTime` seconds.
+   */
+  virtual interactor& triggerEventLoop(double deltaTime) = 0;
+
+  /**
    * Play a VTK interaction file.
    * Provided file path is used as is and file existence will be checked.
    * The event loop will be triggered every deltaTime in seconds, and userCallBack will be called at
