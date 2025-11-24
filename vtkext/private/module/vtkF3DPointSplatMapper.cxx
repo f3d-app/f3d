@@ -287,7 +287,9 @@ void vtkF3DSplatMapperHelper::SetMapperShaderParameters(
       "sphericalHarmonics", this->SphericalHarmonicsTexture->GetTextureUnit());
   }
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251120)
   this->VBOs->SetInstancing(vtkF3DPointSplatMapper::SafeDownCast(this->Owner)->GetUseInstancing());
+#endif
 
   this->Superclass::SetMapperShaderParameters(cellBO, ren, actor);
 }
@@ -412,8 +414,7 @@ void vtkF3DSplatMapperHelper::ReplaceShaderPositionVC(
     vtkShaderProgram::Substitute(VSSource, "//VTK::PositionVC::Dec\n",
       "uniform float boundScale;\n"
       "out vec2 offsetVCVSOutput;\n"
-      "flat out int instanceId;\n"
-    );
+      "flat out int instanceId;\n");
 
     vtkShaderProgram::Substitute(VSSource, "//VTK::PositionVC::Impl\n",
       R"(

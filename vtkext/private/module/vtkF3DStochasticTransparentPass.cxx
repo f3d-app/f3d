@@ -94,10 +94,13 @@ bool vtkF3DStochasticTransparentPass::PreReplaceShaderValues(std::string& vtkNot
     std::string primIdDef = "\n#define primId gl_PrimitiveId\n";
 
     // If we are using instancing, use the instance id instead of the primitive id
-    vtkOpenGLPointGaussianMapperHelper* splatHelper = vtkOpenGLPointGaussianMapperHelper::SafeDownCast(mapper);
+    vtkOpenGLPointGaussianMapperHelper* splatHelper =
+      vtkOpenGLPointGaussianMapperHelper::SafeDownCast(mapper);
+
     if (splatHelper)
     {
-      vtkF3DPointSplatMapper* splatMapper = vtkF3DPointSplatMapper::SafeDownCast(splatHelper->Owner);
+      vtkF3DPointSplatMapper* splatMapper =
+        vtkF3DPointSplatMapper::SafeDownCast(splatHelper->Owner);
 
       if (splatMapper && splatMapper->GetUseInstancing())
       {
