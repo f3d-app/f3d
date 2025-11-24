@@ -656,15 +656,12 @@ bool vtkF3DQuakeMDLImporter::GetTemporalInformation(vtkIdType animationIndex, do
     // If single frame, keep animation duration = 0
     timeRange[1] = times.size() == 2 ? times.front() : times.back();
 
-    if (frameRate > 0)
-    {
-      nbTimeSteps = static_cast<int>(times.size());
-      timeSteps->SetNumberOfTuples(times.size());
+    nbTimeSteps = static_cast<int>(times.size());
+    timeSteps->SetNumberOfTuples(times.size());
 
-      for (unsigned int i = 0; i < times.size(); ++i)
-      {
-        timeSteps->SetValue(i, times[i]);
-      }
+    for (unsigned int i = 0; i < times.size(); ++i)
+    {
+      timeSteps->SetValue(i, times[i]);
     }
     return true;
   }
