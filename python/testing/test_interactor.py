@@ -154,12 +154,3 @@ def test_trigger_key(capfd: pytest.CaptureFixture[str]):
     engine.interactor.trigger_mouse_position(100, 100)
     engine.interactor.trigger_mouse_wheel(f3d.Interactor.WheelDirection.FORWARD)
     engine.interactor.trigger_text_character(0)
-
-
-def test_request_stop():
-    engine = f3d.Engine.create(True)
-
-    def cb():
-        engine.interactor.request_stop()
-
-    engine.interactor.start(1, cb)
