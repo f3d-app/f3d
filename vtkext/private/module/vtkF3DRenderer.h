@@ -310,6 +310,11 @@ public:
   void SetPointSpritesSize(double size);
 
   /**
+   * Set point sprites instancing usage
+   */
+  void SetPointSpritesUseInstancing(bool useInstancing);
+
+  /**
    * Set the visibility of the scalar bar.
    * It will only be shown when coloring and not shown
    * when using direct scalars rendering.
@@ -713,6 +718,7 @@ private:
 
   SplatType PointSpritesType = SplatType::SPHERE;
   double PointSpritesSize = 10;
+  bool PointSpritesUseInstancing = false;
 };
 
 #endif

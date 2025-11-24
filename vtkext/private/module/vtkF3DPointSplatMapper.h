@@ -16,8 +16,22 @@ public:
   static vtkF3DPointSplatMapper* New();
   vtkTypeMacro(vtkF3DPointSplatMapper, vtkOpenGLPointGaussianMapper);
 
+  //@{
+  /**
+   * Use instancing or VTK geometry shader based pipeline.
+   * Instancing works on GLES devices but doesn't support depth sorting.
+   * Default is true.
+   */
+  vtkGetMacro(UseInstancing, bool);
+  vtkSetMacro(UseInstancing, bool);
+  vtkBooleanMacro(UseInstancing, bool);
+  //@}
+
 protected:
   vtkOpenGLPointGaussianMapperHelper* CreateHelper() override;
+
+private:
+  bool UseInstancing = true;
 };
 
 #endif

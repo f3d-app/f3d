@@ -11,6 +11,7 @@
 #include "vtkF3DPolyDataMapper.h"
 #include "vtkF3DRenderPass.h"
 #include "vtkF3DSolidBackgroundPass.h"
+#include "vtkF3DPointSplatMapper.h"
 #include "vtkF3DTAAResolvePass.h"
 #include "vtkF3DUserRenderPass.h"
 
@@ -2138,6 +2139,16 @@ void vtkF3DRenderer::SetPointSpritesSize(double size)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetPointSpritesUseInstancing(bool useInstancing)
+{
+  if (this->PointSpritesUseInstancing != useInstancing)
+  {
+    this->PointSpritesUseInstancing = useInstancing;
+    this->PointSpritesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureActorsProperties()
 {
   assert(this->Importer);
@@ -2331,7 +2342,7 @@ void vtkF3DRenderer::ConfigurePointSprites()
     return;
   }
 
-  if (this->PointSpritesType == SplatType::GAUSSIAN)
+  if (!this->PointSpritesUseInstancing)
   {
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
     if (!vtkShader::IsComputeShaderSupported())
@@ -2353,6 +2364,9 @@ void vtkF3DRenderer::ConfigurePointSprites()
 
   for (const auto& sprites : this->Importer->GetPointSpritesActorsAndMappers())
   {
+    vtkF3DPointSplatMapper* splatMapper = vtkF3DPointSplatMapper::SafeDownCast(sprites.Mapper);
+    splatMapper->SetUseInstancing(useInstancing);
+
     sprites.Mapper->EmissiveOff();
     if (this->PointSpritesType == SplatType::GAUSSIAN)
     {
