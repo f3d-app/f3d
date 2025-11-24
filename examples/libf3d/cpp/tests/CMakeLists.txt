@@ -45,3 +45,11 @@ set_tests_properties(test_use-options-struct PROPERTIES
 add_test(NAME test_use-options-variant COMMAND "$<TARGET_FILE:use-options-variant>" "${CMAKE_CURRENT_SOURCE_DIR}/data/cow.vtp" 1)
 set_tests_properties(test_use-options-variant PROPERTIES
         PASS_REGULAR_EXPRESSION "Number of points: 2903")
+
+# qt6
+if (VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240914)
+  add_test(NAME test_minimal_qt6 COMMAND "$<TARGET_FILE:minimal_qt6>" "${CMAKE_CURRENT_SOURCE_DIR}/data/cow.vtp" "--timeout" 1)
+  set_tests_properties(test_minimal_qt6 PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen"
+  )
+endif ()

@@ -15,6 +15,12 @@ if(F3D_EXAMPLES_EXTERNAL_GLFW)
   add_subdirectory(external-glfw)
 endif()
 
+option(F3D_EXAMPLES_EXTERNAL_QT "Enable external-qt example (requires qt)" OFF)
+if (F3D_EXAMPLES_EXTERNAL_QT)
+  add_subdirectory(qt6)
+endif ()
+
+
 if(BUILD_TESTING)
   add_subdirectory(tests)
 endif()
