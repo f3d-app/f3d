@@ -548,6 +548,19 @@ PYBIND11_MODULE(pyf3d, module)
       "Create an engine with an EGL window (Windows/Linux only)")
     .def_static("create_osmesa", &f3d::engine::createOSMesa,
       "Create an engine with an OSMesa window (Windows/Linux only)")
+    .def_static(
+      "create_external",
+      [](py::object py_get_proc)
+      {
+        f3d::context::function func = [py_get_proc](const char* name) -> f3d::context::fptr
+        {
+          uintptr_t addr = py::int_(py_get_proc(py::bytes(name)));
+          return reinterpret_cast<f3d::context::fptr>(addr);
+        };
+        return f3d::engine::createExternal(func);
+      },
+      py::arg("get_proc_address"),
+      "Create an engine with an existing context via a get_proc_address callback")
     .def_static("create_external_glx", &f3d::engine::createExternalGLX,
       "Create an engine with an existing GLX context (Linux only)")
     .def_static("create_external_wgl", &f3d::engine::createExternalWGL,
