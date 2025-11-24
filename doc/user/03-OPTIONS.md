@@ -208,13 +208,9 @@ Set the opacity of the backdrop behind text information such as FPS, filename, m
 
 ## Material options
 
-### `-o`, `--point-sprites` (_bool_, default: `false`)
+### `-o`, `--point-sprites=<none|sphere|gaussian>` (_string_, default: `none`)
 
-Show sphere _points sprites_ instead of the geometry.
-
-### `--point-sprites-type=<sphere|gaussian>` (_string_, default: `sphere`)
-
-Set the splat type when showing point sprites.
+Select _points sprites_ types to show instead of the geometry.
 
 ### `--point-sprites-size=<size>` (_double_, default: `10.0`)
 
