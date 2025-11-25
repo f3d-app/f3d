@@ -11,6 +11,8 @@
 
 #include "vtkImageProcessingPass.h"
 
+#include <vtkMatrix4x4.h>
+#include <vtkOpenGLHelper.h>
 #include <vtkSmartPointer.h>
 
 #include <memory>
@@ -43,16 +45,25 @@ public:
     this->HistoryIteration = 0;
   }
 
+  bool PreReplaceShaderValues(std::string& vertexShader, std::string& geometryShader,
+    std::string& fragmentShader, vtkAbstractMapper* mapper, vtkProp* prop) override;
+
+  bool SetShaderParameters(vtkShaderProgram* program, vtkAbstractMapper* mapper, vtkProp* prop,
+    vtkOpenGLVertexArrayObject* VAO = nullptr) override;
+
 private:
   vtkF3DTAAResolvePass() = default;
   ~vtkF3DTAAResolvePass() override = default;
 
   vtkSmartPointer<vtkOpenGLFramebufferObject> FrameBufferObject;
+
   vtkSmartPointer<vtkTextureObject> ColorTexture;
   vtkSmartPointer<vtkTextureObject> HistoryTexture;
+  vtkSmartPointer<vtkTextureObject> MotionVectorTexture;
 
   std::shared_ptr<vtkOpenGLQuadHelper> QuadHelper;
 
   int HistoryIteration = 0;
+  vtkSmartPointer<vtkMatrix4x4> PreviousViewProjectionMatrix;
 };
 #endif
