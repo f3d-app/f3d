@@ -24,7 +24,6 @@ public:
    */
   vtkGetMacro(UseInstancing, bool);
   vtkSetMacro(UseInstancing, bool);
-  vtkBooleanMacro(UseInstancing, bool);
   //@}
 
 protected:
