@@ -145,6 +145,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "raytracing-samples", "render.raytracing.samples" },
   { "raytracing-denoise", "render.raytracing.denoise" },
   { "ambient-occlusion", "render.effect.ambient_occlusion" },
+  { "taa-movement-blending", "render.effect.antialiasing.taa_movement_blending" },
   { "tone-mapping", "render.effect.tone_mapping" },
   { "final-shader", "render.effect.final_shader" },
   { "display-depth", "render.effect.display_depth" },
