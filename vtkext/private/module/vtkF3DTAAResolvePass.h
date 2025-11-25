@@ -58,12 +58,13 @@ private:
   vtkSmartPointer<vtkOpenGLFramebufferObject> FrameBufferObject;
 
   vtkSmartPointer<vtkTextureObject> ColorTexture;
+  vtkSmartPointer<vtkTextureObject> DepthTexture;
   vtkSmartPointer<vtkTextureObject> HistoryTexture;
   vtkSmartPointer<vtkTextureObject> MotionVectorTexture;
 
   std::shared_ptr<vtkOpenGLQuadHelper> QuadHelper;
 
   int HistoryIteration = 0;
-  vtkSmartPointer<vtkMatrix4x4> PreviousViewProjectionMatrix;
+  vtkMatrix4x4* PreviousViewProjectionMatrix = nullptr;
 };
 #endif

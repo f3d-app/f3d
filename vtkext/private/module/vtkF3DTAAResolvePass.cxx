@@ -32,8 +32,6 @@ void vtkF3DTAAResolvePass::Render(const vtkRenderState* state)
 
   assert(this->DelegatePass != nullptr);
 
-  this->PreRender(state);
-
   // create framebuffer and textures
   int pos[2];
   int size[2];
@@ -86,19 +84,37 @@ void vtkF3DTAAResolvePass::Render(const vtkRenderState* state)
   }
   this->MotionVectorTexture->Resize(size[0], size[1]);
 
+  if (this->DepthTexture == nullptr)
+  {
+    this->DepthTexture = vtkTextureObject::New();
+    this->DepthTexture->SetContext(renWin);
+    this->DepthTexture->AllocateDepth(size[0], size[1], vtkTextureObject::Float32);
+  }
+
   if (this->FrameBufferObject == nullptr)
   {
     this->FrameBufferObject = vtkSmartPointer<vtkOpenGLFramebufferObject>::New();
     this->FrameBufferObject->SetContext(renWin);
   }
 
+  this->ColorTexture->Activate();
+  this->MotionVectorTexture->Activate();
+  this->DepthTexture->Activate();
+
+  this->PreRender(state);
+
   renWin->GetState()->PushFramebufferBindings();
   this->FrameBufferObject->Bind();
   this->FrameBufferObject->AddColorAttachment(0, this->ColorTexture);
   this->FrameBufferObject->AddColorAttachment(1, this->MotionVectorTexture);
   this->FrameBufferObject->ActivateDrawBuffers(2);
+  this->FrameBufferObject->AddDepthAttachment(this->DepthTexture);
 
   this->DelegatePass->Render(state);
+  this->NumberOfRenderedProps += this->DelegatePass->GetNumberOfRenderedProps();
+
+  this->FrameBufferObject->RemoveColorAttachments(2);
+  this->FrameBufferObject->RemoveDepthAttachment();
   renWin->GetState()->PopFramebufferBindings();
 
   this->PostRender(state);
@@ -130,7 +146,6 @@ void vtkF3DTAAResolvePass::Render(const vtkRenderState* state)
   assert(this->QuadHelper->Program && this->QuadHelper->Program->GetCompiled());
 
   this->HistoryTexture->Activate();
-  this->ColorTexture->Activate();
   this->QuadHelper->Program->SetUniformi("colorTexture", this->ColorTexture->GetTextureUnit());
   this->QuadHelper->Program->SetUniformi("historyTexture", this->HistoryTexture->GetTextureUnit());
 
@@ -157,23 +172,17 @@ bool vtkF3DTAAResolvePass::PreReplaceShaderValues(std::string& vertexShader,
   std::string& geometryShader, std::string& fragmentShader, vtkAbstractMapper* mapper,
   vtkProp* prop)
 {
-  if (vtkPolyDataMapper::SafeDownCast(mapper) != nullptr && this->PreviousViewProjectionMatrix)
+  if (vtkPolyDataMapper::SafeDownCast(mapper) != nullptr)
   {
-    vtkShaderProgram::Substitute(vertexShader, "//VTK::Camera::Impl",
-      "//VTK::Camera::Impl\nTAA_PrevClipPos = TAA_PreviousVP * vertexMC;\n", false);
-
-    vtkShaderProgram::Substitute(fragmentShader, "//VTK::System::Dec",
-      "//VTK::System::Dec\nin vec4 TAA_PrevClipPos;\nuniform sampler2D colorTexture;", false);
-
     vtkShaderProgram::Substitute(fragmentShader, "//VTK::Light::Impl",
       "//VTK::Light::Impl\n"
-      "vec2 currNDC = gl_FragCoord.xy; // will normalize later in resolve if needed\n"
-      "vec4 prevClip = TAA_PrevClipPos;\n"
-      "prevClip /= prevClip.w;\n"
-      "vec2 prevNDC = prevClip.xy * 0.5 + 0.5;\n"
-      "vec2 motion = prevNDC - (currNDC / vec2(textureSize(colorTexture,0))); // screen-space "
-      "motion\n"
-      "gl_FragData[1] = vec4(motion, 0.0, 1.0);\n",
+      "gl_FragData[1] = vec4(1, 0, 0, 1.0);\n",
+      // "vec2 currNDC = gl_FragCoord.xy;\n"
+      // "vec4 prevClip = TAA_PrevClipPos;\n"
+      // "prevClip /= prevClip.w;\n"
+      // "vec2 prevNDC = prevClip.xy * 0.5 + 0.5;\n"
+      // "vec2 motion = prevNDC - (currNDC / vec2(textureSize(colorTexture,0))); // screen-space "
+      // "motion\n",
       false);
   }
   return true;
@@ -183,12 +192,11 @@ bool vtkF3DTAAResolvePass::PreReplaceShaderValues(std::string& vertexShader,
 bool vtkF3DTAAResolvePass::SetShaderParameters(vtkShaderProgram* program, vtkAbstractMapper* mapper,
   vtkProp* prop, vtkOpenGLVertexArrayObject* VAO)
 {
-  if (this->PreviousViewProjectionMatrix == nullptr)
+  if (PreviousViewProjectionMatrix == nullptr)
   {
     return true;
   }
-
-  program->SetUniformMatrix("TAA_PreviousVP", this->PreviousViewProjectionMatrix);
+  // program->SetUniformMatrix("TAA_PreviousVP", this->PreviousViewProjectionMatrix);
   program->SetUniformi("colorTexture", this->ColorTexture->GetTextureUnit());
   return true;
 }
