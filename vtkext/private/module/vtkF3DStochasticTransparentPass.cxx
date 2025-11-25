@@ -7,7 +7,6 @@
 #include <vtkInformationIntegerKey.h>
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLActor.h>
-#include <vtkOpenGLPointGaussianMapperHelper.h>
 #include <vtkOpenGLRenderWindow.h>
 #include <vtkRenderState.h>
 #include <vtkRenderer.h>
@@ -16,6 +15,8 @@
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251120)
 #include "vtkF3DPointSplatMapper.h"
+
+#include <vtkOpenGLPointGaussianMapperHelper.h>
 #endif
 
 vtkStandardNewMacro(vtkF3DStochasticTransparentPass);
