@@ -639,8 +639,8 @@ bool vtkF3DQuakeMDLImporter::IsAnimationEnabled(vtkIdType animationIndex)
 }
 
 //----------------------------------------------------------------------------
-bool vtkF3DQuakeMDLImporter::GetTemporalInformation(vtkIdType animationIndex, double frameRate,
-  int& nbTimeSteps, double timeRange[2], vtkDoubleArray* timeSteps)
+bool vtkF3DQuakeMDLImporter::GetTemporalInformation(vtkIdType animationIndex,
+  double vtkNotUsed(frameRate), int& nbTimeSteps, double timeRange[2], vtkDoubleArray* timeSteps)
 {
   assert(animationIndex >= 0);
 
