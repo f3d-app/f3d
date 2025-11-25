@@ -410,13 +410,34 @@ void window_impl::UpdateDynamicOptions()
     {
       splatType = vtkF3DRenderer::SplatType::SPHERE;
     }
+    else if (opt.model.point_sprites.type == "circle")
+    {
+      splatType = vtkF3DRenderer::SplatType::CIRCLE;
+    }
+    else if (opt.model.point_sprites.type == "stddev")
+    {
+      splatType = vtkF3DRenderer::SplatType::STD_DEV;
+    }
+    else if (opt.model.point_sprites.type == "bound")
+    {
+      splatType = vtkF3DRenderer::SplatType::BOUND;
+    }
+    else if (opt.model.point_sprites.type == "flow")
+    {
+      splatType = vtkF3DRenderer::SplatType::FLOW;
+    }
+    else if (opt.model.point_sprites.type == "cross")
+    {
+      splatType = vtkF3DRenderer::SplatType::CROSS;
+    }
     else
     {
       log::warn(opt.model.point_sprites.type,
-        R"( is an invalid point sprites type. Valid modes are: "sphere", "gaussian")");
+        R"( is an invalid point sprites type. Valid modes are: "gaussian", "sphere", "circle", "stddev", "flow", "bound", "cross"). Falling back to "gaussian".)");
     }
     renderer->SetPointSpritesType(splatType);
-    renderer->SetPointSpritesSize(opt.model.point_sprites.size);
+    renderer->SetPointSpritesSize(
+      opt.model.point_sprites.scene_scale, opt.model.point_sprites.size);
     renderer->SetPointSpritesUseInstancing(opt.render.effect.blending.mode != "sort");
   }
 
@@ -762,4 +783,4 @@ vtkF3DRenderer* window_impl::GetRenderer() const
 {
   return this->Internals->Renderer;
 }
-};
+}
