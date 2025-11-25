@@ -439,6 +439,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240203)
       f3d_test(NAME TestSPZDegree1 DATA hornedlizard_small_d1.spz ARGS -sy --point-sprites-size=1 --point-sprites=gaussian --blending=sort --camera-position=-3.6,0.5,4.2)
       f3d_test(NAME TestSPZDegree2 DATA hornedlizard_small_d2.spz ARGS -sy --point-sprites-size=1 --point-sprites=gaussian --blending=sort --camera-position=-3.6,0.5,4.2)
       f3d_test(NAME TestSPZDegree3 DATA hornedlizard_small_d3.spz ARGS -sy --point-sprites-size=1 --point-sprites=gaussian --blending=sort --camera-position=-3.6,0.5,4.2)
+      f3d_test(NAME TestSPZDegree1Stochastic DATA hornedlizard_small_d1.spz ARGS -sy --point-sprites-size=1 --point-sprites=gaussian --blending=stochastic --camera-position=-3.6,0.5,4.2) # Test instancing with spherical harmonics
 
       f3d_test(NAME TestDefaultConfigFileSPZ DATA hornedlizard_small_d3.spz CONFIG config_build LONG_TIMEOUT UI)
       f3d_test(NAME TestThumbnailConfigFileSPZ DATA hornedlizard_small_d3.spz CONFIG thumbnail_build LONG_TIMEOUT)

@@ -69,6 +69,10 @@
 #include <vtksys/MD5.h>
 #include <vtksys/SystemTools.hxx>
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240203)
+#include "vtkF3DPointSplatMapper.h"
+#endif
+
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
 #include <vtkMemoryResourceStream.h>
 #endif
@@ -2138,6 +2142,16 @@ void vtkF3DRenderer::SetPointSpritesSize(double size)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetPointSpritesUseInstancing(bool useInstancing)
+{
+  if (this->PointSpritesUseInstancing != useInstancing)
+  {
+    this->PointSpritesUseInstancing = useInstancing;
+    this->PointSpritesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureActorsProperties()
 {
   assert(this->Importer);
@@ -2331,7 +2345,7 @@ void vtkF3DRenderer::ConfigurePointSprites()
     return;
   }
 
-  if (this->PointSpritesType == SplatType::GAUSSIAN)
+  if (!this->PointSpritesUseInstancing)
   {
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
     if (!vtkShader::IsComputeShaderSupported())
@@ -2353,6 +2367,11 @@ void vtkF3DRenderer::ConfigurePointSprites()
 
   for (const auto& sprites : this->Importer->GetPointSpritesActorsAndMappers())
   {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240203)
+    vtkF3DPointSplatMapper* splatMapper = vtkF3DPointSplatMapper::SafeDownCast(sprites.Mapper);
+    splatMapper->SetUseInstancing(this->PointSpritesUseInstancing);
+#endif
+
     sprites.Mapper->EmissiveOff();
     if (this->PointSpritesType == SplatType::GAUSSIAN)
     {

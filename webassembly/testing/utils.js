@@ -79,6 +79,8 @@ const utils = {
         // automatically load all supported file format readers
         Module.Engine.autoloadPlugins();
 
+        Module.Log.setVerboseLevel(Module.LogVerboseLevel.DEBUG, false);
+
         Module.engineInstance = Module.Engine.create();
 
         // setup the window size based on the canvas size
@@ -134,7 +136,7 @@ const utils = {
         window.close();
       })
       .catch((error) => {
-        console.error('F3D_ERROR: exception thrown "' + error + '"');
+        console.error('F3D_ERROR: exception thrown "' + error.stack + '"');
         window.close();
       });
   },
