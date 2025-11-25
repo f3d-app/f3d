@@ -8,7 +8,6 @@
 #include "vtkF3DInteractorStyle.h"
 #include "vtkF3DOpenGLGridMapper.h"
 #include "vtkF3DOverlayRenderPass.h"
-#include "vtkF3DPointSplatMapper.h"
 #include "vtkF3DPolyDataMapper.h"
 #include "vtkF3DRenderPass.h"
 #include "vtkF3DSolidBackgroundPass.h"
@@ -69,6 +68,10 @@
 #include <vtksys/FStream.hxx>
 #include <vtksys/MD5.h>
 #include <vtksys/SystemTools.hxx>
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240203)
+#include "vtkF3DPointSplatMapper.h"
+#endif
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
 #include <vtkMemoryResourceStream.h>
@@ -2364,8 +2367,10 @@ void vtkF3DRenderer::ConfigurePointSprites()
 
   for (const auto& sprites : this->Importer->GetPointSpritesActorsAndMappers())
   {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240203)
     vtkF3DPointSplatMapper* splatMapper = vtkF3DPointSplatMapper::SafeDownCast(sprites.Mapper);
-    splatMapper->SetUseInstancing(useInstancing);
+    splatMapper->SetUseInstancing(this->PointSpritesUseInstancing);
+#endif
 
     sprites.Mapper->EmissiveOff();
     if (this->PointSpritesType == SplatType::GAUSSIAN)

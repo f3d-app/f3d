@@ -1,6 +1,5 @@
 #include "vtkF3DStochasticTransparentPass.h"
 
-#include "vtkF3DPointSplatMapper.h"
 #include "vtkF3DRandomFS.h"
 
 #include <vtkF3DOpenGLGridMapper.h>
@@ -14,6 +13,10 @@
 #include <vtkRenderer.h>
 #include <vtkShaderProgram.h>
 #include <vtkVersion.h>
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251120)
+#include "vtkF3DPointSplatMapper.h"
+#endif
 
 vtkStandardNewMacro(vtkF3DStochasticTransparentPass);
 vtkCxxSetObjectMacro(vtkF3DStochasticTransparentPass, TranslucentPass, vtkRenderPass);
