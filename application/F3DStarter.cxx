@@ -109,6 +109,8 @@ public:
     std::string CommandScriptFile;
     std::string AntiAliasing;
     std::string AntiAliasingMode; // Deprecated
+    std::string PointSprites;
+    std::string PointSpritesType; // Deprecated
     bool TranslucencySupport;     // Deprecated
     std::string Blending;
   };

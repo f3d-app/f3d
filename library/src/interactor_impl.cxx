@@ -965,6 +965,33 @@ interactor& interactor_impl::initCommands()
       std::vector<std::string>{ "field", "array", "component" }));
 
   this->addCommand(
+    "cycle_point_sprites",
+    [&](const std::vector<std::string>&)
+    {
+      bool& enabled = this->Internals->Options.model.point_sprites.enable;
+      std::string& type = this->Internals->Options.model.point_sprites.type;
+      if (!enabled)
+      {
+        enabled = true;
+        type = "sphere";
+      }
+      else
+      {
+        if (type == "sphere")
+        {
+          type = "gaussian";
+        }
+        else
+        {
+          enabled = false;
+        }
+      }
+      this->Internals->Window.render();
+    },
+    command_documentation_t{
+      "cycle_point_sprites", "cycle between the point sprite types (none,sphere,gaussian)" });
+
+  this->addCommand(
     "roll_camera",
     [&](const std::vector<std::string>& args)
     {
@@ -1341,6 +1368,21 @@ interactor& interactor_impl::initBindings()
     return std::pair("Anti-aliasing", std::move(desc));
   };
 
+  // "Cycle point sprites" , "none/sphere/gaussian"
+  auto docPS = [&]()
+  {
+    std::string desc;
+    if (!this->Internals->Options.model.point_sprites.enable)
+    {
+      desc = "none";
+    }
+    else
+    {
+      desc = this->Internals->Options.model.point_sprites.type;
+    }
+    return std::pair("Point sprites", std::move(desc));
+  };
+
   // "Cycle blending" , "none/ddp/sort/stochastic"
   auto docBlend = [&]()
   {
@@ -1453,7 +1495,7 @@ interactor& interactor_impl::initBindings()
 #endif
   this->addBinding({mod_t::NONE, "V"}, "toggle_volume_rendering","Scene", std::bind(docTgl, "Volume rendering", std::cref(opts.model.volume.enable)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "I"}, "toggle model.volume.inverse","Scene", std::bind(docTgl, "Inverse volume opacity", std::cref(opts.model.volume.inverse)), f3d::interactor::BindingType::TOGGLE);
-  this->addBinding({mod_t::NONE, "O"}, "toggle model.point_sprites.enable","Scene", std::bind(docTgl, "Point sprites rendering", std::cref(opts.model.point_sprites.enable)), f3d::interactor::BindingType::TOGGLE);
+  this->addBinding({mod_t::NONE, "O"}, "cycle_point_sprites","Scene", docPS, f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "U"}, "toggle render.background.blur.enable","Scene", std::bind(docTgl, "Blur background", std::cref(opts.render.background.blur.enable)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "K"}, "toggle interactor.trackball","Scene", std::bind(docTgl, "Trackball interaction", std::cref(opts.interactor.trackball)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "F"}, "toggle render.hdri.ambient","Scene", std::bind(docTgl, "HDRI ambient lighting", std::cref(opts.render.hdri.ambient)), f3d::interactor::BindingType::TOGGLE);

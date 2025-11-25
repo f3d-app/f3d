@@ -29,14 +29,14 @@ The coloring can be controlled directly by pressing the following hotkeys:
 
 See the [coloring cycle](#cycling-coloring) section for more info.
 
-Other options can be toggled directly by pressing the following hotkeys:
+Other options can be toggled or cycled directly by pressing the following hotkeys:
 
 - <kbd>W</kbd>: [cycle animations](05-ANIMATIONS.md#cycling-animations).
 - <kbd>B</kbd>: display of the scalar bar, only when coloring and not using direct scalars.
 - <kbd>V</kbd>: volume rendering, forces coloring.
 - <kbd>I</kbd>: opacity function inversion during volume rendering.
-- <kbd>O</kbd>: point sprites rendering.
-- <kbd>P</kbd>: translucency support.
+- <kbd>O</kbd>: cycle point sprites type.
+- <kbd>P</kbd>: cycle blending mode for translucency support.
 - <kbd>Q</kbd>: ambient occlusion.
 - <kbd>T</kbd>: tone mapping.
 - <kbd>E</kbd>: the display of cell edges.
