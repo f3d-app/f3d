@@ -1575,7 +1575,7 @@ void vtkF3DRenderer::ConfigureTextActors()
   double scaleFactor = 1.0;
 
 #ifdef _WIN32
-  const int dpi = GetDeviceCaps(wglGetCurrentDC(), LOGPIXELSY);// Default return 96
+  const int dpi = GetDeviceCaps(wglGetCurrentDC(), LOGPIXELSY); // Default return 96
   scaleFactor = static_cast<double>(dpi) / 96;
 #endif
 
