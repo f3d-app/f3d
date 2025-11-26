@@ -101,6 +101,10 @@
 #include <vtk_glew.h>
 #endif
 
+#ifdef _WIN32
+#include "vtkWindows.h"
+#endif
+
 #include <cctype>
 #include <chrono>
 #include <sstream>
@@ -1568,21 +1572,13 @@ void vtkF3DRenderer::ConfigureTextActors()
     }
   }
 
-  vtkWindow* vtkWindow = this->GetVTKWindow();
-  // Detect and set logical DPI
-  vtkWindow->DetectDPI();
-  // Return logical DPI is scaled by system scale
-  // Default return value = 72 when DPI was not detected
-  const int dpi = vtkWindow->GetDPI();
-  // To prevent VTK text render effected by `SetDPI()` we need to set DPI back to default value
-  vtkWindow->SetDPI(72);
+  double scaleFactor = 1.0;
 
 #ifdef _WIN32
-  // `GetDeviceCaps(this->DeviceContext, LOGPIXELSY)` default return value 96
-  const double scaleFactor = static_cast<double>(dpi) / 96;
-#else
-  const double scaleFactor = static_cast<double>(dpi) / 72;
+  const int dpi = GetDeviceCaps(wglGetCurrentDC(), LOGPIXELSY);// Default return 96
+  scaleFactor = static_cast<double>(dpi) / 96;
 #endif
+
   const double adjustedFontScale = this->FontScale * scaleFactor;
 
   this->UIActor->SetFontScale(adjustedFontScale);
