@@ -109,6 +109,7 @@ runs:
         python -m pip install --upgrade pip
         python -m pip install pytest==8.0.0
         python -m pip install pyopengltk==0.0.4
+        python -m pip install PySide6==6.10.1
 
     - name: Set PATH windows
       if: runner.os == 'Windows'
@@ -177,7 +178,8 @@ runs:
       with:
         path: ${{ env.Python_ROOT_DIR }}
 
+    # Qt6 tests only supported on windows for now https://github.com/f3d-app/f3d/issues/2670
     - name: Test wheel
       shell: bash
       working-directory: ${{github.workspace}}/source
-      run: python -m pytest
+      run: python -m pytest ${{ runner.os != 'Windows' && '-k "not test_minimal_qt6"' || null }}

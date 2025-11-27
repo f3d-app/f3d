@@ -43,12 +43,6 @@ void animationManager::SetInteractor(interactor_impl* interactor)
 }
 
 //----------------------------------------------------------------------------
-void animationManager::SetDeltaTime(double deltaTime)
-{
-  this->DeltaTime = deltaTime;
-}
-
-//----------------------------------------------------------------------------
 void animationManager::Initialize()
 {
   assert(this->Importer);
@@ -166,11 +160,11 @@ void animationManager::ToggleAnimation()
 }
 
 //----------------------------------------------------------------------------
-void animationManager::Tick()
+void animationManager::Tick(double deltaTime)
 {
   if (this->Playing)
   {
-    this->CurrentTime += this->DeltaTime * this->SpeedFactor;
+    this->CurrentTime += deltaTime * this->SpeedFactor;
 
     // Modulo computation, compute CurrentTime in the time range.
     if (this->CurrentTime < this->TimeRange[0] || this->CurrentTime > this->TimeRange[1])

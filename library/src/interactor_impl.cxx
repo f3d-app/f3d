@@ -540,16 +540,10 @@ public:
     // Copy user callback
     this->EventLoopUserCallBack = std::move(userCallBack);
 
-    // Configure UI delta time
-    vtkRenderWindow* renWin = this->Window.GetRenderWindow();
-    vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
-    ren->SetUIDeltaTime(deltaTime);
-
-    // Configure animation delta time
-    this->AnimationManager->SetDeltaTime(deltaTime);
-
     // Create the timer
     this->EventLoopTimerId = this->VTKInteractor->CreateRepeatingTimer(deltaTime * 1000);
+
+    this->CallbackDeltaTime = deltaTime;
 
     // Create the callback and add an observer
     vtkNew<vtkCallbackCommand> timerCallBack;
@@ -557,7 +551,7 @@ public:
       [](vtkObject*, unsigned long, void* clientData, void*)
       {
         internals* that = static_cast<internals*>(clientData);
-        that->EventLoop();
+        that->EventLoop(that->CallbackDeltaTime);
       });
     this->EventLoopObserverId =
       this->VTKInteractor->AddObserver(vtkCommand::TimerEvent, timerCallBack);
@@ -574,7 +568,7 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  void EventLoop()
+  void EventLoop(double deltaTime)
   {
     if (this->StopRequested)
     {
@@ -602,7 +596,11 @@ public:
       this->CommandBuffer.reset();
     }
 
-    this->AnimationManager->Tick();
+    this->AnimationManager->Tick(deltaTime);
+
+    vtkRenderWindow* renWin = this->Window.GetRenderWindow();
+    vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+    ren->SetUIDeltaTime(deltaTime);
 
     // Determine if we need a full render or just a UI render
     // At the moment, only TAA requires a full render each frame
@@ -654,6 +652,8 @@ public:
   int EventLoopObserverId = -1;
   std::atomic<bool> RenderRequested = false;
   std::atomic<bool> StopRequested = false;
+
+  double CallbackDeltaTime = 0.0;
 };
 
 //----------------------------------------------------------------------------
@@ -1255,6 +1255,13 @@ std::vector<std::string> interactor_impl::getCommandActions() const
     actions.emplace_back(action);
   }
   return actions;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::triggerEventLoop(double deltaTime)
+{
+  this->Internals->EventLoop(deltaTime);
+  return *this;
 }
 
 //----------------------------------------------------------------------------

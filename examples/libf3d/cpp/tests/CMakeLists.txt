@@ -45,3 +45,13 @@ set_tests_properties(test_use-options-struct PROPERTIES
 add_test(NAME test_use-options-variant COMMAND "$<TARGET_FILE:use-options-variant>" "${CMAKE_CURRENT_SOURCE_DIR}/data/cow.vtp" 1)
 set_tests_properties(test_use-options-variant PROPERTIES
         PASS_REGULAR_EXPRESSION "Number of points: 2903")
+
+# glfw -- only works if libf3d was built against a VTK >= 9.3.20240914
+if (F3D_EXAMPLES_EXTERNAL_GLFW)
+  add_test(NAME test_external-glfw COMMAND "$<TARGET_FILE:external-glfw>" "${CMAKE_CURRENT_SOURCE_DIR}/data/cow.vtp" 1)
+endif ()
+
+# qt6 -- only works if libf3d was built against a VTK >= 9.3.20240914
+if (F3D_EXAMPLES_EXTERNAL_QT)
+  add_test(NAME test_minimal_qt6 COMMAND "$<TARGET_FILE:minimal_qt6>" "${CMAKE_CURRENT_SOURCE_DIR}/data/cow.vtp" "--timeout" 1)
+endif ()
