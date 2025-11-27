@@ -390,16 +390,16 @@ public:
   {
     Alembic::Abc::IObject top = this->Archive.getTop();
 
-    std::stack<std::tuple<const Alembic::Abc::IObject, const Alembic::Abc::ObjectHeader>> objects;
+    std::stack<std::pair<const Alembic::Abc::IObject, const Alembic::Abc::ObjectHeader>> objects;
 
     for (size_t i = 0; i < top.getNumChildren(); ++i)
     {
-      objects.emplace(std::make_tuple(top, top.getChildHeader(i)));
+      objects.emplace(std::make_pair(top, top.getChildHeader(i)));
     }
 
     while (!objects.empty())
     {
-      auto [parent, ohead] = objects.top();
+      const auto [parent, ohead] = objects.top();
       objects.pop();
       int numSamples;
       Alembic::Abc::TimeSamplingPtr ts;
@@ -411,7 +411,7 @@ public:
         numSamples = schema.getNumSamples();
         for (size_t i = 0; i < xForm.getNumChildren(); ++i)
         {
-          objects.emplace(std::make_tuple(xForm, xForm.getChildHeader(i)));
+          objects.emplace(std::make_pair(xForm, xForm.getChildHeader(i)));
         }
       }
       else if (Alembic::AbcGeom::IPolyMesh::matches(ohead))
