@@ -23,7 +23,9 @@
 #include <vtkPolyData.h>
 #include <vtkShader.h>
 #include <vtkShaderProgram.h>
+#include <vtkShaderProperty.h>
 #include <vtkTextureObject.h>
+#include <vtkUniforms.h>
 #include <vtkVersion.h>
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
@@ -56,7 +58,7 @@ protected:
   // overridden to sort splats
   void RenderPieceDraw(vtkRenderer* ren, vtkActor* act) override;
 
-  // add instance id to fragment shader
+  // add instance id and TAA to fragment shader
   void ReplaceShaderPositionVC(
     std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor) override;
 
@@ -398,6 +400,28 @@ void vtkF3DSplatMapperHelper::RenderPieceDraw(vtkRenderer* ren, vtkActor* actor)
 void vtkF3DSplatMapperHelper::ReplaceShaderPositionVC(
   std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor)
 {
+  vtkUniforms* uniforms = actor->GetShaderProperty()->GetVertexCustomUniforms();
+
+  // TAA
+  vtkUniforms::TupleType type = uniforms->GetUniformTupleType("jitter");
+  if (type != vtkUniforms::TupleTypeInvalid)
+  {
+    std::string VSSource = shaders[vtkShader::Vertex]->GetSource();
+
+    vtkShaderProgram::Substitute(VSSource, "//VTK::PositionVC::Dec",
+      "//VTK::PositionVC::Dec\n"
+      "  uniform vec2 jitter;\n",
+      false);
+
+    vtkShaderProgram::Substitute(VSSource, "//VTK::PositionVC::Impl",
+      "//VTK::PositionVC::Impl\n"
+      "  // apply temporal jittering for TAA\n"
+      "  gl_Position.xy += jitter * gl_Position.w;\n",
+      false);
+
+    shaders[vtkShader::Vertex]->SetSource(VSSource);
+  }
+
   if (this->OwnerUseInstancing())
   {
     std::string FSSource = shaders[vtkShader::Fragment]->GetSource();
