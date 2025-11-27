@@ -51,7 +51,12 @@ if (F3D_EXAMPLES_EXTERNAL_GLFW)
   add_test(NAME test_external-glfw COMMAND "$<TARGET_FILE:external-glfw>" "${CMAKE_CURRENT_SOURCE_DIR}/data/cow.vtp" 1)
 endif ()
 
-# qt6 -- only works if libf3d was built against a VTK >= 9.3.20240914
+# qt6 & qml -- only works if libf3d was built against a VTK >= 9.3.20240914
 if (F3D_EXAMPLES_EXTERNAL_QT)
   add_test(NAME test_minimal_qt6 COMMAND "$<TARGET_FILE:minimal_qt6>" "${CMAKE_CURRENT_SOURCE_DIR}/data/cow.vtp" "--timeout" 1)
+  add_test(
+    NAME test_minimal_qml
+    COMMAND "$<TARGET_FILE:minimal_qml>" "${CMAKE_CURRENT_SOURCE_DIR}/data/cow.vtp" "--timeout" 1
+    WORKING_DIRECTORY "$<TARGET_FILE_DIR:minimal_qml>"
+  )
 endif ()
