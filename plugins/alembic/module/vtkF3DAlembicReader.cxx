@@ -364,7 +364,7 @@ public:
 
     while (!objects.empty())
     {
-      const auto [parent, ohead, matrix] = objects.top();
+      const auto& [parent, ohead, matrix] = objects.top();
       objects.pop();
       if (Alembic::AbcGeom::IPolyMesh::matches(ohead))
       {
