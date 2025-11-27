@@ -173,9 +173,15 @@ public:
     double fwd[3];
     vtkMath::Cross(right, up, fwd);
     const double m[9] = {
-      right[0], right[1], right[2], //
-      fwd[0], fwd[1], fwd[2],       //
-      up[0], up[1], up[2],          //
+      right[0],
+      right[1],
+      right[2], //
+      fwd[0],
+      fwd[1],
+      fwd[2], //
+      up[0],
+      up[1],
+      up[2], //
     };
     transform->DeepCopy(m);
   }
@@ -831,10 +837,9 @@ interactor& interactor_impl::initCommands()
         if (it != COMPL_OPTIONS_SET.end())
         {
           // Transform potential values into found option
-          for (const std::string& value : it->second)
-          {
-            candidates.emplace_back(args[0] + " " + value);
-          }
+          std::transform(std::begin(it->second), std::end(it->second),
+            std::back_inserter(candidates),
+            [&](const auto& value) { return args[0] + " " + value; });
         }
         else
         {
