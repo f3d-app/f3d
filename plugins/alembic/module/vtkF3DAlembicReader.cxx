@@ -1,6 +1,5 @@
 #include "vtkF3DAlembicReader.h"
 
-#include <Alembic/Abc/Foundation.h>
 #include <stack>
 #include <tuple>
 #include <vtkAppendPolyData.h>
