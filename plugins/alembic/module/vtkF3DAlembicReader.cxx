@@ -1,5 +1,7 @@
 #include "vtkF3DAlembicReader.h"
 
+#include <stack>
+#include <tuple>
 #include <vtkAppendPolyData.h>
 #include <vtkFloatArray.h>
 #include <vtkIdTypeArray.h>
@@ -390,15 +392,42 @@ public:
   {
     Alembic::Abc::IObject top = this->Archive.getTop();
 
-    auto computeRange = [&](const Alembic::AbcGeom::IPolyMesh& polymesh)
+    std::stack<std::tuple<const Alembic::Abc::IObject, const Alembic::Abc::ObjectHeader>> objects;
+
+    for (size_t i = 0; i < top.getNumChildren(); ++i)
     {
-      Alembic::Abc::TimeSamplingPtr ts = polymesh.getSchema().getTimeSampling();
+      objects.emplace(std::make_tuple(top, top.getChildHeader(i)));
+    }
+
+    while (!objects.empty())
+    {
+      auto [parent, ohead] = objects.top();
+      objects.pop();
+      int numSamples;
+      Alembic::Abc::TimeSamplingPtr ts;
+      if (Alembic::AbcGeom::IXform::matches(ohead))
+      {
+        const Alembic::AbcGeom::IXform xForm(parent, ohead.getName());
+        const Alembic::AbcGeom::IXformSchema schema = xForm.getSchema();
+        ts = schema.getTimeSampling();
+        numSamples = schema.getNumSamples();
+        for (size_t i = 0; i < xForm.getNumChildren(); ++i)
+        {
+          objects.emplace(std::make_tuple(xForm, xForm.getChildHeader(i)));
+        }
+      }
+      else if (Alembic::AbcGeom::IPolyMesh::matches(ohead))
+      {
+        const Alembic::AbcGeom::IPolyMesh polymesh(parent, ohead.getName());
+        const Alembic::AbcGeom::IPolyMeshSchema schema = polymesh.getSchema();
+        ts = schema.getTimeSampling();
+        numSamples = schema.getNumSamples();
+      }
 
       if (ts->getTimeSamplingType().isUniform())
       {
         double min = ts->getSampleTime(0);
-        double max = min +
-          (polymesh.getSchema().getNumSamples() - 1) * ts->getTimeSamplingType().getTimePerCycle();
+        double max = min + (numSamples - 1) * ts->getTimeSamplingType().getTimePerCycle();
         start = std::min(start, min);
         end = std::max(end, max);
       }
@@ -408,11 +437,6 @@ public:
         start = std::min(start, times.front());
         end = std::max(end, times.back());
       }
-    };
-
-    for (size_t i = 0; i < top.getNumChildren(); ++i)
-    {
-      this->IterateIObject(computeRange, top, top.getChildHeader(i));
     }
   }
 
