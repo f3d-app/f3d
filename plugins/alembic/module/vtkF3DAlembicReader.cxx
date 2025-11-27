@@ -364,12 +364,12 @@ public:
 
     while (!objects.empty())
     {
-      const auto [parent, ohead, matrix] = objects.top();
-      objects.pop();
+      const auto& [parent, ohead, matrix] = objects.top();
       if (Alembic::AbcGeom::IPolyMesh::matches(ohead))
       {
         const Alembic::AbcGeom::IPolyMesh polymesh(parent, ohead.getName());
         append->AddInputData(ProcessIPolyMesh(polymesh, time, matrix));
+        objects.pop();
       }
       else if (Alembic::AbcGeom::IXform::matches(ohead))
       {
@@ -378,6 +378,7 @@ public:
         Alembic::AbcGeom::XformSample xFormSamp;
         xFormSchema.get(xFormSamp, selector);
         const Alembic::Abc::M44d xFormMatrix = matrix * xFormSamp.getMatrix();
+        objects.pop();
         for (size_t i = 0; i < xForm.getNumChildren(); ++i)
         {
           objects.emplace(std::make_tuple(xForm, xForm.getChildHeader(i), xFormMatrix));
