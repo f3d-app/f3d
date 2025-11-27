@@ -764,7 +764,8 @@ interactor& interactor_impl::initCommands()
   };
 
   // Completion method for a vector of names
-  auto complNames = [](const std::vector<std::string>& args, const std::vector<std::string>& names, size_t indexToCheck = 0)
+  auto complNames = [](const std::vector<std::string>& args, const std::vector<std::string>& names,
+                      size_t indexToCheck = 0)
   {
     std::vector<std::string> candidates;
     if (args.size() < indexToCheck + 1)
@@ -784,12 +785,13 @@ interactor& interactor_impl::initCommands()
 
     // Create an arg pattern before the indexToCheck
     std::string argPattern;
-    for (int i = 0; i < indexToCheck; i++)
+    for (std::size_t i = 0; i < indexToCheck; i++)
     {
       argPattern += args[i] + " ";
     }
     // Include it in front of the candidates
-    std::transform(candidates.begin(), candidates.end(), candidates.begin(), [&](const auto& argCandidate) { return argPattern + argCandidate; });
+    std::transform(candidates.begin(), candidates.end(), candidates.begin(),
+      [&](const auto& argCandidate) { return argPattern + argCandidate; });
 
     if (candidates.size() == 1)
     {
@@ -805,13 +807,13 @@ interactor& interactor_impl::initCommands()
   auto complOptionNames = [&](const std::vector<std::string>& args)
   { return complNames(args, this->Internals->Options.getAllNames()); };
 
-  static const std::map<std::string, std::vector<std::string>> COMPL_OPTIONS_SET = { 
-    { "model.point_sprites.type", { "sphere", "gaussian" } }, 
-    { "render.effect.antialiasing.mode", { "fxaa", "ssaa", "taa" } }, 
-    { "render.effect.blending.mode", { "ddp", "sort", "stochastic" } }, 
-  } ;
+  static const std::map<std::string, std::vector<std::string>> COMPL_OPTIONS_SET = {
+    { "model.point_sprites.type", { "sphere", "gaussian" } },
+    { "render.effect.antialiasing.mode", { "fxaa", "ssaa", "taa" } },
+    { "render.effect.blending.mode", { "ddp", "sort", "stochastic" } },
+  };
   auto complOptionSet = [&](const std::vector<std::string>& args)
-  { 
+  {
     std::vector<std::string> optionNames = this->Internals->Options.getAllNames();
     std::vector<std::string> candidates;
     if (args.size() == 0)
@@ -843,14 +845,14 @@ interactor& interactor_impl::initCommands()
       else
       {
         // Not an existing option, try completing with option names
-        return complNames(args, optionNames); 
+        return complNames(args, optionNames);
       }
     }
     else
     {
       // Complete the option value if possible
       const auto it = COMPL_OPTIONS_SET.find(args[0]);
-      if ( it != COMPL_OPTIONS_SET.end())
+      if (it != COMPL_OPTIONS_SET.end())
       {
         return complNames(args, it->second, 1);
       }
