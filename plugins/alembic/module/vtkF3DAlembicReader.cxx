@@ -20,11 +20,12 @@
 #include <Alembic/AbcCoreOgawa/All.h>
 #include <Alembic/AbcGeom/All.h>
 #include <Alembic/Util/All.h>
-#include <stack>
-#include <tuple>
 #if defined(_MSC_VER)
 #pragma warning(pop)
 #endif
+
+#include <stack>
+#include <tuple>
 
 using IndicesContainer = std::vector<int>;
 using V3fContainer = std::vector<Alembic::Abc::V3f>;
