@@ -723,9 +723,9 @@ if(F3D_MODULE_WEBP)
 endif()
 
 if(F3D_PLUGIN_BUILD_ALEMBIC)
-  f3d_test(NAME TestABC DATA suzanne.abc ARGS -s --load-plugins=alembic)
-  f3d_test(NAME TestABCNonFaceVarying DATA tetrahedron_non_facevarying_uv.abc ARGS -s --load-plugins=alembic)
-  f3d_test(NAME TestABCAnimation DATA drop.abc ARGS --animation-time=2 --load-plugins=alembic --animation-progress)
+  f3d_test(NAME TestAlembic DATA suzanne.abc ARGS -s --load-plugins=alembic)
+  f3d_test(NAME TestAlembicNonFaceVarying DATA tetrahedron_non_facevarying_uv.abc ARGS -s --load-plugins=alembic)
+  f3d_test(NAME TestAlembicAnimation DATA drop.abc ARGS --animation-time=2 --load-plugins=alembic --animation-progress)
   f3d_test(NAME TestAlembicAnimationXForm DATA xform_anim.abc ARGS --animation-time=1.5 --load-plugins=alembic --animation-progress)
 
   if(NOT F3D_MACOS_BUNDLE)
