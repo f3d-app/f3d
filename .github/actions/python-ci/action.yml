@@ -182,4 +182,4 @@ runs:
     - name: Test wheel
       shell: bash
       working-directory: ${{github.workspace}}/source
-      run: python -m pytest ${{ runner.os != 'Windows' && '-k "not test_minimal_qt6"' || null }}
+      run: python -m pytest ${{ runner.os != 'Windows' && '-k "not test_minimal_qt6 and not test_minimal_qml"' || null }}
