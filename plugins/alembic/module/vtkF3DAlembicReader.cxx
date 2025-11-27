@@ -1,7 +1,5 @@
 #include "vtkF3DAlembicReader.h"
 
-#include <stack>
-#include <tuple>
 #include <vtkAppendPolyData.h>
 #include <vtkFloatArray.h>
 #include <vtkIdTypeArray.h>
@@ -366,7 +364,7 @@ public:
 
     while (!objects.empty())
     {
-      const auto [parent, ohead, matrix] = objects.top();
+      const auto& [parent, ohead, matrix] = objects.top();
       objects.pop();
       if (Alembic::AbcGeom::IPolyMesh::matches(ohead))
       {
