@@ -426,6 +426,8 @@ public:
         };
 
         self->AnimateCameraTransition(interpolateCameraState);
+
+        self->Style->InvokeEvent(vtkCommand::InteractionEvent, nullptr);
       }
     }
 
