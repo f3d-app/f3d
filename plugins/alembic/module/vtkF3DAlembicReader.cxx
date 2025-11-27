@@ -369,7 +369,7 @@ public:
       if (Alembic::AbcGeom::IPolyMesh::matches(ohead))
       {
         const Alembic::AbcGeom::IPolyMesh polymesh(parent, ohead.getName());
-        append->AddInputData(ProcessIPolyMesh(polymesh, time, matrix));
+        append->AddInputData(this->ProcessIPolyMesh(polymesh, time, matrix));
         objects.pop();
       }
       else if (Alembic::AbcGeom::IXform::matches(ohead))
