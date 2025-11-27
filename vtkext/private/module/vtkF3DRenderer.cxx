@@ -69,6 +69,10 @@
 #include <vtksys/MD5.h>
 #include <vtksys/SystemTools.hxx>
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240203)
+#include "vtkF3DPointSplatMapper.h"
+#endif
+
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
 #include <vtkMemoryResourceStream.h>
 #endif
@@ -310,7 +314,7 @@ void vtkF3DRenderer::Initialize()
 
   this->ColorTransferFunctionConfigured = false;
   this->ColoringMappersConfigured = false;
-  this->PointSpritesMappersConfigured = false;
+  this->ColoringPointSpritesMappersConfigured = false;
   this->VolumePropsAndMappersConfigured = false;
   this->ScalarBarActorConfigured = false;
   this->CheatSheetConfigured = false;
@@ -1808,7 +1812,7 @@ void vtkF3DRenderer::UpdateActors()
     // when the coloring range actually change
     this->ColorTransferFunctionConfigured = false;
     this->ColoringMappersConfigured = false;
-    this->PointSpritesMappersConfigured = false;
+    this->ColoringPointSpritesMappersConfigured = false;
     this->VolumePropsAndMappersConfigured = false;
     this->ScalarBarActorConfigured = false;
     this->ColoringConfigured = false;
@@ -1818,6 +1822,11 @@ void vtkF3DRenderer::UpdateActors()
   if (!this->ActorsPropertiesConfigured)
   {
     this->ConfigureActorsProperties();
+  }
+
+  if (!this->PointSpritesConfigured)
+  {
+    this->ConfigurePointSprites();
   }
 
   if (!this->ColoringConfigured)
@@ -2112,6 +2121,37 @@ void vtkF3DRenderer::SetTextureNormal(const std::optional<fs::path>& tex)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetPointSpritesType(vtkF3DRenderer::SplatType type)
+{
+  if (this->PointSpritesType != type)
+  {
+    this->PointSpritesType = type;
+    this->PointSpritesConfigured = false;
+    this->CheatSheetConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetPointSpritesSize(double size)
+{
+  if (this->PointSpritesSize != size)
+  {
+    this->PointSpritesSize = size;
+    this->PointSpritesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetPointSpritesUseInstancing(bool useInstancing)
+{
+  if (this->PointSpritesUseInstancing != useInstancing)
+  {
+    this->PointSpritesUseInstancing = useInstancing;
+    this->PointSpritesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureActorsProperties()
 {
   assert(this->Importer);
@@ -2298,11 +2338,14 @@ void vtkF3DRenderer::ConfigureActorsProperties()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetPointSpritesProperties(SplatType type, double pointSpritesSize)
+void vtkF3DRenderer::ConfigurePointSprites()
 {
-  assert(this->Importer);
+  if (!this->UsePointSprites)
+  {
+    return;
+  }
 
-  if (type == SplatType::GAUSSIAN)
+  if (!this->PointSpritesUseInstancing)
   {
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
     if (!vtkShader::IsComputeShaderSupported())
@@ -2319,13 +2362,18 @@ void vtkF3DRenderer::SetPointSpritesProperties(SplatType type, double pointSprit
   double scaleFactor = 1.0;
   if (bbox.IsValid())
   {
-    scaleFactor = pointSpritesSize * bbox.GetDiagonalLength() * 0.001;
+    scaleFactor = this->PointSpritesSize * bbox.GetDiagonalLength() * 0.001;
   }
 
   for (const auto& sprites : this->Importer->GetPointSpritesActorsAndMappers())
   {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240203)
+    vtkF3DPointSplatMapper* splatMapper = vtkF3DPointSplatMapper::SafeDownCast(sprites.Mapper);
+    splatMapper->SetUseInstancing(this->PointSpritesUseInstancing);
+#endif
+
     sprites.Mapper->EmissiveOff();
-    if (type == SplatType::GAUSSIAN)
+    if (this->PointSpritesType == SplatType::GAUSSIAN)
     {
       sprites.Mapper->SetScaleFactor(1.0);
       sprites.Mapper->SetSplatShaderCode(nullptr); // gaussian is the default VTK shader
@@ -2394,6 +2442,7 @@ void vtkF3DRenderer::SetUsePointSprites(bool use)
     this->UsePointSprites = use;
     this->CheatSheetConfigured = false;
     this->ColoringConfigured = false;
+    this->PointSpritesConfigured = false;
   }
 }
 
@@ -2446,7 +2495,7 @@ void vtkF3DRenderer::SetScalarBarRange(const std::optional<std::vector<double>>&
     this->UserScalarBarRange = range;
     this->ColorTransferFunctionConfigured = false;
     this->ColoringMappersConfigured = false;
-    this->PointSpritesMappersConfigured = false;
+    this->ColoringPointSpritesMappersConfigured = false;
     this->VolumePropsAndMappersConfigured = false;
     this->ScalarBarActorConfigured = false;
     this->ColoringConfigured = false;
@@ -2462,7 +2511,7 @@ void vtkF3DRenderer::SetColormap(const std::vector<double>& colormap)
 
     this->ColorTransferFunctionConfigured = false;
     this->ColoringMappersConfigured = false;
-    this->PointSpritesMappersConfigured = false;
+    this->ColoringPointSpritesMappersConfigured = false;
     this->VolumePropsAndMappersConfigured = false;
 
     this->ScalarBarActorConfigured = false;
@@ -2479,7 +2528,7 @@ void vtkF3DRenderer::SetColormapDiscretization(std::optional<int> discretization
 
     this->ColorTransferFunctionConfigured = false;
     this->ColoringMappersConfigured = false;
-    this->PointSpritesMappersConfigured = false;
+    this->ColoringPointSpritesMappersConfigured = false;
     this->VolumePropsAndMappersConfigured = false;
 
     this->ScalarBarActorConfigured = false;
@@ -2506,7 +2555,7 @@ void vtkF3DRenderer::SetUseCellColoring(bool useCell)
     this->UseCellColoring = useCell;
     this->ColorTransferFunctionConfigured = false;
     this->ColoringMappersConfigured = false;
-    this->PointSpritesMappersConfigured = false;
+    this->ColoringPointSpritesMappersConfigured = false;
     this->VolumePropsAndMappersConfigured = false;
     this->ScalarBarActorConfigured = false;
     this->CheatSheetConfigured = false;
@@ -2523,7 +2572,7 @@ void vtkF3DRenderer::SetArrayNameForColoring(const std::optional<std::string>& a
     this->ArrayNameForColoring = arrayName;
     this->ColorTransferFunctionConfigured = false;
     this->ColoringMappersConfigured = false;
-    this->PointSpritesMappersConfigured = false;
+    this->ColoringPointSpritesMappersConfigured = false;
     this->VolumePropsAndMappersConfigured = false;
     this->ScalarBarActorConfigured = false;
     this->CheatSheetConfigured = false;
@@ -2546,7 +2595,7 @@ void vtkF3DRenderer::SetComponentForColoring(int component)
     this->ComponentForColoring = component;
     this->ColorTransferFunctionConfigured = false;
     this->ColoringMappersConfigured = false;
-    this->PointSpritesMappersConfigured = false;
+    this->ColoringPointSpritesMappersConfigured = false;
     this->VolumePropsAndMappersConfigured = false;
     this->ScalarBarActorConfigured = false;
     this->CheatSheetConfigured = false;
@@ -2614,7 +2663,7 @@ void vtkF3DRenderer::ConfigureColoring()
     {
       if (hasColoring)
       {
-        if (!this->PointSpritesMappersConfigured)
+        if (!this->ColoringPointSpritesMappersConfigured)
         {
           vtkF3DRenderer::ConfigureMapperForColoring(sprites.Mapper, info.value().Name,
             this->ComponentForColoring, this->ColorTransferFunction, this->ColorRange,
@@ -2626,7 +2675,7 @@ void vtkF3DRenderer::ConfigureColoring()
   }
   if (pointSpritesVisible)
   {
-    this->PointSpritesMappersConfigured = true;
+    this->ColoringPointSpritesMappersConfigured = true;
   }
 
   // Handle Volume prop

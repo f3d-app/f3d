@@ -210,7 +210,7 @@ CLI: `--point-sprites`.
 
 Set the sprites type when showing point sprites (can be `sphere` or `gaussian`).
 
-CLI: `--point-sprites-type`.
+CLI: `--point-sprites`.
 
 ### `model.point_sprites.size` (_double_, default: `10.0`)
 

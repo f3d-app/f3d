@@ -113,9 +113,9 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
 #endif
       { "command-script", "", "Path to a script file containing commands to execute", "<file_path>", "" } } },
   { "Material",
-    { {"point-sprites", "o", "Show sphere sprites instead of surfaces", "<bool>", "1" },
-      {"point-sprites-type", "", "Point sprites type", "<sphere|gaussian>", ""},
-      {"point-sprites-size", "", "Point sprites size", "<size>", ""},
+    { {"point-sprites", "o", R"(Select point sprites type ("none", "sphere", "gaussian"))", "<string>", "sphere" },
+      {"point-sprites-type", "", "Point sprites type (deprecated)", "<sphere|gaussian>", ""},
+      {"point-sprites-size", "", "Point sprites sphere size", "<size>", ""},
       {"point-size", "", "Point size when showing vertices, model specified by default", "<size>", ""},
       {"line-width", "", "Line width when showing edges, model specified by default", "<width>", ""},
       {"backface-type", "", "Backface type, can be visible or hidden, model specified by default", "<visible|hidden>", ""},
@@ -706,6 +706,38 @@ std::vector<std::pair<std::string, std::string>> F3DOptionsTools::ConvertToLibf3
   {
     f3d::log::warn("--translucency-support is deprecated, please use --blending instead");
     libf3dOptions.emplace_back(std::make_pair("render.effect.blending.enable", value));
+  }
+
+  // point sprites is handled in two options in the lib
+  else if (key == "point-sprites")
+  {
+    if (value != "none")
+    {
+      // Handle deprecated boolean option
+      bool deprecatedBooleanOption;
+      if (F3DOptionsTools::Parse(value, deprecatedBooleanOption))
+      {
+        f3d::log::warn("--point-sprites is a now a string, please specify the type of "
+                       "point sprites to use or use the implicit default");
+        libf3dOptions.emplace_back(std::make_pair("model.point_sprites.enable", value));
+      }
+      else
+      {
+        libf3dOptions.emplace_back(std::make_pair("model.point_sprites.enable", "true"));
+        libf3dOptions.emplace_back(std::make_pair("model.point_sprites.type", value));
+      }
+    }
+    else
+    {
+      libf3dOptions.emplace_back(std::make_pair("model.point_sprites.enable", "false"));
+    }
+  }
+
+  // handle deprecated point-sprites-type option
+  else if (key == "point-sprites-type")
+  {
+    f3d::log::warn("--point-sprites-type is deprecated");
+    libf3dOptions.emplace_back(std::make_pair("model.point_sprites.mode", value));
   }
 
   else

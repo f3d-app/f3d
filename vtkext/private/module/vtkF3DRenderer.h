@@ -62,6 +62,15 @@ public:
     STOCHASTIC
   };
 
+  /**
+   * Enum listing possible splat types.
+   */
+  enum class SplatType : unsigned char
+  {
+    SPHERE,
+    GAUSSIAN
+  };
+
   ///@{
   /**
    * Set visibility of different actors
@@ -290,16 +299,20 @@ public:
    */
   void SetTextureNormal(const std::optional<fs::path>& tex);
 
-  enum class SplatType
-  {
-    SPHERE,
-    GAUSSIAN
-  };
+  /**
+   * Set point sprites type
+   */
+  void SetPointSpritesType(SplatType type);
 
   /**
-   * Set the point sprites size and the splat type on the pointGaussianMapper
+   * Set the point sprites size
    */
-  void SetPointSpritesProperties(SplatType splatType, double pointSpritesSize);
+  void SetPointSpritesSize(double size);
+
+  /**
+   * Set point sprites instancing usage
+   */
+  void SetPointSpritesUseInstancing(bool useInstancing);
 
   /**
    * Set the visibility of the scalar bar.
@@ -554,6 +567,11 @@ private:
    */
   void ConfigureActorTextureTransform(vtkActor* actorBase, const double* matrix);
 
+  /**
+   * Configure all properties of the point sprites mapper
+   */
+  void ConfigurePointSprites();
+
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
 
   // Does vtk version support GridAxesActor
@@ -575,6 +593,7 @@ private:
   bool LightIntensitiesConfigured = false;
   bool TextActorsConfigured = false;
   bool MetaDataConfigured = false;
+  bool PointSpritesConfigured = false;
   bool HDRIReaderConfigured = false;
   bool HDRIHashConfigured = false;
   bool HDRITextureConfigured = false;
@@ -656,7 +675,7 @@ private:
   bool ScalarBarActorConfigured = false;
 
   bool ColoringMappersConfigured = false;
-  bool PointSpritesMappersConfigured = false;
+  bool ColoringPointSpritesMappersConfigured = false;
   bool VolumePropsAndMappersConfigured = false;
   bool ColoringConfigured = false;
 
@@ -696,6 +715,10 @@ private:
 
   int TaaHaltonNumerator[2] = { 0, 0 };
   int TaaHaltonDenominator[2] = { 1, 1 };
+
+  SplatType PointSpritesType = SplatType::SPHERE;
+  double PointSpritesSize = 10;
+  bool PointSpritesUseInstancing = false;
 };
 
 #endif
