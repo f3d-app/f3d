@@ -1,7 +1,5 @@
 #include "vtkF3DAlembicReader.h"
 
-#include <stack>
-#include <tuple>
 #include <vtkAppendPolyData.h>
 #include <vtkFloatArray.h>
 #include <vtkIdTypeArray.h>
@@ -22,6 +20,8 @@
 #include <Alembic/AbcCoreOgawa/All.h>
 #include <Alembic/AbcGeom/All.h>
 #include <Alembic/Util/All.h>
+#include <stack>
+#include <tuple>
 #if defined(_MSC_VER)
 #pragma warning(pop)
 #endif
