@@ -218,6 +218,12 @@ Set the _size_ of point sprites.
 
 CLI: `--point-sprites-size`.
 
+### `model.point_sprites.scene_scale` (_bool_, default: `false`)
+
+Scales the point sprites size by the scene bounding box.
+
+CLI: `--point-sprites-scene-scale`.
+
 ### `model.volume.enable` (_bool_, default: `false`)
 
 Enable _volume rendering_. It is only available for 3D image data and will display nothing with incompatible data. It forces coloring.

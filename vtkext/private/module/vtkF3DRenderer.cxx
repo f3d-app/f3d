@@ -224,8 +224,7 @@ void ExecFuncOnAllPolyDataUniforms(vtkActorCollection* actors, F&& func)
 
   while ((actor = actors->GetNextActor()))
   {
-    const vtkPolyDataMapper* mapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
-    if (mapper)
+    if (actor->GetMapper() && actor->GetMapper()->IsA("vtkPolyDataMapper"))
     {
       func(actor->GetShaderProperty()->GetVertexCustomUniforms());
     }
@@ -2203,11 +2202,12 @@ void vtkF3DRenderer::SetPointSpritesType(vtkF3DRenderer::SplatType type)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetPointSpritesSize(double size)
+void vtkF3DRenderer::SetPointSpritesSize(bool sceneScale, double size)
 {
-  if (this->PointSpritesSize != size)
+  if (this->PointSpritesSceneScale != sceneScale || this->PointSpritesSize != size)
   {
     this->PointSpritesSize = size;
+    this->PointSpritesSceneScale = sceneScale;
     this->PointSpritesConfigured = false;
   }
 }
@@ -2431,7 +2431,7 @@ void vtkF3DRenderer::ConfigurePointSprites()
   const vtkBoundingBox& bbox = this->Importer->GetGeometryBoundingBox();
 
   double scaleFactor = 1.0;
-  if (bbox.IsValid())
+  if (this->PointSpritesSceneScale && bbox.IsValid())
   {
     scaleFactor = this->PointSpritesSize * bbox.GetDiagonalLength() * 0.001;
   }
@@ -2444,40 +2444,54 @@ void vtkF3DRenderer::ConfigurePointSprites()
 #endif
 
     sprites.Mapper->EmissiveOff();
-    if (this->PointSpritesType == SplatType::GAUSSIAN)
-    {
-      sprites.Mapper->SetScaleFactor(1.0);
-      sprites.Mapper->SetSplatShaderCode(nullptr); // gaussian is the default VTK shader
-      sprites.Mapper->SetScaleArray("scale");
+    sprites.Mapper->SetScaleFactor(scaleFactor);
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
-      sprites.Mapper->AnisotropicOn();
-      sprites.Mapper->SetBoundScale(3.0);
-      sprites.Mapper->SetRotationArray("rotation");
+    // in order to make sure the sprites are at least 1 pixel large we set a lowpass matrix
+    // that will convolve the splat with another isotropic splat
+    // the value 0.3 is coming from the Gaussian Splatting paper
+    // ideally we should expose this as a parameter
+    int* viewport = this->GetSize();
 
-      int* viewport = this->GetSize();
-
-      float lowPass[3] = { 0.3f / (viewport[0] * viewport[0]), 0.f,
-        0.3f / (viewport[1] * viewport[1]) };
-      sprites.Mapper->SetLowpassMatrix(lowPass);
-#else
-      F3DLog::Print(F3DLog::Severity::Warning,
-        "Gaussian splatting selected but VTK <= 9.3 only supports isotropic gaussians");
+    float lowPass[3] = { 0.3f / (viewport[0] * viewport[0]), 0.f,
+      0.3f / (viewport[1] * viewport[1]) };
+    sprites.Mapper->SetLowpassMatrix(lowPass);
 #endif
 
-      sprites.Actor->ForceTranslucentOn();
+    vtkPolyData* polyData = vtkPolyData::SafeDownCast(sprites.Mapper->GetInput());
+    if (polyData && polyData->GetPointData()->HasArray("scale") &&
+      polyData->GetPointData()->HasArray("rotation"))
+    {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
+      sprites.Mapper->AnisotropicOn();
+      sprites.Mapper->SetRotationArray("rotation");
+      sprites.Mapper->SetScaleArray("scale");
+#else
+      F3DLog::Print(F3DLog::Severity::Warning, "VTK <= 9.3 only supports isotropic point sprites");
+#endif
     }
     else
     {
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
       sprites.Mapper->AnisotropicOff();
-      sprites.Mapper->SetLowpassMatrix(0., 0., 0.);
       sprites.Mapper->SetRotationArray(nullptr);
-#endif
-
-      sprites.Mapper->SetScaleFactor(scaleFactor);
       sprites.Mapper->SetScaleArray(nullptr);
+#endif
+    }
 
+    if (this->PointSpritesType == SplatType::GAUSSIAN)
+    {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
+      sprites.Mapper->SetBoundScale(3.0);
+#endif
+      sprites.Mapper->SetSplatShaderCode(nullptr); // gaussian is the default VTK shader
+      sprites.Actor->ForceTranslucentOn();
+    }
+    else
+    {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
+      sprites.Mapper->SetBoundScale(1.0);
+#endif
       sprites.Mapper->SetSplatShaderCode(
         "//VTK::Color::Impl\n"
         "float dist = dot(offsetVCVSOutput.xy, offsetVCVSOutput.xy);\n"

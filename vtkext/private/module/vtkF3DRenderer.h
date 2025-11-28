@@ -315,7 +315,7 @@ public:
   /**
    * Set the point sprites size
    */
-  void SetPointSpritesSize(double size);
+  void SetPointSpritesSize(bool sceneScale, double size);
 
   /**
    * Set point sprites instancing usage
@@ -735,6 +735,7 @@ private:
 
   SplatType PointSpritesType = SplatType::SPHERE;
   double PointSpritesSize = 10;
+  bool PointSpritesSceneScale = false;
   bool PointSpritesUseInstancing = false;
 };
 
