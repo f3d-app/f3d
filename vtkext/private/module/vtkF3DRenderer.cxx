@@ -91,6 +91,10 @@
 #include <vtk_glew.h>
 #endif
 
+#ifdef _WIN32
+#include "vtkWindows.h"
+#endif
+
 #include <cctype>
 #include <chrono>
 #include <sstream>
@@ -1367,7 +1371,16 @@ void vtkF3DRenderer::ConfigureTextActors()
     }
   }
 
-  this->UIActor->SetFontScale(this->FontScale);
+  double scaleFactor = 1.0;
+
+#ifdef _WIN32
+  const int dpi = GetDeviceCaps(wglGetCurrentDC(), LOGPIXELSY); // Default return 96
+  scaleFactor = static_cast<double>(dpi) / 96;
+#endif
+
+  const double adjustedFontScale = this->FontScale * scaleFactor;
+
+  this->UIActor->SetFontScale(adjustedFontScale);
 
   this->TextActorsConfigured = true;
 }
