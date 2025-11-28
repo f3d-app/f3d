@@ -410,7 +410,7 @@ public:
         const Alembic::AbcGeom::IXform xForm(parent, ohead.getName());
         const Alembic::AbcGeom::IXformSchema& schema = xForm.getSchema();
         ts = schema.getTimeSampling();
-        numSamples = schema.getNumSamples();
+        numSamples = static_cast<int>(schema.getNumSamples());
         for (size_t i = 0; i < xForm.getNumChildren(); ++i)
         {
           objects.emplace(std::make_pair(xForm, xForm.getChildHeader(i)));
@@ -421,7 +421,7 @@ public:
         const Alembic::AbcGeom::IPolyMesh polymesh(parent, ohead.getName());
         const Alembic::AbcGeom::IPolyMeshSchema& schema = polymesh.getSchema();
         ts = schema.getTimeSampling();
-        numSamples = schema.getNumSamples();
+        numSamples = static_cast<int>(schema.getNumSamples());
       }
 
       if (ts->getTimeSamplingType().isUniform())
