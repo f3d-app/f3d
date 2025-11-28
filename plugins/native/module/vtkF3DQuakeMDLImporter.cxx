@@ -2,6 +2,7 @@
 #include "vtkF3DQuakeMDLImporterConstants.h"
 
 #include <vtkCommand.h>
+#include <vtkDoubleArray.h>
 #include <vtkFileResourceStream.h>
 #include <vtkFloatArray.h>
 #include <vtkImageData.h>
@@ -639,8 +640,7 @@ bool vtkF3DQuakeMDLImporter::IsAnimationEnabled(vtkIdType animationIndex)
 
 //----------------------------------------------------------------------------
 bool vtkF3DQuakeMDLImporter::GetTemporalInformation(vtkIdType animationIndex,
-  double vtkNotUsed(frameRate), int& vtkNotUsed(nbTimeSteps), double timeRange[2],
-  vtkDoubleArray* vtkNotUsed(timeSteps))
+  double vtkNotUsed(frameRate), int& nbTimeSteps, double timeRange[2], vtkDoubleArray* timeSteps)
 {
   assert(animationIndex < static_cast<vtkIdType>(this->Internals->AnimationNames.size() +
                             this->Internals->GroupSkinAnimationNames.size()));
@@ -650,9 +650,17 @@ bool vtkF3DQuakeMDLImporter::GetTemporalInformation(vtkIdType animationIndex,
     animationIndex < static_cast<vtkIdType>(this->Internals->AnimationNames.size())
     ? this->Internals->AnimationTimes[animationIndex]
     : this->Internals->GroupSkinDurations[animationIndex - this->Internals->AnimationNames.size()];
-  // F3D does not care about timesteps, only set time range
+
   timeRange[0] = times.front();
   // If single frame, keep animation duration = 0
   timeRange[1] = times.size() == 2 ? times.front() : times.back();
+
+  nbTimeSteps = static_cast<int>(times.size());
+  timeSteps->SetNumberOfTuples(times.size());
+
+  for (unsigned int i = 0; i < times.size(); ++i)
+  {
+    timeSteps->SetValue(i, times[i]);
+  }
   return true;
 }
