@@ -536,8 +536,7 @@ public:
   {
     if (this->EventLoopObserverId != -1)
     {
-      log::info(
-        "Interaction: event loop has already been started");
+      log::info("Interaction: event loop has already been started");
       return false;
     }
 
@@ -571,8 +570,7 @@ public:
   {
     if (this->EventLoopObserverId == -1)
     {
-      log::info(
-        "Interaction: event loop has not been started hence cannot be stopped");
+      log::info("Interaction: event loop has not been started hence cannot be stopped");
       return false;
     }
     this->VTKInteractor->RemoveObserver(this->EventLoopObserverId);

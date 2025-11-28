@@ -12,7 +12,10 @@ int TestSDKStartInteractor([[maybe_unused]] int argc, [[maybe_unused]] char* arg
   inter.start(0.1, [&inter]() { inter.stop(); });
 
   // Call start multiple times
-  inter.start(0.1, [&inter]() { inter.start(1, [&inter]() {}); inter.stop(); });
+  inter.start(0.1, [&inter]() {
+    inter.start(1, [&inter]() {});
+    inter.stop();
+  });
 
   // Call stop without loop running
   inter.stop();

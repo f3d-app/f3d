@@ -362,7 +362,7 @@ public:
   /**
    * Play a VTK interaction file.
    * Provided file path is used as is and file existence will be checked.
-   * If the event loop is not already running, it will be triggered every deltaTime in seconds, 
+   * If the event loop is not already running, it will be triggered every deltaTime in seconds,
    * and userCallBack will be called at the start of the event loop.
    */
   virtual bool playInteraction(const std::filesystem::path& file, double deltaTime = 1.0 / 30,
