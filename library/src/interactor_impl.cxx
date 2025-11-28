@@ -990,8 +990,9 @@ interactor& interactor_impl::initCommands()
       }
       this->Internals->Window.render();
     },
-    command_documentation_t{
-      "cycle_point_sprites", "cycle between the point sprite types (none,sphere,gaussian)" });
+    command_documentation_t{ "cycle_point_sprites",
+      "cycle between the point sprite types "
+      "(none,sphere,gaussian,sphere,circle,stddev,flow,bound,cross)" });
 
   this->addCommand(
     "roll_camera",

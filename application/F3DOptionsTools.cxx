@@ -116,6 +116,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
     { {"point-sprites", "o", R"(Select point sprites type ("none", "sphere", "gaussian"))", "<string>", "sphere" },
       {"point-sprites-type", "", "Point sprites type (deprecated)", "<sphere|gaussian>", ""},
       {"point-sprites-size", "", "Point sprites sphere size", "<size>", ""},
+      {"point-sprites-scene-scale", "", "Scale point sprites size by scene size", "<bool>", "1"},
       {"point-size", "", "Point size when showing vertices, model specified by default", "<size>", ""},
       {"line-width", "", "Line width when showing edges, model specified by default", "<width>", ""},
       {"backface-type", "", "Backface type, can be visible or hidden, model specified by default", "<visible|hidden>", ""},

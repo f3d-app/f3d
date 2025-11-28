@@ -218,8 +218,7 @@ void ExecFuncOnAllPolyDataUniforms(vtkActorCollection* actors, F&& func)
 
   while ((actor = actors->GetNextActor()))
   {
-    const vtkPolyDataMapper* mapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
-    if (mapper)
+    if (actor->GetMapper() && actor->GetMapper()->IsA("vtkPolyDataMapper"))
     {
       func(actor->GetShaderProperty()->GetVertexCustomUniforms());
     }
@@ -2132,11 +2131,12 @@ void vtkF3DRenderer::SetPointSpritesType(vtkF3DRenderer::SplatType type)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetPointSpritesSize(double size)
+void vtkF3DRenderer::SetPointSpritesSize(bool sceneScale, double size)
 {
-  if (this->PointSpritesSize != size)
+  if (this->PointSpritesSceneScale != sceneScale || this->PointSpritesSize != size)
   {
     this->PointSpritesSize = size;
+    this->PointSpritesSceneScale = sceneScale;
     this->PointSpritesConfigured = false;
   }
 }
@@ -2360,7 +2360,7 @@ void vtkF3DRenderer::ConfigurePointSprites()
   const vtkBoundingBox& bbox = this->Importer->GetGeometryBoundingBox();
 
   double scaleFactor = 1.0;
-  if (bbox.IsValid())
+  if (this->PointSpritesSceneScale && bbox.IsValid())
   {
     scaleFactor = this->PointSpritesSize * bbox.GetDiagonalLength() * 0.001;
   }
@@ -2373,16 +2373,16 @@ void vtkF3DRenderer::ConfigurePointSprites()
 #endif
 
     sprites.Mapper->EmissiveOff();
-    if (this->PointSpritesType == SplatType::GAUSSIAN)
-    {
-      sprites.Mapper->SetScaleFactor(1.0);
-      sprites.Mapper->SetSplatShaderCode(nullptr); // gaussian is the default VTK shader
-      sprites.Mapper->SetScaleArray("scale");
+    sprites.Mapper->SetScaleFactor(scaleFactor);
 
+    vtkPolyData* polyData = vtkPolyData::SafeDownCast(sprites.Mapper->GetInput());
+    if (polyData && polyData->GetPointData()->HasArray("scale") &&
+      polyData->GetPointData()->HasArray("rotation"))
+    {
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
       sprites.Mapper->AnisotropicOn();
-      sprites.Mapper->SetBoundScale(3.0);
       sprites.Mapper->SetRotationArray("rotation");
+      sprites.Mapper->SetScaleArray("scale");
 
       int* viewport = this->GetSize();
 
@@ -2390,23 +2390,23 @@ void vtkF3DRenderer::ConfigurePointSprites()
         0.3f / (viewport[1] * viewport[1]) };
       sprites.Mapper->SetLowpassMatrix(lowPass);
 #else
-      F3DLog::Print(F3DLog::Severity::Warning,
-        "Gaussian splatting selected but VTK <= 9.3 only supports isotropic gaussians");
+      F3DLog::Print(F3DLog::Severity::Warning, "VTK <= 9.3 only supports isotropic point sprites");
 #endif
-
-      sprites.Actor->ForceTranslucentOn();
     }
-    else
+
+    if (this->PointSpritesType == SplatType::GAUSSIAN)
     {
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
-      sprites.Mapper->AnisotropicOff();
-      sprites.Mapper->SetLowpassMatrix(0., 0., 0.);
-      sprites.Mapper->SetRotationArray(nullptr);
+      sprites.Mapper->SetBoundScale(3.0);
 #endif
-
-      sprites.Mapper->SetScaleFactor(scaleFactor);
-      sprites.Mapper->SetScaleArray(nullptr);
-
+      sprites.Mapper->SetSplatShaderCode(nullptr); // gaussian is the default VTK shader
+      sprites.Actor->ForceTranslucentOn();
+    }
+    else if (this->PointSpritesType == SplatType::SPHERE)
+    {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
+      sprites.Mapper->SetBoundScale(1.0);
+#endif
       sprites.Mapper->SetSplatShaderCode(
         "//VTK::Color::Impl\n"
         "float dist = dot(offsetVCVSOutput.xy, offsetVCVSOutput.xy);\n"
@@ -2416,6 +2416,75 @@ void vtkF3DRenderer::ConfigurePointSprites()
         "  float scale = (1.0 - dist);\n"
         "  ambientColor *= scale;\n"
         "  diffuseColor *= scale;\n"
+        "}\n");
+
+      sprites.Actor->ForceTranslucentOff();
+    }
+    else if (this->PointSpritesType == SplatType::CIRCLE)
+    {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
+      sprites.Mapper->SetBoundScale(1.1);
+#endif
+      sprites.Mapper->SetSplatShaderCode(
+        "//VTK::Color::Impl\n"
+        "float dist = dot(offsetVCVSOutput.xy, offsetVCVSOutput.xy);\n"
+        "if (dist > 1.21 || dist < 0.81) {\n"
+        "  discard;\n"
+        "}\n");
+
+      sprites.Actor->ForceTranslucentOff();
+    }
+    else if (this->PointSpritesType == SplatType::STD_DEV)
+    {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
+      sprites.Mapper->SetBoundScale(3.0);
+#endif
+      sprites.Mapper->SetSplatShaderCode(
+        "//VTK::Color::Impl\n"
+        "float dist2 = dot(offsetVCVSOutput.xy, offsetVCVSOutput.xy);\n"
+        "float val = mod(sqrt(dist2), 1.0);\n"
+        "if (dist2 > 9.0 || val < 0.9) {\n"
+        "  discard;\n"
+        "}\n");
+
+      sprites.Actor->ForceTranslucentOff();
+    }
+    else if (this->PointSpritesType == SplatType::FLOW)
+    {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
+      sprites.Mapper->SetBoundScale(2.0);
+#endif
+      sprites.Mapper->SetSplatShaderCode("//VTK::Color::Impl\n"
+                                         "if (abs(offsetVCVSOutput.y) > 0.1) {\n"
+                                         "  discard;\n"
+                                         "}\n");
+
+      sprites.Actor->ForceTranslucentOff();
+    }
+    else if (this->PointSpritesType == SplatType::BOUND)
+    {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
+      sprites.Mapper->SetBoundScale(3.0);
+#endif
+      sprites.Mapper->SetSplatShaderCode(
+        "//VTK::Color::Impl\n"
+        "float dist = dot(offsetVCVSOutput.xy, offsetVCVSOutput.xy);\n"
+        "if (abs(offsetVCVSOutput.x) < 2.9 && abs(offsetVCVSOutput.y) < 2.9) {\n"
+        "  discard;\n"
+        "}\n");
+
+      sprites.Actor->ForceTranslucentOff();
+    }
+    else if (this->PointSpritesType == SplatType::CROSS)
+    {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
+      sprites.Mapper->SetBoundScale(1.0);
+#endif
+      sprites.Mapper->SetSplatShaderCode(
+        "//VTK::Color::Impl\n"
+        "float dist = dot(offsetVCVSOutput.xy, offsetVCVSOutput.xy);\n"
+        "if (abs(offsetVCVSOutput.x) > 0.1 && abs(offsetVCVSOutput.y) > 0.1) {\n"
+        "  discard;\n"
         "}\n");
 
       sprites.Actor->ForceTranslucentOff();
