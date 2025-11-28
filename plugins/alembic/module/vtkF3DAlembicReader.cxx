@@ -403,7 +403,7 @@ public:
     {
       const auto [parent, ohead] = objects.top();
       objects.pop();
-      int numSamples;
+      int numSamples = 0;
       Alembic::Abc::TimeSamplingPtr ts;
       if (Alembic::AbcGeom::IXform::matches(ohead))
       {
