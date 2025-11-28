@@ -12,8 +12,6 @@
 #include <vector>
 /// @endcond
 
-#include "F3DNodeInfo.h"
-
 namespace f3d
 {
 /**
@@ -191,17 +189,6 @@ public:
    */
   [[nodiscard]] virtual std::vector<std::string> getAnimationNames() = 0;
 
-protected:
-  //! @cond
-  scene() = default;
-  // virtual ~scene() = default;
-  scene(const scene& opt) = delete;
-  scene(scene&& opt) = delete;
-  scene& operator=(const scene& opt) = delete;
-  scene& operator=(scene&& opt) = delete;
-  //! @endcond
-
-public:
   /**
    * Get the scene hierarchy nodes for display and control.
    * Returns a vector of NodeInfo structures representing the actors in the scene.
