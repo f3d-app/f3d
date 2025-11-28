@@ -67,19 +67,9 @@ KeyPressEvent 199 142 0 9 1 Tab 0
 CharEvent 199 142 0 9 1 Tab 0
 KeyReleaseEvent 199 142 0 9 1 Tab 0
 
-# S
-KeyPressEvent 199 142 0 115 1 s 0
-CharEvent 199 142 0 115 1 s 0
-KeyReleaseEvent 199 142 0 115 1 s 0
-
 # Tab
 KeyPressEvent 199 142 0 9 1 Tab 0
 CharEvent 199 142 0 9 1 Tab 0
 KeyReleaseEvent 199 142 0 9 1 Tab 0
-
-# Enter
-KeyPressEvent 199 142 0 13 1 Return 0
-CharEvent 199 142 0 13 1 Return 0
-KeyReleaseEvent 199 142 0 13 1 Return 0
 
 TimerEvent 351 169 0 0 0 0 0
