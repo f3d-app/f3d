@@ -408,7 +408,7 @@ public:
       if (Alembic::AbcGeom::IXform::matches(ohead))
       {
         const Alembic::AbcGeom::IXform xForm(parent, ohead.getName());
-        const Alembic::AbcGeom::IXformSchema schema = xForm.getSchema();
+        const Alembic::AbcGeom::IXformSchema& schema = xForm.getSchema();
         ts = schema.getTimeSampling();
         numSamples = schema.getNumSamples();
         for (size_t i = 0; i < xForm.getNumChildren(); ++i)
@@ -419,7 +419,7 @@ public:
       else if (Alembic::AbcGeom::IPolyMesh::matches(ohead))
       {
         const Alembic::AbcGeom::IPolyMesh polymesh(parent, ohead.getName());
-        const Alembic::AbcGeom::IPolyMeshSchema schema = polymesh.getSchema();
+        const Alembic::AbcGeom::IPolyMeshSchema& schema = polymesh.getSchema();
         ts = schema.getTimeSampling();
         numSamples = schema.getNumSamples();
       }
