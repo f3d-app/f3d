@@ -11,8 +11,6 @@
 #include <vector>
 /// @endcond
 
-#include "F3DNodeInfo.h"
-
 namespace f3d
 {
 /**
@@ -149,13 +147,6 @@ public:
    * Return the number of animations available in the currently loaded files.
    */
   [[nodiscard]] virtual unsigned int availableAnimations() const = 0;
-
-  /**
-   * Get the scene hierarchy nodes for display and control.
-   * Returns a vector of NodeInfo structures representing the actors in the scene.
-   * This is used to populate the scene hierarchy UI widget.
-   */
-  virtual std::vector<NodeInfo> GetSceneHierarchyNodes() = 0;
 
 protected:
   //! @cond
