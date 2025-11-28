@@ -19,7 +19,6 @@ list(APPEND libf3dSDKTests_list
      TestSDKRenderFinalShader.cxx
      TestSDKScene.cxx
      TestSDKSceneFromMemory.cxx
-     TestSDKStartInteractor.cxx
      TestSDKUtils.cxx
      TestSDKUI.cxx
      TestSDKWindowAuto.cxx
@@ -61,8 +60,10 @@ configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestSDKInteractorDropFullSc
 
 set(libf3dSDKTests_link_libs "")
 
-# External window tests
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240914)
+  list(APPEND libf3dSDKTests_list TestSDKStartInteractor.cxx)
+
+  # External window tests
   option(F3D_TESTING_ENABLE_EXTERNAL_GLFW "Test external GLFW" OFF)
   option(F3D_TESTING_ENABLE_EXTERNAL_QT "Test external QT" OFF)
 
