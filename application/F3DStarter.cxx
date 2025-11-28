@@ -1903,8 +1903,6 @@ void F3DStarter::LoadFileGroupInternal(
   options.ui.drop_zone.enable = options.ui.drop_zone.show_logo =
     this->Internals->LoadedFiles.empty();
   options.ui.filename_info = filenameInfo;
-  auto hierarchy = scene.GetSceneHierarchyNodes(); // changed to NodeInfo vector
-  this->Internals->Engine->getWindow().SetSceneHierarchy(hierarchy);
 }
 
 //----------------------------------------------------------------------------
