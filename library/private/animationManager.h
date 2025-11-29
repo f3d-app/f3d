@@ -6,6 +6,7 @@
 #ifndef f3d_animationManager_h
 #define f3d_animationManager_h
 
+#include <vtkDoubleArray.h>
 #include <vtkNew.h>
 #include <vtkProgressBarWidget.h>
 #include <vtkSmartPointer.h>
@@ -86,9 +87,24 @@ public:
   void Tick(double deltaTime);
 
   /**
+   * Set current animation to next frame
+   */
+  void NextFrame();
+
+  /**
+   * Set current animation to previous frame
+   */
+  void PreviousFrame();
+
+  /**
    * Load animation at provided time value
    */
   bool LoadAtTime(double timeValue);
+
+  /**
+   * Load animation to a specific delta from current frame
+   */
+  bool LoadAtFrame(int frame);
 
   /**
    * Return a pair containing the current time range values
@@ -138,6 +154,7 @@ private:
   int AvailAnimations = 0;
 
   std::optional<std::vector<int>> PreparedAnimationIndices;
+  std::optional<vtkSmartPointer<vtkDoubleArray>> AnimationTimeSteps;
   double TimeRange[2] = { 0.0, 0.0 };
   bool Playing = false;
   double CurrentTime = 0;

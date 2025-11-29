@@ -89,6 +89,7 @@ void animationManager::Initialize()
 
   // Reset animation indices before updating
   this->PreparedAnimationIndices.reset();
+  this->AnimationTimeSteps.reset();
   this->PrepareForAnimationIndices();
 
   if (this->AvailAnimations == 0)
@@ -247,6 +248,55 @@ bool animationManager::LoadAtTime(double timeValue)
     this->Interactor->UpdateRendererAfterInteraction();
   }
   return true;
+}
+
+bool animationManager::LoadAtFrame(int frame)
+{
+  if (!this->PreparedAnimationIndices.has_value())
+  {
+    return false;
+  }
+
+  const double tolerance = 1e-6;
+  int nbTimeSteps;
+  vtkSmartPointer<vtkDoubleArray> timeSteps = vtkSmartPointer<vtkDoubleArray>::New();
+
+  const vtkIdType currentAnimation = this->PreparedAnimationIndices.value()[0];
+  if (!this->AnimationTimeSteps.has_value())
+  {
+    this->Importer->GetTemporalInformation(
+      currentAnimation, 1 / this->DeltaTime, nbTimeSteps, this->TimeRange, timeSteps);
+    this->AnimationTimeSteps = timeSteps;
+  }
+
+  timeSteps = this->AnimationTimeSteps.value();
+
+  auto it = std::find_if(timeSteps->Begin(), timeSteps->End(),
+    [&](double step) { return std::abs(step - this->CurrentTime) < tolerance; });
+
+  if (it == timeSteps->End())
+  {
+    return false;
+  }
+
+  this->CurrentTime = std::clamp(*(it + frame), this->TimeRange[0], this->TimeRange[1]);
+  return this->LoadAtTime(this->CurrentTime);
+}
+
+void animationManager::NextFrame()
+{
+  if (this->LoadAtFrame(1))
+  {
+    this->Window.render();
+  }
+}
+
+void animationManager::PreviousFrame()
+{
+  if (this->LoadAtFrame(-1))
+  {
+    this->Window.render();
+  }
 }
 
 // ---------------------------------------------------------------------------------
