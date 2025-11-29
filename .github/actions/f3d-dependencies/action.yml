@@ -116,3 +116,11 @@ runs:
         cpu: ${{inputs.cpu}}
         version: ${{inputs.webp_version}}
         global_cache_index: ${{inputs.global_cache_index}}
+
+    - name: Install clip dependency
+      if: inputs.clip_version != ''
+      uses: ./source/.github/actions/clip-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        version: ${{inputs.clip_version}}
+        global_cache_index: ${{inputs.global_cache_index}}
