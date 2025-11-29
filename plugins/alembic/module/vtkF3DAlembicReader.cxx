@@ -24,6 +24,9 @@
 #pragma warning(pop)
 #endif
 
+#include <stack>
+#include <tuple>
+
 using IndicesContainer = std::vector<int>;
 using V3fContainer = std::vector<Alembic::Abc::V3f>;
 using AttributesContainer = std::map<std::string, V3fContainer>;
@@ -240,7 +243,7 @@ class vtkF3DAlembicReader::vtkInternals
 
 public:
   vtkSmartPointer<vtkPolyData> ProcessIPolyMesh(
-    const Alembic::AbcGeom::IPolyMesh& pmesh, double time)
+    const Alembic::AbcGeom::IPolyMesh& pmesh, double time, const Alembic::Abc::M44d& matrix)
   {
     vtkNew<vtkPolyData> polydata;
     IntermediateGeometry originalData;
@@ -263,8 +266,8 @@ public:
         V3fContainer pV3F;
         for (size_t pIndex = 0; pIndex < positions->size(); pIndex++)
         {
-          pV3F.emplace_back(
-            positions->get()[pIndex].x, positions->get()[pIndex].y, positions->get()[pIndex].z);
+          const Alembic::Abc::V3f tp = positions->get()[pIndex] * matrix;
+          pV3F.emplace_back(tp.x, tp.y, tp.z);
         }
         originalData.Attributes.insert(AttributesContainer::value_type("P", pV3F));
 
@@ -344,45 +347,44 @@ public:
     return polydata;
   }
 
-  template<typename F>
-  void IterateIObject(
-    F func, const Alembic::Abc::IObject& parent, const Alembic::Abc::ObjectHeader& ohead)
-  {
-    // Set this if we should continue traversing
-    Alembic::Abc::IObject nextParentObject;
-
-    if (Alembic::AbcGeom::IXform::matches(ohead))
-    {
-      Alembic::AbcGeom::IXform xForm(parent, ohead.getName());
-      nextParentObject = xForm;
-    }
-    else if (Alembic::AbcGeom::IPolyMesh::matches(ohead))
-    {
-      Alembic::AbcGeom::IPolyMesh polymesh(parent, ohead.getName());
-      func(polymesh);
-      nextParentObject = polymesh;
-    }
-
-    // Recursion
-    if (nextParentObject.valid())
-    {
-      for (size_t i = 0; i < nextParentObject.getNumChildren(); ++i)
-      {
-        this->IterateIObject(func, nextParentObject, nextParentObject.getChildHeader(i));
-      }
-    }
-  }
-
   void ImportRoot(vtkAppendPolyData* append, double time)
   {
-    Alembic::Abc::IObject top = this->Archive.getTop();
+    const Alembic::Abc::IObject top = this->Archive.getTop();
+    const Alembic::AbcGeom::ISampleSelector selector(time);
+    Alembic::Abc::M44d identity;
+    identity.makeIdentity();
 
-    auto appendMesh = [&](const Alembic::AbcGeom::IPolyMesh& polymesh)
-    { append->AddInputData(ProcessIPolyMesh(polymesh, time)); };
+    std::stack<std::tuple<const Alembic::Abc::IObject, const Alembic::Abc::ObjectHeader,
+      const Alembic::Abc::M44d>>
+      objects;
 
     for (size_t i = 0; i < top.getNumChildren(); ++i)
     {
-      this->IterateIObject(appendMesh, top, top.getChildHeader(i));
+      objects.emplace(std::make_tuple(top, top.getChildHeader(i), identity));
+    }
+
+    while (!objects.empty())
+    {
+      const auto& [parent, ohead, matrix] = objects.top();
+      if (Alembic::AbcGeom::IPolyMesh::matches(ohead))
+      {
+        const Alembic::AbcGeom::IPolyMesh polymesh(parent, ohead.getName());
+        append->AddInputData(this->ProcessIPolyMesh(polymesh, time, matrix));
+        objects.pop();
+      }
+      else if (Alembic::AbcGeom::IXform::matches(ohead))
+      {
+        const Alembic::AbcGeom::IXform xForm(parent, ohead.getName());
+        const Alembic::AbcGeom::IXformSchema& xFormSchema = xForm.getSchema();
+        Alembic::AbcGeom::XformSample xFormSamp;
+        xFormSchema.get(xFormSamp, selector);
+        const Alembic::Abc::M44d xFormMatrix = matrix * xFormSamp.getMatrix();
+        objects.pop();
+        for (size_t i = 0; i < xForm.getNumChildren(); ++i)
+        {
+          objects.emplace(std::make_tuple(xForm, xForm.getChildHeader(i), xFormMatrix));
+        }
+      }
     }
   }
 
@@ -390,15 +392,43 @@ public:
   {
     Alembic::Abc::IObject top = this->Archive.getTop();
 
-    auto computeRange = [&](const Alembic::AbcGeom::IPolyMesh& polymesh)
+    std::stack<std::pair<const Alembic::Abc::IObject, const Alembic::Abc::ObjectHeader>> objects;
+
+    for (size_t i = 0; i < top.getNumChildren(); ++i)
     {
-      Alembic::Abc::TimeSamplingPtr ts = polymesh.getSchema().getTimeSampling();
+      objects.emplace(std::make_pair(top, top.getChildHeader(i)));
+    }
+
+    while (!objects.empty())
+    {
+      const auto& [parent, ohead] = objects.top();
+      int numSamples = 0;
+      Alembic::Abc::TimeSamplingPtr ts;
+      if (Alembic::AbcGeom::IXform::matches(ohead))
+      {
+        const Alembic::AbcGeom::IXform xForm(parent, ohead.getName());
+        const Alembic::AbcGeom::IXformSchema& schema = xForm.getSchema();
+        ts = schema.getTimeSampling();
+        numSamples = static_cast<int>(schema.getNumSamples());
+        objects.pop();
+        for (size_t i = 0; i < xForm.getNumChildren(); ++i)
+        {
+          objects.emplace(std::make_pair(xForm, xForm.getChildHeader(i)));
+        }
+      }
+      else if (Alembic::AbcGeom::IPolyMesh::matches(ohead))
+      {
+        const Alembic::AbcGeom::IPolyMesh polymesh(parent, ohead.getName());
+        const Alembic::AbcGeom::IPolyMeshSchema& schema = polymesh.getSchema();
+        ts = schema.getTimeSampling();
+        numSamples = static_cast<int>(schema.getNumSamples());
+        objects.pop();
+      }
 
       if (ts->getTimeSamplingType().isUniform())
       {
         double min = ts->getSampleTime(0);
-        double max = min +
-          (polymesh.getSchema().getNumSamples() - 1) * ts->getTimeSamplingType().getTimePerCycle();
+        double max = min + (numSamples - 1) * ts->getTimeSamplingType().getTimePerCycle();
         start = std::min(start, min);
         end = std::max(end, max);
       }
@@ -408,11 +438,6 @@ public:
         start = std::min(start, times.front());
         end = std::max(end, times.back());
       }
-    };
-
-    for (size_t i = 0; i < top.getNumChildren(); ++i)
-    {
-      this->IterateIObject(computeRange, top, top.getChildHeader(i));
     }
   }
 
