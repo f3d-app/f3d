@@ -20,6 +20,7 @@
 #include <vtkVersion.h>
 
 #include <filesystem>
+#include <functional>
 #include <map>
 #include <optional>
 
@@ -93,6 +94,7 @@ public:
   void ShowDropZoneLogo(bool show);
   void ShowHDRISkybox(bool show);
   void ShowArmature(bool show);
+  void ShowSceneHierarchy(bool show);
   ///@}
 
   using vtkOpenGLRenderer::SetBackground;
@@ -111,6 +113,7 @@ public:
   void SetFilenameInfo(const std::string& info);
   void SetDropZoneInfo(const std::string& info);
   void SetDropZoneBinds(const std::vector<std::pair<std::string, std::string>>& dropZoneBinds);
+  void SetHierarchy(const std::vector<NodeInfo>& hierarchy);
   void SetGridAbsolute(bool absolute);
   void SetGridUnitSquare(const std::optional<double>& unitSquare);
   void SetGridSubdivisions(int subdivisions);
@@ -464,6 +467,11 @@ public:
    */
   void SetConsoleBadgeEnabled(bool enabled);
 
+  /**
+   * Set a callback to request a render safely from within the render loop
+   */
+  void SetRenderRequestCallback(std::function<void()> callback);
+
 private:
   vtkF3DRenderer();
   ~vtkF3DRenderer() override;
@@ -629,7 +637,11 @@ private:
   bool TimerVisible = false;
   bool FilenameVisible = false;
   bool MetaDataVisible = false;
+<<<<<<< HEAD
   bool HDRIFilenameVisible = false;
+=======
+  bool SceneHierarchyVisible = false;
+>>>>>>> aa51b800 (Add key bind for showing the hierarchy)
   bool CheatSheetVisible = false;
   bool ConsoleVisible = false;
   bool MinimalConsoleVisible = false;

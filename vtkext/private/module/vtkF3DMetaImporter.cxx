@@ -6,7 +6,10 @@
 #include <vtkActorCollection.h>
 #include <vtkCallbackCommand.h>
 #include <vtkCamera.h>
+#include <vtkDataAssembly.h>
+#include <vtkDataSet.h>
 #include <vtkImageData.h>
+#include <vtkMapper.h>
 #include <vtkObjectFactory.h>
 #include <vtkPolyData.h>
 #include <vtkRenderWindow.h>
@@ -15,9 +18,13 @@
 #include <vtkVersion.h>
 
 #include <cassert>
+#include <functional>
 #include <iostream>
+#include <map>
 #include <numeric>
 #include <vector>
+
+#include "vtkF3DGLTFImporter.h"
 
 //----------------------------------------------------------------------------
 struct vtkF3DMetaImporter::Internals
@@ -669,4 +676,118 @@ F3DColoringInfoHandler& vtkF3DMetaImporter::GetColoringInfoHandler()
 vtkMTimeType vtkF3DMetaImporter::GetUpdateMTime()
 {
   return this->Pimpl->UpdateTime.GetMTime();
+}
+
+//----------------------------------------------------------------------------
+vtkDataAssembly* vtkF3DMetaImporter::GetSceneHierarchy()
+{
+  for (const auto& importerPair : this->Pimpl->Importers)
+  {
+    vtkF3DGLTFImporter* gltfImporter = vtkF3DGLTFImporter::SafeDownCast(importerPair.Importer);
+    if (gltfImporter)
+    {
+      return gltfImporter->GetSceneHierarchy();
+    }
+  }
+  return nullptr;
+}
+
+//----------------------------------------------------------------------------
+std::vector<NodeInfo> vtkF3DMetaImporter::GetActorHierarchy()
+{
+  std::vector<NodeInfo> nodes;
+
+  // Get scene hierarchy for GLTF files (where names are stored)
+  vtkDataAssembly* hierarchy = this->GetSceneHierarchy();
+  std::map<int, std::string> actorIndexNameMap;
+  
+  // If we have a scene hierarchy (GLTF file), extract names from it
+  if (hierarchy)
+  {
+    // Build a map of actor indices to their names from the hierarchy
+    // Since GLTF doesn't store explicit actor_id attributes, we map leaf mesh nodes sequentially
+    int meshCounter = 0;
+    std::function<void(int)> traverseHierarchy = [&](int nodeId) {
+      const char* nodeName = hierarchy->GetNodeName(nodeId);
+      std::vector<int> children = hierarchy->GetChildNodes(nodeId, false);
+      
+      // If this is a leaf node (no children) and not Camera/Light, it's likely a mesh
+      if (children.empty() && nodeName)
+      {
+        std::string nameStr(nodeName);
+        if (nameStr != "Camera" && nameStr != "Light" && nameStr != "assembly" && nameStr != "root")
+        {
+          // This is a mesh leaf node - map it to the next actor index
+          actorIndexNameMap[meshCounter] = nodeName;
+          meshCounter++;
+        }
+      }
+      
+      // Traverse children
+      for (int childId : children)
+      {
+        traverseHierarchy(childId);
+      }
+    };
+    
+    traverseHierarchy(0); // Start from root
+  }
+
+  // Return only the original imported actors, not internal F3D rendering actors
+  vtkCollectionSimpleIterator ait;
+  this->ActorCollection->InitTraversal(ait);
+  int actorIndex = 0;
+  while (vtkActor* actor = this->ActorCollection->GetNextActor(ait))
+  {
+    if (!actor)
+    {
+      continue;
+    }
+
+    NodeInfo node;
+    node.prop = actor;
+
+    // Try to get a meaningful name for the actor
+    // Priority: DataAssembly (GLTF hierarchy) > Actor ObjectName > Mapper input name > Generic
+    std::string actorName;
+
+    // First, check if we have a name from the GLTF scene hierarchy
+    auto it = actorIndexNameMap.find(actorIndex);
+    if (it != actorIndexNameMap.end())
+    {
+      actorName = it->second;
+    }
+    // Second, try to use the actor's ObjectName
+    else
+    {
+      std::string objectName = actor->GetObjectName();
+      if (!objectName.empty())
+      {
+        actorName = objectName;
+      }
+      // Third, try to get name from mapper's input
+      else if (actor->GetMapper() && actor->GetMapper()->GetInput())
+      {
+        vtkDataSet* input = actor->GetMapper()->GetInput();
+        std::string inputName = input->GetObjectName();
+        if (!inputName.empty())
+        {
+          actorName = inputName;
+        }
+      }
+    }
+
+    // Last resort: use a generic name with index
+    if (actorName.empty())
+    {
+      actorName = "Actor " + std::to_string(actorIndex);
+    }
+
+    node.name = actorName;
+    node.displayName = actorName;
+    nodes.push_back(node);
+    actorIndex++;
+  }
+
+  return nodes;
 }
