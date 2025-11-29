@@ -401,8 +401,7 @@ public:
 
     while (!objects.empty())
     {
-      const auto [parent, ohead] = objects.top();
-      objects.pop();
+      const auto& [parent, ohead] = objects.top();
       int numSamples = 0;
       Alembic::Abc::TimeSamplingPtr ts;
       if (Alembic::AbcGeom::IXform::matches(ohead))
@@ -411,6 +410,7 @@ public:
         const Alembic::AbcGeom::IXformSchema& schema = xForm.getSchema();
         ts = schema.getTimeSampling();
         numSamples = static_cast<int>(schema.getNumSamples());
+        objects.pop();
         for (size_t i = 0; i < xForm.getNumChildren(); ++i)
         {
           objects.emplace(std::make_pair(xForm, xForm.getChildHeader(i)));
@@ -422,6 +422,7 @@ public:
         const Alembic::AbcGeom::IPolyMeshSchema& schema = polymesh.getSchema();
         ts = schema.getTimeSampling();
         numSamples = static_cast<int>(schema.getNumSamples());
+        objects.pop();
       }
 
       if (ts->getTimeSamplingType().isUniform())
