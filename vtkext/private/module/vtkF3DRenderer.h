@@ -14,6 +14,7 @@
 #include "vtkF3DMetaImporter.h"
 #include "vtkF3DUIActor.h"
 
+#include <vtkCallbackCommand.h>
 #include <vtkLight.h>
 #include <vtkOpenGLRenderer.h>
 #include <vtkVersion.h>
@@ -30,6 +31,8 @@ class vtkCornerAnnotation;
 class vtkGridAxesActor3D;
 class vtkImageReader2;
 class vtkOrientationMarkerWidget;
+class vtkCameraOrientationRepresentation;
+class vtkCameraOrientationWidget;
 class vtkScalarBarActor;
 class vtkSkybox;
 class vtkTextActor;
@@ -112,8 +115,13 @@ public:
   void SetGridUnitSquare(const std::optional<double>& unitSquare);
   void SetGridSubdivisions(int subdivisions);
   void SetGridColor(const std::vector<double>& color);
-  void SetBackdropOpacity(const double backdropOpacity);
   ///@}
+
+  /**
+   * Set the backdrop opacity
+   * Should be called before ShowAxis
+   */
+  void SetBackdropOpacity(const double backdropOpacity);
 
   ///@{
   /**
@@ -572,7 +580,16 @@ private:
    */
   void ConfigurePointSprites();
 
+  /**
+   * Updates the axis widget size based on the window size
+   */
+  void UpdateAxisWidgetSize();
+
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
+  vtkSmartPointer<vtkCameraOrientationWidget> ModernAxisWidget;
+  vtkSmartPointer<vtkCameraOrientationRepresentation> ModernAxisRepresentation;
+  vtkSmartPointer<vtkCallbackCommand> ModernAxisWidgetResizeCallback;
+  double ModernAxisBackdropOpacity = 0.0;
 
   // Does vtk version support GridAxesActor
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)

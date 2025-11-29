@@ -17,6 +17,8 @@
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
 #include <vtkCamera.h>
+#include <vtkCameraOrientationRepresentation.h>
+#include <vtkCameraOrientationWidget.h>
 #include <vtkCellData.h>
 #include <vtkCornerAnnotation.h>
 #include <vtkCullerCollection.h>
@@ -68,6 +70,10 @@
 #include <vtksys/FStream.hxx>
 #include <vtksys/MD5.h>
 #include <vtksys/SystemTools.hxx>
+
+#if F3D_MODULE_UI
+#include "F3DStyle.h"
+#endif
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240203)
 #include "vtkF3DPointSplatMapper.h"
@@ -322,6 +328,20 @@ void vtkF3DRenderer::Initialize()
 
   // create ImGui context if F3D_MODULE_UI is enabled
   this->UIActor->Initialize(vtkOpenGLRenderWindow::SafeDownCast(this->RenderWindow));
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251001)
+  // create a window resize callback for axis
+  this->ModernAxisWidgetResizeCallback = vtkSmartPointer<vtkCallbackCommand>::New();
+  this->ModernAxisWidgetResizeCallback->SetClientData(this);
+  this->ModernAxisWidgetResizeCallback->SetCallback(
+    [](vtkObject* const, unsigned long, void* clientData, void*)
+    {
+      vtkF3DRenderer* self = static_cast<vtkF3DRenderer*>(clientData);
+      self->UpdateAxisWidgetSize();
+    });
+  this->RenderWindow->AddObserver(
+    vtkCommand::WindowResizeEvent, this->ModernAxisWidgetResizeCallback);
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -552,6 +572,20 @@ std::string vtkF3DRenderer::GetSceneDescription()
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::UpdateAxisWidgetSize()
+{
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251001)
+  if (this->ModernAxisRepresentation)
+  {
+    int* size = this->GetSize();
+    // Maintain the axis widget size proportional (15%) to the shortest viewport dimension.
+    int widgetSize = static_cast<int>(std::min(size[0], size[1]) * 0.15);
+    this->ModernAxisRepresentation->SetSize(widgetSize, widgetSize);
+  }
+#endif
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowAxis(bool show)
 {
   // Dynamic visible axis
@@ -561,9 +595,43 @@ void vtkF3DRenderer::ShowAxis(bool show)
   // care when destructing this renderer
   if (this->AxisVisible != show)
   {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251001)
+    this->ModernAxisWidget = nullptr;
+    this->ModernAxisRepresentation = nullptr;
+#else
     this->AxisWidget = nullptr;
+#endif
     if (show)
     {
+      // Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251001)
+      this->ModernAxisWidget = vtkSmartPointer<vtkCameraOrientationWidget>::New();
+      this->ModernAxisRepresentation = vtkSmartPointer<vtkCameraOrientationRepresentation>::New();
+      this->ModernAxisRepresentation->SetRenderer(this);
+      this->ModernAxisRepresentation->AnchorToLowerRight();
+      this->ModernAxisRepresentation->ContainerVisibilityOn();
+
+      // Closest colors to red, green, blue in OKHSL space at 95% saturation and 50% lightness
+      this->ModernAxisRepresentation->SetXAxisColor(0.841107, 0.16327, 0.120593);
+      this->ModernAxisRepresentation->SetYAxisColor(0.19516, 0.553311, 0.174);
+      this->ModernAxisRepresentation->SetZAxisColor(0.127357, 0.429147, 0.937383);
+
+#if F3D_MODULE_UI
+      auto containerProperty = this->ModernAxisRepresentation->GetContainerProperty();
+      containerProperty->SetOpacity(this->ModernAxisBackdropOpacity);
+      const auto [r, g, b] = F3DStyle::GetF3DBlack();
+      containerProperty->SetColor(r, g, b);
+#endif
+
+      this->ModernAxisWidget->SetRepresentation(this->ModernAxisRepresentation);
+
+      this->ModernAxisWidget->SetParentRenderer(this);
+      this->ModernAxisWidget->SetKeyPressActivation(false);
+      this->ModernAxisWidget->SetProcessEvents(false);
+      this->ModernAxisWidget->On();
+
+      this->UpdateAxisWidgetSize();
+#else
       assert(this->RenderWindow->GetInteractor());
       vtkNew<vtkAxesActor> axes;
       this->AxisWidget = vtkSmartPointer<vtkOrientationMarkerWidget>::New();
@@ -573,6 +641,7 @@ void vtkF3DRenderer::ShowAxis(bool show)
       this->AxisWidget->On();
       this->AxisWidget->InteractiveOff();
       this->AxisWidget->SetKeyPressActivation(false);
+#endif
     }
 
     this->AxisVisible = show;
@@ -1416,6 +1485,8 @@ void vtkF3DRenderer::SetFontScale(const double fontScale)
 void vtkF3DRenderer::SetBackdropOpacity(const double backdropOpacity)
 {
   this->UIActor->SetBackdropOpacity(backdropOpacity);
+  // Adjust axis opacity to visually match ImGui background (VTK appears darker)
+  this->ModernAxisBackdropOpacity = backdropOpacity - 0.3;
 }
 
 //----------------------------------------------------------------------------

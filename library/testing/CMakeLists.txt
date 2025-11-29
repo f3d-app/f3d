@@ -37,11 +37,17 @@ if(F3D_MODULE_UI)
     TestSDKDynamicFontFile.cxx
     TestSDKDynamicHDRI.cxx
     TestSDKDynamicProperties.cxx
-    TestSDKInteractorCallBack.cxx
     TestSDKInteractorDocumentation.cxx
     TestSDKMultiOptions.cxx
     TestSDKTriggerInteractions.cxx
     )
+
+  # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
+    list(APPEND libf3dSDKTests_list
+      TestSDKInteractorCallBack.cxx
+      )
+  endif()
 endif()
 
 # Invalid scene codepath needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11287
@@ -72,9 +78,12 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240914)
     list(APPEND libf3dSDKTests_link_libs glfw)
   endif()
   if(F3D_TESTING_ENABLE_EXTERNAL_QT)
-    find_package(Qt5 COMPONENTS OpenGL REQUIRED)
-    list(APPEND libf3dSDKTests_list TestSDKExternalWindowQT.cxx)
-    list(APPEND libf3dSDKTests_link_libs Qt5::OpenGL)
+    # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
+    if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
+      find_package(Qt5 COMPONENTS OpenGL REQUIRED)
+      list(APPEND libf3dSDKTests_list TestSDKExternalWindowQT.cxx)
+      list(APPEND libf3dSDKTests_link_libs Qt5::OpenGL)
+    endif()
   endif()
   if(F3D_TESTING_ENABLE_OSMESA_TESTS)
     find_library(OSMesa_LIB OSMesa REQUIRED)
@@ -170,7 +179,11 @@ if(F3D_MODULE_UI)
 endif()
 
 if(F3D_MODULE_UI AND NOT F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS)
-  set_tests_properties(libf3d::TestSDKInteractorCallBack PROPERTIES DISABLED ON)
+  # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
+    set_tests_properties(libf3d::TestSDKInteractorCallBack PROPERTIES DISABLED ON)
+  endif()
+
   set_tests_properties(libf3d::TestSDKTriggerInteractions PROPERTIES DISABLED ON)
 endif()
 

@@ -433,6 +433,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->ShowMinimalConsole(opt.ui.minimal_console);
   renderer->ShowDropZone(opt.ui.drop_zone.enable);
   renderer->ShowDropZoneLogo(opt.ui.drop_zone.show_logo);
+  renderer->SetBackdropOpacity(opt.ui.backdrop.opacity);
 
   if (this->Internals->Interactor)
   {
@@ -576,7 +577,6 @@ void window_impl::UpdateDynamicOptions()
 
   renderer->SetFontFile(opt.ui.font_file);
   renderer->SetFontScale(opt.ui.scale);
-  renderer->SetBackdropOpacity(opt.ui.backdrop.opacity);
 
   renderer->SetGridUnitSquare(opt.render.grid.unit);
   renderer->SetGridSubdivisions(opt.render.grid.subdivisions);
