@@ -534,7 +534,7 @@ void window_impl::UpdateDynamicOptions()
     else
     {
       log::warn(opt.render.effect.antialiasing.mode,
-        R"( is an invalid antialiasing mode. Valid modes are: "fxaa", "ssaa", "taa)");
+        R"( is an invalid antialiasing mode. Valid modes are: "fxaa", "ssaa", "taa")");
     }
   }
 
