@@ -532,8 +532,14 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  void StartEventLoop(double deltaTime, std::function<void()> userCallBack)
+  bool StartEventLoop(double deltaTime, std::function<void()> userCallBack)
   {
+    if (this->EventLoopObserverId != -1)
+    {
+      log::info("Interaction: event loop has already been started");
+      return false;
+    }
+
     // Trigger a render to ensure Window is ready to be configured
     this->Window.render();
 
@@ -556,20 +562,32 @@ public:
     this->EventLoopObserverId =
       this->VTKInteractor->AddObserver(vtkCommand::TimerEvent, timerCallBack);
     timerCallBack->SetClientData(this);
+    return true;
   }
 
   //----------------------------------------------------------------------------
-  void StopEventLoop()
+  bool StopEventLoop()
   {
+    if (this->EventLoopObserverId == -1)
+    {
+      log::info("Interaction: event loop has not been started hence cannot be stopped");
+      return false;
+    }
     this->VTKInteractor->RemoveObserver(this->EventLoopObserverId);
     this->VTKInteractor->DestroyTimer(this->EventLoopTimerId);
     this->EventLoopObserverId = -1;
     this->EventLoopTimerId = 0;
+    return true;
   }
 
   //----------------------------------------------------------------------------
   void EventLoop(double deltaTime)
   {
+    if (deltaTime <= 0)
+    {
+      log::error("Interaction: delta time should be > 0");
+      return;
+    }
     if (this->StopRequested)
     {
       this->Interactor.stop();
@@ -1880,11 +1898,14 @@ bool interactor_impl::playInteraction(
     this->Internals->Recorder->Off();
     this->Internals->Recorder->Clear();
 
-    this->Internals->StartEventLoop(loopTime, std::move(userCallBack));
+    bool loop = this->Internals->StartEventLoop(loopTime, std::move(userCallBack));
     this->Internals->Recorder->SetFileName(file.string().c_str());
     this->Internals->Recorder->Play();
 
-    this->Internals->StopEventLoop();
+    if (loop)
+    {
+      this->Internals->StopEventLoop();
+    }
   }
   catch (const fs::filesystem_error& ex)
   {
@@ -1940,16 +1961,20 @@ bool interactor_impl::recordInteraction(const fs::path& file)
 //----------------------------------------------------------------------------
 interactor& interactor_impl::start(double loopTime, std::function<void()> userCallBack)
 {
-  this->Internals->StartEventLoop(loopTime, std::move(userCallBack));
-  this->Internals->VTKInteractor->Start();
+  if (this->Internals->StartEventLoop(loopTime, std::move(userCallBack)))
+  {
+    this->Internals->VTKInteractor->Start();
+  }
   return *this;
 }
 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::stop()
 {
-  this->Internals->StopEventLoop();
-  this->Internals->VTKInteractor->ExitCallback();
+  if (this->Internals->StopEventLoop())
+  {
+    this->Internals->VTKInteractor->ExitCallback();
+  }
   return *this;
 }
 
