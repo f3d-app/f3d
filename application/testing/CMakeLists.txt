@@ -558,6 +558,7 @@ f3d_test(NAME TestInteractionAnimationSlow DATA f3d.glb ARGS --animation-progres
 f3d_test(NAME TestInteractionAnimationFrameRate DATA f3d.glb ARGS --animation-progress --frame-rate=1 INTERACTION)#Space;Wait;Space;
 f3d_test(NAME TestInteractionAnimationCameraMovement DATA CameraAnimated.glb ARGS --camera-index=0 --animation-progress INTERACTION)#Space;MouseMovement;Space;
 f3d_test(NAME TestInteractionAnimationInvert DATA f3d.glb ARGS --animation-speed-factor=-1 --animation-progress INTERACTION)#Space;Wait;Space;
+f3d_test(NAME TestInteractionAnimationBackward DATA f3d.glb ARGS --animation-speed-factor=1 --animation-progress INTERACTION)#Ctrl+Shift+Space;Wait;Space;
 
 # Test temporal anti-aliasing
 f3d_test(NAME TestInteractionTAA DATA suzanne.ply ARGS --anti-aliasing=taa INTERACTION) #Render;Render...
