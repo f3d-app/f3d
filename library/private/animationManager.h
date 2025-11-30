@@ -56,6 +56,16 @@ public:
    * Start/Stop playing the animation
    */
   void ToggleAnimation();
+
+  /**
+   * Start/Stop playing the animation backward
+   */
+  void ToggleAnimationForward();
+
+  /**
+   * Start/Stop playing the animation backward
+   */
+  void ToggleAnimationBackward();
   void StartAnimation();
   void StopAnimation();
 
