@@ -162,16 +162,16 @@ void animationManager::ToggleAnimation()
 //----------------------------------------------------------------------------
 void animationManager::ToggleAnimationForward()
 {
-  this->Options.scene.animation.speed_factor =
-    f3d::ratio_t(std::abs(this->Options.scene.animation.speed_factor));
+  // Restore Speed Factor to user defined value
+  this->SpeedFactor = this->Options.scene.animation.speed_factor;
   this->ToggleAnimation();
 }
 
 //----------------------------------------------------------------------------
 void animationManager::ToggleAnimationBackward()
 {
-  this->Options.scene.animation.speed_factor =
-    f3d::ratio_t(this->Options.scene.animation.speed_factor * -1);
+  // Multiply Speed factor by -1 in order to play get previous animation data on tick call
+  this->SpeedFactor *= -1;
   this->ToggleAnimation();
 }
 
