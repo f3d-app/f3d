@@ -160,6 +160,22 @@ void animationManager::ToggleAnimation()
 }
 
 //----------------------------------------------------------------------------
+void animationManager::ToggleAnimationForward()
+{
+  this->Options.scene.animation.speed_factor =
+    f3d::ratio_t(std::abs(this->Options.scene.animation.speed_factor));
+  this->ToggleAnimation();
+}
+
+//----------------------------------------------------------------------------
+void animationManager::ToggleAnimationBackward()
+{
+  this->Options.scene.animation.speed_factor =
+    f3d::ratio_t(this->Options.scene.animation.speed_factor * -1);
+  this->ToggleAnimation();
+}
+
+//----------------------------------------------------------------------------
 void animationManager::Tick(double deltaTime)
 {
   if (this->Playing)
