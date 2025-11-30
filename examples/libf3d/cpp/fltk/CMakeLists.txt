@@ -7,7 +7,7 @@ if (POLICY CMP0072)
 endif()
 
 find_package(f3d REQUIRED COMPONENTS library)
-find_package(FLTK REQUIRED CONFIG)
+find_package(FLTK REQUIRED)
 
 add_executable(minimal_fltk main.cxx)
 
