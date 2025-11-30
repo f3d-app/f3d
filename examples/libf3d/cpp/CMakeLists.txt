@@ -20,6 +20,11 @@ if (F3D_EXAMPLES_EXTERNAL_QT)
   add_subdirectory(qt6)
 endif ()
 
+option(F3D_EXAMPLES_EXTERNAL_FLTK "Enable external-fltk example (requires fltk)" OFF)
+if (F3D_EXAMPLES_EXTERNAL_FLTK)
+  add_subdirectory(fltk)
+endif ()
+
 if(BUILD_TESTING)
   add_subdirectory(tests)
 endif()
