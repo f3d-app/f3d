@@ -7,6 +7,7 @@
 #include <vtkOpenGLQuadHelper.h>
 #include <vtkOpenGLRenderUtilities.h>
 #include <vtkOpenGLRenderWindow.h>
+#include <vtkOpenGLRenderer.h>
 #include <vtkOpenGLShaderCache.h>
 #include <vtkOpenGLState.h>
 #include <vtkPolyDataMapper.h>
@@ -110,6 +111,27 @@ void vtkF3DTAAResolvePass::Render(const vtkRenderState* state)
   this->FrameBufferObject->ActivateDrawBuffers(2);
   this->FrameBufferObject->AddDepthAttachment(this->DepthTexture);
 
+  // clear color and depth
+  vtkOpenGLRenderer* glRen = vtkOpenGLRenderer::SafeDownCast(state->GetRenderer());
+  if (glRen)
+  {
+    vtkOpenGLState* ostate = glRen->GetState();
+    GLbitfield clear_mask = 0;
+    if (!glRen->Transparent())
+    {
+      clear_mask |= GL_COLOR_BUFFER_BIT;
+    }
+
+    if (!glRen->GetPreserveDepthBuffer())
+    {
+      ostate->vtkglClearDepth(static_cast<GLclampf>(1.0));
+      clear_mask |= GL_DEPTH_BUFFER_BIT;
+      ostate->vtkglDepthMask(GL_TRUE);
+    }
+
+    ostate->vtkglClear(clear_mask);
+  }
+
   this->DelegatePass->Render(state);
   this->NumberOfRenderedProps += this->DelegatePass->GetNumberOfRenderedProps();
 
@@ -197,7 +219,7 @@ bool vtkF3DTAAResolvePass::SetShaderParameters(vtkShaderProgram* program, vtkAbs
     return true;
   }
   // program->SetUniformMatrix("TAA_PreviousVP", this->PreviousViewProjectionMatrix);
-  program->SetUniformi("colorTexture", this->ColorTexture->GetTextureUnit());
+  // program->SetUniformi("colorTexture", this->ColorTexture->GetTextureUnit());
   return true;
 }
 
