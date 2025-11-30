@@ -163,7 +163,7 @@ void animationManager::ToggleAnimation()
 void animationManager::ToggleAnimationForward()
 {
   // Restore Speed Factor to user defined value
-  this->SpeedFactor = this->Options.scene.animation.speed_factor;
+  this->SetSpeedFactor(this->Options.scene.animation.speed_factor);
   this->ToggleAnimation();
 }
 
@@ -171,7 +171,7 @@ void animationManager::ToggleAnimationForward()
 void animationManager::ToggleAnimationBackward()
 {
   // Multiply Speed factor by -1 in order to play get previous animation data on tick call
-  this->SpeedFactor *= -1;
+  this->SetSpeedFactor(this->SpeedFactor * -1);
   this->ToggleAnimation();
 }
 
