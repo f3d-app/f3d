@@ -48,7 +48,7 @@ runs:
       shell: bash
       run: >
         cmake ../clip
-        -DBUILD_SHARED_LIBS=ON
+        -DBUILD_SHARED_LIBS=OFF
         -DCLIP_ENABLE_IMAGE=OFF
         -DCLIP_EXAMPLES=OFF 
         -DCLIP_TESTS=OFF
