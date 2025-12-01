@@ -49,6 +49,7 @@ runs:
       run: >
         cmake ../clip
         -DBUILD_SHARED_LIBS=ON
+        -DCLIP_ENABLE_IMAGE=OFF
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX:PATH=../clip_install
         -DCMAKE_PREFIX_PATH:PATH=../install/
