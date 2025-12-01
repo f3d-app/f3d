@@ -24,7 +24,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/clip_install
-        key: clip-master-${{ runner.os }}-${{ inputs.cpu }}-${{ inputs.global_cache_index }}-0
+        key: clip-master-${{ runner.os }}-${{ inputs.cpu }}-${{ inputs.global_cache_index }}-1
 
     - name: Checkout clip (only if no cache)
       if: steps.cache-clip.outputs.cache-hit != 'true'
