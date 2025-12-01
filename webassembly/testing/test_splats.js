@@ -13,6 +13,7 @@ const settings = {
 
     // splats
     options.toggle("model.point_sprites.enable");
+    options.setAsString("model.point_sprites.absolute_size", "gaussian");
     options.setAsString("model.point_sprites.type", "gaussian");
     options.toggle("render.effect.blending.enable");
     options.setAsString("render.effect.blending.mode", "stochastic");
