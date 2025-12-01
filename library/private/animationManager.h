@@ -151,6 +151,7 @@ private:
   double TimeRange[2] = { 0.0, 0.0 };
   bool Playing = false;
   double CurrentTime = 0;
+  double AnimationDirection = 1;
   bool CurrentTimeSet = false;
 
   // Dynamic options

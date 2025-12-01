@@ -69,6 +69,7 @@ public:
   interactor& triggerTextCharacter(unsigned int codepoint) override;
 
   interactor& toggleAnimation() override;
+  interactor& toggleAnimation(AnimationDirection direction) override;
   interactor& startAnimation() override;
   interactor& stopAnimation() override;
   bool isPlayingAnimation() override;

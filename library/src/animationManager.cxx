@@ -162,16 +162,14 @@ void animationManager::ToggleAnimation()
 //----------------------------------------------------------------------------
 void animationManager::ToggleAnimationForward()
 {
-  // Restore Speed Factor to user defined value
-  this->SetSpeedFactor(this->Options.scene.animation.speed_factor);
+  this->AnimationDirection = 1;
   this->ToggleAnimation();
 }
 
 //----------------------------------------------------------------------------
 void animationManager::ToggleAnimationBackward()
 {
-  // Multiply Speed factor by -1 in order to play get previous animation data on tick call
-  this->SetSpeedFactor(this->SpeedFactor * -1);
+  this->AnimationDirection = -1;
   this->ToggleAnimation();
 }
 
@@ -180,7 +178,7 @@ void animationManager::Tick(double deltaTime)
 {
   if (this->Playing)
   {
-    this->CurrentTime += deltaTime * this->SpeedFactor;
+    this->CurrentTime += (deltaTime * this->SpeedFactor) * this->AnimationDirection;
 
     // Modulo computation, compute CurrentTime in the time range.
     if (this->CurrentTime < this->TimeRange[0] || this->CurrentTime > this->TimeRange[1])

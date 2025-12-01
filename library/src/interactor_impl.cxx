@@ -1224,14 +1224,14 @@ interactor& interactor_impl::initCommands()
     command_documentation_t{ "reset_camera", "reset the camera to its original location" });
 
   this->addCommand(
-    "toggle_animation", [&](const std::vector<std::string>&)
-    { this->Internals->AnimationManager->ToggleAnimationForward(); },
+    "toggle_animation",
+    [&](const std::vector<std::string>&) { this->toggleAnimation(AnimationDirection::FORWARD); },
     command_documentation_t{ "toggle_animation", "start/stop the animation" });
 
   this->addCommand(
-    "toggle_animation_backward", [&](const std::vector<std::string>&)
-    { this->Internals->AnimationManager->ToggleAnimationBackward(); },
-    command_documentation_t{ "toggle_reverse_animation", "start/stop the backward animation" });
+    "toggle_animation_backward",
+    [&](const std::vector<std::string>&) { this->toggleAnimation(AnimationDirection::BACKWARD); },
+    command_documentation_t{ "toggle_animation_backward", "start/stop the backward animation" });
 
   // XXX: No filesystem completion, F3DStarter add its own command anyway
   this->addCommand(
@@ -1848,6 +1848,21 @@ interactor& interactor_impl::toggleAnimation()
 {
   assert(this->Internals->AnimationManager);
   this->Internals->AnimationManager->ToggleAnimation();
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::toggleAnimation(AnimationDirection direction)
+{
+  assert(this->Internals->AnimationManager);
+  if (direction == AnimationDirection::FORWARD)
+  {
+    this->Internals->AnimationManager->ToggleAnimationForward();
+  }
+  else if (direction == AnimationDirection::BACKWARD)
+  {
+    this->Internals->AnimationManager->ToggleAnimationBackward();
+  }
   return *this;
 }
 
