@@ -282,8 +282,17 @@ PYBIND11_MODULE(pyf3d, module)
     .value("CTRL_SHIFT", f3d::interactor::InputModifier::CTRL_SHIFT)
     .export_values();
 
+  py::enum_<f3d::interactor::AnimationDirection>(interactor, "AnimationDirection")
+    .value("FORWARD", f3d::interactor::AnimationDirection::FORWARD)
+    .value("BACKWARD", f3d::interactor::AnimationDirection::BACKWARD)
+    .export_values();
+
   interactor //
-    .def("toggle_animation", &f3d::interactor::toggleAnimation, "Toggle the animation")
+    .def("toggle_animation", py::overload_cast<>(&f3d::interactor::toggleAnimation),
+      "Toggle the animation")
+    .def("toggle_animation",
+      py::overload_cast<f3d::interactor::AnimationDirection>(&f3d::interactor::toggleAnimation),
+      "Toggle the animation")
     .def("start_animation", &f3d::interactor::startAnimation, "Start the animation")
     .def("stop_animation", &f3d::interactor::stopAnimation, "Stop the animation")
     .def("is_playing_animation", &f3d::interactor::isPlayingAnimation,
