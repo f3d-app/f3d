@@ -1,7 +1,6 @@
 import pytest
 
 import f3d
-import pytest
 
 
 def print_fn(args: list[str]):
