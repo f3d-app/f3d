@@ -362,7 +362,7 @@
         "type": "double",
         "default_value": 10.0
       },
-      "scene_scale": {
+      "absolute_size": {
         "type": "bool",
         "default_value": "false"
       }

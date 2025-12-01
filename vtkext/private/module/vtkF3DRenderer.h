@@ -314,8 +314,9 @@ public:
 
   /**
    * Set the point sprites size
+   * If absoluteScale is false, the size is scaled by the scene bounding box
    */
-  void SetPointSpritesSize(bool sceneScale, double size);
+  void SetPointSpritesSize(bool absoluteScale, double size);
 
   /**
    * Set point sprites instancing usage
@@ -735,7 +736,7 @@ private:
 
   SplatType PointSpritesType = SplatType::SPHERE;
   double PointSpritesSize = 10;
-  bool PointSpritesSceneScale = false;
+  bool PointSpritesAbsoluteScale = false;
   bool PointSpritesUseInstancing = false;
 };
 

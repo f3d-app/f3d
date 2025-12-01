@@ -2202,12 +2202,12 @@ void vtkF3DRenderer::SetPointSpritesType(vtkF3DRenderer::SplatType type)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetPointSpritesSize(bool sceneScale, double size)
+void vtkF3DRenderer::SetPointSpritesSize(bool absoluteScale, double size)
 {
-  if (this->PointSpritesSceneScale != sceneScale || this->PointSpritesSize != size)
+  if (this->PointSpritesAbsoluteScale != absoluteScale || this->PointSpritesSize != size)
   {
     this->PointSpritesSize = size;
-    this->PointSpritesSceneScale = sceneScale;
+    this->PointSpritesAbsoluteScale = absoluteScale;
     this->PointSpritesConfigured = false;
   }
 }
@@ -2431,7 +2431,7 @@ void vtkF3DRenderer::ConfigurePointSprites()
   const vtkBoundingBox& bbox = this->Importer->GetGeometryBoundingBox();
 
   double scaleFactor = 1.0;
-  if (this->PointSpritesSceneScale && bbox.IsValid())
+  if (!this->PointSpritesAbsoluteScale && bbox.IsValid())
   {
     scaleFactor = this->PointSpritesSize * bbox.GetDiagonalLength() * 0.001;
   }

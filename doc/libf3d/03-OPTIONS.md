@@ -218,11 +218,11 @@ Set the _size_ of point sprites.
 
 CLI: `--point-sprites-size`.
 
-### `model.point_sprites.scene_scale` (_bool_, default: `false`)
+### `model.point_sprites.absolute_size` (_bool_, default: `false`)
 
-Scales the point sprites size by the scene bounding box.
+Do not scale the point sprites size by the scene bounding box.
 
-CLI: `--point-sprites-scene-scale`.
+CLI: `--point-sprites-absolute-size`.
 
 ### `model.volume.enable` (_bool_, default: `false`)
 
