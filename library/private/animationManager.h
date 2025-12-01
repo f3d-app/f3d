@@ -58,7 +58,7 @@ public:
   void ToggleAnimation();
 
   /**
-   * Start/Stop playing the animation backward
+   * Start/Stop playing the animation forward
    */
   void ToggleAnimationForward();
 
