@@ -216,7 +216,7 @@ Select _points sprites_ types to show instead of the geometry.
 
 Set the _size_ of point sprites.
 
-### `--point-sprites-scene-scale` (_bool_, default: `false`)
+### `--point-sprites-absolute-size` (_bool_, default: `false`)
 
 Determine if the point sprites should be scaled with the scene bounding box size.
 
