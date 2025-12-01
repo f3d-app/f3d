@@ -1,6 +1,7 @@
 import pytest
 
 import f3d
+import pytest
 
 
 def print_fn(args: list[str]):
@@ -154,3 +155,16 @@ def test_trigger_key(capfd: pytest.CaptureFixture[str]):
     engine.interactor.trigger_mouse_position(100, 100)
     engine.interactor.trigger_mouse_wheel(f3d.Interactor.WheelDirection.FORWARD)
     engine.interactor.trigger_text_character(0)
+
+def test_toggle_animation(capfd: pytest.CaptureFixture[str]):
+    engine = f3d.Engine.create(True)
+    engine.window.render()
+
+    # Smoke test: test only if toggle_animation could be call
+    # without args and with animation direction enum
+    engine.interactor.toggle_animation() # Play Forward
+    engine.interactor.toggle_animation() # Pause
+    engine.interactor.toggle_animation(f3d.Interactor.AnimationDirection.FORWARD) # Play Forward
+    engine.interactor.toggle_animation() # Pause
+    engine.interactor.toggle_animation(f3d.Interactor.AnimationDirection.BACKWARD) # Play Backward
+    engine.interactor.toggle_animation() # Pause
