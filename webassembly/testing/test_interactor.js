@@ -51,7 +51,9 @@ const settings = {
 
     interactor.startAnimation();
     utils.assert(
-      interactor.isPlayingAnimation() && interactor.getAnimationDirection() == Module.InteractorAnimationDirection.FORWARD,
+      interactor.isPlayingAnimation() &&
+      interactor.getAnimationDirection() ==
+      Module.InteractorAnimationDirection.FORWARD,
       "animation should be playing",
     );
 
@@ -63,35 +65,45 @@ const settings = {
 
     interactor.startAnimation(Module.InteractorAnimationDirection.FORWARD);
     utils.assert(
-      interactor.isPlayingAnimation() && interactor.getAnimationDirection() == Module.InteractorAnimationDirection.FORWARD,
+      interactor.isPlayingAnimation() &&
+      interactor.getAnimationDirection() ==
+      Module.InteractorAnimationDirection.FORWARD,
       "animation should be playing forward",
     );
     interactor.stopAnimation();
 
     interactor.startAnimation(Module.InteractorAnimationDirection.BACKWARD);
     utils.assert(
-      interactor.isPlayingAnimation() && interactor.getAnimationDirection() == Module.InteractorAnimationDirection.BACKWARD,
+      interactor.isPlayingAnimation() &&
+      interactor.getAnimationDirection() ==
+      Module.InteractorAnimationDirection.BACKWARD,
       "animation should be playing backward",
     );
     interactor.stopAnimation();
 
     interactor.toggleAnimation();
     utils.assert(
-      interactor.isPlayingAnimation() && interactor.getAnimationDirection() == Module.InteractorAnimationDirection.FORWARD,
+      interactor.isPlayingAnimation() &&
+      interactor.getAnimationDirection() ==
+      Module.InteractorAnimationDirection.FORWARD,
       "animation should be playing forward",
     );
     interactor.stopAnimation();
 
     interactor.toggleAnimation(Module.InteractorAnimationDirection.FORWARD);
     utils.assert(
-      interactor.isPlayingAnimation() && interactor.getAnimationDirection() == Module.InteractorAnimationDirection.FORWARD,
+      interactor.isPlayingAnimation() &&
+      interactor.getAnimationDirection() ==
+      Module.InteractorAnimationDirection.FORWARD,
       "animation should be playing forward",
     );
     interactor.stopAnimation();
 
     interactor.toggleAnimation(Module.InteractorAnimationDirection.BACKWARD);
     utils.assert(
-      interactor.isPlayingAnimation() && interactor.getAnimationDirection() == Module.InteractorAnimationDirection.BACKWARD,
+      interactor.isPlayingAnimation() &&
+      interactor.getAnimationDirection() ==
+      Module.InteractorAnimationDirection.BACKWARD,
       "animation should be playing backward",
     );
     interactor.stopAnimation();
