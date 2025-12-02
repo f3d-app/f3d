@@ -218,7 +218,7 @@ Set the _size_ of point sprites.
 
 ### `--point-sprites-absolute-size` (_bool_, default: `false`)
 
-Determine if the point sprites should be scaled with the scene bounding box size.
+Do not scale the point sprites size by the scene bounding box.
 
 ### `--point-size=<size>` (_double_)
 
