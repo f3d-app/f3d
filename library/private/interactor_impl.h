@@ -72,6 +72,7 @@ public:
   interactor& startAnimation(AnimationDirection direction = AnimationDirection::FORWARD) override;
   interactor& stopAnimation() override;
   bool isPlayingAnimation() override;
+  interactor::AnimationDirection getAnimationDirection() override;
 
   interactor& enableCameraMovement() override;
   interactor& disableCameraMovement() override;

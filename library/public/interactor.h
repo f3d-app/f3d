@@ -263,6 +263,7 @@ public:
     AnimationDirection direction = AnimationDirection::FORWARD) = 0;
   virtual interactor& stopAnimation() = 0;
   [[nodiscard]] virtual bool isPlayingAnimation() = 0;
+  [[nodiscard]] virtual interactor::AnimationDirection getAnimationDirection() = 0;
   ///@}
 
   ///@{ @name Movement

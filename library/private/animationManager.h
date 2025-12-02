@@ -81,6 +81,16 @@ public:
   std::string GetAnimationName();
 
   /**
+   * Return animation direction
+   * 1 for forward animation
+   * -1 for backward animation
+   */
+  int GetAnimationDirection() const
+  {
+    return AnimationDirection;
+  }
+
+  /**
    * Return true if the animation manager is playing the animation
    */
   bool IsPlaying() const

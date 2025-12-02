@@ -1878,6 +1878,15 @@ bool interactor_impl::isPlayingAnimation()
 }
 
 //----------------------------------------------------------------------------
+interactor::AnimationDirection interactor_impl::getAnimationDirection()
+{
+  assert(this->Internals->AnimationManager);
+  return this->Internals->AnimationManager->GetAnimationDirection() == 1
+    ? AnimationDirection::FORWARD
+    : AnimationDirection::BACKWARD;
+}
+
+//----------------------------------------------------------------------------
 interactor& interactor_impl::enableCameraMovement()
 {
   this->Internals->Style->SetCameraMovementDisabled(false);
