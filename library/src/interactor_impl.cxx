@@ -1060,26 +1060,31 @@ interactor& interactor_impl::initCommands()
     {
       bool& enabled = this->Internals->Options.model.point_sprites.enable;
       std::string& type = this->Internals->Options.model.point_sprites.type;
+      constexpr std::array<std::string_view, 8> validTypes = {
+        "sphere", "gaussian", "circle", "stddev", "flow", "bound", "cross"
+      };
       if (!enabled)
       {
         enabled = true;
-        type = "sphere";
+        type = validTypes[0];
       }
       else
       {
-        if (type == "sphere")
+        auto index = std::distance(std::begin(validTypes), std::find(std::begin(validTypes), std::end(validTypes), type));
+        if (index == 6) // last type
         {
-          type = "gaussian";
+          enabled = false;
         }
         else
         {
-          enabled = false;
+          type = validTypes[index + 1];
         }
       }
       this->Internals->Window.render();
     },
-    command_documentation_t{
-      "cycle_point_sprites", "cycle between the point sprite types (none,sphere,gaussian)" });
+    command_documentation_t{ "cycle_point_sprites",
+      "cycle between the point sprite types "
+      "(none,sphere,gaussian,sphere,circle,stddev,flow,bound,cross)" });
 
   this->addCommand(
     "roll_camera",
