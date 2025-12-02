@@ -155,6 +155,7 @@ def test_trigger_key(capfd: pytest.CaptureFixture[str]):
     engine.interactor.trigger_mouse_wheel(f3d.Interactor.WheelDirection.FORWARD)
     engine.interactor.trigger_text_character(0)
 
+
 def test_toggle_animation(capfd: pytest.CaptureFixture[str]):
     engine = f3d.Engine.create(True)
     engine.window.render()
