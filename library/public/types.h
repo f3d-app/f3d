@@ -307,6 +307,43 @@ protected:
 };
 
 /**
+ * Describe a opacity map, which is a vector of repeated:
+ * val,a
+ */
+class opacitymap_t
+{
+public:
+  opacitymap_t() = default;
+  explicit opacitymap_t(const std::vector<double>& vec)
+    : Vector(vec)
+  {
+  }
+  opacitymap_t(const std::initializer_list<double>& list)
+    : Vector(list)
+  {
+  }
+  [[nodiscard]] operator std::vector<double>() const
+  {
+    return this->Vector;
+  }
+  [[nodiscard]] bool operator==(const opacitymap_t& other) const
+  {
+    return this->Vector == other.Vector;
+  }
+  [[nodiscard]] bool operator!=(const opacitymap_t& other) const
+  {
+    return this->Vector != other.Vector;
+  }
+  [[nodiscard]] const double* data() const
+  {
+    return this->Vector.data();
+  }
+
+protected:
+  std::vector<double> Vector;
+};
+
+/**
  * Describe a 3D surfacic mesh.
  * A valid mesh fulfills these requirements:
  * - points must not be empty and its length must be a multiple of 3 (3 times the number of points)

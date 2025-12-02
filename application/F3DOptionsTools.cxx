@@ -156,6 +156,8 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       {"colormap-file", "", "Specify a colormap image", "<filePath/filename/fileStem>", ""},
       {"colormap-discretization", "", "Specify number of colors in colormap", "<int>", ""},
       {"colormap", "", "Specify a custom colormap (ignored if \"colormap-file\" is specified)", "<color_list>", ""},
+      {"volume-opacity-map", "", "Specify a custom opacity map for volume rendering", "<opacity_list>", ""},
+      {"volume-opacity-file", "", "Specify a custom opacity map image for volume rendering", "<filePath/filename/fileStem>", ""},
       {"volume", "v", "Show volume if the file is compatible", "<bool>", "1"},
       {"volume-inverse", "i", "Inverse opacity function for volume rendering", "<bool>", "1"} } },
   {"Camera",

@@ -345,6 +345,10 @@
         "type": "colormap",
         "default_value": "0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0, 1.0, 1.0, 1.0, 1.0"
       },
+      "opacitymap": {
+        "type": "opacitymap",
+        "default_value": "0.0, 0.0, 1.0, 1.0"
+      },
       "range": {
         "type": "double_vector"
       }

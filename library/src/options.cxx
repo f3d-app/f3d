@@ -217,6 +217,7 @@ F3D_DECL_TYPE_WITH_VEC(std::string);
 F3D_DECL_TYPE(color_t);
 F3D_DECL_TYPE(direction_t);
 F3D_DECL_TYPE(colormap_t);
+F3D_DECL_TYPE(opacitymap_t);
 F3D_DECL_TYPE(transform2d_t);
 F3D_DECL_TYPE(std::filesystem::path);
 
