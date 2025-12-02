@@ -1224,8 +1224,7 @@ interactor& interactor_impl::initCommands()
     command_documentation_t{ "reset_camera", "reset the camera to its original location" });
 
   this->addCommand(
-    "toggle_animation",
-    [&](const std::vector<std::string>&) { this->toggleAnimation(AnimationDirection::FORWARD); },
+    "toggle_animation", [&](const std::vector<std::string>&) { this->toggleAnimation(); },
     command_documentation_t{ "toggle_animation", "start/stop the animation" });
 
   this->addCommand(
