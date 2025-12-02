@@ -1846,14 +1846,9 @@ interactor& interactor_impl::triggerTextCharacter(unsigned int codepoint)
 interactor& interactor_impl::toggleAnimation(AnimationDirection direction)
 {
   assert(this->Internals->AnimationManager);
-  if (direction == AnimationDirection::FORWARD)
-  {
-    this->Internals->AnimationManager->ToggleAnimation(1);
-  }
-  else if (direction == AnimationDirection::BACKWARD)
-  {
-    this->Internals->AnimationManager->ToggleAnimation(-1);
-  }
+  this->Internals->AnimationManager->SetAnimationDirection(
+    direction == AnimationDirection::FORWARD ? 1 : -1);
+  this->Internals->AnimationManager->ToggleAnimation();
   return *this;
 }
 

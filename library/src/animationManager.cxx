@@ -131,15 +131,14 @@ void animationManager::StopAnimation()
 }
 
 //----------------------------------------------------------------------------
-void animationManager::ToggleAnimation(int direction)
+void animationManager::ToggleAnimation()
 {
-  assert(direction == -1 || direction == 1);
+
 
   this->PrepareForAnimationIndices();
   if (!this->PreparedAnimationIndices.value().empty() && this->Interactor)
   {
     this->Playing = !this->Playing;
-    this->AnimationDirection = direction;
 
     if (this->Playing)
     {
@@ -540,6 +539,12 @@ void animationManager::SetSpeedFactor(double speedFactor)
     this->SpeedFactor = speedFactor;
     this->SetCheatSheetConfigured(false);
   }
+}
+
+void animationManager::SetAnimationDirection(int direction)
+{
+  assert(direction == 1 || direction == -1);
+  this->AnimationDirection = direction;
 }
 
 //----------------------------------------------------------------------------
