@@ -164,10 +164,10 @@ def test_toggle_animation(capfd: pytest.CaptureFixture[str]):
     engine.interactor.toggle_animation()  # Play Forward
     engine.interactor.toggle_animation()  # Pause
     engine.interactor.toggle_animation(
-      f3d.Interactor.AnimationDirection.FORWARD
+        f3d.Interactor.AnimationDirection.FORWARD
     )  # Play Forward
     engine.interactor.toggle_animation()  # Pause
     engine.interactor.toggle_animation(
-      f3d.Interactor.AnimationDirection.BACKWARD
+        f3d.Interactor.AnimationDirection.BACKWARD
     )  # Play Backward
     engine.interactor.toggle_animation()  # Pause
