@@ -69,7 +69,7 @@ public:
   interactor& triggerTextCharacter(unsigned int codepoint) override;
 
   interactor& toggleAnimation(AnimationDirection direction = AnimationDirection::FORWARD) override;
-  interactor& startAnimation() override;
+  interactor& startAnimation(AnimationDirection direction = AnimationDirection::FORWARD) override;
   interactor& stopAnimation() override;
   bool isPlayingAnimation() override;
 

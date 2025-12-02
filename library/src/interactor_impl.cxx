@@ -1853,9 +1853,11 @@ interactor& interactor_impl::toggleAnimation(AnimationDirection direction)
 }
 
 //----------------------------------------------------------------------------
-interactor& interactor_impl::startAnimation()
+interactor& interactor_impl::startAnimation(AnimationDirection direction)
 {
   assert(this->Internals->AnimationManager);
+  this->Internals->AnimationManager->SetAnimationDirection(
+    direction == AnimationDirection::FORWARD ? 1 : -1);
   this->Internals->AnimationManager->StartAnimation();
   return *this;
 }

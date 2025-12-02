@@ -259,7 +259,8 @@ public:
    */
   virtual interactor& toggleAnimation(
     AnimationDirection direction = AnimationDirection::FORWARD) = 0;
-  virtual interactor& startAnimation() = 0;
+  virtual interactor& startAnimation(
+    AnimationDirection direction = AnimationDirection::FORWARD) = 0;
   virtual interactor& stopAnimation() = 0;
   [[nodiscard]] virtual bool isPlayingAnimation() = 0;
   ///@}
