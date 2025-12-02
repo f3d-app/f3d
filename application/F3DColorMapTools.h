@@ -17,6 +17,7 @@ namespace F3DColorMapTools
 {
 std::filesystem::path Find(const std::string& str);
 f3d::colormap_t Read(const std::filesystem::path& path);
+f3d::opacitymap_t ReadOpacity(const std::filesystem::path& path);
 }
 
 #endif

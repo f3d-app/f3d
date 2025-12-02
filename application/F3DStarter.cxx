@@ -805,15 +805,12 @@ public:
       const std::string& opacityMapFile = this->AppOptions.OpacityMapFile;
       if (!opacityMapFile.empty())
       {
-        // fs::path fullPath = F3DOpacityMapTools::Find(opacityMapFile);
+        this->LibOptions.model.scivis.opacitymap = F3DColorMapTools::ReadOpacity(fullPath);
 
-        if (!fullPath.empty())
+        std::vector<double> opacityMap = this->LibOptions.model.scivis.opacitymap;
+        if (opacityMap.empty())
         {
-          // this->LibOptions.model.scivis.opacitymap = F3DOpacityMapTools::Read(fullPath);
-        }
-        else
-        {
-          f3d::log::error("Cannot find the opacitymap ", opacityMapFile);
+          f3d::log::error("Cannot read the opacity map ", opacityMapFile);
           this->LibOptions.model.scivis.opacitymap = f3d::opacitymap_t();
         }
       }
