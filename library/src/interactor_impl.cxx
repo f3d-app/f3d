@@ -1230,7 +1230,7 @@ interactor& interactor_impl::initCommands()
   this->addCommand(
     "toggle_animation_backward",
     [&](const std::vector<std::string>&) { this->toggleAnimation(AnimationDirection::BACKWARD); },
-    command_documentation_t{ "toggle_animation_backward", "start/stop the backward animation" });
+    command_documentation_t{ "toggle_animation_backward", "start/stop the animation backward" });
 
   // XXX: No filesystem completion, F3DStarter add its own command anyway
   this->addCommand(
