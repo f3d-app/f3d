@@ -171,19 +171,19 @@ PYBIND11_MODULE(pyf3d, module)
         }
         catch (const f3d::options::incompatible_exception&)
         {
-          // failed to set an `int` try again as `double`
+          // failed to set an `int`, try again as `double`
           if (std::holds_alternative<int>(value))
           {
             opts.set(key, static_cast<double>(std::get<int>(value)));
           }
-          // failed to set an `vector<int>` try again as `vector<double>`
+          // failed to set a `vector<int>`, try again as `vector<double>`
           else if (std::holds_alternative<std::vector<int>>(value))
           {
             const std::vector<int>& ints = std::get<std::vector<int>>(value);
             const std::vector<double> doubles(ints.begin(), ints.end());
             opts.set(key, doubles);
           }
-          // failed to set a `string` parse and try again
+          // failed to set a `string`, parse and try again
           else if (std::holds_alternative<std::string>(value))
           {
             try
