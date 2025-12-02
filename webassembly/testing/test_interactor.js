@@ -52,8 +52,8 @@ const settings = {
     interactor.startAnimation();
     utils.assert(
       interactor.isPlayingAnimation() &&
-      	interactor.getAnimationDirection() ==
-      	  Module.InteractorAnimationDirection.FORWARD,
+        interactor.getAnimationDirection() ==
+          Module.InteractorAnimationDirection.FORWARD,
       "animation should be playing",
     );
 
