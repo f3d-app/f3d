@@ -290,10 +290,13 @@ PYBIND11_MODULE(pyf3d, module)
   interactor //
     .def("toggle_animation", &f3d::interactor::toggleAnimation, "Toggle the animation",
       py::arg("direction") = f3d::interactor::AnimationDirection::FORWARD)
-    .def("start_animation", &f3d::interactor::startAnimation, "Start the animation")
+    .def("start_animation", &f3d::interactor::startAnimation, "Start the animation",
+      py::arg("direction") = f3d::interactor::AnimationDirection::FORWARD)
     .def("stop_animation", &f3d::interactor::stopAnimation, "Stop the animation")
     .def("is_playing_animation", &f3d::interactor::isPlayingAnimation,
       "Returns True if the animation is currently started")
+    .def("get_animation_direction", &f3d::interactor::getAnimationDirection,
+      "Returns the current animation direction")
     .def("enable_camera_movement", &f3d::interactor::enableCameraMovement,
       "Enable the camera interaction")
     .def("disable_camera_movement", &f3d::interactor::disableCameraMovement,

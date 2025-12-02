@@ -156,19 +156,64 @@ def test_trigger_key(capfd: pytest.CaptureFixture[str]):
     engine.interactor.trigger_text_character(0)
 
 
-def test_toggle_animation(capfd: pytest.CaptureFixture[str]):
+def test_interactor_animation(capfd: pytest.CaptureFixture[str]):
     engine = f3d.Engine.create(True)
     engine.window.render()
 
-    # Smoke test: test only if toggle_animation could be call
-    # without args and with animation direction enum
-    engine.interactor.toggle_animation()  # Play Forward
+    engine.interactor.start_animation()  # Play Forward
+    assert (
+        engine.interactor.is_playing_animation()
+        and engine.interactor.get_animation_direction()
+        == f3d.Interactor.AnimationDirection.FORWARD
+    )
     engine.interactor.toggle_animation()  # Pause
+    assert not engine.interactor.is_playing_animation()
+
+    engine.interactor.start_animation(
+        f3d.Interactor.AnimationDirection.FORWARD
+    )  # Play Forward
+    assert (
+        engine.interactor.is_playing_animation()
+        and engine.interactor.get_animation_direction()
+        == f3d.Interactor.AnimationDirection.FORWARD
+    )
+    engine.interactor.stop_animation()  # Pause
+    assert not engine.interactor.is_playing_animation()
+
+    engine.interactor.start_animation(
+        f3d.Interactor.AnimationDirection.BACKWARD
+    )  # Play Backward
+    assert (
+        engine.interactor.is_playing_animation()
+        and engine.interactor.get_animation_direction()
+        == f3d.Interactor.AnimationDirection.BACKWARD
+    )
+    engine.interactor.stop_animation()  # Pause
+
+    engine.interactor.toggle_animation()
+    assert (
+        engine.interactor.is_playing_animation()
+        and engine.interactor.get_animation_direction()
+        == f3d.Interactor.AnimationDirection.FORWARD
+    )
+    engine.interactor.stop_animation()  # Pause
+
     engine.interactor.toggle_animation(
         f3d.Interactor.AnimationDirection.FORWARD
     )  # Play Forward
-    engine.interactor.toggle_animation()  # Pause
+    assert (
+        engine.interactor.is_playing_animation()
+        and engine.interactor.get_animation_direction()
+        == f3d.Interactor.AnimationDirection.FORWARD
+    )
+    engine.interactor.stop_animation()
+
     engine.interactor.toggle_animation(
         f3d.Interactor.AnimationDirection.BACKWARD
     )  # Play Backward
-    engine.interactor.toggle_animation()  # Pause
+    assert (
+        engine.interactor.is_playing_animation()
+        and engine.interactor.get_animation_direction()
+        == f3d.Interactor.AnimationDirection.BACKWARD
+    )
+    engine.interactor.stop_animation()
