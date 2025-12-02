@@ -4,6 +4,7 @@
 #include "vtkF3DBitonicSort.h"
 #include "vtkF3DComputeDepthCS.h"
 #endif
+#include "vtkF3DPointSplatUtilsSDF.h"
 #include "vtkF3DPointSplatVS.h"
 #include "vtkF3DRenderer.h"
 
@@ -400,43 +401,20 @@ void vtkF3DSplatMapperHelper::RenderPieceDraw(vtkRenderer* ren, vtkActor* actor)
 void vtkF3DSplatMapperHelper::ReplaceShaderPositionVC(
   std::map<vtkShader::Type, vtkShader*> shaders, vtkRenderer* ren, vtkActor* actor)
 {
-  vtkUniforms* uniforms = actor->GetShaderProperty()->GetVertexCustomUniforms();
+  std::string VSSource = shaders[vtkShader::Vertex]->GetSource();
+  std::string FSSource = shaders[vtkShader::Fragment]->GetSource();
 
-  // TAA
-  vtkUniforms::TupleType type = uniforms->GetUniformTupleType("jitter");
-  if (type != vtkUniforms::TupleTypeInvalid)
-  {
-    std::string VSSource = shaders[vtkShader::Vertex]->GetSource();
+  std::string sdfFunctions = vtkF3DPointSplatUtilsSDF;
 
-    vtkShaderProgram::Substitute(VSSource, "//VTK::PositionVC::Dec",
-      "//VTK::PositionVC::Dec\n"
-      "  uniform vec2 jitter;\n",
-      false);
-
-    vtkShaderProgram::Substitute(VSSource, "//VTK::PositionVC::Impl",
-      "//VTK::PositionVC::Impl\n"
-      "  // apply temporal jittering for TAA\n"
-      "  gl_Position.xy += jitter * gl_Position.w;\n",
-      false);
-
-    shaders[vtkShader::Vertex]->SetSource(VSSource);
-  }
+  vtkShaderProgram::Substitute(
+    FSSource, "//VTK::PositionVC::Dec\n", sdfFunctions + "//VTK::PositionVC::Dec\n");
 
   if (this->OwnerUseInstancing())
   {
-    std::string FSSource = shaders[vtkShader::Fragment]->GetSource();
-
     vtkShaderProgram::Substitute(FSSource, "//VTK::PositionVC::Dec\n",
       "//VTK::PositionVC::Dec\n"
       "flat in int instanceId;\n");
 
-    shaders[vtkShader::Fragment]->SetSource(FSSource);
-  }
-
-  std::string VSSource = shaders[vtkShader::Vertex]->GetSource();
-
-  if (this->OwnerUseInstancing())
-  {
     vtkShaderProgram::Substitute(VSSource, "//VTK::PositionVC::Dec\n",
       "uniform float boundScale;\n"
       "out vec2 offsetVCVSOutput;\n"
@@ -472,6 +450,7 @@ void vtkF3DSplatMapperHelper::ReplaceShaderPositionVC(
   }
 
   shaders[vtkShader::Vertex]->SetSource(VSSource);
+  shaders[vtkShader::Fragment]->SetSource(FSSource);
 
   this->Superclass::ReplaceShaderPositionVC(shaders, ren, actor);
 }
