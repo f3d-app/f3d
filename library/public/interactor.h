@@ -140,8 +140,8 @@ public:
    */
   enum class AnimationDirection : std::uint8_t
   {
-    FORWARD = 1,
-    BACKWARD = 2
+    FORWARD,
+    BACKWARD
   };
 
   /**
