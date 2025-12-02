@@ -257,8 +257,8 @@ public:
   /**
    * Control the animation.
    */
-  virtual interactor& toggleAnimation() = 0;
-  virtual interactor& toggleAnimation(AnimationDirection direction) = 0;
+  virtual interactor& toggleAnimation(
+    AnimationDirection direction = AnimationDirection::FORWARD) = 0;
   virtual interactor& startAnimation() = 0;
   virtual interactor& stopAnimation() = 0;
   [[nodiscard]] virtual bool isPlayingAnimation() = 0;

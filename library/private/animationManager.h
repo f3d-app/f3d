@@ -54,18 +54,9 @@ public:
 
   /**
    * Start/Stop playing the animation
+   * Direction must always be equal to 1 (forward) or -1 (backward)
    */
-  void ToggleAnimation();
-
-  /**
-   * Start/Stop playing the animation forward
-   */
-  void ToggleAnimationForward();
-
-  /**
-   * Start/Stop playing the animation backward
-   */
-  void ToggleAnimationBackward();
+  void ToggleAnimation(int direction = 1);
   void StartAnimation();
   void StopAnimation();
 

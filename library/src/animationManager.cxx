@@ -131,12 +131,15 @@ void animationManager::StopAnimation()
 }
 
 //----------------------------------------------------------------------------
-void animationManager::ToggleAnimation()
+void animationManager::ToggleAnimation(int direction)
 {
+  assert(direction == -1 || direction == 1);
+
   this->PrepareForAnimationIndices();
   if (!this->PreparedAnimationIndices.value().empty() && this->Interactor)
   {
     this->Playing = !this->Playing;
+    this->AnimationDirection = direction;
 
     if (this->Playing)
     {
@@ -157,20 +160,6 @@ void animationManager::ToggleAnimation()
       this->Interactor->enableCameraMovement();
     }
   }
-}
-
-//----------------------------------------------------------------------------
-void animationManager::ToggleAnimationForward()
-{
-  this->AnimationDirection = 1;
-  this->ToggleAnimation();
-}
-
-//----------------------------------------------------------------------------
-void animationManager::ToggleAnimationBackward()
-{
-  this->AnimationDirection = -1;
-  this->ToggleAnimation();
 }
 
 //----------------------------------------------------------------------------
