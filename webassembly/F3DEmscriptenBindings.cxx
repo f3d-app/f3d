@@ -304,6 +304,10 @@ EMSCRIPTEN_BINDINGS(f3d)
       });
 
   // f3d::interactor
+  emscripten::enum_<f3d::interactor::AnimationDirection>("InteractorAnimationDirection")
+    .value("FORWARD", f3d::interactor::AnimationDirection::FORWARD)
+    .value("BACKWARD", f3d::interactor::AnimationDirection::BACKWARD);
+
   // Not bound on purpose because usually used for external interactors:
   // trigger*
   // TODO:
