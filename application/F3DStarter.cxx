@@ -800,19 +800,21 @@ public:
         f3d::log::error("Cannot find the colormap ", colorMapFile);
         this->LibOptions.model.scivis.colormap = f3d::colormap_t();
       }
+    }
 
-      // opacitymap-file and opacitymap are interdependent
-      const std::string& opacityMapFile = this->AppOptions.OpacityMapFile;
-      if (!opacityMapFile.empty())
+    // opacitymap-file and opacitymap are interdependent
+    const std::string& opacityMapFile = this->AppOptions.OpacityMapFile;
+    if (!opacityMapFile.empty() && std::filesystem::exists(opacityMapFile) &&
+      std::filesystem::is_regular_file(opacityMapFile))
+    {
+      fs::path fullPath(f3d::utils::collapsePath(opacityMapFile));
+      this->LibOptions.model.scivis.opacitymap = F3DColorMapTools::ReadOpacity(fullPath);
+
+      std::vector<double> opacityMap = this->LibOptions.model.scivis.opacitymap;
+      if (opacityMap.empty())
       {
-        this->LibOptions.model.scivis.opacitymap = F3DColorMapTools::ReadOpacity(fullPath);
-
-        std::vector<double> opacityMap = this->LibOptions.model.scivis.opacitymap;
-        if (opacityMap.empty())
-        {
-          f3d::log::error("Cannot read the opacity map ", opacityMapFile);
-          this->LibOptions.model.scivis.opacitymap = f3d::opacitymap_t();
-        }
+        f3d::log::error("Cannot read the opacity map ", opacityMapFile);
+        this->LibOptions.model.scivis.opacitymap = f3d::opacitymap_t();
       }
     }
   }
@@ -1691,7 +1693,7 @@ void F3DStarter::LoadFileGroupInternal(
 
     // Unwatch and erase paths that should not be watched anymore
     for (auto it = this->Internals->FolderWatchIds.begin();
-         it != this->Internals->FolderWatchIds.end();)
+      it != this->Internals->FolderWatchIds.end();)
     {
       const fs::path& path = it->first;
       const dmon_watch_id& dmonId = it->second;
@@ -2144,7 +2146,8 @@ void F3DStarter::AddCommands()
 
   interactor.addCommand(
     "load_next_file_group",
-    [this](const std::vector<std::string>& args) {
+    [this](const std::vector<std::string>& args)
+    {
       this->LoadRelativeFileGroup(
         +1, parse_optional_bool_flag(args, "load_next_file_group", false));
     },
