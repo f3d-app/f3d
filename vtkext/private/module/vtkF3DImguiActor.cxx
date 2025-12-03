@@ -59,6 +59,34 @@ static std::vector<std::string> SplitBindings(const std::string& s, char delim)
 
   return result;
 }
+
+/*
+ * This method is used to compute the real size of binding text
+ * by taking account of '+' and ' ' size between each keys
+ */
+static float ComputeBindingsTextWidth(const std::string& bind, char delim)
+{
+  const float spacingX = ImGui::GetStyle().ItemSpacing.x;
+  const float plusWidth = ImGui::CalcTextSize("+").x;
+
+  float totalBindingsWidth = 0.0f;
+  auto keys = ::SplitBindings(bind, delim);
+
+  totalBindingsWidth += std::accumulate(keys.begin(), keys.end(),
+    0.0f, // use float init since CalcTextSize returns float
+    [](float sum, const std::string& key)
+    {
+      return sum + ImGui::CalcTextSize(key.c_str()).x +
+        ::DROPZONE_MARGIN * ::DROPZONE_LOGO_TEXT_PADDING;
+    });
+
+  if (keys.size() > 1)
+  {
+    totalBindingsWidth += (keys.size() - 1) * (spacingX + plusWidth + spacingX);
+  }
+  return totalBindingsWidth;
+}
+
 }
 
 struct vtkF3DImguiActor::Internals
@@ -482,25 +510,10 @@ void vtkF3DImguiActor::RenderDropZone()
     {
       const auto& desc = pair.first;
       const auto& bind = pair.second;
-      float totalBindingsWidth = 0.0f;
+      float totalBindingsWidth = ComputeBindingsTextWidth(bind, '+');
 
       ImVec2 descSize = ImGui::CalcTextSize(desc.c_str());
       maxDescTextWidth = std::max(maxDescTextWidth, descSize.x);
-
-      auto keys = ::SplitBindings(bind, '+');
-
-      totalBindingsWidth += std::accumulate(keys.begin(), keys.end(),
-        0.0f, // use float init since CalcTextSize returns float
-        [](float sum, const std::string& key)
-        {
-          return sum + ImGui::CalcTextSize(key.c_str()).x +
-            ::DROPZONE_MARGIN * ::DROPZONE_LOGO_TEXT_PADDING;
-        });
-
-      if (keys.size() > 1)
-      {
-        totalBindingsWidth += (keys.size() - 1) * (spacingX + plusWidth + spacingX);
-      }
 
       maxBindingsTextWidth = std::max(maxBindingsTextWidth, totalBindingsWidth);
     }
@@ -684,8 +697,8 @@ void vtkF3DImguiActor::RenderCheatSheet()
     {
       textHeight += ImGui::GetTextLineHeightWithSpacing();
 
-      ImVec2 bindingLineSize = ImGui::CalcTextSize(bind.c_str());
-      maxBindingTextWidth = std::max(maxBindingTextWidth, bindingLineSize.x);
+      float bindingLineWidth = ComputeBindingsTextWidth(bind, '+');
+      maxBindingTextWidth = std::max(maxBindingTextWidth, bindingLineWidth);
 
       ImVec2 descriptionLineSize = ImGui::CalcTextSize(desc.c_str());
       maxDescTextWidth = std::max(maxDescTextWidth, descriptionLineSize.x);
