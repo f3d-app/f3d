@@ -2,6 +2,8 @@
 
 #include <vtkObjectFactory.h>
 
+#include <iostream>
+
 vtkStandardNewMacro(vtkF3DConsoleOutputWindow);
 
 //----------------------------------------------------------------------------
