@@ -2146,8 +2146,7 @@ void F3DStarter::AddCommands()
 
   interactor.addCommand(
     "load_next_file_group",
-    [this](const std::vector<std::string>& args)
-    {
+    [this](const std::vector<std::string>& args) {
       this->LoadRelativeFileGroup(
         +1, parse_optional_bool_flag(args, "load_next_file_group", false));
     },
