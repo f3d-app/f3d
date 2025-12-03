@@ -522,8 +522,8 @@ void vtkF3DImguiActor::RenderDropZone()
     const ImColor bindingRectColor = F3DStyle::imgui::GetMidColor();
     const ImColor bindingTextColor = F3DStyle::imgui::GetTextColor();
 
-    float tableWidth = maxDescTextWidth + maxBindingsTextWidth + ::DROPZONE_LOGO_TEXT_PADDING +
-      ImGui::GetStyle().ItemSpacing.x;
+    float tableWidth =
+      maxDescTextWidth + maxBindingsTextWidth + ::DROPZONE_LOGO_TEXT_PADDING + spacingX;
 
     // Position table below logo if needed
     ImVec2 startPos;
@@ -567,12 +567,12 @@ void vtkF3DImguiActor::RenderDropZone()
         drawList->AddText(
           ImVec2(rectMin.x + padding.x, rectMin.y + padding.y), bindingTextColor, key.c_str());
 
-        bindingPos.x = rectMax.x + ImGui::GetStyle().ItemSpacing.x;
+        bindingPos.x = rectMax.x + spacingX;
 
         if (k < keys.size() - 1)
         {
           drawList->AddText(bindingPos, descTextColor, "+");
-          bindingPos.x += plusWidth + ImGui::GetStyle().ItemSpacing.x;
+          bindingPos.x += plusWidth + spacingX;
         }
       }
       cursor.y += rowHeight;
