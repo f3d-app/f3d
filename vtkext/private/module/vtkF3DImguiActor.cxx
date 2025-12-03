@@ -46,7 +46,7 @@ constexpr float DROPZONE_MARGIN = 0.5f;
 constexpr float DROPZONE_PADDING_X = 5.0f;
 constexpr float DROPZONE_PADDING_Y = 2.0f;
 
-static std::vector<std::string> SplitBindings(const std::string& s, char delim)
+static std::vector<std::string> SplitBindings(const std::string& s, const char delim)
 {
   std::vector<std::string> result;
   std::stringstream ss(s);
@@ -64,10 +64,10 @@ static std::vector<std::string> SplitBindings(const std::string& s, char delim)
  * This method is used to compute the real size of binding text
  * by taking account of '+' and ' ' size between each keys
  */
-static float ComputeBindingsTextWidth(const std::string& bind, char delim)
+static float ComputeBindingsTextWidth(const std::string& bind, const char delim)
 {
+  const float delimWidth = ImGui::CalcTextSize(&delim).x;
   const float spacingX = ImGui::GetStyle().ItemSpacing.x;
-  const float plusWidth = ImGui::CalcTextSize("+").x;
 
   float totalBindingsWidth = 0.0f;
   auto keys = ::SplitBindings(bind, delim);
@@ -82,7 +82,7 @@ static float ComputeBindingsTextWidth(const std::string& bind, char delim)
 
   if (keys.size() > 1)
   {
-    totalBindingsWidth += (keys.size() - 1) * (spacingX + plusWidth + spacingX);
+    totalBindingsWidth += (keys.size() - 1) * (spacingX + delimWidth + spacingX);
   }
   return totalBindingsWidth;
 }
