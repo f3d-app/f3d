@@ -43,7 +43,7 @@ int TestF3DGenericImporter(int argc, char* argv[])
 
   importer->SetInternalReader(reader);
   importer->Update();
-  importer->Print(cout);
+  importer->Print(std::cout);
   if (importer->GetNumberOfAnimations() != 1)
   {
     std::cerr << "Unexpected number of animations\n";

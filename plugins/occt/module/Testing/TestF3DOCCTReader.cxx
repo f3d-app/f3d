@@ -16,7 +16,7 @@ bool testReader(const std::string& filename, const vtkF3DOCCTReader::FILE_FORMAT
   reader->SetFileName(filename);
   reader->SetFileFormat(format);
   reader->Update();
-  reader->Print(cout);
+  reader->Print(std::cout);
   return reader->GetOutput()->GetNumberOfBlocks() > 0;
 }
 

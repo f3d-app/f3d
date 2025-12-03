@@ -13,7 +13,7 @@ int TestF3DEXRReader(int argc, char* argv[])
   reader->SetFileName(filename.c_str());
   reader->Update();
 
-  reader->Print(cout);
+  reader->Print(std::cout);
 
   vtkImageData* img = reader->GetOutput();
 
