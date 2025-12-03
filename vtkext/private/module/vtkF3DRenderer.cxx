@@ -2550,9 +2550,8 @@ void vtkF3DRenderer::SetUseInverseOpacityFunction(bool use)
 
           if (this->OpacityMap.size() % 2 != 0 || this->OpacityMap.empty())
           {
-            double value = this->UseInverseOpacityFunction ? 0.0 : 1.0;
-            pwf->AddPoint(range[0], value);
-            pwf->AddPoint(range[1], value);
+            pwf->AddPoint(range[0], this->UseInverseOpacityFunction ? 1.0 : 0.0);
+            pwf->AddPoint(range[1], this->UseInverseOpacityFunction ? 0.0 : 1.0);
           }
           else
           {
