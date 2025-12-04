@@ -280,7 +280,7 @@ bool animationManager::LoadAtFrame(int frame)
 
 void animationManager::NextFrame()
 {
-  if (this->LoadAtFrame(this->Options.scene.animation.frame_jump))
+  if (this->LoadAtFrame(1))
   {
     this->Window.render();
   }
@@ -288,7 +288,7 @@ void animationManager::NextFrame()
 
 void animationManager::PreviousFrame()
 {
-  if (this->LoadAtFrame(-this->Options.scene.animation.frame_jump))
+  if (this->LoadAtFrame(-1))
   {
     this->Window.render();
   }
