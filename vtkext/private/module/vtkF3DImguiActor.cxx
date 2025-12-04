@@ -68,12 +68,12 @@ static float ComputeBindingsWidth(const std::string& binding, const char delim,
   std::function<float(float, const std::string&)> accumulator)
 {
   const float spacingX = ImGui::GetStyle().ItemSpacing.x;
-  const float delimWidth = ImGui::CalcTextSize(&delim).x;
+  const float plusWidth = ImGui::CalcTextSize(&delim).x;
   auto keys = ::SplitBindings(binding, delim);
   float totalBindingsWidth = std::accumulate(keys.begin(), keys.end(), 0.0f, accumulator);
   if (keys.size() > 1)
   {
-    totalBindingsWidth += (keys.size() - 1) * (spacingX + delimWidth + spacingX);
+    totalBindingsWidth += (keys.size() - 1) * (spacingX + plusWidth + spacingX);
   }
   return totalBindingsWidth;
 }
@@ -676,6 +676,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
 
   constexpr float margin = F3DStyle::GetDefaultMargin();
   constexpr float padding = 16.f;
+  const float plusWidth = ImGui::CalcTextSize("+").x;
   const float spacingX = ImGui::GetStyle().ItemSpacing.x;
 
   float textHeight = 0.f;
