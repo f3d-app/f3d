@@ -104,7 +104,6 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "animation-autoplay", "", "Automatically start animation", "<bool>", "1" },
       { "animation-index", "", "Select animation to show (deprecated)", "<index>", "" },
       { "animation-indices", "", "Select animations to show", "<index,index,index>", "" },
-      { "animation-frame-jump", "", "Set jump size in animation", "<int>", "1" },
       { "animation-speed-factor", "", "Set animation speed factor", "<ratio>", "" },
       { "animation-time", "", "Set animation time to load", "<time>", "" },
       { "font-file", "", "Path to a FreeType compatible font file", "<file_path>", ""},
