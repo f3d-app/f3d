@@ -70,7 +70,8 @@ static float ComputeBindingsWidth(const std::string& binding, const char delim,
   const float spacingX = ImGui::GetStyle().ItemSpacing.x;
   const float delimWidth = ImGui::CalcTextSize(&delim).x;
   auto keys = ::SplitBindings(binding, delim);
-  float totalBindingsWidth = std::accumulate(keys.begin(), keys.end(), 0.0f, accumulator);
+  float totalBindingsWidth =
+    std::accumulate(keys.begin(), keys.end(), 0.0f, std::move(accumulator));
   if (keys.size() > 1)
   {
     totalBindingsWidth += (keys.size() - 1) * (spacingX + delimWidth + spacingX);
