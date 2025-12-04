@@ -60,24 +60,6 @@ static std::vector<std::string> SplitBindings(const std::string& s, const char d
   return result;
 }
 
-/*
- * This method allows user to compute bindings text with with specific
- * delimiter
- */
-static float ComputeBindingsWidth(const std::string& binding, const char delim,
-  std::function<float(float, const std::string&)> accumulator)
-{
-  const float spacingX = ImGui::GetStyle().ItemSpacing.x;
-  const float plusWidth = ImGui::CalcTextSize(&delim).x;
-  auto keys = ::SplitBindings(binding, delim);
-  float totalBindingsWidth = std::accumulate(keys.begin(), keys.end(), 0.0f, accumulator);
-  if (keys.size() > 1)
-  {
-    totalBindingsWidth += (keys.size() - 1) * (spacingX + plusWidth + spacingX);
-  }
-  return totalBindingsWidth;
-}
-
 }
 
 struct vtkF3DImguiActor::Internals
@@ -505,12 +487,20 @@ void vtkF3DImguiActor::RenderDropZone()
       ImVec2 descSize = ImGui::CalcTextSize(desc.c_str());
       maxDescTextWidth = std::max(maxDescTextWidth, descSize.x);
 
-      float totalBindingsWidth = ComputeBindingsWidth(bind, '+',
+      auto keys = ::SplitBindings(bind, '+');
+      float totalBindingsWidth = std::accumulate(keys.begin(), keys.end(),
+        0.0f, // use float init since CalcTextSize returns float
         [](float sum, const std::string& key)
         {
           return sum + ImGui::CalcTextSize(key.c_str()).x +
             ::DROPZONE_MARGIN * ::DROPZONE_LOGO_TEXT_PADDING;
         });
+
+      if (keys.size() > 1)
+      {
+        totalBindingsWidth += (keys.size() - 1) * (spacingX + plusWidth + spacingX);
+      }
+
       maxBindingsTextWidth = std::max(maxBindingsTextWidth, totalBindingsWidth);
     }
 
@@ -695,9 +685,16 @@ void vtkF3DImguiActor::RenderCheatSheet()
     {
       textHeight += ImGui::GetTextLineHeightWithSpacing();
 
-      float bindingLineWidth = ComputeBindingsWidth(bind, '+',
+      auto keys = ::SplitBindings(bind, '+');
+
+      float bindingLineWidth = std::accumulate(keys.begin(), keys.end(),
+        0.0f, // use float init since CalcTextSize returns float
         [](float sum, const std::string& key) { return sum + ImGui::CalcTextSize(key.c_str()).x; });
 
+      if (keys.size() > 1)
+      {
+        bindingLineWidth += (keys.size() - 1) * (spacingX + plusWidth + spacingX);
+      }
       maxBindingTextWidth = std::max(maxBindingTextWidth, bindingLineWidth);
 
       ImVec2 descriptionLineSize = ImGui::CalcTextSize(desc.c_str());
