@@ -6,13 +6,33 @@ include(GNUInstallDirs)
 
 # List of source files
 set(F3D_C_SOURCE_FILES
+  ${CMAKE_CURRENT_SOURCE_DIR}/camera_c_api.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/context_c_api.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/engine_c_api.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/image_c_api.cxx
-  )
+  ${CMAKE_CURRENT_SOURCE_DIR}/interactor_c_api.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/log_c_api.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/options_c_api.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/scene_c_api.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/types_c_api.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/utils_c_api.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/window_c_api.cxx
+)
 
 # List of headers that will be installed
 set(F3D_C_PUBLIC_HEADERS
+  ${CMAKE_CURRENT_SOURCE_DIR}/camera_c_api.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/context_c_api.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/engine_c_api.h
   ${CMAKE_CURRENT_SOURCE_DIR}/image_c_api.h
-  )
+  ${CMAKE_CURRENT_SOURCE_DIR}/interactor_c_api.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/log_c_api.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/options_c_api.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/scene_c_api.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/types_c_api.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/utils_c_api.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/window_c_api.h
+)
 
 add_library(f3d_c_api ${F3D_C_SOURCE_FILES})
 
