@@ -60,33 +60,6 @@ static std::vector<std::string> SplitBindings(const std::string& s, const char d
   return result;
 }
 
-/*
- * This method is used to compute the real size of binding text
- * by taking account of '+' and ' ' size between each keys
- */
-static float ComputeBindingsTextWidth(const std::string& bind, const char delim)
-{
-  const float delimWidth = ImGui::CalcTextSize(&delim).x;
-  const float spacingX = ImGui::GetStyle().ItemSpacing.x;
-
-  float totalBindingsWidth = 0.0f;
-  auto keys = ::SplitBindings(bind, delim);
-
-  totalBindingsWidth += std::accumulate(keys.begin(), keys.end(),
-    0.0f, // use float init since CalcTextSize returns float
-    [](float sum, const std::string& key)
-    {
-      return sum + ImGui::CalcTextSize(key.c_str()).x +
-        ::DROPZONE_MARGIN * ::DROPZONE_LOGO_TEXT_PADDING;
-    });
-
-  if (keys.size() > 1)
-  {
-    totalBindingsWidth += (keys.size() - 1) * (spacingX + delimWidth + spacingX);
-  }
-  return totalBindingsWidth;
-}
-
 }
 
 struct vtkF3DImguiActor::Internals
@@ -510,7 +483,21 @@ void vtkF3DImguiActor::RenderDropZone()
     {
       const auto& desc = pair.first;
       const auto& bind = pair.second;
-      float totalBindingsWidth = ComputeBindingsTextWidth(bind, '+');
+
+      auto keys = ::SplitBindings(bind, '+');
+
+      float totalBindingsWidth = std::accumulate(keys.begin(), keys.end(),
+        0.0f, // use float init since CalcTextSize returns float
+        [](float sum, const std::string& key)
+        {
+          return sum + ImGui::CalcTextSize(key.c_str()).x +
+            ::DROPZONE_MARGIN * ::DROPZONE_LOGO_TEXT_PADDING;
+        });
+
+      if (keys.size() > 1)
+      {
+        totalBindingsWidth += (keys.size() - 1) * (spacingX + plusWidth + spacingX);
+      }
 
       ImVec2 descSize = ImGui::CalcTextSize(desc.c_str());
       maxDescTextWidth = std::max(maxDescTextWidth, descSize.x);
@@ -680,6 +667,8 @@ void vtkF3DImguiActor::RenderCheatSheet()
 
   constexpr float margin = F3DStyle::GetDefaultMargin();
   constexpr float padding = 16.f;
+  const float plusWidth = ImGui::CalcTextSize("+").x;
+  const float spacingX = ImGui::GetStyle().ItemSpacing.x;
 
   float textHeight = 0.f;
   float winWidth = 0.f;
@@ -697,7 +686,16 @@ void vtkF3DImguiActor::RenderCheatSheet()
     {
       textHeight += ImGui::GetTextLineHeightWithSpacing();
 
-      float bindingLineWidth = ComputeBindingsTextWidth(bind, '+');
+      auto keys = ::SplitBindings(bind, '+');
+
+      float bindingLineWidth = std::accumulate(keys.begin(), keys.end(),
+        0.0f, // use float init since CalcTextSize returns float
+        [](float sum, const std::string& key) { return sum + ImGui::CalcTextSize(key.c_str()).x; });
+
+      if (keys.size() > 1)
+      {
+        bindingLineWidth += (keys.size() - 1) * (spacingX + plusWidth + spacingX);
+      }
       maxBindingTextWidth = std::max(maxBindingTextWidth, bindingLineWidth);
 
       ImVec2 descriptionLineSize = ImGui::CalcTextSize(desc.c_str());
@@ -776,7 +774,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
       std::vector<std::string> splittedBinding = ::SplitBindings(bind, '+');
       const float maxCursorPosX = ImGui::GetCursorPosX() + ImGui::GetColumnWidth();
       float posX = maxCursorPosX - ImGui::CalcTextSize(bind.c_str()).x - ImGui::GetScrollX() -
-        ((splittedBinding.size() * 2) - 1) * ImGui::GetStyle().ItemSpacing.x;
+        ((splittedBinding.size() * 2) - 1) * spacingX;
       ImGui::SetCursorPosX(posX);
       for (const std::string& key : splittedBinding)
       {
