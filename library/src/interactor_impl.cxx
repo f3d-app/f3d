@@ -1429,9 +1429,7 @@ interactor& interactor_impl::initBindings()
 #endif
   this->addBinding({mod_t::CTRL, "Q"}, "stop_interactor", "Others", std::bind(docStr, "Stop the interactor"));
   this->addBinding({mod_t::NONE, "Return"}, "reset_camera", "Others", std::bind(docStr, "Reset camera to initial parameters"));
-  this->addBinding({mod_t::SHIFT, "Space"}, "previous_frame_animation", "Others", std::bind(docStr, "Play animation's next frame if any"));
   this->addBinding({mod_t::NONE, "Space"}, "toggle_animation", "Others", std::bind(docStr, "Play/Pause animation if any"));
-  this->addBinding({mod_t::CTRL, "Space"}, "next_frame_animation", "Others", std::bind(docStr, "Play animation's next frame if any"));
   this->addBinding({mod_t::NONE, "Drop"}, "add_files", "Others", std::bind(docStr, "Add files to the scene"));
   this->addBinding({mod_t::SHIFT, "V"}, "cycle_verbose_level", "Others", docVerbose, f3d::interactor::BindingType::CYCLIC);
   // clang-format on

@@ -1,0 +1,8 @@
+[
+  {
+    "bindings": {
+      "Ctrl+Space": "next_keyframe_animation",
+      "Shift+Space": "previous_keyframe_animation"
+    }
+  }
+]
