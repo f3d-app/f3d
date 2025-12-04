@@ -1063,14 +1063,15 @@ interactor& interactor_impl::initCommands()
     command_documentation_t{ "reset_camera", "reset the camera to its original location" });
 
   this->addCommand(
-    "next_frame_animation",
-    [&](const std::vector<std::string>&) {this->Internals->AnimationManager->NextFrame(); },
-    command_documentation_t{ "next_frame_animation", "Play animation's next frame" });
+    "next_keyframe_animation",
+    [&](const std::vector<std::string>&) { this->Internals->AnimationManager->NextKeyFrame(); },
+    command_documentation_t{ "next_keyframe_animation", "Play animation's next key frame" });
 
   this->addCommand(
-    "previous_frame_animation",
-    [&](const std::vector<std::string>&) { this->Internals->AnimationManager->PreviousFrame(); },
-    command_documentation_t{ "previous_frame_animation", "Play animation's previous frame" });
+    "previous_keyframe_animation",
+    [&](const std::vector<std::string>&) { this->Internals->AnimationManager->PreviousKeyFrame(); },
+    command_documentation_t{
+      "previous_keyframe_animation", "Play animation's previous key frame" });
 
   this->addCommand(
     "toggle_animation",

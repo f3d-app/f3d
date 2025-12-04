@@ -246,7 +246,7 @@ bool animationManager::LoadAtTime(double timeValue)
   return true;
 }
 
-bool animationManager::LoadAtFrame(int frame)
+bool animationManager::LoadAtKeyFrame(int frame_jump)
 {
   if (!this->PreparedAnimationIndices.has_value())
   {
@@ -274,21 +274,21 @@ bool animationManager::LoadAtFrame(int frame)
     return false;
   }
 
-  this->CurrentTime = std::clamp(*(it + frame), this->TimeRange[0], this->TimeRange[1]);
+  this->CurrentTime = std::clamp(*(it + frame_jump), this->TimeRange[0], this->TimeRange[1]);
   return this->LoadAtTime(this->CurrentTime);
 }
 
-void animationManager::NextFrame()
+void animationManager::NextKeyFrame()
 {
-  if (this->LoadAtFrame(1))
+  if (this->LoadAtKeyFrame(1))
   {
     this->Window.render();
   }
 }
 
-void animationManager::PreviousFrame()
+void animationManager::PreviousKeyFrame()
 {
-  if (this->LoadAtFrame(-1))
+  if (this->LoadAtKeyFrame(-1))
   {
     this->Window.render();
   }

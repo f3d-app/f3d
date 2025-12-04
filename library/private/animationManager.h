@@ -92,14 +92,14 @@ public:
   void Tick();
 
   /**
-   * Set current animation to next frame
+   * Set current animation to next keyframe
    */
-  void NextFrame();
+  void NextKeyFrame();
 
   /**
-   * Set current animation to previous frame
+   * Set current animation to previous keyframe
    */
-  void PreviousFrame();
+  void PreviousKeyFrame();
 
   /**
    * Load animation at provided time value
@@ -107,9 +107,9 @@ public:
   bool LoadAtTime(double timeValue);
 
   /**
-   * Load animation to a specific delta from current frame
+   * Load animation at a specific keyframe
    */
-  bool LoadAtFrame(int frame);
+  bool LoadAtKeyFrame(int keyframe_jump);
 
   /**
    * Return a pair containing the current time range values
