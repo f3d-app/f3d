@@ -8,7 +8,7 @@
 int main(int argc, char** argv)
 {
   // Check inputs
-  if (argc != 2)
+  if (argc < 2)
   {
     return EXIT_FAILURE;
   }
@@ -35,10 +35,25 @@ int main(int argc, char** argv)
 
   // Start interaction and stop it after one second
   f3d::interactor& inter = eng.getInteractor();
-  inter.start(1, [&inter]() { inter.stop(); });
 
-  // Actual call would look like this
-  // inter.start();
+  if (argc > 2)
+  {
+    // For testing purposes only, shutdown the example after `timeout` seconds
+    try
+    {
+      int timeout = std::stoi(argv[2]);
+      inter.start(timeout, [&inter]() { inter.stop(); });
+    }
+    catch (const std::exception& e)
+    {
+      std::cout << e.what() << std::endl;
+      return EXIT_FAILURE;
+    }
+  }
+  else
+  {
+    inter.start();
+  }
 
   return EXIT_SUCCESS;
 }

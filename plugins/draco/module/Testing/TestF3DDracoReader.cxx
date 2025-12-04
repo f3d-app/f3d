@@ -11,6 +11,6 @@ int TestF3DDracoReader(int vtkNotUsed(argc), char* argv[])
   vtkNew<vtkF3DDracoReader> reader;
   reader->SetFileName(filename);
   reader->Update();
-  reader->Print(cout);
+  reader->Print(std::cout);
   return EXIT_SUCCESS;
 }

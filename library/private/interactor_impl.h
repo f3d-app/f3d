@@ -60,6 +60,7 @@ public:
     const interaction_bind_t& bind) const override;
   BindingType getBindingType(const interaction_bind_t& bind) const override;
 
+  interactor& triggerEventLoop(double deltaTime) override;
   interactor& triggerModUpdate(InputModifier mod) override;
   interactor& triggerMouseButton(InputAction action, MouseButton button) override;
   interactor& triggerMousePosition(double xpos, double ypos) override;
@@ -82,6 +83,7 @@ public:
   interactor& start(double deltaTime, std::function<void()> userCallBack) override;
   interactor& stop() override;
   interactor& requestRender() override;
+  interactor& requestStop() override;
   ///@}
 
   /**

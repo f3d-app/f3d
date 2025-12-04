@@ -100,7 +100,7 @@ jobs:
 
       - name: Cache LFS Data
         id: lfs_sha_recover
-        uses: f3d-app/lfs-data-cache-action@v1
+        uses: f3d-app/lfs-data-cache-action@v2
         with:
           cache_postfix: cache-0
 
@@ -734,8 +734,6 @@ jobs:
         python_version: ["3.14"]
         include:
           - os: ubuntu-22.04
-            python_version: "3.9"
-          - os: ubuntu-22.04
             python_version: "3.10"
           - os: ubuntu-22.04
             python_version: "3.11"
@@ -1021,7 +1019,7 @@ jobs:
   # webassembly: Build webassembly artifacts
   #----------------------------------------------------------------------------
   webassembly:
-    needs: [default_versions, check_docker_images]
+    needs: [cache_lfs, default_versions, check_docker_images]
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
@@ -1040,10 +1038,12 @@ jobs:
         with:
           path: "source"
           fetch-depth: 0
-          lfs: true
+          lfs: false
 
       - name: WebAssembly CI
         uses: ./source/.github/actions/wasm-ci
+        with:
+          lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
       # TODO: it's currently NOT using NPM, let's fix it when 3.3 is available
       - name: Install dependencies

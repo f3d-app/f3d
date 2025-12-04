@@ -16,6 +16,8 @@
 #include "vtkF3DPointSplatMapper.h"
 #endif
 
+#include <iostream>
+
 int TestF3DObjectFactory(int argc, char* argv[])
 {
   vtkNew<vtkF3DObjectFactory> factory;
@@ -49,7 +51,7 @@ int TestF3DObjectFactory(int argc, char* argv[])
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240203)
   vtkNew<vtkPointGaussianMapper> pointMapper;
-  pointMapper->Print(cout);
+  pointMapper->Print(std::cout);
   vtkF3DPointSplatMapper* pointMapperPtr = vtkF3DPointSplatMapper::SafeDownCast(pointMapper);
   if (pointMapperPtr == nullptr)
   {

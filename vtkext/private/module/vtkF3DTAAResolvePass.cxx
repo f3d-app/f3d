@@ -31,8 +31,6 @@ void vtkF3DTAAResolvePass::Render(const vtkRenderState* state)
 
   assert(this->DelegatePass != nullptr);
 
-  this->InspectCameraMovement(renderer);
-
   // create framebuffer and textures
   int pos[2];
   int size[2];
@@ -42,13 +40,16 @@ void vtkF3DTAAResolvePass::Render(const vtkRenderState* state)
   {
     this->HistoryTexture = vtkSmartPointer<vtkTextureObject>::New();
     this->HistoryTexture->SetContext(renWin);
+    this->HistoryTexture->SetFormat(GL_RGBA);
+    this->HistoryTexture->SetInternalFormat(GL_RGBA16F);
+    this->HistoryTexture->SetDataType(GL_HALF_FLOAT);
     this->HistoryTexture->SetMinificationFilter(vtkTextureObject::Linear);
     this->HistoryTexture->SetMagnificationFilter(vtkTextureObject::Linear);
     this->HistoryTexture->SetWrapS(vtkTextureObject::ClampToEdge);
     this->HistoryTexture->SetWrapT(vtkTextureObject::ClampToEdge);
     renderer->GetTiledSizeAndOrigin(&size[0], &size[1], &pos[0], &pos[1]);
     this->HistoryTexture->Allocate2D(size[0], size[1], 4, VTK_FLOAT);
-    this->HistoryInitialized = false;
+    this->ResetIterations();
   }
   this->HistoryTexture->Resize(size[0], size[1]);
 
@@ -56,6 +57,9 @@ void vtkF3DTAAResolvePass::Render(const vtkRenderState* state)
   {
     this->ColorTexture = vtkSmartPointer<vtkTextureObject>::New();
     this->ColorTexture->SetContext(renWin);
+    this->ColorTexture->SetFormat(GL_RGBA);
+    this->ColorTexture->SetInternalFormat(GL_RGBA16F);
+    this->ColorTexture->SetDataType(GL_HALF_FLOAT);
     this->ColorTexture->SetMinificationFilter(vtkTextureObject::Linear);
     this->ColorTexture->SetMagnificationFilter(vtkTextureObject::Linear);
     this->ColorTexture->SetWrapS(vtkTextureObject::ClampToEdge);
@@ -105,8 +109,7 @@ void vtkF3DTAAResolvePass::Render(const vtkRenderState* state)
   this->QuadHelper->Program->SetUniformi("colorTexture", this->ColorTexture->GetTextureUnit());
   this->QuadHelper->Program->SetUniformi("historyTexture", this->HistoryTexture->GetTextureUnit());
 
-  const float blendFactor = this->HistoryInitialized ? 0.9f : 0.0f;
-  this->QuadHelper->Program->SetUniformf("blendFactor", blendFactor);
+  const float blendFactor = this->HistoryIteration / (this->HistoryIteration + 1.0f);
   this->QuadHelper->Program->SetUniformf("blendFactor", blendFactor);
   ostate->vtkglDisable(GL_BLEND);
   ostate->vtkglDisable(GL_DEPTH_TEST);
@@ -119,45 +122,9 @@ void vtkF3DTAAResolvePass::Render(const vtkRenderState* state)
   this->ColorTexture->Deactivate();
   this->HistoryTexture->Deactivate();
   this->HistoryTexture->CopyFromFrameBuffer(pos[0], pos[1], size[0], size[1], size[0], size[1]);
-  this->HistoryInitialized = true;
+  this->HistoryIteration = std::min(this->HistoryIteration + 1, 1024);
 
   vtkOpenGLCheckErrorMacro("failed after Render");
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DTAAResolvePass::InspectCameraMovement(vtkRenderer* renderer)
-{
-  vtkCamera* cam = renderer->GetActiveCamera();
-
-  assert(cam != nullptr);
-
-  double position[3];
-  cam->GetPosition(position);
-  double focalPoint[3];
-  cam->GetFocalPoint(focalPoint);
-  double viewUp[3];
-  cam->GetViewUp(viewUp);
-
-  if (this->LastPosition[0] != position[0] || this->LastPosition[1] != position[1] ||
-    this->LastPosition[2] != position[2] || this->LastFocalPoint[0] != focalPoint[0] ||
-    this->LastFocalPoint[1] != focalPoint[1] || this->LastFocalPoint[2] != focalPoint[2] ||
-    this->LastViewUp[0] != viewUp[0] || this->LastViewUp[1] != viewUp[1] ||
-    this->LastViewUp[2] != viewUp[2])
-  {
-    this->HistoryInitialized = false;
-
-    this->LastPosition[0] = position[0];
-    this->LastPosition[1] = position[1];
-    this->LastPosition[2] = position[2];
-
-    this->LastFocalPoint[0] = focalPoint[0];
-    this->LastFocalPoint[1] = focalPoint[1];
-    this->LastFocalPoint[2] = focalPoint[2];
-
-    this->LastViewUp[0] = viewUp[0];
-    this->LastViewUp[1] = viewUp[1];
-    this->LastViewUp[2] = viewUp[2];
-  }
 }
 
 //------------------------------------------------------------------------------

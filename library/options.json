@@ -92,7 +92,18 @@
     "effect": {
       "translucency_support": {
         "type": "bool",
-        "default_value": "false"
+        "default_value": "false",
+        "deprecated": "use render.effect.blending.enable instead"
+      },
+      "blending": {
+        "enable": {
+          "type": "bool",
+          "default_value": "false"
+        },
+        "mode": {
+          "type": "string",
+          "default_value": "ddp"
+        }
       },
       "anti_aliasing": {
         "type": "bool",
@@ -235,6 +246,10 @@
       "type": "bool",
       "default_value": "false"
     },
+    "hdri_filename": {
+      "type": "bool",
+      "default_value": "false"
+    },
     "font_file": {
       "type": "path"
     },
@@ -246,9 +261,15 @@
       "type": "bool",
       "default_value": "false"
     },
+    "loader_progress_color": {
+      "type": "color"
+    },
     "animation_progress": {
       "type": "bool",
       "default_value": "false"
+    },
+    "animation_progress_color": {
+      "type": "color"
     }
   },
   "model": {
@@ -340,6 +361,10 @@
       "size": {
         "type": "double",
         "default_value": 10.0
+      },
+      "absolute_size": {
+        "type": "bool",
+        "default_value": "false"
       }
     },
     "volume": {

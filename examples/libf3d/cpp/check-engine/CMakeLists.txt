@@ -22,8 +22,3 @@ check_variable_defined(f3d_BINDINGS_JAVA)
 add_executable(check-engine main.cxx)
 target_link_libraries(check-engine f3d::libf3d)
 set_target_properties(check-engine PROPERTIES CXX_STANDARD 17)
-
-if(BUILD_TESTING)
-  enable_testing()
-  add_test(NAME test_check-engine COMMAND "$<TARGET_FILE:check-engine>")
-endif()

@@ -26,6 +26,7 @@ unknownMacro
 *:*libf3dSDKTests.cxx
 
 // specific checks
+knownConditionTrueFalse:vtkext/private/module/vtkF3DPointSplatMapper.cxx
 knownConditionTrueFalse:library/testing/TestSDKImage.cxx
 knownConditionTrueFalse:library/testing/TestSDKImageDeprecated.cxx
 noExplicitConstructor:library/public/types.h

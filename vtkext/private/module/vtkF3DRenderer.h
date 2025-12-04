@@ -14,6 +14,7 @@
 #include "vtkF3DMetaImporter.h"
 #include "vtkF3DUIActor.h"
 
+#include <vtkCallbackCommand.h>
 #include <vtkLight.h>
 #include <vtkOpenGLRenderer.h>
 #include <vtkVersion.h>
@@ -30,6 +31,8 @@ class vtkCornerAnnotation;
 class vtkGridAxesActor3D;
 class vtkImageReader2;
 class vtkOrientationMarkerWidget;
+class vtkCameraOrientationRepresentation;
+class vtkCameraOrientationWidget;
 class vtkScalarBarActor;
 class vtkSkybox;
 class vtkTextActor;
@@ -51,6 +54,26 @@ public:
     TAA
   };
 
+  /**
+   * Enum listing possible blending modes.
+   */
+  enum class BlendingMode : unsigned char
+  {
+    NONE,
+    DUAL_DEPTH_PEELING,
+    SORT,
+    STOCHASTIC
+  };
+
+  /**
+   * Enum listing possible splat types.
+   */
+  enum class SplatType : unsigned char
+  {
+    SPHERE,
+    GAUSSIAN
+  };
+
   ///@{
   /**
    * Set visibility of different actors
@@ -62,6 +85,7 @@ public:
   void ShowTimer(bool show);
   void ShowMetaData(bool show);
   void ShowFilename(bool show);
+  void ShowHDRIFilename(bool show);
   void ShowCheatSheet(bool show);
   void ShowConsole(bool show);
   void ShowMinimalConsole(bool show);
@@ -91,8 +115,13 @@ public:
   void SetGridUnitSquare(const std::optional<double>& unitSquare);
   void SetGridSubdivisions(int subdivisions);
   void SetGridColor(const std::vector<double>& color);
-  void SetBackdropOpacity(const double backdropOpacity);
   ///@}
+
+  /**
+   * Set the backdrop opacity
+   * Should be called before ShowAxis
+   */
+  void SetBackdropOpacity(const double backdropOpacity);
 
   ///@{
   /**
@@ -100,7 +129,7 @@ public:
    */
   void SetUseRaytracing(bool use);
   void SetUseRaytracingDenoiser(bool use);
-  void SetUseDepthPeelingPass(bool use);
+  void SetBlendingMode(BlendingMode mode);
   void SetUseSSAOPass(bool use);
   void SetAntiAliasingMode(AntiAliasingMode mode);
   void SetUseToneMappingPass(bool use);
@@ -110,6 +139,11 @@ public:
   void SetBackfaceType(const std::optional<std::string>& backfaceType);
   void SetFinalShader(const std::optional<std::string>& finalShader);
   ///@}
+
+  /**
+   * Get BlendingMode
+   */
+  BlendingMode GetBlendingMode() const;
 
   /**
    * Set SetUseOrthographicProjection
@@ -273,16 +307,21 @@ public:
    */
   void SetTextureNormal(const std::optional<fs::path>& tex);
 
-  enum class SplatType
-  {
-    SPHERE,
-    GAUSSIAN
-  };
+  /**
+   * Set point sprites type
+   */
+  void SetPointSpritesType(SplatType type);
 
   /**
-   * Set the point sprites size and the splat type on the pointGaussianMapper
+   * Set the point sprites size
+   * If absoluteScale is false, the size is scaled by the scene bounding box
    */
-  void SetPointSpritesProperties(SplatType splatType, double pointSpritesSize);
+  void SetPointSpritesSize(bool absoluteScale, double size);
+
+  /**
+   * Set point sprites instancing usage
+   */
+  void SetPointSpritesUseInstancing(bool useInstancing);
 
   /**
    * Set the visibility of the scalar bar.
@@ -537,7 +576,21 @@ private:
    */
   void ConfigureActorTextureTransform(vtkActor* actorBase, const double* matrix);
 
+  /**
+   * Configure all properties of the point sprites mapper
+   */
+  void ConfigurePointSprites();
+
+  /**
+   * Updates the axis widget size based on the window size
+   */
+  void UpdateAxisWidgetSize();
+
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
+  vtkSmartPointer<vtkCameraOrientationWidget> ModernAxisWidget;
+  vtkSmartPointer<vtkCameraOrientationRepresentation> ModernAxisRepresentation;
+  vtkSmartPointer<vtkCallbackCommand> ModernAxisWidgetResizeCallback;
+  double ModernAxisBackdropOpacity = 0.0;
 
   // Does vtk version support GridAxesActor
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
@@ -558,6 +611,7 @@ private:
   bool LightIntensitiesConfigured = false;
   bool TextActorsConfigured = false;
   bool MetaDataConfigured = false;
+  bool PointSpritesConfigured = false;
   bool HDRIReaderConfigured = false;
   bool HDRIHashConfigured = false;
   bool HDRITextureConfigured = false;
@@ -576,6 +630,7 @@ private:
   bool TimerVisible = false;
   bool FilenameVisible = false;
   bool MetaDataVisible = false;
+  bool HDRIFilenameVisible = false;
   bool CheatSheetVisible = false;
   bool ConsoleVisible = false;
   bool MinimalConsoleVisible = false;
@@ -585,8 +640,8 @@ private:
   bool ArmatureVisible = false;
   bool UseRaytracing = false;
   bool UseRaytracingDenoiser = false;
-  bool UseDepthPeelingPass = false;
   AntiAliasingMode AntiAliasingModeEnabled = AntiAliasingMode::NONE;
+  BlendingMode BlendingModeEnabled = BlendingMode::NONE;
   bool UseSSAOPass = false;
   bool UseToneMappingPass = false;
   bool UseBlurBackground = false;
@@ -638,7 +693,7 @@ private:
   bool ScalarBarActorConfigured = false;
 
   bool ColoringMappersConfigured = false;
-  bool PointSpritesMappersConfigured = false;
+  bool ColoringPointSpritesMappersConfigured = false;
   bool VolumePropsAndMappersConfigured = false;
   bool ColoringConfigured = false;
 
@@ -678,6 +733,11 @@ private:
 
   int TaaHaltonNumerator[2] = { 0, 0 };
   int TaaHaltonDenominator[2] = { 1, 1 };
+
+  SplatType PointSpritesType = SplatType::SPHERE;
+  double PointSpritesSize = 10;
+  bool PointSpritesAbsoluteScale = false;
+  bool PointSpritesUseInstancing = false;
 };
 
 #endif

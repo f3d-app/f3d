@@ -81,15 +81,10 @@ public:
   }
 
   /**
-   * Set the animation in delta time in seconds
-   */
-  void SetDeltaTime(double deltaTime);
-
-  /**
-   * Advance animationTime of DeltaTime and call loadAtTime accordingly
+   * Advance animationTime of deltaTime and call loadAtTime accordingly
    * Do nothing if IsPlaying is false
    */
-  void Tick();
+  void Tick(double deltaTime);
 
   /**
    * Set current animation to next keyframe
@@ -121,6 +116,11 @@ public:
    */
   unsigned int GetNumberOfAvailableAnimations() const;
 
+  /**
+   * Update the dynamic options value to trigger cheatsheet update if needed.
+   */
+  void UpdateDynamicOptions();
+
   animationManager(animationManager const&) = delete;
   void operator=(animationManager const&) = delete;
 
@@ -130,6 +130,21 @@ private:
    * Return early if already prepared for the current subset of animation in the options
    */
   void PrepareForAnimationIndices();
+
+  /**
+   * Internal setter for Autoplay.
+   */
+  void SetAutoplay(bool enable);
+
+  /**
+   * Internal setter for SpeedFactor.
+   */
+  void SetSpeedFactor(double speedFactor);
+
+  /**
+   * Helper method to call the homonymous method from vtkF3DRenderer.
+   */
+  void SetCheatSheetConfigured(bool configured);
 
   options& Options;
   window_impl& Window;
@@ -143,8 +158,11 @@ private:
   double TimeRange[2] = { 0.0, 0.0 };
   bool Playing = false;
   double CurrentTime = 0;
-  double DeltaTime = 0;
   bool CurrentTimeSet = false;
+
+  // Dynamic options
+  bool Autoplay = false;
+  double SpeedFactor = 1.0;
 
   vtkSmartPointer<vtkProgressBarWidget> ProgressWidget;
 };

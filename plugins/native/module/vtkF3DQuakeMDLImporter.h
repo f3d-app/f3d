@@ -20,11 +20,6 @@ public:
   static vtkF3DQuakeMDLImporter* New();
   vtkTypeMacro(vtkF3DQuakeMDLImporter, vtkF3DImporter);
 
-#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 5, 20250923)
-  vtkSetMacro(FileName, std::string);
-  vtkGetMacro(FileName, std::string);
-#endif
-
   /**
    * Update actors at the given time value.
    */
@@ -84,9 +79,6 @@ private:
   void operator=(const vtkF3DQuakeMDLImporter&) = delete;
 
   struct vtkInternals;
-#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 5, 20250923)
-  std::string FileName;
-#endif
   unsigned int SkinIndex = 0;
 
   std::unique_ptr<vtkInternals> Internals;

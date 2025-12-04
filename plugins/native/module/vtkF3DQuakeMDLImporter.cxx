@@ -1,7 +1,9 @@
 #include "vtkF3DQuakeMDLImporter.h"
 #include "vtkF3DQuakeMDLImporterConstants.h"
 
+#include <vtkCommand.h>
 #include <vtkDoubleArray.h>
+#include <vtkFileResourceStream.h>
 #include <vtkFloatArray.h>
 #include <vtkImageData.h>
 #include <vtkOpenGLTexture.h>
@@ -10,6 +12,7 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
+#include <vtkResourceStream.h>
 
 #include <cstdint>
 #include <cstring>
@@ -233,6 +236,10 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   //----------------------------------------------------------------------------
   bool CreateMesh(const std::vector<unsigned char>& buffer, int offset, const mdl_header_t* header)
   {
+    const unsigned long totalProgress = header->numFrames * 2 + header->numTriangles;
+    unsigned long currentProgress = 0;
+    double progressRate;
+
     constexpr int mdl_simpleframe_t_fixed_size =
       2 * sizeof(mdl_vertex_t) + 16 * sizeof(int8_t); // Size of bboxmin, bboxmax and name.
 
@@ -289,6 +296,13 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
           offset += mdl_simpleframe_t_fixed_size + sizeof(mdl_vertex_t) * header->numVertices;
         }
       }
+
+      currentProgress++;
+      if (i % 128 == 0)
+      {
+        progressRate = static_cast<double>(currentProgress) / totalProgress;
+        this->Parent->InvokeEvent(vtkCommand::ProgressEvent, static_cast<void*>(&progressRate));
+      }
     }
 
     // Draw cells and scale texture coordinates
@@ -318,6 +332,13 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       // triangle winding order is inverted in Quake MDL
       vtkIdType triangle[3] = { i * 3, i * 3 + 2, i * 3 + 1 };
       cells->InsertNextCell(3, triangle);
+
+      currentProgress++;
+      if (i % 128 == 0)
+      {
+        progressRate = static_cast<double>(currentProgress) / totalProgress;
+        this->Parent->InvokeEvent(vtkCommand::ProgressEvent, static_cast<void*>(&progressRate));
+      }
     }
 
     // Extract animation name from frame name and recover animation index accordingly
@@ -413,15 +434,32 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         this->AnimationTimes.emplace_back(times);
         this->AnimationFrames.emplace_back(meshes);
       }
+
+      currentProgress++;
+      if (frameNum % 128 == 0)
+      {
+        progressRate = static_cast<double>(currentProgress) / totalProgress;
+        this->Parent->InvokeEvent(vtkCommand::ProgressEvent, static_cast<void*>(&progressRate));
+      }
     }
+
+    currentProgress = totalProgress;
+    progressRate = 1.0;
+    this->Parent->InvokeEvent(vtkCommand::ProgressEvent, static_cast<void*>(&progressRate));
     return true;
   }
 
   //----------------------------------------------------------------------------
-  bool ReadScene(const std::string& filePath)
+  bool ReadScene(vtkResourceStream* stream)
   {
-    std::ifstream inputStream(filePath, std::ios::binary);
-    std::vector<unsigned char> buffer(std::istreambuf_iterator<char>(inputStream), {});
+    // Recover length of stream
+    stream->Seek(0, vtkResourceStream::SeekDirection::End);
+    size_t length = stream->Tell();
+    stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+
+    // Read stream into buffer
+    std::vector<unsigned char> buffer(length);
+    stream->Read(buffer.data(), length);
 
     // Read header
     // XXX: This is completely unsafe, should be rewritten using modern API
@@ -477,7 +515,21 @@ vtkF3DQuakeMDLImporter::vtkF3DQuakeMDLImporter()
 //----------------------------------------------------------------------------
 int vtkF3DQuakeMDLImporter::ImportBegin()
 {
-  return this->Internals->ReadScene(this->GetFileName());
+  // Stream is higher priority than filename.
+  vtkResourceStream* stream = this->GetStream();
+  vtkNew<vtkFileResourceStream> fileStream;
+  if (!stream)
+  {
+    if (!fileStream->Open(this->GetFileName()))
+    {
+      vtkErrorMacro("Unable to open " << this->GetFileName() << " , aborting.");
+      return 0;
+    }
+
+    stream = fileStream;
+  }
+
+  return this->Internals->ReadScene(stream);
 }
 
 //----------------------------------------------------------------------------
@@ -590,31 +642,25 @@ bool vtkF3DQuakeMDLImporter::IsAnimationEnabled(vtkIdType animationIndex)
 bool vtkF3DQuakeMDLImporter::GetTemporalInformation(vtkIdType animationIndex, double frameRate,
   int& nbTimeSteps, double timeRange[2], vtkDoubleArray* timeSteps)
 {
+  assert(animationIndex < static_cast<vtkIdType>(this->Internals->AnimationNames.size() +
+                            this->Internals->GroupSkinAnimationNames.size()));
   assert(animationIndex >= 0);
 
-  if (animationIndex < this->GetNumberOfAnimations())
+  const std::vector<double>& times =
+    animationIndex < static_cast<vtkIdType>(this->Internals->AnimationNames.size())
+    ? this->Internals->AnimationTimes[animationIndex]
+    : this->Internals->GroupSkinDurations[animationIndex - this->Internals->AnimationNames.size()];
+
+  timeRange[0] = times.front();
+  // If single frame, keep animation duration = 0
+  timeRange[1] = times.size() == 2 ? times.front() : times.back();
+
+  nbTimeSteps = static_cast<int>(times.size());
+  timeSteps->SetNumberOfTuples(times.size());
+
+  for (unsigned int i = 0; i < times.size(); ++i)
   {
-    const std::vector<double>& times =
-      animationIndex < static_cast<vtkIdType>(this->Internals->AnimationNames.size())
-      ? this->Internals->AnimationTimes[animationIndex]
-      : this->Internals
-          ->GroupSkinDurations[animationIndex - this->Internals->AnimationNames.size()];
-
-    timeRange[0] = times.front();
-    // If single frame, keep animation duration = 0
-    timeRange[1] = times.size() == 2 ? times.front() : times.back();
-
-    if (frameRate > 0)
-    {
-      nbTimeSteps = times.size();
-      timeSteps->SetNumberOfTuples(times.size());
-
-      for (uint i = 0; i < times.size(); ++i)
-      {
-        timeSteps->SetValue(i, times[i]);
-      }
-    }
-    return true;
+    timeSteps->SetValue(i, times[i]);
   }
-  return false;
+  return true;
 }

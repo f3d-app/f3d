@@ -1,8 +1,18 @@
+From e70fcb8533e7ec780f94d96152506f0365f56c97 Mon Sep 17 00:00:00 2001
+From: Mathieu Westphal <mathieu.westphal@kitware.com>
+Date: Wed, 29 Oct 2025 17:21:46 +0100
+Subject: [PATCH] install-bin
+
+---
+ cmake/macros/Private.cmake | 11 ++++++-----
+ cmake/macros/Public.cmake  |  5 +++--
+ 2 files changed, 9 insertions(+), 7 deletions(-)
+
 diff --git a/cmake/macros/Private.cmake b/cmake/macros/Private.cmake
-index 23172745e..dddc5c2ee 100644
+index b90b743de..a08164afd 100644
 --- a/cmake/macros/Private.cmake
 +++ b/cmake/macros/Private.cmake
-@@ -1224,6 +1224,7 @@ function(_pxr_library NAME)
+@@ -1231,6 +1231,7 @@ function(_pxr_library NAME)
      _get_install_dir("include" headerInstallDir)
      _get_install_dir("include/${PXR_PREFIX}/${NAME}" headerInstallPrefix)
      _get_install_dir("lib" libInstallPrefix)
@@ -10,7 +20,7 @@ index 23172745e..dddc5c2ee 100644
      if(isPlugin)
          if(NOT isObject)
              # A plugin embedded in the monolithic library is found in
-@@ -1432,12 +1433,12 @@ function(_pxr_library NAME)
+@@ -1423,12 +1424,12 @@ function(_pxr_library NAME)
                  TARGETS ${NAME}
                  LIBRARY DESTINATION ${libInstallPrefix}
                  ARCHIVE DESTINATION ${libInstallPrefix}
@@ -25,7 +35,7 @@ index 23172745e..dddc5c2ee 100644
                      OPTIONAL
                  )
              endif()
-@@ -1447,13 +1448,13 @@ function(_pxr_library NAME)
+@@ -1438,13 +1439,13 @@ function(_pxr_library NAME)
                  EXPORT pxrTargets
                  LIBRARY DESTINATION ${libInstallPrefix}
                  ARCHIVE DESTINATION ${libInstallPrefix}
@@ -41,7 +51,7 @@ index 23172745e..dddc5c2ee 100644
                      OPTIONAL
                  )
              endif()
-@@ -1463,7 +1464,7 @@ function(_pxr_library NAME)
+@@ -1454,7 +1455,7 @@ function(_pxr_library NAME)
                  EXPORT pxrTargets
                  LIBRARY DESTINATION ${libInstallPrefix}
                  ARCHIVE DESTINATION ${libInstallPrefix}
@@ -51,16 +61,16 @@ index 23172745e..dddc5c2ee 100644
          endif()
      
 diff --git a/cmake/macros/Public.cmake b/cmake/macros/Public.cmake
-index a1734b6a2..397315e8e 100644
+index b8e588bf3..418234a5d 100644
 --- a/cmake/macros/Public.cmake
 +++ b/cmake/macros/Public.cmake
-@@ -1005,17 +1005,18 @@ function(pxr_toplevel_prologue)
-                     IMPORT_PREFIX "${libPrefix}"
+@@ -1154,17 +1154,18 @@ function(pxr_toplevel_prologue)
+                     OUTPUT_NAME ${libName}
              )
              _get_install_dir("lib" libInstallPrefix)
 +            _get_install_dir("bin" binInstallPrefix)
              install(
-                 TARGETS usd_ms
+                 TARGETS usd_m
                  EXPORT pxrTargets
                  LIBRARY DESTINATION ${libInstallPrefix}
                  ARCHIVE DESTINATION ${libInstallPrefix}
@@ -69,9 +79,12 @@ index a1734b6a2..397315e8e 100644
              )
              if(WIN32)
                  install(
-                     FILES $<TARGET_PDB_FILE:usd_ms>
+                     FILES $<TARGET_PDB_FILE:usd_m>
 -                    DESTINATION ${libInstallPrefix}
 +                    DESTINATION ${binInstallPrefix}
                      OPTIONAL
                  )
              endif()
+-- 
+2.51.1
+

@@ -2,7 +2,7 @@
 
 #include "F3DDefaultLogo.h"
 #include "F3DFontBuffer.h"
-#include "F3DImguiStyle.h"
+#include "F3DStyle.h"
 #include "vtkF3DImguiConsole.h"
 #include "vtkF3DImguiFS.h"
 #include "vtkF3DImguiVS.h"
@@ -352,15 +352,15 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
   style->WindowBorderSize = 0.f;
   style->WindowPadding = ImVec2(10, 10);
   style->WindowRounding = 8.f;
-  style->Colors[ImGuiCol_Text] = F3DImguiStyle::GetTextColor();
-  style->Colors[ImGuiCol_WindowBg] = F3DImguiStyle::GetBackgroundColor();
+  style->Colors[ImGuiCol_Text] = F3DStyle::imgui::GetTextColor();
+  style->Colors[ImGuiCol_WindowBg] = F3DStyle::imgui::GetBackgroundColor();
   style->Colors[ImGuiCol_FrameBg] = colTransparent;
   style->Colors[ImGuiCol_FrameBgActive] = colTransparent;
   style->Colors[ImGuiCol_ScrollbarBg] = colTransparent;
-  style->Colors[ImGuiCol_ScrollbarGrab] = F3DImguiStyle::GetMidColor();
-  style->Colors[ImGuiCol_ScrollbarGrabHovered] = F3DImguiStyle::GetHighlightColor();
-  style->Colors[ImGuiCol_ScrollbarGrabActive] = F3DImguiStyle::GetHighlightColor();
-  style->Colors[ImGuiCol_TextSelectedBg] = F3DImguiStyle::GetHighlightColor();
+  style->Colors[ImGuiCol_ScrollbarGrab] = F3DStyle::imgui::GetMidColor();
+  style->Colors[ImGuiCol_ScrollbarGrabHovered] = F3DStyle::imgui::GetHighlightColor();
+  style->Colors[ImGuiCol_ScrollbarGrabActive] = F3DStyle::imgui::GetHighlightColor();
+  style->Colors[ImGuiCol_TextSelectedBg] = F3DStyle::imgui::GetHighlightColor();
 
   // Setup backend name
   io.BackendPlatformName = io.BackendRendererName = "F3D/VTK";
@@ -389,8 +389,8 @@ void vtkF3DImguiActor::RenderDropZone()
       return;
     }
 
-    constexpr ImVec4 colorImv = F3DImguiStyle::GetTextColor();
-    constexpr ImU32 color =
+    const ImVec4 colorImv = F3DStyle::imgui::GetTextColor();
+    const ImU32 color =
       IM_COL32(colorImv.x * 255, colorImv.y * 255, colorImv.z * 255, colorImv.w * 255);
 
     const int dropzonePad =
@@ -468,7 +468,7 @@ void vtkF3DImguiActor::RenderDropZone()
       ImVec2 textPos(viewport->GetWorkCenter().x - textSize.x * ::DROPZONE_MARGIN,
         viewport->GetWorkCenter().y - ::DROPZONE_MARGIN * textSize.y + ::LOGO_DISPLAY_HEIGHT / 2 +
           ::DROPZONE_LOGO_TEXT_PADDING);
-      drawList->AddText(textPos, ImColor(F3DImguiStyle::GetTextColor()), this->DropText.c_str());
+      drawList->AddText(textPos, ImColor(F3DStyle::imgui::GetTextColor()), this->DropText.c_str());
       return;
     }
 
@@ -505,9 +505,9 @@ void vtkF3DImguiActor::RenderDropZone()
       maxBindingsTextWidth = std::max(maxBindingsTextWidth, totalBindingsWidth);
     }
 
-    const ImColor descTextColor = F3DImguiStyle::GetTextColor();
-    const ImColor bindingRectColor = F3DImguiStyle::GetMidColor();
-    const ImColor bindingTextColor = F3DImguiStyle::GetTextColor();
+    const ImColor descTextColor = F3DStyle::imgui::GetTextColor();
+    const ImColor bindingRectColor = F3DStyle::imgui::GetMidColor();
+    const ImColor bindingTextColor = F3DStyle::imgui::GetTextColor();
 
     float tableWidth = maxDescTextWidth + maxBindingsTextWidth + ::DROPZONE_LOGO_TEXT_PADDING +
       ImGui::GetStyle().ItemSpacing.x;
@@ -574,12 +574,21 @@ void vtkF3DImguiActor::RenderFileName()
   {
     const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-    constexpr float margin = F3DImguiStyle::GetDefaultMargin();
+    constexpr float margin = F3DStyle::GetDefaultMargin();
     ImVec2 winSize = ImGui::CalcTextSize(this->FileName.c_str());
     winSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
     winSize.y += 2.f * ImGui::GetStyle().WindowPadding.y;
 
-    ::SetupNextWindow(ImVec2(viewport->GetWorkCenter().x - 0.5f * winSize.x, margin), winSize);
+    // Adjust position if HDRIFileName is also visible
+    float totalWidth = winSize.x;
+    if (this->HDRIFileNameVisible && !this->HDRIFileName.empty())
+    {
+      ImVec2 hdriWinSize = ImGui::CalcTextSize(this->HDRIFileName.c_str());
+      hdriWinSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
+      totalWidth += hdriWinSize.x + ImGui::GetStyle().WindowPadding.x;
+    }
+
+    ::SetupNextWindow(ImVec2(viewport->GetWorkCenter().x - 0.5f * totalWidth, margin), winSize);
     ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
 
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
@@ -596,7 +605,7 @@ void vtkF3DImguiActor::RenderMetaData()
 {
   const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-  constexpr float margin = F3DImguiStyle::GetDefaultMargin();
+  constexpr float margin = F3DStyle::GetDefaultMargin();
 
   ImVec2 winSize = ImGui::CalcTextSize(this->MetaData.c_str());
   winSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
@@ -616,11 +625,47 @@ void vtkF3DImguiActor::RenderMetaData()
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DImguiActor::RenderHDRIFileName()
+{
+  if (!this->HDRIFileName.empty())
+  {
+    const ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+    constexpr float margin = F3DStyle::GetDefaultMargin();
+    ImVec2 winSize = ImGui::CalcTextSize(this->HDRIFileName.c_str());
+    winSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
+    winSize.y += 2.f * ImGui::GetStyle().WindowPadding.y;
+
+    // Adjust position if FileName is also visible
+    float totalWidth = winSize.x;
+    float winOffsetX = 0.f;
+    if (this->FileNameVisible && !this->FileName.empty())
+    {
+      ImVec2 fileWinSize = ImGui::CalcTextSize(this->FileName.c_str());
+      fileWinSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
+      totalWidth += fileWinSize.x + ImGui::GetStyle().WindowPadding.x;
+      winOffsetX = fileWinSize.x + ImGui::GetStyle().WindowPadding.x;
+    }
+
+    ::SetupNextWindow(
+      ImVec2(viewport->GetWorkCenter().x - 0.5f * totalWidth + winOffsetX, margin), winSize);
+    ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
+
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings |
+      ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoMove;
+
+    ImGui::Begin("HDRIFileName", nullptr, flags);
+    ImGui::TextUnformatted(this->HDRIFileName.c_str());
+    ImGui::End();
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderCheatSheet()
 {
   const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-  constexpr float margin = F3DImguiStyle::GetDefaultMargin();
+  constexpr float margin = F3DStyle::GetDefaultMargin();
   constexpr float padding = 16.f;
 
   float textHeight = 0.f;
@@ -684,17 +729,17 @@ void vtkF3DImguiActor::RenderCheatSheet()
 
       if (type == CheatSheetBindingType::TOGGLE && val == "ON")
       {
-        bindingTextColor = F3DImguiStyle::GetBackgroundColor();
-        bindingRectColor = F3DImguiStyle::GetWarningColor();
-        descTextColor = F3DImguiStyle::GetWarningColor();
-        valueTextColor = F3DImguiStyle::GetWarningColor();
+        bindingTextColor = F3DStyle::imgui::GetBackgroundColor();
+        bindingRectColor = F3DStyle::imgui::GetWarningColor();
+        descTextColor = F3DStyle::imgui::GetWarningColor();
+        valueTextColor = F3DStyle::imgui::GetWarningColor();
       }
       else
       {
-        bindingTextColor = F3DImguiStyle::GetTextColor();
-        bindingRectColor = F3DImguiStyle::GetMidColor();
-        descTextColor = F3DImguiStyle::GetTextColor();
-        valueTextColor = F3DImguiStyle::GetHighlightColor();
+        bindingTextColor = F3DStyle::imgui::GetTextColor();
+        bindingRectColor = F3DStyle::imgui::GetMidColor();
+        descTextColor = F3DStyle::imgui::GetTextColor();
+        valueTextColor = F3DStyle::imgui::GetHighlightColor();
       }
 
       ImGui::TableNextRow(ImGuiTableRowFlags_None, ImGui::GetTextLineHeightWithSpacing() + margin);
@@ -755,7 +800,7 @@ void vtkF3DImguiActor::RenderFpsCounter()
 {
   const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-  constexpr float margin = F3DImguiStyle::GetDefaultMargin();
+  constexpr float margin = F3DStyle::GetDefaultMargin();
 
   std::string fpsString = std::to_string(this->FpsValue);
   fpsString += " fps";

@@ -353,10 +353,17 @@ public:
   ///@}
 
   /**
+   * Manually trigger the event loop.
+   * Advances the internal timers of `deltaTime` seconds.
+   * deltaTime should be strictly positive.
+   */
+  virtual interactor& triggerEventLoop(double deltaTime) = 0;
+
+  /**
    * Play a VTK interaction file.
    * Provided file path is used as is and file existence will be checked.
-   * The event loop will be triggered every deltaTime in seconds, and userCallBack will be called at
-   * the start of the event loop.
+   * If the event loop is not already running, it will be triggered every deltaTime in seconds,
+   * and userCallBack will be called at the start of the event loop.
    */
   virtual bool playInteraction(const std::filesystem::path& file, double deltaTime = 1.0 / 30,
     std::function<void()> userCallBack = nullptr) = 0;
@@ -370,13 +377,15 @@ public:
   /**
    * Start the interactor event loop.
    * The event loop will be triggered every deltaTime in seconds, and userCallBack will be called at
-   * the start of the event loop.
+   * the start of the event loop, deltaTime should be strictly positive.
+   * Safe to call multiple times but will log an info in that case.
    */
   virtual interactor& start(
     double deltaTime = 1.0 / 30, std::function<void()> userCallBack = nullptr) = 0;
 
   /**
    * Stop the interactor.
+   * If interactor has not been started, this logs an info and returns without doing anything.
    */
   virtual interactor& stop() = 0;
 
@@ -385,6 +394,12 @@ public:
    * Safe to call in a multithreaded environment.
    */
   virtual interactor& requestRender() = 0;
+
+  /**
+   * Request the interactor to stop on the next event loop.
+   * Safe to call in a multithreaded environment.
+   */
+  virtual interactor& requestStop() = 0;
 
   /**
    * An exception that can be thrown by the interactor

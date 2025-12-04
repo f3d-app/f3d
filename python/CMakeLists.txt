@@ -13,7 +13,7 @@ list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_LIST_DIR}/cmake")
 include(GNUInstallDirs)
 include(f3dPython)
 
-find_package(Python 3.9 COMPONENTS Interpreter Development)
+find_package(Python 3.10 COMPONENTS Interpreter Development)
 find_package(pybind11 2.9.2 REQUIRED)
 
 pybind11_add_module(pyf3d MODULE F3DPythonBindings.cxx)
@@ -115,6 +115,6 @@ install(TARGETS pyf3d
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/__init__.py-install" RENAME "__init__.py"
   DESTINATION ${f3d_python_install_path} COMPONENT python)
 if (F3D_BINDINGS_PYTHON_GENERATE_STUBS)
-  install(FILES "${f3d_module_dir}/__init__.pyi" "${f3d_module_dir}/pyf3d.pyi" "${CMAKE_CURRENT_SOURCE_DIR}/py.typed"
+  install(FILES "${f3d_module_dir}/pyf3d.pyi" "${CMAKE_CURRENT_SOURCE_DIR}/py.typed"
     DESTINATION ${f3d_python_install_path} COMPONENT python)
 endif()

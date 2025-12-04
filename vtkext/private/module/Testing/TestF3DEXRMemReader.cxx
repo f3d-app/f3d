@@ -52,7 +52,7 @@ int TestF3DEXRMemReader(int argc, char* argv[])
 #endif
   reader->Update();
 
-  reader->Print(cout);
+  reader->Print(std::cout);
 
   vtkImageData* img = reader->GetOutput();
 

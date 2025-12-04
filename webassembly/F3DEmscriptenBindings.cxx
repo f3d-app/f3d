@@ -346,7 +346,9 @@ EMSCRIPTEN_BINDINGS(f3d)
       emscripten::return_value_policy::reference())
     .function("stop", &f3d::interactor::stop, emscripten::return_value_policy::reference())
     .function("requestRender", &f3d::interactor::requestRender,
-      emscripten::return_value_policy::reference());
+      emscripten::return_value_policy::reference())
+    .function(
+      "requestStop", &f3d::interactor::requestStop, emscripten::return_value_policy::reference());
 
   // f3d::engine
   // Not bound on purpose because only one engine is supported:
@@ -423,5 +425,19 @@ EMSCRIPTEN_BINDINGS(f3d)
     .value("ERROR", f3d::log::VerboseLevel::ERROR)
     .value("QUIET", f3d::log::VerboseLevel::QUIET);
 
-  emscripten::class_<f3d::log>("Log").class_function("setVerboseLevel", f3d::log::setVerboseLevel);
+  emscripten::class_<f3d::log>("Log")
+    .class_function("setVerboseLevel", f3d::log::setVerboseLevel)
+    .class_function("getVerboseLevel", f3d::log::getVerboseLevel)
+    .class_function("setUseColoring", f3d::log::setUseColoring)
+    .class_function(
+      "print",
+      +[](f3d::log::VerboseLevel level, const std::string& message)
+      { f3d::log::print(level, message); })
+    .class_function(
+      "forward",
+      +[](const emscripten::val& callback)
+      {
+        f3d::log::forward(
+          [=](f3d::log::VerboseLevel level, const std::string& txt) { callback(level, txt); });
+      });
 }
