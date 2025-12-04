@@ -253,6 +253,8 @@ bool animationManager::LoadAtTime(double timeValue)
 
 bool animationManager::LoadAtKeyFrame(int frame_jump)
 {
+  constexpr double epsilon = 1e-6;
+
   if (!this->PreparedAnimationIndices.has_value())
   {
     return false;
@@ -271,8 +273,8 @@ bool animationManager::LoadAtKeyFrame(int frame_jump)
 
   timeSteps = this->AnimationTimeSteps.value();
 
-  auto it = std::find_if(
-    timeSteps->Begin(), timeSteps->End(), [&](double step) { return step >= this->CurrentTime; });
+  auto it = std::find_if(timeSteps->Begin(), timeSteps->End(),
+    [&](double step) { return this->CurrentTime - step <= epsilon; });
 
   if (it == timeSteps->End())
   {
