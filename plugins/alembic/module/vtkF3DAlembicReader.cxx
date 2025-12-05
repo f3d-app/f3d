@@ -8,6 +8,7 @@
 #include <vtkObjectFactory.h>
 #include <vtkPointData.h>
 #include <vtkPoints.h>
+#include <vtkPolyLine.h>
 #include <vtkSmartPointer.h>
 #include <vtkStreamingDemandDrivenPipeline.h>
 
@@ -347,6 +348,53 @@ public:
     return polydata;
   }
 
+  vtkSmartPointer<vtkPolyData> ProcessICurves(
+    const Alembic::AbcGeom::ICurves& curve, double time, const Alembic::Abc::M44d& matrix)
+  {
+    vtkNew<vtkPolyData> polydata;
+
+    const Alembic::AbcGeom::ICurvesSchema& schema = curve.getSchema();
+    Alembic::AbcGeom::ICurvesSchema::Sample samp;
+
+    if (schema.getNumSamples() > 0)
+    {
+      Alembic::AbcGeom::ISampleSelector selector(time);
+      schema.get(samp, selector);
+      auto positions = samp.getPositions();
+      auto curveCounts = samp.getCurvesNumVertices();
+
+      vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+      vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New();
+
+      for (size_t i = 0; i < positions->size(); ++i)
+      {
+        const auto& p = (*positions)[i] * matrix;
+        points->InsertNextPoint(p.x, p.y, p.z);
+      }
+
+      size_t index = 0;
+      for (size_t c = 0; c < curveCounts->size(); ++c)
+      {
+        size_t count = (*curveCounts)[c];
+
+        vtkSmartPointer<vtkPolyLine> polyLine = vtkSmartPointer<vtkPolyLine>::New();
+        polyLine->GetPointIds()->SetNumberOfIds(count);
+
+        for (size_t j = 0; j < count; ++j)
+        {
+          polyLine->GetPointIds()->SetId(j, index + j);
+        }
+
+        lines->InsertNextCell(polyLine);
+        index += count;
+      }
+
+      polydata->SetPoints(points);
+      polydata->SetLines(lines);
+    }
+    return polydata;
+  }
+
   void ImportRoot(vtkAppendPolyData* append, double time)
   {
     const Alembic::Abc::IObject top = this->Archive.getTop();
@@ -372,6 +420,11 @@ public:
       {
         const Alembic::AbcGeom::IPolyMesh polymesh(parent, ohead.getName());
         append->AddInputData(this->ProcessIPolyMesh(polymesh, time, objMatrix));
+      }
+      else if (Alembic::AbcGeom::ICurves::matches(ohead))
+      {
+        const Alembic::AbcGeom::ICurves curve(parent, ohead.getName());
+        append->AddInputData(this->ProcessICurves(curve, time, objMatrix));
       }
       else if (Alembic::AbcGeom::IXform::matches(ohead))
       {
