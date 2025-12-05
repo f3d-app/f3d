@@ -1,7 +1,40 @@
 #include "image_c_api.h"
 #include "image.h"
 #include <algorithm>
+#include <cstdio>
 #include <cstring>
+#include <iostream>
+
+// Helper class to wrap FILE* as an ostream
+class FileStreamBuf : public std::streambuf
+{
+public:
+  explicit FileStreamBuf(FILE* file)
+    : file_(file)
+  {
+  }
+
+protected:
+  int_type overflow(int_type c) override
+  {
+    if (c != EOF)
+    {
+      if (std::fputc(c, file_) == EOF)
+      {
+        return EOF;
+      }
+    }
+    return c;
+  }
+
+  std::streamsize xsputn(const char* s, std::streamsize n) override
+  {
+    return std::fwrite(s, 1, n, file_);
+  }
+
+private:
+  FILE* file_;
+};
 
 //----------------------------------------------------------------------------
 f3d_image_t* f3d_image_new_empty()
@@ -99,6 +132,32 @@ double f3d_image_compare(f3d_image_t* img, f3d_image_t* reference)
 }
 
 //----------------------------------------------------------------------------
+int f3d_image_equals(f3d_image_t* img, f3d_image_t* reference)
+{
+  if (!img || !reference)
+  {
+    return 0;
+  }
+
+  const f3d::image* cpp_img = reinterpret_cast<f3d::image*>(img);
+  const f3d::image* cpp_ref = reinterpret_cast<f3d::image*>(reference);
+  return *cpp_img == *cpp_ref ? 1 : 0;
+}
+
+//----------------------------------------------------------------------------
+int f3d_image_not_equals(f3d_image_t* img, f3d_image_t* reference)
+{
+  if (!img || !reference)
+  {
+    return 1;
+  }
+
+  const f3d::image* cpp_img = reinterpret_cast<f3d::image*>(img);
+  const f3d::image* cpp_ref = reinterpret_cast<f3d::image*>(reference);
+  return *cpp_img != *cpp_ref ? 1 : 0;
+}
+
+//----------------------------------------------------------------------------
 void f3d_image_save(f3d_image_t* img, const char* path, f3d_image_save_format_t format)
 {
   const f3d::image* cpp_img = reinterpret_cast<f3d::image*>(img);
@@ -125,7 +184,25 @@ void f3d_image_free_buffer(unsigned char* buffer)
 }
 
 //----------------------------------------------------------------------------
-const char* f3d_image_to_terminal_text(f3d_image_t* img)
+void f3d_image_to_terminal_text(f3d_image_t* img, void* stream)
+{
+  if (!img || !stream)
+  {
+    return;
+  }
+
+  const f3d::image* cpp_img = reinterpret_cast<f3d::image*>(img);
+  FILE* file = static_cast<FILE*>(stream);
+
+  FileStreamBuf buffer(file);
+  std::ostream os(&buffer);
+
+  cpp_img->toTerminalText(os);
+  os.flush();
+}
+
+//----------------------------------------------------------------------------
+const char* f3d_image_to_terminal_text_string(f3d_image_t* img)
 {
   const f3d::image* cpp_img = reinterpret_cast<f3d::image*>(img);
   static std::string result;
@@ -182,30 +259,6 @@ f3d_image_t* f3d_image_create_from_file(const char* path)
 }
 
 //----------------------------------------------------------------------------
-f3d_image_t* f3d_image_create_with_params(
-  unsigned int width, unsigned int height, unsigned int channelCount, unsigned int type)
-{
-  f3d::image::ChannelType channel_type;
-  switch (type)
-  {
-    case 0:
-      channel_type = f3d::image::ChannelType::BYTE;
-      break;
-    case 1:
-      channel_type = f3d::image::ChannelType::SHORT;
-      break;
-    case 2:
-      channel_type = f3d::image::ChannelType::FLOAT;
-      break;
-    default:
-      channel_type = f3d::image::ChannelType::BYTE; // Default to BYTE
-      break;
-  }
-  f3d::image* img = new f3d::image(width, height, channelCount, channel_type);
-  return reinterpret_cast<f3d_image_t*>(img);
-}
-
-//----------------------------------------------------------------------------
 unsigned int f3d_image_get_supported_formats_count()
 {
   std::vector<std::string> formats = f3d::image::getSupportedFormats();
@@ -222,10 +275,4 @@ const char** f3d_image_get_supported_formats()
   std::transform(formats.begin(), formats.end(), c_formats.begin(),
     [](const std::string& s) { return s.c_str(); });
   return c_formats.data();
-}
-
-//----------------------------------------------------------------------------
-void f3d_image_free_normalized_pixel(double* pixel)
-{
-  delete[] pixel;
 }

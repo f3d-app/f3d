@@ -47,6 +47,50 @@ void f3d_log_print(f3d_log_verbose_level_t level, const char* message)
 }
 
 //----------------------------------------------------------------------------
+void f3d_log_debug(const char* message)
+{
+  if (!message)
+  {
+    return;
+  }
+
+  f3d::log::debug(message);
+}
+
+//----------------------------------------------------------------------------
+void f3d_log_info(const char* message)
+{
+  if (!message)
+  {
+    return;
+  }
+
+  f3d::log::info(message);
+}
+
+//----------------------------------------------------------------------------
+void f3d_log_warn(const char* message)
+{
+  if (!message)
+  {
+    return;
+  }
+
+  f3d::log::warn(message);
+}
+
+//----------------------------------------------------------------------------
+void f3d_log_error(const char* message)
+{
+  if (!message)
+  {
+    return;
+  }
+
+  f3d::log::error(message);
+}
+
+//----------------------------------------------------------------------------
 void f3d_log_forward(f3d_log_forward_fn_t callback)
 {
   g_log_callback = callback;

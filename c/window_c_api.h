@@ -3,6 +3,7 @@
 
 #include "camera_c_api.h"
 #include "export.h"
+#include "image_c_api.h"
 #include "types_c_api.h"
 
 #ifdef __cplusplus
@@ -64,6 +65,19 @@ extern "C"
    * @return 1 on success, 0 on failure.
    */
   F3D_EXPORT int f3d_window_render(f3d_window_t* window);
+
+  /**
+   * @brief Perform a render of the window to the screen and save the result in an image.
+   *
+   * The image is of ChannelType BYTE and 3 or 4 components (RGB or RGBA).
+   * Set no_background to non-zero to have a transparent background.
+   * The caller must free the returned image with f3d_image_delete().
+   *
+   * @param window Window handle.
+   * @param no_background If non-zero, renders with a transparent background.
+   * @return Image handle containing the rendered result, or NULL on failure.
+   */
+  F3D_EXPORT f3d_image_t* f3d_window_render_to_image(f3d_window_t* window, int no_background);
 
   /**
    * @brief Set the size of the window.

@@ -17,22 +17,6 @@ extern "C"
   typedef struct f3d_scene_t f3d_scene_t;
 
   /**
-   * @brief Check if a file path is supported by the scene.
-   *
-   * @param scene Scene handle.
-   * @param file_path File path to check.
-   * @return 1 if supported, 0 otherwise.
-   */
-  F3D_EXPORT int f3d_scene_supports(f3d_scene_t* scene, const char* file_path);
-
-  /**
-   * @brief Clear the scene of all added files.
-   *
-   * @param scene Scene handle.
-   */
-  F3D_EXPORT void f3d_scene_clear(f3d_scene_t* scene);
-
-  /**
    * @brief Add and load a file into the scene.
    *
    * @param scene Scene handle.
@@ -61,6 +45,79 @@ extern "C"
   F3D_EXPORT int f3d_scene_add_mesh(f3d_scene_t* scene, const f3d_mesh_t* mesh);
 
   /**
+   * @brief Clear the scene of all added files.
+   *
+   * @param scene Scene handle.
+   */
+  F3D_EXPORT void f3d_scene_clear(f3d_scene_t* scene);
+
+  /**
+   * @brief Add a light based on a light state.
+   *
+   * @param scene Scene handle.
+   * @param light_state Light state structure.
+   * @return Index of the added light.
+   */
+  F3D_EXPORT int f3d_scene_add_light(
+    const f3d_scene_t* scene, const f3d_light_state_t* light_state);
+
+  /**
+   * @brief Get the number of lights.
+   *
+   * @param scene Scene handle.
+   * @return Number of lights in the scene.
+   */
+  F3D_EXPORT int f3d_scene_get_light_count(const f3d_scene_t* scene);
+
+  /**
+   * @brief Get the light state at provided index.
+   *
+   * The returned light_state is heap-allocated and must be freed with
+   * f3d_light_state_free().
+   *
+   * @param scene Scene handle.
+   * @param index Index of the light.
+   * @return Light state.
+   */
+  F3D_EXPORT f3d_light_state_t* f3d_scene_get_light(const f3d_scene_t* scene, int index);
+
+  /**
+   * @brief Update a light at provided index with the provided light state.
+   *
+   * @param scene Scene handle.
+   * @param index Index of the light to update.
+   * @param light_state New light state.
+   * @return 1 on success, 0 on failure.
+   */
+  F3D_EXPORT int f3d_scene_update_light(
+    f3d_scene_t* scene, int index, const f3d_light_state_t* light_state);
+
+  /**
+   * @brief Remove a light at provided index.
+   *
+   * @param scene Scene handle.
+   * @param index Index of the light to remove.
+   * @return 1 on success, 0 on failure.
+   */
+  F3D_EXPORT int f3d_scene_remove_light(f3d_scene_t* scene, int index);
+
+  /**
+   * @brief Remove all lights from the scene.
+   *
+   * @param scene Scene handle.
+   */
+  F3D_EXPORT void f3d_scene_remove_all_lights(f3d_scene_t* scene);
+
+  /**
+   * @brief Check if a file path is supported by the scene.
+   *
+   * @param scene Scene handle.
+   * @param file_path File path to check.
+   * @return 1 if supported, 0 otherwise.
+   */
+  F3D_EXPORT int f3d_scene_supports(f3d_scene_t* scene, const char* file_path);
+
+  /**
    * @brief Load added files at provided time value if they contain any animation.
    *
    * @param scene Scene handle.
@@ -85,63 +142,6 @@ extern "C"
    * @return Number of available animations.
    */
   F3D_EXPORT unsigned int f3d_scene_available_animations(const f3d_scene_t* scene);
-
-  /**
-   * @brief Add a light based on a light state.
-   *
-   * @param scene Scene handle.
-   * @param light_state Light state structure.
-   * @return Index of the added light.
-   */
-  F3D_EXPORT int f3d_scene_add_light(
-    const f3d_scene_t* scene, const f3d_light_state_t* light_state);
-
-  /**
-   * @brief Remove a light at provided index.
-   *
-   * @param scene Scene handle.
-   * @param index Index of the light to remove.
-   * @return 1 on success, 0 on failure.
-   */
-  F3D_EXPORT int f3d_scene_remove_light(f3d_scene_t* scene, int index);
-
-  /**
-   * @brief Update a light at provided index with the provided light state.
-   *
-   * @param scene Scene handle.
-   * @param index Index of the light to update.
-   * @param light_state New light state.
-   * @return 1 on success, 0 on failure.
-   */
-  F3D_EXPORT int f3d_scene_update_light(
-    f3d_scene_t* scene, int index, const f3d_light_state_t* light_state);
-
-  /**
-   * @brief Get the light state at provided index.
-   *
-   * The returned light_state is heap-allocated and must be freed with
-   * f3d_light_state_free().
-   *
-   * @param scene Scene handle.
-   * @param index Index of the light.
-   * @return Light state.
-   */
-  F3D_EXPORT f3d_light_state_t* f3d_scene_get_light(const f3d_scene_t* scene, int index);
-
-  /**
-   * @brief Get the number of lights.
-   *
-   * @param scene Scene handle.
-   * @return Number of lights in the scene.
-   */
-  F3D_EXPORT int f3d_scene_get_light_count(const f3d_scene_t* scene);
-
-  /**
-   * @brief Remove all lights from the scene.
-   *
-   * @param scene Scene handle.
-   */
-  F3D_EXPORT void f3d_scene_remove_all_lights(f3d_scene_t* scene);
 
 #ifdef __cplusplus
 }

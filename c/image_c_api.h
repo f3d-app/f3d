@@ -64,6 +64,24 @@ extern "C"
   F3D_EXPORT void f3d_image_delete(f3d_image_t* img);
 
   /**
+   * @brief Test if two images are equal
+   *
+   * @param img Pointer to the first image object
+   * @param reference Pointer to the second image object
+   * @return Non-zero if images are equal, zero otherwise
+   */
+  F3D_EXPORT int f3d_image_equals(f3d_image_t* img, f3d_image_t* reference);
+
+  /**
+   * @brief Test if two images are not equal
+   *
+   * @param img Pointer to the first image object
+   * @param reference Pointer to the second image object
+   * @return Non-zero if images are not equal, zero otherwise
+   */
+  F3D_EXPORT int f3d_image_not_equals(f3d_image_t* img, f3d_image_t* reference);
+
+  /**
    * @brief Get the normalized pixel
    * @param img Pointer to the image object to be deleted
    * @param x horizontal pixel coordinate
@@ -71,6 +89,22 @@ extern "C"
    * @param pixel Pointer to a preallocated buffer of channel count size
    */
   F3D_EXPORT void f3d_image_get_normalized_pixel(f3d_image_t* img, int x, int y, double* pixel);
+
+  /**
+   * @brief Get the count of supported image formats
+   * @return Count of supported image formats
+   */
+  F3D_EXPORT unsigned int f3d_image_get_supported_formats_count();
+
+  /**
+   * @brief Get the list of supported image formats
+   *
+   * The returned array points to internal static storage and must NOT be freed.
+   * The pointer is valid until the next call to this function.
+   *
+   * @return Pointer to the array of supported image formats
+   */
+  F3D_EXPORT const char** f3d_image_get_supported_formats();
 
   /**
    * @brief Get the width of an image
@@ -162,15 +196,27 @@ extern "C"
   F3D_EXPORT void f3d_image_free_buffer(unsigned char* buffer);
 
   /**
+   * @brief Convert an image to colored text using ANSI escape sequences for terminal output
+   *
+   * Writes colored text to the provided file stream.
+   * This is the C equivalent of toTerminalText(std::ostream&).
+   *
+   * @param img Pointer to the image object
+   * @param stream File stream to write to (e.g., stdout, stderr, or file handle)
+   */
+  F3D_EXPORT void f3d_image_to_terminal_text(f3d_image_t* img, void* stream);
+
+  /**
    * @brief Convert an image to a string representation for terminal output
    *
    * The returned string points to internal static storage and must NOT be freed.
    * The pointer is valid until the next call to this function.
+   * This is the C equivalent of toTerminalText() that returns a std::string.
    *
    * @param img Pointer to the image object
    * @return Pointer to the string representation of the image
    */
-  F3D_EXPORT const char* f3d_image_to_terminal_text(f3d_image_t* img);
+  F3D_EXPORT const char* f3d_image_to_terminal_text_string(f3d_image_t* img);
 
   /**
    * @brief Set metadata for an image
@@ -194,6 +240,9 @@ extern "C"
 
   /**
    * @brief Get all metadata keys from an image
+   *
+   * The returned keys must be freed with f3d_image_free_metadata_keys.
+   *
    * @param img Pointer to the image object
    * @param count Pointer to store the count of metadata keys
    * @return Pointer to the array of metadata keys
@@ -202,6 +251,9 @@ extern "C"
 
   /**
    * @brief Free metadata keys obtained from an image
+   *
+   * Used to free the return of f3d_image_all_metadata.
+   *
    * @param keys Pointer to the array of metadata keys
    * @param count Count of metadata keys
    */
@@ -216,42 +268,6 @@ extern "C"
    * @return Pointer to the created image object
    */
   F3D_EXPORT f3d_image_t* f3d_image_create_from_file(const char* path);
-
-  /**
-   * @brief Create an image with specified parameters
-   *
-   * The returned image must be deleted with f3d_image_delete().
-   *
-   * @param width Width of the image
-   * @param height Height of the image
-   * @param channelCount Number of channels in the image
-   * @param type Type of channels in the image
-   * @return Pointer to the created image object
-   */
-  F3D_EXPORT f3d_image_t* f3d_image_create_with_params(
-    unsigned int width, unsigned int height, unsigned int channelCount, unsigned int type);
-
-  /**
-   * @brief Get the count of supported image formats
-   * @return Count of supported image formats
-   */
-  F3D_EXPORT unsigned int f3d_image_get_supported_formats_count();
-
-  /**
-   * @brief Get the list of supported image formats
-   *
-   * The returned array points to internal static storage and must NOT be freed.
-   * The pointer is valid until the next call to this function.
-   *
-   * @return Pointer to the array of supported image formats
-   */
-  F3D_EXPORT const char** f3d_image_get_supported_formats();
-
-  /**
-   * @brief Free a normalized pixel value obtained from an image
-   * @param pixel Pointer to the array of normalized pixel values
-   */
-  F3D_EXPORT void f3d_image_free_normalized_pixel(double* pixel);
 
 #ifdef __cplusplus
 }

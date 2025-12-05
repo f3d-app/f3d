@@ -1,11 +1,12 @@
 list(APPEND f3d_c_api_tests_list
   test_camera_c_api.c
-  test_context_c_api.c
   test_engine_c_api.c
   test_image_c_api.c
   test_interactor_c_api.c
   test_log_c_api.c
+  test_options_c_api.c
   test_scene_c_api.c
+  test_types_c_api.c
   test_utils_c_api.c
   test_window_c_api.c
 )
@@ -18,10 +19,6 @@ create_test_sourcelist(_f3d_c_api_driver_src f3d_c_api_tests.c ${f3d_c_api_tests
 
 # add the executable
 add_executable(f3d_c_api_tests ${_f3d_c_api_driver_src})
-set_target_properties(f3d_c_api_tests PROPERTIES
-  C_VISIBILITY_PRESET hidden
-  LINKER_LANGUAGE CXX
-  )
 
 target_link_libraries(f3d_c_api_tests PRIVATE f3d_c_api)
 

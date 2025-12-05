@@ -78,6 +78,10 @@ int test_log_c_api()
     failed++;
   }
 
+  f3d_log_debug(NULL);
+  f3d_log_warn(NULL);
+  f3d_log_info(NULL);
+  f3d_log_error(NULL);
   f3d_log_forward(NULL);
 
   return failed;

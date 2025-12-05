@@ -57,13 +57,3 @@ void f3d_context_delete(f3d_context_t* ctx)
 {
   delete ctx;
 }
-
-//----------------------------------------------------------------------------
-void* f3d_context_get_function(f3d_context_t* ctx)
-{
-  if (!ctx)
-  {
-    return nullptr;
-  }
-  return &(ctx->func);
-}

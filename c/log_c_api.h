@@ -21,12 +21,55 @@ extern "C"
   } f3d_log_verbose_level_t;
 
   /**
+   * @brief Log a message at the specified verbose level.
+   *
+   * @param level The verbose level for the message.
+   * @param message The message string.
+   */
+  F3D_EXPORT void f3d_log_print(f3d_log_verbose_level_t level, const char* message);
+
+  /**
+   * @brief Log a debug message.
+   *
+   * @param message The message string.
+   */
+  F3D_EXPORT void f3d_log_debug(const char* message);
+
+  /**
+   * @brief Log an info message.
+   *
+   * @param message The message string.
+   */
+  F3D_EXPORT void f3d_log_info(const char* message);
+
+  /**
+   * @brief Log a warning message.
+   *
+   * @param message The message string.
+   */
+  F3D_EXPORT void f3d_log_warn(const char* message);
+
+  /**
+   * @brief Log an error message.
+   *
+   * @param message The message string.
+   */
+  F3D_EXPORT void f3d_log_error(const char* message);
+
+  /**
    * @brief Callback function type for log forwarding.
    *
    * @param level The verbose level of the log message.
    * @param message The log message string.
    */
   typedef void (*f3d_log_forward_fn_t)(f3d_log_verbose_level_t level, const char* message);
+
+  /**
+   * @brief Set the coloring usage, if applicable (e.g., console output).
+   *
+   * @param use If non-zero, coloring will be used.
+   */
+  F3D_EXPORT void f3d_log_set_use_coloring(int use);
 
   /**
    * @brief Set the verbose level.
@@ -46,21 +89,6 @@ extern "C"
    * @return The current verbose level.
    */
   F3D_EXPORT f3d_log_verbose_level_t f3d_log_get_verbose_level(void);
-
-  /**
-   * @brief Set the coloring usage, if applicable (e.g., console output).
-   *
-   * @param use If non-zero, coloring will be used.
-   */
-  F3D_EXPORT void f3d_log_set_use_coloring(int use);
-
-  /**
-   * @brief Log a message at the specified verbose level.
-   *
-   * @param level The verbose level for the message.
-   * @param message The message string.
-   */
-  F3D_EXPORT void f3d_log_print(f3d_log_verbose_level_t level, const char* message);
 
   /**
    * @brief Set a callback function to forward log messages.

@@ -1,7 +1,6 @@
 #include <utils_c_api.h>
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 int test_utils_c_api()

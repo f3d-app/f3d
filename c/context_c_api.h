@@ -81,17 +81,6 @@ extern "C"
    */
   F3D_EXPORT void f3d_context_delete(f3d_context_t* ctx);
 
-  /**
-   * @brief Get the underlying function pointer from a context object.
-   *
-   * The returned pointer is owned by the context and must NOT be freed.
-   * It is valid as long as the context exists.
-   *
-   * @param ctx Context handle.
-   * @return Opaque pointer to the underlying function object.
-   */
-  F3D_EXPORT void* f3d_context_get_function(f3d_context_t* ctx);
-
 #ifdef __cplusplus
 }
 #endif

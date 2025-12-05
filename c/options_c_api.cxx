@@ -6,6 +6,25 @@
 #include <vector>
 
 //----------------------------------------------------------------------------
+f3d_options_t* f3d_options_create()
+{
+  f3d::options* cpp_options = new f3d::options();
+  return reinterpret_cast<f3d_options_t*>(cpp_options);
+}
+
+//----------------------------------------------------------------------------
+void f3d_options_delete(f3d_options_t* options)
+{
+  if (!options)
+  {
+    return;
+  }
+
+  f3d::options* cpp_options = reinterpret_cast<f3d::options*>(options);
+  delete cpp_options;
+}
+
+//----------------------------------------------------------------------------
 void f3d_options_set_as_bool(f3d_options_t* options, const char* name, int value)
 {
   if (!options || !name)
@@ -343,4 +362,166 @@ void f3d_options_free_string(const char* str)
   }
 
   delete[] str;
+}
+
+//----------------------------------------------------------------------------
+void f3d_options_get_closest_option(
+  const f3d_options_t* options, const char* option, char** closest, unsigned int* distance)
+{
+  if (!options || !option || !closest || !distance)
+  {
+    return;
+  }
+
+  const f3d::options* cpp_options = reinterpret_cast<const f3d::options*>(options);
+  auto result = cpp_options->getClosestOption(option);
+
+  char* result_str = new char[result.first.length() + 1];
+  std::strcpy(result_str, result.first.c_str());
+  *closest = result_str;
+  *distance = result.second;
+}
+
+//----------------------------------------------------------------------------
+int f3d_options_parse_bool(const char* str)
+{
+  if (!str)
+  {
+    return 0;
+  }
+
+  return f3d::options::parse<bool>(str) ? 1 : 0;
+}
+
+//----------------------------------------------------------------------------
+int f3d_options_parse_int(const char* str)
+{
+  if (!str)
+  {
+    return 0;
+  }
+
+  return f3d::options::parse<int>(str);
+}
+
+//----------------------------------------------------------------------------
+double f3d_options_parse_double(const char* str)
+{
+  if (!str)
+  {
+    return 0.0;
+  }
+
+  return f3d::options::parse<double>(str);
+}
+
+//----------------------------------------------------------------------------
+const char* f3d_options_parse_string(const char* str)
+{
+  if (!str)
+  {
+    return nullptr;
+  }
+
+  std::string result = f3d::options::parse<std::string>(str);
+  char* result_str = new char[result.length() + 1];
+  std::strcpy(result_str, result.c_str());
+  return result_str;
+}
+
+//----------------------------------------------------------------------------
+void f3d_options_parse_double_vector(const char* str, double* values, size_t* count)
+{
+  if (!str || !values || !count)
+  {
+    return;
+  }
+
+  std::vector<double> vec = f3d::options::parse<std::vector<double>>(str);
+  *count = vec.size();
+  std::copy(vec.begin(), vec.end(), values);
+}
+
+//----------------------------------------------------------------------------
+void f3d_options_parse_int_vector(const char* str, int* values, size_t* count)
+{
+  if (!str || !values || !count)
+  {
+    return;
+  }
+
+  std::vector<int> vec = f3d::options::parse<std::vector<int>>(str);
+  *count = vec.size();
+  std::copy(vec.begin(), vec.end(), values);
+}
+
+//----------------------------------------------------------------------------
+const char* f3d_options_format_bool(int value)
+{
+  std::string result = f3d::options::format(static_cast<bool>(value));
+  char* result_str = new char[result.length() + 1];
+  std::strcpy(result_str, result.c_str());
+  return result_str;
+}
+
+//----------------------------------------------------------------------------
+const char* f3d_options_format_int(int value)
+{
+  std::string result = f3d::options::format(value);
+  char* result_str = new char[result.length() + 1];
+  std::strcpy(result_str, result.c_str());
+  return result_str;
+}
+
+//----------------------------------------------------------------------------
+const char* f3d_options_format_double(double value)
+{
+  std::string result = f3d::options::format(value);
+  char* result_str = new char[result.length() + 1];
+  std::strcpy(result_str, result.c_str());
+  return result_str;
+}
+
+//----------------------------------------------------------------------------
+const char* f3d_options_format_string(const char* value)
+{
+  if (!value)
+  {
+    return nullptr;
+  }
+
+  std::string result = f3d::options::format(std::string(value));
+  char* result_str = new char[result.length() + 1];
+  std::strcpy(result_str, result.c_str());
+  return result_str;
+}
+
+//----------------------------------------------------------------------------
+const char* f3d_options_format_double_vector(const double* values, size_t count)
+{
+  if (!values)
+  {
+    return nullptr;
+  }
+
+  std::vector<double> vec(values, values + count);
+  std::string result = f3d::options::format(vec);
+  char* result_str = new char[result.length() + 1];
+  std::strcpy(result_str, result.c_str());
+  return result_str;
+}
+
+//----------------------------------------------------------------------------
+const char* f3d_options_format_int_vector(const int* values, size_t count)
+{
+  if (!values)
+  {
+    return nullptr;
+  }
+
+  std::vector<int> vec(values, values + count);
+  std::string result = f3d::options::format(vec);
+  char* result_str = new char[result.length() + 1];
+  std::strcpy(result_str, result.c_str());
+  return result_str;
 }

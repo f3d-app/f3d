@@ -1,4 +1,5 @@
 #include "window_c_api.h"
+#include "image.h"
 #include "window.h"
 
 //----------------------------------------------------------------------------
@@ -49,6 +50,21 @@ int f3d_window_render(f3d_window_t* window)
 
   f3d::window* cpp_window = reinterpret_cast<f3d::window*>(window);
   return cpp_window->render() ? 1 : 0;
+}
+
+//----------------------------------------------------------------------------
+f3d_image_t* f3d_window_render_to_image(f3d_window_t* window, int no_background)
+{
+  if (!window)
+  {
+    return nullptr;
+  }
+
+  f3d::window* cpp_window = reinterpret_cast<f3d::window*>(window);
+  f3d::image img = cpp_window->renderToImage(no_background != 0);
+
+  f3d::image* heap_img = new f3d::image(std::move(img));
+  return reinterpret_cast<f3d_image_t*>(heap_img);
 }
 
 //----------------------------------------------------------------------------
