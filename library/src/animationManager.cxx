@@ -251,13 +251,13 @@ bool animationManager::LoadAtTime(double timeValue)
   return true;
 }
 
-bool animationManager::LoadAtKeyFrame(int frame_jump)
+void animationManager::JumpToKeyFrame(int keyframe, bool relative)
 {
   constexpr double epsilon = 1e-6;
 
   if (!this->PreparedAnimationIndices.has_value())
   {
-    return false;
+    return;
   }
 
   int nbTimeSteps;
@@ -273,29 +273,28 @@ bool animationManager::LoadAtKeyFrame(int frame_jump)
 
   timeSteps = this->AnimationTimeSteps.value();
 
-  auto it = std::find_if(timeSteps->Begin(), timeSteps->End(),
-    [&](double step) { return this->CurrentTime - step <= epsilon; });
-
-  if (it == timeSteps->End())
+  if (relative)
   {
-    return false;
+    auto it = std::find_if(timeSteps->Begin(), timeSteps->End(),
+      [&](double step) { return this->CurrentTime - step <= epsilon; });
+
+    if (it == timeSteps->End())
+    {
+      return;
+    }
+
+    this->CurrentTime = std::clamp(*(it + keyframe), this->TimeRange[0], this->TimeRange[1]);
+  }
+  else
+  {
+    if (keyframe < 0 || keyframe > timeSteps->GetSize())
+    {
+      return;
+    }
+    this->CurrentTime = timeSteps->GetValue(keyframe);
   }
 
-  this->CurrentTime = std::clamp(*(it + frame_jump), this->TimeRange[0], this->TimeRange[1]);
-  return this->LoadAtTime(this->CurrentTime);
-}
-
-void animationManager::NextKeyFrame()
-{
-  if (this->LoadAtKeyFrame(1))
-  {
-    this->Window.render();
-  }
-}
-
-void animationManager::PreviousKeyFrame()
-{
-  if (this->LoadAtKeyFrame(-1))
+  if (this->LoadAtTime(this->CurrentTime))
   {
     this->Window.render();
   }
