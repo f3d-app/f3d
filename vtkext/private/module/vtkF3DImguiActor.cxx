@@ -329,17 +329,17 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
     // ImGui API is not very helpful with this
     fontConfig.FontDataOwnedByAtlas = false;
     font = io.Fonts->AddFontFromMemoryTTF(
-      const_cast<void*>(reinterpret_cast<const void*>(F3DFontBuffer)), sizeof(F3DFontBuffer), 18,
+      const_cast<void*>(reinterpret_cast<const void*>(F3DFontBuffer)), sizeof(F3DFontBuffer), 18 * this->FontScale,
       &fontConfig, ranges.Data);
   }
   else
   {
-    font = io.Fonts->AddFontFromFileTTF(this->FontFile.c_str(), 18, &fontConfig, ranges.Data);
+    font = io.Fonts->AddFontFromFileTTF(
+      this->FontFile.c_str(), 18 * this->FontScale, &fontConfig, ranges.Data);
   }
 
   io.Fonts->Build();
   io.FontDefault = font;
-  io.FontGlobalScale = this->FontScale;
 
   ImVec4 colTransparent = ImVec4(0.0f, 0.0f, 0.0f, 0.0f); // #000000
 
@@ -353,6 +353,7 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
   style->WindowBorderSize = 0.f;
   style->WindowPadding = ImVec2(10, 10);
   style->WindowRounding = 8.f;
+  style->ScaleAllSizes(this->FontScale);
   style->Colors[ImGuiCol_Text] = F3DStyle::imgui::GetTextColor();
   style->Colors[ImGuiCol_WindowBg] = F3DStyle::imgui::GetBackgroundColor();
   style->Colors[ImGuiCol_FrameBg] = colTransparent;

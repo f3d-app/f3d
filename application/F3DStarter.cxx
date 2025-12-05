@@ -40,6 +40,11 @@
 #include "utils.h"
 #include "window.h"
 
+#ifdef WIN32
+#include <WinUser.h>
+#include <wingdi.h>
+#endif
+
 #include <algorithm>
 #include <atomic>
 #include <cassert>
@@ -893,7 +898,37 @@ public:
       f3d::window& window = this->Engine->getWindow();
       if (this->AppOptions.Resolution.size() == 2)
       {
-        window.setSize(this->AppOptions.Resolution[0], this->AppOptions.Resolution[1]);
+        F3DOptionsTools::OptionsDict appOptions = F3DOptionsTools::DefaultAppOptions;
+        std::vector<int> defaultRes;
+
+        this->ParseOption(appOptions, "resolution", defaultRes);
+
+        // If user did not set window size, scale it base on fontScale and system zoom scale
+        if (defaultRes != this->AppOptions.Resolution)
+        {
+          window.setSize(this->AppOptions.Resolution[0], this->AppOptions.Resolution[1]);
+        }
+        else
+        {
+          double dpiScaleFactor = 1.0;
+#ifdef WIN32
+          // Get main monitor dpi
+          HDC hdc = GetDC(NULL);
+
+          if (hdc)
+          {
+            const int dpi = GetDeviceCaps(hdc, LOGPIXELSY); // Default return 96
+            dpiScaleFactor = static_cast<double>(dpi) / 96;
+            ReleaseDC(NULL, hdc);
+          }
+#endif
+          int width = static_cast<int>(
+              this->AppOptions.Resolution[0] * this->LibOptions.ui.scale * dpiScaleFactor);
+          int height = static_cast<int>(
+            this->AppOptions.Resolution[1] * this->LibOptions.ui.scale * dpiScaleFactor);
+
+          window.setSize(width, height);
+        }
       }
       else if (!this->AppOptions.Resolution.empty())
       {
