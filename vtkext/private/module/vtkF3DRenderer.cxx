@@ -14,6 +14,7 @@
 #include "vtkF3DTAAResolvePass.h"
 #include "vtkF3DUserRenderPass.h"
 
+#include "vtkWindows.h"
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
 #include <vtkCamera.h>
@@ -70,7 +71,6 @@
 #include <vtksys/FStream.hxx>
 #include <vtksys/MD5.h>
 #include <vtksys/SystemTools.hxx>
-#include "vtkWindows.h"
 
 #if F3D_MODULE_UI
 #include "F3DStyle.h"
