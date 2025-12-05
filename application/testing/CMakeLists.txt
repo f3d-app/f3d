@@ -1181,10 +1181,10 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240729)
   # First file (`.d`) doesn't exist and is there to test multi args
   f3d_test(NAME TestInteractionConsoleAutoCompleteFilesystem INTERACTION UI) #Escape;ad;Tab;_f;Tab; ;.;Tab;d ..;Tab;T;Tab;i;Tab;d;Tab;Tab;Enter;Esc
   if(WIN32 OR APPLE)
-    f3d_test(NAME TestInteractionConsoleAutoCompleteDirectoriesCaseInsensitive1 INTERACTION UI NO_DATA_FORCE_RENDER WORKING_DIR ${F3D_SOURCE_DIR}/testing/data/AutoCompletion) #Escape;add_files F;Tab
-    f3d_test(NAME TestInteractionConsoleAutoCompleteDirectoriesCaseInsensitive2 INTERACTION UI NO_DATA_FORCE_RENDER WORKING_DIR ${F3D_SOURCE_DIR}/testing/data/AutoCompletion) #Escape;add_files f;Tab
+    f3d_test(NAME TestInteractionConsoleAutoCompleteDirCaseInsensitiveUppercaseF INTERACTION UI NO_DATA_FORCE_RENDER WORKING_DIR ${F3D_SOURCE_DIR}/testing/data/AutoCompletion) #Escape;add_files F;Tab
+    f3d_test(NAME TestInteractionConsoleAutoCompleteDirCaseInsensitiveLowercaseF INTERACTION UI NO_DATA_FORCE_RENDER WORKING_DIR ${F3D_SOURCE_DIR}/testing/data/AutoCompletion) #Escape;add_files f;Tab
   else()
-    f3d_test(NAME TestInteractionConsoleAutoCompleteDirectoriesCaseSensitive INTERACTION UI NO_DATA_FORCE_RENDER WORKING_DIR ${F3D_SOURCE_DIR}/testing/data/AutoCompletion) #Escape;add_files F;Tab
+    f3d_test(NAME TestInteractionConsoleAutoCompleteDirCaseSensitive INTERACTION UI NO_DATA_FORCE_RENDER WORKING_DIR ${F3D_SOURCE_DIR}/testing/data/AutoCompletion) #Escape;add_files F;Tab
   endif()
 
   if(NOT WIN32)
