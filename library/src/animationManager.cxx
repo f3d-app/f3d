@@ -89,6 +89,7 @@ void animationManager::Initialize()
 
   // Reset animation indices before updating
   this->PreparedAnimationIndices.reset();
+  this->AnimationTimeSteps.reset();
   this->PrepareForAnimationIndices();
 
   if (this->AvailAnimations == 0)
@@ -165,6 +166,7 @@ void animationManager::Tick(double deltaTime)
   if (this->Playing)
   {
     this->CurrentTime += deltaTime * this->SpeedFactor;
+    this->DeltaTime = deltaTime;
 
     // Modulo computation, compute CurrentTime in the time range.
     if (this->CurrentTime < this->TimeRange[0] || this->CurrentTime > this->TimeRange[1])
@@ -247,6 +249,55 @@ bool animationManager::LoadAtTime(double timeValue)
     this->Interactor->UpdateRendererAfterInteraction();
   }
   return true;
+}
+
+void animationManager::JumpToKeyFrame(int keyframe, bool relative)
+{
+  constexpr double epsilon = 1e-6;
+
+  if (!this->PreparedAnimationIndices.has_value())
+  {
+    return;
+  }
+
+  int nbTimeSteps;
+  vtkSmartPointer<vtkDoubleArray> timeSteps = vtkSmartPointer<vtkDoubleArray>::New();
+
+  const vtkIdType currentAnimation = this->PreparedAnimationIndices.value()[0];
+  if (!this->AnimationTimeSteps.has_value())
+  {
+    this->Importer->GetTemporalInformation(
+      currentAnimation, 1 / this->DeltaTime, nbTimeSteps, this->TimeRange, timeSteps);
+    this->AnimationTimeSteps = timeSteps;
+  }
+
+  timeSteps = this->AnimationTimeSteps.value();
+
+  if (relative)
+  {
+    auto it = std::find_if(timeSteps->Begin(), timeSteps->End(),
+      [&](double step) { return this->CurrentTime - step <= epsilon; });
+
+    if (it == timeSteps->End())
+    {
+      return;
+    }
+
+    this->CurrentTime = std::clamp(*(it + keyframe), this->TimeRange[0], this->TimeRange[1]);
+  }
+  else
+  {
+    if (keyframe < 0 || keyframe > timeSteps->GetSize())
+    {
+      return;
+    }
+    this->CurrentTime = timeSteps->GetValue(keyframe);
+  }
+
+  if (this->LoadAtTime(this->CurrentTime))
+  {
+    this->Window.render();
+  }
 }
 
 // ---------------------------------------------------------------------------------

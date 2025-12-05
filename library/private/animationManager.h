@@ -6,6 +6,7 @@
 #ifndef f3d_animationManager_h
 #define f3d_animationManager_h
 
+#include <vtkDoubleArray.h>
 #include <vtkNew.h>
 #include <vtkProgressBarWidget.h>
 #include <vtkSmartPointer.h>
@@ -91,6 +92,11 @@ public:
   bool LoadAtTime(double timeValue);
 
   /**
+   * Load animation at a specific keyframe
+   */
+  void JumpToKeyFrame(int keyframe, bool relative = true);
+
+  /**
    * Return a pair containing the current time range values
    */
   std::pair<double, double> GetTimeRange();
@@ -138,6 +144,7 @@ private:
   int AvailAnimations = 0;
 
   std::optional<std::vector<int>> PreparedAnimationIndices;
+  std::optional<vtkSmartPointer<vtkDoubleArray>> AnimationTimeSteps;
   double TimeRange[2] = { 0.0, 0.0 };
   bool Playing = false;
   double CurrentTime = 0;
@@ -145,6 +152,7 @@ private:
 
   // Dynamic options
   bool Autoplay = false;
+  double DeltaTime = 1.0;
   double SpeedFactor = 1.0;
 
   vtkSmartPointer<vtkProgressBarWidget> ProgressWidget;
