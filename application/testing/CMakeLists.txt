@@ -559,7 +559,7 @@ f3d_test(NAME TestInteractionAnimationFast DATA f3d.glb ARGS --animation-progres
 f3d_test(NAME TestInteractionAnimationSlow DATA f3d.glb ARGS --animation-progress --animation-speed-factor=0.5 INTERACTION)#Space;Wait;Space;
 f3d_test(NAME TestInteractionAnimationFrameRate DATA f3d.glb ARGS --animation-progress --frame-rate=1 INTERACTION)#Space;Wait;Space;
 f3d_test(NAME TestInteractionAnimationJumpToNextKeyFrame DATA soldier_animations.mdl ARGS --animation-indices=1 --animation-progress CONFIG ${F3D_SOURCE_DIR}/testing/configs/animation.json INTERACTION)#Ctrl+Space;Ctrl+Space;Ctrl+Space;
-f3d_test(NAME TestInteractionAnimationJumpToKeyFrame DATA soldier_animations.mdl ARGS --animation-indices=1 --animation-progress CONFIG ${F3D_SOURCE_DIR}/testing/configs/animation.json INTERACTION)#Ctrl+Space;Ctrl+Space;Ctrl+Space;
+f3d_test(NAME TestInteractionAnimationJumpToKeyFrame DATA soldier_animations.mdl ARGS --animation-indices=1 --animation-progress CONFIG ${F3D_SOURCE_DIR}/testing/configs/animation.json INTERACTION)#Ctrl+Shift+Space;
 f3d_test(NAME TestInteractionAnimationCameraMovement DATA CameraAnimated.glb ARGS --camera-index=0 --animation-progress INTERACTION)#Space;MouseMovement;Space;
 f3d_test(NAME TestInteractionAnimationInvert DATA f3d.glb ARGS --animation-speed-factor=-1 --animation-progress INTERACTION)#Space;Wait;Space;
 
