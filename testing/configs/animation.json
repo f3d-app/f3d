@@ -1,8 +1,8 @@
 [
   {
     "bindings": {
-      "Ctrl+Space": "next_keyframe_animation",
-      "Shift+Space": "previous_keyframe_animation"
+      "Ctrl+Space": "jump_to_keyframe 1 true",
+      "Shift+Space": "jump_to_keyframe -1 true"
     }
   }
 ]

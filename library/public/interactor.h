@@ -252,6 +252,8 @@ public:
   virtual interactor& startAnimation() = 0;
   virtual interactor& stopAnimation() = 0;
   [[nodiscard]] virtual bool isPlayingAnimation() = 0;
+
+  virtual interactor& jumpToKeyFrame(int keyframe, bool relative) = 0;
   ///@}
 
   ///@{ @name Movement

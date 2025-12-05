@@ -1224,15 +1224,15 @@ interactor& interactor_impl::initCommands()
     command_documentation_t{ "reset_camera", "reset the camera to its original location" });
 
   this->addCommand(
-    "next_keyframe_animation", [&](const std::vector<std::string>&)
-    { this->Internals->AnimationManager->JumpToKeyFrame(1, true); },
-    command_documentation_t{ "next_keyframe_animation", "Play animation's next key frame" });
-
-  this->addCommand(
-    "previous_keyframe_animation", [&](const std::vector<std::string>&)
-    { this->Internals->AnimationManager->JumpToKeyFrame(-1, true); },
-    command_documentation_t{
-      "previous_keyframe_animation", "Play animation's previous key frame" });
+    "jump_to_keyframe",
+    [&](const std::vector<std::string>& args)
+    {
+      check_args(args, 2, "jump_to_keyframe");
+      int keyframe = options::parse<int>(args[0]);
+      bool relative = options::parse<bool>(args[1]);
+      this->jumpToKeyFrame(keyframe, relative);
+    },
+    command_documentation_t{ "jump_to_keyframe", "Jump to animation's key frame" });
 
   this->addCommand(
     "toggle_animation",
@@ -1877,6 +1877,14 @@ bool interactor_impl::isPlayingAnimation()
 {
   assert(this->Internals->AnimationManager);
   return this->Internals->AnimationManager->IsPlaying();
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::jumpToKeyFrame(int keyframe, bool relative)
+{
+  assert(this->Internals->AnimationManager);
+  this->Internals->AnimationManager->JumpToKeyFrame(keyframe, relative);
+  return *this;
 }
 
 //----------------------------------------------------------------------------
