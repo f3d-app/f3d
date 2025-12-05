@@ -2,7 +2,8 @@
   {
     "bindings": {
       "Ctrl+Space": "jump_to_keyframe 1 true",
-      "Shift+Space": "jump_to_keyframe -1 true"
+      "Shift+Space": "jump_to_keyframe -1 true",
+      "Ctrl+Shift+Space": "jump_to_keyframe 4 false"
     }
   }
 ]
