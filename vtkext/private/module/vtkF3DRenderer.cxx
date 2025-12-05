@@ -14,6 +14,7 @@
 #include "vtkF3DTAAResolvePass.h"
 #include "vtkF3DUserRenderPass.h"
 
+#include "vtkWindows.h"
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
 #include <vtkCamera.h>
@@ -1435,7 +1436,16 @@ void vtkF3DRenderer::ConfigureTextActors()
     }
   }
 
-  this->UIActor->SetFontScale(this->FontScale);
+  double dpiScaleFactor = 1.0;
+
+#ifdef _WIN32
+  const int dpi = GetDeviceCaps(wglGetCurrentDC(), LOGPIXELSY); // Default return 96
+  dpiScaleFactor = static_cast<double>(dpi) / 96;
+#endif
+
+  const double adjustedFontScale = this->FontScale * dpiScaleFactor;
+
+  this->UIActor->SetFontScale(adjustedFontScale);
 
   this->TextActorsConfigured = true;
 }
