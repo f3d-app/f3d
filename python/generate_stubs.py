@@ -35,6 +35,7 @@ def run_pybind11_stubgen(
         # fix enum for default values in `Image.save()` and `Image.save_buffer()`
         *("--enum-class-locations", "SaveFormat:Image"),
         # more enums
+        *("--enum-class-locations", "AnimationDirection:Interactor"),
         *("--enum-class-locations", "BindingType:Interactor"),
         *("--enum-class-locations", "LightType:f3d"),
         # ignore `f3d.vector3_t` and `f3d.point3_t` as we dont actually map them
