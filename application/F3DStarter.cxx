@@ -923,7 +923,7 @@ public:
           }
 #endif
           int width = static_cast<int>(
-              this->AppOptions.Resolution[0] * this->LibOptions.ui.scale * dpiScaleFactor);
+            this->AppOptions.Resolution[0] * this->LibOptions.ui.scale * dpiScaleFactor);
           int height = static_cast<int>(
             this->AppOptions.Resolution[1] * this->LibOptions.ui.scale * dpiScaleFactor);
 

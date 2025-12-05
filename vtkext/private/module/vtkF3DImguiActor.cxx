@@ -329,8 +329,8 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
     // ImGui API is not very helpful with this
     fontConfig.FontDataOwnedByAtlas = false;
     font = io.Fonts->AddFontFromMemoryTTF(
-      const_cast<void*>(reinterpret_cast<const void*>(F3DFontBuffer)), sizeof(F3DFontBuffer), 18 * this->FontScale,
-      &fontConfig, ranges.Data);
+      const_cast<void*>(reinterpret_cast<const void*>(F3DFontBuffer)), sizeof(F3DFontBuffer),
+      18 * this->FontScale, &fontConfig, ranges.Data);
   }
   else
   {
