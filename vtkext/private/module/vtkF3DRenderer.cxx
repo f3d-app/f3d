@@ -68,6 +68,7 @@
 #include <vtksys/FStream.hxx>
 #include <vtksys/MD5.h>
 #include <vtksys/SystemTools.hxx>
+#include "vtkWindows.h"
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
 #include <vtkMemoryResourceStream.h>
@@ -85,10 +86,6 @@
 #include <vtk_glad.h>
 #else
 #include <vtk_glew.h>
-#endif
-
-#ifdef _WIN32
-#include "vtkWindows.h"
 #endif
 
 #include <cctype>
@@ -1349,14 +1346,14 @@ void vtkF3DRenderer::ConfigureTextActors()
     }
   }
 
-  double scaleFactor = 1.0;
+  double dpiScaleFactor = 1.0;
 
 #ifdef _WIN32
   const int dpi = GetDeviceCaps(wglGetCurrentDC(), LOGPIXELSY); // Default return 96
-  scaleFactor = static_cast<double>(dpi) / 96;
+  dpiScaleFactor = static_cast<double>(dpi) / 96;
 #endif
 
-  const double adjustedFontScale = this->FontScale * scaleFactor;
+  const double adjustedFontScale = this->FontScale * dpiScaleFactor;
 
   this->UIActor->SetFontScale(adjustedFontScale);
 
