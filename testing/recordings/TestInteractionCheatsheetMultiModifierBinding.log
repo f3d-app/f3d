@@ -1,10 +1,16 @@
 # StreamVersion 1.1
 ExposeEvent 0 150 0 0 0 0
 RenderEvent 0 150 0 0 0 0
+
+# H
 KeyPressEvent 0 150 0 104 1 h
 CharEvent 0 150 0 104 1 h
 KeyReleaseEvent 0 150 0 104 1 h
+
+# Move hover cheatsheet
 MouseMoveEvent 91 150 0 0 0 h 0
+
+# Scroll down to max
 MouseWheelBackwardEvent 91 150 0 0 0 h 0
 MouseWheelBackwardEvent 91 150 0 0 1 h 0
 MouseWheelBackwardEvent 91 150 0 0 0 h 0
@@ -25,15 +31,4 @@ MouseWheelBackwardEvent 91 150 0 0 0 h 0
 MouseWheelBackwardEvent 91 150 0 0 1 h 0
 MouseWheelBackwardEvent 91 150 0 0 0 h 0
 MouseWheelBackwardEvent 91 150 0 0 1 h 0
-MouseWheelBackwardEvent 91 150 0 0 0 h 0
-MouseWheelBackwardEvent 91 150 0 0 1 h 0
-MouseWheelBackwardEvent 91 150 0 0 0 h 0
-MouseWheelBackwardEvent 91 150 0 0 1 h 0
-MouseWheelBackwardEvent 91 150 0 0 0 h 0
-MouseWheelBackwardEvent 91 150 0 0 1 h 0
-MouseWheelBackwardEvent 91 150 0 0 0 h 0
-MouseWheelBackwardEvent 91 150 0 0 0 h 0
-MouseWheelBackwardEvent 91 150 0 0 0 h 0
-MouseWheelBackwardEvent 91 150 0 0 0 h 0
-MouseWheelBackwardEvent 91 150 0 0 0 h 0
 MouseWheelBackwardEvent 91 150 0 0 0 h 0
