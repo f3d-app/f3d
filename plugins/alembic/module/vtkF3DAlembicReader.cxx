@@ -474,6 +474,13 @@ public:
         ts = schema.getTimeSampling();
         numSamples = static_cast<int>(schema.getNumSamples());
       }
+      else if (Alembic::AbcGeom::ICurves::matches(ohead))
+      {
+        const Alembic::AbcGeom::ICurves curves(parent, ohead.getName());
+        const Alembic::AbcGeom::ICurvesSchema& schema = curves.getSchema();
+        ts = schema.getTimeSampling();
+        numSamples = static_cast<int>(schema.getNumSamples());
+      }
 
       objects.pop();
       for (size_t i = 0; i < obj.getNumChildren(); ++i)
