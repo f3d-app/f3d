@@ -386,6 +386,9 @@
     "invert_zoom": {
       "type": "bool",
       "default_value": "false"
+    },
+    "axis_lock": {
+      "type": "direction"
     }
   }
 }

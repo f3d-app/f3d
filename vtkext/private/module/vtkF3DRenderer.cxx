@@ -1856,6 +1856,27 @@ void vtkF3DRenderer::SetUseTrackball(bool use)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetRotationAxis(const std::optional<std::array<double, 3>>& axis)
+{
+  if (!axis)
+  {
+    this->UseRotationAxis = false;
+    this->CheatSheetConfigured = false;
+    return;
+  }
+
+  if (!UseRotationAxis || RotationAxis[0] != (*axis)[0] || RotationAxis[1] != (*axis)[1] || RotationAxis[2] != (*axis)[2])
+  {
+    this->RotationAxis[0] = (*axis)[0];
+    this->RotationAxis[1] = (*axis)[1];
+    this->RotationAxis[2] = (*axis)[2];
+
+    this->UseRotationAxis = true;
+    this->CheatSheetConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::UpdateActors()
 {
   assert(this->Importer);

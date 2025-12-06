@@ -1053,6 +1053,22 @@ interactor& interactor_impl::initCommands()
     std::bind(complNames, std::placeholders::_1,
       std::vector<std::string>{ "field", "array", "component" }));
 
+  this->addCommand("toggle_axis_lock",
+    [&](const std::vector<std::string>& args)
+    {
+      check_args(args, 1, "toggle_axis_lock");
+      if (this->Internals->Options.interactor.axis_lock &&
+        args[0] == this->Internals->Options.getAsString("interactor.axis_lock"))
+      {
+        this->Internals->Options.interactor.axis_lock = std::nullopt;
+      }
+      else
+      {
+        this->Internals->Options.interactor.axis_lock = options::parse<f3d::direction_t>(args[0]);
+      }
+    },
+    command_documentation_t{ "toggle_axis_lock direction", "lock rotation to one direction" });
+
   this->addCommand(
     "cycle_point_sprites",
     [&](const std::vector<std::string>&)
@@ -1565,6 +1581,15 @@ interactor& interactor_impl::initBindings()
       "Verbose level", this->Internals->VerboseLevelToString(log::getVerboseLevel()));
   };
 
+  auto docAxisTgl = [&](const std::string& doc, const std::string& val)
+  {
+    return std::make_pair(doc,
+      (opts.interactor.axis_lock &&
+        val == this->Internals->Options.getAsString("interactor.axis_lock"))
+        ? "ON"
+        : "OFF");
+  };
+
   // clang-format off
   this->addBinding({mod_t::NONE, "W"}, "cycle_animation", "Scene", docAnim, f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "C"}, "cycle_coloring field", "Scene", docField, f3d::interactor::BindingType::CYCLIC);
@@ -1594,6 +1619,9 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "O"}, "cycle_point_sprites","Scene", docPS, f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "U"}, "toggle render.background.blur.enable","Scene", std::bind(docTgl, "Blur background", std::cref(opts.render.background.blur.enable)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "K"}, "toggle interactor.trackball","Scene", std::bind(docTgl, "Trackball interaction", std::cref(opts.interactor.trackball)), f3d::interactor::BindingType::TOGGLE);
+  this->addBinding({mod_t::CTRL, "X"}, "toggle_axis_lock +X", "Scene", [=]() { return docAxisTgl("Toggle x axis lock", "+X"); });
+  this->addBinding({mod_t::CTRL, "Y"}, "toggle_axis_lock +Y", "Scene", [=]() { return docAxisTgl("Toggle y axis lock", "+Y"); });
+  this->addBinding({mod_t::CTRL, "Z"}, "toggle_axis_lock +Z", "Scene", [=]() { return docAxisTgl("Toggle z axis lock", "+Z"); });
   this->addBinding({mod_t::NONE, "F"}, "toggle render.hdri.ambient","Scene", std::bind(docTgl, "HDRI ambient lighting", std::cref(opts.render.hdri.ambient)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "J"}, "toggle render.background.skybox","Scene", std::bind(docTgl, "HDRI skybox", std::cref(opts.render.background.skybox)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "L"}, "increase_light_intensity", "Scene", std::bind(docDbl, "Increase lights intensity", std::cref(opts.render.light.intensity)), f3d::interactor::BindingType::NUMERICAL);

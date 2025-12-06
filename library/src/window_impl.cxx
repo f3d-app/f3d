@@ -441,6 +441,7 @@ void window_impl::UpdateDynamicOptions()
     renderer->ShowAxis(opt.ui.axis);
     renderer->SetUseTrackball(opt.interactor.trackball);
     renderer->SetInvertZoom(opt.interactor.invert_zoom);
+    renderer->SetRotationAxis(opt.interactor.axis_lock);
 
 #if F3D_MODULE_UI
     std::string bindsStr = opt.ui.drop_zone.custom_binds;

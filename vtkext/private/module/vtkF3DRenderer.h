@@ -166,7 +166,16 @@ public:
   vtkGetMacro(InvertZoom, bool);
   ///@}
 
+  ///@{
   /**
+   * Set/Get RotationAxis
+   */
+  void SetRotationAxis(const std::optional<std::array<double, 3>>& axis);  
+  vtkGetMacro(UseRotationAxis, bool);
+  vtkGetVector3Macro(RotationAxis, double);
+  ///@}
+
+   /**
    * Reimplemented to configure:
    *  - ActorsProperties
    *  - Timer
@@ -648,6 +657,8 @@ private:
   std::optional<bool> UseOrthographicProjection = false;
   bool UseTrackball = false;
   bool InvertZoom = false;
+  bool UseRotationAxis = false;
+  double RotationAxis[3] = { 0.0, 0.0, 0.0 };
 
   int RaytracingSamples = 0;
   double UpVector[3] = { 0.0, 1.0, 0.0 };
