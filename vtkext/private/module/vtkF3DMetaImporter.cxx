@@ -515,8 +515,7 @@ void vtkF3DMetaImporter::SetCameraIndex(std::optional<vtkIdType> camIndex)
 }
 
 //----------------------------------------------------------------------------
-bool vtkF3DMetaImporter::GetTemporalInformation(vtkIdType animationIndex, double frameRate,
-  int& nbTimeSteps, double timeRange[2], vtkDoubleArray* timeSteps)
+bool vtkF3DMetaImporter::GetTemporalInformation(vtkIdType animationIndex,double timeRange[2], int& nbTimeSteps, vtkDoubleArray* timeSteps)
 {
   vtkIdType localAnimationIndex = animationIndex;
   for (const auto& importerPair : this->Pimpl->Importers)
@@ -530,7 +529,7 @@ bool vtkF3DMetaImporter::GetTemporalInformation(vtkIdType animationIndex, double
     if (localAnimationIndex < nAnim)
     {
       return importerPair.Importer->GetTemporalInformation(
-        localAnimationIndex, frameRate, nbTimeSteps, timeRange, timeSteps);
+        localAnimationIndex, timeRange, nbTimeSteps, timeSteps);
     }
     else
     {
