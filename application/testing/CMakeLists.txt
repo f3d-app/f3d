@@ -1689,6 +1689,25 @@ f3d_test(NAME TestHelpPrecedenceWithUnknownOption ARGS --help --unknown REGEXP "
 # Test that --version is displayed even when there is an unknown option
 f3d_test(NAME TestVersionPrecedenceWithUnknownOption ARGS --version --unknown REGEXP "Version:" NO_BASELINE)
 
+# Regression test for #2440: first-load match block should apply no-render
+set(_cfg "${CMAKE_CURRENT_BINARY_DIR}/firstload_match_no_render.json")
+file(WRITE "${_cfg}" "[\n"
+"  {\n"
+"    \"match\": \".*\\\\.vtp$\",\n"
+"    \"options\": { \"no-render\": true }\n"
+"  }\n"
+"]\n")
+
+f3d_test(
+  NAME TestConfigFirstLoadMatchNoRender
+  DATA cow.vtp
+  CONFIG "${_cfg}"
+  ARGS --verbose=debug
+  NO_BASELINE
+  NO_OUTPUT
+  REGEXP "'no-render' = 'true'"
+)
+
 # Test rendering backend list
 if(WIN32)
   f3d_test(NAME TestRenderingBackenListWGL ARGS --list-rendering-backends NO_RENDER NO_BASELINE REGEXP "wgl: available")
