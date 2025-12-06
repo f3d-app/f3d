@@ -377,6 +377,15 @@ window_impl::~window_impl()
 }
 
 //----------------------------------------------------------------------------
+void window_impl::SetSceneHierarchy(const std::vector<NodeInfo>& hierarchy)
+{
+  if (this->Internals->Renderer)
+  {
+    this->Internals->Renderer->SetHierarchy(hierarchy);
+  }
+}
+
+//----------------------------------------------------------------------------
 void window_impl::UpdateDynamicOptions()
 {
   vtkF3DRenderer* renderer = this->Internals->Renderer;
@@ -429,6 +438,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetFilenameInfo(opt.ui.filename_info);
   renderer->ShowMetaData(opt.ui.metadata);
   renderer->ShowHDRIFilename(opt.ui.hdri_filename);
+  renderer->ShowSceneHierarchy(opt.ui.scene_hierarchy);
   renderer->ShowCheatSheet(opt.ui.cheatsheet);
   renderer->ShowConsole(opt.ui.console);
   renderer->ShowMinimalConsole(opt.ui.minimal_console);
@@ -741,6 +751,16 @@ void window_impl::SetCachePath(const fs::path& cachePath)
 void window_impl::SetInteractor(interactor_impl* interactor)
 {
   this->Internals->Interactor = interactor;
+  
+  // Set up render request callback on the UI actor
+  // This allows the UI to safely request renders from within the render loop
+  if (interactor)
+  {
+    this->Internals->Renderer->SetRenderRequestCallback([interactor]()
+    {
+      interactor->requestRender();
+    });
+  }
 }
 
 //----------------------------------------------------------------------------
