@@ -266,8 +266,8 @@ if(F3D_WINDOWS_BUILD_SHELL_THUMBNAILS_EXTENSION)
   add_subdirectory(winshellext)
 endif()
 
-# Python bindings
-option(F3D_BINDINGS_C "Create C bindings" ON)
+# C bindings
+option(F3D_BINDINGS_C "Create C bindings" OFF)
 if(F3D_BINDINGS_C)
   add_subdirectory(c)
 endif()
