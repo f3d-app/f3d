@@ -3,6 +3,7 @@
 #include "F3DColoringInfoHandler.h"
 #include "F3DDefaultHDRI.h"
 #include "F3DLog.h"
+#include "F3DUtils.h"
 #include "vtkF3DCachedLUTTexture.h"
 #include "vtkF3DCachedSpecularTexture.h"
 #include "vtkF3DDisplayDepthRenderPass.h"
@@ -15,7 +16,6 @@
 #include "vtkF3DTAAPass.h"
 #include "vtkF3DUserRenderPass.h"
 
-#include "vtkWindows.h"
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
 #include <vtkCamera.h>
@@ -1569,16 +1569,7 @@ void vtkF3DRenderer::ConfigureTextActors()
     }
   }
 
-  double dpiScaleFactor = 1.0;
-
-#ifdef _WIN32
-  const int dpi = GetDeviceCaps(wglGetCurrentDC(), LOGPIXELSY); // Default return 96
-  dpiScaleFactor = static_cast<double>(dpi) / 96;
-#endif
-
-  const double adjustedFontScale = this->FontScale * dpiScaleFactor;
-
-  this->UIActor->SetFontScale(adjustedFontScale);
+  this->UIActor->SetFontScale(this->FontScale * F3DUtils::getDPIScale());
 
   this->TextActorsConfigured = true;
 }

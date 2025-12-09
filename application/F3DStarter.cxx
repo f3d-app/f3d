@@ -40,11 +40,6 @@
 #include "utils.h"
 #include "window.h"
 
-#ifdef WIN32
-#include <WinUser.h>
-#include <wingdi.h>
-#endif
-
 #include <algorithm>
 #include <atomic>
 #include <cassert>
@@ -910,22 +905,12 @@ public:
         }
         else
         {
-          double dpiScaleFactor = 1.0;
-#ifdef WIN32
-          // Get main monitor dpi
-          HDC hdc = GetDC(NULL);
+          const float dpiScale = f3d::utils::getDPIScale();
 
-          if (hdc)
-          {
-            const int dpi = GetDeviceCaps(hdc, LOGPIXELSY); // Default return 96
-            dpiScaleFactor = static_cast<double>(dpi) / 96;
-            ReleaseDC(NULL, hdc);
-          }
-#endif
-          int width = static_cast<int>(
-            this->AppOptions.Resolution[0] * this->LibOptions.ui.scale * dpiScaleFactor);
-          int height = static_cast<int>(
-            this->AppOptions.Resolution[1] * this->LibOptions.ui.scale * dpiScaleFactor);
+          int width =
+            static_cast<int>(this->AppOptions.Resolution[0] * this->LibOptions.ui.scale * dpiScale);
+          int height =
+            static_cast<int>(this->AppOptions.Resolution[1] * this->LibOptions.ui.scale * dpiScale);
 
           window.setSize(width, height);
         }
