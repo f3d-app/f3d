@@ -3,6 +3,7 @@ ExposeEvent 0 289 0 0 0 0 0
 RenderEvent 0 289 0 0 0 0 0
 EnterEvent 609 197 0 0 0 0 0
 MouseMoveEvent 609 197 0 0 0 0 0
+
 # H
 KeyPressEvent 700 193 0 104 1 h 0
 CharEvent 700 193 0 104 1 h 0
