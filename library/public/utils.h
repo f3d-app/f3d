@@ -96,7 +96,7 @@ public:
    * Currently only supported on Windows platform.
    * Return a hardcoded 1.f on other platform.
    */
-  [[nodiscard]] static const float getDPIScale();
+  [[nodiscard]] static float getDPIScale();
 
   /**
    * Get an environment variable value, returns std::nullopt if not set

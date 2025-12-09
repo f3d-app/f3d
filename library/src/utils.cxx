@@ -332,7 +332,7 @@ std::string utils::globToRegex(std::string_view glob, char pathSeparator)
 }
 
 //----------------------------------------------------------------------------
-const float utils::getDPIScale()
+float utils::getDPIScale()
 {
 #ifdef WIN32
   HDC hdc = GetDC(NULL);
