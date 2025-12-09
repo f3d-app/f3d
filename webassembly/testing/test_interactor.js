@@ -67,6 +67,11 @@ const settings = {
       "animation should be playing",
     );
 
+    utils.assert(
+      interactor.getAnimationName() == "unnamed_0",
+      "getAnimationName returns name",
+    );
+
     // only for coverage, do not test the actual feature yet
     interactor.disableCameraMovement();
     interactor.enableCameraMovement();
