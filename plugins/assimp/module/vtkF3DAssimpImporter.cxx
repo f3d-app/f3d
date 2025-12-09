@@ -1,6 +1,5 @@
 #include "vtkF3DAssimpImporter.h"
 
-#include <assimp/ProgressHandler.hpp>
 #include <vtkActor.h>
 #include <vtkActorCollection.h>
 #include <vtkCamera.h>
@@ -38,6 +37,7 @@
 
 #include <assimp/Exceptional.h>
 #include <assimp/Importer.hpp>
+#include <assimp/ProgressHandler.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 
@@ -54,6 +54,12 @@ public:
 
   bool Update(float percentage = -1.f) override
   {
+    // no progress to report, not necessarily an error
+    if (percentage == -1.f)
+    {
+      return true;
+    }
+
     double reportPercentage = percentage < 0 ? double{ 1.0 } : static_cast<double>(percentage);
 
     this->Parent->InvokeEvent(vtkCommand::ProgressEvent, static_cast<void*>(&reportPercentage));
