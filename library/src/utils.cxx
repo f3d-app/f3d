@@ -334,17 +334,20 @@ std::string utils::globToRegex(std::string_view glob, char pathSeparator)
 //----------------------------------------------------------------------------
 float utils::getDPIScale()
 {
+  float dpiScale = 1.f;
+
 #ifdef WIN32
   HDC hdc = GetDC(NULL);
 
   if (hdc)
   {
     const int dpi = GetDeviceCaps(hdc, LOGPIXELSY); // Default return 96
+    dpiScale = static_cast<float>(dpi) / 96;
     ReleaseDC(NULL, hdc);
-    return static_cast<float>(dpi) / 96;
   }
 #endif
-  return 1.f;
+
+  return dpiScale;
 }
 
 //----------------------------------------------------------------------------

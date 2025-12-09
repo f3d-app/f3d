@@ -58,9 +58,12 @@ int F3DUtils::ParseToInt(const std::string& str, int def, const std::string& nam
 //----------------------------------------------------------------------------
 float F3DUtils::getDPIScale()
 {
+  float dpiScale = 1.f;
+
 #ifdef _WIN32
   const int dpi = GetDeviceCaps(wglGetCurrentDC(), LOGPIXELSY); // Default return 96
-  return static_cast<float>(dpi) / 96;
+  dpiScale = static_cast<float>(dpi) / 96;
 #endif
-  return 1.f;
+
+  return dpiScale;
 }

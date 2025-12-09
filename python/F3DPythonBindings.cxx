@@ -243,6 +243,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def_static("tokenize", &f3d::utils::tokenize, py::arg("str"), py::arg("keep_comments") = true)
     .def_static(
       "glob_to_regex", &f3d::utils::globToRegex, py::arg("glob"), py::arg("path_separator") = '/')
+    .def_static("get_dpi_scale", &f3d::ultis::getDPIScale)
     .def_static("get_env", &f3d::utils::getEnv)
     .def_static("get_known_folder", &f3d::utils::getKnownFolder);
 
