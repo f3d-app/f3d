@@ -20,6 +20,29 @@
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkF3DQuakeMDLImporter);
 
+// //----------------------------------------------------------------------------
+template<typename TYPE>
+const TYPE* peek_from_vector(const std::vector<uint8_t>& buffer, const size_t& offset)
+{
+  static_assert(std::is_pod<TYPE>::value, "Vector typecast requires POD input");
+
+  if (offset + sizeof(TYPE) > buffer.size())
+  {
+    throw std::out_of_range("Requested data out of range.");
+  }
+
+  return reinterpret_cast<const TYPE*>(buffer.data() + offset);
+  ;
+}
+
+template<typename TYPE>
+const TYPE* read_from_vector(const std::vector<uint8_t>& buffer, size_t& offset)
+{
+  const TYPE* ptr = peek_from_vector<TYPE>(buffer, offset);
+  offset += sizeof(TYPE);
+  return ptr;
+}
+
 //----------------------------------------------------------------------------
 struct vtkF3DQuakeMDLImporter::vtkInternals
 {
@@ -109,29 +132,24 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   }
 
   //----------------------------------------------------------------------------
-  vtkSmartPointer<vtkTexture> CreateTexture(const std::vector<unsigned char>& buffer, int& offset,
+  vtkSmartPointer<vtkTexture> CreateTexture(const std::vector<uint8_t>& buffer, size_t& offset,
     int skinWidth, int skinHeight, unsigned int nbSkins, unsigned int skinIndex)
   {
-    vtkNew<vtkTexture> texture;
-    texture->SetColorModeToDirectScalars();
-    texture->UseSRGBColorSpaceOn();
-
-    if (skinIndex >= nbSkins)
-    {
-      skinIndex = 0;
-      vtkWarningWithObjectMacro(
-        this->Parent, "QuakeMDL.skin_index is out of bounds. Defaulting to 0.");
-    }
-
     auto make_new_skin = [&](vtkNew<vtkImageData>& skin)
     {
+      // check if all the data for this operation exists
+      if (offset + (skinHeight - 1) * (skinWidth - 1) >= buffer.size())
+      {
+        throw std::out_of_range("Failed to read data for skin.");
+      }
       skin->SetDimensions(skinWidth, skinHeight, 1);
       skin->AllocateScalars(VTK_UNSIGNED_CHAR, 3);
       for (int x = 0; x < skinHeight; ++x)
       {
         for (int y = 0; y < skinWidth; ++y)
         {
-          unsigned char index = *(buffer.data() + offset + x * skinWidth + y);
+          // note, due to above memory size check we can safely assume this is true
+          auto index = *peek_from_vector<uint8_t>(buffer, offset + x * skinWidth + y);
           unsigned char* ptr = static_cast<unsigned char*>(skin->GetScalarPointer(y, x, 0));
           std::copy(F3DMDLDefaultColorMap[index], F3DMDLDefaultColorMap[index] + 3, ptr);
         }
@@ -139,55 +157,68 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     };
 
     // Read textures.
-    int skinSize = skinWidth * skinHeight;
-    int groupSkinCount = 0;
-    for (unsigned int i = 0; i < nbSkins; i++)
+    try
     {
-      int skinGroup = *reinterpret_cast<const int*>(buffer.data() + offset);
-      offset += sizeof(int32_t);
-      if (skinGroup == 0)
+      vtkNew<vtkTexture> texture;
+      texture->SetColorModeToDirectScalars();
+      texture->UseSRGBColorSpaceOn();
+
+      if (skinIndex >= nbSkins)
       {
-        // Skip the skins that are not selected
-        if (i == skinIndex)
-        {
-          vtkNew<vtkImageData> img;
-          make_new_skin(img);
-          texture->SetInputData(img);
-        }
-        offset += skinSize * sizeof(int8_t);
+        skinIndex = 0;
+        vtkWarningWithObjectMacro(
+          this->Parent, "QuakeMDL.skin_index is out of bounds. Defaulting to 0.");
       }
-      else
+      int skinSize = skinWidth * skinHeight;
+      int groupSkinCount = 0;
+      for (unsigned int i = 0; i < nbSkins; i++)
       {
-        std::string skinAnimationName = "skin_" + std::to_string(groupSkinCount);
-        this->GroupSkinAnimationNames.emplace_back(skinAnimationName);
-        int nb;
-        std::memcpy(&nb, buffer.data() + offset, sizeof(nb));
-        offset += sizeof(nb);
-        this->GroupSkins.emplace_back(nb);
-        this->GroupSkinDurations.emplace_back(nb + 1, 0.0f);
-        for (int j = 1; j <= nb; ++j)
+        int skinGroup = *read_from_vector<int>(buffer, offset);
+        if (skinGroup == 0)
         {
-          float timeValue;
-          std::memcpy(&timeValue, buffer.data() + offset, sizeof(timeValue));
-          this->GroupSkinDurations[groupSkinCount][j] = static_cast<double>(timeValue);
-          offset += sizeof(timeValue);
-        }
-        for (int skinIdx = 0; skinIdx < nb; ++skinIdx)
-        {
-          vtkNew<vtkImageData> skinTemp;
-          make_new_skin(skinTemp);
-          this->GroupSkins[groupSkinCount][skinIdx] = skinTemp;
+          // Skip the skins that are not selected
+          if (i == skinIndex)
+          {
+            vtkNew<vtkImageData> img;
+            make_new_skin(img);
+            texture->SetInputData(img);
+          }
           offset += skinSize * sizeof(int8_t);
         }
-        if (i == skinIndex)
+        else
         {
-          texture->SetInputData(this->GroupSkins[groupSkinCount].front());
+          std::string skinAnimationName = "skin_" + std::to_string(groupSkinCount);
+          this->GroupSkinAnimationNames.emplace_back(skinAnimationName);
+          auto nb = *read_from_vector<int>(buffer, offset);
+          ;
+          this->GroupSkins.emplace_back(nb);
+          this->GroupSkinDurations.emplace_back(nb + 1, 0.0f);
+          for (int j = 1; j <= nb; ++j)
+          {
+            auto timeValue = *read_from_vector<float>(buffer, offset);
+            this->GroupSkinDurations[groupSkinCount][j] = static_cast<double>(timeValue);
+          }
+          for (int skinIdx = 0; skinIdx < nb; ++skinIdx)
+          {
+            vtkNew<vtkImageData> skinTemp;
+            make_new_skin(skinTemp);
+            this->GroupSkins[groupSkinCount][skinIdx] = skinTemp;
+            offset += skinSize * sizeof(int8_t);
+          }
+          if (i == skinIndex)
+          {
+            texture->SetInputData(this->GroupSkins[groupSkinCount].front());
+          }
+          ++groupSkinCount;
         }
-        ++groupSkinCount;
       }
+      return texture;
     }
-
-    return texture;
+    catch (const std::out_of_range& e)
+    {
+      vtkErrorWithObjectMacro(this->Parent, "CreateTexture Accessed data out of range, aborting.");
+      return nullptr;
+    }
   }
 
   //----------------------------------------------------------------------------
@@ -234,219 +265,253 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   }
 
   //----------------------------------------------------------------------------
-  bool CreateMesh(const std::vector<unsigned char>& buffer, int offset, const mdl_header_t* header)
+  bool CreateMesh(const std::vector<uint8_t>& buffer, size_t offset, const mdl_header_t* header)
   {
-    const unsigned long totalProgress = header->numFrames * 2 + header->numTriangles;
-    unsigned long currentProgress = 0;
-    double progressRate;
-
-    constexpr int mdl_simpleframe_t_fixed_size =
-      2 * sizeof(mdl_vertex_t) + 16 * sizeof(int8_t); // Size of bboxmin, bboxmax and name.
-
-    // Read Texture Coordinates
-    const mdl_texcoord_t* texcoords =
-      reinterpret_cast<const mdl_texcoord_t*>(buffer.data() + offset);
-    offset += sizeof(mdl_texcoord_t) * header->numVertices;
-
-    // Read Triangles
-    const mdl_triangle_t* triangles =
-      reinterpret_cast<const mdl_triangle_t*>(buffer.data() + offset);
-    offset += sizeof(mdl_triangle_t) * header->numTriangles;
-
-    // Read frames
-    std::vector<plugin_frame_pointer> framePtr =
-      std::vector<plugin_frame_pointer>(header->numFrames);
-    std::vector<std::vector<int>> frameOffsets = std::vector<std::vector<int>>();
-    for (int i = 0; i < header->numFrames; i++)
+    try
     {
-      framePtr[i].type = reinterpret_cast<const int*>(buffer.data() + offset);
-      if (*framePtr[i].type == SINGLE_FRAME)
+      const unsigned long totalProgress = header->numFrames * 2 + header->numTriangles;
+      unsigned long currentProgress = 0;
+      double progressRate;
+
+      constexpr int mdl_simpleframe_t_fixed_size =
+        2 * sizeof(mdl_vertex_t) + 16 * sizeof(int8_t); // Size of bboxmin, bboxmax and name.
+
+      // Read Texture Coordinates
+      auto texcoords = peek_from_vector<mdl_texcoord_t>(buffer, offset);
+      offset += sizeof(mdl_texcoord_t) * header->numVertices;
+
+      // Read Triangles
+      auto triangles = peek_from_vector<mdl_triangle_t>(buffer, offset);
+      offset += sizeof(mdl_triangle_t) * header->numTriangles;
+
+      // Read frames
+      std::vector<plugin_frame_pointer> framePtr =
+        std::vector<plugin_frame_pointer>(header->numFrames);
+      std::vector<std::vector<int>> frameOffsets = std::vector<std::vector<int>>();
+      for (int i = 0; i < header->numFrames; i++)
       {
-        framePtr[i].nb = nullptr;
-        framePtr[i].time = nullptr;
-        framePtr[i].frames =
-          reinterpret_cast<const mdl_simpleframe_t*>(buffer.data() + sizeof(int32_t) + offset);
-
-        // Size of a frame is mdl_simpleframe_t_fixed_size + mdl_vertex_t * numVertices, +
-        // sizeof(int)
-        offset += sizeof(int32_t) + mdl_simpleframe_t_fixed_size +
-          sizeof(mdl_vertex_t) * header->numVertices;
-
-        // Always emplace in case of mixed single frame and group frame
-        frameOffsets.emplace_back(std::vector<int>());
-      }
-      else
-      {
-        framePtr[i].nb = reinterpret_cast<const int*>(buffer.data() + sizeof(int32_t) + offset);
-        // Skips parameters min and max.
-        framePtr[i].time = reinterpret_cast<const float*>(reinterpret_cast<const void*>(
-          buffer.data() + 2 * sizeof(int32_t) + 2 * sizeof(mdl_vertex_t) + offset));
-        // Points to the first frame, 4 * nbFrames for the float array
-        framePtr[i].frames =
-          reinterpret_cast<const mdl_simpleframe_t*>(buffer.data() + 2 * sizeof(int32_t) +
-            2 * sizeof(mdl_vertex_t) + (*framePtr[i].nb) * sizeof(float) + offset);
-        offset +=
-          2 * sizeof(int32_t) + 2 * sizeof(mdl_vertex_t) + (*framePtr[i].nb) * sizeof(float);
-        frameOffsets.emplace_back(std::vector<int>());
-
-        for (int j = 0; j < *framePtr[i].nb; j++)
+        framePtr[i].type = peek_from_vector<int>(buffer, offset);
+        if (*framePtr[i].type == SINGLE_FRAME)
         {
-          // Offset for each frame
-          frameOffsets[i].emplace_back(offset);
-          offset += mdl_simpleframe_t_fixed_size + sizeof(mdl_vertex_t) * header->numVertices;
-        }
-      }
+          framePtr[i].nb = nullptr;
+          framePtr[i].time = nullptr;
+          // note : mdl_simpleframe_t can have *up to and including* 1024 verts. So if this data is
+          // the last in the file the peek_at_vector func will error out. As such we manually check
+          // this to see if all the verts are valid. If they are, continue.
+          framePtr[i].frames =
+            reinterpret_cast<const mdl_simpleframe_t*>(buffer.data() + sizeof(int32_t) + offset);
 
-      currentProgress++;
-      if (i % 128 == 0)
-      {
-        progressRate = static_cast<double>(currentProgress) / totalProgress;
-        this->Parent->InvokeEvent(vtkCommand::ProgressEvent, static_cast<void*>(&progressRate));
-      }
-    }
-
-    // Draw cells and scale texture coordinates
-    vtkNew<vtkCellArray> cells;
-    cells->AllocateExact(header->numTriangles, 3 * header->numTriangles);
-    vtkNew<vtkFloatArray> textureCoordinates;
-    textureCoordinates->SetNumberOfComponents(2);
-    textureCoordinates->SetName("TextureCoordinates");
-    textureCoordinates->Allocate(header->numTriangles * 3);
-    for (int i = 0; i < header->numTriangles; i++)
-    {
-      for (int vertex : triangles[i].vertex)
-      {
-        float coord_s = texcoords[vertex].coord_s;
-        float coord_t = texcoords[vertex].coord_t;
-        if (!triangles[i].facesFront && texcoords[vertex].onseam)
-        {
-          coord_s = coord_s + header->skinWidth * 0.5f; // Backface
-        }
-
-        // Scale s and t to range from 0.0 to 1.0
-        coord_s = (coord_s + 0.5) / header->skinWidth;
-        coord_t = (coord_t + 0.5) / header->skinHeight;
-        float coords_st[2] = { coord_s, coord_t };
-        textureCoordinates->InsertNextTuple(coords_st);
-      }
-      // triangle winding order is inverted in Quake MDL
-      vtkIdType triangle[3] = { i * 3, i * 3 + 2, i * 3 + 1 };
-      cells->InsertNextCell(3, triangle);
-
-      currentProgress++;
-      if (i % 128 == 0)
-      {
-        progressRate = static_cast<double>(currentProgress) / totalProgress;
-        this->Parent->InvokeEvent(vtkCommand::ProgressEvent, static_cast<void*>(&progressRate));
-      }
-    }
-
-    // Extract animation name from frame name and recover animation index accordingly
-    // Check if frame name respect standard naming scheme for single frames
-    // eg: stand1, stand2, stand3, run1, run2, run3
-    // XXX: This code assume frames are provided in order and does not check the numbering
-    // If not, just return the frame name
-    auto extract_animation_name = [&](const std::string& frameName)
-    {
-      std::string::size_type sz;
-      sz = frameName.find_first_of("0123456789");
-      if (sz == std::string::npos)
-      {
-        return frameName;
-      }
-      return frameName.substr(0, sz);
-    };
-
-    // A lambda to add an empty named animation, return the index to it
-    auto emplace_empty_animation = [&](const std::string& animName)
-    {
-      this->AnimationNames.emplace_back(animName);
-      this->AnimationTimes.emplace_back(std::vector<double>());
-      this->AnimationFrames.emplace_back(std::vector<vtkSmartPointer<vtkPolyData>>());
-      return this->AnimationNames.size() - 1;
-    };
-
-    // Create frames
-    size_t singleFrameAnimIdx = 0;
-    bool hasSingleFrameAnim = false;
-    for (int frameNum = 0; frameNum < header->numFrames; frameNum++)
-    {
-      plugin_frame_pointer pluginFramePtr = framePtr[frameNum];
-
-      if (*(pluginFramePtr.type) == SINGLE_FRAME)
-      {
-        // Recover pointer to the single frame
-        const mdl_simpleframe_t* frame = pluginFramePtr.frames;
-
-        std::string animationName = extract_animation_name(frame->name);
-        if (!hasSingleFrameAnim || animationName != this->AnimationNames[singleFrameAnimIdx])
-        {
-          // New animation, emplace it
-          singleFrameAnimIdx = emplace_empty_animation(animationName);
-          hasSingleFrameAnim = true;
-        }
-
-        // Handle animation times
-        std::vector<double>& times = this->AnimationTimes[singleFrameAnimIdx];
-        if (times.empty())
-        {
-          times.emplace_back(0.0);
-        }
-        // Single frames are 10 fps
-        times.emplace_back(times.back() + 0.1);
-
-        // Create the animation frame
-        vtkSmartPointer<vtkPolyData> mesh =
-          this->CreateMeshForSimpleFrame(frame, header, triangles, cells, textureCoordinates);
-        this->AnimationFrames[singleFrameAnimIdx].emplace_back(mesh);
-      }
-      else
-      {
-        // Group frame are expected to be a single animation
-        std::string animationName;
-        std::vector<double> times;
-        std::vector<vtkSmartPointer<vtkPolyData>> meshes;
-
-        // groupFrames always start at 0.0
-        times.emplace_back(0.0);
-        // Iterate over each frame in the group
-        for (int groupFrameNum = 0; groupFrameNum < *pluginFramePtr.nb; groupFrameNum++)
-        {
-          // Recover the frame using the offsets because the struct does not store this pointer
-          const mdl_simpleframe_t* frame = reinterpret_cast<const mdl_simpleframe_t*>(
-            buffer.data() + frameOffsets[frameNum][groupFrameNum]);
-
-          // Assume all frames are named identicaly in the group
-          if (animationName.empty())
+          if (offset + sizeof(int32_t) + mdl_simpleframe_t_fixed_size > buffer.size() ||
+            offset + sizeof(int32_t) + mdl_simpleframe_t_fixed_size +
+                sizeof(mdl_vertex_t) * header->numVertices >
+              buffer.size())
           {
-            // Add a group_ prefix to identify group frames
-            animationName = "group_" + extract_animation_name(frame->name);
+            // really ran out of room
+            throw std::out_of_range("Requested data out of range.");
           }
 
-          // Recover time for this frame from the dedicated table
-          times.emplace_back(pluginFramePtr.time[groupFrameNum]);
+          // Size of a frame is mdl_simpleframe_t_fixed_size + mdl_vertex_t * numVertices, +
+          // sizeof(int)
+          offset += sizeof(int32_t) + mdl_simpleframe_t_fixed_size +
+            sizeof(mdl_vertex_t) * header->numVertices;
 
-          // Recover mesh for this frame
-          meshes.emplace_back(
-            this->CreateMeshForSimpleFrame(frame, header, triangles, cells, textureCoordinates));
+          // Always emplace in case of mixed single frame and group frame
+          frameOffsets.emplace_back(std::vector<int>());
         }
-        this->AnimationNames.emplace_back(animationName);
-        this->AnimationTimes.emplace_back(times);
-        this->AnimationFrames.emplace_back(meshes);
+        else
+        {
+          framePtr[i].nb = peek_from_vector<int>(buffer, offset + sizeof(int32_t));
+          // Skips parameters min and max.
+          framePtr[i].time = peek_from_vector<float>(
+            buffer, offset + (2 * sizeof(int32_t)) + (2 * sizeof(mdl_vertex_t)));
+          // Points to the first frame, 4 * nbFrames for the float array
+          // note : see above
+          framePtr[i].frames =
+            reinterpret_cast<const mdl_simpleframe_t*>(buffer.data() + 2 * sizeof(int32_t) +
+              2 * sizeof(mdl_vertex_t) + (*framePtr[i].nb) * sizeof(float) + offset);
+
+          if (offset + sizeof(int32_t) + mdl_simpleframe_t_fixed_size > buffer.size() ||
+            offset + sizeof(int32_t) + mdl_simpleframe_t_fixed_size +
+                sizeof(mdl_vertex_t) * header->numVertices >
+              buffer.size())
+          {
+            throw std::out_of_range("Requested data out of range.");
+          }
+
+          offset +=
+            2 * sizeof(int32_t) + 2 * sizeof(mdl_vertex_t) + (*framePtr[i].nb) * sizeof(float);
+          frameOffsets.emplace_back(std::vector<int>());
+
+          for (int j = 0; j < *framePtr[i].nb; j++)
+          {
+            // Offset for each frame
+            frameOffsets[i].emplace_back(offset);
+            offset += mdl_simpleframe_t_fixed_size + sizeof(mdl_vertex_t) * header->numVertices;
+          }
+
+          // check that we didn't run off the memory during loop
+          if (offset > buffer.size())
+          {
+            throw std::out_of_range("Requested data out of range.");
+          }
+        }
+
+        currentProgress++;
+        if (i % 128 == 0)
+        {
+          progressRate = static_cast<double>(currentProgress) / totalProgress;
+          this->Parent->InvokeEvent(vtkCommand::ProgressEvent, static_cast<void*>(&progressRate));
+        }
       }
 
-      currentProgress++;
-      if (frameNum % 128 == 0)
+      // Draw cells and scale texture coordinates
+      vtkNew<vtkCellArray> cells;
+      cells->AllocateExact(header->numTriangles, 3 * header->numTriangles);
+      vtkNew<vtkFloatArray> textureCoordinates;
+      textureCoordinates->SetNumberOfComponents(2);
+      textureCoordinates->SetName("TextureCoordinates");
+      textureCoordinates->Allocate(header->numTriangles * 3);
+      for (int i = 0; i < header->numTriangles; i++)
       {
-        progressRate = static_cast<double>(currentProgress) / totalProgress;
-        this->Parent->InvokeEvent(vtkCommand::ProgressEvent, static_cast<void*>(&progressRate));
-      }
-    }
+        for (int vertex : triangles[i].vertex)
+        {
+          float coord_s = texcoords[vertex].coord_s;
+          float coord_t = texcoords[vertex].coord_t;
+          if (!triangles[i].facesFront && texcoords[vertex].onseam)
+          {
+            coord_s = coord_s + header->skinWidth * 0.5f; // Backface
+          }
 
-    currentProgress = totalProgress;
-    progressRate = 1.0;
-    this->Parent->InvokeEvent(vtkCommand::ProgressEvent, static_cast<void*>(&progressRate));
-    return true;
+          // Scale s and t to range from 0.0 to 1.0
+          coord_s = (coord_s + 0.5) / header->skinWidth;
+          coord_t = (coord_t + 0.5) / header->skinHeight;
+          float coords_st[2] = { coord_s, coord_t };
+          textureCoordinates->InsertNextTuple(coords_st);
+        }
+        // triangle winding order is inverted in Quake MDL
+        vtkIdType triangle[3] = { i * 3, i * 3 + 2, i * 3 + 1 };
+        cells->InsertNextCell(3, triangle);
+
+        currentProgress++;
+        if (i % 128 == 0)
+        {
+          progressRate = static_cast<double>(currentProgress) / totalProgress;
+          this->Parent->InvokeEvent(vtkCommand::ProgressEvent, static_cast<void*>(&progressRate));
+        }
+      }
+
+      // Extract animation name from frame name and recover animation index accordingly
+      // Check if frame name respect standard naming scheme for single frames
+      // eg: stand1, stand2, stand3, run1, run2, run3
+      // XXX: This code assume frames are provided in order and does not check the numbering
+      // If not, just return the frame name
+      auto extract_animation_name = [&](const std::string& frameName)
+      {
+        std::string::size_type sz;
+        sz = frameName.find_first_of("0123456789");
+        if (sz == std::string::npos)
+        {
+          return frameName;
+        }
+        return frameName.substr(0, sz);
+      };
+
+      // A lambda to add an empty named animation, return the index to it
+      auto emplace_empty_animation = [&](const std::string& animName)
+      {
+        this->AnimationNames.emplace_back(animName);
+        this->AnimationTimes.emplace_back(std::vector<double>());
+        this->AnimationFrames.emplace_back(std::vector<vtkSmartPointer<vtkPolyData>>());
+        return this->AnimationNames.size() - 1;
+      };
+
+      // Create frames
+      size_t singleFrameAnimIdx = 0;
+      bool hasSingleFrameAnim = false;
+      for (int frameNum = 0; frameNum < header->numFrames; frameNum++)
+      {
+        plugin_frame_pointer pluginFramePtr = framePtr[frameNum];
+
+        if (*(pluginFramePtr.type) == SINGLE_FRAME)
+        {
+          // Recover pointer to the single frame
+          const mdl_simpleframe_t* frame = pluginFramePtr.frames;
+
+          std::string animationName = extract_animation_name(frame->name);
+          if (!hasSingleFrameAnim || animationName != this->AnimationNames[singleFrameAnimIdx])
+          {
+            // New animation, emplace it
+            singleFrameAnimIdx = emplace_empty_animation(animationName);
+            hasSingleFrameAnim = true;
+          }
+
+          // Handle animation times
+          std::vector<double>& times = this->AnimationTimes[singleFrameAnimIdx];
+          if (times.empty())
+          {
+            times.emplace_back(0.0);
+          }
+          // Single frames are 10 fps
+          times.emplace_back(times.back() + 0.1);
+
+          // Create the animation frame
+          vtkSmartPointer<vtkPolyData> mesh =
+            this->CreateMeshForSimpleFrame(frame, header, triangles, cells, textureCoordinates);
+          this->AnimationFrames[singleFrameAnimIdx].emplace_back(mesh);
+        }
+        else
+        {
+          // Group frame are expected to be a single animation
+          std::string animationName;
+          std::vector<double> times;
+          std::vector<vtkSmartPointer<vtkPolyData>> meshes;
+
+          // groupFrames always start at 0.0
+          times.emplace_back(0.0);
+          // Iterate over each frame in the group
+          for (int groupFrameNum = 0; groupFrameNum < *pluginFramePtr.nb; groupFrameNum++)
+          {
+            // Recover the frame using the offsets because the struct does not store this pointer
+            auto frame =
+              peek_from_vector<mdl_simpleframe_t>(buffer, frameOffsets[frameNum][groupFrameNum]);
+
+            // Assume all frames are named identicaly in the group
+            if (animationName.empty())
+            {
+              // Add a group_ prefix to identify group frames
+              animationName = "group_" + extract_animation_name(frame->name);
+            }
+
+            // Recover time for this frame from the dedicated table
+            times.emplace_back(pluginFramePtr.time[groupFrameNum]);
+
+            // Recover mesh for this frame
+            meshes.emplace_back(
+              this->CreateMeshForSimpleFrame(frame, header, triangles, cells, textureCoordinates));
+          }
+          this->AnimationNames.emplace_back(animationName);
+          this->AnimationTimes.emplace_back(times);
+          this->AnimationFrames.emplace_back(meshes);
+        }
+
+        currentProgress++;
+        if (frameNum % 128 == 0)
+        {
+          progressRate = static_cast<double>(currentProgress) / totalProgress;
+          this->Parent->InvokeEvent(vtkCommand::ProgressEvent, static_cast<void*>(&progressRate));
+        }
+      }
+
+      currentProgress = totalProgress;
+      progressRate = 1.0;
+      this->Parent->InvokeEvent(vtkCommand::ProgressEvent, static_cast<void*>(&progressRate));
+      return true;
+    }
+    catch (const std::out_of_range& e)
+    {
+      vtkErrorWithObjectMacro(this->Parent, "CreateMesh Accessed data out of range, aborting.");
+      return false;
+    }
   }
 
   //----------------------------------------------------------------------------
@@ -458,14 +523,28 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
 
     // Read stream into buffer
-    std::vector<unsigned char> buffer(length);
+    std::vector<uint8_t> buffer(length);
     stream->Read(buffer.data(), length);
 
     // Read header
     // XXX: This is completely unsafe, should be rewritten using modern API
-    int offset = 0;
-    const mdl_header_t* header = reinterpret_cast<const mdl_header_t*>(buffer.data());
-    offset += sizeof(mdl_header_t);
+    size_t offset = 0;
+    const mdl_header_t* header;
+    try
+    {
+      header = read_from_vector<mdl_header_t>(buffer, offset);
+    }
+    catch (const std::out_of_range& e)
+    {
+      vtkErrorWithObjectMacro(this->Parent, "Unable to read header, aborting.");
+      return false;
+    }
+
+    if (header->IDPO != 1330660425)
+    { // check magic number for "IPDO"
+      vtkErrorWithObjectMacro(this->Parent, "Header Magic number incorrect, aborting.");
+      return false;
+    }
 
     // Create textures
     if (header->numSkins > 0 && header->skinWidth > 0 && header->skinHeight > 0)
