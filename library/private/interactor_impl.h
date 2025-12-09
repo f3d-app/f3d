@@ -73,6 +73,8 @@ public:
   interactor& stopAnimation() override;
   bool isPlayingAnimation() override;
 
+  std::string getAnimationName() override;
+
   interactor& enableCameraMovement() override;
   interactor& disableCameraMovement() override;
 

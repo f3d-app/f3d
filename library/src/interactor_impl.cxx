@@ -1862,6 +1862,13 @@ interactor& interactor_impl::stopAnimation()
 }
 
 //----------------------------------------------------------------------------
+std::string interactor_impl::getAnimationName()
+{
+  assert(this->Internals->AnimationManager);
+  return this->Internals->AnimationManager->GetAnimationName();
+}
+
+//----------------------------------------------------------------------------
 bool interactor_impl::isPlayingAnimation()
 {
   assert(this->Internals->AnimationManager);
