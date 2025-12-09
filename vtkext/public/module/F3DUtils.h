@@ -36,7 +36,7 @@ VTKEXT_EXPORT int ParseToInt(const std::string& str, int def, const std::string&
  * Currently only supported on Windows platform.
  * Return a hardcoded 1.f on other platform.
  */
-VTKEXT_EXPORT const float getDPIScale();
+VTKEXT_EXPORT float getDPIScale();
 };
 
 #endif
