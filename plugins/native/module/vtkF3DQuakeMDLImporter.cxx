@@ -32,7 +32,6 @@ const TYPE* peek_from_vector(const std::vector<uint8_t>& buffer, const size_t& o
   }
 
   return reinterpret_cast<const TYPE*>(buffer.data() + offset);
-  ;
 }
 
 template<typename TYPE>
@@ -148,7 +147,6 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       {
         for (int y = 0; y < skinWidth; ++y)
         {
-          // note, due to above memory size check we can safely assume this is true
           auto index = *peek_from_vector<uint8_t>(buffer, offset + x * skinWidth + y);
           unsigned char* ptr = static_cast<unsigned char*>(skin->GetScalarPointer(y, x, 0));
           std::copy(F3DMDLDefaultColorMap[index], F3DMDLDefaultColorMap[index] + 3, ptr);
@@ -190,7 +188,6 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
           std::string skinAnimationName = "skin_" + std::to_string(groupSkinCount);
           this->GroupSkinAnimationNames.emplace_back(skinAnimationName);
           auto nb = *read_from_vector<int>(buffer, offset);
-          ;
           this->GroupSkins.emplace_back(nb);
           this->GroupSkinDurations.emplace_back(nb + 1, 0.0f);
           for (int j = 1; j <= nb; ++j)
