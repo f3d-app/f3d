@@ -53,6 +53,7 @@
     "match": "*.{splat,spz}",
     "options": {
       "point-sprites": "gaussian",
+      "point-sprites-absolute-size": true,
       "point-sprites-size": 1,
       "scalar-coloring": true,
       "coloring-array": "color",

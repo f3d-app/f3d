@@ -20,6 +20,16 @@ def test_setitem():
     options["model.point_sprites.type"] = "sphere"
 
 
+def test_set_double_from_int():
+    options = f3d.Options()
+    options["scene.animation.speed_factor"] = 3
+
+
+def test_set_double_vector_from_ints():
+    options = f3d.Options()
+    options["scene.up_direction"] = 1, 2, 3
+
+
 def test_getitem():
     engine = f3d.Engine.create_none()
     options = engine.options
@@ -52,7 +62,7 @@ def test_set_invalid_str_value():
 
 def test_set_incompatible_value_type():
     options = f3d.Options()
-    with pytest.raises(AttributeError):
+    with pytest.raises(TypeError):
         options["ui.axis"] = 1.12
 
 

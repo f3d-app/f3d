@@ -22,6 +22,6 @@ int TestF3DUSDImporter(int vtkNotUsed(argc), char* argv[])
 #endif
 
   importer->Update();
-  importer->Print(cout);
+  importer->Print(std::cout);
   return importer->GetRenderer() ? EXIT_SUCCESS : EXIT_FAILURE;
 }

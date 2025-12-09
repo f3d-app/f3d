@@ -1,7 +1,7 @@
 # F3D Testing
 function(f3d_test)
 
-	cmake_parse_arguments(F3D_TEST "TONE_MAPPING;LONG_TIMEOUT;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI" "NAME;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;SCRIPT;RENDERING_BACKEND" "DATA;DEPENDS;ENV;ARGS" ${ARGN})
+  cmake_parse_arguments(F3D_TEST "TONE_MAPPING;LONG_TIMEOUT;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI" "NAME;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;SCRIPT;RENDERING_BACKEND;WORKING_DIR" "DATA;DEPENDS;ENV;ARGS" ${ARGN})
 
   if(F3D_TEST_CONFIG)
     list(APPEND F3D_TEST_ARGS "--config=${F3D_TEST_CONFIG}")
@@ -127,6 +127,10 @@ function(f3d_test)
     set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES FIXTURES_REQUIRED "${_depends_fixtures}")
   endif()
 
+  if(F3D_TEST_WORKING_DIR)
+    set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES WORKING_DIRECTORY "${F3D_TEST_WORKING_DIR}")
+  endif()
+
   set(f3d_test_env_vars ${F3D_TEST_ENV})
   list(APPEND f3d_test_env_vars "CTEST_F3D_PROGRESS_BAR=1")
   if (F3D_TEST_UI)
@@ -161,7 +165,9 @@ f3d_test(NAME TestVTM DATA mb.vtm)
 f3d_test(NAME TestVTK DATA cow.vtk)
 f3d_test(NAME TestNRRD DATA beach.nrrd ARGS -s)
 f3d_test(NAME TestVRMLImporter DATA bot2.wrl)
-f3d_test(NAME TestSPLAT DATA small.splat ARGS -osy --up=-Y --point-sprites-size=1)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20231102)
+  f3d_test(NAME TestSPLAT DATA small.splat ARGS -osy --up=-Y --point-sprites-absolute-size --point-sprites-size=1)
+endif()
 f3d_test(NAME TestQuakeMDL DATA zombie.mdl)
 f3d_test(NAME TestQuakeMDLAnimationSimpleFrame DATA zombie.mdl ARGS --animation-time=0.5)
 f3d_test(NAME TestQuakeMDLAnimationBetween DATA zombie.mdl ARGS --animation-time=1.42)
@@ -432,33 +438,33 @@ endif()
 # Needs splat sorting with compute shaders
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240203)
   if(NOT APPLE) # MacOS does not support compute shaders
-    f3d_test(NAME Test3DGaussiansSplatting DATA small.splat ARGS -sy --up=-Y --point-sprites-size=1 --point-sprites=gaussian --blending=sort --camera-position=-3.6,0.5,-4.2)
+    f3d_test(NAME Test3DGaussiansSplatting DATA small.splat ARGS -sy --up=-Y --point-sprites-absolute-size --point-sprites-size=1 --point-sprites=gaussian --blending=sort --camera-position=-3.6,0.5,-4.2)
     # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
       f3d_test(NAME TestDefaultConfigFileSPLAT DATA small.splat CONFIG config_build LONG_TIMEOUT UI)
     endif()
     f3d_test(NAME TestThumbnailConfigFileSPLAT DATA small.splat CONFIG thumbnail_build LONG_TIMEOUT)
 
-    f3d_test(NAME Test3DGSPLY DATA bonsai_small.ply ARGS -sy --up=-Y --point-sprites-size=1 --point-sprites=gaussian --blending=sort --camera-position=-2.6,0.5,-3.2)
-    f3d_test(NAME Test3DGSPLYHDRI DATA bonsai_small.ply HDRI shanghai_bund_1k.hdr ARGS -sy --up=-Y --point-sprites-size=1 --point-sprites=gaussian --blending=sort --camera-position=-2.6,0.5,-3.2)
-    f3d_test(NAME TestInteractionPointSpritesCycle DATA bonsai_small.ply ARGS -sy --up=-Y --blending=sort --camera-position=-2.6,0.5,-3.2 INTERACTION) #OOOOO
+    f3d_test(NAME Test3DGSPLY DATA bonsai_small.ply ARGS -sy --up=-Y --point-sprites-absolute-size --point-sprites-size=1 --point-sprites=gaussian --blending=sort --camera-position=-2.6,0.5,-3.2)
+    f3d_test(NAME Test3DGSPLYHDRI DATA bonsai_small.ply HDRI shanghai_bund_1k.hdr ARGS -sy --up=-Y --point-sprites-absolute-size --point-sprites-size=1 --point-sprites=gaussian --blending=sort --camera-position=-2.6,0.5,-3.2)
+    f3d_test(NAME TestInteractionPointSpritesCycle DATA bonsai_small.ply ARGS -sy --point-sprites-absolute-size --up=-Y --blending=sort --camera-position=-2.6,0.5,-3.2 INTERACTION) #OOOOO
 
-    f3d_test(NAME TestSPZDegree0 DATA hornedlizard_small_d0.spz ARGS -sy --point-sprites-size=1 --point-sprites=gaussian --blending=sort --camera-position=-3.6,0.5,4.2)
+    f3d_test(NAME TestSPZDegree0 DATA hornedlizard_small_d0.spz ARGS -sy --point-sprites-absolute-size --point-sprites-size=1 --point-sprites=gaussian --blending=sort --camera-position=-3.6,0.5,4.2)
     f3d_test(NAME TestInvalidSH DATA invalidSH.vtp ARGS -osy --verbose REGEXP "Spherical harmonics array is not valid" NO_BASELINE)
 
     # Needs texture array support: https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12112
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250513)
-      f3d_test(NAME TestSPZDegree1 DATA hornedlizard_small_d1.spz ARGS -sy --point-sprites-size=1 --point-sprites=gaussian --blending=sort --camera-position=-3.6,0.5,4.2)
-      f3d_test(NAME TestSPZDegree2 DATA hornedlizard_small_d2.spz ARGS -sy --point-sprites-size=1 --point-sprites=gaussian --blending=sort --camera-position=-3.6,0.5,4.2)
-      f3d_test(NAME TestSPZDegree3 DATA hornedlizard_small_d3.spz ARGS -sy --point-sprites-size=1 --point-sprites=gaussian --blending=sort --camera-position=-3.6,0.5,4.2)
-      f3d_test(NAME TestSPZDegree1Stochastic DATA hornedlizard_small_d1.spz ARGS -sy --point-sprites-size=1 --point-sprites=gaussian --blending=stochastic --camera-position=-3.6,0.5,4.2) # Test instancing with spherical harmonics
+      f3d_test(NAME TestSPZDegree1 DATA hornedlizard_small_d1.spz ARGS -sy --point-sprites-absolute-size --point-sprites-size=1 --point-sprites=gaussian --blending=sort --camera-position=-3.6,0.5,4.2)
+      f3d_test(NAME TestSPZDegree2 DATA hornedlizard_small_d2.spz ARGS -sy --point-sprites-absolute-size --point-sprites-size=1 --point-sprites=gaussian --blending=sort --camera-position=-3.6,0.5,4.2)
+      f3d_test(NAME TestSPZDegree3 DATA hornedlizard_small_d3.spz ARGS -sy --point-sprites-absolute-size --point-sprites-size=1 --point-sprites=gaussian --blending=sort --camera-position=-3.6,0.5,4.2)
+      f3d_test(NAME TestSPZDegree1Stochastic DATA hornedlizard_small_d1.spz ARGS -sy --point-sprites-absolute-size --point-sprites-size=1 --point-sprites=gaussian --blending=stochastic --camera-position=-3.6,0.5,4.2) # Test instancing with spherical harmonics
 
       # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
       if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
         f3d_test(NAME TestDefaultConfigFileSPZ DATA hornedlizard_small_d3.spz CONFIG config_build LONG_TIMEOUT UI)
       endif()
       f3d_test(NAME TestThumbnailConfigFileSPZ DATA hornedlizard_small_d3.spz CONFIG thumbnail_build LONG_TIMEOUT)
-      f3d_test(NAME TestSPZVersion3 DATA bonsai.spz ARGS -sy --up=-Y --point-sprites-size=1 --point-sprites=gaussian --blending=sort --camera-position=-2.6,0.5,-3.2)
+      f3d_test(NAME TestSPZVersion3 DATA bonsai.spz ARGS -sy --up=-Y --point-sprites-absolute-size --point-sprites-size=1 --point-sprites=gaussian --blending=sort --camera-position=-2.6,0.5,-3.2)
       f3d_test(NAME TestSPZCorruptedGZIP DATA wrong_spz_gzip_corrupted.spz ARGS -osy --verbose REGEXP "Invalid GZIP file" NO_BASELINE)
       f3d_test(NAME TestSPZTruncatedGZIP DATA truncated_gzip.spz ARGS -osy --verbose REGEXP "Invalid GZIP file" NO_BASELINE)
       f3d_test(NAME TestWrongSPZMagic DATA wrong_spz_magic.spz ARGS -osy --verbose REGEXP "Incompatible SPZ header" NO_BASELINE)
@@ -469,7 +475,7 @@ endif()
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10662
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20231102)
-  f3d_test(NAME Test3DGaussiansSplattingStochastic DATA small.splat ARGS -sy --up=-Y --point-sprites-size=1 --point-sprites=gaussian --blending=stochastic --camera-position=-3.6,0.5,-4.2)
+  f3d_test(NAME Test3DGaussiansSplattingStochastic DATA small.splat ARGS -sy --up=-Y --point-sprites-absolute-size --point-sprites-size=1 --point-sprites=gaussian --blending=stochastic --camera-position=-3.6,0.5,-4.2)
 endif()
 
 # Test plugin fail code path
@@ -614,6 +620,7 @@ f3d_test(NAME TestInteractionCheatsheetScalars DATA dragon.vtu ARGS --scalar-col
 f3d_test(NAME TestInteractionCheatsheetOpacity DATA cow.vtp INTERACTION UI ARGS --opacity=0.5 RESOLUTION 300,700) #H;ScrollDown
 f3d_test(NAME TestInteractionCheatsheetAnimationName DATA InterpolationTest.glb ARGS --animation-indices=6 INTERACTION UI) #HWWW
 f3d_test(NAME TestInteractionCheatsheetConfigFile DATA dragon.vtu CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json INTERACTION UI) #H;ScrollDown
+f3d_test(NAME TestInteractionCheatsheetMultiModifierBinding DATA dragon.vtu RESOLUTION 1200,300 CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json INTERACTION UI) #H;ScrollDown
 f3d_test(NAME TestInteractionCheatsheetCycle DATA cow.vtp RESOLUTION 800,300 INTERACTION UI LONG_TIMEOUT) #HAAPO
 
 if(F3D_MODULE_RAYTRACING)
@@ -765,6 +772,7 @@ if(F3D_PLUGIN_BUILD_ALEMBIC)
   f3d_test(NAME TestAlembicNonFaceVarying DATA tetrahedron_non_facevarying_uv.abc ARGS -s --load-plugins=alembic)
   f3d_test(NAME TestAlembicAnimation DATA drop.abc ARGS --animation-time=2 --load-plugins=alembic --animation-progress)
   f3d_test(NAME TestAlembicAnimationXForm DATA xform_anim.abc ARGS -g --animation-time=1.5 --load-plugins=alembic --animation-progress)
+  f3d_test(NAME TestAlembicCurves DATA monkey_curves.abc ARGS --load-plugins=alembic)
 
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${F3D_SOURCE_DIR}/plugins/alembic/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
@@ -1174,6 +1182,12 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240729)
   file(COPY "${F3D_SOURCE_DIR}/testing/data/cow.vtp" DESTINATION "${CMAKE_BINARY_DIR}/Testing/data/") # Capital T, to avoid confusion on Windows and in-sources build
   # First file (`.d`) doesn't exist and is there to test multi args
   f3d_test(NAME TestInteractionConsoleAutoCompleteFilesystem INTERACTION UI) #Escape;ad;Tab;_f;Tab; ;.;Tab;d ..;Tab;T;Tab;i;Tab;d;Tab;Tab;Enter;Esc
+  if(WIN32 OR APPLE)
+    f3d_test(NAME TestInteractionConsoleAutoCompleteDirCaseInsensitiveUppercaseF INTERACTION UI NO_DATA_FORCE_RENDER WORKING_DIR ${F3D_SOURCE_DIR}/testing/data/AutoCompletion) #Escape;add_files F;Tab
+    f3d_test(NAME TestInteractionConsoleAutoCompleteDirCaseInsensitiveLowercaseF INTERACTION UI NO_DATA_FORCE_RENDER WORKING_DIR ${F3D_SOURCE_DIR}/testing/data/AutoCompletion) #Escape;add_files f;Tab
+  else()
+    f3d_test(NAME TestInteractionConsoleAutoCompleteDirCaseSensitive INTERACTION UI NO_DATA_FORCE_RENDER WORKING_DIR ${F3D_SOURCE_DIR}/testing/data/AutoCompletion) #Escape;add_files F;Tab
+  endif()
 
   if(NOT WIN32)
     # Does not work on windows as it uses hard coded slash

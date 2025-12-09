@@ -216,6 +216,10 @@ Select _points sprites_ types to show instead of the geometry.
 
 Set the _size_ of point sprites.
 
+### `--point-sprites-absolute-size` (_bool_, default: `false`)
+
+Do not scale the point sprites size by the scene bounding box.
+
 ### `--point-size=<size>` (_double_)
 
 Set the _size_ of points when showing vertices. Model-specified by default.

@@ -67,10 +67,10 @@ find_package(VTK 9.3.0 REQUIRED
     InteractionStyle
     InteractionWidgets
     IOCityGML
+    IOLegacy
     IOGeometry
     IOImage
     IOImport
-    IOParallel
     IOPLY
     IOXML
     RenderingAnnotation
@@ -78,7 +78,6 @@ find_package(VTK 9.3.0 REQUIRED
     RenderingOpenGL2
     RenderingVolumeOpenGL2
     TestingCore
-    jsoncpp
   OPTIONAL_COMPONENTS
     opengl
     IOExodus
