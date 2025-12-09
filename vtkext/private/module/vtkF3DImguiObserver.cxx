@@ -181,7 +181,6 @@ vtkStandardNewMacro(vtkF3DImguiObserver);
 //----------------------------------------------------------------------------
 void vtkF3DImguiObserver::RenderUI(vtkRenderWindowInteractor* interactor)
 {
-
   vtkRenderWindow* renWin = interactor->GetRenderWindow();
   vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
   vtkInformation* info = ren->GetInformation();
