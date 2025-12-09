@@ -21,7 +21,6 @@ inputs:
   zlib_version:
     description: "Version of zlib to build"
     required: true
-<<<<<<< HEAD
   pdal_version:
     description: "Version of pdal to build against"
     required: false
@@ -45,10 +44,6 @@ inputs:
     required: true
   proj_version:
     description: "Version of proj to build against"
-=======
-  global_cache_index:
-    description: "Global cache index"
->>>>>>> 4fc092a17dd5ab4c32cead874fd56feb7171db08
     required: true
 
 runs:
@@ -92,7 +87,6 @@ runs:
         blosc_version: ${{inputs.blosc_version}}
         tbb_version: ${{inputs.tbb_version}}
         zlib_version: ${{inputs.zlib_version}}
-<<<<<<< HEAD
 
     - name: Install sqlite
       if: runner.os == 'Linux'
@@ -161,6 +155,3 @@ runs:
         xercesc_version: ${{inputs.xercesc_version}}
         proj_version: ${{inputs.proj_version}}
         blosc_version: ${{inputs.blosc_version}}
-=======
-        global_cache_index: ${{inputs.global_cache_index}}
->>>>>>> 4fc092a17dd5ab4c32cead874fd56feb7171db08

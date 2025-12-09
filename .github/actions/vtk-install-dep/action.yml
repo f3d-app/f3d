@@ -23,7 +23,6 @@ inputs:
   zlib_version:
     description: "Version of zlib to build against"
     required: true
-<<<<<<< HEAD
   pdal_version:
     description: "Version of pdal to build against"
     required: false
@@ -47,10 +46,6 @@ inputs:
     required: true
   proj_version:
     description: "Version of proj to build against"
-=======
-  global_cache_index:
-    description: "Global cache index"
->>>>>>> 4fc092a17dd5ab4c32cead874fd56feb7171db08
     required: true
 
 runs:
@@ -63,7 +58,6 @@ runs:
         [[ "${{ inputs.tbb_version }}" ]] || { echo "tbb_version input is empty" ; exit 1; }
         [[ "${{ inputs.vtk_version }}" ]] || { echo "vtk_version input is empty" ; exit 1; }
         [[ "${{ inputs.zlib_version }}" ]] || { echo "zlib_version input is empty" ; exit 1; }
-<<<<<<< HEAD
         [[ "${{ inputs.sqlite_version }}" ]] || { echo "sqlite_version input is empty" ; exit 1; }
         [[ "${{ inputs.xercesc_version }}" ]] || { echo "xercesc_version input is empty" ; exit 1; }
         [[ "${{ inputs.curl_version }}" ]] || { echo "curl_version input is empty" ; exit 1; }
@@ -71,20 +65,13 @@ runs:
         [[ "${{ inputs.gdal_version }}" ]] || { echo "gdal_version input is empty" ; exit 1; }
         [[ "${{ inputs.libgeotiff_version }}" ]] || { echo "libgeotiff_version input is empty" ; exit 1; }
         [[ "${{ inputs.libtiff_version }}" ]] || { echo "libtiff_version input is empty" ; exit 1; }
-=======
-        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
->>>>>>> 4fc092a17dd5ab4c32cead874fd56feb7171db08
 
     - name: Cache VTK
       id: cache-vtk
       uses: actions/cache/restore@v4
       with:
         path: dependencies/vtk_install
-<<<<<<< HEAD
         key: vtk-${{ inputs.vtk_version }}-${{inputs.zlib_version}}-${{inputs.blosc_version}}-${{inputs.tbb_version}}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}${{ inputs.ospray_version != '' && format('-ospray-{0}', inputs.ospray_version) || '' }}-${{inputs.proj_version}}-${{inputs.gdal_version}}-${{inputs.libgeotiff_version}}-${{inputs.libtiff_version}}-${{inputs.sqlite_version}}-${{inputs.xercesc_version}}-${{inputs.curl_version}}-${{inputs.pdal_version}}-${{runner.os}}-${{inputs.cpu}}-0
-=======
-        key: vtk-${{ inputs.vtk_version }}-${{inputs.zlib_version}}-${{inputs.blosc_version}}-${{inputs.tbb_version}}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}${{ inputs.ospray_version != '' && format('-ospray-{0}', inputs.ospray_version) || '' }}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-1
->>>>>>> 4fc092a17dd5ab4c32cead874fd56feb7171db08
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'

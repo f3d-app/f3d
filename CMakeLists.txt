@@ -124,7 +124,6 @@ if (F3D_USE_EXTERNAL_IMGUI)
   find_package(imgui REQUIRED)
 endif ()
 
-<<<<<<< HEAD
 # VTK dependency
 # Optional components should list VTK modules
 # needed by plugins and optional modules
@@ -168,8 +167,6 @@ if(VTK_VERSION VERSION_LESS 9.3.20240914)
   find_package(VTK REQUIRED COMPONENTS opengl)
 endif()
 
-=======
->>>>>>> 4fc092a17dd5ab4c32cead874fd56feb7171db08
 # Shared options between application and library
 include(GNUInstallDirs)
 cmake_dependent_option(F3D_WINDOWS_BUILD_CONSOLE_APPLICATION "Build a supplemental f3d-console application" OFF "WIN32" OFF)

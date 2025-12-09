@@ -203,7 +203,6 @@ jobs:
           usd_version: ${{matrix.usd_version}}
           webp_version: ${{matrix.webp_version}}
           zlib_version: ${{matrix.zlib_version}}
-<<<<<<< HEAD
           pdal_version: 2.9.2
           sqlite_version: version-3.42.1
           xercesc_version: v3.3.0
@@ -212,9 +211,6 @@ jobs:
           libgeotiff_version: 1.7.4
           libtiff_version: v4.7.0
           gdal_version: v3.11.3
-=======
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
->>>>>>> 4fc092a17dd5ab4c32cead874fd56feb7171db08
 
   #----------------------------------------------------------------------------
   # Cache VTK Dependency: Checkout and compile VTK if not cached
@@ -235,11 +231,7 @@ jobs:
             "${{needs.default_versions.outputs.vtk_commit_sha}}",
             v9.5.2,
             v9.4.2,
-<<<<<<< HEAD
             v9.3.1,
-=======
-            v9.3.0,
->>>>>>> 4fc092a17dd5ab4c32cead874fd56feb7171db08
           ]
         build_type: [standard]
         exclude:
@@ -254,7 +246,6 @@ jobs:
           - ospray_version: ${{needs.default_versions.outputs.ospray_version}}
           - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-<<<<<<< HEAD
           - sqlite_version: version-3.42.1
           - xercesc_version: v3.3.0
           - curl_version: curl-8_15_0
@@ -264,9 +255,6 @@ jobs:
           - libtiff_version: v4.7.0
           - gdal_version: v3.11.3
           - os: macos-14
-=======
-          - os: macos-15
->>>>>>> 4fc092a17dd5ab4c32cead874fd56feb7171db08
             cpu: arm64
           - build_type: mindeps
             os: ubuntu-22.04
@@ -348,7 +336,6 @@ jobs:
           blosc_version: ${{matrix.blosc_version}}
           tbb_version: ${{matrix.tbb_version}}
           zlib_version: ${{matrix.zlib_version}}
-<<<<<<< HEAD
           sqlite_version: version-3.42.1
           xercesc_version: v3.3.0
           curl_version: curl-8_15_0
@@ -357,9 +344,6 @@ jobs:
           libgeotiff_version: 1.7.4
           libtiff_version: v4.7.0
           gdal_version: v3.11.3
-=======
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
->>>>>>> 4fc092a17dd5ab4c32cead874fd56feb7171db08
 
       - name: Install Raytracing Dependencies
         if: matrix.ospray_version != ''
@@ -380,7 +364,6 @@ jobs:
           ospray_version: ${{matrix.ospray_version}}
           tbb_version: ${{matrix.tbb_version}}
           zlib_version: ${{matrix.zlib_version}}
-<<<<<<< HEAD
           sqlite_version: version-3.42.1
           xercesc_version: v3.3.0
           curl_version: curl-8_15_0
@@ -389,9 +372,6 @@ jobs:
           libgeotiff_version: 1.7.4
           libtiff_version: v4.7.0
           gdal_version: v3.11.3
-=======
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
->>>>>>> 4fc092a17dd5ab4c32cead874fd56feb7171db08
 
   #----------------------------------------------------------------------------
   # Windows CI: Build and test, cross-vtk build matrix
@@ -491,7 +471,6 @@ jobs:
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           vtk_version: v9.5.2
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-<<<<<<< HEAD
           sqlite_version: version-3.42.1
           xercesc_version: v3.3.0
           curl_version: curl-8_15_0
@@ -500,9 +479,6 @@ jobs:
           libgeotiff_version: 1.7.4
           libtiff_version: v4.7.0
           gdal_version: v3.11.3
-=======
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
->>>>>>> 4fc092a17dd5ab4c32cead874fd56feb7171db08
 
   #----------------------------------------------------------------------------
   # Linux CI: Build and test, cross-vtk build matrix
@@ -521,11 +497,7 @@ jobs:
             "${{needs.default_versions.outputs.vtk_commit_sha}}",
             v9.5.2,
             v9.4.2,
-<<<<<<< HEAD
             v9.3.1,
-=======
-            v9.3.0,
->>>>>>> 4fc092a17dd5ab4c32cead874fd56feb7171db08
           ]
         build_type: [standard]
         include:
@@ -757,7 +729,6 @@ jobs:
           usd_version: ${{matrix.usd_version}}
           webp_version: ${{matrix.webp_version}}
           zlib_version: ${{matrix.zlib_version}}
-<<<<<<< HEAD
           sqlite_version: version-3.42.1
           xercesc_version: v3.3.0
           curl_version: curl-8_15_0
@@ -766,9 +737,6 @@ jobs:
           libgeotiff_version: 1.7.4
           libtiff_version: v4.7.0
           gdal_version: v3.11.3
-=======
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
->>>>>>> 4fc092a17dd5ab4c32cead874fd56feb7171db08
 
   #----------------------------------------------------------------------------
   # MacOS CI: Build and test, cross-vtk build matrix
@@ -986,7 +954,6 @@ jobs:
           vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
           webp_version: ${{needs.default_versions.outputs.webp_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
-<<<<<<< HEAD
           pdal_version: 2.9.2
           sqlite_version: version-3.42.1
           xercesc_version: v3.3.0
@@ -995,9 +962,6 @@ jobs:
           libgeotiff_version: 1.7.4
           libtiff_version: v4.7.0
           gdal_version: v3.11.3
-=======
-          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
->>>>>>> 4fc092a17dd5ab4c32cead874fd56feb7171db08
 
   #----------------------------------------------------------------------------
   # Sanitizer: Build and test on linux with last VTK with sanitizer options
