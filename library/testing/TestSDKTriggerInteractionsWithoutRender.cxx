@@ -23,7 +23,6 @@ int TestSDKTriggerInteractionsWithoutRender([[maybe_unused]] int argc, [[maybe_u
   inter.triggerKeyboardKey(f3d::interactor::InputAction::PRESS, "E");
   inter.triggerKeyboardKey(f3d::interactor::InputAction::RELEASE, "E");
 
-
   // Trigger modifier update
   inter.triggerModUpdate(f3d::interactor::InputModifier::SHIFT);
   
