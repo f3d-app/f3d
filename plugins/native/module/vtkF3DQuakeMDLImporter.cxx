@@ -30,6 +30,7 @@ public:
   }
 };
 
+// Safer buffer typecasting of arbitrary buffer location
 template<typename TYPE>
 const TYPE* peek_from_vector(const std::vector<uint8_t>& buffer, const size_t& offset)
 {
@@ -43,6 +44,7 @@ const TYPE* peek_from_vector(const std::vector<uint8_t>& buffer, const size_t& o
   return reinterpret_cast<const TYPE*>(buffer.data() + offset);
 }
 
+// Safer buffer typecasting with auto offset interating
 template<typename TYPE>
 const TYPE* read_from_vector(const std::vector<uint8_t>& buffer, size_t& offset)
 {
@@ -222,6 +224,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     }
     catch (const F3DRangeError& e)
     {
+      // Catch fatal errors thrown from overrunning the buffer
       vtkErrorWithObjectMacro(this->Parent, "CreateTexture Accessed data out of range, aborting.");
       return nullptr;
     }
@@ -301,7 +304,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         {
           framePtr[i].nb = nullptr;
           framePtr[i].time = nullptr;
-          // note : mdl_simpleframe_t can have *up to and including* 1024 verts. So if this data is
+          // Note : mdl_simpleframe_t can have *up to and including* 1024 verts. So if this data is
           // the last in the file the peek_at_vector func will error out. As such we manually check
           // this to see if all the verts are valid. If they are, continue.
           framePtr[i].frames =
@@ -312,7 +315,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
                 sizeof(mdl_vertex_t) * header->numVertices >
               buffer.size())
           {
-            // really ran out of room
+            // Not enough room for mdl_simpleframe_t - verts[] or mdl_simple_frame_t
             throw F3DRangeError("Requested data out of range.");
           }
 
@@ -515,6 +518,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     }
     catch (const F3DRangeError& e)
     {
+      // Catch fatal errors thrown from overrunning the buffer
       vtkErrorWithObjectMacro(this->Parent, "CreateMesh Accessed data out of range, aborting.");
       return false;
     }
