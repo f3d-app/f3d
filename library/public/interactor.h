@@ -253,9 +253,9 @@ public:
   virtual interactor& stopAnimation() = 0;
   [[nodiscard]] virtual bool isPlayingAnimation() = 0;
   /**
-   * Animation data accessors.
+   * Access animation data.
    */
-  virtual std::string getAnimationName() = 0;
+  [[nodiscard]] virtual std::string getAnimationName() = 0;
   ///@}
 
   ///@{ @name Movement
