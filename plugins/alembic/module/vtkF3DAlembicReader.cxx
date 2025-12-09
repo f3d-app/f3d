@@ -363,8 +363,8 @@ public:
       auto positions = samp.getPositions();
       auto curveCounts = samp.getCurvesNumVertices();
 
-      vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-      vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New();
+      vtkNew<vtkPoints> points;
+      vtkNew<vtkCellArray> lines;
 
       for (size_t i = 0; i < positions->size(); ++i)
       {
@@ -377,7 +377,7 @@ public:
       {
         size_t count = (*curveCounts)[c];
 
-        vtkSmartPointer<vtkPolyLine> polyLine = vtkSmartPointer<vtkPolyLine>::New();
+        vtkNew<vtkPolyLine> polyLine;
         polyLine->GetPointIds()->SetNumberOfIds(count);
 
         for (size_t j = 0; j < count; ++j)
