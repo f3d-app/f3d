@@ -21,6 +21,15 @@
 vtkStandardNewMacro(vtkF3DQuakeMDLImporter);
 
 // //----------------------------------------------------------------------------
+class F3DRangeError : public std::out_of_range
+{
+public:
+  explicit F3DRangeError(const std::string& what = "")
+    : std::out_of_range(what)
+  {
+  }
+};
+
 template<typename TYPE>
 const TYPE* peek_from_vector(const std::vector<uint8_t>& buffer, const size_t& offset)
 {
@@ -28,7 +37,7 @@ const TYPE* peek_from_vector(const std::vector<uint8_t>& buffer, const size_t& o
 
   if (offset + sizeof(TYPE) > buffer.size())
   {
-    throw std::out_of_range("Requested data out of range.");
+    throw F3DRangeError("Requested data out of range.");
   }
 
   return reinterpret_cast<const TYPE*>(buffer.data() + offset);
@@ -139,7 +148,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       // check if all the data for this operation exists
       if (offset + (skinHeight - 1) * (skinWidth - 1) >= buffer.size())
       {
-        throw std::out_of_range("Failed to read data for skin.");
+        throw F3DRangeError("Failed to read data for skin.");
       }
       skin->SetDimensions(skinWidth, skinHeight, 1);
       skin->AllocateScalars(VTK_UNSIGNED_CHAR, 3);
@@ -211,7 +220,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       }
       return texture;
     }
-    catch (const std::out_of_range& e)
+    catch (const F3DRangeError& e)
     {
       vtkErrorWithObjectMacro(this->Parent, "CreateTexture Accessed data out of range, aborting.");
       return nullptr;
@@ -304,7 +313,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
               buffer.size())
           {
             // really ran out of room
-            throw std::out_of_range("Requested data out of range.");
+            throw F3DRangeError("Requested data out of range.");
           }
 
           // Size of a frame is mdl_simpleframe_t_fixed_size + mdl_vertex_t * numVertices, +
@@ -332,7 +341,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
                 sizeof(mdl_vertex_t) * header->numVertices >
               buffer.size())
           {
-            throw std::out_of_range("Requested data out of range.");
+            throw F3DRangeError("Requested data out of range.");
           }
 
           offset +=
@@ -349,7 +358,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
           // check that we didn't run off the memory during loop
           if (offset > buffer.size())
           {
-            throw std::out_of_range("Requested data out of range.");
+            throw F3DRangeError("Requested data out of range.");
           }
         }
 
@@ -504,7 +513,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       this->Parent->InvokeEvent(vtkCommand::ProgressEvent, static_cast<void*>(&progressRate));
       return true;
     }
-    catch (const std::out_of_range& e)
+    catch (const F3DRangeError& e)
     {
       vtkErrorWithObjectMacro(this->Parent, "CreateMesh Accessed data out of range, aborting.");
       return false;
@@ -531,7 +540,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     {
       header = read_from_vector<mdl_header_t>(buffer, offset);
     }
-    catch (const std::out_of_range& e)
+    catch (const F3DRangeError& e)
     {
       vtkErrorWithObjectMacro(this->Parent, "Unable to read header, aborting.");
       return false;
