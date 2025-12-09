@@ -21,11 +21,6 @@ public:
   vtkTypeMacro(vtkF3DQuakeMDLImporter, vtkF3DImporter);
 
   /**
-   * Set the file name.
-   */
-  vtkSetMacro(FileName, std::string);
-
-  /**
    * Update actors at the given time value.
    */
   bool UpdateAtTimeValue(double timeValue) override;
@@ -84,7 +79,6 @@ private:
   void operator=(const vtkF3DQuakeMDLImporter&) = delete;
 
   struct vtkInternals;
-  std::string FileName;
   unsigned int SkinIndex = 0;
 
   std::unique_ptr<vtkInternals> Internals;

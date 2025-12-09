@@ -34,7 +34,7 @@ include(f3dVersion)
 
 # Handle F3D_VERSION
 set(F3D_MAJOR_VERSION 3)
-set(F3D_MINOR_VERSION 2)
+set(F3D_MINOR_VERSION 3)
 set(F3D_PATCH_VERSION 0)
 set(F3D_VERSION ${F3D_MAJOR_VERSION}.${F3D_MINOR_VERSION}.${F3D_PATCH_VERSION})
 
@@ -56,9 +56,51 @@ set(F3D_SYSTEM_PROCESSOR "${F3D_SYSTEM_PROCESSOR}-bits")
 option(F3D_EXCLUDE_DEPRECATED "Exclude deprecated functions and options" OFF)
 mark_as_advanced(F3D_EXCLUDE_DEPRECATED)
 
+# VTK dependency
+# Optional components should list VTK modules
+# needed by plugins and optional modules
+find_package(VTK 9.3.0 REQUIRED
+  COMPONENTS
+    CommonCore
+    CommonDataModel
+    CommonExecutionModel
+    FiltersGeneral
+    FiltersGeometry
+    ImagingCore
+    ImagingHybrid
+    InteractionStyle
+    InteractionWidgets
+    IOCityGML
+    IOLegacy
+    IOGeometry
+    IOImage
+    IOImport
+    IOPLY
+    IOXML
+    RenderingAnnotation
+    RenderingCore
+    RenderingOpenGL2
+    RenderingVolumeOpenGL2
+    TestingCore
+  OPTIONAL_COMPONENTS
+    opengl
+    IOExodus
+    IOHDF
+    IONetCDF
+    IOOpenVDB
+    RenderingGridAxes
+    RenderingRayTracing)
+message(STATUS "VTK ${VTK_VERSION} found")
+
+if(VTK_VERSION VERSION_LESS 9.3.20240914)
+  # Not optional before
+  find_package(VTK REQUIRED COMPONENTS opengl)
+endif()
+
 # Modules
 option(F3D_MODULE_RAYTRACING "Raytracing module" OFF)
 option(F3D_MODULE_EXR "OpenEXR images module" OFF)
+option(F3D_MODULE_WEBP "WebP images module" OFF)
 option(F3D_MODULE_UI "ImGui widgets module" ON)
 option(F3D_MODULE_DMON "dmon (watch) module" ON)
 option(F3D_MODULE_TINYFILEDIALOGS "tinyfiledialogs module" ON)
@@ -82,6 +124,7 @@ if (F3D_USE_EXTERNAL_IMGUI)
   find_package(imgui REQUIRED)
 endif ()
 
+<<<<<<< HEAD
 # VTK dependency
 # Optional components should list VTK modules
 # needed by plugins and optional modules
@@ -125,6 +168,8 @@ if(VTK_VERSION VERSION_LESS 9.3.20240914)
   find_package(VTK REQUIRED COMPONENTS opengl)
 endif()
 
+=======
+>>>>>>> 4fc092a17dd5ab4c32cead874fd56feb7171db08
 # Shared options between application and library
 include(GNUInstallDirs)
 cmake_dependent_option(F3D_WINDOWS_BUILD_CONSOLE_APPLICATION "Build a supplemental f3d-console application" OFF "WIN32" OFF)
@@ -299,7 +344,7 @@ install(FILES LICENSE.md
   DESTINATION ${F3D_LIC_DIR} COMPONENT licenses)
 
 if (F3D_BUILD_APPLICATION)
-  install(FILES doc/THIRD_PARTY_LICENSES.md
+  install(FILES THIRD_PARTY_LICENSES.md
     DESTINATION ${F3D_LIC_DIR} COMPONENT licenses)
 endif ()
 
@@ -325,6 +370,7 @@ f3d_report_variable(F3D_BUILD_APPLICATION)
 f3d_report_variable(F3D_MODULE_EXR)
 f3d_report_variable(F3D_MODULE_RAYTRACING)
 f3d_report_variable(F3D_MODULE_UI)
+f3d_report_variable(F3D_MODULE_WEBP)
 f3d_report_variable(F3D_PLUGIN_BUILD_ALEMBIC)
 f3d_report_variable(F3D_PLUGIN_BUILD_ASSIMP)
 f3d_report_variable(F3D_PLUGIN_BUILD_DRACO)

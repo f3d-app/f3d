@@ -45,9 +45,13 @@ inputs:
   usd_version:
     description: "Version of usd to build"
     required: false
+  webp_version:
+    description: "Version of webp to build"
+    required: false
   zlib_version:
     description: "Version of zlib to build"
     required: true
+<<<<<<< HEAD
   pdal_version:
     description: "Version of pdal to build"
     required: false
@@ -71,6 +75,10 @@ inputs:
     required: true
   proj_version:
     description: "Version of proj to build"
+=======
+  global_cache_index:
+    description: "Global cache index"
+>>>>>>> 4fc092a17dd5ab4c32cead874fd56feb7171db08
     required: true
 
 runs:
@@ -92,6 +100,7 @@ runs:
         openvdb_version: ${{inputs.openvdb_version}}
         tbb_version: ${{inputs.tbb_version}}
         zlib_version: ${{inputs.zlib_version}}
+<<<<<<< HEAD
         pdal_version: ${{inputs.pdal_version}}
         gdal_version: ${{inputs.gdal_version}}
         libgeotiff_version: ${{inputs.libgeotiff_version}}
@@ -100,6 +109,9 @@ runs:
         xercesc_version: ${{inputs.xercesc_version}}
         curl_version: ${{inputs.curl_version}}
         proj_version: ${{inputs.proj_version}}
+=======
+        global_cache_index: ${{inputs.global_cache_index}}
+>>>>>>> 4fc092a17dd5ab4c32cead874fd56feb7171db08
 
     - name: Install Raytracing Dependencies
       if: inputs.ospray_version != ''
@@ -107,6 +119,7 @@ runs:
       with:
         version: ${{inputs.ospray_version}}
         cpu: ${{inputs.cpu}}
+        global_cache_index: ${{inputs.global_cache_index}}
 
     - name: Install F3D dependencies
       if: inputs.optional_deps_label == 'optional-deps'
@@ -122,3 +135,5 @@ runs:
         pybind11_version: ${{inputs.pybind11_version}}
         tbb_version: ${{inputs.tbb_version}}
         usd_version: ${{inputs.usd_version}}
+        webp_version: ${{inputs.webp_version}}
+        global_cache_index: ${{inputs.global_cache_index}}

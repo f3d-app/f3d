@@ -171,7 +171,20 @@ PYBIND11_MODULE(pyf3d, module)
         }
         catch (const f3d::options::incompatible_exception&)
         {
-          if (std::holds_alternative<std::string>(value))
+          // failed to set an `int`, try again as `double`
+          if (std::holds_alternative<int>(value))
+          {
+            opts.set(key, static_cast<double>(std::get<int>(value)));
+          }
+          // failed to set a `vector<int>`, try again as `vector<double>`
+          else if (std::holds_alternative<std::vector<int>>(value))
+          {
+            const std::vector<int>& ints = std::get<std::vector<int>>(value);
+            const std::vector<double> doubles(ints.begin(), ints.end());
+            opts.set(key, doubles);
+          }
+          // failed to set a `string`, parse and try again
+          else if (std::holds_alternative<std::string>(value))
           {
             try
             {
@@ -184,7 +197,7 @@ PYBIND11_MODULE(pyf3d, module)
           }
           else
           {
-            throw py::attribute_error(key);
+            throw py::type_error(key);
           }
         }
       })
@@ -227,6 +240,7 @@ PYBIND11_MODULE(pyf3d, module)
   utils //
     .def_static("text_distance", &f3d::utils::textDistance)
     .def_static("collapse_path", &f3d::utils::collapsePath)
+    .def_static("tokenize", &f3d::utils::tokenize, py::arg("str"), py::arg("keep_comments") = true)
     .def_static(
       "glob_to_regex", &f3d::utils::globToRegex, py::arg("glob"), py::arg("path_separator") = '/')
     .def_static("get_env", &f3d::utils::getEnv)
@@ -242,7 +256,6 @@ PYBIND11_MODULE(pyf3d, module)
     .value("SHIFT", f3d::interaction_bind_t::ModifierKeys::SHIFT)
     .value("CTRL_SHIFT", f3d::interaction_bind_t::ModifierKeys::CTRL_SHIFT)
     .export_values();
-
   interaction_bind.def(py::init<const f3d::interaction_bind_t::ModifierKeys&, const std::string&>())
     .def_readwrite("mod", &f3d::interaction_bind_t::mod)
     .def_readwrite("inter", &f3d::interaction_bind_t::inter)
@@ -250,46 +263,6 @@ PYBIND11_MODULE(pyf3d, module)
 
   py::class_<f3d::interactor, std::unique_ptr<f3d::interactor, py::nodelete>> interactor(
     module, "Interactor");
-  interactor //
-    .def("toggle_animation", &f3d::interactor::toggleAnimation, "Toggle the animation")
-    .def("start_animation", &f3d::interactor::startAnimation, "Start the animation")
-    .def("stop_animation", &f3d::interactor::stopAnimation, "Stop the animation")
-    .def("is_playing_animation", &f3d::interactor::isPlayingAnimation,
-      "Returns True if the animation is currently started")
-    .def("enable_camera_movement", &f3d::interactor::enableCameraMovement,
-      "Enable the camera interaction")
-    .def("disable_camera_movement", &f3d::interactor::disableCameraMovement,
-      "Disable the camera interaction")
-    .def("trigger_mod_update", &f3d::interactor::triggerModUpdate, "Trigger a key modifier update")
-    .def("trigger_mouse_button", &f3d::interactor::triggerMouseButton, "Trigger a mouse button")
-    .def(
-      "trigger_mouse_position", &f3d::interactor::triggerMousePosition, "Trigger a mouse position")
-    .def("trigger_mouse_wheel", &f3d::interactor::triggerMouseWheel, "Trigger a mouse wheel")
-    .def("trigger_keyboard_key", &f3d::interactor::triggerKeyboardKey, "Trigger a keyboard input")
-    .def("trigger_text_character", &f3d::interactor::triggerTextCharacter,
-      "Trigger a text character input")
-    .def("play_interaction", &f3d::interactor::playInteraction, "Play an interaction file")
-    .def("record_interaction", &f3d::interactor::recordInteraction, "Record an interaction file")
-    .def("start", &f3d::interactor::start, "Start the interactor and the event loop",
-      py::arg("delta_time") = 1.0 / 30, py::arg("user_callback") = nullptr)
-    .def("stop", &f3d::interactor::stop, "Stop the interactor and the event loop")
-    .def(
-      "request_render", &f3d::interactor::requestRender, "Request a render on the next event loop")
-    .def("init_commands", &f3d::interactor::initCommands,
-      "Remove all commands and add all default command callbacks")
-    .def("add_command", &f3d::interactor::addCommand, "Add a command", py::arg("action"),
-      py::arg("callback"), py::arg("doc") = std::nullopt, py::arg("completionCallback") = nullptr)
-    .def("remove_command", &f3d::interactor::removeCommand, "Remove a command")
-    .def("get_command_actions", &f3d::interactor::getCommandActions, "Get all command actions")
-    .def("trigger_command", &f3d::interactor::triggerCommand, "Trigger a command")
-    .def("init_bindings", &f3d::interactor::initBindings,
-      "Remove all bindings and add default bindings")
-    .def("remove_binding", &f3d::interactor::removeBinding, "Remove interaction commands")
-    .def("get_bind_groups", &f3d::interactor::getBindGroups)
-    .def("get_binds_for_group", &f3d::interactor::getBindsForGroup)
-    .def("get_binds", &f3d::interactor::getBinds)
-    .def("get_binding_documentation", &f3d::interactor::getBindingDocumentation)
-    .def("get_binding_type", &f3d::interactor::getBindingType);
 
   py::enum_<f3d::interactor::BindingType>(interactor, "BindingType")
     .value("CYCLIC", f3d::interactor::BindingType::CYCLIC)
@@ -297,23 +270,6 @@ PYBIND11_MODULE(pyf3d, module)
     .value("TOGGLE", f3d::interactor::BindingType::TOGGLE)
     .value("OTHER", f3d::interactor::BindingType::OTHER)
     .export_values();
-
-  interactor
-    .def("add_binding",
-      py::overload_cast<const f3d::interaction_bind_t&, std::string, std::string,
-        std::function<std::pair<std::string, std::string>()>, f3d::interactor::BindingType>(
-        &f3d::interactor::addBinding),
-      "Add a binding command", py::arg("bind"), py::arg("command"), py::arg("group"),
-      py::arg("documentationCallback") = nullptr,
-      py::arg("type") = f3d::interactor::BindingType::OTHER)
-    .def("add_binding",
-      py::overload_cast<const f3d::interaction_bind_t&, std::vector<std::string>, std::string,
-        std::function<std::pair<std::string, std::string>()>, f3d::interactor::BindingType>(
-        &f3d::interactor::addBinding),
-      "Add binding commands", py::arg("bind"), py::arg("command"), py::arg("group"),
-      py::arg("documentationCallback") = nullptr,
-      py::arg("type") = f3d::interactor::BindingType::OTHER);
-
   py::enum_<f3d::interactor::MouseButton>(interactor, "MouseButton")
     .value("LEFT", f3d::interactor::MouseButton::LEFT)
     .value("MIDDLE", f3d::interactor::MouseButton::MIDDLE)
@@ -339,6 +295,67 @@ PYBIND11_MODULE(pyf3d, module)
     .value("CTRL_SHIFT", f3d::interactor::InputModifier::CTRL_SHIFT)
     .export_values();
 
+  interactor //
+    .def("toggle_animation", &f3d::interactor::toggleAnimation, "Toggle the animation")
+    .def("start_animation", &f3d::interactor::startAnimation, "Start the animation")
+    .def("stop_animation", &f3d::interactor::stopAnimation, "Stop the animation")
+    .def("is_playing_animation", &f3d::interactor::isPlayingAnimation,
+      "Returns True if the animation is currently started")
+    .def("enable_camera_movement", &f3d::interactor::enableCameraMovement,
+      "Enable the camera interaction")
+    .def("disable_camera_movement", &f3d::interactor::disableCameraMovement,
+      "Disable the camera interaction")
+    .def("trigger_mod_update", &f3d::interactor::triggerModUpdate, "Trigger a key modifier update")
+    .def("trigger_mouse_button", &f3d::interactor::triggerMouseButton, "Trigger a mouse button")
+    .def(
+      "trigger_mouse_position", &f3d::interactor::triggerMousePosition, "Trigger a mouse position")
+    .def("trigger_mouse_wheel", &f3d::interactor::triggerMouseWheel, "Trigger a mouse wheel")
+    .def("trigger_keyboard_key", &f3d::interactor::triggerKeyboardKey, "Trigger a keyboard input")
+    .def("trigger_text_character", &f3d::interactor::triggerTextCharacter,
+      "Trigger a text character input")
+    .def(
+      "trigger_event_loop", &f3d::interactor::triggerEventLoop, "Manually trigger the event loop.")
+    .def("play_interaction", &f3d::interactor::playInteraction, "Play an interaction file")
+    .def("record_interaction", &f3d::interactor::recordInteraction, "Record an interaction file")
+    .def("start", &f3d::interactor::start, "Start the interactor and the event loop",
+      py::arg("delta_time") = 1.0 / 30, py::arg("user_callback") = nullptr)
+    .def("stop", &f3d::interactor::stop, "Stop the interactor and the event loop")
+    .def(
+      "request_render", &f3d::interactor::requestRender, "Request a render on the next event loop")
+    .def("request_stop", &f3d::interactor::requestStop, "Stop on the next event loop")
+    .def("init_commands", &f3d::interactor::initCommands,
+      "Remove all commands and add all default command callbacks")
+    .def("add_command", &f3d::interactor::addCommand, "Add a command", py::arg("action"),
+      py::arg("callback"), py::arg("doc") = std::nullopt, py::arg("completionCallback") = nullptr)
+    .def("remove_command", &f3d::interactor::removeCommand, "Remove a command")
+    .def("get_command_actions", &f3d::interactor::getCommandActions, "Get all command actions")
+    .def("trigger_command", &f3d::interactor::triggerCommand, "Trigger a command",
+      py::arg("command"), py::arg("keep_comments") = true)
+    .def("init_bindings", &f3d::interactor::initBindings,
+      "Remove all bindings and add default bindings")
+    .def("remove_binding", &f3d::interactor::removeBinding, "Remove interaction commands")
+    .def("get_bind_groups", &f3d::interactor::getBindGroups)
+    .def("get_binds_for_group", &f3d::interactor::getBindsForGroup)
+    .def("get_binds", &f3d::interactor::getBinds)
+    .def("get_binding_documentation", &f3d::interactor::getBindingDocumentation)
+    .def("get_binding_type", &f3d::interactor::getBindingType);
+
+  interactor
+    .def("add_binding",
+      py::overload_cast<const f3d::interaction_bind_t&, std::string, std::string,
+        std::function<std::pair<std::string, std::string>()>, f3d::interactor::BindingType>(
+        &f3d::interactor::addBinding),
+      "Add a binding command", py::arg("bind"), py::arg("command"), py::arg("group"),
+      py::arg("documentationCallback") = nullptr,
+      py::arg("type") = f3d::interactor::BindingType::OTHER)
+    .def("add_binding",
+      py::overload_cast<const f3d::interaction_bind_t&, std::vector<std::string>, std::string,
+        std::function<std::pair<std::string, std::string>()>, f3d::interactor::BindingType>(
+        &f3d::interactor::addBinding),
+      "Add binding commands", py::arg("bind"), py::arg("command"), py::arg("group"),
+      py::arg("documentationCallback") = nullptr,
+      py::arg("type") = f3d::interactor::BindingType::OTHER);
+
   // f3d::mesh_t
   py::class_<f3d::mesh_t>(module, "Mesh")
     .def(py::init<>())
@@ -353,37 +370,6 @@ PYBIND11_MODULE(pyf3d, module)
     .def_readwrite("texture_coordinates", &f3d::mesh_t::texture_coordinates)
     .def_readwrite("face_sides", &f3d::mesh_t::face_sides)
     .def_readwrite("face_indices", &f3d::mesh_t::face_indices);
-
-  // f3d::scene
-  py::class_<f3d::scene, std::unique_ptr<f3d::scene, py::nodelete>> scene(module, "Scene");
-  scene //
-    .def("supports", &f3d::scene::supports)
-    .def("clear", &f3d::scene::clear)
-    .def("add", py::overload_cast<const std::filesystem::path&>(&f3d::scene::add),
-      "Add a file the scene", py::arg("file_path"))
-    .def("add", py::overload_cast<const std::vector<std::filesystem::path>&>(&f3d::scene::add),
-      "Add multiple filepaths to the scene", py::arg("file_path_vector"))
-    .def("add", py::overload_cast<const std::vector<std::string>&>(&f3d::scene::add),
-      "Add multiple filenames to the scene", py::arg("file_name_vector"))
-    .def("add", py::overload_cast<const f3d::mesh_t&>(&f3d::scene::add),
-      "Add a surfacic mesh from memory into the scene", py::arg("mesh"))
-    .def("load_animation_time", &f3d::scene::loadAnimationTime)
-    .def("animation_time_range", &f3d::scene::animationTimeRange)
-    .def("available_animations", &f3d::scene::availableAnimations)
-    .def("add_light", &f3d::scene::addLight, "Add a light to the scene", py::arg("light_state"))
-    .def(
-      "remove_light", &f3d::scene::removeLight, "Remove a light from the scene", py::arg("index"))
-    .def("update_light", &f3d::scene::updateLight, "Update a light in the scene", py::arg("index"),
-      py::arg("light_state"))
-    .def("get_light", &f3d::scene::getLight, "Get a light from the scene", py::arg("index"))
-    .def("get_light_count", &f3d::scene::getLightCount, "Get the number of lights in the scene")
-    .def("remove_all_lights", &f3d::scene::removeAllLights, "Remove all lights from the scene");
-
-  py::enum_<f3d::light_type>(module, "LightType")
-    .value("HEADLIGHT", f3d::light_type::HEADLIGHT)
-    .value("CAMERA_LIGHT", f3d::light_type::CAMERA_LIGHT)
-    .value("SCENE_LIGHT", f3d::light_type::SCENE_LIGHT)
-    .export_values();
 
   // f3d::color_t
   py::class_<f3d::color_t>(module, "Color")
@@ -412,6 +398,12 @@ PYBIND11_MODULE(pyf3d, module)
       },
       "Set color from a tuple of (r, g, b)");
 
+  py::enum_<f3d::light_type>(module, "LightType")
+    .value("HEADLIGHT", f3d::light_type::HEADLIGHT)
+    .value("CAMERA_LIGHT", f3d::light_type::CAMERA_LIGHT)
+    .value("SCENE_LIGHT", f3d::light_type::SCENE_LIGHT)
+    .export_values();
+
   // f3d::light_state_t
   py::class_<f3d::light_state_t>(module, "LightState")
     .def(py::init<>())
@@ -419,7 +411,7 @@ PYBIND11_MODULE(pyf3d, module)
            const f3d::vector3_t&, const bool&, const double&, const bool&>(),
       py::arg("type") = f3d::light_type::SCENE_LIGHT,
       py::arg("position") = f3d::point3_t({ 0.0, 0.0, 0.0 }),
-      py::arg("color") = f3d::color_t({ 1.0, 1.0, 1.0 }),
+      py::arg_v("color", f3d::color_t({ 1.0, 1.0, 1.0 }), "Color(1.0, 1.0, 1.0)"),
       py::arg("direction") = f3d::vector3_t({ 1.0, 0.0, 0.0 }), py::arg("positional_light") = false,
       py::arg("intensity") = 1.0, py::arg("switch_state") = true)
     .def_readwrite("type", &f3d::light_state_t::type)
@@ -429,6 +421,31 @@ PYBIND11_MODULE(pyf3d, module)
     .def_readwrite("positional_light", &f3d::light_state_t::positionalLight)
     .def_readwrite("intensity", &f3d::light_state_t::intensity)
     .def_readwrite("switch_state", &f3d::light_state_t::switchState);
+
+  // f3d::scene
+  py::class_<f3d::scene, std::unique_ptr<f3d::scene, py::nodelete>> scene(module, "Scene");
+  scene //
+    .def("supports", &f3d::scene::supports)
+    .def("clear", &f3d::scene::clear)
+    .def("add", py::overload_cast<const std::filesystem::path&>(&f3d::scene::add),
+      "Add a file the scene", py::arg("file_path"))
+    .def("add", py::overload_cast<const std::vector<std::filesystem::path>&>(&f3d::scene::add),
+      "Add multiple filepaths to the scene", py::arg("file_path_vector"))
+    .def("add", py::overload_cast<const std::vector<std::string>&>(&f3d::scene::add),
+      "Add multiple filenames to the scene", py::arg("file_name_vector"))
+    .def("add", py::overload_cast<const f3d::mesh_t&>(&f3d::scene::add),
+      "Add a surfacic mesh from memory into the scene", py::arg("mesh"))
+    .def("load_animation_time", &f3d::scene::loadAnimationTime)
+    .def("animation_time_range", &f3d::scene::animationTimeRange)
+    .def("available_animations", &f3d::scene::availableAnimations)
+    .def("add_light", &f3d::scene::addLight, "Add a light to the scene", py::arg("light_state"))
+    .def(
+      "remove_light", &f3d::scene::removeLight, "Remove a light from the scene", py::arg("index"))
+    .def("update_light", &f3d::scene::updateLight, "Update a light in the scene", py::arg("index"),
+      py::arg("light_state"))
+    .def("get_light", &f3d::scene::getLight, "Get a light from the scene", py::arg("index"))
+    .def("get_light_count", &f3d::scene::getLightCount, "Get the number of lights in the scene")
+    .def("remove_all_lights", &f3d::scene::removeAllLights, "Remove all lights from the scene");
 
   // f3d::camera_state_t
   py::class_<f3d::camera_state_t>(module, "CameraState")
@@ -544,6 +561,19 @@ PYBIND11_MODULE(pyf3d, module)
       "Create an engine with an EGL window (Windows/Linux only)")
     .def_static("create_osmesa", &f3d::engine::createOSMesa,
       "Create an engine with an OSMesa window (Windows/Linux only)")
+    .def_static(
+      "create_external",
+      [](py::object py_get_proc)
+      {
+        f3d::context::function func = [py_get_proc](const char* name) -> f3d::context::fptr
+        {
+          uintptr_t addr = py::int_(py_get_proc(py::bytes(name)));
+          return reinterpret_cast<f3d::context::fptr>(addr);
+        };
+        return f3d::engine::createExternal(func);
+      },
+      py::arg("get_proc_address"),
+      "Create an engine with an existing context via a get_proc_address callback")
     .def_static("create_external_glx", &f3d::engine::createExternalGLX,
       "Create an engine with an existing GLX context (Linux only)")
     .def_static("create_external_wgl", &f3d::engine::createExternalWGL,
@@ -594,11 +624,17 @@ PYBIND11_MODULE(pyf3d, module)
     .value("QUIET", f3d::log::VerboseLevel::QUIET)
     .export_values();
 
+  auto forwardWrapper = [](f3d::log::forward_fn_t callback) { f3d::log::forward(callback); };
+
+  module.add_object("forwardcleanup",
+    py::capsule(&forwardWrapper, nullptr, [](PyObject*) { f3d::log::forward(nullptr); }));
+
   log //
     .def_static("set_verbose_level", &f3d::log::setVerboseLevel, py::arg("level"),
       py::arg("force_std_err") = false)
     .def_static("get_verbose_level", &f3d::log::getVerboseLevel)
     .def_static("set_use_coloring", &f3d::log::setUseColoring)
     .def_static("print", [](f3d::log::VerboseLevel& level, const std::string& message)
-      { f3d::log::print(level, message); });
+      { f3d::log::print(level, message); })
+    .def_static("forward", forwardWrapper, py::arg("callback"));
 }

@@ -426,6 +426,8 @@ public:
         };
 
         self->AnimateCameraTransition(interpolateCameraState);
+
+        self->Style->InvokeEvent(vtkCommand::InteractionEvent, nullptr);
       }
     }
 
@@ -522,29 +524,32 @@ public:
       }
     }
 
+    // Update the dynamic options of the animation manager so check if the cheatsheet needs an
+    // update.
+    this->AnimationManager->UpdateDynamicOptions();
     // Always render after interaction
     this->Window.render();
   }
 
   //----------------------------------------------------------------------------
-  void StartEventLoop(double deltaTime, std::function<void()> userCallBack)
+  bool StartEventLoop(double deltaTime, std::function<void()> userCallBack)
   {
+    if (this->EventLoopObserverId != -1)
+    {
+      log::info("Interaction: event loop has already been started");
+      return false;
+    }
+
     // Trigger a render to ensure Window is ready to be configured
     this->Window.render();
 
     // Copy user callback
     this->EventLoopUserCallBack = std::move(userCallBack);
 
-    // Configure UI delta time
-    vtkRenderWindow* renWin = this->Window.GetRenderWindow();
-    vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
-    ren->SetUIDeltaTime(deltaTime);
-
-    // Configure animation delta time
-    this->AnimationManager->SetDeltaTime(deltaTime);
-
     // Create the timer
     this->EventLoopTimerId = this->VTKInteractor->CreateRepeatingTimer(deltaTime * 1000);
+
+    this->CallbackDeltaTime = deltaTime;
 
     // Create the callback and add an observer
     vtkNew<vtkCallbackCommand> timerCallBack;
@@ -552,25 +557,42 @@ public:
       [](vtkObject*, unsigned long, void* clientData, void*)
       {
         internals* that = static_cast<internals*>(clientData);
-        that->EventLoop();
+        that->EventLoop(that->CallbackDeltaTime);
       });
     this->EventLoopObserverId =
       this->VTKInteractor->AddObserver(vtkCommand::TimerEvent, timerCallBack);
     timerCallBack->SetClientData(this);
+    return true;
   }
 
   //----------------------------------------------------------------------------
-  void StopEventLoop()
+  bool StopEventLoop()
   {
+    if (this->EventLoopObserverId == -1)
+    {
+      log::info("Interaction: event loop has not been started hence cannot be stopped");
+      return false;
+    }
     this->VTKInteractor->RemoveObserver(this->EventLoopObserverId);
     this->VTKInteractor->DestroyTimer(this->EventLoopTimerId);
     this->EventLoopObserverId = -1;
     this->EventLoopTimerId = 0;
+    return true;
   }
 
   //----------------------------------------------------------------------------
-  void EventLoop()
+  void EventLoop(double deltaTime)
   {
+    if (deltaTime <= 0)
+    {
+      log::error("Interaction: delta time should be > 0");
+      return;
+    }
+    if (this->StopRequested)
+    {
+      this->Interactor.stop();
+      return;
+    }
     if (this->EventLoopUserCallBack)
     {
       this->EventLoopUserCallBack();
@@ -582,7 +604,7 @@ public:
       {
         // XXX: Ignore the boolean return of triggerCommand,
         // error is already logged by triggerCommand
-        this->Interactor.triggerCommand(this->CommandBuffer.value());
+        this->Interactor.triggerCommand(this->CommandBuffer.value(), false);
       }
       catch (const f3d::interactor::command_runtime_exception& ex)
       {
@@ -592,9 +614,18 @@ public:
       this->CommandBuffer.reset();
     }
 
-    this->AnimationManager->Tick();
+    this->AnimationManager->Tick(deltaTime);
 
-    if (this->RenderRequested)
+    vtkRenderWindow* renWin = this->Window.GetRenderWindow();
+    vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+    ren->SetUIDeltaTime(deltaTime);
+
+    // Determine if we need a full render or just a UI render
+    // At the moment, only TAA requires a full render each frame
+    bool forceRender = (this->Options.render.effect.antialiasing.enable &&
+      this->Options.render.effect.antialiasing.mode == "taa");
+
+    if (this->RenderRequested || forceRender)
     {
       this->Window.render();
       this->RenderRequested = false;
@@ -638,6 +669,9 @@ public:
   unsigned long EventLoopTimerId = 0;
   int EventLoopObserverId = -1;
   std::atomic<bool> RenderRequested = false;
+  std::atomic<bool> StopRequested = false;
+
+  double CallbackDeltaTime = 0.0;
 };
 
 //----------------------------------------------------------------------------
@@ -750,23 +784,34 @@ interactor& interactor_impl::initCommands()
   };
 
   // Completion method for a vector of names
-  auto complNames = [](const std::vector<std::string>& args, const std::vector<std::string>& names)
+  auto complNames = [](const std::vector<std::string>& args, const std::vector<std::string>& names,
+                      size_t indexToCheck = 0)
   {
     std::vector<std::string> candidates;
-    if (args.size() < 1)
+    if (args.size() < indexToCheck + 1)
     {
       // No arguments, return all option names
       return names;
     }
-    else if (args.size() > 1)
+    else if (args.size() > indexToCheck + 1)
     {
       // Multi arguments, do not complete
       return candidates;
     }
 
-    // Recover all names that starts with args[0]
+    // Recover all names that starts with args[indexToCheck]
     std::copy_if(names.begin(), names.end(), std::back_inserter(candidates),
-      [&](const std::string& name) { return f3d::detail::StartWith(name, args[0]); });
+      [&](const std::string& name) { return f3d::detail::StartWith(name, args[indexToCheck]); });
+
+    // Create an arg pattern before the indexToCheck
+    std::string argPattern;
+    for (std::size_t i = 0; i < indexToCheck; i++)
+    {
+      argPattern += args[i] + " ";
+    }
+    // Include it in front of the candidates
+    std::transform(candidates.begin(), candidates.end(), candidates.begin(),
+      [&](const auto& argCandidate) { return argPattern + argCandidate; });
 
     if (candidates.size() == 1)
     {
@@ -782,6 +827,64 @@ interactor& interactor_impl::initCommands()
   auto complOptionNames = [&](const std::vector<std::string>& args)
   { return complNames(args, this->Internals->Options.getAllNames()); };
 
+  static const std::map<std::string, std::vector<std::string>> COMPL_OPTIONS_SET = {
+    { "model.point_sprites.type", { "sphere", "gaussian" } },
+    { "render.effect.antialiasing.mode", { "fxaa", "ssaa", "taa" } },
+    { "render.effect.blending.mode", { "ddp", "sort", "stochastic" } },
+  };
+  auto complOptionSet = [&](const std::vector<std::string>& args)
+  {
+    std::vector<std::string> optionNames = this->Internals->Options.getAllNames();
+    std::vector<std::string> candidates;
+    if (args.size() == 0)
+    {
+      // No args, return all option names
+      return optionNames;
+    }
+    else if (args.size() == 1)
+    {
+      // One arg, check if its an option
+      if (std::find(optionNames.begin(), optionNames.end(), args[0]) != optionNames.end())
+      {
+        // Its an existing option, check if it should be completed
+        const auto it = COMPL_OPTIONS_SET.find(args[0]);
+        if (it != COMPL_OPTIONS_SET.end())
+        {
+          // Transform potential values into found option
+          std::transform(std::begin(it->second), std::end(it->second),
+            std::back_inserter(candidates),
+            [&](const auto& value) { return args[0] + " " + value; });
+        }
+        else
+        {
+          // no value completion, return option by itself
+          candidates.emplace_back(args[0]);
+        }
+      }
+      else
+      {
+        // Not an existing option, try completing with option names
+        return complNames(args, optionNames);
+      }
+    }
+    else
+    {
+      // Complete the option value if possible
+      const auto it = COMPL_OPTIONS_SET.find(args[0]);
+      if (it != COMPL_OPTIONS_SET.end())
+      {
+        return complNames(args, it->second, 1);
+      }
+    }
+
+    if (candidates.size() == 1)
+    {
+      // Single candidate, add a space separator
+      candidates[0] += " ";
+    }
+    return candidates;
+  };
+
   // Add default callbacks
   this->addCommand(
     "set",
@@ -790,7 +893,7 @@ interactor& interactor_impl::initCommands()
       check_args(args, 2, "set");
       this->Internals->Options.setAsString(args[0], args[1]);
     },
-    command_documentation_t{ "set option.name values", "set a libf3d option" }, complOptionNames);
+    command_documentation_t{ "set option.name values", "set a libf3d option" }, complOptionSet);
 
   this->addCommand(
     "toggle",
@@ -870,6 +973,10 @@ interactor& interactor_impl::initCommands()
         {
           mode = "ssaa";
         }
+        else if (mode == "ssaa")
+        {
+          mode = "taa";
+        }
         else
         {
           enabled = false;
@@ -878,7 +985,38 @@ interactor& interactor_impl::initCommands()
       this->Internals->Window.render();
     },
     command_documentation_t{
-      "cycle_anti_aliasing", "cycle between the anti-aliasing method (none,fxaa,ssaa)" });
+      "cycle_anti_aliasing", "cycle between the anti-aliasing method (none,fxaa,ssaa,taa)" });
+
+  this->addCommand(
+    "cycle_blending",
+    [&](const std::vector<std::string>&)
+    {
+      bool& enabled = this->Internals->Options.render.effect.blending.enable;
+      std::string& mode = this->Internals->Options.render.effect.blending.mode;
+      if (!enabled)
+      {
+        enabled = true;
+        mode = "ddp";
+      }
+      else
+      {
+        if (mode == "ddp")
+        {
+          mode = "sort";
+        }
+        else if (mode == "sort")
+        {
+          mode = "stochastic";
+        }
+        else
+        {
+          enabled = false;
+        }
+      }
+      this->Internals->Window.render();
+    },
+    command_documentation_t{
+      "cycle_blending", "cycle between the blending method (none,ddp,sort,stochastic)" });
 
   std::vector<std::string> cycleColoringValidArgs = { "field", "array", "component" };
   this->addCommand(
@@ -914,6 +1052,33 @@ interactor& interactor_impl::initCommands()
       "cycle_coloring field/array/component", "cycle scivis options using model information" },
     std::bind(complNames, std::placeholders::_1,
       std::vector<std::string>{ "field", "array", "component" }));
+
+  this->addCommand(
+    "cycle_point_sprites",
+    [&](const std::vector<std::string>&)
+    {
+      bool& enabled = this->Internals->Options.model.point_sprites.enable;
+      std::string& type = this->Internals->Options.model.point_sprites.type;
+      if (!enabled)
+      {
+        enabled = true;
+        type = "sphere";
+      }
+      else
+      {
+        if (type == "sphere")
+        {
+          type = "gaussian";
+        }
+        else
+        {
+          enabled = false;
+        }
+      }
+      this->Internals->Window.render();
+    },
+    command_documentation_t{
+      "cycle_point_sprites", "cycle between the point sprite types (none,sphere,gaussian)" });
 
   this->addCommand(
     "roll_camera",
@@ -1180,7 +1345,14 @@ std::vector<std::string> interactor_impl::getCommandActions() const
 }
 
 //----------------------------------------------------------------------------
-bool interactor_impl::triggerCommand(std::string_view command)
+interactor& interactor_impl::triggerEventLoop(double deltaTime)
+{
+  this->Internals->EventLoop(deltaTime);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+bool interactor_impl::triggerCommand(std::string_view command, bool keepComments)
 {
   log::debug("Command: ", command);
 
@@ -1194,7 +1366,7 @@ bool interactor_impl::triggerCommand(std::string_view command)
   std::vector<std::string> tokens;
   try
   {
-    tokens = utils::tokenize(command);
+    tokens = utils::tokenize(command, keepComments);
   }
   catch (const utils::tokenize_exception&)
   {
@@ -1292,6 +1464,36 @@ interactor& interactor_impl::initBindings()
     return std::pair("Anti-aliasing", std::move(desc));
   };
 
+  // "Cycle point sprites" , "none/sphere/gaussian"
+  auto docPS = [&]()
+  {
+    std::string desc;
+    if (!this->Internals->Options.model.point_sprites.enable)
+    {
+      desc = "none";
+    }
+    else
+    {
+      desc = this->Internals->Options.model.point_sprites.type;
+    }
+    return std::pair("Point sprites", std::move(desc));
+  };
+
+  // "Cycle blending" , "none/ddp/sort/stochastic"
+  auto docBlend = [&]()
+  {
+    std::string desc;
+    if (!this->Internals->Options.render.effect.blending.enable)
+    {
+      desc = "none";
+    }
+    else
+    {
+      desc = this->Internals->Options.render.effect.blending.mode;
+    }
+    return std::pair("Blending", std::move(desc));
+  };
+
   // "Cycle animation" , "animationName"
   auto docAnim = [&]()
   { return std::pair("Animation", this->Internals->AnimationManager->GetAnimationName()); };
@@ -1369,7 +1571,7 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "S"}, "cycle_coloring array", "Scene", docArray, f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "Y"}, "cycle_coloring component", "Scene", docComp, f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "B"}, "toggle ui.scalar_bar", "Scene", std::bind(docTgl, "Scalar bar", std::cref(opts.ui.scalar_bar)), f3d::interactor::BindingType::TOGGLE);
-  this->addBinding({mod_t::NONE, "P"}, "toggle render.effect.translucency_support", "Scene", std::bind(docTgl, "Translucency", std::cref(opts.render.effect.translucency_support)), f3d::interactor::BindingType::TOGGLE);
+  this->addBinding({mod_t::NONE, "P"}, "cycle_blending", "Scene", docBlend, f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "Q"}, "toggle render.effect.ambient_occlusion","Scene", std::bind(docTgl, "Ambient occlusion", std::cref(opts.render.effect.ambient_occlusion)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "A"}, "cycle_anti_aliasing","Scene", docAA, f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "T"}, "toggle render.effect.tone_mapping","Scene", std::bind(docTgl, "Toggle tone mapping", std::cref(opts.render.effect.tone_mapping)), f3d::interactor::BindingType::TOGGLE);
@@ -1380,6 +1582,7 @@ interactor& interactor_impl::initBindings()
 #if F3D_MODULE_UI
   this->addBinding({mod_t::NONE, "N"}, "toggle ui.filename","Scene", std::bind(docTgl, "Filename", std::cref(opts.ui.filename)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "M"}, "toggle ui.metadata","Scene", std::bind(docTgl, "Metadata", std::cref(opts.ui.metadata)), f3d::interactor::BindingType::TOGGLE);
+  this->addBinding({mod_t::SHIFT, "N"}, "toggle ui.hdri_filename","Scene", std::bind(docTgl, "HDRI filename", std::cref(opts.ui.hdri_filename)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "Z"}, "toggle ui.fps","Scene", std::bind(docTgl, "FPS Counter", std::cref(opts.ui.fps)), f3d::interactor::BindingType::TOGGLE);
 #endif
 #if F3D_MODULE_RAYTRACING
@@ -1388,7 +1591,7 @@ interactor& interactor_impl::initBindings()
 #endif
   this->addBinding({mod_t::NONE, "V"}, "toggle_volume_rendering","Scene", std::bind(docTgl, "Volume rendering", std::cref(opts.model.volume.enable)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "I"}, "toggle model.volume.inverse","Scene", std::bind(docTgl, "Inverse volume opacity", std::cref(opts.model.volume.inverse)), f3d::interactor::BindingType::TOGGLE);
-  this->addBinding({mod_t::NONE, "O"}, "toggle model.point_sprites.enable","Scene", std::bind(docTgl, "Point sprites rendering", std::cref(opts.model.point_sprites.enable)), f3d::interactor::BindingType::TOGGLE);
+  this->addBinding({mod_t::NONE, "O"}, "cycle_point_sprites","Scene", docPS, f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "U"}, "toggle render.background.blur.enable","Scene", std::bind(docTgl, "Blur background", std::cref(opts.render.background.blur.enable)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "K"}, "toggle interactor.trackball","Scene", std::bind(docTgl, "Trackball interaction", std::cref(opts.interactor.trackball)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "F"}, "toggle render.hdri.ambient","Scene", std::bind(docTgl, "HDRI ambient lighting", std::cref(opts.render.hdri.ambient)), f3d::interactor::BindingType::TOGGLE);
@@ -1695,11 +1898,14 @@ bool interactor_impl::playInteraction(
     this->Internals->Recorder->Off();
     this->Internals->Recorder->Clear();
 
-    this->Internals->StartEventLoop(loopTime, std::move(userCallBack));
+    bool loop = this->Internals->StartEventLoop(loopTime, std::move(userCallBack));
     this->Internals->Recorder->SetFileName(file.string().c_str());
     this->Internals->Recorder->Play();
 
-    this->Internals->StopEventLoop();
+    if (loop)
+    {
+      this->Internals->StopEventLoop();
+    }
   }
   catch (const fs::filesystem_error& ex)
   {
@@ -1755,16 +1961,20 @@ bool interactor_impl::recordInteraction(const fs::path& file)
 //----------------------------------------------------------------------------
 interactor& interactor_impl::start(double loopTime, std::function<void()> userCallBack)
 {
-  this->Internals->StartEventLoop(loopTime, std::move(userCallBack));
-  this->Internals->VTKInteractor->Start();
+  if (this->Internals->StartEventLoop(loopTime, std::move(userCallBack)))
+  {
+    this->Internals->VTKInteractor->Start();
+  }
   return *this;
 }
 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::stop()
 {
-  this->Internals->StopEventLoop();
-  this->Internals->VTKInteractor->ExitCallback();
+  if (this->Internals->StopEventLoop())
+  {
+    this->Internals->VTKInteractor->ExitCallback();
+  }
   return *this;
 }
 
@@ -1772,6 +1982,13 @@ interactor& interactor_impl::stop()
 interactor& interactor_impl::requestRender()
 {
   this->Internals->RenderRequested = true;
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::requestStop()
+{
+  this->Internals->StopRequested = true;
   return *this;
 }
 

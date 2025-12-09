@@ -62,6 +62,13 @@ public:
   void SetDropText(const std::string& info);
 
   /**
+   * Set the dropzone binds
+   * Each pair contains a description and its associated interaction bind
+   * Empty by default
+   */
+  void SetDropBinds(const std::vector<std::pair<std::string, std::string>>& dropZoneBinds);
+
+  /**
    * Set the filename visibility
    * False by default
    */
@@ -72,6 +79,18 @@ public:
    * Empty by default
    */
   void SetFileName(const std::string& filename);
+
+  /**
+   * Set the HDRI filename visibility
+   * False by default
+   */
+  void SetHDRIFileNameVisibility(bool show);
+
+  /**
+   * Set the HDRI filename string
+   * Empty by default
+   */
+  void SetHDRIFileName(const std::string& filename);
 
   /**
    * Set the metadata visibility
@@ -145,6 +164,11 @@ public:
   int RenderOverlay(vtkViewport* vp) override;
 
   /**
+   * Set the backdrop opacity
+   */
+  void SetBackdropOpacity(const double backdropOpacity);
+
+  /**
    * Set the delta time (time between UI frames) in seconds
    */
   virtual void SetDeltaTime(double)
@@ -191,6 +215,13 @@ protected:
   }
 
   /**
+   * Render the HDRI filename UI widget
+   */
+  virtual void RenderHDRIFileName()
+  {
+  }
+
+  /**
    * Render the cheatsheet UI widget
    */
   virtual void RenderCheatSheet()
@@ -220,9 +251,13 @@ protected:
   bool DropZoneLogoVisible = false;
   bool DropZoneVisible = false;
   std::string DropText = "";
+  std::vector<std::pair<std::string, std::string>> DropBinds;
 
   bool FileNameVisible = false;
   std::string FileName = "";
+
+  bool HDRIFileNameVisible = false;
+  std::string HDRIFileName = "";
 
   bool MetaDataVisible = false;
   std::string MetaData = "";
@@ -244,6 +279,8 @@ protected:
 
   std::string FontFile = "";
   double FontScale = 1.0;
+
+  double BackdropOpacity = 0.9;
 
 private:
   vtkF3DUIActor(const vtkF3DUIActor&) = delete;

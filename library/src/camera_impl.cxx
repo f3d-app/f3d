@@ -41,6 +41,7 @@ public:
   //--------------------------------------------------------------------------
   vtkRenderer* VTKRenderer = nullptr;
   camera_state_t DefaultCamera;
+  bool SuccessfullyReset = true; // could be false only if resetToBounds was called
 };
 
 //----------------------------------------------------------------------------
@@ -63,7 +64,7 @@ camera& camera_impl::setPosition(const point3_t& pos)
 }
 
 //----------------------------------------------------------------------------
-point3_t camera_impl::getPosition()
+point3_t camera_impl::getPosition() const
 {
   point3_t pos;
   this->getPosition(pos);
@@ -71,7 +72,7 @@ point3_t camera_impl::getPosition()
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::getPosition(point3_t& pos)
+void camera_impl::getPosition(point3_t& pos) const
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->GetPosition(pos.data());
@@ -88,7 +89,7 @@ camera& camera_impl::setFocalPoint(const point3_t& foc)
 }
 
 //----------------------------------------------------------------------------
-point3_t camera_impl::getFocalPoint()
+point3_t camera_impl::getFocalPoint() const
 {
   point3_t foc;
   this->getFocalPoint(foc);
@@ -96,7 +97,7 @@ point3_t camera_impl::getFocalPoint()
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::getFocalPoint(point3_t& foc)
+void camera_impl::getFocalPoint(point3_t& foc) const
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->GetFocalPoint(foc.data());
@@ -113,7 +114,7 @@ camera& camera_impl::setViewUp(const vector3_t& up)
 }
 
 //----------------------------------------------------------------------------
-vector3_t camera_impl::getViewUp()
+vector3_t camera_impl::getViewUp() const
 {
   vector3_t up;
   this->getViewUp(up);
@@ -121,7 +122,7 @@ vector3_t camera_impl::getViewUp()
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::getViewUp(vector3_t& up)
+void camera_impl::getViewUp(vector3_t& up) const
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->GetViewUp(up.data());
@@ -138,7 +139,7 @@ camera& camera_impl::setViewAngle(const angle_deg_t& angle)
 }
 
 //----------------------------------------------------------------------------
-angle_deg_t camera_impl::getViewAngle()
+angle_deg_t camera_impl::getViewAngle() const
 {
   angle_deg_t angle;
   this->getViewAngle(angle);
@@ -146,7 +147,7 @@ angle_deg_t camera_impl::getViewAngle()
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::getViewAngle(angle_deg_t& angle)
+void camera_impl::getViewAngle(angle_deg_t& angle) const
 {
   vtkCamera* cam = this->GetVTKCamera();
   angle = cam->GetViewAngle();
@@ -166,7 +167,7 @@ camera& camera_impl::setState(const camera_state_t& state)
 }
 
 //----------------------------------------------------------------------------
-camera_state_t camera_impl::getState()
+camera_state_t camera_impl::getState() const
 {
   camera_state_t state;
   this->getState(state);
@@ -174,7 +175,7 @@ camera_state_t camera_impl::getState()
 }
 
 //----------------------------------------------------------------------------
-void camera_impl::getState(camera_state_t& state)
+void camera_impl::getState(camera_state_t& state) const
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->GetPosition(state.position.data());
@@ -299,14 +300,29 @@ camera& camera_impl::resetToDefault()
 //----------------------------------------------------------------------------
 camera& camera_impl::resetToBounds([[maybe_unused]] double zoomFactor)
 {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251102)
+#if __ANDROID__
+  this->Internals->SuccessfullyReset = this->Internals->VTKRenderer->ResetCamera();
+#else
+  this->Internals->SuccessfullyReset =
+    this->Internals->VTKRenderer->ResetCameraScreenSpace(zoomFactor);
+#endif
+#else
 #if __ANDROID__
   this->Internals->VTKRenderer->ResetCamera();
 #else
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 2, 20230221)
   this->Internals->VTKRenderer->ResetCameraScreenSpace(zoomFactor);
-#else
-  this->Internals->VTKRenderer->ResetCameraScreenSpace();
 #endif
+  // VTK doesn't provide a way to know if the bounds were initialized, perform rough check
+  point3_t pos = this->getPosition();
+  if (vtkMath::Distance2BetweenPoints(pos, point3_t{ 0, 0, 1 }) <= 1e-6)
+  {
+    this->Internals->SuccessfullyReset = false;
+  }
+  else
+  {
+    this->Internals->SuccessfullyReset = true;
+  }
 #endif
   this->Internals->VTKRenderer->ResetCameraClippingRange();
   return *this;
@@ -319,8 +335,15 @@ void camera_impl::SetVTKRenderer(vtkRenderer* renderer)
 }
 
 //----------------------------------------------------------------------------
-vtkCamera* camera_impl::GetVTKCamera()
+vtkCamera* camera_impl::GetVTKCamera() const
 {
   return this->Internals->VTKRenderer->GetActiveCamera();
 }
+
+//----------------------------------------------------------------------------
+bool camera_impl::GetSuccessfullyReset() const
+{
+  return this->Internals->SuccessfullyReset;
+}
+
 };

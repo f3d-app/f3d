@@ -1,5 +1,53 @@
 # Changelog
 
+## v3.3.0
+
+For F3D users:
+
+- Created a F3D web application based on WebAssembly: https://f3d.app/viewer
+- **BEHAVIOR CHANGE**: Added a CLI option `--recursive-dir-add` to control if directory should be added recursively, off by default
+- Complete rework of the cheatsheet with for a nicer, cleaner look
+- [Linux] Added support for using F3D offscreen without GLX lib being present on the system
+- Added support for identifying non-supported files and not loading them at all
+- Added support for skipping unsupported files when loading multiple files
+- Added `--remove-empty-file-groups` to control if scene without files should be removed
+- Added `--watch` support for yet-to-exists files
+- Added a `remove_current_file_group` command
+- Added `--axes-grid` CLI option to show grid axes
+- Added an bind `Ctrl+X` to control the visibility of grid axes
+- Added proper parsing for transform2D options
+- Added `--multi-file-regex` CLI option to group files based on their names
+- Added autocompletion in interactive console
+- Added a `help` command to print information about commands
+- Added support for SPZ v3 format
+- Added `--backdrop-opacity` to control the UI backdrop opacity
+- Added support for .webp image and textures
+- Added support for GroupSkin for .mdl format
+- Added temporal anti aliasing support `--antialiasing-mode=taa`
+- Improve dropzone visuals
+- Improved `print_scene_info` output
+- Improved UI consistency
+- Improved rendering performance slightly
+- Reworked the website from scratch which now support documentation versioning
+- Removed support for comments in interactive console for better color parsing
+- Fixed and improved many documentations issues
+- Fixed an issue with `--watch` when file is failing to load
+- Fixed missing frame in .mdl animations
+- Fixed a potential crash when graphic libraries are not found
+- Fixed an issue with the scalar bar not being continuous
+
+For libf3d users:
+
+- Created a npm package to implement libf3d app for the web
+- Added event forwarding in order to implement interactions easily with _external_ engines
+- Added `ui.drop_zone.custom_binds` option to control the bindings visible in drop zone
+- Added `ui.backdrop.opacity` to control the UI backdrop opacity
+
+For F3D packagers:
+
+- F3D does not use libglx directly anymore when using VTK > 9.5
+- F3D v3.3.0 will be the last version of F3D supporting vtk v9.2.6, VTK v9.3.1 will be required for the next release
+
 ## v3.2.0
 
 For F3D users:
@@ -124,7 +172,7 @@ For F3D plugin developers:
 
 For F3D users:
 
-- BREAKING CHANGE: [Configuration files](https://f3d.app/doc/user/CONFIGURATION_FILE.html) have changed syntax
+- BREAKING CHANGE: [Configuration files](https://f3d.app/docs/next/user/CONFIGURATION_FILE) have changed syntax
 - BREAKING CHANGE: Removed all deprecated options
 - BREAKING CHANGE: `--scalars` have been split into `--scalar-coloring` and `--coloring-array` CLI options
 - BREAKING CHANGE: `=` must be used for CLI Options, `--option value` is not supported anymore
@@ -135,7 +183,7 @@ For F3D users:
 - BREAKING CHANGE: `--animation-frame-rate` has been replaced by `--frame-rate`
 - BREAKING CHANGE: Renamed `--bg-color` into `--background-color`
 - BREAKING CHANGE: Renamed `--comp` into `--coloring-component`
-- BREAKING CHANGE: Removed the `?` interaction to dump info, use [commands](https://f3d.app/doc/user/COMMANDS.html) instead
+- BREAKING CHANGE: Removed the `?` interaction to dump info, use [commands](https://f3d.app/docs/next/user/COMMANDS) instead
 - BREAKING CHANGE: Renamed `--progress` into `--loading-progress`
 - BREAKING CHANGE: Renamed `--cells` into `--coloring-by-cells`
 - BREAKING CHANGE: Renamed `--range` into `--coloring-range`
@@ -148,19 +196,19 @@ For F3D users:
 - BREAKING CHANGE: F3D binary release is now built with GCC9
 - Changed the logo!
 - Reworked the UI using ImGui
-- Added support for specifying interactions in config files, [see doc](https://f3d.app/doc/user/CONFIGURATION_FILE.html#bindings)
+- Added support for specifying interactions in config files, [see doc](https://f3d.app/docs/next/user/CONFIGURATION_FILE#bindings)
 - Added a `--command-script` CLI option
 - Added a tiny file dialog, just press `Ctrl+O`
 - Added support for armature visualization with `--armature` CLI option (glTF only)
 - Added support for keeping camera position when switching files, just press `Ctrl+Arrow`
-- Added a ImGui based console to input [commands](https://f3d.app/doc/user/COMMANDS.html) by pressing `Esc`
+- Added a ImGui based console to input [commands](https://f3d.app/docs/next/user/COMMANDS) by pressing `Esc`
 - Added a "Save minimal screenshot" interaction by pressing `Shift+F12`
 - Added error reporting when loading a file failed for some reason
 - Added missing config file for .brep files
 - Added support for .xbf files
 - Added `--input` CLI option
 - Added support for libf3d option in configuration files
-- Added support for parsing option based on their type, see [the doc](https://f3d.app/doc/user/PARSING.html)
+- Added support for parsing option based on their type, see [the doc](https://f3d.app/docs/next/user/PARSING)
 - Added a `--rendering-backend` option to select the rendering backend, including headless
 - Added an interaction to rotate camera 90 degrees by pressing 4/6
 - Added an interaction to drop only HDRI (Shift+Drop) and an interaction to drop only 3D files (Ctrl+Drop)
@@ -241,14 +289,14 @@ For F3D packagers:
 
 For F3D users:
 
-- Added a Webassembly version available online: https://f3d.app/web
+- Added a Webassembly version available online: https://f3d.app/viewer
 - Added a "neutral" tone mapping feature
 - Added an screenshot feature when pressing F12, with its dedicated option, `--screenshot-filename`
 - Added a `--final-shader` option to customize post-processing.
 - Added a `--grid-color` option to set the color of the grid
 - Added a `--animation-progress` option to control if the animation progress bar should be shown
 - Added a `--backface-type` option to control backface visibility
-- Added a concept of filename [template](https://f3d.app/doc/user/OPTIONS.html#filename-templating) for saving screenshots and outputs
+- Added a concept of filename [template](https://f3d.app/docs/next/user/OPTIONS#filename-templating) for saving screenshots and outputs
 - Added native menus for macOS
 - Improved documentation all around
 - Reworked config file logic to avoid duplicating of the default config
@@ -304,7 +352,7 @@ For libf3d users:
 - Added a new option `model.point-sprites.type` used to specify how to display points (only if `model.point-sprites.enable` is true)
 - Added a `image::toTerminalText` method to print image to terminal text
 - Added an `image` metadata API
-- Added a `vtkext` module for plugin developer, see the [documentation](https://f3d.app/doc/libf3d/PLUGINS.html)
+- Added a `vtkext` module for plugin developer, see the [documentation](https://f3d.app/docs/next/libf3d/PLUGINS)
 - Added a new f3d component to find_package of, `pluginsdk`, require to build plugins against F3D
 
 For F3D packagers:

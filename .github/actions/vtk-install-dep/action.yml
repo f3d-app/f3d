@@ -23,6 +23,7 @@ inputs:
   zlib_version:
     description: "Version of zlib to build against"
     required: true
+<<<<<<< HEAD
   pdal_version:
     description: "Version of pdal to build against"
     required: false
@@ -46,6 +47,10 @@ inputs:
     required: true
   proj_version:
     description: "Version of proj to build against"
+=======
+  global_cache_index:
+    description: "Global cache index"
+>>>>>>> 4fc092a17dd5ab4c32cead874fd56feb7171db08
     required: true
 
 runs:
@@ -58,6 +63,7 @@ runs:
         [[ "${{ inputs.tbb_version }}" ]] || { echo "tbb_version input is empty" ; exit 1; }
         [[ "${{ inputs.vtk_version }}" ]] || { echo "vtk_version input is empty" ; exit 1; }
         [[ "${{ inputs.zlib_version }}" ]] || { echo "zlib_version input is empty" ; exit 1; }
+<<<<<<< HEAD
         [[ "${{ inputs.sqlite_version }}" ]] || { echo "sqlite_version input is empty" ; exit 1; }
         [[ "${{ inputs.xercesc_version }}" ]] || { echo "xercesc_version input is empty" ; exit 1; }
         [[ "${{ inputs.curl_version }}" ]] || { echo "curl_version input is empty" ; exit 1; }
@@ -65,13 +71,20 @@ runs:
         [[ "${{ inputs.gdal_version }}" ]] || { echo "gdal_version input is empty" ; exit 1; }
         [[ "${{ inputs.libgeotiff_version }}" ]] || { echo "libgeotiff_version input is empty" ; exit 1; }
         [[ "${{ inputs.libtiff_version }}" ]] || { echo "libtiff_version input is empty" ; exit 1; }
+=======
+        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
+>>>>>>> 4fc092a17dd5ab4c32cead874fd56feb7171db08
 
     - name: Cache VTK
       id: cache-vtk
       uses: actions/cache/restore@v4
       with:
         path: dependencies/vtk_install
+<<<<<<< HEAD
         key: vtk-${{ inputs.vtk_version }}-${{inputs.zlib_version}}-${{inputs.blosc_version}}-${{inputs.tbb_version}}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}${{ inputs.ospray_version != '' && format('-ospray-{0}', inputs.ospray_version) || '' }}-${{inputs.proj_version}}-${{inputs.gdal_version}}-${{inputs.libgeotiff_version}}-${{inputs.libtiff_version}}-${{inputs.sqlite_version}}-${{inputs.xercesc_version}}-${{inputs.curl_version}}-${{inputs.pdal_version}}-${{runner.os}}-${{inputs.cpu}}-0
+=======
+        key: vtk-${{ inputs.vtk_version }}-${{inputs.zlib_version}}-${{inputs.blosc_version}}-${{inputs.tbb_version}}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}${{ inputs.ospray_version != '' && format('-ospray-{0}', inputs.ospray_version) || '' }}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-1
+>>>>>>> 4fc092a17dd5ab4c32cead874fd56feb7171db08
 
     - name: Setup VTK
       if: steps.cache-vtk.outputs.cache-hit != 'true'
@@ -101,13 +114,6 @@ runs:
       run: |
         cat $GITHUB_ACTION_PATH/set_cmp0177_policy.cmake CMake/vtkModule.cmake > patched.cmake
         mv patched.cmake CMake/vtkModule.cmake
-
-    # VTK 9.2.6 needs patching with recent libstd
-    - name: Patch VTK v9.2.6
-      if: steps.cache-vtk.outputs.cache-hit != 'true' && inputs.vtk_version == 'v9.2.6'
-      working-directory: ${{github.workspace}}/dependencies/vtk
-      shell: bash
-      run: patch -p1 < $GITHUB_ACTION_PATH/include_cstdint.patch
 
       # OpenVDB_CMAKE_PATH is required because of
       # https://github.com/AcademySoftwareFoundation/openvdb/issues/1160 and
@@ -142,11 +148,11 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_IOHDF=YES
         -DVTK_MODULE_ENABLE_VTK_IOImage=YES
         -DVTK_MODULE_ENABLE_VTK_IOImport=YES
+        -DVTK_MODULE_ENABLE_VTK_IOLegacy=YES
         -DVTK_MODULE_ENABLE_VTK_IONetCDF=YES
         -DVTK_MODULE_ENABLE_VTK_IOOpenVDB=${{ inputs.openvdb_version != '' && 'YES' || 'DEFAULT' }}
         -DVTK_MODULE_ENABLE_VTK_IOPDAL=YES
         -DVTK_MODULE_ENABLE_VTK_IOPLY=YES
-        -DVTK_MODULE_ENABLE_VTK_IOParallel=YES
         -DVTK_MODULE_ENABLE_VTK_IOXML=YES
         -DVTK_MODULE_ENABLE_VTK_ImagingCore=YES
         -DVTK_MODULE_ENABLE_VTK_ImagingHybrid=YES
@@ -159,7 +165,7 @@ runs:
         -DVTK_MODULE_ENABLE_VTK_RenderingRayTracing=${{ inputs.ospray_version != '' && 'YES' || 'DEFAULT' }}
         -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2=YES
         -DVTK_MODULE_ENABLE_VTK_TestingCore=YES
-        -DVTK_OPENGL_HAS_EGL=${{ runner.os != 'macOS' && inputs.vtk_version != 'v9.2.6' && inputs.vtk_version != 'v9.3.1' && 'ON' || 'OFF' }}
+        -DVTK_OPENGL_HAS_EGL=${{ runner.os != 'macOS' && inputs.vtk_version != 'v9.3.0' && 'ON' || 'OFF' }}
         -DVTK_SMP_IMPLEMENTATION_TYPE=TBB
         -DVTK_VERSIONED_INSTALL=OFF
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}

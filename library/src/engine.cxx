@@ -473,6 +473,12 @@ engine::libInformation engine::getLibInfo()
   libInfo.Modules["OpenEXR"] = false;
 #endif
 
+#if F3D_MODULE_WEBP
+  libInfo.Modules["WebP"] = true;
+#else
+  libInfo.Modules["WebP"] = false;
+#endif
+
 #if F3D_MODULE_UI
   libInfo.Modules["ImGui"] = true;
 #else
@@ -496,6 +502,7 @@ engine::libInformation engine::getLibInfo()
 
   libInfo.Copyrights.emplace_back("2019-2021 Kitware SAS");
   libInfo.Copyrights.emplace_back("2021-2025 Michael Migliore, Mathieu Westphal");
+  libInfo.Copyrights.emplace_back("2025 F3D-APP Foundation");
   libInfo.License = "BSD-3-Clause";
 
   return libInfo;

@@ -8,6 +8,9 @@ inputs:
     description: "CPU architecture to build for"
     required: false
     default: "x86_64"
+  global_cache_index:
+    description: "Global cache index"
+    required: true
 
 runs:
   using: "composite"
@@ -16,13 +19,14 @@ runs:
       shell: bash
       run: |
         [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
 
     - name: Cache ospray
       id: cache-ospray
       uses: actions/cache/restore@v4
       with:
         path: dependencies/ospray_install
-        key: ospray-sb-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-0
+        key: ospray-sb-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-0
 
     # Dependents: vtk
     - name: Checkout ospray
@@ -33,12 +37,19 @@ runs:
         path: "./dependencies/ospray"
         ref: ${{inputs.version}}
 
-      # https://github.com/ospray/ospray/pull/550
+    # https://github.com/ospray/ospray/pull/550
     - name: Patch ospray rkcommon superbuild
       if: steps.cache-ospray.outputs.cache-hit != 'true'
       working-directory: ${{github.workspace}}/dependencies/ospray
       shell: bash
       run: patch -p1 < $GITHUB_ACTION_PATH/0001-Fix-INSTALL_RPATH-in-rkcommon-superbuild.patch
+
+    # https://github.com/RenderKit/embree/issues/486
+    - name: Patch ospray embree superbuild
+      if: steps.cache-ospray.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/ospray
+      shell: bash
+      run: patch -p1 < $GITHUB_ACTION_PATH/0001-fix-embree-for-modern-clang.patch
 
     - name: Setup ospray
       if: steps.cache-ospray.outputs.cache-hit != 'true'

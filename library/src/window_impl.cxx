@@ -39,6 +39,10 @@
 #include <vtkF3DEGLRenderWindow.h>
 #endif
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+#include <vtkMemoryResourceStream.h>
+#endif
+
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240914)
 #include <vtkOSOpenGLRenderWindow.h>
 #endif
@@ -312,8 +316,14 @@ window& window_impl::setIcon(const unsigned char* icon, size_t iconSize)
 {
   // XXX This code requires that the interactor has already been set on the render window
   vtkNew<vtkPNGReader> iconReader;
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+  vtkNew<vtkMemoryResourceStream> stream;
+  stream->SetBuffer(icon, iconSize);
+  iconReader->SetStream(stream);
+#else
   iconReader->SetMemoryBuffer(icon);
   iconReader->SetMemoryBufferLength(iconSize);
+#endif
   iconReader->Update();
   this->Internals->RenWin->SetIcon(iconReader->GetOutput());
   return *this;
@@ -386,20 +396,30 @@ void window_impl::UpdateDynamicOptions()
 
   const options& opt = this->Internals->Options;
 
-  if (this->Internals->Interactor)
-  {
-    renderer->ShowAxis(opt.ui.axis);
-    renderer->SetUseTrackball(opt.interactor.trackball);
-    renderer->SetInvertZoom(opt.interactor.invert_zoom);
-  }
-
   // XXX: model.point_sprites.type only has an effect on geometry scene
   // but we set it here for practical reasons
-  const int pointSpritesSize = opt.model.point_sprites.size;
-  const vtkF3DRenderer::SplatType splatType = opt.model.point_sprites.type == "gaussian"
-    ? vtkF3DRenderer::SplatType::GAUSSIAN
-    : vtkF3DRenderer::SplatType::SPHERE;
-  renderer->SetPointSpritesProperties(splatType, pointSpritesSize);
+  renderer->SetUsePointSprites(opt.model.point_sprites.enable);
+  vtkF3DRenderer::SplatType splatType = vtkF3DRenderer::SplatType::SPHERE;
+  if (opt.model.point_sprites.enable)
+  {
+    if (opt.model.point_sprites.type == "gaussian")
+    {
+      splatType = vtkF3DRenderer::SplatType::GAUSSIAN;
+    }
+    else if (opt.model.point_sprites.type == "sphere")
+    {
+      splatType = vtkF3DRenderer::SplatType::SPHERE;
+    }
+    else
+    {
+      log::warn(opt.model.point_sprites.type,
+        R"( is an invalid point sprites type. Valid modes are: "sphere", "gaussian")");
+    }
+    renderer->SetPointSpritesType(splatType);
+    renderer->SetPointSpritesSize(
+      opt.model.point_sprites.absolute_size, opt.model.point_sprites.size);
+    renderer->SetPointSpritesUseInstancing(opt.render.effect.blending.mode != "sort");
+  }
 
   renderer->SetLineWidth(opt.render.line_width);
   renderer->SetPointSize(opt.render.point_size);
@@ -408,29 +428,65 @@ void window_impl::UpdateDynamicOptions()
   renderer->ShowFilename(opt.ui.filename);
   renderer->SetFilenameInfo(opt.ui.filename_info);
   renderer->ShowMetaData(opt.ui.metadata);
+  renderer->ShowHDRIFilename(opt.ui.hdri_filename);
   renderer->ShowCheatSheet(opt.ui.cheatsheet);
   renderer->ShowConsole(opt.ui.console);
   renderer->ShowMinimalConsole(opt.ui.minimal_console);
   renderer->ShowDropZone(opt.ui.drop_zone.enable);
-  renderer->SetDropZoneInfo(opt.ui.drop_zone.info);
   renderer->ShowDropZoneLogo(opt.ui.drop_zone.show_logo);
+  renderer->SetBackdropOpacity(opt.ui.backdrop.opacity);
+
+  if (this->Internals->Interactor)
+  {
+    renderer->ShowAxis(opt.ui.axis);
+    renderer->SetUseTrackball(opt.interactor.trackball);
+    renderer->SetInvertZoom(opt.interactor.invert_zoom);
+
+#if F3D_MODULE_UI
+    std::string bindsStr = opt.ui.drop_zone.custom_binds;
+    std::vector<std::pair<std::string, std::string>> dropZoneBinds;
+
+    for (const std::string& token : utils::tokenize(bindsStr))
+    {
+      if (!token.empty())
+      {
+        try
+        {
+          auto bind = interaction_bind_t::parse(token);
+          auto docPair = this->Internals->Interactor->getBindingDocumentation(bind);
+          dropZoneBinds.push_back({ docPair.first, bind.format() });
+        }
+        catch (const interactor_impl::does_not_exists_exception&)
+        {
+          // skip non-existent binds
+          log::warn("Bind ", token, " does not exist and will be ignored.");
+        }
+      }
+    }
+    renderer->SetDropZoneBinds(dropZoneBinds);
+#endif
+  }
+
   // F3D_DEPRECATED
   // Remove this in the next major release
   F3D_SILENT_WARNING_PUSH()
   F3D_SILENT_WARNING_DECL(4996, "deprecated-declarations")
+
   if (!opt.ui.dropzone_info.empty())
   {
-    log::warn("'ui.dropzone_info' is deprecated. Please Use 'ui.drop_zone.info' instead.");
+    log::warn("'ui.dropzone_info' is deprecated. Please Use 'ui.drop_zone.custom_binds' instead.");
     renderer->SetDropZoneInfo(opt.ui.dropzone_info);
   }
+  else if (!opt.ui.drop_zone.info.empty())
+  {
+    log::warn("'ui.drop_zone.info' is deprecated. Please Use 'ui.drop_zone.custom_binds' instead.");
+    renderer->SetDropZoneInfo(opt.ui.drop_zone.info);
+  }
+
   if (opt.ui.dropzone)
   {
     log::warn("'ui.dropzone' is deprecated. Please Use 'ui.drop_zone.enable' instead.");
     renderer->ShowDropZone(opt.ui.dropzone);
-    if (!opt.ui.dropzone_info.empty())
-    {
-      renderer->SetDropZoneInfo(opt.ui.dropzone_info);
-    }
     renderer->ShowDropZoneLogo(opt.ui.dropzone);
   }
   F3D_SILENT_WARNING_POP()
@@ -442,6 +498,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetUseRaytracingDenoiser(opt.render.raytracing.denoise);
 
   vtkF3DRenderer::AntiAliasingMode aaMode = vtkF3DRenderer::AntiAliasingMode::NONE;
+  vtkF3DRenderer::BlendingMode blendMode = vtkF3DRenderer::BlendingMode::NONE;
 
   // F3D_DEPRECATED
   // Remove this in the next major release
@@ -452,6 +509,12 @@ void window_impl::UpdateDynamicOptions()
     log::warn("render.effect.anti_aliasing is deprecated, please use "
               "render.effect.antialiasing.enable instead");
     aaMode = vtkF3DRenderer::AntiAliasingMode::FXAA;
+  }
+  if (opt.render.effect.translucency_support)
+  {
+    log::warn("render.effect.translucency_support is deprecated, please use "
+              "render.effect.blending.enable instead");
+    blendMode = vtkF3DRenderer::BlendingMode::DUAL_DEPTH_PEELING;
   }
   F3D_SILENT_WARNING_POP()
 
@@ -465,17 +528,42 @@ void window_impl::UpdateDynamicOptions()
     {
       aaMode = vtkF3DRenderer::AntiAliasingMode::SSAA;
     }
+    else if (opt.render.effect.antialiasing.mode == "taa")
+    {
+      aaMode = vtkF3DRenderer::AntiAliasingMode::TAA;
+    }
     else
     {
       log::warn(opt.render.effect.antialiasing.mode,
-        R"( is an invalid antialiasing mode. Valid modes are: "fxaa", "ssaa")");
+        R"( is an invalid antialiasing mode. Valid modes are: "fxaa", "ssaa", "taa")");
+    }
+  }
+
+  if (opt.render.effect.blending.enable)
+  {
+    if (opt.render.effect.blending.mode == "ddp")
+    {
+      blendMode = vtkF3DRenderer::BlendingMode::DUAL_DEPTH_PEELING;
+    }
+    else if (opt.render.effect.blending.mode == "sort")
+    {
+      blendMode = vtkF3DRenderer::BlendingMode::SORT;
+    }
+    else if (opt.render.effect.blending.mode == "stochastic")
+    {
+      blendMode = vtkF3DRenderer::BlendingMode::STOCHASTIC;
+    }
+    else
+    {
+      log::warn(opt.render.effect.blending.mode,
+        R"( is an invalid blending mode. Valid modes are: "ddp", "sort", "stochastic")");
     }
   }
 
   renderer->SetUseSSAOPass(opt.render.effect.ambient_occlusion);
   renderer->SetAntiAliasingMode(aaMode);
   renderer->SetUseToneMappingPass(opt.render.effect.tone_mapping);
-  renderer->SetUseDepthPeelingPass(opt.render.effect.translucency_support);
+  renderer->SetBlendingMode(blendMode);
   renderer->SetBackfaceType(opt.render.backface_type);
   renderer->SetFinalShader(opt.render.effect.final_shader);
 
@@ -528,7 +616,6 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetColormapDiscretization(opt.model.scivis.discretization);
   renderer->ShowScalarBar(opt.ui.scalar_bar);
 
-  renderer->SetUsePointSprites(opt.model.point_sprites.enable);
   renderer->SetUseVolume(opt.model.volume.enable);
   renderer->SetUseInverseOpacityFunction(opt.model.volume.inverse);
 
@@ -583,6 +670,13 @@ vtkRenderWindow* window_impl::GetRenderWindow()
 bool window_impl::render()
 {
   this->UpdateDynamicOptions();
+  const options& opt = this->Internals->Options;
+  if ((!opt.scene.camera.index.has_value()) && (!this->Internals->Camera->GetSuccessfullyReset()))
+  {
+    // Camera wasn't successfully reset last time, it could be a chance that update of dynamic
+    // options will enable successful reset of camera
+    this->Internals->Camera->resetToBounds();
+  }
   this->Internals->RenWin->Render();
   return true;
 }
@@ -669,4 +763,4 @@ vtkF3DRenderer* window_impl::GetRenderer() const
 {
   return this->Internals->Renderer;
 }
-};
+}

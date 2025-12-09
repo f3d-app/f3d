@@ -3,8 +3,11 @@
 
 #include "export.h"
 
+/// @cond
+#include <functional>
 #include <sstream>
 #include <string>
+/// @endcond
 
 namespace f3d
 {
@@ -22,12 +25,11 @@ class F3D_EXPORT log
 public:
   /**
    * Enumeration of verbose levels
-   * =============================
-   * DEBUG: All logs are displayed, including from third parties.
-   * INFO: Standard logging level, the default.
-   * WARN: Only warnings and errors are displayed.
-   * ERROR: Only errors are displayed.
-   * QUIET: Logging is fully disabled.
+   * - DEBUG: All logs are displayed, including from third parties.
+   * - INFO: Standard logging level, the default.
+   * - WARN: Only warnings and errors are displayed.
+   * - ERROR: Only errors are displayed.
+   * - QUIET: Logging is fully disabled.
    */
   enum class VerboseLevel : unsigned char
   {
@@ -109,6 +111,19 @@ public:
    * Get the current verbose level.
    */
   static VerboseLevel getVerboseLevel();
+
+  /**
+   * Alias for log forwarder callback.
+   */
+  using forward_fn_t = std::function<void(VerboseLevel, const std::string&)>;
+
+  /**
+   * Set a callback function to forward log messages.
+   * The callback will be invoked with the level and the message string whenever a message is
+   * logged, regardless of the verbose level.
+   * Set to nullptr to disable forwarding.
+   */
+  static void forward(const forward_fn_t& callback);
 
 protected:
   //! @cond

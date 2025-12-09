@@ -6,6 +6,7 @@
 #include "options.h"
 #include "window_impl.h"
 
+#include "F3DStyle.h"
 #include "vtkF3DRenderer.h"
 
 #include <vtkDoubleArray.h>
@@ -42,12 +43,6 @@ void animationManager::SetInteractor(interactor_impl* interactor)
 }
 
 //----------------------------------------------------------------------------
-void animationManager::SetDeltaTime(double deltaTime)
-{
-  this->DeltaTime = deltaTime;
-}
-
-//----------------------------------------------------------------------------
 void animationManager::Initialize()
 {
   assert(this->Importer);
@@ -68,7 +63,17 @@ void animationManager::Initialize()
     progressRep->SetPosition(0.0, 0.0);
     progressRep->SetPosition2(1.0, 0.0);
     progressRep->SetMinimumSize(0, 5);
-    progressRep->SetProgressBarColor(1, 0, 0);
+    f3d::color_t color;
+    if (!this->Options.ui.animation_progress_color.has_value())
+    {
+      const auto [r, g, b] = F3DStyle::GetF3DBlue();
+      color = color_t(r, g, b);
+    }
+    else
+    {
+      color = this->Options.ui.animation_progress_color.value();
+    }
+    progressRep->SetProgressBarColor(color.r(), color.g(), color.b());
     progressRep->DrawBackgroundOff();
     progressRep->DragableOff();
     progressRep->SetShowBorderToOff();
@@ -101,8 +106,7 @@ void animationManager::Initialize()
     log::debug(i, ": ", this->Importer->GetAnimationName(i));
   }
 
-  bool autoplay = this->Options.scene.animation.autoplay;
-  if (autoplay)
+  if (this->Autoplay)
   {
     this->StartAnimation();
   }
@@ -156,11 +160,11 @@ void animationManager::ToggleAnimation()
 }
 
 //----------------------------------------------------------------------------
-void animationManager::Tick()
+void animationManager::Tick(double deltaTime)
 {
   if (this->Playing)
   {
-    this->CurrentTime += this->DeltaTime * this->Options.scene.animation.speed_factor;
+    this->CurrentTime += deltaTime * this->SpeedFactor;
 
     // Modulo computation, compute CurrentTime in the time range.
     if (this->CurrentTime < this->TimeRange[0] || this->CurrentTime > this->TimeRange[1])
@@ -466,11 +470,7 @@ void animationManager::PrepareForAnimationIndices()
       double timeRange[2];
       int nbTimeSteps;
       vtkNew<vtkDoubleArray> timeSteps;
-
-      // Discard timesteps, F3D only cares about elapsed time using time range and deltaTime
-      // Specifying a frame rate (60) in the next call is not needed after VTK 9.2.20230603 :
-      // VTK_VERSION_CHECK(9, 2, 20230603)
-      this->Importer->GetTemporalInformation(animIndex, 60, nbTimeSteps, timeRange, timeSteps);
+      this->Importer->GetTemporalInformation(animIndex, 0, nbTimeSteps, timeRange, timeSteps);
 
       // Accumulate time ranges
       this->TimeRange[0] = std::min(timeRange[0], this->TimeRange[0]);
@@ -510,5 +510,39 @@ unsigned int animationManager::GetNumberOfAvailableAnimations() const
 {
   assert(this->AvailAnimations >= 0);
   return static_cast<unsigned int>(this->AvailAnimations);
+}
+
+//----------------------------------------------------------------------------
+void animationManager::SetCheatSheetConfigured(bool configured)
+{
+  vtkF3DRenderer* ren = this->Window.GetRenderer();
+  ren->SetCheatSheetConfigured(configured);
+}
+
+//----------------------------------------------------------------------------
+void animationManager::SetAutoplay(bool enable)
+{
+  if (this->Autoplay != enable)
+  {
+    this->Autoplay = enable;
+    this->SetCheatSheetConfigured(false);
+  }
+}
+
+//----------------------------------------------------------------------------
+void animationManager::SetSpeedFactor(double speedFactor)
+{
+  if (this->SpeedFactor != speedFactor)
+  {
+    this->SpeedFactor = speedFactor;
+    this->SetCheatSheetConfigured(false);
+  }
+}
+
+//----------------------------------------------------------------------------
+void animationManager::UpdateDynamicOptions()
+{
+  this->SetAutoplay(this->Options.scene.animation.autoplay);
+  this->SetSpeedFactor(this->Options.scene.animation.speed_factor);
 }
 }

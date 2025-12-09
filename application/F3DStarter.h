@@ -33,9 +33,12 @@ public:
   void LoadFileGroup(int index = 0, bool relativeIndex = false, bool forceClear = false);
 
   /**
-   * Trigger a render on the next event loop
+   * Get supported extensions for open file command
+   * On macOS, the extensions are returned in the format: {"x", "y", "z"}
+   * On other operating systems, the format is: {"*.x", "*.y", "*.z"}
+   * Returns a vector of supported file extension strings
    */
-  void RequestRender();
+  static std::vector<std::string> GetExtensions();
 
   /**
    * Trigger a render immediately (must be called by the main thread)

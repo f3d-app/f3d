@@ -44,9 +44,13 @@ inputs:
   vtk_version:
     description: "Version of vtk to build"
     required: true
+  webp_version:
+    description: "Version of webp to build"
+    required: true
   zlib_version:
     description: "Version of zlib to build"
     required: true
+<<<<<<< HEAD
   pdal_version:
     description: "Version of pdal to build"
     required: true
@@ -70,6 +74,10 @@ inputs:
     required: true
   xercesc_version:
     description: "Version of xercesc to build"
+=======
+  global_cache_index:
+    description: "Global cache index"
+>>>>>>> 4fc092a17dd5ab4c32cead874fd56feb7171db08
     required: true
 
 runs:
@@ -82,7 +90,7 @@ runs:
         [[ "${{ inputs.vtk_version }}" ]] || { echo "vtk_version input is empty" ; exit 1; }
 
     - name: Recover LFS Data
-      uses: f3d-app/lfs-data-cache-action@v1
+      uses: f3d-app/lfs-data-cache-action@v2
       with:
         type: "consumer"
         lfs_sha: ${{inputs.lfs_sha}}
@@ -103,7 +111,9 @@ runs:
         ospray_version: ${{inputs.ospray_version}}
         tbb_version: ${{inputs.tbb_version}}
         usd_version: ${{inputs.usd_version}}
+        webp_version: ${{inputs.webp_version}}
         zlib_version: ${{inputs.zlib_version}}
+<<<<<<< HEAD
         libgeotiff_version: ${{inputs.libgeotiff_version}}
         libtiff_version: ${{inputs.libtiff_version}}
         gdal_version: ${{inputs.gdal_version}}
@@ -111,6 +121,9 @@ runs:
         sqlite_version: ${{inputs.sqlite_version}}
         curl_version: ${{inputs.curl_version}}
         xercesc_version: ${{inputs.xercesc_version}}
+=======
+        global_cache_index: ${{inputs.global_cache_index}}
+>>>>>>> 4fc092a17dd5ab4c32cead874fd56feb7171db08
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
@@ -122,6 +135,7 @@ runs:
         tbb_version: ${{inputs.tbb_version}}
         vtk_version: ${{inputs.vtk_version}}
         zlib_version: ${{inputs.zlib_version}}
+<<<<<<< HEAD
         gdal_version: ${{inputs.gdal_version}}
         libgeotiff_version: ${{inputs.libgeotiff_version}}
         libtiff_version: ${{inputs.libtiff_version}}
@@ -129,6 +143,9 @@ runs:
         xercesc_version: ${{inputs.xercesc_version}}
         curl_version: ${{inputs.curl_version}}
         proj_version: ${{inputs.proj_version}}
+=======
+        global_cache_index: ${{inputs.global_cache_index}}
+>>>>>>> 4fc092a17dd5ab4c32cead874fd56feb7171db08
 
     # coverage build is done in source as it seems to be required for codecov
     # CMAKE_MODULE_PATH is required because of
@@ -148,6 +165,7 @@ runs:
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
         -DF3D_COVERAGE=ON
         -DF3D_MODULE_EXR=ON
+        -DF3D_MODULE_WEBP=ON
         -DF3D_MODULE_RAYTRACING=ON
         -DF3D_MODULE_UI=ON
         -DF3D_PLUGINS_STATIC_BUILD=OFF

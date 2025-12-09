@@ -23,15 +23,6 @@ class vtkF3DAssimpImporter : public vtkF3DImporter
 public:
   static vtkF3DAssimpImporter* New();
   vtkTypeMacro(vtkF3DAssimpImporter, vtkF3DImporter);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
-
-  ///@{
-  /**
-   * Set/Get the file name.
-   */
-  vtkSetMacro(FileName, std::string);
-  vtkGetMacro(FileName, std::string);
-  ///@}
 
   /**
    * Update actors at the given time value.
@@ -115,12 +106,11 @@ protected:
   void ImportCameras(vtkRenderer*) override;
   void ImportLights(vtkRenderer*) override;
 
-  std::string FileName;
-  bool ColladaFixup = false;
-
 private:
   vtkF3DAssimpImporter(const vtkF3DAssimpImporter&) = delete;
   void operator=(const vtkF3DAssimpImporter&) = delete;
+
+  bool ColladaFixup = false;
 
   class vtkInternals;
   std::unique_ptr<vtkInternals> Internals;

@@ -11,6 +11,9 @@ inputs:
   imath_version:
     description: "Version of imath to build against"
     required: true
+  global_cache_index:
+    description: "Global cache index"
+    required: true
 
 runs:
   using: "composite"
@@ -19,13 +22,14 @@ runs:
       shell: bash
       run: |
         [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
 
     - name: Cache OpenEXR
       id: cache-openexr
       uses: actions/cache/restore@v4
       with:
         path: dependencies/openexr_install
-        key: openexr-${{inputs.version}}-${{inputs.imath_version}}-${{runner.os}}-${{inputs.cpu}}-2
+        key: openexr-${{inputs.version}}-${{inputs.imath_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-0
 
     # Dependents: usd
     - name: Checkout OpenEXR

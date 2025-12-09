@@ -22,6 +22,7 @@
 
 class vtkOpenGLRenderWindow;
 class vtkWindow;
+struct ImVec2;
 
 class vtkF3DImguiConsole : public vtkF3DConsoleOutputWindow
 {
@@ -48,6 +49,11 @@ public:
    * Clear console
    */
   void Clear();
+
+  /**
+   * Get Badge window size
+   */
+  ImVec2 GetBadgeSize();
 
   /**
    * Set the callback to get completion candidates

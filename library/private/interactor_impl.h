@@ -43,7 +43,7 @@ public:
       nullptr) override;
   interactor& removeCommand(const std::string& action) override;
   std::vector<std::string> getCommandActions() const override;
-  bool triggerCommand(std::string_view command) override;
+  bool triggerCommand(std::string_view command, bool keepComments = true) override;
 
   interactor& initBindings() override;
   interactor& addBinding(const interaction_bind_t& bind, std::vector<std::string> commands,
@@ -60,6 +60,7 @@ public:
     const interaction_bind_t& bind) const override;
   BindingType getBindingType(const interaction_bind_t& bind) const override;
 
+  interactor& triggerEventLoop(double deltaTime) override;
   interactor& triggerModUpdate(InputModifier mod) override;
   interactor& triggerMouseButton(InputAction action, MouseButton button) override;
   interactor& triggerMousePosition(double xpos, double ypos) override;
@@ -82,6 +83,7 @@ public:
   interactor& start(double deltaTime, std::function<void()> userCallBack) override;
   interactor& stop() override;
   interactor& requestRender() override;
+  interactor& requestStop() override;
   ///@}
 
   /**

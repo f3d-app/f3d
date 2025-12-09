@@ -110,7 +110,7 @@ f3d_plugin_declare_reader(
   SCORE 99
   EXTENSIONS vtk
   MIMETYPES application/vnd.vtk
-  VTK_READER vtkPDataSetReader
+  VTK_READER vtkDataSetReader
   FORMAT_DESCRIPTION "VTK Legacy"
 )
 
@@ -178,46 +178,35 @@ f3d_plugin_declare_reader(
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/mdl.inl"
 )
 
-# Needs vtkResourceStream (https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9663)
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221216)
-  f3d_plugin_declare_reader(
-    NAME SPZ
-    EXTENSIONS spz
-    MIMETYPES application/vnd.spz
-    VTK_READER vtkF3DSPZReader
-    FORMAT_DESCRIPTION "Compressed 3D gaussian splats"
-  )
-  f3d_plugin_declare_reader(
-    NAME Splat
-    SCORE 90
-    EXTENSIONS splat
-    MIMETYPES application/vnd.splat
-    VTK_READER vtkF3DSplatReader
-    FORMAT_DESCRIPTION "3D Gaussian splats"
-  )
+f3d_plugin_declare_reader(
+  NAME SPZ
+  EXTENSIONS spz
+  MIMETYPES application/vnd.spz
+  VTK_READER vtkF3DSPZReader
+  FORMAT_DESCRIPTION "Compressed 3D gaussian splats"
+)
+f3d_plugin_declare_reader(
+  NAME Splat
+  SCORE 90
+  EXTENSIONS splat
+  MIMETYPES application/vnd.splat
+  VTK_READER vtkF3DSplatReader
+  FORMAT_DESCRIPTION "3D Gaussian splats"
+)
 
-  f3d_plugin_declare_reader(
-    NAME PLYReader
-    EXTENSIONS ply
-    MIMETYPES application/vnd.ply
-    VTK_READER vtkF3DPLYReader
-    FORMAT_DESCRIPTION "Polygon"
-  )
-else()
-  f3d_plugin_declare_reader(
-    NAME PLYReader
-    EXTENSIONS ply
-    MIMETYPES application/vnd.ply
-    VTK_READER vtkPLYReader
-    FORMAT_DESCRIPTION "Polygon"
-  )
-endif()
+f3d_plugin_declare_reader(
+  NAME PLYReader
+  EXTENSIONS ply
+  MIMETYPES application/vnd.ply
+  VTK_READER vtkF3DPLYReader
+  FORMAT_DESCRIPTION "Polygon"
+)
 
 f3d_plugin_build(
   NAME native
   VERSION 1.0
   DESCRIPTION "Native VTK I/O support"
-  VTK_MODULES IOXML IOParallel IOCityGML IOImage IOGeometry IOPLY
+  VTK_MODULES IOXML IOLegacy IOCityGML IOImage IOGeometry IOPLY
   MIMETYPE_XML_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/f3d-3d-formats.xml"
     "${CMAKE_CURRENT_SOURCE_DIR}/f3d-3d-image-formats.xml"

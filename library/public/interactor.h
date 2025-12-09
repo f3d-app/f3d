@@ -7,10 +7,12 @@
 #include "options.h"
 #include "window.h"
 
+/// @cond
 #include <functional>
 #include <string>
 #include <utility>
 #include <vector>
+/// @endcond
 
 namespace f3d
 {
@@ -79,6 +81,7 @@ public:
    * Use this method to add a command to be called using triggerCommand.
    * Adding a command with an already existing action throw a
    * interactor::already_exists_exception.
+   *
    * Considering namespacing dedicated action to avoid conflicts with default action,
    * eg: `my_app::action`
    */
@@ -104,13 +107,17 @@ public:
    *
    * If the command fails, it prints a debug log explaining why.
    *
+   * When keepComments argument is true, comments are supported with `#`, any characters after are
+   * ignored otherwise `#` and any characters after will be handled as standard character
+   *
    * Return true if the command succeeded, false otherwise.
    * Throw an interactor::command_runtime_exception if the command callback
    * throw an unrecognized exception.
+   *
    * Note that default commands will never throw this exception, but adding commands
    * without exception catching may trigger this behavior.
    */
-  virtual bool triggerCommand(std::string_view command) = 0;
+  virtual bool triggerCommand(std::string_view command, bool keepComments = true) = 0;
   ///@}
 
   ///@{ @name Bindings
@@ -143,12 +150,12 @@ public:
    * "Left", "Right", "Up", "Down", "Space", "Enter", "Escape", "Question".
    *
    * group is an optional arg to group bindings together for better display of the documentation.
-   * Groups are kept in order of addition when recovered using `getBindGroups`.
-   * Bindings are kept in order of addition when recovered using `getBindsForGroup`.
+   * Groups are kept in order of addition when recovered using getBindGroups().
+   * Bindings are kept in order of addition when recovered using getBindsForGroup().
    *
    * documentationCallback is an optional function that returns a pair of string,
    * the first is the doc itself, the second is the current value as a string, if any.
-   * Use `getBindingDocumentation` to access this doc.
+   * Use getBindingDocumentation() to access this doc.
    *
    * type is an optional type of binding to provide, it can be used for presenting the
    * binding in a coherent way in logs and cheatsheet.
@@ -169,7 +176,7 @@ public:
   /**
    * See addBinding
    * Convenience method to add a single command for an interaction,
-   * similar as `addBinding(bind, {command})`
+   * similar as `addBinding(bind, {command})`.
    *
    * Adding command for an existing bind will throw a interactor::already_exists_exception.
    */
@@ -216,8 +223,10 @@ public:
    * Get a pair of string documenting a binding.
    * The first string is the documentation of the binding,
    * eg: "Toggle anti aliasing", "Print scene descr to terminal", "Decrease light intensity"
+   *
    * The second string is the current value of the binding,
    * eg: "OFF", "" if there is no value or "1.12".
+   *
    * If a binding was not documented on addition, the provided strings will be empty.
    * The possible string can depends on the bindings but boolean value are expected to be
    * "ON", "OFF", "N/A" (for optional values).
@@ -226,7 +235,6 @@ public:
    */
   [[nodiscard]] virtual std::pair<std::string, std::string> getBindingDocumentation(
     const interaction_bind_t& bind) const = 0;
-  ///@}
 
   /**
    * Get the type of a binding.
@@ -330,7 +338,7 @@ public:
    * - "Space", "Return", "Escape", "Tab", "BackSpace" for common keys
    * - "F1", "F2", ..., "F25" for function keys
    * - "KP_0", "KP_1", ..., "KP_9" for numpad keys
-   * @note
+   *
    * It's possible to run F3D application in verbose mode and press keys to print their symbols.
    */
   virtual interactor& triggerKeyboardKey(InputAction action, std::string_view keySym) = 0;
@@ -345,38 +353,53 @@ public:
   ///@}
 
   /**
+   * Manually trigger the event loop.
+   * Advances the internal timers of `deltaTime` seconds.
+   * deltaTime should be strictly positive.
+   */
+  virtual interactor& triggerEventLoop(double deltaTime) = 0;
+
+  /**
    * Play a VTK interaction file.
    * Provided file path is used as is and file existence will be checked.
-   * The event loop will be triggered every deltaTime in seconds, and userCallBack will be called at
-   * the start of the event loop
+   * If the event loop is not already running, it will be triggered every deltaTime in seconds,
+   * and userCallBack will be called at the start of the event loop.
    */
   virtual bool playInteraction(const std::filesystem::path& file, double deltaTime = 1.0 / 30,
     std::function<void()> userCallBack = nullptr) = 0;
 
   /**
    * Start interaction and record it all in a VTK interaction file.
-   * Provided file path will be used as is and the parent directories of the file will be created
+   * Provided file path will be used as is and the parent directories of the file will be created.
    */
   virtual bool recordInteraction(const std::filesystem::path& file) = 0;
 
   /**
    * Start the interactor event loop.
    * The event loop will be triggered every deltaTime in seconds, and userCallBack will be called at
-   * the start of the event loop
+   * the start of the event loop, deltaTime should be strictly positive.
+   * Safe to call multiple times but will log an info in that case.
    */
   virtual interactor& start(
     double deltaTime = 1.0 / 30, std::function<void()> userCallBack = nullptr) = 0;
 
   /**
    * Stop the interactor.
+   * If interactor has not been started, this logs an info and returns without doing anything.
    */
   virtual interactor& stop() = 0;
 
   /**
-   * Request a render to be done on the next event loop
-   * Safe to call in a multithreaded environment
+   * Request a render to be done on the next event loop.
+   * Safe to call in a multithreaded environment.
    */
   virtual interactor& requestRender() = 0;
+
+  /**
+   * Request the interactor to stop on the next event loop.
+   * Safe to call in a multithreaded environment.
+   */
+  virtual interactor& requestStop() = 0;
 
   /**
    * An exception that can be thrown by the interactor

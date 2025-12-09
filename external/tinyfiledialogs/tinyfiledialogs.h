@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: Zlib
-Copyright (c) 2014 - 2024 Guillaume Vareille http://ysengrin.com
+Copyright (c) 2014 - 2025 Guillaume Vareille http://ysengrin.com
 	 ____________________________________________________________________
 	|                                                                    |
 	| 100% compatible C C++  ->  You can rename tinfiledialogs.c as .cpp |
@@ -7,7 +7,7 @@ Copyright (c) 2014 - 2024 Guillaume Vareille http://ysengrin.com
 
 ********* TINY FILE DIALOGS OFFICIAL WEBSITE IS ON SOURCEFORGE *********
   _________
- /         \ tinyfiledialogs.h v3.19.1 [Jan 27, 2025]
+ /         \ tinyfiledialogs.h v3.21.2 [Oct 25, 2025]
  |tiny file| Unique header file created [November 9, 2014]
  | dialogs |
  \____  ___/ http://tinyfiledialogs.sourceforge.net
@@ -124,7 +124,7 @@ tinyfd_response is then filled with the retain solution.
 possible values for tinyfd_response are (all lowercase)
 for graphic mode:
   windows_wchar windows applescript kdialog zenity zenity3 yad matedialog
-  shellementary qarma python2-tkinter python3-tkinter python-dbus
+  shellementary qarma shanty boxer python2-tkinter python3-tkinter python-dbus
   perl-dbus gxmessage gmessage xmessage xdialog gdialog dunst
 for console mode:
   dialog whiptail basicinput no_solution */
@@ -288,8 +288,8 @@ wchar_t * tinyfd_colorChooserW(
   (on windows the no linking claim is a lie)
 - On unix: it tries command line calls, so no such need (NO LINKING).
 - On unix you need one of the following:
-  applescript, kdialog, zenity, matedialog, shellementary, qarma, yad,
-  python (2 or 3)/tkinter/python-dbus (optional), Xdialog
+  applescript, kdialog, zenity, matedialog, shellementary, qarma, shanty, boxer,
+  yad, python (2 or 3)/tkinter/python-dbus (optional), Xdialog
   or curses dialogs (opens terminal if running without console).
 - One of those is already included on most (if not all) desktops.
 - In the absence of those it will use gdialog, gxmessage or whiptail

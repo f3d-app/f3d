@@ -59,6 +59,18 @@ int TestSDKUtils([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     f3d::utils::tokenize(R"(set render.hdri.file file # A comment)") ==
       std::vector<std::string>{ "set", "render.hdri.file", "file" });
 
+  test("tokenize comments with keep comments flag",
+    f3d::utils::tokenize(R"(set render.hdri.file file # A comment)", false) ==
+      std::vector<std::string>{ "set", "render.hdri.file", "file", "#", "A", "comment" });
+
+  test("tokenize base color",
+    f3d::utils::tokenize(R"(set render.background.color #000)") ==
+      std::vector<std::string>{ "set", "render.background.color" });
+
+  test("tokenize base color with keep comments flag",
+    f3d::utils::tokenize(R"(set render.background.color #000)", false) ==
+      std::vector<std::string>{ "set", "render.background.color", "#000" });
+
   test("tokenize escaped comments",
     f3d::utils::tokenize(R"(set render.hdri.file fi\#le)") ==
       std::vector<std::string>{ "set", "render.hdri.file", "fi#le" });

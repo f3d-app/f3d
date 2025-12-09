@@ -10,8 +10,10 @@
 
 #include "vtkextModule.h"
 
+/// @cond
 #include <vtkGLTFImporter.h>
 #include <vtkVersion.h>
+/// @endcond
 
 class vtkInformationIntegerKey;
 

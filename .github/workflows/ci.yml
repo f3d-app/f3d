@@ -55,10 +55,13 @@ jobs:
       tbb_version: ${{ steps.set_default_versions.outputs.tbb_version }}
       usd_min_version: ${{ steps.set_default_versions.outputs.usd_min_version }}
       usd_version: ${{ steps.set_default_versions.outputs.usd_version }}
+      webp_min_version: ${{ steps.set_default_versions.outputs.webp_min_version }}
+      webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
       zlib_min_version: ${{ steps.set_default_versions.outputs.zlib_min_version }}
       zlib_version: ${{ steps.set_default_versions.outputs.zlib_version }}
       vtk_commit_sha: ${{ steps.set_default_versions.outputs.vtk_commit_sha }}
-      timestamp: ${{ steps.set_default_versions.outputs.timestamp }}
+      docker_timestamp: ${{ steps.set_default_versions.outputs.docker_timestamp }}
+      global_cache_index: ${{ steps.set_default_versions.outputs.global_cache_index }}
 
     steps:
       - name: Checkout
@@ -97,7 +100,7 @@ jobs:
 
       - name: Cache LFS Data
         id: lfs_sha_recover
-        uses: f3d-app/lfs-data-cache-action@v1
+        uses: f3d-app/lfs-data-cache-action@v2
         with:
           cache_postfix: cache-0
 
@@ -114,11 +117,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, windows-latest, macos-13, macos-14]
+        os: [ubuntu-22.04, windows-latest, macos-15-intel, macos-15]
         build_type: [standard]
         include:
           - cpu: x86_64
-          - os: macos-14
+          - os: macos-15
             cpu: arm64
           - alembic_version: ${{needs.default_versions.outputs.alembic_version}}
           - assimp_version: ${{needs.default_versions.outputs.assimp_version}}
@@ -132,6 +135,7 @@ jobs:
           - pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
           - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           - usd_version: ${{needs.default_versions.outputs.usd_version}}
+          - webp_version: ${{needs.default_versions.outputs.webp_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           - sqlite_version: version-3.42.1
           - xercesc_version: v3.3.0
@@ -156,6 +160,7 @@ jobs:
             pybind11_version: ${{needs.default_versions.outputs.pybind11_min_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_min_version}}
             usd_version: ${{needs.default_versions.outputs.usd_min_version}}
+            webp_version: ${{needs.default_versions.outputs.webp_min_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_min_version}}
             sqlite_version: version-3.42.1
             xercesc_version: v3.3.0
@@ -168,6 +173,10 @@ jobs:
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
+
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -192,7 +201,9 @@ jobs:
           pybind11_version: ${{matrix.pybind11_version}}
           tbb_version: ${{matrix.tbb_version}}
           usd_version: ${{matrix.usd_version}}
+          webp_version: ${{matrix.webp_version}}
           zlib_version: ${{matrix.zlib_version}}
+<<<<<<< HEAD
           pdal_version: 2.9.2
           sqlite_version: version-3.42.1
           xercesc_version: v3.3.0
@@ -201,6 +212,9 @@ jobs:
           libgeotiff_version: 1.7.4
           libtiff_version: v4.7.0
           gdal_version: v3.11.3
+=======
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
+>>>>>>> 4fc092a17dd5ab4c32cead874fd56feb7171db08
 
   #----------------------------------------------------------------------------
   # Cache VTK Dependency: Checkout and compile VTK if not cached
@@ -215,24 +229,24 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, windows-latest, macos-13, macos-14]
+        os: [ubuntu-22.04, windows-latest, macos-15-intel, macos-15]
         vtk_version:
           [
             "${{needs.default_versions.outputs.vtk_commit_sha}}",
-            v9.5.0,
+            v9.5.2,
             v9.4.2,
+<<<<<<< HEAD
             v9.3.1,
+=======
+            v9.3.0,
+>>>>>>> 4fc092a17dd5ab4c32cead874fd56feb7171db08
           ]
         build_type: [standard]
         exclude:
-          - os: macos-13
-            vtk_version: v9.3.1
-          - os: macos-13
-            vtk_version: v9.2.6
-          - os: macos-14
-            vtk_version: v9.3.1
-          - os: macos-14
-            vtk_version: v9.2.6
+          - os: macos-15-intel
+            vtk_version: v9.3.0
+          - os: macos-15
+            vtk_version: v9.3.0
         include:
           - cpu: x86_64
           - blosc_version: ${{needs.default_versions.outputs.blosc_version}}
@@ -240,6 +254,7 @@ jobs:
           - ospray_version: ${{needs.default_versions.outputs.ospray_version}}
           - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+<<<<<<< HEAD
           - sqlite_version: version-3.42.1
           - xercesc_version: v3.3.0
           - curl_version: curl-8_15_0
@@ -249,6 +264,9 @@ jobs:
           - libtiff_version: v4.7.0
           - gdal_version: v3.11.3
           - os: macos-14
+=======
+          - os: macos-15
+>>>>>>> 4fc092a17dd5ab4c32cead874fd56feb7171db08
             cpu: arm64
           - build_type: mindeps
             os: ubuntu-22.04
@@ -301,6 +319,10 @@ jobs:
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
+
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -326,6 +348,7 @@ jobs:
           blosc_version: ${{matrix.blosc_version}}
           tbb_version: ${{matrix.tbb_version}}
           zlib_version: ${{matrix.zlib_version}}
+<<<<<<< HEAD
           sqlite_version: version-3.42.1
           xercesc_version: v3.3.0
           curl_version: curl-8_15_0
@@ -334,6 +357,9 @@ jobs:
           libgeotiff_version: 1.7.4
           libtiff_version: v4.7.0
           gdal_version: v3.11.3
+=======
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
+>>>>>>> 4fc092a17dd5ab4c32cead874fd56feb7171db08
 
       - name: Install Raytracing Dependencies
         if: matrix.ospray_version != ''
@@ -341,6 +367,7 @@ jobs:
         with:
           version: ${{matrix.ospray_version}}
           cpu: ${{matrix.cpu}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
       - name: VTK dependency
         uses: ./source/.github/actions/vtk-install-dep
@@ -353,6 +380,7 @@ jobs:
           ospray_version: ${{matrix.ospray_version}}
           tbb_version: ${{matrix.tbb_version}}
           zlib_version: ${{matrix.zlib_version}}
+<<<<<<< HEAD
           sqlite_version: version-3.42.1
           xercesc_version: v3.3.0
           curl_version: curl-8_15_0
@@ -361,6 +389,9 @@ jobs:
           libgeotiff_version: 1.7.4
           libtiff_version: v4.7.0
           gdal_version: v3.11.3
+=======
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
+>>>>>>> 4fc092a17dd5ab4c32cead874fd56feb7171db08
 
   #----------------------------------------------------------------------------
   # Windows CI: Build and test, cross-vtk build matrix
@@ -377,10 +408,9 @@ jobs:
         vtk_version:
           [
             "${{needs.default_versions.outputs.vtk_commit_sha}}",
-            v9.5.0,
+            v9.5.2,
             v9.4.2,
-            v9.3.1,
-            v9.2.6,
+            v9.3.0,
           ]
         static_label: [no-static]
         include:
@@ -388,6 +418,9 @@ jobs:
             static_label: static
 
     runs-on: windows-latest
+
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
 
     steps:
       - name: Checkout
@@ -416,7 +449,9 @@ jobs:
           python_version: ${{needs.default_versions.outputs.python_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
+          webp_version: ${{needs.default_versions.outputs.webp_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # Linux fast CI: Build and test a single fast CI
@@ -432,6 +467,7 @@ jobs:
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
       DISPLAY: :0
 
     steps:
@@ -453,8 +489,9 @@ jobs:
           lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
           blosc_version: ${{needs.default_versions.outputs.blosc_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
-          vtk_version: v9.5.0
+          vtk_version: v9.5.2
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+<<<<<<< HEAD
           sqlite_version: version-3.42.1
           xercesc_version: v3.3.0
           curl_version: curl-8_15_0
@@ -463,6 +500,9 @@ jobs:
           libgeotiff_version: 1.7.4
           libtiff_version: v4.7.0
           gdal_version: v3.11.3
+=======
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
+>>>>>>> 4fc092a17dd5ab4c32cead874fd56feb7171db08
 
   #----------------------------------------------------------------------------
   # Linux CI: Build and test, cross-vtk build matrix
@@ -479,9 +519,13 @@ jobs:
         vtk_version:
           [
             "${{needs.default_versions.outputs.vtk_commit_sha}}",
-            v9.5.0,
+            v9.5.2,
             v9.4.2,
+<<<<<<< HEAD
             v9.3.1,
+=======
+            v9.3.0,
+>>>>>>> 4fc092a17dd5ab4c32cead874fd56feb7171db08
           ]
         build_type: [standard]
         include:
@@ -503,6 +547,7 @@ jobs:
           - python_version: ${{needs.default_versions.outputs.python_version}}
           - tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           - usd_version: ${{needs.default_versions.outputs.usd_version}}
+          - webp_version: ${{needs.default_versions.outputs.webp_version}}
           - zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           - pdal_version: 2.9.2
           - sqlite_version: version-3.42.1
@@ -532,6 +577,7 @@ jobs:
             python_version: ${{needs.default_versions.outputs.python_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_version}}
             usd_version: ${{needs.default_versions.outputs.usd_version}}
+            webp_version: ${{needs.default_versions.outputs.webp_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_version}}
             pdal_version: 2.9.2
             sqlite_version: version-3.42.1
@@ -561,6 +607,7 @@ jobs:
             python_version: ${{needs.default_versions.outputs.python_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_version}}
             usd_version: ${{needs.default_versions.outputs.usd_version}}
+            webp_version: ${{needs.default_versions.outputs.webp_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_version}}
             pdal_version: 2.9.2
             sqlite_version: version-3.42.1
@@ -590,6 +637,7 @@ jobs:
             python_version: ${{needs.default_versions.outputs.python_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_version}}
             usd_version: ${{needs.default_versions.outputs.usd_version}}
+            webp_version: ${{needs.default_versions.outputs.webp_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_version}}
             pdal_version: 2.9.2
             sqlite_version: version-3.42.1
@@ -627,6 +675,7 @@ jobs:
             python_version: ${{needs.default_versions.outputs.python_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_version}}
             usd_version: ${{needs.default_versions.outputs.usd_version}}
+            webp_version: ${{needs.default_versions.outputs.webp_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_version}}
             pdal_version: 2.9.2
             sqlite_version: version-3.42.1
@@ -656,6 +705,7 @@ jobs:
             python_version: ${{needs.default_versions.outputs.python_min_version}}
             tbb_version: ${{needs.default_versions.outputs.tbb_min_version}}
             usd_version: ${{needs.default_versions.outputs.usd_min_version}}
+            webp_version: ${{needs.default_versions.outputs.webp_min_version}}
             zlib_version: ${{needs.default_versions.outputs.zlib_min_version}}
             pdal_version: 2.9.2
             sqlite_version: version-3.42.1
@@ -670,6 +720,7 @@ jobs:
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
       DISPLAY: :0
 
     steps:
@@ -704,7 +755,9 @@ jobs:
           python_version: ${{matrix.python_version}}
           tbb_version: ${{matrix.tbb_version}}
           usd_version: ${{matrix.usd_version}}
+          webp_version: ${{matrix.webp_version}}
           zlib_version: ${{matrix.zlib_version}}
+<<<<<<< HEAD
           sqlite_version: version-3.42.1
           xercesc_version: v3.3.0
           curl_version: curl-8_15_0
@@ -713,6 +766,9 @@ jobs:
           libgeotiff_version: 1.7.4
           libtiff_version: v4.7.0
           gdal_version: v3.11.3
+=======
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
+>>>>>>> 4fc092a17dd5ab4c32cead874fd56feb7171db08
 
   #----------------------------------------------------------------------------
   # MacOS CI: Build and test, cross-vtk build matrix
@@ -727,15 +783,12 @@ jobs:
       fail-fast: false
       matrix:
         vtk_version:
-          [
-            "${{needs.default_versions.outputs.vtk_commit_sha}}",
-            v9.5.0,
-            v9.4.2,
-            v9.3.1,
-            v9.2.6,
-          ]
+          ["${{needs.default_versions.outputs.vtk_commit_sha}}", v9.5.2, v9.4.2]
 
-    runs-on: macos-13
+    runs-on: macos-15-intel
+
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
 
     steps:
       - name: Checkout
@@ -763,7 +816,9 @@ jobs:
           python_version: ${{needs.default_versions.outputs.python_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
+          webp_version: ${{needs.default_versions.outputs.webp_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # MacOS ARM CI: Build and test, cross-vtk build matrix with a few optional builds
@@ -777,12 +832,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        vtk_version: [
-            "${{needs.default_versions.outputs.vtk_commit_sha}}",
-            v9.5.0,
-            v9.4.2,
-            v9.3.1,
-          ] # VTK 9.2.6 not compatible with recent clang version on macOS
+        vtk_version:
+          ["${{needs.default_versions.outputs.vtk_commit_sha}}", v9.5.2, v9.4.2]
         bundle_label: [no-bundle]
         static_label: [no-static]
         include:
@@ -793,7 +844,10 @@ jobs:
             bundle_label: no-bundle
             static_label: static
 
-    runs-on: macos-14
+    runs-on: macos-15
+
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
 
     steps:
       - name: Checkout
@@ -823,7 +877,9 @@ jobs:
           python_version: ${{needs.default_versions.outputs.python_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
+          webp_version: ${{needs.default_versions.outputs.webp_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # Python packaging: Build and test the Python wheel
@@ -836,11 +892,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, windows-latest, macos-13]
-        python_version: ["3.11"]
+        os: [ubuntu-22.04, windows-latest, macos-15-intel]
+        python_version: ["3.14"]
         include:
-          - os: ubuntu-22.04
-            python_version: "3.9"
           - os: ubuntu-22.04
             python_version: "3.10"
           - os: ubuntu-22.04
@@ -849,12 +903,15 @@ jobs:
             python_version: "3.12"
           - os: ubuntu-22.04
             python_version: "3.13"
+          - os: ubuntu-22.04
+            python_version: "3.14"
 
     runs-on: ${{matrix.os}}
     container: ${{ matrix.os == 'ubuntu-22.04' && 'ghcr.io/f3d-app/f3d-ci' || null }}
 
     env:
       DISPLAY: :0
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
 
     steps:
       - name: Checkout
@@ -881,7 +938,9 @@ jobs:
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
+          webp_version: ${{needs.default_versions.outputs.webp_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # Coverage: Build and test on linux with last VTK with coverage option
@@ -925,7 +984,9 @@ jobs:
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
+          webp_version: ${{needs.default_versions.outputs.webp_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+<<<<<<< HEAD
           pdal_version: 2.9.2
           sqlite_version: version-3.42.1
           xercesc_version: v3.3.0
@@ -934,6 +995,9 @@ jobs:
           libgeotiff_version: 1.7.4
           libtiff_version: v4.7.0
           gdal_version: v3.11.3
+=======
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
+>>>>>>> 4fc092a17dd5ab4c32cead874fd56feb7171db08
 
   #----------------------------------------------------------------------------
   # Sanitizer: Build and test on linux with last VTK with sanitizer options
@@ -955,6 +1019,7 @@ jobs:
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
       DISPLAY: :0
       CC: clang
       CXX: clang++
@@ -982,7 +1047,9 @@ jobs:
           openexr_version: ${{needs.default_versions.outputs.openexr_version}}
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
+          webp_version: ${{needs.default_versions.outputs.webp_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # static-analysis: Run static analysis on linux
@@ -999,6 +1066,7 @@ jobs:
     container: ghcr.io/f3d-app/f3d-ci
 
     env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
       CC: clang
       CXX: clang++
 
@@ -1025,7 +1093,9 @@ jobs:
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
+          webp_version: ${{needs.default_versions.outputs.webp_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # external-build: Check build of F3D as sub-project
@@ -1040,6 +1110,9 @@ jobs:
 
     runs-on: ubuntu-22.04
     container: ghcr.io/f3d-app/f3d-ci
+
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
 
     steps:
       - name: Checkout
@@ -1056,6 +1129,7 @@ jobs:
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # Check android/wasm docker images
@@ -1099,7 +1173,7 @@ jobs:
         arch: [armeabi-v7a, arm64-v8a, x86, x86_64]
 
     runs-on: ubuntu-22.04
-    container: ghcr.io/f3d-app/f3d-android-${{ matrix.arch }}:${{needs.default_versions.outputs.timestamp}}
+    container: ghcr.io/f3d-app/f3d-android-${{ matrix.arch }}:${{needs.default_versions.outputs.docker_timestamp}}
 
     steps:
       - name: Checkout
@@ -1118,7 +1192,7 @@ jobs:
   # webassembly: Build webassembly artifacts
   #----------------------------------------------------------------------------
   webassembly:
-    needs: [default_versions, check_docker_images]
+    needs: [cache_lfs, default_versions, check_docker_images]
     if: |
       contains(github.event.pull_request.labels.*.name, 'ci:full') ||
       github.ref == 'refs/heads/master'
@@ -1129,68 +1203,41 @@ jobs:
 
     env:
       CMAKE_BUILD_PARALLEL_LEVEL: 4
-      F3D_DOCKER_TIMESTAMP: ${{needs.default_versions.outputs.timestamp}}
+      F3D_DOCKER_TIMESTAMP: ${{needs.default_versions.outputs.docker_timestamp}}
 
     steps:
-      # Note that LFS is needed in order to include the default model
       - name: Checkout
         uses: actions/checkout@v4
         with:
           path: "source"
           fetch-depth: 0
-          lfs: true
+          lfs: false
 
       - name: WebAssembly CI
         uses: ./source/.github/actions/wasm-ci
-
-  #----------------------------------------------------------------------------
-  # generate website
-  #----------------------------------------------------------------------------
-  generate-website:
-    needs: webassembly
-    name: Generate Website
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-          lfs: true
+          lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
 
-      - name: Build Jekyll
-        uses: actions/jekyll-build-pages@v1
+      # TODO: it's currently NOT using NPM, let's fix it when 3.3 is available
+      - name: Install dependencies
+        working-directory: ${{github.workspace}}/source/examples/libf3d/web
+        run: npm install
 
-      - name: Install doxygen and build doxygen doc
-        working-directory: ${{github.workspace}}
-        run: |
-          pip install "sphinx==5.3.0" "pydata-sphinx-theme==0.13.1" sphinx-book-theme exhale
-          sudo apt install doxygen
-          sphinx-build -M html ./library/doxygen ./library/doxygen/build/
-          sudo mv library/doxygen/build/html _site/doc/libf3d/doxygen
-          sphinx-build -M html ./vtkext/public/doxygen ./vtkext/public/doxygen/build/
-          sudo mv vtkext/public/doxygen/build/html _site/doc/libf3d/vtkext_doxygen
+      - name: Build F3D web app with npm F3D package
+        working-directory: ${{github.workspace}}/source/examples/libf3d/web
+        run: npm run build
 
       - name: Retrieve f3d package
         uses: actions/download-artifact@v4
         with:
           name: f3d-wasm-package
-          path: ${{github.workspace}}/examples/libf3d/web
+          path: ${{github.workspace}}/source/examples/libf3d/web
 
+      # Override with the locally built package
       - name: Install f3d package
-        working-directory: ${{github.workspace}}/examples/libf3d/web
+        working-directory: ${{github.workspace}}/source/examples/libf3d/web
         run: npm install f3d-*.tgz
 
-      - name: Build F3D web app
-        working-directory: ${{github.workspace}}/examples/libf3d/web
+      - name: Build F3D web app with package just built from branch
+        working-directory: ${{github.workspace}}/source/examples/libf3d/web
         run: npm run build
-
-      - name: Copy F3D web app
-        run: sudo mv ${{github.workspace}}/examples/libf3d/web/dist _site/web
-
-      - name: Deploy
-        if: github.ref == 'refs/heads/master'
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: _site
-          token: ${{ secrets.GITHUB_TOKEN }}
-          clean: true

@@ -26,6 +26,9 @@ int TestSDKAnimation([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   inter.toggleAnimation();
   test("isPlaying after toggle on", inter.isPlayingAnimation());
 
+  f3d::interactor& interRef = inter.triggerEventLoop(0.1);
+  test("triggerEventLoop returns self", &interRef == &inter);
+
   inter.stopAnimation();
   test("isPlaying after stop", !inter.isPlayingAnimation());
 

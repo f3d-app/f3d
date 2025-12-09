@@ -95,6 +95,7 @@ public:
     std::string ScreenshotFilename;
     std::string VerboseLevel;
     std::string MultiFileMode;
+    std::string MultiFileRegex;
     bool RecursiveDirAdd;
     bool RemoveEmptyFileGroups;
     std::vector<int> Resolution;
@@ -106,6 +107,12 @@ public:
     std::string InteractionTestRecordFile;
     std::string InteractionTestPlayFile;
     std::string CommandScriptFile;
+    std::string AntiAliasing;
+    std::string AntiAliasingMode; // Deprecated
+    std::string PointSprites;
+    std::string PointSpritesType; // Deprecated
+    bool TranslucencySupport;     // Deprecated
+    std::string Blending;
   };
 
   void SetupCamera(const CameraConfiguration& camConf)
@@ -515,7 +522,13 @@ public:
 
     // Initialize libf3dOptions
     f3d::options libOptions;
-    libOptions.ui.drop_zone.info = "Drop a file or HDRI to load it\nPress H to show cheatsheet";
+#if F3D_MODULE_UI
+#if F3D_MODULE_TINYFILEDIALOGS
+    libOptions.ui.drop_zone.custom_binds = "None+Drop Ctrl+O None+H";
+#else
+    libOptions.ui.drop_zone.custom_binds = "None+Drop None+H";
+#endif
+#endif
 
     // Copy appOptions
     F3DOptionsTools::OptionsDict appOptions = F3DOptionsTools::DefaultAppOptions;
@@ -553,117 +566,114 @@ public:
                 continue;
               }
 
-              // Handle CLI options deprecation
+              // Handle CLI options deprecation simple warnings
               if (key == "animation-index")
               {
                 f3d::log::warn("animation-index is deprecated, please use animation-indices");
               }
 
               // Convert key into a libf3d option name if possible
-              std::string libf3dOptionName = key;
               std::string keyForLog = key;
-              auto libf3dIter = F3DOptionsTools::LibOptionsNames.find(libf3dOptionName);
-              if (libf3dIter != F3DOptionsTools::LibOptionsNames.end())
+              for (const auto& libf3dOption : F3DOptionsTools::ConvertToLibf3dOptions(key, value))
               {
-                libf3dOptionName = std::string(libf3dIter->second);
-              }
+                auto [libf3dOptionName, libf3dOptionValue] = libf3dOption;
 
-              std::string libf3dOptionValue = value;
-              bool reset = false;
+                bool reset = false;
 
-              // Handle options reset
-              // XXX: Use starts_with once C++20 is supported
-              if (libf3dOptionName.rfind("reset-", 0) == 0)
-              {
-                if (libf3dOptionName.size() > 6)
+                // Handle options reset
+                // XXX: Use starts_with once C++20 is supported
+                if (libf3dOptionName.rfind("reset-", 0) == 0)
                 {
-                  reset = true;
-                  libf3dOptionName = libf3dOptionName.substr(6);
-                  keyForLog = libf3dOptionName;
-                  libf3dOptionValue = "reset";
+                  if (libf3dOptionName.size() > 6)
+                  {
+                    reset = true;
+                    libf3dOptionName = libf3dOptionName.substr(6);
+                    keyForLog = libf3dOptionName;
+                    libf3dOptionValue = "reset";
+                  }
+                  else
+                  {
+                    f3d::log::warn("Invalid option: 'reset' must be followed by a valid option "
+                                   "name, ignoring entry");
+                    continue;
+                  }
                 }
-                else
+
+                // Handle reader options
+                std::vector<std::string> readerOptionNames = f3d::engine::getAllReaderOptionNames();
+                if (std::find(readerOptionNames.begin(), readerOptionNames.end(),
+                      libf3dOptionName) != readerOptionNames.end())
                 {
-                  f3d::log::warn("Invalid option: 'reset' must be followed by a valid option "
-                                 "name, ignoring entry");
+                  f3d::engine::setReaderOption(libf3dOptionName, libf3dOptionValue);
                   continue;
                 }
-              }
 
-              // Handle reader options
-              std::vector<std::string> readerOptionNames = f3d::engine::getAllReaderOptionNames();
-              if (std::find(readerOptionNames.begin(), readerOptionNames.end(), libf3dOptionName) !=
-                readerOptionNames.end())
-              {
-                f3d::engine::setReaderOption(libf3dOptionName, libf3dOptionValue);
-                continue;
-              }
-
-              try
-              {
-                // Assume this is a libf3d option and set/reset the value
-                if (reset)
+                try
                 {
-                  libOptions.reset(libf3dOptionName);
-                }
-                else
-                {
-                  libOptions.setAsString(libf3dOptionName, libf3dOptionValue);
-                }
-
-                // Log the option if needed
-                if (logOptions)
-                {
-                  loggingMap[libf3dOptionName] =
-                    std::tuple(keyForLog, source, matchType, match, libf3dOptionValue);
-                }
-              }
-              catch (const f3d::options::parsing_exception& ex)
-              {
-                if (!quiet)
-                {
-                  std::string origin;
-                  if (source.empty())
+                  // Assume this is a libf3d option and set/reset the value
+                  if (reset)
                   {
-                    origin = match;
+                    libOptions.reset(libf3dOptionName);
                   }
                   else
                   {
-                    // TODO: Use std::format once C++20 is supported
-                    origin = source;
-                    origin += ":`";
-                    origin += match;
-                    origin += "` (";
-                    origin += matchType;
-                    origin += ")";
+                    libOptions.setAsString(libf3dOptionName, libf3dOptionValue);
                   }
-                  f3d::log::warn("Could not set '", keyForLog, "' to '", libf3dOptionValue,
-                    "' from ", origin, " because: ", ex.what());
+
+                  // Log the option if needed
+                  if (logOptions)
+                  {
+                    loggingMap[libf3dOptionName] =
+                      std::tuple(keyForLog, source, matchType, match, libf3dOptionValue);
+                  }
                 }
-              }
-              catch (const f3d::options::inexistent_exception&)
-              {
-                if (!quiet)
+                catch (const f3d::options::parsing_exception& ex)
                 {
-                  std::string origin;
-                  if (source.empty())
+                  if (!quiet)
                   {
-                    origin = match;
+                    std::string origin;
+                    if (source.empty())
+                    {
+                      origin = match;
+                    }
+                    else
+                    {
+                      // TODO: Use std::format once C++20 is supported
+                      origin = source;
+                      origin += ":`";
+                      origin += match;
+                      origin += "` (";
+                      origin += matchType;
+                      origin += ")";
+                    }
+                    f3d::log::warn("Could not set '", keyForLog, "' to '", libf3dOptionValue,
+                      "' from ", origin, " because: ", ex.what());
                   }
-                  else
+                }
+                catch (const f3d::options::inexistent_exception&)
+                {
+                  if (!quiet)
                   {
-                    // TODO: Use std::format once C++20 is supported
-                    origin = source;
-                    origin += ":`";
-                    origin += match;
-                    origin += "` (";
-                    origin += matchType;
-                    origin += ")";
+                    std::string origin;
+                    if (source.empty())
+                    {
+                      origin = match;
+                    }
+                    else
+                    {
+                      // TODO: Use std::format once C++20 is supported
+                      origin = source;
+                      origin += ":`";
+                      origin += match;
+                      origin += "` (";
+                      origin += matchType;
+                      origin += ")";
+                    }
+                    auto [closestName, dist] =
+                      F3DOptionsTools::GetClosestOption(libf3dOptionName, true);
+                    f3d::log::warn("'", keyForLog, "' option from ", origin,
+                      " does not exists , did you mean '", closestName, "'?");
                   }
-                  auto [closestName, dist] =
-                    F3DOptionsTools::GetClosestOption(libf3dOptionName, true);
-                  f3d::log::warn("'", keyForLog, "' option from ", origin,
-                    " does not exists , did you mean '", closestName, "'?");
                 }
               }
             }
@@ -686,34 +696,30 @@ public:
     // Update libf3d options
     this->LibOptions = libOptions;
 
-    // Update options that depends on both app and libf3d options
-    this->UpdateInterdependentOptions();
+    // Update options that depends on both libf3d and app options
+    // Note that this should not be used for interactive options
+    // As this break the logic of updating options by priority
+    // TODO: Rework to avoid this
+    this->UpdateInterdependantOptions();
   }
 
-  template<typename T>
-  bool Parse(const std::string& optionString, T& option)
-  {
-    try
-    {
-      option = f3d::options::parse<T>(optionString);
-      return true;
-    }
-    catch (const f3d::options::parsing_exception&)
-    {
-      return false;
-    }
-  }
-
+  /**
+   * Parse a named string option from appOptions into provided typed option.
+   */
   template<typename T>
   void ParseOption(
     const F3DOptionsTools::OptionsDict& appOptions, const std::string& name, T& option)
   {
-    if (!this->Parse(appOptions.at(name), option))
+    if (!F3DOptionsTools::Parse(appOptions.at(name), option))
     {
       f3d::log::warn("Could not parse '" + appOptions.at(name) + "' into '" + name + "' option");
     }
   }
 
+  /**
+   * Parse a named string option from appOptions into provided typed optional option.
+   * If the string is empty, set it to nullopt
+   */
   template<typename T>
   void ParseOption(const F3DOptionsTools::OptionsDict& appOptions, const std::string& name,
     std::optional<T>& option)
@@ -747,6 +753,7 @@ public:
     this->ParseOption(appOptions, "screenshot-filename", this->AppOptions.ScreenshotFilename);
     this->ParseOption(appOptions, "verbose", this->AppOptions.VerboseLevel);
     this->ParseOption(appOptions, "multi-file-mode", this->AppOptions.MultiFileMode);
+    this->ParseOption(appOptions, "multi-file-regex", this->AppOptions.MultiFileRegex);
     this->ParseOption(appOptions, "recursive-dir-add", this->AppOptions.RecursiveDirAdd);
     this->ParseOption(
       appOptions, "remove-empty-file-groups", this->AppOptions.RemoveEmptyFileGroups);
@@ -774,7 +781,7 @@ public:
     this->ParseOption(appOptions, "command-script", this->AppOptions.CommandScriptFile);
   }
 
-  void UpdateInterdependentOptions()
+  void UpdateInterdependantOptions()
   {
     // colormap-file and colormap are interdependent
     const std::string& colorMapFile = this->AppOptions.ColorMapFile;
@@ -932,7 +939,7 @@ public:
   {
     if (GlobalInteractor)
     {
-      GlobalInteractor->stop();
+      GlobalInteractor->requestStop();
       GlobalInteractor = nullptr;
     }
   }
@@ -1000,7 +1007,7 @@ int F3DStarter::Start(int argc, char** argv)
   iter = cliOptionsDict.find("no-config");
   if (iter != cliOptionsDict.end())
   {
-    if (!this->Internals->Parse(iter->second, noConfig))
+    if (!F3DOptionsTools::Parse(iter->second, noConfig))
     {
       f3d::log::warn(
         "Could not parse '" + iter->second + "' into 'no-config' option, assuming false");
@@ -1014,7 +1021,7 @@ int F3DStarter::Start(int argc, char** argv)
     if (iter != cliOptionsDict.end())
     {
       // XXX: Discarding bool return because this cannot return false with a string
-      this->Internals->Parse(iter->second, config);
+      F3DOptionsTools::Parse(iter->second, config);
     }
   }
 
@@ -1024,7 +1031,7 @@ int F3DStarter::Start(int argc, char** argv)
   {
     std::string localOutput;
     // XXX: Discarding bool return because this cannot return false with a string
-    this->Internals->Parse(iter->second, localOutput);
+    F3DOptionsTools::Parse(iter->second, localOutput);
     renderToStdout = localOutput == "-";
   }
 
@@ -1033,7 +1040,7 @@ int F3DStarter::Start(int argc, char** argv)
   if (iter != cliOptionsDict.end())
   {
     // XXX: Discarding bool return because this cannot return false with a string
-    this->Internals->Parse(iter->second, this->Internals->AppOptions.VerboseLevel);
+    F3DOptionsTools::Parse(iter->second, this->Internals->AppOptions.VerboseLevel);
   }
 
   // Set verbosity level early from command line
@@ -1064,6 +1071,20 @@ int F3DStarter::Start(int argc, char** argv)
   {
     f3d::log::warn("Unrecognized multi-file-mode: ", mode, ". Assuming \"single\" mode.");
     this->Internals->AppOptions.MultiFileMode = "single";
+  }
+
+  if (!this->Internals->AppOptions.MultiFileRegex.empty())
+  {
+    try
+    {
+      std::regex regex(this->Internals->AppOptions.MultiFileRegex);
+    }
+    catch (const std::regex_error&)
+    {
+      f3d::log::error(
+        "invalid regular expression: ", std::quoted(this->Internals->AppOptions.MultiFileRegex));
+      this->Internals->AppOptions.MultiFileRegex = "";
+    }
   }
 
 #if __APPLE__
@@ -1798,6 +1819,30 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
       const auto pathToGroupKey = [&]()
       {
         // XXX more multi-file mode may be added in the future
+        std::string tmpPathString = tmpPath.string();
+        if (!this->Internals->AppOptions.MultiFileRegex.empty())
+        {
+          const std::regex regex(this->Internals->AppOptions.MultiFileRegex);
+          std::smatch match;
+          if (std::regex_search(tmpPathString, match, regex))
+          {
+            // Replace captured groups with `*` so that, for example,
+            // `"foo-part12.xyz"` matching `part(\d+)` becomes `"foo-part*.xyz"`
+            std::stringstream groupKey;
+            size_t j = 0;
+            for (size_t i = 1; i <= regex.mark_count(); ++i)
+            {
+              if (match.length(i) &&                                 // skip empty
+                match.position(i) >= static_cast<std::ptrdiff_t>(j)) // or nested groups
+              {
+                groupKey << tmpPathString.substr(j, match.position(i) - j) << "*";
+                j = match.position(i) + match.length(i);
+              }
+            }
+            groupKey << tmpPathString.substr(j);
+            return groupKey.str();
+          }
+        }
         if (this->Internals->AppOptions.MultiFileMode == "all")
         {
           return std::string("");
@@ -1806,7 +1851,7 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
         {
           return tmpPath.parent_path().string();
         }
-        return tmpPath.string();
+        return tmpPathString;
       };
 
       const std::string groupKey = pathToGroupKey();
@@ -1875,6 +1920,25 @@ void F3DStarter::ResetWindowName()
 {
   f3d::window& window = this->Internals->Engine->getWindow();
   window.setWindowName(F3D::AppTitle).setIcon(F3DIcon, sizeof(F3DIcon));
+}
+
+//----------------------------------------------------------------------------
+std::vector<std::string> F3DStarter::GetExtensions()
+{
+  std::vector<std::string> filters;
+  for (const auto& info : f3d::engine::getReadersInfo())
+  {
+    for (const auto& ext : info.Extensions)
+    {
+#ifdef __APPLE__
+      filters.push_back(ext);
+#else
+      filters.push_back("*." + ext);
+#endif
+    }
+  }
+
+  return filters;
 }
 
 //----------------------------------------------------------------------------
@@ -1952,10 +2016,34 @@ void F3DStarter::AddCommands()
             [&](const std::string& ext) { return "." + ext; });
         }
 
+        const auto filenameStartsWithPattern = [&filePattern](std::string_view filename)
+        {
+#if defined(_WIN32) || defined(__APPLE__)
+          // Windows and Linux filesystems are case-insensitive by default
+          // Perform a case insensitive search
+          if (filePattern.size() > filename.size())
+          {
+            return false;
+          }
+
+          return std::equal(filePattern.begin(), filePattern.end(), filename.begin(),
+            [](char a, char b)
+            {
+              return std::tolower(static_cast<unsigned char>(a)) ==
+                std::tolower(static_cast<unsigned char>(b));
+            });
+#else
+          // Linux filesystems are typically case-sensitive
+          // Perform a case sensitive search
+          // Using rfind to avoid dependency for C++20 starts_with
+          return filename.rfind(filePattern, 0) == 0;
+#endif
+        };
+
         for (const auto& path : dirContent)
         {
           // Select candidates that starts with filePattern
-          if (path.filename().string().rfind(filePattern, 0) == 0)
+          if (filenameStartsWithPattern(path.filename().string()))
           {
             // filter out candidate files with the unsupported extensions
             if (fs::is_regular_file(path) &&
@@ -1969,6 +2057,9 @@ void F3DStarter::AddCommands()
           }
         }
       }
+
+      // Sort for output readability and test reproducibility
+      std::sort(candidates.begin(), candidates.end());
 
       if (candidates.size() == 1 && fs::is_directory(candidates[0]))
       {
@@ -2199,15 +2290,7 @@ void F3DStarter::AddCommands()
     "open_file_dialog",
     [this](const std::vector<std::string>&)
     {
-      std::vector<std::string> filters;
-      for (const auto& info : f3d::engine::getReadersInfo())
-      {
-        for (const auto& ext : info.Extensions)
-        {
-          filters.push_back("*." + ext);
-        }
-      }
-
+      std::vector<std::string> filters = F3DStarter::GetExtensions();
       std::vector<const char*> cstrings;
       cstrings.reserve(filters.size());
       for (const auto& filter : filters)
@@ -2218,12 +2301,16 @@ void F3DStarter::AddCommands()
       std::optional<std::string> file = f3d::utils::getEnv("CTEST_OPEN_DIALOG_FILE");
       if (!file.has_value())
       {
+#ifdef __APPLE__
+        F3DNSDelegate::ShowOpenFileDialog(cstrings.data(), cstrings.size());
+#else
         char* ptr = tinyfd_openFileDialog("Open File", nullptr, static_cast<int>(cstrings.size()),
           cstrings.data(), "Supported Files", false);
         if (ptr)
         {
           file = ptr;
         }
+#endif
       }
 
       if (file.has_value())

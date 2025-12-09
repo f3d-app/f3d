@@ -5,23 +5,25 @@
     "OpenVDB is part of VFX reference platform (CY2025: 12.x)",
     "OpenVDB min version is not enforced by F3D code and missing from VTK code",
     "Python is part of VFX reference platform (CY2025: 3.11)",
-    "OSPRay is fixed at 2.12.0 until full support for OSPRay 3.0 is added in VTK"
+    "OSPRay is fixed at 2.12.0 until full support for OSPRay 3.0 is added in VTK",
+    "TBB is set at v2021.13.1 because OpenUSD seems to not support more revent versions: https://github.com/PixarAnimationStudios/OpenUSD/issues/3878"
   ],
   "versions": {
-    "alembic": "1.8.8",
+    "alembic": "1.8.9",
     "assimp": "v6.0.2",
     "blosc": "v1.21.6",
     "draco": "1.5.7",
-    "imath": "v3.1.12",
-    "java": "21",
-    "occt": "V7_9_1",
-    "openexr": "v3.3.4",
-    "openvdb": "v12.0.1",
+    "imath": "v3.2.2",
+    "java": "25",
+    "occt": "V7_9_2",
+    "openexr": "v3.4.2",
+    "openvdb": "v12.1.1",
     "ospray": "v2.12.0",
-    "pybind11": "v2.13.6",
-    "python": "3.13",
-    "tbb": "v2021.12.0",
-    "usd": "v25.05.01",
+    "pybind11": "v3.0.1",
+    "python": "3.14",
+    "tbb": "v2021.13.1",
+    "usd": "v25.11",
+    "webp": "v1.6.0",
     "zlib": "v1.3.1"
   },
   "min_versions": {
@@ -36,11 +38,13 @@
     "openvdb": "v12.0.0",
     "ospray": "v2.12.0",
     "pybind11": "v2.9.2",
-    "python": "3.9",
+    "python": "3.10",
     "tbb": "v2021.10.0",
     "usd": "v24.08",
+    "webp": "v1.2.4",
     "zlib": "v1.2.13"
   },
-  "vtk_commit_sha": "f79f45bccf13df70c8937ea99f1e492eb5b7cf94",
-  "timestamp": "20250809_0"
+  "vtk_commit_sha": "f2897dc025ab604a8edeff3f04bd07936edbc4a8",
+  "docker_timestamp": "20250203_1",
+  "global_cache_index": "1"
 }

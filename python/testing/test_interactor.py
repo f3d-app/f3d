@@ -11,8 +11,8 @@ def doc_fn():
     return "dummyDoc", "dummyValue"
 
 
-def compl_fn():
-    return "compl"
+def compl_fn(args: list[str]):
+    return ["compl"]
 
 
 def test_command(capfd: pytest.CaptureFixture[str]):
@@ -32,9 +32,40 @@ def test_command(capfd: pytest.CaptureFixture[str]):
     out, _err = capfd.readouterr()
     assert out == "['arg1', 'arg2']\n"
 
+    # Check a command can be triggered with #
+    inter.add_command("my_cmd", print_fn)
+    inter.trigger_command("my_cmd arg1 arg2 #000", False)
+    inter.remove_command("my_cmd")
+    out, _err = capfd.readouterr()
+    assert out == "['arg1', 'arg2', '#000']\n"
+
     # Smoke test
     inter.init_commands()
-    inter.add_command("my_cmd2", print_fn, ["my_cmd2", "doc"], compl_fn)
+    inter.add_command("my_cmd2", print_fn, ("my_cmd2", "doc"), compl_fn)
+
+
+def test_command_completion(capfd: pytest.CaptureFixture[str]):
+    engine = f3d.Engine.create(True)
+    inter = engine.interactor
+
+    # Check default commands can be removed
+    actions = inter.get_command_actions()
+    for action in actions:
+        inter.remove_command(action)
+    assert len(inter.get_command_actions()) == 0
+
+    # Smoke test
+    inter.init_commands()
+    inter.add_command("cmd", print_fn, ("cmd", "doc"), compl_fn)
+
+    engine.window.render()
+
+    inter.trigger_keyboard_key(inter.InputAction.PRESS, "Escape")
+    inter.trigger_keyboard_key(inter.InputAction.RELEASE, "Escape")
+    for c in "cmd ":
+        inter.trigger_text_character(ord(c))
+    inter.trigger_keyboard_key(inter.InputAction.PRESS, "Tab")
+    inter.trigger_keyboard_key(inter.InputAction.RELEASE, "Tab")
 
 
 def test_binding():

@@ -67,6 +67,7 @@
 - WaterBottle.glb: glTF-Sample-Models: Public Domain
 - Wolf.fbx: OLEKSO: [CC-NC 4.0](http://creativecommons.org/licenses/by-nc/4.0/)
 - world\*: VTK Data: BSD-3-Clause
+- xform_anim.abc: Public Domain
 - zombie\*.mdl: LibreQuake Project: BSD-3-Clause
 - bunnyInt19.e57: libE57.org: [MIT](http://www.libe57.org/data.html)
 
