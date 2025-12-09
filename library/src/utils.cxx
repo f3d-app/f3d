@@ -332,6 +332,22 @@ std::string utils::globToRegex(std::string_view glob, char pathSeparator)
 }
 
 //----------------------------------------------------------------------------
+const float utils::getDPIScale()
+{
+#ifdef WIN32
+  HDC hdc = GetDC(NULL);
+
+  if (hdc)
+  {
+    const int dpi = GetDeviceCaps(hdc, LOGPIXELSY); // Default return 96
+    ReleaseDC(NULL, hdc);
+    return static_cast<float>(dpi) / 96;
+  }
+#endif
+  return 1.f;
+}
+
+//----------------------------------------------------------------------------
 std::optional<std::string> utils::getEnv(const std::string& env)
 {
   std::string val;
