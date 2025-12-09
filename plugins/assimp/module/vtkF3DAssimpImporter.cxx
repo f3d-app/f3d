@@ -1,8 +1,10 @@
 #include "vtkF3DAssimpImporter.h"
 
+#include <assimp/ProgressHandler.hpp>
 #include <vtkActor.h>
 #include <vtkActorCollection.h>
 #include <vtkCamera.h>
+#include <vtkCommand.h>
 #include <vtkDoubleArray.h>
 #include <vtkFloatArray.h>
 #include <vtkImageData.h>
@@ -42,6 +44,27 @@
 #include <memory>
 #include <regex>
 
+class F3DAssimpProgressHandler : public Assimp::ProgressHandler
+{
+public:
+  explicit F3DAssimpProgressHandler(vtkF3DAssimpImporter* parent)
+    : Parent(parent)
+  {
+  }
+
+  bool Update(float percentage = -1.f) override
+  {
+    double reportPercentage = percentage < 0 ? double{ 1.0 } : static_cast<double>(percentage);
+
+    this->Parent->InvokeEvent(vtkCommand::ProgressEvent, static_cast<void*>(&reportPercentage));
+
+    return percentage < 0 ? false : true;
+  }
+
+private:
+  vtkF3DAssimpImporter* Parent;
+};
+
 vtkStandardNewMacro(vtkF3DAssimpImporter);
 
 class vtkF3DAssimpImporter::vtkInternals
@@ -51,6 +74,12 @@ public:
   explicit vtkInternals(vtkF3DAssimpImporter* parent)
     : Parent(parent)
   {
+    auto progressHandler = new F3DAssimpProgressHandler(parent);
+
+    if (this->Importer.IsDefaultProgressHandler())
+    {
+      this->Importer.SetProgressHandler(static_cast<Assimp::ProgressHandler*>(progressHandler));
+    }
   }
 
   //----------------------------------------------------------------------------
