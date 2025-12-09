@@ -34,6 +34,7 @@ MouseMoveEvent 700 193 0 0 0 0 0
 TimerEvent 700 193 0 0 0 0 0
 TimerEvent 700 193 0 0 0 0 0
 TimerEvent 700 193 0 0 0 0 0
+# H
 KeyPressEvent 700 193 0 104 1 h 0
 CharEvent 700 193 0 104 1 h 0
 TimerEvent 700 193 0 104 1 h 0
