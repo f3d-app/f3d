@@ -39,6 +39,7 @@ if(F3D_MODULE_UI)
     TestSDKInteractorDocumentation.cxx
     TestSDKMultiOptions.cxx
     TestSDKTriggerInteractions.cxx
+    TestSDKTriggerInteractionsWithoutRender.cxx
     )
 
   # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
