@@ -135,6 +135,25 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     const mdl_simpleframe_t* frames; // simple frame list
   };
 
+  // Safer buffer typecasting of arbitrary buffer location with variable length data
+  static const mdl_simpleframe_t* peek_from_vector_simpleframe(
+    const std::vector<uint8_t>& buffer, const size_t& offset, size_t num_verts = 0)
+  {
+    static constexpr auto mdl_simpleframe_t_minimal =
+      sizeof(mdl_simpleframe_t) - sizeof(mdl_simpleframe_t::verts);
+    static_assert(std::is_pod<mdl_simpleframe_t>::value, "Vector typecast requires POD input");
+
+    // check that we have enough data for the given number of verts requested
+    if (offset + mdl_simpleframe_t_minimal + num_verts * sizeof(mdl_simpleframe_t::verts[0]) >
+      buffer.size())
+    {
+      throw F3DRangeError("Requested data out of range.");
+    }
+
+    return reinterpret_cast<const mdl_simpleframe_t*>(buffer.data() + offset);
+    ;
+  }
+
   //----------------------------------------------------------------------------
   explicit vtkInternals(vtkF3DQuakeMDLImporter* parent)
     : Parent(parent)
@@ -305,19 +324,10 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
           framePtr[i].nb = nullptr;
           framePtr[i].time = nullptr;
           // Note : mdl_simpleframe_t can have *up to and including* 1024 verts. So if this data is
-          // the last in the file the peek_at_vector func will error out. As such we manually check
-          // this to see if all the verts are valid. If they are, continue.
+          // the last in the file the peek_at_vector func will error out. As such we use a different
+          // helper.
           framePtr[i].frames =
-            reinterpret_cast<const mdl_simpleframe_t*>(buffer.data() + sizeof(int32_t) + offset);
-
-          if (offset + sizeof(int32_t) + mdl_simpleframe_t_fixed_size > buffer.size() ||
-            offset + sizeof(int32_t) + mdl_simpleframe_t_fixed_size +
-                sizeof(mdl_vertex_t) * header->numVertices >
-              buffer.size())
-          {
-            // Not enough room for mdl_simpleframe_t - verts[] or mdl_simple_frame_t
-            throw F3DRangeError("Requested data out of range.");
-          }
+            peek_from_vector_simpleframe(buffer, offset + sizeof(int32_t), header->numVertices);
 
           // Size of a frame is mdl_simpleframe_t_fixed_size + mdl_vertex_t * numVertices, +
           // sizeof(int)
@@ -335,17 +345,10 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
             buffer, offset + (2 * sizeof(int32_t)) + (2 * sizeof(mdl_vertex_t)));
           // Points to the first frame, 4 * nbFrames for the float array
           // note : see above
-          framePtr[i].frames =
-            reinterpret_cast<const mdl_simpleframe_t*>(buffer.data() + 2 * sizeof(int32_t) +
-              2 * sizeof(mdl_vertex_t) + (*framePtr[i].nb) * sizeof(float) + offset);
-            
-          if (offset + sizeof(int32_t) + mdl_simpleframe_t_fixed_size > buffer.size() ||
-            offset + sizeof(int32_t) + mdl_simpleframe_t_fixed_size +
-                sizeof(mdl_vertex_t) * header->numVertices >
-              buffer.size())
-          {
-            throw F3DRangeError("Requested data out of range.");
-          }
+          framePtr[i].frames = peek_from_vector_simpleframe(buffer,
+            offset + 2 * sizeof(int32_t) + 2 * sizeof(mdl_vertex_t) +
+              (*framePtr[i].nb) * sizeof(float),
+            header->numVertices);
 
           offset +=
             2 * sizeof(int32_t) + 2 * sizeof(mdl_vertex_t) + (*framePtr[i].nb) * sizeof(float);
@@ -483,9 +486,10 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
           // Iterate over each frame in the group
           for (int groupFrameNum = 0; groupFrameNum < *pluginFramePtr.nb; groupFrameNum++)
           {
+
             // Recover the frame using the offsets because the struct does not store this pointer
-            auto frame =
-              peek_from_vector<mdl_simpleframe_t>(buffer, frameOffsets[frameNum][groupFrameNum]);
+            auto frame = peek_from_vector_simpleframe(
+              buffer, frameOffsets[frameNum][groupFrameNum], header->numVertices);
 
             // Assume all frames are named identicaly in the group
             if (animationName.empty())
