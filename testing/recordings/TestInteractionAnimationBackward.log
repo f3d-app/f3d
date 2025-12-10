@@ -1,39 +1,20 @@
 # StreamVersion 1.2
 ExposeEvent 0 289 0 0 0 0 0
 RenderEvent 0 289 0 0 0 0 0
-TimerEvent 0 289 0 0 0 0 0
-TimerEvent 0 289 0 0 0 0 0
+
+# Ctrl + Shift + Space
 KeyPressEvent 1006 -1296 0 0 1 Control_L 0
-CharEvent 1006 -1296 0 0 1 Control_L 0
-TimerEvent 1006 -1296 0 0 1 Control_L 0
-TimerEvent 1006 -1296 0 0 1 Control_L 0
-TimerEvent 1006 -1296 0 0 1 Control_L 0
 KeyPressEvent 1006 -1296 2 0 1 Shift_L 0
-CharEvent 1006 -1296 2 0 1 Shift_L 0
-TimerEvent 1006 -1296 2 0 1 Shift_L 0
-TimerEvent 1006 -1296 2 0 1 Shift_L 0
-TimerEvent 1006 -1296 2 0 1 Shift_L 0
 KeyPressEvent 1006 -1296 3 0 1 space 0
-CharEvent 1006 -1296 3 0 1 space 0
 TimerEvent 1006 -1296 3 0 1 space 0
 TimerEvent 1006 -1296 3 0 1 space 0
 TimerEvent 1006 -1296 3 0 1 space 0
-KeyReleaseEvent 1006 -1296 3 0 1 space 0
 TimerEvent 1006 -1296 3 0 1 space 0
-KeyReleaseEvent 1006 -1296 3 0 1 Shift_L 0
 TimerEvent 1006 -1296 3 0 1 Shift_L 0
+TimerEvent 1006 -1296 2 0 1 Control_L 0
+TimerEvent 1006 -1296 2 0 1 Control_L 0
+TimerEvent 1006 -1296 2 0 1 Control_L 0
+TimerEvent 1006 -1296 2 0 1 Control_L 0
+KeyReleaseEvent 1006 -1296 3 0 1 space 0
+KeyReleaseEvent 1006 -1296 3 0 1 Shift_L 0
 KeyReleaseEvent 1006 -1296 2 0 1 Control_L 0
-TimerEvent 1006 -1296 2 0 1 Control_L 0
-TimerEvent 1006 -1296 2 0 1 Control_L 0
-TimerEvent 1006 -1296 2 0 1 Control_L 0
-TimerEvent 1006 -1296 2 0 1 Control_L 0
-TimerEvent 1006 -1296 2 0 1 Control_L 0
-TimerEvent 1006 -1296 2 0 1 Control_L 0
-KeyPressEvent 1006 -1296 0 32 1 space 0
-CharEvent 1006 -1296 0 32 1 space 0
-TimerEvent 1006 -1296 0 32 1 space 0
-KeyReleaseEvent 1006 -1296 0 32 1 space 0
-TimerEvent 1006 -1296 0 32 1 space 0
-TimerEvent 1006 -1296 0 32 1 space 0
-TimerEvent 1006 -1296 0 32 1 space 0
-TimerEvent 1006 -1296 0 32 1 space 0
