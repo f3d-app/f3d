@@ -528,8 +528,14 @@ bool vtkF3DMetaImporter::GetTemporalInformation(vtkIdType animationIndex,double 
 
     if (localAnimationIndex < nAnim)
     {
+
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 5, 20251210)
+      return importerPair.Importer->GetTemporalInformation(
+        localAnimationIndex, 0, nbTimeSteps, timeRange, timeSteps);
+#else
       return importerPair.Importer->GetTemporalInformation(
         localAnimationIndex, timeRange, nbTimeSteps, timeSteps);
+#endif
     }
     else
     {

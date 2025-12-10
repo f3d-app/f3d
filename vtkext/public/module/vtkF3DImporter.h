@@ -57,6 +57,15 @@ public:
   }
 #endif
 
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 5, 20251210)
+  /**
+   * Forward call to pre-20251210 implementation for GetTemporalInformation
+   * with framerate at 0
+   */
+  virtual bool GetTemporalInformation(
+    vtkIdType animationIndex, double timeRange[2], int& nbTimeSteps, vtkDoubleArray* timeSteps);
+#endif
+
   /**
    * Call this method to set the status to failure if supported
    * by the VTK version in use
