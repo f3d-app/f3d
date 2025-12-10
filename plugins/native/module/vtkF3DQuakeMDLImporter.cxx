@@ -568,8 +568,9 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       return false;
     }
 
-    if (header->IDPO != 1330660425)
-    { // check magic number for "IPDO"
+    // check magic number for "IPDO" or "IDST"
+    if (!(header->IDPO != 1330660425 || header->IDPO != 1414743113))
+    {
       vtkErrorWithObjectMacro(this->Parent, "Header Magic number incorrect, aborting.");
       return false;
     }
