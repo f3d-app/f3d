@@ -893,27 +893,10 @@ public:
       f3d::window& window = this->Engine->getWindow();
       if (this->AppOptions.Resolution.size() == 2)
       {
-        F3DOptionsTools::OptionsDict appOptions = F3DOptionsTools::DefaultAppOptions;
-        std::vector<int> defaultRes;
+        double dpiScale = f3d::utils::getDPIScale();
 
-        this->ParseOption(appOptions, "resolution", defaultRes);
-
-        // If user did not set window size, scale it base on fontScale and system zoom scale
-        if (defaultRes != this->AppOptions.Resolution)
-        {
-          window.setSize(this->AppOptions.Resolution[0], this->AppOptions.Resolution[1]);
-        }
-        else
-        {
-          const float dpiScale = f3d::utils::getDPIScale();
-
-          int width =
-            static_cast<int>(this->AppOptions.Resolution[0] * this->LibOptions.ui.scale * dpiScale);
-          int height =
-            static_cast<int>(this->AppOptions.Resolution[1] * this->LibOptions.ui.scale * dpiScale);
-
-          window.setSize(width, height);
-        }
+        window.setSize(static_cast<int>(this->AppOptions.Resolution[0] * dpiScale),
+          static_cast<int>(this->AppOptions.Resolution[1] * dpiScale));
       }
       else if (!this->AppOptions.Resolution.empty())
       {
