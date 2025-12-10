@@ -366,11 +366,12 @@ public:
     while (!objects.empty())
     {
       const auto& [parent, ohead, matrix] = objects.top();
+      const Alembic::AbcGeom::IObject obj(parent, ohead.getName());
+      Alembic::Abc::M44d objMatrix = matrix;
       if (Alembic::AbcGeom::IPolyMesh::matches(ohead))
       {
         const Alembic::AbcGeom::IPolyMesh polymesh(parent, ohead.getName());
-        append->AddInputData(this->ProcessIPolyMesh(polymesh, time, matrix));
-        objects.pop();
+        append->AddInputData(this->ProcessIPolyMesh(polymesh, time, objMatrix));
       }
       else if (Alembic::AbcGeom::IXform::matches(ohead))
       {
@@ -378,12 +379,13 @@ public:
         const Alembic::AbcGeom::IXformSchema& xFormSchema = xForm.getSchema();
         Alembic::AbcGeom::XformSample xFormSamp;
         xFormSchema.get(xFormSamp, selector);
-        const Alembic::Abc::M44d xFormMatrix = matrix * xFormSamp.getMatrix();
-        objects.pop();
-        for (size_t i = 0; i < xForm.getNumChildren(); ++i)
-        {
-          objects.emplace(std::make_tuple(xForm, xForm.getChildHeader(i), xFormMatrix));
-        }
+        objMatrix = matrix * xFormSamp.getMatrix();
+      }
+
+      objects.pop();
+      for (size_t i = 0; i < obj.getNumChildren(); ++i)
+      {
+        objects.emplace(std::make_tuple(obj, obj.getChildHeader(i), objMatrix));
       }
     }
   }
@@ -402,6 +404,7 @@ public:
     while (!objects.empty())
     {
       const auto& [parent, ohead] = objects.top();
+      const Alembic::AbcGeom::IObject obj(parent, ohead.getName());
       int numSamples = 0;
       Alembic::Abc::TimeSamplingPtr ts;
       if (Alembic::AbcGeom::IXform::matches(ohead))
@@ -410,11 +413,6 @@ public:
         const Alembic::AbcGeom::IXformSchema& schema = xForm.getSchema();
         ts = schema.getTimeSampling();
         numSamples = static_cast<int>(schema.getNumSamples());
-        objects.pop();
-        for (size_t i = 0; i < xForm.getNumChildren(); ++i)
-        {
-          objects.emplace(std::make_pair(xForm, xForm.getChildHeader(i)));
-        }
       }
       else if (Alembic::AbcGeom::IPolyMesh::matches(ohead))
       {
@@ -422,7 +420,17 @@ public:
         const Alembic::AbcGeom::IPolyMeshSchema& schema = polymesh.getSchema();
         ts = schema.getTimeSampling();
         numSamples = static_cast<int>(schema.getNumSamples());
-        objects.pop();
+      }
+
+      objects.pop();
+      for (size_t i = 0; i < obj.getNumChildren(); ++i)
+      {
+        objects.emplace(std::make_pair(obj, obj.getChildHeader(i)));
+      }
+
+      if (ts == nullptr)
+      {
+        continue;
       }
 
       if (ts->getTimeSamplingType().isUniform())
