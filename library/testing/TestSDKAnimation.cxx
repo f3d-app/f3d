@@ -32,5 +32,7 @@ int TestSDKAnimation([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   inter.stopAnimation();
   test("isPlaying after stop", !inter.isPlayingAnimation());
 
+  test("getAnimationName returns name", inter.getAnimationName(), "unnamed_0");
+
   return test.result();
 }
