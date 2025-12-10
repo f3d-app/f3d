@@ -540,6 +540,7 @@ void animationManager::SetSpeedFactor(double speedFactor)
   }
 }
 
+//----------------------------------------------------------------------------
 void animationManager::SetAnimationDirection(int direction)
 {
   assert(direction == 1 || direction == -1);
