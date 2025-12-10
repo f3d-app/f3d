@@ -332,37 +332,41 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         framePtr[i].type = peek_from_vector<int>(buffer, offset);
         if (*framePtr[i].type == SINGLE_FRAME)
         {
+          // Alias offset
+          auto _offset = offset + sizeof(int32_t);
           framePtr[i].nb = nullptr;
           framePtr[i].time = nullptr;
-          // Note : mdl_simpleframe_t can have *up to and including* 1024 verts. So if this data is
-          // the last in the file the peek_at_vector func will error out. As such we use a different
-          // helper.
-          framePtr[i].frames =
-            peek_from_vector_simpleframe(buffer, offset + sizeof(int32_t), header->numVertices);
 
           // Size of a frame is mdl_simpleframe_t_fixed_size + mdl_vertex_t * numVertices, +
           // sizeof(int)
-          offset += sizeof(int32_t) + mdl_simpleframe_t_fixed_size +
-            sizeof(mdl_vertex_t) * header->numVertices;
+
+          // Note : mdl_simpleframe_t can have *up to and including* 1024 verts. So if this data is
+          // the last in the file the peek_at_vector func will error out. As such we use a different
+          // helper.
+          framePtr[i].frames = read_from_vector_simpleframe(buffer, _offset, header->numVertices);
+          // Apply alias
+          offset = _offset;
 
           // Always emplace in case of mixed single frame and group frame
           frameOffsets.emplace_back(std::vector<int>());
         }
         else
         {
-          framePtr[i].nb = peek_from_vector<int>(buffer, offset + sizeof(int32_t));
+          // Alias offset
+          auto _offset = offset + sizeof(int32_t);
+          framePtr[i].nb = read_from_vector<int>(buffer, _offset);
           // Skips parameters min and max.
-          framePtr[i].time = peek_from_vector<float>(
-            buffer, offset + (2 * sizeof(int32_t)) + (2 * sizeof(mdl_vertex_t)));
+          _offset += (2 * sizeof(mdl_vertex_t));
+          framePtr[i].time = peek_from_vector<float>(buffer, _offset);
           // Points to the first frame, 4 * nbFrames for the float array
           // note : see above
-          framePtr[i].frames = peek_from_vector_simpleframe(buffer,
-            offset + 2 * sizeof(int32_t) + 2 * sizeof(mdl_vertex_t) +
-              (*framePtr[i].nb) * sizeof(float),
-            header->numVertices);
+          framePtr[i].frames = peek_from_vector_simpleframe(
+            buffer, _offset + (*framePtr[i].nb) * sizeof(float), header->numVertices);
 
-          offset +=
-            2 * sizeof(int32_t) + 2 * sizeof(mdl_vertex_t) + (*framePtr[i].nb) * sizeof(float);
+          _offset += (*framePtr[i].nb) * sizeof(float);
+          // Apply alias
+          offset = _offset;
+          
           frameOffsets.emplace_back(std::vector<int>());
 
           // check that we wont run off the buffer during loop
