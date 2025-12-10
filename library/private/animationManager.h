@@ -152,7 +152,6 @@ private:
 
   // Dynamic options
   bool Autoplay = false;
-  double DeltaTime = 1.0;
   double SpeedFactor = 1.0;
 
   vtkSmartPointer<vtkProgressBarWidget> ProgressWidget;

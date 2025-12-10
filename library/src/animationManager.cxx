@@ -166,7 +166,6 @@ void animationManager::Tick(double deltaTime)
   if (this->Playing)
   {
     this->CurrentTime += deltaTime * this->SpeedFactor;
-    this->DeltaTime = deltaTime;
 
     // Modulo computation, compute CurrentTime in the time range.
     if (this->CurrentTime < this->TimeRange[0] || this->CurrentTime > this->TimeRange[1])
