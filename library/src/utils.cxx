@@ -333,7 +333,7 @@ std::string utils::globToRegex(std::string_view glob, char pathSeparator)
 }
 
 //----------------------------------------------------------------------------
-float utils::getDPIScale()
+double utils::getDPIScale()
 {
   return F3DUtils::getDPIScale();
 }
