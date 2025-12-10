@@ -15,8 +15,8 @@ int TestSDKTriggerInteractionsWithoutRender(
   eng.getWindow().setSize(300, 300);
   eng.getScene().add(DataPath);
   f3d::interactor& inter = eng.getInteractor();
-  
-  // Trigger mouse wheel 
+
+  // Trigger mouse wheel
   inter.triggerMouseWheel(f3d::interactor::WheelDirection::BACKWARD);
   inter.triggerMouseWheel(f3d::interactor::WheelDirection::FORWARD);
 
@@ -32,10 +32,9 @@ int TestSDKTriggerInteractionsWithoutRender(
  
   // Trigger rotate camera with mouse left button
   inter.triggerMousePosition(150, 100);
-  
+
   // Trigger mouse button
-  inter.triggerMouseButton(
-    f3d::interactor::InputAction::PRESS, f3d::interactor::MouseButton::LEFT);
+  inter.triggerMouseButton(f3d::interactor::InputAction::PRESS, f3d::interactor::MouseButton::LEFT);
   inter.triggerMouseButton(
     f3d::interactor::InputAction::RELEASE, f3d::interactor::MouseButton::LEFT);
   inter.triggerMouseButton(
