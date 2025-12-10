@@ -253,28 +253,16 @@ bool animationManager::LoadAtTime(double timeValue)
 
 void animationManager::JumpToKeyFrame(int keyframe, bool relative)
 {
-  constexpr double epsilon = 1e-6;
-
-  if (!this->PreparedAnimationIndices.has_value())
+  if (!this->AnimationTimeSteps.has_value() || this->AnimationTimeSteps.value()->GetSize() == 0)
   {
     return;
   }
 
-  int nbTimeSteps;
-  vtkSmartPointer<vtkDoubleArray> timeSteps = vtkSmartPointer<vtkDoubleArray>::New();
-
-  const vtkIdType currentAnimation = this->PreparedAnimationIndices.value()[0];
-  if (!this->AnimationTimeSteps.has_value())
-  {
-    this->Importer->GetTemporalInformation(
-      currentAnimation, 1 / this->DeltaTime, nbTimeSteps, this->TimeRange, timeSteps);
-    this->AnimationTimeSteps = timeSteps;
-  }
-
-  timeSteps = this->AnimationTimeSteps.value();
+  vtkSmartPointer<vtkDoubleArray> timeSteps = this->AnimationTimeSteps.value();
 
   if (relative)
   {
+    constexpr double epsilon = 1e-6;
     auto it = std::find_if(timeSteps->Begin(), timeSteps->End(),
       [&](double step) { return this->CurrentTime - step <= epsilon; });
 
@@ -522,6 +510,7 @@ void animationManager::PrepareForAnimationIndices()
       int nbTimeSteps;
       vtkNew<vtkDoubleArray> timeSteps;
       this->Importer->GetTemporalInformation(animIndex, 0, nbTimeSteps, timeRange, timeSteps);
+      this->AnimationTimeSteps = timeSteps;
 
       // Accumulate time ranges
       this->TimeRange[0] = std::min(timeRange[0], this->TimeRange[0]);
