@@ -154,6 +154,17 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     ;
   }
 
+  // Safer buffer typecasting with auto offset interating
+  const mdl_simpleframe_t* read_from_vector_simpleframe(
+    const std::vector<uint8_t>& buffer, size_t& offset, size_t num_verts = 0)
+  {
+    static constexpr auto mdl_simpleframe_t_minimal =
+      sizeof(mdl_simpleframe_t) - sizeof(mdl_simpleframe_t::verts);
+    auto ptr = peek_from_vector_simpleframe(buffer, offset, num_verts);
+    offset += mdl_simpleframe_t_minimal + num_verts * sizeof(mdl_simpleframe_t::verts[0]);
+    return ptr;
+  }
+
   //----------------------------------------------------------------------------
   explicit vtkInternals(vtkF3DQuakeMDLImporter* parent)
     : Parent(parent)
@@ -301,8 +312,8 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       unsigned long currentProgress = 0;
       double progressRate;
 
-      constexpr int mdl_simpleframe_t_fixed_size =
-        2 * sizeof(mdl_vertex_t) + 16 * sizeof(int8_t); // Size of bboxmin, bboxmax and name.
+      constexpr int mdl_simpleframe_t_fixed_size = sizeof(mdl_simpleframe_t) -
+        sizeof(mdl_simpleframe_t::verts); // Size of bboxmin, bboxmax and name.
 
       // Read Texture Coordinates
       auto texcoords = peek_from_vector<mdl_texcoord_t>(buffer, offset);
