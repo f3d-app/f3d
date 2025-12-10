@@ -471,7 +471,6 @@ void animationManager::PrepareForAnimationIndices()
       int nbTimeSteps;
       vtkNew<vtkDoubleArray> timeSteps;
       this->Importer->GetTemporalInformation(animIndex, timeRange, nbTimeSteps, timeSteps);
-      std::cout<<nbTimeSteps<<std::endl;
 
       // Accumulate time ranges
       this->TimeRange[0] = std::min(timeRange[0], this->TimeRange[0]);
