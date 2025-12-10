@@ -23,7 +23,6 @@ int TestSDKTriggerInteractionsWithoutRender([[maybe_unused]] int argc, [[maybe_u
   inter.triggerKeyboardKey(f3d::interactor::InputAction::PRESS, "E");
   inter.triggerKeyboardKey(f3d::interactor::InputAction::RELEASE, "E");
 
-
   // Trigger modifier update
   inter.triggerModUpdate(f3d::interactor::InputModifier::SHIFT);
   
@@ -38,7 +37,5 @@ int TestSDKTriggerInteractionsWithoutRender([[maybe_unused]] int argc, [[maybe_u
   inter.triggerMouseButton(f3d::interactor::InputAction::RELEASE, f3d::interactor::MouseButton::LEFT);
   inter.triggerMouseButton(f3d::interactor::InputAction::PRESS, f3d::interactor::MouseButton::RIGHT);
   inter.triggerMouseButton(f3d::interactor::InputAction::RELEASE, f3d::interactor::MouseButton::RIGHT);
-
-  
   return EXIT_SUCCESS;
 }
