@@ -338,7 +338,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
           framePtr[i].frames =
             reinterpret_cast<const mdl_simpleframe_t*>(buffer.data() + 2 * sizeof(int32_t) +
               2 * sizeof(mdl_vertex_t) + (*framePtr[i].nb) * sizeof(float) + offset);
-
+            
           if (offset + sizeof(int32_t) + mdl_simpleframe_t_fixed_size > buffer.size() ||
             offset + sizeof(int32_t) + mdl_simpleframe_t_fixed_size +
                 sizeof(mdl_vertex_t) * header->numVertices >
@@ -351,17 +351,20 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
             2 * sizeof(int32_t) + 2 * sizeof(mdl_vertex_t) + (*framePtr[i].nb) * sizeof(float);
           frameOffsets.emplace_back(std::vector<int>());
 
+          // check that we wont run off the buffer during loop
+          if (offset +
+              (*framePtr[i].nb *
+                (mdl_simpleframe_t_fixed_size + sizeof(mdl_vertex_t) * header->numVertices)) >
+            buffer.size())
+          {
+            throw F3DRangeError("Requested data out of range.");
+          }
+
           for (int j = 0; j < *framePtr[i].nb; j++)
           {
             // Offset for each frame
             frameOffsets[i].emplace_back(offset);
             offset += mdl_simpleframe_t_fixed_size + sizeof(mdl_vertex_t) * header->numVertices;
-          }
-
-          // check that we didn't run off the memory during loop
-          if (offset > buffer.size())
-          {
-            throw F3DRangeError("Requested data out of range.");
           }
         }
 
