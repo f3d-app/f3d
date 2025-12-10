@@ -26,10 +26,10 @@ int TestSDKTriggerInteractionsWithoutRender(
 
   // Trigger modifier update
   inter.triggerModUpdate(f3d::interactor::InputModifier::SHIFT);
-  
+
   // Trigger character inputs 
   inter.triggerTextCharacter('f');
- 
+
   // Trigger rotate camera with mouse left button
   inter.triggerMousePosition(150, 100);
 
