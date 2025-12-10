@@ -133,7 +133,6 @@ void animationManager::StopAnimation()
 //----------------------------------------------------------------------------
 void animationManager::ToggleAnimation()
 {
-
   this->PrepareForAnimationIndices();
   if (!this->PreparedAnimationIndices.value().empty() && this->Interactor)
   {
