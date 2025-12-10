@@ -33,7 +33,8 @@ void vtkF3DImporter::UpdateTimeStep(double timeValue)
 bool vtkF3DImporter::GetTemporalInformation(
   vtkIdType animationIndex, double timeRange[2], int& nbTimeSteps, vtkDoubleArray* timeSteps)
 {
-  return this->vtkImporter::GetTemporalInformation(animationIndex, 0, nbTimeSteps, timeRange, timeSteps);
+  return this->vtkImporter::GetTemporalInformation(
+    animationIndex, 0, nbTimeSteps, timeRange, timeSteps);
 }
 #endif
 

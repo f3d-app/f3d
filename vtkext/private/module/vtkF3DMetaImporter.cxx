@@ -515,7 +515,8 @@ void vtkF3DMetaImporter::SetCameraIndex(std::optional<vtkIdType> camIndex)
 }
 
 //----------------------------------------------------------------------------
-bool vtkF3DMetaImporter::GetTemporalInformation(vtkIdType animationIndex,double timeRange[2], int& nbTimeSteps, vtkDoubleArray* timeSteps)
+bool vtkF3DMetaImporter::GetTemporalInformation(
+  vtkIdType animationIndex, double timeRange[2], int& nbTimeSteps, vtkDoubleArray* timeSteps)
 {
   vtkIdType localAnimationIndex = animationIndex;
   for (const auto& importerPair : this->Pimpl->Importers)
