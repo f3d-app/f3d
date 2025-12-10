@@ -107,4 +107,42 @@ f3d::colormap_t Read(const fs::path& path)
     return {};
   }
 }
+
+f3d::opacitymap_t ReadOpacity(const fs::path& path)
+{
+  try
+  {
+    f3d::image img(path);
+
+    if (img.getChannelCount() < 1)
+    {
+      f3d::log::error("The specified opacity map must have at least 1 channel");
+      return {};
+    }
+
+    if (img.getHeight() != 1)
+    {
+      f3d::log::warn("The specified opacity map height is not equal to 1, only the first row is "
+                     "taken into account");
+    }
+
+    int w = img.getWidth();
+
+    std::vector<double> om(2 * w);
+
+    for (int i = 0; i < w; i++)
+    {
+      std::vector<double> pixel = img.getNormalizedPixel({ i, 0 });
+      om[2 * i + 0] = static_cast<double>(i) / (w - 1);
+      om[2 * i + 1] = pixel[0];
+    }
+
+    return f3d::opacitymap_t(om);
+  }
+  catch (const f3d::image::read_exception&)
+  {
+    f3d::log::error("Cannot read opacity map at ", path);
+    return {};
+  }
+}
 }
