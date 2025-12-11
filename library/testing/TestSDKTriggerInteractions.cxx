@@ -139,6 +139,6 @@ int TestSDKTriggerInteractions([[maybe_unused]] int argc, [[maybe_unused]] char*
   });
 
   helper([](f3d::engine& engine) { engine.getInteractor().triggerTextCharacter('f'); });
-  
+
   return EXIT_SUCCESS;
 }
