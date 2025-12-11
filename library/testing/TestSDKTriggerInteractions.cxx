@@ -124,5 +124,23 @@ int TestSDKTriggerInteractions([[maybe_unused]] int argc, [[maybe_unused]] char*
     engine.getInteractor().triggerMouseWheel(f3d::interactor::WheelDirection::RIGHT);
   });
 
+  helper([](f3d::engine& engine) {
+    engine.getInteractor().triggerMouseButton(
+      f3d::interactor::InputAction::RELEASE, f3d::interactor::MouseButton::LEFT);
+  });
+
+  helper([](f3d::engine& engine) {
+    engine.getInteractor().triggerMouseButton(
+      f3d::interactor::InputAction::RELEASE, f3d::interactor::MouseButton::RIGHT);
+  });
+
+  helper([](f3d::engine& engine) {
+    engine.getInteractor().triggerKeyboardKey(f3d::interactor::InputAction::RELEASE, "Return");
+  });
+
+  helper([](f3d::engine& engine) {
+    engine.getInteractor().triggerTextCharacter('f');
+  });
+  
   return EXIT_SUCCESS;
 }
