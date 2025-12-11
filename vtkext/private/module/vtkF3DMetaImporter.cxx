@@ -2,6 +2,7 @@
 
 #include "F3DLog.h"
 #include "vtkF3DGenericImporter.h"
+#include "vtkF3DImporter.h"
 
 #include <vtkActorCollection.h>
 #include <vtkCallbackCommand.h>
@@ -530,8 +531,17 @@ bool vtkF3DMetaImporter::GetTemporalInformation(
     if (localAnimationIndex < nAnim)
     {
 #if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 5, 20251210)
-      return importerPair.Importer->GetTemporalInformation(
-        localAnimationIndex, 0, nbTimeSteps, timeRange, timeSteps);
+      vtkF3DImporter* f3dImporter = vtkF3DImporter::SafeDownCast(importerPair.Importer);
+      if (f3dImporter)
+      {
+        f3dImporter->GetTemporalInformation(
+          localAnimationIndex, timeRange, nbTimeSteps, timeSteps);
+      }
+      else
+      {
+        return importerPair.Importer->GetTemporalInformation(
+          localAnimationIndex, 0, nbTimeSteps, timeRange, timeSteps);
+      }
 #else
       return importerPair.Importer->GetTemporalInformation(
         localAnimationIndex, timeRange, nbTimeSteps, timeSteps);

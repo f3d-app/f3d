@@ -26,6 +26,7 @@ class vtkInformationIntegerKey;
 class VTKEXT_EXPORT vtkF3DImporter : public vtkImporter
 {
 public:
+  vtkTypeMacro(vtkF3DImporter, vtkImporter);
   /**
    * Information key used to flag actors.
    * Actors having this flag will be drawn on top.
