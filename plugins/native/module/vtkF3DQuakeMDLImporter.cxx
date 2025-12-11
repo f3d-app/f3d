@@ -333,7 +333,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         if (*framePtr[i].type == SINGLE_FRAME)
         {
           // Alias offset
-          auto _offset = offset + sizeof(int32_t);
+          auto offsetAlias = offset + sizeof(int32_t);
           framePtr[i].nb = nullptr;
           framePtr[i].time = nullptr;
 
@@ -343,9 +343,9 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
           // Note : mdl_simpleframe_t can have *up to and including* 1024 verts. So if this data is
           // the last in the file the peek_at_vector func will error out. As such we use a different
           // helper.
-          framePtr[i].frames = read_from_vector_simpleframe(buffer, _offset, header->numVertices);
+          framePtr[i].frames = read_from_vector_simpleframe(buffer, offsetAlias, header->numVertices);
           // Apply alias
-          offset = _offset;
+          offset = offsetAlias;
 
           // Always emplace in case of mixed single frame and group frame
           frameOffsets.emplace_back(std::vector<int>());
@@ -353,19 +353,19 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         else
         {
           // Alias offset
-          auto _offset = offset + sizeof(int32_t);
-          framePtr[i].nb = read_from_vector<int>(buffer, _offset);
+          auto offsetAlias = offset + sizeof(int32_t);
+          framePtr[i].nb = read_from_vector<int>(buffer, offsetAlias);
           // Skips parameters min and max.
-          _offset += (2 * sizeof(mdl_vertex_t));
-          framePtr[i].time = peek_from_vector<float>(buffer, _offset);
+          offsetAlias += (2 * sizeof(mdl_vertex_t));
+          framePtr[i].time = peek_from_vector<float>(buffer, offsetAlias);
           // Points to the first frame, 4 * nbFrames for the float array
           // note : see above
           framePtr[i].frames = peek_from_vector_simpleframe(
-            buffer, _offset + (*framePtr[i].nb) * sizeof(float), header->numVertices);
+            buffer, offsetAlias + (*framePtr[i].nb) * sizeof(float), header->numVertices);
 
-          _offset += (*framePtr[i].nb) * sizeof(float);
+          offsetAlias += (*framePtr[i].nb) * sizeof(float);
           // Apply alias
-          offset = _offset;
+          offset = offsetAlias;
           
           frameOffsets.emplace_back(std::vector<int>());
 
