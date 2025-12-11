@@ -81,7 +81,8 @@ public:
   /**
    * Recover animation timeRange, all other args are ignored
    */
-  bool GetTemporalInformation(vtkIdType animationIndex, double timeRange[2], int& nbTimeSteps, vtkDoubleArray* timeSteps) override;
+  bool GetTemporalInformation(vtkIdType animationIndex, double timeRange[2], int& nbTimeSteps,
+    vtkDoubleArray* timeSteps) override;
 
   /**
    * Update importer at provided timeValue

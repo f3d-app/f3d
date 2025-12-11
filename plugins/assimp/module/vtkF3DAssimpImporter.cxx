@@ -1105,8 +1105,8 @@ bool vtkF3DAssimpImporter::IsAnimationEnabled(vtkIdType animationIndex)
 }
 
 //----------------------------------------------------------------------------
-bool vtkF3DAssimpImporter::GetTemporalInformation(vtkIdType animationIndex,
-  double timeRange[2], int& vtkNotUsed(nbTimeSteps), vtkDoubleArray* vtkNotUsed(timeSteps))
+bool vtkF3DAssimpImporter::GetTemporalInformation(vtkIdType animationIndex, double timeRange[2],
+  int& vtkNotUsed(nbTimeSteps), vtkDoubleArray* vtkNotUsed(timeSteps))
 {
   assert(animationIndex < this->GetNumberOfAnimations());
   assert(animationIndex >= 0);

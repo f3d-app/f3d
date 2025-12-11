@@ -56,7 +56,8 @@ public:
   /**
    * Get temporal information for the currently enabled animations.
    */
-  bool GetTemporalInformation(vtkIdType animationIndex, double timeRange[2], int& nbTimeSteps, vtkDoubleArray* timeSteps) override;
+  bool GetTemporalInformation(vtkIdType animationIndex, double timeRange[2], int& nbTimeSteps,
+    vtkDoubleArray* timeSteps) override;
 
   ///@{
   /**

@@ -639,8 +639,8 @@ bool vtkF3DQuakeMDLImporter::IsAnimationEnabled(vtkIdType animationIndex)
 }
 
 //----------------------------------------------------------------------------
-bool vtkF3DQuakeMDLImporter::GetTemporalInformation(vtkIdType animationIndex,
-  double timeRange[2], int& nbTimeSteps, vtkDoubleArray* timeSteps)
+bool vtkF3DQuakeMDLImporter::GetTemporalInformation(
+  vtkIdType animationIndex, double timeRange[2], int& nbTimeSteps, vtkDoubleArray* timeSteps)
 {
   assert(animationIndex < static_cast<vtkIdType>(this->Internals->AnimationNames.size() +
                             this->Internals->GroupSkinAnimationNames.size()));
