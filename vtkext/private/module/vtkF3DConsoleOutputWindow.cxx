@@ -13,22 +13,33 @@ vtkF3DConsoleOutputWindow::vtkF3DConsoleOutputWindow() = default;
 void vtkF3DConsoleOutputWindow::DisplayText(const char* txt)
 {
   std::string fmtText;
-  switch (this->GetCurrentMessageType())
+
+  if (this->UseColoring)
   {
-    case vtkOutputWindow::MESSAGE_TYPE_ERROR:
-      fmtText = this->UseColoring ? "\033[31;1m" : "";
-      break;
-    case vtkOutputWindow::MESSAGE_TYPE_WARNING:
-    case vtkOutputWindow::MESSAGE_TYPE_GENERIC_WARNING:
-      fmtText = this->UseColoring ? "\033[33m" : "";
-      break;
-    default:
-      break;
+    switch (this->GetCurrentMessageType())
+    {
+      case vtkOutputWindow::MESSAGE_TYPE_ERROR:
+        fmtText = "\033[31;1m";
+        fmtText += txt;
+        fmtText += "\033[0m";
+        break;
+      case vtkOutputWindow::MESSAGE_TYPE_WARNING:
+      case vtkOutputWindow::MESSAGE_TYPE_GENERIC_WARNING:
+        fmtText = "\033[33m";
+        fmtText += txt;
+        fmtText += "\033[0m";
+        break;
+      default:
+        fmtText = txt;
+        break;
+    }
   }
-  fmtText += txt;
+  else
+  {
+    fmtText = txt;
+  }
 
-  fmtText += this->UseColoring ? "\033[0m\n" : "\n";
-
+  fmtText += "\n";
   this->Superclass::DisplayText(fmtText.c_str());
 
   switch (this->GetDisplayStream(this->GetCurrentMessageType()))

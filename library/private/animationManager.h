@@ -44,6 +44,14 @@ public:
   void SetImporter(vtkImporter* importer);
 
   /**
+   * Set animation direction,
+   * Only following values are correct :
+   * 1 for forward animation
+   * -1 for backward animation
+   */
+  void SetAnimationDirection(int direction);
+
+  /**
    * Initialize the animation manager, required before playing the animation.
    * Can be used to reset animation to the initial state.
    * Importer must be set before use.
@@ -54,6 +62,7 @@ public:
 
   /**
    * Start/Stop playing the animation
+   * Direction must always be equal to 1 (forward) or -1 (backward)
    */
   void ToggleAnimation();
   void StartAnimation();
@@ -70,6 +79,16 @@ public:
    * Can be called before initialization safely
    */
   std::string GetAnimationName();
+
+  /**
+   * Return animation direction
+   * 1 for forward animation
+   * -1 for backward animation
+   */
+  int GetAnimationDirection() const
+  {
+    return AnimationDirection;
+  }
 
   /**
    * Return true if the animation manager is playing the animation
@@ -136,6 +155,7 @@ private:
   interactor_impl* Interactor = nullptr;
 
   int AvailAnimations = 0;
+  int AnimationDirection = 1;
 
   std::optional<std::vector<int>> PreparedAnimationIndices;
   double TimeRange[2] = { 0.0, 0.0 };

@@ -2016,10 +2016,34 @@ void F3DStarter::AddCommands()
             [&](const std::string& ext) { return "." + ext; });
         }
 
+        const auto filenameStartsWithPattern = [&filePattern](std::string_view filename)
+        {
+#if defined(_WIN32) || defined(__APPLE__)
+          // Windows and Linux filesystems are case-insensitive by default
+          // Perform a case insensitive search
+          if (filePattern.size() > filename.size())
+          {
+            return false;
+          }
+
+          return std::equal(filePattern.begin(), filePattern.end(), filename.begin(),
+            [](char a, char b)
+            {
+              return std::tolower(static_cast<unsigned char>(a)) ==
+                std::tolower(static_cast<unsigned char>(b));
+            });
+#else
+          // Linux filesystems are typically case-sensitive
+          // Perform a case sensitive search
+          // Using rfind to avoid dependency for C++20 starts_with
+          return filename.rfind(filePattern, 0) == 0;
+#endif
+        };
+
         for (const auto& path : dirContent)
         {
           // Select candidates that starts with filePattern
-          if (path.filename().string().rfind(filePattern, 0) == 0)
+          if (filenameStartsWithPattern(path.filename().string()))
           {
             // filter out candidate files with the unsupported extensions
             if (fs::is_regular_file(path) &&
@@ -2033,6 +2057,9 @@ void F3DStarter::AddCommands()
           }
         }
       }
+
+      // Sort for output readability and test reproducibility
+      std::sort(candidates.begin(), candidates.end());
 
       if (candidates.size() == 1 && fs::is_directory(candidates[0]))
       {

@@ -110,7 +110,7 @@ f3d_plugin_declare_reader(
   SCORE 99
   EXTENSIONS vtk
   MIMETYPES application/vnd.vtk
-  VTK_READER vtkPDataSetReader
+  VTK_READER vtkDataSetReader
   FORMAT_DESCRIPTION "VTK Legacy"
 )
 
@@ -206,7 +206,7 @@ f3d_plugin_build(
   NAME native
   VERSION 1.0
   DESCRIPTION "Native VTK I/O support"
-  VTK_MODULES IOXML IOParallel IOCityGML IOImage IOGeometry IOPLY
+  VTK_MODULES IOXML IOLegacy IOCityGML IOImage IOGeometry IOPLY
   MIMETYPE_XML_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/f3d-3d-formats.xml"
     "${CMAKE_CURRENT_SOURCE_DIR}/f3d-3d-image-formats.xml"
