@@ -71,6 +71,14 @@ Supports `front`, `top`, `right`, `isometric` arguments. eg: `set_camera top`.
 
 `toggle_animation_backward`: A specific command to start/stop the animation backward. No argument.
 
+`jump_to_frame`: A specific command to load an animation at a specific frame, takes a number and a boolean as arguments.
+eg:
+- `jump_to_frame 1 true` jump to next frame.
+- `jump_to_frame -1 true` jump to previous frame.
+- `jump_to_frame 0 false` jump to first frame.
+- `jump_to_frame 2 false` jump to the second frame.
+- `jump_to_frame -1 false` jump to last frame.
+
 `cycle_verbose_level` : A specific command to cycle between the verbose levels (`Debug`, `Info`, `Warning`, `Error`, `Quiet`).
 
 `add_files [path/to/file1] [path/to/file2]`: A specific command to add files to the scene (overridden by a F3D specific command, see below). Take one or more files as arguments.
