@@ -15,7 +15,7 @@
 #include <set>
 
 class vtkF3DRenderer;
-class vtkF3DImporter;
+class vtkF3DMetaImporter;
 class vtkRenderWindow;
 
 namespace f3d
@@ -41,7 +41,7 @@ public:
   /**
    * Set the importer to use in the animation_manager, must be set before initializing
    */
-  void SetImporter(vtkF3DImporter* importer);
+  void SetImporter(vtkF3DMetaImporter* importer);
 
   /**
    * Initialize the animation manager, required before playing the animation.
@@ -132,7 +132,7 @@ private:
 
   options& Options;
   window_impl& Window;
-  vtkF3DImporter* Importer = nullptr;
+  vtkF3DMetaImporter* Importer = nullptr;
   interactor_impl* Interactor = nullptr;
 
   int AvailAnimations = 0;

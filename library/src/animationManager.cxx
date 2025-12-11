@@ -7,7 +7,7 @@
 #include "window_impl.h"
 
 #include "F3DStyle.h"
-#include "vtkF3DImporter.h"
+#include "vtkF3DMetaImporter.h"
 #include "vtkF3DRenderer.h"
 
 #include <vtkDoubleArray.h>
@@ -31,7 +31,7 @@ animationManager::animationManager(options& options, window_impl& window)
 }
 
 //----------------------------------------------------------------------------
-void animationManager::SetImporter(vtkF3DImporter* importer)
+void animationManager::SetImporter(vtkF3DMetaImporter* importer)
 {
   this->Importer = importer;
 }
