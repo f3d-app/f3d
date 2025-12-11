@@ -8,6 +8,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
     TestF3DPLYReader.cxx
     TestF3DQuakeMDLImporterStream.cxx
     TestF3DQuakeMDLImporterInexistent.cxx
+    TestF3DQuakeMDLParser.cxx
   )
 endif()
 
