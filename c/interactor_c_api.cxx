@@ -77,7 +77,8 @@ int f3d_interaction_bind_equals(
 }
 
 //----------------------------------------------------------------------------
-void f3d_interactor_toggle_animation(f3d_interactor_t* interactor)
+void f3d_interactor_toggle_animation(
+  f3d_interactor_t* interactor, f3d_interactor_animation_direction_t direction)
 {
   if (!interactor)
   {
@@ -85,11 +86,14 @@ void f3d_interactor_toggle_animation(f3d_interactor_t* interactor)
   }
 
   f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
-  cpp_interactor->toggleAnimation();
+  f3d::interactor::AnimationDirection cpp_direction =
+    static_cast<f3d::interactor::AnimationDirection>(direction);
+  cpp_interactor->toggleAnimation(cpp_direction);
 }
 
 //----------------------------------------------------------------------------
-void f3d_interactor_start_animation(f3d_interactor_t* interactor)
+void f3d_interactor_start_animation(
+  f3d_interactor_t* interactor, f3d_interactor_animation_direction_t direction)
 {
   if (!interactor)
   {
@@ -97,7 +101,9 @@ void f3d_interactor_start_animation(f3d_interactor_t* interactor)
   }
 
   f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
-  cpp_interactor->startAnimation();
+  f3d::interactor::AnimationDirection cpp_direction =
+    static_cast<f3d::interactor::AnimationDirection>(direction);
+  cpp_interactor->startAnimation(cpp_direction);
 }
 
 //----------------------------------------------------------------------------
@@ -122,6 +128,20 @@ int f3d_interactor_is_playing_animation(f3d_interactor_t* interactor)
 
   f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
   return cpp_interactor->isPlayingAnimation() ? 1 : 0;
+}
+
+//----------------------------------------------------------------------------
+f3d_interactor_animation_direction_t f3d_interactor_get_animation_direction(
+  f3d_interactor_t* interactor)
+{
+  if (!interactor)
+  {
+    return F3D_INTERACTOR_ANIMATION_FORWARD;
+  }
+
+  f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
+  f3d::interactor::AnimationDirection cpp_direction = cpp_interactor->getAnimationDirection();
+  return static_cast<f3d_interactor_animation_direction_t>(cpp_direction);
 }
 
 //----------------------------------------------------------------------------

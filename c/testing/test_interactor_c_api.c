@@ -28,10 +28,13 @@ int test_interactor_c_api()
     return 1;
   }
 
-  f3d_interactor_toggle_animation(interactor);
-  f3d_interactor_start_animation(interactor);
+  f3d_interactor_toggle_animation(interactor, F3D_INTERACTOR_ANIMATION_FORWARD);
+  f3d_interactor_start_animation(interactor, F3D_INTERACTOR_ANIMATION_BACKWARD);
   int playing = f3d_interactor_is_playing_animation(interactor);
   (void)playing;
+  f3d_interactor_animation_direction_t direction =
+    f3d_interactor_get_animation_direction(interactor);
+  (void)direction;
   f3d_interactor_stop_animation(interactor);
 
   f3d_interactor_enable_camera_movement(interactor);

@@ -134,6 +134,15 @@ extern "C"
     F3D_INTERACTOR_INPUT_CTRL_SHIFT
   } f3d_interactor_input_modifier_t;
 
+  /**
+   * @brief Enumeration of animation direction.
+   */
+  typedef enum f3d_interactor_animation_direction_t
+  {
+    F3D_INTERACTOR_ANIMATION_FORWARD,
+    F3D_INTERACTOR_ANIMATION_BACKWARD
+  } f3d_interactor_animation_direction_t;
+
   ///@{ @name Commands
   /**
    * @brief Initialize commands (remove existing and add defaults).
@@ -287,15 +296,19 @@ extern "C"
    * @brief Toggle the animation.
    *
    * @param interactor Interactor handle.
+   * @param direction Animation direction.
    */
-  F3D_EXPORT void f3d_interactor_toggle_animation(f3d_interactor_t* interactor);
+  F3D_EXPORT void f3d_interactor_toggle_animation(
+    f3d_interactor_t* interactor, f3d_interactor_animation_direction_t direction);
 
   /**
    * @brief Start the animation.
    *
    * @param interactor Interactor handle.
+   * @param direction Animation direction.
    */
-  F3D_EXPORT void f3d_interactor_start_animation(f3d_interactor_t* interactor);
+  F3D_EXPORT void f3d_interactor_start_animation(
+    f3d_interactor_t* interactor, f3d_interactor_animation_direction_t direction);
 
   /**
    * @brief Stop the animation.
@@ -311,6 +324,15 @@ extern "C"
    * @return 1 if animation is playing, 0 otherwise.
    */
   F3D_EXPORT int f3d_interactor_is_playing_animation(f3d_interactor_t* interactor);
+
+  /**
+   * @brief Get the current animation direction.
+   *
+   * @param interactor Interactor handle.
+   * @return Current animation direction.
+   */
+  F3D_EXPORT f3d_interactor_animation_direction_t f3d_interactor_get_animation_direction(
+    f3d_interactor_t* interactor);
   ///@}
 
   ///@{ @name Movement
