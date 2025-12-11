@@ -52,7 +52,7 @@ public:
   {
   }
 
-  bool Update(float percentage = -1.f) override
+  bool Update(float percentage) override
   {
     // no progress to report, not necessarily an error
     if (percentage == -1.f)
@@ -82,10 +82,9 @@ public:
   {
     auto progressHandler = new F3DAssimpProgressHandler(parent);
 
-    if (this->Importer.IsDefaultProgressHandler())
-    {
-      this->Importer.SetProgressHandler(static_cast<Assimp::ProgressHandler*>(progressHandler));
-    }
+    assert(this->Importer.IsDefaultProgressHandler());
+
+    this->Importer.SetProgressHandler(static_cast<Assimp::ProgressHandler*>(progressHandler));
   }
 
   //----------------------------------------------------------------------------
