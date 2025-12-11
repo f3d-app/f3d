@@ -20,39 +20,6 @@
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkF3DQuakeMDLImporter);
 
-// //----------------------------------------------------------------------------
-class F3DRangeError : public std::out_of_range
-{
-public:
-  explicit F3DRangeError(const std::string& what = "")
-    : std::out_of_range(what)
-  {
-  }
-};
-
-// Safer buffer typecasting of arbitrary buffer location
-template<typename TYPE>
-const TYPE* peek_from_vector(const std::vector<uint8_t>& buffer, const size_t& offset)
-{
-  static_assert(std::is_pod<TYPE>::value, "Vector typecast requires POD input");
-
-  if (offset + sizeof(TYPE) > buffer.size())
-  {
-    throw F3DRangeError("Requested data out of range.");
-  }
-
-  return reinterpret_cast<const TYPE*>(buffer.data() + offset);
-}
-
-// Safer buffer typecasting with auto offset interating
-template<typename TYPE>
-const TYPE* read_from_vector(const std::vector<uint8_t>& buffer, size_t& offset)
-{
-  const TYPE* ptr = peek_from_vector<TYPE>(buffer, offset);
-  offset += sizeof(TYPE);
-  return ptr;
-}
-
 //----------------------------------------------------------------------------
 struct vtkF3DQuakeMDLImporter::vtkInternals
 {
@@ -135,16 +102,51 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     const mdl_simpleframe_t* frames; // simple frame list
   };
 
+  //----------------------------------------------------------------------------
+  class F3DRangeError : public std::out_of_range
+  {
+  public:
+    explicit F3DRangeError(const std::string& what = "")
+      : std::out_of_range(what)
+    {
+    }
+  };
+
+  //----------------------------------------------------------------------------
+  // Safer buffer typecasting of arbitrary buffer location
+  template<typename TYPE>
+  static const TYPE* PeekFromVector(const std::vector<uint8_t>& buffer, const size_t& offset)
+  {
+    static_assert(std::is_pod<TYPE>::value, "Vector typecast requires POD input");
+
+    if (offset + sizeof(TYPE) > buffer.size())
+    {
+      throw F3DRangeError("Requested data out of range.");
+    }
+
+    return reinterpret_cast<const TYPE*>(buffer.data() + offset);
+  }
+
+  //----------------------------------------------------------------------------
+  // Safer buffer typecasting with auto offset interating
+  template<typename TYPE>
+  static const TYPE* ReadFromVector(const std::vector<uint8_t>& buffer, size_t& offset)
+  {
+    const TYPE* ptr = PeekFromVector<TYPE>(buffer, offset);
+    offset += sizeof(TYPE);
+    return ptr;
+  }
+
   // Safer buffer typecasting of arbitrary buffer location with variable length data
-  static const mdl_simpleframe_t* peek_from_vector_simpleframe(
+  static const mdl_simpleframe_t* PeekFromVectorSimpleframe(
     const std::vector<uint8_t>& buffer, const size_t& offset, size_t num_verts = 0)
   {
-    static constexpr auto mdl_simpleframe_t_minimal =
+    static constexpr auto mdl_simpleframe_t_fixed_size =
       sizeof(mdl_simpleframe_t) - sizeof(mdl_simpleframe_t::verts);
     static_assert(std::is_pod<mdl_simpleframe_t>::value, "Vector typecast requires POD input");
 
     // check that we have enough data for the given number of verts requested
-    if (offset + mdl_simpleframe_t_minimal + num_verts * sizeof(mdl_simpleframe_t::verts[0]) >
+    if (offset + mdl_simpleframe_t_fixed_size + num_verts * sizeof(mdl_simpleframe_t::verts[0]) >
       buffer.size())
     {
       throw F3DRangeError("Requested data out of range.");
@@ -155,13 +157,13 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   }
 
   // Safer buffer typecasting with auto offset interating
-  const mdl_simpleframe_t* read_from_vector_simpleframe(
+  const mdl_simpleframe_t* ReadFromVectorSimpleframe(
     const std::vector<uint8_t>& buffer, size_t& offset, size_t num_verts = 0)
   {
-    static constexpr auto mdl_simpleframe_t_minimal =
+    static constexpr auto mdl_simpleframe_t_fixed_size =
       sizeof(mdl_simpleframe_t) - sizeof(mdl_simpleframe_t::verts);
-    auto ptr = peek_from_vector_simpleframe(buffer, offset, num_verts);
-    offset += mdl_simpleframe_t_minimal + num_verts * sizeof(mdl_simpleframe_t::verts[0]);
+    auto ptr = PeekFromVectorSimpleframe(buffer, offset, num_verts);
+    offset += mdl_simpleframe_t_fixed_size + num_verts * sizeof(mdl_simpleframe_t::verts[0]);
     return ptr;
   }
 
@@ -188,7 +190,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       {
         for (int y = 0; y < skinWidth; ++y)
         {
-          auto index = *peek_from_vector<uint8_t>(buffer, offset + x * skinWidth + y);
+          auto index = *PeekFromVector<uint8_t>(buffer, offset + x * skinWidth + y);
           unsigned char* ptr = static_cast<unsigned char*>(skin->GetScalarPointer(y, x, 0));
           std::copy(F3DMDLDefaultColorMap[index], F3DMDLDefaultColorMap[index] + 3, ptr);
         }
@@ -212,7 +214,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       int groupSkinCount = 0;
       for (unsigned int i = 0; i < nbSkins; i++)
       {
-        int skinGroup = *read_from_vector<int>(buffer, offset);
+        int skinGroup = *ReadFromVector<int>(buffer, offset);
         if (skinGroup == 0)
         {
           // Skip the skins that are not selected
@@ -228,12 +230,12 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         {
           std::string skinAnimationName = "skin_" + std::to_string(groupSkinCount);
           this->GroupSkinAnimationNames.emplace_back(skinAnimationName);
-          auto nb = *read_from_vector<int>(buffer, offset);
+          auto nb = *ReadFromVector<int>(buffer, offset);
           this->GroupSkins.emplace_back(nb);
           this->GroupSkinDurations.emplace_back(nb + 1, 0.0f);
           for (int j = 1; j <= nb; ++j)
           {
-            auto timeValue = *read_from_vector<float>(buffer, offset);
+            auto timeValue = *ReadFromVector<float>(buffer, offset);
             this->GroupSkinDurations[groupSkinCount][j] = static_cast<double>(timeValue);
           }
           for (int skinIdx = 0; skinIdx < nb; ++skinIdx)
@@ -316,11 +318,11 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         sizeof(mdl_simpleframe_t::verts); // Size of bboxmin, bboxmax and name.
 
       // Read Texture Coordinates
-      auto texcoords = peek_from_vector<mdl_texcoord_t>(buffer, offset);
+      auto texcoords = PeekFromVector<mdl_texcoord_t>(buffer, offset);
       offset += sizeof(mdl_texcoord_t) * header->numVertices;
 
       // Read Triangles
-      auto triangles = peek_from_vector<mdl_triangle_t>(buffer, offset);
+      auto triangles = PeekFromVector<mdl_triangle_t>(buffer, offset);
       offset += sizeof(mdl_triangle_t) * header->numTriangles;
 
       // Read frames
@@ -329,7 +331,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       std::vector<std::vector<int>> frameOffsets = std::vector<std::vector<int>>();
       for (int i = 0; i < header->numFrames; i++)
       {
-        framePtr[i].type = peek_from_vector<int>(buffer, offset);
+        framePtr[i].type = PeekFromVector<int>(buffer, offset);
         if (*framePtr[i].type == SINGLE_FRAME)
         {
           // Alias offset
@@ -343,7 +345,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
           // Note : mdl_simpleframe_t can have *up to and including* 1024 verts. So if this data is
           // the last in the file the peek_at_vector func will error out. As such we use a different
           // helper.
-          framePtr[i].frames = read_from_vector_simpleframe(buffer, offsetAlias, header->numVertices);
+          framePtr[i].frames = ReadFromVectorSimpleframe(buffer, offsetAlias, header->numVertices);
           // Apply alias
           offset = offsetAlias;
 
@@ -354,19 +356,19 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         {
           // Alias offset
           auto offsetAlias = offset + sizeof(int32_t);
-          framePtr[i].nb = read_from_vector<int>(buffer, offsetAlias);
+          framePtr[i].nb = ReadFromVector<int>(buffer, offsetAlias);
           // Skips parameters min and max.
           offsetAlias += (2 * sizeof(mdl_vertex_t));
-          framePtr[i].time = peek_from_vector<float>(buffer, offsetAlias);
+          framePtr[i].time = PeekFromVector<float>(buffer, offsetAlias);
           // Points to the first frame, 4 * nbFrames for the float array
           // note : see above
-          framePtr[i].frames = peek_from_vector_simpleframe(
+          framePtr[i].frames = PeekFromVectorSimpleframe(
             buffer, offsetAlias + (*framePtr[i].nb) * sizeof(float), header->numVertices);
 
           offsetAlias += (*framePtr[i].nb) * sizeof(float);
           // Apply alias
           offset = offsetAlias;
-          
+
           frameOffsets.emplace_back(std::vector<int>());
 
           // check that we wont run off the buffer during loop
@@ -503,7 +505,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
           {
 
             // Recover the frame using the offsets because the struct does not store this pointer
-            auto frame = peek_from_vector_simpleframe(
+            auto frame = PeekFromVectorSimpleframe(
               buffer, frameOffsets[frameNum][groupFrameNum], header->numVertices);
 
             // Assume all frames are named identicaly in the group
@@ -564,7 +566,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     const mdl_header_t* header;
     try
     {
-      header = read_from_vector<mdl_header_t>(buffer, offset);
+      header = ReadFromVector<mdl_header_t>(buffer, offset);
     }
     catch (const F3DRangeError& e)
     {
