@@ -373,21 +373,20 @@ public:
         points->InsertNextPoint(tp.x, tp.y, tp.z);
       }
 
-      size_t index = 0;
+      size_t pOffsetIndex = 0;
       for (size_t cIndex = 0; cIndex < curveCounts->size(); ++cIndex)
       {
-        size_t count = curveCounts->get()[cIndex];
+        const size_t vCount = curveCounts->get()[cIndex];
 
         vtkNew<vtkPolyLine> polyLine;
-        polyLine->GetPointIds()->SetNumberOfIds(count);
-
-        for (size_t j = 0; j < count; ++j)
+        polyLine->GetPointIds()->SetNumberOfIds(vCount);
+        for (size_t j = 0; j < vCount; ++j)
         {
-          polyLine->GetPointIds()->SetId(j, index + j);
+          polyLine->GetPointIds()->SetId(j, pOffsetIndex + j);
         }
 
         lines->InsertNextCell(polyLine);
-        index += count;
+        pOffsetIndex += vCount;
       }
 
       polydata->SetPoints(points);
