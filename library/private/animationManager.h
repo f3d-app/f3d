@@ -110,6 +110,12 @@ public:
   bool LoadAtTime(double timeValue);
 
   /**
+   * Load animation at provided frmae value
+   * When relative is false frame -1 is equal to last frame
+   */
+  void JumpToFrame(int frame, bool relative);
+
+  /**
    * Return a pair containing the current time range values
    */
   std::pair<double, double> GetTimeRange();
@@ -161,6 +167,7 @@ private:
   double TimeRange[2] = { 0.0, 0.0 };
   bool Playing = false;
   double CurrentTime = 0;
+  double DeltaTime = 0;
   bool CurrentTimeSet = false;
 
   // Dynamic options
