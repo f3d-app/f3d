@@ -134,7 +134,7 @@ int TestSDKTriggerInteractions([[maybe_unused]] int argc, [[maybe_unused]] char*
       f3d::interactor::InputAction::RELEASE, f3d::interactor::MouseButton::RIGHT);
   });
 
-  helper([](f3d::engine& engine) { 
+  helper([](f3d::engine& engine) {
     engine.getInteractor().triggerKeyboardKey(f3d::interactor::InputAction::RELEASE, "Return"); 
   });
 
