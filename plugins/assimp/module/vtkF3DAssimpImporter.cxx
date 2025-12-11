@@ -54,14 +54,13 @@ public:
 
   bool Update(float percentage) override
   {
-    // no progress to report, not necessarily an error
+    // special case: no progress to report, not an error
     if (percentage == -1.f)
     {
       return true;
     }
 
     double reportPercentage = percentage < 0 ? double{ 1.0 } : static_cast<double>(percentage);
-
     this->Parent->InvokeEvent(vtkCommand::ProgressEvent, static_cast<void*>(&reportPercentage));
 
     return percentage < 0 ? false : true;
@@ -80,11 +79,9 @@ public:
   explicit vtkInternals(vtkF3DAssimpImporter* parent)
     : Parent(parent)
   {
-    auto progressHandler = new F3DAssimpProgressHandler(parent);
-
     assert(this->Importer.IsDefaultProgressHandler());
-
-    this->Importer.SetProgressHandler(static_cast<Assimp::ProgressHandler*>(progressHandler));
+    auto progressHandler = new F3DAssimpProgressHandler(parent);
+    this->Importer.SetProgressHandler(progressHandler);
   }
 
   //----------------------------------------------------------------------------
