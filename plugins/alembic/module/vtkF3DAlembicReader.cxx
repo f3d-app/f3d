@@ -360,22 +360,23 @@ public:
     {
       Alembic::AbcGeom::ISampleSelector selector(time);
       schema.get(samp, selector);
-      auto positions = samp.getPositions();
-      auto curveCounts = samp.getCurvesNumVertices();
+
+      Alembic::AbcGeom::P3fArraySamplePtr positions = samp.getPositions();
+      Alembic::AbcGeom::Int32ArraySamplePtr curveCounts = samp.getCurvesNumVertices();
 
       vtkNew<vtkPoints> points;
       vtkNew<vtkCellArray> lines;
 
-      for (size_t i = 0; i < positions->size(); ++i)
+      for (size_t pIndex = 0; pIndex < positions->size(); ++pIndex)
       {
-        const auto& p = (*positions)[i] * matrix;
-        points->InsertNextPoint(p.x, p.y, p.z);
+        const Alembic::Abc::V3f& tp = positions->get()[pIndex] * matrix;
+        points->InsertNextPoint(tp.x, tp.y, tp.z);
       }
 
       size_t index = 0;
-      for (size_t c = 0; c < curveCounts->size(); ++c)
+      for (size_t cIndex = 0; cIndex < curveCounts->size(); ++cIndex)
       {
-        size_t count = (*curveCounts)[c];
+        size_t count = curveCounts->get()[cIndex];
 
         vtkNew<vtkPolyLine> polyLine;
         polyLine->GetPointIds()->SetNumberOfIds(count);
