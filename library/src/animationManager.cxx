@@ -164,7 +164,7 @@ void animationManager::Tick(double deltaTime)
 {
   if (this->Playing)
   {
-    this->CurrentTime += deltaTime * this->SpeedFactor;
+    this->CurrentTime += (deltaTime * this->SpeedFactor) * this->AnimationDirection;
 
     // Modulo computation, compute CurrentTime in the time range.
     if (this->CurrentTime < this->TimeRange[0] || this->CurrentTime > this->TimeRange[1])
@@ -537,6 +537,13 @@ void animationManager::SetSpeedFactor(double speedFactor)
     this->SpeedFactor = speedFactor;
     this->SetCheatSheetConfigured(false);
   }
+}
+
+//----------------------------------------------------------------------------
+void animationManager::SetAnimationDirection(int direction)
+{
+  assert(direction == 1 || direction == -1);
+  this->AnimationDirection = direction;
 }
 
 //----------------------------------------------------------------------------

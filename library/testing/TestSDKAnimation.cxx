@@ -19,18 +19,42 @@ int TestSDKAnimation([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   inter.startAnimation();
   test("isPlaying after start", inter.isPlayingAnimation());
+  test("isPlaying forward after start",
+    inter.getAnimationDirection() == f3d::interactor::AnimationDirection::FORWARD);
 
   inter.toggleAnimation();
   test("isPlaying after toggle off", !inter.isPlayingAnimation());
 
   inter.toggleAnimation();
   test("isPlaying after toggle on", inter.isPlayingAnimation());
+  test("isPlaying forward toggle on",
+    inter.getAnimationDirection() == f3d::interactor::AnimationDirection::FORWARD);
 
   f3d::interactor& interRef = inter.triggerEventLoop(0.1);
   test("triggerEventLoop returns self", &interRef == &inter);
 
   inter.stopAnimation();
   test("isPlaying after stop", !inter.isPlayingAnimation());
+
+  inter.startAnimation(f3d::interactor::AnimationDirection::FORWARD);
+  test("isPlaying backward after forward start",
+    inter.getAnimationDirection() == f3d::interactor::AnimationDirection::FORWARD);
+  inter.stopAnimation();
+
+  inter.startAnimation(f3d::interactor::AnimationDirection::BACKWARD);
+  test("isPlaying backward after backward start",
+    inter.getAnimationDirection() == f3d::interactor::AnimationDirection::BACKWARD);
+  inter.stopAnimation();
+
+  inter.toggleAnimation(f3d::interactor::AnimationDirection::FORWARD);
+  test("isPlaying backward after forward toggle on",
+    inter.getAnimationDirection() == f3d::interactor::AnimationDirection::FORWARD);
+  inter.stopAnimation();
+
+  inter.toggleAnimation(f3d::interactor::AnimationDirection::BACKWARD);
+  test("isPlaying backward after backward toggle on",
+    inter.getAnimationDirection() == f3d::interactor::AnimationDirection::BACKWARD);
+  inter.stopAnimation();
 
   return test.result();
 }
