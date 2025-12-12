@@ -2,6 +2,7 @@
 
 #include <vtkObject.h>
 #include <vtkSetGet.h>
+#include <vtkWindows.h>
 
 #include <charconv>
 #include <stdexcept>
@@ -52,4 +53,17 @@ int F3DUtils::ParseToInt(const std::string& str, int def, const std::string& nam
     }
   }
   return value;
+}
+
+//----------------------------------------------------------------------------
+double F3DUtils::getDPIScale()
+{
+  double dpiScale = 1.0;
+
+#ifdef _WIN32
+  int dpi = GetDeviceCaps(wglGetCurrentDC(), LOGPIXELSY); // Default return 96
+  dpiScale = static_cast<double>(dpi) / 96;
+#endif
+
+  return dpiScale;
 }
