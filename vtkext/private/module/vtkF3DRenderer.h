@@ -115,6 +115,7 @@ public:
   void SetGridUnitSquare(const std::optional<double>& unitSquare);
   void SetGridSubdivisions(int subdivisions);
   void SetGridColor(const std::vector<double>& color);
+  void SetAxisXColor(const std::vector<double>& color);
   ///@}
 
   /**
@@ -658,6 +659,7 @@ private:
   std::optional<double> GridUnitSquare;
   int GridSubdivisions = 10;
   double GridColor[3] = { 0.0, 0.0, 0.0 };
+  double AxisXColor[3] = { 0.841107, 0.16327, 0.120593 }; 
 
   std::string HDRIFile;
   vtkSmartPointer<vtkImageReader2> HDRIReader;

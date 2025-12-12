@@ -100,7 +100,6 @@
 #include <cctype>
 #include <chrono>
 #include <sstream>
-
 namespace
 {
 std::string DeprecatedCollapsePath(const fs::path& path)
@@ -299,6 +298,10 @@ void vtkF3DRenderer::Initialize()
 #endif
 
   this->GridConfigured = false;
+  this->AxisXColor[0] = 0.841107;
+  this->AxisXColor[1] = 0.16327;
+  this->AxisXColor[2] = 0.120593;
+
   this->CheatSheetConfigured = false;
   this->ActorsPropertiesConfigured = false;
   this->RenderPassesConfigured = false;
@@ -611,7 +614,7 @@ void vtkF3DRenderer::ShowAxis(bool show)
       this->ModernAxisRepresentation->ContainerVisibilityOn();
 
       // Closest colors to red, green, blue in OKHSL space at 95% saturation and 50% lightness
-      this->ModernAxisRepresentation->SetXAxisColor(0.841107, 0.16327, 0.120593);
+      this->ModernAxisRepresentation->SetXAxisColor(this->AxisXColor[0], this->AxisXColor[1], this->AxisXColor[2]);
       this->ModernAxisRepresentation->SetYAxisColor(0.19516, 0.553311, 0.174);
       this->ModernAxisRepresentation->SetZAxisColor(0.127357, 0.429147, 0.937383);
 
@@ -693,6 +696,18 @@ void vtkF3DRenderer::SetGridColor(const std::vector<double>& color)
     this->GridConfigured = false;
   }
 }
+
+void vtkF3DRenderer::SetAxisXColor(const std::vector<double>& color){
+  #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251001)
+  
+    if (this->ModernAxisRepresentation)
+    {
+      this->ModernAxisRepresentation->SetXAxisColor(
+        color[0],color[1],color[2]);
+    }
+  #endif
+}
+
 
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowGrid(bool show)

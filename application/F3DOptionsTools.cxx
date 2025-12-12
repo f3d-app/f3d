@@ -52,7 +52,7 @@ struct CLIGroup
 };
 
 /**
- * Declaration of all F3D CLI options except `--input` using above structs
+ * Declaration of all F3D CLI options except `sinput` using above structs
  * Order of groups matters in the context of `--help`
  */
 // clang-format off
@@ -91,6 +91,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "remove-empty-file-groups", "", "Remove file groups that results into an empty scene", "<bool>", "1" },
       { "up", "", "Up direction", "<direction>", "" },
       { "axis", "x", "Show axes", "<bool>", "1" }, { "grid", "g", "Show grid", "<bool>", "1" },
+      { "x-color", "", "Color of the X axis", "<color>", "" },
       { "grid-absolute", "", "Position grid at the absolute origin instead of below the model", "<bool>", "1" },
       { "grid-unit", "", "Size of grid unit square, automatically computed by default", "<value>", "" },
       { "grid-subdivisions", "", "Number of grid subdivisions", "<value>", "" },

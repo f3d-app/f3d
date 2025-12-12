@@ -439,6 +439,7 @@ void window_impl::UpdateDynamicOptions()
   if (this->Internals->Interactor)
   {
     renderer->ShowAxis(opt.ui.axis);
+    renderer->SetAxisXColor(opt.ui.xcolor);
     renderer->SetUseTrackball(opt.interactor.trackball);
     renderer->SetInvertZoom(opt.interactor.invert_zoom);
 

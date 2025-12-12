@@ -99,6 +99,7 @@ public:
     bool RecursiveDirAdd;
     bool RemoveEmptyFileGroups;
     std::vector<int> Resolution;
+    std::vector<int> XAxisColor;
     std::vector<int> Position;
     std::string ColorMapFile;
     CameraConfiguration CamConf;
@@ -748,6 +749,7 @@ public:
     this->ParseOption(
       appOptions, "remove-empty-file-groups", this->AppOptions.RemoveEmptyFileGroups);
     this->ParseOption(appOptions, "resolution", this->AppOptions.Resolution);
+    this->ParseOption(appOptions, "x-axis-color", this->AppOptions.XAxisColor);
     this->ParseOption(appOptions, "position", this->AppOptions.Position);
     this->ParseOption(appOptions, "colormap-file", this->AppOptions.ColorMapFile);
 
