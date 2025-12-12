@@ -288,6 +288,7 @@ f3d_test(NAME TestConfigResetInexistent DATA suzanne.stl ARGS -Rrender.glid.enab
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
   f3d_test(NAME TestConfigImperative DATA dragon.vtu ARGS --axis=false CONFIG ${F3D_SOURCE_DIR}/testing/configs/imperative.json UI)
+  f3d_test(NAME TestConfigXAxisColor DATA dragon.vtu ARGS --x-axis-color=0,0,0)
 endif()
 f3d_test(NAME TestAnimationIndicesSingle DATA soldier_animations.mdl ARGS --animation-indices=7 --animation-time=0.5 --animation-progress)
 f3d_test(NAME TestAnimationIndicesMulti DATA InterpolationTest.glb ARGS --animation-indices=7,6 --animation-time=0.5 --animation-progress)

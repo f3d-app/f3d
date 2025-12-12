@@ -185,6 +185,10 @@
       "type": "bool",
       "default_value": "false"
     },
+    "xcolor": {
+      "type": "color",
+      "default_value": "0.841107, 0.16327, 0.120593"
+    },
     "scalar_bar": {
       "type": "bool",
       "default_value": "false"
