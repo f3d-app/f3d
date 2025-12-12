@@ -140,7 +140,6 @@ public:
     }
 
     bool reset = false;
-    double zoomFactor = 0.9;
     if (camConf.CameraPosition.size() != 3 && camConf.CameraDirection.has_value())
     {
       f3d::vector3_t dir = camConf.CameraDirection.value();
@@ -156,20 +155,18 @@ public:
     }
     if (camConf.CameraPosition.size() != 3)
     {
-      if (camConf.CameraZoomFactor > 0)
-      {
-        zoomFactor = camConf.CameraZoomFactor;
-      }
       reset = true;
     }
+
+    cam.azimuth(camConf.CameraAzimuthAngle).elevation(camConf.CameraElevationAngle);
+
     if (reset)
     {
+      const double zoomFactor = camConf.CameraZoomFactor > 0 ? camConf.CameraZoomFactor : 0.9;
       cam.resetToBounds(zoomFactor);
     }
 
-    cam.azimuth(camConf.CameraAzimuthAngle)
-      .elevation(camConf.CameraElevationAngle)
-      .setCurrentAsDefault();
+    cam.setCurrentAsDefault();
   }
 
   static bool HasHDRIExtension(const std::string& file)
