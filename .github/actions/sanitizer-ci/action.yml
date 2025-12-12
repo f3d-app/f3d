@@ -121,6 +121,7 @@ runs:
         -DF3D_TESTING_ENABLE_GLX_TESTS=ON
         -DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=ON
         -DF3D_TESTING_ENABLE_OSMESA_TESTS=ON
+        ${{ inputs.sanitizer_type == 'undefined' && '-DF3D_BINDINGS_C=OFF' || '' }}
 
     - name: Build
       shell: bash
