@@ -73,6 +73,7 @@ Supports `front`, `top`, `right`, `isometric` arguments. eg: `set_camera top`.
 
 `jump_to_frame`: A specific command to load an animation at a specific frame, takes a number and a boolean as arguments.
 eg:
+
 - `jump_to_frame 1 true` jump to next frame.
 - `jump_to_frame -1 true` jump to previous frame.
 - `jump_to_frame 0 false` jump to first frame.
