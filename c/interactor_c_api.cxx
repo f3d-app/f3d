@@ -611,10 +611,10 @@ void f3d_interactor_get_binding_documentation(f3d_interactor_t* interactor,
 
   auto [doc_str, value_str] = cpp_interactor->getBindingDocumentation(cpp_bind);
 
-  strncpy(doc->doc, doc_str.c_str(), sizeof(doc->doc) - 1);
+  std::strncpy(doc->doc, doc_str.c_str(), sizeof(doc->doc) - 1);
   doc->doc[sizeof(doc->doc) - 1] = '\0';
 
-  strncpy(doc->value, value_str.c_str(), sizeof(doc->value) - 1);
+  std::strncpy(doc->value, value_str.c_str(), sizeof(doc->value) - 1);
   doc->value[sizeof(doc->value) - 1] = '\0';
 }
 

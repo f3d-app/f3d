@@ -236,7 +236,7 @@ char** f3d_image_all_metadata(f3d_image_t* img, unsigned int* count)
   for (size_t i = 0; i < metadata_keys.size(); ++i)
   {
     keys[i] = new char[metadata_keys[i].size() + 1];
-    strcpy(keys[i], metadata_keys[i].c_str());
+    std::strcpy(keys[i], metadata_keys[i].c_str());
   }
   return keys;
 }
@@ -249,13 +249,6 @@ void f3d_image_free_metadata_keys(char** keys, unsigned int count)
     delete[] keys[i];
   }
   delete[] keys;
-}
-
-//----------------------------------------------------------------------------
-f3d_image_t* f3d_image_create_from_file(const char* path)
-{
-  f3d::image* img = new f3d::image(path);
-  return reinterpret_cast<f3d_image_t*>(img);
 }
 
 //----------------------------------------------------------------------------

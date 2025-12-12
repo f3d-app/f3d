@@ -259,16 +259,6 @@ extern "C"
    */
   F3D_EXPORT void f3d_image_free_metadata_keys(char** keys, unsigned int count);
 
-  /**
-   * @brief Create an image from a file
-   *
-   * The returned image must be deleted with f3d_image_delete().
-   *
-   * @param path Path to the image file
-   * @return Pointer to the created image object
-   */
-  F3D_EXPORT f3d_image_t* f3d_image_create_from_file(const char* path);
-
 #ifdef __cplusplus
 }
 #endif

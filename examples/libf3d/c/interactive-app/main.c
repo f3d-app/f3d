@@ -82,6 +82,7 @@ int main(int argc, char** argv)
 
   if (argc > 2)
   {
+    // For testing purposes only, shutdown the example after `timeout` seconds
     int timeout = atoi(argv[2]);
     f3d_interactor_start_with_callback(interactor, timeout, timeout_callback, interactor);
   }
