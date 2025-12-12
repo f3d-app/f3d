@@ -10,9 +10,16 @@ endif()
 
 set(F3D_JAVA_SOURCES
   Camera.java
+  Context.java
   Engine.java
+  Image.java
+  Interactor.java
+  Log.java
   Options.java
   Scene.java
+  Transform2D.java
+  Types.java
+  Utils.java
   Window.java)
 
 # Generate JNI headers, and builds a JAR package
@@ -21,7 +28,20 @@ add_jar(f3d-jar ${F3D_JAVA_SOURCES}
   GENERATE_NATIVE_HEADERS f3d-jni-headers
   OUTPUT_NAME f3d)
 
-add_library(javaf3d SHARED F3DJavaBindings.cxx)
+set(F3D_JAVA_BINDINGS_SOURCES
+  F3DCameraBindings.cxx
+  F3DContextBindings.cxx
+  F3DEngineBindings.cxx
+  F3DImageBindings.cxx
+  F3DInteractorBindings.cxx
+  F3DLogBindings.cxx
+  F3DOptionsBindings.cxx
+  F3DSceneBindings.cxx
+  F3DTypesBindings.cxx
+  F3DUtilsBindings.cxx
+  F3DWindowBindings.cxx)
+
+add_library(javaf3d SHARED ${F3D_JAVA_BINDINGS_SOURCES})
 target_link_libraries(javaf3d PRIVATE f3d-jni-headers)
 
 target_include_directories(javaf3d PRIVATE ${JNI_INCLUDE_DIRS})
