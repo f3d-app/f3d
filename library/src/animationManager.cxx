@@ -196,15 +196,13 @@ void animationManager::JumpToFrame(int frame, bool relative)
   }
   else
   {
-    switch (frame)
+    if (frame < 0)
     {
-      case -1:
-        this->CurrentTime = this->TimeRange[1];
-        break;
-      default:
-        this->CurrentTime = this->TimeRange[0] + (frame * this->DeltaTime);
-        break;
+      const double animationFrameDuration =
+        (this->TimeRange[1] - this->TimeRange[0]) / this->DeltaTime;
+      frame += animationFrameDuration;
     }
+    this->CurrentTime = this->TimeRange[0] + (frame * this->DeltaTime);
   }
 
   if (this->LoadAtTime(this->CurrentTime))
