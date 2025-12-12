@@ -7,7 +7,9 @@
 
 int test_scene_c_api()
 {
-  f3d_engine_t* engine = f3d_engine_create_none();
+  f3d_engine_autoload_plugins();
+
+  f3d_engine_t* engine = f3d_engine_create(1);
   if (!engine)
   {
     puts("[ERROR] Failed to create engine");
@@ -24,6 +26,13 @@ int test_scene_c_api()
 
   int supported = f3d_scene_supports(scene, "test.obj");
   (void)supported;
+
+  int add_result = f3d_scene_add(scene, F3D_TESTING_DATA_DIR "cow.vtp");
+  (void)add_result;
+
+  const char* files[] = { F3D_TESTING_DATA_DIR "cow.vtp", F3D_TESTING_DATA_DIR "suzanne.obj" };
+  int add_multiple_result = f3d_scene_add_multiple(scene, files, 2);
+  (void)add_multiple_result;
 
   f3d_scene_clear(scene);
 

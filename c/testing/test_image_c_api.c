@@ -70,6 +70,15 @@ int test_image_c_api()
     f3d_image_free_buffer(buffer);
   }
 
+  const char* tmp_path = "/tmp/f3d_test_image.png";
+  f3d_image_save(img, tmp_path, PNG);
+
+  f3d_image_t* img_from_file = f3d_image_new_path(tmp_path);
+  if (img_from_file)
+  {
+    f3d_image_delete(img_from_file);
+  }
+
   const char* text = f3d_image_to_terminal_text_string(img);
   (void)text;
 

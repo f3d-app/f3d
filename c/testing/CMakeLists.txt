@@ -21,6 +21,7 @@ create_test_sourcelist(_f3d_c_api_driver_src f3d_c_api_tests.c ${f3d_c_api_tests
 add_executable(f3d_c_api_tests ${_f3d_c_api_driver_src})
 
 target_link_libraries(f3d_c_api_tests PRIVATE c_api)
+target_compile_definitions(f3d_c_api_tests PRIVATE F3D_TESTING_DATA_DIR="${F3D_SOURCE_DIR}/testing/data/")
 
 # Add all the ADD_TEST for each test
 foreach (test ${f3d_c_api_tests_list})

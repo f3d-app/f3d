@@ -5,6 +5,12 @@
 #include <stdio.h>
 #include <string.h>
 
+static void stop_callback(void* user_data)
+{
+  f3d_interactor_t* interactor = (f3d_interactor_t*)user_data;
+  f3d_interactor_request_stop(interactor);
+}
+
 int test_interactor_c_api()
 {
   f3d_engine_t* engine = f3d_engine_create(1);
@@ -123,6 +129,13 @@ int test_interactor_c_api()
 
   f3d_binding_documentation_t doc;
   f3d_interactor_get_binding_documentation(interactor, &bind, &doc);
+
+  f3d_interactor_binding_type_t binding_type = f3d_interactor_get_binding_type(interactor, &bind);
+  (void)binding_type;
+
+  f3d_interactor_remove_binding(interactor, &bind);
+
+  f3d_interactor_start_with_callback(interactor, 0.01, stop_callback, interactor);
 
   f3d_engine_delete(engine);
   return 0;
