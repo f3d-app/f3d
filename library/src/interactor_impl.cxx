@@ -1091,6 +1091,15 @@ interactor& interactor_impl::initCommands()
     },
     command_documentation_t{ "roll_camera value", "roll the camera on its side" });
 
+  this->addCommand("jump_to_frame",
+    [&](const std::vector<std::string>& args)
+    {
+      check_args(args, 2, "jump_to_frame");
+      const int frame = options::parse<int>(args[0]);
+      const bool relative = options::parse<bool>(args[1]);
+      this->Internals->AnimationManager->JumpToFrame(frame, relative);
+    });
+
   this->addCommand(
     "elevation_camera",
     [&](const std::vector<std::string>& args)

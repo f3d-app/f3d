@@ -1,0 +1,15 @@
+# StreamVersion 1.2
+ExposeEvent 0 289 0 0 0 0 0
+RenderEvent 0 289 0 0 0 0 0
+TimerEvent 0 289 0 0 0 0 0
+
+# Ctrl + Shift + M
+KeyPressEvent 909 -228 0 0 1 Control_L 0
+CharEvent 909 -228 0 0 1 Control_L 0
+KeyPressEvent 909 -228 0 0 1 Shift_L 0
+CharEvent 909 -228 0 0 1 Shift_L 0
+KeyPressEvent 869 -67 3 6 1 M 0
+CharEvent 869 -67 3 6 1 M 0
+KeyReleaseEvent 869 -67 3 6 1 M 0
+KeyReleaseEvent 869 -67 3 0 1 Shift_L 0
+KeyReleaseEvent 869 -67 2 0 1 Control_L 0

@@ -162,6 +162,8 @@ void animationManager::ToggleAnimation()
 //----------------------------------------------------------------------------
 void animationManager::Tick(double deltaTime)
 {
+  this->DeltaTime = deltaTime;
+
   if (this->Playing)
   {
     this->CurrentTime += (deltaTime * this->SpeedFactor) * this->AnimationDirection;
@@ -182,6 +184,30 @@ void animationManager::Tick(double deltaTime)
     {
       this->Window.render();
     }
+  }
+}
+
+//----------------------------------------------------------------------------
+void animationManager::JumpToFrame(int frame, bool relative)
+{
+  if (relative)
+  {
+    this->CurrentTime += ((this->DeltaTime * this->SpeedFactor) * this->AnimationDirection) * frame;
+  }
+  else
+  {
+    if (frame < 0)
+    {
+      const double animationFrameDuration =
+        (this->TimeRange[1] - this->TimeRange[0]) / this->DeltaTime;
+      frame += animationFrameDuration;
+    }
+    this->CurrentTime = this->TimeRange[0] + (frame * this->DeltaTime);
+  }
+
+  if (this->LoadAtTime(this->CurrentTime))
+  {
+    this->Window.render();
   }
 }
 
