@@ -2,6 +2,7 @@
 
 #include "F3DLog.h"
 #include "vtkF3DGenericImporter.h"
+#include "vtkF3DImporter.h"
 
 #include <vtkActorCollection.h>
 #include <vtkCallbackCommand.h>
@@ -515,8 +516,8 @@ void vtkF3DMetaImporter::SetCameraIndex(std::optional<vtkIdType> camIndex)
 }
 
 //----------------------------------------------------------------------------
-bool vtkF3DMetaImporter::GetTemporalInformation(vtkIdType animationIndex, double frameRate,
-  int& nbTimeSteps, double timeRange[2], vtkDoubleArray* timeSteps)
+bool vtkF3DMetaImporter::GetTemporalInformation(
+  vtkIdType animationIndex, double timeRange[2], int& nbTimeSteps, vtkDoubleArray* timeSteps)
 {
   vtkIdType localAnimationIndex = animationIndex;
   for (const auto& importerPair : this->Pimpl->Importers)
@@ -529,8 +530,21 @@ bool vtkF3DMetaImporter::GetTemporalInformation(vtkIdType animationIndex, double
 
     if (localAnimationIndex < nAnim)
     {
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 5, 20251210)
+      vtkF3DImporter* f3dImporter = vtkF3DImporter::SafeDownCast(importerPair.Importer);
+      if (f3dImporter)
+      {
+        f3dImporter->GetTemporalInformation(localAnimationIndex, timeRange, nbTimeSteps, timeSteps);
+      }
+      else
+      {
+        return importerPair.Importer->GetTemporalInformation(
+          localAnimationIndex, 0, nbTimeSteps, timeRange, timeSteps);
+      }
+#else
       return importerPair.Importer->GetTemporalInformation(
-        localAnimationIndex, frameRate, nbTimeSteps, timeRange, timeSteps);
+        localAnimationIndex, timeRange, nbTimeSteps, timeSteps);
+#endif
     }
     else
     {

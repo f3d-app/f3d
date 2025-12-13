@@ -27,7 +27,7 @@ int TestF3DGenericImporter(int argc, char* argv[])
   double timeRange[2];
   vtkNew<vtkDoubleArray> timeSteps;
 
-  if (importer->GetTemporalInformation(0, 60, nbTimeSteps, timeRange, timeSteps))
+  if (importer->GetTemporalInformation(0, timeRange, nbTimeSteps, timeSteps))
   {
     std::cerr << "Unexpected return value with GetTemporalInformation\n";
     return EXIT_FAILURE;
