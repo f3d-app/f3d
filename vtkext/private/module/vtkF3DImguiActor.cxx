@@ -484,7 +484,7 @@ void vtkF3DImguiActor::RenderSceneHierarchy()
     return;
   }
 
-  constexpr float margin = F3DImguiStyle::GetDefaultMargin();
+  constexpr float margin = F3DStyle::GetDefaultMargin();
   float winWidth = this->CalculateHierarchyWidth();
   float winHeight = viewport->WorkSize.y - 2.0f * margin;
 

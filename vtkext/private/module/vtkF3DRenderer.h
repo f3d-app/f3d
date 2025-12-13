@@ -682,11 +682,8 @@ private:
   bool TimerVisible = false;
   bool FilenameVisible = false;
   bool MetaDataVisible = false;
-<<<<<<< HEAD
   bool HDRIFilenameVisible = false;
-=======
   bool SceneHierarchyVisible = false;
->>>>>>> aa51b800 (Add key bind for showing the hierarchy)
   bool CheatSheetVisible = false;
   bool ConsoleVisible = false;
   bool MinimalConsoleVisible = false;
