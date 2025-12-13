@@ -1665,7 +1665,7 @@ void F3DStarter::LoadFileGroupInternal(
 
     // Unwatch and erase paths that should not be watched anymore
     for (auto it = this->Internals->FolderWatchIds.begin();
-      it != this->Internals->FolderWatchIds.end();)
+         it != this->Internals->FolderWatchIds.end();)
     {
       const fs::path& path = it->first;
       const dmon_watch_id& dmonId = it->second;
@@ -2145,8 +2145,7 @@ void F3DStarter::AddCommands()
 
   interactor.addCommand(
     "load_next_file_group",
-    [this](const std::vector<std::string>& args)
-    {
+    [this](const std::vector<std::string>& args) {
       this->LoadRelativeFileGroup(
         +1, parse_optional_bool_flag(args, "load_next_file_group", false));
     },
