@@ -50,6 +50,9 @@ public:
   camera& setState(const camera_state_t& state) override;
   camera_state_t getState() const override;
   void getState(camera_state_t& state) const override;
+  double getAzimuth() const override;
+  double getElevation() const override;
+  double getDistance() const override;
 
   camera& dolly(double val) override;
   camera& pan(double right, double up, double forward) override;
