@@ -59,6 +59,7 @@ public:
 #endif
 
 #if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 5, 20251210)
+  using vtkImporter::GetTemporalInformation;
   /**
    * Forward call to pre-20251210 implementation for GetTemporalInformation
    * with framerate at 0
