@@ -12,6 +12,7 @@
 #include <vtkPointData.h>
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
+#include <vtkResourceStream.h>
 
 #include "draco/compression/decode.h"
 #include "draco/draco_features.h"
@@ -20,6 +21,9 @@
 #ifndef DRACO_MESH_COMPRESSION_SUPPORTED
 #error "Please rebuild draco with DRACO_MESH_COMPRESSION cmake option enabled."
 #endif
+
+vtkCxxSetSmartPointerMacro(vtkF3DDracoReader, Stream, vtkResourceStream);
+
 class vtkF3DDracoReader::vtkInternals
 {
 public:
@@ -184,11 +188,24 @@ int vtkF3DDracoReader::RequestData(
 
   std::vector<char> data;
 
-  auto reader = draco::StdioFileReader::Open(this->FileName);
-  if (!reader->ReadFileToBuffer(&data))
+  if (this->Stream)
   {
-    vtkErrorMacro("Cannot read file");
-    return 0;
+    this->Stream->Seek(0, vtkResourceStream::SeekDirection::End);
+    size_t length = this->Stream->Tell();
+    this->Stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+
+    // Read stream into buffer
+    data.resize(length);
+    this->Stream->Read(data.data(), length);
+  }
+  else
+  {
+    auto reader = draco::StdioFileReader::Open(this->FileName);
+    if (!reader || !reader->ReadFileToBuffer(&data))
+    {
+      vtkErrorMacro("Cannot read file");
+      return 0;
+    }
   }
 
   draco::DecoderBuffer buffer;
@@ -222,11 +239,4 @@ int vtkF3DDracoReader::RequestData(
   }
 
   return 1;
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DDracoReader::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os, indent);
-  os << indent << "FileName: " << this->FileName << "\n";
 }
