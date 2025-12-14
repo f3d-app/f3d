@@ -106,22 +106,6 @@ void camera_impl::getFocalPoint(point3_t& foc) const
 }
 
 //----------------------------------------------------------------------------
-double camera_impl::getDistance() const
-{
-  point3_t pos;
-  point3_t focal;
-
-  this->getPosition(pos);
-  this->getFocalPoint(focal);
-
-  const double dx = pos[0] - focal[0];
-  const double dy = pos[1] - focal[1];
-  const double dz = pos[2] - focal[2];
-
-  return std::sqrt(dx * dx + dy * dy + dz * dz);
-}
-
-//----------------------------------------------------------------------------
   double camera_impl::getAzimuth() const
 {
   point3_t pos;
@@ -133,7 +117,7 @@ double camera_impl::getDistance() const
   const double dx = pos[0] - focal[0];
   const double dy = pos[1] - focal[1];
 
-  return std::atan2(dy, dx) * 180.0 / M_PI;
+  return std::atan2(dy, dx) * 180.0 / std::acos(-1.0);
 }
 
 //----------------------------------------------------------------------------
@@ -151,9 +135,24 @@ double camera_impl::getDistance() const
 
   const double horizontalDist = std::sqrt(dx * dx + dy * dy);
 
-  return std::atan2(dz, horizontalDist) * 180.0 / M_PI;
+  return std::atan2(dz, horizontalDist) * 180.0 / std::acos(-1.0);
 }
 
+//----------------------------------------------------------------------------
+double camera_impl::getDistance() const
+{
+  point3_t pos;
+  point3_t focal;
+
+  this->getPosition(pos);
+  this->getFocalPoint(focal);
+
+  const double dx = pos[0] - focal[0];
+  const double dy = pos[1] - focal[1];
+  const double dz = pos[2] - focal[2];
+
+  return std::sqrt(dx * dx + dy * dy + dz * dz);
+}
 
 //----------------------------------------------------------------------------
 camera& camera_impl::setViewUp(const vector3_t& up)
