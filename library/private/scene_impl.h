@@ -12,6 +12,8 @@
 #include "log.h"
 #include "scene.h"
 
+#include "F3DNodeInfo.h"
+
 #include <memory>
 
 namespace f3d
@@ -58,6 +60,12 @@ public:
    * Display available cameras in the log
    */
   void PrintImporterDescription(log::VerboseLevel level);
+
+  /**
+   * Get scene hierarchy nodes for display and control.
+   * This is used internally to update the window.
+   */
+  std::vector<NodeInfo> GetSceneHierarchyNodes();
 
 private:
   class internals;

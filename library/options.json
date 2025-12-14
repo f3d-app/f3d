@@ -270,6 +270,10 @@
     },
     "animation_progress_color": {
       "type": "color"
+    },
+    "scene_hierarchy": {
+      "type": "bool",
+      "default_value": "false"
     }
   },
   "model": {
