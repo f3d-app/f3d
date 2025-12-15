@@ -100,6 +100,7 @@
 #include <cctype>
 #include <chrono>
 #include <sstream>
+
 namespace
 {
 std::string DeprecatedCollapsePath(const fs::path& path)
@@ -298,7 +299,6 @@ void vtkF3DRenderer::Initialize()
 #endif
 
   this->GridConfigured = false;
-
   this->CheatSheetConfigured = false;
   this->ActorsPropertiesConfigured = false;
   this->RenderPassesConfigured = false;
