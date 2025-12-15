@@ -21,6 +21,3 @@ _wasm_build
 
 # testing related
 .cache
-
-#ide related
-.vscode/*
