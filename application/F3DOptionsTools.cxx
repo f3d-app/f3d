@@ -92,6 +92,8 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "up", "", "Up direction", "<direction>", "" },
       { "axis", "x", "Show axes", "<bool>", "1" }, { "grid", "g", "Show grid", "<bool>", "1" },
       { "x-color", "", "Color of the X axis", "<color>", "" },
+      { "y-color", "", "Color of the Y axis", "<color>", "" },
+      { "z-color", "", "Color of the Z axis", "<color>", "" },
       { "grid-absolute", "", "Position grid at the absolute origin instead of below the model", "<bool>", "1" },
       { "grid-unit", "", "Size of grid unit square, automatically computed by default", "<value>", "" },
       { "grid-subdivisions", "", "Number of grid subdivisions", "<value>", "" },

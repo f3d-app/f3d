@@ -189,6 +189,14 @@
       "type": "color",
       "default_value": "0.841107, 0.16327, 0.120593"
     },
+    "ycolor": {
+      "type": "color",
+      "default_value": "0.19516, 0.553311, 0.174"
+    },
+    "zcolor": {
+      "type": "color",
+      "default_value": "0.127357, 0.429147, 0.937383"
+    },
     "scalar_bar": {
       "type": "bool",
       "default_value": "false"

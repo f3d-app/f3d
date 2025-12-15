@@ -74,6 +74,8 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "up", "scene.up_direction" },
   { "axis", "ui.axis" },
   { "x-color", "ui.xcolor" },
+  { "y-color", "ui.ycolor" },
+  { "z-color", "ui.zcolor" },
   { "grid", "render.grid.enable" },
   { "grid-absolute", "render.grid.absolute" },
   { "grid-unit", "render.grid.unit" },
