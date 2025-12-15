@@ -694,6 +694,7 @@ void vtkF3DRenderer::SetGridColor(const std::vector<double>& color)
   }
 }
 
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetAxisColor(const std::vector<double>& colorXAxis,const std::vector<double>& colorYAxis,const std::vector<double>& colorZAxis){
   #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251001)
   
@@ -710,7 +711,6 @@ void vtkF3DRenderer::SetAxisColor(const std::vector<double>& colorXAxis,const st
   this->GridMapper->SetAxis1Color((colorXAxis[0]), (colorXAxis[1]), (colorXAxis[2]), 1);
   this->GridMapper->SetAxis2Color((colorZAxis[0]), (colorZAxis[1]), (colorZAxis[2]), 1);
 }
-
 
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ShowGrid(bool show)
