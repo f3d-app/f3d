@@ -13,6 +13,7 @@
 
 #include "vtkF3DMetaImporter.h"
 #include "vtkF3DUIActor.h"
+#include "vtkF3DOpenGLGridMapper.h"
 
 #include <vtkCallbackCommand.h>
 #include <vtkLight.h>
@@ -599,6 +600,7 @@ private:
 #endif
 
   vtkNew<vtkActor> GridActor;
+  vtkNew<vtkF3DOpenGLGridMapper> GridMapper;
   vtkNew<vtkSkybox> SkyboxActor;
   vtkNew<vtkF3DUIActor> UIActor;
 
