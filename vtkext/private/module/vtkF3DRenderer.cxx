@@ -298,9 +298,6 @@ void vtkF3DRenderer::Initialize()
 #endif
 
   this->GridConfigured = false;
-  this->AxisXColor[0] = 0.841107;
-  this->AxisXColor[1] = 0.16327;
-  this->AxisXColor[2] = 0.120593;
 
   this->CheatSheetConfigured = false;
   this->ActorsPropertiesConfigured = false;
@@ -614,7 +611,7 @@ void vtkF3DRenderer::ShowAxis(bool show)
       this->ModernAxisRepresentation->ContainerVisibilityOn();
 
       // Closest colors to red, green, blue in OKHSL space at 95% saturation and 50% lightness
-      this->ModernAxisRepresentation->SetXAxisColor(this->AxisXColor[0], this->AxisXColor[1], this->AxisXColor[2]);
+      this->ModernAxisRepresentation->SetXAxisColor(0.841107, 0.16327, 0.120593);
       this->ModernAxisRepresentation->SetYAxisColor(0.19516, 0.553311, 0.174);
       this->ModernAxisRepresentation->SetZAxisColor(0.127357, 0.429147, 0.937383);
 
