@@ -772,8 +772,7 @@ if(F3D_PLUGIN_BUILD_ALEMBIC)
   f3d_test(NAME TestAlembicNonFaceVarying DATA tetrahedron_non_facevarying_uv.abc ARGS -s --load-plugins=alembic)
   f3d_test(NAME TestAlembicAnimation DATA drop.abc ARGS --animation-time=2 --load-plugins=alembic --animation-progress)
   f3d_test(NAME TestAlembicAnimationXForm DATA xform_anim.abc ARGS -g --animation-time=1.5 --load-plugins=alembic --animation-progress)
-  # Threshold is little bit higher because we have a small difference between CI and the baseline due to floating point imprecision or anti aliasing
-  f3d_test(NAME TestAlembicCurves DATA monkey_curves.abc ARGS --load-plugins=alembic THRESHOLD 0.07)
+  f3d_test(NAME TestAlembicCurves DATA monkey_curves.abc ARGS --load-plugins=alembic THRESHOLD 0.07) # High treshold because of line rendering
 
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${F3D_SOURCE_DIR}/plugins/alembic/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
