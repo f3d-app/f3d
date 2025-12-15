@@ -52,7 +52,7 @@ struct CLIGroup
 };
 
 /**
- * Declaration of all F3D CLI options except `sinput` using above structs
+ * Declaration of all F3D CLI options except `--input` using above structs
  * Order of groups matters in the context of `--help`
  */
 // clang-format off

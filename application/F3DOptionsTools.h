@@ -46,7 +46,6 @@ static inline const OptionsDict DefaultAppOptions = {
   { "recursive-dir-add", "false" },
   { "remove-empty-file-groups", "false" },
   { "resolution", "1000, 600" },
-  { "x-axis-color", "255, 0,0" },
   { "position", "" },
   { "colormap-file", "" },
   { "camera-position", "" },
