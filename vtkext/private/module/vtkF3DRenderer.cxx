@@ -795,8 +795,35 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
       this->GridActor->SetPosition(gridPos);
 
       this->GridActor->GetProperty()->SetColor(this->GridColor);
-      gridMapper->SetAxis1Color(::abs(right[0]), ::abs(right[1]), ::abs(right[2]), 1);
-      gridMapper->SetAxis2Color(::abs(front[0]), ::abs(front[1]), ::abs(front[2]), 1);
+
+      double colorX[3] = { 1, 0, 0 }; // TODO: set from config
+      double colorY[3] = { 0, 1, 0 }; // TODO: set from config
+      double colorZ[3] = { 0, 0, 1 }; // TODO: set from config
+
+      const auto factor = [](const double* v, const double x, const double y, const double z)
+      {
+        const double ref[3] = { x, y, z };
+        const double angle180 = vtkMath::DegreesFromRadians(vtkMath::AngleBetweenVectors(v, ref));
+        const double angle90 = angle180 > 90 ? 180 - angle180 : angle180;
+        return 1.0 - angle90 / 90.0;
+      };
+      const double fX1 = factor(right, 1, 0, 0);
+      const double fY1 = factor(right, 0, 1, 0);
+      const double fZ1 = factor(right, 0, 0, 1);
+      const double fX2 = factor(front, 1, 0, 0);
+      const double fY2 = factor(front, 0, 1, 0);
+      const double fZ2 = factor(front, 0, 0, 1);
+      const double f1 = fX1 + fY1 + fZ1;
+      const double f2 = fX2 + fY2 + fZ2;
+
+      gridMapper->SetAxis1Color( //
+        (colorX[0] * fX1 + colorY[0] * fY1 + colorZ[0] * fZ1) / f1,
+        (colorX[1] * fX1 + colorY[1] * fY1 + colorZ[1] * fZ1) / f1,
+        (colorX[2] * fX1 + colorY[2] * fY1 + colorZ[2] * fZ1) / f1, 1);
+      gridMapper->SetAxis2Color( //
+        (colorX[0] * fX2 + colorY[0] * fY2 + colorZ[0] * fZ2) / f2,
+        (colorX[1] * fX2 + colorY[1] * fY2 + colorZ[1] * fZ2) / f2,
+        (colorX[2] * fX2 + colorY[2] * fY2 + colorZ[2] * fZ2) / f2, 1);
 
       this->GridActor->ForceTranslucentOn();
       this->GridActor->SetMapper(gridMapper);
