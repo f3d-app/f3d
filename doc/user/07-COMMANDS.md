@@ -76,9 +76,11 @@ eg:
 
 - `jump_to_frame 1 true` jump to next frame.
 - `jump_to_frame -1 true` jump to previous frame.
-- `jump_to_frame 1 false` jump to first frame.
-- `jump_to_frame 2 false` jump to the second frame.
+- `jump_to_frame 0 false` jump to frame 0.
+- `jump_to_frame 0 false` jump to frame 1.
+- `jump_to_frame 10 false` jump to frame 10.
 - `jump_to_frame -1 false` jump to last frame.
+- `jump_to_frame -2 false` jump to second last frame.
 
 `cycle_verbose_level` : A specific command to cycle between the verbose levels (`Debug`, `Info`, `Warning`, `Error`, `Quiet`).
 
