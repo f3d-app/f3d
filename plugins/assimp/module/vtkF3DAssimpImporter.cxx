@@ -224,7 +224,15 @@ public:
       }
       else
       {
-        std::string dir = vtksys::SystemTools::GetParentDirectory(this->Parent->GetFileName());
+        const char* filename = this->Parent->GetFileName();
+        if (!filename)
+        {
+          vtkWarningWithObjectMacro(
+            this->Parent, "Cannot read texture from file without a filename");
+          return nullptr;
+        }
+
+        std::string dir = vtksys::SystemTools::GetParentDirectory(filename);
         std::string texturePath = vtksys::SystemTools::CollapseFullPath(path, dir);
 
         // try to get the texture in the same dir as the model file
@@ -628,14 +636,44 @@ public:
   /**
    * Read the scene file
    */
-  bool ReadScene(const std::string& filePath)
+  bool ReadScene(vtkResourceStream* stream, const char* filePath, [[maybe_unused]] const char* hint)
   {
     try
     {
       // Work around for https://github.com/assimp/assimp/issues/4620
       this->Importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
-      this->Scene = this->Importer.ReadFile(
-        filePath, aiProcess_LimitBoneWeights | aiProcess_ValidateDataStructure);
+
+      if (stream)
+      {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+        stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+        auto memStream = vtkMemoryResourceStream::SafeDownCast(stream);
+        vtkNew<vtkMemoryResourceStream> localMemStream;
+        if (!memStream)
+        {
+          // Copy to a mem stream if needed
+          stream->Seek(0, vtkResourceStream::SeekDirection::End);
+          std::size_t size = stream->Tell();
+          stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+          std::vector<std::byte> tempBuffer;
+          tempBuffer.resize(size);
+          stream->Read(tempBuffer.data(), size);
+          localMemStream->SetBuffer(std::move(tempBuffer));
+          memStream = localMemStream;
+        }
+        this->Scene = this->Importer.ReadFileFromMemory(memStream->GetBuffer(),
+          memStream->GetSize(), aiProcess_LimitBoneWeights | aiProcess_ValidateDataStructure, hint);
+#else
+        vtkErrorWithObjectMacro(
+          this->Parent, "This version of VTK doesn't support reading memory stream with Assimp");
+        return false;
+#endif
+      }
+      else
+      {
+        this->Scene = this->Importer.ReadFile(
+          std::string(filePath), aiProcess_LimitBoneWeights | aiProcess_ValidateDataStructure);
+      }
     }
     catch (const DeadlyImportError& e)
     {
@@ -951,7 +989,8 @@ vtkF3DAssimpImporter::~vtkF3DAssimpImporter() = default;
 //----------------------------------------------------------------------------
 int vtkF3DAssimpImporter::ImportBegin()
 {
-  return this->Internals->ReadScene(this->GetFileName());
+  return this->Internals->ReadScene(
+    this->GetStream(), this->GetFileName(), this->MemoryHint.c_str());
 }
 
 //----------------------------------------------------------------------------

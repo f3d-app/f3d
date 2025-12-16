@@ -1,55 +1,57 @@
-import subprocess
-import sys
-
 from f3d import Log
+from pytest import CaptureFixture, mark
 
 
-def test_default_level():
-    assert (
-        run_python(
-            "from f3d import Log",
-            "Log.set_use_coloring(False)",
-            "Log.print(Log.DEBUG, 'debug')",
-            "Log.print(Log.INFO, 'info')",
-        )
-        == "info\n"
-    )
+@mark.parametrize(
+    "level, expected_out, expected_err",
+    [
+        (None, "info\n", "warn\nerror\n"),
+        (Log.DEBUG, "debug\ninfo\n", "warn\nerror\n"),
+        (Log.INFO, "info\n", "warn\nerror\n"),
+        (Log.WARN, "", "warn\nerror\n"),
+        (Log.ERROR, "", "error\n"),
+        (Log.QUIET, "", ""),
+    ],
+)
+def test_levels(
+    level: Log.VerboseLevel | None,
+    expected_out: str,
+    expected_err: str,
+    capfd: CaptureFixture[str],
+):
+    if level is not None:
+        Log.set_verbose_level(level)
+    Log.set_use_coloring(False)
+
+    Log.print(Log.DEBUG, "debug")
+    Log.print(Log.INFO, "info")
+    Log.print(Log.WARN, "warn")
+    Log.print(Log.ERROR, "error")
+
+    out, err = capfd.readouterr()
+    assert out == expected_out
+    assert err == expected_err
 
 
-def test_debug():
-    assert (
-        run_python(
-            "from f3d import Log",
-            "Log.set_use_coloring(False)",
-            "Log.set_verbose_level(Log.DEBUG)",
-            "Log.print(Log.DEBUG, 'debug')",
-        )
-        == "debug\n"
-    )
+def test_coloring(capfd: CaptureFixture[str]):
+    Log.set_verbose_level(Log.DEBUG)
+    Log.set_use_coloring(True)
 
+    Log.print(Log.DEBUG, "debug")
+    Log.print(Log.INFO, "info")
+    Log.print(Log.WARN, "warn")
+    Log.print(Log.ERROR, "error")
 
-def test_coloring():
-    assert (
-        run_python(
-            "from f3d import Log",
-            "Log.set_use_coloring(True)",
-            "Log.print(Log.INFO, 'info')",
-        )
-        == "info\x1b[0m\n"
-    )
+    out, err = capfd.readouterr()
+    assert out == "debug\ninfo\n"
+    assert err == "\x1b[33mwarn\x1b[0m\n\x1b[31;1merror\x1b[0m\n"
 
 
 def test_get_verbose_level():
-    assert (
-        run_python(
-            "from f3d import Log",
-            "Log.set_verbose_level(Log.DEBUG)",
-            "print(Log.get_verbose_level() == Log.DEBUG)",
-            "Log.set_verbose_level(Log.WARN)",
-            "print(Log.get_verbose_level() == Log.WARN)",
-        )
-        == "True\nTrue\n"
-    )
+    Log.set_verbose_level(Log.DEBUG)
+    assert Log.get_verbose_level() == Log.DEBUG
+    Log.set_verbose_level(Log.WARN)
+    assert Log.get_verbose_level() == Log.WARN
 
 
 def test_forward():
@@ -72,10 +74,3 @@ def test_forward():
         Log.VerboseLevel.WARN: ["O_o"],
         Log.VerboseLevel.ERROR: ["x_x"],
     }
-
-
-def run_python(*statements: str):
-    return subprocess.check_output(
-        [sys.executable, "-c", "; ".join(statements)],
-        text=True,
-    )
