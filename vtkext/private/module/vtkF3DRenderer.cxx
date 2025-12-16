@@ -796,9 +796,9 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
 
       this->GridActor->GetProperty()->SetColor(this->GridColor);
 
-      double colorX[3] = { 1, 0, 0 }; // TODO: set from config
-      double colorY[3] = { 0, 1, 0 }; // TODO: set from config
-      double colorZ[3] = { 0, 0, 1 }; // TODO: set from config
+      const double colorX[3] = { 1, 0, 0 }; // TODO: set from config
+      const double colorY[3] = { 0, 1, 0 }; // TODO: set from config
+      const double colorZ[3] = { 0, 0, 1 }; // TODO: set from config
 
       const auto factor = [](const double* v, const double x, const double y, const double z)
       {
