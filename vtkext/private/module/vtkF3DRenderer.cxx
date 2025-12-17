@@ -803,9 +803,7 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
       const auto factor = [](const double* v, const double x, const double y, const double z)
       {
         const double ref[3] = { x, y, z };
-        const double angle180 = vtkMath::DegreesFromRadians(vtkMath::AngleBetweenVectors(v, ref));
-        const double angle90 = angle180 > 90 ? 180 - angle180 : angle180;
-        return 1.0 - angle90 / 90.0;
+        return std::abs(vtkMath::Dot(v, ref));
       };
       const double fX1 = factor(right, 1, 0, 0);
       const double fY1 = factor(right, 0, 1, 0);
