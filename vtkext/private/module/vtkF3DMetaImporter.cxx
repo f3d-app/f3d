@@ -226,6 +226,11 @@ bool vtkF3DMetaImporter::Update()
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
     vtkActorCollection* actorCollection = importer->GetImportedActors();
 #endif
+
+    // Recover generic importer if any (for indexed access to points/image)
+    vtkF3DGenericImporter* genericImporter = vtkF3DGenericImporter::SafeDownCast(importer);
+    vtkIdType actorIndex = 0;
+
     vtkCollectionSimpleIterator ait;
     actorCollection->InitTraversal(ait);
     while (auto* actor = actorCollection->GetNextActor(ait))
@@ -240,9 +245,6 @@ bool vtkF3DMetaImporter::Update()
       double bounds[6];
       surface->GetBounds(bounds);
       this->Pimpl->GeometryBoundingBox.AddBounds(bounds);
-
-      // Recover generic importer if any
-      vtkF3DGenericImporter* genericImporter = vtkF3DGenericImporter::SafeDownCast(importer);
 
       // Create and configure coloring actors
       this->Pimpl->ColoringActorsAndMappers.emplace_back(vtkF3DMetaImporter::ColoringStruct(actor));
@@ -260,9 +262,8 @@ bool vtkF3DMetaImporter::Update()
       vtkPolyData* points = surface;
       if (genericImporter)
       {
-        // For generic importer, use the single imported points
-        // TODO when supporting composite, handle with an actor based index
-        points = genericImporter->GetImportedPoints();
+        // Use indexed accessor for composite support
+        points = genericImporter->GetImportedPoints(actorIndex);
       }
       pss.Mapper->SetInputData(points);
       this->Renderer->AddActor(pss.Actor);
@@ -271,7 +272,7 @@ bool vtkF3DMetaImporter::Update()
       // Create and configure volume props
       if (genericImporter)
       {
-        vtkImageData* image = genericImporter->GetImportedImage();
+        vtkImageData* image = genericImporter->GetImportedImage(actorIndex);
         if (image)
         {
           // XXX: Note that creating this struct takes some time
@@ -282,6 +283,8 @@ bool vtkF3DMetaImporter::Update()
           vs.Prop->VisibilityOff();
         }
       }
+
+      actorIndex++;
     }
 
     importerPair.Updated = true;
@@ -606,6 +609,12 @@ void vtkF3DMetaImporter::UpdateInfoForColoring()
       vtkActorCollection* actorCollection =
         this->Pimpl->ActorsForImporterMap.at(importerPair.Importer).Get();
 #endif
+
+      // Recover generic importer if any (for indexed access to points/image)
+      vtkF3DGenericImporter* genericImporter =
+        vtkF3DGenericImporter::SafeDownCast(importerPair.Importer);
+      vtkIdType actorIndex = 0;
+
       vtkCollectionSimpleIterator ait;
       actorCollection->InitTraversal(ait);
       while (auto* actor = actorCollection->GetNextActor(ait))
@@ -615,23 +624,22 @@ void vtkF3DMetaImporter::UpdateInfoForColoring()
 
         // Update coloring vectors, with a dedicated logic for generic importer
         vtkDataSet* datasetForColoring = pdMapper->GetInput();
-        vtkF3DGenericImporter* genericImporter =
-          vtkF3DGenericImporter::SafeDownCast(importerPair.Importer);
         if (genericImporter)
         {
-          // TODO This will be improved with proper composite support
-          // Currently generic importer always has a single actor
-          if (genericImporter->GetImportedImage())
+          // Use indexed accessor for composite support
+          if (genericImporter->GetImportedImage(actorIndex))
           {
-            datasetForColoring = genericImporter->GetImportedImage();
+            datasetForColoring = genericImporter->GetImportedImage(actorIndex);
           }
-          else if (genericImporter->GetImportedPoints())
+          else if (genericImporter->GetImportedPoints(actorIndex))
           {
-            datasetForColoring = genericImporter->GetImportedPoints();
+            datasetForColoring = genericImporter->GetImportedPoints(actorIndex);
           }
         }
         this->Pimpl->ColoringInfoHandler.UpdateColoringInfo(datasetForColoring, false);
         this->Pimpl->ColoringInfoHandler.UpdateColoringInfo(datasetForColoring, true);
+
+        actorIndex++;
       }
     }
     this->Pimpl->ColoringInfoTime.Modified();

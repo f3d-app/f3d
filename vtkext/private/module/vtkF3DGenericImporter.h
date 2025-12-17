@@ -89,11 +89,26 @@ public:
 
   ///@{
   /**
-   * Direct access to generic importer specific datasets
+   * Direct access to generic importer specific datasets.
+   * The no-argument versions return data for the first block.
+   * The indexed versions return data for the specified actor/block index.
    */
   vtkPolyData* GetImportedPoints();
+  vtkPolyData* GetImportedPoints(vtkIdType actorIndex);
   vtkImageData* GetImportedImage();
+  vtkImageData* GetImportedImage(vtkIdType actorIndex);
   ///@}
+
+  /**
+   * Get the name of a block by its actor index.
+   * Returns an empty string if the index is invalid.
+   */
+  std::string GetBlockName(vtkIdType actorIndex);
+
+  /**
+   * Get the number of blocks/actors created by this importer.
+   */
+  vtkIdType GetNumberOfBlocks();
 
 protected:
   vtkF3DGenericImporter();
@@ -117,6 +132,11 @@ protected:
 private:
   vtkF3DGenericImporter(const vtkF3DGenericImporter&) = delete;
   void operator=(const vtkF3DGenericImporter&) = delete;
+
+  /**
+   * Create an actor for a single dataset block
+   */
+  void CreateActorForBlock(vtkDataSet* block, vtkRenderer* ren, const std::string& blockName = "");
 
   struct Internals;
   std::unique_ptr<Internals> Pimpl;
