@@ -7,6 +7,8 @@ if(BUILD_TESTING)
   enable_testing()
 endif()
 
+option(F3D_EXAMPLES_EXTERNAL_QT "Enable external-qt example (requires qt)" OFF)
+
 option(F3D_ENABLE_CPP_EXAMPLES "Enable the C++ examples" ON)
 if (F3D_ENABLE_CPP_EXAMPLES)
   add_subdirectory(cpp)

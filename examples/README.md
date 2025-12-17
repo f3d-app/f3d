@@ -18,8 +18,20 @@ Each example is intended to be built as a separate CMake project, however there 
 eg:
 
 ```
-cmake -Df3d_DIR=/path/to/f3d/install/lib/cmake/f3d /path/to/example/dir/libf3d
+cmake -Df3d_DIR=<path_to_f3d_install>/lib/cmake/f3d <path_to_examples_dir>/libf3d
 cmake --build .
 ```
 
 Then run the example individually.
+
+## Testing
+
+When building from a top level `CMakeLists.txt`, one can enable the cmake option `BUILD_TESTING` to enable tests.
+
+## Python
+
+Python example can be run using python directly or using tests
+
+## Web
+
+Web examples have to be run independently using npm
