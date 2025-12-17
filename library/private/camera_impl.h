@@ -50,8 +50,8 @@ public:
   camera& setState(const camera_state_t& state) override;
   camera_state_t getState() const override;
   void getState(camera_state_t& state) const override;
-  double getAzimuth() const override;
-  double getElevation() const override;
+  double getWorldAzimuth() const override;
+  double getWorldElevation() const override;
   double getDistance() const override;
 
   camera& dolly(double val) override;
@@ -90,6 +90,7 @@ public:
 private:
   class internals;
   std::unique_ptr<internals> Internals;
+  void getPositionToFocalVector(double& dx, double& dy, double& dz) const;
 };
 }
 

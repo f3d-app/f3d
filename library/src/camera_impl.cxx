@@ -106,50 +106,43 @@ void camera_impl::getFocalPoint(point3_t& foc) const
 }
 
 //----------------------------------------------------------------------------
-  double camera_impl::getAzimuth() const
+  void camera_impl::getPositionToFocalVector(double& dx, double& dy, double& dz) const
 {
-  point3_t pos;
-  point3_t focal;
-
+  point3_t pos, focal;
   this->getPosition(pos);
   this->getFocalPoint(focal);
 
-  const double dx = pos[0] - focal[0];
-  const double dy = pos[1] - focal[1];
-
-  return std::atan2(dy, dx) * 180.0 / std::acos(-1.0);
+  dx = pos[0] - focal[0];
+  dy = pos[1] - focal[1];
+  dz = pos[2] - focal[2];
 }
 
 //----------------------------------------------------------------------------
-  double camera_impl::getElevation() const
+  double camera_impl::getWorldAzimuth() const
 {
-  point3_t pos;
-  point3_t focal;
+  double dx, dy, dz;
+  this->getPositionToFocalVector(dx, dy, dz);
 
-  this->getPosition(pos);
-  this->getFocalPoint(focal);
-
-  const double dx = pos[0] - focal[0];
-  const double dy = pos[1] - focal[1];
-  const double dz = pos[2] - focal[2];
-
-  const double horizontalDist = std::sqrt(dx * dx + dy * dy);
-
-  return std::atan2(dz, horizontalDist) * 180.0 / std::acos(-1.0);
+  return std::atan2(dy, dx) * 180.0 / vtkMath::Pi();
 }
 
+
 //----------------------------------------------------------------------------
-double camera_impl::getDistance() const
+  double camera_impl::getWorldElevation() const
 {
-  point3_t pos;
-  point3_t focal;
+  double dx, dy, dz;
+  this->getPositionToFocalVector(dx, dy, dz);
 
-  this->getPosition(pos);
-  this->getFocalPoint(focal);
+  const double horizontal = std::sqrt(dx * dx + dy * dy);
+  return std::atan2(dz, horizontal) * 180.0 / vtkMath::Pi();
+}
 
-  const double dx = pos[0] - focal[0];
-  const double dy = pos[1] - focal[1];
-  const double dz = pos[2] - focal[2];
+
+//----------------------------------------------------------------------------
+  double camera_impl::getDistance() const
+{
+  double dx, dy, dz;
+  this->getPositionToFocalVector(dx, dy, dz);
 
   return std::sqrt(dx * dx + dy * dy + dz * dz);
 }
