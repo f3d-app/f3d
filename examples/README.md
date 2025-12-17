@@ -13,7 +13,7 @@ Examples plugins for the libf3d, which also requires the `plugin_sdk` cmake comp
 
 ## Building
 
-Each example is intended to be built as a separate CMake project, however there are top level `CMakeLists.txt` in each directory for easier usage.
+Each example (C++, C, Java) is intended to be built as a separate CMake project, however there are top level `CMakeLists.txt` in each directory for easier usage.
 
 eg:
 
@@ -30,7 +30,7 @@ When building from a top level `CMakeLists.txt`, one can enable the cmake option
 
 ## Python
 
-Python example can be run using python directly or using tests
+Python example can be run using python directly or with pytest
 
 ## Web
 
