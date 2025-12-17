@@ -13,11 +13,13 @@ Examples plugins for the libf3d, which also requires the `plugin_sdk` cmake comp
 
 ## Building
 
-Each example is intended to be built as a separate CMake project, however top level `CMakeLists.txt` are provided if needed.
+Each example is intended to be built as a separate CMake project, however there are top level `CMakeLists.txt` in each directory for easier usage.
+
+eg:
 
 ```
-cmake -Df3d_DIR=/path/to/f3d/install/lib/cmake/f3d /path/to/example/dir
+cmake -Df3d_DIR=/path/to/f3d/install/lib/cmake/f3d /path/to/example/dir/libf3d
 cmake --build .
 ```
 
-Then run the example
+Then run the example individually.

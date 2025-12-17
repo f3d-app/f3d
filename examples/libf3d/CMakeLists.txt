@@ -2,17 +2,27 @@ cmake_minimum_required(VERSION 3.10)
 
 project(libf3d-examples)
 
+option(BUILD_TESTING "Build the example tests" OFF)
 if(BUILD_TESTING)
   enable_testing()
 endif()
 
-add_subdirectory(cpp)
-if (F3D_BINDINGS_C)
+option(F3D_ENABLE_CPP_EXAMPLES "Enable the C++ examples" ON)
+if (F3D_ENABLE_CPP_EXAMPLES)
+  add_subdirectory(cpp)
+endif ()
+
+option(F3D_ENABLE_C_EXAMPLES "Enable the C examples" OFF)
+if (F3D_ENABLE_C_EXAMPLES)
   add_subdirectory(c)
 endif ()
-if (F3D_BINDINGS_PYTHON)
+
+option(F3D_ENABLE_PYTHON_EXAMPLES "Enable the Python examples" OFF)
+if (F3D_ENABLE_PYTHON_EXAMPLES)
   add_subdirectory(python)
 endif ()
-if (F3D_BINDINGS_JAVA)
+
+option(F3D_ENABLE_JAVA_EXAMPLES "Enable the Java examples" OFF)
+if (F3D_ENABLE_JAVA_EXAMPLES)
   add_subdirectory(java)
 endif ()
