@@ -181,8 +181,25 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 
   vtkCompositeDataSet* composite = vtkCompositeDataSet::SafeDownCast(output);
 
-  if (composite)
+  vtkMultiBlockDataSet* mb = vtkMultiBlockDataSet::SafeDownCast(output);
+  vtkPartitionedDataSetCollection* pdc = vtkPartitionedDataSetCollection::SafeDownCast(output);
+  vtkPartitionedDataSet* pds = vtkPartitionedDataSet::SafeDownCast(output);
+
+  if (mb)
   {
+    this->ImportMultiBlock(mb, ren);
+  }
+  else if (pdc)
+  {
+    this->ImportPartitionedDataSetCollection(pdc, ren);
+  }
+  else if (pds)
+  {
+    this->ImportPartitionedDataSet(pds, ren);
+  }
+  else if (composite)
+  {
+    // Generic composite fallback
     auto iter = vtkSmartPointer<vtkCompositeDataIterator>::Take(composite->NewIterator());
     iter->SkipEmptyNodesOn();
 
@@ -191,20 +208,7 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
       vtkDataSet* block = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
       if (block)
       {
-        std::string blockName;
-        if (iter->HasCurrentMetaData())
-        {
-          const char* name = iter->GetCurrentMetaData()->Get(vtkCompositeDataSet::NAME());
-          if (name)
-          {
-            blockName = name;
-          }
-        }
-        if (blockName.empty())
-        {
-          blockName = "Block_" + std::to_string(this->Pimpl->Blocks.size());
-        }
-
+        std::string blockName = "Block_" + std::to_string(this->Pimpl->Blocks.size());
         this->CreateActorForBlock(block, ren, blockName);
       }
     }
@@ -431,4 +435,182 @@ std::string vtkF3DGenericImporter::GetBlockName(vtkIdType actorIndex)
 vtkIdType vtkF3DGenericImporter::GetNumberOfBlocks()
 {
   return static_cast<vtkIdType>(this->Pimpl->Blocks.size());
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DGenericImporter::ImportMultiBlock(
+  vtkMultiBlockDataSet* mb, vtkRenderer* ren, const std::string& parentName)
+{
+  for (unsigned int i = 0; i < mb->GetNumberOfBlocks(); i++)
+  {
+    vtkDataObject* obj = mb->GetBlock(i);
+    if (!obj)
+    {
+      continue;
+    }
+
+    std::string blockName;
+    if (mb->HasMetaData(i))
+    {
+      const char* name = mb->GetMetaData(i)->Get(vtkCompositeDataSet::NAME());
+      if (name)
+      {
+        blockName = name;
+      }
+    }
+
+    // Build full name with parent prefix
+    if (!parentName.empty() && !blockName.empty())
+    {
+      blockName = parentName + "/" + blockName;
+    }
+    else if (!parentName.empty())
+    {
+      blockName = parentName + "/Block_" + std::to_string(i);
+    }
+    else if (blockName.empty())
+    {
+      blockName = "Block_" + std::to_string(this->Pimpl->Blocks.size());
+    }
+
+    vtkMultiBlockDataSet* childMB = vtkMultiBlockDataSet::SafeDownCast(obj);
+    vtkPartitionedDataSetCollection* childPDC = vtkPartitionedDataSetCollection::SafeDownCast(obj);
+    vtkPartitionedDataSet* childPDS = vtkPartitionedDataSet::SafeDownCast(obj);
+    vtkCompositeDataSet* childComposite = vtkCompositeDataSet::SafeDownCast(obj);
+
+    if (childMB)
+    {
+      this->ImportMultiBlock(childMB, ren, blockName);
+    }
+    else if (childPDC)
+    {
+      this->ImportPartitionedDataSetCollection(childPDC, ren);
+    }
+    else if (childPDS)
+    {
+      this->ImportPartitionedDataSet(childPDS, ren, blockName);
+    }
+    else if (childComposite)
+    {
+      auto iter = vtkSmartPointer<vtkCompositeDataIterator>::Take(childComposite->NewIterator());
+      iter->SkipEmptyNodesOn();
+      int subIdx = 0;
+      for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem(), subIdx++)
+      {
+        vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
+        if (ds)
+        {
+          std::string subName = blockName + "/Block_" + std::to_string(subIdx);
+          this->CreateActorForBlock(ds, ren, subName);
+        }
+      }
+    }
+    else
+    {
+      vtkDataSet* ds = vtkDataSet::SafeDownCast(obj);
+      if (ds)
+      {
+        this->CreateActorForBlock(ds, ren, blockName);
+      }
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DGenericImporter::ImportPartitionedDataSetCollection(
+  vtkPartitionedDataSetCollection* pdc, vtkRenderer* ren)
+{
+  std::map<unsigned int, std::string> datasetIndexToName;
+  vtkDataAssembly* assembly = pdc->GetDataAssembly();
+  if (assembly)
+  {
+    std::vector<int> childNodes = assembly->GetChildNodes(assembly->GetRootNode());
+    for (int nodeId : childNodes)
+    {
+      const char* nodeName = assembly->GetNodeName(nodeId);
+      if (nodeName)
+      {
+        std::vector<unsigned int> indices = assembly->GetDataSetIndices(nodeId, false);
+        for (unsigned int idx : indices)
+        {
+          datasetIndexToName[idx] = nodeName;
+        }
+      }
+    }
+  }
+
+  for (unsigned int i = 0; i < pdc->GetNumberOfPartitionedDataSets(); i++)
+  {
+    std::string pdsName;
+
+    auto it = datasetIndexToName.find(i);
+    if (it != datasetIndexToName.end())
+    {
+      pdsName = it->second;
+    }
+    else if (pdc->HasMetaData(i))
+    {
+      const char* name = pdc->GetMetaData(i)->Get(vtkCompositeDataSet::NAME());
+      if (name)
+      {
+        pdsName = name;
+      }
+    }
+    if (pdsName.empty())
+    {
+      pdsName = "PartitionedDataSet_" + std::to_string(i);
+    }
+
+    vtkPartitionedDataSet* pds = pdc->GetPartitionedDataSet(i);
+    if (pds)
+    {
+      this->ImportPartitionedDataSet(pds, ren, pdsName);
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DGenericImporter::ImportPartitionedDataSet(
+  vtkPartitionedDataSet* pds, vtkRenderer* ren, const std::string& pdsName)
+{
+  std::string baseName = pdsName;
+  if (baseName.empty())
+  {
+    baseName = "PartitionedDataSet_" + std::to_string(this->Pimpl->Blocks.size());
+  }
+
+  for (unsigned int j = 0; j < pds->GetNumberOfPartitions(); j++)
+  {
+    vtkDataSet* ds = pds->GetPartition(j);
+    if (!ds)
+    {
+      continue;
+    }
+
+    std::string partitionName;
+    if (pds->HasMetaData(j))
+    {
+      const char* name = pds->GetMetaData(j)->Get(vtkCompositeDataSet::NAME());
+      if (name)
+      {
+        partitionName = name;
+      }
+    }
+
+    std::string blockName;
+    if (!partitionName.empty())
+    {
+      blockName = baseName + "/" + partitionName;
+    }
+    else if (pds->GetNumberOfPartitions() > 1)
+    {
+      blockName = baseName + "/Partition_" + std::to_string(j);
+    }
+    else
+    {
+      blockName = baseName;
+    }
+
+    this->CreateActorForBlock(ds, ren, blockName);
+  }
 }

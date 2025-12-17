@@ -14,6 +14,7 @@ class vtkAlgorithm;
 class vtkDataObject;
 class vtkImageData;
 class vtkMultiBlockDataSet;
+class vtkPartitionedDataSet;
 class vtkPartitionedDataSetCollection;
 class vtkPolyData;
 class vtkF3DGenericImporter : public vtkF3DImporter
@@ -137,6 +138,23 @@ private:
    * Create an actor for a single dataset block
    */
   void CreateActorForBlock(vtkDataSet* block, vtkRenderer* ren, const std::string& blockName = "");
+
+  /**
+   * Import blocks from a vtkMultiBlockDataSet with proper name extraction
+   */
+  void ImportMultiBlock(
+    vtkMultiBlockDataSet* mb, vtkRenderer* ren, const std::string& parentName = "");
+
+  /**
+   * Import blocks from a vtkPartitionedDataSetCollection with proper name extraction
+   */
+  void ImportPartitionedDataSetCollection(vtkPartitionedDataSetCollection* pdc, vtkRenderer* ren);
+
+  /**
+   * Import blocks from a vtkPartitionedDataSet with proper name extraction
+   */
+  void ImportPartitionedDataSet(
+    vtkPartitionedDataSet* pds, vtkRenderer* ren, const std::string& pdsName = "");
 
   struct Internals;
   std::unique_ptr<Internals> Pimpl;
