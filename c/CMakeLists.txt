@@ -54,6 +54,12 @@ target_include_directories(c_api
 target_compile_options(c_api PUBLIC ${f3d_sanitizer_compile_options})
 target_link_options(c_api PUBLIC ${f3d_sanitizer_link_options})
 
+if(APPLE)
+  set_target_properties(c_api PROPERTIES INSTALL_RPATH "@loader_path")
+elseif(UNIX)
+  set_target_properties(c_api PROPERTIES INSTALL_RPATH "$ORIGIN")
+endif()
+
 # testing
 if(BUILD_TESTING)
   add_subdirectory(testing)
