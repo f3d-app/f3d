@@ -1,5 +1,49 @@
 # Language Bindings
 
+## C
+
+If the C bindings have been generated using the `F3D_BINDINGS_C` CMake option, the libf3d can be used directly from C.
+Make sure to install not only f3d but also the `sdk` component using `cmake --install -b <build_dir> --component sdk`
+
+Here is an example showing how to use libf3d c bindings:
+
+```c
+  f3d_engine_autoload_plugins();
+  f3d_engine_t* engine = f3d_engine_create(0);
+  f3d_options_t* options = f3d_engine_get_options(engine);
+
+  f3d_options_set_as_bool(options, "render.grid.enable", 1);
+  f3d_options_set_as_bool(options, "render.show_edges", 1);
+  f3d_options_set_as_bool(options, "ui.axis", 1);
+  f3d_options_set_as_bool(options, "ui.fps", 1);
+  f3d_options_set_as_bool(options, "ui.animation_progress", 1);
+  f3d_options_set_as_bool(options, "ui.filename", 1);
+
+  f3d_scene_t* scene = f3d_engine_get_scene(engine);
+  f3d_scene_add(scene, "f3d/testing/data/dragon.vtu");
+
+  f3d_interactor_t* interactor = f3d_engine_get_interactor(engine);
+  f3d_interactor_start(interactor, 1.0 / 30.0);
+
+  // ...
+
+  f3d_engine_delete(engine);
+```
+
+```cmake
+cmake_minimum_required(VERSION 3.10)
+project(f3d-example-c)
+find_package(f3d REQUIRED COMPONENTS c_api)
+add_executable(f3d-example-c main.c)
+target_include_directories(f3d-example-c PRIVATE ${f3d_INCLUDE_DIR})
+target_link_libraries(f3d-example-c
+  PRIVATE
+  f3d::c_api
+)
+```
+
+You can see more examples using c bindings in the dedicated example directory [here](https://github.com/f3d-app/f3d/tree/master/examples/libf3d/c).
+
 ## Python
 
 If the python bindings have been generated using the `F3D_BINDINGS_PYTHON` CMake option, the libf3d can be used directly from python.
