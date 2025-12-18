@@ -63,6 +63,7 @@
 #include <vtkPointData.h>
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
+#include <vtkResourceStream.h>
 #include <vtkTransform.h>
 #include <vtkTransformFilter.h>
 #include <vtkUnsignedCharArray.h>
@@ -73,6 +74,8 @@
 #include <numeric>
 #include <unordered_map>
 #include <vector>
+
+vtkCxxSetSmartPointerMacro(vtkF3DOCCTReader, Stream, vtkResourceStream);
 
 class vtkF3DOCCTReader::vtkInternals
 {
@@ -551,6 +554,12 @@ vtkF3DOCCTReader::vtkF3DOCCTReader()
 vtkF3DOCCTReader::~vtkF3DOCCTReader() = default;
 
 //----------------------------------------------------------------------------
+vtkResourceStream* vtkF3DOCCTReader::GetStream()
+{
+  return this->Stream;
+}
+
+//----------------------------------------------------------------------------
 class ProgressIndicator : public Message_ProgressIndicator
 {
 public:
@@ -585,14 +594,28 @@ bool TransferToDocument(vtkF3DOCCTReader* that, T& reader, Handle(TDocStd_Docume
   reader.SetNameMode(true);
   reader.SetLayerMode(true);
 
-  if (reader.ReadFile(that->GetFileName().c_str()) == IFSelect_RetDone)
+  IFSelect_ReturnStatus ret;
+  if (that->GetStream())
+  {
+    // Encapsulate resource stream into an istream
+    that->GetStream()->Seek(0, vtkResourceStream::SeekDirection::Begin);
+    auto strbuf = that->GetStream()->ToStreambuf();
+    std::istream buffer(strbuf.get());
+    ret = reader.ReadStream("name", buffer);
+  }
+  else
+  {
+    ret = reader.ReadFile(that->GetFileName().c_str());
+  }
+
+  if (ret == IFSelect_RetDone)
   {
     ProgressIndicator pi(that);
     return reader.Transfer(doc, pi.Start());
   }
   else
   {
-    vtkErrorWithObjectMacro(that, "Failed opening file " << that->GetFileName());
+    vtkErrorWithObjectMacro(that, "Failed opening file or stream");
     return false;
   }
 }
@@ -612,15 +635,41 @@ int vtkF3DOCCTReader::RequestData(
     ProgressIndicator pIndicator(this);
     const Message_ProgressRange pRange = pIndicator.Start();
 
-    bool success = false;
-    try
+    bool success = true;
+    if (this->GetStream())
     {
-      success = BinTools::Read(shape, this->GetFileName().c_str(), pRange);
+      // Encapsulate resource stream into an istream
+      this->Stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+      auto strbuf = this->GetStream()->ToStreambuf();
+      std::istream buffer(strbuf.get());
+      try
+      {
+        std::cout<<"Try BIN"<<std::endl;
+        BinTools::Read(shape, buffer, pRange);
+      }
+      catch (Storage_StreamTypeMismatchError&)
+      {
+        std::cout<<"Try BREP"<<std::endl;
+        this->Stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+        auto strbuf = this->GetStream()->ToStreambuf();
+        std::istream buffer2(strbuf.get());
+
+        const BRep_Builder builder;
+        BRepTools::Read(shape, buffer2, builder, pRange);
+      }
+      // todo check shape ?
     }
-    catch (Storage_StreamTypeMismatchError&)
+    else
     {
-      const BRep_Builder builder;
-      success = BRepTools::Read(shape, this->GetFileName().c_str(), builder, pRange);
+      try
+      {
+        success = BinTools::Read(shape, this->GetFileName().c_str(), pRange);
+      }
+      catch (Storage_StreamTypeMismatchError&)
+      {
+        const BRep_Builder builder;
+        success = BRepTools::Read(shape, this->GetFileName().c_str(), builder, pRange);
+      }
     }
 
     if (success)
@@ -754,4 +803,15 @@ void vtkF3DOCCTReader::PrintSelf(ostream& os, vtkIndent indent)
     case FILE_FORMAT::XBF: os << "FileFormat: XBF" << "\n"; break;
   }
   // clang-format
+}
+
+//----------------------------------------------------------------------------
+vtkMTimeType vtkF3DOCCTReader::GetMTime()
+{
+  auto mtime = this->Superclass::GetMTime();
+  if (this->Stream)
+  {
+    mtime = std::max(mtime, this->Stream->GetMTime());
+  }
+  return mtime;
 }

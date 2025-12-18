@@ -1,5 +1,6 @@
 list(APPEND vtkextOCCT_list
      TestF3DOCCTReader.cxx
+     TestF3DOCCTReaderStream.cxx
     )
 
 vtk_add_test_cxx(vtkextOCCTTests tests

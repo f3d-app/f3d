@@ -26,6 +26,7 @@ int TestF3DOCCTReader(int vtkNotUsed(argc), char* argv[])
   return (testReader(data + "/f3d.stp", vtkF3DOCCTReader::FILE_FORMAT::STEP) &&
            testReader(data + "/f3d.igs", vtkF3DOCCTReader::FILE_FORMAT::IGES) &&
            testReader(data + "/f3d.brep", vtkF3DOCCTReader::FILE_FORMAT::BREP) &&
+           testReader(data + "/f3d.bin.brep", vtkF3DOCCTReader::FILE_FORMAT::BREP) &&
            testReader(data + "/f3d.xbf", vtkF3DOCCTReader::FILE_FORMAT::XBF))
     ? EXIT_SUCCESS
     : EXIT_FAILURE;

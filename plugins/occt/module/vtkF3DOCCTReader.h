@@ -20,7 +20,7 @@
 #include <memory>
 
 class vtkInformationDoubleVectorKey;
-
+class vtkResourceStream;
 class vtkF3DOCCTReader : public vtkMultiBlockDataSetAlgorithm
 {
 public:
@@ -88,11 +88,25 @@ public:
 
   ///@{
   /**
+   * Specify stream to read from
+   * When both `Stream` and `Filename` are set, stream is used.
+   */
+  void SetStream(vtkResourceStream* stream);
+  vtkResourceStream* GetStream();
+  ///@}
+
+  ///@{
+  /**
    * Get/Set the file name.
    */
   vtkSetMacro(FileName, std::string);
   vtkGetMacro(FileName, std::string);
   ///@}
+
+  /**
+   * Overridden to take into account mtime from the internal vtkResourceStream.
+   */
+  vtkMTimeType GetMTime() override;
 
 protected:
   vtkF3DOCCTReader();
@@ -108,6 +122,7 @@ private:
   std::unique_ptr<vtkInternals> Internals;
 
   std::string FileName;
+  vtkSmartPointer<vtkResourceStream> Stream;
 
   double LinearDeflection = 0.1;
   double AngularDeflection = 0.5;
