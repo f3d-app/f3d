@@ -4,6 +4,8 @@
 #include "vtkF3DPostProcessFilter.h"
 
 #include <vtkActor.h>
+#include <vtkCompositeDataIterator.h>
+#include <vtkDataAssembly.h>
 #include <vtkEventForwarderCommand.h>
 #include <vtkImageData.h>
 #include <vtkInformation.h>
@@ -179,8 +181,6 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 
   this->Pimpl->OutputDescription = this->GetDataObjectDescription(output);
 
-  vtkCompositeDataSet* composite = vtkCompositeDataSet::SafeDownCast(output);
-
   vtkMultiBlockDataSet* mb = vtkMultiBlockDataSet::SafeDownCast(output);
   vtkPartitionedDataSetCollection* pdc = vtkPartitionedDataSetCollection::SafeDownCast(output);
   vtkPartitionedDataSet* pds = vtkPartitionedDataSet::SafeDownCast(output);
@@ -197,22 +197,6 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   {
     this->ImportPartitionedDataSet(pds, ren);
   }
-  else if (composite)
-  {
-    // Generic composite fallback
-    auto iter = vtkSmartPointer<vtkCompositeDataIterator>::Take(composite->NewIterator());
-    iter->SkipEmptyNodesOn();
-
-    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-    {
-      vtkDataSet* block = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
-      if (block)
-      {
-        std::string blockName = "Block_" + std::to_string(this->Pimpl->Blocks.size());
-        this->CreateActorForBlock(block, ren, blockName);
-      }
-    }
-  }
   else
   {
     vtkDataSet* dataset = vtkDataSet::SafeDownCast(output);
@@ -222,8 +206,27 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     }
     else
     {
-      this->SetFailureStatus();
-      return;
+      vtkCompositeDataSet* composite = vtkCompositeDataSet::SafeDownCast(output);
+      if (composite)
+      {
+        auto iter = vtkSmartPointer<vtkCompositeDataIterator>::Take(composite->NewIterator());
+        iter->SkipEmptyNodesOn();
+        int blockIdx = 0;
+        for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem(), blockIdx++)
+        {
+          vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
+          if (ds)
+          {
+            std::string blockName = "Block_" + std::to_string(blockIdx);
+            this->CreateActorForBlock(ds, ren, blockName);
+          }
+        }
+      }
+      else
+      {
+        this->SetFailureStatus();
+        return;
+      }
     }
   }
 
@@ -450,11 +453,14 @@ void vtkF3DGenericImporter::ImportMultiBlock(
     // Build full name with parent prefix
     if (!parentName.empty() && !blockName.empty())
     {
-      blockName = parentName + "/" + blockName;
+      blockName.insert(0, "/");
+      blockName.insert(0, parentName);
     }
     else if (!parentName.empty())
     {
-      blockName = parentName + "/Block_" + std::to_string(i);
+      blockName = parentName;
+      blockName += "/Block_";
+      blockName += std::to_string(i);
     }
     else if (blockName.empty())
     {
@@ -588,11 +594,15 @@ void vtkF3DGenericImporter::ImportPartitionedDataSet(
     std::string blockName;
     if (!partitionName.empty())
     {
-      blockName = baseName + "/" + partitionName;
+      blockName = baseName;
+      blockName += "/";
+      blockName += partitionName;
     }
     else if (pds->GetNumberOfPartitions() > 1)
     {
-      blockName = baseName + "/Partition_" + std::to_string(j);
+      blockName = baseName;
+      blockName += "/Partition_";
+      blockName += std::to_string(j);
     }
     else
     {

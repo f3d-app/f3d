@@ -12,12 +12,15 @@
 #include <vtkTable.h>
 #include <vtkTestUtilities.h>
 #include <vtkTrivialProducer.h>
+#include <vtkUniformGrid.h>
+#include <vtkUniformGridAMR.h>
 #include <vtkVersion.h>
 #include <vtkXMLMultiBlockDataReader.h>
 
 #include "vtkF3DGenericImporter.h"
 
 #include <iostream>
+#include <vector>
 
 int TestF3DGenericImporter(int argc, char* argv[])
 {
@@ -395,6 +398,52 @@ int TestF3DGenericImporter(int argc, char* argv[])
     if (name1 != "OuterBlock/InnerCone")
     {
       std::cerr << "Nested MB: Expected 'OuterBlock/InnerCone', got '" << name1 << "'\n";
+      return EXIT_FAILURE;
+    }
+  }
+
+  // Test generic composite
+  {
+    vtkNew<vtkUniformGridAMR> amr;
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 0)
+    std::vector<unsigned int> blocksPerLevel = { 1 };
+    amr->Initialize(blocksPerLevel);
+#else
+    int blocksPerLevel[1] = { 1 };
+    amr->Initialize(1, blocksPerLevel);
+#endif
+
+    vtkNew<vtkUniformGrid> grid;
+    grid->SetDimensions(3, 3, 3);
+    grid->SetOrigin(0, 0, 0);
+    grid->SetSpacing(1.0, 1.0, 1.0);
+    amr->SetDataSet(0, 0, grid);
+
+    vtkNew<vtkTrivialProducer> amrProducer;
+    amrProducer->SetOutput(amr);
+
+    vtkNew<vtkF3DGenericImporter> amrImporter;
+    amrImporter->SetInternalReader(amrProducer);
+    amrImporter->Update();
+
+    if (amrImporter->GetNumberOfBlocks() < 1)
+    {
+      std::cerr << "AMR: Expected at least 1 block, got " << amrImporter->GetNumberOfBlocks()
+                << "\n";
+      return EXIT_FAILURE;
+    }
+
+    const vtkPolyData* points = amrImporter->GetImportedPoints(0);
+    if (!points)
+    {
+      std::cerr << "AMR: GetImportedPoints(0) returned nullptr\n";
+      return EXIT_FAILURE;
+    }
+
+    std::string blockName = amrImporter->GetBlockName(0);
+    if (blockName.empty())
+    {
+      std::cerr << "AMR: GetBlockName(0) returned empty string\n";
       return EXIT_FAILURE;
     }
   }
