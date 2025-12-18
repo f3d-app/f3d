@@ -91,12 +91,9 @@ public:
   ///@{
   /**
    * Direct access to generic importer specific datasets.
-   * The no-argument versions return data for the first block.
-   * The indexed versions return data for the specified actor/block index.
+   * Return data for the specified actor/block index.
    */
-  vtkPolyData* GetImportedPoints();
   vtkPolyData* GetImportedPoints(vtkIdType actorIndex);
-  vtkImageData* GetImportedImage();
   vtkImageData* GetImportedImage(vtkIdType actorIndex);
   ///@}
 

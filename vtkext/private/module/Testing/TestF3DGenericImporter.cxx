@@ -132,12 +132,6 @@ int TestF3DGenericImporter(int argc, char* argv[])
     }
   }
 
-  if (mbImporter->GetImportedPoints() != mbImporter->GetImportedPoints(0))
-  {
-    std::cerr << "GetImportedPoints() doesn't match GetImportedPoints(0)\n";
-    return EXIT_FAILURE;
-  }
-
   if (mbImporter->GetImportedPoints(-1) != nullptr)
   {
     std::cerr << "GetImportedPoints(-1) should return nullptr\n";
@@ -146,12 +140,6 @@ int TestF3DGenericImporter(int argc, char* argv[])
   if (mbImporter->GetImportedPoints(expectedBlocks) != nullptr)
   {
     std::cerr << "GetImportedPoints(expectedBlocks) should return nullptr\n";
-    return EXIT_FAILURE;
-  }
-
-  if (mbImporter->GetImportedImage() != nullptr)
-  {
-    std::cerr << "GetImportedImage() should return nullptr for non-image data\n";
     return EXIT_FAILURE;
   }
 

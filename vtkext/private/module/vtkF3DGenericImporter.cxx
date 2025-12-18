@@ -390,12 +390,6 @@ void vtkF3DGenericImporter::UpdateOutputDescriptions()
 }
 
 //----------------------------------------------------------------------------
-vtkPolyData* vtkF3DGenericImporter::GetImportedPoints()
-{
-  return this->Pimpl->Blocks.empty() ? nullptr : this->Pimpl->Blocks[0].Points;
-}
-
-//----------------------------------------------------------------------------
 vtkPolyData* vtkF3DGenericImporter::GetImportedPoints(vtkIdType actorIndex)
 {
   if (actorIndex >= 0 && actorIndex < static_cast<vtkIdType>(this->Pimpl->Blocks.size()))
@@ -403,12 +397,6 @@ vtkPolyData* vtkF3DGenericImporter::GetImportedPoints(vtkIdType actorIndex)
     return this->Pimpl->Blocks[actorIndex].Points;
   }
   return nullptr;
-}
-
-//----------------------------------------------------------------------------
-vtkImageData* vtkF3DGenericImporter::GetImportedImage()
-{
-  return this->Pimpl->Blocks.empty() ? nullptr : this->Pimpl->Blocks[0].Image;
 }
 
 //----------------------------------------------------------------------------
