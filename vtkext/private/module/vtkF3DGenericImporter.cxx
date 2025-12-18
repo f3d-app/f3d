@@ -197,6 +197,32 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
   {
     this->ImportPartitionedDataSet(pds, ren);
   }
+#if VTK_VERSION_NUMBER <= VTK_VERSION_CHECK(9, 5, 2)
+  // Handle other composite types (e.g., AMR) using generic iterator
+  else if (vtkCompositeDataSet* composite = vtkCompositeDataSet::SafeDownCast(output))
+  {
+    auto iter = vtkSmartPointer<vtkCompositeDataIterator>::Take(composite->NewIterator());
+    iter->SkipEmptyNodesOn();
+    int idx = 0;
+    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem(), idx++)
+    {
+      vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
+      if (ds)
+      {
+        std::string blockName = "Block_" + std::to_string(idx);
+        if (iter->HasCurrentMetaData())
+        {
+          const char* name = iter->GetCurrentMetaData()->Get(vtkCompositeDataSet::NAME());
+          if (name)
+          {
+            blockName = name;
+          }
+        }
+        this->CreateActorForBlock(ds, ren, blockName);
+      }
+    }
+  }
+#endif
   else
   {
     vtkDataSet* dataset = vtkDataSet::SafeDownCast(output);
@@ -206,27 +232,8 @@ void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
     }
     else
     {
-      vtkCompositeDataSet* composite = vtkCompositeDataSet::SafeDownCast(output);
-      if (composite)
-      {
-        auto iter = vtkSmartPointer<vtkCompositeDataIterator>::Take(composite->NewIterator());
-        iter->SkipEmptyNodesOn();
-        int blockIdx = 0;
-        for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem(), blockIdx++)
-        {
-          vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
-          if (ds)
-          {
-            std::string blockName = "Block_" + std::to_string(blockIdx);
-            this->CreateActorForBlock(ds, ren, blockName);
-          }
-        }
-      }
-      else
-      {
-        this->SetFailureStatus();
-        return;
-      }
+      this->SetFailureStatus();
+      return;
     }
   }
 
@@ -468,21 +475,12 @@ void vtkF3DGenericImporter::ImportMultiBlock(
     }
 
     vtkMultiBlockDataSet* childMB = vtkMultiBlockDataSet::SafeDownCast(obj);
-    vtkPartitionedDataSetCollection* childPDC = vtkPartitionedDataSetCollection::SafeDownCast(obj);
-    vtkPartitionedDataSet* childPDS = vtkPartitionedDataSet::SafeDownCast(obj);
     vtkCompositeDataSet* childComposite = vtkCompositeDataSet::SafeDownCast(obj);
+    vtkDataSet* ds = vtkDataSet::SafeDownCast(obj);
 
     if (childMB)
     {
       this->ImportMultiBlock(childMB, ren, blockName);
-    }
-    else if (childPDC)
-    {
-      this->ImportPartitionedDataSetCollection(childPDC, ren);
-    }
-    else if (childPDS)
-    {
-      this->ImportPartitionedDataSet(childPDS, ren, blockName);
     }
     else if (childComposite)
     {
@@ -491,21 +489,33 @@ void vtkF3DGenericImporter::ImportMultiBlock(
       int subIdx = 0;
       for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem(), subIdx++)
       {
-        vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
-        if (ds)
+        vtkDataSet* subDs = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
+        if (subDs)
         {
-          std::string subName = blockName + "/Block_" + std::to_string(subIdx);
-          this->CreateActorForBlock(ds, ren, subName);
+          std::string subName = blockName + "/";
+          if (iter->HasCurrentMetaData())
+          {
+            const char* name = iter->GetCurrentMetaData()->Get(vtkCompositeDataSet::NAME());
+            if (name)
+            {
+              subName += name;
+            }
+            else
+            {
+              subName += "Block_" + std::to_string(subIdx);
+            }
+          }
+          else
+          {
+            subName += "Block_" + std::to_string(subIdx);
+          }
+          this->CreateActorForBlock(subDs, ren, subName);
         }
       }
     }
-    else
+    else if (ds)
     {
-      vtkDataSet* ds = vtkDataSet::SafeDownCast(obj);
-      if (ds)
-      {
-        this->CreateActorForBlock(ds, ren, blockName);
-      }
+      this->CreateActorForBlock(ds, ren, blockName);
     }
   }
 }

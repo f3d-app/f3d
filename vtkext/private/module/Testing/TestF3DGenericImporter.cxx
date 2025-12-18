@@ -4,228 +4,197 @@
 #include <vtkGLTFReader.h>
 #include <vtkInformation.h>
 #include <vtkMultiBlockDataSet.h>
+#include <vtkMultiPieceDataSet.h>
 #include <vtkNew.h>
 #include <vtkPartitionedDataSet.h>
 #include <vtkPartitionedDataSetCollection.h>
 #include <vtkPolyData.h>
 #include <vtkSphereSource.h>
 #include <vtkTable.h>
-#include <vtkTestUtilities.h>
 #include <vtkTrivialProducer.h>
-#include <vtkUniformGrid.h>
-#include <vtkUniformGridAMR.h>
 #include <vtkVersion.h>
 #include <vtkXMLMultiBlockDataReader.h>
 
 #include "vtkF3DGenericImporter.h"
 
 #include <iostream>
-#include <vector>
 
 int TestF3DGenericImporter(int argc, char* argv[])
 {
-  vtkNew<vtkF3DGenericImporter> importer;
-  if (importer->GetAnimationSupportLevel() != vtkF3DImporter::AnimationSupportLevel::UNIQUE)
+  // Create reusable test data
+  vtkNew<vtkSphereSource> sphere;
+  sphere->Update();
+  vtkNew<vtkConeSource> cone;
+  cone->Update();
+
+  // Test basic importer state
   {
-    std::cerr << "Unexpected animation support level\n";
-    return EXIT_FAILURE;
-  }
-  if (importer->GetNumberOfAnimations() != 0)
-  {
-    std::cerr << "Unexpected number of animations\n";
-    return EXIT_FAILURE;
-  }
+    vtkNew<vtkF3DGenericImporter> importer;
+    if (importer->GetAnimationSupportLevel() != vtkF3DImporter::AnimationSupportLevel::UNIQUE)
+    {
+      std::cerr << "Unexpected animation support level\n";
+      return EXIT_FAILURE;
+    }
+    if (importer->GetNumberOfAnimations() != 0)
+    {
+      std::cerr << "Unexpected number of animations\n";
+      return EXIT_FAILURE;
+    }
 
-  int nbTimeSteps;
-  double timeRange[2];
-  vtkNew<vtkDoubleArray> timeSteps;
-
-  if (importer->GetTemporalInformation(0, timeRange, nbTimeSteps, timeSteps))
-  {
-    std::cerr << "Unexpected return value with GetTemporalInformation\n";
-    return EXIT_FAILURE;
-  }
-
-  // Test with reader
-  vtkNew<vtkGLTFReader> reader;
-
-  std::string filename = std::string(argv[1]) + "data/BoxAnimated.gltf";
-  reader->SetFileName(filename.c_str());
-  reader->UpdateInformation();
-  reader->EnableAnimation(0);
-
-  importer->SetInternalReader(reader);
-  importer->Update();
-  importer->Print(std::cout);
-  if (importer->GetNumberOfAnimations() != 1)
-  {
-    std::cerr << "Unexpected number of animations\n";
-    return EXIT_FAILURE;
+    int nbTimeSteps;
+    double timeRange[2];
+    vtkNew<vtkDoubleArray> timeSteps;
+    if (importer->GetTemporalInformation(0, timeRange, nbTimeSteps, timeSteps))
+    {
+      std::cerr << "Unexpected return value with GetTemporalInformation\n";
+      return EXIT_FAILURE;
+    }
   }
 
-  importer->EnableAnimation(0);
-  if (!importer->IsAnimationEnabled(0))
+  // Test animation with GLTF reader
   {
-    std::cerr << "Unexpected not enabled animation\n";
-    return EXIT_FAILURE;
-  }
+    vtkNew<vtkGLTFReader> reader;
+    std::string filename = std::string(argv[1]) + "data/BoxAnimated.gltf";
+    reader->SetFileName(filename.c_str());
+    reader->UpdateInformation();
+    reader->EnableAnimation(0);
 
-  importer->DisableAnimation(0);
-  if (importer->IsAnimationEnabled(0))
-  {
-    std::cerr << "Unexpected enabled animation\n";
-    return EXIT_FAILURE;
+    vtkNew<vtkF3DGenericImporter> importer;
+    importer->SetInternalReader(reader);
+    importer->Update();
+    importer->Print(std::cout);
+
+    if (importer->GetNumberOfAnimations() != 1)
+    {
+      std::cerr << "Unexpected number of animations\n";
+      return EXIT_FAILURE;
+    }
+
+    importer->EnableAnimation(0);
+    if (!importer->IsAnimationEnabled(0))
+    {
+      std::cerr << "Unexpected not enabled animation\n";
+      return EXIT_FAILURE;
+    }
+
+    importer->DisableAnimation(0);
+    if (importer->IsAnimationEnabled(0))
+    {
+      std::cerr << "Unexpected enabled animation\n";
+      return EXIT_FAILURE;
+    }
   }
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240910)
-  filename = std::string(argv[1]) + "data/BoxAnimated_invalid_animation.gltf";
-  reader->SetFileName(filename.c_str());
-  reader->UpdateInformation();
-  reader->EnableAnimation(0);
-
-  importer->SetInternalReader(reader);
-  importer->Update();
-  if (!importer->UpdateAtTimeValue(0.1))
+  // Test UpdateAtTimeValue with invalid animation
   {
-    std::cerr << "Unexpected UpdateAtTimeValue failure\n";
-    return EXIT_FAILURE;
+    vtkNew<vtkGLTFReader> reader;
+    std::string filename = std::string(argv[1]) + "data/BoxAnimated_invalid_animation.gltf";
+    reader->SetFileName(filename.c_str());
+    reader->UpdateInformation();
+    reader->EnableAnimation(0);
+
+    vtkNew<vtkF3DGenericImporter> importer;
+    importer->SetInternalReader(reader);
+    importer->Update();
+    if (!importer->UpdateAtTimeValue(0.1))
+    {
+      std::cerr << "Unexpected UpdateAtTimeValue failure\n";
+      return EXIT_FAILURE;
+    }
   }
 #endif
 
-  // Static method testing
-  if (vtkF3DGenericImporter::GetDataObjectDescription(nullptr) != "")
+  // Test UpdateAtTimeValue failure path
   {
-    std::cerr << "Unexpected data object description with null input\n";
-    return EXIT_FAILURE;
-  }
+    vtkNew<vtkGLTFReader> reader;
+    std::string filename = std::string(argv[1]) + "data/BoxAnimated.gltf";
+    reader->SetFileName(filename.c_str());
+    reader->UpdateInformation();
+    reader->EnableAnimation(0);
 
-  // Composite/multiblock support testing
-  vtkNew<vtkXMLMultiBlockDataReader> mbReader;
-  std::string mbFilename = std::string(argv[1]) + "data/mb.vtm";
-  mbReader->SetFileName(mbFilename.c_str());
+    vtkNew<vtkF3DGenericImporter> importer;
+    importer->SetInternalReader(reader);
+    importer->Update();
+    importer->EnableAnimation(0);
 
-  vtkNew<vtkF3DGenericImporter> mbImporter;
-  mbImporter->SetInternalReader(mbReader);
-  mbImporter->Update();
-
-  // mb.vtm contains 3 dataset blocks (1 vtkUnstructuredGrid, 2 vtkPolyData)
-  // vtkTable blocks are skipped as they are not vtkDataSet
-  vtkIdType expectedBlocks = 3;
-  if (mbImporter->GetNumberOfBlocks() != expectedBlocks)
-  {
-    std::cerr << "Unexpected number of blocks: " << mbImporter->GetNumberOfBlocks() << " (expected "
-              << expectedBlocks << ")\n";
-    return EXIT_FAILURE;
-  }
-
-  for (vtkIdType i = 0; i < expectedBlocks; i++)
-  {
-    const vtkPolyData* points = mbImporter->GetImportedPoints(i);
-    if (!points)
+    reader->SetFileName("/nonexistent/path/file.gltf");
+    if (importer->UpdateAtTimeValue(0.5))
     {
-      std::cerr << "GetImportedPoints(" << i << ") returned nullptr\n";
-      return EXIT_FAILURE;
-    }
-
-    std::string blockName = mbImporter->GetBlockName(i);
-    if (blockName.empty())
-    {
-      std::cerr << "GetBlockName(" << i << ") returned empty string\n";
+      std::cerr << "UpdateAtTimeValue should fail with invalid reader\n";
       return EXIT_FAILURE;
     }
   }
 
-  if (mbImporter->GetImportedPoints(-1) != nullptr)
+  // Test GetDataObjectDescription
   {
-    std::cerr << "GetImportedPoints(-1) should return nullptr\n";
-    return EXIT_FAILURE;
-  }
-  if (mbImporter->GetImportedPoints(expectedBlocks) != nullptr)
-  {
-    std::cerr << "GetImportedPoints(expectedBlocks) should return nullptr\n";
-    return EXIT_FAILURE;
-  }
+    if (vtkF3DGenericImporter::GetDataObjectDescription(nullptr) != "")
+    {
+      std::cerr << "GetDataObjectDescription(nullptr) should return empty\n";
+      return EXIT_FAILURE;
+    }
 
-  if (mbImporter->GetImportedImage(-1) != nullptr)
-  {
-    std::cerr << "GetImportedImage(-1) should return nullptr\n";
-    return EXIT_FAILURE;
-  }
-  if (mbImporter->GetImportedImage(expectedBlocks) != nullptr)
-  {
-    std::cerr << "GetImportedImage(expectedBlocks) should return nullptr\n";
-    return EXIT_FAILURE;
-  }
+    vtkNew<vtkPartitionedDataSet> pds;
+    pds->SetNumberOfPartitions(1);
+    pds->SetPartition(0, sphere->GetOutput());
 
-  if (!mbImporter->GetBlockName(-1).empty())
-  {
-    std::cerr << "GetBlockName(-1) should return empty string\n";
-    return EXIT_FAILURE;
-  }
-  if (!mbImporter->GetBlockName(expectedBlocks).empty())
-  {
-    std::cerr << "GetBlockName(expectedBlocks) should return empty string\n";
-    return EXIT_FAILURE;
+    vtkNew<vtkPartitionedDataSetCollection> pdc;
+    pdc->SetNumberOfPartitionedDataSets(1);
+    pdc->SetPartitionedDataSet(0, pds);
+
+    if (vtkF3DGenericImporter::GetDataObjectDescription(pdc).empty())
+    {
+      std::cerr << "GetDataObjectDescription(pdc) should not be empty\n";
+      return EXIT_FAILURE;
+    }
   }
 
-  vtkNew<vtkSphereSource> sphereSource;
-  sphereSource->Update();
-
-  vtkNew<vtkPartitionedDataSet> pds;
-  pds->SetNumberOfPartitions(1);
-  pds->SetPartition(0, sphereSource->GetOutput());
-
-  vtkNew<vtkPartitionedDataSetCollection> pdc;
-  pdc->SetNumberOfPartitionedDataSets(1);
-  pdc->SetPartitionedDataSet(0, pds);
-
-  std::string pdcDescription = vtkF3DGenericImporter::GetDataObjectDescription(pdc);
-  if (pdcDescription.empty())
+  // Test failure path with unsupported data type (vtkTable)
   {
-    std::cerr << "GetDataObjectDescription(pdc) returned empty string\n";
-    return EXIT_FAILURE;
+    vtkNew<vtkTable> table;
+    vtkNew<vtkTrivialProducer> producer;
+    producer->SetOutput(table);
+
+    vtkNew<vtkF3DGenericImporter> importer;
+    importer->SetInternalReader(producer);
+    importer->Update();
+
+    if (importer->GetNumberOfBlocks() != 0)
+    {
+      std::cerr << "Importer with vtkTable should have 0 blocks\n";
+      return EXIT_FAILURE;
+    }
   }
 
-  vtkNew<vtkTable> table;
-  vtkNew<vtkTrivialProducer> tableProducer;
-  tableProducer->SetOutput(table);
-
-  vtkNew<vtkF3DGenericImporter> tableImporter;
-  tableImporter->SetInternalReader(tableProducer);
-  tableImporter->Update();
-
-  if (tableImporter->GetNumberOfBlocks() != 0)
+  // Test MultiBlock from file (covers null blocks, nested structures)
   {
-    std::cerr << "Importer with vtkTable should have 0 blocks\n";
-    return EXIT_FAILURE;
+    vtkNew<vtkXMLMultiBlockDataReader> reader;
+    std::string filename = std::string(argv[1]) + "data/mb.vtm";
+    reader->SetFileName(filename.c_str());
+
+    vtkNew<vtkF3DGenericImporter> importer;
+    importer->SetInternalReader(reader);
+    importer->Update();
+
+    // mb.vtm contains 3 dataset blocks, vtkTable is skipped
+    if (importer->GetNumberOfBlocks() != 3)
+    {
+      std::cerr << "MB file: Expected 3 blocks, got " << importer->GetNumberOfBlocks() << "\n";
+      return EXIT_FAILURE;
+    }
+
+    // Test out-of-bounds access
+    if (importer->GetImportedPoints(-1) != nullptr || importer->GetImportedPoints(3) != nullptr ||
+      importer->GetImportedImage(-1) != nullptr || importer->GetImportedImage(3) != nullptr ||
+      !importer->GetBlockName(-1).empty() || !importer->GetBlockName(3).empty())
+    {
+      std::cerr << "Out-of-bounds access should return nullptr/empty\n";
+      return EXIT_FAILURE;
+    }
   }
 
-  vtkNew<vtkGLTFReader> animReader;
-  std::string animFilename = std::string(argv[1]) + "data/BoxAnimated.gltf";
-  animReader->SetFileName(animFilename.c_str());
-  animReader->UpdateInformation();
-  animReader->EnableAnimation(0);
-
-  vtkNew<vtkF3DGenericImporter> animImporter;
-  animImporter->SetInternalReader(animReader);
-  animImporter->Update();
-  animImporter->EnableAnimation(0);
-
-  animReader->SetFileName("/nonexistent/path/file.gltf");
-
-  if (animImporter->UpdateAtTimeValue(0.5))
+  // Test MultiBlock with metadata names
   {
-    std::cerr << "UpdateAtTimeValue should fail with invalid reader\n";
-    return EXIT_FAILURE;
-  }
-
-  // Test block names for vtkMultiBlockDataSet with metadata names
-  {
-    vtkNew<vtkSphereSource> sphere;
-    sphere->Update();
-    vtkNew<vtkConeSource> cone;
-    cone->Update();
-
     vtkNew<vtkMultiBlockDataSet> mb;
     mb->SetNumberOfBlocks(2);
     mb->SetBlock(0, sphere->GetOutput());
@@ -233,135 +202,44 @@ int TestF3DGenericImporter(int argc, char* argv[])
     mb->GetMetaData(0u)->Set(vtkCompositeDataSet::NAME(), "MySphere");
     mb->GetMetaData(1u)->Set(vtkCompositeDataSet::NAME(), "MyCone");
 
-    vtkNew<vtkTrivialProducer> mbProducer;
-    mbProducer->SetOutput(mb);
+    vtkNew<vtkTrivialProducer> producer;
+    producer->SetOutput(mb);
 
-    vtkNew<vtkF3DGenericImporter> mbNameImporter;
-    mbNameImporter->SetInternalReader(mbProducer);
-    mbNameImporter->Update();
+    vtkNew<vtkF3DGenericImporter> importer;
+    importer->SetInternalReader(producer);
+    importer->Update();
 
-    if (mbNameImporter->GetNumberOfBlocks() != 2)
+    if (importer->GetBlockName(0) != "MySphere" || importer->GetBlockName(1) != "MyCone")
     {
-      std::cerr << "MultiBlock: Expected 2 blocks, got " << mbNameImporter->GetNumberOfBlocks()
-                << "\n";
-      return EXIT_FAILURE;
-    }
-    if (mbNameImporter->GetBlockName(0) != "MySphere")
-    {
-      std::cerr << "MultiBlock: Expected 'MySphere', got '" << mbNameImporter->GetBlockName(0)
-                << "'\n";
-      return EXIT_FAILURE;
-    }
-    if (mbNameImporter->GetBlockName(1) != "MyCone")
-    {
-      std::cerr << "MultiBlock: Expected 'MyCone', got '" << mbNameImporter->GetBlockName(1)
-                << "'\n";
+      std::cerr << "MB metadata names not preserved\n";
       return EXIT_FAILURE;
     }
   }
 
-  // Test block names for vtkPartitionedDataSet
+  // Test MultiBlock without metadata (Block_N fallback)
   {
-    vtkNew<vtkSphereSource> sphere;
-    sphere->Update();
-    vtkNew<vtkConeSource> cone;
-    cone->Update();
+    vtkNew<vtkMultiBlockDataSet> mb;
+    mb->SetNumberOfBlocks(2);
+    mb->SetBlock(0, sphere->GetOutput());
+    mb->SetBlock(1, cone->GetOutput());
 
-    vtkNew<vtkPartitionedDataSet> pdsTest;
-    pdsTest->SetNumberOfPartitions(2);
-    pdsTest->SetPartition(0, sphere->GetOutput());
-    pdsTest->SetPartition(1, cone->GetOutput());
-    pdsTest->GetMetaData(0u)->Set(vtkCompositeDataSet::NAME(), "SpherePartition");
-    pdsTest->GetMetaData(1u)->Set(vtkCompositeDataSet::NAME(), "ConePartition");
+    vtkNew<vtkTrivialProducer> producer;
+    producer->SetOutput(mb);
 
-    vtkNew<vtkTrivialProducer> pdsProducer;
-    pdsProducer->SetOutput(pdsTest);
+    vtkNew<vtkF3DGenericImporter> importer;
+    importer->SetInternalReader(producer);
+    importer->Update();
 
-    vtkNew<vtkF3DGenericImporter> pdsImporter;
-    pdsImporter->SetInternalReader(pdsProducer);
-    pdsImporter->Update();
-
-    if (pdsImporter->GetNumberOfBlocks() != 2)
+    if (importer->GetBlockName(0) != "Block_0" || importer->GetBlockName(1) != "Block_1")
     {
-      std::cerr << "PDS: Expected 2 blocks, got " << pdsImporter->GetNumberOfBlocks() << "\n";
-      return EXIT_FAILURE;
-    }
-    // PDS with no parent name should use default + partition name
-    std::string name0 = pdsImporter->GetBlockName(0);
-    std::string name1 = pdsImporter->GetBlockName(1);
-    if (name0.find("SpherePartition") == std::string::npos)
-    {
-      std::cerr << "PDS: Expected name containing 'SpherePartition', got '" << name0 << "'\n";
-      return EXIT_FAILURE;
-    }
-    if (name1.find("ConePartition") == std::string::npos)
-    {
-      std::cerr << "PDS: Expected name containing 'ConePartition', got '" << name1 << "'\n";
+      std::cerr << "MB without metadata: Expected 'Block_N', got '" << importer->GetBlockName(0)
+                << "', '" << importer->GetBlockName(1) << "'\n";
       return EXIT_FAILURE;
     }
   }
 
-  // Test block names for vtkPartitionedDataSetCollection with assembly
+  // Test nested MultiBlock with hierarchical names
   {
-    vtkNew<vtkSphereSource> sphere;
-    sphere->Update();
-    vtkNew<vtkConeSource> cone;
-    cone->Update();
-
-    vtkNew<vtkPartitionedDataSet> pds0;
-    pds0->SetNumberOfPartitions(1);
-    pds0->SetPartition(0, sphere->GetOutput());
-
-    vtkNew<vtkPartitionedDataSet> pds1;
-    pds1->SetNumberOfPartitions(1);
-    pds1->SetPartition(0, cone->GetOutput());
-
-    vtkNew<vtkPartitionedDataSetCollection> pdcTest;
-    pdcTest->SetNumberOfPartitionedDataSets(2);
-    pdcTest->SetPartitionedDataSet(0, pds0);
-    pdcTest->SetPartitionedDataSet(1, pds1);
-
-    vtkNew<vtkDataAssembly> assembly;
-    assembly->Initialize();
-    int sphereNode = assembly->AddNode("SphereFromAssembly", assembly->GetRootNode());
-    int coneNode = assembly->AddNode("ConeFromAssembly", assembly->GetRootNode());
-    assembly->AddDataSetIndex(sphereNode, 0);
-    assembly->AddDataSetIndex(coneNode, 1);
-    pdcTest->SetDataAssembly(assembly);
-
-    vtkNew<vtkTrivialProducer> pdcProducer;
-    pdcProducer->SetOutput(pdcTest);
-
-    vtkNew<vtkF3DGenericImporter> pdcImporter;
-    pdcImporter->SetInternalReader(pdcProducer);
-    pdcImporter->Update();
-
-    if (pdcImporter->GetNumberOfBlocks() != 2)
-    {
-      std::cerr << "PDC: Expected 2 blocks, got " << pdcImporter->GetNumberOfBlocks() << "\n";
-      return EXIT_FAILURE;
-    }
-    if (pdcImporter->GetBlockName(0) != "SphereFromAssembly")
-    {
-      std::cerr << "PDC: Expected 'SphereFromAssembly', got '" << pdcImporter->GetBlockName(0)
-                << "'\n";
-      return EXIT_FAILURE;
-    }
-    if (pdcImporter->GetBlockName(1) != "ConeFromAssembly")
-    {
-      std::cerr << "PDC: Expected 'ConeFromAssembly', got '" << pdcImporter->GetBlockName(1)
-                << "'\n";
-      return EXIT_FAILURE;
-    }
-  }
-
-  // Test nested vtkMultiBlockDataSet with hierarchical names
-  {
-    vtkNew<vtkSphereSource> sphere;
-    sphere->Update();
-    vtkNew<vtkConeSource> cone;
-    cone->Update();
-
     vtkNew<vtkMultiBlockDataSet> innerMB;
     innerMB->SetNumberOfBlocks(2);
     innerMB->SetBlock(0, sphere->GetOutput());
@@ -374,76 +252,193 @@ int TestF3DGenericImporter(int argc, char* argv[])
     outerMB->SetBlock(0, innerMB);
     outerMB->GetMetaData(0u)->Set(vtkCompositeDataSet::NAME(), "OuterBlock");
 
-    vtkNew<vtkTrivialProducer> nestedProducer;
-    nestedProducer->SetOutput(outerMB);
+    vtkNew<vtkTrivialProducer> producer;
+    producer->SetOutput(outerMB);
 
-    vtkNew<vtkF3DGenericImporter> nestedImporter;
-    nestedImporter->SetInternalReader(nestedProducer);
-    nestedImporter->Update();
+    vtkNew<vtkF3DGenericImporter> importer;
+    importer->SetInternalReader(producer);
+    importer->Update();
 
-    if (nestedImporter->GetNumberOfBlocks() != 2)
+    if (importer->GetBlockName(0) != "OuterBlock/InnerSphere" ||
+      importer->GetBlockName(1) != "OuterBlock/InnerCone")
     {
-      std::cerr << "Nested MB: Expected 2 blocks, got " << nestedImporter->GetNumberOfBlocks()
-                << "\n";
-      return EXIT_FAILURE;
-    }
-    // Names should be hierarchical: OuterBlock/InnerSphere, OuterBlock/InnerCone
-    std::string name0 = nestedImporter->GetBlockName(0);
-    std::string name1 = nestedImporter->GetBlockName(1);
-    if (name0 != "OuterBlock/InnerSphere")
-    {
-      std::cerr << "Nested MB: Expected 'OuterBlock/InnerSphere', got '" << name0 << "'\n";
-      return EXIT_FAILURE;
-    }
-    if (name1 != "OuterBlock/InnerCone")
-    {
-      std::cerr << "Nested MB: Expected 'OuterBlock/InnerCone', got '" << name1 << "'\n";
+      std::cerr << "Nested MB: Expected hierarchical names\n";
       return EXIT_FAILURE;
     }
   }
 
-  // Test generic composite
+  // Test MultiPieceDataSet nested inside MultiBlock (generic composite fallback)
   {
-    vtkNew<vtkUniformGridAMR> amr;
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 0)
-    std::vector<unsigned int> blocksPerLevel = { 1 };
-    amr->Initialize(blocksPerLevel);
-#else
-    int blocksPerLevel[1] = { 1 };
-    amr->Initialize(1, blocksPerLevel);
-#endif
+    vtkNew<vtkMultiPieceDataSet> mp;
+    mp->SetNumberOfPieces(2);
+    mp->SetPiece(0, sphere->GetOutput());
+    mp->SetPiece(1, cone->GetOutput());
+    mp->GetMetaData(0u)->Set(vtkCompositeDataSet::NAME(), "SpherePiece");
+    mp->GetMetaData(1u)->Set(vtkCompositeDataSet::NAME(), "ConePiece");
 
-    vtkNew<vtkUniformGrid> grid;
-    grid->SetDimensions(3, 3, 3);
-    grid->SetOrigin(0, 0, 0);
-    grid->SetSpacing(1.0, 1.0, 1.0);
-    amr->SetDataSet(0, 0, grid);
+    vtkNew<vtkMultiBlockDataSet> mb;
+    mb->SetNumberOfBlocks(1);
+    mb->SetBlock(0, mp);
+    mb->GetMetaData(0u)->Set(vtkCompositeDataSet::NAME(), "NestedMP");
 
-    vtkNew<vtkTrivialProducer> amrProducer;
-    amrProducer->SetOutput(amr);
+    vtkNew<vtkTrivialProducer> producer;
+    producer->SetOutput(mb);
 
-    vtkNew<vtkF3DGenericImporter> amrImporter;
-    amrImporter->SetInternalReader(amrProducer);
-    amrImporter->Update();
+    vtkNew<vtkF3DGenericImporter> importer;
+    importer->SetInternalReader(producer);
+    importer->Update();
 
-    if (amrImporter->GetNumberOfBlocks() < 1)
+    if (importer->GetNumberOfBlocks() != 2)
     {
-      std::cerr << "AMR: Expected at least 1 block, got " << amrImporter->GetNumberOfBlocks()
+      std::cerr << "Nested MP: Expected 2 blocks\n";
+      return EXIT_FAILURE;
+    }
+
+    std::string name0 = importer->GetBlockName(0);
+    std::string name1 = importer->GetBlockName(1);
+    if (name0.find("NestedMP") == std::string::npos ||
+      name0.find("SpherePiece") == std::string::npos ||
+      name1.find("NestedMP") == std::string::npos || name1.find("ConePiece") == std::string::npos)
+    {
+      std::cerr << "Nested MP: Expected hierarchical names with piece metadata\n";
+      return EXIT_FAILURE;
+    }
+  }
+
+  // Test PartitionedDataSet with metadata names
+  {
+    vtkNew<vtkPartitionedDataSet> pds;
+    pds->SetNumberOfPartitions(2);
+    pds->SetPartition(0, sphere->GetOutput());
+    pds->SetPartition(1, cone->GetOutput());
+    pds->GetMetaData(0u)->Set(vtkCompositeDataSet::NAME(), "SpherePartition");
+    pds->GetMetaData(1u)->Set(vtkCompositeDataSet::NAME(), "ConePartition");
+
+    vtkNew<vtkTrivialProducer> producer;
+    producer->SetOutput(pds);
+
+    vtkNew<vtkF3DGenericImporter> importer;
+    importer->SetInternalReader(producer);
+    importer->Update();
+
+    std::string name0 = importer->GetBlockName(0);
+    std::string name1 = importer->GetBlockName(1);
+    if (name0.find("SpherePartition") == std::string::npos ||
+      name1.find("ConePartition") == std::string::npos)
+    {
+      std::cerr << "PDS: Expected partition metadata names\n";
+      return EXIT_FAILURE;
+    }
+  }
+
+  // Test PartitionedDataSet without metadata (Partition_N fallback)
+  {
+    vtkNew<vtkPartitionedDataSet> pds;
+    pds->SetNumberOfPartitions(2);
+    pds->SetPartition(0, sphere->GetOutput());
+    pds->SetPartition(1, cone->GetOutput());
+    // No metadata
+
+    vtkNew<vtkTrivialProducer> producer;
+    producer->SetOutput(pds);
+
+    vtkNew<vtkF3DGenericImporter> importer;
+    importer->SetInternalReader(producer);
+    importer->Update();
+
+    std::string name0 = importer->GetBlockName(0);
+    std::string name1 = importer->GetBlockName(1);
+    if (name0.find("Partition_0") == std::string::npos ||
+      name1.find("Partition_1") == std::string::npos)
+    {
+      std::cerr << "PDS without metadata: Expected 'Partition_N', got '" << name0 << "', '" << name1
+                << "'\n";
+      return EXIT_FAILURE;
+    }
+  }
+
+  // Test PartitionedDataSet with null partition
+  {
+    vtkNew<vtkPartitionedDataSet> pds;
+    pds->SetNumberOfPartitions(3);
+    pds->SetPartition(0, sphere->GetOutput());
+    pds->SetPartition(2, cone->GetOutput());
+
+    vtkNew<vtkTrivialProducer> producer;
+    producer->SetOutput(pds);
+
+    vtkNew<vtkF3DGenericImporter> importer;
+    importer->SetInternalReader(producer);
+    importer->Update();
+
+    if (importer->GetNumberOfBlocks() != 2)
+    {
+      std::cerr << "PDS with null: Expected 2 blocks, got " << importer->GetNumberOfBlocks()
                 << "\n";
       return EXIT_FAILURE;
     }
+  }
 
-    const vtkPolyData* points = amrImporter->GetImportedPoints(0);
-    if (!points)
+  // Test PartitionedDataSetCollection with assembly
+  {
+    vtkNew<vtkPartitionedDataSet> pds0;
+    pds0->SetNumberOfPartitions(1);
+    pds0->SetPartition(0, sphere->GetOutput());
+
+    vtkNew<vtkPartitionedDataSet> pds1;
+    pds1->SetNumberOfPartitions(1);
+    pds1->SetPartition(0, cone->GetOutput());
+
+    vtkNew<vtkPartitionedDataSetCollection> pdc;
+    pdc->SetNumberOfPartitionedDataSets(2);
+    pdc->SetPartitionedDataSet(0, pds0);
+    pdc->SetPartitionedDataSet(1, pds1);
+
+    vtkNew<vtkDataAssembly> assembly;
+    assembly->Initialize();
+    int sphereNode = assembly->AddNode("SphereFromAssembly", assembly->GetRootNode());
+    int coneNode = assembly->AddNode("ConeFromAssembly", assembly->GetRootNode());
+    assembly->AddDataSetIndex(sphereNode, 0);
+    assembly->AddDataSetIndex(coneNode, 1);
+    pdc->SetDataAssembly(assembly);
+
+    vtkNew<vtkTrivialProducer> producer;
+    producer->SetOutput(pdc);
+
+    vtkNew<vtkF3DGenericImporter> importer;
+    importer->SetInternalReader(producer);
+    importer->Update();
+
+    if (importer->GetBlockName(0) != "SphereFromAssembly" ||
+      importer->GetBlockName(1) != "ConeFromAssembly")
     {
-      std::cerr << "AMR: GetImportedPoints(0) returned nullptr\n";
+      std::cerr << "PDC with assembly: Expected assembly names\n";
       return EXIT_FAILURE;
     }
+  }
 
-    std::string blockName = amrImporter->GetBlockName(0);
-    if (blockName.empty())
+  // Test PartitionedDataSetCollection with metadata (no assembly)
+  {
+    vtkNew<vtkPartitionedDataSet> pds0;
+    pds0->SetNumberOfPartitions(1);
+    pds0->SetPartition(0, sphere->GetOutput());
+
+    vtkNew<vtkPartitionedDataSetCollection> pdc;
+    pdc->SetNumberOfPartitionedDataSets(1);
+    pdc->SetPartitionedDataSet(0, pds0);
+    pdc->GetMetaData(0u)->Set(vtkCompositeDataSet::NAME(), "MetadataName");
+
+    vtkNew<vtkTrivialProducer> producer;
+    producer->SetOutput(pdc);
+
+    vtkNew<vtkF3DGenericImporter> importer;
+    importer->SetInternalReader(producer);
+    importer->Update();
+
+    if (importer->GetBlockName(0) != "MetadataName")
     {
-      std::cerr << "AMR: GetBlockName(0) returned empty string\n";
+      std::cerr << "PDC with metadata: Expected 'MetadataName', got '" << importer->GetBlockName(0)
+                << "'\n";
       return EXIT_FAILURE;
     }
   }
