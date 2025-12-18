@@ -7,10 +7,10 @@
 #include "window_impl.h"
 
 #include "F3DStyle.h"
+#include "vtkF3DMetaImporter.h"
 #include "vtkF3DRenderer.h"
 
 #include <vtkDoubleArray.h>
-#include <vtkImporter.h>
 #include <vtkProgressBarRepresentation.h>
 #include <vtkRenderWindow.h>
 #include <vtkRendererCollection.h>
@@ -31,7 +31,7 @@ animationManager::animationManager(options& options, window_impl& window)
 }
 
 //----------------------------------------------------------------------------
-void animationManager::SetImporter(vtkImporter* importer)
+void animationManager::SetImporter(vtkF3DMetaImporter* importer)
 {
   this->Importer = importer;
 }
@@ -470,7 +470,7 @@ void animationManager::PrepareForAnimationIndices()
       double timeRange[2];
       int nbTimeSteps;
       vtkNew<vtkDoubleArray> timeSteps;
-      this->Importer->GetTemporalInformation(animIndex, 0, nbTimeSteps, timeRange, timeSteps);
+      this->Importer->GetTemporalInformation(animIndex, timeRange, nbTimeSteps, timeSteps);
 
       // Accumulate time ranges
       this->TimeRange[0] = std::min(timeRange[0], this->TimeRange[0]);

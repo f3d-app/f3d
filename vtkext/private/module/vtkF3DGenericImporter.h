@@ -84,8 +84,8 @@ public:
    * Framerate is ignored in this implementation.
    * Only timerange is defined in this implementation.
    */
-  bool GetTemporalInformation(vtkIdType animationIndex, double frameRate, int& nbTimeSteps,
-    double timeRange[2], vtkDoubleArray* timeSteps) override;
+  bool GetTemporalInformation(vtkIdType animationIndex, double timeRange[2], int& nbTimeSteps,
+    vtkDoubleArray* timeSteps) override;
 
   ///@{
   /**
