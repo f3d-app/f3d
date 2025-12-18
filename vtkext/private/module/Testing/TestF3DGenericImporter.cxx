@@ -1,5 +1,9 @@
+#include <vtkConeSource.h>
+#include <vtkDataAssembly.h>
 #include <vtkDoubleArray.h>
 #include <vtkGLTFReader.h>
+#include <vtkInformation.h>
+#include <vtkMultiBlockDataSet.h>
 #include <vtkNew.h>
 #include <vtkPartitionedDataSet.h>
 #include <vtkPartitionedDataSetCollection.h>
@@ -222,6 +226,189 @@ int TestF3DGenericImporter(int argc, char* argv[])
   {
     std::cerr << "UpdateAtTimeValue should fail with invalid reader\n";
     return EXIT_FAILURE;
+  }
+
+  // Test block names for vtkMultiBlockDataSet with metadata names
+  {
+    vtkNew<vtkSphereSource> sphere;
+    sphere->Update();
+    vtkNew<vtkConeSource> cone;
+    cone->Update();
+
+    vtkNew<vtkMultiBlockDataSet> mb;
+    mb->SetNumberOfBlocks(2);
+    mb->SetBlock(0, sphere->GetOutput());
+    mb->SetBlock(1, cone->GetOutput());
+    mb->GetMetaData(0u)->Set(vtkCompositeDataSet::NAME(), "MySphere");
+    mb->GetMetaData(1u)->Set(vtkCompositeDataSet::NAME(), "MyCone");
+
+    vtkNew<vtkTrivialProducer> mbProducer;
+    mbProducer->SetOutput(mb);
+
+    vtkNew<vtkF3DGenericImporter> mbNameImporter;
+    mbNameImporter->SetInternalReader(mbProducer);
+    mbNameImporter->Update();
+
+    if (mbNameImporter->GetNumberOfBlocks() != 2)
+    {
+      std::cerr << "MultiBlock: Expected 2 blocks, got " << mbNameImporter->GetNumberOfBlocks()
+                << "\n";
+      return EXIT_FAILURE;
+    }
+    if (mbNameImporter->GetBlockName(0) != "MySphere")
+    {
+      std::cerr << "MultiBlock: Expected 'MySphere', got '" << mbNameImporter->GetBlockName(0)
+                << "'\n";
+      return EXIT_FAILURE;
+    }
+    if (mbNameImporter->GetBlockName(1) != "MyCone")
+    {
+      std::cerr << "MultiBlock: Expected 'MyCone', got '" << mbNameImporter->GetBlockName(1)
+                << "'\n";
+      return EXIT_FAILURE;
+    }
+  }
+
+  // Test block names for vtkPartitionedDataSet
+  {
+    vtkNew<vtkSphereSource> sphere;
+    sphere->Update();
+    vtkNew<vtkConeSource> cone;
+    cone->Update();
+
+    vtkNew<vtkPartitionedDataSet> pdsTest;
+    pdsTest->SetNumberOfPartitions(2);
+    pdsTest->SetPartition(0, sphere->GetOutput());
+    pdsTest->SetPartition(1, cone->GetOutput());
+    pdsTest->GetMetaData(0u)->Set(vtkCompositeDataSet::NAME(), "SpherePartition");
+    pdsTest->GetMetaData(1u)->Set(vtkCompositeDataSet::NAME(), "ConePartition");
+
+    vtkNew<vtkTrivialProducer> pdsProducer;
+    pdsProducer->SetOutput(pdsTest);
+
+    vtkNew<vtkF3DGenericImporter> pdsImporter;
+    pdsImporter->SetInternalReader(pdsProducer);
+    pdsImporter->Update();
+
+    if (pdsImporter->GetNumberOfBlocks() != 2)
+    {
+      std::cerr << "PDS: Expected 2 blocks, got " << pdsImporter->GetNumberOfBlocks() << "\n";
+      return EXIT_FAILURE;
+    }
+    // PDS with no parent name should use default + partition name
+    std::string name0 = pdsImporter->GetBlockName(0);
+    std::string name1 = pdsImporter->GetBlockName(1);
+    if (name0.find("SpherePartition") == std::string::npos)
+    {
+      std::cerr << "PDS: Expected name containing 'SpherePartition', got '" << name0 << "'\n";
+      return EXIT_FAILURE;
+    }
+    if (name1.find("ConePartition") == std::string::npos)
+    {
+      std::cerr << "PDS: Expected name containing 'ConePartition', got '" << name1 << "'\n";
+      return EXIT_FAILURE;
+    }
+  }
+
+  // Test block names for vtkPartitionedDataSetCollection with assembly
+  {
+    vtkNew<vtkSphereSource> sphere;
+    sphere->Update();
+    vtkNew<vtkConeSource> cone;
+    cone->Update();
+
+    vtkNew<vtkPartitionedDataSet> pds0;
+    pds0->SetNumberOfPartitions(1);
+    pds0->SetPartition(0, sphere->GetOutput());
+
+    vtkNew<vtkPartitionedDataSet> pds1;
+    pds1->SetNumberOfPartitions(1);
+    pds1->SetPartition(0, cone->GetOutput());
+
+    vtkNew<vtkPartitionedDataSetCollection> pdcTest;
+    pdcTest->SetNumberOfPartitionedDataSets(2);
+    pdcTest->SetPartitionedDataSet(0, pds0);
+    pdcTest->SetPartitionedDataSet(1, pds1);
+
+    vtkNew<vtkDataAssembly> assembly;
+    assembly->Initialize();
+    int sphereNode = assembly->AddNode("SphereFromAssembly", assembly->GetRootNode());
+    int coneNode = assembly->AddNode("ConeFromAssembly", assembly->GetRootNode());
+    assembly->AddDataSetIndex(sphereNode, 0);
+    assembly->AddDataSetIndex(coneNode, 1);
+    pdcTest->SetDataAssembly(assembly);
+
+    vtkNew<vtkTrivialProducer> pdcProducer;
+    pdcProducer->SetOutput(pdcTest);
+
+    vtkNew<vtkF3DGenericImporter> pdcImporter;
+    pdcImporter->SetInternalReader(pdcProducer);
+    pdcImporter->Update();
+
+    if (pdcImporter->GetNumberOfBlocks() != 2)
+    {
+      std::cerr << "PDC: Expected 2 blocks, got " << pdcImporter->GetNumberOfBlocks() << "\n";
+      return EXIT_FAILURE;
+    }
+    if (pdcImporter->GetBlockName(0) != "SphereFromAssembly")
+    {
+      std::cerr << "PDC: Expected 'SphereFromAssembly', got '" << pdcImporter->GetBlockName(0)
+                << "'\n";
+      return EXIT_FAILURE;
+    }
+    if (pdcImporter->GetBlockName(1) != "ConeFromAssembly")
+    {
+      std::cerr << "PDC: Expected 'ConeFromAssembly', got '" << pdcImporter->GetBlockName(1)
+                << "'\n";
+      return EXIT_FAILURE;
+    }
+  }
+
+  // Test nested vtkMultiBlockDataSet with hierarchical names
+  {
+    vtkNew<vtkSphereSource> sphere;
+    sphere->Update();
+    vtkNew<vtkConeSource> cone;
+    cone->Update();
+
+    vtkNew<vtkMultiBlockDataSet> innerMB;
+    innerMB->SetNumberOfBlocks(2);
+    innerMB->SetBlock(0, sphere->GetOutput());
+    innerMB->SetBlock(1, cone->GetOutput());
+    innerMB->GetMetaData(0u)->Set(vtkCompositeDataSet::NAME(), "InnerSphere");
+    innerMB->GetMetaData(1u)->Set(vtkCompositeDataSet::NAME(), "InnerCone");
+
+    vtkNew<vtkMultiBlockDataSet> outerMB;
+    outerMB->SetNumberOfBlocks(1);
+    outerMB->SetBlock(0, innerMB);
+    outerMB->GetMetaData(0u)->Set(vtkCompositeDataSet::NAME(), "OuterBlock");
+
+    vtkNew<vtkTrivialProducer> nestedProducer;
+    nestedProducer->SetOutput(outerMB);
+
+    vtkNew<vtkF3DGenericImporter> nestedImporter;
+    nestedImporter->SetInternalReader(nestedProducer);
+    nestedImporter->Update();
+
+    if (nestedImporter->GetNumberOfBlocks() != 2)
+    {
+      std::cerr << "Nested MB: Expected 2 blocks, got " << nestedImporter->GetNumberOfBlocks()
+                << "\n";
+      return EXIT_FAILURE;
+    }
+    // Names should be hierarchical: OuterBlock/InnerSphere, OuterBlock/InnerCone
+    std::string name0 = nestedImporter->GetBlockName(0);
+    std::string name1 = nestedImporter->GetBlockName(1);
+    if (name0 != "OuterBlock/InnerSphere")
+    {
+      std::cerr << "Nested MB: Expected 'OuterBlock/InnerSphere', got '" << name0 << "'\n";
+      return EXIT_FAILURE;
+    }
+    if (name1 != "OuterBlock/InnerCone")
+    {
+      std::cerr << "Nested MB: Expected 'OuterBlock/InnerCone', got '" << name1 << "'\n";
+      return EXIT_FAILURE;
+    }
   }
 
   return EXIT_SUCCESS;
