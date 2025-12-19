@@ -356,7 +356,7 @@ jobs:
     steps:
       # This require a F3D_DOCKER_CI_DISPATCH secret contain a PAT with read and write admin access
       - name: Trigger docker images build
-        uses: rolkool/trigger-workflow-and-wait@master
+        uses: convictional/trigger-workflow-and-wait@v1.6.5
         with:
           owner: f3d-app
           repo: f3d-docker-images
