@@ -212,12 +212,6 @@ void window_impl::InitializeUpVector()
 }
 
 //----------------------------------------------------------------------------
-void window_impl::RotateUpVector(const std::array<double, 3>& axis, double angleDegrees)
-{
-  this->Internals->Renderer->RotateUpVector(axis, angleDegrees);
-}
-
-//----------------------------------------------------------------------------
 window_impl::Type window_impl::getType()
 {
   if (this->Internals->RenWin->IsA("vtkOSOpenGLRenderWindow"))
@@ -401,6 +395,9 @@ void window_impl::UpdateDynamicOptions()
   renderer->UpdateLights();
 
   const options& opt = this->Internals->Options;
+
+  // Update up direction if changed
+  renderer->SetUpDirection(opt.scene.up_direction);
 
   // XXX: model.point_sprites.type only has an effect on geometry scene
   // but we set it here for practical reasons

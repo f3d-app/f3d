@@ -30,6 +30,7 @@
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRendererCollection.h>
+#include <vtkTransform.h>
 #include <vtkStringArray.h>
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
@@ -1118,16 +1119,23 @@ interactor& interactor_impl::initCommands()
     [&](const std::vector<std::string>& args)
     {
       check_args(args, 4, "rotate_up");
-      std::array<double, 3> axis = {
+
+      double axis[3] = {
         options::parse<double>(args[0]),
         options::parse<double>(args[1]),
         options::parse<double>(args[2])
       };
+      vtkMath::Normalize(axis);
       double angle = options::parse<double>(args[3]);
-      this->Internals->Window.RotateUpVector(axis, angle);
 
-      // Update the up_direction option to reflect the new up vector
-      const double* newUp = this->Internals->Window.GetRenderer()->GetUpVector();
+      const double* currentUp = this->Internals->Window.GetRenderer()->GetUpVector();
+
+      vtkNew<vtkTransform> transform;
+      transform->RotateWXYZ(angle, axis);
+      double newUp[3];
+      transform->TransformPoint(currentUp, newUp);
+      vtkMath::Normalize(newUp);
+
       this->Internals->Options.scene.up_direction = { newUp[0], newUp[1], newUp[2] };
 
       this->Internals->Style->ResetTemporaryUp();

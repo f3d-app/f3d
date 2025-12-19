@@ -210,12 +210,10 @@ public:
   void InitializeUpVector(const std::vector<double>& upVec);
 
   /**
-   * Rotate the up vector around the specified axis by the given angle (degrees).
-   * Updates skybox and environment orientation. Does NOT reset camera.
-   * @param axis the axis to rotate around (will be normalized)
-   * @param angleDegrees rotation angle in degrees
+   * Set the up direction dynamically. Updates skybox and environment orientation.
+   * Does NOT reset camera. Can be called at any time to change the scene orientation.
    */
-  void RotateUpVector(const std::array<double, 3>& axis, double angleDegrees);
+  void SetUpDirection(const std::vector<double>& upVec);
 
   /**
    * Compute bounds of visible props as transformed by given matrix.

@@ -406,24 +406,29 @@ void vtkF3DRenderer::InitializeUpVector(const std::vector<double>& upVec)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::RotateUpVector(const std::array<double, 3>& axis, double angleDegrees)
+void vtkF3DRenderer::SetUpDirection(const std::vector<double>& upVec)
 {
-  std::array<double, 3> normAxis = axis;
-  vtkMath::Normalize(normAxis.data());
+  assert(upVec.size() == 3);
 
-  vtkNew<vtkTransform> rotationTransform;
-  rotationTransform->RotateWXYZ(angleDegrees, normAxis.data());
+  std::array<double, 3> up = { upVec[0], upVec[1], upVec[2] };
 
-  std::array<double, 3> newUp;
-  rotationTransform->TransformPoint(this->UpVector, newUp.data());
-  vtkMath::Normalize(newUp.data());
+  constexpr double epsilon = 1e-6;
+  if (std::abs(up[0] - this->UpVector[0]) < epsilon &&
+      std::abs(up[1] - this->UpVector[1]) < epsilon &&
+      std::abs(up[2] - this->UpVector[2]) < epsilon)
+  {
+    return;
+  }
 
-  std::array<double, 3> newRight;
-  rotationTransform->TransformPoint(this->RightVector, newRight.data());
-  vtkMath::Normalize(newRight.data());
+  vtkMath::Normalize(up.data());
 
-  this->ApplyUpVector(newUp, newRight);
+  std::array<double, 3> right = { 1, 0, 0 };
+  if (std::abs(vtkMath::Dot(right.data(), up.data())) > 0.999)
+  {
+    right = { 0, 1, 0 };
+  }
 
+  this->ApplyUpVector(up, right);
   this->GridConfigured = false;
 }
 
