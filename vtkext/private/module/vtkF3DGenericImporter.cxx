@@ -456,7 +456,7 @@ void vtkF3DGenericImporter::ImportMultiBlock(
     }
     if (blockName.empty())
     {
-      blockName = "Block_" + std::to_string(parentName.empty() ? this->Pimpl->Blocks.size() : i);
+      blockName = "Block_" + std::to_string(i);
     }
     if (!parentName.empty())
     {
@@ -482,24 +482,11 @@ void vtkF3DGenericImporter::ImportMultiBlock(
         vtkDataSet* subDs = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
         if (subDs)
         {
-          std::string subName = blockName + "/";
-          if (iter->HasCurrentMetaData())
-          {
-            const char* name = iter->GetCurrentMetaData()->Get(vtkCompositeDataSet::NAME());
-            if (name)
-            {
-              subName += name;
-            }
-            else
-            {
-              subName += "Block_" + std::to_string(subIdx);
-            }
-          }
-          else
-          {
-            subName += "Block_" + std::to_string(subIdx);
-          }
-          this->CreateActorForBlock(subDs, ren, subName);
+          const char* name = iter->HasCurrentMetaData()
+            ? iter->GetCurrentMetaData()->Get(vtkCompositeDataSet::NAME())
+            : "Block_";
+          blockName += "/" + (name ? std::string(name) : "Block_") + std::to_string(subIdx);
+          this->CreateActorForBlock(subDs, ren, blockName);
         }
       }
     }
