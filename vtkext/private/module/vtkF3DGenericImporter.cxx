@@ -44,6 +44,15 @@ struct vtkF3DGenericImporter::Internals
   bool HasAnimation = false;
   bool AnimationEnabled = false;
   std::array<double, 2> TimeRange;
+
+  void UpdateBlock(BlockData& bd, vtkDataSet* dataset)
+  {
+    bd.PostPro->SetInputDataObject(dataset);
+    bd.PostPro->Update();
+    bd.Points = vtkPolyData::SafeDownCast(bd.PostPro->GetOutput(1));
+    vtkImageData* image = vtkImageData::SafeDownCast(bd.PostPro->GetOutput(2));
+    bd.Image = image && image->GetNumberOfCells() > 0 ? image : nullptr;
+  }
 };
 
 vtkStandardNewMacro(vtkF3DGenericImporter);
@@ -363,12 +372,7 @@ bool vtkF3DGenericImporter::UpdateAtTimeValue(double timeValue)
       vtkDataSet* block = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
       if (block)
       {
-        Internals::BlockData& bd = this->Pimpl->Blocks[blockIdx];
-        bd.PostPro->SetInputDataObject(block);
-        bd.PostPro->Update();
-        bd.Points = vtkPolyData::SafeDownCast(bd.PostPro->GetOutput(1));
-        vtkImageData* image = vtkImageData::SafeDownCast(bd.PostPro->GetOutput(2));
-        bd.Image = (image && image->GetNumberOfCells() > 0) ? image : nullptr;
+        this->Pimpl->UpdateBlock(this->Pimpl->Blocks[blockIdx], block);
       }
     }
   }
@@ -377,12 +381,7 @@ bool vtkF3DGenericImporter::UpdateAtTimeValue(double timeValue)
     vtkDataSet* dataset = vtkDataSet::SafeDownCast(output);
     if (dataset)
     {
-      Internals::BlockData& bd = this->Pimpl->Blocks[0];
-      bd.PostPro->SetInputDataObject(dataset);
-      bd.PostPro->Update();
-      bd.Points = vtkPolyData::SafeDownCast(bd.PostPro->GetOutput(1));
-      vtkImageData* image = vtkImageData::SafeDownCast(bd.PostPro->GetOutput(2));
-      bd.Image = (image && image->GetNumberOfCells() > 0) ? image : nullptr;
+      this->Pimpl->UpdateBlock(this->Pimpl->Blocks[0], dataset);
     }
   }
 
@@ -450,28 +449,19 @@ void vtkF3DGenericImporter::ImportMultiBlock(
     std::string blockName;
     if (mb->HasMetaData(i))
     {
-      const char* name = mb->GetMetaData(i)->Get(vtkCompositeDataSet::NAME());
-      if (name)
+      if (const char* name = mb->GetMetaData(i)->Get(vtkCompositeDataSet::NAME()))
       {
         blockName = name;
       }
     }
-
-    // Build full name with parent prefix
-    if (!parentName.empty() && !blockName.empty())
+    if (blockName.empty())
+    {
+      blockName = "Block_" + std::to_string(parentName.empty() ? this->Pimpl->Blocks.size() : i);
+    }
+    if (!parentName.empty())
     {
       blockName.insert(0, "/");
       blockName.insert(0, parentName);
-    }
-    else if (!parentName.empty())
-    {
-      blockName = parentName;
-      blockName += "/Block_";
-      blockName += std::to_string(i);
-    }
-    else if (blockName.empty())
-    {
-      blockName = "Block_" + std::to_string(this->Pimpl->Blocks.size());
     }
 
     vtkMultiBlockDataSet* childMB = vtkMultiBlockDataSet::SafeDownCast(obj);
