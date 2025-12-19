@@ -686,7 +686,7 @@ int vtkF3DOCCTReader::RequestData(
     }
     else
     {
-      vtkErrorWithObjectMacro(this, "Failed opening file " << this->GetFileName());
+      vtkErrorWithObjectMacro(this, "Failed opening file or stream" << this->GetFileName());
       return 0;
     }
   }
