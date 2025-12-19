@@ -6,8 +6,6 @@ find_package(f3d REQUIRED COMPONENTS c_api)
 
 add_executable(interactive-app-c main.c)
 
-target_include_directories(interactive-app-c PRIVATE ${f3d_INCLUDE_DIR})
-
 target_link_libraries(interactive-app-c
   PRIVATE
   f3d::c_api

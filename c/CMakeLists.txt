@@ -49,6 +49,8 @@ target_include_directories(c_api
   PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<BUILD_INTERFACE:${F3D_BINARY_DIR}/library/public>
+  INTERFACE
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
   )
 
 target_compile_options(c_api PUBLIC ${f3d_sanitizer_compile_options})

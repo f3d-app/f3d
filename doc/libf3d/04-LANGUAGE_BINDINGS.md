@@ -35,7 +35,6 @@ cmake_minimum_required(VERSION 3.10)
 project(f3d-example-c)
 find_package(f3d REQUIRED COMPONENTS c_api)
 add_executable(f3d-example-c main.c)
-target_include_directories(f3d-example-c PRIVATE ${f3d_INCLUDE_DIR})
 target_link_libraries(f3d-example-c
   PRIVATE
   f3d::c_api
