@@ -127,7 +127,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "coloring-scalar-bar", "ui.scalar_bar" },
   { "colormap", "model.scivis.colormap" },
   { "colormap-discretization", "model.scivis.discretization" },
-  { "volume-opacity-map", "model.scivis.opacitymap" },
+  { "volume-opacity-map", "model.scivis.opacity_map" },
   { "volume", "model.volume.enable" },
   { "volume-inverse", "model.volume.inverse" },
   { "camera-orthographic", "scene.camera.orthographic" },

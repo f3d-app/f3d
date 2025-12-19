@@ -108,15 +108,15 @@ f3d::colormap_t Read(const fs::path& path)
   }
 }
 
-f3d::opacitymap_t ReadOpacity(const fs::path& path)
+std::vector<double> ReadOpacity(const fs::path& path)
 {
   try
   {
     f3d::image img(path);
 
-    if (img.getChannelCount() < 1)
+    if (img.getChannelCount() != 1)
     {
-      f3d::log::error("The specified opacity map must have at least 1 channel");
+      f3d::log::error("The specified opacity map must have exactly 1 channel");
       return {};
     }
 
@@ -137,7 +137,7 @@ f3d::opacitymap_t ReadOpacity(const fs::path& path)
       om[2 * i + 1] = pixel[0];
     }
 
-    return f3d::opacitymap_t(om);
+    return om;
   }
   catch (const f3d::image::read_exception&)
   {

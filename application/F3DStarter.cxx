@@ -802,19 +802,19 @@ public:
       }
     }
 
-    // opacitymap-file and opacitymap are interdependent
+    // opacity_map file and opacity_map are interdependent
     const std::string& opacityMapFile = this->AppOptions.OpacityMapFile;
     if (!opacityMapFile.empty() && std::filesystem::exists(opacityMapFile) &&
       std::filesystem::is_regular_file(opacityMapFile))
     {
       fs::path fullPath(f3d::utils::collapsePath(opacityMapFile));
-      this->LibOptions.model.scivis.opacitymap = F3DColorMapTools::ReadOpacity(fullPath);
+      this->LibOptions.model.scivis.opacity_map = F3DColorMapTools::ReadOpacity(fullPath);
 
-      std::vector<double> opacityMap = this->LibOptions.model.scivis.opacitymap;
+      std::vector<double>& opacityMap = this->LibOptions.model.scivis.opacity_map;
       if (opacityMap.empty())
       {
         f3d::log::error("Cannot read the opacity map ", opacityMapFile);
-        this->LibOptions.model.scivis.opacitymap = f3d::opacitymap_t();
+        this->LibOptions.model.scivis.opacity_map = { 0.0, 0.0, 1.0, 1.0 };
       }
     }
   }

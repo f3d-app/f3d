@@ -492,75 +492,6 @@ colormap_t parse(const std::string& str)
 
 //----------------------------------------------------------------------------
 /**
- * Parse provided string into a opacitymap_t.
- * Supported formats:
- * - "val, opacity, val, opacity, ..."
- * Where val is in [0, 1].
- * Can throw options::parsing_exception in case of failure to parse
- */
-template<>
-opacitymap_t parse(const std::string& str)
-{
-  std::vector<double> opacityVec;
-  std::istringstream split(str);
-  std::string each;
-
-  while (std::getline(split, each, ','))
-  {
-    // Parse scalar value (val)
-    double val;
-    try
-    {
-      val = options_tools::parse<double>(each);
-    }
-    catch (const options::parsing_exception&)
-    {
-      throw options::parsing_exception("Cannot parse value from opacity map: " + each +
-        ". Check provided opacity map string: " + str);
-    }
-
-    // Check range
-    if (val < 0.0 || val > 1.0)
-    {
-      throw options::parsing_exception("Parsed scalar value from opacity map: " + each +
-        " is not in expected [0, 1] range. Provided string: " + str);
-    }
-
-    opacityVec.emplace_back(val);
-
-    // Parse opacity
-    if (!std::getline(split, each, ','))
-    {
-      throw options::parsing_exception(
-        "Incorrect number of tokens in provided opacity map: " + str);
-    }
-
-    double opacity;
-    try
-    {
-      opacity = options_tools::parse<double>(each);
-    }
-    catch (const options::parsing_exception&)
-    {
-      throw options::parsing_exception("Cannot parse opacity from opacity map: " + each +
-        ". Check provided opacity map string: " + str);
-    }
-
-    // Check opacity range
-    if (opacity < 0.0 || opacity > 1.0)
-    {
-      throw options::parsing_exception("Parsed opacity value: " + each +
-        " is not in expected [0, 1] range. Provided string: " + str);
-    }
-
-    opacityVec.emplace_back(opacity);
-  }
-
-  return opacitymap_t(opacityVec);
-}
-
-//----------------------------------------------------------------------------
-/**
  *  Parse provided string into a transform2d_t
  *  Supported formats:
  *  - "double, double, double, ..." as a sequence of 9 values
@@ -941,22 +872,6 @@ std::string format(const colormap_t& var)
   {
     stream << ((i > 0) ? "," : "") << options_tools::format(vec[i * 4]) << ","
            << options_tools::format(color_t(vec[i * 4 + 1], vec[i * 4 + 2], vec[i * 4 + 3]));
-  }
-  return stream.str();
-}
-
-//----------------------------------------------------------------------------
-/**
- * Format provided var into a string from provided opacitymap_t.
- */
-std::string format(const opacitymap_t& var)
-{
-  std::ostringstream stream;
-  std::vector<double> vec(var);
-  size_t size = vec.size();
-  for (unsigned int i = 0; i < size; i++)
-  {
-    stream << ((i > 0) ? "," : "") << options_tools::format(vec[i]);
   }
   return stream.str();
 }
