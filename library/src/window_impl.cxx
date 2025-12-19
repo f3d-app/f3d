@@ -212,7 +212,7 @@ void window_impl::InitializeUpVector()
 }
 
 //----------------------------------------------------------------------------
-void window_impl::RotateUpVector(int axis, double angleDegrees)
+void window_impl::RotateUpVector(const std::array<double, 3>& axis, double angleDegrees)
 {
   this->Internals->Renderer->RotateUpVector(axis, angleDegrees);
 }

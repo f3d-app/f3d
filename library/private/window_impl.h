@@ -15,6 +15,7 @@
 #include "log.h"
 #include "window.h"
 
+#include <array>
 #include <filesystem>
 #include <memory>
 #include <optional>
@@ -76,10 +77,10 @@ public:
   /**
    * Implementation only API.
    * Rotate the up vector around the specified axis.
-   * @param axis 0=X, 1=Y, 2=Z
+   * @param axis the axis to rotate around (will be normalized)
    * @param angleDegrees rotation angle in degrees
    */
-  void RotateUpVector(int axis, double angleDegrees);
+  void RotateUpVector(const std::array<double, 3>& axis, double angleDegrees);
 
   /**
    * Implementation only API.

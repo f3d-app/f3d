@@ -406,18 +406,13 @@ void vtkF3DRenderer::InitializeUpVector(const std::vector<double>& upVec)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::RotateUpVector(int axis, double angleDegrees)
+void vtkF3DRenderer::RotateUpVector(const std::array<double, 3>& axis, double angleDegrees)
 {
-  if (axis < 0 || axis > 2)
-  {
-    F3DLog::Print(F3DLog::Severity::Warning, "Invalid axis for rotate_up, must be 0 (X), 1 (Y), or 2 (Z)");
-    return;
-  }
+  std::array<double, 3> normAxis = axis;
+  vtkMath::Normalize(normAxis.data());
 
   vtkNew<vtkTransform> rotationTransform;
-  std::array<double, 3> axisVec = { 0.0, 0.0, 0.0 };
-  axisVec[axis] = 1.0;
-  rotationTransform->RotateWXYZ(angleDegrees, axisVec.data());
+  rotationTransform->RotateWXYZ(angleDegrees, normAxis.data());
 
   std::array<double, 3> newUp;
   rotationTransform->TransformPoint(this->UpVector, newUp.data());
