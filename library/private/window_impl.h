@@ -75,6 +75,14 @@ public:
 
   /**
    * Implementation only API.
+   * Rotate the up vector around the specified axis.
+   * @param axis 0=X, 1=Y, 2=Z
+   * @param angleDegrees rotation angle in degrees
+   */
+  void RotateUpVector(int axis, double angleDegrees);
+
+  /**
+   * Implementation only API.
    * Set the importer on the internal renderer
    */
   void SetImporter(vtkF3DMetaImporter* importer);

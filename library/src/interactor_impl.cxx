@@ -1114,6 +1114,35 @@ interactor& interactor_impl::initCommands()
     command_documentation_t{ "azimuth_camera value", "tilt the camera right or left" });
 
   this->addCommand(
+    "rotate_up",
+    [&](const std::vector<std::string>& args)
+    {
+      check_args(args, 2, "rotate_up");
+      int axis = -1;
+      if (args[0] == "x" || args[0] == "X")
+      {
+        axis = 0;
+      }
+      else if (args[0] == "y" || args[0] == "Y")
+      {
+        axis = 1;
+      }
+      else if (args[0] == "z" || args[0] == "Z")
+      {
+        axis = 2;
+      }
+      else
+      {
+        throw interactor::invalid_args_exception("rotate_up: axis must be x, y, or z");
+      }
+      double angle = options::parse<double>(args[1]);
+      this->Internals->Window.RotateUpVector(axis, angle);
+      this->Internals->Style->ResetTemporaryUp();
+    },
+    command_documentation_t{ "rotate_up x/y/z angle", "rotate the scene up vector around an axis" },
+    std::bind(complNames, std::placeholders::_1, std::vector<std::string>{ "x", "y", "z" }));
+
+  this->addCommand(
     "increase_light_intensity",
     [&](const std::vector<std::string>&) { this->Internals->IncreaseLightIntensity(false); },
     command_documentation_t{ "increase_light_intensity", "increase light intensity" });
@@ -1613,9 +1642,11 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::ANY, "1"}, "set_camera front", "Camera", std::bind(docStr, "Front View camera"));
   this->addBinding({mod_t::ANY, "2"}, "elevation_camera -90", "Camera", std::bind(docStr, "Rotate camera down"));
   this->addBinding({mod_t::ANY, "3"}, "set_camera right", "Camera", std::bind(docStr, "Right View camera"));
-  this->addBinding({mod_t::ANY, "4"}, "roll_camera -90", "Camera", std::bind(docStr, "Rotate camera right"));
+  this->addBinding({mod_t::NONE, "4"}, "roll_camera -90", "Camera", std::bind(docStr, "Rotate camera right"));
+  this->addBinding({mod_t::CTRL, "4"}, "rotate_up x 90", "Scene", std::bind(docStr, "Rotate scene up +90 around X"));
   this->addBinding({mod_t::ANY, "5"}, "toggle scene.camera.orthographic", "Camera", std::bind(docTglOpt, "Orthographic Projection", std::cref(opts.scene.camera.orthographic)), f3d::interactor::BindingType::TOGGLE);
-  this->addBinding({mod_t::ANY, "6"}, "roll_camera 90", "Camera", std::bind(docStr, "Rotate camera left"));
+  this->addBinding({mod_t::NONE, "6"}, "roll_camera 90", "Camera", std::bind(docStr, "Rotate camera left"));
+  this->addBinding({mod_t::CTRL, "6"}, "rotate_up x -90", "Scene", std::bind(docStr, "Rotate scene up -90 around X"));
   this->addBinding({mod_t::ANY, "7"}, "set_camera top", "Camera", std::bind(docStr, "Top View camera"));
   this->addBinding({mod_t::ANY, "8"}, "elevation_camera 90", "Camera", std::bind(docStr, "Rotate camera up"));
   this->addBinding({mod_t::ANY, "9"}, "set_camera isometric", "Camera", std::bind(docStr, "Isometric View camera"));

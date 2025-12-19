@@ -19,6 +19,7 @@
 #include <vtkOpenGLRenderer.h>
 #include <vtkVersion.h>
 
+#include <array>
 #include <filesystem>
 #include <map>
 #include <optional>
@@ -207,6 +208,14 @@ public:
    * the camera
    */
   void InitializeUpVector(const std::vector<double>& upVec);
+
+  /**
+   * Rotate the up vector around the specified axis by the given angle (degrees).
+   * Updates skybox and environment orientation. Does NOT reset camera.
+   * @param axis 0=X, 1=Y, 2=Z
+   * @param angleDegrees rotation angle in degrees
+   */
+  void RotateUpVector(int axis, double angleDegrees);
 
   /**
    * Compute bounds of visible props as transformed by given matrix.
@@ -502,6 +511,12 @@ private:
   bool CheckForSpecCache(std::string& path);
   bool CheckForSHCache(std::string& path);
   ///@}
+
+  /**
+   * Apply the given up and right vectors to the scene.
+   * Updates UpVector, RightVector, skybox floor, and environment orientation.
+   */
+  void ApplyUpVector(const std::array<double, 3>& up, const std::array<double, 3>& right);
 
   /**
    * Configure all actors properties

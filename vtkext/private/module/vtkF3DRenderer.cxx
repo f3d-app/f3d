@@ -344,6 +344,28 @@ void vtkF3DRenderer::Initialize()
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::ApplyUpVector(
+  const std::array<double, 3>& up, const std::array<double, 3>& right)
+{
+  std::array<double, 3> front;
+  vtkMath::Cross(right.data(), up.data(), front.data());
+  vtkMath::Normalize(front.data());
+
+  std::array<double, 3> orthRight;
+  vtkMath::Cross(up.data(), front.data(), orthRight.data());
+  vtkMath::Normalize(orthRight.data());
+
+  std::copy(up.begin(), up.end(), this->UpVector);
+  std::copy(orthRight.begin(), orthRight.end(), this->RightVector);
+
+  this->SkyboxActor->SetFloorPlane(up[0], up[1], up[2], 0.0);
+  this->SkyboxActor->SetFloorRight(front[0], front[1], front[2]);
+
+  this->SetEnvironmentUp(this->UpVector);
+  this->SetEnvironmentRight(this->RightVector);
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::InitializeUpVector(const std::vector<double>& upVec)
 {
   assert(upVec.size() == 3);
@@ -361,7 +383,7 @@ void vtkF3DRenderer::InitializeUpVector(const std::vector<double>& upVec)
   if (isNullVector(up))
   {
     up[1] = 1.0;
-    F3DLog::Print(F3DLog::Severity::Warning, "null up vector, using (0,0,1) instead");
+    F3DLog::Print(F3DLog::Severity::Warning, "null up vector, using (0,1,0) instead");
   }
   vtkMath::Normalize(up.data());
 
@@ -371,38 +393,43 @@ void vtkF3DRenderer::InitializeUpVector(const std::vector<double>& upVec)
     right = { 0, 1, 0 };
   }
 
-  /* make `front` orthogonal */
-  std::array<double, 3> front;
-  vtkMath::Cross(right.data(), up.data(), front.data());
-  vtkMath::Normalize(front.data());
+  this->ApplyUpVector(up, right);
 
-  /* ensure `right` is orthogonal */
-  vtkMath::Cross(up.data(), front.data(), right.data());
-  vtkMath::Normalize(right.data());
-
-  this->UpVector[0] = up[0];
-  this->UpVector[1] = up[1];
-  this->UpVector[2] = up[2];
-  this->RightVector[0] = right[0];
-  this->RightVector[1] = right[1];
-  this->RightVector[2] = right[2];
-
-  double pos[3];
-  vtkMath::Cross(this->UpVector, this->RightVector, pos);
-  vtkMath::MultiplyScalar(pos, -1.0);
+  std::array<double, 3> pos;
+  vtkMath::Cross(this->UpVector, this->RightVector, pos.data());
+  vtkMath::MultiplyScalar(pos.data(), -1.0);
 
   vtkCamera* cam = this->GetActiveCamera();
   cam->SetFocalPoint(0.0, 0.0, 0.0);
-  cam->SetPosition(pos);
+  cam->SetPosition(pos.data());
   cam->SetViewUp(this->UpVector);
+}
 
-  // skybox orientation
-  this->SkyboxActor->SetFloorPlane(this->UpVector[0], this->UpVector[1], this->UpVector[2], 0.0);
-  this->SkyboxActor->SetFloorRight(front[0], front[1], front[2]);
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::RotateUpVector(int axis, double angleDegrees)
+{
+  if (axis < 0 || axis > 2)
+  {
+    F3DLog::Print(F3DLog::Severity::Warning, "Invalid axis for rotate_up, must be 0 (X), 1 (Y), or 2 (Z)");
+    return;
+  }
 
-  // environment orientation
-  this->SetEnvironmentUp(this->UpVector);
-  this->SetEnvironmentRight(this->RightVector);
+  vtkNew<vtkTransform> rotationTransform;
+  std::array<double, 3> axisVec = { 0.0, 0.0, 0.0 };
+  axisVec[axis] = 1.0;
+  rotationTransform->RotateWXYZ(angleDegrees, axisVec.data());
+
+  std::array<double, 3> newUp;
+  rotationTransform->TransformPoint(this->UpVector, newUp.data());
+  vtkMath::Normalize(newUp.data());
+
+  std::array<double, 3> newRight;
+  rotationTransform->TransformPoint(this->RightVector, newRight.data());
+  vtkMath::Normalize(newRight.data());
+
+  this->ApplyUpVector(newUp, newRight);
+
+  this->GridConfigured = false;
 }
 
 //----------------------------------------------------------------------------

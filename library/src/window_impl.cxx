@@ -212,6 +212,12 @@ void window_impl::InitializeUpVector()
 }
 
 //----------------------------------------------------------------------------
+void window_impl::RotateUpVector(int axis, double angleDegrees)
+{
+  this->Internals->Renderer->RotateUpVector(axis, angleDegrees);
+}
+
+//----------------------------------------------------------------------------
 window_impl::Type window_impl::getType()
 {
   if (this->Internals->RenWin->IsA("vtkOSOpenGLRenderWindow"))
