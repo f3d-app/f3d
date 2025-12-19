@@ -555,6 +555,12 @@ private:
     bool inverseOpacityFlag = false);
 
   /**
+   * Configure opacity transfer function for volume rendering
+   */
+  static void ConfigureOpacityTransferFunction(vtkPiecewiseFunction* otf, double range[2],
+    std::vector<double>& opacityMap, bool inverseOpacityFlag);
+
+  /**
    * Configure screen spaced jittering for TAA
    */
   void ConfigureJitter(bool enable);

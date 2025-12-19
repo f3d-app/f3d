@@ -2548,20 +2548,8 @@ void vtkF3DRenderer::SetUseInverseOpacityFunction(bool use)
 
           pwf->RemoveAllPoints();
 
-          if (this->OpacityMap.size() % 2 != 0 || this->OpacityMap.empty())
-          {
-            pwf->AddPoint(range[0], this->UseInverseOpacityFunction ? 1.0 : 0.0);
-            pwf->AddPoint(range[1], this->UseInverseOpacityFunction ? 0.0 : 1.0);
-          }
-          else
-          {
-            for (size_t i = 0; i + 1 < this->OpacityMap.size(); i += 2)
-            {
-              double value = this->UseInverseOpacityFunction ? 1.0 - this->OpacityMap[i + 1]
-                                                             : this->OpacityMap[i + 1];
-              pwf->AddPoint(range[0] + this->OpacityMap[i] * (range[1] - range[0]), value);
-            }
-          }
+          vtkF3DRenderer::ConfigureOpacityTransferFunction(
+            pwf, range, this->OpacityMap, this->UseInverseOpacityFunction);
         }
       }
     }
@@ -2942,8 +2930,32 @@ bool vtkF3DRenderer::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vt
   }
 
   vtkNew<vtkPiecewiseFunction> otf;
+  vtkF3DRenderer::ConfigureOpacityTransferFunction(otf, range, opacityMap, inverseOpacityFlag);
+
+  vtkNew<vtkVolumeProperty> property;
+  property->SetColor(ctf);
+  property->SetScalarOpacity(otf);
+  property->ShadeOff();
+  property->SetInterpolationTypeToLinear();
+
+  volume->SetProperty(property);
+  return true;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ConfigureOpacityTransferFunction(vtkPiecewiseFunction* otf, double range[2],
+  std::vector<double>& opacityMap, bool inverseOpacityFlag)
+{
+  if (!otf)
+  {
+    return;
+  }
+
   if (opacityMap.size() % 2 != 0 || opacityMap.empty())
   {
+    F3DLog::Print(F3DLog::Severity::Warning,
+      "Opacity map with an odd number of elements, resetting to default linear opacity "
+      "function");
     otf->AddPoint(range[0], inverseOpacityFlag ? 1.0 : 0.0);
     otf->AddPoint(range[1], inverseOpacityFlag ? 0.0 : 1.0);
   }
@@ -2955,15 +2967,6 @@ bool vtkF3DRenderer::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vt
       otf->AddPoint(range[0] + opacityMap[i] * (range[1] - range[0]), value);
     }
   }
-
-  vtkNew<vtkVolumeProperty> property;
-  property->SetColor(ctf);
-  property->SetScalarOpacity(otf);
-  property->ShadeOff();
-  property->SetInterpolationTypeToLinear();
-
-  volume->SetProperty(property);
-  return true;
 }
 
 //----------------------------------------------------------------------------

@@ -6,12 +6,19 @@
 #include "log.h"
 #include "utils.h"
 
+#include <cstdint>
 #include <filesystem>
 
 namespace fs = std::filesystem;
 
 namespace F3DColorMapTools
 {
+enum class MapType : std::uint8_t
+{
+  Color,
+  Opacity
+};
+
 fs::path Find(const std::string& str)
 {
   try
@@ -68,81 +75,69 @@ fs::path Find(const std::string& str)
   return {};
 }
 
-f3d::colormap_t Read(const fs::path& path)
+std::vector<double> Read1DMap(const fs::path& path, MapType type)
 {
   try
   {
     f3d::image img(path);
 
-    if (img.getChannelCount() < 3)
+    const int channels = img.getChannelCount();
+    const int expectedChannels = (type == MapType::Color) ? 3 : 1;
+
+    if (channels < expectedChannels)
     {
-      f3d::log::error("The specified color map must have at least 3 channels");
+      f3d::log::error("The specified ", (type == MapType::Color ? "color" : "opacity"),
+        " map must have at least ", expectedChannels, " channel(s)");
       return {};
     }
 
     if (img.getHeight() != 1)
     {
-      f3d::log::warn("The specified color map height is not equal to 1, only the first row is "
-                     "taken into account");
+      f3d::log::warn("The specified ", (type == MapType::Color ? "color" : "opacity"),
+        " map height is not equal to 1, only the first row is taken into account");
     }
 
-    int w = img.getWidth();
+    const int w = img.getWidth();
+    const int stride = (type == MapType::Color) ? 4 : 2;
 
-    std::vector<double> cm(4 * w);
+    std::vector<double> out(stride * w);
 
-    for (int i = 0; i < w; i++)
+    for (int i = 0; i < w; ++i)
     {
-      std::vector<double> pixel = img.getNormalizedPixel({ i, 0 });
-      cm[4 * i + 0] = static_cast<double>(i) / (w - 1);
-      cm[4 * i + 1] = pixel[0];
-      cm[4 * i + 2] = pixel[1];
-      cm[4 * i + 3] = pixel[2];
+      const auto pixel = img.getNormalizedPixel({ i, 0 });
+      const double x = static_cast<double>(i) / (w - 1);
+
+      if (type == MapType::Color)
+      {
+        out[4 * i + 0] = x;
+        out[4 * i + 1] = pixel[0];
+        out[4 * i + 2] = pixel[1];
+        out[4 * i + 3] = pixel[2];
+      }
+      else
+      {
+        out[2 * i + 0] = x;
+        out[2 * i + 1] = pixel[0];
+      }
     }
 
-    return f3d::colormap_t(cm);
+    return out;
   }
   catch (const f3d::image::read_exception&)
   {
-    f3d::log::error("Cannot read colormap at ", path);
+    f3d::log::error(
+      "Cannot read ", (type == MapType::Color ? "color" : "opacity"), " map at ", path);
     return {};
   }
 }
 
+f3d::colormap_t Read(const fs::path& path)
+{
+  return f3d::colormap_t(Read1DMap(path, MapType::Color));
+}
+
 std::vector<double> ReadOpacity(const fs::path& path)
 {
-  try
-  {
-    f3d::image img(path);
-
-    if (img.getChannelCount() != 1)
-    {
-      f3d::log::error("The specified opacity map must have exactly 1 channel");
-      return {};
-    }
-
-    if (img.getHeight() != 1)
-    {
-      f3d::log::warn("The specified opacity map height is not equal to 1, only the first row is "
-                     "taken into account");
-    }
-
-    int w = img.getWidth();
-
-    std::vector<double> om(2 * w);
-
-    for (int i = 0; i < w; i++)
-    {
-      std::vector<double> pixel = img.getNormalizedPixel({ i, 0 });
-      om[2 * i + 0] = static_cast<double>(i) / (w - 1);
-      om[2 * i + 1] = pixel[0];
-    }
-
-    return om;
-  }
-  catch (const f3d::image::read_exception&)
-  {
-    f3d::log::error("Cannot read opacity map at ", path);
-    return {};
-  }
+  return Read1DMap(path, MapType::Opacity);
 }
 }
