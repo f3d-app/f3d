@@ -522,6 +522,12 @@ void vtkF3DGenericImporter::ImportPartitionedDataSetCollection(
 
   for (unsigned int i = 0; i < pdc->GetNumberOfPartitionedDataSets(); i++)
   {
+    vtkPartitionedDataSet* pds = pdc->GetPartitionedDataSet(i);
+    if (!pds)
+    {
+      continue;
+    }
+
     std::string pdsName;
 
     auto it = datasetIndexToName.find(i);
@@ -542,11 +548,7 @@ void vtkF3DGenericImporter::ImportPartitionedDataSetCollection(
       pdsName = "PartitionedDataSet_" + std::to_string(i);
     }
 
-    vtkPartitionedDataSet* pds = pdc->GetPartitionedDataSet(i);
-    if (pds)
-    {
-      this->ImportPartitionedDataSet(pds, ren, pdsName);
-    }
+    this->ImportPartitionedDataSet(pds, ren, pdsName);
   }
 }
 
@@ -578,22 +580,16 @@ void vtkF3DGenericImporter::ImportPartitionedDataSet(
       }
     }
 
-    std::string blockName;
+    std::string blockName = baseName;
     if (!partitionName.empty())
     {
-      blockName = baseName;
       blockName += "/";
       blockName += partitionName;
     }
     else if (pds->GetNumberOfPartitions() > 1)
     {
-      blockName = baseName;
       blockName += "/Partition_";
       blockName += std::to_string(j);
-    }
-    else
-    {
-      blockName = baseName;
     }
 
     this->CreateActorForBlock(ds, ren, blockName);
