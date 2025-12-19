@@ -3,7 +3,7 @@
 ## C
 
 If the C bindings have been generated using the `F3D_BINDINGS_C` CMake option, the libf3d can be used directly from C.
-Make sure to install not only f3d but also the `sdk` component using `cmake --install -b <build_dir> --component sdk`
+If you want to use CMake, make sure to install not only f3d but also the `sdk` component using `cmake --install <build_dir> --component sdk`
 
 Here is an example showing how to use libf3d c bindings:
 
