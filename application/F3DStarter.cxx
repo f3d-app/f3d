@@ -140,8 +140,6 @@ public:
       cam.setViewAngle(camConf.CameraViewAngle);
     }
 
-    bool reset = false;
-    double zoomFactor = 0.9;
     if (camConf.CameraPosition.size() != 3 && camConf.CameraDirection.has_value())
     {
       f3d::vector3_t dir = camConf.CameraDirection.value();
@@ -153,24 +151,16 @@ public:
         pos[i] = foc[i] - dir[i];
       }
       cam.setPosition(pos);
-      reset = true;
-    }
-    if (camConf.CameraPosition.size() != 3)
-    {
-      if (camConf.CameraZoomFactor > 0)
-      {
-        zoomFactor = camConf.CameraZoomFactor;
-      }
-      reset = true;
-    }
-    if (reset)
-    {
-      cam.resetToBounds(zoomFactor);
     }
 
-    cam.azimuth(camConf.CameraAzimuthAngle)
-      .elevation(camConf.CameraElevationAngle)
-      .setCurrentAsDefault();
+    cam.azimuth(camConf.CameraAzimuthAngle).elevation(camConf.CameraElevationAngle);
+
+    if (camConf.CameraPosition.size() != 3)
+    {
+      cam.resetToBounds(camConf.CameraZoomFactor > 0 ? camConf.CameraZoomFactor : 0.9);
+    }
+
+    cam.setCurrentAsDefault();
   }
 
   static bool HasHDRIExtension(const std::string& file)

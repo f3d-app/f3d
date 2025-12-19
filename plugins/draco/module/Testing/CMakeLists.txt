@@ -1,5 +1,7 @@
 list(APPEND vtkextDraco_list
      TestF3DDracoReader.cxx
+     TestF3DDracoReaderError.cxx
+     TestF3DDracoReaderStream.cxx
     )
 
 vtk_add_test_cxx(vtkextDracoTests tests
