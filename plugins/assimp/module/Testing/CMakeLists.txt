@@ -6,6 +6,13 @@ if(NOT F3D_SANITIZER STREQUAL "address")
        TestF3DAssimpImporter.cxx
        TestF3DAssimpImportError.cxx
       )
+
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251016)
+    list(APPEND VTKExtensionsPluginAssimp_list
+         TestF3DAssimpImporterStream.cxx
+         TestF3DAssimpImporterStreamError.cxx
+        )
+  endif()
 endif()
 
 vtk_add_test_cxx(VTKExtensionsPluginAssimp tests

@@ -171,7 +171,20 @@ PYBIND11_MODULE(pyf3d, module)
         }
         catch (const f3d::options::incompatible_exception&)
         {
-          if (std::holds_alternative<std::string>(value))
+          // failed to set an `int`, try again as `double`
+          if (std::holds_alternative<int>(value))
+          {
+            opts.set(key, static_cast<double>(std::get<int>(value)));
+          }
+          // failed to set a `vector<int>`, try again as `vector<double>`
+          else if (std::holds_alternative<std::vector<int>>(value))
+          {
+            const std::vector<int>& ints = std::get<std::vector<int>>(value);
+            const std::vector<double> doubles(ints.begin(), ints.end());
+            opts.set(key, doubles);
+          }
+          // failed to set a `string`, parse and try again
+          else if (std::holds_alternative<std::string>(value))
           {
             try
             {
@@ -184,7 +197,7 @@ PYBIND11_MODULE(pyf3d, module)
           }
           else
           {
-            throw py::attribute_error(key);
+            throw py::type_error(key);
           }
         }
       })
@@ -282,12 +295,21 @@ PYBIND11_MODULE(pyf3d, module)
     .value("CTRL_SHIFT", f3d::interactor::InputModifier::CTRL_SHIFT)
     .export_values();
 
+  py::enum_<f3d::interactor::AnimationDirection>(interactor, "AnimationDirection")
+    .value("FORWARD", f3d::interactor::AnimationDirection::FORWARD)
+    .value("BACKWARD", f3d::interactor::AnimationDirection::BACKWARD)
+    .export_values();
+
   interactor //
-    .def("toggle_animation", &f3d::interactor::toggleAnimation, "Toggle the animation")
-    .def("start_animation", &f3d::interactor::startAnimation, "Start the animation")
+    .def("toggle_animation", &f3d::interactor::toggleAnimation, "Toggle the animation",
+      py::arg("direction") = f3d::interactor::AnimationDirection::FORWARD)
+    .def("start_animation", &f3d::interactor::startAnimation, "Start the animation",
+      py::arg("direction") = f3d::interactor::AnimationDirection::FORWARD)
     .def("stop_animation", &f3d::interactor::stopAnimation, "Stop the animation")
     .def("is_playing_animation", &f3d::interactor::isPlayingAnimation,
       "Returns True if the animation is currently started")
+    .def("get_animation_direction", &f3d::interactor::getAnimationDirection,
+      "Returns the current animation direction")
     .def("enable_camera_movement", &f3d::interactor::enableCameraMovement,
       "Enable the camera interaction")
     .def("disable_camera_movement", &f3d::interactor::disableCameraMovement,

@@ -365,6 +365,10 @@
       "size": {
         "type": "double",
         "default_value": 10.0
+      },
+      "absolute_size": {
+        "type": "bool",
+        "default_value": "false"
       }
     },
     "volume": {

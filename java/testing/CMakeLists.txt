@@ -1,5 +1,14 @@
 list(APPEND javaf3dTests_list
-     ${CMAKE_CURRENT_SOURCE_DIR}/TestJavaBindings.java
+  ${CMAKE_CURRENT_SOURCE_DIR}/TestCamera.java
+  ${CMAKE_CURRENT_SOURCE_DIR}/TestEngine.java
+  ${CMAKE_CURRENT_SOURCE_DIR}/TestImage.java
+  ${CMAKE_CURRENT_SOURCE_DIR}/TestInteractor.java
+  ${CMAKE_CURRENT_SOURCE_DIR}/TestLog.java
+  ${CMAKE_CURRENT_SOURCE_DIR}/TestOptions.java
+  ${CMAKE_CURRENT_SOURCE_DIR}/TestScene.java
+  ${CMAKE_CURRENT_SOURCE_DIR}/TestTypes.java
+  ${CMAKE_CURRENT_SOURCE_DIR}/TestUtils.java
+  ${CMAKE_CURRENT_SOURCE_DIR}/TestWindow.java
     )
 
 set(java_test_args "-ea") # enable assertions

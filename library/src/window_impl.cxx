@@ -416,7 +416,8 @@ void window_impl::UpdateDynamicOptions()
         R"( is an invalid point sprites type. Valid modes are: "sphere", "gaussian")");
     }
     renderer->SetPointSpritesType(splatType);
-    renderer->SetPointSpritesSize(opt.model.point_sprites.size);
+    renderer->SetPointSpritesSize(
+      opt.model.point_sprites.absolute_size, opt.model.point_sprites.size);
     renderer->SetPointSpritesUseInstancing(opt.render.effect.blending.mode != "sort");
   }
 
@@ -763,4 +764,4 @@ vtkF3DRenderer* window_impl::GetRenderer() const
 {
   return this->Internals->Renderer;
 }
-};
+}
