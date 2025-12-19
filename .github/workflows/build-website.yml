@@ -25,7 +25,7 @@ jobs:
         run: echo "WEBSITE_SKIP_DEPLOY=${{ github.ref == 'refs/heads/master' && github.event_name == 'push' && 'false' || 'true' }}" >> $GITHUB_ENV
 
       - name: Trigger docker images build
-        uses: rolkool/trigger-workflow-and-wait@master
+        uses: convictional/trigger-workflow-and-wait@v1.6.5
         with:
           owner: f3d-app
           repo: f3d-website
