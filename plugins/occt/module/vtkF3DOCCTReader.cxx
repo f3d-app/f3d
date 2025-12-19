@@ -595,13 +595,14 @@ bool TransferToDocument(vtkF3DOCCTReader* that, T& reader, Handle(TDocStd_Docume
   reader.SetLayerMode(true);
 
   IFSelect_ReturnStatus ret;
-  if (that->GetStream())
+  vtkResourceStream* stream = that->GetStream();
+  if (stream)
   {
     // Encapsulate resource stream into an istream
-    that->GetStream()->Seek(0, vtkResourceStream::SeekDirection::Begin);
-    auto strbuf = that->GetStream()->ToStreambuf();
+    stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+    auto strbuf = stream->ToStreambuf();
     std::istream buffer(strbuf.get());
-    ret = reader.ReadStream("name", buffer);
+    ret = reader.ReadStream("", buffer);
   }
   else
   {
@@ -636,28 +637,24 @@ int vtkF3DOCCTReader::RequestData(
     const Message_ProgressRange pRange = pIndicator.Start();
 
     bool success = true;
-    if (this->GetStream())
+    vtkResourceStream* stream = this->GetStream();
+    if (stream)
     {
       // Encapsulate resource stream into an istream
-      this->Stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
-      auto strbuf = this->GetStream()->ToStreambuf();
+      stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+      auto strbuf = stream->ToStreambuf();
       std::istream buffer(strbuf.get());
       try
       {
-        std::cout<<"Try BIN"<<std::endl;
         BinTools::Read(shape, buffer, pRange);
       }
       catch (Storage_StreamTypeMismatchError&)
       {
-        std::cout<<"Try BREP"<<std::endl;
         this->Stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
-        auto strbuf = this->GetStream()->ToStreambuf();
-        std::istream buffer2(strbuf.get());
-
         const BRep_Builder builder;
-        BRepTools::Read(shape, buffer2, builder, pRange);
+        BRepTools::Read(shape, buffer, builder, pRange);
       }
-      // todo check shape ?
+      success = !shape.IsNull();
     }
     else
     {
@@ -711,10 +708,27 @@ int vtkF3DOCCTReader::RequestData(
   {
     Handle(TDocStd_Application) app = new TDocStd_Application();
     BinXCAFDrivers::DefineFormat(app);
-    if (app->Open(this->GetFileName().c_str(), doc) != PCDM_RS_OK)
+
+    vtkResourceStream* stream = this->GetStream();
+    if (stream)
     {
-      vtkErrorWithObjectMacro(this, "Failed to read XBF file");
-      return 0;
+      // Encapsulate resource stream into an istream
+      stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+      auto strbuf = stream->ToStreambuf();
+      std::istream buffer(strbuf.get());
+      if (app->Open(buffer, doc) != PCDM_RS_OK)
+      {
+        vtkErrorWithObjectMacro(this, "Failed to read XBF stream");
+        return 0;
+      }
+    }
+    else
+    {
+      if (app->Open(this->GetFileName().c_str(), doc) != PCDM_RS_OK)
+      {
+        vtkErrorWithObjectMacro(this, "Failed to read XBF file");
+        return 0;
+      }
     }
   }
 

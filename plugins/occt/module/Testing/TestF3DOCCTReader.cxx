@@ -17,7 +17,7 @@ bool testReader(const std::string& filename, const vtkF3DOCCTReader::FILE_FORMAT
   reader->SetFileFormat(format);
   reader->Update();
   reader->Print(std::cout);
-  return reader->GetOutput()->GetNumberOfBlocks() > 0;
+  return reader->GetOutput()->GetNumberOfPoints() > 0;
 }
 
 int TestF3DOCCTReader(int vtkNotUsed(argc), char* argv[])
