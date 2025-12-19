@@ -12,8 +12,9 @@
 #define vtkF3DRenderer_h
 
 #include "vtkF3DMetaImporter.h"
-#include "vtkF3DUIActor.h"
+
 #include "vtkF3DOpenGLGridMapper.h"
+#include "vtkF3DUIActor.h"
 
 #include <vtkCallbackCommand.h>
 #include <vtkLight.h>
@@ -116,7 +117,8 @@ public:
   void SetGridUnitSquare(const std::optional<double>& unitSquare);
   void SetGridSubdivisions(int subdivisions);
   void SetGridColor(const std::vector<double>& color);
-  void SetAxisColor(const std::vector<double>& colorXAxis,const std::vector<double>& colorYAxis,const std::vector<double>& colorZAxis);
+  void SetAxisColor(const std::vector<double>& colorXAxis, const std::vector<double>& colorYAxis,
+    const std::vector<double>& colorZAxis);
   ///@}
 
   /**
