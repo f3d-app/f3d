@@ -117,7 +117,7 @@ public:
   void SetGridUnitSquare(const std::optional<double>& unitSquare);
   void SetGridSubdivisions(int subdivisions);
   void SetGridColor(const std::vector<double>& color);
-  void SetAxisColor(const std::vector<double>& colorXAxis, const std::vector<double>& colorYAxis,
+  void SetAxesColor(const std::vector<double>& colorXAxis, const std::vector<double>& colorYAxis,
     const std::vector<double>& colorZAxis);
   ///@}
 

@@ -99,7 +99,6 @@ public:
     bool RecursiveDirAdd;
     bool RemoveEmptyFileGroups;
     std::vector<int> Resolution;
-    std::vector<int> XAxisColor;
     std::vector<int> Position;
     std::string ColorMapFile;
     CameraConfiguration CamConf;
