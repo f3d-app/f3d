@@ -1,7 +1,7 @@
+#include "vtkF3DAssimpImporter.h"
+
 #include <vtkNew.h>
 #include <vtkTestUtilities.h>
-
-#include "vtkF3DAssimpImporter.h"
 
 #include <iostream>
 

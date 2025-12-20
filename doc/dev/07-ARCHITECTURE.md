@@ -6,44 +6,46 @@ This architecture is reflected by the directories organisation.
 - **application**: the code of the F3D application itself, see below
 - cmake: cmake macros and functions, used by the CMake build system
 - doc: this very documentation
-- examples: examples usage of the libf3d and plugin framework in python and C++
+- examples: examples usage of the libf3d and plugin framework in C++, C, python, java and javascript
 - external: dependencies that are included directly in the code
 - java: [java bindings](../libf3d/04-LANGUAGE_BINDINGS.md#java-experimental) and associated tests.
 - **library**: the [libf3d](../libf3d/01-OVERVIEW.md) itself, see below
 - **plugins**: all the [plugins](../libf3d/05-PLUGINS.md) providing different readers, see below
-- python: [python bindings](../libf3d/04-LANGUAGE_BINDINGS.md#python) and tests
 - resources: all non code, non doc, like icon, configs and such
 - testing: all testing related resources, does not contain the test themselves
 - **vtkext**: extensions to VTK and related tests, see below
-- webassembly: [webassembly/javascript bindings](../libf3d/04-LANGUAGE_BINDINGS.md#javascript) and [F3DWeb](https://f3d.app/viewer) application code
+- c: [c bindings](../libf3d/04-LANGUAGE_BINDINGS.md#c) and tests
+- python: [python bindings](../libf3d/04-LANGUAGE_BINDINGS.md#python) and tests
+- java: [java bindings](../libf3d/04-LANGUAGE_BINDINGS.md#java) and tests
+- webassembly: [webassembly/javascript bindings](../libf3d/04-LANGUAGE_BINDINGS.md#javascript) and tests
 - winshellext: shell extension for Windows, provide [thumbnails for Windows](../user/11-DESKTOP_INTEGRATION.md#windows)
 
 Here is diagram explaining how some of these parts interact together:
 
 ```
-   ┌────────────────┐              ┌───────────────┐
-   │                │              │               │
-   │  application   │◄────uses─────│  winshellext  │
-   │                │              │               │
-   └────────────────┘              └───────────────┘
-           │
-           │                                   ┌──────────┐
-           │                                   │          │
-       depends on                     ┌─wraps──│  python  │
-           │                          │        │          │
-           │                          │        └──────────┘
-           │         ┌───────────┐    │        ┌──────────┐
-           └────────►│           │◄───┘        │          │
-                     │  library  │◄─────wraps──│   java   │
-      ┌───loads──────│           │◄───┐        │          │
-      │              └───────────┘    │        └──────────┘
-      ▼                    │          │        ┌──────────┐
-┌───────────┐              │          │        │          │
-│           │          depends on     └─wraps──│   wasm   │
-│  plugins  │              │                   │          │
-│           │              ▼                   └──────────┘
-└───────────┘     ┌──────────────────┐
-      │           │      vtkext      │
+   ┌────────────────┐        ┌───────────────┐
+   │                │        │               │
+   │  application   │◄──uses─┤  winshellext  │
+   │                │        │               │ ┌──────────┐
+   └───────┬────────┘        └───────────────┘ │          │
+           │                              ┌────┤  python  │
+           │                              │    │          │
+           │                              │    └──────────┘
+       depends on                         │    ┌──────────┐
+           │                              │    │          │
+           │                              ├────┤   java   │
+           │         ┌───────────┐        │    │          │
+           └────────►│           │        │    └──────────┘
+                     │  library  │◄─wraps─┤    ┌──────────┐
+      ┌───loads──────┤           │        │    │          │
+      │              └─────┬─────┘        ├────┤   wasm   │
+      ▼                    │              │    │          │
+┌───────────┐              │              │    └──────────┘
+│           │          depends on         │    ┌──────────┐
+│  plugins  │              │              │    │          │
+│           │              ▼              └────┤    c     │
+└─────┬─────┘     ┌──────────────────┐         │          │
+      │           │      vtkext      │         └──────────┘
       │           ├────────┬─────────┤
      depends─on──►│ public │ private │
                   └────────┴─────────┘
@@ -90,6 +92,6 @@ There is also a dedicated `testing` directory which contains all of the [applica
 Although almost everything is contained in the [f3d-app/f3d](https://github.com/f3d-app/f3d) repository, other repositories in the [f3d-app](https://github.com/f3d-app) organisation are handling certains specific tasks in the F3D ecosystem.
 
 - The [f3d-superbuild](https://github.com/f3d-app/f3d-superbuild) handles the packaging and the creation of the binaries provided in the [releases page](https://github.com/f3d-app/f3d/releases).
-- [f3d-website](https://github.com/f3d-app/f3d-website) contains the website generated from our documentation and deployed [here](https://f3d.app).
+- [f3d-website](https://github.com/f3d-app/f3d-website) contains the website generated from our documentation and deployed [here](https://f3d.app) as well as our [webviewer](https://f3d.app/viewer).
 - A collection of actions: [sccache-setup](https://github.com/f3d-app/sccache-setup-action), [lfs-data-cache](https://github.com/f3d-app/lfs-data-cache-action) and [install-mesa-windows](https://github.com/f3d-app/install-mesa-windows-action) used by the CI of F3D
 - A collection of [docker files](https://github.com/f3d-app/f3d-docker-images) used for generating docker images used by the CI of F3D

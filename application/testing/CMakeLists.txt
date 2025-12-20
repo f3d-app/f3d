@@ -545,7 +545,6 @@ f3d_test(NAME TestMetaData DATA pdiag.vtu ARGS -m UI)
 f3d_test(NAME TestEdges DATA suzanne.ply ARGS -e)
 f3d_test(NAME TestLineWidth DATA cow.vtk ARGS -e --line-width=5)
 f3d_test(NAME TestLineWidthFullScene DATA suzanne.obj ARGS -e --line-width=3 --up=-Y)
-f3d_test(NAME TestPointCloudFullScene DATA pointsCloud.gltf ARGS --point-size=20)
 f3d_test(NAME TestTextureMatCapWithEdges DATA suzanne.ply ARGS -e --texture-matcap=${F3D_SOURCE_DIR}/testing/data/skin.png)
 
 # Test enabling all animations
@@ -564,6 +563,7 @@ f3d_test(NAME TestInteractionAnimationSlow DATA f3d.glb ARGS --animation-progres
 f3d_test(NAME TestInteractionAnimationFrameRate DATA f3d.glb ARGS --animation-progress --frame-rate=1 INTERACTION)#Space;Wait;Space;
 f3d_test(NAME TestInteractionAnimationCameraMovement DATA CameraAnimated.glb ARGS --camera-index=0 --animation-progress INTERACTION)#Space;MouseMovement;Space;
 f3d_test(NAME TestInteractionAnimationInvert DATA f3d.glb ARGS --animation-speed-factor=-1 --animation-progress INTERACTION)#Space;Wait;Space;
+f3d_test(NAME TestInteractionAnimationBackward DATA f3d.glb ARGS --animation-progress INTERACTION)#Ctrl+Shift+Space;Wait;Space;
 
 # Test temporal anti-aliasing
 f3d_test(NAME TestInteractionTAA DATA suzanne.ply ARGS --anti-aliasing=taa INTERACTION) #Render;Render...
@@ -584,6 +584,11 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240729)
   # Test scrolling cheatsheet with no model by mouse wheel and by using scrollbar
   f3d_test(NAME TestInteractionNoModelScrollWheel RESOLUTION 1000,600 NO_DATA_FORCE_RENDER LONG_TIMEOUT INTERACTION UI)
   f3d_test(NAME TestInteractionNoModelScrollBar RESOLUTION 1000,600 NO_DATA_FORCE_RENDER LONG_TIMEOUT INTERACTION UI)
+endif()
+
+# https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12678
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251206)
+  f3d_test(NAME TestPointCloudFullScene DATA pointsCloud.gltf ARGS --point-size=20)
 endif()
 
 # A verbose test that needs animation index support
@@ -619,6 +624,7 @@ f3d_test(NAME TestInteractionCheatsheetScalars DATA dragon.vtu ARGS --scalar-col
 f3d_test(NAME TestInteractionCheatsheetOpacity DATA cow.vtp INTERACTION UI ARGS --opacity=0.5 RESOLUTION 300,700) #H;ScrollDown
 f3d_test(NAME TestInteractionCheatsheetAnimationName DATA InterpolationTest.glb ARGS --animation-indices=6 INTERACTION UI) #HWWW
 f3d_test(NAME TestInteractionCheatsheetConfigFile DATA dragon.vtu CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json INTERACTION UI) #H;ScrollDown
+f3d_test(NAME TestInteractionCheatsheetMultiModifierBinding DATA dragon.vtu RESOLUTION 1200,300 CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json INTERACTION UI) #H;ScrollDown
 f3d_test(NAME TestInteractionCheatsheetCycle DATA cow.vtp RESOLUTION 800,300 INTERACTION UI LONG_TIMEOUT) #HAAPO
 
 if(F3D_MODULE_RAYTRACING)
@@ -770,7 +776,7 @@ if(F3D_PLUGIN_BUILD_ALEMBIC)
   f3d_test(NAME TestAlembicNonFaceVarying DATA tetrahedron_non_facevarying_uv.abc ARGS -s --load-plugins=alembic)
   f3d_test(NAME TestAlembicAnimation DATA drop.abc ARGS --animation-time=2 --load-plugins=alembic --animation-progress)
   f3d_test(NAME TestAlembicAnimationXForm DATA xform_anim.abc ARGS -g --animation-time=1.5 --load-plugins=alembic --animation-progress)
-  f3d_test(NAME TestAlembicCurves DATA monkey_curves.abc ARGS --load-plugins=alembic)
+  f3d_test(NAME TestAlembicCurves DATA monkey_curves.abc ARGS --load-plugins=alembic THRESHOLD 0.07) #  High threshold because of line rendering
 
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${F3D_SOURCE_DIR}/plugins/alembic/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
