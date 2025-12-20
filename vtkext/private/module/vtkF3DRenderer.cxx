@@ -698,21 +698,21 @@ void vtkF3DRenderer::SetGridColor(const std::vector<double>& color)
 void vtkF3DRenderer::SetAxesColor(const std::vector<double>& colorXAxis,
   const std::vector<double>& colorYAxis, const std::vector<double>& colorZAxis)
 {
-  assert(colorXAxis.size()==3);
-  assert(colorYAxis.size()==3);
-  assert(colorZAxis.size()==3);
+  assert(colorXAxis.size() == 3);
+  assert(colorYAxis.size() == 3);
+  assert(colorZAxis.size() == 3);
 
-  this->ColorAxisX[0]=colorXAxis[0]; 
-  this->ColorAxisX[1]=colorXAxis[1]; 
-  this->ColorAxisX[2]=colorXAxis[2];
+  this->ColorAxisX[0] = colorXAxis[0]; 
+  this->ColorAxisX[1] = colorXAxis[1]; 
+  this->ColorAxisX[2] = colorXAxis[2];
   
-  this->ColorAxisY[0]=colorYAxis[0]; 
-  this->ColorAxisY[1]=colorYAxis[1]; 
-  this->ColorAxisY[2]=colorYAxis[2];
+  this->ColorAxisY[0] = colorYAxis[0]; 
+  this->ColorAxisY[1] = colorYAxis[1]; 
+  this->ColorAxisY[2] = colorYAxis[2];
 
-  this->ColorAxisZ[0]=colorZAxis[0]; 
-  this->ColorAxisZ[1]=colorZAxis[1]; 
-  this->ColorAxisZ[2]=colorZAxis[2];
+  this->ColorAxisZ[0] = colorZAxis[0]; 
+  this->ColorAxisZ[1] = colorZAxis[1]; 
+  this->ColorAxisZ[2] = colorZAxis[2];
 }
 
 //----------------------------------------------------------------------------
@@ -833,11 +833,13 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
       this->GridMapper->SetAxis1Color( //
         (this->ColorAxisX[0] * fX1 + this->ColorAxisY[0] * fY1 + this->ColorAxisZ[0] * fZ1) / f1,
         (this->ColorAxisX[1] * fX1 + this->ColorAxisY[1] * fY1 + this->ColorAxisZ[1] * fZ1) / f1,
-        (this->ColorAxisX[2] * fX1 + this->ColorAxisY[2] * fY1 + this->ColorAxisZ[2] * fZ1) / f1, 1);
+        (this->ColorAxisX[2] * fX1 + this->ColorAxisY[2] * fY1 + this->ColorAxisZ[2] * fZ1) / f1,
+        1);
       this->GridMapper->SetAxis2Color( //
         (this->ColorAxisX[0] * fX2 + this->ColorAxisY[0] * fY2 + this->ColorAxisZ[0] * fZ2) / f2,
         (this->ColorAxisX[1] * fX2 + this->ColorAxisY[1] * fY2 + this->ColorAxisZ[1] * fZ2) / f2,
-        (this->ColorAxisX[2] * fX2 + this->ColorAxisY[2] * fY2 + this->ColorAxisZ[2] * fZ2) / f2, 1);
+        (this->ColorAxisX[2] * fX2 + this->ColorAxisY[2] * fY2 + this->ColorAxisZ[2] * fZ2) / f2, 
+        1);
 
       this->GridActor->ForceTranslucentOn();
       this->GridActor->SetMapper(this->GridMapper);
