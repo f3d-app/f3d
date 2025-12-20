@@ -664,6 +664,10 @@ private:
   int GridSubdivisions = 10;
   double GridColor[3] = { 0.0, 0.0, 0.0 };
 
+  double ColorAxisX[3] = {0.841107, 0.16327, 0.120593};
+  double ColorAxisY[3] = {0.19516, 0.553311, 0.174};
+  double ColorAxisZ[3] = {0.127357, 0.429147, 0.937383};
+
   std::string HDRIFile;
   vtkSmartPointer<vtkImageReader2> HDRIReader;
   bool HasValidHDRIReader = false;

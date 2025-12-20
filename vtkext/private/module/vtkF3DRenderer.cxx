@@ -611,9 +611,9 @@ void vtkF3DRenderer::ShowAxis(bool show)
       this->ModernAxisRepresentation->ContainerVisibilityOn();
 
       // Closest colors to red, green, blue in OKHSL space at 95% saturation and 50% lightness
-      this->ModernAxisRepresentation->SetXAxisColor(0.841107, 0.16327, 0.120593);
-      this->ModernAxisRepresentation->SetYAxisColor(0.19516, 0.553311, 0.174);
-      this->ModernAxisRepresentation->SetZAxisColor(0.127357, 0.429147, 0.937383);
+      this->ModernAxisRepresentation->SetXAxisColor(this->ColorAxisX);
+      this->ModernAxisRepresentation->SetYAxisColor(this->ColorAxisY);
+      this->ModernAxisRepresentation->SetZAxisColor(this->ColorAxisZ);
 
 #if F3D_MODULE_UI
       auto containerProperty = this->ModernAxisRepresentation->GetContainerProperty();
@@ -698,17 +698,21 @@ void vtkF3DRenderer::SetGridColor(const std::vector<double>& color)
 void vtkF3DRenderer::SetAxesColor(const std::vector<double>& colorXAxis,
   const std::vector<double>& colorYAxis, const std::vector<double>& colorZAxis)
 {
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251001)
+  assert(colorXAxis.size()==3);
+  assert(colorYAxis.size()==3);
+  assert(colorZAxis.size()==3);
 
-  if (this->ModernAxisRepresentation)
-  {
-    this->ModernAxisRepresentation->SetXAxisColor(colorXAxis[0], colorXAxis[1], colorXAxis[2]);
-    this->ModernAxisRepresentation->SetYAxisColor(colorYAxis[0], colorYAxis[1], colorYAxis[2]);
-    this->ModernAxisRepresentation->SetZAxisColor(colorZAxis[0], colorZAxis[1], colorZAxis[2]);
-  }
-#endif
-  this->GridMapper->SetAxis1Color((colorXAxis[0]), (colorXAxis[1]), (colorXAxis[2]), 1);
-  this->GridMapper->SetAxis2Color((colorZAxis[0]), (colorZAxis[1]), (colorZAxis[2]), 1);
+  this->ColorAxisX[0]=colorXAxis[0]; 
+  this->ColorAxisX[1]=colorXAxis[1]; 
+  this->ColorAxisX[2]=colorXAxis[2];
+  
+  this->ColorAxisY[0]=colorYAxis[0]; 
+  this->ColorAxisY[1]=colorYAxis[1]; 
+  this->ColorAxisY[2]=colorYAxis[2];
+
+  this->ColorAxisZ[0]=colorZAxis[0]; 
+  this->ColorAxisZ[1]=colorZAxis[1]; 
+  this->ColorAxisZ[2]=colorZAxis[2];
 }
 
 //----------------------------------------------------------------------------
@@ -812,10 +816,6 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
 
       this->GridActor->GetProperty()->SetColor(this->GridColor);
 
-      const double colorX[3] = { 1, 0, 0 }; // TODO: set from config
-      const double colorY[3] = { 0, 1, 0 }; // TODO: set from config
-      const double colorZ[3] = { 0, 0, 1 }; // TODO: set from config
-
       const auto factor = [](const double* v, const double x, const double y, const double z)
       {
         const double ref[3] = { x, y, z };
@@ -831,13 +831,13 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
       const double f2 = fX2 + fY2 + fZ2;
 
       this->GridMapper->SetAxis1Color( //
-        (colorX[0] * fX1 + colorY[0] * fY1 + colorZ[0] * fZ1) / f1,
-        (colorX[1] * fX1 + colorY[1] * fY1 + colorZ[1] * fZ1) / f1,
-        (colorX[2] * fX1 + colorY[2] * fY1 + colorZ[2] * fZ1) / f1, 1);
+        (this->ColorAxisX[0] * fX1 + this->ColorAxisY[0] * fY1 + this->ColorAxisZ[0] * fZ1) / f1,
+        (this->ColorAxisX[1] * fX1 + this->ColorAxisY[1] * fY1 + this->ColorAxisZ[1] * fZ1) / f1,
+        (this->ColorAxisX[2] * fX1 + this->ColorAxisY[2] * fY1 + this->ColorAxisZ[2] * fZ1) / f1, 1);
       this->GridMapper->SetAxis2Color( //
-        (colorX[0] * fX2 + colorY[0] * fY2 + colorZ[0] * fZ2) / f2,
-        (colorX[1] * fX2 + colorY[1] * fY2 + colorZ[1] * fZ2) / f2,
-        (colorX[2] * fX2 + colorY[2] * fY2 + colorZ[2] * fZ2) / f2, 1);
+        (this->ColorAxisX[0] * fX2 + this->ColorAxisY[0] * fY2 + this->ColorAxisZ[0] * fZ2) / f2,
+        (this->ColorAxisX[1] * fX2 + this->ColorAxisY[1] * fY2 + this->ColorAxisZ[1] * fZ2) / f2,
+        (this->ColorAxisX[2] * fX2 + this->ColorAxisY[2] * fY2 + this->ColorAxisZ[2] * fZ2) / f2, 1);
 
       this->GridActor->ForceTranslucentOn();
       this->GridActor->SetMapper(this->GridMapper);
