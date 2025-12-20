@@ -709,7 +709,7 @@ void vtkF3DRenderer::SetAxesColor(const std::vector<double>& colorXAxis,
   this->ColorAxisY[0] = colorYAxis[0];
   this->ColorAxisY[1] = colorYAxis[1];
   this->ColorAxisY[2] = colorYAxis[2];
-
+  
   this->ColorAxisZ[0] = colorZAxis[0];
   this->ColorAxisZ[1] = colorZAxis[1];
   this->ColorAxisZ[2] = colorZAxis[2];
@@ -838,7 +838,7 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
       this->GridMapper->SetAxis2Color( //
         (this->ColorAxisX[0] * fX2 + this->ColorAxisY[0] * fY2 + this->ColorAxisZ[0] * fZ2) / f2,
         (this->ColorAxisX[1] * fX2 + this->ColorAxisY[1] * fY2 + this->ColorAxisZ[1] * fZ2) / f2,
-        (this->ColorAxisX[2] * fX2 + this->ColorAxisY[2] * fY2 + this->ColorAxisZ[2] * fZ2) / f2, 
+        (this->ColorAxisX[2] * fX2 + this->ColorAxisY[2] * fY2 + this->ColorAxisZ[2] * fZ2) / f2,
         1);
 
       this->GridActor->ForceTranslucentOn();
