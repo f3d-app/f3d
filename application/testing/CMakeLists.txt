@@ -778,6 +778,11 @@ if(F3D_PLUGIN_BUILD_ALEMBIC)
   f3d_test(NAME TestAlembicAnimationXForm DATA xform_anim.abc ARGS -g --animation-time=1.5 --load-plugins=alembic --animation-progress)
   f3d_test(NAME TestAlembicCurves DATA monkey_curves.abc ARGS --load-plugins=alembic THRESHOLD 0.07) #  High threshold because of line rendering
 
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
+    f3d_test(NAME TestAlembicInvalid DATA invalid.abc ARGS -s --load-plugins=alembic REGEXP "failed to load scene" NO_BASELINE)
+  endif()
+
+
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${F3D_SOURCE_DIR}/plugins/alembic/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
