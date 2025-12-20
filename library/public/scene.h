@@ -7,6 +7,7 @@
 
 /// @cond
 #include <filesystem>
+#include <functional>
 #include <string>
 #include <vector>
 /// @endcond
@@ -45,6 +46,12 @@ public:
       : exception(what) {};
   };
 
+  /**
+   * Callback type for animated meshes.
+   * Called with the current time value, should return the mesh for that time.
+   */
+  using MeshCallback = std::function<mesh_t(double time)>;
+
   ///@{
   /**
    * Add and load provided files into the scene
@@ -60,7 +67,12 @@ public:
   /**
    * Add and load provided mesh into the scene
    */
-  virtual scene& add(const mesh_t& mesh, const double timeStamp = 0) = 0;
+  virtual scene& add(const mesh_t& mesh) = 0;
+
+  /**
+   * Add and load provided mesh into the scene
+   */
+  virtual scene& add(const double startTime, const double endTime, MeshCallback&& callback) = 0;
 
   ///@{
   /**

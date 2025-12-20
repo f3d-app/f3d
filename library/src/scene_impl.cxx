@@ -192,9 +192,6 @@ public:
   animationManager AnimationManager;
 
   vtkNew<vtkF3DMetaImporter> MetaImporter;
-  vtkNew<vtkF3DMemoryMesh> VtkSource;
-  vtkNew<vtkF3DGenericImporter> MemoryMeshImporter;
-  bool MemoryMeshLoaded;
 };
 
 //----------------------------------------------------------------------------
@@ -299,7 +296,36 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
 }
 
 //----------------------------------------------------------------------------
-scene& scene_impl::add(const mesh_t& mesh, const double timeStamp)
+scene& scene_impl::add(const double startTime, const double endTime, MeshCallback&& callback)
+{
+  if (startTime > endTime)
+  {
+    throw scene::load_failure_exception("startTime must be less than or equal to endTime");
+  }
+
+  vtkNew<vtkF3DMemoryMesh> vtkSource;
+
+  auto wrappedCallback = [cb = std::move(callback)](double time, vtkF3DMemoryMesh* vtkMesh)
+  {
+    mesh_t mesh = cb(time);
+    vtkMesh->SetPoints(mesh.points);
+    vtkMesh->SetNormals(mesh.normals);
+    vtkMesh->SetTCoords(mesh.texture_coordinates);
+    vtkMesh->SetFaces(mesh.face_sides, mesh.face_indices);
+  };
+
+  vtkSource->SetAnimatedMesh(startTime, endTime, std::move(wrappedCallback));
+
+  auto importer = vtkSmartPointer<vtkF3DGenericImporter>::New();
+  importer->SetInternalReader(vtkSource);
+
+  log::debug("Loading animated 3D scene from memory");
+
+  this->Internals->Load({ importer });
+  return *this;
+}
+
+scene& scene_impl::add(const mesh_t& mesh)
 {
   // sanity checks
   auto [valid, err] = mesh.isValid();
@@ -308,31 +334,18 @@ scene& scene_impl::add(const mesh_t& mesh, const double timeStamp)
     throw scene::load_failure_exception(err);
   }
 
-  auto& memoryMesh = Internals->VtkSource;
-  auto& importer = this->Internals->MemoryMeshImporter;
+  vtkNew<vtkF3DMemoryMesh> vtkSource;
+  auto importer = vtkSmartPointer<vtkF3DGenericImporter>::New();
 
   log::debug("Loading 3D scene from memory");
 
-  memoryMesh->SetPoints(mesh.points, timeStamp);
-  memoryMesh->SetNormals(mesh.normals, timeStamp);
-  memoryMesh->SetTCoords(mesh.texture_coordinates, timeStamp);
-  memoryMesh->SetFaces(mesh.face_sides, mesh.face_indices, timeStamp);
+  vtkSource->SetPoints(mesh.points);
+  vtkSource->SetNormals(mesh.normals);
+  vtkSource->SetTCoords(mesh.texture_coordinates);
+  vtkSource->SetFaces(mesh.face_sides, mesh.face_indices);
 
-  if (!this->Internals->MemoryMeshLoaded)
-  {
-    importer->SetInternalReader(memoryMesh);
-    Internals->Load({ importer });
-    this->Internals->MemoryMeshLoaded = true;
-  }
-  else
-  {
-    memoryMesh->Modified();
-    memoryMesh->Update();
-
-    importer->Modified();
-    importer->Update();
-    this->Internals->AnimationManager.Initialize();
-  }
+  importer->SetInternalReader(vtkSource);
+  Internals->Load({ importer });
 
   return *this;
 }

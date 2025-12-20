@@ -1,13 +1,16 @@
 #include "vtkF3DMemoryMesh.h"
 
+#include "vtkCellArray.h"
 #include "vtkFloatArray.h"
 #include "vtkIdTypeArray.h"
+#include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
+#include "vtkPoints.h"
+#include "vtkPolyData.h"
 #include "vtkSMPTools.h"
-#include <vtkInformation.h>
-#include <vtkStreamingDemandDrivenPipeline.h>
+#include "vtkStreamingDemandDrivenPipeline.h"
 
 vtkStandardNewMacro(vtkF3DMemoryMesh);
 
@@ -45,30 +48,38 @@ vtkF3DMemoryMesh::vtkF3DMemoryMesh()
 vtkF3DMemoryMesh::~vtkF3DMemoryMesh() = default;
 
 //------------------------------------------------------------------------------
-void vtkF3DMemoryMesh::SetPoints(const std::vector<float>& positions, const double timeStamp)
+void vtkF3DMemoryMesh::SetPoints(const std::vector<float>& positions)
 {
   vtkNew<vtkPoints> points;
   points->SetDataTypeToFloat();
   points->SetData(ConvertToFloatArray<3>(positions));
-
-  this->Meshes[timeStamp]->SetPoints(points);
+  this->StaticMesh->SetPoints(points);
+  this->Modified();
 }
 
 //------------------------------------------------------------------------------
-void vtkF3DMemoryMesh::SetNormals(const std::vector<float>& normals, const double timeStamp)
+void vtkF3DMemoryMesh::SetNormals(const std::vector<float>& normals)
 {
-  this->Meshes[timeStamp]->GetPointData()->SetNormals(ConvertToFloatArray<3>(normals));
+  if (!normals.empty())
+  {
+    this->StaticMesh->GetPointData()->SetNormals(ConvertToFloatArray<3>(normals));
+    this->Modified();
+  }
 }
 
 //------------------------------------------------------------------------------
-void vtkF3DMemoryMesh::SetTCoords(const std::vector<float>& tcoords, const double timeStamp)
+void vtkF3DMemoryMesh::SetTCoords(const std::vector<float>& tcoords)
 {
-  this->Meshes[timeStamp]->GetPointData()->SetTCoords(ConvertToFloatArray<2>(tcoords));
+  if (!tcoords.empty())
+  {
+    this->StaticMesh->GetPointData()->SetTCoords(ConvertToFloatArray<2>(tcoords));
+    this->Modified();
+  }
 }
 
 //------------------------------------------------------------------------------
-void vtkF3DMemoryMesh::SetFaces(const std::vector<unsigned int>& faceSizes,
-  const std::vector<unsigned int>& faceIndices, const double timeStamp)
+void vtkF3DMemoryMesh::SetFaces(
+  const std::vector<unsigned int>& faceSizes, const std::vector<unsigned int>& faceIndices)
 {
   vtkNew<vtkIdTypeArray> offsets;
   vtkNew<vtkIdTypeArray> connectivity;
@@ -95,19 +106,30 @@ void vtkF3DMemoryMesh::SetFaces(const std::vector<unsigned int>& faceSizes,
 
   vtkNew<vtkCellArray> polys;
   polys->SetData(offsets, connectivity);
+  this->StaticMesh->SetPolys(polys);
+  this->Modified();
+}
 
-  this->Meshes[timeStamp]->SetPolys(polys);
+//------------------------------------------------------------------------------
+void vtkF3DMemoryMesh::SetAnimatedMesh(double startTime, double endTime, MeshCallback callback)
+{
+  this->AnimatedCallback = std::move(callback);
+  this->TimeRange[0] = startTime;
+  this->TimeRange[1] = endTime;
+  this->IsAnimated = true;
+  this->Modified();
 }
 
 //------------------------------------------------------------------------------
 int vtkF3DMemoryMesh::RequestInformation(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* outputVector)
 {
-  // timeRange = {map_min, map_max}, map_min always <= map_max
-  const auto timeRange = std::array<double, 2>{ Meshes.begin()->first, Meshes.rbegin()->first };
-
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
-  outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange.data(), 2);
+
+  if (this->IsAnimated)
+  {
+    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), this->TimeRange, 2);
+  }
 
   return 1;
 }
@@ -119,21 +141,17 @@ int vtkF3DMemoryMesh::RequestData(vtkInformation* vtkNotUsed(request),
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
   vtkPolyData* output = vtkPolyData::GetData(outInfo);
 
-  if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()) && !this->Meshes.empty())
+  if (this->IsAnimated && this->AnimatedCallback)
   {
-    const double requestedTimeValue =
-      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
-    auto iter = Meshes.upper_bound(requestedTimeValue);
-    if (iter != Meshes.begin())
+    double requestedTime = this->TimeRange[0];
+    if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP()))
     {
-      iter = std::prev(iter);
+      requestedTime = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP());
     }
-    output->ShallowCopy(iter->second);
+    this->AnimatedCallback(requestedTime, this);
   }
-  else
-  {
-    output->ShallowCopy(this->Meshes[0.0]);
-  }
+
+  output->ShallowCopy(this->StaticMesh);
 
   return 1;
 }
