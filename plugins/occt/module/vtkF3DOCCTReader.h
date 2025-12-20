@@ -129,6 +129,9 @@ private:
   bool RelativeDeflection = false;
   bool ReadWire = false;
   FILE_FORMAT FileFormat = FILE_FORMAT::STEP;
+
+  std::unique_ptr<std::streambuf> Streambuf;
+  std::unique_ptr<std::istream> Buffer;
 };
 
 #endif

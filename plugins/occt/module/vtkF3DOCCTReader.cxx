@@ -642,17 +642,20 @@ int vtkF3DOCCTReader::RequestData(
     {
       // Encapsulate resource stream into an istream
       stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
-      auto strbuf = stream->ToStreambuf();
-      std::istream buffer(strbuf.get());
+      this->Streambuf = stream->ToStreambuf();
+      this->Buffer = std::make_unique<std::istream>(this->Streambuf.get());
+
       try
       {
-        BinTools::Read(shape, buffer, pRange);
+        BinTools::Read(shape, *this->Buffer, pRange);
       }
       catch (Storage_StreamTypeMismatchError&)
       {
         this->Stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+        this->Streambuf = stream->ToStreambuf();
+        this->Buffer = std::make_unique<std::istream>(this->Streambuf.get());
         const BRep_Builder builder;
-        BRepTools::Read(shape, buffer, builder, pRange);
+        BRepTools::Read(shape, *this->Buffer, builder, pRange);
       }
       success = !shape.IsNull();
     }
@@ -714,9 +717,9 @@ int vtkF3DOCCTReader::RequestData(
     {
       // Encapsulate resource stream into an istream
       stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
-      auto strbuf = stream->ToStreambuf();
-      std::istream buffer(strbuf.get());
-      if (app->Open(buffer, doc) != PCDM_RS_OK)
+      this->Streambuf = stream->ToStreambuf();
+      this->Buffer = std::make_unique<std::istream>(this->Streambuf.get());
+      if (app->Open(*this->Buffer.get(), doc) != PCDM_RS_OK)
       {
         vtkErrorWithObjectMacro(this, "Failed to read XBF stream");
         return 0;

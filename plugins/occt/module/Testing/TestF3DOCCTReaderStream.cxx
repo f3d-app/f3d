@@ -29,8 +29,8 @@ int TestF3DOCCTReaderStream(int vtkNotUsed(argc), char* argv[])
   bool ret = true;
   ret &= testReaderStream(data + "/f3d.stp", vtkF3DOCCTReader::FILE_FORMAT::STEP);
 //  ret &= testReaderStream(data + "/f3d.igs", vtkF3DOCCTReader::FILE_FORMAT::IGES); // FAILS TO READ
-//  ret &= testReaderStream(data + "/f3d.brep", vtkF3DOCCTReader::FILE_FORMAT::BREP); // EMPTY
-//  ret &= testReaderStream(data + "/f3d.bin.brep", vtkF3DOCCTReader::FILE_FORMAT::BREP); // EXCEPTION StandardFailure
-//   ret &= testReaderStream(data + "/f3d.xbf", vtkF3DOCCTReader::FILE_FORMAT::XBF); // Storage_StreamReadError
+  ret &= testReaderStream(data + "/f3d.brep", vtkF3DOCCTReader::FILE_FORMAT::BREP);
+//  ret &= testReaderStream(data + "/f3d.bin.brep", vtkF3DOCCTReader::FILE_FORMAT::BREP); // BUG IN VTK with Streambuf
+   ret &= testReaderStream(data + "/f3d.xbf", vtkF3DOCCTReader::FILE_FORMAT::XBF); // Storage_StreamReadError
   return ret ? EXIT_SUCCESS : EXIT_FAILURE;
 }
