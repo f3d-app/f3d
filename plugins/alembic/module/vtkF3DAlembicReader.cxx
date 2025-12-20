@@ -8,6 +8,7 @@
 #include <vtkObjectFactory.h>
 #include <vtkPointData.h>
 #include <vtkPoints.h>
+#include <vtkPolyLine.h>
 #include <vtkSmartPointer.h>
 #include <vtkStreamingDemandDrivenPipeline.h>
 
@@ -347,6 +348,53 @@ public:
     return polydata;
   }
 
+  vtkSmartPointer<vtkPolyData> ProcessICurves(
+    const Alembic::AbcGeom::ICurves& curve, double time, const Alembic::Abc::M44d& matrix)
+  {
+    vtkNew<vtkPolyData> polydata;
+
+    const Alembic::AbcGeom::ICurvesSchema& schema = curve.getSchema();
+    Alembic::AbcGeom::ICurvesSchema::Sample samp;
+
+    if (schema.getNumSamples() > 0)
+    {
+      Alembic::AbcGeom::ISampleSelector selector(time);
+      schema.get(samp, selector);
+
+      Alembic::AbcGeom::P3fArraySamplePtr positions = samp.getPositions();
+      Alembic::AbcGeom::Int32ArraySamplePtr curveCounts = samp.getCurvesNumVertices();
+
+      vtkNew<vtkPoints> points;
+      vtkNew<vtkCellArray> lines;
+
+      for (size_t pIndex = 0; pIndex < positions->size(); ++pIndex)
+      {
+        const Alembic::Abc::V3f& tp = positions->get()[pIndex] * matrix;
+        points->InsertNextPoint(tp.x, tp.y, tp.z);
+      }
+
+      size_t pOffsetIndex = 0;
+      for (size_t cIndex = 0; cIndex < curveCounts->size(); ++cIndex)
+      {
+        const size_t vCount = curveCounts->get()[cIndex];
+
+        vtkNew<vtkPolyLine> polyLine;
+        polyLine->GetPointIds()->SetNumberOfIds(vCount);
+        for (size_t j = 0; j < vCount; ++j)
+        {
+          polyLine->GetPointIds()->SetId(j, pOffsetIndex + j);
+        }
+
+        lines->InsertNextCell(polyLine);
+        pOffsetIndex += vCount;
+      }
+
+      polydata->SetPoints(points);
+      polydata->SetLines(lines);
+    }
+    return polydata;
+  }
+
   void ImportRoot(vtkAppendPolyData* append, double time)
   {
     const Alembic::Abc::IObject top = this->Archive.getTop();
@@ -372,6 +420,11 @@ public:
       {
         const Alembic::AbcGeom::IPolyMesh polymesh(parent, ohead.getName());
         append->AddInputData(this->ProcessIPolyMesh(polymesh, time, objMatrix));
+      }
+      else if (Alembic::AbcGeom::ICurves::matches(ohead))
+      {
+        const Alembic::AbcGeom::ICurves curve(parent, ohead.getName());
+        append->AddInputData(this->ProcessICurves(curve, time, objMatrix));
       }
       else if (Alembic::AbcGeom::IXform::matches(ohead))
       {
@@ -418,6 +471,13 @@ public:
       {
         const Alembic::AbcGeom::IPolyMesh polymesh(parent, ohead.getName());
         const Alembic::AbcGeom::IPolyMeshSchema& schema = polymesh.getSchema();
+        ts = schema.getTimeSampling();
+        numSamples = static_cast<int>(schema.getNumSamples());
+      }
+      else if (Alembic::AbcGeom::ICurves::matches(ohead))
+      {
+        const Alembic::AbcGeom::ICurves curves(parent, ohead.getName());
+        const Alembic::AbcGeom::ICurvesSchema& schema = curves.getSchema();
         ts = schema.getTimeSampling();
         numSamples = static_cast<int>(schema.getNumSamples());
       }
