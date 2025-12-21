@@ -990,6 +990,7 @@ if(F3D_PLUGIN_BUILD_OCCT)
   f3d_test(NAME TestSTEPDefines DATA cheese.stp ARGS --load-plugins=occt -DSTEP.linear_deflection=0.5 -DSTEP.angular_deflection=0.9 -DSTEP.relative_deflection=1)
   f3d_test(NAME TestIGESDefines DATA cheese.igs ARGS --load-plugins=occt -DIGES.read_wire=0 --line-width=5 --up=+Z)
   f3d_test(NAME TestBREPDefines DATA cheese.brep ARGS --load-plugins=occt -DBREP.linear_deflection=100 --up=+Z)
+  f3d_test(NAME TestInvalidSTEP DATA invalid.step ARGS --verbose --load-plugins=occt REGEXP "failed to load scene" NO_BASELINE)
 
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
     f3d_test(NAME TestInvalidBREP DATA invalid.brep ARGS --verbose --load-plugins=occt REGEXP "failed to load scene" NO_BASELINE)

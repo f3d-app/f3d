@@ -1,7 +1,13 @@
 list(APPEND vtkextOCCT_list
      TestF3DOCCTReader.cxx
-     TestF3DOCCTReaderStream.cxx
     )
+
+# TODO VERSION
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251210)
+  list(APPEND vtkextOCCT_list
+     TestF3DOCCTReaderStream.cxx
+      )
+endif()
 
 vtk_add_test_cxx(vtkextOCCTTests tests
   NO_DATA NO_VALID NO_OUTPUT
