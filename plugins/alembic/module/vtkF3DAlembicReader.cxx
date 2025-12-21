@@ -9,6 +9,7 @@
 #include <vtkPointData.h>
 #include <vtkPoints.h>
 #include <vtkPolyLine.h>
+#include <vtkResourceStream.h>
 #include <vtkSmartPointer.h>
 #include <vtkStreamingDemandDrivenPipeline.h>
 
@@ -509,17 +510,51 @@ public:
     }
   }
 
-  void ReadArchive(const std::string& filePath)
+  bool ReadArchive(
+    vtkResourceStream* stream, const std::string& filePath, [[maybe_unused]] vtkObject* parent)
   {
     Alembic::AbcCoreFactory::IFactory factory;
     Alembic::AbcCoreFactory::IFactory::CoreType coreType;
 
-    this->Archive = factory.getArchive(filePath, coreType);
+    if (stream)
+    {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251210)
+      // Encapsulate resource stream into an istream
+      stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+      this->Streambuf = stream->ToStreambuf();
+      this->Buffer = std::make_unique<std::istream>(this->Streambuf.get());
+      try
+      {
+        this->Archive =
+          factory.getArchive(std::vector<std::istream*>({ this->Buffer.get() }), coreType);
+      }
+      catch (Alembic::Util::v12::Exception& ex)
+      {
+        vtkErrorWithObjectMacro(parent, "Error reading stream: " << ex.what());
+        return false;
+      }
+#else
+      vtkErrorWithObjectMacro(
+        parent, "This version of VTK doesn't support reading memory stream with Alembic");
+      return false;
+#endif
+    }
+    else
+    {
+      this->Archive = factory.getArchive(filePath, coreType);
+    }
+    return this->Archive.valid();
   }
   Alembic::Abc::IArchive Archive;
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251210)
+  std::unique_ptr<std::streambuf> Streambuf;
+  std::unique_ptr<std::istream> Buffer;
+#endif
 };
 
 vtkStandardNewMacro(vtkF3DAlembicReader);
+vtkCxxSetSmartPointerMacro(vtkF3DAlembicReader, Stream, vtkResourceStream);
 
 //----------------------------------------------------------------------------
 vtkF3DAlembicReader::vtkF3DAlembicReader()
@@ -535,14 +570,17 @@ vtkF3DAlembicReader::~vtkF3DAlembicReader() = default;
 int vtkF3DAlembicReader::RequestInformation(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* outputVector)
 {
-  vtkInformation* outInfo = outputVector->GetInformationObject(0);
-
-  this->Internals->ReadArchive(this->FileName);
+  if (!this->Internals->ReadArchive(this->Stream, this->FileName, this))
+  {
+    vtkErrorMacro("Unable to read this alembic file or stream");
+    return 0;
+  }
 
   double timeRange[2] = { std::numeric_limits<double>::infinity(),
     -std::numeric_limits<double>::infinity() };
   this->Internals->ExtendTimeRange(timeRange[0], timeRange[1]);
 
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
   if (timeRange[0] < timeRange[1])
   {
     outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange, 2);
@@ -575,8 +613,12 @@ int vtkF3DAlembicReader::RequestData(
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DAlembicReader::PrintSelf(ostream& os, vtkIndent indent)
+vtkMTimeType vtkF3DAlembicReader::GetMTime()
 {
-  this->Superclass::PrintSelf(os, indent);
-  os << indent << "FileName: " << this->FileName << "\n";
+  auto mtime = this->Superclass::GetMTime();
+  if (this->Stream)
+  {
+    mtime = std::max(mtime, this->Stream->GetMTime());
+  }
+  return mtime;
 }
