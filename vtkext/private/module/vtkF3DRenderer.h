@@ -13,7 +13,6 @@
 
 #include "vtkF3DMetaImporter.h"
 
-#include "vtkF3DOpenGLGridMapper.h"
 #include "vtkF3DUIActor.h"
 
 #include <vtkCallbackCommand.h>
@@ -38,6 +37,7 @@ class vtkCameraOrientationWidget;
 class vtkScalarBarActor;
 class vtkSkybox;
 class vtkTextActor;
+class vtkF3DOpenGLGridMapper
 
 class vtkF3DRenderer : public vtkOpenGLRenderer
 {
