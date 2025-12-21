@@ -8,3 +8,8 @@ vtk_add_test_cxx(vtkextOCCTTests tests
   ${vtkextOCCT_list}
   ${F3D_SOURCE_DIR}/testing/ ${CMAKE_BINARY_DIR}/Testing/Temporary/)
 vtk_test_cxx_executable(vtkextOCCTTests tests)
+
+if(F3D_PLUGIN_OCCT_COLORING_SUPPORT)
+  vtk_module_definitions(vtkextOCCTTests
+    PRIVATE F3D_PLUGIN_OCCT_XCAF)
+endif()

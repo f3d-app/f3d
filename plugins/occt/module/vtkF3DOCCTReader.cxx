@@ -775,8 +775,24 @@ int vtkF3DOCCTReader::RequestData(
   {
     reader = new IGESControl_Reader();
   }
+  assert(reader);
 
-  if (reader && reader->ReadFile(this->GetFileName().c_str()) == IFSelect_RetDone)
+  vtkResourceStream* stream = this->GetStream();
+  IFSelect_ReturnStatus ret;
+  if (stream)
+  {
+    // Encapsulate resource stream into an istream
+    stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+    this->Streambuf = stream->ToStreambuf();
+    this->Buffer = std::make_unique<std::istream>(this->Streambuf.get());
+    ret = reader->ReadStream("", *this->Buffer.get());
+  }
+  else
+  {
+    ret = reader->ReadFile(this->GetFileName().c_str());
+  }
+
+  if (ret == IFSelect_RetDone)
   {
     ProgressIndicator pi(this);
     reader->TransferRoots(pi.Start());
@@ -795,6 +811,11 @@ int vtkF3DOCCTReader::RequestData(
         output->SetBlock(iShape, polydata);
       }
     }
+  }
+  else
+  {
+    vtkErrorMacro("Unable to read STEP or IGES file");
+    return 0;
   }
 
   delete reader;
