@@ -782,7 +782,6 @@ if(F3D_PLUGIN_BUILD_ALEMBIC)
     f3d_test(NAME TestAlembicInvalid DATA invalid.abc ARGS -s --load-plugins=alembic REGEXP "failed to load scene" NO_BASELINE)
   endif()
 
-
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${F3D_SOURCE_DIR}/plugins/alembic/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
     # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
