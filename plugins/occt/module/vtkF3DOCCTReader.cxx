@@ -744,7 +744,7 @@ int vtkF3DOCCTReader::RequestData(
 #else
       vtkErrorMacro(
         "This version of VTK doesn't support reading memory stream with OCCT");
-      return 0
+      return 0;
 #endif
     }
     else
