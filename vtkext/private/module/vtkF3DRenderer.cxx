@@ -1967,6 +1967,7 @@ void vtkF3DRenderer::UpdateActors()
     this->ConfigureGridUsingCurrentActors();
   }
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251001)
   if (!this->AxesColorConfigured && this->ModernAxisRepresentation)
   {
     this->ModernAxisRepresentation->SetXAxisColor(this->ColorAxisX);
@@ -1974,6 +1975,7 @@ void vtkF3DRenderer::UpdateActors()
     this->ModernAxisRepresentation->SetZAxisColor(this->ColorAxisZ);
     this->AxesColorConfigured = true;
   }
+#endif
 }
 
 //----------------------------------------------------------------------------
