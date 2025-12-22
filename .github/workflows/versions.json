@@ -44,7 +44,7 @@
     "webp": "v1.2.4",
     "zlib": "v1.2.13"
   },
-  "vtk_commit_sha": "89e81f44cfb990f214aae77f6081f935c169eb64",
-  "docker_timestamp": "20251217_0",
+  "vtk_commit_sha": "262273831bc9fad3637da30fe544a2bf1cdebf83",
+  "docker_timestamp": "20251222_0",
   "global_cache_index": "1"
 }
