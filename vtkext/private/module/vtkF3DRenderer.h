@@ -119,7 +119,6 @@ public:
   void SetGridColor(const std::vector<double>& color);
   void SetAxesColor(const std::vector<double>& colorXAxis, const std::vector<double>& colorYAxis,
     const std::vector<double>& colorZAxis);
-  void SetWidgetColor();
   ///@}
 
   /**
