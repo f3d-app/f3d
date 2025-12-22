@@ -697,7 +697,7 @@ void vtkF3DRenderer::SetAxesColor(const std::vector<double>& colorXAxis,
 
   if (!std::equal(colorXAxis.begin(), colorXAxis.end(), this->ColorAxisX) ||
     !std::equal(colorYAxis.begin(), colorYAxis.end(), this->ColorAxisY) ||
-    !std::equal(colorZAxis.begin(), colorZAxis.end(), this->ColorAxisZ))  
+    !std::equal(colorZAxis.begin(), colorZAxis.end(), this->ColorAxisZ))
   {
     std::copy(colorXAxis.begin(), colorXAxis.end(), this->ColorAxisX);
     std::copy(colorYAxis.begin(), colorYAxis.end(), this->ColorAxisY);
@@ -1967,11 +1967,12 @@ void vtkF3DRenderer::UpdateActors()
     this->ConfigureGridUsingCurrentActors();
   }
 
-  if (!this->AxesColorConfigured){
+  if (!this->AxesColorConfigured && this->ModernAxisRepresentation)
+  {
     this->ModernAxisRepresentation->SetXAxisColor(this->ColorAxisX);
     this->ModernAxisRepresentation->SetYAxisColor(this->ColorAxisY);
     this->ModernAxisRepresentation->SetZAxisColor(this->ColorAxisZ);
-    this->AxesColorConfigured=true;
+    this->AxesColorConfigured = true;
   }
 }
 
