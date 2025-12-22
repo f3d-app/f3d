@@ -15,6 +15,7 @@
 #define vtkF3DOCCTReader_h
 
 #include <vtkMultiBlockDataSetAlgorithm.h>
+#include <vtkSmartPointer.h>
 #include <vtkVersion.h>
 
 #include <memory>
