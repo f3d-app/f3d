@@ -610,8 +610,6 @@ void vtkF3DRenderer::ShowAxis(bool show)
       this->ModernAxisRepresentation->AnchorToLowerRight();
       this->ModernAxisRepresentation->ContainerVisibilityOn();
 
-      this->SetWidgetColor();
-
 #if F3D_MODULE_UI
       auto containerProperty = this->ModernAxisRepresentation->GetContainerProperty();
       containerProperty->SetOpacity(this->ModernAxisBackdropOpacity);
@@ -643,17 +641,6 @@ void vtkF3DRenderer::ShowAxis(bool show)
     this->AxisVisible = show;
     this->RenderPassesConfigured = false;
     this->CheatSheetConfigured = false;
-    this->AxesColorConfigured = true;
-  }
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DRenderer::SetWidgetColor(){
-  if(!this->AxesColorConfigured){
-    this->ModernAxisRepresentation->SetXAxisColor(this->ColorAxisX);
-    this->ModernAxisRepresentation->SetYAxisColor(this->ColorAxisY);
-    this->ModernAxisRepresentation->SetZAxisColor(this->ColorAxisZ);
-    this->AxesColorConfigured=true;
   }
 }
 
@@ -707,7 +694,10 @@ void vtkF3DRenderer::SetAxesColor(const std::vector<double>& colorXAxis,
   const std::vector<double>& colorYAxis, const std::vector<double>& colorZAxis)
 {
   assert(colorXAxis.size() == 3 && colorYAxis.size() == 3 && colorZAxis.size() == 3);
-  if(colorXAxis != this->ColorAxisX || colorYAxis != this->ColorAxisY || colorZAxis != this->ColorAxisZ)
+
+  if (!std::equal(colorXAxis.begin(), colorXAxis.end(), this->ColorAxisX) ||
+    !std::equal(colorYAxis.begin(), colorYAxis.end(), this->ColorAxisY) ||
+    !std::equal(colorZAxis.begin(), colorZAxis.end(), this->ColorAxisZ))  
   {
     std::copy(colorXAxis.begin(), colorXAxis.end(), this->ColorAxisX);
     std::copy(colorYAxis.begin(), colorYAxis.end(), this->ColorAxisY);
@@ -1978,7 +1968,10 @@ void vtkF3DRenderer::UpdateActors()
   }
 
   if (!this->AxesColorConfigured){
-    this->SetWidgetColor();
+    this->ModernAxisRepresentation->SetXAxisColor(this->ColorAxisX);
+    this->ModernAxisRepresentation->SetYAxisColor(this->ColorAxisY);
+    this->ModernAxisRepresentation->SetZAxisColor(this->ColorAxisZ);
+    this->AxesColorConfigured=true;
   }
 }
 
