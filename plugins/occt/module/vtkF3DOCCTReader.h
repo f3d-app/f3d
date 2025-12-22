@@ -9,6 +9,8 @@
  * and LinearDeflection.
  * Reading 1D cells (wires) is optional.
  *
+ * This reader support reading streams for all supported formats but IGES.
+ *
  */
 
 #ifndef vtkF3DOCCTReader_h
