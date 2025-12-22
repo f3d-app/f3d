@@ -729,6 +729,7 @@ private:
   bool UsingExpandingRange = true;
   double ColorRange[2] = { 0.0, 1.0 };
   bool ColorTransferFunctionConfigured = false;
+  bool OpacityTransferFunctionConfigured = false;
 
   bool EnableColoring = false;
   bool UseCellColoring = false;

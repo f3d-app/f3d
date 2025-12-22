@@ -318,6 +318,7 @@ void vtkF3DRenderer::Initialize()
   this->ExpandingRangeSet = false;
 
   this->ColorTransferFunctionConfigured = false;
+  this->OpacityTransferFunctionConfigured = false;
   this->ColoringMappersConfigured = false;
   this->ColoringPointSpritesMappersConfigured = false;
   this->VolumePropsAndMappersConfigured = false;
@@ -1911,6 +1912,7 @@ void vtkF3DRenderer::UpdateActors()
     this->VolumePropsAndMappersConfigured = false;
     this->ScalarBarActorConfigured = false;
     this->ColoringConfigured = false;
+    this->OpacityTransferFunctionConfigured = false;
   }
   this->ImporterUpdateTimeStamp = importerUpdateMTime;
 
@@ -2595,6 +2597,7 @@ void vtkF3DRenderer::SetUseInverseOpacityFunction(bool use)
     this->VolumePropsAndMappersConfigured = false;
     this->CheatSheetConfigured = false;
     this->ColoringConfigured = false;
+    this->OpacityTransferFunctionConfigured = false;
   }
 }
 
@@ -2654,13 +2657,8 @@ void vtkF3DRenderer::SetOpacityMap(const std::vector<double>& opacityMap)
   {
     this->OpacityMap = opacityMap;
 
-    this->ColorTransferFunctionConfigured = false;
-    this->ColoringMappersConfigured = false;
-    this->ColoringPointSpritesMappersConfigured = false;
+    this->OpacityTransferFunctionConfigured = false;
     this->VolumePropsAndMappersConfigured = false;
-
-    this->ScalarBarActorConfigured = false;
-    this->ColoringConfigured = false;
   }
 }
 
@@ -2822,12 +2820,13 @@ void vtkF3DRenderer::ConfigureColoring()
       {
         // Initialize the visibility based on the mapper configuration
         visible = !std::string(volume.Mapper->GetArrayName()).empty();
-        if (!this->VolumePropsAndMappersConfigured)
+        if (!this->VolumePropsAndMappersConfigured && !this->OpacityTransferFunctionConfigured)
         {
           visible = vtkF3DRenderer::ConfigureVolumeForColoring(volume.Mapper, volume.Prop,
             info.value().Name, this->ComponentForColoring, this->ColorTransferFunction,
             this->OpacityMap, this->ColorRange, this->UseCellColoring,
             this->UseInverseOpacityFunction);
+          this->OpacityTransferFunctionConfigured = true;
           if (!visible)
           {
             F3DLog::Print(F3DLog::Severity::Warning,
@@ -2993,7 +2992,7 @@ void vtkF3DRenderer::ConfigureOpacityTransferFunction(vtkPiecewiseFunction* otf,
   if (opacityMap.size() % 2 != 0 || opacityMap.empty())
   {
     F3DLog::Print(F3DLog::Severity::Warning,
-      "Opacity map with an odd number of elements, resetting to default linear opacity "
+      "Opacity map empty or with an odd number of elements, resetting to default linear opacity "
       "function");
     otf->AddPoint(range[0], inverseOpacityFlag ? 1.0 : 0.0);
     otf->AddPoint(range[1], inverseOpacityFlag ? 0.0 : 1.0);

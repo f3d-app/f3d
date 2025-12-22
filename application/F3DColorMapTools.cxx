@@ -102,22 +102,14 @@ std::vector<double> Read1DMap(const fs::path& path, MapType type)
 
     std::vector<double> out(stride * w);
 
-    for (int i = 0; i < w; ++i)
+    for (int i = 0; i < w; i++)
     {
       const auto pixel = img.getNormalizedPixel({ i, 0 });
       const double x = static_cast<double>(i) / (w - 1);
-
-      if (type == MapType::Color)
+      out[stride * i + 0] = x;
+      for (int c = 1; c <= expectedChannels; c++)
       {
-        out[4 * i + 0] = x;
-        out[4 * i + 1] = pixel[0];
-        out[4 * i + 2] = pixel[1];
-        out[4 * i + 3] = pixel[2];
-      }
-      else
-      {
-        out[2 * i + 0] = x;
-        out[2 * i + 1] = pixel[0];
+        out[stride * i + c] = pixel[c - 1];
       }
     }
 
