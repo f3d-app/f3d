@@ -703,8 +703,8 @@ void vtkF3DRenderer::SetAxesColor(const std::vector<double>& colorXAxis,
     std::copy(colorYAxis.begin(), colorYAxis.end(), this->ColorAxisY);
     std::copy(colorZAxis.begin(), colorZAxis.end(), this->ColorAxisZ);
     this->GridConfigured = false;
+    this->AxesColorConfigured = false;
   }
-  this->AxesColorConfigured = false;
 }
 
 //----------------------------------------------------------------------------
