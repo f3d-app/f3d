@@ -610,10 +610,7 @@ void vtkF3DRenderer::ShowAxis(bool show)
       this->ModernAxisRepresentation->AnchorToLowerRight();
       this->ModernAxisRepresentation->ContainerVisibilityOn();
 
-      // Closest colors to red, green, blue in OKHSL space at 95% saturation and 50% lightness
-      this->ModernAxisRepresentation->SetXAxisColor(this->ColorAxisX);
-      this->ModernAxisRepresentation->SetYAxisColor(this->ColorAxisY);
-      this->ModernAxisRepresentation->SetZAxisColor(this->ColorAxisZ);
+      this->SetWidgetColor();
 
 #if F3D_MODULE_UI
       auto containerProperty = this->ModernAxisRepresentation->GetContainerProperty();
@@ -646,6 +643,17 @@ void vtkF3DRenderer::ShowAxis(bool show)
     this->AxisVisible = show;
     this->RenderPassesConfigured = false;
     this->CheatSheetConfigured = false;
+    this->AxesColorConfigured = true;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetWidgetColor(){
+  if(!this->AxesColorConfigured){
+    this->ModernAxisRepresentation->SetXAxisColor(this->ColorAxisX);
+    this->ModernAxisRepresentation->SetYAxisColor(this->ColorAxisY);
+    this->ModernAxisRepresentation->SetZAxisColor(this->ColorAxisZ);
+    this->AxesColorConfigured=true;
   }
 }
 
@@ -704,6 +712,7 @@ void vtkF3DRenderer::SetAxesColor(const std::vector<double>& colorXAxis,
   std::copy(colorYAxis.begin(), colorYAxis.end(), this->ColorAxisY);
   std::copy(colorZAxis.begin(), colorZAxis.end(), this->ColorAxisZ);
   this->GridConfigured = false;
+  this->AxesColorConfigured = false;
 }
 
 //----------------------------------------------------------------------------
@@ -1964,6 +1973,10 @@ void vtkF3DRenderer::UpdateActors()
   if (!this->GridConfigured)
   {
     this->ConfigureGridUsingCurrentActors();
+  }
+
+  if (!this->AxesColorConfigured){
+    this->SetWidgetColor();
   }
 }
 
