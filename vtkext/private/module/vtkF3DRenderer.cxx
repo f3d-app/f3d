@@ -707,11 +707,13 @@ void vtkF3DRenderer::SetAxesColor(const std::vector<double>& colorXAxis,
   const std::vector<double>& colorYAxis, const std::vector<double>& colorZAxis)
 {
   assert(colorXAxis.size() == 3 && colorYAxis.size() == 3 && colorZAxis.size() == 3);
-  assert(colorXAxis != colorYAxis && colorYAxis != colorZAxis && colorXAxis != colorZAxis);
-  std::copy(colorXAxis.begin(), colorXAxis.end(), this->ColorAxisX);
-  std::copy(colorYAxis.begin(), colorYAxis.end(), this->ColorAxisY);
-  std::copy(colorZAxis.begin(), colorZAxis.end(), this->ColorAxisZ);
-  this->GridConfigured = false;
+  if(colorXAxis != this->ColorAxisX || colorYAxis != this->ColorAxisY || colorZAxis != this->ColorAxisZ)
+  {
+    std::copy(colorXAxis.begin(), colorXAxis.end(), this->ColorAxisX);
+    std::copy(colorYAxis.begin(), colorYAxis.end(), this->ColorAxisY);
+    std::copy(colorZAxis.begin(), colorZAxis.end(), this->ColorAxisZ);
+    this->GridConfigured = false;
+  }
   this->AxesColorConfigured = false;
 }
 
