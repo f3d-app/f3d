@@ -125,11 +125,11 @@ std::vector<double> Read1DMap(const fs::path& path, MapType type)
 
 f3d::colormap_t Read(const fs::path& path)
 {
-  return f3d::colormap_t(Read1DMap(path, MapType::Color));
+  return f3d::colormap_t(F3DColorMapTools::Read1DMap(path, MapType::Color));
 }
 
 std::vector<double> ReadOpacity(const fs::path& path)
 {
-  return Read1DMap(path, MapType::Opacity);
+  return F3DColorMapTools::Read1DMap(path, MapType::Opacity);
 }
 }
