@@ -16,6 +16,6 @@ vtk_add_test_cxx(vtkextOCCTTests tests
 vtk_test_cxx_executable(vtkextOCCTTests tests)
 
 if(F3D_PLUGIN_OCCT_COLORING_SUPPORT)
-  vtk_module_definitions(vtkextOCCTTests
+  target_compile_definitions(vtkextOCCTTests
     PRIVATE F3D_PLUGIN_OCCT_XCAF)
 endif()
