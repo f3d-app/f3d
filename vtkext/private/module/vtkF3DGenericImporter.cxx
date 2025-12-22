@@ -446,22 +446,20 @@ void vtkF3DGenericImporter::ImportMultiBlock(
       continue;
     }
 
-    std::string blockName;
-    if (mb->HasMetaData(i))
+    std::string blockName = parentName;
+    if (!blockName.empty())
     {
-      if (const char* name = mb->GetMetaData(i)->Get(vtkCompositeDataSet::NAME()))
-      {
-        blockName = name;
-      }
+      blockName += "/";
     }
-    if (blockName.empty())
+
+    if (const char* name =
+          mb->HasMetaData(i) ? mb->GetMetaData(i)->Get(vtkCompositeDataSet::NAME()) : nullptr)
     {
-      blockName = "Block_" + std::to_string(i);
+      blockName += name;
     }
-    if (!parentName.empty())
+    else
     {
-      blockName.insert(0, "/");
-      blockName.insert(0, parentName);
+      blockName += "Block_" + std::to_string(i);
     }
 
     vtkMultiBlockDataSet* childMB = vtkMultiBlockDataSet::SafeDownCast(obj);
