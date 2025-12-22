@@ -119,6 +119,7 @@ public:
   void SetGridColor(const std::vector<double>& color);
   void SetAxesColor(const std::vector<double>& colorXAxis, const std::vector<double>& colorYAxis,
     const std::vector<double>& colorZAxis);
+  void SetWidgetColor();
   ///@}
 
   /**
@@ -612,6 +613,7 @@ private:
   bool ActorsPropertiesConfigured = false;
   bool GridConfigured = false;
   bool GridAxesConfigured = false;
+  bool AxesColorConfigured = false;
   bool RenderPassesConfigured = false;
   bool LightIntensitiesConfigured = false;
   bool TextActorsConfigured = false;
