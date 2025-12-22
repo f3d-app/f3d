@@ -190,15 +190,24 @@ void animationManager::Tick(double deltaTime)
 //----------------------------------------------------------------------------
 void animationManager::JumpToFrame(int frame, bool relative)
 {
+  const double frameLen = (this->DeltaTime * this->SpeedFactor);
+  const double currentFrame = (this->CurrentTime - this->TimeRange[0]) / frameLen;
+
+  double nextFrame = 0;
   if (relative)
   {
-    this->CurrentTime += ((this->DeltaTime * this->SpeedFactor) * this->AnimationDirection) * frame;
+    nextFrame = currentFrame + frame;
+  }
+  else if (frame >= 0)
+  {
+    nextFrame = frame;
   }
   else
   {
-    const double startFrame = frame >= 0 ? this->TimeRange[0] : this->TimeRange[1];
-    this->CurrentTime = startFrame + (frame * this->DeltaTime);
+    nextFrame = (this->TimeRange[1] - this->TimeRange[0]) / frameLen;
   }
+
+  this->CurrentTime = this->TimeRange[0] + (nextFrame * this->DeltaTime * this->SpeedFactor);
 
   if (this->LoadAtTime(this->CurrentTime))
   {
