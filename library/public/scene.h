@@ -72,7 +72,7 @@ public:
   /**
    * Add and load provided mesh into the scene
    */
-  virtual scene& add(const double startTime, const double endTime, MeshCallback&& callback) = 0;
+  virtual scene& add(std::pair<double> timeRange, MeshCallback&& callback) = 0;
 
   ///@{
   /**
