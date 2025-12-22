@@ -26,6 +26,7 @@ class vtkInformationIntegerKey;
 class VTKEXT_EXPORT vtkF3DImporter : public vtkImporter
 {
 public:
+  vtkTypeMacro(vtkF3DImporter, vtkImporter);
   /**
    * Information key used to flag actors.
    * Actors having this flag will be drawn on top.
@@ -55,6 +56,16 @@ public:
   {
     return AnimationSupportLevel::MULTI;
   }
+#endif
+
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 5, 20251210)
+  using vtkImporter::GetTemporalInformation;
+  /**
+   * Forward call to pre-20251210 implementation for GetTemporalInformation
+   * with framerate at 0
+   */
+  virtual bool GetTemporalInformation(
+    vtkIdType animationIndex, double timeRange[2], int& nbTimeSteps, vtkDoubleArray* timeSteps);
 #endif
 
   /**

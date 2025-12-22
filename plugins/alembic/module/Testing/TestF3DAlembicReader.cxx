@@ -11,6 +11,5 @@ int TestF3DAlembicReader(int vtkNotUsed(argc), char* argv[])
   vtkNew<vtkF3DAlembicReader> reader;
   reader->SetFileName(filename);
   reader->Update();
-  reader->Print(std::cout);
-  return reader->GetOutput() ? EXIT_SUCCESS : EXIT_FAILURE;
+  return reader->GetOutput()->GetNumberOfPoints() > 0 ? EXIT_SUCCESS : EXIT_FAILURE;
 }
