@@ -30,8 +30,7 @@ int TestSDKSceneTemporalFromMemory([[maybe_unused]] int argc, [[maybe_unused]] c
   const std::vector<unsigned int> faceSides{ 3, 3 };
   const std::vector<unsigned int> faceIndices{ 0, 1, 2, 1, 3, 2 };
 
-  auto meshCallback = [&](double time) -> f3d::mesh_t
-  {
+  auto meshCallback = [&](double time) -> f3d::mesh_t {
     if (time < 0.5)
     {
       return f3d::mesh_t{ basePoints, normals, tcoords, faceSides, faceIndices };
@@ -42,7 +41,7 @@ int TestSDKSceneTemporalFromMemory([[maybe_unused]] int argc, [[maybe_unused]] c
     }
   };
 
-  test("add animated mesh with callback", [&]() { sce.add(0.0, 1.0, meshCallback); });
+  test("add animated mesh with callback", [&]() { sce.add({ 0.0, 1.0 }, meshCallback); });
 
   test("animation time range", [&]() {
     auto range = sce.animationTimeRange();

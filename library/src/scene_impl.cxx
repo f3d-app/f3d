@@ -296,9 +296,9 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
 }
 
 //----------------------------------------------------------------------------
-scene& scene_impl::add(const double startTime, const double endTime, MeshCallback&& callback)
+scene& scene_impl::add(std::vector<double> times, MeshCallback&& callback)
 {
-  if (startTime > endTime)
+  if (times[1] < times[0])
   {
     throw scene::load_failure_exception("startTime must be less than or equal to endTime");
   }
@@ -314,7 +314,7 @@ scene& scene_impl::add(const double startTime, const double endTime, MeshCallbac
     vtkMesh->SetFaces(mesh.face_sides, mesh.face_indices);
   };
 
-  vtkSource->SetAnimatedMesh(startTime, endTime, std::move(wrappedCallback));
+  vtkSource->SetAnimatedMesh(times[0], times[1], std::move(wrappedCallback));
 
   auto importer = vtkSmartPointer<vtkF3DGenericImporter>::New();
   importer->SetInternalReader(vtkSource);
