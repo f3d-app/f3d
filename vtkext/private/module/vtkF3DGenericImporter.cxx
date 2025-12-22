@@ -142,12 +142,7 @@ void vtkF3DGenericImporter::CreateActorForBlock(
   Internals::BlockData& bd = this->Pimpl->Blocks.back();
   bd.Name = blockName;
 
-  bd.PostPro->SetInputDataObject(block);
-  bd.PostPro->Update();
-
-  bd.Points = vtkPolyData::SafeDownCast(bd.PostPro->GetOutput(1));
-  vtkImageData* image = vtkImageData::SafeDownCast(bd.PostPro->GetOutput(2));
-  bd.Image = (image && image->GetNumberOfCells() > 0) ? image : nullptr;
+  this->Pimpl->UpdateBlock(bd, block);
 
   bd.Mapper->SetInputConnection(bd.PostPro->GetOutputPort(0));
   bd.Mapper->ScalarVisibilityOff();
