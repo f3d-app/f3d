@@ -1,0 +1,11 @@
+[
+  {
+    "bindings": {
+      "Shift+Space": "jump_to_frame -1 true",
+      "Ctrl+Space": "jump_to_frame 1 true",
+      "Ctrl+Shift+F": "jump_to_frame 0 false",
+      "Ctrl+Shift+L": "jump_to_frame -1 false",
+      "Ctrl+Shift+M": "jump_to_frame 20 false"
+    }
+  }
+]

@@ -1,0 +1,18 @@
+# StreamVersion 1.2
+ExposeEvent 0 289 0 0 0 0 0
+RenderEvent 0 289 0 0 0 0 0
+TimerEvent 0 289 0 0 0 0 0
+
+# Ctrl + Space (3 Times)
+KeyPressEvent 1116 15 0 0 1 Control_L 0
+CharEvent 1116 15 0 0 1 Control_L 0
+KeyPressEvent 1116 15 2 0 1 space 0
+CharEvent 1116 15 2 0 1 space 0
+KeyReleaseEvent 1116 15 2 0 1 space 0
+KeyPressEvent 1116 15 2 0 1 space 0
+CharEvent 1116 15 2 0 1 space 0
+KeyReleaseEvent 1116 15 2 0 1 space 0
+KeyPressEvent 1116 15 2 0 1 space 0
+CharEvent 1116 15 2 0 1 space 0
+KeyReleaseEvent 1116 15 2 0 1 space 0
+KeyReleaseEvent 1116 15 2 0 1 Control_L 0
