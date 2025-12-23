@@ -581,6 +581,12 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       return false;
     }
 
+    // check version number for 6
+    if (header->version != 6){
+      vtkErrorWithObjectMacro(this->Parent, "Incorrect version number for a Quake MDL file");
+      return false;
+    }
+
     // Create textures
     if (header->numSkins > 0 && header->skinWidth > 0 && header->skinHeight > 0)
     {
