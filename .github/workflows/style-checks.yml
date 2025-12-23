@@ -32,7 +32,9 @@ jobs:
         shell: bash
         run: |
           pip install codespell
-          [[ -n "$(codespell -fHw --quiet=48 .)" ]] && exit 1 || exit 0
+          codespell -fHw --quiet=51 . > out.txt
+          cat out.txt
+          [[ -n "$(cat out.txt)" ]] && exit 1 || exit 0
 
       - name: C++ Formatting
         uses: DoozyX/clang-format-lint-action@v0.16
