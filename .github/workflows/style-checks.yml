@@ -30,7 +30,6 @@ jobs:
       # Run codespell first to avoid issues with style check on same location
       - name: Codespell in place
         shell: bash
-        continue-on-error: true
         run: |
           pip install codespell
           codespell -fHw .
