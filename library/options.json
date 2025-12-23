@@ -187,15 +187,18 @@
     },
     "x_color": {
       "type": "color",
-      "default_value": "0.841107, 0.16327, 0.120593"
+      "default_value": "0.841107, 0.16327, 0.120593",
+      "comment": "Closest color to red"
     },
     "y_color": {
       "type": "color",
-      "default_value": "0.19516, 0.553311, 0.174"
+      "default_value": "0.19516, 0.553311, 0.174",
+      "comment": "Closest color to green"
     },
     "z_color": {
       "type": "color",
-      "default_value": "0.127357, 0.429147, 0.937383"
+      "default_value": "0.127357, 0.429147, 0.937383",
+      "comment": "Closest color to blue"
     },
     "scalar_bar": {
       "type": "bool",
