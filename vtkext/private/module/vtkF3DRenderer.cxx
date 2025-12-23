@@ -645,6 +645,16 @@ void vtkF3DRenderer::ShowAxis(bool show)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::ConfigureAxesActor(){
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251001)
+    this->ModernAxisRepresentation->SetXAxisColor(this->ColorAxisX);
+    this->ModernAxisRepresentation->SetYAxisColor(this->ColorAxisY);
+    this->ModernAxisRepresentation->SetZAxisColor(this->ColorAxisZ);
+    this->AxesActorConfigured = true;
+#endif
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetGridAbsolute(bool absolute)
 {
   if (this->GridAbsolute != absolute)
@@ -703,7 +713,7 @@ void vtkF3DRenderer::SetAxesColor(const std::vector<double>& colorXAxis,
     std::copy(colorYAxis.begin(), colorYAxis.end(), this->ColorAxisY);
     std::copy(colorZAxis.begin(), colorZAxis.end(), this->ColorAxisZ);
     this->GridConfigured = false;
-    this->AxesColorConfigured = false;
+    this->AxesActorConfigured = false;
   }
 }
 
@@ -1967,15 +1977,11 @@ void vtkF3DRenderer::UpdateActors()
     this->ConfigureGridUsingCurrentActors();
   }
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251001)
-  if (!this->AxesColorConfigured && this->ModernAxisRepresentation)
+  if (!this->AxesActorConfigured && this->ModernAxisRepresentation)
   {
-    this->ModernAxisRepresentation->SetXAxisColor(this->ColorAxisX);
-    this->ModernAxisRepresentation->SetYAxisColor(this->ColorAxisY);
-    this->ModernAxisRepresentation->SetZAxisColor(this->ColorAxisZ);
-    this->AxesColorConfigured = true;
+    this->ConfigureAxesActor();
   }
-#endif
+
 }
 
 //----------------------------------------------------------------------------
