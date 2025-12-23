@@ -188,9 +188,9 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   vtkSmartPointer<vtkTexture> CreateTexture(const std::vector<uint8_t>& buffer, size_t& offset,
     int skinWidth, int skinHeight, unsigned int nbSkins, unsigned int skinIndex)
   {
-    auto safe_mul = [](int a, int b) -> int
+    auto safe_mul = [](size_t a, size_t b) -> size_t
     {
-      if (b > 0 && a > std::numeric_limits<int>::max() / b)
+      if (a != 0 && b > std::numeric_limits<size_t>::max() / a)
       {
         // overflow handling
         throw F3DMathError("Multiplication overflow");
@@ -198,17 +198,12 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       return a * b;
     };
 
-    auto safe_add = [](int a, int b) -> int
+    auto safe_add = [](size_t a, size_t b) -> size_t
     {
-      // Check for positive overflow
-      if (b > 0 && a > std::numeric_limits<int>::max() - b)
+      if (a != 0 && a > std::numeric_limits<size_t>::max() - b)
       {
+        // overflow handling
         throw F3DMathError("Addition overflow");
-      }
-      // Check for negative overflow (underflow)
-      if (b < 0 && a < std::numeric_limits<int>::min() - b)
-      {
-        throw F3DMathError("Addition underflow");
       }
       return a + b;
     };
@@ -218,7 +213,10 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       // check if all the data for this operation exists
       try
       {
-        if (safe_add(offset, safe_mul(skinHeight - 1, skinWidth - 1)) >= buffer.size())
+        size_t checkHeight = static_cast<size_t>(skinHeight) - 1;
+        size_t checkWidth = static_cast<size_t>(skinWidth) - 1;
+        if (skinHeight > 0 && skinWidth > 0 &&
+          safe_add(offset, safe_mul(checkHeight, checkWidth)) >= buffer.size())
         {
           throw F3DRangeError("Skin dimentions out of bounds of file size");
         }
