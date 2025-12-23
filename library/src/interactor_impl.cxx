@@ -614,7 +614,8 @@ public:
       this->CommandBuffer.reset();
     }
 
-    this->AnimationManager->Tick(deltaTime);
+    this->AnimationManager->SetDeltaTime(deltaTime);
+    this->AnimationManager->Tick();
 
     vtkRenderWindow* renWin = this->Window.GetRenderWindow();
     vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
@@ -1097,6 +1098,7 @@ interactor& interactor_impl::initCommands()
       check_args(args, 2, "jump_to_frame");
       const int frame = options::parse<int>(args[0]);
       const bool relative = options::parse<bool>(args[1]);
+      this->Internals->AnimationManager->SetDeltaTime(this->Internals->CallbackDeltaTime);
       this->Internals->AnimationManager->JumpToFrame(frame, relative);
     });
 

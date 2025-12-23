@@ -99,10 +99,15 @@ public:
   }
 
   /**
+   *Set the animation in delta time in seconds
+   */
+  void SetDeltaTime(double deltaTime);
+
+  /**
    * Advance animationTime of deltaTime and call loadAtTime accordingly
    * Do nothing if IsPlaying is false
    */
-  void Tick(double deltaTime);
+  void Tick();
 
   /**
    * Load animation at provided time value
