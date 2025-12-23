@@ -422,7 +422,7 @@ public:
       };
     };
 
-    /* try substituting incrementing number until file doesn't exist already */
+    /* try substituting incrementing number until file doesnt exist already */
     for (size_t i = 1; i <= maxNumberingAttempts; ++i)
     {
       const std::string candidate =
