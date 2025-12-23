@@ -30,10 +30,9 @@ jobs:
       # Run codespell first to avoid issues with style check on same location
       - name: Codespell in place
         shell: bash
-        continue-on-error: true
         run: |
           pip install codespell
-          codespell -fHw .
+          [[ -n "$(codespell -fHw --quiet=48 .)" ]] && exit 1 || exit 0
 
       - name: C++ Formatting
         uses: DoozyX/clang-format-lint-action@v0.16
