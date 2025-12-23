@@ -1,5 +1,5 @@
 #include <climits>
-#include <regex> // slow, but thats ok for a test
+#include <regex> // slow, but that's ok for a test
 #include <vtkCallbackCommand.h>
 #include <vtkCommand.h>
 #include <vtkDataSet.h>

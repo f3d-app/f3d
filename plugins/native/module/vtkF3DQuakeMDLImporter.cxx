@@ -163,7 +163,6 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     }
 
     return reinterpret_cast<const mdl_simpleframe_t*>(buffer.data() + offset);
-    ;
   }
 
   //----------------------------------------------------------------------------
