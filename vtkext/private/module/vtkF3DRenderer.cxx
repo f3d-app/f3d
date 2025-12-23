@@ -647,10 +647,10 @@ void vtkF3DRenderer::ShowAxis(bool show)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureAxesActor(){
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251001)
-    this->ModernAxisRepresentation->SetXAxisColor(this->ColorAxisX);
-    this->ModernAxisRepresentation->SetYAxisColor(this->ColorAxisY);
-    this->ModernAxisRepresentation->SetZAxisColor(this->ColorAxisZ);
-    this->AxesActorConfigured = true;
+  this->ModernAxisRepresentation->SetXAxisColor(this->ColorAxisX);
+  this->ModernAxisRepresentation->SetYAxisColor(this->ColorAxisY);
+  this->ModernAxisRepresentation->SetZAxisColor(this->ColorAxisZ);
+  this->AxesActorConfigured = true;
 #endif
 }
 
