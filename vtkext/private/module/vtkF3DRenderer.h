@@ -26,18 +26,18 @@
 
 namespace fs = std::filesystem;
 
-class vtkDiscretizableColorTransferFunction;
+class vtkCameraOrientationRepresentation;
+class vtkCameraOrientationWidget;
 class vtkColorTransferFunction;
 class vtkCornerAnnotation;
+class vtkDiscretizableColorTransferFunction;
+class vtkF3DOpenGLGridMapper;
 class vtkGridAxesActor3D;
 class vtkImageReader2;
 class vtkOrientationMarkerWidget;
-class vtkCameraOrientationRepresentation;
-class vtkCameraOrientationWidget;
 class vtkScalarBarActor;
 class vtkSkybox;
 class vtkTextActor;
-class vtkF3DOpenGLGridMapper;
 
 class vtkF3DRenderer : public vtkOpenGLRenderer
 {
@@ -119,7 +119,6 @@ public:
   void SetGridColor(const std::vector<double>& color);
   void SetAxesColor(const std::vector<double>& colorXAxis, const std::vector<double>& colorYAxis,
     const std::vector<double>& colorZAxis);
-  void ConfigureAxesActor();
   ///@}
 
   /**
@@ -453,6 +452,11 @@ public:
    * Should be called before Render() if CheatSheetInfoNeedsUpdate() returns true.
    */
   void ConfigureCheatSheet(const std::vector<vtkF3DUIActor::CheatSheetGroup>& info);
+
+  /**
+   * Configure Axes (X,Y,Z) colors on the widget
+   */
+  void ConfigureAxesActor();
 
   /**
    * Use this method to flag in the renderer that the cheatsheet needs to be updated
