@@ -4,6 +4,7 @@
 #include "vtkF3DPostProcessFilter.h"
 
 #include <vtkActor.h>
+#include <vtkDoubleArray.h>
 #include <vtkCompositeDataIterator.h>
 #include <vtkDataAssembly.h>
 #include <vtkEventForwarderCommand.h>
@@ -45,6 +46,9 @@ struct vtkF3DGenericImporter::Internals
   bool AnimationEnabled = false;
   std::array<double, 2> TimeRange;
 
+  int NumberOfTimeSteps = 0;
+  vtkNew<vtkDoubleArray> TimeSteps;
+
   void UpdateBlock(BlockData& bd, vtkDataSet* dataset)
   {
     bd.PostPro->SetInputDataObject(dataset);
@@ -76,6 +80,23 @@ void vtkF3DGenericImporter::UpdateTemporalInformation()
     this->Pimpl->TimeRange[0] = readerTimeRange[0];
     this->Pimpl->TimeRange[1] = readerTimeRange[1];
     this->Pimpl->HasAnimation = true;
+  }
+
+  if (readerInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS())) 
+  {
+    const double* readerTimeSteps = readerInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+    const int readerNumberOfTimeSteps =
+      readerInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+
+    // Update TimeSteps only if memory allocation call is success 
+    if (this->Pimpl->TimeSteps->SetNumberOfValues(readerNumberOfTimeSteps))
+    {
+      for (vtkIdType i = 0; i < readerNumberOfTimeSteps; i++)
+      {
+        this->Pimpl->TimeSteps->SetValue(i, readerTimeSteps[i]);
+      }
+      this->Pimpl->NumberOfTimeSteps = readerNumberOfTimeSteps;
+    }
   }
 }
 
@@ -121,14 +142,20 @@ bool vtkF3DGenericImporter::IsAnimationEnabled([[maybe_unused]] vtkIdType animat
 
 //----------------------------------------------------------------------------
 bool vtkF3DGenericImporter::GetTemporalInformation([[maybe_unused]] vtkIdType animationIndex,
-  double timeRange[2], int& vtkNotUsed(nbTimeSteps), vtkDoubleArray* vtkNotUsed(timeSteps))
+  double timeRange[2], int& nbTimeSteps, vtkDoubleArray* timeSteps)
 {
   assert(animationIndex == 0);
-  // F3D do not care about timesteps
+  // F3D now cares about timesteps
   if (this->Pimpl->HasAnimation)
   {
     timeRange[0] = this->Pimpl->TimeRange[0];
     timeRange[1] = this->Pimpl->TimeRange[1];
+
+    if (timeSteps != nullptr)
+    {
+      nbTimeSteps = this->Pimpl->NumberOfTimeSteps;
+      timeSteps->DeepCopy(this->Pimpl->TimeSteps);
+    }
     return true;
   }
   return false;

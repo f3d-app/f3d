@@ -3,6 +3,12 @@ include(CMakeDependentOption)
 
 # Generic CMake variables, should be done before project()
 set(output_postfix "")
+
+
+# set( CMAKE_C_COMPILER "D:/Program Files (x86)/VisualStudio/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/cl.exe" )
+# set( CMAKE_CXX_COMPILER "D:/Program Files (x86)/VisualStudio/VC/Tools/MSVC/14.50.35717/bin/Hostx64/x64/cl.exe" )
+  
+  
 get_property(F3D_MULTI_CONFIG_GENERATOR GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 if(${F3D_MULTI_CONFIG_GENERATOR})
   set(output_postfix "_$<CONFIG>")
