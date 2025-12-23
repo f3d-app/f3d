@@ -20,6 +20,7 @@
 #include "vtkF3DUIObserver.h"
 
 #include <vtkCallbackCommand.h>
+#include <vtkCamera.h>
 #include <vtkCellPicker.h>
 #include <vtkGenericRenderWindowInteractor.h>
 #include <vtkMath.h>
@@ -45,6 +46,7 @@
 #include <vector>
 
 #include "camera.h"
+#include "camera_impl.h"
 
 namespace fs = std::filesystem;
 
@@ -1134,6 +1136,14 @@ interactor& interactor_impl::initCommands()
       vtkMath::Normalize(newUp);
 
       this->Internals->Options.scene.up_direction = { newUp[0], newUp[1], newUp[2] };
+
+      auto& cam = static_cast<camera_impl&>(this->Internals->Window.getCamera());
+      point3_t foc = cam.getFocalPoint();
+      vtkNew<vtkTransform> camTransform;
+      camTransform->Translate(foc[0], foc[1], foc[2]);
+      camTransform->RotateWXYZ(angle, axis);
+      camTransform->Translate(-foc[0], -foc[1], -foc[2]);
+      cam.GetVTKCamera()->ApplyTransform(camTransform);
 
       this->Internals->Style->ResetTemporaryUp();
     },
