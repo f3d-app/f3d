@@ -623,7 +623,7 @@ bool TransferToDocument(vtkF3DOCCTReader* that, T& reader, Handle(TDocStd_Docume
   }
   else
   {
-    vtkErrorWithObjectMacro(that, "Failed opening file or stream");
+    vtkErrorWithObjectMacro(that, "Failed to read file or stream");
     return false;
   }
 }
@@ -668,8 +668,7 @@ int vtkF3DOCCTReader::RequestData(
       }
       success = !shape.IsNull();
 #else
-      vtkErrorMacro(
-        "This version of VTK doesn't support reading memory stream with OCCT");
+      vtkErrorMacro("This version of VTK doesn't support reading memory stream with OCCT");
       return 0;
 #endif
     }
@@ -703,7 +702,7 @@ int vtkF3DOCCTReader::RequestData(
     }
     else
     {
-      vtkErrorMacro("Failed opening file or stream");
+      vtkErrorMacro("Failed to read BREP file or stream");
       return 0;
     }
   }
@@ -742,8 +741,7 @@ int vtkF3DOCCTReader::RequestData(
         success = false;
       }
 #else
-      vtkErrorMacro(
-        "This version of VTK doesn't support reading memory stream with OCCT");
+      vtkErrorMacro("This version of VTK doesn't support reading memory stream with OCCT");
       return 0;
 #endif
     }
@@ -816,9 +814,8 @@ int vtkF3DOCCTReader::RequestData(
     this->Buffer = std::make_unique<std::istream>(this->Streambuf.get());
     ret = reader->ReadStream("", *this->Buffer.get());
 #else
-      vtkErrorMacro(
-        "This version of VTK doesn't support reading memory stream with OCCT");
-      return false;
+    vtkErrorMacro("This version of VTK doesn't support reading memory stream with OCCT");
+    return false;
 #endif
   }
   else

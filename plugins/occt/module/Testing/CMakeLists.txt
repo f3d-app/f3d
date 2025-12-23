@@ -6,6 +6,7 @@ list(APPEND vtkextOCCT_list
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251210)
   list(APPEND vtkextOCCT_list
      TestF3DOCCTReaderStream.cxx
+     TestF3DOCCTReaderStreamError.cxx
       )
 endif()
 
