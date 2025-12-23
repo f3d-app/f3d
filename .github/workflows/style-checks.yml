@@ -34,7 +34,7 @@ jobs:
           pip install codespell
           codespell -fHw --quiet=51 . > out.txt
           cat out.txt
-          [[ -n "$(cat out.txt)" ]] && exit 1 || exit 0
+          [[ -n "$(cat out.txt)" ]] && exit 1 || rm out.txt && exit 0
 
       - name: C++ Formatting
         uses: DoozyX/clang-format-lint-action@v0.16
