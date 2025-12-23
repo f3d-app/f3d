@@ -20,7 +20,6 @@
 #include "vtkF3DUIObserver.h"
 
 #include <vtkCallbackCommand.h>
-#include <vtkCamera.h>
 #include <vtkCellPicker.h>
 #include <vtkGenericRenderWindowInteractor.h>
 #include <vtkMath.h>
@@ -31,8 +30,8 @@
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRendererCollection.h>
-#include <vtkTransform.h>
 #include <vtkStringArray.h>
+#include <vtkTransform.h>
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
 
@@ -46,7 +45,6 @@
 #include <vector>
 
 #include "camera.h"
-#include "camera_impl.h"
 
 namespace fs = std::filesystem;
 
@@ -1117,37 +1115,42 @@ interactor& interactor_impl::initCommands()
     command_documentation_t{ "azimuth_camera value", "tilt the camera right or left" });
 
   this->addCommand(
-    "rotate_up",
+    "set_up",
     [&](const std::vector<std::string>& args)
     {
-      check_args(args, 2, "rotate_up");
+      check_args(args, 1, "set_up");
 
-      f3d::direction_t axisDir = options::parse<f3d::direction_t>(args[0]);
-      double axis[3] = { axisDir[0], axisDir[1], axisDir[2] };
-      vtkMath::Normalize(axis);
-      double angle = options::parse<double>(args[1]);
-
-      const double* currentUp = this->Internals->Options.scene.up_direction.data();
-
-      vtkNew<vtkTransform> transform;
-      transform->RotateWXYZ(angle, axis);
-      double newUp[3];
-      transform->TransformPoint(currentUp, newUp);
+      f3d::direction_t newUpDir = options::parse<f3d::direction_t>(args[0]);
+      double newUp[3] = { newUpDir[0], newUpDir[1], newUpDir[2] };
       vtkMath::Normalize(newUp);
 
-      this->Internals->Options.scene.up_direction = { newUp[0], newUp[1], newUp[2] };
+      const double* oldUp = this->Internals->Options.scene.up_direction.data();
 
-      auto& cam = static_cast<camera_impl&>(this->Internals->Window.getCamera());
+      double axis[3];
+      vtkMath::Cross(oldUp, newUp, axis);
+      double sinAngle = vtkMath::Normalize(axis);
+      double cosAngle = vtkMath::Dot(oldUp, newUp);
+      double angle = std::atan2(sinAngle, cosAngle) * 180.0 / vtkMath::Pi();
+
+      camera& cam = this->Internals->Window.getCamera();
       point3_t foc = cam.getFocalPoint();
       vtkNew<vtkTransform> camTransform;
       camTransform->Translate(foc[0], foc[1], foc[2]);
       camTransform->RotateWXYZ(angle, axis);
       camTransform->Translate(-foc[0], -foc[1], -foc[2]);
-      cam.GetVTKCamera()->ApplyTransform(camTransform);
 
+      point3_t pos = cam.getPosition();
+      camTransform->TransformPoint(pos.data(), pos.data());
+      cam.setPosition(pos);
+
+      vector3_t viewUp = cam.getViewUp();
+      camTransform->TransformVector(viewUp.data(), viewUp.data());
+      cam.setViewUp(viewUp);
+
+      this->Internals->Options.scene.up_direction = { newUp[0], newUp[1], newUp[2] };
       this->Internals->Style->ResetTemporaryUp();
     },
-    command_documentation_t{ "rotate_up axis angle", "rotate the scene up vector around an axis" });
+    command_documentation_t{ "set_up axis", "set the scene up direction" });
 
   this->addCommand(
     "increase_light_intensity",
@@ -1649,14 +1652,14 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::ANY, "1"}, "set_camera front", "Camera", std::bind(docStr, "Front View camera"));
   this->addBinding({mod_t::ANY, "2"}, "elevation_camera -90", "Camera", std::bind(docStr, "Rotate camera down"));
   this->addBinding({mod_t::ANY, "3"}, "set_camera right", "Camera", std::bind(docStr, "Right View camera"));
-  this->addBinding({mod_t::NONE, "4"}, "roll_camera -90", "Camera", std::bind(docStr, "Rotate camera right"));
-  this->addBinding({mod_t::CTRL, "4"}, "rotate_up x 90", "Scene", std::bind(docStr, "Rotate scene up +90 around X"));
+  this->addBinding({mod_t::ANY, "4"}, "roll_camera -90", "Camera", std::bind(docStr, "Rotate camera right"));
   this->addBinding({mod_t::ANY, "5"}, "toggle scene.camera.orthographic", "Camera", std::bind(docTglOpt, "Orthographic Projection", std::cref(opts.scene.camera.orthographic)), f3d::interactor::BindingType::TOGGLE);
-  this->addBinding({mod_t::NONE, "6"}, "roll_camera 90", "Camera", std::bind(docStr, "Rotate camera left"));
-  this->addBinding({mod_t::CTRL, "6"}, "rotate_up x -90", "Scene", std::bind(docStr, "Rotate scene up -90 around X"));
+  this->addBinding({mod_t::ANY, "6"}, "roll_camera 90", "Camera", std::bind(docStr, "Rotate camera left"));
   this->addBinding({mod_t::ANY, "7"}, "set_camera top", "Camera", std::bind(docStr, "Top View camera"));
   this->addBinding({mod_t::ANY, "8"}, "elevation_camera 90", "Camera", std::bind(docStr, "Rotate camera up"));
   this->addBinding({mod_t::ANY, "9"}, "set_camera isometric", "Camera", std::bind(docStr, "Isometric View camera"));
+  this->addBinding({mod_t::CTRL, "Y"}, "set_up +Y", "Scene", std::bind(docStr, "Set scene up direction to +Y"));
+  this->addBinding({mod_t::CTRL, "Z"}, "set_up +Z", "Scene", std::bind(docStr, "Set scene up direction to +Z"));
 #if F3D_MODULE_UI
   this->addBinding({mod_t::NONE, "H"}, "toggle ui.cheatsheet", "Others", std::bind(docStr, "Cheatsheet"));
   this->addBinding({mod_t::NONE, "Escape"}, "toggle ui.console", "Others", std::bind(docStr, "Console"));
