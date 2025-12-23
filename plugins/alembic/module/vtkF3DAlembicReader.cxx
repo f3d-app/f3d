@@ -48,6 +48,14 @@ struct IntermediateGeometry
   bool nFaceVarying = false;
 };
 
+struct CachedMesh
+{
+  vtkSmartPointer<vtkCellArray> Cells;
+  // Maps the original Alembic Point Index to a list of VTK Point IDs.
+  std::vector<std::vector<vtkIdType>> RawPointToVTKPointsMap;
+  vtkIdType NumVTKPoints;
+};
+
 class vtkF3DAlembicReader::vtkInternals
 {
   void SetupIndicesStorage(const Alembic::AbcGeom::Int32ArraySamplePtr& faceVertexCounts,
@@ -244,6 +252,7 @@ class vtkF3DAlembicReader::vtkInternals
   }
 
 public:
+  std::map<std::string, CachedMesh> MeshCache;
   vtkSmartPointer<vtkPolyData> ProcessIPolyMesh(
     const Alembic::AbcGeom::IPolyMesh& pmesh, double time, const Alembic::Abc::M44d& matrix)
   {
