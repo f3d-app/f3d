@@ -9,7 +9,7 @@ if(APPLE)
 endif()
 
 if(WIN32)
-  set(CP_SEP "\;")
+  set(CP_SEP "$<SEMICOLON>")
 else()
   set(CP_SEP ":")
 endif()
