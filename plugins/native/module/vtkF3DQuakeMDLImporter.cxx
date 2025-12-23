@@ -188,9 +188,9 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   vtkSmartPointer<vtkTexture> CreateTexture(const std::vector<uint8_t>& buffer, size_t& offset,
     int skinWidth, int skinHeight, unsigned int nbSkins, unsigned int skinIndex)
   {
-    auto safe_mul = [](int a, int b) -> int
+    auto safe_mul = [](int64_t a, int64_t b) -> int64_t
     {
-      if (b > 0 && a > std::numeric_limits<int>::max() / b)
+      if (b > 0 && a > std::numeric_limits<int64_t>::max() / b)
       {
         // overflow handling
         throw F3DMathError("Multiplication overflow");
@@ -198,15 +198,15 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       return a * b;
     };
 
-    auto safe_add = [](int a, int b) -> int
+    auto safe_add = [](int64_t a, int64_t b) -> int64_t
     {
       // Check for positive overflow
-      if (b > 0 && a > std::numeric_limits<int>::max() - b)
+      if (b > 0 && a > std::numeric_limits<int64_t>::max() - b)
       {
         throw F3DMathError("Addition overflow");
       }
       // Check for negative overflow (underflow)
-      if (b < 0 && a < std::numeric_limits<int>::min() - b)
+      if (b < 0 && a < std::numeric_limits<int64_t>::min() - b)
       {
         throw F3DMathError("Addition underflow");
       }
