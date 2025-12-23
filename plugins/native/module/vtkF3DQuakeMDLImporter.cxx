@@ -137,6 +137,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     return ptr;
   }
 
+  //----------------------------------------------------------------------------
   // Safer buffer typecasting of arbitrary buffer location with variable length data
   static const mdl_simpleframe_t* PeekFromVectorSimpleframe(
     const std::vector<uint8_t>& buffer, const size_t& offset, size_t num_verts = 0)
@@ -156,6 +157,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     ;
   }
 
+  //----------------------------------------------------------------------------
   // Safer buffer typecasting with auto offset interating
   const mdl_simpleframe_t* ReadFromVectorSimpleframe(
     const std::vector<uint8_t>& buffer, size_t& offset, size_t num_verts = 0)
