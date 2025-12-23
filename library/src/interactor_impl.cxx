@@ -1509,11 +1509,16 @@ interactor& interactor_impl::initBindings()
   // "Cycle array to color with" , "arrayName"
   auto docArray = [&]()
   {
+    // enable + no array : ON
+    // enable + array : array
+    // no enable + array : array (forced)
+    // no enable + no array : OFF
     return std::pair("Color array",
       (opts.model.scivis.array_name.has_value()
           ? shortName(opts.model.scivis.array_name.value(), 15) +
             (opts.model.scivis.enable ? "" : " (forced)")
-          : "OFF"));
+          : opts.model.scivis.enable ? "ON"
+                                     : "OFF"));
   };
 
   // "Cycle component to color with" , "component"
