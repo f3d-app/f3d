@@ -52,7 +52,7 @@ public class InteractiveApp {
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        interactor.requestStop();
+                        interactor.stop();
                         timer.cancel();
                     }
                 }, timeout * 1000L);
