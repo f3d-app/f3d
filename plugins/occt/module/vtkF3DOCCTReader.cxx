@@ -598,8 +598,7 @@ bool TransferToDocument(vtkF3DOCCTReader* that, T& reader, Handle(TDocStd_Docume
   vtkResourceStream* stream = that->GetStream();
   if (stream)
   {
-// TODO VERSION
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251210)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251223)
     // Encapsulate resource stream into an istream
     stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
     auto strbuf = stream->ToStreambuf();
@@ -647,8 +646,7 @@ int vtkF3DOCCTReader::RequestData(
     vtkResourceStream* stream = this->GetStream();
     if (stream)
     {
-// TODO VERSION
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251210)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251223)
       // Encapsulate resource stream into an istream
       stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
       this->Streambuf = stream->ToStreambuf();
@@ -729,8 +727,7 @@ int vtkF3DOCCTReader::RequestData(
     vtkResourceStream* stream = this->GetStream();
     if (stream)
     {
-// TODO VERSION
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251210)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251223)
       // Encapsulate resource stream into an istream
       stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
       this->Streambuf = stream->ToStreambuf();
@@ -806,8 +803,7 @@ int vtkF3DOCCTReader::RequestData(
   IFSelect_ReturnStatus ret;
   if (stream)
   {
-// TODO VERSION
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251210)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251223)
     // Encapsulate resource stream into an istream
     stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
     this->Streambuf = stream->ToStreambuf();

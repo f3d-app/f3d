@@ -2,8 +2,7 @@ list(APPEND vtkextOCCT_list
      TestF3DOCCTReader.cxx
     )
 
-# TODO VERSION
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251210)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251223)
   list(APPEND vtkextOCCT_list
      TestF3DOCCTReaderStream.cxx
      TestF3DOCCTReaderStreamError.cxx
