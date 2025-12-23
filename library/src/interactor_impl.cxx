@@ -1125,7 +1125,7 @@ interactor& interactor_impl::initCommands()
       vtkMath::Normalize(axis);
       double angle = options::parse<double>(args[1]);
 
-      const double* currentUp = this->Internals->Window.GetRenderer()->GetUpVector();
+      const double* currentUp = this->Internals->Options.scene.up_direction.data();
 
       vtkNew<vtkTransform> transform;
       transform->RotateWXYZ(angle, axis);

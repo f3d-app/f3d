@@ -511,10 +511,10 @@ private:
   ///@}
 
   /**
-   * Apply the given up and right vectors to the scene.
+   * Apply the given up vector to the scene, computing an appropriate right vector.
    * Updates UpVector, RightVector, skybox floor, and environment orientation.
    */
-  void ApplyUpVector(const std::array<double, 3>& up, const std::array<double, 3>& right);
+  void ApplyUpVector(const std::array<double, 3>& up);
 
   /**
    * Configure all actors properties

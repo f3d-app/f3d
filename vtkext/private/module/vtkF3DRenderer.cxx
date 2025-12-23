@@ -344,9 +344,14 @@ void vtkF3DRenderer::Initialize()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::ApplyUpVector(
-  const std::array<double, 3>& up, const std::array<double, 3>& right)
+void vtkF3DRenderer::ApplyUpVector(const std::array<double, 3>& up)
 {
+  std::array<double, 3> right = { 1, 0, 0 };
+  if (std::abs(vtkMath::Dot(right.data(), up.data())) > 0.999)
+  {
+    right = { 0, 1, 0 };
+  }
+
   std::array<double, 3> front;
   vtkMath::Cross(right.data(), up.data(), front.data());
   vtkMath::Normalize(front.data());
@@ -377,7 +382,6 @@ void vtkF3DRenderer::InitializeUpVector(const std::vector<double>& upVec)
   };
 
   std::array<double, 3> up = { upVec[0], upVec[1], upVec[2] };
-  std::array<double, 3> right = { 1, 0, 0 };
 
   /* if `up` is `(0,0,0)` make it `(0,1,0)` */
   if (isNullVector(up))
@@ -387,13 +391,7 @@ void vtkF3DRenderer::InitializeUpVector(const std::vector<double>& upVec)
   }
   vtkMath::Normalize(up.data());
 
-  /* make sure `right` is not colinear with `up` */
-  if (::abs(vtkMath::Dot(right, up)) > 0.999)
-  {
-    right = { 0, 1, 0 };
-  }
-
-  this->ApplyUpVector(up, right);
+  this->ApplyUpVector(up);
 
   std::array<double, 3> pos;
   vtkMath::Cross(this->UpVector, this->RightVector, pos.data());
@@ -422,13 +420,7 @@ void vtkF3DRenderer::SetUpDirection(const std::vector<double>& upVec)
 
   vtkMath::Normalize(up.data());
 
-  std::array<double, 3> right = { 1, 0, 0 };
-  if (std::abs(vtkMath::Dot(right.data(), up.data())) > 0.999)
-  {
-    right = { 0, 1, 0 };
-  }
-
-  this->ApplyUpVector(up, right);
+  this->ApplyUpVector(up);
   this->GridConfigured = false;
 }
 
