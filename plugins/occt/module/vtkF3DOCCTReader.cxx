@@ -841,7 +841,7 @@ int vtkF3DOCCTReader::RequestData(
   }
   else
   {
-    vtkErrorMacro("Unable to read STEP or IGES file");
+    vtkErrorMacro("Failed to read STEP or IGES file");
     return 0;
   }
 
