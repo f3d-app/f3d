@@ -2582,16 +2582,13 @@ void vtkF3DRenderer::SetUseInverseOpacityFunction(bool use)
       if (volume.Prop)
       {
         vtkPiecewiseFunction* pwf = volume.Prop->GetProperty()->GetScalarOpacity();
-        if (pwf->GetSize() == 2)
-        {
-          double range[2];
-          pwf->GetRange(range);
+        double range[2];
+        pwf->GetRange(range);
 
-          pwf->RemoveAllPoints();
+        pwf->RemoveAllPoints();
 
-          vtkF3DRenderer::ConfigureOpacityTransferFunction(
-            pwf, range, this->OpacityMap, this->UseInverseOpacityFunction);
-        }
+        vtkF3DRenderer::ConfigureOpacityTransferFunction(
+          pwf, range, this->OpacityMap, this->UseInverseOpacityFunction);
       }
     }
     this->VolumePropsAndMappersConfigured = false;
@@ -2967,17 +2964,16 @@ bool vtkF3DRenderer::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vt
     }
   }
 
-  vtkNew<vtkVolumeProperty> property;
-  property->SetColor(ctf);
-
+  vtkPiecewiseFunction* otf = volume->GetProperty()->GetScalarOpacity();
   if (!opacityTransferFunctionConfigured)
   {
-    vtkNew<vtkPiecewiseFunction> otf;
     vtkF3DRenderer::ConfigureOpacityTransferFunction(otf, range, opacityMap, inverseOpacityFlag);
     opacityTransferFunctionConfigured = true;
-    property->SetScalarOpacity(otf);
   }
 
+  vtkNew<vtkVolumeProperty> property;
+  property->SetColor(ctf);
+  property->SetScalarOpacity(otf);
   property->ShadeOff();
   property->SetInterpolationTypeToLinear();
 
