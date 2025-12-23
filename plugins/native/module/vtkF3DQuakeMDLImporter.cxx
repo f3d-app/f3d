@@ -112,6 +112,15 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     }
   };
 
+  class F3DMathError : public std::overflow_error
+  {
+  public:
+    explicit F3DMathError(const std::string& what = "")
+      : std::overflow_error(what)
+    {
+    }
+  };
+
   //----------------------------------------------------------------------------
   // Safer buffer typecasting of arbitrary buffer location
   template<typename TYPE>
@@ -179,12 +188,45 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   vtkSmartPointer<vtkTexture> CreateTexture(const std::vector<uint8_t>& buffer, size_t& offset,
     int skinWidth, int skinHeight, unsigned int nbSkins, unsigned int skinIndex)
   {
+    auto safe_mul = [](int a, int b) -> int
+    {
+      if (b > 0 && a > std::numeric_limits<int>::max() / b)
+      {
+        // overflow handling
+        throw F3DMathError("Multiplication overflow");
+      }
+      return a * b;
+    };
+
+    auto safe_add = [](int a, int b) -> int
+    {
+      // Check for positive overflow
+      if (b > 0 && a > std::numeric_limits<int>::max() - b)
+      {
+        throw F3DMathError("Addition overflow");
+      }
+      // Check for negative overflow (underflow)
+      if (b < 0 && a < std::numeric_limits<int>::min() - b)
+      {
+        throw F3DMathError("Addition underflow");
+      }
+      return a + b;
+    };
+
     auto make_new_skin = [&](vtkNew<vtkImageData>& skin)
     {
       // check if all the data for this operation exists
-      if (offset + (skinHeight - 1) * (skinWidth - 1) >= buffer.size())
+      try
       {
-        throw F3DRangeError("Failed to read data for skin.");
+        if (safe_add(offset, safe_mul(skinHeight - 1, skinWidth - 1)) >= buffer.size())
+        {
+          throw F3DRangeError("Skin dimentions out of bounds of file size");
+        }
+      }
+      catch (const F3DMathError& e)
+      {
+        // Catch safe math errors and rethrow range indexing error
+        throw F3DRangeError("Skin dimentions out of bounds of size_t");
       }
       skin->SetDimensions(skinWidth, skinHeight, 1);
       skin->AllocateScalars(VTK_UNSIGNED_CHAR, 3);
@@ -584,7 +626,8 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     }
 
     // check version number for 6
-    if (header->version != 6){
+    if (header->version != 6)
+    {
       vtkErrorWithObjectMacro(this->Parent, "Incorrect version number for a Quake MDL file");
       return false;
     }
