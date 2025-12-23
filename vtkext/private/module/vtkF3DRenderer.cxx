@@ -2820,13 +2820,12 @@ void vtkF3DRenderer::ConfigureColoring()
       {
         // Initialize the visibility based on the mapper configuration
         visible = !std::string(volume.Mapper->GetArrayName()).empty();
-        if (!this->VolumePropsAndMappersConfigured && !this->OpacityTransferFunctionConfigured)
+        if (!this->VolumePropsAndMappersConfigured)
         {
           visible = vtkF3DRenderer::ConfigureVolumeForColoring(volume.Mapper, volume.Prop,
             info.value().Name, this->ComponentForColoring, this->ColorTransferFunction,
-            this->OpacityMap, this->ColorRange, this->UseCellColoring,
-            this->UseInverseOpacityFunction);
-          this->OpacityTransferFunctionConfigured = true;
+            this->OpacityMap, this->ColorRange, this->OpacityTransferFunctionConfigured,
+            this->UseCellColoring, this->UseInverseOpacityFunction);
           if (!visible)
           {
             F3DLog::Print(F3DLog::Severity::Warning,
@@ -2926,7 +2925,8 @@ bool vtkF3DRenderer::ConfigureMapperForColoring(vtkPolyDataMapper* mapper, const
 //----------------------------------------------------------------------------
 bool vtkF3DRenderer::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vtkVolume* volume,
   const std::string& name, int component, vtkColorTransferFunction* ctf,
-  std::vector<double>& opacityMap, double range[2], bool cellFlag, bool inverseOpacityFlag)
+  std::vector<double>& opacityMap, double range[2], bool& opacityTransferFunctionConfigured,
+  bool cellFlag, bool inverseOpacityFlag)
 {
   vtkDataSetAttributes* data = cellFlag
     ? static_cast<vtkDataSetAttributes*>(mapper->GetInput()->GetCellData())
@@ -2967,12 +2967,17 @@ bool vtkF3DRenderer::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vt
     }
   }
 
-  vtkNew<vtkPiecewiseFunction> otf;
-  vtkF3DRenderer::ConfigureOpacityTransferFunction(otf, range, opacityMap, inverseOpacityFlag);
-
   vtkNew<vtkVolumeProperty> property;
   property->SetColor(ctf);
-  property->SetScalarOpacity(otf);
+
+  if (!opacityTransferFunctionConfigured)
+  {
+    vtkNew<vtkPiecewiseFunction> otf;
+    vtkF3DRenderer::ConfigureOpacityTransferFunction(otf, range, opacityMap, inverseOpacityFlag);
+    opacityTransferFunctionConfigured = true;
+    property->SetScalarOpacity(otf);
+  }
+
   property->ShadeOff();
   property->SetInterpolationTypeToLinear();
 

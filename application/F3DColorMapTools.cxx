@@ -87,7 +87,8 @@ std::vector<double> Read1DMap(const fs::path& path, MapType type)
     if (channels < expectedChannels)
     {
       f3d::log::error("The specified ", (type == MapType::Color ? "color" : "opacity"),
-        " map must have at least ", expectedChannels, " channel(s)");
+        " map must have at least ", expectedChannels,
+        " channel" + std::string(expectedChannels > 1 ? "s" : ""));
       return {};
     }
 
@@ -118,7 +119,7 @@ std::vector<double> Read1DMap(const fs::path& path, MapType type)
   catch (const f3d::image::read_exception&)
   {
     f3d::log::error(
-      "Cannot read ", (type == MapType::Color ? "color" : "opacity"), " map at ", path);
+      "Cannot read ", (type == MapType::Color ? "colormap" : "opacity map"), " at ", path);
     return {};
   }
 }

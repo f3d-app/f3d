@@ -552,8 +552,8 @@ private:
    */
   static bool ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vtkVolume* volume,
     const std::string& name, int component, vtkColorTransferFunction* ctf,
-    std::vector<double>& opacityMap, double range[2], bool cellFlag = false,
-    bool inverseOpacityFlag = false);
+    std::vector<double>& opacityMap, double range[2], bool& opacityTransferFunctionConfigured,
+    bool cellFlag = false, bool inverseOpacityFlag = false);
 
   /**
    * Configure opacity transfer function for volume rendering
