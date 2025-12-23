@@ -218,13 +218,13 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         if (skinHeight > 0 && skinWidth > 0 &&
           safe_add(offset, safe_mul(checkHeight, checkWidth)) >= buffer.size())
         {
-          throw F3DRangeError("Skin dimentions out of bounds of file size");
+          throw F3DRangeError("Skin dimensions out of bounds of file size");
         }
       }
       catch (const F3DMathError& e)
       {
         // Catch safe math errors and rethrow range indexing error
-        throw F3DRangeError("Skin dimentions out of bounds of size_t");
+        throw F3DRangeError("Skin dimensions out of bounds of size_t");
       }
       skin->SetDimensions(skinWidth, skinHeight, 1);
       skin->AllocateScalars(VTK_UNSIGNED_CHAR, 3);
@@ -413,7 +413,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
 
           frameOffsets.emplace_back(std::vector<int>());
 
-          // check that we wont run off the buffer during loop
+          // check that we won't run off the buffer during loop
           if (offset +
               (*framePtr[i].nb *
                 (mdl_simpleframe_t_fixed_size + sizeof(mdl_vertex_t) * header->numVertices)) >
