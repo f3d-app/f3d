@@ -2677,6 +2677,7 @@ void vtkF3DRenderer::SetUseCellColoring(bool useCell)
   {
     this->UseCellColoring = useCell;
     this->ColorTransferFunctionConfigured = false;
+    this->OpacityTransferFunctionConfigured = false;
     this->ColoringMappersConfigured = false;
     this->ColoringPointSpritesMappersConfigured = false;
     this->VolumePropsAndMappersConfigured = false;
@@ -2694,6 +2695,7 @@ void vtkF3DRenderer::SetArrayNameForColoring(const std::optional<std::string>& a
   {
     this->ArrayNameForColoring = arrayName;
     this->ColorTransferFunctionConfigured = false;
+    this->OpacityTransferFunctionConfigured = false;
     this->ColoringMappersConfigured = false;
     this->ColoringPointSpritesMappersConfigured = false;
     this->VolumePropsAndMappersConfigured = false;
