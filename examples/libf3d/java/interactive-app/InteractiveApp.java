@@ -1,6 +1,4 @@
 import app.f3d.F3D.*;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class InteractiveApp {
 
@@ -48,15 +46,7 @@ public class InteractiveApp {
             if (args.length > 1) {
                 // For testing purposes, stop after timeout seconds
                 int timeout = Integer.parseInt(args[1]);
-                Timer timer = new Timer();
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        interactor.stop();
-                        timer.cancel();
-                    }
-                }, timeout * 1000L);
-                interactor.start();
+                interactor.start(timeout, () -> interactor.stop());
             } else {
                 interactor.start();
             }
