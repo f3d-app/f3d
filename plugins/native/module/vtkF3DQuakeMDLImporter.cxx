@@ -622,10 +622,11 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       return false;
     }
 
-    // check version number for 6
-    if (header->version != 6)
+    // check version number for numbers under 10
+    if (header->version > 10)
     {
-      vtkErrorWithObjectMacro(this->Parent, "Incorrect version number for a Quake MDL file");
+      // TODO : Should probably check for exact version numbers. This info isn't easy to come by.
+      vtkErrorWithObjectMacro(this->Parent, "Unsupported MDL version");
       return false;
     }
 
