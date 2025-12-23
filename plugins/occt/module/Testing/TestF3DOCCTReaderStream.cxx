@@ -28,7 +28,7 @@ int TestF3DOCCTReaderStream(int vtkNotUsed(argc), char* argv[])
   const std::string data = std::string(argv[1]) + "data";
   bool ret = true;
   ret &= testReaderStream(data + "/f3d.stp", vtkF3DOCCTReader::FILE_FORMAT::STEP);
-  // OCCT doesnt support reading IGES stream yet
+  // OCCT doesn't support reading IGES stream yet
   // https://dev.opencascade.org/content/reading-iges-stream-seems-broken-770
   //  ret &= testReaderStream(data + "/f3d.igs", vtkF3DOCCTReader::FILE_FORMAT::IGES);
   ret &= testReaderStream(data + "/f3d.brep", vtkF3DOCCTReader::FILE_FORMAT::BREP);
