@@ -600,6 +600,7 @@ bool TransferToDocument(vtkF3DOCCTReader* that, T& reader, Handle(TDocStd_Docume
   {
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251223)
     // Encapsulate resource stream into an istream
+    // Reading happen on ReadStream call, no need to keep buffers around
     stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
     auto strbuf = stream->ToStreambuf();
     std::istream buffer(strbuf.get());
@@ -658,7 +659,7 @@ int vtkF3DOCCTReader::RequestData(
       }
       catch (Storage_StreamTypeMismatchError&)
       {
-        this->Stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+        stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
         this->Streambuf = stream->ToStreambuf();
         this->Buffer = std::make_unique<std::istream>(this->Streambuf.get());
         const BRep_Builder builder;
@@ -732,7 +733,7 @@ int vtkF3DOCCTReader::RequestData(
       stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
       this->Streambuf = stream->ToStreambuf();
       this->Buffer = std::make_unique<std::istream>(this->Streambuf.get());
-      if (app->Open(*this->Buffer.get(), doc) != PCDM_RS_OK)
+      if (app->Open(*this->Buffer, doc) != PCDM_RS_OK)
       {
         vtkErrorMacro("Failed to read XBF stream");
         success = false;
@@ -808,7 +809,7 @@ int vtkF3DOCCTReader::RequestData(
     stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
     this->Streambuf = stream->ToStreambuf();
     this->Buffer = std::make_unique<std::istream>(this->Streambuf.get());
-    ret = reader->ReadStream("", *this->Buffer.get());
+    ret = reader->ReadStream("", *this->Buffer);
 #else
     vtkErrorMacro("This version of VTK doesn't support reading memory stream with OCCT");
     return false;
