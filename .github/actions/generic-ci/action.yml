@@ -1,0 +1,526 @@
+name: "Generic F3D CI"
+description: "Generic F3D CI"
+inputs:
+  build_type:
+    description: "Name of the build"
+    required: false
+    default: "standard"
+  optional_deps_label:
+    description: "Label to optional dependencies"
+    required: false
+    default: "optional-deps"
+  exclude_deprecated_label:
+    description: "Label to control deprecated exclusion"
+    required: false
+    default: "no-exclude-deprecated"
+  bundle_label:
+    description: "Label to control bundle"
+    required: false
+    default: "no-bundle"
+  rendering_backend:
+    description: "Label to control the rendering backend"
+    required: false
+    default: "auto"
+  static_label:
+    description: "Label to control static build"
+    required: false
+    default: "no-static"
+  cpu:
+    description: "CPU architecture to build for"
+    required: false
+    default: "x86_64"
+  lfs_sha:
+    description: "Cache LFS sha"
+    required: true
+  alembic_version:
+    description: "Version of alembic to build"
+    required: false
+  assimp_version:
+    description: "Version of assimp to build"
+    required: false
+  blosc_version:
+    description: "Version of blosc to build"
+    required: true
+  draco_version:
+    description: "Version of draco to build"
+    required: false
+  imath_version:
+    description: "Version of imath to build"
+    required: false
+  java_version:
+    description: "Version of java to install"
+    required: false
+  occt_version:
+    description: "Version of occt to build"
+    required: false
+  openexr_version:
+    description: "Version of openexr to build"
+    required: false
+  openvdb_version:
+    description: "Version of openvdb to build"
+    required: false
+  ospray_version:
+    description: "Version of ospray to build"
+    required: false
+  pybind11_version:
+    description: "Version of pybind11 to build"
+    required: false
+  python_version:
+    description: "Version of python to install"
+    required: false
+  tbb_version:
+    description: "Version of tbb to build"
+    required: true
+  usd_version:
+    description: "Version of usd to build"
+    required: false
+  sqlite_version:
+    description: "Version of sqlite to build"
+    required: true
+  xercesc_version:
+    description: "Version of xerces-c to build"
+    required: true
+  curl_version:
+    description: "Version of curl to build"
+    required: true
+  pdal_version:
+    description: "Version of pdal to build"
+    required: false
+  libgeotiff_version:
+    description: "Version of libgeotiff to build"
+    required: true
+  libtiff_version:
+    description: "Version of libtiff to build"
+    required: true
+  gdal_version:
+    description: "Version of gdal to build"
+    required: true
+  proj_version:
+    description: "Version of proj to build"
+    required: true
+  vtk_version:
+    description: "VTK version"
+    required: true
+  webp_version:
+    description: "Version of webp to build"
+    required: true
+  zlib_version:
+    description: "Version of zlib to build"
+    required: true
+  global_cache_index:
+    description: "Global cache index"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.lfs_sha }}" ]] || { echo "lfs_sha input is empty" ; exit 1; }
+        [[ "${{ inputs.vtk_version }}" ]] || { echo "vtk_version input is empty" ; exit 1; }
+
+    - name: Recover LFS Data
+      uses: f3d-app/lfs-data-cache-action@v2
+      with:
+        type: "consumer"
+        lfs_sha: ${{inputs.lfs_sha}}
+        cache_postfix: cache-0
+
+    - name: Install all F3D dependencies
+      uses: ./source/.github/actions/generic-dependencies
+      with:
+        cpu: ${{inputs.cpu}}
+        alembic_version: ${{inputs.alembic_version}}
+        assimp_version: ${{inputs.assimp_version}}
+        blosc_version: ${{inputs.blosc_version}}
+        draco_version: ${{inputs.draco_version}}
+        imath_version: ${{inputs.imath_version}}
+        occt_version: ${{inputs.occt_version}}
+        openexr_version: ${{inputs.openexr_version}}
+        openvdb_version: ${{inputs.openvdb_version}}
+        ospray_version: ${{inputs.ospray_version}}
+        pybind11_version: ${{inputs.pybind11_version}}
+        tbb_version: ${{inputs.tbb_version}}
+        usd_version: ${{inputs.usd_version}}
+        webp_version: ${{inputs.webp_version}}
+        zlib_version: ${{inputs.zlib_version}}
+        pdal_version: ${{inputs.pdal_version}}
+        gdal_version: ${{inputs.gdal_version}}
+        libgeotiff_version: ${{inputs.libgeotiff_version}}
+        libtiff_version: ${{inputs.libtiff_version}}
+        sqlite_version: ${{inputs.sqlite_version}}
+        xercesc_version: ${{inputs.xercesc_version}}
+        curl_version: ${{inputs.curl_version}}
+        proj_version: ${{inputs.proj_version}}
+
+    - name: Install VTK dependency
+      uses: ./source/.github/actions/vtk-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        blosc_version: ${{inputs.blosc_version}}
+        openvdb_version: ${{inputs.openvdb_version}}
+        ospray_version: ${{inputs.ospray_version}}
+        tbb_version: ${{inputs.tbb_version}}
+        vtk_version: ${{inputs.vtk_version}}
+        zlib_version: ${{inputs.zlib_version}}
+        gdal_version: ${{inputs.gdal_version}}
+        libgeotiff_version: ${{inputs.libgeotiff_version}}
+        libtiff_version: ${{inputs.libtiff_version}}
+        sqlite_version: ${{inputs.sqlite_version}}
+        xercesc_version: ${{inputs.xercesc_version}}
+        curl_version: ${{inputs.curl_version}}
+        proj_version: ${{inputs.proj_version}}
+
+    - name: Set up Python
+      if: |
+        inputs.optional_deps_label == 'optional-deps' &&
+        inputs.python_version != ''
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{inputs.python_version}}
+
+    - name: Install Python dependencies
+      if: |
+        inputs.optional_deps_label == 'optional-deps' &&
+        inputs.python_version != ''
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install pytest==8.0.0
+        python -m pip install pybind11_stubgen
+
+    - name: Setup JDK
+      if: |
+        inputs.optional_deps_label == 'optional-deps' &&
+        inputs.java_version != ''
+      uses: actions/setup-java@v4
+      with:
+        distribution: "temurin"
+        java-version: ${{inputs.java_version}}
+
+    - name: Setup Directories
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: |
+        mkdir build
+        mkdir install
+        mkdir install/output
+
+    - name: Set PATH windows
+      if: runner.os == 'Windows'
+      shell: powershell
+      working-directory: ${{github.workspace}}
+      run: echo "PATH=$env:PATH;$(pwd)\dependencies\install\bin\;$(pwd)\dependencies\install\lib\;$(pwd)\install\bin\;"| Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+    - name: Set DYLD_LIBRARY_PATH on macOS for OSPRay dynamic loading
+      if: |
+        runner.os == 'macOS' &&
+        inputs.ospray_version != ''
+      shell: bash
+      run: echo "DYLD_LIBRARY_PATH=$(pwd)/dependencies/install/lib" >> $GITHUB_ENV
+
+    # Works around for https://github.com/actions/runner-images/issues/10055
+    - name: Remove conflicting libraries for Java bindings on Windows
+      if: runner.os == 'Windows'
+      shell: bash
+      run: find "C:/hostedtoolcache/windows/Java_Temurin-Hotspot_jdk" -name "msvcp140.dll" -exec rm {} \;
+
+      # Exodus not supported on Apple Silicon because of #976
+      # CMAKE_MODULE_PATH is required because of
+      # https://github.com/AcademySoftwareFoundation/openvdb/issues/1160
+      # OCCT plugin causes issues with static build because it exports symbols with the executable for some reasons
+      # https://github.com/f3d-app/f3d/issues/1322
+      # MacOS x86_64 occasionally segfault with Java
+      # https://github.com/f3d-app/f3d/issues/1410
+      # F3D_TESTING_ENABLE_EXTERNAL_(QT|GLFW) are disabled if no X server is running
+      # QT/GLFW external tests should be adapted to run offscreen
+      # https://github.com/f3d-app/f3d/issues/1670
+    - name: Configure
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: >
+        cmake ../source
+        -Werror=dev
+        -Werror=deprecated
+        --warn-uninitialized
+        -DBUILD_SHARED_LIBS=${{ inputs.static_label == 'static' && 'OFF' || 'ON' }}
+        -DBUILD_TESTING=ON
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX:PATH=../install
+        -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
+        -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
+        -DCMAKE_MODULE_PATH=${{ (runner.os != 'Windows' || matrix.vtk_version != 'v9.3.0') && inputs.optional_deps_label == 'optional-deps' && '$(pwd)/../dependencies/install/lib/cmake/OpenVDB/' || '' }}
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
+        -DF3D_BINDINGS_C=ON
+        -DF3D_BINDINGS_JAVA=${{ (runner.os != 'macOS' || inputs.cpu == 'arm64') && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_BINDINGS_PYTHON=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_BINDINGS_PYTHON_GENERATE_STUBS=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_EXCLUDE_DEPRECATED=${{ inputs.exclude_deprecated_label == 'exclude-deprecated' && 'ON' || 'OFF' }}
+        -DF3D_LINUX_GENERATE_MAN=ON
+        -DF3D_LINUX_INSTALL_DEFAULT_CONFIGURATION_FILE_IN_PREFIX=ON
+        -DF3D_MACOS_BUNDLE=${{ inputs.bundle_label == 'bundle' && 'ON' || 'OFF' }}
+        -DF3D_MODULE_EXR=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_MODULE_WEBP=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_MODULE_RAYTRACING=${{ inputs.ospray_version != '' && 'ON' || 'OFF' }}
+        -DF3D_MODULE_UI=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_MODULE_DMON=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_MODULE_TINYFILEDIALOGS=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_PLUGINS_STATIC_BUILD=${{ inputs.bundle_label == 'bundle' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_ALEMBIC=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_ASSIMP=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_DRACO=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_HDF=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_OCCT=${{ inputs.optional_deps_label == 'optional-deps' && inputs.static_label == 'no-static' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_USD=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_VDB=${{ matrix.vtk_version != 'v9.2.6' && (runner.os != 'Windows' || matrix.vtk_version != 'v9.3.1') && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_PDAL=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
+        -DF3D_STRICT_BUILD=ON
+        -DF3D_TESTING_ENABLE_EGL_TESTS=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
+        -DF3D_TESTING_ENABLE_EXTERNAL_GLFW=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
+        -DF3D_TESTING_ENABLE_EXTERNAL_QT=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
+        -DF3D_TESTING_ENABLE_GLX_TESTS=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
+        -DF3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS=${{ (runner.os == 'Linux' || runner.os == 'Windows') && 'ON' || 'OFF' }}
+        -DF3D_TESTING_ENABLE_OSMESA_TESTS=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
+        -DF3D_TESTING_DISABLE_CATCH_ALL=ON
+        -DF3D_TESTING_FORCE_RENDERING_BACKEND=${{ inputs.rendering_backend }}
+        -DF3D_WINDOWS_BUILD_CONSOLE_APPLICATION=ON
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
+
+    - name: Build
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: cmake --build . --parallel 2 --config Release
+
+    - name: Run Xvfb ubuntu
+      if: |
+        runner.os == 'Linux' &&
+        inputs.rendering_backend == 'auto'
+      shell: bash
+      run: Xvfb $DISPLAY -screen 0 1280x1024x24 &
+
+    - name: Install Mesa Windows
+      if: runner.os == 'Windows'
+      uses: f3d-app/install-mesa-windows-action@v2
+      with:
+        path: ${{github.workspace}}\build\bin_Release
+
+    - name: Install Mesa Windows Python
+      if: runner.os == 'Windows'
+      uses: f3d-app/install-mesa-windows-action@v2
+      with:
+        path: ${{github.workspace}}\build\Release\f3d
+
+    # A EGL test is crashing in the CI but not locally
+    - name: Set CI test exception for Linux EGL
+      if: runner.os == 'Linux' &&
+        inputs.rendering_backend != 'auto'
+      shell: bash
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestSDKExternalWindowEGL)" >> $GITHUB_ENV
+
+    # Certain tests are failing on macOS with GPU pass through
+    # https://github.com/f3d-app/f3d/issues/792
+    # https://github.com/f3d-app/f3d/issues/1534
+    # https://github.com/f3d-app/f3d/issues/2268
+    - name: Set CI test exception for macOS x86_64
+      if: |
+        runner.os == 'macOS' &&
+        inputs.cpu == 'x86_64'
+      shell: bash
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestInteractionAnimationSlow)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionCycleComp)|(TestGLTFRigArmature)|(TestInteractionNoModelScrollWheel)|(TestInteractionNoModelScrollBar)" >> $GITHUB_ENV
+
+    # Certain tests are failing on macOS arm64 for unknown reasons
+    # https://github.com/f3d-app/f3d/issues/1276
+    # https://github.com/f3d-app/f3d/issues/792
+    # https://github.com/f3d-app/f3d/issues/1534
+    - name: Set CI test exception for macOS arm64
+      if: |
+        runner.os == 'macOS' &&
+        inputs.cpu == 'arm64'
+      shell: bash
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestDepthPeelingToneMapping)|(TestDepthPeeling)|(TestTextureColor)|(TestDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)|(TestInteractionActors)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionAnimationSlow)|(TestInteractionConfigFileInteractions)|(TestGLTFRigArmature)|(TestInteractionRollCameraRotation)|(TestInteractionDragRotateVertical)|(TestInteractionCheatsheetConfigFile)|(TestInteractionCheatsheetWhiteBG)|(TestInteractionCheatsheetBlackBG)|(TestInteractionCheatsheetNoFile)|(TestInteractionCheatsheetOpacity)|(TestInteractionCheatsheetAnimationName)|(TestInteractionCheatsheetSSAA)|(TestMaxSizeAboveMultiFile)" >> $GITHUB_ENV
+
+    - name: Test
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: ctest -E "${{ env.F3D_CTEST_EXCEPTIONS }}" -C Release -j 2 --output-on-failure --no-tests=error || ctest -E "${{ env.F3D_CTEST_EXCEPTIONS }}" -C Release -j 1 --rerun-failed --no-tests=error -VV
+
+    - name: Upload Tests Artifact
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        path: ./build/Testing/Temporary
+        name: f3d-tests-artifact-${{runner.os}}-${{inputs.vtk_version}}-${{inputs.build_type}}-${{inputs.cpu}}-${{inputs.bundle_label}}-${{inputs.static_label}}
+
+    - name: Install (ALL)
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: cmake --install .
+
+    - name: Install (mimetypes on Linux)
+      if: runner.os == 'Linux'
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: cmake --install . --component mimetypes
+
+    - name: Install optional component for libf3d
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: |
+        cmake --install . --component sdk
+        cmake --install . --component configuration
+        cmake --install . --component colormaps
+
+    - name: Build and configure python externally
+      if: |
+        inputs.optional_deps_label == 'optional-deps' &&
+        inputs.static_label == 'no-static'
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: |
+        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DCMAKE_PREFIX_PATH:PATH=$(pwd)/dependencies/install/ -DBUILD_TESTING=ON -B build_python source/python
+        cmake --build build_python --config Release
+
+    - name: Configure libf3d examples (C++, C, Java)
+      if: inputs.static_label == 'no-static'
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: >
+        cmake -Werror=dev -Werror=deprecated --warn-uninitialized
+        -B build_examples -S source/examples/libf3d
+        -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d
+        -DBUILD_TESTING=ON
+        -DF3D_ENABLE_C_EXAMPLES=ON
+        -DF3D_ENABLE_JAVA_EXAMPLES=${{ (runner.os != 'macOS' || inputs.cpu == 'arm64') && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_EXAMPLES_EXTERNAL_GLFW=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto' && inputs.vtk_version != 'v9.3.0') && 'ON' || 'OFF' }}
+        -DF3D_EXAMPLES_EXTERNAL_QT=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto' && inputs.vtk_version != 'v9.3.0') && 'ON' || 'OFF' }}
+        -DF3D_EXAMPLES_EXTERNAL_FLTK=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto' && inputs.vtk_version != 'v9.3.0') && 'ON' || 'OFF' }}
+
+    - name: Build libf3d examples
+      if: inputs.static_label == 'no-static'
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: cmake --build build_examples --config Release
+
+    - name: Install Mesa Windows examples
+      if: |
+        runner.os == 'Windows' &&
+        inputs.static_label == 'no-static'
+      uses: f3d-app/install-mesa-windows-action@v2
+      with:
+        path: ${{github.workspace}}\build_examples\*\*\Release
+
+    # older VTK version create different renderings so they are not tested
+    - name: Test libf3d examples
+      if: inputs.static_label == 'no-static'
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: ctest --test-dir build_examples --no-tests=error -C Release -VV
+
+    - name: Install optional component f3d plugins
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: cmake --install . --component plugin_sdk
+
+      # CMAKE_MODULE_PATH is required because of
+      # https://github.com/AcademySoftwareFoundation/openvdb/issues/1160
+    - name: Build plugin examples
+      if: inputs.static_label == 'no-static'
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: |
+        cmake -Werror=dev -Werror=deprecated --warn-uninitialized -DCMAKE_MODULE_PATH=$(pwd)/dependencies/install/lib/cmake/OpenVDB/ -Df3d_DIR=$(pwd)/install/lib/cmake/f3d -DCMAKE_PREFIX_PATH:PATH=$(pwd)/dependencies/install/ -DCMAKE_INSTALL_PREFIX=$(pwd)/install/ -DBUILD_TESTING=ON -B build_plugins source/examples/plugins
+        cmake --build build_plugins --config Release
+
+    - name: Test plugin examples
+      if: inputs.static_label == 'no-static'
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: ctest --test-dir build_plugins --no-tests=error -C Release -VV
+
+    - name: Set F3D binary path Linux
+      if: runner.os == 'Linux'
+      shell: bash
+      run: echo "F3D_BIN_PATH=./bin/f3d" >> $GITHUB_ENV
+
+    - name: Set F3D binary path Windows
+      if: runner.os == 'Windows'
+      shell: bash
+      run: |
+        echo "F3D_BIN_PATH=./bin/f3d.exe" >> $GITHUB_ENV
+        echo "F3D_CONSOLE_BIN_PATH=./bin/f3d-console.exe" >> $GITHUB_ENV
+
+    - name: Set F3D binary path MacOS bundle
+      if: |
+        runner.os == 'macOS' &&
+        inputs.bundle_label == 'bundle'
+      shell: bash
+      run: echo "F3D_BIN_PATH=./f3d.app/Contents/MacOS/f3d" >> $GITHUB_ENV
+
+    - name: Set F3D binary path MacOS no-bundle
+      if: |
+        runner.os == 'macOS' &&
+        inputs.bundle_label != 'bundle'
+      shell: bash
+      run: echo "F3D_BIN_PATH=./bin/f3d" >> $GITHUB_ENV
+
+    - name: Install Mesa Windows in install
+      if: runner.os == 'Windows'
+      uses: f3d-app/install-mesa-windows-action@v2
+      with:
+        path: ${{github.workspace}}\install\bin
+
+    # Grid rendering has artifacts in macOS arm64 CI
+    # https://github.com/f3d-app/f3d/issues/1276
+    - name: Check F3D_PLUGINS_PATH using plugin example
+      if: |
+        inputs.vtk_version != 'v9.3.0' && inputs.vtk_version != 'v9.4.2' && inputs.vtk_version != 'v9.5.2' &&
+        inputs.cpu != 'arm64' && inputs.static_label == 'no-static' && inputs.optional_deps_label == 'optional-deps'
+      shell: bash
+      working-directory: ${{github.workspace}}/install
+      run: F3D_PLUGINS_PATH=$(pwd)/../build_plugins/example-plugin${{ runner.os == 'Windows' && '/Release' || null }} ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --load-plugins=example --output=output/install_example_plugin_output.png --reference=../source/.github/baselines/install_example_plugin_output.png --resolution=300,300 --rendering-backend=${{ inputs.rendering_backend }} --verbose
+
+    - name: Install plugin examples
+      if: inputs.static_label == 'no-static'
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: |
+        cmake --install build_plugins --config Release
+        cmake --install build_plugins --config Release --component configuration
+
+    # Grid rendering has artifacts in macOS arm64 CI
+    # https://github.com/f3d-app/f3d/issues/1276
+    - name: Check Install
+      if: |
+        inputs.vtk_version != 'v9.3.0' && inputs.vtk_version != 'v9.4.2' && inputs.vtk_version != 'v9.5.2'
+        && inputs.cpu != 'arm64' && inputs.optional_deps_label == 'optional-deps'
+      shell: bash
+      working-directory: ${{github.workspace}}/install
+      run: |
+        ${{ env.F3D_BIN_PATH }} ../source/testing/data/dragon.vtu --output=output/install_output.png --reference=../source/.github/baselines/install_output.png --resolution=300,300 --colormap-file=viridis --coloring-component=0 --verbose --rendering-backend=${{ inputs.rendering_backend }}
+
+    - name: Check Install plugins
+      if: |
+        inputs.vtk_version != 'v9.3.0' && inputs.vtk_version != 'v9.4.2' && inputs.vtk_version != 'v9.5.2' && inputs.cpu != 'arm64'
+        && inputs.static_label == 'no-static' && inputs.optional_deps_label == 'optional-deps'
+      shell: bash
+      working-directory: ${{github.workspace}}/install
+      run: |
+        ${{ env.F3D_BIN_PATH }} ../source/examples/plugins/example-plugin/data.expl --output=output/install_example_plugin_output.png --reference=../source/.github/baselines/install_example_plugin_output.png  --resolution=300,300 --verbose --rendering-backend=${{ inputs.rendering_backend }}
+
+    - name: Check Install Windows Console Executable
+      if: |
+        inputs.vtk_version != 'v9.3.0' && inputs.vtk_version != 'v9.4.2' && inputs.vtk_version != 'v9.5.2' 
+        && runner.os == 'Windows'
+      shell: bash
+      working-directory: ${{github.workspace}}/install
+      run: |
+        ${{ env.F3D_CONSOLE_BIN_PATH }} ../source/testing/data/dragon.vtu --output=output/install_output.png --reference=../source/.github/baselines/install_output.png --resolution=300,300 --colormap-file=viridis --coloring-component=0 --verbose --rendering-backend=${{ inputs.rendering_backend }}
+
+    - name: Upload Tests Install Artifact
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        path: ./install/output
+        name: f3d-tests-install-artifact-${{runner.os}}-${{inputs.vtk_version}}-${{inputs.build_type}}-${{inputs.cpu}}-${{inputs.bundle_label}}-${{inputs.static_label}}

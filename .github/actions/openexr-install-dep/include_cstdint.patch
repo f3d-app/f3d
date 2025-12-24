@@ -1,0 +1,39 @@
+diff --git a/src/lib/OpenEXR/ImfDeepTiledInputFile.h b/src/lib/OpenEXR/ImfDeepTiledInputFile.h
+index b01330f3..2f765fdb 100644
+--- a/src/lib/OpenEXR/ImfDeepTiledInputFile.h
++++ b/src/lib/OpenEXR/ImfDeepTiledInputFile.h
+@@ -21,6 +21,8 @@
+ 
+ #include <ImathBox.h>
+ 
++#include <cstdint>
++
+ OPENEXR_IMF_INTERNAL_NAMESPACE_HEADER_ENTER
+ 
+ class IMF_EXPORT_TYPE DeepTiledInputFile : public GenericInputFile
+diff --git a/src/lib/OpenEXR/ImfDeepTiledInputPart.h b/src/lib/OpenEXR/ImfDeepTiledInputPart.h
+index e5f950a9..a5533b49 100644
+--- a/src/lib/OpenEXR/ImfDeepTiledInputPart.h
++++ b/src/lib/OpenEXR/ImfDeepTiledInputPart.h
+@@ -12,6 +12,8 @@
+ 
+ #include <ImathBox.h>
+ 
++#include <cstdint>
++
+ OPENEXR_IMF_INTERNAL_NAMESPACE_HEADER_ENTER
+ 
+ class IMF_EXPORT_TYPE DeepTiledInputPart
+diff --git a/src/lib/OpenEXR/ImfTiledMisc.h b/src/lib/OpenEXR/ImfTiledMisc.h
+index 9059ae2c..9c016148 100644
+--- a/src/lib/OpenEXR/ImfTiledMisc.h
++++ b/src/lib/OpenEXR/ImfTiledMisc.h
+@@ -19,7 +19,7 @@
+ 
+ #include <stdio.h>
+ #include <vector>
+-
++#include <cstdint>
+ 
+ OPENEXR_IMF_INTERNAL_NAMESPACE_HEADER_ENTER
+ 

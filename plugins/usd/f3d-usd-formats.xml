@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/vnd.usd">
+    <comment>USD</comment>
+    <glob pattern="*.usd"/>
+  </mime-type>
+  <mime-type type="application/vnd.usdc">
+    <comment>USD Binary</comment>
+    <glob pattern="*.usdc"/>
+  </mime-type>
+  <mime-type type="model/vnd.usda">
+    <comment>USD ASCII</comment>
+    <glob pattern="*.usda"/>
+  </mime-type>
+  <mime-type type="model/vnd.usdz+zip">
+    <comment>Compressed USD</comment>
+    <glob pattern="*.usdz"/>
+  </mime-type>
+</mime-info>

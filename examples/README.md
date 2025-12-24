@@ -1,0 +1,37 @@
+# Examples
+
+This folder contains examples on how to use `libf3d`. All the examples are using some form of `find_package(f3d)` so they are intended to be built against an existing f3d installation with the `sdk` or `plugin_sdk` component installed.
+The code is documented in a didactic way to help with understanding them.
+
+## libf3d
+
+Examples usages of the libf3d, which requires the `sdk` cmake component to be installed.
+
+## plugins
+
+Examples plugins for the libf3d, which also requires the `plugin_sdk` cmake component to be installed.
+
+## Building
+
+Each example (C++, C, Java) is intended to be built as a separate CMake project, however there are top level `CMakeLists.txt` in each directory for easier usage.
+
+eg:
+
+```
+cmake -Df3d_DIR=<path_to_f3d_install>/lib/cmake/f3d <path_to_examples_dir>/libf3d
+cmake --build .
+```
+
+Then run the example individually.
+
+## Testing
+
+When building from a top level `CMakeLists.txt`, one can enable the cmake option `BUILD_TESTING` to enable tests.
+
+## Python
+
+Python example can be run using python directly or with pytest
+
+## Web
+
+Web examples have to be run independently using npm

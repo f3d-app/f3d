@@ -1,0 +1,33 @@
+# StreamVersion 1.2
+ExposeEvent 0 599 0 0 0 0 0
+RenderEvent 0 599 0 0 0 0 0
+TimerEvent 0 599 0 0 0 0 0
+
+# Interact with the view
+LeftButtonPressEvent 788 300 0 0 0 0 0
+StartInteractionEvent 788 300 0 0 0 0 0
+TimerEvent 788 300 0 0 0 0 0
+MouseMoveEvent 788 301 0 0 0 0 0
+RenderEvent 788 301 0 0 0 0 0
+InteractionEvent 788 301 0 0 0 0 0
+MouseMoveEvent 517 294 0 0 0 0 0
+RenderEvent 517 294 0 0 0 0 0
+InteractionEvent 517 294 0 0 0 0 0
+TimerEvent 517 294 0 0 0 0 0
+TimerEvent 517 294 0 0 0 0 0
+LeftButtonReleaseEvent 517 294 0 0 0 0 0
+EndInteractionEvent 517 294 0 0 0 0 0
+
+# Ctrl + Left
+RenderEvent 517 294 0 0 0 0 0
+TimerEvent 517 294 0 0 0 0 0
+KeyPressEvent 517 294 0 0 1 Control_L 0
+CharEvent 517 294 0 0 1 Control_L 0
+TimerEvent 517 294 0 0 1 Control_L 0
+KeyPressEvent 517 292 2 0 1 Left 0
+CharEvent 517 292 2 0 1 Left 0
+TimerEvent 517 292 2 0 1 Left 0
+KeyReleaseEvent 517 292 2 0 1 Left 0
+TimerEvent 517 292 2 0 1 Left 0
+KeyReleaseEvent 517 292 2 0 1 Control_L 0
+TimerEvent 517 292 2 0 1 Control_L 0

@@ -1,0 +1,25 @@
+From d6f93577ff0a8dd09c71502ec3c9fdd993f1fad4 Mon Sep 17 00:00:00 2001
+From: Mathieu Westphal <mathieu.westphal@kitware.com>
+Date: Mon, 16 Jan 2023 15:32:00 +0100
+Subject: [PATCH] linux only fixup
+
+---
+ adm/cmake/occt_toolkit.cmake | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/adm/cmake/occt_toolkit.cmake b/adm/cmake/occt_toolkit.cmake
+index 517d1b47f..7c1acf50d 100644
+--- a/adm/cmake/occt_toolkit.cmake
++++ b/adm/cmake/occt_toolkit.cmake
+@@ -317,6 +317,8 @@ if (CURRENT_MODULE)
+     if (NOT "${INSTALL_NAME_DIR}" STREQUAL "")
+       set_target_properties (${PROJECT_NAME} PROPERTIES BUILD_WITH_INSTALL_RPATH 1 INSTALL_NAME_DIR "${INSTALL_NAME_DIR}")
+     endif()
++  elseif (UNIX)
++      set_target_properties(${PROJECT_NAME} PROPERTIES INSTALL_RPATH $ORIGIN)
+   endif()
+ endif()
+ 
+-- 
+2.39.0
+

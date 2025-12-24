@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/vnd.vtk">
+    <comment>VTK legacy file</comment>
+    <glob pattern="*.vtk"/>
+  </mime-type>
+  <mime-type type="application/vnd.vtp">
+    <comment>VTK polydata file</comment>
+    <glob pattern="*.vtp"/>
+  </mime-type>
+  <mime-type type="application/vnd.vtu">
+    <comment>VTK unstructured grid file</comment>
+    <glob pattern="*.vtu"/>
+  </mime-type>
+  <mime-type type="application/vnd.vtr">
+    <comment>VTK rectilinear grid file</comment>
+    <glob pattern="*.vtr"/>
+  </mime-type>
+  <mime-type type="application/vnd.vti">
+    <comment>VTK image data file</comment>
+    <glob pattern="*.vti"/>
+  </mime-type>
+  <mime-type type="application/vnd.vts">
+    <comment>VTK structured grid file</comment>
+    <glob pattern="*.vts"/>
+  </mime-type>
+  <mime-type type="application/vnd.vtm">
+    <comment>VTK multiblock dataset file</comment>
+    <glob pattern="*.vtm"/>
+  </mime-type>
+</mime-info>

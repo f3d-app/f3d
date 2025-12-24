@@ -1,0 +1,9 @@
+[
+  {
+    "match-type": "glob",
+    "match": "*.ex2",
+    "options": {
+      "load-plugins": "hdf"
+    }
+  }
+]

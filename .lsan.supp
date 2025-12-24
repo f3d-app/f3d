@@ -1,0 +1,31 @@
+# NVIDIA driver
+leak:nvidia-glcore
+
+# Kernel
+leak:ld-linux-x86-64
+
+# OCCT
+leak:TKBO
+leak:TKG2d
+leak:TKG3d
+leak:TKIGES
+leak:TKMath
+leak:TKMesh
+leak:TKVCAF
+leak:TKXSBase
+leak:TKernel
+
+# TBB
+leak:libtbb
+
+# Mesa
+leak:libOSMesa
+leak:libGLX_mesa
+leak:libEGL_mesa
+
+# Qt
+leak:libQt5Core
+leak:libQt5Gui
+
+# png
+leak:libvtkpng

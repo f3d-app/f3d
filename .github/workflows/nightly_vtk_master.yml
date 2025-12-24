@@ -1,0 +1,422 @@
+name: Nightly VTK master
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  #----------------------------------------------------------------------------
+  # Check nightly: Checkout VTK and check if the last merged commit is less than 24 hours old
+  #----------------------------------------------------------------------------
+  check_nightly:
+    if: github.repository == 'f3d-app/f3d'
+    runs-on: ubuntu-22.04
+    name: Check nightly
+    outputs:
+      should_run: ${{ steps.should_run.outputs.should_run }}
+      vtk_sha: ${{ steps.vtk_sha_recover.outputs.vtk_sha }}
+    steps:
+      - name: Checkout VTK
+        uses: actions/checkout@v4
+        with:
+          repository: Kitware/VTK
+          submodules: false
+          fetch-depth: 0
+          ref: master
+
+      - name: Check latest commit age is less than 24 hours
+        id: should_run
+        run: test -n "$(git rev-list --no-merges HEAD --not $(git rev-list -n1 --before=24hours --first-parent HEAD))" && echo "should_run=true" >> $GITHUB_OUTPUT || echo "should_run=false" >> $GITHUB_OUTPUT
+
+      - name: Set VTK sha env var
+        id: vtk_sha_recover
+        shell: bash
+        run: echo "vtk_sha=$(git log -n 1 --pretty=format:%H)" >> $GITHUB_OUTPUT
+
+  #----------------------------------------------------------------------------
+  # Default versions: Set default version for all dependencies
+  #----------------------------------------------------------------------------
+  default_versions:
+    runs-on: ubuntu-22.04
+    name: Set default versions
+    outputs:
+      alembic_version: ${{ steps.set_default_versions.outputs.alembic_version }}
+      assimp_version: ${{ steps.set_default_versions.outputs.assimp_version }}
+      blosc_version: ${{ steps.set_default_versions.outputs.blosc_version }}
+      draco_version: ${{ steps.set_default_versions.outputs.draco_version }}
+      imath_version: ${{ steps.set_default_versions.outputs.imath_version }}
+      java_version: ${{ steps.set_default_versions.outputs.java_version }}
+      occt_version: ${{ steps.set_default_versions.outputs.occt_version }}
+      openexr_version: ${{ steps.set_default_versions.outputs.openexr_version }}
+      openvdb_version: ${{ steps.set_default_versions.outputs.openvdb_version }}
+      ospray_version: ${{ steps.set_default_versions.outputs.ospray_version }}
+      pybind11_version: ${{ steps.set_default_versions.outputs.pybind11_version }}
+      python_version: ${{ steps.set_default_versions.outputs.python_version }}
+      tbb_version: ${{ steps.set_default_versions.outputs.tbb_version }}
+      usd_version: ${{ steps.set_default_versions.outputs.usd_version }}
+      webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
+      zlib_version: ${{ steps.set_default_versions.outputs.zlib_version }}
+      docker_timestamp: ${{ steps.set_default_versions.outputs.docker_timestamp }}
+      global_cache_index: ${{ steps.set_default_versions.outputs.global_cache_index }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 1
+          lfs: false
+
+      - name: Set default versions
+        id: set_default_versions
+        uses: f3d-app/default-versions-action@main
+        with:
+          file: ./source/.github/workflows/versions.json
+
+  #----------------------------------------------------------------------------
+  # Cache LFS: Checkout LFS data and update the cache to limit LFS bandwidth
+  #----------------------------------------------------------------------------
+
+  cache_lfs:
+    needs: check_nightly
+    if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
+    runs-on: ubuntu-22.04
+    name: Update LFS data cache
+    outputs:
+      lfs_sha: ${{ steps.lfs_sha_recover.outputs.lfs_sha }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 1
+          lfs: false
+
+      - name: Cache LFS Data
+        id: lfs_sha_recover
+        uses: f3d-app/lfs-data-cache-action@v2
+        with:
+          cache_postfix: cache-0
+
+  #----------------------------------------------------------------------------
+  # Windows CI: Build and test
+  #----------------------------------------------------------------------------
+  windows:
+    needs: [cache_lfs, check_nightly, default_versions]
+    if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
+    strategy:
+      fail-fast: false
+    runs-on: windows-latest
+
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 0
+          lfs: false
+
+      - name: Generic CI
+        uses: ./source/.github/actions/generic-ci
+        with:
+          vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
+          lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+          alembic_version: ${{needs.default_versions.outputs.alembic_version}}
+          assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          blosc_version: ${{needs.default_versions.outputs.blosc_version}}
+          draco_version: ${{needs.default_versions.outputs.draco_version}}
+          imath_version: ${{needs.default_versions.outputs.imath_version}}
+          java_version: ${{needs.default_versions.outputs.java_version}}
+          occt_version: ${{needs.default_versions.outputs.occt_version}}
+          openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+          openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+          ospray_version: ${{needs.default_versions.outputs.ospray_version}}
+          pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
+          python_version: ${{needs.default_versions.outputs.python_version}}
+          tbb_version: ${{needs.default_versions.outputs.tbb_version}}
+          usd_version: ${{needs.default_versions.outputs.usd_version}}
+          webp_version: ${{ needs.default_versions.outputs.webp_version }}
+          zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
+
+  #----------------------------------------------------------------------------
+  # Linux CI: Build and test
+  #----------------------------------------------------------------------------
+  linux:
+    needs: [cache_lfs, check_nightly, default_versions]
+    if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [standard]
+        include:
+          - rendering_backend: auto
+          - build_type: egl
+            rendering_backend: egl
+          - build_type: osmesa
+            rendering_backend: osmesa
+    runs-on: ubuntu-22.04
+    container: ghcr.io/f3d-app/f3d-ci
+
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
+      DISPLAY: :0
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 0
+          lfs: false
+
+      - name: Generic CI
+        uses: ./source/.github/actions/generic-ci
+        with:
+          build_type: ${{matrix.build_type}}
+          vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
+          rendering_backend: ${{matrix.rendering_backend}}
+          lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+          alembic_version: ${{needs.default_versions.outputs.alembic_version}}
+          assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          blosc_version: ${{needs.default_versions.outputs.blosc_version}}
+          draco_version: ${{needs.default_versions.outputs.draco_version}}
+          imath_version: ${{needs.default_versions.outputs.imath_version}}
+          java_version: ${{needs.default_versions.outputs.java_version}}
+          occt_version: ${{needs.default_versions.outputs.occt_version}}
+          openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+          openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+          ospray_version: ${{needs.default_versions.outputs.ospray_version}}
+          pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
+          python_version: ${{needs.default_versions.outputs.python_version}}
+          tbb_version: ${{needs.default_versions.outputs.tbb_version}}
+          usd_version: ${{needs.default_versions.outputs.usd_version}}
+          webp_version: ${{ needs.default_versions.outputs.webp_version }}
+          zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
+
+  #----------------------------------------------------------------------------
+  # MacOS CI: Build and test
+  #----------------------------------------------------------------------------
+  macos:
+    needs: [cache_lfs, check_nightly, default_versions]
+    if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
+    strategy:
+      fail-fast: false
+
+    runs-on: macos-15-intel
+
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 0
+          lfs: false
+
+      - name: Generic CI
+        uses: ./source/.github/actions/generic-ci
+        with:
+          vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
+          cpu: x86_64
+          lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+          alembic_version: ${{needs.default_versions.outputs.alembic_version}}
+          assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          blosc_version: ${{needs.default_versions.outputs.blosc_version}}
+          draco_version: ${{needs.default_versions.outputs.draco_version}}
+          imath_version: ${{needs.default_versions.outputs.imath_version}}
+          java_version: ${{needs.default_versions.outputs.java_version}}
+          occt_version: ${{needs.default_versions.outputs.occt_version}}
+          openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+          openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+          ospray_version: ${{needs.default_versions.outputs.ospray_version}}
+          pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
+          python_version: ${{needs.default_versions.outputs.python_version}}
+          tbb_version: ${{needs.default_versions.outputs.tbb_version}}
+          usd_version: ${{needs.default_versions.outputs.usd_version}}
+          webp_version: ${{ needs.default_versions.outputs.webp_version }}
+          zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
+
+  #----------------------------------------------------------------------------
+  # MacOS arm64 CI: Build and test
+  #----------------------------------------------------------------------------
+  macos_arm:
+    needs: [cache_lfs, check_nightly, default_versions]
+    if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
+    strategy:
+      fail-fast: false
+
+    runs-on: macos-15
+
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 0
+          lfs: false
+
+      - name: Generic CI
+        uses: ./source/.github/actions/generic-ci
+        with:
+          vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
+          cpu: arm64
+          lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+          alembic_version: ${{needs.default_versions.outputs.alembic_version}}
+          assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          blosc_version: ${{needs.default_versions.outputs.blosc_version}}
+          draco_version: ${{needs.default_versions.outputs.draco_version}}
+          imath_version: ${{needs.default_versions.outputs.imath_version}}
+          java_version: ${{needs.default_versions.outputs.java_version}}
+          occt_version: ${{needs.default_versions.outputs.occt_version}}
+          openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+          openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+          ospray_version: ${{needs.default_versions.outputs.ospray_version}}
+          pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
+          python_version: ${{needs.default_versions.outputs.python_version}}
+          tbb_version: ${{needs.default_versions.outputs.tbb_version}}
+          usd_version: ${{needs.default_versions.outputs.usd_version}}
+          webp_version: ${{ needs.default_versions.outputs.webp_version }}
+          zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
+
+  #----------------------------------------------------------------------------
+  # Sanitizer: Build and test on linux with last VTK with sanitizer options
+  #----------------------------------------------------------------------------
+  # "leak" is run by default with "address" so we do not need to run it in CI
+  # "memory" returns false positives in VTK:
+  # https://stackoverflow.com/questions/60097307/memory-sanitizer-reports-use-of-uninitialized-value-in-global-object-constructio
+  sanitizer:
+    needs: [cache_lfs, check_nightly, default_versions]
+    if: ${{ needs.check_nightly.outputs.should_run == 'true' }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        sanitizer_type: [address, thread, undefined]
+
+    runs-on: ubuntu-22.04
+    container: ghcr.io/f3d-app/f3d-ci
+
+    env:
+      CMAKE_POLICY_VERSION_MINIMUM: 3.5
+      DISPLAY: :0
+      CC: clang
+      CXX: clang++
+      VTK_SMP_BACKEND_IN_USE: Sequential
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 0
+          lfs: false
+
+      - name: Sanitizer CI
+        uses: ./source/.github/actions/sanitizer-ci
+        with:
+          vtk_version: ${{needs.check_nightly.outputs.vtk_sha}}
+          sanitizer_type: ${{matrix.sanitizer_type}}
+          lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}
+          alembic_version: ${{needs.default_versions.outputs.alembic_version}}
+          assimp_version: ${{needs.default_versions.outputs.assimp_version}}
+          blosc_version: ${{needs.default_versions.outputs.blosc_version}}
+          draco_version: ${{needs.default_versions.outputs.draco_version}}
+          imath_version: ${{needs.default_versions.outputs.imath_version}}
+          java_version: ${{needs.default_versions.outputs.java_version}}
+          occt_version: ${{needs.default_versions.outputs.occt_version}}
+          openexr_version: ${{needs.default_versions.outputs.openexr_version}}
+          openvdb_version: ${{needs.default_versions.outputs.openvdb_version}}
+          pybind11_version: ${{needs.default_versions.outputs.pybind11_version}}
+          python_version: ${{needs.default_versions.outputs.python_version}}
+          tbb_version: ${{needs.default_versions.outputs.tbb_version}}
+          usd_version: ${{needs.default_versions.outputs.usd_version}}
+          webp_version: ${{ needs.default_versions.outputs.webp_version }}
+          zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
+
+  #----------------------------------------------------------------------------
+  # Build android/wasm docker images
+  #----------------------------------------------------------------------------
+  build_docker_images:
+    needs: check_nightly
+    name: Build docker images
+    runs-on: ubuntu-latest
+    steps:
+      # This require a F3D_DOCKER_CI_DISPATCH secret contain a PAT with read and write admin access
+      - name: Trigger docker images build
+        uses: convictional/trigger-workflow-and-wait@v1.6.5
+        with:
+          owner: f3d-app
+          repo: f3d-docker-images
+          github_token: ${{ secrets.F3D_DOCKER_CI_DISPATCH }}
+          workflow_file_name: build_docker_image.yml
+          wait_interval: 60
+          client_payload: '{"vtk_version_override": "${{needs.check_nightly.outputs.vtk_sha}}"}'
+          propagate_failure: true
+          trigger_workflow: true
+          wait_workflow: true
+
+  #----------------------------------------------------------------------------
+  # android: Check build of F3D for android
+  #----------------------------------------------------------------------------
+  android:
+    needs: [check_nightly, default_versions, build_docker_images]
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [armeabi-v7a, arm64-v8a, x86, x86_64]
+
+    runs-on: ubuntu-22.04
+    container: ghcr.io/f3d-app/f3d-android-${{ matrix.arch }}:${{needs.default_versions.outputs.docker_timestamp}}_${{needs.check_nightly.outputs.vtk_sha}}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 0
+          lfs: false
+
+      - name: Android CI
+        uses: ./source/.github/actions/android-ci
+        with:
+          arch: ${{matrix.arch}}
+
+  #----------------------------------------------------------------------------
+  # webassembly: Build webassembly artifacts
+  #----------------------------------------------------------------------------
+  webassembly:
+    needs: [cache_lfs, check_nightly, default_versions, build_docker_images]
+    strategy:
+      fail-fast: false
+
+    runs-on: ubuntu-22.04
+
+    env:
+      CMAKE_BUILD_PARALLEL_LEVEL: 4
+      F3D_DOCKER_TIMESTAMP: ${{needs.default_versions.outputs.docker_timestamp}}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: "source"
+          fetch-depth: 0
+          lfs: false
+
+      - name: WebAssembly CI
+        uses: ./source/.github/actions/wasm-ci
+        with:
+          lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}

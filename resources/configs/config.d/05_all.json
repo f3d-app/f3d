@@ -1,0 +1,17 @@
+[
+  {
+    "options": {
+      "axis": true,
+      "tone-mapping": true,
+      "grid": true,
+      "loading-progress": true,
+      "anti-aliasing": "fxaa",
+      "filename": true,
+      "camera-direction": "-1,-0.5,-1",
+      "hdri-ambient": true,
+      "blending": "ddp",
+      "animation-progress": true,
+      "remove-empty-file-groups": true
+    }
+  }
+]

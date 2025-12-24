@@ -1,0 +1,33 @@
+{
+  "name": "f3d",
+  "dependencies": [
+    {
+      "name": "vtk",
+      "default-features": false,
+      "features": ["opengl", "seacas"]
+    }
+  ],
+  "features": {
+    "alembic": {
+      "description": "alembic plugin",
+      "dependencies": ["alembic"]
+    },
+    "assimp": {
+      "description": "assimp plugin",
+      "dependencies": ["assimp"]
+    },
+    "occt": {
+      "description": "opencascade plugin",
+      "dependencies": ["opencascade"]
+    },
+    "draco": {
+      "description": "draco plugin",
+      "dependencies": ["draco"]
+    },
+    "usd": {
+      "description": "openusd plugin",
+      "dependencies": ["usd"]
+    }
+  },
+  "builtin-baseline": "7e7032a82d7c0674a6e7e399a0bad928c44af473"
+}

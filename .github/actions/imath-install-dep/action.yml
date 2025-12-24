@@ -1,0 +1,77 @@
+name: "Install Imath Dependency"
+description: "Install Imath Dependency using cache when possible"
+inputs:
+  cpu:
+    description: "CPU architecture to build for"
+    required: false
+    default: "x86_64"
+  version:
+    description: "Version of imath to build"
+    required: true
+  global_cache_index:
+    description: "Global cache index"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
+
+    - name: Cache Imath
+      id: cache-imath
+      uses: actions/cache/restore@v4
+      with:
+        path: dependencies/imath_install
+        key: imath-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-0
+
+    # Dependents: alembic openexr
+    - name: Checkout Imath
+      if: steps.cache-imath.outputs.cache-hit != 'true'
+      uses: actions/checkout@v4
+      with:
+        repository: AcademySoftwareFoundation/Imath
+        path: "./dependencies/imath"
+        ref: ${{inputs.version}}
+
+    - name: Setup Imath
+      if: steps.cache-imath.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir imath_build
+        mkdir imath_install
+
+    - name: Configure Imath
+      if: steps.cache-imath.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/imath_build
+      shell: bash
+      run: >
+        cmake ../imath
+        -DBUILD_SHARED_LIBS=ON
+        -DBUILD_TESTING=OFF
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX:PATH=../imath_install
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+
+    - name: Build Imath
+      if: steps.cache-imath.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/imath_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/imath_install
+      shell: bash
+      run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-imath.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-imath.outputs.cache-primary-key }}
+        path: dependencies/imath_install

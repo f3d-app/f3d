@@ -1,0 +1,106 @@
+name: "Install USD Dependency"
+description: "Install USD Dependency using cache when possible"
+inputs:
+  cpu:
+    description: "CPU architecture to build for"
+    required: false
+    default: "x86_64"
+  version:
+    description: "Version of usd to build"
+    required: true
+  openexr_version:
+    description: "Version of openexr to build against"
+    required: true
+  tbb_version:
+    description: "Version of tbb to build against"
+    required: true
+  global_cache_index:
+    description: "Global cache index"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+        [[ "${{ inputs.openexr_version }}" ]] || { echo "openexr_version input is empty" ; exit 1; }
+        [[ "${{ inputs.tbb_version }}" ]] || { echo "tbb_version input is empty" ; exit 1; }
+        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
+
+    - name: Cache USD
+      id: cache-usd
+      uses: actions/cache/restore@v4
+      with:
+        path: dependencies/usd_install
+        key: usd-${{inputs.version}}-${{inputs.openexr_version}}-${{inputs.tbb_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-0
+
+    - name: Checkout USD
+      if: steps.cache-usd.outputs.cache-hit != 'true'
+      uses: actions/checkout@v4
+      with:
+        repository: PixarAnimationStudios/USD
+        path: "./dependencies/usd"
+        ref: ${{inputs.version}}
+
+    # Upstream issue: https://github.com/PixarAnimationStudios/OpenUSD/issues/2490
+    - name: Patch USD
+      if: steps.cache-usd.outputs.cache-hit != 'true' && inputs.version == 'v24.08'
+      working-directory: ${{github.workspace}}/dependencies/usd
+      shell: bash
+      run: patch -p1 < $GITHUB_ACTION_PATH/usd-install-bin-mindep.patch
+
+    # Upstream issue: https://github.com/PixarAnimationStudios/OpenUSD/issues/2490
+    - name: Patch USD
+      if: steps.cache-usd.outputs.cache-hit != 'true' && inputs.version != 'v24.08'
+      working-directory: ${{github.workspace}}/dependencies/usd
+      shell: bash
+      run: patch -p1 < $GITHUB_ACTION_PATH/usd-install-bin.patch
+
+    - name: Setup USD
+      if: steps.cache-usd.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir usd_build
+        mkdir usd_install
+
+    - name: Configure USD
+      if: steps.cache-usd.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/usd_build
+      shell: bash
+      run: >
+        cmake ../usd
+        -DPXR_BUILD_ALEMBIC_PLUGIN:BOOL=OFF
+        -DPXR_BUILD_EMBREE_PLUGIN:BOOL=OFF
+        -DPXR_BUILD_IMAGING:BOOL=OFF
+        -DPXR_BUILD_MONOLITHIC:BOOL=ON
+        -DPXR_BUILD_TESTS:BOOL=OFF
+        -DPXR_BUILD_USD_IMAGING:BOOL=OFF
+        -DPXR_ENABLE_PYTHON_SUPPORT:BOOL=OFF
+        -DPXR_BUILD_EXAMPLES:BOOL=OFF
+        -DPXR_BUILD_TUTORIALS:BOOL=OFF
+        -DPXR_BUILD_USD_TOOLS:BOOL=OFF
+        -DPXR_INSTALL_LOCATION:PATH=../lib/usd
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX:PATH=$(pwd)/../usd_install
+        -DCMAKE_PREFIX_PATH:PATH=../install/
+
+    - name: Build USD
+      if: steps.cache-usd.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/usd_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/usd_install
+      shell: bash
+      run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-usd.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-usd.outputs.cache-primary-key }}
+        path: dependencies/usd_install

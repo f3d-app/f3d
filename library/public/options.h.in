@@ -1,0 +1,237 @@
+#ifndef f3d_options_h
+#define f3d_options_h
+
+#include "exception.h"
+#include "export.h"
+#include "types.h"
+
+/// @cond
+#include <array>
+#include <filesystem>
+#include <optional>
+#include <string>
+#include <variant>
+#include <vector>
+/// @endcond
+
+namespace f3d
+{
+// Declared here for simplicity
+using option_variant_t =
+  std::variant<bool, int, double, std::string, std::vector<double>, std::vector<int>>;
+
+/**
+ * @class   options
+ * @brief   Class used to control the different options
+ *
+ * A class to control the different options of f3d.
+ *
+ */
+class F3D_EXPORT options
+{
+public:
+  ///@{ @name Constructors
+  /**
+   * Default/Copy/move constructors/operators.
+   */
+  options();
+  ~options();
+  options(const options& opt);
+  options& operator=(const options& opt);
+  options(options&& other) noexcept;
+  options& operator=(options&& other) noexcept;
+  ///@}
+
+  /**
+   * Set an option as a variant based on its name
+   * Please note that, on Windows, using an explicit std::string may be required:
+   * https://stackoverflow.com/questions/60681710/prefer-stdstring-in-stdvariantbool-stdstring-for-const-char
+   *
+   * Throws an options::inexistent_exception if option does not exist.
+   * Throws an options::incompatible_exception if value is not compatible with option.
+   */
+  options& set(std::string_view name, const option_variant_t& value);
+
+  /**
+   * Get an option as a variant based on its name
+   *
+   * Throws an options::inexistent_exception if option does not exist.
+   * Throws an options::no_value_exception if option has not been set.
+   */
+  [[nodiscard]] option_variant_t get(std::string_view name) const;
+
+  /**
+   * Set an option as a string based on its name
+   * Use dedicated parsing code, see the related doc in PARSING.md.
+   *
+   * Throws an options::inexistent_exception if option does not exist.
+   * Throws an options::parsing_exception if parsing failed.
+   */
+  options& setAsString(std::string_view name, const std::string& str);
+
+  /**
+   * Get an option as a string based on its name
+   *
+   * Throws an options::inexistent_exception if option does not exist.
+   * Throws an options::no_value_exception if option has not been set.
+   */
+  [[nodiscard]] std::string getAsString(std::string_view name) const;
+
+  /**
+   * A boolean option specific method to toggle it.
+   * If the option has not been set yet, set it to true.
+   *
+   * Throws an options::inexistent_exception if option does not exist.
+   * Throws an options::incompatible_exception if option is not boolean.
+   */
+  options& toggle(std::string_view name);
+
+  /**
+   * Compare an option between this and a provided other.
+   * Return true if they are the same value, false otherwise.
+   *
+   * Throws an options::inexistent_exception if option does not exist.
+   */
+  [[nodiscard]] bool isSame(const options& other, std::string_view name) const;
+
+  /**
+   * Return true if an option has a value, false otherwise
+   * Always returns true for non-optional options.
+   *
+   * Throws an options::inexistent_exception if option does not exist.
+   */
+  [[nodiscard]] bool hasValue(std::string_view name) const;
+
+  /**
+   * Copy the value of an option from this to the provided other.
+   *
+   * Throws an options::inexistent_exception if option does not exist.
+   */
+  options& copy(const options& other, std::string_view name);
+
+  /**
+   * Get all available option names.
+   */
+  [[nodiscard]] static std::vector<std::string> getAllNames();
+
+  /**
+   * Get all option names that currently have values.
+   */
+  [[nodiscard]] std::vector<std::string> getNames() const;
+
+  /**
+   * Get the closest option name and its Levenshtein distance.
+   */
+  [[nodiscard]] std::pair<std::string, unsigned int> getClosestOption(
+    std::string_view option) const;
+
+  /**
+   *  Returns true if the option is optional else returns false.
+   *
+   *  Throws an options::inexistent_exception if option does not exist.
+   */
+  [[nodiscard]] bool isOptional(std::string_view option) const;
+
+  /**
+   *  Resets the option to default value.
+   *
+   *  Throws an options::inexistent_exception if option does not exist.
+   */
+  options& reset(std::string_view name);
+
+  /**
+   *  Unset the option if it is optional else throws options::incompatible_exception.
+   *
+   *  Throws an options::inexistent_exception if option does not exist.
+   */
+  options& removeValue(std::string_view name);
+
+  /**
+   * Templated parsing method used internally to parse strings.
+   * Implemented for the different supported types,
+   * see PARSING.md for more info.
+   *
+   * Throws an options::parsing_exception if parsing failed.
+   */
+  template<typename T>
+  [[nodiscard]] static T parse(const std::string& str);
+
+  /**
+   * Templated parsing method used internally to format var into strings.
+   * Implemented for the different supported types,
+   *
+   * see PARSING.md for more info.
+   */
+  template<typename T>
+  [[nodiscard]] static std::string format(const T& var);
+
+  /**
+   * An exception that can be thrown by the options
+   * when parsing of a string into an option value fails
+   */
+  struct parsing_exception : public exception
+  {
+    explicit parsing_exception(const std::string& what = "");
+  };
+
+  /**
+   * An exception that can be thrown by the options
+   * when an operation on a specific option is incompatible with
+   * its internal type.
+   */
+  struct incompatible_exception : public exception
+  {
+    explicit incompatible_exception(const std::string& what = "");
+  };
+
+  /**
+   * An exception that can be thrown by the options
+   * when a provided option does not exist.
+   */
+  struct inexistent_exception : public exception
+  {
+    explicit inexistent_exception(const std::string& what = "");
+  };
+
+  /**
+   * An exception that can be thrown by the options
+   * when a provided option is accessed before being set.
+   */
+  struct no_value_exception : public exception
+  {
+    explicit no_value_exception(const std::string& what = "");
+  };
+
+  /**
+   * The complete generated options struct
+   */
+  // clang-format off
+  ${_options_struct}
+  // clang-format on
+};
+
+}
+
+// Certain options types are not trivially streamable
+//----------------------------------------------------------------------------
+inline std::ostream& operator<<(std::ostream& os, const f3d::color_t& color)
+{
+  os << f3d::options::format(color);
+  return os;
+}
+inline std::ostream& operator<<(std::ostream& os, const f3d::direction_t& direction)
+{
+  os << f3d::options::format(direction);
+  return os;
+}
+inline std::ostream& operator<<(std::ostream& os, const f3d::colormap_t& cm)
+{
+  os << f3d::options::format(cm);
+  return os;
+}
+inline std::ostream& operator<<(std::ostream& os, const f3d::transform2d_t& transform)
+{
+  os << f3d::options::format(transform);
+  return os;
+}
+#endif

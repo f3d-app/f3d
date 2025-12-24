@@ -1,0 +1,93 @@
+[
+  {
+    "match-type": "glob",
+    "match": "*.{dcm,nrrd,nhdr,mhd,mha,vtp,vtu,vtr,vti,vts,vtm}",
+    "options": {
+      "scalar-coloring": true,
+      "coloring-scalar-bar": true
+    }
+  },
+  {
+    "match-type": "glob",
+    "match": "*.{dcm,nrrd,nhdr,mhd,mha,vti}",
+    "options": {
+      "volume": true
+    }
+  },
+  {
+    "match-type": "glob",
+    "match": "*.{3ds,stl}",
+    "options": {
+      "up": "+Z",
+      "camera-direction": "-1,1,-0.5"
+    }
+  },
+  {
+    "match-type": "glob",
+    "match": "*.{stl,gml,pts}",
+    "options": {
+      "scalar-coloring": true
+    }
+  },
+  {
+    "match-type": "glob",
+    "match": "*.{tif,tiff}",
+    "options": {
+      "scalar-coloring": true,
+      "up": "-Y",
+      "coloring-component": "-2",
+      "camera-direction": "-1,0.5,1"
+    }
+  },
+  {
+    "match-type": "glob",
+    "match": "*.ply",
+    "options": {
+      "scalar-coloring": true,
+      "coloring-component": "-2",
+      "blending": "ddp"
+    }
+  },
+  {
+    "match-type": "glob",
+    "match": "*.{splat,spz}",
+    "options": {
+      "point-sprites": "gaussian",
+      "point-sprites-absolute-size": true,
+      "point-sprites-size": 1,
+      "scalar-coloring": true,
+      "coloring-array": "color",
+      "coloring-component": "-2",
+      "background-color": "0, 0, 0",
+      "interaction-trackball": true,
+      "tone-mapping": false,
+      "grid": false,
+      "anti-aliasing": "none",
+      "blending": "sort"
+    }
+  },
+  {
+    "match-type": "glob",
+    "match": "*.splat",
+    "options": {
+      "up": "-Y",
+      "camera-position": "0,1,-5.2",
+      "camera-focal-point": "0,1,0"
+    }
+  },
+  {
+    "match-type": "glob",
+    "match": "*.spz",
+    "options": {
+      "camera-position": "0,1,4",
+      "camera-focal-point": "0,0,0"
+    }
+  },
+  {
+    "match-type": "glob",
+    "match": "*.mdl",
+    "options": {
+      "up": "+Z"
+    }
+  }
+]

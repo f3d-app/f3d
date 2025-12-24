@@ -1,0 +1,13 @@
+NAME
+  f3d::vtkextAssimp
+DESCRIPTION
+  A VTK module for the Assimp plugin
+DEPENDS
+  VTK::CommonCore
+  VTK::IOImport
+  VTK::IOImage
+  VTK::RenderingOpenGL2
+  f3d::vtkext
+  assimp::assimp
+TEST_DEPENDS
+  VTK::TestingCore

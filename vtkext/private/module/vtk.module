@@ -1,0 +1,31 @@
+NAME
+  f3d::vtkextPrivate
+DESCRIPTION
+  A VTK module only used internally by libf3d
+DEPENDS
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::IOImage
+  VTK::ImagingCore
+  VTK::InteractionStyle
+  VTK::RenderingAnnotation
+  VTK::RenderingCore
+  VTK::RenderingOpenGL2
+  VTK::RenderingVolumeOpenGL2
+  f3d::vtkext
+PRIVATE_DEPENDS
+  VTK::CommonExecutionModel
+  VTK::FiltersGeneral
+  VTK::FiltersGeometry
+  VTK::IOXML
+  VTK::ImagingHybrid
+  VTK::InteractionWidgets
+OPTIONAL_DEPENDS
+  VTK::opengl
+  VTK::RenderingRayTracing
+  VTK::RenderingGridAxes
+TEST_DEPENDS
+  VTK::IOGeometry
+  VTK::IOPLY
+  VTK::IOXML
+  VTK::TestingCore

@@ -1,0 +1,6 @@
+# A comment at the beginning of the script
+roll_camera 90 # A comment at the end of a command
+toggle ui.scalar_bar
+# A comment in the middle of the script
+print_scene_info
+increase_light_intensity

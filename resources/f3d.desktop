@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=F3D
+GenericName=3D Viewer
+Comment=A fast and minimalist 3D viewer
+TryExec=f3d
+Exec=f3d %F
+Icon=f3d
+Categories=Graphics;3DGraphics;Viewer;
+Keywords=vtk;animations;fbx;step;stl;dcm;ex2;gml;obj;3ds;gltf;pbr;raytracing;scivis;volume;rendering

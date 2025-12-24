@@ -1,0 +1,27 @@
+# StreamVersion 1.2
+ExposeEvent 0 599 0 0 0 0 0
+RenderEvent 0 599 0 0 0 0 0
+MouseWheelBackwardEvent 553 355 0 0 0 Super_L 0
+StartInteractionEvent 553 355 0 0 0 Super_L 0
+RenderEvent 553 355 0 0 0 Super_L 0
+EndInteractionEvent 553 355 0 0 0 Super_L 0
+RenderEvent 553 355 0 0 0 Super_L 0
+MouseWheelBackwardEvent 553 355 0 0 1 Super_L 0
+StartInteractionEvent 553 355 0 0 1 Super_L 0
+RenderEvent 553 355 0 0 1 Super_L 0
+EndInteractionEvent 553 355 0 0 1 Super_L 0
+RenderEvent 553 355 0 0 1 Super_L 0
+MouseWheelBackwardEvent 553 355 0 0 0 Super_L 0
+StartInteractionEvent 553 355 0 0 0 Super_L 0
+RenderEvent 553 355 0 0 0 Super_L 0
+EndInteractionEvent 553 355 0 0 0 Super_L 0
+RenderEvent 553 355 0 0 0 Super_L 0
+MouseMoveEvent 552 355 0 0 0 Super_L 0
+MouseWheelBackwardEvent 552 355 0 0 1 Super_L 0
+StartInteractionEvent 552 355 0 0 1 Super_L 0
+RenderEvent 552 355 0 0 1 Super_L 0
+EndInteractionEvent 552 355 0 0 1 Super_L 0
+RenderEvent 552 355 0 0 1 Super_L 0
+KeyPressEvent 552 355 0 115 1 s 0
+CharEvent 552 355 0 115 1 s 0
+KeyReleaseEvent 552 355 0 115 1 s 0

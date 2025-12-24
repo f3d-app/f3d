@@ -1,0 +1,13 @@
+NAME
+  f3d::vtkextUSD
+DESCRIPTION
+  A VTK module for the USD plugin
+DEPENDS
+  VTK::CommonCore
+  VTK::FiltersGeneral
+  VTK::FiltersSources
+  VTK::IOImport
+  VTK::IOImage
+  f3d::vtkext
+TEST_DEPENDS
+  VTK::TestingCore

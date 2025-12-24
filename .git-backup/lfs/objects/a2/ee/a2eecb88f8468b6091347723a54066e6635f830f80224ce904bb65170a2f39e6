@@ -1,0 +1,7 @@
+NDims = 3
+DimSize = 48 62 42
+ElementSize = 4.000000e+000 4.000000e+000 4.000000e+000
+ElementSpacing = 4.000000e+000 4.000000e+000 4.000000e+000
+ElementType = MET_UCHAR
+ElementByteOrderMSB = False
+ElementDataFile = HeadMRVolume.raw

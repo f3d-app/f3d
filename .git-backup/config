@@ -1,0 +1,39 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+	ignorecase = true
+	precomposeunicode = true
+[remote "origin"]
+	url = git@github.com:RealEdwardS/f3d.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "master"]
+	remote = origin
+	merge = refs/heads/master
+	vscode-merge-base = origin/master
+[lfs]
+	repositoryformatversion = 0
+[branch "feature-add-pdal"]
+	vscode-merge-base = origin/master
+	remote = origin
+	merge = refs/heads/feature-add-pdal
+[pull]
+	rebase = true
+[submodule "external/clip/clip"]
+	url = https://github.com/dacap/clip.git
+	active = true
+[branch "copy-console-clipboard"]
+	vscode-merge-base = origin/feature-add-pdal
+	remote = origin
+	merge = refs/heads/copy-console-clipboard
+[submodule "clip"]
+	url = https://github.com/dacap/clip.git
+	active = true
+[submodule "external/clip"]
+	url = https://github.com/dacap/clip.git
+	active = true
+[branch "searchbar-cheatsheet"]
+	vscode-merge-base = origin/feature-add-pdal
+	remote = origin
+	merge = refs/heads/searchbar-cheatsheet

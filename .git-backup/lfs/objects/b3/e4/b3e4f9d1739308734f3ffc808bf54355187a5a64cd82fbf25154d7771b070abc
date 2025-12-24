@@ -1,0 +1,4 @@
+newmtl world
+map_Ka world.tga
+map_Kd world.tga
+map_Ks world.tga

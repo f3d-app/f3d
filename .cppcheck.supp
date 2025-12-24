@@ -1,0 +1,43 @@
+// remove some checks
+duplInheritedMember  // VTK design
+missingIncludeSystem // cppcheck seems confused about this
+missingInclude
+unusedFunction
+unknownMacro
+
+// external libraries
+*:external/nlohmann_json/nlohmann/json.hpp
+*:external/tinyfiledialogs/tinyfiledialogs.cxx
+*:external/tinyfiledialogs/tinyfiledialogs.h
+*:external/cxxopts/cxxopts.hpp
+*:external/dmon/dmon.h
+*:external/imgui/*.h
+*:external/imgui/*.cpp
+
+// generated files
+*:*vtkextTests.cxx
+*:*vtkextPrivateTests.cxx
+*:*vtkextNativeTests.cxx
+*:*VTKExtensionsPluginAlembic.cxx
+*:*VTKExtensionsPluginAssimp.cxx
+*:*vtkextDracoTests.cxx
+*:*vtkextOCCTTests.cxx
+*:*VTKExtensionsPluginUSD.cxx
+*:*libf3dSDKTests.cxx
+
+// specific checks
+knownConditionTrueFalse:vtkext/private/module/vtkF3DPointSplatMapper.cxx
+knownConditionTrueFalse:library/testing/TestSDKImage.cxx
+knownConditionTrueFalse:library/testing/TestSDKImageDeprecated.cxx
+noExplicitConstructor:library/public/types.h
+preprocessorErrorDirective:library/src/engine.cxx
+preprocessorErrorDirective:plugins/draco/module/vtkF3DDracoReader.cxx
+unknownMacro:library/VTKExtensions/Applicative/vtkF3DObjectFactory.cxx
+constParameter:library/src/image.cxx
+invalidPointerCast:plugins/native/module/vtkF3DSplatReader.cxx
+invalidPointerCast:plugins/draco/module/vtkF3DGLTFDocumentLoader.cxx
+unusedStructMember:plugins/native/module/vtkF3DQuakeMDLImporter.cxx
+unusedStructMember:plugins/native/module/vtkF3DSPZReader.cxx
+constParameterPointer:vtkext/private/module/vtkF3DMetaImporter.cxx
+constParameterPointer:plugins/assimp/module/vtkF3DAssimpImporter.cxx
+constParameterPointer:plugins/alembic/module/vtkF3DAlembicReader.cxx

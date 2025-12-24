@@ -1,0 +1,9 @@
+ply
+format binary_little_endian 1.0
+comment Written with hapPLY (https://github.com/nmwsharp/happly)
+element vertex 5
+property float x
+property float y
+property float z
+end_header
+∏æ‰;ñæ‚Ê9ΩÓ·ÅΩb<+=˛ãπæJ›Fæ˛ùxΩ°oæJæ:æ	8•ºÄÒæà‚FæÒàxΩcjæ

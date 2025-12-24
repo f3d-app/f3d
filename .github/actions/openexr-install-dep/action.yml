@@ -1,0 +1,89 @@
+name: "Install OpenEXR Dependency"
+description: "Install OpenEXR Dependency using cache when possible"
+inputs:
+  cpu:
+    description: "CPU architecture to build for"
+    required: false
+    default: "x86_64"
+  version:
+    description: "Version of openexr to build"
+    required: true
+  imath_version:
+    description: "Version of imath to build against"
+    required: true
+  global_cache_index:
+    description: "Global cache index"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
+
+    - name: Cache OpenEXR
+      id: cache-openexr
+      uses: actions/cache/restore@v4
+      with:
+        path: dependencies/openexr_install
+        key: openexr-${{inputs.version}}-${{inputs.imath_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-0
+
+    # Dependents: usd
+    - name: Checkout OpenEXR
+      if: steps.cache-openexr.outputs.cache-hit != 'true'
+      uses: actions/checkout@v4
+      with:
+        repository: AcademySoftwareFoundation/openexr
+        path: "./dependencies/openexr"
+        ref: ${{inputs.version}}
+
+    - name: Setup OpenEXR
+      if: steps.cache-openexr.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir openexr_build
+        mkdir openexr_install
+
+    # OpenEXR 3.0.1 needs patching with recent libstd
+    - name: Patch OpenEXR v3.0.1
+      if: steps.cache-openexr.outputs.cache-hit != 'true' && inputs.version == 'v3.0.1'
+      working-directory: ${{github.workspace}}/dependencies/openexr
+      shell: bash
+      run: patch -p1 < $GITHUB_ACTION_PATH/include_cstdint.patch
+
+    - name: Configure OpenEXR
+      if: steps.cache-openexr.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/openexr_build
+      shell: bash
+      run: >
+        cmake ../openexr
+        -DBUILD_SHARED_LIBS=ON
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX:PATH=../openexr_install
+        -DCMAKE_PREFIX_PATH:PATH=../install/
+        -DOPENEXR_INSTALL_TOOLS=OFF
+        -DOPENEXR_INSTALL_EXAMPLES=OFF
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0 -DCMAKE_MACOSX_RPATH=ON' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+
+    - name: Build OpenEXR
+      if: steps.cache-openexr.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/openexr_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/openexr_install
+      shell: bash
+      run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-openexr.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-openexr.outputs.cache-primary-key }}
+        path: dependencies/openexr_install

@@ -1,0 +1,18 @@
+NAME
+  f3d::vtkextNative
+DESCRIPTION
+  A VTK module for the native plugin
+DEPENDS
+  VTK::CommonCore
+  VTK::CommonExecutionModel
+  f3d::vtkext
+PRIVATE_DEPENDS
+  VTK::IOPLY
+  VTK::RenderingOpenGL2
+  VTK::zlib
+TEST_DEPENDS
+  VTK::IOPLY
+  VTK::TestingCore
+  VTK::CommonDataModel
+  VTK::FiltersCore
+  VTK::IOCore

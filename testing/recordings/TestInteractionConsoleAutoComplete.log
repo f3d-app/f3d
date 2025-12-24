@@ -1,0 +1,45 @@
+# StreamVersion 1.2
+EnterEvent 293 98 0 0 0 0 0
+RenderEvent 199 142 0 0 0 0 0
+
+KeyPressEvent 199 142 0 27 1 Escape 0
+CharEvent 199 142 0 27 1 Escape 0
+KeyReleaseEvent 199 142 0 27 1 Escape 0
+
+KeyPressEvent 199 142 0 9 1 Tab 0
+CharEvent 199 142 0 9 1 Tab 0
+KeyReleaseEvent 199 142 0 9 1 Tab 0
+
+KeyPressEvent 199 142 0 116 1 t 0
+CharEvent 199 142 0 116 1 t 0
+KeyReleaseEvent 199 142 0 116 1 t 0
+
+KeyPressEvent 199 142 0 111 1 o 0
+CharEvent 199 142 0 111 1 o 0
+KeyReleaseEvent 199 142 0 111 1 o 0
+
+KeyPressEvent 199 142 0 9 1 Tab 0
+CharEvent 199 142 0 9 1 Tab 0
+KeyReleaseEvent 199 142 0 9 1 Tab 0
+
+KeyPressEvent 199 142 0 9 1 Tab 0
+CharEvent 199 142 0 9 1 Tab 0
+KeyReleaseEvent 199 142 0 9 1 Tab 0
+
+KeyPressEvent 199 142 0 95 1 underscore 0
+CharEvent 199 142 0 95 1 underscore 0
+KeyReleaseEvent 199 142 0 95 1 underscore 0
+
+KeyPressEvent 199 142 0 97 1 a 0
+CharEvent 199 142 0 97 1 a 0
+KeyReleaseEvent 199 142 0 97 1 a 0
+
+KeyPressEvent 199 142 0 9 1 Tab 0
+CharEvent 199 142 0 9 1 Tab 0
+KeyReleaseEvent 199 142 0 9 1 Tab 0
+
+KeyPressEvent 199 142 0 13 1 Return 0
+CharEvent 199 142 0 13 1 Return 0
+KeyReleaseEvent 199 142 0 13 1 Return 0
+
+TimerEvent 351 169 0 0 0 0 0

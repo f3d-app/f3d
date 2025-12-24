@@ -1,0 +1,14 @@
+[
+  {
+    "options": {
+      "!ui.axis": true
+    }
+  },
+  {
+    "match-type": "glob",
+    "match": "*.stl",
+    "options": {
+      "!edges": true
+    }
+  }
+]

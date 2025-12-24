@@ -1,0 +1,9 @@
+[
+  {
+    "match-type": "glob",
+    "match": "*.expl",
+    "options": {
+      "load-plugins": "example"
+    }
+  }
+]

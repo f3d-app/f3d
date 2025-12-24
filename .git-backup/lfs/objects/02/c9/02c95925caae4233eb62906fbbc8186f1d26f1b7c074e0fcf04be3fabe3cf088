@@ -1,0 +1,19 @@
+#usda 1.0
+ 
+def "Instancing"
+{
+    def "primitives_1" (
+        instanceable = true
+        references = @./primitives.usda@</Primitives>
+    )
+    {
+        double3 xformOp:translate = (-400, 0, 0)
+    }
+ 
+    def "primitives_2" (
+        instanceable = true
+        references = @./primitives.usda@</Primitives>
+    )
+    {
+    }
+}

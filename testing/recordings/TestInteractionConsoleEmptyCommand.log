@@ -1,0 +1,10 @@
+# StreamVersion 1.2
+RenderEvent 0 0 0 0 0 0 0
+
+KeyPressEvent 211 120 0 27 1 Escape 0
+CharEvent 211 120 0 27 1 Escape 0
+KeyReleaseEvent 211 120 0 27 1 Escape 0
+
+KeyPressEvent 211 120 0 13 1 Return 0
+CharEvent 211 120 0 13 1 Return 0
+KeyReleaseEvent 211 120 0 13 1 Return 0

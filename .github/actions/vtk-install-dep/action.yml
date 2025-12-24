@@ -1,0 +1,177 @@
+name: "Install VTK Dependency"
+description: "Install VTK Dependency using cache when possible"
+inputs:
+  vtk_version:
+    description: "VTK version"
+    required: true
+  cpu:
+    description: "CPU architecture to build for"
+    required: false
+    default: "x86_64"
+  blosc_version:
+    description: "Version of blosc to build against"
+    required: true
+  openvdb_version:
+    description: "Version of openvdb to build against"
+    required: false
+  ospray_version:
+    description: "Version of ospray to build against"
+    required: false
+  tbb_version:
+    description: "Version of tbb to build against"
+    required: true
+  zlib_version:
+    description: "Version of zlib to build against"
+    required: true
+  pdal_version:
+    description: "Version of pdal to build against"
+    required: false
+  gdal_version:
+    description: "Version of gdal to build against"
+    required: true
+  sqlite_version:
+    description: "Version of sqlite to build against"
+    required: true
+  xercesc_version:
+    description: "Version of xerces-c to build against"
+    required: true
+  curl_version:
+    description: "Version of curl to build against"
+    required: true
+  libgeotiff_version:
+    description: "Version of libgeotiff to build against"
+    required: true
+  libtiff_version:
+    description: "Version of libtiff to build against"
+    required: true
+  proj_version:
+    description: "Version of proj to build against"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.blosc_version }}" ]] || { echo "blosc_version input is empty" ; exit 1; }
+        [[ "${{ inputs.tbb_version }}" ]] || { echo "tbb_version input is empty" ; exit 1; }
+        [[ "${{ inputs.vtk_version }}" ]] || { echo "vtk_version input is empty" ; exit 1; }
+        [[ "${{ inputs.zlib_version }}" ]] || { echo "zlib_version input is empty" ; exit 1; }
+        [[ "${{ inputs.sqlite_version }}" ]] || { echo "sqlite_version input is empty" ; exit 1; }
+        [[ "${{ inputs.xercesc_version }}" ]] || { echo "xercesc_version input is empty" ; exit 1; }
+        [[ "${{ inputs.curl_version }}" ]] || { echo "curl_version input is empty" ; exit 1; }
+        [[ "${{ inputs.proj_version }}" ]] || { echo "proj_version input is empty" ; exit 1; }
+        [[ "${{ inputs.gdal_version }}" ]] || { echo "gdal_version input is empty" ; exit 1; }
+        [[ "${{ inputs.libgeotiff_version }}" ]] || { echo "libgeotiff_version input is empty" ; exit 1; }
+        [[ "${{ inputs.libtiff_version }}" ]] || { echo "libtiff_version input is empty" ; exit 1; }
+
+    - name: Cache VTK
+      id: cache-vtk
+      uses: actions/cache/restore@v4
+      with:
+        path: dependencies/vtk_install
+        key: vtk-${{ inputs.vtk_version }}-${{inputs.zlib_version}}-${{inputs.blosc_version}}-${{inputs.tbb_version}}${{ inputs.openvdb_version != '' && format('-openvdb-{0}', inputs.openvdb_version) || '' }}${{ inputs.ospray_version != '' && format('-ospray-{0}', inputs.ospray_version) || '' }}-${{inputs.proj_version}}-${{inputs.gdal_version}}-${{inputs.libgeotiff_version}}-${{inputs.libtiff_version}}-${{inputs.sqlite_version}}-${{inputs.xercesc_version}}-${{inputs.curl_version}}-${{inputs.pdal_version}}-${{runner.os}}-${{inputs.cpu}}-0
+
+    - name: Setup VTK
+      if: steps.cache-vtk.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir vtk_build
+        mkdir vtk_install
+
+    # MacOS needs fetch-depth: 0 to avoid an issue with version in linker
+    - name: Checkout VTK
+      if: steps.cache-vtk.outputs.cache-hit != 'true'
+      uses: actions/checkout@v4
+      with:
+        repository: Kitware/VTK
+        submodules: true
+        fetch-depth: 0
+        path: "./dependencies/vtk"
+        ref: ${{ inputs.vtk_version }}
+
+    # CMake 3.31 introduced a new policy producing a warning when using vtkModule.cmake
+    # See https://gitlab.kitware.com/vtk/vtk/-/issues/19526
+    - name: Patch VTK CMake
+      if: steps.cache-vtk.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/vtk
+      shell: bash
+      run: |
+        cat $GITHUB_ACTION_PATH/set_cmp0177_policy.cmake CMake/vtkModule.cmake > patched.cmake
+        mv patched.cmake CMake/vtkModule.cmake
+
+      # OpenVDB_CMAKE_PATH is required because of
+      # https://github.com/AcademySoftwareFoundation/openvdb/issues/1160 and
+      # https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10393
+      # CMAKE_MODULE_PATH is not used because OpenVDB_CMAKE_PATH seems to be the canonical way to handle this with VTK
+    - name: Configure VTK
+      if: steps.cache-vtk.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/vtk_build
+      shell: bash
+      run: >
+        cmake ../vtk
+        -DBUILD_SHARED_LIBS=ON
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX:PATH=../vtk_install
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
+        -DOpenVDB_CMAKE_PATH=${{ inputs.openvdb_version != '' && '$(pwd)/../install/lib/cmake/OpenVDB/' || '' }}
+        -DVTKOSPRAY_ENABLE_DENOISER=ON
+        -DVTK_BUILD_TESTING=OFF
+        -DVTK_DEBUG_LEAKS=ON
+        -DVTK_ENABLE_LOGGING=OFF
+        -DVTK_ENABLE_REMOTE_MODULES=OFF
+        -DVTK_ENABLE_WRAPPING=OFF
+        -DVTK_GROUP_ENABLE_Rendering=DEFAULT
+        -DVTK_GROUP_ENABLE_StandAlone=DEFAULT
+        -DVTK_LEGACY_REMOVE=ON
+        -DVTK_MODULE_ENABLE_VTK_CommonSystem=YES
+        -DVTK_MODULE_ENABLE_VTK_FiltersGeneral=YES
+        -DVTK_MODULE_ENABLE_VTK_FiltersGeometry=YES
+        -DVTK_MODULE_ENABLE_VTK_IOCityGML=YES
+        -DVTK_MODULE_ENABLE_VTK_IOExodus=YES
+        -DVTK_MODULE_ENABLE_VTK_IOGeometry=YES
+        -DVTK_MODULE_ENABLE_VTK_IOHDF=YES
+        -DVTK_MODULE_ENABLE_VTK_IOImage=YES
+        -DVTK_MODULE_ENABLE_VTK_IOImport=YES
+        -DVTK_MODULE_ENABLE_VTK_IOLegacy=YES
+        -DVTK_MODULE_ENABLE_VTK_IONetCDF=YES
+        -DVTK_MODULE_ENABLE_VTK_IOOpenVDB=${{ inputs.openvdb_version != '' && 'YES' || 'DEFAULT' }}
+        -DVTK_MODULE_ENABLE_VTK_IOPDAL=YES
+        -DVTK_MODULE_ENABLE_VTK_IOPLY=YES
+        -DVTK_MODULE_ENABLE_VTK_IOXML=YES
+        -DVTK_MODULE_ENABLE_VTK_ImagingCore=YES
+        -DVTK_MODULE_ENABLE_VTK_ImagingHybrid=YES
+        -DVTK_MODULE_ENABLE_VTK_InteractionStyle=YES
+        -DVTK_MODULE_ENABLE_VTK_InteractionWidgets=YES
+        -DVTK_MODULE_ENABLE_VTK_RenderingAnnotation=YES
+        -DVTK_MODULE_ENABLE_VTK_RenderingCore=YES
+        -DVTK_MODULE_ENABLE_VTK_RenderingGridAxes=YES
+        -DVTK_MODULE_ENABLE_VTK_RenderingOpenGL2=YES
+        -DVTK_MODULE_ENABLE_VTK_RenderingRayTracing=${{ inputs.ospray_version != '' && 'YES' || 'DEFAULT' }}
+        -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2=YES
+        -DVTK_MODULE_ENABLE_VTK_TestingCore=YES
+        -DVTK_OPENGL_HAS_EGL=${{ runner.os != 'macOS' && inputs.vtk_version != 'v9.3.0' && 'ON' || 'OFF' }}
+        -DVTK_SMP_IMPLEMENTATION_TYPE=TBB
+        -DVTK_VERSIONED_INSTALL=OFF
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+
+    - name: Build VTK
+      if: steps.cache-vtk.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/vtk_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/vtk_install
+      shell: bash
+      run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-vtk.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-vtk.outputs.cache-primary-key }}
+        path: dependencies/vtk_install

@@ -1,0 +1,96 @@
+on:
+  pull_request_target:
+    types: [assigned, opened, synchronize, reopened, labeled]
+    branches:
+      - master
+      - release
+name: Style Checks
+jobs:
+  #----------------------------------------------------------------------------
+  # Style checks
+  #----------------------------------------------------------------------------
+  style_checks:
+    name: Formatting Check
+    runs-on: ubuntu-latest
+    if: |
+      contains(github.event.pull_request.labels.*.name, 'ci:fast') ||
+      contains(github.event.pull_request.labels.*.name, 'ci:main') ||
+      contains(github.event.pull_request.labels.*.name, 'ci:full')
+    env:
+      ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{github.event.pull_request.head.ref}}
+          repository: ${{github.event.pull_request.head.repo.full_name}}
+          fetch-depth: 1
+          lfs: false
+
+      # Run codespell first to avoid issues with style check on same location
+      - name: Codespell in place
+        shell: bash
+        run: |
+          pip install codespell
+          codespell -fHw .
+
+      - name: C++ Formatting
+        uses: DoozyX/clang-format-lint-action@v0.16
+        with:
+          source: "."
+          extensions: "h,cxx,in"
+          exclude: "./cmake **/*.py.in **/*.log.in **/*.json.in **/*.thumbnailer.in **/*.cmake.in **/*.desktop.in"
+          clangFormatVersion: 18
+          inplace: True
+
+      - name: Python Formatting
+        uses: psf/black@stable
+        with:
+          options: "--include '(\\.py|\\.py\\.in)'"
+
+      - name: Prettier Formatting
+        continue-on-error: true
+        uses: creyD/prettier_action@v4.3
+        with:
+          dry: True
+          prettier_options: "-w **/*.{js,json,md,html,yml}"
+
+      - name: Echo Diff
+        shell: bash
+        run: git diff --color=always --exit-code
+
+      - name: Generate Diff
+        if: failure()
+        shell: bash
+        run: |
+          diff=$(git diff)
+          echo "$diff" > ./f3d_style_checks_diff.patch
+          {
+            echo 'F3D_STYLE_DIFF<<EOF'
+            echo "$diff"
+            echo EOF
+          } >> "$GITHUB_ENV"
+
+      - name: Upload diff as an artifact
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          path: ./f3d_style_diff.patch
+          name: f3d-style-checks-diff-${{ github.event.pull_request.head.ref }}
+
+      - name: Delete comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: style
+          delete: true
+
+      - name: Create comment
+        if: failure()
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: style
+          message: |
+            Style Checks CI failed:
+            ```diff
+            ${{env.F3D_STYLE_DIFF}}
+            ```

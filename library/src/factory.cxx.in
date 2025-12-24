@@ -1,0 +1,137 @@
+#include "factory.h"
+
+#include "log.h"
+// clang-format off
+${F3D_STATIC_PLUGIN_EXTERN}
+// clang-format on
+
+namespace f3d
+{
+//----------------------------------------------------------------------------
+factory* factory::instance()
+{
+  static factory instance;
+  return &instance;
+}
+
+//----------------------------------------------------------------------------
+factory::factory()
+{
+  // clang-format off
+  ${F3D_STATIC_PLUGIN_MAP}
+  // clang-format on
+}
+
+//----------------------------------------------------------------------------
+const std::vector<plugin*>& factory::getPlugins()
+{
+  return this->Plugins;
+}
+
+//----------------------------------------------------------------------------
+factory::plugin_initializer_t factory::getStaticInitializer(const std::string& pluginName)
+{
+  auto it = this->StaticPluginInitializers.find(pluginName);
+  if (it != this->StaticPluginInitializers.end())
+  {
+    return it->second;
+  }
+  return nullptr;
+}
+
+//----------------------------------------------------------------------------
+reader* factory::getReader(const std::string& fileName, std::optional<std::string> forceReader)
+{
+  int bestScore = -1;
+  reader* bestReader = nullptr;
+
+  for (const auto* plugin : this->Plugins)
+  {
+    for (const auto& reader : plugin->getReaders())
+    {
+      if (forceReader)
+      {
+        if (reader->getName() == *forceReader)
+        {
+          return reader.get();
+        }
+      }
+      else if (reader->getScore() > bestScore && reader->canRead(fileName))
+      {
+        bestScore = reader->getScore();
+        bestReader = reader.get();
+      }
+    }
+  }
+
+  return bestReader;
+}
+
+//----------------------------------------------------------------------------
+bool factory::setReaderOption(const std::string& name, const std::string& value)
+{
+  // Set the reader option on the first reader that accepts it
+  return std::any_of(this->Plugins.begin(), this->Plugins.end(),
+    [&](const f3d::plugin* plugin)
+    {
+      const auto& readers = plugin->getReaders();
+      return std::any_of(readers.begin(), readers.end(),
+        [&](const auto& reader) { return reader->setReaderOption(name, value); });
+    });
+}
+
+//----------------------------------------------------------------------------
+std::vector<std::string> factory::getAllReaderOptionNames()
+{
+  std::vector<std::string> names;
+  for (const f3d::plugin* plugin : this->Plugins)
+  {
+    for (const auto& reader : plugin->getReaders())
+    {
+      auto readerNames = reader->getAllReaderOptionNames();
+      names.insert(names.end(), readerNames.begin(), readerNames.end());
+    }
+  }
+  return names;
+}
+
+//----------------------------------------------------------------------------
+void factory::load(plugin* plug)
+{
+  if (!this->registerOnce(plug))
+  {
+    log::debug("A plugin named \"" + plug->getName() + "\" is already registered.");
+  }
+}
+
+//----------------------------------------------------------------------------
+void factory::autoload()
+{
+  for (const auto& [str, init] : this->StaticPluginInitializers)
+  {
+    this->registerOnce(init());
+  }
+}
+
+//----------------------------------------------------------------------------
+bool factory::registerOnce(plugin* plug)
+{
+  if (std::find(this->Plugins.begin(), this->Plugins.end(), plug) == this->Plugins.end())
+  {
+    this->Plugins.push_back(plug);
+
+    log::debug("Loading plugin \"" + plug->getName() + "\"");
+    log::debug("  Version: " + plug->getVersion());
+    log::debug("  Description: " + plug->getDescription());
+    log::debug("  Readers:");
+
+    for (const auto& read : plug->getReaders())
+    {
+      log::debug("    " + read->getLongDescription());
+    }
+
+    return true;
+  }
+  return false;
+}
+}

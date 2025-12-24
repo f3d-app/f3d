@@ -1,0 +1,11 @@
+[
+  {
+    "match-type": "glob",
+    "match": "*.{exo,ex2,e,g,vtkhdf,nc,cdf,ncdf}",
+    "options": {
+      "scalar-coloring": true,
+      "load-plugins": "hdf",
+      "coloring-scalar-bar": true
+    }
+  }
+]

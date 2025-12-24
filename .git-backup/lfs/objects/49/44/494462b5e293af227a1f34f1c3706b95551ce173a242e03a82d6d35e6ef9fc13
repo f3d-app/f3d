@@ -1,0 +1,12 @@
+<VTKFile type="vtkMultiBlockDataSet" version="1.0" byte_order="LittleEndian" header_type="UInt64">
+  <vtkMultiBlockDataSet>
+    <DataSet index="0" file="mb/mb_0_0.vtu"/>
+    <Block index="1">
+      <Piece index="0" name="INLET">
+        <DataSet index="0" file="mb/mb_1_0.vtp"/>
+        <DataSet index="1" file="mb/mb_2_0.vtp"/>
+      </Piece>
+    </Block>
+    <DataSet index="2" file="mb/mb_3_0.vtt"/>
+  </vtkMultiBlockDataSet>
+</VTKFile>

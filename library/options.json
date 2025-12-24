@@ -1,0 +1,391 @@
+{
+  "scene": {
+    "up_direction": {
+      "type": "direction",
+      "default_value": "0,1,0"
+    },
+    "animation": {
+      "autoplay": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "index": {
+        "type": "int",
+        "default_value": "0",
+        "deprecated": "use scene.animation.indices instead"
+      },
+      "indices": {
+        "type": "int_vector",
+        "default_value": "0"
+      },
+      "speed_factor": {
+        "type": "ratio",
+        "default_value": "1.0"
+      }
+    },
+    "camera": {
+      "index": {
+        "type": "int"
+      },
+      "orthographic": {
+        "type": "bool"
+      }
+    },
+    "force_reader": {
+      "type": "string"
+    }
+  },
+  "render": {
+    "show_edges": {
+      "type": "bool"
+    },
+    "line_width": {
+      "type": "double"
+    },
+    "point_size": {
+      "type": "double"
+    },
+    "backface_type": {
+      "type": "string"
+    },
+    "grid": {
+      "enable": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "absolute": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "unit": {
+        "type": "double"
+      },
+      "subdivisions": {
+        "type": "int",
+        "default_value": "10"
+      },
+      "color": {
+        "type": "color",
+        "default_value": "0.0, 0.0, 0.0"
+      }
+    },
+    "axes_grid": {
+      "enable": {
+        "type": "bool",
+        "default_value": "false"
+      }
+    },
+    "raytracing": {
+      "enable": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "denoise": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "samples": {
+        "type": "int",
+        "default_value": "5"
+      }
+    },
+    "effect": {
+      "translucency_support": {
+        "type": "bool",
+        "default_value": "false",
+        "deprecated": "use render.effect.blending.enable instead"
+      },
+      "blending": {
+        "enable": {
+          "type": "bool",
+          "default_value": "false"
+        },
+        "mode": {
+          "type": "string",
+          "default_value": "ddp"
+        }
+      },
+      "anti_aliasing": {
+        "type": "bool",
+        "default_value": "false",
+        "deprecated": "use render.effect.antialiasing.enable instead"
+      },
+      "antialiasing": {
+        "enable": {
+          "type": "bool",
+          "default_value": "false"
+        },
+        "mode": {
+          "type": "string",
+          "default_value": "fxaa"
+        }
+      },
+      "ambient_occlusion": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "tone_mapping": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "final_shader": {
+        "type": "string"
+      }
+    },
+    "hdri": {
+      "file": {
+        "type": "path"
+      },
+      "ambient": {
+        "type": "bool",
+        "default_value": "false"
+      }
+    },
+    "background": {
+      "color": {
+        "type": "color",
+        "default_value": "0.2, 0.2, 0.2"
+      },
+      "skybox": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "blur": {
+        "enable": {
+          "type": "bool",
+          "default_value": "false"
+        },
+        "coc": {
+          "type": "double",
+          "default_value": "20.0"
+        }
+      }
+    },
+    "light": {
+      "intensity": {
+        "type": "double",
+        "default_value": "1.0"
+      }
+    },
+    "armature": {
+      "enable": {
+        "type": "bool",
+        "default_value": "false"
+      }
+    }
+  },
+  "ui": {
+    "backdrop": {
+      "opacity": {
+        "type": "double",
+        "default_value": "0.9"
+      }
+    },
+    "axis": {
+      "type": "bool",
+      "default_value": "false"
+    },
+    "scalar_bar": {
+      "type": "bool",
+      "default_value": "false"
+    },
+    "filename": {
+      "type": "bool",
+      "default_value": "false"
+    },
+    "filename_info": {
+      "type": "string",
+      "default_value": ""
+    },
+    "fps": {
+      "type": "bool",
+      "default_value": "false"
+    },
+    "cheatsheet": {
+      "type": "bool",
+      "default_value": "false"
+    },
+    "console": {
+      "type": "bool",
+      "default_value": "false"
+    },
+    "minimal_console": {
+      "type": "bool",
+      "default_value": "false"
+    },
+    "dropzone": {
+      "type": "bool",
+      "default_value": "false",
+      "deprecated": "use ui.drop_zone.enable instead"
+    },
+    "dropzone_info": {
+      "type": "string",
+      "default_value": "",
+      "deprecated": "use ui.drop_zone.custom_binds instead"
+    },
+    "drop_zone": {
+      "enable": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "info": {
+        "type": "string",
+        "default_value": "",
+        "deprecated": "use ui.drop_zone.custom_binds instead"
+      },
+      "show_logo": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "custom_binds": {
+        "type": "string",
+        "default_value": ""
+      }
+    },
+    "metadata": {
+      "type": "bool",
+      "default_value": "false"
+    },
+    "hdri_filename": {
+      "type": "bool",
+      "default_value": "false"
+    },
+    "font_file": {
+      "type": "path"
+    },
+    "scale": {
+      "type": "ratio",
+      "default_value": "1.0"
+    },
+    "loader_progress": {
+      "type": "bool",
+      "default_value": "false"
+    },
+    "loader_progress_color": {
+      "type": "color"
+    },
+    "animation_progress": {
+      "type": "bool",
+      "default_value": "false"
+    },
+    "animation_progress_color": {
+      "type": "color"
+    }
+  },
+  "model": {
+    "matcap": {
+      "texture": {
+        "type": "path"
+      }
+    },
+    "color": {
+      "opacity": {
+        "type": "double"
+      },
+      "rgb": {
+        "type": "color"
+      },
+      "texture": {
+        "type": "path"
+      }
+    },
+    "emissive": {
+      "factor": {
+        "type": "color"
+      },
+      "texture": {
+        "type": "path"
+      }
+    },
+    "normal": {
+      "scale": {
+        "type": "double"
+      },
+      "texture": {
+        "type": "path"
+      }
+    },
+    "material": {
+      "metallic": {
+        "type": "double"
+      },
+      "roughness": {
+        "type": "double"
+      },
+      "base_ior": {
+        "type": "double"
+      },
+      "texture": {
+        "type": "path"
+      }
+    },
+    "textures_transform": {
+      "type": "transform2d"
+    },
+    "scivis": {
+      "enable": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "cells": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "discretization": {
+        "type": "int"
+      },
+      "array_name": {
+        "type": "string"
+      },
+      "component": {
+        "type": "int",
+        "default_value": "-1"
+      },
+      "colormap": {
+        "type": "colormap",
+        "default_value": "0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0, 1.0, 1.0, 1.0, 1.0"
+      },
+      "range": {
+        "type": "double_vector"
+      }
+    },
+    "point_sprites": {
+      "enable": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "type": {
+        "type": "string",
+        "default_value": "sphere"
+      },
+      "size": {
+        "type": "double",
+        "default_value": 10.0
+      },
+      "absolute_size": {
+        "type": "bool",
+        "default_value": "false"
+      }
+    },
+    "volume": {
+      "enable": {
+        "type": "bool",
+        "default_value": "false"
+      },
+      "inverse": {
+        "type": "bool",
+        "default_value": "false"
+      }
+    }
+  },
+  "interactor": {
+    "trackball": {
+      "type": "bool",
+      "default_value": "false"
+    },
+    "invert_zoom": {
+      "type": "bool",
+      "default_value": "false"
+    }
+  }
+}

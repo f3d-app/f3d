@@ -1,0 +1,14 @@
+#ifndef F3DConfig_h
+#define F3DConfig_h
+
+#include <string>
+
+namespace F3D
+{
+const std::string AppName = "@PROJECT_NAME@";
+const std::string AppTitle = "@PROJECT_DESCRIPTION@";
+const std::string AppVersion = "@F3D_VERSION@";
+const std::string AppVersionFull = "@F3D_VERSION_FULL@";
+const std::string PluginsInstallDir = "@F3D_PLUGINS_INSTALL_DIR@";
+}
+#endif

@@ -1,0 +1,9 @@
+[
+  {
+    "match-type": "glob",
+    "match": "*.usd{,a,c,z}",
+    "options": {
+      "load-plugins": "usd"
+    }
+  }
+]

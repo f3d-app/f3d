@@ -1,0 +1,20 @@
+codecov:
+  notify:
+    after_n_builds: 1
+    wait_for_ci: yes
+
+coverage:
+  range: 70..100
+  round: down
+  precision: 2
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 0.1%
+
+comment:
+  require_changes: true
+
+fixes:
+  - "/source::"

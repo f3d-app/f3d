@@ -1,0 +1,14 @@
+# StreamVersion 1.2
+ExposeEvent 0 599 0 0 0 0 0
+RenderEvent 0 599 0 0 0 0 0
+KeyPressEvent 1698 319 0 32 1 space 0
+CharEvent 1698 319 0 32 1 space 0
+KeyReleaseEvent 1698 319 0 32 1 space 0
+UpdateDropLocationEvent 677 699 0 0 1 Super_L 0
+EnterEvent 781 494 0 0 0 Super_L 0
+DropFilesEvent 781 494 0 0 0 Super_L 1 1 ${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr
+RenderEvent 781 494 0 0 0 Super_L 0
+KeyPressEvent 1698 319 0 32 1 space 0
+CharEvent 1698 319 0 32 1 space 0
+KeyReleaseEvent 1698 319 0 32 1 space 0
+RenderEvent 781 494 0 0 0 Super_L 0

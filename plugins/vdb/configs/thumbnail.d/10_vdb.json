@@ -1,0 +1,11 @@
+[
+  {
+    "match-type": "glob",
+    "match": "*.vdb",
+    "options": {
+      "load-plugins": "vdb",
+      "volume": true,
+      "volume-inverse": true
+    }
+  }
+]

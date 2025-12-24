@@ -1,0 +1,86 @@
+name: "Install blosc Dependency"
+description: "Install blosc Dependency using cache when possible"
+inputs:
+  cpu:
+    description: "CPU architecture to build for"
+    required: false
+    default: "x86_64"
+  version:
+    description: "Version of blosc to build"
+    required: true
+  zlib_version:
+    description: "Version of zlib to build against"
+    required: true
+  global_cache_index:
+    description: "Global cache index"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+        [[ "${{ inputs.zlib_version }}" ]] || { echo "zlib_version input is empty" ; exit 1; }
+        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
+
+    - name: Cache blosc
+      id: cache-blosc
+      uses: actions/cache/restore@v4
+      with:
+        path: dependencies/blosc_install
+        key: blosc-${{inputs.version}}-${{inputs.zlib_version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-1
+
+    # Dependents: openvdb vtk
+    - name: Checkout blosc
+      if: steps.cache-blosc.outputs.cache-hit != 'true'
+      uses: actions/checkout@v4
+      with:
+        repository: Blosc/c-blosc
+        path: "./dependencies/blosc"
+        ref: ${{inputs.version}}
+
+    - name: Setup blosc
+      if: steps.cache-blosc.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir blosc_build
+        mkdir blosc_install
+
+    - name: Configure blosc
+      if: steps.cache-blosc.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/blosc_build
+      shell: bash
+      run: >
+        cmake ../blosc
+        -DBUILD_BENCHMARKS=OFF
+        -DBUILD_FUZZERS=OFF
+        -DBUILD_SHARED=ON
+        -DBUILD_STATIC=OFF
+        -DBUILD_TESTS=OFF
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX=../blosc_install
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
+        -DPREFER_EXTERNAL_ZLIB=ON
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+
+    - name: Build blosc
+      if: steps.cache-blosc.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/blosc_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/blosc_install
+      shell: bash
+      run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-blosc.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-blosc.outputs.cache-primary-key }}
+        path: dependencies/blosc_install

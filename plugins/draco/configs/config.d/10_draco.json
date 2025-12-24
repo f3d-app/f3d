@@ -1,0 +1,10 @@
+[
+  {
+    "match-type": "glob",
+    "match": "*.drc",
+    "options": {
+      "scalar-coloring": true,
+      "load-plugins": "draco"
+    }
+  }
+]

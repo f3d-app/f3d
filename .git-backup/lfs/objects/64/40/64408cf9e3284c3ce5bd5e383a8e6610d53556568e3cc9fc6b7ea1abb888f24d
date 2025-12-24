@@ -1,0 +1,1722 @@
+#VRML V2.0 utf8
+
+#Created with V-Realm Builder v2.1
+#Ligos Corporation
+#www.ligos.com
+
+
+PointLight {
+	ambientIntensity	0.8
+	location	4.54513 2.08908 5.96832
+}
+PointLight {
+	location	-19.8135 -0.000332542 -51.3933
+}
+NavigationInfo {
+	headlight	FALSE
+	type	"EXAMINE"
+}
+Viewpoint {
+	orientation	0 -1 0  0.0615995
+	position	-0.0760903 1.22919 3.58091
+	description	"start"
+}
+DEF bot2 Transform {
+	children DEF fixbot2 Transform {
+		translation	0 1.89 0
+		scale	0.005 0.005 0.005
+		children DEF bot2 Transform {
+			children [ 
+			    DEF chest-ROOT Transform {
+				    translation	-4.16 0 -13.5
+				    center	1.12676 -187.158 0.00257015
+				    children [ 
+					Shape {
+						appearance	Appearance {
+							material	DEF Blue_Plastic Material {
+								ambientIntensity	0.2
+								transparency	0
+								shininess	0.2
+								diffuseColor	0.00200167 0.0121456 0.8
+								specularColor	1 1 1
+							}
+
+							textureTransform	NULL
+							texture	NULL
+						}
+
+						geometry	DEF chest-FACES IndexedFaceSet {
+							color	NULL
+							coord	DEF chest-COORD Coordinate {
+								point	[ -72.9 -76.2 36.4,
+										  72.9 -76.2 36.4,
+										  -72.9 -76.2 -36.4,
+										  72.9 -76.2 -36.4,
+										  -63.9 -29.4 26.6,
+										  63.9 -29.4 26.6,
+										  -63.9 -29.4 -26.6,
+										  63.9 -29.4 -26.6,
+										  -78.7 -151 44.1,
+										  -78.7 -151 -44.1,
+										  78.7 -151 -44.1,
+										  78.7 -151 44.1,
+										  -70.6 -202 35.3,
+										  -70.6 -202 -35.3,
+										  70.6 -202 -35.3,
+										  70.6 -202 35.3 ]
+							}
+
+							ccw	TRUE
+							convex	TRUE
+							creaseAngle	0
+							solid	TRUE
+							coordIndex	[ 12, 13, 14, -1, 14, 15, 12, -1,
+									  0, 1, 5, -1, 5, 4, 0, -1,
+									  3, 2, 6, -1, 6, 7, 3, -1,
+									  0, 2, 9, -1, 9, 8, 0, -1,
+									  2, 3, 10, -1, 10, 9, 2, -1,
+									  3, 1, 11, -1, 11, 10, 3, -1,
+									  1, 0, 8, -1, 8, 11, 1, -1,
+									  8, 9, 13, -1, 13, 12, 8, -1,
+									  9, 10, 14, -1, 14, 13, 9, -1,
+									  10, 11, 15, -1, 15, 14, 10, -1,
+									  11, 8, 12, -1, 12, 15, 11, -1,
+									  5, 1, 3, -1, 3, 7, 5, -1,
+									  2, 0, 6, -1, 6, 0, 4, -1 ]
+							colorIndex	[  ]
+						}
+
+					}
+
+					DEF clavicle Shape {
+						appearance	Appearance {
+							material	Material {
+								diffuseColor	0.451 0.451 0.451
+							}
+
+						}
+
+						geometry	DEF clavicle-FACES IndexedFaceSet {
+							coord	DEF clavicle-COORD Coordinate {
+								point	[ -63.9 -29.4 26.6,
+										  63.9 -29.4 26.6,
+										  -63.9 -29.4 -26.6,
+										  63.9 -29.4 -26.6 ]
+							}
+
+							ccw	TRUE
+							solid	TRUE
+							coordIndex	[ 0, 3, 2, -1, 0, 1, 3, -1 ]
+						}
+
+					}
+
+					DEF sign Transform {
+						translation	0 -65.1 8.2
+						rotation	1 0 0  1.57
+						children Shape {
+							appearance	Appearance {
+								material	Material {
+									diffuseColor	1 1 1
+								}
+
+								textureTransform	TextureTransform {
+									scale	1 2.2
+								}
+
+								texture	ImageTexture {
+									url	"Texture/MATRIX.gif"
+								}
+
+							}
+
+							geometry	DEF Cylinder03-FACES IndexedFaceSet {
+								coord	DEF Cylinder03-COORD Coordinate {
+									point	[ 57.4 36.9 47.8,
+											  28.7 32.3 21.9,
+											  -28.7 32.3 21.9,
+											  -57.4 36.9 47.8,
+											  -28.7 41.5 73.7,
+											  28.7 41.5 73.7,
+											  0 36.9 47.8 ]
+								}
+
+								ccw	TRUE
+								solid	TRUE
+								coordIndex	[ 6, 0, 1, -1, 6, 1, 2, -1,
+										  6, 2, 3, -1, 6, 3, 4, -1,
+										  6, 4, 5, -1, 6, 5, 0, -1 ]
+							}
+
+						}
+					}
+
+					DEF neck-ROOT Transform {
+						translation	-1.37514e-006 -3.83999e-005 5.00001
+						scale	0.999999 0.999999 0.999999
+						scaleOrientation	1 1.85105e-006 3.96208e-005  0.241992
+						center	6.53899 -24.9049 0.00011193
+						children [ 
+						    Shape {
+							    appearance	Appearance {
+								    material	DEF Blue_Plastic Material {
+									    ambientIntensity	0.2
+									    transparency	0
+									    shininess	0.2
+									    diffuseColor	0.00200167 0.0121456 0.8
+									    specularColor	1 1 1
+								    }
+
+							    }
+
+							    geometry	DEF neck-FACES IndexedFaceSet {
+								    coord	DEF neck-COORD Coordinate {
+									    point	[ -55 0 -35.8,
+											      55 0 -35.7,
+											      -45.1 -29.3 29.3,
+											      -45.1 -29.3 -29.3,
+											      45.1 -29.3 -29.3,
+											      45.1 -29.3 29.3,
+											      -50 -14.6 15.8,
+											      50 -14.6 15.7,
+											      55 0 12.6,
+											      -55 0 12.6 ]
+								    }
+
+								    ccw	TRUE
+								    solid	TRUE
+								    coordIndex	[ 2, 3, 4, -1, 4, 5, 2, -1,
+										      9, 0, 6, -1, 3, 2, 6, -1,
+										      0, 1, 4, -1, 4, 3, 0, -1,
+										      5, 4, 7, -1, 6, 0, 3, -1,
+										      7, 4, 1, -1, 1, 8, 7, -1 ]
+							    }
+
+						    }
+
+						    DEF head-ROOT Transform {
+							    translation	0 0 0
+							    children [ 
+								Shape {
+									appearance	Appearance {
+										material	DEF Blue_Plastic Material {
+											ambientIntensity	0.2
+											transparency	0
+											shininess	0.2
+											diffuseColor	0.00200167 0.0121456 0.8
+											specularColor	1 1 1
+										}
+
+									}
+
+									geometry	DEF head-FACES IndexedFaceSet {
+										coord	DEF head-COORD Coordinate {
+											point	[ -55 0 35.8,
+													  55 0 35.8,
+													  -55 0 -35.8,
+													  55 0 -35.7,
+													  -39.7 50 23,
+													  40.6 50 23,
+													  -39.7 50 -26.6,
+													  40.6 50 -26.6 ]
+										}
+
+										ccw	TRUE
+										solid	TRUE
+										coordIndex	[ 4, 5, 7, -1, 7, 6, 4, -1,
+												  0, 1, 5, -1, 5, 4, 0, -1,
+												  1, 3, 7, -1, 7, 5, 1, -1,
+												  3, 2, 6, -1, 6, 7, 3, -1,
+												  2, 0, 4, -1, 4, 6, 2, -1,
+												  0, 2, 1, -1, 1, 2, 3, -1 ]
+									}
+
+								}
+
+								DEF reye-ROOT Transform {
+									translation	0 25 10
+									rotation	1 0 0  1.27
+									children Shape {
+										appearance	Appearance {
+											material	Material {
+												diffuseColor	1 1 1
+											}
+
+										}
+
+										geometry	DEF reye-FACES IndexedFaceSet {
+											coord	DEF reye-COORD Coordinate {
+												point	[ -30 20 5,
+														  -10 20 5,
+														  -27.7 20 -5,
+														  -12.3 20 -5 ]
+											}
+
+											ccw	TRUE
+											solid	TRUE
+											coordIndex	[ 0, 1, 3, -1, 3, 2, 0, -1 ]
+										}
+
+									}
+								}
+
+								DEF leye-ROOT Transform {
+									translation	45 24.8 10
+									rotation	1 0 0  1.27
+									children Shape {
+										appearance	Appearance {
+											material	Material {
+												diffuseColor	1 1 1
+											}
+
+										}
+
+										geometry	DEF leye-FACES IndexedFaceSet {
+											coord	DEF leye-COORD Coordinate {
+												point	[ -30 20 5,
+														  -10 20 5,
+														  -27.7 20 -5,
+														  -12.3 20 -5 ]
+											}
+
+											ccw	TRUE
+											solid	TRUE
+											coordIndex	[ 0, 1, 3, -1, 3, 2, 0, -1 ]
+										}
+
+									}
+								}
+
+								DEF eyeballs Transform {
+									translation	0 0 0
+									children [ 
+									    DEF reyeball-ROOT Transform {
+										    translation	-20.7 1.99 26.9
+										    center	-0.614317 29.1173 -9.0301e-005
+										    children Shape {
+											    appearance	Appearance {
+												    material	DEF Red_Plastic Material {
+													    ambientIntensity	0.2
+													    transparency	0
+													    shininess	0.2
+													    diffuseColor	1 0.0408163 0.0408163
+													    specularColor	0.984314 0.984314 0.984314
+												    }
+
+											    }
+
+											    geometry	DEF reyeball-FACES IndexedFaceSet {
+												    color	NULL
+												    coord	DEF reyeball-COORD Coordinate {
+													    point	[ 0 26 2.81,
+															      -2.36 27 2.81,
+															      -3.34 29.3 2.81,
+															      -2.36 31.7 2.81,
+															      0 32.7 2.81,
+															      2.36 31.7 2.81,
+															      3.34 29.3 2.81,
+															      2.36 27 2.81,
+															      0 27 4.28,
+															      -1.67 27.7 4.28,
+															      -2.36 29.3 4.28,
+															      -1.67 31 4.28,
+															      0 31.7 4.28,
+															      1.67 31 4.28,
+															      2.36 29.3 4.28,
+															      1.67 27.7 4.28,
+															      0 29.3 4.89 ]
+												    }
+
+												    ccw	TRUE
+												    convex	TRUE
+												    creaseAngle	1.08
+												    solid	TRUE
+												    coordIndex	[ 0, 8, 9, -1, 0, 9, 1, -1,
+														      1, 9, 10, -1, 1, 10, 2, -1,
+														      2, 10, 11, -1, 2, 11, 3, -1,
+														      3, 11, 12, -1, 3, 12, 4, -1,
+														      4, 12, 13, -1, 4, 13, 5, -1,
+														      5, 13, 14, -1, 5, 14, 6, -1,
+														      6, 14, 15, -1, 6, 15, 7, -1,
+														      7, 15, 8, -1, 7, 8, 0, -1,
+														      16, 9, 8, -1, 16, 10, 9, -1,
+														      16, 11, 10, -1, 16, 12, 11, -1,
+														      16, 13, 12, -1, 16, 14, 13, -1,
+														      16, 15, 14, -1, 16, 8, 15, -1 ]
+												    colorIndex	[  ]
+											    }
+
+										    }
+									    }
+
+									    DEF leyeball-ROOT Transform {
+										    translation	23.7 1.99 26.2
+										    center	0.61255 29.3802 -8.26716e-005
+										    children Shape {
+											    appearance	Appearance {
+												    material	DEF Red_Plastic Material {
+													    ambientIntensity	0.2
+													    transparency	0
+													    shininess	0.2
+													    diffuseColor	1 0.0408163 0.0408163
+													    specularColor	0.984314 0.984314 0.984314
+												    }
+
+											    }
+
+											    geometry	DEF leyeball-FACES IndexedFaceSet {
+												    color	NULL
+												    coord	DEF leyeball-COORD Coordinate {
+													    point	[ 0 26 2.81,
+															      -2.36 27 2.81,
+															      -3.34 29.3 2.81,
+															      -2.36 31.7 2.81,
+															      0 32.7 2.81,
+															      2.36 31.7 2.81,
+															      3.34 29.3 2.81,
+															      2.36 27 2.81,
+															      0 27 4.28,
+															      -1.67 27.7 4.28,
+															      -2.36 29.3 4.28,
+															      -1.67 31 4.28,
+															      0 31.7 4.28,
+															      1.67 31 4.28,
+															      2.36 29.3 4.28,
+															      1.67 27.7 4.28,
+															      0 29.3 4.89 ]
+												    }
+
+												    ccw	TRUE
+												    convex	TRUE
+												    creaseAngle	1.08
+												    solid	TRUE
+												    coordIndex	[ 0, 8, 9, -1, 0, 9, 1, -1,
+														      1, 9, 10, -1, 1, 10, 2, -1,
+														      2, 10, 11, -1, 2, 11, 3, -1,
+														      3, 11, 12, -1, 3, 12, 4, -1,
+														      4, 12, 13, -1, 4, 13, 5, -1,
+														      5, 13, 14, -1, 5, 14, 6, -1,
+														      6, 14, 15, -1, 6, 15, 7, -1,
+														      7, 15, 8, -1, 7, 8, 0, -1,
+														      16, 9, 8, -1, 16, 10, 9, -1,
+														      16, 11, 10, -1, 16, 12, 11, -1,
+														      16, 13, 12, -1, 16, 14, 13, -1,
+														      16, 15, 14, -1, 16, 8, 15, -1 ]
+												    colorIndex	[  ]
+											    }
+
+										    }
+									    }
+									]
+								}
+
+								DEF mohawk-ROOT Transform {
+									translation	0 0 0
+									children Shape {
+										appearance	Appearance {
+											material	Material {
+												diffuseColor	0.69 0.102 0.102
+											}
+
+										}
+
+										geometry	DEF mohawk-FACES IndexedFaceSet {
+											coord	DEF mohawk-COORD Coordinate {
+												point	[ -7.26 47.5 27.7,
+														  7.26 47.5 27.7,
+														  -7.26 47.7 -24.4,
+														  7.26 47.7 -24.4,
+														  -13.8 70.9 21.7,
+														  13.8 70.9 21.7,
+														  -13.8 72.6 -24.4,
+														  13.8 72.6 -24.4,
+														  7.26 34.5 -28.1,
+														  -7.26 34.5 -28.1,
+														  -13.8 57.4 -51.4,
+														  13.8 57.4 -51.4,
+														  7.26 -0.238 -34.2,
+														  -7.26 -0.238 -34.2,
+														  -13.8 14.7 -60,
+														  13.8 14.7 -60,
+														  7.26 -29.7 -27.1,
+														  -7.26 -29.7 -27.1,
+														  -13.8 -27.1 -52.8,
+														  13.8 -27.1 -52.8,
+														  13.8 62.3 46.2,
+														  -13.8 62.3 46.2,
+														  8.68 47.4 46.1,
+														  -8.68 47.4 46.1 ]
+											}
+
+											ccw	TRUE
+											solid	TRUE
+											coordIndex	[ 0, 2, 3, -1, 3, 1, 0, -1,
+													  4, 5, 7, -1, 7, 6, 4, -1,
+													  0, 1, 22, -1, 22, 23, 0, -1,
+													  1, 3, 7, -1, 7, 5, 1, -1,
+													  16, 17, 18, -1, 18, 19, 16, -1,
+													  2, 0, 4, -1, 4, 6, 2, -1,
+													  3, 2, 9, -1, 9, 8, 3, -1,
+													  6, 7, 11, -1, 11, 10, 6, -1,
+													  7, 3, 8, -1, 8, 11, 7, -1,
+													  2, 6, 10, -1, 10, 9, 2, -1,
+													  8, 9, 13, -1, 13, 12, 8, -1,
+													  9, 10, 14, -1, 14, 13, 9, -1,
+													  10, 11, 15, -1, 15, 14, 10, -1,
+													  11, 8, 12, -1, 12, 15, 11, -1,
+													  12, 13, 17, -1, 17, 16, 12, -1,
+													  13, 14, 18, -1, 18, 17, 13, -1,
+													  14, 15, 19, -1, 19, 18, 14, -1,
+													  15, 12, 16, -1, 16, 19, 15, -1,
+													  5, 4, 21, -1, 21, 20, 5, -1,
+													  1, 5, 20, -1, 0, 21, 4, -1,
+													  1, 20, 22, -1, 20, 21, 23, -1,
+													  23, 22, 20, -1, 0, 23, 21, -1 ]
+										}
+
+									}
+								}
+
+								DEF mouth-ROOT Transform {
+									translation	0 0 0
+									children Shape {
+										appearance	Appearance {
+											material	Material {
+												diffuseColor	0.451 0.451 0.451
+											}
+
+										}
+
+										geometry	DEF mouth-FACES IndexedFaceSet {
+											coord	DEF mouth-COORD Coordinate {
+												point	[ -45.1 -29.3 29.3,
+														  45.1 -29.3 29.3,
+														  -50 -14.6 15.8,
+														  50 -14.6 15.7,
+														  55 0 12.6,
+														  -55 0 12.6 ]
+											}
+
+											ccw	TRUE
+											solid	TRUE
+											coordIndex	[ 2, 0, 1, -1, 1, 3, 2, -1,
+													  2, 3, 5, -1, 5, 3, 4, -1 ]
+										}
+
+									}
+								}
+
+								DEF jaw-ROOT Transform {
+									translation	-4.18576e-007 0.220744 0.00126113
+									rotation	1 -6.27193e-006 6.2719e-006  0.0087619
+									scale	0.999998 0.999997 0.999997
+									scaleOrientation	-1 0.000203894 0.000225135  0.00229024
+									center	-0.000196314 1.29323 10.4743
+									children Shape {
+										appearance	Appearance {
+											material	Material {
+												diffuseColor	0.89 0.596 0.596
+											}
+
+										}
+
+										geometry	DEF jaw-FACES IndexedFaceSet {
+											color	NULL
+											coord	DEF jaw-COORD Coordinate {
+												point	[ -55 0 35.8,
+														  55 0 35.8,
+														  -45.1 -29.3 29.3,
+														  45.1 -29.3 29.3,
+														  5.37 -5.93 50.3,
+														  36.6 -0.474 34.1,
+														  -32.1 -0.474 34.1,
+														  33.7 -7.55 43,
+														  -26.1 -7.55 43,
+														  -50 -14.6 15.8,
+														  50 -14.6 15.7,
+														  55 0 12.6,
+														  -55 0 12.6 ]
+											}
+
+											ccw	TRUE
+											convex	TRUE
+											creaseAngle	0.72
+											solid	TRUE
+											coordIndex	[ 11, 1, 10, -1, 2, 3, 4, -1,
+													  6, 0, 8, -1, 4, 3, 7, -1,
+													  7, 3, 1, -1, 8, 0, 2, -1,
+													  7, 1, 5, -1, 4, 8, 2, -1,
+													  9, 2, 0, -1, 10, 1, 3, -1,
+													  0, 12, 9, -1, 8, 4, 2, -1,
+													  4, 3, 2, -1, 4, 7, 3, -1,
+													  5, 3, 7, -1, 8, 2, 6, -1 ]
+											colorIndex	[  ]
+										}
+
+									}
+								}
+							    ]
+						    }
+						]
+					}
+
+					DEF cape-ROOT Transform {
+						translation	0.495 -214 -58.3
+						children Shape {
+							appearance	Appearance {
+								material	DEF Yellow_Plastic Material {
+									ambientIntensity	0.2
+									transparency	0
+									shininess	0.2
+									diffuseColor	0.8 0.789856 0.00200167
+									specularColor	1 1 1
+								}
+
+							}
+
+							geometry	DEF cape-FACES IndexedFaceSet {
+								color	NULL
+								coord	DEF cape-COORD Coordinate {
+									point	[ -69.1 17.2 -7.52,
+											  -41.4 13.8 -29.7,
+											  -13.8 17.2 -7.52,
+											  13.8 12.5 -22.2,
+											  41.4 17.2 -7.52,
+											  69.1 17.2 -7.52,
+											  -70.1 187 18,
+											  -42.5 187 18,
+											  -14.9 175 -2.94,
+											  12.8 175 -2.94,
+											  40.4 187 18,
+											  68 187 18,
+											  66 119 -3.62,
+											  40.4 157 -26.7,
+											  9.78 56.4 -11.6,
+											  -30.8 98 -18.6,
+											  -42.5 156 -14.6,
+											  -72.1 119 -3.62 ]
+								}
+
+								ccw	TRUE
+								convex	TRUE
+								creaseAngle	3.04
+								solid	TRUE
+								coordIndex	[ 5, 4, 13, -1, 13, 12, 5, -1,
+										  4, 3, 14, -1, 14, 13, 4, -1,
+										  3, 2, 15, -1, 15, 14, 3, -1,
+										  2, 1, 16, -1, 16, 15, 2, -1,
+										  1, 0, 17, -1, 17, 16, 1, -1,
+										  12, 13, 10, -1, 10, 11, 12, -1,
+										  13, 14, 9, -1, 9, 10, 13, -1,
+										  14, 15, 8, -1, 8, 9, 14, -1,
+										  15, 16, 7, -1, 7, 8, 15, -1,
+										  16, 17, 6, -1, 6, 7, 16, -1 ]
+								colorIndex	[  ]
+							}
+
+						}
+					}
+
+					DEF rshoulder-ROOT Transform {
+						translation	3.10323e-005 1.72274e-005 -2.35298e-005
+						scale	0.999999 0.999999 0.999999
+						scaleOrientation	-1 1.55015e-006 -9.28391e-006  0.785398
+						center	-68.0031 -54.4774 3.25012e-005
+						children [ 
+						    Shape {
+							    appearance	Appearance {
+								    material	DEF Blue_Plastic Material {
+									    ambientIntensity	0.2
+									    transparency	0
+									    shininess	0.2
+									    diffuseColor	0.00200167 0.0121456 0.8
+									    specularColor	1 1 1
+								    }
+
+							    }
+
+							    geometry	DEF rshoulder-FACES IndexedFaceSet {
+								    color	NULL
+								    coord	DEF rshoulder-COORD Coordinate {
+									    point	[ -72.9 -76.2 36.4,
+											      -72.9 -76.2 -36.4,
+											      -63.9 -29.4 26.6,
+											      -63.9 -29.4 -26.6,
+											      -107 -9.54 66.8,
+											      -107 -9.54 -48.3,
+											      -134 -69.4 32,
+											      -134 -69.4 -32 ]
+								    }
+
+								    ccw	TRUE
+								    convex	TRUE
+								    creaseAngle	1.24
+								    solid	TRUE
+								    coordIndex	[ 2, 3, 5, -1, 5, 4, 2, -1,
+										      0, 2, 4, -1, 1, 5, 3, -1,
+										      0, 4, 6, -1, 4, 5, 7, -1,
+										      7, 6, 4, -1, 1, 7, 5, -1,
+										      2, 0, 1, -1, 1, 3, 2, -1,
+										      6, 7, 0, -1, 0, 7, 1, -1 ]
+								    colorIndex	[  ]
+							    }
+
+						    }
+
+						    DEF rarm-ROOT Transform {
+							    translation	1.03147 0.72634 0
+							    scale	0.99 0.99 1
+							    center	-103.147 -72.634 -0.00117207
+							    children [ 
+								DEF rfarm-ROOT Transform {
+									translation	1.07098 1.21377 1.52617e-005
+									scale	0.989998 0.984598 1.00548
+									scaleOrientation	-1 0.000201723 -0.000532998  0.246166
+									center	-107.1 -121.4 0.00126362
+									children [ 
+									    DEF rfing-ROOT Transform {
+										    translation	-0.315279 -0.14522 0
+										    scale	0.99 0.99 1
+										    center	-118.472 -185.478 6.42538
+										    children Shape {
+											    appearance	Appearance {
+												    material	Material {
+													    diffuseColor	0.89 0.596 0.596
+												    }
+
+											    }
+
+											    geometry	DEF rfing-FACES IndexedFaceSet {
+												    coord	DEF rfing-COORD Coordinate {
+													    point	[ -106 -184 -15.6,
+															      -106 -184 24.9,
+															      -122 -186 24.9,
+															      -122 -186 -15.6,
+															      -104 -225 -15.6,
+															      -104 -225 24.9,
+															      -120 -227 24.9,
+															      -120 -227 -15.6 ]
+												    }
+
+												    ccw	TRUE
+												    solid	TRUE
+												    coordIndex	[ 4, 5, 6, -1, 6, 7, 4, -1,
+														      0, 1, 5, -1, 5, 4, 0, -1,
+														      1, 2, 6, -1, 6, 5, 1, -1,
+														      2, 3, 7, -1, 7, 6, 2, -1,
+														      3, 0, 4, -1, 4, 7, 3, -1,
+														      2, 1, 3, -1, 3, 1, 0, -1 ]
+											    }
+
+										    }
+									    }
+
+									    DEF rthumb-ROOT Transform {
+										    translation	-98.7 -223 15.7898
+										    scale	0.999614 1 1.00039
+										    scaleOrientation	-0.316344 0.547682 0.774578  1.28191
+										    center	8.79399 38.9477 0.000279169
+										    children Shape {
+											    appearance	Appearance {
+												    material	Material {
+													    diffuseColor	0.89 0.596 0.596
+												    }
+
+											    }
+
+											    geometry	DEF rthumb-FACES IndexedFaceSet {
+												    coord	DEF rthumb-COORD Coordinate {
+													    point	[ -7.11 13.4 8.95,
+															      8.52 13.4 8.95,
+															      -7.11 13.4 -8.95,
+															      8.52 13.4 -8.95,
+															      -6.69 39 8.95,
+															      8.95 39 8.95,
+															      -6.69 39 -8.95,
+															      8.95 39 -8.95 ]
+												    }
+
+												    ccw	TRUE
+												    solid	TRUE
+												    coordIndex	[ 0, 2, 3, -1, 3, 1, 0, -1,
+														      4, 5, 7, -1, 7, 6, 4, -1,
+														      0, 1, 5, -1, 5, 4, 0, -1,
+														      1, 3, 7, -1, 7, 5, 1, -1,
+														      3, 2, 6, -1, 6, 7, 3, -1,
+														      2, 0, 4, -1, 4, 6, 2, -1 ]
+											    }
+
+										    }
+									    }
+
+									    DEF wristband-ROOT Transform {
+										    translation	-104.3 -11.4 3.2
+										    children [ 
+											Shape {
+												appearance	Appearance {
+													material	DEF Red_Plastic Material {
+														ambientIntensity	0.2
+														transparency	0
+														shininess	0.2
+														diffuseColor	1 0.0408163 0.0408163
+														specularColor	0.984314 0.984314 0.984314
+													}
+
+												}
+
+												geometry	DEF wristband-FACES IndexedFaceSet {
+													coord	DEF wristband-COORD Coordinate {
+														point	[ 22.4 -166 0,
+																  15.8 -166 -27.7,
+																  -21.8 -181 -27.7,
+																  -23.2 -214 0,
+																  -21.8 -181 27.7,
+																  15.8 -166 27.7,
+																  19.4 -138 0,
+																  16 -148 -35.2,
+																  -24.9 -148 -35.2,
+																  -32.9 -122 0,
+																  -20.5 -148 27.7,
+																  16 -148 27.7 ]
+													}
+
+													ccw	TRUE
+													solid	TRUE
+													coordIndex	[ 0, 7, 6, -1, 0, 1, 7, -1,
+															  1, 8, 7, -1, 1, 2, 8, -1,
+															  2, 9, 8, -1, 2, 3, 9, -1,
+															  3, 10, 9, -1, 3, 4, 10, -1,
+															  4, 11, 10, -1, 4, 5, 11, -1,
+															  5, 6, 11, -1, 5, 0, 6, -1 ]
+												}
+
+											}
+
+											DEF flasher-ROOT Transform {
+												translation	0 0 0
+												children Shape {
+													appearance	Appearance {
+														material	DEF flashtime1-Material Material {
+															diffuseColor	0.0314 0.0314 0.533
+															emissiveColor	0.18 0.18 0.18
+														}
+
+													}
+
+													geometry	DEF flasher-FACES IndexedFaceSet {
+														coord	DEF flasher-COORD Coordinate {
+															point	[ -26.9 -176 -18.2,
+																	  -28.4 -196 -1.49,
+																	  -26.9 -176 15.2,
+																	  -30 -156 -22.6,
+																	  -38 -140 -1.49,
+																	  -25.6 -156 15.2 ]
+														}
+
+														ccw	TRUE
+														solid	TRUE
+														coordIndex	[ 0, 4, 3, -1, 0, 1, 4, -1,
+																  1, 5, 4, -1, 1, 2, 5, -1 ]
+													}
+
+												}
+											}
+										    ]
+									    }
+
+									    Shape {
+										    appearance	Appearance {
+											    material	Material {
+												    ambientIntensity	0.2
+												    transparency	0
+												    shininess	0.2
+												    diffuseColor	0.89 0.596 0.596
+												    emissiveColor	0 0 0
+												    specularColor	0 0 0
+											    }
+
+										    }
+
+										    geometry	DEF rfarm-FACES IndexedFaceSet {
+											    coord	DEF rfarm-COORD Coordinate {
+												    point	[ -88.3 -121 -31.7,
+														      -88.3 -121 31.7,
+														      -129 -122 31.7,
+														      -129 -122 -31.7,
+														      -89.7 -184 -15.6,
+														      -89.7 -184 24.9,
+														      -122 -186 24.9,
+														      -122 -186 -15.6,
+														      -96.3 -95.5 9.05,
+														      -96.3 -103 -21.6,
+														      -123 -96.6 9.05,
+														      -123 -104 -21.6 ]
+											    }
+
+											    ccw	TRUE
+											    solid	TRUE
+											    coordIndex	[ 0, 1, 5, -1, 5, 4, 0, -1,
+													      1, 2, 6, -1, 6, 5, 1, -1,
+													      2, 3, 7, -1, 7, 6, 2, -1,
+													      3, 0, 4, -1, 4, 7, 3, -1,
+													      10, 8, 9, -1, 9, 11, 10, -1,
+													      6, 7, 4, -1, 4, 5, 6, -1,
+													      1, 0, 9, -1, 9, 8, 1, -1,
+													      2, 1, 8, -1, 8, 10, 2, -1,
+													      3, 2, 10, -1, 10, 11, 3, -1,
+													      0, 3, 11, -1, 11, 9, 0, -1 ]
+										    }
+
+									    }
+									]
+								}
+
+								Shape {
+									appearance	Appearance {
+										material	Material {
+											ambientIntensity	0.2
+											transparency	0
+											shininess	0.2
+											diffuseColor	0.89 0.596 0.596
+											emissiveColor	0 0 0
+											specularColor	0 0 0
+										}
+
+									}
+
+									geometry	DEF rarm-FACES IndexedFaceSet {
+										color	NULL
+										coord	DEF rarm-COORD Coordinate {
+											point	[ -72.9 -76.2 36.4,
+													  -72.9 -76.2 -36.4,
+													  -134 -69.4 32,
+													  -134 -69.4 -32,
+													  -80.1 -92.7 -36.5,
+													  -80.1 -92.7 42.6,
+													  -137 -93.5 42.6,
+													  -137 -93.5 -36.5,
+													  -88.3 -121 -31.7,
+													  -88.3 -121 31.7,
+													  -129 -122 31.7,
+													  -129 -122 -31.7,
+													  -96.5 -146 -5.31,
+													  -96.5 -142 15.9,
+													  -119 -143 15.9,
+													  -119 -147 -5.31 ]
+										}
+
+										ccw	TRUE
+										convex	TRUE
+										creaseAngle	1.08
+										solid	TRUE
+										coordIndex	[ 1, 0, 5, -1, 5, 4, 1, -1,
+												  0, 2, 6, -1, 6, 5, 0, -1,
+												  2, 3, 7, -1, 7, 6, 2, -1,
+												  3, 1, 4, -1, 4, 7, 3, -1,
+												  4, 5, 9, -1, 9, 8, 4, -1,
+												  5, 6, 10, -1, 10, 9, 5, -1,
+												  6, 7, 11, -1, 11, 10, 6, -1,
+												  7, 4, 8, -1, 8, 11, 7, -1,
+												  2, 0, 3, -1, 3, 0, 1, -1,
+												  14, 15, 13, -1, 13, 15, 12, -1,
+												  8, 9, 13, -1, 13, 12, 8, -1,
+												  9, 10, 14, -1, 14, 13, 9, -1,
+												  10, 11, 15, -1, 15, 14, 10, -1,
+												  11, 8, 12, -1, 12, 15, 11, -1 ]
+										colorIndex	[  ]
+									}
+
+								}
+							    ]
+						    }
+						]
+					}
+
+					DEF lshoulder-ROOT Transform {
+						translation	-2.43851e-005 -6.8667e-005 -3.9899e-005
+						scale	0.999999 0.999999 0.999999
+						scaleOrientation	0.00668265 0.00668911 -0.999955  0.352183
+						center	66.8939 -54.7423 -0.00159828
+						children [ 
+						    Shape {
+							    appearance	Appearance {
+								    material	DEF Blue_Plastic Material {
+									    ambientIntensity	0.2
+									    transparency	0
+									    shininess	0.2
+									    diffuseColor	0.00200167 0.0121456 0.8
+									    specularColor	1 1 1
+								    }
+
+							    }
+
+							    geometry	DEF lshoulder-FACES IndexedFaceSet {
+								    color	NULL
+								    coord	DEF lshoulder-COORD Coordinate {
+									    point	[ 72.9 -76.2 36.4,
+											      72.9 -76.2 -36.4,
+											      63.9 -29.4 26.6,
+											      63.9 -29.4 -26.6,
+											      107 -9.54 -48.3,
+											      107 -9.54 66.8,
+											      134 -69.4 -32,
+											      134 -69.4 32 ]
+								    }
+
+								    ccw	TRUE
+								    convex	TRUE
+								    creaseAngle	1.68
+								    solid	TRUE
+								    coordIndex	[ 3, 2, 5, -1, 5, 4, 3, -1,
+										      0, 5, 2, -1, 1, 3, 4, -1,
+										      1, 4, 6, -1, 4, 5, 7, -1,
+										      7, 6, 4, -1, 0, 7, 5, -1,
+										      3, 1, 2, -1, 2, 1, 0, -1,
+										      1, 6, 0, -1, 0, 6, 7, -1 ]
+								    colorIndex	[  ]
+							    }
+
+						    }
+
+						    DEF larm-ROOT Transform {
+							    translation	0 0 0
+							    children [ 
+								DEF lfarm-ROOT Transform {
+									translation	2.30756e-005 0.000176477 7.89169e-005
+									scaleOrientation	0.372853 0.886666 -0.273503  0.0424785
+									center	104.049 -122.817 0.000408173
+									children [ 
+									    DEF lfing-ROOT Transform {
+										    translation	1.42821e-005 -4.75252e-006 -0.000100192
+										    scaleOrientation	-0.227796 -0.0320221 0.973182  0.256075
+										    center	118.569 -184.263 6.39547
+										    children Shape {
+											    appearance	Appearance {
+												    material	Material {
+													    diffuseColor	0.89 0.596 0.596
+												    }
+
+											    }
+
+											    geometry	DEF lfing-FACES IndexedFaceSet {
+												    coord	DEF lfing-COORD Coordinate {
+													    point	[ 106 -183 25.4,
+															      106 -183 -15.7,
+															      122 -185 -15.7,
+															      122 -185 25.4,
+															      104 -224 25.4,
+															      104 -224 -15.7,
+															      120 -226 -15.7,
+															      120 -226 25.4 ]
+												    }
+
+												    ccw	TRUE
+												    solid	TRUE
+												    coordIndex	[ 4, 5, 6, -1, 6, 7, 4, -1,
+														      0, 1, 5, -1, 5, 4, 0, -1,
+														      1, 2, 6, -1, 6, 5, 1, -1,
+														      2, 3, 7, -1, 7, 6, 2, -1,
+														      3, 0, 4, -1, 4, 7, 3, -1,
+														      0, 3, 1, -1, 1, 3, 2, -1 ]
+											    }
+
+										    }
+									    }
+
+									    DEF lthumb-ROOT Transform {
+										    translation	96.3 -221.9 15.4898
+										    scaleOrientation	-0.446353 -0.212148 -0.869346  0.444384
+										    center	-6.66314 37.6198 4.71072e-005
+										    children Shape {
+											    appearance	Appearance {
+												    material	Material {
+													    diffuseColor	0.89 0.596 0.596
+												    }
+
+											    }
+
+											    geometry	DEF lthumb-FACES IndexedFaceSet {
+												    coord	DEF lthumb-COORD Coordinate {
+													    point	[ -7.11 13.4 8.95,
+															      8.52 13.4 8.95,
+															      -7.11 13.4 -8.95,
+															      8.52 13.4 -8.95,
+															      -6.69 39 8.95,
+															      8.95 39 8.95,
+															      -6.69 39 -8.95,
+															      8.95 39 -8.95 ]
+												    }
+
+												    ccw	TRUE
+												    solid	TRUE
+												    coordIndex	[ 0, 2, 3, -1, 3, 1, 0, -1,
+														      4, 5, 7, -1, 7, 6, 4, -1,
+														      0, 1, 5, -1, 5, 4, 0, -1,
+														      1, 3, 7, -1, 7, 5, 1, -1,
+														      3, 2, 6, -1, 6, 7, 3, -1,
+														      2, 0, 4, -1, 4, 6, 2, -1 ]
+											    }
+
+										    }
+									    }
+
+									    Shape {
+										    appearance	Appearance {
+											    material	Material {
+												    ambientIntensity	0.2
+												    transparency	0
+												    shininess	0.2
+												    diffuseColor	0.89 0.596 0.596
+												    emissiveColor	0 0 0
+												    specularColor	0 0 0
+											    }
+
+										    }
+
+										    geometry	DEF lfarm-FACES IndexedFaceSet {
+											    coord	DEF lfarm-COORD Coordinate {
+												    point	[ 88.3 -121 31.7,
+														      88.3 -121 -31.7,
+														      129 -122 -31.7,
+														      129 -122 31.7,
+														      89.5 -183 25.4,
+														      89.5 -183 -15.7,
+														      122 -185 -15.7,
+														      122 -185 25.4,
+														      125 -103 -22.1,
+														      98.6 -102 -22.1,
+														      126 -104 10.5 ]
+											    }
+
+											    ccw	TRUE
+											    solid	TRUE
+											    coordIndex	[ 0, 1, 5, -1, 5, 4, 0, -1,
+													      1, 2, 6, -1, 6, 5, 1, -1,
+													      2, 3, 7, -1, 7, 6, 2, -1,
+													      3, 0, 4, -1, 4, 7, 3, -1,
+													      4, 5, 6, -1, 6, 7, 4, -1,
+													      0, 3, 1, -1, 9, 10, 8, -1,
+													      2, 1, 9, -1, 9, 8, 2, -1,
+													      3, 2, 8, -1, 8, 10, 3, -1,
+													      1, 3, 10, -1, 10, 9, 1, -1 ]
+										    }
+
+									    }
+									]
+								}
+
+								Shape {
+									appearance	Appearance {
+										material	Material {
+											ambientIntensity	0.2
+											transparency	0
+											shininess	0.2
+											diffuseColor	0.89 0.596 0.596
+											emissiveColor	0 0 0
+											specularColor	0 0 0
+										}
+
+									}
+
+									geometry	DEF larm-FACES IndexedFaceSet {
+										color	NULL
+										coord	DEF larm-COORD Coordinate {
+											point	[ 72.9 -76.2 36.4,
+													  72.9 -76.2 -36.4,
+													  134 -69.4 -32,
+													  134 -69.4 32,
+													  80.1 -92.7 42.6,
+													  80.1 -92.7 -36.5,
+													  137 -93.5 -36.5,
+													  137 -93.5 42.6,
+													  88.3 -121 31.7,
+													  88.3 -121 -31.7,
+													  129 -122 -31.7,
+													  129 -122 31.7,
+													  96.5 -140 17.7,
+													  96.5 -144 -4.44,
+													  119 -145 -4.44,
+													  119 -141 17.7 ]
+										}
+
+										ccw	TRUE
+										convex	TRUE
+										creaseAngle	1.08
+										solid	TRUE
+										coordIndex	[ 0, 1, 5, -1, 5, 4, 0, -1,
+												  1, 2, 6, -1, 6, 5, 1, -1,
+												  2, 3, 7, -1, 7, 6, 2, -1,
+												  3, 0, 4, -1, 4, 7, 3, -1,
+												  4, 5, 9, -1, 9, 8, 4, -1,
+												  5, 6, 10, -1, 10, 9, 5, -1,
+												  6, 7, 11, -1, 11, 10, 6, -1,
+												  7, 4, 8, -1, 8, 11, 7, -1,
+												  12, 13, 14, -1, 14, 15, 12, -1,
+												  0, 3, 1, -1, 1, 3, 2, -1,
+												  8, 9, 13, -1, 13, 12, 8, -1,
+												  9, 10, 14, -1, 14, 13, 9, -1,
+												  10, 11, 15, -1, 15, 14, 10, -1,
+												  11, 8, 12, -1, 12, 15, 11, -1 ]
+										colorIndex	[  ]
+									}
+
+								}
+							    ]
+						    }
+						]
+					}
+				    ]
+			    }
+
+			    DEF rthigh-ROOT Transform {
+				    translation	-41.5 -310 -20
+				    scale	0.999998 0.999998 0.999998
+				    scaleOrientation	1 4.19114e-006 0.000223369  0.100952
+				    center	-4.52118 103.982 2.71797e-006
+				    children [ 
+					Shape {
+						appearance	Appearance {
+							material	DEF Blue_Plastic Material {
+								ambientIntensity	0.2
+								transparency	0
+								shininess	0.2
+								diffuseColor	0.00200167 0.0121456 0.8
+								specularColor	1 1 1
+							}
+
+						}
+
+						geometry	DEF rthigh-FACES IndexedFaceSet {
+							coord	DEF rthigh-COORD Coordinate {
+								point	[ -32 24.8 40,
+										  20.2 24.8 40,
+										  -32 24.8 -12.2,
+										  20.2 24.8 -12.2,
+										  -30.2 110 40,
+										  36.4 110 40,
+										  -30.2 110 -26.6,
+										  36.4 110 -26.6,
+										  20.2 -2.33 20.2,
+										  -32 -2.33 20.2,
+										  -30.2 136 31.2,
+										  36.4 136 31.2,
+										  36.4 150 4.1,
+										  -30.2 150 4.1 ]
+							}
+
+							ccw	TRUE
+							solid	TRUE
+							coordIndex	[ 10, 11, 12, -1, 12, 13, 10, -1,
+									  0, 1, 5, -1, 5, 4, 0, -1,
+									  1, 3, 7, -1, 7, 5, 1, -1,
+									  3, 2, 6, -1, 6, 7, 3, -1,
+									  2, 0, 4, -1, 4, 6, 2, -1,
+									  9, 2, 8, -1, 8, 2, 3, -1,
+									  1, 0, 9, -1, 9, 8, 1, -1,
+									  3, 1, 8, -1, 2, 9, 0, -1,
+									  4, 5, 11, -1, 11, 10, 4, -1,
+									  5, 7, 12, -1, 12, 11, 5, -1,
+									  7, 6, 13, -1, 13, 12, 7, -1,
+									  6, 4, 10, -1, 10, 13, 6, -1 ]
+						}
+
+					}
+
+					DEF rshin-ROOT Transform {
+						translation	1.15933e-005 5.76589e-005 -5.98798e-005
+						scale	0.999999 0.999999 0.999999
+						scaleOrientation	-0.464685 -0.321048 0.825225  0.0627576
+						center	-2.03519 22.3872 1.19209e-006
+						children [ 
+						    Shape {
+							    appearance	Appearance {
+								    material	DEF Yellow_Plastic Material {
+									    ambientIntensity	0.2
+									    transparency	0
+									    shininess	0.2
+									    diffuseColor	0.8 0.789856 0.00200167
+									    specularColor	1 1 1
+								    }
+
+							    }
+
+							    geometry	DEF rshin-FACES IndexedFaceSet {
+								    coord	DEF rshin-COORD Coordinate {
+									    point	[ -39.8 24.8 47.8,
+											      28 24.8 47.8,
+											      -39.8 24.8 -20,
+											      28 24.8 -20,
+											      -32 -45.4 40,
+											      -32 -45.4 -12.2,
+											      20.2 -45.4 -12.2,
+											      20.2 -45.4 40 ]
+								    }
+
+								    ccw	TRUE
+								    solid	TRUE
+								    coordIndex	[ 0, 2, 5, -1, 5, 4, 0, -1,
+										      2, 3, 6, -1, 6, 5, 2, -1,
+										      3, 1, 7, -1, 7, 6, 3, -1,
+										      1, 0, 4, -1, 4, 7, 1, -1,
+										      0, 1, 2, -1, 2, 1, 3, -1,
+										      7, 4, 6, -1, 4, 5, 6, -1 ]
+							    }
+
+						    }
+
+						    DEF rfoot-ROOT Transform {
+							    translation	0 0 0
+							    center	-6.40519 -50.1626 0.000146151
+							    children Shape {
+								    appearance	Appearance {
+									    material	DEF Yellow_Plastic Material {
+										    ambientIntensity	0.2
+										    transparency	0
+										    shininess	0.2
+										    diffuseColor	0.8 0.789856 0.00200167
+										    specularColor	1 1 1
+									    }
+
+								    }
+
+								    geometry	DEF rfoot-FACES IndexedFaceSet {
+									    coord	DEF rfoot-COORD Coordinate {
+										    point	[ -32 -45.4 40,
+												      -32 -45.4 -12.2,
+												      20.2 -45.4 -12.2,
+												      20.2 -45.4 40,
+												      -32 -70.3 40,
+												      -32 -70.3 -12.2,
+												      20.2 -70.3 -12.2,
+												      20.2 -70.3 40,
+												      -32 -70.3 76.3,
+												      20.2 -70.3 76.3,
+												      20.2 -45.4 76.3,
+												      -32 -45.4 76.3 ]
+									    }
+
+									    ccw	TRUE
+									    solid	TRUE
+									    coordIndex	[ 4, 5, 6, -1, 6, 7, 4, -1,
+											      0, 1, 5, -1, 5, 4, 0, -1,
+											      1, 2, 6, -1, 6, 5, 1, -1,
+											      2, 3, 7, -1, 7, 6, 2, -1,
+											      10, 11, 8, -1, 8, 9, 10, -1,
+											      4, 7, 9, -1, 9, 8, 4, -1,
+											      0, 4, 8, -1, 8, 11, 0, -1,
+											      7, 3, 10, -1, 10, 9, 7, -1,
+											      11, 10, 3, -1, 3, 0, 11, -1,
+											      0, 3, 1, -1, 3, 2, 1, -1 ]
+								    }
+
+							    }
+						    }
+						]
+					}
+				    ]
+			    }
+
+			    DEF lthigh-ROOT Transform {
+				    translation	25.4 -310 -20
+				    scale	0.999999 0.999998 0.999998
+				    scaleOrientation	1 9.10677e-007 2.37935e-007  3.92699
+				    center	3.61895 112.029 -0.00115924
+				    children [ 
+					Shape {
+						appearance	Appearance {
+							material	DEF Blue_Plastic Material {
+								ambientIntensity	0.2
+								transparency	0
+								shininess	0.2
+								diffuseColor	0.00200167 0.0121456 0.8
+								specularColor	1 1 1
+							}
+
+						}
+
+						geometry	DEF lthigh-FACES IndexedFaceSet {
+							coord	DEF lthigh-COORD Coordinate {
+								point	[ -10.6 25.7 40,
+										  41.6 25.7 40,
+										  -10.6 25.7 -12.2,
+										  41.6 25.7 -12.2,
+										  -30.2 110 40,
+										  36.4 110 40,
+										  -30.2 110 -26.6,
+										  36.4 110 -26.6,
+										  41.6 -4 21.3,
+										  -10.6 -4 21.3,
+										  -30.2 135 31.2,
+										  36.4 135 31.2,
+										  36.4 150 4.1,
+										  -30.2 150 4.1 ]
+							}
+
+							ccw	TRUE
+							solid	TRUE
+							coordIndex	[ 10, 11, 12, -1, 12, 13, 10, -1,
+									  0, 1, 5, -1, 5, 4, 0, -1,
+									  1, 3, 7, -1, 7, 5, 1, -1,
+									  3, 2, 6, -1, 6, 7, 3, -1,
+									  2, 0, 4, -1, 4, 6, 2, -1,
+									  9, 2, 8, -1, 8, 2, 3, -1,
+									  1, 0, 9, -1, 9, 8, 1, -1,
+									  3, 1, 8, -1, 2, 9, 0, -1,
+									  4, 5, 11, -1, 11, 10, 4, -1,
+									  5, 7, 12, -1, 12, 11, 5, -1,
+									  7, 6, 13, -1, 13, 12, 7, -1,
+									  6, 4, 10, -1, 10, 13, 6, -1 ]
+						}
+
+					}
+
+					DEF lshin-ROOT Transform {
+						translation	-2.51928e-005 -8.26879e-006 -9.93524e-005
+						scale	0.999999 0.999998 0.999999
+						scaleOrientation	1 3.78694e-005 -9.8704e-007  0.0240204
+						center	19.3589 22.3712 0.000274706
+						children [ 
+						    Shape {
+							    appearance	Appearance {
+								    material	DEF Yellow_Plastic Material {
+									    ambientIntensity	0.2
+									    transparency	0
+									    shininess	0.2
+									    diffuseColor	0.8 0.789856 0.00200167
+									    specularColor	1 1 1
+								    }
+
+							    }
+
+							    geometry	DEF lshin-FACES IndexedFaceSet {
+								    coord	DEF lshin-COORD Coordinate {
+									    point	[ -18.4 25.7 47.8,
+											      49.4 25.7 47.8,
+											      -18.4 25.7 -20,
+											      49.4 25.7 -20,
+											      -10.6 -44.5 40,
+											      -10.6 -44.5 -12.2,
+											      41.6 -44.5 -12.2,
+											      41.6 -44.5 40 ]
+								    }
+
+								    ccw	TRUE
+								    solid	TRUE
+								    coordIndex	[ 0, 2, 5, -1, 5, 4, 0, -1,
+										      2, 3, 6, -1, 6, 5, 2, -1,
+										      3, 1, 7, -1, 7, 6, 3, -1,
+										      1, 0, 4, -1, 4, 7, 1, -1,
+										      4, 5, 7, -1, 7, 5, 6, -1,
+										      0, 1, 2, -1, 2, 1, 3, -1 ]
+							    }
+
+						    }
+
+						    DEF lfoot-ROOT Transform {
+							    translation	0 0 0
+							    center	20.3286 -51.3209 0.000146151
+							    children Shape {
+								    appearance	Appearance {
+									    material	DEF Yellow_Plastic Material {
+										    ambientIntensity	0.2
+										    transparency	0
+										    shininess	0.2
+										    diffuseColor	0.8 0.789856 0.00200167
+										    specularColor	1 1 1
+									    }
+
+								    }
+
+								    geometry	DEF lfoot-FACES IndexedFaceSet {
+									    coord	DEF lfoot-COORD Coordinate {
+										    point	[ -10.6 -44.5 40,
+												      -10.6 -44.5 -12.2,
+												      41.6 -44.5 -12.2,
+												      41.6 -44.5 40,
+												      -10.6 -71.2 40,
+												      -10.6 -71.2 -12.2,
+												      41.6 -71.2 -12.2,
+												      41.6 -71.2 40,
+												      -10.6 -71.2 76,
+												      41.6 -71.2 76,
+												      41.6 -44.5 76,
+												      -10.6 -44.5 76 ]
+									    }
+
+									    ccw	TRUE
+									    solid	TRUE
+									    coordIndex	[ 4, 5, 6, -1, 6, 7, 4, -1,
+											      0, 1, 5, -1, 5, 4, 0, -1,
+											      1, 2, 6, -1, 6, 5, 1, -1,
+											      2, 3, 7, -1, 7, 6, 2, -1,
+											      10, 11, 8, -1, 8, 9, 10, -1,
+											      4, 7, 9, -1, 9, 8, 4, -1,
+											      0, 4, 8, -1, 8, 11, 0, -1,
+											      7, 3, 10, -1, 10, 9, 7, -1,
+											      11, 10, 0, -1, 0, 10, 3, -1,
+											      3, 1, 0, -1, 1, 3, 2, -1 ]
+								    }
+
+							    }
+						    }
+						]
+					}
+				    ]
+			    }
+			]
+		}
+	}
+}
+DEF arms_ani Group {
+	children [ 
+	    DEF arm_time TimeSensor {
+		    cycleInterval	10
+		    enabled	TRUE
+		    loop	TRUE
+	    }
+
+	    DEF arm_time2-rotation OrientationInterpolator {
+		    key	[ 0, 0.0987055, 0.199029, 0.299353,
+				      0.399676, 0.498382, 0.598706, 0.699029,
+				      0.799353, 1 ]
+		    keyValue	[ 0 0 1  0,
+				      0 0 1  0,
+				      0 0 1  0,
+				      0 0 1  0,
+				      -1 6.27191e-006 -6.27199e-006  1.12916,
+				      -1 6.27191e-006 -6.27199e-006  1.12916,
+				      -1 6.27191e-006 -6.27199e-006  1.12916,
+				      -1 6.25552e-006 -6.26844e-006  0.00436732,
+				      -0.0107071 0.00219026 0.99994  0.40244,
+				      0 0 1  0 ]
+	    }
+
+	    DEF arm_time4-rotation OrientationInterpolator {
+		    key	[ 0, 0.0987055, 0.199029, 0.299353,
+				      0.399676, 0.498382, 0.598706, 0.699029,
+				      0.799353, 1 ]
+		    keyValue	[ 0.985898 0.0233546 -0.165709  0.0213509,
+				      0.985898 0.0233546 -0.165709  0.0213509,
+				      0.985898 0.0233546 -0.165709  0.0213509,
+				      0.985898 0.0233546 -0.165709  0.0213509,
+				      0.304934 -0.936047 -0.175589  0.0695386,
+				      0.304934 -0.936047 -0.175589  0.0695386,
+				      0.304934 -0.936047 -0.175589  0.0695386,
+				      0.304934 -0.936047 -0.175589  0.0695386,
+				      0.304934 -0.936047 -0.175589  0.0695386,
+				      0 0 1  0 ]
+	    }
+
+	    DEF arm_time6-rotation OrientationInterpolator {
+		    key	[ 0, 0.0987055, 0.199029, 0.299353,
+				      0.399676, 0.498382, 0.598706, 0.699029,
+				      0.799353, 1 ]
+		    keyValue	[ 0 0 1  0,
+				      0 0 1  0,
+				      0 0 1  0,
+				      0 0 1  0,
+				      0 0 1  0,
+				      -1.12958e-007 6.25872e-006 1  0.385077,
+				      -8.12865e-007 -6.73053e-006 -1  0.0606397,
+				      -8.12865e-007 -6.73053e-006 -1  0.0606397,
+				      -8.12865e-007 -6.73053e-006 -1  0.0606397,
+				      0 0 1  0 ]
+	    }
+
+	    DEF arm_time8-rotation OrientationInterpolator {
+		    key	[ 0, 0.0987055, 0.199029, 0.299353,
+				      0.399676, 0.498382, 0.598706, 0.699029,
+				      0.799353, 1 ]
+		    keyValue	[ 0 0 1  0,
+				      0 0 1  0,
+				      0 0 1  0,
+				      0 0 1  0,
+				      0 0 1  0,
+				      1.55033e-008 -6.28238e-006 -1  0.490835,
+				      0.719354 0.683033 0.126474  0.140996,
+				      0.719354 0.683033 0.126474  0.140996,
+				      0.719354 0.683033 0.126474  0.140996,
+				      0 0 1  0 ]
+	    }
+
+	    DEF arm_time10-rotation OrientationInterpolator {
+		    key	[ 0, 0.0987055, 0.199029, 0.299353,
+				      0.399676, 0.498382, 0.598706, 0.699029,
+				      0.799353, 1 ]
+		    keyValue	[ 0 0 1  0,
+				      -1 6.27388e-006 -6.26872e-006  1.28245,
+				      -1 6.27388e-006 -6.26872e-006  1.28245,
+				      -1 7.24348e-006 -5.41253e-006  0.0363504,
+				      -1 7.24348e-006 -5.41253e-006  0.0363504,
+				      -1 7.24348e-006 -5.41253e-006  0.0363504,
+				      -1 7.24348e-006 -5.41253e-006  0.0363504,
+				      -1 7.24348e-006 -5.41253e-006  0.0363504,
+				      -1 7.24348e-006 -5.41253e-006  0.0363504,
+				      0 0 1  0 ]
+	    }
+
+	    DEF arm_time12-rotation OrientationInterpolator {
+		    key	[ 0, 0.0987055, 0.199029, 0.299353,
+				      0.399676, 0.498382, 0.598706, 0.699029,
+				      0.799353, 1 ]
+		    keyValue	[ 0 0 1  0,
+				      -1.49444e-007 -0.00193393 0.999998  0.155892,
+				      -1.53221e-008 -0.00193399 0.999998  1.02875,
+				      6.02472e-007 0.00193567 -0.999998  0.0555071,
+				      6.02472e-007 0.00193567 -0.999998  0.0555071,
+				      6.02472e-007 0.00193567 -0.999998  0.0555071,
+				      6.02472e-007 0.00193567 -0.999998  0.0555071,
+				      6.02472e-007 0.00193567 -0.999998  0.0555071,
+				      6.02472e-007 0.00193567 -0.999998  0.0555071,
+				      0 0 1  0 ]
+	    }
+	]
+ROUTE arm_time.fraction_changed TO arm_time2-rotation.set_fraction
+ROUTE arm_time2-rotation.value_changed TO lshoulder-ROOT.set_rotation
+ROUTE arm_time.fraction_changed TO arm_time4-rotation.set_fraction
+ROUTE arm_time4-rotation.value_changed TO lfarm-ROOT.set_rotation
+ROUTE arm_time.fraction_changed TO arm_time6-rotation.set_fraction
+ROUTE arm_time6-rotation.value_changed TO lfing-ROOT.set_rotation
+ROUTE arm_time.fraction_changed TO arm_time8-rotation.set_fraction
+ROUTE arm_time8-rotation.value_changed TO lthumb-ROOT.set_rotation
+ROUTE arm_time.fraction_changed TO arm_time10-rotation.set_fraction
+ROUTE arm_time10-rotation.value_changed TO rshoulder-ROOT.set_rotation
+ROUTE arm_time.fraction_changed TO arm_time12-rotation.set_fraction
+ROUTE arm_time12-rotation.value_changed TO rfarm-ROOT.set_rotation
+}
+DEF wristband_ani Group {
+	children [ 
+	    DEF flashtime TimeSensor {
+		    cycleInterval	5
+		    enabled	TRUE
+		    loop	TRUE
+	    }
+
+	    DEF flashtime1-emissiveColor ColorInterpolator {
+		    key	[ 0, 0.199029, 0.399676, 0.598706,
+				      0.799353, 1 ]
+		    keyValue	[ 0 0 0.53,
+				      0.95 0 1,
+				      0.35 0 1,
+				      0.83 0 1,
+				      0.83 0 0.2,
+				      0 0.05 0.49 ]
+	    }
+	]
+ROUTE flashtime.fraction_changed TO flashtime1-emissiveColor.set_fraction
+ROUTE flashtime1-emissiveColor.value_changed TO flashtime1-Material.set_emissiveColor
+}
+DEF legs_ani Group {
+	children [ 
+	    DEF legtime TimeSensor {
+		    cycleInterval	4
+		    loop	TRUE
+	    }
+
+	    DEF legtime26-rotation OrientationInterpolator {
+		    key	[ 0, 0.199029, 0.399676, 0.598706,
+				      0.799353, 1 ]
+		    keyValue	[ 0 0 1  0,
+				      -1 6.27192e-006 -6.27199e-006  0.608114,
+				      1 -6.27192e-006 6.27198e-006  0.145435,
+				      -1 6.27192e-006 -6.272e-006  0.484188,
+				      -1 6.27194e-006 -6.27204e-006  0.0591467,
+				      0 0 1  0 ]
+	    }
+
+	    DEF legtime28-rotation OrientationInterpolator {
+		    key	[ 0, 0.199029, 0.399676, 0.598706,
+				      0.799353, 1 ]
+		    keyValue	[ 0 0 1  0,
+				      1 -6.24268e-006 6.23844e-006  0.625483,
+				      0.996945 0.0559058 -0.054544  0.420198,
+				      0.999065 0.0251648 -0.0351574  0.772519,
+				      0.663006 -0.159484 -0.731428  0.0817691,
+				      0 0 1  0 ]
+	    }
+
+	    DEF legtime30-rotation OrientationInterpolator {
+		    key	[ 0, 0.199029, 0.399676, 0.598706,
+				      0.799353, 1 ]
+		    keyValue	[ 0 0 1  0,
+				      1 -6.27191e-006 6.27199e-006  0.216061,
+				      -1 6.27192e-006 -6.27199e-006  0.250118,
+				      1 -6.27191e-006 6.27199e-006  0.286585,
+				      1 -6.2719e-006 6.27199e-006  0.0613395,
+				      0 0 1  0 ]
+	    }
+
+	    DEF legtime32-rotation OrientationInterpolator {
+		    key	[ 0, 0.199029, 0.399676, 0.598706,
+				      0.799353, 1 ]
+		    keyValue	[ 0 0 1  0,
+				      1 -6.27189e-006 6.27197e-006  0.201045,
+				      1 -6.2951e-006 5.97967e-006  0.58302,
+				      1 -6.24879e-006 5.76494e-006  0.333618,
+				      -1 6.6518e-006 -7.6339e-006  0.119286,
+				      0 0 1  0 ]
+	    }
+	]
+ROUTE legtime.fraction_changed TO legtime26-rotation.set_fraction
+ROUTE legtime26-rotation.value_changed TO rthigh-ROOT.set_rotation
+ROUTE legtime.fraction_changed TO legtime28-rotation.set_fraction
+ROUTE legtime28-rotation.value_changed TO rshin-ROOT.set_rotation
+ROUTE legtime.fraction_changed TO legtime30-rotation.set_fraction
+ROUTE legtime30-rotation.value_changed TO lthigh-ROOT.set_rotation
+ROUTE legtime.fraction_changed TO legtime32-rotation.set_fraction
+ROUTE legtime32-rotation.value_changed TO lshin-ROOT.set_rotation
+}
+DEF face_ani Group {
+	children [ 
+	    DEF facetime TimeSensor {
+		    cycleInterval	5
+		    enabled	TRUE
+		    loop	TRUE
+	    }
+
+	    DEF facetime18-rotation OrientationInterpolator {
+		    key	[ 0, 0.199029, 0.399676, 0.598706,
+				      0.699029, 0.7589, 0.859223, 1 ]
+		    keyValue	[ 0 0 1  0,
+				      0 -1 0  0.212854,
+				      0 1 0  0.307758,
+				      0 -1 0  0.368127,
+				      -0.930707 -0.362557 0.0483352  0.11206,
+				      1 -6.27191e-006 6.27199e-006  0.0965583,
+				      0 0 1  0,
+				      0 0 1  0 ]
+	    }
+
+	    DEF facetime20-rotation OrientationInterpolator {
+		    key	[ 0, 0.199029, 0.399676, 0.598706,
+				      0.699029, 0.7589, 0.859223, 1 ]
+		    keyValue	[ 1 -6.27193e-006 6.2719e-006  0.0087619,
+				      1 -5.97763e-006 6.24943e-006  0.126094,
+				      -1 6.38654e-006 -6.29219e-006  0.133719,
+				      1 -6.76184e-006 6.32155e-006  0.182177,
+				      -1 6.36603e-006 -6.24792e-006  0.0520487,
+				      0.959722 0.134826 -0.246487  0.111668,
+				      -1 6.27191e-006 -6.272e-006  0.140207,
+				      1 -6.27193e-006 6.2719e-006  0.0087619 ]
+	    }
+
+	    DEF facetime22-translation PositionInterpolator {
+		    key	[ 0, 0.199029, 0.399676, 0.598706,
+				      0.699029, 0.7589, 0.859223, 1 ]
+		    keyValue	[ 0 0 0,
+				      -1.6 0 0,
+				      3.7 0 0,
+				      -1.5 0 0,
+				      4.8 0 0,
+				      0.6 0 0,
+				      0 0.7 0,
+				      0 0 0 ]
+	    }
+	]
+ROUTE facetime.fraction_changed TO facetime18-rotation.set_fraction
+ROUTE facetime18-rotation.value_changed TO neck-ROOT.set_rotation
+ROUTE facetime.fraction_changed TO facetime20-rotation.set_fraction
+ROUTE facetime20-rotation.value_changed TO jaw-ROOT.set_rotation
+ROUTE facetime.fraction_changed TO facetime22-translation.set_fraction
+ROUTE facetime22-translation.value_changed TO eyeballs.set_translation
+}

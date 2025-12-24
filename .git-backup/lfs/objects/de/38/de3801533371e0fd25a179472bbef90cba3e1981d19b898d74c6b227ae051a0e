@@ -1,0 +1,4 @@
+newmtl world
+map_Ka world.png
+map_Kd world.png
+map_Ks world.png

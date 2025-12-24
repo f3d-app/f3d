@@ -1,0 +1,62 @@
+#usda 1.0
+(
+    defaultPrim = "TwoQuads"
+    metersPerUnit = 1
+    upAxis = "Y"
+)
+
+def Xform "TwoQuads"
+{
+    def Mesh "Mesh" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        uniform bool doubleSided = 1
+        float3[] extent = [(0, 0, 0), (2, 1, 0)]
+        int[] faceVertexCounts = [4, 4]
+        int[] faceVertexIndices = [0, 1, 2, 3, 1, 4, 5, 2]
+        rel material:binding = </Materials/ColorTexture>
+        normal3f[] normals = [(-1, 0, 0), (0, 0, 1), (0, 0, 1), (-1, 0, 0), (1, 0, 0), (1, 0, 0)] (
+            interpolation = "vertex"
+        )
+        point3f[] points = [(0, 0, 0), (1, 0, 0), (1, 1, 0), (0, 1, 0), (2, 0, 0), (2, 1, 0)]
+        texCoord2f[] primvars:tcoord = [(0, 0), (1, 0), (1, 1), (0, 1)] (
+            interpolation = "faceVarying"
+        )
+        int[] primvars:tcoord:indices = [0, 1, 2, 3, 0, 1, 2, 3]
+        uniform token subdivisionScheme = "none"
+    }
+}
+
+def "Materials"
+{
+    def Material "ColorTexture"
+    {
+        token outputs:surface.connect = </Materials/ColorTexture/PBR.outputs:surface>
+
+        def Shader "PBR"
+        {
+            uniform token info:id = "UsdPreviewSurface"
+            color3f inputs:diffuseColor.connect = </Materials/ColorTexture/Image.outputs:rgb>
+            float inputs:roughness = 0.2
+            token outputs:surface
+        }
+
+        def Shader "Image"
+        {
+            uniform token info:id = "UsdUVTexture"
+            asset inputs:file = @16bit.png@
+            token inputs:sourceColorSpace = "sRGB"
+            float2 inputs:st.connect = </Materials/ColorTexture/uvmap.outputs:result>
+            float3 outputs:rgb
+        }
+
+        def Shader "uvmap"
+        {
+            uniform token info:id = "UsdPrimvarReader_float2"
+            token inputs:varname = "tcoord"
+            float2 outputs:result
+        }
+    }
+}
+

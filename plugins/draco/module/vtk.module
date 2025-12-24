@@ -1,0 +1,14 @@
+NAME
+  f3d::vtkextDraco
+DESCRIPTION
+  A VTK module for the Draco plugin
+DEPENDS
+  VTK::CommonCore
+  VTK::CommonExecutionModel
+  VTK::IOGeometry
+  VTK::IOImport
+  f3d::vtkext
+  draco::draco
+TEST_DEPENDS
+  VTK::TestingCore
+  VTK::CommonDataModel

@@ -1,0 +1,7 @@
+# StreamVersion 1.2
+RenderEvent 0 0 0 0 0 0 0
+KeyPressEvent 0 0 2 0 1 Control_L 0
+KeyPressEvent 0 0 2 0 1 F12 0
+RenderEvent 0 0 2 0 1 F12 0
+KeyReleaseEvent 0 0 2 0 1 F12 0
+KeyReleaseEvent 0 0 0 0 1 Control_L 0

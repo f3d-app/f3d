@@ -1,0 +1,74 @@
+# StreamVersion 1.2
+ConfigureEvent 1249 1374 0 0 0 0 0
+ExposeEvent 0 1406 0 0 0 0 0
+RenderEvent 0 1406 0 0 0 0 0
+
+KeyPressEvent -763 401 0 27 1 Escape 0
+CharEvent -763 401 0 27 1 Escape 0
+KeyReleaseEvent -763 401 0 27 1 Escape 0
+
+KeyPressEvent -763 401 0 115 1 s 0
+CharEvent -763 401 0 115 1 s 0
+KeyReleaseEvent -763 401 0 115 1 s 0
+
+KeyPressEvent -763 401 0 101 1 e 0
+CharEvent -763 401 0 101 1 e 0
+KeyReleaseEvent -763 401 0 101 1 e 0
+
+KeyPressEvent -763 401 0 116 1 t 0
+CharEvent -763 401 0 116 1 t 0
+KeyReleaseEvent -763 401 0 116 1 t 0
+
+KeyPressEvent -763 401 1 95 1 underscore 0
+CharEvent -763 401 1 95 1 underscore 0
+KeyReleaseEvent -763 401 1 95 1 underscore 0
+
+KeyPressEvent -763 401 0 99 1 c 0
+CharEvent -763 401 0 99 1 c 0
+KeyReleaseEvent -763 401 0 99 1 c 0
+
+KeyPressEvent -763 401 0 97 1 a 0
+CharEvent -763 401 0 97 1 a 0
+KeyReleaseEvent -763 401 0 97 1 a 0
+
+KeyPressEvent -763 401 0 109 1 m 0
+CharEvent -763 401 0 109 1 m 0
+KeyReleaseEvent -763 401 0 109 1 m 0
+
+KeyPressEvent -763 401 0 101 1 e 0
+CharEvent -763 401 0 101 1 e 0
+KeyReleaseEvent -763 401 0 101 1 e 0
+
+KeyPressEvent -763 401 0 114 1 r 0
+CharEvent -763 401 0 114 1 r 0
+KeyReleaseEvent -763 401 0 114 1 r 0
+
+KeyPressEvent -763 401 0 97 1 a 0
+CharEvent -763 401 0 97 1 a 0
+KeyReleaseEvent -763 401 0 97 1 a 0
+
+KeyPressEvent -763 401 0 32 1 space 0
+CharEvent -763 401 0 32 1 space 0
+KeyReleaseEvent -763 401 0 32 1 space 0
+
+KeyPressEvent -763 401 0 116 1 t 0
+CharEvent -763 401 0 116 1 t 0
+KeyReleaseEvent -763 401 0 116 1 t 0
+
+KeyPressEvent -763 401 0 111 1 o 0
+CharEvent -763 401 0 111 1 o 0
+KeyReleaseEvent -763 401 0 111 1 o 0
+
+KeyPressEvent -763 401 0 112 1 p 0
+CharEvent -763 401 0 112 1 p 0
+KeyReleaseEvent -763 401 0 112 1 p 0
+
+KeyPressEvent -763 401 0 13 1 Return 0
+CharEvent -763 401 0 13 1 Return 0
+KeyReleaseEvent -763 401 0 13 1 Return 0
+
+KeyPressEvent -763 401 0 27 1 Escape 0
+CharEvent -763 401 0 27 1 Escape 0
+KeyReleaseEvent -763 401 0 27 1 Escape 0
+
+TimerEvent 212 76 0 27 1 Escape 0

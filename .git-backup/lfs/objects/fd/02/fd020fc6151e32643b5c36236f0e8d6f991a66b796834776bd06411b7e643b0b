@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <asset>
+    <contributor>
+      <author>Blender User</author>
+      <authoring_tool>Blender 3.4.1 commit date:2022-12-20, commit time:08:50, hash:ef9ca44dee7f</authoring_tool>
+    </contributor>
+    <created>2023-02-09T22:35:41</created>
+    <modified>2023-02-09T22:35:41</modified>
+    <unit name="meter" meter="1"/>
+    <up_axis>Z_UP</up_axis>
+  </asset>
+  <library_lights>
+    <light id="Sun-light" name="Sun">
+      <technique_common>
+        <directional>
+          <color sid="color">0 0 1</color>
+        </directional>
+      </technique_common>
+      <extra>
+        <technique profile="blender">
+          <type sid="type" type="int">1</type>
+          <flag sid="flag" type="int">0</flag>
+          <mode sid="mode" type="int">1</mode>
+          <gamma sid="blender_gamma" type="float">1</gamma>
+          <red sid="red" type="float">0</red>
+          <green sid="green" type="float">0</green>
+          <blue sid="blue" type="float">1</blue>
+          <shadow_r sid="blender_shadow_r" type="float">0</shadow_r>
+          <shadow_g sid="blender_shadow_g" type="float">0</shadow_g>
+          <shadow_b sid="blender_shadow_b" type="float">0</shadow_b>
+          <energy sid="blender_energy" type="float">1</energy>
+          <dist sid="blender_dist" type="float">12.5</dist>
+          <spotsize sid="spotsize" type="float">45</spotsize>
+          <spotblend sid="spotblend" type="float">0.15</spotblend>
+          <att1 sid="att1" type="float">0</att1>
+          <att2 sid="att2" type="float">1</att2>
+          <falloff_type sid="falloff_type" type="int">2</falloff_type>
+          <clipsta sid="clipsta" type="float">0.04999995</clipsta>
+          <clipend sid="clipend" type="float">40</clipend>
+          <bias sid="bias" type="float">1</bias>
+          <soft sid="soft" type="float">3</soft>
+          <bufsize sid="bufsize" type="int">512</bufsize>
+          <samp sid="samp" type="int">3</samp>
+          <buffers sid="buffers" type="int">1</buffers>
+          <area_shape sid="area_shape" type="int">0</area_shape>
+          <area_size sid="area_size" type="float">0.125</area_size>
+          <area_sizey sid="area_sizey" type="float">0.125</area_sizey>
+          <area_sizez sid="area_sizez" type="float">0.125</area_sizez>
+        </technique>
+      </extra>
+    </light>
+    <light id="Point-light" name="Point">
+      <technique_common>
+        <point>
+          <color sid="color">0 1 0</color>
+          <constant_attenuation>1</constant_attenuation>
+          <linear_attenuation>0</linear_attenuation>
+          <quadratic_attenuation>0.001599967</quadratic_attenuation>
+        </point>
+      </technique_common>
+      <extra>
+        <technique profile="blender">
+          <type sid="type" type="int">0</type>
+          <flag sid="flag" type="int">0</flag>
+          <mode sid="mode" type="int">1</mode>
+          <gamma sid="blender_gamma" type="float">1</gamma>
+          <red sid="red" type="float">0</red>
+          <green sid="green" type="float">1</green>
+          <blue sid="blue" type="float">0</blue>
+          <shadow_r sid="blender_shadow_r" type="float">0</shadow_r>
+          <shadow_g sid="blender_shadow_g" type="float">0</shadow_g>
+          <shadow_b sid="blender_shadow_b" type="float">0</shadow_b>
+          <energy sid="blender_energy" type="float">1</energy>
+          <dist sid="blender_dist" type="float">25</dist>
+          <spotsize sid="spotsize" type="float">45</spotsize>
+          <spotblend sid="spotblend" type="float">0.15</spotblend>
+          <att1 sid="att1" type="float">0</att1>
+          <att2 sid="att2" type="float">1</att2>
+          <falloff_type sid="falloff_type" type="int">2</falloff_type>
+          <clipsta sid="clipsta" type="float">0.04999995</clipsta>
+          <clipend sid="clipend" type="float">40</clipend>
+          <bias sid="bias" type="float">1</bias>
+          <soft sid="soft" type="float">3</soft>
+          <bufsize sid="bufsize" type="int">512</bufsize>
+          <samp sid="samp" type="int">3</samp>
+          <buffers sid="buffers" type="int">1</buffers>
+          <area_shape sid="area_shape" type="int">0</area_shape>
+          <area_size sid="area_size" type="float">0.25</area_size>
+          <area_sizey sid="area_sizey" type="float">0.25</area_sizey>
+          <area_sizez sid="area_sizez" type="float">0.25</area_sizez>
+        </technique>
+      </extra>
+    </light>
+    <light id="Spot-light" name="Spot">
+      <technique_common>
+        <spot>
+          <color sid="color">1 0 0</color>
+          <constant_attenuation>1</constant_attenuation>
+          <linear_attenuation>0</linear_attenuation>
+          <quadratic_attenuation>0.001599967</quadratic_attenuation>
+          <falloff_angle sid="fall_off_angle">20</falloff_angle>
+        </spot>
+      </technique_common>
+      <extra>
+        <technique profile="blender">
+          <type sid="type" type="int">2</type>
+          <flag sid="flag" type="int">0</flag>
+          <mode sid="mode" type="int">1</mode>
+          <gamma sid="blender_gamma" type="float">1</gamma>
+          <red sid="red" type="float">1</red>
+          <green sid="green" type="float">0</green>
+          <blue sid="blue" type="float">0</blue>
+          <shadow_r sid="blender_shadow_r" type="float">0</shadow_r>
+          <shadow_g sid="blender_shadow_g" type="float">0</shadow_g>
+          <shadow_b sid="blender_shadow_b" type="float">0</shadow_b>
+          <energy sid="blender_energy" type="float">1</energy>
+          <dist sid="blender_dist" type="float">25</dist>
+          <spotsize sid="spotsize" type="float">20</spotsize>
+          <spotblend sid="spotblend" type="float">0</spotblend>
+          <att1 sid="att1" type="float">0</att1>
+          <att2 sid="att2" type="float">1</att2>
+          <falloff_type sid="falloff_type" type="int">2</falloff_type>
+          <clipsta sid="clipsta" type="float">0.04999995</clipsta>
+          <clipend sid="clipend" type="float">40</clipend>
+          <bias sid="bias" type="float">1</bias>
+          <soft sid="soft" type="float">3</soft>
+          <bufsize sid="bufsize" type="int">512</bufsize>
+          <samp sid="samp" type="int">3</samp>
+          <buffers sid="buffers" type="int">1</buffers>
+          <area_shape sid="area_shape" type="int">0</area_shape>
+          <area_size sid="area_size" type="float">0.25</area_size>
+          <area_sizey sid="area_sizey" type="float">0.25</area_sizey>
+          <area_sizez sid="area_sizez" type="float">0.25</area_sizez>
+        </technique>
+      </extra>
+    </light>
+  </library_lights>
+  <library_effects>
+    <effect id="Material-effect">
+      <profile_COMMON>
+        <technique sid="common">
+          <lambert>
+            <emission>
+              <color sid="emission">0 0 0 1</color>
+            </emission>
+            <diffuse>
+              <color sid="diffuse">0.8 0.8 0.8 1</color>
+            </diffuse>
+            <index_of_refraction>
+              <float sid="ior">1.45</float>
+            </index_of_refraction>
+          </lambert>
+        </technique>
+      </profile_COMMON>
+    </effect>
+  </library_effects>
+  <library_images/>
+  <library_materials>
+    <material id="Material-material" name="Material">
+      <instance_effect url="#Material-effect"/>
+    </material>
+  </library_materials>
+  <library_geometries>
+    <geometry id="Cube_003-mesh" name="Cube.003">
+      <mesh>
+        <source id="Cube_003-mesh-positions">
+          <float_array id="Cube_003-mesh-positions-array" count="24">-1 -1 -1 -1 -1 1 -1 1 -1 -1 1 1 1 -1 -1 1 -1 1 1 1 -1 1 1 1</float_array>
+          <technique_common>
+            <accessor source="#Cube_003-mesh-positions-array" count="8" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Cube_003-mesh-normals">
+          <float_array id="Cube_003-mesh-normals-array" count="18">-1 0 0 0 1 0 1 0 0 0 -1 0 0 0 -1 0 0 1</float_array>
+          <technique_common>
+            <accessor source="#Cube_003-mesh-normals-array" count="6" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Cube_003-mesh-map-0">
+          <float_array id="Cube_003-mesh-map-0-array" count="72">0.625 0 0.375 0.25 0.375 0 0.625 0.25 0.375 0.5 0.375 0.25 0.625 0.5 0.375 0.75 0.375 0.5 0.625 0.75 0.375 1 0.375 0.75 0.375 0.5 0.125 0.75 0.125 0.5 0.875 0.5 0.625 0.75 0.625 0.5 0.625 0 0.625 0.25 0.375 0.25 0.625 0.25 0.625 0.5 0.375 0.5 0.625 0.5 0.625 0.75 0.375 0.75 0.625 0.75 0.625 1 0.375 1 0.375 0.5 0.375 0.75 0.125 0.75 0.875 0.5 0.875 0.75 0.625 0.75</float_array>
+          <technique_common>
+            <accessor source="#Cube_003-mesh-map-0-array" count="36" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="Cube_003-mesh-vertices">
+          <input semantic="POSITION" source="#Cube_003-mesh-positions"/>
+        </vertices>
+        <triangles count="12">
+          <input semantic="VERTEX" source="#Cube_003-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#Cube_003-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#Cube_003-mesh-map-0" offset="2" set="0"/>
+          <p>1 0 0 2 0 1 0 0 2 3 1 3 6 1 4 2 1 5 7 2 6 4 2 7 6 2 8 5 3 9 0 3 10 4 3 11 6 4 12 0 4 13 2 4 14 3 5 15 5 5 16 7 5 17 1 0 18 3 0 19 2 0 20 3 1 21 7 1 22 6 1 23 7 2 24 5 2 25 4 2 26 5 3 27 1 3 28 0 3 29 6 4 30 4 4 31 0 4 32 3 5 33 1 5 34 5 5 35</p>
+        </triangles>
+      </mesh>
+    </geometry>
+    <geometry id="Cube_002-mesh" name="Cube.002">
+      <mesh>
+        <source id="Cube_002-mesh-positions">
+          <float_array id="Cube_002-mesh-positions-array" count="24">-1 -1 -1 -1 -1 1 -1 1 -1 -1 1 1 1 -1 -1 1 -1 1 1 1 -1 1 1 1</float_array>
+          <technique_common>
+            <accessor source="#Cube_002-mesh-positions-array" count="8" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Cube_002-mesh-normals">
+          <float_array id="Cube_002-mesh-normals-array" count="18">-1 0 0 0 1 0 1 0 0 0 -1 0 0 0 -1 0 0 1</float_array>
+          <technique_common>
+            <accessor source="#Cube_002-mesh-normals-array" count="6" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Cube_002-mesh-map-0">
+          <float_array id="Cube_002-mesh-map-0-array" count="72">0.625 0 0.375 0.25 0.375 0 0.625 0.25 0.375 0.5 0.375 0.25 0.625 0.5 0.375 0.75 0.375 0.5 0.625 0.75 0.375 1 0.375 0.75 0.375 0.5 0.125 0.75 0.125 0.5 0.875 0.5 0.625 0.75 0.625 0.5 0.625 0 0.625 0.25 0.375 0.25 0.625 0.25 0.625 0.5 0.375 0.5 0.625 0.5 0.625 0.75 0.375 0.75 0.625 0.75 0.625 1 0.375 1 0.375 0.5 0.375 0.75 0.125 0.75 0.875 0.5 0.875 0.75 0.625 0.75</float_array>
+          <technique_common>
+            <accessor source="#Cube_002-mesh-map-0-array" count="36" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="Cube_002-mesh-vertices">
+          <input semantic="POSITION" source="#Cube_002-mesh-positions"/>
+        </vertices>
+        <triangles count="12">
+          <input semantic="VERTEX" source="#Cube_002-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#Cube_002-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#Cube_002-mesh-map-0" offset="2" set="0"/>
+          <p>1 0 0 2 0 1 0 0 2 3 1 3 6 1 4 2 1 5 7 2 6 4 2 7 6 2 8 5 3 9 0 3 10 4 3 11 6 4 12 0 4 13 2 4 14 3 5 15 5 5 16 7 5 17 1 0 18 3 0 19 2 0 20 3 1 21 7 1 22 6 1 23 7 2 24 5 2 25 4 2 26 5 3 27 1 3 28 0 3 29 6 4 30 4 4 31 0 4 32 3 5 33 1 5 34 5 5 35</p>
+        </triangles>
+      </mesh>
+    </geometry>
+    <geometry id="Cube_001-mesh" name="Cube.001">
+      <mesh>
+        <source id="Cube_001-mesh-positions">
+          <float_array id="Cube_001-mesh-positions-array" count="24">-1 -1 -1 -1 -1 1 -1 1 -1 -1 1 1 1 -1 -1 1 -1 1 1 1 -1 1 1 1</float_array>
+          <technique_common>
+            <accessor source="#Cube_001-mesh-positions-array" count="8" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Cube_001-mesh-normals">
+          <float_array id="Cube_001-mesh-normals-array" count="18">-1 0 0 0 1 0 1 0 0 0 -1 0 0 0 -1 0 0 1</float_array>
+          <technique_common>
+            <accessor source="#Cube_001-mesh-normals-array" count="6" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Cube_001-mesh-map-0">
+          <float_array id="Cube_001-mesh-map-0-array" count="72">0.625 0 0.375 0.25 0.375 0 0.625 0.25 0.375 0.5 0.375 0.25 0.625 0.5 0.375 0.75 0.375 0.5 0.625 0.75 0.375 1 0.375 0.75 0.375 0.5 0.125 0.75 0.125 0.5 0.875 0.5 0.625 0.75 0.625 0.5 0.625 0 0.625 0.25 0.375 0.25 0.625 0.25 0.625 0.5 0.375 0.5 0.625 0.5 0.625 0.75 0.375 0.75 0.625 0.75 0.625 1 0.375 1 0.375 0.5 0.375 0.75 0.125 0.75 0.875 0.5 0.875 0.75 0.625 0.75</float_array>
+          <technique_common>
+            <accessor source="#Cube_001-mesh-map-0-array" count="36" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="Cube_001-mesh-vertices">
+          <input semantic="POSITION" source="#Cube_001-mesh-positions"/>
+        </vertices>
+        <triangles count="12">
+          <input semantic="VERTEX" source="#Cube_001-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#Cube_001-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#Cube_001-mesh-map-0" offset="2" set="0"/>
+          <p>1 0 0 2 0 1 0 0 2 3 1 3 6 1 4 2 1 5 7 2 6 4 2 7 6 2 8 5 3 9 0 3 10 4 3 11 6 4 12 0 4 13 2 4 14 3 5 15 5 5 16 7 5 17 1 0 18 3 0 19 2 0 20 3 1 21 7 1 22 6 1 23 7 2 24 5 2 25 4 2 26 5 3 27 1 3 28 0 3 29 6 4 30 4 4 31 0 4 32 3 5 33 1 5 34 5 5 35</p>
+        </triangles>
+      </mesh>
+    </geometry>
+    <geometry id="Cube-mesh" name="Cube">
+      <mesh>
+        <source id="Cube-mesh-positions">
+          <float_array id="Cube-mesh-positions-array" count="24">1 1 1 1 1 -1 1 -1 1 1 -1 -1 -1 1 1 -1 1 -1 -1 -1 1 -1 -1 -1</float_array>
+          <technique_common>
+            <accessor source="#Cube-mesh-positions-array" count="8" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Cube-mesh-normals">
+          <float_array id="Cube-mesh-normals-array" count="18">0 0 1 0 -1 0 -1 0 0 0 0 -1 1 0 0 0 1 0</float_array>
+          <technique_common>
+            <accessor source="#Cube-mesh-normals-array" count="6" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Cube-mesh-map-0">
+          <float_array id="Cube-mesh-map-0-array" count="72">0.875 0.5 0.625 0.75 0.625 0.5 0.625 0.75 0.375 1 0.375 0.75 0.625 0 0.375 0.25 0.375 0 0.375 0.5 0.125 0.75 0.125 0.5 0.625 0.5 0.375 0.75 0.375 0.5 0.625 0.25 0.375 0.5 0.375 0.25 0.875 0.5 0.875 0.75 0.625 0.75 0.625 0.75 0.625 1 0.375 1 0.625 0 0.625 0.25 0.375 0.25 0.375 0.5 0.375 0.75 0.125 0.75 0.625 0.5 0.625 0.75 0.375 0.75 0.625 0.25 0.625 0.5 0.375 0.5</float_array>
+          <technique_common>
+            <accessor source="#Cube-mesh-map-0-array" count="36" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="Cube-mesh-vertices">
+          <input semantic="POSITION" source="#Cube-mesh-positions"/>
+        </vertices>
+        <triangles material="Material-material" count="12">
+          <input semantic="VERTEX" source="#Cube-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#Cube-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#Cube-mesh-map-0" offset="2" set="0"/>
+          <p>4 0 0 2 0 1 0 0 2 2 1 3 7 1 4 3 1 5 6 2 6 5 2 7 7 2 8 1 3 9 7 3 10 5 3 11 0 4 12 3 4 13 1 4 14 4 5 15 1 5 16 5 5 17 4 0 18 6 0 19 2 0 20 2 1 21 6 1 22 7 1 23 6 2 24 4 2 25 5 2 26 1 3 27 3 3 28 7 3 29 0 4 30 2 4 31 3 4 32 4 5 33 0 5 34 1 5 35</p>
+        </triangles>
+      </mesh>
+    </geometry>
+  </library_geometries>
+  <library_animations>
+    <animation id="action_container-Spot" name="Spot">
+      <animation id="Spot_SpotAction_transform" name="Spot">
+        <source id="Spot_SpotAction_transform-input">
+          <float_array id="Spot_SpotAction_transform-input-array" count="250">0.04166662 0.08333331 0.125 0.1666666 0.2083333 0.25 0.2916666 0.3333333 0.375 0.4166666 0.4583333 0.5 0.5416667 0.5833333 0.625 0.6666667 0.7083333 0.75 0.7916667 0.8333333 0.875 0.9166667 0.9583333 1 1.041667 1.083333 1.125 1.166667 1.208333 1.25 1.291667 1.333333 1.375 1.416667 1.458333 1.5 1.541667 1.583333 1.625 1.666667 1.708333 1.75 1.791667 1.833333 1.875 1.916667 1.958333 2 2.041667 2.083333 2.125 2.166667 2.208333 2.25 2.291667 2.333333 2.375 2.416667 2.458333 2.5 2.541667 2.583333 2.625 2.666667 2.708333 2.75 2.791667 2.833333 2.875 2.916667 2.958333 3 3.041667 3.083333 3.125 3.166667 3.208333 3.25 3.291667 3.333333 3.375 3.416667 3.458333 3.5 3.541667 3.583333 3.625 3.666667 3.708333 3.75 3.791667 3.833333 3.875 3.916667 3.958333 4 4.041666 4.083333 4.125 4.166666 4.208333 4.25 4.291666 4.333333 4.375 4.416666 4.458333 4.5 4.541666 4.583333 4.625 4.666666 4.708333 4.75 4.791666 4.833333 4.875 4.916666 4.958333 5 5.041666 5.083333 5.125 5.166666 5.208333 5.25 5.291666 5.333333 5.375 5.416666 5.458333 5.5 5.541666 5.583333 5.625 5.666666 5.708333 5.75 5.791666 5.833333 5.875 5.916666 5.958333 6 6.041666 6.083333 6.125 6.166666 6.208333 6.25 6.291666 6.333333 6.375 6.416666 6.458333 6.5 6.541666 6.583333 6.625 6.666666 6.708333 6.75 6.791666 6.833333 6.875 6.916666 6.958333 7 7.041666 7.083333 7.125 7.166666 7.208333 7.25 7.291666 7.333333 7.375 7.416666 7.458333 7.5 7.541666 7.583333 7.625 7.666666 7.708333 7.75 7.791666 7.833333 7.875 7.916666 7.958333 8 8.041667 8.083333 8.125 8.166667 8.208333 8.25 8.291667 8.333333 8.375 8.416667 8.458333 8.5 8.541667 8.583333 8.625 8.666667 8.708333 8.75 8.791667 8.833333 8.875 8.916667 8.958333 9 9.041667 9.083333 9.125 9.166667 9.208333 9.25 9.291667 9.333333 9.375 9.416667 9.458333 9.5 9.541667 9.583333 9.625 9.666667 9.708333 9.75 9.791667 9.833333 9.875 9.916667 9.958333 10 10.04167 10.08333 10.125 10.16667 10.20833 10.25 10.29167 10.33333 10.375 10.41667</float_array>
+          <technique_common>
+            <accessor source="#Spot_SpotAction_transform-input-array" count="250" stride="1">
+              <param name="TIME" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Spot_SpotAction_transform-output">
+          <float_array id="Spot_SpotAction_transform-output-array" count="4000">1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0.01938671 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0.07619818 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0.1684115 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0.2940036 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0.4509517 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0.6372327 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0.8508235 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 1.089701 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 1.351843 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 1.635226 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 1.937828 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 2.257624 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 2.592593 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 2.94071 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 3.299955 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 3.668302 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 4.04373 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 4.424215 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 4.807734 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 5.192266 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 5.575786 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 5.956271 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 6.331699 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 6.700046 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 7.05929 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 7.407407 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 7.742376 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 8.062172 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 8.364773 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 8.648157 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 8.910298 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 9.149176 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 9.362767 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 9.549049 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 9.705997 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 9.831588 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 9.923803 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 9.980614 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 10 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 9.981563 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 9.9275 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 9.839687 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 9.72 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 9.570313 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 9.3925 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 9.188437 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 8.96 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 8.709063 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 8.4375 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 8.147187 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 7.84 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 7.517812 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 7.1825 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 6.835937 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 6.48 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 6.116562 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 5.747499 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 5.374687 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 4.999999 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 4.625312 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 4.2525 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 3.883437 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 3.52 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 3.164061 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 2.8175 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 2.482187 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 2.16 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 1.852813 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 1.562498 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 1.290937 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 1.04 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0.8115625 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0.6074991 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0.4296875 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0.2800007 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0.1603127 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0.07250023 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0.01843834 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1 1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1</float_array>
+          <technique_common>
+            <accessor source="#Spot_SpotAction_transform-output-array" count="250" stride="16">
+              <param name="TRANSFORM" type="float4x4"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Spot_SpotAction_transform-interpolation">
+          <Name_array id="Spot_SpotAction_transform-interpolation-array" count="250">LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR LINEAR</Name_array>
+          <technique_common>
+            <accessor source="#Spot_SpotAction_transform-interpolation-array" count="250" stride="1">
+              <param name="INTERPOLATION" type="name"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <sampler id="Spot_SpotAction_transform-sampler">
+          <input semantic="INPUT" source="#Spot_SpotAction_transform-input"/>
+          <input semantic="OUTPUT" source="#Spot_SpotAction_transform-output"/>
+          <input semantic="INTERPOLATION" source="#Spot_SpotAction_transform-interpolation"/>
+        </sampler>
+        <channel source="#Spot_SpotAction_transform-sampler" target="Spot/transform"/>
+      </animation>
+    </animation>
+  </library_animations>
+  <library_visual_scenes>
+    <visual_scene id="Scene" name="Scene">
+      <node id="Sun" name="Sun" type="NODE">
+        <matrix sid="transform">0.7071068 0 0.7071068 20 0 1 0 0 -0.7071068 0 0.7071068 20 0 0 0 1</matrix>
+        <instance_light url="#Sun-light"/>
+      </node>
+      <node id="Point" name="Point" type="NODE">
+        <matrix sid="transform">1 0 0 10 0 1 0 -5 0 0 1 10 0 0 0 1</matrix>
+        <instance_light url="#Point-light"/>
+      </node>
+      <node id="Spot" name="Spot" type="NODE">
+        <matrix sid="transform">1 0 0 0 0 -4.37114e-8 -1 -5 0 1 -4.37114e-8 0 0 0 0 1</matrix>
+        <instance_light url="#Spot-light"/>
+      </node>
+      <node id="Cube_003" name="Cube.003" type="NODE">
+        <matrix sid="transform">1 0 0 10 0 1 0 0 0 0 1 10 0 0 0 1</matrix>
+        <instance_geometry url="#Cube_003-mesh" name="Cube.003"/>
+      </node>
+      <node id="Cube_002" name="Cube.002" type="NODE">
+        <matrix sid="transform">1 0 0 10 0 1 0 0 0 0 1 0 0 0 0 1</matrix>
+        <instance_geometry url="#Cube_002-mesh" name="Cube.002"/>
+      </node>
+      <node id="Cube_001" name="Cube.001" type="NODE">
+        <matrix sid="transform">1 0 0 0 0 1 0 0 0 0 1 10 0 0 0 1</matrix>
+        <instance_geometry url="#Cube_001-mesh" name="Cube.001"/>
+      </node>
+      <node id="Cube" name="Cube" type="NODE">
+        <matrix sid="transform">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</matrix>
+        <instance_geometry url="#Cube-mesh" name="Cube">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="Material-material" target="#Material-material">
+                <bind_vertex_input semantic="UVMap" input_semantic="TEXCOORD" input_set="0"/>
+              </instance_material>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+      </node>
+    </visual_scene>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene url="#Scene"/>
+  </scene>
+</COLLADA>

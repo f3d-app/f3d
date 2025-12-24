@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop">
+    <id>app.f3d.F3D</id>
+    <launchable type="desktop-id">f3d.desktop</launchable>
+    <name>F3D</name>
+    <summary>A fast and minimalist 3D viewer</summary>
+    <metadata_license>CC0-1.0</metadata_license>
+    <project_license>BSD-3-Clause</project_license>
+    <description>
+        <p>
+            A VTK-based 3D viewer following the KISS principle, so it is minimalist,
+            efficient, has no GUI, has simple interaction mechanisms and is fully
+            controllable using arguments on the command line.
+        </p> 
+    </description>
+    <url type="homepage">https://f3d.app/</url>
+    <url type="help">https://f3d.app/docs/next/user/QUICKSTART</url>
+    <url type="bugtracker">https://github.com/f3d-app/f3d/issues</url>
+    <developer_name>F3D-APP Foundation</developer_name>
+    <screenshots>
+        <screenshot type="default">
+            <image>https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/static/images/typical.png</image>
+        </screenshot>
+        <screenshot>
+            <image>https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/static/images/realisticMask.png</image>
+        </screenshot>
+        <screenshot>
+            <image>https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/static/images/step.png</image>
+        </screenshot>
+        <screenshot>
+            <image>https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/static/images/realisticHelmet.png</image>
+        </screenshot>
+        <screenshot>
+            <image>https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/static/images/directScalars.png</image>
+        </screenshot>
+        <screenshot>
+            <image>https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/static/images/cad.png</image>
+        </screenshot>
+        <screenshot>
+            <image>https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/static/images/volume.png</image>
+        </screenshot>
+        <screenshot>
+            <image>https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/static/images/volumeMedical.png</image>
+        </screenshot>
+    </screenshots>
+    <content_rating type="oars-1.1"/>
+</component>
