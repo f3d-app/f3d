@@ -206,9 +206,9 @@ void window_impl::Initialize()
 }
 
 //----------------------------------------------------------------------------
-void window_impl::InitializeUpVector()
+void window_impl::InitializeCamera()
 {
-  this->Internals->Renderer->InitializeUpVector(this->Internals->Options.scene.up_direction);
+  this->Internals->Renderer->InitializeCamera();
 }
 
 //----------------------------------------------------------------------------

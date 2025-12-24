@@ -204,10 +204,9 @@ public:
   void Initialize();
 
   /**
-   * Initialize actors properties related to the up vector using the provided upString, including
-   * the camera
+   * Initialize the camera to a default position.
    */
-  void InitializeUpVector(const std::vector<double>& upVec);
+  void InitializeCamera();
 
   /**
    * Set the up direction dynamically. Stores the pending

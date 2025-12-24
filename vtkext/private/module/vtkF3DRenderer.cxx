@@ -371,36 +371,12 @@ void vtkF3DRenderer::ApplyUpVector(const std::array<double, 3>& up)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::InitializeUpVector(const std::vector<double>& upVec)
+void vtkF3DRenderer::InitializeCamera()
 {
-  assert(upVec.size() == 3);
-
-  const auto isNullVector = [](const std::array<double, 3>& v)
-  {
-    constexpr double e = 1e-8;
-    return ::abs(v[0]) < e && ::abs(v[1]) < e && ::abs(v[2]) < e;
-  };
-
-  std::array<double, 3> up = { upVec[0], upVec[1], upVec[2] };
-
-  /* if `up` is `(0,0,0)` make it `(0,1,0)` */
-  if (isNullVector(up))
-  {
-    up[1] = 1.0;
-    F3DLog::Print(F3DLog::Severity::Warning, "null up vector, using (0,1,0) instead");
-  }
-  vtkMath::Normalize(up.data());
-
-  this->ApplyUpVector(up);
-
-  std::array<double, 3> pos;
-  vtkMath::Cross(this->UpVector, this->RightVector, pos.data());
-  vtkMath::MultiplyScalar(pos.data(), -1.0);
-
   vtkCamera* cam = this->GetActiveCamera();
   cam->SetFocalPoint(0.0, 0.0, 0.0);
-  cam->SetPosition(pos.data());
-  cam->SetViewUp(this->UpVector);
+  cam->SetPosition(0.0, 0.0, 1.0);
+  cam->SetViewUp(0.0, 1.0, 0.0);
 }
 
 //----------------------------------------------------------------------------

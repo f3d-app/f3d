@@ -69,9 +69,9 @@ public:
 
   /**
    * Implementation only API.
-   * Initialize the up vector on the renderer using the Up string option
+   * Initialize the camera to a default position and set the up direction.
    */
-  void InitializeUpVector();
+  void InitializeCamera();
 
   /**
    * Implementation only API.

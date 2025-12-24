@@ -96,8 +96,8 @@ public:
       this->MetaImporter->AddImporter(importer);
     }
 
-    // Initialize the UpVector on load
-    this->Window.InitializeUpVector();
+    // Initialize the camera on load
+    this->Window.InitializeCamera();
 
     // Reset temporary up to apply any config values
     if (this->Interactor)
