@@ -141,7 +141,7 @@ bool vtkF3DGenericImporter::GetTemporalInformation([[maybe_unused]] vtkIdType an
   double timeRange[2], int& nbTimeSteps, vtkDoubleArray* timeSteps)
 {
   assert(animationIndex == 0);
-  // F3D now cares about timesteps
+
   if (this->Pimpl->HasAnimation)
   {
     timeRange[0] = this->Pimpl->TimeRange[0];
@@ -150,7 +150,7 @@ bool vtkF3DGenericImporter::GetTemporalInformation([[maybe_unused]] vtkIdType an
     if (timeSteps != nullptr)
     {
       nbTimeSteps = this->Pimpl->TimeSteps->GetNumberOfTuples();
-      timeSteps->DeepCopy(this->Pimpl->TimeSteps);
+      timeSteps->ShallowCopy(this->Pimpl->TimeSteps);
     }
     return true;
   }
