@@ -8,17 +8,11 @@ if(APPLE)
   list(APPEND java_test_args "-XstartOnFirstThread")
 endif()
 
-if(WIN32)
-  set(CP_SEP "$<SEMICOLON>")
-else()
-  set(CP_SEP ":")
-endif()
-
 # interactive-app
 add_test(NAME test_interactive-app-java COMMAND ${Java_JAVA_EXECUTABLE}
   ${java_test_args}
   -Djava.library.path=${F3D_JAVA_LIBRARY_DIR}
-  -cp "$<TARGET_PROPERTY:interactive-app-java,JAR_FILE>${CP_SEP}${F3D_JAR}"
+  -cp "$<TARGET_PROPERTY:interactive-app-java,JAR_FILE>:${F3D_JAR}"
   InteractiveApp
   "${CMAKE_CURRENT_SOURCE_DIR}/data/cow.vtp" 1)
 if(WIN32)
