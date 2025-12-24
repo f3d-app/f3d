@@ -210,8 +210,9 @@ public:
   void InitializeUpVector(const std::vector<double>& upVec);
 
   /**
-   * Set the up direction dynamically. Updates skybox and environment orientation.
-   * Does NOT reset camera. Can be called at any time to change the scene orientation.
+   * Set the up direction dynamically. Stores the pending
+   * direction and marks the up vector as needing configuration.
+   * Actual configuration (camera rotation, skybox, environment) happens in UpdateActors.
    */
   void SetUpDirection(const std::vector<double>& upVec);
 
@@ -517,6 +518,12 @@ private:
   void ApplyUpVector(const std::array<double, 3>& up);
 
   /**
+   * Configure up vector: rotate camera and apply up vector to scene.
+   * Called from UpdateActors when UpVectorConfigured is false.
+   */
+  void ConfigureUpVector();
+
+  /**
    * Configure all actors properties
    */
   void ConfigureActorsProperties();
@@ -618,6 +625,7 @@ private:
 
   bool CheatSheetConfigured = false;
   bool ActorsPropertiesConfigured = false;
+  bool UpVectorConfigured = true;
   bool GridConfigured = false;
   bool GridAxesConfigured = false;
   bool RenderPassesConfigured = false;
@@ -665,6 +673,7 @@ private:
   int RaytracingSamples = 0;
   double UpVector[3] = { 0.0, 1.0, 0.0 };
   double RightVector[3] = { 1.0, 0.0, 0.0 };
+  double PendingUpDirection[3] = { 0.0, 1.0, 0.0 };
   double CircleOfConfusionRadius = 20.0;
   std::optional<double> PointSize;
   std::optional<double> LineWidth;

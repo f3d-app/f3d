@@ -409,19 +409,56 @@ void vtkF3DRenderer::SetUpDirection(const std::vector<double>& upVec)
   assert(upVec.size() == 3);
 
   std::array<double, 3> up = { upVec[0], upVec[1], upVec[2] };
+  vtkMath::Normalize(up.data());
 
   constexpr double epsilon = 1e-6;
-  if (std::abs(up[0] - this->UpVector[0]) < epsilon &&
-      std::abs(up[1] - this->UpVector[1]) < epsilon &&
-      std::abs(up[2] - this->UpVector[2]) < epsilon)
+  if (std::abs(up[0] - this->PendingUpDirection[0]) < epsilon &&
+      std::abs(up[1] - this->PendingUpDirection[1]) < epsilon &&
+      std::abs(up[2] - this->PendingUpDirection[2]) < epsilon)
   {
     return;
   }
 
-  vtkMath::Normalize(up.data());
+  std::copy(up.begin(), up.end(), this->PendingUpDirection);
+  this->UpVectorConfigured = false;
+}
 
-  this->ApplyUpVector(up);
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ConfigureUpVector()
+{
+  std::array<double, 3> newUp = { this->PendingUpDirection[0], this->PendingUpDirection[1],
+    this->PendingUpDirection[2] };
+  std::array<double, 3> oldUp = { this->UpVector[0], this->UpVector[1], this->UpVector[2] };
+
+  std::array<double, 3> axis;
+  vtkMath::Cross(oldUp.data(), newUp.data(), axis.data());
+  double sinAngle = vtkMath::Normalize(axis.data());
+  double cosAngle = vtkMath::Dot(oldUp.data(), newUp.data());
+  double angle = std::atan2(sinAngle, cosAngle) * 180.0 / vtkMath::Pi();
+
+  vtkCamera* cam = this->GetActiveCamera();
+  double foc[3];
+  cam->GetFocalPoint(foc);
+
+  vtkNew<vtkTransform> camTransform;
+  camTransform->Translate(foc[0], foc[1], foc[2]);
+  camTransform->RotateWXYZ(angle, axis.data());
+  camTransform->Translate(-foc[0], -foc[1], -foc[2]);
+
+  double pos[3];
+  cam->GetPosition(pos);
+  camTransform->TransformPoint(pos, pos);
+  cam->SetPosition(pos);
+
+  double viewUp[3];
+  cam->GetViewUp(viewUp);
+  camTransform->TransformVector(viewUp, viewUp);
+  cam->SetViewUp(viewUp);
+
+  this->ApplyUpVector(newUp);
+
   this->GridConfigured = false;
+  this->UpVectorConfigured = true;
 }
 
 //----------------------------------------------------------------------------
@@ -1936,6 +1973,11 @@ void vtkF3DRenderer::UpdateActors()
   if (!this->ActorsPropertiesConfigured)
   {
     this->ConfigureActorsProperties();
+  }
+
+  if (!this->UpVectorConfigured)
+  {
+    this->ConfigureUpVector();
   }
 
   if (!this->PointSpritesConfigured)
