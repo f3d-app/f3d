@@ -51,7 +51,6 @@ struct IntermediateGeometry
 struct CachedMesh
 {
   vtkSmartPointer<vtkCellArray> Cells;
-  // Maps the original Alembic Point Index to a list of VTK Point IDs.
   std::vector<std::vector<vtkIdType>> RawPointToVTKPointsMap;
   vtkIdType NumVTKPoints;
 };
@@ -261,96 +260,121 @@ public:
 
     Alembic::AbcGeom::IPolyMeshSchema::Sample samp;
     const Alembic::AbcGeom::IPolyMeshSchema& schema = pmesh.getSchema();
-    if (schema.getNumSamples() > 0)
+
+    if (schema.getNumSamples() == 0)
     {
-      Alembic::AbcGeom::ISampleSelector selector(time);
-      schema.get(samp, selector);
+      return polydata;
+    }
 
-      Alembic::AbcGeom::P3fArraySamplePtr positions = samp.getPositions();
-      Alembic::AbcGeom::Int32ArraySamplePtr facePositionIndices = samp.getFaceIndices();
-      Alembic::AbcGeom::Int32ArraySamplePtr faceVertexCounts = samp.getFaceCounts();
-
-      this->SetupIndicesStorage(faceVertexCounts, originalData.Indices);
-
-      // By default, Alembic is CW while VTK is CCW
-      // So we need to reverse the order of indices only if the mesh is not mirrored
-      const bool doReverseRotate = matrix.determinant() > 0;
-
-      // Positions
-      {
-        V3fContainer pV3F;
-        for (size_t pIndex = 0; pIndex < positions->size(); pIndex++)
+    Alembic::AbcGeom::ISampleSelector selector(time);
+    schema.get(samp, selector);
+    
+    auto topologyVariance = schema.getTopologyVariance();
+    bool isTopologyConstant = (topologyVariance == Alembic::AbcGeom::kConstantTopology) ||
+                          (topologyVariance == Alembic::AbcGeom::kHomogenousTopology);
+    std::string meshName = pmesh.getName();
+    Alembic::AbcGeom::P3fArraySamplePtr positions = samp.getPositions();
+    if (isTopologyConstant)
+    {
+      auto cacheIterator = this->MeshCache.find(meshName);
+      if (cacheIterator != this->MeshCache.end()){
+        const auto& cachedMesh = cacheIterator->second;
+        polydata->SetPolys(cachedMesh.Cells);
+        vtkNew<vtkPoints> points;
+        points->SetNumberOfPoints(cachedMesh.NumVTKPoints);
+        size_t numRawPoints = positions->size();
+        for (size_t i = 0; i < numRawPoints; i++)
         {
-          Alembic::Abc::V3f tp;
-          matrix.multVecMatrix(positions->get()[pIndex], tp);
-          pV3F.emplace_back(tp.x, tp.y, tp.z);
-        }
-        originalData.Attributes.insert(AttributesContainer::value_type("P", pV3F));
-
-        this->UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
-          facePositionIndices, pIndicesOffset, originalData.Indices, doReverseRotate);
+          if (i >= cachedMesh.RawPointToVTKPointsMap.size())
+            {
+              break;
+            }
+          const Alembic::Abc::V3f tp = positions->get()[i] * matrix;
+          for (vtkIdType vtkIdx : cachedMesh.RawPointToVTKPointsMap[i])
+            {
+              points->SetPoint(vtkIdx, tp.x, tp.y, tp.z);
+            }
+          }
+        polydata->SetPoints(points);
+        return polydata;
       }
+    }
+    Alembic::AbcGeom::Int32ArraySamplePtr facePositionIndices = samp.getFaceIndices();
+    Alembic::AbcGeom::Int32ArraySamplePtr faceVertexCounts = samp.getFaceCounts();
+    this->SetupIndicesStorage(faceVertexCounts, originalData.Indices);
 
-      // Texture coordinate
-      Alembic::AbcGeom::IV2fGeomParam uvsParam = schema.getUVsParam();
-      if (uvsParam.valid())
+    // By default, Alembic is CW while VTK is CCW
+    // So we need to reverse the order of indices only if the mesh is not mirrored
+    const bool doReverseRotate = matrix.determinant() > 0;
+
+    // Positions
+    {
+      V3fContainer pV3F;
+      for (size_t pIndex = 0; pIndex < positions->size(); pIndex++)
       {
-        Alembic::AbcGeom::IV2fGeomParam::Sample uvValue = uvsParam.getIndexedValue(selector);
-        if (uvValue.valid())
+        Alembic::Abc::V3f tp;
+        matrix.multVecMatrix(positions->get()[pIndex], tp);
+        pV3F.emplace_back(tp.x, tp.y, tp.z);
+      }
+      originalData.Attributes.insert(AttributesContainer::value_type("P", pV3F));
+      this->UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
+        facePositionIndices, pIndicesOffset, originalData.Indices, doReverseRotate);
+    }
+    // Texture coordinate
+    Alembic::AbcGeom::IV2fGeomParam uvsParam = schema.getUVsParam();
+    if (uvsParam.valid())
+    {
+      Alembic::AbcGeom::IV2fGeomParam::Sample uvValue = uvsParam.getIndexedValue(selector);
+      if (uvValue.valid())
+      {
+        V3fContainer uvV3F;
+        Alembic::AbcGeom::UInt32ArraySamplePtr uvIndices = uvValue.getIndices();
+        for (size_t index = 0; index < uvValue.getVals()->size(); ++index)
         {
-          V3fContainer uvV3F;
-          Alembic::AbcGeom::UInt32ArraySamplePtr uvIndices = uvValue.getIndices();
-          for (size_t index = 0; index < uvValue.getVals()->size(); ++index)
-          {
-            Alembic::AbcGeom::V2f uv = (*(uvValue.getVals()))[index];
-            uvV3F.emplace_back(uv[0], uv[1], 0);
-          }
-          originalData.Attributes.insert(AttributesContainer::value_type("uv", uvV3F));
-
-          if (uvsParam.getScope() == Alembic::AbcGeom::kFacevaryingScope)
-          {
-            originalData.uvFaceVarying = true;
-            this->UpdateIndices<Alembic::AbcGeom::UInt32ArraySamplePtr>(
-              uvIndices, uvIndicesOffset, originalData.Indices, doReverseRotate);
-          }
-          else
-          {
-            this->UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
-              facePositionIndices, uvIndicesOffset, originalData.Indices, doReverseRotate);
-          }
+          Alembic::AbcGeom::V2f uv = (*(uvValue.getVals()))[index];
+          uvV3F.emplace_back(uv[0], uv[1], 0);
+        }
+        originalData.Attributes.insert(AttributesContainer::value_type("uv", uvV3F));
+        if (uvsParam.getScope() == Alembic::AbcGeom::kFacevaryingScope)
+        {
+          originalData.uvFaceVarying = true;
+          this->UpdateIndices<Alembic::AbcGeom::UInt32ArraySamplePtr>(
+            uvIndices, uvIndicesOffset, originalData.Indices, doReverseRotate);
+        }
+        else
+        {
+          this->UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
+            facePositionIndices, uvIndicesOffset, originalData.Indices, doReverseRotate);
         }
       }
-
-      // Normals
-      Alembic::AbcGeom::IN3fGeomParam normalsParam = schema.getNormalsParam();
-      if (normalsParam.valid())
+    }
+    // Normals
+    Alembic::AbcGeom::IN3fGeomParam normalsParam = schema.getNormalsParam();
+    if (normalsParam.valid())
+    {
+      Alembic::AbcGeom::IN3fGeomParam::Sample normalValue =
+        normalsParam.getIndexedValue(selector);
+      if (normalValue.valid())
       {
-        Alembic::AbcGeom::IN3fGeomParam::Sample normalValue =
-          normalsParam.getIndexedValue(selector);
-        if (normalValue.valid())
+        V3fContainer normal_v3f;
+        Alembic::AbcGeom::UInt32ArraySamplePtr normalIndices = normalValue.getIndices();
+        for (size_t index = 0; index < normalValue.getVals()->size(); ++index)
         {
-          V3fContainer normal_v3f;
-          Alembic::AbcGeom::UInt32ArraySamplePtr normalIndices = normalValue.getIndices();
-          for (size_t index = 0; index < normalValue.getVals()->size(); ++index)
-          {
-            Alembic::AbcGeom::V3f normal;
-            matrix.multDirMatrix((*(normalValue.getVals()))[index], normal);
-            normal_v3f.emplace_back(normal);
-          }
-          originalData.Attributes.insert(AttributesContainer::value_type("N", normal_v3f));
-
-          if (normalsParam.getScope() == Alembic::AbcGeom::kFacevaryingScope)
-          {
-            originalData.nFaceVarying = true;
-
-            this->UpdateIndices<Alembic::AbcGeom::UInt32ArraySamplePtr>(
-              normalIndices, nIndicesOffset, originalData.Indices, doReverseRotate);
-          }
-          else
-          {
-            this->UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
-              facePositionIndices, nIndicesOffset, originalData.Indices, doReverseRotate);
-          }
+          Alembic::AbcGeom::V3f normal;
+          matrix.multDirMatrix((*(normalValue.getVals()))[index], normal);
+          normal_v3f.emplace_back(normal);
+        }
+        originalData.Attributes.insert(AttributesContainer::value_type("N", normal_v3f));
+        if (normalsParam.getScope() == Alembic::AbcGeom::kFacevaryingScope)
+        {
+          originalData.nFaceVarying = true;
+          this->UpdateIndices<Alembic::AbcGeom::UInt32ArraySamplePtr>(
+            normalIndices, nIndicesOffset, originalData.Indices, doReverseRotate);
+        }
+        else
+        {
+          this->UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
+            facePositionIndices, nIndicesOffset, originalData.Indices, doReverseRotate);
         }
       }
     }
@@ -360,7 +384,41 @@ public:
     this->PointDuplicateAccumulator(originalData, duplicatedData);
 
     this->FillPolyData(duplicatedData, polydata);
+    
+    //Store data for the next frame
+    if (isTopologyConstant)
+    {
+      CachedMesh cache;
+      cache.Cells = polydata->GetPolys();
+      cache.NumVTKPoints = polydata -> GetNumberOfPoints();
 
+      size_t numRawPoints = positions->size();
+      cache.RawPointToVTKPointsMap.resize(numRawPoints);
+      bool unwelded = (originalData.uvFaceVarying || originalData.nFaceVarying);
+      if (unwelded)
+      {
+        vtkIdType currentVTKId = 0;
+        for (const auto& faceIndices : originalData.Indices)
+        {
+          for (const auto& triplet: faceIndices){
+            int rawIndex = triplet.x;
+            if (rawIndex >= 0 && static_cast<size_t>(rawIndex) < numRawPoints)
+            {
+              cache.RawPointToVTKPointsMap[rawIndex].push_back(currentVTKId);
+            }
+            currentVTKId++;
+          }
+        }
+      }
+      else
+      {
+        for(size_t i = 0; i < numRawPoints; i++)
+        {
+          cache.RawPointToVTKPointsMap[i].push_back(static_cast<vtkIdType>(i));
+        }
+        this->MeshCache[meshName] = cache;
+      }
+    }
     return polydata;
   }
 
