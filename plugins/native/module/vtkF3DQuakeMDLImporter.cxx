@@ -403,7 +403,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
           framePtr[i].time = vtkInternals::PeekFromVector<float>(buffer, offsetAlias);
           // Points to the first frame, 4 * nbFrames for the float array
           // note : see above
-          framePtr[i].frames = PeekFromVectorSimpleframe(
+          framePtr[i].frames = vtkInternals::PeekFromVectorSimpleframe(
             buffer, offsetAlias + (*framePtr[i].nb) * sizeof(float), header->numVertices);
 
           offsetAlias += (*framePtr[i].nb) * sizeof(float);
