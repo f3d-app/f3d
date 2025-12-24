@@ -10,8 +10,8 @@
 #include <vtkTestUtilities.h>
 
 #include <climits>
-#include <regex>
 #include <iostream>
+#include <regex>
 
 // Header definition : cloned from plugins/native/module/vtkF3DQuakeMDLImporter.cxx
 struct mdl_header_t
