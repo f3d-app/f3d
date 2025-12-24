@@ -615,17 +615,16 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       return false;
     }
 
-    // check magic number for "IPDO" or "IDST"
+    // Check magic number for "IPDO" or "IDST"
     if (!(header->IDPO == 1330660425 || header->IDPO == 1414743113))
     {
       vtkErrorWithObjectMacro(this->Parent, "Header Magic number incorrect, aborting.");
       return false;
     }
 
-    // check version number for numbers under 10
-    if (header->version > 10)
+    // Check version for v6 exactly
+    if (header->version != 6)
     {
-      // TODO : Should probably check for exact version numbers. This info isn't easy to come by.
       vtkErrorWithObjectMacro(this->Parent, "Unsupported MDL version");
       return false;
     }
