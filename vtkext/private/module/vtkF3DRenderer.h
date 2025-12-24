@@ -209,13 +209,6 @@ public:
   void InitializeCamera();
 
   /**
-   * Set the up direction dynamically. Stores the pending
-   * direction and marks the up vector as needing configuration.
-   * Actual configuration (camera rotation, skybox, environment) happens in UpdateActors.
-   */
-  void SetUpDirection(const std::vector<double>& upVec);
-
-  /**
    * Compute bounds of visible props as transformed by given matrix.
    */
   vtkBoundingBox ComputeVisiblePropOrientedBounds(const vtkMatrix4x4*);
@@ -412,6 +405,13 @@ public:
   ///@}
 
   /**
+   * Set the up direction dynamically. Stores the pending
+   * direction and marks the up vector as needing configuration.
+   * Actual configuration (camera rotation, skybox, environment) happens in UpdateActors.
+   */
+  void SetUpDirection(const std::vector<double>& upVec);
+
+  /**
    * Get information about the current coloring
    * Returns a single line string containing the coloring description
    */
@@ -517,12 +517,6 @@ private:
   void ApplyUpVector(const std::array<double, 3>& up);
 
   /**
-   * Configure up vector: rotate camera and apply up vector to scene.
-   * Called from UpdateActors when UpVectorConfigured is false.
-   */
-  void ConfigureUpVector();
-
-  /**
    * Configure all actors properties
    */
   void ConfigureActorsProperties();
@@ -541,6 +535,12 @@ private:
    * Configure the different render passes
    */
   void ConfigureRenderPasses();
+
+  /**
+   * Rotate camera and apply up vector to scene.
+   * Called from UpdateActors when UpVectorConfigured is false.
+   */
+  void ConfigureUpVector();
 
   /**
    * Create a cache directory if a HDRIHash is set
