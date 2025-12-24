@@ -1,5 +1,6 @@
 list(APPEND VTKExtensionsPluginUSD_list
      TestF3DUSDImporter.cxx
+     TestF3DUSDImporterStream.cxx
     )
 
 vtk_add_test_cxx(VTKExtensionsPluginUSD tests
