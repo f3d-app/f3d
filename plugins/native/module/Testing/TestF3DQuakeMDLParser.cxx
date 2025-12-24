@@ -1,5 +1,5 @@
-#include <climits>
-#include <regex> // slow, but that's ok for a test
+#include "vtkF3DQuakeMDLImporter.h"
+
 #include <vtkCallbackCommand.h>
 #include <vtkCommand.h>
 #include <vtkDataSet.h>
@@ -9,8 +9,8 @@
 #include <vtkRenderer.h>
 #include <vtkTestUtilities.h>
 
-#include "vtkF3DQuakeMDLImporter.h"
-
+#include <climits>
+#include <regex>
 #include <iostream>
 
 // Header definition : cloned from plugins/native/module/vtkF3DQuakeMDLImporter.cxx
@@ -80,7 +80,6 @@ void ErrorCallbackFunc(
   vtkObject* caller, long unsigned int vtkNotUsed(eventId), void* clientData, void* callData)
 {
   auto errors = static_cast<std::vector<Error>*>(clientData);
-
   errors->push_back(ErrorCodeParser(static_cast<char*>(callData)));
 }
 

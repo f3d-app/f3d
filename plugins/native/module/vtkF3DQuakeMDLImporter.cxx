@@ -231,7 +231,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       {
         for (int y = 0; y < skinWidth; ++y)
         {
-          auto index = *PeekFromVector<uint8_t>(buffer, offset + x * skinWidth + y);
+          auto index = *vtkInternals::PeekFromVector<uint8_t>(buffer, offset + x * skinWidth + y);
           unsigned char* ptr = static_cast<unsigned char*>(skin->GetScalarPointer(y, x, 0));
           std::copy(F3DMDLDefaultColorMap[index], F3DMDLDefaultColorMap[index] + 3, ptr);
         }
@@ -255,7 +255,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       int groupSkinCount = 0;
       for (unsigned int i = 0; i < nbSkins; i++)
       {
-        int skinGroup = *ReadFromVector<int>(buffer, offset);
+        int skinGroup = *vtkInternals::ReadFromVector<int>(buffer, offset);
         if (skinGroup == 0)
         {
           // Skip the skins that are not selected
@@ -271,7 +271,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         {
           std::string skinAnimationName = "skin_" + std::to_string(groupSkinCount);
           this->GroupSkinAnimationNames.emplace_back(skinAnimationName);
-          auto nb = *ReadFromVector<int>(buffer, offset);
+          auto nb = *vtkInternals::ReadFromVector<int>(buffer, offset);
           this->GroupSkins.emplace_back(nb);
           this->GroupSkinDurations.emplace_back(nb + 1, 0.0f);
           for (int j = 1; j <= nb; ++j)
@@ -397,7 +397,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         {
           // Alias offset
           auto offsetAlias = offset + sizeof(int32_t);
-          framePtr[i].nb = ReadFromVector<int>(buffer, offsetAlias);
+          framePtr[i].nb = vtkInternals::ReadFromVector<int>(buffer, offsetAlias);
           // Skips parameters min and max.
           offsetAlias += (2 * sizeof(mdl_vertex_t));
           framePtr[i].time = PeekFromVector<float>(buffer, offsetAlias);
@@ -546,7 +546,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
           {
 
             // Recover the frame using the offsets because the struct does not store this pointer
-            auto frame = PeekFromVectorSimpleframe(
+            auto frame = vtkInternals::PeekFromVectorSimpleframe(
               buffer, frameOffsets[frameNum][groupFrameNum], header->numVertices);
 
             // Assume all frames are named identicaly in the group
@@ -607,7 +607,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     const mdl_header_t* header;
     try
     {
-      header = ReadFromVector<mdl_header_t>(buffer, offset);
+      header = vtkInternals::ReadFromVector<mdl_header_t>(buffer, offset);
     }
     catch (const F3DRangeError& e)
     {
