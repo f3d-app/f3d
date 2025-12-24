@@ -255,7 +255,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       int groupSkinCount = 0;
       for (unsigned int i = 0; i < nbSkins; i++)
       {
-        int skinGroup = *ReadFromVector<int>(buffer, offset);
+        int skinGroup = *vtkInternals::ReadFromVector<int>(buffer, offset);
         if (skinGroup == 0)
         {
           // Skip the skins that are not selected
