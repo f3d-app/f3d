@@ -409,6 +409,13 @@ void vtkF3DRenderer::SetUpDirection(const std::vector<double>& upVec)
   assert(upVec.size() == 3);
 
   std::array<double, 3> up = { upVec[0], upVec[1], upVec[2] };
+
+  constexpr double e = 1e-8;
+  if (std::abs(up[0]) < e && std::abs(up[1]) < e && std::abs(up[2]) < e)
+  {
+    return;
+  }
+
   vtkMath::Normalize(up.data());
 
   constexpr double epsilon = 1e-6;
