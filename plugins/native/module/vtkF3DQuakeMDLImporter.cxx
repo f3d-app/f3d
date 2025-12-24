@@ -271,7 +271,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         {
           std::string skinAnimationName = "skin_" + std::to_string(groupSkinCount);
           this->GroupSkinAnimationNames.emplace_back(skinAnimationName);
-          auto nb = *ReadFromVector<int>(buffer, offset);
+          auto nb = *vtkInternals::ReadFromVector<int>(buffer, offset);
           this->GroupSkins.emplace_back(nb);
           this->GroupSkinDurations.emplace_back(nb + 1, 0.0f);
           for (int j = 1; j <= nb; ++j)
