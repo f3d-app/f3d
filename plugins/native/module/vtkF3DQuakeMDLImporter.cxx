@@ -231,7 +231,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       {
         for (int y = 0; y < skinWidth; ++y)
         {
-          auto index = *PeekFromVector<uint8_t>(buffer, offset + x * skinWidth + y);
+          auto index = *vtkInternals::PeekFromVector<uint8_t>(buffer, offset + x * skinWidth + y);
           unsigned char* ptr = static_cast<unsigned char*>(skin->GetScalarPointer(y, x, 0));
           std::copy(F3DMDLDefaultColorMap[index], F3DMDLDefaultColorMap[index] + 3, ptr);
         }
