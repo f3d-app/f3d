@@ -437,13 +437,10 @@ void window_impl::UpdateDynamicOptions()
   renderer->ShowDropZoneLogo(opt.ui.drop_zone.show_logo);
   renderer->SetBackdropOpacity(opt.ui.backdrop.opacity);
 
-  auto tupleToColor = [](const std::tuple<float, float, float>& t) -> f3d::color_t 
+  auto tupleToColor = [](const std::tuple<float, float, float>& t) -> f3d::color_t
   {
-    return {
-      static_cast<double>(std::get<0>(t)),
-      static_cast<double>(std::get<1>(t)),
-      static_cast<double>(std::get<2>(t))
-    };
+    return {static_cast<double>(std::get<0>(t)), static_cast<double>(std::get<1>(t)),
+      static_cast<double>(std::get<2>(t)) };
   };
 
   f3d::color_t xColor = opt.ui.x_color.value_or(tupleToColor(F3DStyle::GetF3DRed()));
