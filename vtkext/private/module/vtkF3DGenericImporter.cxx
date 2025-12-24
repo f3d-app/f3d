@@ -45,8 +45,6 @@ struct vtkF3DGenericImporter::Internals
   bool HasAnimation = false;
   bool AnimationEnabled = false;
   std::array<double, 2> TimeRange;
-
-  int NumberOfTimeSteps = 0;
   vtkNew<vtkDoubleArray> TimeSteps;
 
   void UpdateBlock(BlockData& bd, vtkDataSet* dataset)
@@ -88,16 +86,14 @@ void vtkF3DGenericImporter::UpdateTemporalInformation()
     const int readerNumberOfTimeSteps =
       readerInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
 
-    // Update TimeSteps only if memory allocation call is success 
-    if (this->Pimpl->TimeSteps->SetNumberOfValues(readerNumberOfTimeSteps))
+    this->Pimpl->TimeSteps->SetNumberOfTuples(readerNumberOfTimeSteps);
+    
+    for (vtkIdType i = 0; i < readerNumberOfTimeSteps; i++)
     {
-      for (vtkIdType i = 0; i < readerNumberOfTimeSteps; i++)
-      {
-        this->Pimpl->TimeSteps->SetValue(i, readerTimeSteps[i]);
-      }
-      this->Pimpl->NumberOfTimeSteps = readerNumberOfTimeSteps;
+      this->Pimpl->TimeSteps->SetValue(i, readerTimeSteps[i]);
     }
   }
+
 }
 
 //----------------------------------------------------------------------------
@@ -153,7 +149,7 @@ bool vtkF3DGenericImporter::GetTemporalInformation([[maybe_unused]] vtkIdType an
 
     if (timeSteps != nullptr)
     {
-      nbTimeSteps = this->Pimpl->NumberOfTimeSteps;
+      nbTimeSteps = this->Pimpl->TimeSteps->GetNumberOfTuples();
       timeSteps->DeepCopy(this->Pimpl->TimeSteps);
     }
     return true;

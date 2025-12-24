@@ -82,8 +82,7 @@ public:
 
   /**
    * Get temporal information for the currently enabled animations.
-   * Framerate is ignored in this implementation.
-   * Only timerange and timestep is defined in this implementation.
+   * Recover timeRange, nbTimeSteps and timeSteps.
    */
   bool GetTemporalInformation(vtkIdType animationIndex, double timeRange[2], int& nbTimeSteps,
     vtkDoubleArray* timeSteps) override;
