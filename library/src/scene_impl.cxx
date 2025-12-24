@@ -307,6 +307,47 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
 }
 
 //----------------------------------------------------------------------------
+scene& scene_impl::add(void* buffer, std::size_t size)
+{
+  if (buffer == nullptr)
+  {
+    log::debug("No buffer to load a full scene provided\n");
+    return *this;
+  }
+
+  vtkSmartPointer<vtkImporter> importers;
+
+  std::optional<std::string> forceReader = this->Internals->Options.scene.force_reader;
+  // Recover the forced reader
+  const f3d::reader* reader = f3d::factory::instance()->getReader("", forceReader);
+  if (reader)
+  {
+    log::debug("Using forced reader ", (*forceReader), " for stream");
+  }
+  else
+  {
+    throw scene::load_failure_exception(*forceReader + " is not a valid force reader");
+  }
+
+  vtkSmartPointer<vtkImporter> importer = reader->createSceneReader(buffer, size);
+  if (!importer)
+  {
+    // XXX: F3D Plugin CMake logic ensure there is either a scene reader or a geometry reader
+    auto vtkReader = reader->createGeometryReader(buffer, size);
+    assert(vtkReader);
+    vtkSmartPointer<vtkF3DGenericImporter> genericImporter =
+      vtkSmartPointer<vtkF3DGenericImporter>::New();
+    genericImporter->SetInternalReader(vtkReader);
+    importer = genericImporter;
+  }
+
+  log::debug("\nLoading stream");
+  this->Internals->Load({importer});
+  return *this;
+}
+
+
+//----------------------------------------------------------------------------
 scene& scene_impl::add(const mesh_t& mesh)
 {
   // sanity checks

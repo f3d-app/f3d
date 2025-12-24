@@ -62,6 +62,11 @@ public:
    */
   virtual scene& add(const mesh_t& mesh) = 0;
 
+  /**
+   * Add and load provided buffer into the scene
+   */
+  virtual scene& add(void* buffer, std::size_t size) = 0;
+
   ///@{
   /**
    * Convenience initializer list signature for add method
