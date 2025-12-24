@@ -369,7 +369,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       // Read frames
       std::vector<plugin_frame_pointer> framePtr =
         std::vector<plugin_frame_pointer>(header->numFrames);
-      std::vector<std::vector<int>> frameOffsets = std::vector<std::vector<int>>();
+      std::vector<std::vector<size_t>> frameOffsets = std::vector<std::vector<size_t>>();
       for (int i = 0; i < header->numFrames; i++)
       {
         framePtr[i].type = PeekFromVector<int>(buffer, offset);
@@ -391,7 +391,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
           offset = offsetAlias;
 
           // Always emplace in case of mixed single frame and group frame
-          frameOffsets.emplace_back(std::vector<int>());
+          frameOffsets.emplace_back(std::vector<size_t>());
         }
         else
         {
@@ -410,7 +410,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
           // Apply alias
           offset = offsetAlias;
 
-          frameOffsets.emplace_back(std::vector<int>());
+          frameOffsets.emplace_back(std::vector<size_t>());
 
           // check that we won't run off the buffer during loop
           if (offset +
