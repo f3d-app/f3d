@@ -439,7 +439,7 @@ void window_impl::UpdateDynamicOptions()
 
   auto tupleToColor = [](const std::tuple<float, float, float>& t) -> f3d::color_t
   {
-    return {static_cast<double>(std::get<0>(t)), static_cast<double>(std::get<1>(t)),
+    return { static_cast<double>(std::get<0>(t)), static_cast<double>(std::get<1>(t)),
       static_cast<double>(std::get<2>(t)) };
   };
 
