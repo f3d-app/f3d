@@ -546,7 +546,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
           {
 
             // Recover the frame using the offsets because the struct does not store this pointer
-            auto frame = PeekFromVectorSimpleframe(
+            auto frame = vtkInternals::PeekFromVectorSimpleframe(
               buffer, frameOffsets[frameNum][groupFrameNum], header->numVertices);
 
             // Assume all frames are named identicaly in the group
