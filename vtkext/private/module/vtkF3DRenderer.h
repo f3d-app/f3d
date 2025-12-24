@@ -405,11 +405,11 @@ public:
   ///@}
 
   /**
-   * Set the up direction dynamically. Stores the pending
-   * direction and marks the up vector as needing configuration.
+   * Set the pending up direction. Stores the direction and marks
+   * the up vector as needing configuration.
    * Actual configuration (camera rotation, skybox, environment) happens in UpdateActors.
    */
-  void SetUpDirection(const std::vector<double>& upVec);
+  void SetPendingUpDirection(const std::vector<double>& upVec);
 
   /**
    * Get information about the current coloring
@@ -672,7 +672,7 @@ private:
   int RaytracingSamples = 0;
   double UpVector[3] = { 0.0, 1.0, 0.0 };
   double RightVector[3] = { 1.0, 0.0, 0.0 };
-  double UpDirection[3] = { 0.0, 1.0, 0.0 };
+  double PendingUpDirection[3] = { 0.0, 1.0, 0.0 };
   double CircleOfConfusionRadius = 20.0;
   std::optional<double> PointSize;
   std::optional<double> LineWidth;

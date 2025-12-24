@@ -396,8 +396,8 @@ void window_impl::UpdateDynamicOptions()
 
   const options& opt = this->Internals->Options;
 
-  // Update up direction if changed
-  renderer->SetUpDirection(opt.scene.up_direction);
+  // Update pending up direction if changed
+  renderer->SetPendingUpDirection(opt.scene.up_direction);
 
   // XXX: model.point_sprites.type only has an effect on geometry scene
   // but we set it here for practical reasons

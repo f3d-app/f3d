@@ -380,7 +380,7 @@ void vtkF3DRenderer::InitializeCamera()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetUpDirection(const std::vector<double>& upVec)
+void vtkF3DRenderer::SetPendingUpDirection(const std::vector<double>& upVec)
 {
   assert(upVec.size() == 3);
 
@@ -395,22 +395,22 @@ void vtkF3DRenderer::SetUpDirection(const std::vector<double>& upVec)
   vtkMath::Normalize(up.data());
 
   constexpr double epsilon = 1e-6;
-  if (std::abs(up[0] - this->UpDirection[0]) < epsilon &&
-    std::abs(up[1] - this->UpDirection[1]) < epsilon &&
-    std::abs(up[2] - this->UpDirection[2]) < epsilon)
+  if (std::abs(up[0] - this->PendingUpDirection[0]) < epsilon &&
+    std::abs(up[1] - this->PendingUpDirection[1]) < epsilon &&
+    std::abs(up[2] - this->PendingUpDirection[2]) < epsilon)
   {
     return;
   }
 
-  std::copy(up.begin(), up.end(), this->UpDirection);
+  std::copy(up.begin(), up.end(), this->PendingUpDirection);
   this->UpVectorConfigured = false;
 }
 
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureUpVector()
 {
-  std::array<double, 3> newUp = { this->UpDirection[0], this->UpDirection[1],
-    this->UpDirection[2] };
+  std::array<double, 3> newUp = { this->PendingUpDirection[0], this->PendingUpDirection[1],
+    this->PendingUpDirection[2] };
   std::array<double, 3> oldUp = { this->UpVector[0], this->UpVector[1], this->UpVector[2] };
 
   std::array<double, 3> axis;
