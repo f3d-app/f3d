@@ -3,8 +3,14 @@
 
 #include "log.h"
 
+#include <iostream>
+#include <istream>
+#include <unistd.h>
+
 int main(int argc, char** argv)
 {
+
+
   int res = EXIT_FAILURE;
 
   try

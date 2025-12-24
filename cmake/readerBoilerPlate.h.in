@@ -17,6 +17,7 @@
 #include <@F3D_READER_VTK_IMPORTER@.h>
 #endif
 
+#include <vtkMemoryResourceStream.h>
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
 
@@ -88,10 +89,28 @@ public:
     vtkNew<@F3D_READER_VTK_READER@> geomReader;
     geomReader->SetFileName(vtksys::SystemTools::CollapseFullPath(fileName).c_str());
 
-    this->applyCustomReader(geomReader, fileName);
+    this->applyCustomReader(geomReader, fileName, nullptr);
 
     return geomReader;
   }
+
+  /*
+   * Create the geometry reader (VTK reader) for the given filename
+   * The filename is collapsed as some VTK reader needs it to read reliably TODO add issue
+   */
+  vtkSmartPointer<vtkAlgorithm> createGeometryReader(void* buffer, std::size_t size) const override
+  {
+    vtkNew<vtkMemoryResourceStream> stream;
+    stream->SetBuffer(buffer, size);
+
+    vtkNew<@F3D_READER_VTK_READER@> geomReader;
+    geomReader->SetStream(stream);
+
+    this->applyCustomReader(geomReader, "", stream);
+
+    return geomReader;
+  }
+
 #endif
 
 #if @F3D_READER_HAS_SCENE_READER@
@@ -113,7 +132,24 @@ public:
     vtkNew<@F3D_READER_VTK_IMPORTER@> importer;
     importer->SetFileName(vtksys::SystemTools::CollapseFullPath(fileName).c_str());
 
-    this->applyCustomImporter(importer, fileName);
+    this->applyCustomImporter(importer, fileName, nullptr);
+
+    return importer;
+  }
+
+  /*
+   * Create the scene reader (VTK importer) for the given filename
+   * The filename is collapsed as some VTK reader needs it to read reliably TODO add issue
+   */
+  vtkSmartPointer<vtkImporter> createSceneReader(void* buffer, std::size_t size) const override
+  {
+    vtkNew<vtkMemoryResourceStream> stream;
+    stream->SetBuffer(buffer, size);
+
+    vtkNew<@F3D_READER_VTK_IMPORTER@> importer;
+    importer->SetStream(stream);
+
+    this->applyCustomImporter(importer, "", stream);
 
     return importer;
   }
