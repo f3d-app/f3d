@@ -607,7 +607,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     const mdl_header_t* header;
     try
     {
-      header = ReadFromVector<mdl_header_t>(buffer, offset);
+      header = vtkInternals::ReadFromVector<mdl_header_t>(buffer, offset);
     }
     catch (const F3DRangeError& e)
     {
