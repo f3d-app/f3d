@@ -413,8 +413,8 @@ void vtkF3DRenderer::SetUpDirection(const std::vector<double>& upVec)
 
   constexpr double epsilon = 1e-6;
   if (std::abs(up[0] - this->PendingUpDirection[0]) < epsilon &&
-      std::abs(up[1] - this->PendingUpDirection[1]) < epsilon &&
-      std::abs(up[2] - this->PendingUpDirection[2]) < epsilon)
+    std::abs(up[1] - this->PendingUpDirection[1]) < epsilon &&
+    std::abs(up[2] - this->PendingUpDirection[2]) < epsilon)
   {
     return;
   }
