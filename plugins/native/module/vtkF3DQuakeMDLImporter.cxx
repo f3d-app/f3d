@@ -397,7 +397,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         {
           // Alias offset
           auto offsetAlias = offset + sizeof(int32_t);
-          framePtr[i].nb = ReadFromVector<int>(buffer, offsetAlias);
+          framePtr[i].nb = vtkInternals::ReadFromVector<int>(buffer, offsetAlias);
           // Skips parameters min and max.
           offsetAlias += (2 * sizeof(mdl_vertex_t));
           framePtr[i].time = PeekFromVector<float>(buffer, offsetAlias);
