@@ -137,7 +137,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   }
 
   //----------------------------------------------------------------------------
-  // Safer buffer typecasting with auto offset interating
+  // Safer buffer typecasting with auto offset incrementing
   template<typename TYPE>
   static const TYPE* ReadFromVector(const std::vector<uint8_t>& buffer, size_t& offset)
   {
@@ -166,7 +166,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   }
 
   //----------------------------------------------------------------------------
-  // Safer buffer typecasting with auto offset interating with variable length data
+  // Safer buffer typecasting with auto offset incrementing with variable length data
   const mdl_simpleframe_t* ReadFromVectorSimpleframe(
     const std::vector<uint8_t>& buffer, size_t& offset, size_t num_verts = 0)
   {
