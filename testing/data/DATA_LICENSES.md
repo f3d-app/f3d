@@ -69,6 +69,7 @@
 - world\*: VTK Data: BSD-3-Clause
 - xform_anim.abc: Public Domain
 - zombie\*.mdl: LibreQuake Project: BSD-3-Clause
+- bunnyInt19.e57: libE57.org: [MIT](http://www.libe57.org/data.html)
 
 All other datasets are licensed under the BSD-3-Clause F3D license.
 

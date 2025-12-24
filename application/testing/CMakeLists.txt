@@ -1072,6 +1072,10 @@ if(F3D_PLUGIN_BUILD_VDB)
   endif()
 endif ()
 
+if(F3D_PLUGIN_BUILD_PDAL)
+  f3d_test(NAME TestE57 DATA bunnyInt19.e57 ENV "LD_LIBRARY_PATH=${F3D_SOURCE_DIR}/testing/data:/__w/f3d/f3d/dependencies/install/lib" ARGS --load-plugins=pdal)
+endif()
+
 if(F3D_PLUGIN_BUILD_ALEMBIC AND F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME TestMultiplePluginsLoad DATA cow.vtp ARGS --load-plugins=assimp,alembic NO_BASELINE REGEXP_FAIL "Plugin failed to load")
 endif()

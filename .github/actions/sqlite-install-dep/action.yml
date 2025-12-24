@@ -1,0 +1,68 @@
+name: "Install sqlite Dependency"
+description: "Install sqlite Dependency using cache when possible"
+inputs:
+  cpu:
+    description: "CPU architecture to build for"
+    required: false
+    default: "x86_64"
+  version:
+    description: "Version of sqlite to build"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+
+    - name: Cache sqlite
+      id: cache-sqlite
+      uses: actions/cache/restore@v4
+      with:
+        path: ${{github.workspace}}/dependencies/sqlite_install
+        key: sqlite-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-0
+
+    - name: Checkout sqlite
+      if: steps.cache-sqlite.outputs.cache-hit != 'true'
+      uses: actions/checkout@v4
+      with:
+        repository: sqlite/sqlite
+        path: "./dependencies/sqlite"
+        ref: ${{inputs.version}}
+
+    - name: Setup sqlite
+      if: steps.cache-sqlite.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir sqlite_install
+
+    - name: Configure sqlite
+      if: steps.cache-sqlite.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/sqlite
+      shell: bash
+      run: |
+        apt install -y tcl8.6
+        ./configure \
+        --prefix=$(pwd)/dependencies/sqlite_install \
+        --enable-all
+
+    - name: Build sqlite
+      if: steps.cache-sqlite.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/sqlite
+      shell: bash
+      run: make install
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/sqlite
+      shell: bash
+      run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-sqlite.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-sqlite.outputs.cache-primary-key }}
+        path: dependencies/sqlite_install

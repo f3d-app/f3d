@@ -1,0 +1,80 @@
+name: "Install libgeotiff Dependency"
+description: "Install libgeotiff Dependency using cache when possible"
+inputs:
+  cpu:
+    description: "CPU architecture to build for"
+    required: false
+    default: "x86_64"
+  version:
+    description: "Version of libgeotiff to build"
+    required: true
+  proj_version:
+    description: "Version of PROJ to build against"
+    required: true
+  libtiff_version:
+    description: "Version of libtiff to build against"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+        [[ "${{ inputs.proj_version }}" ]] || { echo "proj_version input is empty" ; exit 1; }
+        [[ "${{ inputs.libtiff_version }}" ]] || { echo "libtiff_version input is empty" ; exit 1; }
+
+    - name: Cache libgeotiff
+      id: cache-libgeotiff
+      uses: actions/cache/restore@v4
+      with:
+        path: ${{github.workspace}}/dependencies/libgeotiff_install
+        key: libgeotiff-${{inputs.version}}-${{inputs.prof_version}}-${{inputs.libtiff_version}}-${{runner.os}}-${{inputs.cpu}}-0
+
+    - name: Checkout libgeotiff
+      if: steps.cache-libgeotiff.outputs.cache-hit != 'true'
+      uses: actions/checkout@v4
+      with:
+        repository: OSGeo/libgeotiff
+        path: "./dependencies/libgeotiff"
+        ref: ${{inputs.version}}
+
+    - name: Setup libgeotiff
+      if: steps.cache-libgeotiff.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir libgeotiff_build
+        mkdir libgeotiff_install
+
+    - name: Configure libgeotiff
+      if: steps.cache-libgeotiff.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/libgeotiff_build
+      shell: bash
+      run: >
+        cmake ../libgeotiff/libgeotiff
+        -DBUILD_SHARED_LIBS=ON
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX=../libgeotiff_install
+        -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../install/
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+
+    - name: Build libgeotiff
+      if: steps.cache-libgeotiff.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/libgeotiff_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/libgeotiff_install
+      shell: bash
+      run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-libgeotiff.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-libgeotiff.outputs.cache-primary-key }}
+        path: dependencies/libgeotiff_install
