@@ -4,6 +4,8 @@
 #include "vtkF3DPostProcessFilter.h"
 
 #include <vtkActor.h>
+#include <vtkCompositeDataIterator.h>
+#include <vtkDataAssembly.h>
 #include <vtkEventForwarderCommand.h>
 #include <vtkImageData.h>
 #include <vtkInformation.h>
@@ -24,18 +26,33 @@
 
 struct vtkF3DGenericImporter::Internals
 {
-  vtkSmartPointer<vtkAlgorithm> Reader = nullptr;
-  vtkNew<vtkF3DPostProcessFilter> PostPro;
-  vtkNew<vtkActor> GeometryActor;
-  vtkNew<vtkPolyDataMapper> PolyDataMapper;
-  std::string OutputDescription;
+  // Data structure for each block in a composite dataset
+  struct BlockData
+  {
+    vtkNew<vtkF3DPostProcessFilter> PostPro;
+    vtkNew<vtkActor> Actor;
+    vtkNew<vtkPolyDataMapper> Mapper;
+    vtkPolyData* Points = nullptr;
+    vtkImageData* Image = nullptr;
+    std::string Name;
+  };
 
-  vtkPolyData* ImportedPoints = nullptr;
-  vtkImageData* ImportedImage = nullptr;
+  vtkSmartPointer<vtkAlgorithm> Reader = nullptr;
+  std::vector<BlockData> Blocks;
+  std::string OutputDescription;
 
   bool HasAnimation = false;
   bool AnimationEnabled = false;
   std::array<double, 2> TimeRange;
+
+  void UpdateBlock(BlockData& bd, vtkDataSet* dataset)
+  {
+    bd.PostPro->SetInputDataObject(dataset);
+    bd.PostPro->Update();
+    bd.Points = vtkPolyData::SafeDownCast(bd.PostPro->GetOutput(1));
+    vtkImageData* image = vtkImageData::SafeDownCast(bd.PostPro->GetOutput(2));
+    bd.Image = image && image->GetNumberOfCells() > 0 ? image : nullptr;
+  }
 };
 
 vtkStandardNewMacro(vtkF3DGenericImporter);
@@ -104,8 +121,7 @@ bool vtkF3DGenericImporter::IsAnimationEnabled([[maybe_unused]] vtkIdType animat
 
 //----------------------------------------------------------------------------
 bool vtkF3DGenericImporter::GetTemporalInformation([[maybe_unused]] vtkIdType animationIndex,
-  double vtkNotUsed(frameRate), int& vtkNotUsed(nbTimeSteps), double timeRange[2],
-  vtkDoubleArray* vtkNotUsed(timeSteps))
+  double timeRange[2], int& vtkNotUsed(nbTimeSteps), vtkDoubleArray* vtkNotUsed(timeSteps))
 {
   assert(animationIndex == 0);
   // F3D do not care about timesteps
@@ -119,54 +135,111 @@ bool vtkF3DGenericImporter::GetTemporalInformation([[maybe_unused]] vtkIdType an
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DGenericImporter::CreateActorForBlock(
+  vtkDataSet* block, vtkRenderer* ren, const std::string& blockName)
+{
+  this->Pimpl->Blocks.emplace_back();
+  Internals::BlockData& bd = this->Pimpl->Blocks.back();
+  bd.Name = blockName;
+
+  this->Pimpl->UpdateBlock(bd, block);
+
+  bd.Mapper->SetInputConnection(bd.PostPro->GetOutputPort(0));
+  bd.Mapper->ScalarVisibilityOff();
+
+  bd.Actor->SetMapper(bd.Mapper);
+  bd.Actor->GetProperty()->SetPointSize(10.0);
+  bd.Actor->GetProperty()->SetLineWidth(1.0);
+  bd.Actor->GetProperty()->SetRoughness(0.3);
+  bd.Actor->GetProperty()->SetBaseIOR(1.5);
+  bd.Actor->GetProperty()->SetInterpolationToPBR();
+
+  ren->AddActor(bd.Actor);
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
+  this->ActorCollection->AddItem(bd.Actor);
+#endif
+
+  bd.Actor->VisibilityOn();
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DGenericImporter::ImportActors(vtkRenderer* ren)
 {
   assert(this->Pimpl->Reader);
+
+  // Clear any previous blocks
+  this->Pimpl->Blocks.clear();
 
   // Read file and forward progress
   vtkNew<vtkEventForwarderCommand> progressForwarder;
   progressForwarder->SetTarget(this);
   this->Pimpl->Reader->AddObserver(vtkCommand::ProgressEvent, progressForwarder);
-  bool status = this->Pimpl->PostPro->GetExecutive()->Update();
-  if (!status || !this->Pimpl->Reader->GetOutputDataObject(0))
+  bool status = this->Pimpl->Reader->GetExecutive()->Update();
+
+  vtkDataObject* output = this->Pimpl->Reader->GetOutputDataObject(0);
+  if (!status || !output)
   {
     this->SetFailureStatus();
     return;
   }
 
-  // Cast to dataset types
-  this->Pimpl->ImportedPoints = vtkPolyData::SafeDownCast(this->Pimpl->PostPro->GetOutput(1));
-  vtkImageData* image = vtkImageData::SafeDownCast(this->Pimpl->PostPro->GetOutput(2));
-  this->Pimpl->ImportedImage = image->GetNumberOfCells() > 0 ? image : nullptr;
+  this->Pimpl->OutputDescription = this->GetDataObjectDescription(output);
 
-  // Recover output description from the reader
-  this->Pimpl->OutputDescription =
-    vtkF3DGenericImporter::GetDataObjectDescription(this->Pimpl->Reader->GetOutputDataObject(0));
+  vtkMultiBlockDataSet* mb = vtkMultiBlockDataSet::SafeDownCast(output);
+  vtkPartitionedDataSetCollection* pdc = vtkPartitionedDataSetCollection::SafeDownCast(output);
+  vtkPartitionedDataSet* pds = vtkPartitionedDataSet::SafeDownCast(output);
 
-  // Add filter outputs to mapper inputs
-  this->Pimpl->PolyDataMapper->SetInputConnection(this->Pimpl->PostPro->GetOutputPort(0));
-  this->Pimpl->PolyDataMapper->ScalarVisibilityOff();
-
-  // Set geometry actor default properties
-  // Rely on vtkProperty default for other properties
-  this->Pimpl->GeometryActor->GetProperty()->SetPointSize(10.0);
-  this->Pimpl->GeometryActor->GetProperty()->SetLineWidth(1.0);
-  this->Pimpl->GeometryActor->GetProperty()->SetRoughness(0.3);
-  this->Pimpl->GeometryActor->GetProperty()->SetBaseIOR(1.5);
-  this->Pimpl->GeometryActor->GetProperty()->SetInterpolationToPBR();
-
-  // add mappers
-  // TODO implement proper composite support
-  this->Pimpl->GeometryActor->SetMapper(this->Pimpl->PolyDataMapper);
-
-  // add props
-  ren->AddActor(this->Pimpl->GeometryActor);
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
-  this->ActorCollection->AddItem(this->Pimpl->GeometryActor);
+  if (mb)
+  {
+    this->ImportMultiBlock(mb, ren);
+  }
+  else if (pdc)
+  {
+    this->ImportPartitionedDataSetCollection(pdc, ren);
+  }
+  else if (pds)
+  {
+    this->ImportPartitionedDataSet(pds, ren);
+  }
+#if VTK_VERSION_NUMBER <= VTK_VERSION_CHECK(9, 5, 2)
+  // Handle other composite types (e.g., AMR) using generic iterator
+  else if (vtkCompositeDataSet* composite = vtkCompositeDataSet::SafeDownCast(output))
+  {
+    auto iter = vtkSmartPointer<vtkCompositeDataIterator>::Take(composite->NewIterator());
+    iter->SkipEmptyNodesOn();
+    int idx = 0;
+    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem(), idx++)
+    {
+      vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
+      if (ds)
+      {
+        std::string blockName = "Block_" + std::to_string(idx);
+        if (iter->HasCurrentMetaData())
+        {
+          const char* name = iter->GetCurrentMetaData()->Get(vtkCompositeDataSet::NAME());
+          if (name)
+          {
+            blockName = name;
+          }
+        }
+        this->CreateActorForBlock(ds, ren, blockName);
+      }
+    }
+  }
 #endif
-
-  // Set visibilities
-  this->Pimpl->GeometryActor->VisibilityOn();
+  else
+  {
+    vtkDataSet* dataset = vtkDataSet::SafeDownCast(output);
+    if (dataset)
+    {
+      this->CreateActorForBlock(dataset, ren, "");
+    }
+    else
+    {
+      this->SetFailureStatus();
+      return;
+    }
+  }
 
   this->UpdateTemporalInformation();
 }
@@ -177,7 +250,6 @@ void vtkF3DGenericImporter::SetInternalReader(vtkAlgorithm* reader)
   if (reader)
   {
     this->Pimpl->Reader = reader;
-    this->Pimpl->PostPro->SetInputConnection(this->Pimpl->Reader->GetOutputPort());
   }
 }
 
@@ -261,7 +333,6 @@ std::string vtkF3DGenericImporter::GetDataObjectDescription(vtkDataObject* objec
 //----------------------------------------------------------------------------
 bool vtkF3DGenericImporter::UpdateAtTimeValue(double timeValue)
 {
-
   if (!this->Pimpl->AnimationEnabled)
   {
     // Animation is not enabled, nothing to do
@@ -269,11 +340,44 @@ bool vtkF3DGenericImporter::UpdateAtTimeValue(double timeValue)
   }
 
   assert(this->Pimpl->Reader);
-  if (!this->Pimpl->PostPro->UpdateTimeStep(timeValue) ||
-    !this->Pimpl->Reader->GetOutputDataObject(0))
+
+  vtkInformation* info = this->Pimpl->Reader->GetOutputInformation(0);
+  info->Set(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEP(), timeValue);
+  bool status = this->Pimpl->Reader->GetExecutive()->Update();
+
+  vtkDataObject* output = this->Pimpl->Reader->GetOutputDataObject(0);
+  if (!status || !output)
   {
     F3DLog::Print(F3DLog::Severity::Warning, "A reader failed to update at a timeValue");
     return false;
+  }
+
+  vtkCompositeDataSet* composite = vtkCompositeDataSet::SafeDownCast(output);
+
+  if (composite)
+  {
+    auto iter = vtkSmartPointer<vtkCompositeDataIterator>::Take(composite->NewIterator());
+    iter->SkipEmptyNodesOn();
+
+    size_t blockIdx = 0;
+    for (iter->InitTraversal();
+         !iter->IsDoneWithTraversal() && blockIdx < this->Pimpl->Blocks.size();
+         iter->GoToNextItem(), blockIdx++)
+    {
+      vtkDataSet* block = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
+      if (block)
+      {
+        this->Pimpl->UpdateBlock(this->Pimpl->Blocks[blockIdx], block);
+      }
+    }
+  }
+  else if (!this->Pimpl->Blocks.empty())
+  {
+    vtkDataSet* dataset = vtkDataSet::SafeDownCast(output);
+    if (dataset)
+    {
+      this->Pimpl->UpdateBlock(this->Pimpl->Blocks[0], dataset);
+    }
   }
 
   this->UpdateOutputDescriptions();
@@ -290,13 +394,197 @@ void vtkF3DGenericImporter::UpdateOutputDescriptions()
 }
 
 //----------------------------------------------------------------------------
-vtkPolyData* vtkF3DGenericImporter::GetImportedPoints()
+vtkPolyData* vtkF3DGenericImporter::GetImportedPoints(vtkIdType actorIndex)
 {
-  return this->Pimpl->ImportedPoints;
+  if (actorIndex >= 0 && actorIndex < static_cast<vtkIdType>(this->Pimpl->Blocks.size()))
+  {
+    return this->Pimpl->Blocks[actorIndex].Points;
+  }
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------
-vtkImageData* vtkF3DGenericImporter::GetImportedImage()
+vtkImageData* vtkF3DGenericImporter::GetImportedImage(vtkIdType actorIndex)
 {
-  return this->Pimpl->ImportedImage;
+  if (actorIndex >= 0 && actorIndex < static_cast<vtkIdType>(this->Pimpl->Blocks.size()))
+  {
+    return this->Pimpl->Blocks[actorIndex].Image;
+  }
+  return nullptr;
+}
+
+//----------------------------------------------------------------------------
+std::string vtkF3DGenericImporter::GetBlockName(vtkIdType actorIndex)
+{
+  if (actorIndex >= 0 && actorIndex < static_cast<vtkIdType>(this->Pimpl->Blocks.size()))
+  {
+    return this->Pimpl->Blocks[actorIndex].Name;
+  }
+  return "";
+}
+
+//----------------------------------------------------------------------------
+vtkIdType vtkF3DGenericImporter::GetNumberOfBlocks()
+{
+  return static_cast<vtkIdType>(this->Pimpl->Blocks.size());
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DGenericImporter::ImportMultiBlock(
+  vtkMultiBlockDataSet* mb, vtkRenderer* ren, const std::string& parentName)
+{
+  for (unsigned int i = 0; i < mb->GetNumberOfBlocks(); i++)
+  {
+    vtkDataObject* obj = mb->GetBlock(i);
+    if (!obj)
+    {
+      continue;
+    }
+
+    std::string blockName = parentName;
+    if (!blockName.empty())
+    {
+      blockName += "/";
+    }
+
+    if (const char* name =
+          mb->HasMetaData(i) ? mb->GetMetaData(i)->Get(vtkCompositeDataSet::NAME()) : nullptr)
+    {
+      blockName += name;
+    }
+    else
+    {
+      blockName += "Block_" + std::to_string(i);
+    }
+
+    vtkMultiBlockDataSet* childMB = vtkMultiBlockDataSet::SafeDownCast(obj);
+    vtkCompositeDataSet* childComposite = vtkCompositeDataSet::SafeDownCast(obj);
+    vtkDataSet* ds = vtkDataSet::SafeDownCast(obj);
+
+    if (childMB)
+    {
+      this->ImportMultiBlock(childMB, ren, blockName);
+    }
+    else if (childComposite)
+    {
+      auto iter = vtkSmartPointer<vtkCompositeDataIterator>::Take(childComposite->NewIterator());
+      iter->SkipEmptyNodesOn();
+      int subIdx = 0;
+      for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem(), subIdx++)
+      {
+        vtkDataSet* subDs = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
+        if (subDs)
+        {
+          const char* name = iter->HasCurrentMetaData()
+            ? iter->GetCurrentMetaData()->Get(vtkCompositeDataSet::NAME())
+            : "Block_";
+          blockName += "/" + (name ? std::string(name) : "Block_") + std::to_string(subIdx);
+          this->CreateActorForBlock(subDs, ren, blockName);
+        }
+      }
+    }
+    else if (ds)
+    {
+      this->CreateActorForBlock(ds, ren, blockName);
+    }
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DGenericImporter::ImportPartitionedDataSetCollection(
+  vtkPartitionedDataSetCollection* pdc, vtkRenderer* ren)
+{
+  std::map<unsigned int, std::string> datasetIndexToName;
+  vtkDataAssembly* assembly = pdc->GetDataAssembly();
+  if (assembly)
+  {
+    std::vector<int> childNodes = assembly->GetChildNodes(assembly->GetRootNode());
+    for (int nodeId : childNodes)
+    {
+      const char* nodeName = assembly->GetNodeName(nodeId);
+      if (nodeName)
+      {
+        std::vector<unsigned int> indices = assembly->GetDataSetIndices(nodeId, false);
+        for (unsigned int idx : indices)
+        {
+          datasetIndexToName[idx] = nodeName;
+        }
+      }
+    }
+  }
+
+  for (unsigned int i = 0; i < pdc->GetNumberOfPartitionedDataSets(); i++)
+  {
+    vtkPartitionedDataSet* pds = pdc->GetPartitionedDataSet(i);
+    if (!pds)
+    {
+      continue;
+    }
+
+    std::string pdsName;
+
+    auto it = datasetIndexToName.find(i);
+    if (it != datasetIndexToName.end())
+    {
+      pdsName = it->second;
+    }
+    else if (pdc->HasMetaData(i))
+    {
+      const char* name = pdc->GetMetaData(i)->Get(vtkCompositeDataSet::NAME());
+      if (name)
+      {
+        pdsName = name;
+      }
+    }
+    if (pdsName.empty())
+    {
+      pdsName = "PartitionedDataSet_" + std::to_string(i);
+    }
+
+    this->ImportPartitionedDataSet(pds, ren, pdsName);
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DGenericImporter::ImportPartitionedDataSet(
+  vtkPartitionedDataSet* pds, vtkRenderer* ren, const std::string& pdsName)
+{
+  std::string baseName = pdsName;
+  if (baseName.empty())
+  {
+    baseName = "PartitionedDataSet_" + std::to_string(this->Pimpl->Blocks.size());
+  }
+
+  for (unsigned int j = 0; j < pds->GetNumberOfPartitions(); j++)
+  {
+    vtkDataSet* ds = pds->GetPartition(j);
+    if (!ds)
+    {
+      continue;
+    }
+
+    std::string partitionName;
+    if (pds->HasMetaData(j))
+    {
+      const char* name = pds->GetMetaData(j)->Get(vtkCompositeDataSet::NAME());
+      if (name)
+      {
+        partitionName = name;
+      }
+    }
+
+    std::string blockName = baseName;
+    if (!partitionName.empty())
+    {
+      blockName += "/";
+      blockName += partitionName;
+    }
+    else if (pds->GetNumberOfPartitions() > 1)
+    {
+      blockName += "/Partition_";
+      blockName += std::to_string(j);
+    }
+
+    this->CreateActorForBlock(ds, ren, blockName);
+  }
 }

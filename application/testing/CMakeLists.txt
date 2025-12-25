@@ -545,7 +545,6 @@ f3d_test(NAME TestMetaData DATA pdiag.vtu ARGS -m UI)
 f3d_test(NAME TestEdges DATA suzanne.ply ARGS -e)
 f3d_test(NAME TestLineWidth DATA cow.vtk ARGS -e --line-width=5)
 f3d_test(NAME TestLineWidthFullScene DATA suzanne.obj ARGS -e --line-width=3 --up=-Y)
-f3d_test(NAME TestPointCloudFullScene DATA pointsCloud.gltf ARGS --point-size=20)
 f3d_test(NAME TestTextureMatCapWithEdges DATA suzanne.ply ARGS -e --texture-matcap=${F3D_SOURCE_DIR}/testing/data/skin.png)
 
 # Test enabling all animations
@@ -587,6 +586,11 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240729)
   f3d_test(NAME TestInteractionNoModelScrollBar RESOLUTION 1000,600 NO_DATA_FORCE_RENDER LONG_TIMEOUT INTERACTION UI)
 endif()
 
+# https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12678
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251206)
+  f3d_test(NAME TestPointCloudFullScene DATA pointsCloud.gltf ARGS --point-size=20)
+endif()
+
 # A verbose test that needs animation index support
 f3d_test(NAME TestVerboseAnimationWrongAnimationTimeHigh DATA BoxAnimated.gltf ARGS --animation-time=10 --verbose REGEXP "Animation time 10 is outside of range \\[0, 3\\.70833\\], using 3\\.70833" NO_BASELINE)
 f3d_test(NAME TestVerboseAnimationWrongAnimationTimeLow DATA BoxAnimated.gltf ARGS --animation-time=-5 --verbose REGEXP "Animation time -5 is outside of range \\[0, 3\\.70833\\], using 0" NO_BASELINE)
@@ -617,6 +621,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
   f3d_test(NAME TestInteractionCheatsheetNoFile INTERACTION UI NO_DATA_FORCE_RENDER) #HXM
 endif()
 f3d_test(NAME TestInteractionCheatsheetScalars DATA dragon.vtu ARGS --scalar-coloring --coloring-component=-2 INTERACTION UI LONG_TIMEOUT) #HSSS
+f3d_test(NAME TestInteractionCheatsheetScalarsNoArray DATA dragon.vtu ARGS --scalar-coloring INTERACTION UI RESOLUTION 500,300) #H
 f3d_test(NAME TestInteractionCheatsheetOpacity DATA cow.vtp INTERACTION UI ARGS --opacity=0.5 RESOLUTION 300,700) #H;ScrollDown
 f3d_test(NAME TestInteractionCheatsheetAnimationName DATA InterpolationTest.glb ARGS --animation-indices=6 INTERACTION UI) #HWWW
 f3d_test(NAME TestInteractionCheatsheetConfigFile DATA dragon.vtu CONFIG ${F3D_SOURCE_DIR}/testing/configs/bindings.json INTERACTION UI) #H;ScrollDown
@@ -772,7 +777,11 @@ if(F3D_PLUGIN_BUILD_ALEMBIC)
   f3d_test(NAME TestAlembicNonFaceVarying DATA tetrahedron_non_facevarying_uv.abc ARGS -s --load-plugins=alembic)
   f3d_test(NAME TestAlembicAnimation DATA drop.abc ARGS --animation-time=2 --load-plugins=alembic --animation-progress)
   f3d_test(NAME TestAlembicAnimationXForm DATA xform_anim.abc ARGS -g --animation-time=1.5 --load-plugins=alembic --animation-progress)
-  f3d_test(NAME TestAlembicCurves DATA monkey_curves.abc ARGS --load-plugins=alembic)
+  f3d_test(NAME TestAlembicCurves DATA monkey_curves.abc ARGS --load-plugins=alembic THRESHOLD 0.07) #  High threshold because of line rendering
+
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
+    f3d_test(NAME TestAlembicInvalid DATA invalid.abc ARGS -s --load-plugins=alembic REGEXP "failed to load scene" NO_BASELINE)
+  endif()
 
   if(NOT F3D_MACOS_BUNDLE)
     file(COPY "${F3D_SOURCE_DIR}/plugins/alembic/configs/config.d/" DESTINATION "${CMAKE_BINARY_DIR}/share/f3d/configs/config_build.d")
@@ -882,6 +891,10 @@ if(F3D_PLUGIN_BUILD_HDF)
   if (VTK_VERSION VERSION_GREATER_EQUAL 9.3.0)
     f3d_test(NAME TestVTKHDF DATA blob.vtkhdf ARGS --load-plugins=hdf -s)
     f3d_test(NAME TestAMRDataSet DATA amr.vtkhdf ARGS --load-plugins=hdf -s)
+  endif()
+
+  if (VTK_VERSION VERSION_GREATER_EQUAL 9.4.0)
+    f3d_test(NAME TestVTKHDFPartitionedDataSetCollection DATA pdc_sphere_cone.vtkhdf ARGS --load-plugins=hdf -s)
   endif()
 
   f3d_test(NAME TestExodus DATA disk_out_ref.ex2 ARGS --load-plugins=hdf -s --camera-position=-11,-2,-49)
