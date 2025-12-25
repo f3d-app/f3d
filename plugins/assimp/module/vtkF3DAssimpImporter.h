@@ -20,6 +20,8 @@
 
 #include <vtkVersion.h>
 
+#include <assimp/ProgressHandler.hpp>
+
 #include <memory>
 
 class vtkF3DAssimpImporter : public vtkF3DImporter
@@ -125,6 +127,16 @@ private:
 
   class vtkInternals;
   std::unique_ptr<vtkInternals> Internals;
+};
+
+class F3DAssimpProgressHandler : public Assimp::ProgressHandler
+{
+public:
+  explicit F3DAssimpProgressHandler(vtkF3DAssimpImporter* parent);
+  bool Update(float percentage) override;
+
+private:
+  vtkF3DAssimpImporter* Parent;
 };
 
 #endif
