@@ -371,12 +371,32 @@ void vtkF3DRenderer::ApplyUpVector(const std::array<double, 3>& up)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::InitializeCamera()
+void vtkF3DRenderer::InitializeCamera(const std::vector<double>& upVec)
 {
+  assert(upVec.size() == 3);
+
+  std::array<double, 3> up = { upVec[0], upVec[1], upVec[2] };
+
+  constexpr double e = 1e-8;
+  if (std::abs(up[0]) < e && std::abs(up[1]) < e && std::abs(up[2]) < e)
+  {
+    up = { 0.0, 1.0, 0.0 };
+  }
+  vtkMath::Normalize(up.data());
+
+  this->ApplyUpVector(up);
+
+  double pos[3];
+  vtkMath::Cross(this->UpVector, this->RightVector, pos);
+  vtkMath::MultiplyScalar(pos, -1.0);
+
   vtkCamera* cam = this->GetActiveCamera();
   cam->SetFocalPoint(0.0, 0.0, 0.0);
-  cam->SetPosition(0.0, 0.0, 1.0);
-  cam->SetViewUp(0.0, 1.0, 0.0);
+  cam->SetPosition(pos);
+  cam->SetViewUp(this->UpVector);
+
+  std::copy(up.begin(), up.end(), this->PendingUpDirection);
+  this->UpVectorConfigured = true;
 }
 
 //----------------------------------------------------------------------------

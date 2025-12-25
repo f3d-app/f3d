@@ -204,9 +204,9 @@ public:
   void Initialize();
 
   /**
-   * Initialize the camera to a default position.
+   * Initialize the camera position based on the given up direction.
    */
-  void InitializeCamera();
+  void InitializeCamera(const std::vector<double>& upVec);
 
   /**
    * Compute bounds of visible props as transformed by given matrix.
@@ -624,7 +624,7 @@ private:
 
   bool CheatSheetConfigured = false;
   bool ActorsPropertiesConfigured = false;
-  bool UpVectorConfigured = true;
+  bool UpVectorConfigured = false;
   bool GridConfigured = false;
   bool GridAxesConfigured = false;
   bool RenderPassesConfigured = false;
