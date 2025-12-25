@@ -208,7 +208,7 @@ void window_impl::Initialize()
 //----------------------------------------------------------------------------
 void window_impl::InitializeCamera()
 {
-  this->Internals->Renderer->InitializeCamera();
+  this->Internals->Renderer->InitializeCamera(this->Internals->Options.scene.up_direction);
 }
 
 //----------------------------------------------------------------------------
