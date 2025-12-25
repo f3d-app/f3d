@@ -220,7 +220,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
           throw F3DRangeError("Skin dimensions out of bounds of file size");
         }
       }
-      catch (const F3DMathError& e)
+      catch (const F3DMathError&)
       {
         // Catch safe math errors and rethrow range indexing error
         throw F3DRangeError("Skin dimensions out of bounds of size_t");
@@ -295,7 +295,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       }
       return texture;
     }
-    catch (const F3DRangeError& e)
+    catch (const F3DRangeError&)
     {
       // Catch fatal errors thrown from overrunning the buffer
       vtkErrorWithObjectMacro(this->Parent, "CreateTexture Accessed data out of range, aborting.");
@@ -582,7 +582,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       this->Parent->InvokeEvent(vtkCommand::ProgressEvent, static_cast<void*>(&progressRate));
       return true;
     }
-    catch (const F3DRangeError& e)
+    catch (const F3DRangeError&)
     {
       // Catch fatal errors thrown from overrunning the buffer
       vtkErrorWithObjectMacro(this->Parent, "CreateMesh Accessed data out of range, aborting.");
@@ -610,7 +610,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     {
       header = vtkInternals::ReadFromVector<mdl_header_t>(buffer, offset);
     }
-    catch (const F3DRangeError& e)
+    catch (const F3DRangeError&)
     {
       vtkErrorWithObjectMacro(this->Parent, "Unable to read header, aborting.");
       return false;
