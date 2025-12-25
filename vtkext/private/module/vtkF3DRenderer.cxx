@@ -344,48 +344,49 @@ void vtkF3DRenderer::Initialize()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::InitializeUpVector(const std::vector<double>& upVec)
+void vtkF3DRenderer::ApplyUpVector(const std::array<double, 3>& up)
 {
-  assert(upVec.size() == 3);
-
-  const auto isNullVector = [](const std::array<double, 3>& v)
-  {
-    constexpr double e = 1e-8;
-    return ::abs(v[0]) < e && ::abs(v[1]) < e && ::abs(v[2]) < e;
-  };
-
-  std::array<double, 3> up = { upVec[0], upVec[1], upVec[2] };
   std::array<double, 3> right = { 1, 0, 0 };
-
-  /* if `up` is `(0,0,0)` make it `(0,1,0)` */
-  if (isNullVector(up))
-  {
-    up[1] = 1.0;
-    F3DLog::Print(F3DLog::Severity::Warning, "null up vector, using (0,0,1) instead");
-  }
-  vtkMath::Normalize(up.data());
-
-  /* make sure `right` is not colinear with `up` */
-  if (::abs(vtkMath::Dot(right, up)) > 0.999)
+  if (std::abs(vtkMath::Dot(right.data(), up.data())) > 0.999)
   {
     right = { 0, 1, 0 };
   }
 
-  /* make `front` orthogonal */
   std::array<double, 3> front;
   vtkMath::Cross(right.data(), up.data(), front.data());
   vtkMath::Normalize(front.data());
 
-  /* ensure `right` is orthogonal */
-  vtkMath::Cross(up.data(), front.data(), right.data());
-  vtkMath::Normalize(right.data());
+  std::array<double, 3> orthRight;
+  vtkMath::Cross(up.data(), front.data(), orthRight.data());
+  vtkMath::Normalize(orthRight.data());
 
-  this->UpVector[0] = up[0];
-  this->UpVector[1] = up[1];
-  this->UpVector[2] = up[2];
-  this->RightVector[0] = right[0];
-  this->RightVector[1] = right[1];
-  this->RightVector[2] = right[2];
+  std::copy(up.begin(), up.end(), this->UpVector);
+  std::copy(orthRight.begin(), orthRight.end(), this->RightVector);
+
+  this->SkyboxActor->SetFloorPlane(up[0], up[1], up[2], 0.0);
+  this->SkyboxActor->SetFloorRight(front[0], front[1], front[2]);
+
+  this->SetEnvironmentUp(this->UpVector);
+  this->SetEnvironmentRight(this->RightVector);
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::InitializeCamera(const std::vector<double>& upVec)
+{
+  assert(upVec.size() == 3);
+
+  std::array<double, 3> up = { upVec[0], upVec[1], upVec[2] };
+
+  // Handle null vector - use default (0,1,0)
+  constexpr double e = 1e-8;
+  if (std::abs(up[0]) < e && std::abs(up[1]) < e && std::abs(up[2]) < e)
+  {
+    up = { 0.0, 1.0, 0.0 };
+  }
+  vtkMath::Normalize(up.data());
+
+  // Compute camera position based on up direction
+  this->ApplyUpVector(up);
 
   double pos[3];
   vtkMath::Cross(this->UpVector, this->RightVector, pos);
@@ -396,13 +397,74 @@ void vtkF3DRenderer::InitializeUpVector(const std::vector<double>& upVec)
   cam->SetPosition(pos);
   cam->SetViewUp(this->UpVector);
 
-  // skybox orientation
-  this->SkyboxActor->SetFloorPlane(this->UpVector[0], this->UpVector[1], this->UpVector[2], 0.0);
-  this->SkyboxActor->SetFloorRight(front[0], front[1], front[2]);
+  // Mark PendingUpDirection to match so we don't rotate on first render
+  std::copy(up.begin(), up.end(), this->PendingUpDirection);
+  this->UpVectorConfigured = true;
+}
 
-  // environment orientation
-  this->SetEnvironmentUp(this->UpVector);
-  this->SetEnvironmentRight(this->RightVector);
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetPendingUpDirection(const std::vector<double>& upVec)
+{
+  assert(upVec.size() == 3);
+
+  std::array<double, 3> up = { upVec[0], upVec[1], upVec[2] };
+
+  constexpr double e = 1e-8;
+  if (std::abs(up[0]) < e && std::abs(up[1]) < e && std::abs(up[2]) < e)
+  {
+    return;
+  }
+
+  vtkMath::Normalize(up.data());
+
+  constexpr double epsilon = 1e-6;
+  if (std::abs(up[0] - this->PendingUpDirection[0]) < epsilon &&
+    std::abs(up[1] - this->PendingUpDirection[1]) < epsilon &&
+    std::abs(up[2] - this->PendingUpDirection[2]) < epsilon)
+  {
+    return;
+  }
+
+  std::copy(up.begin(), up.end(), this->PendingUpDirection);
+  this->UpVectorConfigured = false;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ConfigureUpVector()
+{
+  std::array<double, 3> newUp = { this->PendingUpDirection[0], this->PendingUpDirection[1],
+    this->PendingUpDirection[2] };
+  std::array<double, 3> oldUp = { this->UpVector[0], this->UpVector[1], this->UpVector[2] };
+
+  std::array<double, 3> axis;
+  vtkMath::Cross(oldUp.data(), newUp.data(), axis.data());
+  double sinAngle = vtkMath::Normalize(axis.data());
+  double cosAngle = vtkMath::Dot(oldUp.data(), newUp.data());
+  double angle = std::atan2(sinAngle, cosAngle) * 180.0 / vtkMath::Pi();
+
+  vtkCamera* cam = this->GetActiveCamera();
+  double foc[3];
+  cam->GetFocalPoint(foc);
+
+  vtkNew<vtkTransform> camTransform;
+  camTransform->Translate(foc[0], foc[1], foc[2]);
+  camTransform->RotateWXYZ(angle, axis.data());
+  camTransform->Translate(-foc[0], -foc[1], -foc[2]);
+
+  double pos[3];
+  cam->GetPosition(pos);
+  camTransform->TransformPoint(pos, pos);
+  cam->SetPosition(pos);
+
+  double viewUp[3];
+  cam->GetViewUp(viewUp);
+  camTransform->TransformVector(viewUp, viewUp);
+  cam->SetViewUp(viewUp);
+
+  this->ApplyUpVector(newUp);
+
+  this->GridConfigured = false;
+  this->UpVectorConfigured = true;
 }
 
 //----------------------------------------------------------------------------
@@ -1917,6 +1979,11 @@ void vtkF3DRenderer::UpdateActors()
   if (!this->ActorsPropertiesConfigured)
   {
     this->ConfigureActorsProperties();
+  }
+
+  if (!this->UpVectorConfigured)
+  {
+    this->ConfigureUpVector();
   }
 
   if (!this->PointSpritesConfigured)
