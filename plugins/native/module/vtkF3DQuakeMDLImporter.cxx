@@ -276,7 +276,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
           this->GroupSkinDurations.emplace_back(nb + 1, 0.0f);
           for (int j = 1; j <= nb; ++j)
           {
-            auto timeValue = *ReadFromVector<float>(buffer, offset);
+            auto timeValue = *vtkInternals::ReadFromVector<float>(buffer, offset);
             this->GroupSkinDurations[groupSkinCount][j] = static_cast<double>(timeValue);
           }
           for (int skinIdx = 0; skinIdx < nb; ++skinIdx)
@@ -359,11 +359,11 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
         sizeof(mdl_simpleframe_t::verts); // Size of bboxmin, bboxmax and name.
 
       // Read Texture Coordinates
-      auto texcoords = PeekFromVector<mdl_texcoord_t>(buffer, offset);
+      auto texcoords = vtkInternals::PeekFromVector<mdl_texcoord_t>(buffer, offset);
       offset += sizeof(mdl_texcoord_t) * header->numVertices;
 
       // Read Triangles
-      auto triangles = PeekFromVector<mdl_triangle_t>(buffer, offset);
+      auto triangles = vtkInternals::PeekFromVector<mdl_triangle_t>(buffer, offset);
       offset += sizeof(mdl_triangle_t) * header->numTriangles;
 
       // Read frames
@@ -372,7 +372,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
       std::vector<std::vector<size_t>> frameOffsets = std::vector<std::vector<size_t>>();
       for (int i = 0; i < header->numFrames; i++)
       {
-        framePtr[i].type = PeekFromVector<int>(buffer, offset);
+        framePtr[i].type = vtkInternals::PeekFromVector<int>(buffer, offset);
         if (*framePtr[i].type == SINGLE_FRAME)
         {
           // Alias offset
@@ -386,7 +386,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
           // Note : mdl_simpleframe_t can have *up to and including* 1024 verts. So if this data is
           // the last in the file the peek_at_vector func will error out. As such we use a different
           // helper.
-          framePtr[i].frames = ReadFromVectorSimpleframe(buffer, offsetAlias, header->numVertices);
+          framePtr[i].frames = vtkInternals::ReadFromVectorSimpleframe(buffer, offsetAlias, header->numVertices);
           // Apply alias
           offset = offsetAlias;
 
