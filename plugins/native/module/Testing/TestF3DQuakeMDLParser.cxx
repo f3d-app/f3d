@@ -65,7 +65,8 @@ Error ErrorCodeParser(const std::string& errorStr)
     std::string pLineNumber = matches[2].str();
     std::string pErrorString = matches[3].str();
 
-    std::cout << "Parsed error\n    file name : \"" << pFileName << "\"\n    line number : \"" << pLineNumber << "\"\n    error string : \"" << pErrorString << "\"\n";
+    std::cout << "Parsed error\n    file name : \"" << pFileName << "\"\n    line number : \""
+              << pLineNumber << "\"\n    error string : \"" << pErrorString << "\"\n";
 
     return {
       .parsed = true, .fileName = pFileName, .lineNumber = pLineNumber, .errorString = pErrorString
