@@ -386,7 +386,8 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
           // Note : mdl_simpleframe_t can have *up to and including* 1024 verts. So if this data is
           // the last in the file the peek_at_vector func will error out. As such we use a different
           // helper.
-          framePtr[i].frames = vtkInternals::ReadFromVectorSimpleframe(buffer, offsetAlias, header->numVertices);
+          framePtr[i].frames =
+            vtkInternals::ReadFromVectorSimpleframe(buffer, offsetAlias, header->numVertices);
           // Apply alias
           offset = offsetAlias;
 
