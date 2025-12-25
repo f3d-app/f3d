@@ -62,12 +62,10 @@ Error ErrorCodeParser(const std::string& errorStr)
   if (std::regex_search(errorStr, matches, errorRegex))
   {
     std::string pFileName = matches[1].str();
-    std::string pLineNumber = matches[2].str(); // Convert string to int
+    std::string pLineNumber = matches[2].str();
     std::string pErrorString = matches[3].str();
 
-    printf(
-      "Parsed error\n    file name : \"%s\"\n    line number : \"%s\"\n    error string : \"%s\"\n",
-      pFileName.c_str(), pLineNumber.c_str(), pErrorString.c_str());
+    std::cout << "Parsed error\n    file name : \"" << pFileName << "\"\n    line number : \"" << pLineNumber << "\"\n    error string : \"" << pErrorString << "\"\n";
 
     return {
       .parsed = true, .fileName = pFileName, .lineNumber = pLineNumber, .errorString = pErrorString
