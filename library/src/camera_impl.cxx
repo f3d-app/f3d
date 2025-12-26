@@ -5,6 +5,8 @@
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
 #include <vtkVersion.h>
+#include <cmath>
+
 
 namespace f3d::detail
 {
@@ -101,6 +103,48 @@ void camera_impl::getFocalPoint(point3_t& foc) const
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->GetFocalPoint(foc.data());
+}
+
+//----------------------------------------------------------------------------
+  void camera_impl::getPositionToFocalVector(double& dx, double& dy, double& dz) const
+{
+  point3_t pos, focal;
+  this->getPosition(pos);
+  this->getFocalPoint(focal);
+
+  dx = pos[0] - focal[0];
+  dy = pos[1] - focal[1];
+  dz = pos[2] - focal[2];
+}
+
+//----------------------------------------------------------------------------
+  double camera_impl::getWorldAzimuth() const
+{
+  double dx, dy, dz;
+  this->getPositionToFocalVector(dx, dy, dz);
+
+  return std::atan2(dy, dx) * 180.0 / vtkMath::Pi();
+}
+
+
+//----------------------------------------------------------------------------
+  double camera_impl::getWorldElevation() const
+{
+  double dx, dy, dz;
+  this->getPositionToFocalVector(dx, dy, dz);
+
+  const double horizontal = std::sqrt(dx * dx + dy * dy);
+  return std::atan2(dz, horizontal) * 180.0 / vtkMath::Pi();
+}
+
+
+//----------------------------------------------------------------------------
+  double camera_impl::getDistance() const
+{
+  double dx, dy, dz;
+  this->getPositionToFocalVector(dx, dy, dz);
+
+  return std::sqrt(dx * dx + dy * dy + dz * dz);
 }
 
 //----------------------------------------------------------------------------
