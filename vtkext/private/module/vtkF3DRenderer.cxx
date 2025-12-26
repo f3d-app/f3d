@@ -1585,6 +1585,7 @@ void vtkF3DRenderer::SetBackfaceType(const std::optional<std::string>& backfaceT
   {
     this->BackfaceType = backfaceType;
     this->RenderPassesConfigured = false;
+    this->CheatSheetConfigured = false;
   }
 }
 
