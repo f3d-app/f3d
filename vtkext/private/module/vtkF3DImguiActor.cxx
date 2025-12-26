@@ -21,6 +21,8 @@
 #include <vtkTextureObject.h>
 #include <vtkVersion.h>
 
+#include <algorithm>
+
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
 #include <vtkMemoryResourceStream.h>
 #endif
@@ -64,6 +66,9 @@ static std::vector<std::string> SplitBindings(const std::string& s, const char d
 
 struct vtkF3DImguiActor::Internals
 {
+  std::array<char, 2048> CurrentInput = {};
+  int SearchSelectionIndex = 0;
+  bool SearchFocus = false;
 
   void Initialize(vtkOpenGLRenderWindow* renWin)
   {
@@ -726,6 +731,25 @@ void vtkF3DImguiActor::RenderCheatSheet()
 
   ImGui::Begin("CheatSheet", nullptr, flags);
 
+  if (this->Pimpl->SearchFocus)
+  {
+    ImGui::SetKeyboardFocusHere();
+    this->Pimpl->SearchFocus = false;
+  }
+
+  ImGui::InputTextWithHint(
+    "##Search", "Search...", this->Pimpl->CurrentInput.data(), sizeof(this->Pimpl->CurrentInput));
+
+  if (ImGui::RadioButton("Keyword", &(this->Pimpl->SearchSelectionIndex), 0))
+  {
+    this->Pimpl->SearchFocus = true;
+  }
+  ImGui::SameLine();
+  if (ImGui::RadioButton("Keybind", &(this->Pimpl->SearchSelectionIndex), 1))
+  {
+    this->Pimpl->SearchFocus = true;
+  }
+
   for (const auto& [group, list] : this->CheatSheet)
   {
     ImGui::SeparatorText(group.c_str());
@@ -735,6 +759,37 @@ void vtkF3DImguiActor::RenderCheatSheet()
     ImGui::TableSetupColumn("Bindings", ImGuiTableColumnFlags_WidthStretch, maxBindingTextWidth);
     for (const auto& [bind, desc, val, type] : list)
     {
+
+      if (!this->Pimpl->CurrentInput.empty())
+      {
+        std::string lowercaseInput = this->Pimpl->CurrentInput.data();
+        std::transform(lowercaseInput.begin(), lowercaseInput.end(), lowercaseInput.begin(),
+          [](const auto& a) { return std::tolower(a); });
+
+        if (!(this->Pimpl->SearchSelectionIndex))
+        {
+          auto lowercaseDesc = desc;
+          std::transform(lowercaseDesc.begin(), lowercaseDesc.end(), lowercaseDesc.begin(),
+            [](const auto& a) { return std::tolower(a); });
+
+          if (lowercaseDesc.find(lowercaseInput) == std::string::npos)
+          {
+            continue;
+          }
+        }
+        else
+        {
+          auto lowercaseBind = bind;
+          std::transform(lowercaseBind.begin(), lowercaseBind.end(), lowercaseBind.begin(),
+            [](const auto& a) { return std::tolower(a); });
+
+          if (lowercaseBind.find(lowercaseInput) == std::string::npos)
+          {
+            continue;
+          }
+        }
+      }
+
       ImVec4 bindingTextColor, bindingRectColor, descTextColor, valueTextColor;
 
       if (type == CheatSheetBindingType::TOGGLE && val == "ON")
