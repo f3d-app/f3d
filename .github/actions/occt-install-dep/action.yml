@@ -26,7 +26,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: dependencies/occt_install
-        key: occt-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-0
+        key: occt-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-1
 
     - name: Checkout OCCT
       if: steps.cache-occt.outputs.cache-hit != 'true'
@@ -78,6 +78,8 @@ runs:
         ${{ runner.os == 'macOS' && '-DCMAKE_BUILD_WITH_INSTALL_RPATH=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
+    # Build without XCAF (TKXDESTEP;TKXDEIGES;TKBinXCAF) in minver for better testing
+    # Drop this when V7_8_0 is the new minver for occt
     - name: Configure OCCT min version
       if: |
         steps.cache-occt.outputs.cache-hit != 'true' &&
@@ -86,7 +88,7 @@ runs:
       shell: bash
       run: >
         cmake ../occt
-        -DBUILD_ADDITIONAL_TOOLKITS="TKSTEP;TKIGES;TKMesh;TKXDESTEP;TKXDEIGES;TKBinXCAF"
+        -DBUILD_ADDITIONAL_TOOLKITS="TKSTEP;TKIGES;TKMesh"
         -DBUILD_DOC_Overview=OFF
         -DBUILD_LIBRARY_TYPE=Shared
         -DBUILD_MODULE_ApplicationFramework=OFF
