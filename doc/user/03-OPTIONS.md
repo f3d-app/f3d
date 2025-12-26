@@ -126,6 +126,18 @@ Define the Up direction.
 
 Show _axes_ as a trihedron in the scene.
 
+### `--x-color` (_color_, default: `0.841107, 0.16327, 0.120593`)
+
+Set the X axis color.
+
+### `--y-color` (_color_, default: `0.187072, 0.630718, 0.168627`)
+
+Set the Y axis color.
+
+### `--z-color` (_color_, default: `0.156863, 0.345098, 0.827451`)
+
+Set the Z axis color.
+
 ### `-g`, `--grid` (_bool_, default: `false`)
 
 Show _a grid_ aligned with the horizontal (orthogonal to the Up direction) plane.
