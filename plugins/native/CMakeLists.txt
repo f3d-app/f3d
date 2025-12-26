@@ -40,10 +40,20 @@ f3d_plugin_declare_reader(
 f3d_plugin_declare_reader(
   NAME GLTF
   SCORE 80
-  EXTENSIONS gltf glb
+  EXTENSIONS gltf
   MIMETYPES model/gltf-binary model/gltf+json
   VTK_IMPORTER vtkF3DGLTFImporter
   FORMAT_DESCRIPTION "GL Transmission Format"
+)
+
+f3d_plugin_declare_reader(
+  NAME GLB
+  SCORE 80
+  EXTENSIONS glb
+  MIMETYPES model/gltf-binary
+  VTK_IMPORTER vtkF3DGLTFImporter
+  FORMAT_DESCRIPTION "GL Transmission Format (binary)"
+  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/glb.inl"
 )
 
 f3d_plugin_declare_reader(
