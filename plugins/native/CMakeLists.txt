@@ -106,6 +106,69 @@ f3d_plugin_declare_reader(
 )
 
 f3d_plugin_declare_reader(
+  NAME VTKLegacy
+  SCORE 99
+  EXTENSIONS vtk
+  MIMETYPES application/vnd.vtk
+  VTK_READER vtkDataSetReader
+  FORMAT_DESCRIPTION "VTK Legacy"
+)
+
+f3d_plugin_declare_reader(
+  NAME VTKXMLVTU
+  SCORE 99
+  EXTENSIONS vtu
+  MIMETYPES application/vnd.vtu
+  VTK_READER vtkXMLGenericDataObjectReader
+  FORMAT_DESCRIPTION "VTK XML UnstructuredGrid"
+)
+
+f3d_plugin_declare_reader(
+  NAME VTKXMLVTP
+  SCORE 99
+  EXTENSIONS vtp
+  MIMETYPES application/vnd.vtp
+  VTK_READER vtkXMLGenericDataObjectReader
+  FORMAT_DESCRIPTION "VTK XML PolyData"
+)
+
+f3d_plugin_declare_reader(
+  NAME VTKXMLVTI
+  SCORE 99
+  EXTENSIONS vti
+  MIMETYPES application/vnd.vti
+  VTK_READER vtkXMLGenericDataObjectReader
+  FORMAT_DESCRIPTION "VTK XML ImageData"
+)
+
+f3d_plugin_declare_reader(
+  NAME VTKXMLVTR
+  SCORE 99
+  EXTENSIONS vtr
+  MIMETYPES application/vnd.vtr
+  VTK_READER vtkXMLGenericDataObjectReader
+  FORMAT_DESCRIPTION "VTK XML RectangularGrid"
+)
+
+f3d_plugin_declare_reader(
+  NAME VTKXMLVTS
+  SCORE 99
+  EXTENSIONS vts
+  MIMETYPES application/vnd.vts
+  VTK_READER vtkXMLGenericDataObjectReader
+  FORMAT_DESCRIPTION "VTK XML StructuredGrid"
+)
+
+f3d_plugin_declare_reader(
+  NAME VTKXMLVTM
+  SCORE 99
+  EXTENSIONS vtm
+  MIMETYPES application/vnd.vtm
+  VTK_READER vtkXMLGenericDataObjectReader
+  FORMAT_DESCRIPTION "VTK XML MultiBlock"
+)
+
+f3d_plugin_declare_reader(
   NAME QuakeMDL
   EXTENSIONS mdl
   MIMETYPES application/vnd.mdl
