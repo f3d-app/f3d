@@ -1,4 +1,4 @@
-void applyCustomReader(vtkAlgorithm* algo, const std::string& vtkNotUsed(fileName)) const override
+void applyCustomReader(vtkAlgorithm* algo, const std::string& vtkNotUsed(fileName), vtkResourceStream*) const override
 {
   std::string optName = "@_occt_format@.linear_deflection";
   std::string str = this->ReaderOptions.at(optName);

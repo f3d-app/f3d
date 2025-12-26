@@ -1715,18 +1715,21 @@ void F3DStarter::LoadFileGroupInternal(
         // Add files to the scene
        // scene.add(localPaths);
 
-        constexpr size_t cache_length = 126384;
-        char cachebuffer[cache_length];
-        size_t howmany = 0;
+        constexpr size_t readLength = 10000024;
+        std::vector<char> buffer;
+        std::size_t cnt = 0;
+        std::size_t readSize = 0;
         if(!isatty(fileno(stdin)))
         {
           while(std::cin) {
-            std::cin.read(cachebuffer, cache_length);
-            howmany += std::cin.gcount();
+            buffer.resize(readLength*(cnt+1)); // TODO smarter
+            std::cin.read(buffer.data() + readLength * cnt, readLength);
+            cnt++;
+            readSize += std::cin.gcount();
           }
         }
-        scene.add(cachebuffer, howmany);
-
+        buffer.resize(readSize);
+        scene.add(buffer.data(), buffer.size());
 
         if (this->Internals->AppOptions.AnimationTime.has_value())
         {
