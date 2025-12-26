@@ -1,7 +1,6 @@
 void applyCustomReader(vtkAlgorithm* algo, const std::string&, vtkResourceStream*) const override
 {
   vtkOpenVDBReader* vdbReader = vtkOpenVDBReader::SafeDownCast(algo);
-  vdbReader->UpdateInformation();
 
   // No check needed, we know the option exists
   std::string optName = "VDB.downsampling_factor";
