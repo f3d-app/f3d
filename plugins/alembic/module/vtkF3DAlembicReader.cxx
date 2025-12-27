@@ -46,13 +46,7 @@ struct IntermediateGeometry
   PerMeshWavefrontIndicesTripletsContainer Indices;
   bool uvFaceVarying = false;
   bool nFaceVarying = false;
-};
-
-struct CachedMesh
-{
-  vtkSmartPointer<vtkCellArray> Cells;
-  std::vector<std::vector<vtkIdType>> RawPointToVTKPointsMap;
-  vtkIdType NumVTKPoints;
+  std::vector<int> SourceIndices;
 };
 
 class vtkF3DAlembicReader::vtkInternals
@@ -131,6 +125,7 @@ class vtkF3DAlembicReader::vtkInternals
             Alembic::Abc::V3f originalPosition =
               originalData.Attributes.at("P")[originalData.Indices[i][j].x];
             pV3F.emplace_back(originalPosition);
+            duplicatedData.SourceIndices.push_back(originalData.Indices[i][j].x);
             duplicatedData.Indices[i][j].x = pRunningIndex;
             pRunningIndex++;
           }
@@ -186,6 +181,13 @@ class vtkF3DAlembicReader::vtkInternals
     else
     {
       duplicatedData = originalData;
+      size_t numPoints = 0;
+      if (originalData.Attributes.count("P"))
+      {
+        numPoints = originalData.Attributes.at("P").size();
+      }
+      duplicatedData.SourceIndices.resize(numPoints);
+      std::iota(duplicatedData.SourceIndices.begin(), duplicatedData.SourceIndices.end(), 0);
     }
   }
 
@@ -248,10 +250,25 @@ class vtkF3DAlembicReader::vtkInternals
       }
       pointAttributes->SetTCoords(uvs);
     }
+
+    if (!data.SourceIndices.empty())
+    {
+      vtkNew<vtkIdTypeArray> sourceIds;
+      sourceIds->SetName("AbcSourceIds");
+      sourceIds->SetNumberOfComponents(1);
+      sourceIds->SetNumberOfTuples(data.SourceIndices.size());
+
+      for (size_t i = 0; i < data.SourceIndices.size(); i++)
+      {
+        sourceIds->SetValue(i, data.SourceIndices[i]);
+      }
+
+      polydata->GetPointData()->AddArray(sourceIds);
+    }
   }
 
 public:
-  std::map<std::string, CachedMesh> MeshCache;
+  std::map<std::string, vtkSmartPointer<vtkPolyData>> OutputCache;
   vtkSmartPointer<vtkPolyData> ProcessIPolyMesh(
     const Alembic::AbcGeom::IPolyMesh& pmesh, double time, const Alembic::Abc::M44d& matrix)
   {
@@ -268,34 +285,35 @@ public:
 
     Alembic::AbcGeom::ISampleSelector selector(time);
     schema.get(samp, selector);
-    
+
     auto topologyVariance = schema.getTopologyVariance();
     bool isTopologyConstant = (topologyVariance == Alembic::AbcGeom::kConstantTopology) ||
-                          (topologyVariance == Alembic::AbcGeom::kHomogenousTopology);
+      (topologyVariance == Alembic::AbcGeom::kHomogenousTopology);
     std::string meshName = pmesh.getName();
     Alembic::AbcGeom::P3fArraySamplePtr positions = samp.getPositions();
-    if (isTopologyConstant)
+    if (isTopologyConstant && this->OutputCache[meshName])
     {
-      auto cacheIterator = this->MeshCache.find(meshName);
-      if (cacheIterator != this->MeshCache.end()){
-        const auto& cachedMesh = cacheIterator->second;
-        polydata->SetPolys(cachedMesh.Cells);
-        vtkNew<vtkPoints> points;
-        points->SetNumberOfPoints(cachedMesh.NumVTKPoints);
-        size_t numRawPoints = positions->size();
-        for (size_t i = 0; i < numRawPoints; i++)
+      vtkPolyData* cachedPoly = this->OutputCache[meshName];
+      polydata->ShallowCopy(cachedPoly);
+      Alembic::AbcGeom::P3fArraySamplePtr positions = samp.getPositions();
+      vtkDataArray* sourceIdsDA = polydata->GetPointData()->GetArray("AbcSourceIds");
+      if (sourceIdsDA)
+      {
+        vtkNew<vtkPoints> newPoints;
+        vtkIdType numPoints = polydata->GetNumberOfPoints();
+        newPoints->SetNumberOfPoints(numPoints);
+
+        vtkIdType* srcIndices = static_cast<vtkIdTypeArray*>(sourceIdsDA)->GetPointer(0);
+        for (vtkIdType i = 0; i < numPoints; i++)
         {
-          if (i >= cachedMesh.RawPointToVTKPointsMap.size())
-            {
-              break;
-            }
-          const Alembic::Abc::V3f tp = positions->get()[i] * matrix;
-          for (vtkIdType vtkIdx : cachedMesh.RawPointToVTKPointsMap[i])
-            {
-              points->SetPoint(vtkIdx, tp.x, tp.y, tp.z);
-            }
+          vtkIdType rawIndex = srcIndices[i];
+          if (rawIndex < positions->size())
+          {
+            const Alembic::Abc::V3f tp = positions->get()[rawIndex] * matrix;
+            newPoints->SetPoint(i, tp.x, tp.y, tp.z);
           }
-        polydata->SetPoints(points);
+        }
+        polydata->SetPoints(newPoints);
         return polydata;
       }
     }
@@ -352,8 +370,7 @@ public:
     Alembic::AbcGeom::IN3fGeomParam normalsParam = schema.getNormalsParam();
     if (normalsParam.valid())
     {
-      Alembic::AbcGeom::IN3fGeomParam::Sample normalValue =
-        normalsParam.getIndexedValue(selector);
+      Alembic::AbcGeom::IN3fGeomParam::Sample normalValue = normalsParam.getIndexedValue(selector);
       if (normalValue.valid())
       {
         V3fContainer normal_v3f;
@@ -384,40 +401,11 @@ public:
     this->PointDuplicateAccumulator(originalData, duplicatedData);
 
     this->FillPolyData(duplicatedData, polydata);
-    
-    //Store data for the next frame
+
+    // Store data for the next frame
     if (isTopologyConstant)
     {
-      CachedMesh cache;
-      cache.Cells = polydata->GetPolys();
-      cache.NumVTKPoints = polydata -> GetNumberOfPoints();
-
-      size_t numRawPoints = positions->size();
-      cache.RawPointToVTKPointsMap.resize(numRawPoints);
-      bool unwelded = (originalData.uvFaceVarying || originalData.nFaceVarying);
-      if (unwelded)
-      {
-        vtkIdType currentVTKId = 0;
-        for (const auto& faceIndices : originalData.Indices)
-        {
-          for (const auto& triplet: faceIndices){
-            int rawIndex = triplet.x;
-            if (rawIndex >= 0 && static_cast<size_t>(rawIndex) < numRawPoints)
-            {
-              cache.RawPointToVTKPointsMap[rawIndex].push_back(currentVTKId);
-            }
-            currentVTKId++;
-          }
-        }
-      }
-      else
-      {
-        for(size_t i = 0; i < numRawPoints; i++)
-        {
-          cache.RawPointToVTKPointsMap[i].push_back(static_cast<vtkIdType>(i));
-        }
-        this->MeshCache[meshName] = cache;
-      }
+      this->OutputCache[meshName] = polydata;
     }
     return polydata;
   }
