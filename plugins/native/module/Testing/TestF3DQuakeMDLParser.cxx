@@ -50,29 +50,27 @@ static TYPE* PeekFromVector(std::vector<uint8_t>& buffer, const size_t& offset)
 struct Error
 {
   bool parsed = false;
-  std::string fileName;
-  std::string lineNumber;
-  std::string errorString;
+  std::string fileName = "";
+  std::string lineNumber = "";
+  std::string errorString = "";
 };
 
 Error ErrorCodeParser(const std::string& errorStr)
 {
+  Error err;
   std::regex errorRegex(R"(ERROR: In (.+?), line (\d+)\n.+: (.+))");
   std::smatch matches;
   if (std::regex_search(errorStr, matches, errorRegex))
   {
-    std::string pFileName = matches[1].str();
-    std::string pLineNumber = matches[2].str();
-    std::string pErrorString = matches[3].str();
+    err.parsed = true;
+    err.fileName = matches[1].str();
+    err.lineNumber = matches[2].str();
+    err.errorString = matches[3].str();
 
-    std::cout << "Parsed error\n    file name : \"" << pFileName << "\"\n    line number : \""
-              << pLineNumber << "\"\n    error string : \"" << pErrorString << "\"\n";
-
-    return {
-      .parsed = true, .fileName = pFileName, .lineNumber = pLineNumber, .errorString = pErrorString
-    };
+    std::cout << "Parsed error\n    file name : \"" << err.fileName << "\"\n    line number : \""
+              << err.lineNumber << "\"\n    error string : \"" << err.errorString << "\"\n";
   }
-  return { .parsed = false };
+  return err;
 }
 
 void ErrorCallbackFunc(
