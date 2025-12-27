@@ -91,12 +91,16 @@ int TestF3DQuakeMDLParser(int vtkNotUsed(argc), char* argv[])
     (std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 
   // setup vectors
+  std::vector<uint8_t> testNoData;
+  std::vector<uint8_t> testNonmagicHeader;
+  std::vector<uint8_t> testNormalHeader;
+  std::vector<uint8_t> testMaxedHeader;
+  std::vector<uint8_t> testMinedHeader;
+
   // .mdl file with no data
-  std::vector<uint8_t> testNoData = {};
-  std::vector<uint8_t> testNonmagicHeader = {};
-  std::vector<uint8_t> testNormalHeader = {};
-  std::vector<uint8_t> testMaxedHeader = {};
-  std::vector<uint8_t> testMinedHeader = {};
+  {
+    testNoData = {};
+  }
 
   // .mdl file with only header (but incorrect magic number)
   {
