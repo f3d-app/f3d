@@ -74,7 +74,7 @@ Error ErrorCodeParser(const std::string& errorStr)
 }
 
 void ErrorCallbackFunc(
-  vtkObject* caller, long unsigned int vtkNotUsed(eventId), void* clientData, void* callData)
+  vtkObject*, long unsigned int vtkNotUsed(eventId), void* clientData, void* callData)
 {
   auto errors = static_cast<std::vector<Error>*>(clientData);
   errors->push_back(ErrorCodeParser(static_cast<char*>(callData)));
