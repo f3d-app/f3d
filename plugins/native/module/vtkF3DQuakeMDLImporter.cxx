@@ -141,7 +141,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   template<typename TYPE>
   static const TYPE* ReadFromVector(const std::vector<uint8_t>& buffer, size_t& offset)
   {
-    const TYPE* ptr = PeekFromVector<TYPE>(buffer, offset);
+    const TYPE* ptr = vtkInternals::PeekFromVector<TYPE>(buffer, offset);
     offset += sizeof(TYPE);
     return ptr;
   }
@@ -172,7 +172,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   {
     static constexpr auto mdl_simpleframe_t_fixed_size =
       sizeof(mdl_simpleframe_t) - sizeof(mdl_simpleframe_t::verts);
-    auto ptr = PeekFromVectorSimpleframe(buffer, offset, num_verts);
+    auto ptr = vtkInternals::PeekFromVectorSimpleframe(buffer, offset, num_verts);
     offset += mdl_simpleframe_t_fixed_size + num_verts * sizeof(mdl_simpleframe_t::verts[0]);
     return ptr;
   }
