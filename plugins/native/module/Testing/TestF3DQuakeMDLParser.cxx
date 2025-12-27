@@ -35,7 +35,7 @@ struct mdl_header_t
 
 // Buffer typecasting helper
 template<typename TYPE>
-static TYPE* PeekFromVector(std::vector<uint8_t>& buffer, const size_t& offset)
+static TYPE* PeekFromVector(const std::vector<uint8_t>& buffer, const size_t& offset)
 {
   static_assert(std::is_pod<TYPE>::value, "Vector typecast requires POD input");
 
@@ -44,7 +44,7 @@ static TYPE* PeekFromVector(std::vector<uint8_t>& buffer, const size_t& offset)
     return nullptr;
   }
 
-  return reinterpret_cast<TYPE*>(buffer.data() + offset);
+  return reinterpret_cast<TYPE*>(const_cast<uint8_t*>(buffer.data() + offset));
 }
 
 struct Error
