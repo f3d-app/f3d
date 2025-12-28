@@ -112,15 +112,6 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     }
   };
 
-  class F3DMathError : public std::overflow_error
-  {
-  public:
-    explicit F3DMathError(const std::string& what = "")
-      : std::overflow_error(what)
-    {
-    }
-  };
-
   //----------------------------------------------------------------------------
   // Safer buffer typecasting of arbitrary buffer location
   template<typename TYPE>
@@ -187,44 +178,17 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   vtkSmartPointer<vtkTexture> CreateTexture(const std::vector<uint8_t>& buffer, size_t& offset,
     int skinWidth, int skinHeight, unsigned int nbSkins, unsigned int skinIndex)
   {
-    auto safe_mul = [](size_t a, size_t b) -> size_t
-    {
-      if (a != 0 && b > std::numeric_limits<size_t>::max() / a)
-      {
-        // overflow handling
-        throw F3DMathError("Multiplication overflow");
-      }
-      return a * b;
-    };
-
-    auto safe_add = [](size_t a, size_t b) -> size_t
-    {
-      if (a != 0 && a > std::numeric_limits<size_t>::max() - b)
-      {
-        // overflow handling
-        throw F3DMathError("Addition overflow");
-      }
-      return a + b;
-    };
-
     auto make_new_skin = [&](vtkNew<vtkImageData>& skin)
     {
       // check if all the data for this operation exists
-      try
+      uint64_t checkHeight = static_cast<uint64_t>(skinHeight) - 1;
+      uint64_t checkWidth = static_cast<uint64_t>(skinWidth) - 1;
+      uint64_t checkSize = static_cast<uint64_t>(offset) + (checkHeight * checkWidth);
+      if (skinHeight > 0 && skinWidth > 0 && (checkSize >= static_cast<uint64_t>(buffer.size())))
       {
-        size_t checkHeight = static_cast<size_t>(skinHeight) - 1;
-        size_t checkWidth = static_cast<size_t>(skinWidth) - 1;
-        if (skinHeight > 0 && skinWidth > 0 &&
-          safe_add(offset, safe_mul(checkHeight, checkWidth)) >= buffer.size())
-        {
-          throw F3DRangeError("Skin dimensions out of bounds of file size");
-        }
+        throw F3DRangeError("Skin dimensions out of bounds of file size");
       }
-      catch (const F3DMathError&)
-      {
-        // Catch safe math errors and rethrow range indexing error
-        throw F3DRangeError("Skin dimensions out of bounds of size_t");
-      }
+
       skin->SetDimensions(skinWidth, skinHeight, 1);
       skin->AllocateScalars(VTK_UNSIGNED_CHAR, 3);
       for (int x = 0; x < skinHeight; ++x)
