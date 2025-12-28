@@ -6,8 +6,8 @@
  * https://book.leveldesignbook.com/appendix/resources/formats/mdl It reads vertices, normals and
  * texture coordinate data from .mdl files. Supports animations.
  *
- * This reader expects a header IDPO of either 0x4F504449 ("IDPO") or 0x54534449 ("IDST")
- * This reader expects a header version of exactly 6
+ * This reader expects a header "indent" value of either 0x4F504449 ("IDPO") or 0x54534449 ("IDST")
+ * This reader expects a header "version" value of exactly 6
  */
 
 #ifndef vtkF3DQuakeMDLImporter_h
