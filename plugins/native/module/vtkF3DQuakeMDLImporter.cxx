@@ -576,21 +576,21 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     }
     catch (const F3DRangeError&)
     {
-      vtkErrorWithObjectMacro(this->Parent, "Unable to read header, aborting.");
+      vtkErrorWithObjectMacro(this->Parent, "Invalid MDL file");
       return false;
     }
 
     // Check magic number for "IPDO" or "IDST"
     if (!(header->IDPO == 1330660425 || header->IDPO == 1414743113))
     {
-      vtkErrorWithObjectMacro(this->Parent, "Header Magic number incorrect, aborting.");
+      vtkErrorWithObjectMacro(this->Parent, "Incompatible MDL header");
       return false;
     }
 
     // Check version for v6 exactly
     if (header->version != 6)
     {
-      vtkErrorWithObjectMacro(this->Parent, "Unsupported MDL version");
+      vtkErrorWithObjectMacro(this->Parent, "Unsupported MDL version. Only version 6 is supported");
       return false;
     }
 

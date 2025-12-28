@@ -168,7 +168,7 @@ int TestF3DQuakeMDLParser(int vtkNotUsed(argc), char* argv[])
 
     importer->Update();
 
-    if (errors.size() != 1 || errors[0].errorString != "Unable to read header, aborting.")
+    if (errors.size() != 1 || errors[0].errorString != "Invalid MDL file")
     {
       std::cerr << "Test \"" << testName << "\" failed\n";
       return EXIT_FAILURE;
@@ -192,7 +192,7 @@ int TestF3DQuakeMDLParser(int vtkNotUsed(argc), char* argv[])
 
     importer->Update();
 
-    if (errors.size() != 1 || errors[0].errorString != "Header Magic number incorrect, aborting.")
+    if (errors.size() != 1 || errors[0].errorString != "Incompatible MDL header")
     {
       std::cerr << "Test \"" << testName << "\" failed\n";
       return EXIT_FAILURE;
