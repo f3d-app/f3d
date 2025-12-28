@@ -16,7 +16,7 @@
 // Header definition : cloned from plugins/native/module/vtkF3DQuakeMDLImporter.cxx
 struct mdl_header_t
 {
-  int indent;
+  int ident;
   int version;
   float scale[3];
   float translation[3];
@@ -105,7 +105,7 @@ int TestF3DQuakeMDLParser(int vtkNotUsed(argc), char* argv[])
     testNonmagicHeader = defaultFile;
     // modify header
     auto header = PeekFromVector<mdl_header_t>(testNonmagicHeader, 0);
-    header->indent = 0;
+    header->ident = 0;
   }
 
   // .mdl file with only header (correct magic number, but no body data)

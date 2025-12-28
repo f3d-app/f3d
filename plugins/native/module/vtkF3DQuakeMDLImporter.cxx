@@ -29,7 +29,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   // Header definition
   struct mdl_header_t
   {
-    int indent;
+    int ident;
     int version;
     float scale[3];
     float translation[3];
@@ -581,7 +581,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     }
 
     // Check magic number for "IPDO" or "IDST"
-    if (!(header->indent == 0x4F504449 || header->indent == 0x54534449))
+    if (!(header->ident == 0x4F504449 || header->ident == 0x54534449))
     {
       vtkErrorWithObjectMacro(this->Parent, "Incompatible MDL header");
       return false;
