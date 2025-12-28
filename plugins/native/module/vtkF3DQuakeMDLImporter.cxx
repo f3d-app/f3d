@@ -581,7 +581,7 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     }
 
     // Check magic number for "IPDO" or "IDST"
-    if (!(header->IDPO == 1330660425 || header->IDPO == 1414743113))
+    if (!(header->IDPO == 0x4F504449 || header->IDPO == 0x54534449))
     {
       vtkErrorWithObjectMacro(this->Parent, "Incompatible MDL header");
       return false;
