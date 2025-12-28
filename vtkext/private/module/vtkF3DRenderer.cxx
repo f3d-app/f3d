@@ -706,6 +706,7 @@ void vtkF3DRenderer::SetAxisXColor(const std::vector<double>& color){
         color[0],color[1],color[2]);
     }
   #endif
+  this->GridMapper->SetAxis1Color((color[0]), (color[1]), (color[2]), 1);
 }
 
 
@@ -794,14 +795,14 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
              << "]\n\n";
       this->GridInfo = stream.str();
 
-      vtkNew<vtkF3DOpenGLGridMapper> gridMapper;
-      gridMapper->SetFadeDistance(diag);
-      gridMapper->SetUnitSquare(tmpUnitSquare);
-      gridMapper->SetSubdivisions(this->GridSubdivisions);
+      
+      this->GridMapper->SetFadeDistance(diag);
+      this->GridMapper->SetUnitSquare(tmpUnitSquare);
+      this->GridMapper->SetSubdivisions(this->GridSubdivisions);
 
       if (this->GridAbsolute)
       {
-        gridMapper->SetOriginOffset(-center[0], -center[1], -center[2]);
+        this->GridMapper->SetOriginOffset(-center[0], -center[1], -center[2]);
       }
 
       double orientation[3];
@@ -839,7 +840,7 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
         (colorX[2] * fX2 + colorY[2] * fY2 + colorZ[2] * fZ2) / f2, 1);
 
       this->GridActor->ForceTranslucentOn();
-      this->GridActor->SetMapper(gridMapper);
+      this->GridActor->SetMapper(this->GridMapper);
       this->GridActor->UseBoundsOff();
       this->GridActor->PickableOff();
       this->GridConfigured = true;
