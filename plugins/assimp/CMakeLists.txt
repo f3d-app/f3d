@@ -30,6 +30,7 @@ f3d_plugin_declare_reader(
   MIMETYPES application/vnd.fbx
   VTK_IMPORTER vtkF3DAssimpImporter
   FORMAT_DESCRIPTION "Filmbox"
+  SUPPORTS_STREAM
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/fbx.inl"
 )
 
@@ -39,6 +40,7 @@ f3d_plugin_declare_reader(
   MIMETYPES application/vnd.dae
   VTK_IMPORTER vtkF3DAssimpImporter
   FORMAT_DESCRIPTION "COLLADA"
+  SUPPORTS_STREAM
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/collada.inl"
 )
 
@@ -48,6 +50,7 @@ f3d_plugin_declare_reader(
   MIMETYPES image/vnd.dxf
   VTK_IMPORTER vtkF3DAssimpImporter
   FORMAT_DESCRIPTION "AutoCAD DXF"
+  SUPPORTS_STREAM
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/dxf.inl"
 )
 
@@ -57,6 +60,7 @@ f3d_plugin_declare_reader(
   MIMETYPES application/vnd.off
   VTK_IMPORTER vtkF3DAssimpImporter
   FORMAT_DESCRIPTION "Object File Format"
+  SUPPORTS_STREAM
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/off.inl"
 )
 
@@ -66,6 +70,7 @@ f3d_plugin_declare_reader(
   MIMETYPES application/vnd.x
   VTK_IMPORTER vtkF3DAssimpImporter
   FORMAT_DESCRIPTION "DirectX File Format"
+  SUPPORTS_STREAM
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/x.inl"
 )
 
@@ -75,6 +80,7 @@ f3d_plugin_declare_reader(
   MIMETYPES model/3mf
   VTK_IMPORTER vtkF3DAssimpImporter
   FORMAT_DESCRIPTION "3D Manufacturing Format"
+  SUPPORTS_STREAM
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/3mf.inl"
 )
 

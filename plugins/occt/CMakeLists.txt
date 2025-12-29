@@ -62,6 +62,7 @@ f3d_plugin_declare_reader(
   MIMETYPES application/vnd.step
   VTK_READER vtkF3DOCCTReader
   FORMAT_DESCRIPTION "STEP ISO 10303"
+  SUPPORTS_STREAM
   CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/STEP.inl"
   OPTIONS linear_deflection angular_deflection read_wire relative_deflection
 )
@@ -72,6 +73,7 @@ f3d_plugin_declare_reader(
   MIMETYPES model/iges
   VTK_READER vtkF3DOCCTReader
   FORMAT_DESCRIPTION "Initial Graphics Exchange Specification"
+  SUPPORTS_STREAM
   CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/IGES.inl"
   OPTIONS linear_deflection angular_deflection read_wire relative_deflection
 )
@@ -82,6 +84,7 @@ f3d_plugin_declare_reader(
   MIMETYPES application/vnd.brep
   VTK_READER vtkF3DOCCTReader
   FORMAT_DESCRIPTION "Open CASCADE BRep"
+  SUPPORTS_STREAM
   CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/BREP.inl"
   OPTIONS linear_deflection angular_deflection read_wire relative_deflection
 )
@@ -93,6 +96,7 @@ if (F3D_PLUGIN_OCCT_COLORING_SUPPORT)
     MIMETYPES application/vnd.xbf
     VTK_READER vtkF3DOCCTReader
     FORMAT_DESCRIPTION "Open CASCADE XBF"
+    SUPPORTS_STREAM
     CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/XBF.inl"
     OPTIONS linear_deflection angular_deflection read_wire relative_deflection
   )
