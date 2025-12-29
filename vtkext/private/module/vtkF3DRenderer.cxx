@@ -2969,6 +2969,7 @@ bool vtkF3DRenderer::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vt
   vtkPiecewiseFunction* otf = volume->GetProperty()->GetScalarOpacity();
   if (!opacityTransferFunctionConfigured)
   {
+    otf->RemoveAllPoints();
     vtkF3DRenderer::ConfigureOpacityTransferFunction(otf, range, opacityMap, inverseOpacityFlag);
     opacityTransferFunctionConfigured = true;
   }
@@ -3005,7 +3006,7 @@ void vtkF3DRenderer::ConfigureOpacityTransferFunction(vtkPiecewiseFunction* otf,
     for (size_t i = 0; i + 1 < opacityMap.size(); i += 2)
     {
       double value = inverseOpacityFlag ? 1.0 - opacityMap[i + 1] : opacityMap[i + 1];
-      otf->AddPoint(range[0] + opacityMap[i] * (range[1] - range[0]), value);
+      otf->AddPoint(range[0] + (range[1] - range[0]) * opacityMap[i], value);
     }
   }
 }
