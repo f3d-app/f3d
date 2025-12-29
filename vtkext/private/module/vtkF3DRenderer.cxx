@@ -597,6 +597,7 @@ void vtkF3DRenderer::ShowAxis(bool show)
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251001)
     this->ModernAxisWidget = nullptr;
     this->ModernAxisRepresentation = nullptr;
+    this->AxesActorConfigured = false;
 #else
     this->AxisWidget = nullptr;
 #endif
