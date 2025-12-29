@@ -248,6 +248,12 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
       log::debug("An empty file to load was provided\n");
       continue;
     }
+    if (filePath.empty())
+    {
+      log::debug("An empty file to load was provided\n");
+      continue;
+    }
+
     if (!vtksys::SystemTools::FileExists(filePath.string(), true))
     {
       throw scene::load_failure_exception(filePath.string() + " does not exists");
