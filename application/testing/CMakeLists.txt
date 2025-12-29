@@ -564,11 +564,11 @@ f3d_test(NAME TestInteractionAnimationFrameRate DATA f3d.glb ARGS --animation-pr
 f3d_test(NAME TestInteractionAnimationCameraMovement DATA CameraAnimated.glb ARGS --camera-index=0 --animation-progress INTERACTION)#Space;MouseMovement;Space;
 f3d_test(NAME TestInteractionAnimationInvert DATA f3d.glb ARGS --animation-speed-factor=-1 --animation-progress INTERACTION)#Space;Wait;Space;
 f3d_test(NAME TestInteractionAnimationBackward DATA f3d.glb ARGS --animation-progress INTERACTION)#Ctrl+Shift+Space;Wait;Space;
-f3d_test(NAME TestInteractionAnimationJumpToPreviousFrame DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5 --animation-progress CONFIG ${F3D_SOURCE_DIR}/testing/configs/animation_jump.json INTERACTION)#Shift+Space;
-f3d_test(NAME TestInteractionAnimationJumpToNextFrame DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress CONFIG ${F3D_SOURCE_DIR}/testing/configs/animation_jump.json INTERACTION)#Ctrl+Space;#Ctrl+Space;#Ctrl+Space;
-f3d_test(NAME TestInteractionAnimationJumpToFirstFrame DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5 --animation-progress CONFIG ${F3D_SOURCE_DIR}/testing/configs/animation_jump.json INTERACTION)#Ctrl+Shift+F
-f3d_test(NAME TestInteractionAnimationJumpToLastFrame DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5 --animation-progress CONFIG ${F3D_SOURCE_DIR}/testing/configs/animation_jump.json INTERACTION)#Ctrl+Shift+L
-f3d_test(NAME TestInteractionAnimationJumpToMiddleFrame DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5 --animation-progress CONFIG ${F3D_SOURCE_DIR}/testing/configs/animation_jump.json INTERACTION)#Ctrl+Shift+M
+f3d_test(NAME TestCommandScriptJumpToPreviousFrame DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5 --animation-progress SCRIPT TestCommandScriptJumpToPreviousFrame.txt)
+f3d_test(NAME TestCommandScriptJumpToNextFrame DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress SCRIPT TestCommandScriptJumpToNextFrame.txt)
+f3d_test(NAME TestCommandScriptJumpToFirstFrame DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5 --animation-progress SCRIPT TestCommandScriptJumpToFirstFrame.txt)
+f3d_test(NAME TestCommandScriptJumpToLastFrame DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5 --animation-progress SCRIPT TestCommandScriptJumpToLastFrame.txt)
+f3d_test(NAME TestCommandScriptJumpToMiddleFrame DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5 --animation-progress SCRIPT TestCommandScriptJumpToMiddleFrame.txt)
 
 # Test temporal anti-aliasing
 f3d_test(NAME TestInteractionTAA DATA suzanne.ply ARGS --anti-aliasing=taa INTERACTION) #Render;Render...
