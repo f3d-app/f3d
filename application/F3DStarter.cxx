@@ -59,6 +59,8 @@ namespace fs = std::filesystem;
 // This pointer is used to retrieve the interactor in case an OS signal is handled
 f3d::interactor* GlobalInteractor = nullptr;
 
+const std::string F3D_PIPED = "-";
+
 class F3DStarter::F3DInternals
 {
 public:
@@ -723,7 +725,7 @@ public:
     this->UpdateTypedAppOptions(appOptions);
 
     // Update Verbose level as soon as possible
-    F3DInternals::SetVerboseLevel(this->AppOptions.VerboseLevel, this->AppOptions.Output == "-");
+    F3DInternals::SetVerboseLevel(this->AppOptions.VerboseLevel, this->AppOptions.Output == F3D_PIPED);
 
     // Load any new plugins
     F3DPluginsTools::LoadPlugins(this->AppOptions.Plugins);
@@ -1010,6 +1012,7 @@ public:
   std::vector<fs::path> LoadedFiles;
   std::set<fs::path> FilesToWatch;
   int CurrentFilesGroupIndex = -1;
+  std::vector<char> PipedBuffer;
 
 #if F3D_MODULE_DMON
   // dmon related
@@ -1088,7 +1091,7 @@ int F3DStarter::Start(int argc, char** argv)
     std::string localOutput;
     // XXX: Discarding bool return because this cannot return false with a string
     F3DOptionsTools::Parse(iter->second, localOutput);
-    renderToStdout = localOutput == "-";
+    renderToStdout = localOutput == F3D_PIPED;
   }
 
   this->Internals->AppOptions.VerboseLevel = "info";
@@ -1222,8 +1225,14 @@ int F3DStarter::Start(int argc, char** argv)
   // Add all input files
   for (auto& file : inputFiles)
   {
-    this->AddFile(f3d::utils::collapsePath(file));
+    this->AddFile(file == F3D_PIPED ? fs::path(file) : f3d::utils::collapsePath(file));
   }
+
+  // TODO CROSS PLATFORM AND C++
+/*  if(!isatty(fileno(stdin)))
+  {
+    this->AddFile(F3D_PIPED);
+  }*/
 
   // Load a file
   this->LoadFileGroup();
@@ -1668,6 +1677,12 @@ void F3DStarter::LoadFileGroupInternal(
 
           try
           {
+            if (tmpPath == F3D_PIPED)
+            {
+              localPaths.emplace_back(tmpPath);
+              continue;
+            }
+
             if (!fs::exists(tmpPath))
             {
               f3d::log::error(tmpPath.string(), " does not exist");
@@ -1712,27 +1727,41 @@ void F3DStarter::LoadFileGroupInternal(
 
       if (!localPaths.empty())
       {
-        // Add files to the scene
-       // scene.add(localPaths);
-
-        /*
-        constexpr size_t readLength = 10000024;
-        std::vector<char> buffer;
-        std::size_t cnt = 0;
-        std::size_t readSize = 0;
-        if(!isatty(fileno(stdin)))
+        auto cinIt = std::find(localPaths.begin(), localPaths.end(), F3D_PIPED);
+        if (cinIt != localPaths.end())
         {
-          while(std::cin) {
-            buffer.resize(readLength*(cnt+1)); // TODO smarter
-            std::cin.read(buffer.data() + readLength * cnt, readLength);
-            cnt++;
-            readSize += std::cin.gcount();
-          }
-        }
-        buffer.resize(readSize);
-        scene.add(buffer.data(), buffer.size());*/
+          // Remove cin from path
+          localPaths.erase(cinIt);
 
-        scene.add(std::cin);
+          if (this->Internals->PipedBuffer.empty())
+          {
+            // Read cin into a buffer
+            this->Internals->PipedBuffer.clear();
+            constexpr size_t readLength = 1024;
+            std::size_t cnt = 0;
+            std::size_t readSize = 0;
+
+            // this can make f3d hang
+            while(std::cin) {
+              this->Internals->PipedBuffer.resize(readLength*(cnt+1)); // TODO smarter
+              std::cin.read(this->Internals->PipedBuffer.data() + readLength * cnt, readLength);
+              cnt++;
+              readSize += std::cin.gcount();
+            }
+
+            this->Internals->PipedBuffer.resize(readSize);
+          }
+
+          // Add buffer to the scene
+          scene.add(this->Internals->PipedBuffer.data(), this->Internals->PipedBuffer.size());
+          this->Internals->LoadedFiles.emplace_back(F3D_PIPED);
+        }
+
+        if (!localPaths.empty())
+        {
+          // Add files to the scene
+          scene.add(localPaths);
+        }
 
         if (this->Internals->AppOptions.AnimationTime.has_value())
         {
@@ -1904,7 +1933,15 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
 {
   try
   {
-    auto tmpPath = fs::absolute(path);
+    fs::path tmpPath;
+    if (path == F3D_PIPED)
+    {
+      tmpPath = path;
+    }
+    else
+    {
+      tmpPath = fs::absolute(path);
+    }
 
     // If file is a directory, add files recursively
     if (fs::is_directory(tmpPath))
