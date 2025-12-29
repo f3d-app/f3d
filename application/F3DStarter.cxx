@@ -1715,6 +1715,7 @@ void F3DStarter::LoadFileGroupInternal(
         // Add files to the scene
        // scene.add(localPaths);
 
+        /*
         constexpr size_t readLength = 10000024;
         std::vector<char> buffer;
         std::size_t cnt = 0;
@@ -1729,7 +1730,9 @@ void F3DStarter::LoadFileGroupInternal(
           }
         }
         buffer.resize(readSize);
-        scene.add(buffer.data(), buffer.size());
+        scene.add(buffer.data(), buffer.size());*/
+
+        scene.add(std::cin);
 
         if (this->Internals->AppOptions.AnimationTime.has_value())
         {

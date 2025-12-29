@@ -66,6 +66,7 @@ public:
    * Add and load provided buffer into the scene
    */
   virtual scene& add(void* buffer, std::size_t size) = 0;
+  virtual scene& add(std::istream& is) = 0;
 
   ///@{
   /**
