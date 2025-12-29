@@ -672,7 +672,7 @@ public:
   std::atomic<bool> RenderRequested = false;
   std::atomic<bool> StopRequested = false;
 
-  double CallbackDeltaTime = 0.033; /* Default DeltaTime (1/30fps) */
+  double CallbackDeltaTime = 1.0 / 30; /* Default DeltaTime (30fps) */
 };
 
 //----------------------------------------------------------------------------
