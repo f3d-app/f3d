@@ -1973,15 +1973,15 @@ void vtkF3DRenderer::UpdateActors()
     this->ConfigureRenderPasses();
   }
 
+  if (!this->AxesActorConfigured && this->ModernAxisRepresentation)
+  {
+    this->ConfigureAxesActor();
+  }
+
   // Grid need all actors setup to be configured correctly
   if (!this->GridConfigured)
   {
     this->ConfigureGridUsingCurrentActors();
-  }
-
-  if (!this->AxesActorConfigured && this->ModernAxisRepresentation)
-  {
-    this->ConfigureAxesActor();
   }
 }
 
