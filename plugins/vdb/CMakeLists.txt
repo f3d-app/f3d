@@ -20,6 +20,7 @@ f3d_plugin_declare_reader(
   OPTIONS downsampling_factor
   VTK_READER vtkOpenVDBReader
   FORMAT_DESCRIPTION "VDB"
+  SUPPORTS_STREAM
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/vdb.inl"
 )
 

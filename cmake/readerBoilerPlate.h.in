@@ -94,6 +94,7 @@ public:
     return geomReader;
   }
 
+#if @F3D_READER_HAS_SUPPORTS_STREAM@
   /*
    * Create the geometry reader (VTK reader) for the given filename
    * The filename is collapsed as some VTK reader needs it to read reliably TODO add issue
@@ -111,6 +112,7 @@ public:
     return geomReader;
   }
 
+#endif
 #endif
 
 #if @F3D_READER_HAS_SCENE_READER@
@@ -137,6 +139,7 @@ public:
     return importer;
   }
 
+#if @F3D_READER_HAS_SUPPORTS_STREAM@
   /*
    * Create the scene reader (VTK importer) for the given filename
    * The filename is collapsed as some VTK reader needs it to read reliably TODO add issue
@@ -153,6 +156,7 @@ public:
 
     return importer;
   }
+#endif
 #endif
 
 #if @F3D_READER_HAS_CUSTOM_CODE@

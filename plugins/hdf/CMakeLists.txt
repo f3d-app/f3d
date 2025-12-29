@@ -14,21 +14,32 @@ endif()
 f3d_plugin_init()
 
 f3d_plugin_declare_reader(
-  NAME NetCDF
-  EXTENSIONS nc cdf ncdf
-  MIMETYPES application/netcdf application/x-netcdf
-  VTK_READER vtkNetCDFReader
-  FORMAT_DESCRIPTION "NetCDF"
-  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/netcdf.inl"
-)
-
-f3d_plugin_declare_reader(
   NAME VTKHDF
   SCORE 99
   EXTENSIONS vtkhdf
   MIMETYPES application/vnd.vtkhdf
   VTK_READER vtkHDFReader
+  SUPPORTS_STREAM
   FORMAT_DESCRIPTION "VTKHDF"
+)
+
+f3d_plugin_declare_reader(
+  NAME ExodusII
+  EXTENSIONS exo ex2 e g
+  MIMETYPES application/vnd.exodus
+  VTK_READER vtkExodusIIReader
+  FORMAT_DESCRIPTION "Exodus II"
+  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/exodus.inl"
+)
+
+f3d_plugin_declare_reader(
+  NAME NetCDF
+  EXTENSIONS nc cdf ncdf
+  MIMETYPES application/netcdf application/x-netcdf
+  VTK_READER vtkNetCDFReader
+  FORMAT_DESCRIPTION "NetCDF"
+  SUPPORTS_STREAM
+  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/netcdf.inl"
 )
 
 f3d_plugin_build(

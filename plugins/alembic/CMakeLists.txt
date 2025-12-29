@@ -23,6 +23,7 @@ f3d_plugin_declare_reader(
   MIMETYPES application/vnd.abc
   VTK_READER vtkF3DAlembicReader
   FORMAT_DESCRIPTION "Alembic"
+  SUPPORTS_STREAM
 )
 
 set(rpaths "")
