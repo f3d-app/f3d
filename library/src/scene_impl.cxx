@@ -22,6 +22,8 @@
 #include <vtkTimerLog.h>
 #include <vtkVersion.h>
 #include <vtksys/SystemTools.hxx>
+#include <vtkMemoryResourceStream.h>
+//#include <vtkStreambufResourceStream.h>
 
 #include <vector>
 
@@ -329,11 +331,14 @@ scene& scene_impl::add(void* buffer, std::size_t size)
     throw scene::load_failure_exception(*forceReader + " is not a valid force reader");
   }
 
-  vtkSmartPointer<vtkImporter> importer = reader->createSceneReader(buffer, size);
+  vtkNew<vtkMemoryResourceStream> stream;
+  stream->SetBuffer(buffer, size);
+
+  vtkSmartPointer<vtkImporter> importer = reader->createSceneReader(stream);
   if (!importer)
   {
     // XXX: F3D Plugin CMake logic ensure there is either a scene reader or a geometry reader
-    auto vtkReader = reader->createGeometryReader(buffer, size);
+    auto vtkReader = reader->createGeometryReader(stream);
     assert(vtkReader);
     vtkSmartPointer<vtkF3DGenericImporter> genericImporter =
       vtkSmartPointer<vtkF3DGenericImporter>::New();
@@ -345,6 +350,61 @@ scene& scene_impl::add(void* buffer, std::size_t size)
   this->Internals->Load({importer});
   return *this;
 }
+
+//----------------------------------------------------------------------------
+scene& scene_impl::add(std::istream& is)
+{
+  vtkSmartPointer<vtkImporter> importers;
+
+  std::optional<std::string> forceReader = this->Internals->Options.scene.force_reader;
+  // Recover the forced reader
+  const f3d::reader* reader = f3d::factory::instance()->getReader("", forceReader);
+  if (reader)
+  {
+    log::debug("Using forced reader ", (*forceReader), " for stream");
+  }
+  else
+  {
+    throw scene::load_failure_exception(*forceReader + " is not a valid force reader");
+  }
+
+/*  vtkNew<vtkStreambufResourceStream> stream;
+  stream->SetStream(is);*/
+  constexpr size_t readLength = 1024;
+  std::vector<char> buffer;
+  std::size_t cnt = 0;
+  std::size_t readSize = 0;
+  if(!isatty(fileno(stdin)))
+  {
+    while(is) {
+      buffer.resize(readLength*(cnt+1)); // TODO smarter
+      is.read(buffer.data() + readLength * cnt, readLength);
+      cnt++;
+      readSize += is.gcount();
+    }
+  }
+  buffer.resize(readSize);
+
+  vtkNew<vtkMemoryResourceStream> stream;
+  stream->SetBuffer(buffer.data(), readSize);
+
+  vtkSmartPointer<vtkImporter> importer = reader->createSceneReader(stream);
+  if (!importer)
+  {
+    // XXX: F3D Plugin CMake logic ensure there is either a scene reader or a geometry reader
+    auto vtkReader = reader->createGeometryReader(stream);
+    assert(vtkReader);
+    vtkSmartPointer<vtkF3DGenericImporter> genericImporter =
+      vtkSmartPointer<vtkF3DGenericImporter>::New();
+    genericImporter->SetInternalReader(vtkReader);
+    importer = genericImporter;
+  }
+
+  log::debug("\nLoading stream");
+  this->Internals->Load({importer});
+  return *this;
+}
+
 
 
 //----------------------------------------------------------------------------

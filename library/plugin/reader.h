@@ -106,7 +106,7 @@ public:
   /**
    * Create the geometry reader (VTK reader) for the given filename
    */
-  virtual vtkSmartPointer<vtkAlgorithm> createGeometryReader(void*, std::size_t) const
+  virtual vtkSmartPointer<vtkAlgorithm> createGeometryReader(vtkResourceStream*) const
   {
     return nullptr;
   }
@@ -138,7 +138,7 @@ public:
   /**
    * Create the scene reader (VTK importer) for the given filename
    */
-  virtual vtkSmartPointer<vtkImporter> createSceneReader(void*, std::size_t) const
+  virtual vtkSmartPointer<vtkImporter> createSceneReader(vtkResourceStream*) const
   {
     return nullptr;
   }
