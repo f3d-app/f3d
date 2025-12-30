@@ -3,6 +3,7 @@ NAME
 DESCRIPTION
   A VTK module for the OCCT plugin
 DEPENDS
+  VTK::IOCore
   VTK::CommonCore
   VTK::CommonExecutionModel
   VTK::FiltersGeneral

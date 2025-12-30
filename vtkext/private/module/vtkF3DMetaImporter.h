@@ -141,8 +141,8 @@ public:
   void EnableAnimation(vtkIdType animationIndex) override;
   void DisableAnimation(vtkIdType animationIndex) override;
   bool IsAnimationEnabled(vtkIdType animationIndex) override;
-  bool GetTemporalInformation(vtkIdType animationIndex, double frameRate, int& nbTimeSteps,
-    double timeRange[2], vtkDoubleArray* timeSteps) override;
+  bool GetTemporalInformation(vtkIdType animationIndex, double timeRange[2], int& nbTimeSteps,
+    vtkDoubleArray* timeSteps) override;
   ///@}
 
   ///@{

@@ -340,6 +340,12 @@ Set the color of grid lines.
 
 CLI: `--grid-color`.
 
+### `render.axes_grid` (_bool_, default: `false`)
+
+Show _axes grid_ in the scene.
+
+CLI: `--axes-grid`.
+
 ### `render.raytracing.enable` (_bool_, default: `false`)
 
 Enable _raytracing_. Requires the raytracing module to be enabled.

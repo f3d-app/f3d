@@ -14,6 +14,7 @@ class vtkAlgorithm;
 class vtkDataObject;
 class vtkImageData;
 class vtkMultiBlockDataSet;
+class vtkPartitionedDataSet;
 class vtkPartitionedDataSetCollection;
 class vtkPolyData;
 class vtkF3DGenericImporter : public vtkF3DImporter
@@ -84,16 +85,28 @@ public:
    * Framerate is ignored in this implementation.
    * Only timerange is defined in this implementation.
    */
-  bool GetTemporalInformation(vtkIdType animationIndex, double frameRate, int& nbTimeSteps,
-    double timeRange[2], vtkDoubleArray* timeSteps) override;
+  bool GetTemporalInformation(vtkIdType animationIndex, double timeRange[2], int& nbTimeSteps,
+    vtkDoubleArray* timeSteps) override;
 
   ///@{
   /**
-   * Direct access to generic importer specific datasets
+   * Direct access to generic importer specific datasets.
+   * Return data for the specified actor/block index.
    */
-  vtkPolyData* GetImportedPoints();
-  vtkImageData* GetImportedImage();
+  vtkPolyData* GetImportedPoints(vtkIdType actorIndex);
+  vtkImageData* GetImportedImage(vtkIdType actorIndex);
   ///@}
+
+  /**
+   * Get the name of a block by its actor index.
+   * Returns an empty string if the index is invalid.
+   */
+  std::string GetBlockName(vtkIdType actorIndex);
+
+  /**
+   * Get the number of blocks/actors created by this importer.
+   */
+  vtkIdType GetNumberOfBlocks();
 
 protected:
   vtkF3DGenericImporter();
@@ -117,6 +130,28 @@ protected:
 private:
   vtkF3DGenericImporter(const vtkF3DGenericImporter&) = delete;
   void operator=(const vtkF3DGenericImporter&) = delete;
+
+  /**
+   * Create an actor for a single dataset block
+   */
+  void CreateActorForBlock(vtkDataSet* block, vtkRenderer* ren, const std::string& blockName = "");
+
+  /**
+   * Import blocks from a vtkMultiBlockDataSet with proper name extraction
+   */
+  void ImportMultiBlock(
+    vtkMultiBlockDataSet* mb, vtkRenderer* ren, const std::string& parentName = "");
+
+  /**
+   * Import blocks from a vtkPartitionedDataSetCollection with proper name extraction
+   */
+  void ImportPartitionedDataSetCollection(vtkPartitionedDataSetCollection* pdc, vtkRenderer* ren);
+
+  /**
+   * Import blocks from a vtkPartitionedDataSet with proper name extraction
+   */
+  void ImportPartitionedDataSet(
+    vtkPartitionedDataSet* pds, vtkRenderer* ren, const std::string& pdsName = "");
 
   struct Internals;
   std::unique_ptr<Internals> Pimpl;

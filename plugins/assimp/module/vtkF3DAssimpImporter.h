@@ -88,8 +88,8 @@ public:
    * Get temporal information for the currently enabled animation.
    * Only defines timerange and ignore provided frameRate.
    */
-  bool GetTemporalInformation(vtkIdType animationIndex, double frameRate, int& nbTimeSteps,
-    double timeRange[2], vtkDoubleArray* timeSteps) override;
+  bool GetTemporalInformation(vtkIdType animationIndex, double timeRange[2], int& nbTimeSteps,
+    vtkDoubleArray* timeSteps) override;
 
   /**
    * Get the number of available cameras.

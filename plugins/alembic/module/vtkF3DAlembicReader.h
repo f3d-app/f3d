@@ -7,6 +7,8 @@
  * to build polygonal geometries. Vertex normals and texture
  * coordinates are not supported yet.
  *
+ * This reader supports reading streams.
+ *
  * @sa https://github.com/alembic/alembic/blob/master/README.txt
  *
  */
@@ -20,17 +22,28 @@
 
 #include <memory>
 
+class vtkResourceStream;
 class vtkF3DAlembicReader : public vtkPolyDataAlgorithm
 {
 public:
   static vtkF3DAlembicReader* New();
   vtkTypeMacro(vtkF3DAlembicReader, vtkPolyDataAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
 
   /**
    * Set the file name.
    */
   vtkSetMacro(FileName, std::string);
+
+  /**
+   * Specify stream to read from
+   * When both `Stream` and `Filename` are set, stream is used.
+   */
+  void SetStream(vtkResourceStream* stream);
+
+  /**
+   * Overridden to take into account mtime from the internal vtkResourceStream.
+   */
+  vtkMTimeType GetMTime() override;
 
 protected:
   vtkF3DAlembicReader();
@@ -39,11 +52,12 @@ protected:
   int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
-  std::string FileName;
-
 private:
   vtkF3DAlembicReader(const vtkF3DAlembicReader&) = delete;
   void operator=(const vtkF3DAlembicReader&) = delete;
+
+  vtkSmartPointer<vtkResourceStream> Stream;
+  std::string FileName;
 
   class vtkInternals;
   std::unique_ptr<vtkInternals> Internals;
