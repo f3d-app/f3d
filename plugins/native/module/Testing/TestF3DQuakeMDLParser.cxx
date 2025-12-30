@@ -180,7 +180,7 @@ int TestF3DQuakeMDLParser(int vtkNotUsed(argc), char* argv[])
     printf("size of data %lu\n", testOverflowSF.size());
   }
 
-  // .mdl file where the header indicates more verticies than can physcially be in the file
+  // .mdl file where the header indicates more vertices than can physically be in the file
   {
     // note : most of this data was setup and can be shared with the testOverflowSF
     testOverflowVerts = testOverflowSF;
