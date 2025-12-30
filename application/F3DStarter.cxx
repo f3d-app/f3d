@@ -1737,8 +1737,7 @@ void F3DStarter::LoadFileGroupInternal(
           {
             // Read cin into a buffer
             this->Internals->PipedBuffer.clear();
-            constexpr size_t readLength = 10000024;
-            std::size_t cnt = 0;
+            std::size_t readLength = 1024;
             std::size_t readSize = 0;
 
             // this can make f3d hang
@@ -1746,10 +1745,18 @@ void F3DStarter::LoadFileGroupInternal(
 //            std::ifstream is;
 //            is.open("/home/glow/dev/f3d/f3d/src/testing/data/f3d.glb");
             while(is) {
-              this->Internals->PipedBuffer.resize(readLength*(cnt+1)); // TODO smarter
-              is.read(this->Internals->PipedBuffer.data() + readLength * cnt, readLength);
-              cnt++;
+
+              // Increase size as needed
+              this->Internals->PipedBuffer.resize(this->Internals->PipedBuffer.size() + readLength);
+
+              // Read only what is needed
+              is.read(this->Internals->PipedBuffer.data() + readSize, readLength);
+
+              // Recover size of what was read
               readSize += is.gcount();
+
+              // Multiple size of read by 2 and start again
+              readLength*=2;
             }
 
             this->Internals->PipedBuffer.resize(readSize);
