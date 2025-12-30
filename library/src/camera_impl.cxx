@@ -106,45 +106,73 @@ void camera_impl::getFocalPoint(point3_t& foc) const
 }
 
 //----------------------------------------------------------------------------
-  void camera_impl::getPositionToFocalVector(double& dx, double& dy, double& dz) const
+  void camera_impl::getPositionToFocalVector(vector3_t& vec) const
 {
   point3_t pos, focal;
   this->getPosition(pos);
   this->getFocalPoint(focal);
 
-  dx = pos[0] - focal[0];
-  dy = pos[1] - focal[1];
-  dz = pos[2] - focal[2];
+  vtkMath::Subtract(pos.data(), focal.data(), vec.data());
 }
 
 //----------------------------------------------------------------------------
   double camera_impl::getWorldAzimuth() const
 {
-  double dx, dy, dz;
-  this->getPositionToFocalVector(dx, dy, dz);
+  vector3_t view;
+  this->getPositionToFocalVector(view);
+  vtkMath::Normalize(view.data());
 
-  return std::atan2(dy, dx) * 180.0 / vtkMath::Pi();
+  vtkRenderer* ren = this->Internals->VTKRenderer;
+  double* up = ren->GetEnvironmentUp();
+  double* right = ren->GetEnvironmentRight();
+
+  // Project view vector onto plane orthogonal to up
+  vector3_t projUp;
+  vtkMath::ProjectVector(view.data(), up, projUp.data());
+
+  vector3_t horizontal;
+  vtkMath::Subtract(view.data(), projUp.data(), horizontal.data());
+
+  static constexpr double EPS = 128 * std::numeric_limits<double>::epsilon();
+  if (vtkMath::Norm(horizontal.data()) < EPS)
+  {
+    return 0.0;
+  }
+
+  vtkMath::Normalize(horizontal.data());
+
+  // Signed angle between right and horizontal projection
+  vector3_t cross;
+  vtkMath::Cross(right, horizontal.data(), cross.data());
+  double sign = (vtkMath::Dot(cross.data(), up) >= 0.0) ? 1.0 : -1.0;
+
+  double angleRad = vtkMath::AngleBetweenVectors(right, horizontal.data());
+  return sign * vtkMath::DegreesFromRadians(angleRad);
 }
-
 
 //----------------------------------------------------------------------------
   double camera_impl::getWorldElevation() const
 {
-  double dx, dy, dz;
-  this->getPositionToFocalVector(dx, dy, dz);
+  vector3_t view;
+  this->getPositionToFocalVector(view);
+  vtkMath::Normalize(view.data());
 
-  const double horizontal = std::sqrt(dx * dx + dy * dy);
-  return std::atan2(dz, horizontal) * 180.0 / vtkMath::Pi();
+  vtkRenderer* ren = this->Internals->VTKRenderer;
+  double* up = ren->GetEnvironmentUp();
+
+  // Elevation is angle above the horizontal plane
+  double dot = vtkMath::Dot(view.data(), up);
+  dot = std::clamp(dot, -1.0, 1.0);
+
+  return vtkMath::DegreesFromRadians(std::asin(dot));
 }
-
 
 //----------------------------------------------------------------------------
   double camera_impl::getDistance() const
 {
-  double dx, dy, dz;
-  this->getPositionToFocalVector(dx, dy, dz);
-
-  return std::sqrt(dx * dx + dy * dy + dz * dz);
+  vector3_t v;
+  this->getPositionToFocalVector(v);
+  return vtkMath::Norm(v.data());
 }
 
 //----------------------------------------------------------------------------
