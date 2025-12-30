@@ -80,6 +80,8 @@ public:
     return true;
   }
 
+  using f3d::reader::createGeometryReader;
+
   /*
    * Create the geometry reader (VTK reader) for the given filename
    * The filename is collapsed as some VTK reader needs it to read reliably TODO add issue
@@ -122,6 +124,7 @@ public:
     return true;
   }
 
+  using f3d::reader::createSceneReader;
   /*
    * Create the scene reader (VTK importer) for the given filename
    * The filename is collapsed as some VTK reader needs it to read reliably TODO add issue
