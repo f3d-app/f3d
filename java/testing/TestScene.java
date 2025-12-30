@@ -1,6 +1,9 @@
 import app.f3d.F3D.*;
 
+import java.io.*;
+import java.lang.String;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class TestScene {
@@ -18,14 +21,21 @@ public class TestScene {
     }
   }
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws FileNotFoundException, IOException {
     Engine.autoloadPlugins();
+
+    String testDataPath = args.length > 0 ? args[0] : ".";
+    String world = testDataPath + "data/world.obj";
+    String logo = testDataPath +  "data/f3d.glb";
+    String sphere = testDataPath + "data/mb/recursive/mb_1_0.vtp";
 
     Engine engine = Engine.createNone();
     Scene scene = engine.getScene();
 
     scene.supports("test.obj");
 
+    scene.add(sphere);
+    scene.addAll(new ArrayList<>(Arrays.asList(world, logo)));
     scene.clear();
 
     float[] points = new float[] { 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.5f, 1.0f, 0.0f };
@@ -34,6 +44,15 @@ public class TestScene {
     Types.Mesh mesh = new Types.Mesh(points, new float[0], new float[0], faceSides, faceIndices);
 
     scene.addMesh(mesh);
+    scene.clear();
+
+    char[] array = new char[256];
+    FileReader input = new FileReader(testDataPath + "data/points.ply");
+    int size = input.read(array);
+    input.close();
+    Options options = engine.getOptions();
+    options.setAsString("scene.force_reader", "PLYReader");
+    scene.addBuffer(new String(array).getBytes(), size);
 
     scene.loadAnimationTime(0.5);
     scene.animationTimeRange();

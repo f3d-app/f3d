@@ -137,6 +137,7 @@ EMSCRIPTEN_BINDINGS(f3d)
   // TODO:
   // - add lights support
   // - add f3d::mesh_t support
+  // - add proper testing
   emscripten::class_<f3d::scene>("Scene")
     .function(
       "supports",
@@ -153,6 +154,14 @@ EMSCRIPTEN_BINDINGS(f3d)
         {
           return scene.add(arg.as<std::string>());
         }
+      },
+      emscripten::return_value_policy::reference())
+    .function(
+      "add",
+      +[](f3d::scene& scene, emscripten::val jsbuf) -> f3d::scene&
+      {
+        std::vector<char> data = emscripten::vecFromJSArray<char>(jsbuf);
+        return scene.add(data.data(), data.size());
       },
       emscripten::return_value_policy::reference())
     .function("clear", &f3d::scene::clear, emscripten::return_value_policy::reference())

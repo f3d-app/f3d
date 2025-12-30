@@ -193,6 +193,19 @@ int f3d_scene_add_mesh(f3d_scene_t* scene, const f3d_mesh_t* mesh)
 }
 
 //----------------------------------------------------------------------------
+int f3d_scene_add_buffer(f3d_scene_t* scene, void* buffer, size_t size)
+{
+  if (!scene || !buffer || size == 0)
+  {
+    return 0;
+  }
+
+  f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
+  cpp_scene->add(buffer, size);
+  return 1;
+}
+
+//----------------------------------------------------------------------------
 void f3d_scene_load_animation_time(f3d_scene_t* scene, double time_value)
 {
   if (!scene)
