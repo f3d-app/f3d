@@ -101,9 +101,6 @@ public:
    */
   vtkSmartPointer<vtkAlgorithm> createGeometryReader(vtkResourceStream* stream) const override
   {
-/*    vtkNew<vtkMemoryResourceStream> stream;
-    stream->SetBuffer(buffer, size);*/
-
     vtkNew<@F3D_READER_VTK_READER@> geomReader;
     geomReader->SetStream(stream);
 
@@ -146,9 +143,6 @@ public:
    */
   vtkSmartPointer<vtkImporter> createSceneReader(vtkResourceStream* stream) const override
   {
-/*    vtkNew<vtkMemoryResourceStream> stream;
-    stream->SetBuffer(buffer, size);*/
-
     vtkNew<@F3D_READER_VTK_IMPORTER@> importer;
     importer->SetStream(stream);
 
