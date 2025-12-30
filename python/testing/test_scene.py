@@ -88,6 +88,7 @@ def test_scene():
 
     assert img.compare(f3d.Image(reference_red_light)) < 0.05
 
+
 def test_scene_buffer():
     testing_dir = Path(__file__).parent.parent.parent / "testing"
     reference = Path(testing_dir) / "baselines/TestPythonSceneBuffer.png"

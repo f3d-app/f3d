@@ -255,7 +255,8 @@ extern "C"
     return self;
   }
 
-  JNIEXPORT jobject JAVA_BIND(Scene, addBuffer)(JNIEnv* env, jobject self, jbyteArray buffer, jint size)
+  JNIEXPORT jobject JAVA_BIND(Scene, addBuffer)(
+    JNIEnv* env, jobject self, jbyteArray buffer, jint size)
   {
     jbyte* bufferData = env->GetByteArrayElements(buffer, nullptr);
     if (!bufferData)

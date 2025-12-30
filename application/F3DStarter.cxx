@@ -725,7 +725,8 @@ public:
     this->UpdateTypedAppOptions(appOptions);
 
     // Update Verbose level as soon as possible
-    F3DInternals::SetVerboseLevel(this->AppOptions.VerboseLevel, this->AppOptions.Output == F3D_PIPED);
+    F3DInternals::SetVerboseLevel(
+      this->AppOptions.VerboseLevel, this->AppOptions.Output == F3D_PIPED);
 
     // Load any new plugins
     F3DPluginsTools::LoadPlugins(this->AppOptions.Plugins);
@@ -1636,7 +1637,7 @@ void F3DStarter::LoadFileGroupInternal(
     // as imperative options should override dynamic option even in that case
     this->Internals->UpdateOptions(
       { this->Internals->ConfigOptionsEntries, this->Internals->CLIOptionsEntries,
-      this->Internals->DynamicOptionsEntries, this->Internals->ImperativeConfigOptionsEntries },
+        this->Internals->DynamicOptionsEntries, this->Internals->ImperativeConfigOptionsEntries },
       { "" }, false);
     this->Internals->Engine->setOptions(this->Internals->LibOptions);
     f3d::log::debug("No files to load provided");
@@ -1650,7 +1651,7 @@ void F3DStarter::LoadFileGroupInternal(
     std::copy(paths.begin(), paths.end(), std::back_inserter(configPaths));
     this->Internals->UpdateOptions(
       { this->Internals->ConfigOptionsEntries, this->Internals->CLIOptionsEntries,
-      this->Internals->DynamicOptionsEntries, this->Internals->ImperativeConfigOptionsEntries },
+        this->Internals->DynamicOptionsEntries, this->Internals->ImperativeConfigOptionsEntries },
       configPaths, false);
     this->Internals->UpdateBindings(configPaths);
 
@@ -1660,7 +1661,7 @@ void F3DStarter::LoadFileGroupInternal(
     for (const fs::path& tmpPath : paths)
     {
       if (std::find(this->Internals->LoadedFiles.begin(), this->Internals->LoadedFiles.end(),
-                    tmpPath) == this->Internals->LoadedFiles.end())
+            tmpPath) == this->Internals->LoadedFiles.end())
       {
         // Always add files to the watch set
         if (this->Internals->AppOptions.Watch)
@@ -1686,7 +1687,7 @@ void F3DStarter::LoadFileGroupInternal(
             // Check the size of the file before loading it
             static constexpr int BYTES_IN_MIB = 1048576;
             if (this->Internals->AppOptions.MaxSize.has_value() &&
-                fs::file_size(tmpPath) >
+              fs::file_size(tmpPath) >
                 static_cast<std::uintmax_t>(
                   this->Internals->AppOptions.MaxSize.value() * BYTES_IN_MIB))
             {
@@ -1741,7 +1742,8 @@ void F3DStarter::LoadFileGroupInternal(
 
           // Read input stream into a buffer
           // this can make f3d hang until an input stream is provided
-          while(is) {
+          while (is)
+          {
 
             // Increase size as needed
             this->Internals->PipedBuffer.resize(this->Internals->PipedBuffer.size() + readLength);
@@ -1753,7 +1755,7 @@ void F3DStarter::LoadFileGroupInternal(
             readSize += is.gcount();
 
             // Multiple size of read by 2 and start again
-            readLength*=2;
+            readLength *= 2;
           }
 
           this->Internals->PipedBuffer.resize(readSize);
