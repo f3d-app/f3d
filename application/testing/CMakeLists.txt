@@ -9,9 +9,10 @@ function(f3d_test)
     list(APPEND F3D_TEST_ARGS "--no-config")
   endif()
 
+  set(_f3d_test_data)
   if (F3D_TEST_DATA)
     foreach(_single_data ${F3D_TEST_DATA})
-      list(APPEND F3D_TEST_DATA_ABSOLUTE "${F3D_SOURCE_DIR}/testing/data/${_single_data}")
+      list(APPEND _f3d_test_data "${F3D_SOURCE_DIR}/testing/data/${_single_data}")
     endforeach()
   endif()
 
@@ -71,12 +72,12 @@ function(f3d_test)
       NAME "f3d::${F3D_TEST_NAME}"
       COMMAND ${CMAKE_COMMAND} 
         -DF3D_EXE:FILEPATH=$<TARGET_FILE:f3d> 
-        -DF3D_PIPED_DATA=${F3D_TEST_DATA_ABSOLUTE}
+        -DF3D_PIPED_DATA=${_f3d_test_data}
         -DF3D_ARGS=${F3D_TEST_ARGS_JOINED} 
         -P ${CMAKE_CURRENT_SOURCE_DIR}/f3d_piped.cmake
         COMMAND_EXPAND_LISTS)
   else()
-    add_test(NAME "f3d::${F3D_TEST_NAME}" COMMAND $<TARGET_FILE:f3d> ${F3D_TEST_DATA_ABSOLUTE} ${F3D_TEST_ARGS} COMMAND_EXPAND_LISTS)
+    add_test(NAME "f3d::${F3D_TEST_NAME}" COMMAND $<TARGET_FILE:f3d> ${_f3d_test_data} ${F3D_TEST_ARGS} COMMAND_EXPAND_LISTS)
   endif()
 
   set(_timeout "30")
