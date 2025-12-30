@@ -340,9 +340,13 @@ scene& scene_impl::add(void* buffer, std::size_t size)
   vtkSmartPointer<vtkImporter> importer = reader->createSceneReader(stream);
   if (!importer)
   {
-    // XXX: F3D Plugin CMake logic ensure there is either a scene reader or a geometry reader
     auto vtkReader = reader->createGeometryReader(stream);
-    assert(vtkReader);
+
+    if (!vtkReader)
+    {
+      throw scene::load_failure_exception(*forceReader + " does not support reading streams");
+    }
+
     vtkSmartPointer<vtkF3DGenericImporter> genericImporter =
       vtkSmartPointer<vtkF3DGenericImporter>::New();
     genericImporter->SetInternalReader(vtkReader);
