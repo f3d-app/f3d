@@ -11,8 +11,9 @@
 #ifndef vtkF3DRenderer_h
 #define vtkF3DRenderer_h
 
-#include "vtkF3DMetaImporter.h"
+#include "F3DStyle.h"
 
+#include "vtkF3DMetaImporter.h"
 #include "vtkF3DUIActor.h"
 
 #include <vtkCallbackCommand.h>
@@ -670,9 +671,23 @@ private:
   int GridSubdivisions = 10;
   double GridColor[3] = { 0.0, 0.0, 0.0 };
 
-  double ColorAxisX[3];
-  double ColorAxisY[3];
-  double ColorAxisZ[3];
+  double ColorAxisX[3] = {
+    static_cast<double>(std::get<0>(F3DStyle::GetF3DRed())),
+    static_cast<double>(std::get<1>(F3DStyle::GetF3DRed())),
+    static_cast<double>(std::get<2>(F3DStyle::GetF3DRed()))
+  };
+
+  double ColorAxisY[3] = {
+    static_cast<double>(std::get<0>(F3DStyle::GetF3DGreen())),
+    static_cast<double>(std::get<1>(F3DStyle::GetF3DGreen())),
+    static_cast<double>(std::get<2>(F3DStyle::GetF3DGreen()))
+  };
+
+  double ColorAxisZ[3] = {
+    static_cast<double>(std::get<0>(F3DStyle::GetF3DBlue())),
+    static_cast<double>(std::get<1>(F3DStyle::GetF3DBlue())),
+    static_cast<double>(std::get<2>(F3DStyle::GetF3DBlue()))
+  };
 
   std::string HDRIFile;
   vtkSmartPointer<vtkImageReader2> HDRIReader;
