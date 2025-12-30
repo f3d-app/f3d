@@ -219,6 +219,33 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     return EXIT_FAILURE;
   }
 
+  // Test getters: azimuth / elevation / distance
+  cam.setPosition({ 0., -11., -1. });
+  cam.setFocalPoint({ 0., 0., -1. });
+  cam.setViewUp({ 1., 0., 0. });
+
+  double azimuth = cam.getWorldAzimuth();
+  double elevation = cam.getWorldElevation();
+  double distance = cam.getDistance();
+
+  if (!compareDouble(distance, 11.0))
+  {
+    std::cerr << "getDistance is not behaving as expected: " << distance << "\n";
+    return EXIT_FAILURE;
+  }
+
+  if (!compareDouble(azimuth, 90.0))
+  {
+    std::cerr << "getAzimuth is not behaving as expected: " << azimuth << "\n";
+    return EXIT_FAILURE;
+  }
+
+  if (!compareDouble(elevation, 0.0))
+  {
+    std::cerr << "getElevation is not behaving as expected: " << elevation << "\n";
+    return EXIT_FAILURE;
+  }
+
   // Test dolly
   cam.dolly(10);
   expectedPos = { 20.9, -11., -12. };
