@@ -1228,12 +1228,6 @@ int F3DStarter::Start(int argc, char** argv)
     this->AddFile(file == F3D_PIPED ? fs::path(file) : f3d::utils::collapsePath(file));
   }
 
-  // TODO CROSS PLATFORM AND C++
-/*  if(!isatty(fileno(stdin)))
-  {
-    this->AddFile(F3D_PIPED);
-  }*/
-
   // Load a file
   this->LoadFileGroup();
 
@@ -1623,177 +1617,187 @@ void F3DStarter::LoadFileGroupInternal(
   bool unsupported = false;
 
   std::vector<fs::path> localPaths;
-  try
-  {
+
 #if F3D_MODULE_DMON
-    // In the main thread, we only need to guard writing
-    const std::lock_guard<std::mutex> lock(this->Internals->FilesToWatchMutex);
+  // In the main thread, we only need to guard writing
+  const std::lock_guard<std::mutex> lock(this->Internals->FilesToWatchMutex);
 #endif
 
-    if (clear)
-    {
-      scene.clear();
-      this->Internals->LoadedFiles.clear();
-      this->Internals->FilesToWatch.clear();
-    }
+  if (clear)
+  {
+    scene.clear();
+    this->Internals->LoadedFiles.clear();
+    this->Internals->FilesToWatch.clear();
+  }
 
-    if (paths.empty())
-    {
-      // Update options even when there is no file
-      // as imperative options should override dynamic option even in that case
-      this->Internals->UpdateOptions(
-        { this->Internals->ConfigOptionsEntries, this->Internals->CLIOptionsEntries,
-          this->Internals->DynamicOptionsEntries, this->Internals->ImperativeConfigOptionsEntries },
-        { "" }, false);
-      this->Internals->Engine->setOptions(this->Internals->LibOptions);
-      f3d::log::debug("No files to load provided");
-    }
-    else
-    {
-      // Update app and libf3d options based on config entries, selecting block using the input file
-      // config < cli < dynamic
-      // Options must be updated before checking the supported files in order to load plugins
-      std::vector<fs::path> configPaths = this->Internals->LoadedFiles;
-      std::copy(paths.begin(), paths.end(), std::back_inserter(configPaths));
-      this->Internals->UpdateOptions(
-        { this->Internals->ConfigOptionsEntries, this->Internals->CLIOptionsEntries,
-          this->Internals->DynamicOptionsEntries, this->Internals->ImperativeConfigOptionsEntries },
-        configPaths, false);
-      this->Internals->UpdateBindings(configPaths);
+  if (paths.empty())
+  {
+    // Update options even when there is no file
+    // as imperative options should override dynamic option even in that case
+    this->Internals->UpdateOptions(
+      { this->Internals->ConfigOptionsEntries, this->Internals->CLIOptionsEntries,
+      this->Internals->DynamicOptionsEntries, this->Internals->ImperativeConfigOptionsEntries },
+      { "" }, false);
+    this->Internals->Engine->setOptions(this->Internals->LibOptions);
+    f3d::log::debug("No files to load provided");
+  }
+  else
+  {
+    // Update app and libf3d options based on config entries, selecting block using the input file
+    // config < cli < dynamic
+    // Options must be updated before checking the supported files in order to load plugins
+    std::vector<fs::path> configPaths = this->Internals->LoadedFiles;
+    std::copy(paths.begin(), paths.end(), std::back_inserter(configPaths));
+    this->Internals->UpdateOptions(
+      { this->Internals->ConfigOptionsEntries, this->Internals->CLIOptionsEntries,
+      this->Internals->DynamicOptionsEntries, this->Internals->ImperativeConfigOptionsEntries },
+      configPaths, false);
+    this->Internals->UpdateBindings(configPaths);
 
-      this->Internals->Engine->setOptions(this->Internals->LibOptions);
+    this->Internals->Engine->setOptions(this->Internals->LibOptions);
 
-      f3d::log::debug("Checking files:");
-      for (const fs::path& tmpPath : paths)
+    f3d::log::debug("Checking files:");
+    for (const fs::path& tmpPath : paths)
+    {
+      if (std::find(this->Internals->LoadedFiles.begin(), this->Internals->LoadedFiles.end(),
+                    tmpPath) == this->Internals->LoadedFiles.end())
       {
-        if (std::find(this->Internals->LoadedFiles.begin(), this->Internals->LoadedFiles.end(),
-              tmpPath) == this->Internals->LoadedFiles.end())
+        // Always add files to the watch set
+        if (this->Internals->AppOptions.Watch)
         {
-          // Always add files to the watch set
-          if (this->Internals->AppOptions.Watch)
+          this->Internals->FilesToWatch.insert(tmpPath);
+        }
+
+        try
+        {
+          if (tmpPath == F3D_PIPED)
           {
-            this->Internals->FilesToWatch.insert(tmpPath);
+            // When piping, skip any file check
+            localPaths.emplace_back(tmpPath);
+            continue;
           }
 
-          try
+          if (!fs::exists(tmpPath))
           {
-            if (tmpPath == F3D_PIPED)
-            {
-              localPaths.emplace_back(tmpPath);
-              continue;
-            }
-
-            if (!fs::exists(tmpPath))
-            {
-              f3d::log::error(tmpPath.string(), " does not exist");
-            }
-            else if (scene.supports(tmpPath))
-            {
-              // Check the size of the file before loading it
-              static constexpr int BYTES_IN_MIB = 1048576;
-              if (this->Internals->AppOptions.MaxSize.has_value() &&
+            f3d::log::error(tmpPath.string(), " does not exist");
+          }
+          else if (scene.supports(tmpPath))
+          {
+            // Check the size of the file before loading it
+            static constexpr int BYTES_IN_MIB = 1048576;
+            if (this->Internals->AppOptions.MaxSize.has_value() &&
                 fs::file_size(tmpPath) >
-                  static_cast<std::uintmax_t>(
-                    this->Internals->AppOptions.MaxSize.value() * BYTES_IN_MIB))
-              {
-                f3d::log::info(tmpPath.string(), " skipped, file is bigger than max size");
-              }
-              else
-              {
-                localPaths.emplace_back(tmpPath);
-              }
+                static_cast<std::uintmax_t>(
+                  this->Internals->AppOptions.MaxSize.value() * BYTES_IN_MIB))
+            {
+              f3d::log::info(tmpPath.string(), " skipped, file is bigger than max size");
             }
             else
             {
-              auto forceReader = this->Internals->LibOptions.scene.force_reader;
-              if (forceReader)
-              {
-                f3d::log::warn("Forced reader ", *forceReader, " doesn't exist");
-              }
-              else
-              {
-                f3d::log::warn(tmpPath.string(), " is not a file of a supported file format");
-              }
-              unsupported = true;
+              localPaths.emplace_back(tmpPath);
             }
           }
-          catch (const fs::filesystem_error& ex)
+          else
           {
-            // Unreachable
-            f3d::log::error("Error loading file: ", ex.what());
+            auto forceReader = this->Internals->LibOptions.scene.force_reader;
+            if (forceReader)
+            {
+              f3d::log::warn("Forced reader ", *forceReader, " doesn't exist");
+            }
+            else
+            {
+              f3d::log::warn(tmpPath.string(), " is not a file of a supported file format");
+            }
+            unsupported = true;
           }
+        }
+        catch (const fs::filesystem_error& ex)
+        {
+          // Unreachable
+          f3d::log::error("Error loading file: ", ex.what());
+        }
+      }
+    }
+
+    if (!localPaths.empty())
+    {
+      auto cinIt = std::find(localPaths.begin(), localPaths.end(), F3D_PIPED);
+      if (cinIt != localPaths.end())
+      {
+        // Remove cin from path
+        localPaths.erase(cinIt);
+
+        if (this->Internals->PipedBuffer.empty())
+        {
+          // Read cin into a buffer
+          this->Internals->PipedBuffer.clear();
+          std::size_t readLength = 1024;
+          std::size_t readSize = 0;
+
+          std::istream& is = std::cin;
+          // TODO useful for debugging with gdb
+          //            std::ifstream is;
+          //            is.open("/home/glow/dev/f3d/f3d/src/testing/data/f3d.glb");
+
+          // Read input stream into a buffer
+          // this can make f3d hang until an input stream is provided
+          while(is) {
+
+            // Increase size as needed
+            this->Internals->PipedBuffer.resize(this->Internals->PipedBuffer.size() + readLength);
+
+            // Read only what is needed
+            is.read(this->Internals->PipedBuffer.data() + readSize, readLength);
+
+            // Recover size of what was read
+            readSize += is.gcount();
+
+            // Multiple size of read by 2 and start again
+            readLength*=2;
+          }
+
+          this->Internals->PipedBuffer.resize(readSize);
+        }
+
+        try
+        {
+          // Add buffer to the scene
+          scene.add(this->Internals->PipedBuffer.data(), this->Internals->PipedBuffer.size());
+          this->Internals->LoadedFiles.emplace_back(F3D_PIPED);
+        }
+        catch (const f3d::scene::load_failure_exception& ex)
+        {
+          f3d::log::error("Input stream could not be loaded: ", ex.what());
         }
       }
 
       if (!localPaths.empty())
       {
-        auto cinIt = std::find(localPaths.begin(), localPaths.end(), F3D_PIPED);
-        if (cinIt != localPaths.end())
-        {
-          // Remove cin from path
-          localPaths.erase(cinIt);
-
-          if (this->Internals->PipedBuffer.empty())
-          {
-            // Read cin into a buffer
-            this->Internals->PipedBuffer.clear();
-            std::size_t readLength = 1024;
-            std::size_t readSize = 0;
-
-            // this can make f3d hang
-            std::istream& is = std::cin;
-//            std::ifstream is;
-//            is.open("/home/glow/dev/f3d/f3d/src/testing/data/f3d.glb");
-
-            // Read input stream into a buffer
-            while(is) {
-
-              // Increase size as needed
-              this->Internals->PipedBuffer.resize(this->Internals->PipedBuffer.size() + readLength);
-
-              // Read only what is needed
-              is.read(this->Internals->PipedBuffer.data() + readSize, readLength);
-
-              // Recover size of what was read
-              readSize += is.gcount();
-
-              // Multiple size of read by 2 and start again
-              readLength*=2;
-            }
-
-            this->Internals->PipedBuffer.resize(readSize);
-          }
-
-          // Add buffer to the scene
-          scene.add(this->Internals->PipedBuffer.data(), this->Internals->PipedBuffer.size());
-          this->Internals->LoadedFiles.emplace_back(F3D_PIPED);
-        }
-
-        if (!localPaths.empty())
+        try
         {
           // Add files to the scene
           scene.add(localPaths);
-        }
 
-        if (this->Internals->AppOptions.AnimationTime.has_value())
+          if (this->Internals->AppOptions.AnimationTime.has_value())
+          {
+            f3d::log::debug(
+              "Loading animation time: ", this->Internals->AppOptions.AnimationTime.value());
+            scene.loadAnimationTime(this->Internals->AppOptions.AnimationTime.value());
+          }
+
+          // Update loaded files
+          std::copy(
+            localPaths.begin(), localPaths.end(), std::back_inserter(this->Internals->LoadedFiles));
+        }
+        catch (const f3d::scene::load_failure_exception& ex)
         {
-          f3d::log::debug(
-            "Loading animation time: ", this->Internals->AppOptions.AnimationTime.value());
-          scene.loadAnimationTime(this->Internals->AppOptions.AnimationTime.value());
+          f3d::log::error("Some of these files could not be loaded: ", ex.what());
+          for (const fs::path& tmpPath : localPaths)
+          {
+            f3d::log::error("  ", tmpPath.string());
+          }
         }
-
-        // Update loaded files
-        std::copy(
-          localPaths.begin(), localPaths.end(), std::back_inserter(this->Internals->LoadedFiles));
       }
-    }
-  }
-  catch (const f3d::scene::load_failure_exception& ex)
-  {
-    f3d::log::error("Some of these files could not be loaded: ", ex.what());
-    for (const fs::path& tmpPath : localPaths)
-    {
-      f3d::log::error("  ", tmpPath.string());
     }
   }
 
@@ -1948,6 +1952,7 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
     fs::path tmpPath;
     if (path == F3D_PIPED)
     {
+      // When piping, do not recover an absolute path
       tmpPath = path;
     }
     else
