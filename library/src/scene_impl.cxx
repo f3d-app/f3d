@@ -319,13 +319,19 @@ scene& scene_impl::add(void* buffer, std::size_t size)
 {
   if (buffer == nullptr)
   {
-    log::debug("No buffer to load a full scene provided\n");
+    log::warn("No buffer to load a full scene provided\n");
     return *this;
   }
 
   vtkSmartPointer<vtkImporter> importers;
 
   std::optional<std::string> forceReader = this->Internals->Options.scene.force_reader;
+  if (!forceReader)
+  {
+    log::error("No force reader set while trying to load a buffer from memory\n");
+    return *this;
+  }
+
   // Recover the forced reader
   const f3d::reader* reader = f3d::factory::instance()->getReader("", forceReader);
   if (reader)
