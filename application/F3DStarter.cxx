@@ -1744,6 +1744,8 @@ void F3DStarter::LoadFileGroupInternal(
             std::istream& is = std::cin;
 //            std::ifstream is;
 //            is.open("/home/glow/dev/f3d/f3d/src/testing/data/f3d.glb");
+
+            // Read input stream into a buffer
             while(is) {
 
               // Increase size as needed
