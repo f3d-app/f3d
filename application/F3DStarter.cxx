@@ -1737,7 +1737,7 @@ void F3DStarter::LoadFileGroupInternal(
           {
             // Read cin into a buffer
             this->Internals->PipedBuffer.clear();
-            constexpr size_t readLength = 1024;
+            constexpr size_t readLength = 10000024;
             std::size_t cnt = 0;
             std::size_t readSize = 0;
 

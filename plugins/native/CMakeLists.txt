@@ -228,6 +228,7 @@ f3d_plugin_declare_reader(
   VTK_READER vtkF3DPLYReader
   FORMAT_DESCRIPTION "Polygon"
   SUPPORTS_STREAM
+  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/ply.inl"
 )
 
 f3d_plugin_build(

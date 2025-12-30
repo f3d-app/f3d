@@ -1,7 +1,7 @@
 # F3D Testing
 function(f3d_test)
 
-  cmake_parse_arguments(F3D_TEST "TONE_MAPPING;LONG_TIMEOUT;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI" "NAME;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;SCRIPT;RENDERING_BACKEND;WORKING_DIR" "DATA;DEPENDS;ENV;ARGS" ${ARGN})
+  cmake_parse_arguments(F3D_TEST "TONE_MAPPING;LONG_TIMEOUT;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI;PIPED" "NAME;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;SCRIPT;RENDERING_BACKEND;WORKING_DIR" "DATA;DEPENDS;ENV;ARGS" ${ARGN})
 
   if(F3D_TEST_CONFIG)
     list(APPEND F3D_TEST_ARGS "--config=${F3D_TEST_CONFIG}")
@@ -11,7 +11,7 @@ function(f3d_test)
 
   if (F3D_TEST_DATA)
     foreach(_single_data ${F3D_TEST_DATA})
-      list(APPEND F3D_TEST_ARGS "${F3D_SOURCE_DIR}/testing/data/${_single_data}")
+      list(APPEND F3D_TEST_DATA_ABSOLUTE "${F3D_SOURCE_DIR}/testing/data/${_single_data}")
     endforeach()
   endif()
 
@@ -65,7 +65,19 @@ function(f3d_test)
     endif()
   endif()
 
-  add_test(NAME "f3d::${F3D_TEST_NAME}" COMMAND $<TARGET_FILE:f3d> ${F3D_TEST_ARGS} COMMAND_EXPAND_LISTS)
+  if (F3D_TEST_PIPED)
+    list(JOIN F3D_TEST_ARGS " " F3D_TEST_ARGS_JOINED)
+    add_test(
+      NAME "f3d::${F3D_TEST_NAME}"
+      COMMAND ${CMAKE_COMMAND} 
+        -DF3D_EXE:FILEPATH=$<TARGET_FILE:f3d> 
+        -DF3D_PIPED_DATA=${F3D_TEST_DATA_ABSOLUTE}
+        -DF3D_ARGS=${F3D_TEST_ARGS_JOINED} 
+        -P ${CMAKE_CURRENT_SOURCE_DIR}/f3d_piped.cmake
+        COMMAND_EXPAND_LISTS)
+  else()
+    add_test(NAME "f3d::${F3D_TEST_NAME}" COMMAND $<TARGET_FILE:f3d> ${F3D_TEST_DATA_ABSOLUTE} ${F3D_TEST_ARGS} COMMAND_EXPAND_LISTS)
+  endif()
 
   set(_timeout "30")
   if(F3D_TEST_LONG_TIMEOUT)
@@ -155,20 +167,32 @@ set (_outOfRangeDoubleStr "\
 ")
 
 f3d_test(NAME TestPLY DATA suzanne.ply)
+f3d_test(NAME TestPipedPLY DATA suzanne.ply ARGS --force-reader=PLYReader PIPED)
 f3d_test(NAME TestOBJ DATA world.obj)
+f3d_test(NAME TestPipedOBJ DATA world.obj ARGS --force-reader=OBJ PIPED) # MTL and Textures not loaded
 f3d_test(NAME TestSTL DATA suzanne.stl)
+f3d_test(NAME TestPipedSTL DATA suzanne.stl ARGS --force-reader=STL PIPED)
 f3d_test(NAME TestVTU DATA dragon.vtu)
+f3d_test(NAME TestPipedVTU DATA dragon.vtu ARGS --force-reader=VTKXMLVTU PIPED)
 f3d_test(NAME TestVTP DATA cow.vtp)
+f3d_test(NAME TestPipedVTP DATA cow.vtp ARGS --force-reader=VTKXMLVTP PIPED)
 f3d_test(NAME TestVTR DATA RectGrid2.vtr ARGS --scalar-coloring --roughness=1)
+f3d_test(NAME TestPipedVTR DATA RectGrid2.vtr ARGS --scalar-coloring --roughness=1 --force-reader=VTKXMLVTR PIPED)
 f3d_test(NAME TestVTS DATA bluntfin.vts)
+f3d_test(NAME TestPipedVTS DATA bluntfin.vts ARGS --force-reader=VTKXMLVTS PIPED)
 f3d_test(NAME TestVTM DATA mb.vtm)
 f3d_test(NAME TestVTK DATA cow.vtk)
+f3d_test(NAME TestPipedVTK DATA cow.vtk ARGS --force-reader=VTKLegacy PIPED)
 f3d_test(NAME TestNRRD DATA beach.nrrd ARGS -s)
 f3d_test(NAME TestVRMLImporter DATA bot2.wrl)
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20231102)
   f3d_test(NAME TestSPLAT DATA small.splat ARGS -osy --up=-Y --point-sprites-absolute-size --point-sprites-size=1)
+  f3d_test(NAME TestPipedSPLAT DATA small.splat ARGS -osy --up=-Y --point-sprites-absolute-size --point-sprites-size=1 --force-reader=Splat PIPED)
+  f3d_test(NAME TestSPZ DATA hornedlizard_small_d0.spz ARGS -sy --point-sprites-absolute-size --point-sprites-size=1)
+  f3d_test(NAME TestPipedSPZ DATA hornedlizard_small_d0.spz ARGS -sy --point-sprites-absolute-size --point-sprites-size=1 --force-reader=SPZ PIPED)
 endif()
 f3d_test(NAME TestQuakeMDL DATA zombie.mdl)
+f3d_test(NAME TestPipedQuakeMDL DATA zombie.mdl ARGS --force-reader=QuakeMDL PIPED)
 f3d_test(NAME TestQuakeMDLAnimationSimpleFrame DATA zombie.mdl ARGS --animation-time=0.5)
 f3d_test(NAME TestQuakeMDLAnimationBetween DATA zombie.mdl ARGS --animation-time=1.42)
 f3d_test(NAME TestQuakeMDLAnimationMulti DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5)
@@ -211,17 +235,22 @@ f3d_test(NAME TestPointCloudUG DATA pointsCloud.vtu ARGS -o --point-sprites-size
 f3d_test(NAME TestPointCloudVolume DATA bluntfin.vts ARGS -sob)
 f3d_test(NAME TestPointCloudDefaultScene DATA pointsCloud.vtp ARGS --point-size=20)
 f3d_test(NAME Test3DSImporter DATA iflamigm.3ds ARGS --up=+Z)
+f3d_test(NAME TestPiped3DSImporter DATA iflamigm.3ds ARGS --up=+Z --force-reader=3DS PIPED)
 f3d_test(NAME TestScalars DATA suzanne.ply ARGS -s --coloring-array=Normals --coloring-component=1)
 f3d_test(NAME TestScalarsCell DATA f3d.vtp ARGS --scalar-coloring --coloring-by-cells --coloring-component=-2 --up=+Z)
 f3d_test(NAME TestScalarsRange DATA suzanne.ply ARGS -s --coloring-array=Normals --coloring-component=1 --coloring-range=0,1)
 f3d_test(NAME TestScalarsWithBar DATA suzanne.ply ARGS -b -s --coloring-array=Normals --coloring-component=0)
 f3d_test(NAME TestScalarsWithBarContinuity DATA suzanne.ply ARGS -b -s --coloring-array=Normals --coloring-component=0)
 f3d_test(NAME TestGLTFImporter DATA f3d.glb)
+f3d_test(NAME TestPipedGLTFImporter DATA f3d.glb ARGS --force-reader=GLB PIPED)
 f3d_test(NAME TestGLTFImporterWithAnimation DATA BoxAnimated.gltf ARGS --animation-time=2 --animation-progress)
 f3d_test(NAME TestGLTFSkin DATA SimpleSkin.gltf)
+f3d_test(NAME TestPipedGLTFSkin DATA SimpleSkin.gltf ARGS --force-reader=GLTF PIPED)
 f3d_test(NAME TestDicom DATA IM-0001-1983.dcm ARGS --scalar-coloring --roughness=1)
+f3d_test(NAME TestPipedDicom DATA IM-0001-1983.dcm ARGS --scalar-coloring --roughness=1 --force-reader=DICOM PIPED)
 f3d_test(NAME TestMHD DATA HeadMRVolume.mhd ARGS --scalar-coloring --roughness=1)
 f3d_test(NAME TestVTICell DATA waveletMaterial.vti ARGS -s --coloring-array=Material -c --roughness=1)
+f3d_test(NAME TestPipedVTICell DATA waveletMaterial.vti ARGS -s --coloring-array=Material -c --roughness=1 --force-reader=VTKXMLVTI PIPED)
 f3d_test(NAME TestSSAO DATA suzanne.ply ARGS -q)
 f3d_test(NAME TestDepthPeeling DATA suzanne.ply ARGS -sp --opacity=0.9)
 f3d_test(NAME TestBackground DATA suzanne.ply ARGS --background-color=0.8,0.2,0.9 THRESHOLD 0.1) # Threshold is needed for legacy image comparison for VTK 9.3
@@ -234,7 +263,9 @@ f3d_test(NAME TestFilenameWhiteBg DATA suzanne.ply ARGS -n --background-color=1,
 f3d_test(NAME TestConsoleBadgeWarning DATA suzanne.ply ARGS --position=0 UI)
 f3d_test(NAME TestConsoleBadgeQuiet DATA suzanne.ply ARGS --position=0 --verbose=quiet UI)
 f3d_test(NAME TestCityGML DATA Part-4-Buildings-V4-one.gml)
+f3d_test(NAME TestPipedCityGML DATA Part-4-Buildings-V4-one.gml ARGS --force-reader=CityGML PIPED)
 f3d_test(NAME TestPTS DATA samplePTS.pts)
+f3d_test(NAME TestPipedPTS DATA samplePTS.pts ARGS --force-reader=PTS PIPED)
 f3d_test(NAME TestColormap DATA IM-0001-1983.dcm ARGS --scalar-coloring --roughness=1 --colormap=0,1,0,0,1,0,1,0)
 f3d_test(NAME TestOpacityMap DATA waveletArrays.vti ARGS -vb --coloring-array=Result --volume-opacity-map=0.0,0.0,0.5,1.0,1.0,0.0 THRESHOLD 0.05) # Small rendering differences when using VTK 9.3.0
 f3d_test(NAME TestOpacityMapFile DATA waveletArrays.vti ARGS -vb --coloring-array=Result --volume-opacity-file=${F3D_SOURCE_DIR}/testing/data/gaussian_opacity_map.png)
@@ -788,6 +819,7 @@ endif()
 
 if(F3D_PLUGIN_BUILD_ALEMBIC)
   f3d_test(NAME TestAlembic DATA suzanne.abc ARGS -s --load-plugins=alembic)
+  f3d_test(NAME TestPipedAlembic DATA suzanne.abc ARGS -s --load-plugins=alembic --force-reader=Alembic PIPED)
   f3d_test(NAME TestAlembicNonFaceVarying DATA tetrahedron_non_facevarying_uv.abc ARGS -s --load-plugins=alembic)
   f3d_test(NAME TestAlembicAnimation DATA drop.abc ARGS --animation-time=2 --load-plugins=alembic --animation-progress)
   f3d_test(NAME TestAlembicAnimationXForm DATA xform_anim.abc ARGS -g --animation-time=1.5 --load-plugins=alembic --animation-progress)
@@ -813,8 +845,11 @@ endif()
 
 if(F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME TestOFF DATA teapot.off ARGS --up=+Z --load-plugins=assimp)
+  f3d_test(NAME TestPipedOFF DATA teapot.off ARGS --up=+Z --load-plugins=assimp --force-reader=OFF PIPED)
   f3d_test(NAME Test3MF DATA cube_gears.3mf ARGS --load-plugins=assimp)
+  f3d_test(NAME TestPiped3MF DATA cube_gears.3mf ARGS --load-plugins=assimp --force-reader=3MF PIPED)
   f3d_test(NAME TestFBX DATA phong_cube.fbx ARGS --load-plugins=assimp)
+  f3d_test(NAME TestPipedFBX DATA phong_cube.fbx ARGS --load-plugins=assimp --force-reader=FBX PIPED)
   f3d_test(NAME TestFBX16bits DATA 16bit.fbx ARGS --load-plugins=assimp)
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
     f3d_test(NAME TestAssimpValidation DATA Wolf.fbx ARGS --load-plugins=assimp REGEXP "Some of these files could not be loaded" NO_BASELINE)
@@ -823,6 +858,7 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
 
   if(NOT APPLE OR VTK_VERSION VERSION_GREATER_EQUAL 9.3.0)
     f3d_test(NAME TestDXF DATA PinkEggFromLW.dxf ARGS --background-color=1,1,1 -p --load-plugins=assimp)
+    f3d_test(NAME TestPipedDXF DATA PinkEggFromLW.dxf ARGS --background-color=1,1,1 -p --load-plugins=assimp --force-reader=DXF PIPED)
   endif()
 
   f3d_test(NAME TestVerboseAssimp DATA duck.fbx ARGS --verbose --load-plugins=assimp NO_BASELINE REGEXP "LOD3sp")
@@ -830,7 +866,9 @@ if(F3D_PLUGIN_BUILD_ASSIMP)
   f3d_test(NAME TestAssimpAnimationNegativeIndex DATA animatedLights.fbx ARGS --load-plugins=assimp --animation-indices=-113 --animation-time=2 --animation-progress)
   f3d_test(NAME TestTGATextureFBX DATA duck.fbx ARGS --load-plugins=assimp)
   f3d_test(NAME TestDAE DATA duck.dae ARGS --load-plugins=assimp)
+  f3d_test(NAME TestPipedDAE DATA duck.dae ARGS --load-plugins=assimp --force-reader=COLLADA PIPED) # Texture not loaded
   f3d_test(NAME TestX DATA anim_test.x ARGS --load-plugins=assimp)
+  f3d_test(NAME TestPipedX DATA anim_test.x ARGS --load-plugins=assimp --force-reader=DirectX PIPED)
 
   # This test baseline is incorrect because of https://github.com/f3d-app/f3d/issues/603
   # It will need to be changed when fixed
@@ -881,6 +919,7 @@ endif()
 
 if(F3D_PLUGIN_BUILD_DRACO)
   f3d_test(NAME TestDRACO DATA suzanne.drc ARGS --load-plugins=draco)
+  f3d_test(NAME TestPipedDRACO DATA suzanne.drc ARGS --load-plugins=draco --force-reader=Draco PIPED)
   f3d_test(NAME TestDRACOColoring DATA suzanne.drc ARGS --scalar-coloring --coloring-component=0 --load-plugins=draco)
 
   # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10884
@@ -905,6 +944,7 @@ endif()
 if(F3D_PLUGIN_BUILD_HDF)
   if (VTK_VERSION VERSION_GREATER_EQUAL 9.3.0)
     f3d_test(NAME TestVTKHDF DATA blob.vtkhdf ARGS --load-plugins=hdf -s)
+    f3d_test(NAME TestPipedVTKHDF DATA blob.vtkhdf ARGS --load-plugins=hdf -s --force-reader=VTKHDF PIPED)
     f3d_test(NAME TestAMRDataSet DATA amr.vtkhdf ARGS --load-plugins=hdf -s)
   endif()
 
@@ -988,6 +1028,7 @@ if(F3D_PLUGIN_BUILD_HDF)
   # NetCDF tests
   # Basic rendering test with scalar coloring
   f3d_test(NAME TestNetCDF DATA temperature_grid.nc ARGS --load-plugins=hdf -s)
+  f3d_test(NAME TestPipedNetCDF DATA temperature_grid.nc ARGS --load-plugins=hdf -s --force-reader=NetCDF)
 
   if(NOT F3D_MACOS_BUNDLE)
     # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
@@ -1000,9 +1041,13 @@ endif()
 
 if(F3D_PLUGIN_BUILD_OCCT)
   f3d_test(NAME TestSTEP DATA f3d.stp ARGS --load-plugins=occt --up=+Z)
+  f3d_test(NAME TestPipedSTEP DATA f3d.stp ARGS --load-plugins=occt --up=+Z --force-reader=STEP)
   f3d_test(NAME TestIGES DATA f3d.igs ARGS --load-plugins=occt --up=+Z)
+  f3d_test(NAME TestPipedIGES DATA f3d.igs ARGS --load-plugins=occt --up=+Z --force-reader=IGES)
   f3d_test(NAME TestBREP DATA f3d.brep ARGS --load-plugins=occt --up=+Z)
+  f3d_test(NAME TestPipedBREP DATA f3d.brep ARGS --load-plugins=occt --up=+Z --force-reader=BREP)
   f3d_test(NAME TestBinaryBREP DATA f3d.bin.brep ARGS --load-plugins=occt --up=+Z)
+  f3d_test(NAME TestPipedBinaryBREP DATA f3d.bin.brep ARGS --load-plugins=occt --up=+Z --force-reader=BREP)
   f3d_test(NAME TestSTEPDefines DATA cheese.stp ARGS --load-plugins=occt -DSTEP.linear_deflection=0.5 -DSTEP.angular_deflection=0.9 -DSTEP.relative_deflection=1)
   f3d_test(NAME TestIGESDefines DATA cheese.igs ARGS --load-plugins=occt -DIGES.read_wire=0 --line-width=5 --up=+Z)
   f3d_test(NAME TestBREPDefines DATA cheese.brep ARGS --load-plugins=occt -DBREP.linear_deflection=100 --up=+Z)
@@ -1014,6 +1059,7 @@ if(F3D_PLUGIN_BUILD_OCCT)
 
   if(F3D_PLUGIN_OCCT_COLORING_SUPPORT)
     f3d_test(NAME TestXBF DATA f3d.xbf ARGS --load-plugins=occt --up=+Z)
+    f3d_test(NAME TestPipedXBF DATA f3d.xbf ARGS --load-plugins=occt --up=+Z --force-reader=XBF PIPED)
     f3d_test(NAME TestXBFDefines DATA cheese.xbf ARGS --load-plugins=occt -DXBF.angular_deflection=1 -DXBF.relative_deflection=1 --up=+Z)
     f3d_test(NAME TestXCAFColors DATA xcaf-colors.stp ARGS --load-plugins=occt -csy --up=+Z --line-width=3 --camera-direction=-1,-1,-1)
     f3d_test(NAME TestXCAFColorsXBF DATA xcaf-colors.xbf ARGS --load-plugins=occt -csy --up=+Z --line-width=3 --camera-direction=-1,-1,-1)
@@ -1068,6 +1114,7 @@ endif()
 
 if(F3D_PLUGIN_BUILD_VDB)
   f3d_test(NAME TestVDBVolume DATA icosahedron.vdb ARGS --load-plugins=vdb --volume --volume-inverse)
+  f3d_test(NAME TestPipedVDBVolume DATA icosahedron.vdb ARGS --load-plugins=vdb --volume --volume-inverse --force-reader=VDB PIPED)
   f3d_test(NAME TestVDBPoints DATA sphere_points.vdb ARGS --load-plugins=vdb -o)
   f3d_test(NAME TestVDBVerbose DATA icosahedron.vdb ARGS --load-plugins=vdb REGEXP "PartitionedDataSet" NO_RENDER)
   f3d_test(NAME TestVDBDefinesDownsamplingFactor DATA icosahedron.vdb ARGS --load-plugins=vdb -DVDB.downsampling_factor=0.2 --volume --volume-inverse)
@@ -1785,3 +1832,4 @@ if(F3D_MODULE_DMON AND (WIN32 OR APPLE OR F3D_TESTING_ENABLE_GLX_TESTS))
   add_test (NAME f3d::TestWatch COMMAND ${_f3d_os_script_exec} ${CMAKE_CURRENT_SOURCE_DIR}/test_watch.${_f3d_os_script_ext} $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data ${CMAKE_BINARY_DIR}/Testing/Temporary)
   set_tests_properties(f3d::TestWatch PROPERTIES RUN_SERIAL TRUE TIMEOUT 90)
 endif()
+
