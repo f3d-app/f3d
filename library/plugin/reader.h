@@ -143,7 +143,6 @@ public:
     return nullptr;
   }
 
-
   /**
    * Apply custom code for the importer
    */

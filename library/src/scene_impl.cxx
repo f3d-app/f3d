@@ -320,7 +320,8 @@ scene& scene_impl::add(void* buffer, std::size_t size)
   std::optional<std::string> forceReader = this->Internals->Options.scene.force_reader;
   if (!forceReader)
   {
-    throw scene::load_failure_exception("No force reader set while trying to load a buffer from memory");
+    throw scene::load_failure_exception(
+      "No force reader set while trying to load a buffer from memory");
   }
 
   // Recover the forced reader
@@ -354,7 +355,7 @@ scene& scene_impl::add(void* buffer, std::size_t size)
   }
 
   log::debug("\nLoading stream");
-  this->Internals->Load({importer});
+  this->Internals->Load({ importer });
   return *this;
 }
 
