@@ -1084,7 +1084,7 @@ if(F3D_PLUGIN_BUILD_HDF)
   # Basic rendering test with scalar coloring
   f3d_test(NAME TestNetCDF DATA temperature_grid.nc ARGS --load-plugins=hdf -s)
   if (VTK_VERSION VERSION_GREATER_EQUAL 9.6.20269999)
-    f3d_test(NAME TestPipedNetCDF DATA temperature_grid.nc ARGS --load-plugins=hdf -s --force-reader=NetCDF)
+    f3d_test(NAME TestPipedNetCDF DATA temperature_grid.nc ARGS --load-plugins=hdf -s --force-reader=NetCDF PIPED)
   endif()
 
   if(NOT F3D_MACOS_BUNDLE)
@@ -1111,10 +1111,10 @@ if(F3D_PLUGIN_BUILD_OCCT)
   endif()
 
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251223)
-    f3d_test(NAME TestPipedSTEP DATA f3d.stp ARGS --load-plugins=occt --up=+Z --force-reader=STEP)
-    f3d_test(NAME TestPipedIGES DATA f3d.igs ARGS --load-plugins=occt --up=+Z --force-reader=IGES)
-    f3d_test(NAME TestPipedBREP DATA f3d.brep ARGS --load-plugins=occt --up=+Z --force-reader=BREP)
-    f3d_test(NAME TestPipedBinaryBREP DATA f3d.bin.brep ARGS --load-plugins=occt --up=+Z --force-reader=BREP)
+    f3d_test(NAME TestPipedSTEP DATA f3d.stp ARGS --load-plugins=occt --up=+Z --force-reader=STEP PIPED)
+    f3d_test(NAME TestPipedIGES DATA f3d.igs ARGS --load-plugins=occt --up=+Z --force-reader=IGES PIPED)
+    f3d_test(NAME TestPipedBREP DATA f3d.brep ARGS --load-plugins=occt --up=+Z --force-reader=BREP PIPED)
+    f3d_test(NAME TestPipedBinaryBREP DATA f3d.bin.brep ARGS --load-plugins=occt --up=+Z --force-reader=BREP PIPED)
   endif()
 
   if(F3D_PLUGIN_OCCT_COLORING_SUPPORT)
