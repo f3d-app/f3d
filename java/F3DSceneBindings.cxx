@@ -255,6 +255,28 @@ extern "C"
     return self;
   }
 
+  JNIEXPORT jobject JAVA_BIND(Scene, addBuffer)(JNIEnv* env, jobject self, jbyteArray buffer, jint size)
+  {
+    jbyte* bufferData = env->GetByteArrayElements(buffer, nullptr);
+    if (!bufferData)
+    {
+      return self;
+    }
+
+    try
+    {
+      GetEngine(env, self)->getScene().add(bufferData, size);
+    }
+    catch (const std::exception& e)
+    {
+      jclass exceptionClass = env->FindClass("java/lang/RuntimeException");
+      env->ThrowNew(exceptionClass, e.what());
+      return nullptr;
+    }
+    env->ReleaseByteArrayElements(buffer, bufferData, 0);
+    return self;
+  }
+
   JNIEXPORT jobject JAVA_BIND(Scene, clear)(JNIEnv* env, jobject self)
   {
     GetEngine(env, self)->getScene().clear();
