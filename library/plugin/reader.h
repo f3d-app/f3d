@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 
+class vtkResourceStream;
 namespace f3d
 {
 /**
