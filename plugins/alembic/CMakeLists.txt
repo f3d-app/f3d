@@ -17,13 +17,18 @@ message(STATUS "Plugin: Alembic ${Alembic_VERSION} found")
 
 f3d_plugin_init()
 
+set(_SUPPORTS_STREAM)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251210)
+  set(_SUPPORTS_STREAM SUPPORTS_STREAM)
+endif()
+
 f3d_plugin_declare_reader(
   NAME Alembic
   EXTENSIONS abc
   MIMETYPES application/vnd.abc
   VTK_READER vtkF3DAlembicReader
   FORMAT_DESCRIPTION "Alembic"
-  SUPPORTS_STREAM
+  ${_SUPPORTS_STREAM}
 )
 
 set(rpaths "")
