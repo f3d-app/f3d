@@ -14,6 +14,7 @@
 #include "vtkF3DTAAResolvePass.h"
 #include "vtkF3DUserRenderPass.h"
 
+#include <iostream>
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
 #include <vtkCamera.h>
@@ -344,7 +345,7 @@ void vtkF3DRenderer::Initialize()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::ApplyUpVector(const std::array<double, 3>& up)
+void vtkF3DRenderer::ApplyUpDirection(const std::array<double, 3>& up)
 {
   std::array<double, 3> right = { 1, 0, 0 };
   if (std::abs(vtkMath::Dot(right.data(), up.data())) > 0.999)
@@ -360,18 +361,18 @@ void vtkF3DRenderer::ApplyUpVector(const std::array<double, 3>& up)
   vtkMath::Cross(up.data(), front.data(), orthRight.data());
   vtkMath::Normalize(orthRight.data());
 
-  std::copy(up.begin(), up.end(), this->UpVector);
-  std::copy(orthRight.begin(), orthRight.end(), this->RightVector);
+  std::copy(up.begin(), up.end(), this->UpDirection);
+  std::copy(orthRight.begin(), orthRight.end(), this->RightDirection);
 
   this->SkyboxActor->SetFloorPlane(up[0], up[1], up[2], 0.0);
   this->SkyboxActor->SetFloorRight(front[0], front[1], front[2]);
 
-  this->SetEnvironmentUp(this->UpVector);
-  this->SetEnvironmentRight(this->RightVector);
+  this->SetEnvironmentUp(this->UpDirection);
+  this->SetEnvironmentRight(this->RightDirection);
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::InitializeCamera(const std::vector<double>& upVec)
+void vtkF3DRenderer::InitializeUpDirection(const std::vector<double>& upVec)
 {
   assert(upVec.size() == 3);
 
@@ -382,21 +383,19 @@ void vtkF3DRenderer::InitializeCamera(const std::vector<double>& upVec)
   {
     up = { 0.0, 1.0, 0.0 };
   }
-  vtkMath::Normalize(up.data());
 
-  this->ApplyUpVector(up);
+  this->SetPendingUpDirection({ up[0], up[1], up[2] });
+  this->ConfigureUpDirection();
 
   double pos[3];
-  vtkMath::Cross(this->UpVector, this->RightVector, pos);
+  vtkMath::Cross(this->UpDirection, this->RightDirection, pos);
   vtkMath::MultiplyScalar(pos, -1.0);
 
   vtkCamera* cam = this->GetActiveCamera();
   cam->SetFocalPoint(0.0, 0.0, 0.0);
   cam->SetPosition(pos);
-  cam->SetViewUp(this->UpVector);
-
-  std::copy(up.begin(), up.end(), this->PendingUpDirection);
-  this->UpVectorConfigured = true;
+  cam->SetViewUp(this->UpDirection);
+  this->UpDirectionConfigured = true;
 }
 
 //----------------------------------------------------------------------------
@@ -423,15 +422,16 @@ void vtkF3DRenderer::SetPendingUpDirection(const std::vector<double>& upVec)
   }
 
   std::copy(up.begin(), up.end(), this->PendingUpDirection);
-  this->UpVectorConfigured = false;
+  this->UpDirectionConfigured = false;
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::ConfigureUpVector()
+void vtkF3DRenderer::ConfigureUpDirection()
 {
   std::array<double, 3> newUp = { this->PendingUpDirection[0], this->PendingUpDirection[1],
     this->PendingUpDirection[2] };
-  std::array<double, 3> oldUp = { this->UpVector[0], this->UpVector[1], this->UpVector[2] };
+  std::array<double, 3> oldUp = { this->UpDirection[0], this->UpDirection[1],
+    this->UpDirection[2] };
 
   std::array<double, 3> axis;
   vtkMath::Cross(oldUp.data(), newUp.data(), axis.data());
@@ -458,10 +458,10 @@ void vtkF3DRenderer::ConfigureUpVector()
   camTransform->TransformVector(viewUp, viewUp);
   cam->SetViewUp(viewUp);
 
-  this->ApplyUpVector(newUp);
+  this->ApplyUpDirection(newUp);
 
   this->GridConfigured = false;
-  this->UpVectorConfigured = true;
+  this->UpDirectionConfigured = true;
 }
 
 //----------------------------------------------------------------------------
@@ -1978,9 +1978,9 @@ void vtkF3DRenderer::UpdateActors()
     this->ConfigureActorsProperties();
   }
 
-  if (!this->UpVectorConfigured)
+  if (!this->UpDirectionConfigured)
   {
-    this->ConfigureUpVector();
+    this->ConfigureUpDirection();
   }
 
   if (!this->PointSpritesConfigured)

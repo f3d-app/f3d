@@ -206,7 +206,7 @@ public:
   /**
    * Initialize the camera position based on the given up direction.
    */
-  void InitializeCamera(const std::vector<double>& upVec);
+  void InitializeUpDirection(const std::vector<double>& upVec);
 
   /**
    * Compute bounds of visible props as transformed by given matrix.
@@ -228,12 +228,12 @@ public:
   /**
    * Get up vector
    */
-  vtkGetVector3Macro(UpVector, double);
+  vtkGetVector3Macro(UpDirection, double);
 
   /**
    * Set/Get right vector
    */
-  vtkGetVector3Macro(RightVector, double);
+  vtkGetVector3Macro(RightDirection, double);
 
   /**
    * Set cache path, only used by the HDRI logic
@@ -512,9 +512,9 @@ private:
 
   /**
    * Apply the given up vector to the scene, computing an appropriate right vector.
-   * Updates UpVector, RightVector, skybox floor, and environment orientation.
+   * Updates UpDirection, RightDirection, skybox floor, and environment orientation.
    */
-  void ApplyUpVector(const std::array<double, 3>& up);
+  void ApplyUpDirection(const std::array<double, 3>& up);
 
   /**
    * Configure all actors properties
@@ -537,10 +537,10 @@ private:
   void ConfigureRenderPasses();
 
   /**
-   * Rotate camera and apply up vector to scene.
-   * Called from UpdateActors when UpVectorConfigured is false.
+   * Rotate camera and apply up direction to scene.
+   * Called from UpdateActors when UpDirectionConfigured is false.
    */
-  void ConfigureUpVector();
+  void ConfigureUpDirection();
 
   /**
    * Create a cache directory if a HDRIHash is set
@@ -624,7 +624,7 @@ private:
 
   bool CheatSheetConfigured = false;
   bool ActorsPropertiesConfigured = false;
-  bool UpVectorConfigured = false;
+  bool UpDirectionConfigured = false;
   bool GridConfigured = false;
   bool GridAxesConfigured = false;
   bool RenderPassesConfigured = false;
@@ -670,8 +670,8 @@ private:
   bool InvertZoom = false;
 
   int RaytracingSamples = 0;
-  double UpVector[3] = { 0.0, 1.0, 0.0 };
-  double RightVector[3] = { 1.0, 0.0, 0.0 };
+  double UpDirection[3] = { 0.0, 1.0, 0.0 };
+  double RightDirection[3] = { 1.0, 0.0, 0.0 };
   double PendingUpDirection[3] = { 0.0, 1.0, 0.0 };
   double CircleOfConfusionRadius = 20.0;
   std::optional<double> PointSize;
