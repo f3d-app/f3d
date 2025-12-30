@@ -10,6 +10,7 @@
 #include <vtkTestUtilities.h>
 
 #include <climits>
+#include <cstring>
 #include <iostream>
 #include <regex>
 
@@ -94,6 +95,8 @@ int TestF3DQuakeMDLParser(int vtkNotUsed(argc), char* argv[])
   std::vector<uint8_t> testNormalHeader;
   std::vector<uint8_t> testMaxedHeader;
   std::vector<uint8_t> testMinedHeader;
+  std::vector<uint8_t> testOverflowSF;
+  std::vector<uint8_t> testOverflowVerts;
 
   // .mdl file with no data
   {
@@ -141,6 +144,51 @@ int TestF3DQuakeMDLParser(int vtkNotUsed(argc), char* argv[])
     header->numVertices = INT_MIN;
     header->numTriangles = INT_MIN;
     header->numFrames = INT_MIN;
+  }
+
+  // .mdl file where the mdl_simpleframe_t is cut off
+  {
+    // clone the header from default
+    auto header = *PeekFromVector<mdl_header_t>(defaultFile, 0);
+    header.numSkins = 0;
+    header.skinWidth = 0;
+    header.skinHeight = 0;
+    header.numFrames = 1;
+    header.numVertices = 1;
+    header.numTriangles = 0;
+
+    int nb = 2;
+
+    // push data into vec
+    // header
+    const uint8_t* data = reinterpret_cast<const uint8_t*>(&header);
+    testOverflowSF.insert(testOverflowSF.end(), data, data + sizeof(mdl_header_t));
+    // texcoords
+    testOverflowSF.insert(testOverflowSF.end(), 12, 0);
+    // type
+    testOverflowSF.insert(testOverflowSF.end(), 4, 0xff);
+    printf("size of data %lu\n", testOverflowSF.size());
+    // nb
+    const uint8_t* data_nb = reinterpret_cast<const uint8_t*>(&nb);
+    testOverflowSF.insert(testOverflowSF.end(), data_nb, data_nb + 4);
+    // void data :
+    // sizeof(mdl_vertex_t) * 2 "min/max",
+    // sizeof(float) "time",
+    // sizeof(float) nb offset,
+    // mdl_simpleframe_t_fixed_size
+    testOverflowSF.insert(testOverflowSF.end(), 2 * 4 + 4 + 4 + 24, 0);
+    printf("size of data %lu\n", testOverflowSF.size());
+  }
+
+  // .mdl file where the header indicates more verticies than can physcially be in the file
+  {
+    // note : most of this data was setup and can be shared with the testOverflowSF
+    testOverflowVerts = testOverflowSF;
+    // push data to vec
+    // void data :
+    // sizeof(mdl_vertex_t) "mdl_simpleframe_t::verts"
+    // (note : this was negated from the testOverflowSF test to trigger the specific error)
+    testOverflowVerts.insert(testOverflowVerts.end(), 4, 0);
   }
 
   // Setup
@@ -259,6 +307,58 @@ int TestF3DQuakeMDLParser(int vtkNotUsed(argc), char* argv[])
 
     vtkNew<vtkMemoryResourceStream> stream;
     stream->SetBuffer(testMinedHeader);
+
+    vtkNew<vtkF3DQuakeMDLImporter> importer;
+    importer->SetStream(stream);
+    importer->AddObserver(vtkCommand::ErrorEvent, errorCallback);
+
+    importer->Update();
+
+    if (errors.size() != 2 ||
+      errors[0].errorString != "CreateMesh Accessed data out of range, aborting." ||
+      errors[1].errorString != "No frame read, there is nothing to display in this file.")
+    {
+      std::cerr << "Test \"" << testName << "\" failed\n";
+      return EXIT_FAILURE;
+    }
+  }
+
+  // Test "overflowing mdl_simpleframe_t"
+  {
+    testName = "overflowing mdl_simpleframe_t";
+    std::cout << "Running test \"" << testName << "\"\n";
+
+    std::vector<Error> errors;
+    errorCallback->SetClientData(&errors);
+
+    vtkNew<vtkMemoryResourceStream> stream;
+    stream->SetBuffer(testOverflowSF);
+
+    vtkNew<vtkF3DQuakeMDLImporter> importer;
+    importer->SetStream(stream);
+    importer->AddObserver(vtkCommand::ErrorEvent, errorCallback);
+
+    importer->Update();
+
+    if (errors.size() != 2 ||
+      errors[0].errorString != "CreateMesh Accessed data out of range, aborting." ||
+      errors[1].errorString != "No frame read, there is nothing to display in this file.")
+    {
+      std::cerr << "Test \"" << testName << "\" failed\n";
+      return EXIT_FAILURE;
+    }
+  }
+
+  // Test "overflowing vertices"
+  {
+    testName = "overflowing vertices";
+    std::cout << "Running test \"" << testName << "\"\n";
+
+    std::vector<Error> errors;
+    errorCallback->SetClientData(&errors);
+
+    vtkNew<vtkMemoryResourceStream> stream;
+    stream->SetBuffer(testOverflowVerts);
 
     vtkNew<vtkF3DQuakeMDLImporter> importer;
     importer->SetStream(stream);
