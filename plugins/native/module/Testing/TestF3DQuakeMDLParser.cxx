@@ -167,7 +167,6 @@ int TestF3DQuakeMDLParser(int vtkNotUsed(argc), char* argv[])
     testOverflowSF.insert(testOverflowSF.end(), 12, 0);
     // type
     testOverflowSF.insert(testOverflowSF.end(), 4, 0xff);
-    printf("size of data %lu\n", testOverflowSF.size());
     // nb
     const uint8_t* data_nb = reinterpret_cast<const uint8_t*>(&nb);
     testOverflowSF.insert(testOverflowSF.end(), data_nb, data_nb + 4);
@@ -177,7 +176,6 @@ int TestF3DQuakeMDLParser(int vtkNotUsed(argc), char* argv[])
     // sizeof(float) nb offset,
     // mdl_simpleframe_t_fixed_size
     testOverflowSF.insert(testOverflowSF.end(), 2 * 4 + 4 + 4 + 24, 0);
-    printf("size of data %lu\n", testOverflowSF.size());
   }
 
   // .mdl file where the header indicates more vertices than can physically be in the file
