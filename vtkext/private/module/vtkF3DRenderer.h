@@ -13,7 +13,6 @@
 
 #include "vtkF3DMetaImporter.h"
 
-#include "vtkF3DOpenGLGridMapper.h"
 #include "vtkF3DUIActor.h"
 
 #include <vtkCallbackCommand.h>
