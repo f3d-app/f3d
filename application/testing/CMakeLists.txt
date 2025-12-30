@@ -977,7 +977,7 @@ if(F3D_PLUGIN_BUILD_DRACO)
   endif()
 
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250923)
-    f3d_test(NAME TestPipedGLTFDracoImporter DATA f3d.glb ARGS --force-reader=GLBDraco PIPED)
+    f3d_test(NAME TestPipedGLTFDracoImporter DATA f3d.glb ARGS --load-plugins=draco --force-reader=GLBDraco PIPED)
   endif()  
 
   if(NOT F3D_MACOS_BUNDLE)

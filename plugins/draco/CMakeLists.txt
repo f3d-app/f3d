@@ -28,13 +28,19 @@ f3d_plugin_declare_reader(
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10884
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240214)
+
+  set(_SUPPORTS_STREAM)
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250923)
+    set(_SUPPORTS_STREAM SUPPORTS_STREAM)
+  endif()
+
   f3d_plugin_declare_reader(
     NAME GLTFDraco
     SCORE 90
     EXTENSIONS gltf
     MIMETYPES model/gltf+json
     VTK_IMPORTER vtkF3DGLTFDracoImporter
-    SUPPORTS_STREAM
+    ${_SUPPORTS_STREAM}
     FORMAT_DESCRIPTION "GL Transmission Format"
   )
 
@@ -45,7 +51,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240214)
     MIMETYPES model/gltf-binary
     VTK_IMPORTER vtkF3DGLTFDracoImporter
     FORMAT_DESCRIPTION "GL Transmission Format (binary)"
-    SUPPORTS_STREAM
+    ${_SUPPORTS_STREAM}
     CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/glb.inl"
   )
 endif()
