@@ -90,7 +90,7 @@ public:
 private:
   class internals;
   std::unique_ptr<internals> Internals;
-  void getPositionToFocalVector(double& dx, double& dy, double& dz) const;
+  void getPositionToFocalVector(vector3_t& vec) const;
 };
 }
 
