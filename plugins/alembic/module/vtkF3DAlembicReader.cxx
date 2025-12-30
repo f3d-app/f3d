@@ -203,27 +203,55 @@ class vtkF3DAlembicReader::vtkInternals
       return;
     }
 
+    const auto& pArray = pMapIter->second;
+    vtkIdType numPoints = static_cast<vtkIdType>(pArray.size());
+
+    points->SetNumberOfPoints(numPoints);
+
+    for (vtkIdType i = 0; i < numPoints; ++i)
+    {
+      const auto& p = pArray[i];
+      points->SetPoint(i, p.x, p.y, p.z);
+    }
+    polydata->SetPoints(points);
+
+    vtkIdType numCells = static_cast<vtkIdType>(data.Indices.size());
+    vtkIdType totalConnectivitySize = 0;
+    for (const auto& face : data.Indices)
+    {
+      totalConnectivitySize += static_cast<vtkIdType>(face.size());
+    }
+
+    vtkNew<vtkIdTypeArray> offsets;
+    offsets->SetNumberOfTuples(numCells + 1);
+
+    vtkNew<vtkIdTypeArray> connectivity;
+    connectivity->SetNumberOfTuples(totalConnectivitySize);
+
+    vtkIdType* offsetsPtr = offsets->GetPointer(0);
+    vtkIdType* connPtr = connectivity->GetPointer(0);
+
+    vtkIdType currentOffset = 0;
+    offsetsPtr[0] = 0;
+    vtkIdType connIdx = 0;
+
+    for (vtkIdType i = 0; i < numCells; i++)
+    {
+      const auto& face = data.Indices[i];
+      for (const auto& triplet : face)
+      {
+        connPtr[connIdx++] = triplet.x;
+      }
+      currentOffset += static_cast<vtkIdType>(face.size());
+      offsetsPtr[i + 1] = currentOffset;
+    }
+    cells->SetData(offsets, connectivity);
     // Note : uv and N are optional
     auto uvMapIter = data.Attributes.find("uv");
     auto nMapIter = data.Attributes.find("N");
     bool haveUV = uvMapIter != data.Attributes.end();
     bool haveN = nMapIter != data.Attributes.end();
-    for (auto& pIter : pMapIter->second)
-    {
-      points->InsertNextPoint(pIter.x, pIter.y, pIter.z);
-    }
-    polydata->SetPoints(points);
 
-    std::vector<vtkIdType> indexArr;
-    for (auto& faceIndicesIter : data.Indices)
-    {
-      indexArr.clear();
-
-      std::transform(faceIndicesIter.cbegin(), faceIndicesIter.cend(), std::back_inserter(indexArr),
-        [](const Alembic::Abc::V3i& v) { return v.x; });
-
-      cells->InsertNextCell(indexArr.size(), indexArr.data());
-    }
     polydata->SetPolys(cells);
     vtkDataSetAttributes* pointAttributes = polydata->GetAttributes(vtkDataSet::POINT);
 
@@ -232,9 +260,14 @@ class vtkF3DAlembicReader::vtkInternals
       vtkNew<vtkFloatArray> normals;
       normals->SetName("Normals");
       normals->SetNumberOfComponents(3);
-      for (auto& N : nMapIter->second)
+
+      const auto& nArray = nMapIter->second;
+      vtkIdType numNormals = static_cast<vtkIdType>(nArray.size());
+      normals->SetNumberOfTuples(numNormals);
+      for (vtkIdType i = 0; i < numNormals; i++)
       {
-        normals->InsertNextTuple3(N.x, N.y, N.z);
+        const auto& n = nArray[i];
+        normals->SetTuple3(i, n.x, n.y, n.z);
       }
       pointAttributes->SetNormals(normals);
     }
@@ -244,10 +277,17 @@ class vtkF3DAlembicReader::vtkInternals
       vtkNew<vtkFloatArray> uvs;
       uvs->SetName("UVs");
       uvs->SetNumberOfComponents(2);
-      for (auto& uv : uvMapIter->second)
+
+      const auto& uvArray = uvMapIter->second;
+      vtkIdType numUVs = static_cast<vtkIdType>(uvArray.size());
+      uvs->SetNumberOfTuples(numUVs);
+
+      for (vtkIdType i = 0; i < numUVs; i++)
       {
-        uvs->InsertNextTuple2(uv.x, uv.y);
+        const auto& uv = uvArray[i];
+        uvs->SetTuple2(i, uv.x, uv.y);
       }
+
       pointAttributes->SetTCoords(uvs);
     }
 
