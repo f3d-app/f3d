@@ -53,13 +53,29 @@ If you use the portable archive, make sure to extract it somewhere the sandboxin
 
 F3D supports piping in and out, using the `-` char, as long as the reader is specified, eg:
 
-`cat path/to/file.glb | f3d - --force-reader=GLB --output=- | display`
-
-or:
-
 `f3d - --force-reader=GLB --output=- < path/to/file.glb > path/to/img.png`
 
-Please note this works on MacOS as well.
+or, using [display](https://imagemagick.org/script/display.php#gsc.tab=0):
+
+`cat path/to/file.glb | f3d - --force-reader=GLB --output=- | display`
+
+and even, using [build123d](https://github.com/gumyr/build123d):
+
+`script.py`:
+
+```
+import sys
+
+from build123d import Box, Cylinder, export_brep, export_step
+from OCP.BRepTools import BRepTools
+
+obj = Box(2, 2, 1) - Cylinder(0.5, 2)
+BRepTools.Write_s(obj.wrapped, sys.stdout.buffer)
+```
+
+`python script.py | f3d - --force-reader=BREP --output=- | display`
+
+While piping is more common on Linux, F3D supports it perfectly on Windows and MacOS as well.
 
 ## Windows
 
