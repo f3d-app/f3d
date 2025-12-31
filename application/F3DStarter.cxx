@@ -1672,7 +1672,14 @@ void F3DStarter::LoadFileGroupInternal(
       if (std::find(this->Internals->LoadedFiles.begin(), this->Internals->LoadedFiles.end(),
             tmpPath) == this->Internals->LoadedFiles.end())
       {
-        // Always add files to the watch set
+        if (tmpPath == F3D_PIPED)
+        {
+          // When piping, skip watch and file checks
+          localPaths.emplace_back(tmpPath);
+          continue;
+        }
+
+        // Always add actual files to the watch set
         if (this->Internals->AppOptions.Watch)
         {
           this->Internals->FilesToWatch.insert(tmpPath);
@@ -1680,13 +1687,6 @@ void F3DStarter::LoadFileGroupInternal(
 
         try
         {
-          if (tmpPath == F3D_PIPED)
-          {
-            // When piping, skip any file check
-            localPaths.emplace_back(tmpPath);
-            continue;
-          }
-
           if (!fs::exists(tmpPath))
           {
             f3d::log::error(tmpPath.string(), " does not exist");
@@ -1747,14 +1747,13 @@ void F3DStarter::LoadFileGroupInternal(
           std::istream& is = std::cin;
           SET_STDIN_BINARY_MODE();
           // TODO useful for debugging with gdb
-          //            std::ifstream is;
-          //            is.open("/home/glow/dev/f3d/f3d/src/testing/data/f3d.glb");
+          // std::ifstream is;
+          // is.open("/home/glow/dev/f3d/f3d/src/testing/data/f3d.glb");
 
           // Read input stream into a buffer
           // this can make f3d hang until an input stream is provided
           while (is)
           {
-
             // Increase size as needed
             this->Internals->PipedBuffer.resize(this->Internals->PipedBuffer.size() + readLength);
 
@@ -1961,16 +1960,7 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
 {
   try
   {
-    fs::path tmpPath;
-    if (path == F3D_PIPED)
-    {
-      // When piping, do not recover an absolute path
-      tmpPath = path;
-    }
-    else
-    {
-      tmpPath = fs::absolute(path);
-    }
+    fs::path tmpPath = path == F3D_PIPED ? path : fs::absolute(path);
 
     // If file is a directory, add files recursively
     if (fs::is_directory(tmpPath))

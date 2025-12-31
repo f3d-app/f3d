@@ -170,14 +170,12 @@ set (_outOfRangeDoubleStr "\
 f3d_test(NAME TestPLY DATA suzanne.ply)
 f3d_test(NAME TestOBJ DATA world.obj)
 f3d_test(NAME TestSTL DATA suzanne.stl)
-
 f3d_test(NAME TestVTU DATA dragon.vtu)
 f3d_test(NAME TestVTP DATA cow.vtp)
 f3d_test(NAME TestVTR DATA RectGrid2.vtr ARGS --scalar-coloring --roughness=1)
 f3d_test(NAME TestVTS DATA bluntfin.vts)
 f3d_test(NAME TestVTM DATA mb.vtm)
 f3d_test(NAME TestVTK DATA cow.vtk)
-
 f3d_test(NAME TestNRRD DATA beach.nrrd ARGS -s)
 f3d_test(NAME TestVRMLImporter DATA bot2.wrl)
 
@@ -1899,4 +1897,3 @@ if(F3D_MODULE_DMON AND (WIN32 OR APPLE OR F3D_TESTING_ENABLE_GLX_TESTS))
   add_test (NAME f3d::TestWatch COMMAND ${_f3d_os_script_exec} ${CMAKE_CURRENT_SOURCE_DIR}/test_watch.${_f3d_os_script_ext} $<TARGET_FILE:f3d> ${F3D_SOURCE_DIR}/testing/data ${CMAKE_BINARY_DIR}/Testing/Temporary)
   set_tests_properties(f3d::TestWatch PROPERTIES RUN_SERIAL TRUE TIMEOUT 90)
 endif()
-

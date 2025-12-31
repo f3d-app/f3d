@@ -324,7 +324,7 @@ void PrintReadersList()
   // Compute the size of the 5 columns
   for (const auto& reader : readersInfo)
   {
-    // There is at more one MIME type by extension
+    // There is at most one MIME type by extension
     assert(reader.Extensions.size() >= reader.MimeTypes.size());
 
     nameColSize = std::max(nameColSize, reader.Name.length());

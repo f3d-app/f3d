@@ -1,11 +1,9 @@
 #include <engine_c_api.h>
-#include <options_c_api.h>
 #include <scene_c_api.h>
 #include <types_c_api.h>
 #include <utils_c_api.h>
 
 #include <stdio.h>
-#include <string.h>
 
 int test_scene_c_api()
 {

@@ -13,10 +13,9 @@ endif()
 
 f3d_plugin_init()
 
-
-set(_SUPPORTS_STREAM_VTKHDF)
+set(_SUPPORTS_STREAM)
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251109)
-  set(_SUPPORTS_STREAM_VTKHDF SUPPORTS_STREAM)
+  set(_SUPPORTS_STREAM SUPPORTS_STREAM)
 endif()
 
 f3d_plugin_declare_reader(
@@ -25,7 +24,7 @@ f3d_plugin_declare_reader(
   EXTENSIONS vtkhdf
   MIMETYPES application/vnd.vtkhdf
   VTK_READER vtkHDFReader
-  ${_SUPPORTS_STREAM_VTKHDF}
+  ${_SUPPORTS_STREAM}
   FORMAT_DESCRIPTION "VTKHDF"
 )
 
@@ -38,10 +37,9 @@ f3d_plugin_declare_reader(
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/exodus.inl"
 )
 
-# TODO
-set(_SUPPORTS_STREAM_NetCDF)
+set(_SUPPORTS_STREAM)
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20269999)
-  set(_SUPPORTS_STREAM_NetCDF SUPPORTS_STREAM)
+  set(_SUPPORTS_STREAM SUPPORTS_STREAM)
 endif()
 
 f3d_plugin_declare_reader(
@@ -50,7 +48,7 @@ f3d_plugin_declare_reader(
   MIMETYPES application/netcdf application/x-netcdf
   VTK_READER vtkNetCDFReader
   FORMAT_DESCRIPTION "NetCDF"
-  ${_SUPPORTS_STREAM_NetCDF}
+  ${_SUPPORTS_STREAM}
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/netcdf.inl"
 )
 
