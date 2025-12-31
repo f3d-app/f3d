@@ -156,6 +156,17 @@ public:
 #endif
 #endif
 
+#if @F3D_READER_HAS_SUPPORTS_STREAM@
+  /**
+   * Return true if this reader supports stream
+   * false otherwise
+   */
+  bool supportsStream() override
+  {
+    return true;
+  }
+#endif
+
 #if @F3D_READER_HAS_CUSTOM_CODE@
 #include "@F3D_READER_CUSTOM_CODE@"
 #endif

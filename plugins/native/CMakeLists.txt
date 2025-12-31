@@ -64,7 +64,7 @@ f3d_plugin_declare_reader(
   NAME GLTF
   SCORE 80
   EXTENSIONS gltf
-  MIMETYPES model/gltf-binary model/gltf+json
+  MIMETYPES model/gltf+json
   VTK_IMPORTER vtkF3DGLTFImporter
   FORMAT_DESCRIPTION "GL Transmission Format"
   ${_SUPPORTS_STREAM}

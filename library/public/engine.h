@@ -337,6 +337,7 @@ public:
     std::string PluginName;
     bool HasSceneReader;
     bool HasGeometryReader;
+    bool SupportsStream;
   };
 
   /**

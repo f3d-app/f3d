@@ -42,6 +42,8 @@ F3D supports the following file formats:
 
 Streaming support refers to the ability to read from stdin and requires specifying the reader name, see [the examples](11-DESKTOP_INTEGRATION.md#piping).
 
+To get accurate information for your own build of F3D, using the [dedicated option](03-OPTIONS.md), `--list-readers`.
+
 ## Reader options
 
 Readers can provide option that can be set using the `-D/--define` [command line option](03-OPTIONS.md).
