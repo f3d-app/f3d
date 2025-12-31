@@ -115,7 +115,7 @@ public:
   bool LoadAtTime(double timeValue);
 
   /**
-   * Load animation at provided frmae value
+   * Load animation at provided frame value
    * When relative is false frame -1 is equal to last frame
    */
   void JumpToFrame(int frame, bool relative);
