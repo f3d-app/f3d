@@ -55,12 +55,12 @@
 #include <set>
 
 #ifdef _WIN32
-# include <fcntl.h>
-# include <io.h>
-# include <stdio.h>
-# define SET_STDIN_BINARY_MODE() setmode(stdin, O_BINARY)
+#include <fcntl.h>
+#include <io.h>
+#include <stdio.h>
+#define SET_STDIN_BINARY_MODE() setmode(stdin, O_BINARY)
 #else
-# define SET_STDIN_BINARY_MODE() ((void)0)
+#define SET_STDIN_BINARY_MODE() ((void)0)
 #endif
 
 namespace fs = std::filesystem;
