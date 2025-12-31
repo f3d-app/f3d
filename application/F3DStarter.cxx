@@ -58,7 +58,7 @@
 #include <fcntl.h>
 #include <io.h>
 #include <stdio.h>
-#define SET_STDIN_BINARY_MODE() setmode(stdin, O_BINARY)
+#define SET_STDIN_BINARY_MODE() _setmode(_fileno(stdin), O_BINARY)
 #else
 #define SET_STDIN_BINARY_MODE() ((void)0)
 #endif
