@@ -453,6 +453,12 @@ extern "C"
       enumClass, fromValueMethod, static_cast<int>(nativeDirection));
   }
 
+  JNIEXPORT jobject JAVA_BIND(Interactor, jumpToFrame)(
+    JNIEnv* env, jobject self, jint frame, jboolean relative)
+  {
+    return GetInteractor(env, self).jumpToFrame(frame, relative);
+  }
+
   JNIEXPORT jobject JAVA_BIND(Interactor, enableCameraMovement)(JNIEnv* env, jobject self)
   {
     GetInteractor(env, self).enableCameraMovement();
