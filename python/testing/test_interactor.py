@@ -218,12 +218,12 @@ def test_interactor_animation(capfd: pytest.CaptureFixture[str]):
     )
     engine.interactor.stop_animation()
 
-def test_interactor_jump_to_frame(pytest.CaptureFixture[str]):
+def test_interactor_jump_to_frame(capfd: pytest.CaptureFixture[str]):
     engine = f3d.Engine.create(True)
     engine.window.render()
 
     # only for coverage, do not test the actual feature yet
-    engine.interactor.jumpToFrame(0, False);
-    engine.interactor.jumpToFrame(-1, False);
-    engine.interactor.jumpToFrame(1, True);
-    engine.interactor.jumpToFrame(-1, True);
+    engine.interactor.jump_to_frame(0, False);
+    engine.interactor.jump_to_frame(-1, False);
+    engine.interactor.jump_to_frame(1, True);
+    engine.interactor.jump_to_frame(-1, True);
