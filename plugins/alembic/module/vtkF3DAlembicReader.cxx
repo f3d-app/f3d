@@ -231,20 +231,18 @@ class vtkF3DAlembicReader::vtkInternals
     vtkIdType* offsetsPtr = offsets->GetPointer(0);
     vtkIdType* connPtr = connectivity->GetPointer(0);
 
-    vtkIdType currentOffset = 0;
-    offsetsPtr[0] = 0;
-    vtkIdType connIdx = 0;
+    vtkIdType currentConnectivityIdx = 0;
 
     for (vtkIdType i = 0; i < numCells; i++)
     {
+      offsetsPtr[i] = currentConnectivityIdx;
       const auto& face = data.Indices[i];
       for (const auto& triplet : face)
       {
-        connPtr[connIdx++] = triplet.x;
+        connPtr[currentConnectivityIdx++] = triplet.x;
       }
-      currentOffset += static_cast<vtkIdType>(face.size());
-      offsetsPtr[i + 1] = currentOffset;
     }
+    offsetsPtr[numCells] = currentConnectivityIdx;
     cells->SetData(offsets, connectivity);
     // Note : uv and N are optional
     auto uvMapIter = data.Attributes.find("uv");
