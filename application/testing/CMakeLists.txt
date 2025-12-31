@@ -199,6 +199,9 @@ endif()
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251104)
   f3d_test(NAME TestPipedSTL DATA suzanne.stl ARGS --force-reader=STL PIPED)
+  if(NOT F3D_MACOS_BUNDLE)
+    f3d_test(NAME TestDefaultConfigFilePipedSTL DATA suzanne.stl ARGS --force-reader=STL CONFIG config_build LONG_TIMEOUT UI PIPED)
+  endif()
 endif()
 
 
