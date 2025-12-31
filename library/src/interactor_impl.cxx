@@ -614,7 +614,8 @@ public:
       this->CommandBuffer.reset();
     }
 
-    this->AnimationManager->Tick(deltaTime);
+    this->AnimationManager->SetDeltaTime(deltaTime);
+    this->AnimationManager->Tick();
 
     vtkRenderWindow* renWin = this->Window.GetRenderWindow();
     vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
@@ -671,7 +672,7 @@ public:
   std::atomic<bool> RenderRequested = false;
   std::atomic<bool> StopRequested = false;
 
-  double CallbackDeltaTime = 0.0;
+  double CallbackDeltaTime = 1.0 / 30; /* Default DeltaTime (30fps) */
 };
 
 //----------------------------------------------------------------------------
@@ -1091,6 +1092,16 @@ interactor& interactor_impl::initCommands()
     },
     command_documentation_t{ "roll_camera value", "roll the camera on its side" });
 
+  this->addCommand("jump_to_frame",
+    [&](const std::vector<std::string>& args)
+    {
+      check_args(args, 2, "jump_to_frame");
+      const int frame = options::parse<int>(args[0]);
+      const bool relative = options::parse<bool>(args[1]);
+      this->Internals->AnimationManager->SetDeltaTime(this->Internals->CallbackDeltaTime);
+      this->Internals->AnimationManager->JumpToFrame(frame, relative);
+    });
+
   this->addCommand(
     "elevation_camera",
     [&](const std::vector<std::string>& args)
@@ -1509,11 +1520,16 @@ interactor& interactor_impl::initBindings()
   // "Cycle array to color with" , "arrayName"
   auto docArray = [&]()
   {
+    // enable + no array : ON
+    // enable + array : array
+    // no enable + array : array (forced)
+    // no enable + no array : OFF
     return std::pair("Color array",
       (opts.model.scivis.array_name.has_value()
           ? shortName(opts.model.scivis.array_name.value(), 15) +
             (opts.model.scivis.enable ? "" : " (forced)")
-          : "OFF"));
+          : opts.model.scivis.enable ? "ON"
+                                     : "OFF"));
   };
 
   // "Cycle component to color with" , "component"

@@ -9,18 +9,22 @@
  * and LinearDeflection.
  * Reading 1D cells (wires) is optional.
  *
+ * This reader support reading streams for all supported formats but IGES.
+ * https://dev.opencascade.org/content/reading-iges-stream-seems-broken-770
+ *
  */
 
 #ifndef vtkF3DOCCTReader_h
 #define vtkF3DOCCTReader_h
 
 #include <vtkMultiBlockDataSetAlgorithm.h>
+#include <vtkSmartPointer.h>
 #include <vtkVersion.h>
 
 #include <memory>
 
 class vtkInformationDoubleVectorKey;
-
+class vtkResourceStream;
 class vtkF3DOCCTReader : public vtkMultiBlockDataSetAlgorithm
 {
 public:
@@ -88,11 +92,25 @@ public:
 
   ///@{
   /**
+   * Specify stream to read from
+   * When both `Stream` and `Filename` are set, stream is used.
+   */
+  void SetStream(vtkResourceStream* stream);
+  vtkResourceStream* GetStream();
+  ///@}
+
+  ///@{
+  /**
    * Get/Set the file name.
    */
   vtkSetMacro(FileName, std::string);
   vtkGetMacro(FileName, std::string);
   ///@}
+
+  /**
+   * Overridden to take into account mtime from the internal vtkResourceStream.
+   */
+  vtkMTimeType GetMTime() override;
 
 protected:
   vtkF3DOCCTReader();
@@ -108,12 +126,16 @@ private:
   std::unique_ptr<vtkInternals> Internals;
 
   std::string FileName;
+  vtkSmartPointer<vtkResourceStream> Stream;
 
   double LinearDeflection = 0.1;
   double AngularDeflection = 0.5;
   bool RelativeDeflection = false;
   bool ReadWire = false;
   FILE_FORMAT FileFormat = FILE_FORMAT::STEP;
+
+  std::unique_ptr<std::streambuf> Streambuf;
+  std::unique_ptr<std::istream> Buffer;
 };
 
 #endif

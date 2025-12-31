@@ -20,7 +20,7 @@ Press <kbd>W</kbd> to cycle through available animations
 
 <img width="1024" alt="4" src="https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/docs/user/animation_3.png" />
 Press <kbd>space</kbd> to play/pause current animation.
-Note: A red bar runs along the bottom of screen to indicate the current time interval of the animation sequence if animation-progress was turned on.
+Note: A blue bar runs along the bottom of screen to indicate the current time interval of the animation sequence if animation-progress was turned on.
 
 <img width="1024" alt="5" src="https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/docs/user/animation_4.png" />
 "All Animations" will play all animations at the same time if supported by the file format.
@@ -41,6 +41,9 @@ F3D animation behavior can be fully controlled from the command line using the f
 
 - Press <kbd>W</kbd> to cycle through animations
 - Press <kbd>Space</kbd> to play/pause animation
+- Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Space</kbd> to play/pause animation backward
+
+See [COMMANDS](07-COMMANDS.md) for commands like `jump_to_frame`
 
 ## Cycling Animations
 
