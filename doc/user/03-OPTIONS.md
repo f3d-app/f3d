@@ -126,17 +126,20 @@ Define the Up direction.
 
 Show _axes_ as a trihedron in the scene.
 
-### `--x-color` (_color_, default: `0.976471, 0.262745, 0.023529`)
+### `--x-color` (_color_)
 
 Set the X axis color in both widget and grid.
+If not set, `0.976471, 0.262745, 0.023529` will be used.
 
-### `--y-color` (_color_, default: `0.478431, 1.000000, 0.478431`)
+### `--y-color` (_color_)
 
 Set the Y axis color in both widget and grid.
+If not set, `0.478431, 1.000000, 0.478431` will be used.
 
-### `--z-color` (_color_, default: `0.470588, 0.545098, 1.000000`)
+### `--z-color` (_color_)
 
 Set the Z axis color in both widget and grid.
+If not set, `0.470588, 0.545098, 1.000000` will be used.
 
 ### `-g`, `--grid` (_bool_, default: `false`)
 

@@ -425,23 +425,26 @@ Show _axes_ as a trihedron in the scene. Requires an interactor.
 
 CLI: `--axis`.
 
-### `ui.x_color` (_color_, default: `0.976471, 0.262745, 0.023529`)
+### `ui.x_color` (_color_, optional)
 
 Set the X axis color in both widget and grid.
+If not set, `0.976471, 0.262745, 0.023529` will be used.
 
 CLI: `--x-color`.
 
-### `ui.y_color` (_color_, default: `0.478431, 1.000000, 0.478431`)
+### `ui.y_color` (_color_, optional)
 
 Set the Y axis color in both widget and grid.
+If not set, `0.478431, 1.000000, 0.478431` will be used.
 
 CLI: `--y-color`.
 
-### `ui.z_color` (_color_, default: `0.470588, 0.545098, 1.000000`)
+### `ui.z_color` (_color_, optional)
 
 Set the Z axis color in both widget and grid.
+If not set, `0.470588, 0.545098, 1.000000` will be used.
 
-CLI: `--x-color`.
+CLI: `--z-color`.
 
 ### `ui.scalar_bar` (_bool_, default: `false`)
 
