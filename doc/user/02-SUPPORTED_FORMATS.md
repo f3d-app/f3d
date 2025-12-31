@@ -2,42 +2,45 @@
 
 F3D supports the following file formats:
 
-| Name                                      | File Extension(s)                              | Full scene | Animation Support | Plugin    | Reader Name             |
-| ----------------------------------------- | ---------------------------------------------- | ---------- | ----------------- | --------- | ----------------------- |
-| Legacy VTK                                | `.vtk`                                         | No         | NONE              | `native`  | `VTKLegacy`             |
-| VTK XML                                   | `.vtp`, `.vtu`, `.vtr`, `.vti`, `.vts`, `.vtm` | No         | NONE              | `native`  | `VTKXMLVT<P,U,R,I,S,M>` |
-| VTKHDF                                    | `.vtkhdf`                                      | No         | UNIQUE            | `hdf`     | `VTKHDF`                |
-| EXODUS II                                 | `.e`, `.ex2`, `.exo`, `.g`                     | No         | UNIQUE            | `hdf`     | `ExodusII`              |
-| NetCDF                                    | `.nc`, `.cdf`, `.ncdf`                         | No         | UNIQUE            | `hdf`     | `NetCDF`                |
-| Polygon File Format                       | `.ply`                                         | No         | NONE              | `native`  | `PLYReader`             |
-| Standard Triangle Language                | `.stl`                                         | No         | NONE              | `native`  | `STL`                   |
-| DICOM                                     | `.dcm`                                         | No         | NONE              | `native`  | `DICOM`                 |
-| NRRD ("nearly raw raster data")           | `.nrrd`, `.nhdr`                               | No         | NONE              | `native`  | `Nrrd`                  |
-| MetaHeader MetaIO                         | `.mhd`, `.mha`                                 | No         | NONE              | `native`  | `MetaImage`             |
-| Tag Image File Format 2D/3D               | `.tif`, `.tiff`                                | No         | NONE              | `native`  | `TIFF`                  |
-| QuakeMDL                                  | `.mdl`                                         | Yes        | SINGLE            | `native`  | `QuakeMDL`              |
-| CityGML                                   | `.gml`                                         | No         | NONE              | `native`  | `CityGML`               |
-| Point Cloud                               | `.pts`                                         | No         | NONE              | `native`  | `PTS`                   |
-| Standard for the Exchange of Product Data | `.step`, `.stp`, `.stpnc`, `.p21`, `.210`      | No         | NONE              | `occt`    | `STEP`                  |
-| Initial Graphics Exchange Specification   | `.iges`, `.igs`                                | No         | NONE              | `occt`    | `IGES`                  |
-| Open CASCADE Technology BRep format       | `.brep`                                        | No         | NONE              | `occt`    | `BREP`                  |
-| Open CASCADE Technology XBF format        | `.xbf`                                         | No         | NONE              | `occt`    | `XBF`                   |
-| Alembic                                   | `.abc`                                         | No         | UNIQUE            | `alembic` | `Alembic`               |
-| Wavefront OBJ                             | `.obj`                                         | Yes        | NONE              | `native`  | `OBJ`                   |
-| GL Transmission Format                    | `.gltf`, `.glb`                                | Yes        | MULTI             | `native`  | `GLTF`, `GLTFDraco`     |
-| Draco                                     | `.drc`                                         | No         | NONE              | `draco`   | `Draco`                 |
-| Autodesk 3D Studio                        | `.3ds`                                         | Yes        | NONE              | `native`  | `3DS`                   |
-| Virtual Reality Modeling Language         | `.wrl`, `.vrml`                                | Yes        | NONE              | `native`  | `VRMLReader`            |
-| Autodesk Filmbox                          | `.fbx`                                         | Yes        | SINGLE            | `assimp`  | `FBX`                   |
-| COLLADA                                   | `.dae`                                         | Yes        | SINGLE            | `assimp`  | `COLLADA`               |
-| Object File Format                        | `.off`                                         | Yes        | NONE              | `assimp`  | `OFF`                   |
-| Drawing Exchange Format                   | `.dxf`                                         | Yes        | NONE              | `assimp`  | `DXF`                   |
-| DirectX                                   | `.x`                                           | Yes        | SINGLE            | `assimp`  | `DirectX`               |
-| 3D Manufacturing Format                   | `.3mf`                                         | Yes        | NONE              | `assimp`  | `3MF`                   |
-| Universal Scene Description               | `.usd`, `.usda`, `.usdc`, `.usdz`              | Yes        | SINGLE            | `usd`     | `USD`                   |
-| VDB                                       | `.vdb`                                         | No         | NONE              | `vdb`     | `VDB`                   |
-| 3D Gaussian splatting                     | `.splat`                                       | No         | NONE              | `native`  | `Splat`                 |
-| Compressed 3D Gaussian splatting          | `.spz`                                         | No         | NONE              | `native`  | `SPZ`                   |
+| Name                                      | File Extension(s)                              | Full scene | Animation Support | Streaming Support | Plugin    | Reader Name             |
+| ----------------------------------------- | ---------------------------------------------- | ---------- | ----------------- | ----------------- | --------- | ----------------------- |
+| Legacy VTK                                | `.vtk`                                         | No         | NONE              | YES (VTK 9.7)     | `native`  | `VTKLegacy`             |
+| VTK XML                                   | `.vtp`, `.vtu`, `.vtr`, `.vti`, `.vts`, `.vtm` | No         | NONE              | YES (VTK 9.7)     | `native`  | `VTKXMLVT<P,U,R,I,S,M>` |
+| VTKHDF                                    | `.vtkhdf`                                      | No         | UNIQUE            | YES (VTK 9.6)     | `hdf`     | `VTKHDF`                |
+| EXODUS II                                 | `.e`, `.ex2`, `.exo`, `.g`                     | No         | UNIQUE            | NO                | `hdf`     | `ExodusII`              |
+| NetCDF                                    | `.nc`, `.cdf`, `.ncdf`                         | No         | UNIQUE            | YES (VTK 9.7)     | `hdf`     | `NetCDF`                |
+| Polygon File Format                       | `.ply`                                         | No         | NONE              | YES (VTK 9.5)     | `native`  | `PLYReader`             |
+| Standard Triangle Language                | `.stl`                                         | No         | NONE              | YES (VTK 9.6)     | `native`  | `STL`                   |
+| DICOM                                     | `.dcm`                                         | No         | NONE              | YES (VTK 9.6)     | `native`  | `DICOM`                 |
+| NRRD ("nearly raw raster data")           | `.nrrd`, `.nhdr`                               | No         | NONE              | NO                | `native`  | `Nrrd`                  |
+| MetaHeader MetaIO                         | `.mhd`, `.mha`                                 | No         | NONE              | NO                | `native`  | `MetaImage`             |
+| Tag Image File Format 2D/3D               | `.tif`, `.tiff`                                | No         | NONE              | NO                | `native`  | `TIFF`                  |
+| QuakeMDL                                  | `.mdl`                                         | Yes        | SINGLE            | YES (VTK 9.5)     | `native`  | `QuakeMDL`              |
+| CityGML                                   | `.gml`                                         | No         | NONE              | YES (VTK 9.6)     | `native`  | `CityGML`               |
+| Point Cloud                               | `.pts`                                         | No         | NONE              | YES (VTK 9.6)     | `native`  | `PTS`                   |
+| Standard for the Exchange of Product Data | `.step`, `.stp`, `.stpnc`, `.p21`, `.210`      | No         | NONE              | YES (VTK 9.6)     | `occt`    | `STEP`                  |
+| Initial Graphics Exchange Specification   | `.iges`, `.igs`                                | No         | NONE              | NO                | `occt`    | `IGES`                  |
+| Open CASCADE Technology BRep format       | `.brep`                                        | No         | NONE              | YES (VTK 9.6)     | `occt`    | `BREP`                  |
+| Open CASCADE Technology XBF format        | `.xbf`                                         | No         | NONE              | YES (VTK 9.6)     | `occt`    | `XBF`                   |
+| Alembic                                   | `.abc`                                         | No         | UNIQUE            | YES (VTK 9.6)     | `alembic` | `Alembic`               |
+| Wavefront OBJ                             | `.obj`                                         | Yes        | NONE              | PARTIAL (VTK 9.7) | `native`  | `OBJ`                   |
+| GL Transmission Format                    | `.gltf`                                        | Yes        | MULTI             | PARTIAL (VTK 9.6) | `native`  | `GLTF`, `GLTFDraco`     |
+| GL Transmission Format (binary)           | `.glb`                                         | Yes        | MULTI             | YES (VTK 9.6)     | `native`  | `GLTF`, `GLTFDraco`     |
+| Draco                                     | `.drc`                                         | No         | NONE              | YES               | `draco`   | `Draco`                 |
+| Autodesk 3D Studio                        | `.3ds`                                         | Yes        | NONE              | YES (VTK 9.6)     | `native`  | `3DS`                   |
+| Virtual Reality Modeling Language         | `.wrl`, `.vrml`                                | Yes        | NONE              | NO                | `native`  | `VRMLReader`            |
+| Autodesk Filmbox                          | `.fbx`                                         | Yes        | SINGLE            | YES (VTK 9.6)     | `assimp`  | `FBX`                   |
+| COLLADA                                   | `.dae`                                         | Yes        | SINGLE            | YES (VTK 9.6)     | `assimp`  | `COLLADA`               |
+| Object File Format                        | `.off`                                         | Yes        | NONE              | YES (VTK 9.6)     | `assimp`  | `OFF`                   |
+| Drawing Exchange Format                   | `.dxf`                                         | Yes        | NONE              | YES (VTK 9.6)     | `assimp`  | `DXF`                   |
+| DirectX                                   | `.x`                                           | Yes        | SINGLE            | YES (VTK 9.6)     | `assimp`  | `DirectX`               |
+| 3D Manufacturing Format                   | `.3mf`                                         | Yes        | NONE              | YES (VTK 9.6)     | `assimp`  | `3MF`                   |
+| Universal Scene Description               | `.usd`, `.usda`, `.usdc`, `.usdz`              | Yes        | SINGLE            | NO                | `usd`     | `USD`                   |
+| VDB                                       | `.vdb`                                         | No         | NONE              | YES (VTK 9.6)     | `vdb`     | `VDB`                   |
+| 3D Gaussian splatting                     | `.splat`                                       | No         | NONE              | YES (VTK 9.5)     | `native`  | `Splat`                 |
+| Compressed 3D Gaussian splatting          | `.spz`                                         | No         | NONE              | YES (VTK 9.5)     | `native`  | `SPZ`                   |
+
+Streaming support refers to the ability to read from stdin and requires specifying the reader name, see [the examples](11-DESKTOP_INTEGRATION.md#piping). 
 
 ## Reader options
 

@@ -25,7 +25,7 @@ All static plugins can be loaded using `f3d::engine::autoloadPlugins()`.
 
 ## Scene class
 
-The scene class is responsible to `add` file from the disk into the scene. It supports reading multiple files at the same time and even mesh from memory.
+The scene class is responsible to `add` file from the disk into the scene. It supports reading multiple files at the same time and even mesh or files from memory.
 It is possible to `clear` the scene and to check if the scene `supports` a file.
 
 ## Context class

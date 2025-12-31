@@ -137,7 +137,6 @@ EMSCRIPTEN_BINDINGS(f3d)
   // TODO:
   // - add lights support
   // - add f3d::mesh_t support
-  // - add proper testing
   emscripten::class_<f3d::scene>("Scene")
     .function(
       "supports",
