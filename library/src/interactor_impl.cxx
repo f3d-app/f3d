@@ -1098,8 +1098,7 @@ interactor& interactor_impl::initCommands()
       check_args(args, 2, "jump_to_frame");
       const int frame = options::parse<int>(args[0]);
       const bool relative = options::parse<bool>(args[1]);
-      this->Internals->AnimationManager->SetDeltaTime(this->Internals->CallbackDeltaTime);
-      this->Internals->AnimationManager->JumpToFrame(frame, relative);
+      this->jumpToFrame(frame, relative);
     });
 
   this->addCommand(
@@ -1900,6 +1899,15 @@ interactor::AnimationDirection interactor_impl::getAnimationDirection()
   return this->Internals->AnimationManager->GetAnimationDirection() == 1
     ? AnimationDirection::FORWARD
     : AnimationDirection::BACKWARD;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::jumpToFrame(int frame, bool relative)
+{
+  assert(this->Internals->AnimationManager);
+  this->Internals->AnimationManager->SetDeltaTime(this->Internals->CallbackDeltaTime);
+  this->Internals->AnimationManager->JumpToFrame(frame, relative);
+  return *this;
 }
 
 //----------------------------------------------------------------------------
