@@ -109,6 +109,10 @@ const settings = {
     interactor.stopAnimation();
 
     // only for coverage, do not test the actual feature yet
+    interactor.jumpToFrame(0, false);
+    interactor.jumpToFrame(-1, false);
+    interactor.jumpToFrame(1, true);
+    interactor.jumpToFrame(-1, true);
     interactor.disableCameraMovement();
     interactor.enableCameraMovement();
     interactor.requestRender();
