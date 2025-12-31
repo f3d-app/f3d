@@ -311,9 +311,9 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
 //----------------------------------------------------------------------------
 scene& scene_impl::add(void* buffer, std::size_t size)
 {
-  if (buffer == nullptr)
+  if (buffer == nullptr || size == 0)
   {
-    log::debug("Empty buffer when trying to load a buffer into the scene provided\n");
+    log::debug("Empty buffer or zero size when trying to load a buffer into the scene provided\n");
     return *this;
   }
 

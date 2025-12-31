@@ -3,6 +3,7 @@ import utils from "./utils.js";
 const settings = {
   runBefore: (Module) => {
     // does nothing but called for coverage
+    Module.engineInstance.getScene().addBuffer(new Array());
     Module.engineInstance.getScene().clear();
 
     const options = Module.engineInstance.getOptions();
