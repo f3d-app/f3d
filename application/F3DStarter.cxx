@@ -54,6 +54,15 @@
 #include <regex>
 #include <set>
 
+#ifdef _WIN32
+# include <fcntl.h>
+# include <io.h>
+# include <stdio.h>
+# define SET_STDIN_BINARY_MODE() setmode(stdin, O_BINARY)
+#else
+# define SET_STDIN_BINARY_MODE() ((void)0)
+#endif
+
 namespace fs = std::filesystem;
 
 // This pointer is used to retrieve the interactor in case an OS signal is handled
@@ -1736,6 +1745,7 @@ void F3DStarter::LoadFileGroupInternal(
           std::size_t readSize = 0;
 
           std::istream& is = std::cin;
+          SET_STDIN_BINARY_MODE();
           // TODO useful for debugging with gdb
           //            std::ifstream is;
           //            is.open("/home/glow/dev/f3d/f3d/src/testing/data/f3d.glb");
