@@ -145,6 +145,13 @@ f3d_interactor_animation_direction_t f3d_interactor_get_animation_direction(
 }
 
 //----------------------------------------------------------------------------
+void f3d_interactor_jump_to_frame(f3d_interactor_t* interactor, int frame, bool relative)
+{
+  f3d::interactor* cpp_interactor = reinterpret_cast<f3d::interactor*>(interactor);
+  f3d::interactor::AnimationDirection cpp_direction = cpp_interactor->jumpToFrame(frame, relative);
+}
+
+//----------------------------------------------------------------------------
 void f3d_interactor_enable_camera_movement(f3d_interactor_t* interactor)
 {
   if (!interactor)

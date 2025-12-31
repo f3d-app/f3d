@@ -335,6 +335,18 @@ extern "C"
     f3d_interactor_t* interactor);
   ///@}
 
+  /**
+   * @brief Load animation at provided frame value
+   * When relative is false frame -1 is equal to last frame
+   *
+   * @param interactor Interactor handle.
+   * @param frame Frame to load.
+   * @param relative Use current frame as jump computation starting point.
+   */
+  F3D_EXPORT void f3d_interactor_jump_to_frame(
+    f3d_interactor_t* interactor, int frame, bool relative);
+  ///@}
+
   ///@{ @name Movement
   /**
    * @brief Enable camera movement.
