@@ -1136,7 +1136,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
   f3d_test(NAME TestInteractionDragRotateVertical DATA offset-flat-box.glb ARGS -g -x --up=y INTERACTION UI) # Drag down, should look straight down and avoid gimbal lock
 endif()
 f3d_test(NAME TestInteractionVerticalDragRotate DATA dragon.vtu ARGS --up=y INTERACTION LONG_TIMEOUT) # 7 (top-view); left click and drag
-f3d_test(NAME TestInteractionDynamicUpDirection DATA dragon.vtu INTERACTION) # Ctrl+Z to change up direction to +Z
+f3d_test(NAME TestInteractionDynamicUpDirection DATA dragon.vtu INTERACTION) # Ctrl+Z
 f3d_test(NAME TestInteractionReload DATA dragon.vtu ARGS -e INTERACTION) #Up;
 f3d_test(NAME TestInteractionLoadParentDirectory DATA multi/dragon.vtu ARGS --filename INTERACTION UI) #Down;
 f3d_test(NAME TestInteractionEmptyLoadParentDirectory INTERACTION NO_BASELINE REGEXP "No files loaded, no rendering performed") #Down;

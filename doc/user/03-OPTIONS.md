@@ -120,7 +120,7 @@ When loading a file group, if they results in an empty scene, remove the file gr
 
 ### `--up=<direction>` (_direction_, default: `+Y`)
 
-Define the Up direction. Can be changed at runtime.
+Define the Up direction.
 
 ### `-x`, `--axis` (_bool_, default: `false`)
 

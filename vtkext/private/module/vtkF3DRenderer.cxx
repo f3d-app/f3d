@@ -408,7 +408,7 @@ void vtkF3DRenderer::SetPendingUpDirection(const std::vector<double>& upVec)
   constexpr double e = 1e-8;
   if (std::abs(up[0]) < e && std::abs(up[1]) < e && std::abs(up[2]) < e)
   {
-    return;
+    up = { 0.0, 1.0, 0.0 };
   }
 
   vtkMath::Normalize(up.data());
