@@ -413,7 +413,9 @@ void vtkF3DRenderer::SetPendingUpDirection(const std::vector<double>& upVec)
 
   vtkMath::Normalize(up.data());
 
-  if (vtkMathUtilities::FuzzyCompare(up[0], this->PendingUpDirection[0]) && vtkMathUtilities::FuzzyCompare(up[1], this->PendingUpDirection[1]) && vtkMathUtilities::FuzzyCompare(up[2], this->PendingUpDirection[2]))
+  if (vtkMathUtilities::FuzzyCompare(up[0], this->PendingUpDirection[0]) &&
+    vtkMathUtilities::FuzzyCompare(up[1], this->PendingUpDirection[1]) &&
+    vtkMathUtilities::FuzzyCompare(up[2], this->PendingUpDirection[2]))
   {
     return;
   }
