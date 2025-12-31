@@ -40,7 +40,7 @@ F3D supports the following file formats:
 | 3D Gaussian splatting                     | `.splat`                                       | No         | NONE              | YES (VTK 9.5)     | `native`  | `Splat`                 |
 | Compressed 3D Gaussian splatting          | `.spz`                                         | No         | NONE              | YES (VTK 9.5)     | `native`  | `SPZ`                   |
 
-Streaming support refers to the ability to read from stdin and requires specifying the reader name, see [the examples](11-DESKTOP_INTEGRATION.md#piping). 
+Streaming support refers to the ability to read from stdin and requires specifying the reader name, see [the examples](11-DESKTOP_INTEGRATION.md#piping).
 
 ## Reader options
 
