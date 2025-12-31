@@ -43,6 +43,12 @@ void animationManager::SetInteractor(interactor_impl* interactor)
 }
 
 //----------------------------------------------------------------------------
+void animationManager::SetDeltaTime(double deltaTime)
+{
+  this->DeltaTime = deltaTime;
+}
+
+//----------------------------------------------------------------------------
 void animationManager::Initialize()
 {
   assert(this->Importer);
@@ -160,11 +166,12 @@ void animationManager::ToggleAnimation()
 }
 
 //----------------------------------------------------------------------------
-void animationManager::Tick(double deltaTime)
+void animationManager::Tick()
 {
+  assert(this->DeltaTime > 0);
   if (this->Playing)
   {
-    this->CurrentTime += (deltaTime * this->SpeedFactor) * this->AnimationDirection;
+    this->CurrentTime += (this->DeltaTime * this->SpeedFactor) * this->AnimationDirection;
 
     // Modulo computation, compute CurrentTime in the time range.
     if (this->CurrentTime < this->TimeRange[0] || this->CurrentTime > this->TimeRange[1])
@@ -182,6 +189,35 @@ void animationManager::Tick(double deltaTime)
     {
       this->Window.render();
     }
+  }
+}
+
+//----------------------------------------------------------------------------
+void animationManager::JumpToFrame(int frame, bool relative)
+{
+  assert(this->DeltaTime > 0);
+  const double frameDuration = (this->DeltaTime * this->SpeedFactor);
+  const double currentFrame = (this->CurrentTime - this->TimeRange[0]) / frameDuration;
+
+  double nextFrame = 0;
+  if (relative)
+  {
+    nextFrame = currentFrame + frame;
+  }
+  else if (frame >= 0)
+  {
+    nextFrame = frame;
+  }
+  else
+  {
+    nextFrame = (this->TimeRange[1] - this->TimeRange[0]) / frameDuration;
+  }
+
+  this->CurrentTime = this->TimeRange[0] + (nextFrame * this->DeltaTime * this->SpeedFactor);
+
+  if (this->LoadAtTime(this->CurrentTime))
+  {
+    this->Window.render();
   }
 }
 

@@ -42,6 +42,8 @@ F3D animation behavior can be fully controlled from the command line using the f
 - Press <kbd>W</kbd> to cycle through animations
 - Press <kbd>Space</kbd> to play/pause animation
 
+See [COMMANDS](07-COMMANDS.md) for commands like `jump_to_frame`
+
 ## Cycling Animations
 
 Pressing <kbd>W</kbd> let you cycle the animation to show.
