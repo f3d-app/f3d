@@ -63,7 +63,7 @@ A JSON file of the following form will also be generated. It's used by F3D inter
       "extensions": ["myext"],
       "mimetypes": ["application/vnd.myext"],
       "name": "ReaderName",
-      "supports_stream" : true
+      "supports_stream": true
     }
   ],
   "type": "MODULE",
