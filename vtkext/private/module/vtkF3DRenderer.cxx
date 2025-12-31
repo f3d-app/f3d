@@ -376,15 +376,7 @@ void vtkF3DRenderer::InitializeUpDirection(const std::vector<double>& upVec)
 {
   assert(upVec.size() == 3);
 
-  std::array<double, 3> up = { upVec[0], upVec[1], upVec[2] };
-
-  constexpr double e = 1e-8;
-  if (std::abs(up[0]) < e && std::abs(up[1]) < e && std::abs(up[2]) < e)
-  {
-    up = { 0.0, 1.0, 0.0 };
-  }
-
-  this->SetPendingUpDirection({ up[0], up[1], up[2] });
+  this->SetPendingUpDirection(upVec);
   this->ConfigureUpDirection();
 
   double pos[3];
