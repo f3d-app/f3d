@@ -16,4 +16,4 @@ jobs:
         with:
           message: |
             You are modifying libf3d public API! :warning:Please update bindings accordingly:warning:!
-            You can find them in their respective directories: `python`, `java`, `webassembly`.
+            You can find them in their respective directories: `c`, `python`, `java`, `webassembly`.
