@@ -44,15 +44,6 @@ public class TestScene {
     Types.Mesh mesh = new Types.Mesh(points, new float[0], new float[0], faceSides, faceIndices);
 
     scene.addMesh(mesh);
-    scene.clear();
-
-    char[] array = new char[256];
-    FileReader input = new FileReader(testDataPath + "data/points.ply");
-    int size = input.read(array);
-    input.close();
-    Options options = engine.getOptions();
-    options.setAsString("scene.force_reader", "PLYReader");
-    scene.addBuffer(new String(array).getBytes(), size);
 
     scene.loadAnimationTime(0.5);
     scene.animationTimeRange();

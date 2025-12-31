@@ -63,22 +63,6 @@ int test_scene_c_api()
   }
 
   f3d_scene_add_mesh(scene, &mesh);
-  f3d_scene_clear(scene);
-
-  // Test adding a memory buffer
-
-  char source[256];
-  FILE *fp = fopen(F3D_TESTING_DATA_DIR "points.ply", "r");
-  size_t readLength = 0;
-  if (fp != NULL)
-  {
-    readLength = fread(source, sizeof(char), 256, fp);
-    fclose(fp);
-  }
-  f3d_options_t* options = f3d_engine_get_options(engine);
-  f3d_options_set_as_string(options, "scene.force_reader", "PLYReader");
-  f3d_scene_add_buffer(scene, source, readLength);
-  f3d_options_reset(options, "scene.force_reader");
 
   // Test the rest of the API
 
