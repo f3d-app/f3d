@@ -312,6 +312,8 @@ void PrintReadersList()
   size_t mimeColSize = 0;
   size_t descColSize = 0;
   size_t plugColSize = 0;
+  std::string streamStr = "Supports Stream";
+  size_t streamColSize = streamStr.size();
 
   std::vector<f3d::engine::readerInformation> readersInfo = f3d::engine::getReadersInfo();
   if (readersInfo.empty())
@@ -322,7 +324,7 @@ void PrintReadersList()
   // Compute the size of the 5 columns
   for (const auto& reader : readersInfo)
   {
-    // There is at least one MIME type for each extension
+    // There is at more one MIME type by extension
     assert(reader.Extensions.size() >= reader.MimeTypes.size());
 
     nameColSize = std::max(nameColSize, reader.Name.length());
@@ -340,6 +342,7 @@ void PrintReadersList()
   mimeColSize += colGap;
   descColSize += colGap;
   plugColSize += colGap;
+  streamColSize += colGap;
 
   std::string separator =
     std::string(nameColSize + extsColSize + descColSize + mimeColSize + plugColSize - colGap, '-');
@@ -347,7 +350,7 @@ void PrintReadersList()
   // Print the rows split in 3 columns
   std::stringstream headerLine;
   headerLine << std::left << std::setw(nameColSize) << "Name" << std::setw(plugColSize) << "Plugin"
-             << std::setw(descColSize) << "Description" << std::setw(extsColSize) << "Exts"
+             << std::setw(descColSize) << "Description" << std::setw(streamColSize) << streamStr << std::setw(extsColSize) << "Exts"
              << std::setw(mimeColSize - colGap) << "Mime-types";
   f3d::log::info(headerLine.str());
   f3d::log::info(separator);
@@ -361,6 +364,7 @@ void PrintReadersList()
       readerLine << std::setw(nameColSize) << (i == 0 ? reader.Name : "");
       readerLine << std::setw(plugColSize) << (i == 0 ? reader.PluginName : "");
       readerLine << std::setw(descColSize) << (i == 0 ? reader.Description : "");
+      readerLine << std::setw(streamColSize) << (i == 0 ? (reader.SupportsStream ? "YES" : "NO") : "");
       readerLine << std::setw(extsColSize)
                  << (i < reader.Extensions.size() ? reader.Extensions[i] : "");
       readerLine << std::setw(mimeColSize - colGap)

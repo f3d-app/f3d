@@ -152,6 +152,15 @@ public:
   }
 
   /**
+   * Return true if this reader supports stream
+   * false otherwise
+   */
+  virtual bool supportsStream()
+  {
+    return false;
+  }
+
+  /**
    * Set a reader option
    * Return true if the option was found (and set), false otherwise
    */
