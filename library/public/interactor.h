@@ -265,6 +265,11 @@ public:
   [[nodiscard]] virtual bool isPlayingAnimation() = 0;
   [[nodiscard]] virtual interactor::AnimationDirection getAnimationDirection() = 0;
 
+  /**
+   *
+   * Load animation at provided frame value
+   * When relative is false frame -1 is equal to last frame
+   */
   virtual interactor& jumpToFrame(int frame, bool relative) = 0;
   ///@}
 
