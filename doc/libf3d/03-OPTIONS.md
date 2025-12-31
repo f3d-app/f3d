@@ -182,6 +182,12 @@ Set a _custom colormap for the coloring_.See [colormap parsing](../user/08-PARSI
 
 CLI: `--colormap`.
 
+### `model.scivis.opacity_map` (_opacity_map_, default: "0.0,0.0,1.0,1.0")
+Set a _custom opacity map for the coloring_. The format of the opacity map should be `val, opacity, ...`.
+It works only for volumes at the moment.
+
+CLI: `--opacity-map`.
+
 ### `model.scivis.component` (_int_, default: `-1`)
 
 Specify the component to color with. `-1` means _magnitude_. `-2` means _direct values_.
