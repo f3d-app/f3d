@@ -206,7 +206,7 @@ void window_impl::Initialize()
 }
 
 //----------------------------------------------------------------------------
-void window_impl::InitializeCamera()
+void window_impl::InitializeUpDirection()
 {
   this->Internals->Renderer->InitializeUpDirection(this->Internals->Options.scene.up_direction);
 }

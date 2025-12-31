@@ -71,7 +71,7 @@ public:
    * Implementation only API.
    * Initialize the camera to a default position and set the up direction.
    */
-  void InitializeCamera();
+  void InitializeUpDirection();
 
   /**
    * Implementation only API.

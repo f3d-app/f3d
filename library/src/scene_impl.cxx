@@ -97,7 +97,7 @@ public:
     }
 
     // Initialize the camera on load
-    this->Window.InitializeCamera();
+    this->Window.InitializeUpDirection();
 
     // Reset temporary up to apply any config values
     if (this->Interactor)

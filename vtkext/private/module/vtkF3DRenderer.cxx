@@ -14,7 +14,6 @@
 #include "vtkF3DTAAResolvePass.h"
 #include "vtkF3DUserRenderPass.h"
 
-#include <iostream>
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
 #include <vtkCamera.h>
@@ -32,6 +31,7 @@
 #include <vtkLightCollection.h>
 #include <vtkLightKit.h>
 #include <vtkMath.h>
+#include <vtkMathUtilities.h>
 #include <vtkMatrix4x4.h>
 #include <vtkMultiBlockDataSet.h>
 #include <vtkObjectFactory.h>
@@ -413,10 +413,7 @@ void vtkF3DRenderer::SetPendingUpDirection(const std::vector<double>& upVec)
 
   vtkMath::Normalize(up.data());
 
-  constexpr double epsilon = 1e-6;
-  if (std::abs(up[0] - this->PendingUpDirection[0]) < epsilon &&
-    std::abs(up[1] - this->PendingUpDirection[1]) < epsilon &&
-    std::abs(up[2] - this->PendingUpDirection[2]) < epsilon)
+  if (vtkMathUtilities::FuzzyCompare(up[0], this->PendingUpDirection[0]) && vtkMathUtilities::FuzzyCompare(up[1], this->PendingUpDirection[1]) && vtkMathUtilities::FuzzyCompare(up[2], this->PendingUpDirection[2]))
   {
     return;
   }
