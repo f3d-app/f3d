@@ -21,6 +21,7 @@
 #include <vtkOpenGLRenderer.h>
 #include <vtkVersion.h>
 
+#include <array>
 #include <filesystem>
 #include <map>
 #include <optional>
@@ -208,10 +209,9 @@ public:
   void Initialize();
 
   /**
-   * Initialize actors properties related to the up vector using the provided upString, including
-   * the camera
+   * Initialize the camera position based on the given up direction.
    */
-  void InitializeUpVector(const std::vector<double>& upVec);
+  void InitializeUpDirection(const std::vector<double>& upVec);
 
   /**
    * Compute bounds of visible props as transformed by given matrix.
@@ -233,12 +233,12 @@ public:
   /**
    * Get up vector
    */
-  vtkGetVector3Macro(UpVector, double);
+  vtkGetVector3Macro(UpDirection, double);
 
   /**
    * Set/Get right vector
    */
-  vtkGetVector3Macro(RightVector, double);
+  vtkGetVector3Macro(RightDirection, double);
 
   /**
    * Set cache path, only used by the HDRI logic
@@ -410,6 +410,13 @@ public:
   ///@}
 
   /**
+   * Set the pending up direction. Stores the direction and marks
+   * the up vector as needing configuration.
+   * Actual configuration (camera rotation, skybox, environment) happens in UpdateActors.
+   */
+  void SetPendingUpDirection(const std::vector<double>& upVec);
+
+  /**
    * Get information about the current coloring
    * Returns a single line string containing the coloring description
    */
@@ -514,6 +521,12 @@ private:
   ///@}
 
   /**
+   * Apply the given up vector to the scene, computing an appropriate right vector.
+   * Updates UpDirection, RightDirection, skybox floor, and environment orientation.
+   */
+  void ApplyUpDirection(const std::array<double, 3>& up);
+
+  /**
    * Configure all actors properties
    */
   void ConfigureActorsProperties();
@@ -532,6 +545,12 @@ private:
    * Configure the different render passes
    */
   void ConfigureRenderPasses();
+
+  /**
+   * Rotate camera and apply up direction to scene.
+   * Called from UpdateActors when UpDirectionConfigured is false.
+   */
+  void ConfigureUpDirection();
 
   /**
    * Create a cache directory if a HDRIHash is set
@@ -616,6 +635,7 @@ private:
 
   bool CheatSheetConfigured = false;
   bool ActorsPropertiesConfigured = false;
+  bool UpDirectionConfigured = false;
   bool GridConfigured = false;
   bool GridAxesConfigured = false;
   bool AxesActorConfigured = false;
@@ -662,8 +682,9 @@ private:
   bool InvertZoom = false;
 
   int RaytracingSamples = 0;
-  double UpVector[3] = { 0.0, 1.0, 0.0 };
-  double RightVector[3] = { 1.0, 0.0, 0.0 };
+  double UpDirection[3] = { 0.0, 1.0, 0.0 };
+  double RightDirection[3] = { 1.0, 0.0, 0.0 };
+  double PendingUpDirection[3] = { 0.0, 1.0, 0.0 };
   double CircleOfConfusionRadius = 20.0;
   std::optional<double> PointSize;
   std::optional<double> LineWidth;

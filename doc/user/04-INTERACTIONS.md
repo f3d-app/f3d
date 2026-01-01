@@ -73,6 +73,11 @@ Camera Hotkeys:
 - <kbd>9</kbd>: isometric view camera.
 - <kbd>Enter</kbd>: reset the camera to its initial parameters.
 
+Scene Hotkeys:
+
+- <kbd>Ctrl</kbd>+<kbd>Y</kbd>: set scene up direction to +Y.
+- <kbd>Ctrl</kbd>+<kbd>Z</kbd>: set scene up direction to +Z.
+
 Other hotkeys and interactions are available:
 
 - <kbd>H</kbd>: key to toggle the display of a cheat sheet showing all these hotkeys and their statuses.
