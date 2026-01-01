@@ -53,9 +53,10 @@ The default scene always uses automatic camera.
 
 CLI: `--camera-index`.
 
-### `scene.up_direction` (_direction_, default: `+Y`, **on load**)
+### `scene.up_direction` (_direction_, default: `+Y`)
 
 Define the Up direction. It impacts the grid, the axis, the HDRI and the camera.
+
 CLI: `--up`.
 
 ### `scene.force_reader` (_string_, optional, **on load**)

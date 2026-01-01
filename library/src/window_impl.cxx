@@ -207,9 +207,9 @@ void window_impl::Initialize()
 }
 
 //----------------------------------------------------------------------------
-void window_impl::InitializeUpVector()
+void window_impl::InitializeUpDirection()
 {
-  this->Internals->Renderer->InitializeUpVector(this->Internals->Options.scene.up_direction);
+  this->Internals->Renderer->InitializeUpDirection(this->Internals->Options.scene.up_direction);
 }
 
 //----------------------------------------------------------------------------
@@ -396,6 +396,9 @@ void window_impl::UpdateDynamicOptions()
   renderer->UpdateLights();
 
   const options& opt = this->Internals->Options;
+
+  // Update pending up direction if changed
+  renderer->SetPendingUpDirection(opt.scene.up_direction);
 
   // XXX: model.point_sprites.type only has an effect on geometry scene
   // but we set it here for practical reasons
