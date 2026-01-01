@@ -197,6 +197,7 @@ f3d_test(NAME TestGridColor DATA suzanne.ply ARGS -g --grid-color=1,1,1)
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
   f3d_test(NAME TestAxis DATA suzanne.ply ARGS -x UI)
+  f3d_test(NAME TestAxesCustomColor DATA suzanne.ply ARGS -x -g --x-color=1,0,0.643 --y-color=0,1,0.894 --z-color=0.89,1,0 UI)
 endif()
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11209
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250513)

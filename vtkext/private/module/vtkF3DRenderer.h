@@ -11,6 +11,8 @@
 #ifndef vtkF3DRenderer_h
 #define vtkF3DRenderer_h
 
+#include "F3DStyle.h"
+
 #include "vtkF3DMetaImporter.h"
 #include "vtkF3DUIActor.h"
 
@@ -25,14 +27,15 @@
 
 namespace fs = std::filesystem;
 
-class vtkDiscretizableColorTransferFunction;
+class vtkCameraOrientationRepresentation;
+class vtkCameraOrientationWidget;
 class vtkColorTransferFunction;
 class vtkCornerAnnotation;
+class vtkDiscretizableColorTransferFunction;
+class vtkF3DOpenGLGridMapper;
 class vtkGridAxesActor3D;
 class vtkImageReader2;
 class vtkOrientationMarkerWidget;
-class vtkCameraOrientationRepresentation;
-class vtkCameraOrientationWidget;
 class vtkScalarBarActor;
 class vtkSkybox;
 class vtkTextActor;
@@ -115,6 +118,8 @@ public:
   void SetGridUnitSquare(const std::optional<double>& unitSquare);
   void SetGridSubdivisions(int subdivisions);
   void SetGridColor(const std::vector<double>& color);
+  void SetAxesColor(const std::vector<double>& colorXAxis, const std::vector<double>& colorYAxis,
+    const std::vector<double>& colorZAxis);
   ///@}
 
   /**
@@ -450,6 +455,11 @@ public:
   void ConfigureCheatSheet(const std::vector<vtkF3DUIActor::CheatSheetGroup>& info);
 
   /**
+   * Configure Axes (X,Y,Z) colors on the widget
+   */
+  void ConfigureAxesActor();
+
+  /**
    * Use this method to flag in the renderer that the cheatsheet needs to be updated
    * This is not required to call when using any of the setter of the renderer
    */
@@ -598,6 +608,7 @@ private:
 #endif
 
   vtkNew<vtkActor> GridActor;
+  vtkNew<vtkF3DOpenGLGridMapper> GridMapper;
   vtkNew<vtkSkybox> SkyboxActor;
   vtkNew<vtkF3DUIActor> UIActor;
 
@@ -607,6 +618,7 @@ private:
   bool ActorsPropertiesConfigured = false;
   bool GridConfigured = false;
   bool GridAxesConfigured = false;
+  bool AxesActorConfigured = false;
   bool RenderPassesConfigured = false;
   bool LightIntensitiesConfigured = false;
   bool TextActorsConfigured = false;
@@ -658,6 +670,10 @@ private:
   std::optional<double> GridUnitSquare;
   int GridSubdivisions = 10;
   double GridColor[3] = { 0.0, 0.0, 0.0 };
+
+  double ColorAxisX[3] = { 0.0, 0.0, 0.0 };
+  double ColorAxisY[3] = { 0.0, 0.0, 0.0 };
+  double ColorAxisZ[3] = { 0.0, 0.0, 0.0 };
 
   std::string HDRIFile;
   vtkSmartPointer<vtkImageReader2> HDRIReader;
