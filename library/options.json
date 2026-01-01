@@ -185,6 +185,15 @@
       "type": "bool",
       "default_value": "false"
     },
+    "x_color": {
+      "type": "color"
+    },
+    "y_color": {
+      "type": "color"
+    },
+    "z_color": {
+      "type": "color"
+    },
     "scalar_bar": {
       "type": "bool",
       "default_value": "false"
