@@ -410,6 +410,7 @@ Set an _opacity map file for the coloring_.
 ### `--opacity-map=<value, opacity>` (_vector\<double\>_, default: `0.0,0.0,1.0,1.0`)
 
 Set a _custom opacity map for the coloring_.
+Only used with volume rendering for now.
 Ignored if `--opacity-map-file` option is specified.
 
 ### `-v`, `--volume` (_bool_, default: `false`)

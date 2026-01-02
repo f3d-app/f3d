@@ -185,7 +185,7 @@ CLI: `--colormap`.
 ### `model.scivis.opacity_map` (_opacity_map_, default: "0.0,0.0,1.0,1.0")
 
 Set a _custom opacity map for the coloring_. The format of the opacity map should be `val, opacity, ...`.
-It works only for volumes at the moment.
+It is only used for volume rendering currently.
 
 CLI: `--opacity-map`.
 

@@ -235,7 +235,7 @@ f3d_test(NAME TestConsoleBadgeQuiet DATA suzanne.ply ARGS --position=0 --verbose
 f3d_test(NAME TestCityGML DATA Part-4-Buildings-V4-one.gml)
 f3d_test(NAME TestPTS DATA samplePTS.pts)
 f3d_test(NAME TestColormap DATA IM-0001-1983.dcm ARGS --scalar-coloring --roughness=1 --colormap=0,1,0,0,1,0,1,0)
-f3d_test(NAME TestOpacityMap DATA waveletArrays.vti ARGS -vb --coloring-array=Result --volume-opacity-map=0.0,0.0,0.5,1.0,1.0,0.0 THRESHOLD 0.05) # Small rendering differences due to 9.3.0
+f3d_test(NAME TestOpacityMap DATA waveletArrays.vti ARGS -vb --coloring-array=Result --volume-opacity-map=0.0,0.0,0.5,1.0,1.0,0.0 THRESHOLD 0.05) # Small rendering differences when using VTK 9.3.0
 f3d_test(NAME TestOpacityMapFile DATA waveletArrays.vti ARGS -vb --coloring-array=Result --volume-opacity-file=${F3D_SOURCE_DIR}/testing/data/gaussian_opacity_map.png)
 f3d_test(NAME TestInvalidOpacityMapFile DATA waveletArrays.vti ARGS -vb --coloring-array=Result --volume-opacity-file=${F3D_SOURCE_DIR}/testing/data/nonexistent_opacity_map.png)
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
