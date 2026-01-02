@@ -70,7 +70,7 @@ public:
   virtual void getState(camera_state_t& state) const = 0;
   /** Return the camera azimuth angle in degrees */
   [[nodiscard]] virtual double getWorldAzimuth() const = 0;
-  /** Return the camera elevation angle in  degrees */
+  /** Return the camera elevation angle in degrees */
   [[nodiscard]] virtual double getWorldElevation() const = 0;
   /** Return the distance between the camera position and its focal point */
   [[nodiscard]] virtual double getDistance() const = 0;

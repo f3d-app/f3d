@@ -142,12 +142,10 @@ void camera_impl::getFocalPoint(point3_t& foc) const
   vtkMath::Normalize(horizontal.data());
 
   // Signed angle between right and horizontal projection
-  vector3_t cross;
-  vtkMath::Cross(right, horizontal.data(), cross.data());
-  double sign = (vtkMath::Dot(cross.data(), up) >= 0.0) ? 1.0 : -1.0;
+  double angleRad = vtkMath::SignedAngleBetweenVectors(right, horizontal.data(), up);
 
-  double angleRad = vtkMath::AngleBetweenVectors(right, horizontal.data());
-  return sign * vtkMath::DegreesFromRadians(angleRad);
+  return vtkMath::DegreesFromRadians(angleRad);
+
 }
 
 //----------------------------------------------------------------------------

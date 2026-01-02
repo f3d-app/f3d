@@ -88,9 +88,15 @@ public:
   bool GetSuccessfullyReset() const;
 
 private:
+  /**
+   * This helper computes the direction vector pointing from the camera position
+   * toward the focal point in world coordinates:
+   * view = focal_point - position
+   */
+  void getPositionToFocalVector(vector3_t& vec) const;
+
   class internals;
   std::unique_ptr<internals> Internals;
-  void getPositionToFocalVector(vector3_t& vec) const;
 };
 }
 
