@@ -5,6 +5,9 @@
  * This reader is based on implementations of Quake 1's MDL, defined in
  * https://book.leveldesignbook.com/appendix/resources/formats/mdl It reads vertices, normals and
  * texture coordinate data from .mdl files. Supports animations.
+ *
+ * This reader expects a header "ident" value of either 0x4F504449 ("IDPO") or 0x54534449 ("IDST")
+ * This reader expects a header "version" value of exactly 6
  */
 
 #ifndef vtkF3DQuakeMDLImporter_h
@@ -19,11 +22,6 @@ class vtkF3DQuakeMDLImporter : public vtkF3DImporter
 public:
   static vtkF3DQuakeMDLImporter* New();
   vtkTypeMacro(vtkF3DQuakeMDLImporter, vtkF3DImporter);
-
-#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 5, 20250923)
-  vtkSetMacro(FileName, std::string);
-  vtkGetMacro(FileName, std::string);
-#endif
 
   /**
    * Update actors at the given time value.
@@ -61,8 +59,8 @@ public:
   /**
    * Get temporal information for the currently enabled animations.
    */
-  bool GetTemporalInformation(vtkIdType animationIndex, double frameRate, int& nbTimeSteps,
-    double timeRange[2], vtkDoubleArray* timeSteps) override;
+  bool GetTemporalInformation(vtkIdType animationIndex, double timeRange[2], int& nbTimeSteps,
+    vtkDoubleArray* timeSteps) override;
 
   ///@{
   /**
@@ -84,9 +82,6 @@ private:
   void operator=(const vtkF3DQuakeMDLImporter&) = delete;
 
   struct vtkInternals;
-#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 5, 20250923)
-  std::string FileName;
-#endif
   unsigned int SkinIndex = 0;
 
   std::unique_ptr<vtkInternals> Internals;

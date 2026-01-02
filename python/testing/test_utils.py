@@ -11,6 +11,11 @@ def test_text_distance():
 def test_collapse_path():
     assert f3d.Utils.collapse_path("/folder/../file.ext", ".") == Path("/file.ext")
 
+    # ensure we're getting a `Path` back
+    assert isinstance(f3d.Utils.collapse_path("/folder/../file.ext", Path(".")), Path)
+    # ensure the typing says we're getting `Path` back (pytest won't know but type checkers would)
+    assert f3d.Utils.collapse_path(Path("/folder/../file.ext"), ".").parent
+
 
 def test_tokenize():
     out = f3d.Utils.tokenize("my_cmd arg1 arg2")
@@ -30,11 +35,11 @@ def test_glob_to_regex():
 
 
 def test_get_env():
-    assert f3d.Utils.get_env("F3D_TEST_ENV_EMPTY") == None
+    assert f3d.Utils.get_env("F3D_TEST_ENV_EMPTY") is None
 
 
 def test_get_know_folder():
     if os.name == "nt":
-        assert f3d.Utils.get_known_folder(f3d.Utils.KnownFolder.PICTURES) != None
+        assert f3d.Utils.get_known_folder(f3d.Utils.KnownFolder.PICTURES) is not None
     else:
-        assert f3d.Utils.get_known_folder(f3d.Utils.KnownFolder.PICTURES) == None
+        assert f3d.Utils.get_known_folder(f3d.Utils.KnownFolder.PICTURES) is None

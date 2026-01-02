@@ -7,6 +7,10 @@
  * https://github.com/assimp/assimp/blob/master/doc/Fileformats.md
  *
  * The following formats have been tested and are supported by f3d: FBX, DAE, OFF, DXF, X, 3MF
+
+ * This importer supports reading from stream but prefer memory stream over filestream.
+ * Reading from stream require to position the MemoryHint to the correct file extension.
+ * No support for reading textures from streams unless embedded.
  */
 
 #ifndef vtkF3DAssimpImporter_h
@@ -23,16 +27,6 @@ class vtkF3DAssimpImporter : public vtkF3DImporter
 public:
   static vtkF3DAssimpImporter* New();
   vtkTypeMacro(vtkF3DAssimpImporter, vtkF3DImporter);
-
-#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 5, 20250923)
-  ///@{
-  /**
-   * Set/Get the file name.
-   */
-  vtkSetMacro(FileName, std::string);
-  vtkGetMacro(FileName, std::string);
-  ///@}
-#endif
 
   /**
    * Update actors at the given time value.
@@ -85,11 +79,17 @@ public:
   ///@}
 
   /**
+   * Set the hint to pass to assimp when reading from memory
+   * Typically the file extension.
+   */
+  vtkSetMacro(MemoryHint, std::string);
+
+  /**
    * Get temporal information for the currently enabled animation.
    * Only defines timerange and ignore provided frameRate.
    */
-  bool GetTemporalInformation(vtkIdType animationIndex, double frameRate, int& nbTimeSteps,
-    double timeRange[2], vtkDoubleArray* timeSteps) override;
+  bool GetTemporalInformation(vtkIdType animationIndex, double timeRange[2], int& nbTimeSteps,
+    vtkDoubleArray* timeSteps) override;
 
   /**
    * Get the number of available cameras.
@@ -116,14 +116,12 @@ protected:
   void ImportCameras(vtkRenderer*) override;
   void ImportLights(vtkRenderer*) override;
 
-#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 5, 20250923)
-  std::string FileName;
-#endif
-  bool ColladaFixup = false;
-
 private:
   vtkF3DAssimpImporter(const vtkF3DAssimpImporter&) = delete;
   void operator=(const vtkF3DAssimpImporter&) = delete;
+
+  bool ColladaFixup = false;
+  std::string MemoryHint;
 
   class vtkInternals;
   std::unique_ptr<vtkInternals> Internals;

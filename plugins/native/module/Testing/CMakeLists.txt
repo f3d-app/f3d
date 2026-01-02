@@ -6,6 +6,9 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
     TestF3DSPZReader.cxx
     TestF3DSplatReader.cxx
     TestF3DPLYReader.cxx
+    TestF3DQuakeMDLImporterStream.cxx
+    TestF3DQuakeMDLImporterInexistent.cxx
+    TestF3DQuakeMDLParser.cxx
   )
 endif()
 
@@ -17,6 +20,9 @@ vtk_test_cxx_executable(vtkextNativeTests tests)
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
   set_tests_properties(f3d::vtkextNativeCxx-TestF3DPLYReader
+    PROPERTIES
+    FAIL_REGULAR_EXPRESSION "")
+  set_tests_properties(f3d::vtkextNativeCxx-TestF3DQuakeMDLImporterInexistent
     PROPERTIES
     FAIL_REGULAR_EXPRESSION "")
 endif()

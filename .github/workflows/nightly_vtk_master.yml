@@ -56,7 +56,8 @@ jobs:
       usd_version: ${{ steps.set_default_versions.outputs.usd_version }}
       webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
       zlib_version: ${{ steps.set_default_versions.outputs.zlib_version }}
-      timestamp: ${{ steps.set_default_versions.outputs.timestamp }}
+      docker_timestamp: ${{ steps.set_default_versions.outputs.docker_timestamp }}
+      global_cache_index: ${{ steps.set_default_versions.outputs.global_cache_index }}
 
     steps:
       - name: Checkout
@@ -93,7 +94,7 @@ jobs:
 
       - name: Cache LFS Data
         id: lfs_sha_recover
-        uses: f3d-app/lfs-data-cache-action@v1
+        uses: f3d-app/lfs-data-cache-action@v2
         with:
           cache_postfix: cache-0
 
@@ -139,6 +140,7 @@ jobs:
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           webp_version: ${{ needs.default_versions.outputs.webp_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # Linux CI: Build and test
@@ -194,6 +196,7 @@ jobs:
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           webp_version: ${{ needs.default_versions.outputs.webp_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # MacOS CI: Build and test
@@ -204,7 +207,7 @@ jobs:
     strategy:
       fail-fast: false
 
-    runs-on: macos-13
+    runs-on: macos-15-intel
 
     env:
       CMAKE_POLICY_VERSION_MINIMUM: 3.5
@@ -239,6 +242,7 @@ jobs:
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           webp_version: ${{ needs.default_versions.outputs.webp_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # MacOS arm64 CI: Build and test
@@ -249,7 +253,7 @@ jobs:
     strategy:
       fail-fast: false
 
-    runs-on: macos-14
+    runs-on: macos-15
 
     env:
       CMAKE_POLICY_VERSION_MINIMUM: 3.5
@@ -284,6 +288,7 @@ jobs:
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           webp_version: ${{ needs.default_versions.outputs.webp_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # Sanitizer: Build and test on linux with last VTK with sanitizer options
@@ -339,6 +344,7 @@ jobs:
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           webp_version: ${{ needs.default_versions.outputs.webp_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
+          global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
   #----------------------------------------------------------------------------
   # Build android/wasm docker images
@@ -373,7 +379,7 @@ jobs:
         arch: [armeabi-v7a, arm64-v8a, x86, x86_64]
 
     runs-on: ubuntu-22.04
-    container: ghcr.io/f3d-app/f3d-android-${{ matrix.arch }}:${{needs.default_versions.outputs.timestamp}}_${{needs.check_nightly.outputs.vtk_sha}}
+    container: ghcr.io/f3d-app/f3d-android-${{ matrix.arch }}:${{needs.default_versions.outputs.docker_timestamp}}_${{needs.check_nightly.outputs.vtk_sha}}
 
     steps:
       - name: Checkout
@@ -392,7 +398,7 @@ jobs:
   # webassembly: Build webassembly artifacts
   #----------------------------------------------------------------------------
   webassembly:
-    needs: [check_nightly, default_versions, build_docker_images]
+    needs: [cache_lfs, check_nightly, default_versions, build_docker_images]
     strategy:
       fail-fast: false
 
@@ -400,7 +406,7 @@ jobs:
 
     env:
       CMAKE_BUILD_PARALLEL_LEVEL: 4
-      F3D_DOCKER_TIMESTAMP: ${{needs.default_versions.outputs.timestamp}}
+      F3D_DOCKER_TIMESTAMP: ${{needs.default_versions.outputs.docker_timestamp}}
 
     steps:
       - name: Checkout
@@ -408,7 +414,9 @@ jobs:
         with:
           path: "source"
           fetch-depth: 0
-          lfs: true
+          lfs: false
 
       - name: WebAssembly CI
         uses: ./source/.github/actions/wasm-ci
+        with:
+          lfs_sha: ${{ needs.cache_lfs.outputs.lfs_sha}}

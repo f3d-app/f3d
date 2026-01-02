@@ -26,7 +26,7 @@ int TestF3DMetaImporterAnimation(int argc, char* argv[])
 
   int nbTimeSteps;
   double timeRange[2];
-  if (importer->GetTemporalInformation(0, 60, nbTimeSteps, timeRange, nullptr))
+  if (importer->GetTemporalInformation(0, timeRange, nbTimeSteps, nullptr))
   {
     std::cerr << "Unexpected enabled animation that should not be\n";
     return EXIT_FAILURE;

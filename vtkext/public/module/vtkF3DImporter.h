@@ -14,6 +14,11 @@
 /// @cond
 #include <vtkImporter.h>
 #include <vtkVersion.h>
+
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 5, 20250923)
+#include <vtkResourceStream.h>
+#include <vtkSmartPointer.h>
+#endif
 /// @endcond
 
 class vtkInformationIntegerKey;
@@ -21,6 +26,7 @@ class vtkInformationIntegerKey;
 class VTKEXT_EXPORT vtkF3DImporter : public vtkImporter
 {
 public:
+  vtkTypeMacro(vtkF3DImporter, vtkImporter);
   /**
    * Information key used to flag actors.
    * Actors having this flag will be drawn on top.
@@ -52,11 +58,45 @@ public:
   }
 #endif
 
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 5, 20251210)
+  using vtkImporter::GetTemporalInformation;
+  /**
+   * Forward call to pre-20251210 implementation for GetTemporalInformation
+   * with framerate at 0
+   */
+  virtual bool GetTemporalInformation(
+    vtkIdType animationIndex, double timeRange[2], int& nbTimeSteps, vtkDoubleArray* timeSteps);
+#endif
+
   /**
    * Call this method to set the status to failure if supported
    * by the VTK version in use
    */
   void SetFailureStatus();
+
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 5, 20250923)
+  ///@{
+  /**
+   * Specify file name of the file to read
+   */
+  vtkSetFilePathMacro(FileName);
+  vtkGetFilePathMacro(FileName);
+  ///@}
+
+  ///@{
+  /**
+   * Specify stream to read from
+   */
+  vtkSetSmartPointerMacro(Stream, vtkResourceStream);
+  vtkGetSmartPointerMacro(Stream, vtkResourceStream);
+  ///@}
+#endif
+
+private:
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 5, 20250923)
+  char* FileName = nullptr;
+  vtkSmartPointer<vtkResourceStream> Stream;
+#endif
 };
 
 #endif

@@ -51,6 +51,9 @@ inputs:
   zlib_version:
     description: "Version of zlib to build"
     required: true
+  global_cache_index:
+    description: "Global cache index"
+    required: true
 
 runs:
   using: "composite"
@@ -71,6 +74,7 @@ runs:
         openvdb_version: ${{inputs.openvdb_version}}
         tbb_version: ${{inputs.tbb_version}}
         zlib_version: ${{inputs.zlib_version}}
+        global_cache_index: ${{inputs.global_cache_index}}
 
     - name: Install Raytracing Dependencies
       if: inputs.ospray_version != ''
@@ -78,6 +82,7 @@ runs:
       with:
         version: ${{inputs.ospray_version}}
         cpu: ${{inputs.cpu}}
+        global_cache_index: ${{inputs.global_cache_index}}
 
     - name: Install F3D dependencies
       if: inputs.optional_deps_label == 'optional-deps'
@@ -94,3 +99,4 @@ runs:
         tbb_version: ${{inputs.tbb_version}}
         usd_version: ${{inputs.usd_version}}
         webp_version: ${{inputs.webp_version}}
+        global_cache_index: ${{inputs.global_cache_index}}

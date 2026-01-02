@@ -1,0 +1,74 @@
+From 61b6983c68e620710069a2c8c45c621e949fa3d1 Mon Sep 17 00:00:00 2001
+From: Mathieu Westphal <mathieu.westphal@kitware.com>
+Date: Sun, 26 Oct 2025 08:42:08 +0100
+Subject: [PATCH] fix embree for modern clang
+
+---
+ .../superbuild/dependencies/dep_embree.cmake  |  1 +
+ ...embree-fix-output-operator-issue-486.patch | 42 +++++++++++++++++++
+ 2 files changed, 43 insertions(+)
+ create mode 100644 scripts/superbuild/dependencies/embree-fix-output-operator-issue-486.patch
+
+diff --git a/scripts/superbuild/dependencies/dep_embree.cmake b/scripts/superbuild/dependencies/dep_embree.cmake
+index 6d442bf94..f0ebbaa32 100644
+--- a/scripts/superbuild/dependencies/dep_embree.cmake
++++ b/scripts/superbuild/dependencies/dep_embree.cmake
+@@ -31,6 +31,7 @@ if (BUILD_EMBREE_FROM_SOURCE)
+     LIST_SEPARATOR | # Use the alternate list separator
+     ${EMBREE_CLONE_URL}
+     ${EMBREE_URL_HASH}
++    PATCH_COMMAND git init -q . && git apply -v -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/embree-fix-output-operator-issue-486.patch
+     CMAKE_ARGS
+       -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
+       -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+diff --git a/scripts/superbuild/dependencies/embree-fix-output-operator-issue-486.patch b/scripts/superbuild/dependencies/embree-fix-output-operator-issue-486.patch
+new file mode 100644
+index 000000000..d5b652090
+--- /dev/null
++++ b/scripts/superbuild/dependencies/embree-fix-output-operator-issue-486.patch
+@@ -0,0 +1,42 @@
++From 5669d422255b15f4be33589c2b31564f319be529 Mon Sep 17 00:00:00 2001
++From: Daniel Opitz <daniel.opitz@intel.com>
++Date: Mon, 13 May 2024 10:17:51 +0200
++Subject: [PATCH] fix output operator, issue #486
++
++---
++ kernels/geometry/pointi.h     | 4 ++--
++ kernels/subdiv/bezier_curve.h | 2 +-
++ 2 files changed, 3 insertions(+), 3 deletions(-)
++
++diff --git a/kernels/geometry/pointi.h b/kernels/geometry/pointi.h
++index f81edb903..aba8ec4ab 100644
++--- a/kernels/geometry/pointi.h
+++++ b/kernels/geometry/pointi.h
++@@ -210,9 +210,9 @@ namespace embree
++     };
++ 
++     /*! output operator */
++-    friend __forceinline embree_ostream operator<<(embree_ostream cout, const PointMi& line)
+++    friend __forceinline embree_ostream operator<<(embree_ostream cout, const PointMi& point)
++     {
++-      return cout << "Line" << M << "i {" << line.v0 << ", " << line.geomID() << ", " << line.primID() << "}";
+++      return cout << "Point" << M << "i {" << point.geomID() << ", " << point.primID() << "}";
++     }
++ 
++    public:
++diff --git a/kernels/subdiv/bezier_curve.h b/kernels/subdiv/bezier_curve.h
++index 257e0afd4..5e3b5c83b 100644
++--- a/kernels/subdiv/bezier_curve.h
+++++ b/kernels/subdiv/bezier_curve.h
++@@ -135,7 +135,7 @@ namespace embree
++       }
++       
++       friend embree_ostream operator<<(embree_ostream cout, const QuadraticBezierCurve& a) {
++-        return cout << "QuadraticBezierCurve ( (" << a.u.lower << ", " << a.u.upper << "), " << a.v0 << ", " << a.v1 << ", " << a.v2 << ")";
+++        return cout << "QuadraticBezierCurve (" << a.v0 << ", " << a.v1 << ", " << a.v2 << ")";
++       }
++     };
++   
++-- 
++2.51.1
++
+-- 
+2.51.1
+

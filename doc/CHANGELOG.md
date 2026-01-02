@@ -1,5 +1,53 @@
 # Changelog
 
+## v3.3.0
+
+For F3D users:
+
+- Created a F3D web application based on WebAssembly: https://f3d.app/viewer
+- **BEHAVIOR CHANGE**: Added a CLI option `--recursive-dir-add` to control if directory should be added recursively, off by default
+- Complete rework of the cheatsheet with for a nicer, cleaner look
+- [Linux] Added support for using F3D offscreen without GLX lib being present on the system
+- Added support for identifying non-supported files and not loading them at all
+- Added support for skipping unsupported files when loading multiple files
+- Added `--remove-empty-file-groups` to control if scene without files should be removed
+- Added `--watch` support for yet-to-exists files
+- Added a `remove_current_file_group` command
+- Added `--axes-grid` CLI option to show grid axes
+- Added an bind `Ctrl+X` to control the visibility of grid axes
+- Added proper parsing for transform2D options
+- Added `--multi-file-regex` CLI option to group files based on their names
+- Added autocompletion in interactive console
+- Added a `help` command to print information about commands
+- Added support for SPZ v3 format
+- Added `--backdrop-opacity` to control the UI backdrop opacity
+- Added support for .webp image and textures
+- Added support for GroupSkin for .mdl format
+- Added temporal anti aliasing support `--antialiasing-mode=taa`
+- Improve dropzone visuals
+- Improved `print_scene_info` output
+- Improved UI consistency
+- Improved rendering performance slightly
+- Reworked the website from scratch which now support documentation versioning
+- Removed support for comments in interactive console for better color parsing
+- Fixed and improved many documentations issues
+- Fixed an issue with `--watch` when file is failing to load
+- Fixed missing frame in .mdl animations
+- Fixed a potential crash when graphic libraries are not found
+- Fixed an issue with the scalar bar not being continuous
+
+For libf3d users:
+
+- Created a npm package to implement libf3d app for the web
+- Added event forwarding in order to implement interactions easily with _external_ engines
+- Added `ui.drop_zone.custom_binds` option to control the bindings visible in drop zone
+- Added `ui.backdrop.opacity` to control the UI backdrop opacity
+
+For F3D packagers:
+
+- F3D does not use libglx directly anymore when using VTK > 9.5
+- F3D v3.3.0 will be the last version of F3D supporting vtk v9.2.6, VTK v9.3.1 will be required for the next release
+
 ## v3.2.0
 
 For F3D users:

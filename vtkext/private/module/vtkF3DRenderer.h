@@ -11,22 +11,29 @@
 #ifndef vtkF3DRenderer_h
 #define vtkF3DRenderer_h
 
+#include "F3DStyle.h"
+
 #include "vtkF3DMetaImporter.h"
 #include "vtkF3DUIActor.h"
 
+#include <vtkCallbackCommand.h>
 #include <vtkLight.h>
 #include <vtkOpenGLRenderer.h>
 #include <vtkVersion.h>
 
+#include <array>
 #include <filesystem>
 #include <map>
 #include <optional>
 
 namespace fs = std::filesystem;
 
-class vtkDiscretizableColorTransferFunction;
+class vtkCameraOrientationRepresentation;
+class vtkCameraOrientationWidget;
 class vtkColorTransferFunction;
 class vtkCornerAnnotation;
+class vtkDiscretizableColorTransferFunction;
+class vtkF3DOpenGLGridMapper;
 class vtkGridAxesActor3D;
 class vtkImageReader2;
 class vtkOrientationMarkerWidget;
@@ -51,6 +58,26 @@ public:
     TAA
   };
 
+  /**
+   * Enum listing possible blending modes.
+   */
+  enum class BlendingMode : unsigned char
+  {
+    NONE,
+    DUAL_DEPTH_PEELING,
+    SORT,
+    STOCHASTIC
+  };
+
+  /**
+   * Enum listing possible splat types.
+   */
+  enum class SplatType : unsigned char
+  {
+    SPHERE,
+    GAUSSIAN
+  };
+
   ///@{
   /**
    * Set visibility of different actors
@@ -62,6 +89,7 @@ public:
   void ShowTimer(bool show);
   void ShowMetaData(bool show);
   void ShowFilename(bool show);
+  void ShowHDRIFilename(bool show);
   void ShowCheatSheet(bool show);
   void ShowConsole(bool show);
   void ShowMinimalConsole(bool show);
@@ -91,8 +119,15 @@ public:
   void SetGridUnitSquare(const std::optional<double>& unitSquare);
   void SetGridSubdivisions(int subdivisions);
   void SetGridColor(const std::vector<double>& color);
-  void SetBackdropOpacity(const double backdropOpacity);
+  void SetAxesColor(const std::vector<double>& colorXAxis, const std::vector<double>& colorYAxis,
+    const std::vector<double>& colorZAxis);
   ///@}
+
+  /**
+   * Set the backdrop opacity
+   * Should be called before ShowAxis
+   */
+  void SetBackdropOpacity(const double backdropOpacity);
 
   ///@{
   /**
@@ -100,7 +135,7 @@ public:
    */
   void SetUseRaytracing(bool use);
   void SetUseRaytracingDenoiser(bool use);
-  void SetUseDepthPeelingPass(bool use);
+  void SetBlendingMode(BlendingMode mode);
   void SetUseSSAOPass(bool use);
   void SetAntiAliasingMode(AntiAliasingMode mode);
   void SetUseToneMappingPass(bool use);
@@ -110,6 +145,11 @@ public:
   void SetBackfaceType(const std::optional<std::string>& backfaceType);
   void SetFinalShader(const std::optional<std::string>& finalShader);
   ///@}
+
+  /**
+   * Get BlendingMode
+   */
+  BlendingMode GetBlendingMode() const;
 
   /**
    * Set SetUseOrthographicProjection
@@ -169,10 +209,9 @@ public:
   void Initialize();
 
   /**
-   * Initialize actors properties related to the up vector using the provided upString, including
-   * the camera
+   * Initialize the camera position based on the given up direction.
    */
-  void InitializeUpVector(const std::vector<double>& upVec);
+  void InitializeUpDirection(const std::vector<double>& upVec);
 
   /**
    * Compute bounds of visible props as transformed by given matrix.
@@ -194,12 +233,12 @@ public:
   /**
    * Get up vector
    */
-  vtkGetVector3Macro(UpVector, double);
+  vtkGetVector3Macro(UpDirection, double);
 
   /**
    * Set/Get right vector
    */
-  vtkGetVector3Macro(RightVector, double);
+  vtkGetVector3Macro(RightDirection, double);
 
   /**
    * Set cache path, only used by the HDRI logic
@@ -273,16 +312,21 @@ public:
    */
   void SetTextureNormal(const std::optional<fs::path>& tex);
 
-  enum class SplatType
-  {
-    SPHERE,
-    GAUSSIAN
-  };
+  /**
+   * Set point sprites type
+   */
+  void SetPointSpritesType(SplatType type);
 
   /**
-   * Set the point sprites size and the splat type on the pointGaussianMapper
+   * Set the point sprites size
+   * If absoluteScale is false, the size is scaled by the scene bounding box
    */
-  void SetPointSpritesProperties(SplatType splatType, double pointSpritesSize);
+  void SetPointSpritesSize(bool absoluteScale, double size);
+
+  /**
+   * Set point sprites instancing usage
+   */
+  void SetPointSpritesUseInstancing(bool useInstancing);
 
   /**
    * Set the visibility of the scalar bar.
@@ -366,6 +410,13 @@ public:
   ///@}
 
   /**
+   * Set the pending up direction. Stores the direction and marks
+   * the up vector as needing configuration.
+   * Actual configuration (camera rotation, skybox, environment) happens in UpdateActors.
+   */
+  void SetPendingUpDirection(const std::vector<double>& upVec);
+
+  /**
    * Get information about the current coloring
    * Returns a single line string containing the coloring description
    */
@@ -409,6 +460,11 @@ public:
    * Should be called before Render() if CheatSheetInfoNeedsUpdate() returns true.
    */
   void ConfigureCheatSheet(const std::vector<vtkF3DUIActor::CheatSheetGroup>& info);
+
+  /**
+   * Configure Axes (X,Y,Z) colors on the widget
+   */
+  void ConfigureAxesActor();
 
   /**
    * Use this method to flag in the renderer that the cheatsheet needs to be updated
@@ -465,6 +521,12 @@ private:
   ///@}
 
   /**
+   * Apply the given up vector to the scene, computing an appropriate right vector.
+   * Updates UpDirection, RightDirection, skybox floor, and environment orientation.
+   */
+  void ApplyUpDirection(const std::array<double, 3>& up);
+
+  /**
    * Configure all actors properties
    */
   void ConfigureActorsProperties();
@@ -483,6 +545,12 @@ private:
    * Configure the different render passes
    */
   void ConfigureRenderPasses();
+
+  /**
+   * Rotate camera and apply up direction to scene.
+   * Called from UpdateActors when UpDirectionConfigured is false.
+   */
+  void ConfigureUpDirection();
 
   /**
    * Create a cache directory if a HDRIHash is set
@@ -537,7 +605,21 @@ private:
    */
   void ConfigureActorTextureTransform(vtkActor* actorBase, const double* matrix);
 
+  /**
+   * Configure all properties of the point sprites mapper
+   */
+  void ConfigurePointSprites();
+
+  /**
+   * Updates the axis widget size based on the window size
+   */
+  void UpdateAxisWidgetSize();
+
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
+  vtkSmartPointer<vtkCameraOrientationWidget> ModernAxisWidget;
+  vtkSmartPointer<vtkCameraOrientationRepresentation> ModernAxisRepresentation;
+  vtkSmartPointer<vtkCallbackCommand> ModernAxisWidgetResizeCallback;
+  double ModernAxisBackdropOpacity = 0.0;
 
   // Does vtk version support GridAxesActor
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 4, 20250513)
@@ -545,6 +627,7 @@ private:
 #endif
 
   vtkNew<vtkActor> GridActor;
+  vtkNew<vtkF3DOpenGLGridMapper> GridMapper;
   vtkNew<vtkSkybox> SkyboxActor;
   vtkNew<vtkF3DUIActor> UIActor;
 
@@ -552,12 +635,15 @@ private:
 
   bool CheatSheetConfigured = false;
   bool ActorsPropertiesConfigured = false;
+  bool UpDirectionConfigured = false;
   bool GridConfigured = false;
   bool GridAxesConfigured = false;
+  bool AxesActorConfigured = false;
   bool RenderPassesConfigured = false;
   bool LightIntensitiesConfigured = false;
   bool TextActorsConfigured = false;
   bool MetaDataConfigured = false;
+  bool PointSpritesConfigured = false;
   bool HDRIReaderConfigured = false;
   bool HDRIHashConfigured = false;
   bool HDRITextureConfigured = false;
@@ -576,6 +662,7 @@ private:
   bool TimerVisible = false;
   bool FilenameVisible = false;
   bool MetaDataVisible = false;
+  bool HDRIFilenameVisible = false;
   bool CheatSheetVisible = false;
   bool ConsoleVisible = false;
   bool MinimalConsoleVisible = false;
@@ -585,8 +672,8 @@ private:
   bool ArmatureVisible = false;
   bool UseRaytracing = false;
   bool UseRaytracingDenoiser = false;
-  bool UseDepthPeelingPass = false;
   AntiAliasingMode AntiAliasingModeEnabled = AntiAliasingMode::NONE;
+  BlendingMode BlendingModeEnabled = BlendingMode::NONE;
   bool UseSSAOPass = false;
   bool UseToneMappingPass = false;
   bool UseBlurBackground = false;
@@ -595,14 +682,19 @@ private:
   bool InvertZoom = false;
 
   int RaytracingSamples = 0;
-  double UpVector[3] = { 0.0, 1.0, 0.0 };
-  double RightVector[3] = { 1.0, 0.0, 0.0 };
+  double UpDirection[3] = { 0.0, 1.0, 0.0 };
+  double RightDirection[3] = { 1.0, 0.0, 0.0 };
+  double PendingUpDirection[3] = { 0.0, 1.0, 0.0 };
   double CircleOfConfusionRadius = 20.0;
   std::optional<double> PointSize;
   std::optional<double> LineWidth;
   std::optional<double> GridUnitSquare;
   int GridSubdivisions = 10;
   double GridColor[3] = { 0.0, 0.0, 0.0 };
+
+  double ColorAxisX[3] = { 0.0, 0.0, 0.0 };
+  double ColorAxisY[3] = { 0.0, 0.0, 0.0 };
+  double ColorAxisZ[3] = { 0.0, 0.0, 0.0 };
 
   std::string HDRIFile;
   vtkSmartPointer<vtkImageReader2> HDRIReader;
@@ -638,7 +730,7 @@ private:
   bool ScalarBarActorConfigured = false;
 
   bool ColoringMappersConfigured = false;
-  bool PointSpritesMappersConfigured = false;
+  bool ColoringPointSpritesMappersConfigured = false;
   bool VolumePropsAndMappersConfigured = false;
   bool ColoringConfigured = false;
 
@@ -678,6 +770,11 @@ private:
 
   int TaaHaltonNumerator[2] = { 0, 0 };
   int TaaHaltonDenominator[2] = { 1, 1 };
+
+  SplatType PointSpritesType = SplatType::SPHERE;
+  double PointSpritesSize = 10;
+  bool PointSpritesAbsoluteScale = false;
+  bool PointSpritesUseInstancing = false;
 };
 
 #endif

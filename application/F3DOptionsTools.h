@@ -5,6 +5,8 @@
  * @class   F3DOptionsTools
  * @brief   A namespace to handle and parse F3D Options
  */
+#include <options.h>
+
 #include <filesystem>
 #include <map>
 #include <string>
@@ -70,6 +72,9 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "animation-progress", "ui.animation_progress" },
   { "up", "scene.up_direction" },
   { "axis", "ui.axis" },
+  { "x-color", "ui.x_color" },
+  { "y-color", "ui.y_color" },
+  { "z-color", "ui.z_color" },
   { "grid", "render.grid.enable" },
   { "grid-absolute", "render.grid.absolute" },
   { "grid-unit", "render.grid.unit" },
@@ -89,9 +94,8 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "font-file", "ui.font_file" },
   { "font-scale", "ui.scale" },
   { "backdrop-opacity", "ui.backdrop.opacity" },
-  { "point-sprites", "model.point_sprites.enable" },
-  { "point-sprites-type", "model.point_sprites.type" },
   { "point-sprites-size", "model.point_sprites.size" },
+  { "point-sprites-absolute-size", "model.point_sprites.absolute_size" },
   { "point-size", "render.point_size" },
   { "line-width", "render.line_width" },
   { "backface-type", "render.backface_type" },
@@ -114,6 +118,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "fps", "ui.fps" },
   { "filename", "ui.filename" },
   { "metadata", "ui.metadata" },
+  { "hdri-filename", "ui.hdri_filename" },
   { "blur-background", "render.background.blur.enable" },
   { "blur-coc", "render.background.blur.coc" },
   { "scalar-coloring", "model.scivis.enable" },
@@ -131,14 +136,29 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "raytracing", "render.raytracing.enable" },
   { "raytracing-samples", "render.raytracing.samples" },
   { "raytracing-denoise", "render.raytracing.denoise" },
-  { "translucency-support", "render.effect.translucency_support" },
   { "ambient-occlusion", "render.effect.ambient_occlusion" },
-  { "anti-aliasing", "render.effect.antialiasing.enable" },
-  { "anti-aliasing-mode", "render.effect.antialiasing.mode" },
   { "tone-mapping", "render.effect.tone_mapping" },
   { "final-shader", "render.effect.final_shader" },
   { "textures-transform", "model.textures_transform" },
 };
+
+/**
+ * List of CLI option names that requires custom mapping
+ */
+static inline const std::map<std::string_view, std::string_view> CustomMappingOptions = {
+  { "anti-aliasing", "none" },
+  { "anti-aliasing-mode", "" },
+  { "translucency-support", "false" },
+  { "blending", "none" },
+  { "point-sprites", "none" },
+  { "point-sprites-type", "" },
+};
+
+/**
+ * Convert a CLI options key/value to a vector of libf3d options key/value
+ */
+std::vector<std::pair<std::string, std::string>> ConvertToLibf3dOptions(
+  const std::string& key, const std::string& value);
 
 /**
  * Browse through all possible option names to find one that have the smallest distance to the
@@ -162,6 +182,25 @@ F3DOptionsTools::OptionsDict ParseCLIOptions(
  */
 void PrintHelpPair(
   std::string_view key, std::string_view help, int keyWidth = 10, int helpWidth = 70);
+
+/**
+ * Parse provided string into provided typed var.
+ * Return true if successful, false otherwise.
+ */
+template<typename T>
+bool Parse(const std::string& optionString, T& option)
+{
+  try
+  {
+    option = f3d::options::parse<T>(optionString);
+    return true;
+  }
+  catch (const f3d::options::parsing_exception&)
+  {
+    return false;
+  }
+}
+
 };
 
 #endif

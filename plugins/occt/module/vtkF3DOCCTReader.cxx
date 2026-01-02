@@ -63,6 +63,7 @@
 #include <vtkPointData.h>
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
+#include <vtkResourceStream.h>
 #include <vtkTransform.h>
 #include <vtkTransformFilter.h>
 #include <vtkUnsignedCharArray.h>
@@ -73,6 +74,8 @@
 #include <numeric>
 #include <unordered_map>
 #include <vector>
+
+vtkCxxSetSmartPointerMacro(vtkF3DOCCTReader, Stream, vtkResourceStream);
 
 class vtkF3DOCCTReader::vtkInternals
 {
@@ -551,6 +554,12 @@ vtkF3DOCCTReader::vtkF3DOCCTReader()
 vtkF3DOCCTReader::~vtkF3DOCCTReader() = default;
 
 //----------------------------------------------------------------------------
+vtkResourceStream* vtkF3DOCCTReader::GetStream()
+{
+  return this->Stream;
+}
+
+//----------------------------------------------------------------------------
 class ProgressIndicator : public Message_ProgressIndicator
 {
 public:
@@ -585,14 +594,36 @@ bool TransferToDocument(vtkF3DOCCTReader* that, T& reader, Handle(TDocStd_Docume
   reader.SetNameMode(true);
   reader.SetLayerMode(true);
 
-  if (reader.ReadFile(that->GetFileName().c_str()) == IFSelect_RetDone)
+  IFSelect_ReturnStatus ret;
+  vtkResourceStream* stream = that->GetStream();
+  if (stream)
+  {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251223)
+    // Encapsulate resource stream into an istream
+    // Reading happen on ReadStream call, no need to keep buffers around
+    stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+    auto strbuf = stream->ToStreambuf();
+    std::istream buffer(strbuf.get());
+    ret = reader.ReadStream("", buffer);
+#else
+    vtkErrorWithObjectMacro(
+      that, "This version of VTK doesn't support reading memory stream with OCCT");
+    return false;
+#endif
+  }
+  else
+  {
+    ret = reader.ReadFile(that->GetFileName().c_str());
+  }
+
+  if (ret == IFSelect_RetDone)
   {
     ProgressIndicator pi(that);
     return reader.Transfer(doc, pi.Start());
   }
   else
   {
-    vtkErrorWithObjectMacro(that, "Failed opening file " << that->GetFileName());
+    vtkErrorWithObjectMacro(that, "Failed to read file or stream");
     return false;
   }
 }
@@ -612,15 +643,45 @@ int vtkF3DOCCTReader::RequestData(
     ProgressIndicator pIndicator(this);
     const Message_ProgressRange pRange = pIndicator.Start();
 
-    bool success = false;
-    try
+    bool success = true;
+    vtkResourceStream* stream = this->GetStream();
+    if (stream)
     {
-      success = BinTools::Read(shape, this->GetFileName().c_str(), pRange);
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251223)
+      // Encapsulate resource stream into an istream
+      stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+      this->Streambuf = stream->ToStreambuf();
+      this->Buffer = std::make_unique<std::istream>(this->Streambuf.get());
+
+      try
+      {
+        BinTools::Read(shape, *this->Buffer, pRange);
+      }
+      catch (Storage_StreamTypeMismatchError&)
+      {
+        stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+        this->Streambuf = stream->ToStreambuf();
+        this->Buffer = std::make_unique<std::istream>(this->Streambuf.get());
+        const BRep_Builder builder;
+        BRepTools::Read(shape, *this->Buffer, builder, pRange);
+      }
+      success = !shape.IsNull();
+#else
+      vtkErrorMacro("This version of VTK doesn't support reading memory stream with OCCT");
+      return 0;
+#endif
     }
-    catch (Storage_StreamTypeMismatchError&)
+    else
     {
-      const BRep_Builder builder;
-      success = BRepTools::Read(shape, this->GetFileName().c_str(), builder, pRange);
+      try
+      {
+        success = BinTools::Read(shape, this->GetFileName().c_str(), pRange);
+      }
+      catch (Storage_StreamTypeMismatchError&)
+      {
+        const BRep_Builder builder;
+        success = BRepTools::Read(shape, this->GetFileName().c_str(), builder, pRange);
+      }
     }
 
     if (success)
@@ -640,7 +701,7 @@ int vtkF3DOCCTReader::RequestData(
     }
     else
     {
-      vtkErrorWithObjectMacro(this, "Failed opening file " << this->GetFileName());
+      vtkErrorMacro("Failed to read BREP file or stream");
       return 0;
     }
   }
@@ -648,25 +709,53 @@ int vtkF3DOCCTReader::RequestData(
 #if F3D_PLUGIN_OCCT_XCAF
   Handle(TDocStd_Document) doc;
   XCAFApp_Application::GetApplication()->NewDocument("MDTV-XCAF", doc);
+  bool success = true;
   if (this->FileFormat == FILE_FORMAT::STEP)
   {
     STEPCAFControl_Reader reader;
-    TransferToDocument(this, reader, doc);
+    success = TransferToDocument(this, reader, doc);
   }
   else if (this->FileFormat == FILE_FORMAT::IGES)
   {
     IGESCAFControl_Reader reader;
-    TransferToDocument(this, reader, doc);
+    success = TransferToDocument(this, reader, doc);
   }
   else if (this->FileFormat == FILE_FORMAT::XBF)
   {
     Handle(TDocStd_Application) app = new TDocStd_Application();
     BinXCAFDrivers::DefineFormat(app);
-    if (app->Open(this->GetFileName().c_str(), doc) != PCDM_RS_OK)
+
+    vtkResourceStream* stream = this->GetStream();
+    if (stream)
     {
-      vtkErrorWithObjectMacro(this, "Failed to read XBF file");
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251223)
+      // Encapsulate resource stream into an istream
+      stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+      this->Streambuf = stream->ToStreambuf();
+      this->Buffer = std::make_unique<std::istream>(this->Streambuf.get());
+      if (app->Open(*this->Buffer, doc) != PCDM_RS_OK)
+      {
+        vtkErrorMacro("Failed to read XBF stream");
+        success = false;
+      }
+#else
+      vtkErrorMacro("This version of VTK doesn't support reading memory stream with OCCT");
       return 0;
+#endif
     }
+    else
+    {
+      if (app->Open(this->GetFileName().c_str(), doc) != PCDM_RS_OK)
+      {
+        vtkErrorWithObjectMacro(this, "Failed to read XBF file");
+        success = false;
+      }
+    }
+  }
+
+  if (!success)
+  {
+    return 0;
   }
 
   this->Internals->ShapeTool = XCAFDoc_DocumentTool::ShapeTool(doc->Main());
@@ -709,8 +798,29 @@ int vtkF3DOCCTReader::RequestData(
   {
     reader = new IGESControl_Reader();
   }
+  assert(reader);
 
-  if (reader && reader->ReadFile(this->GetFileName().c_str()) == IFSelect_RetDone)
+  vtkResourceStream* stream = this->GetStream();
+  IFSelect_ReturnStatus ret;
+  if (stream)
+  {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251223)
+    // Encapsulate resource stream into an istream
+    stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+    this->Streambuf = stream->ToStreambuf();
+    this->Buffer = std::make_unique<std::istream>(this->Streambuf.get());
+    ret = reader->ReadStream("", *this->Buffer);
+#else
+    vtkErrorMacro("This version of VTK doesn't support reading memory stream with OCCT");
+    return false;
+#endif
+  }
+  else
+  {
+    ret = reader->ReadFile(this->GetFileName().c_str());
+  }
+
+  if (ret == IFSelect_RetDone)
   {
     ProgressIndicator pi(this);
     reader->TransferRoots(pi.Start());
@@ -729,6 +839,11 @@ int vtkF3DOCCTReader::RequestData(
         output->SetBlock(iShape, polydata);
       }
     }
+  }
+  else
+  {
+    vtkErrorMacro("Failed to read STEP or IGES file");
+    return 0;
   }
 
   delete reader;
@@ -754,4 +869,15 @@ void vtkF3DOCCTReader::PrintSelf(ostream& os, vtkIndent indent)
     case FILE_FORMAT::XBF: os << "FileFormat: XBF" << "\n"; break;
   }
   // clang-format
+}
+
+//----------------------------------------------------------------------------
+vtkMTimeType vtkF3DOCCTReader::GetMTime()
+{
+  auto mtime = this->Superclass::GetMTime();
+  if (this->Stream)
+  {
+    mtime = std::max(mtime, this->Stream->GetMTime());
+  }
+  return mtime;
 }

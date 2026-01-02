@@ -99,7 +99,9 @@ EMSCRIPTEN_BINDINGS(f3d)
       "setAsString",
       +[](f3d::options& o, const std::string& name, const std::string& value) -> f3d::options&
       { return o.setAsString(name, value); }, emscripten::return_value_policy::reference())
-    .function("getAsString", &f3d::options::getAsString)
+    .function(
+      "getAsString",
+      +[](f3d::options& o, const std::string& name) -> std::string { return o.getAsString(name); })
     .function(
       "toggle", +[](f3d::options& o, const std::string& name) -> f3d::options&
       { return o.toggle(name); }, emscripten::return_value_policy::reference())
@@ -302,6 +304,10 @@ EMSCRIPTEN_BINDINGS(f3d)
       });
 
   // f3d::interactor
+  emscripten::enum_<f3d::interactor::AnimationDirection>("InteractorAnimationDirection")
+    .value("FORWARD", f3d::interactor::AnimationDirection::FORWARD)
+    .value("BACKWARD", f3d::interactor::AnimationDirection::BACKWARD);
+
   // Not bound on purpose because usually used for external interactors:
   // trigger*
   // TODO:
@@ -328,13 +334,28 @@ EMSCRIPTEN_BINDINGS(f3d)
       "triggerCommand",
       +[](f3d::interactor& interactor, const std::string& command, bool keepComments) -> bool
       { return interactor.triggerCommand(command, keepComments); })
-    .function("toggleAnimation", &f3d::interactor::toggleAnimation,
+    .function(
+      "toggleAnimation",
+      +[](f3d::interactor& interactor, emscripten::val direction) -> f3d::interactor&
+      {
+        return direction.isUndefined()
+          ? interactor.toggleAnimation()
+          : interactor.toggleAnimation(direction.as<f3d::interactor::AnimationDirection>());
+      },
       emscripten::return_value_policy::reference())
-    .function("startAnimation", &f3d::interactor::startAnimation,
+    .function(
+      "startAnimation",
+      +[](f3d::interactor& interactor, emscripten::val direction) -> f3d::interactor&
+      {
+        return direction.isUndefined()
+          ? interactor.startAnimation()
+          : interactor.startAnimation(direction.as<f3d::interactor::AnimationDirection>());
+      },
       emscripten::return_value_policy::reference())
     .function("stopAnimation", &f3d::interactor::stopAnimation,
       emscripten::return_value_policy::reference())
     .function("isPlayingAnimation", &f3d::interactor::isPlayingAnimation)
+    .function("getAnimationDirection", &f3d::interactor::getAnimationDirection)
     .function("enableCameraMovement", &f3d::interactor::enableCameraMovement,
       emscripten::return_value_policy::reference())
     .function("disableCameraMovement", &f3d::interactor::disableCameraMovement,
@@ -344,7 +365,9 @@ EMSCRIPTEN_BINDINGS(f3d)
       emscripten::return_value_policy::reference())
     .function("stop", &f3d::interactor::stop, emscripten::return_value_policy::reference())
     .function("requestRender", &f3d::interactor::requestRender,
-      emscripten::return_value_policy::reference());
+      emscripten::return_value_policy::reference())
+    .function(
+      "requestStop", &f3d::interactor::requestStop, emscripten::return_value_policy::reference());
 
   // f3d::engine
   // Not bound on purpose because only one engine is supported:
@@ -393,7 +416,8 @@ EMSCRIPTEN_BINDINGS(f3d)
       "create", +[]() { return f3d::engine::create(); },
       emscripten::return_value_policy::take_ownership())
     .function(
-      "setCachePath", &f3d::engine::setCachePath, emscripten::return_value_policy::reference())
+      "setCachePath", +[](f3d::engine& engine, const std::string& path) -> f3d::engine&
+      { return engine.setCachePath(path); }, emscripten::return_value_policy::reference())
     .function("setOptions",
       static_cast<f3d::engine& (f3d::engine::*)(const f3d::options&)>(&f3d::engine::setOptions),
       emscripten::return_value_policy::reference())
@@ -420,5 +444,19 @@ EMSCRIPTEN_BINDINGS(f3d)
     .value("ERROR", f3d::log::VerboseLevel::ERROR)
     .value("QUIET", f3d::log::VerboseLevel::QUIET);
 
-  emscripten::class_<f3d::log>("Log").class_function("setVerboseLevel", f3d::log::setVerboseLevel);
+  emscripten::class_<f3d::log>("Log")
+    .class_function("setVerboseLevel", f3d::log::setVerboseLevel)
+    .class_function("getVerboseLevel", f3d::log::getVerboseLevel)
+    .class_function("setUseColoring", f3d::log::setUseColoring)
+    .class_function(
+      "print",
+      +[](f3d::log::VerboseLevel level, const std::string& message)
+      { f3d::log::print(level, message); })
+    .class_function(
+      "forward",
+      +[](const emscripten::val& callback)
+      {
+        f3d::log::forward(
+          [=](f3d::log::VerboseLevel level, const std::string& txt) { callback(level, txt); });
+      });
 }

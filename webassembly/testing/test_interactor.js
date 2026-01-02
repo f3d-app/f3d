@@ -51,7 +51,9 @@ const settings = {
 
     interactor.startAnimation();
     utils.assert(
-      interactor.isPlayingAnimation(),
+      interactor.isPlayingAnimation() &&
+        interactor.getAnimationDirection() ==
+          Module.InteractorAnimationDirection.FORWARD,
       "animation should be playing",
     );
 
@@ -61,16 +63,56 @@ const settings = {
       "animation should not be playing",
     );
 
+    interactor.startAnimation(Module.InteractorAnimationDirection.FORWARD);
+    utils.assert(
+      interactor.isPlayingAnimation() &&
+        interactor.getAnimationDirection() ==
+          Module.InteractorAnimationDirection.FORWARD,
+      "animation should be playing forward",
+    );
+    interactor.stopAnimation();
+
+    interactor.startAnimation(Module.InteractorAnimationDirection.BACKWARD);
+    utils.assert(
+      interactor.isPlayingAnimation() &&
+        interactor.getAnimationDirection() ==
+          Module.InteractorAnimationDirection.BACKWARD,
+      "animation should be playing backward",
+    );
+    interactor.stopAnimation();
+
     interactor.toggleAnimation();
     utils.assert(
-      interactor.isPlayingAnimation(),
-      "animation should be playing",
+      interactor.isPlayingAnimation() &&
+        interactor.getAnimationDirection() ==
+          Module.InteractorAnimationDirection.FORWARD,
+      "animation should be playing forward",
     );
+    interactor.stopAnimation();
+
+    interactor.toggleAnimation(Module.InteractorAnimationDirection.FORWARD);
+    utils.assert(
+      interactor.isPlayingAnimation() &&
+        interactor.getAnimationDirection() ==
+          Module.InteractorAnimationDirection.FORWARD,
+      "animation should be playing forward",
+    );
+    interactor.stopAnimation();
+
+    interactor.toggleAnimation(Module.InteractorAnimationDirection.BACKWARD);
+    utils.assert(
+      interactor.isPlayingAnimation() &&
+        interactor.getAnimationDirection() ==
+          Module.InteractorAnimationDirection.BACKWARD,
+      "animation should be playing backward",
+    );
+    interactor.stopAnimation();
 
     // only for coverage, do not test the actual feature yet
     interactor.disableCameraMovement();
     interactor.enableCameraMovement();
     interactor.requestRender();
+    interactor.requestStop();
     interactor.stop();
   },
 };

@@ -1,7 +1,7 @@
+#include "vtkF3DAssimpImporter.h"
+
 #include <vtkNew.h>
 #include <vtkTestUtilities.h>
-
-#include "vtkF3DAssimpImporter.h"
 
 #include <iostream>
 
@@ -11,6 +11,6 @@ int TestF3DAssimpImporter(int vtkNotUsed(argc), char* argv[])
   vtkNew<vtkF3DAssimpImporter> importer;
   importer->SetFileName(filename.c_str());
   importer->Update();
-  importer->Print(cout);
+  importer->Print(std::cout);
   return importer->GetNumberOfAnimations() == 1 ? EXIT_SUCCESS : EXIT_FAILURE;
 }

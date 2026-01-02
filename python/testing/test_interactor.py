@@ -11,8 +11,8 @@ def doc_fn():
     return "dummyDoc", "dummyValue"
 
 
-def compl_fn():
-    return "compl"
+def compl_fn(args: list[str]):
+    return ["compl"]
 
 
 def test_command(capfd: pytest.CaptureFixture[str]):
@@ -41,7 +41,31 @@ def test_command(capfd: pytest.CaptureFixture[str]):
 
     # Smoke test
     inter.init_commands()
-    inter.add_command("my_cmd2", print_fn, ["my_cmd2", "doc"], compl_fn)
+    inter.add_command("my_cmd2", print_fn, ("my_cmd2", "doc"), compl_fn)
+
+
+def test_command_completion(capfd: pytest.CaptureFixture[str]):
+    engine = f3d.Engine.create(True)
+    inter = engine.interactor
+
+    # Check default commands can be removed
+    actions = inter.get_command_actions()
+    for action in actions:
+        inter.remove_command(action)
+    assert len(inter.get_command_actions()) == 0
+
+    # Smoke test
+    inter.init_commands()
+    inter.add_command("cmd", print_fn, ("cmd", "doc"), compl_fn)
+
+    engine.window.render()
+
+    inter.trigger_keyboard_key(inter.InputAction.PRESS, "Escape")
+    inter.trigger_keyboard_key(inter.InputAction.RELEASE, "Escape")
+    for c in "cmd ":
+        inter.trigger_text_character(ord(c))
+    inter.trigger_keyboard_key(inter.InputAction.PRESS, "Tab")
+    inter.trigger_keyboard_key(inter.InputAction.RELEASE, "Tab")
 
 
 def test_binding():
@@ -130,3 +154,66 @@ def test_trigger_key(capfd: pytest.CaptureFixture[str]):
     engine.interactor.trigger_mouse_position(100, 100)
     engine.interactor.trigger_mouse_wheel(f3d.Interactor.WheelDirection.FORWARD)
     engine.interactor.trigger_text_character(0)
+
+
+def test_interactor_animation(capfd: pytest.CaptureFixture[str]):
+    engine = f3d.Engine.create(True)
+    engine.window.render()
+
+    engine.interactor.start_animation()  # Play Forward
+    assert (
+        engine.interactor.is_playing_animation()
+        and engine.interactor.get_animation_direction()
+        == f3d.Interactor.AnimationDirection.FORWARD
+    )
+    engine.interactor.toggle_animation()  # Pause
+    assert not engine.interactor.is_playing_animation()
+
+    engine.interactor.start_animation(
+        f3d.Interactor.AnimationDirection.FORWARD
+    )  # Play Forward
+    assert (
+        engine.interactor.is_playing_animation()
+        and engine.interactor.get_animation_direction()
+        == f3d.Interactor.AnimationDirection.FORWARD
+    )
+    engine.interactor.stop_animation()  # Pause
+    assert not engine.interactor.is_playing_animation()
+
+    engine.interactor.start_animation(
+        f3d.Interactor.AnimationDirection.BACKWARD
+    )  # Play Backward
+    assert (
+        engine.interactor.is_playing_animation()
+        and engine.interactor.get_animation_direction()
+        == f3d.Interactor.AnimationDirection.BACKWARD
+    )
+    engine.interactor.stop_animation()  # Pause
+
+    engine.interactor.toggle_animation()
+    assert (
+        engine.interactor.is_playing_animation()
+        and engine.interactor.get_animation_direction()
+        == f3d.Interactor.AnimationDirection.FORWARD
+    )
+    engine.interactor.stop_animation()  # Pause
+
+    engine.interactor.toggle_animation(
+        f3d.Interactor.AnimationDirection.FORWARD
+    )  # Play Forward
+    assert (
+        engine.interactor.is_playing_animation()
+        and engine.interactor.get_animation_direction()
+        == f3d.Interactor.AnimationDirection.FORWARD
+    )
+    engine.interactor.stop_animation()
+
+    engine.interactor.toggle_animation(
+        f3d.Interactor.AnimationDirection.BACKWARD
+    )  # Play Backward
+    assert (
+        engine.interactor.is_playing_animation()
+        and engine.interactor.get_animation_direction()
+        == f3d.Interactor.AnimationDirection.BACKWARD
+    )
+    engine.interactor.stop_animation()

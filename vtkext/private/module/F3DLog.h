@@ -11,6 +11,7 @@
 #ifndef F3DLog_h
 #define F3DLog_h
 
+#include <functional>
 #include <string>
 
 namespace F3DLog
@@ -56,6 +57,18 @@ void SetUseColoring(bool use);
  * are written to stdout.
  */
 void SetStandardStream(StandardStream mode);
+
+/**
+ * Callback function for forwarding log messages.
+ * If set, it will be invoked with the message string whenever a log message is printed.
+ */
+extern std::function<void(Severity, const std::string&)> Forwarder;
+
+/**
+ * Set a callback function to forward log messages.
+ * The callback will be invoked with the message string whenever a log message is printed.
+ */
+void Forward(std::function<void(Severity, const std::string&)> userCallback);
 };
 
 #endif

@@ -83,6 +83,9 @@ inputs:
   zlib_version:
     description: "Version of zlib to build"
     required: true
+  global_cache_index:
+    description: "Global cache index"
+    required: true
 
 runs:
   using: "composite"
@@ -94,7 +97,7 @@ runs:
         [[ "${{ inputs.vtk_version }}" ]] || { echo "vtk_version input is empty" ; exit 1; }
 
     - name: Recover LFS Data
-      uses: f3d-app/lfs-data-cache-action@v1
+      uses: f3d-app/lfs-data-cache-action@v2
       with:
         type: "consumer"
         lfs_sha: ${{inputs.lfs_sha}}
@@ -118,6 +121,7 @@ runs:
         usd_version: ${{inputs.usd_version}}
         webp_version: ${{inputs.webp_version}}
         zlib_version: ${{inputs.zlib_version}}
+        global_cache_index: ${{inputs.global_cache_index}}
 
     - name: Install VTK dependency
       uses: ./source/.github/actions/vtk-install-dep
@@ -129,6 +133,7 @@ runs:
         tbb_version: ${{inputs.tbb_version}}
         vtk_version: ${{inputs.vtk_version}}
         zlib_version: ${{inputs.zlib_version}}
+        global_cache_index: ${{inputs.global_cache_index}}
 
     - name: Set up Python
       if: |
@@ -208,8 +213,9 @@ runs:
         -DCMAKE_INSTALL_PREFIX:PATH=../install
         -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
         -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
-        -DCMAKE_MODULE_PATH=${{ matrix.vtk_version != 'v9.2.6' && (runner.os != 'Windows' || matrix.vtk_version != 'v9.3.1') && inputs.optional_deps_label == 'optional-deps' && '$(pwd)/../dependencies/install/lib/cmake/OpenVDB/' || '' }}
+        -DCMAKE_MODULE_PATH=${{ (runner.os != 'Windows' || matrix.vtk_version != 'v9.3.0') && inputs.optional_deps_label == 'optional-deps' && '$(pwd)/../dependencies/install/lib/cmake/OpenVDB/' || '' }}
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
+        -DF3D_BINDINGS_C=ON
         -DF3D_BINDINGS_JAVA=${{ (runner.os != 'macOS' || inputs.cpu == 'arm64') && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_BINDINGS_PYTHON=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_BINDINGS_PYTHON_GENERATE_STUBS=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
@@ -230,7 +236,8 @@ runs:
         -DF3D_PLUGIN_BUILD_HDF=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_OCCT=${{ inputs.optional_deps_label == 'optional-deps' && inputs.static_label == 'no-static' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_USD=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
-        -DF3D_PLUGIN_BUILD_VDB=${{ matrix.vtk_version != 'v9.2.6' && (runner.os != 'Windows' || matrix.vtk_version != 'v9.3.1') && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_BUILD_VDB=${{ (runner.os != 'Windows' || matrix.vtk_version != 'v9.3.0') && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_OCCT_COLORING_SUPPORT=${{ inputs.occt_version != 'V7_6_3' && 'ON' || 'OFF' }}
         -DF3D_STRICT_BUILD=ON
         -DF3D_TESTING_ENABLE_EGL_TESTS=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_EXTERNAL_GLFW=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
@@ -284,7 +291,7 @@ runs:
         runner.os == 'macOS' &&
         inputs.cpu == 'x86_64'
       shell: bash
-      run: echo "F3D_CTEST_EXCEPTIONS=(TestDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestInteractionAnimationSlow)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionCycleComp)|(TestGLTFRigArmature)|(TestInteractionNoModelScrollWheel)|(TestInteractionNoModelScrollBar)|(TestInteractionTrackball)|(TestInteractionTrackballBind)" >> $GITHUB_ENV
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestInteractionAnimationSlow)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionCycleComp)|(TestGLTFRigArmature)|(TestInteractionNoModelScrollWheel)|(TestInteractionNoModelScrollBar)" >> $GITHUB_ENV
 
     # Certain tests are failing on macOS arm64 for unknown reasons
     # https://github.com/f3d-app/f3d/issues/1276
@@ -295,12 +302,12 @@ runs:
         runner.os == 'macOS' &&
         inputs.cpu == 'arm64'
       shell: bash
-      run: echo "F3D_CTEST_EXCEPTIONS=(TestDepthPeelingToneMapping)|(TestDepthPeeling)|(TestTextureColor)|(TestDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)|(TestInteractionActors)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionAnimationSlow)|(TestInteractionConfigFileInteractions)|(TestGLTFRigArmature)|(TestInteractionRollCameraRotation)|(TestInteractionDragRotateVertical)|(TestInteractionCheatsheetConfigFile)|(TestInteractionCheatsheetWhiteBG)|(TestInteractionCheatsheetBlackBG)|(TestInteractionCheatsheetNoFile)|(TestInteractionCheatsheetOpacity)|(TestInteractionCheatsheetAnimationName)|(TestInteractionCheatsheetSSAA)|(TestMaxSizeAboveMultiFile)" >> $GITHUB_ENV
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestDepthPeelingToneMapping)|(TestDepthPeeling)|(TestTextureColor)|(TestDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)|(TestInteractionActors)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionAnimationSlow)|(TestInteractionConfigFileInteractions)|(TestGLTFRigArmature)|(TestInteractionRollCameraRotation)|(TestInteractionDragRotateVertical)|(TestInteractionCheatsheetConfigFile)|(TestInteractionCheatsheetWhiteBG)|(TestInteractionCheatsheetBlackBG)|(TestInteractionCheatsheetNoFile)|(TestInteractionCheatsheetOpacity)|(TestInteractionCheatsheetAnimationName)|(TestInteractionCheatsheetSSAA)|(TestMaxSizeAboveMultiFile)|(TestAxesCustomColor)" >> $GITHUB_ENV
 
     - name: Test
       shell: bash
       working-directory: ${{github.workspace}}/build
-      run: ctest -E "${{ env.F3D_CTEST_EXCEPTIONS }}" -C Release -j 2 --output-on-failure || ctest -E "${{ env.F3D_CTEST_EXCEPTIONS }}" -C Release -j 1 --rerun-failed -VV
+      run: ctest -E "${{ env.F3D_CTEST_EXCEPTIONS }}" -C Release -j 2 --output-on-failure --no-tests=error || ctest -E "${{ env.F3D_CTEST_EXCEPTIONS }}" -C Release -j 1 --rerun-failed --no-tests=error -VV
 
     - name: Upload Tests Artifact
       if: failure()
@@ -338,7 +345,7 @@ runs:
         cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DCMAKE_PREFIX_PATH:PATH=$(pwd)/dependencies/install/ -DBUILD_TESTING=ON -B build_python source/python
         cmake --build build_python --config Release
 
-    - name: Configure libf3d examples
+    - name: Configure libf3d examples (C++, C, Java)
       if: inputs.static_label == 'no-static'
       shell: bash
       working-directory: ${{github.workspace}}
@@ -347,7 +354,11 @@ runs:
         -B build_examples -S source/examples/libf3d
         -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d
         -DBUILD_TESTING=ON
-        -DF3D_EXAMPLES_EXTERNAL_GLFW=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
+        -DF3D_ENABLE_C_EXAMPLES=ON
+        -DF3D_ENABLE_JAVA_EXAMPLES=${{ (runner.os != 'macOS' || inputs.cpu == 'arm64') && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_EXAMPLES_EXTERNAL_GLFW=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto' && inputs.vtk_version != 'v9.3.0') && 'ON' || 'OFF' }}
+        -DF3D_EXAMPLES_EXTERNAL_QT=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto' && inputs.vtk_version != 'v9.3.0') && 'ON' || 'OFF' }}
+        -DF3D_EXAMPLES_EXTERNAL_FLTK=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto' && inputs.vtk_version != 'v9.3.0') && 'ON' || 'OFF' }}
 
     - name: Build libf3d examples
       if: inputs.static_label == 'no-static'
@@ -361,14 +372,14 @@ runs:
         inputs.static_label == 'no-static'
       uses: f3d-app/install-mesa-windows-action@v2
       with:
-        path: ${{github.workspace}}\build_examples\*\Release
+        path: ${{github.workspace}}\build_examples\*\*\Release
 
     # older VTK version create different renderings so they are not tested
     - name: Test libf3d examples
       if: inputs.static_label == 'no-static'
       shell: bash
       working-directory: ${{github.workspace}}
-      run: ctest --test-dir build_examples -C Release -VV
+      run: ctest --test-dir build_examples --no-tests=error -C Release -VV
 
     - name: Install optional component f3d plugins
       shell: bash
@@ -389,7 +400,7 @@ runs:
       if: inputs.static_label == 'no-static'
       shell: bash
       working-directory: ${{github.workspace}}
-      run: ctest --test-dir build_plugins -C Release -VV
+      run: ctest --test-dir build_plugins --no-tests=error -C Release -VV
 
     - name: Set F3D binary path Linux
       if: runner.os == 'Linux'
@@ -427,7 +438,7 @@ runs:
     # https://github.com/f3d-app/f3d/issues/1276
     - name: Check F3D_PLUGINS_PATH using plugin example
       if: |
-        inputs.vtk_version != 'v9.2.6' && inputs.vtk_version != 'v9.3.1' &&
+        inputs.vtk_version != 'v9.3.0' && inputs.vtk_version != 'v9.4.2' && inputs.vtk_version != 'v9.5.2' &&
         inputs.cpu != 'arm64' && inputs.static_label == 'no-static' && inputs.optional_deps_label == 'optional-deps'
       shell: bash
       working-directory: ${{github.workspace}}/install
@@ -445,7 +456,7 @@ runs:
     # https://github.com/f3d-app/f3d/issues/1276
     - name: Check Install
       if: |
-        inputs.vtk_version != 'v9.2.6' && inputs.vtk_version != 'v9.3.1'
+        inputs.vtk_version != 'v9.3.0' && inputs.vtk_version != 'v9.4.2' && inputs.vtk_version != 'v9.5.2'
         && inputs.cpu != 'arm64' && inputs.optional_deps_label == 'optional-deps'
       shell: bash
       working-directory: ${{github.workspace}}/install
@@ -454,8 +465,7 @@ runs:
 
     - name: Check Install plugins
       if: |
-        inputs.vtk_version != 'v9.2.6'
-        && inputs.vtk_version != 'v9.3.1' && inputs.cpu != 'arm64'
+        inputs.vtk_version != 'v9.3.0' && inputs.vtk_version != 'v9.4.2' && inputs.vtk_version != 'v9.5.2' && inputs.cpu != 'arm64'
         && inputs.static_label == 'no-static' && inputs.optional_deps_label == 'optional-deps'
       shell: bash
       working-directory: ${{github.workspace}}/install
@@ -464,7 +474,7 @@ runs:
 
     - name: Check Install Windows Console Executable
       if: |
-        inputs.vtk_version != 'v9.2.6' && inputs.vtk_version != 'v9.3.1'
+        inputs.vtk_version != 'v9.3.0' && inputs.vtk_version != 'v9.4.2' && inputs.vtk_version != 'v9.5.2' 
         && runner.os == 'Windows'
       shell: bash
       working-directory: ${{github.workspace}}/install

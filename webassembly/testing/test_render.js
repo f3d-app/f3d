@@ -44,6 +44,9 @@ const settings = {
       utils.numArrayEquals(ptDisplay, [0, 0, 0], 0.001),
       "point has no been restored to original value",
     );
+
+    // just for coverage
+    Module.engineInstance.setCachePath("/tmp");
   },
 };
 

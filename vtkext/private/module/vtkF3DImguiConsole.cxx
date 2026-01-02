@@ -1,6 +1,6 @@
 #include "vtkF3DImguiConsole.h"
 
-#include "F3DImguiStyle.h"
+#include "F3DStyle.h"
 
 #include <vtkCallbackCommand.h>
 #include <vtkCommand.h>
@@ -72,6 +72,32 @@ struct vtkF3DImguiConsole::Internals
         }
         else if (candidates.size() > 1)
         {
+          std::string_view bestCandidate = candidates[0];
+#if defined(_WIN32) || defined(__APPLE__)
+          // Find which candidate matches the casing of the pattern the best
+          int bestPatternMatchLen = 0;
+          for (const auto& candidate : candidates)
+          {
+            int patternMatchLen = 0;
+            for (unsigned i = 0; i < pattern.size() && i < candidate.size(); i++)
+            {
+              if (pattern[i] == candidate[i])
+              {
+                patternMatchLen++;
+              }
+              else
+              {
+                break;
+              }
+            }
+            if (patternMatchLen > bestPatternMatchLen)
+            {
+              bestCandidate = candidate;
+              bestPatternMatchLen = patternMatchLen;
+            }
+          }
+#endif
+
           // Multiple matches. Complete as much as we can.
           // So inputting "C"+Tab will complete to "CL" then display "CLEAR" and "CLASSIFY" as
           // matches.
@@ -80,19 +106,29 @@ struct vtkF3DImguiConsole::Internals
           // Find the common prefix to all candidates
           while (allCandidatesMatches)
           {
-            const std::string& first = candidates[0];
-            if (first.size() <= matchLen)
+            if (bestCandidate.size() <= matchLen)
             {
-              // The first candidate is shorter than the current match length
+              // The best candidate is shorter than the current match length
               allCandidatesMatches = false;
             }
             else
             {
               // Check if all candidates match the current character
-              const char target = first[matchLen];
+              const char target = bestCandidate[matchLen];
               allCandidatesMatches = std::all_of(candidates.begin(), candidates.end(),
                 [matchLen, target](const std::string& s)
-                { return s.size() > matchLen && s[matchLen] == target; });
+                {
+                  return s.size() > matchLen &&
+#if defined(_WIN32) || defined(__APPLE__)
+                    // Windows and Mac filesystems are case-insensitive by default
+                    // Perform a case-insensitive comparison in case this char is part of a file
+                    // path
+                    std::tolower(s[matchLen]) == std::tolower(target);
+#else
+                    // Linux filesystems are typically case-sensitive
+                    s[matchLen] == target;
+#endif
+                });
             }
             if (allCandidatesMatches)
             {
@@ -106,7 +142,7 @@ struct vtkF3DImguiConsole::Internals
             // (possibly just pattern itself in the worst case)
             data->DeleteChars(0, static_cast<int>(pattern.size()));
             data->InsertChars(
-              data->CursorPos, candidates[0].c_str(), candidates[0].c_str() + matchLen);
+              data->CursorPos, bestCandidate.data(), bestCandidate.data() + matchLen);
           }
 
           this->Completions.first = this->Logs.size();
@@ -210,7 +246,7 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
 {
   const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-  constexpr float margin = F3DImguiStyle::GetDefaultMargin();
+  constexpr float margin = F3DStyle::GetDefaultMargin();
   const float padding = ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().FramePadding.x;
   float windowWidth = viewport->WorkSize.x - 2.f * margin;
 
@@ -269,16 +305,16 @@ void vtkF3DImguiConsole::ShowConsole(bool minimal)
           switch (severity)
           {
             case Internals::LogType::Error:
-              ImGui::PushStyleColor(ImGuiCol_Text, F3DImguiStyle::GetErrorColor());
+              ImGui::PushStyleColor(ImGuiCol_Text, F3DStyle::imgui::GetErrorColor());
               break;
             case Internals::LogType::Warning:
-              ImGui::PushStyleColor(ImGuiCol_Text, F3DImguiStyle::GetWarningColor());
+              ImGui::PushStyleColor(ImGuiCol_Text, F3DStyle::imgui::GetWarningColor());
               break;
             case Internals::LogType::Typed:
-              ImGui::PushStyleColor(ImGuiCol_Text, F3DImguiStyle::GetHighlightColor());
+              ImGui::PushStyleColor(ImGuiCol_Text, F3DStyle::imgui::GetHighlightColor());
               break;
             case Internals::LogType::Completion:
-              ImGui::PushStyleColor(ImGuiCol_Text, F3DImguiStyle::GetCompletionColor());
+              ImGui::PushStyleColor(ImGuiCol_Text, F3DStyle::imgui::GetCompletionColor());
               break;
             default:
               hasColor = false;
@@ -370,7 +406,7 @@ void vtkF3DImguiConsole::ShowBadge()
 
   if (this->Pimpl->NewError || this->Pimpl->NewWarning)
   {
-    constexpr float margin = F3DImguiStyle::GetDefaultMargin();
+    constexpr float margin = F3DStyle::GetDefaultMargin();
     ImVec2 badgeSize = this->GetBadgeSize();
 
     ImGui::SetNextWindowPos(ImVec2(viewport->WorkSize.x - badgeSize.x - margin, margin));
@@ -383,10 +419,11 @@ void vtkF3DImguiConsole::ShowBadge()
     ImGui::Begin("ConsoleAlert", nullptr, winFlags);
 
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, F3DImguiStyle::GetHighlightColor());
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, F3DStyle::imgui::GetHighlightColor());
 
     ImGui::PushStyleColor(ImGuiCol_Text,
-      this->Pimpl->NewError ? F3DImguiStyle::GetErrorColor() : F3DImguiStyle::GetWarningColor());
+      this->Pimpl->NewError ? F3DStyle::imgui::GetErrorColor()
+                            : F3DStyle::imgui::GetWarningColor());
 
     if (ImGui::Button("!"))
     {

@@ -55,7 +55,7 @@ mark_as_advanced(F3D_EXCLUDE_DEPRECATED)
 # VTK dependency
 # Optional components should list VTK modules
 # needed by plugins and optional modules
-find_package(VTK 9.2.6 REQUIRED
+find_package(VTK 9.3.0 REQUIRED
   COMPONENTS
     CommonCore
     CommonDataModel
@@ -67,10 +67,10 @@ find_package(VTK 9.2.6 REQUIRED
     InteractionStyle
     InteractionWidgets
     IOCityGML
+    IOLegacy
     IOGeometry
     IOImage
     IOImport
-    IOParallel
     IOPLY
     IOXML
     RenderingAnnotation
@@ -78,7 +78,6 @@ find_package(VTK 9.2.6 REQUIRED
     RenderingOpenGL2
     RenderingVolumeOpenGL2
     TestingCore
-    jsoncpp
   OPTIONAL_COMPONENTS
     opengl
     IOExodus
@@ -96,9 +95,8 @@ endif()
 
 # Modules
 option(F3D_MODULE_RAYTRACING "Raytracing module" OFF)
-# Needs vtkResourceStream (https://gitlab.kitware.com/vtk/vtk/-/merge_requests/9663)
-cmake_dependent_option(F3D_MODULE_EXR "OpenEXR images module" OFF "VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221216" OFF)
-cmake_dependent_option(F3D_MODULE_WEBP "WebP images module" OFF "VTK_VERSION VERSION_GREATER_EQUAL 9.2.20221216" OFF)
+option(F3D_MODULE_EXR "OpenEXR images module" OFF)
+option(F3D_MODULE_WEBP "WebP images module" OFF)
 option(F3D_MODULE_UI "ImGui widgets module" ON)
 option(F3D_MODULE_DMON "dmon (watch) module" ON)
 option(F3D_MODULE_TINYFILEDIALOGS "tinyfiledialogs module" ON)
@@ -268,6 +266,12 @@ if(F3D_WINDOWS_BUILD_SHELL_THUMBNAILS_EXTENSION)
   add_subdirectory(winshellext)
 endif()
 
+# C bindings
+option(F3D_BINDINGS_C "Create C bindings" OFF)
+if(F3D_BINDINGS_C)
+  add_subdirectory(c)
+endif()
+
 # Python bindings
 option(F3D_BINDINGS_PYTHON "Create Python bindings" OFF)
 if(F3D_BINDINGS_PYTHON)
@@ -316,6 +320,7 @@ function(f3d_report_variable f3d_var)
   message(STATUS "${f3d_var}: ${${f3d_var}}")
 endfunction()
 
+f3d_report_variable(F3D_BINDINGS_C)
 f3d_report_variable(F3D_BINDINGS_JAVA)
 f3d_report_variable(F3D_BINDINGS_PYTHON)
 f3d_report_variable(F3D_BUILD_APPLICATION)

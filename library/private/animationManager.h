@@ -15,7 +15,7 @@
 #include <set>
 
 class vtkF3DRenderer;
-class vtkImporter;
+class vtkF3DMetaImporter;
 class vtkRenderWindow;
 
 namespace f3d
@@ -41,7 +41,15 @@ public:
   /**
    * Set the importer to use in the animation_manager, must be set before initializing
    */
-  void SetImporter(vtkImporter* importer);
+  void SetImporter(vtkF3DMetaImporter* importer);
+
+  /**
+   * Set animation direction,
+   * Only following values are correct :
+   * 1 for forward animation
+   * -1 for backward animation
+   */
+  void SetAnimationDirection(int direction);
 
   /**
    * Initialize the animation manager, required before playing the animation.
@@ -54,6 +62,7 @@ public:
 
   /**
    * Start/Stop playing the animation
+   * Direction must always be equal to 1 (forward) or -1 (backward)
    */
   void ToggleAnimation();
   void StartAnimation();
@@ -72,6 +81,16 @@ public:
   std::string GetAnimationName();
 
   /**
+   * Return animation direction
+   * 1 for forward animation
+   * -1 for backward animation
+   */
+  int GetAnimationDirection() const
+  {
+    return AnimationDirection;
+  }
+
+  /**
    * Return true if the animation manager is playing the animation
    */
   bool IsPlaying() const
@@ -80,12 +99,12 @@ public:
   }
 
   /**
-   * Set the animation in delta time in seconds
+   *Set the animation in delta time in seconds
    */
   void SetDeltaTime(double deltaTime);
 
   /**
-   * Advance animationTime of DeltaTime and call loadAtTime accordingly
+   * Advance animationTime of deltaTime and call loadAtTime accordingly
    * Do nothing if IsPlaying is false
    */
   void Tick();
@@ -94,6 +113,12 @@ public:
    * Load animation at provided time value
    */
   bool LoadAtTime(double timeValue);
+
+  /**
+   * Load animation at provided frmae value
+   * When relative is false frame -1 is equal to last frame
+   */
+  void JumpToFrame(int frame, bool relative);
 
   /**
    * Return a pair containing the current time range values
@@ -105,6 +130,11 @@ public:
    */
   unsigned int GetNumberOfAvailableAnimations() const;
 
+  /**
+   * Update the dynamic options value to trigger cheatsheet update if needed.
+   */
+  void UpdateDynamicOptions();
+
   animationManager(animationManager const&) = delete;
   void operator=(animationManager const&) = delete;
 
@@ -115,12 +145,28 @@ private:
    */
   void PrepareForAnimationIndices();
 
+  /**
+   * Internal setter for Autoplay.
+   */
+  void SetAutoplay(bool enable);
+
+  /**
+   * Internal setter for SpeedFactor.
+   */
+  void SetSpeedFactor(double speedFactor);
+
+  /**
+   * Helper method to call the homonymous method from vtkF3DRenderer.
+   */
+  void SetCheatSheetConfigured(bool configured);
+
   options& Options;
   window_impl& Window;
-  vtkImporter* Importer = nullptr;
+  vtkF3DMetaImporter* Importer = nullptr;
   interactor_impl* Interactor = nullptr;
 
   int AvailAnimations = 0;
+  int AnimationDirection = 1;
 
   std::optional<std::vector<int>> PreparedAnimationIndices;
   double TimeRange[2] = { 0.0, 0.0 };
@@ -128,6 +174,10 @@ private:
   double CurrentTime = 0;
   double DeltaTime = 0;
   bool CurrentTimeSet = false;
+
+  // Dynamic options
+  bool Autoplay = false;
+  double SpeedFactor = 1.0;
 
   vtkSmartPointer<vtkProgressBarWidget> ProgressWidget;
 };

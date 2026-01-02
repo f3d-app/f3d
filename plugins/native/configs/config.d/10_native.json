@@ -45,16 +45,16 @@
     "options": {
       "scalar-coloring": true,
       "coloring-component": "-2",
-      "translucency-support": true
+      "blending": "ddp"
     }
   },
   {
     "match-type": "glob",
     "match": "*.{splat,spz}",
     "options": {
-      "point-sprites": true,
+      "point-sprites": "gaussian",
+      "point-sprites-absolute-size": true,
       "point-sprites-size": 1,
-      "point-sprites-type": "gaussian",
       "scalar-coloring": true,
       "coloring-array": "color",
       "coloring-component": "-2",
@@ -62,8 +62,8 @@
       "interaction-trackball": true,
       "tone-mapping": false,
       "grid": false,
-      "anti-aliasing": false,
-      "translucency-support": false
+      "anti-aliasing": "none",
+      "blending": "sort"
     }
   },
   {

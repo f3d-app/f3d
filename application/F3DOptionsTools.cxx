@@ -91,6 +91,9 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "remove-empty-file-groups", "", "Remove file groups that results into an empty scene", "<bool>", "1" },
       { "up", "", "Up direction", "<direction>", "" },
       { "axis", "x", "Show axes", "<bool>", "1" }, { "grid", "g", "Show grid", "<bool>", "1" },
+      { "x-color", "", "Color of the X axis", "<color>", "" },
+      { "y-color", "", "Color of the Y axis", "<color>", "" },
+      { "z-color", "", "Color of the Z axis", "<color>", "" },
       { "grid-absolute", "", "Position grid at the absolute origin instead of below the model", "<bool>", "1" },
       { "grid-unit", "", "Size of grid unit square, automatically computed by default", "<value>", "" },
       { "grid-subdivisions", "", "Number of grid subdivisions", "<value>", "" },
@@ -109,13 +112,14 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "font-file", "", "Path to a FreeType compatible font file", "<file_path>", ""},
       { "font-scale", "", "Scale fonts", "<ratio>", ""},
 #if F3D_MODULE_UI
-      { "backdrop-opacity", "", "UI backdrop opacity", "<value>", ""}, 
+      { "backdrop-opacity", "", "UI backdrop opacity", "<value>", ""},
 #endif
       { "command-script", "", "Path to a script file containing commands to execute", "<file_path>", "" } } },
   { "Material",
-    { {"point-sprites", "o", "Show sphere sprites instead of surfaces", "<bool>", "1" },
-      {"point-sprites-type", "", "Point sprites type", "<sphere|gaussian>", ""},
-      {"point-sprites-size", "", "Point sprites size", "<size>", ""},
+    { {"point-sprites", "o", R"(Select point sprites type ("none", "sphere", "gaussian"))", "<string>", "sphere" },
+      {"point-sprites-type", "", "Point sprites type (deprecated)", "<sphere|gaussian>", ""},
+      {"point-sprites-size", "", "Point sprites sphere size", "<size>", ""},
+      {"point-sprites-absolute-size", "", "Do not scale point sprites size by scene size", "<bool>", "1"},
       {"point-size", "", "Point size when showing vertices, model specified by default", "<size>", ""},
       {"line-width", "", "Line width when showing edges, model specified by default", "<width>", ""},
       {"backface-type", "", "Backface type, can be visible or hidden, model specified by default", "<visible|hidden>", ""},
@@ -142,6 +146,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       {"fps", "z", "Display rendering frame per second", "<bool>", "1"},
       {"filename", "n", "Display filename", "<bool>", "1"},
       {"metadata", "m", "Display file metadata", "<bool>", "1"},
+      {"hdri-filename", "", "Display hdri filename", "<bool>", "1"},
       {"blur-background", "u", "Blur background", "<bool>", "1" },
       {"blur-coc", "", "Blur circle of confusion radius", "<value>", ""},
       {"light-intensity", "", "Light intensity", "<value>", ""} } },
@@ -175,10 +180,11 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       {"raytracing-denoise", "d", "Denoise the image", "<bool>", "1"} } },
 #endif
   {"PostFX (OpenGL)",
-    { {"translucency-support", "p", "Enable translucency support, implemented using depth peeling", "<bool>", "1"},
+    { {"blending", "p", R"(Select translucency blending mode ("none", "ddp", "sort" or "stochastic"))", "<string>", "ddp"},
+      {"translucency-support", "", "Enable translucency blending (deprecated)", "<bool>", "1"},
       {"ambient-occlusion", "q", "Enable ambient occlusion providing approximate shadows for better depth perception, implemented using SSAO", "<bool>", "1"},
-      {"anti-aliasing", "a", "Enable anti-aliasing", "<bool>", "1"},
-      {"anti-aliasing-mode", "", R"(Select anti-aliasing method ("fxaa", "ssaa" or "taa"))", "<string>", "fxaa"},
+      {"anti-aliasing", "a", R"(Select anti-aliasing method ("none", "fxaa", "ssaa" or "taa"))", "<string>", "fxaa"},
+      {"anti-aliasing-mode", "", R"(Select anti-aliasing method ("fxaa", "ssaa" or "taa") (deprecated))", "<string>", "fxaa"},
       {"tone-mapping", "t", "Enable Tone Mapping, providing balanced coloring", "<bool>", "1"},
       {"final-shader", "", "Execute the final shader at the end of the rendering pipeline", "<GLSL code>", ""} } },
   {"Testing",
@@ -391,6 +397,12 @@ std::pair<std::string, int> F3DOptionsTools::GetClosestOption(const std::string&
     checkDistance(key, option, ret);
   }
 
+  // Check cli names in custom mapping options
+  for (const auto& [key, value] : F3DOptionsTools::CustomMappingOptions)
+  {
+    checkDistance(std::string(key), option, ret);
+  }
+
   // Check cli names for libf3d options
   for (const auto& [key, value] : F3DOptionsTools::LibOptionsNames)
   {
@@ -459,23 +471,32 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
           // Add the default value to the help text if any
           std::string defaultValue;
           std::string helpText(cliOption.HelpText);
+          std::string longName(cliOption.LongName);
 
           // Recover default value from app options
-          auto appIter = F3DOptionsTools::DefaultAppOptions.find(std::string(cliOption.LongName));
+          auto appIter = F3DOptionsTools::DefaultAppOptions.find(longName);
           if (appIter != F3DOptionsTools::DefaultAppOptions.end())
           {
             defaultValue = appIter->second;
           }
           else
           {
-            // Recover default value from lib options
-            auto libIter = F3DOptionsTools::LibOptionsNames.find(cliOption.LongName);
-            if (libIter != F3DOptionsTools::LibOptionsNames.end())
+            auto customIter = F3DOptionsTools::CustomMappingOptions.find(longName);
+            if (customIter != F3DOptionsTools::CustomMappingOptions.end())
             {
-              f3d::options opt;
-              std::string name = std::string(libIter->second);
-              // let default value empty for unset options
-              defaultValue = opt.hasValue(name) ? opt.getAsString(name) : "";
+              defaultValue = customIter->second;
+            }
+            else
+            {
+              // Recover default value from lib options
+              auto libIter = F3DOptionsTools::LibOptionsNames.find(cliOption.LongName);
+              if (libIter != F3DOptionsTools::LibOptionsNames.end())
+              {
+                f3d::options opt;
+                std::string name = std::string(libIter->second);
+                // let default value empty for unset options
+                defaultValue = opt.hasValue(name) ? opt.getAsString(name) : "";
+              }
             }
           }
 
@@ -624,4 +645,110 @@ void F3DOptionsTools::PrintHelpPair(
   }
   ss << " " << std::setw(helpWidth) << help;
   f3d::log::info(ss.str());
+}
+
+//----------------------------------------------------------------------------
+std::vector<std::pair<std::string, std::string>> F3DOptionsTools::ConvertToLibf3dOptions(const std::string& key, const std::string& value)
+{
+  std::vector<std::pair<std::string, std::string>> libf3dOptions;
+
+  // Simple one-to-one case
+  auto libf3dIter = F3DOptionsTools::LibOptionsNames.find(key);
+  if (libf3dIter != F3DOptionsTools::LibOptionsNames.end())
+  {
+    libf3dOptions.emplace_back(std::make_pair(libf3dIter->second, value));
+  }
+
+  // anti-aliasing is handled in two options in the lib
+  else if (key == "anti-aliasing")
+  {
+    if (value != "none")
+    {
+      // Handle deprecated boolean option
+      bool deprecatedBooleanOption;
+      if (F3DOptionsTools::Parse(value, deprecatedBooleanOption))
+      {
+        f3d::log::warn("--anti-aliasing is a now a string, please specify the type of "
+                       "anti-aliasing or use the implicit default");
+        libf3dOptions.emplace_back(std::make_pair("render.effect.antialiasing.enable", value));
+      }
+      else
+      {
+        libf3dOptions.emplace_back(std::make_pair("render.effect.antialiasing.enable", "true"));
+        libf3dOptions.emplace_back(std::make_pair("render.effect.antialiasing.mode", value));
+      }
+    }
+    else
+    {
+      libf3dOptions.emplace_back(std::make_pair("render.effect.antialiasing.enable", "false"));
+    }
+  }
+
+  // handle deprecated anti-aliasing option
+  else if (key == "anti-aliasing-mode")
+  {
+    f3d::log::warn("--anti-aliasing-mode is deprecated");
+    libf3dOptions.emplace_back(std::make_pair("render.effect.antialiasing.mode", value));
+  }
+
+  // blending is handled in two options in the lib
+  else if (key == "blending")
+  {
+    if (value != "none")
+    {
+      libf3dOptions.emplace_back(std::make_pair("render.effect.blending.enable", "true"));
+      libf3dOptions.emplace_back(std::make_pair("render.effect.blending.mode", value));
+    }
+    else
+    {
+      libf3dOptions.emplace_back(std::make_pair("render.effect.blending.enable", "false"));
+    }
+  }
+
+  // handle deprecated translucency support
+  else if (key == "translucency-support")
+  {
+    f3d::log::warn("--translucency-support is deprecated, please use --blending instead");
+    libf3dOptions.emplace_back(std::make_pair("render.effect.blending.enable", value));
+  }
+
+  // point sprites is handled in two options in the lib
+  else if (key == "point-sprites")
+  {
+    if (value != "none")
+    {
+      // Handle deprecated boolean option
+      bool deprecatedBooleanOption;
+      if (F3DOptionsTools::Parse(value, deprecatedBooleanOption))
+      {
+        f3d::log::warn("--point-sprites is a now a string, please specify the type of "
+                       "point sprites to use or use the implicit default");
+        libf3dOptions.emplace_back(std::make_pair("model.point_sprites.enable", value));
+      }
+      else
+      {
+        libf3dOptions.emplace_back(std::make_pair("model.point_sprites.enable", "true"));
+        libf3dOptions.emplace_back(std::make_pair("model.point_sprites.type", value));
+      }
+    }
+    else
+    {
+      libf3dOptions.emplace_back(std::make_pair("model.point_sprites.enable", "false"));
+    }
+  }
+
+  // handle deprecated point-sprites-type option
+  else if (key == "point-sprites-type")
+  {
+    f3d::log::warn("--point-sprites-type is deprecated");
+    libf3dOptions.emplace_back(std::make_pair("model.point_sprites.mode", value));
+  }
+
+  else
+  {
+    // If nothing to convert, just return the input
+    libf3dOptions.emplace_back(std::make_pair(key, value));
+  }
+
+  return libf3dOptions;
 }

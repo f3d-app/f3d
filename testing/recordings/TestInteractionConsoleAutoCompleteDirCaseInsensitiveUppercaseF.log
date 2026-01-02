@@ -1,0 +1,87 @@
+# StreamVersion 1.2
+TimerEvent 0 0 0 0 0 0 0
+# Esc
+KeyPressEvent 2238 568 0 27 1 Escape 0
+CharEvent 2238 568 0 27 1 Escape 0
+TimerEvent 2238 568 0 27 1 Escape 0
+KeyReleaseEvent 2238 568 0 27 1 Escape 0
+TimerEvent 2238 568 0 27 1 Escape 0
+# a
+KeyPressEvent 2238 568 0 97 1 a 0
+CharEvent 2238 568 0 97 1 a 0
+TimerEvent 2238 568 0 97 1 a 0
+KeyReleaseEvent 2238 568 0 97 1 a 0
+TimerEvent 2238 568 0 97 1 a 0
+# d
+KeyPressEvent 2238 568 0 100 1 d 0
+CharEvent 2238 568 0 100 1 d 0
+TimerEvent 2238 568 0 100 1 d 0
+KeyReleaseEvent 2238 568 0 100 1 d 0
+TimerEvent 2238 568 0 100 1 d 0
+# d
+KeyPressEvent 2238 568 0 100 1 d 0
+CharEvent 2238 568 0 100 1 d 0
+TimerEvent 2238 568 0 100 1 d 0
+KeyReleaseEvent 2238 568 0 100 1 d 0
+TimerEvent 2238 568 0 100 1 d 0
+# Shift+_
+KeyPressEvent 2238 568 1 0 1 Shift_L 0
+TimerEvent 2238 568 1 0 1 Shift_L 0
+KeyPressEvent 2238 568 1 95 1 underscore 0
+CharEvent 2238 568 1 95 1 underscore 0
+TimerEvent 2238 568 1 95 1 underscore 0
+KeyReleaseEvent 2238 568 1 95 1 underscore 0
+TimerEvent 2238 568 1 95 1 underscore 0
+KeyReleaseEvent 2238 568 0 0 1 Shift_L 0
+TimerEvent 2238 568 0 0 1 Shift_L 0
+# f
+KeyPressEvent 2238 568 0 102 1 f 0
+CharEvent 2238 568 0 102 1 f 0
+TimerEvent 2238 568 0 102 1 f 0
+KeyReleaseEvent 2238 568 0 102 1 f 0
+# i
+KeyPressEvent 2238 568 0 105 1 i 0
+CharEvent 2238 568 0 105 1 i 0
+TimerEvent 2238 568 0 105 1 i 0
+KeyReleaseEvent 2238 568 0 105 1 i 0
+TimerEvent 2238 568 0 105 1 i 0
+# l
+KeyPressEvent 2238 568 0 108 1 l 0
+CharEvent 2238 568 0 108 1 l 0
+TimerEvent 2238 568 0 108 1 l 0
+# e
+KeyPressEvent 2238 568 0 101 1 e 0
+CharEvent 2238 568 0 101 1 e 0
+KeyReleaseEvent 2238 568 0 108 1 l 0
+TimerEvent 2238 568 0 108 1 l 0
+KeyReleaseEvent 2238 568 0 101 1 e 0
+TimerEvent 2238 568 0 101 1 e 0
+# s
+KeyPressEvent 2238 568 0 115 1 s 0
+CharEvent 2238 568 0 115 1 s 0
+TimerEvent 2238 568 0 115 1 s 0
+KeyReleaseEvent 2238 568 0 115 1 s 0
+TimerEvent 2238 568 0 115 1 s 0
+# Space
+KeyPressEvent 2238 568 0 32 1 space 0
+CharEvent 2238 568 0 32 1 space 0
+TimerEvent 2238 568 0 32 1 space 0
+KeyReleaseEvent 2238 568 0 32 1 space 0
+TimerEvent 2238 568 0 32 1 space 0
+# Shift+F
+KeyPressEvent 2238 568 1 0 1 Shift_L 0
+TimerEvent 2238 568 1 0 1 Shift_L 0
+TimerEvent 2238 568 1 0 1 Shift_L 0
+KeyPressEvent 2238 568 1 70 1 F 0
+CharEvent 2238 568 1 70 1 F 0
+TimerEvent 2238 568 1 70 1 F 0
+KeyReleaseEvent 2238 568 0 0 1 Shift_L 0
+TimerEvent 2238 568 0 0 1 Shift_L 0
+KeyReleaseEvent 2238 568 0 102 1 f 0
+TimerEvent 2238 568 0 102 1 f 0
+# Tab
+KeyPressEvent 2238 568 0 9 1 Tab 0
+CharEvent 2238 568 0 9 1 Tab 0
+TimerEvent 2238 568 0 9 1 Tab 0
+KeyReleaseEvent 2238 568 0 9 1 Tab 0
+TimerEvent 2238 568 0 9 1 Tab 0
