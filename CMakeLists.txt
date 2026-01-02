@@ -137,9 +137,11 @@ cmake_dependent_option(BUILD_SHARED_LIBS "Build f3d with shared libraries" ON "N
 set(F3D_STRICT_BUILD OFF CACHE BOOL "Use strict warnings and errors flags for building F3D")
 mark_as_advanced(F3D_STRICT_BUILD)
 set(f3d_strict_build_compile_options "")
+set(f3d_strict_build_link_options "")
 if(F3D_STRICT_BUILD)
   if(MSVC)
     set(f3d_strict_build_compile_options /W4 /WX)
+    set(f3d_strict_build_link_options /WX)
   else()
     set(f3d_strict_build_compile_options -Wall -Wextra -Wshadow -Woverloaded-virtual -Wno-deprecated -Wno-strict-overflow -Wno-array-bounds -Wunreachable-code -Wno-missing-field-initializers -Wno-unused-parameter -Wredundant-decls -Wpointer-arith -Werror)
     if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -189,6 +191,7 @@ set(f3d_link_options_public "")
 
 ## F3D_STRICT_BUILD
 list(APPEND f3d_compile_options_private ${f3d_strict_build_compile_options})
+list(APPEND f3d_link_options_public ${f3d_strict_build_link_options})
 
 ## Coverage
 list(APPEND f3d_compile_options_public ${f3d_coverage_compile_options})
