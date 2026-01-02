@@ -147,11 +147,11 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
         // directory_iterator is not ordered, enforce alphabetical ordering for the added files.
         std::sort(actualConfigFilePaths.begin() + oldSize, actualConfigFilePaths.end());
       }
-      /*else
+      else
       {
         f3d::log::debug("Using config file ", configPath.string());
         actualConfigFilePaths.emplace_back(configPath);
-      }*/
+      }
     }
     catch (const fs::filesystem_error& e)
     {
