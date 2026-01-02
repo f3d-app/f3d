@@ -2924,7 +2924,7 @@ bool vtkF3DRenderer::ConfigureMapperForColoring(vtkPolyDataMapper* mapper, const
 //----------------------------------------------------------------------------
 bool vtkF3DRenderer::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vtkVolume* volume,
   const std::string& name, int component, vtkColorTransferFunction* ctf,
-  std::vector<double>& opacityMap, double range[2], bool& opacityTransferFunctionConfigured,
+  const std::vector<double>& opacityMap, double range[2], bool& opacityTransferFunctionConfigured,
   bool cellFlag, bool inverseOpacityFlag)
 {
   vtkDataSetAttributes* data = cellFlag
@@ -2986,7 +2986,7 @@ bool vtkF3DRenderer::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vt
 
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureOpacityTransferFunction(vtkPiecewiseFunction* otf, double range[2],
-  std::vector<double>& opacityMap, bool inverseOpacityFlag)
+  const std::vector<double>& opacityMap, bool inverseOpacityFlag)
 {
   if (!otf)
   {

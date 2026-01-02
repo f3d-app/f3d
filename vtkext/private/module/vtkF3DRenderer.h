@@ -552,14 +552,14 @@ private:
    */
   static bool ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vtkVolume* volume,
     const std::string& name, int component, vtkColorTransferFunction* ctf,
-    std::vector<double>& opacityMap, double range[2], bool& opacityTransferFunctionConfigured,
+    const std::vector<double>& opacityMap, double range[2], bool& opacityTransferFunctionConfigured,
     bool cellFlag = false, bool inverseOpacityFlag = false);
 
   /**
    * Configure opacity transfer function for volume rendering
    */
   static void ConfigureOpacityTransferFunction(vtkPiecewiseFunction* otf, double range[2],
-    std::vector<double>& opacityMap, bool inverseOpacityFlag);
+    const std::vector<double>& opacityMap, bool inverseOpacityFlag);
 
   /**
    * Configure screen spaced jittering for TAA
