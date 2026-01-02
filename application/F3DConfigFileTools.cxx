@@ -18,7 +18,6 @@ std::vector<fs::path> F3DConfigFileTools::GetConfigPaths(const std::string& conf
 {
   std::vector<fs::path> paths;
 
-  fs::path configPath;
   std::vector<fs::path> dirsToCheck = {
 
 #ifdef __APPLE__
@@ -56,13 +55,12 @@ std::vector<fs::path> F3DConfigFileTools::GetConfigPaths(const std::string& conf
 
       for (const auto& configName : configNames)
       {
-        configPath = dir / (configName);
-        paths.emplace_back(configPath);
+        paths.emplace_back(dir / configName);
       }
     }
     catch (const fs::filesystem_error&)
     {
-      f3d::log::error("Error recovering configuration file path: ", configPath.string());
+      f3d::log::error("Error recovering configuration file path");
     }
   }
 
@@ -72,7 +70,7 @@ std::vector<fs::path> F3DConfigFileTools::GetConfigPaths(const std::string& conf
 //----------------------------------------------------------------------------
 void F3DConfigFileTools::PrintConfigInfo(const std::vector<fs::path>& configPaths)
 {
-  for (const fs::path& path : F3DConfigFileTools::GetConfigPaths("config"))
+  for (const fs::path& path : configPaths)
   {
     if (fs::exists(path))
     {
@@ -144,18 +142,18 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
         f3d::log::debug("Using config directory ", configPath.string());
         const size_t oldSize = actualConfigFilePaths.size();
         auto dirIter = fs::directory_iterator(configPath);
-        std::copy(std::filesystem::begin(dirIter), std::filesystem::end(dirIter),
+        std::copy(fs::begin(dirIter), fs::end(dirIter),
           std::back_inserter(actualConfigFilePaths));
         // directory_iterator is not ordered, enforce alphabetical ordering for the added files.
         std::sort(actualConfigFilePaths.begin() + oldSize, actualConfigFilePaths.end());
       }
-      else
+      /*else
       {
         f3d::log::debug("Using config file ", configPath.string());
         actualConfigFilePaths.emplace_back(configPath);
-      }
+      }*/
     }
-    catch (const std::filesystem::filesystem_error& e)
+    catch (const fs::filesystem_error& e)
     {
       f3d::log::error("Error while locating config path: ", e.what());
     }
@@ -347,5 +345,6 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
     }
   }
   return F3DConfigFileTools::ParsedConfigFiles{ std::move(optionsEntries),
-    std::move(imperativeOptionsEntries), std::move(bindingsEntries) };
+    std::move(imperativeOptionsEntries), std::move(bindingsEntries), 
+    std::move(configPaths) };
 }

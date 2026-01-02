@@ -959,6 +959,7 @@ public:
   F3DOptionsTools::OptionsEntries DynamicOptionsEntries;
   F3DOptionsTools::OptionsEntries ImperativeConfigOptionsEntries;
   F3DConfigFileTools::BindingsEntries ConfigBindingsEntries;
+  std::vector<fs::path> ConfigPaths;
   std::unique_ptr<f3d::engine> Engine;
   std::vector<std::pair<std::string, std::vector<fs::path>>> FilesGroups;
   std::vector<fs::path> LoadedFiles;
@@ -1061,6 +1062,8 @@ int F3DStarter::Start(int argc, char** argv)
   {
     F3DConfigFileTools::ParsedConfigFiles parsedConfigFiles =
       F3DConfigFileTools::ReadConfigFiles(config);
+    this->Internals->ConfigPaths = parsedConfigFiles.ConfigPaths;
+
     this->Internals->ConfigOptionsEntries = parsedConfigFiles.Options;
     this->Internals->ImperativeConfigOptionsEntries = parsedConfigFiles.ImperativeOptions;
     this->Internals->ConfigBindingsEntries = parsedConfigFiles.Bindings;
@@ -2120,7 +2123,8 @@ void F3DStarter::AddCommands()
   };
 
   interactor.addCommand("print_config_info", [this](const std::vector<std::string>&)
-    { F3DConfigFileTools::PrintConfigInfo(F3DConfigFileTools::GetConfigPaths("config")); });
+    { F3DConfigFileTools::PrintConfigInfo(this->Internals->ConfigPaths); });
+
 
   interactor.addCommand(
     "remove_current_file_group",
