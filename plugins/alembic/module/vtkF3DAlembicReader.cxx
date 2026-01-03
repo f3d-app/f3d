@@ -26,6 +26,7 @@
 #pragma warning(pop)
 #endif
 
+#include <numeric>
 #include <stack>
 #include <tuple>
 
@@ -182,9 +183,10 @@ class vtkF3DAlembicReader::vtkInternals
     {
       duplicatedData = originalData;
       size_t numPoints = 0;
-      if (originalData.Attributes.count("P"))
+      auto it = originalData.Attributes.find("P");
+      if (it != originalData.Attributes.end())
       {
-        numPoints = originalData.Attributes.at("P").size();
+        numPoints = it->second.size();
       }
       duplicatedData.SourceIndices.resize(numPoints);
       std::iota(duplicatedData.SourceIndices.begin(), duplicatedData.SourceIndices.end(), 0);
@@ -328,11 +330,10 @@ public:
     bool isTopologyConstant = (topologyVariance == Alembic::AbcGeom::kConstantTopology) ||
       (topologyVariance == Alembic::AbcGeom::kHomogenousTopology);
     Alembic::AbcGeom::P3fArraySamplePtr positions = samp.getPositions();
+
     if (isTopologyConstant && this->OutputCache)
     {
-      vtkPolyData* cachedPoly = this->OutputCache;
-      polydata->ShallowCopy(cachedPoly);
-      Alembic::AbcGeom::P3fArraySamplePtr positions = samp.getPositions();
+      polydata->ShallowCopy(this->OutputCache);
       vtkDataArray* sourceIdsDA = polydata->GetPointData()->GetArray("AbcSourceIds");
       if (sourceIdsDA)
       {
@@ -340,110 +341,116 @@ public:
         vtkIdType numPoints = polydata->GetNumberOfPoints();
         newPoints->SetNumberOfPoints(numPoints);
 
-        vtkIdType* srcIndices = static_cast<vtkIdTypeArray*>(sourceIdsDA)->GetPointer(0);
-        for (vtkIdType i = 0; i < numPoints; i++)
+        vtkIdTypeArray* sourceIdsArr = vtkIdTypeArray::SafeDownCast(sourceIdsDA);
+        if (sourceIdsArr)
         {
-          vtkIdType rawIndex = srcIndices[i];
-          if (rawIndex < positions->size())
+          for (vtkIdType i = 0; i < numPoints; i++)
           {
-            const Alembic::Abc::V3f tp = positions->get()[rawIndex] * matrix;
-            newPoints->SetPoint(i, tp.x, tp.y, tp.z);
+            vtkIdType rawIndex = sourceIdsArr->GetValue(i);
+            if (rawIndex < static_cast<vtkIdType>(positions->size()))
+            {
+              Alembic::Abc::V3f tp;
+              matrix.multVecMatrix(positions->get()[rawIndex], tp);
+              newPoints->SetPoint(i, tp.x, tp.y, tp.z);
+            }
+          }
+          polydata->SetPoints(newPoints);
+        }
+      }
+    }
+    else
+    {
+      Alembic::AbcGeom::Int32ArraySamplePtr facePositionIndices = samp.getFaceIndices();
+      Alembic::AbcGeom::Int32ArraySamplePtr faceVertexCounts = samp.getFaceCounts();
+      this->SetupIndicesStorage(faceVertexCounts, originalData.Indices);
+
+      // By default, Alembic is CW while VTK is CCW
+      // So we need to reverse the order of indices only if the mesh is not mirrored
+      const bool doReverseRotate = matrix.determinant() > 0;
+
+      // Positions
+      {
+        V3fContainer pV3F;
+        for (size_t pIndex = 0; pIndex < positions->size(); pIndex++)
+        {
+          Alembic::Abc::V3f tp;
+          matrix.multVecMatrix(positions->get()[pIndex], tp);
+          pV3F.emplace_back(tp.x, tp.y, tp.z);
+        }
+        originalData.Attributes.insert(AttributesContainer::value_type("P", pV3F));
+        this->UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
+          facePositionIndices, pIndicesOffset, originalData.Indices, doReverseRotate);
+      }
+
+      // Texture coordinate
+      Alembic::AbcGeom::IV2fGeomParam uvsParam = schema.getUVsParam();
+      if (uvsParam.valid())
+      {
+        Alembic::AbcGeom::IV2fGeomParam::Sample uvValue = uvsParam.getIndexedValue(selector);
+        if (uvValue.valid())
+        {
+          V3fContainer uvV3F;
+          Alembic::AbcGeom::UInt32ArraySamplePtr uvIndices = uvValue.getIndices();
+          for (size_t index = 0; index < uvValue.getVals()->size(); ++index)
+          {
+            Alembic::AbcGeom::V2f uv = (*(uvValue.getVals()))[index];
+            uvV3F.emplace_back(uv[0], uv[1], 0);
+          }
+          originalData.Attributes.insert(AttributesContainer::value_type("uv", uvV3F));
+          if (uvsParam.getScope() == Alembic::AbcGeom::kFacevaryingScope)
+          {
+            originalData.uvFaceVarying = true;
+            this->UpdateIndices<Alembic::AbcGeom::UInt32ArraySamplePtr>(
+              uvIndices, uvIndicesOffset, originalData.Indices, doReverseRotate);
+          }
+          else
+          {
+            this->UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
+              facePositionIndices, uvIndicesOffset, originalData.Indices, doReverseRotate);
           }
         }
-        polydata->SetPoints(newPoints);
-        return polydata;
       }
-    }
-    Alembic::AbcGeom::Int32ArraySamplePtr facePositionIndices = samp.getFaceIndices();
-    Alembic::AbcGeom::Int32ArraySamplePtr faceVertexCounts = samp.getFaceCounts();
-    this->SetupIndicesStorage(faceVertexCounts, originalData.Indices);
 
-    // By default, Alembic is CW while VTK is CCW
-    // So we need to reverse the order of indices only if the mesh is not mirrored
-    const bool doReverseRotate = matrix.determinant() > 0;
-
-    // Positions
-    {
-      V3fContainer pV3F;
-      for (size_t pIndex = 0; pIndex < positions->size(); pIndex++)
+      // Normals
+      Alembic::AbcGeom::IN3fGeomParam normalsParam = schema.getNormalsParam();
+      if (normalsParam.valid())
       {
-        Alembic::Abc::V3f tp;
-        matrix.multVecMatrix(positions->get()[pIndex], tp);
-        pV3F.emplace_back(tp.x, tp.y, tp.z);
+        Alembic::AbcGeom::IN3fGeomParam::Sample normalValue = normalsParam.getIndexedValue(selector);
+        if (normalValue.valid())
+        {
+          V3fContainer normal_v3f;
+          Alembic::AbcGeom::UInt32ArraySamplePtr normalIndices = normalValue.getIndices();
+          for (size_t index = 0; index < normalValue.getVals()->size(); ++index)
+          {
+            Alembic::Abc::V3f normal;
+            matrix.multDirMatrix((*(normalValue.getVals()))[index], normal);
+            normal_v3f.emplace_back(normal.x, normal.y, normal.z);
+          }
+          originalData.Attributes.insert(AttributesContainer::value_type("N", normal_v3f));
+          if (normalsParam.getScope() == Alembic::AbcGeom::kFacevaryingScope)
+          {
+            originalData.nFaceVarying = true;
+            this->UpdateIndices<Alembic::AbcGeom::UInt32ArraySamplePtr>(
+              normalIndices, nIndicesOffset, originalData.Indices, doReverseRotate);
+          }
+          else
+          {
+            this->UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
+              facePositionIndices, nIndicesOffset, originalData.Indices, doReverseRotate);
+          }
+        }
       }
-      originalData.Attributes.insert(AttributesContainer::value_type("P", pV3F));
-      this->UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
-        facePositionIndices, pIndicesOffset, originalData.Indices, doReverseRotate);
-    }
-    // Texture coordinate
-    Alembic::AbcGeom::IV2fGeomParam uvsParam = schema.getUVsParam();
-    if (uvsParam.valid())
-    {
-      Alembic::AbcGeom::IV2fGeomParam::Sample uvValue = uvsParam.getIndexedValue(selector);
-      if (uvValue.valid())
+
+      IntermediateGeometry duplicatedData;
+      this->PointDuplicateAccumulator(originalData, duplicatedData);
+      this->FillPolyData(duplicatedData, polydata);
+
+      if (isTopologyConstant)
       {
-        V3fContainer uvV3F;
-        Alembic::AbcGeom::UInt32ArraySamplePtr uvIndices = uvValue.getIndices();
-        for (size_t index = 0; index < uvValue.getVals()->size(); ++index)
-        {
-          Alembic::AbcGeom::V2f uv = (*(uvValue.getVals()))[index];
-          uvV3F.emplace_back(uv[0], uv[1], 0);
-        }
-        originalData.Attributes.insert(AttributesContainer::value_type("uv", uvV3F));
-        if (uvsParam.getScope() == Alembic::AbcGeom::kFacevaryingScope)
-        {
-          originalData.uvFaceVarying = true;
-          this->UpdateIndices<Alembic::AbcGeom::UInt32ArraySamplePtr>(
-            uvIndices, uvIndicesOffset, originalData.Indices, doReverseRotate);
-        }
-        else
-        {
-          this->UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
-            facePositionIndices, uvIndicesOffset, originalData.Indices, doReverseRotate);
-        }
-      }
-    }
-    // Normals
-    Alembic::AbcGeom::IN3fGeomParam normalsParam = schema.getNormalsParam();
-    if (normalsParam.valid())
-    {
-      Alembic::AbcGeom::IN3fGeomParam::Sample normalValue = normalsParam.getIndexedValue(selector);
-      if (normalValue.valid())
-      {
-        V3fContainer normal_v3f;
-        Alembic::AbcGeom::UInt32ArraySamplePtr normalIndices = normalValue.getIndices();
-        for (size_t index = 0; index < normalValue.getVals()->size(); ++index)
-        {
-          Alembic::AbcGeom::V3f normal;
-          matrix.multDirMatrix((*(normalValue.getVals()))[index], normal);
-          normal_v3f.emplace_back(normal);
-        }
-        originalData.Attributes.insert(AttributesContainer::value_type("N", normal_v3f));
-        if (normalsParam.getScope() == Alembic::AbcGeom::kFacevaryingScope)
-        {
-          originalData.nFaceVarying = true;
-          this->UpdateIndices<Alembic::AbcGeom::UInt32ArraySamplePtr>(
-            normalIndices, nIndicesOffset, originalData.Indices, doReverseRotate);
-        }
-        else
-        {
-          this->UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
-            facePositionIndices, nIndicesOffset, originalData.Indices, doReverseRotate);
-        }
+        this->OutputCache = polydata;
       }
     }
 
-    IntermediateGeometry duplicatedData;
-
-    this->PointDuplicateAccumulator(originalData, duplicatedData);
-
-    this->FillPolyData(duplicatedData, polydata);
-
-    // Store data for the next frame
-    if (isTopologyConstant)
-    {
-      this->OutputCache = polydata;
-    }
     return polydata;
   }
 
@@ -468,7 +475,8 @@ public:
 
       for (size_t pIndex = 0; pIndex < positions->size(); ++pIndex)
       {
-        const Alembic::Abc::V3f& tp = positions->get()[pIndex] * matrix;
+        Alembic::Abc::V3f tp;
+        matrix.multVecMatrix(positions->get()[pIndex], tp);
         points->InsertNextPoint(tp.x, tp.y, tp.z);
       }
 
