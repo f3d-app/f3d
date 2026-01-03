@@ -42,8 +42,9 @@ Other options can be toggled or cycled directly by pressing the following hotkey
 - <kbd>E</kbd>: the display of cell edges.
 - <kbd>X</kbd>: the trihedral axes display.
 - <kbd>G</kbd>: the horizontal grid display.
-- <kbd>Shift</kbd>+<kbd>x</kbd>: show/hide axes grid
+- <kbd>Shift</kbd> + <kbd>x</kbd>: show/hide axes grid
 - <kbd>N</kbd>: the display of the file name.
+- <kbd>Shift</kbd> + <kbd>N</kbd>: the display of the HDRI file name.
 - <kbd>M</kbd>: the display of the metadata if exists.
 - <kbd>Z</kbd>: the display of the FPS counter.
 - <kbd>R</kbd>: raytracing.
@@ -53,10 +54,12 @@ Other options can be toggled or cycled directly by pressing the following hotkey
 - <kbd>F</kbd>: HDRI ambient lighting.
 - <kbd>J</kbd>: the display of the HDRI skybox.
 - <kbd>L</kbd>: increase lights intensity.
-- <kbd>Shift</kbd>+<kbd>L</kbd>: decrease lights intensity.
-- <kbd>Ctrl</kbd>+<kbd>P</kbd>: increase opacity.
-- <kbd>Shift</kbd>+<kbd>P</kbd>: decrease opacity.
-- <kbd>Shift</kbd>+<kbd>A</kbd>: toggle armature.
+- <kbd>Shift</kbd> + <kbd>L</kbd>: decrease lights intensity.
+- <kbd>Ctrl</kbd> + <kbd>P</kbd>: increase opacity.
+- <kbd>Shift</kbd> + <kbd>P</kbd>: decrease opacity.
+- <kbd>Shift</kbd> + <kbd>A</kbd>: toggle armature.
+- <kbd>Ctrl</kbd> + <kbd>Y</kbd>: Scene up direction to +Y
+- <kbd>Ctrl</kbd> + <kbd>Z</kbd>: Scene up direction to +Z
 
 Note that the raytracing hotkeys are only available if F3D is build with raytracing enabled.
 
@@ -75,8 +78,8 @@ Camera Hotkeys:
 
 Scene Hotkeys:
 
-- <kbd>Ctrl</kbd>+<kbd>Y</kbd>: set scene up direction to +Y.
-- <kbd>Ctrl</kbd>+<kbd>Z</kbd>: set scene up direction to +Z.
+- <kbd>Ctrl</kbd> + <kbd>Y</kbd>: set scene up direction to +Y.
+- <kbd>Ctrl</kbd> + <kbd>Z</kbd>: set scene up direction to +Z.
 
 Other hotkeys and interactions are available:
 
