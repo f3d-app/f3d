@@ -629,6 +629,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetScalarBarRange(opt.model.scivis.range);
   renderer->SetColormap(opt.model.scivis.colormap);
   renderer->SetColormapDiscretization(opt.model.scivis.discretization);
+  renderer->SetOpacityMap(opt.model.scivis.opacity_map);
   renderer->ShowScalarBar(opt.ui.scalar_bar);
 
   renderer->SetUseVolume(opt.model.volume.enable);
