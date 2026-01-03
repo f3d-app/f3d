@@ -436,6 +436,10 @@ else()
   f3d_test(NAME TestSkinningManyBonesWarning DATA tube_254bones.glb ARGS --verbose REGEXP "with more than 250 bones \\\(254\\\)" NO_BASELINE)
 endif()
 
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
+  f3d_test(NAME TestDefaultConfigFileHDRIFilename DATA dragon.vtu CONFIG config_build ARGS -j --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr UI LONG_TIMEOUT)
+endif()
+
 # Needs splat sorting with compute shaders
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240203)
   if(NOT APPLE) # MacOS does not support compute shaders
