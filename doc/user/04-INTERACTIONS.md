@@ -44,6 +44,7 @@ Other options can be toggled or cycled directly by pressing the following hotkey
 - <kbd>G</kbd>: the horizontal grid display.
 - <kbd>Shift</kbd>+<kbd>x</kbd>: show/hide axes grid
 - <kbd>N</kbd>: the display of the file name.
+- <kbd>Shift</kbd>+<kbd>N</kbd>: the display of the HDRI file name.
 - <kbd>M</kbd>: the display of the metadata if exists.
 - <kbd>Z</kbd>: the display of the FPS counter.
 - <kbd>R</kbd>: raytracing.
@@ -57,6 +58,8 @@ Other options can be toggled or cycled directly by pressing the following hotkey
 - <kbd>Ctrl</kbd>+<kbd>P</kbd>: increase opacity.
 - <kbd>Shift</kbd>+<kbd>P</kbd>: decrease opacity.
 - <kbd>Shift</kbd>+<kbd>A</kbd>: toggle armature.
+- <kbd>Ctrl</kbd>+<kbd>Y</kbd>: Scene up direction to +Y
+- <kbd>Ctrl</kbd>+<kbd>Z</kbd>: Scene up direction to +Z
 
 Note that the raytracing hotkeys are only available if F3D is build with raytracing enabled.
 
@@ -81,18 +84,18 @@ Scene Hotkeys:
 Other hotkeys and interactions are available:
 
 - <kbd>H</kbd>: key to toggle the display of a cheat sheet showing all these hotkeys and their statuses.
-- <kbd>CTRL</kbd> + <kbd>Q</kbd>: close the window and quit F3D.
+- <kbd>CTRL</kbd>+<kbd>Q</kbd>: close the window and quit F3D.
 - <kbd>Esc</kbd>: display the console or hide console/minimal console.
 - <kbd>:</kbd>: display the minimal console
 - <kbd>Space</kbd>: play the animation if any.
-- <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Space</kbd>: play the animation backward if any.
-- <kbd>Shift</kbd> + <kbd>V</kbd>: cycle between verbosity levels.
+- <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Space</kbd>: play the animation backward if any.
+- <kbd>Shift</kbd>+<kbd>V</kbd>: cycle between verbosity levels.
 - <kbd>&larr;</kbd>: load the previous file if any and reset the camera.
 - <kbd>&rarr;</kbd>: load the next file if any and reset the camera.
 - <kbd>&uarr;</kbd>: reload the currently loaded files.
 - <kbd>&darr;</kbd>: add all current files parent directories to the list of files, reload the currently loaded files and reset the camera, respect the `--recursive-dir-add` CLI option.
 - <kbd>F12</kbd>: take a screenshot, ie. render the current view to an image file.
-- <kbd>Ctrl</kbd> + <kbd>F12</kbd>: take a "minimal" screenshot, ie. render the current view with no grid and no overlays to an image file with a transparent background.
+- <kbd>Ctrl</kbd>+<kbd>F12</kbd>: take a "minimal" screenshot, ie. render the current view with no grid and no overlays to an image file with a transparent background.
 - _Drop_ a file, directory or HDRI into the F3D window to load it. F3D relies on the extension (`.hdr` or `.exr`) to detect if the dropped file is an HDRI.
 - <kbd>Ctrl</kbd> + _Drop_ a file, directory and load it.
 - <kbd>Shift</kbd> + _Drop_ a HDRI and use it, no extensions checks performed.
@@ -116,7 +119,7 @@ as specified above.
 
 ## Taking Screenshots
 
-The destination filename used to save the screenshots (created by pressing <kbd>F12</kbd> or <kbd>Ctrl</kbd> + <kbd>F12</kbd>) is configurable (using the `screenshot-filename` option) and can use template variables as described [on the options page](03-OPTIONS.md#filename-templating).
+The destination filename used to save the screenshots (created by pressing <kbd>F12</kbd> or <kbd>Ctrl</kbd>+<kbd>F12</kbd>) is configurable (using the `screenshot-filename` option) and can use template variables as described [on the options page](03-OPTIONS.md#filename-templating).
 
 Unless the configured filename template is an absolute path, images will be saved in dedicated directories:
 
