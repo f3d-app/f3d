@@ -1145,7 +1145,7 @@ bool vtkF3DAssimpImporter::IsAnimationEnabled(vtkIdType animationIndex)
 
 //----------------------------------------------------------------------------
 bool vtkF3DAssimpImporter::GetTemporalInformation(vtkIdType animationIndex, double timeRange[2],
-  int& vtkNotUsed(nbTimeSteps), vtkDoubleArray* vtkNotUsed(timeSteps))
+  int& nbTimeSteps, vtkDoubleArray* timeSteps)
 {
   assert(animationIndex < this->GetNumberOfAnimations());
   assert(animationIndex >= 0);
@@ -1165,9 +1165,21 @@ bool vtkF3DAssimpImporter::GetTemporalInformation(vtkIdType animationIndex, doub
   this->Internals->Description += std::to_string(fps);
   this->Internals->Description += " fps.\n";
 
-  // F3D do not care about timesteps, only set time range
+  // F3D do care about timesteps and time range
   timeRange[0] = 0.0;
   timeRange[1] = duration / fps;
+
+  double period = 1.0 / fps;
+  
+  nbTimeSteps = 0;
+  timeSteps->SetNumberOfComponents(1);
+  timeSteps->SetNumberOfTuples(0);
+  
+  for (double i = timeRange[0]; i < timeRange[1]; i += period) {
+    timeSteps->InsertNextTuple(&i);
+    nbTimeSteps++;
+  }
+
   return true;
 }
 
