@@ -351,92 +351,96 @@ public:
           }
         }
         polydata->SetPoints(newPoints);
-        return polydata;
       }
     }
-    Alembic::AbcGeom::Int32ArraySamplePtr facePositionIndices = samp.getFaceIndices();
-    Alembic::AbcGeom::Int32ArraySamplePtr faceVertexCounts = samp.getFaceCounts();
-    this->SetupIndicesStorage(faceVertexCounts, originalData.Indices);
-    // Positions
+    else
     {
-      V3fContainer pV3F;
-      for (size_t pIndex = 0; pIndex < positions->size(); pIndex++)
+      Alembic::AbcGeom::Int32ArraySamplePtr facePositionIndices = samp.getFaceIndices();
+      Alembic::AbcGeom::Int32ArraySamplePtr faceVertexCounts = samp.getFaceCounts();
+      this->SetupIndicesStorage(faceVertexCounts, originalData.Indices);
+      // Positions
       {
-        const Alembic::Abc::V3f tp = positions->get()[pIndex] * matrix;
-        pV3F.emplace_back(tp.x, tp.y, tp.z);
+        V3fContainer pV3F;
+        for (size_t pIndex = 0; pIndex < positions->size(); pIndex++)
+        {
+          const Alembic::Abc::V3f tp = positions->get()[pIndex] * matrix;
+          pV3F.emplace_back(tp.x, tp.y, tp.z);
+        }
+        originalData.Attributes.insert(AttributesContainer::value_type("P", pV3F));
+        this->UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
+          facePositionIndices, pIndicesOffset, originalData.Indices);
       }
-      originalData.Attributes.insert(AttributesContainer::value_type("P", pV3F));
-      this->UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
-        facePositionIndices, pIndicesOffset, originalData.Indices);
-    }
-    // Texture coordinate
-    Alembic::AbcGeom::IV2fGeomParam uvsParam = schema.getUVsParam();
-    if (uvsParam.valid())
-    {
-      Alembic::AbcGeom::IV2fGeomParam::Sample uvValue = uvsParam.getIndexedValue(selector);
-      if (uvValue.valid())
+      // Texture coordinate
+      Alembic::AbcGeom::IV2fGeomParam uvsParam = schema.getUVsParam();
+      if (uvsParam.valid())
       {
-        V3fContainer uvV3F;
-        Alembic::AbcGeom::UInt32ArraySamplePtr uvIndices = uvValue.getIndices();
-        for (size_t index = 0; index < uvValue.getVals()->size(); ++index)
+        Alembic::AbcGeom::IV2fGeomParam::Sample uvValue = uvsParam.getIndexedValue(selector);
+        if (uvValue.valid())
         {
-          Alembic::AbcGeom::V2f uv = (*(uvValue.getVals()))[index];
-          uvV3F.emplace_back(uv[0], uv[1], 0);
-        }
-        originalData.Attributes.insert(AttributesContainer::value_type("uv", uvV3F));
-        if (uvsParam.getScope() == Alembic::AbcGeom::kFacevaryingScope)
-        {
-          originalData.uvFaceVarying = true;
-          this->UpdateIndices<Alembic::AbcGeom::UInt32ArraySamplePtr>(
-            uvIndices, uvIndicesOffset, originalData.Indices);
-        }
-        else
-        {
-          this->UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
-            facePositionIndices, uvIndicesOffset, originalData.Indices);
+          V3fContainer uvV3F;
+          Alembic::AbcGeom::UInt32ArraySamplePtr uvIndices = uvValue.getIndices();
+          for (size_t index = 0; index < uvValue.getVals()->size(); ++index)
+          {
+            Alembic::AbcGeom::V2f uv = (*(uvValue.getVals()))[index];
+            uvV3F.emplace_back(uv[0], uv[1], 0);
+          }
+          originalData.Attributes.insert(AttributesContainer::value_type("uv", uvV3F));
+          if (uvsParam.getScope() == Alembic::AbcGeom::kFacevaryingScope)
+          {
+            originalData.uvFaceVarying = true;
+            this->UpdateIndices<Alembic::AbcGeom::UInt32ArraySamplePtr>(
+              uvIndices, uvIndicesOffset, originalData.Indices);
+          }
+          else
+          {
+            this->UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
+              facePositionIndices, uvIndicesOffset, originalData.Indices);
+          }
         }
       }
-    }
-    // Normals
-    Alembic::AbcGeom::IN3fGeomParam normalsParam = schema.getNormalsParam();
-    if (normalsParam.valid())
-    {
-      Alembic::AbcGeom::IN3fGeomParam::Sample normalValue = normalsParam.getIndexedValue(selector);
-      if (normalValue.valid())
+      // Normals
+      Alembic::AbcGeom::IN3fGeomParam normalsParam = schema.getNormalsParam();
+      if (normalsParam.valid())
       {
-        V3fContainer normal_v3f;
-        Alembic::AbcGeom::UInt32ArraySamplePtr normalIndices = normalValue.getIndices();
-        for (size_t index = 0; index < normalValue.getVals()->size(); ++index)
+        Alembic::AbcGeom::IN3fGeomParam::Sample normalValue =
+          normalsParam.getIndexedValue(selector);
+        if (normalValue.valid())
         {
-          Alembic::AbcGeom::V3f normal = (*(normalValue.getVals()))[index];
-          normal_v3f.emplace_back(normal[0], normal[1], normal[2]);
+          V3fContainer normal_v3f;
+          Alembic::AbcGeom::UInt32ArraySamplePtr normalIndices = normalValue.getIndices();
+          for (size_t index = 0; index < normalValue.getVals()->size(); ++index)
+          {
+            Alembic::AbcGeom::V3f normal = (*(normalValue.getVals()))[index];
+            normal_v3f.emplace_back(normal[0], normal[1], normal[2]);
+          }
+          originalData.Attributes.insert(AttributesContainer::value_type("N", normal_v3f));
+          if (normalsParam.getScope() == Alembic::AbcGeom::kFacevaryingScope)
+          {
+            originalData.nFaceVarying = true;
+            this->UpdateIndices<Alembic::AbcGeom::UInt32ArraySamplePtr>(
+              normalIndices, nIndicesOffset, originalData.Indices);
+          }
+          else
+          {
+            this->UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
+              facePositionIndices, nIndicesOffset, originalData.Indices);
+          }
         }
-        originalData.Attributes.insert(AttributesContainer::value_type("N", normal_v3f));
-        if (normalsParam.getScope() == Alembic::AbcGeom::kFacevaryingScope)
-        {
-          originalData.nFaceVarying = true;
-          this->UpdateIndices<Alembic::AbcGeom::UInt32ArraySamplePtr>(
-            normalIndices, nIndicesOffset, originalData.Indices);
-        }
-        else
-        {
-          this->UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
-            facePositionIndices, nIndicesOffset, originalData.Indices);
-        }
+      }
+
+      IntermediateGeometry duplicatedData;
+
+      this->PointDuplicateAccumulator(originalData, duplicatedData);
+
+      this->FillPolyData(duplicatedData, polydata);
+
+      // Store data for the next frame
+      if (isTopologyConstant)
+      {
+        this->OutputCache = polydata;
       }
     }
 
-    IntermediateGeometry duplicatedData;
-
-    this->PointDuplicateAccumulator(originalData, duplicatedData);
-
-    this->FillPolyData(duplicatedData, polydata);
-
-    // Store data for the next frame
-    if (isTopologyConstant)
-    {
-      this->OutputCache = polydata;
-    }
     return polydata;
   }
 
