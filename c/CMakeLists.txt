@@ -53,6 +53,9 @@ target_include_directories(c_api
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
   )
 
+# Required because we use libf3d own export.h
+target_compile_definitions(c_api PRIVATE libf3d_EXPORTS)
+
 target_compile_options(c_api PUBLIC ${f3d_sanitizer_compile_options})
 target_link_options(c_api PUBLIC ${f3d_sanitizer_link_options})
 
