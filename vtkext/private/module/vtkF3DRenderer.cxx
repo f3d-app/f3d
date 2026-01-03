@@ -319,6 +319,7 @@ void vtkF3DRenderer::Initialize()
   this->ExpandingRangeSet = false;
 
   this->ColorTransferFunctionConfigured = false;
+  this->OpacityTransferFunctionConfigured = false;
   this->ColoringMappersConfigured = false;
   this->ColoringPointSpritesMappersConfigured = false;
   this->VolumePropsAndMappersConfigured = false;
@@ -1983,6 +1984,7 @@ void vtkF3DRenderer::UpdateActors()
     this->VolumePropsAndMappersConfigured = false;
     this->ScalarBarActorConfigured = false;
     this->ColoringConfigured = false;
+    this->OpacityTransferFunctionConfigured = false;
   }
   this->ImporterUpdateTimeStamp = importerUpdateMTime;
 
@@ -2662,20 +2664,19 @@ void vtkF3DRenderer::SetUseInverseOpacityFunction(bool use)
       if (volume.Prop)
       {
         vtkPiecewiseFunction* pwf = volume.Prop->GetProperty()->GetScalarOpacity();
-        if (pwf->GetSize() == 2)
-        {
-          double range[2];
-          pwf->GetRange(range);
+        double range[2];
+        pwf->GetRange(range);
 
-          pwf->RemoveAllPoints();
-          pwf->AddPoint(range[0], this->UseInverseOpacityFunction ? 1.0 : 0.0);
-          pwf->AddPoint(range[1], this->UseInverseOpacityFunction ? 0.0 : 1.0);
-        }
+        pwf->RemoveAllPoints();
+
+        vtkF3DRenderer::ConfigureOpacityTransferFunction(
+          pwf, range, this->OpacityMap, this->UseInverseOpacityFunction);
       }
     }
     this->VolumePropsAndMappersConfigured = false;
     this->CheatSheetConfigured = false;
     this->ColoringConfigured = false;
+    this->OpacityTransferFunctionConfigured = false;
   }
 }
 
@@ -2729,6 +2730,18 @@ void vtkF3DRenderer::SetColormapDiscretization(std::optional<int> discretization
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetOpacityMap(const std::vector<double>& opacityMap)
+{
+  if (this->OpacityMap != opacityMap)
+  {
+    this->OpacityMap = opacityMap;
+
+    this->OpacityTransferFunctionConfigured = false;
+    this->VolumePropsAndMappersConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetEnableColoring(bool enable)
 {
   if (enable != this->EnableColoring)
@@ -2746,6 +2759,7 @@ void vtkF3DRenderer::SetUseCellColoring(bool useCell)
   {
     this->UseCellColoring = useCell;
     this->ColorTransferFunctionConfigured = false;
+    this->OpacityTransferFunctionConfigured = false;
     this->ColoringMappersConfigured = false;
     this->ColoringPointSpritesMappersConfigured = false;
     this->VolumePropsAndMappersConfigured = false;
@@ -2763,6 +2777,7 @@ void vtkF3DRenderer::SetArrayNameForColoring(const std::optional<std::string>& a
   {
     this->ArrayNameForColoring = arrayName;
     this->ColorTransferFunctionConfigured = false;
+    this->OpacityTransferFunctionConfigured = false;
     this->ColoringMappersConfigured = false;
     this->ColoringPointSpritesMappersConfigured = false;
     this->VolumePropsAndMappersConfigured = false;
@@ -2890,7 +2905,8 @@ void vtkF3DRenderer::ConfigureColoring()
         {
           visible = vtkF3DRenderer::ConfigureVolumeForColoring(volume.Mapper, volume.Prop,
             info.value().Name, this->ComponentForColoring, this->ColorTransferFunction,
-            this->ColorRange, this->UseCellColoring, this->UseInverseOpacityFunction);
+            this->OpacityMap, this->ColorRange, this->OpacityTransferFunctionConfigured,
+            this->UseCellColoring, this->UseInverseOpacityFunction);
           if (!visible)
           {
             F3DLog::Print(F3DLog::Severity::Warning,
@@ -2989,7 +3005,8 @@ bool vtkF3DRenderer::ConfigureMapperForColoring(vtkPolyDataMapper* mapper, const
 
 //----------------------------------------------------------------------------
 bool vtkF3DRenderer::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vtkVolume* volume,
-  const std::string& name, int component, vtkColorTransferFunction* ctf, double range[2],
+  const std::string& name, int component, vtkColorTransferFunction* ctf,
+  const std::vector<double>& opacityMap, double range[2], bool& opacityTransferFunctionConfigured,
   bool cellFlag, bool inverseOpacityFlag)
 {
   vtkDataSetAttributes* data = cellFlag
@@ -3031,9 +3048,13 @@ bool vtkF3DRenderer::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vt
     }
   }
 
-  vtkNew<vtkPiecewiseFunction> otf;
-  otf->AddPoint(range[0], inverseOpacityFlag ? 1.0 : 0.0);
-  otf->AddPoint(range[1], inverseOpacityFlag ? 0.0 : 1.0);
+  vtkPiecewiseFunction* otf = volume->GetProperty()->GetScalarOpacity();
+  if (!opacityTransferFunctionConfigured)
+  {
+    otf->RemoveAllPoints();
+    vtkF3DRenderer::ConfigureOpacityTransferFunction(otf, range, opacityMap, inverseOpacityFlag);
+    opacityTransferFunctionConfigured = true;
+  }
 
   vtkNew<vtkVolumeProperty> property;
   property->SetColor(ctf);
@@ -3043,6 +3064,33 @@ bool vtkF3DRenderer::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vt
 
   volume->SetProperty(property);
   return true;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ConfigureOpacityTransferFunction(vtkPiecewiseFunction* otf, double range[2],
+  const std::vector<double>& opacityMap, bool inverseOpacityFlag)
+{
+  if (!otf)
+  {
+    return;
+  }
+
+  if (opacityMap.size() % 2 != 0 || opacityMap.empty())
+  {
+    F3DLog::Print(F3DLog::Severity::Warning,
+      "Opacity map empty or with an odd number of elements, resetting to default linear opacity "
+      "function");
+    otf->AddPoint(range[0], inverseOpacityFlag ? 1.0 : 0.0);
+    otf->AddPoint(range[1], inverseOpacityFlag ? 0.0 : 1.0);
+  }
+  else
+  {
+    for (size_t i = 0; i + 1 < opacityMap.size(); i += 2)
+    {
+      double value = inverseOpacityFlag ? 1.0 - opacityMap[i + 1] : opacityMap[i + 1];
+      otf->AddPoint(range[0] + (range[1] - range[0]) * opacityMap[i], value);
+    }
+  }
 }
 
 //----------------------------------------------------------------------------
