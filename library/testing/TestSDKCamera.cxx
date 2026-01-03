@@ -99,7 +99,8 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   test("pitch method focal point", foc, approx(expectedFoc));
   test("pitch method up", up, approx(expectedUp));
 
-  // Test getters: azimuth / elevation / distance
+  // Test getters: world azimuth / elevation / distance
+  // Case 1: Horizontal view
   cam.setPosition({ 0., -11., -1. });
   cam.setFocalPoint({ 0., 0., -1. });
   cam.setViewUp({ 1., 0., 0. });
@@ -110,19 +111,147 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   if (!compareDouble(distance, 11.0))
   {
-    std::cerr << "getDistance is not behaving as expected: " << distance << "\n";
+    std::cerr << "getDistance (horizontal) is not behaving as expected: " << distance << "\n";
     return EXIT_FAILURE;
   }
 
   if (!compareDouble(azimuth, 90.0))
   {
-    std::cerr << "getAzimuth is not behaving as expected: " << azimuth << "\n";
+    std::cerr << "getWorldAzimuth (horizontal) is not behaving as expected: " << azimuth << "\n";
     return EXIT_FAILURE;
   }
 
   if (!compareDouble(elevation, 0.0))
   {
-    std::cerr << "getElevation is not behaving as expected: " << elevation << "\n";
+    std::cerr << "getWorldElevation (horizontal) is not behaving as expected: " << elevation << "\n";
+    return EXIT_FAILURE;
+  }
+
+  // Case 2: Positive elevation (+45 deg)
+  cam.setPosition({ 0., -11., -1. });
+  cam.setFocalPoint({ 0., 0., 10. });
+  cam.setViewUp({ 1., 0., 0. });
+
+  azimuth = cam.getWorldAzimuth();
+  elevation = cam.getWorldElevation();
+  distance = cam.getDistance();
+
+  if (!compareDouble(distance, std::sqrt(11.0 * 11.0 + 11.0 * 11.0)))
+  {
+    std::cerr << "getDistance (positive elevation) is not behaving as expected: " << distance << "\n";
+    return EXIT_FAILURE;
+  }
+
+  if (!compareDouble(azimuth, 90.0))
+  {
+    std::cerr << "getWorldAzimuth (positive elevation) is not behaving as expected: " << azimuth << "\n";
+    return EXIT_FAILURE;
+  }
+
+  if (!compareDouble(elevation, 45.0))
+  {
+    std::cerr << "getWorldElevation (positive elevation) is not behaving as expected: " << elevation
+              << "\n";
+    return EXIT_FAILURE;
+  }
+
+  // Case 3: Negative elevation (-45 deg)
+  cam.setPosition({ 0., -11., 10. });
+  cam.setFocalPoint({ 0., 0., -1. });
+  cam.setViewUp({ 1., 0., 0. });
+
+  azimuth = cam.getWorldAzimuth();
+  elevation = cam.getWorldElevation();
+  distance = cam.getDistance();
+
+  if (!compareDouble(distance, std::sqrt(11.0 * 11.0 + 11.0 * 11.0)))
+  {
+    std::cerr << "getDistance (negative elevation) is not behaving as expected: " << distance << "\n";
+    return EXIT_FAILURE;
+  }
+
+  if (!compareDouble(azimuth, 90.0))
+  {
+    std::cerr << "getWorldAzimuth (negative elevation) is not behaving as expected: " << azimuth
+              << "\n";
+    return EXIT_FAILURE;
+  }
+
+  if (!compareDouble(elevation, -45.0))
+  {
+    std::cerr << "getWorldElevation (negative elevation) is not behaving as expected: " << elevation
+              << "\n";
+    return EXIT_FAILURE;
+  }
+
+  // Case 4: Custom up direction (non-Z up)
+  cam.setPosition({ -11., 0., 0. });
+  cam.setFocalPoint({ 0., 0., 0. });
+  cam.setViewUp({ 0., 1., 0. });
+
+  azimuth = cam.getWorldAzimuth();
+  elevation = cam.getWorldElevation();
+  distance = cam.getDistance();
+
+  if (!compareDouble(distance, 11.0))
+  {
+    std::cerr << "getDistance (custom up) is not behaving as expected: " << distance << "\n";
+    return EXIT_FAILURE;
+  }
+
+  if (!compareDouble(azimuth, 0.0))
+  {
+    std::cerr << "getWorldAzimuth (custom up) is not behaving as expected: " << azimuth << "\n";
+    return EXIT_FAILURE;
+  }
+
+  if (!compareDouble(elevation, 0.0))
+  {
+    std::cerr << "getWorldElevation (custom up) is not behaving as expected: " << elevation << "\n";
+    return EXIT_FAILURE;
+  }
+
+  // Case 5: position equals focal point (zero direction vector)
+  cam.setPosition({ 0., 0., 0. });
+  cam.setFocalPoint({ 0., 0., 0. });
+  cam.setViewUp({ 0., 1., 0. });
+
+  double azimuth = cam.getWorldAzimuth();
+  double elevation = cam.getWorldElevation();
+
+  if (!compareDouble(azimuth, 0.0))
+  {
+    std::cerr << "getWorldAzimuth with zero direction vector should return 0: "
+              << azimuth << "\n";
+    return EXIT_FAILURE;
+  }
+
+  if (!compareDouble(elevation, 0.0))
+  {
+    std::cerr << "getWorldElevation with zero direction vector should return 0: "
+              << elevation << "\n";
+    return EXIT_FAILURE;
+  }
+
+  // Case 6: view direction parallel to environment up
+  cam.setPosition({ 0., 0., -1. });
+  cam.setFocalPoint({ 0., 0., 0. });
+  cam.setViewUp({ 0., 0., 1. });
+
+  double azimuth = cam.getWorldAzimuth();
+  double elevation = cam.getWorldElevation();
+
+  if (!compareDouble(azimuth, 0.0))
+  {
+    std::cerr << "getWorldAzimuth with forward parallel to up should return 0: "
+              << azimuth << "\n";
+    return EXIT_FAILURE;
+  }
+
+  if (!compareDouble(elevation, 90.0))
+  {
+    std::cerr << "getWorldElevation with forward parallel to up should be 90: "
+              << elevation << "\n";
     return EXIT_FAILURE;
   }
 
