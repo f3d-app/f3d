@@ -7,6 +7,7 @@
       "loading-progress": true,
       "anti-aliasing": "fxaa",
       "filename": true,
+      "hdri-filename": true,
       "camera-direction": "-1,-0.5,-1",
       "hdri-ambient": true,
       "blending": "ddp",
