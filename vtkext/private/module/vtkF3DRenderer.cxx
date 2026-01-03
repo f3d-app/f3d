@@ -3,6 +3,7 @@
 #include "F3DColoringInfoHandler.h"
 #include "F3DDefaultHDRI.h"
 #include "F3DLog.h"
+#include "F3DUtils.h"
 #include "vtkF3DCachedLUTTexture.h"
 #include "vtkF3DCachedSpecularTexture.h"
 #include "vtkF3DInteractorStyle.h"
@@ -1533,7 +1534,7 @@ void vtkF3DRenderer::ConfigureTextActors()
     }
   }
 
-  this->UIActor->SetFontScale(this->FontScale);
+  this->UIActor->SetFontScale(this->FontScale * F3DUtils::getDPIScale());
 
   this->TextActorsConfigured = true;
 }
