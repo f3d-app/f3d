@@ -50,6 +50,10 @@ const settings = {
       .pitch(-30);
 
     camera.resetToDefault();
+
+    camera.getWorldAzimuth();
+    camera.getWorldElevation();
+    camera.getDistance();
   },
 };
 
