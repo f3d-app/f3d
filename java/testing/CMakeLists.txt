@@ -11,6 +11,12 @@ list(APPEND javaf3dTests_list
   ${CMAKE_CURRENT_SOURCE_DIR}/TestWindow.java
     )
 
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
+  list(APPEND javaf3dTests_list
+    ${CMAKE_CURRENT_SOURCE_DIR}/TestSceneBuffer.java
+    )
+endif()
+
 set(java_test_args "-ea") # enable assertions
 if(APPLE)
   # On macOS, this argument is mandatory in order to create native window

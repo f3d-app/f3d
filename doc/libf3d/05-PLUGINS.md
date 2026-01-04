@@ -36,6 +36,7 @@ f3d_plugin_declare_reader(
   MIMETYPES "application/vnd.myext2" # set the mimetypes the reader can support
   VTK_IMPORTER ${vtk_classname}      # set the name of the VTK importer class you have created
   FORMAT_DESCRIPTION "description"   # set the proper name of the file format
+  SUPPORTS_STREAM                    # add this flag to specify that this reader support streaming
   CUSTOM_CODE "file.inl"             # set this to add a custom code when instancing your class, this is where reader options should be processed
 )
 
@@ -61,7 +62,8 @@ A JSON file of the following form will also be generated. It's used by F3D inter
       "description": "Reader description",
       "extensions": ["myext"],
       "mimetypes": ["application/vnd.myext"],
-      "name": "ReaderName"
+      "name": "ReaderName",
+      "supports_stream": true
     }
   ],
   "type": "MODULE",

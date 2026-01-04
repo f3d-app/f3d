@@ -1,4 +1,4 @@
-void applyCustomReader(vtkAlgorithm* algo, const std::string&) const override
+void applyCustomReader(vtkAlgorithm* algo, const std::string&, vtkResourceStream*) const override
 {
   vtkExodusIIReader* exReader = vtkExodusIIReader::SafeDownCast(algo);
   exReader->UpdateInformation();
