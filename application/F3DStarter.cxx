@@ -1051,7 +1051,6 @@ int F3DStarter::Start(int argc, char** argv)
     F3DConfigFileTools::ParsedConfigFiles parsedConfigFiles =
       F3DConfigFileTools::ReadConfigFiles(config);
     this->Internals->ConfigPaths = parsedConfigFiles.ConfigPaths;
-
     this->Internals->ConfigOptionsEntries = parsedConfigFiles.Options;
     this->Internals->ImperativeConfigOptionsEntries = parsedConfigFiles.ImperativeOptions;
     this->Internals->ConfigBindingsEntries = parsedConfigFiles.Bindings;
@@ -2112,7 +2111,6 @@ void F3DStarter::AddCommands()
 
   interactor.addCommand("print_config_info", [this](const std::vector<std::string>&)
     { F3DConfigFileTools::PrintConfigInfo(this->Internals->ConfigPaths); });
-
 
   interactor.addCommand(
     "remove_current_file_group",

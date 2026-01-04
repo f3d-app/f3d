@@ -72,7 +72,10 @@ void F3DConfigFileTools::PrintConfigInfo(const std::vector<fs::path>& configPath
 {
   for (const fs::path& path : configPaths)
   {
-    if (fs::exists(path))
+    std::error_code ec;
+    const bool exists = fs::exists(path, ec);
+
+    if (exists)
     {
       f3d::log::info("Config file found: ", path);
     }
