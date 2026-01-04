@@ -5,6 +5,8 @@
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
 #include <vtkVersion.h>
+#include <cmath>
+
 
 namespace f3d::detail
 {
@@ -101,6 +103,74 @@ void camera_impl::getFocalPoint(point3_t& foc) const
 {
   vtkCamera* cam = this->GetVTKCamera();
   cam->GetFocalPoint(foc.data());
+}
+
+//----------------------------------------------------------------------------
+  void camera_impl::getPositionToFocalVector(vector3_t& vec) const
+{
+  point3_t pos, focal;
+  this->getPosition(pos);
+  this->getFocalPoint(focal);
+
+  vtkMath::Subtract(pos.data(), focal.data(), vec.data());
+}
+
+//----------------------------------------------------------------------------
+  double camera_impl::getWorldAzimuth() const
+{
+  vector3_t view;
+  this->getPositionToFocalVector(view);
+  vtkMath::Normalize(view.data());
+
+  vtkRenderer* ren = this->Internals->VTKRenderer;
+  double* up = ren->GetEnvironmentUp();
+  double* right = ren->GetEnvironmentRight();
+
+  // Project view vector onto plane orthogonal to up
+  vector3_t projUp;
+  vtkMath::ProjectVector(view.data(), up, projUp.data());
+
+  vector3_t horizontal;
+  vtkMath::Subtract(view.data(), projUp.data(), horizontal.data());
+
+  static constexpr double EPS = 128 * std::numeric_limits<double>::epsilon();
+  if (vtkMath::Norm(horizontal.data()) < EPS)
+  {
+    return 0.0;
+  }
+
+  vtkMath::Normalize(horizontal.data());
+
+  // Signed angle between right and horizontal projection
+  double angleRad = vtkMath::SignedAngleBetweenVectors(right, horizontal.data(), up);
+
+  return vtkMath::DegreesFromRadians(angleRad);
+
+}
+
+//----------------------------------------------------------------------------
+  double camera_impl::getWorldElevation() const
+{
+  vector3_t view;
+  this->getPositionToFocalVector(view);
+  vtkMath::Normalize(view.data());
+
+  vtkRenderer* ren = this->Internals->VTKRenderer;
+  double* up = ren->GetEnvironmentUp();
+
+  // Elevation is angle above the horizontal plane
+  double dot = vtkMath::Dot(view.data(), up);
+  dot = std::clamp(dot, -1.0, 1.0);
+
+  return vtkMath::DegreesFromRadians(std::asin(dot));
+}
+
+//----------------------------------------------------------------------------
+  double camera_impl::getDistance() const
+{
+  vector3_t v;
+  this->getPositionToFocalVector(v);
+  return vtkMath::Norm(v.data());
 }
 
 //----------------------------------------------------------------------------
