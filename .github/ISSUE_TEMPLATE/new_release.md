@@ -14,8 +14,9 @@ When creating this issue
 Before release:
 
 - [ ] Force fetch origin remote tag with `git fetch origin --tags --force`
-- [ ] Write and format release notes from the pull requests since last release, including contributors and packagers
-- [ ] Create a new [NPM token](https://www.npmjs.com/package/f3d) and replace the existing `NPM_TOKEN` in https://github.com/f3d-app/f3d-superbuild/settings/secrets/actions
+- [ ] Write and format release notes from the pull requests since last release, including sponsors, returning contributors, contributors and packagers
+- [ ] Create a new [NPM token](https://www.npmjs.com/package/f3d) (user -> access tokens -> Bypass 2Fa + ReadWrite All package + ReadWrite f3d-app), copy the token
+- [ ] replace the existing `NPM_TOKEN` in https://github.com/f3d-app/f3d-superbuild/settings/secrets/actions
 
 Release Split :
 
@@ -81,9 +82,6 @@ Linux testing protocol:
 - Drag&Drop cow.vtp, Drag&Drop palermo_park.hdr, check render
 - Check that CTRL+O (file dialog) is working
 - Press "Esc" and check the following commands `reload_current_file_group`, `set_camera top`, `toggle_volume_rendering`, `exit`
-- `cd examples/libf3d && mkdir build && cd build && cmake ../ && make`
-- `./cpp/check-engine/check-engine`
-- `./cpp/render-interact/render-interact ../../../testing/data/cow.vtp`
 
 macOS testing protocol:
 
@@ -112,9 +110,6 @@ Windows testing protocol:
 - Check that CTRL+O (file dialog) is working
 - run `f3d-console --version` in a Windows command line and check it output the version
 - Press "Esc" and check the following commands `reload_current_file_group`, `set_camera top`, `toggle_volume_rendering`, `exit`
-- `cd examples\libf3d && mkdir build && cd build && cmake ../ && cmake --build . --config Release`
-- `.\cpp\check-engine\Release\check-engine`
-- `.\cpp\render-interact\Release\render-interact ..\..\..\testing\data\cow.vtp`
 
 Python testing protocol:
 
@@ -126,7 +121,7 @@ Python testing protocol:
 import f3d
 eng = f3d.Engine.create()
 eng.scene.add("/path/to/cow.vtp")
-eng.window.render() # No effect on Windows
+eng.window.render() # May have no effect on Windows
 eng.interactor.start()
 ```
 
@@ -137,12 +132,10 @@ eng.interactor.start()
 Webassembly testing protocol:
 
 - Clone https://github.com/f3d-app/f3d-website
-- Replace the current `f3d` version by the last RC available and run the website locally to check the web viewer
-- Make sure to check for broken anchor in the npm output
 
 ```bash
 npm uninstall f3d
-npm install f3d --tag next
+npm install f3d --tag rc
 npm run start
 ```
 
