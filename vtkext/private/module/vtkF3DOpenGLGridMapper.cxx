@@ -163,17 +163,21 @@ void vtkF3DOpenGLGridMapper::BuildBufferObjects(vtkRenderer* ren, vtkActor* vtkN
 {
   vtkNew<vtkFloatArray> infinitePlane;
   infinitePlane->SetNumberOfComponents(2);
-  infinitePlane->SetNumberOfTuples(4);
+  infinitePlane->SetNumberOfTuples(6);
 
-  float corner1[] = { -1, -1 };
-  float corner2[] = { +1, -1 };
+  float corner0[] = { -1, -1 };
+  float corner1[] = { +1, -1 };
+  float corner2[] = { -1, +1 };
   float corner3[] = { -1, +1 };
-  float corner4[] = { +1, +1 };
+  float corner4[] = { +1, -1 };
+  float corner5[] = { +1, +1 };
 
-  infinitePlane->SetTuple(0, corner1);
-  infinitePlane->SetTuple(1, corner2);
-  infinitePlane->SetTuple(2, corner3);
-  infinitePlane->SetTuple(3, corner4);
+  infinitePlane->SetTuple(0, corner0);
+  infinitePlane->SetTuple(1, corner1);
+  infinitePlane->SetTuple(2, corner2);
+  infinitePlane->SetTuple(3, corner3);
+  infinitePlane->SetTuple(4, corner4);
+  infinitePlane->SetTuple(5, corner5);
 
   vtkOpenGLRenderWindow* renWin = vtkOpenGLRenderWindow::SafeDownCast(ren->GetRenderWindow());
   vtkOpenGLVertexBufferObjectCache* cache = renWin->GetVBOCache();
@@ -205,7 +209,7 @@ void vtkF3DOpenGLGridMapper::RenderPiece(vtkRenderer* ren, vtkActor* actor)
   this->UpdateBufferObjects(ren, actor);
   this->UpdateShaders(this->Primitives[PrimitivePoints], ren, actor);
 
-  glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+  glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 //-----------------------------------------------------------------------------
