@@ -444,6 +444,7 @@ PYBIND11_MODULE(pyf3d, module)
       "Add multiple filenames to the scene", py::arg("file_name_vector"))
     .def("add", py::overload_cast<const f3d::mesh_t&>(&f3d::scene::add),
       "Add a surfacic mesh from memory into the scene", py::arg("mesh"))
+    .def("jump_to_keyframe", &f3d::scene::jumpToKeyFrame)
     .def("load_animation_time", &f3d::scene::loadAnimationTime)
     .def("animation_time_range", &f3d::scene::animationTimeRange)
     .def("available_animations", &f3d::scene::availableAnimations)
