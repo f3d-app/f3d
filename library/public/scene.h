@@ -131,7 +131,7 @@ public:
 
   /**
    * Load added files at provided time value if they contain any animation
-   * Providing a timeVale outside of the current animationTimeRange will clamp
+   * Providing a time Value outside of the current animation TimeRange will clamp
    * to the closest value in the range.
    * Does not do anything if there is no animations.
    */
