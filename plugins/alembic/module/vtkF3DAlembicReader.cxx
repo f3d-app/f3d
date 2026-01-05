@@ -204,7 +204,7 @@ class vtkF3DAlembicReader::vtkInternals
     }
 
     const auto& pArray = pMapIter->second;
-    vtkIdType numPoints = static_cast<vtkIdType>(pArray.size());
+    const vtkIdType numPoints = static_cast<vtkIdType>(pArray.size());
 
     points->SetNumberOfPoints(numPoints);
 
@@ -215,7 +215,7 @@ class vtkF3DAlembicReader::vtkInternals
     }
     polydata->SetPoints(points);
 
-    vtkIdType numCells = static_cast<vtkIdType>(data.Indices.size());
+    const vtkIdType numCells = static_cast<vtkIdType>(data.Indices.size());
     vtkIdType totalConnectivitySize = 0;
     for (const auto& face : data.Indices)
     {
@@ -260,7 +260,7 @@ class vtkF3DAlembicReader::vtkInternals
       normals->SetNumberOfComponents(3);
 
       const auto& nArray = nMapIter->second;
-      vtkIdType numNormals = static_cast<vtkIdType>(nArray.size());
+      const vtkIdType numNormals = static_cast<vtkIdType>(nArray.size());
       normals->SetNumberOfTuples(numNormals);
       for (vtkIdType i = 0; i < numNormals; i++)
       {
@@ -277,7 +277,7 @@ class vtkF3DAlembicReader::vtkInternals
       uvs->SetNumberOfComponents(2);
 
       const auto& uvArray = uvMapIter->second;
-      vtkIdType numUVs = static_cast<vtkIdType>(uvArray.size());
+      const vtkIdType numUVs = static_cast<vtkIdType>(uvArray.size());
       uvs->SetNumberOfTuples(numUVs);
 
       for (vtkIdType i = 0; i < numUVs; i++)
@@ -297,7 +297,7 @@ class vtkF3DAlembicReader::vtkInternals
       sourceIds->SetNumberOfTuples(numPoints);
 
       vtkIdType* srcPtr = sourceIds->GetPointer(0);
-      size_t numFaces = data.Indices.size();
+      const size_t numFaces = data.Indices.size();
 
       for (size_t i = 0; i < numFaces; i++)
       {
@@ -344,7 +344,7 @@ public:
 
       vtkDataArray* sourceIdsDA = polydata->GetPointData()->GetArray("AbcSourceIds");
 
-      vtkIdType numPoints = polydata->GetNumberOfPoints();
+      const vtkIdType numPoints = polydata->GetNumberOfPoints();
       vtkNew<vtkPoints> newPoints;
       newPoints->SetNumberOfPoints(numPoints);
       if (sourceIdsDA)
@@ -362,7 +362,7 @@ public:
               newPoints->SetPoint(i, tp.x, tp.y, tp.z);
             }
           }
-          polydata->SetPoints(newPoints);
+        }
         }
       }
       else
