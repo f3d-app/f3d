@@ -363,17 +363,20 @@ public:
             }
           }
         }
+        vtkIdType* srcIndices = static_cast<vtkIdTypeArray*>(sourceIdsDA)->GetPointer(0);
+        for (size_t i = 0; i < positions->size(); i++)
+        {
+          vtkIdType rawIndex = srcIndices[i];
+          const Alembic::Abc::V3f tp = positions->get()[rawIndex] * matrix;
+          newPoints->SetPoint(i, tp.x, tp.y, tp.z);
         }
       }
       else
       {
-        for (vtkIdType i = 0; i < numPoints; i++)
+        for (size_t i = 0; i < positions->size(); i++)
         {
-          if (i < positions->size())
-          {
-            const Alembic::Abc::V3f tp = positions->get()[i] * matrix;
-            newPoints->SetPoint(i, tp.x, tp.y, tp.z);
-          }
+          const Alembic::Abc::V3f tp = positions->get()[i] * matrix;
+          newPoints->SetPoint(i, tp.x, tp.y, tp.z);
         }
       }
       polydata->SetPoints(newPoints);
