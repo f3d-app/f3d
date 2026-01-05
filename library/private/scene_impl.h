@@ -43,6 +43,7 @@ public:
   scene& removeLight(int index) override;
   scene& removeAllLights() override;
   bool supports(const std::filesystem::path& filePath) override;
+  scene& jumpToKeyFrame(int keyframe, bool relative) override;
   scene& loadAnimationTime(double timeValue) override;
   std::pair<double, double> animationTimeRange() override;
   unsigned int availableAnimations() const override;

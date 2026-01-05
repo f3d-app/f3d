@@ -1241,7 +1241,7 @@ interactor& interactor_impl::initCommands()
       check_args(args, 2, "jump_to_keyframe");
       int keyframe = options::parse<int>(args[0]);
       bool relative = options::parse<bool>(args[1]);
-      this->jumpToKeyFrame(keyframe, relative);
+      this->Internals->AnimationManager->JumpToKeyFrame(keyframe, relative);
     },
     command_documentation_t{ "jump_to_keyframe", "Jump to animation's key frame" });
 
@@ -1904,14 +1904,6 @@ bool interactor_impl::isPlayingAnimation()
 {
   assert(this->Internals->AnimationManager);
   return this->Internals->AnimationManager->IsPlaying();
-}
-
-//----------------------------------------------------------------------------
-interactor& interactor_impl::jumpToKeyFrame(int keyframe, bool relative)
-{
-  assert(this->Internals->AnimationManager);
-  this->Internals->AnimationManager->JumpToKeyFrame(keyframe, relative);
-  return *this;
 }
 
 //----------------------------------------------------------------------------

@@ -264,7 +264,6 @@ public:
   virtual interactor& stopAnimation() = 0;
   [[nodiscard]] virtual bool isPlayingAnimation() = 0;
   [[nodiscard]] virtual interactor::AnimationDirection getAnimationDirection() = 0;
-  virtual interactor& jumpToKeyFrame(int keyframe, bool relative) = 0;
   ///@}
 
   ///@{ @name Movement

@@ -444,6 +444,13 @@ bool scene_impl::supports(const fs::path& filePath)
 }
 
 //----------------------------------------------------------------------------
+scene& scene_impl::jumpToKeyFrame(int keyframe, bool relative)
+{
+  this->Internals->AnimationManager.JumpToKeyFrame(keyframe, relative);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
 scene& scene_impl::loadAnimationTime(double timeValue)
 {
   this->Internals->AnimationManager.LoadAtTime(timeValue);
