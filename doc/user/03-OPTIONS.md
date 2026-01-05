@@ -126,6 +126,18 @@ Define the Up direction.
 
 Show _axes_ as a trihedron in the scene.
 
+### `--x-color` (_color_, default: `#f94306`)
+
+Set the X axis color in both widget and grid.
+
+### `--y-color` (_color_, default: `#7aff7a`)
+
+Set the Y axis color in both widget and grid.
+
+### `--z-color` (_color_, default: `#788bff`)
+
+Set the Z axis color in both widget and grid.
+
 ### `-g`, `--grid` (_bool_, default: `false`)
 
 Show _a grid_ aligned with the horizontal (orthogonal to the Up direction) plane.
@@ -402,6 +414,16 @@ Use with the scalar option.
 ### `--colormap-discretization=<colors>` (_int_)
 
 Set the number of distinct colors from [1, N] will be used in the colormap. Any values outside the valid range will result in smooth shading.
+
+### `--opacity-map-file=<name>` (_string_)
+
+Set an _opacity map file for the coloring_.
+
+### `--opacity-map=<value, opacity>` (_vector\<double\>_, default: `0.0,0.0,1.0,1.0`)
+
+Set a _custom opacity map for the coloring_.
+Only used with volume rendering for now.
+Ignored if `--opacity-map-file` option is specified.
 
 ### `-v`, `--volume` (_bool_, default: `false`)
 

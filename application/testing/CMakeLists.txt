@@ -197,6 +197,7 @@ f3d_test(NAME TestGridColor DATA suzanne.ply ARGS -g --grid-color=1,1,1)
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
   f3d_test(NAME TestAxis DATA suzanne.ply ARGS -x UI)
+  f3d_test(NAME TestAxesCustomColor DATA suzanne.ply ARGS -x -g --x-color=1,0,0.643 --y-color=0,1,0.894 --z-color=0.89,1,0 UI)
 endif()
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11209
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250513)
@@ -235,6 +236,10 @@ f3d_test(NAME TestConsoleBadgeQuiet DATA suzanne.ply ARGS --position=0 --verbose
 f3d_test(NAME TestCityGML DATA Part-4-Buildings-V4-one.gml)
 f3d_test(NAME TestPTS DATA samplePTS.pts)
 f3d_test(NAME TestColormap DATA IM-0001-1983.dcm ARGS --scalar-coloring --roughness=1 --colormap=0,1,0,0,1,0,1,0)
+f3d_test(NAME TestOpacityMap DATA waveletArrays.vti ARGS -vb --coloring-array=Result --volume-opacity-map=0.0,0.0,0.5,1.0,1.0,0.0 THRESHOLD 0.05) # Small rendering differences when using VTK 9.3.0
+f3d_test(NAME TestOpacityMapFile DATA waveletArrays.vti ARGS -vb --coloring-array=Result --volume-opacity-file=${F3D_SOURCE_DIR}/testing/data/gaussian_opacity_map.png)
+f3d_test(NAME TestOpacityMapFileNonExistent DATA waveletArrays.vti ARGS -vb --coloring-array=Result --volume-opacity-file=${F3D_SOURCE_DIR}/testing/data/nonexistent_opacity_map.png)
+f3d_test(NAME TestOpacityMapFileInvalid DATA waveletArrays.vti ARGS -vb --coloring-array=Result --volume-opacity-file=${F3D_SOURCE_DIR}/testing/data/invalid.png)
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
   f3d_test(NAME TestCameraConfiguration DATA suzanne.obj ARGS --camera-position=0,0,-10 -x --camera-view-up=+X --camera-focal-point=1,0,0 --camera-view-angle=20 --camera-azimuth-angle=40 --camera-elevation-angle=-80 --camera-direction=12,34,56 --camera-zoom-factor=78 UI)
@@ -433,6 +438,10 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20231108)
   endif()
 else()
   f3d_test(NAME TestSkinningManyBonesWarning DATA tube_254bones.glb ARGS --verbose REGEXP "with more than 250 bones \\\(254\\\)" NO_BASELINE)
+endif()
+
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
+  f3d_test(NAME TestDefaultConfigFileHDRIFilename DATA dragon.vtu CONFIG config_build ARGS -j --hdri-file=${F3D_SOURCE_DIR}/testing/data/palermo_park_1k.hdr UI LONG_TIMEOUT)
 endif()
 
 # Needs splat sorting with compute shaders
@@ -1144,6 +1153,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
   f3d_test(NAME TestInteractionDragRotateVertical DATA offset-flat-box.glb ARGS -g -x --up=y INTERACTION UI) # Drag down, should look straight down and avoid gimbal lock
 endif()
 f3d_test(NAME TestInteractionVerticalDragRotate DATA dragon.vtu ARGS --up=y INTERACTION LONG_TIMEOUT) # 7 (top-view); left click and drag
+f3d_test(NAME TestInteractionDynamicUpDirection DATA dragon.vtu INTERACTION) # Ctrl+Z
 f3d_test(NAME TestInteractionReload DATA dragon.vtu ARGS -e INTERACTION) #Up;
 f3d_test(NAME TestInteractionLoadParentDirectory DATA multi/dragon.vtu ARGS --filename INTERACTION UI) #Down;
 f3d_test(NAME TestInteractionEmptyLoadParentDirectory INTERACTION NO_BASELINE REGEXP "No files loaded, no rendering performed") #Down;

@@ -8,6 +8,7 @@
 #include "options.h"
 #include "utils.h"
 
+#include "F3DStyle.h"
 #include "vtkF3DExternalRenderWindow.h"
 
 #include "vtkF3DGenericImporter.h"
@@ -206,9 +207,9 @@ void window_impl::Initialize()
 }
 
 //----------------------------------------------------------------------------
-void window_impl::InitializeUpVector()
+void window_impl::InitializeUpDirection()
 {
-  this->Internals->Renderer->InitializeUpVector(this->Internals->Options.scene.up_direction);
+  this->Internals->Renderer->InitializeUpDirection(this->Internals->Options.scene.up_direction);
 }
 
 //----------------------------------------------------------------------------
@@ -396,6 +397,9 @@ void window_impl::UpdateDynamicOptions()
 
   const options& opt = this->Internals->Options;
 
+  // Update pending up direction if changed
+  renderer->SetPendingUpDirection(opt.scene.up_direction);
+
   // XXX: model.point_sprites.type only has an effect on geometry scene
   // but we set it here for practical reasons
   renderer->SetUsePointSprites(opt.model.point_sprites.enable);
@@ -438,6 +442,7 @@ void window_impl::UpdateDynamicOptions()
 
   if (this->Internals->Interactor)
   {
+    renderer->SetAxesColor(opt.ui.x_color, opt.ui.y_color, opt.ui.z_color);
     renderer->ShowAxis(opt.ui.axis);
     renderer->SetUseTrackball(opt.interactor.trackball);
     renderer->SetInvertZoom(opt.interactor.invert_zoom);
@@ -614,6 +619,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetScalarBarRange(opt.model.scivis.range);
   renderer->SetColormap(opt.model.scivis.colormap);
   renderer->SetColormapDiscretization(opt.model.scivis.discretization);
+  renderer->SetOpacityMap(opt.model.scivis.opacity_map);
   renderer->ShowScalarBar(opt.ui.scalar_bar);
 
   renderer->SetUseVolume(opt.model.volume.enable);

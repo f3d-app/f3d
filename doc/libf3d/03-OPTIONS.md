@@ -53,9 +53,10 @@ The default scene always uses automatic camera.
 
 CLI: `--camera-index`.
 
-### `scene.up_direction` (_direction_, default: `+Y`, **on load**)
+### `scene.up_direction` (_direction_, default: `+Y`)
 
 Define the Up direction. It impacts the grid, the axis, the HDRI and the camera.
+
 CLI: `--up`.
 
 ### `scene.force_reader` (_string_, optional, **on load**)
@@ -181,6 +182,13 @@ CLI: `--colormap-discretization`.
 Set a _custom colormap for the coloring_.See [colormap parsing](../user/08-PARSING.md#colormap) for details.
 
 CLI: `--colormap`.
+
+### `model.scivis.opacity_map` (_opacity_map_, default: "0.0,0.0,1.0,1.0")
+
+Set a _custom opacity map for the coloring_. The format of the opacity map should be `val, opacity, ...`.
+It is only used for volume rendering currently.
+
+CLI: `--opacity-map`.
 
 ### `model.scivis.component` (_int_, default: `-1`)
 
@@ -424,6 +432,24 @@ CLI: `--armature`.
 Show _axes_ as a trihedron in the scene. Requires an interactor.
 
 CLI: `--axis`.
+
+### `ui.x_color` (_color_, default: `#f94306`)
+
+Set the X axis color in both widget and grid.
+
+CLI: `--x-color`.
+
+### `ui.y_color` (_color_, default: `#7aff7a`)
+
+Set the Y axis color in both widget and grid.
+
+CLI: `--y-color`.
+
+### `ui.z_color` (_color_, default: `#788bff`)
+
+Set the Z axis color in both widget and grid.
+
+CLI: `--z-color`.
 
 ### `ui.scalar_bar` (_bool_, default: `false`)
 
