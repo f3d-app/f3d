@@ -288,30 +288,6 @@ class vtkF3DAlembicReader::vtkInternals
 
       pointAttributes->SetTCoords(uvs);
     }
-
-    if (data.uvFaceVarying || data.nFaceVarying)
-    {
-      vtkNew<vtkIdTypeArray> sourceIds;
-      sourceIds->SetName("AbcSourceIds");
-      sourceIds->SetNumberOfComponents(1);
-      sourceIds->SetNumberOfTuples(numPoints);
-
-      vtkIdType* srcPtr = sourceIds->GetPointer(0);
-      const size_t numFaces = data.Indices.size();
-
-      for (size_t i = 0; i < numFaces; i++)
-      {
-        const auto& face = data.Indices[i];
-        const auto& origFace = originalData.Indices[i];
-        size_t numVerts = face.size();
-        for (size_t j = 0; j < numVerts; j++)
-        {
-          srcPtr[face[j].x] = origFace[j].x;
-        }
-      }
-
-      polydata->GetPointData()->AddArray(sourceIds);
-    }
   }
 
 public:
