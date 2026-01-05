@@ -150,7 +150,6 @@ std::string ComputeFileHash(const std::string& filepath)
   return md5Hash;
 }
 
-#ifndef __EMSCRIPTEN__
 //----------------------------------------------------------------------------
 // Download texture from the GPU to a vtkImageData
 vtkSmartPointer<vtkImageData> SaveTextureToImage(
@@ -175,7 +174,6 @@ vtkSmartPointer<vtkImageData> SaveTextureToImage(
 
   return img;
 }
-#endif
 
 //----------------------------------------------------------------------------
 // TODO : add this function in a utils file for rendering in VTK directly
@@ -1385,16 +1383,22 @@ void vtkF3DRenderer::ConfigureHDRILUT()
       }
       assert(lut->GetTextureObject());
 
-#ifndef __EMSCRIPTEN__
-      vtkSmartPointer<vtkImageData> img = ::SaveTextureToImage(
-        lut->GetTextureObject(), GL_TEXTURE_2D, 0, lut->GetLUTSize(), VTK_UNSIGNED_SHORT);
-      assert(img);
+      if (!this->CachePath.empty())
+      {
+        vtkSmartPointer<vtkImageData> img = ::SaveTextureToImage(
+          lut->GetTextureObject(), GL_TEXTURE_2D, 0, lut->GetLUTSize(), VTK_UNSIGNED_SHORT);
+        assert(img);
 
-      vtkNew<vtkXMLImageDataWriter> writer;
-      writer->SetFileName(lutCachePath.c_str());
-      writer->SetInputData(img);
-      writer->Write();
-#endif
+        vtkNew<vtkXMLImageDataWriter> writer;
+        writer->SetFileName(lutCachePath.c_str());
+        writer->SetInputData(img);
+        writer->Write();
+      }
+      else
+      {
+        F3DLog::Print(F3DLog::Severity::Warning,
+          "Cannot cache HDRI LUT texture as no cache path has been set.");
+      }
     }
     this->HasValidHDRILUT = true;
   }
@@ -1429,16 +1433,22 @@ void vtkF3DRenderer::ConfigureHDRISphericalHarmonics()
           vtkTable::SafeDownCast(sh->GetOutputDataObject(0))->GetColumn(0));
       }
 
-#ifndef __EMSCRIPTEN__
-      // Create spherical harmonics cache file
-      vtkNew<vtkTable> table;
-      table->AddColumn(this->SphericalHarmonics);
+      if (!this->CachePath.empty())
+      {
+        // Create spherical harmonics cache file
+        vtkNew<vtkTable> table;
+        table->AddColumn(this->SphericalHarmonics);
 
-      vtkNew<vtkXMLTableWriter> writer;
-      writer->SetInputData(table);
-      writer->SetFileName(shCachePath.c_str());
-      writer->Write();
-#endif
+        vtkNew<vtkXMLTableWriter> writer;
+        writer->SetInputData(table);
+        writer->SetFileName(shCachePath.c_str());
+        writer->Write();
+      }
+      else
+      {
+        F3DLog::Print(F3DLog::Severity::Warning,
+          "Cannot cache HDRI Spherical Harmonics as no cache path has been set.");
+      }
     }
     this->HasValidHDRISH = true;
   }
@@ -1471,30 +1481,36 @@ void vtkF3DRenderer::ConfigureHDRISpecular()
       }
       assert(spec->GetTextureObject());
 
-#ifndef __EMSCRIPTEN__
-      unsigned int nbLevels = spec->GetPrefilterLevels();
-      unsigned int size = spec->GetPrefilterSize();
-
-      vtkNew<vtkMultiBlockDataSet> mb;
-      mb->SetNumberOfBlocks(nbLevels);
-
-      for (unsigned int i = 0; i < nbLevels; i++)
+      if (!this->CachePath.empty())
       {
-        vtkSmartPointer<vtkImageData> img = ::SaveTextureToImage(
-          spec->GetTextureObject(), GL_TEXTURE_CUBE_MAP_POSITIVE_X, i, size >> i, VTK_FLOAT);
-        assert(img);
-        mb->SetBlock(i, img);
-      }
+        unsigned int nbLevels = spec->GetPrefilterLevels();
+        unsigned int size = spec->GetPrefilterSize();
 
-      vtkNew<vtkXMLMultiBlockDataWriter> writer;
-      writer->SetCompressorTypeToNone();
-      writer->SetDataModeToAppended();
-      writer->EncodeAppendedDataOff();
-      writer->SetHeaderTypeToUInt64();
-      writer->SetFileName(specCachePath.c_str());
-      writer->SetInputData(mb);
-      writer->Write();
-#endif
+        vtkNew<vtkMultiBlockDataSet> mb;
+        mb->SetNumberOfBlocks(nbLevels);
+
+        for (unsigned int i = 0; i < nbLevels; i++)
+        {
+          vtkSmartPointer<vtkImageData> img = ::SaveTextureToImage(
+            spec->GetTextureObject(), GL_TEXTURE_CUBE_MAP_POSITIVE_X, i, size >> i, VTK_FLOAT);
+          assert(img);
+          mb->SetBlock(i, img);
+        }
+
+        vtkNew<vtkXMLMultiBlockDataWriter> writer;
+        writer->SetCompressorTypeToNone();
+        writer->SetDataModeToAppended();
+        writer->EncodeAppendedDataOff();
+        writer->SetHeaderTypeToUInt64();
+        writer->SetFileName(specCachePath.c_str());
+        writer->SetInputData(mb);
+        writer->Write();
+      }
+      else
+      {
+        F3DLog::Print(F3DLog::Severity::Warning,
+          "Cannot cache HDRI Specular texture as no cache path has been set.");
+      }
     }
     this->HasValidHDRISpec = true;
   }
@@ -2155,11 +2171,14 @@ void vtkF3DRenderer::CreateCacheDirectory()
 {
   assert(this->HasValidHDRIHash);
 
-  // Cache folder for this HDRI
-  std::string currentCachePath = this->CachePath + "/" + this->HDRIHash;
+  if (!this->CachePath.empty())
+  {
+    // Cache folder for this HDRI
+    std::string currentCachePath = this->CachePath + "/" + this->HDRIHash;
 
-  // Create the folder if it does not exists
-  vtksys::SystemTools::MakeDirectory(currentCachePath);
+    // Create the folder if it does not exists
+    vtksys::SystemTools::MakeDirectory(currentCachePath);
+  }
 }
 
 //----------------------------------------------------------------------------
