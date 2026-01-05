@@ -123,8 +123,9 @@ public:
 
   /**
    * Load animation at a specific keyframe
+   * When relative is false keyframe -1 is equal to last keyframe
    */
-  void JumpToKeyFrame(int keyframe, bool relative = true);
+  void JumpToKeyFrame(int keyframe, bool relative);
 
   /**
    * Return a pair containing the current time range values

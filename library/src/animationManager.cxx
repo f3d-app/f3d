@@ -222,6 +222,49 @@ void animationManager::JumpToFrame(int frame, bool relative)
   }
 }
 
+void animationManager::JumpToKeyFrame(int keyframe, bool relative)
+{
+  if (!this->AnimationTimeSteps.has_value() || this->AnimationTimeSteps.value()->GetSize() == 0)
+  {
+    return;
+  }
+
+  vtkSmartPointer<vtkDoubleArray> timeSteps = this->AnimationTimeSteps.value();
+  if (keyframe == 0 || keyframe > timeSteps->GetSize())
+  {
+    return;
+  }
+
+  int nextKeyFrame = 0;
+  if (relative)
+  {
+    constexpr double epsilon = 1e-6;
+    auto it = std::find_if(timeSteps->Begin(), timeSteps->End(),
+      [&](double step) { return this->CurrentTime - step <= epsilon; });
+    nextKeyFrame = std::distance(timeSteps->Begin(), it) + keyframe;
+  }
+  else if (keyframe > 0)
+  {
+    nextKeyFrame = keyframe;
+  }
+  else
+  {
+    nextKeyFrame = timeSteps->GetSize() + keyframe;
+  }
+
+  if (nextKeyFrame < 0)
+  {
+    nextKeyFrame = timeSteps->GetSize() + keyframe;
+  }
+
+  this->CurrentTime = timeSteps->GetValue(nextKeyFrame);
+
+  if (this->LoadAtTime(this->CurrentTime))
+  {
+    this->Window.render();
+  }
+}
+
 //----------------------------------------------------------------------------
 bool animationManager::LoadAtTime(double timeValue)
 {
@@ -284,43 +327,6 @@ bool animationManager::LoadAtTime(double timeValue)
     this->Interactor->UpdateRendererAfterInteraction();
   }
   return true;
-}
-
-void animationManager::JumpToKeyFrame(int keyframe, bool relative)
-{
-  if (!this->AnimationTimeSteps.has_value() || this->AnimationTimeSteps.value()->GetSize() == 0)
-  {
-    return;
-  }
-
-  vtkSmartPointer<vtkDoubleArray> timeSteps = this->AnimationTimeSteps.value();
-
-  if (relative)
-  {
-    constexpr double epsilon = 1e-6;
-    auto it = std::find_if(timeSteps->Begin(), timeSteps->End(),
-      [&](double step) { return this->CurrentTime - step <= epsilon; });
-
-    if (it == timeSteps->End())
-    {
-      return;
-    }
-
-    this->CurrentTime = std::clamp(*(it + keyframe), this->TimeRange[0], this->TimeRange[1]);
-  }
-  else
-  {
-    if (keyframe < 0 || keyframe > timeSteps->GetSize())
-    {
-      return;
-    }
-    this->CurrentTime = timeSteps->GetValue(keyframe);
-  }
-
-  if (this->LoadAtTime(this->CurrentTime))
-  {
-    this->Window.render();
-  }
 }
 
 // ---------------------------------------------------------------------------------
