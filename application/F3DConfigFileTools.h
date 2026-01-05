@@ -14,7 +14,6 @@ using BindingsVector = std::vector<std::pair<std::string, std::vector<std::strin
 using BindingsEntry = std::tuple<BindingsVector, std::string, std::string, std::string>;
 using BindingsEntries = std::vector<BindingsEntry>;
 
-
 struct ParsedConfigFiles
 {
   F3DOptionsTools::OptionsEntries Options;

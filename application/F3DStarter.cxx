@@ -948,6 +948,7 @@ public:
   F3DOptionsTools::OptionsEntries ImperativeConfigOptionsEntries;
   F3DConfigFileTools::BindingsEntries ConfigBindingsEntries;
   std::vector<fs::path> ConfigPaths;
+  std::string UserConfig;
   std::unique_ptr<f3d::engine> Engine;
   std::vector<std::pair<std::string, std::vector<fs::path>>> FilesGroups;
   std::vector<fs::path> LoadedFiles;
@@ -1021,6 +1022,8 @@ int F3DStarter::Start(int argc, char** argv)
       F3DOptionsTools::Parse(iter->second, config);
     }
   }
+
+  this->Internals->UserConfig = config;
 
   bool renderToStdout = false;
   iter = cliOptionsDict.find("output");
@@ -1673,7 +1676,7 @@ void F3DStarter::LoadFileGroupInternal(
 
     // Unwatch and erase paths that should not be watched anymore
     for (auto it = this->Internals->FolderWatchIds.begin();
-         it != this->Internals->FolderWatchIds.end();)
+      it != this->Internals->FolderWatchIds.end();)
     {
       const fs::path& path = it->first;
       const dmon_watch_id& dmonId = it->second;
@@ -2109,8 +2112,12 @@ void F3DStarter::AddCommands()
     return candidates;
   };
 
-  interactor.addCommand("print_config_info", [this](const std::vector<std::string>&)
-    { F3DConfigFileTools::PrintConfigInfo(this->Internals->ConfigPaths); });
+  interactor.addCommand("print_config_info",
+    [this](const std::vector<std::string>&)
+    {
+      auto parsed = F3DConfigFileTools::ReadConfigFiles(this->Internals->UserConfig);
+      F3DConfigFileTools::PrintConfigInfo(parsed.ConfigPaths);
+    });
 
   interactor.addCommand(
     "remove_current_file_group",
@@ -2156,7 +2163,8 @@ void F3DStarter::AddCommands()
 
   interactor.addCommand(
     "load_next_file_group",
-    [this](const std::vector<std::string>& args) {
+    [this](const std::vector<std::string>& args)
+    {
       this->LoadRelativeFileGroup(
         +1, parse_optional_bool_flag(args, "load_next_file_group", false));
     },

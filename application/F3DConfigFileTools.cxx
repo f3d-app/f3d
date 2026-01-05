@@ -70,6 +70,11 @@ std::vector<fs::path> F3DConfigFileTools::GetConfigPaths(const std::string& conf
 //----------------------------------------------------------------------------
 void F3DConfigFileTools::PrintConfigInfo(const std::vector<fs::path>& configPaths)
 {
+  if (!configPaths.empty())
+  {
+    f3d::log::info("Found available config path");
+  }
+
   for (const fs::path& path : configPaths)
   {
     std::error_code ec;
@@ -127,12 +132,18 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
 
   // Recover actual individual config file paths
   std::vector<fs::path> actualConfigFilePaths;
+  bool explicitConfigMissing = false;
   for (auto configPath : configPaths)
   {
     try
     {
       if (!fs::exists(configPath))
       {
+        if (!explicitConfigMissing && !userConfig.empty() && configSearch.empty())
+        {
+          f3d::log::error("Configuration file does not exist");
+          explicitConfigMissing = true;
+        }
         continue;
       }
 
@@ -145,8 +156,7 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
         f3d::log::debug("Using config directory ", configPath.string());
         const size_t oldSize = actualConfigFilePaths.size();
         auto dirIter = fs::directory_iterator(configPath);
-        std::copy(fs::begin(dirIter), fs::end(dirIter),
-          std::back_inserter(actualConfigFilePaths));
+        std::copy(fs::begin(dirIter), fs::end(dirIter), std::back_inserter(actualConfigFilePaths));
         // directory_iterator is not ordered, enforce alphabetical ordering for the added files.
         std::sort(actualConfigFilePaths.begin() + oldSize, actualConfigFilePaths.end());
       }
@@ -348,6 +358,5 @@ F3DConfigFileTools::ParsedConfigFiles F3DConfigFileTools::ReadConfigFiles(
     }
   }
   return F3DConfigFileTools::ParsedConfigFiles{ std::move(optionsEntries),
-    std::move(imperativeOptionsEntries), std::move(bindingsEntries), 
-    std::move(configPaths) };
+    std::move(imperativeOptionsEntries), std::move(bindingsEntries), std::move(configPaths) };
 }
