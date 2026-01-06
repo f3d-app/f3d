@@ -737,7 +737,7 @@ public:
     }
     else
     {
-      T localOption;
+      T localOption{};
       this->ParseOption(appOptions, name, localOption);
       option = localOption;
     }
