@@ -109,6 +109,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "animation-indices", "", "Select animations to show", "<index,index,index>", "" },
       { "animation-speed-factor", "", "Set animation speed factor", "<ratio>", "" },
       { "animation-time", "", "Set animation time to load", "<time>", "" },
+      { "output-frame-count", "", "Save `count` animation frames to output files", "<count>", "" },
       { "font-file", "", "Path to a FreeType compatible font file", "<file_path>", ""},
       { "font-scale", "", "Scale fonts", "<ratio>", ""},
 #if F3D_MODULE_UI

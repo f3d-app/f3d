@@ -89,6 +89,7 @@ public:
     std::string RenderingBackend;
     std::optional<double> MaxSize;
     std::optional<double> AnimationTime;
+    std::optional<int> OutputFrameCount;
     bool Watch;
     double FrameRate;
     std::vector<std::string> Plugins;
@@ -289,12 +290,16 @@ public:
    * - `{n}`: auto-incremented number to make filename unique (up to 1000000)
    * - `{n:2}`, `{n:3}`, ...: zero-padded auto-incremented number to make filename unique
    *   (up to 1000000)
+   * - `{frame}`: current animation frame number (when outputting multiple frames)
+   * - `{frame:4}`, `{frame:5}`, ...: zero-padded animation frame number
    */
-  fs::path applyFilenameTemplate(const fs::path& templatePath)
+  fs::path applyFilenameTemplate(
+    const fs::path& templatePath, std::optional<int> frame = std::nullopt)
   {
     constexpr size_t maxNumberingAttempts = 1000000;
     const std::regex numberingRe("(n:?(.*))");
     const std::regex dateRe("date:?(.*)");
+    const std::regex frameRe("(frame:?(.*))");
 
     /* Return a file related string depending on the currently loaded files, or the empty string if
      * a single file is loaded */
@@ -372,6 +377,28 @@ public:
           f3d::log::warn("invalid date format for \"", var, "\"");
         }
         return formatted;
+      }
+      else if (std::regex_match(var, frameRe))
+      {
+        if (!frame.has_value())
+        {
+          throw std::runtime_error("{frame} variable can only be used with --output-frame-count");
+        }
+        std::stringstream formattedFrame;
+        const std::string fmt = std::regex_replace(var, frameRe, "$2");
+        try
+        {
+          formattedFrame << std::setfill('0') << std::setw(std::stoi(fmt)) << frame.value();
+        }
+        catch (std::invalid_argument&)
+        {
+          if (!fmt.empty())
+          {
+            f3d::log::warn("ignoring invalid frame format for \"", var, "\"");
+          }
+          formattedFrame << std::setw(0) << frame.value();
+        }
+        return formattedFrame.str();
       }
       throw f3d::utils::string_template::lookup_error(var);
     };
@@ -726,6 +753,7 @@ public:
     this->ParseOption(appOptions, "rendering-backend", this->AppOptions.RenderingBackend);
     this->ParseOption(appOptions, "max-size", this->AppOptions.MaxSize);
     this->ParseOption(appOptions, "animation-time", this->AppOptions.AnimationTime);
+    this->ParseOption(appOptions, "output-frame-count", this->AppOptions.OutputFrameCount);
     this->ParseOption(appOptions, "frame-rate", this->AppOptions.FrameRate);
     this->ParseOption(appOptions, "watch", this->AppOptions.Watch);
     this->ParseOption(appOptions, "load-plugins", this->AppOptions.Plugins);
@@ -1250,8 +1278,14 @@ int F3DStarter::Start(int argc, char** argv)
       f3d::utils::getEnv("CTEST_F3D_NO_DATA_FORCE_RENDER");
 
     fs::path reference = f3d::utils::collapsePath(this->Internals->AppOptions.Reference);
-    fs::path output = this->Internals->applyFilenameTemplate(
-      f3d::utils::collapsePath(this->Internals->AppOptions.Output));
+    // Defer template application if multi-frame output is requested (template will be applied
+    // per-frame)
+    const bool multiFrameOutput = this->Internals->AppOptions.OutputFrameCount.has_value() &&
+      this->Internals->AppOptions.OutputFrameCount.value() > 0;
+    fs::path output = multiFrameOutput
+      ? fs::path{}
+      : this->Internals->applyFilenameTemplate(
+          f3d::utils::collapsePath(this->Internals->AppOptions.Output));
 
     // Render and compare with file if needed
     if (!reference.empty())
@@ -1337,7 +1371,7 @@ int F3DStarter::Start(int argc, char** argv)
       }
     }
     // Render to file if needed
-    else if (!output.empty())
+    else if (!this->Internals->AppOptions.Output.empty())
     {
       if (this->Internals->LoadedFiles.empty() && !noDataForceRender.has_value())
       {
@@ -1345,28 +1379,87 @@ int F3DStarter::Start(int argc, char** argv)
         return EXIT_FAILURE;
       }
 
-      f3d::image img = window.renderToImage(this->Internals->AppOptions.NoBackground);
-      this->Internals->addOutputImageMetadata(img);
-
-      if (renderToStdout)
+      const auto& frameCount = this->Internals->AppOptions.OutputFrameCount;
+      if (frameCount.has_value() && frameCount.value() > 0)
       {
-        const auto buffer = img.saveBuffer();
-        std::copy(buffer.begin(), buffer.end(), std::ostreambuf_iterator(std::cout));
-        f3d::log::debug("Output image saved to stdout");
+        f3d::scene& animScene = this->Internals->Engine->getScene();
+        auto [minTime, maxTime] = animScene.animationTimeRange();
+        if (minTime == maxTime)
+        {
+          f3d::log::warn("No animation available or animation has zero duration, outputting single "
+                         "frame");
+          fs::path frameOutput = this->Internals->applyFilenameTemplate(
+            f3d::utils::collapsePath(this->Internals->AppOptions.Output), 0);
+          f3d::image img = window.renderToImage(this->Internals->AppOptions.NoBackground);
+          this->Internals->addOutputImageMetadata(img);
+          try
+          {
+            img.save(frameOutput);
+          }
+          catch (const f3d::image::write_exception& ex)
+          {
+            f3d::log::error("Could not write output: ", ex.what());
+            return EXIT_FAILURE;
+          }
+          f3d::log::debug("Output image saved to ", frameOutput);
+        }
+        else
+        {
+          int count = frameCount.value();
+          double timeStep = (count > 1) ? (maxTime - minTime) / (count - 1) : 0.0;
+
+          for (int frame = 0; frame < count; ++frame)
+          {
+            double currentTime = minTime + frame * timeStep;
+            animScene.loadAnimationTime(currentTime);
+
+            fs::path frameOutput = this->Internals->applyFilenameTemplate(
+              f3d::utils::collapsePath(this->Internals->AppOptions.Output), frame);
+
+            f3d::image img = window.renderToImage(this->Internals->AppOptions.NoBackground);
+            this->Internals->addOutputImageMetadata(img);
+
+            try
+            {
+              img.save(frameOutput);
+            }
+            catch (const f3d::image::write_exception& ex)
+            {
+              f3d::log::error("Could not write output: ", ex.what());
+              return EXIT_FAILURE;
+            }
+
+            f3d::log::debug("Frame ", frame, " (time=", currentTime, ") saved to ", frameOutput);
+          }
+
+          f3d::log::info("Saved ", count, " animation frames");
+        }
       }
       else
       {
-        try
-        {
-          img.save(output);
-        }
-        catch (const f3d::image::write_exception& ex)
-        {
-          f3d::log::error("Could not write output: ", ex.what());
-          return EXIT_FAILURE;
-        }
+        f3d::image img = window.renderToImage(this->Internals->AppOptions.NoBackground);
+        this->Internals->addOutputImageMetadata(img);
 
-        f3d::log::debug("Output image saved to ", output);
+        if (renderToStdout)
+        {
+          const auto buffer = img.saveBuffer();
+          std::copy(buffer.begin(), buffer.end(), std::ostreambuf_iterator(std::cout));
+          f3d::log::debug("Output image saved to stdout");
+        }
+        else
+        {
+          try
+          {
+            img.save(output);
+          }
+          catch (const f3d::image::write_exception& ex)
+          {
+            f3d::log::error("Could not write output: ", ex.what());
+            return EXIT_FAILURE;
+          }
+
+          f3d::log::debug("Output image saved to ", output);
+        }
       }
 
       if (this->Internals->FilesGroups.size() > 1)

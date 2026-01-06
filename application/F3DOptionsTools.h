@@ -37,6 +37,7 @@ static inline const OptionsDict DefaultAppOptions = {
   { "rendering-backend", "auto" },
   { "max-size", "" },
   { "animation-time", "" },
+  { "output-frame-count", "" },
   { "watch", "false" },
   { "load-plugins", "" },
   { "screenshot-filename", "{app}/{model}_{n}.png" },
