@@ -263,18 +263,23 @@ public:
 
       this->SetupIndicesStorage(faceVertexCounts, originalData.Indices);
 
+      // By default, Alembic is CW while VTK is CCW
+      // So we need to reverse the order of indices only if the mesh is not mirrored
+      const bool doReverseRotate = matrix.determinant() > 0;
+
       // Positions
       {
         V3fContainer pV3F;
         for (size_t pIndex = 0; pIndex < positions->size(); pIndex++)
         {
-          const Alembic::Abc::V3f tp = positions->get()[pIndex] * matrix;
+          Alembic::Abc::V3f tp;
+          matrix.multVecMatrix(positions->get()[pIndex], tp);
           pV3F.emplace_back(tp.x, tp.y, tp.z);
         }
         originalData.Attributes.insert(AttributesContainer::value_type("P", pV3F));
 
         this->UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
-          facePositionIndices, pIndicesOffset, originalData.Indices);
+          facePositionIndices, pIndicesOffset, originalData.Indices, doReverseRotate);
       }
 
       // Texture coordinate
@@ -297,12 +302,12 @@ public:
           {
             originalData.uvFaceVarying = true;
             this->UpdateIndices<Alembic::AbcGeom::UInt32ArraySamplePtr>(
-              uvIndices, uvIndicesOffset, originalData.Indices);
+              uvIndices, uvIndicesOffset, originalData.Indices, doReverseRotate);
           }
           else
           {
             this->UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
-              facePositionIndices, uvIndicesOffset, originalData.Indices);
+              facePositionIndices, uvIndicesOffset, originalData.Indices, doReverseRotate);
           }
         }
       }
@@ -319,8 +324,9 @@ public:
           Alembic::AbcGeom::UInt32ArraySamplePtr normalIndices = normalValue.getIndices();
           for (size_t index = 0; index < normalValue.getVals()->size(); ++index)
           {
-            Alembic::AbcGeom::V3f normal = (*(normalValue.getVals()))[index];
-            normal_v3f.emplace_back(normal[0], normal[1], normal[2]);
+            Alembic::AbcGeom::V3f normal;
+            matrix.multDirMatrix((*(normalValue.getVals()))[index], normal);
+            normal_v3f.emplace_back(normal);
           }
           originalData.Attributes.insert(AttributesContainer::value_type("N", normal_v3f));
 
@@ -329,12 +335,12 @@ public:
             originalData.nFaceVarying = true;
 
             this->UpdateIndices<Alembic::AbcGeom::UInt32ArraySamplePtr>(
-              normalIndices, nIndicesOffset, originalData.Indices);
+              normalIndices, nIndicesOffset, originalData.Indices, doReverseRotate);
           }
           else
           {
             this->UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
-              facePositionIndices, nIndicesOffset, originalData.Indices);
+              facePositionIndices, nIndicesOffset, originalData.Indices, doReverseRotate);
           }
         }
       }
@@ -433,7 +439,7 @@ public:
         const Alembic::AbcGeom::IXformSchema& xFormSchema = xForm.getSchema();
         Alembic::AbcGeom::XformSample xFormSamp;
         xFormSchema.get(xFormSamp, selector);
-        objMatrix = matrix * xFormSamp.getMatrix();
+        objMatrix = xFormSamp.getMatrix() * matrix;
       }
 
       objects.pop();
