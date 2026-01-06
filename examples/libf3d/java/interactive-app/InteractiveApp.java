@@ -2,9 +2,16 @@ import app.f3d.F3D.*;
 
 public class InteractiveApp {
 
+    // On Windows, try to load opengl32 from Java path
+    // It's only useful in order to force Mesa software OpenGL
     static {
-        if (System.getProperty("os.name").startsWith("Windows")) {
-            System.loadLibrary("opengl32");
+        if (System.getProperty("os.name").startsWith("Windows"))
+        {
+            try {
+                System.loadLibrary("opengl32");
+            } catch (UnsatisfiedLinkError e) {
+                // Ignore if opengl32 is not available
+            }
         }
     }
 
