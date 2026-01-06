@@ -68,6 +68,7 @@
 - Wolf.fbx: OLEKSO: [CC-NC 4.0](http://creativecommons.org/licenses/by-nc/4.0/)
 - world\*: VTK Data: BSD-3-Clause
 - xform_anim.abc: Public Domain
+- joint1.abc: Public Domain
 - zombie\*.mdl: LibreQuake Project: BSD-3-Clause
 
 All other datasets are licensed under the BSD-3-Clause F3D license.
