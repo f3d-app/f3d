@@ -103,6 +103,7 @@ protected:
     if (this->HasPendingMouseMove && this->Interactor)
     {
       this->Interactor->triggerMousePosition(this->PendingMouseX, this->PendingMouseY);
+      this->UpdateModifiers(this->PendingModifiers);
       this->HasPendingMouseMove = false;
     }
 
@@ -195,6 +196,22 @@ protected:
         return "Space";
       case FL_Tab:
         return "Tab";
+      case FL_Shift_L:
+        return "Shift_L";
+      case FL_Shift_R:
+        return "Shift_R";
+      case FL_Control_L:
+        return "Control_L";
+      case FL_Control_R:
+        return "Control_R";
+      case FL_Alt_L:
+        return "Alt_L";
+      case FL_Alt_R:
+        return "Alt_R";
+      case FL_Meta_L:
+        return "Super_L";
+      case FL_Meta_R:
+        return "Super_R";
       default:
         break;
     }
@@ -219,7 +236,6 @@ protected:
     {
       case FL_PUSH:
       {
-        this->UpdateModifiers(Fl::event_state());
         auto button = this->MapMouseButton(Fl::event_button());
 
         if (button.has_value())
@@ -227,6 +243,7 @@ protected:
           const int x = Fl::event_x();
           const int y = Fl::event_y();
           this->Interactor->triggerMousePosition(x, y);
+          this->UpdateModifiers(Fl::event_state());
           this->Interactor->triggerMouseButton(f3d::interactor::InputAction::PRESS, button.value());
         }
 
@@ -236,13 +253,13 @@ protected:
       case FL_DRAG:
       case FL_MOVE:
       {
-        this->UpdateModifiers(Fl::event_state());
         const int x = Fl::event_x();
         const int y = Fl::event_y();
 
-        // Store the position for the next draw cycle
+        // Store the position and modifiers for the next draw cycle
         this->PendingMouseX = x;
         this->PendingMouseY = y;
+        this->PendingModifiers = Fl::event_state();
         this->HasPendingMouseMove = true;
 
         return 1;
@@ -250,13 +267,13 @@ protected:
 
       case FL_RELEASE:
       {
-        this->UpdateModifiers(Fl::event_state());
         auto button = this->MapMouseButton(Fl::event_button());
         if (button.has_value())
         {
           const int x = Fl::event_x();
           const int y = Fl::event_y();
           this->Interactor->triggerMousePosition(x, y);
+          this->UpdateModifiers(Fl::event_state());
           this->Interactor->triggerMouseButton(
             f3d::interactor::InputAction::RELEASE, button.value());
         }
@@ -358,6 +375,7 @@ private:
 
   int PendingMouseX = 0;
   int PendingMouseY = 0;
+  int PendingModifiers = 0;
   bool HasPendingMouseMove = false;
 };
 
