@@ -172,6 +172,14 @@ protected:
         return "Space";
       case Qt::Key_Tab:
         return "Tab";
+      case Qt::Key_Shift:
+        return "Shift_L";
+      case Qt::Key_Control:
+        return "Control_L";
+      case Qt::Key_Alt:
+        return "Alt_L";
+      case Qt::Key_Meta:
+        return "Super_L";
       default:
         break;
     }
@@ -199,13 +207,13 @@ protected:
 
     this->makeCurrent();
 
-    this->UpdateModifiers(event->modifiers());
     auto button = this->MapMouseButton(event->button());
 
     if (button.has_value())
     {
       const QPointF pos = event->position();
       this->Interactor->triggerMousePosition(pos.x(), pos.y());
+      this->UpdateModifiers(event->modifiers());
       this->Interactor->triggerMouseButton(f3d::interactor::InputAction::PRESS, button.value());
       this->update();
     }
@@ -223,9 +231,9 @@ protected:
 
     this->makeCurrent();
 
-    this->UpdateModifiers(event->modifiers());
     const QPointF pos = event->position();
     this->Interactor->triggerMousePosition(pos.x(), pos.y());
+    this->UpdateModifiers(event->modifiers());
     this->update();
 
     this->doneCurrent();
@@ -241,13 +249,13 @@ protected:
 
     this->makeCurrent();
 
-    this->UpdateModifiers(event->modifiers());
     auto button = this->MapMouseButton(event->button());
     if (button.has_value())
     {
-      this->Interactor->triggerMouseButton(f3d::interactor::InputAction::RELEASE, button.value());
       const QPointF pos = event->position();
       this->Interactor->triggerMousePosition(pos.x(), pos.y());
+      this->UpdateModifiers(event->modifiers());
+      this->Interactor->triggerMouseButton(f3d::interactor::InputAction::RELEASE, button.value());
       this->update();
     }
 

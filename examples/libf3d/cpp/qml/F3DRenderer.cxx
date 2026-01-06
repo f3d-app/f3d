@@ -207,6 +207,14 @@ std::string F3DRenderer::KeySymFromKeyAndText(int key, const QString& text) cons
       return "Space";
     case Qt::Key_Tab:
       return "Tab";
+    case Qt::Key_Shift:
+      return "Shift_L";
+    case Qt::Key_Control:
+      return "Control_L";
+    case Qt::Key_Alt:
+      return "Alt_L";
+    case Qt::Key_Meta:
+      return "Super_L";
     default:
       break;
   }
@@ -228,29 +236,29 @@ void F3DRenderer::HandleEvent(const Event& ev)
   {
     case EventType::MousePress:
     {
-      this->UpdateModifiers(ev.modifiers);
       auto mouseButtonEnum =
         static_cast<f3d::interactor::MouseButton>(this->MapMouseButton(ev.button));
       double yFlipped = this->View->height() - ev.y;
       inter.triggerMousePosition(ev.x, yFlipped);
+      this->UpdateModifiers(ev.modifiers);
       inter.triggerMouseButton(f3d::interactor::InputAction::PRESS, mouseButtonEnum);
       break;
     }
     case EventType::MouseMove:
     {
-      this->UpdateModifiers(ev.modifiers);
       double yFlipped = this->View->height() - ev.y;
       inter.triggerMousePosition(ev.x, yFlipped);
+      this->UpdateModifiers(ev.modifiers);
       break;
     }
     case EventType::MouseRelease:
     {
-      this->UpdateModifiers(ev.modifiers);
       auto mouseButtonEnum =
         static_cast<f3d::interactor::MouseButton>(this->MapMouseButton(ev.button));
       double yFlipped = this->View->height() - ev.y;
-      inter.triggerMouseButton(f3d::interactor::InputAction::RELEASE, mouseButtonEnum);
       inter.triggerMousePosition(ev.x, yFlipped);
+      this->UpdateModifiers(ev.modifiers);
+      inter.triggerMouseButton(f3d::interactor::InputAction::RELEASE, mouseButtonEnum);
       break;
     }
     case EventType::Wheel:
