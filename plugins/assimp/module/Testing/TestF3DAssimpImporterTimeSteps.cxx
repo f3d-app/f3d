@@ -19,7 +19,7 @@ int TestF3DAssimpImporterTimeSteps(int vtkNotUsed(argc), char* argv[])
   importer->GetTemporalInformation(0, timeRange, nbTimeSteps, timeSteps);
   importer->Print(std::cout);
 
-  if (nbTimeSteps != 25) 
+  if (nbTimeSteps != 24) 
   {
     std::cerr << "Time steps is not as expected.\n";
     return EXIT_FAILURE;

@@ -41,6 +41,7 @@
 
 #include <memory>
 #include <regex>
+#include <set>
 
 vtkStandardNewMacro(vtkF3DAssimpImporter);
 
@@ -1169,15 +1170,56 @@ bool vtkF3DAssimpImporter::GetTemporalInformation(vtkIdType animationIndex, doub
   timeRange[0] = 0.0;
   timeRange[1] = duration / fps;
 
-  double period = 1.0 / fps;
-  
-  nbTimeSteps = 0;
+  std::set<double> timeStepSet;
+
+  aiAnimation* anim = this->Internals->Scene->mAnimations[animationIndex];
+  for (int channel = 0; channel < anim->mNumChannels; channel++)
+  {
+    aiNodeAnim* nodeAnim = anim->mChannels[channel];
+
+    for (int positionIndex = 0; positionIndex < nodeAnim->mNumPositionKeys; positionIndex++)
+    {
+      timeStepSet.insert(nodeAnim->mPositionKeys[positionIndex].mTime / anim->mTicksPerSecond);
+    }
+
+    for (int rotationIndex = 0; rotationIndex < nodeAnim->mNumRotationKeys; rotationIndex++)
+    {
+      timeStepSet.insert(nodeAnim->mRotationKeys[rotationIndex].mTime / anim->mTicksPerSecond);
+    }
+
+    for (int scalingIndex = 0; scalingIndex < nodeAnim->mNumScalingKeys; scalingIndex++)
+    {
+      timeStepSet.insert(nodeAnim->mScalingKeys[scalingIndex].mTime / anim->mTicksPerSecond);
+    }
+  }
+
+  for (int channel = 0; channel < anim->mNumMeshChannels; channel++)
+  {
+    aiMeshAnim* meshAnim = anim->mMeshChannels[channel];
+    for (int i = 0; i < meshAnim->mNumKeys; i++)
+    {
+      timeStepSet.insert(meshAnim->mKeys[i].mTime / anim->mTicksPerSecond);
+    }
+  }
+
+  for (int channel = 0; channel < anim->mNumMorphMeshChannels; channel++)
+  {
+    aiMeshMorphAnim* meshMorphAnim = anim->mMorphMeshChannels[channel];
+    for (int i = 0; i < meshMorphAnim->mNumKeys; i++)
+    {
+      timeStepSet.insert(meshMorphAnim->mKeys[i].mTime / anim->mTicksPerSecond);
+    }
+  }
+
+  nbTimeSteps = timeStepSet.size();
+  timeSteps->SetNumberOfTuples(nbTimeSteps);
   timeSteps->SetNumberOfComponents(1);
-  timeSteps->SetNumberOfTuples(0);
   
-  for (double i = timeRange[0]; i < timeRange[1]; i += period) {
-    timeSteps->InsertNextTuple(&i);
-    nbTimeSteps++;
+  int index = 0;
+  for (auto it = timeStepSet.begin(); it != timeStepSet.end(); it++) 
+  {
+    timeSteps->SetValue(index, *it);
+    index++;
   }
 
   return true;
