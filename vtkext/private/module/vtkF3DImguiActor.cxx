@@ -90,7 +90,7 @@ struct vtkF3DImguiActor::Internals
 #ifdef F3D_MODULE_CLIP
       static std::string imgui_clipboard_storage;
       io.ClipboardUserData = &imgui_clipboard_storage;
-      io.SetClipboardTextFn = [](void* user_data, const char* text) { clip::set_text(text); };
+      io.SetClipboardTextFn = [](void*, const char* text) { clip::set_text(text); };
       io.GetClipboardTextFn = [](void* user_data) -> const char*
       {
         auto storage = static_cast<std::string*>(user_data);
