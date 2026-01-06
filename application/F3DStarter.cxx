@@ -1282,10 +1282,18 @@ int F3DStarter::Start(int argc, char** argv)
     // per-frame)
     const bool multiFrameOutput = this->Internals->AppOptions.OutputFrameCount.has_value() &&
       this->Internals->AppOptions.OutputFrameCount.value() > 0;
-    fs::path output = multiFrameOutput
-      ? fs::path{}
-      : this->Internals->applyFilenameTemplate(
-          f3d::utils::collapsePath(this->Internals->AppOptions.Output));
+    fs::path output;
+    try
+    {
+      output = multiFrameOutput ? fs::path{}
+                                : this->Internals->applyFilenameTemplate(
+                                    f3d::utils::collapsePath(this->Internals->AppOptions.Output));
+    }
+    catch (const std::runtime_error& ex)
+    {
+      f3d::log::error(ex.what());
+      return EXIT_FAILURE;
+    }
 
     // Render and compare with file if needed
     if (!reference.empty())
