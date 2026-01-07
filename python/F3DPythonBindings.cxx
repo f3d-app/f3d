@@ -308,9 +308,6 @@ PYBIND11_MODULE(pyf3d, module)
     .def("stop_animation", &f3d::interactor::stopAnimation, "Stop the animation")
     .def("is_playing_animation", &f3d::interactor::isPlayingAnimation,
       "Returns True if the animation is currently started")
-    .def("get_animation_name", &f3d::interactor::getAnimationName, py::arg("index") = INT_MIN,
-      "Returns the animation at an index (defaults to current)")
-    .def("get_animation_names", &f3d::interactor::getAnimationNames, "Returns all animation names")
     .def("get_animation_direction", &f3d::interactor::getAnimationDirection,
       "Returns the current animation direction")
     .def("enable_camera_movement", &f3d::interactor::enableCameraMovement,
@@ -450,6 +447,9 @@ PYBIND11_MODULE(pyf3d, module)
     .def("load_animation_time", &f3d::scene::loadAnimationTime)
     .def("animation_time_range", &f3d::scene::animationTimeRange)
     .def("available_animations", &f3d::scene::availableAnimations)
+    .def("get_animation_name", &f3d::scene::getAnimationName, py::arg("index") = INT_MIN,
+      "Returns the animation at an index (defaults to current)")
+    .def("get_animation_names", &f3d::scene::getAnimationNames, "Returns all animation names")
     .def("add_light", &f3d::scene::addLight, "Add a light to the scene", py::arg("light_state"))
     .def(
       "remove_light", &f3d::scene::removeLight, "Remove a light from the scene", py::arg("index"))

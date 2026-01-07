@@ -6,6 +6,7 @@
 #include "types.h"
 
 /// @cond
+#include <climits>
 #include <filesystem>
 #include <string>
 #include <vector>
@@ -147,6 +148,19 @@ public:
    * Return the number of animations available in the currently loaded files.
    */
   [[nodiscard]] virtual unsigned int availableAnimations() const = 0;
+
+  /**
+   * Return the animation name of a given animation indices, if any.
+   * Will return current animation if indices is INT_MIN (default)
+   * Can be called before initialization safely
+   */
+  [[nodiscard]] virtual std::string getAnimationName(int indices = INT_MIN) = 0;
+
+  /**
+   * Return all of the animation names, if any.
+   * Can be called before initialization safely
+   */
+  [[nodiscard]] virtual std::vector<std::string> getAnimationNames() = 0;
 
 protected:
   //! @cond

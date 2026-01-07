@@ -161,7 +161,12 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function(
       "animationTimeRange",
       +[](f3d::scene& o) -> emscripten::val { return pairToJSArray(o.animationTimeRange()); })
-    .function("availableAnimations", &f3d::scene::availableAnimations);
+    .function("availableAnimations", &f3d::scene::availableAnimations)
+    .function("getAnimationName", &f3d::scene::getAnimationName)
+    .function(
+      "getAnimationNames",
+      +[](f3d::scene& scene)
+      { return containerToJSArray(scene.getAnimationNames()); });
 
   // f3d::image
   emscripten::enum_<f3d::image::SaveFormat>("ImageSaveFormat")
@@ -355,11 +360,6 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function("stopAnimation", &f3d::interactor::stopAnimation,
       emscripten::return_value_policy::reference())
     .function("isPlayingAnimation", &f3d::interactor::isPlayingAnimation)
-    .function("getAnimationName", &f3d::interactor::getAnimationName)
-    .function(
-      "getAnimationNames",
-      +[](f3d::interactor& interactor)
-      { return containerToJSArray(interactor.getAnimationNames()); })
     .function("getAnimationDirection", &f3d::interactor::getAnimationDirection)
     .function("enableCameraMovement", &f3d::interactor::enableCameraMovement,
       emscripten::return_value_policy::reference())

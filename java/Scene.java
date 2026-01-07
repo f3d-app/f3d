@@ -116,5 +116,29 @@ public class Scene {
      */
     public native int availableAnimations();
 
+    /**
+     * Get the current animation name, if any.
+     *
+     * @return animation names or string error
+     */
+    public String getAnimationName() {
+        // note : INT32 MIN
+        return getAnimationName(-2147483648);
+    }
+
+    /**
+     * Get the animation name of a given animation indices, if any.
+     *
+     * @return animation name or string error 
+     */
+    public native String getAnimationName(int indices);
+
+    /**
+     * Get all of the animation names, if any.
+     *
+     * @return list of animation names
+     */
+    public native List<String> getAnimationNames();
+
     private long mNativeAddress;
 }

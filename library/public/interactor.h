@@ -12,7 +12,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include <climits>
 /// @endcond
 
 namespace f3d
@@ -265,11 +264,6 @@ public:
   virtual interactor& stopAnimation() = 0;
   [[nodiscard]] virtual bool isPlayingAnimation() = 0;
   [[nodiscard]] virtual interactor::AnimationDirection getAnimationDirection() = 0;
-  /**
-   * Access animation data.
-   */
-  [[nodiscard]] virtual std::string getAnimationName(int indices = INT_MIN) = 0;
-  [[nodiscard]] virtual std::vector<std::string> getAnimationNames() = 0;
   ///@}
 
   ///@{ @name Movement

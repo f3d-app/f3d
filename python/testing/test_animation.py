@@ -43,13 +43,13 @@ def test_animation():
     assert engine.interactor.is_playing_animation() == 0
 
     # getAnimationName returns name at index
-    assert engine.interactor.get_animation_name(0) == "unnamed_0"
+    assert engine.scene.get_animation_name(0) == "unnamed_0"
 
     # getAnimationName returns for out of range
-    assert engine.interactor.get_animation_name(9999) == "No animation"
+    assert engine.scene.get_animation_name(9999) == "No animation"
 
     # getAnimationName returns current name
-    assert engine.interactor.get_animation_name() == "unnamed_0"
+    assert engine.scene.get_animation_name() == "unnamed_0"
 
     # getAnimationNames returns names
-    assert engine.interactor.get_animation_names() == ["unnamed_0"]
+    assert engine.scene.get_animation_names() == ["unnamed_0"]
