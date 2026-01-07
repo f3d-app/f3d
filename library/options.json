@@ -270,6 +270,10 @@
     },
     "animation_progress_color": {
       "type": "color"
+    },
+    "dpi_scale": {
+      "type": "bool",
+      "default_value": "false"
     }
   },
   "model": {
