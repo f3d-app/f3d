@@ -335,6 +335,12 @@ runs:
         cmake --install . --component configuration
         cmake --install . --component colormaps
 
+    - name: Install Mesa Windows in install
+      if: runner.os == 'Windows'
+      uses: f3d-app/install-mesa-windows-action@v2
+      with:
+        path: ${{github.workspace}}\install\bin
+
     - name: Build and configure python externally
       if: |
         inputs.optional_deps_label == 'optional-deps' &&
@@ -435,12 +441,6 @@ runs:
         inputs.bundle_label != 'bundle'
       shell: bash
       run: echo "F3D_BIN_PATH=./bin/f3d" >> $GITHUB_ENV
-
-    - name: Install Mesa Windows in install
-      if: runner.os == 'Windows'
-      uses: f3d-app/install-mesa-windows-action@v2
-      with:
-        path: ${{github.workspace}}\install\bin
 
     # Grid rendering has artifacts in macOS arm64 CI
     # https://github.com/f3d-app/f3d/issues/1276
