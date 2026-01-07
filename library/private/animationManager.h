@@ -13,6 +13,7 @@
 #include <chrono>
 #include <optional>
 #include <set>
+#include <climits>
 
 class vtkF3DRenderer;
 class vtkImporter;
@@ -66,10 +67,17 @@ public:
   void CycleAnimation();
 
   /**
-   * Return the current animation name if any
+   * Return the animation name of a given animation indices, if any.
+   * Will return current animation if indices is INT_MIN (default)
    * Can be called before initialization safely
    */
-  std::string GetAnimationName();
+  std::string GetAnimationName(int indices = INT_MIN);
+
+  /**
+   * Return all of the animation names, if any.
+   * Can be called before initialization safely
+   */
+  std::vector<std::string> GetAnimationNames();
 
   /**
    * Return true if the animation manager is playing the animation

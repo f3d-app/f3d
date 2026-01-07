@@ -12,6 +12,7 @@
 #include "interactor.h"
 
 #include <memory>
+#include <climits>
 
 class vtkInteractorObserver;
 class vtkImporter;
@@ -73,7 +74,8 @@ public:
   interactor& stopAnimation() override;
   bool isPlayingAnimation() override;
 
-  std::string getAnimationName() override;
+  std::string getAnimationName(int indices = INT_MIN) override;
+  std::vector<std::string> getAnimationNames() override;
 
   interactor& enableCameraMovement() override;
   interactor& disableCameraMovement() override;

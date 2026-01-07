@@ -326,33 +326,63 @@ void animationManager::CycleAnimation()
 }
 
 // ---------------------------------------------------------------------------------
-std::string animationManager::GetAnimationName()
+std::string animationManager::GetAnimationName(int indices)
 {
   assert(this->Importer);
-  if (this->PreparedAnimationIndices.has_value() &&
-    this->PreparedAnimationIndices.value().size() > 1)
+  if (indices == INT_MIN)
   {
-    std::vector<bool> animCheck(this->AvailAnimations, false);
-    for (int idx : this->PreparedAnimationIndices.value())
+    if (this->PreparedAnimationIndices.has_value() &&
+      this->PreparedAnimationIndices.value().size() > 1)
     {
-      if (idx < this->AvailAnimations)
+      std::vector<bool> animCheck(this->AvailAnimations, false);
+      for (int idx : this->PreparedAnimationIndices.value())
       {
-        animCheck[idx] = true;
+        if (idx < this->AvailAnimations)
+        {
+          animCheck[idx] = true;
+        }
       }
+      return std::none_of(animCheck.begin(), animCheck.end(), std::logical_not<>())
+        ? "All animations"
+        : "Multi animations";
     }
-    return std::none_of(animCheck.begin(), animCheck.end(), std::logical_not<>())
-      ? "All animations"
-      : "Multi animations";
+
+    if (this->AvailAnimations == 0 || !this->PreparedAnimationIndices.has_value() ||
+      this->PreparedAnimationIndices.value().empty() ||
+      this->PreparedAnimationIndices.value()[0] >= this->AvailAnimations)
+    {
+      return "No animation";
+    }
+
+    return this->Importer->GetAnimationName(this->PreparedAnimationIndices.value()[0]);
   }
 
-  if (this->AvailAnimations == 0 || !this->PreparedAnimationIndices.has_value() ||
-    this->PreparedAnimationIndices.value().empty() ||
-    this->PreparedAnimationIndices.value()[0] >= this->AvailAnimations)
+  if (this->AvailAnimations == 0 || indices < 0 || indices > this->AvailAnimations)
   {
     return "No animation";
   }
 
-  return this->Importer->GetAnimationName(this->PreparedAnimationIndices.value()[0]);
+  return this->Importer->GetAnimationName(indices);
+}
+
+// ---------------------------------------------------------------------------------
+std::vector<std::string> animationManager::GetAnimationNames()
+{
+  assert(this->Importer);
+
+  if (this->AvailAnimations == 0)
+  {
+    return {};
+  }
+
+  std::vector<std::string> animations(this->AvailAnimations);
+
+  for (size_t index = 0; index < this->AvailAnimations; index++)
+  {
+    animations[index] = this->Importer->GetAnimationName(index);
+  }
+
+  return animations;
 }
 
 //----------------------------------------------------------------------------

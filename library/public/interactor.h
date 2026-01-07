@@ -12,6 +12,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <climits>
 /// @endcond
 
 namespace f3d
@@ -255,7 +256,8 @@ public:
   /**
    * Access animation data.
    */
-  [[nodiscard]] virtual std::string getAnimationName() = 0;
+  [[nodiscard]] virtual std::string getAnimationName(int indices = INT_MIN) = 0;
+  [[nodiscard]] virtual std::vector<std::string> getAnimationNames() = 0;
   ///@}
 
   ///@{ @name Movement
