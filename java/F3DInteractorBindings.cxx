@@ -453,6 +453,16 @@ extern "C"
       enumClass, fromValueMethod, static_cast<int>(nativeDirection));
   }
 
+  JNIEXPORT jstring JAVA_BIND(Interactor, getAnimationName)(JNIEnv* env, jobject self, jint indices)
+  {
+    return env->NewStringUTF(GetInteractor(env, self).getAnimationName(indices).c_str());
+  }
+
+  JNIEXPORT jobject JAVA_BIND(Interactor, getAnimationNames)(JNIEnv* env, jobject self)
+  {
+    return CreateStringList(env, GetInteractor(env, self).getAnimationNames());
+  }
+
   JNIEXPORT jobject JAVA_BIND(Interactor, enableCameraMovement)(JNIEnv* env, jobject self)
   {
     GetInteractor(env, self).enableCameraMovement();
