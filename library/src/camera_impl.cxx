@@ -158,11 +158,8 @@ double camera_impl::getWorldElevation() const
   vtkRenderer* ren = this->Internals->VTKRenderer;
   double* up = ren->GetEnvironmentUp();
 
-  // Elevation is angle above the horizontal plane
-  double dot = vtkMath::Dot(view.data(), up);
-  dot = std::clamp(dot, -1.0, 1.0);
-
-  return vtkMath::DegreesFromRadians(std::asin(dot));
+  double angleRad = vtkMath::AngleBetweenVectors(view.data(), up);
+  return 90.0 - vtkMath::DegreesFromRadians(angleRad);
 }
 
 //----------------------------------------------------------------------------
