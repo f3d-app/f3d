@@ -377,7 +377,7 @@ std::vector<std::string> animationManager::GetAnimationNames()
 
   std::vector<std::string> animations(this->AvailAnimations);
 
-  for (size_t index = 0; index < this->AvailAnimations; index++)
+  for (int index = 0; index < this->AvailAnimations; index++)
   {
     animations[index] = this->Importer->GetAnimationName(index);
   }
