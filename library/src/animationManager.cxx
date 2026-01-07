@@ -235,26 +235,13 @@ void animationManager::JumpToKeyFrame(int keyframe, bool relative)
     return;
   }
 
-  int nextKeyFrame = 0;
-  if (relative)
-  {
-    constexpr double epsilon = 1e-6;
-    auto it = std::find_if(timeSteps->Begin(), timeSteps->End(),
-      [&](double step) { return this->CurrentTime - step <= epsilon; });
-    nextKeyFrame = std::distance(timeSteps->Begin(), it) + keyframe;
-    if (nextKeyFrame < 0)
-    {
-      nextKeyFrame = timeSteps->GetSize() + keyframe;
-    }
-  }
-  else if (keyframe > 0)
-  {
-    nextKeyFrame = keyframe;
-  }
-  else
-  {
-    nextKeyFrame = timeSteps->GetSize() + keyframe;
-  }
+  constexpr double epsilon = 1e-6;
+  auto it = std::find_if(timeSteps->Begin(), timeSteps->End(),
+    [&](double step) { return this->CurrentTime - step <= epsilon; });
+
+  int nextKeyFrame = relative ? std::distance(timeSteps->Begin(), it) + keyframe : keyframe;
+  // Ensure keyframe index is located inside timeSteps size
+  nextKeyFrame = nextKeyFrame >= 0 ? nextKeyFrame : timeSteps->GetSize() + nextKeyFrame;
 
   this->CurrentTime = timeSteps->GetValue(nextKeyFrame);
 
