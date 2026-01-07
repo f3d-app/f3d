@@ -230,7 +230,7 @@ void animationManager::JumpToKeyFrame(int keyframe, bool relative)
   }
 
   vtkSmartPointer<vtkDoubleArray> timeSteps = this->AnimationTimeSteps.value();
-  if (keyframe == 0 || keyframe > timeSteps->GetSize())
+  if (keyframe > timeSteps->GetSize())
   {
     return;
   }
