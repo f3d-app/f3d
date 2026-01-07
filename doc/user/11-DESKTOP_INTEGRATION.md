@@ -69,10 +69,6 @@ cd C:\path\to\f3d\bin\
 regsvr32 /u F3DShellExtension.dll
 ```
 
-On Windows platforms where screen DPI detection is supported, the F3D window resolution is scaled by the display scaling factor.
-
-For example, if you specify `--resolution=800,600` in the CLI options and the system display scale is set to `150%`, the effective window resolution becomes `1200×900`.
-
 ## MacOS
 
 There is no support for thumbnails on MacOS, the .dmg binary release provides automatic file openings.

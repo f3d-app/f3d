@@ -142,6 +142,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
   {"Window",
     { {"background-color", "", "Background color", "<color>", ""},
       {"resolution", "", "Window resolution", "<width,height>", ""},
+      {"dpi-scale", "","Scale font and window resolution according to system scale", "<bool>", "1"},
       {"position", "", "Window position", "<x,y>", ""},
       {"fps", "z", "Display rendering frame per second", "<bool>", "1"},
       {"filename", "n", "Display filename", "<bool>", "1"},

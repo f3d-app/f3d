@@ -893,7 +893,7 @@ public:
       f3d::window& window = this->Engine->getWindow();
       if (this->AppOptions.Resolution.size() == 2)
       {
-        double dpiScale = f3d::utils::getDPIScale();
+        double dpiScale = this->LibOptions.ui.dpi_scale ? f3d::utils::getDPIScale() : 1.0;
 
         window.setSize(static_cast<int>(this->AppOptions.Resolution[0] * dpiScale),
           static_cast<int>(this->AppOptions.Resolution[1] * dpiScale));

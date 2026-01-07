@@ -15,10 +15,14 @@
 #include "vtkF3DSolidBackgroundPass.h"
 #include "vtkF3DTAAPass.h"
 #include "vtkF3DUserRenderPass.h"
+#ifdef _WIN32
+#include "vtkF3DWGLRenderWindow.h"
+#endif
 
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
 #include <vtkCamera.h>
+#include <vtkCallbackCommand.h>
 #include <vtkCameraOrientationRepresentation.h>
 #include <vtkCameraOrientationWidget.h>
 #include <vtkCameraPass.h>
@@ -328,6 +332,7 @@ void vtkF3DRenderer::Initialize()
   this->ScalarBarActorConfigured = false;
   this->CheatSheetConfigured = false;
   this->ColoringConfigured = false;
+  this->SystemScaleChangeObserverConfigured = false;
 
   // create ImGui context if F3D_MODULE_UI is enabled
   this->UIActor->Initialize(vtkOpenGLRenderWindow::SafeDownCast(this->RenderWindow));
@@ -1547,6 +1552,39 @@ void vtkF3DRenderer::ConfigureHDRISkybox()
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::ConfigureSystemScaleChangeObserver()
+{
+#ifdef _WIN32
+  if (this->RenderWindow->IsA("vtkF3DWGLRenderWindow"))
+  {
+    if (this->DPIScaleEnable && this->SystemScaleChangeObserverId == -1)
+    {
+      vtkNew<vtkCallbackCommand> commandCallback;
+      commandCallback->SetClientData(this);
+
+      commandCallback->SetCallback(
+        [](vtkObject* caller, unsigned long eventId, void* clientData, void*)
+        {
+          vtkF3DRenderer* self = static_cast<vtkF3DRenderer*>(clientData);
+
+          // Update UIActor->fontScale
+          self->ConfigureTextActors();
+        });
+
+      this->SystemScaleChangeObserverId = this->GetRenderWindow()->AddObserver(
+        vtkF3DWGLRenderWindow::SystemScaleChangeEvent, commandCallback);
+    }
+    else if (!this->DPIScaleEnable && this->SystemScaleChangeObserverId != -1)
+    {
+      this->GetRenderWindow()->RemoveObserver(this->SystemScaleChangeObserverId);
+      this->SystemScaleChangeObserverId = -1;
+    }
+  }
+#endif
+  this->SystemScaleChangeObserverConfigured = true;
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureTextActors()
 {
   // Font
@@ -1569,7 +1607,9 @@ void vtkF3DRenderer::ConfigureTextActors()
     }
   }
 
-  this->UIActor->SetFontScale(this->FontScale * F3DUtils::getDPIScale());
+  double scaleFactor = this->DPIScaleEnable ? F3DUtils::getDPIScale(this->GetVTKWindow()) : 1.0;
+
+  this->UIActor->SetFontScale(this->FontScale * scaleFactor);
 
   this->TextActorsConfigured = true;
 }
@@ -1610,6 +1650,17 @@ void vtkF3DRenderer::SetFontScale(const double fontScale)
   if (this->FontScale != fontScale)
   {
     this->FontScale = fontScale;
+    this->TextActorsConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetDPIScaleEnable(bool dpiScaleEnable)
+{
+  if (this->DPIScaleEnable != dpiScaleEnable)
+  {
+    this->DPIScaleEnable = dpiScaleEnable;
+    this->SystemScaleChangeObserverConfigured = false;
     this->TextActorsConfigured = false;
   }
 }
@@ -2069,6 +2120,11 @@ void vtkF3DRenderer::UpdateActors()
   if (!this->MetaDataConfigured)
   {
     this->ConfigureMetaData();
+  }
+
+  if (!this->SystemScaleChangeObserverConfigured)
+  {
+    this->ConfigureSystemScaleChangeObserver();
   }
 
   if (!this->TextActorsConfigured)

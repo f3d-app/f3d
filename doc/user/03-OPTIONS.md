@@ -332,6 +332,15 @@ Ignored if `--hdri-skybox` is enabled.
 
 Set the _window resolution_.
 
+### `--dpi-scale (_bool_, default: `false`)
+
+Scale the _window resolution_ and _font scale_ by the display scaling factor.
+
+> [!NOTE]
+> Supported on Windows and Linux platform.
+> On Windows, it can support run-time dpi change.
+> On Linux, it require restart application to take effect.
+
 ### `--position=<x,y>` (_vector\<double\>_)
 
 Set the _window position_ (top left corner) , in pixels, starting from the top left of your screens.

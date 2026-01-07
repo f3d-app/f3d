@@ -9,6 +9,7 @@
 #define F3DUtils_h
 
 #include "vtkextModule.h"
+#include "vtkWindow.h"
 
 /// @cond
 #include <string>
@@ -32,11 +33,21 @@ VTKEXT_EXPORT double ParseToDouble(
 VTKEXT_EXPORT int ParseToInt(const std::string& str, int def, const std::string& nameError);
 
 /*
- * Get the primary monitor system zoom scale base on DPI.
- * Currently only supported on Windows platform.
- * Return a hardcoded 1.f on other platform.
+ * Get the monitor system scale base on DPI.
+ * Supported on Windows and Linux.
+ * Return a hardcoded 1.0 double on other platforms.
+ *
+ * Capability:
+ *
+ *    Windows:
+ *        Handle DPI change at run-time:            Yes
+ *        Handle DPI difference between monitor:    Yes
+ *
+ *    Linux:
+ *        Handle DPI change at run-time:            No
+ *        Handle DPI difference between monitor:    No
  */
-VTKEXT_EXPORT double getDPIScale();
+VTKEXT_EXPORT double getDPIScale(vtkWindow* win = nullptr);
 };
 
 #endif

@@ -108,6 +108,7 @@ public:
   void SetPointSize(const std::optional<double>& pointSize);
   void SetFontFile(const std::optional<fs::path>& fontFile);
   void SetFontScale(const double fontScale);
+  void SetDPIScaleEnable(bool dpiScaleEnable);
   void SetHDRIFile(const std::optional<fs::path>& hdriFile);
   void SetUseImageBasedLighting(bool use) override;
   void SetBackground(const double* backgroundColor) override;
@@ -502,6 +503,11 @@ private:
   void ConfigureMetaData();
 
   /**
+   * Enable or disable system scale change observer base on `DPIScaleEnable = <bool>`
+   */
+  void ConfigureSystemScaleChangeObserver();
+
+  /**
    * Configure text actors properties font file and color
    */
   void ConfigureTextActors();
@@ -655,6 +661,7 @@ private:
   bool HDRISphericalHarmonicsConfigured = false;
   bool HDRISpecularConfigured = false;
   bool HDRISkyboxConfigured = false;
+  bool SystemScaleChangeObserverConfigured = false;
 
   bool GridVisible = false;
   bool GridAbsolute = false;
@@ -716,6 +723,8 @@ private:
 
   std::optional<fs::path> FontFile;
   double FontScale = 1.0;
+  bool DPIScaleEnable = false;
+  int SystemScaleChangeObserverId = -1;
 
   double LightIntensity = 1.0;
   std::map<vtkLight*, double> OriginalLightIntensities;
