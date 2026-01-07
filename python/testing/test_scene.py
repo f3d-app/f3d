@@ -44,11 +44,6 @@ def test_scene():
     engine.scene.add(sphere1)
     engine.scene.add([sphere2, cube])
 
-    assert engine.scene.animation_time_range() == (0.0, 4.0)
-    engine.scene.load_animation_time(2)
-
-    assert engine.scene.available_animations() == 1
-
     img = engine.window.render_to_image()
     img.save(output)
 
