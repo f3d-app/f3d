@@ -51,7 +51,7 @@ If you use the portable archive, make sure to extract it somewhere the sandboxin
 
 ### Piping
 
-F3D supports piping in and out, using the `-` char, as long as the reader is specified, eg:
+F3D supports piping in and out for [most formats](02-SUPPORTED_FORMATS.md), using the `-` char, as long as the reader is specified, eg:
 
 `f3d - --force-reader=GLB --output=- < path/to/file.glb > path/to/img.png`
 

@@ -312,7 +312,7 @@ void PrintReadersList()
   size_t mimeColSize = 0;
   size_t descColSize = 0;
   size_t plugColSize = 0;
-  std::string streamStr = "Supports Stream";
+  constexpr std::string_view streamStr = "Supports Stream";
   size_t streamColSize = streamStr.size();
 
   std::vector<f3d::engine::readerInformation> readersInfo = f3d::engine::getReadersInfo();

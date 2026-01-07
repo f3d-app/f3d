@@ -60,7 +60,7 @@ public:
 
   /**
    * Add and load provided mesh into the scene
-   * If it fails to loads the mest, it clears the scene and
+   * If it fails to load the mesh, it clears the scene and
    * throw a load_failure_exception.
    * On other failure, throw a load_failure_exception.
    */

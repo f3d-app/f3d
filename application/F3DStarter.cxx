@@ -68,7 +68,7 @@ namespace fs = std::filesystem;
 // This pointer is used to retrieve the interactor in case an OS signal is handled
 f3d::interactor* GlobalInteractor = nullptr;
 
-const std::string F3D_PIPED = "-";
+constexpr std::string_view F3D_PIPED = "-";
 
 class F3DStarter::F3DInternals
 {
@@ -1747,8 +1747,8 @@ void F3DStarter::LoadFileGroupInternal(
           std::istream& is = std::cin;
           SET_STDIN_BINARY_MODE();
           // TODO useful for debugging with gdb
-          // std::ifstream is;
-          // is.open("/home/glow/dev/f3d/f3d/src/testing/data/f3d.glb");
+          //std::ifstream is;
+          //is.open("/home/glow/dev/f3d/f3d/src/testing/data/cow.vtk");
 
           // Read input stream into a buffer
           // this can make f3d hang until an input stream is provided

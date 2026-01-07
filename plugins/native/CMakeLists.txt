@@ -98,7 +98,7 @@ f3d_plugin_declare_reader(
 )
 
 set(_SUPPORTS_STREAM)
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20269999)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260103)
   set(_SUPPORTS_STREAM SUPPORTS_STREAM)
 endif()
 
@@ -159,7 +159,7 @@ f3d_plugin_declare_reader(
 )
 
 set(_SUPPORTS_STREAM)
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20269999)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260106)
   set(_SUPPORTS_STREAM SUPPORTS_STREAM)
 endif()
 
@@ -171,10 +171,11 @@ f3d_plugin_declare_reader(
   VTK_READER vtkDataSetReader
   FORMAT_DESCRIPTION "VTK Legacy"
   ${_SUPPORTS_STREAM}
+  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/vtk.inl"
 )
 
 set(_SUPPORTS_STREAM)
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20269999)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260106)
   set(_SUPPORTS_STREAM SUPPORTS_STREAM)
 endif()
 
@@ -186,6 +187,7 @@ f3d_plugin_declare_reader(
   VTK_READER vtkXMLGenericDataObjectReader
   FORMAT_DESCRIPTION "VTK XML UnstructuredGrid"
   ${_SUPPORTS_STREAM}
+  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/xml.inl"
 )
 
 f3d_plugin_declare_reader(
@@ -196,6 +198,7 @@ f3d_plugin_declare_reader(
   VTK_READER vtkXMLGenericDataObjectReader
   FORMAT_DESCRIPTION "VTK XML PolyData"
   ${_SUPPORTS_STREAM}
+  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/xml.inl"
 )
 
 f3d_plugin_declare_reader(
@@ -206,6 +209,7 @@ f3d_plugin_declare_reader(
   VTK_READER vtkXMLGenericDataObjectReader
   FORMAT_DESCRIPTION "VTK XML ImageData"
   ${_SUPPORTS_STREAM}
+  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/xml.inl"
 )
 
 f3d_plugin_declare_reader(
@@ -216,6 +220,7 @@ f3d_plugin_declare_reader(
   VTK_READER vtkXMLGenericDataObjectReader
   FORMAT_DESCRIPTION "VTK XML RectangularGrid"
   ${_SUPPORTS_STREAM}
+  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/xml.inl"
 )
 
 f3d_plugin_declare_reader(
@@ -226,6 +231,7 @@ f3d_plugin_declare_reader(
   VTK_READER vtkXMLGenericDataObjectReader
   FORMAT_DESCRIPTION "VTK XML StructuredGrid"
   ${_SUPPORTS_STREAM}
+  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/xml.inl"
 )
 
 f3d_plugin_declare_reader(

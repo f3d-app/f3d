@@ -8,7 +8,7 @@ F3D supports the following file formats:
 | VTK XML                                   | `.vtp`, `.vtu`, `.vtr`, `.vti`, `.vts`, `.vtm` | No         | NONE              | YES (VTK 9.7)     | `native`  | `VTKXMLVT<P,U,R,I,S,M>` |
 | VTKHDF                                    | `.vtkhdf`                                      | No         | UNIQUE            | YES (VTK 9.6)     | `hdf`     | `VTKHDF`                |
 | EXODUS II                                 | `.e`, `.ex2`, `.exo`, `.g`                     | No         | UNIQUE            | NO                | `hdf`     | `ExodusII`              |
-| NetCDF                                    | `.nc`, `.cdf`, `.ncdf`                         | No         | UNIQUE            | YES (VTK 9.7)     | `hdf`     | `NetCDF`                |
+| NetCDF                                    | `.nc`, `.cdf`, `.ncdf`                         | No         | UNIQUE            | NO                | `hdf`     | `NetCDF`                |
 | Polygon File Format                       | `.ply`                                         | No         | NONE              | YES (VTK 9.5)     | `native`  | `PLYReader`             |
 | Standard Triangle Language                | `.stl`                                         | No         | NONE              | YES (VTK 9.6)     | `native`  | `STL`                   |
 | DICOM                                     | `.dcm`                                         | No         | NONE              | YES (VTK 9.6)     | `native`  | `DICOM`                 |

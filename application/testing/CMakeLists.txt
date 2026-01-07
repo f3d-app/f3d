@@ -179,11 +179,11 @@ f3d_test(NAME TestVTK DATA cow.vtk)
 f3d_test(NAME TestNRRD DATA beach.nrrd ARGS -s)
 f3d_test(NAME TestVRMLImporter DATA bot2.wrl)
 
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20269999)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260103)
   f3d_test(NAME TestPipedOBJ DATA world.obj ARGS --force-reader=OBJ PIPED) # MTL and Textures not loaded
 endif()
 
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20269999)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260106)
   f3d_test(NAME TestPipedVTR DATA RectGrid2.vtr ARGS --scalar-coloring --roughness=1 --force-reader=VTKXMLVTR PIPED)
   f3d_test(NAME TestPipedVTU DATA dragon.vtu ARGS --force-reader=VTKXMLVTU PIPED)
   f3d_test(NAME TestPipedVTP DATA cow.vtp ARGS --force-reader=VTKXMLVTP PIPED)
@@ -191,7 +191,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20269999)
   f3d_test(NAME TestPipedVTICell DATA waveletMaterial.vti ARGS -s --coloring-array=Material -c --roughness=1 --force-reader=VTKXMLVTI PIPED)
 endif()
 
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20269999)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260103)
   f3d_test(NAME TestPipedVTK DATA cow.vtk ARGS --force-reader=VTKLegacy PIPED)
 endif()
 
@@ -1079,13 +1079,6 @@ if(F3D_PLUGIN_BUILD_HDF)
 
     # Test --load-plugins with a full path plugin
     f3d_test(NAME TestPluginFullPath DATA disk_out_ref.ex2 ARGS --verbose --load-plugins "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_SHARED_MODULE_PREFIX}f3d-plugin-hdf${CMAKE_SHARED_MODULE_SUFFIX}" NO_BASELINE REGEXP "Loaded plugin hdf from")
-  endif()
-
-  # NetCDF tests
-  # Basic rendering test with scalar coloring
-  f3d_test(NAME TestNetCDF DATA temperature_grid.nc ARGS --load-plugins=hdf -s)
-  if (VTK_VERSION VERSION_GREATER_EQUAL 9.6.20269999)
-    f3d_test(NAME TestPipedNetCDF DATA temperature_grid.nc ARGS --load-plugins=hdf -s --force-reader=NetCDF PIPED)
   endif()
 
   if(NOT F3D_MACOS_BUNDLE)
