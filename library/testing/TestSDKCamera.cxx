@@ -112,19 +112,22 @@ int TestSDKCamera([[maybe_unused]] int argc, char* argv[])
 
   if (!compareDouble(distance, 11.0))
   {
-    std::cerr << "getDistance (horizontal) is not behaving as expected: " << distance << "\n";
+    std::cerr << "getDistance (horizontal) is not behaving as expected: " << distance
+              << "\n";
     return EXIT_FAILURE;
   }
 
   if (!compareDouble(azimuth, 90.0))
   {
-    std::cerr << "getWorldAzimuth (horizontal) is not behaving as expected: " << azimuth << "\n";
+    std::cerr << "getWorldAzimuth (horizontal) is not behaving as expected: " << azimuth
+              << "\n";
     return EXIT_FAILURE;
   }
 
   if (!compareDouble(elevation, 0.0))
   {
-    std::cerr << "getWorldElevation (horizontal) is not behaving as expected: " << elevation << "\n";
+    std::cerr << "getWorldElevation (horizontal) is not behaving as expected: " << elevation
+              << "\n";
     return EXIT_FAILURE;
   }
 
@@ -139,13 +142,15 @@ int TestSDKCamera([[maybe_unused]] int argc, char* argv[])
 
   if (!compareDouble(distance, std::sqrt(11.0 * 11.0 + 11.0 * 11.0)))
   {
-    std::cerr << "getDistance (positive elevation) is not behaving as expected: " << distance << "\n";
+    std::cerr << "getDistance (positive elevation) is not behaving as expected: " << distance
+              << "\n";
     return EXIT_FAILURE;
   }
 
   if (!compareDouble(azimuth, 90.0))
   {
-    std::cerr << "getWorldAzimuth (positive elevation) is not behaving as expected: " << azimuth << "\n";
+    std::cerr << "getWorldAzimuth (positive elevation) is not behaving as expected: " << azimuth
+              << "\n";
     return EXIT_FAILURE;
   }
 
@@ -167,7 +172,8 @@ int TestSDKCamera([[maybe_unused]] int argc, char* argv[])
 
   if (!compareDouble(distance, std::sqrt(11.0 * 11.0 + 11.0 * 11.0)))
   {
-    std::cerr << "getDistance (negative elevation) is not behaving as expected: " << distance << "\n";
+    std::cerr << "getDistance (negative elevation) is not behaving as expected: " << distance
+              << "\n";
     return EXIT_FAILURE;
   }
 
@@ -196,19 +202,22 @@ int TestSDKCamera([[maybe_unused]] int argc, char* argv[])
 
   if (!compareDouble(distance, 11.0))
   {
-    std::cerr << "getDistance (custom up) is not behaving as expected: " << distance << "\n";
+    std::cerr << "getDistance (custom up) is not behaving as expected: " << distance
+              << "\n";
     return EXIT_FAILURE;
   }
 
   if (!compareDouble(azimuth, 0.0))
   {
-    std::cerr << "getWorldAzimuth (custom up) is not behaving as expected: " << azimuth << "\n";
+    std::cerr << "getWorldAzimuth (custom up) is not behaving as expected: " << azimuth
+              << "\n";
     return EXIT_FAILURE;
   }
 
   if (!compareDouble(elevation, 0.0))
   {
-    std::cerr << "getWorldElevation (custom up) is not behaving as expected: " << elevation << "\n";
+    std::cerr << "getWorldElevation (custom up) is not behaving as expected: " << elevation
+              << "\n";
     return EXIT_FAILURE;
   }
 
@@ -222,15 +231,15 @@ int TestSDKCamera([[maybe_unused]] int argc, char* argv[])
 
   if (!compareDouble(azimuth, 0.0))
   {
-    std::cerr << "getWorldAzimuth with zero direction vector should return 0: "
-              << azimuth << "\n";
+    std::cerr << "getWorldAzimuth with zero direction vector should return 0: " << azimuth
+              << "\n";
     return EXIT_FAILURE;
   }
 
   if (!compareDouble(elevation, 0.0))
   {
-    std::cerr << "getWorldElevation with zero direction vector should return 0: "
-              << elevation << "\n";
+    std::cerr << "getWorldElevation with zero direction vector should return 0: " << elevation
+              << "\n";
     return EXIT_FAILURE;
   }
 
