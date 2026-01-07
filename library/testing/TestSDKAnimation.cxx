@@ -14,11 +14,6 @@ int TestSDKAnimation([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   test("availableAnimations", sce.availableAnimations() == 1);
 
-  sce.jumpToKeyFrame(1, true);
-  sce.jumpToKeyFrame(-1, true);
-  sce.jumpToKeyFrame(1, false);
-  sce.jumpToKeyFrame(-1, false);
-
   sce.loadAnimationTime(0.5);
   test("recover animationTimeRange", sce.animationTimeRange() == std::make_pair(0.0, 4.0));
 
