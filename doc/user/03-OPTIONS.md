@@ -569,6 +569,8 @@ The destination filename used by `--output` or to save screenshots using `--scre
 - `{date:format}`: current date as per C++'s `std::put_time` format
 - `{n}`: auto-incremented number to make filename unique (up to 1000000)
 - `{n:2}`, `{n:3}`, ...: zero-padded auto-incremented number to make filename unique (up to 1000000)
+- `{frame}`: frame number when outputting animation frames (see [Animations](05-ANIMATIONS.md))
+- `{frame:4}`, `{frame:5}`, ...: zero-padded frame number when outputting animation frames
 - variable names can be escaped by doubling the braces (eg. use `{{model}}.png` to output `{model}.png` without the model name being substituted)
 
 For example the screenshot filename is configured as `{app}/{model}_{n}.png` by default, meaning that, assuming the model `hello.glb` is being viewed,

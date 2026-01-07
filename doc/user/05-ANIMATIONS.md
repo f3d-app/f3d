@@ -34,8 +34,32 @@ F3D animation behavior can be fully controlled from the command line using the f
 | \-\-animation\-indices       |                     | Select the animations to play.                  |
 | \-\-animation\-indices=-1    |                     | Play all animations at once (only if supported) |
 | \-\-animation\-speed\-factor | Time Unit = Seconds | Adjust time unit.                               |
-| \-\-animation\-frame\-rate   | 60 FPS              | Adjust animation frame rate.                    |
+| \-\-frame\-rate              | 60 FPS              | Adjust animation frame rate.                    |
 | \-\-animation\-time          |                     | Load a specific time value on start.            |
+
+## Exporting animation frames
+
+F3D can export multiple frames from an animation to image files. To do this, include `{frame}` in the output filename template:
+
+```bash
+f3d example.file --output=frame_{frame:04}.png
+```
+
+This will save frames as `frame_0000.png`, `frame_0001.png`, etc.
+
+The number of frames is determined by `--frame-rate`
+
+```bash
+f3d example.file --output=frame_{frame}.png --frame-rate=30
+```
+
+Use `--animation-time` to start exporting from a specific time instead of the beginning:
+
+```bash
+f3d example.file --output=frame_{frame}.png --frame-rate=10 --animation-time=1.5
+```
+
+See [Filename templating](03-OPTIONS.md#filename-templating) for more template variables.
 
 ## Animation Interactions
 
