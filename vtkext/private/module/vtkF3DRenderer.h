@@ -11,6 +11,8 @@
 #ifndef vtkF3DRenderer_h
 #define vtkF3DRenderer_h
 
+#include "F3DStyle.h"
+
 #include "vtkF3DMetaImporter.h"
 #include "vtkF3DUIActor.h"
 
@@ -19,20 +21,22 @@
 #include <vtkOpenGLRenderer.h>
 #include <vtkVersion.h>
 
+#include <array>
 #include <filesystem>
 #include <map>
 #include <optional>
 
 namespace fs = std::filesystem;
 
-class vtkDiscretizableColorTransferFunction;
+class vtkCameraOrientationRepresentation;
+class vtkCameraOrientationWidget;
 class vtkColorTransferFunction;
 class vtkCornerAnnotation;
+class vtkDiscretizableColorTransferFunction;
+class vtkF3DOpenGLGridMapper;
 class vtkGridAxesActor3D;
 class vtkImageReader2;
 class vtkOrientationMarkerWidget;
-class vtkCameraOrientationRepresentation;
-class vtkCameraOrientationWidget;
 class vtkScalarBarActor;
 class vtkSkybox;
 class vtkTextActor;
@@ -115,6 +119,8 @@ public:
   void SetGridUnitSquare(const std::optional<double>& unitSquare);
   void SetGridSubdivisions(int subdivisions);
   void SetGridColor(const std::vector<double>& color);
+  void SetAxesColor(const std::vector<double>& colorXAxis, const std::vector<double>& colorYAxis,
+    const std::vector<double>& colorZAxis);
   ///@}
 
   /**
@@ -203,10 +209,9 @@ public:
   void Initialize();
 
   /**
-   * Initialize actors properties related to the up vector using the provided upString, including
-   * the camera
+   * Initialize the camera position based on the given up direction.
    */
-  void InitializeUpVector(const std::vector<double>& upVec);
+  void InitializeUpDirection(const std::vector<double>& upVec);
 
   /**
    * Compute bounds of visible props as transformed by given matrix.
@@ -228,12 +233,12 @@ public:
   /**
    * Get up vector
    */
-  vtkGetVector3Macro(UpVector, double);
+  vtkGetVector3Macro(UpDirection, double);
 
   /**
    * Set/Get right vector
    */
-  vtkGetVector3Macro(RightVector, double);
+  vtkGetVector3Macro(RightDirection, double);
 
   /**
    * Set cache path, only used by the HDRI logic
@@ -368,6 +373,12 @@ public:
   void SetColormapDiscretization(std::optional<int> discretization);
 
   /**
+   * Set the opacity map to use
+   * Setting an empty vector will use default opacity map
+   */
+  void SetOpacityMap(const std::vector<double>& opacityMap);
+
+  /**
    * Set the meta importer to recover coloring information from
    */
   void SetImporter(vtkF3DMetaImporter* importer);
@@ -403,6 +414,13 @@ public:
   void SetComponentForColoring(int component);
   vtkGetMacro(ComponentForColoring, int);
   ///@}
+
+  /**
+   * Set the pending up direction. Stores the direction and marks
+   * the up vector as needing configuration.
+   * Actual configuration (camera rotation, skybox, environment) happens in UpdateActors.
+   */
+  void SetPendingUpDirection(const std::vector<double>& upVec);
 
   /**
    * Get information about the current coloring
@@ -448,6 +466,11 @@ public:
    * Should be called before Render() if CheatSheetInfoNeedsUpdate() returns true.
    */
   void ConfigureCheatSheet(const std::vector<vtkF3DUIActor::CheatSheetGroup>& info);
+
+  /**
+   * Configure Axes (X,Y,Z) colors on the widget
+   */
+  void ConfigureAxesActor();
 
   /**
    * Use this method to flag in the renderer that the cheatsheet needs to be updated
@@ -504,6 +527,12 @@ private:
   ///@}
 
   /**
+   * Apply the given up vector to the scene, computing an appropriate right vector.
+   * Updates UpDirection, RightDirection, skybox floor, and environment orientation.
+   */
+  void ApplyUpDirection(const std::array<double, 3>& up);
+
+  /**
    * Configure all actors properties
    */
   void ConfigureActorsProperties();
@@ -522,6 +551,12 @@ private:
    * Configure the different render passes
    */
   void ConfigureRenderPasses();
+
+  /**
+   * Rotate camera and apply up direction to scene.
+   * Called from UpdateActors when UpDirectionConfigured is false.
+   */
+  void ConfigureUpDirection();
 
   /**
    * Create a cache directory if a HDRIHash is set
@@ -545,8 +580,15 @@ private:
    * Return true if they were configured for coloring, false otherwise.
    */
   static bool ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vtkVolume* volume,
-    const std::string& name, int component, vtkColorTransferFunction* ctf, double range[2],
+    const std::string& name, int component, vtkColorTransferFunction* ctf,
+    const std::vector<double>& opacityMap, double range[2], bool& opacityTransferFunctionConfigured,
     bool cellFlag = false, bool inverseOpacityFlag = false);
+
+  /**
+   * Configure opacity transfer function for volume rendering
+   */
+  static void ConfigureOpacityTransferFunction(vtkPiecewiseFunction* otf, double range[2],
+    const std::vector<double>& opacityMap, bool inverseOpacityFlag);
 
   /**
    * Configure screen spaced jittering for TAA
@@ -598,6 +640,7 @@ private:
 #endif
 
   vtkNew<vtkActor> GridActor;
+  vtkNew<vtkF3DOpenGLGridMapper> GridMapper;
   vtkNew<vtkSkybox> SkyboxActor;
   vtkNew<vtkF3DUIActor> UIActor;
 
@@ -605,8 +648,10 @@ private:
 
   bool CheatSheetConfigured = false;
   bool ActorsPropertiesConfigured = false;
+  bool UpDirectionConfigured = false;
   bool GridConfigured = false;
   bool GridAxesConfigured = false;
+  bool AxesActorConfigured = false;
   bool RenderPassesConfigured = false;
   bool LightIntensitiesConfigured = false;
   bool TextActorsConfigured = false;
@@ -650,14 +695,19 @@ private:
   bool InvertZoom = false;
 
   int RaytracingSamples = 0;
-  double UpVector[3] = { 0.0, 1.0, 0.0 };
-  double RightVector[3] = { 1.0, 0.0, 0.0 };
+  double UpDirection[3] = { 0.0, 1.0, 0.0 };
+  double RightDirection[3] = { 1.0, 0.0, 0.0 };
+  double PendingUpDirection[3] = { 0.0, 1.0, 0.0 };
   double CircleOfConfusionRadius = 20.0;
   std::optional<double> PointSize;
   std::optional<double> LineWidth;
   std::optional<double> GridUnitSquare;
   int GridSubdivisions = 10;
   double GridColor[3] = { 0.0, 0.0, 0.0 };
+
+  double ColorAxisX[3] = { 0.0, 0.0, 0.0 };
+  double ColorAxisY[3] = { 0.0, 0.0, 0.0 };
+  double ColorAxisZ[3] = { 0.0, 0.0, 0.0 };
 
   std::string HDRIFile;
   vtkSmartPointer<vtkImageReader2> HDRIReader;
@@ -716,6 +766,7 @@ private:
   bool UsingExpandingRange = true;
   double ColorRange[2] = { 0.0, 1.0 };
   bool ColorTransferFunctionConfigured = false;
+  bool OpacityTransferFunctionConfigured = false;
 
   bool EnableColoring = false;
   bool UseCellColoring = false;
@@ -730,6 +781,8 @@ private:
   std::optional<std::vector<double>> UserScalarBarRange;
   std::vector<double> Colormap;
   std::optional<int> ColormapDiscretization;
+
+  std::vector<double> OpacityMap;
 
   int TaaHaltonNumerator[2] = { 0, 0 };
   int TaaHaltonDenominator[2] = { 1, 1 };

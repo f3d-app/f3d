@@ -215,6 +215,7 @@ runs:
         -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
         -DCMAKE_MODULE_PATH=${{ (runner.os != 'Windows' || matrix.vtk_version != 'v9.3.0') && inputs.optional_deps_label == 'optional-deps' && '$(pwd)/../dependencies/install/lib/cmake/OpenVDB/' || '' }}
         -DCMAKE_PREFIX_PATH:PATH=$(pwd)/../dependencies/install/
+        -DF3D_BINDINGS_C=ON
         -DF3D_BINDINGS_JAVA=${{ (runner.os != 'macOS' || inputs.cpu == 'arm64') && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_BINDINGS_PYTHON=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_BINDINGS_PYTHON_GENERATE_STUBS=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
@@ -236,6 +237,7 @@ runs:
         -DF3D_PLUGIN_BUILD_OCCT=${{ inputs.optional_deps_label == 'optional-deps' && inputs.static_label == 'no-static' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_USD=${{ inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_PLUGIN_BUILD_VDB=${{ (runner.os != 'Windows' || matrix.vtk_version != 'v9.3.0') && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
+        -DF3D_PLUGIN_OCCT_COLORING_SUPPORT=${{ inputs.occt_version != 'V7_6_3' && 'ON' || 'OFF' }}
         -DF3D_STRICT_BUILD=ON
         -DF3D_TESTING_ENABLE_EGL_TESTS=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
         -DF3D_TESTING_ENABLE_EXTERNAL_GLFW=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto') && 'ON' || 'OFF' }}
@@ -300,7 +302,7 @@ runs:
         runner.os == 'macOS' &&
         inputs.cpu == 'arm64'
       shell: bash
-      run: echo "F3D_CTEST_EXCEPTIONS=(TestDepthPeelingToneMapping)|(TestDepthPeeling)|(TestTextureColor)|(TestDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)|(TestInteractionActors)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionAnimationSlow)|(TestInteractionConfigFileInteractions)|(TestGLTFRigArmature)|(TestInteractionRollCameraRotation)|(TestInteractionDragRotateVertical)|(TestInteractionCheatsheetConfigFile)|(TestInteractionCheatsheetWhiteBG)|(TestInteractionCheatsheetBlackBG)|(TestInteractionCheatsheetNoFile)|(TestInteractionCheatsheetOpacity)|(TestInteractionCheatsheetAnimationName)|(TestInteractionCheatsheetSSAA)|(TestMaxSizeAboveMultiFile)" >> $GITHUB_ENV
+      run: echo "F3D_CTEST_EXCEPTIONS=(TestDepthPeelingToneMapping)|(TestDepthPeeling)|(TestTextureColor)|(TestDXF)|(TestScalarsCell)|(TestXCAFColors)|(TestGrid)|(TestConfig)|(TestGLTFDracoImporter)|(TestInteractionActors)|(TestInteractionFocalPointPickingPoints)|(TestInteractionCycleAnimation)|(TestInteractionAnimationSlow)|(TestInteractionConfigFileInteractions)|(TestGLTFRigArmature)|(TestInteractionRollCameraRotation)|(TestInteractionDragRotateVertical)|(TestInteractionCheatsheetConfigFile)|(TestInteractionCheatsheetWhiteBG)|(TestInteractionCheatsheetBlackBG)|(TestInteractionCheatsheetNoFile)|(TestInteractionCheatsheetOpacity)|(TestInteractionCheatsheetAnimationName)|(TestInteractionCheatsheetSSAA)|(TestMaxSizeAboveMultiFile)|(TestAxesCustomColor)" >> $GITHUB_ENV
 
     - name: Test
       shell: bash
@@ -343,7 +345,7 @@ runs:
         cmake -Werror=dev -Werror=deprecated --warn-uninitialized -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d -DCMAKE_PREFIX_PATH:PATH=$(pwd)/dependencies/install/ -DBUILD_TESTING=ON -B build_python source/python
         cmake --build build_python --config Release
 
-    - name: Configure libf3d examples
+    - name: Configure libf3d examples (C++, C, Java)
       if: inputs.static_label == 'no-static'
       shell: bash
       working-directory: ${{github.workspace}}
@@ -352,6 +354,8 @@ runs:
         -B build_examples -S source/examples/libf3d
         -Df3d_DIR:PATH=$(pwd)/install/lib/cmake/f3d
         -DBUILD_TESTING=ON
+        -DF3D_ENABLE_C_EXAMPLES=ON
+        -DF3D_ENABLE_JAVA_EXAMPLES=${{ (runner.os != 'macOS' || inputs.cpu == 'arm64') && inputs.optional_deps_label == 'optional-deps' && 'ON' || 'OFF' }}
         -DF3D_EXAMPLES_EXTERNAL_GLFW=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto' && inputs.vtk_version != 'v9.3.0') && 'ON' || 'OFF' }}
         -DF3D_EXAMPLES_EXTERNAL_QT=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto' && inputs.vtk_version != 'v9.3.0') && 'ON' || 'OFF' }}
         -DF3D_EXAMPLES_EXTERNAL_FLTK=${{ (runner.os == 'Linux' && inputs.rendering_backend == 'auto' && inputs.vtk_version != 'v9.3.0') && 'ON' || 'OFF' }}

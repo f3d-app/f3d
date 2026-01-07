@@ -8,6 +8,8 @@
 #include <vtkObjectFactory.h>
 #include <vtkPointData.h>
 #include <vtkPoints.h>
+#include <vtkPolyLine.h>
+#include <vtkResourceStream.h>
 #include <vtkSmartPointer.h>
 #include <vtkStreamingDemandDrivenPipeline.h>
 
@@ -261,18 +263,23 @@ public:
 
       this->SetupIndicesStorage(faceVertexCounts, originalData.Indices);
 
+      // By default, Alembic is CW while VTK is CCW
+      // So we need to reverse the order of indices only if the mesh is not mirrored
+      const bool doReverseRotate = matrix.determinant() > 0;
+
       // Positions
       {
         V3fContainer pV3F;
         for (size_t pIndex = 0; pIndex < positions->size(); pIndex++)
         {
-          const Alembic::Abc::V3f tp = positions->get()[pIndex] * matrix;
+          Alembic::Abc::V3f tp;
+          matrix.multVecMatrix(positions->get()[pIndex], tp);
           pV3F.emplace_back(tp.x, tp.y, tp.z);
         }
         originalData.Attributes.insert(AttributesContainer::value_type("P", pV3F));
 
         this->UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
-          facePositionIndices, pIndicesOffset, originalData.Indices);
+          facePositionIndices, pIndicesOffset, originalData.Indices, doReverseRotate);
       }
 
       // Texture coordinate
@@ -295,12 +302,12 @@ public:
           {
             originalData.uvFaceVarying = true;
             this->UpdateIndices<Alembic::AbcGeom::UInt32ArraySamplePtr>(
-              uvIndices, uvIndicesOffset, originalData.Indices);
+              uvIndices, uvIndicesOffset, originalData.Indices, doReverseRotate);
           }
           else
           {
             this->UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
-              facePositionIndices, uvIndicesOffset, originalData.Indices);
+              facePositionIndices, uvIndicesOffset, originalData.Indices, doReverseRotate);
           }
         }
       }
@@ -317,8 +324,9 @@ public:
           Alembic::AbcGeom::UInt32ArraySamplePtr normalIndices = normalValue.getIndices();
           for (size_t index = 0; index < normalValue.getVals()->size(); ++index)
           {
-            Alembic::AbcGeom::V3f normal = (*(normalValue.getVals()))[index];
-            normal_v3f.emplace_back(normal[0], normal[1], normal[2]);
+            Alembic::AbcGeom::V3f normal;
+            matrix.multDirMatrix((*(normalValue.getVals()))[index], normal);
+            normal_v3f.emplace_back(normal);
           }
           originalData.Attributes.insert(AttributesContainer::value_type("N", normal_v3f));
 
@@ -327,12 +335,12 @@ public:
             originalData.nFaceVarying = true;
 
             this->UpdateIndices<Alembic::AbcGeom::UInt32ArraySamplePtr>(
-              normalIndices, nIndicesOffset, originalData.Indices);
+              normalIndices, nIndicesOffset, originalData.Indices, doReverseRotate);
           }
           else
           {
             this->UpdateIndices<Alembic::AbcGeom::Int32ArraySamplePtr>(
-              facePositionIndices, nIndicesOffset, originalData.Indices);
+              facePositionIndices, nIndicesOffset, originalData.Indices, doReverseRotate);
           }
         }
       }
@@ -344,6 +352,53 @@ public:
 
     this->FillPolyData(duplicatedData, polydata);
 
+    return polydata;
+  }
+
+  vtkSmartPointer<vtkPolyData> ProcessICurves(
+    const Alembic::AbcGeom::ICurves& curve, double time, const Alembic::Abc::M44d& matrix)
+  {
+    vtkNew<vtkPolyData> polydata;
+
+    const Alembic::AbcGeom::ICurvesSchema& schema = curve.getSchema();
+    Alembic::AbcGeom::ICurvesSchema::Sample samp;
+
+    if (schema.getNumSamples() > 0)
+    {
+      Alembic::AbcGeom::ISampleSelector selector(time);
+      schema.get(samp, selector);
+
+      Alembic::AbcGeom::P3fArraySamplePtr positions = samp.getPositions();
+      Alembic::AbcGeom::Int32ArraySamplePtr curveCounts = samp.getCurvesNumVertices();
+
+      vtkNew<vtkPoints> points;
+      vtkNew<vtkCellArray> lines;
+
+      for (size_t pIndex = 0; pIndex < positions->size(); ++pIndex)
+      {
+        const Alembic::Abc::V3f& tp = positions->get()[pIndex] * matrix;
+        points->InsertNextPoint(tp.x, tp.y, tp.z);
+      }
+
+      size_t pOffsetIndex = 0;
+      for (size_t cIndex = 0; cIndex < curveCounts->size(); ++cIndex)
+      {
+        const size_t vCount = curveCounts->get()[cIndex];
+
+        vtkNew<vtkPolyLine> polyLine;
+        polyLine->GetPointIds()->SetNumberOfIds(vCount);
+        for (size_t j = 0; j < vCount; ++j)
+        {
+          polyLine->GetPointIds()->SetId(j, pOffsetIndex + j);
+        }
+
+        lines->InsertNextCell(polyLine);
+        pOffsetIndex += vCount;
+      }
+
+      polydata->SetPoints(points);
+      polydata->SetLines(lines);
+    }
     return polydata;
   }
 
@@ -373,13 +428,18 @@ public:
         const Alembic::AbcGeom::IPolyMesh polymesh(parent, ohead.getName());
         append->AddInputData(this->ProcessIPolyMesh(polymesh, time, objMatrix));
       }
+      else if (Alembic::AbcGeom::ICurves::matches(ohead))
+      {
+        const Alembic::AbcGeom::ICurves curve(parent, ohead.getName());
+        append->AddInputData(this->ProcessICurves(curve, time, objMatrix));
+      }
       else if (Alembic::AbcGeom::IXform::matches(ohead))
       {
         const Alembic::AbcGeom::IXform xForm(parent, ohead.getName());
         const Alembic::AbcGeom::IXformSchema& xFormSchema = xForm.getSchema();
         Alembic::AbcGeom::XformSample xFormSamp;
         xFormSchema.get(xFormSamp, selector);
-        objMatrix = matrix * xFormSamp.getMatrix();
+        objMatrix = xFormSamp.getMatrix() * matrix;
       }
 
       objects.pop();
@@ -421,6 +481,13 @@ public:
         ts = schema.getTimeSampling();
         numSamples = static_cast<int>(schema.getNumSamples());
       }
+      else if (Alembic::AbcGeom::ICurves::matches(ohead))
+      {
+        const Alembic::AbcGeom::ICurves curves(parent, ohead.getName());
+        const Alembic::AbcGeom::ICurvesSchema& schema = curves.getSchema();
+        ts = schema.getTimeSampling();
+        numSamples = static_cast<int>(schema.getNumSamples());
+      }
 
       objects.pop();
       for (size_t i = 0; i < obj.getNumChildren(); ++i)
@@ -449,17 +516,51 @@ public:
     }
   }
 
-  void ReadArchive(const std::string& filePath)
+  bool ReadArchive(
+    vtkResourceStream* stream, const std::string& filePath, [[maybe_unused]] vtkObject* parent)
   {
     Alembic::AbcCoreFactory::IFactory factory;
     Alembic::AbcCoreFactory::IFactory::CoreType coreType;
 
-    this->Archive = factory.getArchive(filePath, coreType);
+    if (stream)
+    {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251210)
+      // Encapsulate resource stream into an istream
+      stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+      this->Streambuf = stream->ToStreambuf();
+      this->Buffer = std::make_unique<std::istream>(this->Streambuf.get());
+      try
+      {
+        this->Archive =
+          factory.getArchive(std::vector<std::istream*>({ this->Buffer.get() }), coreType);
+      }
+      catch (Alembic::Util::v12::Exception& ex)
+      {
+        vtkErrorWithObjectMacro(parent, "Error reading stream: " << ex.what());
+        return false;
+      }
+#else
+      vtkErrorWithObjectMacro(
+        parent, "This version of VTK doesn't support reading memory stream with Alembic");
+      return false;
+#endif
+    }
+    else
+    {
+      this->Archive = factory.getArchive(filePath, coreType);
+    }
+    return this->Archive.valid();
   }
   Alembic::Abc::IArchive Archive;
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251210)
+  std::unique_ptr<std::streambuf> Streambuf;
+  std::unique_ptr<std::istream> Buffer;
+#endif
 };
 
 vtkStandardNewMacro(vtkF3DAlembicReader);
+vtkCxxSetSmartPointerMacro(vtkF3DAlembicReader, Stream, vtkResourceStream);
 
 //----------------------------------------------------------------------------
 vtkF3DAlembicReader::vtkF3DAlembicReader()
@@ -475,14 +576,17 @@ vtkF3DAlembicReader::~vtkF3DAlembicReader() = default;
 int vtkF3DAlembicReader::RequestInformation(vtkInformation* vtkNotUsed(request),
   vtkInformationVector** vtkNotUsed(inputVector), vtkInformationVector* outputVector)
 {
-  vtkInformation* outInfo = outputVector->GetInformationObject(0);
-
-  this->Internals->ReadArchive(this->FileName);
+  if (!this->Internals->ReadArchive(this->Stream, this->FileName, this))
+  {
+    vtkErrorMacro("Unable to read this alembic file or stream");
+    return 0;
+  }
 
   double timeRange[2] = { std::numeric_limits<double>::infinity(),
     -std::numeric_limits<double>::infinity() };
   this->Internals->ExtendTimeRange(timeRange[0], timeRange[1]);
 
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
   if (timeRange[0] < timeRange[1])
   {
     outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange, 2);
@@ -515,8 +619,12 @@ int vtkF3DAlembicReader::RequestData(
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DAlembicReader::PrintSelf(ostream& os, vtkIndent indent)
+vtkMTimeType vtkF3DAlembicReader::GetMTime()
 {
-  this->Superclass::PrintSelf(os, indent);
-  os << indent << "FileName: " << this->FileName << "\n";
+  auto mtime = this->Superclass::GetMTime();
+  if (this->Stream)
+  {
+    mtime = std::max(mtime, this->Stream->GetMTime());
+  }
+  return mtime;
 }

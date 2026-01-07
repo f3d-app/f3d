@@ -7,10 +7,10 @@
 #include "window_impl.h"
 
 #include "F3DStyle.h"
+#include "vtkF3DMetaImporter.h"
 #include "vtkF3DRenderer.h"
 
 #include <vtkDoubleArray.h>
-#include <vtkImporter.h>
 #include <vtkProgressBarRepresentation.h>
 #include <vtkRenderWindow.h>
 #include <vtkRendererCollection.h>
@@ -31,7 +31,7 @@ animationManager::animationManager(options& options, window_impl& window)
 }
 
 //----------------------------------------------------------------------------
-void animationManager::SetImporter(vtkImporter* importer)
+void animationManager::SetImporter(vtkF3DMetaImporter* importer)
 {
   this->Importer = importer;
 }
@@ -40,6 +40,12 @@ void animationManager::SetImporter(vtkImporter* importer)
 void animationManager::SetInteractor(interactor_impl* interactor)
 {
   this->Interactor = interactor;
+}
+
+//----------------------------------------------------------------------------
+void animationManager::SetDeltaTime(double deltaTime)
+{
+  this->DeltaTime = deltaTime;
 }
 
 //----------------------------------------------------------------------------
@@ -160,11 +166,12 @@ void animationManager::ToggleAnimation()
 }
 
 //----------------------------------------------------------------------------
-void animationManager::Tick(double deltaTime)
+void animationManager::Tick()
 {
+  assert(this->DeltaTime > 0);
   if (this->Playing)
   {
-    this->CurrentTime += deltaTime * this->SpeedFactor;
+    this->CurrentTime += (this->DeltaTime * this->SpeedFactor) * this->AnimationDirection;
 
     // Modulo computation, compute CurrentTime in the time range.
     if (this->CurrentTime < this->TimeRange[0] || this->CurrentTime > this->TimeRange[1])
@@ -182,6 +189,35 @@ void animationManager::Tick(double deltaTime)
     {
       this->Window.render();
     }
+  }
+}
+
+//----------------------------------------------------------------------------
+void animationManager::JumpToFrame(int frame, bool relative)
+{
+  assert(this->DeltaTime > 0);
+  const double frameDuration = (this->DeltaTime * this->SpeedFactor);
+  const double currentFrame = (this->CurrentTime - this->TimeRange[0]) / frameDuration;
+
+  double nextFrame = 0;
+  if (relative)
+  {
+    nextFrame = currentFrame + frame;
+  }
+  else if (frame >= 0)
+  {
+    nextFrame = frame;
+  }
+  else
+  {
+    nextFrame = (this->TimeRange[1] - this->TimeRange[0]) / frameDuration;
+  }
+
+  this->CurrentTime = this->TimeRange[0] + (nextFrame * this->DeltaTime * this->SpeedFactor);
+
+  if (this->LoadAtTime(this->CurrentTime))
+  {
+    this->Window.render();
   }
 }
 
@@ -500,7 +536,7 @@ void animationManager::PrepareForAnimationIndices()
       double timeRange[2];
       int nbTimeSteps;
       vtkNew<vtkDoubleArray> timeSteps;
-      this->Importer->GetTemporalInformation(animIndex, 0, nbTimeSteps, timeRange, timeSteps);
+      this->Importer->GetTemporalInformation(animIndex, timeRange, nbTimeSteps, timeSteps);
 
       // Accumulate time ranges
       this->TimeRange[0] = std::min(timeRange[0], this->TimeRange[0]);
@@ -567,6 +603,13 @@ void animationManager::SetSpeedFactor(double speedFactor)
     this->SpeedFactor = speedFactor;
     this->SetCheatSheetConfigured(false);
   }
+}
+
+//----------------------------------------------------------------------------
+void animationManager::SetAnimationDirection(int direction)
+{
+  assert(direction == 1 || direction == -1);
+  this->AnimationDirection = direction;
 }
 
 //----------------------------------------------------------------------------

@@ -30,7 +30,7 @@ include(f3dVersion)
 
 # Handle F3D_VERSION
 set(F3D_MAJOR_VERSION 3)
-set(F3D_MINOR_VERSION 3)
+set(F3D_MINOR_VERSION 4)
 set(F3D_PATCH_VERSION 0)
 set(F3D_VERSION ${F3D_MAJOR_VERSION}.${F3D_MINOR_VERSION}.${F3D_PATCH_VERSION})
 
@@ -137,9 +137,11 @@ cmake_dependent_option(BUILD_SHARED_LIBS "Build f3d with shared libraries" ON "N
 set(F3D_STRICT_BUILD OFF CACHE BOOL "Use strict warnings and errors flags for building F3D")
 mark_as_advanced(F3D_STRICT_BUILD)
 set(f3d_strict_build_compile_options "")
+set(f3d_strict_build_link_options "")
 if(F3D_STRICT_BUILD)
   if(MSVC)
     set(f3d_strict_build_compile_options /W4 /WX)
+    set(f3d_strict_build_link_options /WX)
   else()
     set(f3d_strict_build_compile_options -Wall -Wextra -Wshadow -Woverloaded-virtual -Wno-deprecated -Wno-strict-overflow -Wno-array-bounds -Wunreachable-code -Wno-missing-field-initializers -Wno-unused-parameter -Wredundant-decls -Wpointer-arith -Werror)
     if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -189,6 +191,7 @@ set(f3d_link_options_public "")
 
 ## F3D_STRICT_BUILD
 list(APPEND f3d_compile_options_private ${f3d_strict_build_compile_options})
+list(APPEND f3d_link_options_public ${f3d_strict_build_link_options})
 
 ## Coverage
 list(APPEND f3d_compile_options_public ${f3d_coverage_compile_options})
@@ -266,6 +269,12 @@ if(F3D_WINDOWS_BUILD_SHELL_THUMBNAILS_EXTENSION)
   add_subdirectory(winshellext)
 endif()
 
+# C bindings
+option(F3D_BINDINGS_C "Create C bindings" OFF)
+if(F3D_BINDINGS_C)
+  add_subdirectory(c)
+endif()
+
 # Python bindings
 option(F3D_BINDINGS_PYTHON "Create Python bindings" OFF)
 if(F3D_BINDINGS_PYTHON)
@@ -314,6 +323,7 @@ function(f3d_report_variable f3d_var)
   message(STATUS "${f3d_var}: ${${f3d_var}}")
 endfunction()
 
+f3d_report_variable(F3D_BINDINGS_C)
 f3d_report_variable(F3D_BINDINGS_JAVA)
 f3d_report_variable(F3D_BINDINGS_PYTHON)
 f3d_report_variable(F3D_BUILD_APPLICATION)

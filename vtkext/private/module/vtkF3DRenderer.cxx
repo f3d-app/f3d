@@ -31,6 +31,7 @@
 #include <vtkLightCollection.h>
 #include <vtkLightKit.h>
 #include <vtkMath.h>
+#include <vtkMathUtilities.h>
 #include <vtkMatrix4x4.h>
 #include <vtkMultiBlockDataSet.h>
 #include <vtkObjectFactory.h>
@@ -149,7 +150,6 @@ std::string ComputeFileHash(const std::string& filepath)
   return md5Hash;
 }
 
-#ifndef __EMSCRIPTEN__
 //----------------------------------------------------------------------------
 // Download texture from the GPU to a vtkImageData
 vtkSmartPointer<vtkImageData> SaveTextureToImage(
@@ -174,7 +174,6 @@ vtkSmartPointer<vtkImageData> SaveTextureToImage(
 
   return img;
 }
-#endif
 
 //----------------------------------------------------------------------------
 // TODO : add this function in a utils file for rendering in VTK directly
@@ -318,6 +317,7 @@ void vtkF3DRenderer::Initialize()
   this->ExpandingRangeSet = false;
 
   this->ColorTransferFunctionConfigured = false;
+  this->OpacityTransferFunctionConfigured = false;
   this->ColoringMappersConfigured = false;
   this->ColoringPointSpritesMappersConfigured = false;
   this->VolumePropsAndMappersConfigured = false;
@@ -344,65 +344,114 @@ void vtkF3DRenderer::Initialize()
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::InitializeUpVector(const std::vector<double>& upVec)
+void vtkF3DRenderer::ApplyUpDirection(const std::array<double, 3>& up)
 {
-  assert(upVec.size() == 3);
-
-  const auto isNullVector = [](const std::array<double, 3>& v)
-  {
-    constexpr double e = 1e-8;
-    return ::abs(v[0]) < e && ::abs(v[1]) < e && ::abs(v[2]) < e;
-  };
-
-  std::array<double, 3> up = { upVec[0], upVec[1], upVec[2] };
   std::array<double, 3> right = { 1, 0, 0 };
-
-  /* if `up` is `(0,0,0)` make it `(0,1,0)` */
-  if (isNullVector(up))
-  {
-    up[1] = 1.0;
-    F3DLog::Print(F3DLog::Severity::Warning, "null up vector, using (0,0,1) instead");
-  }
-  vtkMath::Normalize(up.data());
-
-  /* make sure `right` is not colinear with `up` */
-  if (::abs(vtkMath::Dot(right, up)) > 0.999)
+  if (std::abs(vtkMath::Dot(right.data(), up.data())) > 0.999)
   {
     right = { 0, 1, 0 };
   }
 
-  /* make `front` orthogonal */
   std::array<double, 3> front;
   vtkMath::Cross(right.data(), up.data(), front.data());
   vtkMath::Normalize(front.data());
 
-  /* ensure `right` is orthogonal */
-  vtkMath::Cross(up.data(), front.data(), right.data());
-  vtkMath::Normalize(right.data());
+  std::array<double, 3> orthRight;
+  vtkMath::Cross(up.data(), front.data(), orthRight.data());
+  vtkMath::Normalize(orthRight.data());
 
-  this->UpVector[0] = up[0];
-  this->UpVector[1] = up[1];
-  this->UpVector[2] = up[2];
-  this->RightVector[0] = right[0];
-  this->RightVector[1] = right[1];
-  this->RightVector[2] = right[2];
+  std::copy(up.begin(), up.end(), this->UpDirection);
+  std::copy(orthRight.begin(), orthRight.end(), this->RightDirection);
+
+  this->SkyboxActor->SetFloorPlane(up[0], up[1], up[2], 0.0);
+  this->SkyboxActor->SetFloorRight(front[0], front[1], front[2]);
+
+  this->SetEnvironmentUp(this->UpDirection);
+  this->SetEnvironmentRight(this->RightDirection);
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::InitializeUpDirection(const std::vector<double>& upVec)
+{
+  assert(upVec.size() == 3);
+
+  this->SetPendingUpDirection(upVec);
+  this->ConfigureUpDirection();
 
   double pos[3];
-  vtkMath::Cross(this->UpVector, this->RightVector, pos);
+  vtkMath::Cross(this->UpDirection, this->RightDirection, pos);
   vtkMath::MultiplyScalar(pos, -1.0);
 
   vtkCamera* cam = this->GetActiveCamera();
   cam->SetFocalPoint(0.0, 0.0, 0.0);
   cam->SetPosition(pos);
-  cam->SetViewUp(this->UpVector);
+  cam->SetViewUp(this->UpDirection);
+  this->UpDirectionConfigured = true;
+}
 
-  // skybox orientation
-  this->SkyboxActor->SetFloorPlane(this->UpVector[0], this->UpVector[1], this->UpVector[2], 0.0);
-  this->SkyboxActor->SetFloorRight(front[0], front[1], front[2]);
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetPendingUpDirection(const std::vector<double>& upVec)
+{
+  assert(upVec.size() == 3);
 
-  // environment orientation
-  this->SetEnvironmentUp(this->UpVector);
-  this->SetEnvironmentRight(this->RightVector);
+  std::array<double, 3> up = { upVec[0], upVec[1], upVec[2] };
+
+  constexpr double e = 1e-8;
+  if (std::abs(up[0]) < e && std::abs(up[1]) < e && std::abs(up[2]) < e)
+  {
+    up = { 0.0, 1.0, 0.0 };
+  }
+
+  vtkMath::Normalize(up.data());
+
+  if (vtkMathUtilities::FuzzyCompare(up[0], this->PendingUpDirection[0]) &&
+    vtkMathUtilities::FuzzyCompare(up[1], this->PendingUpDirection[1]) &&
+    vtkMathUtilities::FuzzyCompare(up[2], this->PendingUpDirection[2]))
+  {
+    return;
+  }
+
+  std::copy(up.begin(), up.end(), this->PendingUpDirection);
+  this->UpDirectionConfigured = false;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ConfigureUpDirection()
+{
+  std::array<double, 3> newUp = { this->PendingUpDirection[0], this->PendingUpDirection[1],
+    this->PendingUpDirection[2] };
+  std::array<double, 3> oldUp = { this->UpDirection[0], this->UpDirection[1],
+    this->UpDirection[2] };
+
+  std::array<double, 3> axis;
+  vtkMath::Cross(oldUp.data(), newUp.data(), axis.data());
+  double sinAngle = vtkMath::Normalize(axis.data());
+  double cosAngle = vtkMath::Dot(oldUp.data(), newUp.data());
+  double angle = std::atan2(sinAngle, cosAngle) * 180.0 / vtkMath::Pi();
+
+  vtkCamera* cam = this->GetActiveCamera();
+  double foc[3];
+  cam->GetFocalPoint(foc);
+
+  vtkNew<vtkTransform> camTransform;
+  camTransform->Translate(foc[0], foc[1], foc[2]);
+  camTransform->RotateWXYZ(angle, axis.data());
+  camTransform->Translate(-foc[0], -foc[1], -foc[2]);
+
+  double pos[3];
+  cam->GetPosition(pos);
+  camTransform->TransformPoint(pos, pos);
+  cam->SetPosition(pos);
+
+  double viewUp[3];
+  cam->GetViewUp(viewUp);
+  camTransform->TransformVector(viewUp, viewUp);
+  cam->SetViewUp(viewUp);
+
+  this->ApplyUpDirection(newUp);
+
+  this->GridConfigured = false;
+  this->UpDirectionConfigured = true;
 }
 
 //----------------------------------------------------------------------------
@@ -597,6 +646,7 @@ void vtkF3DRenderer::ShowAxis(bool show)
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251001)
     this->ModernAxisWidget = nullptr;
     this->ModernAxisRepresentation = nullptr;
+    this->AxesActorConfigured = false;
 #else
     this->AxisWidget = nullptr;
 #endif
@@ -609,11 +659,6 @@ void vtkF3DRenderer::ShowAxis(bool show)
       this->ModernAxisRepresentation->SetRenderer(this);
       this->ModernAxisRepresentation->AnchorToLowerRight();
       this->ModernAxisRepresentation->ContainerVisibilityOn();
-
-      // Closest colors to red, green, blue in OKHSL space at 95% saturation and 50% lightness
-      this->ModernAxisRepresentation->SetXAxisColor(0.841107, 0.16327, 0.120593);
-      this->ModernAxisRepresentation->SetYAxisColor(0.19516, 0.553311, 0.174);
-      this->ModernAxisRepresentation->SetZAxisColor(0.127357, 0.429147, 0.937383);
 
 #if F3D_MODULE_UI
       auto containerProperty = this->ModernAxisRepresentation->GetContainerProperty();
@@ -647,6 +692,17 @@ void vtkF3DRenderer::ShowAxis(bool show)
     this->RenderPassesConfigured = false;
     this->CheatSheetConfigured = false;
   }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ConfigureAxesActor()
+{
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251001)
+  this->ModernAxisRepresentation->SetXAxisColor(this->ColorAxisX);
+  this->ModernAxisRepresentation->SetYAxisColor(this->ColorAxisY);
+  this->ModernAxisRepresentation->SetZAxisColor(this->ColorAxisZ);
+  this->AxesActorConfigured = true;
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -691,6 +747,24 @@ void vtkF3DRenderer::SetGridColor(const std::vector<double>& color)
     this->GridColor[1] = color[1];
     this->GridColor[2] = color[2];
     this->GridConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetAxesColor(const std::vector<double>& colorXAxis,
+  const std::vector<double>& colorYAxis, const std::vector<double>& colorZAxis)
+{
+  assert(colorXAxis.size() == 3 && colorYAxis.size() == 3 && colorZAxis.size() == 3);
+
+  if (!std::equal(colorXAxis.begin(), colorXAxis.end(), this->ColorAxisX) ||
+    !std::equal(colorYAxis.begin(), colorYAxis.end(), this->ColorAxisY) ||
+    !std::equal(colorZAxis.begin(), colorZAxis.end(), this->ColorAxisZ))
+  {
+    std::copy(colorXAxis.begin(), colorXAxis.end(), this->ColorAxisX);
+    std::copy(colorYAxis.begin(), colorYAxis.end(), this->ColorAxisY);
+    std::copy(colorZAxis.begin(), colorZAxis.end(), this->ColorAxisZ);
+    this->GridConfigured = false;
+    this->AxesActorConfigured = false;
   }
 }
 
@@ -779,14 +853,13 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
              << "]\n\n";
       this->GridInfo = stream.str();
 
-      vtkNew<vtkF3DOpenGLGridMapper> gridMapper;
-      gridMapper->SetFadeDistance(diag);
-      gridMapper->SetUnitSquare(tmpUnitSquare);
-      gridMapper->SetSubdivisions(this->GridSubdivisions);
+      this->GridMapper->SetFadeDistance(diag);
+      this->GridMapper->SetUnitSquare(tmpUnitSquare);
+      this->GridMapper->SetSubdivisions(this->GridSubdivisions);
 
       if (this->GridAbsolute)
       {
-        gridMapper->SetOriginOffset(-center[0], -center[1], -center[2]);
+        this->GridMapper->SetOriginOffset(-center[0], -center[1], -center[2]);
       }
 
       double orientation[3];
@@ -795,11 +868,34 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
       this->GridActor->SetPosition(gridPos);
 
       this->GridActor->GetProperty()->SetColor(this->GridColor);
-      gridMapper->SetAxis1Color(::abs(right[0]), ::abs(right[1]), ::abs(right[2]), 1);
-      gridMapper->SetAxis2Color(::abs(front[0]), ::abs(front[1]), ::abs(front[2]), 1);
+
+      const auto factor = [](const double* v, const double x, const double y, const double z)
+      {
+        const double ref[3] = { x, y, z };
+        return std::abs(vtkMath::Dot(v, ref));
+      };
+      const double fX1 = factor(right, 1, 0, 0);
+      const double fY1 = factor(right, 0, 1, 0);
+      const double fZ1 = factor(right, 0, 0, 1);
+      const double fX2 = factor(front, 1, 0, 0);
+      const double fY2 = factor(front, 0, 1, 0);
+      const double fZ2 = factor(front, 0, 0, 1);
+      const double f1 = fX1 + fY1 + fZ1;
+      const double f2 = fX2 + fY2 + fZ2;
+
+      this->GridMapper->SetAxis1Color( //
+        (this->ColorAxisX[0] * fX1 + this->ColorAxisY[0] * fY1 + this->ColorAxisZ[0] * fZ1) / f1,
+        (this->ColorAxisX[1] * fX1 + this->ColorAxisY[1] * fY1 + this->ColorAxisZ[1] * fZ1) / f1,
+        (this->ColorAxisX[2] * fX1 + this->ColorAxisY[2] * fY1 + this->ColorAxisZ[2] * fZ1) / f1,
+        1);
+      this->GridMapper->SetAxis2Color( //
+        (this->ColorAxisX[0] * fX2 + this->ColorAxisY[0] * fY2 + this->ColorAxisZ[0] * fZ2) / f2,
+        (this->ColorAxisX[1] * fX2 + this->ColorAxisY[1] * fY2 + this->ColorAxisZ[1] * fZ2) / f2,
+        (this->ColorAxisX[2] * fX2 + this->ColorAxisY[2] * fY2 + this->ColorAxisZ[2] * fZ2) / f2,
+        1);
 
       this->GridActor->ForceTranslucentOn();
-      this->GridActor->SetMapper(gridMapper);
+      this->GridActor->SetMapper(this->GridMapper);
       this->GridActor->UseBoundsOff();
       this->GridActor->PickableOff();
       this->GridConfigured = true;
@@ -1287,16 +1383,22 @@ void vtkF3DRenderer::ConfigureHDRILUT()
       }
       assert(lut->GetTextureObject());
 
-#ifndef __EMSCRIPTEN__
-      vtkSmartPointer<vtkImageData> img = ::SaveTextureToImage(
-        lut->GetTextureObject(), GL_TEXTURE_2D, 0, lut->GetLUTSize(), VTK_UNSIGNED_SHORT);
-      assert(img);
+      if (!this->CachePath.empty())
+      {
+        vtkSmartPointer<vtkImageData> img = ::SaveTextureToImage(
+          lut->GetTextureObject(), GL_TEXTURE_2D, 0, lut->GetLUTSize(), VTK_UNSIGNED_SHORT);
+        assert(img);
 
-      vtkNew<vtkXMLImageDataWriter> writer;
-      writer->SetFileName(lutCachePath.c_str());
-      writer->SetInputData(img);
-      writer->Write();
-#endif
+        vtkNew<vtkXMLImageDataWriter> writer;
+        writer->SetFileName(lutCachePath.c_str());
+        writer->SetInputData(img);
+        writer->Write();
+      }
+      else
+      {
+        F3DLog::Print(F3DLog::Severity::Warning,
+          "Cannot cache HDRI LUT texture as no cache path has been set.");
+      }
     }
     this->HasValidHDRILUT = true;
   }
@@ -1331,16 +1433,22 @@ void vtkF3DRenderer::ConfigureHDRISphericalHarmonics()
           vtkTable::SafeDownCast(sh->GetOutputDataObject(0))->GetColumn(0));
       }
 
-#ifndef __EMSCRIPTEN__
-      // Create spherical harmonics cache file
-      vtkNew<vtkTable> table;
-      table->AddColumn(this->SphericalHarmonics);
+      if (!this->CachePath.empty())
+      {
+        // Create spherical harmonics cache file
+        vtkNew<vtkTable> table;
+        table->AddColumn(this->SphericalHarmonics);
 
-      vtkNew<vtkXMLTableWriter> writer;
-      writer->SetInputData(table);
-      writer->SetFileName(shCachePath.c_str());
-      writer->Write();
-#endif
+        vtkNew<vtkXMLTableWriter> writer;
+        writer->SetInputData(table);
+        writer->SetFileName(shCachePath.c_str());
+        writer->Write();
+      }
+      else
+      {
+        F3DLog::Print(F3DLog::Severity::Warning,
+          "Cannot cache HDRI Spherical Harmonics as no cache path has been set.");
+      }
     }
     this->HasValidHDRISH = true;
   }
@@ -1373,30 +1481,36 @@ void vtkF3DRenderer::ConfigureHDRISpecular()
       }
       assert(spec->GetTextureObject());
 
-#ifndef __EMSCRIPTEN__
-      unsigned int nbLevels = spec->GetPrefilterLevels();
-      unsigned int size = spec->GetPrefilterSize();
-
-      vtkNew<vtkMultiBlockDataSet> mb;
-      mb->SetNumberOfBlocks(nbLevels);
-
-      for (unsigned int i = 0; i < nbLevels; i++)
+      if (!this->CachePath.empty())
       {
-        vtkSmartPointer<vtkImageData> img = ::SaveTextureToImage(
-          spec->GetTextureObject(), GL_TEXTURE_CUBE_MAP_POSITIVE_X, i, size >> i, VTK_FLOAT);
-        assert(img);
-        mb->SetBlock(i, img);
-      }
+        unsigned int nbLevels = spec->GetPrefilterLevels();
+        unsigned int size = spec->GetPrefilterSize();
 
-      vtkNew<vtkXMLMultiBlockDataWriter> writer;
-      writer->SetCompressorTypeToNone();
-      writer->SetDataModeToAppended();
-      writer->EncodeAppendedDataOff();
-      writer->SetHeaderTypeToUInt64();
-      writer->SetFileName(specCachePath.c_str());
-      writer->SetInputData(mb);
-      writer->Write();
-#endif
+        vtkNew<vtkMultiBlockDataSet> mb;
+        mb->SetNumberOfBlocks(nbLevels);
+
+        for (unsigned int i = 0; i < nbLevels; i++)
+        {
+          vtkSmartPointer<vtkImageData> img = ::SaveTextureToImage(
+            spec->GetTextureObject(), GL_TEXTURE_CUBE_MAP_POSITIVE_X, i, size >> i, VTK_FLOAT);
+          assert(img);
+          mb->SetBlock(i, img);
+        }
+
+        vtkNew<vtkXMLMultiBlockDataWriter> writer;
+        writer->SetCompressorTypeToNone();
+        writer->SetDataModeToAppended();
+        writer->EncodeAppendedDataOff();
+        writer->SetHeaderTypeToUInt64();
+        writer->SetFileName(specCachePath.c_str());
+        writer->SetInputData(mb);
+        writer->Write();
+      }
+      else
+      {
+        F3DLog::Print(F3DLog::Severity::Warning,
+          "Cannot cache HDRI Specular texture as no cache path has been set.");
+      }
     }
     this->HasValidHDRISpec = true;
   }
@@ -1886,12 +2000,18 @@ void vtkF3DRenderer::UpdateActors()
     this->VolumePropsAndMappersConfigured = false;
     this->ScalarBarActorConfigured = false;
     this->ColoringConfigured = false;
+    this->OpacityTransferFunctionConfigured = false;
   }
   this->ImporterUpdateTimeStamp = importerUpdateMTime;
 
   if (!this->ActorsPropertiesConfigured)
   {
     this->ConfigureActorsProperties();
+  }
+
+  if (!this->UpDirectionConfigured)
+  {
+    this->ConfigureUpDirection();
   }
 
   if (!this->PointSpritesConfigured)
@@ -1924,6 +2044,11 @@ void vtkF3DRenderer::UpdateActors()
   if (!this->RenderPassesConfigured)
   {
     this->ConfigureRenderPasses();
+  }
+
+  if (!this->AxesActorConfigured && this->ModernAxisRepresentation)
+  {
+    this->ConfigureAxesActor();
   }
 
   // Grid need all actors setup to be configured correctly
@@ -2046,11 +2171,14 @@ void vtkF3DRenderer::CreateCacheDirectory()
 {
   assert(this->HasValidHDRIHash);
 
-  // Cache folder for this HDRI
-  std::string currentCachePath = this->CachePath + "/" + this->HDRIHash;
+  if (!this->CachePath.empty())
+  {
+    // Cache folder for this HDRI
+    std::string currentCachePath = this->CachePath + "/" + this->HDRIHash;
 
-  // Create the folder if it does not exists
-  vtksys::SystemTools::MakeDirectory(currentCachePath);
+    // Create the folder if it does not exists
+    vtksys::SystemTools::MakeDirectory(currentCachePath);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -2555,20 +2683,19 @@ void vtkF3DRenderer::SetUseInverseOpacityFunction(bool use)
       if (volume.Prop)
       {
         vtkPiecewiseFunction* pwf = volume.Prop->GetProperty()->GetScalarOpacity();
-        if (pwf->GetSize() == 2)
-        {
-          double range[2];
-          pwf->GetRange(range);
+        double range[2];
+        pwf->GetRange(range);
 
-          pwf->RemoveAllPoints();
-          pwf->AddPoint(range[0], this->UseInverseOpacityFunction ? 1.0 : 0.0);
-          pwf->AddPoint(range[1], this->UseInverseOpacityFunction ? 0.0 : 1.0);
-        }
+        pwf->RemoveAllPoints();
+
+        vtkF3DRenderer::ConfigureOpacityTransferFunction(
+          pwf, range, this->OpacityMap, this->UseInverseOpacityFunction);
       }
     }
     this->VolumePropsAndMappersConfigured = false;
     this->CheatSheetConfigured = false;
     this->ColoringConfigured = false;
+    this->OpacityTransferFunctionConfigured = false;
   }
 }
 
@@ -2622,6 +2749,18 @@ void vtkF3DRenderer::SetColormapDiscretization(std::optional<int> discretization
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetOpacityMap(const std::vector<double>& opacityMap)
+{
+  if (this->OpacityMap != opacityMap)
+  {
+    this->OpacityMap = opacityMap;
+
+    this->OpacityTransferFunctionConfigured = false;
+    this->VolumePropsAndMappersConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetEnableColoring(bool enable)
 {
   if (enable != this->EnableColoring)
@@ -2639,6 +2778,7 @@ void vtkF3DRenderer::SetUseCellColoring(bool useCell)
   {
     this->UseCellColoring = useCell;
     this->ColorTransferFunctionConfigured = false;
+    this->OpacityTransferFunctionConfigured = false;
     this->ColoringMappersConfigured = false;
     this->ColoringPointSpritesMappersConfigured = false;
     this->VolumePropsAndMappersConfigured = false;
@@ -2656,6 +2796,7 @@ void vtkF3DRenderer::SetArrayNameForColoring(const std::optional<std::string>& a
   {
     this->ArrayNameForColoring = arrayName;
     this->ColorTransferFunctionConfigured = false;
+    this->OpacityTransferFunctionConfigured = false;
     this->ColoringMappersConfigured = false;
     this->ColoringPointSpritesMappersConfigured = false;
     this->VolumePropsAndMappersConfigured = false;
@@ -2783,7 +2924,8 @@ void vtkF3DRenderer::ConfigureColoring()
         {
           visible = vtkF3DRenderer::ConfigureVolumeForColoring(volume.Mapper, volume.Prop,
             info.value().Name, this->ComponentForColoring, this->ColorTransferFunction,
-            this->ColorRange, this->UseCellColoring, this->UseInverseOpacityFunction);
+            this->OpacityMap, this->ColorRange, this->OpacityTransferFunctionConfigured,
+            this->UseCellColoring, this->UseInverseOpacityFunction);
           if (!visible)
           {
             F3DLog::Print(F3DLog::Severity::Warning,
@@ -2882,7 +3024,8 @@ bool vtkF3DRenderer::ConfigureMapperForColoring(vtkPolyDataMapper* mapper, const
 
 //----------------------------------------------------------------------------
 bool vtkF3DRenderer::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vtkVolume* volume,
-  const std::string& name, int component, vtkColorTransferFunction* ctf, double range[2],
+  const std::string& name, int component, vtkColorTransferFunction* ctf,
+  const std::vector<double>& opacityMap, double range[2], bool& opacityTransferFunctionConfigured,
   bool cellFlag, bool inverseOpacityFlag)
 {
   vtkDataSetAttributes* data = cellFlag
@@ -2924,9 +3067,13 @@ bool vtkF3DRenderer::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vt
     }
   }
 
-  vtkNew<vtkPiecewiseFunction> otf;
-  otf->AddPoint(range[0], inverseOpacityFlag ? 1.0 : 0.0);
-  otf->AddPoint(range[1], inverseOpacityFlag ? 0.0 : 1.0);
+  vtkPiecewiseFunction* otf = volume->GetProperty()->GetScalarOpacity();
+  if (!opacityTransferFunctionConfigured)
+  {
+    otf->RemoveAllPoints();
+    vtkF3DRenderer::ConfigureOpacityTransferFunction(otf, range, opacityMap, inverseOpacityFlag);
+    opacityTransferFunctionConfigured = true;
+  }
 
   vtkNew<vtkVolumeProperty> property;
   property->SetColor(ctf);
@@ -2936,6 +3083,33 @@ bool vtkF3DRenderer::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vt
 
   volume->SetProperty(property);
   return true;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ConfigureOpacityTransferFunction(vtkPiecewiseFunction* otf, double range[2],
+  const std::vector<double>& opacityMap, bool inverseOpacityFlag)
+{
+  if (!otf)
+  {
+    return;
+  }
+
+  if (opacityMap.size() % 2 != 0 || opacityMap.empty())
+  {
+    F3DLog::Print(F3DLog::Severity::Warning,
+      "Opacity map empty or with an odd number of elements, resetting to default linear opacity "
+      "function");
+    otf->AddPoint(range[0], inverseOpacityFlag ? 1.0 : 0.0);
+    otf->AddPoint(range[1], inverseOpacityFlag ? 0.0 : 1.0);
+  }
+  else
+  {
+    for (size_t i = 0; i + 1 < opacityMap.size(); i += 2)
+    {
+      double value = inverseOpacityFlag ? 1.0 - opacityMap[i + 1] : opacityMap[i + 1];
+      otf->AddPoint(range[0] + (range[1] - range[0]) * opacityMap[i], value);
+    }
+  }
 }
 
 //----------------------------------------------------------------------------

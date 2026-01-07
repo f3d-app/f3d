@@ -295,15 +295,24 @@ PYBIND11_MODULE(pyf3d, module)
     .value("CTRL_SHIFT", f3d::interactor::InputModifier::CTRL_SHIFT)
     .export_values();
 
+  py::enum_<f3d::interactor::AnimationDirection>(interactor, "AnimationDirection")
+    .value("FORWARD", f3d::interactor::AnimationDirection::FORWARD)
+    .value("BACKWARD", f3d::interactor::AnimationDirection::BACKWARD)
+    .export_values();
+
   interactor //
-    .def("toggle_animation", &f3d::interactor::toggleAnimation, "Toggle the animation")
-    .def("start_animation", &f3d::interactor::startAnimation, "Start the animation")
+    .def("toggle_animation", &f3d::interactor::toggleAnimation, "Toggle the animation",
+      py::arg("direction") = f3d::interactor::AnimationDirection::FORWARD)
+    .def("start_animation", &f3d::interactor::startAnimation, "Start the animation",
+      py::arg("direction") = f3d::interactor::AnimationDirection::FORWARD)
     .def("stop_animation", &f3d::interactor::stopAnimation, "Stop the animation")
     .def("is_playing_animation", &f3d::interactor::isPlayingAnimation,
       "Returns True if the animation is currently started")
     .def("get_animation_name", &f3d::interactor::getAnimationName, py::arg("index") = INT_MIN,
       "Returns the animation at an index (defaults to current)")
     .def("get_animation_names", &f3d::interactor::getAnimationNames, "Returns all animation names")
+    .def("get_animation_direction", &f3d::interactor::getAnimationDirection,
+      "Returns the current animation direction")
     .def("enable_camera_movement", &f3d::interactor::enableCameraMovement,
       "Enable the camera interaction")
     .def("disable_camera_movement", &f3d::interactor::disableCameraMovement,

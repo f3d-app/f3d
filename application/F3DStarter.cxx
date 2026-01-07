@@ -101,6 +101,7 @@ public:
     std::vector<int> Resolution;
     std::vector<int> Position;
     std::string ColorMapFile;
+    std::string OpacityMapFile;
     CameraConfiguration CamConf;
     std::string Reference;
     double RefThreshold;
@@ -139,8 +140,6 @@ public:
       cam.setViewAngle(camConf.CameraViewAngle);
     }
 
-    bool reset = false;
-    double zoomFactor = 0.9;
     if (camConf.CameraPosition.size() != 3 && camConf.CameraDirection.has_value())
     {
       f3d::vector3_t dir = camConf.CameraDirection.value();
@@ -152,24 +151,16 @@ public:
         pos[i] = foc[i] - dir[i];
       }
       cam.setPosition(pos);
-      reset = true;
-    }
-    if (camConf.CameraPosition.size() != 3)
-    {
-      if (camConf.CameraZoomFactor > 0)
-      {
-        zoomFactor = camConf.CameraZoomFactor;
-      }
-      reset = true;
-    }
-    if (reset)
-    {
-      cam.resetToBounds(zoomFactor);
     }
 
-    cam.azimuth(camConf.CameraAzimuthAngle)
-      .elevation(camConf.CameraElevationAngle)
-      .setCurrentAsDefault();
+    cam.azimuth(camConf.CameraAzimuthAngle).elevation(camConf.CameraElevationAngle);
+
+    if (camConf.CameraPosition.size() != 3)
+    {
+      cam.resetToBounds(camConf.CameraZoomFactor > 0 ? camConf.CameraZoomFactor : 0.9);
+    }
+
+    cam.setCurrentAsDefault();
   }
 
   static bool HasHDRIExtension(const std::string& file)
@@ -760,6 +751,7 @@ public:
     this->ParseOption(appOptions, "resolution", this->AppOptions.Resolution);
     this->ParseOption(appOptions, "position", this->AppOptions.Position);
     this->ParseOption(appOptions, "colormap-file", this->AppOptions.ColorMapFile);
+    this->ParseOption(appOptions, "volume-opacity-file", this->AppOptions.OpacityMapFile);
 
     this->ParseOption(appOptions, "camera-position", this->AppOptions.CamConf.CameraPosition);
     this->ParseOption(appOptions, "camera-focal-point", this->AppOptions.CamConf.CameraFocalPoint);
@@ -797,6 +789,22 @@ public:
       {
         f3d::log::error("Cannot find the colormap ", colorMapFile);
         this->LibOptions.model.scivis.colormap = f3d::colormap_t();
+      }
+    }
+
+    // opacity_map file and opacity_map are interdependent
+    const std::string& opacityMapFile = this->AppOptions.OpacityMapFile;
+    if (!opacityMapFile.empty() && std::filesystem::exists(opacityMapFile) &&
+      std::filesystem::is_regular_file(opacityMapFile))
+    {
+      fs::path fullPath(f3d::utils::collapsePath(opacityMapFile));
+      this->LibOptions.model.scivis.opacity_map = F3DColorMapTools::ReadOpacity(fullPath);
+
+      std::vector<double>& opacityMap = this->LibOptions.model.scivis.opacity_map;
+      if (opacityMap.empty())
+      {
+        f3d::log::error("Cannot read the opacity map ", opacityMapFile);
+        this->LibOptions.model.scivis.opacity_map = { 0.0, 0.0, 1.0, 1.0 };
       }
     }
   }

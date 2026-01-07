@@ -614,7 +614,8 @@ public:
       this->CommandBuffer.reset();
     }
 
-    this->AnimationManager->Tick(deltaTime);
+    this->AnimationManager->SetDeltaTime(deltaTime);
+    this->AnimationManager->Tick();
 
     vtkRenderWindow* renWin = this->Window.GetRenderWindow();
     vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
@@ -671,7 +672,7 @@ public:
   std::atomic<bool> RenderRequested = false;
   std::atomic<bool> StopRequested = false;
 
-  double CallbackDeltaTime = 0.0;
+  double CallbackDeltaTime = 1.0 / 30; /* Default DeltaTime (30fps) */
 };
 
 //----------------------------------------------------------------------------
@@ -1091,6 +1092,16 @@ interactor& interactor_impl::initCommands()
     },
     command_documentation_t{ "roll_camera value", "roll the camera on its side" });
 
+  this->addCommand("jump_to_frame",
+    [&](const std::vector<std::string>& args)
+    {
+      check_args(args, 2, "jump_to_frame");
+      const int frame = options::parse<int>(args[0]);
+      const bool relative = options::parse<bool>(args[1]);
+      this->Internals->AnimationManager->SetDeltaTime(this->Internals->CallbackDeltaTime);
+      this->Internals->AnimationManager->JumpToFrame(frame, relative);
+    });
+
   this->addCommand(
     "elevation_camera",
     [&](const std::vector<std::string>& args)
@@ -1224,9 +1235,13 @@ interactor& interactor_impl::initCommands()
     command_documentation_t{ "reset_camera", "reset the camera to its original location" });
 
   this->addCommand(
-    "toggle_animation",
-    [&](const std::vector<std::string>&) { this->Internals->AnimationManager->ToggleAnimation(); },
+    "toggle_animation", [&](const std::vector<std::string>&) { this->toggleAnimation(); },
     command_documentation_t{ "toggle_animation", "start/stop the animation" });
+
+  this->addCommand(
+    "toggle_animation_backward",
+    [&](const std::vector<std::string>&) { this->toggleAnimation(AnimationDirection::BACKWARD); },
+    command_documentation_t{ "toggle_animation_backward", "start/stop the animation backward" });
 
   // XXX: No filesystem completion, F3DStarter add its own command anyway
   this->addCommand(
@@ -1505,11 +1520,16 @@ interactor& interactor_impl::initBindings()
   // "Cycle array to color with" , "arrayName"
   auto docArray = [&]()
   {
+    // enable + no array : ON
+    // enable + array : array
+    // no enable + array : array (forced)
+    // no enable + no array : OFF
     return std::pair("Color array",
       (opts.model.scivis.array_name.has_value()
           ? shortName(opts.model.scivis.array_name.value(), 15) +
             (opts.model.scivis.enable ? "" : " (forced)")
-          : "OFF"));
+          : opts.model.scivis.enable ? "ON"
+                                     : "OFF"));
   };
 
   // "Cycle component to color with" , "component"
@@ -1610,6 +1630,8 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::ANY, "7"}, "set_camera top", "Camera", std::bind(docStr, "Top View camera"));
   this->addBinding({mod_t::ANY, "8"}, "elevation_camera 90", "Camera", std::bind(docStr, "Rotate camera up"));
   this->addBinding({mod_t::ANY, "9"}, "set_camera isometric", "Camera", std::bind(docStr, "Isometric View camera"));
+  this->addBinding({mod_t::CTRL, "Y"}, "set scene.up_direction +Y", "Scene", std::bind(docStr, "Set scene up direction to +Y"));
+  this->addBinding({mod_t::CTRL, "Z"}, "set scene.up_direction +Z", "Scene", std::bind(docStr, "Set scene up direction to +Z"));
 #if F3D_MODULE_UI
   this->addBinding({mod_t::NONE, "H"}, "toggle ui.cheatsheet", "Others", std::bind(docStr, "Cheatsheet"));
   this->addBinding({mod_t::NONE, "Escape"}, "toggle ui.console", "Others", std::bind(docStr, "Console"));
@@ -1618,6 +1640,7 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::CTRL, "Q"}, "stop_interactor", "Others", std::bind(docStr, "Stop the interactor"));
   this->addBinding({mod_t::NONE, "Return"}, "reset_camera", "Others", std::bind(docStr, "Reset camera to initial parameters"));
   this->addBinding({mod_t::NONE, "Space"}, "toggle_animation", "Others", std::bind(docStr, "Play/Pause animation if any"));
+  this->addBinding({mod_t::CTRL_SHIFT, "Space"}, "toggle_animation_backward", "Others", std::bind(docStr, "Play/Pause animation backward if any"));
   this->addBinding({mod_t::NONE, "Drop"}, "add_files", "Others", std::bind(docStr, "Add files to the scene"));
   this->addBinding({mod_t::SHIFT, "V"}, "cycle_verbose_level", "Others", docVerbose, f3d::interactor::BindingType::CYCLIC);
   // clang-format on
@@ -1838,17 +1861,21 @@ interactor& interactor_impl::triggerTextCharacter(unsigned int codepoint)
 }
 
 //----------------------------------------------------------------------------
-interactor& interactor_impl::toggleAnimation()
+interactor& interactor_impl::toggleAnimation(AnimationDirection direction)
 {
   assert(this->Internals->AnimationManager);
+  this->Internals->AnimationManager->SetAnimationDirection(
+    direction == AnimationDirection::FORWARD ? 1 : -1);
   this->Internals->AnimationManager->ToggleAnimation();
   return *this;
 }
 
 //----------------------------------------------------------------------------
-interactor& interactor_impl::startAnimation()
+interactor& interactor_impl::startAnimation(AnimationDirection direction)
 {
   assert(this->Internals->AnimationManager);
+  this->Internals->AnimationManager->SetAnimationDirection(
+    direction == AnimationDirection::FORWARD ? 1 : -1);
   this->Internals->AnimationManager->StartAnimation();
   return *this;
 }
@@ -1880,6 +1907,15 @@ bool interactor_impl::isPlayingAnimation()
 {
   assert(this->Internals->AnimationManager);
   return this->Internals->AnimationManager->IsPlaying();
+}
+
+//----------------------------------------------------------------------------
+interactor::AnimationDirection interactor_impl::getAnimationDirection()
+{
+  assert(this->Internals->AnimationManager);
+  return this->Internals->AnimationManager->GetAnimationDirection() == 1
+    ? AnimationDirection::FORWARD
+    : AnimationDirection::BACKWARD;
 }
 
 //----------------------------------------------------------------------------

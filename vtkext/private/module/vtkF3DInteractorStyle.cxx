@@ -156,7 +156,7 @@ void vtkF3DInteractorStyle::Rotate()
   if (!ren->GetUseTrackball())
   {
     double up[3];
-    this->InterpolateTemporaryUp(0.1, ren->GetUpVector(), up);
+    this->InterpolateTemporaryUp(0.1, ren->GetUpDirection(), up);
 
     double envUpCamDirCross[3];
     vtkMath::Cross(up, camera->GetDirectionOfProjection(), envUpCamDirCross);
@@ -166,7 +166,7 @@ void vtkF3DInteractorStyle::Rotate()
       // Keep setting the temporary up to the camera's up vector until the interpolated up vector
       // and the camera direction vector are not collinear
       this->SetTemporaryUp(camera->GetViewUp());
-      this->InterpolateTemporaryUp(0.1, ren->GetUpVector(), up);
+      this->InterpolateTemporaryUp(0.1, ren->GetUpDirection(), up);
     }
 
     // Rotate camera around the focal point about the environment's up vector
@@ -174,7 +174,7 @@ void vtkF3DInteractorStyle::Rotate()
     Transform->Identity();
     const double* fp = camera->GetFocalPoint();
     Transform->Translate(+fp[0], +fp[1], +fp[2]);
-    Transform->RotateWXYZ(rxf, ren->GetUpVector());
+    Transform->RotateWXYZ(rxf, ren->GetUpDirection());
     Transform->Translate(-fp[0], -fp[1], -fp[2]);
     Transform->TransformPoint(camera->GetPosition(), camera->GetPosition());
 
@@ -183,7 +183,7 @@ void vtkF3DInteractorStyle::Rotate()
     // Clamp parameter to `camera->Elevation()` to maintain -90 < elevation < +90
     constexpr double maxAbsElevation = 90 - 1e-10;
     const double elevation = vtkMath::DegreesFromRadians(
-      vtkMath::AngleBetweenVectors(ren->GetUpVector(), camera->GetDirectionOfProjection()) -
+      vtkMath::AngleBetweenVectors(ren->GetUpDirection(), camera->GetDirectionOfProjection()) -
       vtkMath::Pi() / 2);
     camera->Elevation(std::clamp(ryf, -maxAbsElevation - elevation, +maxAbsElevation - elevation));
 
@@ -361,7 +361,7 @@ void vtkF3DInteractorStyle::ResetTemporaryUp()
   if (this->CurrentRenderer)
   {
     vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(this->CurrentRenderer);
-    SetTemporaryUp(ren->GetUpVector());
+    SetTemporaryUp(ren->GetUpDirection());
   }
 }
 

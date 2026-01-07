@@ -1,10 +1,6 @@
 #include "vtkF3DPostProcessFilter.h"
 
-#include "F3DLog.h"
-
 #include <vtkAppendPolyData.h>
-#include <vtkCompositeDataIterator.h>
-#include <vtkCompositeDataSet.h>
 #include <vtkDataObject.h>
 #include <vtkDataSetSurfaceFilter.h>
 #include <vtkImageData.h>
@@ -38,53 +34,7 @@ int vtkF3DPostProcessFilter::RequestData(vtkInformation* vtkNotUsed(request),
   vtkPolyData* outputPoints = vtkPolyData::GetData(outputVector, 1);
   vtkImageData* outputImage = vtkImageData::GetData(outputVector, 2);
 
-  vtkCompositeDataSet* composite = vtkCompositeDataSet::SafeDownCast(dataObject);
   vtkSmartPointer<vtkDataSet> dataset = vtkDataSet::SafeDownCast(dataObject);
-
-  // Extract data from a composite dataset
-  if (composite)
-  {
-    auto iter = vtkSmartPointer<vtkCompositeDataIterator>::Take(composite->NewIterator());
-    iter->SkipEmptyNodesOn();
-
-    // If it contains a single leaf, extract it as is
-    int nLeaf = 0;
-    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-    {
-      dataset = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
-      nLeaf++;
-    }
-
-    // If multiple leaves, extract all surfaces and append them together
-    if (nLeaf > 1)
-    {
-      vtkNew<vtkAppendPolyData> append;
-      for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-      {
-        vtkDataSet* leafDS = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
-        vtkSmartPointer<vtkPolyData> leafPD = vtkPolyData::SafeDownCast(leafDS);
-        if (!leafDS)
-        {
-          F3DLog::Print(F3DLog::Severity::Warning,
-            "A non data set block was ignored while reading a composite.");
-        }
-        else
-        {
-          if (!leafPD)
-          {
-            vtkNew<vtkDataSetSurfaceFilter> geom;
-            geom->SetInputData(iter->GetCurrentDataObject());
-            geom->Update();
-            leafPD = vtkPolyData::SafeDownCast(geom->GetOutput());
-          }
-          append->AddInputData(leafPD);
-        }
-      }
-
-      append->Update();
-      dataset = append->GetOutput();
-    }
-  }
 
   // If the input is a polydata or an unstructured grid without cells, add a polyvertex cell
   vtkPolyData* pd = vtkPolyData::SafeDownCast(dataset);
@@ -158,7 +108,6 @@ int vtkF3DPostProcessFilter::RequestData(vtkInformation* vtkNotUsed(request),
 int vtkF3DPostProcessFilter::FillInputPortInformation(int vtkNotUsed(port), vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
-  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
   return 1;
 }
 

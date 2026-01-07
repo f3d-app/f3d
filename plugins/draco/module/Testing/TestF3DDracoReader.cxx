@@ -1,7 +1,6 @@
-#include <vtkNew.h>
-#include <vtkTestUtilities.h>
-
 #include "vtkF3DDracoReader.h"
+
+#include <vtkNew.h>
 
 #include <iostream>
 
@@ -11,6 +10,5 @@ int TestF3DDracoReader(int vtkNotUsed(argc), char* argv[])
   vtkNew<vtkF3DDracoReader> reader;
   reader->SetFileName(filename);
   reader->Update();
-  reader->Print(std::cout);
-  return EXIT_SUCCESS;
+  return reader->GetOutput()->GetNumberOfPoints() == 7958 ? EXIT_SUCCESS : EXIT_FAILURE;
 }

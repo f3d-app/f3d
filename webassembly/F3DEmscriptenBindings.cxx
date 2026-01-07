@@ -304,6 +304,10 @@ EMSCRIPTEN_BINDINGS(f3d)
       });
 
   // f3d::interactor
+  emscripten::enum_<f3d::interactor::AnimationDirection>("InteractorAnimationDirection")
+    .value("FORWARD", f3d::interactor::AnimationDirection::FORWARD)
+    .value("BACKWARD", f3d::interactor::AnimationDirection::BACKWARD);
+
   // Not bound on purpose because usually used for external interactors:
   // trigger*
   // TODO:
@@ -330,9 +334,23 @@ EMSCRIPTEN_BINDINGS(f3d)
       "triggerCommand",
       +[](f3d::interactor& interactor, const std::string& command, bool keepComments) -> bool
       { return interactor.triggerCommand(command, keepComments); })
-    .function("toggleAnimation", &f3d::interactor::toggleAnimation,
+    .function(
+      "toggleAnimation",
+      +[](f3d::interactor& interactor, emscripten::val direction) -> f3d::interactor&
+      {
+        return direction.isUndefined()
+          ? interactor.toggleAnimation()
+          : interactor.toggleAnimation(direction.as<f3d::interactor::AnimationDirection>());
+      },
       emscripten::return_value_policy::reference())
-    .function("startAnimation", &f3d::interactor::startAnimation,
+    .function(
+      "startAnimation",
+      +[](f3d::interactor& interactor, emscripten::val direction) -> f3d::interactor&
+      {
+        return direction.isUndefined()
+          ? interactor.startAnimation()
+          : interactor.startAnimation(direction.as<f3d::interactor::AnimationDirection>());
+      },
       emscripten::return_value_policy::reference())
     .function("stopAnimation", &f3d::interactor::stopAnimation,
       emscripten::return_value_policy::reference())
@@ -342,6 +360,7 @@ EMSCRIPTEN_BINDINGS(f3d)
       "getAnimationNames",
       +[](f3d::interactor& interactor)
       { return containerToJSArray(interactor.getAnimationNames()); })
+    .function("getAnimationDirection", &f3d::interactor::getAnimationDirection)
     .function("enableCameraMovement", &f3d::interactor::enableCameraMovement,
       emscripten::return_value_policy::reference())
     .function("disableCameraMovement", &f3d::interactor::disableCameraMovement,

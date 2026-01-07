@@ -137,6 +137,15 @@ public:
   };
 
   /**
+   * Enumeration of animation direction.
+   */
+  enum class AnimationDirection : std::uint8_t
+  {
+    FORWARD,
+    BACKWARD
+  };
+
+  /**
    * Remove all existing interaction commands and add all default bindings
    * see INTERACTIONS.md for details.
    */
@@ -249,8 +258,10 @@ public:
   /**
    * Control the animation.
    */
-  virtual interactor& toggleAnimation() = 0;
-  virtual interactor& startAnimation() = 0;
+  virtual interactor& toggleAnimation(
+    AnimationDirection direction = AnimationDirection::FORWARD) = 0;
+  virtual interactor& startAnimation(
+    AnimationDirection direction = AnimationDirection::FORWARD) = 0;
   virtual interactor& stopAnimation() = 0;
   [[nodiscard]] virtual bool isPlayingAnimation() = 0;
   /**
@@ -258,6 +269,7 @@ public:
    */
   [[nodiscard]] virtual std::string getAnimationName(int indices = INT_MIN) = 0;
   [[nodiscard]] virtual std::vector<std::string> getAnimationNames() = 0;
+  [[nodiscard]] virtual interactor::AnimationDirection getAnimationDirection() = 0;
   ///@}
 
   ///@{ @name Movement

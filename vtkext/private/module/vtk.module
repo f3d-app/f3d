@@ -25,6 +25,7 @@ OPTIONAL_DEPENDS
   VTK::RenderingRayTracing
   VTK::RenderingGridAxes
 TEST_DEPENDS
+  VTK::FiltersSources
   VTK::IOGeometry
   VTK::IOPLY
   VTK::IOXML
