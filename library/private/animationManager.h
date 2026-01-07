@@ -11,9 +11,9 @@
 #include <vtkSmartPointer.h>
 
 #include <chrono>
+#include <climits>
 #include <optional>
 #include <set>
-#include <climits>
 
 class vtkF3DRenderer;
 class vtkF3DMetaImporter;

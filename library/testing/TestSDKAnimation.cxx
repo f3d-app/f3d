@@ -42,7 +42,8 @@ int TestSDKAnimation([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   test("getAnimationName returns current name", sce.getAnimationName(), "unnamed_0");
 
-  test("getAnimationNames returns names", sce.getAnimationNames(), std::vector<std::string>{"unnamed_0"});
+  test("getAnimationNames returns names", sce.getAnimationNames(),
+    std::vector<std::string>{ "unnamed_0" });
   inter.startAnimation(f3d::interactor::AnimationDirection::FORWARD);
   test("isPlaying backward after forward start",
     inter.getAnimationDirection() == f3d::interactor::AnimationDirection::FORWARD);

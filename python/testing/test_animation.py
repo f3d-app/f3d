@@ -36,7 +36,7 @@ def test_animation():
 
     # triggerEventLoop returns self
     inter_ref = engine.interactor.trigger_event_loop(0.1)
-    assert  inter_ref == engine.interactor
+    assert inter_ref == engine.interactor
 
     # isPlaying after stop
     engine.interactor.stop_animation()

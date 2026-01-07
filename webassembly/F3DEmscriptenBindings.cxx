@@ -165,8 +165,7 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function("getAnimationName", &f3d::scene::getAnimationName)
     .function(
       "getAnimationNames",
-      +[](f3d::scene& scene)
-      { return containerToJSArray(scene.getAnimationNames()); });
+      +[](f3d::scene& scene) { return containerToJSArray(scene.getAnimationNames()); });
 
   // f3d::image
   emscripten::enum_<f3d::image::SaveFormat>("ImageSaveFormat")
