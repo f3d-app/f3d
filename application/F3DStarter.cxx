@@ -43,6 +43,7 @@
 #include <algorithm>
 #include <atomic>
 #include <cassert>
+#include <cmath>
 #include <csignal>
 #include <filesystem>
 #include <fstream>
@@ -89,7 +90,6 @@ public:
     std::string RenderingBackend;
     std::optional<double> MaxSize;
     std::optional<double> AnimationTime;
-    std::optional<int> OutputFrameCount;
     bool Watch;
     double FrameRate;
     std::vector<std::string> Plugins;
@@ -410,7 +410,8 @@ public:
       {
         if (!frame.has_value())
         {
-          throw std::runtime_error("{frame} variable can only be used with --output-frame-count");
+          throw std::runtime_error(
+            "{frame} variable can only be used when outputting animation frames");
         }
         std::stringstream formattedFrame;
         const std::string fmt = std::regex_replace(var, frameRe, "$2");
@@ -781,7 +782,6 @@ public:
     this->ParseOption(appOptions, "rendering-backend", this->AppOptions.RenderingBackend);
     this->ParseOption(appOptions, "max-size", this->AppOptions.MaxSize);
     this->ParseOption(appOptions, "animation-time", this->AppOptions.AnimationTime);
-    this->ParseOption(appOptions, "output-frame-count", this->AppOptions.OutputFrameCount);
     this->ParseOption(appOptions, "frame-rate", this->AppOptions.FrameRate);
     this->ParseOption(appOptions, "watch", this->AppOptions.Watch);
     this->ParseOption(appOptions, "load-plugins", this->AppOptions.Plugins);
@@ -1306,16 +1306,16 @@ int F3DStarter::Start(int argc, char** argv)
       f3d::utils::getEnv("CTEST_F3D_NO_DATA_FORCE_RENDER");
 
     fs::path reference = f3d::utils::collapsePath(this->Internals->AppOptions.Reference);
-    // Defer template application if multi-frame output is requested (template will be applied
-    // per-frame)
-    const bool multiFrameOutput = this->Internals->AppOptions.OutputFrameCount.has_value() &&
-      this->Internals->AppOptions.OutputFrameCount.value() > 0;
+    // Check if output template contains {frame} - if so, defer template application
+    const std::string& outputTemplate = this->Internals->AppOptions.Output;
+    const bool hasFrameTemplate = outputTemplate.find("{frame}") != std::string::npos ||
+      std::regex_search(outputTemplate, std::regex("\\{frame:[^}]+\\}"));
     fs::path output;
     try
     {
-      output = multiFrameOutput ? fs::path{}
-                                : this->Internals->applyFilenameTemplate(
-                                    f3d::utils::collapsePath(this->Internals->AppOptions.Output));
+      output = hasFrameTemplate
+        ? fs::path{}
+        : this->Internals->applyFilenameTemplate(f3d::utils::collapsePath(outputTemplate));
     }
     catch (const std::runtime_error& ex)
     {
@@ -1415,28 +1415,34 @@ int F3DStarter::Start(int argc, char** argv)
         return EXIT_FAILURE;
       }
 
-      const auto& frameCount = this->Internals->AppOptions.OutputFrameCount;
-      if (frameCount.has_value() && frameCount.value() > 0)
+      if (hasFrameTemplate)
       {
         f3d::scene& animScene = this->Internals->Engine->getScene();
         auto [minTime, maxTime] = animScene.animationTimeRange();
-        int count = frameCount.value();
 
-        if (minTime == maxTime)
+        double startTime = this->Internals->AppOptions.AnimationTime.value_or(minTime);
+        double endTime = maxTime;
+        double duration = endTime - startTime;
+        int count = 1;
+
+        if (duration <= 0.0)
         {
           f3d::log::warn("No animation available or animation has zero duration, outputting single "
                          "frame");
-          count = 1;
+        }
+        else
+        {
+          count = static_cast<int>(std::ceil(duration * this->Internals->AppOptions.FrameRate)) + 1;
         }
 
-        double timeStep = count > 1 ? (maxTime - minTime) / (count - 1) : 0.0;
+        double timeStep = count > 1 ? duration / (count - 1) : 0.0;
 
         f3d::log::info(
-          "Saving ", count, " animation frame(s) from time ", minTime, " to ", maxTime);
+          "Saving ", count, " animation frame(s) from time ", startTime, " to ", endTime);
 
         for (int frame = 0; frame < count; ++frame)
         {
-          double currentTime = minTime + frame * timeStep;
+          double currentTime = startTime + frame * timeStep;
           animScene.loadAnimationTime(currentTime);
 
           fs::path frameOutput = renderToStdout
