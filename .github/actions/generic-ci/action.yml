@@ -366,13 +366,21 @@ runs:
       working-directory: ${{github.workspace}}
       run: cmake --build build_examples --config Release
 
-    - name: Install Mesa Windows examples
+    - name: Install Mesa Windows C/C++ examples
       if: |
         runner.os == 'Windows' &&
         inputs.static_label == 'no-static'
       uses: f3d-app/install-mesa-windows-action@v2
       with:
         path: ${{github.workspace}}\build_examples\*\*\Release
+
+    - name: Install Mesa Windows Java examples
+      if: |
+        runner.os == 'Windows' &&
+        inputs.static_label == 'no-static'
+      uses: f3d-app/install-mesa-windows-action@v2
+      with:
+        path: ${{github.workspace}}\build_examples\java\interactive-app
 
     # older VTK version create different renderings so they are not tested
     - name: Test libf3d examples
