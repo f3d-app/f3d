@@ -1,11 +1,11 @@
 #include "camera_impl.h"
 
+#include <cmath>
 #include <vtkCamera.h>
 #include <vtkMatrix4x4.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
 #include <vtkVersion.h>
-#include <cmath>
 
 
 namespace f3d::detail
@@ -106,7 +106,7 @@ void camera_impl::getFocalPoint(point3_t& foc) const
 }
 
 //----------------------------------------------------------------------------
-  void camera_impl::getPositionToFocalVector(vector3_t& vec) const
+void camera_impl::getPositionToFocalVector(vector3_t& vec) const
 {
   point3_t pos, focal;
   this->getPosition(pos);
@@ -116,7 +116,7 @@ void camera_impl::getFocalPoint(point3_t& foc) const
 }
 
 //----------------------------------------------------------------------------
-  double camera_impl::getWorldAzimuth() const
+double camera_impl::getWorldAzimuth() const
 {
   vector3_t view;
   this->getPositionToFocalVector(view);
@@ -149,7 +149,7 @@ void camera_impl::getFocalPoint(point3_t& foc) const
 }
 
 //----------------------------------------------------------------------------
-  double camera_impl::getWorldElevation() const
+double camera_impl::getWorldElevation() const
 {
   vector3_t view;
   this->getPositionToFocalVector(view);
@@ -166,7 +166,7 @@ void camera_impl::getFocalPoint(point3_t& foc) const
 }
 
 //----------------------------------------------------------------------------
-  double camera_impl::getDistance() const
+double camera_impl::getDistance() const
 {
   vector3_t v;
   this->getPositionToFocalVector(v);
