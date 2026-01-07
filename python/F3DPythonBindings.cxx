@@ -301,7 +301,8 @@ PYBIND11_MODULE(pyf3d, module)
     .def("stop_animation", &f3d::interactor::stopAnimation, "Stop the animation")
     .def("is_playing_animation", &f3d::interactor::isPlayingAnimation,
       "Returns True if the animation is currently started")
-    .def("get_animation_name", &f3d::interactor::getAnimationName, "Returns the animation at an index (defaults to current)")
+    .def("get_animation_name", &f3d::interactor::getAnimationName, py::arg("index") = INT_MIN,
+      "Returns the animation at an index (defaults to current)")
     .def("get_animation_names", &f3d::interactor::getAnimationNames, "Returns all animation names")
     .def("enable_camera_movement", &f3d::interactor::enableCameraMovement,
       "Enable the camera interaction")
