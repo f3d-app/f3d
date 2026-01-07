@@ -338,6 +338,10 @@ EMSCRIPTEN_BINDINGS(f3d)
       emscripten::return_value_policy::reference())
     .function("isPlayingAnimation", &f3d::interactor::isPlayingAnimation)
     .function("getAnimationName", &f3d::interactor::getAnimationName)
+    .function(
+      "getAnimationNames",
+      +[](f3d::interactor& interactor)
+      { return containerToJSArray(interactor.getAnimationNames()); })
     .function("enableCameraMovement", &f3d::interactor::enableCameraMovement,
       emscripten::return_value_policy::reference())
     .function("disableCameraMovement", &f3d::interactor::disableCameraMovement,

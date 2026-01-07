@@ -72,6 +72,12 @@ const settings = {
       "getAnimationName returns name",
     );
 
+    // array comparison in JS is a little annoying so we just compare the 0th element
+    utils.assert(
+      interactor.getAnimationNames()[0] == "unnamed_0",
+      "getAnimationNames returns names",
+    );
+
     // only for coverage, do not test the actual feature yet
     interactor.disableCameraMovement();
     interactor.enableCameraMovement();
