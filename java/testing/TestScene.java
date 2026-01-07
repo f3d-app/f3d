@@ -32,6 +32,9 @@ public class TestScene {
     scene.loadAnimationTime(0.5);
     scene.animationTimeRange();
     scene.availableAnimations();
+    scene.getAnimationName();
+    scene.getAnimationName(0);
+    scene.getAnimationNames();
 
     Types.LightState lightState = new Types.LightState();
     lightState.type = Types.LightType.HEADLIGHT;
