@@ -32,7 +32,13 @@ int TestSDKAnimation([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   inter.stopAnimation();
   test("isPlaying after stop", !inter.isPlayingAnimation());
 
-  test("getAnimationName returns name", inter.getAnimationName(), "unnamed_0");
+  test("getAnimationName returns name at index", inter.getAnimationName(0), "unnamed_0");
+
+  test("getAnimationName returns for out of range", inter.getAnimationName(9999), "No animation");
+
+  test("getAnimationName returns current name", inter.getAnimationName(), "unnamed_0");
+
+  test("getAnimationNames returns names", inter.getAnimationNames(), std::vector<std::string>{"unnamed_0"});
 
   return test.result();
 }
