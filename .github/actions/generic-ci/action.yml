@@ -381,6 +381,14 @@ runs:
       uses: f3d-app/install-mesa-windows-action@v2
       with:
         path: ${{github.workspace}}\build_examples\java\tests
+    
+    - name: Debug Java examples build directory
+      if: |
+        runner.os == 'Windows' &&
+        inputs.static_label == 'no-static'
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: ls -R build_examples/java
 
     # older VTK version create different renderings so they are not tested
     - name: Test libf3d examples
