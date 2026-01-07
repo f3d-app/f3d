@@ -29,11 +29,6 @@ const settings = {
     utils.assert(end === 4, "End value should be 4");
 
     scene.loadAnimationTime(1.5);
-
-    scene.jumpToKeyFrame(1, true);
-    scene.jumpToKeyFrame(-1, true);
-    scene.jumpToKeyFrame(1, false);
-    scene.jumpToKeyFrame(-1, false);
   },
 };
 
