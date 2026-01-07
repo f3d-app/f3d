@@ -1315,8 +1315,9 @@ f3d_test(NAME TestOutputFrameCount DATA BoxAnimated.gltf ARGS --output=${CMAKE_B
 f3d_test(NAME TestOutputFrameCountFrame0 DATA BoxAnimated.gltf ARGS --reference=${CMAKE_BINARY_DIR}/Testing/Temporary/TestOutputFrameCount_0000.png --animation-time=0 DEPENDS TestOutputFrameCount NO_BASELINE)
 f3d_test(NAME TestOutputFrameCountFrame1 DATA BoxAnimated.gltf ARGS --reference=${CMAKE_BINARY_DIR}/Testing/Temporary/TestOutputFrameCount_0001.png --animation-time=3.70833 DEPENDS TestOutputFrameCount NO_BASELINE)
 f3d_test(NAME TestOutputFrameCountNoAnimation DATA cow.vtp ARGS --output=${CMAKE_BINARY_DIR}/Testing/Temporary/static_{frame:4}.png REGEXP "No animation available" NO_BASELINE NO_OUTPUT)
-f3d_test(NAME TestOutputFrameCountInvalidFormat DATA BoxAnimated.gltf ARGS --output=${CMAKE_BINARY_DIR}/Testing/Temporary/invalid_{frame:abc}.png REGEXP "ignoring invalid frame format" NO_BASELINE NO_OUTPUT)
+f3d_test(NAME TestOutputFrameCountInvalidFormat DATA BoxAnimated.gltf ARGS --output=${CMAKE_BINARY_DIR}/Testing/Temporary/invalid_{frame:abc}.png --frame-rate=0.25 REGEXP "ignoring invalid frame format" NO_BASELINE NO_OUTPUT)
 f3d_test(NAME TestOutputFrameCountStartTime DATA BoxAnimated.gltf ARGS --output=${CMAKE_BINARY_DIR}/Testing/Temporary/TestOutputFrameCountStartTime_{frame:4}.png --frame-rate=0.3 --animation-time=2.0 REGEXP "Saving 2 animation frame" NO_BASELINE NO_OUTPUT)
+f3d_test(NAME TestOutputFrameEmptyFormat DATA cow.vtp ARGS --output=${CMAKE_BINARY_DIR}/Testing/Temporary/empty_{frame:}.png NO_BASELINE NO_OUTPUT WILL_FAIL)
 
 # Basic record and play test
 f3d_test(NAME TestInteractionRecord DATA cow.vtp ARGS --interaction-test-record=${CMAKE_BINARY_DIR}/Testing/Temporary/TestInteractionRecord.log NO_BASELINE)
