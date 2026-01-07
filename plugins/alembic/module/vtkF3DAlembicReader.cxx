@@ -664,10 +664,12 @@ public:
     timeSteps = std::vector<double>(timeStepSet.begin(), timeStepSet.end());
   }
 
-  void ExtendTimeRange(double& start, double& end)
+  void ComputeTimeRangeAndSteps(double& start, double& end, std::vector<double>& timeSteps)
   {
     Alembic::Abc::IObject top = this->Archive.getTop();
 
+    // Using std::set since we need time steps to be unique and ordered
+    std::set<double> timeStepSet;
     std::stack<std::pair<const Alembic::Abc::IObject, const Alembic::Abc::ObjectHeader>> objects;
 
     for (size_t i = 0; i < top.getNumChildren(); ++i)
@@ -714,20 +716,16 @@ public:
         continue;
       }
 
-      if (ts->getTimeSamplingType().isUniform())
+      // Collecting all time steps
+      const auto& times = ts->getStoredTimes();
+      for (auto& timeStep : times)
       {
-        double min = ts->getSampleTime(0);
-        double max = min + (numSamples - 1) * ts->getTimeSamplingType().getTimePerCycle();
-        start = std::min(start, min);
-        end = std::max(end, max);
-      }
-      else if (ts->getTimeSamplingType().isCyclic())
-      {
-        const auto& times = ts->getStoredTimes();
-        start = std::min(start, times.front());
-        end = std::max(end, times.back());
+        timeStepSet.insert(timeStep);
       }
     }
+    start = *timeStepSet.begin();
+    end = *timeStepSet.rbegin();
+    timeSteps = std::vector<double>(timeStepSet.begin(), timeStepSet.end());
   }
 
   bool ReadArchive(
@@ -798,20 +796,17 @@ int vtkF3DAlembicReader::RequestInformation(vtkInformation* vtkNotUsed(request),
 
   double timeRange[2] = { std::numeric_limits<double>::infinity(),
     -std::numeric_limits<double>::infinity() };
-  this->Internals->ExtendTimeRange(timeRange[0], timeRange[1]);
+  std::vector<double> timeSteps {0};
+  this->Internals->ComputeTimeRangeAndSteps(timeRange[0], timeRange[1], timeSteps);
 
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
   if (timeRange[0] < timeRange[1])
   {
     outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange, 2);
   }
-
-  std::vector<int> timeSteps {0};
-  this->Internals->RetrieveTimeSteps(timeSteps);
-
   if (timeSteps.size() > 0)
   {
-    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), timeSteps, timeSteps.size());
+    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), timeSteps.data(), timeSteps.size());
   }
 
   return 1;
