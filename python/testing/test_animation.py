@@ -18,7 +18,7 @@ def test_animation():
     # availableAnimations
     assert engine.scene.available_animations() == 1
 
-    # recover animationTimeRange"
+    # recover animationTimeRange
     engine.scene.load_animation_time(0.5)
     assert engine.scene.animation_time_range() == (0.0, 4.0)
 
