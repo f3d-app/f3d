@@ -278,6 +278,34 @@ public:
   }
 
   /**
+   * Save image to file or stdout.
+   * Returns true on success, false on failure (error already logged).
+   */
+  bool saveImage(f3d::image& img, const fs::path& outputPath, bool toStdout)
+  {
+    if (toStdout)
+    {
+      const auto buffer = img.saveBuffer();
+      std::copy(buffer.begin(), buffer.end(), std::ostreambuf_iterator(std::cout));
+      f3d::log::debug("Output image saved to stdout");
+    }
+    else
+    {
+      try
+      {
+        img.save(outputPath);
+      }
+      catch (const f3d::image::write_exception& ex)
+      {
+        f3d::log::error("Could not write output: ", ex.what());
+        return false;
+      }
+      f3d::log::debug("Output image saved to ", outputPath);
+    }
+    return true;
+  }
+
+  /**
    * Substitute the following variables in a filename template:
    * - `{app}`: application name (ie. `F3D`)
    * - `{version}`: application version (eg. `2.4.0`)
@@ -1392,81 +1420,49 @@ int F3DStarter::Start(int argc, char** argv)
       {
         f3d::scene& animScene = this->Internals->Engine->getScene();
         auto [minTime, maxTime] = animScene.animationTimeRange();
+        int count = frameCount.value();
+
         if (minTime == maxTime)
         {
           f3d::log::warn("No animation available or animation has zero duration, outputting single "
                          "frame");
-          fs::path frameOutput = this->Internals->applyFilenameTemplate(
-            f3d::utils::collapsePath(this->Internals->AppOptions.Output), 0);
+          count = 1;
+        }
+
+        double timeStep = count > 1 ? (maxTime - minTime) / (count - 1) : 0.0;
+
+        f3d::log::info(
+          "Saving ", count, " animation frame(s) from time ", minTime, " to ", maxTime);
+
+        for (int frame = 0; frame < count; ++frame)
+        {
+          double currentTime = minTime + frame * timeStep;
+          animScene.loadAnimationTime(currentTime);
+
+          fs::path frameOutput = renderToStdout
+            ? fs::path{}
+            : this->Internals->applyFilenameTemplate(
+                f3d::utils::collapsePath(this->Internals->AppOptions.Output), frame);
+
           f3d::image img = window.renderToImage(this->Internals->AppOptions.NoBackground);
           this->Internals->addOutputImageMetadata(img);
-          try
+
+          if (!this->Internals->saveImage(img, frameOutput, renderToStdout))
           {
-            img.save(frameOutput);
-          }
-          catch (const f3d::image::write_exception& ex)
-          {
-            f3d::log::error("Could not write output: ", ex.what());
             return EXIT_FAILURE;
           }
-          f3d::log::debug("Output image saved to ", frameOutput);
         }
-        else
-        {
-          int count = frameCount.value();
-          double timeStep = (count > 1) ? (maxTime - minTime) / (count - 1) : 0.0;
 
-          for (int frame = 0; frame < count; ++frame)
-          {
-            double currentTime = minTime + frame * timeStep;
-            animScene.loadAnimationTime(currentTime);
-
-            fs::path frameOutput = this->Internals->applyFilenameTemplate(
-              f3d::utils::collapsePath(this->Internals->AppOptions.Output), frame);
-
-            f3d::image img = window.renderToImage(this->Internals->AppOptions.NoBackground);
-            this->Internals->addOutputImageMetadata(img);
-
-            try
-            {
-              img.save(frameOutput);
-            }
-            catch (const f3d::image::write_exception& ex)
-            {
-              f3d::log::error("Could not write output: ", ex.what());
-              return EXIT_FAILURE;
-            }
-
-            f3d::log::debug("Frame ", frame, " (time=", currentTime, ") saved to ", frameOutput);
-          }
-
-          f3d::log::info("Saved ", count, " animation frames");
-        }
+        f3d::log::info("Saved ", count, " animation frame(s)");
       }
       else
       {
         f3d::image img = window.renderToImage(this->Internals->AppOptions.NoBackground);
         this->Internals->addOutputImageMetadata(img);
 
-        if (renderToStdout)
+        if (!this->Internals->saveImage(img, output, renderToStdout))
         {
-          const auto buffer = img.saveBuffer();
-          std::copy(buffer.begin(), buffer.end(), std::ostreambuf_iterator(std::cout));
-          f3d::log::debug("Output image saved to stdout");
-        }
-        else
-        {
-          try
-          {
-            img.save(output);
-          }
-          catch (const f3d::image::write_exception& ex)
-          {
-            f3d::log::error("Could not write output: ", ex.what());
-            return EXIT_FAILURE;
-          }
-
-          f3d::log::debug("Output image saved to ", output);
+          return EXIT_FAILURE;
         }
       }
 
