@@ -165,6 +165,9 @@ public:
     /** List the remaining un-substituted variables. */
     [[nodiscard]] std::vector<std::string> variables() const;
 
+    /** Check if the template contains a variable matching the regex pattern. */
+    [[nodiscard]] bool hasVariable(const std::regex& pattern) const;
+
     /**
      * Exception to be thrown by substitution functions to let untouched variables through.
      */
@@ -280,6 +283,19 @@ inline std::vector<std::string> utils::string_template::variables() const
     }
   }
   return variables;
+}
+
+//------------------------------------------------------------------------------
+inline bool utils::string_template::hasVariable(const std::regex& pattern) const
+{
+  for (const auto& variable : this->variables())
+  {
+    if (std::regex_match(variable, pattern))
+    {
+      return true;
+    }
+  }
+  return false;
 }
 }
 

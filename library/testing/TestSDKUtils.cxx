@@ -118,6 +118,11 @@ int TestSDKUtils([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
       .str(),
     "hello {foo}!");
 
+  test("string_template: has variable",
+    f3d::utils::string_template("{foo} {bar}!").hasVariable(std::regex("ba.")), true);
+  test("string_template: has variable",
+    f3d::utils::string_template("{foo} {bar}!").hasVariable(std::regex("baz")), false);
+
   //
 
   test("collapsePath: empty", f3d::utils::collapsePath("").empty());
