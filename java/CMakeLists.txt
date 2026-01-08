@@ -23,7 +23,7 @@ set(F3D_JAVA_SOURCES
   Window.java)
 
 # Generate JNI headers, and builds a JAR package
-set(CMAKE_JAVA_COMPILE_FLAGS -source 8 -target 8)
+set(CMAKE_JAVA_COMPILE_FLAGS --release 11)
 add_jar(f3d-jar ${F3D_JAVA_SOURCES}
   GENERATE_NATIVE_HEADERS f3d-jni-headers
   OUTPUT_NAME f3d)
