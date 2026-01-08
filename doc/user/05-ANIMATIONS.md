@@ -1,4 +1,4 @@
-# Animations
+#Animations
 
 F3D is able to play animations for any files which contain them.
 Play them either interactively or by selecting a specific time to display.
@@ -29,13 +29,13 @@ Note: A blue bar runs along the bottom of screen to indicate the current time in
 
 F3D animation behavior can be fully controlled from the command line using the following options.
 
-| Options                      | Default             | Description                                     |
-| ---------------------------- | ------------------- | ----------------------------------------------- |
-| \-\-animation\-indices       |                     | Select the animations to play.                  |
-| \-\-animation\-indices=-1    |                     | Play all animations at once (only if supported) |
-| \-\-animation\-speed\-factor | Time Unit = Seconds | Adjust time unit.                               |
-| \-\-frame\-rate              | 60 FPS              | Adjust animation frame rate.                    |
-| \-\-animation\-time          |                     | Load a specific time value on start.            |
+| Options                      | Default             | Description                                          |
+| ---------------------------- | ------------------- | ---------------------------------------------------- |
+| \-\-animation\-indices       |                     | Select the animations to play.                       |
+| \-\-animation\-indices=-1    |                     | Play all animations at once (only if supported)      |
+| \-\-animation\-speed\-factor | Time Unit = Seconds | Adjust time unit.                                    |
+| \-\-frame\-rate              | 60 FPS              | Adjust animation (and others components) frame rate. |
+| \-\-animation\-time          |                     | Load a specific time value on start.                 |
 
 ## Exporting animation frames
 
