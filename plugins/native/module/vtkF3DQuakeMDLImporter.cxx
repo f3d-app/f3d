@@ -15,6 +15,7 @@
 #include <vtkResourceStream.h>
 
 #include <vtkInterpolateDataSetAttributes.h>
+#include <vtkMathUtilities.h>
 
 #include <cstdint>
 #include <cstring>
@@ -757,25 +758,19 @@ bool vtkF3DQuakeMDLImporter::UpdateAtTimeValue(double timeValue)
 
     // Calculate interpolation factor (alpha)
     double alpha = 0.0;
-    if (frameIndex0 != frameIndex1 && (t1 - t0) > 1e-9)
+    if (frameIndex0 != frameIndex1)
     {
-      alpha = (clampedTime - t0) / (t1 - t0);
+      alpha = vtkMathUtilities::SafeDivision(clampedTime - t0, t1 - t0);
       alpha = std::max(0.0, std::min(1.0, alpha));
     }
 
     if (isMeshAnimation)
     {
-      if (frameIndex0 == frameIndex1 || alpha < 1e-9)
+      if (frameIndex0 == frameIndex1)
       {
         // No interpolation needed: use frame0
         this->Internals->Mapper->SetInputData(
           this->Internals->AnimationFrames[animIndex][frameIndex0]);
-      }
-      else if (alpha > 1.0 - 1e-9)
-      {
-        // Alpha is effectively 1.0: use frame1
-        this->Internals->Mapper->SetInputData(
-          this->Internals->AnimationFrames[animIndex][frameIndex1]);
       }
       else
       {
