@@ -1145,8 +1145,8 @@ bool vtkF3DAssimpImporter::IsAnimationEnabled(vtkIdType animationIndex)
 }
 
 //----------------------------------------------------------------------------
-bool vtkF3DAssimpImporter::GetTemporalInformation(vtkIdType animationIndex, double timeRange[2],
-  int& nbTimeSteps, vtkDoubleArray* timeSteps)
+bool vtkF3DAssimpImporter::GetTemporalInformation(
+  vtkIdType animationIndex, double timeRange[2], int& nbTimeSteps, vtkDoubleArray* timeSteps)
 {
   assert(animationIndex < this->GetNumberOfAnimations());
   assert(animationIndex >= 0);
@@ -1213,10 +1213,9 @@ bool vtkF3DAssimpImporter::GetTemporalInformation(vtkIdType animationIndex, doub
 
   nbTimeSteps = timeStepSet.size();
   timeSteps->SetNumberOfTuples(nbTimeSteps);
-  timeSteps->SetNumberOfComponents(1);
-  
+
   int index = 0;
-  for (auto it = timeStepSet.begin(); it != timeStepSet.end(); it++) 
+  for (auto it = timeStepSet.begin(); it != timeStepSet.end(); it++)
   {
     timeSteps->SetValue(index, *it);
     index++;

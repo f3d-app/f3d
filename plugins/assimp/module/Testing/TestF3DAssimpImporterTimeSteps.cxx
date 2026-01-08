@@ -1,8 +1,8 @@
 #include "vtkF3DAssimpImporter.h"
 
+#include <vtkDoubleArray.h>
 #include <vtkNew.h>
 #include <vtkTestUtilities.h>
-#include <vtkDoubleArray.h>
 
 #include <iostream>
 
@@ -19,13 +19,13 @@ int TestF3DAssimpImporterTimeSteps(int vtkNotUsed(argc), char* argv[])
   importer->GetTemporalInformation(0, timeRange, nbTimeSteps, timeSteps);
   importer->Print(std::cout);
 
-  if (nbTimeSteps != 24) 
+  if (nbTimeSteps != 24)
   {
     std::cerr << "Time steps is not as expected.\n";
     return EXIT_FAILURE;
   }
 
-  for (int i = 0; i < nbTimeSteps; i++) 
+  for (int i = 0; i < nbTimeSteps; i++)
   {
     double currentTimeStep = timeSteps->GetValue(i);
     if (currentTimeStep > timeRange[1] || currentTimeStep < timeRange[0])
