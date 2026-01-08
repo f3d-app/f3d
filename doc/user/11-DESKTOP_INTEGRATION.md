@@ -49,34 +49,6 @@ by modifying the [thumbnail config file](06-CONFIGURATION_FILE.md), eg:`~/.confi
 
 If you use the portable archive, make sure to extract it somewhere the sandboxing system has access to, eg: Nautilus uses `bwrap` and gives it access to `/usr` but not to `/opt`.
 
-### Piping
-
-F3D supports piping in and out for [most formats](02-SUPPORTED_FORMATS.md), using the `-` char, as long as the reader is specified, eg:
-
-`f3d - --force-reader=GLB --output=- < path/to/file.glb > path/to/img.png`
-
-or, using [display](https://imagemagick.org/script/display.php#gsc.tab=0):
-
-`cat path/to/file.glb | f3d - --force-reader=GLB --output=- | display`
-
-and even, using [build123d](https://github.com/gumyr/build123d):
-
-`script.py`:
-
-```
-import sys
-
-from build123d import Box, Cylinder, export_brep, export_step
-from OCP.BRepTools import BRepTools
-
-obj = Box(2, 2, 1) - Cylinder(0.5, 2)
-BRepTools.Write_s(obj.wrapped, sys.stdout.buffer)
-```
-
-`python script.py | f3d - --force-reader=BREP --output=- | display`
-
-While piping is more common on Linux, F3D supports it perfectly on Windows and MacOS as well.
-
 ## Windows
 
 For Windows desktop integration, F3D rely on a registered shell extension.
