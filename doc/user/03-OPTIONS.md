@@ -8,7 +8,7 @@ F3D behavior can be fully controlled from the command line using the following o
 
 The input file or files to read, can also be provided as a positional argument. Support directories as well.
 If `-` is specified instead of a filename, the file will be streamed from the stdin, which will hang until a stream is provided.
-Using this feature require `--force-reader`.
+Using this feature requires to use `--force-reader`.
 
 ### `--output=<png file>` (_string_)
 

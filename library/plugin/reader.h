@@ -105,7 +105,7 @@ public:
   }
 
   /**
-   * Create the geometry reader (VTK reader) for the given filename
+   * Create the geometry reader (VTK reader) for the given stream
    */
   virtual vtkSmartPointer<vtkAlgorithm> createGeometryReader(vtkResourceStream*) const
   {
@@ -137,7 +137,7 @@ public:
   }
 
   /**
-   * Create the scene reader (VTK importer) for the given filename
+   * Create the scene reader (VTK importer) for the given stream
    */
   virtual vtkSmartPointer<vtkImporter> createSceneReader(vtkResourceStream*) const
   {

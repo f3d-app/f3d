@@ -25,12 +25,12 @@ F3D supports the following file formats:
 | Alembic                                   | `.abc`                                         | No         | UNIQUE            | YES (VTK 9.6)     | `alembic` | `Alembic`               |
 | Wavefront OBJ                             | `.obj`                                         | Yes        | NONE              | PARTIAL (VTK 9.7) | `native`  | `OBJ`                   |
 | GL Transmission Format                    | `.gltf`                                        | Yes        | MULTI             | PARTIAL (VTK 9.6) | `native`  | `GLTF`, `GLTFDraco`     |
-| GL Transmission Format (binary)           | `.glb`                                         | Yes        | MULTI             | YES (VTK 9.6)     | `native`  | `GLTF`, `GLTFDraco`     |
+| GL Transmission Format (binary)           | `.glb`                                         | Yes        | MULTI             | YES (VTK 9.6)     | `native`  | `GLB`, `GLBDraco`       |
 | Draco                                     | `.drc`                                         | No         | NONE              | YES               | `draco`   | `Draco`                 |
 | Autodesk 3D Studio                        | `.3ds`                                         | Yes        | NONE              | YES (VTK 9.6)     | `native`  | `3DS`                   |
 | Virtual Reality Modeling Language         | `.wrl`, `.vrml`                                | Yes        | NONE              | NO                | `native`  | `VRMLReader`            |
 | Autodesk Filmbox                          | `.fbx`                                         | Yes        | SINGLE            | YES (VTK 9.6)     | `assimp`  | `FBX`                   |
-| COLLADA                                   | `.dae`                                         | Yes        | SINGLE            | YES (VTK 9.6)     | `assimp`  | `COLLADA`               |
+| COLLADA                                   | `.dae`                                         | Yes        | SINGLE            | PARTIAL (VTK 9.6) | `assimp`  | `COLLADA`               |
 | Object File Format                        | `.off`                                         | Yes        | NONE              | YES (VTK 9.6)     | `assimp`  | `OFF`                   |
 | Drawing Exchange Format                   | `.dxf`                                         | Yes        | NONE              | YES (VTK 9.6)     | `assimp`  | `DXF`                   |
 | DirectX                                   | `.x`                                           | Yes        | SINGLE            | YES (VTK 9.6)     | `assimp`  | `DirectX`               |

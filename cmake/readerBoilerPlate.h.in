@@ -98,8 +98,7 @@ public:
 
 #if @F3D_READER_HAS_SUPPORTS_STREAM@
   /*
-   * Create the geometry reader (VTK reader) for the given filename
-   * The filename is collapsed as some VTK reader needs it to read reliably TODO add issue
+   * Create the geometry reader (VTK reader) for the given stream
    */
   vtkSmartPointer<vtkAlgorithm> createGeometryReader(vtkResourceStream* stream) const override
   {
@@ -141,8 +140,7 @@ public:
 
 #if @F3D_READER_HAS_SUPPORTS_STREAM@
   /*
-   * Create the scene reader (VTK importer) for the given filename
-   * The filename is collapsed as some VTK reader needs it to read reliably TODO add issue
+   * Create the scene reader (VTK importer) for the given stream
    */
   vtkSmartPointer<vtkImporter> createSceneReader(vtkResourceStream* stream) const override
   {

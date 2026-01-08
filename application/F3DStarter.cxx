@@ -1739,7 +1739,6 @@ void F3DStarter::LoadFileGroupInternal(
 
         if (this->Internals->PipedBuffer.empty())
         {
-          // Read cin into a buffer
           this->Internals->PipedBuffer.clear();
           std::size_t readLength = 1024;
           std::size_t readSize = 0;

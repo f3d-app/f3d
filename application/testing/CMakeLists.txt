@@ -1081,6 +1081,10 @@ if(F3D_PLUGIN_BUILD_HDF)
     f3d_test(NAME TestPluginFullPath DATA disk_out_ref.ex2 ARGS --verbose --load-plugins "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_SHARED_MODULE_PREFIX}f3d-plugin-hdf${CMAKE_SHARED_MODULE_SUFFIX}" NO_BASELINE REGEXP "Loaded plugin hdf from")
   endif()
 
+  # NetCDF tests
+  # Basic rendering test with scalar coloring
+  f3d_test(NAME TestNetCDF DATA temperature_grid.nc ARGS --load-plugins=hdf -s)
+
   if(NOT F3D_MACOS_BUNDLE)
     # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
     if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
