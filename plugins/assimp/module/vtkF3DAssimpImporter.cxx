@@ -1172,39 +1172,39 @@ bool vtkF3DAssimpImporter::GetTemporalInformation(
   std::set<double> timeStepSet;
 
   aiAnimation* anim = this->Internals->Scene->mAnimations[animationIndex];
-  for (int channel = 0; channel < anim->mNumChannels; channel++)
+  for (unsigned int channel = 0; channel < anim->mNumChannels; channel++)
   {
     aiNodeAnim* nodeAnim = anim->mChannels[channel];
 
-    for (int positionIndex = 0; positionIndex < nodeAnim->mNumPositionKeys; positionIndex++)
+    for (unsigned int positionIndex = 0; positionIndex < nodeAnim->mNumPositionKeys; positionIndex++)
     {
       timeStepSet.insert(nodeAnim->mPositionKeys[positionIndex].mTime / anim->mTicksPerSecond);
     }
 
-    for (int rotationIndex = 0; rotationIndex < nodeAnim->mNumRotationKeys; rotationIndex++)
+    for (unsigned int rotationIndex = 0; rotationIndex < nodeAnim->mNumRotationKeys; rotationIndex++)
     {
       timeStepSet.insert(nodeAnim->mRotationKeys[rotationIndex].mTime / anim->mTicksPerSecond);
     }
 
-    for (int scalingIndex = 0; scalingIndex < nodeAnim->mNumScalingKeys; scalingIndex++)
+    for (unsigned int scalingIndex = 0; scalingIndex < nodeAnim->mNumScalingKeys; scalingIndex++)
     {
       timeStepSet.insert(nodeAnim->mScalingKeys[scalingIndex].mTime / anim->mTicksPerSecond);
     }
   }
 
-  for (int channel = 0; channel < anim->mNumMeshChannels; channel++)
+  for (unsigned int channel = 0; channel < anim->mNumMeshChannels; channel++)
   {
     aiMeshAnim* meshAnim = anim->mMeshChannels[channel];
-    for (int i = 0; i < meshAnim->mNumKeys; i++)
+    for (unsigned int i = 0; i < meshAnim->mNumKeys; i++)
     {
       timeStepSet.insert(meshAnim->mKeys[i].mTime / anim->mTicksPerSecond);
     }
   }
 
-  for (int channel = 0; channel < anim->mNumMorphMeshChannels; channel++)
+  for (unsigned int channel = 0; channel < anim->mNumMorphMeshChannels; channel++)
   {
     aiMeshMorphAnim* meshMorphAnim = anim->mMorphMeshChannels[channel];
-    for (int i = 0; i < meshMorphAnim->mNumKeys; i++)
+    for (unsigned int i = 0; i < meshMorphAnim->mNumKeys; i++)
     {
       timeStepSet.insert(meshMorphAnim->mKeys[i].mTime / anim->mTicksPerSecond);
     }
