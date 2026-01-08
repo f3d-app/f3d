@@ -10,6 +10,13 @@ int TestSDKAnimation([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   f3d::engine eng = f3d::engine::create(true);
   f3d::scene& sce = eng.getScene();
   f3d::interactor& inter = eng.getInteractor();
+
+  test("availableAnimations for empty scene", sce.availableAnimations() == 0);
+
+  test("getAnimationName returns for empty scene", sce.getAnimationName(), "No animation");
+
+  test("getAnimationNames returns 0 len vec for empty scene", sce.getAnimationNames().size(), 0);
+
   sce.add(std::string(argv[1]) + "/data/f3d.glb");
 
   test("availableAnimations", sce.availableAnimations() == 1);
