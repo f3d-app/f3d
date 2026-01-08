@@ -1754,7 +1754,8 @@ void F3DStarter::LoadFileGroupInternal(
             this->Internals->PipedBuffer.resize(this->Internals->PipedBuffer.size() + readLength);
 
             // Read only what is needed
-            is.read(reinterpret_cast<char*>(this->Internals->PipedBuffer.data()) + readSize, readLength);
+            is.read(
+              reinterpret_cast<char*>(this->Internals->PipedBuffer.data()) + readSize, readLength);
 
             // Recover size of what was read
             readSize += is.gcount();

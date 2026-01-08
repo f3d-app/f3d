@@ -18,7 +18,7 @@ int TestSDKSceneFromBuffer([[maybe_unused]] int argc, [[maybe_unused]] char* arg
   // Add empty buffer
   test("Add empty buffer", [&]() { sce.add(nullptr, 0); });
 
-  std::byte y{1};
+  std::byte y{ 1 };
 
   // Add buffer without setting reader
   test.expect<f3d::scene::load_failure_exception>(
