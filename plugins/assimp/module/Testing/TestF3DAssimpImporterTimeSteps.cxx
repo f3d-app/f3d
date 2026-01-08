@@ -17,7 +17,6 @@ int TestF3DAssimpImporterTimeSteps(int vtkNotUsed(argc), char* argv[])
   int nbTimeSteps;
   vtkNew<vtkDoubleArray> timeSteps;
   importer->GetTemporalInformation(0, timeRange, nbTimeSteps, timeSteps);
-  importer->Print(std::cout);
 
   if (nbTimeSteps != 24)
   {

@@ -1166,7 +1166,6 @@ bool vtkF3DAssimpImporter::GetTemporalInformation(
   this->Internals->Description += std::to_string(fps);
   this->Internals->Description += " fps.\n";
 
-  // F3D do care about timesteps and time range
   timeRange[0] = 0.0;
   timeRange[1] = duration / fps;
 
