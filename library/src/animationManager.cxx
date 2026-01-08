@@ -222,6 +222,7 @@ void animationManager::JumpToFrame(int frame, bool relative)
   }
 }
 
+//----------------------------------------------------------------------------
 void animationManager::JumpToKeyFrame(int keyframe, bool relative)
 {
   vtkSmartPointer<vtkDoubleArray> timeSteps = this->AnimationTimeSteps.value();
