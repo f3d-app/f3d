@@ -1310,18 +1310,9 @@ int F3DStarter::Start(int argc, char** argv)
     const std::string& outputTemplate = this->Internals->AppOptions.Output;
     const bool hasFrameTemplate =
       f3d::utils::string_template(outputTemplate).hasVariable(std::regex("frame:?.*"));
-    fs::path output;
-    try
-    {
-      output = hasFrameTemplate
-        ? fs::path{}
-        : this->Internals->applyFilenameTemplate(f3d::utils::collapsePath(outputTemplate));
-    }
-    catch (const std::runtime_error& ex)
-    {
-      f3d::log::error(ex.what());
-      return EXIT_FAILURE;
-    }
+    fs::path output = hasFrameTemplate
+      ? fs::path{}
+      : this->Internals->applyFilenameTemplate(f3d::utils::collapsePath(outputTemplate));
 
     // Render and compare with file if needed
     if (!reference.empty())
