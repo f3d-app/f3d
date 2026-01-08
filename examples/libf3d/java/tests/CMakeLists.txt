@@ -14,7 +14,7 @@ endif()
 add_test(NAME test_interactive-app-java
   WORKING_DIRECTORY "${F3D_JAVA_LIBRARY_DIR}"
   COMMAND ${Java_JAVA_EXECUTABLE}
-    -Djava.library.path="${F3D_JAVA_LIBRARY_DIR}"
+    -Djava.library.path=${F3D_JAVA_LIBRARY_DIR}
     ${java_test_args}
     -jar $<SHELL_PATH:$<TARGET_PROPERTY:interactive-app-java,JAR_FILE>>
     "${CMAKE_CURRENT_SOURCE_DIR}/data/cow.vtp" 1)
