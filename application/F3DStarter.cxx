@@ -410,8 +410,8 @@ public:
       {
         if (!frame.has_value())
         {
-          throw std::runtime_error(
-            "{frame} variable can only be used when outputting animation frames");
+          f3d::log::warn("{frame} variable can only be used when outputting animation frames");
+          throw f3d::utils::string_template::lookup_error(var);
         }
         std::stringstream formattedFrame;
         const std::string fmt = std::regex_replace(var, frameRe, "$2");
