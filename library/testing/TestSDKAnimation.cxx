@@ -15,7 +15,7 @@ int TestSDKAnimation([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   test("getAnimationName returns for empty scene", sce.getAnimationName(), "No animation");
 
-  test("getAnimationNames returns 0 len vec for empty scene", sce.getAnimationNames().size(), 0);
+  test("getAnimationNames returns 0 len vec for empty scene", sce.getAnimationNames().size() == 0);
 
   sce.add(std::string(argv[1]) + "/data/f3d.glb");
 
