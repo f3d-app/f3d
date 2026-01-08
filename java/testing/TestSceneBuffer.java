@@ -5,13 +5,6 @@ import java.lang.String;
 
 public class TestSceneBuffer {
 
-  static {
-    if (System.getProperty("os.name").startsWith("Windows"))
-    {
-      System.loadLibrary("opengl32");
-    }
-  }
-
   public static void main(String[] args) throws FileNotFoundException, IOException {
     Engine.autoloadPlugins();
 

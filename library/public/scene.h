@@ -6,6 +6,7 @@
 #include "types.h"
 
 /// @cond
+#include <cstddef>
 #include <filesystem>
 #include <string>
 #include <vector>
@@ -73,7 +74,7 @@ public:
    * throw a load_failure_exception.
    * On other failure, throw a load_failure_exception.
    */
-  virtual scene& add(void* buffer, std::size_t size) = 0;
+  virtual scene& add(std::byte* buffer, std::size_t size) = 0;
 
   ///@{
   /**

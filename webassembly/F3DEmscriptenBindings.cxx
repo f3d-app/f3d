@@ -159,7 +159,7 @@ EMSCRIPTEN_BINDINGS(f3d)
       "addBuffer",
       +[](f3d::scene& scene, emscripten::val jsbuf) -> f3d::scene&
       {
-        std::vector<char> data = emscripten::vecFromJSArray<char>(jsbuf);
+        std::vector<std::byte> data = emscripten::vecFromJSArray<std::byte>(jsbuf);
         return scene.add(data.data(), data.size());
       },
       emscripten::return_value_policy::reference())

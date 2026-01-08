@@ -266,7 +266,7 @@ extern "C"
 
     try
     {
-      GetEngine(env, self)->getScene().add(bufferData, size);
+      GetEngine(env, self)->getScene().add(reinterpret_cast<std::byte*>(bufferData), size);
     }
     catch (const std::exception& e)
     {

@@ -18,21 +18,21 @@ int TestSDKSceneFromBuffer([[maybe_unused]] int argc, [[maybe_unused]] char* arg
   // Add empty buffer
   test("Add empty buffer", [&]() { sce.add(nullptr, 0); });
 
-  char c = '\0';
+  std::byte y{1};
 
   // Add buffer without setting reader
   test.expect<f3d::scene::load_failure_exception>(
-    "add buffer without setting reader", [&]() { sce.add(&c, 1); });
+    "add buffer without setting reader", [&]() { sce.add(&y, 1); });
 
   // Add buffer with invalid reader
   opt.scene.force_reader = "INVALID";
   test.expect<f3d::scene::load_failure_exception>(
-    "add buffer with invalid reader", [&]() { sce.add(&c, 1); });
+    "add buffer with invalid reader", [&]() { sce.add(&y, 1); });
 
   // Add buffer with reader that doesn't support streams
   opt.scene.force_reader = "Nrrd";
   test.expect<f3d::scene::load_failure_exception>(
-    "add buffer with reader that doesn't support streams", [&]() { sce.add(&c, 1); });
+    "add buffer with reader that doesn't support streams", [&]() { sce.add(&y, 1); });
 
   return test.result();
 }

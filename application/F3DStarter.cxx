@@ -1022,7 +1022,7 @@ public:
   std::vector<fs::path> LoadedFiles;
   std::set<fs::path> FilesToWatch;
   int CurrentFilesGroupIndex = -1;
-  std::vector<char> PipedBuffer;
+  std::vector<std::byte> PipedBuffer;
 
 #if F3D_MODULE_DMON
   // dmon related
@@ -1754,7 +1754,7 @@ void F3DStarter::LoadFileGroupInternal(
             this->Internals->PipedBuffer.resize(this->Internals->PipedBuffer.size() + readLength);
 
             // Read only what is needed
-            is.read(this->Internals->PipedBuffer.data() + readSize, readLength);
+            is.read(reinterpret_cast<char*>(this->Internals->PipedBuffer.data()) + readSize, readLength);
 
             // Recover size of what was read
             readSize += is.gcount();

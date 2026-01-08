@@ -40,5 +40,6 @@ int test_scene_buffer_c_api()
   f3d_options_reset(options, "scene.force_reader");
 
   f3d_engine_delete(engine);
+  fclose(fp);
   return 0;
 }

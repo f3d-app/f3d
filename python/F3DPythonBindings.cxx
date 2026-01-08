@@ -449,7 +449,7 @@ PYBIND11_MODULE(pyf3d, module)
       [](f3d::scene& scene, py::bytes buffer, std::size_t size)
       {
         std::string str(buffer);
-        scene.add(str.data(), size);
+        scene.add(reinterpret_cast<std::byte*>(str.data()), size);
       },
       "Add a memory buffer containing a file the scene", py::arg("buffer"), py::arg("size"))
     .def("load_animation_time", &f3d::scene::loadAnimationTime)

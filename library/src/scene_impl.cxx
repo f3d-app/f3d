@@ -309,7 +309,7 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
 }
 
 //----------------------------------------------------------------------------
-scene& scene_impl::add(void* buffer, std::size_t size)
+scene& scene_impl::add(std::byte* buffer, std::size_t size)
 {
   if (buffer == nullptr || size == 0)
   {
@@ -348,8 +348,7 @@ scene& scene_impl::add(void* buffer, std::size_t size)
       throw scene::load_failure_exception(*forceReader + " does not support reading streams");
     }
 
-    vtkSmartPointer<vtkF3DGenericImporter> genericImporter =
-      vtkSmartPointer<vtkF3DGenericImporter>::New();
+    vtkNew<vtkF3DGenericImporter> genericImporter;
     genericImporter->SetInternalReader(vtkReader);
     importer = genericImporter;
   }
