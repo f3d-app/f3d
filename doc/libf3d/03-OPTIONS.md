@@ -183,6 +183,13 @@ Set a _custom colormap for the coloring_.See [colormap parsing](../user/08-PARSI
 
 CLI: `--colormap`.
 
+### `model.scivis.opacity_map` (_opacity_map_, default: "0.0,0.0,1.0,1.0")
+
+Set a _custom opacity map for the coloring_. The format of the opacity map should be `val, opacity, ...`.
+It is only used for volume rendering currently.
+
+CLI: `--opacity-map`.
+
 ### `model.scivis.component` (_int_, default: `-1`)
 
 Specify the component to color with. `-1` means _magnitude_. `-2` means _direct values_.
@@ -426,24 +433,21 @@ Show _axes_ as a trihedron in the scene. Requires an interactor.
 
 CLI: `--axis`.
 
-### `ui.x_color` (_color_, optional)
+### `ui.x_color` (_color_, default: `#f94306`)
 
 Set the X axis color in both widget and grid.
-If not set, `0.976471, 0.262745, 0.023529` will be used.
 
 CLI: `--x-color`.
 
-### `ui.y_color` (_color_, optional)
+### `ui.y_color` (_color_, default: `#7aff7a`)
 
 Set the Y axis color in both widget and grid.
-If not set, `0.478431, 1.000000, 0.478431` will be used.
 
 CLI: `--y-color`.
 
-### `ui.z_color` (_color_, optional)
+### `ui.z_color` (_color_, default: `#788bff`)
 
 Set the Z axis color in both widget and grid.
-If not set, `0.470588, 0.545098, 1.000000` will be used.
 
 CLI: `--z-color`.
 

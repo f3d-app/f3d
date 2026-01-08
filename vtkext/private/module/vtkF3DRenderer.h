@@ -373,6 +373,12 @@ public:
   void SetColormapDiscretization(std::optional<int> discretization);
 
   /**
+   * Set the opacity map to use
+   * Setting an empty vector will use default opacity map
+   */
+  void SetOpacityMap(const std::vector<double>& opacityMap);
+
+  /**
    * Set the meta importer to recover coloring information from
    */
   void SetImporter(vtkF3DMetaImporter* importer);
@@ -574,8 +580,15 @@ private:
    * Return true if they were configured for coloring, false otherwise.
    */
   static bool ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vtkVolume* volume,
-    const std::string& name, int component, vtkColorTransferFunction* ctf, double range[2],
+    const std::string& name, int component, vtkColorTransferFunction* ctf,
+    const std::vector<double>& opacityMap, double range[2], bool& opacityTransferFunctionConfigured,
     bool cellFlag = false, bool inverseOpacityFlag = false);
+
+  /**
+   * Configure opacity transfer function for volume rendering
+   */
+  static void ConfigureOpacityTransferFunction(vtkPiecewiseFunction* otf, double range[2],
+    const std::vector<double>& opacityMap, bool inverseOpacityFlag);
 
   /**
    * Configure screen spaced jittering for TAA
@@ -753,6 +766,7 @@ private:
   bool UsingExpandingRange = true;
   double ColorRange[2] = { 0.0, 1.0 };
   bool ColorTransferFunctionConfigured = false;
+  bool OpacityTransferFunctionConfigured = false;
 
   bool EnableColoring = false;
   bool UseCellColoring = false;
@@ -767,6 +781,8 @@ private:
   std::optional<std::vector<double>> UserScalarBarRange;
   std::vector<double> Colormap;
   std::optional<int> ColormapDiscretization;
+
+  std::vector<double> OpacityMap;
 
   int TaaHaltonNumerator[2] = { 0, 0 };
   int TaaHaltonDenominator[2] = { 1, 1 };

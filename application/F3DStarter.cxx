@@ -101,6 +101,7 @@ public:
     std::vector<int> Resolution;
     std::vector<int> Position;
     std::string ColorMapFile;
+    std::string OpacityMapFile;
     CameraConfiguration CamConf;
     std::string Reference;
     double RefThreshold;
@@ -378,20 +379,8 @@ public:
     f3d::utils::string_template stringTemplate(templatePath.string());
     stringTemplate.substitute(variableLookup);
 
-    const auto hasNumbering = [&]()
-    {
-      for (const auto& variable : stringTemplate.variables())
-      {
-        if (std::regex_search(variable, numberingRe))
-        {
-          return true;
-        }
-      }
-      return false;
-    };
-
     /* return if there's no numbering to be done */
-    if (!hasNumbering())
+    if (!stringTemplate.hasVariable(numberingRe))
     {
       return { stringTemplate.str() };
     }
@@ -750,6 +739,7 @@ public:
     this->ParseOption(appOptions, "resolution", this->AppOptions.Resolution);
     this->ParseOption(appOptions, "position", this->AppOptions.Position);
     this->ParseOption(appOptions, "colormap-file", this->AppOptions.ColorMapFile);
+    this->ParseOption(appOptions, "volume-opacity-file", this->AppOptions.OpacityMapFile);
 
     this->ParseOption(appOptions, "camera-position", this->AppOptions.CamConf.CameraPosition);
     this->ParseOption(appOptions, "camera-focal-point", this->AppOptions.CamConf.CameraFocalPoint);
@@ -787,6 +777,22 @@ public:
       {
         f3d::log::error("Cannot find the colormap ", colorMapFile);
         this->LibOptions.model.scivis.colormap = f3d::colormap_t();
+      }
+    }
+
+    // opacity_map file and opacity_map are interdependent
+    const std::string& opacityMapFile = this->AppOptions.OpacityMapFile;
+    if (!opacityMapFile.empty() && std::filesystem::exists(opacityMapFile) &&
+      std::filesystem::is_regular_file(opacityMapFile))
+    {
+      fs::path fullPath(f3d::utils::collapsePath(opacityMapFile));
+      this->LibOptions.model.scivis.opacity_map = F3DColorMapTools::ReadOpacity(fullPath);
+
+      std::vector<double>& opacityMap = this->LibOptions.model.scivis.opacity_map;
+      if (opacityMap.empty())
+      {
+        f3d::log::error("Cannot read the opacity map ", opacityMapFile);
+        this->LibOptions.model.scivis.opacity_map = { 0.0, 0.0, 1.0, 1.0 };
       }
     }
   }

@@ -150,7 +150,6 @@ std::string ComputeFileHash(const std::string& filepath)
   return md5Hash;
 }
 
-#ifndef __EMSCRIPTEN__
 //----------------------------------------------------------------------------
 // Download texture from the GPU to a vtkImageData
 vtkSmartPointer<vtkImageData> SaveTextureToImage(
@@ -175,7 +174,6 @@ vtkSmartPointer<vtkImageData> SaveTextureToImage(
 
   return img;
 }
-#endif
 
 //----------------------------------------------------------------------------
 // TODO : add this function in a utils file for rendering in VTK directly
@@ -319,6 +317,7 @@ void vtkF3DRenderer::Initialize()
   this->ExpandingRangeSet = false;
 
   this->ColorTransferFunctionConfigured = false;
+  this->OpacityTransferFunctionConfigured = false;
   this->ColoringMappersConfigured = false;
   this->ColoringPointSpritesMappersConfigured = false;
   this->VolumePropsAndMappersConfigured = false;
@@ -1384,16 +1383,22 @@ void vtkF3DRenderer::ConfigureHDRILUT()
       }
       assert(lut->GetTextureObject());
 
-#ifndef __EMSCRIPTEN__
-      vtkSmartPointer<vtkImageData> img = ::SaveTextureToImage(
-        lut->GetTextureObject(), GL_TEXTURE_2D, 0, lut->GetLUTSize(), VTK_UNSIGNED_SHORT);
-      assert(img);
+      if (!this->CachePath.empty())
+      {
+        vtkSmartPointer<vtkImageData> img = ::SaveTextureToImage(
+          lut->GetTextureObject(), GL_TEXTURE_2D, 0, lut->GetLUTSize(), VTK_UNSIGNED_SHORT);
+        assert(img);
 
-      vtkNew<vtkXMLImageDataWriter> writer;
-      writer->SetFileName(lutCachePath.c_str());
-      writer->SetInputData(img);
-      writer->Write();
-#endif
+        vtkNew<vtkXMLImageDataWriter> writer;
+        writer->SetFileName(lutCachePath.c_str());
+        writer->SetInputData(img);
+        writer->Write();
+      }
+      else
+      {
+        F3DLog::Print(F3DLog::Severity::Warning,
+          "Cannot cache HDRI LUT texture as no cache path has been set.");
+      }
     }
     this->HasValidHDRILUT = true;
   }
@@ -1428,16 +1433,22 @@ void vtkF3DRenderer::ConfigureHDRISphericalHarmonics()
           vtkTable::SafeDownCast(sh->GetOutputDataObject(0))->GetColumn(0));
       }
 
-#ifndef __EMSCRIPTEN__
-      // Create spherical harmonics cache file
-      vtkNew<vtkTable> table;
-      table->AddColumn(this->SphericalHarmonics);
+      if (!this->CachePath.empty())
+      {
+        // Create spherical harmonics cache file
+        vtkNew<vtkTable> table;
+        table->AddColumn(this->SphericalHarmonics);
 
-      vtkNew<vtkXMLTableWriter> writer;
-      writer->SetInputData(table);
-      writer->SetFileName(shCachePath.c_str());
-      writer->Write();
-#endif
+        vtkNew<vtkXMLTableWriter> writer;
+        writer->SetInputData(table);
+        writer->SetFileName(shCachePath.c_str());
+        writer->Write();
+      }
+      else
+      {
+        F3DLog::Print(F3DLog::Severity::Warning,
+          "Cannot cache HDRI Spherical Harmonics as no cache path has been set.");
+      }
     }
     this->HasValidHDRISH = true;
   }
@@ -1470,30 +1481,36 @@ void vtkF3DRenderer::ConfigureHDRISpecular()
       }
       assert(spec->GetTextureObject());
 
-#ifndef __EMSCRIPTEN__
-      unsigned int nbLevels = spec->GetPrefilterLevels();
-      unsigned int size = spec->GetPrefilterSize();
-
-      vtkNew<vtkMultiBlockDataSet> mb;
-      mb->SetNumberOfBlocks(nbLevels);
-
-      for (unsigned int i = 0; i < nbLevels; i++)
+      if (!this->CachePath.empty())
       {
-        vtkSmartPointer<vtkImageData> img = ::SaveTextureToImage(
-          spec->GetTextureObject(), GL_TEXTURE_CUBE_MAP_POSITIVE_X, i, size >> i, VTK_FLOAT);
-        assert(img);
-        mb->SetBlock(i, img);
-      }
+        unsigned int nbLevels = spec->GetPrefilterLevels();
+        unsigned int size = spec->GetPrefilterSize();
 
-      vtkNew<vtkXMLMultiBlockDataWriter> writer;
-      writer->SetCompressorTypeToNone();
-      writer->SetDataModeToAppended();
-      writer->EncodeAppendedDataOff();
-      writer->SetHeaderTypeToUInt64();
-      writer->SetFileName(specCachePath.c_str());
-      writer->SetInputData(mb);
-      writer->Write();
-#endif
+        vtkNew<vtkMultiBlockDataSet> mb;
+        mb->SetNumberOfBlocks(nbLevels);
+
+        for (unsigned int i = 0; i < nbLevels; i++)
+        {
+          vtkSmartPointer<vtkImageData> img = ::SaveTextureToImage(
+            spec->GetTextureObject(), GL_TEXTURE_CUBE_MAP_POSITIVE_X, i, size >> i, VTK_FLOAT);
+          assert(img);
+          mb->SetBlock(i, img);
+        }
+
+        vtkNew<vtkXMLMultiBlockDataWriter> writer;
+        writer->SetCompressorTypeToNone();
+        writer->SetDataModeToAppended();
+        writer->EncodeAppendedDataOff();
+        writer->SetHeaderTypeToUInt64();
+        writer->SetFileName(specCachePath.c_str());
+        writer->SetInputData(mb);
+        writer->Write();
+      }
+      else
+      {
+        F3DLog::Print(F3DLog::Severity::Warning,
+          "Cannot cache HDRI Specular texture as no cache path has been set.");
+      }
     }
     this->HasValidHDRISpec = true;
   }
@@ -1983,6 +2000,7 @@ void vtkF3DRenderer::UpdateActors()
     this->VolumePropsAndMappersConfigured = false;
     this->ScalarBarActorConfigured = false;
     this->ColoringConfigured = false;
+    this->OpacityTransferFunctionConfigured = false;
   }
   this->ImporterUpdateTimeStamp = importerUpdateMTime;
 
@@ -2153,11 +2171,14 @@ void vtkF3DRenderer::CreateCacheDirectory()
 {
   assert(this->HasValidHDRIHash);
 
-  // Cache folder for this HDRI
-  std::string currentCachePath = this->CachePath + "/" + this->HDRIHash;
+  if (!this->CachePath.empty())
+  {
+    // Cache folder for this HDRI
+    std::string currentCachePath = this->CachePath + "/" + this->HDRIHash;
 
-  // Create the folder if it does not exists
-  vtksys::SystemTools::MakeDirectory(currentCachePath);
+    // Create the folder if it does not exists
+    vtksys::SystemTools::MakeDirectory(currentCachePath);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -2662,20 +2683,19 @@ void vtkF3DRenderer::SetUseInverseOpacityFunction(bool use)
       if (volume.Prop)
       {
         vtkPiecewiseFunction* pwf = volume.Prop->GetProperty()->GetScalarOpacity();
-        if (pwf->GetSize() == 2)
-        {
-          double range[2];
-          pwf->GetRange(range);
+        double range[2];
+        pwf->GetRange(range);
 
-          pwf->RemoveAllPoints();
-          pwf->AddPoint(range[0], this->UseInverseOpacityFunction ? 1.0 : 0.0);
-          pwf->AddPoint(range[1], this->UseInverseOpacityFunction ? 0.0 : 1.0);
-        }
+        pwf->RemoveAllPoints();
+
+        vtkF3DRenderer::ConfigureOpacityTransferFunction(
+          pwf, range, this->OpacityMap, this->UseInverseOpacityFunction);
       }
     }
     this->VolumePropsAndMappersConfigured = false;
     this->CheatSheetConfigured = false;
     this->ColoringConfigured = false;
+    this->OpacityTransferFunctionConfigured = false;
   }
 }
 
@@ -2729,6 +2749,18 @@ void vtkF3DRenderer::SetColormapDiscretization(std::optional<int> discretization
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetOpacityMap(const std::vector<double>& opacityMap)
+{
+  if (this->OpacityMap != opacityMap)
+  {
+    this->OpacityMap = opacityMap;
+
+    this->OpacityTransferFunctionConfigured = false;
+    this->VolumePropsAndMappersConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetEnableColoring(bool enable)
 {
   if (enable != this->EnableColoring)
@@ -2746,6 +2778,7 @@ void vtkF3DRenderer::SetUseCellColoring(bool useCell)
   {
     this->UseCellColoring = useCell;
     this->ColorTransferFunctionConfigured = false;
+    this->OpacityTransferFunctionConfigured = false;
     this->ColoringMappersConfigured = false;
     this->ColoringPointSpritesMappersConfigured = false;
     this->VolumePropsAndMappersConfigured = false;
@@ -2763,6 +2796,7 @@ void vtkF3DRenderer::SetArrayNameForColoring(const std::optional<std::string>& a
   {
     this->ArrayNameForColoring = arrayName;
     this->ColorTransferFunctionConfigured = false;
+    this->OpacityTransferFunctionConfigured = false;
     this->ColoringMappersConfigured = false;
     this->ColoringPointSpritesMappersConfigured = false;
     this->VolumePropsAndMappersConfigured = false;
@@ -2890,7 +2924,8 @@ void vtkF3DRenderer::ConfigureColoring()
         {
           visible = vtkF3DRenderer::ConfigureVolumeForColoring(volume.Mapper, volume.Prop,
             info.value().Name, this->ComponentForColoring, this->ColorTransferFunction,
-            this->ColorRange, this->UseCellColoring, this->UseInverseOpacityFunction);
+            this->OpacityMap, this->ColorRange, this->OpacityTransferFunctionConfigured,
+            this->UseCellColoring, this->UseInverseOpacityFunction);
           if (!visible)
           {
             F3DLog::Print(F3DLog::Severity::Warning,
@@ -2989,7 +3024,8 @@ bool vtkF3DRenderer::ConfigureMapperForColoring(vtkPolyDataMapper* mapper, const
 
 //----------------------------------------------------------------------------
 bool vtkF3DRenderer::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vtkVolume* volume,
-  const std::string& name, int component, vtkColorTransferFunction* ctf, double range[2],
+  const std::string& name, int component, vtkColorTransferFunction* ctf,
+  const std::vector<double>& opacityMap, double range[2], bool& opacityTransferFunctionConfigured,
   bool cellFlag, bool inverseOpacityFlag)
 {
   vtkDataSetAttributes* data = cellFlag
@@ -3031,9 +3067,13 @@ bool vtkF3DRenderer::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vt
     }
   }
 
-  vtkNew<vtkPiecewiseFunction> otf;
-  otf->AddPoint(range[0], inverseOpacityFlag ? 1.0 : 0.0);
-  otf->AddPoint(range[1], inverseOpacityFlag ? 0.0 : 1.0);
+  vtkPiecewiseFunction* otf = volume->GetProperty()->GetScalarOpacity();
+  if (!opacityTransferFunctionConfigured)
+  {
+    otf->RemoveAllPoints();
+    vtkF3DRenderer::ConfigureOpacityTransferFunction(otf, range, opacityMap, inverseOpacityFlag);
+    opacityTransferFunctionConfigured = true;
+  }
 
   vtkNew<vtkVolumeProperty> property;
   property->SetColor(ctf);
@@ -3043,6 +3083,33 @@ bool vtkF3DRenderer::ConfigureVolumeForColoring(vtkSmartVolumeMapper* mapper, vt
 
   volume->SetProperty(property);
   return true;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ConfigureOpacityTransferFunction(vtkPiecewiseFunction* otf, double range[2],
+  const std::vector<double>& opacityMap, bool inverseOpacityFlag)
+{
+  if (!otf)
+  {
+    return;
+  }
+
+  if (opacityMap.size() % 2 != 0 || opacityMap.empty())
+  {
+    F3DLog::Print(F3DLog::Severity::Warning,
+      "Opacity map empty or with an odd number of elements, resetting to default linear opacity "
+      "function");
+    otf->AddPoint(range[0], inverseOpacityFlag ? 1.0 : 0.0);
+    otf->AddPoint(range[1], inverseOpacityFlag ? 0.0 : 1.0);
+  }
+  else
+  {
+    for (size_t i = 0; i + 1 < opacityMap.size(); i += 2)
+    {
+      double value = inverseOpacityFlag ? 1.0 - opacityMap[i + 1] : opacityMap[i + 1];
+      otf->AddPoint(range[0] + (range[1] - range[0]) * opacityMap[i], value);
+    }
+  }
 }
 
 //----------------------------------------------------------------------------

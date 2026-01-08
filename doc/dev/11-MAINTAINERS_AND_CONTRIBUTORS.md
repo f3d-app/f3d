@@ -28,6 +28,7 @@ Contributors with a single contribution or that may not want to are not listed h
 | Luke                            | lknknm         | Yes        |
 | Larry Skuse                     | skusel         | Yes        |
 | Medyan Naser                    | Medyan-Naser   | Yes        |
+| Archie Payne                    | ArchiePayne    | Yes        |
 
 ---
 

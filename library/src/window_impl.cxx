@@ -440,19 +440,9 @@ void window_impl::UpdateDynamicOptions()
   renderer->ShowDropZoneLogo(opt.ui.drop_zone.show_logo);
   renderer->SetBackdropOpacity(opt.ui.backdrop.opacity);
 
-  auto tupleToColor = [](const std::tuple<float, float, float>& t) -> f3d::color_t
-  {
-    return { static_cast<double>(std::get<0>(t)), static_cast<double>(std::get<1>(t)),
-      static_cast<double>(std::get<2>(t)) };
-  };
-
-  f3d::color_t xColor = opt.ui.x_color.value_or(tupleToColor(F3DStyle::GetF3DRed()));
-  f3d::color_t yColor = opt.ui.y_color.value_or(tupleToColor(F3DStyle::GetF3DGreen()));
-  f3d::color_t zColor = opt.ui.z_color.value_or(tupleToColor(F3DStyle::GetF3DBlue()));
-
   if (this->Internals->Interactor)
   {
-    renderer->SetAxesColor(xColor, yColor, zColor);
+    renderer->SetAxesColor(opt.ui.x_color, opt.ui.y_color, opt.ui.z_color);
     renderer->ShowAxis(opt.ui.axis);
     renderer->SetUseTrackball(opt.interactor.trackball);
     renderer->SetInvertZoom(opt.interactor.invert_zoom);
@@ -629,6 +619,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetScalarBarRange(opt.model.scivis.range);
   renderer->SetColormap(opt.model.scivis.colormap);
   renderer->SetColormapDiscretization(opt.model.scivis.discretization);
+  renderer->SetOpacityMap(opt.model.scivis.opacity_map);
   renderer->ShowScalarBar(opt.ui.scalar_bar);
 
   renderer->SetUseVolume(opt.model.volume.enable);

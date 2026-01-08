@@ -24,8 +24,7 @@ leak:libGLX_mesa
 leak:libEGL_mesa
 
 # Qt
-leak:libQt5Core
-leak:libQt5Gui
+leak:libQt6Core
 
 # png
 leak:libvtkpng

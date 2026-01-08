@@ -84,19 +84,17 @@ engine::engine(
     }
   }
 #endif
-  if (cachePath.empty())
-  {
-    delete Internals;
-    throw engine::cache_exception(
-      "Could not setup cache, please set the appropriate environment variable");
-  }
-  cachePath /= "f3d";
 
   this->Internals->Options = std::make_unique<options>();
 
   this->Internals->Window =
     std::make_unique<detail::window_impl>(*this->Internals->Options, windowType, offscreen, loader);
-  this->Internals->Window->SetCachePath(cachePath);
+
+  if (!cachePath.empty())
+  {
+    cachePath /= "f3d";
+    this->Internals->Window->SetCachePath(cachePath);
+  }
 
   this->Internals->Scene =
     std::make_unique<detail::scene_impl>(*this->Internals->Options, *this->Internals->Window);
