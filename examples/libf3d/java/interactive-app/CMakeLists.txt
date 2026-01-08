@@ -27,7 +27,7 @@ file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/MANIFEST.MF"
   "Class-Path: f3d.jar\n"
 )
 
-set(CMAKE_JAVA_COMPILE_FLAGS --release 11)
+set(CMAKE_JAVA_COMPILE_FLAGS --release 17)
 add_jar(interactive-app-java
   InteractiveApp.java
   INCLUDE_JARS ${F3D_JAR}
