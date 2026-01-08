@@ -1746,9 +1746,6 @@ void F3DStarter::LoadFileGroupInternal(
 
           std::istream& is = std::cin;
           SET_STDIN_BINARY_MODE();
-          // TODO useful for debugging with gdb
-          //std::ifstream is;
-          //is.open("/home/glow/dev/f3d/f3d/src/testing/data/cow.vtk");
 
           // Read input stream into a buffer
           // this can make f3d hang until an input stream is provided
