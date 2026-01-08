@@ -379,20 +379,8 @@ public:
     f3d::utils::string_template stringTemplate(templatePath.string());
     stringTemplate.substitute(variableLookup);
 
-    const auto hasNumbering = [&]()
-    {
-      for (const auto& variable : stringTemplate.variables())
-      {
-        if (std::regex_search(variable, numberingRe))
-        {
-          return true;
-        }
-      }
-      return false;
-    };
-
     /* return if there's no numbering to be done */
-    if (!hasNumbering())
+    if (!stringTemplate.hasVariable(numberingRe))
     {
       return { stringTemplate.str() };
     }
