@@ -288,14 +288,9 @@ inline std::vector<std::string> utils::string_template::variables() const
 //------------------------------------------------------------------------------
 inline bool utils::string_template::hasVariable(const std::regex& pattern) const
 {
-  for (const auto& variable : this->variables())
-  {
-    if (std::regex_match(variable, pattern))
-    {
-      return true;
-    }
-  }
-  return false;
+  return std::any_of(this->fragments.begin(), this->fragments.end(),
+    [&pattern](const std::pair<const std::string, bool>& pair)
+    { return pair.second && std::regex_match(pair.first, pattern); });
 }
 }
 

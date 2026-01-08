@@ -119,9 +119,9 @@ int TestSDKUtils([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     "hello {foo}!");
 
   test("string_template: has variable",
-    f3d::utils::string_template("{foo} {bar}!").hasVariable(std::regex("ba.")), true);
+    f3d::utils::string_template("{foo}{bar}baz").hasVariable(std::regex("ba.")), true);
   test("string_template: has variable",
-    f3d::utils::string_template("{foo} {bar}!").hasVariable(std::regex("baz")), false);
+    f3d::utils::string_template("{foo}{bar}baz").hasVariable(std::regex("baz")), false);
 
   //
 
