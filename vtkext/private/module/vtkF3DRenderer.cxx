@@ -486,8 +486,11 @@ void vtkF3DRenderer::ConfigureRenderPasses()
   {
     vtkNew<vtkF3DDisplayDepthRenderPass> depthP;
     depthP->SetDelegatePass(renderingPass);
-    // this->ConfigureColoring();
-    // depthP->SetColorMap(this->ColorTransferFunction);
+    if (this->DisplayDepthScalarColoring)
+    {
+      this->ConfigureColoring();
+      depthP->SetColorMap(this->ColorTransferFunction);
+    }
     renderingPass = depthP;
   }
 
@@ -1746,6 +1749,17 @@ void vtkF3DRenderer::SetDisplayDepth(bool use)
   if (this->DisplayDepth != use)
   {
     this->DisplayDepth = use;
+    this->RenderPassesConfigured = false;
+    this->CheatSheetConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetDisplayDepthScalarColoring(bool use)
+{
+  if (this->DisplayDepthScalarColoring != use)
+  {
+    this->DisplayDepthScalarColoring = use;
     this->RenderPassesConfigured = false;
     this->CheatSheetConfigured = false;
   }
