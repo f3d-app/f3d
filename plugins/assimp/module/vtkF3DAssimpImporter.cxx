@@ -1212,7 +1212,7 @@ bool vtkF3DAssimpImporter::GetTemporalInformation(
     }
   }
 
-  nbTimeSteps = timeStepSet.size();
+  nbTimeSteps = static_cast<int>(timeStepSet.size());
   timeSteps->SetNumberOfTuples(nbTimeSteps);
 
   int index = 0;
