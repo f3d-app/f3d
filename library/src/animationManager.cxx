@@ -365,7 +365,7 @@ void animationManager::CycleAnimation()
 std::string animationManager::GetAnimationName(int indices)
 {
   assert(this->Importer);
-  if (indices == INT_MIN)
+  if (indices == -1)
   {
     if (this->PreparedAnimationIndices.has_value() &&
       this->PreparedAnimationIndices.value().size() > 1)

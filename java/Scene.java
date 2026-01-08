@@ -122,8 +122,8 @@ public class Scene {
      * @return animation names or string error
      */
     public String getAnimationName() {
-        // note : INT32 MIN
-        return getAnimationName(-2147483648);
+        // note : -1 gets the current animation
+        return getAnimationName(-1);
     }
 
     /**

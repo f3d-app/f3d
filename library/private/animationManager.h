@@ -11,7 +11,6 @@
 #include <vtkSmartPointer.h>
 
 #include <chrono>
-#include <climits>
 #include <optional>
 #include <set>
 
@@ -77,10 +76,10 @@ public:
 
   /**
    * Return the animation name of a given animation indices, if any.
-   * Will return current animation if indices is INT_MIN (default)
+   * Will return current animation if indices is -1 (default)
    * Can be called before initialization safely
    */
-  std::string GetAnimationName(int indices = INT_MIN);
+  std::string GetAnimationName(int indices = -1);
 
   /**
    * Return all of the animation names, if any.

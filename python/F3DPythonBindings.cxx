@@ -447,7 +447,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def("load_animation_time", &f3d::scene::loadAnimationTime)
     .def("animation_time_range", &f3d::scene::animationTimeRange)
     .def("available_animations", &f3d::scene::availableAnimations)
-    .def("get_animation_name", &f3d::scene::getAnimationName, py::arg("index") = INT_MIN,
+    .def("get_animation_name", &f3d::scene::getAnimationName, py::arg("index") = -1,
       "Returns the animation at an index (defaults to current)")
     .def("get_animation_names", &f3d::scene::getAnimationNames, "Returns all animation names")
     .def("add_light", &f3d::scene::addLight, "Add a light to the scene", py::arg("light_state"))
