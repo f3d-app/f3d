@@ -6,6 +6,11 @@
 #include <vtkRenderer.h>
 #include <vtkVersion.h>
 
+namespace
+{
+constexpr double EPSILON = 128 * std::numeric_limits<double>::epsilon();
+}
+
 namespace f3d::detail
 {
 class camera_impl::internals
@@ -21,7 +26,6 @@ public:
     cam->OrthogonalizeViewUp();
     vector3_t orthogonalizedUp;
     cam->GetViewUp(orthogonalizedUp.data());
-    static constexpr double EPSILON = 128 * std::numeric_limits<double>::epsilon();
     for (size_t i = 0; vtkMath::Norm(orthogonalizedUp.data()) < EPSILON && i < up.size(); i++)
     {
       // find closest up vector that cam->OrthogonalizeViewUp() does not transform into a zero
@@ -183,6 +187,7 @@ void camera_impl::getState(camera_state_t& state) const
   cam->GetViewUp(state.viewUp.data());
   state.viewAngle = cam->GetViewAngle();
 }
+
 //----------------------------------------------------------------------------
 camera& camera_impl::dolly(double val)
 {
@@ -281,6 +286,66 @@ camera& camera_impl::pitch(angle_deg_t angle)
   this->Internals->OrthogonalizeViewUp(cam);
   this->Internals->VTKRenderer->ResetCameraClippingRange();
   return *this;
+}
+
+//----------------------------------------------------------------------------
+angle_deg_t camera_impl::getYaw()
+{
+  point3_t pos, foc;
+  vector3_t dir, projectedAlongUp, projected;
+  double* up = this->Internals->VTKRenderer->GetEnvironmentUp();
+  double* right = this->Internals->VTKRenderer->GetEnvironmentRight();
+  this->getPosition(pos);
+  this->getFocalPoint(foc);
+
+  // Forward vector (focal - position)
+  vtkMath::Subtract(foc, pos, dir);
+  vtkMath::Normalize(dir.data());
+  vtkMath::Normalize(up);
+
+  if (vtkMath::Norm(dir.data()) <= EPSILON)
+  {
+    return 0;
+  }
+
+  // Project forward vector onto up vector
+  if (abs(vtkMath::AngleBetweenVectors(dir.data(), up) - vtkMath::Pi() / 2) <= EPSILON)
+  {
+    projectedAlongUp = { 0, 0, 0 };
+  }
+  else
+  {
+    vtkMath::ProjectVector(dir.data(), up, projectedAlongUp.data());
+  }
+  vtkMath::Normalize(projectedAlongUp.data());
+
+  // Projection of forward vector along the plane perpendicular to up vector
+  vtkMath::Subtract(dir, projectedAlongUp, projected);
+  if (vtkMath::Norm(projected.data()) <= EPSILON)
+  {
+    return 0;
+  }
+
+  vector3_t cross;
+  vtkMath::Cross(right, projected.data(), cross.data());
+  double sign = (vtkMath::Dot(cross.data(), up) >= 0) ? 1.0 : -1.0;
+  double angleRad = vtkMath::AngleBetweenVectors(right, projected.data());
+  return sign * vtkMath::DegreesFromRadians(angleRad);
+}
+
+//----------------------------------------------------------------------------
+angle_deg_t camera_impl::getAzimuth()
+{
+  return camera_impl::getYaw();
+}
+
+//----------------------------------------------------------------------------
+angle_deg_t camera_impl::getElevation()
+{
+  double* up = this->Internals->VTKRenderer->GetEnvironmentUp();
+  vtkCamera* cam = this->GetVTKCamera();
+  return vtkMath::DegreesFromRadians(
+    vtkMath::AngleBetweenVectors(up, cam->GetDirectionOfProjection()) - vtkMath::Pi() / 2);
 }
 
 //----------------------------------------------------------------------------
