@@ -31,11 +31,11 @@ void vtkF3DDisplayDepthRenderPass::Render(const vtkRenderState* state)
 
   assert(this->DelegatePass != nullptr);
 
-  // create framebuffer and textures
   int pos[2];
   int size[2];
   renderer->GetTiledSizeAndOrigin(&size[0], &size[1], &pos[0], &pos[1]);
 
+  // initialize resources
   if (this->DepthTexture == nullptr)
   {
     this->DepthTexture = vtkSmartPointer<vtkTextureObject>::New();
@@ -87,6 +87,7 @@ void vtkF3DDisplayDepthRenderPass::Render(const vtkRenderState* state)
     this->FrameBufferObject->SetContext(renWin);
   }
 
+  // render to texture
   this->PreRender(state);
   renWin->GetState()->PushFramebufferBindings();
   this->RenderDelegate(
@@ -94,6 +95,7 @@ void vtkF3DDisplayDepthRenderPass::Render(const vtkRenderState* state)
   renWin->GetState()->PopFramebufferBindings();
   this->PostRender(state);
 
+  // depth displaying pass
   if (!this->QuadHelper)
   {
     std::string depthDisplayingFS =
