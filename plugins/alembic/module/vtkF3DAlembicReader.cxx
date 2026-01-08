@@ -291,7 +291,7 @@ class vtkF3DAlembicReader::vtkInternals
   }
 
 public:
-  vtkSmartPointer<vtkPolyData> OutputCache;
+  std::map<std::string, vtkSmartPointer<vtkPolyData>> OutputCache;
   vtkSmartPointer<vtkPolyData> ProcessIPolyMesh(
     const Alembic::AbcGeom::IPolyMesh& pmesh, double time, const Alembic::Abc::M44d& matrix)
   {
@@ -308,15 +308,16 @@ public:
 
     Alembic::AbcGeom::ISampleSelector selector(time);
     schema.get(samp, selector);
-
+    std::string meshName = pmesh.getName();
     auto topologyVariance = schema.getTopologyVariance();
     bool isTopologyConstant = (topologyVariance == Alembic::AbcGeom::kConstantTopology) ||
       (topologyVariance == Alembic::AbcGeom::kHomogenousTopology);
     Alembic::AbcGeom::P3fArraySamplePtr positions = samp.getPositions();
 
-    if (isTopologyConstant && this->OutputCache)
+    if (isTopologyConstant && this->OutputCache.count(meshName))
     {
-      polydata->ShallowCopy(this->OutputCache);
+      vtkPolyData* cachedPoly = this->OutputCache[meshName];
+      polydata->ShallowCopy(cachedPoly);
 
       vtkDataArray* sourceIdsDA = polydata->GetPointData()->GetArray("AbcSourceIds");
 
@@ -447,7 +448,7 @@ public:
 
       if (isTopologyConstant)
       {
-        this->OutputCache = polydata;
+        this->OutputCache[meshName] = polydata;
       }
     }
 
