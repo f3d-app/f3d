@@ -35,6 +35,7 @@ protected:
    * Override to handle dpi change message
    */
   LRESULT MessageProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) override;
+
 private:
   vtkF3DWGLRenderWindow(const vtkF3DWGLRenderWindow&) = delete;
   void operator=(const vtkF3DWGLRenderWindow&) = delete;

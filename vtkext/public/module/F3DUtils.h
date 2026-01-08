@@ -8,8 +8,8 @@
 #ifndef F3DUtils_h
 #define F3DUtils_h
 
-#include "vtkextModule.h"
 #include "vtkWindow.h"
+#include "vtkextModule.h"
 
 /// @cond
 #include <string>
