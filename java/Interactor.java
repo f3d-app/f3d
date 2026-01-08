@@ -503,6 +503,28 @@ public class Interactor {
     }
 
     /**
+     * Start the interactor event loop with a callback.
+     * The callback is called on each event loop iteration.
+     *
+     * @param deltaTime time delta in seconds (must be positive)
+     * @param callback callback to execute on each iteration
+     * @return this interactor for method chaining
+     */
+    private native Interactor startWithCallback(double deltaTime, Runnable callback);
+
+    /**
+     * Start the interactor event loop with a callback.
+     * The callback is called on each event loop iteration.
+     *
+     * @param deltaTime time delta in seconds (must be positive)
+     * @param callback callback to execute on each iteration
+     * @return this interactor for method chaining
+     */
+    public Interactor start(double deltaTime, Runnable callback) {
+        return startWithCallback(deltaTime, callback);
+    }
+
+    /**
      * Stop the interactor.
      *
      * @return this interactor for method chaining

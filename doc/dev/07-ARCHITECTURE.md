@@ -15,7 +15,7 @@ This architecture is reflected by the directories organisation.
 - **vtkext**: extensions to VTK and related tests, see below
 - c: [c bindings](../libf3d/04-LANGUAGE_BINDINGS.md#c) and tests
 - python: [python bindings](../libf3d/04-LANGUAGE_BINDINGS.md#python) and tests
-- java: [java bindings](../libf3d/04-LANGUAGE_BINDINGS.md#java-experimental) and tests
+- java: [java bindings](../libf3d/04-LANGUAGE_BINDINGS.md#java) and tests
 - webassembly: [webassembly/javascript bindings](../libf3d/04-LANGUAGE_BINDINGS.md#javascript) and tests
 - winshellext: shell extension for Windows, provide [thumbnails for Windows](../user/11-DESKTOP_INTEGRATION.md#windows)
 

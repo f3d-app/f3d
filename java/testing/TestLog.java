@@ -2,13 +2,6 @@ import app.f3d.F3D.*;
 
 public class TestLog {
 
-  static {
-    if (System.getProperty("os.name").startsWith("Windows"))
-    {
-      System.loadLibrary("opengl32");
-    }
-  }
-
   static class TestCallback implements Log.ForwardCallback {
     @Override
     public void onLogMessage(Log.VerboseLevel level, String message) {
