@@ -108,15 +108,13 @@ void vtkF3DDisplayDepthRenderPass::Render(const vtkRenderState* state)
 
     vtkShaderProgram::Substitute(depthDisplayingFS, "//VTK::FSQ::Impl",
       "float depth = texture2D(depthTexture, texCoord).r;\n"
+      "if (depth <= 1e-6) depth = 1.0;\n"
       "if (useColorMap)\n"
       "{\n"
       "  vec4 colorMapped = texture1D(colorMapTexture, depth);\n"
       "  gl_FragData[0] = vec4(colorMapped.rgb, 1.0);\n"
       "  return;\n"
       "}\n"
-      "else {"
-      "if (depth <= 1e-6) depth = 1.0;\n"
-      "}"
       "gl_FragData[0] = vec4(depth, depth, depth, 1.0);\n"
       "//VTK::FSQ::Impl");
     this->QuadHelper =
