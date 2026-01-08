@@ -21,8 +21,8 @@
 
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
-#include <vtkCamera.h>
 #include <vtkCallbackCommand.h>
+#include <vtkCamera.h>
 #include <vtkCameraOrientationRepresentation.h>
 #include <vtkCameraOrientationWidget.h>
 #include <vtkCameraPass.h>
