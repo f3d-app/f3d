@@ -53,10 +53,8 @@ std::vector<fs::path> F3DConfigFileTools::GetConfigPaths(const std::string& conf
         configNames.emplace_back(configSearch);
       }
 
-      for (const auto& configName : configNames)
-      {
-        paths.emplace_back(dir / configName);
-      }
+      std::transform(configNames.begin(), configNames.end(), std::back_inserter(paths),
+        [&dir](const auto& configName) { return dir / configName; });
     }
     catch (const fs::filesystem_error&)
     {
@@ -80,7 +78,11 @@ void F3DConfigFileTools::PrintConfigInfo(const std::vector<fs::path>& configPath
     std::error_code ec;
     const bool exists = fs::exists(path, ec);
 
-    if (exists)
+    if (ec)
+    {
+      f3d::log::info("Error while checking config path: ", path);
+    }
+    else if (exists)
     {
       f3d::log::info("Config file found: ", path);
     }
