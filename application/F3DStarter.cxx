@@ -1308,8 +1308,8 @@ int F3DStarter::Start(int argc, char** argv)
     fs::path reference = f3d::utils::collapsePath(this->Internals->AppOptions.Reference);
     // Check if output template contains {frame} - if so, defer template application
     const std::string& outputTemplate = this->Internals->AppOptions.Output;
-    const bool hasFrameTemplate = outputTemplate.find("{frame}") != std::string::npos ||
-      std::regex_search(outputTemplate, std::regex("\\{frame:[^}]+\\}"));
+    const bool hasFrameTemplate =
+      f3d::utils::string_template(outputTemplate).hasVariable(std::regex("frame:?.*"));
     fs::path output;
     try
     {
