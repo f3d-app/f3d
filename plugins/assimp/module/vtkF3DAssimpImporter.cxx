@@ -1176,12 +1176,14 @@ bool vtkF3DAssimpImporter::GetTemporalInformation(
   {
     aiNodeAnim* nodeAnim = anim->mChannels[channel];
 
-    for (unsigned int positionIndex = 0; positionIndex < nodeAnim->mNumPositionKeys; positionIndex++)
+    for (unsigned int positionIndex = 0; positionIndex < nodeAnim->mNumPositionKeys;
+         positionIndex++)
     {
       timeStepSet.insert(nodeAnim->mPositionKeys[positionIndex].mTime / anim->mTicksPerSecond);
     }
 
-    for (unsigned int rotationIndex = 0; rotationIndex < nodeAnim->mNumRotationKeys; rotationIndex++)
+    for (unsigned int rotationIndex = 0; rotationIndex < nodeAnim->mNumRotationKeys;
+         rotationIndex++)
     {
       timeStepSet.insert(nodeAnim->mRotationKeys[rotationIndex].mTime / anim->mTicksPerSecond);
     }
