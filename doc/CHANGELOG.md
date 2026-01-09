@@ -1,5 +1,77 @@
 # Changelog
 
+## v3.4.1
+
+For F3D users:
+
+- BEHAVIOR CHANGE: Changed the behavior of gaussian point sprites, it now require the use of `--point-sprites-absolute-size`
+- BEHAVIOR CHANGE: Changed the default configuration for alembic to NOT display scalar by default
+- Added a CLI option to control if point sprites should be scaled or not: `--point-sprites-absolute-size`
+- Added HDRI filename display CLI option and interaction (`Shift+N`)
+- Added progress support to QuakeMDL importer
+- Added point sprites modes switch interaction (`O`)
+- Added console auto completion for all libf3d options with a domain and filepath
+- Added support for Alembic XForm animation
+- Added an interaction to play animation backward: `Ctrl+Shift+Space`
+- Added a console command to play animation backward: `toggle_animation_backward`
+- Added support for importing Alembic file with curves
+- Added a `jump_to_frame` command
+- Added axes and grid color configuration with a CLI option `--x/y/z-color`
+- Added proper support for composite data
+- Added an interaction to change the up direction `Ctrl+Y` and `Ctrl+Z` and dynamic up support
+- Improved the documentation on https://f3d.app
+- Improved style of progress and animation bar to fit F3D style
+- Improved color logging
+- Reduced VRAM usage of antialiasing and HDRI rendering
+- Fixed an issue where the camera would reset after volume rendering
+- Fixed multiple issue with temporal anti-aliasing
+- Fixed an issue with parsing `none` CLI options
+- Fixed small issues with the event loop
+- Fixed a blending issue with external rendering context
+- Fixed an issue with display of `Ctrl+Shift+` bindings
+- Fixed many memory issues in QuakeMDL reader
+- Fixed an issue with elevation and azimuth options
+- Fixed a small display issue in the cheatsheet
+- Deprecated `--anti-aliasing-mode` in favor of simply `--anti-aliasing`
+- Deprecated `--point-sprites-type` in favor of simply `--point-sprites`
+- MacOS: Fixed a native window focus issues
+- MacOS: Added a native file menu
+
+For libf3d users:
+
+- Added HDRI filename display option `ui.hdri_filename`
+- Added an option to control if point sprites should be scaled or not `model.point_sprites.absolute_size`
+- Added x/y/z axis color options `ui.x/y/z_color` to control the color of the axis widget and grid
+- Added a `interactor::requestStop` API for asynchronous loop stopping
+- Added a `log` API to forward log instead of displaying them
+- Added C bindings
+- Fixed potential crash when using `interactor::trigger*` methods
+- python: Added many libf3d usage examples
+- python: Removed Python 3.9 wheel support
+- python: Fixed stubs for better auto completion
+- python: Fixed multiples tests that were not run
+- python: Fixed an issue when setting a double option from ints
+- python: Created a dedicated helper repository: https://github.com/f3d-app/python-f3d-extras
+- wasm: Added typescript support
+- java: Improved the bindings to cover almost the whole API
+- examples: Completely reworked the examples with new and details examples in C++
+- examples: Added a complete Qt6 examples
+- examples: Added a complete Qml examples
+- examples: Added a complete Fltk examples
+- examples: Added C example
+- examples: Added Java example
+
+For F3D packagers:
+
+- Removed compatibility with VTK v9.2.6 and older. VTK v9.3.0 is the new minimum version.
+- Added `F3D_BINDINGS_C` CMake option to build the C bindings, no dependencies
+
+For Web viewer users:
+
+- Added support for gaussian splatting
+- Added console support
+- Improved color theme
+
 ## v3.3.0
 
 For F3D users:
