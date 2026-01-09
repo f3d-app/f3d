@@ -148,6 +148,28 @@ public:
    */
   [[nodiscard]] virtual unsigned int availableAnimations() const = 0;
 
+  /**
+   * Return the animation name of a given animation indices, if any.
+   *
+   * Specific animation (0..availableAnimations): Returns the name of the animation at that index
+   * Current animation (-1):
+   *   - Returns the name of the current animation
+   *   - Returns "Multi animations" if more than one animation is current
+   *   - Returns "All animations" if all animations are current
+   *   - Returns "No animations" if no animations are current
+   * Fallback: Returns "No animation" for out-of-bounds requests.
+   *
+   * Can be called before initialization safely
+   */
+  [[nodiscard]] virtual std::string getAnimationName(int indices = -1) = 0;
+
+  /**
+   * Return all of the animation names, if any.
+   * Returns a vector of length 0 if none.
+   * Can be called before initialization safely
+   */
+  [[nodiscard]] virtual std::vector<std::string> getAnimationNames() = 0;
+
 protected:
   //! @cond
   scene() = default;

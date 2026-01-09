@@ -464,6 +464,18 @@ unsigned int scene_impl::availableAnimations() const
 }
 
 //----------------------------------------------------------------------------
+std::string scene_impl::getAnimationName(int indices)
+{
+  return this->Internals->AnimationManager.GetAnimationName(indices);
+}
+
+//----------------------------------------------------------------------------
+std::vector<std::string> scene_impl::getAnimationNames()
+{
+  return this->Internals->AnimationManager.GetAnimationNames();
+}
+
+//----------------------------------------------------------------------------
 void scene_impl::SetInteractor(interactor_impl* interactor)
 {
   this->Internals->Interactor = interactor;
