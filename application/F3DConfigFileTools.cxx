@@ -73,7 +73,7 @@ void F3DConfigFileTools::PrintConfigInfo(const std::vector<fs::path>& configPath
     f3d::log::info("Found available config path");
   }
 
-  for (const fs::path& path : configPaths)
+  for (const fs::path& path : configPaths) 
   {
     std::error_code ec;
     const bool exists = fs::exists(path, ec);
