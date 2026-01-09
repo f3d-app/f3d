@@ -80,7 +80,7 @@ void F3DConfigFileTools::PrintConfigInfo(const std::vector<fs::path>& configPath
 
     if (ec)
     {
-      f3d::log::info("Error while checking config path: ", path);
+      f3d::log::info("Error while checking config path: ", path, " : ", ec.message());
     }
     else if (exists)
     {
