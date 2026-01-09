@@ -226,18 +226,22 @@ void animationManager::JumpToFrame(int frame, bool relative)
 void animationManager::JumpToKeyFrame(int keyframe, bool relative)
 {
   vtkSmartPointer<vtkDoubleArray> timeSteps = this->AnimationTimeSteps.value();
-  if (keyframe > timeSteps->GetSize())
+  const int timeStepsAvailable = timeSteps->GetSize();
+
+  auto it = std::lower_bound(timeSteps->Begin(), timeSteps->End(), this->CurrentTime);
+  const int closestKeyFrame = (it != timeSteps->End())
+    ? static_cast<int>(std::distance(timeSteps->Begin(), it))
+    : timeStepsAvailable - 1;
+
+  int nextKeyFrame = relative ? closestKeyFrame + keyframe : keyframe;
+  const bool outsideOfRange = std::abs(nextKeyFrame) > timeStepsAvailable;
+  nextKeyFrame = ((nextKeyFrame % timeStepsAvailable) + timeStepsAvailable) % timeStepsAvailable;
+
+  if (outsideOfRange)
   {
-    return;
+    log::warn("Keyframe index ", keyframe, " is outside of range [", timeStepsAvailable,
+      "], converting to ", nextKeyFrame, " instead.");
   }
-
-  constexpr double epsilon = 1e-6;
-  auto it = std::find_if(timeSteps->Begin(), timeSteps->End(),
-    [&](double step) { return this->CurrentTime - step <= epsilon; });
-
-  int nextKeyFrame = relative ? std::distance(timeSteps->Begin(), it) + keyframe : keyframe;
-  // Ensure keyframe index is located inside timeSteps size
-  nextKeyFrame = nextKeyFrame >= 0 ? nextKeyFrame : timeSteps->GetSize() + nextKeyFrame;
 
   this->CurrentTime = timeSteps->GetValue(nextKeyFrame);
 
