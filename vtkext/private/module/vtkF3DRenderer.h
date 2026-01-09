@@ -615,7 +615,6 @@ private:
    */
   void ConfigureActorTextureTransform(vtkActor* actorBase, const double* matrix);
 
-<<<<<<< HEAD
   /**
    * Configure all properties of the point sprites mapper
    */
@@ -626,8 +625,6 @@ private:
    */
   void UpdateAxisWidgetSize();
 
-=======
->>>>>>> aa3f0e8a (fix style)
   vtkSmartPointer<vtkOrientationMarkerWidget> AxisWidget;
   vtkSmartPointer<vtkCameraOrientationWidget> ModernAxisWidget;
   vtkSmartPointer<vtkCameraOrientationRepresentation> ModernAxisRepresentation;

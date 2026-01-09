@@ -8,7 +8,9 @@
 #ifdef _MSC_VER
 #pragma comment(lib, "Shcore")
 #include <ShellScalingApi.h>
-#elif __linux__
+#endif
+
+#if defined(__linux__)
 #include <X11/Xlib.h>
 #endif
 
