@@ -10,7 +10,7 @@
 #include <ShellScalingApi.h>
 #endif
 
-#if defined(__linux__)
+#if defined(__linux__) && !defined(__ANDROID__)
 #include <X11/Xlib.h>
 #endif
 
