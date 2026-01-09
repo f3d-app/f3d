@@ -1424,7 +1424,7 @@ int F3DStarter::Start(int argc, char** argv)
                          "frame");
         }
 
-        const double timeStep = count > 1 ? duration / (count - 1) : 0.0;
+        const double timeStep = 1.0 / this->Internals->AppOptions.FrameRate;
 
         f3d::log::info(
           "Saving ", count, " animation frame(s) from time ", startTime, " to ", endTime);
