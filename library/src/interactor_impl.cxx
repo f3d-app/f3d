@@ -173,9 +173,15 @@ public:
     double fwd[3];
     vtkMath::Cross(right, up, fwd);
     const double m[9] = {
-      right[0], right[1], right[2], //
-      fwd[0], fwd[1], fwd[2],       //
-      up[0], up[1], up[2],          //
+      right[0],
+      right[1],
+      right[2], //
+      fwd[0],
+      fwd[1],
+      fwd[2], //
+      up[0],
+      up[1],
+      up[2], //
     };
     transform->DeepCopy(m);
   }
@@ -620,7 +626,7 @@ public:
     vtkRenderWindow* renWin = this->Window.GetRenderWindow();
     vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
     ren->SetUIDeltaTime(deltaTime);
-    ren->AddTime(deltaTime);
+    ren->SetTime(ren->GetTime() + deltaTime);
 
     // Determine if we need a full render or just a UI render
     // At the moment, only TAA requires a full render each frame
