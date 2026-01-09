@@ -12,6 +12,9 @@ list(APPEND javaf3dTests_list
     )
 
 set(java_test_args "-ea") # enable assertions
+if (WIN32)
+  list(APPEND java_test_args "--enable-native-access=ALL-UNNAMED")
+endif()
 if(APPLE)
   # On macOS, this argument is mandatory in order to create native window
   list(APPEND java_test_args "-XstartOnFirstThread")

@@ -5,10 +5,16 @@ import java.util.List;
 
 public class TestScene {
 
+  // On Windows, try to load opengl32 from Java path
+  // It's only useful in order to force Mesa software OpenGL
   static {
     if (System.getProperty("os.name").startsWith("Windows"))
     {
-      System.loadLibrary("opengl32");
+      try {
+        System.loadLibrary("opengl32");
+      } catch (UnsatisfiedLinkError e) {
+        // Ignore if opengl32 is not available
+      }
     }
   }
 
@@ -32,6 +38,9 @@ public class TestScene {
     scene.loadAnimationTime(0.5);
     scene.animationTimeRange();
     scene.availableAnimations();
+    scene.getAnimationName();
+    scene.getAnimationName(0);
+    scene.getAnimationNames();
 
     Types.LightState lightState = new Types.LightState();
     lightState.type = Types.LightType.HEADLIGHT;

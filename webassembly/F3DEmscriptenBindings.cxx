@@ -161,7 +161,11 @@ EMSCRIPTEN_BINDINGS(f3d)
     .function(
       "animationTimeRange",
       +[](f3d::scene& o) -> emscripten::val { return pairToJSArray(o.animationTimeRange()); })
-    .function("availableAnimations", &f3d::scene::availableAnimations);
+    .function("availableAnimations", &f3d::scene::availableAnimations)
+    .function("getAnimationName", &f3d::scene::getAnimationName)
+    .function(
+      "getAnimationNames",
+      +[](f3d::scene& scene) { return containerToJSArray(scene.getAnimationNames()); });
 
   // f3d::image
   emscripten::enum_<f3d::image::SaveFormat>("ImageSaveFormat")
