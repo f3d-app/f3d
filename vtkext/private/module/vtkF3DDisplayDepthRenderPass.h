@@ -4,7 +4,6 @@
 #include "vtkImageProcessingPass.h"
 
 #include <vtkDepthImageProcessingPass.h>
-#include <vtkDiscretizableColorTransferFunction.h>
 #include <vtkSmartPointer.h>
 
 #include <memory>
@@ -12,6 +11,7 @@
 class vtkOpenGLFramebufferObject;
 class vtkOpenGLQuadHelper;
 class vtkTextureObject;
+class vtkDiscretizableColorTransferFunction;
 
 class vtkF3DDisplayDepthRenderPass : public vtkDepthImageProcessingPass
 {
@@ -29,7 +29,7 @@ private:
 
   void InitializeResources(vtkOpenGLRenderWindow* renWin, int w, int h);
 
-  vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorMap = nullptr;
+  vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorMap;
   vtkTimeStamp ColorMapBuildTime;
 
   vtkSmartPointer<vtkTextureObject> ColorTexture;

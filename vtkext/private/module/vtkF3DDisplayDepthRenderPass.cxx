@@ -1,5 +1,6 @@
 #include "vtkF3DDisplayDepthRenderPass.h"
 
+#include <vtkDiscretizableColorTransferFunction.h>
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLError.h>
 #include <vtkOpenGLFramebufferObject.h>
@@ -55,10 +56,10 @@ void vtkF3DDisplayDepthRenderPass::Render(const vtkRenderState* state)
       "//VTK::FSQ::Decl");
 
     vtkShaderProgram::Substitute(depthDisplayingFS, "//VTK::FSQ::Impl",
-      "float depth = texture2D(texDepth, texCoord).r;\n"
+      "float depth = texture(texDepth, texCoord).r;\n"
       "if (useColorMap)\n"
       "{\n"
-      "  vec4 colorMapped = texture1D(colorMapTexture, depth);\n"
+      "  vec4 colorMapped = texture(colorMapTexture, depth);\n"
       "  gl_FragData[0] = vec4(colorMapped.rgb, 1.0);\n"
       "  return;\n"
       "}\n"
@@ -111,13 +112,13 @@ void vtkF3DDisplayDepthRenderPass::InitializeResources(vtkOpenGLRenderWindow* re
     this->ColorTexture = vtkSmartPointer<vtkTextureObject>::New();
     this->ColorTexture->SetContext(renWin);
     this->ColorTexture->SetFormat(GL_RGBA);
-    this->ColorTexture->SetInternalFormat(GL_RGBA16F);
-    this->ColorTexture->SetDataType(GL_HALF_FLOAT);
+    this->ColorTexture->SetInternalFormat(GL_RGBA8);
+    this->ColorTexture->SetDataType(GL_UNSIGNED_BYTE);
     this->ColorTexture->SetMinificationFilter(vtkTextureObject::Linear);
     this->ColorTexture->SetMagnificationFilter(vtkTextureObject::Linear);
     this->ColorTexture->SetWrapS(vtkTextureObject::ClampToEdge);
     this->ColorTexture->SetWrapT(vtkTextureObject::ClampToEdge);
-    this->ColorTexture->Allocate2D(w, h, 4, VTK_FLOAT);
+    this->ColorTexture->Allocate2D(w, h, 4, VTK_UNSIGNED_CHAR);
   }
   this->ColorTexture->Resize(w, h);
 

@@ -294,6 +294,13 @@ Add a final shader to the output image. See [user documentation](../user/10-FINA
 
 CLI: `--final-shader`
 
+### "render.effect.display_depth" (_bool_, default: `false`)
+
+Display the depth buffer as a grayscale image or with a colormap if `model.scivis.enable` is specified.
+Only opaque objects are displayed, translucent and volumetric objects are ignored.
+
+CLI: `--display-depth`
+
 ### `render.line_width` (_double_, optional)
 
 Set the _width_ of lines when showing edges. Model-specified by default.

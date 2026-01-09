@@ -189,7 +189,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       {"anti-aliasing-mode", "", R"(Select anti-aliasing method ("fxaa", "ssaa" or "taa") (deprecated))", "<string>", "fxaa"},
       {"tone-mapping", "t", "Enable Tone Mapping, providing balanced coloring", "<bool>", "1"},
       {"final-shader", "", "Execute the final shader at the end of the rendering pipeline", "<GLSL code>", ""},
-      {"display-depth", "", "Display depth buffer as grayscale image", "<bool>", "1"} } },
+      {"display-depth", "", "Display depth buffer as grayscale image or with a colormap if \"--scalar-coloring\" is specified", "<bool>", "1"} } },
   {"Testing",
     { {"reference", "", "Reference", "<png file>", ""},
       {"reference-threshold", "", "Testing threshold", "<threshold>", ""},
