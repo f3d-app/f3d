@@ -97,6 +97,7 @@ void vtkF3DDisplayDepthRenderPass::Render(const vtkRenderState* state)
   vtkOpenGLCheckErrorMacro("failed after Render");
 }
 
+//------------------------------------------------------------------------------
 void vtkF3DDisplayDepthRenderPass::InitializeResources(vtkOpenGLRenderWindow* renWin, int w, int h)
 {
   if (this->DepthTexture == nullptr)
@@ -159,6 +160,7 @@ void vtkF3DDisplayDepthRenderPass::InitializeResources(vtkOpenGLRenderWindow* re
   }
 }
 
+///------------------------------------------------------------------------------
 void vtkF3DDisplayDepthRenderPass::ReleaseGraphicsResources(vtkWindow* window)
 {
   this->Superclass::ReleaseGraphicsResources(window);
@@ -181,6 +183,7 @@ void vtkF3DDisplayDepthRenderPass::ReleaseGraphicsResources(vtkWindow* window)
   }
 }
 
+///------------------------------------------------------------------------------
 void vtkF3DDisplayDepthRenderPass::SetColorMap(vtkDiscretizableColorTransferFunction* colorMap)
 {
   this->ColorMap = colorMap;
