@@ -3483,16 +3483,6 @@ void vtkF3DRenderer::SetUIDeltaTime(double time)
   this->UIActor->SetDeltaTime(time);
 }
 
-void vtkF3DRenderer::AddTime(double time)
-{
-  this->TotalTime += time;
-}
-
-void vtkF3DRenderer::GetTime()
-{
-  return this->TotalTime;
-}
-
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetConsoleBadgeEnabled(bool enabled)
 {

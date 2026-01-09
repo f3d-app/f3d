@@ -72,7 +72,7 @@ void vtkF3DUserRenderPass::Render(const vtkRenderState* s)
     vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Decl",
       "uniform sampler2D source;\n"
       "uniform ivec2 resolution;\n"
-      "uniform double time;\n"
+      "uniform float time;\n"
       "//VTK::FSQ::Decl");
 
     vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Decl", this->UserShader);
