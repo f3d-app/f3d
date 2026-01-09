@@ -1409,34 +1409,32 @@ int F3DStarter::Start(int argc, char** argv)
       if (hasFrameTemplate)
       {
         f3d::scene& animScene = this->Internals->Engine->getScene();
-        auto [minTime, maxTime] = animScene.animationTimeRange();
+        const auto [minTime, maxTime] = animScene.animationTimeRange();
 
-        double startTime = this->Internals->AppOptions.AnimationTime.value_or(minTime);
-        double endTime = maxTime;
-        double duration = endTime - startTime;
-        int count = 1;
+        const double startTime = this->Internals->AppOptions.AnimationTime.value_or(minTime);
+        const double endTime = maxTime;
+        const double duration = endTime - startTime;
+        const int count = duration > 0
+          ? static_cast<int>(std::ceil(duration * this->Internals->AppOptions.FrameRate)) + 1
+          : 1;
 
-        if (duration <= 0.0)
+        if (count == 1)
         {
           f3d::log::warn("No animation available or animation has zero duration, outputting single "
                          "frame");
         }
-        else
-        {
-          count = static_cast<int>(std::ceil(duration * this->Internals->AppOptions.FrameRate)) + 1;
-        }
 
-        double timeStep = count > 1 ? duration / (count - 1) : 0.0;
+        const double timeStep = count > 1 ? duration / (count - 1) : 0.0;
 
         f3d::log::info(
           "Saving ", count, " animation frame(s) from time ", startTime, " to ", endTime);
 
         for (int frame = 0; frame < count; ++frame)
         {
-          double currentTime = startTime + frame * timeStep;
+          const double currentTime = startTime + frame * timeStep;
           animScene.loadAnimationTime(currentTime);
 
-          fs::path frameOutput = renderToStdout
+          const fs::path frameOutput = renderToStdout
             ? fs::path{}
             : this->Internals->applyFilenameTemplate(
                 f3d::utils::collapsePath(this->Internals->AppOptions.Output), frame);
