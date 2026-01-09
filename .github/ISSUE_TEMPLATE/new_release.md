@@ -54,7 +54,7 @@ Release :
 - [ ] Format the release note into a changelog and commit/review/merge them into https://github.com/f3d-app/f3d
 - [ ] Add a **new versioned doc** as described [here](https://f3d.app/dev/TOOLING#how-to-update-the-doc-for-a-new-release), commit/review/merge into https://github.com/f3d-app/f3d-website
 - [ ] Change f3d version to `^X.Y.Z` in `package.json` in f3d-website, then build locally as described above, then commit review and merge the resulting changes into https://github.com/f3d-app/f3d-website
-- [ ] Update **download links** using `GITHUB_TOKEN=$PAT npm run update-downloads`, commit/review/merge into https://github.com/f3d-app/f3d-website and then immediately
+- [ ] Update **download links** using `GITHUB_TOKEN=$PAT F3D_RELEASE=vX.Y.Z npm run update-downloads`, commit/review/merge into https://github.com/f3d-app/f3d-website and then immediately
 - [ ] Release
 - [ ] Communicate on discord
 - [ ] Communicate on reddit
