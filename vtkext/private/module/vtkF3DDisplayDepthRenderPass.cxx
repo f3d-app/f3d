@@ -1,18 +1,19 @@
 #include "vtkF3DDisplayDepthRenderPass.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkOpenGLError.h"
-#include "vtkOpenGLFramebufferObject.h"
-#include "vtkOpenGLQuadHelper.h"
-#include "vtkOpenGLRenderUtilities.h"
-#include "vtkOpenGLRenderWindow.h"
-#include "vtkOpenGLShaderCache.h"
-#include "vtkOpenGLState.h"
-#include "vtkRenderState.h"
-#include "vtkRenderer.h"
-#include "vtkShaderProgram.h"
-#include "vtkTextureObject.h"
+#include <vtkObjectFactory.h>
+#include <vtkOpenGLError.h>
+#include <vtkOpenGLFramebufferObject.h>
+#include <vtkOpenGLQuadHelper.h>
+#include <vtkOpenGLRenderUtilities.h>
+#include <vtkOpenGLRenderWindow.h>
 #include <vtkOpenGLRenderer.h>
+#include <vtkOpenGLShaderCache.h>
+#include <vtkOpenGLState.h>
+#include <vtkRenderState.h>
+#include <vtkRenderer.h>
+#include <vtkShaderProgram.h>
+#include <vtkTextureObject.h>
+#include <vtk_glew.h>
 
 vtkStandardNewMacro(vtkF3DDisplayDepthRenderPass);
 
@@ -35,65 +36,13 @@ void vtkF3DDisplayDepthRenderPass::Render(const vtkRenderState* state)
   int size[2];
   renderer->GetTiledSizeAndOrigin(&size[0], &size[1], &pos[0], &pos[1]);
 
-  // initialize resources
-  if (this->DepthTexture == nullptr)
-  {
-    this->DepthTexture = vtkSmartPointer<vtkTextureObject>::New();
-    this->DepthTexture->SetContext(renWin);
-    this->DepthTexture->SetFormat(GL_RGBA);
-    this->DepthTexture->SetInternalFormat(GL_RGBA16F);
-    this->DepthTexture->SetDataType(GL_HALF_FLOAT);
-    this->DepthTexture->SetMinificationFilter(vtkTextureObject::Linear);
-    this->DepthTexture->SetMagnificationFilter(vtkTextureObject::Linear);
-    this->DepthTexture->SetWrapS(vtkTextureObject::ClampToEdge);
-    this->DepthTexture->SetWrapT(vtkTextureObject::ClampToEdge);
-    this->DepthTexture->Allocate2D(size[0], size[1], 4, VTK_FLOAT);
-  }
-  this->DepthTexture->Resize(size[0], size[1]);
+  InitializeResources(renWin, size[0], size[1]);
 
-  if (this->ColorMapTexture == nullptr)
-  {
-    this->ColorMapTexture = vtkSmartPointer<vtkTextureObject>::New();
-    this->ColorMapTexture->SetContext(renWin);
-    this->ColorMapTexture->Allocate1D(256, 3, VTK_FLOAT);
-    this->ColorMapTexture->SetWrapS(vtkTextureObject::ClampToEdge);
-    this->ColorMapTexture->SetWrapT(vtkTextureObject::ClampToEdge);
-    this->ColorMapTexture->SetMinificationFilter(vtkTextureObject::Linear);
-    this->ColorMapTexture->SetMagnificationFilter(vtkTextureObject::Linear);
-
-    this->ColorMapTexture->SetFormat(GL_RGB);
-    this->ColorMapTexture->SetInternalFormat(GL_RGB16F);
-    this->ColorMapTexture->SetDataType(GL_FLOAT);
-
-    if (ColorMapDirty && this->ColorMap)
-    {
-      int tableSize = 256;
-      this->ColorMap->SetNumberOfValues(tableSize);
-      this->ColorMap->Build();
-      double range[2];
-      this->ColorMap->GetRange(range);
-
-      std::vector<float> table(tableSize * 3);
-      this->ColorMap->GetTable(range[0], range[1], tableSize, table.data());
-
-      this->ColorMapTexture->Create1DFromRaw(tableSize, 3, VTK_FLOAT, table.data());
-      ColorMapDirty = false;
-    }
-  }
-
-  if (this->FrameBufferObject == nullptr)
-  {
-    this->FrameBufferObject = vtkSmartPointer<vtkOpenGLFramebufferObject>::New();
-    this->FrameBufferObject->SetContext(renWin);
-  }
-
-  // render to texture
-  this->PreRender(state);
+  // render to color and depth texture
   renWin->GetState()->PushFramebufferBindings();
-  this->RenderDelegate(
-    state, size[0], size[1], size[0], size[1], this->FrameBufferObject, this->DepthTexture);
+  this->RenderDelegate(state, size[0], size[1], size[0], size[1], this->FrameBufferObject,
+    this->ColorTexture, this->DepthTexture);
   renWin->GetState()->PopFramebufferBindings();
-  this->PostRender(state);
 
   // depth displaying pass
   if (!this->QuadHelper)
@@ -101,14 +50,13 @@ void vtkF3DDisplayDepthRenderPass::Render(const vtkRenderState* state)
     std::string depthDisplayingFS =
       vtkOpenGLRenderUtilities::GetFullScreenQuadFragmentShaderTemplate();
     vtkShaderProgram::Substitute(depthDisplayingFS, "//VTK::FSQ::Decl",
-      "uniform sampler2D depthTexture;\n"
+      "uniform sampler2D texDepth;\n"
       "uniform bool useColorMap;\n"
       "uniform sampler1D colorMapTexture;\n"
       "//VTK::FSQ::Decl");
 
     vtkShaderProgram::Substitute(depthDisplayingFS, "//VTK::FSQ::Impl",
-      "float depth = texture2D(depthTexture, texCoord).r;\n"
-      "if (depth <= 1e-6) depth = 1.0;\n"
+      "float depth = texture2D(texDepth, texCoord).r;\n"
       "if (useColorMap)\n"
       "{\n"
       "  vec4 colorMapped = texture1D(colorMapTexture, depth);\n"
@@ -128,24 +76,87 @@ void vtkF3DDisplayDepthRenderPass::Render(const vtkRenderState* state)
 
   assert(this->QuadHelper->Program && this->QuadHelper->Program->GetCompiled());
 
+  this->ColorTexture->Activate();
   this->DepthTexture->Activate();
   this->ColorMapTexture->Activate();
 
-  this->QuadHelper->Program->SetUniformi("depthTexture", this->DepthTexture->GetTextureUnit());
+  this->QuadHelper->Program->SetUniformi("texDepth", this->DepthTexture->GetTextureUnit());
   this->QuadHelper->Program->SetUniformi("useColorMap", this->ColorMap != nullptr ? 1 : 0);
   this->QuadHelper->Program->SetUniformi(
     "colorMapTexture", this->ColorMapTexture->GetTextureUnit());
 
-  ostate->vtkglDisable(GL_BLEND);
-  ostate->vtkglDisable(GL_DEPTH_TEST);
-  ostate->vtkglViewport(pos[0], pos[1], size[0], size[1]);
-  ostate->vtkglScissor(pos[0], pos[1], size[0], size[1]);
+  ostate->vtkglEnable(GL_DEPTH_TEST);
+  ostate->vtkglDepthFunc(GL_LEQUAL);
+  ostate->vtkglClear(GL_DEPTH_BUFFER_BIT);
 
   this->QuadHelper->Render();
 
+  this->ColorTexture->Deactivate();
   this->DepthTexture->Deactivate();
   this->ColorMapTexture->Deactivate();
   vtkOpenGLCheckErrorMacro("failed after Render");
+}
+
+void vtkF3DDisplayDepthRenderPass::InitializeResources(vtkOpenGLRenderWindow* renWin, int w, int h)
+{
+  if (this->DepthTexture == nullptr)
+  {
+    this->DepthTexture = vtkSmartPointer<vtkTextureObject>::New();
+    this->DepthTexture->SetContext(renWin);
+    this->DepthTexture->AllocateDepth(w, h, vtkTextureObject::Float32);
+  }
+  this->DepthTexture->Resize(w, h);
+
+  if (this->ColorTexture == nullptr)
+  {
+    this->ColorTexture = vtkSmartPointer<vtkTextureObject>::New();
+    this->ColorTexture->SetContext(renWin);
+    this->ColorTexture->SetFormat(GL_RGBA);
+    this->ColorTexture->SetInternalFormat(GL_RGBA16F);
+    this->ColorTexture->SetDataType(GL_HALF_FLOAT);
+    this->ColorTexture->SetMinificationFilter(vtkTextureObject::Linear);
+    this->ColorTexture->SetMagnificationFilter(vtkTextureObject::Linear);
+    this->ColorTexture->SetWrapS(vtkTextureObject::ClampToEdge);
+    this->ColorTexture->SetWrapT(vtkTextureObject::ClampToEdge);
+    this->ColorTexture->Allocate2D(w, h, 4, VTK_FLOAT);
+  }
+  this->ColorTexture->Resize(w, h);
+
+  if (this->ColorMapTexture == nullptr)
+  {
+    this->ColorMapTexture = vtkSmartPointer<vtkTextureObject>::New();
+    this->ColorMapTexture->SetContext(renWin);
+    this->ColorMapTexture->Allocate1D(256, 3, VTK_FLOAT);
+    this->ColorMapTexture->SetWrapS(vtkTextureObject::ClampToEdge);
+    this->ColorMapTexture->SetWrapT(vtkTextureObject::ClampToEdge);
+    this->ColorMapTexture->SetMinificationFilter(vtkTextureObject::Linear);
+    this->ColorMapTexture->SetMagnificationFilter(vtkTextureObject::Linear);
+
+    this->ColorMapTexture->SetFormat(GL_RGB);
+    this->ColorMapTexture->SetInternalFormat(GL_RGB16F);
+    this->ColorMapTexture->SetDataType(GL_FLOAT);
+
+    if (this->ColorMap && this->ColorMapBuildTime.GetMTime() < this->ColorMap->GetMTime())
+    {
+      constexpr int tableSize = 256;
+      this->ColorMap->SetNumberOfValues(tableSize);
+      this->ColorMap->Build();
+      double range[2];
+      this->ColorMap->GetRange(range);
+
+      std::vector<float> table(tableSize * 3);
+      this->ColorMap->GetTable(range[0], range[1], tableSize, table.data());
+
+      this->ColorMapTexture->Create1DFromRaw(tableSize, 3, VTK_FLOAT, table.data());
+      this->ColorMapBuildTime.Modified();
+    }
+  }
+
+  if (this->FrameBufferObject == nullptr)
+  {
+    this->FrameBufferObject = vtkSmartPointer<vtkOpenGLFramebufferObject>::New();
+    this->FrameBufferObject->SetContext(renWin);
+  }
 }
 
 void vtkF3DDisplayDepthRenderPass::ReleaseGraphicsResources(vtkWindow* window)
@@ -155,6 +166,10 @@ void vtkF3DDisplayDepthRenderPass::ReleaseGraphicsResources(vtkWindow* window)
   if (this->FrameBufferObject)
   {
     this->FrameBufferObject->ReleaseGraphicsResources(window);
+  }
+  if (this->ColorTexture)
+  {
+    this->ColorTexture->ReleaseGraphicsResources(window);
   }
   if (this->DepthTexture)
   {
@@ -166,17 +181,7 @@ void vtkF3DDisplayDepthRenderPass::ReleaseGraphicsResources(vtkWindow* window)
   }
 }
 
-bool vtkF3DDisplayDepthRenderPass::PreReplaceShaderValues(std::string& vertexShader,
-  std::string& geometryShader, std::string& fragmentShader, vtkAbstractMapper* mapper,
-  vtkProp* prop)
-{
-  vtkShaderProgram::Substitute(
-    fragmentShader, "//VTK::Light::Impl", "  gl_FragData[0] = vec4(vec3(gl_FragCoord.z), 1.0);\n");
-  return true;
-}
-
 void vtkF3DDisplayDepthRenderPass::SetColorMap(vtkDiscretizableColorTransferFunction* colorMap)
 {
   this->ColorMap = colorMap;
-  ColorMapDirty = true;
 }

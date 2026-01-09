@@ -20,6 +20,7 @@
 #include <vtkCamera.h>
 #include <vtkCameraOrientationRepresentation.h>
 #include <vtkCameraOrientationWidget.h>
+#include <vtkCameraPass.h>
 #include <vtkCellData.h>
 #include <vtkCornerAnnotation.h>
 #include <vtkCullerCollection.h>
@@ -36,6 +37,7 @@
 #include <vtkMatrix4x4.h>
 #include <vtkMultiBlockDataSet.h>
 #include <vtkObjectFactory.h>
+#include <vtkOpaquePass.h>
 #include <vtkOpenGLFXAAPass.h>
 #include <vtkOpenGLRenderWindow.h>
 #include <vtkOpenGLRenderer.h>
@@ -484,8 +486,12 @@ void vtkF3DRenderer::ConfigureRenderPasses()
 
   if (this->DisplayDepth)
   {
+    // discard vtkF3DRenderPass if displaying depth
+    vtkNew<vtkOpaquePass> opaqueP;
+    vtkNew<vtkCameraPass> camP;
     vtkNew<vtkF3DDisplayDepthRenderPass> depthP;
-    depthP->SetDelegatePass(renderingPass);
+    camP->SetDelegatePass(opaqueP);
+    depthP->SetDelegatePass(camP);
     if (this->DisplayDepthScalarColoring)
     {
       this->ConfigureColoring();

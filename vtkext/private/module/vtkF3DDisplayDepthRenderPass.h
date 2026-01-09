@@ -3,6 +3,7 @@
 
 #include "vtkImageProcessingPass.h"
 
+#include <vtkDepthImageProcessingPass.h>
 #include <vtkDiscretizableColorTransferFunction.h>
 #include <vtkSmartPointer.h>
 
@@ -12,24 +13,26 @@ class vtkOpenGLFramebufferObject;
 class vtkOpenGLQuadHelper;
 class vtkTextureObject;
 
-class vtkF3DDisplayDepthRenderPass : public vtkImageProcessingPass
+class vtkF3DDisplayDepthRenderPass : public vtkDepthImageProcessingPass
 {
 public:
   static vtkF3DDisplayDepthRenderPass* New();
-  vtkTypeMacro(vtkF3DDisplayDepthRenderPass, vtkImageProcessingPass);
+  vtkTypeMacro(vtkF3DDisplayDepthRenderPass, vtkDepthImageProcessingPass);
   void Render(const vtkRenderState* state) override;
   void ReleaseGraphicsResources(vtkWindow* window) override;
-  bool PreReplaceShaderValues(std::string& vertexShader, std::string& geometryShader,
-    std::string& fragmentShader, vtkAbstractMapper* mapper, vtkProp* prop) override;
+
   void SetColorMap(vtkDiscretizableColorTransferFunction* colorMap);
 
 private:
   vtkF3DDisplayDepthRenderPass() = default;
   ~vtkF3DDisplayDepthRenderPass() override = default;
 
-  vtkDiscretizableColorTransferFunction* ColorMap = nullptr;
-  bool ColorMapDirty = true;
+  void InitializeResources(vtkOpenGLRenderWindow* renWin, int w, int h);
 
+  vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorMap = nullptr;
+  vtkTimeStamp ColorMapBuildTime;
+
+  vtkSmartPointer<vtkTextureObject> ColorTexture;
   vtkSmartPointer<vtkTextureObject> DepthTexture;
   vtkSmartPointer<vtkTextureObject> ColorMapTexture;
   vtkSmartPointer<vtkOpenGLFramebufferObject> FrameBufferObject;
