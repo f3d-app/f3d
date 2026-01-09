@@ -13,7 +13,6 @@
 #include <vtkRenderer.h>
 #include <vtkShaderProgram.h>
 #include <vtkTextureObject.h>
-#include <vtk_glew.h>
 
 vtkStandardNewMacro(vtkF3DDisplayDepthRenderPass);
 
