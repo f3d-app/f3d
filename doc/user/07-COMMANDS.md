@@ -82,6 +82,19 @@ eg:
 - `jump_to_frame -1 false` jump to last frame.
 - `jump_to_frame -2 false` jump to second last frame.
 
+`jump_to_keyframe`: A specific command to load an animation at a specific keyframe, takes a number and a boolean as arguments.
+When jumping between keyframes, the target keyframe index is adjusted to stay within the total number of available keyframes, avoiding invalid keyframe access.
+eg:
+
+- `jump_to_keyframe 1 true` jump to next keyframe.
+- `jump_to_keyframe -1 true` jump to previous keyframe.
+- `jump_to_keyframe 0 true` jump to closest keyframe.
+- `jump_to_keyframe 0 false` jump to animation start frame.
+- `jump_to_keyframe 1 false` jump to keyframe 1.
+- `jump_to_keyframe 10 false` jump to keyframe 10.
+- `jump_to_keyframe -1 false` jump to last keyframe.
+- `jump_to_keyframe -2 false` jump to second last keyframe.
+
 `cycle_verbose_level` : A specific command to cycle between the verbose levels (`Debug`, `Info`, `Warning`, `Error`, `Quiet`).
 
 `add_files [path/to/file1] [path/to/file2]`: A specific command to add files to the scene (overridden by a F3D specific command, see below). Take one or more files as arguments.
