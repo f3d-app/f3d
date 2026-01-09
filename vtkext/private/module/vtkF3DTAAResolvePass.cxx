@@ -7,8 +7,10 @@
 #include <vtkOpenGLQuadHelper.h>
 #include <vtkOpenGLRenderUtilities.h>
 #include <vtkOpenGLRenderWindow.h>
+#include <vtkOpenGLRenderer.h>
 #include <vtkOpenGLShaderCache.h>
 #include <vtkOpenGLState.h>
+#include <vtkPolyDataMapper.h>
 #include <vtkRenderState.h>
 #include <vtkRenderer.h>
 #include <vtkShaderProgram.h>
@@ -68,16 +70,77 @@ void vtkF3DTAAResolvePass::Render(const vtkRenderState* state)
   }
   this->ColorTexture->Resize(size[0], size[1]);
 
+  if (this->MotionVectorTexture == nullptr)
+  {
+    this->MotionVectorTexture = vtkSmartPointer<vtkTextureObject>::New();
+    this->MotionVectorTexture->SetContext(renWin);
+    this->MotionVectorTexture->SetFormat(GL_RG);
+    this->MotionVectorTexture->SetInternalFormat(GL_RG16F);
+    this->MotionVectorTexture->SetDataType(GL_HALF_FLOAT);
+    this->MotionVectorTexture->SetMinificationFilter(vtkTextureObject::Linear);
+    this->MotionVectorTexture->SetMagnificationFilter(vtkTextureObject::Linear);
+    this->MotionVectorTexture->SetWrapS(vtkTextureObject::ClampToEdge);
+    this->MotionVectorTexture->SetWrapT(vtkTextureObject::ClampToEdge);
+    this->MotionVectorTexture->Allocate2D(size[0], size[1], 2, VTK_FLOAT);
+  }
+  this->MotionVectorTexture->Resize(size[0], size[1]);
+
+  if (this->DepthTexture == nullptr)
+  {
+    this->DepthTexture = vtkTextureObject::New();
+    this->DepthTexture->SetContext(renWin);
+    this->DepthTexture->AllocateDepth(size[0], size[1], vtkTextureObject::Float32);
+  }
+
   if (this->FrameBufferObject == nullptr)
   {
     this->FrameBufferObject = vtkSmartPointer<vtkOpenGLFramebufferObject>::New();
     this->FrameBufferObject->SetContext(renWin);
   }
 
+  this->ColorTexture->Activate();
+  this->MotionVectorTexture->Activate();
+  this->DepthTexture->Activate();
+
+  this->PreRender(state);
+
   renWin->GetState()->PushFramebufferBindings();
-  this->RenderDelegate(
-    state, size[0], size[1], size[0], size[1], this->FrameBufferObject, this->ColorTexture);
+  this->FrameBufferObject->Bind();
+  this->FrameBufferObject->AddColorAttachment(0, this->ColorTexture);
+  this->FrameBufferObject->AddColorAttachment(1, this->MotionVectorTexture);
+  this->FrameBufferObject->ActivateDrawBuffers(2);
+  this->FrameBufferObject->AddDepthAttachment(this->DepthTexture);
+
+  // clear color and depth
+  vtkOpenGLRenderer* glRen = vtkOpenGLRenderer::SafeDownCast(state->GetRenderer());
+  if (glRen)
+  {
+    vtkOpenGLState* ostate = glRen->GetState();
+    GLbitfield clear_mask = 0;
+    if (!glRen->Transparent())
+    {
+      clear_mask |= GL_COLOR_BUFFER_BIT;
+    }
+
+    if (!glRen->GetPreserveDepthBuffer())
+    {
+      ostate->vtkglClearDepth(static_cast<GLclampf>(1.0));
+      clear_mask |= GL_DEPTH_BUFFER_BIT;
+      ostate->vtkglDepthMask(GL_TRUE);
+    }
+
+    ostate->vtkglClear(clear_mask);
+  }
+
+  this->DelegatePass->Render(state);
+  this->NumberOfRenderedProps += this->DelegatePass->GetNumberOfRenderedProps();
+
+  this->FrameBufferObject->RemoveColorAttachments(2);
+  this->FrameBufferObject->RemoveDepthAttachment();
   renWin->GetState()->PopFramebufferBindings();
+
+  this->PostRender(state);
+  this->PreviousViewProjectionMatrix = renderer->GetActiveCamera()->GetViewTransformMatrix();
 
   if (!this->QuadHelper)
   {
@@ -105,7 +168,6 @@ void vtkF3DTAAResolvePass::Render(const vtkRenderState* state)
   assert(this->QuadHelper->Program && this->QuadHelper->Program->GetCompiled());
 
   this->HistoryTexture->Activate();
-  this->ColorTexture->Activate();
   this->QuadHelper->Program->SetUniformi("colorTexture", this->ColorTexture->GetTextureUnit());
   this->QuadHelper->Program->SetUniformi("historyTexture", this->HistoryTexture->GetTextureUnit());
 
@@ -125,6 +187,40 @@ void vtkF3DTAAResolvePass::Render(const vtkRenderState* state)
   this->HistoryIteration = std::min(this->HistoryIteration + 1, 1024);
 
   vtkOpenGLCheckErrorMacro("failed after Render");
+}
+
+//------------------------------------------------------------------------------
+bool vtkF3DTAAResolvePass::PreReplaceShaderValues(std::string& vertexShader,
+  std::string& geometryShader, std::string& fragmentShader, vtkAbstractMapper* mapper,
+  vtkProp* prop)
+{
+  if (vtkPolyDataMapper::SafeDownCast(mapper) != nullptr)
+  {
+    vtkShaderProgram::Substitute(fragmentShader, "//VTK::Light::Impl",
+      "//VTK::Light::Impl\n"
+      "gl_FragData[1] = vec4(1, 0, 0, 1.0);\n",
+      // "vec2 currNDC = gl_FragCoord.xy;\n"
+      // "vec4 prevClip = TAA_PrevClipPos;\n"
+      // "prevClip /= prevClip.w;\n"
+      // "vec2 prevNDC = prevClip.xy * 0.5 + 0.5;\n"
+      // "vec2 motion = prevNDC - (currNDC / vec2(textureSize(colorTexture,0))); // screen-space "
+      // "motion\n",
+      false);
+  }
+  return true;
+}
+
+//------------------------------------------------------------------------------
+bool vtkF3DTAAResolvePass::SetShaderParameters(vtkShaderProgram* program, vtkAbstractMapper* mapper,
+  vtkProp* prop, vtkOpenGLVertexArrayObject* VAO)
+{
+  if (PreviousViewProjectionMatrix == nullptr)
+  {
+    return true;
+  }
+  // program->SetUniformMatrix("TAA_PreviousVP", this->PreviousViewProjectionMatrix);
+  // program->SetUniformi("colorTexture", this->ColorTexture->GetTextureUnit());
+  return true;
 }
 
 //------------------------------------------------------------------------------
