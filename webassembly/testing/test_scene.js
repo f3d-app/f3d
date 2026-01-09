@@ -29,6 +29,17 @@ const settings = {
     utils.assert(end === 4, "End value should be 4");
 
     scene.loadAnimationTime(1.5);
+
+    utils.assert(
+      scene.getAnimationName() == "unnamed_0",
+      "getAnimationName returns name",
+    );
+
+    // array comparison in JS is a little annoying so we just compare the 0th element
+    utils.assert(
+      scene.getAnimationNames()[0] == "unnamed_0",
+      "getAnimationNames returns names",
+    );
   },
 };
 

@@ -19,13 +19,15 @@ find_file(F3D_JAR
 
 message(STATUS "Found f3d.jar: ${F3D_JAR}")
 
+file(COPY ${F3D_JAR} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/MANIFEST.MF"
   "Manifest-Version: 1.0\n"
   "Main-Class: InteractiveApp\n"
-  "Class-Path: ${F3D_JAR}\n"
+  "Class-Path: f3d.jar\n"
 )
 
-set(CMAKE_JAVA_COMPILE_FLAGS -source 8 -target 8)
+set(CMAKE_JAVA_COMPILE_FLAGS --release 17)
 add_jar(interactive-app-java
   InteractiveApp.java
   INCLUDE_JARS ${F3D_JAR}

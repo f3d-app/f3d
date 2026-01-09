@@ -46,6 +46,8 @@ public:
   scene& loadAnimationTime(double timeValue) override;
   std::pair<double, double> animationTimeRange() override;
   unsigned int availableAnimations() const override;
+  std::string getAnimationName(int indices = -1) override;
+  std::vector<std::string> getAnimationNames() override;
   ///@}
 
   /**
