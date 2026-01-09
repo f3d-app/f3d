@@ -1098,7 +1098,7 @@ f3d_test(NAME TestFinalShaderCompilationFailure DATA cow.vtp ARGS --final-shader
 
 f3d_test(NAME TestDisplayDepth DATA dragon.vtu ARGS --display-depth)
 f3d_test(NAME TestDisplayDepthColorMap DATA dragon.vtu ARGS --display-depth --scalar-coloring=True)
-f3d_test(NAME TestDisplayDepthCustomColorMap DATA dragon.vtu ARGS --display-depth --scalar-coloring --colormap-file=viridis)
+f3d_test(NAME TestDisplayDepthCustomColorMap DATA dragon.vtu ARGS --display-depth --scalar-coloring --colormap=0,red,1,blue)
 
 ## Interaction Tests
 # Test hotkeys
