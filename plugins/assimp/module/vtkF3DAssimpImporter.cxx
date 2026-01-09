@@ -1194,31 +1194,15 @@ bool vtkF3DAssimpImporter::GetTemporalInformation(
     }
   }
 
-  for (unsigned int channel = 0; channel < anim->mNumMeshChannels; channel++)
-  {
-    aiMeshAnim* meshAnim = anim->mMeshChannels[channel];
-    for (unsigned int i = 0; i < meshAnim->mNumKeys; i++)
-    {
-      timeStepSet.insert(meshAnim->mKeys[i].mTime / anim->mTicksPerSecond);
-    }
-  }
-
-  for (unsigned int channel = 0; channel < anim->mNumMorphMeshChannels; channel++)
-  {
-    aiMeshMorphAnim* meshMorphAnim = anim->mMorphMeshChannels[channel];
-    for (unsigned int i = 0; i < meshMorphAnim->mNumKeys; i++)
-    {
-      timeStepSet.insert(meshMorphAnim->mKeys[i].mTime / anim->mTicksPerSecond);
-    }
-  }
+  // Mesh animation is not supported for now, no need to get time step from it.
 
   nbTimeSteps = static_cast<int>(timeStepSet.size());
   timeSteps->SetNumberOfTuples(nbTimeSteps);
 
   int index = 0;
-  for (auto it = timeStepSet.begin(); it != timeStepSet.end(); it++)
+  for (double it : timeStepSet)
   {
-    timeSteps->SetValue(index, *it);
+    timeSteps->SetValue(index, it);
     index++;
   }
 
