@@ -52,7 +52,6 @@ Release :
 - [ ] Trigger a release build using https://github.com/f3d-app/f3d-superbuild actions with `vX.Y.Z` F3D version, `vX.Y.Z` sb version and prerelease publish true
 - [ ] Finalize release note and add them to the release
 - [ ] Format the release note into a changelog and commit/review/merge them into https://github.com/f3d-app/f3d
-- [ ] Update dev and nightly docs as described [here](https://f3d.app/dev/TOOLING#how-to-update-the-doc-using-latest-master), commit/review/merge into https://github.com/f3d-app/f3d-website
 - [ ] Add a **new versioned doc** as described [here](https://f3d.app/dev/TOOLING#how-to-update-the-doc-for-a-new-release), commit/review/merge into https://github.com/f3d-app/f3d-website
 - [ ] Commit review and merge a bump of F3D version in `package.json` in https://github.com/f3d-app/f3d-website
 - [ ] Update **download links** using `GITHUB_TOKEN=$PAT npm run update-downloads`, commit/review/merge into https://github.com/f3d-app/f3d-website and then immediately
