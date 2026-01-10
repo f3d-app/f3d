@@ -14,6 +14,10 @@
 #include "vtkF3DTAAResolvePass.h"
 #include "vtkF3DUserRenderPass.h"
 
+#if F3D_MODULE_UI
+#include "vtkF3DImguiActor.h"
+#endif
+
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
 #include <vtkCamera.h>
@@ -50,6 +54,8 @@
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkSSAAPass.h>
+#include <vtkInformation.h>
+#include <vtkInformationIntegerKey.h>
 #include <vtkScalarBarActor.h>
 #include <vtkShaderProperty.h>
 #include <vtkSkybox.h>
@@ -1640,6 +1646,12 @@ void vtkF3DRenderer::SetDropZoneBinds(
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetHierarchy(const std::vector<NodeInfo>& hierarchy)
+{
+  this->UIActor->SetHierarchy(hierarchy);
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetBlendingMode(BlendingMode mode)
 {
   if (this->BlendingModeEnabled != mode)
@@ -1817,6 +1829,16 @@ void vtkF3DRenderer::ConfigureMetaData()
     this->UIActor->SetMetaData(this->Importer->GetMetaDataDescription());
   }
   this->MetaDataConfigured = true;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ShowSceneHierarchy(bool show)
+{
+  if (this->SceneHierarchyVisible != show)
+  {
+    this->SceneHierarchyVisible = show;
+    this->UIActor->SetSceneHierarchyVisibility(show);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -2085,6 +2107,7 @@ void vtkF3DRenderer::Render()
 
   vtkInformation* info = this->GetInformation();
 
+  info->Remove(vtkF3DRenderPass::RENDER_UI_ONLY());
   bool uiOnly = info->Get(vtkF3DRenderPass::RENDER_UI_ONLY());
 
   if (!uiOnly)
@@ -2831,6 +2854,26 @@ void vtkF3DRenderer::SetComponentForColoring(int component)
 }
 
 //----------------------------------------------------------------------------
+namespace
+{
+/**
+ * Helper to get user-controlled visibility from actor's property keys
+ * Returns the user-set visibility if available, otherwise returns defaultValue
+ */
+bool GetUserVisibility(vtkProp* prop, bool defaultValue)
+{
+#if F3D_MODULE_UI
+  vtkInformation* info = prop->GetPropertyKeys();
+  if (info && info->Has(vtkF3DImguiActor::USER_VISIBILITY()))
+  {
+    return info->Get(vtkF3DImguiActor::USER_VISIBILITY()) != 0;
+  }
+#endif
+  return defaultValue;
+}
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureColoring()
 {
   assert(this->Importer);
@@ -2866,13 +2909,17 @@ void vtkF3DRenderer::ConfigureColoring()
             this->UseCellColoring);
         }
       }
+      
+      // Apply visibility, respecting user overrides
+      visible = GetUserVisibility(coloring.Actor, visible);
       coloring.Actor->SetVisibility(visible);
-      coloring.OriginalActor->SetVisibility(!visible);
+      coloring.OriginalActor->SetVisibility(GetUserVisibility(coloring.OriginalActor, !visible));
     }
     else
     {
-      coloring.Actor->SetVisibility(false);
-      coloring.OriginalActor->SetVisibility(false);
+      // When geometries not visible, hide both unless user-controlled
+      coloring.Actor->SetVisibility(GetUserVisibility(coloring.Actor, false));
+      coloring.OriginalActor->SetVisibility(GetUserVisibility(coloring.OriginalActor, false));
     }
   }
   if (geometriesVisible)
@@ -3463,4 +3510,10 @@ void vtkF3DRenderer::SetUIDeltaTime(double time)
 void vtkF3DRenderer::SetConsoleBadgeEnabled(bool enabled)
 {
   this->UIActor->SetConsoleBadgeEnabled(enabled);
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetRenderRequestCallback(std::function<void()> callback)
+{
+  this->UIActor->SetRenderRequestCallback(std::move(callback));
 }

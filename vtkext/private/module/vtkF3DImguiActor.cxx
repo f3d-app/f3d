@@ -8,6 +8,8 @@
 #include "vtkF3DImguiVS.h"
 
 #include <vtkImageData.h>
+#include <vtkInformation.h>
+#include <vtkInformationIntegerKey.h>
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLBufferObject.h>
 #include <vtkOpenGLRenderWindow.h>
@@ -15,11 +17,16 @@
 #include <vtkOpenGLState.h>
 #include <vtkOpenGLVertexArrayObject.h>
 #include <vtkPNGReader.h>
+#include <vtkRenderer.h>
+#include <vtkRendererCollection.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkShader.h>
 #include <vtkShaderProgram.h>
 #include <vtkTextureObject.h>
 #include <vtkVersion.h>
+#include <vtkCallbackCommand.h>
+#include <vtkCommand.h>
+#include <vtkSmartPointer.h>
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
 #include <vtkMemoryResourceStream.h>
@@ -32,10 +39,13 @@
 #endif
 
 #include <imgui.h>
+#include <functional>
 #include <numeric>
 #include <optional>
 #include <sstream>
 #include <string>
+
+vtkInformationKeyMacro(vtkF3DImguiActor, USER_VISIBILITY, Integer);
 
 namespace
 {
@@ -298,8 +308,8 @@ vtkStandardNewMacro(vtkF3DImguiActor);
 
 //----------------------------------------------------------------------------
 vtkF3DImguiActor::vtkF3DImguiActor()
-  : Pimpl(new Internals())
 {
+  this->Pimpl = std::make_unique<Internals>();
 }
 
 //----------------------------------------------------------------------------
@@ -371,12 +381,145 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
 void vtkF3DImguiActor::ReleaseGraphicsResources(vtkWindow* w)
 {
   this->Superclass::ReleaseGraphicsResources(w);
-
   this->Pimpl->Release(vtkOpenGLRenderWindow::SafeDownCast(w));
 }
 
 //----------------------------------------------------------------------------
 vtkF3DImguiActor::~vtkF3DImguiActor() = default;
+
+//----------------------------------------------------------------------------
+void vtkF3DImguiActor::RenderNode(NodeInfo* node)
+{
+  if (!node)
+  {
+    return;
+  }
+
+  if (node->prop)
+  {
+    ImGui::PushID((void*)node->prop);
+
+    // Retrieve previous state or initialize from actor
+    bool visible = true;
+    auto it = NodeVisibilityState.find(node->prop);
+    if (it != NodeVisibilityState.end())
+    {
+      visible = it->second;
+    }
+    else
+    {
+      visible = node->prop->GetVisibility() != 0;
+      NodeVisibilityState[node->prop] = visible;
+    }
+
+    const std::string& displayText = node->displayName.empty() ? node->name : node->displayName;
+    if (ImGui::Checkbox(displayText.c_str(), &visible))
+    {
+      NodeVisibilityState[node->prop] = visible;
+      node->prop->SetVisibility(visible ? 1 : 0);
+      node->prop->Modified();
+
+      // Mark this prop as user-controlled
+      vtkInformation* info = node->prop->GetPropertyKeys();
+      if (!info)
+      {
+        info = vtkInformation::New();
+        node->prop->SetPropertyKeys(info);
+        info->Delete();
+      }
+      info->Set(vtkF3DImguiActor::USER_VISIBILITY(), visible ? 1 : 0);
+
+      // Request a render to update the scene
+      this->VisibilityChangedThisFrame = true;
+    }
+
+    ImGui::PopID();
+  }
+  else
+  {
+    ImGui::Text("%s", node->name.c_str());
+  }
+
+  for (auto& child : node->children)
+  {
+    ImGui::Indent(10);
+    RenderNode(&child);
+    ImGui::Unindent(10);
+  }
+}
+
+
+//----------------------------------------------------------------------------
+void vtkF3DImguiActor::RenderSceneHierarchy()
+{
+  if (!this->SceneHierarchyVisible)
+  {
+    return;
+  }
+
+  const ImGuiViewport* viewport = ImGui::GetMainViewport();
+  if (!viewport)
+  {
+    return;
+  }
+
+  constexpr float margin = F3DStyle::GetDefaultMargin();
+  float winWidth = this->CalculateHierarchyWidth();
+  float winHeight = viewport->WorkSize.y - 2.0f * margin;
+
+  ::SetupNextWindow(ImVec2(margin, margin), ImVec2(winWidth, winHeight));
+  ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
+
+  ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
+    ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoResize;
+
+  ImGui::Begin("Scene Hierarchy", nullptr, flags);
+
+  if (this->HierarchyNodes.empty())
+  {
+    ImGui::Text("No hierarchy available");
+    ImGui::End();
+    return;
+  }
+
+  for (auto& node : this->HierarchyNodes)
+  {
+    RenderNode(&node);
+  }
+
+  ImGui::End();
+}
+
+//----------------------------------------------------------------------------
+float vtkF3DImguiActor::CalculateHierarchyWidth()
+{
+  float maxWidth = 0.0f;
+
+  std::function<void(const NodeInfo&, int)> processNode = [&](const NodeInfo& node, int depth)
+  {
+    const std::string& displayText = node.displayName.empty() ? node.name : node.displayName;
+    ImVec2 textSize = ImGui::CalcTextSize(displayText.c_str());
+    float nodeWidth = textSize.x + depth * 10.0f; // 10px indent per level
+    maxWidth = std::max(maxWidth, nodeWidth);
+
+    for (const auto& child : node.children)
+    {
+      processNode(child, depth + 1);
+    }
+  };
+
+  for (const auto& node : this->HierarchyNodes)
+  {
+    processNode(node, 0);
+  }
+
+  // Add padding for checkbox, window padding, and margin
+  constexpr float checkboxWidth = 20.0f;
+  float totalWidth = maxWidth + checkboxWidth + 2.0f * ImGui::GetStyle().WindowPadding.x + 30.0f;
+
+  // Clamp to reasonable bounds
+  return std::max(200.0f, std::min(totalWidth, 800.0f));
+}
 
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderDropZone()
@@ -861,6 +1004,9 @@ void vtkF3DImguiActor::StartFrame(vtkOpenGLRenderWindow* renWin)
   io.DisplaySize = ImVec2(static_cast<float>(size[0]), static_cast<float>(size[1]));
 
   this->Pimpl->Initialize(renWin);
+  
+  // Reset the visibility change flag at the start of each frame
+  this->VisibilityChangedThisFrame = false;
 
   ImGui::NewFrame();
 }
@@ -870,7 +1016,14 @@ void vtkF3DImguiActor::EndFrame(vtkOpenGLRenderWindow* renWin)
 {
   ImGui::Render();
   this->Pimpl->RenderDrawData(renWin, ImGui::GetDrawData());
+  
+  // If visibility changed, request a render to update the scene
+  if (this->VisibilityChangedThisFrame && this->RenderRequestCallback)
+  {
+    this->RenderRequestCallback();
+  }
 }
+
 
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::SetDeltaTime(double time)
