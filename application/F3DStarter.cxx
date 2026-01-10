@@ -426,7 +426,6 @@ public:
     const std::regex numberingRe("n(:(.*))?");
     constexpr size_t maxNumberingAttempts = 1000000;
 
-    /* return value for template variable name (eg. `app` -> `F3D`) */
     const auto variableLookup = [&](const std::string& var)
     {
       if (std::regex_match(var, frameRe))
