@@ -14,8 +14,9 @@ When creating this issue
 Before release:
 
 - [ ] Force fetch origin remote tag with `git fetch origin --tags --force`
-- [ ] Write and format release notes from the pull requests since last release, including contributors and packagers
-- [ ] Create a new [NPM token](https://www.npmjs.com/package/f3d) and replace the existing `NPM_TOKEN` in https://github.com/f3d-app/f3d-superbuild/settings/secrets/actions
+- [ ] Write and format release notes from the pull requests since last release, including sponsors, returning contributors, contributors and packagers
+- [ ] Create a new [NPM token](https://www.npmjs.com/package/f3d) (user -> access tokens -> Bypass 2Fa + ReadWrite All package + ReadWrite f3d-app), copy the token
+- [ ] Replace the existing `NPM_TOKEN` in https://github.com/f3d-app/f3d-superbuild/settings/secrets/actions
 
 Release Split :
 
@@ -51,10 +52,9 @@ Release :
 - [ ] Trigger a release build using https://github.com/f3d-app/f3d-superbuild actions with `vX.Y.Z` F3D version, `vX.Y.Z` sb version and prerelease publish true
 - [ ] Finalize release note and add them to the release
 - [ ] Format the release note into a changelog and commit/review/merge them into https://github.com/f3d-app/f3d
-- [ ] Update dev and nightly docs as described [here](https://f3d.app/dev/TOOLING#how-to-update-the-doc-using-latest-master), commit/review/merge into https://github.com/f3d-app/f3d-website
 - [ ] Add a **new versioned doc** as described [here](https://f3d.app/dev/TOOLING#how-to-update-the-doc-for-a-new-release), commit/review/merge into https://github.com/f3d-app/f3d-website
-- [ ] Commit review and merge a bump of F3D version in `package.json` in https://github.com/f3d-app/f3d-website
-- [ ] Update **download links** using `GITHUB_TOKEN=$PAT npm run update-downloads`, commit/review/merge into https://github.com/f3d-app/f3d-website and then immediately
+- [ ] Change f3d version to `^X.Y.Z` in `package.json` in f3d-website, then build locally as described above, then commit review and merge the resulting changes into https://github.com/f3d-app/f3d-website
+- [ ] Update **download links** using `GITHUB_TOKEN=$PAT F3D_RELEASE=vX.Y.Z npm run update-downloads`, commit/review/merge into https://github.com/f3d-app/f3d-website and then immediately
 - [ ] Release
 - [ ] Communicate on discord
 - [ ] Communicate on reddit
@@ -63,9 +63,9 @@ Release :
 - [ ] Communicate on mastodon
 - [ ] Communicate on bluesky
 - [ ] Move all issue from current milestone to next milestone, close current roadmap issue and open a next roadmap issue
-- [ ] Update `dev/ROADMAPS_AND_RELEASES.md` for next release in https://github.com/f3d-app/f3d-website
+- [ ] Commit review and merge an update of `doc/dev/ROADMAPS_AND_RELEASES.md` for next release in https://github.com/f3d-app/f3d
 - [ ] Create an issue for updating dependencies in CI and superbuild
-- [ ] Update `.github/ISSUE_TEMPLATE/new_release.md` in https://github.com/f3d-app/f3d if needed
+- [ ] Commit review and merge an update of `.github/ISSUE_TEMPLATE/new_release.md` in https://github.com/f3d-app/f3d if needed
 
 Linux testing protocol:
 
@@ -81,9 +81,6 @@ Linux testing protocol:
 - Drag&Drop cow.vtp, Drag&Drop palermo_park.hdr, check render
 - Check that CTRL+O (file dialog) is working
 - Press "Esc" and check the following commands `reload_current_file_group`, `set_camera top`, `toggle_volume_rendering`, `exit`
-- `cd examples/libf3d && mkdir build && cd build && cmake ../ && make`
-- `./cpp/check-engine/check-engine`
-- `./cpp/render-interact/render-interact ../../../testing/data/cow.vtp`
 
 macOS testing protocol:
 
@@ -112,9 +109,6 @@ Windows testing protocol:
 - Check that CTRL+O (file dialog) is working
 - run `f3d-console --version` in a Windows command line and check it output the version
 - Press "Esc" and check the following commands `reload_current_file_group`, `set_camera top`, `toggle_volume_rendering`, `exit`
-- `cd examples\libf3d && mkdir build && cd build && cmake ../ && cmake --build . --config Release`
-- `.\cpp\check-engine\Release\check-engine`
-- `.\cpp\render-interact\Release\render-interact ..\..\..\testing\data\cow.vtp`
 
 Python testing protocol:
 
@@ -126,7 +120,7 @@ Python testing protocol:
 import f3d
 eng = f3d.Engine.create()
 eng.scene.add("/path/to/cow.vtp")
-eng.window.render() # No effect on Windows
+eng.window.render() # May have no effect on Windows
 eng.interactor.start()
 ```
 
@@ -137,12 +131,10 @@ eng.interactor.start()
 Webassembly testing protocol:
 
 - Clone https://github.com/f3d-app/f3d-website
-- Replace the current `f3d` version by the last RC available and run the website locally to check the web viewer
-- Make sure to check for broken anchor in the npm output
 
 ```bash
 npm uninstall f3d
-npm install f3d --tag next
+npm install f3d --tag rc
 npm run start
 ```
 
