@@ -1003,6 +1003,8 @@ public:
   F3DOptionsTools::OptionsEntries DynamicOptionsEntries;
   F3DOptionsTools::OptionsEntries ImperativeConfigOptionsEntries;
   F3DConfigFileTools::BindingsEntries ConfigBindingsEntries;
+  std::vector<fs::path> ConfigPaths;
+  std::string UserConfig;
   std::unique_ptr<f3d::engine> Engine;
   std::vector<std::pair<std::string, std::vector<fs::path>>> FilesGroups;
   std::vector<fs::path> LoadedFiles;
@@ -1077,6 +1079,8 @@ int F3DStarter::Start(int argc, char** argv)
     }
   }
 
+  this->Internals->UserConfig = config;
+
   bool renderToStdout = false;
   iter = cliOptionsDict.find("output");
   if (iter != cliOptionsDict.end())
@@ -1105,6 +1109,7 @@ int F3DStarter::Start(int argc, char** argv)
   {
     F3DConfigFileTools::ParsedConfigFiles parsedConfigFiles =
       F3DConfigFileTools::ReadConfigFiles(config);
+    this->Internals->ConfigPaths = parsedConfigFiles.ConfigPaths;
     this->Internals->ConfigOptionsEntries = parsedConfigFiles.Options;
     this->Internals->ImperativeConfigOptionsEntries = parsedConfigFiles.ImperativeOptions;
     this->Internals->ConfigBindingsEntries = parsedConfigFiles.Bindings;
@@ -2198,6 +2203,13 @@ void F3DStarter::AddCommands()
 
     return candidates;
   };
+
+  interactor.addCommand("print_config_info",
+    [this](const std::vector<std::string>&)
+    {
+      auto parsed = F3DConfigFileTools::ReadConfigFiles(this->Internals->UserConfig);
+      F3DConfigFileTools::PrintConfigInfo(parsed.ConfigPaths);
+    });
 
   interactor.addCommand(
     "remove_current_file_group",
