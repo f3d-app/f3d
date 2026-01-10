@@ -1194,7 +1194,7 @@ bool vtkF3DAssimpImporter::GetTemporalInformation(
     }
   }
 
-  // Mesh animation is not supported for now, no need to get time step from it.
+  // Mesh and morph animation are not supported for now, no need to get time steps from it.
 
   nbTimeSteps = static_cast<int>(timeStepSet.size());
   timeSteps->SetNumberOfTuples(nbTimeSteps);
