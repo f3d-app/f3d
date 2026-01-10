@@ -45,6 +45,16 @@ extern "C"
   F3D_EXPORT int f3d_scene_add_mesh(f3d_scene_t* scene, const f3d_mesh_t* mesh);
 
   /**
+   * @brief Add and load a memory buffer into the scene.
+   *
+   * @param scene Scene handle.
+   * @param buffer Memory buffer containing a file.
+   * @param size Size of the buffer in bytes.
+   * @return 1 on success, 0 on failure.
+   */
+  F3D_EXPORT int f3d_scene_add_buffer(f3d_scene_t* scene, void* buffer, size_t size);
+
+  /**
    * @brief Clear the scene of all added files.
    *
    * @param scene Scene handle.

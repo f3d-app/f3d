@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 
+class vtkResourceStream;
 namespace f3d
 {
 /**
@@ -104,9 +105,17 @@ public:
   }
 
   /**
+   * Create the geometry reader (VTK reader) for the given stream
+   */
+  virtual vtkSmartPointer<vtkAlgorithm> createGeometryReader(vtkResourceStream*) const
+  {
+    return nullptr;
+  }
+
+  /**
    * Apply custom code for the reader
    */
-  virtual void applyCustomReader(vtkAlgorithm*, const std::string&) const
+  virtual void applyCustomReader(vtkAlgorithm*, const std::string&, vtkResourceStream*) const
   {
   }
 
@@ -128,10 +137,27 @@ public:
   }
 
   /**
+   * Create the scene reader (VTK importer) for the given stream
+   */
+  virtual vtkSmartPointer<vtkImporter> createSceneReader(vtkResourceStream*) const
+  {
+    return nullptr;
+  }
+
+  /**
    * Apply custom code for the importer
    */
-  virtual void applyCustomImporter(vtkImporter*, const std::string&) const
+  virtual void applyCustomImporter(vtkImporter*, const std::string&, vtkResourceStream*) const
   {
+  }
+
+  /**
+   * Return true if this reader supports stream
+   * false otherwise
+   */
+  virtual bool supportsStream()
+  {
+    return false;
   }
 
   /**

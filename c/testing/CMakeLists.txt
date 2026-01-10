@@ -11,6 +11,12 @@ list(APPEND f3d_c_api_tests_list
   test_window_c_api.c
 )
 
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
+  list(APPEND f3d_c_api_tests_list
+    test_scene_buffer_c_api.c
+    )
+endif()
+
 set(CMAKE_TESTDRIVER_EXTRA_INCLUDES "")
 set(CMAKE_TESTDRIVER_ARGVC_FUNCTION "")
 set(CMAKE_TESTDRIVER_BEFORE_TESTMAIN "")
