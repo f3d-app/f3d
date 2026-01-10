@@ -6,6 +6,7 @@
 #include "types.h"
 
 /// @cond
+#include <cstddef>
 #include <filesystem>
 #include <string>
 #include <vector>
@@ -51,6 +52,7 @@ public:
    * Already added file will NOT be reloaded
    * If it fails to loads a file, it clears the scene and
    * throw a load_failure_exception.
+   * On other failure, throw a load_failure_exception.
    */
   virtual scene& add(const std::filesystem::path& filePath) = 0;
   virtual scene& add(const std::vector<std::filesystem::path>& filePath) = 0;
@@ -59,8 +61,20 @@ public:
 
   /**
    * Add and load provided mesh into the scene
+   * If it fails to load the mesh, it clears the scene and
+   * throw a load_failure_exception.
+   * On other failure, throw a load_failure_exception.
    */
   virtual scene& add(const mesh_t& mesh) = 0;
+
+  /**
+   * Add and load provided buffer into the scene as it was file
+   * Require the use of `scene.force_reader` to be able to pick the right reader
+   * If it fails to loads the buffer, it clears the scene and
+   * throw a load_failure_exception.
+   * On other failure, throw a load_failure_exception.
+   */
+  virtual scene& add(std::byte* buffer, std::size_t size) = 0;
 
   ///@{
   /**

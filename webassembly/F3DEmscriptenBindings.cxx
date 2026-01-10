@@ -155,6 +155,14 @@ EMSCRIPTEN_BINDINGS(f3d)
         }
       },
       emscripten::return_value_policy::reference())
+    .function(
+      "addBuffer",
+      +[](f3d::scene& scene, emscripten::val jsbuf) -> f3d::scene&
+      {
+        std::vector<std::byte> data = emscripten::vecFromJSArray<std::byte>(jsbuf);
+        return scene.add(data.data(), data.size());
+      },
+      emscripten::return_value_policy::reference())
     .function("clear", &f3d::scene::clear, emscripten::return_value_policy::reference())
     .function("loadAnimationTime", &f3d::scene::loadAnimationTime,
       emscripten::return_value_policy::reference())

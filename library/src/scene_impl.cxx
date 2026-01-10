@@ -17,6 +17,7 @@
 #include <optional>
 #include <vtkCallbackCommand.h>
 #include <vtkLightCollection.h>
+#include <vtkMemoryResourceStream.h>
 #include <vtkProgressBarRepresentation.h>
 #include <vtkProgressBarWidget.h>
 #include <vtkTimerLog.h>
@@ -246,6 +247,7 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
       log::debug("An empty file to load was provided\n");
       continue;
     }
+
     if (!vtksys::SystemTools::FileExists(filePath.string(), true))
     {
       throw scene::load_failure_exception(filePath.string() + " does not exists");
@@ -303,6 +305,56 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
   log::debug("");
 
   this->Internals->Load(importers);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+scene& scene_impl::add(std::byte* buffer, std::size_t size)
+{
+  if (buffer == nullptr || size == 0)
+  {
+    log::debug("Empty buffer or zero size when trying to load a buffer into the scene provided\n");
+    return *this;
+  }
+
+  std::optional<std::string> forceReader = this->Internals->Options.scene.force_reader;
+  if (!forceReader)
+  {
+    throw scene::load_failure_exception(
+      "No force reader set while trying to load a buffer from memory");
+  }
+
+  // Recover the forced reader
+  const f3d::reader* reader = f3d::factory::instance()->getReader("", forceReader);
+  if (reader)
+  {
+    log::debug("Using forced reader ", (*forceReader), " for stream");
+  }
+  else
+  {
+    throw scene::load_failure_exception(*forceReader + " is not a valid force reader");
+  }
+
+  vtkNew<vtkMemoryResourceStream> stream;
+  stream->SetBuffer(buffer, size);
+
+  vtkSmartPointer<vtkImporter> importer = reader->createSceneReader(stream);
+  if (!importer)
+  {
+    auto vtkReader = reader->createGeometryReader(stream);
+
+    if (!vtkReader)
+    {
+      throw scene::load_failure_exception(*forceReader + " does not support reading streams");
+    }
+
+    vtkNew<vtkF3DGenericImporter> genericImporter;
+    genericImporter->SetInternalReader(vtkReader);
+    importer = genericImporter;
+  }
+
+  log::debug("\nLoading stream");
+  this->Internals->Load({ importer });
   return *this;
 }
 

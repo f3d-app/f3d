@@ -13,12 +13,18 @@ endif()
 
 f3d_plugin_init()
 
+set(_SUPPORTS_STREAM)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251109)
+  set(_SUPPORTS_STREAM SUPPORTS_STREAM)
+endif()
+
 f3d_plugin_declare_reader(
   NAME VTKHDF
   SCORE 99
   EXTENSIONS vtkhdf
   MIMETYPES application/vnd.vtkhdf
   VTK_READER vtkHDFReader
+  ${_SUPPORTS_STREAM}
   FORMAT_DESCRIPTION "VTKHDF"
 )
 
