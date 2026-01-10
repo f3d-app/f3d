@@ -63,9 +63,9 @@ Release :
 - [ ] Communicate on mastodon
 - [ ] Communicate on bluesky
 - [ ] Move all issue from current milestone to next milestone, close current roadmap issue and open a next roadmap issue
-- [ ] Update `dev/ROADMAPS_AND_RELEASES.md` for next release in https://github.com/f3d-app/f3d-website
+- [ ] Commit review and merge an update of `doc/dev/ROADMAPS_AND_RELEASES.md` for next release in https://github.com/f3d-app/f3d
 - [ ] Create an issue for updating dependencies in CI and superbuild
-- [ ] Update `.github/ISSUE_TEMPLATE/new_release.md` in https://github.com/f3d-app/f3d if needed
+- [ ] Commit review and merge an update of `.github/ISSUE_TEMPLATE/new_release.md` in https://github.com/f3d-app/f3d if needed
 
 Linux testing protocol:
 
