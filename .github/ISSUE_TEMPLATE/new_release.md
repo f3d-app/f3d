@@ -16,7 +16,7 @@ Before release:
 - [ ] Force fetch origin remote tag with `git fetch origin --tags --force`
 - [ ] Write and format release notes from the pull requests since last release, including sponsors, returning contributors, contributors and packagers
 - [ ] Create a new [NPM token](https://www.npmjs.com/package/f3d) (user -> access tokens -> Bypass 2Fa + ReadWrite All package + ReadWrite f3d-app), copy the token
-- [ ] replace the existing `NPM_TOKEN` in https://github.com/f3d-app/f3d-superbuild/settings/secrets/actions
+- [ ] Replace the existing `NPM_TOKEN` in https://github.com/f3d-app/f3d-superbuild/settings/secrets/actions
 
 Release Split :
 
