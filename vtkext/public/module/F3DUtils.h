@@ -8,6 +8,7 @@
 #ifndef F3DUtils_h
 #define F3DUtils_h
 
+#include "vtkWindow.h"
 #include "vtkextModule.h"
 
 /// @cond
@@ -30,6 +31,23 @@ VTKEXT_EXPORT double ParseToDouble(
  * Use nameError in the log for easier debugging.
  */
 VTKEXT_EXPORT int ParseToInt(const std::string& str, int def, const std::string& nameError);
+
+/*
+ * Get the monitor system scale base on DPI.
+ * Supported on Windows and Linux.
+ * Return a hardcoded 1.0 double on other platforms.
+ *
+ * Capability:
+ *
+ *    Windows:
+ *        Handle DPI change at run-time:            Yes
+ *        Handle DPI difference between monitor:    Yes
+ *
+ *    Linux:
+ *        Handle DPI change at run-time:            No
+ *        Handle DPI difference between monitor:    No
+ */
+VTKEXT_EXPORT double getDPIScale(vtkWindow* win = nullptr);
 };
 
 #endif
