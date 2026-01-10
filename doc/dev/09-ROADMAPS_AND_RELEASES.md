@@ -10,12 +10,12 @@ while the development happens.
 
 If you want to get involved, please feel free to join the [discord](https://discord.f3d.app), comment on the issues and contribute to the issues that matters to you!
 
-## 3.4.0
+## 3.5.0
 
-Out next minor release is planned for January 2026
+Out next minor release is planned for April 2026
 
-- [Issue](https://github.com/f3d-app/f3d/issues/2565)
-- [Milestone](https://github.com/f3d-app/f3d/milestone/14)
+- [Issue](https://github.com/f3d-app/f3d/issues/2799)
+- [Milestone](https://github.com/f3d-app/f3d/milestone/15)
 - [Board](https://github.com/orgs/f3d-app/projects/2)
 
 ## Release cycle
