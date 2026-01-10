@@ -151,8 +151,9 @@ void vtkF3DTAAPass::ReleaseGraphicsResources(vtkWindow* window)
 }
 
 //------------------------------------------------------------------------------
-bool vtkF3DTAAPass::PreReplaceShaderValues(std::string& vertexShader, std::string& geometryShader,
-  std::string& fragmentShader, vtkAbstractMapper* mapper, vtkProp* prop)
+bool vtkF3DTAAPass::PreReplaceShaderValues(std::string& vertexShader,
+  std::string& vtkNotUsed(geometryShader), std::string& vtkNotUsed(fragmentShader),
+  vtkAbstractMapper* mapper, vtkProp* vtkNotUsed(prop))
 {
   if (vtkPolyDataMapper::SafeDownCast(mapper) != nullptr)
   {
@@ -165,8 +166,9 @@ bool vtkF3DTAAPass::PreReplaceShaderValues(std::string& vertexShader, std::strin
 }
 
 //------------------------------------------------------------------------------
-bool vtkF3DTAAPass::SetShaderParameters(vtkShaderProgram* program, vtkAbstractMapper* mapper,
-  vtkProp* prop, vtkOpenGLVertexArrayObject* VAO)
+bool vtkF3DTAAPass::SetShaderParameters(vtkShaderProgram* program,
+  vtkAbstractMapper* vtkNotUsed(mapper), vtkProp* vtkNotUsed(prop),
+  vtkOpenGLVertexArrayObject* vtkNotUsed(VAO))
 {
   program->SetUniform2f("jitter", this->Jitter);
   return true;
