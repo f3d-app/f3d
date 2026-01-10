@@ -1,4 +1,4 @@
-#Animations
+# Animations
 
 F3D is able to play animations for any files which contain them.
 Play them either interactively or by selecting a specific time to display.

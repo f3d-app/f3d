@@ -41,7 +41,6 @@ USD file formats rely on [OpenUSD](https://github.com/PixarAnimationStudios/Open
 
 VDB file formats rely on [OpenVDB](https://github.com/AcademySoftwareFoundation/openvdb) and VTK libraries. It currently comes with some known limitations:
 
-- VDB Grid files are opened with a hard-coded 0.1 sampling rate.
 - The `vdb` plugin is not shipped in the python wheels yet.
 
 ### Gaussian splatting
