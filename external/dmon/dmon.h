@@ -64,7 +64,6 @@
 //          default is 10 ms
 //
 // TODO:
-//      - Use FSEventStreamSetDispatchQueue instead of FSEventStreamScheduleWithRunLoop on MacOS
 //      - DMON_WATCHFLAGS_FOLLOW_SYMLINKS does not resolve files
 //      - implement DMON_WATCHFLAGS_OUTOFSCOPE_LINKS
 //
@@ -86,6 +85,7 @@
 //      1.3.6       Fix deadlock when watch/unwatch API is called from the OnChange callback
 //      1.3.7       Fix deadlock caused by constantly locking the mutex in the thread loop (recent change)
 //      1.3.8       Fix a cpp compatiblity compiler bug after recent changes
+//      1.3.9       Switch from deprecated FSEventStreamScheduleWithRunLoop to FSEventStreamSetDispatchQueue on macOS
 //      
 
 #include <stdbool.h>
@@ -1343,6 +1343,7 @@ typedef struct dmon__watch_state {
     dmon_watch_id id;
     uint32_t watch_flags;
     FSEventStreamRef fsev_stream_ref;
+    dispatch_queue_t queue;
     _dmon_watch_cb* watch_cb;
     void* user_data;
     char rootdir[DMON_MAX_PATH];
@@ -1508,7 +1509,6 @@ _DMON_PRIVATE void* _dmon_thread(void* arg)
             dmon__watch_state* watch = _dmon.watches[i];
             if (!watch->init) {
                 DMON_ASSERT(watch->fsev_stream_ref);
-                FSEventStreamScheduleWithRunLoop(watch->fsev_stream_ref, _dmon.cf_loop_ref, kCFRunLoopDefaultMode);
                 FSEventStreamStart(watch->fsev_stream_ref);
 
                 watch->init = true;
@@ -1737,7 +1737,14 @@ DMON_API_IMPL dmon_watch_id dmon_watch(const char* rootdir,
     watch->fsev_stream_ref = FSEventStreamCreate(_dmon.cf_alloc_ref, _dmon_fsevent_callback, &ctx,
                                                  cf_dirarr, kFSEventStreamEventIdSinceNow, 0.25,
                                                  kFSEventStreamCreateFlagFileEvents);
-
+                
+    watch->queue = dispatch_queue_create("com.septag.dmon", NULL);
+    if(!watch->queue) {
+        _DMON_LOG_ERRORF("Could not create dispatch queue: %s.", rootdir);
+        pthread_mutex_unlock(&_dmon.mutex);
+        return _dmon_make_id(0);
+    }
+    FSEventStreamSetDispatchQueue(watch->fsev_stream_ref, watch->queue);
 
     CFRelease(cf_dirarr);
     CFRelease(cf_dir);
