@@ -43,6 +43,7 @@
 #include <algorithm>
 #include <atomic>
 #include <cassert>
+#include <cmath>
 #include <csignal>
 #include <filesystem>
 #include <fstream>
@@ -277,6 +278,34 @@ public:
   }
 
   /**
+   * Save image to file or stdout.
+   * Returns true on success, false on failure (error already logged).
+   */
+  bool saveImage(f3d::image& img, const fs::path& outputPath, bool toStdout)
+  {
+    if (toStdout)
+    {
+      const auto buffer = img.saveBuffer();
+      std::copy(buffer.begin(), buffer.end(), std::ostreambuf_iterator(std::cout));
+      f3d::log::debug("Output image saved to stdout");
+    }
+    else
+    {
+      try
+      {
+        img.save(outputPath);
+      }
+      catch (const f3d::image::write_exception& ex)
+      {
+        f3d::log::error("Could not write output: ", ex.what());
+        return false;
+      }
+      f3d::log::debug("Output image saved to ", outputPath);
+    }
+    return true;
+  }
+
+  /**
    * Substitute the following variables in a filename template:
    * - `{app}`: application name (ie. `F3D`)
    * - `{version}`: application version (eg. `2.4.0`)
@@ -289,12 +318,16 @@ public:
    * - `{n}`: auto-incremented number to make filename unique (up to 1000000)
    * - `{n:2}`, `{n:3}`, ...: zero-padded auto-incremented number to make filename unique
    *   (up to 1000000)
+   * - `{frame}`: current animation frame number (when outputting multiple frames)
+   * - `{frame:4}`, `{frame:5}`, ...: zero-padded animation frame number
    */
-  fs::path applyFilenameTemplate(const fs::path& templatePath)
+  fs::path applyFilenameTemplate(
+    const fs::path& templatePath, std::optional<int> frame = std::nullopt)
   {
     constexpr size_t maxNumberingAttempts = 1000000;
     const std::regex numberingRe("(n:?(.*))");
     const std::regex dateRe("date:?(.*)");
+    const std::regex frameRe("(frame:?(.*))");
 
     /* Return a file related string depending on the currently loaded files, or the empty string if
      * a single file is loaded */
@@ -372,6 +405,29 @@ public:
           f3d::log::warn("invalid date format for \"", var, "\"");
         }
         return formatted;
+      }
+      else if (std::regex_match(var, frameRe))
+      {
+        if (!frame.has_value())
+        {
+          f3d::log::warn("{frame} variable can only be used when outputting animation frames");
+          throw f3d::utils::string_template::lookup_error(var);
+        }
+        std::stringstream formattedFrame;
+        const std::string fmt = std::regex_replace(var, frameRe, "$2");
+        try
+        {
+          formattedFrame << std::setfill('0') << std::setw(std::stoi(fmt)) << frame.value();
+        }
+        catch (std::invalid_argument&)
+        {
+          if (!fmt.empty())
+          {
+            f3d::log::warn("ignoring invalid frame format for \"", var, "\"");
+          }
+          formattedFrame << std::setw(0) << frame.value();
+        }
+        return formattedFrame.str();
       }
       throw f3d::utils::string_template::lookup_error(var);
     };
@@ -710,7 +766,7 @@ public:
     }
     else
     {
-      T localOption;
+      T localOption{};
       this->ParseOption(appOptions, name, localOption);
       option = localOption;
     }
@@ -1250,8 +1306,13 @@ int F3DStarter::Start(int argc, char** argv)
       f3d::utils::getEnv("CTEST_F3D_NO_DATA_FORCE_RENDER");
 
     fs::path reference = f3d::utils::collapsePath(this->Internals->AppOptions.Reference);
-    fs::path output = this->Internals->applyFilenameTemplate(
-      f3d::utils::collapsePath(this->Internals->AppOptions.Output));
+    // Check if output template contains {frame} - if so, defer template application
+    const std::string& outputTemplate = this->Internals->AppOptions.Output;
+    const bool hasFrameTemplate =
+      f3d::utils::string_template(outputTemplate).hasVariable(std::regex("frame:?.*"));
+    fs::path output = hasFrameTemplate
+      ? fs::path{}
+      : this->Internals->applyFilenameTemplate(f3d::utils::collapsePath(outputTemplate));
 
     // Render and compare with file if needed
     if (!reference.empty())
@@ -1337,7 +1398,7 @@ int F3DStarter::Start(int argc, char** argv)
       }
     }
     // Render to file if needed
-    else if (!output.empty())
+    else if (!this->Internals->AppOptions.Output.empty())
     {
       if (this->Internals->LoadedFiles.empty() && !noDataForceRender.has_value())
       {
@@ -1345,28 +1406,59 @@ int F3DStarter::Start(int argc, char** argv)
         return EXIT_FAILURE;
       }
 
-      f3d::image img = window.renderToImage(this->Internals->AppOptions.NoBackground);
-      this->Internals->addOutputImageMetadata(img);
-
-      if (renderToStdout)
+      if (hasFrameTemplate)
       {
-        const auto buffer = img.saveBuffer();
-        std::copy(buffer.begin(), buffer.end(), std::ostreambuf_iterator(std::cout));
-        f3d::log::debug("Output image saved to stdout");
+        f3d::scene& animScene = this->Internals->Engine->getScene();
+        const auto [minTime, maxTime] = animScene.animationTimeRange();
+
+        const double startTime = this->Internals->AppOptions.AnimationTime.value_or(minTime);
+        const double endTime = maxTime;
+        const double duration = endTime - startTime;
+        const int count = duration > 0
+          ? static_cast<int>(std::ceil(duration * this->Internals->AppOptions.FrameRate)) + 1
+          : 1;
+
+        if (count == 1)
+        {
+          f3d::log::warn("No animation available or animation has zero duration, outputting single "
+                         "frame");
+        }
+
+        const double timeStep = 1.0 / this->Internals->AppOptions.FrameRate;
+
+        f3d::log::info(
+          "Saving ", count, " animation frame(s) from time ", startTime, " to ", endTime);
+
+        for (int frame = 0; frame < count; ++frame)
+        {
+          const double currentTime = startTime + frame * timeStep;
+          animScene.loadAnimationTime(currentTime);
+
+          const fs::path frameOutput = renderToStdout
+            ? fs::path{}
+            : this->Internals->applyFilenameTemplate(
+                f3d::utils::collapsePath(this->Internals->AppOptions.Output), frame);
+
+          f3d::image img = window.renderToImage(this->Internals->AppOptions.NoBackground);
+          this->Internals->addOutputImageMetadata(img);
+
+          if (!this->Internals->saveImage(img, frameOutput, renderToStdout))
+          {
+            return EXIT_FAILURE;
+          }
+        }
+
+        f3d::log::info("Saved ", count, " animation frame(s)");
       }
       else
       {
-        try
+        f3d::image img = window.renderToImage(this->Internals->AppOptions.NoBackground);
+        this->Internals->addOutputImageMetadata(img);
+
+        if (!this->Internals->saveImage(img, output, renderToStdout))
         {
-          img.save(output);
-        }
-        catch (const f3d::image::write_exception& ex)
-        {
-          f3d::log::error("Could not write output: ", ex.what());
           return EXIT_FAILURE;
         }
-
-        f3d::log::debug("Output image saved to ", output);
       }
 
       if (this->Internals->FilesGroups.size() > 1)
