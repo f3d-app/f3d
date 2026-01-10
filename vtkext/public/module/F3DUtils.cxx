@@ -124,7 +124,7 @@ double F3DUtils::getDPIScale(vtkWindow* win)
       vtkWarningWithObjectMacro(nullptr, "Fail to get window ID.");
     }
   }
-#elif __linux__
+#elif defined(__linux__) && !defined(__ANDROID__)
   Display* dpy = nullptr;
 
   if (win)
