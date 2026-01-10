@@ -8,9 +8,7 @@
 #ifdef _MSC_VER
 #pragma comment(lib, "Shcore")
 #include <ShellScalingApi.h>
-#endif
-
-#if defined(__linux__) && !defined(__ANDROID__)
+#elif defined(__linux__) && defined(VTK_USE_X)
 #include <X11/Xlib.h>
 #endif
 
@@ -124,7 +122,7 @@ double F3DUtils::getDPIScale(vtkWindow* win)
       vtkWarningWithObjectMacro(nullptr, "Fail to get window ID.");
     }
   }
-#elif defined(__linux__) && !defined(__ANDROID__)
+#elif defined(__linux__) && defined(VTK_USE_X)
   Display* dpy = nullptr;
 
   if (win)
