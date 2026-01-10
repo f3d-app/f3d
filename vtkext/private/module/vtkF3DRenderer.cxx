@@ -246,6 +246,7 @@ vtkF3DRenderer::vtkF3DRenderer()
   this->Cullers->RemoveAllItems();
   this->AutomaticLightCreationOff();
   this->SetClippingRangeExpansion(0.99);
+  this->SystemScaleChangeObserverId = -1;
 
   // Create cached texture
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20230902)
@@ -1430,7 +1431,7 @@ void vtkF3DRenderer::ConfigureSystemScaleChangeObserver()
       commandCallback->SetClientData(this);
 
       commandCallback->SetCallback(
-        [](vtkObject* caller, unsigned long eventId, void* clientData, void*)
+        [](vtkObject*, unsigned long, void* clientData, void*)
         {
           vtkF3DRenderer* self = static_cast<vtkF3DRenderer*>(clientData);
 
