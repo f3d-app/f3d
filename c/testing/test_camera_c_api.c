@@ -48,6 +48,14 @@ int test_camera_c_api()
   f3d_angle_deg_t angle = f3d_camera_get_view_angle(camera);
   (void)angle;
 
+  f3d_angle_deg_t azimuth = f3d_camera_get_world_azimuth(camera);
+  f3d_angle_deg_t elevation = f3d_camera_get_world_elevation(camera);
+  double distance = f3d_camera_get_distance(camera);
+
+  (void)azimuth;
+  (void)elevation;
+  (void)distance;
+
   f3d_camera_state_t state = { 0 };
   state.position[0] = 5.0;
   state.position[1] = 5.0;
