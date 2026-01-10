@@ -1332,11 +1332,10 @@ int F3DStarter::Start(int argc, char** argv)
     std::optional<std::string> noDataForceRender =
       f3d::utils::getEnv("CTEST_F3D_NO_DATA_FORCE_RENDER");
 
-    fs::path reference = f3d::utils::collapsePath(this->Internals->AppOptions.Reference);
-    // Check if output template contains {frame} - if so, defer template application
-    const f3d::utils::string_template outputTemplate =
-      this->Internals->prepareFilenameTemplate(this->Internals->AppOptions.Output);
+    const f3d::utils::string_template outputTemplate = this->Internals->prepareFilenameTemplate(
+      f3d::utils::collapsePath(this->Internals->AppOptions.Output));
 
+    fs::path reference = f3d::utils::collapsePath(this->Internals->AppOptions.Reference);
     // Render and compare with file if needed
     if (!reference.empty())
     {
