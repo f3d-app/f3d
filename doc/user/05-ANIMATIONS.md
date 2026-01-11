@@ -13,13 +13,13 @@ This specific example uses an animation file which can be downloaded [here](http
 Load the example animation file shown above by executing within command line: `f3d InterpolationTest.glb`
 
 <img width="1024" alt="2" src="https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/docs/user/animation_1.png" />
-To view current animation name, press <kbd>H</kbdto open up cheatsheet menu
+To view current animation name, press <kbd>H</kbd> to open up cheatsheet menu
 
 <img width="1024" alt="3" src="https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/docs/user/animation_2.png" />
-Press <kbd>W</kbdto cycle through available animations
+Press <kbd>W</kbd> to cycle through available animations
 
 <img width="1024" alt="4" src="https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/docs/user/animation_3.png" />
-Press <kbd>space</kbdto play/pause current animation.
+Press <kbd>space</kbd> to play/pause current animation.
 Note: A blue bar runs along the bottom of screen to indicate the current time interval of the animation sequence if animation-progress was turned on.
 
 <img width="1024" alt="5" src="https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/docs/user/animation_4.png" />
@@ -39,15 +39,15 @@ F3D animation behavior can be fully controlled from the command line using the f
 
 ## Animation Interactions
 
-- Press <kbd>W</kbdto cycle through animations
-- Press <kbd>Space</kbdto play/pause animation
-- Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Space</kbdto play/pause animation backward
+- Press <kbd>W</kbd> to cycle through animations
+- Press <kbd>Space</kbd> to play/pause animation
+- Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Space</kbd> to play/pause animation backward
 
 See [COMMANDS](07-COMMANDS.md) for commands like `jump_to_frame`
 
 ## Cycling Animations
 
-Pressing <kbd>W</kbdlet you cycle the animation to show.
+Pressing <kbd>W</kbd> let you cycle the animation to show.
 
 When cycling, F3D will cycle like this:
 
