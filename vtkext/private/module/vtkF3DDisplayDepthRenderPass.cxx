@@ -63,7 +63,7 @@ void vtkF3DDisplayDepthRenderPass::Render(const vtkRenderState* state)
       "  gl_FragData[0] = vec4(colorMapped.rgb, 1.0);\n"
       "  return;\n"
       "}\n"
-      "gl_FragData[0] = vec4(depth, depth, depth, 1.0);\n"
+      "gl_FragData[0] = vec4(vec3(depth), 1.0);\n"
       "//VTK::FSQ::Impl");
     this->QuadHelper =
       std::make_shared<vtkOpenGLQuadHelper>(renWin, nullptr, depthDisplayingFS.c_str(), nullptr);
@@ -145,7 +145,7 @@ void vtkF3DDisplayDepthRenderPass::InitializeResources(vtkOpenGLRenderWindow* re
       double range[2];
       this->ColorMap->GetRange(range);
 
-      std::vector<float> table(tableSize * 3);
+      std::array<double, tableSize * 3> table;
       this->ColorMap->GetTable(range[0], range[1], tableSize, table.data());
 
       this->ColorMapTexture->Create1DFromRaw(tableSize, 3, VTK_FLOAT, table.data());
@@ -181,10 +181,4 @@ void vtkF3DDisplayDepthRenderPass::ReleaseGraphicsResources(vtkWindow* window)
   {
     this->ColorMapTexture->ReleaseGraphicsResources(window);
   }
-}
-
-///------------------------------------------------------------------------------
-void vtkF3DDisplayDepthRenderPass::SetColorMap(vtkDiscretizableColorTransferFunction* colorMap)
-{
-  this->ColorMap = colorMap;
 }

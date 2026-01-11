@@ -1756,7 +1756,6 @@ void vtkF3DRenderer::SetDisplayDepth(bool use)
   {
     this->DisplayDepth = use;
     this->RenderPassesConfigured = false;
-    this->CheatSheetConfigured = false;
   }
 }
 
@@ -1767,7 +1766,6 @@ void vtkF3DRenderer::SetDisplayDepthScalarColoring(bool use)
   {
     this->DisplayDepthScalarColoring = use;
     this->RenderPassesConfigured = false;
-    this->CheatSheetConfigured = false;
   }
 }
 

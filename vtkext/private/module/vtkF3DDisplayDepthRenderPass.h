@@ -1,3 +1,10 @@
+/**
+ * @class   vtkF3DDisplayDepthRenderPass
+ * @brief   Render pass for displaying depth buffer
+ *
+ * This render pass displays the depth buffer as a grayscale image or using a
+ * color map if provided.
+ */
 #ifndef vtkF3DDepthRenderPass_h
 #define vtkF3DDepthRenderPass_h
 
@@ -21,7 +28,7 @@ public:
   void Render(const vtkRenderState* state) override;
   void ReleaseGraphicsResources(vtkWindow* window) override;
 
-  void SetColorMap(vtkDiscretizableColorTransferFunction* colorMap);
+  vtkSetSmartPointerMacro(ColorMap, vtkDiscretizableColorTransferFunction);
 
 private:
   vtkF3DDisplayDepthRenderPass() = default;
