@@ -81,6 +81,7 @@ set(classes
   vtkF3DUIActor
   vtkF3DUserRenderPass
   vtkF3DTAAResolvePass
+  vtkF3DDisplayDepthRenderPass
   )
 
 if (F3D_MODULE_UI)
