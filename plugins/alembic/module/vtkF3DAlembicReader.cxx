@@ -612,13 +612,16 @@ public:
     std::set<double> timeStepSet;
     std::stack<std::pair<const Alembic::Abc::IObject, const Alembic::Abc::ObjectHeader>> objects;
 
-    objects.push(std::make_pair(top, top.getHeader()));
+    for (size_t i = 0; i < top.getNumChildren(); ++i)
+    {
+      objects.emplace(std::make_pair(top, top.getChildHeader(i)));
+    }
 
     while (!objects.empty())
     {
       const auto& [parent, ohead] = objects.top();
       const Alembic::AbcGeom::IObject obj(parent, ohead.getName());
-
+      int numSamples = 0;
       Alembic::Abc::TimeSamplingPtr ts;
       if (Alembic::AbcGeom::IXform::matches(ohead))
       {
@@ -642,7 +645,7 @@ public:
       objects.pop();
       for (size_t i = 0; i < obj.getNumChildren(); ++i)
       {
-        objects.push(std::make_pair(obj.getChild(i), obj.getChildHeader(i)));
+        objects.emplace(std::make_pair(obj, obj.getChildHeader(i)));
       }
 
       if (ts == nullptr)
@@ -657,7 +660,8 @@ public:
         timeStepSet.insert(timeStep);
       }
     }
-    if (timeStepSet.size() > 0) {
+    if (timeStepSet.size() > 0)
+    {
       start = *timeStepSet.begin();
       end = *timeStepSet.rbegin();
       timeSteps = std::vector<double>(timeStepSet.begin(), timeStepSet.end());
