@@ -92,8 +92,6 @@ eg:
 - `jump_to_keyframe 0 false` jump to animation start frame.
 - `jump_to_keyframe 1 false` jump to keyframe 1.
 - `jump_to_keyframe 10 false` jump to keyframe 10.
-- `jump_to_keyframe -1 false` jump to last keyframe.
-- `jump_to_keyframe -2 false` jump to second last keyframe.
 
 `cycle_verbose_level` : A specific command to cycle between the verbose levels (`Debug`, `Info`, `Warning`, `Error`, `Quiet`).
 
