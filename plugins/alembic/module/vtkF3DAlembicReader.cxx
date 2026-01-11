@@ -612,43 +612,37 @@ public:
     std::set<double> timeStepSet;
     std::stack<std::pair<const Alembic::Abc::IObject, const Alembic::Abc::ObjectHeader>> objects;
 
-    for (size_t i = 0; i < top.getNumChildren(); ++i)
-    {
-      objects.emplace(std::make_pair(top, top.getChildHeader(i)));
-    }
+    objects.push(std::make_pair(top, top.getHeader()));
 
     while (!objects.empty())
     {
       const auto& [parent, ohead] = objects.top();
       const Alembic::AbcGeom::IObject obj(parent, ohead.getName());
-      int numSamples = 0;
+
       Alembic::Abc::TimeSamplingPtr ts;
       if (Alembic::AbcGeom::IXform::matches(ohead))
       {
         const Alembic::AbcGeom::IXform xForm(parent, ohead.getName());
         const Alembic::AbcGeom::IXformSchema& schema = xForm.getSchema();
         ts = schema.getTimeSampling();
-        numSamples = static_cast<int>(schema.getNumSamples());
       }
       else if (Alembic::AbcGeom::IPolyMesh::matches(ohead))
       {
         const Alembic::AbcGeom::IPolyMesh polymesh(parent, ohead.getName());
         const Alembic::AbcGeom::IPolyMeshSchema& schema = polymesh.getSchema();
         ts = schema.getTimeSampling();
-        numSamples = static_cast<int>(schema.getNumSamples());
       }
       else if (Alembic::AbcGeom::ICurves::matches(ohead))
       {
         const Alembic::AbcGeom::ICurves curves(parent, ohead.getName());
         const Alembic::AbcGeom::ICurvesSchema& schema = curves.getSchema();
         ts = schema.getTimeSampling();
-        numSamples = static_cast<int>(schema.getNumSamples());
       }
 
       objects.pop();
       for (size_t i = 0; i < obj.getNumChildren(); ++i)
       {
-        objects.emplace(std::make_pair(obj, obj.getChildHeader(i)));
+        objects.push(std::make_pair(obj.getChild(i), obj.getChildHeader(i)));
       }
 
       if (ts == nullptr)
@@ -663,9 +657,11 @@ public:
         timeStepSet.insert(timeStep);
       }
     }
-    start = *timeStepSet.begin();
-    end = *timeStepSet.rbegin();
-    timeSteps = std::vector<double>(timeStepSet.begin(), timeStepSet.end());
+    if (timeStepSet.size() > 0) {
+      start = *timeStepSet.begin();
+      end = *timeStepSet.rbegin();
+      timeSteps = std::vector<double>(timeStepSet.begin(), timeStepSet.end());
+    }
   }
 
   bool ReadArchive(
