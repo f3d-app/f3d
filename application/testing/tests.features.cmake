@@ -233,7 +233,7 @@ f3d_test(NAME TestVerboseAnimation DATA InterpolationTest.glb ARGS --verbose NO_
 f3d_test(NAME TestVerboseAnimationWrongAnimationTimeHigh DATA BoxAnimated.gltf ARGS --animation-time=10 --verbose REGEXP "Animation time 10 is outside of range \\[0, 3\\.70833\\], using 3\\.70833" NO_BASELINE)
 f3d_test(NAME TestVerboseAnimationWrongAnimationTimeLow DATA BoxAnimated.gltf ARGS --animation-time=-5 --verbose REGEXP "Animation time -5 is outside of range \\[0, 3\\.70833\\], using 0" NO_BASELINE)
 f3d_test(NAME TestVerboseAnimationTimeRange DATA InterpolationTest.glb ARGS --verbose REGEXP "0, 1.66667" NO_BASELINE)
-f3d_test(NAME TestCommandScriptVerboseMultiAnimationTimeRange SCRIPT TestCommandScriptVerboseMultiAnimationTimeRange.txt DATA InterpolationTest.glb ARGS --verbose REGEXP "0, 1.70833" NO_BASELINE)# cycle_animation x3
+f3d_test(NAME TestCommandScriptVerboseMultiAnimationTimeRange SCRIPT DATA InterpolationTest.glb ARGS --verbose REGEXP "0, 1.70833" NO_BASELINE)# cycle_animation x3
 
 ## MaxSize
 f3d_test(NAME TestMaxSizeBelow DATA suzanne.stl ARGS --max-size=1)
@@ -381,7 +381,7 @@ if(F3D_MODULE_RAYTRACING)
     f3d_test(NAME TestRaytracingNoBackground DATA suzanne.ply ARGS -rd --raytracing-samples=4 --no-background)
   endif()
 else(F3D_MODULE_RAYTRACING)
-  f3d_test(NAME TestCommandScriptRaytracingNoRaytracing DATA suzanne.ply SCRIPT TestCommandScriptRaytracing.txt NO_BASELINE REGEXP "Raytracing options can't be used if F3D has not been built with raytracing")
+  f3d_test(NAME TestCommandScriptRaytracing SCRIPT DATA suzanne.ply NO_BASELINE REGEXP "Raytracing options can't be used if F3D has not been built with raytracing")
 endif()
 
 if(F3D_MODULE_EXR)
@@ -403,29 +403,29 @@ f3d_test(NAME TestFinalShaderUndefined DATA cow.vtp ARGS --final-shader "undefin
 f3d_test(NAME TestFinalShaderCompilationFailure DATA cow.vtp ARGS --final-shader "vec4 pixel(vec2 uv){}" --verbose REGEXP " build the shader program" NO_BASELINE)
 
 ## Command Script
-f3d_test(NAME TestCommandScriptBasic DATA dragon.vtu SCRIPT TestCommandScriptBasic.txt) # roll_camera 90;toggle ui.scalar_bar;print_scene_info;increase_light_intensity
-f3d_test(NAME TestCommandScriptElevation DATA dragon.vtu SCRIPT TestCommandScriptElevation.txt) # elevation_camera 90;toggle ui.scalar_bar;print_scene_info;increase_light_intensity
-f3d_test(NAME TestCommandScriptAzimuth DATA dragon.vtu SCRIPT TestCommandScriptAzimuth.txt) # azimuth_camera 90;toggle ui.scalar_bar;print_scene_info;increase_light_intensity
-f3d_test(NAME TestCommandScriptInvalidCommand DATA dragon.vtu SCRIPT TestCommandScriptInvalid.txt REGEXP "Command: \"INVALID_COMMAND_1\" is not recognized, ignoring" NO_BASELINE) # INVALID_COMMAND_1
-f3d_test(NAME TestCommandScriptMissingFile DATA dragon.vtu SCRIPT TestCommandScriptMissingFile.txt REGEXP "Unable to open command script file" NO_BASELINE)
-f3d_test(NAME TestCommandScriptPrintScene DATA dragon.vtu SCRIPT TestCommandScriptPrintScene.txt REGEXP "Camera position: 2.23745, 3.83305, 507.598" NO_BASELINE) # print_scene_info
-f3d_test(NAME TestCommandScriptPrintConfig DATA dragon.vtu SCRIPT TestCommandScriptPrintConfig.txt REGEXP "Found available config path" NO_BASELINE) # print_config_info 
-f3d_test(NAME TestCommandScriptPrintColoring DATA dragon.vtu SCRIPT TestCommandScriptPrintColoring.txt REGEXP "Not coloring" NO_BASELINE) # print_coloring_info
-f3d_test(NAME TestCommandScriptPrintMesh DATA dragon.vtu SCRIPT TestCommandScriptPrintMesh.txt REGEXP "Number of points: 13268" NO_BASELINE) # print_mesh_info
-f3d_test(NAME TestCommandScriptPrintOptions DATA dragon.vtu SCRIPT TestCommandScriptPrintOptions.txt REGEXP "interactor.invert_zoom: false" NO_BASELINE) # print_options_info
-f3d_test(NAME TestCommandScriptAlias DATA dragon.vtu SCRIPT TestCommandScriptAlias.txt --reference=${F3D_SOURCE_DIR}/testing/baselines/TestCommandScriptAlias.png) # alias myrotate roll_camera 90;myrotate
-f3d_test(NAME TestCommandScriptReset DATA dragon.vtu suzanne.stl ARGS --edges SCRIPT TestCommandScriptReset.txt) # reset render.show_edges; load_next_file_group;
-f3d_test(NAME TestCommandScriptParseOptionalBoolExtraArg DATA dragon.vtu SCRIPT TestCommandScriptParseOptionalBoolExtraArg.txt REGEXP "Command: load_previous_file_group takes at most 1 argument, got 2 arguments instead." NO_BASELINE) # load_previous_file_group true extra
-f3d_test(NAME TestCommandScriptRemoveCurrentFileGroup DATA cow.vtp dragon.vtu SCRIPT TestCommandScriptRemoveCurrentFileGroup.txt) # remove_current_file_group
-f3d_test(NAME TestCommandScriptRemoveFileGroups DATA dragon.vtu SCRIPT TestCommandScriptRemoveFileGroups.txt NO_DATA_FORCE_RENDER UI) # remove_file_groups
-f3d_test(NAME TestCommandScriptInvalidReaderOptions DATA dragon.vtu SCRIPT TestCommandScriptInvalidReaderOptions.txt REGEXP "point to an inexistent option, ignoring" NO_BASELINE) # set_reader_option invalid value
-f3d_test(NAME TestCommandScriptHelp DATA dragon.vtu SCRIPT TestCommandScriptHelp.txt REGEX "set a libf3d option" NO_BASELINE) # help set
-f3d_test(NAME TestCommandScriptHelpInvalid DATA dragon.vtu SCRIPT TestCommandScriptHelpInvalid.txt REGEX "is not a recognized command" NO_BASELINE) # help invalid
-f3d_test(NAME TestCommandScriptJumpToPreviousFrame DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5 --animation-progress SCRIPT TestCommandScriptJumpToPreviousFrame.txt)
-f3d_test(NAME TestCommandScriptJumpToNextFrame DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress SCRIPT TestCommandScriptJumpToNextFrame.txt)
-f3d_test(NAME TestCommandScriptJumpToFirstFrame DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5 --animation-progress SCRIPT TestCommandScriptJumpToFirstFrame.txt)
-f3d_test(NAME TestCommandScriptJumpToLastFrame DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5 --animation-progress SCRIPT TestCommandScriptJumpToLastFrame.txt)
-f3d_test(NAME TestCommandScriptJumpToMiddleFrame DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5 --animation-progress SCRIPT TestCommandScriptJumpToMiddleFrame.txt)
+f3d_test(NAME TestCommandScriptBasic SCRIPT DATA dragon.vtu) # roll_camera 90;toggle ui.scalar_bar;print_scene_info;increase_light_intensity
+f3d_test(NAME TestCommandScriptElevation SCRIPT DATA dragon.vtu) # elevation_camera 90;toggle ui.scalar_bar;print_scene_info;increase_light_intensity
+f3d_test(NAME TestCommandScriptAzimuth SCRIPT DATA dragon.vtu) # azimuth_camera 90;toggle ui.scalar_bar;print_scene_info;increase_light_intensity
+f3d_test(NAME TestCommandScriptInvalid SCRIPT DATA dragon.vtu REGEXP "Command: \"INVALID_COMMAND_1\" is not recognized, ignoring" NO_BASELINE) # INVALID_COMMAND_1
+f3d_test(NAME TestCommandScriptMissingFile SCRIPT DATA dragon.vtu REGEXP "Unable to open command script file" NO_BASELINE)
+f3d_test(NAME TestCommandScriptPrintScene SCRIPT DATA dragon.vtu REGEXP "Camera position: 2.23745, 3.83305, 507.598" NO_BASELINE) # print_scene_info
+f3d_test(NAME TestCommandScriptPrintConfig SCRIPT DATA dragon.vtu REGEXP "Found available config path" NO_BASELINE) # print_config_info 
+f3d_test(NAME TestCommandScriptPrintColoring SCRIPT DATA dragon.vtu REGEXP "Not coloring" NO_BASELINE) # print_coloring_info
+f3d_test(NAME TestCommandScriptPrintMesh SCRIPT DATA dragon.vtu REGEXP "Number of points: 13268" NO_BASELINE) # print_mesh_info
+f3d_test(NAME TestCommandScriptPrintOptions SCRIPT DATA dragon.vtu REGEXP "interactor.invert_zoom: false" NO_BASELINE) # print_options_info
+f3d_test(NAME TestCommandScriptAlias SCRIPT DATA dragon.vtu --reference=${F3D_SOURCE_DIR}/testing/baselines/TestCommandScriptAlias.png) # alias myrotate roll_camera 90;myrotate
+f3d_test(NAME TestCommandScriptReset SCRIPT DATA dragon.vtu suzanne.stl ARGS --edges) # reset render.show_edges; load_next_file_group;
+f3d_test(NAME TestCommandScriptParseOptionalBoolExtraArg SCRIPT DATA dragon.vtu REGEXP "Command: load_previous_file_group takes at most 1 argument, got 2 arguments instead." NO_BASELINE) # load_previous_file_group true extra
+f3d_test(NAME TestCommandScriptRemoveCurrentFileGroup SCRIPT DATA cow.vtp dragon.vtu) # remove_current_file_group
+f3d_test(NAME TestCommandScriptRemoveFileGroups SCRIPT DATA dragon.vtu NO_DATA_FORCE_RENDER UI) # remove_file_groups
+f3d_test(NAME TestCommandScriptInvalidReaderOptions SCRIPT DATA dragon.vtu REGEXP "point to an inexistent option, ignoring" NO_BASELINE) # set_reader_option invalid value
+f3d_test(NAME TestCommandScriptHelp SCRIPT DATA dragon.vtu REGEX "set a libf3d option" NO_BASELINE) # help set
+f3d_test(NAME TestCommandScriptHelpInvalid SCRIPT DATA dragon.vtu REGEX "is not a recognized command" NO_BASELINE) # help invalid
+f3d_test(NAME TestCommandScriptJumpToPreviousFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5 --animation-progress)
+f3d_test(NAME TestCommandScriptJumpToNextFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress)
+f3d_test(NAME TestCommandScriptJumpToFirstFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5 --animation-progress)
+f3d_test(NAME TestCommandScriptJumpToLastFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5 --animation-progress)
+f3d_test(NAME TestCommandScriptJumpToMiddleFrame SCRIPT DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-time=0.5 --animation-progress)
 
 ## Tests to increase coverage
 # Output option test
@@ -441,7 +441,7 @@ f3d_test(NAME TestOutputFrameCountFrame1 DATA BoxAnimated.gltf ARGS --reference=
 f3d_test(NAME TestOutputFrameCountNoAnimation DATA cow.vtp ARGS --output=${CMAKE_BINARY_DIR}/Testing/Temporary/static_{frame:4}.png REGEXP "No animation available" NO_BASELINE NO_OUTPUT)
 f3d_test(NAME TestOutputFrameCountInvalidFormat DATA BoxAnimated.gltf ARGS --output=${CMAKE_BINARY_DIR}/Testing/Temporary/invalid_{frame:abc}.png --frame-rate=0.25 REGEXP "ignoring invalid frame format" NO_BASELINE NO_OUTPUT)
 f3d_test(NAME TestOutputFrameCountStartTime DATA BoxAnimated.gltf ARGS --output=${CMAKE_BINARY_DIR}/Testing/Temporary/TestOutputFrameCountStartTime_{frame:4}.png --frame-rate=0.3 --animation-time=2.0 REGEXP "Saving 2 animation frame" NO_BASELINE NO_OUTPUT)
-f3d_test(NAME TestScreenshotFrameVariable DATA cow.vtp ARGS --screenshot-filename=${CMAKE_BINARY_DIR}/Testing/Temporary/screenshot_{frame}.png SCRIPT TestCommandScriptScreenshotFrame.txt REGEXP "{frame} variable can only be used when outputting animation frames" NO_BASELINE)
+f3d_test(NAME TestCommandScriptScreenshotFrame SCRIPT DATA cow.vtp ARGS --screenshot-filename=${CMAKE_BINARY_DIR}/Testing/Temporary/screenshot_{frame}.png REGEXP "{frame} variable can only be used when outputting animation frames" NO_BASELINE)
 
 # Basic record and play test
 f3d_test(NAME TestInteractionRecord DATA cow.vtp ARGS --interaction-test-record=${CMAKE_BINARY_DIR}/Testing/Temporary/TestInteractionRecord.log NO_BASELINE)
