@@ -145,7 +145,7 @@ void vtkF3DDisplayDepthRenderPass::InitializeResources(vtkOpenGLRenderWindow* re
       double range[2];
       this->ColorMap->GetRange(range);
 
-      std::array<double, tableSize * 3> table;
+      std::array<float, tableSize * 3> table;
       this->ColorMap->GetTable(range[0], range[1], tableSize, table.data());
 
       this->ColorMapTexture->Create1DFromRaw(tableSize, 3, VTK_FLOAT, table.data());
