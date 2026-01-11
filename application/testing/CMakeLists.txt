@@ -586,6 +586,7 @@ f3d_test(NAME TestCommandScriptJumpToClosestKeyFrame DATA soldier_animations.mdl
 f3d_test(NAME TestCommandScriptJumpToStartKeyFrame DATA soldier_animations.mdl ARGS --animation-time=0.4 --animation-indices=2 --animation-progress SCRIPT TestCommandScriptJumpToStartKeyFrame.txt)
 f3d_test(NAME TestCommandScriptJumpToPositiveOutsideKeyFrame DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress SCRIPT TestCommandScriptJumpToPositiveOutsideKeyFrame.txt)
 f3d_test(NAME TestCommandScriptJumpToNegativeOutsideKeyFrame DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress SCRIPT TestCommandScriptJumpToNegativeOutsideKeyFrame.txt)
+f3d_test(NAME TestCommandScriptJumpToKeyFrameNoAnimation DATA cow.vtp SCRIPT TestCommandScriptJumpToKeyFrameNoAnimation.txt)
 
 # Test temporal anti-aliasing
 f3d_test(NAME TestInteractionTAA DATA suzanne.ply ARGS --anti-aliasing=taa INTERACTION) #Render;Render...

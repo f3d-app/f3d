@@ -95,7 +95,6 @@ void animationManager::Initialize()
 
   // Reset animation indices before updating
   this->PreparedAnimationIndices.reset();
-  this->AnimationTimeSteps.reset();
   this->PrepareForAnimationIndices();
 
   if (this->AvailAnimations == 0)
@@ -225,12 +224,17 @@ void animationManager::JumpToFrame(int frame, bool relative)
 //----------------------------------------------------------------------------
 void animationManager::JumpToKeyFrame(int keyframe, bool relative)
 {
-  vtkSmartPointer<vtkDoubleArray> timeSteps = this->AnimationTimeSteps.value();
-  const int timeStepsAvailable = timeSteps->GetSize();
+  if (!this->AnimationTimeSteps || this->AnimationTimeSteps->GetSize() == 0)
+  {
+    return;
+  }
 
-  auto it = std::lower_bound(timeSteps->Begin(), timeSteps->End(), this->CurrentTime);
-  const int closestKeyFrame = (it != timeSteps->End())
-    ? static_cast<int>(std::distance(timeSteps->Begin(), it))
+  const int timeStepsAvailable = this->AnimationTimeSteps->GetSize();
+
+  auto it = std::lower_bound(
+    this->AnimationTimeSteps->Begin(), this->AnimationTimeSteps->End(), this->CurrentTime);
+  const int closestKeyFrame = (it != this->AnimationTimeSteps->End())
+    ? static_cast<int>(std::distance(this->AnimationTimeSteps->Begin(), it))
     : timeStepsAvailable - 1;
 
   int nextKeyFrame = closestKeyFrame;
@@ -249,7 +253,7 @@ void animationManager::JumpToKeyFrame(int keyframe, bool relative)
     }
   }
 
-  this->CurrentTime = timeSteps->GetValue(nextKeyFrame);
+  this->CurrentTime = this->AnimationTimeSteps->GetValue(nextKeyFrame);
 
   if (this->LoadAtTime(this->CurrentTime))
   {
