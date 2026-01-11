@@ -340,6 +340,12 @@ public:
    */
   void ShowScalarBar(bool show);
 
+   /**
+   * Set the visibility of the normal glyphs actor.
+   * It will only be shown if raytracing and volume, and Point Sprites are not enabled
+   */
+  void SetUseNormalGlyphs(bool use);
+
   /**
    * Set the visibility of the normal glyphs actor.
    * It will only be shown if raytracing and volume, and Point Sprites are not enabled
