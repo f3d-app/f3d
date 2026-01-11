@@ -5,6 +5,7 @@
 #include "vtkF3DImporter.h"
 
 #include <vtkActorCollection.h>
+#include <vtkArrowSource.h>
 #include <vtkCallbackCommand.h>
 #include <vtkCamera.h>
 #include <vtkImageData.h>
@@ -26,6 +27,7 @@ struct vtkF3DMetaImporter::Internals
 {
   // Actors related vectors
   std::vector<vtkF3DMetaImporter::ColoringStruct> ColoringActorsAndMappers;
+  std::vector<vtkF3DMetaImporter::NormalGlyphsStruct> NormalGlyphsActorsAndMappers;
   std::vector<vtkF3DMetaImporter::PointSpritesStruct> PointSpritesActorsAndMappers;
   std::vector<vtkF3DMetaImporter::VolumeStruct> VolumePropsAndMappers;
 
@@ -118,6 +120,13 @@ const std::vector<vtkF3DMetaImporter::ColoringStruct>&
 vtkF3DMetaImporter::GetColoringActorsAndMappers()
 {
   return this->Pimpl->ColoringActorsAndMappers;
+}
+
+//----------------------------------------------------------------------------
+const std::vector<vtkF3DMetaImporter::NormalGlyphsStruct>&
+vtkF3DMetaImporter::GetNormalGlyphsActorsAndMappers()
+{
+  return this->Pimpl->NormalGlyphsActorsAndMappers;
 }
 
 //----------------------------------------------------------------------------
@@ -288,18 +297,37 @@ bool vtkF3DMetaImporter::Update()
       this->Renderer->AddActor(cs.Actor);
       cs.Actor->VisibilityOff();
 
-      // Create and configure point sprites actors
-      this->Pimpl->PointSpritesActorsAndMappers.emplace_back(
-        vtkF3DMetaImporter::PointSpritesStruct(actor, importer));
-      vtkF3DMetaImporter::PointSpritesStruct& pss =
-        this->Pimpl->PointSpritesActorsAndMappers.back();
-
       vtkPolyData* points = surface;
       if (genericImporter)
       {
         // Use indexed accessor for composite support
         points = genericImporter->GetImportedPoints(actorIndex);
       }
+
+      // Create and configure normal glyph actors
+      this->Pimpl->NormalGlyphsActorsAndMappers.emplace_back(
+        vtkF3DMetaImporter::NormalGlyphsStruct(actor, importer));
+      vtkF3DMetaImporter::NormalGlyphsStruct& ngs =
+        this->Pimpl->NormalGlyphsActorsAndMappers.back();
+
+      vtkNew<vtkArrowSource> arrowSource;
+
+      ngs.glyph3D->SetSourceConnection(arrowSource->GetOutputPort());
+      ngs.glyph3D->SetVectorModeToUseNormal();
+      ngs.glyph3D->SetInputData(points);
+      ngs.glyph3D->SetScaleFactor(.2);
+      ngs.glyph3D->Update();
+
+      ngs.Mapper->SetInputConnection(ngs.glyph3D->GetOutputPort());
+      this->Renderer->AddActor(ngs.Actor);
+      ngs.Actor->VisibilityOff();
+
+      // Create and configure point sprites actors
+      this->Pimpl->PointSpritesActorsAndMappers.emplace_back(
+        vtkF3DMetaImporter::PointSpritesStruct(actor, importer));
+      vtkF3DMetaImporter::PointSpritesStruct& pss =
+        this->Pimpl->PointSpritesActorsAndMappers.back();
+
       pss.Mapper->SetInputData(points);
       this->Renderer->AddActor(pss.Actor);
       pss.Actor->VisibilityOff();

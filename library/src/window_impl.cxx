@@ -400,6 +400,8 @@ void window_impl::UpdateDynamicOptions()
   // Update pending up direction if changed
   renderer->SetPendingUpDirection(opt.scene.up_direction);
 
+  renderer->SetUseNormalGlyphs(opt.model.normal_glyphs.enable);
+
   // XXX: model.point_sprites.type only has an effect on geometry scene
   // but we set it here for practical reasons
   renderer->SetUsePointSprites(opt.model.point_sprites.enable);

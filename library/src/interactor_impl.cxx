@@ -1238,6 +1238,18 @@ interactor& interactor_impl::initCommands()
     std::bind(complNames, std::placeholders::_1,
       std::vector<std::string>{ "front", "top", "right", "isometric" }));
 
+   this->addCommand(
+    "toggle_normal_glyphs",
+    [&](const std::vector<std::string>&)
+    {
+      this->Internals->Options.model.normal_glyphs.enable =
+        !this->Internals->Options.model.normal_glyphs.enable;
+      this->Internals->Window.render();
+      this->Internals->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
+    },
+    command_documentation_t{
+      "toggle_normal_glyphs", "toggle model.normal_glyphs.enable" });
+
   this->addCommand(
     "toggle_volume_rendering",
     [&](const std::vector<std::string>&)
@@ -1673,6 +1685,7 @@ interactor& interactor_impl::initBindings()
 #endif
   this->addBinding({mod_t::NONE, "V"}, "toggle_volume_rendering","Scene", std::bind(docTgl, "Volume rendering", std::cref(opts.model.volume.enable)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "I"}, "toggle model.volume.inverse","Scene", std::bind(docTgl, "Inverse volume opacity", std::cref(opts.model.volume.inverse)), f3d::interactor::BindingType::TOGGLE);
+  this->addBinding({mod_t::CTRL, "N"}, "toggle_normal_glyphs","Scene", std::bind(docTgl, "Normal glyphs", std::cref(opts.model.normal_glyphs.enable)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "O"}, "cycle_point_sprites","Scene", docPS, f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "U"}, "toggle render.background.blur.enable","Scene", std::bind(docTgl, "Blur background", std::cref(opts.render.background.blur.enable)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "K"}, "cycle_interactor_style","Scene", std::bind(docStr, "Interaction style", std::cref(opts.interactor.style)), f3d::interactor::BindingType::CYCLIC);
