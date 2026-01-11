@@ -465,6 +465,7 @@ PYBIND11_MODULE(pyf3d, module)
       "Add a memory buffer containing a file the scene", py::arg("buffer"), py::prepend())
     .def("load_animation_time", &f3d::scene::loadAnimationTime)
     .def("animation_time_range", &f3d::scene::animationTimeRange)
+    .def("animation_keyframes", &f3d::scene::animationKeyFrames)
     .def("available_animations", &f3d::scene::availableAnimations)
     .def("get_animation_name", &f3d::scene::getAnimationName, py::arg("index") = -1,
       "Returns the animation at an index (defaults to current)")
