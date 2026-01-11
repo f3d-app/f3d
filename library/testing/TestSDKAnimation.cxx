@@ -53,6 +53,12 @@ int TestSDKAnimation([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   test("getAnimationNames returns names", sce.getAnimationNames(),
     std::vector<std::string>{ "unnamed_0" });
+
+  auto keyframes = sce.animationKeyFrames();
+  test("check keyframes size", keyframes.size(), 50);
+  test("check first keyframes", keyframes[0], 0.f);
+  test("check last keyframes", keyframes[49], 4.f);
+
   inter.startAnimation(f3d::interactor::AnimationDirection::FORWARD);
   test("isPlaying backward after forward start",
     inter.getAnimationDirection() == f3d::interactor::AnimationDirection::FORWARD);

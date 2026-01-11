@@ -632,6 +632,22 @@ std::pair<double, double> animationManager::GetTimeRange()
 }
 
 //----------------------------------------------------------------------------
+std::vector<double> animationManager::GetKeyFrames()
+{
+  this->PrepareForAnimationIndices();
+
+  std::vector<double> keyFrames;
+  keyFrames.reserve(this->AnimationTimeSteps->GetSize());
+
+  for (vtkIdType i = 0; i < this->AnimationTimeSteps->GetNumberOfTuples(); ++i)
+  {
+    keyFrames.push_back(this->AnimationTimeSteps->GetValue(i));
+  }
+
+  return keyFrames;
+}
+
+//----------------------------------------------------------------------------
 unsigned int animationManager::GetNumberOfAvailableAnimations() const
 {
   assert(this->AvailAnimations >= 0);
