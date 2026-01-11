@@ -149,6 +149,11 @@ public:
   std::pair<double, double> GetTimeRange();
 
   /**
+   * Return a vector containing current animation keyframe's times
+   */
+  std::vector<double> GetKeyFrames();
+
+  /**
    * Get the number of available animations
    */
   unsigned int GetNumberOfAvailableAnimations() const;
