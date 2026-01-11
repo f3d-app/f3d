@@ -9,15 +9,15 @@
     "TBB is set at v2021.13.1 because OpenUSD seems to not support more revent versions: https://github.com/PixarAnimationStudios/OpenUSD/issues/3878"
   ],
   "versions": {
-    "alembic": "1.8.9",
+    "alembic": "1.8.10",
     "assimp": "v6.0.2",
     "blosc": "v1.21.6",
     "draco": "1.5.7",
     "imath": "v3.2.2",
     "java": "25",
-    "occt": "V7_9_2",
-    "openexr": "v3.4.2",
-    "openvdb": "v12.1.1",
+    "occt": "V7_9_3",
+    "openexr": "v3.4.4",
+    "openvdb": "v13.0.0",
     "ospray": "v2.12.0",
     "pybind11": "v3.0.1",
     "python": "3.14",
@@ -45,6 +45,6 @@
     "zlib": "v1.2.13"
   },
   "vtk_commit_sha": "c4400870a52e8a49b050fafffd7f9d6fad88a1b3",
-  "docker_timestamp": "20260107_0",
+  "docker_timestamp": "20260111_0",
   "global_cache_index": "1"
 }
