@@ -233,14 +233,20 @@ void animationManager::JumpToKeyFrame(int keyframe, bool relative)
     ? static_cast<int>(std::distance(timeSteps->Begin(), it))
     : timeStepsAvailable - 1;
 
-  int nextKeyFrame = relative ? closestKeyFrame + keyframe : keyframe;
-  const bool outsideOfRange = std::abs(nextKeyFrame) > timeStepsAvailable;
-  nextKeyFrame = ((nextKeyFrame % timeStepsAvailable) + timeStepsAvailable) % timeStepsAvailable;
-
-  if (outsideOfRange)
+  int nextKeyFrame = closestKeyFrame;
+  if (relative)
   {
-    log::warn("Keyframe index ", keyframe, " is outside of range [", timeStepsAvailable,
-      "], converting to ", nextKeyFrame, " instead.");
+    nextKeyFrame = closestKeyFrame + keyframe;
+    nextKeyFrame = ((nextKeyFrame % timeStepsAvailable) + timeStepsAvailable) % timeStepsAvailable;
+  }
+  else
+  {
+    nextKeyFrame = keyframe > 0 ? std::min(keyframe, timeStepsAvailable - 1) : 0;
+    if (0 > keyframe || keyframe > timeStepsAvailable)
+    {
+      log::warn("Keyframe index ", keyframe, " is outside of range [0-", timeStepsAvailable - 1,
+        "], converting to ", nextKeyFrame, " instead.");
+    }
   }
 
   this->CurrentTime = timeSteps->GetValue(nextKeyFrame);
