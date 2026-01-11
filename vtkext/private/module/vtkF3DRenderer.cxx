@@ -2356,6 +2356,16 @@ void vtkF3DRenderer::SetTextureNormal(const std::optional<fs::path>& tex)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetTextureChecker(const std::optional<fs::path>& tex)
+{
+  if (this->TextureChecker != tex)
+  {
+    this->TextureChecker = tex;
+    this->ActorsPropertiesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetPointSpritesType(vtkF3DRenderer::SplatType type)
 {
   if (this->PointSpritesType != type)
@@ -2541,6 +2551,16 @@ void vtkF3DRenderer::ConfigureActorsProperties()
       auto normTex = ::GetTexture(this->TextureNormal.value());
       coloring.Actor->GetProperty()->SetNormalTexture(normTex);
       coloring.OriginalActor->GetProperty()->SetNormalTexture(normTex);
+    }
+
+    if (this->TextureChecker.has_value())
+    {
+      F3DLog::Print(F3DLog::Severity::Warning, "hello");
+      auto checkTex = ::GetTexture(this->TextureChecker.value());
+      coloring.Actor->GetProperty()->SetORMTexture(checkTex);
+      coloring.OriginalActor->GetProperty()->SetORMTexture(checkTex);
+      coloring.Actor->GetProperty()->SetBaseColorTexture(checkTex);
+      coloring.OriginalActor->GetProperty()->SetBaseColorTexture(checkTex);
     }
 
     if (this->NormalScale.has_value())

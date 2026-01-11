@@ -159,6 +159,12 @@ Path to a texture file that sets the normal map of the object. Model-specified b
 
 CLI: `--texture-normal`.
 
+### `model.checker.texture` (_path_, optional)
+
+Path to a texture file that sets the checker texture of the object. Model-specified by default.
+
+CLI: `--texture-checker`.
+
 ### `model.scivis.enable` (_bool_, default: `false`)
 
 _Color by an array_ present in on the data. If `model.scivis.array_name` is not set, the first available array will be used.

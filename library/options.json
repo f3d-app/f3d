@@ -294,6 +294,11 @@
         "type": "path"
       }
     },
+    "checker": {
+      "texture": {
+        "type": "path"
+      }
+    },
     "color": {
       "opacity": {
         "type": "double"

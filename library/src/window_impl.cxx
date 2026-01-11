@@ -612,6 +612,7 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetTextureNormal(opt.model.normal.texture);
   renderer->SetNormalScale(opt.model.normal.scale);
   renderer->SetTextureMatCap(opt.model.matcap.texture);
+  renderer->SetTextureChecker(opt.model.checker.texture);
 
   renderer->SetEnableColoring(opt.model.scivis.enable);
   renderer->SetUseCellColoring(opt.model.scivis.cells);

@@ -138,6 +138,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       {"textures-transform", "", "3x3 matrix to transform textures", "<transform2d>", ""},
       {"emissive-factor", "", "Emissive factor. This value is multiplied with the emissive color when an emissive texture is present", "<color>", ""},
       {"texture-normal", "", "Path to a texture file that sets the normal map of the object", "<file path>", ""},
+      {"texture-checker", "", "Path to a checker file that sets the texture of the object", "<file path>", ""},
       {"normal-scale", "", "Normal scale affects the strength of the normal deviation from the normal texture", "<normalScale>", ""} } },
   {"Window",
     { {"background-color", "", "Background color", "<color>", ""},
