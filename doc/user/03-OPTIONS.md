@@ -222,6 +222,10 @@ Set the opacity of the backdrop behind text information such as FPS, filename, m
 
 ## Material options
 
+### `--normal-glyphs` (_bool_, default: `false`)
+
+Display arrows that show vertex normals.
+
 ### `-o`, `--point-sprites=<none|sphere|gaussian>` (_string_, default: `none`)
 
 Select _points sprites_ types to show instead of the geometry.
