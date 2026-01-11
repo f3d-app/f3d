@@ -236,7 +236,7 @@ void animationManager::JumpToKeyFrame(int keyframe, bool relative)
   int nextKeyFrame = closestKeyFrame;
   if (relative)
   {
-    nextKeyFrame = closestKeyFrame + keyframe;
+    nextKeyFrame += keyframe;
     nextKeyFrame = ((nextKeyFrame % timeStepsAvailable) + timeStepsAvailable) % timeStepsAvailable;
   }
   else
