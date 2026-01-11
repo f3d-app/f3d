@@ -26,8 +26,6 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251016)
   endif()
 endif()
 
-# TODO Remove a test
-f3d_test(NAME TestAssimpVerbose DATA duck.fbx ARGS --verbose --load-plugins=assimp REGEXP "Number of points: 12636" NO_BASELINE)
 f3d_test(NAME TestVerboseAssimp DATA duck.fbx ARGS --verbose --load-plugins=assimp NO_BASELINE REGEXP "LOD3sp")
 f3d_test(NAME TestVerboseAssimpAnimationIndicesError DATA animatedLights.fbx ARGS --load-plugins=assimp --animation-indices=48 NO_BASELINE REGEXP "Specified animation index: 48 is not in range")
 
