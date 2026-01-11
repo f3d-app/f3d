@@ -169,6 +169,13 @@ public class Scene {
     public native double[] animationTimeRange();
 
     /**
+     * Get animation time range of currently added files.
+     *
+     * @return array of 2 doubles [min_time, max_time]
+     */
+    public native List<Double> animationKeyFrames();
+
+    /**
      * Return the number of animations available in the currently loaded files.
      *
      * @return number of available animations
@@ -188,7 +195,7 @@ public class Scene {
     /**
      * Get the animation name of a given animation indices, if any.
      *
-     * @return animation name or string error 
+     * @return animation name or string error
      */
     public native String getAnimationName(int indices);
 
