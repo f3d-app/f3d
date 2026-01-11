@@ -1242,7 +1242,7 @@ interactor& interactor_impl::initCommands()
     std::bind(complNames, std::placeholders::_1,
       std::vector<std::string>{ "front", "top", "right", "isometric" }));
 
-   this->addCommand(
+  this->addCommand(
     "toggle_normal_glyphs",
     [&](const std::vector<std::string>&)
     {
@@ -1250,8 +1250,7 @@ interactor& interactor_impl::initCommands()
         !this->Internals->Options.model.normal_glyphs.enable;
       this->Internals->Window.render();
     },
-    command_documentation_t{
-      "toggle_normal_glyphs", "toggle model.normal_glyphs.enable" });
+    command_documentation_t{ "toggle_normal_glyphs", "toggle model.normal_glyphs.enable" });
 
   this->addCommand(
     "toggle_volume_rendering",
