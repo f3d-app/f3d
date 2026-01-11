@@ -92,6 +92,14 @@ eg:
 - `jump_to_keyframe 0 false` jump to animation start frame.
 - `jump_to_keyframe 1 false` jump to keyframe 1.
 - `jump_to_keyframe 10 false` jump to keyframe 10.
+- `jump_to_keyframe 10 true` jump 10 keyframes ahead.
+
+This command is currently supported only by the following readers :
+- `vtkF3DGLTFImporter`
+- `vtkF3DQuakeMDLImporter`
+
+You can follow the issue below to track the progress of animation support for other readers:
+[F3D Issue – Improve Animation System #2637](https://github.com/f3d-app/f3d/issues/2637#:~:text=Access%20to%20timesteps)
 
 `cycle_verbose_level` : A specific command to cycle between the verbose levels (`Debug`, `Info`, `Warning`, `Error`, `Quiet`).
 
