@@ -401,6 +401,12 @@
         "default_value": "false"
       }
     },
+    "normal_glyphs": {
+      "enable": {
+        "type": "bool",
+        "default_value": "false"
+      }
+    },
     "volume": {
       "enable": {
         "type": "bool",
