@@ -3124,7 +3124,8 @@ void vtkF3DRenderer::ConfigureColoring()
   }
 
   //// Handle Normal Glyphs
-  bool normalGlyphsVisible = !this->UseRaytracing && !this->UsePointSprites && this->UseNormalGlyphs;
+  bool normalGlyphsVisible =
+    !this->UseRaytracing && !this->UsePointSprites && this->UseNormalGlyphs;
   for (const auto& normalGlyph : this->Importer->GetNormalGlyphsActorsAndMappers())
   {
     normalGlyph.Actor->SetVisibility(normalGlyphsVisible);
