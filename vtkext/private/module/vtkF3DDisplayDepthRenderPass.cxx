@@ -36,7 +36,7 @@ void vtkF3DDisplayDepthRenderPass::Render(const vtkRenderState* state)
   int size[2];
   renderer->GetTiledSizeAndOrigin(&size[0], &size[1], &pos[0], &pos[1]);
 
-  InitializeResources(renWin, size[0], size[1]);
+  this->InitializeResources(renWin, size[0], size[1]);
 
   // render to color and depth texture
   renWin->GetState()->PushFramebufferBindings();
