@@ -1245,7 +1245,6 @@ interactor& interactor_impl::initCommands()
       this->Internals->Options.model.normal_glyphs.enable =
         !this->Internals->Options.model.normal_glyphs.enable;
       this->Internals->Window.render();
-      this->Internals->Window.PrintColoringDescription(log::VerboseLevel::DEBUG);
     },
     command_documentation_t{
       "toggle_normal_glyphs", "toggle model.normal_glyphs.enable" });
