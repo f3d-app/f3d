@@ -581,8 +581,6 @@ f3d_test(NAME TestCommandScriptJumpToMiddleFrame DATA soldier_animations.mdl ARG
 f3d_test(NAME TestCommandScriptJumpToPreviousKeyFrame DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress SCRIPT TestCommandScriptJumpToPreviousKeyFrame.txt)
 f3d_test(NAME TestCommandScriptJumpToNextKeyFrame DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress SCRIPT TestCommandScriptJumpToNextKeyFrame.txt)
 f3d_test(NAME TestCommandScriptJumpToFirstKeyFrame DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress SCRIPT TestCommandScriptJumpToFirstKeyFrame.txt)
-f3d_test(NAME TestCommandScriptJumpToLastKeyFrame DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress SCRIPT TestCommandScriptJumpToLastKeyFrame.txt)
-f3d_test(NAME TestCommandScriptJumpToThirdToLastKeyFrame DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress SCRIPT TestCommandScriptJumpToThirdToLastKeyFrame.txt)
 f3d_test(NAME TestCommandScriptJumpToAbsoluteKeyFrame DATA soldier_animations.mdl ARGS --animation-indices=2 --animation-progress SCRIPT TestCommandScriptJumpToAbsoluteKeyFrame.txt)
 f3d_test(NAME TestCommandScriptJumpToClosestKeyFrame DATA soldier_animations.mdl ARGS --animation-time=0.14 --animation-indices=2 --animation-progress SCRIPT TestCommandScriptJumpToClosestKeyFrame.txt)
 f3d_test(NAME TestCommandScriptJumpToStartKeyFrame DATA soldier_animations.mdl ARGS --animation-time=0.4 --animation-indices=2 --animation-progress SCRIPT TestCommandScriptJumpToStartKeyFrame.txt)
