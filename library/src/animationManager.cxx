@@ -95,6 +95,7 @@ void animationManager::Initialize()
 
   // Reset animation indices before updating
   this->PreparedAnimationIndices.reset();
+  this->AnimationTimeSteps->Reset();
   this->PrepareForAnimationIndices();
 
   if (this->AvailAnimations == 0)
@@ -214,6 +215,46 @@ void animationManager::JumpToFrame(int frame, bool relative)
   }
 
   this->CurrentTime = this->TimeRange[0] + (nextFrame * this->DeltaTime * this->SpeedFactor);
+
+  if (this->LoadAtTime(this->CurrentTime))
+  {
+    this->Window.render();
+  }
+}
+
+//----------------------------------------------------------------------------
+void animationManager::JumpToKeyFrame(int keyframe, bool relative)
+{
+  if (this->AnimationTimeSteps->GetSize() == 0)
+  {
+    return;
+  }
+
+  const int timeStepsAvailable = this->AnimationTimeSteps->GetSize();
+
+  auto it = std::lower_bound(
+    this->AnimationTimeSteps->Begin(), this->AnimationTimeSteps->End(), this->CurrentTime);
+  const int closestKeyFrame = (it != this->AnimationTimeSteps->End())
+    ? static_cast<int>(std::distance(this->AnimationTimeSteps->Begin(), it))
+    : timeStepsAvailable - 1;
+
+  int nextKeyFrame = closestKeyFrame;
+  if (relative)
+  {
+    nextKeyFrame += keyframe;
+    nextKeyFrame = ((nextKeyFrame % timeStepsAvailable) + timeStepsAvailable) % timeStepsAvailable;
+  }
+  else
+  {
+    nextKeyFrame = keyframe > 0 ? std::min(keyframe, timeStepsAvailable - 1) : 0;
+    if (0 > keyframe || keyframe > timeStepsAvailable)
+    {
+      log::warn("Keyframe index ", keyframe, " is outside of range [0-", timeStepsAvailable - 1,
+        "], converting to ", nextKeyFrame, " instead.");
+    }
+  }
+
+  this->CurrentTime = this->AnimationTimeSteps->GetValue(nextKeyFrame);
 
   if (this->LoadAtTime(this->CurrentTime))
   {
@@ -535,8 +576,9 @@ void animationManager::PrepareForAnimationIndices()
     {
       double timeRange[2];
       int nbTimeSteps;
-      vtkNew<vtkDoubleArray> timeSteps;
-      this->Importer->GetTemporalInformation(animIndex, timeRange, nbTimeSteps, timeSteps);
+
+      this->Importer->GetTemporalInformation(
+        animIndex, timeRange, nbTimeSteps, this->AnimationTimeSteps);
 
       // Accumulate time ranges
       this->TimeRange[0] = std::min(timeRange[0], this->TimeRange[0]);

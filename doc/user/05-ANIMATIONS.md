@@ -106,3 +106,15 @@ The animation support level is listed for each reader [here](02-SUPPORTED_FORMAT
 
 When opening multiple files at the same time using the `--multi-file-mode` option and selecting multiple animations to show,
 F3D may warn when combining SINGLE and non SINGLE files, but will still try to respect the chosen animation indices.
+
+## Animation keyframes
+
+The `jump_to_keyframe` command allows you to load an animation at a specific keyframe. See [COMMANDS](07-COMMANDS.md) for more information and examples on how to use this command.
+
+This command is currently supported only by the following readers:
+
+- `vtkF3DGLTFImporter`
+- `vtkF3DQuakeMDLImporter`
+
+You can follow the issue below to track the progress of animation support for other readers :
+[F3D Issue – Improve Animation System #2637](https://github.com/f3d-app/f3d/issues/2637#:~:text=Access%20to%20timesteps)
