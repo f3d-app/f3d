@@ -213,13 +213,6 @@ void vtkF3DPolyDataMapper::ReplaceShaderValues(
 
   posImpl += "  gl_Position = MCDCMatrix * posMC;\n";
 
-  // TAA
-  type = uniforms->GetUniformTupleType("jitter");
-  if (type)
-  {
-    posImpl += "  gl_Position.xy += jitter * gl_Position.w;\n";
-  }
-
   if (this->PrimitiveInfo[this->LastBoundBO].LastLightComplexity > 0)
   {
     posImpl += "  vertexVCVSOutput = MCVCMatrix * posMC;\n";

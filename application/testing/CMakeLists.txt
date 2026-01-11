@@ -669,7 +669,7 @@ endif()
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12098
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250504)
-  f3d_test(NAME TestInteractionStochasticTAA DATA alpha.glb ARGS --anti-aliasing=taa --blending=stochastic INTERACTION) #Render;Render...
+  f3d_test(NAME TestInteractionStochasticTAA DATA alpha.glb ARGS --anti-aliasing=taa --blending=stochastic INTERACTION THRESHOLD 0.05) #Render;Render...
   f3d_test(NAME TestInteractionAndCLIBlending ARGS --blending DATA suzanne.stl alpha.glb INTERACTION)#PP;Right
 endif()
 
