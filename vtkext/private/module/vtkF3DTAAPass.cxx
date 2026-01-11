@@ -1,4 +1,4 @@
-#include "vtkF3DTAAResolvePass.h"
+#include "vtkF3DTAAPass.h"
 
 #include <vtkCamera.h>
 #include <vtkObjectFactory.h>
@@ -9,15 +9,16 @@
 #include <vtkOpenGLRenderWindow.h>
 #include <vtkOpenGLShaderCache.h>
 #include <vtkOpenGLState.h>
+#include <vtkPolyDataMapper.h>
 #include <vtkRenderState.h>
 #include <vtkRenderer.h>
 #include <vtkShaderProgram.h>
 #include <vtkTextureObject.h>
 
-vtkStandardNewMacro(vtkF3DTAAResolvePass);
+vtkStandardNewMacro(vtkF3DTAAPass);
 
 //------------------------------------------------------------------------------
-void vtkF3DTAAResolvePass::Render(const vtkRenderState* state)
+void vtkF3DTAAPass::Render(const vtkRenderState* state)
 {
   vtkOpenGLClearErrorMacro();
   this->NumberOfRenderedProps = 0;
@@ -74,10 +75,13 @@ void vtkF3DTAAResolvePass::Render(const vtkRenderState* state)
     this->FrameBufferObject->SetContext(renWin);
   }
 
+  this->ConfigureJitter(size[0], size[1]);
+  this->PreRender(state);
   renWin->GetState()->PushFramebufferBindings();
   this->RenderDelegate(
     state, size[0], size[1], size[0], size[1], this->FrameBufferObject, this->ColorTexture);
   renWin->GetState()->PopFramebufferBindings();
+  this->PostRender(state);
 
   if (!this->QuadHelper)
   {
@@ -128,7 +132,7 @@ void vtkF3DTAAResolvePass::Render(const vtkRenderState* state)
 }
 
 //------------------------------------------------------------------------------
-void vtkF3DTAAResolvePass::ReleaseGraphicsResources(vtkWindow* window)
+void vtkF3DTAAPass::ReleaseGraphicsResources(vtkWindow* window)
 {
   this->Superclass::ReleaseGraphicsResources(window);
 
@@ -144,4 +148,67 @@ void vtkF3DTAAResolvePass::ReleaseGraphicsResources(vtkWindow* window)
   {
     this->HistoryTexture->ReleaseGraphicsResources(window);
   }
+}
+
+//------------------------------------------------------------------------------
+bool vtkF3DTAAPass::PreReplaceShaderValues(std::string& vertexShader,
+  std::string& vtkNotUsed(geometryShader), std::string& vtkNotUsed(fragmentShader),
+  vtkAbstractMapper* mapper, vtkProp* vtkNotUsed(prop))
+{
+  if (vtkPolyDataMapper::SafeDownCast(mapper) != nullptr)
+  {
+    vtkShaderProgram::Substitute(
+      vertexShader, "//VTK::Clip::Dec", "uniform vec2 jitter;\n//VTK::Clip::Dec", false);
+    vtkShaderProgram::Substitute(vertexShader, "//VTK::CustomEnd::Impl",
+      "  gl_Position.xy += jitter;\n//VTK::CustomEnd::Impl", false);
+  }
+  return true;
+}
+
+//------------------------------------------------------------------------------
+bool vtkF3DTAAPass::SetShaderParameters(vtkShaderProgram* program,
+  vtkAbstractMapper* vtkNotUsed(mapper), vtkProp* vtkNotUsed(prop),
+  vtkOpenGLVertexArrayObject* vtkNotUsed(VAO))
+{
+  program->SetUniform2f("jitter", this->Jitter);
+  return true;
+}
+
+//------------------------------------------------------------------------------
+void vtkF3DTAAPass::ConfigureJitter(int w, int h)
+{
+  Jitter[0] = this->ConfigureHaltonSequence(0);
+  Jitter[1] = this->ConfigureHaltonSequence(1);
+
+  Jitter[0] = ((Jitter[0] - 0.5f) / w) * 2.0f;
+  Jitter[1] = ((Jitter[1] - 0.5f) / h) * 2.0f;
+}
+
+//------------------------------------------------------------------------------
+float vtkF3DTAAPass::ConfigureHaltonSequence(int direction)
+{
+  assert(direction == 0 || direction == 1);
+
+  int base = 2 + direction;
+  int& numerator = this->TaaHaltonNumerator[direction];
+  int& denominator = this->TaaHaltonDenominator[direction];
+
+  int difference = denominator - numerator;
+  if (difference == 1)
+  {
+    numerator = 1;
+    denominator *= base;
+  }
+  else
+  {
+    int quotient = denominator / base;
+    while (difference <= quotient && quotient > 0)
+    {
+      quotient = quotient / base;
+    }
+
+    numerator = (base + 1) * quotient - difference;
+  }
+
+  return static_cast<float>(numerator) / static_cast<float>(denominator);
 }
