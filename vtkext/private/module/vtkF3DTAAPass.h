@@ -19,11 +19,11 @@ class vtkOpenGLFramebufferObject;
 class vtkOpenGLQuadHelper;
 class vtkTextureObject;
 
-class vtkF3DTAAResolvePass : public vtkImageProcessingPass
+class vtkF3DTAAPass : public vtkImageProcessingPass
 {
 public:
-  static vtkF3DTAAResolvePass* New();
-  vtkTypeMacro(vtkF3DTAAResolvePass, vtkImageProcessingPass);
+  static vtkF3DTAAPass* New();
+  vtkTypeMacro(vtkF3DTAAPass, vtkImageProcessingPass);
 
   /**
    * Perform rendering according to a render state.
@@ -43,9 +43,32 @@ public:
     this->HistoryIteration = 0;
   }
 
+  /**
+   * Modify shader code for jittering
+   */
+  bool PreReplaceShaderValues(std::string& vertexShader, std::string& geometryShader,
+    std::string& fragmentShader, vtkAbstractMapper* mapper, vtkProp* prop) override;
+
+  /**
+   * Modify shader parameters for jittering
+   */
+  bool SetShaderParameters(vtkShaderProgram* program, vtkAbstractMapper* mapper, vtkProp* prop,
+    vtkOpenGLVertexArrayObject* VAO = nullptr) override;
+
 private:
-  vtkF3DTAAResolvePass() = default;
-  ~vtkF3DTAAResolvePass() override = default;
+  vtkF3DTAAPass() = default;
+  ~vtkF3DTAAPass() override = default;
+
+  /**
+   * Configure screen spaced jittering for TAA
+   */
+  void ConfigureJitter(int w, int h);
+
+  /**
+   * Configure Halton sequence for TAA. Valid direction values are 0 and 1. Returns a value that is
+   * used for jitter
+   */
+  float ConfigureHaltonSequence(int direction);
 
   vtkSmartPointer<vtkOpenGLFramebufferObject> FrameBufferObject;
   vtkSmartPointer<vtkTextureObject> ColorTexture;
@@ -54,5 +77,8 @@ private:
   std::shared_ptr<vtkOpenGLQuadHelper> QuadHelper;
 
   int HistoryIteration = 0;
+  float Jitter[2] = { 0.0f, 0.0f };
+  int TaaHaltonNumerator[2] = { 0, 0 };
+  int TaaHaltonDenominator[2] = { 1, 1 };
 };
 #endif

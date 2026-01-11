@@ -11,7 +11,7 @@
 #include "vtkF3DPolyDataMapper.h"
 #include "vtkF3DRenderPass.h"
 #include "vtkF3DSolidBackgroundPass.h"
-#include "vtkF3DTAAResolvePass.h"
+#include "vtkF3DTAAPass.h"
 #include "vtkF3DUserRenderPass.h"
 
 #include <vtkAxesActor.h>
@@ -525,14 +525,14 @@ void vtkF3DRenderer::ConfigureRenderPasses()
 
   if (this->AntiAliasingModeEnabled == vtkF3DRenderer::AntiAliasingMode::TAA)
   {
-    vtkNew<vtkF3DTAAResolvePass> taaP;
+    vtkNew<vtkF3DTAAPass> taaP;
     taaP->SetDelegatePass(renderingPass);
     renderingPass = taaP;
 
     this->RenderWindow->AddObserver(
-      vtkCommand::WindowResizeEvent, taaP.Get(), &vtkF3DTAAResolvePass::ResetIterations);
+      vtkCommand::WindowResizeEvent, taaP.Get(), &vtkF3DTAAPass::ResetIterations);
     this->RenderWindow->GetInteractor()->GetInteractorStyle()->AddObserver(
-      vtkCommand::InteractionEvent, taaP.Get(), &vtkF3DTAAResolvePass::ResetIterations);
+      vtkCommand::InteractionEvent, taaP.Get(), &vtkF3DTAAPass::ResetIterations);
   }
 
   if (this->FinalShader.has_value())
@@ -2061,8 +2061,6 @@ void vtkF3DRenderer::UpdateActors()
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::Render()
 {
-  this->ConfigureJitter(this->AntiAliasingModeEnabled == vtkF3DRenderer::AntiAliasingMode::TAA);
-
   if (!this->TimerVisible)
   {
     this->Superclass::Render();
@@ -3110,72 +3108,6 @@ void vtkF3DRenderer::ConfigureOpacityTransferFunction(vtkPiecewiseFunction* otf,
       otf->AddPoint(range[0] + (range[1] - range[0]) * opacityMap[i], value);
     }
   }
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DRenderer::ConfigureJitter(bool enable)
-{
-  // needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12534
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251017)
-  if (!enable)
-  {
-    ExecFuncOnAllPolyDataUniforms(
-      this->GetActors(), [](vtkUniforms* uniforms) { uniforms->RemoveUniform("jitter"); });
-    return;
-  }
-#endif
-
-  float jitter[2];
-
-  if (enable)
-  {
-    jitter[0] = this->ConfigureHaltonSequence(0);
-    jitter[1] = this->ConfigureHaltonSequence(1);
-
-    vtkRenderWindow* renderWindow = this->GetRenderWindow();
-    int width = renderWindow->GetSize()[0];
-    int height = renderWindow->GetSize()[1];
-
-    jitter[0] = ((jitter[0] - 0.5f) / width) * 2.0f;
-    jitter[1] = ((jitter[1] - 0.5f) / height) * 2.0f;
-  }
-  else
-  {
-    jitter[0] = 0.0f;
-    jitter[1] = 0.0f;
-  }
-
-  ExecFuncOnAllPolyDataUniforms(
-    this->GetActors(), [&](vtkUniforms* uniforms) { uniforms->SetUniform2f("jitter", jitter); });
-}
-
-//----------------------------------------------------------------------------
-float vtkF3DRenderer::ConfigureHaltonSequence(int direction)
-{
-  assert(direction == 0 || direction == 1);
-
-  int base = 2 + direction;
-  int& numerator = this->TaaHaltonNumerator[direction];
-  int& denominator = this->TaaHaltonDenominator[direction];
-
-  int difference = denominator - numerator;
-  if (difference == 1)
-  {
-    numerator = 1;
-    denominator *= base;
-  }
-  else
-  {
-    int quotient = denominator / base;
-    while (difference <= quotient && quotient > 0)
-    {
-      quotient = quotient / base;
-    }
-
-    numerator = (base + 1) * quotient - difference;
-  }
-
-  return static_cast<float>(numerator) / static_cast<float>(denominator);
 }
 
 //----------------------------------------------------------------------------
