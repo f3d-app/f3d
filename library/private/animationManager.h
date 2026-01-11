@@ -176,7 +176,7 @@ private:
   int AnimationDirection = 1;
 
   std::optional<std::vector<int>> PreparedAnimationIndices;
-  vtkSmartPointer<vtkDoubleArray> AnimationTimeSteps;
+  vtkNew<vtkDoubleArray> AnimationTimeSteps;
   double TimeRange[2] = { 0.0, 0.0 };
   bool Playing = false;
   double CurrentTime = 0;

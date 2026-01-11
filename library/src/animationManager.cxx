@@ -95,6 +95,7 @@ void animationManager::Initialize()
 
   // Reset animation indices before updating
   this->PreparedAnimationIndices.reset();
+  this->AnimationTimeSteps->Reset();
   this->PrepareForAnimationIndices();
 
   if (this->AvailAnimations == 0)
@@ -224,7 +225,7 @@ void animationManager::JumpToFrame(int frame, bool relative)
 //----------------------------------------------------------------------------
 void animationManager::JumpToKeyFrame(int keyframe, bool relative)
 {
-  if (!this->AnimationTimeSteps || this->AnimationTimeSteps->GetSize() == 0)
+  if (this->AnimationTimeSteps->GetSize() == 0)
   {
     return;
   }
@@ -545,9 +546,9 @@ void animationManager::PrepareForAnimationIndices()
     {
       double timeRange[2];
       int nbTimeSteps;
-      vtkNew<vtkDoubleArray> timeSteps;
-      this->Importer->GetTemporalInformation(animIndex, timeRange, nbTimeSteps, timeSteps);
-      this->AnimationTimeSteps = timeSteps;
+
+      this->Importer->GetTemporalInformation(
+        animIndex, timeRange, nbTimeSteps, this->AnimationTimeSteps);
 
       // Accumulate time ranges
       this->TimeRange[0] = std::min(timeRange[0], this->TimeRange[0]);
