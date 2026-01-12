@@ -61,10 +61,6 @@ inline jobject CreateDoubleList(JNIEnv* env, const std::vector<double>& vec)
     env->DeleteLocalRef(jvalue);
   }
 
-  // Optional but good practice
-  env->DeleteLocalRef(doubleClass);
-  env->DeleteLocalRef(arrayListClass);
-
   return list;
 }
 
