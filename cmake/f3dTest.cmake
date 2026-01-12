@@ -62,7 +62,11 @@ function(f3d_test)
   set(_f3d_test_data)
   if (F3D_TEST_DATA)
     foreach(_single_data ${F3D_TEST_DATA})
-      list(APPEND _f3d_test_data "${F3D_SOURCE_DIR}/testing/data/${_single_data}")
+      if(DEFINED f3d_INCLUDE_DIR)
+        list(APPEND _f3d_test_data "${_single_data}")
+      else()
+        list(APPEND _f3d_test_data "${F3D_SOURCE_DIR}/testing/data/${_single_data}")
+      endif()
     endforeach()
   endif()
 
@@ -116,18 +120,26 @@ function(f3d_test)
     endif()
   endif()
 
+  if(DEFINED f3d_INCLUDE_DIR)
+    # Used for testing plugins
+    find_package(f3d REQUIRED COMPONENTS application)
+    set(_f3d_target "$<TARGET_FILE:f3d::f3d>")
+  else()
+    set(_f3d_target "$<TARGET_FILE:f3d>")
+  endif()
+
   if (F3D_TEST_PIPED)
     list(JOIN F3D_TEST_ARGS " " F3D_TEST_ARGS_JOINED)
     add_test(
       NAME "f3d::${F3D_TEST_NAME}"
       COMMAND ${CMAKE_COMMAND}
-        -DF3D_EXE:FILEPATH=$<TARGET_FILE:f3d>
+        -DF3D_EXE:FILEPATH=${_f3d_target}
         -DF3D_PIPED_DATA=${_f3d_test_data}
         -DF3D_ARGS=${F3D_TEST_ARGS_JOINED}
         -P ${CMAKE_CURRENT_SOURCE_DIR}/f3d_piped.cmake
         COMMAND_EXPAND_LISTS)
   else()
-    add_test(NAME "f3d::${F3D_TEST_NAME}" COMMAND $<TARGET_FILE:f3d> ${_f3d_test_data} ${F3D_TEST_ARGS} COMMAND_EXPAND_LISTS)
+    add_test(NAME "f3d::${F3D_TEST_NAME}" COMMAND ${_f3d_target} ${_f3d_test_data} ${F3D_TEST_ARGS} COMMAND_EXPAND_LISTS)
   endif()
 
   set(_timeout "30")
