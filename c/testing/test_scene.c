@@ -82,6 +82,9 @@ int test_scene()
   f3d_scene_animation_time_range(scene, &min_time, &max_time);
   unsigned int anim_count = f3d_scene_available_animations(scene);
   (void)anim_count;
+  unsigned int keyframes_number;
+  double* keyframes = f3d_scene_animation_keyframes(scene, &keyframes_number);
+  (void)keyframes;
 
   f3d_light_state_t light_state = { 0 };
   light_state.type = F3D_LIGHT_TYPE_HEADLIGHT;
