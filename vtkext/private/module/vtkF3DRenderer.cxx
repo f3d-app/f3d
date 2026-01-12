@@ -2555,12 +2555,19 @@ void vtkF3DRenderer::ConfigureActorsProperties()
 
     if (this->TextureChecker.has_value())
     {
-      F3DLog::Print(F3DLog::Severity::Warning, "hello");
-      auto checkTex = ::GetTexture(this->TextureChecker.value());
-      coloring.Actor->GetProperty()->SetORMTexture(checkTex);
-      coloring.OriginalActor->GetProperty()->SetORMTexture(checkTex);
+      auto checkTex = ::GetTexture(this->TextureChecker.value(), true);
+
       coloring.Actor->GetProperty()->SetBaseColorTexture(checkTex);
       coloring.OriginalActor->GetProperty()->SetBaseColorTexture(checkTex);
+
+      coloring.Actor->GetProperty()->SetORMTexture(checkTex);
+      coloring.OriginalActor->GetProperty()->SetORMTexture(checkTex);
+
+      coloring.Actor->GetProperty()->SetNormalTexture(checkTex);
+      coloring.OriginalActor->GetProperty()->SetNormalTexture(checkTex);
+
+      coloring.Actor->GetProperty()->SetEmissiveTexture(checkTex);
+      coloring.OriginalActor->GetProperty()->SetEmissiveTexture(checkTex);
     }
 
     if (this->NormalScale.has_value())
