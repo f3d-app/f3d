@@ -519,6 +519,11 @@ Enable generic filmic _Tone Mapping Pass_. This technique is used to map colors 
 
 Add a final shader to the output image. See the [dedicated documentation](10-FINAL_SHADER.md) for more details.
 
+### `--display-depth` (_bool_, default: `false`)
+
+Display the depth buffer as a grayscale image or with a colormap if `--scalar-coloring` is specified.
+Only opaque objects are displayed, translucent and volumetric objects are ignored.
+
 ## Testing options
 
 ### `--ref=<png file>` (_string_)

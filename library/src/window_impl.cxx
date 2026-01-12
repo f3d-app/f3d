@@ -568,6 +568,8 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetUseSSAOPass(opt.render.effect.ambient_occlusion);
   renderer->SetAntiAliasingMode(aaMode);
   renderer->SetUseToneMappingPass(opt.render.effect.tone_mapping);
+  renderer->SetDisplayDepth(opt.render.effect.display_depth);
+  renderer->SetDisplayDepthScalarColoring(opt.model.scivis.enable);
   renderer->SetBlendingMode(blendMode);
   renderer->SetBackfaceType(opt.render.backface_type);
   renderer->SetFinalShader(opt.render.effect.final_shader);

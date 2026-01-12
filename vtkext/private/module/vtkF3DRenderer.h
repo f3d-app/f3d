@@ -139,6 +139,8 @@ public:
   void SetUseSSAOPass(bool use);
   void SetAntiAliasingMode(AntiAliasingMode mode);
   void SetUseToneMappingPass(bool use);
+  void SetDisplayDepth(bool use);
+  void SetDisplayDepthScalarColoring(bool use);
   void SetUseBlurBackground(bool use);
   void SetBlurCircleOfConfusionRadius(double radius);
   void SetRaytracingSamples(int samples);
@@ -678,6 +680,8 @@ private:
   BlendingMode BlendingModeEnabled = BlendingMode::NONE;
   bool UseSSAOPass = false;
   bool UseToneMappingPass = false;
+  bool DisplayDepth = false;
+  bool DisplayDepthScalarColoring = false;
   bool UseBlurBackground = false;
   std::optional<bool> UseOrthographicProjection = false;
   bool UseTrackball = false;
