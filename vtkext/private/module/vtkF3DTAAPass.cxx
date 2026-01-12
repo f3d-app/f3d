@@ -160,7 +160,7 @@ bool vtkF3DTAAPass::PreReplaceShaderValues(std::string& vertexShader,
     vtkShaderProgram::Substitute(
       vertexShader, "//VTK::Clip::Dec", "uniform vec2 jitter;\n//VTK::Clip::Dec", false);
     vtkShaderProgram::Substitute(vertexShader, "//VTK::CustomEnd::Impl",
-      "  gl_Position.xy += jitter;\n//VTK::CustomEnd::Impl", false);
+      "  gl_Position.xy += jitter * gl_Position.w;\n//VTK::CustomEnd::Impl", false);
   }
   return true;
 }
