@@ -294,9 +294,10 @@
         "type": "path"
       }
     },
-    "checker": {
-      "texture": {
-        "type": "path"
+    "checkerboard": {
+      "enable": {
+        "type": "bool",
+        "default_value": "false"
       }
     },
     "color": {

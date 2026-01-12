@@ -1,5 +1,6 @@
 #include "vtkF3DRenderer.h"
 
+#include "F3DCheckerBoard.h"
 #include "F3DColoringInfoHandler.h"
 #include "F3DDefaultHDRI.h"
 #include "F3DLog.h"
@@ -2366,6 +2367,16 @@ void vtkF3DRenderer::SetTextureChecker(const std::optional<fs::path>& tex)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetEnableCheckerBoard(bool enable)
+{
+  if (enable != this->EnableCheckerBoard)
+  {
+    this->EnableCheckerBoard = enable;
+    this->ActorsPropertiesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetPointSpritesType(vtkF3DRenderer::SplatType type)
 {
   if (this->PointSpritesType != type)
@@ -2553,21 +2564,51 @@ void vtkF3DRenderer::ConfigureActorsProperties()
       coloring.OriginalActor->GetProperty()->SetNormalTexture(normTex);
     }
 
-    if (this->TextureChecker.has_value())
+    if (this->EnableCheckerBoard)
     {
-      auto checkTex = ::GetTexture(this->TextureChecker.value(), true);
+      if (!this->HasValidCheckBoardReader || !CheckerBoardReaderConfigured)
+      {
+        this->CheckerBoardReader = vtkSmartPointer<vtkPNGReader>::New();
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+        vtkNew<vtkMemoryResourceStream> stream;
+        stream->SetBuffer(F3DCheckerBoard, sizeof(F3DCheckerBoard));
+        this->CheckerBoardReader->SetStream(stream);
+#else
+        this->CheckerBoardReader->SetMemoryBuffer(F3DCheckerBoard);
+        this->CheckerBoardReader->SetMemoryBufferLength(sizeof(F3DCheckerBoard));
+#endif
+        this->HasValidCheckBoardReader = true;
+        this->CheckerBoardReaderConfigured = true;
+      }
 
-      coloring.Actor->GetProperty()->SetBaseColorTexture(checkTex);
-      coloring.OriginalActor->GetProperty()->SetBaseColorTexture(checkTex);
+      if (!HasValidCheckerBoardTexture)
+      {
+        assert(this->HasValidCheckBoardReader);
+        this->CheckerBoardReader->Update();
 
-      coloring.Actor->GetProperty()->SetORMTexture(checkTex);
-      coloring.OriginalActor->GetProperty()->SetORMTexture(checkTex);
+        this->CheckBoardTexture = vtkSmartPointer<vtkTexture>::New();
+        this->CheckBoardTexture->SetInputConnection(this->CheckerBoardReader->GetOutputPort());
+        this->CheckBoardTexture->UseSRGBColorSpaceOn();
+        this->CheckBoardTexture->InterpolateOn();
+        this->CheckBoardTexture->SetColorModeToDirectScalars();
 
-      coloring.Actor->GetProperty()->SetNormalTexture(checkTex);
-      coloring.OriginalActor->GetProperty()->SetNormalTexture(checkTex);
+        this->HasValidCheckerBoardTexture = true;
+      }
 
-      coloring.Actor->GetProperty()->SetEmissiveTexture(checkTex);
-      coloring.OriginalActor->GetProperty()->SetEmissiveTexture(checkTex);
+      if (HasValidCheckerBoardTexture)
+      {
+        coloring.Actor->GetProperty()->SetBaseColorTexture(this->CheckBoardTexture);
+        coloring.OriginalActor->GetProperty()->SetBaseColorTexture(this->CheckBoardTexture);
+
+        coloring.Actor->GetProperty()->SetORMTexture(this->CheckBoardTexture);
+        coloring.OriginalActor->GetProperty()->SetORMTexture(this->CheckBoardTexture);
+
+        coloring.Actor->GetProperty()->SetNormalTexture(this->CheckBoardTexture);
+        coloring.OriginalActor->GetProperty()->SetNormalTexture(this->CheckBoardTexture);
+
+        coloring.Actor->GetProperty()->SetEmissiveTexture(this->CheckBoardTexture);
+        coloring.OriginalActor->GetProperty()->SetEmissiveTexture(this->CheckBoardTexture);
+      }
     }
 
     if (this->NormalScale.has_value())
