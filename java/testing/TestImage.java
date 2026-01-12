@@ -2,13 +2,6 @@ import app.f3d.F3D.*;
 
 public class TestImage {
 
-  static {
-    if (System.getProperty("os.name").startsWith("Windows"))
-    {
-      System.loadLibrary("opengl32");
-    }
-  }
-
   public static void main(String[] args) {
     Engine.autoloadPlugins();
 

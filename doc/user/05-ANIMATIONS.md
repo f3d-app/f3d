@@ -29,13 +29,37 @@ Note: A blue bar runs along the bottom of screen to indicate the current time in
 
 F3D animation behavior can be fully controlled from the command line using the following options.
 
-| Options                      | Default             | Description                                     |
-| ---------------------------- | ------------------- | ----------------------------------------------- |
-| \-\-animation\-indices       |                     | Select the animations to play.                  |
-| \-\-animation\-indices=-1    |                     | Play all animations at once (only if supported) |
-| \-\-animation\-speed\-factor | Time Unit = Seconds | Adjust time unit.                               |
-| \-\-animation\-frame\-rate   | 60 FPS              | Adjust animation frame rate.                    |
-| \-\-animation\-time          |                     | Load a specific time value on start.            |
+| Options                      | Default             | Description                                          |
+| ---------------------------- | ------------------- | ---------------------------------------------------- |
+| \-\-animation\-indices       |                     | Select the animations to play.                       |
+| \-\-animation\-indices=-1    |                     | Play all animations at once (only if supported)      |
+| \-\-animation\-speed\-factor | Time Unit = Seconds | Adjust time unit.                                    |
+| \-\-frame\-rate              | 60 FPS              | Adjust animation (and others components) frame rate. |
+| \-\-animation\-time          |                     | Load a specific time value on start.                 |
+
+## Exporting animation frames
+
+F3D can export multiple frames from an animation to image files. To do this, include `{frame}` in the output filename template:
+
+```bash
+f3d example.file --output=frame_{frame:04}.png
+```
+
+This will save frames as `frame_0000.png`, `frame_0001.png`, etc.
+
+The number of frames is determined by `--frame-rate`
+
+```bash
+f3d example.file --output=frame_{frame}.png --frame-rate=30
+```
+
+Use `--animation-time` to start exporting from a specific time instead of the beginning:
+
+```bash
+f3d example.file --output=frame_{frame}.png --frame-rate=10 --animation-time=1.5
+```
+
+See [Filename templating](03-OPTIONS.md#filename-templating) for more template variables.
 
 ## Animation Interactions
 
@@ -82,3 +106,15 @@ The animation support level is listed for each reader [here](02-SUPPORTED_FORMAT
 
 When opening multiple files at the same time using the `--multi-file-mode` option and selecting multiple animations to show,
 F3D may warn when combining SINGLE and non SINGLE files, but will still try to respect the chosen animation indices.
+
+## Animation keyframes
+
+The `jump_to_keyframe` command allows you to load an animation at a specific keyframe. See [COMMANDS](07-COMMANDS.md) for more information and examples on how to use this command.
+
+This command is currently supported only by the following readers:
+
+- `vtkF3DGLTFImporter`
+- `vtkF3DQuakeMDLImporter`
+
+You can follow the issue below to track the progress of animation support for other readers :
+[F3D Issue – Improve Animation System #2637](https://github.com/f3d-app/f3d/issues/2637#:~:text=Access%20to%20timesteps)

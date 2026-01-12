@@ -1235,6 +1235,17 @@ interactor& interactor_impl::initCommands()
     command_documentation_t{ "reset_camera", "reset the camera to its original location" });
 
   this->addCommand(
+    "jump_to_keyframe",
+    [&](const std::vector<std::string>& args)
+    {
+      check_args(args, 2, "jump_to_keyframe");
+      int keyframe = options::parse<int>(args[0]);
+      bool relative = options::parse<bool>(args[1]);
+      this->Internals->AnimationManager->JumpToKeyFrame(keyframe, relative);
+    },
+    command_documentation_t{ "jump_to_keyframe", "Jump to animation's key frame" });
+
+  this->addCommand(
     "toggle_animation", [&](const std::vector<std::string>&) { this->toggleAnimation(); },
     command_documentation_t{ "toggle_animation", "start/stop the animation" });
 

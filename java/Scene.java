@@ -33,6 +33,15 @@ public class Scene {
     public native Scene addMesh(Types.Mesh mesh);
 
     /**
+     * Add and load a buffer containing a file into the scene.
+     *
+     * @param buffer Memory buffer to load
+     * @param size Size of memory buffer to load
+     * @return this scene for method chaining
+     */
+    public native Scene addBuffer(byte[] buffer, int size);
+
+    /**
      * Clear the scene of all added files.
      *
      * @return this scene for method chaining
@@ -115,6 +124,30 @@ public class Scene {
      * @return number of available animations
      */
     public native int availableAnimations();
+
+    /**
+     * Get the current animation name, if any.
+     *
+     * @return animation names or string error
+     */
+    public String getAnimationName() {
+        // note : -1 gets the current animation
+        return getAnimationName(-1);
+    }
+
+    /**
+     * Get the animation name of a given animation indices, if any.
+     *
+     * @return animation name or string error 
+     */
+    public native String getAnimationName(int indices);
+
+    /**
+     * Get all of the animation names, if any.
+     *
+     * @return list of animation names
+     */
+    public native List<String> getAnimationNames();
 
     private long mNativeAddress;
 }

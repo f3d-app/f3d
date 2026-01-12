@@ -7,10 +7,12 @@ F3D behavior can be fully controlled from the command line using the following o
 ### `--input=<input file>` (_string_)
 
 The input file or files to read, can also be provided as a positional argument. Support directories as well.
+If `-` is specified instead of a filename, the file will be streamed from the stdin, which will hang until a stream is provided.
+Using this feature requires to use `--force-reader`.
 
 ### `--output=<png file>` (_string_)
 
-Instead of showing a render view and render into it, _render directly into a png file_. When used with --ref option, only outputs on failure. If `-` is specified instead of a filename, the PNG file is streamed to the stdout. Can use [template variables](#filename-templating).
+Instead of showing a render view and render into it, _render directly into a png file_. When used with --ref option, only outputs on failure. If `-` is specified instead of a filename, the PNG file is streamed to the stdout. Can use [template variables](#filename-templating). When using the `{frame}` variable, multiple animation frames are exported (see [Exporting animation frames](05-ANIMATIONS.md#exporting-animation-frames)).
 
 ### `--no-background` (_bool_, default: `false`)
 
@@ -560,6 +562,40 @@ The `-D/--define` option has a special syntax: `-Dlibf3d.option=value` or `--def
 
 All options are parsed according to their type, see the [parsing documentation](08-PARSING.md) for more details.
 
+## Piping
+
+F3D supports piping in and out for [most formats](02-SUPPORTED_FORMATS.md), using the `-` char, as long as the reader is specified, eg:
+
+```
+f3d - --force-reader=GLB --output=- < path/to/file.glb > path/to/img.png
+```
+
+or, using [display](https://imagemagick.org/script/display.php#gsc.tab=0):
+
+```
+cat path/to/file.glb | f3d - --force-reader=GLB --output=- | display
+```
+
+and even, using [build123d](https://github.com/gumyr/build123d):
+
+`script.py`:
+
+```py
+import sys
+
+from build123d import Box, Cylinder, export_brep, export_step
+from OCP.BRepTools import BRepTools
+
+obj = Box(2, 2, 1) - Cylinder(0.5, 2)
+BRepTools.Write_s(obj.wrapped, sys.stdout.buffer)
+```
+
+```
+python script.py | f3d - --force-reader=BREP --output=- | display
+```
+
+While piping is more common on Linux, F3D supports it perfectly on Windows and MacOS as well.
+
 ## Filename templating
 
 The destination filename used by `--output` or to save screenshots using `--screenshot-filename` can use the following template variables:
@@ -574,6 +610,8 @@ The destination filename used by `--output` or to save screenshots using `--scre
 - `{date:format}`: current date as per C++'s `std::put_time` format
 - `{n}`: auto-incremented number to make filename unique (up to 1000000)
 - `{n:2}`, `{n:3}`, ...: zero-padded auto-incremented number to make filename unique (up to 1000000)
+- `{frame}`: frame number when outputting animation frames (see [Animations](05-ANIMATIONS.md))
+- `{frame:4}`, `{frame:5}`, ...: zero-padded frame number when outputting animation frames
 - variable names can be escaped by doubling the braces (eg. use `{{model}}.png` to output `{model}.png` without the model name being substituted)
 
 For example the screenshot filename is configured as `{app}/{model}_{n}.png` by default, meaning that, assuming the model `hello.glb` is being viewed,

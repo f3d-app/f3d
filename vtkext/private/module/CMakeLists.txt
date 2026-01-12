@@ -80,8 +80,8 @@ set(classes
   vtkF3DUIObserver
   vtkF3DUIActor
   vtkF3DUserRenderPass
-  vtkF3DTAAResolvePass
   vtkF3DDisplayDepthRenderPass
+  vtkF3DTAAPass
   )
 
 if (F3D_MODULE_UI)

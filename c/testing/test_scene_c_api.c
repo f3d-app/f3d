@@ -24,6 +24,8 @@ int test_scene_c_api()
     return 1;
   }
 
+  // Test adding files
+
   int supported = f3d_scene_supports(scene, "test.obj");
   (void)supported;
 
@@ -35,6 +37,8 @@ int test_scene_c_api()
   (void)add_multiple_result;
 
   f3d_scene_clear(scene);
+
+  // Test adding a mesh
 
   float points[] = { 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.5f, 1.0f, 0.0f };
   unsigned int face_sides[] = { 3 };
@@ -57,6 +61,8 @@ int test_scene_c_api()
   }
 
   f3d_scene_add_mesh(scene, &mesh);
+
+  // Test the rest of the API
 
   f3d_scene_load_animation_time(scene, 0.5);
   double min_time, max_time;
