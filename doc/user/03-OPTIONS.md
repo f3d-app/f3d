@@ -332,7 +332,7 @@ Ignored if `--hdri-skybox` is enabled.
 
 Set the _window resolution_.
 
-### `--dpi-scale (_bool_, default: `false`)
+### `--dpi-scale` (_bool_, default: `false`)
 
 Scale the _window resolution_ and _font scale_ by the display scaling factor.
 
