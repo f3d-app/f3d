@@ -1,13 +1,14 @@
 /**
- * @class   vtkF3DTAAResolvePass
+ * @class   vtkF3DTAAPass
  * @brief   Temporal Anti-Aliasing resolve pass
  *
- * This pass is used to resolve the jittered rendering for Temporal Anti-Aliasing.
+ * This pass is used to perform jittering of the geometry pass and to blend the current frame
+ * with the history frame to achieve Temporal Anti-Aliasing (TAA).
  * Adapted from https://sugulee.wordpress.com/2021/06/21/temporal-anti-aliasingtaa-tutorial/
  */
 
-#ifndef vtkF3DTAAResolvePass_h
-#define vtkF3DTAAResolvePass_h
+#ifndef vtkF3DTAAPass_h
+#define vtkF3DTAAPass_h
 
 #include "vtkImageProcessingPass.h"
 
