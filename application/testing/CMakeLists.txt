@@ -1215,6 +1215,10 @@ f3d_test(NAME TestFinalShaderNegativeFileName DATA cow.vtp ARGS --filename --fin
 f3d_test(NAME TestFinalShaderUndefined DATA cow.vtp ARGS --final-shader "undefined" REGEXP "Final shader must define a function" NO_BASELINE)
 f3d_test(NAME TestFinalShaderCompilationFailure DATA cow.vtp ARGS --final-shader "vec4 pixel(vec2 uv){}" --verbose REGEXP " build the shader program" NO_BASELINE)
 
+f3d_test(NAME TestDisplayDepth DATA dragon.vtu ARGS --display-depth)
+f3d_test(NAME TestDisplayDepthColorMap DATA dragon.vtu ARGS --display-depth --scalar-coloring=True)
+f3d_test(NAME TestDisplayDepthCustomColorMap DATA dragon.vtu ARGS --display-depth --scalar-coloring --colormap=0,red,1,blue)
+
 ## Interaction Tests
 # Test hotkeys
 f3d_test(NAME TestInteractionPostFX DATA cow.vtp INTERACTION TONE_MAPPING LONG_TIMEOUT) #PQAAAAT

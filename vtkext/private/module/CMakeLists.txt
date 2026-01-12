@@ -80,6 +80,7 @@ set(classes
   vtkF3DUIObserver
   vtkF3DUIActor
   vtkF3DUserRenderPass
+  vtkF3DDisplayDepthRenderPass
   vtkF3DTAAPass
   )
 

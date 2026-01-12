@@ -130,6 +130,10 @@
       },
       "final_shader": {
         "type": "string"
+      },
+      "display_depth": {
+        "type": "bool",
+        "default_value": "false"
       }
     },
     "hdri": {

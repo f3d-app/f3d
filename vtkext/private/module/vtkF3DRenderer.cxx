@@ -5,6 +5,7 @@
 #include "F3DLog.h"
 #include "vtkF3DCachedLUTTexture.h"
 #include "vtkF3DCachedSpecularTexture.h"
+#include "vtkF3DDisplayDepthRenderPass.h"
 #include "vtkF3DInteractorStyle.h"
 #include "vtkF3DOpenGLGridMapper.h"
 #include "vtkF3DOverlayRenderPass.h"
@@ -19,6 +20,7 @@
 #include <vtkCamera.h>
 #include <vtkCameraOrientationRepresentation.h>
 #include <vtkCameraOrientationWidget.h>
+#include <vtkCameraPass.h>
 #include <vtkCellData.h>
 #include <vtkCornerAnnotation.h>
 #include <vtkCullerCollection.h>
@@ -35,6 +37,7 @@
 #include <vtkMatrix4x4.h>
 #include <vtkMultiBlockDataSet.h>
 #include <vtkObjectFactory.h>
+#include <vtkOpaquePass.h>
 #include <vtkOpenGLFXAAPass.h>
 #include <vtkOpenGLRenderWindow.h>
 #include <vtkOpenGLRenderer.h>
@@ -480,6 +483,22 @@ void vtkF3DRenderer::ConfigureRenderPasses()
 
   // Image post processing passes
   vtkSmartPointer<vtkRenderPass> renderingPass = newPass;
+
+  if (this->DisplayDepth)
+  {
+    // discard vtkF3DRenderPass if displaying depth
+    vtkNew<vtkOpaquePass> opaqueP;
+    vtkNew<vtkCameraPass> camP;
+    vtkNew<vtkF3DDisplayDepthRenderPass> depthP;
+    camP->SetDelegatePass(opaqueP);
+    depthP->SetDelegatePass(camP);
+    if (this->DisplayDepthScalarColoring)
+    {
+      this->ConfigureColoring();
+      depthP->SetColorMap(this->ColorTransferFunction);
+    }
+    renderingPass = depthP;
+  }
 
   if (this->AntiAliasingModeEnabled == vtkF3DRenderer::AntiAliasingMode::SSAA)
   {
@@ -1731,6 +1750,26 @@ void vtkF3DRenderer::SetUseToneMappingPass(bool use)
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetDisplayDepth(bool use)
+{
+  if (this->DisplayDepth != use)
+  {
+    this->DisplayDepth = use;
+    this->RenderPassesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetDisplayDepthScalarColoring(bool use)
+{
+  if (this->DisplayDepthScalarColoring != use)
+  {
+    this->DisplayDepthScalarColoring = use;
+    this->RenderPassesConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetUseRaytracing(bool use)
 {
   if (this->UseRaytracing != use)
@@ -2834,7 +2873,8 @@ void vtkF3DRenderer::ConfigureColoring()
   assert(this->Importer);
 
   // Recover coloring information and update handler
-  bool enableColoring = this->EnableColoring || (!this->UseRaytracing && this->UseVolume);
+  bool enableColoring = this->EnableColoring || (!this->UseRaytracing && this->UseVolume) ||
+    (this->DisplayDepth && this->DisplayDepthScalarColoring);
   F3DColoringInfoHandler& coloringHandler = this->Importer->GetColoringInfoHandler();
   auto info = coloringHandler.SetCurrentColoring(
     enableColoring, this->UseCellColoring, this->ArrayNameForColoring, false);
