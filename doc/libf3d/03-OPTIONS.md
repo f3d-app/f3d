@@ -159,9 +159,9 @@ Path to a texture file that sets the normal map of the object. Model-specified b
 
 CLI: `--texture-normal`.
 
-### `model.checker.texture` (_path_, optional)
+### `model.checkerboard.enable` (_bool_, default: `false`)
 
-Path to a texture file that sets the checker texture of the object. Model-specified by default.
+Apply checkerboard texture to objects.
 
 CLI: `--texture-checker`.
 
