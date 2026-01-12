@@ -2357,16 +2357,6 @@ void vtkF3DRenderer::SetTextureNormal(const std::optional<fs::path>& tex)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetTextureChecker(const std::optional<fs::path>& tex)
-{
-  if (this->TextureChecker != tex)
-  {
-    this->TextureChecker = tex;
-    this->ActorsPropertiesConfigured = false;
-  }
-}
-
-//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetEnableCheckerBoard(bool enable)
 {
   if (enable != this->EnableCheckerBoard)

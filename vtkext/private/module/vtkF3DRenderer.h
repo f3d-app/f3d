@@ -315,11 +315,6 @@ public:
   void SetTextureNormal(const std::optional<fs::path>& tex);
 
   /**
-   * Set the normal texture on all actors
-   */
-  void SetTextureChecker(const std::optional<fs::path>& tex);
-
-  /**
    * Set point sprites type
    */
   void SetPointSpritesType(SplatType type);
@@ -766,7 +761,6 @@ private:
   std::optional<fs::path> TextureMaterial;
   std::optional<fs::path> TextureEmissive;
   std::optional<fs::path> TextureNormal;
-  std::optional<fs::path> TextureChecker;
 
   vtkSmartPointer<vtkImageReader2> CheckerBoardReader;
   bool HasValidCheckBoardReader = false;
