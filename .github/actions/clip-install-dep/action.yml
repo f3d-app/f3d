@@ -1,0 +1,78 @@
+name: "Install clip Dependency"
+description: "Install clip Dependency using cache when possible"
+
+inputs:
+  cpu:
+    description: "CPU architecture to build for"
+    required: false
+    default: "x86_64"
+
+  global_cache_index:
+    description: "Global cache index"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty"; exit 1; }
+
+    - name: Cache clip
+      id: cache-clip
+      uses: actions/cache/restore@v4
+      with:
+        path: dependencies/clip_install
+        key: clip-master-${{ runner.os }}-${{ inputs.cpu }}-${{ inputs.global_cache_index }}-2
+
+    - name: Checkout clip (only if no cache)
+      if: steps.cache-clip.outputs.cache-hit != 'true'
+      uses: actions/checkout@v4
+      with:
+        repository: dacap/clip
+        path: "./dependencies/clip"
+        ref: v1.13
+
+    - name: Setup clip folders
+      if: steps.cache-clip.outputs.cache-hit != 'true'
+      working-directory: ${{ github.workspace }}/dependencies
+      shell: bash
+      run: |
+        mkdir clip_build
+        mkdir clip_install
+
+    - name: Configure clip
+      if: steps.cache-clip.outputs.cache-hit != 'true'
+      working-directory: ${{ github.workspace }}/dependencies/clip_build
+      shell: bash
+      run: >
+        cmake ../clip
+        -DBUILD_SHARED_LIBS=ON
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+        -DCLIP_ENABLE_IMAGE=OFF
+        -DCLIP_EXAMPLES=OFF 
+        -DCLIP_TESTS=OFF
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_INSTALL_PREFIX:PATH=../clip_install
+        -DCMAKE_PREFIX_PATH:PATH=../install/
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0 -DCMAKE_MACOSX_RPATH=ON' || '' }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || '' }}
+
+    - name: Build clip
+      if: steps.cache-clip.outputs.cache-hit != 'true'
+      working-directory: ${{ github.workspace }}/dependencies/clip_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target install --config Release
+
+    - name: Copy to install directory (F3D compatibility)
+      working-directory: ${{ github.workspace }}/dependencies/clip_install
+      shell: bash
+      run: cp -r ./* ../install/
+
+    - name: Save clip cache
+      if: steps.cache-clip.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-clip.outputs.cache-primary-key }}
+        path: dependencies/clip_install
