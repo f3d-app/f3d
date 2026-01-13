@@ -11,6 +11,7 @@
 #include <vtkImageData.h>
 #include <vtkObjectFactory.h>
 #include <vtkPolyData.h>
+#include <vtkPolyDataNormals.h>
 #include <vtkRenderWindow.h>
 #include <vtkRendererCollection.h>
 #include <vtkSmartPointer.h>
@@ -310,15 +311,23 @@ bool vtkF3DMetaImporter::Update()
       vtkF3DMetaImporter::NormalGlyphsStruct& ngs =
         this->Pimpl->NormalGlyphsActorsAndMappers.back();
 
+      vtkNew<vtkPolyDataNormals> normals;
+      normals->SetInputData(points);
+      normals->ComputePointNormalsOn();
+      normals->ComputeCellNormalsOff();
+      normals->Update();
+
       vtkNew<vtkArrowSource> arrowSource;
 
-      ngs.glyph3D->SetSourceConnection(arrowSource->GetOutputPort());
-      ngs.glyph3D->SetVectorModeToUseNormal();
-      ngs.glyph3D->SetInputData(points);
-      ngs.glyph3D->SetScaleFactor(.2);
-      ngs.glyph3D->Update();
+      ngs.GlyphMapper->SetInputData(normals->GetOutput());
+      ngs.GlyphMapper->SetSourceConnection(arrowSource->GetOutputPort());
+      ngs.GlyphMapper->SetOrientationModeToDirection();
+      ngs.GlyphMapper->SetOrientationArray("Normals");
+      ngs.GlyphMapper->SetScaleFactor(0.2);
+      ngs.GlyphMapper->ScalingOn();
 
-      ngs.Mapper->SetInputConnection(ngs.glyph3D->GetOutputPort());
+      ngs.Actor->SetMapper(ngs.GlyphMapper);
+
       this->Renderer->AddActor(ngs.Actor);
       ngs.Actor->VisibilityOff();
 
