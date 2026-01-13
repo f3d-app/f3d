@@ -31,7 +31,8 @@ f3d_test(<NAME> [ARGS...])
   - `FORCE_RENDER` Position the environment variable `CTEST_F3D_NO_DATA_FORCE_RENDER` that forces a render
     even when F3D logic usually would not
   - `UI` Mark the test to require the presence of UI component and disable it otherwise
-  - `PIPED` Mark the test to pipe the data (`cat data | f3d`) instead of providing the filename as data
+  - `PIPED` Mark the test to pipe the data (`cat data | f3d`) instead of providing the filename as data,
+    doesn't work for external plugins.
   - `NAME` Provide the name of the test, mandatory and must be unique
   - `CONFIG` Provide the `--config` to use, instead of `--no-config`
   - `RESOLUTION` Provide the `--resolution` to use, instead of `300,300`
@@ -121,6 +122,10 @@ function(f3d_test)
   endif()
 
   if(DEFINED f3d_INCLUDE_DIR)
+    if (F3D_TEST_PIPED)
+      message(FATAL_ERROR "PIPED test is not supported to external plugins")
+    endif ()
+
     # Used for testing plugins
     find_package(f3d REQUIRED COMPONENTS application)
     set(_f3d_target "$<TARGET_FILE:f3d::f3d>")
