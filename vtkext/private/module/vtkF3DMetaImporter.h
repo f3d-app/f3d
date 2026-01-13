@@ -11,7 +11,7 @@
 
 #include <vtkActor.h>
 #include <vtkBoundingBox.h>
-#include <vtkGlyph3D.h>
+#include <vtkGlyph3DMapper.h>
 #include <vtkPointGaussianMapper.h>
 #include <vtkProperty.h>
 #include <vtkSmartVolumeMapper.h>
@@ -71,14 +71,13 @@ public:
       , Importer(importer)
     {
       this->Actor->vtkProp3D::ShallowCopy(originalActor);
-      this->Actor->SetMapper(this->Mapper);
+      this->Actor->SetMapper(this->GlyphMapper);
     }
 
     vtkNew<vtkActor> Actor;
-    vtkNew<vtkPolyDataMapper> Mapper;
     vtkActor* OriginalActor;
     vtkImporter* Importer;
-    vtkNew<vtkGlyph3D> glyph3D;
+    vtkNew<vtkGlyph3DMapper> GlyphMapper;
   };
 
   struct ColoringStruct
