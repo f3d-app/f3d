@@ -18,7 +18,7 @@ class F3DView : public QQuickFramebufferObject
 public:
 
     explicit F3DView(QQuickItem* parent = nullptr);
-    virtual ~F3DView();
+    ~F3DView() override;
 
     Renderer* createRenderer() const override;
     void releaseResources() override;
@@ -26,7 +26,7 @@ public:
     QString modelPath() const;
     void setModelPath(const QString& path);
 
-    Q_INVOKABLE void setOption(const QString opt, QVariant value);
+    Q_INVOKABLE void setOption(const QString &opt, const QVariant &value);
     QVariantMap& pendingOptions();
 
 protected:

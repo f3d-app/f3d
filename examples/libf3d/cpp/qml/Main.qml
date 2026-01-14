@@ -1,7 +1,8 @@
 import QtQuick
 import F3D
 
-Window {
+Window
+{
     id: root
     width: 800
     height: 600
@@ -9,16 +10,18 @@ Window {
     title: "libf3d + QML (C++)"
     color: "#202020"
 
-    F3DView {
+    F3DView
+    {
         id: view
         anchors.fill: parent
         focus: true
 
         enableMouse: true
         enableKeyboard: true
-        modelPath: "C:/Path/to/Your/File/BrainStem.glb"
+        modelPath:  "C:/Path/to/Your/File/BrainStem.glb"
 
-        Component.onCompleted: {
+        Component.onCompleted:
+        {
             setOption("render.show_edges", false);
             setOption("ui.axis", true);
             setOption("ui.fps", true);
