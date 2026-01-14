@@ -63,6 +63,7 @@ static inline const OptionsDict DefaultAppOptions = {
   { "interaction-test-play", "" },
   { "command-script", "" },
   { "frame-rate", "30.0" },
+  { "dpi-scale", "false" },
 };
 
 /**
@@ -94,7 +95,6 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "force-reader", "scene.force_reader" },
   { "font-file", "ui.font_file" },
   { "font-scale", "ui.scale" },
-  { "dpi-scale", "ui.dpi_scale" },
   { "backdrop-opacity", "ui.backdrop.opacity" },
   { "point-sprites-size", "model.point_sprites.size" },
   { "point-sprites-absolute-size", "model.point_sprites.absolute_size" },

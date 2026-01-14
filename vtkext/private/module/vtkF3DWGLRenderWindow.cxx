@@ -106,23 +106,3 @@ void vtkF3DWGLRenderWindow::WindowInitialize()
   SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 #endif
 }
-
-LRESULT vtkF3DWGLRenderWindow::MessageProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-  // Handle dpi change message and invoke custom event
-  // We will catch it in vtkF3DRenderer to signal font scale update
-  switch (message)
-  {
-    case WM_DPICHANGED:
-    {
-      if (this->WindowId)
-      {
-        this->InvokeEvent(vtkF3DWGLRenderWindow::SystemScaleChangeEvent);
-        return 0;
-      }
-    }
-    break;
-  }
-
-  return Superclass::MessageProc(hWnd, message, wParam, lParam);
-}

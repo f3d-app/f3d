@@ -2,13 +2,10 @@
 
 #include <vtkObject.h>
 #include <vtkSetGet.h>
-#include <vtkWindow.h>
-#include <vtkWindows.h>
 
 #ifdef _MSC_VER
-#pragma comment(lib, "Shcore")
-#include <ShellScalingApi.h>
-#elif defined(__linux__) && defined(VTK_USE_X)
+#include <Windows.h>
+#elif VTK_USE_X
 #include <X11/Xlib.h>
 #endif
 
@@ -64,75 +61,23 @@ int F3DUtils::ParseToInt(const std::string& str, int def, const std::string& nam
 }
 
 //----------------------------------------------------------------------------
-double F3DUtils::getDPIScale(vtkWindow* win)
+double F3DUtils::getDPIScale()
 {
   double dpiScale = 1.0;
 
 #ifdef _WIN32
-  if (!win)
-  // Get primary monitor dpi for app start up
+  UINT dpi = GetDeviceCaps(wglGetCurrentDC(), LOGPIXELSY);
+
+  if (dpi > 0)
   {
-    // A legacy API that does not reflect DPI change at runtime.
-    // Minimum supported client: Windows 2000 Professional [desktop apps only]
-    UINT dpi = GetDeviceCaps(wglGetCurrentDC(), LOGPIXELSY);
-
-    if (dpi > 0)
-    {
-      dpiScale = static_cast<double>(dpi) / 96;
-    }
-    else
-    {
-      vtkWarningWithObjectMacro(nullptr, "Fail to detect primary monitor DPI.");
-    }
-  }
-  else
-  // Get monitor dpi where the app window currently locate.
-  // Handle window dragging between multi-monitors configuration
-  // and system scale change at run-time.
-  {
-    HWND winID = static_cast<HWND>(win->GetGenericWindowId());
-
-    if (winID)
-    {
-      HMONITOR hmon = MonitorFromWindow(winID, MONITOR_DEFAULTTONEAREST);
-
-      if (hmon)
-      {
-        UINT dpiX = 0, dpiY = 0;
-        // A more modern API that able to detect DPI dynamically.
-        // Minimum supported client: Windows 8.1 [desktop apps only]
-        HRESULT hres = GetDpiForMonitor(hmon, MDT_DEFAULT, &dpiX, &dpiY);
-
-        if (hres == S_OK && dpiX > 0)
-        {
-          dpiScale = static_cast<double>(dpiX) / 96;
-        }
-        else
-        {
-          vtkWarningWithObjectMacro(nullptr, "Fail to detect current window DPI.");
-        }
-      }
-      else
-      {
-        vtkWarningWithObjectMacro(nullptr, "Fail to Get HMONITOR.");
-      }
-    }
-    else
-    {
-      vtkWarningWithObjectMacro(nullptr, "Fail to get window ID.");
-    }
-  }
-#elif defined(__linux__) && defined(VTK_USE_X)
-  Display* dpy = nullptr;
-
-  if (win)
-  {
-    dpy = static_cast<Display*>(win->GetGenericDisplayId());
+    dpiScale = static_cast<double>(dpi) / 96;
   }
   else
   {
-    dpy = XOpenDisplay(nullptr);
+    vtkWarningWithObjectMacro(nullptr, "Fail to detect primary monitor DPI.");
   }
+#elif VTK_USE_X
+  Display* dpy = XOpenDisplay(nullptr);
 
   if (dpy)
   {
@@ -151,10 +96,7 @@ double F3DUtils::getDPIScale(vtkWindow* win)
     vtkWarningWithObjectMacro(nullptr, "Fail to get Display.");
   }
 
-  if (!win)
-  {
-    XCloseDisplay(dpy);
-  }
+  XCloseDisplay(dpy);
 #endif
 
   return dpiScale;

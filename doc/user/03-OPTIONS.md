@@ -58,6 +58,11 @@ Do not render anything and quit just after loading the first file, use with --ve
 
 Prevent F3D to load a file bigger than the provided size in Mib, leave empty for unlimited, useful for thumbnails.
 
+### `--dpi-scale` (_bool_, default: `false`)
+
+Scale the _window resolution_ and _font scale_ by the display scaling factor.
+Supported on Windows and Linux platform.
+
 ### `--watch` (_bool_, default: `false`)
 
 Watch current file and automatically reload it whenever it is modified on disk. Consider ensuring `--remove-empty-file-groups` is not enabled when using this option.
@@ -331,15 +336,6 @@ Ignored if `--hdri-skybox` is enabled.
 ### `--resolution=<width,height>` (_vector\<double\>_, default: `1000, 600`)
 
 Set the _window resolution_.
-
-### `--dpi-scale` (_bool_, default: `false`)
-
-Scale the _window resolution_ and _font scale_ by the display scaling factor.
-
-> [!NOTE]
-> Supported on Windows and Linux platform.
-> On Windows, it can support run-time dpi change.
-> On Linux, it require restart application to take effect.
 
 ### `--position=<x,y>` (_vector\<double\>_)
 
