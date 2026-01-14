@@ -130,11 +130,6 @@ public:
    */
   [[nodiscard]] vtkF3DRenderer* GetRenderer() const;
 
-  /**
-   * Enable dpi scale
-   */
-  void EnableDpiScale(bool enable) override;
-
 private:
   class internals;
   std::unique_ptr<internals> Internals;

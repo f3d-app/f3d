@@ -1569,7 +1569,7 @@ void vtkF3DRenderer::ConfigureTextActors()
     }
   }
 
-  double scaleFactor = this->DPIScaleEnable.value_or(false) ? F3DUtils::getDPIScale() : 1.0;
+  double scaleFactor = this->DPIScaleEnable ? F3DUtils::getDPIScale() : 1.0;
 
   this->UIActor->SetFontScale(this->FontScale * scaleFactor);
 
@@ -1617,11 +1617,12 @@ void vtkF3DRenderer::SetFontScale(const double fontScale)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::EnableDpiScale(bool enable)
+void vtkF3DRenderer::ToggleDpiScale(bool enable)
 {
-  if (!this->DPIScaleEnable.has_value())
+  if (this->DPIScaleEnable != enable)
   {
     this->DPIScaleEnable = enable;
+    this->TextActorsConfigured = false;
   }
 }
 

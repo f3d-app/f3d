@@ -126,7 +126,6 @@ public:
     std::string PointSpritesType; // Deprecated
     bool TranslucencySupport;     // Deprecated
     std::string Blending;
-    bool EnableDpiScale;
   };
 
   void SetupCamera(const CameraConfiguration& camConf)
@@ -849,7 +848,6 @@ public:
     this->ParseOption(
       appOptions, "interaction-test-play", this->AppOptions.InteractionTestPlayFile);
     this->ParseOption(appOptions, "command-script", this->AppOptions.CommandScriptFile);
-    this->ParseOption(appOptions, "dpi-scale", this->AppOptions.EnableDpiScale);
   }
 
   void UpdateInterdependantOptions()
@@ -895,7 +893,7 @@ public:
       f3d::window& window = this->Engine->getWindow();
       if (this->AppOptions.Resolution.size() == 2)
       {
-        double dpiScale = this->AppOptions.EnableDpiScale ? f3d::utils::getDPIScale() : 1.0;
+        double dpiScale = this->LibOptions.ui.dpi_scale ? f3d::utils::getDPIScale() : 1.0;
 
         window.setSize(static_cast<int>(this->AppOptions.Resolution[0] * dpiScale),
           static_cast<int>(this->AppOptions.Resolution[1] * dpiScale));
@@ -1031,15 +1029,6 @@ public:
     {
       GlobalInteractor->requestStop();
       GlobalInteractor = nullptr;
-    }
-  }
-
-  void EnableDpiScale()
-  {
-    if (!this->AppOptions.NoRender)
-    {
-      f3d::window& window = this->Engine->getWindow();
-      window.EnableDpiScale(AppOptions.EnableDpiScale);
     }
   }
 
@@ -1262,7 +1251,6 @@ int F3DStarter::Start(int argc, char** argv)
     this->Internals->ApplyPositionAndResolution();
     this->AddCommands();
     this->Internals->UpdateBindings({ "" });
-    this->Internals->EnableDpiScale();
   }
 
   this->Internals->Engine->setOptions(this->Internals->LibOptions);

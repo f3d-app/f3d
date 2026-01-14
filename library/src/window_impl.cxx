@@ -585,6 +585,7 @@ void window_impl::UpdateDynamicOptions()
 
   renderer->SetFontFile(opt.ui.font_file);
   renderer->SetFontScale(opt.ui.scale);
+  renderer->ToggleDpiScale(opt.ui.dpi_scale);
 
   renderer->SetGridUnitSquare(opt.render.grid.unit);
   renderer->SetGridSubdivisions(opt.render.grid.subdivisions);
@@ -770,11 +771,5 @@ void window_impl::RenderUIOnly()
 vtkF3DRenderer* window_impl::GetRenderer() const
 {
   return this->Internals->Renderer;
-}
-
-//----------------------------------------------------------------------------
-void window_impl::EnableDpiScale(bool enable)
-{
-  this->Internals->Renderer->EnableDpiScale(enable);
 }
 }

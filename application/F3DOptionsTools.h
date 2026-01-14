@@ -63,7 +63,6 @@ static inline const OptionsDict DefaultAppOptions = {
   { "interaction-test-play", "" },
   { "command-script", "" },
   { "frame-rate", "30.0" },
-  { "dpi-scale", "false" },
 };
 
 /**
@@ -144,6 +143,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "final-shader", "render.effect.final_shader" },
   { "display-depth", "render.effect.display_depth" },
   { "textures-transform", "model.textures_transform" },
+  { "dpi-scale", "ui.dpi_scale" },
 };
 
 /**
