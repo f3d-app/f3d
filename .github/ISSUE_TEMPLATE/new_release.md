@@ -81,6 +81,10 @@ Linux testing protocol:
 - Drag&Drop cow.vtp, Drag&Drop palermo_park.hdr, check render
 - Check that CTRL+O (file dialog) is working
 - Press "Esc" and check the following commands `reload_current_file_group`, `set_camera top`, `toggle_volume_rendering`, `exit`
+- `cd examples/libf3d && mkdir build && cd build && cmake ../ && make`
+- `./cpp/check-engine/check-engine`
+- `./cpp/render-interact/render-interact ../../../testing/data/cow.vtp`
+- Check that the font scale has been auto-scaled correctly when app launched
 
 macOS testing protocol:
 
@@ -109,6 +113,10 @@ Windows testing protocol:
 - Check that CTRL+O (file dialog) is working
 - run `f3d-console --version` in a Windows command line and check it output the version
 - Press "Esc" and check the following commands `reload_current_file_group`, `set_camera top`, `toggle_volume_rendering`, `exit`
+- `cd examples\libf3d && mkdir build && cd build && cmake ../ && cmake --build . --config Release`
+- `.\cpp\check-engine\Release\check-engine`
+- `.\cpp\render-interact\Release\render-interact ..\..\..\testing\data\cow.vtp`
+- Check that the font scale has been auto-scaled correctly when app launched
 
 Python testing protocol:
 
