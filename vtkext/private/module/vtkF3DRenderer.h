@@ -656,7 +656,6 @@ private:
   bool HDRISphericalHarmonicsConfigured = false;
   bool HDRISpecularConfigured = false;
   bool HDRISkyboxConfigured = false;
-  bool SystemScaleChangeObserverConfigured = false;
 
   bool GridVisible = false;
   bool GridAbsolute = false;

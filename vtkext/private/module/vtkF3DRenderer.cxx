@@ -18,7 +18,6 @@
 
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
-#include <vtkCallbackCommand.h>
 #include <vtkCamera.h>
 #include <vtkCameraOrientationRepresentation.h>
 #include <vtkCameraOrientationWidget.h>
@@ -329,7 +328,6 @@ void vtkF3DRenderer::Initialize()
   this->ScalarBarActorConfigured = false;
   this->CheatSheetConfigured = false;
   this->ColoringConfigured = false;
-  this->SystemScaleChangeObserverConfigured = false;
 
   // create ImGui context if F3D_MODULE_UI is enabled
   this->UIActor->Initialize(vtkOpenGLRenderWindow::SafeDownCast(this->RenderWindow));
