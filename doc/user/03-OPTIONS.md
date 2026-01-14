@@ -321,6 +321,10 @@ Model-specified by default.
 Set the 2d transform to use for all textures applied to the model.
 Importer may set a default value depending on file type. If a default value exists, the default value is multiplied by the provided transform.
 
+### `--texture-checker` (_bool_, default: `false`)
+
+Apply checkerboard texture to objects.
+
 ## Window options
 
 ### `--background-color=<color>` (_color_, default: `0.2, 0.2, 0.2`)
