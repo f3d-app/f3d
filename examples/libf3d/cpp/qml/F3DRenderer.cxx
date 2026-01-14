@@ -9,14 +9,16 @@
 #include <f3d/window.h>
 
 
+//----------------------------------------------------------------------------
 F3DRenderer::F3DRenderer()
 {
     initialize();
 }
 
-
+//----------------------------------------------------------------------------
 F3DRenderer::~F3DRenderer() = default;
 
+//----------------------------------------------------------------------------
 void F3DRenderer::initialize()
 {
         f3d::engine::autoloadPlugins();
@@ -50,6 +52,7 @@ void F3DRenderer::initialize()
         _frameTimer.start();        
 }
 
+//----------------------------------------------------------------------------
 void F3DRenderer::enqueue(const Event& ev)
 {
     std::lock_guard lock(_mutex);
@@ -57,49 +60,49 @@ void F3DRenderer::enqueue(const Event& ev)
     update();
 }
 
-
+//----------------------------------------------------------------------------
 void F3DRenderer::queueMousePress(QPointF position, Qt::MouseButton button, Qt::KeyboardModifiers modifiers)
 {
     Event event{ EventType::MousePress, position.x(), position.y(), button, modifiers };
     enqueue(event);
 }
 
-
+//----------------------------------------------------------------------------
 void F3DRenderer::queueMouseMove(QPointF position, Qt::MouseButton button, Qt::KeyboardModifiers modifiers)
 {
     Event event{ EventType::MouseMove, position.x(), position.y(), button, modifiers };
     enqueue(event);
 }
 
-
+//----------------------------------------------------------------------------
 void F3DRenderer::queueMouseRelease(QPointF position, Qt::MouseButton button, Qt::KeyboardModifiers modifiers)
 {
     Event event{ EventType::MouseRelease, position.x(), position.y(), button, modifiers };
     enqueue(event);
 }
 
-
+//----------------------------------------------------------------------------
 void F3DRenderer::queueWheel(QPoint angleDelta, Qt::KeyboardModifiers modifiers)
 {
     Event event{ EventType::Wheel, 0, 0, Qt::MouseButton::NoButton, modifiers, angleDelta.x(), angleDelta.y()};
     enqueue(event);
 }
 
-
+//----------------------------------------------------------------------------
 void F3DRenderer::queueKeyPress(int key, const QString& text, Qt::KeyboardModifiers modifiers)
 {
     Event event{ EventType::KeyPress, 0, 0, Qt::MouseButton::NoButton, modifiers, 0, 0, key, text};
     enqueue(event);
 }
 
-
+//----------------------------------------------------------------------------
 void F3DRenderer::queueKeyRelease(int key, Qt::KeyboardModifiers modifiers)
 {
     Event event{ EventType::KeyRelease, 0, 0, Qt::MouseButton::NoButton, modifiers, 0, 0, key};
     enqueue(event);
 }
 
-
+//----------------------------------------------------------------------------
 void F3DRenderer::updateModifiers(Qt::KeyboardModifiers mods)
 {
     if (_interactor == nullptr)
@@ -140,7 +143,7 @@ int F3DRenderer::mapMouseButton(Qt::MouseButton button) const
     return static_cast<int>(MouseButton::MIDDLE);
 }
 
-
+//----------------------------------------------------------------------------
 std::string F3DRenderer::keySymFromKeyAndText(int key, const QString& text) const
 {
     if (key >= Qt::Key_A && key <= Qt::Key_Z)
@@ -177,7 +180,7 @@ std::string F3DRenderer::keySymFromKeyAndText(int key, const QString& text) cons
     return {};
 }
 
-
+//----------------------------------------------------------------------------
 void F3DRenderer::handleEvent(const Event& ev)
 {
     auto& inter = *_interactor;
@@ -247,14 +250,14 @@ void F3DRenderer::handleEvent(const Event& ev)
     }
 }
 
-
+//----------------------------------------------------------------------------
 void F3DRenderer::updateSize(const QSizeF &size)
 {
     auto& window = _engine->getWindow();
     window.setSize(static_cast<int>(size.width()), static_cast<int>(size.height()));
 }
 
-
+//----------------------------------------------------------------------------
 void F3DRenderer::render()
 {
     if (!_engine || !_interactor)    
@@ -281,6 +284,7 @@ void F3DRenderer::render()
     update();
 }
 
+//----------------------------------------------------------------------------
 void F3DRenderer::synchronize(QQuickFramebufferObject* item)
 {
     if (!_engine)    
