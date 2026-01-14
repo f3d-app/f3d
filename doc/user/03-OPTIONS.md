@@ -58,11 +58,6 @@ Do not render anything and quit just after loading the first file, use with --ve
 
 Prevent F3D to load a file bigger than the provided size in Mib, leave empty for unlimited, useful for thumbnails.
 
-### `--dpi-scale` (_bool_, default: `false`)
-
-Scale the _window resolution_ and _font scale_ by the display scaling factor.
-Supported on Windows and Linux platform.
-
 ### `--watch` (_bool_, default: `false`)
 
 Watch current file and automatically reload it whenever it is modified on disk. Consider ensuring `--remove-empty-file-groups` is not enabled when using this option.
@@ -215,6 +210,11 @@ Can be useful to display non-ASCII filenames.
 ### `--font-scale=<ratio>` (_ratio_, default: `1.0`)
 
 Scale fonts. Useful for HiDPI displays.
+
+### `--dpi-scale` (_bool_, default: `false`)
+
+Scale the _window resolution_ and _font scale_ by the display scaling factor.
+Supported on Windows and Linux platform.
 
 ### `--command-script=<command script>` (_script_)
 
