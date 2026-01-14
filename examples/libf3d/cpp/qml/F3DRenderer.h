@@ -2,6 +2,7 @@
 #define F3DRENDERER_H
 
 #include <QElapsedTimer>
+#include <QSizeF>
 #include <QString>
 #include <QtQuick/QQuickFramebufferObject>
 
@@ -15,24 +16,28 @@ class engine;
 class interactor;
 }
 
-class F3DView;
 
 class F3DRenderer : public QQuickFramebufferObject::Renderer
 {
+
 public:
-  explicit F3DRenderer(F3DView* item);
+  explicit F3DRenderer();
   ~F3DRenderer() override;
 
-  void QueueMousePress(float x, float y, int button, int modifiers);
-  void QueueMouseMove(float x, float y, int buttons, int modifiers);
-  void QueueMouseRelease(float x, float y, int button, int modifiers);
-  void QueueWheel(int dx, int dy, int modifiers);
-  void QueueKeyPress(int key, const QString& text, int modifiers);
-  void QueueKeyRelease(int key, int modifiers);
+  void queueMousePress(QPointF position, Qt::MouseButton button, Qt::KeyboardModifiers modifiers);
+  void queueMouseMove(QPointF position, Qt::MouseButton buttons, Qt::KeyboardModifiers modifiers);
+  void queueMouseRelease(QPointF position, Qt::MouseButton button, Qt::KeyboardModifiers modifiers);
+  void queueWheel(QPoint angleDelta, Qt::KeyboardModifiers modifiers);
+  void queueKeyPress(int key, const QString& text, Qt::KeyboardModifiers modifiers);
+  void queueKeyRelease(int key, Qt::KeyboardModifiers modifiers);
 
   void render() override;
+  void synchronize(QQuickFramebufferObject* item) override;
+
+  void updateSize(const QSizeF& size);
 
 private:
+
   enum class EventType
   {
     MousePress,
@@ -48,30 +53,32 @@ private:
     EventType type;
     double x = 0.0;
     double y = 0.0;
-    int button = 0;
-    int buttons = 0;
-    int modifiers = 0;
+    Qt::MouseButton button = Qt::NoButton;
+    Qt::KeyboardModifiers modifiers = Qt::NoModifier;
     int dx = 0;
     int dy = 0;
     int key = 0;
-    QString text;
+    QString text;    
   };
 
-  void Enqueue(const Event& ev);
+  void initialize();
+  void enqueue(const Event& ev);
 
-  void UpdateModifiers(int mods);
-  int MapMouseButton(int button) const;
-  std::string KeySymFromKeyAndText(int key, const QString& text) const;
-  void HandleEvent(const Event& ev);
+  void updateModifiers(Qt::KeyboardModifiers mods);
+  int mapMouseButton(Qt::MouseButton button) const;
+  std::string keySymFromKeyAndText(int key, const QString& text) const;
+  void handleEvent(const Event& ev);
 
-  F3DView* View = nullptr;
-  std::unique_ptr<f3d::engine> Engine;
-  f3d::interactor* Interactor = nullptr;
+  std::unique_ptr<f3d::engine> _engine;
+  f3d::interactor* _interactor = nullptr;
 
-  std::deque<Event> Events;
-  std::mutex Mutex;
-  QElapsedTimer FrameTimer;
-  bool FirstFrame = true;
+  std::deque<Event> _events;
+  std::mutex _mutex;
+  QElapsedTimer _frameTimer;
+
+  QSizeF _lastSize;
+  QString _lastModelPath;
+
 };
 
 #endif // F3DRENDERER_H
