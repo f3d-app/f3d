@@ -8,10 +8,10 @@
 #include <vtkArrowSource.h>
 #include <vtkCallbackCommand.h>
 #include <vtkCamera.h>
+#include <vtkDataSetAttributes.h>
 #include <vtkImageData.h>
 #include <vtkObjectFactory.h>
 #include <vtkPolyData.h>
-#include <vtkPolyDataNormals.h>
 #include <vtkRenderWindow.h>
 #include <vtkRendererCollection.h>
 #include <vtkSmartPointer.h>
@@ -311,18 +311,11 @@ bool vtkF3DMetaImporter::Update()
       vtkF3DMetaImporter::NormalGlyphsStruct& ngs =
         this->Pimpl->NormalGlyphsActorsAndMappers.back();
 
-      vtkNew<vtkPolyDataNormals> normals;
-      normals->SetInputData(points);
-      normals->ComputePointNormalsOn();
-      normals->ComputeCellNormalsOff();
-      normals->Update();
-
       vtkNew<vtkArrowSource> arrowSource;
-
-      ngs.GlyphMapper->SetInputData(normals->GetOutput());
+      ngs.GlyphMapper->SetInputData(points);
       ngs.GlyphMapper->SetSourceConnection(arrowSource->GetOutputPort());
       ngs.GlyphMapper->SetOrientationModeToDirection();
-      ngs.GlyphMapper->SetOrientationArray("Normals");
+      ngs.GlyphMapper->SetOrientationArray(vtkDataSetAttributes::NORMALS);
       ngs.GlyphMapper->SetScaleFactor(0.2);
       ngs.GlyphMapper->ScalingOn();
 
