@@ -10,8 +10,8 @@ class F3DView : public QQuickFramebufferObject
     Q_OBJECT
 
     QML_ELEMENT
-    Q_PROPERTY(QString modelPath READ modelPath WRITE setModelPath NOTIFY modelPathChanged)
 
+    Q_PROPERTY(QString modelPath READ modelPath WRITE setModelPath NOTIFY modelPathChanged)
     Q_PROPERTY(bool enableKeyboard MEMBER _enableKeyboard NOTIFY enableKeyboardChanged)
     Q_PROPERTY(bool enableMouse MEMBER _enableMouse NOTIFY enableMouseChanged)
 

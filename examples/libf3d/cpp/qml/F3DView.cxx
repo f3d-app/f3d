@@ -56,11 +56,11 @@ void F3DView::releaseResources()
 //----------------------------------------------------------------------------
 void F3DView::mousePressEvent(QMouseEvent *event)
 {
-  if(!_enableMouse)
+  if (!_enableMouse)
   {
     return event->ignore();
   }
-  if(_renderer)
+  if (_renderer)
   {
     _renderer->queueMousePress(event->position(), event->button(), event->modifiers());
   }
@@ -69,11 +69,11 @@ void F3DView::mousePressEvent(QMouseEvent *event)
 //----------------------------------------------------------------------------
 void F3DView::mouseMoveEvent(QMouseEvent *event)
 {
-  if(!_enableMouse)
+  if (!_enableMouse)
   {
     return event->ignore();
   }
-  if(_renderer)
+  if (_renderer)
   {
     _renderer->queueMouseMove(event->position(), event->button(), event->modifiers());
   }
@@ -82,11 +82,11 @@ void F3DView::mouseMoveEvent(QMouseEvent *event)
 //----------------------------------------------------------------------------
 void F3DView::mouseReleaseEvent(QMouseEvent *event)
 {
-  if(!_enableMouse)
+  if (!_enableMouse)
   {
     return event->ignore();
   }
-  if(_renderer)
+  if (_renderer)
   {
     _renderer->queueMouseRelease(event->position(), event->button(), event->modifiers());
   }
@@ -95,11 +95,11 @@ void F3DView::mouseReleaseEvent(QMouseEvent *event)
 //----------------------------------------------------------------------------
 void F3DView::wheelEvent(QWheelEvent *event)
 {
-  if(!_enableMouse)
+  if (!_enableMouse)
   {
     return event->ignore();
   }
-  if(_renderer)
+  if (_renderer)
   {
     _renderer->queueWheel(event->angleDelta(), event->modifiers());
   }
@@ -108,11 +108,11 @@ void F3DView::wheelEvent(QWheelEvent *event)
 //----------------------------------------------------------------------------
 void F3DView::keyPressEvent(QKeyEvent *event)
 {
-  if(!_enableKeyboard)
+  if (!_enableKeyboard)
   {
     return event->ignore();
   }
-  if(_renderer)
+  if (_renderer)
   {
     _renderer->queueKeyPress(event->key(), event->text(), event->modifiers());
   }
@@ -121,11 +121,11 @@ void F3DView::keyPressEvent(QKeyEvent *event)
 //----------------------------------------------------------------------------
 void F3DView::keyReleaseEvent(QKeyEvent *event)
 {
-  if(!_enableKeyboard)
+  if (!_enableKeyboard)
   {
     return event->ignore();
   }
-  if(_renderer)
+  if (_renderer)
   {
     _renderer->queueKeyRelease(event->key(), event->modifiers());
   }

@@ -57,7 +57,7 @@ void F3DRenderer::initialize()
 //----------------------------------------------------------------------------
 void F3DRenderer::enqueue(const Event& ev)
 {
-  std::lock_guard lock(_mutex);
+  std::scoped_lock lock(_mutex);
   _events.push_back(ev);
   update();
 }
@@ -287,7 +287,7 @@ void F3DRenderer::render()
 
   std::deque<Event> localQueue;
   {
-    std::lock_guard lock(_mutex);
+    std::scoped_lock lock(_mutex);
     localQueue.swap(_events);
   }
 
@@ -328,14 +328,14 @@ void F3DRenderer::synchronize(QQuickFramebufferObject* item)
   }
 
   QVariantMap& pendingOptions = view->pendingOptions();
-  if(pendingOptions.size())
+  if (pendingOptions.size())
   {
     QMapIterator<QString, QVariant> it(pendingOptions);
     auto& options = _engine->getOptions();
-    while(it.hasNext())
+    while (it.hasNext())
     {
       it.next();
-      switch(it.value().typeId())
+      switch (it.value().typeId())
       {
         case QMetaType::Bool:
           options.set(it.key().toStdString(), it.value().toBool());
