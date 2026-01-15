@@ -398,7 +398,6 @@ public:
    * Set/Get if checkerboard is enabled
    */
   void SetEnableCheckerBoard(bool enable);
-  vtkGetMacro(EnableCheckerBoard, bool);
   ///@}
 
   ///@{
