@@ -2589,15 +2589,10 @@ void vtkF3DRenderer::ConfigureActorsProperties()
       {
         coloring.Actor->GetProperty()->SetBaseColorTexture(this->CheckBoardTexture);
         coloring.OriginalActor->GetProperty()->SetBaseColorTexture(this->CheckBoardTexture);
-
-        coloring.Actor->GetProperty()->SetORMTexture(this->CheckBoardTexture);
-        coloring.OriginalActor->GetProperty()->SetORMTexture(this->CheckBoardTexture);
-
-        coloring.Actor->GetProperty()->SetNormalTexture(this->CheckBoardTexture);
-        coloring.OriginalActor->GetProperty()->SetNormalTexture(this->CheckBoardTexture);
-
-        coloring.Actor->GetProperty()->SetEmissiveTexture(this->CheckBoardTexture);
-        coloring.OriginalActor->GetProperty()->SetEmissiveTexture(this->CheckBoardTexture);
+        coloring.Actor->GetProperty()->SetMetallic(0.f);
+        coloring.OriginalActor->GetProperty()->SetMetallic(0.f);
+        coloring.Actor->GetProperty()->SetBaseIOR(1.f);
+        coloring.OriginalActor->GetProperty()->SetBaseIOR(1.f);
       }
     }
 
