@@ -2580,6 +2580,7 @@ void vtkF3DRenderer::ConfigureActorsProperties()
         this->CheckBoardTexture->SetInputConnection(this->CheckerBoardReader->GetOutputPort());
         this->CheckBoardTexture->UseSRGBColorSpaceOn();
         this->CheckBoardTexture->InterpolateOn();
+        this->CheckBoardTexture->MipmapOn();
         this->CheckBoardTexture->SetColorModeToDirectScalars();
 
         this->HasValidCheckerBoardTexture = true;
