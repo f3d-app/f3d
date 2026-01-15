@@ -74,6 +74,7 @@ public:
     vtkActor* OriginalActor;
     vtkImporter* Importer;
     vtkNew<vtkGlyph3DMapper> GlyphMapper;
+    bool InputDataHasNormals = false;
   };
 
   struct ColoringStruct

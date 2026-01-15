@@ -3156,6 +3156,13 @@ void vtkF3DRenderer::ConfigureColoringAndVisibilities()
     !this->UseRaytracing && !this->UsePointSprites && this->UseNormalGlyphs;
   for (const auto& normalGlyph : this->Importer->GetNormalGlyphsActorsAndMappers())
   {
+    if (normalGlyphsVisible && !normalGlyph.InputDataHasNormals)
+    {
+      F3DLog::Print(F3DLog::Severity::Warning,
+        "Data does not contain any normals to display the normal glyphs with");
+      continue;
+    }
+
     normalGlyph.Actor->SetVisibility(normalGlyphsVisible);
   }
 

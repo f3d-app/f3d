@@ -13,6 +13,7 @@
 #include <vtkImageData.h>
 #include <vtkInformationIntegerKey.h>
 #include <vtkObjectFactory.h>
+#include <vtkPointData.h>
 #include <vtkPolyData.h>
 #include <vtkRenderWindow.h>
 #include <vtkRendererCollection.h>
@@ -446,6 +447,8 @@ bool vtkF3DMetaImporter::Update()
         vtkF3DMetaImporter::NormalGlyphsStruct(actor, importer));
       vtkF3DMetaImporter::NormalGlyphsStruct& ngs =
         this->Pimpl->NormalGlyphsActorsAndMappers.back();
+
+      ngs.InputDataHasNormals = points->GetPointData()->GetNormals() != nullptr;
 
       vtkNew<vtkArrowSource> arrowSource;
       ngs.GlyphMapper->SetInputData(points);
