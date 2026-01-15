@@ -585,7 +585,7 @@ void window_impl::UpdateDynamicOptions()
 
   renderer->SetFontFile(opt.ui.font_file);
   renderer->SetFontScale(opt.ui.scale);
-  renderer->ToggleDpiScale(opt.ui.dpi_scale);
+  renderer->SetDPIAware(opt.ui.dpi_aware);
 
   renderer->SetGridUnitSquare(opt.render.grid.unit);
   renderer->SetGridSubdivisions(opt.render.grid.subdivisions);

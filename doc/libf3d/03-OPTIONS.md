@@ -553,6 +553,13 @@ Set the opacity of the backdrop behind the UI elements. Value is between 0.0 (fu
 
 CLI: `--backdrop-opacity`.
 
+### `ui.dpi_aware` (_bool_, default: `false`)
+
+Scale the _window resolution_ and _font scale_ by the display scaling factor.
+Supported on Windows and Linux platform.
+
+CLI: `--dpi-aware`.
+
 # APIs
 
 There are three APIs to access the options

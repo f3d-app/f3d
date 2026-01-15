@@ -74,7 +74,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "rendering-backend", "", "Backend to use when rendering (auto|glx|wgl|egl|osmesa)", "<string>", "" },
       { "list-rendering-backends", "", "Print the list of rendering backends available on this system", "", "" },
       { "max-size", "", "Maximum size in Mib of a file to load, leave empty for unlimited", "<size in Mib>", "" },
-      { "dpi-scale", "","Scale font and window resolution according to system scale", "<bool>", "1" },
+      { "dpi-aware", "","Scale font and window resolution according to system scale", "<bool>", "1" },
 #if F3D_MODULE_DMON
       { "watch", "", "Watch current file and automatically reload it whenever it is modified on disk", "<bool>", "1" },
 #endif
