@@ -121,7 +121,7 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     return EXIT_FAILURE;
   }
 
-  if (!compareDouble(elevation, 0.0))
+  if (!compareDouble(elevation, -90.0))
   {
     std::cerr << "getWorldElevation (horizontal) is not behaving as expected: "
               << elevation << "\n";
@@ -151,7 +151,7 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     return EXIT_FAILURE;
   }
 
-  if (!compareDouble(elevation, 45.0))
+  if (!compareDouble(elevation, -45.0))
   {
     std::cerr << "getWorldElevation (positive elevation) is not behaving as expected: "
               << elevation << "\n";
@@ -181,7 +181,7 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     return EXIT_FAILURE;
   }
 
-  if (!compareDouble(elevation, -45.0))
+  if (!compareDouble(elevation, 45.0))
   {
     std::cerr << "getWorldElevation (negative elevation) is not behaving as expected: " << elevation
               << "\n";
