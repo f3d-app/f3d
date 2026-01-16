@@ -2594,6 +2594,10 @@ void vtkF3DRenderer::ConfigureActorsProperties()
         coloring.OriginalActor->GetProperty()->SetMetallic(0.f);
         coloring.Actor->GetProperty()->SetBaseIOR(1.f);
         coloring.OriginalActor->GetProperty()->SetBaseIOR(1.f);
+        coloring.Actor->GetProperty()->SetNormalTexture(nullptr);
+        coloring.OriginalActor->GetProperty()->SetNormalTexture(nullptr);
+        coloring.Actor->GetProperty()->SetEmissiveTexture(nullptr);
+        coloring.OriginalActor->GetProperty()->SetEmissiveTexture(nullptr);
       }
     }
 
