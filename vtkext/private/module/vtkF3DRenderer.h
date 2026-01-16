@@ -395,6 +395,13 @@ public:
 
   ///@{
   /**
+   * Set/Get if checkerboard is enabled
+   */
+  void SetEnableCheckerBoard(bool enable);
+  ///@}
+
+  ///@{
+  /**
    * Set/Get if using point or cell data coloring
    */
   void SetUseCellColoring(bool useCell);
@@ -753,6 +760,13 @@ private:
   std::optional<fs::path> TextureMaterial;
   std::optional<fs::path> TextureEmissive;
   std::optional<fs::path> TextureNormal;
+
+  vtkSmartPointer<vtkImageReader2> CheckerBoardReader;
+  bool HasValidCheckBoardReader = false;
+  bool CheckerBoardReaderConfigured = false;
+  bool EnableCheckerBoard = false;
+  vtkSmartPointer<vtkTexture> CheckBoardTexture;
+  bool HasValidCheckerBoardTexture = false;
 
   vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorTransferFunction;
   bool ExpandingRangeSet = false;
