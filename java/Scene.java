@@ -173,7 +173,7 @@ public class Scene {
      *
      * @return array of 2 doubles [min_time, max_time]
      */
-    public native List<Double> animationKeyFrames();
+    public native List<Double> getAnimationKeyFrames();
 
     /**
      * Return the number of animations available in the currently loaded files.

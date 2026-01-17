@@ -399,9 +399,9 @@ extern "C"
     return result;
   }
 
-  JNIEXPORT jobject JAVA_BIND(Scene, animationKeyFrames)(JNIEnv* env, jobject self)
+  JNIEXPORT jobject JAVA_BIND(Scene, getAnimationKeyFrames)(JNIEnv* env, jobject self)
   {
-    return CreateDoubleList(env, GetEngine(env, self)->getScene().animationKeyFrames());
+    return CreateDoubleList(env, GetEngine(env, self)->getScene().getAnimationKeyFrames());
   }
 
   JNIEXPORT jint JAVA_BIND(Scene, availableAnimations)(JNIEnv* env, jobject self)
