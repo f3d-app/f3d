@@ -63,19 +63,15 @@ int F3DUtils::ParseToInt(const std::string& str, int def, const std::string& nam
 //----------------------------------------------------------------------------
 double F3DUtils::getDPIScale()
 {
-  double dpiScale = 1.0;
+  unsigned int dpi = 96;
   constexpr int baseDPI = 96;
 
 #ifdef _WIN32
-  UINT dpi = GetDeviceCaps(wglGetCurrentDC(), LOGPIXELSY);
+  dpi = GetDeviceCaps(wglGetCurrentDC(), LOGPIXELSY);
 
-  if (dpi > 0)
+  if (dpi == 0)
   {
-    dpiScale = static_cast<double>(dpi) / baseDPI;
-  }
-  else
-  {
-    vtkWarningWithObjectMacro(nullptr, "Fail to detect primary monitor DPI.");
+    vtkWarningWithObjectMacro(nullptr, "Fail to get DPI.");
   }
 #elif VTK_USE_X
   Display* dpy = XOpenDisplay(nullptr);
@@ -83,11 +79,8 @@ double F3DUtils::getDPIScale()
   if (dpy)
   {
     unsigned int dpi = std::atoi(XGetDefault(dpy, "Xft", "dpi"));
-    if (dpi > 0)
-    {
-      dpiScale = static_cast<double>(dpi) / baseDPI;
-    }
-    else
+
+    if (dpi == 0)
     {
       vtkWarningWithObjectMacro(nullptr, "Fail to get DPI.");
     }
@@ -100,5 +93,5 @@ double F3DUtils::getDPIScale()
   XCloseDisplay(dpy);
 #endif
 
-  return dpiScale;
+  return static_cast<double>(dpi) / baseDPI;
 }
