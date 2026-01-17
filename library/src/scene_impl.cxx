@@ -510,7 +510,7 @@ std::pair<double, double> scene_impl::animationTimeRange()
 }
 
 //----------------------------------------------------------------------------
-std::vector<double> scene_impl::animationKeyFrames()
+std::vector<double> scene_impl::getAnimationKeyFrames()
 {
   return this->Internals->AnimationManager.GetKeyFrames();
 }

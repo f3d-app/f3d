@@ -170,8 +170,8 @@ EMSCRIPTEN_BINDINGS(f3d)
       "animationTimeRange", +[](f3d::scene& scene) -> emscripten::val
       { return pairToJSArray(scene.animationTimeRange()); })
     .function(
-      "animationKeyFrames", +[](f3d::scene& scene) -> emscripten::val
-      { return containerToJSArray(scene.animationKeyFrames()); })
+      "getAnimationKeyFrames", +[](f3d::scene& scene) -> emscripten::val
+      { return containerToJSArray(scene.getAnimationKeyFrames()); })
     .function("availableAnimations", &f3d::scene::availableAnimations)
     .function("getAnimationName", &f3d::scene::getAnimationName)
     .function(
