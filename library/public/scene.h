@@ -166,7 +166,7 @@ public:
    * Get animation keyframe's time of currently added files.
    * Returns empty vector if there is no animations.
    */
-  [[nodiscard]] virtual std::vector<double> animationKeyFrames() = 0;
+  [[nodiscard]] virtual std::vector<double> getAnimationKeyFrames() = 0;
 
   /**
    * Return the number of animations available in the currently loaded files.

@@ -47,7 +47,7 @@ public class TestScene {
 
     scene.loadAnimationTime(0.5);
     scene.animationTimeRange();
-    scene.animationKeyFrames();
+    scene.getAnimationKeyFrames();
     scene.availableAnimations();
     scene.getAnimationName();
     scene.getAnimationName(0);
