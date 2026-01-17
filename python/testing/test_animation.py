@@ -18,6 +18,11 @@ def test_animation():
     # availableAnimations
     assert engine.scene.available_animations() == 1
 
+    keyframes = engine.scene.animation_keyframes()
+    assert len(keyframes) == 50
+    assert keyframes[0] == 0
+    assert keyframes[49] == 4.0
+
     # recover animationTimeRange
     engine.scene.load_animation_time(0.5)
     assert engine.scene.animation_time_range() == (0.0, 4.0)
