@@ -29,9 +29,18 @@ const settings = {
     utils.assert(start === 0, "Start value should be 0");
     utils.assert(end === 4, "End value should be 4");
 
-    utils.assert(scene.getAnimationKeyFrames().length === 50, "KeyFrames length should be 50");
-    utils.assert(scene.getAnimationKeyFrames()[0] === 0, "First KeyFrame should be 0");
-    utils.assert(scene.getAnimationKeyFrames()[49] === 4.0, "First KeyFrame should be 4.0");
+    utils.assert(
+      scene.animationKeyFrames().length === 50,
+      "KeyFrames length should be 50",
+    );
+    utils.assert(
+      scene.animationKeyFrames()[0] === 0,
+      "First KeyFrame should be 0",
+    );
+    utils.assert(
+      scene.animationKeyFrames()[49] === 4.0,
+      "First KeyFrame should be 4.0",
+    );
 
     scene.loadAnimationTime(1.5);
 
