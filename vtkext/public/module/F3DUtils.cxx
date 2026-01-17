@@ -64,13 +64,14 @@ int F3DUtils::ParseToInt(const std::string& str, int def, const std::string& nam
 double F3DUtils::getDPIScale()
 {
   double dpiScale = 1.0;
+  constexpr int baseDPI = 96;
 
 #ifdef _WIN32
   UINT dpi = GetDeviceCaps(wglGetCurrentDC(), LOGPIXELSY);
 
   if (dpi > 0)
   {
-    dpiScale = static_cast<double>(dpi) / 96;
+    dpiScale = static_cast<double>(dpi) / baseDPI;
   }
   else
   {
@@ -84,7 +85,7 @@ double F3DUtils::getDPIScale()
     unsigned int dpi = std::atoi(XGetDefault(dpy, "Xft", "dpi"));
     if (dpi > 0)
     {
-      dpiScale = dpi / 96.0;
+      dpiScale = static_cast<double>(dpi) / baseDPI;
     }
     else
     {

@@ -149,6 +149,10 @@ xattr -cr /Applications/F3D.app
 
 Then F3D should work as expected.
 
+> Options `ui.dpi_aware` and CLI `--dpi-aware` doesn't work.
+
+This is due to the missing implementation of `F3DUtils::getDPIScale()` on MacOS end.
+
 ### Python
 
 > I can't find `usd` and `vdb` plugins after installing f3d with pip
