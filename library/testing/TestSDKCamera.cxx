@@ -312,5 +312,76 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     return EXIT_FAILURE;
   }
 
+  // Test getWorldAzimuth, getWorldElevation, getDistance
+
+  // Case 1: looking along -X axis, up along +Y
+  cam.setPosition({ 1., 0., 0. });
+  cam.setFocalPoint({ 0., 0., 0. });
+  cam.setViewUp({ 0., 1., 0 });
+
+  if (!compareDouble(cam.getWorldAzimuth(), 0.))
+  {
+    std::cerr << "WorldAzimuth test 1 failed: " << cam.getWorldAzimuth() << " != 0\n";
+    return EXIT_FAILURE;
+  }
+
+  if (!compareDouble(cam.getWorldElevation(), 0.))
+  {
+    std::cerr << "WorldElevation test 1 failed: " << cam.getWorldElevation() << " != 0\n";
+    return EXIT_FAILURE;
+  }
+
+  if (!compareDouble(cam.getDistance(), 1.))
+  {
+    std::cerr << "Distance test 1 failed: " << cam.getDistance() << " != 1\n";
+    return EXIT_FAILURE;
+  }
+
+  // Case 2: looking straight up along +Z
+  cam.setPosition({ 0., 0., 1. });
+  cam.setFocalPoint({ 0., 0., 0. });
+  cam.setViewUp({ 0., 1., 0 });
+
+  if (!compareDouble(cam.getWorldAzimuth(), -90.))
+  {
+    std::cerr << "WorldAzimuth test 2 failed: " << cam.getWorldAzimuth() << " != -90\n";
+    return EXIT_FAILURE;
+  }
+
+  if (!compareDouble(cam.getWorldElevation(), 0.))
+  {
+    std::cerr << "WorldElevation test 2 failed: " << cam.getWorldElevation() << " != 0\n";
+    return EXIT_FAILURE;
+  }
+
+  if (!compareDouble(cam.getDistance(), 1.))
+  {
+    std::cerr << "Distance test 2 failed: " << cam.getDistance() << " != 1\n";
+    return EXIT_FAILURE;
+  }
+
+  // Case 3: diagonal vector (-1, 0, 1)
+  cam.setPosition({ -1., 0., 1. });
+  cam.setFocalPoint({ 0., 0., 0. });
+  cam.setViewUp({ 0., 1., 0 });
+
+  if (!compareDouble(cam.getWorldAzimuth(), -135.))
+  {
+    std::cerr << "WorldAzimuth test 3 failed: " << cam.getWorldAzimuth() << " != -135\n";
+    return EXIT_FAILURE;
+  }
+
+  if (!compareDouble(cam.getWorldElevation(), 0.))
+  {
+    std::cerr << "WorldElevation test 3 failed: " << cam.getWorldElevation() << " != 0\n";
+    return EXIT_FAILURE;
+  }
+
+  if (!compareDouble(cam.getDistance(), std::sqrt(2.)))
+  {
+    std::cerr << "Distance test 3 failed: " << cam.getDistance() << " != " << std::sqrt(2.) << "\n";
+    return EXIT_FAILURE;
+  }
+
   return EXIT_SUCCESS;
 }
