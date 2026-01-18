@@ -6,7 +6,8 @@
 
 #if defined(_WIN32)
 #include <Windows.h>
-#elif defined(VTK_USE_X)
+#endif
+#if defined(VTK_USE_X)
 #include <X11/Xlib.h>
 #endif
 
@@ -74,7 +75,8 @@ double F3DUtils::getDPIScale()
   {
     vtkWarningWithObjectMacro(nullptr, "Fail to get DPI.");
   }
-#elif defined(VTK_USE_X)
+#endif // _WIN32
+#if defined(VTK_USE_X)
   Display* dpy = XOpenDisplay(nullptr);
 
   if (dpy)
@@ -92,7 +94,7 @@ double F3DUtils::getDPIScale()
   }
 
   XCloseDisplay(dpy);
-#endif
+#endif // VTK_USE_X
 
   return static_cast<double>(dpi) / baseDPI;
 }
