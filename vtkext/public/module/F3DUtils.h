@@ -32,9 +32,9 @@ VTKEXT_EXPORT double ParseToDouble(
 VTKEXT_EXPORT int ParseToInt(const std::string& str, int def, const std::string& nameError);
 
 /*
- * Get the primary monitor system zoom scale base on DPI.
+ * Calculate the primary monitor system zoom scale base on DPI.
  * Supported on Windows and Linux platforms.
- * Return a hardcoded 1.0 double on other platforms.
+ * Return 1.0 on other platforms.
  */
 VTKEXT_EXPORT double getDPIScale();
 };

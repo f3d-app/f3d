@@ -129,8 +129,8 @@ extern "C"
     return result.has_value() ? env->NewStringUTF(result.value().c_str()) : nullptr;
   }
 
-  JNIEXPORT jstring JAVA_BIND(Utils, getDPIScale)(jclass)
+  JNIEXPORT jdouble JAVA_BIND(Utils, getDPIScale)(jclass)
   {
-    return static_cast<jdouble>(f3d::ultis::getDPIScale());
+    return static_cast<jdouble>(f3d::utils::getDPIScale());
   }
 }

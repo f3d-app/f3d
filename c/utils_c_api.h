@@ -103,11 +103,11 @@ extern "C"
   F3D_EXPORT void f3d_utils_string_free(char* str);
 
   /**
-   * @brief Get the primary monitor system zoom scale base on DPI.
+   * @brief Calculate the primary monitor system zoom scale base on DPI.
    *
    * Supported on Windows and Linux platforms.
    *
-   * @return DPI scale in double, or hardcoded 1.0 on other platforms.
+   * @return DPI scale in double, or 1.0 on other platforms.
    */
   F3D_EXPORT double f3d_utils_get_dpi_scale();
 
