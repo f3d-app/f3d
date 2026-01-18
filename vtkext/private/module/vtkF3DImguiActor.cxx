@@ -819,8 +819,7 @@ void vtkF3DImguiActor::RenderFpsCounter()
   winSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
   winSize.y += 2.f * ImGui::GetStyle().WindowPadding.y;
 
-  ImVec2 position(
-    viewport->WorkSize.x - winSize.x - margin, viewport->WorkSize.y - winSize.y - margin);
+  ImVec2 position(viewport->WorkSize.x - winSize.x - margin, margin);
 
   ::SetupNextWindow(position, winSize);
   ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
