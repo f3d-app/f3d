@@ -67,14 +67,14 @@ double F3DUtils::getDPIScale()
   unsigned int dpi = 96;
   constexpr int baseDPI = 96;
 
-#ifdef _WIN32
+#if defined(_WIN32)
   dpi = GetDeviceCaps(wglGetCurrentDC(), LOGPIXELSY);
 
   if (dpi == 0)
   {
     vtkWarningWithObjectMacro(nullptr, "Fail to get DPI.");
   }
-#elif VTK_USE_X
+#elif defined(VTK_USE_X)
   Display* dpy = XOpenDisplay(nullptr);
 
   if (dpy)
