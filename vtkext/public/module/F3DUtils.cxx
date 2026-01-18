@@ -1,8 +1,8 @@
 #include "F3DUtils.h"
 
 #include <vtkObject.h>
-#include <vtkSetGet.h>
 #include <vtkRenderingOpenGLConfigure.h>
+#include <vtkSetGet.h>
 
 #if defined(_WIN32)
 #include <Windows.h>
