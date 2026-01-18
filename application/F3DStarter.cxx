@@ -2352,8 +2352,7 @@ void F3DStarter::AddCommands()
     {
       if (!this->Internals->LoadedFiles.empty())
       {
-        for (const auto& parentPath : F3DInternals::ParentPaths(this->Internals->LoadedFiles))
-        {
+        for (const auto& parentPath : F3DInternals::ParentPaths(this->Internals->LoadedFiles)) {
           this->AddFile(parentPath, true);
         }
         this->LoadRelativeFileGroup(0);
