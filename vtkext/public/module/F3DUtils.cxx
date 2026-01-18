@@ -1,7 +1,14 @@
 #include "F3DUtils.h"
 
 #include <vtkObject.h>
+#include <vtkRenderingOpenGLConfigure.h>
 #include <vtkSetGet.h>
+
+#if defined(_WIN32)
+#include <Windows.h>
+#elif defined(__linux__) && defined(VTK_USE_X)
+#include <X11/Xlib.h>
+#endif
 
 #include <charconv>
 #include <stdexcept>
@@ -52,4 +59,40 @@ int F3DUtils::ParseToInt(const std::string& str, int def, const std::string& nam
     }
   }
   return value;
+}
+
+//----------------------------------------------------------------------------
+double F3DUtils::getDPIScale()
+{
+  unsigned int dpi = 96;
+  constexpr int baseDPI = 96;
+
+#if defined(_WIN32)
+  dpi = GetDeviceCaps(wglGetCurrentDC(), LOGPIXELSY);
+
+  if (dpi == 0)
+  {
+    vtkWarningWithObjectMacro(nullptr, "Fail to get DPI.");
+  }
+#elif defined(__linux__) && defined(VTK_USE_X)
+  Display* dpy = XOpenDisplay(nullptr);
+
+  if (dpy)
+  {
+    dpi = std::atoi(XGetDefault(dpy, "Xft", "dpi"));
+
+    if (dpi == 0)
+    {
+      vtkWarningWithObjectMacro(nullptr, "Fail to get DPI.");
+    }
+  }
+  else
+  {
+    vtkWarningWithObjectMacro(nullptr, "Fail to get Display.");
+  }
+
+  XCloseDisplay(dpy);
+#endif
+
+  return static_cast<double>(dpi) / baseDPI;
 }

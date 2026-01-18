@@ -108,6 +108,7 @@ public:
   void SetPointSize(const std::optional<double>& pointSize);
   void SetFontFile(const std::optional<fs::path>& fontFile);
   void SetFontScale(const double fontScale);
+  void SetDPIAware(bool enable);
   void SetHDRIFile(const std::optional<fs::path>& hdriFile);
   void SetUseImageBasedLighting(bool use) override;
   void SetBackground(const double* backgroundColor) override;
@@ -716,6 +717,7 @@ private:
 
   std::optional<fs::path> FontFile;
   double FontScale = 1.0;
+  bool DPIAware = false;
 
   double LightIntensity = 1.0;
   std::map<vtkLight*, double> OriginalLightIntensities;
