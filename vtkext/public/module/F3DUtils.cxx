@@ -2,10 +2,11 @@
 
 #include <vtkObject.h>
 #include <vtkSetGet.h>
+#include <vtkRenderingOpenGLConfigure.h>
 
-#ifdef _MSC_VER
+#if defined(_WIN32)
 #include <Windows.h>
-#elif VTK_USE_X
+#elif defined(VTK_USE_X)
 #include <X11/Xlib.h>
 #endif
 
@@ -78,7 +79,7 @@ double F3DUtils::getDPIScale()
 
   if (dpy)
   {
-    unsigned int dpi = std::atoi(XGetDefault(dpy, "Xft", "dpi"));
+    dpi = std::atoi(XGetDefault(dpy, "Xft", "dpi"));
 
     if (dpi == 0)
     {
