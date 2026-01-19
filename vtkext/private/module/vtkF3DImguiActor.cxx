@@ -819,8 +819,15 @@ void vtkF3DImguiActor::RenderFpsCounter()
   winSize.x += 2.f * ImGui::GetStyle().WindowPadding.x;
   winSize.y += 2.f * ImGui::GetStyle().WindowPadding.y;
 
-  ImVec2 position(
-    viewport->WorkSize.x - winSize.x - margin, viewport->WorkSize.y - winSize.y - margin);
+  float posX = viewport->WorkSize.x - winSize.x - margin;
+  if (this->ConsoleBadgeEnabled)
+  {
+    const float padding = ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().FramePadding.x;
+    ImVec2 badgeSize = ImGui::CalcTextSize("!");
+    badgeSize.x += 2.f * padding;
+    posX = viewport->WorkSize.x - winSize.x - badgeSize.x - 2.f * margin;
+  }
+  ImVec2 position(posX, margin);
 
   ::SetupNextWindow(position, winSize);
   ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
