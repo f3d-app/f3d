@@ -506,7 +506,7 @@ CLI: `--font-scale`.
 ### `ui.dpi_aware` (_bool_, default: `false`)
 
 Scale the _font scale_ by the display scaling factor.
-Supported on Windows and Linux platform.
+Only supported on Windows platform.
 
 CLI: `--dpi-aware`.
 

@@ -9,6 +9,7 @@ Here is a non exhaustive list of F3D limitations:
 - Volume rendering and HDRI support requires a decent GPU.
 - Information about the failure to load a file is not provided before VTK >= 9.4.0.
 - Streaming require different version of VTK depending of the format to read.
+- Options `ui.dpi_aware` and CLI `--dpi-aware` Only supported on Windows platform.
 
 ### Assimp
 
@@ -146,12 +147,6 @@ Our macOS binary package are not signed, to work around this, you can simply run
 ```
 xattr -cr /Applications/F3D.app
 ```
-
-Then F3D should work as expected.
-
-> Options `ui.dpi_aware` and CLI `--dpi-aware` doesn't work.
-
-This is due to the missing implementation of `F3DUtils::getDPIScale()` on MacOS end.
 
 ### Python
 

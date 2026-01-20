@@ -93,7 +93,7 @@ public:
 
   /**
    * Calculate the primary monitor system zoom scale base on DPI.
-   * Supported on Windows and Linux platforms.
+   * Only supported on Windows platform.
    * Return 1.0 on other platforms.
    */
   [[nodiscard]] static double getDPIScale();

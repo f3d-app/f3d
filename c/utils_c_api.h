@@ -105,7 +105,7 @@ extern "C"
   /**
    * @brief Calculate the primary monitor system zoom scale base on DPI.
    *
-   * Supported on Windows and Linux platforms.
+   * Only supported on Windows platform.
    *
    * @return DPI scale in double, or 1.0 on other platforms.
    */
