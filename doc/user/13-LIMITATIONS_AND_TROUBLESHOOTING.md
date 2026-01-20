@@ -148,6 +148,8 @@ Our macOS binary package are not signed, to work around this, you can simply run
 xattr -cr /Applications/F3D.app
 ```
 
+Then F3D should work as expected.
+
 ### Python
 
 > I can't find `usd` and `vdb` plugins after installing f3d with pip
