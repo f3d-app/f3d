@@ -1,12 +1,15 @@
+#include "PseudoUnitTest.h"
+#include "TestSDKHelpers.h"
+
 #include <engine.h>
 #include <options.h>
 #include <scene.h>
 #include <window.h>
 
-#include "TestSDKHelpers.h"
-
 int TestSDKDynamicFontFile([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
+  PseudoUnitTest test;
+
   f3d::engine eng = f3d::engine::create(true);
   f3d::scene& sce = eng.getScene();
   f3d::window& win = eng.getWindow();
@@ -22,8 +25,6 @@ int TestSDKDynamicFontFile([[maybe_unused]] int argc, [[maybe_unused]] char* arg
   // Change the font file and make sure it is taken into account
   opt.ui.font_file = std::string(argv[1]) + "data/Crosterian.ttf";
 
-  return TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
-           std::string(argv[2]), "TestSDKDynamicFontFile")
-    ? EXIT_SUCCESS
-    : EXIT_FAILURE;
+  test("Render with dynamic font file", TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKDynamicFontFile"));
+  return test.result();
 }
