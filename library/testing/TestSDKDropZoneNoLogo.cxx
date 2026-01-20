@@ -1,11 +1,14 @@
+#include "PseudoUnitTest.h"
+#include "TestSDKHelpers.h"
+
 #include <engine.h>
 #include <interactor.h>
 #include <window.h>
 
-#include "TestSDKHelpers.h"
-
 int TestSDKDropZoneNoLogo([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
+  PseudoUnitTest test;
+
   f3d::engine eng = f3d::engine::create(true);
   f3d::window& win = eng.getWindow();
   f3d::options& opt = eng.getOptions();
@@ -16,8 +19,6 @@ int TestSDKDropZoneNoLogo([[maybe_unused]] int argc, [[maybe_unused]] char* argv
 
   win.render();
 
-  return TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
-           std::string(argv[2]), "TestSDKDropZoneNoLogo")
-    ? EXIT_SUCCESS
-    : EXIT_FAILURE;
+  test("Drop zone without a logo", TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKDropZoneNoLogo"));
+  return test.result();
 }

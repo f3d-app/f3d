@@ -1,11 +1,14 @@
+#include "PseudoUnitTest.h"
+#include "TestSDKHelpers.h"
+
 #include <engine.h>
 #include <interactor.h>
 #include <window.h>
 
-#include "TestSDKHelpers.h"
-
 int TestSDKDropZone([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
+  PseudoUnitTest test;
+
   f3d::engine eng = f3d::engine::create(true);
   f3d::window& win = eng.getWindow();
   f3d::options& opt = eng.getOptions();
@@ -16,8 +19,6 @@ int TestSDKDropZone([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   opt.ui.drop_zone.custom_binds = "None+Drop Ctrl+O None+H";
   win.render();
 
-  return TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
-           std::string(argv[2]), "TestSDKDropZone")
-    ? EXIT_SUCCESS
-    : EXIT_FAILURE;
+  test("Render Drop Zone", TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKDropZone"));
+  return test.result();
 }
