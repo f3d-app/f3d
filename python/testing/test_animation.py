@@ -18,7 +18,7 @@ def test_animation():
     # availableAnimations
     assert engine.scene.available_animations() == 1
 
-    keyframes = engine.scene.animation_keyframes()
+    keyframes = engine.scene.get_animation_keyframes()
     assert len(keyframes) == 50
     assert keyframes[0] == 0
     assert keyframes[49] == 4.0
