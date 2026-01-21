@@ -63,7 +63,7 @@ int TestSDKEngine([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   // coverage for getPluginList
   test("check getPluginsList for invalid configs",
-    f3d::engine::getPluginsList(std::string(argv[1]) + "configs").empty() > 0);
+    f3d::engine::getPluginsList(std::string(argv[1]) + "configs").empty());
   test("check getPluginsList for inexistent config",
     f3d::engine::getPluginsList("inexistent").empty());
 
