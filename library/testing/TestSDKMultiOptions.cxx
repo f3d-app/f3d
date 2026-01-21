@@ -36,6 +36,8 @@ int TestSDKMultiOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]
   sce.add(right);
 
   // Check rendering is correct
-  test("render with multiple options set", TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKMultiOptions"));
+  test("render with multiple options set",
+    TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
+      std::string(argv[2]), "TestSDKMultiOptions"));
   return test.result();
 }

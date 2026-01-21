@@ -93,7 +93,9 @@ int TestSDKExternalWindowGLX([[maybe_unused]] int argc, [[maybe_unused]] char* a
   eng.getWindow().setSize(300, 300);
   eng.getScene().add(std::string(argv[1]) + "/data/cow.vtp");
 
-  test("render with external GLX window", TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/", argv[2], "TestSDKExternalWindowGLX"));
+  test("render with external GLX window",
+    TestSDKHelpers::RenderTest(
+      eng.getWindow(), std::string(argv[1]) + "baselines/", argv[2], "TestSDKExternalWindowGLX"));
 
   ctx = glXGetCurrentContext();
   glXMakeCurrent(display, 0, nullptr);

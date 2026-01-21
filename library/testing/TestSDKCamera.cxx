@@ -11,21 +11,20 @@
 #include <limits>
 #include <sstream>
 
-
 int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   PseudoUnitTest test;
 
-  const auto compareDouble = [](double a, double b) { return std::fabs(a - b) < 128 * std::numeric_limits<double>::epsilon(); };
+  const auto compareDouble = [](double a, double b) {
+    return std::fabs(a - b) < 128 * std::numeric_limits<double>::epsilon();
+  };
 
-  const auto compareVec = [compareDouble](const f3d::vector3_t& vec1, const f3d::vector3_t& vec2)
-  {
+  const auto compareVec = [compareDouble](const f3d::vector3_t& vec1, const f3d::vector3_t& vec2) {
     return compareDouble(vec1[0], vec2[0]) && compareDouble(vec1[1], vec2[1]) &&
       compareDouble(vec1[2], vec2[2]);
   };
 
-  const auto comparePoint = [compareDouble](const f3d::point3_t& vec1, const f3d::point3_t& vec2)
-  {
+  const auto comparePoint = [compareDouble](const f3d::point3_t& vec1, const f3d::point3_t& vec2) {
     return compareDouble(vec1[0], vec2[0]) && compareDouble(vec1[1], vec2[1]) &&
       compareDouble(vec1[2], vec2[2]);
   };
@@ -153,30 +152,42 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   cam.setPosition({ 1, 0, 0 });
   cam.setFocalPoint({ 0, 0, 0 });
   cam.setViewUp({ 1, 0, 0 });
-  test("pos when cross product of pos->foc and up is 0 - test 1", cam.getPosition(), f3d::point3_t{ 1, 0, 0 }, comparePoint);
-  test("foc when cross product of pos->foc and up is 0 - test 1", cam.getFocalPoint(), f3d::point3_t{ 0, 0, 0 }, comparePoint);
-  test("up when cross product of pos->foc and up is 0 - test 1", cam.getViewUp(), f3d::vector3_t{ 0, 1, 0 }, compareVec);
+  test("pos when cross product of pos->foc and up is 0 - test 1", cam.getPosition(),
+    f3d::point3_t{ 1, 0, 0 }, comparePoint);
+  test("foc when cross product of pos->foc and up is 0 - test 1", cam.getFocalPoint(),
+    f3d::point3_t{ 0, 0, 0 }, comparePoint);
+  test("up when cross product of pos->foc and up is 0 - test 1", cam.getViewUp(),
+    f3d::vector3_t{ 0, 1, 0 }, compareVec);
 
   cam.setPosition({ 0, 1, 0 });
   cam.setFocalPoint({ 0, 0, 0 });
   cam.setViewUp({ 0, 1, 0 });
-  test("pos when cross product of pos->foc and up is 0 - test 2", cam.getPosition(), f3d::point3_t{ 0, 1, 0 }, comparePoint);
-  test("foc when cross product of pos->foc and up is 0 - test 2", cam.getFocalPoint(), f3d::point3_t{ 0, 0, 0 }, comparePoint);
-  test("up when cross product of pos->foc and up is 0 - test 2", cam.getViewUp(), f3d::vector3_t{ 1, 0, 0 }, compareVec);
+  test("pos when cross product of pos->foc and up is 0 - test 2", cam.getPosition(),
+    f3d::point3_t{ 0, 1, 0 }, comparePoint);
+  test("foc when cross product of pos->foc and up is 0 - test 2", cam.getFocalPoint(),
+    f3d::point3_t{ 0, 0, 0 }, comparePoint);
+  test("up when cross product of pos->foc and up is 0 - test 2", cam.getViewUp(),
+    f3d::vector3_t{ 1, 0, 0 }, compareVec);
 
   cam.setPosition({ 0, 0, 1 });
   cam.setFocalPoint({ 0, 0, 0 });
   cam.setViewUp({ 0, 0, 1 });
-  test("pos when cross product of pos->foc and up is 0 - test 3", cam.getPosition(), f3d::point3_t{ 0, 0, 1 }, comparePoint);
-  test("foc when cross product of pos->foc and up is 0 - test 3", cam.getFocalPoint(), f3d::point3_t{ 0, 0, 0 }, comparePoint);
-  test("up when cross product of pos->foc and up is 0 - test 3", cam.getViewUp(), f3d::vector3_t{ 1, 0, 0 }, compareVec);
+  test("pos when cross product of pos->foc and up is 0 - test 3", cam.getPosition(),
+    f3d::point3_t{ 0, 0, 1 }, comparePoint);
+  test("foc when cross product of pos->foc and up is 0 - test 3", cam.getFocalPoint(),
+    f3d::point3_t{ 0, 0, 0 }, comparePoint);
+  test("up when cross product of pos->foc and up is 0 - test 3", cam.getViewUp(),
+    f3d::vector3_t{ 1, 0, 0 }, compareVec);
 
   cam.setPosition({ 5, 0, 0 });
   cam.setFocalPoint({ 1, 0, 0 });
   cam.setViewUp({ 1, 0, 0 });
-  test("pos when cross product of pos->foc and up is 0 - test 4", cam.getPosition(), f3d::point3_t{ 5, 0, 0 }, comparePoint);
-  test("foc when cross product of pos->foc and up is 0 - test 4", cam.getFocalPoint(), f3d::point3_t{ 1, 0, 0 }, comparePoint);
-  test("up when cross product of pos->foc and up is 0 - test 4", cam.getViewUp(), f3d::vector3_t{ 0, 1, 0 }, compareVec);
+  test("pos when cross product of pos->foc and up is 0 - test 4", cam.getPosition(),
+    f3d::point3_t{ 5, 0, 0 }, comparePoint);
+  test("foc when cross product of pos->foc and up is 0 - test 4", cam.getFocalPoint(),
+    f3d::point3_t{ 1, 0, 0 }, comparePoint);
+  test("up when cross product of pos->foc and up is 0 - test 4", cam.getViewUp(),
+    f3d::vector3_t{ 0, 1, 0 }, compareVec);
 
   return test.result();
 }

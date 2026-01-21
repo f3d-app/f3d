@@ -12,7 +12,9 @@
 namespace
 {
 template<typename T>
-struct is_container : std::false_type {};
+struct is_container : std::false_type
+{
+};
 
 template<>
 struct is_container<f3d::point3_t> : std::true_type

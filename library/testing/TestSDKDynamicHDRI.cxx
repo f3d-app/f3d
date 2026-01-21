@@ -27,7 +27,7 @@ int TestSDKDynamicHDRI([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   sce.add(std::string(argv[1]) + "/data/cow.vtp");
 
-  test("first render", [&](){win.render();});
+  test("first render", [&]() { win.render(); });
 
   // Generate a random cache path to avoid reusing any existing cache
   std::random_device r;
@@ -39,11 +39,15 @@ int TestSDKDynamicHDRI([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   // Enable HDRI ambient and skybox and check the default HDRI
   opt.render.hdri.ambient = true;
   opt.render.background.skybox = true;
-  test("render with default HDRI", TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKDynamicHDRIDefault"));
+  test("render with default HDRI",
+    TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
+      std::string(argv[2]), "TestSDKDynamicHDRIDefault"));
 
   // Change the hdri and make sure it is taken into account
   opt.render.hdri.file = std::string(argv[1]) + "data/palermo_park_1k.hdr";
-  test("render with set HDRI", TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKDynamicHDRI"));
+  test("render with set HDRI",
+    TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
+      std::string(argv[2]), "TestSDKDynamicHDRI"));
 
   // Check caching is working
   std::ifstream lutFile(cachePath + "/lut.vti");
@@ -51,16 +55,22 @@ int TestSDKDynamicHDRI([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   // Force a cache path change to force a LUT reconfiguration and test dynamic cache path
   eng.setCachePath(std::string(argv[2]) + "/cache_" + std::to_string(dist(e1)));
-  test("render with HDRI using another cache path", TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKDynamicHDRI"));
+  test("render with HDRI using another cache path",
+    TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
+      std::string(argv[2]), "TestSDKDynamicHDRI"));
 
   // Use an existing cache
   eng.setCachePath(cachePath);
-  test("render with HDRI using existing cache path", TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKDynamicHDRI"));
+  test("render with HDRI using existing cache path",
+    TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
+      std::string(argv[2]), "TestSDKDynamicHDRI"));
 
 #if F3D_MODULE_EXR
   // Change the hdri and make sure it is taken into account
   opt.render.hdri.file = std::string(argv[1]) + "/data/kloofendal_43d_clear_1k.exr";
-  test("render with EXR HDRI", TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKDynamicHDRIExr"));
+  test("render with EXR HDRI",
+    TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
+      std::string(argv[2]), "TestSDKDynamicHDRIExr"));
 #endif
 
   return test.result();

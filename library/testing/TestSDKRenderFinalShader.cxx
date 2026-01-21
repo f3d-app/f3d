@@ -39,12 +39,16 @@ int TestSDKRenderFinalShader([[maybe_unused]] int argc, [[maybe_unused]] char* a
   f3d::options& options = eng.getOptions();
   options.render.effect.final_shader = negativeShader;
 
-  test("render with negative shader", TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKRenderFinalShaderNegative"));
+  test("render with negative shader",
+    TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
+      "TestSDKRenderFinalShaderNegative"));
 
   // change the shader to test the recompilation is triggered
   options.render.effect.final_shader = vignetteShader;
 
-  test("render with vignetter shader", TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),"TestSDKRenderFinalShaderVignette"));
+  test("render with vignetter shader",
+    TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
+      "TestSDKRenderFinalShaderVignette"));
 
   return test.result();
 }

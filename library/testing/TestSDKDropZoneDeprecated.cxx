@@ -32,13 +32,17 @@ int TestSDKDropZoneDeprecated([[maybe_unused]] int argc, [[maybe_unused]] char* 
   opt.ui.drop_zone.info = "Drop a file to open it\nPress H to show cheatsheet";
   win.render();
 
-  test("Deprecated drop_zone.info option render", TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKDropZoneDeprecated"));
+  test("Deprecated drop_zone.info option render",
+    TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
+      std::string(argv[2]), "TestSDKDropZoneDeprecated"));
 
   opt.ui.dropzone = true;
   opt.ui.dropzone_info = "Drop a file to open it\nPress H to show cheatsheet";
   win.render();
 
-  test("Deprecated dropzone_info option render", TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKDropZoneDeprecated"));
+  test("Deprecated dropzone_info option render",
+    TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
+      std::string(argv[2]), "TestSDKDropZoneDeprecated"));
   return test.result();
 }
 

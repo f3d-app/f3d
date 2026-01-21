@@ -40,7 +40,9 @@ int TestSDKExternalWindowEGL([[maybe_unused]] int argc, [[maybe_unused]] char* a
   eng.getWindow().setSize(size[0], size[1]);
   eng.getScene().add(std::string(argv[1]) + "/data/cow.vtp");
 
-  test("render with external EGL window", TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/", argv[2], "TestSDKExternalWindowEGL"));
+  test("render with external EGL window",
+    TestSDKHelpers::RenderTest(
+      eng.getWindow(), std::string(argv[1]) + "baselines/", argv[2], "TestSDKExternalWindowEGL"));
 
   // terminate EGL when finished
   eglTerminate(eglDpy);

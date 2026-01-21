@@ -28,6 +28,8 @@ int TestSDKDynamicProperties([[maybe_unused]] int argc, [[maybe_unused]] char* a
   opt.model.color.rgb = { 0.6, 0.1, 0.2 };
   opt.model.color.opacity = 0.6;
 
-  test("render with dynamic properties", TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKDynamicProperties"));
+  test("render with dynamic properties",
+    TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
+      std::string(argv[2]), "TestSDKDynamicProperties"));
   return test.result();
 }

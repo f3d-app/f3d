@@ -16,6 +16,8 @@ int TestSDKCompareWithFile([[maybe_unused]] int argc, [[maybe_unused]] char* arg
 
   sce.add(std::string(argv[1]) + "/data/cow.vtp");
 
-  test("Compare render with baseline", TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKCompareWithFile"));
+  test("Compare render with baseline",
+    TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
+      std::string(argv[2]), "TestSDKCompareWithFile"));
   return test.result();
 }

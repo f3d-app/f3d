@@ -25,6 +25,8 @@ int TestSDKDynamicFontFile([[maybe_unused]] int argc, [[maybe_unused]] char* arg
   // Change the font file and make sure it is taken into account
   opt.ui.font_file = std::string(argv[1]) + "data/Crosterian.ttf";
 
-  test("Render with dynamic font file", TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKDynamicFontFile"));
+  test("Render with dynamic font file",
+    TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
+      std::string(argv[2]), "TestSDKDynamicFontFile"));
   return test.result();
 }

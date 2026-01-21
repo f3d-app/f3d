@@ -32,12 +32,14 @@ int TestSDKInteractorCallBack([[maybe_unused]] int argc, [[maybe_unused]] char* 
 
   // Dragon.vtu; SZZYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
   test("play some interactions", inter.playInteraction(interactionFilePath));
-  test("render interaction result",TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename + "Default"));
+  test("render interaction result",
+    TestSDKHelpers::RenderTest(
+      win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename + "Default"));
 
   // Check that adding an existing interaction command trigger an exception
 
-  test.expect<f3d::interactor::already_exists_exception>("add existing interaction",
-    [&]() { inter.addBinding({ mod_t::ANY, "7" }, "exception"); });
+  test.expect<f3d::interactor::already_exists_exception>(
+    "add existing interaction", [&]() { inter.addBinding({ mod_t::ANY, "7" }, "exception"); });
 
   // Remove bindings that will be triggered later and should not have any effect
   inter.removeBinding({ mod_t::ANY, "7" });
@@ -87,7 +89,9 @@ int TestSDKInteractorCallBack([[maybe_unused]] int argc, [[maybe_unused]] char* 
   test("play interactions after modifications", inter.playInteraction(interactionFilePath));
 
   // With VTK 9.3.0, rendering is slightly different
-  test("render modified interaction result", TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename + "Modified", 0.11));
+  test("render modified interaction result",
+    TestSDKHelpers::RenderTest(
+      win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename + "Modified", 0.11));
 
   // Remove a non-existing interaction command
   inter.removeBinding({ mod_t::ANY, "Invalid" });
@@ -103,10 +107,13 @@ int TestSDKInteractorCallBack([[maybe_unused]] int argc, [[maybe_unused]] char* 
 
   // Play interaction again, which should not have any effect
   // Dragon.vtu; SZZYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
-  test("play interaction after removing all interactions", inter.playInteraction(interactionFilePath));
+  test(
+    "play interaction after removing all interactions", inter.playInteraction(interactionFilePath));
 
   // With VTK 9.3.0, rendering is slightly different
-  test("render after interaction that should have had no effect", TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename + "ModifiedAgain", 0.11));
+  test("render after interaction that should have had no effect",
+    TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
+      filename + "ModifiedAgain", 0.11));
 
   // initialize default bindings again, two times, and check rendering
   inter.initBindings();
@@ -114,15 +121,21 @@ int TestSDKInteractorCallBack([[maybe_unused]] int argc, [[maybe_unused]] char* 
 
   // Dragon.vtu; SZZYB; CTRL+S; CTRL+P; SHIFT+Y; CTRL+SHIFT+B; CTRL+SHIFT+A; 7
   test("play interactions after initialization", inter.playInteraction(interactionFilePath));
-  test("render after playing defaulted interactions", TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename + "DefaultAgain"));
+  test("render after playing defaulted interactions",
+    TestSDKHelpers::RenderTest(
+      win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename + "DefaultAgain"));
 
   // Check error handling
-  test("record to an invalid path", !inter.recordInteraction("/" + std::string(257, 'x') + "/record.ext"));
-  test("play interaction from an invalid path", !inter.playInteraction("/" + std::string(257, 'x') + "/play.ext"));
+  test("record to an invalid path",
+    !inter.recordInteraction("/" + std::string(257, 'x') + "/record.ext"));
+  test("play interaction from an invalid path",
+    !inter.playInteraction("/" + std::string(257, 'x') + "/play.ext"));
 
   // Check console error handling
   // Esc;"exception";Enter;Esc
-  test("play an interaction that write a command that trigger an exception internally", inter.playInteraction(std::string(argv[1]) + "recordings/TestSDKInteractorCallBackConsoleException.log"));
+  test("play an interaction that write a command that trigger an exception internally",
+    inter.playInteraction(
+      std::string(argv[1]) + "recordings/TestSDKInteractorCallBackConsoleException.log"));
 
   return test.result();
 }

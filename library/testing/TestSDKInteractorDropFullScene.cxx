@@ -23,6 +23,8 @@ int TestSDKInteractorDropFullScene([[maybe_unused]] int argc, [[maybe_unused]] c
   std::string interactionFilePath = std::string(argv[2]) + "../../" + filename + ".log";
   inter.playInteraction(interactionFilePath); // world.obj; S
 
-  test("play a drop interaction", TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename));
+  test("play a drop interaction",
+    TestSDKHelpers::RenderTest(
+      win, std::string(argv[1]) + "baselines/", std::string(argv[2]), filename));
   return test.result();
 }

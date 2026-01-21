@@ -25,6 +25,8 @@ int TestSDKDynamicBackgroundColor([[maybe_unused]] int argc, [[maybe_unused]] ch
   // Change the background color and make sure it is taken into account
   opt.render.background.color = { 1.0, 1.0, 1.0 };
 
-  test("Render with dynamic background color",TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKDynamicBackgrounColor"));
+  test("Render with dynamic background color",
+    TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
+      std::string(argv[2]), "TestSDKDynamicBackgrounColor"));
   return test.result();
 }

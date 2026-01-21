@@ -59,7 +59,9 @@ int TestSDKExternalWindowGLFW([[maybe_unused]] int argc, [[maybe_unused]] char* 
 
   // Ideally, we should not test the content of the window, but the GLFW framebuffer itself
   // There is currently no API in GLFW that allows to do that unfortunately
-  test("render test with external GLFW window", TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/", argv[2], "TestSDKExternalWindowGLFW"));
+  test("render test with external GLFW window",
+    TestSDKHelpers::RenderTest(
+      eng.getWindow(), std::string(argv[1]) + "baselines/", argv[2], "TestSDKExternalWindowGLFW"));
 
   glfwTerminate();
 

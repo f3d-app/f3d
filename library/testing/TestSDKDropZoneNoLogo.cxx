@@ -19,6 +19,8 @@ int TestSDKDropZoneNoLogo([[maybe_unused]] int argc, [[maybe_unused]] char* argv
 
   win.render();
 
-  test("Drop zone without a logo", TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKDropZoneNoLogo"));
+  test("Drop zone without a logo",
+    TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
+      std::string(argv[2]), "TestSDKDropZoneNoLogo"));
   return test.result();
 }

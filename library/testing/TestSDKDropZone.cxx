@@ -19,6 +19,8 @@ int TestSDKDropZone([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   opt.ui.drop_zone.custom_binds = "None+Drop Ctrl+O None+H";
   win.render();
 
-  test("Render Drop Zone", TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKDropZone"));
+  test("Render Drop Zone",
+    TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
+      std::string(argv[2]), "TestSDKDropZone"));
   return test.result();
 }

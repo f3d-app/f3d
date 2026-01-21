@@ -21,15 +21,21 @@ int TestSDKDynamicLightIntensity([[maybe_unused]] int argc, [[maybe_unused]] cha
   win.render();
 
   // Check render with default light intensity
-  test("render with default light intensity", TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKDynamicLightIntensity-default"));
+  test("render with default light intensity",
+    TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
+      std::string(argv[2]), "TestSDKDynamicLightIntensity-default"));
 
   // set light intensity to 5x brighter
   opt.render.light.intensity = 5.;
-  test("render with light intensity of 5", TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKDynamicLightIntensity-5x-brighter"));
+  test("render with light intensity of 5",
+    TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
+      std::string(argv[2]), "TestSDKDynamicLightIntensity-5x-brighter"));
 
   // set light intensity to 5x darker
   opt.render.light.intensity = .2;
-  test("render with light intensity of .2", TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKDynamicLightIntensity-5x-darker"));
+  test("render with light intensity of .2",
+    TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
+      std::string(argv[2]), "TestSDKDynamicLightIntensity-5x-darker"));
 
   return test.result();
 }

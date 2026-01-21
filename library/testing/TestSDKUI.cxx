@@ -1,5 +1,5 @@
-#include "TestSDKHelpers.h"
 #include "PseudoUnitTest.h"
+#include "TestSDKHelpers.h"
 
 #include <engine.h>
 #include <options.h>
@@ -31,7 +31,9 @@ int TestSDKUI([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   win.render();
 
-  test("render with animation progress bar", TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKUIAnimationProgressColor"));
+  test("render with animation progress bar",
+    TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
+      "TestSDKUIAnimationProgressColor"));
 
   return test.result();
 }

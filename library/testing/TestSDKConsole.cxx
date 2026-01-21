@@ -22,6 +22,8 @@ int TestSDKConsole([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   f3d::window& win = eng.getWindow();
   win.setSize(300, 300);
 
-  test("Render text in console", TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKConsole"));
+  test("Render text in console",
+    TestSDKHelpers::RenderTest(
+      win, std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKConsole"));
   return test.result();
 }

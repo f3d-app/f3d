@@ -73,7 +73,9 @@ int TestSDKExternalWindowWGL([[maybe_unused]] int argc, [[maybe_unused]] char* a
   engine->getWindow().setSize(size[0], size[1]);
   engine->getScene().add(std::string(argv[1]) + "/data/cow.vtp");
 
-  test("render with external WGL window", TestSDKHelpers::RenderTest(engine->getWindow(), std::string(argv[1]) + "baselines/", argv[2], "TestSDKExternalWindowWGL"));
+  test("render with external WGL window",
+    TestSDKHelpers::RenderTest(engine->getWindow(), std::string(argv[1]) + "baselines/", argv[2],
+      "TestSDKExternalWindowWGL"));
 
   // Disable the RC and delete it
   wglMakeCurrent(nullptr, nullptr);
