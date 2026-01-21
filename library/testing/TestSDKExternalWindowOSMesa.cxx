@@ -1,6 +1,7 @@
-#include "engine.h"
-
+#include "PseudoUnitTest.h"
 #include "TestSDKHelpers.h"
+
+#include "engine.h"
 
 #include <GL/osmesa.h>
 
@@ -27,17 +28,14 @@ int TestSDKExternalWindowOSMesa([[maybe_unused]] int argc, [[maybe_unused]] char
     return EXIT_FAILURE;
   }
 
+  PseudoUnitTest test;
+
   f3d::engine eng = f3d::engine::createExternalOSMesa();
   eng.getWindow().setSize(size[0], size[1]);
   eng.getScene().add(std::string(argv[1]) + "/data/cow.vtp");
 
-  if (!TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/", argv[2],
-        "TestSDKExternalWindowOSMesa"))
-  {
-    OSMesaDestroyContext(ctx);
-    return EXIT_FAILURE;
-  }
+  test("render test with external OSMesa window", TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/", argv[2], "TestSDKExternalWindowOSMesa"));
 
   OSMesaDestroyContext(ctx);
-  return EXIT_SUCCESS;
+  return test.result();
 }

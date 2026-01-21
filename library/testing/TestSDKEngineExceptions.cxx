@@ -5,7 +5,6 @@
 #include <window.h>
 
 #include <filesystem>
-
 #include <cstdlib>
 
 namespace fs = std::filesystem;
