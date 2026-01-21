@@ -55,7 +55,7 @@ int TestSDKAnimation([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     std::vector<std::string>{ "unnamed_0" });
 
   auto keyframes = sce.getAnimationKeyFrames();
-  test("check keyframes size", keyframes.size(), 50);
+  test("check keyframes size", static_cast<int>(keyframes.size()), 50);
   test("check first keyframes", keyframes[0], 0.f);
   test("check last keyframes", keyframes[49], 4.f);
 
