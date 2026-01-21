@@ -1,13 +1,16 @@
+#include "TestSDKHelpers.h"
+#include "PseudoUnitTest.h"
+
 #include <engine.h>
 #include <options.h>
 #include <scene.h>
 #include <types.h>
 #include <window.h>
 
-#include "TestSDKHelpers.h"
-
 int TestSDKUI([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
+  PseudoUnitTest test;
+
   f3d::engine eng = f3d::engine::create(true);
 
   f3d::window& win = eng.getWindow();
@@ -28,12 +31,7 @@ int TestSDKUI([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   win.render();
 
-  if (!TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]),
-        "TestSDKUIAnimationProgressColor"))
-  {
-    std::cerr << "Animation progress color failure";
-    return EXIT_FAILURE;
-  }
+  test("render with animation progress bar", TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKUIAnimationProgressColor"));
 
-  return EXIT_SUCCESS;
+  return test.result();
 }
