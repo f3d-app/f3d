@@ -162,7 +162,7 @@ runs:
       run: |
         lcov --base-directory . --directory . -c -o coverage.info --gcov-tool /usr/bin/gcov
         lcov --remove coverage.info "*/external/*" -o coverage.info
-        lcov --remove coverage.info "*/vtkext*Tests*/" -o coverage.info
+        lcov --remove coverage.info "TestF3D" -o coverage.info
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v5
