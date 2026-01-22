@@ -4,6 +4,7 @@
 #include <image.h>
 #include <window.h>
 
+#include <cmath>
 #include <fstream>
 #include <iostream>
 
@@ -68,5 +69,19 @@ constexpr double Degrees2Radians(double degrees)
   return (3.14159265358979323846 * degrees / 180.0);
 }
 
+constexpr bool CompareDouble(double a, double b)
+{
+  return std::fabs(a - b) < 128 * std::numeric_limits<double>::epsilon();
+}
+
+constexpr bool CompareVec(const f3d::vector3_t& vec1, const f3d::vector3_t& vec2)
+{
+  return TestSDKHelpers::CompareDouble(vec1[0], vec2[0]) && TestSDKHelpers::CompareDouble(vec1[1], vec2[1]) && TestSDKHelpers::CompareDouble(vec1[2], vec2[2]);
+}
+
+constexpr bool ComparePoint(const f3d::point3_t& vec1, const f3d::point3_t& vec2)
+{
+  return TestSDKHelpers::CompareDouble(vec1[0], vec2[0]) && TestSDKHelpers::CompareDouble(vec1[1], vec2[1]) && TestSDKHelpers::CompareDouble(vec1[2], vec2[2]);
+}
 }
 #endif
