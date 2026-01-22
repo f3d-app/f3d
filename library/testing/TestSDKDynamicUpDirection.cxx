@@ -50,7 +50,8 @@ int TestSDKDynamicUpDirection([[maybe_unused]] int argc, [[maybe_unused]] char* 
   opt.scene.up_direction = { 0, 1, 0 };
   win.render();
   newUp = cam.getViewUp();
-  test("setting same direction doesn't change anything", TestSDKHelpers::CompareVec(newUp, { 0, 1, 0 }));
+  test("setting same direction doesn't change anything",
+    TestSDKHelpers::CompareVec(newUp, { 0, 1, 0 }));
 
   return test.result();
 }

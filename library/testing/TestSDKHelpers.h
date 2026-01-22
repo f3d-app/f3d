@@ -76,12 +76,16 @@ constexpr bool CompareDouble(double a, double b)
 
 constexpr bool CompareVec(const f3d::vector3_t& vec1, const f3d::vector3_t& vec2)
 {
-  return TestSDKHelpers::CompareDouble(vec1[0], vec2[0]) && TestSDKHelpers::CompareDouble(vec1[1], vec2[1]) && TestSDKHelpers::CompareDouble(vec1[2], vec2[2]);
+  return TestSDKHelpers::CompareDouble(vec1[0], vec2[0]) &&
+    TestSDKHelpers::CompareDouble(vec1[1], vec2[1]) &&
+    TestSDKHelpers::CompareDouble(vec1[2], vec2[2]);
 }
 
 constexpr bool ComparePoint(const f3d::point3_t& vec1, const f3d::point3_t& vec2)
 {
-  return TestSDKHelpers::CompareDouble(vec1[0], vec2[0]) && TestSDKHelpers::CompareDouble(vec1[1], vec2[1]) && TestSDKHelpers::CompareDouble(vec1[2], vec2[2]);
+  return TestSDKHelpers::CompareDouble(vec1[0], vec2[0]) &&
+    TestSDKHelpers::CompareDouble(vec1[1], vec2[1]) &&
+    TestSDKHelpers::CompareDouble(vec1[2], vec2[2]);
 }
 }
 #endif

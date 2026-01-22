@@ -58,7 +58,8 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   test("add with multiples file strings", [&]() { sce.add({ sphere1, world }); });
 
   // render test
-  test("render after add", TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", argv[2], "TestSDKScene"));
+  test("render after add",
+    TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", argv[2], "TestSDKScene"));
 
   // light test
   f3d::light_state_t defaultLight;
@@ -98,7 +99,9 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     return sce.getLightCount() == 1;
   });
 
-  test("render after light", TestSDKHelpers::RenderTest(win, std::string(argv[1]) + "baselines/", argv[2], "TestSDKSceneRedLight"));
+  test("render after light",
+    TestSDKHelpers::RenderTest(
+      win, std::string(argv[1]) + "baselines/", argv[2], "TestSDKSceneRedLight"));
 
   return test.result();
 }
