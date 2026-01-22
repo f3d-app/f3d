@@ -148,12 +148,7 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   // XXX: PseudoUnitTest could be improved for native image testing
   f3d::image baseline(testingDir + "/baselines/TestSDKImage.png");
-  if (generated != baseline)
-  {
-    std::cerr << "Generated image is different from the png baseline: "
-              << generated.compare(baseline) << "\n";
-    return EXIT_FAILURE;
-  }
+  test("check generated image is the same as png baseline", generated == baseline);
 
   // XXX: enable following code once https://github.com/f3d-app/f3d/issues/1558 is fixed
   /*
@@ -176,12 +171,7 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   test("check generated short image not empty", generated16.getContent() != nullptr);
 
   f3d::image baseline16(testingDir + "/baselines/TestSDKImage16.png");
-  if (generated16 != baseline16)
-  {
-    std::cerr << "generated short image is different from the baseline: "
-              << generated16.compare(baseline16) << "\n";
-    return EXIT_FAILURE;
-  }
+  test("check generated short image is the same as png baseline", generated16 == baseline16);
 
   // XXX: enable following code once https://github.com/f3d-app/f3d/issues/1558 is fixed
   /*
@@ -204,13 +194,7 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   test("check generated float image channel type",
     generated32.getChannelType() == f3d::image::ChannelType::FLOAT);
   test("check generated float image not empty", generated32.getContent() != nullptr);
-
-  if (generated32 != baseline32)
-  {
-    std::cerr << "generated float image is different from the baseline: "
-              << generated32.compare(baseline32) << "\n";
-    return EXIT_FAILURE;
-  }
+  test("check generated float image is the same as png baseline", generated32 == baseline32);
 #endif // F3D_SSIM_COMPARE
 
   // test operators
