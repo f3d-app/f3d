@@ -47,8 +47,7 @@ QQuickFramebufferObject::Renderer* F3DView::createRenderer() const
 //----------------------------------------------------------------------------
 void F3DView::releaseResources()
 {
-  // delete this->_renderer;
-  // this->_renderer = nullptr;
+  QQuickFramebufferObject::releaseResources();
 }
 
 //----------------------------------------------------------------------------
