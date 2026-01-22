@@ -11,12 +11,12 @@ int TestSDKDynamicLightIntensity([[maybe_unused]] int argc, [[maybe_unused]] cha
   PseudoUnitTest test;
 
   f3d::engine eng = f3d::engine::create(true);
-  f3d::scene& Scene = eng.getScene();
+  f3d::scene& scene = eng.getScene();
   f3d::window& win = eng.getWindow();
   f3d::options& opt = eng.getOptions();
   win.setSize(300, 300);
 
-  Scene.add(std::string(argv[1]) + "/data/cow.vtp");
+  scene.add(std::string(argv[1]) + "/data/cow.vtp");
 
   win.render();
 
