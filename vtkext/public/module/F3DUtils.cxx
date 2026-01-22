@@ -61,8 +61,8 @@ int F3DUtils::ParseToInt(const std::string& str, int def, const std::string& nam
 //----------------------------------------------------------------------------
 double F3DUtils::getDPIScale()
 {
-  unsigned int dpi = 96;
   constexpr int baseDPI = 96;
+  unsigned int dpi = baseDPI;
 
 #ifdef _WIN32
   dpi = GetDeviceCaps(wglGetCurrentDC(), LOGPIXELSY);

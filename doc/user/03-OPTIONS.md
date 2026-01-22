@@ -213,7 +213,7 @@ Scale fonts. Useful for HiDPI displays.
 
 ### `--dpi-aware` (_bool_, default: `false`)
 
-Scale the _font scale_ by the display scaling factor.
+Scale the _font scale_ and _resolution_ by the display scaling factor.
 Only supported on Windows platform.
 
 ### `--command-script=<command script>` (_script_)
