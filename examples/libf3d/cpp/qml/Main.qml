@@ -18,7 +18,8 @@ Window
 
         enableMouse: true
         enableKeyboard: true
-        modelPath:  "C:/Path/to/Your/File/BrainStem.glb"
+        // Note: Do not use url (file:///c:/your/file.qsb) but ordinary file paths (c:/your/file.qsb)
+        modelPath: fileArgument
 
         Component.onCompleted:
         {
@@ -28,9 +29,4 @@ Window
             setOption("ui.filename", true);
         }
     }
-
-
-
-
-
 }
