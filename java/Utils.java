@@ -121,4 +121,13 @@ public class Utils {
      * @return folder path, or null on non-Windows platforms or error
      */
     public static native String getKnownFolder(KnownFolder knownFolder);
+
+    /**
+    * Calculate the primary monitor system zoom scale base on DPI.
+    * 
+    * Only supported on Windows platform.
+    * 
+    * @return DPI scale in double, or 1.0 on other platforms.
+    */
+    public static native double getDPIScale();
 }

@@ -211,6 +211,11 @@ Can be useful to display non-ASCII filenames.
 
 Scale fonts. Useful for HiDPI displays.
 
+### `--dpi-aware` (_bool_, default: `false`)
+
+Scale the _font scale_ and _resolution_ by the display scaling factor.
+Only supported on Windows platform.
+
 ### `--command-script=<command script>` (_script_)
 
 Provide a script file containing a list of [commands](07-COMMANDS.md) to be executed sequentially.

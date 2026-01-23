@@ -286,6 +286,10 @@
     },
     "animation_progress_color": {
       "type": "color"
+    },
+    "dpi_aware": {
+      "type": "bool",
+      "default_value": "false"
     }
   },
   "model": {
