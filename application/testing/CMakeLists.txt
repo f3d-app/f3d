@@ -26,6 +26,11 @@ if(F3D_PLUGIN_BUILD_HDF)
   include(tests.hdf.cmake)
 endif()
 
+if(F3D_PLUGIN_BUILD_IFC)
+  f3d_test(NAME TestIFC DATA ifc/IfcOpenHouse.ifc ARGS --load-plugins=ifc)
+  f3d_test(NAME TestIFCDefines DATA ifc/IfcOpenHouse.ifc ARGS --load-plugins=ifc -DIFC.circle_segments=24 -DIFC.read_openings=0 -DIFC.read_spaces=0)
+endif()
+
 if(F3D_PLUGIN_BUILD_OCCT)
   include(tests.occt.cmake)
 endif()
