@@ -12,11 +12,6 @@
 
 namespace
 {
-bool fuzzy_comp(double a, double b)
-{
-  return std::fabs(a - b) < 128 * std::numeric_limits<double>::epsilon();
-}
-
 template<typename T>
 struct is_container : std::false_type
 {
@@ -99,14 +94,19 @@ public:
   template<typename T>
   void fuzzyCompare(const std::string& label, const T& actual, const T& expected)
   {
+    auto fuzzyComp = [](double a, double b)
+    {
+      return std::fabs(a - b) < 128 * std::numeric_limits<double>::epsilon();
+    };
+
     bool success;
     if constexpr (is_container<T>::value)
     {
-      success = std::equal(actual.begin(), actual.end(), expected.begin(), fuzzy_comp);
+      success = std::equal(actual.begin(), actual.end(), expected.begin(), fuzzyComp);
     }
     else
     {
-      success = fuzzy_comp(actual, expected);
+      success = fuzzyComp(actual, expected);
     }
     this->record(success, label, this->comparisonMessage(actual, expected, success ? "==" : "!="));
   }
