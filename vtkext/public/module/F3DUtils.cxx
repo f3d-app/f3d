@@ -3,6 +3,10 @@
 #include <vtkObject.h>
 #include <vtkSetGet.h>
 
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
 #include <charconv>
 #include <stdexcept>
 
@@ -52,4 +56,22 @@ int F3DUtils::ParseToInt(const std::string& str, int def, const std::string& nam
     }
   }
   return value;
+}
+
+//----------------------------------------------------------------------------
+double F3DUtils::getDPIScale()
+{
+  constexpr int baseDPI = 96;
+  unsigned int dpi = baseDPI;
+
+#ifdef _WIN32
+  dpi = GetDeviceCaps(wglGetCurrentDC(), LOGPIXELSY);
+
+  if (dpi == 0)
+  {
+    vtkWarningWithObjectMacro(nullptr, "Fail to get DPI.");
+  }
+#endif
+
+  return static_cast<double>(dpi) / baseDPI;
 }

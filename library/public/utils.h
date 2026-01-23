@@ -92,6 +92,13 @@ public:
   [[nodiscard]] static std::string globToRegex(std::string_view glob, char pathSeparator = '/');
 
   /**
+   * Calculate the primary monitor system zoom scale base on DPI.
+   * Only supported on Windows platform.
+   * Return 1.0 on other platforms.
+   */
+  [[nodiscard]] static double getDPIScale();
+
+  /**
    * Get an environment variable value, returns std::nullopt if not set
    */
   [[nodiscard]] static std::optional<std::string> getEnv(const std::string& env);
