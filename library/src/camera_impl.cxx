@@ -7,7 +7,6 @@
 #include <vtkRenderer.h>
 #include <vtkVersion.h>
 
-
 namespace f3d::detail
 {
 class camera_impl::internals
@@ -145,7 +144,6 @@ double camera_impl::getWorldAzimuth() const
   double angleRad = vtkMath::SignedAngleBetweenVectors(right, horizontal.data(), up);
 
   return vtkMath::DegreesFromRadians(angleRad);
-
 }
 
 //----------------------------------------------------------------------------
@@ -153,6 +151,12 @@ double camera_impl::getWorldElevation() const
 {
   vector3_t view;
   this->getPositionToFocalVector(view);
+
+  static constexpr double EPS = 128 * std::numeric_limits<double>::epsilon();
+  if (vtkMath::Norm(view.data()) < EPS)
+  {
+    return 0.0;
+  }
   vtkMath::Normalize(view.data());
 
   vtkRenderer* ren = this->Internals->VTKRenderer;
