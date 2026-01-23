@@ -87,7 +87,7 @@ public:
     this->testFunction<E>(label, function);
   }
 
-  /** test the equality of two values with `==` */
+  /** test the equality of two values */
   template<typename T>
   void operator()(const std::string& label, const T& actual, const T& expected)
   {
@@ -95,7 +95,7 @@ public:
     this->record(success, label, this->comparisonMessage(actual, expected, success ? "==" : "!="));
   }
 
-  /** test the equality of two values with a comparator */
+  /** test the equality of two values with a fuzzy comparison */
   template<typename T>
   void fuzzyCompare(const std::string& label, const T& actual, const T& expected)
   {
