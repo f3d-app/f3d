@@ -3,7 +3,6 @@
 
 #include <engine.h>
 #include <export.h>
-#include <options.h>
 #include <scene.h>
 #include <window.h>
 
@@ -16,7 +15,6 @@ int TestTestSDKHelpers([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   f3d::engine eng = f3d::engine::create(true);
   f3d::scene& scene = eng.getScene();
   f3d::window& win = eng.getWindow();
-  f3d::options& opt = eng.getOptions();
   win.setSize(300, 300);
 
   scene.add(std::string(argv[1]) + "/data/cow.vtp");
