@@ -2,6 +2,7 @@
 
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
+#include <vtkFileResourceStream.h>
 #include <vtkFloatArray.h>
 #include <vtkInformation.h>
 #include <vtkNew.h>
@@ -9,7 +10,6 @@
 #include <vtkPointData.h>
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
-#include <vtkFileResourceStream.h>
 #include <vtkResourceStream.h>
 #include <vtkUnsignedCharArray.h>
 
@@ -175,7 +175,8 @@ int vtkF3DIFCReader::RequestData(
     uint32_t modelID = this->Internals->Manager.CreateModel(settings);
     webifc::parsing::IfcLoader* loader = this->Internals->Manager.GetIfcLoader(modelID);
 
-    loader->LoadFile([&content](char* dest, size_t sourceOffset, size_t destSize)
+    loader->LoadFile(
+      [&content](char* dest, size_t sourceOffset, size_t destSize)
       {
         if (sourceOffset >= content.size())
         {
@@ -218,12 +219,10 @@ int vtkF3DIFCReader::RequestData(
         }
 
         const auto& transform = placedGeom.flatTransformation;
-        std::array<unsigned char, 4> color = {
-          static_cast<unsigned char>(placedGeom.color.r * 255),
+        std::array<unsigned char, 4> color = { static_cast<unsigned char>(placedGeom.color.r * 255),
           static_cast<unsigned char>(placedGeom.color.g * 255),
           static_cast<unsigned char>(placedGeom.color.b * 255),
-          static_cast<unsigned char>(placedGeom.color.a * 255)
-        };
+          static_cast<unsigned char>(placedGeom.color.a * 255) };
 
         vtkIdType pointOffset = allPoints->GetNumberOfPoints();
         constexpr int vertexSize = 6;
@@ -246,17 +245,15 @@ int vtkF3DIFCReader::RequestData(
           double tnz = transform[2] * nx + transform[6] * ny + transform[10] * nz;
 
           allPoints->InsertNextPoint(tx, ty, tz);
-          normals->InsertNextTuple3(static_cast<float>(tnx), static_cast<float>(tny),
-            static_cast<float>(tnz));
+          normals->InsertNextTuple3(
+            static_cast<float>(tnx), static_cast<float>(tny), static_cast<float>(tnz));
         }
 
         for (size_t i = 0; i < indexData.size(); i += 3)
         {
-          vtkIdType pts[3] = {
-            static_cast<vtkIdType>(indexData[i]) + pointOffset,
+          vtkIdType pts[3] = { static_cast<vtkIdType>(indexData[i]) + pointOffset,
             static_cast<vtkIdType>(indexData[i + 1]) + pointOffset,
-            static_cast<vtkIdType>(indexData[i + 2]) + pointOffset
-          };
+            static_cast<vtkIdType>(indexData[i + 2]) + pointOffset };
           allPolys->InsertNextCell(3, pts);
           colors->InsertNextTypedTuple(color.data());
         }
@@ -277,7 +274,6 @@ int vtkF3DIFCReader::RequestData(
       {
         continue;
       }
-
 
       auto elements = loader->GetExpressIDsWithType(type);
       for (auto expressID : elements)

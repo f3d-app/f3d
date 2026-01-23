@@ -57,7 +57,7 @@ int TestF3DIFCReaderOptions(int vtkNotUsed(argc), char* argv[])
   reader->Print(oss);
   std::string printOutput = oss.str();
   if (printOutput.find("FileName") == std::string::npos ||
-      printOutput.find("CircleSegments") == std::string::npos)
+    printOutput.find("CircleSegments") == std::string::npos)
   {
     std::cerr << "PrintSelf output incomplete" << std::endl;
     return EXIT_FAILURE;
