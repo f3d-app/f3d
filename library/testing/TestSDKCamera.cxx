@@ -23,28 +23,27 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   // check coordinates conversion
   f3d::point3_t point = { 0.1, 0.1, 0.1 };
   f3d::point3_t pointDC = win.getDisplayFromWorld(point);
-  test("coordinates conversion", point, win.getWorldFromDisplay(pointDC),
-    TestSDKHelpers::ComparePoint);
+  test.fuzzyCompare("coordinates conversion", point, win.getWorldFromDisplay(pointDC));
 
   // Test position
   f3d::point3_t testPos = { 0., 0., 10. };
   f3d::point3_t pos = cam.setPosition(testPos).getPosition();
-  test("set/get position", pos, testPos, TestSDKHelpers::ComparePoint);
+  test("set/get position", pos, testPos);
 
   // Test focal point
   f3d::point3_t testFoc = { 0., 0., -1. };
   f3d::point3_t foc = cam.setFocalPoint(testFoc).getFocalPoint();
-  test("set/get focal point", foc, testFoc, TestSDKHelpers::ComparePoint);
+  test("set/get focal point", foc, testFoc);
 
   // Test view up
   f3d::vector3_t testUp = { 1., 0., 0. };
   f3d::vector3_t up = cam.setViewUp(testUp).getViewUp();
-  test("set/get view up", up, testUp, TestSDKHelpers::CompareVec);
+  test("set/get view up", up, testUp);
 
   // Test view angle
   f3d::angle_deg_t testAngle = 20;
   f3d::angle_deg_t angle = cam.setViewAngle(testAngle).getViewAngle();
-  test("set/get view angle", angle, testAngle, TestSDKHelpers::CompareDouble);
+  test("set/get view angle", angle, testAngle);
 
   // Test azimuth
   cam.azimuth(90);
@@ -54,9 +53,9 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   pos = cam.getPosition();
   foc = cam.getFocalPoint();
   up = cam.getViewUp();
-  test("azimuth method position", pos, expectedPos, TestSDKHelpers::ComparePoint);
-  test("azimuth method focal point", foc, expectedFoc, TestSDKHelpers::ComparePoint);
-  test("azimuth method up", up, expectedUp, TestSDKHelpers::CompareVec);
+  test.fuzzyCompare("azimuth method position", pos, expectedPos);
+  test.fuzzyCompare("azimuth method focal point", foc, expectedFoc);
+  test.fuzzyCompare("azimuth method up", up, expectedUp);
 
   // Test roll
   cam.roll(90);
@@ -64,9 +63,9 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   pos = cam.getPosition();
   foc = cam.getFocalPoint();
   up = cam.getViewUp();
-  test("roll method position", pos, expectedPos, TestSDKHelpers::ComparePoint);
-  test("roll method focal point", foc, expectedFoc, TestSDKHelpers::ComparePoint);
-  test("roll method up", up, expectedUp, TestSDKHelpers::CompareVec);
+  test.fuzzyCompare("roll method position", pos, expectedPos);
+  test.fuzzyCompare("roll method focal point", foc, expectedFoc);
+  test.fuzzyCompare("roll method up", up, expectedUp);
 
   // Test yaw
   cam.yaw(90);
@@ -74,9 +73,9 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   pos = cam.getPosition();
   foc = cam.getFocalPoint();
   up = cam.getViewUp();
-  test("yaw method position", pos, expectedPos, TestSDKHelpers::ComparePoint);
-  test("yaw method focal point", foc, expectedFoc, TestSDKHelpers::ComparePoint);
-  test("yaw method up", up, expectedUp, TestSDKHelpers::CompareVec);
+  test.fuzzyCompare("yaw method position", pos, expectedPos);
+  test.fuzzyCompare("yaw method focal point", foc, expectedFoc);
+  test.fuzzyCompare("yaw method up", up, expectedUp);
 
   // Test elevation
   cam.elevation(90);
@@ -85,9 +84,9 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   pos = cam.getPosition();
   foc = cam.getFocalPoint();
   up = cam.getViewUp();
-  test("elevation method position", pos, expectedPos, TestSDKHelpers::ComparePoint);
-  test("elevation method focal point", foc, expectedFoc, TestSDKHelpers::ComparePoint);
-  test("elevation method up", up, expectedUp, TestSDKHelpers::CompareVec);
+  test.fuzzyCompare("elevation method position", pos, expectedPos);
+  test.fuzzyCompare("elevation method focal point", foc, expectedFoc);
+  test.fuzzyCompare("elevation method up", up, expectedUp);
 
   // Test pitch
   cam.pitch(90);
@@ -96,9 +95,9 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   pos = cam.getPosition();
   foc = cam.getFocalPoint();
   up = cam.getViewUp();
-  test("pitch method position", pos, expectedPos, TestSDKHelpers::ComparePoint);
-  test("pitch method focal point", foc, expectedFoc, TestSDKHelpers::ComparePoint);
-  test("pitch method up", up, expectedUp, TestSDKHelpers::CompareVec);
+  test.fuzzyCompare("pitch method position", pos, expectedPos);
+  test.fuzzyCompare("pitch method focal point", foc, expectedFoc);
+  test.fuzzyCompare("pitch method up", up, expectedUp);
 
   // Test dolly
   cam.dolly(10);
@@ -106,27 +105,27 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   pos = cam.getPosition();
   foc = cam.getFocalPoint();
   up = cam.getViewUp();
-  test("dolly method position", pos, expectedPos, TestSDKHelpers::ComparePoint);
-  test("dolly method focal point", foc, expectedFoc, TestSDKHelpers::ComparePoint);
-  test("dolly method up", up, expectedUp, TestSDKHelpers::CompareVec);
+  test.fuzzyCompare("dolly method position", pos, expectedPos);
+  test.fuzzyCompare("dolly method focal point", foc, expectedFoc);
+  test.fuzzyCompare("dolly method up", up, expectedUp);
 
   cam.setPosition({ 1, 2, 3 });
   cam.setFocalPoint({ 1, 2, 13 });
   cam.setViewUp({ 0, 1, 0 });
   cam.pan(1, 2);
-  test("pos after pan", cam.getPosition(), f3d::point3_t{ 0, 4, 3 }, TestSDKHelpers::ComparePoint);
+  test("pos after pan", cam.getPosition(), f3d::point3_t{ 0, 4, 3 });
   test(
-    "foc after pan", cam.getFocalPoint(), f3d::point3_t{ 0, 4, 13 }, TestSDKHelpers::ComparePoint);
-  test("up after pan", cam.getViewUp(), f3d::vector3_t{ 0, 1, 0 }, TestSDKHelpers::CompareVec);
+    "foc after pan", cam.getFocalPoint(), f3d::point3_t{ 0, 4, 13 });
+  test("up after pan", cam.getViewUp(), f3d::vector3_t{ 0, 1, 0 });
 
   cam.setPosition({ 1, 2, 3 });
   cam.setFocalPoint({ 1, -2, 3 });
   cam.setViewUp({ 0, 0, 1 });
   cam.pan(3, 4, 5);
   test(
-    "pos after pan", cam.getPosition(), f3d::point3_t{ -2, -3, 7 }, TestSDKHelpers::ComparePoint);
+    "pos after pan", cam.getPosition(), f3d::point3_t{ -2, -3, 7 });
   test(
-    "foc after pan", cam.getFocalPoint(), f3d::point3_t{ -2, -7, 7 }, TestSDKHelpers::ComparePoint);
+    "foc after pan", cam.getFocalPoint(), f3d::point3_t{ -2, -7, 7 });
   test("up after pan", cam.getViewUp(), f3d::vector3_t{ 0, 0, 1 });
 
   cam.setPosition({ 1, 2, 3 });
@@ -134,51 +133,51 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   cam.setViewUp({ 0, 1, 0 });
   cam.setViewAngle(25);
   cam.zoom(1.5);
-  test("pos after zoom", cam.getPosition(), f3d::point3_t{ 1, 2, 3 }, TestSDKHelpers::ComparePoint);
+  test("pos after zoom", cam.getPosition(), f3d::point3_t{ 1, 2, 3 });
   test(
-    "foc after zoom", cam.getFocalPoint(), f3d::point3_t{ 1, 2, 13 }, TestSDKHelpers::ComparePoint);
-  test("up after zoom", cam.getViewUp(), f3d::vector3_t{ 0, 1, 0 }, TestSDKHelpers::CompareVec);
-  test("angle after zoom", cam.getViewAngle(), 25 / 1.5, TestSDKHelpers::CompareDouble);
+    "foc after zoom", cam.getFocalPoint(), f3d::point3_t{ 1, 2, 13 });
+  test("up after zoom", cam.getViewUp(), f3d::vector3_t{ 0, 1, 0 });
+  test("angle after zoom", cam.getViewAngle(), 25 / 1.5);
 
   cam.setPosition({ 1, 0, 0 });
   cam.setFocalPoint({ 0, 0, 0 });
   cam.setViewUp({ 1, 0, 0 });
   test("pos when cross product of pos->foc and up is 0 - test 1", cam.getPosition(),
-    f3d::point3_t{ 1, 0, 0 }, TestSDKHelpers::ComparePoint);
+    f3d::point3_t{ 1, 0, 0 });
   test("foc when cross product of pos->foc and up is 0 - test 1", cam.getFocalPoint(),
-    f3d::point3_t{ 0, 0, 0 }, TestSDKHelpers::ComparePoint);
+    f3d::point3_t{ 0, 0, 0 });
   test("up when cross product of pos->foc and up is 0 - test 1", cam.getViewUp(),
-    f3d::vector3_t{ 0, 1, 0 }, TestSDKHelpers::CompareVec);
+    f3d::vector3_t{ 0, 1, 0 });
 
   cam.setPosition({ 0, 1, 0 });
   cam.setFocalPoint({ 0, 0, 0 });
   cam.setViewUp({ 0, 1, 0 });
   test("pos when cross product of pos->foc and up is 0 - test 2", cam.getPosition(),
-    f3d::point3_t{ 0, 1, 0 }, TestSDKHelpers::ComparePoint);
+    f3d::point3_t{ 0, 1, 0 });
   test("foc when cross product of pos->foc and up is 0 - test 2", cam.getFocalPoint(),
-    f3d::point3_t{ 0, 0, 0 }, TestSDKHelpers::ComparePoint);
+    f3d::point3_t{ 0, 0, 0 });
   test("up when cross product of pos->foc and up is 0 - test 2", cam.getViewUp(),
-    f3d::vector3_t{ 1, 0, 0 }, TestSDKHelpers::CompareVec);
+    f3d::vector3_t{ 1, 0, 0 });
 
   cam.setPosition({ 0, 0, 1 });
   cam.setFocalPoint({ 0, 0, 0 });
   cam.setViewUp({ 0, 0, 1 });
   test("pos when cross product of pos->foc and up is 0 - test 3", cam.getPosition(),
-    f3d::point3_t{ 0, 0, 1 }, TestSDKHelpers::ComparePoint);
+    f3d::point3_t{ 0, 0, 1 });
   test("foc when cross product of pos->foc and up is 0 - test 3", cam.getFocalPoint(),
-    f3d::point3_t{ 0, 0, 0 }, TestSDKHelpers::ComparePoint);
+    f3d::point3_t{ 0, 0, 0 });
   test("up when cross product of pos->foc and up is 0 - test 3", cam.getViewUp(),
-    f3d::vector3_t{ 1, 0, 0 }, TestSDKHelpers::CompareVec);
+    f3d::vector3_t{ 1, 0, 0 });
 
   cam.setPosition({ 5, 0, 0 });
   cam.setFocalPoint({ 1, 0, 0 });
   cam.setViewUp({ 1, 0, 0 });
   test("pos when cross product of pos->foc and up is 0 - test 4", cam.getPosition(),
-    f3d::point3_t{ 5, 0, 0 }, TestSDKHelpers::ComparePoint);
+    f3d::point3_t{ 5, 0, 0 });
   test("foc when cross product of pos->foc and up is 0 - test 4", cam.getFocalPoint(),
-    f3d::point3_t{ 1, 0, 0 }, TestSDKHelpers::ComparePoint);
+    f3d::point3_t{ 1, 0, 0 });
   test("up when cross product of pos->foc and up is 0 - test 4", cam.getViewUp(),
-    f3d::vector3_t{ 0, 1, 0 }, TestSDKHelpers::CompareVec);
+    f3d::vector3_t{ 0, 1, 0 });
 
   return test.result();
 }
