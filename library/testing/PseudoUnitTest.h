@@ -82,16 +82,16 @@ public:
   }
 
   /** test the equality of two values with `==` */
-  template<typename T1, typename T2>
-  void operator()(const std::string& label, const T1& actual, const T2& expected)
+  template<typename T>
+  void operator()(const std::string& label, const T& actual, const T& expected)
   {
     const bool success = actual == expected;
     this->record(success, label, this->comparisonMessage(actual, expected, success ? "==" : "!="));
   }
 
   /** test the equality of two values with a comparator */
-  template<typename T1, typename T2, typename F>
-  void operator()(const std::string& label, const T1& actual, const T2& expected, F comparator)
+  template<typename T, typename F>
+  void operator()(const std::string& label, const T& actual, const T& expected, F comparator)
   {
     const bool success = comparator(actual, expected);
     this->record(success, label, this->comparisonMessage(actual, expected, success ? "~=" : "!="));
@@ -157,8 +157,8 @@ private:
   }
 
 protected:
-  template<typename T1, typename T2>
-  std::string comparisonMessage(const T1& actual, const T2& expected, const std::string& comp)
+  template<typename T>
+  std::string comparisonMessage(const T& actual, const T& expected, const std::string& comp)
   {
     const std::string actualStr = ::toString(actual);
     const std::string expectedStr = ::toString(expected);

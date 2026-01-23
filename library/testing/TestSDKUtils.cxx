@@ -91,32 +91,32 @@ int TestSDKUtils([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     f3d::utils::string_template("{greeting} {name}!")
       .substitute({ { "greeting", "hello" }, { "name", "World" } })
       .str(),
-    "hello World!");
+    std::string("hello World!"));
 
   test("string_template: partial substitution",
     f3d::utils::string_template("{greeting} {name}!").substitute({ { "greeting", "hello" } }).str(),
-    "hello {name}!");
+    std::string("hello {name}!"));
 
   test("string_template: multi-step substitution",
     f3d::utils::string_template("{greeting} {name}!")
       .substitute({ { "greeting", "hello" } })
       .substitute({ { "name", "World" } })
       .str(),
-    "hello World!");
+    std::string("hello World!"));
 
   test("string_template: escaped variable substitution",
     f3d::utils::string_template("{greeting} {{name}}!")
       .substitute({ { "greeting", "hello" } })
       .substitute({ { "name", "World" } })
       .str(),
-    "hello {name}!");
+    std::string("hello {name}!"));
 
   test("string_template: non-recursive substitution",
     f3d::utils::string_template("{greeting} {name}!")
       .substitute({ { "greeting", "hello" }, { "name", "{foo}" } })
       .substitute({ { "foo", "bar" } })
       .str(),
-    "hello {foo}!");
+    std::string("hello {foo}!"));
 
   test("string_template: has variable",
     f3d::utils::string_template("{foo}{bar}baz").hasVariable(std::regex("ba.")), true);
