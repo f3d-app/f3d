@@ -76,6 +76,39 @@ vtkMTimeType vtkF3DIFCReader::GetMTime()
   return mtime;
 }
 
+//----------------------------------------------------------------------------
+bool vtkF3DIFCReader::CanReadFile(const char* filename)
+{
+  vtkNew<vtkFileResourceStream> stream;
+  if (!stream->Open(filename))
+  {
+    return false;
+  }
+  return vtkF3DIFCReader::CanReadFile(stream);
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DIFCReader::CanReadFile(vtkResourceStream* stream)
+{
+  if (!stream)
+  {
+    return false;
+  }
+
+  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+
+  constexpr const char* ifcHeader = "ISO-10303-21;";
+  constexpr size_t headerLen = 13;
+  char buffer[headerLen] = {};
+
+  if (stream->Read(buffer, headerLen) != headerLen)
+  {
+    return false;
+  }
+
+  return std::strncmp(buffer, ifcHeader, headerLen) == 0;
+}
+
 namespace
 {
 //----------------------------------------------------------------------------
@@ -244,6 +277,7 @@ int vtkF3DIFCReader::RequestData(
       {
         continue;
       }
+
 
       auto elements = loader->GetExpressIDsWithType(type);
       for (auto expressID : elements)

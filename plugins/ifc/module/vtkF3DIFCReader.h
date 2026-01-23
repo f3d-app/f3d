@@ -72,6 +72,11 @@ public:
   vtkBooleanMacro(ReadSpaces, bool);
   ///@}
 
+  /**
+   * Check if the file can be read by this reader.
+   */
+  static bool CanReadFile(const char* filename);
+  static bool CanReadFile(vtkResourceStream* stream);
 
   /**
    * Overridden to take into account mtime from the internal vtkResourceStream.
