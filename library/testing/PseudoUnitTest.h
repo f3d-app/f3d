@@ -4,11 +4,11 @@
 #include "options.h"
 #include "types.h"
 
+#include <cmath>
 #include <functional>
 #include <iostream>
 #include <sstream>
 #include <type_traits>
-#include <cmath>
 
 namespace
 {

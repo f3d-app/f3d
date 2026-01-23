@@ -114,18 +114,15 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   cam.setViewUp({ 0, 1, 0 });
   cam.pan(1, 2);
   test("pos after pan", cam.getPosition(), f3d::point3_t{ 0, 4, 3 });
-  test(
-    "foc after pan", cam.getFocalPoint(), f3d::point3_t{ 0, 4, 13 });
+  test("foc after pan", cam.getFocalPoint(), f3d::point3_t{ 0, 4, 13 });
   test("up after pan", cam.getViewUp(), f3d::vector3_t{ 0, 1, 0 });
 
   cam.setPosition({ 1, 2, 3 });
   cam.setFocalPoint({ 1, -2, 3 });
   cam.setViewUp({ 0, 0, 1 });
   cam.pan(3, 4, 5);
-  test(
-    "pos after pan", cam.getPosition(), f3d::point3_t{ -2, -3, 7 });
-  test(
-    "foc after pan", cam.getFocalPoint(), f3d::point3_t{ -2, -7, 7 });
+  test("pos after pan", cam.getPosition(), f3d::point3_t{ -2, -3, 7 });
+  test("foc after pan", cam.getFocalPoint(), f3d::point3_t{ -2, -7, 7 });
   test("up after pan", cam.getViewUp(), f3d::vector3_t{ 0, 0, 1 });
 
   cam.setPosition({ 1, 2, 3 });
@@ -134,8 +131,7 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   cam.setViewAngle(25);
   cam.zoom(1.5);
   test("pos after zoom", cam.getPosition(), f3d::point3_t{ 1, 2, 3 });
-  test(
-    "foc after zoom", cam.getFocalPoint(), f3d::point3_t{ 1, 2, 13 });
+  test("foc after zoom", cam.getFocalPoint(), f3d::point3_t{ 1, 2, 13 });
   test("up after zoom", cam.getViewUp(), f3d::vector3_t{ 0, 1, 0 });
   test("angle after zoom", cam.getViewAngle(), 25 / 1.5);
 

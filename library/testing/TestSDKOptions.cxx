@@ -181,7 +181,8 @@ int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   // Test colormap_t
   opt.setAsString("model.scivis.colormap", "0,0,0,0,1,1,1,1");
-  test("setAsString colormap", opt.getAsString("model.scivis.colormap"), std::string("0,#000000,1,#ffffff"));
+  test("setAsString colormap", opt.getAsString("model.scivis.colormap"),
+    std::string("0,#000000,1,#ffffff"));
 
   opt.setAsString("model.scivis.colormap", "0,0,  0,0,  1,0,  1,1");
   test("setAsString spaces colormap",

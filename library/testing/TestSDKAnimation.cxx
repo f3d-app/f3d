@@ -13,7 +13,8 @@ int TestSDKAnimation([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   test("availableAnimations for empty scene", sce.availableAnimations() == 0);
 
-  test("getAnimationName returns for empty scene", sce.getAnimationName(), std::string("No animation"));
+  test("getAnimationName returns for empty scene", sce.getAnimationName(),
+    std::string("No animation"));
 
   test("getAnimationNames returns 0 len vec for empty scene", sce.getAnimationNames().size() == 0);
 
@@ -45,7 +46,8 @@ int TestSDKAnimation([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   test("getAnimationName returns name at index", sce.getAnimationName(0), std::string("unnamed_0"));
 
-  test("getAnimationName returns for out of range", sce.getAnimationName(9999), std::string("No animation"));
+  test("getAnimationName returns for out of range", sce.getAnimationName(9999),
+    std::string("No animation"));
 
   test("getAnimationName returns current name", sce.getAnimationName(), std::string("unnamed_0"));
 
