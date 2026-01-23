@@ -1,0 +1,13 @@
+[
+  {
+    "match-type": "glob",
+    "match": "*.ifc",
+    "options": {
+      "load-plugins": "ifc",
+      "scalar-coloring": true,
+      "coloring-array": "Colors",
+      "coloring-component": -2,
+      "coloring-by-cells": true
+    }
+  }
+]
