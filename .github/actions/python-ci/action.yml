@@ -145,6 +145,7 @@ runs:
         -DF3D_PLUGIN_BUILD_OCCT=ON;
         -DF3D_PLUGIN_BUILD_USD=ON;
         -DF3D_PLUGIN_BUILD_VDB=${{ runner.os == 'macOS' && 'OFF' || 'ON' }};
+        -DF3D_PLUGIN_BUILD_IFC=ON;
         -DF3D_MACOS_BUNDLE=OFF;
         -DF3D_MODULE_EXR=ON;
         -DF3D_MODULE_UI=ON;
