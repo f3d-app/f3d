@@ -94,8 +94,7 @@ public:
   template<typename T>
   void fuzzyCompare(const std::string& label, const T& actual, const T& expected)
   {
-    auto fuzzyComp = [](double a, double b)
-    {
+    auto fuzzyComp = [](double a, double b) {
       return std::fabs(a - b) < 128 * std::numeric_limits<double>::epsilon();
     };
 
