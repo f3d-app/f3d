@@ -37,6 +37,9 @@ inputs:
   webp_version:
     description: "webP version"
     required: true
+  webifc_version:
+    description: "Version of web-ifc to build"
+    required: false
   zlib_version:
     description: "Version of zlib to build"
     required: true
@@ -73,6 +76,7 @@ runs:
         openexr_version: ${{inputs.openexr_version}}
         tbb_version: ${{inputs.tbb_version}}
         webp_version: ${{inputs.webp_version}}
+        webifc_version: ${{inputs.webifc_version}}
         zlib_version: ${{inputs.zlib_version}}
         global_cache_index: ${{inputs.global_cache_index}}
 

@@ -1,0 +1,95 @@
+name: "Install web-ifc Dependency"
+description: "Install web-ifc Dependency using cache when possible"
+inputs:
+  cpu:
+    description: "CPU architecture to build for"
+    required: false
+    default: "x86_64"
+  version:
+    description: "Version of web-ifc to build"
+    required: true
+  global_cache_index:
+    description: "Global cache index"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check required inputs
+      shell: bash
+      run: |
+        [[ "${{ inputs.version }}" ]] || { echo "version input is empty" ; exit 1; }
+        [[ "${{ inputs.global_cache_index }}" ]] || { echo "global_cache_index input is empty" ; exit 1; }
+
+    - name: Cache web-ifc
+      id: cache-webifc
+      uses: actions/cache/restore@v4
+      with:
+        path: dependencies/webifc_install
+        key: webifc-${{inputs.version}}-${{runner.os}}-${{inputs.cpu}}-${{inputs.global_cache_index}}-0
+
+    - name: Checkout web-ifc
+      if: steps.cache-webifc.outputs.cache-hit != 'true'
+      uses: actions/checkout@v4
+      with:
+        repository: ThatOpen/engine_web-ifc
+        path: "./dependencies/webifc"
+        ref: ${{inputs.version}}
+
+    - name: Setup web-ifc
+      if: steps.cache-webifc.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir webifc_build
+        mkdir webifc_install
+
+    - name: Configure web-ifc
+      if: steps.cache-webifc.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/webifc_build
+      shell: bash
+      run: >
+        cmake ../webifc/src/cpp
+        -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+        ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
+        ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
+
+    - name: Build web-ifc
+      if: steps.cache-webifc.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies/webifc_build
+      shell: bash
+      run: cmake --build . --parallel 2 --target web-ifc-library --config Release
+
+    - name: Install web-ifc manually
+      if: steps.cache-webifc.outputs.cache-hit != 'true'
+      working-directory: ${{github.workspace}}/dependencies
+      shell: bash
+      run: |
+        mkdir -p webifc_install/lib webifc_install/include
+        # Copy library
+        cp webifc_build/libweb-ifc-library.a webifc_install/lib/ 2>/dev/null || cp webifc_build/Release/web-ifc-library.lib webifc_install/lib/ 2>/dev/null || true
+        # Copy web-ifc headers
+        cp -r webifc/src/cpp/web-ifc webifc_install/include/
+        # Copy dependency headers fetched by web-ifc
+        cp -r webifc_build/_deps/glm-src/glm webifc_install/include/
+        cp -r webifc_build/_deps/earcut-src/include/mapbox webifc_install/include/
+        cp -r webifc_build/_deps/tinynurbs-src/include/tinynurbs webifc_install/include/
+        cp -r webifc_build/_deps/fastfloat-src/include/fast_float webifc_install/include/
+        cp -r webifc_build/_deps/spdlog-src/include/spdlog webifc_install/include/
+        cp webifc_build/_deps/stduuid-src/include/uuid.h webifc_install/include/
+        # Copy CDT headers
+        cp webifc_build/_deps/cdt-src/CDT/include/*.h webifc_install/include/ 2>/dev/null || true
+        cp webifc_build/_deps/cdt-src/CDT/include/*.hpp webifc_install/include/ 2>/dev/null || true
+
+    - name: Copy to install
+      working-directory: ${{github.workspace}}/dependencies/webifc_install
+      shell: bash
+      run: cp -r ./* ../install/
+
+    - name: Save cache
+      if: steps.cache-webifc.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        key: ${{ steps.cache-webifc.outputs.cache-primary-key }}
+        path: dependencies/webifc_install
