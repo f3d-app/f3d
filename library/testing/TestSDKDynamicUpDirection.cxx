@@ -25,7 +25,7 @@ int TestSDKDynamicUpDirection([[maybe_unused]] int argc, [[maybe_unused]] char* 
 
   f3d::vector3_t initialUp = cam.getViewUp();
 
-  test("initial up direction is +Y", initialUp, approx(f3d::vector3_t({0, 1, 0})));
+  test("initial up direction is +Y", initialUp, approx(f3d::vector3_t({ 0, 1, 0 })));
 
   opt.scene.up_direction = { 0, 0, 1 };
 
@@ -50,7 +50,8 @@ int TestSDKDynamicUpDirection([[maybe_unused]] int argc, [[maybe_unused]] char* 
   opt.scene.up_direction = { 0, 1, 0 };
   win.render();
   newUp = cam.getViewUp();
-  test("setting same direction doesn't change anything", newUp, approx(f3d::vector3_t({ 0, 1, 0 })));
+  test(
+    "setting same direction doesn't change anything", newUp, approx(f3d::vector3_t({ 0, 1, 0 })));
 
   return test.result();
 }
