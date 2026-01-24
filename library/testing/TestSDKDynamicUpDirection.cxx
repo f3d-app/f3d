@@ -25,7 +25,7 @@ int TestSDKDynamicUpDirection([[maybe_unused]] int argc, [[maybe_unused]] char* 
 
   f3d::vector3_t initialUp = cam.getViewUp();
 
-  test.fuzzyCompare("initial up direction is +Y", initialUp, { 0, 1, 0 });
+  test("initial up direction is +Y", approx(initialUp), { 0, 1, 0 });
 
   opt.scene.up_direction = { 0, 0, 1 };
 
@@ -33,24 +33,24 @@ int TestSDKDynamicUpDirection([[maybe_unused]] int argc, [[maybe_unused]] char* 
 
   f3d::vector3_t newUp = cam.getViewUp();
 
-  test.fuzzyCompare("camera view up rotated to +Z", newUp, { 0, 0, 1 });
+  test("camera view up rotated to +Z", approx(newUp), { 0, 0, 1 });
 
   opt.scene.up_direction = { 1, 0, 0 };
   win.render();
 
   newUp = cam.getViewUp();
-  test.fuzzyCompare("camera view up rotated to +X", newUp, { 1, 0, 0 });
+  test("camera view up rotated to +X", approx(newUp), { 1, 0, 0 });
 
   opt.scene.up_direction = { 0, 1, 0 };
   win.render();
 
   newUp = cam.getViewUp();
-  test.fuzzyCompare("camera view up rotated back to +Y", newUp, { 0, 1, 0 });
+  test("camera view up rotated back to +Y", approx(newUp), { 0, 1, 0 });
 
   opt.scene.up_direction = { 0, 1, 0 };
   win.render();
   newUp = cam.getViewUp();
-  test.fuzzyCompare("setting same direction doesn't change anything", newUp, { 0, 1, 0 });
+  test("setting same direction doesn't change anything", approx(newUp), { 0, 1, 0 });
 
   return test.result();
 }

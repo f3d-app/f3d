@@ -82,22 +82,22 @@ int TestPseudoUnitTest([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   {
     InnerTest test;
-    test.fuzzyCompare("pass", 1, 1);
+    test("pass", 1, approx(1));
     metatest("pass with 1 almost 1", test.result() == EXIT_SUCCESS);
   }
   {
     InnerTest test;
-    test.fuzzyCompare("pass", 1.0, 1.0);
+    test("pass", 1.0, approx(1.0));
     metatest("pass with 1 almost 1.0", test.result() == EXIT_SUCCESS);
   }
   {
     InnerTest test;
-    test.fuzzyCompare("pass", 1.0, 1.0 + std::numeric_limits<double>::epsilon());
+    test("pass", 1.0, approx(1.0 + std::numeric_limits<double>::epsilon()));
     metatest("pass with 1 almost 1 + epsilon", test.result() == EXIT_SUCCESS);
   }
   {
     InnerTest test;
-    test.fuzzyCompare("fail", 1.0, 2.0001);
+    test("fail", 1.0, approx(2.0001));
     metatest("fail with 1 almost 2.0001", test.result() == EXIT_FAILURE);
   }
 

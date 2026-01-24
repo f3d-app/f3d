@@ -54,6 +54,33 @@ std::string toString(const T& value)
 }
 }
 
+template<typename T>
+class approx
+{
+public:
+  approx(const T value, double tol = 128 * std::numeric_limits<double>::epsilon())
+    : value(value)
+    , tol(tol)
+  {
+  }
+  bool operator==(const T& rhs) const
+  {
+    auto fuzzyComp = [this](double a, double b) { return std::fabs(a - b) < this->tol; };
+
+    if constexpr (is_container<T>::value)
+    {
+      return std::equal(this->value.begin(), this->value.end(), rhs.begin(), fuzzyComp);
+    }
+    else
+    {
+      return fuzzyComp(this->value, rhs);
+    }
+  }
+
+  const T value;
+  const double tol;
+};
+
 /** Helper to perform multiple checks within the same `ctest` test.
  * Checks are performed using the various overloads of `operator()`
  * and their results are logged and tracked so that the `result()` method
@@ -90,24 +117,22 @@ public:
     this->record(success, label, this->comparisonMessage(actual, expected, success ? "==" : "!="));
   }
 
-  /** test the equality of two values with a fuzzy comparison */
+  /** test the equality of two values with fuzzy comparison */
   template<typename T>
-  void fuzzyCompare(const std::string& label, const T& actual, const T& expected)
+  void operator()(const std::string& label, const approx<T>& actual_approx, const T& expected)
   {
-    auto fuzzyComp = [](double a, double b) {
-      return std::fabs(a - b) < 128 * std::numeric_limits<double>::epsilon();
-    };
+    const bool success = actual_approx == expected;
+    this->record(success, label,
+      this->comparisonMessage(actual_approx.value, expected, success ? "~=" : "!="));
+  }
 
-    bool success;
-    if constexpr (is_container<T>::value)
-    {
-      success = std::equal(actual.begin(), actual.end(), expected.begin(), fuzzyComp);
-    }
-    else
-    {
-      success = fuzzyComp(actual, expected);
-    }
-    this->record(success, label, this->comparisonMessage(actual, expected, success ? "==" : "!="));
+  /** test the equality of two values with fuzzy comparison */
+  template<typename T>
+  void operator()(const std::string& label, const T& actual, const approx<T>& expected_approx)
+  {
+    const bool success = expected_approx == actual;
+    this->record(success, label,
+      this->comparisonMessage(actual, expected_approx.value, success ? "~=" : "!="));
   }
 
   int result()

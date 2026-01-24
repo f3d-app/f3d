@@ -23,7 +23,7 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   // check coordinates conversion
   f3d::point3_t point = { 0.1, 0.1, 0.1 };
   f3d::point3_t pointDC = win.getDisplayFromWorld(point);
-  test.fuzzyCompare("coordinates conversion", point, win.getWorldFromDisplay(pointDC));
+  test("coordinates conversion", point, approx(win.getWorldFromDisplay(pointDC)));
 
   // Test position
   f3d::point3_t testPos = { 0., 0., 10. };
@@ -53,9 +53,9 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   pos = cam.getPosition();
   foc = cam.getFocalPoint();
   up = cam.getViewUp();
-  test.fuzzyCompare("azimuth method position", pos, expectedPos);
-  test.fuzzyCompare("azimuth method focal point", foc, expectedFoc);
-  test.fuzzyCompare("azimuth method up", up, expectedUp);
+  test("azimuth method position", pos, approx(expectedPos));
+  test("azimuth method focal point", foc, approx(expectedFoc));
+  test("azimuth method up", up, approx(expectedUp));
 
   // Test roll
   cam.roll(90);
@@ -63,9 +63,9 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   pos = cam.getPosition();
   foc = cam.getFocalPoint();
   up = cam.getViewUp();
-  test.fuzzyCompare("roll method position", pos, expectedPos);
-  test.fuzzyCompare("roll method focal point", foc, expectedFoc);
-  test.fuzzyCompare("roll method up", up, expectedUp);
+  test("roll method position", pos, approx(expectedPos));
+  test("roll method focal point", foc, approx(expectedFoc));
+  test("roll method up", up, approx(expectedUp));
 
   // Test yaw
   cam.yaw(90);
@@ -73,9 +73,9 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   pos = cam.getPosition();
   foc = cam.getFocalPoint();
   up = cam.getViewUp();
-  test.fuzzyCompare("yaw method position", pos, expectedPos);
-  test.fuzzyCompare("yaw method focal point", foc, expectedFoc);
-  test.fuzzyCompare("yaw method up", up, expectedUp);
+  test("yaw method position", pos, approx(expectedPos));
+  test("yaw method focal point", foc, approx(expectedFoc));
+  test("yaw method up", up, approx(expectedUp));
 
   // Test elevation
   cam.elevation(90);
@@ -84,9 +84,9 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   pos = cam.getPosition();
   foc = cam.getFocalPoint();
   up = cam.getViewUp();
-  test.fuzzyCompare("elevation method position", pos, expectedPos);
-  test.fuzzyCompare("elevation method focal point", foc, expectedFoc);
-  test.fuzzyCompare("elevation method up", up, expectedUp);
+  test("elevation method position", pos, approx(expectedPos));
+  test("elevation method focal point", foc, approx(expectedFoc));
+  test("elevation method up", up, approx(expectedUp));
 
   // Test pitch
   cam.pitch(90);
@@ -95,9 +95,9 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   pos = cam.getPosition();
   foc = cam.getFocalPoint();
   up = cam.getViewUp();
-  test.fuzzyCompare("pitch method position", pos, expectedPos);
-  test.fuzzyCompare("pitch method focal point", foc, expectedFoc);
-  test.fuzzyCompare("pitch method up", up, expectedUp);
+  test("pitch method position", pos, approx(expectedPos));
+  test("pitch method focal point", foc, approx(expectedFoc));
+  test("pitch method up", up, approx(expectedUp));
 
   // Test dolly
   cam.dolly(10);
@@ -105,9 +105,9 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   pos = cam.getPosition();
   foc = cam.getFocalPoint();
   up = cam.getViewUp();
-  test.fuzzyCompare("dolly method position", pos, expectedPos);
-  test.fuzzyCompare("dolly method focal point", foc, expectedFoc);
-  test.fuzzyCompare("dolly method up", up, expectedUp);
+  test("dolly method position", pos, approx(expectedPos));
+  test("dolly method focal point", foc, approx(expectedFoc));
+  test("dolly method up", up, approx(expectedUp));
 
   cam.setPosition({ 1, 2, 3 });
   cam.setFocalPoint({ 1, 2, 13 });
