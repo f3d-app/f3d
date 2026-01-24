@@ -116,7 +116,8 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 #if F3D_MODULE_EXR
   // check reading EXR
   f3d::image exrImg(testingDir + "/data/kloofendal_43d_clear_1k.exr");
-  test("check 32-bits EXR image channel type", exrImg.getChannelType() == f3d::image::ChannelType::FLOAT);
+  test("check 32-bits EXR image channel type",
+    exrImg.getChannelType() == f3d::image::ChannelType::FLOAT);
 #endif
 
 #if F3D_MODULE_WEBP
