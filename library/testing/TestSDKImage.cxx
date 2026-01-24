@@ -123,7 +123,7 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 #if F3D_MODULE_WEBP
   // check reading WebP
   f3d::image webpImg(testingDir + "/data/image.webp");
-  test("check width WebP image channel type", webpImg.getWidth(), 1024);
+  test("check width WebP image channel type", webpImg.getWidth(), 1024u);
 #endif
 
   // check reading invalid image
