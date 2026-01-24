@@ -68,16 +68,16 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   // test saveBuffer in different formats
   std::vector<unsigned char> bufferPNG = generated.saveBuffer();
-  test("generated buffer not empty", bufferPNG.size() != 0);
+  test("generated buffer not empty", bufferPNG.size() > 0);
 
   std::vector<unsigned char> bufferJPG = generated.saveBuffer(f3d::image::SaveFormat::JPG);
-  test("generated JPG buffer not empty", bufferJPG.size() != 0);
+  test("generated JPG buffer not empty", bufferJPG.size() > 0);
 
   test.expect<f3d::image::write_exception>("save incompatible buffer to TIF format",
     [&]() { std::ignore = generated.saveBuffer(f3d::image::SaveFormat::TIF); });
 
   std::vector<unsigned char> bufferBMP = generated.saveBuffer(f3d::image::SaveFormat::BMP);
-  test("generated BMP buffer not empty", bufferBMP.size() != 0);
+  test("generated BMP buffer not empty", bufferBMP.size() > 0);
 
   // test constructor with different channel sizes
   f3d::image img16(width, height, channels, f3d::image::ChannelType::SHORT);
@@ -104,26 +104,26 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   f3d::image shortImg(testingDir + "/data/16bit.png");
   test("check 16-bits image channel type",
     shortImg.getChannelType() == f3d::image::ChannelType::SHORT);
-  test("check 16-bits image channel type size", shortImg.getChannelTypeSize() == 2);
+  test("check 16-bits image channel type size", shortImg.getChannelTypeSize(), 2u);
 
   // check reading a 32-bits image
   f3d::image hdrImg(testingDir + "/data/palermo_park_1k.hdr");
   test("check 32-bits HDR image channel type",
     hdrImg.getChannelType() == f3d::image::ChannelType::FLOAT);
-  test("check 32-bits HDR image channel type size", hdrImg.getChannelTypeSize() == 4);
+  test("check 32-bits HDR image channel type size", hdrImg.getChannelTypeSize(), 4u);
   hdrImg.save(tmpDir + "/TestSDKImage32hdr.tif", f3d::image::SaveFormat::TIF);
 
 #if F3D_MODULE_EXR
   // check reading EXR
   f3d::image exrImg(testingDir + "/data/kloofendal_43d_clear_1k.exr");
   test("check 32-bits EXR image channel type",
-    exrImg.getChannelType() == f3d::image::ChannelType::FLOAT);
+    exrImg.getChannelType(), f3d::image::ChannelType::FLOAT);
 #endif
 
 #if F3D_MODULE_WEBP
   // check reading WebP
   f3d::image webpImg(testingDir + "/data/image.webp");
-  test("check width WebP image channel type", webpImg.getWidth() == 1024);
+  test("check width WebP image channel type", webpImg.getWidth(), 1024);
 #endif
 
   // check reading invalid image
@@ -139,9 +139,9 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     [&]() { f3d::image img("/" + std::string(257, 'x') + "/file.ext"); });
 
   // check generated image with baseline
-  test(
-    "check generated image size", generated.getWidth() == width && generated.getHeight() == height);
-  test("check generated image channel count", generated.getChannelCount() == channels);
+  test("check generated image width", generated.getWidth(), width);
+  test("check generated image height", generated.getHeight(), height);
+  test("check generated image channel count", generated.getChannelCount(), channels);
   test("check generated image channel type",
     generated.getChannelType() == f3d::image::ChannelType::BYTE);
   test("check generated image not empty", generated.getContent() != nullptr);
@@ -163,9 +163,9 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 // Remove this once VTK 9.3 support is removed
 #ifdef F3D_SSIM_COMPARE
   // check generated short image with baseline
-  test("check generated short image size",
-    generated16.getWidth() == width && generated16.getHeight() == height);
-  test("check generated short image channel count", generated16.getChannelCount() == channels);
+  test("check generated short image width", generated16.getWidth(), width);
+  test("check generated short image height",generated16.getHeight(), height);
+  test("check generated short image channel count", generated16.getChannelCount(), channels);
   test("check generated short image channel type",
     generated16.getChannelType() == f3d::image::ChannelType::SHORT);
   test("check generated short image not empty", generated16.getContent() != nullptr);
@@ -188,9 +188,9 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   // f3d::image baseline32(testingDir + "/baselines/TestSDKImage32.tif");
   f3d::image baseline32 = generated32;
 
-  test("check generated float image size",
-    generated32.getWidth() == width && generated32.getHeight() == height);
-  test("check generated float image channel count", generated32.getChannelCount() == channels);
+  test("check generated float image width", generated32.getWidth(), width);
+  test("check generated float image height", generated32.getHeight(), height);
+  test("check generated float image channel count", generated32.getChannelCount(), channels);
   test("check generated float image channel type",
     generated32.getChannelType() == f3d::image::ChannelType::FLOAT);
   test("check generated float image not empty", generated32.getContent() != nullptr);
@@ -226,10 +226,10 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     };
 
     test("toTerminalText with RGB image",
-      f3d::image(testingDir + "/data/toTerminalText-rgb.png").toTerminalText() ==
+      f3d::image(testingDir + "/data/toTerminalText-rgb.png").toTerminalText(),
         fileToString(testingDir + "/data/toTerminalText-rgb.txt"));
     test("toTerminalText with RGBA image",
-      f3d::image(testingDir + "/data/toTerminalText-rgba.png").toTerminalText() ==
+      f3d::image(testingDir + "/data/toTerminalText-rgba.png").toTerminalText(),
         fileToString(testingDir + "/data/toTerminalText-rgba.txt"));
   }
 
@@ -254,7 +254,7 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     });
 
     test(
-      "check all metata after removal", img.allMetadata() == std::vector<std::string>({ "hello" }));
+      "check all metata after removal", img.allMetadata(), std::vector<std::string>({ "hello" }));
     img.setMetadata("foo", ""); // make sure removing twice is ok
   }
 
@@ -285,16 +285,16 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   }
 
   // Test image::compare dedicated code paths
-  test("compare images with different channel types", generated.compare(generated16) == 1.);
+  test("compare images with different channel types", generated.compare(generated16), 1.);
 
   f3d::image generatedCount(width, height, channels + 1);
-  test("compare images with different channel count", generated.compare(generatedCount) == 1.);
+  test("compare images with different channel count", generated.compare(generatedCount), 1.);
 
   f3d::image generatedSize(width + 1, height, channels);
-  test("compare images with different size", generated.compare(generatedSize) == 1.);
+  test("compare images with different size", generated.compare(generatedSize), 1.);
 
   f3d::image empty(0, 0, 0);
-  test("compare empty images", empty.compare(empty) == 0.);
+  test("compare empty images", empty.compare(empty), 0.);
 
   return test.result();
 }

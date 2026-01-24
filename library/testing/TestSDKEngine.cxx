@@ -9,6 +9,8 @@
 
 #include <iostream>
 
+using namespace std::string_literals;
+
 int TestSDKEngine([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   PseudoUnitTest test;
@@ -52,14 +54,14 @@ int TestSDKEngine([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   opt.render.line_width = 1.7;
   eng0.setOptions(std::move(opt));
   test("set options value using f3d::engine::setOptions(options&& opt)",
-    eng0.getOptions().render.line_width == 1.7);
+    eng0.getOptions().render.line_width.value(), 1.7);
 
   // Test static information methods
   auto libInfo = f3d::engine::getLibInfo();
-  test("check libInfo output", libInfo.License == "BSD-3-Clause");
+  test("check libInfo output", libInfo.License, "BSD-3-Clause"s);
 
   auto readersInfo = f3d::engine::getReadersInfo();
-  test("check readersInfo output", readersInfo.size() != 0);
+  test("check readersInfo output", !readersInfo.empty());
 
   // coverage for getPluginList
   test("check getPluginsList for invalid configs",

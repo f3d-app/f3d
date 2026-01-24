@@ -10,6 +10,8 @@
 #include <iostream>
 #include <limits>
 
+using namespace std::string_literals;
+
 int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
   PseudoUnitTest test;
@@ -165,7 +167,7 @@ int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   // Test direction_t (rely on testing from color_t)
   opt.setAsString("scene.up_direction", "+X");
-  test("setAsString direction", opt.getAsString("scene.up_direction"), std::string("+X"));
+  test("setAsString direction", opt.getAsString("scene.up_direction"), "+X"s);
 
   f3d::direction_t dir({ 0.707, -0.707, 0 });
   test("direction x", dir.x() == 0.707);
@@ -174,7 +176,7 @@ int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   std::stringstream ssDir;
   ssDir << f3d::direction_t(0, 0, -1.0);
-  test("direction to string", ssDir.str(), std::string("-Z"));
+  test("direction to string", ssDir.str(), "-Z"s);
 
   test.expect<f3d::options::parsing_exception>("setAsString direction with incorrect size",
     [&]() { opt.setAsString("scene.up_direction", "0.1,0.2,0.3,0.4"); });
@@ -182,7 +184,7 @@ int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   // Test colormap_t
   opt.setAsString("model.scivis.colormap", "0,0,0,0,1,1,1,1");
   test("setAsString colormap", opt.getAsString("model.scivis.colormap"),
-    std::string("0,#000000,1,#ffffff"));
+    "0,#000000,1,#ffffff"s);
 
   opt.setAsString("model.scivis.colormap", "0,0,  0,0,  1,0,  1,1");
   test("setAsString spaces colormap",
@@ -199,15 +201,15 @@ int TestSDKOptions([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   // Test transform2d_t
   opt.setAsString("model.textures_transform", "1,0,0,0,-1,0,0,0,1");
   test("setAsString vector transform2d", opt.getAsString("model.textures_transform"),
-    std::string("1,0,0,0,-1,0,0,0,1"));
+    "1,0,0,0,-1,0,0,0,1"s);
 
   opt.setAsString("model.textures_transform", "scale:0.1");
   test("setAsString scale transform2d", opt.getAsString("model.textures_transform"),
-    std::string("0.1,0,0,0,0.1,0,0,0,1"));
+    "0.1,0,0,0,0.1,0,0,0,1"s);
 
   opt.setAsString("model.textures_transform", "translation:0.51,2.1");
   test("setAsString translation transform2d", opt.getAsString("model.textures_transform"),
-    std::string("1,0,0.51,0,1,2.1,0,0,1"));
+    "1,0,0.51,0,1,2.1,0,0,1"s);
 
   opt.model.textures_transform = { 0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5 };
   test("getAsString transform2d",
