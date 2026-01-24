@@ -92,7 +92,7 @@ int TestSDKInteractorCallBack([[maybe_unused]] int argc, [[maybe_unused]] char* 
     const std::string& path = filesVec[0];
     size_t found = path.find_last_of("/\\");
     sce.clear();
-    sce.add(path.substr(0, found + 1) + "suzanne.ply");
+    sce.add(path.substr(0, found + 1) + "f3d.vtp");
   });
 
   // Add a command and binding that throws an exception
