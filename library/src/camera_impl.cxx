@@ -1,11 +1,12 @@
 #include "camera_impl.h"
 
-#include <cmath>
 #include <vtkCamera.h>
 #include <vtkMatrix4x4.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
 #include <vtkVersion.h>
+
+#include <cmath>
 
 namespace f3d::detail
 {
