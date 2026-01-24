@@ -59,26 +59,26 @@ class approx
 {
 public:
   approx(const T value, double tol = 128 * std::numeric_limits<double>::epsilon())
-    : value(value)
-    , tol(tol)
+    : Value(value)
+    , Tol(tol)
   {
   }
   bool operator==(const T& rhs) const
   {
-    auto fuzzyComp = [this](double a, double b) { return std::fabs(a - b) < this->tol; };
+    auto fuzzyComp = [this](double a, double b) { return std::fabs(a - b) < this->Tol; };
 
     if constexpr (is_container<T>::value)
     {
-      return std::equal(this->value.begin(), this->value.end(), rhs.begin(), fuzzyComp);
+      return std::equal(this->Value.begin(), this->Value.end(), rhs.begin(), fuzzyComp);
     }
     else
     {
-      return fuzzyComp(this->value, rhs);
+      return fuzzyComp(this->Value, rhs);
     }
   }
 
-  const T value;
-  const double tol;
+  const T Value;
+  const double Tol;
 };
 
 /** Helper to perform multiple checks within the same `ctest` test.
@@ -119,20 +119,11 @@ public:
 
   /** test the equality of two values with fuzzy comparison */
   template<typename T>
-  void operator()(const std::string& label, const approx<T>& actual_approx, const T& expected)
-  {
-    const bool success = actual_approx == expected;
-    this->record(success, label,
-      this->comparisonMessage(actual_approx.value, expected, success ? "~=" : "!="));
-  }
-
-  /** test the equality of two values with fuzzy comparison */
-  template<typename T>
   void operator()(const std::string& label, const T& actual, const approx<T>& expected_approx)
   {
     const bool success = expected_approx == actual;
     this->record(success, label,
-      this->comparisonMessage(actual, expected_approx.value, success ? "~=" : "!="));
+      this->comparisonMessage(actual, expected_approx.Value, success ? "~=" : "!="));
   }
 
   int result()
