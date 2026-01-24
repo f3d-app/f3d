@@ -48,8 +48,7 @@ int TestSDKAnimation([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   test("getAnimationName returns name at index", sce.getAnimationName(0), "unnamed_0"s);
 
-  test("getAnimationName returns for out of range", sce.getAnimationName(9999),
-    "No animation"s);
+  test("getAnimationName returns for out of range", sce.getAnimationName(9999), "No animation"s);
 
   test("getAnimationName returns current name", sce.getAnimationName(), "unnamed_0"s);
 

@@ -116,8 +116,8 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 #if F3D_MODULE_EXR
   // check reading EXR
   f3d::image exrImg(testingDir + "/data/kloofendal_43d_clear_1k.exr");
-  test("check 32-bits EXR image channel type",
-    exrImg.getChannelType(), f3d::image::ChannelType::FLOAT);
+  test("check 32-bits EXR image channel type", exrImg.getChannelType(),
+    f3d::image::ChannelType::FLOAT);
 #endif
 
 #if F3D_MODULE_WEBP
@@ -164,7 +164,7 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 #ifdef F3D_SSIM_COMPARE
   // check generated short image with baseline
   test("check generated short image width", generated16.getWidth(), width);
-  test("check generated short image height",generated16.getHeight(), height);
+  test("check generated short image height", generated16.getHeight(), height);
   test("check generated short image channel count", generated16.getChannelCount(), channels);
   test("check generated short image channel type",
     generated16.getChannelType() == f3d::image::ChannelType::SHORT);
@@ -227,10 +227,10 @@ int TestSDKImage([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
     test("toTerminalText with RGB image",
       f3d::image(testingDir + "/data/toTerminalText-rgb.png").toTerminalText(),
-        fileToString(testingDir + "/data/toTerminalText-rgb.txt"));
+      fileToString(testingDir + "/data/toTerminalText-rgb.txt"));
     test("toTerminalText with RGBA image",
       f3d::image(testingDir + "/data/toTerminalText-rgba.png").toTerminalText(),
-        fileToString(testingDir + "/data/toTerminalText-rgba.txt"));
+      fileToString(testingDir + "/data/toTerminalText-rgba.txt"));
   }
 
   // test metadata

@@ -138,42 +138,30 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   cam.setPosition({ 1, 0, 0 });
   cam.setFocalPoint({ 0, 0, 0 });
   cam.setViewUp({ 1, 0, 0 });
-  test("pos when cross product of pos->foc and up is 0 - test 1", cam.getPosition(),
-    { 1, 0, 0 });
-  test("foc when cross product of pos->foc and up is 0 - test 1", cam.getFocalPoint(),
-    { 0, 0, 0 });
-  test("up when cross product of pos->foc and up is 0 - test 1", cam.getViewUp(),
-    { 0, 1, 0 });
+  test("pos when cross product of pos->foc and up is 0 - test 1", cam.getPosition(), { 1, 0, 0 });
+  test("foc when cross product of pos->foc and up is 0 - test 1", cam.getFocalPoint(), { 0, 0, 0 });
+  test("up when cross product of pos->foc and up is 0 - test 1", cam.getViewUp(), { 0, 1, 0 });
 
   cam.setPosition({ 0, 1, 0 });
   cam.setFocalPoint({ 0, 0, 0 });
   cam.setViewUp({ 0, 1, 0 });
-  test("pos when cross product of pos->foc and up is 0 - test 2", cam.getPosition(),
-    { 0, 1, 0 });
-  test("foc when cross product of pos->foc and up is 0 - test 2", cam.getFocalPoint(),
-    { 0, 0, 0 });
-  test("up when cross product of pos->foc and up is 0 - test 2", cam.getViewUp(),
-    { 1, 0, 0 });
+  test("pos when cross product of pos->foc and up is 0 - test 2", cam.getPosition(), { 0, 1, 0 });
+  test("foc when cross product of pos->foc and up is 0 - test 2", cam.getFocalPoint(), { 0, 0, 0 });
+  test("up when cross product of pos->foc and up is 0 - test 2", cam.getViewUp(), { 1, 0, 0 });
 
   cam.setPosition({ 0, 0, 1 });
   cam.setFocalPoint({ 0, 0, 0 });
   cam.setViewUp({ 0, 0, 1 });
-  test("pos when cross product of pos->foc and up is 0 - test 3", cam.getPosition(),
-    { 0, 0, 1 });
-  test("foc when cross product of pos->foc and up is 0 - test 3", cam.getFocalPoint(),
-    { 0, 0, 0 });
-  test("up when cross product of pos->foc and up is 0 - test 3", cam.getViewUp(),
-    { 1, 0, 0 });
+  test("pos when cross product of pos->foc and up is 0 - test 3", cam.getPosition(), { 0, 0, 1 });
+  test("foc when cross product of pos->foc and up is 0 - test 3", cam.getFocalPoint(), { 0, 0, 0 });
+  test("up when cross product of pos->foc and up is 0 - test 3", cam.getViewUp(), { 1, 0, 0 });
 
   cam.setPosition({ 5, 0, 0 });
   cam.setFocalPoint({ 1, 0, 0 });
   cam.setViewUp({ 1, 0, 0 });
-  test("pos when cross product of pos->foc and up is 0 - test 4", cam.getPosition(),
-    { 5, 0, 0 });
-  test("foc when cross product of pos->foc and up is 0 - test 4", cam.getFocalPoint(),
-    { 1, 0, 0 });
-  test("up when cross product of pos->foc and up is 0 - test 4", cam.getViewUp(),
-    { 0, 1, 0 });
+  test("pos when cross product of pos->foc and up is 0 - test 4", cam.getPosition(), { 5, 0, 0 });
+  test("foc when cross product of pos->foc and up is 0 - test 4", cam.getFocalPoint(), { 1, 0, 0 });
+  test("up when cross product of pos->foc and up is 0 - test 4", cam.getViewUp(), { 0, 1, 0 });
 
   return test.result();
 }
