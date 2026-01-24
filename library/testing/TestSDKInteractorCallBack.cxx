@@ -84,7 +84,7 @@ int TestSDKInteractorCallBack([[maybe_unused]] int argc, [[maybe_unused]] char* 
     { mod_t::CTRL_SHIFT, "B" }, { "set ui.filename true", "set render.show_edges true" });
 
   // Check ANY modifier
-  inter.addBinding({ mod_t::ANY, "A" }, "toggle render.background.skybox");
+  inter.addBinding({ mod_t::ANY, "A" }, "toggle ui.metadata");
 
   // Replace the add_files command
   inter.removeCommand("add_files");
