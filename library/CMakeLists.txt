@@ -6,7 +6,6 @@ set(F3D_VTK_MODULES
   VTK::CommonColor
   VTK::IOImage
   VTK::InteractionWidgets
-  f3d::vtkext
 )
 
 # Check modules
@@ -151,7 +150,7 @@ target_include_directories(libf3d
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
   )
 
-vtk_module_autoinit(TARGETS libf3d MODULES ${F3D_VTK_MODULES} f3d::vtkextPrivate)
+vtk_module_autoinit(TARGETS libf3d MODULES ${F3D_VTK_MODULES})
 
 # The initialize function pointer of the static plugins must be added to the map of static plugins
 # in the factory constructor. When loading a plugin, there's a lookup into this map.
@@ -174,7 +173,7 @@ list(TRANSFORM F3D_STATIC_PLUGIN_TARGETS PREPEND "f3d-plugin-")
 
 target_link_libraries(libf3d
   PUBLIC ${F3D_VTK_MODULES}
-  PRIVATE f3d::vtkextPrivate ${F3D_STATIC_PLUGIN_TARGETS})
+  PRIVATE f3d::vtkext f3d::vtkextPrivate ${F3D_STATIC_PLUGIN_TARGETS})
 
 target_compile_options(libf3d PUBLIC ${f3d_compile_options_public} PRIVATE ${f3d_compile_options_private})
 target_link_options(libf3d PUBLIC ${f3d_link_options_public})
