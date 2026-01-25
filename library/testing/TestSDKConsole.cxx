@@ -1,10 +1,13 @@
+#include "PseudoUnitTest.h"
+#include "TestSDKHelpers.h"
+
 #include <engine.h>
 #include <window.h>
 
-#include "TestSDKHelpers.h"
-
 int TestSDKConsole([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
+  PseudoUnitTest test;
+
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::INFO);
 
   // test warning with no color
@@ -19,8 +22,8 @@ int TestSDKConsole([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   f3d::window& win = eng.getWindow();
   win.setSize(300, 300);
 
-  return TestSDKHelpers::RenderTest(
-           win, std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKConsole")
-    ? EXIT_SUCCESS
-    : EXIT_FAILURE;
+  test("Render text in console",
+    TestSDKHelpers::RenderTest(
+      win, std::string(argv[1]) + "baselines/", std::string(argv[2]), "TestSDKConsole"));
+  return test.result();
 }

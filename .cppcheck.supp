@@ -15,15 +15,15 @@ unknownMacro
 *:external/imgui/*.cpp
 
 // generated files
-*:*vtkextTests.cxx
-*:*vtkextPrivateTests.cxx
-*:*vtkextNativeTests.cxx
-*:*VTKExtensionsPluginAlembic.cxx
-*:*VTKExtensionsPluginAssimp.cxx
-*:*vtkextDracoTests.cxx
-*:*vtkextOCCTTests.cxx
-*:*VTKExtensionsPluginUSD.cxx
 *:*libf3dSDKTests.cxx
+*:*vtkextAlembicTests.cxx
+*:*vtkextAssimpTests.cxx
+*:*vtkextDracoTests.cxx
+*:*vtkextNativeTests.cxx
+*:*vtkextOCCTTests.cxx
+*:*vtkextPrivateTests.cxx
+*:*vtkextTests.cxx
+*:*vtkextUSDTests.cxx
 
 // specific checks
 knownConditionTrueFalse:vtkext/private/module/vtkF3DPointSplatMapper.cxx
