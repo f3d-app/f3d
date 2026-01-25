@@ -58,8 +58,8 @@ template<typename T>
 class approx
 {
 public:
-  explicit approx(const T value, double tol = 128 * std::numeric_limits<double>::epsilon())
-    : Value(value)
+  explicit approx(T value, double tol = 128 * std::numeric_limits<double>::epsilon())
+    : Value(std::move(value))
     , Tol(tol)
   {
   }
