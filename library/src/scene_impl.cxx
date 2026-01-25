@@ -362,7 +362,7 @@ scene& scene_impl::add(std::byte* buffer, std::size_t size)
   }
 
   log::debug("\nLoading stream");
-  this->Internals->Load({ importer });
+  this->Internals->Load({ importer }, this);
   return *this;
 }
 
