@@ -16,7 +16,7 @@ int TestSDKAnimation([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   test("availableAnimations for empty scene", sce.availableAnimations() == 0);
 
   test("getAnimationName returns for empty scene", sce.getAnimationName(),
-    std::string("No animation"));
+    "No animation"s);
 
   test("getAnimationNames returns 0 len vec for empty scene", sce.getAnimationNames().size() == 0);
 
