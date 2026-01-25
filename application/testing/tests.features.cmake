@@ -125,6 +125,7 @@ f3d_test(NAME TestVolumeColoringArray DATA waveletArrays.vti ARGS -vb --coloring
 
 ## Normal Glyphs
 f3d_test(NAME TestNormalGlyphsEnable DATA suzanne.obj ARGS --normal-glyphs)
+f3d_test(NAME TestNormalGlyphsNoNormalsAvailable DATA cow.vtp ARGS --normal-glyphs)
 
 ## Textures
 f3d_test(NAME TestTextureNormal DATA WaterBottle.glb ARGS --texture-normal=${F3D_SOURCE_DIR}/testing/data/normal.png --normal-scale=0.1)
