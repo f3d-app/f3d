@@ -414,6 +414,7 @@ void vtkF3DImguiActor::RenderNode(NodeInfo* node)
       NodeVisibilityState[node->prop] = visible;
       node->prop->SetVisibility(visible ? 1 : 0);
       node->prop->Modified();
+      this->RequestRender();
     }
 
     ImGui::PopID();

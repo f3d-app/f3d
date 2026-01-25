@@ -488,6 +488,8 @@ public:
    */
   void SetUIDeltaTime(double time);
 
+  bool ConsumeUIRenderRequest();
+
   /**
    * Set console badge enabled status
    */
