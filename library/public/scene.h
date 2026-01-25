@@ -12,6 +12,8 @@
 #include <vector>
 /// @endcond
 
+#include "F3DNodeInfo.h"
+
 namespace f3d
 {
 /**

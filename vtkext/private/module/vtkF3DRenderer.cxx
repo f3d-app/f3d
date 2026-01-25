@@ -18,7 +18,7 @@
 #include "vtkF3DUserRenderPass.h"
 
 #if F3D_MODULE_UI
-#include "vtkF3DImguiActor.h"
+#include "vtkF3DUIActor.h"
 #endif
 
 #include <vtkAxesActor.h>
@@ -3057,26 +3057,6 @@ void vtkF3DRenderer::SetComponentForColoring(int component)
 }
 
 //----------------------------------------------------------------------------
-namespace
-{
-/**
- * Helper to get user-controlled visibility from actor's property keys
- * Returns the user-set visibility if available, otherwise returns defaultValue
- */
-bool GetUserVisibility(vtkProp* prop, bool defaultValue)
-{
-#if F3D_MODULE_UI
-  vtkInformation* info = prop->GetPropertyKeys();
-  if (info && info->Has(vtkF3DImguiActor::USER_VISIBILITY()))
-  {
-    return info->Get(vtkF3DImguiActor::USER_VISIBILITY()) != 0;
-  }
-#endif
-  return defaultValue;
-}
-}
-
-//----------------------------------------------------------------------------
 void vtkF3DRenderer::ConfigureColoring()
 {
   assert(this->Importer);
@@ -3114,16 +3094,13 @@ void vtkF3DRenderer::ConfigureColoring()
         }
       }
       
-      // Apply visibility, respecting user overrides
-      visible = GetUserVisibility(coloring.Actor, visible);
       coloring.Actor->SetVisibility(visible);
-      coloring.OriginalActor->SetVisibility(GetUserVisibility(coloring.OriginalActor, !visible));
+      coloring.OriginalActor->SetVisibility(!visible);
     }
     else
     {
-      // When geometries not visible, hide both unless user-controlled
-      coloring.Actor->SetVisibility(GetUserVisibility(coloring.Actor, false));
-      coloring.OriginalActor->SetVisibility(GetUserVisibility(coloring.OriginalActor, false));
+      coloring.Actor->SetVisibility(false);
+      coloring.OriginalActor->SetVisibility(false);
     }
   }
   if (geometriesVisible)
@@ -3650,8 +3627,3 @@ void vtkF3DRenderer::SetConsoleBadgeEnabled(bool enabled)
   this->UIActor->SetConsoleBadgeEnabled(enabled);
 }
 
-//----------------------------------------------------------------------------
-void vtkF3DRenderer::SetRenderRequestCallback(std::function<void()> callback)
-{
-  this->UIActor->SetRenderRequestCallback(std::move(callback));
-}

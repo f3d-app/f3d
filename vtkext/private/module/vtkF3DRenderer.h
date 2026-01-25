@@ -501,11 +501,6 @@ public:
    */
   void SetConsoleBadgeEnabled(bool enabled);
 
-  /**
-   * Set a callback to request a render safely from within the render loop
-   */
-  void SetRenderRequestCallback(std::function<void()> callback);
-
 private:
   vtkF3DRenderer();
   ~vtkF3DRenderer() override;

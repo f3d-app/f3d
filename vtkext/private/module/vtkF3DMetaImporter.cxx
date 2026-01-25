@@ -755,15 +755,15 @@ std::vector<NodeInfo> vtkF3DMetaImporter::GetActorHierarchy()
 {
   std::vector<NodeInfo> nodes;
 
-  // Get scene hierarchy for GLTF files (where names are stored)
+  // Get scene hierarchy from importers that support it
   vtkDataAssembly* hierarchy = this->GetSceneHierarchy();
   std::map<int, std::string> actorIndexNameMap;
   
-  // If we have a scene hierarchy (GLTF file), extract names from it
+  // If we have a scene hierarchy, extract names from it
   if (hierarchy)
   {
     // Build a map of actor indices to their names from the hierarchy
-    // Since GLTF doesn't store explicit actor_id attributes, we map leaf mesh nodes sequentially
+    // Map leaf mesh nodes sequentially to actor indices
     int meshCounter = 0;
     std::function<void(int)> traverseHierarchy = [&](int nodeId) {
       const char* nodeName = hierarchy->GetNodeName(nodeId);
@@ -806,10 +806,10 @@ std::vector<NodeInfo> vtkF3DMetaImporter::GetActorHierarchy()
     node.prop = actor;
 
     // Try to get a meaningful name for the actor
-    // Priority: DataAssembly (GLTF hierarchy) > Actor ObjectName > Mapper input name > Generic
+    // Priority: DataAssembly hierarchy > Actor ObjectName > Mapper input name > Generic
     std::string actorName;
 
-    // First, check if we have a name from the GLTF scene hierarchy
+    // First, check if we have a name from the scene hierarchy
     auto it = actorIndexNameMap.find(actorIndex);
     if (it != actorIndexNameMap.end())
     {

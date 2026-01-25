@@ -8,8 +8,6 @@
 #include "vtkF3DImguiVS.h"
 
 #include <vtkImageData.h>
-#include <vtkInformation.h>
-#include <vtkInformationIntegerKey.h>
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLBufferObject.h>
 #include <vtkOpenGLRenderWindow.h>
@@ -47,8 +45,6 @@
 #include <optional>
 #include <sstream>
 #include <string>
-
-vtkInformationKeyMacro(vtkF3DImguiActor, USER_VISIBILITY, Integer);
 
 namespace
 {
@@ -439,19 +435,6 @@ void vtkF3DImguiActor::RenderNode(NodeInfo* node)
       NodeVisibilityState[node->prop] = visible;
       node->prop->SetVisibility(visible ? 1 : 0);
       node->prop->Modified();
-
-      // Mark this prop as user-controlled
-      vtkInformation* info = node->prop->GetPropertyKeys();
-      if (!info)
-      {
-        info = vtkInformation::New();
-        node->prop->SetPropertyKeys(info);
-        info->Delete();
-      }
-      info->Set(vtkF3DImguiActor::USER_VISIBILITY(), visible ? 1 : 0);
-
-      // Request a render to update the scene
-      this->VisibilityChangedThisFrame = true;
     }
 
     ImGui::PopID();
@@ -1100,9 +1083,6 @@ void vtkF3DImguiActor::StartFrame(vtkOpenGLRenderWindow* renWin)
   io.DisplaySize = ImVec2(static_cast<float>(size[0]), static_cast<float>(size[1]));
 
   this->Pimpl->Initialize(renWin);
-  
-  // Reset the visibility change flag at the start of each frame
-  this->VisibilityChangedThisFrame = false;
 
   ImGui::NewFrame();
 }
@@ -1112,12 +1092,6 @@ void vtkF3DImguiActor::EndFrame(vtkOpenGLRenderWindow* renWin)
 {
   ImGui::Render();
   this->Pimpl->RenderDrawData(renWin, ImGui::GetDrawData());
-  
-  // If visibility changed, request a render to update the scene
-  if (this->VisibilityChangedThisFrame && this->RenderRequestCallback)
-  {
-    this->RenderRequestCallback();
-  }
 }
 
 

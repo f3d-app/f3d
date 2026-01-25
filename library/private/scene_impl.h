@@ -12,8 +12,6 @@
 #include "log.h"
 #include "scene.h"
 
-#include "F3DNodeInfo.h"
-
 #include <memory>
 
 namespace f3d

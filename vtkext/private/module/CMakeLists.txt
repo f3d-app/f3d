@@ -148,6 +148,10 @@ vtk_module_add_module(f3d::vtkextPrivate
   PRIVATE_HEADERS ${private_headers}
   )
 
+vtk_module_include(f3d::vtkextPrivate
+  PUBLIC
+    "${F3D_SOURCE_DIR}/library/public")
+
 if(MSVC)
   vtk_module_definitions(f3d::vtkextPrivate PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS _CRT_SECURE_NO_WARNINGS)
 endif()
