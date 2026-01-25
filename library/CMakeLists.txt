@@ -6,6 +6,8 @@ set(F3D_VTK_MODULES
   VTK::CommonColor
   VTK::IOImage
   VTK::InteractionWidgets
+  f3d::vtkext
+  f3d::vtkextPrivate
 )
 
 # Check modules
@@ -76,6 +78,7 @@ set(F3D_PUBLIC_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/public/context.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/engine.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/exception.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/public/F3DNodeInfo.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/image.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/interactor.h
   ${CMAKE_CURRENT_SOURCE_DIR}/public/log.h
@@ -171,9 +174,7 @@ configure_file(
 # libf3d links with the static plugins.
 list(TRANSFORM F3D_STATIC_PLUGIN_TARGETS PREPEND "f3d-plugin-")
 
-target_link_libraries(libf3d
-  PUBLIC ${F3D_VTK_MODULES}
-  PRIVATE f3d::vtkext f3d::vtkextPrivate ${F3D_STATIC_PLUGIN_TARGETS})
+target_link_libraries(libf3d PRIVATE ${F3D_VTK_MODULES} ${F3D_STATIC_PLUGIN_TARGETS})
 
 target_compile_options(libf3d PUBLIC ${f3d_compile_options_public} PRIVATE ${f3d_compile_options_private})
 target_link_options(libf3d PUBLIC ${f3d_link_options_public})
