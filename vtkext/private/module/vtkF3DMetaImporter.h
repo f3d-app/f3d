@@ -11,6 +11,7 @@
 
 #include <vtkActor.h>
 #include <vtkBoundingBox.h>
+#include <vtkDataAssembly.h>
 #include <vtkPointGaussianMapper.h>
 #include <vtkProperty.h>
 #include <vtkSmartVolumeMapper.h>
@@ -170,10 +171,10 @@ public:
   vtkMTimeType GetUpdateMTime();
 
   /**
-  * Returns the scene hierarchy if any of the importers is a GLTF importer.
-  * Returns nullptr if no GLTF importer was added.
+  * Returns the scene hierarchy if any of the importers supports it.
+  * Returns nullptr if no importer with hierarchy support was added.
   */
-  vtkDataAssembly* GetSceneHierarchy() override;
+  vtkDataAssembly* GetSceneHierarchy();
   std::vector<NodeInfo> GetActorHierarchy();
 
 private:

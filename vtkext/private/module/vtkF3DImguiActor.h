@@ -16,16 +16,11 @@
 class vtkOpenGLRenderWindow;
 class vtkWindow;
 
-class vtkInformationIntegerKey;
-
 class vtkF3DImguiActor : public vtkF3DUIActor
 {
 public:
   static vtkF3DImguiActor* New();
   vtkTypeMacro(vtkF3DImguiActor, vtkF3DUIActor);
-  
-  // Information key to track user-controlled visibility
-  static vtkInformationIntegerKey* USER_VISIBILITY();
 
   /**
    * Initialize the UI actor resources
@@ -52,9 +47,6 @@ private:
 
   // Track visibility state for each node
   std::unordered_map<vtkProp*, bool> NodeVisibilityState;
-
-  // Flag to trigger render when visibility changes
-  bool VisibilityChangedThisFrame = false;
 
   /**
    * Called at the beginning of the rendering step
