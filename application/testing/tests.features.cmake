@@ -369,7 +369,7 @@ if(F3D_MODULE_RAYTRACING)
     f3d_test(NAME TestRaytracingBackground DATA suzanne.ply ARGS -rd --raytracing-samples=4 --background-color=1,0,0 THRESHOLD 0.05) # Threshold needed because of difference in rendering in VTK 9.3
     f3d_test(NAME TestRaytracingPointCloud DATA pointsCloud.vtp ARGS -rd --raytracing-samples=4 --point-size=20 THRESHOLD 0.1) # Threshold needed because of difference in rendering in VTK 9.3
     f3d_test(NAME TestRaytracingDenoise DATA suzanne.ply ARGS -rd --raytracing-samples=4)
-    f3d_test(NAME TestRaytracingNoDenoise DATA suzanne.ply ARGS -r --raytracing-samples=20)
+    f3d_test(NAME TestRaytracingNoDenoise DATA suzanne.stl ARGS -r --raytracing-samples=20)
     f3d_test(NAME TestVersionRaytracing ARGS --version REGEXP "Module Raytracing: ON")
     f3d_test(NAME TestInteractionRaytracingDenoise DATA suzanne.ply ARGS --raytracing-samples=4 INTERACTION) #RD
     f3d_test(NAME TestRaytracingScalarBar DATA dragon.vtu ARGS -rsbd --raytracing-samples=4 THRESHOLD 0.06) # Threshold needed because of difference in rendering in VTK 9.3 on macOS
