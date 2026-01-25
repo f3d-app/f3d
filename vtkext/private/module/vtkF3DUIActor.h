@@ -199,6 +199,9 @@ public:
   {
   }
 
+  void RequestRender();
+  bool ConsumeRenderRequest();
+
 protected:
   vtkF3DUIActor();
   ~vtkF3DUIActor() override;
@@ -334,6 +337,7 @@ private:
   void operator=(const vtkF3DUIActor&) = delete;
 
   bool Initialized = false;
+  bool RenderRequested = false;
 };
 
 #endif
