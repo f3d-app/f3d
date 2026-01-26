@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
   }
   QString fileArg(argv[1]);
 
-  qInfo()<<"F3D requires OpenGL backend";
+  // F3D requires OpenGL backend!
   QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
 
   QQmlApplicationEngine engine;

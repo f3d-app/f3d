@@ -18,8 +18,8 @@ set(SOURCES
   F3DView.h
 )
 
-qt_add_executable(${PROJECT_NAME} ${SOURCES} )
-qt_add_qml_module(${PROJECT_NAME}
+qt6_add_executable(${PROJECT_NAME} ${SOURCES} )
+qt6_add_qml_module(${PROJECT_NAME}
     URI F3D
     QML_FILES
         Main.qml
