@@ -36,6 +36,7 @@ public:
 
   /**
    * Specify stream to read from
+   * Only Ogawa version of alembic format is supported.
    * When both `Stream` and `Filename` are set, stream is used.
    */
   void SetStream(vtkResourceStream* stream);
@@ -44,6 +45,14 @@ public:
    * Overridden to take into account mtime from the internal vtkResourceStream.
    */
   vtkMTimeType GetMTime() override;
+
+  /**
+   * Return true if, after a quick check of file header, it looks like the provided stream
+   * can be read. Return false if it is sure it cannot be read as a strean.
+   *
+   * This only checks that the first 5 bytes spells "Ogawa".
+   */
+  static bool CanReadFile(vtkResourceStream* stream);
 
 protected:
   vtkF3DAlembicReader();
