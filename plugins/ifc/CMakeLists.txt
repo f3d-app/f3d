@@ -10,10 +10,12 @@ else()
   include(f3dPlugin)
 endif()
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-find_package(web-ifc REQUIRED)
+find_package(web-ifc CONFIG REQUIRED)
+if(NOT TARGET web-ifc::web-ifc)
+  add_library(web-ifc::web-ifc ALIAS web-ifc::web-ifc-library)
+endif()
 
-message(STATUS "Plugin: web-ifc found")
+message(STATUS "Plugin: web-ifc ${web-ifc_VERSION} found")
 
 f3d_plugin_init()
 
