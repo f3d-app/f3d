@@ -6,7 +6,6 @@
 #include <vtkRenderer.h>
 #include <vtkVersion.h>
 
-#include <cmath>
 
 namespace f3d::detail
 {
