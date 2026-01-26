@@ -21,6 +21,7 @@ set(SOURCES
 qt6_add_executable(${PROJECT_NAME} ${SOURCES} )
 qt6_add_qml_module(${PROJECT_NAME}
     URI F3D
+    VERSION 1.0
     QML_FILES
         Main.qml
     SOURCES
