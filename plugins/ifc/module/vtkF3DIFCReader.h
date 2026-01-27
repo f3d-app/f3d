@@ -6,6 +6,14 @@
  * from IFC files used in BIM (Building Information Modeling).
  *
  * The reader supports IFC2x3, IFC4, and IFC4x3 schemas.
+ *
+ * Supported features:
+ * - Geometry (vertices, normals, triangles)
+ * - Colors (RGBA with transparency from IfcSurfaceStyleRendering)
+ *
+ * Not supported by webifc:
+ * - Full materials (specular, roughness, reflectance method)
+ * - Textures
  */
 
 #ifndef vtkF3DIFCReader_h
