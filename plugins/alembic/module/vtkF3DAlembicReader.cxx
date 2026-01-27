@@ -628,3 +628,23 @@ vtkMTimeType vtkF3DAlembicReader::GetMTime()
   }
   return mtime;
 }
+
+//------------------------------------------------------------------------------
+bool vtkF3DAlembicReader::CanReadFile(vtkResourceStream* stream)
+{
+  if (!stream)
+  {
+    return false;
+  }
+
+  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+  constexpr std::string_view abcMagic{ "Ogawa", 5 };
+
+  std::array<char, 5> magic;
+  if (stream->Read(&magic, magic.size()) != magic.size())
+  {
+    return false;
+  }
+
+  return std::string_view(magic.data(), magic.size()) == abcMagic;
+}

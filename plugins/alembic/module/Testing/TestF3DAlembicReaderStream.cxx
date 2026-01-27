@@ -13,6 +13,12 @@ int TestF3DAlembicReaderStream(int vtkNotUsed(argc), char* argv[])
   vtkNew<vtkFileResourceStream> fileStream;
   fileStream->Open(filename.c_str());
 
+  if (!vtkF3DAlembicReader::CanReadFile(fileStream))
+  {
+    std::cerr << "Unexpected CanReadFile result\n";
+    return EXIT_FAILURE;
+  }
+
   vtkNew<vtkF3DAlembicReader> reader;
   reader->SetStream(fileStream);
   reader->Update();
