@@ -2,8 +2,8 @@
 #include "scene.h"
 #include "types.h"
 
-#include <log.h>
 #include <filesystem>
+#include <log.h>
 #include <vector>
 
 namespace
