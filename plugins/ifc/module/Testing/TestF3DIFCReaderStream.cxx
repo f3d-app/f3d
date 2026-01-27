@@ -9,7 +9,7 @@
 
 int TestF3DIFCReaderStream(int vtkNotUsed(argc), char* argv[])
 {
-  std::string filename = std::string(argv[1]) + "data/ifc/IfcOpenHouse.ifc";
+  std::string filename = std::string(argv[1]) + "data/ifc/IfcOpenHouse_IFC4.ifc";
 
   vtkNew<vtkFileResourceStream> fileStream;
   if (!fileStream->Open(filename.c_str()))

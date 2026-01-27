@@ -11,7 +11,7 @@
 
 int TestF3DIFCReaderOptions(int vtkNotUsed(argc), char* argv[])
 {
-  std::string filename = std::string(argv[1]) + "data/ifc/IfcOpenHouse.ifc";
+  std::string filename = std::string(argv[1]) + "data/ifc/IfcOpenHouse_IFC4.ifc";
 
   vtkNew<vtkF3DIFCReader> reader;
   reader->SetFileName(filename);
