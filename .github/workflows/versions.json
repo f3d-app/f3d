@@ -6,8 +6,7 @@
     "OpenVDB min version is not enforced by F3D code and missing from VTK code",
     "Python is part of VFX reference platform (CY2025: 3.11)",
     "OSPRay is fixed at 2.12.0 until full support for OSPRay 3.0 is added in VTK",
-    "TBB is set at v2021.13.1 because OpenUSD seems to not support more revent versions: https://github.com/PixarAnimationStudios/OpenUSD/issues/3878",
-    "webifc uses commit SHA because cmake install support (PR #1808) was merged after 0.75"
+    "TBB is set at v2021.13.1 because OpenUSD seems to not support more revent versions: https://github.com/PixarAnimationStudios/OpenUSD/issues/3878"
   ],
   "versions": {
     "alembic": "1.8.10",
@@ -25,7 +24,7 @@
     "tbb": "v2021.13.1",
     "usd": "v25.11",
     "webp": "v1.6.0",
-    "webifc": "8c52f05e4e47aa09cbbf099b93465171bb8e0fa5",
+    "webifc": "0.75",
     "zlib": "v1.3.1"
   },
   "min_versions": {
@@ -44,7 +43,7 @@
     "tbb": "v2021.10.0",
     "usd": "v24.08",
     "webp": "v1.2.4",
-    "webifc": "8c52f05e4e47aa09cbbf099b93465171bb8e0fa5",
+    "webifc": "0.75",
     "zlib": "v1.2.13"
   },
   "vtk_commit_sha": "b858907b1c684f8aea23d734d79024ede62a4dbc",
