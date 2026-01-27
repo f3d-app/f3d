@@ -20,7 +20,7 @@ int TestF3DIFCReaderOptions(int vtkNotUsed(argc), char* argv[])
   reader->SetCircleSegments(24);
   if (reader->GetCircleSegments() != 24)
   {
-    std::cerr << "CircleSegments getter/setter failed" << std::endl;
+    std::cerr << "CircleSegments getter/setter failed" << '\n';
     return EXIT_FAILURE;
   }
 
@@ -28,13 +28,13 @@ int TestF3DIFCReaderOptions(int vtkNotUsed(argc), char* argv[])
   reader->SetReadOpenings(true);
   if (!reader->GetReadOpenings())
   {
-    std::cerr << "ReadOpenings getter/setter failed" << std::endl;
+    std::cerr << "ReadOpenings getter/setter failed" << '\n';
     return EXIT_FAILURE;
   }
   reader->ReadOpeningsOff();
   if (reader->GetReadOpenings())
   {
-    std::cerr << "ReadOpeningsOff failed" << std::endl;
+    std::cerr << "ReadOpeningsOff failed" << '\n';
     return EXIT_FAILURE;
   }
 
@@ -42,13 +42,13 @@ int TestF3DIFCReaderOptions(int vtkNotUsed(argc), char* argv[])
   reader->SetReadSpaces(true);
   if (!reader->GetReadSpaces())
   {
-    std::cerr << "ReadSpaces getter/setter failed" << std::endl;
+    std::cerr << "ReadSpaces getter/setter failed" << '\n';
     return EXIT_FAILURE;
   }
   reader->ReadSpacesOff();
   if (reader->GetReadSpaces())
   {
-    std::cerr << "ReadSpacesOff failed" << std::endl;
+    std::cerr << "ReadSpacesOff failed" << '\n';
     return EXIT_FAILURE;
   }
 
@@ -59,7 +59,7 @@ int TestF3DIFCReaderOptions(int vtkNotUsed(argc), char* argv[])
   if (printOutput.find("FileName") == std::string::npos ||
     printOutput.find("CircleSegments") == std::string::npos)
   {
-    std::cerr << "PrintSelf output incomplete" << std::endl;
+    std::cerr << "PrintSelf output incomplete" << '\n';
     return EXIT_FAILURE;
   }
 
@@ -69,25 +69,25 @@ int TestF3DIFCReaderOptions(int vtkNotUsed(argc), char* argv[])
   vtkPolyData* output = reader->GetOutput();
   if (!output || output->GetNumberOfPoints() == 0)
   {
-    std::cerr << "No output from reader" << std::endl;
+    std::cerr << "No output from reader" << '\n';
     return EXIT_FAILURE;
   }
 
   // Check for Normals array
   if (!output->GetPointData()->GetNormals())
   {
-    std::cerr << "PolyData has no normals" << std::endl;
+    std::cerr << "PolyData has no normals" << '\n';
     return EXIT_FAILURE;
   }
 
   // Check for Colors array
   if (!output->GetCellData()->GetScalars())
   {
-    std::cerr << "PolyData has no colors" << std::endl;
+    std::cerr << "PolyData has no colors" << '\n';
     return EXIT_FAILURE;
   }
 
-  std::cout << "All options tests passed" << std::endl;
+  std::cout << "All options tests passed" << '\n';
 
   return EXIT_SUCCESS;
 }

@@ -28,11 +28,11 @@ int TestF3DIFCReaderError(int vtkNotUsed(argc), char* argv[])
   // With an invalid file, we expect empty geometry
   if (output && output->GetNumberOfPoints() > 0)
   {
-    std::cerr << "Expected no geometry from invalid file" << std::endl;
+    std::cerr << "Expected no geometry from invalid file" << '\n';
     return EXIT_FAILURE;
   }
 
-  std::cout << "Error handling test passed" << std::endl;
+  std::cout << "Error handling test passed" << '\n';
 
   return EXIT_SUCCESS;
 }

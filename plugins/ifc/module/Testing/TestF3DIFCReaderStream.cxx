@@ -14,7 +14,7 @@ int TestF3DIFCReaderStream(int vtkNotUsed(argc), char* argv[])
   vtkNew<vtkFileResourceStream> fileStream;
   if (!fileStream->Open(filename.c_str()))
   {
-    std::cerr << "Failed to open file stream" << std::endl;
+    std::cerr << "Failed to open file stream" << '\n';
     return EXIT_FAILURE;
   }
 
@@ -25,12 +25,12 @@ int TestF3DIFCReaderStream(int vtkNotUsed(argc), char* argv[])
   vtkPolyData* output = reader->GetOutput();
   if (!output || output->GetNumberOfPoints() == 0)
   {
-    std::cerr << "No output from stream reader" << std::endl;
+    std::cerr << "No output from stream reader" << '\n';
     return EXIT_FAILURE;
   }
 
   std::cout << "Successfully read IFC stream with " << output->GetNumberOfPoints() << " points"
-            << std::endl;
+            << '\n';
 
   return EXIT_SUCCESS;
 }
