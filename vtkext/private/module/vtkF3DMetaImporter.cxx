@@ -537,7 +537,8 @@ bool vtkF3DMetaImporter::GetTemporalInformation(
       vtkF3DImporter* f3dImporter = vtkF3DImporter::SafeDownCast(importerPair.Importer);
       if (f3dImporter)
       {
-        f3dImporter->GetTemporalInformation(localAnimationIndex, timeRange, nbTimeSteps, timeSteps);
+        return f3dImporter->GetTemporalInformation(
+          localAnimationIndex, timeRange, nbTimeSteps, timeSteps);
       }
       else
       {
