@@ -46,7 +46,7 @@ inputs:
     required: true
   webp_version:
     description: "Version of webp to build"
-    required: true
+    required: false
   webifc_version:
     description: "Version of web-ifc to build"
     required: false
