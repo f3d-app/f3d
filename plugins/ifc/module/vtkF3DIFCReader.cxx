@@ -15,6 +15,8 @@
 
 #include <web-ifc/modelmanager/ModelManager.h>
 
+#include <spdlog/spdlog.h>
+
 #include <algorithm>
 #include <array>
 #include <string_view>
@@ -130,7 +132,10 @@ int vtkF3DIFCReader::RequestData(
     settings.CIRCLE_SEGMENTS = static_cast<uint16_t>(this->CircleSegments);
     settings.COORDINATE_TO_ORIGIN = false;
 
+    auto oldLevel = spdlog::get_level();
+    spdlog::set_level(spdlog::level::warn);
     uint32_t modelID = this->Internals->Manager.CreateModel(settings);
+    spdlog::set_level(oldLevel);
     webifc::parsing::IfcLoader* loader = this->Internals->Manager.GetIfcLoader(modelID);
 
     loader->LoadFile(
