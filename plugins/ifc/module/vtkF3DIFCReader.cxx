@@ -77,17 +77,6 @@ vtkMTimeType vtkF3DIFCReader::GetMTime()
 }
 
 //----------------------------------------------------------------------------
-bool vtkF3DIFCReader::CanReadFile(const char* filename)
-{
-  vtkNew<vtkFileResourceStream> stream;
-  if (!stream->Open(filename))
-  {
-    return false;
-  }
-  return vtkF3DIFCReader::CanReadFile(stream);
-}
-
-//----------------------------------------------------------------------------
 bool vtkF3DIFCReader::CanReadFile(vtkResourceStream* stream)
 {
   if (!stream)

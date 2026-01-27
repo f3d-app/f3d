@@ -73,9 +73,8 @@ public:
   ///@}
 
   /**
-   * Check if the file can be read by this reader.
+   * Check if the stream can be read by this reader.
    */
-  static bool CanReadFile(const char* filename);
   static bool CanReadFile(vtkResourceStream* stream);
 
   /**
