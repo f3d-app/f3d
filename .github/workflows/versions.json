@@ -43,6 +43,7 @@
     "tbb": "v2021.10.0",
     "usd": "v24.08",
     "webp": "v1.2.4",
+    "webifc": "v0.0.75",
     "zlib": "v1.2.13"
   },
   "vtk_commit_sha": "b858907b1c684f8aea23d734d79024ede62a4dbc",
