@@ -166,7 +166,7 @@ int vtkF3DIFCReader::RequestData(
 
       for (const auto& placedGeom : mesh.geometries)
       {
-        auto& geometry = geometryProcessor->GetGeometry(placedGeom.geometryExpressID);
+        const auto& geometry = geometryProcessor->GetGeometry(placedGeom.geometryExpressID);
 
         const auto& vertexData = geometry.vertexData;
         const auto& indexData = geometry.indexData;
