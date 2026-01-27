@@ -19,6 +19,13 @@ int TestF3DAssimpImporterStream(int vtkNotUsed(argc), char* argv[])
     return EXIT_FAILURE;
   }
 
+  std::string hint;
+  if (!vtkF3DAssimpImporter::CanReadFile(stream, hint))
+  {
+    std::cerr << "Unexpected CanReadFile failure\n";
+    return EXIT_FAILURE;
+  }
+
   vtkNew<vtkF3DAssimpImporter> importer;
   importer->SetStream(stream);
   importer->SetMemoryHint("fbx");

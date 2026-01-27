@@ -107,6 +107,14 @@ public:
    */
   void SetCamera(vtkIdType camIndex) override;
 
+  /**
+   * Return true if, after a quick check of file header, it looks like the provided stream
+   * can be read. Return false if it is sure it cannot be read as a strean.
+   *
+   * This only checks that the first 5 bytes spells "Ogawa".
+   */
+  static bool CanReadFile(vtkResourceStream* stream, std::string& hint);
+
 protected:
   vtkF3DAssimpImporter();
   ~vtkF3DAssimpImporter() override;

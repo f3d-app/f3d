@@ -43,6 +43,7 @@
 #include <regex>
 #include <set>
 
+#include <iostream>
 vtkStandardNewMacro(vtkF3DAssimpImporter);
 
 class vtkF3DAssimpImporter::vtkInternals
@@ -1237,4 +1238,31 @@ void vtkF3DAssimpImporter::ImportCameras(vtkRenderer* renderer)
 void vtkF3DAssimpImporter::ImportLights(vtkRenderer* renderer)
 {
   this->Internals->ImportLights(renderer);
+}
+
+//------------------------------------------------------------------------------
+bool vtkF3DAssimpImporter::CanReadFile(vtkResourceStream* stream, std::string& hint)
+{
+  if (!stream)
+  {
+    return false;
+  }
+
+  // FBX: Kaydara FBX Binary \0
+  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+  constexpr std::string_view fbxMagic{"Kaydara FBX Binary  \0", 21};
+
+  std::array<char, 21> magic;
+  if (stream->Read(&magic, magic.size()) != magic.size())
+  {
+    return false;
+  }
+
+  if (std::string_view(magic.data(), magic.size()) == fbxMagic)
+  {
+    hint = "fbx";
+    return true;
+  }
+
+  return false;
 }
