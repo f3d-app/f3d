@@ -96,7 +96,6 @@ bool vtkF3DIFCReader::CanReadFile(vtkResourceStream* stream)
   return std::string_view(buffer.data(), buffer.size()) == ifcHeader;
 }
 
-
 //----------------------------------------------------------------------------
 int vtkF3DIFCReader::RequestData(
   vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector)

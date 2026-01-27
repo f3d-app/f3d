@@ -30,8 +30,8 @@ class vtkF3DIFCReader : public vtkPolyDataAlgorithm
 {
 public:
   static vtkF3DIFCReader* New();
-  vtkTypeMacro(vtkF3DIFCReader, vtkPolyDataAlgorithm)
-  void PrintSelf(ostream& os, vtkIndent indent) override;
+  vtkTypeMacro(vtkF3DIFCReader, vtkPolyDataAlgorithm) void PrintSelf(
+    ostream& os, vtkIndent indent) override;
 
   ///@{
   /**
