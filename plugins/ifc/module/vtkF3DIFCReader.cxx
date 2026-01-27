@@ -18,7 +18,6 @@
 #include <algorithm>
 #include <array>
 #include <string_view>
-#include <sstream>
 
 vtkStandardNewMacro(vtkF3DIFCReader);
 
@@ -97,34 +96,6 @@ bool vtkF3DIFCReader::CanReadFile(vtkResourceStream* stream)
   return std::string_view(buffer.data(), buffer.size()) == ifcHeader;
 }
 
-namespace
-{
-//----------------------------------------------------------------------------
-std::string ReadStreamContent(vtkResourceStream* stream)
-{
-  if (!stream)
-  {
-    return {};
-  }
-
-  std::ostringstream oss;
-  constexpr size_t bufferSize = 65536;
-  std::vector<char> buffer(bufferSize);
-
-  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
-  while (true)
-  {
-    size_t bytesRead = stream->Read(buffer.data(), bufferSize);
-    if (bytesRead == 0)
-    {
-      break;
-    }
-    oss.write(buffer.data(), bytesRead);
-  }
-
-  return oss.str();
-}
-}
 
 //----------------------------------------------------------------------------
 int vtkF3DIFCReader::RequestData(
@@ -132,10 +103,10 @@ int vtkF3DIFCReader::RequestData(
 {
   vtkPolyData* output = vtkPolyData::GetData(outputVector);
 
-  std::string content;
+  vtkSmartPointer<vtkResourceStream> stream;
   if (this->Stream)
   {
-    content = ::ReadStreamContent(this->Stream);
+    stream = this->Stream;
   }
   else if (!this->FileName.empty())
   {
@@ -145,12 +116,12 @@ int vtkF3DIFCReader::RequestData(
       vtkErrorMacro("Failed to open file: " << this->FileName);
       return 0;
     }
-    content = ::ReadStreamContent(fileStream);
+    stream = fileStream;
   }
 
-  if (content.empty())
+  if (!stream)
   {
-    vtkErrorMacro("Failed to read IFC content");
+    vtkErrorMacro("No input stream or filename specified");
     return 0;
   }
 
@@ -164,15 +135,10 @@ int vtkF3DIFCReader::RequestData(
     webifc::parsing::IfcLoader* loader = this->Internals->Manager.GetIfcLoader(modelID);
 
     loader->LoadFile(
-      [&content](char* dest, size_t sourceOffset, size_t destSize)
+      [&stream](char* dest, size_t sourceOffset, size_t destSize)
       {
-        if (sourceOffset >= content.size())
-        {
-          return static_cast<uint32_t>(0);
-        }
-        size_t length = std::min(content.size() - sourceOffset, destSize);
-        memcpy(dest, content.data() + sourceOffset, length);
-        return static_cast<uint32_t>(length);
+        stream->Seek(sourceOffset, vtkResourceStream::SeekDirection::Begin);
+        return static_cast<uint32_t>(stream->Read(dest, destSize));
       });
 
     webifc::geometry::IfcGeometryProcessor* geometryProcessor =
