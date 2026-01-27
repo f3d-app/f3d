@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
-  <mime-type type="application/x-ifc">
+  <mime-type type="model/step">
     <comment>Industry Foundation Classes</comment>
     <glob pattern="*.ifc"/>
   </mime-type>
