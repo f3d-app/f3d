@@ -17,7 +17,7 @@
 
 #include <algorithm>
 #include <array>
-#include <cstring>
+#include <string_view>
 #include <sstream>
 
 vtkStandardNewMacro(vtkF3DIFCReader);
@@ -86,16 +86,15 @@ bool vtkF3DIFCReader::CanReadFile(vtkResourceStream* stream)
 
   stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
 
-  constexpr const char* ifcHeader = "ISO-10303-21;";
-  constexpr size_t headerLen = 13;
-  char buffer[headerLen] = {};
+  constexpr std::string_view ifcHeader{ "ISO-10303-21;", 13 };
+  std::array<char, 13> buffer;
 
-  if (stream->Read(buffer, headerLen) != headerLen)
+  if (stream->Read(&buffer, buffer.size()) != buffer.size())
   {
     return false;
   }
 
-  return std::strncmp(buffer, ifcHeader, headerLen) == 0;
+  return std::string_view(buffer.data(), buffer.size()) == ifcHeader;
 }
 
 namespace
