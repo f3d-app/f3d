@@ -1,12 +1,12 @@
-name: "Install web-ifc Dependency"
-description: "Install web-ifc Dependency using cache when possible"
+name: "Install webifc Dependency"
+description: "Install webifc Dependency using cache when possible"
 inputs:
   cpu:
     description: "CPU architecture to build for"
     required: false
     default: "x86_64"
   version:
-    description: "Version of web-ifc to build"
+    description: "Version of webifc to build"
     required: true
   global_cache_index:
     description: "Global cache index"
@@ -52,6 +52,7 @@ runs:
         cmake ../webifc/src/cpp
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+        -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/dependencies/webifc_install
         ${{ runner.os == 'macOS' && '-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0' || null }}
         ${{ runner.os == 'Windows' && '-Ax64 -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDLL' || null }}
 
@@ -61,26 +62,11 @@ runs:
       shell: bash
       run: cmake --build . --parallel 2 --target web-ifc-library --config Release
 
-    - name: Install web-ifc manually
+    - name: Install web-ifc
       if: steps.cache-webifc.outputs.cache-hit != 'true'
-      working-directory: ${{github.workspace}}/dependencies
+      working-directory: ${{github.workspace}}/dependencies/webifc_build
       shell: bash
-      run: |
-        mkdir -p webifc_install/lib webifc_install/include
-        # Copy library
-        cp webifc_build/libweb-ifc-library.a webifc_install/lib/ 2>/dev/null || cp webifc_build/Release/web-ifc-library.lib webifc_install/lib/ 2>/dev/null || true
-        # Copy web-ifc headers
-        cp -r webifc/src/cpp/web-ifc webifc_install/include/
-        # Copy dependency headers fetched by web-ifc
-        cp -r webifc_build/_deps/glm-src/glm webifc_install/include/
-        cp -r webifc_build/_deps/earcut-src/include/mapbox webifc_install/include/
-        cp -r webifc_build/_deps/tinynurbs-src/include/tinynurbs webifc_install/include/
-        cp -r webifc_build/_deps/fastfloat-src/include/fast_float webifc_install/include/
-        cp -r webifc_build/_deps/spdlog-src/include/spdlog webifc_install/include/
-        cp webifc_build/_deps/stduuid-src/include/uuid.h webifc_install/include/
-        # Copy CDT headers
-        cp webifc_build/_deps/cdt-src/CDT/include/*.h webifc_install/include/ 2>/dev/null || true
-        cp webifc_build/_deps/cdt-src/CDT/include/*.hpp webifc_install/include/ 2>/dev/null || true
+      run: cmake --install . --config Release
 
     - name: Copy to install
       working-directory: ${{github.workspace}}/dependencies/webifc_install
