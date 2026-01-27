@@ -2,6 +2,7 @@
 #include "scene.h"
 #include "types.h"
 
+#include <log.h>
 #include <filesystem>
 #include <vector>
 
@@ -149,8 +150,17 @@ int f3d_scene_add(f3d_scene_t* scene, const char* file_path)
     return 0;
   }
 
-  f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
-  cpp_scene->add(std::filesystem::path(file_path));
+  try
+  {
+    f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
+    cpp_scene->add(std::filesystem::path(file_path));
+  }
+  catch (const std::exception& e)
+  {
+    f3d::log::error("Failed to add file to scene: {}", file_path);
+    return 0;
+  }
+
   return 1;
 }
 
@@ -174,7 +184,16 @@ int f3d_scene_add_multiple(f3d_scene_t* scene, const char** file_paths, size_t c
     }
   }
 
-  cpp_scene->add(paths);
+  try
+  {
+    cpp_scene->add(paths);
+  }
+  catch (const f3d::scene::load_failure_exception& e)
+  {
+    f3d::log::error("Failed to add multiple files to scene");
+    return 0;
+  }
+
   return 1;
 }
 
@@ -188,7 +207,17 @@ int f3d_scene_add_mesh(f3d_scene_t* scene, const f3d_mesh_t* mesh)
 
   f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
   f3d::mesh_t cpp_mesh = to_cpp_mesh(mesh);
-  cpp_scene->add(cpp_mesh);
+
+  try
+  {
+    cpp_scene->add(cpp_mesh);
+  }
+  catch (const f3d::scene::load_failure_exception& e)
+  {
+    f3d::log::error("Failed to add mesh to scene");
+    return 0;
+  }
+
   return 1;
 }
 
@@ -201,7 +230,17 @@ int f3d_scene_add_buffer(f3d_scene_t* scene, void* buffer, size_t size)
   }
 
   f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
-  cpp_scene->add(reinterpret_cast<std::byte*>(buffer), size);
+
+  try
+  {
+    cpp_scene->add(reinterpret_cast<std::byte*>(buffer), size);
+  }
+  catch (const f3d::scene::load_failure_exception& e)
+  {
+    f3d::log::error("Failed to add buffer to scene");
+    return 0;
+  }
+
   return 1;
 }
 
@@ -272,7 +311,17 @@ int f3d_scene_remove_light(f3d_scene_t* scene, int index)
   }
 
   f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
-  cpp_scene->removeLight(index);
+
+  try
+  {
+    cpp_scene->removeLight(index);
+  }
+  catch (const f3d::scene::light_exception& e)
+  {
+    f3d::log::error("Failed to remove light at index {}: {}", index, e.what());
+    return 0;
+  }
+
   return 1;
 }
 
@@ -286,7 +335,18 @@ int f3d_scene_update_light(f3d_scene_t* scene, int index, const f3d_light_state_
 
   f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
   f3d::light_state_t cpp_state = to_cpp_light_state(light_state);
-  cpp_scene->updateLight(index, cpp_state);
+
+  try
+  {
+
+    cpp_scene->updateLight(index, cpp_state);
+  }
+  catch (const f3d::scene::light_exception& e)
+  {
+    f3d::log::error("Failed to update light at index {}: {}", index, e.what());
+    return 0;
+  }
+
   return 1;
 }
 
@@ -299,8 +359,17 @@ f3d_light_state_t* f3d_scene_get_light(const f3d_scene_t* scene, int index)
   }
 
   const f3d::scene* cpp_scene = reinterpret_cast<const f3d::scene*>(scene);
-  f3d::light_state_t cpp_state = cpp_scene->getLight(index);
-  return to_c_light_state(cpp_state);
+
+  try
+  {
+    f3d::light_state_t cpp_state = cpp_scene->getLight(index);
+    return to_c_light_state(cpp_state);
+  }
+  catch (const f3d::scene::light_exception& e)
+  {
+    f3d::log::error("Failed to get light at index {}: {}", index, e.what());
+    return nullptr;
+  }
 }
 
 //----------------------------------------------------------------------------
