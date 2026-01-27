@@ -15,7 +15,7 @@ if(NOT TARGET web-ifc::web-ifc)
   add_library(web-ifc::web-ifc ALIAS web-ifc::web-ifc-library)
 endif()
 
-message(STATUS "Plugin: web-ifc ${web-ifc_VERSION} found")
+message(STATUS "Plugin: webifc ${web-ifc_VERSION} found")
 
 f3d_plugin_init()
 
@@ -33,7 +33,7 @@ f3d_plugin_declare_reader(
 f3d_plugin_build(
   NAME ifc
   VERSION 1.0
-  DESCRIPTION "IFC/BIM support via web-ifc"
+  DESCRIPTION "IFC/BIM support via webifc"
   VTK_MODULES CommonDataModel
   MIMETYPE_XML_FILES "${CMAKE_CURRENT_SOURCE_DIR}/f3d-ifc-formats.xml"
   CONFIGURATION_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/configs/config.d" "${CMAKE_CURRENT_SOURCE_DIR}/configs/thumbnail.d"

@@ -48,7 +48,7 @@ inputs:
     description: "Version of webp to build"
     required: false
   webifc_version:
-    description: "Version of web-ifc to build"
+    description: "Version of webifc to build"
     required: false
   zlib_version:
     description: "Version of zlib to build"
