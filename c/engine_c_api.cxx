@@ -1,5 +1,7 @@
 #include "engine_c_api.h"
 #include "engine.h"
+#include "exception.h"
+#include "log.h"
 #include "options.h"
 
 #include <cstring>
@@ -57,8 +59,16 @@ f3d_engine_t* f3d_engine_create_external(f3d_context_function_t get_proc_address
   f3d::context::function func = [get_proc_address](const char* name) -> f3d::context::fptr
   { return get_proc_address(name); };
 
-  f3d::engine* eng = new f3d::engine(f3d::engine::createExternal(func));
-  return reinterpret_cast<f3d_engine_t*>(eng);
+  try
+  {
+    f3d::engine* eng = new f3d::engine(f3d::engine::createExternal(func));
+    return reinterpret_cast<f3d_engine_t*>(eng);
+  }
+  catch (const f3d::engine::no_window_exception&)
+  {
+    f3d::log::error("Failed to create engine with external context");
+    return nullptr;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -155,8 +165,17 @@ f3d_window_t* f3d_engine_get_window(f3d_engine_t* engine)
   }
 
   f3d::engine* cpp_engine = reinterpret_cast<f3d::engine*>(engine);
-  f3d::window& win = cpp_engine->getWindow();
-  return reinterpret_cast<f3d_window_t*>(&win);
+
+  try
+  {
+    f3d::window& win = cpp_engine->getWindow();
+    return reinterpret_cast<f3d_window_t*>(&win);
+  }
+  catch (const f3d::engine::no_window_exception& e)
+  {
+    f3d::log::error("No window available: ", e.what());
+    return nullptr;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -181,8 +200,17 @@ f3d_interactor_t* f3d_engine_get_interactor(f3d_engine_t* engine)
   }
 
   f3d::engine* cpp_engine = reinterpret_cast<f3d::engine*>(engine);
-  f3d::interactor& inter = cpp_engine->getInteractor();
-  return reinterpret_cast<f3d_interactor_t*>(&inter);
+
+  try
+  {
+    f3d::interactor& inter = cpp_engine->getInteractor();
+    return reinterpret_cast<f3d_interactor_t*>(&inter);
+  }
+  catch (const f3d::engine::no_interactor_exception& e)
+  {
+    f3d::log::error("No interactor available: ", e.what());
+    return nullptr;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -193,7 +221,14 @@ void f3d_engine_load_plugin(const char* path_or_name)
     return;
   }
 
-  f3d::engine::loadPlugin(path_or_name);
+  try
+  {
+    f3d::engine::loadPlugin(path_or_name);
+  }
+  catch (const f3d::engine::plugin_exception& e)
+  {
+    f3d::log::error("Failed to load plugin '", path_or_name, "': ", e.what());
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -254,7 +289,14 @@ void f3d_engine_set_reader_option(const char* name, const char* value)
     return;
   }
 
-  f3d::engine::setReaderOption(name, value);
+  try
+  {
+    f3d::engine::setReaderOption(name, value);
+  }
+  catch (const f3d::options::inexistent_exception& e)
+  {
+    f3d::log::error("Failed to set reader option '", name, "': ", e.what());
+  }
 }
 
 //----------------------------------------------------------------------------
