@@ -22,7 +22,7 @@ f3d_plugin_init()
 f3d_plugin_declare_reader(
   NAME IFC
   EXTENSIONS ifc
-  MIMETYPES model/step
+  MIMETYPES application/vnd.ifc
   VTK_READER vtkF3DIFCReader
   FORMAT_DESCRIPTION "Industry Foundation Classes"
   SUPPORTS_STREAM
