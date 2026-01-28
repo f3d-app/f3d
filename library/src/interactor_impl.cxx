@@ -1073,7 +1073,7 @@ interactor& interactor_impl::initCommands()
       {
         auto index = std::distance(
           std::begin(validTypes), std::find(std::begin(validTypes), std::end(validTypes), type));
-        if (index == validTypes.size() - 1) // last type
+        if (static_cast<size_t>(index) == validTypes.size() - 1) // last type
         {
           enabled = false;
         }
