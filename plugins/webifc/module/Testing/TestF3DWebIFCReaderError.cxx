@@ -14,6 +14,21 @@ int TestF3DWebIFCReaderError(int vtkNotUsed(argc), char* argv[])
   vtkNew<vtkCallbackCommand> nullCallback;
   nullCallback->SetCallback([](vtkObject*, unsigned long, void*, void*) {});
 
+  // Test with no filename and no stream
+  {
+    vtkNew<vtkF3DWebIFCReader> reader;
+    reader->AddObserver(vtkCommand::ErrorEvent, nullCallback);
+    reader->GetExecutive()->AddObserver(vtkCommand::ErrorEvent, nullCallback);
+    reader->Update();
+
+    vtkPolyData* output = reader->GetOutput();
+    if (output && output->GetNumberOfPoints() > 0)
+    {
+      std::cerr << "Expected no geometry with no input" << '\n';
+      return EXIT_FAILURE;
+    }
+  }
+
   // Test with non-existent file
   {
     vtkNew<vtkF3DWebIFCReader> reader;
