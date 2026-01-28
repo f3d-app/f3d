@@ -1,4 +1,5 @@
-set(VTKExtensionsPluginAssimp_list)
+set(VTKExtensionsPluginAssimp_list
+    TestF3DAssimpImportCanReadFile.cxx)
 
 # Sanitizer exclusion because of https://github.com/f3d-app/f3d/issues/1323
 if(NOT F3D_SANITIZER STREQUAL "address")
