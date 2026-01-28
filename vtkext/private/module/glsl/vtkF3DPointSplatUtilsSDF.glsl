@@ -1,17 +1,20 @@
 // This file is intended to be included in the point splat mapper fragment shader
 // It defines signed distance field functions used to represent anisotropic gaussians
 
+// return the signed distance from a point to a circle of given radius
 float sdCircle(vec2 p, float radius)
 {
   return length(p) - radius;
 }
 
+// return the signed distance from a point to a box of given half size and corner radius
 float sdRoundBox(vec2 p, vec2 halfSize, float radius)
 {
     vec2 q = abs(p) - halfSize + radius;
     return length(max(q, 0.0)) - radius + min(max(q.x, q.y), 0.0);
 }
 
+// return the positive distance from a point to a line segment defined by points a and b
 float sdSegment(vec2 p, vec2 a, vec2 b)
 {
     vec2 pa = p - a;
@@ -20,21 +23,13 @@ float sdSegment(vec2 p, vec2 a, vec2 b)
     return length(pa - ba * h);
 }
 
-float sdCross(in vec2 p, in vec2 b, float r)
-{
-    p = abs(p);
-    p = (p.y > p.x) ? p.yx : p.xy;
-    vec2 q = p - b;
-    float k = max(q.y,q.x);
-    vec2 w = (k>0.0) ? q : vec2(b.y-p.x,-k);
-    return sign(k)*length(max(w,0.0)) + r;
-}
-
+// boolean union operation between two SDFs
 float opMerge(float shape1, float shape2)
 {
     return min(shape1, shape2);
 }
 
+// boolean union operation between two SDFs with smooth blending
 float opRoundMerge(float shape1, float shape2, float radius)
 {
     vec2 intersectionSpace = vec2(shape1 - radius, shape2 - radius);
@@ -45,11 +40,14 @@ float opRoundMerge(float shape1, float shape2, float radius)
     return  insideDistance + outsideDistance;
 }
 
+// shift operation to expand or contract an SDF
 float opShift(float sd, float shift)
 {
   return sd - shift;
 }
 
+// stroke a SDF with given thickness
+// signed distance and thickness is expressed in pixels
 float strokePx(float sd, float thickness)
 {
   float halfStroke = 0.5 * thickness;
@@ -57,6 +55,8 @@ float strokePx(float sd, float thickness)
   return 1.0 - smoothstep(halfStroke - 1.0, halfStroke + 1.0, abs(sd));
 }
 
+// stroke a SDF with given thickness
+// signed distance and thickness is expressed in object space units
 float stroke(float sd, float thickness)
 {
   float w = fwidth(sd);
@@ -66,11 +66,15 @@ float stroke(float sd, float thickness)
   return 1.0 - smoothstep(halfStroke - w, halfStroke + w, abs(sd));
 }
 
+// fill a SDF
+// signed distance is expressed in pixels
 float fillPx(float sd)
 {
     return 1.0 - smoothstep(0.0, 1.0, sd);
 }
 
+// fill a SDF
+// signed distance is expressed in object space units
 float fill(float sd)
 {
     float w = fwidth(sd);
