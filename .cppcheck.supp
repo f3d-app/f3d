@@ -42,4 +42,3 @@ unusedStructMember:plugins/native/module/vtkF3DSPZReader.cxx
 constParameterPointer:vtkext/private/module/vtkF3DMetaImporter.cxx
 constParameterPointer:plugins/assimp/module/vtkF3DAssimpImporter.cxx
 constParameterPointer:plugins/alembic/module/vtkF3DAlembicReader.cxx
-constParameter:plugins/ifc/module/Testing/TestF3DIFCReader.cxx
