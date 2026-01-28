@@ -1,4 +1,5 @@
 #include <vtkCellData.h>
+#include <vtkFileResourceStream.h>
 #include <vtkNew.h>
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
@@ -13,8 +14,54 @@ int TestF3DWebIFCReaderOptions(int vtkNotUsed(argc), char* argv[])
 {
   std::string filename = std::string(argv[1]) + "data/ifc/IfcOpenHouse_IFC4.ifc";
 
+  // Test CanReadFile with valid IFC file
+  vtkNew<vtkFileResourceStream> validStream;
+  if (!validStream->Open(filename.c_str()))
+  {
+    std::cerr << "Failed to open valid IFC file" << '\n';
+    return EXIT_FAILURE;
+  }
+  if (!vtkF3DWebIFCReader::CanReadFile(validStream))
+  {
+    std::cerr << "CanReadFile returned false for valid IFC file" << '\n';
+    return EXIT_FAILURE;
+  }
+
+  // Test CanReadFile with invalid file
+  std::string invalidFilename = std::string(argv[1]) + "data/cow.vtp";
+  vtkNew<vtkFileResourceStream> invalidStream;
+  if (invalidStream->Open(invalidFilename.c_str()))
+  {
+    if (vtkF3DWebIFCReader::CanReadFile(invalidStream))
+    {
+      std::cerr << "CanReadFile returned true for non-IFC file" << '\n';
+      return EXIT_FAILURE;
+    }
+  }
+
+  // Test CanReadFile with null stream
+  if (vtkF3DWebIFCReader::CanReadFile(nullptr))
+  {
+    std::cerr << "CanReadFile returned true for null stream" << '\n';
+    return EXIT_FAILURE;
+  }
+
   vtkNew<vtkF3DWebIFCReader> reader;
   reader->SetFileName(filename);
+
+  // Test GetFileName
+  if (reader->GetFileName() != filename)
+  {
+    std::cerr << "GetFileName failed" << '\n';
+    return EXIT_FAILURE;
+  }
+
+  // Test GetStream (should be null initially)
+  if (reader->GetStream() != nullptr)
+  {
+    std::cerr << "GetStream should be null initially" << '\n';
+    return EXIT_FAILURE;
+  }
 
   // Test CircleSegments option
   reader->SetCircleSegments(24);
