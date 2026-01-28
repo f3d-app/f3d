@@ -52,22 +52,6 @@ void vtkF3DIFCReader::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DIFCReader::SetStream(vtkResourceStream* stream)
-{
-  if (this->Stream != stream)
-  {
-    this->Stream = stream;
-    this->Modified();
-  }
-}
-
-//----------------------------------------------------------------------------
-vtkResourceStream* vtkF3DIFCReader::GetStream()
-{
-  return this->Stream;
-}
-
-//----------------------------------------------------------------------------
 vtkMTimeType vtkF3DIFCReader::GetMTime()
 {
   vtkMTimeType mtime = this->Superclass::GetMTime();

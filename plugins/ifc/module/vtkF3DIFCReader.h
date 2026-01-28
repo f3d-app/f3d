@@ -46,8 +46,8 @@ public:
    * Specify stream to read from.
    * When both Stream and FileName are set, stream is used.
    */
-  void SetStream(vtkResourceStream* stream);
-  vtkResourceStream* GetStream();
+  vtkSetSmartPointerMacro(Stream, vtkResourceStream);
+  vtkGetSmartPointerMacro(Stream, vtkResourceStream);
   ///@}
 
   ///@{
