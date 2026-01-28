@@ -2674,10 +2674,10 @@ void vtkF3DRenderer::ConfigurePointSprites()
         "//VTK::Color::Impl\n"
         "float dist = sdCircle(offsetVCVSOutput, 1.0);\n"
         "opacity = fill(dist);\n"
-        // (1 - dist) is the cosine of the angle between the camera
+        // -dist is the cosine of the angle between the camera
         // direction (Z) and the normal of the "sphere"
         // so scaling with this value gives an approximation of the Lambertian diffuse
-        "diffuseColor *= 1.0 - dist;\n");
+        "diffuseColor *= -dist;\n");
 
       sprites.Actor->ForceTranslucentOff();
     }
