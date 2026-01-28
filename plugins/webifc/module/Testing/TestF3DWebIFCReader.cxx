@@ -6,16 +6,9 @@
 
 #include <iostream>
 
-int TestF3DWebIFCReader(int argc, char* argv[])
+int TestF3DWebIFCReader(int vtkNotUsed(argc), char* argv[])
 {
-  if (argc < 2)
-  {
-    std::cerr << "Usage: " << argv[0] << " <testing_dir>" << '\n';
-    return EXIT_FAILURE;
-  }
-
-  std::string testingDir = argv[1];
-  std::string filename = testingDir + "data/ifc/IfcOpenHouse_IFC4.ifc";
+  std::string filename = std::string(argv[1]) + "data/ifc/IfcOpenHouse_IFC4.ifc";
 
   vtkNew<vtkF3DWebIFCReader> reader;
   reader->SetFileName(filename);
