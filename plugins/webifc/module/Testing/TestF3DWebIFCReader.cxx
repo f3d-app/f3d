@@ -2,11 +2,11 @@
 #include <vtkPolyData.h>
 #include <vtkTestUtilities.h>
 
-#include "vtkF3DIFCReader.h"
+#include "vtkF3DWebIFCReader.h"
 
 #include <iostream>
 
-int TestF3DIFCReader(int argc, char* argv[])
+int TestF3DWebIFCReader(int argc, char* argv[])
 {
   if (argc < 2)
   {
@@ -17,7 +17,7 @@ int TestF3DIFCReader(int argc, char* argv[])
   std::string testingDir = argv[1];
   std::string filename = testingDir + "data/ifc/IfcOpenHouse_IFC4.ifc";
 
-  vtkNew<vtkF3DIFCReader> reader;
+  vtkNew<vtkF3DWebIFCReader> reader;
   reader->SetFileName(filename);
   reader->Update();
 

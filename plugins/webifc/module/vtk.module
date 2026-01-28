@@ -1,7 +1,7 @@
 NAME
-  f3d::vtkextIFC
+  f3d::vtkextWebIFC
 DESCRIPTION
-  A VTK module for the IFC plugin
+  A VTK module for the webifc plugin
 DEPENDS
   VTK::IOCore
   VTK::CommonCore

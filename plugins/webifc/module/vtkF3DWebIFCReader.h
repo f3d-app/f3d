@@ -1,5 +1,5 @@
 /**
- * @class   vtkF3DIFCReader
+ * @class   vtkF3DWebIFCReader
  * @brief   VTK Reader for IFC (Industry Foundation Classes) files
  *
  * This reader is based on webifc library to parse and generate geometry
@@ -16,21 +16,20 @@
  * - Textures
  */
 
-#ifndef vtkF3DIFCReader_h
-#define vtkF3DIFCReader_h
+#ifndef vtkF3DWebIFCReader_h
+#define vtkF3DWebIFCReader_h
 
 #include <vtkPolyDataAlgorithm.h>
+#include <vtkResourceStream.h>
 #include <vtkSmartPointer.h>
 
 #include <memory>
 
-class vtkResourceStream;
-
-class vtkF3DIFCReader : public vtkPolyDataAlgorithm
+class vtkF3DWebIFCReader : public vtkPolyDataAlgorithm
 {
 public:
-  static vtkF3DIFCReader* New();
-  vtkTypeMacro(vtkF3DIFCReader, vtkPolyDataAlgorithm) void PrintSelf(
+  static vtkF3DWebIFCReader* New();
+  vtkTypeMacro(vtkF3DWebIFCReader, vtkPolyDataAlgorithm) void PrintSelf(
     ostream& os, vtkIndent indent) override;
 
   ///@{
@@ -91,14 +90,14 @@ public:
   vtkMTimeType GetMTime() override;
 
 protected:
-  vtkF3DIFCReader();
-  ~vtkF3DIFCReader() override;
+  vtkF3DWebIFCReader();
+  ~vtkF3DWebIFCReader() override;
 
   int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*) override;
 
 private:
-  vtkF3DIFCReader(const vtkF3DIFCReader&) = delete;
-  void operator=(const vtkF3DIFCReader&) = delete;
+  vtkF3DWebIFCReader(const vtkF3DWebIFCReader&) = delete;
+  void operator=(const vtkF3DWebIFCReader&) = delete;
 
   class vtkInternals;
   std::unique_ptr<vtkInternals> Internals;

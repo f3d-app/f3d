@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 
-project(f3d-plugin-ifc)
+project(f3d-plugin-webifc)
 
 include(GNUInstallDirs)
 
@@ -20,22 +20,22 @@ message(STATUS "Plugin: webifc ${web-ifc_VERSION} found")
 f3d_plugin_init()
 
 f3d_plugin_declare_reader(
-  NAME IFC
+  NAME WebIFC
   EXTENSIONS ifc
   MIMETYPES application/vnd.ifc
-  VTK_READER vtkF3DIFCReader
+  VTK_READER vtkF3DWebIFCReader
   FORMAT_DESCRIPTION "Industry Foundation Classes"
   SUPPORTS_STREAM
-  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/IFC.inl"
+  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/WebIFC.inl"
   OPTIONS circle_segments read_openings read_spaces
 )
 
 f3d_plugin_build(
-  NAME ifc
+  NAME webifc
   VERSION 1.0
   DESCRIPTION "IFC/BIM support via webifc"
   VTK_MODULES CommonDataModel
-  MIMETYPE_XML_FILES "${CMAKE_CURRENT_SOURCE_DIR}/f3d-ifc-formats.xml"
+  MIMETYPE_XML_FILES "${CMAKE_CURRENT_SOURCE_DIR}/f3d-webifc-formats.xml"
   CONFIGURATION_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/configs/config.d" "${CMAKE_CURRENT_SOURCE_DIR}/configs/thumbnail.d"
   FREEDESKTOP
 )

@@ -3,7 +3,7 @@
     "match-type": "glob",
     "match": "*.ifc",
     "options": {
-      "load-plugins": "ifc",
+      "load-plugins": "webifc",
       "scalar-coloring": true,
       "coloring-array": "Colors",
       "coloring-component": -2,

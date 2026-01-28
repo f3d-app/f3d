@@ -1,8 +1,8 @@
 set(classes
-  vtkF3DIFCReader
+  vtkF3DWebIFCReader
   )
 
-vtk_module_add_module(f3d::vtkextIFC
+vtk_module_add_module(f3d::vtkextWebIFC
   NO_INSTALL
   FORCE_STATIC
   CLASSES ${classes})

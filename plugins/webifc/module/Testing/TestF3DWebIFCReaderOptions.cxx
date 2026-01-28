@@ -4,16 +4,16 @@
 #include <vtkPolyData.h>
 #include <vtkTestUtilities.h>
 
-#include "vtkF3DIFCReader.h"
+#include "vtkF3DWebIFCReader.h"
 
 #include <iostream>
 #include <sstream>
 
-int TestF3DIFCReaderOptions(int vtkNotUsed(argc), char* argv[])
+int TestF3DWebIFCReaderOptions(int vtkNotUsed(argc), char* argv[])
 {
   std::string filename = std::string(argv[1]) + "data/ifc/IfcOpenHouse_IFC4.ifc";
 
-  vtkNew<vtkF3DIFCReader> reader;
+  vtkNew<vtkF3DWebIFCReader> reader;
   reader->SetFileName(filename);
 
   // Test CircleSegments option

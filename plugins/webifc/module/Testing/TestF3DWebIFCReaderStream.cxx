@@ -3,11 +3,11 @@
 #include <vtkPolyData.h>
 #include <vtkTestUtilities.h>
 
-#include "vtkF3DIFCReader.h"
+#include "vtkF3DWebIFCReader.h"
 
 #include <iostream>
 
-int TestF3DIFCReaderStream(int vtkNotUsed(argc), char* argv[])
+int TestF3DWebIFCReaderStream(int vtkNotUsed(argc), char* argv[])
 {
   std::string filename = std::string(argv[1]) + "data/ifc/IfcOpenHouse_IFC4.ifc";
 
@@ -18,7 +18,7 @@ int TestF3DIFCReaderStream(int vtkNotUsed(argc), char* argv[])
     return EXIT_FAILURE;
   }
 
-  vtkNew<vtkF3DIFCReader> reader;
+  vtkNew<vtkF3DWebIFCReader> reader;
   reader->SetStream(fileStream);
   reader->Update();
 

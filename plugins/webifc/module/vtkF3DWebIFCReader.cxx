@@ -1,4 +1,4 @@
-#include "vtkF3DIFCReader.h"
+#include "vtkF3DWebIFCReader.h"
 
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
@@ -22,27 +22,27 @@
 #include <string_view>
 #include <vector>
 
-vtkStandardNewMacro(vtkF3DIFCReader);
+vtkStandardNewMacro(vtkF3DWebIFCReader);
 
 //----------------------------------------------------------------------------
-class vtkF3DIFCReader::vtkInternals
+class vtkF3DWebIFCReader::vtkInternals
 {
 public:
   webifc::manager::ModelManager Manager{ false };
 };
 
 //----------------------------------------------------------------------------
-vtkF3DIFCReader::vtkF3DIFCReader()
+vtkF3DWebIFCReader::vtkF3DWebIFCReader()
   : Internals(new vtkInternals())
 {
   this->vtkAlgorithm::SetNumberOfInputPorts(0);
 }
 
 //----------------------------------------------------------------------------
-vtkF3DIFCReader::~vtkF3DIFCReader() = default;
+vtkF3DWebIFCReader::~vtkF3DWebIFCReader() = default;
 
 //----------------------------------------------------------------------------
-void vtkF3DIFCReader::PrintSelf(ostream& os, vtkIndent indent)
+void vtkF3DWebIFCReader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "FileName: " << this->FileName << "\n";
@@ -52,7 +52,7 @@ void vtkF3DIFCReader::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-vtkMTimeType vtkF3DIFCReader::GetMTime()
+vtkMTimeType vtkF3DWebIFCReader::GetMTime()
 {
   vtkMTimeType mtime = this->Superclass::GetMTime();
   if (this->Stream)
@@ -63,7 +63,7 @@ vtkMTimeType vtkF3DIFCReader::GetMTime()
 }
 
 //----------------------------------------------------------------------------
-bool vtkF3DIFCReader::CanReadFile(vtkResourceStream* stream)
+bool vtkF3DWebIFCReader::CanReadFile(vtkResourceStream* stream)
 {
   if (!stream)
   {
@@ -84,7 +84,7 @@ bool vtkF3DIFCReader::CanReadFile(vtkResourceStream* stream)
 }
 
 //----------------------------------------------------------------------------
-int vtkF3DIFCReader::RequestData(
+int vtkF3DWebIFCReader::RequestData(
   vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector)
 {
   vtkPolyData* output = vtkPolyData::GetData(outputVector);

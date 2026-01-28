@@ -4,11 +4,11 @@
 #include <vtkPolyData.h>
 #include <vtkTestUtilities.h>
 
-#include "vtkF3DIFCReader.h"
+#include "vtkF3DWebIFCReader.h"
 
 #include <iostream>
 
-int TestF3DIFCReaderError(int vtkNotUsed(argc), char* argv[])
+int TestF3DWebIFCReaderError(int vtkNotUsed(argc), char* argv[])
 {
   std::string filename = std::string(argv[1]) + "data/ifc/invalid.ifc";
 
@@ -16,7 +16,7 @@ int TestF3DIFCReaderError(int vtkNotUsed(argc), char* argv[])
   vtkNew<vtkCallbackCommand> nullCallback;
   nullCallback->SetCallback([](vtkObject*, unsigned long, void*, void*) {});
 
-  vtkNew<vtkF3DIFCReader> reader;
+  vtkNew<vtkF3DWebIFCReader> reader;
   reader->SetFileName(filename);
   reader->AddObserver(vtkCommand::ErrorEvent, nullCallback);
   reader->GetExecutive()->AddObserver(vtkCommand::ErrorEvent, nullCallback);
