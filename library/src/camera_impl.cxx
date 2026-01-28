@@ -6,7 +6,6 @@
 #include <vtkRenderer.h>
 #include <vtkVersion.h>
 
-
 namespace f3d::detail
 {
 class camera_impl::internals
