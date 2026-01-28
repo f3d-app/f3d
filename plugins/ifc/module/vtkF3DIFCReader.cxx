@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <array>
 #include <string_view>
+#include <vector>
 
 vtkStandardNewMacro(vtkF3DIFCReader);
 
@@ -185,6 +186,75 @@ int vtkF3DIFCReader::RequestData(
         vtkIdType pointOffset = allPoints->GetNumberOfPoints();
         constexpr int vertexSize = 6;
 
+#ifdef __linux__
+        // WORKAROUND: web-ifc produces inconsistent triangle winding order on Linux.
+        // Vertex normals are correct, so compare with geometric normal to fix winding.
+        // Once https://github.com/ThatOpen/engine_web-ifc/issues/1811 is fixed,
+        // remove this #ifdef __linux__ block and keep only the #else branch.
+        std::vector<std::array<double, 3>> localPositions;
+        std::vector<std::array<double, 3>> localNormals;
+        localPositions.reserve(vertexData.size() / vertexSize);
+        localNormals.reserve(vertexData.size() / vertexSize);
+
+        for (size_t i = 0; i < vertexData.size(); i += vertexSize)
+        {
+          double x = vertexData[i];
+          double y = vertexData[i + 1];
+          double z = vertexData[i + 2];
+          double nx = vertexData[i + 3];
+          double ny = vertexData[i + 4];
+          double nz = vertexData[i + 5];
+
+          double tx = transform[0] * x + transform[4] * y + transform[8] * z + transform[12];
+          double ty = transform[1] * x + transform[5] * y + transform[9] * z + transform[13];
+          double tz = transform[2] * x + transform[6] * y + transform[10] * z + transform[14];
+
+          double tnx = transform[0] * nx + transform[4] * ny + transform[8] * nz;
+          double tny = transform[1] * nx + transform[5] * ny + transform[9] * nz;
+          double tnz = transform[2] * nx + transform[6] * ny + transform[10] * nz;
+
+          localPositions.push_back({ tx, ty, tz });
+          localNormals.push_back({ tnx, tny, tnz });
+          allPoints->InsertNextPoint(tx, ty, tz);
+          normals->InsertNextTuple3(
+            static_cast<float>(tnx), static_cast<float>(tny), static_cast<float>(tnz));
+        }
+
+        for (size_t i = 0; i < indexData.size(); i += 3)
+        {
+          uint32_t i0 = indexData[i];
+          uint32_t i1 = indexData[i + 1];
+          uint32_t i2 = indexData[i + 2];
+
+          const auto& p0 = localPositions[i0];
+          const auto& p1 = localPositions[i1];
+          const auto& p2 = localPositions[i2];
+
+          double e1x = p1[0] - p0[0], e1y = p1[1] - p0[1], e1z = p1[2] - p0[2];
+          double e2x = p2[0] - p0[0], e2y = p2[1] - p0[1], e2z = p2[2] - p0[2];
+          double gnx = e1y * e2z - e1z * e2y;
+          double gny = e1z * e2x - e1x * e2z;
+          double gnz = e1x * e2y - e1y * e2x;
+
+          const auto& n0 = localNormals[i0];
+          const auto& n1 = localNormals[i1];
+          const auto& n2 = localNormals[i2];
+          double avgNx = n0[0] + n1[0] + n2[0];
+          double avgNy = n0[1] + n1[1] + n2[1];
+          double avgNz = n0[2] + n1[2] + n2[2];
+
+          bool windingIsWrong = (gnx * avgNx + gny * avgNy + gnz * avgNz) < 0;
+          if (windingIsWrong)
+          {
+            std::swap(i1, i2);
+          }
+
+          vtkIdType pts[3] = { static_cast<vtkIdType>(i0) + pointOffset,
+            static_cast<vtkIdType>(i1) + pointOffset, static_cast<vtkIdType>(i2) + pointOffset };
+          allPolys->InsertNextCell(3, pts);
+          colors->InsertNextTypedTuple(color.data());
+        }
+#else
         for (size_t i = 0; i < vertexData.size(); i += vertexSize)
         {
           double x = vertexData[i];
@@ -215,6 +285,7 @@ int vtkF3DIFCReader::RequestData(
           allPolys->InsertNextCell(3, pts);
           colors->InsertNextTypedTuple(color.data());
         }
+#endif
       }
     };
 
