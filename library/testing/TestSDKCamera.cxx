@@ -228,13 +228,10 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   cam.azimuth(37.0);
   cam.elevation(-22.0);
 
-  test("getDistance invariant after azimuth/elevation",
-       cam.getDistance(), approx(initialDistance));
+  test("getDistance invariant after azimuth/elevation", cam.getDistance(), approx(initialDistance));
 
-  test("getWorldAzimuth finite after camera operations",
-       std::isfinite(cam.getWorldAzimuth()));
+  test("getWorldAzimuth finite after camera operations", std::isfinite(cam.getWorldAzimuth()));
 
-  test("getWorldElevation finite after camera operations",
-       std::isfinite(cam.getWorldElevation()));
+  test("getWorldElevation finite after camera operations", std::isfinite(cam.getWorldElevation()));
   return test.result();
 }
