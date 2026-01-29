@@ -39,6 +39,18 @@ int TestF3DWebIFCReaderOptions(int vtkNotUsed(argc), char* argv[])
     }
   }
 
+  // Test CanReadFile with STEP file (same ISO-10303-21 header but different FILE_SCHEMA)
+  std::string stepFilename = std::string(argv[1]) + "data/f3d.stp";
+  vtkNew<vtkFileResourceStream> stepStream;
+  if (stepStream->Open(stepFilename.c_str()))
+  {
+    if (vtkF3DWebIFCReader::CanReadFile(stepStream))
+    {
+      std::cerr << "CanReadFile returned true for STEP file" << '\n';
+      return EXIT_FAILURE;
+    }
+  }
+
   // Test CanReadFile with null stream
   if (vtkF3DWebIFCReader::CanReadFile(nullptr))
   {

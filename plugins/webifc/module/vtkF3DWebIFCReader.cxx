@@ -10,6 +10,7 @@
 #include <vtkPointData.h>
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
+#include <vtkResourceParser.h>
 #include <vtkResourceStream.h>
 #include <vtkUnsignedCharArray.h>
 
@@ -19,7 +20,7 @@
 
 #include <algorithm>
 #include <array>
-#include <string_view>
+#include <string>
 #include <vector>
 
 vtkStandardNewMacro(vtkF3DWebIFCReader);
@@ -72,15 +73,30 @@ bool vtkF3DWebIFCReader::CanReadFile(vtkResourceStream* stream)
 
   stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
 
-  constexpr std::string_view ifcHeader{ "ISO-10303-21;", 13 };
-  std::array<char, 13> buffer;
+  vtkNew<vtkResourceParser> parser;
+  parser->SetStream(stream);
+  parser->StopOnNewLineOn();
 
-  if (stream->Read(&buffer, buffer.size()) != buffer.size())
+  std::string line;
+  if (parser->ReadLine(line) != vtkParseResult::EndOfLine || line != "ISO-10303-21;")
   {
     return false;
   }
 
-  return std::string_view(buffer.data(), buffer.size()) == ifcHeader;
+  while (parser->ReadLine(line) == vtkParseResult::EndOfLine)
+  {
+    if (line.find("FILE_SCHEMA") != std::string::npos)
+    {
+      return line.find("'IFC") != std::string::npos;
+    }
+
+    if (line.find("ENDSEC") != std::string::npos)
+    {
+      return false;
+    }
+  }
+
+  return false;
 }
 
 //----------------------------------------------------------------------------
