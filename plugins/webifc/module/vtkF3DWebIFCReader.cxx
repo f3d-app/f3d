@@ -127,16 +127,17 @@ int vtkF3DWebIFCReader::RequestData(
     return 0;
   }
 
+  webifc::manager::LoaderSettings settings;
+  settings.CIRCLE_SEGMENTS = this->CircleSegments;
+  settings.COORDINATE_TO_ORIGIN = false;
+
+  auto oldLevel = spdlog::get_level();
+  spdlog::set_level(spdlog::level::warn);
+  uint32_t modelID = this->Internals->Manager.CreateModel(settings);
+  spdlog::set_level(oldLevel);
+
   try
   {
-    webifc::manager::LoaderSettings settings;
-    settings.CIRCLE_SEGMENTS = this->CircleSegments;
-    settings.COORDINATE_TO_ORIGIN = false;
-
-    auto oldLevel = spdlog::get_level();
-    spdlog::set_level(spdlog::level::warn);
-    uint32_t modelID = this->Internals->Manager.CreateModel(settings);
-    spdlog::set_level(oldLevel);
     webifc::parsing::IfcLoader* loader = this->Internals->Manager.GetIfcLoader(modelID);
 
     loader->LoadFile(
@@ -316,13 +317,15 @@ int vtkF3DWebIFCReader::RequestData(
     output->GetPointData()->SetNormals(normals);
     output->GetCellData()->SetScalars(colors);
 
-    this->Internals->Manager.CloseModel(modelID);
   }
   catch (const std::exception& e)
   {
+    this->Internals->Manager.CloseModel(modelID);
     vtkErrorMacro("Error processing IFC file: " << e.what());
     return 0;
   }
+
+  this->Internals->Manager.CloseModel(modelID);
 
   return 1;
 }
