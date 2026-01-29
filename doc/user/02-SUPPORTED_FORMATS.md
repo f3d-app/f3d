@@ -3,7 +3,7 @@
 F3D supports the following file formats:
 
 | Name                                      | File Extension(s)                              | Full scene | Animation Support | Streaming Support | Plugin    | Reader Name             |
-| ----------------------------------------- | ---------------------------------------------- | ---------- | ----------------- | ----------------- | --------- | ----------------------- |
+| ----------------------------------------- | ---------------------------------------------- | ---------- | ----------------- | ----------------- |-----------| ----------------------- |
 | Legacy VTK                                | `.vtk`                                         | No         | NONE              | YES (VTK 9.7)     | `native`  | `VTKLegacy`             |
 | VTK XML                                   | `.vtp`, `.vtu`, `.vtr`, `.vti`, `.vts`, `.vtm` | No         | NONE              | YES (VTK 9.7)     | `native`  | `VTKXMLVT<P,U,R,I,S,M>` |
 | VTKHDF                                    | `.vtkhdf`                                      | No         | UNIQUE            | YES (VTK 9.6)     | `hdf`     | `VTKHDF`                |
@@ -37,7 +37,7 @@ F3D supports the following file formats:
 | 3D Manufacturing Format                   | `.3mf`                                         | Yes        | NONE              | YES (VTK 9.6)     | `assimp`  | `3MF`                   |
 | Universal Scene Description               | `.usd`, `.usda`, `.usdc`, `.usdz`              | Yes        | SINGLE            | NO                | `usd`     | `USD`                   |
 | VDB                                       | `.vdb`                                         | No         | NONE              | YES (VTK 9.6)     | `vdb`     | `VDB`                   |
-| Industry Foundation Classes               | `.ifc`                                         | No         | NONE              | YES               | `ifc`     | `IFC`                   |
+| Industry Foundation Classes               | `.ifc`                                         | No         | NONE              | YES               | `webifc`  | `IFC`                   |
 | 3D Gaussian splatting                     | `.splat`                                       | No         | NONE              | YES (VTK 9.5)     | `native`  | `Splat`                 |
 | Compressed 3D Gaussian splatting          | `.spz`                                         | No         | NONE              | YES (VTK 9.5)     | `native`  | `SPZ`                   |
 

@@ -3,7 +3,7 @@ description: "Install webifc Dependency using cache when possible"
 inputs:
   cpu:
     description: "CPU architecture to build for"
-    required: false
+    required: true
     default: "x86_64"
   version:
     description: "Version of webifc to build"
