@@ -47,7 +47,7 @@ int TestF3DWebIFCReaderError(int vtkNotUsed(argc), char* argv[])
 
   // Test with invalid IFC file
   {
-    std::string filename = std::string(argv[1]) + "data/ifc/invalid.ifc";
+    std::string filename = std::string(argv[1]) + "data/invalid.ifc";
 
     vtkNew<vtkF3DWebIFCReader> reader;
     reader->SetFileName(filename);

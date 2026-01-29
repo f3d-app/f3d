@@ -8,7 +8,7 @@
 
 int TestF3DWebIFCReader(int vtkNotUsed(argc), char* argv[])
 {
-  std::string filename = std::string(argv[1]) + "data/ifc/IfcOpenHouse_IFC4.ifc";
+  std::string filename = std::string(argv[1]) + "data/IfcOpenHouse_IFC4.ifc";
 
   vtkNew<vtkF3DWebIFCReader> reader;
   reader->SetFileName(filename);
