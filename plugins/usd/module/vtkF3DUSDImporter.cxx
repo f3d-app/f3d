@@ -26,12 +26,16 @@
 #include <vtkPolyDataTangents.h>
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
+#include <vtkShaderProperty.h>
 #include <vtkSmartPointer.h>
 #include <vtkSphereSource.h>
+#include <vtkStringArray.h>
 #include <vtkTexture.h>
 #include <vtkTransform.h>
 #include <vtkTransformFilter.h>
 #include <vtkTriangleFilter.h>
+#include <vtkUniforms.h>
+#include <vtkUnsignedShortArray.h>
 #include <vtkVersion.h>
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
@@ -76,6 +80,12 @@
 #include <pxr/usd/usdShade/material.h>
 #include <pxr/usd/usdShade/materialBindingAPI.h>
 #include <pxr/usd/usdSkel/bakeSkinning.h>
+#include <pxr/usd/usdSkel/binding.h>
+#include <pxr/usd/usdSkel/cache.h>
+#include <pxr/usd/usdSkel/root.h>
+#include <pxr/usd/usdSkel/skeleton.h>
+#include <pxr/usd/usdSkel/skeletonQuery.h>
+#include <pxr/usd/usdSkel/skinningQuery.h>
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #elif defined(__GNUC__)
@@ -110,10 +120,8 @@ public:
 
       if (this->Stage)
       {
-        // TODO: USD bake skinning is not performant
-        // We need to read joints and do the skinning in the shader
-        // See https://github.com/f3d-app/f3d/issues/1076
-        pxr::UsdSkelBakeSkinning(this->Stage->Traverse());
+        // Initialize skeleton cache for GPU-based skinning
+        this->SkelCache.Populate(pxr::UsdSkelRoot(this->Stage->GetPseudoRoot()), pxr::UsdTraverseInstanceProxies());
       }
     }
   }
@@ -267,6 +275,130 @@ public:
 
     actor->SetMapper(mapper);
     actor->SetUserMatrix(mat);
+  }
+
+  void ExtractSkinningData(vtkPolyData* polyData, const pxr::UsdGeomMesh& meshPrim)
+  {
+    // Query the skinning data for this mesh
+    pxr::UsdSkelSkinningQuery skinningQuery = this->SkelCache.GetSkinningQuery(meshPrim.GetPrim());
+    
+    if (!skinningQuery.IsValid())
+    {
+      return; // No skinning data for this mesh
+    }
+
+    // Get joint influences and weights
+    pxr::VtIntArray jointIndices;
+    pxr::VtFloatArray jointWeights;
+    pxr::TfToken interpolation;
+    
+    if (!skinningQuery.ComputeJointInfluences(&jointIndices, &jointWeights, &interpolation))
+    {
+      return;
+    }
+
+    // Get the number of influences per point
+    int numInfluencesPerPoint = skinningQuery.GetNumInfluencesPerComponent();
+    if (numInfluencesPerPoint > 4)
+    {
+      vtkWarningWithObjectMacro(this->Parent, 
+        "USD mesh has " << numInfluencesPerPoint << " influences per vertex. "
+        "GPU skinning only supports up to 4. Extra influences will be ignored.");
+      numInfluencesPerPoint = 4;
+    }
+
+    vtkIdType numPoints = polyData->GetNumberOfPoints();
+    
+    // Create VTK arrays for joint indices and weights (limit to 4 per vertex for GPU compatibility)
+    vtkNew<vtkUnsignedShortArray> boneIds;
+    boneIds->SetName("JOINTS_0");
+    boneIds->SetNumberOfComponents(4);
+    boneIds->SetNumberOfTuples(numPoints);
+    
+    vtkNew<vtkFloatArray> weights;
+    weights->SetName("WEIGHTS_0");
+    weights->SetNumberOfComponents(4);
+    weights->SetNumberOfTuples(numPoints);
+    
+    // Fill the arrays
+    for (vtkIdType i = 0; i < numPoints; i++)
+    {
+      for (int j = 0; j < 4; j++)
+      {
+        if (j < numInfluencesPerPoint && (i * numInfluencesPerPoint + j) < jointIndices.size())
+        {
+          boneIds->SetTypedComponent(i, j, static_cast<unsigned short>(jointIndices[i * numInfluencesPerPoint + j]));
+          weights->SetTypedComponent(i, j, jointWeights[i * numInfluencesPerPoint + j]);
+        }
+        else
+        {
+          boneIds->SetTypedComponent(i, j, 0);
+          weights->SetTypedComponent(i, j, 0.0f);
+        }
+      }
+    }
+    
+    polyData->GetPointData()->AddArray(boneIds);
+    polyData->GetPointData()->AddArray(weights);
+    
+    // Get skeleton binding and extract bone names and inverse bind matrices
+    const pxr::UsdSkelSkeleton& skeleton = skinningQuery.GetSkeleton();
+    if (!skeleton)
+    {
+      return;
+    }
+
+    pxr::UsdSkelSkeletonQuery skelQuery = this->SkelCache.GetSkelQuery(skeleton);
+    if (!skelQuery.IsValid())
+    {
+      return;
+    }
+
+    // Get joint order (bone names)
+    pxr::VtTokenArray jointOrder = skelQuery.GetJointOrder();
+    
+    vtkNew<vtkStringArray> bonesList;
+    bonesList->SetName("Bones");
+    for (const auto& joint : jointOrder)
+    {
+      bonesList->InsertNextValue(joint.GetString());
+    }
+    polyData->GetFieldData()->AddArray(bonesList);
+    
+    // Get inverse bind matrices (bind transforms)
+    pxr::VtMatrix4dArray bindTransforms;
+    if (!skelQuery.GetJointWorldBindTransforms(&bindTransforms))
+    {
+      return;
+    }
+    
+    vtkNew<vtkDoubleArray> bonesTransform;
+    bonesTransform->SetName("InverseBindMatrices");
+    bonesTransform->SetNumberOfComponents(16);
+    
+    for (const auto& bindMat : bindTransforms)
+    {
+      // Invert the bind transform to get inverse bind matrix
+      pxr::GfMatrix4d invBindMat = bindMat.GetInverse();
+      
+      // Convert from column-major (USD) to row-major (VTK)
+      double matData[16];
+      for (int i = 0; i < 4; i++)
+      {
+        for (int j = 0; j < 4; j++)
+        {
+          matData[i * 4 + j] = invBindMat[j][i]; // Transpose
+        }
+      }
+      
+      bonesTransform->InsertNextTypedTuple(matData);
+    }
+    
+    polyData->GetFieldData()->AddArray(bonesTransform);
+    
+    // Store skeleton path for later animation updates
+    std::string skelPath = skeleton.GetPath().GetString();
+    this->SkeletonJointMatrices[meshPrim.GetPath().GetString()] = nullptr; // Mark as skinned mesh
   }
 
   void ImportNode(vtkRenderer* renderer, const pxr::UsdPrim& node, const pxr::SdfPath& path,
@@ -494,6 +626,9 @@ public:
             faceVaryingFilter->Update();
 
             mappedPolydata = faceVaryingFilter->GetOutput();
+            
+            // Extract skinning data if this mesh is skinned
+            this->ExtractSkinningData(mappedPolydata, meshPrim);
           }
 
           polydata = mappedPolydata;
@@ -1170,6 +1305,164 @@ public:
     return prop;
   }
 
+  void UpdateBones()
+  {
+    if (!this->Stage)
+    {
+      return;
+    }
+
+    pxr::UsdTimeCode timeCode = this->CurrentTime * this->Stage->GetTimeCodesPerSecond();
+
+    // Iterate through all actors to update their bone matrices
+    for (auto& actorPair : this->ActorMap)
+    {
+      vtkActor* actor = actorPair.second;
+      if (!actor)
+      {
+        continue;
+      }
+
+      vtkPolyDataMapper* mapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
+      if (!mapper)
+      {
+        continue;
+      }
+
+      vtkPolyData* polyData = mapper->GetInput();
+      if (!polyData)
+      {
+        continue;
+      }
+
+      // Check if this mesh has skinning data
+      vtkStringArray* bonesList =
+        vtkStringArray::SafeDownCast(polyData->GetFieldData()->GetAbstractArray("Bones"));
+      vtkDoubleArray* bonesTransform =
+        vtkDoubleArray::SafeDownCast(polyData->GetFieldData()->GetArray("InverseBindMatrices"));
+
+      if (!bonesList || !bonesTransform)
+      {
+        continue; // No skinning data for this mesh
+      }
+
+      vtkIdType nbBones = bonesList->GetNumberOfValues();
+      if (nbBones == 0)
+      {
+        continue;
+      }
+
+      // Find the skinning query for this mesh
+      // We need to get the mesh prim from the path stored in the actor map
+      std::string actorPath = actorPair.first;
+      
+      // Try to find corresponding mesh in MeshMap
+      pxr::UsdGeomMesh meshPrim;
+      bool foundMesh = false;
+      for (const auto& meshPair : this->MeshMap)
+      {
+        if (actorPath.find(meshPair.first) != std::string::npos)
+        {
+          pxr::UsdPrim prim = this->Stage->GetPrimAtPath(pxr::SdfPath(meshPair.first));
+          if (prim.IsA<pxr::UsdGeomMesh>())
+          {
+            meshPrim = pxr::UsdGeomMesh(prim);
+            foundMesh = true;
+            break;
+          }
+        }
+      }
+
+      if (!foundMesh)
+      {
+        continue;
+      }
+
+      pxr::UsdSkelSkinningQuery skinningQuery = this->SkelCache.GetSkinningQuery(meshPrim.GetPrim());
+      if (!skinningQuery.IsValid())
+      {
+        continue;
+      }
+
+      const pxr::UsdSkelSkeleton& skeleton = skinningQuery.GetSkeleton();
+      if (!skeleton)
+      {
+        continue;
+      }
+
+      pxr::UsdSkelSkeletonQuery skelQuery = this->SkelCache.GetSkelQuery(skeleton);
+      if (!skelQuery.IsValid())
+      {
+        continue;
+      }
+
+      // Compute joint transforms at current time
+      pxr::VtMatrix4dArray jointLocalTransforms;
+      if (!skelQuery.ComputeJointLocalTransforms(&jointLocalTransforms, timeCode))
+      {
+        continue;
+      }
+
+      // Get skinning transforms (combines local transforms into world space)
+      pxr::VtMatrix4dArray skinningTransforms;
+      if (!skelQuery.ComputeSkinningTransforms(&skinningTransforms, timeCode))
+      {
+        continue;
+      }
+
+      // Prepare the joint matrices for the shader
+      std::vector<float> jointMatrices;
+      jointMatrices.reserve(16 * nbBones);
+
+      // Get inverse root transform
+      vtkNew<vtkMatrix4x4> inverseRoot;
+      actor->GetUserMatrix()->DeepCopy(inverseRoot);
+      inverseRoot->Invert();
+
+      for (vtkIdType i = 0; i < nbBones; i++)
+      {
+        // Get the inverse bind matrix for this bone
+        vtkNew<vtkMatrix4x4> invBindMat;
+        bonesTransform->GetTypedTuple(i, invBindMat->GetData());
+
+        // Get the skinning transform (world space joint transform)
+        const pxr::GfMatrix4d& skinningXform = skinningTransforms[i];
+
+        // Convert USD matrix to VTK matrix
+        vtkNew<vtkMatrix4x4> jointMat;
+        for (int row = 0; row < 4; row++)
+        {
+          for (int col = 0; col < 4; col++)
+          {
+            jointMat->SetElement(row, col, skinningXform[col][row]); // Transpose
+          }
+        }
+
+        // Combine: skinningTransform * inverseBindMatrix
+        vtkNew<vtkMatrix4x4> boneMat;
+        vtkMatrix4x4::Multiply4x4(jointMat, invBindMat, boneMat);
+
+        // Apply inverse root transform
+        vtkMatrix4x4::Multiply4x4(inverseRoot, boneMat, boneMat);
+
+        // Convert to column-major for shader (transpose)
+        for (int col = 0; col < 4; col++)
+        {
+          for (int row = 0; row < 4; row++)
+          {
+            jointMatrices.push_back(static_cast<float>(boneMat->GetElement(row, col)));
+          }
+        }
+      }
+
+      // Set the joint matrices as shader uniforms
+      vtkShaderProperty* shaderProp = actor->GetShaderProperty();
+      vtkUniforms* uniforms = shaderProp->GetVertexCustomUniforms();
+      uniforms->RemoveAllUniforms();
+      uniforms->SetUniformMatrix4x4v("jointMatrices", static_cast<int>(nbBones), jointMatrices.data());
+    }
+  }
+
   bool HasTimeCode()
   {
     return this->Stage ? this->Stage->HasAuthoredTimeCodeRange() : false;
@@ -1187,12 +1480,14 @@ public:
   }
 
   pxr::UsdStageRefPtr Stage = nullptr;
+  pxr::UsdSkelCache SkelCache;
 
 private:
   std::unordered_map<std::string, vtkSmartPointer<vtkActor>> ActorMap;
   std::unordered_map<std::string, vtkSmartPointer<vtkPolyData>> MeshMap;
   std::unordered_map<std::string, vtkSmartPointer<vtkProperty>> ShaderMap;
   std::unordered_map<std::string, vtkSmartPointer<vtkImageData>> TextureMap;
+  std::unordered_map<std::string, vtkSmartPointer<vtkMatrix4x4>> SkeletonJointMatrices;
   double CurrentTime = 0.0;
 
   class DiagDelegate : public pxr::TfDiagnosticMgr::Delegate
@@ -1262,6 +1557,11 @@ void vtkF3DUSDImporter::ImportActors(vtkRenderer* renderer)
   {
     this->SetFailureStatus();
   }
+  else
+  {
+    // Update bone matrices after initial import
+    this->Internals->UpdateBones();
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -1283,6 +1583,7 @@ bool vtkF3DUSDImporter::UpdateAtTimeValue(double timeValue)
 {
   this->Internals->SetCurrentTime(timeValue);
   this->Update();
+  this->Internals->UpdateBones();
   return this->Superclass::UpdateAtTimeValue(timeValue);
 }
 

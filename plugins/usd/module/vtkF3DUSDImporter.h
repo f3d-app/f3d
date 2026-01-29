@@ -10,7 +10,6 @@
  * - Only supports preview materials
  * - Does not support UV transforms
  * - Do not support lights and cameras
- * - Skinning is done on the CPU
  * - Ignore volumes and NURBS
  *
  * @sa https://openusd.org/release/index.html
