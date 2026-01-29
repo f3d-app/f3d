@@ -61,6 +61,19 @@ int F3DUtils::ParseToInt(const std::string& str, int def, const std::string& nam
 //----------------------------------------------------------------------------
 double F3DUtils::getDPIScale()
 {
+  std::string forceDpiStr;
+  if (vtksys::SystemTools::GetEnv("CTEST_F3D_FORCE_DPI_SCALE", forceDpiStr))
+  {
+    try
+    {
+      return std::stod(forceDpiStr);
+    }
+    catch (const std::exception&)
+    {
+      // silently ignore invalid values
+    }
+  }
+
   constexpr int baseDPI = 96;
   unsigned int dpi = baseDPI;
 
