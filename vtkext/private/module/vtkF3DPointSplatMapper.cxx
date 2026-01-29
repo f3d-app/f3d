@@ -4,7 +4,6 @@
 #include "vtkF3DBitonicSort.h"
 #include "vtkF3DComputeDepthCS.h"
 #endif
-#include "vtkF3DPointSplatUtilsSDF.h"
 #include "vtkF3DPointSplatVS.h"
 #include "vtkF3DRenderer.h"
 
@@ -403,11 +402,6 @@ void vtkF3DSplatMapperHelper::ReplaceShaderPositionVC(
 {
   std::string VSSource = shaders[vtkShader::Vertex]->GetSource();
   std::string FSSource = shaders[vtkShader::Fragment]->GetSource();
-
-  std::string sdfFunctions = vtkF3DPointSplatUtilsSDF;
-
-  vtkShaderProgram::Substitute(
-    FSSource, "//VTK::PositionVC::Dec\n", sdfFunctions + "//VTK::PositionVC::Dec\n");
 
   if (this->OwnerUseInstancing())
   {

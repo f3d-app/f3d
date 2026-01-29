@@ -10,6 +10,7 @@
 #include "vtkF3DInteractorStyle.h"
 #include "vtkF3DOpenGLGridMapper.h"
 #include "vtkF3DOverlayRenderPass.h"
+#include "vtkF3DPointSplatUtilsSDF.h"
 #include "vtkF3DPolyDataMapper.h"
 #include "vtkF3DRenderPass.h"
 #include "vtkF3DSolidBackgroundPass.h"
@@ -2620,6 +2621,13 @@ void vtkF3DRenderer::ConfigurePointSprites()
     vtkF3DPointSplatMapper* splatMapper = vtkF3DPointSplatMapper::SafeDownCast(sprites.Mapper);
     splatMapper->SetUseInstancing(this->PointSpritesUseInstancing);
 #endif
+
+    // add SDF functions
+    vtkShaderProperty* sp = sprites.Actor->GetShaderProperty();
+    sp->ClearAllFragmentShaderReplacements();
+
+    std::string sdfFunctions = vtkF3DPointSplatUtilsSDF;
+    sp->AddFragmentShaderReplacement("//VTK::PositionVC::Dec\n", true, sdfFunctions + "//VTK::PositionVC::Dec\n", true);
 
     sprites.Mapper->EmissiveOff();
     sprites.Mapper->SetScaleFactor(scaleFactor);
