@@ -35,6 +35,9 @@ inputs:
   webp_version:
     description: "Version of webp to build"
     required: false
+  webifc_version:
+    description: "Version of webifc to build"
+    required: false
   global_cache_index:
     description: "Global cache index"
     required: true
@@ -115,4 +118,12 @@ runs:
       with:
         cpu: ${{inputs.cpu}}
         version: ${{inputs.webp_version}}
+        global_cache_index: ${{inputs.global_cache_index}}
+
+    - name: Install webifc dependency
+      if: inputs.webifc_version != ''
+      uses: ./source/.github/actions/webifc-install-dep
+      with:
+        cpu: ${{inputs.cpu}}
+        version: ${{inputs.webifc_version}}
         global_cache_index: ${{inputs.global_cache_index}}

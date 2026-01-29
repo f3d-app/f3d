@@ -57,6 +57,7 @@ jobs:
       usd_version: ${{ steps.set_default_versions.outputs.usd_version }}
       webp_min_version: ${{ steps.set_default_versions.outputs.webp_min_version }}
       webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
+      webifc_version: ${{ steps.set_default_versions.outputs.webifc_version }}
       zlib_min_version: ${{ steps.set_default_versions.outputs.zlib_min_version }}
       zlib_version: ${{ steps.set_default_versions.outputs.zlib_version }}
       vtk_commit_sha: ${{ steps.set_default_versions.outputs.vtk_commit_sha }}
@@ -186,6 +187,7 @@ jobs:
           tbb_version: ${{matrix.tbb_version}}
           usd_version: ${{matrix.usd_version}}
           webp_version: ${{matrix.webp_version}}
+          webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           zlib_version: ${{matrix.zlib_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
@@ -360,6 +362,7 @@ jobs:
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           webp_version: ${{needs.default_versions.outputs.webp_version}}
+          webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
@@ -603,6 +606,7 @@ jobs:
           tbb_version: ${{matrix.tbb_version}}
           usd_version: ${{matrix.usd_version}}
           webp_version: ${{matrix.webp_version}}
+          webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           zlib_version: ${{matrix.zlib_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
@@ -654,6 +658,7 @@ jobs:
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           webp_version: ${{needs.default_versions.outputs.webp_version}}
+          webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
@@ -716,6 +721,7 @@ jobs:
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           webp_version: ${{needs.default_versions.outputs.webp_version}}
+          webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
@@ -777,6 +783,7 @@ jobs:
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
           webp_version: ${{needs.default_versions.outputs.webp_version}}
+          webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
@@ -823,6 +830,7 @@ jobs:
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
           webp_version: ${{needs.default_versions.outputs.webp_version}}
+          webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
@@ -875,6 +883,7 @@ jobs:
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
           webp_version: ${{needs.default_versions.outputs.webp_version}}
+          webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
@@ -921,6 +930,7 @@ jobs:
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           vtk_version: ${{needs.default_versions.outputs.vtk_commit_sha}}
           webp_version: ${{needs.default_versions.outputs.webp_version}}
+          webifc_version: ${{needs.default_versions.outputs.webifc_version}}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 

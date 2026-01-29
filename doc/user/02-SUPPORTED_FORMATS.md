@@ -37,6 +37,7 @@ F3D supports the following file formats:
 | 3D Manufacturing Format                   | `.3mf`                                         | Yes        | NONE              | YES (VTK 9.6)     | `assimp`  | `3MF`                   |
 | Universal Scene Description               | `.usd`, `.usda`, `.usdc`, `.usdz`              | Yes        | SINGLE            | NO                | `usd`     | `USD`                   |
 | VDB                                       | `.vdb`                                         | No         | NONE              | YES (VTK 9.6)     | `vdb`     | `VDB`                   |
+| Industry Foundation Classes               | `.ifc`                                         | No         | NONE              | YES               | `ifc`     | `IFC`                   |
 | 3D Gaussian splatting                     | `.splat`                                       | No         | NONE              | YES (VTK 9.5)     | `native`  | `Splat`                 |
 | Compressed 3D Gaussian splatting          | `.spz`                                         | No         | NONE              | YES (VTK 9.5)     | `native`  | `SPZ`                   |
 
@@ -71,6 +72,9 @@ For booleans, 0 means false, not 0 means true. Unsigned int will interpret anyth
 | `occt`         | `XBF.relative_deflection`  | `bool`         | Control if the deflection values are relative to object size, default is false.      |
 | `occt`         | `XBF.read_wire`            | `bool`         | Control if lines should be read, default is true.                                    |
 | `mdl`          | `QuakeMDL.skin_index`      | `unsigned int` | Select a particular skin from a `mdl` file. Uses 0-indexing, default is 0.           |
+| `ifc`          | `IFC.circle_segments`      | `int`          | Number of segments for circular geometry, default is 12.                             |
+| `ifc`          | `IFC.read_openings`        | `bool`         | Read IfcOpeningElement entities (doors/windows cutouts), default is false.           |
+| `ifc`          | `IFC.read_spaces`          | `bool`         | Read IfcSpace entities (room volumes), default is false.                             |
 
 ## Format details
 
