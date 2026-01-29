@@ -19,6 +19,7 @@
 #include <vtkProperty.h>
 #include <vtkQuaternion.h>
 #include <vtkRenderer.h>
+#include <vtkResourceParser.h>
 #include <vtkShaderProperty.h>
 #include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
@@ -43,6 +44,7 @@
 #include <regex>
 #include <set>
 
+#include <iostream>
 vtkStandardNewMacro(vtkF3DAssimpImporter);
 
 class vtkF3DAssimpImporter::vtkInternals
@@ -1237,4 +1239,45 @@ void vtkF3DAssimpImporter::ImportCameras(vtkRenderer* renderer)
 void vtkF3DAssimpImporter::ImportLights(vtkRenderer* renderer)
 {
   this->Internals->ImportLights(renderer);
+}
+
+//------------------------------------------------------------------------------
+bool vtkF3DAssimpImporter::CanReadFile(vtkResourceStream* stream, std::string& hint)
+{
+  if (!stream)
+  {
+    return false;
+  }
+
+  // FBX: Kaydara FBX Binary \0
+  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+  constexpr std::string_view fbxMagic{"Kaydara FBX Binary  \0", 21};
+  std::array<char, 21> magic;
+  if (stream->Read(&magic, magic.size()) == magic.size())
+  {
+    if (std::string_view(magic.data(), magic.size()) == fbxMagic)
+    {
+      hint = "fbx";
+      return true;
+    }
+  }
+
+  /* COLLADA:
+  <?xml version="1.0"...
+  <COLLADA ...
+  */
+  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+  vtkNew<vtkResourceParser> parser;
+  parser->SetStream(stream);
+  std::string line1, line2;
+  if (parser->ReadLine(line1) == vtkParseResult::EndOfLine && parser->ReadLine(line2) == vtkParseResult::EndOfLine)
+  {
+    if (line1.rfind(R"(<?xml version="1.0")", 0) == 0 && line2.rfind("<COLLADA ", 0) == 0)
+    {
+      hint = "dae";
+      return true;
+    }
+  }
+
+  return false;
 }
