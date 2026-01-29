@@ -1061,7 +1061,7 @@ interactor& interactor_impl::initCommands()
       bool& enabled = this->Internals->Options.model.point_sprites.enable;
       std::string& type = this->Internals->Options.model.point_sprites.type;
 
-      // C++20: use `std::to_array<std::string_view>` to avoid specifying the size
+      // C++20: use `std::to_array<std::string_view>` to avoid specifying the size explicitly
       constexpr std::array<std::string_view, 6> validTypes = { "sphere", "gaussian", "circle",
         "stddev", "bound", "cross" };
       if (!enabled)
