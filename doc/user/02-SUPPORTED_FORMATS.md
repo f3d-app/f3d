@@ -3,7 +3,7 @@
 F3D supports the following file formats:
 
 | Name                                      | File Extension(s)                              | Full scene | Animation Support | Streaming Support | Plugin    | Reader Name             |
-| ----------------------------------------- | ---------------------------------------------- | ---------- | ----------------- | ----------------- |-----------| ----------------------- |
+| ----------------------------------------- | ---------------------------------------------- | ---------- | ----------------- | ----------------- | --------- | ----------------------- |
 | Legacy VTK                                | `.vtk`                                         | No         | NONE              | YES (VTK 9.7)     | `native`  | `VTKLegacy`             |
 | VTK XML                                   | `.vtp`, `.vtu`, `.vtr`, `.vti`, `.vts`, `.vtm` | No         | NONE              | YES (VTK 9.7)     | `native`  | `VTKXMLVT<P,U,R,I,S,M>` |
 | VTKHDF                                    | `.vtkhdf`                                      | No         | UNIQUE            | YES (VTK 9.6)     | `hdf`     | `VTKHDF`                |
@@ -53,7 +53,7 @@ eg: `-DVDB.downsampling_factor=0.5` or using the `set_reader_option` [command](0
 For booleans, 0 means false, not 0 means true. Unsigned int will interpret anything that is not a non-negative integer as the default value.
 
 | Plugin   | Option Name                | Argument Type  | Description                                                                          |
-|----------| -------------------------- | -------------- | ------------------------------------------------------------------------------------ |
+| -------- | -------------------------- | -------------- | ------------------------------------------------------------------------------------ |
 | `vdb`    | `VDB.downsampling_factor`  | `double`       | Control the level of downsampling when reading a volume, default is 0.1.             |
 | `occt`   | `STEP.linear_deflection`   | `double`       | Control the distance between a curve and the resulting tessellation, default is 0.1. |
 | `occt`   | `STEP.angular_deflection`  | `double`       | Control the angle between two subsequent segments, default is 0.5.                   |
