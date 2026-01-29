@@ -110,7 +110,7 @@ void camera_impl::getPositionToFocalVector(vector3_t& vec) const
   this->getPosition(pos);
   this->getFocalPoint(focal);
 
-  vtkMath::Subtract(pos.data(), focal.data(), vec.data());
+  vtkMath::Subtract(focal.data(), pos.data(), vec.data());
 }
 
 //----------------------------------------------------------------------------
@@ -121,10 +121,14 @@ double camera_impl::getWorldAzimuth() const
   vtkMath::Normalize(view.data());
 
   vtkRenderer* ren = this->Internals->VTKRenderer;
-  double* up = ren->GetEnvironmentUp();
-  double* right = ren->GetEnvironmentRight();
+  const double* up = ren->GetEnvironmentUp();
+  const double* right = ren->GetEnvironmentRight();
 
-  // Project view vector onto plane orthogonal to up
+  // Derive environment forward = up × right
+  vector3_t forward;
+  vtkMath::Cross(up, right, forward.data());
+  vtkMath::Normalize(forward.data());
+
   vector3_t projUp;
   vtkMath::ProjectVector(view.data(), up, projUp.data());
 
@@ -139,8 +143,8 @@ double camera_impl::getWorldAzimuth() const
 
   vtkMath::Normalize(horizontal.data());
 
-  // Signed angle between right and horizontal projection
-  double angleRad = vtkMath::SignedAngleBetweenVectors(right, horizontal.data(), up);
+  // Signed angle between environment forward and horizontal view direction
+  double angleRad = vtkMath::SignedAngleBetweenVectors(horizontal.data(), forward.data(), up);
 
   return vtkMath::DegreesFromRadians(angleRad);
 }
