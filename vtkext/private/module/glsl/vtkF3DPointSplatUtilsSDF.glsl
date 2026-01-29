@@ -51,7 +51,6 @@ float opShift(float sd, float shift)
 float strokePx(float sd, float thickness)
 {
   float halfStroke = 0.5 * thickness;
-
   return 1.0 - smoothstep(halfStroke - 1.0, halfStroke + 1.0, abs(sd));
 }
 
@@ -60,9 +59,7 @@ float strokePx(float sd, float thickness)
 float stroke(float sd, float thickness)
 {
   float w = fwidth(sd);
-
   float halfStroke = 0.5 * thickness * w;
-
   return 1.0 - smoothstep(halfStroke - w, halfStroke + w, abs(sd));
 }
 
@@ -78,6 +75,5 @@ float fillPx(float sd)
 float fill(float sd)
 {
     float w = fwidth(sd);
-
     return 1.0 - smoothstep(0.0, w, sd);
 }

@@ -433,7 +433,7 @@ void window_impl::UpdateDynamicOptions()
     else
     {
       log::warn(opt.model.point_sprites.type,
-        R"( is an invalid point sprites type. Valid modes are: "gaussian", "sphere", "circle", "stddev", "bound", "cross"). Falling back to "gaussian".)");
+        R"( is an invalid point sprites type. Valid modes are: "sphere", "gaussian", "circle", "stddev", "bound", "cross"). Falling back to "sphere".)");
     }
     renderer->SetPointSpritesType(splatType);
     renderer->SetPointSpritesSize(
