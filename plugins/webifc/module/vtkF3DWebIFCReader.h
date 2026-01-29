@@ -2,7 +2,7 @@
  * @class   vtkF3DWebIFCReader
  * @brief   VTK Reader for IFC (Industry Foundation Classes) files
  *
- * This reader is based on webifc library to parse and generate geometry
+ * This reader is using the web-ifc library to parse and generate geometry
  * from IFC files used in BIM (Building Information Modeling).
  *
  * The reader supports IFC2x3, IFC4, and IFC4x3 schemas.

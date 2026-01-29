@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <array>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -319,7 +320,7 @@ int vtkF3DWebIFCReader::RequestData(
     output->GetCellData()->SetScalars(colors);
 
   }
-  catch (const std::exception& e)
+  catch (const std::runtime_error& e)
   {
     this->Internals->Manager.CloseModel(modelID);
     vtkErrorMacro("Error processing IFC file: " << e.what());
