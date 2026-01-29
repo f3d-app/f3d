@@ -163,5 +163,75 @@ int TestSDKCamera([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   test("foc when cross product of pos->foc and up is 0 - test 4", cam.getFocalPoint(), { 1, 0, 0 });
   test("up when cross product of pos->foc and up is 0 - test 4", cam.getViewUp(), { 0, 1, 0 });
 
+  // Test world azimuth, elevation and distance
+  f3d::options opt = eng.getOptions();
+  opt.scene.up_direction = { 0, 0, 1 };
+  eng.setOptions(opt);
+  win.render();
+
+  // Case 1: Horizontal view, +Y forward
+  cam.setPosition({ 0., -10., 0. });
+  cam.setFocalPoint({ 0., 0., 0. });
+  cam.setViewUp({ 0., 0., 1. });
+
+  test("getDistance (horizontal)", cam.getDistance(), approx(10.0));
+  test("getWorldElevation (horizontal)", cam.getWorldElevation(), approx(0.0));
+  test("getWorldAzimuth (horizontal)", cam.getWorldAzimuth(), approx(-90.0));
+
+  // Case 2: Positive elevation (+Z)
+  cam.resetToDefault();
+  cam.setPosition({ 0., -10., -10. });
+  cam.setFocalPoint({ 0., 0., 0. });
+  cam.setViewUp({ 0., 0., 1. });
+
+  test("getDistance (positive elevation)", cam.getDistance(), approx(std::sqrt(200.0)));
+  test("getWorldElevation (positive elevation)", cam.getWorldElevation(), approx(-45.0));
+
+  // Case 3: Negative elevation (-Z)
+  cam.resetToDefault();
+  cam.setPosition({ 0., -10., 10. });
+  cam.setFocalPoint({ 0., 0., 0. });
+  cam.setViewUp({ 0., 0., 1. });
+
+  test("getWorldElevation (negative elevation)", cam.getWorldElevation(), approx(45.0));
+
+  // Case 4: Zero-length direction vector
+  cam.resetToDefault();
+  cam.setPosition({ 0., 0., 0. });
+  cam.setFocalPoint({ 0., 0., 0. });
+  cam.setViewUp({ 0., 0., 1. });
+
+  test("getDistance (zero vector)", cam.getDistance(), approx(0.0));
+  test("getWorldAzimuth (zero vector)", cam.getWorldAzimuth(), approx(0.0));
+  test("getWorldElevation (zero vector)", cam.getWorldElevation(), approx(0.0));
+
+  // Case 5: Custom environment up (+X)
+  opt.scene.up_direction = { 1, 0, 0 };
+  eng.setOptions(opt);
+  win.render();
+
+  cam.resetToDefault();
+  cam.setPosition({ -10., 0., 0. });
+  cam.setFocalPoint({ 0., 0., 0. });
+  cam.setViewUp({ 1., 0., 0. });
+
+  test("getWorldElevation (custom up)", cam.getWorldElevation(), approx(-90.0));
+
+  // Case 6: Camera operations before calculation (typical usage)
+  cam.resetToDefault();
+  cam.setPosition({ 5., -7., 3. });
+  cam.setFocalPoint({ 0., 0., 0. });
+  cam.setViewUp({ 0., 0., 1. });
+
+  const double initialDistance = cam.getDistance();
+
+  cam.azimuth(37.0);
+  cam.elevation(-22.0);
+
+  test("getDistance invariant after azimuth/elevation", cam.getDistance(), approx(initialDistance));
+
+  test("getWorldAzimuth finite after camera operations", std::isfinite(cam.getWorldAzimuth()));
+
+  test("getWorldElevation finite after camera operations", std::isfinite(cam.getWorldElevation()));
   return test.result();
 }
