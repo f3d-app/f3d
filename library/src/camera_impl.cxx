@@ -143,7 +143,6 @@ double camera_impl::getWorldAzimuth() const
 
   vtkMath::Normalize(horizontal.data());
 
-  // Signed angle between environment forward and horizontal view direction
   double angleRad = vtkMath::SignedAngleBetweenVectors(horizontal.data(), forward.data(), up);
 
   return vtkMath::DegreesFromRadians(angleRad);
