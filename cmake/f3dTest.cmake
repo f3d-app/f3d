@@ -30,6 +30,7 @@ f3d_test(<NAME> [ARGS...])
   - `NO_DATA` Do not provide a data to the command line
   - `FORCE_RENDER` Position the environment variable `CTEST_F3D_NO_DATA_FORCE_RENDER` that forces a render
     even when F3D logic usually would not
+  - `DPI_SCALE` Set the DPI scale through the environment variable `CTEST_F3D_FORCE_DPI_SCALE`, default is 1.0
   - `UI` Mark the test to require the presence of UI component and disable it otherwise
   - `PIPED` Mark the test to pipe the data (`cat data | f3d`) instead of providing the filename as data,
     doesn't work for external plugins.
@@ -51,7 +52,7 @@ f3d_test(<NAME> [ARGS...])
 
 function(f3d_test)
 
-  cmake_parse_arguments(F3D_TEST "TONE_MAPPING;LONG_TIMEOUT;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI;PIPED;SCRIPT" "NAME;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;RENDERING_BACKEND;WORKING_DIR" "DATA;DEPENDS;ENV;ARGS" ${ARGN})
+  cmake_parse_arguments(F3D_TEST "TONE_MAPPING;LONG_TIMEOUT;INTERACTION;INTERACTION_CONFIGURE;NO_BASELINE;NO_RENDER;NO_OUTPUT;WILL_FAIL;NO_DATA_FORCE_RENDER;UI;PIPED;SCRIPT" "NAME;CONFIG;RESOLUTION;THRESHOLD;REGEXP;REGEXP_FAIL;HDRI;RENDERING_BACKEND;WORKING_DIR;DPI_SCALE" "DATA;DEPENDS;ENV;ARGS" ${ARGN})
 
   if(F3D_TEST_CONFIG)
     list(APPEND F3D_TEST_ARGS "--config=${F3D_TEST_CONFIG}")
@@ -217,6 +218,11 @@ function(f3d_test)
   endif ()
   if (F3D_TEST_NO_DATA_FORCE_RENDER)
     list(APPEND f3d_test_env_vars "CTEST_F3D_NO_DATA_FORCE_RENDER=1")
+  endif ()
+  if (F3D_TEST_DPI_SCALE)
+    list(APPEND f3d_test_env_vars "CTEST_F3D_FORCE_DPI_SCALE=${F3D_TEST_DPI_SCALE}")
+  else()
+    list(APPEND f3d_test_env_vars "CTEST_F3D_FORCE_DPI_SCALE=1.0")
   endif ()
 
   set_tests_properties(f3d::${F3D_TEST_NAME} PROPERTIES ENVIRONMENT
