@@ -16,7 +16,7 @@ int TestF3DWebIFCReaderStreamError(int vtkNotUsed(argc), char* argv[])
   vtkNew<vtkFileResourceStream> fileStream;
   if (!fileStream->Open(filename.c_str()))
   {
-    std::cerr << "Failed to open file stream" << '\n';
+    std::cerr << "Failed to open file stream\n";
     return EXIT_FAILURE;
   }
 
@@ -36,11 +36,11 @@ int TestF3DWebIFCReaderStreamError(int vtkNotUsed(argc), char* argv[])
   // With an invalid file, we expect empty geometry
   if (output && output->GetNumberOfPoints() > 0)
   {
-    std::cerr << "Expected no geometry from invalid stream" << '\n';
+    std::cerr << "Expected no geometry from invalid stream\n";
     return EXIT_FAILURE;
   }
 
-  std::cout << "Stream error handling test passed" << '\n';
+  std::cout << "Stream error handling test passed\n";
 
   return EXIT_SUCCESS;
 }

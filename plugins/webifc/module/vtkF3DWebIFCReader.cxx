@@ -53,8 +53,10 @@ void vtkF3DWebIFCReader::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "FileName: " << this->FileName << "\n";
   os << indent << "CircleSegments: " << this->CircleSegments << "\n";
-  os << indent << "ReadOpenings: " << (this->ReadOpenings ? "true" : "false") << "\n";
-  os << indent << "ReadSpaces: " << (this->ReadSpaces ? "true" : "false") << "\n";
+  os << std::boolalpha;
+  os << indent << "ReadOpenings: " << this->ReadOpenings << "\n";
+  os << indent << "ReadSpaces: " << this->ReadSpaces << "\n";
+  os << std::noboolalpha;
 }
 
 //----------------------------------------------------------------------------
