@@ -66,8 +66,8 @@ f3d_test(NAME TestDisplayDepthColorMap DATA dragon.vtu ARGS --display-depth --sc
 f3d_test(NAME TestDisplayDepthCustomColorMap DATA dragon.vtu ARGS --display-depth --scalar-coloring --colormap=0,red,1,blue)
 
 # DPI scaling
-f3d_test(NAME TestDPI125 DATA dragon.vtu ARGS -nm --dpi-aware DPI_SCALE 1.25)
-f3d_test(NAME TestDPI150 DATA dragon.vtu ARGS -nm --dpi-aware DPI_SCALE 1.5)
+f3d_test(NAME TestDPI125 DATA dragon.vtu ARGS -nm --dpi-aware DPI_SCALE 1.25 UI)
+f3d_test(NAME TestDPI150 DATA dragon.vtu ARGS -nm --dpi-aware DPI_SCALE 1.5 UI)
 
 ## Color/opacity map
 f3d_test(NAME TestColormap DATA IM-0001-1983.dcm ARGS --scalar-coloring --roughness=1 --colormap=0,1,0,0,1,0,1,0)
