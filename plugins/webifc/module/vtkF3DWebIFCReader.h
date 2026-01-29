@@ -55,8 +55,8 @@ public:
    * Higher values produce smoother curves but more geometry.
    * Default is 12.
    */
-  vtkGetMacro(CircleSegments, int);
-  vtkSetMacro(CircleSegments, int);
+  vtkGetMacro(CircleSegments, uint16_t);
+  vtkSetMacro(CircleSegments, uint16_t);
   ///@}
 
   ///@{
@@ -105,7 +105,7 @@ private:
   std::string FileName;
   vtkSmartPointer<vtkResourceStream> Stream;
 
-  int CircleSegments = 12;
+  uint16_t CircleSegments = 12;
   bool ReadOpenings = false;
   bool ReadSpaces = false;
 };

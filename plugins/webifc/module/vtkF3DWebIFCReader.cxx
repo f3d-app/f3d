@@ -130,7 +130,7 @@ int vtkF3DWebIFCReader::RequestData(
   try
   {
     webifc::manager::LoaderSettings settings;
-    settings.CIRCLE_SEGMENTS = static_cast<uint16_t>(this->CircleSegments);
+    settings.CIRCLE_SEGMENTS = this->CircleSegments;
     settings.COORDINATE_TO_ORIGIN = false;
 
     auto oldLevel = spdlog::get_level();
