@@ -318,7 +318,6 @@ int vtkF3DWebIFCReader::RequestData(
     output->SetPolys(allPolys);
     output->GetPointData()->SetNormals(normals);
     output->GetCellData()->SetScalars(colors);
-
   }
   catch (const std::runtime_error& e)
   {
