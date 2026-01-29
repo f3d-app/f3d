@@ -2627,7 +2627,8 @@ void vtkF3DRenderer::ConfigurePointSprites()
     sp->ClearAllFragmentShaderReplacements();
 
     std::string sdfFunctions = vtkF3DPointSplatUtilsSDF;
-    sp->AddFragmentShaderReplacement("//VTK::PositionVC::Dec\n", true, sdfFunctions + "//VTK::PositionVC::Dec\n", true);
+    sp->AddFragmentShaderReplacement(
+      "//VTK::PositionVC::Dec\n", true, sdfFunctions + "//VTK::PositionVC::Dec\n", true);
 
     sprites.Mapper->EmissiveOff();
     sprites.Mapper->SetScaleFactor(scaleFactor);
