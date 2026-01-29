@@ -322,6 +322,14 @@ public:
     weights->SetNumberOfComponents(4);
     weights->SetNumberOfTuples(numPoints);
 
+    // Verify array sizes match
+    if (jointIndices.size() != jointWeights.size())
+    {
+      vtkWarningWithObjectMacro(
+        this->Parent, "Joint indices and weights arrays have mismatched sizes. Skipping skinning.");
+      return;
+    }
+
     // Fill the arrays
     for (vtkIdType i = 0; i < numPoints; i++)
     {
@@ -329,8 +337,17 @@ public:
       {
         if (j < numInfluencesPerPoint && (i * numInfluencesPerPoint + j) < jointIndices.size())
         {
-          boneIds->SetTypedComponent(
-            i, j, static_cast<unsigned short>(jointIndices[i * numInfluencesPerPoint + j]));
+          int jointIndex = jointIndices[i * numInfluencesPerPoint + j];
+
+          // Validate joint index fits in unsigned short
+          if (jointIndex > 65535 || jointIndex < 0)
+          {
+            vtkWarningWithObjectMacro(this->Parent,
+              "Joint index " << jointIndex << " exceeds unsigned short range. Using 0 instead.");
+            jointIndex = 0;
+          }
+
+          boneIds->SetTypedComponent(i, j, static_cast<unsigned short>(jointIndex));
           weights->SetTypedComponent(i, j, jointWeights[i * numInfluencesPerPoint + j]);
         }
         else
@@ -375,12 +392,22 @@ public:
       return;
     }
 
+    // Validate that bind transforms match joint count
+    if (bindTransforms.size() != jointOrder.size())
+    {
+      vtkWarningWithObjectMacro(this->Parent,
+        "Bind transforms count (" << bindTransforms.size() << ") does not match joint count ("
+                                  << jointOrder.size() << "). Using minimum count.");
+    }
+
     vtkNew<vtkDoubleArray> bonesTransform;
     bonesTransform->SetName("InverseBindMatrices");
     bonesTransform->SetNumberOfComponents(16);
 
-    for (const auto& bindMat : bindTransforms)
+    size_t numTransforms = std::min(bindTransforms.size(), jointOrder.size());
+    for (size_t idx = 0; idx < numTransforms; idx++)
     {
+      const auto& bindMat = bindTransforms[idx];
       // Invert the bind transform to get inverse bind matrix
       pxr::GfMatrix4d invBindMat = bindMat.GetInverse();
 
@@ -399,9 +426,9 @@ public:
 
     polyData->GetFieldData()->AddArray(bonesTransform);
 
-    // Store skeleton path for later animation updates
-    std::string skelPath = skeleton.GetPath().GetString();
-    this->SkeletonJointMatrices[meshPrim.GetPath().GetString()] = nullptr; // Mark as skinned mesh
+    // Store mesh path for later bone updates
+    std::string meshPath = meshPrim.GetPath().GetString();
+    this->MeshToSkeletonMap[meshPath] = skeleton.GetPath().GetString();
   }
 
   void ImportNode(vtkRenderer* renderer, const pxr::UsdPrim& node, const pxr::SdfPath& path,
@@ -1355,62 +1382,58 @@ public:
         continue;
       }
 
-      // Find the skinning query for this mesh
-      // We need to get the mesh prim from the path stored in the actor map
+      // Find the mesh using the mapping we created during extraction
+      std::string meshPath;
       std::string actorPath = actorPair.first;
 
-      // Try to find corresponding mesh in MeshMap
-      pxr::UsdGeomMesh meshPrim;
-      bool foundMesh = false;
-      for (const auto& meshPair : this->MeshMap)
+      // Search for the mesh path that matches this actor
+      // Actor path typically contains the mesh path as a prefix
+      for (const auto& entry : this->MeshToSkeletonMap)
       {
-        if (actorPath.find(meshPair.first) != std::string::npos)
+        // Check if actor path contains or matches the mesh path
+        if (actorPath.find(entry.first) != std::string::npos)
         {
-          pxr::UsdPrim prim = this->Stage->GetPrimAtPath(pxr::SdfPath(meshPair.first));
-          if (prim.IsA<pxr::UsdGeomMesh>())
-          {
-            meshPrim = pxr::UsdGeomMesh(prim);
-            foundMesh = true;
-            break;
-          }
+          meshPath = entry.first;
+          break;
         }
       }
 
-      if (!foundMesh)
+      if (meshPath.empty())
+      {
+        continue; // No skeleton mapping found for this actor
+      }
+
+      // Get the skeleton path from our mapping
+      std::string skelPath = this->MeshToSkeletonMap[meshPath];
+
+      // Get the skeleton
+      pxr::UsdPrim skelPrim = this->Stage->GetPrimAtPath(pxr::SdfPath(skelPath));
+      if (!skelPrim.IsA<pxr::UsdSkelSkeleton>())
       {
         continue;
       }
 
-      pxr::UsdSkelSkinningQuery skinningQuery =
-        this->SkelCache.GetSkinningQuery(meshPrim.GetPrim());
-      if (!skinningQuery.IsValid())
-      {
-        continue;
-      }
-
-      const pxr::UsdSkelSkeleton& skeleton = skinningQuery.GetSkeleton();
-      if (!skeleton)
-      {
-        continue;
-      }
-
+      pxr::UsdSkelSkeleton skeleton(skelPrim);
       pxr::UsdSkelSkeletonQuery skelQuery = this->SkelCache.GetSkelQuery(skeleton);
       if (!skelQuery.IsValid())
       {
         continue;
       }
 
-      // Compute joint transforms at current time
-      pxr::VtMatrix4dArray jointLocalTransforms;
-      if (!skelQuery.ComputeJointLocalTransforms(&jointLocalTransforms, timeCode))
+      // Compute skinning transforms at current time
+      pxr::VtMatrix4dArray skinningTransforms;
+      if (!skelQuery.ComputeSkinningTransforms(&skinningTransforms, timeCode))
       {
         continue;
       }
 
-      // Get skinning transforms (combines local transforms into world space)
-      pxr::VtMatrix4dArray skinningTransforms;
-      if (!skelQuery.ComputeSkinningTransforms(&skinningTransforms, timeCode))
+      // Validate array size matches number of bones
+      if (skinningTransforms.size() < static_cast<size_t>(nbBones))
       {
+        vtkWarningWithObjectMacro(this->Parent,
+          "Skinning transforms count (" << skinningTransforms.size()
+                                        << ") is less than bone count (" << nbBones
+                                        << "). Skipping bone update.");
         continue;
       }
 
@@ -1418,10 +1441,19 @@ public:
       std::vector<float> jointMatrices;
       jointMatrices.reserve(16 * nbBones);
 
-      // Get inverse root transform
+      // Get user matrix and check for null
+      vtkMatrix4x4* userMatrix = actor->GetUserMatrix();
       vtkNew<vtkMatrix4x4> inverseRoot;
-      actor->GetUserMatrix()->DeepCopy(inverseRoot);
-      inverseRoot->Invert();
+      if (userMatrix)
+      {
+        userMatrix->DeepCopy(inverseRoot);
+        inverseRoot->Invert();
+      }
+      else
+      {
+        // Use identity matrix if no user matrix is set
+        inverseRoot->Identity();
+      }
 
       for (vtkIdType i = 0; i < nbBones; i++)
       {
@@ -1455,7 +1487,12 @@ public:
       // Set the joint matrices as shader uniforms
       vtkShaderProperty* shaderProp = actor->GetShaderProperty();
       vtkUniforms* uniforms = shaderProp->GetVertexCustomUniforms();
-      uniforms->RemoveAllUniforms();
+
+      // Only update the jointMatrices uniform, not all uniforms
+      if (uniforms->GetUniform("jointMatrices"))
+      {
+        uniforms->RemoveUniform("jointMatrices");
+      }
       uniforms->SetUniformMatrix4x4v(
         "jointMatrices", static_cast<int>(nbBones), jointMatrices.data());
     }
@@ -1485,7 +1522,7 @@ private:
   std::unordered_map<std::string, vtkSmartPointer<vtkPolyData>> MeshMap;
   std::unordered_map<std::string, vtkSmartPointer<vtkProperty>> ShaderMap;
   std::unordered_map<std::string, vtkSmartPointer<vtkImageData>> TextureMap;
-  std::unordered_map<std::string, vtkSmartPointer<vtkMatrix4x4>> SkeletonJointMatrices;
+  std::unordered_map<std::string, std::string> MeshToSkeletonMap; // Maps mesh path to skeleton path
   double CurrentTime = 0.0;
 
   class DiagDelegate : public pxr::TfDiagnosticMgr::Delegate
