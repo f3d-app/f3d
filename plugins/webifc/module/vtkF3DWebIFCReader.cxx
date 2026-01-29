@@ -37,6 +37,10 @@ vtkF3DWebIFCReader::vtkF3DWebIFCReader()
   : Internals(new vtkInternals())
 {
   this->vtkAlgorithm::SetNumberOfInputPorts(0);
+  // f3d sets GlobalWarningDisplay to true only at debug verbose level.
+  // Use it as a proxy since plugins don't have access to f3d::log.
+  spdlog::set_level(
+    vtkObject::GetGlobalWarningDisplay() ? spdlog::level::warn : spdlog::level::off);
 }
 
 //----------------------------------------------------------------------------
@@ -131,10 +135,7 @@ int vtkF3DWebIFCReader::RequestData(
   settings.CIRCLE_SEGMENTS = this->CircleSegments;
   settings.COORDINATE_TO_ORIGIN = false;
 
-  auto oldLevel = spdlog::get_level();
-  spdlog::set_level(spdlog::level::warn);
   uint32_t modelID = this->Internals->Manager.CreateModel(settings);
-  spdlog::set_level(oldLevel);
 
   try
   {
