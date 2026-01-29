@@ -1425,36 +1425,29 @@ public:
 
       for (vtkIdType i = 0; i < nbBones; i++)
       {
-        // Get the inverse bind matrix for this bone
-        vtkNew<vtkMatrix4x4> invBindMat;
-        bonesTransform->GetTypedTuple(i, invBindMat->GetData());
-
-        // Get the skinning transform (world space joint transform)
+        // Get the skinning transform (this already includes inverse bind matrix)
         const pxr::GfMatrix4d& skinningXform = skinningTransforms[i];
 
-        // Convert USD matrix to VTK matrix
-        vtkNew<vtkMatrix4x4> jointMat;
+        // Convert USD matrix to VTK matrix (transpose from column-major to row-major)
+        vtkNew<vtkMatrix4x4> boneMat;
         for (int row = 0; row < 4; row++)
         {
           for (int col = 0; col < 4; col++)
           {
-            jointMat->SetElement(row, col, skinningXform[col][row]); // Transpose
+            boneMat->SetElement(row, col, skinningXform[col][row]); // Transpose
           }
         }
 
-        // Combine: skinningTransform * inverseBindMatrix
-        vtkNew<vtkMatrix4x4> boneMat;
-        vtkMatrix4x4::Multiply4x4(jointMat, invBindMat, boneMat);
-
         // Apply inverse root transform
-        vtkMatrix4x4::Multiply4x4(inverseRoot, boneMat, boneMat);
+        vtkNew<vtkMatrix4x4> finalMat;
+        vtkMatrix4x4::Multiply4x4(inverseRoot, boneMat, finalMat);
 
-        // Convert to column-major for shader (transpose)
+        // Convert to column-major for shader (transpose back)
         for (int col = 0; col < 4; col++)
         {
           for (int row = 0; row < 4; row++)
           {
-            jointMatrices.push_back(static_cast<float>(boneMat->GetElement(row, col)));
+            jointMatrices.push_back(static_cast<float>(finalMat->GetElement(row, col)));
           }
         }
       }
