@@ -3,7 +3,7 @@
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
 #include <vtkFileResourceStream.h>
-#include <vtkFloatArray.h>
+#include <vtkDoubleArray.h>
 #include <vtkInformation.h>
 #include <vtkNew.h>
 #include <vtkObjectFactory.h>
@@ -160,7 +160,7 @@ int vtkF3DWebIFCReader::RequestData(
 
     vtkNew<vtkPoints> allPoints;
     vtkNew<vtkCellArray> allPolys;
-    vtkNew<vtkFloatArray> normals;
+    vtkNew<vtkDoubleArray> normals;
     normals->SetNumberOfComponents(3);
     normals->SetName("Normals");
     vtkNew<vtkUnsignedCharArray> colors;
@@ -222,8 +222,7 @@ int vtkF3DWebIFCReader::RequestData(
           localPositions.push_back({ tx, ty, tz });
           localNormals.push_back({ tnx, tny, tnz });
           allPoints->InsertNextPoint(tx, ty, tz);
-          normals->InsertNextTuple3(
-            static_cast<float>(tnx), static_cast<float>(tny), static_cast<float>(tnz));
+          normals->InsertNextTuple3(tnx, tny, tnz);
         }
 
         for (size_t i = 0; i < indexData.size(); i += 3)
@@ -279,8 +278,7 @@ int vtkF3DWebIFCReader::RequestData(
           double tnz = transform[2] * nx + transform[6] * ny + transform[10] * nz;
 
           allPoints->InsertNextPoint(tx, ty, tz);
-          normals->InsertNextTuple3(
-            static_cast<float>(tnx), static_cast<float>(tny), static_cast<float>(tnz));
+          normals->InsertNextTuple3(tnx, tny, tnz);
         }
 
         for (size_t i = 0; i < indexData.size(); i += 3)
@@ -330,6 +328,5 @@ int vtkF3DWebIFCReader::RequestData(
   }
 
   this->Internals->Manager.CloseModel(modelID);
-
   return 1;
 }
