@@ -16,7 +16,6 @@
 #include "window.h"
 
 #include "F3DNodeInfo.h"
-
 #include <filesystem>
 #include <memory>
 #include <optional>
@@ -61,7 +60,6 @@ public:
   window& setWindowName(std::string_view windowName) override;
   point3_t getWorldFromDisplay(const point3_t& displayPoint) const override;
   point3_t getDisplayFromWorld(const point3_t& worldPoint) const override;
-
   ///@}
 
   /**
