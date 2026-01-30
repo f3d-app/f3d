@@ -5,6 +5,7 @@
 #include "options.h"
 
 #include <cstring>
+#include <exception>
 
 //----------------------------------------------------------------------------
 f3d_engine_t* f3d_engine_create(int offscreen)
@@ -16,36 +17,76 @@ f3d_engine_t* f3d_engine_create(int offscreen)
 //----------------------------------------------------------------------------
 f3d_engine_t* f3d_engine_create_none()
 {
-  f3d::engine* eng = new f3d::engine(f3d::engine::createNone());
-  return reinterpret_cast<f3d_engine_t*>(eng);
+  try
+  {
+    f3d::engine* eng = new f3d::engine(f3d::engine::createNone());
+    return reinterpret_cast<f3d_engine_t*>(eng);
+  }
+  catch (std::exception& e)
+  {
+    f3d::log::error("Failed to create engine: ", e.what());
+    return nullptr;
+  }
 }
 
 //----------------------------------------------------------------------------
 f3d_engine_t* f3d_engine_create_glx(int offscreen)
 {
-  f3d::engine* eng = new f3d::engine(f3d::engine::createGLX(offscreen != 0));
-  return reinterpret_cast<f3d_engine_t*>(eng);
+  try
+  {
+    f3d::engine* eng = new f3d::engine(f3d::engine::createGLX(offscreen != 0));
+    return reinterpret_cast<f3d_engine_t*>(eng);
+  }
+  catch (std::exception& e)
+  {
+    f3d::log::error("Failed to create engine: ", e.what());
+    return nullptr;
+  }
 }
 
 //----------------------------------------------------------------------------
 f3d_engine_t* f3d_engine_create_wgl(int offscreen)
 {
-  f3d::engine* eng = new f3d::engine(f3d::engine::createWGL(offscreen != 0));
-  return reinterpret_cast<f3d_engine_t*>(eng);
+  try
+  {
+    f3d::engine* eng = new f3d::engine(f3d::engine::createWGL(offscreen != 0));
+    return reinterpret_cast<f3d_engine_t*>(eng);
+  }
+  catch (std::exception& e)
+  {
+    f3d::log::error("Failed to create engine: ", e.what());
+    return nullptr;
+  }
 }
 
 //----------------------------------------------------------------------------
 f3d_engine_t* f3d_engine_create_egl()
 {
-  f3d::engine* eng = new f3d::engine(f3d::engine::createEGL());
-  return reinterpret_cast<f3d_engine_t*>(eng);
+  try
+  {
+    f3d::engine* eng = new f3d::engine(f3d::engine::createEGL());
+    return reinterpret_cast<f3d_engine_t*>(eng);
+  }
+  catch (std::exception& e)
+  {
+    f3d::log::error("Failed to create engine: ", e.what());
+    return nullptr;
+  }
 }
 
 //----------------------------------------------------------------------------
 f3d_engine_t* f3d_engine_create_osmesa()
 {
-  f3d::engine* eng = new f3d::engine(f3d::engine::createOSMesa());
-  return reinterpret_cast<f3d_engine_t*>(eng);
+  try
+  {
+    f3d::engine* eng = new f3d::engine(f3d::engine::createOSMesa());
+    return reinterpret_cast<f3d_engine_t*>(eng);
+  }
+  catch (std::exception& e)
+  {
+    f3d::log::error("Failed to create engine: ", e.what());
+    return nullptr;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -64,9 +105,9 @@ f3d_engine_t* f3d_engine_create_external(f3d_context_function_t get_proc_address
     f3d::engine* eng = new f3d::engine(f3d::engine::createExternal(func));
     return reinterpret_cast<f3d_engine_t*>(eng);
   }
-  catch (const f3d::engine::no_window_exception&)
+  catch (std::exception& e)
   {
-    f3d::log::error("Failed to create engine with external context");
+    f3d::log::error("Failed to create engine: ", e.what());
     return nullptr;
   }
 }
@@ -74,36 +115,76 @@ f3d_engine_t* f3d_engine_create_external(f3d_context_function_t get_proc_address
 //----------------------------------------------------------------------------
 f3d_engine_t* f3d_engine_create_external_glx()
 {
-  f3d::engine* eng = new f3d::engine(f3d::engine::createExternalGLX());
-  return reinterpret_cast<f3d_engine_t*>(eng);
+  try
+  {
+    f3d::engine* eng = new f3d::engine(f3d::engine::createExternalGLX());
+    return reinterpret_cast<f3d_engine_t*>(eng);
+  }
+  catch (std::exception& e)
+  {
+    f3d::log::error("Failed to create engine: ", e.what());
+    return nullptr;
+  }
 }
 
 //----------------------------------------------------------------------------
 f3d_engine_t* f3d_engine_create_external_wgl()
 {
-  f3d::engine* eng = new f3d::engine(f3d::engine::createExternalWGL());
-  return reinterpret_cast<f3d_engine_t*>(eng);
+  try
+  {
+    f3d::engine* eng = new f3d::engine(f3d::engine::createExternalWGL());
+    return reinterpret_cast<f3d_engine_t*>(eng);
+  }
+  catch (std::exception& e)
+  {
+    f3d::log::error("Failed to create engine: ", e.what());
+    return nullptr;
+  }
 }
 
 //----------------------------------------------------------------------------
 f3d_engine_t* f3d_engine_create_external_cocoa()
 {
-  f3d::engine* eng = new f3d::engine(f3d::engine::createExternalCOCOA());
-  return reinterpret_cast<f3d_engine_t*>(eng);
+  try
+  {
+    f3d::engine* eng = new f3d::engine(f3d::engine::createExternalCOCOA());
+    return reinterpret_cast<f3d_engine_t*>(eng);
+  }
+  catch (std::exception& e)
+  {
+    f3d::log::error("Failed to create engine: ", e.what());
+    return nullptr;
+  }
 }
 
 //----------------------------------------------------------------------------
 f3d_engine_t* f3d_engine_create_external_egl()
 {
-  f3d::engine* eng = new f3d::engine(f3d::engine::createExternalEGL());
-  return reinterpret_cast<f3d_engine_t*>(eng);
+  try
+  {
+    f3d::engine* eng = new f3d::engine(f3d::engine::createExternalEGL());
+    return reinterpret_cast<f3d_engine_t*>(eng);
+  }
+  catch (std::exception& e)
+  {
+    f3d::log::error("Failed to create engine: ", e.what());
+    return nullptr;
+  }
 }
 
 //----------------------------------------------------------------------------
 f3d_engine_t* f3d_engine_create_external_osmesa()
 {
-  f3d::engine* eng = new f3d::engine(f3d::engine::createExternalOSMesa());
-  return reinterpret_cast<f3d_engine_t*>(eng);
+  try
+  {
+    f3d::engine* eng = new f3d::engine(f3d::engine::createExternalOSMesa());
+    return reinterpret_cast<f3d_engine_t*>(eng);
+  }
+  catch (std::exception& e)
+  {
+    f3d::log::error("Failed to create engine: ", e.what());
+    return nullptr;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -214,11 +295,11 @@ f3d_interactor_t* f3d_engine_get_interactor(f3d_engine_t* engine)
 }
 
 //----------------------------------------------------------------------------
-void f3d_engine_load_plugin(const char* path_or_name)
+int f3d_engine_load_plugin(const char* path_or_name)
 {
   if (!path_or_name)
   {
-    return;
+    return 0;
   }
 
   try
@@ -228,7 +309,10 @@ void f3d_engine_load_plugin(const char* path_or_name)
   catch (const f3d::engine::plugin_exception& e)
   {
     f3d::log::error("Failed to load plugin '", path_or_name, "': ", e.what());
+    return 0;
   }
+
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -282,11 +366,11 @@ char** f3d_engine_get_all_reader_option_names()
 }
 
 //----------------------------------------------------------------------------
-void f3d_engine_set_reader_option(const char* name, const char* value)
+int f3d_engine_set_reader_option(const char* name, const char* value)
 {
   if (!name || !value)
   {
-    return;
+    return 0;
   }
 
   try
@@ -296,7 +380,10 @@ void f3d_engine_set_reader_option(const char* name, const char* value)
   catch (const f3d::options::inexistent_exception& e)
   {
     f3d::log::error("Failed to set reader option '", name, "': ", e.what());
+    return 0;
   }
+
+  return 1;
 }
 
 //----------------------------------------------------------------------------

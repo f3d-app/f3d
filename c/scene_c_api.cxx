@@ -338,7 +338,6 @@ int f3d_scene_update_light(f3d_scene_t* scene, int index, const f3d_light_state_
 
   try
   {
-
     cpp_scene->updateLight(index, cpp_state);
   }
   catch (const f3d::scene::light_exception& e)

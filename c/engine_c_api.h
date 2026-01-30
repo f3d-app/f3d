@@ -77,7 +77,7 @@ extern "C"
    * The returned engine must be deleted with f3d_engine_delete().
    *
    * @param offscreen If non-zero, the window will be hidden.
-   * @return Engine handle.
+   * @return Engine handle, NULL on failure.
    */
   F3D_EXPORT f3d_engine_t* f3d_engine_create(int offscreen);
 
@@ -86,7 +86,7 @@ extern "C"
    *
    * The returned engine must be deleted with f3d_engine_delete().
    *
-   * @return Engine handle.
+   * @return Engine handle, NULL on failure.
    */
   F3D_EXPORT f3d_engine_t* f3d_engine_create_none();
 
@@ -96,7 +96,7 @@ extern "C"
    * The returned engine must be deleted with f3d_engine_delete().
    *
    * @param offscreen If non-zero, the window will be hidden.
-   * @return Engine handle.
+   * @return Engine handle, NULL on failure.
    */
   F3D_EXPORT f3d_engine_t* f3d_engine_create_glx(int offscreen);
 
@@ -106,7 +106,7 @@ extern "C"
    * The returned engine must be deleted with f3d_engine_delete().
    *
    * @param offscreen If non-zero, the window will be hidden.
-   * @return Engine handle.
+   * @return Engine handle, NULL on failure.
    */
   F3D_EXPORT f3d_engine_t* f3d_engine_create_wgl(int offscreen);
 
@@ -115,7 +115,7 @@ extern "C"
    *
    * The returned engine must be deleted with f3d_engine_delete().
    *
-   * @return Engine handle.
+   * @return Engine handle, NULL on failure.
    */
   F3D_EXPORT f3d_engine_t* f3d_engine_create_egl();
 
@@ -124,7 +124,7 @@ extern "C"
    *
    * The returned engine must be deleted with f3d_engine_delete().
    *
-   * @return Engine handle.
+   * @return Engine handle, NULL on failure.
    */
   F3D_EXPORT f3d_engine_t* f3d_engine_create_osmesa();
 
@@ -135,7 +135,7 @@ extern "C"
    * The returned engine must be deleted with f3d_engine_delete().
    *
    * @param get_proc_address Function pointer for OpenGL symbol resolution.
-   * @return Engine handle.
+   * @return Engine handle, NULL on failure.
    */
   F3D_EXPORT f3d_engine_t* f3d_engine_create_external(f3d_context_function_t get_proc_address);
 
@@ -144,7 +144,7 @@ extern "C"
    *
    * The returned engine must be deleted with f3d_engine_delete().
    *
-   * @return Engine handle.
+   * @return Engine handle, NULL on failure.
    */
   F3D_EXPORT f3d_engine_t* f3d_engine_create_external_glx();
 
@@ -153,7 +153,7 @@ extern "C"
    *
    * The returned engine must be deleted with f3d_engine_delete().
    *
-   * @return Engine handle.
+   * @return Engine handle, NULL on failure.
    */
   F3D_EXPORT f3d_engine_t* f3d_engine_create_external_wgl();
 
@@ -162,7 +162,7 @@ extern "C"
    *
    * The returned engine must be deleted with f3d_engine_delete().
    *
-   * @return Engine handle.
+   * @return Engine handle, NULL on failure.
    */
   F3D_EXPORT f3d_engine_t* f3d_engine_create_external_cocoa();
 
@@ -171,7 +171,7 @@ extern "C"
    *
    * The returned engine must be deleted with f3d_engine_delete().
    *
-   * @return Engine handle.
+   * @return Engine handle, NULL on failure.
    */
   F3D_EXPORT f3d_engine_t* f3d_engine_create_external_egl();
 
@@ -180,7 +180,7 @@ extern "C"
    *
    * The returned engine must be deleted with f3d_engine_delete().
    *
-   * @return Engine handle.
+   * @return Engine handle, NULL on failure.
    */
   F3D_EXPORT f3d_engine_t* f3d_engine_create_external_osmesa();
   ///@}
@@ -188,7 +188,7 @@ extern "C"
   /**
    * @brief Destroy an engine and free associated resources.
    *
-   * @param engine Engine handle.
+   * @param engine Engine handle
    */
   F3D_EXPORT void f3d_engine_delete(f3d_engine_t* engine);
 
@@ -260,8 +260,9 @@ extern "C"
    * @brief Load a plugin.
    *
    * @param path_or_name Plugin path or name.
+   * @return 1 on success, 0 on failure.
    */
-  F3D_EXPORT void f3d_engine_load_plugin(const char* path_or_name);
+  F3D_EXPORT int f3d_engine_load_plugin(const char* path_or_name);
 
   /**
    * @brief Automatically load all static plugins.
@@ -298,8 +299,9 @@ extern "C"
    *
    * @param name Option name.
    * @param value Option value.
+   * @return 1 on success, 0 on failure.
    */
-  F3D_EXPORT void f3d_engine_set_reader_option(const char* name, const char* value);
+  F3D_EXPORT int f3d_engine_set_reader_option(const char* name, const char* value);
   ///@}
 
   /**
