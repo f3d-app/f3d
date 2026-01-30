@@ -62,12 +62,6 @@ public:
    */
   void PrintImporterDescription(log::VerboseLevel level);
 
-  /**
-   * Get scene hierarchy nodes for display and control.
-   * This is used internally to update the window.
-   */
-  std::vector<NodeInfo> GetSceneHierarchyNodes();
-
 private:
   class internals;
   std::unique_ptr<internals> Internals;
