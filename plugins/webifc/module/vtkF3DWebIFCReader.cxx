@@ -2,8 +2,8 @@
 
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
-#include <vtkFileResourceStream.h>
 #include <vtkDoubleArray.h>
+#include <vtkFileResourceStream.h>
 #include <vtkInformation.h>
 #include <vtkNew.h>
 #include <vtkObjectFactory.h>
