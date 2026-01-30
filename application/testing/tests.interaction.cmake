@@ -51,9 +51,9 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250504)
   f3d_test(NAME TestInteractionAndCLIBlending ARGS --blending DATA suzanne.stl alpha.glb INTERACTION)#PP;Right
 endif()
 
-# Cycling through gaussian splatting require > 9.3 to not warn
+# Using gaussian splatting require > 9.3 to not warn
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240203)
-  f3d_test(NAME TestInteractionConfigFileAndCommand DATA multi ARGS -o CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI LONG_TIMEOUT) #OOX;Right;N;Right;Right;Right
+  f3d_test(NAME TestInteractionConfigFileAndCommand DATA multi ARGS -o CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI LONG_TIMEOUT) #OX;Right;N;Right;Right;Right
 endif()
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250513)

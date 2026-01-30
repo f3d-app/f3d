@@ -216,7 +216,7 @@ CLI: `--point-sprites`.
 
 ### `model.point_sprites.type` (_string_, default: `sphere`)
 
-Set the sprites type when showing point sprites (can be `sphere` or `gaussian`).
+Set the sprites type when showing point sprites (can be `sphere`, `gaussian`, `circle`, `stddev`, `bound` or `cross`).
 
 CLI: `--point-sprites`.
 
