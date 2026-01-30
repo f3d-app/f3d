@@ -14,9 +14,11 @@
 #include <vtkPolyData.h>
 #include <vtkResourceStream.h>
 
-#include "draco/compression/decode.h"
-#include "draco/draco_features.h"
-#include "draco/io/stdio_file_reader.h"
+#include <draco/compression/decode.h>
+#include <draco/draco_features.h>
+#include <draco/io/stdio_file_reader.h>
+
+#include <string_view>
 
 #ifndef DRACO_MESH_COMPRESSION_SUPPORTED
 #error "Please rebuild draco with DRACO_MESH_COMPRESSION cmake option enabled."
@@ -239,4 +241,24 @@ int vtkF3DDracoReader::RequestData(
   }
 
   return 1;
+}
+
+//------------------------------------------------------------------------------
+bool vtkF3DDracoReader::CanReadFile(vtkResourceStream* stream)
+{
+  if (!stream)
+  {
+    return false;
+  }
+
+  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+  constexpr std::string_view drcMagic{ "DRACO", 5 };
+
+  std::array<char, 5> magic;
+  if (stream->Read(&magic, magic.size()) != magic.size())
+  {
+    return false;
+  }
+
+  return std::string_view(magic.data(), magic.size()) == drcMagic;
 }
