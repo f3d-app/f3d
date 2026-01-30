@@ -17,24 +17,24 @@ int TestF3DWebIFCReader(int vtkNotUsed(argc), char* argv[])
   vtkPolyData* output = reader->GetOutput();
   if (!output)
   {
-    std::cerr << "No output from reader" << '\n';
+    std::cerr << "No output from reader\n";
     return EXIT_FAILURE;
   }
 
   if (output->GetNumberOfPoints() == 0)
   {
-    std::cerr << "PolyData has no points" << '\n';
+    std::cerr << "PolyData has no points\n";
     return EXIT_FAILURE;
   }
 
   if (output->GetNumberOfCells() == 0)
   {
-    std::cerr << "PolyData has no cells" << '\n';
+    std::cerr << "PolyData has no cells\n";
     return EXIT_FAILURE;
   }
 
   std::cout << "Successfully read IFC file with " << output->GetNumberOfPoints() << " points and "
-            << output->GetNumberOfCells() << " cells" << '\n';
+            << output->GetNumberOfCells() << " cells\n";
 
   return EXIT_SUCCESS;
 }

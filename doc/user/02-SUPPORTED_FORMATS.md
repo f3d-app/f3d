@@ -1,4 +1,4 @@
-#Supported File Formats
+# Supported File Formats
 
 F3D supports the following file formats:
 

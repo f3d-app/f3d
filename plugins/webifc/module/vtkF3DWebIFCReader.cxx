@@ -38,10 +38,6 @@ vtkF3DWebIFCReader::vtkF3DWebIFCReader()
   : Internals(new vtkInternals())
 {
   this->vtkAlgorithm::SetNumberOfInputPorts(0);
-  // f3d sets GlobalWarningDisplay to true only at debug verbose level.
-  // Use it as a proxy since plugins don't have access to f3d::log.
-  spdlog::set_level(
-    vtkObject::GetGlobalWarningDisplay() ? spdlog::level::warn : spdlog::level::off);
 }
 
 //----------------------------------------------------------------------------
@@ -133,6 +129,11 @@ int vtkF3DWebIFCReader::RequestData(
     vtkErrorMacro("No input stream or filename specified");
     return 0;
   }
+
+  // f3d sets GlobalWarningDisplay to true only at debug verbose level.
+  // Use it as a proxy since plugins don't have access to f3d::log.
+  spdlog::set_level(
+    vtkObject::GetGlobalWarningDisplay() ? spdlog::level::warn : spdlog::level::off);
 
   webifc::manager::LoaderSettings settings;
   settings.CIRCLE_SEGMENTS = this->CircleSegments;
