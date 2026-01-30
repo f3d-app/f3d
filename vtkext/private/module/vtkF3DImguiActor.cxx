@@ -14,17 +14,17 @@
 #include <vtkOpenGLShaderCache.h>
 #include <vtkOpenGLState.h>
 #include <vtkOpenGLVertexArrayObject.h>
+#include <vtkCallbackCommand.h>
+#include <vtkCommand.h>
 #include <vtkPNGReader.h>
 #include <vtkRenderer.h>
 #include <vtkRendererCollection.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkShader.h>
 #include <vtkShaderProgram.h>
+#include <vtkSmartPointer.h>
 #include <vtkTextureObject.h>
 #include <vtkVersion.h>
-#include <vtkCallbackCommand.h>
-#include <vtkCommand.h>
-#include <vtkSmartPointer.h>
 
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
 #include <vtkMemoryResourceStream.h>
@@ -304,8 +304,8 @@ vtkStandardNewMacro(vtkF3DImguiActor);
 
 //----------------------------------------------------------------------------
 vtkF3DImguiActor::vtkF3DImguiActor()
+  : Pimpl(new Internals())
 {
-  this->Pimpl = std::make_unique<Internals>();
 }
 
 //----------------------------------------------------------------------------
@@ -999,7 +999,6 @@ void vtkF3DImguiActor::EndFrame(vtkOpenGLRenderWindow* renWin)
   ImGui::Render();
   this->Pimpl->RenderDrawData(renWin, ImGui::GetDrawData());
 }
-
 
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::SetDeltaTime(double time)
