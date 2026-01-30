@@ -20,6 +20,14 @@ public:
   static vtkF3DSplatReader* New();
   vtkTypeMacro(vtkF3DSplatReader, vtkPolyDataAlgorithm);
 
+  /**
+   * Return true if, after a quick check of file header, it looks like the provided stream
+   * can be read. Return false if it is sure it cannot be read as a strean.
+   *
+   * This only checks that the size of the file is a multiple of the size of a splat.
+   */
+  static bool CanReadFile(vtkResourceStream* stream);
+
 protected:
   vtkF3DSplatReader();
   ~vtkF3DSplatReader() override = default;
@@ -29,6 +37,8 @@ protected:
 private:
   vtkF3DSplatReader(const vtkF3DSplatReader&) = delete;
   void operator=(const vtkF3DSplatReader&) = delete;
+
+  static void ReadASplat(std::vector<unsigned char>& buffer, std::size_t index, float*& position, float*& scale, unsigned char*& rotation, unsigned char*& color);
 };
 
 #endif
