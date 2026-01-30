@@ -86,7 +86,8 @@ bool vtkF3DWebIFCReader::CanReadFile(vtkResourceStream* stream)
     return false;
   }
 
-  while (parser->ReadLine(line) == vtkParseResult::EndOfLine)
+  constexpr int maxLines = 32;
+  for (int i = 0; i < maxLines && parser->ReadLine(line) == vtkParseResult::EndOfLine; ++i)
   {
     if (line.find("FILE_SCHEMA") != std::string::npos)
     {
