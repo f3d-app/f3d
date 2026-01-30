@@ -198,7 +198,15 @@ public:
   {
   }
 
+  /**
+   * Request a render from the UI actor.
+   */
   void RequestRender();
+
+  /**
+   * Consume and return the render request state.
+   * Returns true if a render was requested, false otherwise.
+   */
   bool ConsumeRenderRequest();
 
 protected:
@@ -303,6 +311,7 @@ protected:
   std::string MetaData = "";
 
   bool SceneHierarchyVisible = false;
+  std::vector<NodeInfo> HierarchyNodes;
 
   bool CheatSheetVisible = false;
   std::vector<CheatSheetGroup> CheatSheet;
@@ -329,7 +338,6 @@ protected:
   std::array<double, 3> FontColor = { 1.0, 1.0, 1.0 };
 
   double BackdropOpacity = 0.9;
-  std::vector<NodeInfo> HierarchyNodes;
 
 private:
   vtkF3DUIActor(const vtkF3DUIActor&) = delete;

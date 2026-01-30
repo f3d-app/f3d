@@ -167,11 +167,8 @@ public:
     scene_impl::internals::DisplayAllInfo(this->MetaImporter, this->Window);
 
     // Update the scene hierarchy in the window automatically
-    if (sceneImpl)
-    {
-      auto hierarchy = sceneImpl->GetSceneHierarchyNodes();
-      this->Window.SetSceneHierarchy(hierarchy);
-    }
+    auto hierarchy = this->GetSceneHierarchyNodes();
+    this->Window.SetSceneHierarchy(hierarchy);
   }
 
   static void DisplayImporterDescription(log::VerboseLevel level, vtkImporter* importer)
@@ -204,6 +201,19 @@ public:
 
     // Print scene description
     window.PrintSceneDescription(log::VerboseLevel::DEBUG);
+  }
+
+  std::vector<NodeInfo> GetSceneHierarchyNodes()
+  {
+    std::vector<NodeInfo> hierarchy;
+
+    if (!this->MetaImporter)
+    {
+      return hierarchy;
+    }
+
+    // Get the raw hierarchy directly - it already handles duplicates and hierarchy
+    return this->MetaImporter->GetActorHierarchy();
   }
 
   const options& Options;
@@ -562,20 +572,6 @@ void scene_impl::SetInteractor(interactor_impl* interactor)
 void scene_impl::PrintImporterDescription(log::VerboseLevel level)
 {
   scene_impl::internals::DisplayImporterDescription(level, this->Internals->MetaImporter);
-}
-
-//----------------------------------------------------------------------------
-std::vector<NodeInfo> scene_impl::GetSceneHierarchyNodes()
-{
-  std::vector<NodeInfo> hierarchy;
-
-  if (!this->Internals || !this->Internals->MetaImporter)
-  {
-    return hierarchy;
-  }
-
-  // Get the raw hierarchy directly - it already handles duplicates and hierarchy
-  return this->Internals->MetaImporter->GetActorHierarchy();
 }
 
 }

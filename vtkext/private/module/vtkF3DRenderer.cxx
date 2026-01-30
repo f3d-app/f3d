@@ -2187,7 +2187,6 @@ void vtkF3DRenderer::Render()
 
   vtkInformation* info = this->GetInformation();
 
-  info->Remove(vtkF3DRenderPass::RENDER_UI_ONLY());
   bool uiOnly = info->Get(vtkF3DRenderPass::RENDER_UI_ONLY());
 
   if (!uiOnly)
@@ -3093,7 +3092,6 @@ void vtkF3DRenderer::ConfigureColoring()
             this->UseCellColoring);
         }
       }
-      
       coloring.Actor->SetVisibility(visible);
       coloring.OriginalActor->SetVisibility(!visible);
     }

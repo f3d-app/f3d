@@ -7,6 +7,7 @@
 #define vtkF3DMetaImporter_h
 
 #include "F3DColoringInfoHandler.h"
+#include "F3DNodeInfo.h"
 #include "vtkF3DImporter.h"
 
 #include <vtkActor.h>
@@ -23,10 +24,6 @@
 #endif
 
 #include <memory>
-#include "vtkF3DImporter.h"
-
-#include "F3DNodeInfo.h"
-
 #include <string>
 #include <vector>
 
