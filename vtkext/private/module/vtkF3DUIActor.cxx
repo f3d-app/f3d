@@ -13,6 +13,20 @@ vtkF3DUIActor::vtkF3DUIActor() = default;
 vtkF3DUIActor::~vtkF3DUIActor() = default;
 
 //----------------------------------------------------------------------------
+void vtkF3DUIActor::RequestRender()
+{
+  this->RenderRequested = true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DUIActor::ConsumeRenderRequest()
+{
+  const bool requested = this->RenderRequested;
+  this->RenderRequested = false;
+  return requested;
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DUIActor::SetDropZoneVisibility(bool show)
 {
   this->DropZoneVisible = show;
@@ -36,6 +50,13 @@ void vtkF3DUIActor::SetDropBinds(
 {
   this->DropBinds = dropZoneBinds;
 }
+
+//----------------------------------------------------------------------------
+void vtkF3DUIActor::SetHierarchy(const std::vector<NodeInfo>& hierarchy)
+{
+  this->HierarchyNodes = hierarchy;
+}
+
 
 //----------------------------------------------------------------------------
 void vtkF3DUIActor::SetFileNameVisibility(bool show)
@@ -65,6 +86,12 @@ void vtkF3DUIActor::SetHDRIFileName(const std::string& filename)
 void vtkF3DUIActor::SetMetaDataVisibility(bool show)
 {
   this->MetaDataVisible = show;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DUIActor::SetSceneHierarchyVisibility(bool show)
+{
+  this->SceneHierarchyVisible = show;
 }
 
 //----------------------------------------------------------------------------
@@ -169,6 +196,7 @@ int vtkF3DUIActor::RenderOverlay(vtkViewport* vp)
   }
 
   this->StartFrame(renWin);
+  this->RenderSceneHierarchy();
 
   if (this->DropZoneVisible)
   {

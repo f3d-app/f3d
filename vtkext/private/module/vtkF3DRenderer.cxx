@@ -17,6 +17,10 @@
 #include "vtkF3DTAAPass.h"
 #include "vtkF3DUserRenderPass.h"
 
+#if F3D_MODULE_UI
+#include "vtkF3DUIActor.h"
+#endif
+
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
 #include <vtkCamera.h>
@@ -55,6 +59,8 @@
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkSSAAPass.h>
+#include <vtkInformation.h>
+#include <vtkInformationIntegerKey.h>
 #include <vtkScalarBarActor.h>
 #include <vtkShaderProperty.h>
 #include <vtkSkybox.h>
@@ -1673,6 +1679,12 @@ void vtkF3DRenderer::SetDropZoneBinds(
 }
 
 //----------------------------------------------------------------------------
+void vtkF3DRenderer::SetHierarchy(const std::vector<NodeInfo>& hierarchy)
+{
+  this->UIActor->SetHierarchy(hierarchy);
+}
+
+//----------------------------------------------------------------------------
 void vtkF3DRenderer::SetBlendingMode(BlendingMode mode)
 {
   if (this->BlendingModeEnabled != mode)
@@ -1870,6 +1882,16 @@ void vtkF3DRenderer::ConfigureMetaData()
     this->UIActor->SetMetaData(this->Importer->GetMetaDataDescription());
   }
   this->MetaDataConfigured = true;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::ShowSceneHierarchy(bool show)
+{
+  if (this->SceneHierarchyVisible != show)
+  {
+    this->SceneHierarchyVisible = show;
+    this->UIActor->SetSceneHierarchyVisibility(show);
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -3506,6 +3528,12 @@ void vtkF3DRenderer::SetCheatSheetConfigured(bool flag)
 void vtkF3DRenderer::SetUIDeltaTime(double time)
 {
   this->UIActor->SetDeltaTime(time);
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DRenderer::ConsumeUIRenderRequest()
+{
+  return this->UIActor->ConsumeRenderRequest();
 }
 
 //----------------------------------------------------------------------------

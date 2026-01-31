@@ -7,7 +7,7 @@ f3d_embed_file(
   BINARY)
 
 set(sources ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultHDRI.cxx)
-set(private_headers ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultHDRI.h)
+set(private_headers ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultHDRI.h F3DNodeInfo.h)
 
 if(F3D_MODULE_UI)
   set(F3D_FONT_FILE "${F3D_SOURCE_DIR}/resources/MonaspaceNeon-Regular.otf" CACHE STRING "Font used in UI widgets")
@@ -137,6 +137,7 @@ vtk_module_add_module(f3d::vtkextPrivate
   SOURCES ${sources}
   PRIVATE_HEADERS ${private_headers}
   )
+
 
 if(MSVC)
   vtk_module_definitions(f3d::vtkextPrivate PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS _CRT_SECURE_NO_WARNINGS)
