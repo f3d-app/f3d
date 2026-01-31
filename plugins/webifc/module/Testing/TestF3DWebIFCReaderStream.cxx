@@ -29,8 +29,8 @@ int TestF3DWebIFCReaderStream(int vtkNotUsed(argc), char* argv[])
   constexpr vtkIdType expectedPoints = 3218;
   if (output->GetNumberOfPoints() != expectedPoints)
   {
-    std::cerr << "Expected " << expectedPoints << " points but got "
-              << output->GetNumberOfPoints() << "\n";
+    std::cerr << "Expected " << expectedPoints << " points but got " << output->GetNumberOfPoints()
+              << "\n";
     return EXIT_FAILURE;
   }
 
