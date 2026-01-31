@@ -22,7 +22,7 @@ int TestF3DWebIFCReaderError(int vtkNotUsed(argc), char* argv[])
     reader->Update();
 
     vtkPolyData* output = reader->GetOutput();
-    if (output && output->GetNumberOfPoints() > 0)
+    if (!output || output->GetNumberOfPoints() != 0)
     {
       std::cerr << "Expected no geometry with no input\n";
       return EXIT_FAILURE;
@@ -38,7 +38,7 @@ int TestF3DWebIFCReaderError(int vtkNotUsed(argc), char* argv[])
     reader->Update();
 
     vtkPolyData* output = reader->GetOutput();
-    if (output && output->GetNumberOfPoints() > 0)
+    if (!output || output->GetNumberOfPoints() != 0)
     {
       std::cerr << "Expected no geometry from non-existent file\n";
       return EXIT_FAILURE;
@@ -56,7 +56,7 @@ int TestF3DWebIFCReaderError(int vtkNotUsed(argc), char* argv[])
     reader->Update();
 
     vtkPolyData* output = reader->GetOutput();
-    if (output && output->GetNumberOfPoints() > 0)
+    if (!output || output->GetNumberOfPoints() != 0)
     {
       std::cerr << "Expected no geometry from invalid file\n";
       return EXIT_FAILURE;
