@@ -80,7 +80,11 @@ public:
   ///@}
 
   /**
-   * Check if the stream can be read by this reader.
+   * Return true if, after a quick check of file header, it looks like the provided stream
+   * can be read. Return false if it is sure it cannot be read.
+   *
+   * This checks that the first line is "ISO-10303-21;" and that the FILE_SCHEMA
+   * in the HEADER section contains an IFC schema identifier (e.g. 'IFC2X3', 'IFC4').
    */
   static bool CanReadFile(vtkResourceStream* stream);
 
