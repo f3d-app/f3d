@@ -7,7 +7,7 @@ f3d_embed_file(
   BINARY)
 
 set(sources ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultHDRI.cxx)
-set(private_headers ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultHDRI.h)
+set(private_headers ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultHDRI.h F3DNodeInfo.h)
 
 set(F3D_CHECKERBOARD_TEXTURE "${F3D_SOURCE_DIR}/resources/checkerboard.png" CACHE PATH "Default F3D Checkerboard")
 mark_as_advanced(F3D_CHECKERBOARD_TEXTURE)
@@ -148,9 +148,6 @@ vtk_module_add_module(f3d::vtkextPrivate
   PRIVATE_HEADERS ${private_headers}
   )
 
-vtk_module_include(f3d::vtkextPrivate
-  PUBLIC
-    "${F3D_SOURCE_DIR}/library/private")
 
 if(MSVC)
   vtk_module_definitions(f3d::vtkextPrivate PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS _CRT_SECURE_NO_WARNINGS)
