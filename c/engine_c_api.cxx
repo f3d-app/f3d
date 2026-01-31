@@ -1,6 +1,5 @@
 #include "engine_c_api.h"
 #include "engine.h"
-#include "exception.h"
 #include "log.h"
 #include "options.h"
 
