@@ -5,6 +5,7 @@
 
 #include "vtkF3DWebIFCReader.h"
 
+#include <cassert>
 #include <iostream>
 
 int TestF3DWebIFCReaderStream(int vtkNotUsed(argc), char* argv[])
@@ -23,13 +24,15 @@ int TestF3DWebIFCReaderStream(int vtkNotUsed(argc), char* argv[])
   reader->Update();
 
   vtkPolyData* output = reader->GetOutput();
-  if (!output || output->GetNumberOfPoints() == 0)
+  assert(output);
+
+  constexpr vtkIdType expectedPoints = 3218;
+  if (output->GetNumberOfPoints() != expectedPoints)
   {
-    std::cerr << "No output from stream reader\n";
+    std::cerr << "Expected " << expectedPoints << " points but got "
+              << output->GetNumberOfPoints() << "\n";
     return EXIT_FAILURE;
   }
-
-  std::cout << "Successfully read IFC stream with " << output->GetNumberOfPoints() << " points\n";
 
   return EXIT_SUCCESS;
 }
