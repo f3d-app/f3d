@@ -5,7 +5,7 @@ void applyCustomReader(
 
   std::string optName = "IFC.circle_segments";
   std::string str = this->ReaderOptions.at(optName);
-  int circleSegments = static_cast<int>(F3DUtils::ParseToDouble(str, 12, optName));
+  int circleSegments = F3DUtils::ParseToInt(str, 12, optName);
   webIfcReader->SetCircleSegments(circleSegments);
 
   optName = "IFC.read_openings";
