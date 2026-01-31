@@ -10,8 +10,16 @@
 //----------------------------------------------------------------------------
 f3d_engine_t* f3d_engine_create(int offscreen)
 {
-  f3d::engine* eng = new f3d::engine(f3d::engine::create(offscreen != 0));
-  return reinterpret_cast<f3d_engine_t*>(eng);
+  try
+  {
+    f3d::engine* eng = new f3d::engine(f3d::engine::create(offscreen != 0));
+    return reinterpret_cast<f3d_engine_t*>(eng);
+  }
+  catch (std::exception& e)
+  {
+    f3d::log::error("Failed to create engine: ", e.what());
+    return nullptr;
+  }
 }
 
 //----------------------------------------------------------------------------
@@ -200,15 +208,25 @@ void f3d_engine_delete(f3d_engine_t* engine)
 }
 
 //----------------------------------------------------------------------------
-void f3d_engine_set_cache_path(f3d_engine_t* engine, const char* cache_path)
+int f3d_engine_set_cache_path(f3d_engine_t* engine, const char* cache_path)
 {
   if (!engine || !cache_path)
   {
-    return;
+    return 0;
   }
 
-  f3d::engine* cpp_engine = reinterpret_cast<f3d::engine*>(engine);
-  cpp_engine->setCachePath(cache_path);
+  try
+  {
+    f3d::engine* cpp_engine = reinterpret_cast<f3d::engine*>(engine);
+    cpp_engine->setCachePath(cache_path);
+  }
+  catch (f3d::engine::cache_exception& e)
+  {
+    f3d::log::error("Failed to set cache path: ", e.what());
+    return 0;
+  }
+
+  return 1;
 }
 
 //----------------------------------------------------------------------------

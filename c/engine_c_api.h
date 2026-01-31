@@ -197,8 +197,9 @@ extern "C"
    *
    * @param engine Engine handle.
    * @param cache_path Cache path string.
+   * @return 1 on success, 0 on failure.
    */
-  F3D_EXPORT void f3d_engine_set_cache_path(f3d_engine_t* engine, const char* cache_path);
+  F3D_EXPORT int f3d_engine_set_cache_path(f3d_engine_t* engine, const char* cache_path);
 
   /**
    * @brief Set options for the engine.

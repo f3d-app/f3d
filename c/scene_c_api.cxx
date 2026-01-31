@@ -155,7 +155,7 @@ int f3d_scene_add(f3d_scene_t* scene, const char* file_path)
     f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
     cpp_scene->add(std::filesystem::path(file_path));
   }
-  catch (const std::exception& e)
+  catch (const f3d::scene::load_failure_exception& e)
   {
     f3d::log::error("Failed to add file to scene: {}", file_path);
     return 0;
