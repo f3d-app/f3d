@@ -1,6 +1,6 @@
 list(APPEND vtkextWebIFCTests_list
      TestF3DWebIFCReader.cxx
-     TestF3DWebIFCReaderOptions.cxx
+     TestF3DWebIFCReaderAPI.cxx
      TestF3DWebIFCReaderError.cxx
     )
 

@@ -10,7 +10,7 @@
 #include <iostream>
 #include <sstream>
 
-int TestF3DWebIFCReaderOptions(int vtkNotUsed(argc), char* argv[])
+int TestF3DWebIFCReaderAPI(int vtkNotUsed(argc), char* argv[])
 {
   std::string filename = std::string(argv[1]) + "data/IfcOpenHouse_IFC4.ifc";
 
