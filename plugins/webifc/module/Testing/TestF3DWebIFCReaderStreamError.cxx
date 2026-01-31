@@ -33,14 +33,11 @@ int TestF3DWebIFCReaderStreamError(int vtkNotUsed(argc), char* argv[])
 
   vtkPolyData* output = reader->GetOutput();
 
-  // With an invalid file, we expect empty geometry
-  if (output && output->GetNumberOfPoints() > 0)
+  if (!output || output->GetNumberOfPoints() != 0)
   {
-    std::cerr << "Expected no geometry from invalid stream\n";
+    std::cerr << "Expected output with 0 points from invalid stream\n";
     return EXIT_FAILURE;
   }
-
-  std::cout << "Stream error handling test passed\n";
 
   return EXIT_SUCCESS;
 }
