@@ -26,6 +26,10 @@ if(F3D_PLUGIN_BUILD_HDF)
   include(tests.hdf.cmake)
 endif()
 
+if(F3D_PLUGIN_BUILD_WEBIFC)
+  include(tests.webifc.cmake)
+endif()
+
 if(F3D_PLUGIN_BUILD_OCCT)
   include(tests.occt.cmake)
 endif()
