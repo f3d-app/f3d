@@ -308,7 +308,7 @@ class vtkF3DAlembicReader::vtkInternals
       polydata->GetFieldData()->AddArray(sourceIds);
     }
 
-    if (haveN && !data.NormalSourceIds.empty() && 
+    if (haveN && !data.NormalSourceIds.empty() &&
       data.NormalSourceIds.size() == static_cast<size_t>(numPoints))
     {
       vtkNew<vtkIdTypeArray> normalSourceIds;
