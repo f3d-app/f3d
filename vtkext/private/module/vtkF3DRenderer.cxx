@@ -3025,7 +3025,7 @@ void vtkF3DRenderer::ConfigureColoring()
     this->ColoringPointSpritesMappersConfigured = true;
   }
 
-  //// Handle Normal Glyphs
+  // Handle Normal Glyphs
   bool normalGlyphsVisible =
     !this->UseRaytracing && !this->UsePointSprites && this->UseNormalGlyphs;
   for (const auto& normalGlyph : this->Importer->GetNormalGlyphsActorsAndMappers())
