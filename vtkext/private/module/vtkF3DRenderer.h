@@ -342,7 +342,8 @@ public:
 
   /**
    * Set the visibility of the normal glyphs actor.
-   * It will only be shown if raytracing and volume, and Point Sprites are not enabled
+   * Normal glyphs actor displays arrows depicting the direction of vertex normals. 
+   * It will only be shown if raytracing and Point Sprites rendering modes are disabled.
    */
   void SetUseNormalGlyphs(bool use);
 
