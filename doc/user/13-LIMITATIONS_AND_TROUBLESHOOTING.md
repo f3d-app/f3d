@@ -5,11 +5,11 @@
 Here is a non exhaustive list of F3D limitations:
 
 - No support for specifying manual lighting in the default scene apart from using `--light-intensity` option.
-- Multiblock (.vtm, .gml) support is partial, non-surfacic data will be converted into surfaces.
 - Drag and drop interaction cannot be recorded nor played back.
 - Volume rendering and HDRI support requires a decent GPU.
-- The `--camera-zoom-factor` option require VTK >= 9.3.0
-- Information about the failure to load a file is not provided before VTK >= 9.4.0
+- Information about the failure to load a file is not provided before VTK >= 9.4.0.
+- Streaming require different version of VTK depending of the format to read.
+- Options `ui.dpi_aware` and CLI `--dpi-aware` are only supported on Windows platform.
 
 ### Assimp
 
@@ -42,7 +42,6 @@ USD file formats rely on [OpenUSD](https://github.com/PixarAnimationStudios/Open
 
 VDB file formats rely on [OpenVDB](https://github.com/AcademySoftwareFoundation/openvdb) and VTK libraries. It currently comes with some known limitations:
 
-- VDB Grid files are opened with a hard-coded 0.1 sampling rate.
 - The `vdb` plugin is not shipped in the python wheels yet.
 
 ### Gaussian splatting

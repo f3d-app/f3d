@@ -4,13 +4,6 @@ import java.util.List;
 
 public class TestUtils {
 
-  static {
-    if (System.getProperty("os.name").startsWith("Windows"))
-    {
-      System.loadLibrary("opengl32");
-    }
-  }
-
   public static void main(String[] args) {
     int distance1 = Utils.textDistance("kitten", "sitting");
     int distance2 = Utils.textDistance("same", "same");

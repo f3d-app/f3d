@@ -19,10 +19,12 @@ list(APPEND libf3dSDKTests_list
      TestSDKRenderAndInteract.cxx
      TestSDKRenderFinalShader.cxx
      TestSDKScene.cxx
+     TestSDKSceneFromBuffer.cxx
      TestSDKSceneFromMemory.cxx
      TestSDKUtils.cxx
      TestSDKUI.cxx
      TestSDKWindowAuto.cxx
+     TestTestSDKHelpers.cxx
 )
 
 # Tests having UI widgets

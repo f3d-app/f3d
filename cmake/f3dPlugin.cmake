@@ -49,6 +49,7 @@ The `NAME` argument is required. The arguments are as follows:
   * `NAME`: (Required) The name of the reader.
   * `VTK_IMPORTER`: The VTK importer class to use.
   * `VTK_READER`: The VTK reader class to use.
+  * `SUPPORTS_STREAM`: Flag to indicate a reader support reading from streams, default is false
   * `FORMAT_DESCRIPTION`: The description of the format read by the reader.
   * `SCORE`: The score of the reader (from 0 to 100). Default value is 50.
   * `EXCLUDE_FROM_THUMBNAILER`: If specified, the reader will not be used for generating thumbnails.
@@ -59,7 +60,7 @@ The `NAME` argument is required. The arguments are as follows:
 #]==]
 
 macro(f3d_plugin_declare_reader)
-  cmake_parse_arguments(F3D_READER "EXCLUDE_FROM_THUMBNAILER" "NAME;VTK_IMPORTER;VTK_READER;FORMAT_DESCRIPTION;SCORE;CUSTOM_CODE" "EXTENSIONS;MIMETYPES;OPTIONS" ${ARGN})
+  cmake_parse_arguments(F3D_READER "EXCLUDE_FROM_THUMBNAILER;SUPPORTS_STREAM" "NAME;VTK_IMPORTER;VTK_READER;FORMAT_DESCRIPTION;SCORE;CUSTOM_CODE" "EXTENSIONS;MIMETYPES;OPTIONS" ${ARGN})
 
   if(F3D_READER_CUSTOM_CODE)
     set(F3D_READER_HAS_CUSTOM_CODE 1)
@@ -103,6 +104,16 @@ macro(f3d_plugin_declare_reader)
 
   string(JSON F3D_READER_JSON
     SET "${F3D_READER_JSON}" "mimetypes" "[${F3D_READER_MIMETYPES}]")
+
+  if(F3D_READER_SUPPORTS_STREAM)
+    set(F3D_READER_HAS_SUPPORTS_STREAM 1)
+    string(JSON F3D_READER_JSON
+      SET "${F3D_READER_JSON}" "supports_stream" "true")
+  else()
+    set(F3D_READER_HAS_SUPPORTS_STREAM 0)
+    string(JSON F3D_READER_JSON
+      SET "${F3D_READER_JSON}" "supports_stream" "false")
+  endif()
 
   if (F3D_READER_EXCLUDE_FROM_THUMBNAILER)
     string(JSON F3D_READER_JSON

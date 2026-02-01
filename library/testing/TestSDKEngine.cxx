@@ -1,3 +1,5 @@
+#include "PseudoUnitTest.h"
+
 #include <engine.h>
 #include <interactor.h>
 #include <log.h>
@@ -7,8 +9,12 @@
 
 #include <iostream>
 
+using namespace std::string_literals;
+
 int TestSDKEngine([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
+  PseudoUnitTest test;
+
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::DEBUG);
 
   // clang-format off
@@ -42,38 +48,26 @@ int TestSDKEngine([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   opt.model.scivis.cells = true;
 
   eng0.setOptions(opt);
-  if (!eng0.getOptions().model.scivis.cells)
-  {
-    std::cerr << "Unexpected options value using f3d::engine::setOptions(const options& opt)\n";
-    return EXIT_FAILURE;
-  }
+  test("set options value using f3d::engine::setOptions(const options& opt)",
+    eng0.getOptions().model.scivis.cells);
 
   opt.render.line_width = 1.7;
   eng0.setOptions(std::move(opt));
-  if (eng0.getOptions().render.line_width != 1.7)
-  {
-    std::cerr << "Unexpected options value using f3d::engine::setOptions(options&& opt)\n";
-    return EXIT_FAILURE;
-  }
+  test("set options value using f3d::engine::setOptions(options&& opt)",
+    eng0.getOptions().render.line_width.value(), 1.7);
 
   // Test static information methods
   auto libInfo = f3d::engine::getLibInfo();
-  if (libInfo.License != "BSD-3-Clause")
-  {
-    std::cerr << "Unexpected libInfo output\n";
-    return EXIT_FAILURE;
-  }
+  test("check libInfo output", libInfo.License, "BSD-3-Clause"s);
 
   auto readersInfo = f3d::engine::getReadersInfo();
-  if (readersInfo.size() == 0)
-  {
-    std::cerr << "Unexpected readersInfo output\n";
-    return EXIT_FAILURE;
-  }
+  test("check readersInfo output", !readersInfo.empty());
 
   // coverage for getPluginList
-  std::ignore = f3d::engine::getPluginsList(std::string(argv[1]) + "configs");
-  std::ignore = f3d::engine::getPluginsList("inexistent");
+  test("check getPluginsList for invalid configs",
+    f3d::engine::getPluginsList(std::string(argv[1]) + "configs").empty());
+  test("check getPluginsList for inexistent config",
+    f3d::engine::getPluginsList("inexistent").empty());
 
-  return EXIT_SUCCESS;
+  return test.result();
 }

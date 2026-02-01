@@ -14,6 +14,13 @@ int TestF3DDracoReaderStream(int vtkNotUsed(argc), char* argv[])
     std::cerr << "Cannot open file\n";
     return EXIT_FAILURE;
   }
+
+  if (!vtkF3DDracoReader::CanReadFile(stream))
+  {
+    std::cerr << "Unexpected CanReadFile failure\n";
+    return EXIT_FAILURE;
+  }
+
   vtkNew<vtkF3DDracoReader> reader;
   reader->SetStream(stream);
   reader->Update();

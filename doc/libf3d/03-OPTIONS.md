@@ -216,7 +216,7 @@ CLI: `--point-sprites`.
 
 ### `model.point_sprites.type` (_string_, default: `sphere`)
 
-Set the sprites type when showing point sprites (can be `sphere` or `gaussian`).
+Set the sprites type when showing point sprites (can be `sphere`, `gaussian`, `circle`, `stddev`, `bound` or `cross`).
 
 CLI: `--point-sprites`.
 
@@ -293,6 +293,13 @@ CLI: `--tone-mapping`.
 Add a final shader to the output image. See [user documentation](../user/10-FINAL_SHADER.md).
 
 CLI: `--final-shader`
+
+### `render.effect.display_depth` (_bool_, default: `false`)
+
+Display the depth buffer as a grayscale image or with a colormap if `model.scivis.enable` is specified.
+Only opaque objects are displayed, translucent and volumetric objects are ignored.
+
+CLI: `--display-depth`
 
 ### `render.line_width` (_double_, optional)
 
@@ -495,6 +502,13 @@ CLI: `--font-file`.
 Scale fonts. Useful for HiDPI displays.
 
 CLI: `--font-scale`.
+
+### `ui.dpi_aware` (_bool_, default: `false`)
+
+Scale the _font scale_ and _resolution_ by the display scaling factor.
+Only supported on Windows platform.
+
+CLI: `--dpi-aware`.
 
 ### `ui.fps` (_bool_, default: `false`)
 

@@ -1,6 +1,6 @@
-#include "engine.h"
-
 #include "TestSDKHelpers.h"
+
+#include "engine.h"
 
 #import <Cocoa/Cocoa.h>
 #import <OpenGL/gl3.h>

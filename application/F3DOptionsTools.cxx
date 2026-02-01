@@ -74,6 +74,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "rendering-backend", "", "Backend to use when rendering (auto|glx|wgl|egl|osmesa)", "<string>", "" },
       { "list-rendering-backends", "", "Print the list of rendering backends available on this system", "", "" },
       { "max-size", "", "Maximum size in Mib of a file to load, leave empty for unlimited", "<size in Mib>", "" },
+      { "dpi-aware", "","Scale font and window resolution according to system scale", "<bool>", "1" },
 #if F3D_MODULE_DMON
       { "watch", "", "Watch current file and automatically reload it whenever it is modified on disk", "<bool>", "1" },
 #endif
@@ -188,7 +189,8 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       {"anti-aliasing", "a", R"(Select anti-aliasing method ("none", "fxaa", "ssaa" or "taa"))", "<string>", "fxaa"},
       {"anti-aliasing-mode", "", R"(Select anti-aliasing method ("fxaa", "ssaa" or "taa") (deprecated))", "<string>", "fxaa"},
       {"tone-mapping", "t", "Enable Tone Mapping, providing balanced coloring", "<bool>", "1"},
-      {"final-shader", "", "Execute the final shader at the end of the rendering pipeline", "<GLSL code>", ""} } },
+      {"final-shader", "", "Execute the final shader at the end of the rendering pipeline", "<GLSL code>", ""},
+      {"display-depth", "", "Display depth buffer as grayscale image or with a colormap if \"--scalar-coloring\" is specified", "<bool>", "1"} } },
   {"Testing",
     { {"reference", "", "Reference", "<png file>", ""},
       {"reference-threshold", "", "Testing threshold", "<threshold>", ""},
@@ -312,6 +314,8 @@ void PrintReadersList()
   size_t mimeColSize = 0;
   size_t descColSize = 0;
   size_t plugColSize = 0;
+  constexpr std::string_view streamStr = "Supports Stream";
+  size_t streamColSize = streamStr.size();
 
   std::vector<f3d::engine::readerInformation> readersInfo = f3d::engine::getReadersInfo();
   if (readersInfo.empty())
@@ -322,7 +326,7 @@ void PrintReadersList()
   // Compute the size of the 5 columns
   for (const auto& reader : readersInfo)
   {
-    // There is at least one MIME type for each extension
+    // There is at most one MIME type by extension
     assert(reader.Extensions.size() >= reader.MimeTypes.size());
 
     nameColSize = std::max(nameColSize, reader.Name.length());
@@ -340,6 +344,7 @@ void PrintReadersList()
   mimeColSize += colGap;
   descColSize += colGap;
   plugColSize += colGap;
+  streamColSize += colGap;
 
   std::string separator =
     std::string(nameColSize + extsColSize + descColSize + mimeColSize + plugColSize - colGap, '-');
@@ -347,7 +352,7 @@ void PrintReadersList()
   // Print the rows split in 3 columns
   std::stringstream headerLine;
   headerLine << std::left << std::setw(nameColSize) << "Name" << std::setw(plugColSize) << "Plugin"
-             << std::setw(descColSize) << "Description" << std::setw(extsColSize) << "Exts"
+             << std::setw(descColSize) << "Description" << std::setw(streamColSize) << streamStr << std::setw(extsColSize) << "Exts"
              << std::setw(mimeColSize - colGap) << "Mime-types";
   f3d::log::info(headerLine.str());
   f3d::log::info(separator);
@@ -361,6 +366,7 @@ void PrintReadersList()
       readerLine << std::setw(nameColSize) << (i == 0 ? reader.Name : "");
       readerLine << std::setw(plugColSize) << (i == 0 ? reader.PluginName : "");
       readerLine << std::setw(descColSize) << (i == 0 ? reader.Description : "");
+      readerLine << std::setw(streamColSize) << (i == 0 ? (reader.SupportsStream ? "YES" : "NO") : "");
       readerLine << std::setw(extsColSize)
                  << (i < reader.Extensions.size() ? reader.Extensions[i] : "");
       readerLine << std::setw(mimeColSize - colGap)

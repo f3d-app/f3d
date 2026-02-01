@@ -33,7 +33,7 @@ if(F3D_MODULE_UI)
   list(APPEND private_headers ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultLogo.h)
 endif()
 
-set(shader_files glsl/vtkF3DRandomFS.glsl glsl/vtkF3DPointSplatVS.glsl)
+set(shader_files glsl/vtkF3DRandomFS.glsl glsl/vtkF3DPointSplatVS.glsl glsl/vtkF3DPointSplatUtilsSDF.glsl)
 
 if (NOT ANDROID AND NOT EMSCRIPTEN)
   list(APPEND shader_files glsl/vtkF3DComputeDepthCS.glsl)
@@ -80,7 +80,8 @@ set(classes
   vtkF3DUIObserver
   vtkF3DUIActor
   vtkF3DUserRenderPass
-  vtkF3DTAAResolvePass
+  vtkF3DDisplayDepthRenderPass
+  vtkF3DTAAPass
   )
 
 if (F3D_MODULE_UI)

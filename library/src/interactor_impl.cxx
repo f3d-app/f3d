@@ -1060,26 +1060,33 @@ interactor& interactor_impl::initCommands()
     {
       bool& enabled = this->Internals->Options.model.point_sprites.enable;
       std::string& type = this->Internals->Options.model.point_sprites.type;
+
+      // C++20: use `std::to_array<std::string_view>` to avoid specifying the size explicitly
+      constexpr std::array<std::string_view, 6> validTypes = { "sphere", "gaussian", "circle",
+        "stddev", "bound", "cross" };
       if (!enabled)
       {
         enabled = true;
-        type = "sphere";
+        type = validTypes[0];
       }
       else
       {
-        if (type == "sphere")
+        auto index = std::distance(
+          std::begin(validTypes), std::find(std::begin(validTypes), std::end(validTypes), type));
+        if (static_cast<size_t>(index) == validTypes.size() - 1) // last type
         {
-          type = "gaussian";
+          enabled = false;
         }
         else
         {
-          enabled = false;
+          type = validTypes[index + 1];
         }
       }
       this->Internals->Window.render();
     },
-    command_documentation_t{
-      "cycle_point_sprites", "cycle between the point sprite types (none,sphere,gaussian)" });
+    command_documentation_t{ "cycle_point_sprites",
+      "cycle between the point sprite types "
+      "(none,sphere,gaussian,circle,stddev,bound,cross)" });
 
   this->addCommand(
     "roll_camera",
@@ -1233,6 +1240,17 @@ interactor& interactor_impl::initCommands()
       this->Internals->Style->ResetTemporaryUp();
     },
     command_documentation_t{ "reset_camera", "reset the camera to its original location" });
+
+  this->addCommand(
+    "jump_to_keyframe",
+    [&](const std::vector<std::string>& args)
+    {
+      check_args(args, 2, "jump_to_keyframe");
+      int keyframe = options::parse<int>(args[0]);
+      bool relative = options::parse<bool>(args[1]);
+      this->Internals->AnimationManager->JumpToKeyFrame(keyframe, relative);
+    },
+    command_documentation_t{ "jump_to_keyframe", "Jump to animation's key frame" });
 
   this->addCommand(
     "toggle_animation", [&](const std::vector<std::string>&) { this->toggleAnimation(); },

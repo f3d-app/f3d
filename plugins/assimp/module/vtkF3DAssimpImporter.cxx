@@ -41,6 +41,7 @@
 
 #include <memory>
 #include <regex>
+#include <set>
 
 vtkStandardNewMacro(vtkF3DAssimpImporter);
 
@@ -1144,8 +1145,8 @@ bool vtkF3DAssimpImporter::IsAnimationEnabled(vtkIdType animationIndex)
 }
 
 //----------------------------------------------------------------------------
-bool vtkF3DAssimpImporter::GetTemporalInformation(vtkIdType animationIndex, double timeRange[2],
-  int& vtkNotUsed(nbTimeSteps), vtkDoubleArray* vtkNotUsed(timeSteps))
+bool vtkF3DAssimpImporter::GetTemporalInformation(
+  vtkIdType animationIndex, double timeRange[2], int& nbTimeSteps, vtkDoubleArray* timeSteps)
 {
   assert(animationIndex < this->GetNumberOfAnimations());
   assert(animationIndex >= 0);
@@ -1165,9 +1166,46 @@ bool vtkF3DAssimpImporter::GetTemporalInformation(vtkIdType animationIndex, doub
   this->Internals->Description += std::to_string(fps);
   this->Internals->Description += " fps.\n";
 
-  // F3D do not care about timesteps, only set time range
   timeRange[0] = 0.0;
   timeRange[1] = duration / fps;
+
+  std::set<double> timeStepSet;
+
+  aiAnimation* anim = this->Internals->Scene->mAnimations[animationIndex];
+  for (unsigned int channel = 0; channel < anim->mNumChannels; channel++)
+  {
+    aiNodeAnim* nodeAnim = anim->mChannels[channel];
+
+    for (unsigned int positionIndex = 0; positionIndex < nodeAnim->mNumPositionKeys;
+         positionIndex++)
+    {
+      timeStepSet.insert(nodeAnim->mPositionKeys[positionIndex].mTime / anim->mTicksPerSecond);
+    }
+
+    for (unsigned int rotationIndex = 0; rotationIndex < nodeAnim->mNumRotationKeys;
+         rotationIndex++)
+    {
+      timeStepSet.insert(nodeAnim->mRotationKeys[rotationIndex].mTime / anim->mTicksPerSecond);
+    }
+
+    for (unsigned int scalingIndex = 0; scalingIndex < nodeAnim->mNumScalingKeys; scalingIndex++)
+    {
+      timeStepSet.insert(nodeAnim->mScalingKeys[scalingIndex].mTime / anim->mTicksPerSecond);
+    }
+  }
+
+  // Mesh and morph animation are not supported for now, no need to get time steps from it.
+
+  nbTimeSteps = static_cast<int>(timeStepSet.size());
+  timeSteps->SetNumberOfTuples(nbTimeSteps);
+
+  int index = 0;
+  for (double it : timeStepSet)
+  {
+    timeSteps->SetValue(index, it);
+    index++;
+  }
+
   return true;
 }
 

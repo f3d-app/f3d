@@ -130,6 +130,10 @@
       },
       "final_shader": {
         "type": "string"
+      },
+      "display_depth": {
+        "type": "bool",
+        "default_value": "false"
       }
     },
     "hdri": {
@@ -282,6 +286,10 @@
     },
     "animation_progress_color": {
       "type": "color"
+    },
+    "dpi_aware": {
+      "type": "bool",
+      "default_value": "false"
     }
   },
   "model": {

@@ -414,10 +414,26 @@ void window_impl::UpdateDynamicOptions()
     {
       splatType = vtkF3DRenderer::SplatType::SPHERE;
     }
+    else if (opt.model.point_sprites.type == "circle")
+    {
+      splatType = vtkF3DRenderer::SplatType::CIRCLE;
+    }
+    else if (opt.model.point_sprites.type == "stddev")
+    {
+      splatType = vtkF3DRenderer::SplatType::STD_DEV;
+    }
+    else if (opt.model.point_sprites.type == "bound")
+    {
+      splatType = vtkF3DRenderer::SplatType::BOUND;
+    }
+    else if (opt.model.point_sprites.type == "cross")
+    {
+      splatType = vtkF3DRenderer::SplatType::CROSS;
+    }
     else
     {
       log::warn(opt.model.point_sprites.type,
-        R"( is an invalid point sprites type. Valid modes are: "sphere", "gaussian")");
+        R"( is an invalid point sprites type. Valid modes are: "sphere", "gaussian", "circle", "stddev", "bound", "cross"). Falling back to "sphere".)");
     }
     renderer->SetPointSpritesType(splatType);
     renderer->SetPointSpritesSize(
@@ -568,6 +584,8 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetUseSSAOPass(opt.render.effect.ambient_occlusion);
   renderer->SetAntiAliasingMode(aaMode);
   renderer->SetUseToneMappingPass(opt.render.effect.tone_mapping);
+  renderer->SetDisplayDepth(opt.render.effect.display_depth);
+  renderer->SetDisplayDepthScalarColoring(opt.model.scivis.enable);
   renderer->SetBlendingMode(blendMode);
   renderer->SetBackfaceType(opt.render.backface_type);
   renderer->SetFinalShader(opt.render.effect.final_shader);
@@ -583,6 +601,7 @@ void window_impl::UpdateDynamicOptions()
 
   renderer->SetFontFile(opt.ui.font_file);
   renderer->SetFontScale(opt.ui.scale);
+  renderer->SetDPIAware(opt.ui.dpi_aware);
 
   renderer->SetGridUnitSquare(opt.render.grid.unit);
   renderer->SetGridSubdivisions(opt.render.grid.subdivisions);

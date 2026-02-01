@@ -4,6 +4,7 @@
 #include <image.h>
 #include <window.h>
 
+#include <cmath>
 #include <fstream>
 #include <iostream>
 
@@ -67,6 +68,5 @@ constexpr double Degrees2Radians(double degrees)
 {
   return (3.14159265358979323846 * degrees / 180.0);
 }
-
 }
 #endif

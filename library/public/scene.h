@@ -6,6 +6,7 @@
 #include "types.h"
 
 /// @cond
+#include <cstddef>
 #include <filesystem>
 #include <string>
 #include <vector>
@@ -51,6 +52,7 @@ public:
    * Already added file will NOT be reloaded
    * If it fails to loads a file, it clears the scene and
    * throw a load_failure_exception.
+   * On other failure, throw a load_failure_exception.
    */
   virtual scene& add(const std::filesystem::path& filePath) = 0;
   virtual scene& add(const std::vector<std::filesystem::path>& filePath) = 0;
@@ -59,8 +61,20 @@ public:
 
   /**
    * Add and load provided mesh into the scene
+   * If it fails to load the mesh, it clears the scene and
+   * throw a load_failure_exception.
+   * On other failure, throw a load_failure_exception.
    */
   virtual scene& add(const mesh_t& mesh) = 0;
+
+  /**
+   * Add and load provided buffer into the scene as it was file
+   * Require the use of `scene.force_reader` to be able to pick the right reader
+   * If it fails to loads the buffer, it clears the scene and
+   * throw a load_failure_exception.
+   * On other failure, throw a load_failure_exception.
+   */
+  virtual scene& add(std::byte* buffer, std::size_t size) = 0;
 
   ///@{
   /**
@@ -131,7 +145,7 @@ public:
 
   /**
    * Load added files at provided time value if they contain any animation
-   * Providing a timeVale outside of the current animationTimeRange will clamp
+   * Providing a time value outside of the current animation time range will clamp
    * to the closest value in the range.
    * Does not do anything if there is no animations.
    */
@@ -147,6 +161,28 @@ public:
    * Return the number of animations available in the currently loaded files.
    */
   [[nodiscard]] virtual unsigned int availableAnimations() const = 0;
+
+  /**
+   * Return the animation name of a given animation indices, if any.
+   *
+   * Specific animation (0..availableAnimations): Returns the name of the animation at that index
+   * Current animation (-1):
+   *   - Returns the name of the current animation
+   *   - Returns "Multi animations" if more than one animation is current
+   *   - Returns "All animations" if all animations are current
+   *   - Returns "No animations" if no animations are current
+   * Fallback: Returns "No animation" for out-of-bounds requests.
+   *
+   * Can be called before initialization safely
+   */
+  [[nodiscard]] virtual std::string getAnimationName(int indices = -1) = 0;
+
+  /**
+   * Return all of the animation names, if any.
+   * Returns a vector of length 0 if none.
+   * Can be called before initialization safely
+   */
+  [[nodiscard]] virtual std::vector<std::string> getAnimationNames() = 0;
 
 protected:
   //! @cond

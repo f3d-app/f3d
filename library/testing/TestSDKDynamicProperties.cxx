@@ -1,12 +1,15 @@
+#include "PseudoUnitTest.h"
+#include "TestSDKHelpers.h"
+
 #include <engine.h>
 #include <options.h>
 #include <scene.h>
 #include <window.h>
 
-#include "TestSDKHelpers.h"
-
 int TestSDKDynamicProperties([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
+  PseudoUnitTest test;
+
   f3d::engine eng = f3d::engine::create(true);
   f3d::scene& sce = eng.getScene();
   f3d::window& win = eng.getWindow();
@@ -25,8 +28,8 @@ int TestSDKDynamicProperties([[maybe_unused]] int argc, [[maybe_unused]] char* a
   opt.model.color.rgb = { 0.6, 0.1, 0.2 };
   opt.model.color.opacity = 0.6;
 
-  return TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
-           std::string(argv[2]), "TestSDKDynamicProperties")
-    ? EXIT_SUCCESS
-    : EXIT_FAILURE;
+  test("render with dynamic properties",
+    TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
+      std::string(argv[2]), "TestSDKDynamicProperties"));
+  return test.result();
 }

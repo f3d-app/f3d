@@ -4,6 +4,8 @@ F3D can be integrated in the desktop experience.
 
 ## Linux
 
+### Thumbnails
+
 For Linux desktop integration, F3D rely on mime types files as defined by the [XDG standard](https://specifications.freedesktop.org/mime-apps-spec/latest-single/), .thumbnailer file as specified [here](https://wiki.archlinux.org/title/File_manager_functionality#Thumbnail_previews) and .desktop file as specified [here](https://wiki.archlinux.org/title/desktop_entries). Many file managers use this mechanism, including nautilus, thunar, pcmanfm and caja.
 
 The simplest way to obtain desktop integration on Linux is to use a package for your distribution, or the .deb binary release package we provide if compatible with your distribution.
@@ -20,6 +22,8 @@ tar -xzvf f3d-1.3.0-Linux.tar.gz -C ~/.local/
 sudo update-mime-database ~/.local/share/mime/
 sudo update-desktop-database ~/.local/share/applications
 ```
+
+### Rendering
 
 F3D supports rendering in environments with limited graphical contexts, including sandboxes or without Xorg running.
 In most cases, the default behavior will automatically detect which capabilities are available and use the right rendering backend,
