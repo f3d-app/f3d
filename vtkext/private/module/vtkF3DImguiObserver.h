@@ -47,8 +47,10 @@ private:
 
   /**
    * Trigger a window rendering, but render only the UI/overlay actors.
+   * If fullRender is true, does two renders to handle ImGui state changes
+   * that occur during the render pass (e.g., visibility toggles).
    */
-  void RenderUI(vtkRenderWindowInteractor* interactor);
+  void RenderUI(vtkRenderWindowInteractor* interactor, bool fullRender = false);
 
   vtkF3DImguiObserver(const vtkF3DImguiObserver&) = delete;
   void operator=(const vtkF3DImguiObserver&) = delete;

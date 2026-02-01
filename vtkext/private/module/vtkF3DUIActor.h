@@ -198,17 +198,6 @@ public:
   {
   }
 
-  /**
-   * Request a render from the UI actor.
-   */
-  void RequestRender();
-
-  /**
-   * Consume and return the render request state.
-   * Returns true if a render was requested, false otherwise.
-   */
-  bool ConsumeRenderRequest();
-
 protected:
   vtkF3DUIActor();
   ~vtkF3DUIActor() override;
@@ -344,7 +333,6 @@ private:
   void operator=(const vtkF3DUIActor&) = delete;
 
   bool Initialized = false;
-  bool RenderRequested = false;
 };
 
 #endif
