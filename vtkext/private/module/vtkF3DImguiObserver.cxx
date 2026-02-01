@@ -1,8 +1,13 @@
 #include "vtkF3DImguiObserver.h"
 
+#include "vtkF3DRenderPass.h"
+#include "vtkF3DRenderer.h"
+
+#include <vtkInformation.h>
 #include <vtkObjectFactory.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
+#include <vtkRendererCollection.h>
 #include <vtkVersion.h>
 
 #include <imgui.h>
@@ -186,7 +191,11 @@ void vtkF3DImguiObserver::RenderUI(vtkRenderWindowInteractor* interactor, bool f
   }
   else
   {
+    vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+    vtkInformation* info = ren->GetInformation();
+    info->Set(vtkF3DRenderPass::RENDER_UI_ONLY(), 1);
     renWin->Render();
+    info->Remove(vtkF3DRenderPass::RENDER_UI_ONLY());
   }
 }
 
