@@ -69,7 +69,7 @@ int test_scene_c_api()
   }
 
   const char* invalid_paths[] = {
-      "invliad_path1",
+      "invalid_path1",
       "invalid_path2",
       "invalid_path3"
   };

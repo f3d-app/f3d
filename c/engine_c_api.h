@@ -188,7 +188,7 @@ extern "C"
   /**
    * @brief Destroy an engine and free associated resources.
    *
-   * @param engine Engine handle
+   * @param engine Engine handle.
    */
   F3D_EXPORT void f3d_engine_delete(f3d_engine_t* engine);
 
