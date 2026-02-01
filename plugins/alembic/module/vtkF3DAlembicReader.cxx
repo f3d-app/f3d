@@ -313,8 +313,8 @@ class vtkF3DAlembicReader::vtkInternals
       vtkNew<vtkIdTypeArray> normalSourceIds;
       normalSourceIds->SetName("AbcNormalIds");
       normalSourceIds->SetNumberOfTuples(data.NormalSourceIds.size());
-      std::copy(data.NormalSourceIds.begin(), data.NormalSourceIds.end(),
-        normalSourceIds->GetPointer(0));
+      std::copy(
+        data.NormalSourceIds.begin(), data.NormalSourceIds.end(), normalSourceIds->GetPointer(0));
       polydata->GetFieldData()->AddArray(normalSourceIds);
     }
   }
@@ -474,7 +474,8 @@ public:
       Alembic::AbcGeom::IN3fGeomParam normalsParam = schema.getNormalsParam();
       if (normalsParam.valid())
       {
-        Alembic::AbcGeom::IN3fGeomParam::Sample normalValue = normalsParam.getIndexedValue(selector);
+        Alembic::AbcGeom::IN3fGeomParam::Sample normalValue =
+          normalsParam.getIndexedValue(selector);
         if (normalValue.valid())
         {
           V3fContainer normal_v3f;
