@@ -51,7 +51,7 @@ void F3DView::releaseResources()
 }
 
 //----------------------------------------------------------------------------
-void F3DView::mousePressEvent(QMouseEvent *event)
+void F3DView::mousePressEvent(QMouseEvent* event)
 {
   if (!this->_enableMouse)
   {
@@ -64,7 +64,7 @@ void F3DView::mousePressEvent(QMouseEvent *event)
 }
 
 //----------------------------------------------------------------------------
-void F3DView::mouseMoveEvent(QMouseEvent *event)
+void F3DView::mouseMoveEvent(QMouseEvent* event)
 {
   if (!this->_enableMouse)
   {
@@ -77,7 +77,7 @@ void F3DView::mouseMoveEvent(QMouseEvent *event)
 }
 
 //----------------------------------------------------------------------------
-void F3DView::mouseReleaseEvent(QMouseEvent *event)
+void F3DView::mouseReleaseEvent(QMouseEvent* event)
 {
   if (!this->_enableMouse)
   {
@@ -90,7 +90,7 @@ void F3DView::mouseReleaseEvent(QMouseEvent *event)
 }
 
 //----------------------------------------------------------------------------
-void F3DView::wheelEvent(QWheelEvent *event)
+void F3DView::wheelEvent(QWheelEvent* event)
 {
   if (!this->_enableMouse)
   {
@@ -103,7 +103,7 @@ void F3DView::wheelEvent(QWheelEvent *event)
 }
 
 //----------------------------------------------------------------------------
-void F3DView::keyPressEvent(QKeyEvent *event)
+void F3DView::keyPressEvent(QKeyEvent* event)
 {
   if (!this->_enableKeyboard)
   {
@@ -116,7 +116,7 @@ void F3DView::keyPressEvent(QKeyEvent *event)
 }
 
 //----------------------------------------------------------------------------
-void F3DView::keyReleaseEvent(QKeyEvent *event)
+void F3DView::keyReleaseEvent(QKeyEvent* event)
 {
   if (!this->_enableKeyboard)
   {
@@ -129,7 +129,7 @@ void F3DView::keyReleaseEvent(QKeyEvent *event)
 }
 
 //----------------------------------------------------------------------------
-void F3DView::geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry)
+void F3DView::geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry)
 {
   QQuickFramebufferObject::geometryChange(newGeometry, oldGeometry);
   this->update();
@@ -147,5 +147,3 @@ void F3DView::setOption(const QString& opt, const QVariant& value)
   this->_pendingOptions.insert(opt, value);
   this->update();
 }
-
-

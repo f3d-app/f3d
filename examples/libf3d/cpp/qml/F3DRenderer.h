@@ -16,7 +16,6 @@ class engine;
 class interactor;
 }
 
-
 class F3DRenderer : public QQuickFramebufferObject::Renderer
 {
 
@@ -37,7 +36,6 @@ public:
   void updateSize(const QSizeF& size);
 
 private:
-
   enum class EventType
   {
     MousePress,
@@ -58,7 +56,7 @@ private:
     int dx = 0;
     int dy = 0;
     int key = 0;
-    QString text;    
+    QString text;
   };
 
   void initialize();
@@ -78,7 +76,6 @@ private:
 
   QSizeF _lastSize;
   QString _lastModelPath;
-
 };
 
 #endif // F3DRENDERER_H

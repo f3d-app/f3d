@@ -1,10 +1,10 @@
+#include <QCommandLineParser>
+#include <QDebug>
+#include <QFileInfo>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
-#include <QDebug>
 #include <QQuickWindow>
-#include <QCommandLineParser>
-#include <QFileInfo>
 #include <QTimer>
 
 int main(int argc, char* argv[])
@@ -18,7 +18,8 @@ int main(int argc, char* argv[])
   parser.setApplicationDescription("libf3d + QML example");
   parser.addHelpOption();
 
-  QCommandLineOption timeoutOpt("timeout", "Optional timeout (in seconds) before closing the viewer.", "seconds");
+  QCommandLineOption timeoutOpt(
+    "timeout", "Optional timeout (in seconds) before closing the viewer.", "seconds");
   parser.addOption(timeoutOpt);
   parser.addPositionalArgument("file", "3D model file to open");
   parser.process(app);
