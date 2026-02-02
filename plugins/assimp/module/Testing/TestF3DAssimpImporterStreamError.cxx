@@ -8,8 +8,7 @@
 
 int TestF3DAssimpImporterStreamError(int vtkNotUsed(argc), char* argv[])
 {
-  std::string hint;
-  if (vtkF3DAssimpImporter::CanReadFile(nullptr, hint))
+  if (vtkF3DAssimpImporter::CanReadFile(nullptr))
   {
     std::cerr << "Unexpected success CanReadFile(nullptr)\n";
     return EXIT_FAILURE;

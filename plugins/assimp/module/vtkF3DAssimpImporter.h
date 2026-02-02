@@ -107,13 +107,16 @@ public:
    */
   void SetCamera(vtkIdType camIndex) override;
 
+  ///@{
   /**
    * Return true if, after a quick check of file header, it looks like the provided stream
-   * can be read. Return false if it is sure it cannot be read as a strean.
+   * can be read. Return false if it is sure it cannot be read as a stream.
    *
-   * This only checks that the first 5 bytes spells "Ogawa".
+   * hint is provided to be used as MemoryHint
    */
   static bool CanReadFile(vtkResourceStream* stream, std::string& hint);
+  static bool CanReadFile(vtkResourceStream* stream);
+  ///@}
 
 protected:
   vtkF3DAssimpImporter();

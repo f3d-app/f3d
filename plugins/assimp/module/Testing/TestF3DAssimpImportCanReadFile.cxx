@@ -16,7 +16,7 @@ bool TestCanReadFile(const std::string& filename, const std::string& expectedHin
   vtkNew<vtkFileResourceStream> stream;
   if (!stream->Open(filename.c_str()))
   {
-    std::cerr << "Cannot open file "<< filename << "\n";
+    std::cerr << "Cannot open file " << filename << "\n";
     return false;
   }
 
