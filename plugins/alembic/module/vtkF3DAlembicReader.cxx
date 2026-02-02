@@ -200,8 +200,7 @@ class vtkF3DAlembicReader::vtkInternals
     }
   }
 
-  void FillPolyData(const IntermediateGeometry& data, const IntermediateGeometry& originalData,
-    vtkPolyData* polydata)
+  void FillPolyData(const IntermediateGeometry& data, vtkPolyData* polydata)
   {
     vtkNew<vtkPoints> points;
     vtkNew<vtkCellArray> cells;
@@ -505,7 +504,7 @@ public:
       IntermediateGeometry duplicatedData;
       this->PointDuplicateAccumulator(originalData, duplicatedData);
 
-      this->FillPolyData(duplicatedData, originalData, polydata);
+      this->FillPolyData(duplicatedData, polydata);
 
       if (isTopologyConstant)
       {
