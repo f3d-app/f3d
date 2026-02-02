@@ -23,7 +23,10 @@ bool TestCanReadFile(const std::string& filename, const std::string& expectedHin
   std::string hint;
   if (!vtkF3DAssimpImporter::CanReadFile(stream, hint))
   {
-    std::cerr << "Unexpected CanReadFile failure for " << filename << "\n";
+    if (!expectedHint.empty())
+    {
+      std::cerr << "Unexpected CanReadFile failure for " << filename << "\n";
+    }
     return false;
   }
 
@@ -41,6 +44,11 @@ int TestF3DAssimpImportCanReadFile(int vtkNotUsed(argc), char* argv[])
 {
   bool result = true;
   result &= ::TestCanReadFile(std::string(argv[1]) + "data/texturedCube.fbx", "fbx");
+  result &= ::TestCanReadFile(std::string(argv[1]) + "data/anim_test.x", "x");
+  result &= ::TestCanReadFile(std::string(argv[1]) + "data/cube_gears.3mf", "3mf");
   result &= ::TestCanReadFile(std::string(argv[1]) + "data/duck.dae", "dae");
+  result &= ::TestCanReadFile(std::string(argv[1]) + "data/PinkEggFromLW.dxf", "dxf");
+  result &= ::TestCanReadFile(std::string(argv[1]) + "data/teapot.off", "off");
+  result &= !::TestCanReadFile(std::string(argv[1]) + "data/f3d.vtp", "");
   return result ? EXIT_SUCCESS : EXIT_FAILURE;
 }
