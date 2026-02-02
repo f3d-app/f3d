@@ -30,6 +30,7 @@ function(f3d_create_exec target_name)
     set_target_properties(${target_name} PROPERTIES VS_DEBUGGER_ENVIRONMENT "PATH=$<TARGET_FILE_DIR:VTK::CommonCore>") # Add VTK in MSVC PATH environment variable
   endif ()
 
+  add_dependencies(${target_name} generate_cli_opts_header)
   target_include_directories(${target_name} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
 
   if (F3D_USE_EXTERNAL_CXXOPTS)
@@ -182,6 +183,19 @@ f3d_embed_file(
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/F3DConfig.h.in"
     "${CMAKE_CURRENT_BINARY_DIR}/F3DConfig.h")
 
+add_custom_command(
+  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/F3DCLIOptions.h"
+  COMMAND ${CMAKE_COMMAND} -D srcDir=${CMAKE_SOURCE_DIR} -D binaryDir=${CMAKE_CURRENT_BINARY_DIR} -P ${CMAKE_SOURCE_DIR}/cmake/f3dCLIOpts.cmake
+  DEPENDS
+    ${CMAKE_SOURCE_DIR}/resources/cli-options.schema.json
+    ${CMAKE_SOURCE_DIR}/resources/cli-options.json
+  VERBATIM
+)
+
+add_custom_target(generate_cli_opts_header
+  DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/F3DCLIOptions.h"
+)
+
 set(F3D_SOURCE_FILES
   ${CMAKE_CURRENT_BINARY_DIR}/F3DIcon.cxx
   ${CMAKE_CURRENT_SOURCE_DIR}/F3DColorMapTools.cxx
@@ -313,6 +327,12 @@ if(UNIX AND NOT APPLE AND NOT ANDROID)
   install(FILES "${F3D_SOURCE_DIR}/resources/logo-mono.svg"
     DESTINATION "share/icons/HighContrast/scalable/apps" COMPONENT assets
     RENAME "f3d.svg")
+  install(FILES
+    "${F3D_SOURCE_DIR}/resources/cli-options.json"
+    "${F3D_SOURCE_DIR}/resources/cli-options.schema.json"
+    DESTINATION "${f3d_resources_dir}"
+    COMPONENT shellext
+  )
   install(FILES "${F3D_SOURCE_DIR}/resources/completion.bash"
     DESTINATION "share/bash-completion/completions" COMPONENT shellext
     RENAME "f3d")

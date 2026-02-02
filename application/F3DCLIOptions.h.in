@@ -1,0 +1,11 @@
+#ifndef F3DCLIOptions_h
+#define F3DCLIOptions_h
+
+#include <string_view>
+
+namespace F3D
+{
+constexpr std::string_view CLI_OPTIONS_JSON = R"END(@CLI_OPTIONS_JSON@)END";
+}
+
+#endif
