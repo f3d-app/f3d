@@ -11,6 +11,7 @@ cmake -S /src -B /src/_wasm_build \
     -DF3D_PLUGIN_BUILD_DRACO=ON \
     -DF3D_PLUGIN_BUILD_HDF=OFF \
     -DF3D_PLUGIN_BUILD_OCCT=ON \
+    -DF3D_PLUGIN_BUILD_WEBIFC=ON \
     -DF3D_STRICT_BUILD=ON
 
 cmake --build /src/_wasm_build
