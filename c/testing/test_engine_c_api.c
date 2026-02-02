@@ -41,8 +41,14 @@ int test_engine_c_api()
   f3d_engine_autoload_plugins();
   f3d_engine_load_plugin("native");
 
+  // f3d load invalid plugin should not crash
+  f3d_engine_load_plugin("inexistent_plugin");
+
   char** plugins_list = f3d_engine_get_plugins_list("inexistent");
   (void)plugins_list;
+
+  // invalid set reader option should not crash
+  f3d_engine_set_reader_option("invalid.option", "value");
 
   f3d_engine_set_reader_option("QuakeMDL.skin_index", "0");
 
