@@ -696,6 +696,7 @@ f3d_test(NAME TestExactMatch DATA suzanne.obj CONFIG ${CMAKE_BINARY_DIR}/exact.j
 # Test help display
 f3d_test(NAME TestHelp ARGS --help REGEXP "Usage:")
 f3d_test(NAME TestHelpPositional ARGS --help REGEXP "file1 file2 \.\.\.")
+f3d_test(NAME TestHelpVersionPresent ARGS --help REGEXP "--version")
 
 # Test version display
 f3d_test(NAME TestVersion ARGS --version REGEXP "Version:")

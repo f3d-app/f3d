@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CLI Options Schema",
+  "description": "Schema for F3D command-line interface options",
+  "type": "object",
+  "properties": {
+    "groups": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/CLIGroup"
+      }
+    }
+  },
+  "required": ["groups"],
+  "$defs": {
+    "CLIGroup": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the CLI option group"
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CLIOption"
+          }
+        },
+        "conditional": {
+          "type": "string",
+          "description": "Preprocessor definition that must be defined for this entire group to be available",
+          "enum": ["F3D_MODULE_RAYTRACING", "F3D_MODULE_DMON", "F3D_MODULE_UI"]
+        }
+      },
+      "required": ["name", "options"]
+    },
+    "CLIOption": {
+      "type": "object",
+      "properties": {
+        "longName": {
+          "type": "string",
+          "description": "Long form of the option (e.g., 'help')"
+        },
+        "shortName": {
+          "type": "string",
+          "description": "Short form of the option (e.g., 'h')"
+        },
+        "helpText": {
+          "type": "string",
+          "description": "Help text describing the option"
+        },
+        "valueHelper": {
+          "type": "string",
+          "description": "Placeholder text showing expected value format"
+        },
+        "implicitValue": {
+          "type": "string",
+          "description": "Default value when option is used without explicit value"
+        },
+        "conditional": {
+          "type": "string",
+          "description": "Preprocessor definition that must be defined for this option to be available",
+          "enum": ["F3D_MODULE_RAYTRACING", "F3D_MODULE_DMON", "F3D_MODULE_UI"]
+        }
+      },
+      "required": [
+        "longName",
+        "shortName",
+        "helpText",
+        "valueHelper",
+        "implicitValue"
+      ]
+    }
+  }
+}
