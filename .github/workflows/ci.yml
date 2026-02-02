@@ -413,7 +413,6 @@ jobs:
   # VCPKG CI: Build with VCPKG
   #----------------------------------------------------------------------------
   vcpkg_preset:
-    needs: [detect_checkboxes]
     if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:full') || (github.ref == 'refs/heads/master') }}
 
     strategy:
