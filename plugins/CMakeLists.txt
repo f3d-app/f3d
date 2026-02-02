@@ -5,6 +5,7 @@ option(F3D_PLUGIN_BUILD_HDF "HDF plugin (VTKHDF and EX2 files)" ON)
 option(F3D_PLUGIN_BUILD_OCCT "OpenCASCADE plugin (STEP and IGES files)" OFF)
 option(F3D_PLUGIN_BUILD_USD "Universal Scene Description plugin (USD files)" OFF)
 option(F3D_PLUGIN_BUILD_VDB "VDB plugin, using OpenVDB (VDB files)" OFF)
+option(F3D_PLUGIN_BUILD_WEBIFC "webifc plugin (IFC files)" OFF)
 
 add_subdirectory(native)
 
@@ -34,4 +35,8 @@ endif()
 
 if (F3D_PLUGIN_BUILD_VDB)
   add_subdirectory(vdb)
+endif()
+
+if (F3D_PLUGIN_BUILD_WEBIFC)
+  add_subdirectory(webifc)
 endif()

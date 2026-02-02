@@ -1,3 +1,6 @@
+#include "PseudoUnitTest.h"
+#include "TestSDKHelpers.h"
+
 #include <engine.h>
 #include <export.h>
 #include <log.h>
@@ -5,12 +8,12 @@
 #include <scene.h>
 #include <window.h>
 
-#include "TestSDKHelpers.h"
-
 #include <random>
 
 int TestSDKDynamicHDRI([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
+  PseudoUnitTest test;
+
   f3d::log::setVerboseLevel(f3d::log::VerboseLevel::INFO);
 
   f3d::engine eng = f3d::engine::create(true);
@@ -24,12 +27,7 @@ int TestSDKDynamicHDRI([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   sce.add(std::string(argv[1]) + "/data/cow.vtp");
 
-  bool ret = win.render();
-  if (!ret)
-  {
-    std::cerr << "First render failed\n";
-    return EXIT_FAILURE;
-  }
+  test("first render", [&]() { win.render(); });
 
   // Generate a random cache path to avoid reusing any existing cache
   std::random_device r;
@@ -41,64 +39,39 @@ int TestSDKDynamicHDRI([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   // Enable HDRI ambient and skybox and check the default HDRI
   opt.render.hdri.ambient = true;
   opt.render.background.skybox = true;
-  ret = TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
-    std::string(argv[2]), "TestSDKDynamicHDRIDefault");
-  if (!ret)
-  {
-    std::cerr << "Render with Default HDRI failed\n";
-    return EXIT_FAILURE;
-  }
+  test("render with default HDRI",
+    TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
+      std::string(argv[2]), "TestSDKDynamicHDRIDefault"));
 
   // Change the hdri and make sure it is taken into account
   opt.render.hdri.file = std::string(argv[1]) + "data/palermo_park_1k.hdr";
-  ret = TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
-    std::string(argv[2]), "TestSDKDynamicHDRI");
-  if (!ret)
-  {
-    std::cerr << "Render with HDRI failed\n";
-    return EXIT_FAILURE;
-  }
+  test("render with set HDRI",
+    TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
+      std::string(argv[2]), "TestSDKDynamicHDRI"));
 
   // Check caching is working
   std::ifstream lutFile(cachePath + "/lut.vti");
-  if (!lutFile.is_open())
-  {
-    std::cerr << "LUT cache file not found\n";
-    return EXIT_FAILURE;
-  }
+  test("open lut cache file", lutFile.is_open());
 
   // Force a cache path change to force a LUT reconfiguration and test dynamic cache path
   eng.setCachePath(std::string(argv[2]) + "/cache_" + std::to_string(dist(e1)));
-  ret = TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
-    std::string(argv[2]), "TestSDKDynamicHDRI");
-  if (!ret)
-  {
-    std::cerr << "Render with HDRI with another cache path failed\n";
-    return EXIT_FAILURE;
-  }
+  test("render with HDRI using another cache path",
+    TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
+      std::string(argv[2]), "TestSDKDynamicHDRI"));
 
   // Use an existing cache
   eng.setCachePath(cachePath);
-  ret = TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
-    std::string(argv[2]), "TestSDKDynamicHDRI");
-  if (!ret)
-  {
-    std::cerr << "Render with HDRI with existing cache path failed\n";
-    return EXIT_FAILURE;
-  }
+  test("render with HDRI using existing cache path",
+    TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
+      std::string(argv[2]), "TestSDKDynamicHDRI"));
 
 #if F3D_MODULE_EXR
   // Change the hdri and make sure it is taken into account
   opt.render.hdri.file = std::string(argv[1]) + "/data/kloofendal_43d_clear_1k.exr";
-  ret = TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
-    std::string(argv[2]), "TestSDKDynamicHDRIExr");
-
-  if (!ret)
-  {
-    std::cerr << "Render with EXR HDRI failed\n";
-    return EXIT_FAILURE;
-  }
+  test("render with EXR HDRI",
+    TestSDKHelpers::RenderTest(eng.getWindow(), std::string(argv[1]) + "baselines/",
+      std::string(argv[2]), "TestSDKDynamicHDRIExr"));
 #endif
 
-  return EXIT_SUCCESS;
+  return test.result();
 }

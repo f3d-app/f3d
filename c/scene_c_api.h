@@ -87,7 +87,7 @@ extern "C"
    *
    * @param scene Scene handle.
    * @param index Index of the light.
-   * @return Light state.
+   * @return Light state, NULL on failure.
    */
   F3D_EXPORT f3d_light_state_t* f3d_scene_get_light(const f3d_scene_t* scene, int index);
 

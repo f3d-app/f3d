@@ -222,7 +222,7 @@ CLI: `--point-sprites`.
 
 ### `model.point_sprites.type` (_string_, default: `sphere`)
 
-Set the sprites type when showing point sprites (can be `sphere` or `gaussian`).
+Set the sprites type when showing point sprites (can be `sphere`, `gaussian`, `circle`, `stddev`, `bound` or `cross`).
 
 CLI: `--point-sprites`.
 
@@ -508,6 +508,13 @@ CLI: `--font-file`.
 Scale fonts. Useful for HiDPI displays.
 
 CLI: `--font-scale`.
+
+### `ui.dpi_aware` (_bool_, default: `false`)
+
+Scale the _font scale_ and _resolution_ by the display scaling factor.
+Only supported on Windows platform.
+
+CLI: `--dpi-aware`.
 
 ### `ui.fps` (_bool_, default: `false`)
 

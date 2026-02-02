@@ -136,7 +136,7 @@ to add a C++ test in the library layer. These tests are simple C++ methods that 
 Library test cases are handled in `library/testing`.
 
 To add a test, create a new `TestSDKName.cxx` file containing a `int TestSDKName(int argc, char* argv[])` method,
-then implement your test in C++ using the [libf3d](../libf3d/01-OVERVIEW.md) API.
+then implement your test in C++ using the [libf3d](../libf3d/01-OVERVIEW.md) API and the `PseudoUnitTest` framework.
 Then add you new file to `src/library/testing/CMakeLists.txt`.
 
 It is supported to read file as input and perform image comparison against baselines as an output, see other tests as examples.

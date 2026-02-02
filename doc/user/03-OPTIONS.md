@@ -211,6 +211,11 @@ Can be useful to display non-ASCII filenames.
 
 Scale fonts. Useful for HiDPI displays.
 
+### `--dpi-aware` (_bool_, default: `false`)
+
+Scale the _font scale_ and _resolution_ by the display scaling factor.
+Only supported on Windows platform.
+
 ### `--command-script=<command script>` (_script_)
 
 Provide a script file containing a list of [commands](07-COMMANDS.md) to be executed sequentially.
@@ -222,7 +227,7 @@ Set the opacity of the backdrop behind text information such as FPS, filename, m
 
 ## Material options
 
-### `-o`, `--point-sprites=<none|sphere|gaussian>` (_string_, default: `none`)
+### `-o`, `--point-sprites=<none|sphere|gaussian|circle|stddev|bound|cross>` (_string_, default: `none`)
 
 Select _points sprites_ types to show instead of the geometry.
 

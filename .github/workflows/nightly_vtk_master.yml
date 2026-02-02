@@ -55,6 +55,7 @@ jobs:
       tbb_version: ${{ steps.set_default_versions.outputs.tbb_version }}
       usd_version: ${{ steps.set_default_versions.outputs.usd_version }}
       webp_version: ${{ steps.set_default_versions.outputs.webp_version }}
+      webifc_version: ${{ steps.set_default_versions.outputs.webifc_version }}
       zlib_version: ${{ steps.set_default_versions.outputs.zlib_version }}
       docker_timestamp: ${{ steps.set_default_versions.outputs.docker_timestamp }}
       global_cache_index: ${{ steps.set_default_versions.outputs.global_cache_index }}
@@ -139,6 +140,7 @@ jobs:
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           webp_version: ${{ needs.default_versions.outputs.webp_version }}
+          webifc_version: ${{ needs.default_versions.outputs.webifc_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
@@ -195,6 +197,7 @@ jobs:
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           webp_version: ${{ needs.default_versions.outputs.webp_version }}
+          webifc_version: ${{ needs.default_versions.outputs.webifc_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
@@ -241,6 +244,7 @@ jobs:
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           webp_version: ${{ needs.default_versions.outputs.webp_version }}
+          webifc_version: ${{ needs.default_versions.outputs.webifc_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
@@ -287,6 +291,7 @@ jobs:
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           webp_version: ${{ needs.default_versions.outputs.webp_version }}
+          webifc_version: ${{ needs.default_versions.outputs.webifc_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 
@@ -343,6 +348,7 @@ jobs:
           tbb_version: ${{needs.default_versions.outputs.tbb_version}}
           usd_version: ${{needs.default_versions.outputs.usd_version}}
           webp_version: ${{ needs.default_versions.outputs.webp_version }}
+          webifc_version: ${{ needs.default_versions.outputs.webifc_version }}
           zlib_version: ${{needs.default_versions.outputs.zlib_version}}
           global_cache_index: ${{needs.default_versions.outputs.global_cache_index}}
 

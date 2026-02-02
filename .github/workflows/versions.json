@@ -24,6 +24,7 @@
     "tbb": "v2021.13.1",
     "usd": "v25.11",
     "webp": "v1.6.0",
+    "webifc": "0.75",
     "zlib": "v1.3.1"
   },
   "min_versions": {
@@ -42,9 +43,10 @@
     "tbb": "v2021.10.0",
     "usd": "v24.08",
     "webp": "v1.2.4",
+    "webifc": "0.75",
     "zlib": "v1.2.13"
   },
-  "vtk_commit_sha": "c4400870a52e8a49b050fafffd7f9d6fad88a1b3",
-  "docker_timestamp": "20260111_0",
+  "vtk_commit_sha": "b858907b1c684f8aea23d734d79024ede62a4dbc",
+  "docker_timestamp": "20260124_0",
   "global_cache_index": "1"
 }

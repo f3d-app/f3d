@@ -30,6 +30,13 @@ VTKEXT_EXPORT double ParseToDouble(
  * Use nameError in the log for easier debugging.
  */
 VTKEXT_EXPORT int ParseToInt(const std::string& str, int def, const std::string& nameError);
+
+/*
+ * Calculate the primary monitor system zoom scale base on DPI.
+ * Only supported on Windows platform.
+ * Return 1.0 on other platforms.
+ */
+VTKEXT_EXPORT double getDPIScale();
 };
 
 #endif

@@ -4,12 +4,14 @@
 #include "F3DColoringInfoHandler.h"
 #include "F3DDefaultHDRI.h"
 #include "F3DLog.h"
+#include "F3DUtils.h"
 #include "vtkF3DCachedLUTTexture.h"
 #include "vtkF3DCachedSpecularTexture.h"
 #include "vtkF3DDisplayDepthRenderPass.h"
 #include "vtkF3DInteractorStyle.h"
 #include "vtkF3DOpenGLGridMapper.h"
 #include "vtkF3DOverlayRenderPass.h"
+#include "vtkF3DPointSplatUtilsSDF.h"
 #include "vtkF3DPolyDataMapper.h"
 #include "vtkF3DRenderPass.h"
 #include "vtkF3DSolidBackgroundPass.h"
@@ -1569,7 +1571,9 @@ void vtkF3DRenderer::ConfigureTextActors()
     }
   }
 
-  this->UIActor->SetFontScale(this->FontScale);
+  double scaleFactor = this->DPIAware ? F3DUtils::getDPIScale() : 1.0;
+
+  this->UIActor->SetFontScale(this->FontScale * scaleFactor);
 
   this->TextActorsConfigured = true;
 }
@@ -1610,6 +1614,16 @@ void vtkF3DRenderer::SetFontScale(const double fontScale)
   if (this->FontScale != fontScale)
   {
     this->FontScale = fontScale;
+    this->TextActorsConfigured = false;
+  }
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DRenderer::SetDPIAware(bool enable)
+{
+  if (this->DPIAware != enable)
+  {
+    this->DPIAware = enable;
     this->TextActorsConfigured = false;
   }
 }
@@ -2666,6 +2680,14 @@ void vtkF3DRenderer::ConfigurePointSprites()
     splatMapper->SetUseInstancing(this->PointSpritesUseInstancing);
 #endif
 
+    // add SDF functions
+    vtkShaderProperty* sp = sprites.Actor->GetShaderProperty();
+    sp->ClearAllFragmentShaderReplacements();
+
+    std::string sdfFunctions = vtkF3DPointSplatUtilsSDF;
+    sp->AddFragmentShaderReplacement(
+      "//VTK::PositionVC::Dec\n", true, sdfFunctions + "//VTK::PositionVC::Dec\n", true);
+
     sprites.Mapper->EmissiveOff();
     sprites.Mapper->SetScaleFactor(scaleFactor);
 
@@ -2710,21 +2732,76 @@ void vtkF3DRenderer::ConfigurePointSprites()
       sprites.Mapper->SetSplatShaderCode(nullptr); // gaussian is the default VTK shader
       sprites.Actor->ForceTranslucentOn();
     }
-    else
+    else if (this->PointSpritesType == SplatType::SPHERE)
     {
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
-      sprites.Mapper->SetBoundScale(1.0);
+      sprites.Mapper->SetBoundScale(1.1);
 #endif
       sprites.Mapper->SetSplatShaderCode(
         "//VTK::Color::Impl\n"
-        "float dist = dot(offsetVCVSOutput.xy, offsetVCVSOutput.xy);\n"
-        "if (dist > 1.0) {\n"
-        "  discard;\n"
-        "} else {\n"
-        "  float scale = (1.0 - dist);\n"
-        "  ambientColor *= scale;\n"
-        "  diffuseColor *= scale;\n"
-        "}\n");
+        "float dist = sdCircle(offsetVCVSOutput, 1.0);\n"
+        "opacity = fill(dist);\n"
+        // -dist is the cosine of the angle between the camera
+        // direction (Z) and the normal of the "sphere"
+        // so scaling with this value gives an approximation of the Lambertian diffuse
+        "diffuseColor *= clamp(-dist, 0.0, 1.0);\n");
+
+      sprites.Actor->ForceTranslucentOff();
+    }
+    else if (this->PointSpritesType == SplatType::CIRCLE)
+    {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
+      sprites.Mapper->SetBoundScale(1.1);
+#endif
+
+      sprites.Mapper->SetSplatShaderCode(
+        "//VTK::Color::Impl\n"
+        "opacity = stroke(sdCircle(offsetVCVSOutput, 1.0), 2.0);\n");
+
+      sprites.Actor->ForceTranslucentOff();
+    }
+    else if (this->PointSpritesType == SplatType::STD_DEV)
+    {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
+      sprites.Mapper->SetBoundScale(3.1);
+#endif
+      sprites.Mapper->SetSplatShaderCode(
+        "//VTK::Color::Impl\n"
+        "opacity = fill(sdCircle(offsetVCVSOutput, 1.0));\n"
+        "opacity += stroke(sdCircle(offsetVCVSOutput, 2.0), 2.0);\n"
+        "opacity += stroke(sdCircle(offsetVCVSOutput, 3.0), 1.0);\n"
+        "opacity = clamp(opacity, 0.0, 1.0);\n");
+
+      sprites.Actor->ForceTranslucentOff();
+    }
+    else if (this->PointSpritesType == SplatType::BOUND)
+    {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
+      sprites.Mapper->SetBoundScale(3.1);
+#endif
+      sprites.Mapper->SetSplatShaderCode(
+        "//VTK::Color::Impl\n"
+        "vec2 g = fwidth(offsetVCVSOutput);\n"
+        "vec2 p = offsetVCVSOutput / g;\n"
+        "opacity = strokePx(sdRoundBox(p, vec2(3.0) / g, 4.0), 2.0);\n");
+
+      sprites.Actor->ForceTranslucentOff();
+    }
+    else if (this->PointSpritesType == SplatType::CROSS)
+    {
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20231102)
+      sprites.Mapper->SetBoundScale(1.1);
+#endif
+      sprites.Mapper->SetSplatShaderCode(
+        "//VTK::Color::Impl\n"
+        "vec2 g = fwidth(offsetVCVSOutput);\n"
+        "vec2 p = offsetVCVSOutput / g;\n"
+        "float d1 = sdSegment(p, vec2(0., -1.0) / g, vec2(0., 1.0) / g);\n"
+        "float d2 = sdSegment(p, vec2(-1.0, 0.) / g, vec2(1.0, 0.) / g);\n"
+        "const float thickness = 2.0;\n"
+        "d1 = opShift(d1, thickness);\n"
+        "d2 = opShift(d2, thickness);\n"
+        "opacity = fillPx(opRoundMerge(d1, d2, thickness));\n");
 
       sprites.Actor->ForceTranslucentOff();
     }
