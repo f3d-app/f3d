@@ -117,7 +117,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
 #endif
       { "command-script", "", "Path to a script file containing commands to execute", "<file_path>", "" } } },
   { "Material",
-    { {"point-sprites", "o", R"(Select point sprites type ("none", "sphere", "gaussian"))", "<string>", "sphere" },
+    { {"point-sprites", "o", R"(Select point sprites type ("none", "sphere", "gaussian", "circle", "stddev", "bound"))", "<string>", "sphere" },
       {"point-sprites-type", "", "Point sprites type (deprecated)", "<sphere|gaussian>", ""},
       {"point-sprites-size", "", "Point sprites sphere size", "<size>", ""},
       {"point-sprites-absolute-size", "", "Do not scale point sprites size by scene size", "<bool>", "1"},
