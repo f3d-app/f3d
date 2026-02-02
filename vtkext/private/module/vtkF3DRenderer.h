@@ -66,6 +66,7 @@ public:
     NONE,
     DUAL_DEPTH_PEELING,
     SORT,
+    SORT_CPU,
     STOCHASTIC
   };
 

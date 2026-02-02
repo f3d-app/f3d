@@ -183,7 +183,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       {"raytracing-denoise", "d", "Denoise the image", "<bool>", "1"} } },
 #endif
   {"PostFX (OpenGL)",
-    { {"blending", "p", R"(Select translucency blending mode ("none", "ddp", "sort" or "stochastic"))", "<string>", "ddp"},
+    { {"blending", "p", R"(Select translucency blending mode ("none", "ddp", "sort", "sort_cpu" or "stochastic"))", "<string>", "ddp"},
       {"translucency-support", "", "Enable translucency blending (deprecated)", "<bool>", "1"},
       {"ambient-occlusion", "q", "Enable ambient occlusion providing approximate shadows for better depth perception, implemented using SSAO", "<bool>", "1"},
       {"anti-aliasing", "a", R"(Select anti-aliasing method ("none", "fxaa", "ssaa" or "taa"))", "<string>", "fxaa"},

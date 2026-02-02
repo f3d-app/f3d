@@ -35,6 +35,8 @@
 #endif
 
 #include <sstream>
+#include <algorithm>
+#include <vector>
 
 //----------------------------------------------------------------------------
 class vtkF3DSplatMapperHelper : public vtkOpenGLPointGaussianMapperHelper
@@ -76,17 +78,18 @@ protected:
 
 private:
 #if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
-  void SortSplats(vtkRenderer* ren);
-
   vtkNew<vtkShader> DepthComputeShader;
   vtkNew<vtkShaderProgram> DepthProgram;
   vtkNew<vtkOpenGLBufferObject> DepthBuffer;
 
   vtkNew<vtkF3DBitonicSort> Sorter;
+#endif
 
   double DirectionThreshold = 0.999;
   double LastDirection[3] = { 0.0, 0.0, 0.0 };
-#endif
+
+  void SortSplats(vtkRenderer* ren);
+  void SortSplatsCPU(vtkRenderer* ren);
 
   bool OwnerUseInstancing();
 
@@ -311,10 +314,10 @@ void vtkF3DSplatMapperHelper::SetCameraShaderParameters(
   this->Superclass::SetCameraShaderParameters(cellBO, ren, actor);
 }
 
-#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
 //----------------------------------------------------------------------------
 void vtkF3DSplatMapperHelper::SortSplats(vtkRenderer* ren)
 {
+#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
   int numVerts = this->VBOs->GetNumberOfTuples("vertexMC");
 
   if (numVerts)
@@ -361,21 +364,146 @@ void vtkF3DSplatMapperHelper::SortSplats(vtkRenderer* ren)
         this->DepthBuffer, this->Primitives[PrimitivePoints].IBO);
     }
   }
-}
 #endif
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DSplatMapperHelper::SortSplatsCPU(vtkRenderer* ren)
+{
+  int numVerts = this->VBOs->GetNumberOfTuples("vertexMC");
+
+  if (numVerts <= 0)
+  {
+    return;
+  }
+
+  const double* focalPoint = ren->GetActiveCamera()->GetFocalPoint();
+  const double* origin = ren->GetActiveCamera()->GetPosition();
+  (void)origin; // origin intentionally unused to match GPU path
+  double direction[3];
+
+  for (int i = 0; i < 3; ++i)
+  {
+    // the orientation is reverted to sort splats back to front
+    direction[i] = origin[i] - focalPoint[i];
+  }
+
+  vtkMath::Normalize(direction);
+
+  if (vtkMath::Dot(this->LastDirection, direction) >= this->DirectionThreshold)
+  {
+    return;
+  }
+
+  this->LastDirection[0] = direction[0];
+  this->LastDirection[1] = direction[1];
+  this->LastDirection[2] = direction[2];
+
+  // Read first numVerts indices from IBO (GPU path uses numVerts, not padded size)
+  this->Primitives[PrimitivePoints].IBO->Bind();
+  GLint iboSizeBytes = 0;
+  glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &iboSizeBytes);
+  if (iboSizeBytes < static_cast<GLint>(numVerts * static_cast<int>(sizeof(GLuint))))
+  {
+    this->Primitives[PrimitivePoints].IBO->Release();
+    return;
+  }
+
+  std::vector<GLuint> indices(static_cast<size_t>(numVerts));
+  glGetBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, numVerts * static_cast<int>(sizeof(GLuint)),
+    indices.data());
+
+  // Read vertexMC buffer and compute the stride actually used by the SSBO/VBO
+  auto vbo = this->VBOs->GetVBO("vertexMC");
+  vbo->Bind();
+  GLint vboSizeBytes = 0;
+  glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &vboSizeBytes);
+  if (vboSizeBytes <= 0)
+  {
+    vbo->Release();
+    this->Primitives[PrimitivePoints].IBO->Release();
+    return;
+  }
+  std::vector<unsigned char> vertexBytes(static_cast<size_t>(vboSizeBytes));
+  glGetBufferSubData(GL_ARRAY_BUFFER, 0, vboSizeBytes, vertexBytes.data());
+  vbo->Release();
+
+  const size_t strideBytes = static_cast<size_t>(vboSizeBytes) / static_cast<size_t>(numVerts);
+  if (strideBytes < sizeof(float) * 3)
+  {
+    this->Primitives[PrimitivePoints].IBO->Release();
+    return;
+  }
+
+  std::vector<std::pair<double, GLuint>> depthIndex;
+  depthIndex.reserve(static_cast<size_t>(numVerts));
+
+  for (int i = 0; i < numVerts; ++i)
+  {
+    const GLuint idx = indices[static_cast<size_t>(i)];
+    if (idx >= static_cast<GLuint>(numVerts))
+    {
+      depthIndex.emplace_back(0.0, idx);
+      continue;
+    }
+
+    const size_t base = static_cast<size_t>(idx) * strideBytes;
+    if (base + sizeof(float) * 3 > vertexBytes.size())
+    {
+      depthIndex.emplace_back(0.0, idx);
+      continue;
+    }
+
+    float vx, vy, vz;
+    std::memcpy(&vx, vertexBytes.data() + base + sizeof(float) * 0, sizeof(float));
+    std::memcpy(&vy, vertexBytes.data() + base + sizeof(float) * 1, sizeof(float));
+    std::memcpy(&vz, vertexBytes.data() + base + sizeof(float) * 2, sizeof(float));
+
+    const double depth = static_cast<double>(vx) * direction[0] +
+      static_cast<double>(vy) * direction[1] + static_cast<double>(vz) * direction[2];
+    depthIndex.emplace_back(depth, idx);
+  }
+
+  // Match bitonic sort ordering: sort ascending by depth (back-to-front given reversed direction)
+  std::sort(depthIndex.begin(), depthIndex.end(), [](const auto& a, const auto& b) {
+    return a.first < b.first;
+  });
+
+  for (int i = 0; i < numVerts; ++i)
+  {
+    indices[static_cast<size_t>(i)] = depthIndex[static_cast<size_t>(i)].second;
+  }
+
+  glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, numVerts * static_cast<int>(sizeof(GLuint)),
+    indices.data());
+  this->Primitives[PrimitivePoints].IBO->Release();
+}
 
 //----------------------------------------------------------------------------
 void vtkF3DSplatMapperHelper::RenderPieceDraw(vtkRenderer* ren, vtkActor* actor)
 {
-#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
+
   const vtkF3DRenderer* renderer = vtkF3DRenderer::SafeDownCast(ren);
 
-  if (renderer->GetBlendingMode() == vtkF3DRenderer::BlendingMode::SORT &&
-    vtkShader::IsComputeShaderSupported() && actor->HasTranslucentPolygonalGeometry())
+  if (actor->HasTranslucentPolygonalGeometry())
   {
-    this->SortSplats(ren);
+    if (renderer->GetBlendingMode() == vtkF3DRenderer::BlendingMode::SORT)
+    {
+      if (vtkShader::IsComputeShaderSupported())
+      {
+        this->SortSplats(ren);
+      }
+      else
+      {
+        vtkWarningMacro("Compute shaders not supported, falling back to CPU sorting");
+        this->SortSplatsCPU(ren);
+      }
+    }
+    else if (renderer->GetBlendingMode() == vtkF3DRenderer::BlendingMode::SORT_CPU)
+    {
+      this->SortSplatsCPU(ren);
+    }
   }
-#endif
 
   if (this->OwnerUseInstancing())
   {
