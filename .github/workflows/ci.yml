@@ -414,7 +414,7 @@ jobs:
   #----------------------------------------------------------------------------
   vcpkg_preset:
     needs: [detect_checkboxes]
-    if: ${{ (contains(needs.detect_checkboxes.outputs.checked, 'vcpkg CI')) || (github.ref == 'refs/heads/master') }}
+    if: ${{ (contains(github.event.pull_request.labels.*.name, 'ci:full') || (github.ref == 'refs/heads/master') }}
 
     strategy:
       fail-fast: false
