@@ -91,7 +91,7 @@ public:
     data->timer->StartTimer();
   }
 
-  void Load(const std::vector<vtkSmartPointer<vtkImporter>>& importers, scene_impl* sceneImpl)
+  void Load(const std::vector<vtkSmartPointer<vtkImporter>>& importers)
   {
     for (const vtkSmartPointer<vtkImporter>& importer : importers)
     {
@@ -167,8 +167,7 @@ public:
     scene_impl::internals::DisplayAllInfo(this->MetaImporter, this->Window);
 
     // Update the scene hierarchy in the window automatically
-    auto hierarchy = this->GetSceneHierarchyNodes();
-    this->Window.SetSceneHierarchy(hierarchy);
+    this->Window.SetSceneHierarchy(this->GetSceneHierarchyNodes());
   }
 
   static void DisplayImporterDescription(log::VerboseLevel level, vtkImporter* importer)
@@ -322,7 +321,7 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
   }
   log::debug("");
 
-  this->Internals->Load(importers, this);
+  this->Internals->Load(importers);
   return *this;
 }
 
@@ -372,7 +371,7 @@ scene& scene_impl::add(std::byte* buffer, std::size_t size)
   }
 
   log::debug("\nLoading stream");
-  this->Internals->Load({ importer }, this);
+  this->Internals->Load({ importer });
   return *this;
 }
 
@@ -396,7 +395,7 @@ scene& scene_impl::add(const mesh_t& mesh)
   importer->SetInternalReader(vtkSource);
 
   log::debug("Loading 3D scene from memory");
-  this->Internals->Load({ importer }, this);
+  this->Internals->Load({ importer });
   return *this;
 }
 
