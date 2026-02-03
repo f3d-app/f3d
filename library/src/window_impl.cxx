@@ -438,7 +438,8 @@ void window_impl::UpdateDynamicOptions()
     renderer->SetPointSpritesType(splatType);
     renderer->SetPointSpritesSize(
       opt.model.point_sprites.absolute_size, opt.model.point_sprites.size);
-    renderer->SetPointSpritesUseInstancing(opt.render.effect.blending.mode != "sort" && opt.render.effect.blending.mode != "sort_cpu");
+    renderer->SetPointSpritesUseInstancing(
+      opt.render.effect.blending.mode != "sort" && opt.render.effect.blending.mode != "sort_cpu");
   }
 
   renderer->SetLineWidth(opt.render.line_width);

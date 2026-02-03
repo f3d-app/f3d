@@ -403,7 +403,8 @@ void vtkF3DSplatMapperHelper::SortSplatsCPU(vtkRenderer* ren)
 
   this->CPUSortedIndices.resize(static_cast<size_t>(numVerts));
 
-  this->Primitives[PrimitivePoints].IBO->Download(this->CPUSortedIndices.data(), static_cast<size_t>(numVerts));
+  this->Primitives[PrimitivePoints].IBO->Download(
+    this->CPUSortedIndices.data(), static_cast<size_t>(numVerts));
 
   this->CPUDepths.resize(static_cast<size_t>(numVerts));
   // compute depth for each splat
@@ -421,8 +422,8 @@ void vtkF3DSplatMapperHelper::SortSplatsCPU(vtkRenderer* ren)
   std::sort(this->CPUSortedIndices.begin(), this->CPUSortedIndices.end(),
     [&](const GLuint& a, const GLuint& b) { return this->CPUDepths[a] < this->CPUDepths[b]; });
 
-  this->Primitives[PrimitivePoints].IBO->Upload(this->CPUSortedIndices.data(), static_cast<size_t>(numVerts),
-    vtkOpenGLBufferObject::ObjectType::ElementArrayBuffer);
+  this->Primitives[PrimitivePoints].IBO->Upload(this->CPUSortedIndices.data(),
+    static_cast<size_t>(numVerts), vtkOpenGLBufferObject::ObjectType::ElementArrayBuffer);
 }
 
 //----------------------------------------------------------------------------
