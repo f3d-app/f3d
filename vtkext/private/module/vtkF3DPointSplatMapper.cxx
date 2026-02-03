@@ -411,7 +411,7 @@ void vtkF3DSplatMapperHelper::SortSplatsCPU(vtkRenderer* ren)
 
   for (int i = 0; i < numVerts; ++i)
   {
-    double* pos = points->GetPoint(i);
+    const double* pos = points->GetPoint(i);
     this->CPUDepths[i] = pos[0] * this->LastDirection[0] + pos[1] * this->LastDirection[1] +
       pos[2] * this->LastDirection[2];
   }
