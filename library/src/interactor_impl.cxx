@@ -103,16 +103,18 @@ public:
 
     this->UIObserver->InstallObservers(this->VTKInteractor);
 
-    // observe console event to trigger commands
+    // observe UI event to trigger commands
     vtkNew<vtkCallbackCommand> commandCallback;
     commandCallback->SetClientData(this);
-    commandCallback->SetCallback(OnConsoleEvent);
+    commandCallback->SetCallback(OnUIEvent);
     vtkOutputWindow::GetInstance()->AddObserver(
       vtkF3DConsoleOutputWindow::TriggerEvent, commandCallback);
     vtkOutputWindow::GetInstance()->AddObserver(
       vtkF3DConsoleOutputWindow::ShowEvent, commandCallback);
     vtkOutputWindow::GetInstance()->AddObserver(
       vtkF3DConsoleOutputWindow::HideEvent, commandCallback);
+    this->VTKInteractor->AddObserver(
+      vtkF3DUIActor::SceneHierarchyChangedEvent, commandCallback);
 
     // Disable standard interactor behavior with timer event
     // in order to be able to interact while animating
@@ -283,7 +285,7 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  static void OnConsoleEvent(vtkObject*, unsigned long event, void* clientData, void* data)
+  static void OnUIEvent(vtkObject*, unsigned long event, void* clientData, void* data)
   {
     internals* self = static_cast<internals*>(clientData);
 

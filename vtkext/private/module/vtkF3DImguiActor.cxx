@@ -385,7 +385,7 @@ void vtkF3DImguiActor::ReleaseGraphicsResources(vtkWindow* w)
 vtkF3DImguiActor::~vtkF3DImguiActor() = default;
 
 //----------------------------------------------------------------------------
-void vtkF3DImguiActor::RenderNode(NodeInfo* node)
+void vtkF3DImguiActor::RenderNode(NodeInfo* node, vtkOpenGLRenderWindow* renWin)
 {
   if (!node)
   {
@@ -415,7 +415,7 @@ void vtkF3DImguiActor::RenderNode(NodeInfo* node)
       NodeVisibilityState[node->prop] = visible;
       node->prop->SetVisibility(visible ? 1 : 0);
       node->prop->Modified();
-      this->RequestRender();
+      renWin->GetInteractor()->InvokeEvent(vtkF3DUIActor::SceneHierarchyChangedEvent, nullptr);
     }
 
     ImGui::PopID();
@@ -428,14 +428,14 @@ void vtkF3DImguiActor::RenderNode(NodeInfo* node)
   for (auto& child : node->children)
   {
     ImGui::Indent(10);
-    RenderNode(&child);
+    RenderNode(&child, renWin);
     ImGui::Unindent(10);
   }
 }
 
 
 //----------------------------------------------------------------------------
-void vtkF3DImguiActor::RenderSceneHierarchy()
+void vtkF3DImguiActor::RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin)
 {
   if (!this->SceneHierarchyVisible)
   {
@@ -469,7 +469,7 @@ void vtkF3DImguiActor::RenderSceneHierarchy()
 
   for (auto& node : this->HierarchyNodes)
   {
-    RenderNode(&node);
+    RenderNode(&node, renWin);
   }
 
   ImGui::End();
