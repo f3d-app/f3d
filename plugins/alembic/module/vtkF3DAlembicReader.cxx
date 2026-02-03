@@ -337,7 +337,7 @@ public:
 
     Alembic::AbcGeom::ISampleSelector selector(time);
     schema.get(samp, selector);
-    std::string meshName = pmesh.getName();
+    const std::string& meshName = pmesh.getName();
     auto topologyVariance = schema.getTopologyVariance();
     bool isTopologyConstant = (topologyVariance == Alembic::AbcGeom::kConstantTopology) ||
       (topologyVariance == Alembic::AbcGeom::kHomogenousTopology);
