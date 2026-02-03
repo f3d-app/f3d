@@ -768,10 +768,10 @@ private:
   std::optional<fs::path> TextureNormal;
 
   vtkSmartPointer<vtkImageReader2> CheckerBoardReader;
-  bool HasValidCheckBoardReader = false;
+  bool HasValidCheckerBoardReader = false;
   bool CheckerBoardReaderConfigured = false;
   bool EnableCheckerBoard = false;
-  vtkSmartPointer<vtkTexture> CheckBoardTexture;
+  vtkSmartPointer<vtkTexture> CheckerBoardTexture;
   bool HasValidCheckerBoardTexture = false;
 
   vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorTransferFunction;

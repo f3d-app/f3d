@@ -2373,7 +2373,7 @@ void vtkF3DRenderer::SetTextureNormal(const std::optional<fs::path>& tex)
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetEnableCheckerBoard(bool enable)
 {
-  if (enable != this->EnableCheckerBoard)
+  if (this->EnableCheckerBoard != enable)
   {
     this->EnableCheckerBoard = enable;
     this->ActorsPropertiesConfigured = false;
@@ -2568,53 +2568,6 @@ void vtkF3DRenderer::ConfigureActorsProperties()
       coloring.OriginalActor->GetProperty()->SetNormalTexture(normTex);
     }
 
-    if (this->EnableCheckerBoard)
-    {
-      if (!this->HasValidCheckBoardReader || !CheckerBoardReaderConfigured)
-      {
-        this->CheckerBoardReader = vtkSmartPointer<vtkPNGReader>::New();
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
-        vtkNew<vtkMemoryResourceStream> stream;
-        stream->SetBuffer(F3DCheckerBoard, sizeof(F3DCheckerBoard));
-        this->CheckerBoardReader->SetStream(stream);
-#else
-        this->CheckerBoardReader->SetMemoryBuffer(F3DCheckerBoard);
-        this->CheckerBoardReader->SetMemoryBufferLength(sizeof(F3DCheckerBoard));
-#endif
-        this->HasValidCheckBoardReader = true;
-        this->CheckerBoardReaderConfigured = true;
-      }
-
-      if (!HasValidCheckerBoardTexture)
-      {
-        assert(this->HasValidCheckBoardReader);
-        this->CheckerBoardReader->Update();
-
-        this->CheckBoardTexture = vtkSmartPointer<vtkTexture>::New();
-        this->CheckBoardTexture->SetInputConnection(this->CheckerBoardReader->GetOutputPort());
-        this->CheckBoardTexture->UseSRGBColorSpaceOn();
-        this->CheckBoardTexture->InterpolateOn();
-        this->CheckBoardTexture->MipmapOn();
-        this->CheckBoardTexture->SetColorModeToDirectScalars();
-
-        this->HasValidCheckerBoardTexture = true;
-      }
-
-      if (HasValidCheckerBoardTexture)
-      {
-        coloring.Actor->GetProperty()->SetBaseColorTexture(this->CheckBoardTexture);
-        coloring.OriginalActor->GetProperty()->SetBaseColorTexture(this->CheckBoardTexture);
-        coloring.Actor->GetProperty()->SetMetallic(0.f);
-        coloring.OriginalActor->GetProperty()->SetMetallic(0.f);
-        coloring.Actor->GetProperty()->SetBaseIOR(1.f);
-        coloring.OriginalActor->GetProperty()->SetBaseIOR(1.f);
-        coloring.Actor->GetProperty()->SetNormalTexture(nullptr);
-        coloring.OriginalActor->GetProperty()->SetNormalTexture(nullptr);
-        coloring.Actor->GetProperty()->SetEmissiveTexture(nullptr);
-        coloring.OriginalActor->GetProperty()->SetEmissiveTexture(nullptr);
-      }
-    }
-
     if (this->NormalScale.has_value())
     {
       coloring.Actor->GetProperty()->SetNormalScale(this->NormalScale.value());
@@ -2626,6 +2579,63 @@ void vtkF3DRenderer::ConfigureActorsProperties()
       auto matCapTex = ::GetTexture(this->TextureMatCap.value());
       coloring.Actor->GetProperty()->SetTexture("matcap", matCapTex);
       coloring.OriginalActor->GetProperty()->SetTexture("matcap", matCapTex);
+    }
+
+    if (this->EnableCheckerBoard)
+    {
+      vtkPolyData* polydata = vtkPolyData::SafeDownCast(coloring.Actor->GetMapper()->GetInput());
+      const bool actorHasUV = polydata && polydata->GetPointData()->GetTCoords();
+
+      if (actorHasUV)
+      {
+        if (!(this->HasValidCheckerBoardReader && CheckerBoardReaderConfigured))
+        {
+          this->CheckerBoardReader = vtkSmartPointer<vtkPNGReader>::New();
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
+          vtkNew<vtkMemoryResourceStream> stream;
+          stream->SetBuffer(F3DCheckerBoard, sizeof(F3DCheckerBoard));
+          this->CheckerBoardReader->SetStream(stream);
+#else
+          this->CheckerBoardReader->SetMemoryBuffer(F3DCheckerBoard);
+          this->CheckerBoardReader->SetMemoryBufferLength(sizeof(F3DCheckerBoard));
+#endif
+          this->HasValidCheckerBoardReader = true;
+          this->CheckerBoardReaderConfigured = true;
+        }
+
+        if (!HasValidCheckerBoardTexture)
+        {
+          assert(this->HasValidCheckerBoardReader);
+          this->CheckerBoardReader->Update();
+
+          this->CheckerBoardTexture = vtkSmartPointer<vtkTexture>::New();
+          this->CheckerBoardTexture->SetInputConnection(this->CheckerBoardReader->GetOutputPort());
+          this->CheckerBoardTexture->UseSRGBColorSpaceOn();
+          this->CheckerBoardTexture->InterpolateOn();
+          this->CheckerBoardTexture->MipmapOn();
+          this->CheckerBoardTexture->SetColorModeToDirectScalars();
+
+          this->HasValidCheckerBoardTexture = true;
+        }
+
+        if (HasValidCheckerBoardTexture)
+        {
+          coloring.Actor->GetProperty()->SetBaseColorTexture(this->CheckerBoardTexture);
+          coloring.OriginalActor->GetProperty()->SetBaseColorTexture(this->CheckerBoardTexture);
+          coloring.Actor->GetProperty()->SetMetallic(0.f);
+          coloring.OriginalActor->GetProperty()->SetMetallic(0.f);
+          coloring.Actor->GetProperty()->SetBaseIOR(1.f);
+          coloring.OriginalActor->GetProperty()->SetBaseIOR(1.f);
+          coloring.Actor->GetProperty()->SetNormalTexture(nullptr);
+          coloring.OriginalActor->GetProperty()->SetNormalTexture(nullptr);
+          coloring.Actor->GetProperty()->SetEmissiveTexture(nullptr);
+          coloring.OriginalActor->GetProperty()->SetEmissiveTexture(nullptr);
+        }
+      }
+      else
+      {
+        F3DLog::Print(F3DLog::Severity::Warning, "Uvs required to display checkerboard texture.");
+      }
     }
   }
 
