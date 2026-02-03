@@ -3528,3 +3528,9 @@ void vtkF3DRenderer::SetConsoleBadgeEnabled(bool enabled)
 {
   this->UIActor->SetConsoleBadgeEnabled(enabled);
 }
+
+//----------------------------------------------------------------------------
+bool vtkF3DRenderer::ConsumeUIRenderRequest()
+{
+  return this->UIActor->ConsumeRenderRequest();
+}
