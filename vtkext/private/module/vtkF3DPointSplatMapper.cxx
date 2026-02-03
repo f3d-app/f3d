@@ -427,7 +427,6 @@ void vtkF3DSplatMapperHelper::SortSplatsCPU(vtkRenderer* ren)
 //----------------------------------------------------------------------------
 void vtkF3DSplatMapperHelper::RenderPieceDraw(vtkRenderer* ren, vtkActor* actor)
 {
-
   const vtkF3DRenderer* renderer = vtkF3DRenderer::SafeDownCast(ren);
 
   if (actor->HasTranslucentPolygonalGeometry())
