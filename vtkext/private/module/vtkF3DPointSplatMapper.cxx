@@ -88,7 +88,7 @@ private:
   std::vector<unsigned int> CPUSortedIndices;
   std::vector<float> CPUDepths;
 
-  double DirectionThreshold = 0.999;
+  static constexpr double DirectionThreshold = 0.999;
   double LastDirection[3] = { 0.0, 0.0, 0.0 };
 
   bool SortNeeded(vtkRenderer* ren);
@@ -321,13 +321,6 @@ void vtkF3DSplatMapperHelper::SetCameraShaderParameters(
 //------------------------------------------------------------------------------
 bool vtkF3DSplatMapperHelper::SortNeeded(vtkRenderer* ren)
 {
-  int numVerts = this->VBOs->GetNumberOfTuples("vertexMC");
-
-  if (numVerts <= 0)
-  {
-    return false;
-  }
-
   const double* focalPoint = ren->GetActiveCamera()->GetFocalPoint();
   const double* origin = ren->GetActiveCamera()->GetPosition();
   double direction[3];
@@ -340,7 +333,7 @@ bool vtkF3DSplatMapperHelper::SortNeeded(vtkRenderer* ren)
 
   vtkMath::Normalize(direction);
 
-  if (vtkMath::Dot(this->LastDirection, direction) >= this->DirectionThreshold)
+  if (vtkMath::Dot(this->LastDirection, direction) >= vtkF3DSplatMapperHelper::DirectionThreshold)
   {
     return false;
   }
