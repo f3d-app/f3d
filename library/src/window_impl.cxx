@@ -382,7 +382,7 @@ void window_impl::SetSceneHierarchy(const std::vector<NodeInfo>& hierarchy)
 {
   if (this->Internals->Renderer)
   {
-    this->Internals->Renderer->SetHierarchy(hierarchy);
+    this->Internals->Renderer->SetSceneHierarchy(hierarchy);
   }
 }
 

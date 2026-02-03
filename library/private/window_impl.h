@@ -15,7 +15,7 @@
 #include "log.h"
 #include "window.h"
 
-#include "F3DNodeInfo.h"
+#include <F3DNodeInfo.h>
 #include <filesystem>
 #include <memory>
 #include <optional>
