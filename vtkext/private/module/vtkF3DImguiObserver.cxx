@@ -179,23 +179,18 @@ ImGuiKey GetImGuiKeyFromKeySym(std::string_view&& keySym)
 vtkStandardNewMacro(vtkF3DImguiObserver);
 
 //----------------------------------------------------------------------------
-void vtkF3DImguiObserver::RenderUI(vtkRenderWindowInteractor* interactor, bool fullRender)
+void vtkF3DImguiObserver::RenderUI(vtkRenderWindowInteractor* interactor)
 {
   vtkRenderWindow* renWin = interactor->GetRenderWindow();
-  if (fullRender)
+  vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+  vtkInformation* info = ren->GetInformation();
+  info->Set(vtkF3DRenderPass::RENDER_UI_ONLY(), 1);
+  renWin->Render();
+  info->Remove(vtkF3DRenderPass::RENDER_UI_ONLY());
+
+  if (ren->ConsumeUIRenderRequest())
   {
-    // Two renders needed: first processes ImGui (state changes happen here),
-    // second shows the result of those changes (e.g., actor visibility toggle)
     renWin->Render();
-    renWin->Render();
-  }
-  else
-  {
-    vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
-    vtkInformation* info = ren->GetInformation();
-    info->Set(vtkF3DRenderPass::RENDER_UI_ONLY(), 1);
-    renWin->Render();
-    info->Remove(vtkF3DRenderPass::RENDER_UI_ONLY());
   }
 }
 
@@ -238,7 +233,7 @@ bool vtkF3DImguiObserver::MouseLeftRelease(vtkObject* caller, unsigned long, voi
     vtkRenderWindowInteractor* that = static_cast<vtkRenderWindowInteractor*>(caller);
     ImGuiIO& io = ImGui::GetIO();
     io.AddMouseButtonEvent(ImGuiMouseButton_Left, false);
-    this->RenderUI(that, true);  // fullRender for ImGui state changes
+    this->RenderUI(that);
     return io.WantCaptureMouse;
   }
   return false;
