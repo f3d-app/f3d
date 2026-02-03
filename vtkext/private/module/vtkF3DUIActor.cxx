@@ -43,7 +43,6 @@ void vtkF3DUIActor::SetHierarchy(const std::vector<NodeInfo>& hierarchy)
   this->HierarchyNodes = hierarchy;
 }
 
-
 //----------------------------------------------------------------------------
 void vtkF3DUIActor::SetFileNameVisibility(bool show)
 {
