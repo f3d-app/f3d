@@ -1,0 +1,29 @@
+name: "VCPKG F3D CI"
+description: "VCPKG F3D CI"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Directories
+      shell: bash
+      working-directory: ${{github.workspace}}
+      run: |
+        mkdir build
+
+    #- name: Set VCPKG_ROOT
+    #  shell: bash
+    #  run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - uses: friendlyanon/setup-vcpkg@v1
+      with: { committish: master }
+
+    - name: Configure
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: >
+        cmake ../source --preset=vcpkg
+
+    - name: Build
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: cmake --build .
