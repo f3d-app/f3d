@@ -497,12 +497,13 @@ _Denoise_ the image when using raytracing.
 ### `-p`, `--blending` (_string_, default: `ddp`)
 
 Enable _translucency blending support_.
-This is a technique used to correctly render translucent objects (`ddp`: dual depth peeling for quality, `sort`: for gaussians, `stochastic`: fast).
+This is a technique used to correctly render translucent objects (`ddp`: dual depth peeling for quality, `sort`: for gaussians, `sort_cpu`: for gaussians, `stochastic`: fast).
 
 > [!WARNING]
 > `stochastic` is introducing a lot of noise with strong translucency.
 > It works better when combined with temporal anti-aliasing (when using `--anti-aliasing=taa` option)
 > `sort` is only working for 3D gaussians and requires compute shaders support.
+> Alternatively, `sort_cpu` will give the same result and work everywhere but it's much slower.
 
 ### `-q`, `--ambient-occlusion` (_bool_, default: `false`)
 

@@ -438,7 +438,8 @@ void window_impl::UpdateDynamicOptions()
     renderer->SetPointSpritesType(splatType);
     renderer->SetPointSpritesSize(
       opt.model.point_sprites.absolute_size, opt.model.point_sprites.size);
-    renderer->SetPointSpritesUseInstancing(opt.render.effect.blending.mode != "sort");
+    renderer->SetPointSpritesUseInstancing(
+      opt.render.effect.blending.mode != "sort" && opt.render.effect.blending.mode != "sort_cpu");
   }
 
   renderer->SetLineWidth(opt.render.line_width);
@@ -570,6 +571,10 @@ void window_impl::UpdateDynamicOptions()
     {
       blendMode = vtkF3DRenderer::BlendingMode::SORT;
     }
+    else if (opt.render.effect.blending.mode == "sort_cpu")
+    {
+      blendMode = vtkF3DRenderer::BlendingMode::SORT_CPU;
+    }
     else if (opt.render.effect.blending.mode == "stochastic")
     {
       blendMode = vtkF3DRenderer::BlendingMode::STOCHASTIC;
@@ -577,7 +582,7 @@ void window_impl::UpdateDynamicOptions()
     else
     {
       log::warn(opt.render.effect.blending.mode,
-        R"( is an invalid blending mode. Valid modes are: "ddp", "sort", "stochastic")");
+        R"( is an invalid blending mode. Valid modes are: "ddp", "sort", "sort_cpu", "stochastic")");
     }
   }
 
