@@ -68,12 +68,12 @@ private:
   /**
    * Render the scene hierarchy UI widget
    */
-  void RenderSceneHierarchy() override;
+  void RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin) override;
 
   /**
    * Recursively render a node in the scene hierarchy tree
    */
-  void RenderNode(NodeInfo* node) override;
+  void RenderNode(NodeInfo* node, vtkOpenGLRenderWindow* renWin) override;
 
   /**
    * Calculate the maximum text width needed for the hierarchy

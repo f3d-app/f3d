@@ -501,12 +501,6 @@ public:
    */
   void SetConsoleBadgeEnabled(bool enabled);
 
-  /**
-   * Consume and return the UI render request state.
-   * Returns true if a render was requested, false otherwise.
-   */
-  bool ConsumeUIRenderRequest();
-
 private:
   vtkF3DRenderer();
   ~vtkF3DRenderer() override;

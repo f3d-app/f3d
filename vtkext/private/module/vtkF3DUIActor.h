@@ -8,6 +8,7 @@
 #ifndef vtkF3DUIActor_h
 #define vtkF3DUIActor_h
 
+#include <vtkCommand.h>
 #include <vtkProp.h>
 
 #include <array>
@@ -38,6 +39,14 @@ public:
     NUMERICAL = 1,
     TOGGLE = 2,
     OTHER = 3,
+  };
+
+  /**
+   * Custom events for UI interactions
+   */
+  enum vtkCustomEvents
+  {
+    SceneHierarchyChangedEvent = vtkCommand::UserEvent + 300
   };
 
   using CheatSheetTuple = std::tuple<std::string, std::string, std::string, CheatSheetBindingType>;
@@ -198,17 +207,6 @@ public:
   {
   }
 
-  /**
-   * Request a render from the UI actor.
-   */
-  void RequestRender();
-
-  /**
-   * Consume and return the render request state.
-   * Returns true if a render was requested, false otherwise.
-   */
-  bool ConsumeRenderRequest();
-
 protected:
   vtkF3DUIActor();
   ~vtkF3DUIActor() override;
@@ -237,14 +235,14 @@ protected:
   /**
    * Render the scene hierarchy UI widget
    */
-  virtual void RenderSceneHierarchy()
+  virtual void RenderSceneHierarchy(vtkOpenGLRenderWindow*)
   {
   }
 
   /**
    * Recursively render a node in the scene hierarchy tree
    */
-  virtual void RenderNode(NodeInfo*)
+  virtual void RenderNode(NodeInfo*, vtkOpenGLRenderWindow*)
   {
   }
 
@@ -344,7 +342,6 @@ private:
   void operator=(const vtkF3DUIActor&) = delete;
 
   bool Initialized = false;
-  bool RenderRequested = false;
 };
 
 #endif
