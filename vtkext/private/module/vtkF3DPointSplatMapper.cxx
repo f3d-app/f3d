@@ -91,6 +91,7 @@ private:
   double DirectionThreshold = 0.999;
   double LastDirection[3] = { 0.0, 0.0, 0.0 };
 
+  bool SortNeeded(vtkRenderer* ren);
   void SortSplats(vtkRenderer* ren);
   void SortSplatsCPU(vtkRenderer* ren);
 
@@ -317,67 +318,14 @@ void vtkF3DSplatMapperHelper::SetCameraShaderParameters(
   this->Superclass::SetCameraShaderParameters(cellBO, ren, actor);
 }
 
-//----------------------------------------------------------------------------
-void vtkF3DSplatMapperHelper::SortSplats(vtkRenderer* ren)
-{
-#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
-  int numVerts = this->VBOs->GetNumberOfTuples("vertexMC");
-
-  if (numVerts)
-  {
-    const double* focalPoint = ren->GetActiveCamera()->GetFocalPoint();
-    const double* origin = ren->GetActiveCamera()->GetPosition();
-    double direction[3];
-
-    for (int i = 0; i < 3; ++i)
-    {
-      // the orientation is reverted to sort splats back to front
-      direction[i] = origin[i] - focalPoint[i];
-    }
-
-    vtkMath::Normalize(direction);
-
-    // sort the splats only if the camera direction has changed
-    if (vtkMath::Dot(this->LastDirection, direction) < this->DirectionThreshold)
-    {
-      vtkOpenGLShaderCache* shaderCache =
-        vtkOpenGLRenderWindow::SafeDownCast(ren->GetRenderWindow())->GetShaderCache();
-
-      // compute next power of two
-      unsigned int numVertsExt = vtkMath::NearestPowerOfTwo(numVerts);
-
-      // depth computation
-      shaderCache->ReadyShaderProgram(this->DepthProgram);
-
-      this->LastDirection[0] = direction[0];
-      this->LastDirection[1] = direction[1];
-      this->LastDirection[2] = direction[2];
-
-      this->DepthProgram->SetUniform3f("viewDirection", direction);
-      this->DepthProgram->SetUniformi("count", numVerts);
-      this->VBOs->GetVBO("vertexMC")->BindShaderStorage(0);
-      this->Primitives[PrimitivePoints].IBO->BindShaderStorage(1);
-      this->DepthBuffer->BindShaderStorage(2);
-
-      glDispatchCompute(numVertsExt / 32, 1, 1);
-      glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-
-      // sort
-      this->Sorter->Run(vtkOpenGLRenderWindow::SafeDownCast(ren->GetRenderWindow()), numVerts,
-        this->DepthBuffer, this->Primitives[PrimitivePoints].IBO);
-    }
-  }
-#endif
-}
-
-//----------------------------------------------------------------------------
-void vtkF3DSplatMapperHelper::SortSplatsCPU(vtkRenderer* ren)
+//------------------------------------------------------------------------------
+bool vtkF3DSplatMapperHelper::SortNeeded(vtkRenderer* ren)
 {
   int numVerts = this->VBOs->GetNumberOfTuples("vertexMC");
 
   if (numVerts <= 0)
   {
-    return;
+    return false;
   }
 
   const double* focalPoint = ren->GetActiveCamera()->GetFocalPoint();
@@ -394,12 +342,61 @@ void vtkF3DSplatMapperHelper::SortSplatsCPU(vtkRenderer* ren)
 
   if (vtkMath::Dot(this->LastDirection, direction) >= this->DirectionThreshold)
   {
-    return;
+    return false;
   }
 
   this->LastDirection[0] = direction[0];
   this->LastDirection[1] = direction[1];
   this->LastDirection[2] = direction[2];
+
+  return true;
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DSplatMapperHelper::SortSplats(vtkRenderer* ren)
+{
+#if !defined(__ANDROID__) && !defined(__EMSCRIPTEN__)
+
+  if (!this->SortNeeded(ren))
+  {
+    return;
+  }
+
+  int numVerts = this->VBOs->GetNumberOfTuples("vertexMC");
+
+  vtkOpenGLShaderCache* shaderCache =
+    vtkOpenGLRenderWindow::SafeDownCast(ren->GetRenderWindow())->GetShaderCache();
+
+  // compute next power of two
+  unsigned int numVertsExt = vtkMath::NearestPowerOfTwo(numVerts);
+
+  // depth computation
+  shaderCache->ReadyShaderProgram(this->DepthProgram);
+
+  this->DepthProgram->SetUniform3f("viewDirection", this->LastDirection);
+  this->DepthProgram->SetUniformi("count", numVerts);
+  this->VBOs->GetVBO("vertexMC")->BindShaderStorage(0);
+  this->Primitives[PrimitivePoints].IBO->BindShaderStorage(1);
+  this->DepthBuffer->BindShaderStorage(2);
+
+  glDispatchCompute(numVertsExt / 32, 1, 1);
+  glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
+  // sort
+  this->Sorter->Run(vtkOpenGLRenderWindow::SafeDownCast(ren->GetRenderWindow()), numVerts,
+    this->DepthBuffer, this->Primitives[PrimitivePoints].IBO);
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkF3DSplatMapperHelper::SortSplatsCPU(vtkRenderer* ren)
+{
+  if (!this->SortNeeded(ren))
+  {
+    return;
+  }
+
+  int numVerts = this->VBOs->GetNumberOfTuples("vertexMC");
 
   this->CPUSortedIndices.resize(static_cast<size_t>(numVerts));
 
@@ -415,7 +412,8 @@ void vtkF3DSplatMapperHelper::SortSplatsCPU(vtkRenderer* ren)
   for (int i = 0; i < numVerts; ++i)
   {
     double* pos = points->GetPoint(i);
-    this->CPUDepths[i] = pos[0] * direction[0] + pos[1] * direction[1] + pos[2] * direction[2];
+    this->CPUDepths[i] = pos[0] * this->LastDirection[0] + pos[1] * this->LastDirection[1] +
+      pos[2] * this->LastDirection[2];
   }
 
   // Match bitonic sort ordering: sort ascending by depth (back-to-front given reversed direction)
