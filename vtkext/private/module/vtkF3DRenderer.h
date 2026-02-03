@@ -125,7 +125,7 @@ public:
   void SetFilenameInfo(const std::string& info);
   void SetDropZoneInfo(const std::string& info);
   void SetDropZoneBinds(const std::vector<std::pair<std::string, std::string>>& dropZoneBinds);
-  void SetHierarchy(const std::vector<NodeInfo>& hierarchy);
+  void SetSceneHierarchy(const std::vector<NodeInfo>& hierarchy);
   void SetGridAbsolute(bool absolute);
   void SetGridUnitSquare(const std::optional<double>& unitSquare);
   void SetGridSubdivisions(int subdivisions);
