@@ -767,12 +767,12 @@ private:
   std::optional<fs::path> TextureEmissive;
   std::optional<fs::path> TextureNormal;
 
-  vtkSmartPointer<vtkImageReader2> CheckerBoardReader;
-  bool HasValidCheckerBoardReader = false;
-  bool CheckerBoardReaderConfigured = false;
   bool EnableCheckerBoard = false;
-  vtkSmartPointer<vtkTexture> CheckerBoardTexture;
+  bool HasValidCheckerBoardReader = false;
   bool HasValidCheckerBoardTexture = false;
+  bool CheckerBoardReaderConfigured = false;
+  vtkSmartPointer<vtkImageReader2> CheckerBoardReader;
+  vtkSmartPointer<vtkTexture> CheckerBoardTexture;
 
   vtkSmartPointer<vtkDiscretizableColorTransferFunction> ColorTransferFunction;
   bool ExpandingRangeSet = false;
