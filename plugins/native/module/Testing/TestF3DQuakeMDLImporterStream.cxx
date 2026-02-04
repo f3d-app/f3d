@@ -19,6 +19,12 @@ int TestF3DQuakeMDLImporterStream(int vtkNotUsed(argc), char* argv[])
     return EXIT_FAILURE;
   }
 
+  if (!vtkF3DQuakeMDLImporter::CanReadFile(stream))
+  {
+    std::cerr << "Unexpected CanReadFile failure\n";
+    return EXIT_FAILURE;
+  }
+
   vtkNew<vtkF3DQuakeMDLImporter> importer;
   importer->SetStream(stream);
   importer->Update();
