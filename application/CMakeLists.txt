@@ -195,7 +195,11 @@ if(F3D_MODULE_UI)
 endif()
 
 add_custom_command(
-  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/F3DCLIOptions.h"
+  OUTPUT
+    "${CMAKE_CURRENT_BINARY_DIR}/F3DCLIOptions.h"
+    "${CMAKE_BINARY_DIR}/completion.bash"
+    "${CMAKE_BINARY_DIR}/completion.fish"
+    "${CMAKE_BINARY_DIR}/completion.zsh"
   COMMAND ${CMAKE_COMMAND}
     -D "F3D_SOURCE_DIR=${CMAKE_SOURCE_DIR}"
     -D "F3D_BINARY_DIR=${CMAKE_BINARY_DIR}"
