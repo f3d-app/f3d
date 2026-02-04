@@ -163,7 +163,7 @@ CLI: `--texture-normal`.
 
 Apply checkerboard texture to objects.
 
-CLI: `--texture-checker`.
+CLI: `--checkerboard`.
 
 ### `model.scivis.enable` (_bool_, default: `false`)
 

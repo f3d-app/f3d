@@ -114,7 +114,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "texture-emissive", "model.emissive.texture" },
   { "emissive-factor", "model.emissive.factor" },
   { "texture-normal", "model.normal.texture" },
-  { "texture-checker", "model.checkerboard.enable" },
+  { "checkerboard", "model.checkerboard.enable" },
   { "normal-scale", "model.normal.scale" },
   { "background-color", "render.background.color" },
   { "fps", "ui.fps" },
