@@ -1326,7 +1326,7 @@ bool vtkF3DAssimpImporter::CanReadFile(vtkResourceStream* stream, std::string& h
     parser->ReadLine(line3) == vtkParseResult::EndOfLine &&
     parser->ReadLine(line4) == vtkParseResult::EndOfLine)
   {
-    if (line1.rfind("0", 0) == 0 && line2.rfind("SECTION", 0) == 0 && line3.rfind("2", 0) == 0 &&
+    if (line1.rfind('0', 0) == 0 && line2.rfind("SECTION", 0) == 0 && line3.rfind('2', 0) == 0 &&
       line4.rfind("HEADER", 0) == 0)
     {
       hint = "dxf";
