@@ -6,35 +6,26 @@
       "options": [
         {
           "longName": "input",
-          "shortName": "",
           "helpText": "Input Files",
-          "valueHelper": "<files>",
-          "implicitValue": ""
+          "valueHelper": "<files>"
         },
         {
           "longName": "define",
           "shortName": "D",
-          "helpText": "Define libf3d options",
-          "valueHelper": "",
-          "implicitValue": ""
+          "helpText": "Define libf3d options"
         },
         {
           "longName": "reset",
           "shortName": "R",
-          "helpText": "Reset libf3d options",
-          "valueHelper": "",
-          "implicitValue": ""
+          "helpText": "Reset libf3d options"
         },
         {
           "longName": "output",
-          "shortName": "",
           "helpText": "Render to file",
-          "valueHelper": "<png file>",
-          "implicitValue": ""
+          "valueHelper": "<png file>"
         },
         {
           "longName": "no-background",
-          "shortName": "",
           "helpText": "No background when render to file",
           "valueHelper": "<bool>",
           "implicitValue": "1"
@@ -42,90 +33,67 @@
         {
           "longName": "help",
           "shortName": "h",
-          "helpText": "Print help",
-          "valueHelper": "",
-          "implicitValue": ""
+          "helpText": "Print help"
         },
         {
           "longName": "version",
-          "shortName": "",
-          "helpText": "Print version details",
-          "valueHelper": "",
-          "implicitValue": ""
+          "helpText": "Print version details"
         },
         {
           "longName": "list-readers",
-          "shortName": "",
-          "helpText": "Print the list of readers",
-          "valueHelper": "",
-          "implicitValue": ""
+          "helpText": "Print the list of readers"
         },
         {
           "longName": "force-reader",
-          "shortName": "",
           "helpText": "Force a specific reader to be used, disregarding the file extension",
           "valueHelper": "<reader>",
           "implicitValue": "1"
         },
         {
           "longName": "list-bindings",
-          "shortName": "",
           "helpText": "Print the list of interaction bindings and exits, ignored with `--no-render`, only considers the first file group.",
           "valueHelper": "<bool>",
           "implicitValue": "1"
         },
         {
           "longName": "config",
-          "shortName": "",
           "helpText": "Specify the configuration file to use. absolute/relative path or filename/filestem to search in configuration file locations",
-          "valueHelper": "<filePath/filename/fileStem>",
-          "implicitValue": ""
+          "valueHelper": "<filePath/filename/fileStem>"
         },
         {
           "longName": "no-config",
-          "shortName": "",
           "helpText": "Do not read the configuration file",
           "valueHelper": "<bool>",
           "implicitValue": "1"
         },
         {
           "longName": "no-render",
-          "shortName": "",
           "helpText": "Do not render anything and quit right after loading the first file, use with --verbose to recover information about a file.",
           "valueHelper": "<bool>",
           "implicitValue": "1"
         },
         {
           "longName": "rendering-backend",
-          "shortName": "",
           "helpText": "Backend to use when rendering (auto|glx|wgl|egl|osmesa)",
-          "valueHelper": "<string>",
-          "implicitValue": ""
+          "valueHelper": "<string>"
         },
         {
           "longName": "list-rendering-backends",
-          "shortName": "",
-          "helpText": "Print the list of rendering backends available on this system",
-          "valueHelper": "",
-          "implicitValue": ""
+          "helpText": "Print the list of rendering backends available on this system"
         },
         {
           "longName": "max-size",
-          "shortName": "",
           "helpText": "Maximum size in Mib of a file to load, leave empty for unlimited",
-          "valueHelper": "<size in Mib>",
-          "implicitValue": ""
+          "valueHelper": "<size in Mib>"
         },
         {
           "longName": "dpi-aware",
-          "shortName": "",
           "helpText": "Scale font and window resolution according to system scale",
           "valueHelper": "<bool>",
           "implicitValue": "1"
         },
         {
           "longName": "watch",
-          "shortName": "",
           "helpText": "Watch current file and automatically reload it whenever it is modified on disk",
           "valueHelper": "<bool>",
           "implicitValue": "1",
@@ -133,31 +101,22 @@
         },
         {
           "longName": "frame-rate",
-          "shortName": "",
           "helpText": "Frame rate used to refresh animation and other repeated tasks (watch, UI). Does not impact rendering frame rate.",
-          "valueHelper": "<fps>",
-          "implicitValue": ""
+          "valueHelper": "<fps>"
         },
         {
           "longName": "load-plugins",
-          "shortName": "",
           "helpText": "List of plugins to load separated with a comma",
-          "valueHelper": "<paths or names>",
-          "implicitValue": ""
+          "valueHelper": "<paths or names>"
         },
         {
           "longName": "scan-plugins",
-          "shortName": "",
-          "helpText": "Scan standard directories for plugins and display available plugins (result can be incomplete)",
-          "valueHelper": "",
-          "implicitValue": ""
+          "helpText": "Scan standard directories for plugins and display available plugins (result can be incomplete)"
         },
         {
           "longName": "screenshot-filename",
-          "shortName": "",
           "helpText": "Screenshot filename",
-          "valueHelper": "<filename>",
-          "implicitValue": ""
+          "valueHelper": "<filename>"
         }
       ]
     },
@@ -166,59 +125,48 @@
       "options": [
         {
           "longName": "verbose",
-          "shortName": "",
           "helpText": "Set verbose level, providing more information about the loaded data in the console output",
           "valueHelper": "{debug, info, warning, error, quiet}",
           "implicitValue": "debug"
         },
         {
           "longName": "loading-progress",
-          "shortName": "",
           "helpText": "Show loading progress bar",
           "valueHelper": "<bool>",
           "implicitValue": "1"
         },
         {
           "longName": "animation-progress",
-          "shortName": "",
           "helpText": "Show animation progress bar",
           "valueHelper": "<bool>",
           "implicitValue": "1"
         },
         {
           "longName": "multi-file-mode",
-          "shortName": "",
           "helpText": "Choose the behavior when opening multiple files. \"single\" will show one file at a time, \"all\" will show all files in a single scene, \"dir\" will show files from the same directory in the same scene.",
-          "valueHelper": "<single|all|dir>",
-          "implicitValue": ""
+          "valueHelper": "<single|all|dir>"
         },
         {
           "longName": "multi-file-regex",
-          "shortName": "",
           "helpText": "Regular expression pattern to group files. Captured groups are replaced with \"*\" so that, for example, the pattern \"part(\\d+)\" would group files \"foo-part1.xyz\" and \"foo-part2.xyz\" together as \"foo-part*.xyz\"",
-          "valueHelper": "<regex>",
-          "implicitValue": ""
+          "valueHelper": "<regex>"
         },
         {
           "longName": "recursive-dir-add",
-          "shortName": "",
           "helpText": "Add directories recursively",
           "valueHelper": "<bool>",
           "implicitValue": "1"
         },
         {
           "longName": "remove-empty-file-groups",
-          "shortName": "",
           "helpText": "Remove file groups that results into an empty scene",
           "valueHelper": "<bool>",
           "implicitValue": "1"
         },
         {
           "longName": "up",
-          "shortName": "",
           "helpText": "Up direction",
-          "valueHelper": "<direction>",
-          "implicitValue": ""
+          "valueHelper": "<direction>"
         },
         {
           "longName": "axis",
@@ -236,56 +184,42 @@
         },
         {
           "longName": "x-color",
-          "shortName": "",
           "helpText": "Color of the X axis",
-          "valueHelper": "<color>",
-          "implicitValue": ""
+          "valueHelper": "<color>"
         },
         {
           "longName": "y-color",
-          "shortName": "",
           "helpText": "Color of the Y axis",
-          "valueHelper": "<color>",
-          "implicitValue": ""
+          "valueHelper": "<color>"
         },
         {
           "longName": "z-color",
-          "shortName": "",
           "helpText": "Color of the Z axis",
-          "valueHelper": "<color>",
-          "implicitValue": ""
+          "valueHelper": "<color>"
         },
         {
           "longName": "grid-absolute",
-          "shortName": "",
           "helpText": "Position grid at the absolute origin instead of below the model",
           "valueHelper": "<bool>",
           "implicitValue": "1"
         },
         {
           "longName": "grid-unit",
-          "shortName": "",
           "helpText": "Size of grid unit square, automatically computed by default",
-          "valueHelper": "<value>",
-          "implicitValue": ""
+          "valueHelper": "<value>"
         },
         {
           "longName": "grid-subdivisions",
-          "shortName": "",
           "helpText": "Number of grid subdivisions",
-          "valueHelper": "<value>",
-          "implicitValue": ""
+          "valueHelper": "<value>"
         },
         {
           "longName": "grid-color",
-          "shortName": "",
           "helpText": "Color of main grid lines",
-          "valueHelper": "<color>",
-          "implicitValue": ""
+          "valueHelper": "<color>"
         },
         {
           "longName": "axes-grid",
-          "shortName": "",
           "helpText": "Enable grid axis",
           "valueHelper": "<bool>",
           "implicitValue": "1"
@@ -299,17 +233,14 @@
         },
         {
           "longName": "armature",
-          "shortName": "",
           "helpText": "Enable armature visualization",
           "valueHelper": "<bool>",
           "implicitValue": "1"
         },
         {
           "longName": "camera-index",
-          "shortName": "",
           "helpText": "Select the camera to use",
-          "valueHelper": "<index>",
-          "implicitValue": ""
+          "valueHelper": "<index>"
         },
         {
           "longName": "interaction-trackball",
@@ -320,74 +251,56 @@
         },
         {
           "longName": "invert-zoom",
-          "shortName": "",
           "helpText": "Invert zoom direction with right mouse click",
           "valueHelper": "<bool>",
           "implicitValue": "1"
         },
         {
           "longName": "animation-autoplay",
-          "shortName": "",
           "helpText": "Automatically start animation",
           "valueHelper": "<bool>",
           "implicitValue": "1"
         },
         {
           "longName": "animation-index",
-          "shortName": "",
           "helpText": "Select animation to show (deprecated)",
-          "valueHelper": "<index>",
-          "implicitValue": ""
+          "valueHelper": "<index>"
         },
         {
           "longName": "animation-indices",
-          "shortName": "",
           "helpText": "Select animations to show",
-          "valueHelper": "<index,index,index>",
-          "implicitValue": ""
+          "valueHelper": "<index,index,index>"
         },
         {
           "longName": "animation-speed-factor",
-          "shortName": "",
           "helpText": "Set animation speed factor",
-          "valueHelper": "<ratio>",
-          "implicitValue": ""
+          "valueHelper": "<ratio>"
         },
         {
           "longName": "animation-time",
-          "shortName": "",
           "helpText": "Set animation time to load",
-          "valueHelper": "<time>",
-          "implicitValue": ""
+          "valueHelper": "<time>"
         },
         {
           "longName": "font-file",
-          "shortName": "",
           "helpText": "Path to a FreeType compatible font file",
-          "valueHelper": "<file_path>",
-          "implicitValue": ""
+          "valueHelper": "<file_path>"
         },
         {
           "longName": "font-scale",
-          "shortName": "",
           "helpText": "Scale fonts",
-          "valueHelper": "<ratio>",
-          "implicitValue": ""
+          "valueHelper": "<ratio>"
         },
         {
           "longName": "backdrop-opacity",
-          "shortName": "",
           "helpText": "UI backdrop opacity",
           "valueHelper": "<value>",
-          "implicitValue": "",
           "conditional": "F3D_MODULE_UI"
         },
         {
           "longName": "command-script",
-          "shortName": "",
           "helpText": "Path to a script file containing commands to execute",
-          "valueHelper": "<file_path>",
-          "implicitValue": ""
+          "valueHelper": "<file_path>"
         }
       ]
     },
@@ -403,87 +316,65 @@
         },
         {
           "longName": "point-sprites-type",
-          "shortName": "",
           "helpText": "Point sprites type (deprecated)",
-          "valueHelper": "<sphere|gaussian>",
-          "implicitValue": ""
+          "valueHelper": "<sphere|gaussian>"
         },
         {
           "longName": "point-sprites-size",
-          "shortName": "",
           "helpText": "Point sprites sphere size",
-          "valueHelper": "<size>",
-          "implicitValue": ""
+          "valueHelper": "<size>"
         },
         {
           "longName": "point-sprites-absolute-size",
-          "shortName": "",
           "helpText": "Do not scale point sprites size by scene size",
           "valueHelper": "<bool>",
           "implicitValue": "1"
         },
         {
           "longName": "point-size",
-          "shortName": "",
           "helpText": "Point size when showing vertices, model specified by default",
           "valueHelper": "<size>",
           "implicitValue": ""
         },
         {
           "longName": "line-width",
-          "shortName": "",
           "helpText": "Line width when showing edges, model specified by default",
-          "valueHelper": "<width>",
-          "implicitValue": ""
+          "valueHelper": "<width>"
         },
         {
           "longName": "backface-type",
-          "shortName": "",
           "helpText": "Backface type, can be visible or hidden, model specified by default",
-          "valueHelper": "<visible|hidden>",
-          "implicitValue": ""
+          "valueHelper": "<visible|hidden>"
         },
         {
           "longName": "color",
-          "shortName": "",
           "helpText": "Solid color",
-          "valueHelper": "<color>",
-          "implicitValue": ""
+          "valueHelper": "<color>"
         },
         {
           "longName": "opacity",
-          "shortName": "",
           "helpText": "Opacity",
-          "valueHelper": "<opacity>",
-          "implicitValue": ""
+          "valueHelper": "<opacity>"
         },
         {
           "longName": "roughness",
-          "shortName": "",
           "helpText": "Roughness coefficient (0.0-1.0)",
-          "valueHelper": "<roughness>",
-          "implicitValue": ""
+          "valueHelper": "<roughness>"
         },
         {
           "longName": "metallic",
-          "shortName": "",
           "helpText": "Metallic coefficient (0.0-1.0)",
-          "valueHelper": "<metallic>",
-          "implicitValue": ""
+          "valueHelper": "<metallic>"
         },
         {
           "longName": "base-ior",
-          "shortName": "",
           "helpText": "Index Of Refraction of the base layer (1.0-2.5)",
-          "valueHelper": "<base-ior>",
-          "implicitValue": ""
+          "valueHelper": "<base-ior>"
         },
         {
           "longName": "hdri-file",
-          "shortName": "",
           "helpText": "Path to an image file that can be used as a light source and skybox",
-          "valueHelper": "<file path>",
-          "implicitValue": ""
+          "valueHelper": "<file path>"
         },
         {
           "longName": "hdri-ambient",
@@ -501,59 +392,43 @@
         },
         {
           "longName": "texture-matcap",
-          "shortName": "",
           "helpText": "Path to a texture file containing a material capture",
-          "valueHelper": "<file path>",
-          "implicitValue": ""
+          "valueHelper": "<file path>"
         },
         {
           "longName": "texture-base-color",
-          "shortName": "",
           "helpText": "Path to a texture file that sets the color of the object",
-          "valueHelper": "<file path>",
-          "implicitValue": ""
+          "valueHelper": "<file path>"
         },
         {
           "longName": "texture-material",
-          "shortName": "",
           "helpText": "Path to a texture file that sets the Occlusion, Roughness and Metallic values of the object",
-          "valueHelper": "<file path>",
-          "implicitValue": ""
+          "valueHelper": "<file path>"
         },
         {
           "longName": "texture-emissive",
-          "shortName": "",
           "helpText": "Path to a texture file that sets the emitted light of the object",
-          "valueHelper": "<file path>",
-          "implicitValue": ""
+          "valueHelper": "<file path>"
         },
         {
           "longName": "textures-transform",
-          "shortName": "",
           "helpText": "3x3 matrix to transform textures",
-          "valueHelper": "<transform2d>",
-          "implicitValue": ""
+          "valueHelper": "<transform2d>"
         },
         {
           "longName": "emissive-factor",
-          "shortName": "",
           "helpText": "Emissive factor. This value is multiplied with the emissive color when an emissive texture is present",
-          "valueHelper": "<color>",
-          "implicitValue": ""
+          "valueHelper": "<color>"
         },
         {
           "longName": "texture-normal",
-          "shortName": "",
           "helpText": "Path to a texture file that sets the normal map of the object",
-          "valueHelper": "<file path>",
-          "implicitValue": ""
+          "valueHelper": "<file path>"
         },
         {
           "longName": "normal-scale",
-          "shortName": "",
           "helpText": "Normal scale affects the strength of the normal deviation from the normal texture",
-          "valueHelper": "<normalScale>",
-          "implicitValue": ""
+          "valueHelper": "<normalScale>"
         }
       ]
     },
@@ -562,24 +437,18 @@
       "options": [
         {
           "longName": "background-color",
-          "shortName": "",
           "helpText": "Background color",
-          "valueHelper": "<color>",
-          "implicitValue": ""
+          "valueHelper": "<color>"
         },
         {
           "longName": "resolution",
-          "shortName": "",
           "helpText": "Window resolution",
-          "valueHelper": "<width,height>",
-          "implicitValue": ""
+          "valueHelper": "<width,height>"
         },
         {
           "longName": "position",
-          "shortName": "",
           "helpText": "Window position",
-          "valueHelper": "<x,y>",
-          "implicitValue": ""
+          "valueHelper": "<x,y>"
         },
         {
           "longName": "fps",
@@ -604,7 +473,6 @@
         },
         {
           "longName": "hdri-filename",
-          "shortName": "",
           "helpText": "Display hdri filename",
           "valueHelper": "<bool>",
           "implicitValue": "1"
@@ -618,17 +486,14 @@
         },
         {
           "longName": "blur-coc",
-          "shortName": "",
           "helpText": "Blur circle of confusion radius",
           "valueHelper": "<value>",
           "implicitValue": ""
         },
         {
           "longName": "light-intensity",
-          "shortName": "",
           "helpText": "Light intensity",
-          "valueHelper": "<value>",
-          "implicitValue": ""
+          "valueHelper": "<value>"
         }
       ]
     },
@@ -644,10 +509,8 @@
         },
         {
           "longName": "coloring-array",
-          "shortName": "",
           "helpText": "Name of the array to color with",
-          "valueHelper": "<array_name>",
-          "implicitValue": ""
+          "valueHelper": "<array_name>"
         },
         {
           "longName": "coloring-component",
@@ -665,10 +528,8 @@
         },
         {
           "longName": "coloring-range",
-          "shortName": "",
           "helpText": "Custom range for the coloring by array, automatically computed by default",
-          "valueHelper": "<min,max>",
-          "implicitValue": ""
+          "valueHelper": "<min,max>"
         },
         {
           "longName": "coloring-scalar-bar",
@@ -679,38 +540,28 @@
         },
         {
           "longName": "colormap-file",
-          "shortName": "",
           "helpText": "Specify a colormap image",
-          "valueHelper": "<filePath/filename/fileStem>",
-          "implicitValue": ""
+          "valueHelper": "<filePath/filename/fileStem>"
         },
         {
           "longName": "colormap-discretization",
-          "shortName": "",
           "helpText": "Specify number of colors in colormap",
-          "valueHelper": "<int>",
-          "implicitValue": ""
+          "valueHelper": "<int>"
         },
         {
           "longName": "colormap",
-          "shortName": "",
           "helpText": "Specify a custom colormap (ignored if \"colormap-file\" is specified)",
-          "valueHelper": "<color_list>",
-          "implicitValue": ""
+          "valueHelper": "<color_list>"
         },
         {
           "longName": "volume-opacity-map",
-          "shortName": "",
           "helpText": "Specify a custom opacity map for volume rendering",
-          "valueHelper": "<opacity_list>",
-          "implicitValue": ""
+          "valueHelper": "<opacity_list>"
         },
         {
           "longName": "volume-opacity-file",
-          "shortName": "",
           "helpText": "Specify a custom opacity map image for volume rendering",
-          "valueHelper": "<filePath/filename/fileStem>",
-          "implicitValue": ""
+          "valueHelper": "<filePath/filename/fileStem>"
         },
         {
           "longName": "volume",
@@ -733,63 +584,46 @@
       "options": [
         {
           "longName": "camera-position",
-          "shortName": "",
           "helpText": "Camera position (overrides camera direction and camera zoom factor if any)",
-          "valueHelper": "<X,Y,Z>",
-          "implicitValue": ""
+          "valueHelper": "<X,Y,Z>"
         },
         {
           "longName": "camera-focal-point",
-          "shortName": "",
           "helpText": "Camera focal point",
-          "valueHelper": "<X,Y,Z>",
-          "implicitValue": ""
+          "valueHelper": "<X,Y,Z>"
         },
         {
           "longName": "camera-view-up",
-          "shortName": "",
           "helpText": "Camera view up",
-          "valueHelper": "<direction>",
-          "implicitValue": ""
+          "valueHelper": "<direction>"
         },
         {
           "longName": "camera-view-angle",
-          "shortName": "",
           "helpText": "Camera view angle (non-zero, in degrees)",
-          "valueHelper": "<angle>",
-          "implicitValue": ""
+          "valueHelper": "<angle>"
         },
         {
           "longName": "camera-direction",
-          "shortName": "",
           "helpText": "Camera direction",
-          "valueHelper": "<direction>",
-          "implicitValue": ""
+          "valueHelper": "<direction>"
         },
         {
           "longName": "camera-zoom-factor",
-          "shortName": "",
           "helpText": "Camera zoom factor (non-zero)",
-          "valueHelper": "<factor>",
-          "implicitValue": ""
+          "valueHelper": "<factor>"
         },
         {
           "longName": "camera-azimuth-angle",
-          "shortName": "",
           "helpText": "Camera azimuth angle (in degrees), performed after other camera options",
-          "valueHelper": "<angle>",
-          "implicitValue": ""
+          "valueHelper": "<angle>"
         },
         {
           "longName": "camera-elevation-angle",
-          "shortName": "",
           "helpText": "Camera elevation angle (in degrees), performed after other camera options",
-          "valueHelper": "<angle>",
-          "implicitValue": ""
+          "valueHelper": "<angle>"
         },
         {
           "longName": "camera-orthographic",
-          "shortName": "",
           "helpText": "Use an orthographic camera",
           "valueHelper": "<bool>",
           "implicitValue": "1"
@@ -808,10 +642,8 @@
         },
         {
           "longName": "raytracing-samples",
-          "shortName": "",
           "helpText": "Number of samples per pixel",
-          "valueHelper": "<samples>",
-          "implicitValue": ""
+          "valueHelper": "<samples>"
         },
         {
           "longName": "raytracing-denoise",
@@ -835,7 +667,6 @@
         },
         {
           "longName": "translucency-support",
-          "shortName": "",
           "helpText": "Enable translucency blending (deprecated)",
           "valueHelper": "<bool>",
           "implicitValue": "1"
@@ -856,7 +687,6 @@
         },
         {
           "longName": "anti-aliasing-mode",
-          "shortName": "",
           "helpText": "Select anti-aliasing method (\"fxaa\", \"ssaa\" or \"taa\") (deprecated)",
           "valueHelper": "<string>",
           "implicitValue": "fxaa"
@@ -870,14 +700,11 @@
         },
         {
           "longName": "final-shader",
-          "shortName": "",
           "helpText": "Execute the final shader at the end of the rendering pipeline",
-          "valueHelper": "<GLSL code>",
-          "implicitValue": ""
+          "valueHelper": "<GLSL code>"
         },
         {
           "longName": "display-depth",
-          "shortName": "",
           "helpText": "Display depth buffer as grayscale image or with a colormap if \"--scalar-coloring\" is specified",
           "valueHelper": "<bool>",
           "implicitValue": "1"
@@ -889,31 +716,23 @@
       "options": [
         {
           "longName": "reference",
-          "shortName": "",
           "helpText": "Reference",
-          "valueHelper": "<png file>",
-          "implicitValue": ""
+          "valueHelper": "<png file>"
         },
         {
           "longName": "reference-threshold",
-          "shortName": "",
           "helpText": "Testing threshold",
-          "valueHelper": "<threshold>",
-          "implicitValue": ""
+          "valueHelper": "<threshold>"
         },
         {
           "longName": "interaction-test-record",
-          "shortName": "",
           "helpText": "Path to an interaction log file to record interactions events to",
-          "valueHelper": "<file_path>",
-          "implicitValue": ""
+          "valueHelper": "<file_path>"
         },
         {
           "longName": "interaction-test-play",
-          "shortName": "",
           "helpText": "Path to an interaction log file to play interaction events from when loading a file",
-          "valueHelper": "<file_path>",
-          "implicitValue": ""
+          "valueHelper": "<file_path>"
         }
       ]
     }
