@@ -1,0 +1,16 @@
+_f3d()
+{
+    local cur prev opts
+    _init_completion || return
+
+    # If current word starts with -, provide option completions
+    if [[ $cur == -* ]]; then
+        opts="@F3D_CLI_OPTIONS_BASH@"
+        COMPREPLY=( $(compgen -W "$opts" -- "$cur") )
+        return
+    fi
+
+    # For file arguments
+    _filedir
+} &&
+complete -F _f3d f3d

@@ -26,96 +26,6 @@ namespace fs = std::filesystem;
 namespace
 {
 /**
- * A struct to configure a complete cxxopts CLI options
- * F3D uses exclusively string options except for a few true boolean option (eg: `--version`)
- * LongName: The long name, eg: `axis`
- * ShortName: The short name, eg: `x`
- * HelpText: The help text, for display only when using `--help`
- * ValueHelper: Used in help but also to discrimate between boolean option or not
- * ImplicitValue: The implicit value when option is provided without a value
- */
-struct CLIOption
-{
-  std::string LongName;
-  std::string ShortName;
-  std::string HelpText;
-  std::string ValueHelper;
-  std::string ImplicitValue;
-};
-
-/**
- * A struct to group option into categories
- */
-struct CLIGroup
-{
-  std::string GroupName;
-  std::vector<CLIOption> Options;
-};
-
-//----------------------------------------------------------------------------
-/**
- * Get all F3D CLI options except `--input`, `--define`, and `--reset`.
- * Order of groups (in JSON) matters in the context of `--help`.
- */
-[[nodiscard]] std::vector<CLIGroup> GetAllCLIOptions()
-{
-  const auto cliOptionsJson = nlohmann::json::parse(F3D::CLI_OPTIONS_JSON);
-
-  auto parseCliOptionJson = [](const nlohmann::json& cliOptionJson) -> CLIOption
-  {
-    CLIOption cliOption;
-    cliOption.LongName = cliOptionJson["longName"];
-    cliOption.ShortName = cliOptionJson["shortName"];
-    cliOption.HelpText = cliOptionJson["helpText"];
-    cliOption.ValueHelper = cliOptionJson["valueHelper"];
-    cliOption.ImplicitValue = cliOptionJson["implicitValue"];
-    return cliOption;
-  };
-
-  auto parseCliGroupJson = [&parseCliOptionJson](const nlohmann::json& cliGroupJson) -> CLIGroup
-  {
-    CLIGroup cliGroup;
-    cliGroup.GroupName = cliGroupJson["name"];
-    for (const auto& cliOptionJson : cliGroupJson["options"])
-    {
-#ifndef F3D_MODULE_DMON
-      if (cliOptionJson.value("conditional", "") == "F3D_MODULE_DMON")
-      {
-        continue;
-      }
-#endif
-#ifndef F3D_MODULE_UI
-      if (cliGroupJson.value("conditional", "") == "F3D_MODULE_UI")
-      {
-        continue;
-      }
-#endif
-      if (cliGroup.GroupName == "Applicative" &&
-        std::set<std::string>{ "input", "define", "reset" }.count(cliOptionJson["longName"]) != 0)
-      {
-        continue;
-      }
-      cliGroup.Options.push_back(parseCliOptionJson(cliOptionJson));
-    }
-    return cliGroup;
-  };
-
-  std::vector<CLIGroup> cliOptions;
-  for (const auto& cliGroupJson : cliOptionsJson["groups"])
-  {
-#ifndef F3D_MODULE_RAYTRACING
-    if (cliGroupJson.value("conditional", "") == "F3D_MODULE_RAYTRACING")
-    {
-      continue;
-    }
-#endif
-    cliOptions.push_back(parseCliGroupJson(cliGroupJson));
-  }
-
-  return cliOptions;
-}
-
-/**
  * True boolean options need to be filtered out in ParseCLIOptions
  * Also filter out special options like `define` and `reset`
  * This is the easiest, compile time way to do it
@@ -139,8 +49,7 @@ std::string CollapseName(const std::string_view& longName, const std::string_vie
 }
 
 //----------------------------------------------------------------------------
-void PrintHelp(const std::string& execName, const cxxopts::Options& cxxOptions,
-  const std::vector<CLIGroup>& cliOptions)
+void PrintHelp(const std::string& execName, const cxxopts::Options& cxxOptions)
 {
   const std::array<std::pair<std::string, std::string>, 4> examples = { {
     { execName + " file.vtu -xtgans",
@@ -153,9 +62,9 @@ void PrintHelp(const std::string& execName, const cxxopts::Options& cxxOptions,
   } };
 
   f3d::log::setUseColoring(false);
-  std::vector<std::string> orderedCLIGroupNames(cliOptions.size());
-  std::transform(cliOptions.cbegin(), cliOptions.cend(), orderedCLIGroupNames.begin(),
-    [](const ::CLIGroup& cliGroup) { return cliGroup.GroupName; });
+  std::vector<std::string> orderedCLIGroupNames(F3D::CLIOptions.size());
+  std::transform(F3D::CLIOptions.cbegin(), F3D::CLIOptions.cend(), orderedCLIGroupNames.begin(),
+    [](const F3D::CLIGroup& cliGroup) { return cliGroup.GroupName; });
   f3d::log::info(cxxOptions.help(orderedCLIGroupNames));
   f3d::log::info("\nExamples:");
   for (const auto& [cmd, desc] : examples)
@@ -373,14 +282,12 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
   std::vector<std::string> resets;
   auto cxxoptsResets = cxxopts::value<std::vector<std::string>>(resets);
 
-  auto CLIOptions = GetAllCLIOptions();
-
   try
   {
     cxxopts::Options cxxOptions(execName, F3D::AppTitle);
     cxxOptions.custom_help("[OPTIONS...]");
 
-    for (const ::CLIGroup& optionGroup : CLIOptions)
+    for (const F3D::CLIGroup& optionGroup : F3D::CLIOptions)
     {
       auto group = cxxOptions.add_options(std::string(optionGroup.GroupName));
 
@@ -393,7 +300,7 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
       }
 
       // Add each option to cxxopts
-      for (const ::CLIOption& cliOption : optionGroup.Options)
+      for (const F3D::CLIOption& cliOption : optionGroup.Options)
       {
         if (cliOption.ValueHelper.empty())
         {
@@ -469,7 +376,7 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
     // Check boolean options and log them if any
     if (result.count("help") > 0)
     {
-      ::PrintHelp(execName, cxxOptions, CLIOptions);
+      ::PrintHelp(execName, cxxOptions);
       throw F3DExNoProcess("help requested");
     }
     if (result.count("version") > 0)
