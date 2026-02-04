@@ -3,6 +3,7 @@
 #include <vtkActor.h>
 #include <vtkActorCollection.h>
 #include <vtkCamera.h>
+#include <vtkCommand.h>
 #include <vtkDoubleArray.h>
 #include <vtkFloatArray.h>
 #include <vtkImageData.h>
@@ -52,6 +53,9 @@ public:
   explicit vtkInternals(vtkF3DAssimpImporter* parent)
     : Parent(parent)
   {
+    assert(this->Importer.IsDefaultProgressHandler());
+    auto progressHandler = new F3DAssimpProgressHandler(parent);
+    this->Importer.SetProgressHandler(progressHandler);
   }
 
   //----------------------------------------------------------------------------
@@ -1237,4 +1241,23 @@ void vtkF3DAssimpImporter::ImportCameras(vtkRenderer* renderer)
 void vtkF3DAssimpImporter::ImportLights(vtkRenderer* renderer)
 {
   this->Internals->ImportLights(renderer);
+}
+
+F3DAssimpProgressHandler::F3DAssimpProgressHandler(vtkF3DAssimpImporter* parent)
+  : Parent(parent)
+{
+}
+
+bool F3DAssimpProgressHandler::Update(float percentage)
+{
+  // special case: no progress to report, not an error
+  if (percentage == -1.f)
+  {
+    return true;
+  }
+
+  double reportPercentage = percentage < 0 ? double{ 1.0 } : static_cast<double>(percentage);
+  this->Parent->InvokeEvent(vtkCommand::ProgressEvent, static_cast<void*>(&reportPercentage));
+
+  return percentage < 0 ? false : true;
 }
