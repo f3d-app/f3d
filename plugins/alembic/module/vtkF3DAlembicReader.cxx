@@ -227,9 +227,7 @@ class vtkF3DAlembicReader::vtkInternals
     const vtkIdType numCells = static_cast<vtkIdType>(data.Indices.size());
     vtkIdType totalConnectivitySize = 0;
     totalConnectivitySize += std::accumulate(data.Indices.begin(), data.Indices.end(), vtkIdType(0),
-      [](vtkIdType sum, const auto& face) {
-        return sum + static_cast<vtkIdType>(face.size());
-      });
+      [](vtkIdType sum, const auto& face) { return sum + static_cast<vtkIdType>(face.size()); });
 
     vtkNew<vtkIdTypeArray> offsets;
     offsets->SetNumberOfTuples(numCells + 1);
