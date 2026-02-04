@@ -30,15 +30,15 @@ const settings = {
     utils.assert(end === 4, "End value should be 4");
 
     utils.assert(
-      scene.animationKeyFrames().length === 50,
+      scene.getAnimationKeyFrames().length === 50,
       "KeyFrames length should be 50",
     );
     utils.assert(
-      scene.animationKeyFrames()[0] === 0,
+      scene.getAnimationKeyFrames()[0] === 0,
       "First KeyFrame should be 0",
     );
     utils.assert(
-      scene.animationKeyFrames()[49] === 4.0,
+      scene.getAnimationKeyFrames()[49] === 4.0,
       "First KeyFrame should be 4.0",
     );
 
