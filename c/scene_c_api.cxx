@@ -257,7 +257,7 @@ void f3d_scene_load_animation_time(f3d_scene_t* scene, double time_value)
 }
 
 //----------------------------------------------------------------------------
-double* f3d_scene_animation_keyframes(f3d_scene_t* scene, unsigned int* count)
+double* f3d_scene_get_animation_keyframes(f3d_scene_t* scene, unsigned int* count)
 {
   f3d::scene* cpp_scene = reinterpret_cast<f3d::scene*>(scene);
   std::vector<double> keyframes = cpp_scene->getAnimationKeyFrames();
