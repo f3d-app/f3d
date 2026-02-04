@@ -64,7 +64,7 @@ int vtkF3DSplatReader::RequestData(
   }
 
   stream->Seek(0, vtkResourceStream::SeekDirection::End);
-  std::size_t nbSplats = stream->Tell() / sizeof(splat_t);
+  std::size_t nbSplats = stream->Tell() / sizeof(::splat_t);
   stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
 
   vtkNew<vtkFloatArray> positionArray;
@@ -87,10 +87,10 @@ int vtkF3DSplatReader::RequestData(
   rotationArray->SetNumberOfTuples(nbSplats);
   rotationArray->SetName("rotation");
 
-  splat_t splat;
+  ::splat_t splat;
   for (size_t i = 0; i < nbSplats; i++)
   {
-    if (stream->Read(&splat, sizeof(splat_t)) != sizeof(splat_t))
+    if (stream->Read(&splat, sizeof(::splat_t)) != sizeof(::splat_t))
     {
       vtkWarningMacro("Could not read a splat at index: " << i << " , result may be incorrect");
       break;
@@ -103,6 +103,16 @@ int vtkF3DSplatReader::RequestData(
     {
       rotationArray->SetTypedComponent(i, c, (static_cast<float>(splat.rotation[c]) - 128.f) / 128.f);
     }
+
+    // TODO This should always be 1 according to math?
+    float squareSum = 0;
+    for (int c = 0; c < 4; c++)
+    {
+      float rot = (static_cast<float>(splat.rotation[c]) - 128.f) / 128.f;
+      squareSum += rot * rot;
+    }
+    std::cout<<"squareSum: " << squareSum<<std::endl;
+
   }
 
   vtkNew<vtkPoints> points;
@@ -128,7 +138,7 @@ bool vtkF3DSplatReader::CanReadFile(vtkResourceStream* stream)
   // Check the size of the file
   stream->Seek(0, vtkResourceStream::SeekDirection::End);
   vtkTypeInt64 streamSize = stream->Tell();
-  if (streamSize % sizeof(splat_t) != 0)
+  if (streamSize % sizeof(::splat_t) != 0)
   {
     return false;
   }
@@ -136,8 +146,8 @@ bool vtkF3DSplatReader::CanReadFile(vtkResourceStream* stream)
 
   // Read the first splat
   stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
-  splat_t splat;
-  if (stream->Read(&splat, sizeof(splat_t) != sizeof(splat_t)))
+  ::splat_t splat;
+  if (stream->Read(&splat, sizeof(::splat_t)) != sizeof(::splat_t))
   {
     return false;
   }
@@ -152,20 +162,17 @@ bool vtkF3DSplatReader::CanReadFile(vtkResourceStream* stream)
   }
 
   // Check sum of squared rotation is 1
-  // TODO
-  /*
+  // TODO check assumption is correct
   float squareSum = 0;
   for (int c = 0; c < 4; c++)
   {
     float rot = (static_cast<float>(splat.rotation[c]) - 128.f) / 128.f;
     squareSum += rot * rot;
   }
-  std::cout<<"squareSum: " << squareSum<<std::endl;
-  if (squareSum != 1)
+/*  if (squareSum != 1)
   {
     return false;
-  }
-  */
+  }*/
 
   return true;
 }
