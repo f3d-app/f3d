@@ -70,7 +70,7 @@ int test_scene_c_api()
   unsigned int anim_count = f3d_scene_available_animations(scene);
   (void)anim_count;
   unsigned int keyframes_number;
-  double* keyframes = f3d_scene_animation_keyframes(scene, &keyframes_number);
+  double* keyframes = f3d_scene_get_animation_keyframes(scene, &keyframes_number);
   (void)keyframes;
 
   f3d_light_state_t light_state = { 0 };
