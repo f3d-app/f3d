@@ -144,7 +144,7 @@ extern "C"
    * @param count Pointer to store the count of keyframes
    * @return Pointer to the array of keyframe time keys
    */
-  F3D_EXPORT double* f3d_scene_animation_keyframes(f3d_scene_t* scene, unsigned int* count);
+  F3D_EXPORT double* f3d_scene_get_animation_keyframes(f3d_scene_t* scene, unsigned int* count);
 
   /**
    * @brief Get animation time range of currently added files.
