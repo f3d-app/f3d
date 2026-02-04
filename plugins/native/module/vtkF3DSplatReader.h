@@ -38,7 +38,8 @@ private:
   vtkF3DSplatReader(const vtkF3DSplatReader&) = delete;
   void operator=(const vtkF3DSplatReader&) = delete;
 
-  static void ReadASplat(std::vector<unsigned char>& buffer, std::size_t index, float*& position, float*& scale, unsigned char*& rotation, unsigned char*& color);
+  static void ReadASplat(std::vector<unsigned char>& buffer, std::size_t index, float*& position,
+    float*& scale, unsigned char*& rotation, unsigned char*& color);
 };
 
 #endif

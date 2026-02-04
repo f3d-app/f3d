@@ -19,17 +19,15 @@
 #include <vtkUnsignedCharArray.h>
 #include <vtkVersion.h>
 
-#include <iostream>
-
 namespace
 {
-  struct splat_t
-  {
-    float position[3];
-    float scale[3];
-    unsigned char color[4];
-    unsigned char rotation[4];
-  };
+struct splat_t
+{
+  float position[3];
+  float scale[3];
+  unsigned char color[4];
+  unsigned char rotation[4];
+};
 }
 
 //----------------------------------------------------------------------------
@@ -101,18 +99,9 @@ int vtkF3DSplatReader::RequestData(
     colorArray->SetTypedTuple(i, splat.color);
     for (int c = 0; c < 4; c++)
     {
-      rotationArray->SetTypedComponent(i, c, (static_cast<float>(splat.rotation[c]) - 128.f) / 128.f);
+      rotationArray->SetTypedComponent(
+        i, c, (static_cast<float>(splat.rotation[c]) - 128.f) / 128.f);
     }
-
-    // TODO This should always be 1 according to math?
-    float squareSum = 0;
-    for (int c = 0; c < 4; c++)
-    {
-      float rot = (static_cast<float>(splat.rotation[c]) - 128.f) / 128.f;
-      squareSum += rot * rot;
-    }
-    std::cout<<"squareSum: " << squareSum<<std::endl;
-
   }
 
   vtkNew<vtkPoints> points;
@@ -143,7 +132,6 @@ bool vtkF3DSplatReader::CanReadFile(vtkResourceStream* stream)
     return false;
   }
 
-
   // Read the first splat
   stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
   ::splat_t splat;
@@ -160,19 +148,6 @@ bool vtkF3DSplatReader::CanReadFile(vtkResourceStream* stream)
       return false;
     }
   }
-
-  // Check sum of squared rotation is 1
-  // TODO check assumption is correct
-  float squareSum = 0;
-  for (int c = 0; c < 4; c++)
-  {
-    float rot = (static_cast<float>(splat.rotation[c]) - 128.f) / 128.f;
-    squareSum += rot * rot;
-  }
-/*  if (squareSum != 1)
-  {
-    return false;
-  }*/
 
   return true;
 }

@@ -54,6 +54,5 @@ int TestF3DSplatReader(int vtkNotUsed(argc), char* argv[])
     return EXIT_FAILURE;
   }
 
-
   return EXIT_SUCCESS;
 }
