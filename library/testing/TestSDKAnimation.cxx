@@ -56,8 +56,8 @@ int TestSDKAnimation([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 
   auto keyframes = sce.getAnimationKeyFrames();
   test("check keyframes size", static_cast<int>(keyframes.size()), 50);
-  test("check first keyframes", keyframes[0], 0.f);
-  test("check last keyframes", keyframes[49], 4.f);
+  test("check first keyframes", keyframes[0], 0.0);
+  test("check last keyframes", keyframes[49], 4.0);
 
   inter.startAnimation(f3d::interactor::AnimationDirection::FORWARD);
   test("isPlaying backward after forward start",
