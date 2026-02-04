@@ -1,9 +1,5 @@
-#include <vtkDataSet.h>
 #include <vtkFileResourceStream.h>
-#include <vtkMapper.h>
 #include <vtkNew.h>
-#include <vtkRenderer.h>
-#include <vtkTestUtilities.h>
 
 #include "vtkF3DQuakeMDLImporter.h"
 
