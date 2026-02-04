@@ -11,7 +11,7 @@
 
 namespace
 {
-bool TestCanReadFile(const std::string& filename, const std::string& expectedHint)
+bool TestCanReadFile(const std::string& filename, std::string_view expectedHint)
 {
   vtkNew<vtkFileResourceStream> stream;
   if (!stream->Open(filename.c_str()))
