@@ -183,12 +183,27 @@ f3d_embed_file(
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/F3DConfig.h.in"
     "${CMAKE_CURRENT_BINARY_DIR}/F3DConfig.h")
 
+set(_ENABLED_CONDITIONALS)
+if(F3D_MODULE_RAYTRACING)
+  list(APPEND _ENABLED_CONDITIONALS "F3D_MODULE_RAYTRACING")
+endif()
+if(F3D_MODULE_DMON)
+  list(APPEND _ENABLED_CONDITIONALS "F3D_MODULE_DMON")
+endif()
+if(F3D_MODULE_UI)
+  list(APPEND _ENABLED_CONDITIONALS "F3D_MODULE_UI")
+endif()
+
 add_custom_command(
   OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/F3DCLIOptions.h"
-  COMMAND ${CMAKE_COMMAND} -D srcDir=${CMAKE_SOURCE_DIR} -D binaryDir=${CMAKE_CURRENT_BINARY_DIR} -P ${CMAKE_SOURCE_DIR}/cmake/f3dCLIOpts.cmake
+  COMMAND ${CMAKE_COMMAND}
+    -D "F3D_SOURCE_DIR=${CMAKE_SOURCE_DIR}"
+    -D "F3D_BINARY_DIR=${CMAKE_BINARY_DIR}"
+    -D "ENABLED_CONDITIONALS=${_ENABLED_CONDITIONALS}"
+    -P "${CMAKE_SOURCE_DIR}/cmake/f3dCLIOptions.cmake"
   DEPENDS
-    ${CMAKE_SOURCE_DIR}/resources/cli-options.schema.json
-    ${CMAKE_SOURCE_DIR}/resources/cli-options.json
+    "${CMAKE_SOURCE_DIR}/resources/cli-options.schema.json"
+    "${CMAKE_SOURCE_DIR}/resources/cli-options.json"
   VERBATIM
 )
 
@@ -333,13 +348,13 @@ if(UNIX AND NOT APPLE AND NOT ANDROID)
     DESTINATION "${f3d_resources_dir}"
     COMPONENT shellext
   )
-  install(FILES "${F3D_SOURCE_DIR}/resources/completion.bash"
+  install(FILES "${CMAKE_BINARY_DIR}/completion.bash"
     DESTINATION "share/bash-completion/completions" COMPONENT shellext
     RENAME "f3d")
-  install(FILES "${F3D_SOURCE_DIR}/resources/completion.zsh"
+  install(FILES "${CMAKE_BINARY_DIR}/completion.zsh"
     DESTINATION "share/zsh/site-functions" COMPONENT shellext
     RENAME "_f3d")
-  install(FILES "${F3D_SOURCE_DIR}/resources/completion.fish"
+  install(FILES "${CMAKE_BINARY_DIR}/completion.fish"
     DESTINATION "share/fish/vendor_completions.d" COMPONENT shellext
     RENAME "f3d.fish")
   install(FILES "${F3D_SOURCE_DIR}/resources/app.f3d.F3D.metainfo.xml"
