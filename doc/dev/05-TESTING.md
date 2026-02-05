@@ -31,6 +31,22 @@ To run a specific test, use the `ctest -R <testname>` option:
 ctest -R PLY
 ```
 
+### Test groups
+
+CTest labels allow you to easily target specific groups of tests.
+
+Available labels:
+
+- libf3d (all libf3d tests)
+- bindings (all binding tests)
+- c, java, python
+
+Labels can be combined to further refine test selection.
+
+```
+ctest -L bindings # run all binding tests
+``` 
+
 ## Testing architecture
 
 There are multiple layers of tests to ensure that testing covers all aspects of the application. The layers of the application are
