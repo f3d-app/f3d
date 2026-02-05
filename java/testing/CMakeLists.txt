@@ -47,5 +47,5 @@ foreach(test_file ${javaf3dTests_list})
     )
 
   set_tests_properties(libf3d_bindings_java::${TName} PROPERTIES DISABLED ${java_test_disabled})
-  set_tests_properties(libf3d_bindings_java::${TName} PROPERTIES LABELS "Bindings;API;Java")
+  set_tests_properties(libf3d_bindings_java::${TName} PROPERTIES LABELS "libf3d;bindings;java")
 endforeach()

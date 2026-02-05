@@ -42,7 +42,7 @@ foreach(test_name ${f3djsTests_list})
       --allow-file-access-from-files
       file://${CMAKE_CURRENT_BINARY_DIR}/${test_name}.html
   )
-
+  set_tests_properties(libf3d_bindings_js::${TName} PROPERTIES LABELS "libf3d;bindings;js")
   set_tests_properties(libf3d_bindings_js::${test_name} PROPERTIES
     FAIL_REGULAR_EXPRESSION "F3D_ERROR")
 endforeach()
