@@ -14,7 +14,6 @@
 #include "vtkF3DPolyDataMapper.h"
 #include "vtkF3DRenderPass.h"
 #include "vtkF3DSolidBackgroundPass.h"
-#include "vtkF3DTAAPass.h"
 #include "vtkF3DUserRenderPass.h"
 
 #include <vtkAxesActor.h>
@@ -542,18 +541,6 @@ void vtkF3DRenderer::ConfigureRenderPasses()
 
     this->SetPass(fxaaP);
     renderingPass = fxaaP;
-  }
-
-  if (this->AntiAliasingModeEnabled == vtkF3DRenderer::AntiAliasingMode::TAA)
-  {
-    vtkNew<vtkF3DTAAPass> taaP;
-    taaP->SetDelegatePass(renderingPass);
-    renderingPass = taaP;
-
-    this->RenderWindow->AddObserver(
-      vtkCommand::WindowResizeEvent, taaP.Get(), &vtkF3DTAAPass::ResetIterations);
-    this->RenderWindow->GetInteractor()->GetInteractorStyle()->AddObserver(
-      vtkCommand::InteractionEvent, taaP.Get(), &vtkF3DTAAPass::ResetIterations);
   }
 
   if (this->FinalShader.has_value())
@@ -1750,6 +1737,12 @@ void vtkF3DRenderer::SetAntiAliasingMode(AntiAliasingMode mode)
     this->RenderPassesConfigured = false;
     this->CheatSheetConfigured = false;
   }
+}
+
+//----------------------------------------------------------------------------
+vtkF3DRenderer::AntiAliasingMode vtkF3DRenderer::GetAntiAliasingMode() const
+{
+  return this->AntiAliasingModeEnabled;
 }
 
 //----------------------------------------------------------------------------
