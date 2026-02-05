@@ -11,7 +11,7 @@ static void stop_callback(void* user_data)
   f3d_interactor_request_stop(interactor);
 }
 
-int test_interactor_c_api()
+int test_interactor()
 {
   f3d_engine_t* engine = f3d_engine_create(1);
   if (!engine)

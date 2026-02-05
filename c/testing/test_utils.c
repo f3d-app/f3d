@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
-int test_utils_c_api()
+int test_utils()
 {
   int failed = 0;
 

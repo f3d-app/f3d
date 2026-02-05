@@ -1,19 +1,19 @@
 list(APPEND f3d_c_api_tests_list
-  test_camera_c_api.c
-  test_engine_c_api.c
-  test_image_c_api.c
-  test_interactor_c_api.c
-  test_log_c_api.c
-  test_options_c_api.c
-  test_scene_c_api.c
-  test_types_c_api.c
-  test_utils_c_api.c
-  test_window_c_api.c
+  test_camera.c
+  test_engine.c
+  test_image.c
+  test_interactor.c
+  test_log.c
+  test_options.c
+  test_scene.c
+  test_types.c
+  test_utils.c
+  test_window.c
 )
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
   list(APPEND f3d_c_api_tests_list
-    test_scene_buffer_c_api.c
+    test_scene_buffer.c
     )
 endif()
 
