@@ -56,10 +56,8 @@ jobs:
           prettier_options: "-w **/*.{js,json,md,html,yml}"
 
       - name: Validate cli-options.json against schema
-        uses: python-jsonschema/check-jsonschema@0.36.1
-        with:
-          files: "resources/cli-options.json"
-          schema: "resources/cli-options.schema.json"
+        shell: bash
+        run: pipx run check-jsonschema==0.36.1 --schemafile resources/cli-options.schema.json resources/cli-options.json
 
       - name: Echo Diff
         shell: bash

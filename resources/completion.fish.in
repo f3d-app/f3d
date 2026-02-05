@@ -1,6 +1,1 @@
-set -l compl_cmds \
 @F3D_CLI_OPTIONS_FISH@
-    
-for current_cmd in $compl_cmds
-    eval $current_cmd
-end

@@ -40,12 +40,13 @@
       "properties": {
         "longName": {
           "type": "string",
-          "minLength": 1,
+          "minLength": 2,
           "description": "Long form of the option (e.g., 'help')"
         },
         "shortName": {
           "type": "string",
           "minLength": 1,
+          "maxLength": 1,
           "description": "Short form of the option (e.g., 'h')"
         },
         "helpText": {
@@ -67,8 +68,7 @@
           "description": "Preprocessor definition that must be defined for this option to be available"
         }
       },
-      "anyOf": [{ "required": ["longName"] }, { "required": ["shortName"] }],
-      "required": ["helpText"],
+      "required": ["longName", "helpText"],
       "additionalProperties": false
     }
   }

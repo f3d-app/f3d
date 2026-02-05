@@ -152,7 +152,7 @@ foreach(_si RANGE ${_last_surv})
 
     # use the `*_json_error`s as an indicator of whether the key is present for this option
     if(_long_name_json_error)
-      set(_long_name "")
+      message(FATAL_ERROR "An option was found in ${F3D_SOURCE_DIR}/resources/cli-options.json without a long name")
     endif()
     if(_short_name_json_error)
       set(_short_name "")
@@ -176,26 +176,22 @@ foreach(_si RANGE ${_last_surv})
 
     # generate completion file content for this CLI option
     if(F3D_CLI_OPTIONS_BASH)
-      string(APPEND F3D_CLI_OPTIONS_BASH " ") # bash string uses space separator between options
+      string(APPEND F3D_CLI_OPTIONS_BASH " ") # space separates completion options in bash array
     endif()
     if(F3D_CLI_OPTIONS_FISH)
-      string(APPEND F3D_CLI_OPTIONS_FISH " \\\n") # fish uses a space, escape character, and newline to separate option commands
+      string(APPEND F3D_CLI_OPTIONS_FISH "\n") # newline separates fish completion commands
     endif()
     if(F3D_CLI_OPTIONS_ZSH)
-      string(APPEND F3D_CLI_OPTIONS_ZSH "\n") # zsh uses a new line to separate options in an array
+      string(APPEND F3D_CLI_OPTIONS_ZSH "\n") # newline separates completion options in zsh array
     endif()
     if(_long_name AND _short_name)
       string(APPEND F3D_CLI_OPTIONS_BASH "--${_long_name} -${_short_name}")
-      string(APPEND F3D_CLI_OPTIONS_FISH "    'complete -c f3d -l ${_long_name} -s ${_short_name} -d \"${_help_text}\"'")
+      string(APPEND F3D_CLI_OPTIONS_FISH "complete -c f3d -l ${_long_name} -s ${_short_name} -d \"${_help_text}\"")
       string(APPEND F3D_CLI_OPTIONS_ZSH "  '(-${_short_name} --${_long_name})'{-${_short_name},--${_long_name}}'[${_help_text}]'")
-    elseif(_long_name)
+    else() # _long_name must be set (checked earlier)
       string(APPEND F3D_CLI_OPTIONS_BASH "--${_long_name}")
-      string(APPEND F3D_CLI_OPTIONS_FISH "    'complete -c f3d -l ${_long_name} -d \"${_help_text}\"'")
+      string(APPEND F3D_CLI_OPTIONS_FISH "complete -c f3d -l ${_long_name} -d \"${_help_text}\"")
       string(APPEND F3D_CLI_OPTIONS_ZSH "  '--${_long_name}[${_help_text}]'")
-    elseif(_short_name)
-      string(APPEND F3D_CLI_OPTIONS_BASH "-${_short_name}")
-      string(APPEND F3D_CLI_OPTIONS_FISH "    'complete -c f3d -s ${_short_name} -d \"${_help_text}\"'")
-      string(APPEND F3D_CLI_OPTIONS_ZSH "  '--${_short_name}[${_help_text}]'")
     endif()
 
   endforeach()

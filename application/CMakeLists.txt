@@ -346,12 +346,6 @@ if(UNIX AND NOT APPLE AND NOT ANDROID)
   install(FILES "${F3D_SOURCE_DIR}/resources/logo-mono.svg"
     DESTINATION "share/icons/HighContrast/scalable/apps" COMPONENT assets
     RENAME "f3d.svg")
-  install(FILES
-    "${F3D_SOURCE_DIR}/resources/cli-options.json"
-    "${F3D_SOURCE_DIR}/resources/cli-options.schema.json"
-    DESTINATION "${f3d_resources_dir}"
-    COMPONENT shellext
-  )
   install(FILES "${CMAKE_BINARY_DIR}/completion.bash"
     DESTINATION "share/bash-completion/completions" COMPONENT shellext
     RENAME "f3d")
