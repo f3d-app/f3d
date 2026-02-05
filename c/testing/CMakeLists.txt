@@ -32,6 +32,7 @@ target_compile_definitions(f3d_c_api_tests PRIVATE F3D_TESTING_DATA_DIR="${F3D_S
 # Add all the ADD_TEST for each test
 foreach (test ${f3d_c_api_tests_list})
   get_filename_component (TName ${test} NAME_WE)
-  add_test(NAME c_api::${TName} COMMAND f3d_c_api_tests ${TName} "${F3D_SOURCE_DIR}/testing/" "${CMAKE_BINARY_DIR}/Testing/Temporary/" "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
-  set_tests_properties(c_api::${TName} PROPERTIES TIMEOUT 30)
+  add_test(NAME libf3d_bindings_c::${TName} COMMAND f3d_c_api_tests ${TName} "${F3D_SOURCE_DIR}/testing/" "${CMAKE_BINARY_DIR}/Testing/Temporary/" "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
+  set_tests_properties(libf3d_bindings_c::${TName} PROPERTIES TIMEOUT 30)
+  set_tests_properties(libf3d_bindings_c::${TName} PROPERTIES LABELS "Bindings;API;C")
 endforeach ()

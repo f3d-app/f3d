@@ -35,8 +35,9 @@ endif ()
 # Add all the ADD_TEST for each test
 foreach(test_file ${javaf3dTests_list})
   get_filename_component (TName ${test_file} NAME_WE)
-
-  add_test(NAME javaf3d::${TName}
+  string(REPLACE "Test" "test_" TName ${TName})
+  string(TOLOWER ${TName} TName)
+  add_test(NAME libf3d_bindings_java::${TName}
     WORKING_DIRECTORY "$<SHELL_PATH:$<TARGET_FILE_DIR:javaf3d>>" # path to the JNI library
     COMMAND ${Java_JAVA_EXECUTABLE}
       -Djava.library.path=$<SHELL_PATH:$<TARGET_FILE_DIR:javaf3d>> # path to the JNI library
