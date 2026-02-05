@@ -9,6 +9,16 @@ f3d_embed_file(
 set(sources ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultHDRI.cxx)
 set(private_headers ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultHDRI.h)
 
+set(F3D_CHECKERBOARD "${F3D_SOURCE_DIR}/resources/checkerboard.png" CACHE STRING "Default F3D Checkerboard")
+mark_as_advanced(F3D_CHECKERBOARD)
+f3d_embed_file(
+  INPUT "${F3D_CHECKERBOARD}"
+  NAME F3DCheckerBoard
+  BINARY)
+
+list(APPEND sources ${CMAKE_CURRENT_BINARY_DIR}/F3DCheckerBoard.cxx)
+list(APPEND private_header ${CMAKE_CURRENT_BINARY_DIR}/F3DCheckerBoard.h)
+
 if(F3D_MODULE_UI)
   set(F3D_FONT_FILE "${F3D_SOURCE_DIR}/resources/MonaspaceNeon-Regular.otf" CACHE STRING "Font used in UI widgets")
   mark_as_advanced(F3D_FONT_FILE)
