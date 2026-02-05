@@ -197,13 +197,15 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       {"interaction-test-record", "", "Path to an interaction log file to record interactions events to", "<file_path>", ""},
       {"interaction-test-play", "", "Path to an interaction log file to play interaction events from when loading a file", "<file_path>", ""} } }
 }};
+// clang-format on
 
 /**
  * True boolean options need to be filtered out in ParseCLIOptions
  * Also filter out special options like `define` and `reset`
  * This is the easiest, compile time way to do it
  */
-constexpr std::array CLIBooleans = {"version", "help", "list-readers", "scan-plugins", "list-rendering-backends", "define", "reset"};
+constexpr std::array CLIBooleans = { "version", "help", "list-readers", "scan-plugins",
+  "list-rendering-backends", "define", "reset" };
 
 //----------------------------------------------------------------------------
 /**
@@ -223,7 +225,7 @@ std::string CollapseName(const std::string_view& longName, const std::string_vie
 //----------------------------------------------------------------------------
 void PrintHelp(const std::string& execName, const cxxopts::Options& cxxOptions)
 {
-  const std::array<std::pair<std::string, std::string>, 4> examples = {{
+  const std::array<std::pair<std::string, std::string>, 4> examples = { {
     { execName + " file.vtu -xtgans",
       "View a unstructured mesh in a typical nice looking sciviz style" },
     { execName + " file.glb -tuqap --hdri-file=file.hdr --hdri-ambient --hdri-skybox",
@@ -231,7 +233,7 @@ void PrintHelp(const std::string& execName, const cxxopts::Options& cxxOptions)
     { execName + " file.ply -so --point-size=0 --coloring-component=-2",
       "View a point cloud file with direct scalars rendering" },
     { execName + " folder", "View all files in folder" },
-  }};
+  } };
 
   f3d::log::setUseColoring(false);
   std::vector<std::string> orderedCLIGroupNames(CLIOptions.size());
@@ -352,8 +354,8 @@ void PrintReadersList()
   // Print the rows split in 3 columns
   std::stringstream headerLine;
   headerLine << std::left << std::setw(nameColSize) << "Name" << std::setw(plugColSize) << "Plugin"
-             << std::setw(descColSize) << "Description" << std::setw(streamColSize) << streamStr << std::setw(extsColSize) << "Exts"
-             << std::setw(mimeColSize - colGap) << "Mime-types";
+             << std::setw(descColSize) << "Description" << std::setw(streamColSize) << streamStr
+             << std::setw(extsColSize) << "Exts" << std::setw(mimeColSize - colGap) << "Mime-types";
   f3d::log::info(headerLine.str());
   f3d::log::info(separator);
 
@@ -366,7 +368,8 @@ void PrintReadersList()
       readerLine << std::setw(nameColSize) << (i == 0 ? reader.Name : "");
       readerLine << std::setw(plugColSize) << (i == 0 ? reader.PluginName : "");
       readerLine << std::setw(descColSize) << (i == 0 ? reader.Description : "");
-      readerLine << std::setw(streamColSize) << (i == 0 ? (reader.SupportsStream ? "YES" : "NO") : "");
+      readerLine << std::setw(streamColSize)
+                 << (i == 0 ? (reader.SupportsStream ? "YES" : "NO") : "");
       readerLine << std::setw(extsColSize)
                  << (i < reader.Extensions.size() ? reader.Extensions[i] : "");
       readerLine << std::setw(mimeColSize - colGap)
@@ -379,10 +382,13 @@ void PrintReadersList()
 }
 
 //----------------------------------------------------------------------------
-std::pair<std::string, int> F3DOptionsTools::GetClosestOption(const std::string& option, bool checkLibAndReaders)
+std::pair<std::string, int> F3DOptionsTools::GetClosestOption(
+  const std::string& option, bool checkLibAndReaders)
 {
   std::pair<std::string, int> ret = { "", std::numeric_limits<int>::max() };
-  auto checkDistance = [](const std::string& key, const std::string& name, std::pair<std::string, int>& ref) {
+  auto checkDistance =
+    [](const std::string& key, const std::string& name, std::pair<std::string, int>& ref)
+  {
     int distance = f3d::utils::textDistance(key, name);
     if (distance < ref.second)
     {
@@ -472,7 +478,8 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
         if (cliOption.ValueHelper.empty())
         {
           // No ValueHelper means its a true boolean option like `--help` or `--version`
-          group(::CollapseName(cliOption.LongName, cliOption.ShortName), std::string(cliOption.HelpText));
+          group(::CollapseName(cliOption.LongName, cliOption.ShortName),
+            std::string(cliOption.HelpText));
         }
         else
         {
@@ -567,7 +574,8 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
       std::vector<std::string> plugins;
       if (result.count("load-plugins") > 0)
       {
-        plugins = f3d::options::parse<std::vector<std::string>>(result["load-plugins"].as<std::string>());
+        plugins =
+          f3d::options::parse<std::vector<std::string>>(result["load-plugins"].as<std::string>());
       }
       F3DPluginsTools::LoadPlugins(plugins);
       ::PrintReadersList();
@@ -592,8 +600,9 @@ F3DOptionsTools::OptionsDict F3DOptionsTools::ParseCLIOptions(
           unknownOption.substr(2, equalPos != std::string::npos ? equalPos - 2 : equalPos);
 
         auto [closestName, dist] = F3DOptionsTools::GetClosestOption(unknownName);
-        const std::string closestOption =
-          equalPos == std::string::npos ? closestName : closestName + unknownOption.substr(equalPos);
+        const std::string closestOption = equalPos == std::string::npos
+          ? closestName
+          : closestName + unknownOption.substr(equalPos);
 
         f3d::log::error("Did you mean '--", closestOption, "'?");
       }
@@ -656,7 +665,8 @@ void F3DOptionsTools::PrintHelpPair(
 }
 
 //----------------------------------------------------------------------------
-std::vector<std::pair<std::string, std::string>> F3DOptionsTools::ConvertToLibf3dOptions(const std::string& key, const std::string& value)
+std::vector<std::pair<std::string, std::string>> F3DOptionsTools::ConvertToLibf3dOptions(
+  const std::string& key, const std::string& value)
 {
   std::vector<std::pair<std::string, std::string>> libf3dOptions;
 
