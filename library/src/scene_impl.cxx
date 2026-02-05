@@ -204,11 +204,9 @@ public:
 
   std::vector<NodeInfo> GetSceneHierarchyNodes()
   {
-    std::vector<NodeInfo> hierarchy;
-
     if (!this->MetaImporter)
     {
-      return hierarchy;
+      return {};
     }
 
     // Get the raw hierarchy directly - it already handles duplicates and hierarchy
