@@ -46,5 +46,6 @@ foreach(test_file ${javaf3dTests_list})
       $<SHELL_PATH:${test_file}> ${F3D_SOURCE_DIR}/testing/ ${CMAKE_BINARY_DIR}/Testing/Temporary/
     )
 
-    set_tests_properties(javaf3d::${TName} PROPERTIES DISABLED ${java_test_disabled})
+  set_tests_properties(libf3d_bindings_java::${TName} PROPERTIES DISABLED ${java_test_disabled})
+  set_tests_properties(libf3d_bindings_java::${TName} PROPERTIES LABELS "Bindings;API;Java")
 endforeach()
