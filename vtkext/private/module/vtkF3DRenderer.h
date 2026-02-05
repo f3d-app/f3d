@@ -142,8 +142,10 @@ public:
   void SetUseRaytracing(bool use);
   void SetUseRaytracingDenoiser(bool use);
   void SetBlendingMode(BlendingMode mode);
+  BlendingMode GetBlendingMode() const;
   void SetUseSSAOPass(bool use);
   void SetAntiAliasingMode(AntiAliasingMode mode);
+  AntiAliasingMode GetAntiAliasingMode() const;
   void SetUseToneMappingPass(bool use);
   void SetDisplayDepth(bool use);
   void SetDisplayDepthScalarColoring(bool use);
@@ -153,11 +155,6 @@ public:
   void SetBackfaceType(const std::optional<std::string>& backfaceType);
   void SetFinalShader(const std::optional<std::string>& finalShader);
   ///@}
-
-  /**
-   * Get BlendingMode
-   */
-  BlendingMode GetBlendingMode() const;
 
   /**
    * Set SetUseOrthographicProjection
