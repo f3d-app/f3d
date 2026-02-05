@@ -22,3 +22,4 @@ vtk_add_test_cxx(vtkextAssimpTests tests
   ${VTKExtensionsPluginAssimp_list}
   ${F3D_SOURCE_DIR}/testing/ ${CMAKE_BINARY_DIR}/Testing/Temporary/)
 vtk_test_cxx_executable(vtkextAssimpTests tests)
+set_target_properties(vtkextAssimpTests PROPERTIES CXX_STANDARD 17)
