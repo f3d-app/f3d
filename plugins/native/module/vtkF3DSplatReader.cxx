@@ -141,9 +141,9 @@ bool vtkF3DSplatReader::CanReadFile(vtkResourceStream* stream)
   }
 
   // Check first splat scale is all positive
-  for (int axis = 0; axis < 3; axis++)
+  for (float scale : splat.scale)
   {
-    if (splat.scale[axis] < 0)
+    if (scale < 0)
     {
       return false;
     }
