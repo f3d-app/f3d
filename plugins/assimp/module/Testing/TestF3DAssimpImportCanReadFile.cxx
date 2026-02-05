@@ -8,6 +8,7 @@
 #include <vtkTestUtilities.h>
 
 #include <iostream>
+#include <string_view>
 
 namespace
 {
