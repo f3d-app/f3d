@@ -140,14 +140,6 @@ bool vtkF3DSplatReader::CanReadFile(vtkResourceStream* stream)
     return false;
   }
 
-  // Check first splat scale is all positive
-  for (float scale : splat.scale)
-  {
-    if (scale < 0)
-    {
-      return false;
-    }
-  }
-
-  return true;
+  // Check first splat scales are all positive
+  return std::all_of(std::begin(splat.scale), std::end(splat.scale), [](float val){ return val > 0; });
 }
