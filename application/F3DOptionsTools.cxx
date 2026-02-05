@@ -348,8 +348,9 @@ void PrintReadersList()
   plugColSize += colGap;
   streamColSize += colGap;
 
-  std::string separator =
-    std::string(nameColSize + extsColSize + descColSize + mimeColSize + plugColSize - colGap, '-');
+  std::string separator = std::string(
+    nameColSize + extsColSize + descColSize + mimeColSize + plugColSize + streamColSize - colGap,
+    '-');
 
   // Print the rows split in 3 columns
   std::stringstream headerLine;
