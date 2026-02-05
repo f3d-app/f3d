@@ -54,6 +54,11 @@ int TestF3DSplatReader(int vtkNotUsed(argc), char* argv[])
     return EXIT_FAILURE;
   }
 
+  // Check for coverage
+  vtkNew<vtkF3DSplatReader> reader2;
+  reader2->SetStream(stream);
+  reader2->Update();
+
   path = std::string(argv[1]) + "data/empty.splat";
   if (!stream->Open(path.c_str()))
   {
@@ -66,9 +71,10 @@ int TestF3DSplatReader(int vtkNotUsed(argc), char* argv[])
     return EXIT_FAILURE;
   }
 
-  reader->SetStream(stream);
-  reader->Update();
-  nbPoints = reader->GetOutput()->GetNumberOfPoints();
+  vtkNew<vtkF3DSplatReader> reader3;
+  reader3->SetStream(stream);
+  reader3->Update();
+  nbPoints = reader3->GetOutput()->GetNumberOfPoints();
   if (nbPoints != 0)
   {
     std::cerr << "Incorrect number of splats: " << nbPoints << " for empty file\n";
