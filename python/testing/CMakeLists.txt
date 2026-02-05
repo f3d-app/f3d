@@ -37,9 +37,10 @@ foreach(test ${pyf3dTests_list})
   get_filename_component (TName ${test} NAME_WE)
   add_test(NAME libf3d_bindings_py::${TName} COMMAND ${Python_EXECUTABLE} -m pytest ${CMAKE_CURRENT_LIST_DIR}/${test})
   set_tests_properties(libf3d_bindings_py::${TName} PROPERTIES
+    LABELS "libf3d;bindings;python"
     ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}$<${F3D_MULTI_CONFIG_GENERATOR}:/$<CONFIG>>"
-    FAIL_REGULAR_EXPRESSION "[^X]FAILURES")
-  set_tests_properties(libf3d_bindings_py::${TName} PROPERTIES LABELS "libf3d;bindings;python")
+    FAIL_REGULAR_EXPRESSION "[^X]FAILURES"
+  )
   if (NOT F3D_TESTING_ENABLE_RENDERING_TESTS AND NOT ${test} IN_LIST pyf3dTestsNoRender_list)
     set_tests_properties(libf3d_bindings_py::${TName} PROPERTIES DISABLED ON)
   endif ()
