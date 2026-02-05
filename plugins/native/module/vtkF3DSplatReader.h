@@ -26,7 +26,8 @@ public:
    * Return true if, after a quick check of file header, it looks like the provided stream
    * can be read. Return false if it is sure it cannot be read as a strean.
    *
-   * This only checks that the size of the file is a multiple of the size of a splat.
+   * This only checks that the size of the file is a multiple of the size of a splat, read the
+   * first splat and then check scales are positive.
    */
   static bool CanReadFile(vtkResourceStream* stream);
 
