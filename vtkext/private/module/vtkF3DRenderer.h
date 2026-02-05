@@ -398,12 +398,10 @@ public:
   vtkGetMacro(EnableColoring, bool);
   ///@}
 
-  ///@{
   /**
-   * Set/Get if checkerboard is enabled
+   * Set checkerboard mode
    */
   void SetEnableCheckerBoard(bool enable);
-  ///@}
 
   ///@{
   /**
