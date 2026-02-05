@@ -14,6 +14,8 @@
 
 #include <vtkAbstractPolyDataReader.h>
 
+class vtkResourceStream;
+
 class vtkF3DSplatReader : public vtkAbstractPolyDataReader
 {
 public:
