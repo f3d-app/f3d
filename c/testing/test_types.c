@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 
-int test_types_c_api()
+int test_types()
 {
   f3d_color_t color;
   f3d_color_set(&color, 1.0, 0.5, 0.25);

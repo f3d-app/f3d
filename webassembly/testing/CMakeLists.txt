@@ -24,7 +24,7 @@ foreach(test_name ${f3djsTests_list})
     "${CMAKE_CURRENT_BINARY_DIR}/${test_name}.html"
     @ONLY)
 
-  add_test(NAME f3djs::${test_name}
+  add_test(NAME libf3d_bindings_js::${test_name}
     COMMAND ${CHROMIUM_EXECUTABLE}
       --disable-application-cache
       --disable-extensions
@@ -42,7 +42,8 @@ foreach(test_name ${f3djsTests_list})
       --allow-file-access-from-files
       file://${CMAKE_CURRENT_BINARY_DIR}/${test_name}.html
   )
-
-  set_tests_properties(f3djs::${test_name} PROPERTIES
-    FAIL_REGULAR_EXPRESSION "F3D_ERROR")
+  set_tests_properties(libf3d_bindings_js::${test_name} PROPERTIES
+    LABELS "libf3d;bindings;js"
+    FAIL_REGULAR_EXPRESSION "F3D_ERROR"
+  )
 endforeach()
