@@ -12,9 +12,9 @@
 
 #include "vtkImageProcessingPass.h"
 
-#include <vtkSmartPointer.h>
 #include <vtkMatrix4x4.h>
 #include <vtkOpenGLHelper.h>
+#include <vtkSmartPointer.h>
 
 #include <memory>
 
@@ -80,11 +80,15 @@ private:
   vtkSmartPointer<vtkTextureObject> MotionVectorTexture;
 
   std::shared_ptr<vtkOpenGLQuadHelper> QuadHelper;
+  int viewPortSize[2];
 
   int HistoryIteration = 0;
   float Jitter[2] = { 0.0f, 0.0f };
   int TaaHaltonNumerator[2] = { 0, 0 };
   int TaaHaltonDenominator[2] = { 1, 1 };
-    vtkMatrix4x4* PreviousViewProjectionMatrix = nullptr;
+
+  vtkSmartPointer<vtkMatrix4x4> CurrentViewProjectionMatrix;
+  vtkSmartPointer<vtkMatrix4x4> PreviousViewProjectionMatrix;
+  
 };
 #endif
