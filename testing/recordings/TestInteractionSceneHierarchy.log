@@ -1,0 +1,22 @@
+# StreamVersion 1.2
+RenderEvent 0 0 0 0 0 0 0
+
+# Press 8 to rotate camera to front view
+KeyPressEvent 150 150 0 56 1 8 0
+CharEvent 150 150 0 56 1 8 0
+KeyReleaseEvent 150 150 0 56 1 8 0
+
+# Press Shift+H to show scene hierarchy UI
+KeyPressEvent 150 150 0 0 1 Shift_L 0
+CharEvent 150 150 0 0 1 Shift_L 0
+KeyPressEvent 150 150 1 72 1 H 0
+CharEvent 150 150 1 72 1 H 0
+KeyReleaseEvent 150 150 1 72 1 H 0
+KeyReleaseEvent 150 150 1 0 1 Shift_L 0
+
+# Click on first checkbox to hide it
+MouseMoveEvent 34 267 0 0 0 0 0
+LeftButtonPressEvent 34 267 0 0 0 0 0
+LeftButtonReleaseEvent 34 267 0 0 0 0 0
+
+TimerEvent 34 267 0 0 0 0 0
