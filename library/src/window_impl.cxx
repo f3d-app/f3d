@@ -378,12 +378,9 @@ window_impl::~window_impl()
 }
 
 //----------------------------------------------------------------------------
-void window_impl::SetSceneHierarchy(const std::vector<NodeInfo>& hierarchy)
+void window_impl::SetSceneHierarchy(const std::vector<F3DNodeInfo>& hierarchy)
 {
-  if (this->Internals->Renderer)
-  {
-    this->Internals->Renderer->SetSceneHierarchy(hierarchy);
-  }
+  this->Internals->Renderer->SetSceneHierarchy(hierarchy);
 }
 
 //----------------------------------------------------------------------------

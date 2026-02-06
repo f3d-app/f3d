@@ -73,7 +73,7 @@ private:
   /**
    * Recursively render a node in the scene hierarchy tree
    */
-  void RenderNode(NodeInfo* node, vtkOpenGLRenderWindow* renWin) override;
+  void RenderNode(F3DNodeInfo* node, vtkOpenGLRenderWindow* renWin) override;
 
   /**
    * Calculate the maximum text width needed for the hierarchy

@@ -1679,7 +1679,7 @@ void vtkF3DRenderer::SetDropZoneBinds(
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetSceneHierarchy(const std::vector<NodeInfo>& hierarchy)
+void vtkF3DRenderer::SetSceneHierarchy(const std::vector<F3DNodeInfo>& hierarchy)
 {
   this->UIActor->SetHierarchy(hierarchy);
 }

@@ -1,8 +1,8 @@
 /**
- * @class   NodeInfo
+ * @class   F3DNodeInfo
  * @brief   Structure to represent a node in the scene hierarchy
  *
- * NodeInfo contains information about a scene node including its name,
+ * F3DNodeInfo contains information about a scene node including its name,
  * associated VTK prop, children nodes, and display name for the UI.
  */
 
@@ -14,11 +14,11 @@
 
 class vtkProp;
 
-struct NodeInfo
+struct F3DNodeInfo
 {
   std::string name;
   vtkProp* prop = nullptr;
-  std::vector<NodeInfo> children;
+  std::vector<F3DNodeInfo> children;
   std::string displayName;
 };
 
