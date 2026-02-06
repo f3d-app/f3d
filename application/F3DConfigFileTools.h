@@ -19,7 +19,18 @@ struct ParsedConfigFiles
   F3DOptionsTools::OptionsEntries Options;
   F3DOptionsTools::OptionsEntries ImperativeOptions;
   BindingsEntries Bindings;
+  std::vector<std::filesystem::path> ConfigPaths;
 };
+
+/**
+ * Recover a OS-specific vector of potential config file directories
+ */
+std::vector<std::filesystem::path> GetConfigPaths(const std::string& configSearch);
+
+/**
+ * Print information about all candidate config files/directories (usually from GetConfigPaths)
+ */
+void PrintConfigInfo(const std::vector<std::filesystem::path>& configPaths);
 
 /**
  * Read config files using userConfig if any, return a ParsedConfigFiles

@@ -1,7 +1,9 @@
 find_package(f3d REQUIRED COMPONENTS library)
 
 add_subdirectory(check-engine)
+add_subdirectory(interactive-app)
 add_subdirectory(multi-files)
+add_subdirectory(offscreen-thumbnail)
 add_subdirectory(render-image)
 add_subdirectory(render-interact)
 add_subdirectory(use-options-string)
@@ -12,6 +14,17 @@ option(F3D_EXAMPLES_EXTERNAL_GLFW "Enable external-glfw example (requires GLFW)"
 if(F3D_EXAMPLES_EXTERNAL_GLFW)
   add_subdirectory(external-glfw)
 endif()
+
+option(F3D_EXAMPLES_EXTERNAL_QT "Enable external-qt example (requires qt)" OFF)
+if (F3D_EXAMPLES_EXTERNAL_QT)
+  add_subdirectory(qml)
+  add_subdirectory(qt6)
+endif ()
+
+option(F3D_EXAMPLES_EXTERNAL_FLTK "Enable external-fltk example (requires fltk)" OFF)
+if (F3D_EXAMPLES_EXTERNAL_FLTK)
+  add_subdirectory(fltk)
+endif ()
 
 if(BUILD_TESTING)
   add_subdirectory(tests)

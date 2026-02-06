@@ -16,17 +16,20 @@ bool testReader(const std::string& filename, const vtkF3DOCCTReader::FILE_FORMAT
   reader->SetFileName(filename);
   reader->SetFileFormat(format);
   reader->Update();
-  reader->Print(cout);
-  return reader->GetOutput()->GetNumberOfBlocks() > 0;
+  reader->Print(std::cout);
+  return reader->GetOutput()->GetNumberOfPoints() > 0;
 }
 
 int TestF3DOCCTReader(int vtkNotUsed(argc), char* argv[])
 {
   const std::string data = std::string(argv[1]) + "data";
-  return (testReader(data + "/f3d.stp", vtkF3DOCCTReader::FILE_FORMAT::STEP) &&
-           testReader(data + "/f3d.igs", vtkF3DOCCTReader::FILE_FORMAT::IGES) &&
-           testReader(data + "/f3d.brep", vtkF3DOCCTReader::FILE_FORMAT::BREP) &&
-           testReader(data + "/f3d.xbf", vtkF3DOCCTReader::FILE_FORMAT::XBF))
-    ? EXIT_SUCCESS
-    : EXIT_FAILURE;
+  bool ret = true;
+  ret &= testReader(data + "/f3d.stp", vtkF3DOCCTReader::FILE_FORMAT::STEP);
+  ret &= testReader(data + "/f3d.igs", vtkF3DOCCTReader::FILE_FORMAT::IGES);
+  ret &= testReader(data + "/f3d.brep", vtkF3DOCCTReader::FILE_FORMAT::BREP);
+  ret &= testReader(data + "/f3d.bin.brep", vtkF3DOCCTReader::FILE_FORMAT::BREP);
+#if F3D_PLUGIN_OCCT_XCAF
+  ret &= testReader(data + "/f3d.xbf", vtkF3DOCCTReader::FILE_FORMAT::XBF);
+#endif
+  return ret ? EXIT_SUCCESS : EXIT_FAILURE;
 }

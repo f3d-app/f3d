@@ -43,6 +43,7 @@
 #include <algorithm>
 #include <atomic>
 #include <cassert>
+#include <cmath>
 #include <csignal>
 #include <filesystem>
 #include <fstream>
@@ -53,10 +54,21 @@
 #include <regex>
 #include <set>
 
+#ifdef _WIN32
+#include <fcntl.h>
+#include <io.h>
+#include <stdio.h>
+#define SET_STDIN_BINARY_MODE() _setmode(_fileno(stdin), O_BINARY)
+#else
+#define SET_STDIN_BINARY_MODE() ((void)0)
+#endif
+
 namespace fs = std::filesystem;
 
 // This pointer is used to retrieve the interactor in case an OS signal is handled
 f3d::interactor* GlobalInteractor = nullptr;
+
+constexpr std::string_view F3D_PIPED = "-";
 
 class F3DStarter::F3DInternals
 {
@@ -101,6 +113,7 @@ public:
     std::vector<int> Resolution;
     std::vector<int> Position;
     std::string ColorMapFile;
+    std::string OpacityMapFile;
     CameraConfiguration CamConf;
     std::string Reference;
     double RefThreshold;
@@ -109,6 +122,8 @@ public:
     std::string CommandScriptFile;
     std::string AntiAliasing;
     std::string AntiAliasingMode; // Deprecated
+    std::string PointSprites;
+    std::string PointSpritesType; // Deprecated
     bool TranslucencySupport;     // Deprecated
     std::string Blending;
   };
@@ -137,8 +152,6 @@ public:
       cam.setViewAngle(camConf.CameraViewAngle);
     }
 
-    bool reset = false;
-    double zoomFactor = 0.9;
     if (camConf.CameraPosition.size() != 3 && camConf.CameraDirection.has_value())
     {
       f3d::vector3_t dir = camConf.CameraDirection.value();
@@ -150,24 +163,16 @@ public:
         pos[i] = foc[i] - dir[i];
       }
       cam.setPosition(pos);
-      reset = true;
-    }
-    if (camConf.CameraPosition.size() != 3)
-    {
-      if (camConf.CameraZoomFactor > 0)
-      {
-        zoomFactor = camConf.CameraZoomFactor;
-      }
-      reset = true;
-    }
-    if (reset)
-    {
-      cam.resetToBounds(zoomFactor);
     }
 
-    cam.azimuth(camConf.CameraAzimuthAngle)
-      .elevation(camConf.CameraElevationAngle)
-      .setCurrentAsDefault();
+    cam.azimuth(camConf.CameraAzimuthAngle).elevation(camConf.CameraElevationAngle);
+
+    if (camConf.CameraPosition.size() != 3)
+    {
+      cam.resetToBounds(camConf.CameraZoomFactor > 0 ? camConf.CameraZoomFactor : 0.9);
+    }
+
+    cam.setCurrentAsDefault();
   }
 
   static bool HasHDRIExtension(const std::string& file)
@@ -284,7 +289,40 @@ public:
   }
 
   /**
-   * Substitute the following variables in a filename template:
+   * Render image and save to file or stdout.
+   * Returns true on success, false on failure (error already logged).
+   */
+  bool renderAndSave(f3d::window& window, const f3d::utils::string_template& outputTemplate,
+    bool toStdout, std::optional<int> frame = std::nullopt)
+  {
+    f3d::image img = window.renderToImage(AppOptions.NoBackground);
+    addOutputImageMetadata(img);
+
+    if (toStdout)
+    {
+      const auto buffer = img.saveBuffer();
+      std::copy(buffer.begin(), buffer.end(), std::ostreambuf_iterator(std::cout));
+      f3d::log::debug("Output image saved to stdout");
+    }
+    else
+    {
+      const fs::path outputPath = finalizeFilenameTemplate(outputTemplate, frame);
+      try
+      {
+        img.save(outputPath);
+      }
+      catch (const f3d::image::write_exception& ex)
+      {
+        f3d::log::error("Could not write output: ", ex.what());
+        return false;
+      }
+      f3d::log::debug("Output image saved to ", outputPath);
+    }
+    return true;
+  }
+
+  /**
+   * Create a filename template and substitute the following variables:
    * - `{app}`: application name (ie. `F3D`)
    * - `{version}`: application version (eg. `2.4.0`)
    * - `{version_full}`: full application version (eg. `2.4.0-abcdefgh`)
@@ -293,14 +331,9 @@ public:
    * - `{model_ext}`: current model filename extension (eg. `glb` for `/home/user/foo.glb`)
    * - `{date}`: current date in YYYYMMDD format
    * - `{date:format}`: current date as per C++'s `std::put_time` format
-   * - `{n}`: auto-incremented number to make filename unique (up to 1000000)
-   * - `{n:2}`, `{n:3}`, ...: zero-padded auto-incremented number to make filename unique
-   *   (up to 1000000)
    */
-  fs::path applyFilenameTemplate(const fs::path& templatePath)
+  f3d::utils::string_template prepareFilenameTemplate(const fs::path& templatePath)
   {
-    constexpr size_t maxNumberingAttempts = 1000000;
-    const std::regex numberingRe("(n:?(.*))");
     const std::regex dateRe("date:?(.*)");
 
     /* Return a file related string depending on the currently loaded files, or the empty string if
@@ -386,20 +419,56 @@ public:
     f3d::utils::string_template stringTemplate(templatePath.string());
     stringTemplate.substitute(variableLookup);
 
-    const auto hasNumbering = [&]()
+    return stringTemplate;
+  }
+
+  /**
+   * Substitute the following variables and return as an `fs::path`
+   * - `{frame}`: current animation frame number (when outputting multiple frames)
+   * - `{frame:2}`, `{frame:3}`, ...: zero-padded animation frame number
+   * - `{n}`: auto-incremented number to make filename unique (up to 1000000)
+   * - `{n:2}`, `{n:3}`, ...: zero-padded auto-incremented number to make filename unique
+   *   (up to 1000000)
+   */
+  fs::path finalizeFilenameTemplate(
+    f3d::utils::string_template stringTemplate, std::optional<int> frame = std::nullopt)
+  {
+    const std::regex frameRe("frame(:(.*))?");
+    const std::regex numberingRe("n(:(.*))?");
+    constexpr size_t maxNumberingAttempts = 1000000;
+
+    const auto variableLookup = [&](const std::string& var)
     {
-      for (const auto& variable : stringTemplate.variables())
+      if (std::regex_match(var, frameRe))
       {
-        if (std::regex_search(variable, numberingRe))
+        if (!frame.has_value())
         {
-          return true;
+          f3d::log::warn("{frame} variable can only be used when outputting animation frames");
+          throw f3d::utils::string_template::lookup_error(var);
         }
+        std::stringstream formattedFrame;
+        const std::string fmt = std::regex_replace(var, frameRe, "$2");
+        try
+        {
+          formattedFrame << std::setfill('0') << std::setw(std::stoi(fmt)) << frame.value();
+        }
+        catch (std::invalid_argument&)
+        {
+          if (!fmt.empty())
+          {
+            f3d::log::warn("ignoring invalid frame format for \"", var, "\"");
+          }
+          formattedFrame << std::setw(0) << frame.value();
+        }
+        return formattedFrame.str();
       }
-      return false;
+      throw f3d::utils::string_template::lookup_error(var);
     };
 
+    stringTemplate.substitute(variableLookup);
+
     /* return if there's no numbering to be done */
-    if (!hasNumbering())
+    if (!stringTemplate.hasVariable(numberingRe))
     {
       return { stringTemplate.str() };
     }
@@ -564,117 +633,114 @@ public:
                 continue;
               }
 
-              // Handle CLI options deprecation
+              // Handle CLI options deprecation simple warnings
               if (key == "animation-index")
               {
                 f3d::log::warn("animation-index is deprecated, please use animation-indices");
               }
 
               // Convert key into a libf3d option name if possible
-              std::string libf3dOptionName = key;
               std::string keyForLog = key;
-              auto libf3dIter = F3DOptionsTools::LibOptionsNames.find(libf3dOptionName);
-              if (libf3dIter != F3DOptionsTools::LibOptionsNames.end())
+              for (const auto& libf3dOption : F3DOptionsTools::ConvertToLibf3dOptions(key, value))
               {
-                libf3dOptionName = std::string(libf3dIter->second);
-              }
+                auto [libf3dOptionName, libf3dOptionValue] = libf3dOption;
 
-              std::string libf3dOptionValue = value;
-              bool reset = false;
+                bool reset = false;
 
-              // Handle options reset
-              // XXX: Use starts_with once C++20 is supported
-              if (libf3dOptionName.rfind("reset-", 0) == 0)
-              {
-                if (libf3dOptionName.size() > 6)
+                // Handle options reset
+                // XXX: Use starts_with once C++20 is supported
+                if (libf3dOptionName.rfind("reset-", 0) == 0)
                 {
-                  reset = true;
-                  libf3dOptionName = libf3dOptionName.substr(6);
-                  keyForLog = libf3dOptionName;
-                  libf3dOptionValue = "reset";
+                  if (libf3dOptionName.size() > 6)
+                  {
+                    reset = true;
+                    libf3dOptionName = libf3dOptionName.substr(6);
+                    keyForLog = libf3dOptionName;
+                    libf3dOptionValue = "reset";
+                  }
+                  else
+                  {
+                    f3d::log::warn("Invalid option: 'reset' must be followed by a valid option "
+                                   "name, ignoring entry");
+                    continue;
+                  }
                 }
-                else
+
+                // Handle reader options
+                std::vector<std::string> readerOptionNames = f3d::engine::getAllReaderOptionNames();
+                if (std::find(readerOptionNames.begin(), readerOptionNames.end(),
+                      libf3dOptionName) != readerOptionNames.end())
                 {
-                  f3d::log::warn("Invalid option: 'reset' must be followed by a valid option "
-                                 "name, ignoring entry");
+                  f3d::engine::setReaderOption(libf3dOptionName, libf3dOptionValue);
                   continue;
                 }
-              }
 
-              // Handle reader options
-              std::vector<std::string> readerOptionNames = f3d::engine::getAllReaderOptionNames();
-              if (std::find(readerOptionNames.begin(), readerOptionNames.end(), libf3dOptionName) !=
-                readerOptionNames.end())
-              {
-                f3d::engine::setReaderOption(libf3dOptionName, libf3dOptionValue);
-                continue;
-              }
-
-              try
-              {
-                // Assume this is a libf3d option and set/reset the value
-                if (reset)
+                try
                 {
-                  libOptions.reset(libf3dOptionName);
-                }
-                else
-                {
-                  libOptions.setAsString(libf3dOptionName, libf3dOptionValue);
-                }
-
-                // Log the option if needed
-                if (logOptions)
-                {
-                  loggingMap[libf3dOptionName] =
-                    std::tuple(keyForLog, source, matchType, match, libf3dOptionValue);
-                }
-              }
-              catch (const f3d::options::parsing_exception& ex)
-              {
-                if (!quiet)
-                {
-                  std::string origin;
-                  if (source.empty())
+                  // Assume this is a libf3d option and set/reset the value
+                  if (reset)
                   {
-                    origin = match;
+                    libOptions.reset(libf3dOptionName);
                   }
                   else
                   {
-                    // TODO: Use std::format once C++20 is supported
-                    origin = source;
-                    origin += ":`";
-                    origin += match;
-                    origin += "` (";
-                    origin += matchType;
-                    origin += ")";
+                    libOptions.setAsString(libf3dOptionName, libf3dOptionValue);
                   }
-                  f3d::log::warn("Could not set '", keyForLog, "' to '", libf3dOptionValue,
-                    "' from ", origin, " because: ", ex.what());
+
+                  // Log the option if needed
+                  if (logOptions)
+                  {
+                    loggingMap[libf3dOptionName] =
+                      std::tuple(keyForLog, source, matchType, match, libf3dOptionValue);
+                  }
                 }
-              }
-              catch (const f3d::options::inexistent_exception&)
-              {
-                if (!quiet)
+                catch (const f3d::options::parsing_exception& ex)
                 {
-                  std::string origin;
-                  if (source.empty())
+                  if (!quiet)
                   {
-                    origin = match;
+                    std::string origin;
+                    if (source.empty())
+                    {
+                      origin = match;
+                    }
+                    else
+                    {
+                      // TODO: Use std::format once C++20 is supported
+                      origin = source;
+                      origin += ":`";
+                      origin += match;
+                      origin += "` (";
+                      origin += matchType;
+                      origin += ")";
+                    }
+                    f3d::log::warn("Could not set '", keyForLog, "' to '", libf3dOptionValue,
+                      "' from ", origin, " because: ", ex.what());
                   }
-                  else
+                }
+                catch (const f3d::options::inexistent_exception&)
+                {
+                  if (!quiet)
                   {
-                    // TODO: Use std::format once C++20 is supported
-                    origin = source;
-                    origin += ":`";
-                    origin += match;
-                    origin += "` (";
-                    origin += matchType;
-                    origin += ")";
+                    std::string origin;
+                    if (source.empty())
+                    {
+                      origin = match;
+                    }
+                    else
+                    {
+                      // TODO: Use std::format once C++20 is supported
+                      origin = source;
+                      origin += ":`";
+                      origin += match;
+                      origin += "` (";
+                      origin += matchType;
+                      origin += ")";
+                    }
+                    auto [closestName, dist] =
+                      F3DOptionsTools::GetClosestOption(libf3dOptionName, true);
+                    f3d::log::warn("'", keyForLog, "' option from ", origin,
+                      " does not exists , did you mean '", closestName, "'?");
                   }
-                  auto [closestName, dist] =
-                    F3DOptionsTools::GetClosestOption(libf3dOptionName, true);
-                  f3d::log::warn("'", keyForLog, "' option from ", origin,
-                    " does not exists , did you mean '", closestName, "'?");
                 }
               }
             }
@@ -689,7 +755,8 @@ public:
     this->UpdateTypedAppOptions(appOptions);
 
     // Update Verbose level as soon as possible
-    F3DInternals::SetVerboseLevel(this->AppOptions.VerboseLevel, this->AppOptions.Output == "-");
+    F3DInternals::SetVerboseLevel(
+      this->AppOptions.VerboseLevel, this->AppOptions.Output == F3D_PIPED);
 
     // Load any new plugins
     F3DPluginsTools::LoadPlugins(this->AppOptions.Plugins);
@@ -697,34 +764,30 @@ public:
     // Update libf3d options
     this->LibOptions = libOptions;
 
-    // Update options that requires a custom logic
-    this->UpdateCustomLogicOptions();
+    // Update options that depends on both libf3d and app options
+    // Note that this should not be used for interactive options
+    // As this break the logic of updating options by priority
+    // TODO: Rework to avoid this
+    this->UpdateInterdependantOptions();
   }
 
-  template<typename T>
-  bool Parse(const std::string& optionString, T& option)
-  {
-    try
-    {
-      option = f3d::options::parse<T>(optionString);
-      return true;
-    }
-    catch (const f3d::options::parsing_exception&)
-    {
-      return false;
-    }
-  }
-
+  /**
+   * Parse a named string option from appOptions into provided typed option.
+   */
   template<typename T>
   void ParseOption(
     const F3DOptionsTools::OptionsDict& appOptions, const std::string& name, T& option)
   {
-    if (!this->Parse(appOptions.at(name), option))
+    if (!F3DOptionsTools::Parse(appOptions.at(name), option))
     {
       f3d::log::warn("Could not parse '" + appOptions.at(name) + "' into '" + name + "' option");
     }
   }
 
+  /**
+   * Parse a named string option from appOptions into provided typed optional option.
+   * If the string is empty, set it to nullopt
+   */
   template<typename T>
   void ParseOption(const F3DOptionsTools::OptionsDict& appOptions, const std::string& name,
     std::optional<T>& option)
@@ -736,7 +799,7 @@ public:
     }
     else
     {
-      T localOption;
+      T localOption{};
       this->ParseOption(appOptions, name, localOption);
       option = localOption;
     }
@@ -765,6 +828,7 @@ public:
     this->ParseOption(appOptions, "resolution", this->AppOptions.Resolution);
     this->ParseOption(appOptions, "position", this->AppOptions.Position);
     this->ParseOption(appOptions, "colormap-file", this->AppOptions.ColorMapFile);
+    this->ParseOption(appOptions, "volume-opacity-file", this->AppOptions.OpacityMapFile);
 
     this->ParseOption(appOptions, "camera-position", this->AppOptions.CamConf.CameraPosition);
     this->ParseOption(appOptions, "camera-focal-point", this->AppOptions.CamConf.CameraFocalPoint);
@@ -784,55 +848,10 @@ public:
     this->ParseOption(
       appOptions, "interaction-test-play", this->AppOptions.InteractionTestPlayFile);
     this->ParseOption(appOptions, "command-script", this->AppOptions.CommandScriptFile);
-    this->ParseOption(appOptions, "anti-aliasing", this->AppOptions.AntiAliasing);
-    this->ParseOption(appOptions, "anti-aliasing-mode", this->AppOptions.AntiAliasingMode);
-    this->ParseOption(appOptions, "translucency-support", this->AppOptions.TranslucencySupport);
-    this->ParseOption(appOptions, "blending", this->AppOptions.Blending);
   }
 
-  void UpdateCustomLogicOptions()
+  void UpdateInterdependantOptions()
   {
-    // AntiAliasing is handled in two options in lib
-    if (this->AppOptions.AntiAliasing != "none")
-    {
-      // Handle deprecated boolean option
-      bool deprecatedBooleanOption;
-      if (this->Parse(this->AppOptions.AntiAliasing, deprecatedBooleanOption))
-      {
-        f3d::log::warn("--anti-aliasing is a now a string, please specify the type of "
-                       "anti-aliasing or use the implicit default");
-        this->LibOptions.render.effect.antialiasing.enable = deprecatedBooleanOption;
-      }
-      else
-      {
-        this->LibOptions.render.effect.antialiasing.enable = true;
-        this->LibOptions.render.effect.antialiasing.mode = this->AppOptions.AntiAliasing;
-      }
-    }
-    else
-    {
-      this->LibOptions.render.effect.antialiasing.enable = false;
-    }
-
-    if (!this->AppOptions.AntiAliasingMode.empty())
-    {
-      f3d::log::warn("--anti-aliasing-mode is deprecated");
-      this->LibOptions.render.effect.antialiasing.mode = this->AppOptions.AntiAliasingMode;
-    }
-
-    if (this->AppOptions.Blending != "none")
-    {
-      this->LibOptions.render.effect.blending.enable = true;
-      this->LibOptions.render.effect.blending.mode = this->AppOptions.Blending;
-    }
-
-    if (this->AppOptions.TranslucencySupport)
-    {
-      f3d::log::warn("--translucency-support is deprecated, please use --blending instead");
-      this->LibOptions.render.effect.blending.enable = true;
-      this->LibOptions.render.effect.blending.mode = "ddp";
-    }
-
     // colormap-file and colormap are interdependent
     const std::string& colorMapFile = this->AppOptions.ColorMapFile;
     if (!colorMapFile.empty())
@@ -849,6 +868,22 @@ public:
         this->LibOptions.model.scivis.colormap = f3d::colormap_t();
       }
     }
+
+    // opacity_map file and opacity_map are interdependent
+    const std::string& opacityMapFile = this->AppOptions.OpacityMapFile;
+    if (!opacityMapFile.empty() && std::filesystem::exists(opacityMapFile) &&
+      std::filesystem::is_regular_file(opacityMapFile))
+    {
+      fs::path fullPath(f3d::utils::collapsePath(opacityMapFile));
+      this->LibOptions.model.scivis.opacity_map = F3DColorMapTools::ReadOpacity(fullPath);
+
+      std::vector<double>& opacityMap = this->LibOptions.model.scivis.opacity_map;
+      if (opacityMap.empty())
+      {
+        f3d::log::error("Cannot read the opacity map ", opacityMapFile);
+        this->LibOptions.model.scivis.opacity_map = { 0.0, 0.0, 1.0, 1.0 };
+      }
+    }
   }
 
   void ApplyPositionAndResolution()
@@ -858,7 +893,10 @@ public:
       f3d::window& window = this->Engine->getWindow();
       if (this->AppOptions.Resolution.size() == 2)
       {
-        window.setSize(this->AppOptions.Resolution[0], this->AppOptions.Resolution[1]);
+        double dpiScale = this->LibOptions.ui.dpi_aware ? f3d::utils::getDPIScale() : 1.0;
+
+        window.setSize(static_cast<int>(this->AppOptions.Resolution[0] * dpiScale),
+          static_cast<int>(this->AppOptions.Resolution[1] * dpiScale));
       }
       else if (!this->AppOptions.Resolution.empty())
       {
@@ -989,7 +1027,7 @@ public:
   {
     if (GlobalInteractor)
     {
-      GlobalInteractor->stop();
+      GlobalInteractor->requestStop();
       GlobalInteractor = nullptr;
     }
   }
@@ -1001,11 +1039,14 @@ public:
   F3DOptionsTools::OptionsEntries DynamicOptionsEntries;
   F3DOptionsTools::OptionsEntries ImperativeConfigOptionsEntries;
   F3DConfigFileTools::BindingsEntries ConfigBindingsEntries;
+  std::vector<fs::path> ConfigPaths;
+  std::string UserConfig;
   std::unique_ptr<f3d::engine> Engine;
   std::vector<std::pair<std::string, std::vector<fs::path>>> FilesGroups;
   std::vector<fs::path> LoadedFiles;
   std::set<fs::path> FilesToWatch;
   int CurrentFilesGroupIndex = -1;
+  std::vector<std::byte> PipedBuffer;
 
 #if F3D_MODULE_DMON
   // dmon related
@@ -1057,7 +1098,7 @@ int F3DStarter::Start(int argc, char** argv)
   iter = cliOptionsDict.find("no-config");
   if (iter != cliOptionsDict.end())
   {
-    if (!this->Internals->Parse(iter->second, noConfig))
+    if (!F3DOptionsTools::Parse(iter->second, noConfig))
     {
       f3d::log::warn(
         "Could not parse '" + iter->second + "' into 'no-config' option, assuming false");
@@ -1071,9 +1112,11 @@ int F3DStarter::Start(int argc, char** argv)
     if (iter != cliOptionsDict.end())
     {
       // XXX: Discarding bool return because this cannot return false with a string
-      this->Internals->Parse(iter->second, config);
+      F3DOptionsTools::Parse(iter->second, config);
     }
   }
+
+  this->Internals->UserConfig = config;
 
   bool renderToStdout = false;
   iter = cliOptionsDict.find("output");
@@ -1081,8 +1124,8 @@ int F3DStarter::Start(int argc, char** argv)
   {
     std::string localOutput;
     // XXX: Discarding bool return because this cannot return false with a string
-    this->Internals->Parse(iter->second, localOutput);
-    renderToStdout = localOutput == "-";
+    F3DOptionsTools::Parse(iter->second, localOutput);
+    renderToStdout = localOutput == F3D_PIPED;
   }
 
   this->Internals->AppOptions.VerboseLevel = "info";
@@ -1090,7 +1133,7 @@ int F3DStarter::Start(int argc, char** argv)
   if (iter != cliOptionsDict.end())
   {
     // XXX: Discarding bool return because this cannot return false with a string
-    this->Internals->Parse(iter->second, this->Internals->AppOptions.VerboseLevel);
+    F3DOptionsTools::Parse(iter->second, this->Internals->AppOptions.VerboseLevel);
   }
 
   // Set verbosity level early from command line
@@ -1103,6 +1146,7 @@ int F3DStarter::Start(int argc, char** argv)
   {
     F3DConfigFileTools::ParsedConfigFiles parsedConfigFiles =
       F3DConfigFileTools::ReadConfigFiles(config);
+    this->Internals->ConfigPaths = parsedConfigFiles.ConfigPaths;
     this->Internals->ConfigOptionsEntries = parsedConfigFiles.Options;
     this->Internals->ImperativeConfigOptionsEntries = parsedConfigFiles.ImperativeOptions;
     this->Internals->ConfigBindingsEntries = parsedConfigFiles.Bindings;
@@ -1215,7 +1259,7 @@ int F3DStarter::Start(int argc, char** argv)
   // Add all input files
   for (auto& file : inputFiles)
   {
-    this->AddFile(f3d::utils::collapsePath(file));
+    this->AddFile(file == F3D_PIPED ? fs::path(file) : f3d::utils::collapsePath(file));
   }
 
   // Load a file
@@ -1303,10 +1347,10 @@ int F3DStarter::Start(int argc, char** argv)
     std::optional<std::string> noDataForceRender =
       f3d::utils::getEnv("CTEST_F3D_NO_DATA_FORCE_RENDER");
 
-    fs::path reference = f3d::utils::collapsePath(this->Internals->AppOptions.Reference);
-    fs::path output = this->Internals->applyFilenameTemplate(
+    const f3d::utils::string_template outputTemplate = this->Internals->prepareFilenameTemplate(
       f3d::utils::collapsePath(this->Internals->AppOptions.Output));
 
+    fs::path reference = f3d::utils::collapsePath(this->Internals->AppOptions.Reference);
     // Render and compare with file if needed
     if (!reference.empty())
     {
@@ -1315,7 +1359,7 @@ int F3DStarter::Start(int argc, char** argv)
         f3d::log::error("No file loaded, no rendering performed");
         return EXIT_FAILURE;
       }
-
+      const fs::path output = this->Internals->finalizeFilenameTemplate(outputTemplate);
       try
       {
         if (!fs::exists(reference))
@@ -1391,7 +1435,7 @@ int F3DStarter::Start(int argc, char** argv)
       }
     }
     // Render to file if needed
-    else if (!output.empty())
+    else if (!this->Internals->AppOptions.Output.empty())
     {
       if (this->Internals->LoadedFiles.empty() && !noDataForceRender.has_value())
       {
@@ -1399,28 +1443,48 @@ int F3DStarter::Start(int argc, char** argv)
         return EXIT_FAILURE;
       }
 
-      f3d::image img = window.renderToImage(this->Internals->AppOptions.NoBackground);
-      this->Internals->addOutputImageMetadata(img);
-
-      if (renderToStdout)
+      if (outputTemplate.hasVariable(std::regex("frame(:.*)?")))
       {
-        const auto buffer = img.saveBuffer();
-        std::copy(buffer.begin(), buffer.end(), std::ostreambuf_iterator(std::cout));
-        f3d::log::debug("Output image saved to stdout");
+        f3d::scene& animScene = this->Internals->Engine->getScene();
+        const auto [minTime, maxTime] = animScene.animationTimeRange();
+
+        const double startTime = this->Internals->AppOptions.AnimationTime.value_or(minTime);
+        const double endTime = maxTime;
+        const double duration = endTime - startTime;
+        const int count = duration > 0
+          ? static_cast<int>(std::ceil(duration * this->Internals->AppOptions.FrameRate)) + 1
+          : 1;
+
+        if (count == 1)
+        {
+          f3d::log::warn("No animation available or animation has zero duration, outputting single "
+                         "frame");
+        }
+
+        const double timeStep = 1.0 / this->Internals->AppOptions.FrameRate;
+
+        f3d::log::info(
+          "Saving ", count, " animation frame(s) from time ", startTime, " to ", endTime);
+
+        for (int frame = 0; frame < count; ++frame)
+        {
+          const double currentTime = startTime + frame * timeStep;
+          animScene.loadAnimationTime(currentTime);
+
+          if (!this->Internals->renderAndSave(window, outputTemplate, renderToStdout, frame))
+          {
+            return EXIT_FAILURE;
+          }
+        }
+
+        f3d::log::info("Saved ", count, " animation frame(s)");
       }
       else
       {
-        try
+        if (!this->Internals->renderAndSave(window, outputTemplate, renderToStdout))
         {
-          img.save(output);
-        }
-        catch (const f3d::image::write_exception& ex)
-        {
-          f3d::log::error("Could not write output: ", ex.what());
           return EXIT_FAILURE;
         }
-
-        f3d::log::debug("Output image saved to ", output);
       }
 
       if (this->Internals->FilesGroups.size() > 1)
@@ -1571,126 +1635,185 @@ void F3DStarter::LoadFileGroupInternal(
   bool unsupported = false;
 
   std::vector<fs::path> localPaths;
-  try
-  {
+
 #if F3D_MODULE_DMON
-    // In the main thread, we only need to guard writing
-    const std::lock_guard<std::mutex> lock(this->Internals->FilesToWatchMutex);
+  // In the main thread, we only need to guard writing
+  const std::lock_guard<std::mutex> lock(this->Internals->FilesToWatchMutex);
 #endif
 
-    if (clear)
-    {
-      scene.clear();
-      this->Internals->LoadedFiles.clear();
-      this->Internals->FilesToWatch.clear();
-    }
+  if (clear)
+  {
+    scene.clear();
+    this->Internals->LoadedFiles.clear();
+    this->Internals->FilesToWatch.clear();
+  }
 
-    if (paths.empty())
-    {
-      // Update options even when there is no file
-      // as imperative options should override dynamic option even in that case
-      this->Internals->UpdateOptions(
-        { this->Internals->ConfigOptionsEntries, this->Internals->CLIOptionsEntries,
-          this->Internals->DynamicOptionsEntries, this->Internals->ImperativeConfigOptionsEntries },
-        { "" }, false);
-      this->Internals->Engine->setOptions(this->Internals->LibOptions);
-      f3d::log::debug("No files to load provided");
-    }
-    else
-    {
-      // Update app and libf3d options based on config entries, selecting block using the input file
-      // config < cli < dynamic
-      // Options must be updated before checking the supported files in order to load plugins
-      std::vector<fs::path> configPaths = this->Internals->LoadedFiles;
-      std::copy(paths.begin(), paths.end(), std::back_inserter(configPaths));
-      this->Internals->UpdateOptions(
-        { this->Internals->ConfigOptionsEntries, this->Internals->CLIOptionsEntries,
-          this->Internals->DynamicOptionsEntries, this->Internals->ImperativeConfigOptionsEntries },
-        configPaths, false);
-      this->Internals->UpdateBindings(configPaths);
+  if (paths.empty())
+  {
+    // Update options even when there is no file
+    // as imperative options should override dynamic option even in that case
+    this->Internals->UpdateOptions(
+      { this->Internals->ConfigOptionsEntries, this->Internals->CLIOptionsEntries,
+        this->Internals->DynamicOptionsEntries, this->Internals->ImperativeConfigOptionsEntries },
+      { "" }, false);
+    this->Internals->Engine->setOptions(this->Internals->LibOptions);
+    f3d::log::debug("No files to load provided");
+  }
+  else
+  {
+    // Update app and libf3d options based on config entries, selecting block using the input file
+    // config < cli < dynamic
+    // Options must be updated before checking the supported files in order to load plugins
+    std::vector<fs::path> configPaths = this->Internals->LoadedFiles;
+    std::copy(paths.begin(), paths.end(), std::back_inserter(configPaths));
+    this->Internals->UpdateOptions(
+      { this->Internals->ConfigOptionsEntries, this->Internals->CLIOptionsEntries,
+        this->Internals->DynamicOptionsEntries, this->Internals->ImperativeConfigOptionsEntries },
+      configPaths, false);
+    this->Internals->UpdateBindings(configPaths);
 
-      this->Internals->Engine->setOptions(this->Internals->LibOptions);
+    this->Internals->Engine->setOptions(this->Internals->LibOptions);
 
-      f3d::log::debug("Checking files:");
-      for (const fs::path& tmpPath : paths)
+    f3d::log::debug("Checking files:");
+    for (const fs::path& tmpPath : paths)
+    {
+      if (std::find(this->Internals->LoadedFiles.begin(), this->Internals->LoadedFiles.end(),
+            tmpPath) == this->Internals->LoadedFiles.end())
       {
-        if (std::find(this->Internals->LoadedFiles.begin(), this->Internals->LoadedFiles.end(),
-              tmpPath) == this->Internals->LoadedFiles.end())
+        if (tmpPath == F3D_PIPED)
         {
-          // Always add files to the watch set
-          if (this->Internals->AppOptions.Watch)
-          {
-            this->Internals->FilesToWatch.insert(tmpPath);
-          }
+          // When piping, skip watch and file checks
+          localPaths.emplace_back(tmpPath);
+          continue;
+        }
 
-          try
+        // Always add actual files to the watch set
+        if (this->Internals->AppOptions.Watch)
+        {
+          this->Internals->FilesToWatch.insert(tmpPath);
+        }
+
+        try
+        {
+          if (!fs::exists(tmpPath))
           {
-            if (!fs::exists(tmpPath))
+            f3d::log::error(tmpPath.string(), " does not exist");
+          }
+          else if (scene.supports(tmpPath))
+          {
+            // Check the size of the file before loading it
+            static constexpr int BYTES_IN_MIB = 1048576;
+            if (this->Internals->AppOptions.MaxSize.has_value() &&
+              fs::file_size(tmpPath) >
+                static_cast<std::uintmax_t>(
+                  this->Internals->AppOptions.MaxSize.value() * BYTES_IN_MIB))
             {
-              f3d::log::error(tmpPath.string(), " does not exist");
-            }
-            else if (scene.supports(tmpPath))
-            {
-              // Check the size of the file before loading it
-              static constexpr int BYTES_IN_MIB = 1048576;
-              if (this->Internals->AppOptions.MaxSize.has_value() &&
-                fs::file_size(tmpPath) >
-                  static_cast<std::uintmax_t>(
-                    this->Internals->AppOptions.MaxSize.value() * BYTES_IN_MIB))
-              {
-                f3d::log::info(tmpPath.string(), " skipped, file is bigger than max size");
-              }
-              else
-              {
-                localPaths.emplace_back(tmpPath);
-              }
+              f3d::log::info(tmpPath.string(), " skipped, file is bigger than max size");
             }
             else
             {
-              auto forceReader = this->Internals->LibOptions.scene.force_reader;
-              if (forceReader)
-              {
-                f3d::log::warn("Forced reader ", *forceReader, " doesn't exist");
-              }
-              else
-              {
-                f3d::log::warn(tmpPath.string(), " is not a file of a supported file format");
-              }
-              unsupported = true;
+              localPaths.emplace_back(tmpPath);
             }
           }
-          catch (const fs::filesystem_error& ex)
+          else
           {
-            // Unreachable
-            f3d::log::error("Error loading file: ", ex.what());
+            auto forceReader = this->Internals->LibOptions.scene.force_reader;
+            if (forceReader)
+            {
+              f3d::log::warn("Forced reader ", *forceReader, " doesn't exist");
+            }
+            else
+            {
+              f3d::log::warn(tmpPath.string(), " is not a file of a supported file format");
+            }
+            unsupported = true;
           }
+        }
+        catch (const fs::filesystem_error& ex)
+        {
+          // Unreachable
+          f3d::log::error("Error loading file: ", ex.what());
+        }
+      }
+    }
+
+    if (!localPaths.empty())
+    {
+      auto cinIt = std::find(localPaths.begin(), localPaths.end(), F3D_PIPED);
+      if (cinIt != localPaths.end())
+      {
+        // Remove cin from path
+        localPaths.erase(cinIt);
+
+        if (this->Internals->PipedBuffer.empty())
+        {
+          this->Internals->PipedBuffer.clear();
+          std::size_t readLength = 1024;
+          std::size_t readSize = 0;
+
+          std::istream& is = std::cin;
+          SET_STDIN_BINARY_MODE();
+
+          // Read input stream into a buffer
+          // this can make f3d hang until an input stream is provided
+          while (is)
+          {
+            // Increase size as needed
+            this->Internals->PipedBuffer.resize(this->Internals->PipedBuffer.size() + readLength);
+
+            // Read only what is needed
+            is.read(
+              reinterpret_cast<char*>(this->Internals->PipedBuffer.data()) + readSize, readLength);
+
+            // Recover size of what was read
+            readSize += is.gcount();
+
+            // Multiple size of read by 2 and start again
+            readLength *= 2;
+          }
+
+          this->Internals->PipedBuffer.resize(readSize);
+        }
+
+        try
+        {
+          // Add buffer to the scene
+          scene.add(this->Internals->PipedBuffer.data(), this->Internals->PipedBuffer.size());
+          this->Internals->LoadedFiles.emplace_back(F3D_PIPED);
+        }
+        catch (const f3d::scene::load_failure_exception& ex)
+        {
+          f3d::log::error("Input stream could not be loaded: ", ex.what());
         }
       }
 
       if (!localPaths.empty())
       {
-        // Add files to the scene
-        scene.add(localPaths);
-
-        if (this->Internals->AppOptions.AnimationTime.has_value())
+        try
         {
-          f3d::log::debug(
-            "Loading animation time: ", this->Internals->AppOptions.AnimationTime.value());
-          scene.loadAnimationTime(this->Internals->AppOptions.AnimationTime.value());
-        }
+          // Add files to the scene
+          scene.add(localPaths);
 
-        // Update loaded files
-        std::copy(
-          localPaths.begin(), localPaths.end(), std::back_inserter(this->Internals->LoadedFiles));
+          if (this->Internals->AppOptions.AnimationTime.has_value())
+          {
+            f3d::log::debug(
+              "Loading animation time: ", this->Internals->AppOptions.AnimationTime.value());
+            scene.loadAnimationTime(this->Internals->AppOptions.AnimationTime.value());
+          }
+
+          // Update loaded files
+          std::copy(
+            localPaths.begin(), localPaths.end(), std::back_inserter(this->Internals->LoadedFiles));
+        }
+        catch (const f3d::scene::load_failure_exception& ex)
+        {
+          f3d::log::error("Some of these files could not be loaded: ", ex.what());
+          for (const fs::path& tmpPath : localPaths)
+          {
+            f3d::log::error("  ", tmpPath.string());
+          }
+        }
       }
-    }
-  }
-  catch (const f3d::scene::load_failure_exception& ex)
-  {
-    f3d::log::error("Some of these files could not be loaded: ", ex.what());
-    for (const fs::path& tmpPath : localPaths)
-    {
-      f3d::log::error("  ", tmpPath.string());
     }
   }
 
@@ -1797,8 +1920,8 @@ void F3DStarter::SaveScreenshot(const std::string& filenameTemplate, bool minima
   try
   {
     fs::path dir = F3DSystemTools::GetUserScreenshotDirectory();
-    path = this->Internals->applyFilenameTemplate(f3d::utils::collapsePath(filenameTemplate, dir));
-
+    path = this->Internals->finalizeFilenameTemplate(
+      this->Internals->prepareFilenameTemplate(f3d::utils::collapsePath(filenameTemplate, dir)));
     fs::create_directories(path.parent_path());
     f3d::log::info("saving screenshot to " + path.string());
   }
@@ -1842,7 +1965,7 @@ int F3DStarter::AddFile(const fs::path& path, bool quiet)
 {
   try
   {
-    auto tmpPath = fs::absolute(path);
+    fs::path tmpPath = path == F3D_PIPED ? path : fs::absolute(path);
 
     // If file is a directory, add files recursively
     if (fs::is_directory(tmpPath))
@@ -2066,10 +2189,34 @@ void F3DStarter::AddCommands()
             [&](const std::string& ext) { return "." + ext; });
         }
 
+        const auto filenameStartsWithPattern = [&filePattern](std::string_view filename)
+        {
+#if defined(_WIN32) || defined(__APPLE__)
+          // Windows and Linux filesystems are case-insensitive by default
+          // Perform a case insensitive search
+          if (filePattern.size() > filename.size())
+          {
+            return false;
+          }
+
+          return std::equal(filePattern.begin(), filePattern.end(), filename.begin(),
+            [](char a, char b)
+            {
+              return std::tolower(static_cast<unsigned char>(a)) ==
+                std::tolower(static_cast<unsigned char>(b));
+            });
+#else
+          // Linux filesystems are typically case-sensitive
+          // Perform a case sensitive search
+          // Using rfind to avoid dependency for C++20 starts_with
+          return filename.rfind(filePattern, 0) == 0;
+#endif
+        };
+
         for (const auto& path : dirContent)
         {
           // Select candidates that starts with filePattern
-          if (path.filename().string().rfind(filePattern, 0) == 0)
+          if (filenameStartsWithPattern(path.filename().string()))
           {
             // filter out candidate files with the unsupported extensions
             if (fs::is_regular_file(path) &&
@@ -2083,6 +2230,9 @@ void F3DStarter::AddCommands()
           }
         }
       }
+
+      // Sort for output readability and test reproducibility
+      std::sort(candidates.begin(), candidates.end());
 
       if (candidates.size() == 1 && fs::is_directory(candidates[0]))
       {
@@ -2133,6 +2283,13 @@ void F3DStarter::AddCommands()
 
     return candidates;
   };
+
+  interactor.addCommand("print_config_info",
+    [this](const std::vector<std::string>&)
+    {
+      auto parsed = F3DConfigFileTools::ReadConfigFiles(this->Internals->UserConfig);
+      F3DConfigFileTools::PrintConfigInfo(parsed.ConfigPaths);
+    });
 
   interactor.addCommand(
     "remove_current_file_group",

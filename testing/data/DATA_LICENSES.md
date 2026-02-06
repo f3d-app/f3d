@@ -32,6 +32,7 @@
 - hornedlizard_small_d\*.spz: Modified from [Niantic's SPZ samples](https://github.com/nianticlabs/spz): MIT
 - icosahedron.vdb: OpenVDB: [MPL-2.0](http://www.mozilla.org/MPL/2.0/)
 - iflamigm.3ds: VTK Data: BSD-3-Clause
+- IfcOpenHouse_IFC4.ifc: [ThatOpen/engine_web-ifc](https://github.com/ThatOpen/engine_web-ifc): [MPL-2.0](https://www.mozilla.org/en-US/MPL/2.0/)
 - IM-0001-1983.dcm: VTK Data: BSD-3-Clause
 - InterpolationTest.glb: glTF-Sample-Models: Public Domain
 - kloofendal_43d_clear_1k.exr: Polyhaven: [CC0](https://creativecommons.org/publicdomain/zero/1.0/)
@@ -67,6 +68,8 @@
 - WaterBottle.glb: glTF-Sample-Models: Public Domain
 - Wolf.fbx: OLEKSO: [CC-NC 4.0](http://creativecommons.org/licenses/by-nc/4.0/)
 - world\*: VTK Data: BSD-3-Clause
+- xform_anim.abc: Public Domain
+- joint1.abc: Public Domain
 - zombie\*.mdl: LibreQuake Project: BSD-3-Clause
 
 All other datasets are licensed under the BSD-3-Clause F3D license.

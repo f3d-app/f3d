@@ -155,13 +155,25 @@ EMSCRIPTEN_BINDINGS(f3d)
         }
       },
       emscripten::return_value_policy::reference())
+    .function(
+      "addBuffer",
+      +[](f3d::scene& scene, emscripten::val jsbuf) -> f3d::scene&
+      {
+        std::vector<std::byte> data = emscripten::vecFromJSArray<std::byte>(jsbuf);
+        return scene.add(data.data(), data.size());
+      },
+      emscripten::return_value_policy::reference())
     .function("clear", &f3d::scene::clear, emscripten::return_value_policy::reference())
     .function("loadAnimationTime", &f3d::scene::loadAnimationTime,
       emscripten::return_value_policy::reference())
     .function(
       "animationTimeRange",
       +[](f3d::scene& o) -> emscripten::val { return pairToJSArray(o.animationTimeRange()); })
-    .function("availableAnimations", &f3d::scene::availableAnimations);
+    .function("availableAnimations", &f3d::scene::availableAnimations)
+    .function("getAnimationName", &f3d::scene::getAnimationName)
+    .function(
+      "getAnimationNames",
+      +[](f3d::scene& scene) { return containerToJSArray(scene.getAnimationNames()); });
 
   // f3d::image
   emscripten::enum_<f3d::image::SaveFormat>("ImageSaveFormat")
@@ -304,6 +316,10 @@ EMSCRIPTEN_BINDINGS(f3d)
       });
 
   // f3d::interactor
+  emscripten::enum_<f3d::interactor::AnimationDirection>("InteractorAnimationDirection")
+    .value("FORWARD", f3d::interactor::AnimationDirection::FORWARD)
+    .value("BACKWARD", f3d::interactor::AnimationDirection::BACKWARD);
+
   // Not bound on purpose because usually used for external interactors:
   // trigger*
   // TODO:
@@ -330,13 +346,28 @@ EMSCRIPTEN_BINDINGS(f3d)
       "triggerCommand",
       +[](f3d::interactor& interactor, const std::string& command, bool keepComments) -> bool
       { return interactor.triggerCommand(command, keepComments); })
-    .function("toggleAnimation", &f3d::interactor::toggleAnimation,
+    .function(
+      "toggleAnimation",
+      +[](f3d::interactor& interactor, emscripten::val direction) -> f3d::interactor&
+      {
+        return direction.isUndefined()
+          ? interactor.toggleAnimation()
+          : interactor.toggleAnimation(direction.as<f3d::interactor::AnimationDirection>());
+      },
       emscripten::return_value_policy::reference())
-    .function("startAnimation", &f3d::interactor::startAnimation,
+    .function(
+      "startAnimation",
+      +[](f3d::interactor& interactor, emscripten::val direction) -> f3d::interactor&
+      {
+        return direction.isUndefined()
+          ? interactor.startAnimation()
+          : interactor.startAnimation(direction.as<f3d::interactor::AnimationDirection>());
+      },
       emscripten::return_value_policy::reference())
     .function("stopAnimation", &f3d::interactor::stopAnimation,
       emscripten::return_value_policy::reference())
     .function("isPlayingAnimation", &f3d::interactor::isPlayingAnimation)
+    .function("getAnimationDirection", &f3d::interactor::getAnimationDirection)
     .function("enableCameraMovement", &f3d::interactor::enableCameraMovement,
       emscripten::return_value_policy::reference())
     .function("disableCameraMovement", &f3d::interactor::disableCameraMovement,
@@ -346,7 +377,9 @@ EMSCRIPTEN_BINDINGS(f3d)
       emscripten::return_value_policy::reference())
     .function("stop", &f3d::interactor::stop, emscripten::return_value_policy::reference())
     .function("requestRender", &f3d::interactor::requestRender,
-      emscripten::return_value_policy::reference());
+      emscripten::return_value_policy::reference())
+    .function(
+      "requestStop", &f3d::interactor::requestStop, emscripten::return_value_policy::reference());
 
   // f3d::engine
   // Not bound on purpose because only one engine is supported:

@@ -53,9 +53,10 @@ The default scene always uses automatic camera.
 
 CLI: `--camera-index`.
 
-### `scene.up_direction` (_direction_, default: `+Y`, **on load**)
+### `scene.up_direction` (_direction_, default: `+Y`)
 
 Define the Up direction. It impacts the grid, the axis, the HDRI and the camera.
+
 CLI: `--up`.
 
 ### `scene.force_reader` (_string_, optional, **on load**)
@@ -182,6 +183,13 @@ Set a _custom colormap for the coloring_.See [colormap parsing](../user/08-PARSI
 
 CLI: `--colormap`.
 
+### `model.scivis.opacity_map` (_opacity_map_, default: "0.0,0.0,1.0,1.0")
+
+Set a _custom opacity map for the coloring_. The format of the opacity map should be `val, opacity, ...`.
+It is only used for volume rendering currently.
+
+CLI: `--opacity-map`.
+
 ### `model.scivis.component` (_int_, default: `-1`)
 
 Specify the component to color with. `-1` means _magnitude_. `-2` means _direct values_.
@@ -208,15 +216,21 @@ CLI: `--point-sprites`.
 
 ### `model.point_sprites.type` (_string_, default: `sphere`)
 
-Set the sprites type when showing point sprites (can be `sphere` or `gaussian`).
+Set the sprites type when showing point sprites (can be `sphere`, `gaussian`, `circle`, `stddev`, `bound` or `cross`).
 
-CLI: `--point-sprites-type`.
+CLI: `--point-sprites`.
 
 ### `model.point_sprites.size` (_double_, default: `10.0`)
 
 Set the _size_ of point sprites.
 
 CLI: `--point-sprites-size`.
+
+### `model.point_sprites.absolute_size` (_bool_, default: `false`)
+
+Do not scale the point sprites size by the scene bounding box.
+
+CLI: `--point-sprites-absolute-size`.
 
 ### `model.volume.enable` (_bool_, default: `false`)
 
@@ -246,7 +260,7 @@ CLI: `--blending`.
 
 ### `render.effect.blending.mode` (_string_, default: `ddp`)
 
-Set the blending technique. Valid options are: `ddp` (dual depth peeling, quality), `sort` (only for gaussians), `stochastic` (fast)
+Set the blending technique. Valid options are: `ddp` (dual depth peeling, quality), `sort` (only for gaussians), `sort_cpu` (only for gaussians, slow), `stochastic` (fast)
 
 CLI: `--blending`.
 
@@ -279,6 +293,13 @@ CLI: `--tone-mapping`.
 Add a final shader to the output image. See [user documentation](../user/10-FINAL_SHADER.md).
 
 CLI: `--final-shader`
+
+### `render.effect.display_depth` (_bool_, default: `false`)
+
+Display the depth buffer as a grayscale image or with a colormap if `model.scivis.enable` is specified.
+Only opaque objects are displayed, translucent and volumetric objects are ignored.
+
+CLI: `--display-depth`
 
 ### `render.line_width` (_double_, optional)
 
@@ -333,6 +354,12 @@ CLI: `--grid-subdivisions`.
 Set the color of grid lines.
 
 CLI: `--grid-color`.
+
+### `render.axes_grid` (_bool_, default: `false`)
+
+Show _axes grid_ in the scene.
+
+CLI: `--axes-grid`.
 
 ### `render.raytracing.enable` (_bool_, default: `false`)
 
@@ -413,6 +440,24 @@ Show _axes_ as a trihedron in the scene. Requires an interactor.
 
 CLI: `--axis`.
 
+### `ui.x_color` (_color_, default: `#f94306`)
+
+Set the X axis color in both widget and grid.
+
+CLI: `--x-color`.
+
+### `ui.y_color` (_color_, default: `#7aff7a`)
+
+Set the Y axis color in both widget and grid.
+
+CLI: `--y-color`.
+
+### `ui.z_color` (_color_, default: `#788bff`)
+
+Set the Z axis color in both widget and grid.
+
+CLI: `--z-color`.
+
 ### `ui.scalar_bar` (_bool_, default: `false`)
 
 Show _scalar bar_ of the coloring by data array.
@@ -457,6 +502,13 @@ CLI: `--font-file`.
 Scale fonts. Useful for HiDPI displays.
 
 CLI: `--font-scale`.
+
+### `ui.dpi_aware` (_bool_, default: `false`)
+
+Scale the _font scale_ and _resolution_ by the display scaling factor.
+Only supported on Windows platform.
+
+CLI: `--dpi-aware`.
 
 ### `ui.fps` (_bool_, default: `false`)
 

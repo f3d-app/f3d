@@ -46,7 +46,7 @@ constexpr float DROPZONE_MARGIN = 0.5f;
 constexpr float DROPZONE_PADDING_X = 5.0f;
 constexpr float DROPZONE_PADDING_Y = 2.0f;
 
-static std::vector<std::string> SplitBindings(const std::string& s, char delim)
+static std::vector<std::string> SplitBindings(const std::string& s, const char delim)
 {
   std::vector<std::string> result;
   std::stringstream ss(s);
@@ -59,6 +59,7 @@ static std::vector<std::string> SplitBindings(const std::string& s, char delim)
 
   return result;
 }
+
 }
 
 struct vtkF3DImguiActor::Internals
@@ -328,17 +329,17 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
     // ImGui API is not very helpful with this
     fontConfig.FontDataOwnedByAtlas = false;
     font = io.Fonts->AddFontFromMemoryTTF(
-      const_cast<void*>(reinterpret_cast<const void*>(F3DFontBuffer)), sizeof(F3DFontBuffer), 18,
-      &fontConfig, ranges.Data);
+      const_cast<void*>(reinterpret_cast<const void*>(F3DFontBuffer)), sizeof(F3DFontBuffer),
+      18 * this->FontScale, &fontConfig, ranges.Data);
   }
   else
   {
-    font = io.Fonts->AddFontFromFileTTF(this->FontFile.c_str(), 18, &fontConfig, ranges.Data);
+    font = io.Fonts->AddFontFromFileTTF(
+      this->FontFile.c_str(), 18 * this->FontScale, &fontConfig, ranges.Data);
   }
 
   io.Fonts->Build();
   io.FontDefault = font;
-  io.FontGlobalScale = this->FontScale;
 
   ImVec4 colTransparent = ImVec4(0.0f, 0.0f, 0.0f, 0.0f); // #000000
 
@@ -352,6 +353,7 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
   style->WindowBorderSize = 0.f;
   style->WindowPadding = ImVec2(10, 10);
   style->WindowRounding = 8.f;
+  style->ScaleAllSizes(this->FontScale);
   style->Colors[ImGuiCol_Text] = F3DStyle::imgui::GetTextColor();
   style->Colors[ImGuiCol_WindowBg] = F3DStyle::imgui::GetBackgroundColor();
   style->Colors[ImGuiCol_FrameBg] = colTransparent;
@@ -482,14 +484,12 @@ void vtkF3DImguiActor::RenderDropZone()
     {
       const auto& desc = pair.first;
       const auto& bind = pair.second;
-      float totalBindingsWidth = 0.0f;
 
       ImVec2 descSize = ImGui::CalcTextSize(desc.c_str());
       maxDescTextWidth = std::max(maxDescTextWidth, descSize.x);
 
       auto keys = ::SplitBindings(bind, '+');
-
-      totalBindingsWidth += std::accumulate(keys.begin(), keys.end(),
+      float totalBindingsWidth = std::accumulate(keys.begin(), keys.end(),
         0.0f, // use float init since CalcTextSize returns float
         [](float sum, const std::string& key)
         {
@@ -509,8 +509,8 @@ void vtkF3DImguiActor::RenderDropZone()
     const ImColor bindingRectColor = F3DStyle::imgui::GetMidColor();
     const ImColor bindingTextColor = F3DStyle::imgui::GetTextColor();
 
-    float tableWidth = maxDescTextWidth + maxBindingsTextWidth + ::DROPZONE_LOGO_TEXT_PADDING +
-      ImGui::GetStyle().ItemSpacing.x;
+    float tableWidth =
+      maxDescTextWidth + maxBindingsTextWidth + ::DROPZONE_LOGO_TEXT_PADDING + spacingX;
 
     // Position table below logo if needed
     ImVec2 startPos;
@@ -554,12 +554,12 @@ void vtkF3DImguiActor::RenderDropZone()
         drawList->AddText(
           ImVec2(rectMin.x + padding.x, rectMin.y + padding.y), bindingTextColor, key.c_str());
 
-        bindingPos.x = rectMax.x + ImGui::GetStyle().ItemSpacing.x;
+        bindingPos.x = rectMax.x + spacingX;
 
         if (k < keys.size() - 1)
         {
           drawList->AddText(bindingPos, descTextColor, "+");
-          bindingPos.x += plusWidth + ImGui::GetStyle().ItemSpacing.x;
+          bindingPos.x += plusWidth + spacingX;
         }
       }
       cursor.y += rowHeight;
@@ -667,6 +667,8 @@ void vtkF3DImguiActor::RenderCheatSheet()
 
   constexpr float margin = F3DStyle::GetDefaultMargin();
   constexpr float padding = 16.f;
+  const float plusWidth = ImGui::CalcTextSize("+").x;
+  const float spacingX = ImGui::GetStyle().ItemSpacing.x;
 
   float textHeight = 0.f;
   float winWidth = 0.f;
@@ -684,8 +686,17 @@ void vtkF3DImguiActor::RenderCheatSheet()
     {
       textHeight += ImGui::GetTextLineHeightWithSpacing();
 
-      ImVec2 bindingLineSize = ImGui::CalcTextSize(bind.c_str());
-      maxBindingTextWidth = std::max(maxBindingTextWidth, bindingLineSize.x);
+      auto keys = ::SplitBindings(bind, '+');
+
+      float bindingLineWidth = std::accumulate(keys.begin(), keys.end(),
+        0.0f, // use float init since CalcTextSize returns float
+        [](float sum, const std::string& key) { return sum + ImGui::CalcTextSize(key.c_str()).x; });
+
+      if (keys.size() > 1)
+      {
+        bindingLineWidth += (keys.size() - 1) * (spacingX + plusWidth + spacingX);
+      }
+      maxBindingTextWidth = std::max(maxBindingTextWidth, bindingLineWidth);
 
       ImVec2 descriptionLineSize = ImGui::CalcTextSize(desc.c_str());
       maxDescTextWidth = std::max(maxDescTextWidth, descriptionLineSize.x);
@@ -763,7 +774,7 @@ void vtkF3DImguiActor::RenderCheatSheet()
       std::vector<std::string> splittedBinding = ::SplitBindings(bind, '+');
       const float maxCursorPosX = ImGui::GetCursorPosX() + ImGui::GetColumnWidth();
       float posX = maxCursorPosX - ImGui::CalcTextSize(bind.c_str()).x - ImGui::GetScrollX() -
-        ((splittedBinding.size() * 2) - 1) * ImGui::GetStyle().ItemSpacing.x;
+        ((splittedBinding.size() * 2) - 1) * spacingX;
       ImGui::SetCursorPosX(posX);
       for (const std::string& key : splittedBinding)
       {

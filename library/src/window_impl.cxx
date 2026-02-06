@@ -8,6 +8,7 @@
 #include "options.h"
 #include "utils.h"
 
+#include "F3DStyle.h"
 #include "vtkF3DExternalRenderWindow.h"
 
 #include "vtkF3DGenericImporter.h"
@@ -206,9 +207,9 @@ void window_impl::Initialize()
 }
 
 //----------------------------------------------------------------------------
-void window_impl::InitializeUpVector()
+void window_impl::InitializeUpDirection()
 {
-  this->Internals->Renderer->InitializeUpVector(this->Internals->Options.scene.up_direction);
+  this->Internals->Renderer->InitializeUpDirection(this->Internals->Options.scene.up_direction);
 }
 
 //----------------------------------------------------------------------------
@@ -396,13 +397,50 @@ void window_impl::UpdateDynamicOptions()
 
   const options& opt = this->Internals->Options;
 
+  // Update pending up direction if changed
+  renderer->SetPendingUpDirection(opt.scene.up_direction);
+
   // XXX: model.point_sprites.type only has an effect on geometry scene
   // but we set it here for practical reasons
-  const int pointSpritesSize = opt.model.point_sprites.size;
-  const vtkF3DRenderer::SplatType splatType = opt.model.point_sprites.type == "gaussian"
-    ? vtkF3DRenderer::SplatType::GAUSSIAN
-    : vtkF3DRenderer::SplatType::SPHERE;
-  renderer->SetPointSpritesProperties(splatType, pointSpritesSize);
+  renderer->SetUsePointSprites(opt.model.point_sprites.enable);
+  vtkF3DRenderer::SplatType splatType = vtkF3DRenderer::SplatType::SPHERE;
+  if (opt.model.point_sprites.enable)
+  {
+    if (opt.model.point_sprites.type == "gaussian")
+    {
+      splatType = vtkF3DRenderer::SplatType::GAUSSIAN;
+    }
+    else if (opt.model.point_sprites.type == "sphere")
+    {
+      splatType = vtkF3DRenderer::SplatType::SPHERE;
+    }
+    else if (opt.model.point_sprites.type == "circle")
+    {
+      splatType = vtkF3DRenderer::SplatType::CIRCLE;
+    }
+    else if (opt.model.point_sprites.type == "stddev")
+    {
+      splatType = vtkF3DRenderer::SplatType::STD_DEV;
+    }
+    else if (opt.model.point_sprites.type == "bound")
+    {
+      splatType = vtkF3DRenderer::SplatType::BOUND;
+    }
+    else if (opt.model.point_sprites.type == "cross")
+    {
+      splatType = vtkF3DRenderer::SplatType::CROSS;
+    }
+    else
+    {
+      log::warn(opt.model.point_sprites.type,
+        R"( is an invalid point sprites type. Valid modes are: "sphere", "gaussian", "circle", "stddev", "bound", "cross"). Falling back to "sphere".)");
+    }
+    renderer->SetPointSpritesType(splatType);
+    renderer->SetPointSpritesSize(
+      opt.model.point_sprites.absolute_size, opt.model.point_sprites.size);
+    renderer->SetPointSpritesUseInstancing(
+      opt.render.effect.blending.mode != "sort" && opt.render.effect.blending.mode != "sort_cpu");
+  }
 
   renderer->SetLineWidth(opt.render.line_width);
   renderer->SetPointSize(opt.render.point_size);
@@ -417,9 +455,11 @@ void window_impl::UpdateDynamicOptions()
   renderer->ShowMinimalConsole(opt.ui.minimal_console);
   renderer->ShowDropZone(opt.ui.drop_zone.enable);
   renderer->ShowDropZoneLogo(opt.ui.drop_zone.show_logo);
+  renderer->SetBackdropOpacity(opt.ui.backdrop.opacity);
 
   if (this->Internals->Interactor)
   {
+    renderer->SetAxesColor(opt.ui.x_color, opt.ui.y_color, opt.ui.z_color);
     renderer->ShowAxis(opt.ui.axis);
     renderer->SetUseTrackball(opt.interactor.trackball);
     renderer->SetInvertZoom(opt.interactor.invert_zoom);
@@ -517,7 +557,7 @@ void window_impl::UpdateDynamicOptions()
     else
     {
       log::warn(opt.render.effect.antialiasing.mode,
-        R"( is an invalid antialiasing mode. Valid modes are: "fxaa", "ssaa", "taa)");
+        R"( is an invalid antialiasing mode. Valid modes are: "fxaa", "ssaa", "taa")");
     }
   }
 
@@ -531,6 +571,10 @@ void window_impl::UpdateDynamicOptions()
     {
       blendMode = vtkF3DRenderer::BlendingMode::SORT;
     }
+    else if (opt.render.effect.blending.mode == "sort_cpu")
+    {
+      blendMode = vtkF3DRenderer::BlendingMode::SORT_CPU;
+    }
     else if (opt.render.effect.blending.mode == "stochastic")
     {
       blendMode = vtkF3DRenderer::BlendingMode::STOCHASTIC;
@@ -538,13 +582,15 @@ void window_impl::UpdateDynamicOptions()
     else
     {
       log::warn(opt.render.effect.blending.mode,
-        R"( is an invalid blending mode. Valid modes are: "ddp", "sort", "stochastic")");
+        R"( is an invalid blending mode. Valid modes are: "ddp", "sort", "sort_cpu", "stochastic")");
     }
   }
 
   renderer->SetUseSSAOPass(opt.render.effect.ambient_occlusion);
   renderer->SetAntiAliasingMode(aaMode);
   renderer->SetUseToneMappingPass(opt.render.effect.tone_mapping);
+  renderer->SetDisplayDepth(opt.render.effect.display_depth);
+  renderer->SetDisplayDepthScalarColoring(opt.model.scivis.enable);
   renderer->SetBlendingMode(blendMode);
   renderer->SetBackfaceType(opt.render.backface_type);
   renderer->SetFinalShader(opt.render.effect.final_shader);
@@ -560,7 +606,7 @@ void window_impl::UpdateDynamicOptions()
 
   renderer->SetFontFile(opt.ui.font_file);
   renderer->SetFontScale(opt.ui.scale);
-  renderer->SetBackdropOpacity(opt.ui.backdrop.opacity);
+  renderer->SetDPIAware(opt.ui.dpi_aware);
 
   renderer->SetGridUnitSquare(opt.render.grid.unit);
   renderer->SetGridSubdivisions(opt.render.grid.subdivisions);
@@ -597,9 +643,9 @@ void window_impl::UpdateDynamicOptions()
   renderer->SetScalarBarRange(opt.model.scivis.range);
   renderer->SetColormap(opt.model.scivis.colormap);
   renderer->SetColormapDiscretization(opt.model.scivis.discretization);
+  renderer->SetOpacityMap(opt.model.scivis.opacity_map);
   renderer->ShowScalarBar(opt.ui.scalar_bar);
 
-  renderer->SetUsePointSprites(opt.model.point_sprites.enable);
   renderer->SetUseVolume(opt.model.volume.enable);
   renderer->SetUseInverseOpacityFunction(opt.model.volume.inverse);
 
@@ -747,4 +793,4 @@ vtkF3DRenderer* window_impl::GetRenderer() const
 {
   return this->Internals->Renderer;
 }
-};
+}

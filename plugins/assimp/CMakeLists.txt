@@ -24,12 +24,19 @@ message(STATUS "Plugin: assimp ${assimp_VERSION} found")
 
 f3d_plugin_init()
 
+set(_SUPPORTS_STREAM)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251016)
+  set(_SUPPORTS_STREAM SUPPORTS_STREAM)
+endif()
+
 f3d_plugin_declare_reader(
   NAME FBX
   EXTENSIONS fbx
   MIMETYPES application/vnd.fbx
   VTK_IMPORTER vtkF3DAssimpImporter
   FORMAT_DESCRIPTION "Filmbox"
+  ${_SUPPORTS_STREAM}
+  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/fbx.inl"
 )
 
 f3d_plugin_declare_reader(
@@ -38,6 +45,7 @@ f3d_plugin_declare_reader(
   MIMETYPES application/vnd.dae
   VTK_IMPORTER vtkF3DAssimpImporter
   FORMAT_DESCRIPTION "COLLADA"
+  ${_SUPPORTS_STREAM}
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/collada.inl"
 )
 
@@ -47,6 +55,8 @@ f3d_plugin_declare_reader(
   MIMETYPES image/vnd.dxf
   VTK_IMPORTER vtkF3DAssimpImporter
   FORMAT_DESCRIPTION "AutoCAD DXF"
+  ${_SUPPORTS_STREAM}
+  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/dxf.inl"
 )
 
 f3d_plugin_declare_reader(
@@ -55,6 +65,8 @@ f3d_plugin_declare_reader(
   MIMETYPES application/vnd.off
   VTK_IMPORTER vtkF3DAssimpImporter
   FORMAT_DESCRIPTION "Object File Format"
+  ${_SUPPORTS_STREAM}
+  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/off.inl"
 )
 
 f3d_plugin_declare_reader(
@@ -63,6 +75,8 @@ f3d_plugin_declare_reader(
   MIMETYPES application/vnd.x
   VTK_IMPORTER vtkF3DAssimpImporter
   FORMAT_DESCRIPTION "DirectX File Format"
+  ${_SUPPORTS_STREAM}
+  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/x.inl"
 )
 
 f3d_plugin_declare_reader(
@@ -71,6 +85,8 @@ f3d_plugin_declare_reader(
   MIMETYPES model/3mf
   VTK_IMPORTER vtkF3DAssimpImporter
   FORMAT_DESCRIPTION "3D Manufacturing Format"
+  ${_SUPPORTS_STREAM}
+  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/3mf.inl"
 )
 
 set(rpaths "")

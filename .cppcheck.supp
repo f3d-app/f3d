@@ -15,17 +15,19 @@ unknownMacro
 *:external/imgui/*.cpp
 
 // generated files
-*:*vtkextTests.cxx
-*:*vtkextPrivateTests.cxx
-*:*vtkextNativeTests.cxx
-*:*VTKExtensionsPluginAlembic.cxx
-*:*VTKExtensionsPluginAssimp.cxx
-*:*vtkextDracoTests.cxx
-*:*vtkextOCCTTests.cxx
-*:*VTKExtensionsPluginUSD.cxx
 *:*libf3dSDKTests.cxx
+*:*vtkextAlembicTests.cxx
+*:*vtkextAssimpTests.cxx
+*:*vtkextDracoTests.cxx
+*:*vtkextNativeTests.cxx
+*:*vtkextOCCTTests.cxx
+*:*vtkextPrivateTests.cxx
+*:*vtkextTests.cxx
+*:*vtkextUSDTests.cxx
+*:*vtkextWebIFCTests.cxx
 
 // specific checks
+knownConditionTrueFalse:vtkext/private/module/vtkF3DPointSplatMapper.cxx
 knownConditionTrueFalse:library/testing/TestSDKImage.cxx
 knownConditionTrueFalse:library/testing/TestSDKImageDeprecated.cxx
 noExplicitConstructor:library/public/types.h
@@ -38,3 +40,5 @@ invalidPointerCast:plugins/draco/module/vtkF3DGLTFDocumentLoader.cxx
 unusedStructMember:plugins/native/module/vtkF3DQuakeMDLImporter.cxx
 unusedStructMember:plugins/native/module/vtkF3DSPZReader.cxx
 constParameterPointer:vtkext/private/module/vtkF3DMetaImporter.cxx
+constParameterPointer:plugins/assimp/module/vtkF3DAssimpImporter.cxx
+constParameterPointer:plugins/alembic/module/vtkF3DAlembicReader.cxx

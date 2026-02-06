@@ -5,11 +5,11 @@
 Here is a non exhaustive list of F3D limitations:
 
 - No support for specifying manual lighting in the default scene apart from using `--light-intensity` option.
-- Multiblock (.vtm, .gml) support is partial, non-surfacic data will be converted into surfaces.
 - Drag and drop interaction cannot be recorded nor played back.
 - Volume rendering and HDRI support requires a decent GPU.
-- The `--camera-zoom-factor` option require VTK >= 9.3.0
-- Information about the failure to load a file is not provided before VTK >= 9.4.0
+- Information about the failure to load a file is not provided before VTK >= 9.4.0.
+- Streaming require different version of VTK depending of the format to read.
+- Options `ui.dpi_aware` and CLI `--dpi-aware` are only supported on Windows platform.
 
 ### Assimp
 
@@ -42,12 +42,11 @@ USD file formats rely on [OpenUSD](https://github.com/PixarAnimationStudios/Open
 
 VDB file formats rely on [OpenVDB](https://github.com/AcademySoftwareFoundation/openvdb) and VTK libraries. It currently comes with some known limitations:
 
-- VDB Grid files are opened with a hard-coded 0.1 sampling rate.
 - The `vdb` plugin is not shipped in the python wheels yet.
 
 ### Gaussian splatting
 
-Gaussian splatting (option `--point-sprites-type=gaussian`) needs depth sorting which is done internally using a compute shader. This requires support for OpenGL 4.3 which is not supported by macOS and old GPUs/drivers.
+Gaussian splatting (option `--point-sprites=gaussian`) needs depth sorting which is done internally using a compute shader. This requires support for OpenGL 4.3 which is not supported by macOS and old GPUs/drivers.
 
 ## Troubleshooting
 
@@ -64,7 +63,7 @@ Your data probably contains some translucent data for some reason, turn on trans
 > My 3D Gaussian Splatting data in .ply format isn't opened properly.
 
 .ply is a generic file format, we cannot assumes it's a 3DGS, thus we do not give good presets for this specific use case.
-It's recommended to use these options: `--point-sprites-size=1 --point-sprites-type=gaussian -soyk`, but you can also add them in your [config file](06-CONFIGURATION_FILE.md).
+It's recommended to use these options: `--point-sprites-size=1 --point-sprites=gaussian -syk`, but you can also add them in your [config file](06-CONFIGURATION_FILE.md).
 
 ### Linux
 

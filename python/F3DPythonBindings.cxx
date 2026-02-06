@@ -171,7 +171,20 @@ PYBIND11_MODULE(pyf3d, module)
         }
         catch (const f3d::options::incompatible_exception&)
         {
-          if (std::holds_alternative<std::string>(value))
+          // failed to set an `int`, try again as `double`
+          if (std::holds_alternative<int>(value))
+          {
+            opts.set(key, static_cast<double>(std::get<int>(value)));
+          }
+          // failed to set a `vector<int>`, try again as `vector<double>`
+          else if (std::holds_alternative<std::vector<int>>(value))
+          {
+            const std::vector<int>& ints = std::get<std::vector<int>>(value);
+            const std::vector<double> doubles(ints.begin(), ints.end());
+            opts.set(key, doubles);
+          }
+          // failed to set a `string`, parse and try again
+          else if (std::holds_alternative<std::string>(value))
           {
             try
             {
@@ -184,7 +197,7 @@ PYBIND11_MODULE(pyf3d, module)
           }
           else
           {
-            throw py::attribute_error(key);
+            throw py::type_error(key);
           }
         }
       })
@@ -230,6 +243,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def_static("tokenize", &f3d::utils::tokenize, py::arg("str"), py::arg("keep_comments") = true)
     .def_static(
       "glob_to_regex", &f3d::utils::globToRegex, py::arg("glob"), py::arg("path_separator") = '/')
+    .def_static("get_dpi_scale", &f3d::utils::getDPIScale)
     .def_static("get_env", &f3d::utils::getEnv)
     .def_static("get_known_folder", &f3d::utils::getKnownFolder);
 
@@ -282,12 +296,21 @@ PYBIND11_MODULE(pyf3d, module)
     .value("CTRL_SHIFT", f3d::interactor::InputModifier::CTRL_SHIFT)
     .export_values();
 
+  py::enum_<f3d::interactor::AnimationDirection>(interactor, "AnimationDirection")
+    .value("FORWARD", f3d::interactor::AnimationDirection::FORWARD)
+    .value("BACKWARD", f3d::interactor::AnimationDirection::BACKWARD)
+    .export_values();
+
   interactor //
-    .def("toggle_animation", &f3d::interactor::toggleAnimation, "Toggle the animation")
-    .def("start_animation", &f3d::interactor::startAnimation, "Start the animation")
+    .def("toggle_animation", &f3d::interactor::toggleAnimation, "Toggle the animation",
+      py::arg("direction") = f3d::interactor::AnimationDirection::FORWARD)
+    .def("start_animation", &f3d::interactor::startAnimation, "Start the animation",
+      py::arg("direction") = f3d::interactor::AnimationDirection::FORWARD)
     .def("stop_animation", &f3d::interactor::stopAnimation, "Stop the animation")
     .def("is_playing_animation", &f3d::interactor::isPlayingAnimation,
       "Returns True if the animation is currently started")
+    .def("get_animation_direction", &f3d::interactor::getAnimationDirection,
+      "Returns the current animation direction")
     .def("enable_camera_movement", &f3d::interactor::enableCameraMovement,
       "Enable the camera interaction")
     .def("disable_camera_movement", &f3d::interactor::disableCameraMovement,
@@ -300,6 +323,8 @@ PYBIND11_MODULE(pyf3d, module)
     .def("trigger_keyboard_key", &f3d::interactor::triggerKeyboardKey, "Trigger a keyboard input")
     .def("trigger_text_character", &f3d::interactor::triggerTextCharacter,
       "Trigger a text character input")
+    .def(
+      "trigger_event_loop", &f3d::interactor::triggerEventLoop, "Manually trigger the event loop.")
     .def("play_interaction", &f3d::interactor::playInteraction, "Play an interaction file")
     .def("record_interaction", &f3d::interactor::recordInteraction, "Record an interaction file")
     .def("start", &f3d::interactor::start, "Start the interactor and the event loop",
@@ -307,6 +332,7 @@ PYBIND11_MODULE(pyf3d, module)
     .def("stop", &f3d::interactor::stop, "Stop the interactor and the event loop")
     .def(
       "request_render", &f3d::interactor::requestRender, "Request a render on the next event loop")
+    .def("request_stop", &f3d::interactor::requestStop, "Stop on the next event loop")
     .def("init_commands", &f3d::interactor::initCommands,
       "Remove all commands and add all default command callbacks")
     .def("add_command", &f3d::interactor::addCommand, "Add a command", py::arg("action"),
@@ -419,9 +445,20 @@ PYBIND11_MODULE(pyf3d, module)
       "Add multiple filenames to the scene", py::arg("file_name_vector"))
     .def("add", py::overload_cast<const f3d::mesh_t&>(&f3d::scene::add),
       "Add a surfacic mesh from memory into the scene", py::arg("mesh"))
+    .def(
+      "add",
+      [](f3d::scene& scene, py::bytes buffer, std::size_t size)
+      {
+        std::string str(buffer);
+        scene.add(reinterpret_cast<std::byte*>(str.data()), size);
+      },
+      "Add a memory buffer containing a file the scene", py::arg("buffer"), py::arg("size"))
     .def("load_animation_time", &f3d::scene::loadAnimationTime)
     .def("animation_time_range", &f3d::scene::animationTimeRange)
     .def("available_animations", &f3d::scene::availableAnimations)
+    .def("get_animation_name", &f3d::scene::getAnimationName, py::arg("index") = -1,
+      "Returns the animation at an index (defaults to current)")
+    .def("get_animation_names", &f3d::scene::getAnimationNames, "Returns all animation names")
     .def("add_light", &f3d::scene::addLight, "Add a light to the scene", py::arg("light_state"))
     .def(
       "remove_light", &f3d::scene::removeLight, "Remove a light from the scene", py::arg("index"))
@@ -545,6 +582,19 @@ PYBIND11_MODULE(pyf3d, module)
       "Create an engine with an EGL window (Windows/Linux only)")
     .def_static("create_osmesa", &f3d::engine::createOSMesa,
       "Create an engine with an OSMesa window (Windows/Linux only)")
+    .def_static(
+      "create_external",
+      [](py::object py_get_proc)
+      {
+        f3d::context::function func = [py_get_proc](const char* name) -> f3d::context::fptr
+        {
+          uintptr_t addr = py::int_(py_get_proc(py::bytes(name)));
+          return reinterpret_cast<f3d::context::fptr>(addr);
+        };
+        return f3d::engine::createExternal(func);
+      },
+      py::arg("get_proc_address"),
+      "Create an engine with an existing context via a get_proc_address callback")
     .def_static("create_external_glx", &f3d::engine::createExternalGLX,
       "Create an engine with an existing GLX context (Linux only)")
     .def_static("create_external_wgl", &f3d::engine::createExternalWGL,

@@ -130,6 +130,10 @@
       },
       "final_shader": {
         "type": "string"
+      },
+      "display_depth": {
+        "type": "bool",
+        "default_value": "false"
       }
     },
     "hdri": {
@@ -184,6 +188,18 @@
     "axis": {
       "type": "bool",
       "default_value": "false"
+    },
+    "x_color": {
+      "type": "color",
+      "default_value": "0.9764705882352941,0.2627450980392157,0.023529411764705882"
+    },
+    "y_color": {
+      "type": "color",
+      "default_value": "0.47843137254901963,1.0,0.47843137254901963"
+    },
+    "z_color": {
+      "type": "color",
+      "default_value": "0.47058823529411764,0.5450980392156862,1.0"
     },
     "scalar_bar": {
       "type": "bool",
@@ -270,6 +286,10 @@
     },
     "animation_progress_color": {
       "type": "color"
+    },
+    "dpi_aware": {
+      "type": "bool",
+      "default_value": "false"
     }
   },
   "model": {
@@ -345,6 +365,10 @@
         "type": "colormap",
         "default_value": "0.0, 0.0, 0.0, 0.0, 0.4, 0.9, 0.0, 0.0, 0.8, 0.9, 0.9, 0.0, 1.0, 1.0, 1.0, 1.0"
       },
+      "opacity_map": {
+        "type": "double_vector",
+        "default_value": "0.0, 0.0, 1.0, 1.0"
+      },
       "range": {
         "type": "double_vector"
       }
@@ -361,6 +385,10 @@
       "size": {
         "type": "double",
         "default_value": 10.0
+      },
+      "absolute_size": {
+        "type": "bool",
+        "default_value": "false"
       }
     },
     "volume": {

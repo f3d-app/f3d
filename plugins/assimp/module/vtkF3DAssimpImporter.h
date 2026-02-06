@@ -7,6 +7,10 @@
  * https://github.com/assimp/assimp/blob/master/doc/Fileformats.md
  *
  * The following formats have been tested and are supported by f3d: FBX, DAE, OFF, DXF, X, 3MF
+
+ * This importer supports reading from stream but prefer memory stream over filestream.
+ * Reading from stream require to position the MemoryHint to the correct file extension.
+ * No support for reading textures from streams unless embedded.
  */
 
 #ifndef vtkF3DAssimpImporter_h
@@ -75,11 +79,17 @@ public:
   ///@}
 
   /**
+   * Set the hint to pass to assimp when reading from memory
+   * Typically the file extension.
+   */
+  vtkSetMacro(MemoryHint, std::string);
+
+  /**
    * Get temporal information for the currently enabled animation.
    * Only defines timerange and ignore provided frameRate.
    */
-  bool GetTemporalInformation(vtkIdType animationIndex, double frameRate, int& nbTimeSteps,
-    double timeRange[2], vtkDoubleArray* timeSteps) override;
+  bool GetTemporalInformation(vtkIdType animationIndex, double timeRange[2], int& nbTimeSteps,
+    vtkDoubleArray* timeSteps) override;
 
   /**
    * Get the number of available cameras.
@@ -97,6 +107,17 @@ public:
    */
   void SetCamera(vtkIdType camIndex) override;
 
+  ///@{
+  /**
+   * Return true if, after a quick check of file header, it looks like the provided stream
+   * can be read. Return false if it is sure it cannot be read as a stream.
+   *
+   * hint is provided to be used as MemoryHint
+   */
+  static bool CanReadFile(vtkResourceStream* stream, std::string& hint);
+  static bool CanReadFile(vtkResourceStream* stream);
+  ///@}
+
 protected:
   vtkF3DAssimpImporter();
   ~vtkF3DAssimpImporter() override;
@@ -111,6 +132,7 @@ private:
   void operator=(const vtkF3DAssimpImporter&) = delete;
 
   bool ColladaFixup = false;
+  std::string MemoryHint;
 
   class vtkInternals;
   std::unique_ptr<vtkInternals> Internals;

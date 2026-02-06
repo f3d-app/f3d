@@ -10,7 +10,7 @@ F3D (pronounced `/fɛd/`) is a fast and minimalist 3D viewer desktop application
 
 It is fully controllable from the command line and support configuration files. It can provide thumbnails, support interactive hotkeys, drag&drop and integration into file managers.
 
-F3D also contains the libf3d, a simple library to render meshes, with a C++17 API, Python and Javascript Bindings, and experimental Java bindings.
+F3D also contains the libf3d, a simple library to render meshes, with a C++17 API, C, Python, Java and Javascript Bindings.
 
 <img src="https://media.githubusercontent.com/media/f3d-app/f3d-website/refs/heads/main/static/images/typical.png" width="640" />
 
@@ -65,7 +65,7 @@ In any case, please star it on github and share the word about it!
 Many thanks to our sponsors for supporting F3D
 
 <a href="https://nlnet.nl/project/F3D/" target="_blank"><img src="https://nlnet.nl/image/logos/NGI0Core_tag.svg" height="45"/></a>
-<a href="https://www.lambdatest.com/?utm_source=f3d&utm_medium=sponsor" target="_blank"><img src="https://www.lambdatest.com/blue-logo.png" height="45" /></a>
+<a href="https://www.testmu.ai/?utm_source=f3d&utm_medium=sponsor" target="_blank"><img src="https://f3d.app/assets/images/testmu-ee484398e4f0ff464fd5c8a24ad92e89.png" height="45" /></a>
 <a href="https://www.opendronemap.org/" target="_blank"><img src="https://f3d.app/assets/images/opendronemap-95d4ad6e24c091a06ec00e1828e1eb38.png" height="45" /></a>
 
 # Vision
@@ -97,7 +97,7 @@ F3D as a community-driven, inclusive and beginner-friendly project. We love to s
 
 # Acknowledgments
 
-F3D was initially created by [Kitware SAS](https://www.kitware.eu/), by Joachim Pouderoux, Michael Migliore and Mathieu Westphal, and is relying on many awesome open source projects, including [VTK](https://vtk.org/), [OCCT](https://dev.opencascade.org/), [Assimp](https://www.assimp.org/), [Alembic](http://www.alembic.io/), [Draco](https://google.github.io/draco/), [OpenUSD](https://openusd.org/release/index.html), [OpenVDB](https://www.openvdb.org/), [OSPRay](https://www.ospray.org/) and [ImGui](https://github.com/ocornut/imgui/).
+F3D was initially created by [Kitware SAS](https://www.kitware.eu/), by Joachim Pouderoux, Michael Migliore and Mathieu Westphal, and is relying on many awesome open source projects, including [VTK](https://vtk.org/), [OCCT](https://dev.opencascade.org/), [Assimp](https://www.assimp.org/), [Alembic](http://www.alembic.io/), [Draco](https://google.github.io/draco/), [web-ifc](https://github.com/ThatOpen/engine_web-ifc), [OpenUSD](https://openusd.org/release/index.html), [OpenVDB](https://www.openvdb.org/), [OSPRay](https://www.ospray.org/) and [ImGui](https://github.com/ocornut/imgui/).
 
 # License
 

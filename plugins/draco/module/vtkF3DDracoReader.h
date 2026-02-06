@@ -7,21 +7,30 @@
  * It reads properly normals, texture coordinates, and colors.
  * All other attributes are added to the point data as generic arrays.
  *
+ * This reader supports reading streams.
+ *
  */
 
 #ifndef vtkF3DDracoReader_h
 #define vtkF3DDracoReader_h
 
 #include <vtkPolyDataAlgorithm.h>
+#include <vtkSmartPointer.h>
 
 #include <memory>
 
+class vtkResourceStream;
 class vtkF3DDracoReader : public vtkPolyDataAlgorithm
 {
 public:
   static vtkF3DDracoReader* New();
   vtkTypeMacro(vtkF3DDracoReader, vtkPolyDataAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
+
+  /**
+   * Specify stream to read from
+   * When both `Stream` and `Filename` are set, stream is used.
+   */
+  void SetStream(vtkResourceStream* stream);
 
   ///@{
   /**
@@ -30,6 +39,14 @@ public:
   vtkSetMacro(FileName, std::string);
   vtkGetMacro(FileName, std::string);
   ///@}
+
+  /**
+   * Return true if, after a quick check of file header, it looks like the provided stream
+   * can be read. Return false if it is sure it cannot be read as a strean.
+   *
+   * This only checks that the first 5 bytes spells "DRACO".
+   */
+  static bool CanReadFile(vtkResourceStream* stream);
 
 protected:
   vtkF3DDracoReader();
@@ -44,6 +61,7 @@ private:
   class vtkInternals;
   std::unique_ptr<vtkInternals> Internals;
 
+  vtkSmartPointer<vtkResourceStream> Stream;
   std::string FileName;
 };
 

@@ -1,0 +1,51 @@
+## Test Screenshot Interaction
+function(f3d_ss_test)
+  cmake_parse_arguments(F3D_SS_TEST "MINIMAL" "NAME;TEMPLATE;EXPECTED;DEPENDS" "ARGS" ${ARGN})
+  if(NOT F3D_SS_TEST_MINIMAL)
+    f3d_test(NAME TestScreenshot${F3D_SS_TEST_NAME} DATA suzanne.ply ARGS --screenshot-filename=${F3D_SS_TEST_TEMPLATE} --no-config --interaction-test-play=${F3D_SOURCE_DIR}/testing/recordings/TestScreenshot.log NO_BASELINE DEPENDS TestSetupScreenshots)
+    f3d_test(NAME TestScreenshot${F3D_SS_TEST_NAME}File DATA suzanne.ply ARGS --reference=${F3D_SS_TEST_EXPECTED} DEPENDS TestScreenshot${F3D_SS_TEST_NAME} ${F3D_SS_TEST_DEPENDS} NO_BASELINE)
+  else()
+    # show filename, axes, fps before the "minimal screenshot" interaction; compare with --no-background only
+    f3d_test(NAME TestScreenshot${F3D_SS_TEST_NAME} DATA suzanne.ply ARGS --screenshot-filename=${F3D_SS_TEST_TEMPLATE} --no-config -nxz --interaction-test-play=${F3D_SOURCE_DIR}/testing/recordings/TestScreenshotMinimal.log NO_BASELINE DEPENDS TestSetupScreenshots)
+    f3d_test(NAME TestScreenshot${F3D_SS_TEST_NAME}File DATA suzanne.ply ARGS --no-background --reference=${F3D_SS_TEST_EXPECTED} DEPENDS TestScreenshot${F3D_SS_TEST_NAME} ${F3D_SS_TEST_DEPENDS} NO_BASELINE)
+  endif()
+endfunction()
+function(f3d_ss_template_test)
+  cmake_parse_arguments(F3D_SS_TEMPLATE_TEST "" "NAME;TEMPLATE;EXPECTED_REGEX" "ARGS" ${ARGN})
+  f3d_test(NAME TestScreenshot${F3D_SS_TEMPLATE_TEST_NAME} DATA suzanne.ply ARGS --screenshot-filename=${F3D_SS_TEMPLATE_TEST_TEMPLATE} --no-config --interaction-test-play=${F3D_SOURCE_DIR}/testing/recordings/TestScreenshot.log
+    REGEXP "saving screenshot to .+[/\\]${F3D_SS_TEMPLATE_TEST_EXPECTED_REGEX}" NO_BASELINE DEPENDS TestSetupScreenshots)
+endfunction()
+
+cmake_path(SET _screenshot_path ${CMAKE_BINARY_DIR}/Testing/Temporary/ss)
+cmake_path(SET _screenshot_user_path ${_screenshot_path}/user)
+cmake_path(NATIVE_PATH _screenshot_path _screenshot_dir)
+cmake_path(NATIVE_PATH _screenshot_user_path _screenshot_user_dir)
+
+add_test(NAME f3d::TestClearScreenshots COMMAND ${CMAKE_COMMAND} -E remove_directory "${_screenshot_dir}")
+set_tests_properties(f3d::TestClearScreenshots PROPERTIES FIXTURES_SETUP f3d::TestClearScreenshots_FIXTURE)
+
+if(WIN32)
+  cmake_path(SET _screenshot_windows_pictures_dir "${_screenshot_user_dir}/Pictures")
+  cmake_path(NATIVE_PATH _screenshot_windows_pictures_dir _screenshot_windows_pictures_dir)
+  # AppData/Local is required because on Windows changing USERPROFILE also impacts the cache location
+  add_test(NAME f3d::TestSetupScreenshots COMMAND ${CMAKE_COMMAND} -E make_directory "${_screenshot_windows_pictures_dir}" -E make_directory "${_screenshot_user_dir}/AppData/Local")
+else()
+  add_test(NAME f3d::TestSetupScreenshots COMMAND ${CMAKE_COMMAND} -E make_directory "${_screenshot_user_dir}")
+endif()
+set_tests_properties(f3d::TestSetupScreenshots PROPERTIES FIXTURES_REQUIRED f3d::TestClearScreenshots_FIXTURE)
+
+f3d_ss_test(NAME Version TEMPLATE ${_screenshot_dir}/{app}_{version}_{version_full}.png EXPECTED ${_screenshot_dir}/${PROJECT_NAME}_${F3D_VERSION}_${F3D_VERSION_FULL}.png)
+f3d_ss_test(NAME Model TEMPLATE ${_screenshot_dir}/{model}_{model.ext}_{model_ext}.png EXPECTED ${_screenshot_dir}/suzanne_suzanne.ply_ply.png)
+f3d_ss_test(NAME ModelN1 TEMPLATE ${_screenshot_dir}/{model}_{n}_{n:2}.png EXPECTED ${_screenshot_dir}/suzanne_1_01.png)
+f3d_ss_test(NAME ModelN2 TEMPLATE ${_screenshot_dir}/{model}_{n}_{n:2}.png EXPECTED ${_screenshot_dir}/suzanne_2_02.png DEPENDS TestScreenshotModelN1)
+f3d_ss_template_test(NAME Date TEMPLATE ${_screenshot_dir}/{model}_{date}_{date:%Y}.png EXPECTED_REGEX suzanne_[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]_[0-9][0-9][0-9][0-9]\.png)
+f3d_ss_template_test(NAME InvalidFormats TEMPLATE ${_screenshot_dir}/{model}_{date:blah}_{n:blah}_{unknown}.png EXPECTED_REGEX suzanne_blah_1_\{unknown\}\.png)
+f3d_ss_test(NAME Esc TEMPLATE ${_screenshot_dir}/{model}_{{model}}_{}.png EXPECTED ${_screenshot_dir}/suzanne_{model}_{}.png)
+f3d_ss_test(NAME Minimal MINIMAL TEMPLATE ${_screenshot_dir}/minimal.png EXPECTED ${_screenshot_dir}/minimal.png)
+
+if(WIN32)
+  f3d_ss_test(NAME UserModelN TEMPLATE {model}_{n}.png EXPECTED ${_screenshot_windows_pictures_dir}/suzanne_1.png)
+else()
+  f3d_ss_test(NAME UserModelN TEMPLATE {model}_{n}.png EXPECTED ${_screenshot_user_dir}/suzanne_1.png)
+endif()
+set_tests_properties(f3d::TestScreenshotUserModelN PROPERTIES ENVIRONMENT "XDG_PICTURES_DIR=${_screenshot_user_dir};HOME=${_screenshot_user_dir};USERPROFILE=${_screenshot_user_dir}")

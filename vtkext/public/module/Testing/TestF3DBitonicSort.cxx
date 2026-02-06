@@ -10,6 +10,7 @@
 #include "vtkF3DBitonicSortLocalSortCS.h"
 
 #include <algorithm>
+#include <iostream>
 #include <random>
 
 int TestF3DBitonicSort(int argc, char* argv[])

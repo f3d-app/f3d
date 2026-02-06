@@ -6,6 +6,8 @@
 #include "vtkF3DGenericImporter.h"
 #include "vtkF3DRenderer.h"
 
+#include <iostream>
+
 int TestF3DRendererWithColoring(int argc, char* argv[])
 {
   vtkNew<vtkF3DRenderer> renderer;

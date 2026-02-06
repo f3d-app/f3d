@@ -5,6 +5,7 @@ list(APPEND libf3dSDKTests_list
      TestSDKCompareWithFile.cxx
      TestSDKDeprecatedOptions.cxx
      TestSDKDynamicLightIntensity.cxx
+     TestSDKDynamicUpDirection.cxx
      TestSDKEngine.cxx
      TestSDKEngineExceptions.cxx
      TestSDKEngineRecreation.cxx
@@ -18,11 +19,12 @@ list(APPEND libf3dSDKTests_list
      TestSDKRenderAndInteract.cxx
      TestSDKRenderFinalShader.cxx
      TestSDKScene.cxx
+     TestSDKSceneFromBuffer.cxx
      TestSDKSceneFromMemory.cxx
-     TestSDKStartInteractor.cxx
      TestSDKUtils.cxx
      TestSDKUI.cxx
      TestSDKWindowAuto.cxx
+     TestTestSDKHelpers.cxx
 )
 
 # Tests having UI widgets
@@ -37,11 +39,17 @@ if(F3D_MODULE_UI)
     TestSDKDynamicFontFile.cxx
     TestSDKDynamicHDRI.cxx
     TestSDKDynamicProperties.cxx
-    TestSDKInteractorCallBack.cxx
     TestSDKInteractorDocumentation.cxx
     TestSDKMultiOptions.cxx
     TestSDKTriggerInteractions.cxx
     )
+
+  # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
+    list(APPEND libf3dSDKTests_list
+      TestSDKInteractorCallBack.cxx
+      )
+  endif()
 endif()
 
 # Invalid scene codepath needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/11287
@@ -61,8 +69,10 @@ configure_file("${F3D_SOURCE_DIR}/testing/recordings/TestSDKInteractorDropFullSc
 
 set(libf3dSDKTests_link_libs "")
 
-# External window tests
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240914)
+  list(APPEND libf3dSDKTests_list TestSDKStartInteractor.cxx)
+
+  # External window tests
   option(F3D_TESTING_ENABLE_EXTERNAL_GLFW "Test external GLFW" OFF)
   option(F3D_TESTING_ENABLE_EXTERNAL_QT "Test external QT" OFF)
 
@@ -72,9 +82,12 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240914)
     list(APPEND libf3dSDKTests_link_libs glfw)
   endif()
   if(F3D_TESTING_ENABLE_EXTERNAL_QT)
-    find_package(Qt5 COMPONENTS OpenGL REQUIRED)
-    list(APPEND libf3dSDKTests_list TestSDKExternalWindowQT.cxx)
-    list(APPEND libf3dSDKTests_link_libs Qt5::OpenGL)
+    # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
+    if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
+      find_package(Qt6 REQUIRED COMPONENTS Widgets OpenGLWidgets)
+      list(APPEND libf3dSDKTests_list TestSDKExternalWindowQT.cxx)
+      list(APPEND libf3dSDKTests_link_libs Qt6::Widgets Qt6::OpenGLWidgets)
+    endif()
   endif()
   if(F3D_TESTING_ENABLE_OSMESA_TESTS)
     find_library(OSMesa_LIB OSMesa REQUIRED)
@@ -170,7 +183,11 @@ if(F3D_MODULE_UI)
 endif()
 
 if(F3D_MODULE_UI AND NOT F3D_TESTING_ENABLE_LONG_TIMEOUT_TESTS)
-  set_tests_properties(libf3d::TestSDKInteractorCallBack PROPERTIES DISABLED ON)
+  # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12489
+  if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
+    set_tests_properties(libf3d::TestSDKInteractorCallBack PROPERTIES DISABLED ON)
+  endif()
+
   set_tests_properties(libf3d::TestSDKTriggerInteractions PROPERTIES DISABLED ON)
 endif()
 

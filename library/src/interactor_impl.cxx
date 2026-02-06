@@ -426,6 +426,8 @@ public:
         };
 
         self->AnimateCameraTransition(interpolateCameraState);
+
+        self->Style->InvokeEvent(vtkCommand::InteractionEvent, nullptr);
       }
     }
 
@@ -522,29 +524,32 @@ public:
       }
     }
 
+    // Update the dynamic options of the animation manager so check if the cheatsheet needs an
+    // update.
+    this->AnimationManager->UpdateDynamicOptions();
     // Always render after interaction
     this->Window.render();
   }
 
   //----------------------------------------------------------------------------
-  void StartEventLoop(double deltaTime, std::function<void()> userCallBack)
+  bool StartEventLoop(double deltaTime, std::function<void()> userCallBack)
   {
+    if (this->EventLoopObserverId != -1)
+    {
+      log::info("Interaction: event loop has already been started");
+      return false;
+    }
+
     // Trigger a render to ensure Window is ready to be configured
     this->Window.render();
 
     // Copy user callback
     this->EventLoopUserCallBack = std::move(userCallBack);
 
-    // Configure UI delta time
-    vtkRenderWindow* renWin = this->Window.GetRenderWindow();
-    vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
-    ren->SetUIDeltaTime(deltaTime);
-
-    // Configure animation delta time
-    this->AnimationManager->SetDeltaTime(deltaTime);
-
     // Create the timer
     this->EventLoopTimerId = this->VTKInteractor->CreateRepeatingTimer(deltaTime * 1000);
+
+    this->CallbackDeltaTime = deltaTime;
 
     // Create the callback and add an observer
     vtkNew<vtkCallbackCommand> timerCallBack;
@@ -552,25 +557,42 @@ public:
       [](vtkObject*, unsigned long, void* clientData, void*)
       {
         internals* that = static_cast<internals*>(clientData);
-        that->EventLoop();
+        that->EventLoop(that->CallbackDeltaTime);
       });
     this->EventLoopObserverId =
       this->VTKInteractor->AddObserver(vtkCommand::TimerEvent, timerCallBack);
     timerCallBack->SetClientData(this);
+    return true;
   }
 
   //----------------------------------------------------------------------------
-  void StopEventLoop()
+  bool StopEventLoop()
   {
+    if (this->EventLoopObserverId == -1)
+    {
+      log::info("Interaction: event loop has not been started hence cannot be stopped");
+      return false;
+    }
     this->VTKInteractor->RemoveObserver(this->EventLoopObserverId);
     this->VTKInteractor->DestroyTimer(this->EventLoopTimerId);
     this->EventLoopObserverId = -1;
     this->EventLoopTimerId = 0;
+    return true;
   }
 
   //----------------------------------------------------------------------------
-  void EventLoop()
+  void EventLoop(double deltaTime)
   {
+    if (deltaTime <= 0)
+    {
+      log::error("Interaction: delta time should be > 0");
+      return;
+    }
+    if (this->StopRequested)
+    {
+      this->Interactor.stop();
+      return;
+    }
     if (this->EventLoopUserCallBack)
     {
       this->EventLoopUserCallBack();
@@ -592,7 +614,12 @@ public:
       this->CommandBuffer.reset();
     }
 
+    this->AnimationManager->SetDeltaTime(deltaTime);
     this->AnimationManager->Tick();
+
+    vtkRenderWindow* renWin = this->Window.GetRenderWindow();
+    vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
+    ren->SetUIDeltaTime(deltaTime);
 
     // Determine if we need a full render or just a UI render
     // At the moment, only TAA requires a full render each frame
@@ -643,6 +670,9 @@ public:
   unsigned long EventLoopTimerId = 0;
   int EventLoopObserverId = -1;
   std::atomic<bool> RenderRequested = false;
+  std::atomic<bool> StopRequested = false;
+
+  double CallbackDeltaTime = 1.0 / 30; /* Default DeltaTime (30fps) */
 };
 
 //----------------------------------------------------------------------------
@@ -755,23 +785,34 @@ interactor& interactor_impl::initCommands()
   };
 
   // Completion method for a vector of names
-  auto complNames = [](const std::vector<std::string>& args, const std::vector<std::string>& names)
+  auto complNames = [](const std::vector<std::string>& args, const std::vector<std::string>& names,
+                      size_t indexToCheck = 0)
   {
     std::vector<std::string> candidates;
-    if (args.size() < 1)
+    if (args.size() < indexToCheck + 1)
     {
       // No arguments, return all option names
       return names;
     }
-    else if (args.size() > 1)
+    else if (args.size() > indexToCheck + 1)
     {
       // Multi arguments, do not complete
       return candidates;
     }
 
-    // Recover all names that starts with args[0]
+    // Recover all names that starts with args[indexToCheck]
     std::copy_if(names.begin(), names.end(), std::back_inserter(candidates),
-      [&](const std::string& name) { return f3d::detail::StartWith(name, args[0]); });
+      [&](const std::string& name) { return f3d::detail::StartWith(name, args[indexToCheck]); });
+
+    // Create an arg pattern before the indexToCheck
+    std::string argPattern;
+    for (std::size_t i = 0; i < indexToCheck; i++)
+    {
+      argPattern += args[i] + " ";
+    }
+    // Include it in front of the candidates
+    std::transform(candidates.begin(), candidates.end(), candidates.begin(),
+      [&](const auto& argCandidate) { return argPattern + argCandidate; });
 
     if (candidates.size() == 1)
     {
@@ -787,6 +828,64 @@ interactor& interactor_impl::initCommands()
   auto complOptionNames = [&](const std::vector<std::string>& args)
   { return complNames(args, this->Internals->Options.getAllNames()); };
 
+  static const std::map<std::string, std::vector<std::string>> COMPL_OPTIONS_SET = {
+    { "model.point_sprites.type", { "sphere", "gaussian" } },
+    { "render.effect.antialiasing.mode", { "fxaa", "ssaa", "taa" } },
+    { "render.effect.blending.mode", { "ddp", "sort", "sort_cpu", "stochastic" } },
+  };
+  auto complOptionSet = [&](const std::vector<std::string>& args)
+  {
+    std::vector<std::string> optionNames = this->Internals->Options.getAllNames();
+    std::vector<std::string> candidates;
+    if (args.size() == 0)
+    {
+      // No args, return all option names
+      return optionNames;
+    }
+    else if (args.size() == 1)
+    {
+      // One arg, check if its an option
+      if (std::find(optionNames.begin(), optionNames.end(), args[0]) != optionNames.end())
+      {
+        // Its an existing option, check if it should be completed
+        const auto it = COMPL_OPTIONS_SET.find(args[0]);
+        if (it != COMPL_OPTIONS_SET.end())
+        {
+          // Transform potential values into found option
+          std::transform(std::begin(it->second), std::end(it->second),
+            std::back_inserter(candidates),
+            [&](const auto& value) { return args[0] + " " + value; });
+        }
+        else
+        {
+          // no value completion, return option by itself
+          candidates.emplace_back(args[0]);
+        }
+      }
+      else
+      {
+        // Not an existing option, try completing with option names
+        return complNames(args, optionNames);
+      }
+    }
+    else
+    {
+      // Complete the option value if possible
+      const auto it = COMPL_OPTIONS_SET.find(args[0]);
+      if (it != COMPL_OPTIONS_SET.end())
+      {
+        return complNames(args, it->second, 1);
+      }
+    }
+
+    if (candidates.size() == 1)
+    {
+      // Single candidate, add a space separator
+      candidates[0] += " ";
+    }
+    return candidates;
+  };
+
   // Add default callbacks
   this->addCommand(
     "set",
@@ -795,7 +894,7 @@ interactor& interactor_impl::initCommands()
       check_args(args, 2, "set");
       this->Internals->Options.setAsString(args[0], args[1]);
     },
-    command_documentation_t{ "set option.name values", "set a libf3d option" }, complOptionNames);
+    command_documentation_t{ "set option.name values", "set a libf3d option" }, complOptionSet);
 
   this->addCommand(
     "toggle",
@@ -908,6 +1007,10 @@ interactor& interactor_impl::initCommands()
         }
         else if (mode == "sort")
         {
+          mode = "sort_cpu";
+        }
+        else if (mode == "sort_cpu")
+        {
           mode = "stochastic";
         }
         else
@@ -918,7 +1021,7 @@ interactor& interactor_impl::initCommands()
       this->Internals->Window.render();
     },
     command_documentation_t{
-      "cycle_blending", "cycle between the blending method (none,ddp,sort,stochastic)" });
+      "cycle_blending", "cycle between the blending method (none,ddp,sort,sort_cpu,stochastic)" });
 
   std::vector<std::string> cycleColoringValidArgs = { "field", "array", "component" };
   this->addCommand(
@@ -956,6 +1059,40 @@ interactor& interactor_impl::initCommands()
       std::vector<std::string>{ "field", "array", "component" }));
 
   this->addCommand(
+    "cycle_point_sprites",
+    [&](const std::vector<std::string>&)
+    {
+      bool& enabled = this->Internals->Options.model.point_sprites.enable;
+      std::string& type = this->Internals->Options.model.point_sprites.type;
+
+      // C++20: use `std::to_array<std::string_view>` to avoid specifying the size explicitly
+      constexpr std::array<std::string_view, 6> validTypes = { "sphere", "gaussian", "circle",
+        "stddev", "bound", "cross" };
+      if (!enabled)
+      {
+        enabled = true;
+        type = validTypes[0];
+      }
+      else
+      {
+        auto index = std::distance(
+          std::begin(validTypes), std::find(std::begin(validTypes), std::end(validTypes), type));
+        if (static_cast<size_t>(index) == validTypes.size() - 1) // last type
+        {
+          enabled = false;
+        }
+        else
+        {
+          type = validTypes[index + 1];
+        }
+      }
+      this->Internals->Window.render();
+    },
+    command_documentation_t{ "cycle_point_sprites",
+      "cycle between the point sprite types "
+      "(none,sphere,gaussian,circle,stddev,bound,cross)" });
+
+  this->addCommand(
     "roll_camera",
     [&](const std::vector<std::string>& args)
     {
@@ -965,6 +1102,16 @@ interactor& interactor_impl::initCommands()
         this->Internals->Window.getCamera().getViewUp().data());
     },
     command_documentation_t{ "roll_camera value", "roll the camera on its side" });
+
+  this->addCommand("jump_to_frame",
+    [&](const std::vector<std::string>& args)
+    {
+      check_args(args, 2, "jump_to_frame");
+      const int frame = options::parse<int>(args[0]);
+      const bool relative = options::parse<bool>(args[1]);
+      this->Internals->AnimationManager->SetDeltaTime(this->Internals->CallbackDeltaTime);
+      this->Internals->AnimationManager->JumpToFrame(frame, relative);
+    });
 
   this->addCommand(
     "elevation_camera",
@@ -1099,9 +1246,24 @@ interactor& interactor_impl::initCommands()
     command_documentation_t{ "reset_camera", "reset the camera to its original location" });
 
   this->addCommand(
-    "toggle_animation",
-    [&](const std::vector<std::string>&) { this->Internals->AnimationManager->ToggleAnimation(); },
+    "jump_to_keyframe",
+    [&](const std::vector<std::string>& args)
+    {
+      check_args(args, 2, "jump_to_keyframe");
+      int keyframe = options::parse<int>(args[0]);
+      bool relative = options::parse<bool>(args[1]);
+      this->Internals->AnimationManager->JumpToKeyFrame(keyframe, relative);
+    },
+    command_documentation_t{ "jump_to_keyframe", "Jump to animation's key frame" });
+
+  this->addCommand(
+    "toggle_animation", [&](const std::vector<std::string>&) { this->toggleAnimation(); },
     command_documentation_t{ "toggle_animation", "start/stop the animation" });
+
+  this->addCommand(
+    "toggle_animation_backward",
+    [&](const std::vector<std::string>&) { this->toggleAnimation(AnimationDirection::BACKWARD); },
+    command_documentation_t{ "toggle_animation_backward", "start/stop the animation backward" });
 
   // XXX: No filesystem completion, F3DStarter add its own command anyway
   this->addCommand(
@@ -1220,6 +1382,13 @@ std::vector<std::string> interactor_impl::getCommandActions() const
 }
 
 //----------------------------------------------------------------------------
+interactor& interactor_impl::triggerEventLoop(double deltaTime)
+{
+  this->Internals->EventLoop(deltaTime);
+  return *this;
+}
+
+//----------------------------------------------------------------------------
 bool interactor_impl::triggerCommand(std::string_view command, bool keepComments)
 {
   log::debug("Command: ", command);
@@ -1332,6 +1501,21 @@ interactor& interactor_impl::initBindings()
     return std::pair("Anti-aliasing", std::move(desc));
   };
 
+  // "Cycle point sprites" , "none/sphere/gaussian"
+  auto docPS = [&]()
+  {
+    std::string desc;
+    if (!this->Internals->Options.model.point_sprites.enable)
+    {
+      desc = "none";
+    }
+    else
+    {
+      desc = this->Internals->Options.model.point_sprites.type;
+    }
+    return std::pair("Point sprites", std::move(desc));
+  };
+
   // "Cycle blending" , "none/ddp/sort/stochastic"
   auto docBlend = [&]()
   {
@@ -1358,11 +1542,16 @@ interactor& interactor_impl::initBindings()
   // "Cycle array to color with" , "arrayName"
   auto docArray = [&]()
   {
+    // enable + no array : ON
+    // enable + array : array
+    // no enable + array : array (forced)
+    // no enable + no array : OFF
     return std::pair("Color array",
       (opts.model.scivis.array_name.has_value()
           ? shortName(opts.model.scivis.array_name.value(), 15) +
             (opts.model.scivis.enable ? "" : " (forced)")
-          : "OFF"));
+          : opts.model.scivis.enable ? "ON"
+                                     : "OFF"));
   };
 
   // "Cycle component to color with" , "component"
@@ -1444,7 +1633,7 @@ interactor& interactor_impl::initBindings()
 #endif
   this->addBinding({mod_t::NONE, "V"}, "toggle_volume_rendering","Scene", std::bind(docTgl, "Volume rendering", std::cref(opts.model.volume.enable)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "I"}, "toggle model.volume.inverse","Scene", std::bind(docTgl, "Inverse volume opacity", std::cref(opts.model.volume.inverse)), f3d::interactor::BindingType::TOGGLE);
-  this->addBinding({mod_t::NONE, "O"}, "toggle model.point_sprites.enable","Scene", std::bind(docTgl, "Point sprites rendering", std::cref(opts.model.point_sprites.enable)), f3d::interactor::BindingType::TOGGLE);
+  this->addBinding({mod_t::NONE, "O"}, "cycle_point_sprites","Scene", docPS, f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "U"}, "toggle render.background.blur.enable","Scene", std::bind(docTgl, "Blur background", std::cref(opts.render.background.blur.enable)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "K"}, "toggle interactor.trackball","Scene", std::bind(docTgl, "Trackball interaction", std::cref(opts.interactor.trackball)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "F"}, "toggle render.hdri.ambient","Scene", std::bind(docTgl, "HDRI ambient lighting", std::cref(opts.render.hdri.ambient)), f3d::interactor::BindingType::TOGGLE);
@@ -1463,6 +1652,8 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::ANY, "7"}, "set_camera top", "Camera", std::bind(docStr, "Top View camera"));
   this->addBinding({mod_t::ANY, "8"}, "elevation_camera 90", "Camera", std::bind(docStr, "Rotate camera up"));
   this->addBinding({mod_t::ANY, "9"}, "set_camera isometric", "Camera", std::bind(docStr, "Isometric View camera"));
+  this->addBinding({mod_t::CTRL, "Y"}, "set scene.up_direction +Y", "Scene", std::bind(docStr, "Set scene up direction to +Y"));
+  this->addBinding({mod_t::CTRL, "Z"}, "set scene.up_direction +Z", "Scene", std::bind(docStr, "Set scene up direction to +Z"));
 #if F3D_MODULE_UI
   this->addBinding({mod_t::NONE, "H"}, "toggle ui.cheatsheet", "Others", std::bind(docStr, "Cheatsheet"));
   this->addBinding({mod_t::NONE, "Escape"}, "toggle ui.console", "Others", std::bind(docStr, "Console"));
@@ -1471,6 +1662,7 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::CTRL, "Q"}, "stop_interactor", "Others", std::bind(docStr, "Stop the interactor"));
   this->addBinding({mod_t::NONE, "Return"}, "reset_camera", "Others", std::bind(docStr, "Reset camera to initial parameters"));
   this->addBinding({mod_t::NONE, "Space"}, "toggle_animation", "Others", std::bind(docStr, "Play/Pause animation if any"));
+  this->addBinding({mod_t::CTRL_SHIFT, "Space"}, "toggle_animation_backward", "Others", std::bind(docStr, "Play/Pause animation backward if any"));
   this->addBinding({mod_t::NONE, "Drop"}, "add_files", "Others", std::bind(docStr, "Add files to the scene"));
   this->addBinding({mod_t::SHIFT, "V"}, "cycle_verbose_level", "Others", docVerbose, f3d::interactor::BindingType::CYCLIC);
   // clang-format on
@@ -1691,17 +1883,21 @@ interactor& interactor_impl::triggerTextCharacter(unsigned int codepoint)
 }
 
 //----------------------------------------------------------------------------
-interactor& interactor_impl::toggleAnimation()
+interactor& interactor_impl::toggleAnimation(AnimationDirection direction)
 {
   assert(this->Internals->AnimationManager);
+  this->Internals->AnimationManager->SetAnimationDirection(
+    direction == AnimationDirection::FORWARD ? 1 : -1);
   this->Internals->AnimationManager->ToggleAnimation();
   return *this;
 }
 
 //----------------------------------------------------------------------------
-interactor& interactor_impl::startAnimation()
+interactor& interactor_impl::startAnimation(AnimationDirection direction)
 {
   assert(this->Internals->AnimationManager);
+  this->Internals->AnimationManager->SetAnimationDirection(
+    direction == AnimationDirection::FORWARD ? 1 : -1);
   this->Internals->AnimationManager->StartAnimation();
   return *this;
 }
@@ -1719,6 +1915,15 @@ bool interactor_impl::isPlayingAnimation()
 {
   assert(this->Internals->AnimationManager);
   return this->Internals->AnimationManager->IsPlaying();
+}
+
+//----------------------------------------------------------------------------
+interactor::AnimationDirection interactor_impl::getAnimationDirection()
+{
+  assert(this->Internals->AnimationManager);
+  return this->Internals->AnimationManager->GetAnimationDirection() == 1
+    ? AnimationDirection::FORWARD
+    : AnimationDirection::BACKWARD;
 }
 
 //----------------------------------------------------------------------------
@@ -1751,11 +1956,14 @@ bool interactor_impl::playInteraction(
     this->Internals->Recorder->Off();
     this->Internals->Recorder->Clear();
 
-    this->Internals->StartEventLoop(loopTime, std::move(userCallBack));
+    bool loop = this->Internals->StartEventLoop(loopTime, std::move(userCallBack));
     this->Internals->Recorder->SetFileName(file.string().c_str());
     this->Internals->Recorder->Play();
 
-    this->Internals->StopEventLoop();
+    if (loop)
+    {
+      this->Internals->StopEventLoop();
+    }
   }
   catch (const fs::filesystem_error& ex)
   {
@@ -1811,16 +2019,20 @@ bool interactor_impl::recordInteraction(const fs::path& file)
 //----------------------------------------------------------------------------
 interactor& interactor_impl::start(double loopTime, std::function<void()> userCallBack)
 {
-  this->Internals->StartEventLoop(loopTime, std::move(userCallBack));
-  this->Internals->VTKInteractor->Start();
+  if (this->Internals->StartEventLoop(loopTime, std::move(userCallBack)))
+  {
+    this->Internals->VTKInteractor->Start();
+  }
   return *this;
 }
 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::stop()
 {
-  this->Internals->StopEventLoop();
-  this->Internals->VTKInteractor->ExitCallback();
+  if (this->Internals->StopEventLoop())
+  {
+    this->Internals->VTKInteractor->ExitCallback();
+  }
   return *this;
 }
 
@@ -1828,6 +2040,13 @@ interactor& interactor_impl::stop()
 interactor& interactor_impl::requestRender()
 {
   this->Internals->RenderRequested = true;
+  return *this;
+}
+
+//----------------------------------------------------------------------------
+interactor& interactor_impl::requestStop()
+{
+  this->Internals->StopRequested = true;
   return *this;
 }
 

@@ -60,6 +60,7 @@ public:
     const interaction_bind_t& bind) const override;
   BindingType getBindingType(const interaction_bind_t& bind) const override;
 
+  interactor& triggerEventLoop(double deltaTime) override;
   interactor& triggerModUpdate(InputModifier mod) override;
   interactor& triggerMouseButton(InputAction action, MouseButton button) override;
   interactor& triggerMousePosition(double xpos, double ypos) override;
@@ -67,10 +68,11 @@ public:
   interactor& triggerKeyboardKey(InputAction action, std::string_view keySym) override;
   interactor& triggerTextCharacter(unsigned int codepoint) override;
 
-  interactor& toggleAnimation() override;
-  interactor& startAnimation() override;
+  interactor& toggleAnimation(AnimationDirection direction = AnimationDirection::FORWARD) override;
+  interactor& startAnimation(AnimationDirection direction = AnimationDirection::FORWARD) override;
   interactor& stopAnimation() override;
   bool isPlayingAnimation() override;
+  interactor::AnimationDirection getAnimationDirection() override;
 
   interactor& enableCameraMovement() override;
   interactor& disableCameraMovement() override;
@@ -82,6 +84,7 @@ public:
   interactor& start(double deltaTime, std::function<void()> userCallBack) override;
   interactor& stop() override;
   interactor& requestRender() override;
+  interactor& requestStop() override;
   ///@}
 
   /**

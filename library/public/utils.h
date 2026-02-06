@@ -92,6 +92,13 @@ public:
   [[nodiscard]] static std::string globToRegex(std::string_view glob, char pathSeparator = '/');
 
   /**
+   * Calculate the primary monitor system zoom scale base on DPI.
+   * Only supported on Windows platform.
+   * Return 1.0 on other platforms.
+   */
+  [[nodiscard]] static double getDPIScale();
+
+  /**
    * Get an environment variable value, returns std::nullopt if not set
    */
   [[nodiscard]] static std::optional<std::string> getEnv(const std::string& env);
@@ -164,6 +171,9 @@ public:
 
     /** List the remaining un-substituted variables. */
     [[nodiscard]] std::vector<std::string> variables() const;
+
+    /** Check if the template contains a variable matching the regex pattern. */
+    [[nodiscard]] bool hasVariable(const std::regex& pattern) const;
 
     /**
      * Exception to be thrown by substitution functions to let untouched variables through.
@@ -280,6 +290,14 @@ inline std::vector<std::string> utils::string_template::variables() const
     }
   }
   return variables;
+}
+
+//------------------------------------------------------------------------------
+inline bool utils::string_template::hasVariable(const std::regex& pattern) const
+{
+  return std::any_of(this->fragments.begin(), this->fragments.end(),
+    [&pattern](const std::pair<const std::string, bool>& pair)
+    { return pair.second && std::regex_match(pair.first, pattern); });
 }
 }
 

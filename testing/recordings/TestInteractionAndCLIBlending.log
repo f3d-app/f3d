@@ -1,0 +1,24 @@
+# StreamVersion 1.2
+ConfigureEvent 1267 1374 0 0 0 0 0
+ExposeEvent 0 1406 0 0 0 0 0
+RenderEvent 0 1406 0 0 0 0 0
+
+# P
+KeyPressEvent -465 475 0 112 1 p 0
+CharEvent -465 475 0 112 1 p 0
+KeyReleaseEvent -465 475 0 112 1 p 0
+
+# P
+KeyPressEvent -465 475 0 112 1 p 0
+CharEvent -465 475 0 112 1 p 0
+KeyReleaseEvent -465 475 0 112 1 p 0
+
+# P
+KeyPressEvent -465 475 0 112 1 p 0
+CharEvent -465 475 0 112 1 p 0
+KeyReleaseEvent -465 475 0 112 1 p 0
+
+# Right
+KeyPressEvent -465 475 0 0 1 Right 0
+CharEvent -465 475 0 0 1 Right 0
+KeyReleaseEvent -465 475 0 0 1 Right 0

@@ -11,6 +11,13 @@
 #include <vtkRenderState.h>
 #include <vtkRenderer.h>
 #include <vtkShaderProgram.h>
+#include <vtkVersion.h>
+
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251120)
+#include "vtkF3DPointSplatMapper.h"
+
+#include <vtkOpenGLPointGaussianMapperHelper.h>
+#endif
 
 vtkStandardNewMacro(vtkF3DStochasticTransparentPass);
 vtkCxxSetObjectMacro(vtkF3DStochasticTransparentPass, TranslucentPass, vtkRenderPass);
@@ -89,11 +96,32 @@ bool vtkF3DStochasticTransparentPass::PreReplaceShaderValues(std::string& vtkNot
     dec += "\nuniform int propIndex;\n";
     dec += "\nuniform int seed;\n";
 
+    std::string primIdDef = "\n#define primId gl_PrimitiveID\n";
+
+    // If we are using instancing, use the instance id instead of the primitive id
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251120)
+    vtkOpenGLPointGaussianMapperHelper* splatHelper =
+      vtkOpenGLPointGaussianMapperHelper::SafeDownCast(mapper);
+
+    if (splatHelper)
+    {
+      vtkF3DPointSplatMapper* splatMapper =
+        vtkF3DPointSplatMapper::SafeDownCast(splatHelper->Owner);
+
+      if (splatMapper && splatMapper->GetUseInstancing())
+      {
+        primIdDef = "\n#define primId instanceId\n";
+      }
+    }
+#endif
+
+    dec += primIdDef;
+
     vtkShaderProgram::Substitute(fragmentShader, "//VTK::Color::Dec", dec);
 
     vtkShaderProgram::Substitute(fragmentShader, "  //VTK::Color::Impl",
       "  //VTK::Color::Impl\n"
-      "  float rd = random_ign(gl_FragCoord.xy, hash(uvec3(seed, propIndex, gl_PrimitiveID)));\n"
+      "  float rd = random_ign(gl_FragCoord.xy, hash(uvec3(seed, propIndex, primId)));\n"
       "  if (rd >= opacity) discard;\n"
       "  opacity = 1.0;\n\n");
   }

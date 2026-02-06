@@ -7,10 +7,12 @@ F3D behavior can be fully controlled from the command line using the following o
 ### `--input=<input file>` (_string_)
 
 The input file or files to read, can also be provided as a positional argument. Support directories as well.
+If `-` is specified instead of a filename, the file will be streamed from the stdin, which will hang until a stream is provided.
+Using this feature requires to use `--force-reader`.
 
 ### `--output=<png file>` (_string_)
 
-Instead of showing a render view and render into it, _render directly into a png file_. When used with --ref option, only outputs on failure. If `-` is specified instead of a filename, the PNG file is streamed to the stdout. Can use [template variables](#filename-templating).
+Instead of showing a render view and render into it, _render directly into a png file_. When used with --ref option, only outputs on failure. If `-` is specified instead of a filename, the PNG file is streamed to the stdout. Can use [template variables](#filename-templating). When using the `{frame}` variable, multiple animation frames are exported (see [Exporting animation frames](05-ANIMATIONS.md#exporting-animation-frames)).
 
 ### `--no-background` (_bool_, default: `false`)
 
@@ -126,6 +128,18 @@ Define the Up direction.
 
 Show _axes_ as a trihedron in the scene.
 
+### `--x-color` (_color_, default: `#f94306`)
+
+Set the X axis color in both widget and grid.
+
+### `--y-color` (_color_, default: `#7aff7a`)
+
+Set the Y axis color in both widget and grid.
+
+### `--z-color` (_color_, default: `#788bff`)
+
+Set the Z axis color in both widget and grid.
+
 ### `-g`, `--grid` (_bool_, default: `false`)
 
 Show _a grid_ aligned with the horizontal (orthogonal to the Up direction) plane.
@@ -197,6 +211,11 @@ Can be useful to display non-ASCII filenames.
 
 Scale fonts. Useful for HiDPI displays.
 
+### `--dpi-aware` (_bool_, default: `false`)
+
+Scale the _font scale_ and _resolution_ by the display scaling factor.
+Only supported on Windows platform.
+
 ### `--command-script=<command script>` (_script_)
 
 Provide a script file containing a list of [commands](07-COMMANDS.md) to be executed sequentially.
@@ -208,17 +227,17 @@ Set the opacity of the backdrop behind text information such as FPS, filename, m
 
 ## Material options
 
-### `-o`, `--point-sprites` (_bool_, default: `false`)
+### `-o`, `--point-sprites=<none|sphere|gaussian|circle|stddev|bound|cross>` (_string_, default: `none`)
 
-Show sphere _points sprites_ instead of the geometry.
-
-### `--point-sprites-type=<sphere|gaussian>` (_string_, default: `sphere`)
-
-Set the splat type when showing point sprites.
+Select _points sprites_ types to show instead of the geometry.
 
 ### `--point-sprites-size=<size>` (_double_, default: `10.0`)
 
 Set the _size_ of point sprites.
+
+### `--point-sprites-absolute-size` (_bool_, default: `false`)
+
+Do not scale the point sprites size by the scene bounding box.
 
 ### `--point-size=<size>` (_double_)
 
@@ -403,6 +422,16 @@ Use with the scalar option.
 
 Set the number of distinct colors from [1, N] will be used in the colormap. Any values outside the valid range will result in smooth shading.
 
+### `--opacity-map-file=<name>` (_string_)
+
+Set an _opacity map file for the coloring_.
+
+### `--opacity-map=<value, opacity>` (_vector\<double\>_, default: `0.0,0.0,1.0,1.0`)
+
+Set a _custom opacity map for the coloring_.
+Only used with volume rendering for now.
+Ignored if `--opacity-map-file` option is specified.
+
 ### `-v`, `--volume` (_bool_, default: `false`)
 
 Enable _volume rendering_. It is only functional for 3D image data (VTKXMLVTI, DICOM, NRRD, MetaImage files) and will display nothing with other formats. It forces coloring.
@@ -468,12 +497,13 @@ _Denoise_ the image when using raytracing.
 ### `-p`, `--blending` (_string_, default: `ddp`)
 
 Enable _translucency blending support_.
-This is a technique used to correctly render translucent objects (`ddp`: dual depth peeling for quality, `sort`: for gaussians, `stochastic`: fast).
+This is a technique used to correctly render translucent objects (`ddp`: dual depth peeling for quality, `sort`: for gaussians, `sort_cpu`: for gaussians, `stochastic`: fast).
 
 > [!WARNING]
 > `stochastic` is introducing a lot of noise with strong translucency.
 > It works better when combined with temporal anti-aliasing (when using `--anti-aliasing=taa` option)
 > `sort` is only working for 3D gaussians and requires compute shaders support.
+> Alternatively, `sort_cpu` will give the same result and work everywhere but it's much slower.
 
 ### `-q`, `--ambient-occlusion` (_bool_, default: `false`)
 
@@ -494,6 +524,11 @@ Enable generic filmic _Tone Mapping Pass_. This technique is used to map colors 
 ### `--final-shader` (_string_)
 
 Add a final shader to the output image. See the [dedicated documentation](10-FINAL_SHADER.md) for more details.
+
+### `--display-depth` (_bool_, default: `false`)
+
+Display the depth buffer as a grayscale image or with a colormap if `--scalar-coloring` is specified.
+Only opaque objects are displayed, translucent and volumetric objects are ignored.
 
 ## Testing options
 
@@ -533,6 +568,40 @@ The `-D/--define` option has a special syntax: `-Dlibf3d.option=value` or `--def
 
 All options are parsed according to their type, see the [parsing documentation](08-PARSING.md) for more details.
 
+## Piping
+
+F3D supports piping in and out for [most formats](02-SUPPORTED_FORMATS.md), using the `-` char, as long as the reader is specified, eg:
+
+```
+f3d - --force-reader=GLB --output=- < path/to/file.glb > path/to/img.png
+```
+
+or, using [display](https://imagemagick.org/script/display.php#gsc.tab=0):
+
+```
+cat path/to/file.glb | f3d - --force-reader=GLB --output=- | display
+```
+
+and even, using [build123d](https://github.com/gumyr/build123d):
+
+`script.py`:
+
+```py
+import sys
+
+from build123d import Box, Cylinder, export_brep, export_step
+from OCP.BRepTools import BRepTools
+
+obj = Box(2, 2, 1) - Cylinder(0.5, 2)
+BRepTools.Write_s(obj.wrapped, sys.stdout.buffer)
+```
+
+```
+python script.py | f3d - --force-reader=BREP --output=- | display
+```
+
+While piping is more common on Linux, F3D supports it perfectly on Windows and MacOS as well.
+
 ## Filename templating
 
 The destination filename used by `--output` or to save screenshots using `--screenshot-filename` can use the following template variables:
@@ -547,6 +616,8 @@ The destination filename used by `--output` or to save screenshots using `--scre
 - `{date:format}`: current date as per C++'s `std::put_time` format
 - `{n}`: auto-incremented number to make filename unique (up to 1000000)
 - `{n:2}`, `{n:3}`, ...: zero-padded auto-incremented number to make filename unique (up to 1000000)
+- `{frame}`: frame number when outputting animation frames (see [Animations](05-ANIMATIONS.md))
+- `{frame:4}`, `{frame:5}`, ...: zero-padded frame number when outputting animation frames
 - variable names can be escaped by doubling the braces (eg. use `{{model}}.png` to output `{model}.png` without the model name being substituted)
 
 For example the screenshot filename is configured as `{app}/{model}_{n}.png` by default, meaning that, assuming the model `hello.glb` is being viewed,

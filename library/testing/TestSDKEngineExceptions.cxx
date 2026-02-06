@@ -4,9 +4,8 @@
 #include <interactor.h>
 #include <window.h>
 
-#include <filesystem>
-
 #include <cstdlib>
+#include <filesystem>
 
 namespace fs = std::filesystem;
 
@@ -71,13 +70,6 @@ int TestSDKEngineExceptions([[maybe_unused]] int argc, [[maybe_unused]] char* ar
 
   test.expect<f3d::engine::plugin_exception>("load plugin with invalid long name",
     [&]() { f3d::engine::loadPlugin("/" + std::string(257, 'x') + "/file.ext"); });
-
-#if defined(__linux__) || defined(__FreeBSD__)
-  // Test error handling without "HOME" set
-  unsetenv("HOME");
-  test.expect<f3d::engine::cache_exception>(
-    "Create engine without HOME set", [&]() { std::ignore = f3d::engine::createNone(); });
-#endif
 
   return test.result();
 }

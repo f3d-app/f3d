@@ -1,4 +1,5 @@
 list(APPEND pyf3dTests_list
+     test_animation.py
      test_camera.py
      test_interactor.py
      test_image.py
@@ -18,6 +19,12 @@ list(APPEND pyf3dTests_list
      test_scene.py
      test_interactor_start.py
     )
+
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
+  list(APPEND pyf3dTests_list
+     test_scene_buffer.py
+    )
+endif()
 
 list(APPEND pyf3dTestsNoRender_list
      test_options.py

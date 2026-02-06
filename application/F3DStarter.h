@@ -41,11 +41,6 @@ public:
   static std::vector<std::string> GetExtensions();
 
   /**
-   * Trigger a render on the next event loop
-   */
-  void RequestRender();
-
-  /**
    * Trigger a render immediately (must be called by the main thread)
    */
   void Render();

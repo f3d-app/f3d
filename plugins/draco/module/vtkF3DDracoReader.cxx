@@ -12,14 +12,20 @@
 #include <vtkPointData.h>
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
+#include <vtkResourceStream.h>
 
-#include "draco/compression/decode.h"
-#include "draco/draco_features.h"
-#include "draco/io/stdio_file_reader.h"
+#include <draco/compression/decode.h>
+#include <draco/draco_features.h>
+#include <draco/io/stdio_file_reader.h>
+
+#include <string_view>
 
 #ifndef DRACO_MESH_COMPRESSION_SUPPORTED
 #error "Please rebuild draco with DRACO_MESH_COMPRESSION cmake option enabled."
 #endif
+
+vtkCxxSetSmartPointerMacro(vtkF3DDracoReader, Stream, vtkResourceStream);
+
 class vtkF3DDracoReader::vtkInternals
 {
 public:
@@ -184,11 +190,24 @@ int vtkF3DDracoReader::RequestData(
 
   std::vector<char> data;
 
-  auto reader = draco::StdioFileReader::Open(this->FileName);
-  if (!reader->ReadFileToBuffer(&data))
+  if (this->Stream)
   {
-    vtkErrorMacro("Cannot read file");
-    return 0;
+    this->Stream->Seek(0, vtkResourceStream::SeekDirection::End);
+    size_t length = this->Stream->Tell();
+    this->Stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+
+    // Read stream into buffer
+    data.resize(length);
+    this->Stream->Read(data.data(), length);
+  }
+  else
+  {
+    auto reader = draco::StdioFileReader::Open(this->FileName);
+    if (!reader || !reader->ReadFileToBuffer(&data))
+    {
+      vtkErrorMacro("Cannot read file");
+      return 0;
+    }
   }
 
   draco::DecoderBuffer buffer;
@@ -224,9 +243,22 @@ int vtkF3DDracoReader::RequestData(
   return 1;
 }
 
-//----------------------------------------------------------------------------
-void vtkF3DDracoReader::PrintSelf(ostream& os, vtkIndent indent)
+//------------------------------------------------------------------------------
+bool vtkF3DDracoReader::CanReadFile(vtkResourceStream* stream)
 {
-  this->Superclass::PrintSelf(os, indent);
-  os << indent << "FileName: " << this->FileName << "\n";
+  if (!stream)
+  {
+    return false;
+  }
+
+  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+  constexpr std::string_view drcMagic{ "DRACO", 5 };
+
+  std::array<char, 5> magic;
+  if (stream->Read(&magic, magic.size()) != magic.size())
+  {
+    return false;
+  }
+
+  return std::string_view(magic.data(), magic.size()) == drcMagic;
 }
