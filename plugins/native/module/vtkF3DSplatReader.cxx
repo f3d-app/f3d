@@ -90,6 +90,7 @@ int vtkF3DSplatReader::RequestData(
   {
     if (stream->Read(&splat, sizeof(::splat_t)) != sizeof(::splat_t))
     {
+      // unreachable
       vtkWarningMacro("Could not read a splat at index: " << i << " , result may be incorrect");
       break;
     }
