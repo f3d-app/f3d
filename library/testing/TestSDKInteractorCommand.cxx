@@ -63,6 +63,12 @@ int TestSDKInteractorCommand([[maybe_unused]] int argc, [[maybe_unused]] char* a
   inter.removeCommand("test_toggle");
   test("removeCommand", inter.triggerCommand("test_toggle") == false);
 
+  // Test toggle_2d_mode
+  inter.triggerCommand("toggle_2d_mode");
+  test("triggerCommand toggle_2d_mode on", options.interactor.two_dimensions_mode == true);
+  inter.triggerCommand("toggle_2d_mode");
+  test("triggerCommand toggle_2d_mode off", options.interactor.two_dimensions_mode == false);
+
   // Coverage print
   inter.triggerCommand("print model.scivis.cells");
 
