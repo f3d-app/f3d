@@ -47,8 +47,6 @@ private:
 
   /**
    * Trigger a window rendering, but render only the UI/overlay actors.
-   * If the UI requested a full render (e.g., visibility toggle), a second
-   * full render is performed.
    */
   void RenderUI(vtkRenderWindowInteractor* interactor);
 

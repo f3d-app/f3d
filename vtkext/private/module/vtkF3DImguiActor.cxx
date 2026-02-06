@@ -385,7 +385,7 @@ void vtkF3DImguiActor::ReleaseGraphicsResources(vtkWindow* w)
 vtkF3DImguiActor::~vtkF3DImguiActor() = default;
 
 //----------------------------------------------------------------------------
-void vtkF3DImguiActor::RenderNode(NodeInfo* node, vtkOpenGLRenderWindow* renWin)
+void vtkF3DImguiActor::RenderNode(F3DNodeInfo* node, vtkOpenGLRenderWindow* renWin)
 {
   if (!node)
   {
@@ -394,11 +394,11 @@ void vtkF3DImguiActor::RenderNode(NodeInfo* node, vtkOpenGLRenderWindow* renWin)
 
   if (node->prop)
   {
-    ImGui::PushID((void*)node->prop);
+    ImGui::PushID(static_cast<void*>(node->prop));
 
     // Retrieve previous state or initialize from actor
     bool visible = true;
-    auto it = NodeVisibilityState.find(node->prop);
+    auto it = this->NodeVisibilityState.find(node->prop);
     if (it != NodeVisibilityState.end())
     {
       visible = it->second;
@@ -443,10 +443,7 @@ void vtkF3DImguiActor::RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin)
   }
 
   const ImGuiViewport* viewport = ImGui::GetMainViewport();
-  if (!viewport)
-  {
-    return;
-  }
+  assert(viewport);
 
   constexpr float margin = F3DStyle::GetDefaultMargin();
   float winWidth = this->CalculateHierarchyWidth();
@@ -480,7 +477,7 @@ float vtkF3DImguiActor::CalculateHierarchyWidth()
 {
   float maxWidth = 0.0f;
 
-  std::function<void(const NodeInfo&, int)> processNode = [&](const NodeInfo& node, int depth)
+  std::function<void(const F3DNodeInfo&, int)> processNode = [&](const F3DNodeInfo& node, int depth)
   {
     const std::string& displayText = node.displayName.empty() ? node.name : node.displayName;
     ImVec2 textSize = ImGui::CalcTextSize(displayText.c_str());
@@ -500,10 +497,13 @@ float vtkF3DImguiActor::CalculateHierarchyWidth()
 
   // Add padding for checkbox, window padding, and margin
   constexpr float checkboxWidth = 20.0f;
-  float totalWidth = maxWidth + checkboxWidth + 2.0f * ImGui::GetStyle().WindowPadding.x + 30.0f;
+  constexpr float extraMargin = 30.0f;
+  constexpr float minWidth = 200.0f;
+  constexpr float maxWidthLimit = 800.0f;
+  float totalWidth = maxWidth + checkboxWidth + 2.0f * ImGui::GetStyle().WindowPadding.x + extraMargin;
 
   // Clamp to reasonable bounds
-  return std::max(200.0f, std::min(totalWidth, 800.0f));
+  return std::max(minWidth, std::min(totalWidth, maxWidthLimit));
 }
 
 //----------------------------------------------------------------------------

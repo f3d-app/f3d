@@ -202,15 +202,11 @@ public:
     window.PrintSceneDescription(log::VerboseLevel::DEBUG);
   }
 
-  std::vector<NodeInfo> GetSceneHierarchyNodes()
+  std::vector<F3DNodeInfo> GetSceneHierarchyNodes()
   {
-    if (!this->MetaImporter)
-    {
-      return {};
-    }
-
+    assert(this->MetaImporter);
     // Get the raw hierarchy directly - it already handles duplicates and hierarchy
-    return this->MetaImporter->GetActorHierarchy();
+    return this->MetaImporter->ComputeNodeInfoHierarchy();
   }
 
   const options& Options;
