@@ -497,11 +497,12 @@ float vtkF3DImguiActor::CalculateHierarchyWidth()
 {
   float maxWidth = 0.0f;
 
+  constexpr float indentPerLevel = 10.0f;
   std::function<void(const F3DNodeInfo&, int)> processNode = [&](const F3DNodeInfo& node, int depth)
   {
     const std::string& displayText = node.displayName.empty() ? node.name : node.displayName;
     ImVec2 textSize = ImGui::CalcTextSize(displayText.c_str());
-    float nodeWidth = textSize.x + depth * 10.0f; // 10px indent per level
+    float nodeWidth = textSize.x + depth * indentPerLevel;
     maxWidth = std::max(maxWidth, nodeWidth);
 
     for (const auto& child : node.children)

@@ -175,6 +175,11 @@ f3d_test(NAME TestMetaData DATA pdiag.vtu ARGS -m UI)
 f3d_test(NAME TestMetaDataImporter DATA BoxAnimated.gltf ARGS -m UI)
 f3d_test(NAME TestMultiblockMetaData DATA mb.vtm ARGS -m UI)
 
+## Scene Hierarchy
+f3d_test(NAME TestSceneHierarchyGLTF DATA WaterBottle.glb ARGS -D ui.scene_hierarchy=true UI)
+f3d_test(NAME TestSceneHierarchyGLTFAnimated DATA BoxAnimated.gltf ARGS -D ui.scene_hierarchy=true UI)
+f3d_test(NAME TestSceneHierarchyNonGLTF DATA cow.vtp ARGS -D ui.scene_hierarchy=true UI)
+
 ## Special files handling
 f3d_test(NAME TestRemoveEmptyFileGroups DATA mb/mb_3_0.vtt mb/mb_0_0.vtu ARGS -n --remove-empty-file-groups UI)
 f3d_test(NAME TestMultiFileMetaData DATA mb/recursive ARGS -m --multi-file-mode=all UI)
