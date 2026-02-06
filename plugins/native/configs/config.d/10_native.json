@@ -34,7 +34,7 @@
     "match": "*.{tif,tiff,png,jpg,jpeg,bmp,tga,hdr}",
     "options": {
       "scalar-coloring": true,
-      "up": "-Y",
+      "up": "+Y",
       "coloring-component": "-2",
       "camera-direction": "0,0,-1",
       "camera-orthographic": true,
