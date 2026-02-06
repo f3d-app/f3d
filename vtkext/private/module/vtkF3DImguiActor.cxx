@@ -14,10 +14,15 @@
 #include <vtkOpenGLShaderCache.h>
 #include <vtkOpenGLState.h>
 #include <vtkOpenGLVertexArrayObject.h>
+#include <vtkCallbackCommand.h>
+#include <vtkCommand.h>
 #include <vtkPNGReader.h>
+#include <vtkRenderer.h>
+#include <vtkRendererCollection.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkShader.h>
 #include <vtkShaderProgram.h>
+#include <vtkSmartPointer.h>
 #include <vtkTextureObject.h>
 #include <vtkVersion.h>
 
@@ -32,6 +37,7 @@
 #endif
 
 #include <imgui.h>
+#include <functional>
 #include <numeric>
 #include <optional>
 #include <sstream>
@@ -372,12 +378,134 @@ void vtkF3DImguiActor::Initialize(vtkOpenGLRenderWindow* renWin)
 void vtkF3DImguiActor::ReleaseGraphicsResources(vtkWindow* w)
 {
   this->Superclass::ReleaseGraphicsResources(w);
-
   this->Pimpl->Release(vtkOpenGLRenderWindow::SafeDownCast(w));
 }
 
 //----------------------------------------------------------------------------
 vtkF3DImguiActor::~vtkF3DImguiActor() = default;
+
+//----------------------------------------------------------------------------
+void vtkF3DImguiActor::RenderNode(F3DNodeInfo* node, vtkOpenGLRenderWindow* renWin)
+{
+  if (!node)
+  {
+    return;
+  }
+
+  if (node->prop)
+  {
+    ImGui::PushID(static_cast<void*>(node->prop));
+
+    // Retrieve previous state or initialize from actor
+    bool visible = true;
+    auto it = this->NodeVisibilityState.find(node->prop);
+    if (it != NodeVisibilityState.end())
+    {
+      visible = it->second;
+    }
+    else
+    {
+      visible = node->prop->GetVisibility() != 0;
+      NodeVisibilityState[node->prop] = visible;
+    }
+
+    const std::string& displayText = node->displayName.empty() ? node->name : node->displayName;
+    if (ImGui::Checkbox(displayText.c_str(), &visible))
+    {
+      NodeVisibilityState[node->prop] = visible;
+      node->prop->SetVisibility(visible ? 1 : 0);
+      node->prop->Modified();
+      renWin->GetInteractor()->InvokeEvent(vtkF3DUIActor::SceneHierarchyChangedEvent, nullptr);
+    }
+
+    ImGui::PopID();
+  }
+  else
+  {
+    ImGui::Text("%s", node->name.c_str());
+  }
+
+  for (auto& child : node->children)
+  {
+    ImGui::Indent(10);
+    RenderNode(&child, renWin);
+    ImGui::Unindent(10);
+  }
+}
+
+
+//----------------------------------------------------------------------------
+void vtkF3DImguiActor::RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin)
+{
+  if (!this->SceneHierarchyVisible)
+  {
+    return;
+  }
+
+  const ImGuiViewport* viewport = ImGui::GetMainViewport();
+  assert(viewport);
+
+  constexpr float margin = F3DStyle::GetDefaultMargin();
+  float winWidth = this->CalculateHierarchyWidth();
+  float winHeight = viewport->WorkSize.y - 2.0f * margin;
+
+  ::SetupNextWindow(ImVec2(margin, margin), ImVec2(winWidth, winHeight));
+  ImGui::SetNextWindowBgAlpha(this->BackdropOpacity);
+
+  ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
+    ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoResize;
+
+  ImGui::Begin("Scene Hierarchy", nullptr, flags);
+
+  if (this->HierarchyNodes.empty())
+  {
+    ImGui::Text("No hierarchy available");
+    ImGui::End();
+    return;
+  }
+
+  for (auto& node : this->HierarchyNodes)
+  {
+    RenderNode(&node, renWin);
+  }
+
+  ImGui::End();
+}
+
+//----------------------------------------------------------------------------
+float vtkF3DImguiActor::CalculateHierarchyWidth()
+{
+  float maxWidth = 0.0f;
+
+  constexpr float indentPerLevel = 10.0f;
+  std::function<void(const F3DNodeInfo&, int)> processNode = [&](const F3DNodeInfo& node, int depth)
+  {
+    const std::string& displayText = node.displayName.empty() ? node.name : node.displayName;
+    ImVec2 textSize = ImGui::CalcTextSize(displayText.c_str());
+    float nodeWidth = textSize.x + depth * indentPerLevel;
+    maxWidth = std::max(maxWidth, nodeWidth);
+
+    for (const auto& child : node.children)
+    {
+      processNode(child, depth + 1);
+    }
+  };
+
+  for (const auto& node : this->HierarchyNodes)
+  {
+    processNode(node, 0);
+  }
+
+  // Add padding for checkbox, window padding, and margin
+  constexpr float checkboxWidth = 20.0f;
+  constexpr float extraMargin = 30.0f;
+  constexpr float minWidth = 200.0f;
+  constexpr float maxWidthLimit = 800.0f;
+  float totalWidth = maxWidth + checkboxWidth + 2.0f * ImGui::GetStyle().WindowPadding.x + extraMargin;
+
+  // Clamp to reasonable bounds
+  return std::max(minWidth, std::min(totalWidth, maxWidthLimit));
+}
 
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderDropZone()

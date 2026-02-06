@@ -7,10 +7,12 @@
 #define vtkF3DMetaImporter_h
 
 #include "F3DColoringInfoHandler.h"
+#include "F3DNodeInfo.h"
 #include "vtkF3DImporter.h"
 
 #include <vtkActor.h>
 #include <vtkBoundingBox.h>
+#include <vtkDataAssembly.h>
 #include <vtkPointGaussianMapper.h>
 #include <vtkProperty.h>
 #include <vtkSmartVolumeMapper.h>
@@ -22,7 +24,6 @@
 #endif
 
 #include <memory>
-#include <optional>
 #include <string>
 #include <vector>
 
@@ -165,6 +166,20 @@ public:
    * Get the update mTime
    */
   vtkMTimeType GetUpdateMTime();
+
+  /**
+  * Returns the scene hierarchy if any of the importers supports it.
+  * Returns nullptr if no importer with hierarchy support was added.
+  */
+  vtkDataAssembly* GetSceneHierarchy() override;
+  std::vector<F3DNodeInfo> ComputeNodeInfoHierarchy();
+
+private:
+  /**
+   * Build hierarchical node structure from vtkDataAssembly
+   */
+  void BuildHierarchyFromAssembly(vtkDataAssembly* assembly, int nodeId, 
+    F3DNodeInfo& parentNode, std::map<std::string, vtkProp*>& actorMap);
 
 protected:
   vtkF3DMetaImporter();
