@@ -30,7 +30,6 @@ function(f3d_create_exec target_name)
     set_target_properties(${target_name} PROPERTIES VS_DEBUGGER_ENVIRONMENT "PATH=$<TARGET_FILE_DIR:VTK::CommonCore>") # Add VTK in MSVC PATH environment variable
   endif ()
 
-  add_dependencies(${target_name} generate_cli_opts_header)
   target_include_directories(${target_name} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
 
   if (F3D_USE_EXTERNAL_CXXOPTS)
@@ -183,36 +182,22 @@ f3d_embed_file(
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/F3DConfig.h.in"
     "${CMAKE_CURRENT_BINARY_DIR}/F3DConfig.h")
 
-set(_ENABLED_CONDITIONALS)
+set(f3d_enabled_conditionals)
 if(F3D_MODULE_RAYTRACING)
-  list(APPEND _ENABLED_CONDITIONALS "F3D_MODULE_RAYTRACING")
+  list(APPEND f3d_enabled_conditionals "F3D_MODULE_RAYTRACING")
 endif()
 if(F3D_MODULE_DMON)
-  list(APPEND _ENABLED_CONDITIONALS "F3D_MODULE_DMON")
+  list(APPEND f3d_enabled_conditionals "F3D_MODULE_DMON")
 endif()
 if(F3D_MODULE_UI)
-  list(APPEND _ENABLED_CONDITIONALS "F3D_MODULE_UI")
+  list(APPEND f3d_enabled_conditionals "F3D_MODULE_UI")
 endif()
 
-add_custom_command(
-  OUTPUT
-    "${CMAKE_CURRENT_BINARY_DIR}/F3DCLIOptions.h"
-    "${CMAKE_BINARY_DIR}/completion.bash"
-    "${CMAKE_BINARY_DIR}/completion.fish"
-    "${CMAKE_BINARY_DIR}/completion.zsh"
-  COMMAND ${CMAKE_COMMAND}
-    -D "F3D_SOURCE_DIR=${CMAKE_SOURCE_DIR}"
-    -D "F3D_BINARY_DIR=${CMAKE_BINARY_DIR}"
-    -D "ENABLED_CONDITIONALS=${_ENABLED_CONDITIONALS}"
-    -P "${CMAKE_SOURCE_DIR}/cmake/f3dCLIOptions.cmake"
-  DEPENDS
-    "${CMAKE_SOURCE_DIR}/resources/cli-options.schema.json"
-    "${CMAKE_SOURCE_DIR}/resources/cli-options.json"
-  VERBATIM
-)
-
-add_custom_target(generate_cli_opts_header
-  DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/F3DCLIOptions.h"
+include(f3dCLIOptions)
+f3d_generate_cli_options(
+  F3D_SOURCE_DIR "${CMAKE_SOURCE_DIR}"
+  F3D_BINARY_DIR "${CMAKE_BINARY_DIR}"
+  ENABLED_CONDITIONALS ${f3d_enabled_conditionals} # Do NOT quote. This needs to be passed as a list.
 )
 
 set(F3D_SOURCE_FILES
