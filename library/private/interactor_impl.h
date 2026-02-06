@@ -122,6 +122,12 @@ public:
   void ResetTemporaryUp();
 
   /**
+   * Implementation only API.
+   * Set the 2D interaction mode (pan/zoom only, no rotation).
+   */
+  void SetUse2DMode(bool use);
+
+  /**
    * Event loop being called automatically once the interactor is started
    * First call the EventLoopUserCallBack, then call render if requested.
    */

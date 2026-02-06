@@ -105,6 +105,7 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "camera-index", "", "Select the camera to use", "<index>", "" },
       { "interaction-trackball", "k", "Enable trackball interaction", "<bool>", "1" },
       { "invert-zoom", "", "Invert zoom direction with right mouse click", "<bool>", "1" },
+      { "two-dimensions-mode", "", "Enable 2D interaction mode (pan/zoom only)", "<bool>", "1" },
       { "animation-autoplay", "", "Automatically start animation", "<bool>", "1" },
       { "animation-index", "", "Select animation to show (deprecated)", "<index>", "" },
       { "animation-indices", "", "Select animations to show", "<index,index,index>", "" },

@@ -410,6 +410,10 @@
     "invert_zoom": {
       "type": "bool",
       "default_value": "false"
+    },
+    "two_dimensions_mode": {
+      "type": "bool",
+      "default_value": "false"
     }
   }
 }
