@@ -88,12 +88,8 @@ int vtkF3DSplatReader::RequestData(
   ::splat_t splat;
   for (size_t i = 0; i < nbSplats; i++)
   {
-    if (stream->Read(&splat, sizeof(::splat_t)) != sizeof(::splat_t))
-    {
-      // unreachable
-      vtkWarningMacro("Could not read a splat at index: " << i << " , result may be incorrect");
-      break;
-    }
+    // This cannot read less bytes than expected because of nbSplats being computed above
+    stream->Read(&splat, sizeof(::splat_t));
 
     positionArray->SetTypedTuple(i, splat.position);
     scaleArray->SetTypedTuple(i, splat.scale);
