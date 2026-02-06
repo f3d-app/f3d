@@ -68,7 +68,7 @@ Frame rate used to refresh animation and other repeated tasks (watch, UI). Does 
 
 ### `--load-plugins=<paths or names>` (_string_)
 
-List of plugins to load separated with a comma. Official plugins are `alembic`, `assimp`, `draco`, `hdf`, `occt`, `usd`, `vdb`. See [plugins](12-PLUGINS.md) for more info.
+List of plugins to load separated with a comma. Official plugins are `alembic`, `assimp`, `draco`, `hdf`, `occt`, `usd`, `vdb`, `webifc`. See [plugins](12-PLUGINS.md) for more info.
 
 ### `--scan-plugins`
 
