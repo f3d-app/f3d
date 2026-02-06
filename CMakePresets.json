@@ -2,20 +2,6 @@
   "version": 3,
   "configurePresets": [
     {
-      "name": "normal",
-      "binaryDir": "${sourceDir}/build",
-      "cacheVariables": {
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-        "F3D_PLUGIN_BUILD_HDF": "ON",
-        "F3D_PLUGIN_BUILD_ALEMBIC": "OFF",
-        "F3D_PLUGIN_BUILD_ASSIMP": "OFF",
-        "F3D_PLUGIN_BUILD_DRACO": "OFF",
-        "F3D_PLUGIN_BUILD_OCCT": "OFF",
-        "F3D_PLUGIN_BUILD_USD": "OFF",
-        "BUILD_TESTING": "ON"
-      }
-    },
-    {
       "name": "vcpkg",
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {

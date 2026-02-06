@@ -98,6 +98,7 @@ void vtkF3DTAAPass::Render(const vtkRenderState* state)
     this->FrameBufferObject->SetContext(renWin);
   }
 
+  this->ConfigureJitter(size[0], size[1]);
   this->ColorTexture->Activate();
   this->MotionVectorTexture->Activate();
   this->DepthTexture->Activate();
