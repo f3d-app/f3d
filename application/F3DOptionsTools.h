@@ -87,6 +87,7 @@ static inline const std::map<std::string_view, std::string_view> LibOptionsNames
   { "camera-index", "scene.camera.index" },
   { "interaction-trackball", "interactor.trackball" },
   { "invert-zoom", "interactor.invert_zoom" },
+  { "two-dimensions-mode", "interactor.two_dimensions_mode" },
   { "animation-autoplay", "scene.animation.autoplay" },
   { "animation-index", "scene.animation.index" },
   { "animation-indices", "scene.animation.indices" },

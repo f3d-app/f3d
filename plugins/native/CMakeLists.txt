@@ -152,6 +152,51 @@ f3d_plugin_declare_reader(
 )
 
 f3d_plugin_declare_reader(
+  NAME PNG
+  EXTENSIONS png
+  MIMETYPES image/png
+  VTK_READER vtkPNGReader
+  FORMAT_DESCRIPTION "PNG Image"
+  EXCLUDE_FROM_THUMBNAILER
+)
+
+f3d_plugin_declare_reader(
+  NAME JPEG
+  EXTENSIONS jpg jpeg
+  MIMETYPES image/jpeg
+  VTK_READER vtkJPEGReader
+  FORMAT_DESCRIPTION "JPEG Image"
+  EXCLUDE_FROM_THUMBNAILER
+)
+
+f3d_plugin_declare_reader(
+  NAME BMP
+  EXTENSIONS bmp
+  MIMETYPES image/bmp
+  VTK_READER vtkBMPReader
+  FORMAT_DESCRIPTION "BMP Image"
+  EXCLUDE_FROM_THUMBNAILER
+)
+
+f3d_plugin_declare_reader(
+  NAME TGA
+  EXTENSIONS tga
+  MIMETYPES image/x-tga
+  VTK_READER vtkTGAReader
+  FORMAT_DESCRIPTION "TGA Image"
+  EXCLUDE_FROM_THUMBNAILER
+)
+
+f3d_plugin_declare_reader(
+  NAME HDR
+  EXTENSIONS hdr
+  MIMETYPES image/vnd.radiance
+  VTK_READER vtkHDRReader
+  FORMAT_DESCRIPTION "HDR Radiance Image"
+  EXCLUDE_FROM_THUMBNAILER
+)
+
+f3d_plugin_declare_reader(
   NAME VRMLReader
   EXTENSIONS wrl vrml
   MIMETYPES model/vrml
