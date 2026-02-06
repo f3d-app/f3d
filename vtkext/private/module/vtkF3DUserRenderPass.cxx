@@ -25,6 +25,7 @@ void vtkF3DUserRenderPass::Render(const vtkRenderState* s)
   vtkRenderer* r = s->GetRenderer();
   vtkOpenGLRenderWindow* renWin = static_cast<vtkOpenGLRenderWindow*>(r->GetRenderWindow());
   vtkOpenGLState* ostate = renWin->GetState();
+  vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(renWin->GetRenderers()->GetFirstRenderer());
 
   vtkOpenGLState::ScopedglEnableDisable bsaver(ostate, GL_BLEND);
   vtkOpenGLState::ScopedglEnableDisable dsaver(ostate, GL_DEPTH_TEST);
@@ -71,6 +72,7 @@ void vtkF3DUserRenderPass::Render(const vtkRenderState* s)
     vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Decl",
       "uniform sampler2D source;\n"
       "uniform ivec2 resolution;\n"
+      "uniform float time;\n"
       "//VTK::FSQ::Decl");
 
     vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Decl", this->UserShader);
@@ -96,6 +98,7 @@ void vtkF3DUserRenderPass::Render(const vtkRenderState* s)
   this->ColorTexture->Activate();
   this->QuadHelper->Program->SetUniformi("source", this->ColorTexture->GetTextureUnit());
   this->QuadHelper->Program->SetUniform2i("resolution", size);
+  this->QuadHelper->Program->SetUniformf("time", ren->GetTime());
 
   ostate->vtkglDisable(GL_BLEND);
   ostate->vtkglDisable(GL_DEPTH_TEST);
