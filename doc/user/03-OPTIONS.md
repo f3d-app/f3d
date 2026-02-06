@@ -184,6 +184,10 @@ Enable trackball interaction.
 
 Invert zoom direction with right mouse click.
 
+### `--two-dimensions-mode` (_bool_, default: `false`)
+
+Enable 2D interaction mode (pan/zoom only, no rotation).
+
 ### `--animation-autoplay` (_bool_, default: `false`)
 
 Automatically start animation.

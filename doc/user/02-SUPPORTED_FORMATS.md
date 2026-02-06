@@ -15,6 +15,11 @@ F3D supports the following file formats:
 | NRRD ("nearly raw raster data")           | `.nrrd`, `.nhdr`                               | No         | NONE              | NO                | `native`  | `Nrrd`                  |
 | MetaHeader MetaIO                         | `.mhd`, `.mha`                                 | No         | NONE              | NO                | `native`  | `MetaImage`             |
 | Tag Image File Format 2D/3D               | `.tif`, `.tiff`                                | No         | NONE              | NO                | `native`  | `TIFF`                  |
+| PNG Image                                 | `.png`                                         | No         | NONE              | NO                | `native`  | `PNG`                   |
+| JPEG Image                                | `.jpg`, `.jpeg`                                | No         | NONE              | NO                | `native`  | `JPEG`                  |
+| BMP Image                                 | `.bmp`                                         | No         | NONE              | NO                | `native`  | `BMP`                   |
+| TGA Image                                 | `.tga`                                         | No         | NONE              | NO                | `native`  | `TGA`                   |
+| HDR Radiance Image                        | `.hdr`                                         | No         | NONE              | NO                | `native`  | `HDR`                   |
 | QuakeMDL                                  | `.mdl`                                         | Yes        | SINGLE            | YES (VTK 9.5)     | `native`  | `QuakeMDL`              |
 | CityGML                                   | `.gml`                                         | No         | NONE              | YES (VTK 9.6)     | `native`  | `CityGML`               |
 | Point Cloud                               | `.pts`                                         | No         | NONE              | YES (VTK 9.6)     | `native`  | `PTS`                   |
