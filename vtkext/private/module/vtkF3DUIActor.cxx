@@ -38,7 +38,7 @@ void vtkF3DUIActor::SetDropBinds(
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DUIActor::SetHierarchy(const std::vector<NodeInfo>& hierarchy)
+void vtkF3DUIActor::SetHierarchy(const std::vector<F3DNodeInfo>& hierarchy)
 {
   this->HierarchyNodes = hierarchy;
 }

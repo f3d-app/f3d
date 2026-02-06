@@ -2,6 +2,7 @@
 
 #include "F3DLog.h"
 #include "vtkF3DGenericImporter.h"
+#include "vtkF3DGLTFImporter.h"
 #include "vtkF3DImporter.h"
 
 #include <vtkActorCollection.h>
@@ -25,8 +26,6 @@
 #include <map>
 #include <numeric>
 #include <vector>
-
-#include "vtkF3DGLTFImporter.h"
 
 //----------------------------------------------------------------------------
 struct vtkF3DMetaImporter::Internals
@@ -741,7 +740,7 @@ vtkDataAssembly* vtkF3DMetaImporter::GetSceneHierarchy()
 {
   for (const auto& importerPair : this->Pimpl->Importers)
   {
-    vtkF3DGLTFImporter* gltfImporter = vtkF3DGLTFImporter::SafeDownCast(importerPair.Importer);
+    vtkGLTFImporter* gltfImporter = vtkGLTFImporter::SafeDownCast(importerPair.Importer);
     if (gltfImporter)
     {
       return gltfImporter->GetSceneHierarchy();
@@ -751,21 +750,21 @@ vtkDataAssembly* vtkF3DMetaImporter::GetSceneHierarchy()
 }
 
 //----------------------------------------------------------------------------
-std::vector<NodeInfo> vtkF3DMetaImporter::GetActorHierarchy()
+std::vector<F3DNodeInfo> vtkF3DMetaImporter::ComputeNodeInfoHierarchy()
 {
-  std::vector<NodeInfo> nodes;
+  std::vector<F3DNodeInfo> nodes;
 
   // Get scene hierarchy from importers that support it
   vtkDataAssembly* hierarchy = this->GetSceneHierarchy();
-  std::map<int, std::string> actorIndexNameMap;
+  std::vector<std::string> actorIndexNameMap;
   
   // If we have a scene hierarchy, extract names from it
   if (hierarchy)
   {
-    // Build a map of actor indices to their names from the hierarchy
+    // Build a vector of actor names from the hierarchy
     // Map leaf mesh nodes sequentially to actor indices
-    int meshCounter = 0;
-    std::function<void(int)> traverseHierarchy = [&](int nodeId) {
+    std::function<void(int)> traverseHierarchy = [&](int nodeId)
+    {
       const char* nodeName = hierarchy->GetNodeName(nodeId);
       std::vector<int> children = hierarchy->GetChildNodes(nodeId, false);
       
@@ -775,9 +774,8 @@ std::vector<NodeInfo> vtkF3DMetaImporter::GetActorHierarchy()
         std::string nameStr(nodeName);
         if (nameStr != "Camera" && nameStr != "Light" && nameStr != "assembly" && nameStr != "root")
         {
-          // This is a mesh leaf node - map it to the next actor index
-          actorIndexNameMap[meshCounter] = nodeName;
-          meshCounter++;
+          // This is a mesh leaf node - add it to the next index
+          actorIndexNameMap.emplace_back(nodeName);
         }
       }
       
@@ -802,7 +800,7 @@ std::vector<NodeInfo> vtkF3DMetaImporter::GetActorHierarchy()
       continue;
     }
 
-    NodeInfo node;
+    F3DNodeInfo node;
     node.prop = actor;
 
     // Try to get a meaningful name for the actor
@@ -810,10 +808,9 @@ std::vector<NodeInfo> vtkF3DMetaImporter::GetActorHierarchy()
     std::string actorName;
 
     // First, check if we have a name from the scene hierarchy
-    auto it = actorIndexNameMap.find(actorIndex);
-    if (it != actorIndexNameMap.end())
+    if (actorIndex < static_cast<int>(actorIndexNameMap.size()))
     {
-      actorName = it->second;
+      actorName = actorIndexNameMap[actorIndex];
     }
     // Second, try to use the actor's ObjectName
     else

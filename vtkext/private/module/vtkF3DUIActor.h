@@ -8,6 +8,8 @@
 #ifndef vtkF3DUIActor_h
 #define vtkF3DUIActor_h
 
+#include "F3DNodeInfo.h"
+
 #include <vtkCommand.h>
 #include <vtkProp.h>
 
@@ -17,8 +19,6 @@
 #include <utility>
 #include <string>
 #include <vector>
-
-#include "F3DNodeInfo.h"
 
 class vtkOpenGLRenderWindow;
 
@@ -79,7 +79,7 @@ public:
   /**
    * Set the scene hierarchy
    */
-  void SetHierarchy(const std::vector<NodeInfo>& hierarchy);
+  void SetHierarchy(const std::vector<F3DNodeInfo>& hierarchy);
 
   /**
    * Set the dropzone binds
@@ -236,7 +236,7 @@ protected:
   /**
    * Recursively render a node in the scene hierarchy tree
    */
-  virtual void RenderNode(NodeInfo*, vtkOpenGLRenderWindow*)
+  virtual void RenderNode(F3DNodeInfo*, vtkOpenGLRenderWindow*)
   {
   }
 
@@ -303,7 +303,7 @@ protected:
   std::string MetaData = "";
 
   bool SceneHierarchyVisible = false;
-  std::vector<NodeInfo> HierarchyNodes;
+  std::vector<F3DNodeInfo> HierarchyNodes;
 
   bool CheatSheetVisible = false;
   std::vector<CheatSheetGroup> CheatSheet;

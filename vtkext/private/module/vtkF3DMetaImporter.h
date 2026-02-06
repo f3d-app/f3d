@@ -171,15 +171,15 @@ public:
   * Returns the scene hierarchy if any of the importers supports it.
   * Returns nullptr if no importer with hierarchy support was added.
   */
-  vtkDataAssembly* GetSceneHierarchy();
-  std::vector<NodeInfo> GetActorHierarchy();
+  vtkDataAssembly* GetSceneHierarchy() override;
+  std::vector<F3DNodeInfo> ComputeNodeInfoHierarchy();
 
 private:
   /**
    * Build hierarchical node structure from vtkDataAssembly
    */
   void BuildHierarchyFromAssembly(vtkDataAssembly* assembly, int nodeId, 
-    NodeInfo& parentNode, std::map<std::string, vtkProp*>& actorMap);
+    F3DNodeInfo& parentNode, std::map<std::string, vtkProp*>& actorMap);
 
 protected:
   vtkF3DMetaImporter();

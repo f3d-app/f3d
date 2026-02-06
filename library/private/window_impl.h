@@ -15,10 +15,11 @@
 #include "log.h"
 #include "window.h"
 
-#include <F3DNodeInfo.h>
 #include <filesystem>
 #include <memory>
 #include <optional>
+
+#include "F3DNodeInfo.h"
 
 class vtkRenderWindow;
 class vtkF3DMetaImporter;
@@ -65,9 +66,9 @@ public:
   /**
    * Implementation only API.
    * Set the scene hierarchy for display in UI.
-   * This is called internally by the scene when content changes.
+   * This is called by the scene when content changes.
    */
-  void SetSceneHierarchy(const std::vector<NodeInfo>& hierarchy);
+  void SetSceneHierarchy(const std::vector<F3DNodeInfo>& hierarchy);
 
   /**
    * Implementation only API.
