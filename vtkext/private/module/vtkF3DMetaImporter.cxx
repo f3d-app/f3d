@@ -314,12 +314,21 @@ bool vtkF3DMetaImporter::Update()
 
       ngs.InputDataHasNormals = points->GetPointData()->GetNormals() != nullptr;
 
+      double actorBounds[6];
+      actor->GetBounds(actorBounds);
+
+      double dx = actorBounds[1] - actorBounds[0];
+      double dy = actorBounds[3] - actorBounds[2];
+      double dz = actorBounds[5] - actorBounds[4];
+      double diagonal = std::sqrt(dx * dx + dy * dy + dz * dz);
+      double glyphScale = 0.05 * diagonal;
+
       vtkNew<vtkArrowSource> arrowSource;
       ngs.GlyphMapper->SetInputData(points);
       ngs.GlyphMapper->SetSourceConnection(arrowSource->GetOutputPort());
       ngs.GlyphMapper->SetOrientationModeToDirection();
       ngs.GlyphMapper->SetOrientationArray(vtkDataSetAttributes::NORMALS);
-      ngs.GlyphMapper->SetScaleFactor(0.2);
+      ngs.GlyphMapper->SetScaleFactor(glyphScale);
       ngs.GlyphMapper->ScalingOn();
 
       ngs.Actor->SetMapper(ngs.GlyphMapper);
