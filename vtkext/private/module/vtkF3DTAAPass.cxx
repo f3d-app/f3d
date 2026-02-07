@@ -141,7 +141,6 @@ void vtkF3DTAAPass::Render(const vtkRenderState* state)
   renWin->GetState()->PopFramebufferBindings();
   this->PostRender(state);
 
-  this->PostRender(state);
   if (!this->QuadHelper)
   {
     std::string TAAResolveFS = vtkOpenGLRenderUtilities::GetFullScreenQuadFragmentShaderTemplate();
@@ -199,6 +198,8 @@ void vtkF3DTAAPass::Render(const vtkRenderState* state)
 
   this->ColorTexture->Deactivate();
   this->HistoryTexture->Deactivate();
+  this->MotionVectorTexture->Deactivate();
+  this->DepthTexture->Deactivate();
   this->HistoryTexture->CopyFromFrameBuffer(pos[0], pos[1], this->viewPortSize[0],
     this->viewPortSize[1], this->viewPortSize[0], this->viewPortSize[1]);
   this->HistoryIteration = std::min(this->HistoryIteration + 1, 1024);
