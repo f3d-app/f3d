@@ -341,6 +341,13 @@ public:
   void ShowScalarBar(bool show);
 
   /**
+   * Set the visibility of the normal glyphs actor.
+   * Normal glyphs actor displays arrows depicting the direction of vertex normals.
+   * It will only be shown if raytracing and Point Sprites rendering modes are disabled.
+   */
+  void SetUseNormalGlyphs(bool use);
+
+  /**
    * Set the visibility of the point sprites actor.
    * It will only be shown if raytracing and volume are not enabled
    */
@@ -771,6 +778,7 @@ private:
   std::optional<std::string> ArrayNameForColoring;
 
   bool ScalarBarVisible = false;
+  bool UseNormalGlyphs = false;
   bool UsePointSprites = false;
   bool UseVolume = false;
   bool UseInverseOpacityFunction = false;

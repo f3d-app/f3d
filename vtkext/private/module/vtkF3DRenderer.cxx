@@ -16,6 +16,7 @@
 #include "vtkF3DSolidBackgroundPass.h"
 #include "vtkF3DUserRenderPass.h"
 
+#include <vtkArrowSource.h>
 #include <vtkAxesActor.h>
 #include <vtkBoundingBox.h>
 #include <vtkCamera.h>
@@ -27,6 +28,7 @@
 #include <vtkCullerCollection.h>
 #include <vtkDiscretizableColorTransferFunction.h>
 #include <vtkFloatArray.h>
+#include <vtkGlyph3D.h>
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Factory.h>
@@ -2754,6 +2756,17 @@ void vtkF3DRenderer::ShowScalarBar(bool show)
   }
 }
 
+// ---------------------------------------------------------------------------
+void vtkF3DRenderer::SetUseNormalGlyphs(bool use)
+{
+  if (this->UseNormalGlyphs != use)
+  {
+    this->CheatSheetConfigured = false;
+    this->ColoringConfigured = false;
+    this->UseNormalGlyphs = use;
+  }
+}
+
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetUsePointSprites(bool use)
 {
@@ -3010,6 +3023,21 @@ void vtkF3DRenderer::ConfigureColoring()
   if (pointSpritesVisible)
   {
     this->ColoringPointSpritesMappersConfigured = true;
+  }
+
+  // Handle Normal Glyphs
+  bool normalGlyphsVisible =
+    !this->UseRaytracing && !this->UsePointSprites && this->UseNormalGlyphs;
+  for (const auto& normalGlyph : this->Importer->GetNormalGlyphsActorsAndMappers())
+  {
+    if (normalGlyphsVisible && !normalGlyph.InputDataHasNormals)
+    {
+      F3DLog::Print(F3DLog::Severity::Warning,
+        "Data does not contain any normals to display the normal glyphs with");
+      continue;
+    }
+
+    normalGlyph.Actor->SetVisibility(normalGlyphsVisible);
   }
 
   // Handle Volume prop
