@@ -47,6 +47,14 @@ public:
   }
 
   /**
+   * Reduce iteratios count. Keep the blending factor at 0.9.
+   */
+  void ReduceIterations()
+  {
+    this->HistoryIteration = 9;
+  }
+
+  /**
    * Modify shader code for jittering
    */
   bool PreReplaceShaderValues(std::string& vertexShader, std::string& geometryShader,
@@ -89,6 +97,5 @@ private:
 
   vtkSmartPointer<vtkMatrix4x4> CurrentViewProjectionMatrix;
   vtkSmartPointer<vtkMatrix4x4> PreviousViewProjectionMatrix;
-  
 };
 #endif

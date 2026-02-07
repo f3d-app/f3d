@@ -149,15 +149,23 @@ void vtkF3DTAAPass::Render(const vtkRenderState* state)
       "uniform sampler2D colorTexture;\n"
       "uniform sampler2D historyTexture;\n"
       "uniform sampler2D motionVectorTexture;\n"
+      "uniform vec2 framebufferSize;"
       "uniform float blendFactor;\n"
       "//VTK::FSQ::Decl");
 
     vtkShaderProgram::Substitute(TAAResolveFS, "//VTK::FSQ::Impl",
       "vec4 current = texture(colorTexture, texCoord);\n"
       "vec2 motion = texture(motionVectorTexture, texCoord).xy;\n"
-      "vec4 history = texture(historyTexture, texCoord + motion);\n"
+      "vec4 history = texture(historyTexture, texCoord + motion / framebufferSize);\n"
+      "vec2 texelSize = 1.0 / framebufferSize;\n"
+      "vec4 c0 = texture(colorTexture, texCoord + vec2( texelSize.x, 0.0));\n"
+      "vec4 c1 = texture(colorTexture, texCoord + vec2(-texelSize.x, 0.0));\n"
+      "vec4 c2 = texture(colorTexture, texCoord + vec2(0.0,  texelSize.y));\n"
+      "vec4 c3 = texture(colorTexture, texCoord + vec2(0.0, -texelSize.y));\n"
+      "vec4 boxMin = min(current, min(c0, min(c1, min(c2, c3))));\n"
+      "vec4 boxMax = max(current, max(c0, max(c1, max(c2, c3))));\n"
+      "history = clamp(history, boxMin, boxMax);\n"
       "gl_FragData[0] = mix(current, history, blendFactor);\n"
-      "gl_FragData[0] = vec4(motion, 0, 1);\n"
       "//VTK::FSQ::Impl");
     this->QuadHelper =
       std::make_shared<vtkOpenGLQuadHelper>(renWin, nullptr, TAAResolveFS.c_str(), nullptr);
@@ -175,6 +183,9 @@ void vtkF3DTAAPass::Render(const vtkRenderState* state)
   this->QuadHelper->Program->SetUniformi("historyTexture", this->HistoryTexture->GetTextureUnit());
   this->QuadHelper->Program->SetUniformi(
     "motionVectorTexture", this->MotionVectorTexture->GetTextureUnit());
+  float framebufferSize[2] = { static_cast<float>(this->viewPortSize[0]),
+    static_cast<float>(this->viewPortSize[1]) };
+  this->QuadHelper->Program->SetUniform2f("framebufferSize", framebufferSize);
 
   const float blendFactor = this->HistoryIteration / (this->HistoryIteration + 1.0f);
   this->QuadHelper->Program->SetUniformf("blendFactor", blendFactor);

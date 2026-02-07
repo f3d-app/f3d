@@ -228,8 +228,8 @@ void vtkF3DRenderPass::Initialize(const vtkRenderState* s)
 
       s->GetRenderer()->GetRenderWindow()->AddObserver(
         vtkCommand::WindowResizeEvent, taaP.Get(), &vtkF3DTAAPass::ResetIterations);
-      //s->GetRenderer()->GetRenderWindow()->GetInteractor()->GetInteractorStyle()->AddObserver(
-      //  vtkCommand::InteractionEvent, taaP.Get(), &vtkF3DTAAPass::ResetIterations);
+      s->GetRenderer()->GetRenderWindow()->GetInteractor()->GetInteractorStyle()->AddObserver(
+        vtkCommand::InteractionEvent, taaP.Get(), &vtkF3DTAAPass::ReduceIterations);
 
       this->MainPass->SetDelegatePass(taaP);
     }
