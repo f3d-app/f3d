@@ -112,6 +112,17 @@ public:
    */
   vtkMTimeType GetMTime() override;
 
+  ///@{
+  /**
+   * Return true if, after a quick check of file header, it looks like the provided stream
+   * can be read. Return false if it is sure it cannot be read.
+   *
+   * format is provided to be used as a FileFormat in this reader.
+   */
+  static bool CanReadFile(vtkResourceStream* stream, vtkF3DOCCTReader::FILE_FORMAT& format);
+  static bool CanReadFile(vtkResourceStream* stream);
+  ///@}
+
 protected:
   vtkF3DOCCTReader();
   ~vtkF3DOCCTReader() override;

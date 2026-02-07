@@ -12,6 +12,11 @@ bool testReaderStream(const std::string& filename, const vtkF3DOCCTReader::FILE_
   vtkNew<vtkFileResourceStream> fileStream;
   fileStream->Open(filename.c_str());
 
+  if (!vtkF3DOCCTReader::CanReadFile(fileStream))
+  {
+    return false;
+  }
+
   vtkNew<vtkF3DOCCTReader> reader;
   reader->RelativeDeflectionOn();
   reader->SetLinearDeflection(0.1);
