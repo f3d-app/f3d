@@ -23,20 +23,17 @@ void vtkF3DInteractorStyle::OnLeftButtonDown()
     this->Interactor->GetEventPosition()[0], this->Interactor->GetEventPosition()[1]);
   assert(this->CurrentRenderer != nullptr);
 
-  if (this->Interactor->GetShiftKey())
+  if (this->InteractionMode == TWO_D || this->Interactor->GetShiftKey())
   {
     this->StartPan();
   }
+  else if (this->Interactor->GetControlKey())
+  {
+    this->StartSpin();
+  }
   else
   {
-    if (this->Interactor->GetControlKey())
-    {
-      this->StartSpin();
-    }
-    else
-    {
-      this->StartRotate();
-    }
+    this->StartRotate();
   }
 }
 
@@ -87,7 +84,7 @@ void vtkF3DInteractorStyle::OnRightButtonDown()
     this->Interactor->GetEventPosition()[0], this->Interactor->GetEventPosition()[1]);
   assert(this->CurrentRenderer != nullptr);
 
-  if (this->Interactor->GetShiftKey())
+  if (this->InteractionMode != TWO_D && this->Interactor->GetShiftKey())
   {
     this->StartEnvRotate();
   }
@@ -132,7 +129,7 @@ void vtkF3DInteractorStyle::OnKeyPress()
 //------------------------------------------------------------------------------
 void vtkF3DInteractorStyle::Rotate()
 {
-  if (this->CameraMovementDisabled)
+  if (this->CameraMovementDisabled || this->InteractionMode == TWO_D)
   {
     return;
   }
@@ -153,7 +150,7 @@ void vtkF3DInteractorStyle::Rotate()
 
   vtkCamera* camera = ren->GetActiveCamera();
 
-  if (!ren->GetUseTrackball())
+  if (this->InteractionMode != TRACKBALL)
   {
     double up[3];
     this->InterpolateTemporaryUp(0.1, ren->GetUpDirection(), up);
@@ -204,7 +201,7 @@ void vtkF3DInteractorStyle::Rotate()
 //----------------------------------------------------------------------------
 void vtkF3DInteractorStyle::Spin()
 {
-  if (this->CameraMovementDisabled)
+  if (this->CameraMovementDisabled || this->InteractionMode == TWO_D)
   {
     return;
   }
@@ -305,6 +302,11 @@ void vtkF3DInteractorStyle::DollyToPosition(double factor, int* position, vtkRen
 //----------------------------------------------------------------------------
 void vtkF3DInteractorStyle::EnvironmentRotate()
 {
+  if (this->InteractionMode == TWO_D)
+  {
+    return;
+  }
+
   this->Superclass::EnvironmentRotate();
 
   vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(this->CurrentRenderer);
