@@ -183,7 +183,6 @@ f3d_plugin_declare_reader(
   MIMETYPES image/x-tga
   VTK_READER vtkTGAReader
   FORMAT_DESCRIPTION "TGA Image"
-  EXCLUDE_FROM_THUMBNAILER
 )
 
 f3d_plugin_declare_reader(
@@ -192,7 +191,6 @@ f3d_plugin_declare_reader(
   MIMETYPES image/vnd.radiance
   VTK_READER vtkHDRReader
   FORMAT_DESCRIPTION "HDR Radiance Image"
-  EXCLUDE_FROM_THUMBNAILER
 )
 
 f3d_plugin_declare_reader(
