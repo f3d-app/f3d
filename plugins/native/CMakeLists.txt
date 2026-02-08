@@ -151,6 +151,11 @@ f3d_plugin_declare_reader(
   EXCLUDE_FROM_THUMBNAILER
 )
 
+set(_SUPPORTS_STREAM)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260106)
+  set(_SUPPORTS_STREAM SUPPORTS_STREAM)
+endif()
+
 f3d_plugin_declare_reader(
   NAME PNG
   EXTENSIONS png
@@ -158,6 +163,7 @@ f3d_plugin_declare_reader(
   VTK_READER vtkPNGReader
   FORMAT_DESCRIPTION "PNG Image"
   EXCLUDE_FROM_THUMBNAILER
+  ${_SUPPORTS_STREAM}
 )
 
 f3d_plugin_declare_reader(
@@ -167,6 +173,7 @@ f3d_plugin_declare_reader(
   VTK_READER vtkJPEGReader
   FORMAT_DESCRIPTION "JPEG Image"
   EXCLUDE_FROM_THUMBNAILER
+  ${_SUPPORTS_STREAM}
 )
 
 f3d_plugin_declare_reader(
@@ -176,6 +183,7 @@ f3d_plugin_declare_reader(
   VTK_READER vtkBMPReader
   FORMAT_DESCRIPTION "BMP Image"
   EXCLUDE_FROM_THUMBNAILER
+  ${_SUPPORTS_STREAM}
 )
 
 f3d_plugin_declare_reader(
@@ -184,6 +192,7 @@ f3d_plugin_declare_reader(
   MIMETYPES image/x-tga
   VTK_READER vtkTGAReader
   FORMAT_DESCRIPTION "TGA Image"
+  ${_SUPPORTS_STREAM}
 )
 
 f3d_plugin_declare_reader(
@@ -192,6 +201,7 @@ f3d_plugin_declare_reader(
   MIMETYPES image/vnd.radiance
   VTK_READER vtkHDRReader
   FORMAT_DESCRIPTION "HDR Radiance Image"
+  ${_SUPPORTS_STREAM}
 )
 
 f3d_plugin_declare_reader(
