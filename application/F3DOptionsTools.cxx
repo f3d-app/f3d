@@ -103,9 +103,9 @@ static inline const std::array<CLIGroup, 8> CLIOptions = {{
       { "edges", "e", "Show cell edges", "<bool>", "1" },
       { "armature", "", "Enable armature visualization", "<bool>", "1" },
       { "camera-index", "", "Select the camera to use", "<index>", "" },
-      { "interaction-trackball", "k", "Enable trackball interaction", "<bool>", "1" },
+      { "interaction-style", "k", "Set interaction style", "<default|trackball|2d>", "trackball" },
+      { "interaction-trackball", "", "Enable trackball interaction (deprecated, use --interaction-style=trackball)", "<bool>", "1" },
       { "invert-zoom", "", "Invert zoom direction with right mouse click", "<bool>", "1" },
-      { "two-dimensions-mode", "", "Enable 2D interaction mode (pan/zoom only)", "<bool>", "1" },
       { "animation-autoplay", "", "Automatically start animation", "<bool>", "1" },
       { "animation-index", "", "Select animation to show (deprecated)", "<index>", "" },
       { "animation-indices", "", "Select animations to show", "<index,index,index>", "" },
@@ -751,6 +751,17 @@ std::vector<std::pair<std::string, std::string>> F3DOptionsTools::ConvertToLibf3
   {
     f3d::log::warn("--point-sprites-type is deprecated");
     libf3dOptions.emplace_back(std::make_pair("model.point_sprites.mode", value));
+  }
+
+  // handle deprecated interaction-trackball option
+  else if (key == "interaction-trackball")
+  {
+    f3d::log::warn("--interaction-trackball is deprecated, please use --interaction-style=trackball instead");
+    bool trackball;
+    if (F3DOptionsTools::Parse(value, trackball) && trackball)
+    {
+      libf3dOptions.emplace_back(std::make_pair("interactor.style", "trackball"));
+    }
   }
 
   else

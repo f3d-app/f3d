@@ -461,9 +461,10 @@ void window_impl::UpdateDynamicOptions()
   {
     renderer->SetAxesColor(opt.ui.x_color, opt.ui.y_color, opt.ui.z_color);
     renderer->ShowAxis(opt.ui.axis);
-    renderer->SetUseTrackball(opt.interactor.trackball);
+    const std::string& style = opt.interactor.style;
+    renderer->SetUseTrackball(style == "trackball");
     renderer->SetInvertZoom(opt.interactor.invert_zoom);
-    this->Internals->Interactor->SetUse2DMode(opt.interactor.two_dimensions_mode);
+    this->Internals->Interactor->SetInteractorStyle(style);
 
 #if F3D_MODULE_UI
     std::string bindsStr = opt.ui.drop_zone.custom_binds;

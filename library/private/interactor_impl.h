@@ -123,9 +123,9 @@ public:
 
   /**
    * Implementation only API.
-   * Set the 2D interaction mode (pan/zoom only, no rotation).
+   * Set the interaction style ("default", "trackball", or "2d").
    */
-  void SetUse2DMode(bool use);
+  void SetInteractorStyle(const std::string& style);
 
   /**
    * Event loop being called automatically once the interactor is started
