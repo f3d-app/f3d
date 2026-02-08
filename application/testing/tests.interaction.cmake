@@ -81,6 +81,11 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
   f3d_test(NAME TestInteractionConfigFileOptional DATA zombie.mdl f3d.glb CONFIG ${F3D_SOURCE_DIR}/testing/configs/complex.json INTERACTION UI) #Right
 endif()
 
+## 2D Mode
+f3d_test(NAME TestInteraction2DPan DATA cow.vtp ARGS --interaction-style=2d INTERACTION) #LeftMouse;MouseMovements
+f3d_test(NAME TestInteraction2DZoom DATA cow.vtp ARGS --interaction-style=2d INTERACTION) #RightMouse;MouseMovements
+f3d_test(NAME TestInteraction2DCycle DATA cow.vtp INTERACTION) #K;K;LeftMouse;MouseMovements
+
 ## Camera
 f3d_test(NAME TestInteractionResetCamera DATA dragon.vtu INTERACTION LONG_TIMEOUT)#MouseMovements;Return;
 f3d_test(NAME TestInteractionResetCameraWithCameraIndex DATA CameraAnimated.glb ARGS --camera-index=0 INTERACTION)#MouseMovements;Return;

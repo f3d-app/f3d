@@ -2006,16 +2006,6 @@ void vtkF3DRenderer::SetUseOrthographicProjection(const std::optional<bool>& use
 }
 
 //----------------------------------------------------------------------------
-void vtkF3DRenderer::SetUseTrackball(bool use)
-{
-  if (this->UseTrackball != use)
-  {
-    this->UseTrackball = use;
-    this->CheatSheetConfigured = false;
-  }
-}
-
-//----------------------------------------------------------------------------
 void vtkF3DRenderer::UpdateActors()
 {
   assert(this->Importer);

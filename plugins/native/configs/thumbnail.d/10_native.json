@@ -66,6 +66,16 @@
   },
   {
     "match-type": "glob",
+    "match": "*.{tga,hdr}",
+    "options": {
+      "scalar-coloring": true,
+      "coloring-component": "-2",
+      "camera-direction": "0,0,-1",
+      "camera-orthographic": true
+    }
+  },
+  {
+    "match-type": "glob",
     "match": "*.mdl",
     "options": {
       "up": "+Z"

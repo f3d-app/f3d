@@ -142,6 +142,23 @@ public:
     this->Recorder->SetInteractor(this->VTKInteractor);
   }
 
+  //----------------------------------------------------------------------------
+  void SetInteractorStyle(const std::string& style)
+  {
+    if (style == "2d")
+    {
+      this->Style->SetInteractionMode(vtkF3DInteractorStyle::TWO_D);
+    }
+    else if (style == "trackball")
+    {
+      this->Style->SetInteractionMode(vtkF3DInteractorStyle::TRACKBALL);
+    }
+    else
+    {
+      this->Style->SetInteractionMode(vtkF3DInteractorStyle::DEFAULT);
+    }
+  }
+
   std::string VerboseLevelToString(log::VerboseLevel level)
   {
     switch (level)
@@ -829,6 +846,7 @@ interactor& interactor_impl::initCommands()
   { return complNames(args, this->Internals->Options.getAllNames()); };
 
   static const std::map<std::string, std::vector<std::string>> COMPL_OPTIONS_SET = {
+    { "interactor.style", { "default", "trackball", "2d" } },
     { "model.point_sprites.type", { "sphere", "gaussian" } },
     { "render.effect.antialiasing.mode", { "fxaa", "ssaa", "taa" } },
     { "render.effect.blending.mode", { "ddp", "sort", "sort_cpu", "stochastic" } },
@@ -1233,6 +1251,28 @@ interactor& interactor_impl::initCommands()
       "toggle_volume_rendering", "toggle model.volume.enable and print coloring information" });
 
   this->addCommand(
+    "cycle_interactor_style",
+    [&](const std::vector<std::string>&)
+    {
+      std::string& style = this->Internals->Options.interactor.style;
+      if (style == "default")
+      {
+        style = "trackball";
+      }
+      else if (style == "trackball")
+      {
+        style = "2d";
+      }
+      else
+      {
+        style = "default";
+      }
+      this->Internals->SetInteractorStyle(style);
+    },
+    command_documentation_t{
+      "cycle_interactor_style", "cycle between interaction styles (default, trackball, 2d)" });
+
+  this->addCommand(
     "stop_interactor", [&](const std::vector<std::string>&) { this->stop(); },
     command_documentation_t{ "stop_interactor", "stop the interactor hence quit the application" });
 
@@ -1607,6 +1647,9 @@ interactor& interactor_impl::initBindings()
       "Verbose level", this->Internals->VerboseLevelToString(log::getVerboseLevel()));
   };
 
+  auto docStyle = [&]()
+  { return std::pair("Interaction style", this->Internals->Options.interactor.style); };
+
   // clang-format off
   this->addBinding({mod_t::NONE, "W"}, "cycle_animation", "Scene", docAnim, f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "C"}, "cycle_coloring field", "Scene", docField, f3d::interactor::BindingType::CYCLIC);
@@ -1635,7 +1678,7 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "I"}, "toggle model.volume.inverse","Scene", std::bind(docTgl, "Inverse volume opacity", std::cref(opts.model.volume.inverse)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "O"}, "cycle_point_sprites","Scene", docPS, f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "U"}, "toggle render.background.blur.enable","Scene", std::bind(docTgl, "Blur background", std::cref(opts.render.background.blur.enable)), f3d::interactor::BindingType::TOGGLE);
-  this->addBinding({mod_t::NONE, "K"}, "toggle interactor.trackball","Scene", std::bind(docTgl, "Trackball interaction", std::cref(opts.interactor.trackball)), f3d::interactor::BindingType::TOGGLE);
+  this->addBinding({mod_t::NONE, "K"}, "cycle_interactor_style","Scene", docStyle, f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "F"}, "toggle render.hdri.ambient","Scene", std::bind(docTgl, "HDRI ambient lighting", std::cref(opts.render.hdri.ambient)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "J"}, "toggle render.background.skybox","Scene", std::bind(docTgl, "HDRI skybox", std::cref(opts.render.background.skybox)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "L"}, "increase_light_intensity", "Scene", std::bind(docDbl, "Increase lights intensity", std::cref(opts.render.light.intensity)), f3d::interactor::BindingType::NUMERICAL);
@@ -2079,5 +2122,11 @@ void interactor_impl::SetCommandBuffer(const char* command)
 {
   // XXX This replace previous command buffer, it should be improved
   this->Internals->CommandBuffer = command;
+}
+
+//----------------------------------------------------------------------------
+void interactor_impl::SetInteractorStyle(const std::string& style)
+{
+  this->Internals->SetInteractorStyle(style);
 }
 }

@@ -122,6 +122,12 @@ public:
   void ResetTemporaryUp();
 
   /**
+   * Implementation only API.
+   * Set the interaction style ("default", "trackball", or "2d").
+   */
+  void SetInteractorStyle(const std::string& style);
+
+  /**
    * Event loop being called automatically once the interactor is started
    * First call the EventLoopUserCallBack, then call render if requested.
    */
