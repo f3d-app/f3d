@@ -822,10 +822,13 @@ void vtkF3DImguiActor::RenderFpsCounter()
   float posX = viewport->WorkSize.x - winSize.x - margin;
   if (this->ConsoleBadgeEnabled)
   {
-    const float padding = ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().FramePadding.x;
-    ImVec2 badgeSize = ImGui::CalcTextSize("!");
-    badgeSize.x += 2.f * padding;
-    posX = viewport->WorkSize.x - winSize.x - badgeSize.x - 2.f * margin;
+    vtkF3DImguiConsole* console =
+      vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
+    if (console && console->IsBadgeVisible())
+    {
+      ImVec2 badgeSize = console->GetBadgeSize();
+      posX = viewport->WorkSize.x - winSize.x - badgeSize.x - 2.f * margin;
+    }
   }
   ImVec2 position(posX, margin);
 

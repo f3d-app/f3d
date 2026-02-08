@@ -437,6 +437,12 @@ void vtkF3DImguiConsole::ShowBadge()
 }
 
 //----------------------------------------------------------------------------
+bool vtkF3DImguiConsole::IsBadgeVisible() const
+{
+  return this->Pimpl->NewError || this->Pimpl->NewWarning;
+}
+
+//----------------------------------------------------------------------------
 ImVec2 vtkF3DImguiConsole::GetBadgeSize()
 {
   const float padding = ImGui::GetStyle().WindowPadding.x + ImGui::GetStyle().FramePadding.x;
