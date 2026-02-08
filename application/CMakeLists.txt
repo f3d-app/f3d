@@ -197,7 +197,8 @@ include(f3dCLIOptions)
 f3d_generate_cli_options(
   F3D_SOURCE_DIR "${CMAKE_SOURCE_DIR}"
   F3D_BINARY_DIR "${CMAKE_BINARY_DIR}"
-  ENABLED_CONDITIONALS ${f3d_enabled_conditionals} # Do NOT quote. This needs to be passed as a list.
+  ENABLED_CONDITIONALS ${f3d_enabled_conditionals} # Do NOT quote so this stays a list
+  CPP_CLI_OPTIONS_TO_SKIP input;define;reset # Do NOT quote so this stays a list
 )
 
 set(F3D_SOURCE_FILES

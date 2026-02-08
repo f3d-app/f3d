@@ -5,6 +5,9 @@ This module parses resources/cli-options.json and generates F3DCLIOptions.h
 and shell completion scripts.
 #]==]
 
+# Policy CMP0057 need to use IN_LIST operator
+cmake_policy(SET CMP0057 NEW)
+
 #[==[
 @brief parse cli-options.json and generate F3DCLIOptions.h, completion.bash,
 completion.fish, and completion.zsh
@@ -14,6 +17,7 @@ f3d_generate_cli_options(
   F3D_SOURCE_DIR "path/to/root/source/directory"
   F3D_BINARY_DIR "path/to/root/binary/directory"
   ENABLED_CONDITIONALS "FIRST_DEF_TO_CHECK;SECOND_DEF_TO_CHECK"
+  CPP_CLI_OPTIONS_TO_SKIP "input;define;reset"
 ~~~
 
 ENABLED_CONDITIONALS is a semicolon-separated list of the macro names that
@@ -24,13 +28,16 @@ is NOT in this list is silently dropped. Any group or option whose
 The array size is therefore a single compile-time constant — no preprocessor
 branching is needed in the generated header.
 
+CPP_CLI_OPTIONS_TO_SKIP is a semicolon-separated list of CLI option long names
+that should be skipped when generating the CLIOptions array in the C++ source
+code.
 #]==]
 function (f3d_generate_cli_options)
   # Parse inputs
   cmake_parse_arguments(PARSE_ARGV 0 _f3d_generate_cli_options
     ""
     "F3D_SOURCE_DIR;F3D_BINARY_DIR"
-    "ENABLED_CONDITIONALS"
+    "ENABLED_CONDITIONALS;CPP_CLI_OPTIONS_TO_SKIP"
   )
 
   # Validate inputs
@@ -51,6 +58,7 @@ function (f3d_generate_cli_options)
   endif()
 
   # _f3d_generate_cli_options_ENABLED_CONDITIONALS is allowed to be empty
+  # _f3d_generate_cli_options_CPP_CLI_OPTIONS_TO_SKIP is allowed to be empty
 
   # Set input file
   set(_input_json_file "${_f3d_generate_cli_options_F3D_SOURCE_DIR}/resources/cli-options.json")
@@ -151,8 +159,8 @@ function (f3d_generate_cli_options)
         set(_implicit_value "")
       endif()
 
-      # input, define, and reset are handled separately in the C++ source code
-      if(NOT "${_long_name}" STREQUAL "input" AND NOT "${_long_name}" STREQUAL "define" AND NOT "${_long_name}" STREQUAL "reset")
+      # some CLI options are handled differently in the C++ source code
+      if(NOT "${_long_name}" IN_LIST _f3d_generate_cli_options_CPP_CLI_OPTIONS_TO_SKIP)
         # generate C++ output for this CLI option
         string(APPEND F3D_CLI_OPTIONS_CPP
           "      { \"${_long_name}\", \"${_short_name}\", \"${_help_text}\", \"${_value_helper}\", \"${_implicit_value}\" },\n")
@@ -238,10 +246,7 @@ _conditional_satisfied(
 )
 ~~~
 
-# Policy CMP0057 need to use IN_LIST operator below
-
 #]==]
-cmake_policy(SET CMP0057 NEW)
 function(_conditional_satisfied _cond OUT_VAR)
   if(_cond STREQUAL "")
     # No conditional -> always included
