@@ -60,8 +60,7 @@ Other options can be toggled or cycled directly by pressing the following hotkey
 - <kbd>R</kbd>: raytracing.
 - <kbd>D</kbd>: the denoiser when raytracing.
 - <kbd>U</kbd>: background blur, useful with an HDRI skybox.
-- <kbd>K</kbd>: trackball interaction mode.
-- <kbd>Shift</kbd>+<kbd>K</kbd>: 2D interaction mode (pan/zoom only, no rotation).
+- <kbd>K</kbd>: Cycle interaction modes.
 - <kbd>F</kbd>: HDRI ambient lighting.
 - <kbd>J</kbd>: the display of the HDRI skybox.
 - <kbd>L</kbd>: increase lights intensity.
