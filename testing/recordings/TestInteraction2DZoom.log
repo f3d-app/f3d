@@ -1,17 +1,9 @@
 # StreamVersion 1.2
+# Test 2D zooming: right-click drag zooms the camera
 EnterEvent 150 150 0 0 0 0 0
 MouseMoveEvent 150 150 0 0 0 0 0
 RightButtonPressEvent 150 100 0 0 0 0 0
 StartInteractionEvent 150 100 0 0 0 0 0
-MouseMoveEvent 150 110 0 0 0 0 0
-MouseMoveEvent 150 120 0 0 0 0 0
-MouseMoveEvent 150 130 0 0 0 0 0
-MouseMoveEvent 150 140 0 0 0 0 0
-MouseMoveEvent 150 150 0 0 0 0 0
-MouseMoveEvent 150 160 0 0 0 0 0
-MouseMoveEvent 150 170 0 0 0 0 0
-MouseMoveEvent 150 180 0 0 0 0 0
-MouseMoveEvent 150 190 0 0 0 0 0
 MouseMoveEvent 150 200 0 0 0 0 0
 RightButtonReleaseEvent 150 200 0 0 0 0 0
 EndInteractionEvent 150 200 0 0 0 0 0
