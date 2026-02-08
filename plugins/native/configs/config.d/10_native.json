@@ -38,7 +38,8 @@
       "coloring-component": "-2",
       "camera-direction": "0,0,-1",
       "camera-orthographic": true,
-      "interaction-style": "2d"
+      "interaction-style": "2d",
+      "axis": false
     }
   },
   {
@@ -50,7 +51,8 @@
       "coloring-component": "-2",
       "camera-direction": "0,0,-1",
       "camera-orthographic": true,
-      "interaction-style": "2d"
+      "interaction-style": "2d",
+      "axis": false
     }
   },
   {
