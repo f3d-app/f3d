@@ -38,7 +38,7 @@
       "coloring-component": "-2",
       "camera-direction": "0,0,-1",
       "camera-orthographic": true,
-      "two-dimensions-mode": true
+      "interaction-style": "2d"
     }
   },
   {
@@ -61,7 +61,7 @@
       "coloring-array": "color",
       "coloring-component": "-2",
       "background-color": "0, 0, 0",
-      "interaction-trackball": true,
+      "interaction-style": "trackball",
       "tone-mapping": false,
       "grid": false,
       "anti-aliasing": "none",

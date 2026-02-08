@@ -1,10 +1,11 @@
 # StreamVersion 1.2
 RenderEvent 0 0 0 0 0 0 0
-KeyPressEvent 150 150 1 0 1 Shift_L 0
-KeyPressEvent 150 150 1 0 1 k 0
-CharEvent 150 150 1 0 1 k 0
-KeyReleaseEvent 150 150 1 0 1 k 0
-KeyReleaseEvent 150 150 0 0 1 Shift_L 0
+KeyPressEvent 150 150 0 0 1 k 0
+CharEvent 150 150 0 0 1 k 0
+KeyReleaseEvent 150 150 0 0 1 k 0
+KeyPressEvent 150 150 0 0 1 k 0
+CharEvent 150 150 0 0 1 k 0
+KeyReleaseEvent 150 150 0 0 1 k 0
 LeftButtonPressEvent 150 150 0 0 0 0 0
 StartInteractionEvent 150 150 0 0 0 0 0
 MouseMoveEvent 150 155 0 0 0 0 0

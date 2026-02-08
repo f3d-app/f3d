@@ -82,9 +82,9 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251001)
 endif()
 
 ## 2D Mode
-f3d_test(NAME TestInteraction2DPan DATA cow.vtp ARGS --two-dimensions-mode INTERACTION) #LeftMouse;MouseMovements
-f3d_test(NAME TestInteraction2DZoom DATA cow.vtp ARGS --two-dimensions-mode INTERACTION) #RightMouse;MouseMovements
-f3d_test(NAME TestInteraction2DToggle DATA cow.vtp INTERACTION) #Shift+K;LeftMouse;MouseMovements
+f3d_test(NAME TestInteraction2DPan DATA cow.vtp ARGS --interaction-style=2d INTERACTION) #LeftMouse;MouseMovements
+f3d_test(NAME TestInteraction2DZoom DATA cow.vtp ARGS --interaction-style=2d INTERACTION) #RightMouse;MouseMovements
+f3d_test(NAME TestInteraction2DCycle DATA cow.vtp INTERACTION) #K;K;LeftMouse;MouseMovements
 
 ## Camera
 f3d_test(NAME TestInteractionResetCamera DATA dragon.vtu INTERACTION LONG_TIMEOUT)#MouseMovements;Return;

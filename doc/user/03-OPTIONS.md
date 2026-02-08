@@ -176,17 +176,13 @@ Show armature if present (glTF only).
 
 Select the scene camera to use when available in the file. Automatically computed by default.
 
-### `-k`, `--trackball` (_bool_, default: `false`)
+### `-k`, `--interaction-style=<default|trackball|2d>` (_string_, default: `default`)
 
-Enable trackball interaction.
+Set the interaction style. `default` uses standard 3D interaction, `trackball` enables trackball interaction, `2d` enables 2D interaction mode (pan/zoom only, no rotation).
 
 ### `--invert-zoom` (_bool_, default: `false`)
 
 Invert zoom direction with right mouse click.
-
-### `--two-dimensions-mode` (_bool_, default: `false`)
-
-Enable 2D interaction mode (pan/zoom only, no rotation).
 
 ### `--animation-autoplay` (_bool_, default: `false`)
 

@@ -403,15 +403,16 @@
     }
   },
   "interactor": {
+    "style": {
+      "type": "string",
+      "default_value": "default"
+    },
     "trackball": {
       "type": "bool",
-      "default_value": "false"
+      "default_value": "false",
+      "deprecated": "use interactor.style instead"
     },
     "invert_zoom": {
-      "type": "bool",
-      "default_value": "false"
-    },
-    "two_dimensions_mode": {
       "type": "bool",
       "default_value": "false"
     }

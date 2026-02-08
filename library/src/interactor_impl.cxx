@@ -149,12 +149,10 @@ public:
   }
 
   //----------------------------------------------------------------------------
-  void SetInteractorMode(bool is2D)
+  void SetInteractorStyle(const std::string& style)
   {
-    if (this->Is2DMode == is2D)
-    {
-      return;
-    }
+    bool is2D = (style == "2d");
+
     this->Is2DMode = is2D;
     this->CurrentStyle = is2D ? static_cast<vtkInteractorStyle*>(this->Style2D.GetPointer())
                               : static_cast<vtkInteractorStyle*>(this->Style3D.GetPointer());
@@ -865,6 +863,7 @@ interactor& interactor_impl::initCommands()
   { return complNames(args, this->Internals->Options.getAllNames()); };
 
   static const std::map<std::string, std::vector<std::string>> COMPL_OPTIONS_SET = {
+    { "interactor.style", { "default", "trackball", "2d" } },
     { "model.point_sprites.type", { "sphere", "gaussian" } },
     { "render.effect.antialiasing.mode", { "fxaa", "ssaa", "taa" } },
     { "render.effect.blending.mode", { "ddp", "sort", "sort_cpu", "stochastic" } },
@@ -1269,15 +1268,26 @@ interactor& interactor_impl::initCommands()
       "toggle_volume_rendering", "toggle model.volume.enable and print coloring information" });
 
   this->addCommand(
-    "toggle_2d_mode",
+    "cycle_interactor_style",
     [&](const std::vector<std::string>&)
     {
-      this->Internals->Options.interactor.two_dimensions_mode =
-        !this->Internals->Options.interactor.two_dimensions_mode;
-      this->Internals->SetInteractorMode(this->Internals->Options.interactor.two_dimensions_mode);
+      std::string& style = this->Internals->Options.interactor.style;
+      if (style == "default")
+      {
+        style = "trackball";
+      }
+      else if (style == "trackball")
+      {
+        style = "2d";
+      }
+      else
+      {
+        style = "default";
+      }
+      this->Internals->SetInteractorStyle(style);
     },
     command_documentation_t{
-      "toggle_2d_mode", "toggle 2D interaction mode (pan/zoom only, no rotation)" });
+      "cycle_interactor_style", "cycle between interaction styles (default, trackball, 2d)" });
 
   this->addCommand(
     "stop_interactor", [&](const std::vector<std::string>&) { this->stop(); },
@@ -1654,6 +1664,9 @@ interactor& interactor_impl::initBindings()
       "Verbose level", this->Internals->VerboseLevelToString(log::getVerboseLevel()));
   };
 
+  auto docStyle = [&]()
+  { return std::pair("Interaction style", this->Internals->Options.interactor.style); };
+
   // clang-format off
   this->addBinding({mod_t::NONE, "W"}, "cycle_animation", "Scene", docAnim, f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "C"}, "cycle_coloring field", "Scene", docField, f3d::interactor::BindingType::CYCLIC);
@@ -1682,8 +1695,7 @@ interactor& interactor_impl::initBindings()
   this->addBinding({mod_t::NONE, "I"}, "toggle model.volume.inverse","Scene", std::bind(docTgl, "Inverse volume opacity", std::cref(opts.model.volume.inverse)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "O"}, "cycle_point_sprites","Scene", docPS, f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "U"}, "toggle render.background.blur.enable","Scene", std::bind(docTgl, "Blur background", std::cref(opts.render.background.blur.enable)), f3d::interactor::BindingType::TOGGLE);
-  this->addBinding({mod_t::NONE, "K"}, "toggle interactor.trackball","Scene", std::bind(docTgl, "Trackball interaction", std::cref(opts.interactor.trackball)), f3d::interactor::BindingType::TOGGLE);
-  this->addBinding({mod_t::SHIFT, "K"}, "toggle_2d_mode","Scene", std::bind(docTgl, "2D interaction mode", std::cref(opts.interactor.two_dimensions_mode)), f3d::interactor::BindingType::TOGGLE);
+  this->addBinding({mod_t::NONE, "K"}, "cycle_interactor_style","Scene", docStyle, f3d::interactor::BindingType::CYCLIC);
   this->addBinding({mod_t::NONE, "F"}, "toggle render.hdri.ambient","Scene", std::bind(docTgl, "HDRI ambient lighting", std::cref(opts.render.hdri.ambient)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "J"}, "toggle render.background.skybox","Scene", std::bind(docTgl, "HDRI skybox", std::cref(opts.render.background.skybox)), f3d::interactor::BindingType::TOGGLE);
   this->addBinding({mod_t::NONE, "L"}, "increase_light_intensity", "Scene", std::bind(docDbl, "Increase lights intensity", std::cref(opts.render.light.intensity)), f3d::interactor::BindingType::NUMERICAL);
@@ -2139,8 +2151,8 @@ void interactor_impl::SetCommandBuffer(const char* command)
 }
 
 //----------------------------------------------------------------------------
-void interactor_impl::SetUse2DMode(bool use)
+void interactor_impl::SetInteractorStyle(const std::string& style)
 {
-  this->Internals->SetInteractorMode(use);
+  this->Internals->SetInteractorStyle(style);
 }
 }

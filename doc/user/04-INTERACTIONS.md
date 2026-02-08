@@ -26,7 +26,7 @@ F3D supports a 2D interaction mode designed for viewing images and flat content.
 - _Click and drag_ with the _left_ or _middle_ mouse button to pan
 - _Click and drag_ with the _right_ mouse button or use the _mouse wheel_ to zoom
 
-Toggle 2D mode with <kbd>Shift</kbd>+<kbd>K</kbd> or through the `interactor.two_dimensions_mode` option.
+Cycle interaction styles with <kbd>K</kbd> or through the `interactor.style` option (values: `default`, `trackball`, `2d`).
 
 ## Bindings
 
