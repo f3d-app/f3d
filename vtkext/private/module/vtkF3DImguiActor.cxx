@@ -822,8 +822,7 @@ void vtkF3DImguiActor::RenderFpsCounter()
   float posX = viewport->WorkSize.x - winSize.x - margin;
   if (this->ConsoleBadgeEnabled)
   {
-    vtkF3DImguiConsole* console =
-      vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
+    vtkF3DImguiConsole* console = vtkF3DImguiConsole::SafeDownCast(vtkOutputWindow::GetInstance());
     if (console && console->IsBadgeVisible())
     {
       ImVec2 badgeSize = console->GetBadgeSize();
