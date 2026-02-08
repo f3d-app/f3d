@@ -740,5 +740,6 @@ if(NOT WIN32)
 endif()
 
 if(F3D_MODULE_UI)
-  f3d_test(NAME TestFPS DATA suzanne.ply ARGS -z --font-scale=0.5 UI)
+  f3d_test(NAME TestFPS DATA suzanne.ply ARGS -z --font-scale=0.35
+    --font-file=${F3D_SOURCE_DIR}/testing/data/Crosterian.ttf UI)
 endif()
