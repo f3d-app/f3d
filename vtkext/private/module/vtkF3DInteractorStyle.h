@@ -24,6 +24,16 @@ public:
     KeyPressEvent
   };
 
+  enum InteractionMode
+  {
+    DEFAULT = 0,
+    TRACKBALL = 1,
+    TWO_D = 2
+  };
+
+  vtkSetMacro(InteractionMode, int);
+  vtkGetMacro(InteractionMode, int);
+
   ///@{
   /**
    * Disable default Grab/Release Focus.
@@ -122,6 +132,7 @@ protected:
    */
   void Dolly(double factor) override;
 
+  int InteractionMode = DEFAULT;
   bool CameraMovementDisabled = false;
 
   /**

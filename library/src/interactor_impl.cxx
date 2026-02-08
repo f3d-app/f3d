@@ -13,7 +13,6 @@
 #include "vtkF3DImguiConsole.h"
 #endif
 
-#include "vtkF3D2DInteractorStyle.h"
 #include "vtkF3DInteractorEventRecorder.h"
 #include "vtkF3DInteractorStyle.h"
 #include "vtkF3DRenderer.h"
@@ -95,8 +94,7 @@ public:
     vtkRenderWindowInteractor::InteractorManagesTheEventLoop = false;
 #endif
     this->VTKInteractor->SetRenderWindow(this->Window.GetRenderWindow());
-    this->CurrentStyle = this->Style3D;
-    this->VTKInteractor->SetInteractorStyle(this->CurrentStyle);
+    this->VTKInteractor->SetInteractorStyle(this->Style);
     this->VTKInteractor->Initialize();
 
     // Some implementation (e.g. macOS) in VTK set the window name during initialization
@@ -123,26 +121,22 @@ public:
     vtkNew<vtkCallbackCommand> keyPressCallback;
     keyPressCallback->SetClientData(this);
     keyPressCallback->SetCallback(OnKeyPress);
-    this->Style3D->AddObserver(vtkF3DInteractorStyle::KeyPressEvent, keyPressCallback);
-    this->Style2D->AddObserver(vtkF3D2DInteractorStyle::KeyPressEvent, keyPressCallback);
+    this->Style->AddObserver(vtkF3DInteractorStyle::KeyPressEvent, keyPressCallback);
 
     vtkNew<vtkCallbackCommand> dropFilesCallback;
     dropFilesCallback->SetClientData(this);
     dropFilesCallback->SetCallback(OnDropFiles);
-    this->Style3D->AddObserver(vtkF3DInteractorStyle::DropFilesEvent, dropFilesCallback);
-    this->Style2D->AddObserver(vtkF3D2DInteractorStyle::DropFilesEvent, dropFilesCallback);
+    this->Style->AddObserver(vtkF3DInteractorStyle::DropFilesEvent, dropFilesCallback);
 
     vtkNew<vtkCallbackCommand> middleButtonPressCallback;
     middleButtonPressCallback->SetClientData(this);
     middleButtonPressCallback->SetCallback(OnMiddleButtonPress);
-    this->Style3D->AddObserver(vtkCommand::MiddleButtonPressEvent, middleButtonPressCallback);
-    this->Style2D->AddObserver(vtkCommand::MiddleButtonPressEvent, middleButtonPressCallback);
+    this->Style->AddObserver(vtkCommand::MiddleButtonPressEvent, middleButtonPressCallback);
 
     vtkNew<vtkCallbackCommand> middleButtonReleaseCallback;
     middleButtonReleaseCallback->SetClientData(this);
     middleButtonReleaseCallback->SetCallback(OnMiddleButtonRelease);
-    this->Style3D->AddObserver(vtkCommand::MiddleButtonReleaseEvent, middleButtonReleaseCallback);
-    this->Style2D->AddObserver(vtkCommand::MiddleButtonReleaseEvent, middleButtonReleaseCallback);
+    this->Style->AddObserver(vtkCommand::MiddleButtonReleaseEvent, middleButtonReleaseCallback);
 
     this->Recorder = vtkSmartPointer<vtkF3DInteractorEventRecorder>::New();
     this->Recorder->SetInteractor(this->VTKInteractor);
@@ -151,12 +145,18 @@ public:
   //----------------------------------------------------------------------------
   void SetInteractorStyle(const std::string& style)
   {
-    bool is2D = (style == "2d");
-
-    this->Is2DMode = is2D;
-    this->CurrentStyle = is2D ? static_cast<vtkInteractorStyle*>(this->Style2D.GetPointer())
-                              : static_cast<vtkInteractorStyle*>(this->Style3D.GetPointer());
-    this->VTKInteractor->SetInteractorStyle(this->CurrentStyle);
+    if (style == "2d")
+    {
+      this->Style->SetInteractionMode(vtkF3DInteractorStyle::TWO_D);
+    }
+    else if (style == "trackball")
+    {
+      this->Style->SetInteractionMode(vtkF3DInteractorStyle::TRACKBALL);
+    }
+    else
+    {
+      this->Style->SetInteractionMode(vtkF3DInteractorStyle::DEFAULT);
+    }
   }
 
   std::string VerboseLevelToString(log::VerboseLevel level)
@@ -329,7 +329,7 @@ public:
   static void OnKeyPress(vtkObject*, unsigned long, void* clientData, void*)
   {
     internals* self = static_cast<internals*>(clientData);
-    vtkRenderWindowInteractor* rwi = self->CurrentStyle->GetInteractor();
+    vtkRenderWindowInteractor* rwi = self->Style->GetInteractor();
     std::string interaction = rwi->GetKeySym();
     if (!interaction.empty())
     {
@@ -370,14 +370,7 @@ public:
 
     self->VTKInteractor->GetEventPosition(self->MiddleButtonDownPosition);
 
-    if (self->Is2DMode)
-    {
-      self->Style2D->OnMiddleButtonDown();
-    }
-    else
-    {
-      self->Style3D->OnMiddleButtonDown();
-    }
+    self->Style->OnMiddleButtonDown();
   }
 
   //----------------------------------------------------------------------------
@@ -426,7 +419,7 @@ public:
         double posV[3];
         vtkMath::Subtract(
           picked, state.focalPoint.data(), posV); /* pos -> pos1, parallel to focV */
-        if (!self->CurrentStyle->GetInteractor()->GetShiftKey())
+        if (!self->Style->GetInteractor()->GetShiftKey())
         {
           double v[3];
           vtkMath::Subtract(state.focalPoint.data(), state.position.data(), v); /* pos -> foc */
@@ -451,18 +444,11 @@ public:
 
         self->AnimateCameraTransition(interpolateCameraState);
 
-        self->CurrentStyle->InvokeEvent(vtkCommand::InteractionEvent, nullptr);
+        self->Style->InvokeEvent(vtkCommand::InteractionEvent, nullptr);
       }
     }
 
-    if (self->Is2DMode)
-    {
-      self->Style2D->OnMiddleButtonUp();
-    }
-    else
-    {
-      self->Style3D->OnMiddleButtonUp();
-    }
+    self->Style->OnMiddleButtonUp();
   }
 
   /**
@@ -504,7 +490,7 @@ public:
   void TriggerBinding(const std::string& interaction, const std::string& argsString)
   {
     mod_t mod = mod_t::NONE;
-    vtkRenderWindowInteractor* rwi = this->CurrentStyle->GetInteractor();
+    vtkRenderWindowInteractor* rwi = this->Style->GetInteractor();
     const bool shift = rwi->GetShiftKey() == 1;
     const bool ctrl = rwi->GetControlKey() == 1;
     if (shift && ctrl)
@@ -676,10 +662,7 @@ public:
   animationManager* AnimationManager;
 
   vtkSmartPointer<vtkRenderWindowInteractor> VTKInteractor;
-  vtkNew<vtkF3DInteractorStyle> Style3D;
-  vtkNew<vtkF3D2DInteractorStyle> Style2D;
-  vtkInteractorStyle* CurrentStyle = nullptr;
-  bool Is2DMode = false;
+  vtkNew<vtkF3DInteractorStyle> Style;
   vtkSmartPointer<vtkF3DInteractorEventRecorder> Recorder;
   vtkNew<vtkF3DUIObserver> UIObserver;
 
@@ -1133,7 +1116,7 @@ interactor& interactor_impl::initCommands()
     {
       check_args(args, 1, "roll_camera");
       this->Internals->Window.getCamera().roll(options::parse<int>(args[0]));
-      this->Internals->Style3D->SetTemporaryUp(
+      this->Internals->Style->SetTemporaryUp(
         this->Internals->Window.getCamera().getViewUp().data());
     },
     command_documentation_t{ "roll_camera value", "roll the camera on its side" });
@@ -1154,7 +1137,7 @@ interactor& interactor_impl::initCommands()
     {
       check_args(args, 1, "elevation_camera");
       this->Internals->Window.getCamera().elevation(options::parse<int>(args[0]));
-      this->Internals->Style3D->SetTemporaryUp(
+      this->Internals->Style->SetTemporaryUp(
         this->Internals->Window.getCamera().getViewUp().data());
     },
     command_documentation_t{ "elevation_camera value", "tilt the camera up or down" });
@@ -1165,7 +1148,7 @@ interactor& interactor_impl::initCommands()
     {
       check_args(args, 1, "azimuth_camera");
       this->Internals->Window.getCamera().azimuth(options::parse<int>(args[0]));
-      this->Internals->Style3D->SetTemporaryUp(
+      this->Internals->Style->SetTemporaryUp(
         this->Internals->Window.getCamera().getViewUp().data());
     },
     command_documentation_t{ "azimuth_camera value", "tilt the camera right or left" });
@@ -1228,22 +1211,22 @@ interactor& interactor_impl::initCommands()
       if (type == "front")
       {
         this->Internals->SetViewOrbit(internals::ViewType::VT_FRONT);
-        this->Internals->Style3D->ResetTemporaryUp();
+        this->Internals->Style->ResetTemporaryUp();
       }
       else if (type == "top")
       {
         this->Internals->SetViewOrbit(internals::ViewType::VT_TOP);
-        this->Internals->Style3D->ResetTemporaryUp();
+        this->Internals->Style->ResetTemporaryUp();
       }
       else if (type == "right")
       {
         this->Internals->SetViewOrbit(internals::ViewType::VT_RIGHT);
-        this->Internals->Style3D->ResetTemporaryUp();
+        this->Internals->Style->ResetTemporaryUp();
       }
       else if (type == "isometric")
       {
         this->Internals->SetViewOrbit(internals::ViewType::VT_ISOMETRIC);
-        this->Internals->Style3D->ResetTemporaryUp();
+        this->Internals->Style->ResetTemporaryUp();
       }
       else
       {
@@ -1298,7 +1281,7 @@ interactor& interactor_impl::initCommands()
     [&](const std::vector<std::string>&)
     {
       this->Internals->Window.getCamera().resetToDefault();
-      this->Internals->Style3D->ResetTemporaryUp();
+      this->Internals->Style->ResetTemporaryUp();
     },
     command_documentation_t{ "reset_camera", "reset the camera to its original location" });
 
@@ -1989,16 +1972,14 @@ interactor::AnimationDirection interactor_impl::getAnimationDirection()
 //----------------------------------------------------------------------------
 interactor& interactor_impl::enableCameraMovement()
 {
-  this->Internals->Style3D->SetCameraMovementDisabled(false);
-  this->Internals->Style2D->SetCameraMovementDisabled(false);
+  this->Internals->Style->SetCameraMovementDisabled(false);
   return *this;
 }
 
 //----------------------------------------------------------------------------
 interactor& interactor_impl::disableCameraMovement()
 {
-  this->Internals->Style3D->SetCameraMovementDisabled(true);
-  this->Internals->Style2D->SetCameraMovementDisabled(true);
+  this->Internals->Style->SetCameraMovementDisabled(true);
   return *this;
 }
 
@@ -2127,20 +2108,13 @@ void interactor_impl::SetInteractorOn(vtkInteractorObserver* observer)
 //----------------------------------------------------------------------------
 void interactor_impl::UpdateRendererAfterInteraction()
 {
-  if (this->Internals->Is2DMode)
-  {
-    this->Internals->Style2D->UpdateRendererAfterInteraction();
-  }
-  else
-  {
-    this->Internals->Style3D->UpdateRendererAfterInteraction();
-  }
+  this->Internals->Style->UpdateRendererAfterInteraction();
 }
 
 //----------------------------------------------------------------------------
 void interactor_impl::ResetTemporaryUp()
 {
-  this->Internals->Style3D->ResetTemporaryUp();
+  this->Internals->Style->ResetTemporaryUp();
 }
 
 //----------------------------------------------------------------------------

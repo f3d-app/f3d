@@ -166,14 +166,6 @@ public:
 
   ///@{
   /**
-   * Set/Get UseTrackball
-   */
-  void SetUseTrackball(bool use);
-  vtkGetMacro(UseTrackball, bool);
-  ///@}
-
-  ///@{
-  /**
    * Set/Get InvertZoom
    */
   vtkSetMacro(InvertZoom, bool);
@@ -690,7 +682,6 @@ private:
   bool DisplayDepthScalarColoring = false;
   bool UseBlurBackground = false;
   std::optional<bool> UseOrthographicProjection = false;
-  bool UseTrackball = false;
   bool InvertZoom = false;
 
   int RaytracingSamples = 0;
