@@ -2,6 +2,7 @@
 #define f3d_reader_h
 
 #include <vtkAlgorithm.h>
+#include <vtkFileResourceStream.h>
 #include <vtkImporter.h>
 #include <vtkSmartPointer.h>
 
@@ -10,6 +11,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <iostream>
 
 class vtkResourceStream;
 namespace f3d
@@ -63,7 +65,7 @@ public:
   virtual const std::vector<std::string> getMimeTypes() const = 0;
 
   /**
-   * Check if this reader can read the given filename - generally according its extension
+   * Check if this reader can read the given filename - according to its extension and header check
    */
   virtual bool canRead(const std::string& fileName) const
   {
@@ -72,9 +74,25 @@ public:
 
     const std::vector<std::string>& extensions = this->getExtensions();
 
-    return std::any_of(
-      extensions.begin(), extensions.end(), [&](const std::string& s) { return s == ext; });
-    // TODO hasstream
+    if(!std::any_of(
+      extensions.begin(), extensions.end(), [&](const std::string& s) { return s == ext; }))
+    {
+      return false;
+    }
+
+    vtkNew<vtkFileResourceStream> stream;
+    stream->Open(fileName.c_str());
+    return this->canRead(stream);
+  }
+
+  /**
+   * Return true if this reader could be able to read provided stream,
+   * false if it is sure it cannot.
+   * Default implementation returns true.
+   */
+  virtual bool canRead(vtkResourceStream*) const
+  {
+    return true;
   }
 
   /**
@@ -157,15 +175,6 @@ public:
    * false otherwise
    */
   virtual bool supportsStream() const
-  {
-    return false;
-  }
-
-  /**
-   * Return true if this reader could be able to read provided stream,
-   * false if it is sure it cannot.
-   */
-  virtual bool canRead(vtkResourceStream*) const
   {
     return false;
   }

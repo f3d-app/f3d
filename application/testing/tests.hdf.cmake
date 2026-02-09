@@ -19,7 +19,7 @@ if (VTK_VERSION VERSION_GREATER_EQUAL 9.4.0)
 endif()
 
 if (VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251109)
-  f3d_test(NAME TestPipedVTKHDF DATA blob.vtkhdf ARGS --load-plugins=hdf -s --force-reader=VTKHDF PIPED)
+  f3d_test(NAME TestPipedVTKHDF DATA blob.vtkhdf ARGS --load-plugins=hdf -s PIPED)
 endif()
 
 if(NOT F3D_MACOS_BUNDLE)

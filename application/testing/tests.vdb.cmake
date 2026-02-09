@@ -24,7 +24,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240203)
 endif()
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251210)
-  f3d_test(NAME TestPipedVDBVolume DATA icosahedron.vdb ARGS --load-plugins=vdb --volume --volume-inverse --force-reader=VDB PIPED)
+  f3d_test(NAME TestPipedVDBVolume DATA icosahedron.vdb ARGS --load-plugins=vdb --volume --volume-inverse PIPED)
 endif()
 
 if(NOT F3D_MACOS_BUNDLE)

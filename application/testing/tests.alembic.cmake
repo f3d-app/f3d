@@ -12,7 +12,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
 endif()
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251210)
-  f3d_test(NAME TestPipedAlembic DATA suzanne.abc ARGS -s --load-plugins=alembic --force-reader=Alembic PIPED)
+  f3d_test(NAME TestPipedAlembic DATA suzanne.abc ARGS -s --load-plugins=alembic PIPED)
 endif()
 
 if(NOT F3D_MACOS_BUNDLE)
