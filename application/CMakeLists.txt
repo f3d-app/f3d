@@ -195,8 +195,8 @@ endif()
 
 include(f3dCLIOptions)
 f3d_generate_cli_options(
-  F3D_SOURCE_DIR "${CMAKE_SOURCE_DIR}"
-  F3D_BINARY_DIR "${CMAKE_BINARY_DIR}"
+  F3D_SOURCE_DIR "${F3D_SOURCE_DIR}"
+  F3D_BINARY_DIR "${F3D_BINARY_DIR}"
   ENABLED_CONDITIONALS ${f3d_enabled_conditionals} # Do NOT quote so this stays a list
   CPP_CLI_OPTIONS_TO_SKIP input;define;reset # Do NOT quote so this stays a list
 )
@@ -332,13 +332,13 @@ if(UNIX AND NOT APPLE AND NOT ANDROID)
   install(FILES "${F3D_SOURCE_DIR}/resources/logo-mono.svg"
     DESTINATION "share/icons/HighContrast/scalable/apps" COMPONENT assets
     RENAME "f3d.svg")
-  install(FILES "${CMAKE_BINARY_DIR}/completion.bash"
+  install(FILES "${F3D_BINARY_DIR}/completion.bash"
     DESTINATION "share/bash-completion/completions" COMPONENT shellext
     RENAME "f3d")
-  install(FILES "${CMAKE_BINARY_DIR}/completion.zsh"
+  install(FILES "${F3D_BINARY_DIR}/completion.zsh"
     DESTINATION "share/zsh/site-functions" COMPONENT shellext
     RENAME "_f3d")
-  install(FILES "${CMAKE_BINARY_DIR}/completion.fish"
+  install(FILES "${F3D_BINARY_DIR}/completion.fish"
     DESTINATION "share/fish/vendor_completions.d" COMPONENT shellext
     RENAME "f3d.fish")
   install(FILES "${F3D_SOURCE_DIR}/resources/app.f3d.F3D.metainfo.xml"
