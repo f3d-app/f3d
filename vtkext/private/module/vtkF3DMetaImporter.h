@@ -172,6 +172,11 @@ public:
   * Returns nullptr if no importer with hierarchy support was added.
   */
   vtkDataAssembly* GetSceneHierarchy() override;
+
+  /**
+   * Compute a flat list of node information from the scene hierarchy.
+   * Returns a vector of F3DNodeInfo containing all actors with their names and properties.
+   */
   std::vector<F3DNodeInfo> ComputeNodeInfoHierarchy();
 
 private:

@@ -1884,6 +1884,7 @@ void vtkF3DRenderer::ShowSceneHierarchy(bool show)
   {
     this->SceneHierarchyVisible = show;
     this->UIActor->SetSceneHierarchyVisibility(show);
+    this->CheatSheetConfigured = false;
   }
 }
 
