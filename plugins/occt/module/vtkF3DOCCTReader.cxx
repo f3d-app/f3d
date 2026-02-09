@@ -869,7 +869,7 @@ void vtkF3DOCCTReader::PrintSelf(ostream& os, vtkIndent indent)
     case FILE_FORMAT::IGES: os << "FileFormat: IGES" << "\n"; break;
     case FILE_FORMAT::XBF: os << "FileFormat: XBF" << "\n"; break;
   }
-  // clang-format
+  // clang-format on
 }
 
 //----------------------------------------------------------------------------
