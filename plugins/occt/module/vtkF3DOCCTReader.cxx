@@ -886,8 +886,8 @@ vtkMTimeType vtkF3DOCCTReader::GetMTime()
 //----------------------------------------------------------------------------
 bool vtkF3DOCCTReader::CanReadFile(vtkResourceStream* stream)
 {
-   vtkF3DOCCTReader::FILE_FORMAT format;
-   return vtkF3DOCCTReader::CanReadFile(stream, format);
+  vtkF3DOCCTReader::FILE_FORMAT format;
+  return vtkF3DOCCTReader::CanReadFile(stream, format);
 }
 
 //----------------------------------------------------------------------------
@@ -908,11 +908,11 @@ bool vtkF3DOCCTReader::CanReadFile(vtkResourceStream* stream, vtkF3DOCCTReader::
   {
     if (strncmp(binfile, "BINFILE", 7) == 0 && magic == 0x0000000704030201)
     {
-      format = vtkF3DOCCTReader::FILE_FORMAT::XBF; 
+      format = vtkF3DOCCTReader::FILE_FORMAT::XBF;
       return true;
     }
   }
-#endif  
+#endif
 
   stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
   vtkNew<vtkResourceParser> parser;
@@ -974,17 +974,14 @@ bool vtkF3DOCCTReader::CanReadFile(vtkResourceStream* stream, vtkF3DOCCTReader::
     }
 
     // line2 should contain IGS, IGES, igs or iges (the file extension)
-    else if (line2.find("IGS") == std::string::npos
-     && line2.find("IGES") == std::string::npos
-     && line2.find("igs") == std::string::npos
-     && line2.find("iges") == std::string::npos)
+    else if (line2.find("IGS") == std::string::npos && line2.find("IGES") == std::string::npos &&
+      line2.find("igs") == std::string::npos && line2.find("iges") == std::string::npos)
     {
       iges = false;
     }
 
     // line3 should contain IGS, IGES
-    else if (line3.find("IGS") == std::string::npos
-     && line3.find("IGES") == std::string::npos)
+    else if (line3.find("IGS") == std::string::npos && line3.find("IGES") == std::string::npos)
     {
       iges = false;
     }
@@ -1000,12 +997,15 @@ bool vtkF3DOCCTReader::CanReadFile(vtkResourceStream* stream, vtkF3DOCCTReader::
 
   // BRep (ASCII):
   // DBRep_DrawableShape
-  // 
+  //
   // [Open ]CASCADE Topology ...
   parser->Seek(0, vtkResourceStream::SeekDirection::Begin);
-  if (parser->ReadLine(line1) == vtkParseResult::EndOfLine && parser->ReadLine(line2) == vtkParseResult::EndOfLine && parser->ReadLine(line3) == vtkParseResult::EndOfLine)
+  if (parser->ReadLine(line1) == vtkParseResult::EndOfLine &&
+    parser->ReadLine(line2) == vtkParseResult::EndOfLine &&
+    parser->ReadLine(line3) == vtkParseResult::EndOfLine)
   {
-    if (line1.rfind("DBRep_DrawableShape", 0) == 0 && line2.empty() && (line3.rfind("CASCADE Topology", 0) == 0 || line3.rfind("Open CASCADE Topology", 0) == 0))
+    if (line1.rfind("DBRep_DrawableShape", 0) == 0 && line2.empty() &&
+      (line3.rfind("CASCADE Topology", 0) == 0 || line3.rfind("Open CASCADE Topology", 0) == 0))
     {
       format = vtkF3DOCCTReader::FILE_FORMAT::BREP;
       return true;
@@ -1016,9 +1016,11 @@ bool vtkF3DOCCTReader::CanReadFile(vtkResourceStream* stream, vtkF3DOCCTReader::
   //
   // [Open ]CASCADE Topology ...
   parser->Seek(0, vtkResourceStream::SeekDirection::Begin);
-  if (parser->ReadLine(line1) == vtkParseResult::EndOfLine && parser->ReadLine(line2) == vtkParseResult::EndOfLine)
+  if (parser->ReadLine(line1) == vtkParseResult::EndOfLine &&
+    parser->ReadLine(line2) == vtkParseResult::EndOfLine)
   {
-    if (line1.empty() && (line2.rfind("CASCADE Topology", 0) == 0 || line2.rfind("Open CASCADE Topology", 0) == 0))
+    if (line1.empty() &&
+      (line2.rfind("CASCADE Topology", 0) == 0 || line2.rfind("Open CASCADE Topology", 0) == 0))
     {
       format = vtkF3DOCCTReader::FILE_FORMAT::BREP;
       return true;
