@@ -32,7 +32,6 @@ public:
   };
 
   vtkSetMacro(InteractionMode, int);
-  vtkGetMacro(InteractionMode, int);
 
   ///@{
   /**

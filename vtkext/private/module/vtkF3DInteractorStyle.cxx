@@ -302,11 +302,6 @@ void vtkF3DInteractorStyle::DollyToPosition(double factor, int* position, vtkRen
 //----------------------------------------------------------------------------
 void vtkF3DInteractorStyle::EnvironmentRotate()
 {
-  if (this->InteractionMode == TWO_D)
-  {
-    return;
-  }
-
   this->Superclass::EnvironmentRotate();
 
   vtkF3DRenderer* ren = vtkF3DRenderer::SafeDownCast(this->CurrentRenderer);
