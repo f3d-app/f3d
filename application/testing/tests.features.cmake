@@ -176,7 +176,7 @@ f3d_test(NAME TestMetaDataImporter DATA BoxAnimated.gltf ARGS -m UI)
 f3d_test(NAME TestMultiblockMetaData DATA mb.vtm ARGS -m UI)
 
 ## Scene Hierarchy
-f3d_test(NAME TestSceneHierarchyGLTF DATA RiggedFigure.glb ARGS -D ui.scene_hierarchy=true UI)
+f3d_test(NAME TestSceneHierarchyGLTF DATA InterpolationTest.glb ARGS -D ui.scene_hierarchy=true UI)
 f3d_test(NAME TestSceneHierarchyGLTFAnimated DATA BoxAnimated.gltf ARGS -D ui.scene_hierarchy=true UI)
 f3d_test(NAME TestSceneHierarchyNonGLTF DATA cow.vtp ARGS -D ui.scene_hierarchy=true UI)
 
