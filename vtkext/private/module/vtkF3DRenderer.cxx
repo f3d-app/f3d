@@ -2588,7 +2588,7 @@ void vtkF3DRenderer::ConfigureActorsProperties()
 
       if (actorHasUV)
       {
-        if (!(this->HasValidCheckerBoardReader && CheckerBoardReaderConfigured))
+        if (!this->CheckerBoardReader)
         {
           this->CheckerBoardReader = vtkSmartPointer<vtkPNGReader>::New();
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 5, 20251016)
@@ -2599,26 +2599,20 @@ void vtkF3DRenderer::ConfigureActorsProperties()
           this->CheckerBoardReader->SetMemoryBuffer(F3DCheckerBoard);
           this->CheckerBoardReader->SetMemoryBufferLength(sizeof(F3DCheckerBoard));
 #endif
-          this->HasValidCheckerBoardReader = true;
-          this->CheckerBoardReaderConfigured = true;
         }
 
-        if (!HasValidCheckerBoardTexture)
+        if (!this->CheckerBoardTexture)
         {
-          assert(this->HasValidCheckerBoardReader);
           this->CheckerBoardReader->Update();
-
           this->CheckerBoardTexture = vtkSmartPointer<vtkTexture>::New();
           this->CheckerBoardTexture->SetInputConnection(this->CheckerBoardReader->GetOutputPort());
           this->CheckerBoardTexture->UseSRGBColorSpaceOn();
           this->CheckerBoardTexture->InterpolateOn();
           this->CheckerBoardTexture->MipmapOn();
           this->CheckerBoardTexture->SetColorModeToDirectScalars();
-
-          this->HasValidCheckerBoardTexture = true;
         }
 
-        if (HasValidCheckerBoardTexture)
+        if (this->CheckerBoardTexture)
         {
           coloring.Actor->GetProperty()->SetBaseColorTexture(this->CheckerBoardTexture);
           coloring.OriginalActor->GetProperty()->SetBaseColorTexture(this->CheckerBoardTexture);
