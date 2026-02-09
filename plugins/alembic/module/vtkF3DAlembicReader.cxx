@@ -115,7 +115,7 @@ class vtkF3DAlembicReader::vtkInternals
       for (size_t i = 0; i < faceCount; i++)
       {
         auto thisFaceVertexCount = originalData.Indices[i].size();
-        duplicatedData.Indices[i].resize(thisFaceVertexCount, Alembic::Abc::V3i());
+        duplicatedData.Indices[i].resize(thisFaceVertexCount, Alembic::Abc::V3i(0));
         totalVertices += thisFaceVertexCount;
       }
 
