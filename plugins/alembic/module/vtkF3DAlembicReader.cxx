@@ -312,7 +312,7 @@ class vtkF3DAlembicReader::vtkInternals
       polydata->GetFieldData()->AddArray(sourceIds);
     }
 
-    if (haveN && !data.NormalSourceIds.empty() && 
+    if (haveN && !data.NormalSourceIds.empty() &&
       data.NormalSourceIds.size() == static_cast<size_t>(numPoints))
     {
       vtkNew<vtkIdTypeArray> normalSourceIds;
@@ -512,8 +512,8 @@ public:
       this->PointDuplicateAccumulator(originalData, duplicatedData);
 
       this->FillPolyData(duplicatedData, polydata);
-      
-      //Store data for the next frame
+
+      // Store data for the next frame
       if (isTopologyConstant)
       {
         this->OutputCache[meshName] = polydata;
@@ -796,7 +796,6 @@ vtkMTimeType vtkF3DAlembicReader::GetMTime()
   }
   return mtime;
 }
-
 //------------------------------------------------------------------------------
 bool vtkF3DAlembicReader::CanReadFile(vtkResourceStream* stream)
 {
