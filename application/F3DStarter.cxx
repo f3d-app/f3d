@@ -169,7 +169,8 @@ public:
 
     if (camConf.CameraPosition.size() != 3)
     {
-      cam.resetToBounds(camConf.CameraZoomFactor > 0 ? camConf.CameraZoomFactor : 0.9);
+      double defaultZoom = this->LibOptions.interactor.style == "2d" ? 1.0 : 0.9;
+      cam.resetToBounds(camConf.CameraZoomFactor > 0 ? camConf.CameraZoomFactor : defaultZoom);
     }
 
     cam.setCurrentAsDefault();

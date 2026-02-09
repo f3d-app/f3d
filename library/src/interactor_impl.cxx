@@ -243,7 +243,8 @@ public:
     /* set camera coordinates back */
     cam.setPosition(newPos);
     cam.setViewUp(up);
-    cam.resetToBounds(0.9);
+    double zoomFactor = this->Options.interactor.style == "2d" ? 1.0 : 0.9;
+    cam.resetToBounds(zoomFactor);
   }
 
   //----------------------------------------------------------------------------
