@@ -41,6 +41,11 @@ protected:
   vtkF3DImguiActor();
   ~vtkF3DImguiActor() override;
 
+  /**
+   * Recursively render a node in the scene hierarchy tree
+   */
+  void RenderNode(F3DNodeInfo* node, vtkOpenGLRenderWindow* renWin) override;
+
 private:
   struct Internals;
   std::unique_ptr<Internals> Pimpl;
@@ -69,16 +74,6 @@ private:
    * Render the scene hierarchy UI widget
    */
   void RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin) override;
-
-  /**
-   * Recursively render a node in the scene hierarchy tree
-   */
-  void RenderNode(F3DNodeInfo* node, vtkOpenGLRenderWindow* renWin) override;
-
-  /**
-   * Calculate the maximum text width needed for the hierarchy
-   */
-  float CalculateHierarchyWidth();
 
   /**
    * Render the filename UI widget
@@ -116,6 +111,11 @@ private:
   void RenderConsoleBadge() override;
 
 private:
+  /**
+   * Calculate the maximum text width needed for the hierarchy
+   */
+  float CalculateHierarchyWidth();
+
   vtkF3DImguiActor(const vtkF3DImguiActor&) = delete;
   void operator=(const vtkF3DImguiActor&) = delete;
 };
