@@ -25,6 +25,7 @@ f3d_plugin_declare_reader(
   MIMETYPES application/vnd.vtkhdf
   VTK_READER vtkHDFReader
   ${_SUPPORTS_STREAM}
+  STANDARD_CAN_READ
   FORMAT_DESCRIPTION "VTKHDF"
 )
 

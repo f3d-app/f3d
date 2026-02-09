@@ -23,6 +23,7 @@ f3d_plugin_declare_reader(
   MIMETYPES application/vnd.drc
   VTK_READER vtkF3DDracoReader
   SUPPORTS_STREAM
+  STANDARD_CAN_READ
   FORMAT_DESCRIPTION "Draco"
 )
 
@@ -41,6 +42,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240214)
     MIMETYPES model/gltf+json
     VTK_IMPORTER vtkF3DGLTFDracoImporter
     ${_SUPPORTS_STREAM}
+    STANDARD_CAN_READ
     FORMAT_DESCRIPTION "GL Transmission Format"
   )
 
@@ -52,6 +54,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240214)
     VTK_IMPORTER vtkF3DGLTFDracoImporter
     FORMAT_DESCRIPTION "GL Transmission Format (binary)"
     ${_SUPPORTS_STREAM}
+    STANDARD_CAN_READ
     CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/glb.inl"
   )
 endif()

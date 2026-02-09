@@ -165,7 +165,7 @@ public:
    * Return true if this reader could be able to read provided stream,
    * false if it is sure it cannot.
    */
-  virtual bool canRead(vtkResourceStream* stream) const
+  virtual bool canRead(vtkResourceStream*) const
   {
     return false;
   }

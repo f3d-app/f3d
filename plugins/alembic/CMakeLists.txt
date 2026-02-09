@@ -29,6 +29,7 @@ f3d_plugin_declare_reader(
   VTK_READER vtkF3DAlembicReader
   FORMAT_DESCRIPTION "Alembic"
   ${_SUPPORTS_STREAM}
+  STANDARD_CAN_READ
 )
 
 set(rpaths "")
