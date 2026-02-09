@@ -270,6 +270,15 @@ f3d_plugin_declare_reader(
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/mdl.inl"
 )
 
+f3d_plugin_declare_reader(
+  NAME SPZ
+  EXTENSIONS spz
+  MIMETYPES application/vnd.spz
+  VTK_READER vtkF3DSPZReader
+  FORMAT_DESCRIPTION "Compressed 3D gaussian splats"
+  ${_SUPPORTS_STREAM}
+  STANDARD_CAN_READ
+)
 
 f3d_plugin_declare_reader(
   NAME Splat
