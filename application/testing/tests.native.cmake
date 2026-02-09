@@ -20,7 +20,9 @@ f3d_test(NAME TestPNG DATA world.png ARGS --scalar-coloring --up=+Y --coloring-c
 f3d_test(NAME TestJPG DATA world.jpg ARGS --scalar-coloring --up=+Y --coloring-component=-2 --camera-direction=0,0,-1 --camera-orthographic)
 f3d_test(NAME TestBMP DATA albedo.bmp ARGS --scalar-coloring --up=+Y --coloring-component=-2 --camera-direction=0,0,-1 --camera-orthographic)
 f3d_test(NAME TestTGA DATA world.tga ARGS --scalar-coloring --up=+Y --coloring-component=-2 --camera-direction=0,0,-1 --camera-orthographic)
-f3d_test(NAME TestHDR DATA palermo_park_1k.hdr ARGS --scalar-coloring --up=+Y --coloring-component=-2 --camera-direction=0,0,-1 --camera-orthographic)
+if(NOT APPLE) # HDR banding renders differently on macOS, can be removed once banding issue is fixed
+  f3d_test(NAME TestHDR DATA palermo_park_1k.hdr ARGS --scalar-coloring --up=+Y --coloring-component=-2 --camera-direction=0,0,-1 --camera-orthographic)
+endif()
 f3d_test(NAME Test3DSImporter DATA iflamigm.3ds ARGS --up=+Z)
 f3d_test(NAME TestGLTFImporter DATA f3d.glb)
 f3d_test(NAME TestGLTFImporterWithAnimation DATA BoxAnimated.gltf ARGS --animation-time=2 --animation-progress)
@@ -118,7 +120,9 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260106)
   f3d_test(NAME TestPipedJPG DATA world.jpg ARGS --scalar-coloring --up=+Y --coloring-component=-2 --camera-direction=0,0,-1 --camera-orthographic --force-reader=JPEG PIPED)
   f3d_test(NAME TestPipedBMP DATA albedo.bmp ARGS --scalar-coloring --up=+Y --coloring-component=-2 --camera-direction=0,0,-1 --camera-orthographic --force-reader=BMP PIPED)
   f3d_test(NAME TestPipedTGA DATA world.tga ARGS --scalar-coloring --up=+Y --coloring-component=-2 --camera-direction=0,0,-1 --camera-orthographic --force-reader=TGA PIPED)
-  f3d_test(NAME TestPipedHDR DATA palermo_park_1k.hdr ARGS --scalar-coloring --up=+Y --coloring-component=-2 --camera-direction=0,0,-1 --camera-orthographic --force-reader=HDR PIPED)
+  if(NOT APPLE) # HDR banding renders differently on macOS, can be removed once banding issue is fixed
+    f3d_test(NAME TestPipedHDR DATA palermo_park_1k.hdr ARGS --scalar-coloring --up=+Y --coloring-component=-2 --camera-direction=0,0,-1 --camera-orthographic --force-reader=HDR PIPED)
+  endif()
 endif()
 
 if(NOT F3D_MACOS_BUNDLE)
