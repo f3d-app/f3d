@@ -48,6 +48,7 @@ endif()
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12098
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250504)
   f3d_test(NAME TestInteractionStochasticTAA DATA alpha.glb ARGS --anti-aliasing=taa --blending=stochastic INTERACTION) #Render;Render...
+  f3d_test(NAME TestInteractionGaussianStochasticTAA DATA small.splat ARGS -sy --point-sprites=gaussian --point-sprites-absolute-size --point-sprites-size=1 --blending=stochastic --anti-aliasing=taa --camera-position=-1.65,-0.06,1.96 --camera-focal-point=-1.65,1.24,1.96 --camera-view-up=0.9954,0,0.0955 INTERACTION LONG_TIMEOUT) #Render;Render...
   f3d_test(NAME TestInteractionAndCLIBlending ARGS --blending DATA suzanne.stl alpha.glb INTERACTION)#PP;Right
 endif()
 

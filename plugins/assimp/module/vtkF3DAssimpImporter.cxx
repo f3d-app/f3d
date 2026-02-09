@@ -19,6 +19,7 @@
 #include <vtkProperty.h>
 #include <vtkQuaternion.h>
 #include <vtkRenderer.h>
+#include <vtkResourceParser.h>
 #include <vtkShaderProperty.h>
 #include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
@@ -1237,4 +1238,114 @@ void vtkF3DAssimpImporter::ImportCameras(vtkRenderer* renderer)
 void vtkF3DAssimpImporter::ImportLights(vtkRenderer* renderer)
 {
   this->Internals->ImportLights(renderer);
+}
+
+//------------------------------------------------------------------------------
+bool vtkF3DAssimpImporter::CanReadFile(vtkResourceStream* stream)
+{
+  std::string unused;
+  return vtkF3DAssimpImporter::CanReadFile(stream, unused);
+}
+
+//------------------------------------------------------------------------------
+bool vtkF3DAssimpImporter::CanReadFile(vtkResourceStream* stream, std::string& hint)
+{
+  if (!stream)
+  {
+    return false;
+  }
+
+  // FBX: Kaydara FBX Binary \0
+  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+  constexpr std::string_view fbxMagic{ "Kaydara FBX Binary  \0", 21 };
+  std::array<char, 21> magic;
+  if (stream->Read(&magic, magic.size()) == magic.size())
+  {
+    if (std::string_view(magic.data(), magic.size()) == fbxMagic)
+    {
+      hint = "fbx";
+      return true;
+    }
+  }
+
+  // DirectX: xof
+  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+  constexpr std::string_view xMagic{ "xof ", 4 };
+  std::array<char, 4> magic2;
+  if (stream->Read(&magic2, magic2.size()) == magic2.size())
+  {
+    if (std::string_view(magic2.data(), magic2.size()) == xMagic)
+    {
+      hint = "x";
+      return true;
+    }
+  }
+
+  // 3mf: Actually a ZIP archive, this is the only ZIP based format we support
+  // so this is not a problem for now
+  // 50 4B 03 04
+  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+  uint32_t magic3;
+  if (stream->Read(&magic3, sizeof(magic3)) == sizeof(magic3))
+  {
+    if (magic3 == 0x04034b50)
+    {
+      hint = "3mf";
+      return true;
+    }
+  }
+
+  /* COLLADA:
+  <?xml version="1.0"...
+  <COLLADA ...
+  */
+  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+  vtkNew<vtkResourceParser> parser;
+  parser->SetStream(stream);
+  std::string line1, line2;
+  if (parser->ReadLine(line1) == vtkParseResult::EndOfLine &&
+    parser->ReadLine(line2) == vtkParseResult::EndOfLine)
+  {
+    if (line1.rfind(R"(<?xml version="1.0")", 0) == 0 && line2.rfind("<COLLADA ", 0) == 0)
+    {
+      hint = "dae";
+      return true;
+    }
+  }
+
+  /* DXF:
+   * 0
+   * SECTION
+   * 2
+   * HEADER
+   */
+  parser->Seek(0, vtkResourceStream::SeekDirection::Begin);
+  std::string line3, line4;
+  if (parser->ReadLine(line1) == vtkParseResult::EndOfLine &&
+    parser->ReadLine(line2) == vtkParseResult::EndOfLine &&
+    parser->ReadLine(line3) == vtkParseResult::EndOfLine &&
+    parser->ReadLine(line4) == vtkParseResult::EndOfLine)
+  {
+    if (line1.rfind('0', 0) == 0 && line2.rfind("SECTION", 0) == 0 && line3.rfind('2', 0) == 0 &&
+      line4.rfind("HEADER", 0) == 0)
+    {
+      hint = "dxf";
+      return true;
+    }
+  }
+
+  /* OFF:
+   * OFF
+   */
+  parser->Seek(0, vtkResourceStream::SeekDirection::Begin);
+  if (parser->ReadLine(line1) == vtkParseResult::EndOfLine)
+  {
+    if (line1.rfind("OFF", 0) == 0)
+    {
+      hint = "off";
+      return true;
+    }
+  }
+
+  return false;
 }

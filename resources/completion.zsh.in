@@ -1,0 +1,7 @@
+#compdef f3d
+
+arguments=(
+@F3D_CLI_OPTIONS_ZSH@
+)
+
+_arguments "$arguments[@]" "*:file:_files"

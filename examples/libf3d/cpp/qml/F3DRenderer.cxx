@@ -1,6 +1,6 @@
 #include "F3DRenderer.h"
 #include "F3DView.h"
-
+#include <QObject>
 #include <QOpenGLContext>
 
 #include <f3d/engine.h>
@@ -9,155 +9,122 @@
 #include <f3d/window.h>
 
 //----------------------------------------------------------------------------
-F3DRenderer::F3DRenderer(F3DView* item)
-  : View(item)
+F3DRenderer::F3DRenderer()
 {
-  f3d::engine::autoloadPlugins();
-
-  f3d::context::function loadFunc = [](const char* name)
-  { return QOpenGLContext::currentContext()->getProcAddress(name); };
-  this->Engine = std::make_unique<f3d::engine>(f3d::engine::createExternal(loadFunc));
-
-  if (!this->Engine)
-  {
-    return;
-  }
-
-  if (!this->View->GetModelPath().isEmpty())
-  {
-    this->Engine->getScene().add(this->View->GetModelPath().toStdString());
-  }
-
-  auto& window = this->Engine->getWindow();
-  window.setSize(static_cast<int>(this->View->width()), static_cast<int>(this->View->height()));
-
-  auto& options = this->Engine->getOptions();
-
-  options.set("render.grid.enable", true);
-  options.set("render.show_edges", false);
-  options.set("ui.axis", true);
-  options.set("ui.fps", true);
-  options.set("ui.filename", true);
-
-  options.set("render.background.color", f3d::color_t(0.15, 0.15, 0.15));
-
-  this->Interactor = &this->Engine->getInteractor();
-
-  this->FrameTimer.start();
-  this->FirstFrame = true;
+  this->initialize();
 }
 
 //----------------------------------------------------------------------------
 F3DRenderer::~F3DRenderer() = default;
 
 //----------------------------------------------------------------------------
-void F3DRenderer::Enqueue(const Event& ev)
+void F3DRenderer::initialize()
 {
-  std::lock_guard lock(this->Mutex);
-  this->Events.push_back(ev);
+  f3d::engine::autoloadPlugins();
+
+  f3d::context::function loadFunc = [](const char* name)
+  { return QOpenGLContext::currentContext()->getProcAddress(name); };
+
+  this->_engine = std::make_unique<f3d::engine>(f3d::engine::createExternal(loadFunc));
+
+  if (!this->_engine)
+  {
+    qWarning() << "Failed to create F3D engine!";
+    return;
+  }
+
+  qDebug() << "F3D Info: ";
+  auto li = this->_engine->getLibInfo();
+  qDebug() << "Version   : " << QString::fromStdString(li.VersionFull);
+  qDebug() << "Build Date: " << QString::fromStdString(li.BuildDate);
+  qDebug() << "Build Sys : " << QString::fromStdString(li.BuildSystem);
+  qDebug() << "Compiler  : " << QString::fromStdString(li.Compiler);
+  qDebug() << "VTK Ver.  : " << QString::fromStdString(li.VTKVersion);
+  qDebug() << "License   : " << QString::fromStdString(li.License);
+  qDebug() << "Modules:";
+  for (auto& m : li.Modules)
+  {
+    qDebug() << " - " << QString::fromStdString(m.first) << ": " << m.second;
+  }
+
+  this->_interactor = &this->_engine->getInteractor();
+  this->_frameTimer.start();
 }
 
 //----------------------------------------------------------------------------
-void F3DRenderer::QueueMousePress(float x, float y, int button, int modifiers)
+void F3DRenderer::enqueue(const Event& ev)
 {
-  Event event;
-  event.type = EventType::MousePress;
-  event.x = x;
-  event.y = y;
-  event.button = button;
-  event.modifiers = modifiers;
-
-  this->Enqueue(event);
+  std::scoped_lock lock(this->_mutex);
+  this->_events.push_back(ev);
   this->update();
 }
 
 //----------------------------------------------------------------------------
-void F3DRenderer::QueueMouseMove(float x, float y, int buttons, int modifiers)
+void F3DRenderer::queueMousePress(
+  QPointF position, Qt::MouseButton button, Qt::KeyboardModifiers modifiers)
 {
-  Event event;
-  event.type = EventType::MouseMove;
-  event.x = x;
-  event.y = y;
-  event.buttons = buttons;
-  event.modifiers = modifiers;
-
-  this->Enqueue(event);
-  this->update();
+  Event event{ EventType::MousePress, position.x(), position.y(), button, modifiers };
+  this->enqueue(event);
 }
 
 //----------------------------------------------------------------------------
-void F3DRenderer::QueueMouseRelease(float x, float y, int button, int modifiers)
+void F3DRenderer::queueMouseMove(
+  QPointF position, Qt::MouseButton button, Qt::KeyboardModifiers modifiers)
 {
-  Event event;
-  event.type = EventType::MouseRelease;
-  event.x = x;
-  event.y = y;
-  event.button = button;
-  event.modifiers = modifiers;
-
-  this->Enqueue(event);
-  this->update();
+  Event event{ EventType::MouseMove, position.x(), position.y(), button, modifiers };
+  this->enqueue(event);
 }
 
 //----------------------------------------------------------------------------
-void F3DRenderer::QueueWheel(int dx, int dy, int modifiers)
+void F3DRenderer::queueMouseRelease(
+  QPointF position, Qt::MouseButton button, Qt::KeyboardModifiers modifiers)
 {
-  Event event;
-  event.type = EventType::Wheel;
-  event.dx = dx;
-  event.dy = dy;
-  event.modifiers = modifiers;
-
-  this->Enqueue(event);
-  this->update();
+  Event event{ EventType::MouseRelease, position.x(), position.y(), button, modifiers };
+  this->enqueue(event);
 }
 
 //----------------------------------------------------------------------------
-void F3DRenderer::QueueKeyPress(int key, const QString& text, int modifiers)
+void F3DRenderer::queueWheel(QPoint angleDelta, Qt::KeyboardModifiers modifiers)
 {
-  Event event;
-  event.type = EventType::KeyPress;
-  event.key = key;
-  event.text = text;
-  event.modifiers = modifiers;
-
-  this->Enqueue(event);
-  this->update();
+  Event event{ EventType::Wheel, 0, 0, Qt::MouseButton::NoButton, modifiers, angleDelta.x(),
+    angleDelta.y() };
+  this->enqueue(event);
 }
 
 //----------------------------------------------------------------------------
-void F3DRenderer::QueueKeyRelease(int key, int modifiers)
+void F3DRenderer::queueKeyPress(int key, const QString& text, Qt::KeyboardModifiers modifiers)
 {
-  Event event;
-  event.type = EventType::KeyRelease;
-  event.key = key;
-  event.modifiers = modifiers;
-
-  this->Enqueue(event);
-  this->update();
+  Event event{ EventType::KeyPress, 0, 0, Qt::MouseButton::NoButton, modifiers, 0, 0, key, text };
+  this->enqueue(event);
 }
 
 //----------------------------------------------------------------------------
-void F3DRenderer::UpdateModifiers(int mods)
+void F3DRenderer::queueKeyRelease(int key, Qt::KeyboardModifiers modifiers)
 {
-  if (this->Interactor == nullptr)
+  Event event{ EventType::KeyRelease, 0, 0, Qt::MouseButton::NoButton, modifiers, 0, 0, key };
+  this->enqueue(event);
+}
+
+//----------------------------------------------------------------------------
+void F3DRenderer::updateModifiers(Qt::KeyboardModifiers mods)
+{
+  if (this->_interactor == nullptr)
   {
     return;
   }
 
-  auto& inter = *this->Interactor;
-  const auto qMods = Qt::KeyboardModifiers(mods);
+  auto& inter = *this->_interactor;
   using InputMod = f3d::interactor::InputModifier;
 
-  if ((qMods & Qt::ControlModifier) && (qMods & Qt::ShiftModifier))
+  if ((mods & Qt::ControlModifier) && (mods & Qt::ShiftModifier))
   {
     inter.triggerModUpdate(InputMod::CTRL_SHIFT);
   }
-  else if (qMods & Qt::ControlModifier)
+  else if (mods & Qt::ControlModifier)
   {
     inter.triggerModUpdate(InputMod::CTRL);
   }
-  else if (qMods & Qt::ShiftModifier)
+  else if (mods & Qt::ShiftModifier)
   {
     inter.triggerModUpdate(InputMod::SHIFT);
   }
@@ -167,18 +134,16 @@ void F3DRenderer::UpdateModifiers(int mods)
   }
 }
 
-//----------------------------------------------------------------------------
-int F3DRenderer::MapMouseButton(int button) const
+int F3DRenderer::mapMouseButton(Qt::MouseButton button) const
 {
-  auto qButton = static_cast<Qt::MouseButton>(button);
   using MouseButton = f3d::interactor::MouseButton;
 
-  if (qButton == Qt::LeftButton)
+  if (button & Qt::LeftButton)
   {
     return static_cast<int>(MouseButton::LEFT);
   }
 
-  if (qButton == Qt::RightButton)
+  if (button & Qt::RightButton)
   {
     return static_cast<int>(MouseButton::RIGHT);
   }
@@ -187,7 +152,7 @@ int F3DRenderer::MapMouseButton(int button) const
 }
 
 //----------------------------------------------------------------------------
-std::string F3DRenderer::KeySymFromKeyAndText(int key, const QString& text) const
+std::string F3DRenderer::keySymFromKeyAndText(int key, const QString& text) const
 {
   if (key >= Qt::Key_A && key <= Qt::Key_Z)
   {
@@ -228,42 +193,39 @@ std::string F3DRenderer::KeySymFromKeyAndText(int key, const QString& text) cons
 }
 
 //----------------------------------------------------------------------------
-void F3DRenderer::HandleEvent(const Event& ev)
+void F3DRenderer::handleEvent(const Event& ev)
 {
-  auto& inter = *this->Interactor;
+  auto& inter = *this->_interactor;
 
   switch (ev.type)
   {
     case EventType::MousePress:
     {
       auto mouseButtonEnum =
-        static_cast<f3d::interactor::MouseButton>(this->MapMouseButton(ev.button));
-      double yFlipped = this->View->height() - ev.y;
-      inter.triggerMousePosition(ev.x, yFlipped);
-      this->UpdateModifiers(ev.modifiers);
+        static_cast<f3d::interactor::MouseButton>(this->mapMouseButton(ev.button));
+      inter.triggerMousePosition(ev.x, ev.y);
+      this->updateModifiers(ev.modifiers);
       inter.triggerMouseButton(f3d::interactor::InputAction::PRESS, mouseButtonEnum);
       break;
     }
     case EventType::MouseMove:
     {
-      double yFlipped = this->View->height() - ev.y;
-      inter.triggerMousePosition(ev.x, yFlipped);
-      this->UpdateModifiers(ev.modifiers);
+      inter.triggerMousePosition(ev.x, ev.y);
+      this->updateModifiers(ev.modifiers);
       break;
     }
     case EventType::MouseRelease:
     {
       auto mouseButtonEnum =
-        static_cast<f3d::interactor::MouseButton>(this->MapMouseButton(ev.button));
-      double yFlipped = this->View->height() - ev.y;
-      inter.triggerMousePosition(ev.x, yFlipped);
-      this->UpdateModifiers(ev.modifiers);
+        static_cast<f3d::interactor::MouseButton>(this->mapMouseButton(ev.button));
+      inter.triggerMousePosition(ev.x, ev.y);
+      this->updateModifiers(ev.modifiers);
       inter.triggerMouseButton(f3d::interactor::InputAction::RELEASE, mouseButtonEnum);
       break;
     }
     case EventType::Wheel:
     {
-      this->UpdateModifiers(ev.modifiers);
+      this->updateModifiers(ev.modifiers);
       using WheelDirection = f3d::interactor::WheelDirection;
 
       WheelDirection direction;
@@ -281,12 +243,13 @@ void F3DRenderer::HandleEvent(const Event& ev)
     }
     case EventType::KeyPress:
     {
-      this->UpdateModifiers(ev.modifiers);
-      std::string keySym = this->KeySymFromKeyAndText(ev.key, ev.text);
+      this->updateModifiers(ev.modifiers);
+      std::string keySym = this->keySymFromKeyAndText(ev.key, ev.text);
       if (!keySym.empty())
       {
         inter.triggerKeyboardKey(f3d::interactor::InputAction::PRESS, keySym);
       }
+
       if (!ev.text.isEmpty())
       {
         for (QChar ch : ev.text)
@@ -298,8 +261,8 @@ void F3DRenderer::HandleEvent(const Event& ev)
     }
     case EventType::KeyRelease:
     {
-      this->UpdateModifiers(ev.modifiers);
-      std::string keySym = this->KeySymFromKeyAndText(ev.key, {});
+      this->updateModifiers(ev.modifiers);
+      std::string keySym = this->keySymFromKeyAndText(ev.key, {});
       if (!keySym.empty())
       {
         inter.triggerKeyboardKey(f3d::interactor::InputAction::RELEASE, keySym);
@@ -310,43 +273,102 @@ void F3DRenderer::HandleEvent(const Event& ev)
 }
 
 //----------------------------------------------------------------------------
+void F3DRenderer::updateSize(const QSizeF& size)
+{
+  auto& window = this->_engine->getWindow();
+  window.setSize(static_cast<int>(size.width()), static_cast<int>(size.height()));
+}
+
+//----------------------------------------------------------------------------
 void F3DRenderer::render()
 {
-  if (!this->Engine || !this->Interactor)
+  if (!this->_engine || !this->_interactor)
   {
     return;
   }
 
-  auto& window = this->Engine->getWindow();
-  window.setSize(static_cast<int>(this->View->width()), static_cast<int>(this->View->height()));
-
   std::deque<Event> localQueue;
   {
-    std::lock_guard lock(this->Mutex);
-    localQueue.swap(this->Events);
+    std::scoped_lock lock(this->_mutex);
+    localQueue.swap(this->_events);
   }
 
   for (const Event& event : localQueue)
   {
-    this->HandleEvent(event);
+    this->handleEvent(event);
   }
 
-  double dt = 1.0 / 30.0;
+  qint64 nSec = this->_frameTimer.nsecsElapsed();
+  double dt = static_cast<double>(nSec) / 1e9;
+  this->_interactor->triggerEventLoop(dt);
+  this->_frameTimer.restart();
 
-  if (this->FirstFrame)
-  {
-    this->FrameTimer.restart();
-    this->FirstFrame = false;
-  }
-  else
-  {
-    qint64 nSec = this->FrameTimer.nsecsElapsed();
-    this->FrameTimer.restart();
-    dt = static_cast<double>(nSec) / 1e9;
-  }
-  this->Interactor->triggerEventLoop(dt);
-
-  window.render();
+  this->_engine->getWindow().render();
 
   this->update();
+}
+
+//----------------------------------------------------------------------------
+void F3DRenderer::synchronize(QQuickFramebufferObject* item)
+{
+  if (!this->_engine)
+  {
+    return;
+  }
+
+  auto* view = qobject_cast<F3DView*>(item);
+  if (!view)
+  {
+    return;
+  }
+
+  const QSizeF size = view->size();
+  if (size.isValid() && size != this->_lastSize)
+  {
+    this->updateSize(size);
+    this->_lastSize = size;
+  }
+
+  QVariantMap& pendingOptions = view->pendingOptions();
+  if (pendingOptions.size())
+  {
+    QMapIterator<QString, QVariant> it(pendingOptions);
+    auto& options = this->_engine->getOptions();
+    while (it.hasNext())
+    {
+      it.next();
+      switch (it.value().typeId())
+      {
+        case QMetaType::Bool:
+          options.set(it.key().toStdString(), it.value().toBool());
+          break;
+        case QMetaType::Int:
+          options.set(it.key().toStdString(), it.value().toInt());
+          break;
+        case QMetaType::Double:
+          options.set(it.key().toStdString(), it.value().toDouble());
+          break;
+        case QMetaType::QString:
+          options.set(it.key().toStdString(), it.value().toString().toStdString());
+          break;
+        default:
+          qWarning() << "Unsupported f3d option type for key " << it.key();
+      }
+    }
+    pendingOptions.clear();
+  }
+
+  const QString modelPath = view->modelPath();
+  if (!modelPath.isEmpty() && modelPath != this->_lastModelPath)
+  {
+    try
+    {
+      this->_engine->getScene().add(modelPath.toStdString());
+      this->_lastModelPath = modelPath;
+    }
+    catch (const std::exception& ex)
+    {
+      qWarning() << "Failed to load model:" << modelPath << ex.what();
+    }
+  }
 }
