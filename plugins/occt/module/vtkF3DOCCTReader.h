@@ -34,7 +34,8 @@ public:
 
   enum FILE_FORMAT : unsigned char
   {
-    BREP,
+    BREP_BINARY,
+    BREP_ASCII,
     STEP,
     IGES,
     XBF,
@@ -43,7 +44,7 @@ public:
   ///@{
   /**
    * Set the file format to read.
-   * It can be either BREP, STEP, IGES, or XBF.
+   * It can be either BREP_BINARY, BREP_ASCII, STEP, IGES, or XBF.
    * Default is FILE_FORMAT::STEP
    */
   vtkSetMacro(FileFormat, FILE_FORMAT);

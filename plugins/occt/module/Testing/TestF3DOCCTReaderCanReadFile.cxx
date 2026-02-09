@@ -44,8 +44,8 @@ int TestF3DOCCTReaderCanReadFile(int vtkNotUsed(argc), char* argv[])
   bool ret = true;
   ret &= ::TestCanReadFile(data + "/f3d.stp", vtkF3DOCCTReader::FILE_FORMAT::STEP);
   ret &= ::TestCanReadFile(data + "/f3d.igs", vtkF3DOCCTReader::FILE_FORMAT::IGES);
-  ret &= ::TestCanReadFile(data + "/f3d.brep", vtkF3DOCCTReader::FILE_FORMAT::BREP);
-  ret &= ::TestCanReadFile(data + "/f3d.bin.brep", vtkF3DOCCTReader::FILE_FORMAT::BREP);
+  ret &= ::TestCanReadFile(data + "/f3d.brep", vtkF3DOCCTReader::FILE_FORMAT::BREP_ASCII);
+  ret &= ::TestCanReadFile(data + "/f3d.bin.brep", vtkF3DOCCTReader::FILE_FORMAT::BREP_BINARY);
 #if F3D_PLUGIN_OCCT_XCAF
   ret &= ::TestCanReadFile(data + "/f3d.xbf", vtkF3DOCCTReader::FILE_FORMAT::XBF);
 #endif

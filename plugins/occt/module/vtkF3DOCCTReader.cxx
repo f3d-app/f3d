@@ -638,7 +638,7 @@ int vtkF3DOCCTReader::RequestData(
 
   Message::DefaultMessenger()->RemovePrinters(STANDARD_TYPE(Message_PrinterOStream));
 
-  if (this->FileFormat == FILE_FORMAT::BREP)
+  if (this->FileFormat == FILE_FORMAT::BREP_BINARY || this->FileFormat == FILE_FORMAT::BREP_ASCII)
   {
     TopoDS_Shape shape;
     ProgressIndicator pIndicator(this);
@@ -656,15 +656,20 @@ int vtkF3DOCCTReader::RequestData(
 
       try
       {
-        BinTools::Read(shape, *this->Buffer, pRange);
+        if (this->FileFormat == FILE_FORMAT::BREP_BINARY)
+        {
+          BinTools::Read(shape, *this->Buffer, pRange);
+        }
+        else // BREP_ASCII
+        {
+          const BRep_Builder builder;
+          BRepTools::Read(shape, *this->Buffer, builder, pRange);
+        }
       }
       catch (Storage_StreamTypeMismatchError&)
       {
-        stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
-        this->Streambuf = stream->ToStreambuf();
-        this->Buffer = std::make_unique<std::istream>(this->Streambuf.get());
-        const BRep_Builder builder;
-        BRepTools::Read(shape, *this->Buffer, builder, pRange);
+        vtkErrorMacro("Error reading a BREP stream");
+        return 0;
       }
       success = !shape.IsNull();
 #else
@@ -676,12 +681,20 @@ int vtkF3DOCCTReader::RequestData(
     {
       try
       {
-        success = BinTools::Read(shape, this->GetFileName().c_str(), pRange);
+        if (this->FileFormat == FILE_FORMAT::BREP_BINARY)
+        {
+          success = BinTools::Read(shape, this->GetFileName().c_str(), pRange);
+        }
+        else // BREP_ASCII
+        {
+          const BRep_Builder builder;
+          success = BRepTools::Read(shape, this->GetFileName().c_str(), builder, pRange);
+        }
       }
       catch (Storage_StreamTypeMismatchError&)
       {
-        const BRep_Builder builder;
-        success = BRepTools::Read(shape, this->GetFileName().c_str(), builder, pRange);
+        vtkErrorMacro("Error reading a BREP file");
+        return 0;
       }
     }
 
@@ -864,7 +877,8 @@ void vtkF3DOCCTReader::PrintSelf(ostream& os, vtkIndent indent)
   // clang-format off
   switch (this->FileFormat)
   {
-    case FILE_FORMAT::BREP: os << "FileFormat: BREP" << "\n"; break;
+    case FILE_FORMAT::BREP_BINARY: os << "FileFormat: BREP_BINARY" << "\n"; break;
+    case FILE_FORMAT::BREP_ASCII: os << "FileFormat: BREP_ASCII" << "\n"; break;
     case FILE_FORMAT::STEP: os << "FileFormat: STEP" << "\n"; break;
     case FILE_FORMAT::IGES: os << "FileFormat: IGES" << "\n"; break;
     case FILE_FORMAT::XBF: os << "FileFormat: XBF" << "\n"; break;
@@ -1007,7 +1021,7 @@ bool vtkF3DOCCTReader::CanReadFile(vtkResourceStream* stream, vtkF3DOCCTReader::
     if (line1.rfind("DBRep_DrawableShape", 0) == 0 && line2.empty() &&
       (line3.rfind("CASCADE Topology", 0) == 0 || line3.rfind("Open CASCADE Topology", 0) == 0))
     {
-      format = vtkF3DOCCTReader::FILE_FORMAT::BREP;
+      format = vtkF3DOCCTReader::FILE_FORMAT::BREP_ASCII;
       return true;
     }
   }
@@ -1022,7 +1036,7 @@ bool vtkF3DOCCTReader::CanReadFile(vtkResourceStream* stream, vtkF3DOCCTReader::
     if (line1.empty() &&
       (line2.rfind("CASCADE Topology", 0) == 0 || line2.rfind("Open CASCADE Topology", 0) == 0))
     {
-      format = vtkF3DOCCTReader::FILE_FORMAT::BREP;
+      format = vtkF3DOCCTReader::FILE_FORMAT::BREP_BINARY;
       return true;
     }
   }

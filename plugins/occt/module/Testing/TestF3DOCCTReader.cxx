@@ -26,8 +26,8 @@ int TestF3DOCCTReader(int vtkNotUsed(argc), char* argv[])
   bool ret = true;
   ret &= testReader(data + "/f3d.stp", vtkF3DOCCTReader::FILE_FORMAT::STEP);
   ret &= testReader(data + "/f3d.igs", vtkF3DOCCTReader::FILE_FORMAT::IGES);
-  ret &= testReader(data + "/f3d.brep", vtkF3DOCCTReader::FILE_FORMAT::BREP);
-  ret &= testReader(data + "/f3d.bin.brep", vtkF3DOCCTReader::FILE_FORMAT::BREP);
+  ret &= testReader(data + "/f3d.brep", vtkF3DOCCTReader::FILE_FORMAT::BREP_ASCII);
+  ret &= testReader(data + "/f3d.bin.brep", vtkF3DOCCTReader::FILE_FORMAT::BREP_BINARY);
 #if F3D_PLUGIN_OCCT_XCAF
   ret &= testReader(data + "/f3d.xbf", vtkF3DOCCTReader::FILE_FORMAT::XBF);
 #endif
