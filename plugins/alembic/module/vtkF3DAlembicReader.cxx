@@ -487,11 +487,7 @@ public:
           {
             Alembic::AbcGeom::V3f normal;
             matrix.multDirMatrix((*(normalValue.getVals()))[index], normal);
-<<<<<<< HEAD
             normal_v3f.emplace_back(normal);
-=======
-            normal_v3f.emplace_back(normal.x, normal.y, normal.z);
->>>>>>> a1e2a8404 (added cache for meshes)
           }
           originalData.Attributes.insert(AttributesContainer::value_type("N", normal_v3f));
           if (normalsParam.getScope() == Alembic::AbcGeom::kFacevaryingScope)
@@ -815,4 +811,3 @@ bool vtkF3DAlembicReader::CanReadFile(vtkResourceStream* stream)
 
   return std::string_view(magic.data(), magic.size()) == abcMagic;
 }
-
