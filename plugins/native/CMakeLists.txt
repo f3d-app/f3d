@@ -204,6 +204,18 @@ f3d_plugin_declare_reader(
   ${_SUPPORTS_STREAM}
 )
 
+if(F3D_MODULE_WEBP)
+  f3d_plugin_declare_reader(
+    NAME WebP
+    EXTENSIONS webp
+    MIMETYPES image/webp
+    VTK_READER vtkF3DWebPReader
+    FORMAT_DESCRIPTION "WebP Image"
+    EXCLUDE_FROM_THUMBNAILER
+    ${_SUPPORTS_STREAM}
+  )
+endif()
+
 f3d_plugin_declare_reader(
   NAME VRMLReader
   EXTENSIONS wrl vrml
@@ -354,3 +366,7 @@ f3d_plugin_build(
   FREEDESKTOP
   FORCE_STATIC
 )
+
+if(F3D_MODULE_WEBP)
+  target_link_libraries(f3d-plugin-native PRIVATE f3d::vtkextPrivate)
+endif()
