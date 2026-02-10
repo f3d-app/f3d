@@ -22,6 +22,14 @@ endif()
 set(F3D_ASSIMP_VERSION "${assimp_VERSION}" CACHE INTERNAL "")
 message(STATUS "Plugin: assimp ${assimp_VERSION} found")
 
+set(_assimp_formats "fbx;dae;dxf;off;x;3mf")
+foreach(_assimp_format IN LISTS _assimp_formats)
+  configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/assimp.inl.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/${_assimp_format}.inl"
+    @ONLY)
+endforeach()
+
 f3d_plugin_init()
 
 set(_SUPPORTS_STREAM)
@@ -36,8 +44,7 @@ f3d_plugin_declare_reader(
   VTK_IMPORTER vtkF3DAssimpImporter
   FORMAT_DESCRIPTION "Filmbox"
   ${_SUPPORTS_STREAM}
-  STANDARD_CAN_READ
-  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/assimp.inl"
+  CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/fbx.inl"
 )
 
 f3d_plugin_declare_reader(
@@ -47,8 +54,7 @@ f3d_plugin_declare_reader(
   VTK_IMPORTER vtkF3DAssimpImporter
   FORMAT_DESCRIPTION "COLLADA"
   ${_SUPPORTS_STREAM}
-  STANDARD_CAN_READ
-  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/assimp.inl"
+  CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/dae.inl"
 )
 
 f3d_plugin_declare_reader(
@@ -58,8 +64,7 @@ f3d_plugin_declare_reader(
   VTK_IMPORTER vtkF3DAssimpImporter
   FORMAT_DESCRIPTION "AutoCAD DXF"
   ${_SUPPORTS_STREAM}
-  STANDARD_CAN_READ
-  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/assimp.inl"
+  CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/dxf.inl"
 )
 
 f3d_plugin_declare_reader(
@@ -69,8 +74,7 @@ f3d_plugin_declare_reader(
   VTK_IMPORTER vtkF3DAssimpImporter
   FORMAT_DESCRIPTION "Object File Format"
   ${_SUPPORTS_STREAM}
-  STANDARD_CAN_READ
-  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/assimp.inl"
+  CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/off.inl"
 )
 
 f3d_plugin_declare_reader(
@@ -80,8 +84,7 @@ f3d_plugin_declare_reader(
   VTK_IMPORTER vtkF3DAssimpImporter
   FORMAT_DESCRIPTION "DirectX File Format"
   ${_SUPPORTS_STREAM}
-  STANDARD_CAN_READ
-  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/assimp.inl"
+  CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/x.inl"
 )
 
 f3d_plugin_declare_reader(
@@ -91,8 +94,7 @@ f3d_plugin_declare_reader(
   VTK_IMPORTER vtkF3DAssimpImporter
   FORMAT_DESCRIPTION "3D Manufacturing Format"
   ${_SUPPORTS_STREAM}
-  STANDARD_CAN_READ
-  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/assimp.inl"
+  CUSTOM_CODE "${CMAKE_CURRENT_BINARY_DIR}/3mf.inl"
 )
 
 set(rpaths "")
