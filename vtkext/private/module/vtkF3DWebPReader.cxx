@@ -139,8 +139,9 @@ int vtkF3DWebPReader::CanReadFile(vtkResourceStream* stream)
   vtkNew<vtkResourceParser> parser;
   parser->SetStream(stream);
 
-  std::string header(12, '\0');
-  if (parser->Read(header.data(), header.size()) != header.size())
+  std::string header;
+  parser->ReadLine(header, 12);
+  if (header.size() != 12)
   {
     return 0;
   }

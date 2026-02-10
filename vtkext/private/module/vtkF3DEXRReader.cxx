@@ -16,6 +16,7 @@
 #include <ImfVersion.h>
 
 #include <algorithm>
+#include <cstring>
 #include <sstream>
 #include <thread>
 
@@ -193,12 +194,15 @@ int vtkF3DEXRReader::CanReadFile(vtkResourceStream* stream)
   vtkNew<vtkResourceParser> parser;
   parser->SetStream(stream);
 
-  int magic = 0;
-  if (parser->Read(reinterpret_cast<char*>(&magic), sizeof(magic)) != sizeof(magic))
+  std::string header;
+  parser->ReadLine(header, sizeof(int));
+  if (header.size() != sizeof(int))
   {
     return 0;
   }
 
+  int magic;
+  std::memcpy(&magic, header.data(), sizeof(int));
   return magic == Imf::MAGIC;
 }
 #endif
