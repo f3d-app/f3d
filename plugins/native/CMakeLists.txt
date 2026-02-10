@@ -216,6 +216,17 @@ if(F3D_MODULE_WEBP)
   )
 endif()
 
+if(F3D_MODULE_EXR)
+  f3d_plugin_declare_reader(
+    NAME EXR
+    EXTENSIONS exr
+    MIMETYPES image/x-exr
+    VTK_IMPORTER vtkF3DImageImporter
+    FORMAT_DESCRIPTION "OpenEXR Image"
+    ${_SUPPORTS_STREAM}
+  )
+endif()
+
 f3d_plugin_declare_reader(
   NAME VRMLReader
   EXTENSIONS wrl vrml
@@ -367,6 +378,6 @@ f3d_plugin_build(
   FORCE_STATIC
 )
 
-if(F3D_MODULE_WEBP)
+if(F3D_MODULE_EXR OR F3D_MODULE_WEBP)
   target_link_libraries(f3d-plugin-native PRIVATE f3d::vtkextPrivate)
 endif()

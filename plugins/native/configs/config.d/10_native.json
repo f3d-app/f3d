@@ -44,7 +44,7 @@
   },
   {
     "match-type": "glob",
-    "match": "*.{png,jpg,jpeg,bmp,tga,hdr,webp}",
+    "match": "*.{png,jpg,jpeg,bmp,tga,hdr,webp,exr}",
     "options": {
       "scalar-coloring": true,
       "up": "+Y",

@@ -21,6 +21,7 @@ F3D supports the following file formats:
 | TGA Image                                 | `.tga`                                         | No         | NONE              | YES (VTK 9.7)     | `native`  | `TGA`                   |
 | HDR Radiance Image                        | `.hdr`                                         | No         | NONE              | YES (VTK 9.7)     | `native`  | `HDR`                   |
 | WebP Image                                | `.webp`                                        | No         | NONE              | YES (VTK 9.7)     | `native`  | `WebP`                  |
+| OpenEXR Image                             | `.exr`                                         | No         | NONE              | YES (VTK 9.7)     | `native`  | `EXR`                   |
 | QuakeMDL                                  | `.mdl`                                         | Yes        | SINGLE            | YES (VTK 9.5)     | `native`  | `QuakeMDL`              |
 | CityGML                                   | `.gml`                                         | No         | NONE              | YES (VTK 9.6)     | `native`  | `CityGML`               |
 | Point Cloud                               | `.pts`                                         | No         | NONE              | YES (VTK 9.6)     | `native`  | `PTS`                   |

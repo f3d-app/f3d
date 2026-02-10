@@ -66,7 +66,7 @@
   },
   {
     "match-type": "glob",
-    "match": "*.{tga,hdr,webp}",
+    "match": "*.{tga,hdr,webp,exr}",
     "options": {
       "scalar-coloring": true,
       "coloring-component": "-2",
