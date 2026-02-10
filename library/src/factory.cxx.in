@@ -90,7 +90,7 @@ reader* factory::getReader(const std::byte* buffer, std::size_t size, std::optio
           return reader.get();
         }
       }
-      else if (reader->getScore() > bestScore && reader->canRead(stream))
+      else if (reader->getScore() > bestScore && reader->supportsStream() && reader->canRead(stream))
       {
         bestScore = reader->getScore();
         bestReader = reader.get();
