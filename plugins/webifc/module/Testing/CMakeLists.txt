@@ -16,3 +16,10 @@ vtk_add_test_cxx(vtkextWebIFCTests tests
   ${vtkextWebIFCTests_list}
   ${F3D_SOURCE_DIR}/testing/ ${CMAKE_BINARY_DIR}/Testing/Temporary/)
 vtk_test_cxx_executable(vtkextWebIFCTests tests)
+
+foreach(test ${vtkextWebIFCTests_list})
+  get_filename_component (TName ${test} NAME_WE)
+  set_tests_properties(f3d::vtkextWebIFCCxx-${TName} PROPERTIES
+    LABELS "module;webifc"
+  )
+endforeach()
