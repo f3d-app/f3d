@@ -18,11 +18,13 @@ please take a look at our [getting started guide](03-GETTING_STARTED.md).
 - Optionally, [Alembic](http://www.alembic.io/) >= 1.8.5.
 - Optionally, [OpenUSD](https://openusd.org/release/index.html) >= 24.08 (25.05.01 recommended).
 - Optionally, [OpenVDB](https://www.openvdb.org/download/) >= 12.0.0, enable `IOOpenVDB` module during VTK configuration.
-- Optionally, [OSPray](https://www.ospray.org/) == v2.12.0, enable `RenderingRayTracing` module during VTK configuration.
+- Optionally, [web-ifc](https://github.com/ThatOpen/engine_web-ifc) >= 0.75 (only C++ library).
+- Optionally, [OSPray](https://www.ospray.org/) == 2.12.0, enable `RenderingRayTracing` module during VTK configuration.
 - Optionally, [Draco](https://google.github.io/draco/) >= 1.5.6.
 - Optionally, [Python](https://www.python.org/) >= 3.10 and [pybind11](https://github.com/pybind/pybind11) >= 2.9.2.
 - Optionally, [Java](https://www.java.com) >= 17.
 - Optionally, [OpenEXR](https://openexr.com/en/latest/) >= 3.0.1.
+- Optionally, [WebP](https://chromium.googlesource.com/webm/libwebp) >= 1.2.4.
 
 F3D is tested continuously against versions recommended by the [VFX reference platform](https://vfxplatform.com) defined for **CY2025**
 
@@ -61,6 +63,7 @@ Some modules, plugins and language bindings depending on external libraries can 
 - `F3D_BINDINGS_PYTHON`: Generate python bindings (requires `Python` and `pybind11`). Disabled by default.
 - `F3D_BINDINGS_PYTHON_GENERATE_STUBS`: Generate python stubs (requires `Python` and `pybind11_stubgen`). Disabled by default.
 - `F3D_BINDINGS_JAVA`: Generate java bindings (requires `Java` >= 17 and `JNI`). Disabled by default.
+- `F3D_BINDINGS_C`: Generate C bindings. Disabled by default.
 
 Some dependencies are provided internally, eg: ImGui, dmon and others. Use `F3D_USE_EXTERNAL_*` to use an external version of these libraries.
 

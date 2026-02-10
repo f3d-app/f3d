@@ -1,2 +1,5 @@
 # ignore vendored libraries:
 ./external/**/*
+
+# ignore shell completion files
+./resources/completion.*.in

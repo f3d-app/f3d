@@ -8,6 +8,12 @@
 
 int TestF3DSPZReader(int vtkNotUsed(argc), char* argv[])
 {
+  if (vtkF3DSPZReader::CanReadFile(nullptr))
+  {
+    std::cerr << "Unexpected CanReadFile success with nullptr\n";
+    return EXIT_FAILURE;
+  }
+
   std::string path = std::string(argv[1]) + "data/hornedlizard_small_d0.spz";
 
   vtkNew<vtkFileResourceStream> stream;
@@ -15,6 +21,12 @@ int TestF3DSPZReader(int vtkNotUsed(argc), char* argv[])
   if (!stream->Open(path.c_str()))
   {
     std::cerr << "Cannot open file\n";
+    return EXIT_FAILURE;
+  }
+
+  if (!vtkF3DSPZReader::CanReadFile(stream))
+  {
+    std::cerr << "Unexpected CanReadFile failure\n";
     return EXIT_FAILURE;
   }
 
@@ -27,6 +39,19 @@ int TestF3DSPZReader(int vtkNotUsed(argc), char* argv[])
   if (nbGaussians != 13296)
   {
     std::cerr << "Incorrect number of gaussians: " << nbGaussians << "\n";
+    return EXIT_FAILURE;
+  }
+
+  path = std::string(argv[1]) + "data/f3d.vtp";
+  if (!stream->Open(path.c_str()))
+  {
+    std::cerr << "Cannot open file\n";
+    return EXIT_FAILURE;
+  }
+
+  if (vtkF3DSPZReader::CanReadFile(stream))
+  {
+    std::cerr << "Unexpected CanReadFile success\n";
     return EXIT_FAILURE;
   }
 

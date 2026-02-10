@@ -570,15 +570,22 @@ void animationManager::PrepareForAnimationIndices()
   bool foundAnimation = false;
   this->TimeRange[0] = std::numeric_limits<double>::infinity();
   this->TimeRange[1] = -std::numeric_limits<double>::infinity();
+  std::set<double> accumulatedTimeSteps;
   for (vtkIdType animIndex = 0; animIndex < this->AvailAnimations; animIndex++)
   {
     if (this->Importer->IsAnimationEnabled(animIndex))
     {
       double timeRange[2];
       int nbTimeSteps;
-
       this->Importer->GetTemporalInformation(
         animIndex, timeRange, nbTimeSteps, this->AnimationTimeSteps);
+
+      // Accumulate timesteps to avoid overwrite
+      for (vtkIdType stepIndex = 0; stepIndex < this->AnimationTimeSteps->GetNumberOfTuples();
+           stepIndex++)
+      {
+        accumulatedTimeSteps.emplace(this->AnimationTimeSteps->GetValue(stepIndex));
+      }
 
       // Accumulate time ranges
       this->TimeRange[0] = std::min(timeRange[0], this->TimeRange[0]);
@@ -589,6 +596,17 @@ void animationManager::PrepareForAnimationIndices()
 
   if (foundAnimation)
   {
+    // Populate AnimationTimeSteps with accumulated values
+    this->AnimationTimeSteps->Reset();
+    int nbAccumulatedTimeSteps = static_cast<int>(accumulatedTimeSteps.size());
+    this->AnimationTimeSteps->SetNumberOfTuples(nbAccumulatedTimeSteps);
+    int index = 0;
+    for (double timeStep : accumulatedTimeSteps)
+    {
+      this->AnimationTimeSteps->SetValue(index, timeStep);
+      index++;
+    }
+
     // Check time range is valid
     if (this->TimeRange[0] > this->TimeRange[1])
     {

@@ -63,6 +63,7 @@
 #include <vtkPointData.h>
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
+#include <vtkResourceParser.h>
 #include <vtkResourceStream.h>
 #include <vtkTransform.h>
 #include <vtkTransformFilter.h>
@@ -868,7 +869,7 @@ void vtkF3DOCCTReader::PrintSelf(ostream& os, vtkIndent indent)
     case FILE_FORMAT::IGES: os << "FileFormat: IGES" << "\n"; break;
     case FILE_FORMAT::XBF: os << "FileFormat: XBF" << "\n"; break;
   }
-  // clang-format
+  // clang-format on
 }
 
 //----------------------------------------------------------------------------
@@ -880,4 +881,151 @@ vtkMTimeType vtkF3DOCCTReader::GetMTime()
     mtime = std::max(mtime, this->Stream->GetMTime());
   }
   return mtime;
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DOCCTReader::CanReadFile(vtkResourceStream* stream)
+{
+  vtkF3DOCCTReader::FILE_FORMAT format;
+  return vtkF3DOCCTReader::CanReadFile(stream, format);
+}
+
+//----------------------------------------------------------------------------
+bool vtkF3DOCCTReader::CanReadFile(vtkResourceStream* stream, vtkF3DOCCTReader::FILE_FORMAT& format)
+{
+  if (!stream)
+  {
+    return false;
+  }
+
+#if F3D_PLUGIN_OCCT_XCAF
+  // XBF:
+  // BINFILEx01x02x03x04x07x00x00x00
+  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+  char binfile[7];
+  uint64_t magic;
+  if (stream->Read(&binfile, 7) == 7 && stream->Read(&magic, 8) == 8)
+  {
+    if (strncmp(binfile, "BINFILE", 7) == 0 && magic == 0x0000000704030201)
+    {
+      format = vtkF3DOCCTReader::FILE_FORMAT::XBF;
+      return true;
+    }
+  }
+#endif
+
+  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+  vtkNew<vtkResourceParser> parser;
+  parser->SetStream(stream);
+  parser->StopOnNewLineOn();
+
+  // STEP:
+  // ISO-10303-21;
+  // HEADER;
+  // ...
+  // FILE_SCHEMA(('AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }'));
+  // ENDSEC;
+  std::string line;
+  if (parser->ReadLine(line) == vtkParseResult::EndOfLine && line == "ISO-10303-21;")
+  {
+    // Only "ISO-10303-21" supported schema is STEP, check for it
+    // FILE_SCHEMA appears in the HEADER section, typically within the first few lines.
+    // 32 lines is a generous upper bound to account for optional header entries.
+    constexpr int maxLines = 32;
+    for (int i = 0; i < maxLines && parser->ReadLine(line) == vtkParseResult::EndOfLine; ++i)
+    {
+      if (line.find("FILE_SCHEMA") != std::string::npos)
+      {
+        format = vtkF3DOCCTReader::FILE_FORMAT::STEP;
+        return line.find("AUTOMOTIVE_DESIGN") != std::string::npos;
+      }
+
+      if (line.find("ENDSEC") != std::string::npos)
+      {
+        return false;
+      }
+    }
+    return false;
+  }
+
+  // IGES:
+  //                                                                         S0000001
+  // ,,31HOpen CASCADE IGES processor 7.6,13HFilename.iges,                  G0000001
+  // 16HOpen CASCADE 7.6,31HOpen CASCADE IGES processor 7.6,32,308,15,308,15,G0000002
+  parser->Seek(0, vtkResourceStream::SeekDirection::Begin);
+  std::string line1, line2, line3;
+  if (parser->ReadLine(line1) == vtkParseResult::EndOfLine &&
+    parser->ReadLine(line2) == vtkParseResult::EndOfLine &&
+    parser->ReadLine(line3) == vtkParseResult::EndOfLine)
+  {
+    bool iges = true;
+
+    // Each line must be 80 chars long
+    if (line1.size() != 80 || line2.size() != 80 || line3.size() != 80)
+    {
+      iges = false;
+    }
+
+    // line1 should contain many spaces followed by a `S`
+    std::size_t nonSpaceIdx = line1.find_first_not_of(' ');
+    if (nonSpaceIdx == std::string::npos || line1[nonSpaceIdx] != 'S')
+    {
+      iges = false;
+    }
+
+    // line2 should contain IGS, IGES, igs or iges (the file extension)
+    else if (line2.find("IGS") == std::string::npos && line2.find("IGES") == std::string::npos &&
+      line2.find("igs") == std::string::npos && line2.find("iges") == std::string::npos)
+    {
+      iges = false;
+    }
+
+    // line3 should contain IGS, IGES
+    else if (line3.find("IGS") == std::string::npos && line3.find("IGES") == std::string::npos)
+    {
+      iges = false;
+    }
+
+    // Above tests could be put into a single line
+    // but this approach seems a bit saner.
+    if (iges)
+    {
+      format = vtkF3DOCCTReader::FILE_FORMAT::IGES;
+      return true;
+    }
+  }
+
+  // BRep (ASCII):
+  // DBRep_DrawableShape
+  //
+  // [Open ]CASCADE Topology ...
+  parser->Seek(0, vtkResourceStream::SeekDirection::Begin);
+  if (parser->ReadLine(line1) == vtkParseResult::EndOfLine &&
+    parser->ReadLine(line2) == vtkParseResult::EndOfLine &&
+    parser->ReadLine(line3) == vtkParseResult::EndOfLine)
+  {
+    if (line1.rfind("DBRep_DrawableShape", 0) == 0 && line2.empty() &&
+      (line3.rfind("CASCADE Topology", 0) == 0 || line3.rfind("Open CASCADE Topology", 0) == 0))
+    {
+      format = vtkF3DOCCTReader::FILE_FORMAT::BREP;
+      return true;
+    }
+  }
+
+  // BRep (binary):
+  //
+  // [Open ]CASCADE Topology ...
+  parser->Seek(0, vtkResourceStream::SeekDirection::Begin);
+  if (parser->ReadLine(line1) == vtkParseResult::EndOfLine &&
+    parser->ReadLine(line2) == vtkParseResult::EndOfLine)
+  {
+    if (line1.empty() &&
+      (line2.rfind("CASCADE Topology", 0) == 0 || line2.rfind("Open CASCADE Topology", 0) == 0))
+    {
+      format = vtkF3DOCCTReader::FILE_FORMAT::BREP;
+      return true;
+    }
+  }
+
+  return false;
 }

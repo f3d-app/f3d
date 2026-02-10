@@ -42,6 +42,7 @@ f3d_application_test(NAME TestVerboseQuakeMDLInvalid ARGS --verbose DATA w_medki
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20231102)
   f3d_application_test(NAME TestSPLAT DATA small.splat ARGS -osy --up=-Y --point-sprites-absolute-size --point-sprites-size=1)
+  f3d_application_test(NAME TestSPLATSortCPU DATA small.splat ARGS -osy --point-sprites=gaussian --up=-Y --point-sprites-absolute-size --point-sprites-size=1 --blending=sort_cpu --camera-position=2,0,0)
   f3d_application_test(NAME TestSPZ DATA hornedlizard_small_d0.spz ARGS -sy --point-sprites-absolute-size --point-sprites-size=1)
 
   set(_splat_args -sy --up=-Y --point-sprites-absolute-size --point-sprites-size=1 --camera-position=-2.00335,1.09654,-0.459485 --camera-focal-point=-0.796712,2.22795,0.705742)

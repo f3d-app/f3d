@@ -70,6 +70,15 @@ public:
   vtkGetMacro(SkinIndex, unsigned int);
   ///@}
 
+  /**
+   * Return true if, after a quick check of file header, it looks like the provided stream
+   * can be read. Return false if it is sure it cannot be read as a strean.
+   *
+   * This only checks that the file header contains the right magic ("IPDO" or "IDST") and the
+   * version is 6.
+   */
+  static bool CanReadFile(vtkResourceStream* stream);
+
 protected:
   vtkF3DQuakeMDLImporter();
   ~vtkF3DQuakeMDLImporter() override = default;
