@@ -125,6 +125,7 @@ int vtkF3DWebPReader::CanReadFile(const char* fname)
   return 1;
 }
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260116)
 //------------------------------------------------------------------------------
 int vtkF3DWebPReader::CanReadFile(vtkResourceStream* stream)
 {
@@ -147,6 +148,7 @@ int vtkF3DWebPReader::CanReadFile(vtkResourceStream* stream)
   std::string_view sv(header);
   return sv.substr(0, 4) == "RIFF" && sv.substr(8, 4) == "WEBP";
 }
+#endif
 
 //------------------------------------------------------------------------------
 void vtkF3DWebPReader::ExecuteDataWithInformation(vtkDataObject* output, vtkInformation* outInfo)

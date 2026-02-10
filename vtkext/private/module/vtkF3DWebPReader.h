@@ -6,6 +6,7 @@
 #define vtkF3DWebPReader_h
 
 #include "vtkImageReader.h"
+#include "vtkVersion.h"
 
 class vtkF3DWebPReader : public vtkImageReader
 {
@@ -17,7 +18,9 @@ public:
    * Return 1 if the reader is compatible with the given file
    */
   int CanReadFile(const char* fname) override;
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260116)
   int CanReadFile(vtkResourceStream* stream) override;
+#endif
 
   /**
    * List of extensions supported by this reader
