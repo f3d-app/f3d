@@ -831,7 +831,7 @@ interactor& interactor_impl::initCommands()
   static const std::map<std::string, std::vector<std::string>> COMPL_OPTIONS_SET = {
     { "model.point_sprites.type", { "sphere", "gaussian" } },
     { "render.effect.antialiasing.mode", { "fxaa", "ssaa", "taa" } },
-    { "render.effect.blending.mode", { "ddp", "sort", "stochastic" } },
+    { "render.effect.blending.mode", { "ddp", "sort", "sort_cpu", "stochastic" } },
   };
   auto complOptionSet = [&](const std::vector<std::string>& args)
   {
@@ -1007,6 +1007,10 @@ interactor& interactor_impl::initCommands()
         }
         else if (mode == "sort")
         {
+          mode = "sort_cpu";
+        }
+        else if (mode == "sort_cpu")
+        {
           mode = "stochastic";
         }
         else
@@ -1017,7 +1021,7 @@ interactor& interactor_impl::initCommands()
       this->Internals->Window.render();
     },
     command_documentation_t{
-      "cycle_blending", "cycle between the blending method (none,ddp,sort,stochastic)" });
+      "cycle_blending", "cycle between the blending method (none,ddp,sort,sort_cpu,stochastic)" });
 
   std::vector<std::string> cycleColoringValidArgs = { "field", "array", "component" };
   this->addCommand(

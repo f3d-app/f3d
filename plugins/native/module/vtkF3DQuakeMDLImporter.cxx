@@ -157,8 +157,48 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
   }
 
   //----------------------------------------------------------------------------
+  static bool ReadAndCheckHeader(const std::vector<uint8_t>& buffer, vtkObject* object,
+    size_t& offset, const mdl_header_t*& header)
+  {
+    // Read header
+    try
+    {
+      header = vtkInternals::ReadFromVector<mdl_header_t>(buffer, offset);
+    }
+    catch (const F3DRangeError&)
+    {
+      if (object)
+      {
+        vtkErrorWithObjectMacro(object, "Invalid MDL file");
+      }
+      return false;
+    }
+
+    // Check magic number for "IPDO" or "IDST"
+    if (!(header->ident == 0x4F504449 || header->ident == 0x54534449))
+    {
+      if (object)
+      {
+        vtkErrorWithObjectMacro(object, "Incompatible MDL header");
+      }
+      return false;
+    }
+
+    // Check version for v6 exactly
+    if (header->version != 6)
+    {
+      if (object)
+      {
+        vtkErrorWithObjectMacro(object, "Unsupported MDL version. Only version 6 is supported");
+      }
+      return false;
+    }
+    return true;
+  }
+
+  //----------------------------------------------------------------------------
   // Safer buffer typecasting with auto offset incrementing with variable length data
-  const mdl_simpleframe_t* ReadFromVectorSimpleframe(
+  static const mdl_simpleframe_t* ReadFromVectorSimpleframe(
     const std::vector<uint8_t>& buffer, size_t& offset, size_t num_verts = 0)
   {
     static constexpr auto mdl_simpleframe_t_fixed_size =
@@ -563,34 +603,15 @@ struct vtkF3DQuakeMDLImporter::vtkInternals
     stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
 
     // Read stream into buffer
+    // TODO rework to avoid copying the whole buffer
     std::vector<uint8_t> buffer(length);
     stream->Read(buffer.data(), length);
 
-    // Read header
-    // XXX: This is completely unsafe, should be rewritten using modern API
+    // Read Header
     size_t offset = 0;
     const mdl_header_t* header;
-    try
+    if (!vtkInternals::ReadAndCheckHeader(buffer, this->Parent, offset, header))
     {
-      header = vtkInternals::ReadFromVector<mdl_header_t>(buffer, offset);
-    }
-    catch (const F3DRangeError&)
-    {
-      vtkErrorWithObjectMacro(this->Parent, "Invalid MDL file");
-      return false;
-    }
-
-    // Check magic number for "IPDO" or "IDST"
-    if (!(header->ident == 0x4F504449 || header->ident == 0x54534449))
-    {
-      vtkErrorWithObjectMacro(this->Parent, "Incompatible MDL header");
-      return false;
-    }
-
-    // Check version for v6 exactly
-    if (header->version != 6)
-    {
-      vtkErrorWithObjectMacro(this->Parent, "Unsupported MDL version. Only version 6 is supported");
       return false;
     }
 
@@ -788,6 +809,33 @@ bool vtkF3DQuakeMDLImporter::GetTemporalInformation(
   for (unsigned int i = 0; i < times.size(); ++i)
   {
     timeSteps->SetValue(i, times[i]);
+  }
+  return true;
+}
+
+//------------------------------------------------------------------------------
+bool vtkF3DQuakeMDLImporter::CanReadFile(vtkResourceStream* stream)
+{
+  if (!stream)
+  {
+    return false;
+  }
+
+  // Read header into buffer
+  std::size_t headerSize = sizeof(vtkInternals::mdl_header_t);
+  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+  std::vector<uint8_t> buffer(headerSize);
+  if (stream->Read(buffer.data(), headerSize) != headerSize)
+  {
+    return false;
+  }
+
+  // Check header buffer
+  size_t offset = 0;
+  const vtkInternals::mdl_header_t* header;
+  if (!vtkInternals::ReadAndCheckHeader(buffer, nullptr, offset, header))
+  {
+    return false;
   }
   return true;
 }
