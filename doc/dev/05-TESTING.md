@@ -37,6 +37,7 @@ CTest labels allow you to easily target specific groups of tests.
 
 Available labels:
 
+- application (all f3d application tests)
 - libf3d (all libf3d tests)
 - bindings (all binding tests)
 - c, java, python
