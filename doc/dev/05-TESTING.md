@@ -41,8 +41,9 @@ Available labels:
 - libf3d (all libf3d tests)
 - bindings (all binding tests)
 - c, java, python
-- module (all vtkext module)
+- module (all vtkext module tests)
 - occt, abc, usd, webifc, draco
+- obj, spz, mdl, etc..
 
 Labels can be combined to further refine test selection.
 
