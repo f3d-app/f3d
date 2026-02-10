@@ -160,7 +160,7 @@ f3d_plugin_declare_reader(
   NAME PNG
   EXTENSIONS png
   MIMETYPES image/png
-  VTK_READER vtkPNGReader
+  VTK_IMPORTER vtkF3DImageImporter
   FORMAT_DESCRIPTION "PNG Image"
   EXCLUDE_FROM_THUMBNAILER
   ${_SUPPORTS_STREAM}
@@ -170,7 +170,7 @@ f3d_plugin_declare_reader(
   NAME JPEG
   EXTENSIONS jpg jpeg
   MIMETYPES image/jpeg
-  VTK_READER vtkJPEGReader
+  VTK_IMPORTER vtkF3DImageImporter
   FORMAT_DESCRIPTION "JPEG Image"
   EXCLUDE_FROM_THUMBNAILER
   ${_SUPPORTS_STREAM}
@@ -180,7 +180,7 @@ f3d_plugin_declare_reader(
   NAME BMP
   EXTENSIONS bmp
   MIMETYPES image/bmp
-  VTK_READER vtkBMPReader
+  VTK_IMPORTER vtkF3DImageImporter
   FORMAT_DESCRIPTION "BMP Image"
   EXCLUDE_FROM_THUMBNAILER
   ${_SUPPORTS_STREAM}
@@ -190,7 +190,7 @@ f3d_plugin_declare_reader(
   NAME TGA
   EXTENSIONS tga
   MIMETYPES image/x-tga
-  VTK_READER vtkTGAReader
+  VTK_IMPORTER vtkF3DImageImporter
   FORMAT_DESCRIPTION "TGA Image"
   ${_SUPPORTS_STREAM}
 )
@@ -199,7 +199,7 @@ f3d_plugin_declare_reader(
   NAME HDR
   EXTENSIONS hdr
   MIMETYPES image/vnd.radiance
-  VTK_READER vtkHDRReader
+  VTK_IMPORTER vtkF3DImageImporter
   FORMAT_DESCRIPTION "HDR Radiance Image"
   ${_SUPPORTS_STREAM}
 )
@@ -209,7 +209,7 @@ if(F3D_MODULE_WEBP)
     NAME WebP
     EXTENSIONS webp
     MIMETYPES image/webp
-    VTK_READER vtkF3DWebPReader
+    VTK_IMPORTER vtkF3DImageImporter
     FORMAT_DESCRIPTION "WebP Image"
     EXCLUDE_FROM_THUMBNAILER
     ${_SUPPORTS_STREAM}
