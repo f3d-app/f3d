@@ -19,3 +19,10 @@ if(F3D_PLUGIN_OCCT_COLORING_SUPPORT)
   target_compile_definitions(vtkextOCCTTests
     PRIVATE F3D_PLUGIN_OCCT_XCAF)
 endif()
+
+foreach(test ${vtkextOCCT_list})
+  get_filename_component (TName ${test} NAME_WE)
+  set_tests_properties(f3d::vtkextOCCTCxx-${TName} PROPERTIES
+    LABELS "module;occt"
+  )
+endforeach()
