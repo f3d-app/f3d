@@ -21,3 +21,10 @@ vtk_add_test_cxx(vtkextAssimpTests tests
   ${VTKExtensionsPluginAssimp_list}
   ${F3D_SOURCE_DIR}/testing/ ${CMAKE_BINARY_DIR}/Testing/Temporary/)
 vtk_test_cxx_executable(vtkextAssimpTests tests)
+
+foreach(test ${VTKExtensionsPluginAssimp_list})
+  get_filename_component (TName ${test} NAME_WE)
+  set_tests_properties(f3d::vtkextAssimpCxx-${TName} PROPERTIES
+    LABELS "module;assimp"
+  )
+endforeach()
