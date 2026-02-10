@@ -147,9 +147,16 @@ function(f3d_test)
     add_test(NAME "f3d::${F3D_TEST_NAME}" COMMAND ${_f3d_target} ${_f3d_test_data} ${F3D_TEST_ARGS} COMMAND_EXPAND_LISTS)
   endif()
 
+  foreach(_single_data ${F3D_TEST_DATA})
+    get_filename_component(FILE_EXT "${_single_data}" EXT)
+    string(TOLOWER "${FILE_EXT}" FILE_EXT)
+    string(REPLACE "." "" FILE_EXT "${FILE_EXT}")
+    set(F3D_TEST_LABELS "${F3D_TEST_LABELS};${FILE_EXT}")
+  endforeach()
+
   if(F3D_TEST_LABELS)
     set_tests_properties("f3d::${F3D_TEST_NAME}" PROPERTIES
-      LABELS ${F3D_TEST_LABELS}
+      LABELS "${F3D_TEST_LABELS}"
     )
   endif()
 
