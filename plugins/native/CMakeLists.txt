@@ -25,6 +25,7 @@ f3d_plugin_declare_reader(
   VTK_IMPORTER vtk3DSImporter
   FORMAT_DESCRIPTION "Autodesk 3D Studio"
   ${_SUPPORTS_STREAM}
+  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/3ds.inl"
 )
 
 set(_SUPPORTS_STREAM)
