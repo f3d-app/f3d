@@ -239,5 +239,5 @@ endfunction()
 
 function(f3d_application_test)
   cmake_parse_arguments(F3D_TEST "" "LABELS" "" ${ARGN})
-  f3d_test(${ARGN} LABELS "application,${F3D_TEST_LABELS}")
+  f3d_test(${ARGN} LABELS "application;${F3D_TEST_LABELS}")
 endfunction()
