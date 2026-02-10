@@ -591,7 +591,8 @@ std::vector<std::pair<std::string, std::string>> F3DOptionsTools::ConvertToLibf3
   // handle deprecated interaction-trackball option
   else if (key == "interaction-trackball")
   {
-    f3d::log::warn("--interaction-trackball is deprecated, please use --interaction-style=trackball instead");
+    f3d::log::warn(
+      "--interaction-trackball is deprecated, please use --interaction-style=trackball instead");
     bool trackball;
     if (F3DOptionsTools::Parse(value, trackball) && trackball)
     {

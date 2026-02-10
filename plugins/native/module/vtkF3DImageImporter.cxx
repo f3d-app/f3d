@@ -4,6 +4,7 @@
 #include <vtkFloatArray.h>
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
+#include <vtkImageReader2Collection.h>
 #include <vtkImageReader2Factory.h>
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
@@ -17,13 +18,38 @@ vtkStandardNewMacro(vtkF3DImageImporter);
 //----------------------------------------------------------------------------
 void vtkF3DImageImporter::ImportActors(vtkRenderer* renderer)
 {
-  // use imagereader2 to read the image file
-  auto reader = vtkSmartPointer<vtkImageReader2>::Take(
-    vtkImageReader2Factory::CreateImageReader2(this->GetFileName()));
+  const char* fileName = this->GetFileName();
 
-  assert(reader);
+  vtkSmartPointer<vtkImageReader2> reader;
+  if (fileName)
+  {
+    reader.TakeReference(vtkImageReader2Factory::CreateImageReader2(fileName));
+    reader->SetFileName(fileName);
+  }
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260106)
+  else if (this->GetStream())
+  {
+    vtkNew<vtkImageReader2Collection> collection;
+    vtkImageReader2Factory::GetRegisteredReaders(collection);
+    collection->InitTraversal();
+    while (vtkImageReader2* probe = collection->GetNextItem())
+    {
+      if (probe->CanReadFile(this->GetStream()))
+      {
+        reader.TakeReference(probe->NewInstance());
+        reader->SetStream(this->GetStream());
+        break;
+      }
+    }
+  }
+#endif
 
-  reader->SetFileName(this->GetFileName());
+  if (!reader)
+  {
+    vtkErrorMacro("Could not find a suitable image reader");
+    return;
+  }
+
   reader->UpdateInformation();
 
   int extent[6];

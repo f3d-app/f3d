@@ -1,6 +1,6 @@
 /**
  * @class   vtkF3DImageImporter
- * @brief   
+ * @brief
  *
  */
 

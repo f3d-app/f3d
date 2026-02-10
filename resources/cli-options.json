@@ -243,9 +243,14 @@
           "valueHelper": "<index>"
         },
         {
-          "longName": "interaction-trackball",
+          "longName": "interaction-style",
           "shortName": "k",
-          "helpText": "Enable trackball interaction",
+          "helpText": "Interaction style",
+          "valueHelper": "<style>"
+        },
+        {
+          "longName": "interaction-trackball",
+          "helpText": "Enable trackball interaction (deprecated, use --interaction-style=trackball)",
           "valueHelper": "<bool>",
           "implicitValue": "1"
         },
