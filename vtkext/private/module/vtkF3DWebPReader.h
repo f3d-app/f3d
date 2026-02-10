@@ -17,6 +17,7 @@ public:
    * Return 1 if the reader is compatible with the given file
    */
   int CanReadFile(const char* fname) override;
+  int CanReadFile(vtkResourceStream* stream) override;
 
   /**
    * List of extensions supported by this reader

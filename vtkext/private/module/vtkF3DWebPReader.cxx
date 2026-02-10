@@ -6,6 +6,7 @@
 #include <vtkNew.h>
 #include <vtkObjectFactory.h>
 #include <vtkPointData.h>
+#include <vtkResourceParser.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtkVersion.h>
 #include <vtksys/FStream.hxx>
@@ -13,6 +14,7 @@
 #include "webp/decode.h"
 
 #include <algorithm>
+#include <string_view>
 
 vtkStandardNewMacro(vtkF3DWebPReader);
 
@@ -121,6 +123,29 @@ int vtkF3DWebPReader::CanReadFile(const char* fname)
 
   ifs.close();
   return 1;
+}
+
+//------------------------------------------------------------------------------
+int vtkF3DWebPReader::CanReadFile(vtkResourceStream* stream)
+{
+  if (!stream)
+  {
+    return 0;
+  }
+
+  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+
+  vtkNew<vtkResourceParser> parser;
+  parser->SetStream(stream);
+
+  std::string header(12, '\0');
+  if (parser->Read(header.data(), header.size()) != header.size())
+  {
+    return 0;
+  }
+
+  std::string_view sv(header);
+  return sv.substr(0, 4) == "RIFF" && sv.substr(8, 4) == "WEBP";
 }
 
 //------------------------------------------------------------------------------

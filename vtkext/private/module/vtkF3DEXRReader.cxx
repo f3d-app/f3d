@@ -6,12 +6,14 @@
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
+#include "vtkResourceParser.h"
 #include "vtkVersion.h"
 #include "vtksys/FStream.hxx"
 
 #include <ImfArray.h>
 #include <ImfIO.h>
 #include <ImfRgbaFile.h>
+#include <ImfVersion.h>
 
 #include <algorithm>
 #include <sstream>
@@ -175,6 +177,28 @@ int vtkF3DEXRReader::CanReadFile(const char* fname)
 
   ifs.close();
   return 1;
+}
+
+//------------------------------------------------------------------------------
+int vtkF3DEXRReader::CanReadFile(vtkResourceStream* stream)
+{
+  if (!stream)
+  {
+    return 0;
+  }
+
+  stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
+
+  vtkNew<vtkResourceParser> parser;
+  parser->SetStream(stream);
+
+  int magic = 0;
+  if (parser->Read(reinterpret_cast<char*>(&magic), sizeof(magic)) != sizeof(magic))
+  {
+    return 0;
+  }
+
+  return magic == Imf::MAGIC;
 }
 
 //------------------------------------------------------------------------------
