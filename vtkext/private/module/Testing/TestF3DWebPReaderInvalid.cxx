@@ -25,7 +25,7 @@ int TestF3DWebPReaderInvalid(int argc, char* argv[])
   reader->CanReadFile(filename.c_str());
   reader->Update();
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260116)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260106)
   reader->CanReadFile(static_cast<vtkResourceStream*>(nullptr));
 
   vtkNew<vtkMemoryResourceStream> emptyStream;
