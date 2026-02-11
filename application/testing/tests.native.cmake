@@ -62,52 +62,78 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250220)
   f3d_test(NAME TestOBJWithTGATexture DATA world_tga.obj)
 endif()
 
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501 AND VTK_VERSION VERSION_LESS 9.6.20260128)
+  f3d_test(NAME TestPipedPLY DATA suzanne.ply ARGS --force-reader=PLYReader PIPED)
+  f3d_test(NAME TestPipedQuakeMDL DATA zombie.mdl ARGS --force-reader=QuakeMDL PIPED)
+  f3d_test(NAME TestPipedSPLAT DATA small.splat ARGS -osy --up=-Y --point-sprites-absolute-size --point-sprites-size=1 --force-reader=Splat PIPED)
+  f3d_test(NAME TestPipedSPZ DATA hornedlizard_small_d0.spz ARGS -sy --point-sprites-absolute-size --point-sprites-size=1 --force-reader=SPZ PIPED)
+  f3d_test(NAME TestPipedInvalid DATA suzanne.ply ARGS --force-reader=QuakeMDL PIPED REGEXP "Input stream could not be loaded" NO_BASELINE)
+endif()
+
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250923 AND VTK_VERSION VERSION_LESS 9.6.20260128)
+  f3d_test(NAME TestPipedGLTFImporter DATA f3d.glb ARGS --force-reader=GLB PIPED)
+  f3d_test(NAME TestPipedGLTFSkin DATA SimpleSkin.gltf ARGS --force-reader=GLTF PIPED)
+endif()  
+
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250925 AND VTK_VERSION VERSION_LESS 9.6.20260128)
+  f3d_test(NAME TestPiped3DSImporter DATA iflamigm.3ds ARGS --up=+Z --force-reader=3DS PIPED)
+endif()
+
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251104 AND VTK_VERSION VERSION_LESS 9.6.20260128)
+  f3d_test(NAME TestPipedSTL DATA suzanne.stl ARGS --force-reader=STL PIPED)
+  if(NOT F3D_MACOS_BUNDLE)
+    f3d_test(NAME TestDefaultConfigFilePipedSTL DATA suzanne.stl ARGS --force-reader=STL CONFIG config_build LONG_TIMEOUT UI PIPED)
+  endif()
+endif()
+
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251109 AND VTK_VERSION VERSION_LESS 9.6.20260128)
+  f3d_test(NAME TestPipedPTS DATA samplePTS.pts ARGS --force-reader=PTS PIPED)
+endif()  
+
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251208 AND VTK_VERSION VERSION_LESS 9.6.20260128)
+  f3d_test(NAME TestPipedCityGML DATA Part-4-Buildings-V4-one.gml ARGS --force-reader=CityGML PIPED)
+endif()
+
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251210 AND VTK_VERSION VERSION_LESS 9.6.20260128)
+  f3d_test(NAME TestPipedDicom DATA IM-0001-1983.dcm ARGS --scalar-coloring --roughness=1 --force-reader=DICOM PIPED)
+endif()
+
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260103 AND VTK_VERSION VERSION_LESS 9.6.20260128)
+  f3d_test(NAME TestPipedOBJ DATA world.obj ARGS --force-reader=OBJ PIPED) # MTL and Textures not loaded
+  f3d_test(NAME TestPipedVTK DATA cow.vtk ARGS --force-reader=VTKLegacy PIPED)
+endif()
+
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260106 AND VTK_VERSION VERSION_LESS 9.6.20260128)
+  f3d_test(NAME TestPipedVTR DATA RectGrid2.vtr ARGS --scalar-coloring --roughness=1 --force-reader=VTKXMLVTR PIPED)
+  f3d_test(NAME TestPipedVTU DATA dragon.vtu ARGS --force-reader=VTKXMLVTU PIPED)
+  f3d_test(NAME TestPipedVTP DATA cow.vtp ARGS --force-reader=VTKXMLVTP PIPED)
+  f3d_test(NAME TestPipedVTS DATA bluntfin.vts ARGS --force-reader=VTKXMLVTS PIPED)
+  f3d_test(NAME TestPipedVTICell DATA waveletMaterial.vti ARGS -s --coloring-array=Material -c --roughness=1 --force-reader=VTKXMLVTI PIPED)
+endif()
+
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
   f3d_test(NAME TestPipedPLY DATA suzanne.ply PIPED)
   f3d_test(NAME TestPipedQuakeMDL DATA zombie.mdl PIPED)
   f3d_test(NAME TestPipedSPLAT DATA small.splat ARGS -osy --up=-Y --point-sprites-absolute-size --point-sprites-size=1 PIPED)
   f3d_test(NAME TestPipedSPZ DATA hornedlizard_small_d0.spz ARGS -sy --point-sprites-absolute-size --point-sprites-size=1 PIPED)
-endif()
-
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250923)
   f3d_test(NAME TestPipedGLTFImporter DATA f3d.glb PIPED)
   f3d_test(NAME TestPipedGLTFSkin DATA SimpleSkin.gltf PIPED)
-endif()  
-
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250925)
-  f3d_test(NAME TestPiped3DSImporter DATA iflamigm.3ds ARGS --up=+Z --force-reader=3DS PIPED)
-endif()
-
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251104)
+  f3d_test(NAME TestPiped3DSImporter DATA iflamigm.3ds ARGS --up=+Z PIPED)
   f3d_test(NAME TestPipedSTL DATA suzanne.stl PIPED)
-  if(NOT F3D_MACOS_BUNDLE)
-    f3d_test(NAME TestDefaultConfigFilePipedSTL DATA suzanne.stl CONFIG config_build LONG_TIMEOUT UI PIPED)
-  endif()
-endif()
-
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251109)
   f3d_test(NAME TestPipedPTS DATA samplePTS.pts PIPED)
-endif()  
-
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251208)
   f3d_test(NAME TestPipedCityGML DATA Part-4-Buildings-V4-one.gml PIPED)
-endif()
-
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251210)
   f3d_test(NAME TestPipedDicom DATA IM-0001-1983.dcm ARGS --scalar-coloring --roughness=1 PIPED)
-endif()
-
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260103)
   f3d_test(NAME TestPipedOBJ DATA world.obj PIPED) # MTL and Textures not loaded
   f3d_test(NAME TestPipedVTK DATA cow.vtk PIPED)
-endif()
-
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260106)
   f3d_test(NAME TestPipedVTR DATA RectGrid2.vtr ARGS --scalar-coloring --roughness=1 PIPED)
   f3d_test(NAME TestPipedVTU DATA dragon.vtu PIPED)
   f3d_test(NAME TestPipedVTP DATA cow.vtp PIPED)
   f3d_test(NAME TestPipedVTS DATA bluntfin.vts PIPED)
   f3d_test(NAME TestPipedVTICell DATA waveletMaterial.vti ARGS -s --coloring-array=Material -c --roughness=1 PIPED)
+
+  if(NOT F3D_MACOS_BUNDLE)
+    f3d_test(NAME TestDefaultConfigFilePipedSTL DATA suzanne.stl CONFIG config_build LONG_TIMEOUT UI PIPED)
+  endif()
 endif()
 
 if(NOT F3D_MACOS_BUNDLE)

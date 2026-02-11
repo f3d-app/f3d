@@ -11,8 +11,10 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
   f3d_test(NAME TestAlembicInvalid DATA invalid.abc ARGS -s --load-plugins=alembic REGEXP "failed to load scene" NO_BASELINE)
 endif()
 
-if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251210)
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
   f3d_test(NAME TestPipedAlembic DATA suzanne.abc ARGS -s --load-plugins=alembic PIPED)
+elseif(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251210)
+  f3d_test(NAME TestPipedAlembic DATA suzanne.abc ARGS -s --load-plugins=alembic --force-reader=Alembic PIPED)
 endif()
 
 if(NOT F3D_MACOS_BUNDLE)
