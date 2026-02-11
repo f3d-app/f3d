@@ -273,7 +273,7 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
         throw scene::load_failure_exception(*forceReader + " is not a valid force reader");
       }
       throw scene::load_failure_exception(
-        filePath.string() + " is not a file of a supported 3D scene file format");
+        filePath.string() + " is not a file of a supported 3D scene file format, use force reader to force a specific reader");
     }
 
     vtkSmartPointer<vtkImporter> importer = reader->createSceneReader(filePath.string());
@@ -338,7 +338,7 @@ scene& scene_impl::add(const std::byte* buffer, std::size_t size)
       throw scene::load_failure_exception(*forceReader + " is not a valid force reader");
     }
     throw scene::load_failure_exception(
-      "provided stream is not a file of a supported 3D scene file format");
+      "provided stream is not a file of a supported 3D scene file format, use force reader to force a specific reader");
   }
 
   vtkNew<vtkMemoryResourceStream> stream;

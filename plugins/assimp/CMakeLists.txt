@@ -91,6 +91,7 @@ f3d_plugin_declare_reader(
   NAME 3MF
   EXTENSIONS 3mf
   MIMETYPES model/3mf
+  SCORE 40 # CanReadFile is just a ZIP check
   VTK_IMPORTER vtkF3DAssimpImporter
   FORMAT_DESCRIPTION "3D Manufacturing Format"
   ${_SUPPORTS_STREAM}

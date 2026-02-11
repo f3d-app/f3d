@@ -37,7 +37,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240214)
 
   f3d_plugin_declare_reader(
     NAME GLTFDraco
-    SCORE 90
+    SCORE 90 # Good CanReadFile and higher priority than native
     EXTENSIONS gltf
     MIMETYPES model/gltf+json
     VTK_IMPORTER vtkF3DGLTFDracoImporter
@@ -48,7 +48,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240214)
 
   f3d_plugin_declare_reader(
     NAME GLBDraco
-    SCORE 90
+    SCORE 90 # Good CanReadFile and higher priority than native
     EXTENSIONS glb
     MIMETYPES model/gltf-binary
     VTK_IMPORTER vtkF3DGLTFDracoImporter

@@ -20,7 +20,6 @@ endif()
 
 f3d_plugin_declare_reader(
   NAME VTKHDF
-  SCORE 99
   EXTENSIONS vtkhdf
   MIMETYPES application/vnd.vtkhdf
   VTK_READER vtkHDFReader

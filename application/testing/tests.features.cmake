@@ -737,6 +737,13 @@ f3d_test(NAME TestHelpPrecedenceWithUnknownOption ARGS --help --unknown REGEXP "
 # Test that --version is displayed even when there is an unknown option
 f3d_test(NAME TestVersionPrecedenceWithUnknownOption ARGS --version --unknown REGEXP "Version:" NO_BASELINE)
 
+# PIPED error code path
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
+  f3d_test(NAME TestPipedForced DATA suzanne.ply ARGS --force-reader=PLYReader --verbose PIPED REGEXP "Forcing reader" NO_BASELINE)
+  f3d_test(NAME TestPipedForcedInvalid DATA suzanne.ply ARGS --force-reader=invalid PIPED REGEXP "is not a valid force reader" NO_BASELINE)
+  f3d_test(NAME TestPipedForcedInvalidStream DATA beach.nrrd ARGS --force-reader=Nrrd PIPED REGEXP "does not support reading streams" NO_BASELINE)
+endif()
+
 ## Filesystem error code path
 if(NOT WIN32)
   STRING(RANDOM LENGTH 257 ALPHABET "x" _f3d_test_invalid_folder)

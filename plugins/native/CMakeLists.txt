@@ -40,6 +40,7 @@ f3d_plugin_declare_reader(
   MIMETYPES application/gml+xml
   VTK_READER vtkCityGMLReader
   FORMAT_DESCRIPTION "CityGML"
+  SCORE 30 # CanReadFile is just a XML check
   ${_SUPPORTS_STREAM}
   STANDARD_CAN_READ
 )
@@ -66,7 +67,7 @@ endif()
 
 f3d_plugin_declare_reader(
   NAME GLTF
-  SCORE 80
+  SCORE 80 # Good CanReadFile but lower priority than draco
   EXTENSIONS gltf
   MIMETYPES model/gltf+json
   VTK_IMPORTER vtkF3DGLTFImporter
@@ -77,7 +78,7 @@ f3d_plugin_declare_reader(
 
 f3d_plugin_declare_reader(
   NAME GLB
-  SCORE 80
+  SCORE 80 # Good CanReadFile but lower priority than draco
   EXTENSIONS glb
   MIMETYPES model/gltf-binary
   VTK_IMPORTER vtkF3DGLTFImporter
@@ -130,6 +131,7 @@ f3d_plugin_declare_reader(
   MIMETYPES application/vnd.pts
   VTK_READER vtkPTSReader
   FORMAT_DESCRIPTION "Point Cloud"
+  SCORE 30 # CanReadFile can be false positive with random ascii
   ${_SUPPORTS_STREAM}
   STANDARD_CAN_READ
 )
@@ -174,7 +176,6 @@ endif()
 
 f3d_plugin_declare_reader(
   NAME VTKLegacy
-  SCORE 99
   EXTENSIONS vtk
   MIMETYPES application/vnd.vtk
   VTK_READER vtkDataSetReader
@@ -191,7 +192,6 @@ endif()
 
 f3d_plugin_declare_reader(
   NAME VTKXMLVTU
-  SCORE 99
   EXTENSIONS vtu
   MIMETYPES application/vnd.vtu
   VTK_READER vtkXMLGenericDataObjectReader
@@ -202,7 +202,6 @@ f3d_plugin_declare_reader(
 
 f3d_plugin_declare_reader(
   NAME VTKXMLVTP
-  SCORE 99
   EXTENSIONS vtp
   MIMETYPES application/vnd.vtp
   VTK_READER vtkXMLGenericDataObjectReader
@@ -213,7 +212,6 @@ f3d_plugin_declare_reader(
 
 f3d_plugin_declare_reader(
   NAME VTKXMLVTI
-  SCORE 99
   EXTENSIONS vti
   MIMETYPES application/vnd.vti
   VTK_READER vtkXMLGenericDataObjectReader
@@ -224,7 +222,6 @@ f3d_plugin_declare_reader(
 
 f3d_plugin_declare_reader(
   NAME VTKXMLVTR
-  SCORE 99
   EXTENSIONS vtr
   MIMETYPES application/vnd.vtr
   VTK_READER vtkXMLGenericDataObjectReader
@@ -235,7 +232,6 @@ f3d_plugin_declare_reader(
 
 f3d_plugin_declare_reader(
   NAME VTKXMLVTS
-  SCORE 99
   EXTENSIONS vts
   MIMETYPES application/vnd.vts
   VTK_READER vtkXMLGenericDataObjectReader
@@ -246,7 +242,6 @@ f3d_plugin_declare_reader(
 
 f3d_plugin_declare_reader(
   NAME VTKXMLVTM
-  SCORE 99
   EXTENSIONS vtm
   MIMETYPES application/vnd.vtm
   VTK_READER vtkXMLGenericDataObjectReader
@@ -276,17 +271,18 @@ f3d_plugin_declare_reader(
   MIMETYPES application/vnd.spz
   VTK_READER vtkF3DSPZReader
   FORMAT_DESCRIPTION "Compressed 3D gaussian splats"
+  SCORE 40 # CanReadFile is just a GunZip check
   ${_SUPPORTS_STREAM}
   STANDARD_CAN_READ
 )
 
 f3d_plugin_declare_reader(
   NAME Splat
-  SCORE 90
   EXTENSIONS splat
   MIMETYPES application/vnd.splat
   VTK_READER vtkF3DSplatReader
   FORMAT_DESCRIPTION "3D Gaussian splats"
+  SCORE 40 # Any random correctly size file is a false positive
   ${_SUPPORTS_STREAM}
   STANDARD_CAN_READ
 )
