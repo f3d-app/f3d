@@ -11,7 +11,6 @@
 #include <map>
 #include <string>
 #include <vector>
-#include <iostream>
 
 class vtkResourceStream;
 namespace f3d
@@ -74,8 +73,8 @@ public:
 
     const std::vector<std::string>& extensions = this->getExtensions();
 
-    if(!std::any_of(
-      extensions.begin(), extensions.end(), [&](const std::string& s) { return s == ext; }))
+    if (!std::any_of(
+          extensions.begin(), extensions.end(), [&](const std::string& s) { return s == ext; }))
     {
       return false;
     }
