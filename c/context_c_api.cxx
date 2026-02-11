@@ -124,7 +124,8 @@ f3d_context_t* f3d_context_get_symbol(const char* lib, const char* func)
   try
   {
     context = new f3d_context_t(f3d::context::getSymbol(lib, func));
-  } catch (f3d::context::loading_exception& e)
+  }
+  catch (f3d::context::loading_exception& e)
   {
     f3d::log::error(e.what());
     return nullptr;
