@@ -21,13 +21,8 @@ void vtkF3DImageImporter::ImportActors(vtkRenderer* renderer)
   const char* fileName = this->GetFileName();
 
   vtkSmartPointer<vtkImageReader2> reader;
-  if (fileName)
-  {
-    reader.TakeReference(vtkImageReader2Factory::CreateImageReader2(fileName));
-    reader->SetFileName(fileName);
-  }
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260106)
-  else if (this->GetStream())
+  if (this->GetStream())
   {
     vtkNew<vtkImageReader2Collection> collection;
     vtkImageReader2Factory::GetRegisteredReaders(collection);
@@ -42,7 +37,13 @@ void vtkF3DImageImporter::ImportActors(vtkRenderer* renderer)
       }
     }
   }
+  else
 #endif
+    if (fileName)
+  {
+    reader.TakeReference(vtkImageReader2Factory::CreateImageReader2(fileName));
+    reader->SetFileName(fileName);
+  }
 
   if (!reader)
   {

@@ -6,7 +6,6 @@
 #include <vtkNew.h>
 #include <vtkObjectFactory.h>
 #include <vtkPointData.h>
-#include <vtkResourceParser.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtkVersion.h>
 #include <vtksys/FStream.hxx>
@@ -95,8 +94,16 @@ void vtkF3DWebPReader::ExecuteInformation()
 //------------------------------------------------------------------------------
 int vtkF3DWebPReader::CanReadFile(const char* fname)
 {
-  // get the magic number by reading in a file
-  vtksys::ifstream ifs(fname, vtksys::ifstream::in);
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260106)
+  vtkNew<vtkFileResourceStream> fileStream;
+  if (!fileStream->Open(fname))
+  {
+    vtkErrorMacro(<< "Could not open file " << fname);
+    return 0;
+  }
+  return this->CanReadFile(fileStream);
+#else
+  vtksys::ifstream ifs(fname, vtksys::ifstream::in | vtksys::ifstream::binary);
 
   if (ifs.fail())
   {
@@ -104,28 +111,19 @@ int vtkF3DWebPReader::CanReadFile(const char* fname)
     return 0;
   }
 
-  // The file must begin with magic number RIFF
-  if ((ifs.get() != 'R') || (ifs.get() != 'I') || (ifs.get() != 'F') || (ifs.get() != 'F'))
+  char header[12];
+  ifs.read(header, 12);
+  if (ifs.gcount() != 12)
   {
-    ifs.close();
     return 0;
   }
 
-  // Skip 4 bytes (file size field) to get to position 8
-  ifs.ignore(4);
-
-  // Check for WEBP signature at bytes 8-11
-  if ((ifs.get() != 'W') || (ifs.get() != 'E') || (ifs.get() != 'B') || (ifs.get() != 'P'))
-  {
-    ifs.close();
-    return 0;
-  }
-
-  ifs.close();
-  return 1;
+  std::string_view sv(header, 12);
+  return sv.substr(0, 4) == "RIFF" && sv.substr(8, 4) == "WEBP";
+#endif
 }
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260116)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260106)
 //------------------------------------------------------------------------------
 int vtkF3DWebPReader::CanReadFile(vtkResourceStream* stream)
 {
@@ -136,17 +134,13 @@ int vtkF3DWebPReader::CanReadFile(vtkResourceStream* stream)
 
   stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
 
-  vtkNew<vtkResourceParser> parser;
-  parser->SetStream(stream);
-
-  std::string header;
-  parser->ReadLine(header, 12);
-  if (header.size() != 12)
+  char header[12];
+  if (stream->Read(header, 12) != 12)
   {
     return 0;
   }
 
-  std::string_view sv(header);
+  std::string_view sv(header, 12);
   return sv.substr(0, 4) == "RIFF" && sv.substr(8, 4) == "WEBP";
 }
 #endif

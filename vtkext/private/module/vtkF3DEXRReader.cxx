@@ -1,12 +1,12 @@
 #include "vtkF3DEXRReader.h"
 
+#include "vtkFileResourceStream.h"
 #include "vtkFloatArray.h"
 #include "vtkImageData.h"
 #include "vtkMemoryResourceStream.h"
 #include "vtkNew.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
-#include "vtkResourceParser.h"
 #include "vtkVersion.h"
 #include "vtksys/FStream.hxx"
 
@@ -16,7 +16,6 @@
 #include <ImfVersion.h>
 
 #include <algorithm>
-#include <cstring>
 #include <sstream>
 #include <thread>
 
@@ -160,8 +159,16 @@ void vtkF3DEXRReader::ExecuteInformation()
 //------------------------------------------------------------------------------
 int vtkF3DEXRReader::CanReadFile(const char* fname)
 {
-  // get the magic number by reading in a file
-  vtksys::ifstream ifs(fname, vtksys::ifstream::in);
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260106)
+  vtkNew<vtkFileResourceStream> fileStream;
+  if (!fileStream->Open(fname))
+  {
+    vtkErrorMacro(<< "Could not open file " << fname);
+    return 0;
+  }
+  return this->CanReadFile(fileStream);
+#else
+  vtksys::ifstream ifs(fname, vtksys::ifstream::in | vtksys::ifstream::binary);
 
   if (ifs.fail())
   {
@@ -170,17 +177,18 @@ int vtkF3DEXRReader::CanReadFile(const char* fname)
   }
 
   // The file must begin with magic number 76 2F 31 01
-  if ((ifs.get() != 0x76) || (ifs.get() != 0x2F) || (ifs.get() != 0x31) || (ifs.get() != 0x01))
+  int magic;
+  ifs.read(reinterpret_cast<char*>(&magic), sizeof(int));
+  if (ifs.gcount() != sizeof(int))
   {
-    ifs.close();
     return 0;
   }
 
-  ifs.close();
-  return 1;
+  return magic == Imf::MAGIC;
+#endif
 }
 
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260116)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260106)
 //------------------------------------------------------------------------------
 int vtkF3DEXRReader::CanReadFile(vtkResourceStream* stream)
 {
@@ -191,18 +199,12 @@ int vtkF3DEXRReader::CanReadFile(vtkResourceStream* stream)
 
   stream->Seek(0, vtkResourceStream::SeekDirection::Begin);
 
-  vtkNew<vtkResourceParser> parser;
-  parser->SetStream(stream);
-
-  std::string header;
-  parser->ReadLine(header, sizeof(int));
-  if (header.size() != sizeof(int))
+  int magic;
+  if (stream->Read(reinterpret_cast<char*>(&magic), sizeof(int)) != sizeof(int))
   {
     return 0;
   }
 
-  int magic;
-  std::memcpy(&magic, header.data(), sizeof(int));
   return magic == Imf::MAGIC;
 }
 #endif

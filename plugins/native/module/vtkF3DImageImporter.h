@@ -1,7 +1,6 @@
 /**
  * @class   vtkF3DImageImporter
- * @brief
- *
+ * @brief   Import an image file as a textured quad
  */
 
 #ifndef vtkF3DImageImporter_h

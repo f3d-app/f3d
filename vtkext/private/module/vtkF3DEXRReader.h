@@ -11,13 +11,15 @@ public:
   vtkTypeMacro(vtkF3DEXRReader, vtkImageReader);
   void PrintSelf(ostream& os, vtkIndent indent) override;
 
+  ///@{
   /**
-   * Return 1 if the reader is compatible with the given file
+   * Return 1 if the reader is compatible with the given file or stream
    */
   int CanReadFile(const char* fname) override;
-#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260116)
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260106)
   int CanReadFile(vtkResourceStream* stream) override;
 #endif
+  ///@}
 
   /**
    * List of extensions supported by this reader
