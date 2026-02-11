@@ -3,7 +3,9 @@ bool canRead(vtkResourceStream* stream) const override
 {
   vtkF3DOCCTReader::FILE_FORMAT format;
   bool ret = vtkF3DOCCTReader::CanReadFile(stream, format);
-  ret &= (format == vtkF3DOCCTReader::FILE_FORMAT::@_occt_format @);
+  // clang-format off
+  ret &= (format == vtkF3DOCCTReader::FILE_FORMAT::@_occt_format@);
+  // clang-format on
   return ret;
 }
 
