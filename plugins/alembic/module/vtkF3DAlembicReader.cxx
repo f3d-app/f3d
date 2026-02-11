@@ -140,7 +140,7 @@ class vtkF3DAlembicReader::vtkInternals
             pV3F.emplace_back(originalPosition);
             duplicatedData.SourceIndices.emplace_back(originalData.Indices[i][j].x);
             duplicatedData.Indices[i][j].x = pRunningIndex;
-            duplicatedData.PointSourceIds.push_back(originalData.Indices[i][j].x);
+            duplicatedData.PointSourceIds.emplace_back(originalData.Indices[i][j].x);
             pRunningIndex++;
           }
         }
