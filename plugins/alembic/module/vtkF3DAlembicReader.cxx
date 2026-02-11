@@ -409,7 +409,7 @@ public:
             {
               for (vtkIdType i = 0; i < numNormals; i++)
               {
-                vtkIdType rawIndex = normalIndices ? normalIndices[i] : i;
+                const vtkIdType rawIndex = normalIndices ? normalIndices[i] : i;
                 if (rawIndex < static_cast<vtkIdType>(vals->size()))
                 {
                   Alembic::Abc::V3f normal;
