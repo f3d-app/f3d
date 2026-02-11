@@ -138,7 +138,7 @@ class vtkF3DAlembicReader::vtkInternals
             Alembic::Abc::V3f originalPosition =
               originalData.Attributes.at("P")[originalData.Indices[i][j].x];
             pV3F.emplace_back(originalPosition);
-            duplicatedData.SourceIndices.push_back(originalData.Indices[i][j].x);
+            duplicatedData.SourceIndices.emplace_back(originalData.Indices[i][j].x);
             duplicatedData.Indices[i][j].x = pRunningIndex;
             duplicatedData.PointSourceIds.push_back(originalData.Indices[i][j].x);
             pRunningIndex++;
