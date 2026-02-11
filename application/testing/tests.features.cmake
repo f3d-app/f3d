@@ -233,7 +233,10 @@ f3d_test(NAME TestAnimationIndicesSingle DATA soldier_animations.mdl ARGS --anim
 f3d_test(NAME TestAnimationIndicesMulti DATA InterpolationTest.glb ARGS --animation-indices=7,6 --animation-time=0.5 --animation-progress)
 f3d_test(NAME TestAnimationIndexDeprecated DATA InterpolationTest.glb ARGS --animation-index=7 --animation-time=0.5 --animation-progress)
 f3d_test(NAME TestMultiFileAnimationIndices DATA InterpolationTest.glb BoxAnimated.gltf ARGS --animation-indices=9 --animation-time=0.85 --animation-progress --multi-file-mode=all)
-f3d_test(NAME TestMultiFileAnimationNoneMulti DATA bot2.wrl InterpolationTest.glb ARGS --animation-indices=6 --animation-time=0.85 --multi-file-mode=all)
+# Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/12688
+if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20251006)
+  f3d_test(NAME TestMultiFileAnimationNoneMulti DATA bot2.wrl InterpolationTest.glb ARGS --animation-indices=6 --animation-time=0.85 --multi-file-mode=all)
+endif()
 f3d_test(NAME TestMultiFileAnimationAnySingle DATA soldier_animations.mdl InterpolationTest.glb ARGS --animation-indices=13 --animation-time=0.85 --multi-file-mode=all --opacity=0.5)
 f3d_test(NAME TestMultiFileAnimationNoAnimationSupport DATA f3d.glb world.obj ARGS --multi-file-mode=all --animation-time=2 --animation-progress)
 f3d_test(NAME TestAnimationAutoplay DATA InterpolationTest.glb ARGS --animation-autoplay)
