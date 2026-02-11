@@ -328,7 +328,7 @@ Importer may set a default value depending on file type. If a default value exis
 
 ### `--checkerboard` (_bool_, default: `false`)
 
-Apply checkerboard texture to objects.
+Override model's texture with a checkerboard texture.
 
 ## Window options
 
