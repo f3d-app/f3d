@@ -47,6 +47,7 @@ f3d_context_t* f3d_context_wgl()
     f3d::log::error(e.what());
     return nullptr;
   }
+
   return context;
 }
 
@@ -63,6 +64,7 @@ f3d_context_t* f3d_context_cocoa()
     f3d::log::error(e.what());
     return nullptr;
   }
+
   return context;
 }
 
@@ -84,6 +86,7 @@ f3d_context_t* f3d_context_egl()
     f3d::log::error(e.what());
     return nullptr;
   }
+
   return context;
 }
 
@@ -105,6 +108,7 @@ f3d_context_t* f3d_context_osmesa()
     f3d::log::error(e.what());
     return nullptr;
   }
+
   return context;
 }
 
