@@ -1252,7 +1252,7 @@ interactor& interactor_impl::initCommands()
       {
         newStyle = "default";
       }
-      this->Internals->Options.setAsString("interactor.style", newStyle);
+      this->Internals->Options.interactor.style = newStyle;
       this->Internals->Window.render();
     },
     command_documentation_t{
