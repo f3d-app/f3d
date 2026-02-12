@@ -21,6 +21,8 @@ public:
   int CanReadFile(const char* fname) override;
 #if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 6, 20260106)
   int CanReadFile(vtkResourceStream* stream) override;
+#else
+  int CanReadFile(vtkResourceStream* stream);
 #endif
   ///@}
 
