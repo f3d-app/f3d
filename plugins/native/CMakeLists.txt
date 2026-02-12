@@ -22,7 +22,7 @@ f3d_plugin_declare_reader(
   NAME 3DS
   EXTENSIONS 3ds
   MIMETYPES application/vnd.3ds
-  VTK_IMPORTER vtk3DSImporter
+  VTK_IMPORTER vtkF3D3DSImporter
   FORMAT_DESCRIPTION "Autodesk 3D Studio"
   ${_SUPPORTS_STREAM}
 )
