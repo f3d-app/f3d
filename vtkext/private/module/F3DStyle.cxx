@@ -14,7 +14,7 @@ const inline ImVec4 intToImVec4(int rgb, int alpha = 255)
   };
 }
 
-const ImVec4 F3DStyle::Vec3ToImVec4(std::vector<double> v, int alpha)
+const inline ImVec4 Vec3ToImVec4(const std::vector<double>& v, int alpha = 255)
 {
   return ImVec4{
     v[0],
@@ -44,9 +44,9 @@ const ImVec4 F3DStyle::imgui::GetCompletionColor()
   return intToImVec4(F3DStyle::F3D_GREEN);
 }
 
-const ImVec4 F3DStyle::imgui::GetTextColor()
+const ImVec4 F3DStyle::imgui::GetTextColor(const std::vector<double>& v)
 {
-  return intToImVec4(F3DStyle::F3D_WHITE);
+  return Vec3ToImVec4(v);
 }
 
 const ImVec4 F3DStyle::imgui::GetMidColor()

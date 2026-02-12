@@ -27,8 +27,6 @@ constexpr int F3D_WHITE = 0xf4f4f4;
 constexpr int F3D_GREY = 0x545454;
 constexpr int F3D_BLACK = 0x141414;
 
-const ImVec4 Vec3ToImVec4(std::vector<double> v, int alpha = 255);
-
 constexpr std::tuple<float, float, float> DecomposeFloatTuple(int val)
 {
   return std::make_tuple(
@@ -84,7 +82,7 @@ const ImVec4 GetErrorColor();
 const ImVec4 GetWarningColor();
 const ImVec4 GetHighlightColor();
 const ImVec4 GetCompletionColor();
-const ImVec4 GetTextColor();
+const ImVec4 GetTextColor(const std::vector<double>& v);
 const ImVec4 GetMidColor();
 const ImVec4 GetBackgroundColor();
 
