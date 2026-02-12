@@ -16,12 +16,8 @@ const inline ImVec4 intToImVec4(int rgb, int alpha = 255)
 
 const inline ImVec4 Vec3ToImVec4(const std::vector<double>& v, int alpha = 255)
 {
-  return ImVec4{
-    static_cast<float>(v[0]),
-    static_cast<float>(v[1]),
-    static_cast<float>(v[2]),
-    alpha / 255.f
-  };
+  return ImVec4{ static_cast<float>(v[0]), static_cast<float>(v[1]), static_cast<float>(v[2]),
+    alpha / 255.f };
 }
 
 const ImVec4 F3DStyle::imgui::GetErrorColor()

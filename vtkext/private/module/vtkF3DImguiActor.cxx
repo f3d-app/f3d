@@ -470,7 +470,8 @@ void vtkF3DImguiActor::RenderDropZone()
       ImVec2 textPos(viewport->GetWorkCenter().x - textSize.x * ::DROPZONE_MARGIN,
         viewport->GetWorkCenter().y - ::DROPZONE_MARGIN * textSize.y + ::LOGO_DISPLAY_HEIGHT / 2 +
           ::DROPZONE_LOGO_TEXT_PADDING);
-      drawList->AddText(textPos, ImColor(F3DStyle::imgui::GetTextColor(this->FontColor)), this->DropText.c_str());
+      drawList->AddText(
+        textPos, ImColor(F3DStyle::imgui::GetTextColor(this->FontColor)), this->DropText.c_str());
       return;
     }
 
