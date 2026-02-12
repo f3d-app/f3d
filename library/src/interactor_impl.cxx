@@ -153,8 +153,13 @@ public:
     {
       this->Style->SetInteractionMode(vtkF3DInteractorStyle::TRACKBALL);
     }
+    else if (style == "default")
+    {
+      this->Style->SetInteractionMode(vtkF3DInteractorStyle::DEFAULT);
+    }
     else
     {
+      log::warn("Unrecognized interaction style \"" + style + "\", using default");
       this->Style->SetInteractionMode(vtkF3DInteractorStyle::DEFAULT);
     }
   }
