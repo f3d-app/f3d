@@ -412,47 +412,77 @@ void vtkF3DImguiActor::RenderNode(F3DNodeInfo* node, vtkOpenGLRenderWindow* renW
     return;
   }
 
+  const std::string& displayText = node->displayName.empty() ? node->name : node->displayName;
+  bool hasChildren = !node->children.empty();
+
   if (node->prop)
   {
     ImGui::PushID(static_cast<void*>(node->prop));
+    // Always sync visibility state from the actual actor to handle external changes
+    // (e.g., pressing O key or other visibility toggles)
+    bool visible = node->prop->GetVisibility() != 0;
+    NodeVisibilityState[node->prop] = visible;
 
-    // Retrieve previous state or initialize from actor
-    bool visible = true;
-    auto it = this->NodeVisibilityState.find(node->prop);
-    if (it != NodeVisibilityState.end())
+    if (hasChildren)
     {
-      visible = it->second;
+      // Node with prop and children - use tree node with checkbox
+      ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_OpenOnArrow;
+      bool isOpen = ImGui::TreeNodeEx(("##tree_" + displayText).c_str(), flags);
+
+      ImGui::SameLine();
+      if (ImGui::Checkbox(displayText.c_str(), &visible))
+      {
+        NodeVisibilityState[node->prop] = visible;
+        node->prop->SetVisibility(visible ? 1 : 0);
+        node->prop->Modified();
+        renWin->GetInteractor()->InvokeEvent(vtkF3DUIActor::SceneHierarchyChangedEvent, nullptr);
+      }
+
+      if (isOpen)
+      {
+        for (auto& child : node->children)
+        {
+          RenderNode(&child, renWin);
+        }
+        ImGui::TreePop();
+      }
     }
     else
     {
-      visible = node->prop->GetVisibility() != 0;
-      NodeVisibilityState[node->prop] = visible;
-    }
-
-    const std::string& displayText = node->displayName.empty() ? node->name : node->displayName;
-    if (ImGui::Checkbox(displayText.c_str(), &visible))
-    {
-      NodeVisibilityState[node->prop] = visible;
-      node->prop->SetVisibility(visible ? 1 : 0);
-      node->prop->Modified();
-      renWin->GetInteractor()->InvokeEvent(vtkF3DUIActor::SceneHierarchyChangedEvent, nullptr);
+      // Leaf node with prop - just checkbox
+      if (ImGui::Checkbox(displayText.c_str(), &visible))
+      {
+        NodeVisibilityState[node->prop] = visible;
+        node->prop->SetVisibility(visible ? 1 : 0);
+        node->prop->Modified();
+        renWin->GetInteractor()->InvokeEvent(vtkF3DUIActor::SceneHierarchyChangedEvent, nullptr);
+      }
     }
 
     ImGui::PopID();
   }
   else
   {
-    ImGui::Text("%s", node->name.c_str());
-  }
-
-  for (auto& child : node->children)
-  {
-    ImGui::Indent(10);
-    RenderNode(&child, renWin);
-    ImGui::Unindent(10);
+    // Intermediate node without prop (e.g., "assembly" node)
+    if (hasChildren)
+    {
+      ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen;
+      if (ImGui::TreeNodeEx(displayText.c_str(), flags))
+      {
+        for (auto& child : node->children)
+        {
+          RenderNode(&child, renWin);
+        }
+        ImGui::TreePop();
+      }
+    }
+    else
+    {
+      // Intermediate node without children - just display text
+      ImGui::Text("%s", displayText.c_str());
+    }
   }
 }
-
 
 //----------------------------------------------------------------------------
 void vtkF3DImguiActor::RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin)
@@ -496,13 +526,24 @@ void vtkF3DImguiActor::RenderSceneHierarchy(vtkOpenGLRenderWindow* renWin)
 float vtkF3DImguiActor::CalculateHierarchyWidth()
 {
   float maxWidth = 0.0f;
+  const float indentPerLevel = ImGui::GetStyle().IndentSpacing;
+  const float treeArrowWidth = ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.x * 2.0f;
+  const float checkboxWidth = ImGui::GetFrameHeight() + ImGui::GetStyle().ItemInnerSpacing.x;
 
-  constexpr float indentPerLevel = 10.0f;
   std::function<void(const F3DNodeInfo&, int)> processNode = [&](const F3DNodeInfo& node, int depth)
   {
     const std::string& displayText = node.displayName.empty() ? node.name : node.displayName;
     ImVec2 textSize = ImGui::CalcTextSize(displayText.c_str());
-    float nodeWidth = textSize.x + depth * indentPerLevel;
+
+    float nodeWidth = depth * indentPerLevel + textSize.x;
+    if (!node.children.empty())
+    {
+      nodeWidth += treeArrowWidth;
+    }
+    if (node.prop)
+    {
+      nodeWidth += checkboxWidth;
+    }
     maxWidth = std::max(maxWidth, nodeWidth);
 
     for (const auto& child : node.children)
@@ -516,14 +557,11 @@ float vtkF3DImguiActor::CalculateHierarchyWidth()
     processNode(node, 0);
   }
 
-  // Add padding for checkbox, window padding, and margin
-  constexpr float checkboxWidth = 20.0f;
-  constexpr float extraMargin = 30.0f;
+  constexpr float scrollbarWidth = 16.0f;
   constexpr float minWidth = 200.0f;
   constexpr float maxWidthLimit = 800.0f;
-  float totalWidth = maxWidth + checkboxWidth + 2.0f * ImGui::GetStyle().WindowPadding.x + extraMargin;
+  float totalWidth = maxWidth + 2.0f * ImGui::GetStyle().WindowPadding.x + scrollbarWidth;
 
-  // Clamp to reasonable bounds
   return std::max(minWidth, std::min(totalWidth, maxWidthLimit));
 }
 
