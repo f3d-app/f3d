@@ -1260,20 +1260,22 @@ interactor& interactor_impl::initCommands()
     "cycle_interactor_style",
     [&](const std::vector<std::string>&)
     {
-      std::string& style = this->Internals->Options.interactor.style;
+      const std::string& style = this->Internals->Options.interactor.style;
+      std::string newStyle;
       if (style == "default")
       {
-        style = "trackball";
+        newStyle = "trackball";
       }
       else if (style == "trackball")
       {
-        style = "2d";
+        newStyle = "2d";
       }
       else
       {
-        style = "default";
+        newStyle = "default";
       }
-      this->Internals->SetInteractorStyle(style);
+      this->Internals->Options.setAsString("interactor.style", newStyle);
+      this->Internals->Window.render();
     },
     command_documentation_t{
       "cycle_interactor_style", "cycle between interaction styles (default, trackball, 2d)" });
