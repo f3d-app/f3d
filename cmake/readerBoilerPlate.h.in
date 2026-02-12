@@ -159,10 +159,28 @@ public:
    * Return true if this reader supports stream
    * false otherwise
    */
-  bool supportsStream() override
+  bool supportsStream() const override
   {
     return true;
   }
+
+#if @F3D_READER_HAS_STANDARD_CAN_READ@
+  using reader::canRead;
+  /**
+   * Return true if this reader could be able to read provided stream,
+   * false if it is sure it cannot.
+   */
+  bool canRead(vtkResourceStream* stream) const override
+  {
+#if @F3D_READER_HAS_GEOMETRY_READER@
+    return @F3D_READER_VTK_READER@::CanReadFile(stream);
+#else
+#if @F3D_READER_HAS_SCENE_READER@
+    return @F3D_READER_VTK_IMPORTER@::CanReadFile(stream);
+#endif
+#endif
+  }
+#endif
 #endif
 
 #if @F3D_READER_HAS_CUSTOM_CODE@

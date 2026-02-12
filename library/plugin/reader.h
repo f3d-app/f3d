@@ -74,6 +74,7 @@ public:
 
     return std::any_of(
       extensions.begin(), extensions.end(), [&](const std::string& s) { return s == ext; });
+    // TODO hasstream
   }
 
   /**
@@ -155,7 +156,16 @@ public:
    * Return true if this reader supports stream
    * false otherwise
    */
-  virtual bool supportsStream()
+  virtual bool supportsStream() const
+  {
+    return false;
+  }
+
+  /**
+   * Return true if this reader could be able to read provided stream,
+   * false if it is sure it cannot.
+   */
+  virtual bool canRead(vtkResourceStream* stream) const
   {
     return false;
   }

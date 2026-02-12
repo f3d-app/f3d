@@ -74,7 +74,7 @@ public:
    * throw a load_failure_exception.
    * On other failure, throw a load_failure_exception.
    */
-  virtual scene& add(std::byte* buffer, std::size_t size) = 0;
+  virtual scene& add(const std::byte* buffer, std::size_t size) = 0;
 
   ///@{
   /**

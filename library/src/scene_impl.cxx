@@ -309,7 +309,7 @@ scene& scene_impl::add(const std::vector<fs::path>& filePaths)
 }
 
 //----------------------------------------------------------------------------
-scene& scene_impl::add(std::byte* buffer, std::size_t size)
+scene& scene_impl::add(const std::byte* buffer, std::size_t size)
 {
   if (buffer == nullptr || size == 0)
   {
@@ -317,22 +317,28 @@ scene& scene_impl::add(std::byte* buffer, std::size_t size)
     return *this;
   }
 
+  // Recover the appropriate reader
   std::optional<std::string> forceReader = this->Internals->Options.scene.force_reader;
-  if (!forceReader)
-  {
-    throw scene::load_failure_exception(
-      "No force reader set while trying to load a buffer from memory");
-  }
-
-  // Recover the forced reader
-  const f3d::reader* reader = f3d::factory::instance()->getReader("", forceReader);
+  const f3d::reader* reader = f3d::factory::instance()->getReader(buffer, size, forceReader);
   if (reader)
   {
-    log::debug("Using forced reader ", (*forceReader), " for stream");
+    if (forceReader)
+    {
+      log::debug("Forcing reader ", (*forceReader), " for stream");
+    }
+    else
+    {
+      log::debug("Found a reader for stream: ", reader->getName(), "\"");
+    }
   }
   else
   {
-    throw scene::load_failure_exception(*forceReader + " is not a valid force reader");
+    if (forceReader)
+    {
+      throw scene::load_failure_exception(*forceReader + " is not a valid force reader");
+    }
+    throw scene::load_failure_exception(
+      "provided stream is not a file of a supported 3D scene file format");
   }
 
   vtkNew<vtkMemoryResourceStream> stream;
@@ -345,7 +351,7 @@ scene& scene_impl::add(std::byte* buffer, std::size_t size)
 
     if (!vtkReader)
     {
-      throw scene::load_failure_exception(*forceReader + " does not support reading streams");
+      throw scene::load_failure_exception(reader->getName() + " does not support reading streams");
     }
 
     vtkNew<vtkF3DGenericImporter> genericImporter;
