@@ -139,9 +139,10 @@ public:
   virtual scene& removeAllLights() = 0;
 
   /**
-   * Return true if provided file in path uses a supported extension, exists and its header 
+   * Return true if provided file in path uses a supported extension, exists and its header
    * correspond to a supported file format, false otherwise.
-   * scene.force_reader is taken into account and plugin should be loaded for their readers to be found.
+   * scene.force_reader is taken into account and plugin should be loaded for their readers to be
+   * found.
    */
   [[nodiscard]] virtual bool supports(const std::filesystem::path& filePath) = 0;
 

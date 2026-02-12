@@ -327,7 +327,7 @@ scene& scene_impl::add(const std::byte* buffer, std::size_t size)
     throw scene::load_failure_exception(
       "No force reader set while trying to load a buffer from memory");
   }
-#endif  
+#endif
 
   const f3d::reader* reader = f3d::factory::instance()->getReader(buffer, size, forceReader);
   if (reader)

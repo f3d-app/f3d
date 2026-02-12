@@ -2,8 +2,8 @@
 
 #include "vtkF3DGLTFDracoDocumentLoader.h"
 
-#include <vtkObjectFactory.h>
 #include <vtkFileResourceStream.h>
+#include <vtkObjectFactory.h>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkF3DGLTFDracoImporter);
