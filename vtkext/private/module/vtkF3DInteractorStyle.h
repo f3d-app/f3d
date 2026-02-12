@@ -131,9 +131,6 @@ protected:
    */
   void Dolly(double factor) override;
 
-  int InteractionMode = DEFAULT;
-  bool CameraMovementDisabled = false;
-
   /**
    * Decrement `TemporaryUpFactor` by `factorDelta`
    * and use it to interpolate `output` between `TemporaryUp` and `target`.
@@ -149,6 +146,10 @@ protected:
    * Interpolation state for `TemporaryUp`
    */
   double TemporaryUpFactor = 1.0;
+
+private:
+  int InteractionMode = DEFAULT;
+  bool CameraMovementDisabled = false;
 };
 
 #endif
