@@ -750,99 +750,201 @@ vtkDataAssembly* vtkF3DMetaImporter::GetSceneHierarchy()
 }
 
 //----------------------------------------------------------------------------
-std::vector<F3DNodeInfo> vtkF3DMetaImporter::ComputeNodeInfoHierarchy()
+void vtkF3DMetaImporter::BuildHierarchyFromAssembly(vtkDataAssembly* assembly, int nodeId,
+  F3DNodeInfo& parentNode, std::map<std::string, vtkProp*>& actorMap)
 {
-  std::vector<F3DNodeInfo> nodes;
-
-  // Get scene hierarchy from importers that support it
-  vtkDataAssembly* hierarchy = this->GetSceneHierarchy();
-  std::vector<std::string> actorIndexNameMap;
-  
-  // If we have a scene hierarchy, extract names from it
-  if (hierarchy)
+  // This method is kept for API compatibility but sequential mapping is now used
+  if (!assembly)
   {
-    // Build a vector of actor names from the hierarchy
-    // Map leaf mesh nodes sequentially to actor indices
-    std::function<void(int)> traverseHierarchy = [&](int nodeId)
-    {
-      const char* nodeName = hierarchy->GetNodeName(nodeId);
-      std::vector<int> children = hierarchy->GetChildNodes(nodeId, false);
-      
-      // If this is a leaf node (no children) and not Camera/Light, it's likely a mesh
-      if (children.empty() && nodeName)
-      {
-        std::string nameStr(nodeName);
-        if (nameStr != "Camera" && nameStr != "Light" && nameStr != "assembly" && nameStr != "root")
-        {
-          // This is a mesh leaf node - add it to the next index
-          actorIndexNameMap.emplace_back(nodeName);
-        }
-      }
-      
-      // Traverse children
-      for (int childId : children)
-      {
-        traverseHierarchy(childId);
-      }
-    };
-    
-    traverseHierarchy(0); // Start from root
+    return;
   }
 
-  // Return only the original imported actors, not internal F3D rendering actors
-  vtkCollectionSimpleIterator ait;
-  this->ActorCollection->InitTraversal(ait);
-  int actorIndex = 0;
-  while (vtkActor* actor = this->ActorCollection->GetNextActor(ait))
+  std::vector<int> children = assembly->GetChildNodes(nodeId, false);
+
+  for (int childId : children)
   {
-    if (!actor)
+    const char* nodeName = assembly->GetNodeName(childId);
+    if (!nodeName)
     {
       continue;
     }
 
-    F3DNodeInfo node;
-    node.prop = actor;
+    std::string nameStr(nodeName);
 
-    // Try to get a meaningful name for the actor
-    // Priority: DataAssembly hierarchy > Actor ObjectName > Mapper input name > Generic
-    std::string actorName;
-
-    // First, check if we have a name from the scene hierarchy
-    if (actorIndex < static_cast<int>(actorIndexNameMap.size()))
+    // Skip Camera and Light nodes as they are not renderable geometry
+    if (nameStr == "Camera" || nameStr == "Light")
     {
-      actorName = actorIndexNameMap[actorIndex];
+      continue;
     }
-    // Second, try to use the actor's ObjectName
+
+    F3DNodeInfo childNode;
+    childNode.name = nameStr;
+    childNode.displayName = nameStr;
+
+    std::vector<int> grandChildren = assembly->GetChildNodes(childId, false);
+
+    if (grandChildren.empty())
+    {
+      // This is a leaf node - try to find the corresponding actor by name
+      auto it = actorMap.find(nameStr);
+      if (it != actorMap.end())
+      {
+        childNode.prop = it->second;
+        actorMap.erase(it);
+      }
+    }
     else
     {
-      std::string objectName = actor->GetObjectName();
-      if (!objectName.empty())
-      {
-        actorName = objectName;
-      }
-      // Third, try to get name from mapper's input
-      else if (actor->GetMapper() && actor->GetMapper()->GetInput())
-      {
-        vtkDataSet* input = actor->GetMapper()->GetInput();
-        std::string inputName = input->GetObjectName();
-        if (!inputName.empty())
-        {
-          actorName = inputName;
-        }
-      }
+      // This is an intermediate node - recurse into children
+      this->BuildHierarchyFromAssembly(assembly, childId, childNode, actorMap);
     }
 
-    // Last resort: use a generic name with index
-    if (actorName.empty())
+    parentNode.children.push_back(childNode);
+  }
+}
+
+//----------------------------------------------------------------------------
+std::vector<F3DNodeInfo> vtkF3DMetaImporter::ComputeNodeInfoHierarchy()
+{
+  std::vector<F3DNodeInfo> rootNodes;
+
+  // Collect all actors into a vector for sequential access
+  std::vector<vtkActor*> actors;
+  vtkCollectionSimpleIterator ait;
+  this->ActorCollection->InitTraversal(ait);
+  while (vtkActor* actor = this->ActorCollection->GetNextActor(ait))
+  {
+    if (actor)
     {
-      actorName = "Actor " + std::to_string(actorIndex);
+      actors.push_back(actor);
     }
-
-    node.name = actorName;
-    node.displayName = actorName;
-    nodes.push_back(node);
-    actorIndex++;
   }
 
-  return nodes;
+  size_t actorIdx = 0;
+
+  // Process each importer separately to support multi-file scenarios
+  for (const auto& importerPair : this->Pimpl->Importers)
+  {
+    vtkGLTFImporter* gltfImporter = vtkGLTFImporter::SafeDownCast(importerPair.Importer);
+
+    if (gltfImporter)
+    {
+      vtkDataAssembly* hierarchy = gltfImporter->GetSceneHierarchy();
+      if (hierarchy)
+      {
+        // Build hierarchy using sequential actor assignment
+        // GLTF exports actors in the same order as leaf nodes in the hierarchy
+        std::function<void(int, F3DNodeInfo&)> buildNode = [&](int nodeId, F3DNodeInfo& parent)
+        {
+          std::vector<int> children = hierarchy->GetChildNodes(nodeId, false);
+
+          for (int childId : children)
+          {
+            const char* nodeName = hierarchy->GetNodeName(childId);
+            if (!nodeName)
+            {
+              continue;
+            }
+
+            std::string nameStr(nodeName);
+
+            // Skip Camera and Light nodes
+            if (nameStr == "Camera" || nameStr == "Light")
+            {
+              continue;
+            }
+
+            F3DNodeInfo childNode;
+            childNode.name = nameStr;
+            childNode.displayName = nameStr;
+
+            std::vector<int> grandChildren = hierarchy->GetChildNodes(childId, false);
+
+            if (grandChildren.empty())
+            {
+              // Leaf node - assign next actor sequentially
+              if (actorIdx < actors.size())
+              {
+                childNode.prop = actors[actorIdx];
+                actorIdx++;
+              }
+            }
+            else
+            {
+              // Intermediate node - recurse
+              buildNode(childId, childNode);
+            }
+
+            parent.children.push_back(childNode);
+          }
+        };
+
+        F3DNodeInfo fileRootNode;
+
+        // Get the filename from the importer
+        std::string filename = gltfImporter->GetFileName();
+        size_t lastSlash = filename.find_last_of("/\\");
+        if (lastSlash != std::string::npos)
+        {
+          filename = filename.substr(lastSlash + 1);
+        }
+
+        if (this->Pimpl->Importers.size() > 1)
+        {
+          // Multiple files - create root node per file
+          fileRootNode.name = filename;
+          fileRootNode.displayName = filename;
+          fileRootNode.prop = nullptr;
+
+          buildNode(0, fileRootNode);
+          rootNodes.push_back(fileRootNode);
+        }
+        else
+        {
+          // Single file - build hierarchy directly at root level
+          buildNode(0, fileRootNode);
+          for (auto& child : fileRootNode.children)
+          {
+            rootNodes.push_back(child);
+          }
+        }
+        continue;
+      }
+    }
+
+    // For non-GLTF importers, create flat nodes for actors from this importer
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 20240707)
+    vtkActorCollection* importerActors = importerPair.Importer->GetImportedActors();
+#else
+    vtkActorCollection* importerActors = this->Pimpl->ActorsForImporterMap.count(importerPair.Importer)
+      ? this->Pimpl->ActorsForImporterMap.at(importerPair.Importer).Get()
+      : nullptr;
+#endif
+    if (importerActors)
+    {
+      int idx = 0;
+      vtkCollectionSimpleIterator it;
+      importerActors->InitTraversal(it);
+      while (vtkActor* actor = importerActors->GetNextActor(it))
+      {
+        F3DNodeInfo node;
+        std::string actorName = actor->GetObjectName();
+        if (actorName.empty() && actor->GetMapper() && actor->GetMapper()->GetInput())
+        {
+          actorName = actor->GetMapper()->GetInput()->GetObjectName();
+        }
+        if (actorName.empty())
+        {
+          actorName = "Actor " + std::to_string(idx);
+        }
+        node.name = actorName;
+        node.displayName = actorName;
+        node.prop = actor;
+        rootNodes.push_back(node);
+        idx++;
+      }
+    }
+  }
+
+  return rootNodes;
 }
