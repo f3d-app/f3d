@@ -12,7 +12,7 @@ set(private_headers ${CMAKE_CURRENT_BINARY_DIR}/F3DDefaultHDRI.h)
 set(F3D_CHECKERBOARD_TEXTURE "${F3D_SOURCE_DIR}/resources/checkerboard.png" CACHE PATH "Default F3D Checkerboard")
 mark_as_advanced(F3D_CHECKERBOARD_TEXTURE)
 f3d_embed_file(
-  INPUT "${F3D_CHECKERBOARD}"
+  INPUT "${F3D_CHECKERBOARD_TEXTURE}"
   NAME F3DCheckerBoard
   BINARY)
 
