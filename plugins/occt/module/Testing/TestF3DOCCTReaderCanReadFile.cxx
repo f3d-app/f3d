@@ -50,11 +50,11 @@ int TestF3DOCCTReaderCanReadFile(int vtkNotUsed(argc), char* argv[])
   ret &= ::TestCanReadFile(data + "/f3d.xbf", vtkF3DOCCTReader::FILE_FORMAT::XBF);
 #endif
   ret &= !::TestCanReadFile(data + "/invalid.step", std::nullopt);
-  ret &= !::TestCanReadFile(data + "/invalid2.step", std::nullopt);
+  ret &= !::TestCanReadFile(data + "/invalid_endsec.step", std::nullopt);
   ret &= !::TestCanReadFile(data + "/IfcOpenHouse_IFC4.ifc", std::nullopt);
   ret &= !::TestCanReadFile(data + "/invalid.igs", std::nullopt);
-  ret &= !::TestCanReadFile(data + "/invalid2.igs", std::nullopt);
-  ret &= !::TestCanReadFile(data + "/invalid3.igs", std::nullopt);
+  ret &= !::TestCanReadFile(data + "/invalid_second_line.igs", std::nullopt);
+  ret &= !::TestCanReadFile(data + "/invalid_second_line.igs", std::nullopt);
   ret &= !::TestCanReadFile(data + "/f3d.vtp", std::nullopt);
   ret &= !vtkF3DOCCTReader::CanReadFile(nullptr);
   return ret ? EXIT_SUCCESS : EXIT_FAILURE;

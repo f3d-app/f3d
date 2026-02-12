@@ -25,6 +25,7 @@ f3d_plugin_declare_reader(
   VTK_IMPORTER vtk3DSImporter
   FORMAT_DESCRIPTION "Autodesk 3D Studio"
   ${_SUPPORTS_STREAM}
+  STANDARD_CAN_READ
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/3ds.inl"
 )
 
@@ -39,7 +40,9 @@ f3d_plugin_declare_reader(
   MIMETYPES application/gml+xml
   VTK_READER vtkCityGMLReader
   FORMAT_DESCRIPTION "CityGML"
+  SCORE 30 # CanReadFile is just a XML check
   ${_SUPPORTS_STREAM}
+  STANDARD_CAN_READ
 )
 
 set(_SUPPORTS_STREAM)
@@ -54,6 +57,7 @@ f3d_plugin_declare_reader(
   VTK_READER vtkDICOMImageReader
   FORMAT_DESCRIPTION "DICOM"
   ${_SUPPORTS_STREAM}
+  CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/dicom.inl"
 )
 
 set(_SUPPORTS_STREAM)
@@ -63,23 +67,26 @@ endif()
 
 f3d_plugin_declare_reader(
   NAME GLTF
-  SCORE 80
+  SCORE 60 # Higher priority than draco
   EXTENSIONS gltf
   MIMETYPES model/gltf+json
   VTK_IMPORTER vtkF3DGLTFImporter
   FORMAT_DESCRIPTION "GL Transmission Format"
   ${_SUPPORTS_STREAM}
+  STANDARD_CAN_READ
 )
 
+# GLB reader will be removed once VTK v9.6 support is dropped
 f3d_plugin_declare_reader(
   NAME GLB
-  SCORE 80
+  SCORE 60 # Higher priority than draco
   EXTENSIONS glb
   MIMETYPES model/gltf-binary
   VTK_IMPORTER vtkF3DGLTFImporter
   FORMAT_DESCRIPTION "GL Transmission Format (binary)"
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/glb.inl"
   ${_SUPPORTS_STREAM}
+  STANDARD_CAN_READ
 )
 
 f3d_plugin_declare_reader(
@@ -111,6 +118,7 @@ f3d_plugin_declare_reader(
   FORMAT_DESCRIPTION "Wavefront OBJ"
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/obj.inl"
   ${_SUPPORTS_STREAM}
+  STANDARD_CAN_READ
 )
 
 set(_SUPPORTS_STREAM)
@@ -124,7 +132,9 @@ f3d_plugin_declare_reader(
   MIMETYPES application/vnd.pts
   VTK_READER vtkPTSReader
   FORMAT_DESCRIPTION "Point Cloud"
+  SCORE 30 # CanReadFile can be false positive with random ascii
   ${_SUPPORTS_STREAM}
+  STANDARD_CAN_READ
 )
 
 set(_SUPPORTS_STREAM)
@@ -140,6 +150,7 @@ f3d_plugin_declare_reader(
   FORMAT_DESCRIPTION "Standard Triangle Language"
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/stl.inl"
   ${_SUPPORTS_STREAM}
+  STANDARD_CAN_READ
 )
 
 f3d_plugin_declare_reader(
@@ -242,12 +253,12 @@ endif()
 
 f3d_plugin_declare_reader(
   NAME VTKLegacy
-  SCORE 99
   EXTENSIONS vtk
   MIMETYPES application/vnd.vtk
   VTK_READER vtkDataSetReader
   FORMAT_DESCRIPTION "VTK Legacy"
   ${_SUPPORTS_STREAM}
+  STANDARD_CAN_READ
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/vtk.inl"
 )
 
@@ -258,7 +269,6 @@ endif()
 
 f3d_plugin_declare_reader(
   NAME VTKXMLVTU
-  SCORE 99
   EXTENSIONS vtu
   MIMETYPES application/vnd.vtu
   VTK_READER vtkXMLGenericDataObjectReader
@@ -269,7 +279,6 @@ f3d_plugin_declare_reader(
 
 f3d_plugin_declare_reader(
   NAME VTKXMLVTP
-  SCORE 99
   EXTENSIONS vtp
   MIMETYPES application/vnd.vtp
   VTK_READER vtkXMLGenericDataObjectReader
@@ -280,7 +289,6 @@ f3d_plugin_declare_reader(
 
 f3d_plugin_declare_reader(
   NAME VTKXMLVTI
-  SCORE 99
   EXTENSIONS vti
   MIMETYPES application/vnd.vti
   VTK_READER vtkXMLGenericDataObjectReader
@@ -291,7 +299,6 @@ f3d_plugin_declare_reader(
 
 f3d_plugin_declare_reader(
   NAME VTKXMLVTR
-  SCORE 99
   EXTENSIONS vtr
   MIMETYPES application/vnd.vtr
   VTK_READER vtkXMLGenericDataObjectReader
@@ -302,7 +309,6 @@ f3d_plugin_declare_reader(
 
 f3d_plugin_declare_reader(
   NAME VTKXMLVTS
-  SCORE 99
   EXTENSIONS vts
   MIMETYPES application/vnd.vts
   VTK_READER vtkXMLGenericDataObjectReader
@@ -313,7 +319,6 @@ f3d_plugin_declare_reader(
 
 f3d_plugin_declare_reader(
   NAME VTKXMLVTM
-  SCORE 99
   EXTENSIONS vtm
   MIMETYPES application/vnd.vtm
   VTK_READER vtkXMLGenericDataObjectReader
@@ -333,6 +338,7 @@ f3d_plugin_declare_reader(
   VTK_IMPORTER vtkF3DQuakeMDLImporter
   FORMAT_DESCRIPTION "Quake 1 MDL model"
   ${_SUPPORTS_STREAM}
+  STANDARD_CAN_READ
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/mdl.inl"
 )
 
@@ -342,16 +348,20 @@ f3d_plugin_declare_reader(
   MIMETYPES application/vnd.spz
   VTK_READER vtkF3DSPZReader
   FORMAT_DESCRIPTION "Compressed 3D gaussian splats"
+  SCORE 40 # CanReadFile is just a gunzip check
   ${_SUPPORTS_STREAM}
+  STANDARD_CAN_READ
 )
+
 f3d_plugin_declare_reader(
   NAME Splat
-  SCORE 90
   EXTENSIONS splat
   MIMETYPES application/vnd.splat
   VTK_READER vtkF3DSplatReader
   FORMAT_DESCRIPTION "3D Gaussian splats"
+  SCORE 40 # Any random correctly sized file is a false positive
   ${_SUPPORTS_STREAM}
+  STANDARD_CAN_READ
 )
 
 f3d_plugin_declare_reader(
@@ -361,6 +371,7 @@ f3d_plugin_declare_reader(
   VTK_READER vtkF3DPLYReader
   FORMAT_DESCRIPTION "Polygon"
   ${_SUPPORTS_STREAM}
+  STANDARD_CAN_READ
   CUSTOM_CODE "${CMAKE_CURRENT_SOURCE_DIR}/ply.inl"
 )
 
