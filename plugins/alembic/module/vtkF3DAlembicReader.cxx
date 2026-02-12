@@ -222,7 +222,7 @@ class vtkF3DAlembicReader::vtkInternals
     polydata->SetPoints(points);
 
     vtkIdType numCells = static_cast<vtkIdType>(data.Indices.size());
-    vtkIdType totalConnectivitySize = 
+    vtkIdType totalConnectivitySize =
       std::accumulate(data.Indices.begin(), data.Indices.end(), vtkIdType(0),
         [](vtkIdType sum, const auto& face) { return sum + static_cast<vtkIdType>(face.size()); });
 
