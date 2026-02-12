@@ -9,6 +9,7 @@
 #define F3DStyle_h
 
 #include <tuple>
+#include <vector>
 
 struct ImVec4;
 
@@ -25,6 +26,8 @@ constexpr int F3D_WHITE = 0xf4f4f4;
 // grey between F3D black and F3D white
 constexpr int F3D_GREY = 0x545454;
 constexpr int F3D_BLACK = 0x141414;
+
+const ImVec4 Vec3ToImVec4(std::vector<double> v, int alpha = 255);
 
 constexpr std::tuple<float, float, float> DecomposeFloatTuple(int val)
 {

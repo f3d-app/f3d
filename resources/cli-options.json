@@ -292,6 +292,11 @@
           "valueHelper": "<ratio>"
         },
         {
+          "longName": "font-color",
+          "helpText": "Set font color",
+          "valueHelper": "<color>"
+        },
+        {
           "longName": "backdrop-opacity",
           "helpText": "UI backdrop opacity",
           "valueHelper": "<value>",

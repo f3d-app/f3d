@@ -14,6 +14,16 @@ const inline ImVec4 intToImVec4(int rgb, int alpha = 255)
   };
 }
 
+const ImVec4 F3DStyle::Vec3ToImVec4(std::vector<double> v, int alpha)
+{
+  return ImVec4{
+    v[0],
+    v[1],
+    v[2],
+    alpha / 255.f,
+  };
+}
+
 const ImVec4 F3DStyle::imgui::GetErrorColor()
 {
   return intToImVec4(F3DStyle::F3D_RED);

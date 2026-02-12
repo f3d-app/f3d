@@ -159,6 +159,11 @@ public:
   void SetFontScale(const double fontScale);
 
   /**
+   * Set the font color
+   */
+  void SetFontColor(const std::vector<double>& color);
+
+  /**
    * Render the UI actor
    */
   int RenderOverlay(vtkViewport* vp) override;
@@ -279,6 +284,7 @@ protected:
 
   std::string FontFile = "";
   double FontScale = 1.0;
+  std::vector<double> FontColor = {0.956862745, 0.956862745, 0.956862745}; // F3D white
 
   double BackdropOpacity = 0.9;
 

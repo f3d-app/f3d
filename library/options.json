@@ -273,6 +273,10 @@
       "type": "ratio",
       "default_value": "1.0"
     },
+    "font_color": {
+      "type": "color",
+      "default_value": "0.956862745,0.956862745,0.956862745"
+    },
     "loader_progress": {
       "type": "bool",
       "default_value": "false"
