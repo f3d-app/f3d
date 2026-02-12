@@ -803,21 +803,13 @@ void vtkF3DRenderer::ConfigureGridUsingCurrentActors()
 
     vtkNew<vtkMatrix4x4> upMatrix;
     const double m[16] = {
-      right[0],
-      right[1],
-      right[2],
+      right[0], right[1], right[2],
       0, //
-      up[0],
-      up[1],
-      up[2],
+      up[0], up[1], up[2],
       0, //
-      front[0],
-      front[1],
-      front[2],
+      front[0], front[1], front[2],
       0, //
-      0,
-      0,
-      0,
+      0, 0, 0,
       1, //
     };
     upMatrix->DeepCopy(m);
@@ -954,21 +946,13 @@ void vtkF3DRenderer::ConfigureGridAxesUsingCurrentActors()
 
     vtkNew<vtkMatrix4x4> upMatrix;
     const double m[16] = {
-      right[0],
-      right[1],
-      right[2],
+      right[0], right[1], right[2],
       0, //
-      up[0],
-      up[1],
-      up[2],
+      up[0], up[1], up[2],
       0, //
-      front[0],
-      front[1],
-      front[2],
+      front[0], front[1], front[2],
       0, //
-      0,
-      0,
-      0,
+      0, 0, 0,
       1, //
     };
     upMatrix->DeepCopy(m);
