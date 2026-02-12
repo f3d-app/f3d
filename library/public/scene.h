@@ -68,13 +68,14 @@ public:
   virtual scene& add(const mesh_t& mesh) = 0;
 
   /**
-   * Add and load provided buffer into the scene as it was file
-   * Require the use of `scene.force_reader` to be able to pick the right reader
+   * Add and load provided buffer into the scene as it was file.
+   * Automatically picks the right reader to use, unless you use
+   * VTK < 9.6.20260128, then it require the use of `scene.force_reader`.
    * If it fails to loads the buffer, it clears the scene and
    * throw a load_failure_exception.
    * On other failure, throw a load_failure_exception.
    */
-  virtual scene& add(std::byte* buffer, std::size_t size) = 0;
+  virtual scene& add(const std::byte* buffer, std::size_t size) = 0;
 
   ///@{
   /**
@@ -139,7 +140,11 @@ public:
   virtual scene& removeAllLights() = 0;
 
   /**
-   * Return true if provided file path is supported, false otherwise.
+   * Return true if provided file in path uses a supported extension, exists and its header
+   * correspond to a supported file format, false otherwise.
+   * header check is only performed with VTK >= 9.6.20260228
+   * scene.force_reader is taken into account and plugin should be loaded for their readers to be
+   * found.
    */
   [[nodiscard]] virtual bool supports(const std::filesystem::path& filePath) = 0;
 

@@ -44,7 +44,7 @@ if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
 
   if(F3D_PLUGIN_BUILD_DRACO)
     f3d_test(NAME TestForceReaderGLTFDraco DATA BoxAnimated.gltf ARGS --load-plugins=draco --force-reader=GLTFDraco)
-    f3d_test(NAME TestForceReaderGLTFDracoIntoGLTF DATA Box_draco.gltf ARGS --load-plugins=draco --force-reader=GLTF NO_BASELINE REGEXP "failed to load scene")
+    f3d_test(NAME TestForceReaderGLTFDracoIntoGLTF DATA Box_draco.glb ARGS --load-plugins=draco --force-reader=GLTF NO_BASELINE REGEXP "failed to load scene")
   endif()
 endif()
 

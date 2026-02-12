@@ -2,6 +2,7 @@
 #define f3d_reader_h
 
 #include <vtkAlgorithm.h>
+#include <vtkFileResourceStream.h>
 #include <vtkImporter.h>
 #include <vtkSmartPointer.h>
 
@@ -63,7 +64,7 @@ public:
   virtual const std::vector<std::string> getMimeTypes() const = 0;
 
   /**
-   * Check if this reader can read the given filename - generally according its extension
+   * Check if this reader can read the given filename - according to its extension and header check
    */
   virtual bool canRead(const std::string& fileName) const
   {
@@ -72,8 +73,29 @@ public:
 
     const std::vector<std::string>& extensions = this->getExtensions();
 
-    return std::any_of(
-      extensions.begin(), extensions.end(), [&](const std::string& s) { return s == ext; });
+    if (!std::any_of(
+          extensions.begin(), extensions.end(), [&](const std::string& s) { return s == ext; }))
+    {
+      return false;
+    }
+
+    vtkNew<vtkFileResourceStream> stream;
+    if (!stream->Open(fileName.c_str()))
+    {
+      return false;
+    }
+
+    return this->canRead(stream);
+  }
+
+  /**
+   * Return true if this reader could be able to read provided stream,
+   * false if it is sure it cannot.
+   * Default implementation returns true.
+   */
+  virtual bool canRead(vtkResourceStream*) const
+  {
+    return true;
   }
 
   /**
@@ -155,7 +177,7 @@ public:
    * Return true if this reader supports stream
    * false otherwise
    */
-  virtual bool supportsStream()
+  virtual bool supportsStream() const
   {
     return false;
   }
@@ -178,7 +200,7 @@ public:
   /**
    * Return the list of all reader option names
    */
-  std::vector<std::string> getAllReaderOptionNames()
+  std::vector<std::string> getAllReaderOptionNames() const
   {
     std::vector<std::string> keys;
     keys.reserve(this->ReaderOptions.size());
