@@ -15,13 +15,13 @@ F3D supports the following file formats:
 | NRRD ("nearly raw raster data")           | `.nrrd`, `.nhdr`                               | No         | NONE              | NO                | `native`  | `Nrrd`                  |
 | MetaHeader MetaIO                         | `.mhd`, `.mha`                                 | No         | NONE              | NO                | `native`  | `MetaImage`             |
 | Tag Image File Format 2D/3D               | `.tif`, `.tiff`                                | No         | NONE              | NO                | `native`  | `TIFF`                  |
-| PNG Image                                 | `.png`                                         | No         | NONE              | YES (VTK 9.7)     | `native`  | `PNG`                   |
-| JPEG Image                                | `.jpg`, `.jpeg`                                | No         | NONE              | YES (VTK 9.7)     | `native`  | `JPEG`                  |
-| BMP Image                                 | `.bmp`                                         | No         | NONE              | YES (VTK 9.7)     | `native`  | `BMP`                   |
-| TGA Image                                 | `.tga`                                         | No         | NONE              | YES (VTK 9.7)     | `native`  | `TGA`                   |
-| HDR Radiance Image                        | `.hdr`                                         | No         | NONE              | YES (VTK 9.7)     | `native`  | `HDR`                   |
-| WebP Image                                | `.webp`                                        | No         | NONE              | YES (VTK 9.7)     | `native`  | `WebP`                  |
-| OpenEXR Image                             | `.exr`                                         | No         | NONE              | YES (VTK 9.7)     | `native`  | `EXR`                   |
+| PNG Image                                 | `.png`                                         | Yes        | NONE              | YES (VTK 9.7)     | `native`  | `PNG`                   |
+| JPEG Image                                | `.jpg`, `.jpeg`                                | Yes        | NONE              | YES (VTK 9.7)     | `native`  | `JPEG`                  |
+| BMP Image                                 | `.bmp`                                         | Yes        | NONE              | YES (VTK 9.7)     | `native`  | `BMP`                   |
+| TGA Image                                 | `.tga`                                         | Yes        | NONE              | YES (VTK 9.7)     | `native`  | `TGA`                   |
+| HDR Radiance Image                        | `.hdr`                                         | Yes        | NONE              | YES (VTK 9.7)     | `native`  | `HDR`                   |
+| WebP Image                                | `.webp`                                        | Yes        | NONE              | YES (VTK 9.7)     | `native`  | `WebP`                  |
+| OpenEXR Image                             | `.exr`                                         | Yes        | NONE              | YES (VTK 9.7)     | `native`  | `EXR`                   |
 | QuakeMDL                                  | `.mdl`                                         | Yes        | SINGLE            | YES (VTK 9.5)     | `native`  | `QuakeMDL`              |
 | CityGML                                   | `.gml`                                         | No         | NONE              | YES (VTK 9.6)     | `native`  | `CityGML`               |
 | Point Cloud                               | `.pts`                                         | No         | NONE              | YES (VTK 9.6)     | `native`  | `PTS`                   |
