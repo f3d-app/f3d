@@ -36,10 +36,7 @@
       "scalar-coloring": true,
       "up": "-Y",
       "coloring-component": "-2",
-      "camera-direction": "0,0,-1",
-      "camera-orthographic": true,
-      "interaction-style": "2d",
-      "axis": false
+      "camera-direction": "-1,0.5,1"
     }
   },
   {
