@@ -117,6 +117,10 @@ def test_moves():
     camera.elevation(angle)
     camera.pitch(angle)
 
+    camera.get_world_azimuth()
+    camera.get_world_elevation()
+    camera.get_distance()
+
 
 def test_pan():
     engine = f3d.Engine.create(True)

@@ -104,6 +104,79 @@ void camera_impl::getFocalPoint(point3_t& foc) const
 }
 
 //----------------------------------------------------------------------------
+void camera_impl::getPositionToFocalVector(vector3_t& vec) const
+{
+  point3_t pos, focal;
+  this->getPosition(pos);
+  this->getFocalPoint(focal);
+
+  vtkMath::Subtract(focal.data(), pos.data(), vec.data());
+}
+
+//----------------------------------------------------------------------------
+double camera_impl::getWorldAzimuth() const
+{
+  vector3_t view;
+  this->getPositionToFocalVector(view);
+  vtkMath::Normalize(view.data());
+
+  vtkRenderer* ren = this->Internals->VTKRenderer;
+  const double* up = ren->GetEnvironmentUp();
+  const double* right = ren->GetEnvironmentRight();
+
+  // Derive environment forward = up × right
+  vector3_t forward;
+  vtkMath::Cross(up, right, forward.data());
+  vtkMath::Normalize(forward.data());
+
+  vector3_t projUp;
+  vtkMath::ProjectVector(view.data(), up, projUp.data());
+
+  vector3_t horizontal;
+  vtkMath::Subtract(view.data(), projUp.data(), horizontal.data());
+
+  static constexpr double EPS = 128 * std::numeric_limits<double>::epsilon();
+  if (vtkMath::Norm(horizontal.data()) < EPS)
+  {
+    return 0.0;
+  }
+
+  vtkMath::Normalize(horizontal.data());
+
+  double angleRad = vtkMath::SignedAngleBetweenVectors(horizontal.data(), forward.data(), up);
+
+  return vtkMath::DegreesFromRadians(angleRad);
+}
+
+//----------------------------------------------------------------------------
+double camera_impl::getWorldElevation() const
+{
+  vector3_t view;
+  this->getPositionToFocalVector(view);
+
+  static constexpr double EPS = 128 * std::numeric_limits<double>::epsilon();
+  if (vtkMath::Norm(view.data()) < EPS)
+  {
+    return 0.0;
+  }
+  vtkMath::Normalize(view.data());
+
+  vtkRenderer* ren = this->Internals->VTKRenderer;
+  double* up = ren->GetEnvironmentUp();
+
+  double angleRad = vtkMath::AngleBetweenVectors(view.data(), up);
+  return 90.0 - vtkMath::DegreesFromRadians(angleRad);
+}
+
+//----------------------------------------------------------------------------
+double camera_impl::getDistance() const
+{
+  vector3_t v;
+  this->getPositionToFocalVector(v);
+  return vtkMath::Norm(v.data());
+}
+
+//----------------------------------------------------------------------------
 camera& camera_impl::setViewUp(const vector3_t& up)
 {
   vtkCamera* cam = this->GetVTKCamera();
