@@ -503,6 +503,12 @@ Scale fonts. Useful for HiDPI displays.
 
 CLI: `--font-scale`.
 
+### `ui.font_color` (_color_, optional)
+
+Set font color or use default one #F4F4F4(F3DWhite) if not set.
+
+CLI: `--font-color`.
+
 ### `ui.dpi_aware` (_bool_, default: `false`)
 
 Scale the _font scale_ and _resolution_ by the display scaling factor.

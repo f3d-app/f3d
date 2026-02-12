@@ -17,10 +17,10 @@ const inline ImVec4 intToImVec4(int rgb, int alpha = 255)
 const inline ImVec4 Vec3ToImVec4(const std::vector<double>& v, int alpha = 255)
 {
   return ImVec4{
-    v[0],
-    v[1],
-    v[2],
-    alpha / 255.f,
+    static_cast<float>(v[0]),
+    static_cast<float>(v[1]),
+    static_cast<float>(v[2]),
+    alpha / 255.f
   };
 }
 
