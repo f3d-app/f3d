@@ -2008,12 +2008,10 @@ void vtkF3DRenderer::SetUseOrthographicProjection(const std::optional<bool>& use
 //----------------------------------------------------------------------------
 void vtkF3DRenderer::SetInteractionStyle(const std::string& style)
 {
-  vtkRenderWindowInteractor* rwi = this->GetRenderWindow()
-    ? this->GetRenderWindow()->GetInteractor()
-    : nullptr;
-  auto* interactorStyle = rwi
-    ? vtkF3DInteractorStyle::SafeDownCast(rwi->GetInteractorStyle())
-    : nullptr;
+  vtkRenderWindowInteractor* rwi =
+    this->GetRenderWindow() ? this->GetRenderWindow()->GetInteractor() : nullptr;
+  auto* interactorStyle =
+    rwi ? vtkF3DInteractorStyle::SafeDownCast(rwi->GetInteractorStyle()) : nullptr;
 
   if (!interactorStyle)
   {
@@ -2034,8 +2032,8 @@ void vtkF3DRenderer::SetInteractionStyle(const std::string& style)
   }
   else
   {
-    F3DLog::Print(F3DLog::Severity::Warning,
-      "Unrecognized interaction style \"" + style + "\", using default");
+    F3DLog::Print(
+      F3DLog::Severity::Warning, "Unrecognized interaction style \"" + style + "\", using default");
     interactorStyle->SetInteractionMode(vtkF3DInteractorStyle::DEFAULT);
   }
 }
