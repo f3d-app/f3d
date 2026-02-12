@@ -5,17 +5,17 @@ f3d_test(NAME TestDRACOColoring DATA suzanne.drc ARGS --scalar-coloring --colori
 
 # Needs https://gitlab.kitware.com/vtk/vtk/-/merge_requests/10884
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240214)
-  f3d_test(NAME TestGLTFDracoImporter DATA Box_draco.gltf ARGS --load-plugins=draco --camera-position=-1.6,1.3,2.7)
+  f3d_test(NAME TestGLTFDracoImporter DATA Box_draco.glb ARGS --load-plugins=draco)
   f3d_test(NAME TestGLTFDracoImporterWithoutCompression DATA BoxAnimated.gltf ARGS --load-plugins=draco --animation-time=2 --animation-progress --force-reader=GLTFDraco)
 endif()
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.6.20260128)
   f3d_test(NAME TestPipedDRACO DATA suzanne.drc ARGS --load-plugins=draco PIPED)
-  f3d_test(NAME TestPipedGLTFDracoImporter DATA f3d.glb ARGS --load-plugins=draco PIPED) # TODO should be a glb using draco compression
+  f3d_test(NAME TestPipedGLTFDracoImporter DATA Box_draco.glb ARGS --load-plugins=draco PIPED)
 else()
   f3d_test(NAME TestPipedDRACO DATA suzanne.drc ARGS --load-plugins=draco --force-reader=Draco PIPED)
   if(VTK_VERSION VERSION_GREATER_EQUAL 9.5.20250923)
-    f3d_test(NAME TestPipedGLTFDracoImporter DATA f3d.glb ARGS --load-plugins=draco --force-reader=GLTFDraco PIPED)
+    f3d_test(NAME TestPipedGLTFDracoImporter DATA Box_draco.glb ARGS --load-plugins=draco --force-reader=GLTFDraco PIPED)
   endif()
 endif()
 
