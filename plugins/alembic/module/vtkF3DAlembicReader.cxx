@@ -47,7 +47,6 @@ struct IntermediateGeometry
   PerMeshWavefrontIndicesTripletsContainer Indices;
   bool uvFaceVarying = false;
   bool nFaceVarying = false;
-  std::vector<int> SourceIndices;
   std::vector<vtkIdType> PointSourceIds;
   std::vector<vtkIdType> NormalSourceIds;
 };
@@ -138,7 +137,6 @@ class vtkF3DAlembicReader::vtkInternals
             Alembic::Abc::V3f originalPosition =
               originalData.Attributes.at("P")[originalData.Indices[i][j].x];
             pV3F.emplace_back(originalPosition);
-            duplicatedData.SourceIndices.emplace_back(originalData.Indices[i][j].x);
             duplicatedData.Indices[i][j].x = pRunningIndex;
             duplicatedData.PointSourceIds.emplace_back(originalData.Indices[i][j].x);
             pRunningIndex++;
@@ -196,14 +194,6 @@ class vtkF3DAlembicReader::vtkInternals
     else
     {
       duplicatedData = originalData;
-      size_t numPoints = 0;
-      auto it = originalData.Attributes.find("P");
-      if (it != originalData.Attributes.end())
-      {
-        numPoints = it->second.size();
-      }
-      duplicatedData.SourceIndices.resize(numPoints);
-      std::iota(duplicatedData.SourceIndices.begin(), duplicatedData.SourceIndices.end(), 0);
     }
   }
 
