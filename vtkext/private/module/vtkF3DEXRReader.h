@@ -4,6 +4,8 @@
 #include "vtkImageReader.h"
 #include "vtkVersion.h"
 
+class vtkResourceStream;
+
 class vtkF3DEXRReader : public vtkImageReader
 {
 public:

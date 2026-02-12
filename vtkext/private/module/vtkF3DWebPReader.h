@@ -8,6 +8,8 @@
 #include "vtkImageReader.h"
 #include "vtkVersion.h"
 
+class vtkResourceStream;
+
 class vtkF3DWebPReader : public vtkImageReader
 {
 public:
