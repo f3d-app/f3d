@@ -320,6 +320,15 @@ scene& scene_impl::add(const std::byte* buffer, std::size_t size)
 
   // Recover the appropriate reader
   std::optional<std::string> forceReader = this->Internals->Options.scene.force_reader;
+
+#if VTK_VERSION_NUMBER < VTK_VERSION_CHECK(9, 6, 20260128)
+  if (!forceReader)
+  {
+    throw scene::load_failure_exception(
+      "No force reader set while trying to load a buffer from memory");
+  }
+#endif  
+
   const f3d::reader* reader = f3d::factory::instance()->getReader(buffer, size, forceReader);
   if (reader)
   {

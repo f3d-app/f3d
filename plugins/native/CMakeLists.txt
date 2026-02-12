@@ -67,7 +67,7 @@ endif()
 
 f3d_plugin_declare_reader(
   NAME GLTF
-  SCORE 80 # Good CanReadFile but lower priority than draco
+  SCORE 60 # higher priority than draco
   EXTENSIONS gltf
   MIMETYPES model/gltf+json
   VTK_IMPORTER vtkF3DGLTFImporter
@@ -76,9 +76,10 @@ f3d_plugin_declare_reader(
   STANDARD_CAN_READ
 )
 
+# GLB reader will be removed once VTK 9.6.0 support is dropped
 f3d_plugin_declare_reader(
   NAME GLB
-  SCORE 80 # Good CanReadFile but lower priority than draco
+  SCORE 60 # Highier priority than draco
   EXTENSIONS glb
   MIMETYPES model/gltf-binary
   VTK_IMPORTER vtkF3DGLTFImporter
@@ -271,7 +272,7 @@ f3d_plugin_declare_reader(
   MIMETYPES application/vnd.spz
   VTK_READER vtkF3DSPZReader
   FORMAT_DESCRIPTION "Compressed 3D gaussian splats"
-  SCORE 40 # CanReadFile is just a GunZip check
+  SCORE 40 # CanReadFile is just a gunzip check
   ${_SUPPORTS_STREAM}
   STANDARD_CAN_READ
 )
@@ -282,7 +283,7 @@ f3d_plugin_declare_reader(
   MIMETYPES application/vnd.splat
   VTK_READER vtkF3DSplatReader
   FORMAT_DESCRIPTION "3D Gaussian splats"
-  SCORE 40 # Any random correctly size file is a false positive
+  SCORE 40 # Any random correctly sized file is a false positive
   ${_SUPPORTS_STREAM}
   STANDARD_CAN_READ
 )

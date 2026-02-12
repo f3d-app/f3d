@@ -11,7 +11,7 @@ if(NOT APPLE OR VTK_VERSION VERSION_GREATER_EQUAL 9.3.0)
 endif()
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.3.20240707)
-  f3d_test(NAME TestAssimpValidation DATA Wolf.fbx ARGS --load-plugins=assimp REGEXP "Some of these files could not be loaded" NO_BASELINE)
+  f3d_test(NAME TestAssimpInvalid DATA invalid_truncated.fbx ARGS --load-plugins=assimp REGEXP "Some of these files could not be loaded" NO_BASELINE)
   f3d_test(NAME TestAssimpMetaDataImporter DATA duck.fbx ARGS --load-plugins=assimp -m UI)
 endif()
 

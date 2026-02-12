@@ -37,9 +37,9 @@ int TestSDKScene([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
   std::string world = std::string(argv[1]) + "data/" + worldFilename;
 
   // supports method
-  test("supported with empty filename", !sce.supports(empty));
-  test("supported with dummy filename", !sce.supports(dummy));
-  test("supported with non existent filename", sce.supports(nonExistent));
+  test("not supported with empty filename", !sce.supports(empty));
+  test("not supported with dummy filename", !sce.supports(dummy));
+  test("not supported with non existent filename", !sce.supports(nonExistent));
   test("supported with default scene format", sce.supports(cube));
   test("supported with full scene format", sce.supports(logo));
 
