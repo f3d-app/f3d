@@ -9,6 +9,7 @@ list(APPEND f3d_c_api_tests_list
   test_types_c_api.c
   test_utils_c_api.c
   test_window_c_api.c
+  test_context_c_api.c
 )
 
 if(VTK_VERSION VERSION_GREATER_EQUAL 9.4.20250501)
